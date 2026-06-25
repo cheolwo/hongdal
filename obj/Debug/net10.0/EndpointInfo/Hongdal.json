@@ -1,0 +1,2484 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Hongdal | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:7117"
+    },
+    {
+      "url": "http://localhost:5104"
+    }
+  ],
+  "paths": {
+    "/api/v1/payments": {
+      "get": {
+        "tags": [
+          "화주결제"
+        ],
+        "parameters": [
+          {
+            "name": "결제상태",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "의뢰Id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/toss/prepare": {
+      "post": {
+        "tags": [
+          "화주결제"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/토스결제준비요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/토스결제준비요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/토스결제준비요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/toss/confirm": {
+      "post": {
+        "tags": [
+          "화주결제"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/토스결제승인요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/토스결제승인요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/토스결제승인요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/shipper/requests": {
+      "get": {
+        "tags": [
+          "화주운송의뢰"
+        ],
+        "parameters": [
+          {
+            "name": "shipperId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "paymentStatus",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dispatchStatus",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "화주운송의뢰"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/화주운송의뢰생성요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/화주운송의뢰생성요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/화주운송의뢰생성요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/shipper/requests/{requestId}": {
+      "get": {
+        "tags": [
+          "화주운송의뢰"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "화주운송의뢰"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/화주운송의뢰수정요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/화주운송의뢰수정요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/화주운송의뢰수정요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "화주운송의뢰"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/{driverId}/shifts/start": {
+      "post": {
+        "tags": [
+          "기사근무"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/근무시작요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/근무시작요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/근무시작요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/{driverId}/shifts/reserve": {
+      "post": {
+        "tags": [
+          "기사근무"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/근무시작요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/근무시작요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/근무시작요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/{driverId}/shifts/{id}": {
+      "get": {
+        "tags": [
+          "기사근무"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/{driverId}/dispatches/confirm": {
+      "post": {
+        "tags": [
+          "기사근무"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차확정요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차확정요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차확정요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/{driverId}/monthly-settlements/current": {
+      "get": {
+        "tags": [
+          "기사월정산"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/{driverId}/monthly-settlements/{year}/{month}/mark-paid": {
+      "post": {
+        "tags": [
+          "기사월정산"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/register": {
+      "post": {
+        "tags": [
+          "용달기사"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/용달기사등록요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/용달기사등록요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/용달기사등록요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/me": {
+      "get": {
+        "tags": [
+          "용달기사"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/dispatch-plans": {
+      "post": {
+        "tags": [
+          "배차계획신청"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차계획신청요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차계획신청요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차계획신청요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/dispatch-plans/{id}": {
+      "put": {
+        "tags": [
+          "배차계획신청"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차계획수정요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차계획수정요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차계획수정요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/dispatch-plans/{id}/cancel": {
+      "post": {
+        "tags": [
+          "배차계획신청"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/drivers/dispatch-plans/me": {
+      "get": {
+        "tags": [
+          "배차계획신청"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "인증"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/로그인요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/로그인요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/로그인요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "인증"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/토큰갱신요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/토큰갱신요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/토큰갱신요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/files/upload": {
+      "post": {
+        "tags": [
+          "파일업로드"
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "File": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  },
+                  "Folder": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dashboard": {
+      "get": {
+        "tags": [
+          "관리자대시보드"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/drivers": {
+      "get": {
+        "tags": [
+          "기사관리"
+        ],
+        "parameters": [
+          {
+            "name": "운행상태",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "차량종류",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "활동지역검색어",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/drivers/{driverId}": {
+      "get": {
+        "tags": [
+          "기사관리"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/drivers/{driverId}/dispatches": {
+      "get": {
+        "tags": [
+          "기사관리"
+        ],
+        "parameters": [
+          {
+            "name": "driverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/drivers/operating": {
+      "get": {
+        "tags": [
+          "기사운행현황"
+        ],
+        "parameters": [
+          {
+            "name": "운행상태",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "기사명검색어",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "활동지역검색어",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/driver-settlements": {
+      "get": {
+        "tags": [
+          "기사월정산관리"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "driverId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dispatch-plans": {
+      "get": {
+        "tags": [
+          "배차계획관리"
+        ],
+        "parameters": [
+          {
+            "name": "기사Id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "상태",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "신청일From",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "신청일To",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dispatch-plans/{id}": {
+      "get": {
+        "tags": [
+          "배차계획관리"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/wait": {
+      "get": {
+        "tags": [
+          "배차대기"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "배차대기"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차대기요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차대기요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차대기요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/dispatch/wait/{id}": {
+      "get": {
+        "tags": [
+          "배차대기"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "배차대기"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차대기요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차대기요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/배차대기요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "배차대기"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/partners/companies": {
+      "get": {
+        "tags": [
+          "업체화주관리"
+        ],
+        "parameters": [
+          {
+            "name": "상태",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/partners/shippers": {
+      "get": {
+        "tags": [
+          "업체화주관리"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/transport-events": {
+      "get": {
+        "tags": [
+          "운송이벤트"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "운송이벤트"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운송이벤트요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운송이벤트요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/운송이벤트요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/transport-events/{id}": {
+      "get": {
+        "tags": [
+          "운송이벤트"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "운송이벤트"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운송이벤트요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운송이벤트요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/운송이벤트요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "운송이벤트"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/transports": {
+      "get": {
+        "tags": [
+          "운송진행관리"
+        ],
+        "parameters": [
+          {
+            "name": "상태",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/transports/events": {
+      "get": {
+        "tags": [
+          "운송진행관리"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/fare-configurations": {
+      "get": {
+        "tags": [
+          "운임구성"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "운임구성"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운임구성요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운임구성요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/운임구성요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/fare-configurations/{id}": {
+      "get": {
+        "tags": [
+          "운임구성"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "운임구성"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운임구성요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/운임구성요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/운임구성요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "운임구성"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/vehicle-rates": {
+      "get": {
+        "tags": [
+          "차량단가"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "차량단가"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/차량단가요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/차량단가요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/차량단가요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/vehicle-rates/{id}": {
+      "get": {
+        "tags": [
+          "차량단가"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "차량단가"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/차량단가요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/차량단가요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/차량단가요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "차량단가"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files/pod/upload": {
+      "post": {
+        "tags": [
+          "파일POD관리"
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "File": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  },
+                  "FileType": {
+                    "type": "string"
+                  },
+                  "RequestId": {
+                    "type": "string"
+                  },
+                  "Folder": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files/pod": {
+      "get": {
+        "tags": [
+          "파일POD관리"
+        ],
+        "parameters": [
+          {
+            "name": "fileType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/files/pod/{id}/status": {
+      "patch": {
+        "tags": [
+          "파일POD관리"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/파일POD상태변경요청"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/파일POD상태변경요청"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/파일POD상태변경요청"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "근무시작요청": {
+        "type": "object",
+        "properties": {
+          "시작모드": {
+            "type": "string"
+          },
+          "시작시각": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "시작위치": {
+            "type": "string"
+          },
+          "복귀지": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "로그인요청": {
+        "type": "object",
+        "properties": {
+          "userNameOrEmail": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "배차계획수정요청": {
+        "type": "object",
+        "properties": {
+          "출발지": {
+            "type": "string"
+          },
+          "복귀지": {
+            "type": "string"
+          },
+          "희망복귀시각": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "배차가능시각": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "메모": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "배차계획신청요청": {
+        "type": "object",
+        "properties": {
+          "출발지": {
+            "type": "string"
+          },
+          "복귀지": {
+            "type": "string"
+          },
+          "희망복귀시각": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "배차가능시각": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "메모": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "배차대기요청": {
+        "type": "object",
+        "properties": {
+          "의뢰Id": {
+            "type": "string"
+          },
+          "화주Id": {
+            "type": "string"
+          },
+          "픽업_도로명주소": {
+            "type": "string"
+          },
+          "픽업_상세주소": {
+            "type": "string"
+          },
+          "픽업_위도": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "픽업_경도": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "하차_도로명주소": {
+            "type": "string"
+          },
+          "하차_상세주소": {
+            "type": "string"
+          },
+          "하차_위도": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "하차_경도": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "상태": {
+            "type": "string"
+          }
+        }
+      },
+      "배차확정요청": {
+        "type": "object",
+        "properties": {
+          "의뢰Id": {
+            "type": "string"
+          }
+        }
+      },
+      "용달기사등록요청": {
+        "type": "object",
+        "properties": {
+          "기사명": {
+            "type": "string"
+          },
+          "연락처": {
+            "type": "string"
+          },
+          "차량": {
+            "type": "string"
+          },
+          "주_활동지역": {
+            "type": "string"
+          },
+          "상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "메모": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "운송이벤트요청": {
+        "type": "object",
+        "properties": {
+          "의뢰Id": {
+            "type": "string"
+          },
+          "이벤트타입": {
+            "type": "string"
+          },
+          "이벤트시각": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "메타데이터": {
+            "type": "string"
+          }
+        }
+      },
+      "운임구성요청": {
+        "type": "object",
+        "properties": {
+          "의뢰Id": {
+            "type": "string"
+          },
+          "기본운임": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "거리운임": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "할증": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "대기료": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "수작업비": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "최종운임": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "차량단가요청": {
+        "type": "object",
+        "properties": {
+          "차량종류": {
+            "type": "string"
+          },
+          "기본운임": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "km당단가": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "야간할증": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "우천할증": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "최소운임": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "토스결제승인요청": {
+        "type": "object",
+        "properties": {
+          "paymentKey": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "토스결제준비요청": {
+        "type": "object",
+        "properties": {
+          "의뢰Id": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "토큰갱신요청": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "파일POD상태변경요청": {
+        "type": "object",
+        "properties": {
+          "uploadStatus": {
+            "type": "string"
+          }
+        }
+      },
+      "화주운송의뢰생성요청": {
+        "type": "object",
+        "properties": {
+          "화주Id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "운송방식": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "화물": {
+            "$ref": "#/components/schemas/CargoDTO"
+          },
+          "픽업": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationContactDTO"
+              }
+            ]
+          },
+          "하차": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationContactDTO"
+              }
+            ]
+          },
+          "요금옵션": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PricingDTO"
+              }
+            ]
+          },
+          "클라이언트요청Id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "결제상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "화주운송의뢰수정요청": {
+        "type": "object",
+        "properties": {
+          "운송방식": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "화물": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CargoDTO"
+              }
+            ]
+          },
+          "픽업": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationContactDTO"
+              }
+            ]
+          },
+          "하차": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationContactDTO"
+              }
+            ]
+          },
+          "요금옵션": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PricingDTO"
+              }
+            ]
+          },
+          "결제상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "배차상태": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AddressDTO": {
+        "type": "object",
+        "properties": {
+          "도로명주소": {
+            "type": "string"
+          },
+          "상세주소": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "위도": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "경도": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "CargoDTO": {
+        "type": "object",
+        "properties": {
+          "화물종류": {
+            "type": "string"
+          },
+          "설명": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "수량": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "중량Kg": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "부피Cbm": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "화물파손주의여부": {
+            "type": "boolean"
+          },
+          "온도조건": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ContactDTO": {
+        "type": "object",
+        "properties": {
+          "이름": {
+            "type": "string"
+          },
+          "전화번호": {
+            "type": "string"
+          }
+        }
+      },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary"
+      },
+      "LocationContactDTO": {
+        "type": "object",
+        "properties": {
+          "주소": {
+            "$ref": "#/components/schemas/AddressDTO"
+          },
+          "연락처": {
+            "$ref": "#/components/schemas/ContactDTO"
+          },
+          "시간창": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TimeWindowDTO"
+              }
+            ]
+          }
+        }
+      },
+      "PricingDTO": {
+        "type": "object",
+        "properties": {
+          "서비스레벨": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "요청사항": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "대기료": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "수작업비": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "할증": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "TimeWindowDTO": {
+        "type": "object",
+        "properties": {
+          "시작일시": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "종료일시": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "화주결제"
+    },
+    {
+      "name": "화주운송의뢰"
+    },
+    {
+      "name": "기사근무"
+    },
+    {
+      "name": "기사월정산"
+    },
+    {
+      "name": "용달기사"
+    },
+    {
+      "name": "배차계획신청"
+    },
+    {
+      "name": "인증"
+    },
+    {
+      "name": "파일업로드"
+    },
+    {
+      "name": "관리자대시보드"
+    },
+    {
+      "name": "기사관리"
+    },
+    {
+      "name": "기사운행현황"
+    },
+    {
+      "name": "기사월정산관리"
+    },
+    {
+      "name": "배차계획관리"
+    },
+    {
+      "name": "배차대기"
+    },
+    {
+      "name": "업체화주관리"
+    },
+    {
+      "name": "운송이벤트"
+    },
+    {
+      "name": "운송진행관리"
+    },
+    {
+      "name": "운임구성"
+    },
+    {
+      "name": "차량단가"
+    },
+    {
+      "name": "파일POD관리"
+    }
+  ]
+}

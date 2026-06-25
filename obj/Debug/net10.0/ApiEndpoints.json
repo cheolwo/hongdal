@@ -1,0 +1,1057 @@
+[
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uAD00\uB9AC\uC790\uB300\uC2DC\uBCF4\uB4DCController",
+    "Method": "\uC694\uC57D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uACC4\uD68D\uAD00\uB9ACController",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/dispatch-plans",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "\uAE30\uC0ACId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uC0C1\uD0DC",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uC2E0\uCCAD\uC77CFrom",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uC2E0\uCCAD\uC77CTo",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uACC4\uD68D\uAD00\uB9ACController",
+    "Method": "\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/admin/dispatch-plans/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uAE30\uC0AC\uC6D4\uC815\uC0B0\uAD00\uB9ACController",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/driver-settlements",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uAE30\uC0AC\uAD00\uB9ACController",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/drivers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "\uC6B4\uD589\uC0C1\uD0DC",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uCC28\uB7C9\uC885\uB958",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uD65C\uB3D9\uC9C0\uC5ED\uAC80\uC0C9\uC5B4",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uAE30\uC0AC\uAD00\uB9ACController",
+    "Method": "\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/admin/drivers/{driverId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uAE30\uC0AC\uAD00\uB9ACController",
+    "Method": "\uAE30\uC0AC\uBCC4\uBC30\uCC28\uB0B4\uC5ED",
+    "RelativePath": "api/v1/admin/drivers/{driverId}/dispatches",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uAE30\uC0AC\uC6B4\uD589\uD604\uD669Controller",
+    "Method": "\uD604\uC7AC\uC6B4\uD589\uAE30\uC0AC\uC870\uD68C",
+    "RelativePath": "api/v1/admin/drivers/operating",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "\uC6B4\uD589\uC0C1\uD0DC",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uAE30\uC0AC\uBA85\uAC80\uC0C9\uC5B4",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uD65C\uB3D9\uC9C0\uC5ED\uAC80\uC0C9\uC5B4",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uD30C\uC77CPOD\uAD00\uB9ACController",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/files/pod",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fileType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "requestId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uD30C\uC77CPOD\uAD00\uB9ACController",
+    "Method": "\uC5C5\uB85C\uB4DC\uC0C1\uD0DC\uBCC0\uACBD",
+    "RelativePath": "api/v1/admin/files/pod/{id}/status",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uD30C\uC77CPOD\uC0C1\uD0DC\uBCC0\uACBD\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uD30C\uC77CPOD\uAD00\uB9ACController",
+    "Method": "\uC5C5\uB85C\uB4DC",
+    "RelativePath": "api/v1/admin/files/pod/upload",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "File",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "FileType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "RequestId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Folder",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC5C5\uCCB4\uD654\uC8FC\uAD00\uB9ACController",
+    "Method": "\uC5C5\uCCB4\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/partners/companies",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "\uC0C1\uD0DC",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC5C5\uCCB4\uD654\uC8FC\uAD00\uB9ACController",
+    "Method": "\uD654\uC8FC\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/partners/shippers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC9C4\uD589\uAD00\uB9ACController",
+    "Method": "\uC6B4\uC1A1\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/admin/transports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "\uC0C1\uD0DC",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC9C4\uD589\uAD00\uB9ACController",
+    "Method": "\uC6B4\uC1A1\uC774\uBCA4\uD2B8\uC870\uD68C",
+    "RelativePath": "api/v1/admin/transports/events",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Common.\uC778\uC99DController",
+    "Method": "\uB85C\uADF8\uC778",
+    "RelativePath": "api/v1/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Common.\uB85C\uADF8\uC778\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Common.\uC778\uC99DController",
+    "Method": "\uD1A0\uD070\uAC31\uC2E0",
+    "RelativePath": "api/v1/auth/refresh",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Common.\uD1A0\uD070\uAC31\uC2E0\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30Controller",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/dispatch/wait",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30Controller",
+    "Method": "\uC0DD\uC131",
+    "RelativePath": "api/v1/dispatch/wait",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30Controller",
+    "Method": "\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/dispatch/wait/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30Controller",
+    "Method": "\uC218\uC815",
+    "RelativePath": "api/v1/dispatch/wait/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uBC30\uCC28\uB300\uAE30Controller",
+    "Method": "\uC0AD\uC81C",
+    "RelativePath": "api/v1/dispatch/wait/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uAE30\uC0AC\uADFC\uBB34Controller",
+    "Method": "\uBC30\uCC28\uD655\uC815",
+    "RelativePath": "api/v1/drivers/{driverId}/dispatches/confirm",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Driver.\uBC30\uCC28\uD655\uC815\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uAE30\uC0AC\uC6D4\uC815\uC0B0Controller",
+    "Method": "\uACB0\uC81C\uC644\uB8CC\uCC98\uB9AC",
+    "RelativePath": "api/v1/drivers/{driverId}/monthly-settlements/{year}/{month}/mark-paid",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uAE30\uC0AC\uC6D4\uC815\uC0B0Controller",
+    "Method": "\uB2F9\uC6D4\uC870\uD68C",
+    "RelativePath": "api/v1/drivers/{driverId}/monthly-settlements/current",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uAE30\uC0AC\uADFC\uBB34Controller",
+    "Method": "\uADFC\uBB34\uC870\uD68C",
+    "RelativePath": "api/v1/drivers/{driverId}/shifts/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uAE30\uC0AC\uADFC\uBB34Controller",
+    "Method": "\uADFC\uBB34\uC608\uC57D",
+    "RelativePath": "api/v1/drivers/{driverId}/shifts/reserve",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "req",
+        "Type": "Hongdal.Controllers.Driver.\uADFC\uBB34\uC2DC\uC791\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uAE30\uC0AC\uADFC\uBB34Controller",
+    "Method": "\uADFC\uBB34\uC2DC\uC791",
+    "RelativePath": "api/v1/drivers/{driverId}/shifts/start",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "driverId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "req",
+        "Type": "Hongdal.Controllers.Driver.\uADFC\uBB34\uC2DC\uC791\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uBC30\uCC28\uACC4\uD68D\uC2E0\uCCADController",
+    "Method": "\uBC30\uCC28\uACC4\uD68D\uC2E0\uCCAD",
+    "RelativePath": "api/v1/drivers/dispatch-plans",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Driver.\uBC30\uCC28\uACC4\uD68D\uC2E0\uCCAD\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uBC30\uCC28\uACC4\uD68D\uC2E0\uCCADController",
+    "Method": "\uBC30\uCC28\uACC4\uD68D\uC218\uC815",
+    "RelativePath": "api/v1/drivers/dispatch-plans/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Driver.\uBC30\uCC28\uACC4\uD68D\uC218\uC815\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uBC30\uCC28\uACC4\uD68D\uC2E0\uCCADController",
+    "Method": "\uBC30\uCC28\uACC4\uD68D\uCDE8\uC18C",
+    "RelativePath": "api/v1/drivers/dispatch-plans/{id}/cancel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uBC30\uCC28\uACC4\uD68D\uC2E0\uCCADController",
+    "Method": "\uB0B4\uBC30\uCC28\uACC4\uD68D\uC870\uD68C",
+    "RelativePath": "api/v1/drivers/dispatch-plans/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uC6A9\uB2EC\uAE30\uC0ACController",
+    "Method": "\uB0B4\uC6A9\uB2EC\uAE30\uC0AC\uC870\uD68C",
+    "RelativePath": "api/v1/drivers/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Driver.\uC6A9\uB2EC\uAE30\uC0ACController",
+    "Method": "\uC6A9\uB2EC\uAE30\uC0AC\uB4F1\uB85D",
+    "RelativePath": "api/v1/drivers/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Driver.\uC6A9\uB2EC\uAE30\uC0AC\uB4F1\uB85D\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131Controller",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/fare-configurations",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131Controller",
+    "Method": "\uC0DD\uC131",
+    "RelativePath": "api/v1/fare-configurations",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131Controller",
+    "Method": "\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/fare-configurations/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131Controller",
+    "Method": "\uC218\uC815",
+    "RelativePath": "api/v1/fare-configurations/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC784\uAD6C\uC131Controller",
+    "Method": "\uC0AD\uC81C",
+    "RelativePath": "api/v1/fare-configurations/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Common.\uD30C\uC77C\uC5C5\uB85C\uB4DCController",
+    "Method": "\uC5C5\uB85C\uB4DC",
+    "RelativePath": "api/v1/files/upload",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "File",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "Folder",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uACB0\uC81CController",
+    "Method": "\uACB0\uC81C\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/payments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "\uACB0\uC81C\uC0C1\uD0DC",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "\uC758\uB8B0Id",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uACB0\uC81CController",
+    "Method": "\uD1A0\uC2A4\uACB0\uC81C\uC2B9\uC778",
+    "RelativePath": "api/v1/payments/toss/confirm",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Shipper.\uD1A0\uC2A4\uACB0\uC81C\uC2B9\uC778\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uACB0\uC81CController",
+    "Method": "\uD1A0\uC2A4\uACB0\uC81C\uC900\uBE44",
+    "RelativePath": "api/v1/payments/toss/prepare",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Shipper.\uD1A0\uC2A4\uACB0\uC81C\uC900\uBE44\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0Controller",
+    "Method": "\uC758\uB8B0\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/shipper/requests",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "shipperId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "paymentStatus",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "dispatchStatus",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0Controller",
+    "Method": "\uC758\uB8B0\uC0DD\uC131",
+    "RelativePath": "api/v1/shipper/requests",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0\uC0DD\uC131\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0Controller",
+    "Method": "\uC758\uB8B0\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/shipper/requests/{requestId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0Controller",
+    "Method": "\uC758\uB8B0\uC218\uC815",
+    "RelativePath": "api/v1/shipper/requests/{requestId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "req",
+        "Type": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0\uC218\uC815\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Shipper.\uD654\uC8FC\uC6B4\uC1A1\uC758\uB8B0Controller",
+    "Method": "\uC758\uB8B0\uC0AD\uC81C",
+    "RelativePath": "api/v1/shipper/requests/{requestId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8Controller",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/transport-events",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8Controller",
+    "Method": "\uC0DD\uC131",
+    "RelativePath": "api/v1/transport-events",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8Controller",
+    "Method": "\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/transport-events/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8Controller",
+    "Method": "\uC218\uC815",
+    "RelativePath": "api/v1/transport-events/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uC6B4\uC1A1\uC774\uBCA4\uD2B8Controller",
+    "Method": "\uC0AD\uC81C",
+    "RelativePath": "api/v1/transport-events/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00Controller",
+    "Method": "\uBAA9\uB85D\uC870\uD68C",
+    "RelativePath": "api/v1/vehicle-rates",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00Controller",
+    "Method": "\uC0DD\uC131",
+    "RelativePath": "api/v1/vehicle-rates",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00Controller",
+    "Method": "\uB2E8\uAC74\uC870\uD68C",
+    "RelativePath": "api/v1/vehicle-rates/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00Controller",
+    "Method": "\uC218\uC815",
+    "RelativePath": "api/v1/vehicle-rates/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00\uC694\uCCAD",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Hongdal.Controllers.Admin.\uCC28\uB7C9\uB2E8\uAC00Controller",
+    "Method": "\uC0AD\uC81C",
+    "RelativePath": "api/v1/vehicle-rates/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

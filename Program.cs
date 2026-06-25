@@ -1,0 +1,312 @@
+using System.Text;
+using System.Data.Common;
+using Hongdal.Hubs;
+using Hongdal.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using StackExchange.Redis;
+using 홍달.Data;
+using 홍달.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+var isRunningInContainer = string.Equals(
+    Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
+
+builder.Services.AddControllers();
+builder.Services.AddSignalR();
+builder.Services.AddOpenApi();
+
+var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
+{
+    throw new InvalidOperationException("Jwt:SecretKey configuration is required.");
+}
+
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.AddScoped<AuthTokenService>();
+
+var tossOptions = builder.Configuration.GetSection(TossPaymentsOptions.SectionName).Get<TossPaymentsOptions>() ?? new TossPaymentsOptions();
+if (string.IsNullOrWhiteSpace(tossOptions.SecretKey))
+{
+    throw new InvalidOperationException("TossPayments:SecretKey configuration is required.");
+}
+
+builder.Services.Configure<TossPaymentsOptions>(builder.Configuration.GetSection(TossPaymentsOptions.SectionName));
+builder.Services.Configure<GoogleCloudStorageOptions>(builder.Configuration.GetSection(GoogleCloudStorageOptions.SectionName));
+builder.Services.Configure<기사이용료정책Options>(builder.Configuration.GetSection(기사이용료정책Options.SectionName));
+builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
+builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
+builder.Services.Configure<PushNotificationsOptions>(builder.Configuration.GetSection(PushNotificationsOptions.SectionName));
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                       ?? (isRunningInContainer
+                           ? "server=mysql;port=3306;database=hongdal_dev;user=hongdal;password=passw0rd;"
+                           : "server=127.0.0.1;port=13306;database=hongdal_dev;user=hongdal;password=passw0rd;");
+builder.Services.AddDbContext<HongdalContext>(options =>
+    options.UseMySql(
+        connectionString,
+        new MySqlServerVersion(new Version(8, 4, 0)),
+        mysqlOptions => mysqlOptions.EnableRetryOnFailure()));
+
+var redisConnectionString = builder.Configuration.GetSection(RedisOptions.SectionName).GetValue<string>(nameof(RedisOptions.ConnectionString))
+                            ?? Environment.GetEnvironmentVariable("Redis__ConnectionString")
+                            ?? (isRunningInContainer ? "redis:6379" : "127.0.0.1:16379");
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
+
+var mongoOptions = builder.Configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();
+var mongoConnectionString = string.IsNullOrWhiteSpace(mongoOptions.ConnectionString)
+    ? Environment.GetEnvironmentVariable("MongoDb__ConnectionString") ?? (isRunningInContainer
+        ? "mongodb://hongdal:passw0rd@mongo:27017/?authSource=admin"
+        : "mongodb://hongdal:passw0rd@127.0.0.1:27017/?authSource=admin")
+    : mongoOptions.ConnectionString;
+builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+    })
+    .AddEntityFrameworkStores<HongdalContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/hubs/dispatch-recommendations"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("서버관리자전용", policy => policy.RequireRole(역할명.서버관리자));
+});
+
+builder.Services.AddHttpClient<IGeocodingService, GoogleGeocodingService>();
+builder.Services.AddHttpClient<IRouteDistanceService, GoogleRouteDistanceService>();
+builder.Services.AddHttpClient<ITossPaymentsService, TossPaymentsService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<TossPaymentsOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+builder.Services.AddHttpClient<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();
+builder.Services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
+builder.Services.AddSingleton<IDriverLocationStore, DriverLocationStore>();
+builder.Services.AddSingleton<IDriverWorkQueueStore, RedisDriverWorkQueueStore>();
+builder.Services.AddSingleton<IDriverRejectedRequestStore, RedisDriverRejectedRequestStore>();
+builder.Services.AddSingleton<IDriverPushTokenStore, RedisDriverPushTokenStore>();
+builder.Services.AddSingleton<IDriverRecommendationPushStateStore, RedisDriverRecommendationPushStateStore>();
+builder.Services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>();
+builder.Services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
+builder.Services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
+builder.Services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
+builder.Services.AddScoped<IDispatchRecommendationService, DispatchRecommendationService>();
+builder.Services.AddScoped<INationalDispatchRequestService, NationalDispatchRequestService>();
+builder.Services.AddScoped<I기사월정산Service, 기사월정산Service>();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<HongdalContext>();
+    await InitializeDatabaseAsync(db, app.Services, app.Logger);
+}
+
+if (!isRunningInContainer)
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
+
+app.Run();
+
+static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider services, ILogger logger)
+{
+    var migrationDelays = new[]
+    {
+        TimeSpan.FromSeconds(2),
+        TimeSpan.FromSeconds(5),
+        TimeSpan.FromSeconds(10),
+        TimeSpan.FromSeconds(20),
+        TimeSpan.FromSeconds(30)
+    };
+
+    for (var attempt = 0; attempt <= migrationDelays.Length; attempt++)
+    {
+        try
+        {
+            await db.Database.MigrateAsync();
+            break;
+        }
+        catch (Exception ex) when (attempt < migrationDelays.Length)
+        {
+            var delay = migrationDelays[attempt];
+            logger.LogWarning(ex, "MySQL migration failed on attempt {Attempt}. Retrying in {Delay}.", attempt + 1, delay);
+            await Task.Delay(delay);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "MySQL migration failed after {Attempt} attempts. Application will continue without applying migrations at startup.", attempt + 1);
+            return;
+        }
+    }
+
+    await EnsureIdentityCompatibilityAsync(db, logger);
+    await EnsureVehicleRateCompatibilityAsync(db, logger);
+
+    try
+    {
+        await IdentityDataSeeder.SeedAsync(services);
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Identity data seeding failed after database migration.");
+    }
+}
+
+static async Task EnsureIdentityCompatibilityAsync(HongdalContext db, ILogger logger)
+{
+    var connection = db.Database.GetDbConnection();
+
+    try
+    {
+        await db.Database.OpenConnectionAsync();
+
+        if (!await ColumnExistsAsync(connection, "AspNetUsers", "BusinessRegistrationNumber"))
+        {
+            await using var alterCommand = connection.CreateCommand();
+            alterCommand.CommandText = "ALTER TABLE `AspNetUsers` ADD COLUMN `BusinessRegistrationNumber` varchar(256) NULL;";
+            await alterCommand.ExecuteNonQueryAsync();
+            logger.LogWarning("Added missing column AspNetUsers.BusinessRegistrationNumber.");
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Identity schema compatibility check failed.");
+    }
+    finally
+    {
+        await db.Database.CloseConnectionAsync();
+    }
+}
+
+static async Task<bool> ColumnExistsAsync(DbConnection connection, string tableName, string columnName)
+{
+    await using var command = connection.CreateCommand();
+    command.CommandText = @"
+SELECT COUNT(*)
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE()
+  AND TABLE_NAME = @tableName
+  AND COLUMN_NAME = @columnName;";
+
+    var tableParam = command.CreateParameter();
+    tableParam.ParameterName = "@tableName";
+    tableParam.Value = tableName;
+    command.Parameters.Add(tableParam);
+
+    var columnParam = command.CreateParameter();
+    columnParam.ParameterName = "@columnName";
+    columnParam.Value = columnName;
+    command.Parameters.Add(columnParam);
+
+    var result = await command.ExecuteScalarAsync();
+    return Convert.ToInt32(result) > 0;
+}
+
+static async Task EnsureVehicleRateCompatibilityAsync(HongdalContext db, ILogger logger)
+{
+    var connection = db.Database.GetDbConnection();
+
+    try
+    {
+        await db.Database.OpenConnectionAsync();
+
+        if (!await TableExistsAsync(connection, "차량단가"))
+        {
+            await using var createCommand = connection.CreateCommand();
+            createCommand.CommandText = @"
+CREATE TABLE `차량단가` (
+    `차량종류` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
+    PRIMARY KEY (`차량종류`)
+) CHARACTER SET=utf8mb4;";
+            await createCommand.ExecuteNonQueryAsync();
+            logger.LogWarning("Created missing table 차량단가.");
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Vehicle rate schema compatibility check failed.");
+    }
+    finally
+    {
+        await db.Database.CloseConnectionAsync();
+    }
+}
+
+static async Task<bool> TableExistsAsync(DbConnection connection, string tableName)
+{
+    await using var command = connection.CreateCommand();
+    command.CommandText = @"
+SELECT COUNT(*)
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = DATABASE()
+  AND TABLE_NAME = @tableName;";
+
+    var tableParam = command.CreateParameter();
+    tableParam.ParameterName = "@tableName";
+    tableParam.Value = tableName;
+    command.Parameters.Add(tableParam);
+
+    var result = await command.ExecuteScalarAsync();
+    return Convert.ToInt32(result) > 0;
+}
