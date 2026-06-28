@@ -7,7 +7,6 @@ Hongdal은 .NET 10 기반의 물류/배차 도메인 솔루션이다.
 - 관리자, 기사, 화주 역할을 기준으로 컨트롤러를 분리한다.
 - 기사 업무 흐름은 `01_Work → 02_Recommendation → 03_Action → 04_Progress → 05_Settings → 06_Settlement → 07_Notification` 순서로 정리한다.
 - 화주 결제는 Toss Payments 승인 확인이 끝난 뒤에만 `배차대기`를 생성하는 방식으로 유지한다.
-- 공유 계약은 `Hongdal.Contracts` 프로젝트에서 분리해 관리한다.
 
 ## DB 구조도
 
