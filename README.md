@@ -114,19 +114,6 @@ flowchart TD
 	L -->|아니오| N[대기 상태]
 ```
 
-## 기사 홈 데이터 흐름
-
-```mermaid
-flowchart LR
-	A[기사 홈 페이지] --> B[api/v1/driver/home 호출]
-	B --> C[기사홈요약응답]
-	C --> D[기사홈ViewModel.From()]
-	D --> E[MudBlazor UI 렌더링]
-	E --> F[주요 행동 버튼]
-	E --> G[오늘 할 일 목록]
-	E --> H[정산 요약]
-```
-
 ## 지도/추천 상호작용 흐름
 
 ```mermaid
