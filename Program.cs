@@ -10,12 +10,15 @@ using MongoDB.Driver;
 using StackExchange.Redis;
 using 홍달.Data;
 using 홍달.Services;
+using 홍달.Services.Dispatch.Recommendation;
 
 var builder = WebApplication.CreateBuilder(args);
 var isRunningInContainer = string.Equals(
     Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"),
     "true",
     StringComparison.OrdinalIgnoreCase);
+
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
@@ -38,6 +41,11 @@ if (string.IsNullOrWhiteSpace(tossOptions.SecretKey))
 
 builder.Services.Configure<TossPaymentsOptions>(builder.Configuration.GetSection(TossPaymentsOptions.SectionName));
 builder.Services.Configure<GoogleCloudStorageOptions>(builder.Configuration.GetSection(GoogleCloudStorageOptions.SectionName));
+builder.Services.Configure<NaverCloudDirectionsOptions>(builder.Configuration.GetSection(NaverCloudDirectionsOptions.SectionName));
+builder.Services.Configure<OpinetOptions>(builder.Configuration.GetSection(OpinetOptions.SectionName));
+builder.Services.Configure<NtsBusinessRegistrationOptions>(builder.Configuration.GetSection(NtsBusinessRegistrationOptions.SectionName));
+builder.Services.Configure<해외제조업소조회Options>(builder.Configuration.GetSection(해외제조업소조회Options.SectionName));
+builder.Services.Configure<수입식품제품조회Options>(builder.Configuration.GetSection(수입식품제품조회Options.SectionName));
 builder.Services.Configure<기사이용료정책Options>(builder.Configuration.GetSection(기사이용료정책Options.SectionName));
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
@@ -123,6 +131,31 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddHttpClient<IGeocodingService, GoogleGeocodingService>();
 builder.Services.AddHttpClient<IRouteDistanceService, GoogleRouteDistanceService>();
+builder.Services.AddHttpClient<INaverCloudDirectionsService, NaverCloudDirectionsService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<NaverCloudDirectionsOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+builder.Services.AddHttpClient<IOpinetAveragePriceService, OpinetAveragePriceService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OpinetOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+builder.Services.AddHttpClient<INtsBusinessRegistrationService, NtsBusinessRegistrationService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<NtsBusinessRegistrationOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+builder.Services.AddHttpClient<I해외제조업소조회Service, 해외제조업소조회Service>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<해외제조업소조회Options>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+builder.Services.AddHttpClient<I수입식품제품조회Service, 수입식품제품조회Service>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<수입식품제품조회Options>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
 builder.Services.AddHttpClient<ITossPaymentsService, TossPaymentsService>((sp, client) =>
 {
     var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<TossPaymentsOptions>>().Value;
@@ -139,7 +172,13 @@ builder.Services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>(
 builder.Services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
 builder.Services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
 builder.Services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
-builder.Services.AddScoped<IDispatchRecommendationService, DispatchRecommendationService>();
+builder.Services.AddScoped<I배차추천경로Service, 배차추천경로Service>();
+builder.Services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
+builder.Services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
+builder.Services.AddScoped<I차량화물적합성Service, 차량화물적합성Service>();
+builder.Services.AddScoped<I배차추천Service, 배차추천Service>();
+builder.Services.AddScoped<I운행중배차추천Service, 운행중배차추천Service>();
+builder.Services.AddScoped<I비운행중배차추천Service, 비운행중배차추천Service>();
 builder.Services.AddScoped<INationalDispatchRequestService, NationalDispatchRequestService>();
 builder.Services.AddScoped<I기사월정산Service, 기사월정산Service>();
 

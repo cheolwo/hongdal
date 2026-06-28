@@ -496,6 +496,77 @@ namespace Hongdal.Migrations
                     b.ToTable("배달기사");
                 });
 
+            modelBuilder.Entity("홍달.도메인.기사.용달기사", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("NotionPageId")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("notion_page_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("기사Id")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("기사Id");
+
+                    b.Property<string>("기사명")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("기사명");
+
+                    b.Property<DateTime?>("등록일")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("등록일");
+
+                    b.Property<string>("메모")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("메모");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("상태");
+
+                    b.Property<string>("연락처")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("연락처");
+
+                    b.Property<string>("운행상태")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("운행상태");
+
+                    b.Property<string>("주_활동지역")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("주_활동지역");
+
+                    b.Property<string>("차량")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("차량");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("용달기사");
+                });
+
             modelBuilder.Entity("홍달.도메인.기사.배차계획신청", b =>
                 {
                     b.Property<long>("Id")

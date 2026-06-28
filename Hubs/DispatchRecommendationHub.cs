@@ -15,12 +15,12 @@ namespace Hongdal.Hubs
     {
         private readonly HongdalContext _db;
         private readonly IDriverLocationStore _driverLocationStore;
-        private readonly IDispatchRecommendationService _dispatchRecommendationService;
+        private readonly I배차추천Service _dispatchRecommendationService;
 
         public DispatchRecommendationHub(
             HongdalContext db,
             IDriverLocationStore driverLocationStore,
-            IDispatchRecommendationService dispatchRecommendationService)
+            I배차추천Service dispatchRecommendationService)
         {
             _db = db;
             _driverLocationStore = driverLocationStore;
@@ -117,12 +117,12 @@ namespace Hongdal.Hubs
             _db.기사위치기록.Add(new 기사위치기록
             {
                 기사Id = snapshot.DriverId,
-                위도 = snapshot.위도,
-                경도 = snapshot.경도,
-                정확도_m = snapshot.정확도_m,
-                기록시각 = snapshot.기록시각,
-                CreatedAt = snapshot.수신시각,
-                UpdatedAt = snapshot.수신시각
+                위도 = snapshot.Latitude,
+                경도 = snapshot.Longitude,
+                정확도_m = snapshot.AccuracyM,
+                기록시각 = snapshot.RecordedAtUtc,
+                CreatedAt = snapshot.ReceivedAtUtc,
+                UpdatedAt = snapshot.ReceivedAtUtc
             });
 
             await _db.SaveChangesAsync();
@@ -169,18 +169,42 @@ namespace Hongdal.Hubs
         public decimal? 픽업_경도 { get; set; }
         public decimal? 하차_위도 { get; set; }
         public decimal? 하차_경도 { get; set; }
-            public decimal? 픽업거리Km { get; set; }
-            public decimal? 직선거리Km
-            {
-                get => base.직선거리Km;
-                set => base.직선거리Km = value;
-            }
+        public decimal? 픽업거리Km { get; set; }
+        public decimal? 공차거리Km { get; set; }
+        public decimal? 운송거리Km { get; set; }
+        public decimal? 예상톨비 { get; set; }
+        public decimal? 예상연료비 { get; set; }
+        public decimal? 예상총비용 { get; set; }
+        public decimal? 예상수익 { get; set; }
+        public decimal? 예상추가순이익 { get; set; }
+        public decimal? 분당추가수익 { get; set; }
+        public string 추천유형 { get; set; } = string.Empty;
+        public decimal? 추가예상시간분 { get; set; }
+        public decimal? 기존배송지연분 { get; set; }
+        public decimal? 기존경로거리Km { get; set; }
+        public decimal? 삽입경로거리Km { get; set; }
+        public decimal? 기존경로소요시간분 { get; set; }
+        public decimal? 삽입경로소요시간분 { get; set; }
+        public decimal? 삽입추가톨비 { get; set; }
+        public decimal? 추천점수 { get; set; }
+        public string 추천사유 { get; set; } = string.Empty;
+        public string[] 배지 { get; set; } = Array.Empty<string>();
+        public string[] 경고 { get; set; } = Array.Empty<string>();
+        public bool 차량적합여부 { get; set; } = true;
+        public string[] 차량부적합사유 { get; set; } = Array.Empty<string>();
+        public string[] 차량경고 { get; set; } = Array.Empty<string>();
 
-            public decimal? 주행거리Km
-            {
-                get => base.주행거리Km;
-                set => base.주행거리Km = value;
-            }
+        public decimal? 직선거리Km
+        {
+            get => base.직선거리Km;
+            set => base.직선거리Km = value;
+        }
+
+        public decimal? 주행거리Km
+        {
+            get => base.주행거리Km;
+            set => base.주행거리Km = value;
+        }
         public string 상태 { get; set; } = string.Empty;
         public string 배차상태 { get; set; } = string.Empty;
     }

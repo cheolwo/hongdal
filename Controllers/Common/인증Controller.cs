@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using 홍달.Data;
+using 홍달.Services;
+using Hongdal.Contracts.Common;
 
 namespace Hongdal.Controllers.Common
 {
@@ -16,15 +18,18 @@ namespace Hongdal.Controllers.Common
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AuthTokenService _authTokenService;
+        private readonly INtsBusinessRegistrationService _ntsBusinessRegistrationService;
         private readonly JwtOptions _jwtOptions;
 
         public 인증Controller(
             UserManager<ApplicationUser> userManager,
             AuthTokenService authTokenService,
+            INtsBusinessRegistrationService ntsBusinessRegistrationService,
             IOptions<JwtOptions> jwtOptions)
         {
             _userManager = userManager;
             _authTokenService = authTokenService;
+            _ntsBusinessRegistrationService = ntsBusinessRegistrationService;
             _jwtOptions = jwtOptions.Value;
         }
 
@@ -75,6 +80,17 @@ namespace Hongdal.Controllers.Common
             if (string.IsNullOrWhiteSpace(request.Password)) return BadRequest("password is required");
             if (string.IsNullOrWhiteSpace(request.BusinessRegistrationNumber)) return BadRequest("businessRegistrationNumber is required");
 
+            var businessCheck = await _ntsBusinessRegistrationService.CheckStatusAsync(request.BusinessRegistrationNumber.Trim());
+            if (!businessCheck.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "사업자등록번호를 확인할 수 없습니다.",
+                    businessCheck.Message,
+                    businessCheck.BusinessRegistrationNumber
+                });
+            }
+
             var existingUser = await _userManager.FindByNameAsync(request.UserName.Trim());
             if (existingUser != null)
             {
@@ -92,7 +108,7 @@ namespace Hongdal.Controllers.Common
                 UserName = request.UserName.Trim(),
                 Email = request.Email.Trim(),
                 EmailConfirmed = true,
-                BusinessRegistrationNumber = request.BusinessRegistrationNumber.Trim()
+                BusinessRegistrationNumber = businessCheck.BusinessRegistrationNumber
             };
 
             var createResult = await _userManager.CreateAsync(user, request.Password);
@@ -187,34 +203,4 @@ namespace Hongdal.Controllers.Common
         }
     }
 
-    public sealed class 로그인요청
-    {
-        public string UserNameOrEmail { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
-
-    public sealed class 토큰갱신요청
-    {
-        public string UserId { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
-    }
-
-    public sealed class 토큰응답
-    {
-        public string AccessToken { get; set; } = string.Empty;
-        public DateTime AccessTokenExpiresAtUtc { get; set; }
-        public string RefreshToken { get; set; } = string.Empty;
-        public DateTime RefreshTokenExpiresAtUtc { get; set; }
-        public string UserId { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string[] Roles { get; set; } = Array.Empty<string>();
-    }
-
-    public sealed class 기사회원가입요청
-    {
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string BusinessRegistrationNumber { get; set; } = string.Empty;
-    }
 }

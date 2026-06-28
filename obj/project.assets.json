@@ -1106,6 +1106,19 @@
         "runtime": {
           "lib/net7.0/ZstdSharp.dll": {}
         }
+      },
+      "Hongdal.Contracts/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Hongdal.Contracts.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Hongdal.Contracts.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },
@@ -3210,11 +3223,17 @@
         "zstdsharp.port.0.7.3.nupkg.sha512",
         "zstdsharp.port.nuspec"
       ]
+    },
+    "Hongdal.Contracts/1.0.0": {
+      "type": "project",
+      "path": "../Hongdal.Contracts/Hongdal.Contracts.csproj",
+      "msbuildProject": "../Hongdal.Contracts/Hongdal.Contracts.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
       "Google.Cloud.Storage.V1 >= 4.15.0",
+      "Hongdal.Contracts >= 1.0.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 10.0.9",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 9.0.0",
       "Microsoft.AspNetCore.OpenApi >= 10.0.9",
@@ -3261,7 +3280,11 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Contracts\\Hongdal.Contracts.csproj": {
+              "projectPath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Contracts\\Hongdal.Contracts.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

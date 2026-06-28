@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services;
+using Hongdal.Contracts.Common;
 
 namespace Hongdal.Controllers.Common
 {
@@ -45,16 +46,4 @@ namespace Hongdal.Controllers.Common
         }
     }
 
-    public sealed class 파일업로드요청
-    {
-        public IFormFile File { get; set; } = null!;
-        public string? Folder { get; set; }
-    }
-
-    public sealed class 파일업로드응답
-    {
-        public string BucketName { get; set; } = string.Empty;
-        public string ObjectName { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
-    }
 }

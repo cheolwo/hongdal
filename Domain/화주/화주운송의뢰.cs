@@ -27,6 +27,18 @@ namespace 홍달.도메인.화주
         [Column("cargo_quantity")]
         public int? 화물수량 { get; set; }
 
+        [Column("cargo_length_mm")]
+        public int? 화물길이Mm { get; set; }
+
+        [Column("cargo_width_mm")]
+        public int? 화물폭Mm { get; set; }
+
+        [Column("cargo_height_mm")]
+        public int? 화물높이Mm { get; set; }
+
+        [Column("cargo_pallet_count")]
+        public int? 화물팔레트개수 { get; set; }
+
         [Column("cargo_weight_kg")]
         public decimal? 화물중량Kg { get; set; }
 

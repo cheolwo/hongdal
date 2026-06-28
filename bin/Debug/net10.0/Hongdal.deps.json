@@ -9,6 +9,7 @@
       "Hongdal/1.0.0": {
         "dependencies": {
           "Google.Cloud.Storage.V1": "4.15.0",
+          "Hongdal.Contracts": "1.0.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.9",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "9.0.0",
           "Microsoft.AspNetCore.OpenApi": "10.0.9",
@@ -787,6 +788,14 @@
             "fileVersion": "0.7.3.0"
           }
         }
+      },
+      "Hongdal.Contracts/1.0.0": {
+        "runtime": {
+          "Hongdal.Contracts.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -1166,6 +1175,11 @@
       "sha512": "sha512-U9Ix4l4cl58Kzz1rJzj5hoVTjmbx1qGMwzAcbv1j/d3NzrFaESIurQyg+ow4mivCgkE3S413y+U9k4WdnEIkRA==",
       "path": "zstdsharp.port/0.7.3",
       "hashPath": "zstdsharp.port.0.7.3.nupkg.sha512"
+    },
+    "Hongdal.Contracts/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

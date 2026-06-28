@@ -1,5 +1,8 @@
 # Toss Payments Integration Guide
 
+> 이 문서는 Toss 결제 연동의 상세 흐름을 담는다.
+> 솔루션 전체 요약은 루트 `README.md`를 참고한다.
+
 ## Overview
 
 This app integrates Toss Payments for shipper-side payment confirmation.
