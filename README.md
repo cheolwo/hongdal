@@ -41,6 +41,48 @@ flowchart TD
 	L --> N[알림설정]
 ```
 
+## 프로젝트 구조
+
+```mermaid
+flowchart TB
+	subgraph Solution[Hongdal 솔루션]
+		direction TB
+
+		subgraph Core[백엔드]
+			Hongdal[Hongdal\nASP.NET Core API]
+			Contracts[Hongdal.Contracts\n공유 DTO / 계약]
+			Hongdal --> Contracts
+		end
+
+		subgraph Apps[클라이언트]
+			Admin[HongdalAdmin\nBlazor 관리자]
+			Driver[DriverApp\n기사 앱]
+			Shipper[ShipperApp\n화주 앱]
+		end
+
+		subgraph Infra[주요 인프라/기능]
+			Db[(MySQL / EF Core)]
+			Redis[(Redis)]
+			Mongo[(MongoDB)]
+			Hub[SignalR Hub]
+			Services[Services / Infrastructure\n비즈니스 로직 / 저장소 / 보안]
+		end
+
+		Admin -->|API 호출| Hongdal
+		Driver -->|API 호출| Hongdal
+		Shipper -->|API 호출| Hongdal
+
+		Hongdal --> Services
+		Hongdal --> Db
+		Hongdal --> Redis
+		Hongdal --> Mongo
+		Hongdal --> Hub
+		Services --> Db
+		Services --> Redis
+		Services --> Mongo
+	end
+```
+
 ## 메모
 
 이 문서는 프로젝트를 빠르게 파악하기 위한 요약용 문서다.
