@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using 홍달.Data;
+using MediatR;
+using Hongdal.Application.Driver.Work;
+using Hongdal.Contracts.Driver.Work;
 using 홍달.도메인.공통;
-using 홍달.도메인.기사;
 
 namespace Hongdal.Controllers.Driver.Work01
 {
@@ -13,11 +13,11 @@ namespace Hongdal.Controllers.Driver.Work01
     [Authorize(Roles = 역할명.기사)]
     public class 용달기사근무Controller : ControllerBase
     {
-        private readonly HongdalContext _db;
+        private readonly ISender _sender;
 
-        public 용달기사근무Controller(HongdalContext db)
+        public 용달기사근무Controller(ISender sender)
         {
-            _db = db;
+            _sender = sender;
         }
 
         [HttpGet("{id:long}")]
@@ -25,9 +25,8 @@ namespace Hongdal.Controllers.Driver.Work01
         {
             if (!현재기사확인(driverId)) return Forbid();
 
-            var s = await _db.기사근무.FindAsync(id);
-            if (s == null || s.기사Id != driverId) return NotFound();
-            return Ok(s);
+            var s = await _sender.Send(new Hongdal.Application.Driver.Work.기사근무상세조회Query(driverId, id));
+            return s == null ? NotFound() : Ok(s);
         }
 
         private bool 현재기사확인(string driverId)

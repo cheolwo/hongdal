@@ -33,25 +33,27 @@ namespace 홍달.Services.Notifications
         {
             if (string.IsNullOrWhiteSpace(driverId) || recommendations.Count == 0)
             {
+                _logger.LogDebug("Action={Action} DriverId={DriverId} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}", "NotificationSkipped", driverId, "Skipped", "Empty driverId or recommendations", System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty, DateTime.UtcNow);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(_options.ServerKey))
             {
-                _logger.LogDebug("PushNotifications:ServerKey is not configured. Skip FCM push for {DriverId}.", driverId);
+                _logger.LogDebug("Action={Action} DriverId={DriverId} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}", "NotificationSkipped", driverId, "Skipped", "PushNotifications:ServerKey is not configured", System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty, DateTime.UtcNow);
                 return false;
             }
 
             var token = await _tokenStore.GetAsync(driverId, cancellationToken).ConfigureAwait(false);
             if (string.IsNullOrWhiteSpace(token))
             {
-                _logger.LogDebug("No push token registered for {DriverId}.", driverId);
+                _logger.LogDebug("Action={Action} DriverId={DriverId} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}", "NotificationSkipped", driverId, "Skipped", "No push token registered", System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty, DateTime.UtcNow);
                 return false;
             }
 
             var ids = recommendations.Select(x => x.의뢰Id).ToList();
             if (!await _pushStateStore.HasChangedAsync(driverId, ids, cancellationToken).ConfigureAwait(false))
             {
+                _logger.LogDebug("Action={Action} DriverId={DriverId} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}", "NotificationSkipped", driverId, "Skipped", "Recommendation set unchanged", System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty, DateTime.UtcNow);
                 return false;
             }
 
@@ -92,9 +94,11 @@ namespace 홍달.Services.Notifications
             if (!response.IsSuccessStatusCode)
             {
                 var errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                _logger.LogWarning("FCM push failed for {DriverId}: {StatusCode} {Body}", driverId, response.StatusCode, errorBody);
+                _logger.LogWarning("Action={Action} DriverId={DriverId} Result={Result} Reason={Reason} StatusCode={StatusCode} TraceId={TraceId} OccurredAt={OccurredAt}", "NotificationSent", driverId, "Failed", errorBody, response.StatusCode, System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty, DateTime.UtcNow);
                 return false;
             }
+
+            _logger.LogInformation("Action={Action} DriverId={DriverId} Result={Result} RecommendationCount={RecommendationCount} TraceId={TraceId} OccurredAt={OccurredAt}", "NotificationSent", driverId, "Success", recommendations.Count, System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty, DateTime.UtcNow);
 
             return true;
         }

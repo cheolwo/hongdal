@@ -15,15 +15,18 @@ public sealed class 용달기사Controller : ControllerBase
     private readonly HongdalContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly IDriverPushTokenStore _pushTokenStore;
 
     public 용달기사Controller(
         HongdalContext db,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        IDriverPushTokenStore pushTokenStore)
     {
         _db = db;
         _userManager = userManager;
         _roleManager = roleManager;
+        _pushTokenStore = pushTokenStore;
     }
 
     [HttpPost("register")]
@@ -101,17 +104,25 @@ public sealed class 용달기사Controller : ControllerBase
         _db.용달기사.Add(driver);
         await _db.SaveChangesAsync();
 
+        var vehicle = await _db.차량제원.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.차량코드 == driver.차량 || x.차량명 == driver.차량);
+
+        var pushToken = await _pushTokenStore.GetAsync(driverId);
+
         return CreatedAtAction(nameof(내용달기사조회), new { }, new 용달기사등록응답
         {
             기사Id = driver.기사Id,
             기사명 = driver.기사명,
             연락처 = driver.연락처,
             차량 = driver.차량,
+            차량코드 = vehicle?.차량코드,
+            차량명 = vehicle?.차량명,
             주_활동지역 = driver.주_활동지역,
             상태 = driver.상태,
             운행상태 = driver.운행상태,
             등록일 = driver.등록일,
-            메모 = driver.메모
+            메모 = driver.메모,
+            푸시토큰등록됨 = !string.IsNullOrWhiteSpace(pushToken)
         });
     }
 
@@ -130,17 +141,24 @@ public sealed class 용달기사Controller : ControllerBase
             return NotFound();
         }
 
+        var vehicle = await _db.차량제원.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.차량코드 == driver.차량 || x.차량명 == driver.차량);
+        var pushToken = await _pushTokenStore.GetAsync(driverId);
+
         return Ok(new 용달기사등록응답
         {
             기사Id = driver.기사Id,
             기사명 = driver.기사명,
             연락처 = driver.연락처,
             차량 = driver.차량,
+            차량코드 = vehicle?.차량코드,
+            차량명 = vehicle?.차량명,
             주_활동지역 = driver.주_활동지역,
             상태 = driver.상태,
             운행상태 = driver.운행상태,
             등록일 = driver.등록일,
-            메모 = driver.메모
+            메모 = driver.메모,
+            푸시토큰등록됨 = !string.IsNullOrWhiteSpace(pushToken)
         });
     }
 

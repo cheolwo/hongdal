@@ -1,9 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using 홍달.Data;
-using 홍달.Services.Settlement;
+using MediatR;
+using Hongdal.Application.Driver.Settlement;
 using 홍달.도메인.공통;
 using Hongdal.Contracts.Driver.Settlement;
 
@@ -14,35 +13,41 @@ namespace Hongdal.Controllers.Driver.Settlement06
     [Route("api/v1/driver/settlements")]
     public sealed class 기사정산Controller : ControllerBase
     {
-        private readonly HongdalContext _db;
-        private readonly I기사월정산Service _settlementService;
+        private readonly ISender _sender;
 
-        public 기사정산Controller(HongdalContext db, I기사월정산Service settlementService)
+        public 기사정산Controller(ISender sender)
         {
-            _db = db;
-            _settlementService = settlementService;
+            _sender = sender;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> 목록조회()
+        {
+            var driverId = 현재기사Id();
+            var items = await _sender.Send(new Hongdal.Application.Driver.Settlement.기사정산목록조회Query(driverId));
+
+            return Ok(items);
+        }
+
+        [HttpGet("{year:int}/{month:int}")]
+        public async Task<IActionResult> 월별조회(int year, int month)
+        {
+            var driverId = 현재기사Id();
+            var settlement = await _sender.Send(new Hongdal.Application.Driver.Settlement.기사정산월별조회Query(driverId, year, month));
+            if (settlement == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(settlement);
         }
 
         [HttpGet("current-month")]
         public async Task<IActionResult> 현재월조회()
         {
             var driverId = 현재기사Id();
-            var now = DateTime.UtcNow;
-            var settlement = await _db.기사월정산.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId && x.년도 == now.Year && x.월 == now.Month);
-            if (settlement == null)
-            {
-                settlement = await _settlementService.배차확정반영Async(driverId, now);
-            }
-
-            return Ok(new 기사정산응답
-            {
-                DriverId = driverId,
-                Year = settlement.년도,
-                Month = settlement.월,
-                DispatchCount = settlement.배차건수,
-                UsageFee = settlement.이용료,
-                IsPaid = settlement.결제완료
-            });
+            var settlement = await _sender.Send(new Hongdal.Application.Driver.Settlement.기사정산현재월조회Query(driverId));
+            return Ok(settlement);
         }
 
         private string 현재기사Id()

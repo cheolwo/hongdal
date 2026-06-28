@@ -16,4 +16,5 @@ global using 홍달.Services.Notifications;
 global using 홍달.Services.Options;
 global using 홍달.Services.Settlement;
 global using 홍달.Services.Storage.Local;
-global using 홍달.Services.Storage.Redis;
+global using 홍달.Infrastructure.Storage.Local;
+global using 홍달.Infrastructure.Storage.Redis;

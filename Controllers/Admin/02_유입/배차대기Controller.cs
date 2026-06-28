@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MediatR;
+using Hongdal.Application.Admin.Inbound;
 using Hongdal.Contracts.Admin.Inbound;
-using 홍달.Data;
-using 홍달.도메인.공통;
-using 홍달.도메인.배차;
 
 namespace Hongdal.Controllers.Admin.Inflow02
 {
@@ -11,23 +9,23 @@ namespace Hongdal.Controllers.Admin.Inflow02
     [Route("api/v1/dispatch/wait")]
     public class 배차대기Controller : ControllerBase
     {
-        private readonly HongdalContext _db;
+        private readonly ISender _sender;
 
-        public 배차대기Controller(HongdalContext db)
+        public 배차대기Controller(ISender sender)
         {
-            _db = db;
+            _sender = sender;
         }
 
         [HttpGet]
         public async Task<IActionResult> 목록조회()
         {
-            return Ok(await _db.배차대기.OrderBy(q => q.CreatedAt).ToListAsync());
+            return Ok(await _sender.Send(new 배차대기목록조회Query()));
         }
 
         [HttpGet("{id:long}")]
         public async Task<IActionResult> 단건조회(long id)
         {
-            var item = await _db.배차대기.FindAsync(id);
+            var item = await _sender.Send(new 배차대기단건조회Query(id));
             if (item == null) return NotFound();
             return Ok(item);
         }
@@ -37,25 +35,18 @@ namespace Hongdal.Controllers.Admin.Inflow02
         {
             if (request == null) return BadRequest();
 
-            var entity = new 배차대기
-            {
-                의뢰Id = request.의뢰Id,
-                화주Id = request.화주Id,
-                픽업_도로명주소 = request.픽업_도로명주소,
-                픽업_상세주소 = request.픽업_상세주소,
-                픽업_위도 = request.픽업_위도,
-                픽업_경도 = request.픽업_경도,
-                하차_도로명주소 = request.하차_도로명주소,
-                하차_상세주소 = request.하차_상세주소,
-                하차_위도 = request.하차_위도,
-                하차_경도 = request.하차_경도,
-                상태 = string.IsNullOrWhiteSpace(request.상태) ? 상태값.배차대기상태.대기 : request.상태,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _db.배차대기.AddAsync(entity);
-            await _db.SaveChangesAsync();
+            var entity = await _sender.Send(new 배차대기생성Command(
+                request.의뢰Id,
+                request.화주Id,
+                request.픽업_도로명주소,
+                request.픽업_상세주소,
+                request.픽업_위도,
+                request.픽업_경도,
+                request.하차_도로명주소,
+                request.하차_상세주소,
+                request.하차_위도,
+                request.하차_경도,
+                request.상태));
             return CreatedAtAction(nameof(단건조회), new { id = entity.Id }, entity);
         }
 
@@ -64,33 +55,27 @@ namespace Hongdal.Controllers.Admin.Inflow02
         {
             if (request == null) return BadRequest();
 
-            var entity = await _db.배차대기.FindAsync(id);
+            var entity = await _sender.Send(new 배차대기수정Command(
+                id,
+                request.의뢰Id,
+                request.화주Id,
+                request.픽업_도로명주소,
+                request.픽업_상세주소,
+                request.픽업_위도,
+                request.픽업_경도,
+                request.하차_도로명주소,
+                request.하차_상세주소,
+                request.하차_위도,
+                request.하차_경도,
+                request.상태));
             if (entity == null) return NotFound();
-
-            entity.의뢰Id = request.의뢰Id;
-            entity.화주Id = request.화주Id;
-            entity.픽업_도로명주소 = request.픽업_도로명주소;
-            entity.픽업_상세주소 = request.픽업_상세주소;
-            entity.픽업_위도 = request.픽업_위도;
-            entity.픽업_경도 = request.픽업_경도;
-            entity.하차_도로명주소 = request.하차_도로명주소;
-            entity.하차_상세주소 = request.하차_상세주소;
-            entity.하차_위도 = request.하차_위도;
-            entity.하차_경도 = request.하차_경도;
-            entity.상태 = string.IsNullOrWhiteSpace(request.상태) ? entity.상태 : request.상태;
-            entity.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
             return Ok(entity);
         }
 
         [HttpDelete("{id:long}")]
         public async Task<IActionResult> 삭제(long id)
         {
-            var entity = await _db.배차대기.FindAsync(id);
-            if (entity == null) return NotFound();
-            _db.배차대기.Remove(entity);
-            await _db.SaveChangesAsync();
+            await _sender.Send(new 배차대기삭제Command(id));
             return NoContent();
         }
     }

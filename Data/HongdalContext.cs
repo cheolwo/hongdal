@@ -4,13 +4,18 @@ using 홍달.도메인.업체;
 using 홍달.도메인.결제;
 using 홍달.도메인.차량;
 using 홍달.도메인.화물;
+using 홍달.Infrastructure.Persistence;
+using 홍달.Infrastructure.Security;
 
 namespace 홍달.Data
 {
     public class HongdalContext : IdentityDbContext<ApplicationUser>
     {
-        public HongdalContext(DbContextOptions<HongdalContext> options) : base(options)
+        private readonly IPersonalDataEncryptionService _personalDataProtector;
+
+        public HongdalContext(DbContextOptions<HongdalContext> options, IPersonalDataEncryptionService personalDataProtector) : base(options)
         {
+            _personalDataProtector = personalDataProtector;
         }
 
         // 업체
@@ -44,6 +49,8 @@ namespace 홍달.Data
         {
             // DataAnnotations ([Table], [Column]) are used on entities.
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyPersonalDataProtection(_personalDataProtector);
         }
     }
 }

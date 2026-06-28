@@ -1,11 +1,8 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using 홍달.Data;
+using MediatR;
+using Hongdal.Application.Admin.Management;
 using Hongdal.Contracts.Admin.Management;
-using 홍달.도메인.운송;
 
 namespace Hongdal.Controllers.Admin.Master06
 {
@@ -14,25 +11,25 @@ namespace Hongdal.Controllers.Admin.Master06
     [Authorize]
     public class 운임구성Controller : ControllerBase
     {
-        private readonly HongdalContext _db;
+        private readonly ISender _sender;
 
-        public 운임구성Controller(HongdalContext db)
+        public 운임구성Controller(ISender sender)
         {
-            _db = db;
+            _sender = sender;
         }
 
         [HttpGet]
         [Authorize(Roles = 역할명.기사 + "," + 역할명.화주 + "," + 역할명.서버관리자)]
         public async Task<IActionResult> 목록조회()
         {
-            return Ok(await _db.운임구성.OrderBy(c => c.CreatedAt).ToListAsync());
+            return Ok(await _sender.Send(new 운임구성목록조회Query()));
         }
 
         [HttpGet("{id:long}")]
         [Authorize(Roles = 역할명.기사 + "," + 역할명.화주 + "," + 역할명.서버관리자)]
         public async Task<IActionResult> 단건조회(long id)
         {
-            var item = await _db.운임구성.FindAsync(id);
+            var item = await _sender.Send(new 운임구성단건조회Query(id));
             if (item == null) return NotFound();
             return Ok(item);
         }
@@ -43,21 +40,14 @@ namespace Hongdal.Controllers.Admin.Master06
         {
             if (request == null) return BadRequest();
 
-            var entity = new 운임구성
-            {
-                의뢰Id = request.의뢰Id,
-                기본운임 = request.기본운임,
-                거리운임 = request.거리운임,
-                할증 = request.할증,
-                대기료 = request.대기료,
-                수작업비 = request.수작업비,
-                최종운임 = request.최종운임,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _db.운임구성.AddAsync(entity);
-            await _db.SaveChangesAsync();
+            var entity = await _sender.Send(new 운임구성생성Command(
+                request.의뢰Id,
+                request.기본운임,
+                request.거리운임,
+                request.할증,
+                request.대기료,
+                request.수작업비,
+                request.최종운임));
             return CreatedAtAction(nameof(단건조회), new { id = entity.Id }, entity);
         }
 
@@ -67,19 +57,16 @@ namespace Hongdal.Controllers.Admin.Master06
         {
             if (request == null) return BadRequest();
 
-            var entity = await _db.운임구성.FindAsync(id);
+            var entity = await _sender.Send(new 운임구성수정Command(
+                id,
+                request.의뢰Id,
+                request.기본운임,
+                request.거리운임,
+                request.할증,
+                request.대기료,
+                request.수작업비,
+                request.최종운임));
             if (entity == null) return NotFound();
-
-            entity.의뢰Id = request.의뢰Id;
-            entity.기본운임 = request.기본운임;
-            entity.거리운임 = request.거리운임;
-            entity.할증 = request.할증;
-            entity.대기료 = request.대기료;
-            entity.수작업비 = request.수작업비;
-            entity.최종운임 = request.최종운임;
-            entity.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
             return Ok(entity);
         }
 
@@ -87,10 +74,7 @@ namespace Hongdal.Controllers.Admin.Master06
         [Authorize(Policy = "서버관리자전용")]
         public async Task<IActionResult> 삭제(long id)
         {
-            var entity = await _db.운임구성.FindAsync(id);
-            if (entity == null) return NotFound();
-            _db.운임구성.Remove(entity);
-            await _db.SaveChangesAsync();
+            await _sender.Send(new 운임구성삭제Command(id));
             return NoContent();
         }
     }

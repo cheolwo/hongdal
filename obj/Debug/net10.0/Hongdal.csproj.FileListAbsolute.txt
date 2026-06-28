@@ -154,3 +154,17 @@ C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\appsettings.Local.j
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Contracts.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Contracts.pdb
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\MediatR.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\MediatR.Contracts.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\FluentValidation.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\FluentResults.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.AspNetCore.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Extensions.Hosting.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Extensions.Logging.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Formatting.Compact.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Settings.Configuration.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Console.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Debug.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.File.dll

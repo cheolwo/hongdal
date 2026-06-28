@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using 홍달.도메인.기사;
 
 namespace 홍달.Services.Settlement
@@ -15,11 +16,13 @@ namespace 홍달.Services.Settlement
     {
         private readonly HongdalContext _db;
         private readonly 기사이용료정책Options _policy;
+        private readonly ILogger<기사월정산Service> _logger;
 
-        public 기사월정산Service(HongdalContext db, IOptions<기사이용료정책Options> policy)
+        public 기사월정산Service(HongdalContext db, IOptions<기사이용료정책Options> policy, ILogger<기사월정산Service> logger)
         {
             _db = db;
             _policy = policy.Value;
+            _logger = logger;
         }
 
         public async Task<기사월정산> 배차확정반영Async(string 기사Id, DateTime? 기준시각Utc = null, CancellationToken cancellationToken = default)
@@ -38,6 +41,18 @@ namespace 홍달.Services.Settlement
             settlement.UpdatedAt = now;
 
             await _db.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation(
+                "Action={Action} DriverId={DriverId} Year={Year} Month={Month} BeforeStatus={BeforeStatus} AfterStatus={AfterStatus} Result={Result} TraceId={TraceId} OccurredAt={OccurredAt}",
+                "SettlementApplied",
+                기사Id,
+                settlement.년도,
+                settlement.월,
+                "Pending",
+                settlement.결제완료 ? "Paid" : "Applied",
+                "Success",
+                System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+                now);
             return settlement;
         }
 
@@ -61,6 +76,18 @@ namespace 홍달.Services.Settlement
             settlement.UpdatedAt = now;
 
             await _db.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation(
+                "Action={Action} DriverId={DriverId} Year={Year} Month={Month} BeforeStatus={BeforeStatus} AfterStatus={AfterStatus} Result={Result} TraceId={TraceId} OccurredAt={OccurredAt}",
+                "SettlementApplied",
+                기사Id,
+                년도,
+                월,
+                "Unpaid",
+                "Paid",
+                "Success",
+                System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+                now);
             return settlement;
         }
 

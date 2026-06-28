@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using 홍달.Data;
+using MediatR;
+using Hongdal.Application.Admin.Management;
 using Hongdal.Contracts.Admin.Management;
 
 namespace Hongdal.Controllers.Admin.Master06;
@@ -11,11 +11,11 @@ namespace Hongdal.Controllers.Admin.Master06;
 [Authorize(Policy = "서버관리자전용")]
 public sealed class 기사관리Controller : ControllerBase
 {
-    private readonly HongdalContext _db;
+    private readonly ISender _sender;
 
-    public 기사관리Controller(HongdalContext db)
+    public 기사관리Controller(ISender sender)
     {
-        _db = db;
+        _sender = sender;
     }
 
     [HttpGet]
@@ -24,54 +24,7 @@ public sealed class 기사관리Controller : ControllerBase
         [FromQuery] string? 차량종류,
         [FromQuery] string? 활동지역검색어)
     {
-        var query = _db.용달기사.AsNoTracking().AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(운행상태))
-        {
-            var status = 운행상태.Trim();
-            query = query.Where(x => x.운행상태 == status);
-        }
-
-        if (!string.IsNullOrWhiteSpace(차량종류))
-        {
-            var vehicle = 차량종류.Trim();
-            query = query.Where(x => x.차량 == vehicle);
-        }
-
-        if (!string.IsNullOrWhiteSpace(활동지역검색어))
-        {
-            var keyword = 활동지역검색어.Trim();
-            query = query.Where(x => x.주_활동지역.Contains(keyword));
-        }
-
-        var items = await query
-            .OrderBy(x => x.기사명)
-            .Select(x => new 기사목록응답
-            {
-                기사Id = x.기사Id,
-                기사명 = x.기사명,
-                연락처 = x.연락처,
-                차량 = x.차량,
-                주_활동지역 = x.주_활동지역,
-                운행상태 = x.운행상태,
-                최근위도 = _db.기사위치기록
-                    .Where(l => l.기사Id == x.기사Id)
-                    .OrderByDescending(l => l.기록시각)
-                    .Select(l => (decimal?)l.위도)
-                    .FirstOrDefault(),
-                최근경도 = _db.기사위치기록
-                    .Where(l => l.기사Id == x.기사Id)
-                    .OrderByDescending(l => l.기록시각)
-                    .Select(l => (decimal?)l.경도)
-                    .FirstOrDefault(),
-                최근위치기록시각 = _db.기사위치기록
-                    .Where(l => l.기사Id == x.기사Id)
-                    .OrderByDescending(l => l.기록시각)
-                    .Select(l => (DateTime?)l.기록시각)
-                    .FirstOrDefault(),
-                배차건수 = _db.기사배차.Count(d => d.용달기사_id == x.Id || d.기사Id == x.Id)
-            })
-            .ToListAsync();
+        var items = await _sender.Send(new 관리자기사목록조회Query(운행상태, 차량종류, 활동지역검색어));
 
         return Ok(items);
     }
@@ -79,36 +32,7 @@ public sealed class 기사관리Controller : ControllerBase
     [HttpGet("{driverId}")]
     public async Task<IActionResult> 단건조회(string driverId)
     {
-        var item = await _db.용달기사
-            .AsNoTracking()
-            .Where(x => x.기사Id == driverId)
-            .Select(x => new 기사상세응답
-            {
-                기사Id = x.기사Id,
-                기사명 = x.기사명,
-                연락처 = x.연락처,
-                차량 = x.차량,
-                주_활동지역 = x.주_활동지역,
-                운행상태 = x.운행상태,
-                메모 = x.메모,
-                등록일 = x.등록일,
-                최근위도 = _db.기사위치기록
-                    .Where(l => l.기사Id == x.기사Id)
-                    .OrderByDescending(l => l.기록시각)
-                    .Select(l => (decimal?)l.위도)
-                    .FirstOrDefault(),
-                최근경도 = _db.기사위치기록
-                    .Where(l => l.기사Id == x.기사Id)
-                    .OrderByDescending(l => l.기록시각)
-                    .Select(l => (decimal?)l.경도)
-                    .FirstOrDefault(),
-                최근위치기록시각 = _db.기사위치기록
-                    .Where(l => l.기사Id == x.기사Id)
-                    .OrderByDescending(l => l.기록시각)
-                    .Select(l => (DateTime?)l.기록시각)
-                    .FirstOrDefault()
-            })
-            .FirstOrDefaultAsync();
+        var item = await _sender.Send(new 관리자기사단건조회Query(driverId));
 
         if (item == null)
         {
@@ -121,31 +45,7 @@ public sealed class 기사관리Controller : ControllerBase
     [HttpGet("{driverId}/dispatches")]
     public async Task<IActionResult> 기사별배차내역(string driverId)
     {
-        var driver = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId);
-        if (driver == null)
-        {
-            return NotFound();
-        }
-
-        var items = await _db.기사배차
-            .AsNoTracking()
-            .Where(x => x.용달기사_id == driver.Id || x.기사Id == driver.Id)
-            .OrderByDescending(x => x.배차일)
-            .ThenByDescending(x => x.CreatedAt)
-            .Select(x => new 기사배차내역응답
-            {
-                Id = x.Id,
-                배차명 = x.배차명,
-                상태 = x.상태,
-                배차일 = x.배차일,
-                픽업지 = x.픽업지,
-                배송지 = x.배송지,
-                배차점수 = x.배차점수,
-                실패사유 = x.실패사유,
-                배차생성시각 = x.배차생성시각,
-                배차완료시각 = x.배차완료시각
-            })
-            .ToListAsync();
+        var items = await _sender.Send(new 관리자기사배차내역조회Query(driverId));
 
         return Ok(items);
     }

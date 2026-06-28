@@ -1,16 +1,27 @@
 using System.Text;
 using System.Data.Common;
 using Hongdal.Hubs;
+using Hongdal.Application.Behaviors;
 using Hongdal.Security;
+using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using StackExchange.Redis;
+using Serilog;
 using 홍달.Data;
 using 홍달.Services;
 using 홍달.Services.Dispatch.Recommendation;
+using 홍달.Services.Storage.Local;
+using 홍달.Infrastructure.Security;
+using 홍달.Infrastructure.Storage.Local;
+using 홍달.Infrastructure.Storage.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var isRunningInContainer = string.Equals(
@@ -20,9 +31,28 @@ var isRunningInContainer = string.Equals(
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "Hongdal.Server")
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: "logs/hongdal-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 14);
+});
+
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
+builder.Services.AddDataProtection();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
 if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
@@ -50,6 +80,8 @@ builder.Services.Configure<기사이용료정책Options>(builder.Configuration.G
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
 builder.Services.Configure<PushNotificationsOptions>(builder.Configuration.GetSection(PushNotificationsOptions.SectionName));
+
+builder.Services.AddSingleton<홍달.Infrastructure.Security.IPersonalDataEncryptionService, 홍달.Infrastructure.Security.DataProtectionPersonalDataEncryptionService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
@@ -169,6 +201,7 @@ builder.Services.AddSingleton<IDriverRejectedRequestStore, RedisDriverRejectedRe
 builder.Services.AddSingleton<IDriverPushTokenStore, RedisDriverPushTokenStore>();
 builder.Services.AddSingleton<IDriverRecommendationPushStateStore, RedisDriverRecommendationPushStateStore>();
 builder.Services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>();
+builder.Services.AddSingleton<IDriverNotificationSettingsStore, RedisDriverNotificationSettingsStore>();
 builder.Services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
 builder.Services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
 builder.Services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
@@ -200,15 +233,61 @@ if (!isRunningInContainer)
     app.UseHttpsRedirection();
 }
 
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("TraceId", httpContext.TraceIdentifier);
+        diagnosticContext.Set("UserName", httpContext.User?.Identity?.Name ?? string.Empty);
+    };
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        if (exception is ValidationException validationException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/problem+json";
+
+            var errors = validationException.Errors
+                .GroupBy(x => x.PropertyName)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Select(e => e.ErrorMessage).ToArray());
+
+            var problem = new ValidationProblemDetails(errors)
+            {
+                Title = "요청값 검증에 실패했습니다.",
+                Status = StatusCodes.Status400BadRequest
+            };
+
+            await context.Response.WriteAsJsonAsync(problem);
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new ProblemDetails
+        {
+            Title = "서버 오류가 발생했습니다.",
+            Status = StatusCodes.Status500InternalServerError
+        });
+    });
+});
 
 app.MapControllers();
 app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
 
 app.Run();
 
-static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider services, ILogger logger)
+static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider services, Microsoft.Extensions.Logging.ILogger logger)
 {
     var migrationDelays = new[]
     {
@@ -252,7 +331,7 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
     }
 }
 
-static async Task EnsureIdentityCompatibilityAsync(HongdalContext db, ILogger logger)
+static async Task EnsureIdentityCompatibilityAsync(HongdalContext db, Microsoft.Extensions.Logging.ILogger logger)
 {
     var connection = db.Database.GetDbConnection();
 
@@ -302,7 +381,7 @@ WHERE TABLE_SCHEMA = DATABASE()
     return Convert.ToInt32(result) > 0;
 }
 
-static async Task EnsureVehicleRateCompatibilityAsync(HongdalContext db, ILogger logger)
+static async Task EnsureVehicleRateCompatibilityAsync(HongdalContext db, Microsoft.Extensions.Logging.ILogger logger)
 {
     var connection = db.Database.GetDbConnection();
 

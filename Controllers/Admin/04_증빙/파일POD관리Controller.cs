@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Hongdal.Contracts.Admin.Evidence;
 using 홍달.Services;
 
 namespace Hongdal.Controllers.Admin.Evidence04;
@@ -58,7 +57,7 @@ public sealed class 파일POD관리Controller : ControllerBase
             UploadedAtUtc: DateTime.UtcNow,
             UpdatedAtUtc: DateTime.UtcNow));
 
-        return Ok(new 파일POD응답
+        return Ok(new
         {
             Id = metadata.Id,
             FileType = metadata.FileType,
@@ -77,7 +76,7 @@ public sealed class 파일POD관리Controller : ControllerBase
     public IActionResult 목록조회([FromQuery] string? fileType, [FromQuery] string? requestId)
     {
         var items = _store.List(fileType, requestId)
-            .Select(x => new 파일POD응답
+            .Select(x => new
             {
                 Id = x.Id,
                 FileType = x.FileType,
@@ -109,7 +108,7 @@ public sealed class 파일POD관리Controller : ControllerBase
             return NotFound();
         }
 
-        return Ok(new 파일POD응답
+        return Ok(new
         {
             Id = updated.Id,
             FileType = updated.FileType,

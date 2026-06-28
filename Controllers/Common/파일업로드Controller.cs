@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services;
-using Hongdal.Contracts.Common;
 
 namespace Hongdal.Controllers.Common
 {
@@ -37,7 +36,7 @@ namespace Hongdal.Controllers.Common
                 request.Folder,
                 cancellationToken);
 
-            return Ok(new 파일업로드응답
+            return Ok(new
             {
                 BucketName = result.BucketName,
                 ObjectName = result.ObjectName,
