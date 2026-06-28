@@ -44,7 +44,7 @@ erDiagram
 		long Id
 		string 의뢰Id
 		string 화주Id
-		long? 운임구성Id
+		long 운임구성Id
 		string 결제상태
 		string 배차상태
 		string 상태
@@ -52,10 +52,10 @@ erDiagram
 
 	화물요구조건 {
 		string 의뢰Id
-		int? 화물길이Mm
-		int? 화물폭Mm
-		int? 화물높이Mm
-		int? 화물무게Kg
+		int 화물길이Mm
+		int 화물폭Mm
+		int 화물높이Mm
+		int 화물무게Kg
 	}
 
 	운임구성 {
@@ -105,7 +105,7 @@ erDiagram
 		long Id
 		string 기사Id
 		string 시작모드
-		DateTime? 시작시각
+		DateTime 시작시각
 	}
 
 	기사위치기록 {
@@ -125,9 +125,9 @@ erDiagram
 
 	기사배차 {
 		long Id
-		long? 배차Id
-		long? 용달기사_id
-		long? 기사Id
+		long 배차Id
+		long 용달기사_id
+		long 기사Id
 		string 상태
 	}
 
