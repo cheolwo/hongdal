@@ -48,12 +48,16 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             return Result.Fail<화주운송의뢰응답>("pickup.window.startAt must be before endAt");
         }
 
+        var shipperId = string.IsNullOrWhiteSpace(request.화주Id) ? currentUserId : request.화주Id.Trim();
         var clientRequestId = request.클라이언트요청Id?.Trim() ?? string.Empty;
         if (!string.IsNullOrWhiteSpace(clientRequestId))
         {
             var duplicate = await _db.화주운송의뢰
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.주문자UserId == currentUserId && r.클라이언트요청Id == clientRequestId, cancellationToken);
+                .FirstOrDefaultAsync(
+                    r => (r.화주Id == shipperId || (r.화주Id == string.Empty && r.주문자UserId == currentUserId))
+                         && r.클라이언트요청Id == clientRequestId,
+                    cancellationToken);
             if (duplicate != null)
             {
                 return Result.Fail<화주운송의뢰응답>("동일한 클라이언트요청Id로 이미 생성된 의뢰가 있습니다.");
@@ -72,7 +76,6 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
         var evidenceMethod = settlementCondition?.증빙방식.ToString() ?? 증빙방식.없음.ToString();
         var collector = settlementCondition?.수납주체.ToString() ?? 수납주체.플랫폼.ToString();
         var settlementStatus = GetSettlementStatus(settlementTime, settlementCondition?.증빙방식);
-        var shipperId = string.IsNullOrWhiteSpace(request.화주Id) ? currentUserId : request.화주Id.Trim();
 
         var (pickupLat, pickupLng) = await ResolveCoordinatesAsync(request.픽업도로명주소, request.픽업상세주소, cancellationToken);
         var (dropoffLat, dropoffLng) = await ResolveCoordinatesAsync(request.하차도로명주소, request.하차상세주소, cancellationToken);

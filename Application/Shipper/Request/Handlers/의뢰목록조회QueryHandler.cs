@@ -37,7 +37,7 @@ public sealed class 의뢰목록조회QueryHandler : IRequestHandler<의뢰목�
         }
         else
         {
-            query = query.Where(r => r.주문자UserId == currentUserId || (r.주문자UserId == string.Empty && r.화주Id == currentUserId));
+            query = query.Where(r => r.화주Id == currentUserId || (r.화주Id == string.Empty && r.주문자UserId == currentUserId));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Status))
