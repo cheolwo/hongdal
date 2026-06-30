@@ -27,6 +27,10 @@ Hongdal은 .NET 10 기반의 물류/배차 도메인 솔루션이다.
 - `ShipperApp` - 화주 앱
 - `Hongdal.Contracts` - 공유 DTO/계약
 
+- <img width="1431" height="756" alt="DriverApp 메뉴" src="https://github.com/user-attachments/assets/da1cc25d-b2f9-43eb-9207-c9b4593457da" />
+<img width="1420" height="739" alt="ShipperApp 메뉴" src="https://github.com/user-attachments/assets/cdf01782-42ca-4648-abda-8c52ae2e9064" />
+
+
 ## 현재 개발 방향
 
 - 현재 단계는 **서버 연동 완성보다 화면 흐름과 사용자 경험 검증을 우선**한다.
