@@ -27,10 +27,6 @@ Hongdal은 .NET 10 기반의 물류/배차 도메인 솔루션이다.
 - `ShipperApp` - 화주 앱
 - `Hongdal.Contracts` - 공유 DTO/계약
 
-- <img width="1431" height="756" alt="DriverApp 메뉴" src="https://github.com/user-attachments/assets/da1cc25d-b2f9-43eb-9207-c9b4593457da" />
-<img width="1420" height="739" alt="ShipperApp 메뉴" src="https://github.com/user-attachments/assets/cdf01782-42ca-4648-abda-8c52ae2e9064" />
-
-
 ## 현재 개발 방향
 
 - 현재 단계는 **서버 연동 완성보다 화면 흐름과 사용자 경험 검증을 우선**한다.
@@ -79,6 +75,22 @@ Hongdal은 .NET 10 기반의 물류/배차 도메인 솔루션이다.
 - 대시보드, 배차대기, 의뢰/결제/운송/정산/기사/업체/공개화물/화면정책/행위로그 등의 관리자 라우트가 존재한다.
 - 운영 화면 범위는 넓지만, 기능별 완성도는 개별 검토가 필요하다.
 - 커밋 시에는 관리자 앱을 독립 단위로 나눠 변경 이력을 관리하는 것이 좋다.
+
+## 앱 화면 예시
+
+아래 이미지는 `docs/images/` 아래에 저장한 파일을 기준으로 표시한다.
+
+### DriverApp
+
+<img src="docs/images/driverapp-home.png" alt="DriverApp 화면 예시" width="700" />
+
+기사 앱의 홈 및 추천 배차 흐름을 보여주는 예시 화면이다.
+
+### ShipperApp
+
+<img src="docs/images/shipperapp-home.png" alt="ShipperApp 화면 예시" width="700" />
+
+화주 앱의 홈 및 업무 메뉴 구성을 보여주는 예시 화면이다.
 
 ## 백엔드 상태 메모
 
@@ -184,31 +196,7 @@ flowchart TB
 	end
 ```
 
-## 결제 게이트 흐름
-
-```mermaid
-flowchart TD
-	A[화주 운송의뢰 생성] --> B[결제 요청]
-	B --> C[Toss 결제창]
-	C --> D{confirm 성공?}
-	D -->|성공| E[배차대기 생성]
-	D -->|실패| F[의뢰/결제 실패 처리]
-	E --> G[배차추천 대상 반영]
-```
-
-## 지도/추천 상호작용 흐름
-
-```mermaid
-flowchart TD
-	A[지도 초기화] --> B[Leaflet 로드]
-	B --> C[상차/하차 마커 표시]
-	C --> D[마커 선택]
-	D --> E[.NET 메서드 호출]
-	E --> F[의뢰 선택/경로 계산]
-	F --> G[거리/경로 정보 갱신]
-```
-
 ## 메모
 
-이 문서는 프로젝트를 파악하기 위한 요약용 문서다.
+이 문서는 프로젝트를 빠르게 파악하기 위한 요약용 문서다.
 상세한 흐름이나 구조는 별도 문서에서 관리한다.
