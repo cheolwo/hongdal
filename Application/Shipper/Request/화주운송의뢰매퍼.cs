@@ -1,21 +1,44 @@
-using Hongdal.Contracts.Shipper.Request;
+using ShipRequest = Hongdal.Contracts.Shipper.Request;
 
 namespace Hongdal.Application.Shipper.Request;
 
 internal static class 화주운송의뢰매퍼
 {
-    internal static 화주운송의뢰응답 To응답(화주운송의뢰 entity)
+    internal static ShipRequest.화주운송의뢰응답 To응답(화주운송의뢰 entity)
     {
-        return new 화주운송의뢰응답
+        ShipRequest.정산시점? settlementTime = Enum.TryParse<ShipRequest.정산시점>(entity.정산시점, ignoreCase: false, out var parsedSettlementTime)
+            ? parsedSettlementTime
+            : (ShipRequest.정산시점?)null;
+        ShipRequest.증빙방식? evidenceMethod = Enum.TryParse<ShipRequest.증빙방식>(entity.증빙방식, ignoreCase: false, out var parsedEvidenceMethod)
+            ? parsedEvidenceMethod
+            : (ShipRequest.증빙방식?)null;
+        ShipRequest.수납주체? collector = Enum.TryParse<ShipRequest.수납주체>(entity.수납주체, ignoreCase: false, out var parsedCollector)
+            ? parsedCollector
+            : (ShipRequest.수납주체?)null;
+
+        return new ShipRequest.화주운송의뢰응답
         {
             의뢰Id = entity.의뢰Id,
+            주문자UserId = entity.주문자UserId,
+            화주Id = entity.화주Id,
             의뢰상태 = entity.상태,
             결제상태 = entity.결제상태,
+            정산상태 = entity.정산상태,
             배차상태 = entity.배차상태,
             운송방식 = entity.운송방식,
             차량종류 = entity.차량종류,
             결제수단 = entity.결제수단,
             결제예정금액 = entity.결제예정금액,
+            정산시점 = settlementTime,
+            증빙방식 = evidenceMethod,
+            수납주체 = collector,
+            세금계산서필요 = entity.세금계산서필요,
+            현금영수증필요 = entity.현금영수증필요,
+            정산메모 = entity.정산메모,
+            인수증번호 = entity.인수증번호,
+            인수증등록일시 = entity.인수증등록일시,
+            현장수금확인일시 = entity.현장수금확인일시,
+            현장지급메모 = entity.현장지급메모,
             생성일시 = entity.CreatedAt,
             화물길이Mm = entity.화물길이Mm,
             화물폭Mm = entity.화물폭Mm,
@@ -33,7 +56,7 @@ internal static class 화주운송의뢰매퍼
             수작업비 = entity.수작업비,
             할증 = entity.할증,
             최종운임 = entity.최종운임,
-            요약 = new 화주운송의뢰응답.요약DTO
+            요약 = new ShipRequest.화주운송의뢰응답.요약DTO
             {
                 화물종류 = entity.화물종류,
                 픽업지 = entity.픽업_도로명주소,
@@ -42,9 +65,9 @@ internal static class 화주운송의뢰매퍼
         };
     }
 
-    internal static 공개화물요약응답 To공개화물요약응답(화주운송의뢰 entity)
+    internal static ShipRequest.공개화물요약응답 To공개화물요약응답(화주운송의뢰 entity)
     {
-        return new 공개화물요약응답
+        return new ShipRequest.공개화물요약응답
         {
             의뢰Id = entity.의뢰Id,
             화물종류 = entity.화물종류,

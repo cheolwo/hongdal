@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Hongdal.Controllers;
 using Hongdal.Application.Admin.Inbound;
 using Hongdal.Contracts.Admin.Inbound;
 
@@ -75,8 +76,8 @@ namespace Hongdal.Controllers.Admin.Inflow02
         [HttpDelete("{id:long}")]
         public async Task<IActionResult> 삭제(long id)
         {
-            await _sender.Send(new 배차대기삭제Command(id));
-            return NoContent();
+            var result = await _sender.Send(new 배차대기삭제Command(id));
+            return this.ToNoContentActionResult(result);
         }
     }
 

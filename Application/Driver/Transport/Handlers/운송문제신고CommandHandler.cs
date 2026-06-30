@@ -1,8 +1,9 @@
 using Hongdal.Contracts.Driver.Transport;
+using FluentResults;
 
 namespace Hongdal.Application.Driver.Transport;
 
-public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문제신고Command, 기사운송요약응답>
+public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문제신고Command, Result<기사운송요약응답>>
 {
     private readonly HongdalContext _db;
 
@@ -11,14 +12,14 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
         _db = db;
     }
 
-    public async Task<기사운송요약응답> Handle(운송문제신고Command request, CancellationToken cancellationToken)
+    public async Task<Result<기사운송요약응답>> Handle(운송문제신고Command request, CancellationToken cancellationToken)
     {
         var entity = await _db.배송_운송
             .FirstOrDefaultAsync(x => x.Id == request.Id && x.기사_운송자 == request.기사Id, cancellationToken);
 
         if (entity is null)
         {
-            throw new InvalidOperationException("운송을 찾을 수 없습니다.");
+            return Result.Fail<기사운송요약응답>("운송을 찾을 수 없습니다.");
         }
 
         var issueText = string.IsNullOrWhiteSpace(request.사유) ? "문제 신고" : request.사유.Trim();
@@ -28,7 +29,7 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
 
         await _db.SaveChangesAsync(cancellationToken);
 
-        return new 기사운송요약응답
+        return Result.Ok(new 기사운송요약응답
         {
             Id = entity.Id,
             운송번호 = entity.운송번호,
@@ -40,6 +41,6 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
             도착 = entity.도착,
             운임 = entity.운임,
             UpdatedAt = entity.UpdatedAt
-        };
+        });
     }
 }

@@ -2,6 +2,7 @@ using System.Text;
 using System.Data.Common;
 using Hongdal.Hubs;
 using Hongdal.Application.Behaviors;
+using Hongdal.Application.CommandProcessing;
 using Hongdal.Security;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
@@ -15,13 +16,22 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using StackExchange.Redis;
 using Serilog;
+using Hongdal.Application.Driver.Transport;
+using Hongdal.Application.Shipper.Request;
+using 홍달.Services.Options;
 using 홍달.Data;
 using 홍달.Services;
 using 홍달.Services.Dispatch.Recommendation;
+using 홍달.Services.Exploration;
 using 홍달.Services.Storage.Local;
 using 홍달.Infrastructure.Security;
 using 홍달.Infrastructure.Storage.Local;
 using 홍달.Infrastructure.Storage.Redis;
+using Hongdal.Middleware;
+using 홍달.Services.Audit;
+using 홍달.Services.Sales;
+using 홍달.Services.ViewSettings;
+using 홍달.Services.Warehouse;
 
 var builder = WebApplication.CreateBuilder(args);
 var isRunningInContainer = string.Equals(
@@ -46,6 +56,8 @@ builder.Host.UseSerilog((context, services, configuration) =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
 builder.Services.AddDataProtection();
@@ -53,6 +65,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progr
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Command후처리Behavior<,>));
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
 if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
@@ -80,8 +93,19 @@ builder.Services.Configure<기사이용료정책Options>(builder.Configuration.G
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
 builder.Services.Configure<PushNotificationsOptions>(builder.Configuration.GetSection(PushNotificationsOptions.SectionName));
+builder.Services.Configure<CommandProcessingOptions>(builder.Configuration.GetSection(CommandProcessingOptions.SectionName));
 
 builder.Services.AddSingleton<홍달.Infrastructure.Security.IPersonalDataEncryptionService, 홍달.Infrastructure.Security.DataProtectionPersonalDataEncryptionService>();
+builder.Services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+builder.Services.AddScoped<ICommand기능설정Resolver, Command기능설정Resolver>();
+builder.Services.AddScoped<ICommand기능CatalogResolver, Command기능CatalogResolver>();
+builder.Services.AddScoped<ICommand후처리Processor, Command감사로그Processor>();
+builder.Services.AddScoped<ICommand후처리Processor, Command알림의도Processor>();
+builder.Services.AddScoped<I사용자행위로그Service, 사용자행위로그Service>();
+builder.Services.AddScoped<ISalesChannelService, SalesChannelService>();
+builder.Services.AddScoped<IView가시성Service, View가시성Service>();
+builder.Services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();
+builder.Services.AddScoped<사용자행위로그Middleware>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
@@ -159,6 +183,9 @@ builder.Services
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("서버관리자전용", policy => policy.RequireRole(역할명.서버관리자));
+    options.AddPolicy("화주또는판매자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자));
+    options.AddPolicy("창고관리자전용", policy => policy.RequireRole(역할명.창고관리자, 역할명.서버관리자));
+    options.AddPolicy("운영사용자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자, 역할명.창고관리자, 역할명.서버관리자));
 });
 
 builder.Services.AddHttpClient<IGeocodingService, GoogleGeocodingService>();
@@ -204,14 +231,21 @@ builder.Services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>(
 builder.Services.AddSingleton<IDriverNotificationSettingsStore, RedisDriverNotificationSettingsStore>();
 builder.Services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
 builder.Services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
+builder.Services.AddSingleton<I탐색캠페인이벤트저장소, 탐색캠페인이벤트저장소>();
 builder.Services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
 builder.Services.AddScoped<I배차추천경로Service, 배차추천경로Service>();
 builder.Services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
 builder.Services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
-builder.Services.AddScoped<I차량화물적합성Service, 차량화물적합성Service>();
+builder.Services.AddScoped<홍달.Services.Dispatch.Recommendation.I차량화물적합성Service, 홍달.Services.Dispatch.Recommendation.차량화물적합성Service>();
+builder.Services.AddScoped<Hongdal.Application.Shipper.Request.I차량추천Service, Hongdal.Application.Shipper.Request.차량추천Service>();
+builder.Services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰추천Service, Hongdal.Application.Shipper.Request.화주운송의뢰추천Service>();
+builder.Services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰일괄등록파서Service, Hongdal.Application.Shipper.Request.화주운송의뢰일괄등록파서Service>();
 builder.Services.AddScoped<I배차추천Service, 배차추천Service>();
 builder.Services.AddScoped<I운행중배차추천Service, 운행중배차추천Service>();
 builder.Services.AddScoped<I비운행중배차추천Service, 비운행중배차추천Service>();
+builder.Services.AddScoped<I기사운송상태전이Service, 기사운송상태전이Service>();
+builder.Services.AddScoped<I탐색대상추천Service, 탐색대상추천Service>();
+builder.Services.AddScoped<I탐색캠페인상태전이Service, 탐색캠페인상태전이Service>();
 builder.Services.AddScoped<INationalDispatchRequestService, NationalDispatchRequestService>();
 builder.Services.AddScoped<I기사월정산Service, 기사월정산Service>();
 
@@ -282,6 +316,7 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
+app.UseMiddleware<사용자행위로그Middleware>();
 app.MapControllers();
 app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
 
@@ -324,10 +359,12 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
     try
     {
         await IdentityDataSeeder.SeedAsync(services);
+        var viewVisibilityService = services.GetRequiredService<IView가시성Service>();
+        await viewVisibilityService.SeedPoliciesAsync();
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "Identity data seeding failed after database migration.");
+        logger.LogWarning(ex, "Initial data seeding failed after database migration.");
     }
 }
 

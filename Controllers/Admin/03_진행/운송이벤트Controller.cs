@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Hongdal.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.Application.Admin.Operating;
@@ -65,8 +66,8 @@ namespace Hongdal.Controllers.Admin.Progress03
         [HttpDelete("{id:long}")]
         public async Task<IActionResult> 삭제(long id)
         {
-            await _sender.Send(new 운송이벤트삭제Command(id));
-            return NoContent();
+            var result = await _sender.Send(new 운송이벤트삭제Command(id));
+            return this.ToNoContentActionResult(result);
         }
     }
 

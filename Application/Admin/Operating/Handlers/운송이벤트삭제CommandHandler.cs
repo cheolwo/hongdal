@@ -1,6 +1,6 @@
 namespace Hongdal.Application.Admin.Operating;
 
-public sealed class 운송이벤트삭제CommandHandler : IRequestHandler<운송이벤트삭제Command, Unit>
+public sealed class 운송이벤트삭제CommandHandler : IRequestHandler<운송이벤트삭제Command, FluentResults.Result<Unit>>
 {
     private readonly HongdalContext _db;
 
@@ -9,15 +9,17 @@ public sealed class 운송이벤트삭제CommandHandler : IRequestHandler<운송
         _db = db;
     }
 
-    public async Task<Unit> Handle(운송이벤트삭제Command request, CancellationToken cancellationToken)
+    public async Task<FluentResults.Result<Unit>> Handle(운송이벤트삭제Command request, CancellationToken cancellationToken)
     {
         var entity = await _db.운송이벤트.FindAsync([request.Id], cancellationToken);
-        if (entity != null)
+        if (entity is null)
         {
-            _db.운송이벤트.Remove(entity);
-            await _db.SaveChangesAsync(cancellationToken);
+            return FluentResults.Result.Fail<Unit>("운송이벤트를 찾을 수 없습니다.");
         }
 
-        return Unit.Value;
+        _db.운송이벤트.Remove(entity);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return FluentResults.Result.Ok(Unit.Value);
     }
 }

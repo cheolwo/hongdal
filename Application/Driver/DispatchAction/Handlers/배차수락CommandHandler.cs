@@ -20,6 +20,8 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
 
     public async Task<Result<배차수락결과>> Handle(배차수락Command request, CancellationToken cancellationToken)
     {
+        await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
+
         var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
         if (queue is null)
         {
@@ -32,27 +34,35 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
             return Result.Fail<배차수락결과>("운송의뢰 데이터를 찾을 수 없습니다.");
         }
 
-        if (queue.상태 == 상태값.배차대기상태.확정)
+        if (dispatchRequest.결제상태 != 상태값.결제상태.결제완료)
+        {
+            return Result.Fail<배차수락결과>("결제완료 의뢰만 수락할 수 있습니다.");
+        }
+
+        if (queue.상태 != 상태값.배차대기상태.대기)
         {
             return Result.Fail<배차수락결과>("이미 수락된 배차입니다.");
         }
 
+        var now = DateTime.UtcNow;
         queue.상태 = 상태값.배차대기상태.확정;
         dispatchRequest.배차상태 = 상태값.배차상태.매칭중;
-        dispatchRequest.UpdatedAt = DateTime.UtcNow;
-        queue.UpdatedAt = DateTime.UtcNow;
+        dispatchRequest.UpdatedAt = now;
+        queue.UpdatedAt = now;
 
         await _db.SaveChangesAsync(cancellationToken);
+        await tx.CommitAsync(cancellationToken);
+
         await _acceptanceLogStore.AppendAsync(new DispatchAcceptanceLogEntry(
             request.기사Id,
             dispatchRequest.화주Id,
             request.RequestId,
-            DateTime.UtcNow,
+            now,
             queue.상태,
             dispatchRequest.배차상태,
             dispatchRequest.결제상태), cancellationToken);
 
-        _logger.LogInformation(
+        _logger.LogDebug(
             "Action={Action} DriverId={DriverId} RequestId={RequestId} BeforeStatus={BeforeStatus} AfterStatus={AfterStatus} Result={Result} TraceId={TraceId} OccurredAt={OccurredAt}",
             "DispatchAccepted",
             request.기사Id,
@@ -61,7 +71,7 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
             queue.상태,
             "Success",
             System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
-            DateTime.UtcNow);
+            now);
 
         return Result.Ok(new 배차수락결과(request.RequestId, "수락되었습니다."));
     }

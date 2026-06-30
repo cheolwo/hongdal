@@ -18,6 +18,9 @@ namespace 홍달.도메인.화주
         [Column("shipper_id")]
         public string 화주Id { get; set; } = string.Empty;
 
+        [Column("orderer_user_id")]
+        public string 주문자UserId { get; set; } = string.Empty;
+
         [Column("cargo_type")]
         public string 화물종류 { get; set; } = string.Empty;
 
@@ -59,6 +62,39 @@ namespace 홍달.도메인.화주
 
         [Column("payment_method")]
         public string 결제수단 { get; set; } = "카드";
+
+        [Column("settlement_time")]
+        public string 정산시점 { get; set; } = "선결제";
+
+        [Column("evidence_method")]
+        public string 증빙방식 { get; set; } = "없음";
+
+        [Column("collector")]
+        public string 수납주체 { get; set; } = "플랫폼";
+
+        [Column("settlement_status")]
+        public string 정산상태 { get; set; } = 상태값.결제상태.결제대기;
+
+        [Column("settlement_memo")]
+        public string 정산메모 { get; set; } = string.Empty;
+
+        [Column("receipt_number")]
+        public string 인수증번호 { get; set; } = string.Empty;
+
+        [Column("receipt_issued_at")]
+        public DateTime? 인수증등록일시 { get; set; }
+
+        [Column("cash_settled_at")]
+        public DateTime? 현장수금확인일시 { get; set; }
+
+        [Column("cash_settlement_memo")]
+        public string 현장지급메모 { get; set; } = string.Empty;
+
+        [Column("tax_invoice_required")]
+        public bool 세금계산서필요 { get; set; }
+
+        [Column("cash_receipt_required")]
+        public bool 현금영수증필요 { get; set; }
 
         [Column("estimated_payment_amount")]
         public int? 결제예정금액 { get; set; }

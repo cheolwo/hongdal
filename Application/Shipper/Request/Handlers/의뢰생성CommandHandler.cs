@@ -1,5 +1,6 @@
 using FluentResults;
 using Hongdal.Contracts.Shipper.Request;
+using Hongdal.Application.CommandProcessing;
 using 홍달.Services.External.Google;
 
 namespace Hongdal.Application.Shipper.Request;
@@ -9,16 +10,24 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
     private static readonly string[] AllowedPaymentStatuses = 상태값.결제상태.허용값;
 
     private readonly HongdalContext _db;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IGeocodingService _geocodingService;
 
-    public 의뢰생성CommandHandler(HongdalContext db, IGeocodingService geocodingService)
+    public 의뢰생성CommandHandler(HongdalContext db, IGeocodingService geocodingService, ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _geocodingService = geocodingService;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<Result<화주운송의뢰응답>> Handle(의뢰생성Command request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserAccessor.UserId;
+        if (string.IsNullOrWhiteSpace(currentUserId))
+        {
+            return Result.Fail<화주운송의뢰응답>("로그인 사용자 정보를 확인할 수 없습니다.");
+        }
+
         if (string.IsNullOrWhiteSpace(request.화물종류))
         {
             return Result.Fail<화주운송의뢰응답>("화물종류 is required");
@@ -39,28 +48,31 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             return Result.Fail<화주운송의뢰응답>("pickup.window.startAt must be before endAt");
         }
 
-        if (!string.IsNullOrWhiteSpace(request.클라이언트요청Id) && string.IsNullOrWhiteSpace(request.화주Id))
-        {
-            return Result.Fail<화주운송의뢰응답>("화주Id is required when clientRequestId is provided");
-        }
-
         var clientRequestId = request.클라이언트요청Id?.Trim() ?? string.Empty;
         if (!string.IsNullOrWhiteSpace(clientRequestId))
         {
             var duplicate = await _db.화주운송의뢰
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.화주Id == request.화주Id && r.클라이언트요청Id == clientRequestId, cancellationToken);
+                .FirstOrDefaultAsync(r => r.주문자UserId == currentUserId && r.클라이언트요청Id == clientRequestId, cancellationToken);
             if (duplicate != null)
             {
                 return Result.Fail<화주운송의뢰응답>("동일한 클라이언트요청Id로 이미 생성된 의뢰가 있습니다.");
             }
         }
 
+        var settlementCondition = request.정산조건;
         var paymentStatus = string.IsNullOrWhiteSpace(request.결제상태) ? 상태값.결제상태.결제대기 : request.결제상태.Trim();
         if (!AllowedPaymentStatuses.Contains(paymentStatus))
         {
             return Result.Fail<화주운송의뢰응답>($"결제상태 must be one of: {string.Join(", ", AllowedPaymentStatuses)}");
         }
+
+        var settlementTime = settlementCondition?.정산시점 ?? 정산시점.선결제;
+        var paymentMethod = settlementCondition?.결제수단.ToString() ?? request.결제수단 ?? "카드";
+        var evidenceMethod = settlementCondition?.증빙방식.ToString() ?? 증빙방식.없음.ToString();
+        var collector = settlementCondition?.수납주체.ToString() ?? 수납주체.플랫폼.ToString();
+        var settlementStatus = GetSettlementStatus(settlementTime, settlementCondition?.증빙방식);
+        var shipperId = string.IsNullOrWhiteSpace(request.화주Id) ? currentUserId : request.화주Id.Trim();
 
         var (pickupLat, pickupLng) = await ResolveCoordinatesAsync(request.픽업도로명주소, request.픽업상세주소, cancellationToken);
         var (dropoffLat, dropoffLng) = await ResolveCoordinatesAsync(request.하차도로명주소, request.하차상세주소, cancellationToken);
@@ -68,7 +80,8 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
         var entity = new 화주운송의뢰
         {
             의뢰Id = Guid.NewGuid().ToString(),
-            화주Id = request.화주Id ?? string.Empty,
+            화주Id = shipperId,
+            주문자UserId = currentUserId,
             화물종류 = request.화물종류,
             화물설명 = request.화물설명 ?? string.Empty,
             화물수량 = request.화물수량,
@@ -78,7 +91,14 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             화물온도조건 = request.화물온도조건 ?? "상온",
             운송방식 = request.운송방식 ?? "혼적",
             차량종류 = request.차량종류 ?? string.Empty,
-            결제수단 = request.결제수단 ?? "카드",
+            결제수단 = paymentMethod,
+            정산시점 = settlementTime.ToString(),
+            증빙방식 = evidenceMethod,
+            수납주체 = collector,
+            정산상태 = settlementStatus,
+            정산메모 = settlementCondition?.정산메모 ?? string.Empty,
+            세금계산서필요 = settlementCondition?.세금계산서필요 ?? false,
+            현금영수증필요 = settlementCondition?.현금영수증필요 ?? false,
             결제예정금액 = request.결제예정금액,
             픽업_도로명주소 = request.픽업도로명주소,
             픽업_상세주소 = request.픽업상세주소 ?? string.Empty,
@@ -114,6 +134,18 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
         await _db.SaveChangesAsync(cancellationToken);
 
         return Result.Ok(화주운송의뢰매퍼.To응답(entity));
+    }
+
+    private static string GetSettlementStatus(정산시점 settlementTime, 증빙방식? evidenceMethod)
+    {
+        return settlementTime switch
+        {
+            정산시점.현장지급 => 운임정산상태.현장수금예정.ToString(),
+            정산시점.운송완료후정산 when evidenceMethod == 증빙방식.인수증 => 운임정산상태.인수증대기.ToString(),
+            정산시점.운송완료후정산 => 운임정산상태.청구대기.ToString(),
+            정산시점.월말정산 => 운임정산상태.후불승인대기.ToString(),
+            _ => 운임정산상태.결제대기.ToString()
+        };
     }
 
     private async Task<(decimal? lat, decimal? lng)> ResolveCoordinatesAsync(string? roadAddress, string? detailAddress, CancellationToken cancellationToken)

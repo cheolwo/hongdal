@@ -2,8 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Hongdal.Controllers;
 using Hongdal.Application.Driver.DispatchAction;
-using FluentResults;
 using 홍달.도메인.공통;
 
 namespace Hongdal.Controllers.Driver.Action03
@@ -26,20 +26,15 @@ namespace Hongdal.Controllers.Driver.Action03
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 배차수락Command(driverId, requestId));
 
-            if (result.IsFailed)
-            {
-                return BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
-            }
-
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpPost("{requestId}/reject")]
         public async Task<IActionResult> 거절(string requestId)
         {
             var driverId = 현재기사Id();
-            await _sender.Send(new 배차거절Command(driverId, requestId));
-            return NoContent();
+            var result = await _sender.Send(new 배차거절Command(driverId, requestId));
+            return this.ToNoContentActionResult(result);
         }
 
         private string 현재기사Id()

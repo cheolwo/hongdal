@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.차량;
+using 홍달.도메인.사용자;
 
 namespace 홍달.Data
 {
@@ -13,7 +14,7 @@ namespace 홍달.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var db = scope.ServiceProvider.GetRequiredService<HongdalContext>();
 
-            var roles = new[] { 역할명.기사, 역할명.화주, 역할명.서버관리자 };
+            var roles = new[] { 역할명.기사, 역할명.화주, 역할명.판매자, 역할명.창고관리자, 역할명.서버관리자 };
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
@@ -132,6 +133,20 @@ namespace 홍달.Data
             {
                 await userManager.AddToRoleAsync(shipperUser, 역할명.화주);
             }
+
+            if (!await userManager.IsInRoleAsync(shipperUser, 역할명.판매자))
+            {
+                await userManager.AddToRoleAsync(shipperUser, 역할명.판매자);
+            }
+
+            if (!await userManager.IsInRoleAsync(shipperUser, 역할명.창고관리자))
+            {
+                await userManager.AddToRoleAsync(shipperUser, 역할명.창고관리자);
+            }
+
+            await EnsureOrdererProfileAsync(db, adminUser, "관리자 주문자", "010-0000-0001");
+            await EnsureOrdererProfileAsync(db, driverUser, "개발용 기사 주문자", "010-0000-0000");
+            await EnsureOrdererProfileAsync(db, shipperUser, "개발용 화주 주문자", "010-0000-0002");
 
             var driverProfile = await db.용달기사.FirstOrDefaultAsync(d => d.기사Id == driverUser.Id);
             if (driverProfile == null)
@@ -753,11 +768,19 @@ namespace 홍달.Data
                 });
             }
 
-            var 기존차량코드셋 = new HashSet<string>(await db.차량제원.Select(x => x.차량코드).ToListAsync(), StringComparer.OrdinalIgnoreCase);
-            foreach (var spec in 차량제원시드)
+            var 기존차량제원목록 = await db.차량제원.ToListAsync();
+            var 기존차량코드셋 = new HashSet<string>(기존차량제원목록.Select(x => x.차량코드), StringComparer.OrdinalIgnoreCase);
+            foreach (var (spec, index) in 차량제원시드.Select((value, index) => (value, index)))
             {
+                ApplyVehicleRecommendationDefaults(spec, index + 1);
+
                 if (기존차량코드셋.Contains(spec.차량코드))
                 {
+                    var existing = 기존차량제원목록.First(x => string.Equals(x.차량코드, spec.차량코드, StringComparison.OrdinalIgnoreCase));
+                    existing.권장최대CBM = existing.권장최대CBM.GetValueOrDefault() > 0 ? existing.권장최대CBM : spec.권장최대CBM;
+                    existing.추천우선순위 = existing.추천우선순위 > 0 ? existing.추천우선순위 : spec.추천우선순위;
+                    existing.추천사용여부 = existing.추천사용여부;
+                    existing.UpdatedAt = DateTime.UtcNow;
                     continue;
                 }
 
@@ -765,6 +788,51 @@ namespace 홍달.Data
             }
 
             await db.SaveChangesAsync();
+        }
+
+        private static async Task EnsureOrdererProfileAsync(HongdalContext db, ApplicationUser user, string displayName, string phoneNumber)
+        {
+            var profile = await db.주문자프로필.FirstOrDefaultAsync(x => x.UserId == user.Id);
+            if (profile == null)
+            {
+                db.주문자프로필.Add(new 주문자프로필
+                {
+                    UserId = user.Id,
+                    표시명 = displayName,
+                    연락처 = phoneNumber,
+                    기본주소 = string.Empty,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                return;
+            }
+
+            profile.표시명 = string.IsNullOrWhiteSpace(profile.표시명) ? displayName : profile.표시명;
+            profile.연락처 = string.IsNullOrWhiteSpace(profile.연락처) ? phoneNumber : profile.연락처;
+            profile.기본주소 ??= string.Empty;
+            profile.UpdatedAt = DateTime.UtcNow;
+        }
+
+        private static void ApplyVehicleRecommendationDefaults(차량제원 spec, int priority)
+        {
+            spec.권장최대CBM = CalculateRecommendedCbm(spec);
+            spec.추천우선순위 = priority;
+            spec.추천사용여부 = true;
+        }
+
+        private static decimal? CalculateRecommendedCbm(차량제원 spec)
+        {
+            if (spec.적재함길이Mm <= 0 || spec.적재함폭Mm <= 0 || spec.적재함높이Mm.GetValueOrDefault() <= 0)
+            {
+                return null;
+            }
+
+            var cbm = (spec.적재함길이Mm / 1000m)
+                      * (spec.적재함폭Mm / 1000m)
+                      * (spec.적재함높이Mm!.Value / 1000m)
+                      * 0.8m;
+            return decimal.Round(cbm, 3, MidpointRounding.AwayFromZero);
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿global using 홍달.Data;
 global using 홍달.도메인.공통;
 global using 홍달.도메인.기사;
+global using 홍달.도메인.탐색캠페인;
 global using 홍달.도메인.배차;
 global using 홍달.도메인.운송;
 global using 홍달.도메인.화주;
 global using 홍달.Services.Dispatch.Recommendation;
 global using 홍달.Services.Dispatch.Request;
+global using 홍달.Services.Exploration;
 global using 홍달.Services.External.Google;
 global using 홍달.Services.External.Mfds;
 global using 홍달.Services.External.Naver;

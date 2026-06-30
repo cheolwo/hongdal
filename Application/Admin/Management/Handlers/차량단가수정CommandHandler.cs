@@ -3,7 +3,7 @@ using 홍달.도메인.운송;
 
 namespace Hongdal.Application.Admin.Management;
 
-public sealed class 차량단가수정CommandHandler : IRequestHandler<차량단가수정Command, 차량단가?>
+public sealed class 차량단가수정CommandHandler : IRequestHandler<차량단가수정Command, 차량단가응답?>
 {
     private readonly HongdalContext _db;
 
@@ -12,7 +12,7 @@ public sealed class 차량단가수정CommandHandler : IRequestHandler<차량단
         _db = db;
     }
 
-    public async Task<차량단가?> Handle(차량단가수정Command request, CancellationToken cancellationToken)
+    public async Task<차량단가응답?> Handle(차량단가수정Command request, CancellationToken cancellationToken)
     {
         var entity = await _db.차량단가.FindAsync([request.Id], cancellationToken);
         if (entity == null)
@@ -29,6 +29,6 @@ public sealed class 차량단가수정CommandHandler : IRequestHandler<차량단
         entity.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
-        return entity;
+        return 차량추천관리매퍼.To응답(entity);
     }
 }

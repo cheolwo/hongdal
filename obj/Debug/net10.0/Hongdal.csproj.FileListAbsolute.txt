@@ -151,7 +151,6 @@ C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Quartz.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\appsettings.Local.example.json
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.sourcelink.json
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\appsettings.Local.json
-C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Contracts.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Contracts.pdb
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\MediatR.dll
@@ -168,3 +167,4 @@ C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Settings.Co
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Console.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Debug.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.File.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Hongdal.Controllers;
 using Hongdal.Application.Driver.Transport;
 using 홍달.도메인.공통;
 using Hongdal.Contracts.Driver.Transport;
@@ -35,6 +36,7 @@ namespace Hongdal.Controllers.Driver.Progress05
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송현재조회Query(driverId));
 
+            if (result is null) return NotFound();
             return Ok(result);
         }
 
@@ -44,6 +46,7 @@ namespace Hongdal.Controllers.Driver.Progress05
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송상세조회Query(driverId, id));
 
+            if (result is null) return NotFound();
             return Ok(result);
         }
 
@@ -52,7 +55,7 @@ namespace Hongdal.Controllers.Driver.Progress05
         {
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송상차지도착Command(driverId, id));
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpPost("{id:long}/pickup-complete")]
@@ -60,7 +63,7 @@ namespace Hongdal.Controllers.Driver.Progress05
         {
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송상차완료Command(driverId, id));
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpPost("{id:long}/arrive-dropoff")]
@@ -68,7 +71,7 @@ namespace Hongdal.Controllers.Driver.Progress05
         {
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송하차지도착Command(driverId, id));
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpPost("{id:long}/complete")]
@@ -76,7 +79,7 @@ namespace Hongdal.Controllers.Driver.Progress05
         {
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송인수완료Command(driverId, id));
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         [HttpPost("{id:long}/report-issue")]
@@ -85,7 +88,7 @@ namespace Hongdal.Controllers.Driver.Progress05
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송문제신고Command(driverId, id, request.사유, request.메모));
 
-            return Ok(result);
+            return this.ToActionResult(result);
         }
 
         private string 현재기사Id()

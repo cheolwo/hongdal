@@ -8,6 +8,7 @@ public sealed record 의뢰생성Command(
     string? 차량종류,
     string? 결제수단,
     int? 결제예정금액,
+    Hongdal.Contracts.Shipper.Request.화주운송정산조건DTO? 정산조건,
     string 화물종류,
     string? 화물설명,
     int? 화물수량,

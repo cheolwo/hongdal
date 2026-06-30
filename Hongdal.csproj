@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Driver\09_Reservation\" />
+    <Folder Include="Domain\운행탐색\" />
     <Folder Include="Services\Storage\Redis\" />
   </ItemGroup>
 

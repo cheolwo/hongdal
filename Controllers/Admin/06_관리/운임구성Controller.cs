@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Hongdal.Controllers;
 using Hongdal.Application.Admin.Management;
 using Hongdal.Contracts.Admin.Management;
 
@@ -74,8 +75,8 @@ namespace Hongdal.Controllers.Admin.Master06
         [Authorize(Policy = "서버관리자전용")]
         public async Task<IActionResult> 삭제(long id)
         {
-            await _sender.Send(new 운임구성삭제Command(id));
-            return NoContent();
+            var result = await _sender.Send(new 운임구성삭제Command(id));
+            return this.ToNoContentActionResult(result);
         }
     }
 

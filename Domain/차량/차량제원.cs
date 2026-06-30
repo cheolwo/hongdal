@@ -67,6 +67,15 @@ namespace 홍달.도메인.차량
         [Column("팔레트적재개수")]
         public int? 팔레트적재개수 { get; set; }
 
+        [Column("권장최대CBM")]
+        public decimal? 권장최대CBM { get; set; }
+
+        [Column("추천우선순위")]
+        public int 추천우선순위 { get; set; } = 100;
+
+        [Column("추천사용여부")]
+        public bool 추천사용여부 { get; set; } = true;
+
         [Column("기준연비KmPerLiter")]
         public decimal? 기준연비KmPerLiter { get; set; }
 

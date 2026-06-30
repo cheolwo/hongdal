@@ -1,4 +1,5 @@
 using FluentResults;
+using Hongdal.Contracts.Shipper.Request;
 using Hongdal.Contracts.Shipper.Payment;
 using 홍달.Services.External.Toss;
 
@@ -81,28 +82,40 @@ public sealed class 토스결제승인CommandHandler : IRequestHandler<토스결
         }
 
         shipperRequest.결제상태 = 상태값.결제상태.결제완료;
-        shipperRequest.배차상태 = 상태값.배차상태.매칭중;
+        shipperRequest.정산상태 = 운임정산상태.결제완료.ToString();
         shipperRequest.UpdatedAt = DateTime.UtcNow;
 
-        var existingQueue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == shipperRequest.의뢰Id, cancellationToken);
-        if (existingQueue == null)
+        var settlementTime = TryParseSettlementTime(shipperRequest.정산시점);
+        var createDispatchQueue = settlementTime == 정산시점.선결제;
+
+        if (createDispatchQueue)
         {
-            _db.배차대기.Add(new 홍달.도메인.배차.배차대기
+            shipperRequest.배차상태 = 상태값.배차상태.매칭중;
+
+            var existingQueue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == shipperRequest.의뢰Id, cancellationToken);
+            if (existingQueue == null)
             {
-                의뢰Id = shipperRequest.의뢰Id,
-                화주Id = shipperRequest.화주Id,
-                픽업_도로명주소 = shipperRequest.픽업_도로명주소,
-                픽업_상세주소 = shipperRequest.픽업_상세주소,
-                픽업_위도 = shipperRequest.픽업_위도,
-                픽업_경도 = shipperRequest.픽업_경도,
-                하차_도로명주소 = shipperRequest.하차_도로명주소,
-                하차_상세주소 = shipperRequest.하차_상세주소,
-                하차_위도 = shipperRequest.하차_위도,
-                하차_경도 = shipperRequest.하차_경도,
-                상태 = 상태값.배차대기상태.대기,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            });
+                _db.배차대기.Add(new 홍달.도메인.배차.배차대기
+                {
+                    의뢰Id = shipperRequest.의뢰Id,
+                    화주Id = shipperRequest.화주Id,
+                    픽업_도로명주소 = shipperRequest.픽업_도로명주소,
+                    픽업_상세주소 = shipperRequest.픽업_상세주소,
+                    픽업_위도 = shipperRequest.픽업_위도,
+                    픽업_경도 = shipperRequest.픽업_경도,
+                    하차_도로명주소 = shipperRequest.하차_도로명주소,
+                    하차_상세주소 = shipperRequest.하차_상세주소,
+                    하차_위도 = shipperRequest.하차_위도,
+                    하차_경도 = shipperRequest.하차_경도,
+                    상태 = 상태값.배차대기상태.대기,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+        }
+        else
+        {
+            shipperRequest.배차상태 = 상태값.배차상태.미시작;
         }
 
         await _db.SaveChangesAsync(cancellationToken);
@@ -117,5 +130,12 @@ public sealed class 토스결제승인CommandHandler : IRequestHandler<토스결
             결제상태 = payment.결제상태,
             결제응답 = confirmResult.ResponseJson
         });
+    }
+
+    private static 정산시점 TryParseSettlementTime(string? value)
+    {
+        return Enum.TryParse<정산시점>(value, ignoreCase: false, out var parsed)
+            ? parsed
+            : 정산시점.선결제;
     }
 }

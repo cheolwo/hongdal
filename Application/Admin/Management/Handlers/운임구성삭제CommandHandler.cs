@@ -1,6 +1,6 @@
 namespace Hongdal.Application.Admin.Management;
 
-public sealed class 운임구성삭제CommandHandler : IRequestHandler<운임구성삭제Command, Unit>
+public sealed class 운임구성삭제CommandHandler : IRequestHandler<운임구성삭제Command, FluentResults.Result<Unit>>
 {
     private readonly HongdalContext _db;
 
@@ -9,15 +9,17 @@ public sealed class 운임구성삭제CommandHandler : IRequestHandler<운임구
         _db = db;
     }
 
-    public async Task<Unit> Handle(운임구성삭제Command request, CancellationToken cancellationToken)
+    public async Task<FluentResults.Result<Unit>> Handle(운임구성삭제Command request, CancellationToken cancellationToken)
     {
         var entity = await _db.운임구성.FindAsync([request.Id], cancellationToken);
-        if (entity != null)
+        if (entity is null)
         {
-            _db.운임구성.Remove(entity);
-            await _db.SaveChangesAsync(cancellationToken);
+            return FluentResults.Result.Fail<Unit>("운임구성을 찾을 수 없습니다.");
         }
 
-        return Unit.Value;
+        _db.운임구성.Remove(entity);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return FluentResults.Result.Ok(Unit.Value);
     }
 }

@@ -2,8 +2,10 @@ using Hongdal.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Hongdal.Contracts.Common.ViewSettings;
 using 홍달.Data;
 using 홍달.Services;
+using 홍달.Services.Audit;
 using Hongdal.Contracts.Common;
 
 namespace Hongdal.Controllers.Common
@@ -20,17 +22,20 @@ namespace Hongdal.Controllers.Common
         private readonly AuthTokenService _authTokenService;
         private readonly INtsBusinessRegistrationService _ntsBusinessRegistrationService;
         private readonly JwtOptions _jwtOptions;
+        private readonly I사용자행위로그Service _activityLogService;
 
         public 인증Controller(
             UserManager<ApplicationUser> userManager,
             AuthTokenService authTokenService,
             INtsBusinessRegistrationService ntsBusinessRegistrationService,
-            IOptions<JwtOptions> jwtOptions)
+            IOptions<JwtOptions> jwtOptions,
+            I사용자행위로그Service activityLogService)
         {
             _userManager = userManager;
             _authTokenService = authTokenService;
             _ntsBusinessRegistrationService = ntsBusinessRegistrationService;
             _jwtOptions = jwtOptions.Value;
+            _activityLogService = activityLogService;
         }
 
         [HttpPost("login")]
@@ -43,12 +48,14 @@ namespace Hongdal.Controllers.Common
             var user = await 사용자조회Async(request.UserNameOrEmail.Trim());
             if (user == null)
             {
+                await 로그인로그기록Async(request.UserNameOrEmail.Trim(), null, false, "UserNotFound", "아이디 또는 비밀번호가 올바르지 않습니다.");
                 return Unauthorized(new { message = "아이디 또는 비밀번호가 올바르지 않습니다." });
             }
 
             var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
             if (!passwordValid)
             {
+                await 로그인로그기록Async(request.UserNameOrEmail.Trim(), user, false, "PasswordInvalid", "아이디 또는 비밀번호가 올바르지 않습니다.");
                 return Unauthorized(new { message = "아이디 또는 비밀번호가 올바르지 않습니다." });
             }
 
@@ -58,6 +65,7 @@ namespace Hongdal.Controllers.Common
             var refreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDays);
 
             await 리프레시토큰저장Async(user, refreshToken, refreshTokenExpiresAtUtc);
+            await 로그인로그기록Async(request.UserNameOrEmail.Trim(), user, true, string.Empty, string.Empty);
 
             return Ok(new 토큰응답
             {
@@ -200,6 +208,38 @@ namespace Hongdal.Controllers.Common
             var refreshTokenHash = _authTokenService.HashRefreshToken(refreshToken);
             await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, RefreshTokenHashName, refreshTokenHash);
             await _userManager.SetAuthenticationTokenAsync(user, TokenProvider, RefreshTokenExpiresAtName, refreshTokenExpiresAtUtc.ToString("O"));
+        }
+
+        private async Task 로그인로그기록Async(string userNameOrEmail, ApplicationUser? user, bool isSuccess, string errorCode, string errorMessage)
+        {
+            var roles = user is null ? [] : await _userManager.GetRolesAsync(user);
+            var roleName = roles.FirstOrDefault() ?? string.Empty;
+            await _activityLogService.기록Async(new 사용자행위로그기록
+            {
+                AppKey = roleName switch
+                {
+                    역할명.기사 => App식별자.DriverApp,
+                    역할명.화주 => App식별자.ShipperApp,
+                    역할명.서버관리자 => App식별자.HongdalAdmin,
+                    _ => "Hongdal.Server"
+                },
+                UserId = user?.Id ?? string.Empty,
+                UserName = user?.UserName ?? userNameOrEmail,
+                RoleName = roleName,
+                Email = user?.Email ?? userNameOrEmail,
+                PhoneNumber = user?.PhoneNumber ?? string.Empty,
+                ActionType = "Auth",
+                ActionName = "Login",
+                Route = Request.Path.Value ?? "/api/v1/auth/login",
+                TraceId = HttpContext.TraceIdentifier,
+                IsSuccess = isSuccess,
+                ErrorCode = errorCode,
+                ErrorMessage = errorMessage,
+                ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
+                UserAgent = Request.Headers.UserAgent.ToString(),
+                OccurredAtUtc = DateTime.UtcNow,
+                MetadataJson = $"{{\"userNameOrEmail\":\"{userNameOrEmail}\"}}"
+            });
         }
     }
 

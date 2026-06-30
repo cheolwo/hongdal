@@ -39,5 +39,53 @@ namespace 홍달.도메인.공통
             public const string 하차완료 = "하차완료";
             public const string 인수완료 = "인수완료";
         }
+
+        public static class 운행탐색상태
+        {
+            public const string 초안 = "초안";
+            public const string 탐색중 = "탐색중";
+            public const string 응답수집중 = "응답수집중";
+            public const string 응답부족 = "응답부족";
+            public const string 실행검토 = "실행검토";
+            public const string 확정연결대기 = "확정연결대기";
+            public const string 종료 = "종료";
+            public const string 취소 = "취소";
+        }
+
+        public static class 운행문의대상상태
+        {
+            public const string 선정됨 = "선정됨";
+            public const string 발송됨 = "발송됨";
+            public const string 열람함 = "열람함";
+            public const string 있음응답 = "있음응답";
+            public const string 없음응답 = "없음응답";
+            public const string 미정응답 = "미정응답";
+            public const string 나중응답 = "나중응답";
+            public const string 만료 = "만료";
+        }
+
+        public static class 탐색캠페인상태
+        {
+            public const string 초안 = "초안";
+            public const string 탐색중 = "탐색중";
+            public const string 응답수집중 = "응답수집중";
+            public const string 응답부족 = "응답부족";
+            public const string 실행검토 = "실행검토";
+            public const string 확정연결대기 = "확정연결대기";
+            public const string 종료 = "종료";
+            public const string 취소 = "취소";
+        }
+
+        public static class 탐색캠페인대상상태
+        {
+            public const string 선정됨 = "선정됨";
+            public const string 발송됨 = "발송됨";
+            public const string 열람함 = "열람함";
+            public const string 있음응답 = "있음응답";
+            public const string 없음응답 = "없음응답";
+            public const string 미정응답 = "미정응답";
+            public const string 나중응답 = "나중응답";
+            public const string 만료 = "만료";
+        }
     }
 }
