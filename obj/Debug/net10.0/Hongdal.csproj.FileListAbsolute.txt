@@ -14,7 +14,6 @@ C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.GeneratedMS
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.AssemblyInfoInputs.cache
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.AssemblyInfo.cs
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.csproj.CoreCompileInputs.cache
-C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
@@ -168,3 +167,8 @@ C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Conso
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Debug.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.File.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Infrastructure.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Infrastructure.pdb
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Domain.dll
+C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Domain.pdb
+C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.MvcApplicationPartsAssemblyInfo.cs

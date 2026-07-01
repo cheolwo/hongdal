@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services;
+using 홍달.Services.Storage.Local;
 
 namespace Hongdal.Controllers.Admin.Evidence04;
 
@@ -10,11 +11,13 @@ namespace Hongdal.Controllers.Admin.Evidence04;
 public sealed class 파일POD관리Controller : ControllerBase
 {
     private readonly IGoogleCloudStorageService _googleCloudStorageService;
+    private readonly ICommandFileStoragePathResolver _pathResolver;
     private readonly IAdminFilePodStore _store;
 
-    public 파일POD관리Controller(IGoogleCloudStorageService googleCloudStorageService, IAdminFilePodStore store)
+    public 파일POD관리Controller(IGoogleCloudStorageService googleCloudStorageService, ICommandFileStoragePathResolver pathResolver, IAdminFilePodStore store)
     {
         _googleCloudStorageService = googleCloudStorageService;
+        _pathResolver = pathResolver;
         _store = store;
     }
 
@@ -38,11 +41,12 @@ public sealed class 파일POD관리Controller : ControllerBase
         }
 
         await using var stream = request.File.OpenReadStream();
+        var folder = _pathResolver.ResolveAdminFilePodFolder(request.FileType, request.RequestId);
         var uploadResult = await _googleCloudStorageService.UploadAsync(
             stream,
             request.File.FileName,
             request.File.ContentType,
-            request.Folder,
+            folder,
             cancellationToken);
 
         var metadata = _store.Add(new AdminFilePodMetadata(

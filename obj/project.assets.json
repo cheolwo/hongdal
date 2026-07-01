@@ -1342,6 +1342,38 @@
         "runtime": {
           "bin/placeholder/Hongdal.Contracts.dll": {}
         }
+      },
+      "Hongdal.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Hongdal.Contracts": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Hongdal.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Hongdal.Domain.dll": {}
+        }
+      },
+      "Hongdal.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Hongdal.Contracts": "1.0.0",
+          "Hongdal.Domain": "1.0.0",
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "9.0.0",
+          "Microsoft.EntityFrameworkCore": "9.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Hongdal.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Hongdal.Infrastructure.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },
@@ -3752,6 +3784,16 @@
       "type": "project",
       "path": "../Hongdal.Contracts/Hongdal.Contracts.csproj",
       "msbuildProject": "../Hongdal.Contracts/Hongdal.Contracts.csproj"
+    },
+    "Hongdal.Domain/1.0.0": {
+      "type": "project",
+      "path": "../Hongdal.Domain/Hongdal.Domain.csproj",
+      "msbuildProject": "../Hongdal.Domain/Hongdal.Domain.csproj"
+    },
+    "Hongdal.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../Hongdal.Infrastructure/Hongdal.Infrastructure.csproj",
+      "msbuildProject": "../Hongdal.Infrastructure/Hongdal.Infrastructure.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -3761,6 +3803,8 @@
       "FluentValidation.DependencyInjectionExtensions >= 12.0.0",
       "Google.Cloud.Storage.V1 >= 4.15.0",
       "Hongdal.Contracts >= 1.0.0",
+      "Hongdal.Domain >= 1.0.0",
+      "Hongdal.Infrastructure >= 1.0.0",
       "MediatR >= 12.5.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 10.0.9",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 9.0.0",
@@ -3791,6 +3835,7 @@
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal\\obj\\",
       "projectStyle": "PackageReference",
+      "centralPackageVersionsManagementEnabled": true,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
@@ -3814,6 +3859,12 @@
           "projectReferences": {
             "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Contracts\\Hongdal.Contracts.csproj": {
               "projectPath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Contracts\\Hongdal.Contracts.csproj"
+            },
+            "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Domain\\Hongdal.Domain.csproj": {
+              "projectPath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Domain\\Hongdal.Domain.csproj"
+            },
+            "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Infrastructure\\Hongdal.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal.Infrastructure\\Hongdal.Infrastructure.csproj"
             }
           }
         }
@@ -3837,82 +3888,132 @@
         "dependencies": {
           "FluentResults": {
             "target": "Package",
-            "version": "[4.0.0, )"
+            "version": "[4.0.0, )",
+            "versionCentrallyManaged": true
           },
           "FluentValidation": {
             "target": "Package",
-            "version": "[12.0.0, )"
+            "version": "[12.0.0, )",
+            "versionCentrallyManaged": true
           },
           "FluentValidation.DependencyInjectionExtensions": {
             "target": "Package",
-            "version": "[12.0.0, )"
+            "version": "[12.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Google.Cloud.Storage.V1": {
             "target": "Package",
-            "version": "[4.15.0, )"
+            "version": "[4.15.0, )",
+            "versionCentrallyManaged": true
           },
           "MediatR": {
             "target": "Package",
-            "version": "[12.5.0, )"
+            "version": "[12.5.0, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
-            "version": "[10.0.9, )"
+            "version": "[10.0.9, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
             "target": "Package",
-            "version": "[9.0.0, )"
+            "version": "[9.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
-            "version": "[10.0.9, )"
+            "version": "[10.0.9, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",
-            "version": "[9.0.0, )"
+            "version": "[9.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.EntityFrameworkCore.Design": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[9.0.0, )"
+            "version": "[9.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.EntityFrameworkCore.Tools": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[9.0.0, )"
+            "version": "[9.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
             "target": "Package",
-            "version": "[1.23.0, )"
+            "version": "[1.23.0, )",
+            "versionCentrallyManaged": true
           },
           "MongoDB.Driver": {
             "target": "Package",
-            "version": "[3.9.0, )"
+            "version": "[3.9.0, )",
+            "versionCentrallyManaged": true
           },
           "Pomelo.EntityFrameworkCore.MySql": {
             "target": "Package",
-            "version": "[9.0.0, )"
+            "version": "[9.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Quartz": {
             "target": "Package",
-            "version": "[3.18.1, )"
+            "version": "[3.18.1, )",
+            "versionCentrallyManaged": true
           },
           "Serilog.AspNetCore": {
             "target": "Package",
-            "version": "[10.0.0, )"
+            "version": "[10.0.0, )",
+            "versionCentrallyManaged": true
           },
           "Serilog.Sinks.Console": {
             "target": "Package",
-            "version": "[6.1.1, )"
+            "version": "[6.1.1, )",
+            "versionCentrallyManaged": true
           },
           "Serilog.Sinks.File": {
             "target": "Package",
-            "version": "[7.0.0, )"
+            "version": "[7.0.0, )",
+            "versionCentrallyManaged": true
           },
           "StackExchange.Redis": {
             "target": "Package",
-            "version": "[3.0.0, )"
+            "version": "[3.0.0, )",
+            "versionCentrallyManaged": true
           }
+        },
+        "centralPackageVersions": {
+          "Bogus": "35.6.5",
+          "coverlet.collector": "6.0.4",
+          "FluentResults": "4.0.0",
+          "FluentValidation": "12.0.0",
+          "FluentValidation.DependencyInjectionExtensions": "12.0.0",
+          "Google.Cloud.Storage.V1": "4.15.0",
+          "MediatR": "12.5.0",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.9",
+          "Microsoft.AspNetCore.Components.WebView.Maui": "(, )",
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "9.0.0",
+          "Microsoft.AspNetCore.OpenApi": "10.0.9",
+          "Microsoft.EntityFrameworkCore": "9.0.0",
+          "Microsoft.EntityFrameworkCore.Design": "9.0.0",
+          "Microsoft.EntityFrameworkCore.Tools": "9.0.0",
+          "Microsoft.Extensions.Logging.Debug": "10.0.0",
+          "Microsoft.Maui.Controls": "(, )",
+          "Microsoft.Maui.Controls.Maps": "(, )",
+          "Microsoft.NET.Test.Sdk": "17.14.1",
+          "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "1.23.0",
+          "MongoDB.Driver": "3.9.0",
+          "MudBlazor": "9.5.0",
+          "Pomelo.EntityFrameworkCore.MySql": "9.0.0",
+          "Quartz": "3.18.1",
+          "Serilog.AspNetCore": "10.0.0",
+          "Serilog.Sinks.Console": "6.1.1",
+          "Serilog.Sinks.File": "7.0.0",
+          "StackExchange.Redis": "3.0.0",
+          "xunit": "2.9.3",
+          "xunit.runner.visualstudio": "3.1.4"
         },
         "imports": [
           "net461",
@@ -4350,5 +4451,17 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "'Microsoft.OpenApi' 2.0.0 패키지에 알려진 높음 심각도 취약성인 https://github.com/advisories/GHSA-v5pm-xwqc-g5wc이(가) 있습니다.",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

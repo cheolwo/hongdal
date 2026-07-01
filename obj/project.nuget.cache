@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "kA0tGx+K3n8=",
+  "dgSpecHash": "YKNQAlH3Chk=",
   "success": true,
   "projectFilePath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal\\Hongdal.csproj",
   "expectedPackageFiles": [
@@ -77,5 +77,18 @@
     "C:\\Users\\user\\.nuget\\packages\\system.management\\7.0.2\\system.management.7.0.2.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\zstdsharp.port\\0.7.3\\zstdsharp.port.0.7.3.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "'Microsoft.OpenApi' 2.0.0 패키지에 알려진 높음 심각도 취약성인 https://github.com/advisories/GHSA-v5pm-xwqc-g5wc이(가) 있습니다.",
+      "projectPath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal\\Hongdal.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\user\\source\\repos\\Hongdal\\Hongdal\\Hongdal.csproj",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

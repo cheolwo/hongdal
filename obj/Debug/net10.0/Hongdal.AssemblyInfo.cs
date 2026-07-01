@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hongdal")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c7571276331bfea5c0388a2596c281c46c0064e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c06ffdb50c612582dd71b02a6b104344e5ac9143")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hongdal")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hongdal")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services;
+using 홍달.Services.Storage.Local;
 
 namespace Hongdal.Controllers.Common
 {
@@ -8,10 +9,12 @@ namespace Hongdal.Controllers.Common
     public class 파일업로드Controller : ControllerBase
     {
         private readonly IGoogleCloudStorageService _googleCloudStorageService;
+        private readonly ICommandFileStoragePathResolver _pathResolver;
 
-        public 파일업로드Controller(IGoogleCloudStorageService googleCloudStorageService)
+        public 파일업로드Controller(IGoogleCloudStorageService googleCloudStorageService, ICommandFileStoragePathResolver pathResolver)
         {
             _googleCloudStorageService = googleCloudStorageService;
+            _pathResolver = pathResolver;
         }
 
         [HttpPost("upload")]
@@ -28,12 +31,19 @@ namespace Hongdal.Controllers.Common
                 return BadRequest("empty file is not allowed");
             }
 
+            if (string.IsNullOrWhiteSpace(request.CommandName))
+            {
+                return BadRequest("commandName is required");
+            }
+
+            var folder = _pathResolver.ResolveCommandFolder(request.CommandName, request.ReferenceId);
+
             await using var stream = request.File.OpenReadStream();
             var result = await _googleCloudStorageService.UploadAsync(
                 stream,
                 request.File.FileName,
                 request.File.ContentType,
-                request.Folder,
+                folder,
                 cancellationToken);
 
             return Ok(new

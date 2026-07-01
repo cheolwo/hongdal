@@ -24,11 +24,12 @@ using 홍달.Services;
 using 홍달.Services.Dispatch.Recommendation;
 using 홍달.Services.Exploration;
 using 홍달.Services.Storage.Local;
-using 홍달.Infrastructure.Security;
+using 홍달.Infrastructure;
 using 홍달.Infrastructure.Storage.Local;
 using 홍달.Infrastructure.Storage.Redis;
 using Hongdal.Middleware;
 using 홍달.Services.Audit;
+using 홍달.Services.Documents;
 using 홍달.Services.Sales;
 using 홍달.Services.ViewSettings;
 using 홍달.Services.Warehouse;
@@ -47,7 +48,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services)
         .Enrich.FromLogContext()
-        .Enrich.WithProperty("Application", "Hongdal.Server")
+        .Enrich.WithProperty("Application", "Hongdal.LogisticsApi")
         .WriteTo.Console()
         .WriteTo.File(
             path: "logs/hongdal-.log",
@@ -94,8 +95,9 @@ builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisO
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
 builder.Services.Configure<PushNotificationsOptions>(builder.Configuration.GetSection(PushNotificationsOptions.SectionName));
 builder.Services.Configure<CommandProcessingOptions>(builder.Configuration.GetSection(CommandProcessingOptions.SectionName));
+builder.Services.Configure<CommandFileStorageOptions>(builder.Configuration.GetSection(CommandFileStorageOptions.SectionName));
 
-builder.Services.AddSingleton<홍달.Infrastructure.Security.IPersonalDataEncryptionService, 홍달.Infrastructure.Security.DataProtectionPersonalDataEncryptionService>();
+builder.Services.AddHongdalInfrastructure();
 builder.Services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
 builder.Services.AddScoped<ICommand기능설정Resolver, Command기능설정Resolver>();
 builder.Services.AddScoped<ICommand기능CatalogResolver, Command기능CatalogResolver>();
@@ -108,10 +110,12 @@ builder.Services.AddScoped<IWarehouseOperationService, WarehouseOperationService
 builder.Services.AddScoped<사용자행위로그Middleware>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                       ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-                       ?? (isRunningInContainer
-                           ? "server=mysql;port=3306;database=hongdal_dev;user=hongdal;password=passw0rd;"
-                           : "server=127.0.0.1;port=13306;database=hongdal_dev;user=hongdal;password=passw0rd;");
+                       ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("ConnectionStrings:DefaultConnection configuration is required.");
+}
+
 builder.Services.AddDbContext<HongdalContext>(options =>
     options.UseMySql(
         connectionString,
@@ -119,16 +123,23 @@ builder.Services.AddDbContext<HongdalContext>(options =>
         mysqlOptions => mysqlOptions.EnableRetryOnFailure()));
 
 var redisConnectionString = builder.Configuration.GetSection(RedisOptions.SectionName).GetValue<string>(nameof(RedisOptions.ConnectionString))
-                            ?? Environment.GetEnvironmentVariable("Redis__ConnectionString")
-                            ?? (isRunningInContainer ? "redis:6379" : "127.0.0.1:16379");
+                            ?? Environment.GetEnvironmentVariable("Redis__ConnectionString");
+if (string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    throw new InvalidOperationException("Redis:ConnectionString configuration is required.");
+}
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
 
 var mongoOptions = builder.Configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();
 var mongoConnectionString = string.IsNullOrWhiteSpace(mongoOptions.ConnectionString)
-    ? Environment.GetEnvironmentVariable("MongoDb__ConnectionString") ?? (isRunningInContainer
-        ? "mongodb://hongdal:passw0rd@mongo:27017/?authSource=admin"
-        : "mongodb://hongdal:passw0rd@127.0.0.1:27017/?authSource=admin")
+    ? Environment.GetEnvironmentVariable("MongoDb__ConnectionString")
     : mongoOptions.ConnectionString;
+if (string.IsNullOrWhiteSpace(mongoConnectionString))
+{
+    throw new InvalidOperationException("MongoDb:ConnectionString configuration is required.");
+}
+
 builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -183,7 +194,9 @@ builder.Services
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("서버관리자전용", policy => policy.RequireRole(역할명.서버관리자));
+    options.AddPolicy("용달기사전용", policy => policy.RequireRole(역할명.용달기사, 역할명.기사));
     options.AddPolicy("화주또는판매자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자));
+    options.AddPolicy("물류운영사용자전용", policy => policy.RequireRole(역할명.용달기사, 역할명.기사, 역할명.화주, 역할명.창고관리자, 역할명.서버관리자));
     options.AddPolicy("창고관리자전용", policy => policy.RequireRole(역할명.창고관리자, 역할명.서버관리자));
     options.AddPolicy("운영사용자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자, 역할명.창고관리자, 역할명.서버관리자));
 });
@@ -229,10 +242,13 @@ builder.Services.AddSingleton<IDriverPushTokenStore, RedisDriverPushTokenStore>(
 builder.Services.AddSingleton<IDriverRecommendationPushStateStore, RedisDriverRecommendationPushStateStore>();
 builder.Services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>();
 builder.Services.AddSingleton<IDriverNotificationSettingsStore, RedisDriverNotificationSettingsStore>();
+builder.Services.AddSingleton<ICommandFileStoragePathResolver, CommandFileStoragePathResolver>();
 builder.Services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
 builder.Services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
 builder.Services.AddSingleton<I탐색캠페인이벤트저장소, 탐색캠페인이벤트저장소>();
 builder.Services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
+builder.Services.AddSingleton<I문서관리Store, 문서관리Store>();
+builder.Services.AddSingleton<I문서관리Service, 문서관리Service>();
 builder.Services.AddScoped<I배차추천경로Service, 배차추천경로Service>();
 builder.Services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
 builder.Services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
@@ -277,9 +293,6 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -315,6 +328,9 @@ app.UseExceptionHandler(errorApp =>
         });
     });
 });
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware<사용자행위로그Middleware>();
 app.MapControllers();
@@ -361,6 +377,8 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
         await IdentityDataSeeder.SeedAsync(services);
         var viewVisibilityService = services.GetRequiredService<IView가시성Service>();
         await viewVisibilityService.SeedPoliciesAsync();
+        var documentService = services.GetRequiredService<I문서관리Service>();
+        await documentService.SeedDefaultsAsync();
     }
     catch (Exception ex)
     {

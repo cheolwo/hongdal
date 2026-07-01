@@ -21,6 +21,7 @@
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Google.Cloud.Storage.V1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+        <PackageReference Include="Microsoft.OpenApi" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
     <PackageReference Include="Quartz" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
@@ -40,6 +41,7 @@
   <ItemGroup>
     <Folder Include="Controllers\Driver\09_Reservation\" />
     <Folder Include="Domain\운행탐색\" />
+    <Folder Include="Infrastructure\Persistence\" />
     <Folder Include="Infrastructure\Security\" />
     <Folder Include="Services\Restaurants\" />
     <Folder Include="Services\Storage\Redis\" />

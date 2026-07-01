@@ -20,7 +20,6 @@ public static class View카탈로그
     [
         new(App식별자.DriverApp, View식별자.Driver.Home, "홈", "/", Icons.Driver.Home, 역할명.기사, true, true, 10),
         new(App식별자.DriverApp, View식별자.Driver.DriverHome, "기사 홈", "/driver/home", Icons.Driver.DriverHome, 역할명.기사, true, true, 20),
-        new(App식별자.DriverApp, View식별자.Driver.WorkStatus, "근무 상태", "/driver/work/status", Icons.Driver.WorkStatus, 역할명.기사, true, true, 30),
         new(App식별자.DriverApp, View식별자.Driver.Recommendations, "추천 목록", "/driver/recommendations", Icons.Driver.Recommendations, 역할명.기사, false, true, 40),
         new(App식별자.DriverApp, View식별자.Driver.ExplorationCampaigns, "보낸 탐색 문의함", "/driver/exploration/campaigns", Icons.Driver.ExplorationCampaigns, 역할명.기사, false, true, 50),
         new(App식별자.DriverApp, View식별자.Driver.Reservations, "예약", "/driver/reservations", Icons.Driver.Reservations, 역할명.기사, false, true, 60),
@@ -55,8 +54,10 @@ public static class View카탈로그
         new(App식별자.HongdalAdmin, View식별자.Admin.Partners, "11. 업체/화주 관리", "/partners", Icons.Admin.Partners, 역할명.서버관리자, false, true, 120),
         new(App식별자.HongdalAdmin, View식별자.Admin.PublicCargo, "12. 공개 화물정보", "/cargo", Icons.Admin.PublicCargo, 역할명.서버관리자, false, true, 130),
         new(App식별자.HongdalAdmin, View식별자.Admin.VehicleManagement, "13. 차량 추천/단가 관리", "/vehicle-management", Icons.Admin.VehicleManagement, 역할명.서버관리자, false, true, 140),
-        new(App식별자.HongdalAdmin, View식별자.Admin.ViewPolicies, "14. 화면 정책", "/view-policies", Icons.Common.Settings, 역할명.서버관리자, true, true, 150),
-        new(App식별자.HongdalAdmin, View식별자.Admin.ActivityLogs, "15. 사용자 행위 로그", "/activity-logs", Icons.Admin.ActivityLogs, 역할명.서버관리자, true, true, 160)
+        new(App식별자.HongdalAdmin, View식별자.Admin.Documents, "14. 문서 관리", "/documents", Icons.Admin.Documents, 역할명.서버관리자, false, true, 150),
+        new(App식별자.HongdalAdmin, View식별자.Admin.ViewPolicies, "15. 화면 정책", "/view-policies", Icons.Common.Settings, 역할명.서버관리자, true, true, 160),
+        new(App식별자.HongdalAdmin, View식별자.Admin.ActivityLogs, "16. 사용자 행위 로그", "/activity-logs", Icons.Admin.ActivityLogs, 역할명.서버관리자, true, true, 170),
+        new(App식별자.HongdalAdmin, View식별자.Admin.FoodOperations, "17. 음식 운영", "/food/operations", Icons.Admin.FoodOperations, 역할명.서버관리자, false, true, 180)
     ];
 
     public static IReadOnlyList<View카탈로그항목> 전체() => Items;
@@ -86,7 +87,6 @@ public static class View카탈로그
         {
             public const string Home = "home";
             public const string DriverHome = "directions_car";
-            public const string WorkStatus = "work";
             public const string Recommendations = "recommend";
             public const string ExplorationCampaigns = "outbox";
             public const string Reservations = "event";
@@ -123,7 +123,9 @@ public static class View카탈로그
             public const string Partners = "bi bi-building-nav-menu";
             public const string PublicCargo = "bi bi-box-seam-nav-menu";
             public const string VehicleManagement = "bi bi-truck-flatbed-nav-menu";
+            public const string Documents = "bi bi-folder2-open-nav-menu";
             public const string ActivityLogs = "bi bi-journal-text";
+            public const string FoodOperations = "bi bi-shop-window";
         }
     }
 }
