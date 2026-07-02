@@ -406,12 +406,12 @@ flowchart TD
 	B -->|예약 확인| L[예약 /driver/reservations]
 	B -->|알림 점검| M[알림 설정 /driver/notifications/settings]
 	B -->|정산 확인| N[월 정산 /driver/settlements/current-month]
-	D --> E[추천 상세 /driver/recommendations/{id}]
-	E --> F[배차 처리 /driver/recommendations/{id}/decision]
+	D --> E[추천 상세 /driver/recommendations/:id]
+	E --> F[배차 처리 /driver/recommendations/:id/decision]
 	F -->|수락 이후 연결 예정| H
 	F -->|거절| D
-	H --> I[상차 /driver/transports/{id}/pickup]
-	I --> J[하차 /driver/transports/{id}/dropoff]
+	H --> I[상차 /driver/transports/:id/pickup]
+	I --> J[하차 /driver/transports/:id/dropoff]
 	J --> K[운송 완료 후 홈/정산 흐름으로 복귀]
 ```
 
