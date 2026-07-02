@@ -219,7 +219,6 @@ flowchart LR
   - Serilog
   - Toss Payments
 - `Kie.AI` 기반 샘플 이미지 생성 파이프라인과 `Google Cloud Storage` 업로드 흐름이 추가되었다.
-- 즉 백엔드는 단순 샘플 서버가 아니라, **실서비스 연동을 염두에 둔 기반은 상당 부분 올라와 있는 상태**로 볼 수 있다.
 
 ## 최근 서버 변경 요약
 
