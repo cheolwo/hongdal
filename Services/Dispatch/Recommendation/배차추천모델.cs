@@ -29,5 +29,62 @@ namespace 홍달.Services.Dispatch.Recommendation
         decimal? 추천점수,
         string[] 배지,
         string[] 경고,
-        string 추천사유);
+        string 추천사유,
+        string? 복귀추천사유);
+
+    public sealed record 복귀지결정결과(
+        string? 주소,
+        배차경로좌표? 좌표,
+        string 출처,
+        bool 복귀지기준사용됨);
+
+    public sealed record 기사운송일정항목(
+        string 의뢰Id,
+        string 단계유형,
+        string 주소,
+        배차경로좌표? 좌표,
+        DateTime? 기준시각,
+        DateTime? 시간창종료일시,
+        int 순서,
+        long? 운송Id,
+        bool 진행중운송여부,
+        bool 후보의뢰여부);
+
+    public sealed record 기사운송일정계획(
+        string 기사Id,
+        DateTime 기준시각,
+        배차경로좌표? 시작좌표,
+        IReadOnlyList<기사운송일정항목> 항목목록);
+
+    public sealed record 운송일정도착예상항목(
+        string 의뢰Id,
+        string 단계유형,
+        int 순서,
+        string 주소,
+        DateTime? 예상도착시각,
+        DateTime? 시간창종료일시,
+        bool 시간위반여부,
+        decimal? 시간위반분);
+
+    public sealed record 운송삽입시도결과(
+        int 삽입인덱스,
+        bool 전체완수가능여부,
+        decimal? 총소요시간분,
+        decimal? 총거리Km,
+        decimal? 총추가지연분,
+        decimal? 최대시간위반분,
+        string[] 위반사유,
+        IReadOnlyList<운송일정도착예상항목> 도착예상목록);
+
+    public sealed record 운송삽입평가결과(
+        bool 삽입가능여부,
+        bool 전체완수가능여부,
+        int? 최적삽입인덱스,
+        decimal? 총소요시간분,
+        decimal? 총거리Km,
+        decimal? 총추가지연분,
+        decimal? 최대시간위반분,
+        string[] 위반사유,
+        IReadOnlyList<운송일정도착예상항목> 도착예상목록,
+        IReadOnlyList<운송삽입시도결과> 시도목록);
 }

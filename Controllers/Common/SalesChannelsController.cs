@@ -49,6 +49,14 @@ public sealed class SalesChannelsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("products/seed-samples")]
+    public async Task<ActionResult<판매상품목록응답>> 샘플상품시드([FromBody] 판매상품샘플시드요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _salesChannelService.SeedSampleProductsAsync(request, cancellationToken);
+        await LogAsync("SalesProduct", "SampleProductsSeeded", $"{{\"count\":{result.Items.Count}}}", cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("listings")]
     public async Task<ActionResult<채널출품목록응답>> 출품목록(CancellationToken cancellationToken)
     {

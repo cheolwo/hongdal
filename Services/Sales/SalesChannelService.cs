@@ -10,11 +10,13 @@ public sealed class SalesChannelService : ISalesChannelService
 {
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly I판매상품샘플시드Service _productSampleSeedService;
 
-    public SalesChannelService(HongdalContext db, ICurrentUserAccessor currentUserAccessor)
+    public SalesChannelService(HongdalContext db, ICurrentUserAccessor currentUserAccessor, I판매상품샘플시드Service productSampleSeedService)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
+        _productSampleSeedService = productSampleSeedService;
     }
 
     public async Task<판매채널계정목록응답> GetAccountsAsync(CancellationToken cancellationToken)
@@ -87,7 +89,11 @@ public sealed class SalesChannelService : ISalesChannelService
                 대표상품명 = x.대표상품명,
                 판매SKU = x.판매SKU,
                 판매가 = x.판매가,
-                상태 = x.상태
+                상태 = x.상태,
+                샘플데이터여부 = x.샘플데이터여부,
+                샘플데이터코드 = x.샘플데이터코드,
+                Image_Url = x.이미지Url,
+                이미지생성상태 = x.이미지생성상태
             })
             .ToArrayAsync(cancellationToken);
 
@@ -113,6 +119,10 @@ public sealed class SalesChannelService : ISalesChannelService
             판매SKU = request.판매SKU.Trim(),
             판매가 = request.판매가,
             상태 = "준비",
+            샘플데이터여부 = request.샘플데이터여부,
+            샘플데이터코드 = string.IsNullOrWhiteSpace(request.샘플데이터코드) ? null : request.샘플데이터코드.Trim(),
+            이미지Url = null,
+            이미지생성상태 = 판매상품이미지생성상태.미생성,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -127,8 +137,17 @@ public sealed class SalesChannelService : ISalesChannelService
             대표상품명 = entity.대표상품명,
             판매SKU = entity.판매SKU,
             판매가 = entity.판매가,
-            상태 = entity.상태
+            상태 = entity.상태,
+            샘플데이터여부 = entity.샘플데이터여부,
+            샘플데이터코드 = entity.샘플데이터코드,
+            Image_Url = entity.이미지Url,
+            이미지생성상태 = entity.이미지생성상태
         };
+    }
+
+    public Task<판매상품목록응답> SeedSampleProductsAsync(판매상품샘플시드요청 request, CancellationToken cancellationToken)
+    {
+        return _productSampleSeedService.SeedSampleProductsAsync(request.최대건수, cancellationToken);
     }
 
     public async Task<채널출품목록응답> GetListingsAsync(CancellationToken cancellationToken)

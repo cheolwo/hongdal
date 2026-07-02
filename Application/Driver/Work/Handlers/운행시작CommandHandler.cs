@@ -48,6 +48,11 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             시작시각 = request.시작시각 ?? DateTime.UtcNow,
             시작위치 = request.시작위치,
             복귀지 = request.복귀지,
+            오늘의복귀지주소 = ResolveTodayReturnAddress(request, driver),
+            오늘의복귀지위도 = ResolveTodayReturnLatitude(request, driver),
+            오늘의복귀지경도 = ResolveTodayReturnLongitude(request, driver),
+            복귀지출처 = ResolveReturnSource(request, driver),
+            복귀지입력일시 = ResolveTodayReturnAddress(request, driver) is null ? null : DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -64,7 +69,7 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             shift.CreatedAt,
             shift.시작모드,
             shift.시작위치,
-            shift.복귀지), cancellationToken);
+            shift.오늘의복귀지주소 ?? shift.복귀지), cancellationToken);
         await tx.CommitAsync(cancellationToken);
 
         await _dispatchRecommendationService.SendToDriverAsync(request.기사Id);
@@ -84,7 +89,64 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             DriverId = request.기사Id,
             Status = driver.운행상태,
             ShiftId = shift.Id,
-            StartedAt = shift.시작시각
+            StartedAt = shift.시작시각,
+            적용복귀지 = shift.오늘의복귀지주소 ?? shift.복귀지,
+            복귀지출처 = shift.복귀지출처
         });
+    }
+
+    private static string? ResolveTodayReturnAddress(운행시작Command request, 용달기사 driver)
+    {
+        if (!string.IsNullOrWhiteSpace(request.오늘의복귀지주소))
+        {
+            return request.오늘의복귀지주소.Trim();
+        }
+
+        if (request.기본복귀지사용 && !string.IsNullOrWhiteSpace(driver.기본복귀지주소))
+        {
+            return driver.기본복귀지주소;
+        }
+
+        return request.복귀지;
+    }
+
+    private static decimal? ResolveTodayReturnLatitude(운행시작Command request, 용달기사 driver)
+    {
+        if (request.오늘의복귀지위도.HasValue)
+        {
+            return request.오늘의복귀지위도.Value;
+        }
+
+        return request.기본복귀지사용 ? driver.기본복귀지위도 : null;
+    }
+
+    private static decimal? ResolveTodayReturnLongitude(운행시작Command request, 용달기사 driver)
+    {
+        if (request.오늘의복귀지경도.HasValue)
+        {
+            return request.오늘의복귀지경도.Value;
+        }
+
+        return request.기본복귀지사용 ? driver.기본복귀지경도 : null;
+    }
+
+    private static string ResolveReturnSource(운행시작Command request, 용달기사 driver)
+    {
+        if (!string.IsNullOrWhiteSpace(request.복귀지출처))
+        {
+            return request.복귀지출처;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.오늘의복귀지주소))
+        {
+            return "오늘입력";
+        }
+
+        if (request.기본복귀지사용 && !string.IsNullOrWhiteSpace(driver.기본복귀지주소))
+        {
+            return "기본복귀지";
+        }
+
+        return string.IsNullOrWhiteSpace(request.복귀지) ? string.Empty : "직접입력";
     }
 }

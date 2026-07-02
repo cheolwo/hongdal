@@ -166,9 +166,9 @@ C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Settings.Co
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Console.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.Debug.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Serilog.Sinks.File.dll
-C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Infrastructure.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Infrastructure.pdb
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Domain.dll
 C:\Users\user\source\repos\Hongdal\Hongdal\bin\Debug\net10.0\Hongdal.Domain.pdb
 C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\Hongdal.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\user\source\repos\Hongdal\Hongdal\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

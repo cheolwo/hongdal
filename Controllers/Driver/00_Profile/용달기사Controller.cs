@@ -94,6 +94,10 @@ public sealed class 용달기사Controller : ControllerBase
             운행상태 = 상태값.기사운행상태.대기,
             주_활동지역 = request.주_활동지역.Trim(),
             메모 = request.메모?.Trim() ?? string.Empty,
+            기본복귀지주소 = request.기본복귀지주소?.Trim(),
+            기본복귀지위도 = request.기본복귀지위도,
+            기본복귀지경도 = request.기본복귀지경도,
+            집주소를복귀지로사용허용 = request.집주소를복귀지로사용허용,
             등록일 = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -120,6 +124,10 @@ public sealed class 용달기사Controller : ControllerBase
             운행상태 = driver.운행상태,
             등록일 = driver.등록일,
             메모 = driver.메모,
+            기본복귀지주소 = driver.기본복귀지주소,
+            기본복귀지위도 = driver.기본복귀지위도,
+            기본복귀지경도 = driver.기본복귀지경도,
+            집주소를복귀지로사용허용 = driver.집주소를복귀지로사용허용,
             푸시토큰등록됨 = !string.IsNullOrWhiteSpace(pushToken)
         });
     }

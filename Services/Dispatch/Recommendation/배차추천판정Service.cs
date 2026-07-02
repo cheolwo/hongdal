@@ -4,8 +4,8 @@ namespace 홍달.Services.Dispatch.Recommendation
 {
     public interface I배차추천판정Service
     {
-        배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km);
-        배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km, 차량화물적합성결과? 적합성결과);
+        배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km, 운송삽입평가결과? 일정삽입평가결과 = null);
+        배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km, 차량화물적합성결과? 적합성결과, 운송삽입평가결과? 일정삽입평가결과 = null);
     }
 
     public sealed class 배차추천판정Service : I배차추천판정Service
@@ -14,10 +14,10 @@ namespace 홍달.Services.Dispatch.Recommendation
         private const decimal 묶음삽입조건부최대지연분 = 20m;
         private const decimal 다음콜최대거리Km = 5m;
 
-        public 배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km)
-            => 판정(request, 추가지연분, 픽업시간창여유분, 경로기준거리Km, null);
+        public 배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km, 운송삽입평가결과? 일정삽입평가결과 = null)
+            => 판정(request, 추가지연분, 픽업시간창여유분, 경로기준거리Km, null, 일정삽입평가결과);
 
-        public 배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km, 차량화물적합성결과? 적합성결과)
+        public 배차추천판정결과 판정(화주운송의뢰? request, decimal? 추가지연분, decimal? 픽업시간창여유분, decimal? 경로기준거리Km, 차량화물적합성결과? 적합성결과, 운송삽입평가결과? 일정삽입평가결과 = null)
         {
             var 허용지연분 = ResolveAllowedDelayMinutes(request);
             var 화물민감여부 = IsCargoSensitive(request);
@@ -40,7 +40,12 @@ namespace 홍달.Services.Dispatch.Recommendation
                     차량경고);
             }
 
+            var 일정삽입가능 = 일정삽입평가결과?.삽입가능여부 ?? true;
+            var 전체완수가능 = 일정삽입평가결과?.전체완수가능여부 ?? true;
+
             var 묶음삽입가능 = request is not null
+                                 && 일정삽입가능
+                                 && 전체완수가능
                                  && !단독배송여부
                                  && IsBundleInsertAllowed(request)
                                  && 경로기준거리Km.HasValue
@@ -49,6 +54,7 @@ namespace 홍달.Services.Dispatch.Recommendation
                                  && (!픽업시간창여유분.HasValue || 픽업시간창여유분.Value >= -3m);
 
             var 도착후추천가능 = request is not null
+                                  && 전체완수가능
                                   && 경로기준거리Km.HasValue
                                   && 경로기준거리Km.Value <= 다음콜최대거리Km
                                   && (!픽업시간창여유분.HasValue || 픽업시간창여유분.Value >= -5m);

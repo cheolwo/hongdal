@@ -29,5 +29,10 @@ public sealed class 운행시작CommandValidator : AbstractValidator<운행시�
             .MaximumLength(200)
             .When(x => !string.IsNullOrWhiteSpace(x.복귀지))
             .WithMessage("복귀지는 200자 이하여야 합니다.");
+
+        RuleFor(x => x.오늘의복귀지주소)
+            .MaximumLength(200)
+            .When(x => !string.IsNullOrWhiteSpace(x.오늘의복귀지주소))
+            .WithMessage("오늘의 복귀지는 200자 이하여야 합니다.");
     }
 }

@@ -41,7 +41,17 @@ namespace Hongdal.Controllers.Driver.Work01
         public async Task<IActionResult> 시작([FromBody] 기사운행시작요청 request)
         {
             var driverId = 현재기사Id();
-            var result = await _sender.Send(new 운행시작Command(driverId, request.시작모드, request.시작시각, request.시작위치, request.복귀지));
+            var result = await _sender.Send(new 운행시작Command(
+                driverId,
+                request.시작모드,
+                request.시작시각,
+                request.시작위치,
+                request.복귀지,
+                request.오늘의복귀지주소,
+                request.오늘의복귀지위도,
+                request.오늘의복귀지경도,
+                request.기본복귀지사용,
+                request.복귀지출처));
 
             if (result.IsFailed)
             {
