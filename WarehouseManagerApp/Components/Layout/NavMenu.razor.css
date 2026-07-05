@@ -1,0 +1,8 @@
+::deep .warehouse-navmenu .mud-nav-link {
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+
+::deep .warehouse-navmenu .mud-nav-link.active {
+    background: rgba(25, 118, 210, 0.1);
+}

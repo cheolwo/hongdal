@@ -1,0 +1,15 @@
+@page "/"
+@inject NavigationManager NavigationManager
+
+<PageTitle>기사 홈으로 이동</PageTitle>
+
+<MudStack Class="pa-4" AlignItems="AlignItems.Center" Justify="Justify.Center">
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+</MudStack>
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.Home, replace: true);
+    }
+}

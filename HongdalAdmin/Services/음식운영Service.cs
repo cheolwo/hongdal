@@ -1,0 +1,77 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using Hongdal.Contracts.Admin.Restaurants;
+
+namespace HongdalAdmin.Services;
+
+public sealed class 음식운영Service
+{
+    private readonly HttpClient _httpClient;
+    private readonly 관리자인증세션Service _session;
+
+    public 음식운영Service(HttpClient httpClient, 관리자인증세션Service session)
+    {
+        _httpClient = httpClient;
+        _session = session;
+    }
+
+    public async Task<음식점리뷰관리목록응답> 리뷰운영목록조회Async(CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Get, "api/v1/admin/restaurant-reviews");
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<음식점리뷰관리목록응답>(cancellationToken: cancellationToken)
+               ?? new 음식점리뷰관리목록응답();
+    }
+
+    public async Task<음식점리뷰운영정책응답> 운영정책조회Async(CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Get, "api/v1/admin/restaurant-reviews/policy");
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<음식점리뷰운영정책응답>(cancellationToken: cancellationToken)
+               ?? new 음식점리뷰운영정책응답();
+    }
+
+    public async Task<음식배달요금정책응답> 배달요금정책조회Async(CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Get, "api/v1/admin/food-delivery-pricing-policy");
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<음식배달요금정책응답>(cancellationToken: cancellationToken)
+               ?? new 음식배달요금정책응답();
+    }
+
+    public async Task<음식배달요금정책응답> 배달요금정책수정Async(음식배달요금정책응답 policy, CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Put, "api/v1/admin/food-delivery-pricing-policy");
+        request.Content = JsonContent.Create(policy);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<음식배달요금정책응답>(cancellationToken: cancellationToken)
+               ?? policy;
+    }
+
+    private HttpRequestMessage CreateRequest(HttpMethod method, string path)
+    {
+        var request = new HttpRequestMessage(method, path);
+        if (!string.IsNullOrWhiteSpace(_session.AccessToken))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _session.AccessToken);
+        }
+
+        return request;
+    }
+}
+
+public sealed class 음식배달요금정책응답
+{
+    public decimal BaseFee { get; set; } = 3000m;
+    public int IncludedDistanceMeters { get; set; } = 1000;
+    public int DistanceUnitMeters { get; set; } = 100;
+    public decimal DistanceUnitFee { get; set; } = 120m;
+    public decimal MinimumFee { get; set; } = 3000m;
+    public decimal DriverBasePayout { get; set; } = 2500m;
+    public decimal DriverDistanceUnitPayout { get; set; } = 90m;
+    public decimal DriverMinimumPayout { get; set; } = 2500m;
+}

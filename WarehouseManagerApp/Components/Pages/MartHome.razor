@@ -1,0 +1,82 @@
+@page "/mart"
+
+<PageTitle>홈달마트</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">홈달마트</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    음식점 주문 처리처럼 빠르게 움직이지만, 조리 대신 창고 재고를 입고, 보충, 피킹, 포장 완료 후 배달 기사 픽업으로 연결합니다.
+                </MudText>
+            </MudStack>
+            <MudButton Href="@WarehouseManagerRoutes.WorkBoard"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       StartIcon="@Icons.Material.Filled.Warehouse">
+                일반 창고
+            </MudButton>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" md="6" xl="3">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.MoveToInbox" Color="Color.Warning" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">도심 입고</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">납품, 반품, 거점 이동 물량을 창고 재고로 확인합니다.</MudText>
+                        <MudButton Href="@WarehouseManagerRoutes.MartInboundWorkStart" Variant="Variant.Filled" Color="Color.Warning">시작</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6" xl="3">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">진열/피킹존 보충</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">냉장, 상온, 즉시 출고 구역의 재고를 주문 처리 가능 상태로 맞춥니다.</MudText>
+                        <MudButton Href="@WarehouseManagerRoutes.MartReplenishmentWorkStart" Variant="Variant.Filled" Color="Color.Info">시작</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6" xl="3">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.ShoppingCartCheckout" Color="Color.Primary" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">주문 피킹/포장</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">고객 주문 단위로 상품을 모으고 포장 완료 상태까지 처리합니다.</MudText>
+                        <MudButton Href="@WarehouseManagerRoutes.MartPickingWorkStart" Variant="Variant.Filled" Color="Color.Primary">시작</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6" xl="3">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.DeliveryDining" Color="Color.Success" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">배달 기사 픽업</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">포장 완료된 주문을 음식 배달 기사에게 넘기고 고객 배송으로 연결합니다.</MudText>
+                        <MudButton Href="@WarehouseManagerRoutes.MartDeliveryPickupWorkStart" Variant="Variant.Filled" Color="Color.Success">시작</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6">홈달마트 업무 흐름</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        주문 마감, 재고 위치, 포장 완료, 배달 기사 도착 시간을 같이 보며 처리 우선순위를 잡습니다.
+                    </MudText>
+                </MudStack>
+                <MudButton Href="@WarehouseManagerRoutes.MartWorkBoard"
+                           Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                    작업 보드
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>

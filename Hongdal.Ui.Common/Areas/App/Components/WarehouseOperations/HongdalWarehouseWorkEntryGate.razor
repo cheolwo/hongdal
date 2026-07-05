@@ -1,0 +1,141 @@
+<MudPaper Class="@PanelClass" Elevation="@Elevation">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h5">@Title</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Description</MudText>
+            </MudStack>
+            <MudChip T="string" Color="@ChipColor" Variant="Variant.Outlined">@ProcessLabel</MudChip>
+        </MudStack>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            휴대폰 번호 뒤 8자리를 숫자만 입력하면 작업자와 공정 역할을 확인합니다.
+        </MudAlert>
+
+        <MudTextField T="string"
+                      Label="휴대폰 뒤 8자리"
+                      Value="@_phoneSuffix"
+                      ValueChanged="OnPhoneSuffixChanged"
+                      Variant="Variant.Outlined"
+                      Immediate="true"
+                      MaxLength="8"
+                      InputMode="InputMode.numeric"
+                      Placeholder="010을 제외한 8자리"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.PhoneIphone"
+                      Disabled="@IsBusy" />
+
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <MudAlert Severity="@_messageSeverity">@_message</MudAlert>
+        }
+
+        @if (_verifiedResult is { IsAllowed: true })
+        {
+            <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">@_verifiedResult.OperatorName</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@_verifiedResult.RoleName</MudText>
+                    </MudStack>
+                    <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Success" />
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Disabled="@(!CanVerify || IsBusy)"
+                       OnClick="VerifyAsync">
+                확인 후 시작
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Backspace"
+                       Disabled="@IsBusy"
+                       OnClick="Clear">
+                다시 입력
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "작업자 확인";
+
+    [Parameter]
+    public string Description { get; set; } = "공정 업무를 시작하기 전에 작업자를 확인합니다.";
+
+    [Parameter]
+    public string ProcessLabel { get; set; } = "창고 업무";
+
+    [Parameter]
+    public Color ChipColor { get; set; } = Color.Primary;
+
+    [Parameter]
+    public string PanelClass { get; set; } = "pa-4";
+
+    [Parameter]
+    public int Elevation { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public Func<string, Task<WarehouseWorkOperatorVerificationResult>>? VerificationHandler { get; set; }
+
+    [Parameter]
+    public EventCallback<WarehouseWorkOperatorVerificationResult> Verified { get; set; }
+
+    private string _phoneSuffix = string.Empty;
+    private string? _message;
+    private Severity _messageSeverity = Severity.Info;
+    private WarehouseWorkOperatorVerificationResult? _verifiedResult;
+
+    private bool CanVerify => _phoneSuffix.Length == 8 && _phoneSuffix.All(char.IsDigit);
+
+    private Task OnPhoneSuffixChanged(string value)
+    {
+        _phoneSuffix = new string((value ?? string.Empty).Where(char.IsDigit).Take(8).ToArray());
+        _verifiedResult = null;
+        _message = null;
+        return Task.CompletedTask;
+    }
+
+    private async Task VerifyAsync()
+    {
+        if (!CanVerify)
+        {
+            _messageSeverity = Severity.Warning;
+            _message = "휴대폰 번호 뒤 8자리를 숫자만 입력해 주세요.";
+            return;
+        }
+
+        if (VerificationHandler is null)
+        {
+            _messageSeverity = Severity.Error;
+            _message = "작업자 확인 서비스가 연결되지 않았습니다.";
+            return;
+        }
+
+        var result = await VerificationHandler.Invoke(_phoneSuffix);
+        _verifiedResult = result;
+        _messageSeverity = result.IsAllowed ? Severity.Success : Severity.Warning;
+        _message = result.Message;
+
+        if (result.IsAllowed)
+        {
+            await Verified.InvokeAsync(result);
+        }
+    }
+
+    private void Clear()
+    {
+        _phoneSuffix = string.Empty;
+        _verifiedResult = null;
+        _message = null;
+    }
+}

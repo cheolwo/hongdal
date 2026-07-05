@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 x:Class="DriverApp.Avalonia.Views.Work02View">
+  <StackPanel Margin="24" Spacing="12">
+	<TextBlock Text="02 근무" FontSize="28" FontWeight="Bold" />
+	<Border Padding="16" CornerRadius="12">
+	  <StackPanel Spacing="8">
+		<TextBlock Text="근무 시작/종료/예약" FontSize="18" FontWeight="SemiBold" />
+		<TextBlock Text="근무 상태와 큐 정보를 메모리 기반으로 표현합니다." TextWrapping="Wrap" />
+	  </StackPanel>
+	</Border>
+  </StackPanel>
+</UserControl>

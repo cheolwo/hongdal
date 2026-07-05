@@ -1,0 +1,66 @@
+@using DriverApp.Services
+@implements IDisposable
+@inject DriverViewVisibilityService ViewVisibilityService
+
+<MudStack Class="pa-4" Spacing="2">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h6">빠른 이동</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">알림, 설정, 진행 화면처럼 홈에서 바로 펼치지 않는 항목을 여기서 연다.</MudText>
+    </MudStack>
+
+    <MudDivider />
+
+    @if (!ViewVisibilityService.IsLoaded)
+    {
+        <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mx-2 my-2" />
+    }
+    else
+    {
+        <MudNavMenu Class="driver-assist-nav">
+            @foreach (var item in 지원메뉴항목)
+            {
+                <MudNavLink Href="@item.Route" Match="NavLinkMatch.Prefix" Icon="@ResolveIcon(item.IconKey)">
+                    @item.DisplayName
+                </MudNavLink>
+            }
+        </MudNavMenu>
+    }
+</MudStack>
+
+@code {
+    private IReadOnlyList<Hongdal.Contracts.Common.ViewSettings.View가시성항목응답> 지원메뉴항목 => ViewVisibilityService.VisibleItems
+            .Where(x => !string.Equals(x.Route, DriverRoutes.Home, StringComparison.OrdinalIgnoreCase)
+                 && !string.Equals(x.Route, "/driver/menu", StringComparison.OrdinalIgnoreCase))
+        .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ViewVisibilityService.Changed += HandleChanged;
+        await ViewVisibilityService.EnsureLoadedAsync();
+    }
+
+    private void HandleChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private static string ResolveIcon(string iconKey) => iconKey switch
+    {
+        "home" => Icons.Material.Filled.Home,
+        "settings" => Icons.Material.Filled.Settings,
+        "directions_car" => Icons.Material.Filled.DirectionsCar,
+        "work" => Icons.Material.Filled.Work,
+        "recommend" => Icons.Material.Filled.Recommend,
+        "outbox" => Icons.Material.Filled.Outbox,
+        "event" => Icons.Material.Filled.Event,
+        "local_shipping" => Icons.Material.Filled.LocalShipping,
+        "receipt_long" => Icons.Material.Filled.ReceiptLong,
+        "notifications" => Icons.Material.Filled.Notifications,
+        _ => Icons.Material.Filled.ChevronRight
+    };
+
+    public void Dispose()
+    {
+        ViewVisibilityService.Changed -= HandleChanged;
+    }
+}

@@ -1,0 +1,25 @@
+﻿@page "/counter"
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h4">Counter</MudText>
+
+        <MudCard Elevation="2">
+            <MudCardContent>
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.body1">Current count: @currentCount</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="IncrementCount">Click me</MudButton>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

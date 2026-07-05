@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="clr-namespace:DriverApp.Avalonia.ViewModels"
+			 x:DataType="vm:LoginViewModel"
+			 x:Class="DriverApp.Avalonia.Views.LoginView">
+  <Grid RowDefinitions="Auto,*" Margin="32">
+	<StackPanel Spacing="12" MaxWidth="480" HorizontalAlignment="Left">
+	  <TextBlock Text="DriverApp" FontSize="32" FontWeight="Bold" />
+	  <TextBlock Text="기사 로그인" FontSize="22" />
+	  <TextBlock Text="서버 없이 메모리 기반으로 먼저 업무 화면을 확인합니다." Opacity="0.75" TextWrapping="Wrap" />
+
+	  <TextBox Watermark="아이디 또는 이메일" Text="{Binding LoginId, Mode=TwoWay}" />
+	  <TextBox Watermark="비밀번호" PasswordChar="*" Text="{Binding Password, Mode=TwoWay}" />
+	  <Button Content="로그인" HorizontalAlignment="Stretch" Click="OnLoginClicked" />
+	  <TextBlock Text="{Binding Message}" Foreground="Tomato" TextWrapping="Wrap" />
+
+	  <StackPanel Orientation="Horizontal" Spacing="8">
+		<Button Content="대시보드" Click="GoDashboard" />
+		<Button Content="01 프로필" Click="GoProfile" />
+		<Button Content="02 근무" Click="GoWork" />
+		<Button Content="03 추천" Click="GoRecommendation" />
+		<Button Content="04 배차" Click="GoDispatch" />
+	  </StackPanel>
+	</StackPanel>
+  </Grid>
+</UserControl>

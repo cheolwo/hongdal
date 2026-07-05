@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="clr-namespace:DriverApp.Avalonia.ViewModels"
+		xmlns:views="clr-namespace:DriverApp.Avalonia.Views"
+		x:Class="DriverApp.Avalonia.MainWindow"
+		x:DataType="vm:MainShellViewModel"
+		Title="DriverApp"
+		Width="1280"
+		Height="820"
+		WindowStartupLocation="CenterScreen">
+  <Window.DataContext>
+	<vm:MainShellViewModel />
+  </Window.DataContext>
+
+	<Grid RowDefinitions="Auto,*" ColumnDefinitions="280,*">
+	<views:ShellHeaderView Grid.ColumnSpan="2" DataContext="{Binding Header}" />
+
+	<Border Grid.Row="1" Grid.Column="0" Margin="16" Padding="12" CornerRadius="12" Background="#1A000000">
+	  <ListBox ItemsSource="{Binding NavigationItems}"
+			   SelectedItem="{Binding SelectedNavItem, Mode=TwoWay}">
+		<ListBox.ItemTemplate>
+		  <DataTemplate x:DataType="vm:ShellNavigationItem">
+			<TextBlock Text="{Binding Title}" Margin="8,10" />
+		  </DataTemplate>
+		</ListBox.ItemTemplate>
+	  </ListBox>
+	</Border>
+
+	<ContentControl Grid.Row="1" Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="0,16,16,16" />
+  </Grid>
+</Window>

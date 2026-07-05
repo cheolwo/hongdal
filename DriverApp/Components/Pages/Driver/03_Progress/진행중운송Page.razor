@@ -1,0 +1,77 @@
+﻿@page "/driver/transports/current"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>진행중 운송</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">진행 중 운송</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">현재 운송과 다음 행동을 샘플데이터로 확인한다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        @if (현재운송 is not null)
+        {
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h6">@현재운송.화물종류 운송</MudText>
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@현재운송.현재단계</MudChip>
+                    </MudStack>
+                    <MudText>@현재운송.픽업지 → @현재운송.하차지</MudText>
+                    <MudText Typo="Typo.body2">예정시각: @현재운송.예정시각.ToString("HH:mm")</MudText>
+                    <MudText Typo="Typo.body2">운송거리: @현재운송.운송거리Km.ToString("0.0")km / 예상수익: @현재운송.예상수익.ToString("0")원</MudText>
+                    <MudAlert Severity="Severity.Info">다음 행동: @현재운송.다음행동</MudAlert>
+
+                    <HongdalSensitiveDisclosureList Title="운행 상세"
+                                                    Summary="@현재운송.현재단계"
+                                                    RelatedParties='@($"기사님 · 화주 · 하차지 담당자 / 의뢰 {현재운송.의뢰Id}")'
+                                                    Icon="@Icons.Material.Filled.LocalShipping"
+                                                    Color="Color.Primary"
+                                                    PrivacyHint="운행 중 필요한 정보만 펼쳐 확인합니다.">
+                        <MudExpansionPanel Text="화물 정보" Expanded="true">
+                            <HongdalSensitiveInfoRow Label="화물 종류" Value="@현재운송.화물종류" />
+                            <HongdalSensitiveInfoRow Label="의뢰 번호" Value="@현재운송.의뢰Id" />
+                            <HongdalSensitiveInfoRow Label="작업 메모" Value="상차 전 화물 상태와 수량을 확인합니다." />
+                        </MudExpansionPanel>
+
+                        <MudExpansionPanel Text="운송 정보">
+                            <HongdalSensitiveInfoRow Label="상차지" Value="@현재운송.픽업지" />
+                            <HongdalSensitiveInfoRow Label="하차지" Value="@현재운송.하차지" />
+                            <HongdalSensitiveInfoRow Label="현재 단계" Value="@현재운송.현재단계" />
+                            <HongdalSensitiveInfoRow Label="예정 시각" Value='@현재운송.예정시각.ToString("HH:mm")' />
+                            <HongdalSensitiveInfoRow Label="운송 거리" Value='@($"{현재운송.운송거리Km:0.0}km")' />
+                        </MudExpansionPanel>
+
+                        <MudExpansionPanel Text="결제 정보">
+                            <HongdalSensitiveInfoRow Label="예상 수익" Value='@($"{현재운송.예상수익:0}원")' />
+                            <HongdalSensitiveInfoRow Label="정산 기준" Value="하차 완료 후 정산 확인" />
+                            <HongdalSensitiveInfoRow Label="인수증" Value="하차 현장에서 필요 여부 확인" />
+                        </MudExpansionPanel>
+
+                        <MudExpansionPanel Text="전달받는자 정보">
+                            <HongdalSensitiveInfoRow Label="전달 위치" Value="@현재운송.하차지" />
+                            <HongdalSensitiveInfoRow Label="담당자" Value="하차지 담당자" />
+                            <HongdalSensitiveInfoRow Label="연락처" Value="상세 API 연결 시 표시" />
+                            <HongdalSensitiveInfoRow Label="전달 요청" Value="도착 전 연락 후 하차 완료 사진을 남깁니다." />
+                        </MudExpansionPanel>
+                    </HongdalSensitiveDisclosureList>
+
+                    <MudStack Row="true" Spacing="2">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.TransportPickup(현재운송.Id)">상차 화면</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="@DriverRoutes.TransportDropoff(현재운송.Id)">하차 화면</MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Home">기사 홈으로</MudButton>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private 기사운송샘플항목? 현재운송 => Samples.현재운송조회();
+}
+

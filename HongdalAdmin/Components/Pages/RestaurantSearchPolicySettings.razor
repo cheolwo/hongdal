@@ -1,0 +1,309 @@
+@page "/restaurant-search-policy"
+@rendermode InteractiveServer
+@using Hongdal.Contracts.Common.Orderer
+@inject RestaurantSearchPolicyAdminService PolicyService
+@inject 관리자인증세션Service AdminSession
+@inject NavigationManager NavigationManager
+
+<PageTitle>음식점 주문 반경 정책</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.h4">음식점 주문 반경 정책</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                주문자가 음식점을 조회할 때 사용할 기본 반경과 운영상 허용 범위를 조정합니다.
+            </MudText>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <MudAlert Severity="Severity.Success">@successMessage</MudAlert>
+        }
+
+        @if (isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        else
+        {
+            <MudGrid>
+                <MudItem xs="12" lg="7">
+                    <MudPaper Class="pa-4 h-100" Elevation="1">
+                        <MudStack Spacing="3">
+                            <MudText Typo="Typo.h6">조회 반경</MudText>
+
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField T="double"
+                                                     Label="기본 반경"
+                                                     @bind-Value="defaultRadiusKm"
+                                                     Min="0.1"
+                                                     Step="0.5"
+                                                     Adornment="Adornment.End"
+                                                     AdornmentText="km" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField T="double"
+                                                     Label="권장 반경"
+                                                     @bind-Value="recommendedRadiusKm"
+                                                     Min="0.1"
+                                                     Step="0.5"
+                                                     Adornment="Adornment.End"
+                                                     AdornmentText="km" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField T="double"
+                                                     Label="최소 반경"
+                                                     @bind-Value="minRadiusKm"
+                                                     Min="0.1"
+                                                     Step="0.5"
+                                                     Adornment="Adornment.End"
+                                                     AdornmentText="km" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField T="double"
+                                                     Label="최대 반경"
+                                                     @bind-Value="maxRadiusKm"
+                                                     Min="0.1"
+                                                     Step="0.5"
+                                                     Adornment="Adornment.End"
+                                                     AdornmentText="km" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField T="double"
+                                                     Label="조정 단위"
+                                                     @bind-Value="radiusStepKm"
+                                                     Min="0.1"
+                                                     Step="0.1"
+                                                     Adornment="Adornment.End"
+                                                     AdornmentText="km" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField T="double"
+                                                     Label="배달료 주의 반경"
+                                                     @bind-Value="deliveryFeeCautionRadiusKm"
+                                                     Min="0.1"
+                                                     Step="0.5"
+                                                     Adornment="Adornment.End"
+                                                     AdornmentText="km" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField Label="빠른 선택 반경"
+                                                  HelperText="쉼표로 구분합니다. 예: 3, 5, 7, 10"
+                                                  @bind-Value="quickRadiusOptionsText"
+                                                  Variant="Variant.Outlined" />
+                                </MudItem>
+                            </MudGrid>
+
+                            <MudStack Row="true" Spacing="2">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync" Disabled="isSaving">저장</MudButton>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ResetAsync" Disabled="isSaving">기본값 복원</MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" lg="5">
+                    <MudPaper Class="pa-4 h-100" Elevation="1">
+                        <MudStack Spacing="3">
+                            <MudText Typo="Typo.h6">운영 기준</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                기본값은 현재 주문자 앱 첫 진입 반경입니다. 권장 반경은 UI에서 강조할 기준이고,
+                                배달료 주의 반경은 너무 넓은 조회로 플랫폼 배달비 부담이 커질 수 있는 지점을 표시합니다.
+                            </MudText>
+
+                            <MudDivider />
+
+                            <MudStack Spacing="2">
+                                @MetricRow("현재 기본 반경", $"{defaultRadiusKm:N1} km")
+                                @MetricRow("허용 범위", $"{minRadiusKm:N1} ~ {maxRadiusKm:N1} km")
+                                @MetricRow("빠른 선택", quickRadiusOptionsText)
+                                @MetricRow("마지막 수정", updatedAtText)
+                                @MetricRow("수정자", updatedByText)
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private bool isLoading = true;
+    private bool isSaving;
+    private string? errorMessage;
+    private string? successMessage;
+    private string? updatedBy;
+    private DateTimeOffset? updatedAt;
+
+    private double defaultRadiusKm = 7;
+    private double minRadiusKm = 1;
+    private double maxRadiusKm = 10;
+    private double radiusStepKm = 0.5;
+    private double recommendedRadiusKm = 7;
+    private double deliveryFeeCautionRadiusKm = 10;
+    private string quickRadiusOptionsText = "3, 5, 7, 10";
+
+    private string updatedByText => string.IsNullOrWhiteSpace(updatedBy) ? "시스템 기본값" : updatedBy;
+
+    private string updatedAtText => updatedAt?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AdminSession.서버관리자인가)
+        {
+            NavigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString("/restaurant-search-policy")}");
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            ApplyPolicy(await PolicyService.GetAsync());
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"음식점 주문 반경 정책 조회 실패: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        errorMessage = null;
+        successMessage = null;
+
+        if (!TryParseQuickOptions(out var quickOptions))
+        {
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            var request = new RestaurantSearchPolicyUpdateRequest
+            {
+                DefaultRadiusKm = defaultRadiusKm,
+                MinRadiusKm = minRadiusKm,
+                MaxRadiusKm = maxRadiusKm,
+                RadiusStepKm = radiusStepKm,
+                QuickRadiusOptions = quickOptions,
+                RecommendedRadiusKm = recommendedRadiusKm,
+                DeliveryFeeCautionRadiusKm = deliveryFeeCautionRadiusKm
+            };
+
+            ApplyPolicy(await PolicyService.UpdateAsync(request));
+            successMessage = "음식점 주문 반경 정책을 저장했습니다.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"음식점 주문 반경 정책 저장 실패: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task ResetAsync()
+    {
+        errorMessage = null;
+        successMessage = null;
+        isSaving = true;
+
+        try
+        {
+            ApplyPolicy(await PolicyService.ResetAsync());
+            successMessage = "음식점 주문 반경 정책을 기본값으로 복원했습니다.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"음식점 주문 반경 정책 복원 실패: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void ApplyPolicy(RestaurantSearchPolicyDto policy)
+    {
+        defaultRadiusKm = policy.DefaultRadiusKm;
+        minRadiusKm = policy.MinRadiusKm;
+        maxRadiusKm = policy.MaxRadiusKm;
+        radiusStepKm = policy.RadiusStepKm;
+        recommendedRadiusKm = policy.RecommendedRadiusKm;
+        deliveryFeeCautionRadiusKm = policy.DeliveryFeeCautionRadiusKm;
+        quickRadiusOptionsText = string.Join(", ", policy.QuickRadiusOptions);
+        updatedBy = policy.UpdatedBy;
+        updatedAt = policy.UpdatedAt;
+    }
+
+    private bool TryParseQuickOptions(out List<double> quickOptions)
+    {
+        quickOptions = [];
+        var parts = quickRadiusOptionsText
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        foreach (var part in parts)
+        {
+            if (!double.TryParse(part, out var value))
+            {
+                errorMessage = $"빠른 선택 반경 값이 올바르지 않습니다: {part}";
+                return false;
+            }
+
+            quickOptions.Add(value);
+        }
+
+        if (quickOptions.Count == 0)
+        {
+            errorMessage = "빠른 선택 반경을 하나 이상 입력해야 합니다.";
+            return false;
+        }
+
+        return true;
+    }
+
+    private static RenderFragment MetricRow(string label, string value) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenComponent<MudStack>(sequence++);
+        builder.AddAttribute(sequence++, "Row", true);
+        builder.AddAttribute(sequence++, "AlignItems", AlignItems.Center);
+        builder.AddAttribute(sequence++, "Justify", Justify.SpaceBetween);
+        builder.AddAttribute(sequence++, "ChildContent", (RenderFragment)(childBuilder =>
+        {
+            var childSequence = 0;
+            childBuilder.OpenComponent<MudText>(childSequence++);
+            childBuilder.AddAttribute(childSequence++, "Typo", Typo.body2);
+            childBuilder.AddAttribute(childSequence++, "Color", Color.Secondary);
+            childBuilder.AddAttribute(childSequence++, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, label)));
+            childBuilder.CloseComponent();
+
+            childBuilder.OpenComponent<MudText>(childSequence++);
+            childBuilder.AddAttribute(childSequence++, "Typo", Typo.body2);
+            childBuilder.AddAttribute(childSequence++, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, value)));
+            childBuilder.CloseComponent();
+        }));
+        builder.CloseComponent();
+    };
+}

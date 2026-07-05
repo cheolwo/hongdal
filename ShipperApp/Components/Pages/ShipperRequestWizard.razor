@@ -1,0 +1,297 @@
+@page "/shipper/request"
+@using ShipperApp.Models.Shipper
+@using ShipperApp.Services
+@inject IShipperOperationsService ShipperOperations
+
+<PageTitle>화물운송의뢰 등록</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">화물운송의뢰 등록</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">단건 등록과 CSV 일괄등록을 한 화면에서 처리합니다.</MudText>
+        </MudStack>
+
+        <MudTabs Elevation="0" Rounded="true">
+            <MudTabPanel Text="단건 등록">
+                <MudProgressLinear Value="@(StepProgress * 100)" Color="Color.Primary" />
+
+                <MudCard Elevation="2" Class="mt-3">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">입력 요약</MudText>
+                        <MudText>@CargoSummary</MudText>
+                        <MudText>@TransportSummary</MudText>
+                        <MudText>@PricingSummary</MudText>
+                        <MudText>@PaymentSummary</MudText>
+                    </MudCardContent>
+                </MudCard>
+
+                @if (!string.IsNullOrWhiteSpace(StatusMessage))
+                {
+                    <MudAlert Severity="Severity.Info">@StatusMessage</MudAlert>
+                }
+
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        @if (CurrentStep == 1)
+                        {
+                            <MudText Typo="Typo.h6">1단계 - 화물정보</MudText>
+                            <MudGrid Class="mt-2">
+                                <MudItem xs="12" md="6"><MudTextField Label="화물종류" @bind-Value="CargoType" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="6"><MudTextField Label="설명" @bind-Value="CargoDescription" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="int?" Label="수량" @bind-Value="CargoQuantity" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="중량Kg" @bind-Value="CargoWeightKg" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="부피Cbm" @bind-Value="CargoVolumeCbm" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12"><MudTextField Label="온도조건" @bind-Value="CargoTemperatureCondition" Variant="Variant.Outlined" /></MudItem>
+                            </MudGrid>
+                        }
+                        else if (CurrentStep == 2)
+                        {
+                            <MudText Typo="Typo.h6">2단계 - 운송정보</MudText>
+                            <MudGrid Class="mt-2">
+                                <MudItem xs="12" md="4"><MudTextField Label="운송방식" @bind-Value="TransportMode" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="8"><MudTextField Label="픽업 도로명주소" @bind-Value="PickupRoadAddress" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="8"><MudTextField Label="픽업 상세주소" @bind-Value="PickupDetailAddress" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="6"><MudTextField Label="픽업 연락처 이름" @bind-Value="PickupContactName" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="6"><MudTextField Label="픽업 연락처 전화번호" @bind-Value="PickupContactPhone" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="8"><MudTextField Label="하차 도로명주소" @bind-Value="DropoffRoadAddress" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="8"><MudTextField Label="하차 상세주소" @bind-Value="DropoffDetailAddress" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="6"><MudTextField Label="하차 연락처 이름" @bind-Value="DropoffContactName" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="6"><MudTextField Label="하차 연락처 전화번호" @bind-Value="DropoffContactPhone" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="6"><MudTextField Label="서비스레벨" @bind-Value="ServiceLevel" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12"><MudTextField Label="요청사항" @bind-Value="RequestNotes" Variant="Variant.Outlined" Lines="3" /></MudItem>
+                            </MudGrid>
+                        }
+                        else if (CurrentStep == 3)
+                        {
+                            <MudText Typo="Typo.h6">3단계 - 결제정보</MudText>
+                            <MudGrid Class="mt-2">
+                                <MudItem xs="12" md="4">
+                                    <MudSelect T="string" Label="결제수단" @bind-Value="PaymentMethod" Variant="Variant.Outlined">
+                                        <MudSelectItem Value=@("인수증")>인수증</MudSelectItem>
+                                        <MudSelectItem Value=@("현금영수증")>현금영수증</MudSelectItem>
+                                        <MudSelectItem Value=@("카드")>카드</MudSelectItem>
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" md="4">
+                                    <MudSelect T="string" Label="차량종류" @bind-Value="SelectedVehicleType" Variant="Variant.Outlined">
+                                        @foreach (var rate in VehicleTypes)
+                                        {
+                                            <MudSelectItem Value="@rate">@rate</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="예상거리Km" @bind-Value="EstimatedDistanceKm" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="int?" Label="결제예정금액" @bind-Value="PaymentAmount" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="대기료" @bind-Value="WaitingFee" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="수작업비" @bind-Value="HandlingFee" Variant="Variant.Outlined" /></MudItem>
+                                <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="할증" @bind-Value="Surcharge" Variant="Variant.Outlined" /></MudItem>
+                            </MudGrid>
+                            <MudAlert Severity="@(HasRateWarning ? Severity.Warning : Severity.Info)" Class="mt-3 mb-0">@RateWarningMessage</MudAlert>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.h6">4단계 - 최종 확인/전송</MudText>
+                            <MudList T="string" Dense="true" Class="mb-3">
+                                <MudListItem>@CargoSummary</MudListItem>
+                                <MudListItem>@TransportSummary</MudListItem>
+                                <MudListItem>@PricingSummary</MudListItem>
+                                <MudListItem>@PaymentSummary</MudListItem>
+                            </MudList>
+                            <MudButton Color="Color.Success" Variant="Variant.Filled" Disabled="@IsBusy" OnClick="SubmitAsync">전송</MudButton>
+                        }
+                    </MudCardContent>
+                </MudCard>
+
+                <MudStack Row="true" Spacing="2">
+                    <MudButton Variant="Variant.Outlined" Disabled="@(CurrentStep == 1 || IsBusy)" OnClick="PreviousStep">이전</MudButton>
+                    <MudButton Variant="Variant.Filled" Disabled="@(CurrentStep == 4 || IsBusy)" OnClick="NextStep">다음</MudButton>
+                </MudStack>
+            </MudTabPanel>
+            <MudTabPanel Text="CSV 일괄등록">
+                <ShipperBulkImportPanel />
+            </MudTabPanel>
+        </MudTabs>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private const int TotalSteps = 4;
+
+    private int CurrentStep { get; set; } = 1;
+    private string StatusMessage { get; set; } = "1단계에서 화물 정보를 입력하세요.";
+    private bool IsBusy { get; set; }
+
+    private string CargoType { get; set; } = string.Empty;
+    private string? CargoDescription { get; set; }
+    private int? CargoQuantity { get; set; }
+    private decimal? CargoWeightKg { get; set; }
+    private decimal? CargoVolumeCbm { get; set; }
+    private string? CargoTemperatureCondition { get; set; }
+
+    private string TransportMode { get; set; } = "혼적";
+    private string PickupRoadAddress { get; set; } = string.Empty;
+    private string? PickupDetailAddress { get; set; }
+    private string PickupContactName { get; set; } = string.Empty;
+    private string PickupContactPhone { get; set; } = string.Empty;
+    private string DropoffRoadAddress { get; set; } = string.Empty;
+    private string? DropoffDetailAddress { get; set; }
+    private string DropoffContactName { get; set; } = string.Empty;
+    private string DropoffContactPhone { get; set; } = string.Empty;
+    private string? ServiceLevel { get; set; }
+    private string? RequestNotes { get; set; }
+
+    private decimal? WaitingFee { get; set; }
+    private decimal? HandlingFee { get; set; }
+    private decimal? Surcharge { get; set; }
+    private string? SelectedVehicleType { get; set; }
+    private decimal? EstimatedDistanceKm { get; set; }
+    private string PaymentMethod { get; set; } = "카드";
+    private int? PaymentAmount { get; set; }
+    private string RateWarningMessage { get; set; } = string.Empty;
+
+    private IReadOnlyList<string> VehicleTypes { get; set; } = [];
+
+    private double StepProgress => CurrentStep / (double)TotalSteps;
+    private bool HasRateWarning => !string.IsNullOrWhiteSpace(RateWarningMessage) && RateWarningMessage.StartsWith("경고:", StringComparison.Ordinal);
+
+    private string CargoSummary => string.IsNullOrWhiteSpace(CargoType) ? "화물종류 미입력" : $"{CargoType} / 수량 {CargoQuantity?.ToString() ?? "-"} / {CargoWeightKg?.ToString() ?? "-"}kg";
+    private string TransportSummary => string.IsNullOrWhiteSpace(PickupRoadAddress) ? "운송정보 미입력" : $"{PickupRoadAddress} → {DropoffRoadAddress}";
+    private string PricingSummary => $"대기료 {WaitingFee?.ToString("N0") ?? "-"}원 / 수작업비 {HandlingFee?.ToString("N0") ?? "-"}원 / 할증 {Surcharge?.ToString("N0") ?? "-"}원";
+    private string PaymentSummary => string.IsNullOrWhiteSpace(SelectedVehicleType) ? "결제정보 미입력" : $"{SelectedVehicleType} · {PaymentMethod} · 예정금액 {PaymentAmount?.ToString("N0") ?? "-"}원";
+
+    protected override async Task OnInitializedAsync()
+    {
+        VehicleTypes = await ShipperOperations.GetVehicleTypesAsync();
+        SelectedVehicleType ??= VehicleTypes.FirstOrDefault();
+        await RecalculateRateWarningAsync();
+    }
+
+    private void NextStep()
+    {
+        if (CurrentStep == 1 && string.IsNullOrWhiteSpace(CargoType))
+        {
+            StatusMessage = "화물정보를 먼저 입력하세요.";
+            return;
+        }
+
+        if (CurrentStep == 2 && (string.IsNullOrWhiteSpace(PickupRoadAddress) || string.IsNullOrWhiteSpace(DropoffRoadAddress)))
+        {
+            StatusMessage = "운송정보를 먼저 입력하세요.";
+            return;
+        }
+
+        if (CurrentStep < TotalSteps)
+        {
+            CurrentStep++;
+            StatusMessage = CurrentStep switch
+            {
+                2 => "2단계에서 운송 정보를 입력하세요.",
+                3 => "3단계에서 결제 정보를 입력하세요.",
+                _ => "4단계에서 최종 내용을 확인하세요."
+            };
+        }
+    }
+
+    private void PreviousStep()
+    {
+        if (CurrentStep > 1)
+        {
+            CurrentStep--;
+            StatusMessage = CurrentStep switch
+            {
+                1 => "1단계에서 화물 정보를 입력하세요.",
+                2 => "2단계에서 운송 정보를 입력하세요.",
+                3 => "3단계에서 결제 정보를 입력하세요.",
+                _ => "4단계에서 최종 내용을 확인하세요."
+            };
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (string.IsNullOrWhiteSpace(CargoType) || string.IsNullOrWhiteSpace(PickupRoadAddress) || string.IsNullOrWhiteSpace(DropoffRoadAddress))
+        {
+            StatusMessage = "필수 정보를 모두 입력해야 합니다.";
+            return;
+        }
+
+        IsBusy = true;
+        StatusMessage = "메모리에 의뢰를 저장하는 중입니다.";
+
+        try
+        {
+            var request = new ShipperRequestItem
+            {
+                의뢰Id = $"SHP-{DateTime.Now:yyyyMMddHHmmss}",
+                화물종류 = CargoType,
+                의뢰상태 = "접수",
+                결제상태 = PaymentAmount.HasValue ? "결제대기" : "대기",
+                배차상태 = "매칭중",
+                운송방식 = TransportMode,
+                차량종류 = SelectedVehicleType ?? "1톤",
+                결제수단 = PaymentMethod,
+                결제예정금액 = PaymentAmount,
+                생성일시 = DateTime.Now,
+                픽업지 = PickupRoadAddress,
+                하차지 = DropoffRoadAddress
+            };
+
+            await ShipperOperations.AddRequestAsync(request);
+            StatusMessage = "의뢰를 메모리에 저장했습니다.";
+            CurrentStep = 1;
+            ClearForm();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void ClearForm()
+    {
+        CargoType = string.Empty;
+        CargoDescription = null;
+        CargoQuantity = null;
+        CargoWeightKg = null;
+        CargoVolumeCbm = null;
+        CargoTemperatureCondition = null;
+        TransportMode = "혼적";
+        PickupRoadAddress = string.Empty;
+        PickupDetailAddress = null;
+        PickupContactName = string.Empty;
+        PickupContactPhone = string.Empty;
+        DropoffRoadAddress = string.Empty;
+        DropoffDetailAddress = null;
+        DropoffContactName = string.Empty;
+        DropoffContactPhone = string.Empty;
+        ServiceLevel = null;
+        RequestNotes = null;
+        WaitingFee = null;
+        HandlingFee = null;
+        Surcharge = null;
+        SelectedVehicleType = VehicleTypes.FirstOrDefault();
+        EstimatedDistanceKm = null;
+        PaymentMethod = "카드";
+        PaymentAmount = null;
+        RateWarningMessage = string.Empty;
+    }
+
+    private async Task RecalculateRateWarningAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedVehicleType) || !EstimatedDistanceKm.HasValue)
+        {
+            RateWarningMessage = string.Empty;
+            return;
+        }
+
+        var estimated = await ShipperOperations.EstimateFareAsync(SelectedVehicleType, EstimatedDistanceKm.Value);
+        if (PaymentAmount.HasValue && PaymentAmount.Value < estimated)
+        {
+            RateWarningMessage = $"경고: 입력한 결제예정금액이 예상 운임 {estimated:N0}원보다 낮습니다.";
+            return;
+        }
+
+        RateWarningMessage = $"예상 운임 기준값: {estimated:N0}원";
+    }
+}

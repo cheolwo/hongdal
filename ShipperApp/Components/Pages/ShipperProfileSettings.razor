@@ -1,0 +1,76 @@
+@page "/shipper/settings/profile"
+@inject ShipperOperatingProfileService ProfileService
+@inject ShipperLocalizationService L
+
+<PageTitle>@L.T("ProfileSettings.PageTitle")</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-6">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">@L.T("ProfileSettings.Title")</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("ProfileSettings.Description")</MudText>
+        </MudStack>
+
+        <MudCard Elevation="2">
+            <MudCardContent>
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h6">@L.T("ProfileSettings.LocationTitle")</MudText>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Elevation="0" Class="pa-4 h-100" Style="@CardStyle(ShipperLocationType.Domestic)">
+                                <MudStack Spacing="2">
+                                    <MudText Typo="Typo.subtitle1" Class="fw-bold">@L.T("ProfileSettings.Domestic")</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("ProfileSettings.DomesticDescription")</MudText>
+                                    <MudButton Variant="@ButtonVariant(ShipperLocationType.Domestic)"
+                                               Color="Color.Primary"
+                                               OnClick="@(() => SelectLocation(ShipperLocationType.Domestic))">
+                                        @L.T("ProfileSettings.Domestic")
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Elevation="0" Class="pa-4 h-100" Style="@CardStyle(ShipperLocationType.Overseas)">
+                                <MudStack Spacing="2">
+                                    <MudText Typo="Typo.subtitle1" Class="fw-bold">@L.T("ProfileSettings.Overseas")</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("ProfileSettings.OverseasDescription")</MudText>
+                                    <MudButton Variant="@ButtonVariant(ShipperLocationType.Overseas)"
+                                               Color="Color.Primary"
+                                               OnClick="@(() => SelectLocation(ShipperLocationType.Overseas))">
+                                        @L.T("ProfileSettings.Overseas")
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+
+        <MudAlert Severity="Severity.Info">
+            <strong>@L.T("ProfileSettings.CurrentPolicy")</strong><br />
+            @(ProfileService.IsDomestic ? L.T("ProfileSettings.DomesticPolicy") : L.T("ProfileSettings.OverseasPolicy"))
+        </MudAlert>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private void SelectLocation(ShipperLocationType locationType)
+    {
+        ProfileService.SetLocationType(locationType);
+    }
+
+    private Variant ButtonVariant(ShipperLocationType locationType)
+    {
+        return ProfileService.LocationType == locationType ? Variant.Filled : Variant.Outlined;
+    }
+
+    private string CardStyle(ShipperLocationType locationType)
+    {
+        return ProfileService.LocationType == locationType
+            ? "border:2px solid var(--mud-palette-primary); border-radius: 8px;"
+            : "border:1px solid var(--mud-palette-divider); border-radius: 8px;";
+    }
+}

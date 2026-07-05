@@ -1,0 +1,51 @@
+<MudGrid Spacing="2" Class="driver-warning-badges">
+    <MudItem xs="6">
+        <MudPaper Elevation="0" Class="driver-warning-badge-group driver-warning-badge-group-left">
+            <MudText Typo="Typo.caption" Color="Color.Secondary">&#xC0C1;&#xCC28;</MudText>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                @if (RequiresSpecialPickup)
+                {
+                    <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">&#xD2B9;&#xC218; &#xC0C1;&#xCC28;</MudChip>
+                }
+                @if (ShowReceipt)
+                {
+                    <MudChip T="string" Color="Color.Dark" Variant="Variant.Outlined">&#xC778;&#xC218;&#xC99D;</MudChip>
+                }
+                @if (!RequiresSpecialPickup && !ShowReceipt)
+                {
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">&#xC8FC;&#xC758; &#xC5C6;&#xC74C;</MudChip>
+                }
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Elevation="0" Class="driver-warning-badge-group driver-warning-badge-group-right">
+            <MudText Typo="Typo.caption" Color="Color.Secondary">&#xD558;&#xCC28;</MudText>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd">
+                @if (RequiresSpecialDropoff)
+                {
+                    <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">&#xD2B9;&#xC218; &#xD558;&#xCC28;</MudChip>
+                }
+                @if (ShowReceipt)
+                {
+                    <MudChip T="string" Color="Color.Dark" Variant="Variant.Outlined">&#xC778;&#xC218;&#xC99D;</MudChip>
+                }
+                @if (!RequiresSpecialDropoff && !ShowReceipt)
+                {
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">&#xC8FC;&#xC758; &#xC5C6;&#xC74C;</MudChip>
+                }
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public bool RequiresSpecialPickup { get; set; }
+
+    [Parameter]
+    public bool RequiresSpecialDropoff { get; set; }
+
+    [Parameter]
+    public bool ShowReceipt { get; set; }
+}

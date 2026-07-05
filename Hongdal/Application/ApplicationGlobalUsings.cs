@@ -1,0 +1,14 @@
+global using MediatR;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Logging;
+global using 홍달.Data;
+global using 홍달.도메인.공통;
+global using 홍달.도메인.기사;
+global using 홍달.도메인.운송;
+global using 홍달.도메인.화주;
+global using 홍달.Services.Dispatch.Recommendation;
+global using 홍달.Services.Dispatch.Request;
+global using 홍달.Services.Storage.Local;
+global using Hongdal.Contracts.Driver.Recommendation;
+global using Hongdal.Contracts.Driver.Work;

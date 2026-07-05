@@ -1,0 +1,47 @@
+@page "/cargo"
+
+<PageTitle>화물·공산품 주문</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">화물·공산품 주문</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                음식 배달과 분리해서, 물건 구매나 운송 의뢰를 처리하는 주문 흐름입니다.
+            </MudText>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.LocalShipping" Color="Color.Warning" />
+                        <MudText Typo="Typo.h6">화물 운송 의뢰</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">상차지, 하차지, 독차/혼적 조건을 입력합니다.</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning">의뢰 시작</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Inventory" Color="Color.Primary" />
+                        <MudText Typo="Typo.h6">공산품 주문</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">공산품 구매와 창고 출고 배송을 연결합니다.</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary">상품 보기</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Secondary" />
+                        <MudText Typo="Typo.h6">대량 주문/견적</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">반복 주문, 기업 배송, 견적 요청을 모읍니다.</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary">견적 요청</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+</MudContainer>

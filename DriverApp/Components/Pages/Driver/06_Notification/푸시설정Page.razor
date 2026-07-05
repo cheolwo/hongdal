@@ -1,0 +1,24 @@
+﻿@page "/driver/notifications/push"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>푸시설정</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">푸시 설정</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">FCM 토큰 등록과 테스트 발송 흐름을 붙일 자리다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">푸시 상태</MudText>
+                <MudText Typo="Typo.body1">샘플 안읽은 알림: @Samples.알림목록.Count(x => !x.읽음)건</MudText>
+                <MudAlert Severity="Severity.Info">기기 권한 확인 → 토큰 등록 → 테스트 알림 발송 순서로 붙이면 된다.</MudAlert>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/notifications/settings">알림 설정으로</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>

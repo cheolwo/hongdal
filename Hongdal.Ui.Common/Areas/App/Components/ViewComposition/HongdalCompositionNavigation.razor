@@ -1,0 +1,74 @@
+@if (VisibleItems.Count == 0)
+{
+    @EmptyContent
+}
+else
+{
+    <MudStack Spacing="@Spacing" Class="@Class" Style="@Style">
+        @foreach (var item in VisibleItems)
+        {
+            <MudButton Variant="@ButtonVariant"
+                       Color="@ButtonColor"
+                       Disabled="@Disabled"
+                       Href="@GetHref(item)"
+                       StartIcon="@item.IconKey"
+                       FullWidth="@FullWidth"
+                       OnClick="@(() => SelectItemAsync(item))">
+                @item.DisplayName
+            </MudButton>
+        }
+    </MudStack>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ViewCompositionItem> Items { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ViewCompositionItem> ItemSelected { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool FullWidth { get; set; } = true;
+
+    [Parameter]
+    public bool UseHrefNavigation { get; set; } = true;
+
+    [Parameter]
+    public Variant ButtonVariant { get; set; } = Variant.Text;
+
+    [Parameter]
+    public Color ButtonColor { get; set; } = Color.Default;
+
+    [Parameter]
+    public int Spacing { get; set; } = 1;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    private IReadOnlyList<ViewCompositionItem> VisibleItems => Items
+        .Where(x => x.EffectiveVisible)
+        .OrderBy(x => x.SortOrder)
+        .ThenBy(x => x.DisplayName, StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+    private string? GetHref(ViewCompositionItem item)
+    {
+        return UseHrefNavigation && !string.IsNullOrWhiteSpace(item.Route)
+            ? item.Route
+            : null;
+    }
+
+    private async Task SelectItemAsync(ViewCompositionItem item)
+    {
+        await ItemSelected.InvokeAsync(item);
+    }
+}

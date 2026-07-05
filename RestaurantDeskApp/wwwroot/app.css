@@ -1,0 +1,18 @@
+html, body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f6f8fb;
+    margin: 0;
+}
+
+.mud-main-content {
+    min-height: 100vh;
+}
+
+.restaurant-navmenu {
+    width: 280px;
+}
+
+.restaurant-chip-row {
+    gap: 8px;
+    flex-wrap: wrap;
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="naver_map_sdk_ncp_key_id">YOUR_NAVER_MAP_NCP_KEY_ID</string>
+</resources>

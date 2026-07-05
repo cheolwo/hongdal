@@ -1,0 +1,187 @@
+@page "/"
+
+<PageTitle>Hongdal HR Manager</PageTitle>
+
+<PlatformCommunityHome AppName="Hongdal HR Manager"
+                       RoleLabel="인력 관리자"
+                       AppKey="hr-manager"
+                       QuickActions="QuickActions">
+    <WorkModeContent>
+        <MudStack Spacing="3">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">인력 관리 콘솔</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    현장 근무자, HR 역할, 근무 시간, 작업장 접근 조건을 가볍게 확인하는 첫 화면입니다.
+                </MudText>
+            </MudStack>
+
+            <MudGrid>
+                @foreach (var metric in Metrics)
+                {
+                    <MudItem xs="12" sm="6" lg="3">
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100 hr-metric-card">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                    <MudIcon Icon="@metric.Icon" Color="@metric.Color" />
+                                    <MudChip T="string" Size="Size.Small" Color="@metric.Color" Variant="Variant.Outlined">@metric.Badge</MudChip>
+                                </MudStack>
+                                <MudText Typo="Typo.h4">@metric.Value</MudText>
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.subtitle1">@metric.Title</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@metric.Description</MudText>
+                                </MudStack>
+                            </MudStack>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+
+            <MudGrid>
+                <MudItem xs="12" lg="7">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">오늘 확인할 인력 업무</MudText>
+                            @foreach (var item in WorkQueue)
+                            {
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                            <MudIcon Icon="@item.Icon" Color="@item.Color" />
+                                            <MudStack Spacing="0">
+                                                <MudText Typo="Typo.subtitle2">@item.Title</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Description</MudText>
+                                            </MudStack>
+                                        </MudStack>
+                                        <MudChip T="string" Size="Size.Small" Color="@item.Color" Variant="Variant.Outlined">@item.Status</MudChip>
+                                    </MudStack>
+                                </MudPaper>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" lg="5">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">업무 기준</MudText>
+                            @foreach (var rule in Rules)
+                            {
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">@rule</MudText>
+                                </MudStack>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">교육/모임 참여 혜택 이관</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                교육 과정이나 오프라인 모임 참석으로 발생한 혜택을 HR 사람 이력으로 남깁니다.
+                            </MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">HR 기록 대상</MudChip>
+                    </MudStack>
+
+                    <MudTable Items="ParticipationBenefitRecords" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                        <HeaderContent>
+                            <MudTh>참여자</MudTh>
+                            <MudTh>원천</MudTh>
+                            <MudTh>혜택</MudTh>
+                            <MudTh>상태</MudTh>
+                            <MudTh>기록</MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="record">
+                            <MudTd DataLabel="참여자">
+                                <MudText Typo="Typo.body2">@record.ParticipantName</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@record.UserId</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="원천">
+                                <MudText Typo="Typo.body2">@record.SourceTitle</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@record.SourceType</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="혜택">
+                                <MudText Typo="Typo.body2">@record.BenefitName</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@record.BenefitDescription</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="상태">
+                                <MudChip T="string" Size="Size.Small" Color="@record.StatusColor" Variant="Variant.Outlined">@record.BenefitStatus</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="기록">
+                                <MudText Typo="Typo.caption">@record.RecordedAt</MudText>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </WorkModeContent>
+</PlatformCommunityHome>
+
+<style>
+    .hr-metric-card {
+        border-radius: 8px;
+        min-height: 180px;
+    }
+</style>
+
+@code {
+    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    [
+        new("역할 배정", "근무자에게 HR 세부 역할을 부여합니다.", "/", Icons.Material.Filled.AssignmentInd, Color.Primary),
+        new("근무 시간", "근무 가능 요일과 시간대를 점검합니다.", "/", Icons.Material.Filled.Schedule, Color.Info),
+        new("작업장 IP", "작업장 접속 조건을 확인합니다.", "/", Icons.Material.Filled.Wifi, Color.Success),
+        new("근로계약", "근로계약 초안과 체결 상태를 확인합니다.", "/", Icons.Material.Filled.Description, Color.Warning)
+    ];
+
+    private static readonly IReadOnlyList<HrMetric> Metrics =
+    [
+        new("활성 근무자", "28", "오늘 업무 가능", "현장별 근무 가능 인원", Icons.Material.Filled.Groups, Color.Primary),
+        new("역할 미확정", "4", "확인 필요", "업무 API 접근 전 역할 배정 필요", Icons.Material.Filled.ManageAccounts, Color.Warning),
+        new("근무 시간 외 요청", "3", "보류", "스케줄 밖 접근 시도", Icons.Material.Filled.AccessTime, Color.Error),
+        new("계약/급여", "7", "예정", "계약서 서명과 급여 지급 일정", Icons.Material.Filled.Payments, Color.Success)
+    ];
+
+    private static readonly IReadOnlyList<HrQueueItem> WorkQueue =
+    [
+        new("창고 입고조 역할 확인", "입고 작업자 2명에게 오늘 근무 시간과 작업장 IP 조건을 확인합니다.", "검토", Icons.Material.Filled.Warehouse, Color.Warning),
+        new("포장 공정 신규 근무자 등록", "휴대폰 뒷자리 인증 후 포장 공정 역할 부여가 필요합니다.", "대기", Icons.Material.Filled.Inventory, Color.Primary),
+        new("근로계약서 초안 확인", "파트타임 근로자 계약 초안과 최저임금 조건을 검토합니다.", "초안", Icons.Material.Filled.Description, Color.Info),
+        new("급여 지급 예정 생성", "계약 체결 후 지급 스케줄을 생성할 항목이 남아 있습니다.", "예정", Icons.Material.Filled.EventAvailable, Color.Success)
+    ];
+
+    private static readonly IReadOnlyList<HrParticipationBenefitRecordItem> ParticipationBenefitRecords =
+    [
+        new("worker-1021", "김민수", "OfflineMeeting", "도심 물류 오프라인 교육", "입고 검수 교육 참여 혜택", "다음 현장 교육 우선 배정", "Granted", "2026-07-05 10:30", Color.Success),
+        new("worker-1184", "박서연", "EducationCourse", "포장 공정 안전 교육", "포장 업무 권한 검토", "포장 공정 역할 배정 검토 대상", "Pending", "2026-07-05 09:20", Color.Warning),
+        new("worker-1207", "이준호", "OfflineMeeting", "홈달마트 운영 설명회", "마트 피킹 참여 혜택", "마트 피킹 보조 업무 후보", "Granted", "2026-07-04 18:15", Color.Success)
+    ];
+
+    private static readonly IReadOnlyList<string> Rules =
+    [
+        "업무 API 접근은 HR 세부 역할, 근무 시간, 작업장 IP 조건을 함께 확인합니다.",
+        "필수 업무 기능은 꺼지지 않게 두고, 보조 기능만 사용자/관리자 설정으로 조정합니다.",
+        "근로계약과 급여 스케줄은 인력 관리 흐름에서 별도 상태로 추적합니다.",
+        "커뮤니티 모드에서는 인력 운영 공지, 현장 요청, 개선 제안을 공유합니다."
+    ];
+
+    private sealed record HrMetric(string Title, string Value, string Badge, string Description, string Icon, Color Color);
+
+    private sealed record HrQueueItem(string Title, string Description, string Status, string Icon, Color Color);
+
+    private sealed record HrParticipationBenefitRecordItem(
+        string UserId,
+        string ParticipantName,
+        string SourceType,
+        string SourceTitle,
+        string BenefitName,
+        string BenefitDescription,
+        string BenefitStatus,
+        string RecordedAt,
+        Color StatusColor);
+}

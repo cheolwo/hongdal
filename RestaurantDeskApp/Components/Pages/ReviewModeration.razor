@@ -1,0 +1,45 @@
+@page "/reviews/moderation"
+@inject RestaurantDeskSampleService SampleService
+
+<PageTitle>리뷰 운영</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudCard Elevation="2">
+            <MudCardContent>
+                <MudText Typo="Typo.h5">저평점 리뷰 운영 규칙</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">같은 음식점 기준으로 1~2점 사진 리뷰가 3회 연속이면 관리자 검토 대상으로 올리고, 기본 게시일은 @(policy.기본저평점게시일수)일이다.</MudText>
+            </MudCardContent>
+        </MudCard>
+
+        <MudTable Items="items" Dense="true" Hover="true">
+            <HeaderContent>
+                <MudTh>음식점</MudTh>
+                <MudTh>주문자</MudTh>
+                <MudTh>별점</MudTh>
+                <MudTh>연속 저평점</MudTh>
+                <MudTh>현재 노출</MudTh>
+                <MudTh>게시 종료</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="음식점">@context.음식점명</MudTd>
+                <MudTd DataLabel="주문자">@context.주문자UserId</MudTd>
+                <MudTd DataLabel="별점">@context.별점</MudTd>
+                <MudTd DataLabel="연속 저평점">@(context.같은음식점기준저평점3회연속여부 ? "예" : "아니오")</MudTd>
+                <MudTd DataLabel="현재 노출">@(context.현재노출여부 ? "노출" : "비노출")</MudTd>
+                <MudTd DataLabel="게시 종료">@(context.게시종료일시Utc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "미지정")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private IReadOnlyList<음식점리뷰관리항목응답> items = [];
+    private 음식점리뷰운영정책응답 policy = new();
+
+    protected override void OnInitialized()
+    {
+        items = SampleService.Get리뷰운영목록();
+        policy = SampleService.Get운영정책();
+    }
+}

@@ -1,0 +1,88 @@
+@if (VisibleWidgets.Count == 0)
+{
+    @EmptyContent
+}
+else
+{
+    <div class="hongdal-dashboard-composition-grid @Class" style="@GridStyle">
+        @foreach (var widget in VisibleWidgets)
+        {
+            <section class="hongdal-dashboard-composition-widget"
+                     style="@GetWidgetStyle(widget)">
+                @if (WidgetTemplate is not null)
+                {
+                    @WidgetTemplate(widget)
+                }
+                else
+                {
+                    <MudPaper Elevation="0" Class="pa-3" Style="border:1px solid var(--mud-palette-divider); border-radius:8px; height:100%;">
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.subtitle2">@widget.DisplayName</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@widget.ComponentKey</MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </section>
+        }
+    </div>
+}
+
+<style>
+    .hongdal-dashboard-composition-grid {
+        display: grid;
+        grid-template-columns: repeat(var(--hongdal-grid-columns, 12), minmax(0, 1fr));
+        gap: var(--hongdal-grid-gap, 12px);
+        align-items: stretch;
+    }
+
+    .hongdal-dashboard-composition-widget {
+        min-width: 0;
+    }
+
+    @@media (max-width: 720px) {
+        .hongdal-dashboard-composition-grid {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        .hongdal-dashboard-composition-widget {
+            grid-column: auto !important;
+            grid-row: auto !important;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ViewCompositionItem> Items { get; set; } = [];
+
+    [Parameter]
+    public RenderFragment<ViewCompositionItem>? WidgetTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    [Parameter]
+    public int Columns { get; set; } = 12;
+
+    [Parameter]
+    public int GapPx { get; set; } = 12;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private IReadOnlyList<ViewCompositionItem> VisibleWidgets => Items
+        .Where(x => x.EffectiveVisible && x.Kind == ViewCompositionItemKindCode.Widget)
+        .OrderBy(x => x.SortOrder)
+        .ThenBy(x => x.DisplayName, StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+    private string GridStyle => $"--hongdal-grid-columns:{Math.Clamp(Columns, 1, 12)}; --hongdal-grid-gap:{Math.Max(0, GapPx)}px;";
+
+    private static string GetWidgetStyle(ViewCompositionItem item)
+    {
+        var columnSpan = Math.Clamp(item.ColumnSpan, 1, 12);
+        var rowSpan = Math.Clamp(item.RowSpan, 1, 12);
+
+        return $"grid-column: span {columnSpan}; grid-row: span {rowSpan};";
+    }
+}

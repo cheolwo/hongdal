@@ -1,0 +1,260 @@
+<MudStack Spacing="3" Class="@Class" Style="@Style">
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <MudDatePicker Label="@PeriodStartLabel"
+                           Date="@_periodStartDateTime"
+                           DateChanged="OnPeriodStartChangedAsync"
+                           Variant="Variant.Outlined"
+                           Disabled="@Disabled" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudDatePicker Label="@PeriodEndLabel"
+                           Date="@_periodEndDateTime"
+                           DateChanged="OnPeriodEndChangedAsync"
+                           Variant="Variant.Outlined"
+                           Disabled="@Disabled" />
+        </MudItem>
+    </MudGrid>
+
+    <MudTable T="WarehouseBillingEntry" Items="@_entries" Dense="true" Hover="true" Elevation="0">
+        <HeaderContent>
+            <MudTh>@ChargeHeader</MudTh>
+            <MudTh>@QuantityHeader</MudTh>
+            <MudTh>@UnitPriceHeader</MudTh>
+            <MudTh>@AmountHeader</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="@ChargeHeader">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.body2">@context.Rate.DisplayName</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Rate.UnitCode</MudText>
+                </MudStack>
+            </MudTd>
+            <MudTd DataLabel="@QuantityHeader">
+                <MudNumericField T="decimal"
+                                 Value="@context.Quantity"
+                                 ValueChanged="@((decimal value) => UpdateQuantityAsync(context.Rate.ChargeCode, value))"
+                                 Variant="Variant.Outlined"
+                                 Disabled="@Disabled"
+                                 Min="0"
+                                 Style="max-width:140px;" />
+            </MudTd>
+            <MudTd DataLabel="@UnitPriceHeader">
+                <MudNumericField T="decimal"
+                                 Value="@context.Rate.UnitPrice"
+                                 ValueChanged="@((decimal value) => UpdateUnitPriceAsync(context.Rate.ChargeCode, value))"
+                                 Variant="Variant.Outlined"
+                                 Disabled="@Disabled"
+                                 Min="0"
+                                 Style="max-width:140px;" />
+            </MudTd>
+            <MudTd DataLabel="@AmountHeader">@GetLineAmount(context.Rate.ChargeCode).ToString("N0") @Currency</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <MudPaper Elevation="0" Class="pa-3" Style="border:1px solid var(--mud-palette-divider); border-radius:8px;">
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@SubtotalLabel</MudText>
+                <MudText Typo="Typo.subtitle1">@Draft.SubtotalAmount.ToString("N0") @Currency</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@TaxLabel</MudText>
+                <MudText Typo="Typo.subtitle1">@Draft.TaxAmount.ToString("N0") @Currency</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@TotalLabel</MudText>
+                <MudText Typo="Typo.h6">@Draft.TotalAmount.ToString("N0") @Currency</MudText>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Disabled="@(Disabled || Draft.TotalAmount <= 0)"
+               OnClick="ConfirmAsync">
+        @ConfirmButtonText
+    </MudButton>
+</MudStack>
+
+@code {
+    private readonly List<WarehouseBillingEntry> _entries = [];
+    private DateOnly _periodStart = DateOnly.FromDateTime(DateTime.Today.AddDays(1 - DateTime.Today.Day));
+    private DateOnly _periodEnd = DateOnly.FromDateTime(DateTime.Today);
+
+    [Parameter]
+    public string LogisticsAgentId { get; set; } = "logistics-agent";
+
+    [Parameter]
+    public string CustomerId { get; set; } = "customer";
+
+    [Parameter]
+    public IReadOnlyList<WarehouseBillingRate>? Rates { get; set; }
+
+    [Parameter]
+    public EventCallback<WarehouseBillingDraft> BillingConfirmed { get; set; }
+
+    [Parameter]
+    public decimal TaxRate { get; set; } = 0.1m;
+
+    [Parameter]
+    public string Currency { get; set; } = "KRW";
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string PeriodStartLabel { get; set; } = "Period start";
+
+    [Parameter]
+    public string PeriodEndLabel { get; set; } = "Period end";
+
+    [Parameter]
+    public string ChargeHeader { get; set; } = "Charge";
+
+    [Parameter]
+    public string QuantityHeader { get; set; } = "Quantity";
+
+    [Parameter]
+    public string UnitPriceHeader { get; set; } = "Unit price";
+
+    [Parameter]
+    public string AmountHeader { get; set; } = "Amount";
+
+    [Parameter]
+    public string SubtotalLabel { get; set; } = "Subtotal";
+
+    [Parameter]
+    public string TaxLabel { get; set; } = "Tax";
+
+    [Parameter]
+    public string TotalLabel { get; set; } = "Total";
+
+    [Parameter]
+    public string ConfirmButtonText { get; set; } = "Create billing draft";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    private DateTime? _periodStartDateTime
+    {
+        get => _periodStart.ToDateTime(TimeOnly.MinValue);
+        set
+        {
+            if (value.HasValue)
+            {
+                _periodStart = DateOnly.FromDateTime(value.Value);
+            }
+        }
+    }
+
+    private DateTime? _periodEndDateTime
+    {
+        get => _periodEnd.ToDateTime(TimeOnly.MinValue);
+        set
+        {
+            if (value.HasValue)
+            {
+                _periodEnd = DateOnly.FromDateTime(value.Value);
+            }
+        }
+    }
+
+    private WarehouseBillingDraft Draft => WarehouseBillingPlanner.Plan(
+        LogisticsAgentId,
+        CustomerId,
+        _periodStart,
+        _periodEnd < _periodStart ? _periodStart : _periodEnd,
+        CreateUsages(),
+        _entries.Select(x => x.Rate),
+        TaxRate,
+        Currency);
+
+    protected override void OnInitialized()
+    {
+        ResetEntries();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_entries.Count == 0)
+        {
+            ResetEntries();
+        }
+    }
+
+    private void ResetEntries()
+    {
+        _entries.Clear();
+        _entries.AddRange((Rates ?? WarehouseBillingRateCatalog.CreateDefaultRates())
+            .Where(x => x.IsEnabled)
+            .Select(x => new WarehouseBillingEntry(x, 0m)));
+    }
+
+    private Task OnPeriodStartChangedAsync(DateTime? value)
+    {
+        _periodStartDateTime = value;
+        return Task.CompletedTask;
+    }
+
+    private Task OnPeriodEndChangedAsync(DateTime? value)
+    {
+        _periodEndDateTime = value;
+        return Task.CompletedTask;
+    }
+
+    private Task UpdateQuantityAsync(string chargeCode, decimal value)
+    {
+        var index = _entries.FindIndex(x => x.Rate.ChargeCode == chargeCode);
+        if (index >= 0)
+        {
+            _entries[index] = _entries[index] with { Quantity = Math.Max(0m, value) };
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task UpdateUnitPriceAsync(string chargeCode, decimal value)
+    {
+        var index = _entries.FindIndex(x => x.Rate.ChargeCode == chargeCode);
+        if (index >= 0)
+        {
+            _entries[index] = _entries[index] with
+            {
+                Rate = _entries[index].Rate with { UnitPrice = Math.Max(0m, value) }
+            };
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private decimal GetLineAmount(string chargeCode)
+    {
+        return Draft.Lines.FirstOrDefault(x => x.ChargeCode == chargeCode)?.Amount ?? 0m;
+    }
+
+    private IEnumerable<WarehouseBillingUsage> CreateUsages()
+    {
+        foreach (var entry in _entries.Where(x => x.Quantity > 0))
+        {
+            if (entry.Rate.UnitCode is WarehouseBillingUnitCode.CbmDay or WarehouseBillingUnitCode.PalletDay)
+            {
+                yield return new WarehouseBillingUsage(entry.Rate.ChargeCode, entry.Quantity, _periodStart, _periodEnd);
+            }
+            else
+            {
+                yield return new WarehouseBillingUsage(entry.Rate.ChargeCode, entry.Quantity);
+            }
+        }
+    }
+
+    private Task ConfirmAsync()
+    {
+        return BillingConfirmed.InvokeAsync(Draft);
+    }
+
+    private sealed record WarehouseBillingEntry(WarehouseBillingRate Rate, decimal Quantity);
+}

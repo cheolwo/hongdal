@@ -1,0 +1,73 @@
+using Quartz;
+using Hongdal.Infrastructure.BackgroundJobs.SalesOrders;
+using Hongdal.Services.LogisticsProcessing.SalesOrders;
+using 홍달.Infrastructure.BackgroundJobs.Customs;
+using 홍달.Infrastructure.BackgroundJobs.DispatchQueue;
+using 홍달.Infrastructure.BackgroundJobs.Payments;
+using 홍달.Services.Options;
+
+namespace Hongdal.Extensions;
+
+public static partial class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddHongdalBackgroundJobs(
+        this IServiceCollection services,
+        배차큐배치작업Options jobOptions,
+        SalesChannelOrderSyncOptions salesOrderSyncOptions)
+    {
+        services.AddQuartz(q =>
+        {
+            var scanJobKey = new JobKey("DispatchQueueScan");
+            q.AddJob<배차큐스캔Job>(opts => opts.WithIdentity(scanJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(scanJobKey)
+                .WithIdentity("DispatchQueueScan-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.큐스캔주기초))).RepeatForever()));
+
+            var expireJobKey = new JobKey("DispatchRecommendationExpire");
+            q.AddJob<추천만료정리Job>(opts => opts.WithIdentity(expireJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(expireJobKey)
+                .WithIdentity("DispatchRecommendationExpire-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.추천만료정리주기초))).RepeatForever()));
+
+            var pushJobKey = new JobKey("DispatchRecommendationPush");
+            q.AddJob<배차추천알림발송Job>(opts => opts.WithIdentity(pushJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(pushJobKey)
+                .WithIdentity("DispatchRecommendationPush-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
+
+            var paymentOutboxJobKey = new JobKey("PaymentApprovedOutboxPublish");
+            q.AddJob<결제승인완료Outbox발행Job>(opts => opts.WithIdentity(paymentOutboxJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(paymentOutboxJobKey)
+                .WithIdentity("PaymentApprovedOutboxPublish-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.결제승인Outbox발행주기초))).RepeatForever()));
+
+            var customsSyncJobKey = new JobKey("CustomsStatusSync");
+            q.AddJob<통관상태동기화Job>(opts => opts.WithIdentity(customsSyncJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(customsSyncJobKey)
+                .WithIdentity("CustomsStatusSync-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(30, jobOptions.통관상태동기화주기초))).RepeatForever()));
+
+            var domesticSalesOrderSyncJobKey = new JobKey("DomesticSalesChannelOrderSync");
+            q.AddJob<DomesticSalesChannelOrderSyncJob>(opts => opts.WithIdentity(domesticSalesOrderSyncJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(domesticSalesOrderSyncJobKey)
+                .WithIdentity("DomesticSalesChannelOrderSync-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(60, salesOrderSyncOptions.DomesticSyncIntervalSeconds))).RepeatForever()));
+
+            var overseasSalesOrderSyncJobKey = new JobKey("OverseasSalesChannelOrderSync");
+            q.AddJob<OverseasSalesChannelOrderSyncJob>(opts => opts.WithIdentity(overseasSalesOrderSyncJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(overseasSalesOrderSyncJobKey)
+                .WithIdentity("OverseasSalesChannelOrderSync-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(60, salesOrderSyncOptions.OverseasSyncIntervalSeconds))).RepeatForever()));
+        });
+
+        services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
+        return services;
+    }
+}

@@ -1,0 +1,181 @@
+﻿@page "/driver/settings/views"
+@using DriverApp.Models.Driver.Home
+@inject DriverViewVisibilityService ViewVisibilityService
+@inject DriverHomeDisplayPreferenceService HomeDisplayPreferenceService
+@inject 추천카드표시설정Service CardPreferenceService
+@inject IDriverSampleDataService SampleData
+
+<PageTitle>화면 설정</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">화면 설정</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">우측 상단 프로필 버튼으로 들어오는 메뉴 화면에서 진입하는 관리 화면이다. 홈은 운행과 추천 중심으로 두고, 여기서만 보조 화면 노출을 조정한다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">홈 추천 보기 방식</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">지도를 먼저 볼지, 리스트를 먼저 볼지, 둘 다 같이 볼지 지금 여기서 고를 수 있다.</MudText>
+
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton Variant="@보기방식버튼Variant(홈추천표시방식.지도우선)"
+                               Color="Color.Primary"
+                               OnClick="@(() => SelectDisplayMode(홈추천표시방식.지도우선))">지도 우선</MudButton>
+                    <MudButton Variant="@보기방식버튼Variant(홈추천표시방식.리스트우선)"
+                               Color="Color.Primary"
+                               OnClick="@(() => SelectDisplayMode(홈추천표시방식.리스트우선))">리스트 우선</MudButton>
+                    <MudButton Variant="@보기방식버튼Variant(홈추천표시방식.둘다표시)"
+                               Color="Color.Primary"
+                               OnClick="@(() => SelectDisplayMode(홈추천표시방식.둘다표시))">둘 다 표시</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">추천카드 표시 방식</MudText>
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton Variant="@(CardPreferenceService.GetSettings().표시모드 == DriverApp.Models.Driver.추천카드표시모드.간단히 ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               OnClick="@(() => SetCardMode(DriverApp.Models.Driver.추천카드표시모드.간단히))">간단히</MudButton>
+                    <MudButton Variant="@(CardPreferenceService.GetSettings().표시모드 == DriverApp.Models.Driver.추천카드표시모드.표준 ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               OnClick="@(() => SetCardMode(DriverApp.Models.Driver.추천카드표시모드.표준))">표준</MudButton>
+                    <MudButton Variant="@(CardPreferenceService.GetSettings().표시모드 == DriverApp.Models.Driver.추천카드표시모드.자세히 ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               OnClick="@(() => SetCardMode(DriverApp.Models.Driver.추천카드표시모드.자세히))">자세히</MudButton>
+                </MudStack>
+
+                <MudText Typo="Typo.caption" Color="Color.Secondary">미리보기</MudText>
+                @* preview card uses first sample request *@
+                @if (SampleData.추천의뢰목록.Count > 0)
+                {
+                    var preview = SampleData.추천의뢰목록[0];
+                    <MudPaper Class="pa-3 mt-2" Elevation="0" Outlined="true">
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.subtitle1">@preview.픽업지 → @preview.하차지</MudText>
+                            <MudStack Row="true" Spacing="1">
+                                @if (CardPreferenceService.CalculatePolicy().운송방식표시)
+                                {
+                                    <MudChip T="string" Color="Color.Primary">@preview.운송방식</MudChip>
+                                }
+                                @if (CardPreferenceService.CalculatePolicy().시간조건표시 && preview.당일상차필수)
+                                {
+                                    <MudChip T="string" Color="Color.Warning">당상</MudChip>
+                                }
+                            </MudStack>
+                            <MudText Typo="Typo.body2">@preview.차량조건표시 · {0}</MudText>
+                            <MudText Typo="Typo.h6" Color="Color.Error">@((preview.예상수익 ?? 0m).ToString("N0") + "원")</MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        </MudPaper>
+
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/home">기사 홈으로 돌아가기</MudButton>
+        </MudStack>
+
+        @if (!ViewVisibilityService.IsLoaded)
+        {
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudTable Items="ViewVisibilityService.Items.OrderBy(x => x.SortOrder)" Dense="true">
+                <HeaderContent>
+                    <MudTh>화면</MudTh>
+                    <MudTh>필수</MudTh>
+                    <MudTh>관리자 정책</MudTh>
+                    <MudTh>표시</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="화면">@context.DisplayName</MudTd>
+                    <MudTd DataLabel="필수">@(context.IsRequired ? "예" : "아니오")</MudTd>
+                    <MudTd DataLabel="관리자 정책">@(context.PolicyEnabled ? "허용" : "숨김")</MudTd>
+                    <MudTd DataLabel="표시">
+                        <MudSwitch T="bool"
+                                   Value="@context.UserVisible"
+                                   ValueChanged="@((bool value) => ToggleAsync(context.ViewKey, value))"
+                                   Disabled="@(context.IsRequired || !context.PolicyEnabled || isBusy)" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private bool isBusy;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewVisibilityService.EnsureLoadedAsync();
+    }
+
+    private async Task ToggleAsync(string viewKey, bool isVisible)
+    {
+        if (isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        message = null;
+
+        try
+        {
+            await ViewVisibilityService.UpdateVisibilityAsync(viewKey, isVisible);
+            messageSeverity = Severity.Success;
+            message = "화면 표시 설정을 저장했습니다.";
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private void SelectDisplayMode(홈추천표시방식 value)
+    {
+        HomeDisplayPreferenceService.Set(value);
+        messageSeverity = Severity.Success;
+        message = value switch
+        {
+            홈추천표시방식.지도우선 => "홈 추천 보기 방식을 지도 우선으로 저장했습니다.",
+            홈추천표시방식.리스트우선 => "홈 추천 보기 방식을 리스트 우선으로 저장했습니다.",
+            _ => "홈 추천 보기 방식을 둘 다 표시로 저장했습니다."
+        };
+    }
+
+    private Variant 보기방식버튼Variant(홈추천표시방식 value)
+        => HomeDisplayPreferenceService.Current == value ? Variant.Filled : Variant.Outlined;
+
+    private void SetCardMode(DriverApp.Models.Driver.추천카드표시모드 mode)
+    {
+        CardPreferenceService.SetMode(mode);
+        messageSeverity = Severity.Success;
+        message = mode switch
+        {
+            DriverApp.Models.Driver.추천카드표시모드.간단히 => "추천카드 표시 방식을 간단히로 저장했습니다.",
+            DriverApp.Models.Driver.추천카드표시모드.표준 => "추천카드 표시 방식을 표준으로 저장했습니다.",
+            _ => "추천카드 표시 방식을 자세히로 저장했습니다."
+        };
+    }
+}
+

@@ -1,0 +1,81 @@
+using DriverApp.Models.Auth;
+using Hongdal.Client.Infrastructure.Security;
+
+namespace DriverApp.Services;
+
+public sealed class AuthSession : IAuthSession
+{
+    private readonly IClientSecureTokenStore _tokenStore;
+    private readonly IClientSessionGuard _sessionGuard;
+    private bool _restored;
+
+    public AuthSession(IClientSecureTokenStore tokenStore, IClientSessionGuard sessionGuard)
+    {
+        _tokenStore = tokenStore;
+        _sessionGuard = sessionGuard;
+    }
+
+    public string? AccessToken { get; private set; }
+    public string? RefreshToken { get; private set; }
+    public string? UserId { get; private set; }
+    public string? UserName { get; private set; }
+    public IReadOnlyList<string> Roles { get; private set; } = Array.Empty<string>();
+    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(UserId);
+    public event Action? Changed;
+
+    public async Task RestoreAsync(CancellationToken cancellationToken = default)
+    {
+        if (_restored)
+        {
+            return;
+        }
+
+        _restored = true;
+        var snapshot = await _tokenStore.LoadAsync(cancellationToken);
+        if (!_sessionGuard.IsAccessTokenUsable(snapshot, DateTime.UtcNow)
+            && !_sessionGuard.IsRefreshTokenUsable(snapshot, DateTime.UtcNow))
+        {
+            await ClearAsync(cancellationToken);
+            return;
+        }
+
+        ApplySnapshot(snapshot!);
+        Changed?.Invoke();
+    }
+
+    public async Task ApplyAsync(TokenResponse tokenResponse, CancellationToken cancellationToken = default)
+    {
+        var snapshot = new ClientAuthTokenSnapshot(
+            tokenResponse.AccessToken,
+            tokenResponse.AccessTokenExpiresAtUtc,
+            tokenResponse.RefreshToken,
+            tokenResponse.RefreshTokenExpiresAtUtc,
+            tokenResponse.UserId,
+            tokenResponse.UserName,
+            tokenResponse.Roles);
+
+        ApplySnapshot(snapshot);
+        await _tokenStore.SaveAsync(snapshot, cancellationToken);
+        Changed?.Invoke();
+    }
+
+    public async Task ClearAsync(CancellationToken cancellationToken = default)
+    {
+        AccessToken = null;
+        RefreshToken = null;
+        UserId = null;
+        UserName = null;
+        Roles = Array.Empty<string>();
+        await _tokenStore.ClearAsync(cancellationToken);
+        Changed?.Invoke();
+    }
+
+    private void ApplySnapshot(ClientAuthTokenSnapshot snapshot)
+    {
+        AccessToken = snapshot.AccessToken;
+        RefreshToken = snapshot.RefreshToken;
+        UserId = snapshot.UserId;
+        UserName = snapshot.UserName;
+        Roles = snapshot.Roles;
+    }
+}

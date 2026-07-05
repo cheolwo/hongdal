@@ -1,0 +1,40 @@
+﻿@page "/driver/reservations"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>예약</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">예약</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">오늘 잡아둔 예약과 운행 전 확인할 내용을 샘플로 본다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudGrid Spacing="3">
+            @foreach (var item in Samples.예약목록)
+            {
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="pa-4 h-100" Elevation="2">
+                        <MudStack Spacing="1">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.h6">@item.시작시각.ToString("HH:mm")</MudText>
+                                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@item.상태</MudChip>
+                            </MudStack>
+                            <MudText Typo="Typo.body2">시작 모드: @item.시작모드</MudText>
+                            <MudText Typo="Typo.body2">시작 위치: @item.시작위치</MudText>
+                            <MudText Typo="Typo.body2">복귀지: @(item.복귀지 ?? "미설정")</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@item.메모</MudText>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/work/start">운행 시작으로</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/home">기사 홈으로</MudButton>
+        </MudStack>
+    </MudStack>
+</MudContainer>

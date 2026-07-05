@@ -1,0 +1,111 @@
+@page "/dispatch/address-form"
+@inject 배차주소ApiService DispatchAddressApiService
+
+<PageTitle>상차/하차 주소 입력</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">상차/하차 주소 입력 폼</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                공통 주소 컴포넌트(HongdalAddressInput)와 사업자등록번호 컴포넌트(BusinessNumberInput) 적용 예시다.
+            </MudText>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Class="mb-3">상차지 주소</MudText>
+                        <HongdalAddressInput @bind-Value="PickupAddress" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Class="mb-3">하차지 주소</MudText>
+                        <HongdalAddressInput @bind-Value="DropoffAddress" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Class="mb-3">사업자등록번호</MudText>
+                        <BusinessNumberInput @bind-Value="BusinessNumber" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="저장Async" Disabled="@Saving">
+                @(Saving ? "저장 중..." : "저장")
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="초기화" Disabled="@Saving">
+                초기화
+            </MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(Message))
+        {
+            <MudAlert Severity="Severity.Info">@Message</MudAlert>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private 주소입력값Dto PickupAddress { get; set; } = new();
+    private 주소입력값Dto DropoffAddress { get; set; } = new();
+    private 사업자등록번호입력값Dto BusinessNumber { get; set; } = new();
+    private string? Message { get; set; }
+    private bool Saving { get; set; }
+
+    private async Task 저장Async()
+    {
+        if (Saving)
+        {
+            return;
+        }
+
+        try
+        {
+            Saving = true;
+
+            var request = new 배차주소저장요청
+            {
+                상차지우편번호 = PickupAddress.우편번호,
+                상차지기본주소 = PickupAddress.기본주소,
+                상차지상세주소 = PickupAddress.상세주소,
+                하차지우편번호 = DropoffAddress.우편번호,
+                하차지기본주소 = DropoffAddress.기본주소,
+                하차지상세주소 = DropoffAddress.상세주소,
+                사업자등록번호 = BusinessNumber.숫자값
+            };
+
+            var result = await DispatchAddressApiService.저장Async(request);
+            Message = result.상차지위도.HasValue && result.하차지위도.HasValue
+                ? $"{result.메시지} / 상차좌표({result.상차지위도:F6}, {result.상차지경도:F6}) / 하차좌표({result.하차지위도:F6}, {result.하차지경도:F6})"
+                : $"{result.메시지} / 좌표 변환 결과 없음";
+        }
+        catch (Exception ex)
+        {
+            Message = $"저장 중 오류: {ex.Message}";
+        }
+        finally
+        {
+            Saving = false;
+        }
+    }
+
+    private void 초기화()
+    {
+        PickupAddress = new();
+        DropoffAddress = new();
+        BusinessNumber = new();
+        Message = null;
+    }
+}

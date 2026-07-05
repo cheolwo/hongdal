@@ -1,0 +1,26 @@
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local secrets / overrides
+appsettings.Local.json
+appsettings.*.local.json
+*.secret.json
+*.secrets.json
+secrets.json
+secrets.*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local scratch files
+/tmp*.txt
+/placeholder.txt

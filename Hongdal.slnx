@@ -1,0 +1,36 @@
+<Solution>
+  <Folder Name="/App/">
+    <Project Path="CustomsBrokerApp/CustomsBrokerApp.csproj" />
+    <Project Path="DriverApp/DriverApp.csproj" />
+    <Project Path="HongdalAdmin/HongdalAdmin.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="ShipperApp/ShipperApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
+    <Project Path="WarehouseManagerApp/WarehouseManagerApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
+  </Folder>
+  <Folder Name="/Net/">
+    <Project Path="Hongdal.BackOffice.Client/Hongdal.BackOffice.Client.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="Hongdal.Contracts/Hongdal.Contracts.csproj" />
+    <Project Path="Hongdal.Domain/Hongdal.Domain.csproj" />
+    <Project Path="Hongdal.Infrastructure/Hongdal.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="Hongdal.BackOffice.Ui/Hongdal.BackOffice.Ui.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+  <Project Path="Hongdal.FoodApi/Hongdal.FoodApi.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+  <Project Path="Hongdal.Ui.Common/Hongdal.Ui.Common.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+  <Project Path="Hongdal/Hongdal.csproj" />
+</Solution>

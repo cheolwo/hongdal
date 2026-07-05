@@ -1,0 +1,142 @@
+@using Hongdal.Contracts.Common.Inbound
+@using Hongdal.Contracts.Common.Inventory
+@using Hongdal.Contracts.Common.Warehouse
+@using Hongdal.Ui.Common.Areas.App.Services
+@inject NavigationManager Navigation
+@inject IWarehouseWorkspaceService WarehouseService
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h4">@Title</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">@Description</MudText>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        @if (isLoading)
+        {
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Class="pa-4">
+                        <MudText Typo="Typo.subtitle2">창고</MudText>
+                        <MudText Typo="Typo.h4">@warehouses.Count</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Class="pa-4">
+                        <MudText Typo="Typo.subtitle2">입고예정</MudText>
+                        <MudText Typo="Typo.h4">@pendingInboundCount</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Class="pa-4">
+                        <MudText Typo="Typo.subtitle2">입고완료</MudText>
+                        <MudText Typo="Typo.h4">@completedInboundCount</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Class="pa-4">
+                        <MudText Typo="Typo.subtitle2">보관 재고</MudText>
+                        <MudText Typo="Typo.h4">@storedInventoryCount</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        }
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">입고 처리</MudText>
+                        <MudText Typo="Typo.body2">입고 요청을 확인하고 입고완료 처리로 재고를 생성합니다.</MudText>
+                        <MudButton Class="mt-3" Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToInboundRequests">입고 현황 보기</MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">입고상품 활용</MudText>
+                        <MudText Typo="Typo.body2">입고된 재고를 보고 다음 업무를 결정합니다.</MudText>
+                        <MudButton Class="mt-3" Variant="Variant.Filled" Color="Color.Success" OnClick="GoToInventory">재고 허브 열기</MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <MudCard>
+            <MudCardContent>
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">결정 포인트</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">입고가 완료되면 재고 허브에서 앱별 후속 업무를 선택할 수 있습니다.</MudText>
+                    </MudStack>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadAsync">현황 새로고침</MudButton>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter] public string Title { get; set; } = "입고 대시보드";
+    [Parameter] public string Description { get; set; } = "입고 현황, 재고, 후속 업무 흐름의 시작 화면입니다.";
+    [Parameter] public string InboundRequestsUrl { get; set; } = "/warehouse/inbound/requests";
+    [Parameter] public string InventoryUrl { get; set; } = "/warehouse/inventory";
+
+    private IReadOnlyList<창고요약응답> warehouses = [];
+    private IReadOnlyList<입고요청항목응답> inbounds = [];
+    private IReadOnlyList<재고항목응답> inventory = [];
+    private bool isLoading;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    private int pendingInboundCount => inbounds.Count(x => string.Equals(x.상태, "입고예정", StringComparison.OrdinalIgnoreCase));
+    private int completedInboundCount => inbounds.Count(x => string.Equals(x.상태, "입고완료", StringComparison.OrdinalIgnoreCase));
+    private int storedInventoryCount => inventory.Count(x => string.Equals(x.상태, "보관중", StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        isLoading = true;
+        message = null;
+
+        try
+        {
+            warehouses = (await WarehouseService.GetWarehousesAsync())?.Items ?? [];
+            inbounds = (await WarehouseService.GetInboundsAsync())?.Items ?? [];
+            inventory = (await WarehouseService.GetInventoryAsync())?.Items ?? [];
+            messageSeverity = Severity.Success;
+            message = $"창고 {warehouses.Count}건, 입고 {inbounds.Count}건, 재고 {inventory.Count}건을 불러왔습니다.";
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoToInboundRequests()
+    {
+        Navigation.NavigateTo(InboundRequestsUrl);
+    }
+
+    private void GoToInventory()
+    {
+        Navigation.NavigateTo(InventoryUrl);
+    }
+}

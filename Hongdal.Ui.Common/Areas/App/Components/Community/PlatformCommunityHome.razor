@@ -1,0 +1,1202 @@
+@namespace Hongdal.Ui.Common.Areas.App.Components.Community
+@inject PlatformCommunityService CommunityService
+
+<MudContainer MaxWidth="MaxWidth.False" Class="@HomeRootClass">
+    <MudStack Spacing="3">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-community-hero">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="2">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.overline" Color="Color.Secondary">@AppName</MudText>
+                    <MudText Typo="Typo.h4">플랫폼 커뮤니티</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        알림과 현장 의견, 운영 공유, 개선 제안, 업무 경험을 함께 남기는 공간입니다.
+                    </MudText>
+                </MudStack>
+                <MudChip T="string" Color="@CurrentModeColor" Variant="Variant.Outlined">@RoleLabel · @CurrentModeLabel</MudChip>
+            </MudStack>
+        </MudPaper>
+
+        <MudGrid Class="@CommunityGridClass">
+            <MudItem xs="12" lg="8">
+                <MudStack Spacing="2">
+                    @if (isLoading)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">커뮤니티 글을 불러오는 중입니다.</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                    else if (posts.Count > 0)
+                    {
+                        @foreach (var post in posts)
+                        {
+                            var commentForm = GetCommentForm(post.Id);
+                            var isReportPost = IsReportPost(post);
+
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-community-post">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                            <MudIcon Icon="@Icons.Material.Filled.Forum" Color="Color.Primary" />
+                                            <MudText Typo="Typo.subtitle1">@post.Title</MudText>
+                                        </MudStack>
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                            @if (post.IsOperatorPinned)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">운영 고정</MudChip>
+                                            }
+                                            else if (post.IsTrending)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">활동 글</MudChip>
+                                            }
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@post.Category</MudChip>
+                                            @if (isReportPost)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Outlined">신고 게시판</MudChip>
+                                            }
+                                        </MudStack>
+                                    </MudStack>
+
+                                    <MudText Typo="Typo.body2">@post.Body</MudText>
+
+                                    @if (isReportPost)
+                                    {
+                                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                                            관찰자에게는 신고자와 피신고자가 익명으로 표시됩니다. 당사자와 운영자는 별도 권한 확인 후 필요한 범위의 정보만 확인합니다.
+                                        </MudAlert>
+                                        <MudGrid>
+                                            <MudItem xs="12" sm="6">
+                                                <MudPaper Elevation="0" Outlined="true" Class="pa-3 platform-community-report-subject">
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">신고한 자</MudText>
+                                                    <MudText Typo="Typo.subtitle2">@ReportReporterLabel(post)</MudText>
+                                                </MudPaper>
+                                            </MudItem>
+                                            <MudItem xs="12" sm="6">
+                                                <MudPaper Elevation="0" Outlined="true" Class="pa-3 platform-community-report-subject">
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">신고받는 자</MudText>
+                                                    <MudText Typo="Typo.subtitle2">@ReportReportedLabel(post)</MudText>
+                                                </MudPaper>
+                                            </MudItem>
+                                        </MudGrid>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(post.SharedLinkUrl))
+                                    {
+                                        <MudButton Href="@post.SharedLinkUrl"
+                                                   Target="_blank"
+                                                   Rel="noopener noreferrer"
+                                                   Variant="Variant.Outlined"
+                                                   Color="Color.Info"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.Link">
+                                            공유 링크 열기
+                                        </MudButton>
+                                    }
+
+                                    @if (post.Attachments.Count > 0)
+                                    {
+                                        <div class="platform-community-attachments">
+                                            @foreach (var attachment in post.Attachments)
+                                            {
+                                                var attachmentCommentForm = GetAttachmentCommentForm(attachment.Id);
+
+                                                <div class="platform-community-attachment-item">
+                                                    <a href="@attachment.Url" target="_blank" rel="noopener noreferrer">
+                                                        <img src="@attachment.Url" alt="@attachment.OriginalFileName" />
+                                                    </a>
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">Image comments @attachment.CommentCount</MudText>
+                                                    @if (attachment.RecentComments.Count > 0)
+                                                    {
+                                                        <MudStack Spacing="1" Class="platform-community-comments">
+                                                            @foreach (var comment in attachment.RecentComments)
+                                                            {
+                                                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                                                    <HongdalCommunityRoleProfileBadge DisplayName="@DisplayCommentNickname(post, comment.Nickname)"
+                                                                                                      ContextKey="@post.AppKey"
+                                                                                                      Category="@post.Category"
+                                                                                                      IsMasked="@IsReportPost(post)"
+                                                                                                      Compact="true" />
+                                                                    <MudText Typo="Typo.caption">@comment.Body</MudText>
+                                                                    <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => ReportAttachmentCommentAsync(comment))">
+                                                                        Report
+                                                                    </MudButton>
+                                                                    <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteAttachmentCommentAsync(attachment, comment))">
+                                                                        Delete
+                                                                    </MudButton>
+                                                                </MudStack>
+                                                            }
+                                                        </MudStack>
+                                                    }
+                                                    <MudStack Spacing="1" Class="platform-community-image-comment-form">
+                                                        <MudTextField T="string" Placeholder="Nickname" @bind-Value="attachmentCommentForm.Nickname" MaxLength="40" Margin="Margin.Dense" />
+                                                        <MudTextField T="string" Placeholder="Password" @bind-Value="attachmentCommentForm.Password" InputType="InputType.Password" MaxLength="100" Margin="Margin.Dense" />
+                                                        <MudTextField T="string" Placeholder="Image comment" @bind-Value="attachmentCommentForm.Body" MaxLength="1000" Margin="Margin.Dense" />
+                                                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" OnClick="@(() => SaveAttachmentCommentAsync(attachment))">
+                                                            Comment
+                                                        </MudButton>
+                                                    </MudStack>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    @if (post.RecentComments.Count > 0)
+                                    {
+                                        <MudStack Spacing="1" Class="platform-community-comments">
+                                            @foreach (var comment in post.RecentComments)
+                                            {
+                                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                                    <HongdalCommunityRoleProfileBadge DisplayName="@DisplayCommentNickname(post, comment.Nickname)"
+                                                                                      ContextKey="@post.AppKey"
+                                                                                      Category="@post.Category"
+                                                                                      IsMasked="@IsReportPost(post)"
+                                                                                      Compact="true" />
+                                                    <MudText Typo="Typo.caption">@comment.Body</MudText>
+                                                    <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => ReportCommentAsync(comment))">
+                                                        Report
+                                                    </MudButton>
+                                                    <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteCommentAsync(post, comment))">
+                                                        Delete
+                                                    </MudButton>
+                                                </MudStack>
+                                            }
+                                        </MudStack>
+                                    }
+
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="platform-community-meta">
+                                            <HongdalCommunityRoleProfileBadge DisplayName="@DisplayPostNickname(post)"
+                                                                              ContextKey="@post.AppKey"
+                                                                              Category="@post.Category"
+                                                                              IsMasked="@IsReportPost(post)"
+                                                                              Compact="true" />
+                                            <MudText Typo="Typo.caption">추천 @post.RecommendationCount</MudText>
+                                            <MudText Typo="Typo.caption">댓글 @post.CommentCount</MudText>
+                                            <MudText Typo="Typo.caption">· @FormatDate(post.CreatedAtUtc)</MudText>
+                                        </MudStack>
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ThumbUp" OnClick="@(() => RecommendPostAsync(post))">
+                                                추천
+                                            </MudButton>
+                                            @if (CanManageCommunityPosts)
+                                            {
+                                                <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Warning" StartIcon="@Icons.Material.Filled.PushPin" OnClick="@(() => ToggleOperatorPinAsync(post))">
+                                                    @(post.IsOperatorPinned ? "고정 해제" : "상단 고정")
+                                                </MudButton>
+                                            }
+                                            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => BeginEdit(post))">
+                                                수정
+                                            </MudButton>
+                                        </MudStack>
+                                    </MudStack>
+
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="platform-community-comment-form">
+                                        <MudTextField T="string" Placeholder="닉네임" @bind-Value="commentForm.Nickname" MaxLength="40" Margin="Margin.Dense" />
+                                        <MudTextField T="string" Placeholder="비밀번호" @bind-Value="commentForm.Password" InputType="InputType.Password" MaxLength="100" Margin="Margin.Dense" />
+                                        <MudTextField T="string" Placeholder="댓글" @bind-Value="commentForm.Body" MaxLength="1000" Margin="Margin.Dense" />
+                                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" OnClick="@(() => SaveCommentAsync(post))">
+                                            댓글
+                                        </MudButton>
+                                    </MudStack>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+                    else
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">아직 등록된 커뮤니티 글이 없습니다. 첫 글을 남겨 보세요.</MudText>
+                        </MudPaper>
+                    }
+
+                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mt-2">운영 공유</MudText>
+                    @foreach (var post in SeedPosts)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-community-post">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudIcon Icon="@post.Icon" Color="@post.Color" />
+                                        <MudText Typo="Typo.subtitle1">@post.Title</MudText>
+                                    </MudStack>
+                                    <MudChip T="string" Size="Size.Small" Color="@post.Color" Variant="Variant.Outlined">@post.Category</MudChip>
+                                </MudStack>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@post.Body</MudText>
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="platform-community-meta">
+                                    <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" />
+                                    <MudText Typo="Typo.caption">@post.Meta</MudText>
+                                </MudStack>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+            </MudItem>
+
+            <MudItem xs="12" lg="4">
+                <MudStack Spacing="2">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">@(editingPostId is null ? "글 남기기" : "글 수정")</MudText>
+                            <MudTextField T="string" Label="닉네임" @bind-Value="form.Nickname" MaxLength="40" />
+                            <MudTextField T="string" Label="비밀번호" @bind-Value="form.Password" InputType="InputType.Password" HelperText="수정할 때 같은 비밀번호를 사용합니다." />
+                            <MudTextField T="string" Label="분류" @bind-Value="form.Category" MaxLength="60" />
+                            <MudCheckBox T="bool" @bind-Value="form.IsReportBoardPost" Label="신고 게시판 글" Color="Color.Error" />
+                            @if (form.IsReportBoardPost)
+                            {
+                                <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                                    관찰자에게는 신고한 자와 신고받는 자가 익명으로 표시됩니다.
+                                </MudAlert>
+                                <MudTextField T="string" Label="신고한 자 표시명" @bind-Value="form.ReporterDisplayName" MaxLength="40" HelperText="비워두면 닉네임을 기준으로 저장합니다." />
+                                <MudTextField T="string" Label="신고받는 자 표시명" @bind-Value="form.ReportedDisplayName" MaxLength="40" />
+                            }
+                            <MudTextField T="string" Label="제목" @bind-Value="form.Title" MaxLength="160" />
+                            <MudTextField T="string" Label="본문" @bind-Value="form.Body" Lines="5" MaxLength="4000" />
+                            <MudTextField T="string" Label="공유 링크/영상 링크" @bind-Value="form.SharedLinkUrl" MaxLength="1000" />
+                            <div>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">사진 첨부</MudText>
+                                <InputFile OnChange="HandleFilesSelected" multiple accept="image/jpeg,image/png,image/webp,image/gif" />
+                                @if (selectedFiles.Count > 0)
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@($"{selectedFiles.Count}개 파일 선택됨")</MudText>
+                                }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(statusMessage))
+                            {
+                                <MudAlert Severity="@statusSeverity" Dense="true">@statusMessage</MudAlert>
+                            }
+                            <MudStack Row="true" Spacing="1">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@isSaving" OnClick="SavePostAsync">
+                                    @(editingPostId is null ? "등록" : "수정 저장")
+                                </MudButton>
+                                @if (editingPostId is not null)
+                                {
+                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@isSaving" OnClick="CancelEdit">
+                                        취소
+                                    </MudButton>
+                                }
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">업무 바로가기</MudText>
+                            @foreach (var action in QuickActions)
+                            {
+                                <MudButton Href="@action.Href"
+                                           Variant="Variant.Outlined"
+                                           Color="@action.Color"
+                                           StartIcon="@action.Icon"
+                                           EndIcon="@Icons.Material.Filled.ChevronRight"
+                                           Class="platform-community-action">
+                                    <MudStack Spacing="0" AlignItems="AlignItems.Start">
+                                        <MudText Typo="Typo.body2">@action.Title</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@action.Description</MudText>
+                                    </MudStack>
+                                </MudButton>
+                            }
+                        </MudStack>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">운영 흐름</MudText>
+                            @foreach (var item in OperatingNotes)
+                            {
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">@item</MudText>
+                                </MudStack>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudStack>
+            </MudItem>
+        </MudGrid>
+
+        <MudPaper Elevation="0" Outlined="true" Class="@WorkPanelClass">
+            <MudStack Spacing="3">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h5">업무 모드</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            커뮤니티 흐름은 잠시 접고, 지금 처리할 업무 화면으로 바로 진입합니다.
+                        </MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="@CurrentModeColor" Variant="Variant.Outlined">@RoleLabel</MudChip>
+                </MudStack>
+
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 platform-work-community-draft">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="2">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.subtitle2">업무에서 커뮤니티 글쓰기</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                업무 중 궁금한 점이나 처리한 일을 바로 커뮤니티 글 초안으로 옮깁니다.
+                            </MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.HelpOutline"
+                                       OnClick="@(() => PrepareWorkCommunityDraft(WorkCommunityDraftKind.Question))">
+                                궁금한 점
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Success"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.TaskAlt"
+                                       OnClick="@(() => PrepareWorkCommunityDraft(WorkCommunityDraftKind.WorkDone))">
+                                처리한 일
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Warning"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Lightbulb"
+                                       OnClick="@(() => PrepareWorkCommunityDraft(WorkCommunityDraftKind.Suggestion))">
+                                개선 제안
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Info"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Public"
+                                       OnClick="@(() => PrepareWorkCommunityDraft(WorkCommunityDraftKind.InternationalCoordination))">
+                                국제 소통
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+
+                @if (WorkModeContent is not null)
+                {
+                    @WorkModeContent
+                }
+                else if (QuickActions.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                        이 앱에는 아직 업무 바로가기가 등록되어 있지 않습니다.
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudGrid>
+                        @foreach (var action in QuickActions)
+                        {
+                            <MudItem xs="12" sm="6" lg="4">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100 platform-work-action-card">
+                                    <MudStack Spacing="2">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                            <MudIcon Icon="@action.Icon" Color="@action.Color" Size="Size.Large" />
+                                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="@action.Color" />
+                                        </MudStack>
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
+                                            <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
+                                        </MudStack>
+                                        <MudButton Href="@action.Href"
+                                                   Variant="Variant.Filled"
+                                                   Color="@action.Color"
+                                                   StartIcon="@action.Icon">
+                                            열기
+                                        </MudButton>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                }
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="6" Class="@ModeBarClass">
+            <MudStack Spacing="1">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@CurrentModeIcon" Color="@CurrentModeColor" />
+                        <MudText Typo="Typo.subtitle2">@CurrentModeLabel</MudText>
+                    </MudStack>
+                    <MudIconButton Icon="@ModeBarToggleIcon"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   OnClick="ToggleModeBar"
+                                   aria-label="모드 바 접기 또는 펼치기" />
+                </MudStack>
+
+                @if (isModeBarExpanded)
+                {
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudButton Variant="@CommunityModeVariant"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Forum"
+                                   OnClick="ShowCommunityMode">
+                            커뮤니티 모드
+                        </MudButton>
+                        <MudButton Variant="@WorkModeVariant"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Work"
+                                   OnClick="ShowWorkMode">
+                            업무 모드
+                        </MudButton>
+                    </MudStack>
+                }
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+<style>
+    .platform-community-home {
+        --platform-home-accent: #2563eb;
+        --platform-home-accent-rgb: 37, 99, 235;
+        --platform-home-border: #bfdbfe;
+        --platform-home-surface: #ffffff;
+        --platform-home-surface-soft: #eff6ff;
+        color: var(--mud-palette-text-primary);
+        padding-bottom: 112px;
+        min-height: 100%;
+        border-radius: 8px;
+        transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    .platform-home--community {
+        --platform-home-accent: #2563eb;
+        --platform-home-accent-rgb: 37, 99, 235;
+        --platform-home-border: #bfdbfe;
+        --platform-home-surface: #ffffff;
+        --platform-home-surface-soft: #eff6ff;
+        background: #f8fbff;
+    }
+
+    .platform-home--work {
+        --platform-home-accent: #0f766e;
+        --platform-home-accent-rgb: 15, 118, 110;
+        --platform-home-border: #99f6e4;
+        --platform-home-surface: #ffffff;
+        --platform-home-surface-soft: #ecfdf5;
+        background: #f7fdfb;
+    }
+
+    .platform-community-hero,
+    .platform-community-post {
+        border-radius: 8px;
+    }
+
+    .platform-community-hero {
+        border-color: var(--platform-home-border) !important;
+        background: var(--platform-home-surface-soft);
+        box-shadow: inset 4px 0 0 var(--platform-home-accent);
+        transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .platform-community-post {
+        border-color: rgba(var(--platform-home-accent-rgb), 0.2) !important;
+        background: var(--platform-home-surface);
+    }
+
+    .platform-community-meta {
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .platform-community-report-subject {
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--mud-palette-warning) 8%, var(--mud-palette-surface));
+    }
+
+    .platform-community-action {
+        justify-content: flex-start;
+        min-height: 64px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .platform-community-action .mud-button-label {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .platform-community-attachments {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+
+    .platform-community-attachment-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .platform-community-attachments img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 8px;
+    }
+
+    .platform-community-comments {
+        border-left: 2px solid var(--mud-palette-divider);
+        padding-left: 10px;
+    }
+
+    .platform-community-comment-form {
+        align-items: stretch;
+    }
+
+    .platform-community-comment-form .mud-input-control {
+        min-width: 120px;
+    }
+
+    @@media (max-width: 720px) {
+        .platform-community-comment-form {
+            flex-direction: column;
+        }
+
+        .platform-community-comment-form .mud-input-control,
+        .platform-community-comment-form .mud-button-root {
+            width: 100%;
+        }
+    }
+
+    .platform-community-image-comment-form {
+        gap: 4px;
+    }
+
+    .platform-home-section-hidden {
+        display: none;
+    }
+
+    .platform-work-panel,
+    .platform-work-action-card {
+        border-radius: 8px;
+    }
+
+    .platform-work-panel {
+        border-color: var(--platform-home-border) !important;
+        background: var(--platform-home-surface-soft);
+        box-shadow: inset 4px 0 0 var(--platform-home-accent);
+    }
+
+    .platform-work-action-card {
+        border-color: rgba(var(--platform-home-accent-rgb), 0.28) !important;
+        background: var(--platform-home-surface);
+        min-height: 220px;
+    }
+
+    .platform-work-community-draft {
+        border-color: rgba(var(--platform-home-accent-rgb), 0.32) !important;
+        background: color-mix(in srgb, var(--platform-home-surface-soft) 68%, var(--platform-home-surface));
+        border-radius: 8px;
+    }
+
+    .platform-home-mode-bar {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        z-index: 1200;
+        width: min(720px, calc(100vw - 24px));
+        transform: translateX(-50%);
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: color-mix(in srgb, var(--platform-home-surface-soft) 82%, var(--mud-palette-surface));
+        border-color: var(--platform-home-border);
+        box-shadow: 0 12px 28px rgba(var(--platform-home-accent-rgb), 0.16);
+        transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, width 180ms ease;
+    }
+
+    .platform-home-mode-bar--collapsed {
+        width: min(360px, calc(100vw - 24px));
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string AppName { get; set; } = "Hongdal";
+
+    [Parameter]
+    public string RoleLabel { get; set; } = "플랫폼 구성원";
+
+    [Parameter]
+    public string AppKey { get; set; } = "platform";
+
+    [Parameter]
+    public IReadOnlyList<PlatformHomeQuickAction> QuickActions { get; set; } = [];
+
+    [Parameter]
+    public bool CanManageCommunityPosts { get; set; }
+
+    [Parameter]
+    public RenderFragment? WorkModeContent { get; set; }
+
+    private readonly List<PlatformCommunityPostResponse> posts = [];
+    private readonly List<IBrowserFile> selectedFiles = [];
+    private readonly PlatformCommunityPostForm form = new();
+    private readonly Dictionary<long, PlatformCommunityCommentForm> commentForms = [];
+    private readonly Dictionary<long, PlatformCommunityCommentForm> attachmentCommentForms = [];
+    private readonly string recommendationSessionKey = Guid.NewGuid().ToString("N");
+    private long? editingPostId;
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isWorkMode;
+    private bool isModeBarExpanded = true;
+    private string? statusMessage;
+    private Severity statusSeverity = Severity.Info;
+    private const long MaxUploadFileBytes = 5 * 1024 * 1024;
+
+    private string HomeRootClass => isWorkMode
+        ? "py-4 platform-community-home platform-home--work"
+        : "py-4 platform-community-home platform-home--community";
+
+    private string CommunityGridClass => isWorkMode
+        ? "platform-community-main-grid platform-home-section-hidden"
+        : "platform-community-main-grid";
+
+    private string WorkPanelClass => isWorkMode
+        ? "pa-4 platform-work-panel"
+        : "pa-4 platform-work-panel platform-home-section-hidden";
+
+    private string ModeBarClass => isModeBarExpanded
+        ? "platform-home-mode-bar"
+        : "platform-home-mode-bar platform-home-mode-bar--collapsed";
+
+    private string CurrentModeLabel => isWorkMode ? "업무 모드" : "커뮤니티 모드";
+
+    private string CurrentModeIcon => isWorkMode ? Icons.Material.Filled.Work : Icons.Material.Filled.Forum;
+
+    private Color CurrentModeColor => isWorkMode ? Color.Success : Color.Primary;
+
+    private string ModeBarToggleIcon => isModeBarExpanded ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ExpandLess;
+
+    private Variant CommunityModeVariant => isWorkMode ? Variant.Outlined : Variant.Filled;
+
+    private Variant WorkModeVariant => isWorkMode ? Variant.Filled : Variant.Outlined;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostsAsync();
+    }
+
+    private void ShowCommunityMode()
+    {
+        isWorkMode = false;
+    }
+
+    private void ShowWorkMode()
+    {
+        isWorkMode = true;
+    }
+
+    private void ToggleModeBar()
+    {
+        isModeBarExpanded = !isModeBarExpanded;
+    }
+
+    private void PrepareWorkCommunityDraft(WorkCommunityDraftKind kind)
+    {
+        editingPostId = null;
+        selectedFiles.Clear();
+        form.Category = ResolveDraftCategory(kind);
+        form.Title = ResolveDraftTitle(kind);
+        form.Body = ResolveDraftBody(kind);
+        form.SharedLinkUrl = string.Empty;
+        form.IsReportBoardPost = false;
+        form.ReporterDisplayName = string.Empty;
+        form.ReportedDisplayName = string.Empty;
+        isWorkMode = false;
+        isModeBarExpanded = true;
+        statusSeverity = Severity.Info;
+        statusMessage = "업무 맥락을 커뮤니티 글 초안으로 옮겼습니다. 닉네임과 비밀번호를 입력한 뒤 필요한 내용을 보완해 등록하세요.";
+    }
+
+    private async Task LoadPostsAsync()
+    {
+        isLoading = true;
+        try
+        {
+            var result = await CommunityService.GetPostsAsync(AppKey);
+            posts.Clear();
+            posts.AddRange(result.Items);
+        }
+        catch
+        {
+            statusSeverity = Severity.Info;
+            statusMessage = "커뮤니티 API가 연결되면 글 작성과 조회가 활성화됩니다.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SavePostAsync()
+    {
+        statusMessage = null;
+        if (string.IsNullOrWhiteSpace(form.Nickname) ||
+            string.IsNullOrWhiteSpace(form.Password) ||
+            string.IsNullOrWhiteSpace(form.Title) ||
+            (string.IsNullOrWhiteSpace(form.Body) && string.IsNullOrWhiteSpace(form.SharedLinkUrl)))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "닉네임, 비밀번호, 제목, 본문 또는 링크를 입력하세요.";
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            var wasEditing = editingPostId is not null;
+            PlatformCommunityPostResponse? saved;
+
+            if (editingPostId is long postId)
+            {
+                saved = await CommunityService.UpdatePostAsync(postId, new PlatformCommunityPostUpdateRequest
+                {
+                    Category = form.Category,
+                    Title = form.Title,
+                    Body = form.Body,
+                    SharedLinkUrl = form.SharedLinkUrl,
+                    Nickname = form.Nickname,
+                    IsReportBoardPost = form.IsReportBoardPost,
+                    ReporterDisplayName = form.ReporterDisplayName,
+                    ReportedDisplayName = form.ReportedDisplayName,
+                    Password = form.Password
+                });
+            }
+            else
+            {
+                saved = await CommunityService.CreatePostAsync(new PlatformCommunityPostCreateRequest
+                {
+                    AppKey = AppKey,
+                    Category = form.Category,
+                    Title = form.Title,
+                    Body = form.Body,
+                    SharedLinkUrl = form.SharedLinkUrl,
+                    Nickname = form.Nickname,
+                    IsReportBoardPost = form.IsReportBoardPost,
+                    ReporterDisplayName = form.ReporterDisplayName,
+                    ReportedDisplayName = form.ReportedDisplayName,
+                    Password = form.Password
+                });
+            }
+
+            if (saved is not null)
+            {
+                foreach (var file in selectedFiles)
+                {
+                    await CommunityService.UploadAttachmentAsync(saved.Id, form.Password, file, MaxUploadFileBytes);
+                }
+
+                ResetForm();
+                await LoadPostsAsync();
+            }
+
+            statusSeverity = Severity.Success;
+            statusMessage = wasEditing ? "글을 수정했습니다." : "글을 등록했습니다.";
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = "비밀번호가 맞지 않아 수정할 수 없습니다.";
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"저장에 실패했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task RecommendPostAsync(PlatformCommunityPostResponse post)
+    {
+        try
+        {
+            await CommunityService.RecommendAsync(post.Id, recommendationSessionKey);
+            await LoadPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"추천 처리에 실패했습니다: {ex.Message}";
+        }
+    }
+
+    private async Task ToggleOperatorPinAsync(PlatformCommunityPostResponse post)
+    {
+        try
+        {
+            await CommunityService.SetOperatorPinAsync(post.Id, !post.IsOperatorPinned);
+            await LoadPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"상단 고정 처리에 실패했습니다: {ex.Message}";
+        }
+    }
+
+    private async Task SaveCommentAsync(PlatformCommunityPostResponse post)
+    {
+        var commentForm = GetCommentForm(post.Id);
+        if (string.IsNullOrWhiteSpace(commentForm.Nickname) ||
+            string.IsNullOrWhiteSpace(commentForm.Password) ||
+            string.IsNullOrWhiteSpace(commentForm.Body))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "댓글 닉네임, 비밀번호, 내용을 입력하세요.";
+            return;
+        }
+
+        try
+        {
+            await CommunityService.CreateCommentAsync(post.Id, new PlatformCommunityPostCommentCreateRequest
+            {
+                Nickname = commentForm.Nickname,
+                Password = commentForm.Password,
+                Body = commentForm.Body
+            });
+
+            commentForms.Remove(post.Id);
+            await LoadPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"댓글 등록에 실패했습니다: {ex.Message}";
+        }
+    }
+
+    private async Task DeleteCommentAsync(PlatformCommunityPostResponse post, PlatformCommunityPostCommentResponse comment)
+    {
+        var commentForm = GetCommentForm(post.Id);
+        if (string.IsNullOrWhiteSpace(commentForm.Password))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "Enter the comment password before deleting.";
+            return;
+        }
+
+        try
+        {
+            await CommunityService.DeleteCommentAsync(post.Id, comment.Id, commentForm.Password);
+            await LoadPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"Comment delete failed: {ex.Message}";
+        }
+    }
+
+    private async Task ReportCommentAsync(PlatformCommunityPostCommentResponse comment)
+    {
+        try
+        {
+            await CommunityService.ReportCommentAsync(comment.Id);
+            statusSeverity = Severity.Info;
+            statusMessage = "Comment report received.";
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"Comment report failed: {ex.Message}";
+        }
+    }
+
+    private PlatformCommunityCommentForm GetCommentForm(long postId)
+    {
+        if (!commentForms.TryGetValue(postId, out var commentForm))
+        {
+            commentForm = new PlatformCommunityCommentForm();
+            commentForms[postId] = commentForm;
+        }
+
+        return commentForm;
+    }
+
+    private async Task SaveAttachmentCommentAsync(PlatformCommunityPostAttachmentResponse attachment)
+    {
+        var commentForm = GetAttachmentCommentForm(attachment.Id);
+        if (string.IsNullOrWhiteSpace(commentForm.Nickname) ||
+            string.IsNullOrWhiteSpace(commentForm.Password) ||
+            string.IsNullOrWhiteSpace(commentForm.Body))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "Image comment nickname, password, and body are required.";
+            return;
+        }
+
+        try
+        {
+            await CommunityService.CreateAttachmentCommentAsync(attachment.Id, new PlatformCommunityPostAttachmentCommentCreateRequest
+            {
+                Nickname = commentForm.Nickname,
+                Password = commentForm.Password,
+                Body = commentForm.Body
+            });
+
+            attachmentCommentForms.Remove(attachment.Id);
+            await LoadPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"Image comment failed: {ex.Message}";
+        }
+    }
+
+    private async Task DeleteAttachmentCommentAsync(
+        PlatformCommunityPostAttachmentResponse attachment,
+        PlatformCommunityPostAttachmentCommentResponse comment)
+    {
+        var commentForm = GetAttachmentCommentForm(attachment.Id);
+        if (string.IsNullOrWhiteSpace(commentForm.Password))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "Enter the image comment password before deleting.";
+            return;
+        }
+
+        try
+        {
+            await CommunityService.DeleteAttachmentCommentAsync(attachment.Id, comment.Id, commentForm.Password);
+            await LoadPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"Image comment delete failed: {ex.Message}";
+        }
+    }
+
+    private async Task ReportAttachmentCommentAsync(PlatformCommunityPostAttachmentCommentResponse comment)
+    {
+        try
+        {
+            await CommunityService.ReportAttachmentCommentAsync(comment.Id);
+            statusSeverity = Severity.Info;
+            statusMessage = "Image comment report received.";
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"Image comment report failed: {ex.Message}";
+        }
+    }
+
+    private PlatformCommunityCommentForm GetAttachmentCommentForm(long attachmentId)
+    {
+        if (!attachmentCommentForms.TryGetValue(attachmentId, out var commentForm))
+        {
+            commentForm = new PlatformCommunityCommentForm();
+            attachmentCommentForms[attachmentId] = commentForm;
+        }
+
+        return commentForm;
+    }
+
+    private void BeginEdit(PlatformCommunityPostResponse post)
+    {
+        editingPostId = post.Id;
+        selectedFiles.Clear();
+        form.Nickname = post.Nickname;
+        form.Password = string.Empty;
+        form.Category = post.Category;
+        form.Title = post.Title;
+        form.Body = post.Body;
+        form.SharedLinkUrl = post.SharedLinkUrl ?? string.Empty;
+        form.IsReportBoardPost = IsReportPost(post);
+        form.ReporterDisplayName = post.ReporterDisplayName;
+        form.ReportedDisplayName = post.ReportedDisplayName;
+        statusMessage = "작성할 때 입력한 비밀번호를 넣고 수정 저장을 누르세요.";
+        statusSeverity = Severity.Info;
+    }
+
+    private void CancelEdit()
+    {
+        ResetForm();
+        statusMessage = null;
+    }
+
+    private void ResetForm()
+    {
+        editingPostId = null;
+        selectedFiles.Clear();
+        form.Nickname = string.Empty;
+        form.Password = string.Empty;
+        form.Category = "자유";
+        form.Title = string.Empty;
+        form.Body = string.Empty;
+        form.SharedLinkUrl = string.Empty;
+    }
+
+    private void HandleFilesSelected(InputFileChangeEventArgs args)
+    {
+        selectedFiles.Clear();
+        selectedFiles.AddRange(args.GetMultipleFiles(5));
+    }
+
+    private static string FormatDate(DateTime createdAtUtc)
+    {
+        return createdAtUtc.ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+    }
+
+    private static bool IsReportPost(PlatformCommunityPostResponse post)
+    {
+        return post.IsReportBoardPost
+            || ContainsReportKeyword(post.Category);
+    }
+
+    private static string DisplayPostNickname(PlatformCommunityPostResponse post)
+    {
+        return IsReportPost(post) ? "익명 신고자" : post.Nickname;
+    }
+
+    private static string DisplayCommentNickname(PlatformCommunityPostResponse post, string nickname)
+    {
+        return IsReportPost(post) ? "익명 참여자" : nickname;
+    }
+
+    private static string ReportReporterLabel(PlatformCommunityPostResponse post)
+    {
+        return post.IsReportSubjectMasked ? "익명 신고자" : Fallback(post.ReporterDisplayName, "신고자");
+    }
+
+    private static string ReportReportedLabel(PlatformCommunityPostResponse post)
+    {
+        return post.IsReportSubjectMasked ? "익명 피신고자" : Fallback(post.ReportedDisplayName, "피신고자");
+    }
+
+    private static string Fallback(string? value, string fallback)
+    {
+        return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+    }
+
+    private static bool ContainsReportKeyword(string? category)
+    {
+        if (string.IsNullOrWhiteSpace(category))
+        {
+            return false;
+        }
+
+        return category.Contains("신고", StringComparison.OrdinalIgnoreCase)
+            || category.Contains("분쟁", StringComparison.OrdinalIgnoreCase)
+            || category.Contains("report", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ResolveDraftCategory(WorkCommunityDraftKind kind)
+    {
+        return kind switch
+        {
+            WorkCommunityDraftKind.Question => "업무 질문",
+            WorkCommunityDraftKind.WorkDone => "업무 기록",
+            WorkCommunityDraftKind.Suggestion => "개선 제안",
+            WorkCommunityDraftKind.InternationalCoordination => "국제 소통",
+            _ => "업무 공유"
+        };
+    }
+
+    private string ResolveDraftTitle(WorkCommunityDraftKind kind)
+    {
+        return kind switch
+        {
+            WorkCommunityDraftKind.Question => $"[{RoleLabel}] 업무 중 궁금한 점",
+            WorkCommunityDraftKind.WorkDone => $"[{RoleLabel}] 오늘 처리한 업무 공유",
+            WorkCommunityDraftKind.Suggestion => $"[{RoleLabel}] 업무 개선 제안",
+            WorkCommunityDraftKind.InternationalCoordination => $"[{RoleLabel}] 국제 소통 확인 요청",
+            _ => $"[{RoleLabel}] 업무 공유"
+        };
+    }
+
+    private string ResolveDraftBody(WorkCommunityDraftKind kind)
+    {
+        var contextLine = $"앱: {AppName}\n역할: {RoleLabel}";
+        return kind switch
+        {
+            WorkCommunityDraftKind.Question =>
+                $"{contextLine}\n\n궁금한 점:\n- \n\n확인한 상황:\n- \n\n도움이 필요한 부분:\n- ",
+            WorkCommunityDraftKind.WorkDone =>
+                $"{contextLine}\n\n처리한 일:\n- \n\n관련된 업무/화면:\n- \n\n다음에 이어서 볼 점:\n- ",
+            WorkCommunityDraftKind.Suggestion =>
+                $"{contextLine}\n\n불편했던 점:\n- \n\n제안하는 개선 방향:\n- \n\n기대 효과:\n- ",
+            WorkCommunityDraftKind.InternationalCoordination =>
+                $"{contextLine}\n\n관련 국가/지역:\n- \n\n관련 업무:\n- 통관 / 해외 창고 / 해외 파트너 / 외국인 참여자 / 언어 확인 중 해당 항목을 남겨주세요.\n\n소통 대상:\n- \n\n확인이 필요한 내용:\n- \n\n언어/문화상 조심할 점:\n- \n\n다음에 이어질 업무:\n- ",
+            _ =>
+                $"{contextLine}\n\n공유할 내용:\n- "
+        };
+    }
+
+    private static readonly IReadOnlyList<CommunitySeedPost> SeedPosts =
+    [
+        new(
+            "HS 코드 데이터 보정 흐름을 관세사 경험 중심으로 분리",
+            "화주가 조회하는 통관 가능성 데이터는 공개 여부와 보정 출처를 구분해서 운영합니다.",
+            "운영 공유",
+            "오늘",
+            Icons.Material.Filled.FactCheck,
+            Color.Info),
+        new(
+            "창고 업무 첫 화면은 공정별 인증 게이트로 통일",
+            "입고, 출고, 포장 업무는 이메일 번호 확인 뒤 근무 시간 조건을 함께 검증합니다.",
+            "업무 표준",
+            "이번 주",
+            Icons.Material.Filled.Warehouse,
+            Color.Warning),
+        new(
+            "구독료 인하 권고와 운영비 우선 기준 공유",
+            "수익 환원은 정산 항목과 운영 정책 안에서 조용히 확인하는 방향으로 정리합니다.",
+            "정산 정책",
+            "검토 중",
+            Icons.Material.Filled.Payments,
+            Color.Success)
+    ];
+
+    private static readonly IReadOnlyList<string> OperatingNotes =
+    [
+        "커뮤니티는 공지 중심으로 유지",
+        "역할별 업무는 바로가기 메뉴에서 진입",
+        "게시글은 닉네임과 비밀번호로 수정 권한을 보호"
+    ];
+
+    private sealed class PlatformCommunityPostForm
+    {
+        public string Nickname { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Category { get; set; } = "자유";
+        public string Title { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public string SharedLinkUrl { get; set; } = string.Empty;
+        public bool IsReportBoardPost { get; set; }
+        public string ReporterDisplayName { get; set; } = string.Empty;
+        public string ReportedDisplayName { get; set; } = string.Empty;
+    }
+
+    private sealed class PlatformCommunityCommentForm
+    {
+        public string Nickname { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+    }
+
+    private enum WorkCommunityDraftKind
+    {
+        Question,
+        WorkDone,
+        Suggestion,
+        InternationalCoordination
+    }
+
+    private sealed record CommunitySeedPost(
+        string Title,
+        string Body,
+        string Category,
+        string Meta,
+        string Icon,
+        Color Color);
+}

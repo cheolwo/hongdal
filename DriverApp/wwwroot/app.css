@@ -1,0 +1,495 @@
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    overflow: hidden;
+}
+
+.status-bar-safe-area {
+    display: none;
+}
+
+.mud-layout {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.driver-main-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    overflow: auto;
+    box-sizing: border-box;
+    padding-bottom: max(40px, calc(env(safe-area-inset-bottom) + 24px));
+}
+
+.driver-map {
+    width: 100%;
+    min-height: 260px;
+    height: clamp(260px, 34vh, 420px);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+@media (max-height: 720px) {
+    .driver-map {
+        min-height: 220px;
+        height: 32vh;
+    }
+}
+
+@media (max-height: 600px) {
+    .driver-map {
+        min-height: 180px;
+        height: 28vh;
+    }
+}
+
+.driver-home-map-shell {
+    position: relative;
+    width: calc(100% + 32px);
+    height: calc(100dvh - 72px);
+    min-height: 420px;
+    margin: -16px;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.driver-home-map {
+    width: 100%;
+    height: 100%;
+}
+
+.driver-home-status-panel {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 124px;
+    z-index: 10;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px);
+}
+
+.driver-home-floating-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 12;
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px);
+}
+
+.driver-floating-action {
+    width: 42px;
+    height: 42px;
+    border-radius: 50% !important;
+    background: rgba(25, 118, 210, 0.1);
+    border: 1px solid rgba(25, 118, 210, 0.14);
+}
+
+.driver-dispatch-beacon {
+    cursor: pointer;
+    min-height: 34px;
+    padding: 3px 8px 3px 4px;
+    border-radius: 999px;
+}
+
+.driver-dispatch-beacon:hover {
+    background: rgba(25, 118, 210, 0.08);
+}
+
+.driver-beacon-dot {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    border-radius: 50%;
+    background: #94a3b8;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.28);
+}
+
+.driver-beacon-dot--on {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.22), 0 0 0 8px rgba(34, 197, 94, 0.12);
+}
+
+.driver-home-bottom-actions {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 10;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px);
+}
+
+.driver-home-focus-panel {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: max(92px, calc(env(safe-area-inset-bottom) + 92px));
+    z-index: 10;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px);
+}
+
+.driver-home-focus-panel .mud-button {
+    min-height: 38px;
+    flex: 1 1 120px;
+}
+
+.driver-home-bottom-actions .mud-button {
+    min-height: 40px;
+    flex: 1 1 120px;
+}
+
+.driver-home-bottom-actions .driver-home-start-button {
+    flex: 2 1 180px;
+    min-height: 46px;
+    font-weight: 700;
+}
+
+@media (max-width: 420px) {
+    .driver-home-status-panel {
+        top: 8px;
+        left: 8px;
+        right: 104px;
+        padding: 10px;
+    }
+
+    .driver-home-floating-actions {
+        top: 8px;
+        right: 8px;
+        gap: 6px;
+        padding: 6px;
+    }
+
+    .driver-floating-action {
+        width: 38px;
+        height: 38px;
+    }
+
+    .driver-home-bottom-actions {
+        left: 8px;
+        right: 8px;
+        padding: 8px;
+    }
+
+    .driver-home-focus-panel {
+        left: 8px;
+        right: 8px;
+        bottom: max(188px, calc(env(safe-area-inset-bottom) + 188px));
+        padding: 10px;
+    }
+
+    .driver-home-bottom-actions .mud-button {
+        flex-basis: 100%;
+    }
+
+    .driver-home-bottom-actions .driver-home-start-button {
+        min-height: 48px;
+    }
+
+    .driver-home-focus-panel .mud-button {
+        flex-basis: 100%;
+    }
+
+}
+
+.driver-marker {
+    width: 20px !important;
+    height: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+    box-sizing: border-box;
+}
+
+.driver-marker__dot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.driver-marker--pickup {
+    background: linear-gradient(145deg, #ffb74d, #f57c00);
+}
+
+.driver-marker--selected {
+    width: 24px !important;
+    height: 24px !important;
+    box-shadow: 0 0 0 4px rgba(245, 124, 0, 0.16), 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+.driver-location-marker {
+    width: 20px !important;
+    height: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(33, 150, 243, 0.18);
+    box-shadow: 0 0 0 5px rgba(33, 150, 243, 0.12);
+}
+
+.driver-location-marker__dot {
+    width: 10px;
+    height: 10px;
+    display: block;
+    border-radius: 50%;
+    background: #1e88e5;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+.driver-map-info-window {
+    min-width: 180px;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    color: #1f2933;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.driver-map-info-window strong {
+    font-size: 14px;
+}
+
+.driver-map-info-window small {
+    color: #697386;
+}
+
+.driver-map-error {
+    width: 100%;
+    height: 100%;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    box-sizing: border-box;
+    background: #f8fafc;
+    color: #1f2933;
+    text-align: center;
+}
+
+.driver-map-error span {
+    color: #697386;
+    font-size: 13px;
+}
+
+.mud-appbar {
+    position: relative;
+}
+
+.driver-topbar {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.driver-quick-action {
+    width: 42px;
+    height: 42px;
+    border-radius: 50% !important;
+    background: rgba(25, 118, 210, 0.1);
+    border: 1px solid rgba(25, 118, 210, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.driver-account-menu-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.driver-account-menu-card:hover {
+    border-color: rgba(25, 118, 210, 0.35);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+
+.driver-warning-badges {
+    width: 100%;
+}
+
+.driver-warning-badge-group {
+    min-height: 72px;
+    padding: 10px;
+    border: 1px solid var(--mud-palette-divider);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.driver-warning-badge-group-left {
+    text-align: left;
+}
+
+.driver-warning-badge-group-right {
+    text-align: right;
+}
+
+.driver-recommendation-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.driver-recommendation-card__head {
+    gap: 12px;
+}
+
+.driver-recommendation-card__fare {
+    min-width: 104px;
+}
+
+.driver-route-card-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+}
+
+.driver-route-section {
+    min-height: 150px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.driver-route-section--pickup {
+    border-left: 4px solid #f59e0b;
+}
+
+.driver-route-section--dropoff {
+    border-left: 4px solid #2563eb;
+}
+
+.driver-route-section__label {
+    width: fit-content;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.driver-route-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+}
+
+.driver-route-meta span,
+.driver-payment-strip span {
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.driver-payment-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid #dbe4ef;
+    border-radius: 8px;
+    background: #f1f5f9;
+}
+
+.driver-payment-strip .driver-payment-strip__label {
+    border-color: #cbd5e1;
+    background: #334155;
+    color: #ffffff;
+}
+
+@media (max-width: 420px) {
+    .driver-warning-badge-group {
+        min-height: 84px;
+        padding: 8px;
+    }
+
+    .driver-recommendation-card__fare {
+        align-items: flex-start !important;
+    }
+
+    .driver-route-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .driver-route-section {
+        min-height: 128px;
+    }
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

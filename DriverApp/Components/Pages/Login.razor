@@ -1,0 +1,121 @@
+@page "/login"
+@using DriverApp.Models.Auth
+@inject IAuthSession AuthSession
+@inject NavigationManager NavigationManager
+
+<PageTitle>로그인</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-6">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">기사 로그인</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">지금은 선택적으로 로그인해 배차신청 같은 동작만 확인하고, 홈 화면은 비로그인 상태에서도 바로 볼 수 있다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="@_statusSeverity">@_statusMessage</MudAlert>
+        }
+
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudStack Spacing="2">
+                <MudTextField @bind-Value="_loginId"
+                              Label="아이디 또는 이메일"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+                <MudTextField @bind-Value="_password"
+                              Label="비밀번호"
+                              InputType="InputType.Password"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">개발용 기사: driver1@hongdal.local</MudChip>
+                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">비밀번호: Driver123!</MudChip>
+                </MudStack>
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           OnClick="LoginAsync">
+                    @(_isLoggedIn ? "세션 갱신" : "로그인")
+                </MudButton>
+
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           FullWidth="true"
+                           OnClick="GoHome">
+                    홈으로 이동
+                </MudButton>
+
+                @if (_isLoggedIn)
+                {
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Secondary"
+                               FullWidth="true"
+                               OnClick="Logout">
+                        로그아웃
+                    </MudButton>
+                }
+
+                <MudText Typo="Typo.body2">현재 사용자: @(AuthSession.UserName ?? "미로그인")</MudText>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string _loginId = string.Empty;
+    private string _password = string.Empty;
+    private bool _isLoggedIn;
+    private string? _statusMessage = "개발 단계에서는 홈을 바로 볼 수 있고, 필요할 때만 여기서 로그인하면 된다.";
+    private Severity _statusSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthSession.RestoreAsync();
+        _isLoggedIn = !string.IsNullOrWhiteSpace(AuthSession.UserId);
+        _loginId = AuthSession.UserName ?? string.Empty;
+    }
+
+    private async Task LoginAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_loginId))
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "아이디를 입력하세요.";
+            return;
+        }
+
+        await AuthSession.ApplyAsync(new TokenResponse
+        {
+            AccessToken = "demo-token",
+            RefreshToken = "demo-refresh-token",
+            AccessTokenExpiresAtUtc = DateTime.UtcNow.AddHours(8),
+            RefreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(7),
+            UserId = _loginId,
+            UserName = _loginId,
+            Roles = ["Driver"]
+        });
+
+        _isLoggedIn = true;
+        _statusSeverity = Severity.Success;
+        _statusMessage = $"{_loginId} 님, 로그인되었습니다.";
+    }
+
+    private async Task Logout()
+    {
+        await AuthSession.ClearAsync();
+        _isLoggedIn = false;
+        _password = string.Empty;
+        _statusSeverity = Severity.Info;
+        _statusMessage = "로그아웃했습니다.";
+    }
+
+    private void GoHome()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.Home);
+    }
+}

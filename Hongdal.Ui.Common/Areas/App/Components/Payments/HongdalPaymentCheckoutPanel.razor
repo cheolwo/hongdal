@@ -1,0 +1,129 @@
+<MudStack Spacing="3">
+    <HongdalPaymentMethodSelector PaymentMethod="@PaymentMethod"
+                                  PaymentMethodChanged="OnPaymentMethodChangedAsync"
+                                  SettlementMode="@SettlementMode"
+                                  SettlementModeChanged="OnSettlementModeChangedAsync"
+                                  AllowMonthlySettlement="@AllowMonthlySettlement"
+                                  AllowSubscription="@AllowSubscription"
+                                  Disabled="@Disabled" />
+
+    <HongdalPaymentPlanPreview TargetType="@TargetType"
+                               TargetId="@TargetId"
+                               ProviderType="@ProviderType"
+                               Amount="@Amount"
+                               OrderName="@OrderName"
+                               PaymentMethod="@PaymentMethod"
+                               SettlementMode="@SettlementMode"
+                               Currency="@Currency" />
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Disabled="@IsActionDisabled"
+               OnClick="StartPaymentAsync">
+        @ActionText
+    </MudButton>
+</MudStack>
+
+@code {
+    [Parameter]
+    public int TargetType { get; set; } = 20;
+
+    [Parameter]
+    public string TargetId { get; set; } = string.Empty;
+
+    [Parameter]
+    public int ProviderType { get; set; } = 10;
+
+    [Parameter]
+    public int Amount { get; set; }
+
+    [Parameter]
+    public string OrderName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string PaymentMethod { get; set; } = PaymentMethodCode.TossCard;
+
+    [Parameter]
+    public EventCallback<string> PaymentMethodChanged { get; set; }
+
+    [Parameter]
+    public string SettlementMode { get; set; } = SettlementModeCode.Prepaid;
+
+    [Parameter]
+    public EventCallback<string> SettlementModeChanged { get; set; }
+
+    [Parameter]
+    public string Currency { get; set; } = "KRW";
+
+    [Parameter]
+    public bool AllowMonthlySettlement { get; set; } = true;
+
+    [Parameter]
+    public bool AllowSubscription { get; set; } = true;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public EventCallback<PaymentRequestPlan> PaymentRequested { get; set; }
+
+    private PaymentRequestPlan? Plan
+    {
+        get
+        {
+            try
+            {
+                return PaymentRequestPlanner.Plan(CreateDraft());
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    private bool IsActionDisabled => Disabled || Plan is null || Amount <= 0;
+
+    private string ActionText => Plan switch
+    {
+        { ShouldScheduleBilling: true } => "\uC790\uB3D9\uACB0\uC81C \uC124\uC815",
+        { ShouldCreateInvoice: true } => "\uCCAD\uAD6C\uC11C \uC0DD\uC131",
+        { Policy.RequiresWebhook: true } => "\uAC00\uC0C1\uACC4\uC88C \uBC1C\uAE09",
+        _ => "\uACB0\uC81C \uC9C4\uD589"
+    };
+
+    private async Task OnPaymentMethodChangedAsync(string value)
+    {
+        PaymentMethod = value;
+        await PaymentMethodChanged.InvokeAsync(value);
+    }
+
+    private async Task OnSettlementModeChangedAsync(string value)
+    {
+        SettlementMode = value;
+        await SettlementModeChanged.InvokeAsync(value);
+    }
+
+    private async Task StartPaymentAsync()
+    {
+        if (Plan is null)
+        {
+            return;
+        }
+
+        await PaymentRequested.InvokeAsync(Plan);
+    }
+
+    private PaymentRequestDraft CreateDraft()
+    {
+        return new PaymentRequestDraft(
+            TargetType,
+            string.IsNullOrWhiteSpace(TargetId) ? "unknown-target" : TargetId,
+            ProviderType,
+            Amount,
+            string.IsNullOrWhiteSpace(OrderName) ? "Hongdal payment" : OrderName,
+            PaymentMethod,
+            SettlementMode,
+            Currency);
+    }
+}

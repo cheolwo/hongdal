@@ -1,0 +1,427 @@
+@page "/driver/home"
+<PageTitle>DriverApp</PageTitle>
+
+@using Microsoft.Extensions.Logging
+@using MudBlazor
+@using DriverApp.Models.Driver.Samples
+@implements IDisposable
+@inject IAuthSession AuthSession
+@inject IDriverSampleDataService SampleDataService
+@inject IJSRuntime JS
+@inject IDialogService DialogService
+@inject ILogger<Home> Logger
+@inject NavigationManager NavigationManager
+@inject IDriverRecommendationDecisionService DecisionService
+@inject IDriverHomeMapService MapService
+
+<MudPaper Class="driver-home-map-shell" Elevation="0">
+    <div id="driver-map" class="driver-home-map"></div>
+
+    <MudPaper Class="driver-home-floating-actions" Elevation="4">
+        <MudTooltip Text="진행 중 운송">
+            <MudIconButton Icon="@Icons.Material.Filled.Route"
+                           Color="Color.Primary"
+                           Class="driver-floating-action"
+                           Size="Size.Medium"
+                           OnClick="GoToCurrentTransport"
+                           aria-label="진행 중 운송 열기" />
+        </MudTooltip>
+        <MudTooltip Text="사용자 메뉴">
+            <MudIconButton Icon="@Icons.Material.Filled.AccountCircle"
+                           Color="Color.Primary"
+                           Class="driver-floating-action"
+                           Size="Size.Medium"
+                           OnClick="GoToMenu"
+                           aria-label="사용자 메뉴 열기" />
+        </MudTooltip>
+    </MudPaper>
+
+    <MudPaper Class="driver-home-status-panel" Elevation="3">
+        <MudStack Spacing="1">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="driver-dispatch-beacon" @onclick="ToggleDispatchBeacon">
+                    <span class="@DispatchBeaconClass"></span>
+                    <MudText Typo="Typo.subtitle1">@DispatchBeaconLabel</MudText>
+                </MudStack>
+                <MudChip T="string" Color="@DispatchBeaconChipColor" Variant="Variant.Filled">@DispatchBeaconChipText</MudChip>
+            </MudStack>
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                현재 위치 @SampleDataService.기사현재위치.위치명 기준으로 주변 의뢰를 표시합니다.
+            </MudText>
+
+            @if (!string.IsNullOrWhiteSpace(_statusMessage))
+            {
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@_statusMessage</MudText>
+            }
+        </MudStack>
+    </MudPaper>
+
+    @if (_현재운송 is not null)
+    {
+        <MudPaper Class="driver-home-focus-panel" Elevation="4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                    <MudText Typo="Typo.subtitle1">진행 중 운송</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">@_현재운송.현재단계</MudChip>
+                </MudStack>
+                <MudText Typo="Typo.body2">@_현재운송.픽업지 → @_현재운송.하차지</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    다음 처리: @_현재운송.다음행동 · 예상 수익 @_현재운송.예상수익.ToString("N0")원
+                </MudText>
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.PlayArrow" OnClick="GoToCurrentTransportAction">
+                        다음 처리
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Navigation" OnClick="GoToCurrentTransport">
+                        운송 현황
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    }
+    else if (_대표추천 is not null)
+    {
+        <MudPaper Class="driver-home-focus-panel" Elevation="4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                    <MudText Typo="Typo.subtitle1">지금 볼 추천</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@_대표추천.추천점수?.ToString("0")점</MudChip>
+                </MudStack>
+                <MudText Typo="Typo.body2">@_대표추천.경로표시</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    @_대표추천.차량조건표시 · @_대표추천.거리표시 · 예상 수익 @_대표추천.예상수익?.ToString("N0")원
+                </MudText>
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="AcceptPrimaryRecommendation">
+                        바로 수락
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.OpenInNew" OnClick="GoToPrimaryRecommendationDetail">
+                        상세 보기
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Schedule" OnClick="HoldPrimaryRecommendation">
+                        보류
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Block" OnClick="RejectPrimaryRecommendation">
+                        거절
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    }
+
+    <MudPaper Class="driver-home-bottom-actions" Elevation="4">
+        <MudStack Row="true" Spacing="1" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudButton Class="driver-home-start-button" Variant="Variant.Filled" Color="@WorkStartButtonColor" StartIcon="@WorkStartButtonIcon" OnClick="HandleWorkStartButton">
+                @WorkStartButtonText
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ListAlt" OnClick="GoToRecommendations">
+                추천 목록
+            </MudButton>
+
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.LocalShipping" OnClick="GoToCurrentTransport">
+                진행 중 운송
+            </MudButton>
+
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Menu" OnClick="GoToMenu">
+                전체 메뉴
+            </MudButton>
+
+            @if (AuthSession.IsAuthenticated)
+            {
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Logout" OnClick="Logout">
+                    로그아웃
+                </MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Login" OnClick="GoToLogin">
+                    로그인
+                </MudButton>
+            }
+        </MudStack>
+    </MudPaper>
+</MudPaper>
+
+@code {
+    private List<DriverRequestItem> _requests = [];
+
+    private DriverRequestItem? _선택의뢰;
+    private DriverRequestItem? _대표추천;
+    private 기사운송샘플항목? _현재운송;
+
+    private bool _mapInitialized;
+    private bool _isWorking;
+    private bool _isDispatchBeaconOn;
+    private DotNetObjectReference<Home>? _dotNetReference;
+    private string _statusMessage = "지금은 기사 현재 위치와 가까운 상차지 중심으로 추천 의뢰를 확인하고 있습니다.";
+
+    private string DispatchBeaconLabel => _isDispatchBeaconOn ? "배차 수신중" : "배차 대기 꺼짐";
+
+    private string DispatchBeaconChipText => _isDispatchBeaconOn ? $"추천 {_requests.Count}건" : "OFF";
+
+    private Color DispatchBeaconChipColor => _isDispatchBeaconOn ? Color.Success : Color.Default;
+
+    private string DispatchBeaconClass => _isDispatchBeaconOn ? "driver-beacon-dot driver-beacon-dot--on" : "driver-beacon-dot";
+
+    private string WorkStartButtonText => _isWorking ? "운행 중" : "운행 시작";
+
+    private string WorkStartButtonIcon => _isWorking ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.PlayArrow;
+
+    private Color WorkStartButtonColor => _isWorking ? Color.Success : Color.Success;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthSession.RestoreAsync();
+        DecisionService.Changed += HandleRecommendationDecisionChanged;
+        _requests = SampleDataService.추천의뢰목록.ToList();
+        RefreshPrimaryRecommendation();
+        _현재운송 = SampleDataService.현재운송조회();
+        _isWorking = string.Equals(SampleDataService.근무상태.운행상태, "운행중", StringComparison.OrdinalIgnoreCase);
+        _isDispatchBeaconOn = _isWorking;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Logger.LogInformation("DriverApp Home.OnAfterRenderAsync firstRender={FirstRender} mapInitialized={MapInitialized}", firstRender, _mapInitialized);
+        if (firstRender && !_mapInitialized)
+        {
+            _mapInitialized = true;
+            await InitializeMapAsync();
+        }
+    }
+
+    private async Task InitializeMapAsync()
+    {
+        try
+        {
+            Logger.LogInformation("DriverApp Home.InitializeMapAsync started.");
+            _dotNetReference = DotNetObjectReference.Create(this);
+            var 현재위치 = SampleDataService.기사현재위치;
+            var 마커목록 = MapService.BuildMarkers(_requests);
+
+            var initialized = await JS.InvokeAsync<bool>("driverMap.init", "driver-map", (double)현재위치.위도, (double)현재위치.경도, 11, 마커목록, _dotNetReference);
+            if (!initialized)
+            {
+                _statusMessage = "네이버 지도 초기화에 실패했습니다. Naver Maps SDK 키 설정을 확인해 주세요.";
+            }
+
+            Logger.LogInformation("DriverApp Home.InitializeMapAsync completed.");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "DriverApp Home.InitializeMapAsync failed.");
+            _statusMessage = $"지도를 초기화하지 못했습니다: {ex.Message}";
+            _dotNetReference?.Dispose();
+            _dotNetReference = null;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    [JSInvokable]
+    public async Task SelectRequestFromMap(string 의뢰Id, string? 마커종류)
+    {
+        await SelectRequestAsync(의뢰Id, 마커종류);
+    }
+
+    private void GoToLogin()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.Login);
+    }
+
+    private void GoToRecommendations()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.Recommendations);
+    }
+
+    private void HandleWorkStartButton()
+    {
+        if (!_isWorking)
+        {
+            _isWorking = true;
+            _isDispatchBeaconOn = true;
+            _statusMessage = "운행을 시작했습니다. 배차 수신 비콘이 켜져 추천콜을 받을 수 있습니다.";
+            return;
+        }
+
+        NavigationManager.NavigateTo(DriverRoutes.WorkStart);
+    }
+
+    private void GoToCurrentTransport()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.CurrentTransport);
+    }
+
+    private void GoToCurrentTransportAction()
+    {
+        if (_현재운송 is null)
+        {
+            GoToCurrentTransport();
+            return;
+        }
+
+        NavigationManager.NavigateTo(ResolveCurrentTransportActionRoute(_현재운송));
+    }
+
+    private static string ResolveCurrentTransportActionRoute(기사운송샘플항목 transport)
+    {
+        var actionText = $"{transport.현재단계} {transport.다음행동}";
+        if (actionText.Contains("하차", StringComparison.OrdinalIgnoreCase))
+        {
+            return DriverRoutes.TransportDropoff(transport.Id);
+        }
+
+        if (actionText.Contains("상차", StringComparison.OrdinalIgnoreCase)
+            || actionText.Contains("픽업", StringComparison.OrdinalIgnoreCase))
+        {
+            return DriverRoutes.TransportPickup(transport.Id);
+        }
+
+        return DriverRoutes.CurrentTransport;
+    }
+
+    private void GoToMenu()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.Menu);
+    }
+
+    private void ToggleDispatchBeacon()
+    {
+        if (!_isWorking)
+        {
+            _statusMessage = "운행 시작 후 배차 수신 비콘을 켤 수 있습니다.";
+            return;
+        }
+
+        _isDispatchBeaconOn = !_isDispatchBeaconOn;
+        _statusMessage = _isDispatchBeaconOn
+            ? "배차 수신 비콘을 켰습니다. 추천콜을 받을 수 있습니다."
+            : "배차 수신 비콘을 껐습니다. 새 배차 추천 수신을 멈춥니다.";
+    }
+
+    private void GoToPrimaryRecommendationDetail()
+    {
+        if (_대표추천 is null)
+        {
+            GoToRecommendations();
+            return;
+        }
+
+        NavigationManager.NavigateTo(DriverRoutes.RecommendationDetail(_대표추천.의뢰Id));
+    }
+
+    private async Task SelectRequestAsync(string 의뢰Id, string? 마커종류 = null)
+    {
+        _선택의뢰 = _requests.FirstOrDefault(x => x.의뢰Id == 의뢰Id);
+        _statusMessage = _선택의뢰 is null
+            ? "선택한 의뢰를 찾지 못했습니다."
+            : $"{_선택의뢰.의뢰Id} 의뢰를 선택했습니다.";
+
+        if (_선택의뢰 is not null && !string.IsNullOrWhiteSpace(마커종류))
+        {
+            await OpenRequestDialogAsync(_선택의뢰, 마커종류);
+        }
+    }
+
+    private async Task OpenPrimaryRecommendationAsync()
+    {
+        if (_대표추천 is null)
+        {
+            GoToRecommendations();
+            return;
+        }
+
+        await SelectRequestAsync(_대표추천.의뢰Id, "추천");
+    }
+
+    private async Task OpenRequestDialogAsync(DriverRequestItem item, string source)
+    {
+        var parameters = new DialogParameters<DriverApp.Components.Dialogs.운송의뢰상세Dialog>
+        {
+            { x => x.의뢰, item },
+            { x => x.선택출처, source }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Medium
+        };
+
+        var dialog = await DialogService.ShowAsync<DriverApp.Components.Dialogs.운송의뢰상세Dialog>("운송의뢰 상세", parameters, options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false, Data: RecommendationDecisionState decision })
+        {
+            _statusMessage = decision.Memo;
+            RefreshPrimaryRecommendation();
+        }
+    }
+
+    private void AcceptPrimaryRecommendation()
+    {
+        if (_대표추천 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Accept(_대표추천);
+        _statusMessage = decision.Memo;
+        RefreshPrimaryRecommendation();
+    }
+
+    private void HoldPrimaryRecommendation()
+    {
+        if (_대표추천 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Hold(_대표추천);
+        _statusMessage = decision.Memo;
+        RefreshPrimaryRecommendation();
+    }
+
+    private void RejectPrimaryRecommendation()
+    {
+        if (_대표추천 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Reject(_대표추천, "홈에서 빠른 거절");
+        _statusMessage = decision.Memo;
+        RefreshPrimaryRecommendation();
+    }
+
+    private void RefreshPrimaryRecommendation()
+    {
+        _대표추천 = _requests
+            .Where(x => DecisionService.GetDecision(x.의뢰Id)?.Decision is not "수락" and not "거절")
+            .OrderByDescending(x => x.추천점수 ?? 0m)
+            .ThenBy(x => x.픽업거리Km ?? decimal.MaxValue)
+            .FirstOrDefault();
+    }
+
+    private void HandleRecommendationDecisionChanged()
+    {
+        InvokeAsync(() =>
+        {
+            RefreshPrimaryRecommendation();
+            StateHasChanged();
+        });
+    }
+
+    private async Task Logout()
+    {
+        await AuthSession.ClearAsync();
+        _statusMessage = "로그아웃했습니다.";
+    }
+
+    public void Dispose()
+    {
+        DecisionService.Changed -= HandleRecommendationDecisionChanged;
+        _dotNetReference?.Dispose();
+    }
+}

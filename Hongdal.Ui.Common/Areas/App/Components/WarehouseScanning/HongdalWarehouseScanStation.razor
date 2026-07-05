@@ -1,0 +1,221 @@
+<MudStack Spacing="2" Class="@Class" Style="@Style">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.subtitle1">@Title</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@Session.Action.Message</MudText>
+        </MudStack>
+        <MudChip T="string" Color="@StatusColor" Variant="Variant.Filled">@StatusText</MudChip>
+    </MudStack>
+
+    <MudTextField T="string"
+                  Label="@ScanInputLabel"
+                  Value="@_scanInput"
+                  ValueChanged="OnScanInputChangedAsync"
+                  Variant="Variant.Outlined"
+                  Immediate="true"
+                  AutoFocus="@AutoFocus"
+                  Disabled="@Disabled"
+                  Placeholder="@ScanInputPlaceholder"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                  OnKeyDown="OnScanKeyDownAsync" />
+
+    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+        @foreach (var requirement in Requirements)
+        {
+            <MudChip T="string"
+                     Color="@GetRequirementColor(requirement)"
+                     Variant="@GetRequirementVariant(requirement)">
+                @requirement.Label
+            </MudChip>
+        }
+    </MudStack>
+
+    @if (Session.Scans.Count > 0)
+    {
+        <MudTable T="WarehouseBarcodeScan" Items="@Session.Scans.OrderByDescending(x => x.ScannedAt)" Dense="true" Hover="true" Elevation="0">
+            <HeaderContent>
+                <MudTh>@KindHeader</MudTh>
+                <MudTh>@ValueHeader</MudTh>
+                <MudTh>@TimeHeader</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="@KindHeader">@context.Kind</MudTd>
+                <MudTd DataLabel="@ValueHeader">@context.Value</MudTd>
+                <MudTd DataLabel="@TimeHeader">@context.ScannedAt.ToLocalTime().ToString("HH:mm:ss")</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Size="Size.Small"
+                                   Disabled="@Disabled"
+                                   OnClick="@(() => RemoveScanAsync(context.RawCode))" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+
+    <MudStack Row="true" Spacing="1">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Disabled="@(Disabled || !Session.Action.IsReady)"
+                   StartIcon="@Icons.Material.Filled.Done"
+                   OnClick="ConfirmAsync">
+            @ConfirmButtonText
+        </MudButton>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   Disabled="@(Disabled || Session.Scans.Count == 0)"
+                   OnClick="ClearAsync">
+            @ClearButtonText
+        </MudButton>
+    </MudStack>
+</MudStack>
+
+@code {
+    private readonly List<WarehouseBarcodeScan> _scans = [];
+    private string _scanInput = string.Empty;
+
+    [Parameter]
+    public string Step { get; set; } = WarehouseScanStepCode.ReceiveInbound;
+
+    [Parameter]
+    public IReadOnlyList<WarehouseBarcodeScan> Scans { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<IReadOnlyList<WarehouseBarcodeScan>> ScansChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<WarehouseScanAction> ActionConfirmed { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<WarehouseScanStepDefinition>? StepDefinitions { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool AutoFocus { get; set; } = true;
+
+    [Parameter]
+    public string ScannerId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string OperatorUserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Title { get; set; } = "Warehouse scan";
+
+    [Parameter]
+    public string ScanInputLabel { get; set; } = "Barcode";
+
+    [Parameter]
+    public string ScanInputPlaceholder { get; set; } = "Scan or type barcode, then press Enter";
+
+    [Parameter]
+    public string ConfirmButtonText { get; set; } = "Confirm";
+
+    [Parameter]
+    public string ClearButtonText { get; set; } = "Clear";
+
+    [Parameter]
+    public string KindHeader { get; set; } = "Kind";
+
+    [Parameter]
+    public string ValueHeader { get; set; } = "Value";
+
+    [Parameter]
+    public string TimeHeader { get; set; } = "Time";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    private WarehouseScanSession Session => WarehouseScanWorkflowPlanner.BuildSession(Step, _scans, StepDefinitions);
+
+    private IReadOnlyList<WarehouseScanRequirement> Requirements => (StepDefinitions ?? WarehouseScanWorkflowPlanner.DefaultSteps)
+        .FirstOrDefault(x => string.Equals(x.Step, Step, StringComparison.OrdinalIgnoreCase))
+        ?.Requirements ?? [];
+
+    private Color StatusColor => Session.Action.IsReady ? Color.Success : Color.Warning;
+
+    private string StatusText => Session.Action.IsReady ? "Ready" : "Waiting";
+
+    protected override void OnParametersSet()
+    {
+        if (Scans.Count == _scans.Count && Scans.Zip(_scans).All(x => x.First.RawCode == x.Second.RawCode))
+        {
+            return;
+        }
+
+        _scans.Clear();
+        _scans.AddRange(Scans);
+    }
+
+    private Task OnScanInputChangedAsync(string value)
+    {
+        _scanInput = value ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private async Task OnScanKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key is not "Enter" && args.Key is not "NumpadEnter")
+        {
+            return;
+        }
+
+        await AddCurrentScanAsync();
+    }
+
+    private async Task AddCurrentScanAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_scanInput))
+        {
+            return;
+        }
+
+        var scan = WarehouseBarcodeParser.Parse(_scanInput, scannerId: ScannerId, operatorUserId: OperatorUserId);
+        _scans.RemoveAll(x => string.Equals(x.RawCode, scan.RawCode, StringComparison.OrdinalIgnoreCase));
+        _scans.Add(scan);
+        _scanInput = string.Empty;
+
+        await ScansChanged.InvokeAsync(_scans.ToArray());
+    }
+
+    private async Task RemoveScanAsync(string rawCode)
+    {
+        _scans.RemoveAll(x => string.Equals(x.RawCode, rawCode, StringComparison.OrdinalIgnoreCase));
+        await ScansChanged.InvokeAsync(_scans.ToArray());
+    }
+
+    private async Task ClearAsync()
+    {
+        _scans.Clear();
+        _scanInput = string.Empty;
+        await ScansChanged.InvokeAsync(_scans.ToArray());
+    }
+
+    private async Task ConfirmAsync()
+    {
+        await ActionConfirmed.InvokeAsync(Session.Action);
+    }
+
+    private Color GetRequirementColor(WarehouseScanRequirement requirement)
+    {
+        return HasScan(requirement.Kind)
+            ? Color.Success
+            : requirement.IsRequired ? Color.Warning : Color.Default;
+    }
+
+    private Variant GetRequirementVariant(WarehouseScanRequirement requirement)
+    {
+        return HasScan(requirement.Kind) ? Variant.Filled : Variant.Outlined;
+    }
+
+    private bool HasScan(string kind)
+    {
+        return _scans.Any(x => string.Equals(x.Kind, kind, StringComparison.OrdinalIgnoreCase));
+    }
+}

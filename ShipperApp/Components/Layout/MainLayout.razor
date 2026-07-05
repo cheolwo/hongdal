@@ -1,0 +1,136 @@
+@inherits LayoutComponentBase
+
+@implements IDisposable
+@inject ShipperLocalizationService L
+@inject ShipperViewVisibilityService ViewVisibilityService
+@inject ShipperOperatingProfileService ProfileService
+@inject NavigationManager Navigation
+
+<CascadingValue Value="L.Language">
+    <MudLayout>
+        <MudAppBar Dense="true" Fixed="false" Elevation="0" Class="shipper-appbar">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" Class="shipper-menu-button" />
+            <MudStack Spacing="0" Class="shipper-appbar-title">
+                <MudText Typo="Typo.subtitle1" Class="fw-bold">Hongdal Shipper</MudText>
+                <MudText Typo="Typo.caption" Class="shipper-appbar-subtitle">@ProfileLabel</MudText>
+            </MudStack>
+            <MudSpacer />
+            <MudButtonGroup Color="Color.Inherit" Size="Size.Small" Class="shipper-language-toggle">
+                <MudButton Variant='@LanguageButtonVariant("ko")' OnClick='@(() => L.SetLanguage("ko"))'>@L.T("Language.Korean")</MudButton>
+                <MudButton Variant='@LanguageButtonVariant("en")' OnClick='@(() => L.SetLanguage("en"))'>@L.T("Language.English")</MudButton>
+            </MudButtonGroup>
+            <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                <ActivatorContent>
+                    <MudAvatar Color="Color.Secondary" Size="Size.Medium" Class="shipper-profile-button">
+                        <MudIcon Icon="@Icons.Material.Filled.Person" />
+                    </MudAvatar>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudText Typo="Typo.caption" Class="px-4 pt-3">@L.T("Language.DisplayLanguage")</MudText>
+                    <MudMenuItem OnClick='@(() => L.SetLanguage("ko"))'>@L.T("Language.Korean")</MudMenuItem>
+                    <MudMenuItem OnClick='@(() => L.SetLanguage("en"))'>@L.T("Language.English")</MudMenuItem>
+                    <MudDivider />
+                    @foreach (var item in VisibleMenuItems)
+                    {
+                        <MudMenuItem Icon="@ResolveIcon(item.IconKey)" OnClick="@(() => NavigateTo(item.Route))">
+                            @L.ViewName(item.Route, item.DisplayName)
+                        </MudMenuItem>
+                    }
+                    <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@(() => NavigateTo(ShipperRoutes.ProfileSettings))">
+                        @L.T("ProfileSettings.Nav")
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => NavigateTo(ShipperRoutes.DispatchAddressForm))">
+                        @L.T("Nav.DispatchAddress")
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Public" OnClick="@(() => NavigateTo(ShipperRoutes.FclLclPlanner))">
+                        FCL/LCL 판단
+                    </MudMenuItem>
+                </ChildContent>
+            </MudMenu>
+        </MudAppBar>
+
+        <MudDrawer Open="@_drawerOpen" Variant="DrawerVariant.Temporary" Elevation="1" ClipMode="DrawerClipMode.Always" Class="shipper-drawer" @onclick="CloseDrawer">
+            <NavMenu />
+        </MudDrawer>
+
+        <MudMainContent Class="shipper-main-content pa-4">
+            @Body
+        </MudMainContent>
+    </MudLayout>
+</CascadingValue>
+
+@code {
+    private bool _drawerOpen;
+
+    private IEnumerable<dynamic> VisibleMenuItems => ViewVisibilityService.VisibleItems
+        .Where(item => ShouldShowForProfile(item.Route))
+        .OrderBy(item => item.SortOrder);
+
+    private string ProfileLabel => ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영";
+
+    protected override void OnInitialized()
+    {
+        L.Changed += HandleChanged;
+        ViewVisibilityService.Changed += HandleChanged;
+        ProfileService.Changed += HandleChanged;
+        _ = ViewVisibilityService.EnsureLoadedAsync();
+    }
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+
+    private void CloseDrawer() => _drawerOpen = false;
+
+    private Variant LanguageButtonVariant(string language)
+    {
+        return L.IsLanguage(language) ? Variant.Filled : Variant.Text;
+    }
+
+    private void NavigateTo(string route)
+    {
+        var href = string.IsNullOrWhiteSpace(route) || route == "/"
+            ? "/"
+            : route.StartsWith('/') ? route : "/" + route;
+
+        Navigation.NavigateTo(href);
+    }
+
+    private bool ShouldShowForProfile(string route)
+    {
+        var normalizedRoute = route.TrimEnd('/');
+        if (ProfileService.IsDomestic)
+        {
+            return normalizedRoute is not ShipperRoutes.InboundDashboard and not ShipperRoutes.InboundRequests;
+        }
+
+        return normalizedRoute is not ShipperRoutes.SalesChannels and not ShipperRoutes.ProductListings and not ShipperRoutes.OrderFulfillment;
+    }
+
+    private static string ResolveIcon(string iconKey) => iconKey switch
+    {
+        "home" => Icons.Material.Filled.Home,
+        "settings" => Icons.Material.Filled.Settings,
+        "add_box" => Icons.Material.Filled.AddBox,
+        "view_list" => Icons.Material.Filled.ViewList,
+        "inbox" => Icons.Material.Filled.Inbox,
+        "dashboard" => Icons.Material.Filled.Dashboard,
+        "inventory_2" => Icons.Material.Filled.Inventory2,
+        "warehouse" => Icons.Material.Filled.Warehouse,
+        "local_shipping" => Icons.Material.Filled.LocalShipping,
+        "storefront" => Icons.Material.Filled.Storefront,
+        "sell" => Icons.Material.Filled.Sell,
+        "public" => Icons.Material.Filled.Public,
+        _ => Icons.Material.Filled.ChevronRight
+    };
+
+    private void HandleChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        L.Changed -= HandleChanged;
+        ViewVisibilityService.Changed -= HandleChanged;
+        ProfileService.Changed -= HandleChanged;
+    }
+}

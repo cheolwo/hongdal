@@ -1,0 +1,26 @@
+@inherits LayoutComponentBase
+
+<MudLayout>
+    <MudAppBar Dense="true" Elevation="1" Color="Color.Primary">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <MudText Typo="Typo.h6" Class="ml-2">RestaurantDeskApp</MudText>
+        <MudSpacer />
+        <MudChip T="string" Color="Color.Success" Variant="Variant.Filled">주문 수신 데스크</MudChip>
+    </MudAppBar>
+
+    <MudDrawer Open="@_drawerOpen" Variant="DrawerVariant.Temporary" Elevation="1" ClipMode="DrawerClipMode.Always" @onclick="CloseDrawer">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent Class="pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+
+    private void CloseDrawer() => _drawerOpen = false;
+}

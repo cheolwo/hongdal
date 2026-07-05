@@ -1,0 +1,35 @@
+@page "/driver/account/bank"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>계좌 정보</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">계좌 정보</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">정산금을 받을 계좌와 이번 달 정산 상태를 확인합니다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <HongdalBankAccountPanel Account="@Account"
+                                 PanelClass="driver-recommendation-card pa-4"
+                                 IdentityVerified="@_identityVerified"
+                                 IdentityVerifiedChanged="@(value => _identityVerified = value)">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.CurrentMonthSettlement">정산 정보</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Menu">사용자 메뉴로</MudButton>
+        </HongdalBankAccountPanel>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private bool _identityVerified;
+
+    private HongdalBankAccountSummary Account => new(
+        "국민은행",
+        "홍길동 기사님",
+        "123-45-678901",
+        "확인 완료",
+        Samples.정산요약.배차건수,
+        Samples.정산요약.이용료);
+}

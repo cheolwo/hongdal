@@ -1,0 +1,25 @@
+<MudChip T="string"
+         Color="@ChipColor"
+         Variant="Variant.Filled"
+         Size="Size.Small">
+    @Label
+</MudChip>
+
+@code {
+    [Parameter]
+    public int BusinessType { get; set; }
+
+    private string Label => BusinessType switch
+    {
+        10 => "음식배달",
+        20 => "용달운송",
+        _ => "기타"
+    };
+
+    private Color ChipColor => BusinessType switch
+    {
+        10 => Color.Secondary,
+        20 => Color.Primary,
+        _ => Color.Default
+    };
+}

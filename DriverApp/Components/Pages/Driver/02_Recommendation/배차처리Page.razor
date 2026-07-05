@@ -1,0 +1,124 @@
+﻿@page "/driver/recommendations/{의뢰Id:long}/decision"
+@inject IDriverSampleDataService Samples
+@inject IDriverRecommendationDecisionService DecisionService
+
+<PageTitle>배차처리</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">배차 처리</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">추천 상세를 본 다음 수락이나 거절을 처리하는 화면이다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudStack Spacing="2">
+                @if (의뢰 is null)
+                {
+                    <MudAlert Severity="Severity.Warning">배차 처리할 추천 의뢰 샘플을 찾지 못했습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudText Typo="Typo.h6">@의뢰.요약설명</MudText>
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">의뢰 @의뢰Id</MudChip>
+                    <MudText Typo="Typo.body1">@의뢰.경로표시</MudText>
+                    <MudText Typo="Typo.body2">예상수익 @((의뢰.예상수익 ?? 0m).ToString("0"))원 / 추천점수 @((의뢰.추천점수 ?? 0m).ToString("0"))점</MudText>
+                    <MudAlert Severity="Severity.Info">지금은 실제 Command 대신 앱 공통 추천 처리 상태를 갱신합니다.</MudAlert>
+                }
+                <MudAlert Severity="@_처리Severity">@_처리상태</MudAlert>
+                @if (_거절입력표시)
+                {
+                    <MudSelect T="string" Label="거절 사유" @bind-Value="_거절사유" Variant="Variant.Outlined">
+                        <MudSelectItem T="string" Value="@("동선이 맞지 않음")">동선이 맞지 않음</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("시간 조건이 맞지 않음")">시간 조건이 맞지 않음</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("차량 조건이 맞지 않음")">차량 조건이 맞지 않음</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("수익성이 낮음")">수익성이 낮음</MudSelectItem>
+                    </MudSelect>
+                }
+                <MudStack Row="true" Spacing="2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(의뢰 is null)" OnClick="배차수락샘플">배차 수락</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(의뢰 is null)" OnClick="배차보류샘플">보류</MudButton>
+                    @if (_거절입력표시)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="배차거절샘플">거절 확정</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="@(() => _거절입력표시 = true)">거절</MudButton>
+                    }
+                </MudStack>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.RecommendationDetail(의뢰Id.ToString())">추천 상세로</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public long 의뢰Id { get; set; }
+
+    private DriverRequestItem? 의뢰 => Samples.추천의뢰조회(의뢰Id);
+    private string _처리상태 = "아직 처리 전입니다.";
+    private Severity _처리Severity = Severity.Normal;
+    private bool _거절입력표시;
+    private string _거절사유 = "동선이 맞지 않음";
+
+    protected override void OnParametersSet()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.GetDecision(의뢰.의뢰Id);
+        if (decision is not null)
+        {
+            _처리상태 = $"{decision.Decision} 처리됨 · {decision.DecidedAt:HH:mm} · {decision.Memo}";
+            _처리Severity = decision.Decision switch
+            {
+                "수락" => Severity.Success,
+                "거절" => Severity.Warning,
+                _ => Severity.Info
+            };
+        }
+    }
+
+    private void 배차수락샘플()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Accept(의뢰);
+        _처리상태 = decision.Memo;
+        _처리Severity = Severity.Success;
+    }
+
+    private void 배차보류샘플()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Hold(의뢰);
+        _처리상태 = decision.Memo;
+        _처리Severity = Severity.Info;
+    }
+
+    private void 배차거절샘플()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Reject(의뢰, _거절사유);
+        _처리상태 = decision.Memo;
+        _처리Severity = Severity.Warning;
+    }
+}
+

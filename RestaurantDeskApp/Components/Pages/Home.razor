@@ -1,0 +1,112 @@
+@page "/"
+@using RestaurantDeskApp.Models.Restaurant
+@inject RestaurantDeskSampleService SampleService
+@inject I주문알림Service OrderAlertService
+
+<PageTitle>주문 대시보드</PageTitle>
+
+<PlatformCommunityHome AppName="Restaurant Desk"
+                       RoleLabel="음식점 운영"
+                       AppKey="restaurant-desk"
+                       QuickActions="QuickActions">
+    <WorkModeContent>
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">음식점 주문 데스크</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">신규 주문 알림, 가까운 상점 흐름, 리뷰 운영을 데스크톱에서 바로 확인합니다.</MudText>
+            </MudStack>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="SimulateOrderAlertAsync">신규 주문 알림 재생</MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="Severity.Success">@message</MudAlert>
+        }
+
+        <MudGrid>
+            <MudItem xs="12" md="5">
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Class="mb-3">신규 주문 수신함</MudText>
+                        @foreach (var order in orders)
+                        {
+                            <MudPaper Elevation="0" Class="pa-3 mb-2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween">
+                                    <div>
+                                        <MudText Typo="Typo.subtitle2">@order.주문번호</MudText>
+                                        <MudText Typo="Typo.body2">@order.고객명 · @order.메뉴요약</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@order.접수시각.ToString("HH:mm") 접수</MudText>
+                                    </div>
+                                    <MudChip T="string" Color="@(order.미확인 ? Color.Error : Color.Success)">@((order.미확인 ? "미확인" : "확인"))</MudChip>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" md="7">
+                <MudCard Elevation="2">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" Class="mb-3">운영 요약</MudText>
+                        <MudGrid>
+                            <MudItem xs="12" sm="4">
+                                <MudPaper Class="pa-4">
+                                    <MudText Typo="Typo.caption">가까운 음식점</MudText>
+                                    <MudText Typo="Typo.h4">@nearbyRestaurants.Count</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudPaper Class="pa-4">
+                                    <MudText Typo="Typo.caption">인기 음식점</MudText>
+                                    <MudText Typo="Typo.h4">@popularRestaurants.Count</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudPaper Class="pa-4">
+                                    <MudText Typo="Typo.caption">리뷰 운영 대상</MudText>
+                                    <MudText Typo="Typo.h4">@reviewModerationItems.Count(x => x.같은음식점기준저평점3회연속여부)</MudText>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                        <MudDivider Class="my-3" />
+                        <MudText Typo="Typo.body2">관리자 기본 게시 정책: 저평점 리뷰 @(policy.기본저평점게시일수)일 공개</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">같은 음식점에서 1~2점 사진 리뷰가 3회 연속이면 관리자 운영 대상으로 올립니다.</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+    </WorkModeContent>
+</PlatformCommunityHome>
+
+@code {
+    private IReadOnlyList<주문알림항목> orders = [];
+    private IReadOnlyList<음식점요약응답> nearbyRestaurants = [];
+    private IReadOnlyList<음식점요약응답> popularRestaurants = [];
+    private IReadOnlyList<음식점리뷰관리항목응답> reviewModerationItems = [];
+    private 음식점리뷰운영정책응답 policy = new();
+    private string? message;
+    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    [
+        new("주문 대시보드", "신규 주문과 운영 요약을 확인합니다.", "/", Icons.Material.Filled.Dashboard, Color.Primary),
+        new("가까운 음식점", "근거리 노출 흐름을 점검합니다.", "/restaurants/nearby", Icons.Material.Filled.NearMe, Color.Info),
+        new("인기 음식점", "인기 음식점 노출 흐름을 확인합니다.", "/restaurants/popular", Icons.Material.Filled.TrendingUp, Color.Success),
+        new("리뷰 운영", "저평점 사진 리뷰와 게시 정책을 관리합니다.", "/reviews/moderation", Icons.Material.Filled.RateReview, Color.Warning)
+    ];
+
+    protected override void OnInitialized()
+    {
+        orders = SampleService.Get신규주문목록();
+        nearbyRestaurants = SampleService.Get가까운음식점목록();
+        popularRestaurants = SampleService.Get인기음식점목록();
+        reviewModerationItems = SampleService.Get리뷰운영목록();
+        policy = SampleService.Get운영정책();
+    }
+
+    private async Task SimulateOrderAlertAsync()
+    {
+        await OrderAlertService.신규주문알림재생Async();
+        message = "신규 주문 알림을 재생했습니다. 데스크톱 스피커 연동 지점을 이 서비스에 확장할 수 있습니다.";
+    }
+}

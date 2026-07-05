@@ -1,0 +1,44 @@
+using Hongdal.Domain.Community;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Hongdal.Infrastructure.Persistence.Configurations.Community;
+
+public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguration<PlatformCommunityPost>
+{
+    public void Configure(EntityTypeBuilder<PlatformCommunityPost> builder)
+    {
+        builder.ToTable("platform_community_posts");
+
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.AppKey).HasMaxLength(80).IsRequired();
+        builder.Property(x => x.Category).HasMaxLength(60).IsRequired();
+        builder.Property(x => x.Title).HasMaxLength(160).IsRequired();
+        builder.Property(x => x.Body).HasMaxLength(4000).IsRequired();
+        builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
+        builder.Property(x => x.Nickname).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.ReporterDisplayName).HasMaxLength(40);
+        builder.Property(x => x.ReportedDisplayName).HasMaxLength(40);
+        builder.Property(x => x.PasswordHash).HasMaxLength(200).IsRequired();
+
+        builder.HasIndex(x => new { x.AppKey, x.IsDeleted, x.IsOperatorPinned, x.OperatorPinnedAtUtc, x.RecommendationCount, x.LastEngagedAtUtc, x.CreatedAtUtc });
+        builder.HasIndex(x => new { x.Category, x.IsDeleted, x.CreatedAtUtc });
+        builder.HasIndex(x => new { x.IsReportBoardPost, x.IsDeleted, x.CreatedAtUtc });
+
+        builder.HasMany(x => x.Attachments)
+            .WithOne(x => x.Post)
+            .HasForeignKey(x => x.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Comments)
+            .WithOne(x => x.Post)
+            .HasForeignKey(x => x.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Recommendations)
+            .WithOne(x => x.Post)
+            .HasForeignKey(x => x.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}

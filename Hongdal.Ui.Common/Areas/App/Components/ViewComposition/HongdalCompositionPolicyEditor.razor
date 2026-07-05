@@ -1,0 +1,149 @@
+@if (EditableItems.Count == 0)
+{
+    @EmptyContent
+}
+else
+{
+    <MudTable T="ViewCompositionItem"
+              Items="@EditableItems"
+              Dense="@Dense"
+              Hover="true"
+              Elevation="0"
+              Class="@Class">
+        <HeaderContent>
+            <MudTh>@NameHeader</MudTh>
+            <MudTh>@KindHeader</MudTh>
+            <MudTh>@VisibleHeader</MudTh>
+            <MudTh>@OrderHeader</MudTh>
+            <MudTh>@SpanHeader</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="@NameHeader">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.body2">@context.DisplayName</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.ItemKey</MudText>
+                </MudStack>
+            </MudTd>
+            <MudTd DataLabel="@KindHeader">
+                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small">@context.Kind</MudChip>
+            </MudTd>
+            <MudTd DataLabel="@VisibleHeader">
+                <MudSwitch T="bool"
+                           Value="@context.PolicyEnabled"
+                           ValueChanged="@((bool value) => UpdatePolicyAsync(context, value))"
+                           Disabled="@(Disabled || context.IsRequired)"
+                           Color="Color.Primary" />
+            </MudTd>
+            <MudTd DataLabel="@OrderHeader">
+                <MudNumericField T="int"
+                                 Value="@context.SortOrder"
+                                 ValueChanged="@((int value) => UpdateLayoutAsync(context, sortOrder: value))"
+                                 Disabled="@Disabled"
+                                 Variant="Variant.Outlined"
+                                 Min="0" />
+            </MudTd>
+            <MudTd DataLabel="@SpanHeader">
+                @if (context.Kind == ViewCompositionItemKindCode.Widget)
+                {
+                    <MudStack Row="true" Spacing="1">
+                        <MudNumericField T="int"
+                                         Value="@context.ColumnSpan"
+                                         ValueChanged="@((int value) => UpdateLayoutAsync(context, columnSpan: value))"
+                                         Disabled="@Disabled"
+                                         Variant="Variant.Outlined"
+                                         Min="1"
+                                         Max="12"
+                                         Style="max-width:84px;" />
+                        <MudNumericField T="int"
+                                         Value="@context.RowSpan"
+                                         ValueChanged="@((int value) => UpdateLayoutAsync(context, rowSpan: value))"
+                                         Disabled="@Disabled"
+                                         Variant="Variant.Outlined"
+                                         Min="1"
+                                         Max="12"
+                                         Style="max-width:84px;" />
+                    </MudStack>
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ViewCompositionItem> Items { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ViewCompositionPolicyOverride> PolicyChanged { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Dense { get; set; } = true;
+
+    [Parameter]
+    public string NameHeader { get; set; } = "Name";
+
+    [Parameter]
+    public string KindHeader { get; set; } = "Kind";
+
+    [Parameter]
+    public string VisibleHeader { get; set; } = "Visible";
+
+    [Parameter]
+    public string OrderHeader { get; set; } = "Order";
+
+    [Parameter]
+    public string SpanHeader { get; set; } = "Span";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private IReadOnlyList<ViewCompositionItem> EditableItems => Items
+        .OrderBy(x => x.SortOrder)
+        .ThenBy(x => x.DisplayName, StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+    private Task UpdatePolicyAsync(ViewCompositionItem item, bool value)
+    {
+        return EmitOverrideAsync(item, policyEnabled: value);
+    }
+
+    private Task UpdateLayoutAsync(
+        ViewCompositionItem item,
+        int? sortOrder = null,
+        int? columnSpan = null,
+        int? rowSpan = null)
+    {
+        return EmitOverrideAsync(
+            item,
+            item.PolicyEnabled,
+            sortOrder ?? item.SortOrder,
+            columnSpan ?? item.ColumnSpan,
+            rowSpan ?? item.RowSpan);
+    }
+
+    private Task EmitOverrideAsync(
+        ViewCompositionItem item,
+        bool policyEnabled,
+        int? sortOrder = null,
+        int? columnSpan = null,
+        int? rowSpan = null)
+    {
+        var policy = new ViewCompositionPolicyOverride(
+            item.AppKey,
+            item.RoleName,
+            item.Surface,
+            item.ItemKey,
+            policyEnabled,
+            sortOrder,
+            columnSpan,
+            rowSpan);
+
+        return PolicyChanged.InvokeAsync(policy);
+    }
+}

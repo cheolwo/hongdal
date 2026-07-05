@@ -1,0 +1,43 @@
+@page "/restaurants/nearby"
+@inject RestaurantDeskSampleService SampleService
+
+<PageTitle>가까운 음식점 흐름</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudText Typo="Typo.h4" Class="mb-1">주문자 기준 가까운 음식점 조회</MudText>
+    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-4">주문자의 위치를 기준으로 가까운 음식점을 우선 노출하는 흐름 예시다.</MudText>
+
+    <MudGrid>
+        @foreach (var item in items)
+        {
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="1">
+                    <MudCardContent>
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.h6">@item.상호명</MudText>
+                            <MudText Typo="Typo.body2">@item.카테고리 · @item.주소</MudText>
+                            <MudStack Row="true" Class="restaurant-chip-row">
+                                <MudChip T="string" Color="Color.Primary">거리 @item.거리Km km</MudChip>
+                                <MudChip T="string" Color="Color.Warning">평점 @item.평균평점</MudChip>
+                                <MudChip T="string" Color="Color.Info">리뷰 @item.리뷰수 건</MudChip>
+                                @if (item.저평점주의필요)
+                                {
+                                    <MudChip T="string" Color="Color.Error">운영 주의</MudChip>
+                                }
+                            </MudStack>
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private IReadOnlyList<음식점요약응답> items = [];
+
+    protected override void OnInitialized()
+    {
+        items = SampleService.Get가까운음식점목록();
+    }
+}

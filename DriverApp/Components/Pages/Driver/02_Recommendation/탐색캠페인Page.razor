@@ -1,0 +1,129 @@
+@page "/driver/exploration/campaigns"
+@using DriverApp.Services.Samples
+@using Hongdal.Contracts.Common.Exploration
+@inject IDriverExplorationCampaignService SampleService
+
+<PageTitle>보낸 탐색 문의함</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h4">보낸 탐색 문의함</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">샘플데이터로 기사님이 먼저 보낸 탐색 캠페인과 응답 흐름을 바로 확인할 수 있다.</MudText>
+                </MudStack>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">샘플 {campaigns.Count}건</MudChip>
+            </MudStack>
+        </MudPaper>
+
+        <MudGrid>
+            <MudItem xs="12" md="5">
+                <MudTable Items="campaigns" Hover="true" Dense="true" OnRowClick="@((TableRowClickEventArgs<탐색캠페인목록항목응답> args) => OnRowClick(args))">
+                    <HeaderContent>
+                        <MudTh>탐색명</MudTh>
+                        <MudTh>상태</MudTh>
+                        <MudTh>응답</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="탐색명">
+                            <MudText Typo="Typo.subtitle2">@context.탐색명</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@context.출발권역 → @context.희망도착권역</MudText>
+                        </MudTd>
+                        <MudTd DataLabel="상태">@context.탐색상태</MudTd>
+                        <MudTd DataLabel="응답">@context.있음응답수 / @context.응답수</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+
+            <MudItem xs="12" md="7">
+                @if (selected is null)
+                {
+                    <MudAlert Severity="Severity.Info">왼쪽에서 탐색 캠페인을 선택하면 상세와 추천 대상을 볼 수 있습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudCard>
+                        <MudCardContent>
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                    <MudText Typo="Typo.h6">@selected.탐색명</MudText>
+                                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">@selected.탐색상태</MudChip>
+                                </MudStack>
+
+                                <MudText Typo="Typo.body2">@selected.출발권역 → @selected.희망도착권역 · @selected.차량종류</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@($"모집 {selected.모집대상수}명 · 응답 {selected.응답수}건 · 가능 {selected.있음응답수}건")</MudText>
+
+                                @if (!string.IsNullOrWhiteSpace(selectedDetail?.실행판단사유))
+                                {
+                                    <MudAlert Severity="Severity.Success">@selectedDetail!.실행판단사유</MudAlert>
+                                }
+
+                                <MudDivider />
+                                <MudText Typo="Typo.subtitle1">선정 대상 현황</MudText>
+                                <MudList T="탐색캠페인대상자응답" Dense="true">
+                                    @foreach (var target in selectedDetail?.대상자목록 ?? [])
+                                    {
+                                        <MudListItem T="탐색캠페인대상자응답" Value="@target">
+                                            <MudStack Spacing="0">
+                                                <MudText Typo="Typo.body1">@target.대상명</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@target.대상상태 · @target.선정사유</MudText>
+                                            </MudStack>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+
+                                <MudDivider />
+                                <MudText Typo="Typo.subtitle1">추가 추천 대상</MudText>
+                                <MudGrid>
+                                    @foreach (var rec in recommendations)
+                                    {
+                                        <MudItem xs="12" md="6">
+                                            <MudPaper Class="pa-3" Outlined="true">
+                                                <MudText Typo="Typo.subtitle2">@rec.대상명</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">점수 @rec.최종추천점수 · @rec.선정사유</MudText>
+                                            </MudPaper>
+                                        </MudItem>
+                                    }
+                                </MudGrid>
+                            </MudStack>
+                        </MudCardContent>
+                    </MudCard>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private IReadOnlyList<탐색캠페인목록항목응답> campaigns = [];
+    private IReadOnlyList<탐색캠페인추천대상응답> recommendations = [];
+    private 탐색캠페인목록항목응답? selected;
+    private 탐색캠페인상세응답? selectedDetail;
+
+    protected override void OnInitialized()
+    {
+        campaigns = SampleService.캠페인목록();
+        selected = campaigns.FirstOrDefault();
+        LoadDetail();
+    }
+
+    private void OnRowClick(TableRowClickEventArgs<탐색캠페인목록항목응답> args)
+    {
+        selected = args.Item;
+        LoadDetail();
+    }
+
+    private void LoadDetail()
+    {
+        if (selected is null)
+        {
+            selectedDetail = null;
+            recommendations = [];
+            return;
+        }
+
+        selectedDetail = SampleService.상세(selected.Id);
+        recommendations = SampleService.추천대상(selected.Id);
+    }
+}

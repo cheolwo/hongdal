@@ -1,0 +1,183 @@
+﻿@page "/driver/recommendations/{의뢰Id:long}"
+@inject IDriverSampleDataService Samples
+@inject IDriverRecommendationDecisionService DecisionService
+
+<PageTitle>추천상세</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">추천 상세</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">추천 사유, 거리, 수익을 보고 수락/거절을 판단한다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        @if (의뢰 is null)
+        {
+            <MudAlert Severity="Severity.Warning">추천 의뢰 샘플을 찾지 못했습니다.</MudAlert>
+        }
+        else
+        {
+            <MudPaper Class="driver-recommendation-card pa-4" Elevation="0">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Class="driver-recommendation-card__head">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">@의뢰.화물종류</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@의뢰.요약설명</MudText>
+                        </MudStack>
+                        <MudStack Spacing="0" AlignItems="AlignItems.End" Class="driver-recommendation-card__fare">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 수익</MudText>
+                            <MudText Typo="Typo.h6" Color="Color.Error">@((의뢰.예상수익 ?? 0m).ToString("0"))원</MudText>
+                        </MudStack>
+                    </MudStack>
+
+                    @{ var warningState = WarningState; }
+                    <RecommendationWarningBadges RequiresSpecialPickup="@warningState.RequiresSpecialPickup"
+                                                 RequiresSpecialDropoff="@warningState.RequiresSpecialDropoff"
+                                                 ShowReceipt="@warningState.ShowReceipt" />
+
+                    <div class="driver-route-card-grid">
+                        <section class="driver-route-section driver-route-section--pickup">
+                            <div class="driver-route-section__label">상차</div>
+                            <MudText Typo="Typo.subtitle2">@의뢰.픽업지</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">상차지까지 @((의뢰.픽업거리Km ?? 0m).ToString("0.0"))km</MudText>
+                            <div class="driver-route-meta">
+                                <span>@의뢰.운송조건표시</span>
+                                <span>@의뢰.차량조건표시</span>
+                                <span>@의뢰.상차시간표시</span>
+                            </div>
+                        </section>
+
+                        <section class="driver-route-section driver-route-section--dropoff">
+                            <div class="driver-route-section__label">하차</div>
+                            <MudText Typo="Typo.subtitle2">@의뢰.하차지</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @((의뢰.운송거리Km ?? 0m).ToString("0.0"))km</MudText>
+                            <div class="driver-route-meta">
+                                <span>@의뢰.하차시간표시</span>
+                                <span>@의뢰.인수증표시</span>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="driver-payment-strip">
+                        <span class="driver-payment-strip__label">하차 정산</span>
+                        <span>@의뢰.결제방식</span>
+                        <span>@의뢰.인수증표시</span>
+                        <span>예상비용 @((의뢰.예상총비용 ?? 0m).ToString("0"))원</span>
+                    </div>
+
+                    <MudText Typo="Typo.body1">@의뢰.상세설명</MudText>
+                    <MudAlert Severity="Severity.Info">@의뢰.추천사유</MudAlert>
+                    @if (!string.IsNullOrWhiteSpace(_처리상태))
+                    {
+                        <MudAlert Severity="@_처리Severity">@_처리상태</MudAlert>
+                    }
+                    <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Accept">수락</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Hold">보류</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Reject">거절</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@DriverRoutes.RecommendationDecision(의뢰Id.ToString())">배차 처리 화면</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Recommendations">추천 목록으로</MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            <HongdalDocumentOutputPanel Draft="@CreateWaybillDraft(의뢰)"
+                                        Title="운송장 출력"
+                                        Subtitle="추천 의뢰 정보를 인쇄 가능한 운송장으로 변환합니다."
+                                        PanelClass="driver-recommendation-card pa-4" />
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public long 의뢰Id { get; set; }
+
+    private DriverRequestItem? 의뢰 => Samples.추천의뢰조회(의뢰Id);
+    private string? _처리상태;
+    private Severity _처리Severity = Severity.Info;
+
+    protected override void OnParametersSet()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.GetDecision(의뢰.의뢰Id);
+        if (decision is not null)
+        {
+            _처리상태 = $"{decision.Decision} 처리됨 · {decision.DecidedAt:HH:mm} · {decision.Memo}";
+            _처리Severity = decision.Decision switch
+            {
+                "수락" => Severity.Success,
+                "거절" => Severity.Warning,
+                _ => Severity.Info
+            };
+        }
+    }
+
+    private void Accept()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Accept(의뢰);
+        _처리상태 = decision.Memo;
+        _처리Severity = Severity.Success;
+    }
+
+    private void Hold()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Hold(의뢰);
+        _처리상태 = decision.Memo;
+        _처리Severity = Severity.Info;
+    }
+
+    private void Reject()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Reject(의뢰, "추천 상세에서 거절");
+        _처리상태 = decision.Memo;
+        _처리Severity = Severity.Warning;
+    }
+
+    private DriverWarningBadgeState WarningState => DriverWarningBadgeStateFactory.Create(의뢰);
+
+    private static HongdalWaybillDocumentDraft CreateWaybillDraft(DriverRequestItem item)
+    {
+        var fare = item.예상수익 ?? 0m;
+        var cost = item.예상총비용 ?? 0m;
+
+        return new HongdalWaybillDocumentDraft(
+            item.의뢰Id,
+            item.화물종류,
+            item.운송조건표시,
+            item.차량조건표시,
+            item.픽업지,
+            item.픽업지,
+            item.상차시간표시,
+            item.하차지,
+            item.하차지,
+            item.하차시간표시,
+            item.결제방식,
+            item.인수증필요,
+            fare,
+            cost,
+            item.상세설명,
+            DateTimeOffset.Now);
+    }
+}

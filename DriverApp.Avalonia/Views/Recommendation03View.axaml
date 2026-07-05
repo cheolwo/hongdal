@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 x:Class="DriverApp.Avalonia.Views.Recommendation03View">
+  <StackPanel Margin="24" Spacing="12">
+	<TextBlock Text="03 추천" FontSize="28" FontWeight="Bold" />
+	<Border Padding="16" CornerRadius="12">
+	  <StackPanel Spacing="8">
+		<TextBlock Text="추천 운송의뢰" FontSize="18" FontWeight="SemiBold" />
+		<TextBlock Text="추천 목록과 수락 흐름을 보여주는 화면입니다." TextWrapping="Wrap" />
+	  </StackPanel>
+	</Border>
+  </StackPanel>
+</UserControl>

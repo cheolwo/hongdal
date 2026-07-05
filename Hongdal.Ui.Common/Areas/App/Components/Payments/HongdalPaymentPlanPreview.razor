@@ -1,0 +1,158 @@
+@if (Plan is null)
+{
+    <MudAlert Severity="Severity.Warning">@InvalidMessage</MudAlert>
+}
+else
+{
+    <MudPaper Elevation="0" Class="pa-3" Style="border:1px solid var(--mud-palette-divider); border-radius:8px;">
+        <MudStack Spacing="2">
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@PaymentMethodText</MudChip>
+                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">@SettlementModeText</MudChip>
+                <MudChip T="string" Color="@StatusColor" Variant="Variant.Filled">@StatusText</MudChip>
+            </MudStack>
+
+            <MudText Typo="Typo.body2" Color="Color.Secondary">@FlowDescription</MudText>
+
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@AmountLabel</MudText>
+                    <MudText Typo="Typo.subtitle1">@Amount.ToString("N0") @Currency</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@OrderNameLabel</MudText>
+                    <MudText Typo="Typo.subtitle1">@DisplayOrderName</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public int TargetType { get; set; } = 20;
+
+    [Parameter]
+    public string TargetId { get; set; } = string.Empty;
+
+    [Parameter]
+    public int ProviderType { get; set; } = 10;
+
+    [Parameter]
+    public int Amount { get; set; }
+
+    [Parameter]
+    public string OrderName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string PaymentMethod { get; set; } = PaymentMethodCode.TossCard;
+
+    [Parameter]
+    public string SettlementMode { get; set; } = SettlementModeCode.Prepaid;
+
+    [Parameter]
+    public string Currency { get; set; } = "KRW";
+
+    [Parameter]
+    public string AmountLabel { get; set; } = "\uACB0\uC81C\uAE08\uC561";
+
+    [Parameter]
+    public string OrderNameLabel { get; set; } = "\uC8FC\uBB38\uBA85";
+
+    [Parameter]
+    public string InvalidMessage { get; set; } = "\uACB0\uC81C \uACC4\uD68D\uC744 \uB9CC\uB4E4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.";
+
+    public PaymentRequestPlan? Plan
+    {
+        get
+        {
+            try
+            {
+                return PaymentRequestPlanner.Plan(CreateDraft(), () => "preview");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    private string DisplayOrderName => string.IsNullOrWhiteSpace(OrderName) ? "-" : OrderName;
+
+    private string PaymentMethodText => PaymentMethod switch
+    {
+        PaymentMethodCode.TossCard => "\uCE74\uB4DC",
+        PaymentMethodCode.TossTransfer => "\uACC4\uC88C\uC774\uCCB4",
+        PaymentMethodCode.TossVirtualAccount => "\uAC00\uC0C1\uACC4\uC88C",
+        PaymentMethodCode.TossBilling => "\uC790\uB3D9\uACB0\uC81C",
+        PaymentMethodCode.MonthlySettlement => "\uC6D4\uC815\uC0B0",
+        _ => PaymentMethod
+    };
+
+    private string SettlementModeText => SettlementMode switch
+    {
+        SettlementModeCode.Prepaid => "\uC120\uACB0\uC81C",
+        SettlementModeCode.PayOnCompletion => "\uC644\uB8CC \uD6C4 \uACB0\uC81C",
+        SettlementModeCode.MonthlyInvoice => "\uC6D4\uB9D0 \uCCAD\uAD6C",
+        SettlementModeCode.Subscription => "\uAD6C\uB3C5",
+        _ => SettlementMode
+    };
+
+    private string StatusText => Plan?.InitialStatus switch
+    {
+        PaymentFlowStatusCode.PaymentWindowRequested => "\uACB0\uC81C\uCC3D",
+        PaymentFlowStatusCode.WaitingForDeposit => "\uC785\uAE08\uB300\uAE30",
+        PaymentFlowStatusCode.InvoicePending => "\uCCAD\uAD6C\uB300\uAE30",
+        PaymentFlowStatusCode.BillingScheduled => "\uBE4C\uB9C1\uC608\uC57D",
+        _ => Plan?.InitialStatus ?? "-"
+    };
+
+    private Color StatusColor => Plan?.InitialStatus switch
+    {
+        PaymentFlowStatusCode.WaitingForDeposit => Color.Warning,
+        PaymentFlowStatusCode.InvoicePending => Color.Info,
+        PaymentFlowStatusCode.BillingScheduled => Color.Success,
+        _ => Color.Primary
+    };
+
+    private string FlowDescription
+    {
+        get
+        {
+            if (Plan is null)
+            {
+                return InvalidMessage;
+            }
+
+            if (Plan.ShouldScheduleBilling)
+            {
+                return "\uAD6C\uB3C5/\uC790\uB3D9\uACB0\uC81C\uB294 \uBE4C\uB9C1\uD0A4 \uAE30\uBC18\uC73C\uB85C \uC608\uC57D\uB429\uB2C8\uB2E4.";
+            }
+
+            if (Plan.ShouldCreateInvoice)
+            {
+                return "\uC6D4\uC815\uC0B0\uC740 \uCCAD\uAD6C\uC11C\uB97C \uBA3C\uC800 \uC0DD\uC131\uD558\uACE0 \uC774\uD6C4 \uACB0\uC81C\uB97C \uC9C4\uD589\uD569\uB2C8\uB2E4.";
+            }
+
+            if (Plan.Policy.RequiresWebhook)
+            {
+                return "\uAC00\uC0C1\uACC4\uC88C\uB294 \uACC4\uC88C \uBC1C\uAE09 \uD6C4 \uC785\uAE08 \uC644\uB8CC\uB97C \uC6F9\uD6C5\uC73C\uB85C \uCC98\uB9AC\uD569\uB2C8\uB2E4.";
+            }
+
+            return "\uD1A0\uC2A4\uD398\uC774\uBA3C\uCE20 \uACB0\uC81C\uCC3D\uC744 \uC5F4\uACE0 \uC2B9\uC778 \uC644\uB8CC \uC2DC \uACB0\uC81C\uC644\uB8CC\uB85C \uCC98\uB9AC\uD569\uB2C8\uB2E4.";
+        }
+    }
+
+    private PaymentRequestDraft CreateDraft()
+    {
+        return new PaymentRequestDraft(
+            TargetType,
+            string.IsNullOrWhiteSpace(TargetId) ? "preview-target" : TargetId,
+            ProviderType,
+            Amount,
+            string.IsNullOrWhiteSpace(OrderName) ? "Hongdal payment" : OrderName,
+            PaymentMethod,
+            SettlementMode,
+            Currency);
+    }
+}

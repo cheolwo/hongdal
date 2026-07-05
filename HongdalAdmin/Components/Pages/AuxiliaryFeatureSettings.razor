@@ -1,0 +1,230 @@
+@page "/auxiliary-feature-settings"
+@rendermode InteractiveServer
+@using Hongdal.Contracts.CommandSettings
+@inject AuxiliaryFeatureSettingsService SettingsService
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>부가 기능 설정</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.h4">부가 기능 설정</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                필수 업무 흐름은 고정하고, 알림이나 인연 스냅샷처럼 업무를 보조하는 기능만 전역 또는 사용자별로 조정합니다.
+            </MudText>
+        </MudStack>
+
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudGrid>
+                <MudItem xs="12" md="5">
+                    <MudTextField Label="사용자 ID"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="userId"
+                                  Placeholder="비워두면 전역 정책만 표시" />
+                </MudItem>
+                <MudItem xs="12" md="7" Class="d-flex align-center gap-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadAsync" Disabled="isLoading">조회</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ClearUserAsync" Disabled="isLoading">전역만 보기</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+        }
+
+        @if (isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        else
+        {
+            <MudPaper Class="pa-4" Elevation="1">
+                <MudTable Items="filteredItems" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <HeaderContent>
+                        <MudTh>대상</MudTh>
+                        <MudTh>기능</MudTh>
+                        <MudTh>앱 기본</MudTh>
+                        <MudTh>전역</MudTh>
+                        <MudTh>사용자</MudTh>
+                        <MudTh>최종</MudTh>
+                        <MudTh></MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="item">
+                        <MudTd DataLabel="대상">
+                            <MudText Typo="Typo.body2">@item.TargetDisplayName</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@item.TargetName</MudText>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item.Category</MudChip>
+                        </MudTd>
+                        <MudTd DataLabel="기능">
+                            <MudText Typo="Typo.body2">@item.FeatureDisplayName</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@item.FeatureName</MudText>
+                            @if (item.IsRequired)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Error">필수</MudChip>
+                            }
+                            else if (item.IsUserConfigurable)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Info">부가</MudChip>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="앱 기본">@StateChip(item.AppDefaultEnabled)</MudTd>
+                        <MudTd DataLabel="전역">
+                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                @StateChip(item.GlobalEnabled)
+                                @if (item.HasGlobalOverride)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">Override</MudChip>
+                                }
+                            </MudStack>
+                        </MudTd>
+                        <MudTd DataLabel="사용자">
+                            @if (string.IsNullOrWhiteSpace(userId))
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">사용자 ID 입력</MudText>
+                            }
+                            else
+                            {
+                                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                    @if (item.UserEnabled.HasValue)
+                                    {
+                                        @StateChip(item.UserEnabled.Value)
+                                    }
+                                    else
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">전역 따름</MudChip>
+                                    }
+                                </MudStack>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="최종">@StateChip(item.EffectiveEnabled)</MudTd>
+                        <MudTd>
+                            <MudMenu Dense="true" Disabled="@(item.IsRequired || isSaving)">
+                                <ActivatorContent Context="menuContext">
+                                    <MudButton Size="Size.Small" Variant="Variant.Outlined" Disabled="@(item.IsRequired || isSaving)">조정</MudButton>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <MudMenuItem OnClick="() => SetGlobalAsync(item, true)">전역 켜기</MudMenuItem>
+                                    <MudMenuItem OnClick="() => SetGlobalAsync(item, false)">전역 끄기</MudMenuItem>
+                                    <MudMenuItem Disabled="@(!item.HasGlobalOverride)" OnClick="() => ResetGlobalAsync(item)">전역 기본값 복원</MudMenuItem>
+                                    <MudDivider />
+                                    <MudMenuItem Disabled="@string.IsNullOrWhiteSpace(userId)" OnClick="() => SetUserAsync(item, true)">사용자 켜기</MudMenuItem>
+                                    <MudMenuItem Disabled="@string.IsNullOrWhiteSpace(userId)" OnClick="() => SetUserAsync(item, false)">사용자 끄기</MudMenuItem>
+                                    <MudMenuItem Disabled="@(string.IsNullOrWhiteSpace(userId) || !item.HasUserOverride)" OnClick="() => ResetUserAsync(item)">사용자 기본값 복원</MudMenuItem>
+                                </ChildContent>
+                            </MudMenu>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string? userId;
+    private string? errorMessage;
+    private bool isLoading = true;
+    private bool isSaving;
+    private IReadOnlyList<AuxiliaryFeatureSettingItem> items = [];
+
+    private IEnumerable<AuxiliaryFeatureSettingItem> filteredItems =>
+        items.OrderBy(x => x.Category).ThenBy(x => x.TargetDisplayName).ThenBy(x => x.FeatureDisplayName);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!관리자인증세션Service.서버관리자인가)
+        {
+            NavigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString("/auxiliary-feature-settings")}");
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        try
+        {
+            items = (await SettingsService.GetAsync(userId)).Items;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"부가 기능 설정 조회 실패: {ex.Message}";
+            items = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ClearUserAsync()
+    {
+        userId = null;
+        await LoadAsync();
+    }
+
+    private async Task SetGlobalAsync(AuxiliaryFeatureSettingItem item, bool enabled)
+    {
+        await SaveAsync(() => SettingsService.SetGlobalAsync(item.TargetType, item.TargetName, item.FeatureName, enabled));
+    }
+
+    private async Task ResetGlobalAsync(AuxiliaryFeatureSettingItem item)
+    {
+        await SaveAsync(() => SettingsService.ResetGlobalAsync(item.TargetType, item.TargetName, item.FeatureName));
+    }
+
+    private async Task SetUserAsync(AuxiliaryFeatureSettingItem item, bool enabled)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        await SaveAsync(() => SettingsService.SetUserAsync(userId, item.TargetType, item.TargetName, item.FeatureName, enabled));
+    }
+
+    private async Task ResetUserAsync(AuxiliaryFeatureSettingItem item)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        await SaveAsync(() => SettingsService.ResetUserAsync(userId, item.TargetType, item.TargetName, item.FeatureName));
+    }
+
+    private async Task SaveAsync(Func<Task> action)
+    {
+        isSaving = true;
+        errorMessage = null;
+        try
+        {
+            await action();
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"부가 기능 설정 저장 실패: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private static RenderFragment StateChip(bool enabled) => builder =>
+    {
+        builder.OpenComponent<MudChip<string>>(0);
+        builder.AddAttribute(1, "Size", Size.Small);
+        builder.AddAttribute(2, "Color", enabled ? Color.Success : Color.Default);
+        builder.AddAttribute(3, "ChildContent", (RenderFragment)(childBuilder => childBuilder.AddContent(0, enabled ? "ON" : "OFF")));
+        builder.CloseComponent();
+    };
+}

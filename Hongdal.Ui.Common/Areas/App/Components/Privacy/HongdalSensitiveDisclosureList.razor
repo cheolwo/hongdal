@@ -1,0 +1,112 @@
+@namespace Hongdal.Ui.Common.Areas.App.Components.Privacy
+
+<MudPaper Elevation="0" Outlined="@Outlined" Class="@RootClass">
+    <MudStack Spacing="2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@Icon" Color="@Color" Size="Size.Small" />
+                <MudText Typo="Typo.subtitle2">@Title</MudText>
+            </MudStack>
+            @if (!string.IsNullOrWhiteSpace(Summary))
+            {
+                <MudChip T="string" Size="Size.Small" Color="@Color" Variant="Variant.Outlined">@Summary</MudChip>
+            }
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(PrivacyHint))
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@PrivacyHint</MudText>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(RelatedParties))
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-2 hongdal-sensitive-related-parties">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@RelatedPartiesIcon" Color="@Color" Size="Size.Small" />
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@RelatedPartiesLabel</MudText>
+                        <MudText Typo="Typo.subtitle2">@RelatedParties</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudExpansionPanels MultiExpansion="@MultiExpansion" Class="hongdal-sensitive-disclosure-panels">
+            @ChildContent
+        </MudExpansionPanels>
+    </MudStack>
+</MudPaper>
+
+<style>
+    .hongdal-sensitive-disclosure {
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--mud-palette-surface) 92%, var(--mud-palette-primary) 8%);
+    }
+
+    .hongdal-sensitive-disclosure .mud-expand-panel {
+        border-bottom: 1px solid var(--mud-palette-divider);
+    }
+
+    .hongdal-sensitive-disclosure .mud-expand-panel:last-child {
+        border-bottom: 0;
+    }
+
+    .hongdal-sensitive-disclosure--compact {
+        padding: 8px;
+    }
+
+    .hongdal-sensitive-related-parties {
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--mud-palette-surface) 86%, var(--mud-palette-primary) 14%);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "상세 정보";
+
+    [Parameter]
+    public string? Summary { get; set; }
+
+    [Parameter]
+    public string? PrivacyHint { get; set; } = "민감할 수 있는 정보는 필요할 때만 펼쳐 확인합니다.";
+
+    [Parameter]
+    public string? RelatedParties { get; set; }
+
+    [Parameter]
+    public string RelatedPartiesLabel { get; set; } = "직접 관련 대상";
+
+    [Parameter]
+    public string RelatedPartiesIcon { get; set; } = Icons.Material.Filled.Group;
+
+    [Parameter]
+    public string Icon { get; set; } = Icons.Material.Filled.Visibility;
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Primary;
+
+    [Parameter]
+    public bool Outlined { get; set; } = true;
+
+    [Parameter]
+    public bool Compact { get; set; } = true;
+
+    [Parameter]
+    public bool MultiExpansion { get; set; } = true;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string RootClass => string.Join(
+        ' ',
+        new[]
+        {
+            "hongdal-sensitive-disclosure",
+            Compact ? "hongdal-sensitive-disclosure--compact" : null,
+            Class
+        }.Where(x => !string.IsNullOrWhiteSpace(x)));
+}

@@ -1,0 +1,74 @@
+@page "/cargo"
+@inject I백오피스Service DataService
+
+<PageTitle>11. 공개 화물정보</PageTitle>
+
+<h1>11. 공개 화물정보</h1>
+<p class="text-muted">비회원도 조회 가능한 공개 화물 요약 목록입니다. 상세 정보는 로그인 후 확인할 수 있습니다.</p>
+
+<button class="btn btn-primary mb-3" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+
+@if (isLoading)
+{
+    <p>공개 화물 요약을 불러오는 중입니다...</p>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (items.Count == 0)
+{
+    <div class="alert alert-info">공개된 화물정보가 없습니다.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-lg-2 g-3">
+        @foreach (var item in items)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.화물종류</h5>
+                        <div class="text-muted small">@item.의뢰Id</div>
+                        <hr />
+                        <div><strong>운송방식:</strong> @item.운송방식</div>
+                        <div><strong>차량종류:</strong> @item.차량종류</div>
+                        <div><strong>수량:</strong> @(item.화물수량?.ToString() ?? "-")</div>
+                        <div><strong>중량:</strong> @(item.화물중량Kg?.ToString("N1") ?? "-") Kg</div>
+                        <div><strong>의뢰상태:</strong> @item.의뢰상태</div>
+                        <div><strong>배차상태:</strong> @item.배차상태</div>
+                        <div><strong>등록일시:</strong> @item.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? errorMessage;
+    private IReadOnlyList<공개화물요약응답> items = [];
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            items = await DataService.공개화물요약조회Async();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"공개 화물 조회 실패: {ex.Message}";
+            items = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

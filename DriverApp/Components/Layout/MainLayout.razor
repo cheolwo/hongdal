@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<MudLayout>
+    <MudAppBar Dense="true" Fixed="false" Elevation="0" Color="Color.Default" Class="driver-topbar px-4 py-2">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.subtitle1">기사 홈</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">운행 중 지금 봐야 할 화면만 먼저 확인한다.</MudText>
+        </MudStack>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle"
+                       Color="Color.Primary"
+                       Class="driver-quick-action"
+                       Size="Size.Medium"
+                       OnClick="GoToMenuPage"
+                       aria-label="메뉴 페이지 열기" />
+    </MudAppBar>
+
+    <MudMainContent Class="driver-main-content pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private void GoToMenuPage()
+    {
+        NavigationManager.NavigateTo(DriverRoutes.Menu);
+    }
+}

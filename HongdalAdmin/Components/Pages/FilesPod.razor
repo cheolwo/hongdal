@@ -1,0 +1,72 @@
+@page "/files/pod"
+@inject I백오피스Service DataService
+
+<PageTitle>08. 파일/POD</PageTitle>
+
+<h1>08. 파일/POD</h1>
+
+<div class="card mb-3"><div class="card-body">
+    <h5 class="card-title">파일 업로드</h5>
+    <div class="row g-2">
+        <div class="col-md-3"><input class="form-control" @bind="uploadFileType" placeholder="파일 타입" /></div>
+        <div class="col-md-3"><input class="form-control" @bind="uploadRequestId" placeholder="의뢰ID" /></div>
+        <div class="col-md-3"><InputFile OnChange="OnFileSelected" /></div>
+    </div>
+    <button class="btn btn-primary mt-3" @onclick="UploadAsync" disabled="@isUploading">업로드</button>
+</div></div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+}
+
+<table class="table table-striped table-hover">
+    <thead><tr><th>업로드시각</th><th>파일타입</th><th>의뢰ID</th><th>파일명</th><th>상태</th><th>작업</th></tr></thead>
+    <tbody>
+        @foreach (var item in items)
+        {
+            <tr><td>@item.UploadedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td><td>@item.FileType</td><td>@item.RequestId</td><td>@item.OriginalFileName</td><td>@item.UploadStatus</td><td><button class="btn btn-sm btn-outline-success" @onclick='() => ChangeStatusAsync(item.Id, "검수완료")'>검수완료</button></td></tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private bool isUploading;
+    private bool isError;
+    private string? message;
+    private string uploadFileType = "첨부파일";
+    private string? uploadRequestId;
+    private IBrowserFile? selectedFile;
+    private IReadOnlyList<파일POD응답> items = [];
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync() => items = await DataService.파일POD목록조회Async();
+    private void OnFileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
+
+    private async Task UploadAsync()
+    {
+        if (selectedFile is null)
+        {
+            isError = true;
+            message = "파일을 선택하세요.";
+            return;
+        }
+
+        isUploading = true;
+        await using var stream = selectedFile.OpenReadStream(50_000_000);
+        await DataService.파일POD업로드Async(stream, selectedFile.Name, selectedFile.ContentType, uploadFileType, uploadRequestId);
+        selectedFile = null;
+        isUploading = false;
+        isError = false;
+        message = "파일을 업로드했습니다.";
+        await LoadAsync();
+    }
+
+    private async Task ChangeStatusAsync(Guid id, string status)
+    {
+        await DataService.파일POD상태변경Async(id, status);
+        isError = false;
+        message = "상태를 변경했습니다.";
+        await LoadAsync();
+    }
+}

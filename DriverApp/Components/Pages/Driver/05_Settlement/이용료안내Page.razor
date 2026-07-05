@@ -1,0 +1,30 @@
+﻿@page "/driver/settlements/info"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>이용료안내</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">이용료 안내</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">오픈 베타와 정식 전환 후 기사 이용료 정책을 화면에서 확인한다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">안내 항목</MudText>
+                <MudText Typo="Typo.body1">오픈 베타 기간에는 이용료 0원으로 안내한다.</MudText>
+                <MudText Typo="Typo.body1">@정식이용료안내</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@현재샘플안내</MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/settlements/current-month">월 정산으로</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string 정식이용료안내 => string.Format("정식 전환 후에는 건당 500원, 월 최대 {0:0}원 상한으로 표시한다.", Samples.정산요약.월상한);
+    private string 현재샘플안내 => string.Format("현재 샘플 기준 배차 {0}건 / 이용료 {1:0}원", Samples.정산요약.배차건수, Samples.정산요약.이용료);
+}

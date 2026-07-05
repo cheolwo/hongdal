@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="clr-namespace:DriverApp.Avalonia.ViewModels"
+			 x:DataType="vm:ShellHeaderViewModel"
+			 x:Class="DriverApp.Avalonia.Views.ShellHeaderView">
+	<Border Padding="20,14"
+		  Background="#F4F6FB"
+		  BorderBrush="#D8DCE8"
+			BorderThickness="0,0,0,1"
+		  MinHeight="64">
+	<Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+	  <StackPanel Spacing="2">
+		<TextBlock Text="{Binding Title}" FontSize="22" FontWeight="Bold" />
+		<TextBlock Text="{Binding Subtitle}" Opacity="0.75" />
+	  </StackPanel>
+
+	  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+		<Border CornerRadius="16" Padding="10,4" Background="#E8ECF7">
+		  <TextBlock Text="{Binding UserLabel}" FontWeight="SemiBold" />
+		</Border>
+	  </StackPanel>
+	</Grid>
+  </Border>
+</UserControl>

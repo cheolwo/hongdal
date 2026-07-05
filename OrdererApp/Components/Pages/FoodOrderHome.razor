@@ -1,0 +1,45 @@
+@page "/food"
+
+<PageTitle>음식 주문</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">음식 주문</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                음식 주문 영역 안에서 일반 음식점 주문과 홈달마트 주문을 구분합니다.
+            </MudText>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <MudIcon Icon="@Icons.Material.Filled.RamenDining" Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">음식점에서 주문</MudText>
+                        </MudStack>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            가게가 조리하고, 조리 완료 후 배달 기사가 픽업합니다.
+                        </MudText>
+                        <MudButton Href="@OrdererRoutes.Restaurants" Variant="Variant.Filled" Color="Color.Primary">음식점 보기</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <MudIcon Icon="@Icons.Material.Filled.Storefront" Color="Color.Success" />
+                            <MudText Typo="Typo.h6">홈달마트에서 주문</MudText>
+                        </MudStack>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            도심 창고 재고를 피킹하고 포장 완료 후 음식 배달 기사 픽업으로 배송합니다.
+                        </MudText>
+                        <MudButton Href="@OrdererRoutes.Mart" Variant="Variant.Filled" Color="Color.Success">홈달마트 보기</MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+</MudContainer>

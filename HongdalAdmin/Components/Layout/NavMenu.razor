@@ -1,0 +1,119 @@
+﻿@using HongdalAdmin.Services
+@implements IDisposable
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject 관리자인증Service 관리자인증Service
+@inject ViewPolicyService ViewPolicyService
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">HongdalAdmin</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        @if (!ViewPolicyService.IsLoaded)
+        {
+            <div class="nav-item px-3 py-2">
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+            </div>
+        }
+        else
+        {
+            @foreach (var item in ViewPolicyService.VisibleItems.Where(x => x.EffectiveVisible))
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@ToHref(item.Route)" Match="@(item.Route == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)">
+                        <span class="@ResolveIcon(item.IconKey)" aria-hidden="true"></span> @item.DisplayName
+                    </NavLink>
+                </div>
+            }
+        }
+
+        @if (관리자인증세션Service.서버관리자인가)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="revenue-policies" Match="NavLinkMatch.Prefix">
+                    <span class="bi bi-calculator-nav-menu" aria-hidden="true"></span> 구독료 운영 정책
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="common-contents" Match="NavLinkMatch.Prefix">
+                    <span class="bi bi-images" aria-hidden="true"></span> 공통콘텐츠 관리
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="auxiliary-feature-settings" Match="NavLinkMatch.Prefix">
+                    <span class="bi bi-gear-nav-menu" aria-hidden="true"></span> 부가 기능 설정
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="restaurant-search-policy" Match="NavLinkMatch.Prefix">
+                    <span class="bi bi-geo-alt-fill-nav-menu" aria-hidden="true"></span> 음식점 반경 정책
+                </NavLink>
+            </div>
+        }
+
+        @if (!관리자인증세션Service.로그인됨)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="login">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> 관리자 로그인
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3 pt-2 text-white-50 small">
+                @관리자인증세션Service.UserName
+            </div>
+            <div class="nav-item px-3">
+                <button type="button" class="btn btn-link nav-link text-start" @onclick="로그아웃">로그아웃</button>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        ViewPolicyService.Changed += HandleChanged;
+        await ViewPolicyService.EnsureLoadedAsync();
+    }
+
+    private void HandleChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private static string ToHref(string route)
+    {
+        if (string.IsNullOrWhiteSpace(route) || route == "/")
+        {
+            return string.Empty;
+        }
+
+        return route.TrimStart('/');
+    }
+
+    private static string ResolveIcon(string iconKey) => iconKey switch
+    {
+        "home" => "bi bi-house-door-fill-nav-menu",
+        "settings" => "bi bi-gear-nav-menu",
+        _ => iconKey
+    };
+
+    private void 로그아웃()
+    {
+        관리자인증Service.로그아웃();
+        NavigationManager.NavigateTo("/login", forceLoad: false);
+    }
+
+    public void Dispose()
+    {
+        ViewPolicyService.Changed -= HandleChanged;
+    }
+}

@@ -1,0 +1,212 @@
+@using DriverApp.Models.Driver
+@using DriverApp.Services
+@using MudBlazor
+@inject IDriverRecommendationDecisionService DecisionService
+
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudText Typo="Typo.h6">운송의뢰 상세</MudText>
+            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@선택출처</MudChip>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        @if (의뢰 is null)
+        {
+            <MudAlert Severity="Severity.Warning">운송의뢰 정보를 찾지 못했습니다.</MudAlert>
+        }
+        else
+        {
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Class="driver-recommendation-card__head">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">@의뢰.화물종류</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@의뢰.요약설명</MudText>
+                    </MudStack>
+                    <MudStack Spacing="0" AlignItems="AlignItems.End" Class="driver-recommendation-card__fare">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">예상 수익</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Error">@((의뢰.예상수익 ?? 0m).ToString("0"))원</MudText>
+                    </MudStack>
+                </MudStack>
+
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@의뢰.운송조건표시</MudChip>
+                    @if (의뢰.시간조건표시 != "일반")
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">@의뢰.시간조건표시</MudChip>
+                    }
+                    @if (의뢰.인수증필요)
+                    {
+                        <MudChip T="string" Color="Color.Dark" Variant="Variant.Outlined">인수증</MudChip>
+                    }
+                </MudStack>
+
+                <div class="driver-route-card-grid">
+                    <section class="driver-route-section driver-route-section--pickup">
+                        <div class="driver-route-section__label">상차</div>
+                        <MudText Typo="Typo.subtitle2">@의뢰.픽업지</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">상차지까지 @((의뢰.픽업거리Km ?? 0m).ToString("0.0"))km</MudText>
+                        <div class="driver-route-meta">
+                            <span>@의뢰.운송조건표시</span>
+                            <span>@의뢰.차량조건표시</span>
+                            <span>@의뢰.상차시간표시</span>
+                        </div>
+                    </section>
+
+                    <section class="driver-route-section driver-route-section--dropoff">
+                        <div class="driver-route-section__label">하차</div>
+                        <MudText Typo="Typo.subtitle2">@의뢰.하차지</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @((의뢰.운송거리Km ?? 0m).ToString("0.0"))km</MudText>
+                        <div class="driver-route-meta">
+                            <span>@의뢰.하차시간표시</span>
+                            <span>@의뢰.인수증표시</span>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="driver-payment-strip">
+                    <span class="driver-payment-strip__label">하차 정산</span>
+                    <span>@의뢰.결제방식</span>
+                    <span>@의뢰.인수증표시</span>
+                    <span>예상비용 @((의뢰.예상총비용 ?? 0m).ToString("0"))원</span>
+                </div>
+
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@의뢰.상세설명</MudText>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6"><MudText>의뢰번호: @의뢰.의뢰Id</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>정산: @의뢰.하차정산표시</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>거리: @의뢰.거리표시</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>총공차거리: @((의뢰.총공차거리Km?.ToString("0.0") ?? "-") + "km")</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>배차상태: @의뢰.배차상태</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>복귀기준: @(의뢰.복귀지출처 ?? "미적용")</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>복귀예상거리: @((의뢰.복귀예상거리Km?.ToString("0.0") ?? "-") + "km")</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>바로복귀거리: @((의뢰.지금바로복귀거리Km?.ToString("0.0") ?? "-") + "km")</MudText></MudItem>
+                    <MudItem xs="12" sm="6"><MudText>복귀우회증가: @((의뢰.복귀우회증가거리Km?.ToString("+0.0;-0.0;0.0") ?? "-") + "km")</MudText></MudItem>
+                </MudGrid>
+
+                <MudAlert Severity="Severity.Info">@의뢰.추천사유</MudAlert>
+
+                @if (!string.IsNullOrWhiteSpace(의뢰.복귀추천사유))
+                {
+                    <MudAlert Severity="Severity.Info">@의뢰.복귀추천사유</MudAlert>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_처리메시지))
+                {
+                    <MudAlert Severity="@_처리Severity">@_처리메시지</MudAlert>
+                }
+
+                @if (_거절입력표시)
+                {
+                    <MudSelect T="string" Label="거절 사유" @bind-Value="_거절사유" Variant="Variant.Outlined">
+                        <MudSelectItem T="string" Value="@("동선이 맞지 않음")">동선이 맞지 않음</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("시간 조건이 맞지 않음")">시간 조건이 맞지 않음</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("차량 조건이 맞지 않음")">차량 조건이 맞지 않음</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("수익성이 낮음")">수익성이 낮음</MudSelectItem>
+                    </MudSelect>
+                }
+            </MudStack>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(의뢰 is null)" OnClick="Accept">수락</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(의뢰 is null)" OnClick="Hold">보류</MudButton>
+        @if (_거절입력표시)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="Reject">거절 확정</MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="ShowRejectInput">거절</MudButton>
+        }
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="Close">닫기</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public DriverRequestItem? 의뢰 { get; set; }
+
+    [Parameter]
+    public string 선택출처 { get; set; } = string.Empty;
+
+    private bool _거절입력표시;
+    private string _거절사유 = "동선이 맞지 않음";
+    private string? _처리메시지;
+    private Severity _처리Severity = Severity.Info;
+
+    protected override void OnParametersSet()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.GetDecision(의뢰.의뢰Id);
+        if (decision is not null)
+        {
+            _처리Severity = ResolveSeverity(decision.Decision);
+            _처리메시지 = $"{decision.Decision} 처리됨 · {decision.DecidedAt:HH:mm} · {decision.Memo}";
+        }
+    }
+
+    private void Accept()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Accept(의뢰);
+        _처리Severity = Severity.Success;
+        _처리메시지 = decision.Memo;
+        MudDialog.Close(DialogResult.Ok(decision));
+    }
+
+    private void Hold()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Hold(의뢰);
+        _처리Severity = Severity.Info;
+        _처리메시지 = decision.Memo;
+        MudDialog.Close(DialogResult.Ok(decision));
+    }
+
+    private void ShowRejectInput()
+    {
+        _거절입력표시 = true;
+    }
+
+    private void Reject()
+    {
+        if (의뢰 is null)
+        {
+            return;
+        }
+
+        var decision = DecisionService.Reject(의뢰, _거절사유);
+        _처리Severity = Severity.Warning;
+        _처리메시지 = decision.Memo;
+        MudDialog.Close(DialogResult.Ok(decision));
+    }
+
+    private void Close()
+    {
+        MudDialog.Close();
+    }
+
+    private static Severity ResolveSeverity(string decision) => decision switch
+    {
+        "수락" => Severity.Success,
+        "거절" => Severity.Warning,
+        _ => Severity.Info
+    };
+}

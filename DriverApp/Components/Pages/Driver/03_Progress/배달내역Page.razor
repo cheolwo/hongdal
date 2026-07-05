@@ -1,0 +1,56 @@
+@page "/driver/transports/history"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>배달 내역</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">배달 내역</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">최근 운송 기록과 예상 수익을 확인합니다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudGrid Spacing="2">
+            @foreach (var item in Samples.운송목록.OrderByDescending(x => x.예정시각))
+            {
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="driver-recommendation-card pa-4 h-100" Elevation="0">
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.subtitle1">@item.화물종류 운송</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@item.의뢰Id</MudText>
+                                </MudStack>
+                                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@item.현재단계</MudChip>
+                            </MudStack>
+
+                            <div class="driver-route-card-grid">
+                                <section class="driver-route-section driver-route-section--pickup">
+                                    <div class="driver-route-section__label">상차</div>
+                                    <MudText Typo="Typo.subtitle2">@item.픽업지</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">예정 @item.예정시각.ToString("MM-dd HH:mm")</MudText>
+                                </section>
+
+                                <section class="driver-route-section driver-route-section--dropoff">
+                                    <div class="driver-route-section__label">하차</div>
+                                    <MudText Typo="Typo.subtitle2">@item.하차지</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @item.운송거리Km.ToString("0.0")km</MudText>
+                                </section>
+                            </div>
+
+                            <div class="driver-payment-strip">
+                                <span class="driver-payment-strip__label">수익</span>
+                                <span>@item.예상수익.ToString("N0")원</span>
+                                <span>다음 처리 @item.다음행동</span>
+                            </div>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Menu">사용자 메뉴로</MudButton>
+    </MudStack>
+</MudContainer>

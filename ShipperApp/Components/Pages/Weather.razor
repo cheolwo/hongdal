@@ -1,0 +1,59 @@
+﻿@page "/weather"
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">Weather</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">This component demonstrates showing data.</MudText>
+        </MudStack>
+
+        @if (forecasts == null)
+        {
+            <MudAlert Severity="Severity.Info">Loading...</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="forecasts" Dense="true" Hover="true" Elevation="1">
+                <HeaderContent>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Temp. (C)</MudTh>
+                    <MudTh>Temp. (F)</MudTh>
+                    <MudTh>Summary</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Date">@context.Date.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="Temp. (C)">@context.TemperatureC</MudTd>
+                    <MudTd DataLabel="Temp. (F)">@context.TemperatureF</MudTd>
+                    <MudTd DataLabel="Summary">@context.Summary</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private WeatherForecast[]? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate a loading indicator
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        {
+            Date = startDate.AddDays(index),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = summaries[Random.Shared.Next(summaries.Length)]
+        }).ToArray();
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}

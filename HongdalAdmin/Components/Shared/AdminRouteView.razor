@@ -1,0 +1,30 @@
+@inject ViewPolicyService ViewPolicyService
+@inject NavigationManager NavigationManager
+
+@if (!ViewPolicyService.IsLoaded)
+{
+    <div class="p-4 text-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+    </div>
+}
+else if (blockedItem is not null)
+{
+    <ViewAccessDenied ViewName="@blockedItem.DisplayName" />
+}
+else
+{
+    <RouteView RouteData="RouteData" DefaultLayout="typeof(Layout.MainLayout)" />
+    <FocusOnNavigate RouteData="RouteData" Selector="h1" />
+}
+
+@code {
+    [Parameter, EditorRequired] public RouteData RouteData { get; set; } = default!;
+
+    private Hongdal.Contracts.Common.ViewSettings.View가시성항목응답? blockedItem;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await ViewPolicyService.EnsureLoadedAsync();
+        blockedItem = ViewPolicyService.GetBlockingItem(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+    }
+}

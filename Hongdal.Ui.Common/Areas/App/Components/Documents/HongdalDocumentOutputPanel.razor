@@ -1,0 +1,105 @@
+@inject IHongdalDocumentOutputService DocumentOutputService
+@inject IJSRuntime JS
+
+<MudPaper Class="@PanelClass" Elevation="@Elevation">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">@Title</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Subtitle</MudText>
+            </MudStack>
+            <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@Draft.DocumentNo</MudChip>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">상차</MudText>
+                <MudText Typo="Typo.subtitle2">@Draft.PickupPlace</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Draft.PickupTime</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">하차</MudText>
+                <MudText Typo="Typo.subtitle2">@Draft.DropoffPlace</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Draft.DropoffTime</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">화물/차량</MudText>
+                <MudText Typo="Typo.body2">@Draft.CargoName · @Draft.VehicleCondition</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">정산</MudText>
+                <MudText Typo="Typo.body2">@Draft.PaymentMethod · @(Draft.ReceiptRequired ? "인수증 필요" : "인수증 없음")</MudText>
+            </MudItem>
+        </MudGrid>
+
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="@_statusSeverity">@_statusMessage</MudAlert>
+        }
+
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Print" OnClick="PrintAsync">
+                인쇄
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Download" OnClick="DownloadHtmlAsync">
+                HTML 저장
+            </MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Article" OnClick="PreviewText">
+                텍스트 미리보기
+            </MudButton>
+        </MudStack>
+
+        @if (_showPreview)
+        {
+            <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.body2" Style="white-space: pre-wrap">@Output.PlainText</MudText>
+            </MudPaper>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public HongdalWaybillDocumentDraft Draft { get; set; } = default!;
+
+    [Parameter]
+    public string Title { get; set; } = "문서 출력";
+
+    [Parameter]
+    public string Subtitle { get; set; } = "운송장 정보를 출력용 문서로 변환합니다.";
+
+    [Parameter]
+    public string PanelClass { get; set; } = "pa-4";
+
+    [Parameter]
+    public int Elevation { get; set; }
+
+    private bool _showPreview;
+    private string? _statusMessage;
+    private Severity _statusSeverity = Severity.Info;
+
+    private HongdalDocumentOutput Output => DocumentOutputService.CreateWaybill(Draft);
+
+    private async Task PrintAsync()
+    {
+        var output = Output;
+        await JS.InvokeVoidAsync("hongdalDocumentOutput.printHtml", output.Title, output.Html);
+        _statusSeverity = Severity.Success;
+        _statusMessage = "인쇄 대화상자를 열었습니다. 연결된 프린터 또는 PDF 저장을 선택할 수 있습니다.";
+    }
+
+    private async Task DownloadHtmlAsync()
+    {
+        var output = Output;
+        await JS.InvokeVoidAsync("hongdalDocumentOutput.downloadHtml", output.FileName, output.Html);
+        _statusSeverity = Severity.Success;
+        _statusMessage = "출력용 HTML 파일을 생성했습니다.";
+    }
+
+    private void PreviewText()
+    {
+        _showPreview = !_showPreview;
+        _statusSeverity = Severity.Info;
+        _statusMessage = _showPreview ? "출력될 핵심 정보를 텍스트로 표시합니다." : null;
+    }
+}

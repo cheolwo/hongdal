@@ -1,0 +1,41 @@
+﻿@page "/driver/work/start"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>운행 시작</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">운행 시작</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">나중에 운행시작Command를 붙일 입력값을 샘플로 먼저 보여준다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">운행 시작 샘플</MudText>
+                <MudText Typo="Typo.body1">시작 모드: @Samples.근무상태.시작모드</MudText>
+                <MudText Typo="Typo.body1">시작 위치: @Samples.근무상태.시작위치</MudText>
+                <MudText Typo="Typo.body1">복귀지: @(Samples.근무상태.복귀지 ?? "미설정")</MudText>
+                <MudAlert Severity="Severity.Info">여기서는 버튼을 누르면 로컬 상태만 바꾼다. 다음 단계에서 실제 API/Command를 연결하면 된다.</MudAlert>
+                @if (!string.IsNullOrWhiteSpace(_상태문구))
+                {
+                    <MudAlert Severity="Severity.Success">@_상태문구</MudAlert>
+                }
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="운행시작샘플">샘플 운행 시작</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/work/status">근무 상태 보기</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/home">기사 홈으로</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string? _상태문구;
+
+    private void 운행시작샘플()
+    {
+        _상태문구 = $"{Samples.근무상태.시작위치} 기준으로 운행 시작 요청을 보낼 수 있다.";
+    }
+}

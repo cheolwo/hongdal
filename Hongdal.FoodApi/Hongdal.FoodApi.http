@@ -1,0 +1,9 @@
+@Hongdal.FoodApi_HostAddress = http://localhost:5187
+
+GET {{Hongdal.FoodApi_HostAddress}}/api/v1/restaurants/nearby
+Accept: application/json
+
+###
+
+GET {{Hongdal.FoodApi_HostAddress}}/api/v1/food-orders
+Accept: application/json

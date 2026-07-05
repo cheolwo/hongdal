@@ -1,0 +1,65 @@
+﻿@page "/driver/settlements/current-month"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>월정산</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">월 정산</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">이번 달 이용료와 정산 내역을 확인합니다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudGrid Spacing="3">
+                <MudItem xs="12" sm="3"><MudText Typo="Typo.h6">@정산월표시</MudText></MudItem>
+                <MudItem xs="12" sm="3"><MudText>@배차건수표시</MudText></MudItem>
+                <MudItem xs="12" sm="3"><MudText>@이용료표시</MudText></MudItem>
+                <MudItem xs="12" sm="3"><MudText>@월상한표시</MudText></MudItem>
+            </MudGrid>
+
+            <MudDivider Class="my-4" />
+
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.subtitle2">상세 내역</MudText>
+                @foreach (var item in Samples.정산요약.상세항목)
+                {
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="driver-settlement-line">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.body2">@item.항목명</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@item.설명</MudText>
+                        </MudStack>
+                        <MudText Typo="Typo.body2" Class="driver-settlement-line__amount">@금액표시(item.금액)</MudText>
+                    </MudStack>
+                }
+            </MudStack>
+
+            <MudAlert Class="mt-3" Severity="@(Samples.정산요약.결제완료 ? Severity.Success : Severity.Warning)">
+                @(Samples.정산요약.결제완료 ? "이번 달 정산이 완료되었습니다." : "이번 달 이용료 확인이 필요합니다.")
+            </MudAlert>
+            <MudStack Row="true" Spacing="2" Class="mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/settlements/info">이용료 안내</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/home">기사 홈으로</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string 정산월표시 => string.Format("{0}년 {1}월", Samples.정산요약.년도, Samples.정산요약.월);
+    private string 배차건수표시 => string.Format("배차 {0}건", Samples.정산요약.배차건수);
+    private string 이용료표시 => string.Format("이용료 {0:0}원", Samples.정산요약.이용료);
+    private string 월상한표시 => string.Format("월 상한 {0:0}원", Samples.정산요약.월상한);
+
+    private static string 금액표시(decimal amount)
+    {
+        if (amount == 0)
+        {
+            return "0원";
+        }
+
+        return amount > 0 ? $"+{amount:0}원" : $"{amount:0}원";
+    }
+}

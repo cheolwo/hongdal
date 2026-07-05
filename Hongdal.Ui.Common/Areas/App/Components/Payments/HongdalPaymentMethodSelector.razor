@@ -1,0 +1,133 @@
+<MudStack Spacing="2">
+    <MudSelect T="string"
+               Label="@PaymentMethodLabel"
+               Value="@PaymentMethod"
+               ValueChanged="OnPaymentMethodChangedAsync"
+               Variant="Variant.Outlined"
+               Dense="true"
+               Disabled="@Disabled">
+        @foreach (var option in PaymentMethodOptions)
+        {
+            <MudSelectItem T="string" Value="@option.Value">@option.Label</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect T="string"
+               Label="@SettlementModeLabel"
+               Value="@SettlementMode"
+               ValueChanged="OnSettlementModeChangedAsync"
+               Variant="Variant.Outlined"
+               Dense="true"
+               Disabled="@Disabled">
+        @foreach (var option in SettlementModeOptions)
+        {
+            <MudSelectItem T="string" Value="@option.Value">@option.Label</MudSelectItem>
+        }
+    </MudSelect>
+</MudStack>
+
+@code {
+    [Parameter]
+    public string PaymentMethod { get; set; } = PaymentMethodCode.TossCard;
+
+    [Parameter]
+    public EventCallback<string> PaymentMethodChanged { get; set; }
+
+    [Parameter]
+    public string SettlementMode { get; set; } = SettlementModeCode.Prepaid;
+
+    [Parameter]
+    public EventCallback<string> SettlementModeChanged { get; set; }
+
+    [Parameter]
+    public bool AllowMonthlySettlement { get; set; } = true;
+
+    [Parameter]
+    public bool AllowSubscription { get; set; } = true;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string PaymentMethodLabel { get; set; } = "\uACB0\uC81C\uC218\uB2E8";
+
+    [Parameter]
+    public string SettlementModeLabel { get; set; } = "\uC815\uC0B0\uBC29\uC2DD";
+
+    private IEnumerable<OptionItem> PaymentMethodOptions
+    {
+        get
+        {
+            yield return new(PaymentMethodCode.TossCard, "\uCE74\uB4DC");
+            yield return new(PaymentMethodCode.TossTransfer, "\uACC4\uC88C\uC774\uCCB4");
+            yield return new(PaymentMethodCode.TossVirtualAccount, "\uAC00\uC0C1\uACC4\uC88C");
+
+            if (AllowSubscription)
+            {
+                yield return new(PaymentMethodCode.TossBilling, "\uC790\uB3D9\uACB0\uC81C(\uBE4C\uB9C1)");
+            }
+
+            if (AllowMonthlySettlement)
+            {
+                yield return new(PaymentMethodCode.MonthlySettlement, "\uC6D4\uC815\uC0B0");
+            }
+        }
+    }
+
+    private IEnumerable<OptionItem> SettlementModeOptions
+    {
+        get
+        {
+            yield return new(SettlementModeCode.Prepaid, "\uC120\uACB0\uC81C");
+            yield return new(SettlementModeCode.PayOnCompletion, "\uC644\uB8CC \uD6C4 \uACB0\uC81C");
+
+            if (AllowMonthlySettlement)
+            {
+                yield return new(SettlementModeCode.MonthlyInvoice, "\uC6D4\uB9D0 \uCCAD\uAD6C");
+            }
+
+            if (AllowSubscription)
+            {
+                yield return new(SettlementModeCode.Subscription, "\uAD6C\uB3C5");
+            }
+        }
+    }
+
+    private async Task OnPaymentMethodChangedAsync(string value)
+    {
+        PaymentMethod = value;
+
+        if (value == PaymentMethodCode.TossBilling)
+        {
+            SettlementMode = SettlementModeCode.Subscription;
+            await SettlementModeChanged.InvokeAsync(SettlementMode);
+        }
+        else if (value == PaymentMethodCode.MonthlySettlement)
+        {
+            SettlementMode = SettlementModeCode.MonthlyInvoice;
+            await SettlementModeChanged.InvokeAsync(SettlementMode);
+        }
+
+        await PaymentMethodChanged.InvokeAsync(value);
+    }
+
+    private async Task OnSettlementModeChangedAsync(string value)
+    {
+        SettlementMode = value;
+
+        if (value == SettlementModeCode.Subscription && PaymentMethod != PaymentMethodCode.TossBilling)
+        {
+            PaymentMethod = PaymentMethodCode.TossBilling;
+            await PaymentMethodChanged.InvokeAsync(PaymentMethod);
+        }
+        else if (value == SettlementModeCode.MonthlyInvoice && PaymentMethod == PaymentMethodCode.TossBilling)
+        {
+            PaymentMethod = PaymentMethodCode.MonthlySettlement;
+            await PaymentMethodChanged.InvokeAsync(PaymentMethod);
+        }
+
+        await SettlementModeChanged.InvokeAsync(value);
+    }
+
+    private sealed record OptionItem(string Value, string Label);
+}

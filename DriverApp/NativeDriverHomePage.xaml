@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:DriverApp.Controls"
+             x:Class="DriverApp.NativeDriverHomePage"
+             BackgroundColor="#f7f8fa"
+             Title="홍달 용달기사">
+    <Grid RowDefinitions="*,Auto">
+        <controls:DriverNativeMapView x:Name="MapView"
+                                      Grid.RowSpan="2" />
+
+        <Border Grid.Row="0"
+                Margin="16"
+                Padding="14"
+                VerticalOptions="Start"
+                BackgroundColor="#fdfdfd"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="4">
+                <Label x:Name="TitleLabel"
+                       Text="운행 지역"
+                       FontAttributes="Bold"
+                       FontSize="16"
+                       TextColor="#202124" />
+                <Label x:Name="StatusLabel"
+                       FontSize="13"
+                       TextColor="#5f6368"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Border>
+
+        <Border Grid.Row="1"
+                Margin="16"
+                Padding="14"
+                BackgroundColor="#ffffff"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="4">
+                    <Label x:Name="SelectedRequestLabel"
+                           Text="추천 운송을 선택해 주세요."
+                           FontAttributes="Bold"
+                           FontSize="15"
+                           TextColor="#202124" />
+                    <Label x:Name="SelectedRequestSummaryLabel"
+                           Text="지도 위의 운송 의뢰 마커를 누르면 상세 요약이 표시됩니다."
+                           FontSize="13"
+                           TextColor="#5f6368"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+                <Button Grid.Column="1"
+                        Text="목록"
+                        Clicked="OnOpenLegacyMenuClicked" />
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

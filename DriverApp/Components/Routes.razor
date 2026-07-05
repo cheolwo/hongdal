@@ -1,0 +1,10 @@
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
+    <Found Context="routeData">
+        <DriverRouteView RouteData="routeData" />
+    </Found>
+</Router>

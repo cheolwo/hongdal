@@ -1,0 +1,43 @@
+@page "/food/mart"
+
+<PageTitle>홈달마트 주문</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">홈달마트 주문</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                창고 재고 기반 장보기 주문입니다. 피킹, 포장 완료, 배달 기사 픽업 순서로 진행됩니다.
+            </MudText>
+        </MudStack>
+
+        <MudGrid>
+            @foreach (var item in MartItems)
+            {
+                <MudItem xs="12" sm="6" lg="3">
+                    <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                        <MudStack Spacing="2">
+                            <MudChip T="string" Size="Size.Small" Color="@item.Color">@item.Zone</MudChip>
+                            <MudText Typo="Typo.h6">@item.Name</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@item.Description</MudText>
+                            <MudText Typo="Typo.subtitle1">@item.Price</MudText>
+                            <MudButton Variant="Variant.Filled" Color="@item.Color" StartIcon="@Icons.Material.Filled.AddShoppingCart">담기</MudButton>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private static readonly IReadOnlyList<MartItem> MartItems =
+    [
+        new("냉장", "샐러드 세트", "피킹 후 냉장 포장", "8,900원", Color.Info),
+        new("상온", "생수 6입", "묶음 포장 가능", "4,200원", Color.Primary),
+        new("즉시", "간편식 2종", "30분 내 배달 픽업 가능", "12,500원", Color.Success),
+        new("생활", "휴지 12롤", "부피 상품 별도 포장", "9,800원", Color.Warning)
+    ];
+
+    private sealed record MartItem(string Zone, string Name, string Description, string Price, Color Color);
+}

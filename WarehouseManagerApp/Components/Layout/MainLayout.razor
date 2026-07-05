@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+
+<MudLayout>
+    <MudAppBar Elevation="0" Dense="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <MudText Typo="Typo.subtitle1" Class="ml-2">Warehouse Manager</MudText>
+        <MudSpacer />
+        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">현장 앱</MudChip>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="drawerOpen" Elevation="1" Variant="@DrawerVariant.Responsive" ClipMode="DrawerClipMode.Always">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent>
+        <div class="warehouse-layout-content">
+            @Body
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool drawerOpen = true;
+
+    private void ToggleDrawer()
+    {
+        drawerOpen = !drawerOpen;
+    }
+}

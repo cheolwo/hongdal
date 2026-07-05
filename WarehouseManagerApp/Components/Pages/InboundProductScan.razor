@@ -1,0 +1,242 @@
+@page "/work/inbound/products"
+@inject NavigationManager Navigation
+@inject IInboundReceivingWorkflowService ReceivingWorkflow
+
+<PageTitle>입고 상품 확인</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">입고 상품 확인</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                상품 바코드를 입력하면 입고 예정 상품을 조회하고, 이 입고가 누구와 직접 연결되는지 먼저 확인합니다.
+            </MudText>
+        </MudStack>
+
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudStack Spacing="3">
+                <MudTextField T="string"
+                              Label="상품 바코드"
+                              Value="@productBarcode"
+                              ValueChanged="OnBarcodeChanged"
+                              Variant="Variant.Outlined"
+                              Immediate="true"
+                              AutoFocus="true"
+                              Placeholder="SKU:MILK-001"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                              OnKeyDown="OnKeyDownAsync" />
+
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               Disabled="@string.IsNullOrWhiteSpace(productBarcode)"
+                               OnClick="LookupAsync">
+                        입고 예정 조회
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Backspace"
+                               OnClick="Clear">
+                        다시 입력
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        @if (selectedProduct is not null)
+        {
+            <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">@selectedProduct.Name</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@selectedProduct.InboundRequestNo / @selectedProduct.Supplier</MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="@QuantityColor" Variant="Variant.Filled">@QuantityStatus</MudChip>
+                    </MudStack>
+
+                    <HongdalSensitiveDisclosureList Title="입고 관계와 상세"
+                                                    Summary="@($"{selectedProduct.Name} / 예정 {selectedProduct.ExpectedQuantity}개")"
+                                                    RelatedParties="@BuildInboundRelatedParties(selectedProduct)"
+                                                    PrivacyHint="입고 담당자가 후속 확인이 필요한 상대를 먼저 인지하도록 구성합니다."
+                                                    Icon="@Icons.Material.Filled.MoveToInbox"
+                                                    Color="@QuantityColor">
+                        <MudExpansionPanel Text="입고 정보" Icon="@Icons.Material.Filled.Inventory2">
+                            <HongdalSensitiveInfoRow Label="입고 번호" Value="@selectedProduct.InboundRequestNo" />
+                            <HongdalSensitiveInfoRow Label="상품 바코드" Value="@selectedProduct.Barcode" />
+                            <HongdalSensitiveInfoRow Label="상품명" Value="@selectedProduct.Name" />
+                            <HongdalSensitiveInfoRow Label="공급사" Value="@selectedProduct.Supplier" />
+                        </MudExpansionPanel>
+                        <MudExpansionPanel Text="수량과 보관" Icon="@Icons.Material.Filled.FactCheck">
+                            <HongdalSensitiveInfoRow Label="예정 수량" Value="@selectedProduct.ExpectedQuantity.ToString()" />
+                            <HongdalSensitiveInfoRow Label="실제 입고 수량" Value="@receivedQuantity.ToString()" />
+                            <HongdalSensitiveInfoRow Label="보관 조건" Value="@selectedProduct.StorageType" />
+                            <HongdalSensitiveInfoRow Label="수량 상태" Value="@QuantityStatus" />
+                        </MudExpansionPanel>
+                        <MudExpansionPanel Text="후속 연결" Icon="@Icons.Material.Filled.ConnectWithoutContact">
+                            <HongdalSensitiveInfoRow Label="다음 공정" Value="입고 확인 후 검수 작업으로 이동" />
+                            <HongdalSensitiveInfoRow Label="문의 가능 대상" Value="@BuildInboundContactContext(selectedProduct)" />
+                            <HongdalSensitiveInfoRow Label="관계 기록" Value="입고 확인 완료 시 공급사, 화주, 검수 담당자와의 업무 관계 스냅샷 후보가 됩니다." />
+                        </MudExpansionPanel>
+                    </HongdalSensitiveDisclosureList>
+
+                    <MudNumericField T="int"
+                                     Label="실제 입고 수량"
+                                     @bind-Value="receivedQuantity"
+                                     Min="0"
+                                     Variant="Variant.Outlined" />
+
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        수량이 맞으면 입고 확인 상태로 변경하고 검수 작업으로 이동합니다. 차이가 있으면 차이 상태를 남긴 뒤 검수에서 사유를 확인합니다.
+                    </MudText>
+
+                    <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Inventory"
+                                   OnClick="ConfirmInboundAsync">
+                            입고 확인 상태로 변경
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.FactCheck"
+                                   Disabled="@(!isInboundConfirmed)"
+                                   OnClick="@(() => Navigation.NavigateTo(WarehouseManagerRoutes.InboundInspection))">
+                            검수 작업으로 이동
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudText Typo="Typo.subtitle1">샘플 상품 바코드</MudText>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="mt-2">
+                @foreach (var item in expectedProducts)
+                {
+                    <MudButton Size="Size.Small"
+                               Variant="Variant.Outlined"
+                               Color="Color.Default"
+                               OnClick="@(() => SelectSampleAsync(item.Barcode))">
+                        @item.Barcode
+                    </MudButton>
+                }
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private IReadOnlyList<InboundExpectedProductDto> expectedProducts = [];
+    private string productBarcode = string.Empty;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+    private InboundExpectedProductDto? selectedProduct;
+    private int receivedQuantity;
+    private bool isInboundConfirmed;
+
+    private Color QuantityColor => selectedProduct is null
+        ? Color.Default
+        : receivedQuantity == selectedProduct.ExpectedQuantity
+            ? Color.Success
+            : Color.Warning;
+
+    private string QuantityStatus => selectedProduct is null
+        ? "대기"
+        : receivedQuantity == selectedProduct.ExpectedQuantity
+            ? "수량 일치"
+            : "수량 차이";
+
+    protected override async Task OnInitializedAsync()
+    {
+        expectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
+    }
+
+    private Task OnBarcodeChanged(string value)
+    {
+        productBarcode = (value ?? string.Empty).Trim();
+        message = null;
+        isInboundConfirmed = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "NumpadEnter")
+        {
+            await LookupAsync();
+        }
+    }
+
+    private async Task LookupAsync()
+    {
+        selectedProduct = await ReceivingWorkflow.FindExpectedProductAsync(productBarcode);
+        isInboundConfirmed = false;
+
+        if (selectedProduct is null)
+        {
+            receivedQuantity = 0;
+            messageSeverity = Severity.Warning;
+            message = "입고 예정 상품에서 찾지 못했습니다. 입고 예정 목록 또는 상품 바코드를 확인해 주세요.";
+            return;
+        }
+
+        receivedQuantity = selectedProduct.ExpectedQuantity;
+        messageSeverity = Severity.Success;
+        message = $"{selectedProduct.Name} 입고 예정 정보를 불러왔습니다.";
+    }
+
+    private async Task ConfirmInboundAsync()
+    {
+        if (selectedProduct is null)
+        {
+            messageSeverity = Severity.Warning;
+            message = "먼저 상품 바코드로 입고 예정 상품을 조회해 주세요.";
+            return;
+        }
+
+        try
+        {
+            var result = await ReceivingWorkflow.ConfirmReceivedAsync(new InboundReceivingConfirmationRequest(
+                selectedProduct.Barcode,
+                receivedQuantity));
+
+            isInboundConfirmed = true;
+            messageSeverity = result.QuantityMatched ? Severity.Success : Severity.Warning;
+            message = result.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+        }
+    }
+
+    private async Task SelectSampleAsync(string barcode)
+    {
+        productBarcode = barcode;
+        await LookupAsync();
+    }
+
+    private void Clear()
+    {
+        productBarcode = string.Empty;
+        selectedProduct = null;
+        receivedQuantity = 0;
+        isInboundConfirmed = false;
+        message = null;
+    }
+
+    private static string BuildInboundRelatedParties(InboundExpectedProductDto product)
+        => $"입고 담당자 · 공급사 {product.Supplier} · 화주 재고 담당자 · 검수 담당자";
+
+    private static string BuildInboundContactContext(InboundExpectedProductDto product)
+        => $"{product.Supplier}, 화주 재고 담당자, 검수 담당자";
+}

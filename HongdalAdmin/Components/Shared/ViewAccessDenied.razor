@@ -1,0 +1,11 @@
+<PageTitle>접근 제한</PageTitle>
+
+<div class="alert alert-warning">
+    <h4>숨겨진 화면입니다.</h4>
+    <p>"@ViewName" 화면은 현재 사용자 설정 또는 관리자 정책에 따라 표시되지 않습니다.</p>
+    <a class="btn btn-primary" href="/view-policies">화면 정책으로 이동</a>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string ViewName { get; set; } = string.Empty;
+}

@@ -1,0 +1,133 @@
+@page "/drivers"
+@inject I백오피스Service DataService
+
+<PageTitle>09. 기사 관리</PageTitle>
+
+<h1>09. 기사 관리</h1>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-3"><input class="form-control" @bind="statusFilter" placeholder="운행상태" /></div>
+    <div class="col-md-3"><input class="form-control" @bind="areaFilter" placeholder="활동지역" /></div>
+    <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">조회</button></div>
+</div>
+
+@if (isLoading)
+{
+    <p>기사 목록을 불러오는 중입니다...</p>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <table class="table table-striped table-hover">
+                <thead><tr><th>기사</th><th>운행상태</th><th>차량</th><th>활동지역</th><th>배차건수</th></tr></thead>
+                <tbody>
+                    @foreach (var item in drivers)
+                    {
+                        <tr style="cursor:pointer" @onclick="() => SelectDriverAsync(item.기사Id)">
+                            <td>@item.기사명</td>
+                            <td>@item.운행상태</td>
+                            <td>@item.차량</td>
+                            <td>@item.주_활동지역</td>
+                            <td>@item.배차건수</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-5">
+            @if (selectedDriver is null)
+            {
+                <p class="text-muted">기사를 선택하면 상세 정보와 배차 내역이 표시됩니다.</p>
+            }
+            else
+            {
+                <div class="card mb-3"><div class="card-body">
+                    <h5 class="card-title">@selectedDriver.기사명</h5>
+                    <div>기사ID: @selectedDriver.기사Id</div>
+                    <div>연락처: @selectedDriver.연락처</div>
+                    <div>차량: @selectedDriver.차량</div>
+                    <div>활동지역: @selectedDriver.주_활동지역</div>
+                    <div>운행상태: @selectedDriver.운행상태</div>
+                    <div>최근 위치: @FormatCoord(selectedDriver.최근위도, selectedDriver.최근경도)</div>
+                    <div>최근 위치 시각: @FormatDateTime(selectedDriver.최근위치기록시각)</div>
+                </div></div>
+
+                <div class="card"><div class="card-body">
+                    <h6 class="card-title">배차 내역</h6>
+                    @if (dispatches.Count == 0)
+                    {
+                        <p class="mb-0 text-muted">배차 내역이 없습니다.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var d in dispatches)
+                            {
+                                <li class="list-group-item px-0">
+                                    <div><strong>@d.배차명</strong> (@d.상태)</div>
+                                    <div class="small text-muted">@d.픽업지 → @d.배송지</div>
+                                    <div class="small text-muted">배차일: @FormatDateTime(d.배차일)</div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div></div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string? statusFilter;
+    private string? areaFilter;
+    private IReadOnlyList<기사목록응답> drivers = [];
+    private 기사상세응답? selectedDriver;
+    private IReadOnlyList<기사배차내역응답> dispatches = [];
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            drivers = await DataService.기사목록조회Async(statusFilter, areaFilter);
+            selectedDriver = null;
+            dispatches = [];
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"기사 목록 조회 실패: {ex.Message}";
+            drivers = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SelectDriverAsync(string driverId)
+    {
+        try
+        {
+            selectedDriver = await DataService.기사상세조회Async(driverId);
+            dispatches = await DataService.기사배차내역조회Async(driverId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"기사 상세 조회 실패: {ex.Message}";
+        }
+    }
+
+    private static string FormatCoord(decimal? lat, decimal? lng) => lat.HasValue && lng.HasValue ? $"{lat.Value}, {lng.Value}" : "-";
+    private static string FormatDateTime(DateTime? value) => value.HasValue ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-";
+}

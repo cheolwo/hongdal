@@ -1,0 +1,53 @@
+@page "/dashboard"
+@inject I백오피스Service DataService
+
+<PageTitle>01. 업무 안내판</PageTitle>
+
+<h1>01. 업무 안내판</h1>
+
+<button class="btn btn-primary mb-3" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+
+@if (isLoading)
+{
+    <p>집계 데이터를 불러오는 중입니다...</p>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var item in cards)
+        {
+            <div class="col-md-4 col-xl-2">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">@item.Title</div>
+                        <div class="fs-3 fw-bold">@item.Value</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private 관리자대시보드요약응답 summary = new();
+    private IReadOnlyList<(string Title, int Value)> cards = [];
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        summary = await DataService.대시보드조회Async();
+        cards =
+        [
+            ("오늘 의뢰", summary.오늘의뢰수),
+            ("결제 대기", summary.결제대기수),
+            ("결제 완료", summary.결제완료수),
+            ("배차 대기", summary.배차대기수),
+            ("운송 중", summary.운송중수),
+            ("완료", summary.완료수)
+        ];
+        isLoading = false;
+    }
+}

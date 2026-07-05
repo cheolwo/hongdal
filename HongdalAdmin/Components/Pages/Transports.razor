@@ -1,0 +1,47 @@
+@page "/transports"
+@inject I백오피스Service DataService
+
+<PageTitle>06. 운송 진행</PageTitle>
+
+<h1>06. 운송 진행</h1>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-3"><input class="form-control" @bind="statusFilter" placeholder="운송상태" /></div>
+    <div class="col-md-3"><input class="form-control" @bind="eventRequestFilter" placeholder="이벤트 의뢰ID" /></div>
+    <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync">조회</button></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <h5>운송 목록</h5>
+        <table class="table table-striped"><thead><tr><th>번호</th><th>상태</th><th>기사</th><th>출발</th><th>도착</th><th>운임</th></tr></thead><tbody>
+        @foreach (var item in transports)
+        {
+            <tr><td>@item.운송번호</td><td>@item.상태</td><td>@item.기사_운송자</td><td>@item.출발지</td><td>@item.도착지</td><td>@(item.운임?.ToString("N0") ?? "-")</td></tr>
+        }
+        </tbody></table>
+    </div>
+    <div class="col-lg-5">
+        <h5>이벤트 로그</h5>
+        <table class="table table-sm table-striped"><thead><tr><th>의뢰ID</th><th>이벤트</th><th>시각</th></tr></thead><tbody>
+        @foreach (var item in events)
+        {
+            <tr><td>@item.의뢰Id</td><td>@item.이벤트타입</td><td>@item.이벤트시각.ToLocalTime().ToString("MM-dd HH:mm")</td></tr>
+        }
+        </tbody></table>
+    </div>
+</div>
+
+@code {
+    private string? statusFilter;
+    private string? eventRequestFilter;
+    private IReadOnlyList<운송진행응답> transports = [];
+    private IReadOnlyList<운송이벤트로그응답> events = [];
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync()
+    {
+        transports = await DataService.운송진행목록조회Async(statusFilter);
+        events = await DataService.운송이벤트조회Async(eventRequestFilter);
+    }
+}

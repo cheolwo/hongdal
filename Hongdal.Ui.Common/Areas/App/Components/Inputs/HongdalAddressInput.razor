@@ -1,0 +1,104 @@
+@using Hongdal.Ui.Common.Areas.App.Models
+
+<MudStack Spacing="1">
+    <MudTextField T="string"
+                  Label="우편번호"
+                  Value="@Value.우편번호"
+                  ReadOnly="true"
+                  Variant="Variant.Outlined"
+                  Adornment="Adornment.End"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  OnAdornmentClick="주소검색열기Async" />
+
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Primary"
+               OnClick="주소검색열기Async"
+               StartIcon="@Icons.Material.Filled.LocationSearching">
+        주소 검색
+    </MudButton>
+
+    <MudTextField T="string"
+                  Label="기본주소"
+                  Value="@Value.기본주소"
+                  ReadOnly="true"
+                  Variant="Variant.Outlined" />
+
+    <MudTextField T="string"
+                  Label="상세주소"
+                  Value="@Value.상세주소"
+                  Immediate="true"
+                  Variant="Variant.Outlined"
+                  Placeholder="상세주소를 입력하세요"
+                  ValueChanged="상세주소변경Async" />
+
+    @if (!string.IsNullOrWhiteSpace(Value.건물명))
+    {
+        <MudText Typo="Typo.body2" Color="Color.Secondary">건물명: @Value.건물명</MudText>
+    }
+</MudStack>
+
+@code {
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
+    [Parameter]
+    public 주소입력값Dto Value { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<주소입력값Dto> ValueChanged { get; set; }
+
+    [Parameter]
+    public string JsInteropFunctionName { get; set; } = "hongdalAddress.openKakaoPostcode";
+
+    private async Task 주소검색열기Async()
+    {
+        var result = await JS.InvokeAsync<주소검색결과확장Dto?>(JsInteropFunctionName);
+        if (result is null)
+        {
+            return;
+        }
+
+        Value.우편번호 = result.Zonecode;
+        Value.도로명주소 = result.RoadAddress;
+        Value.지번주소 = result.JibunAddress;
+        Value.기본주소 = string.IsNullOrWhiteSpace(result.RoadAddress) ? result.Address : result.RoadAddress;
+
+        Value.시도 = result.Sido;
+        Value.시군구 = result.Sigungu;
+        Value.시군구코드 = result.SigunguCode;
+        Value.법정동코드 = result.Bcode;
+        Value.법정동명 = result.Bname;
+        Value.행정동명 = result.Hname;
+
+        Value.건물관리번호 = result.BuildingCode;
+        Value.건물명 = result.BuildingName;
+        Value.주소검색원본Json = result.RawJson;
+
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task 상세주소변경Async(string 상세주소)
+    {
+        Value.상세주소 = 상세주소;
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private sealed class 주소검색결과확장Dto
+    {
+        public string Zonecode { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string RoadAddress { get; set; } = string.Empty;
+        public string JibunAddress { get; set; } = string.Empty;
+
+        public string Sido { get; set; } = string.Empty;
+        public string Sigungu { get; set; } = string.Empty;
+        public string SigunguCode { get; set; } = string.Empty;
+        public string Bcode { get; set; } = string.Empty;
+        public string Bname { get; set; } = string.Empty;
+        public string Hname { get; set; } = string.Empty;
+
+        public string BuildingCode { get; set; } = string.Empty;
+        public string BuildingName { get; set; } = string.Empty;
+        public string RawJson { get; set; } = string.Empty;
+    }
+}

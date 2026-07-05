@@ -1,0 +1,39 @@
+﻿@page "/driver/notifications"
+@inject IDriverSampleDataService Samples
+
+<PageTitle>알림함</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">알림함</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">배차추천, 운행, 정산 알림을 샘플 목록으로 확인한다.</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudStack Spacing="2">
+            @foreach (var item in Samples.알림목록.OrderByDescending(x => x.발생시각))
+            {
+                <MudPaper Class="pa-3" Elevation="1" Outlined="true">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.subtitle1">@item.제목</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@item.내용</MudText>
+                            <MudText Typo="Typo.caption">@item.발생시각.ToString("MM-dd HH:mm")</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1">
+                            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@item.종류</MudChip>
+                            <MudChip T="string" Color="@(item.읽음 ? Color.Default : Color.Warning)" Variant="Variant.Filled">@(item.읽음 ? "읽음" : "안읽음")</MudChip>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            }
+        </MudStack>
+
+        <MudStack Row="true" Spacing="2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/notifications/settings">알림 설정</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/home">기사 홈으로</MudButton>
+        </MudStack>
+    </MudStack>
+</MudContainer>

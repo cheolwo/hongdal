@@ -1,0 +1,9 @@
+using ShipperApp.Services.Application;
+
+namespace ShipperApp.Services.Warehouse.Reconsignment.Events;
+
+public sealed record ReconsignmentOrderCreatedEvent(
+    string TransportRequestId,
+    long InventoryItemId,
+    int RequestedQuantity,
+    DateTime OccurredAt) : IAppEvent;

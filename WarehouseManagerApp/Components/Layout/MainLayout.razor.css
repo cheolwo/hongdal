@@ -1,0 +1,12 @@
+.warehouse-layout-content {
+    min-height: 100vh;
+    background: #f7f8fa;
+}
+
+::deep .mud-appbar {
+    border-bottom: 1px solid var(--mud-palette-divider);
+}
+
+::deep .mud-main-content {
+    background: #f7f8fa;
+}

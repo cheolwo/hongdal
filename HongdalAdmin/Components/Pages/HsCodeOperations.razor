@@ -1,0 +1,514 @@
+@page "/customs/hs-codes"
+@rendermode InteractiveServer
+@using Hongdal.Contracts.Admin.Customs
+@inject HsCodeOperationsService HsCodeOperationsService
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>HS 코드 운영</PageTitle>
+
+<h1>HS 코드 운영</h1>
+
+<div class="alert alert-info">
+    자동 분류된 HS 코드의 업무 분류와 주의 태그를 운영자와 관세사가 보정합니다. 보정 결과는 화주 조회 화면과 통관 검토 흐름의 기준 데이터로 사용됩니다.
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-lg-3">
+                <label class="form-label">검색</label>
+                <input class="form-control" @bind="searchQuery" placeholder="HS 코드, 한글명, 영문명" />
+            </div>
+            <div class="col-lg-2">
+                <label class="form-label">업무 분류</label>
+                <select class="form-select" @bind="selectedBusinessCategory">
+                    <option value="">전체</option>
+                    @foreach (var option in BusinessCategoryOptions)
+                    {
+                        <option value="@option.Value">@option.Label</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <label class="form-label">주의 태그</label>
+                <select class="form-select" @bind="selectedTagType">
+                    <option value="">전체</option>
+                    @foreach (var option in RiskTagOptions)
+                    {
+                        <option value="@option.Value">@option.Label</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <label class="form-label">페이지 크기</label>
+                <select class="form-select" @bind="pageSize">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="includeInactive" @bind="includeInactive" />
+                    <label class="form-check-label" for="includeInactive">비활성 포함</label>
+                </div>
+                <button type="button" class="btn btn-primary w-100" @onclick="SearchAsync" disabled="@isLoading">조회</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert @messageClass">@message</div>
+}
+
+@if (isLoading)
+{
+    <p>HS 코드 운영 데이터를 불러오는 중입니다...</p>
+}
+else
+{
+    <div class="row g-3">
+        <div class="col-xl-7">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="text-muted">총 @result.TotalCount 건</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="PreviousPageAsync" disabled="@(page <= 1)">이전</button>
+                            <span class="text-muted small">페이지 @(page)</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="NextPageAsync" disabled="@IsLastPage">다음</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>HS 코드</th>
+                                    <th>품목명</th>
+                                    <th>분류</th>
+                                    <th>주의 태그</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in result.Items)
+                                {
+                                    <tr class="@(selectedEntry?.Id == item.Id ? "table-primary" : string.Empty)">
+                                        <td>
+                                            <div class="fw-semibold">@item.Code</div>
+                                            <div class="small text-muted">@item.NormalizedCode</div>
+                                        </td>
+                                        <td>
+                                            <div>@item.KoreanName</div>
+                                            <div class="small text-muted">@item.EnglishName</div>
+                                        </td>
+                                        <td><span class="badge text-bg-secondary">@item.BusinessCategoryLabel</span></td>
+                                        <td>
+                                            @foreach (var tag in item.RiskTags.Where(x => x.IsActive).Take(3))
+                                            {
+                                                <span class="badge text-bg-info me-1">@tag.Label</span>
+                                            }
+                                            @if (item.RiskTags.Count(x => x.IsActive) > 3)
+                                            {
+                                                <span class="badge text-bg-light">+@(item.RiskTags.Count(x => x.IsActive) - 3)</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="() => SelectEntry(item)">보정</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-5">
+            <div class="card h-100">
+                <div class="card-body">
+                    @if (selectedEntry is null)
+                    {
+                        <h5 class="card-title">보정 대상</h5>
+                        <p class="text-muted mb-0">왼쪽 목록에서 HS 코드를 선택하면 업무 분류와 주의 태그를 보정할 수 있습니다.</p>
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">@selectedEntry.Code</h5>
+                                <div class="text-muted">@selectedEntry.KoreanName</div>
+                            </div>
+                            <span class="badge @(selectedEntry.IsActive ? "text-bg-success" : "text-bg-secondary")">@(selectedEntry.IsActive ? "활성" : "비활성")</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6>업무 분류 보정</h6>
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <label class="form-label">업무 분류</label>
+                                    <select class="form-select" @bind="editBusinessCategory">
+                                        @foreach (var option in BusinessCategoryOptions)
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="form-label">보정 사유</label>
+                                    <input class="form-control" @bind="editBusinessCategoryReason" />
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm mt-2" @onclick="SaveBusinessCategoryAsync" disabled="@isSaving">분류 저장</button>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">주의 태그</h6>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="ResetTagForm">새 태그</button>
+                            </div>
+                            <div class="table-responsive mt-2">
+                                <table class="table table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>태그</th>
+                                            <th>출처</th>
+                                            <th>상태</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var tag in selectedEntry.RiskTags)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div>@tag.Label</div>
+                                                    <div class="small text-muted">@tag.Reason</div>
+                                                </td>
+                                                <td>@tag.SourceLabel</td>
+                                                <td>
+                                                    <span class="badge @(tag.IsActive ? "text-bg-info" : "text-bg-light")">@(tag.IsActive ? "사용" : "숨김")</span>
+                                                </td>
+                                                <td class="text-nowrap">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" @onclick="() => EditTag(tag)">수정</button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleTagAsync(tag)" disabled="@isSaving">
+                                                        @(tag.IsActive ? "숨김" : "사용")
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6>@(editingTagId is null ? "주의 태그 추가" : "주의 태그 수정")</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">태그 유형</label>
+                                    <select class="form-select" @bind="editTagType">
+                                        @foreach (var option in RiskTagOptions)
+                                        {
+                                            <option value="@option.Value">@option.Label</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">화면 표시명</label>
+                                    <input class="form-control" @bind="editTagLabel" />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">보정 사유</label>
+                                    <textarea class="form-control" rows="3" @bind="editTagReason"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="editTagActive" @bind="editTagIsActive" />
+                                        <label class="form-check-label" for="editTagActive">활성 태그로 사용</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm mt-2" @onclick="SaveTagAsync" disabled="@isSaving">태그 저장</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly IReadOnlyList<OptionItem> BusinessCategoryOptions =
+    [
+        new(0, "미분류"),
+        new(10, "식품 관련"),
+        new(20, "일반 화물"),
+        new(30, "복합")
+    ];
+
+    private static readonly IReadOnlyList<OptionItem> RiskTagOptions =
+    [
+        new(10, "식품 관련"),
+        new(20, "검역/식품신고 확인"),
+        new(30, "조제식품/보충제 검토"),
+        new(40, "섬유/의류"),
+        new(50, "화학물질 확인"),
+        new(60, "전기/인증 확인"),
+        new(70, "배터리 포함 가능"),
+        new(80, "가구/생활용품"),
+        new(900, "관세사 검토 권장")
+    ];
+
+    private AdminHsCodeListResponse result = new();
+    private AdminHsCodeEntryResponse? selectedEntry;
+    private string? searchQuery;
+    private string selectedBusinessCategory = string.Empty;
+    private string selectedTagType = string.Empty;
+    private bool includeInactive;
+    private int page = 1;
+    private int pageSize = 50;
+    private bool isLoading = true;
+    private bool isSaving;
+    private string? message;
+    private string messageClass = "alert-success";
+
+    private int editBusinessCategory = 20;
+    private string editBusinessCategoryReason = string.Empty;
+    private long? editingTagId;
+    private int editTagType = 900;
+    private string editTagLabel = string.Empty;
+    private string editTagReason = string.Empty;
+    private bool editTagIsActive = true;
+
+    private bool IsLastPage => result.TotalCount <= page * pageSize;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!관리자인증세션Service.HsCode운영자인가)
+        {
+            NavigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString("/customs/hs-codes")}");
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task SearchAsync()
+    {
+        page = 1;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        message = null;
+
+        try
+        {
+            result = await HsCodeOperationsService.SearchAsync(
+                searchQuery,
+                selectedBusinessCategory,
+                selectedTagType,
+                includeInactive,
+                page,
+                pageSize);
+
+            if (selectedEntry is not null)
+            {
+                selectedEntry = result.Items.FirstOrDefault(x => x.Id == selectedEntry.Id) ?? selectedEntry;
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"HS 코드 조회 실패: {ex.Message}");
+            result = new AdminHsCodeListResponse();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SelectEntry(AdminHsCodeEntryResponse item)
+    {
+        selectedEntry = item;
+        editBusinessCategory = item.BusinessCategory;
+        editBusinessCategoryReason = item.BusinessCategoryReason;
+        ResetTagForm();
+    }
+
+    private async Task SaveBusinessCategoryAsync()
+    {
+        if (selectedEntry is null)
+        {
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            var updated = await HsCodeOperationsService.UpdateBusinessCategoryAsync(
+                selectedEntry.Id,
+                new AdminHsCodeBusinessCategoryUpdateRequest
+                {
+                    BusinessCategory = editBusinessCategory,
+                    Reason = editBusinessCategoryReason
+                });
+
+            ApplyUpdatedEntry(updated);
+            ShowSuccess("HS 코드 업무 분류를 저장했습니다.");
+        }
+        catch (Exception ex)
+        {
+            ShowError($"업무 분류 저장 실패: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task SaveTagAsync()
+    {
+        if (selectedEntry is null)
+        {
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            var payload = new AdminHsCodeRiskTagUpdateRequest
+            {
+                TagType = editTagType,
+                Label = editTagLabel,
+                Reason = editTagReason,
+                IsActive = editTagIsActive
+            };
+
+            var updated = editingTagId is long tagId
+                ? await HsCodeOperationsService.UpdateRiskTagAsync(tagId, payload)
+                : await HsCodeOperationsService.SaveRiskTagAsync(selectedEntry.Id, payload);
+
+            ApplyUpdatedEntry(updated);
+            ResetTagForm();
+            ShowSuccess("HS 코드 주의 태그를 저장했습니다.");
+        }
+        catch (Exception ex)
+        {
+            ShowError($"주의 태그 저장 실패: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task ToggleTagAsync(AdminHsCodeRiskTagResponse tag)
+    {
+        isSaving = true;
+        try
+        {
+            var updated = await HsCodeOperationsService.UpdateRiskTagAsync(
+                tag.Id,
+                new AdminHsCodeRiskTagUpdateRequest
+                {
+                    TagType = tag.TagType,
+                    Label = tag.Label,
+                    Reason = tag.Reason,
+                    IsActive = !tag.IsActive
+                });
+
+            ApplyUpdatedEntry(updated);
+            ShowSuccess(tag.IsActive ? "주의 태그를 숨김 처리했습니다." : "주의 태그를 다시 사용 처리했습니다.");
+        }
+        catch (Exception ex)
+        {
+            ShowError($"주의 태그 상태 변경 실패: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void EditTag(AdminHsCodeRiskTagResponse tag)
+    {
+        editingTagId = tag.Id;
+        editTagType = tag.TagType;
+        editTagLabel = tag.Label;
+        editTagReason = tag.Reason;
+        editTagIsActive = tag.IsActive;
+    }
+
+    private void ResetTagForm()
+    {
+        editingTagId = null;
+        editTagType = 900;
+        editTagLabel = string.Empty;
+        editTagReason = string.Empty;
+        editTagIsActive = true;
+    }
+
+    private async Task PreviousPageAsync()
+    {
+        if (page <= 1)
+        {
+            return;
+        }
+
+        page--;
+        await LoadAsync();
+    }
+
+    private async Task NextPageAsync()
+    {
+        if (IsLastPage)
+        {
+            return;
+        }
+
+        page++;
+        await LoadAsync();
+    }
+
+    private void ApplyUpdatedEntry(AdminHsCodeEntryResponse? updated)
+    {
+        if (updated is null)
+        {
+            return;
+        }
+
+        selectedEntry = updated;
+        editBusinessCategory = updated.BusinessCategory;
+        editBusinessCategoryReason = updated.BusinessCategoryReason;
+
+        var items = result.Items.ToList();
+        var index = items.FindIndex(x => x.Id == updated.Id);
+        if (index >= 0)
+        {
+            items[index] = updated;
+            result.Items = items;
+        }
+    }
+
+    private void ShowSuccess(string text)
+    {
+        message = text;
+        messageClass = "alert-success";
+    }
+
+    private void ShowError(string text)
+    {
+        message = text;
+        messageClass = "alert-danger";
+    }
+
+    private sealed record OptionItem(int Value, string Label);
+}

@@ -1,0 +1,100 @@
+@page "/login"
+@rendermode InteractiveServer
+@inject 관리자인증Service 관리자인증Service
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>운영자 로그인</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">운영자 로그인</MudText>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Dense="true" Class="mb-3">@errorMessage</MudAlert>
+}
+
+<MudPaper Class="pa-4" Elevation="1" Style="max-width: 480px;">
+    <MudStack Spacing="2">
+        <MudTextField T="string"
+                      Label="아이디 또는 이메일"
+                      @bind-Value="model.UserNameOrEmail"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Required="true" />
+
+        <MudTextField T="string"
+                      Label="비밀번호"
+                      @bind-Value="model.Password"
+                      InputType="InputType.Password"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Required="true" />
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Disabled="@isLoading"
+                   OnClick="LoginAsync">
+            @(isLoading ? "로그인 중..." : "로그인")
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    private bool isLoading;
+    private string? errorMessage;
+    private readonly 로그인요청 model = new();
+
+    protected override void OnInitialized()
+    {
+        if (관리자인증세션Service.HsCode운영자인가)
+        {
+            NavigateAfterLogin();
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        if (isLoading)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(model.UserNameOrEmail) || string.IsNullOrWhiteSpace(model.Password))
+        {
+            errorMessage = "아이디 또는 이메일과 비밀번호를 입력해주세요.";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await 관리자인증Service.로그인Async(model.UserNameOrEmail, model.Password);
+            if (!result.성공여부)
+            {
+                errorMessage = result.오류메시지;
+                return;
+            }
+
+            NavigateAfterLogin();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"로그인 처리 중 오류가 발생했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateAfterLogin()
+    {
+        var defaultRoute = 관리자인증세션Service.서버관리자인가 ? "/" : "/customs/hs-codes";
+        NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? defaultRoute : ReturnUrl);
+    }
+}

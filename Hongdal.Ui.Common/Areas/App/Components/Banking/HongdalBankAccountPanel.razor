@@ -1,0 +1,177 @@
+<MudPaper Class="@PanelClass" Elevation="@Elevation">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudAvatar Color="Color.Primary" Size="Size.Large">
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" />
+            </MudAvatar>
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.subtitle1">@Account.BankName</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Account.AccountHolderName</MudText>
+            </MudStack>
+        </MudStack>
+
+        <MudDivider />
+
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@AccountNoLabel</MudText>
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText Typo="Typo.subtitle1">@DisplayedAccountNo</MudText>
+                    <MudIconButton Icon="@(_showFullAccountNo ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   OnClick="ToggleAccountNoVisibilityAsync"
+                                   aria-label="@VisibilityToggleLabel" />
+                </MudStack>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">계좌 상태</MudText>
+                <MudChip T="string" Color="@StatusColor" Variant="Variant.Outlined">@Account.AccountStatus</MudChip>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@MonthlyDispatchLabel</MudText>
+                <MudText Typo="Typo.subtitle1">@Account.MonthlyDispatchCount.ToString("N0") 건</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@MonthlyFeeLabel</MudText>
+                <MudText Typo="Typo.subtitle1">@Account.MonthlyFee.ToString("N0")원</MudText>
+            </MudItem>
+        </MudGrid>
+
+        <MudAlert Severity="Severity.Info">
+            @MaskingNotice
+        </MudAlert>
+
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="@_statusSeverity">@_statusMessage</MudAlert>
+        }
+
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       StartIcon="@Icons.Material.Filled.VerifiedUser"
+                       OnClick="RequestIdentityCheckAsync">
+                @IdentityCheckText
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick="RequestAccountChangeAsync">
+                @AccountChangeText
+            </MudButton>
+            @ChildContent
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public HongdalBankAccountSummary Account { get; set; } = new(
+        "은행",
+        "계좌 소유자",
+        string.Empty,
+        "확인 필요",
+        0,
+        0);
+
+    [Parameter]
+    public string PanelClass { get; set; } = "pa-4";
+
+    [Parameter]
+    public int Elevation { get; set; }
+
+    [Parameter]
+    public bool IdentityVerified { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IdentityVerifiedChanged { get; set; }
+
+    [Parameter]
+    public string AccountNoLabel { get; set; } = "정산 계좌";
+
+    [Parameter]
+    public string MonthlyDispatchLabel { get; set; } = "이번 달 배차";
+
+    [Parameter]
+    public string MonthlyFeeLabel { get; set; } = "이번 달 이용료";
+
+    [Parameter]
+    public string IdentityCheckText { get; set; } = "본인 확인";
+
+    [Parameter]
+    public string AccountChangeText { get; set; } = "계좌 변경 요청";
+
+    [Parameter]
+    public string MaskingNotice { get; set; } = "계좌번호는 기본적으로 마스킹됩니다. 전체 보기와 계좌 변경은 본인 확인 후 처리합니다.";
+
+    [Parameter]
+    public Color StatusColor { get; set; } = Color.Success;
+
+    [Parameter]
+    public EventCallback OnIdentityVerified { get; set; }
+
+    [Parameter]
+    public EventCallback OnAccountChangeRequested { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool _showFullAccountNo;
+    private string? _statusMessage;
+    private Severity _statusSeverity = Severity.Info;
+
+    private string DisplayedAccountNo => _showFullAccountNo ? Account.AccountNo : MaskAccountNo(Account.AccountNo);
+
+    private string VisibilityToggleLabel => _showFullAccountNo ? "계좌번호 숨기기" : "계좌번호 보기";
+
+    private async Task ToggleAccountNoVisibilityAsync()
+    {
+        if (!IdentityVerified)
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "전체 계좌번호를 보려면 먼저 본인 확인이 필요합니다.";
+            return;
+        }
+
+        _showFullAccountNo = !_showFullAccountNo;
+        _statusSeverity = Severity.Info;
+        _statusMessage = _showFullAccountNo ? "전체 계좌번호를 표시합니다." : "계좌번호를 다시 마스킹했습니다.";
+        await Task.CompletedTask;
+    }
+
+    private async Task RequestIdentityCheckAsync()
+    {
+        IdentityVerified = true;
+        await IdentityVerifiedChanged.InvokeAsync(true);
+        _statusSeverity = Severity.Success;
+        _statusMessage = "본인 확인이 완료되었습니다. 전체 계좌번호 보기와 변경 요청이 가능합니다.";
+        await OnIdentityVerified.InvokeAsync();
+    }
+
+    private async Task RequestAccountChangeAsync()
+    {
+        if (!IdentityVerified)
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "계좌 변경 요청은 본인 확인 후 접수할 수 있습니다.";
+            return;
+        }
+
+        _statusSeverity = Severity.Success;
+        _statusMessage = "계좌 변경 요청을 접수했습니다. 관리자 확인 후 반영됩니다.";
+        await OnAccountChangeRequested.InvokeAsync();
+    }
+
+    private static string MaskAccountNo(string accountNo)
+    {
+        var digits = accountNo.Where(char.IsDigit).ToArray();
+        if (digits.Length <= 4)
+        {
+            return "****";
+        }
+
+        var suffix = new string(digits[^4..]);
+        return $"***-**-{suffix}";
+    }
+}
