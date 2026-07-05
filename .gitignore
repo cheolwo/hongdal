@@ -1,13 +1,19 @@
 # Build output
 **/bin/
 **/obj/
+**/TestResults/
 
 # Visual Studio
 .vs/
+.vscode/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
+
+# Logs
+*.log
+**/logs/
 
 # Local secrets / overrides
 appsettings.Local.json
@@ -24,3 +30,7 @@ Thumbs.db
 # Local scratch files
 /tmp*.txt
 /placeholder.txt
+
+# Local backup / workspace artifacts
+.git-backup*/
+*.tmp
