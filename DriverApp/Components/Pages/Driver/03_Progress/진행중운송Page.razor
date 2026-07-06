@@ -14,16 +14,49 @@
 
         @if (현재운송 is not null)
         {
-            <MudPaper Class="pa-4" Elevation="2">
-                <MudStack Spacing="2">
+            <MudPaper Class="pa-4" Elevation="3">
+                <MudStack Spacing="3">
                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                        <MudText Typo="Typo.h6">@현재운송.화물종류 운송</MudText>
-                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@현재운송.현재단계</MudChip>
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">다음 행동</MudText>
+                            <MudText Typo="Typo.h5">@현재운송.다음행동</MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="@CurrentStageColor" Variant="Variant.Filled">@현재운송.현재단계</MudChip>
                     </MudStack>
-                    <MudText>@현재운송.픽업지 → @현재운송.하차지</MudText>
-                    <MudText Typo="Typo.body2">예정시각: @현재운송.예정시각.ToString("HH:mm")</MudText>
-                    <MudText Typo="Typo.body2">운송거리: @현재운송.운송거리Km.ToString("0.0")km / 예상수익: @현재운송.예상수익.ToString("0")원</MudText>
-                    <MudAlert Severity="Severity.Info">다음 행동: @현재운송.다음행동</MudAlert>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">상차</MudText>
+                                <MudText Typo="Typo.subtitle1">@현재운송.픽업지</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">하차</MudText>
+                                <MudText Typo="Typo.subtitle1">@현재운송.하차지</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="6" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예정시각</MudText>
+                            <MudText Typo="Typo.body1">@현재운송.예정시각.ToString("HH:mm")</MudText>
+                        </MudItem>
+                        <MudItem xs="6" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">운송거리</MudText>
+                            <MudText Typo="Typo.body1">@현재운송.운송거리Km.ToString("0.0")km</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상수익</MudText>
+                            <MudText Typo="Typo.body1">@현재운송.예상수익.ToString("N0")원</MudText>
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudStack Row="true" Spacing="2" Class="flex-wrap">
+                        <MudButton Variant="Variant.Filled" Color="@NextActionColor" Href="@NextActionHref" StartIcon="@NextActionIcon">@NextActionLabel</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@SecondaryActionHref">@SecondaryActionLabel</MudButton>
+                    </MudStack>
+
+                    <MudAlert Severity="Severity.Info" Class="mb-0">주소와 결제 정보는 아래 운행 상세에서 필요한 순간에만 펼쳐 확인합니다.</MudAlert>
 
                     <HongdalSensitiveDisclosureList Title="운행 상세"
                                                     Summary="@현재운송.현재단계"
@@ -31,7 +64,7 @@
                                                     Icon="@Icons.Material.Filled.LocalShipping"
                                                     Color="Color.Primary"
                                                     PrivacyHint="운행 중 필요한 정보만 펼쳐 확인합니다.">
-                        <MudExpansionPanel Text="화물 정보" Expanded="true">
+                        <MudExpansionPanel Text="화물 정보">
                             <HongdalSensitiveInfoRow Label="화물 종류" Value="@현재운송.화물종류" />
                             <HongdalSensitiveInfoRow Label="의뢰 번호" Value="@현재운송.의뢰Id" />
                             <HongdalSensitiveInfoRow Label="작업 메모" Value="상차 전 화물 상태와 수량을 확인합니다." />
@@ -58,11 +91,6 @@
                             <HongdalSensitiveInfoRow Label="전달 요청" Value="도착 전 연락 후 하차 완료 사진을 남깁니다." />
                         </MudExpansionPanel>
                     </HongdalSensitiveDisclosureList>
-
-                    <MudStack Row="true" Spacing="2">
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.TransportPickup(현재운송.Id)">상차 화면</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="@DriverRoutes.TransportDropoff(현재운송.Id)">하차 화면</MudButton>
-                    </MudStack>
                 </MudStack>
             </MudPaper>
         }
@@ -73,5 +101,31 @@
 
 @code {
     private 기사운송샘플항목? 현재운송 => Samples.현재운송조회();
+
+    private bool ShouldPickup => 현재운송?.다음행동.Contains("상차", StringComparison.OrdinalIgnoreCase) == true;
+
+    private string NextActionLabel => ShouldPickup ? "상차 처리하기" : "하차 처리하기";
+
+    private string SecondaryActionLabel => ShouldPickup ? "하차 화면 확인" : "상차 화면 확인";
+
+    private string NextActionHref => 현재운송 is null
+        ? DriverRoutes.Home
+        : ShouldPickup
+            ? DriverRoutes.TransportPickup(현재운송.Id)
+            : DriverRoutes.TransportDropoff(현재운송.Id);
+
+    private string SecondaryActionHref => 현재운송 is null
+        ? DriverRoutes.Home
+        : ShouldPickup
+            ? DriverRoutes.TransportDropoff(현재운송.Id)
+            : DriverRoutes.TransportPickup(현재운송.Id);
+
+    private string NextActionIcon => ShouldPickup
+        ? Icons.Material.Filled.FileUpload
+        : Icons.Material.Filled.TaskAlt;
+
+    private Color NextActionColor => ShouldPickup ? Color.Primary : Color.Success;
+
+    private Color CurrentStageColor => ShouldPickup ? Color.Primary : Color.Success;
 }
 

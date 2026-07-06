@@ -144,8 +144,28 @@
                                                                     <MudText Typo="Typo.subtitle1">@request.의뢰Id</MudText>
                                                                     <MudText Typo="Typo.caption" Color="Color.Secondary">@request.화물종류 · @request.의뢰상태</MudText>
                                                                 </MudStack>
-                                                                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@request.배차상태</MudChip>
+                                                                <MudStack Row="true" Spacing="1" Class="flex-wrap">
+                                                                    <MudChip T="string" Size="Size.Small" Color="@ResolvePaymentColor(request.결제상태)" Variant="Variant.Outlined">@request.결제상태</MudChip>
+                                                                    <MudChip T="string" Size="Size.Small" Color="@ResolveDispatchColor(request.배차상태)" Variant="Variant.Outlined">@request.배차상태</MudChip>
+                                                                </MudStack>
                                                             </MudStack>
+
+                                                            <MudPaper Elevation="0" Class="pa-3 shipper-panel" Style="border-color: var(--mud-palette-primary);">
+                                                                <MudGrid>
+                                                                    <MudItem xs="6" md="4">
+                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제예정</MudText>
+                                                                        <MudText Typo="Typo.body2">@(request.결제예정금액?.ToString("N0") ?? "-")원</MudText>
+                                                                    </MudItem>
+                                                                    <MudItem xs="6" md="4">
+                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제</MudText>
+                                                                        <MudText Typo="Typo.body2">@request.결제상태</MudText>
+                                                                    </MudItem>
+                                                                    <MudItem xs="12" md="4">
+                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">다음 확인</MudText>
+                                                                        <MudText Typo="Typo.body2">@BuildRequestNextCheck(request)</MudText>
+                                                                    </MudItem>
+                                                                </MudGrid>
+                                                            </MudPaper>
 
                                                             <HongdalSensitiveDisclosureList Title="의뢰 상세"
                                                                                             Summary="@request.결제상태"
@@ -638,6 +658,66 @@
             : $"하차지 {request.하차지}";
 
         return $"화주 · {dispatchParty} · {dropoffParty}";
+    }
+
+    private static string BuildRequestNextCheck(ShipperRequestItem request)
+    {
+        if (IsMatch(request.결제상태, "결제대기", "미결제", "대기"))
+        {
+            return "결제 확인";
+        }
+
+        if (IsMatch(request.배차상태, "매칭중", "배차대기", "대기"))
+        {
+            return "기사 매칭";
+        }
+
+        if (IsMatch(request.배차상태, "기사배정", "배차확정"))
+        {
+            return "상차 대기";
+        }
+
+        if (IsMatch(request.배차상태, "운송중", "상차완료", "운송"))
+        {
+            return "하차 진행";
+        }
+
+        return "상세 확인";
+    }
+
+    private static Color ResolvePaymentColor(string status)
+    {
+        if (IsMatch(status, "결제완료"))
+        {
+            return Color.Success;
+        }
+
+        if (IsMatch(status, "결제대기", "미결제", "대기"))
+        {
+            return Color.Warning;
+        }
+
+        return Color.Default;
+    }
+
+    private static Color ResolveDispatchColor(string status)
+    {
+        if (IsMatch(status, "배송완료", "하차완료", "완료"))
+        {
+            return Color.Success;
+        }
+
+        if (IsMatch(status, "운송중", "상차완료", "운송"))
+        {
+            return Color.Info;
+        }
+
+        if (IsMatch(status, "매칭중", "배차대기", "대기"))
+        {
+            return Color.Warning;
+        }
+
+        return Color.Primary;
     }
 
     private IReadOnlyList<WorkActionItem> BuildWorkActions()

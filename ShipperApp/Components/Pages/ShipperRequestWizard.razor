@@ -87,7 +87,39 @@
                                 <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="수작업비" @bind-Value="HandlingFee" Variant="Variant.Outlined" /></MudItem>
                                 <MudItem xs="12" md="4"><MudNumericField T="decimal?" Label="할증" @bind-Value="Surcharge" Variant="Variant.Outlined" /></MudItem>
                             </MudGrid>
-                            <MudAlert Severity="@(HasRateWarning ? Severity.Warning : Severity.Info)" Class="mt-3 mb-0">@RateWarningMessage</MudAlert>
+                            <MudPaper Elevation="0" Class="pa-3 mt-3 shipper-panel">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">운임 확인</MudText>
+                                            <MudText Typo="Typo.subtitle1">@FareCheckTitle</MudText>
+                                        </MudStack>
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Calculate" OnClick="RecalculateRateWarningAsync">기준운임 확인</MudButton>
+                                    </MudStack>
+                                    <MudGrid>
+                                        <MudItem xs="6" md="3">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">차량</MudText>
+                                            <MudText Typo="Typo.body2">@(SelectedVehicleType ?? "-")</MudText>
+                                        </MudItem>
+                                        <MudItem xs="6" md="3">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">거리</MudText>
+                                            <MudText Typo="Typo.body2">@EstimatedDistanceDisplay km</MudText>
+                                        </MudItem>
+                                        <MudItem xs="6" md="3">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">결제예정</MudText>
+                                            <MudText Typo="Typo.body2">@PaymentAmountDisplay 원</MudText>
+                                        </MudItem>
+                                        <MudItem xs="6" md="3">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">부가비용</MudText>
+                                            <MudText Typo="Typo.body2">@AdditionalChargeDisplay 원</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+                                </MudStack>
+                            </MudPaper>
+                            @if (!string.IsNullOrWhiteSpace(RateWarningMessage))
+                            {
+                                <MudAlert Severity="@FareCheckSeverity" Class="mt-3 mb-0">@RateWarningMessage</MudAlert>
+                            }
                         }
                         else
                         {
@@ -157,8 +189,13 @@
 
     private string CargoSummary => string.IsNullOrWhiteSpace(CargoType) ? "화물종류 미입력" : $"{CargoType} / 수량 {CargoQuantity?.ToString() ?? "-"} / {CargoWeightKg?.ToString() ?? "-"}kg";
     private string TransportSummary => string.IsNullOrWhiteSpace(PickupRoadAddress) ? "운송정보 미입력" : $"{PickupRoadAddress} → {DropoffRoadAddress}";
-    private string PricingSummary => $"대기료 {WaitingFee?.ToString("N0") ?? "-"}원 / 수작업비 {HandlingFee?.ToString("N0") ?? "-"}원 / 할증 {Surcharge?.ToString("N0") ?? "-"}원";
+    private string PricingSummary => $"예상거리 {EstimatedDistanceDisplay}km / 부가비용 {AdditionalChargeDisplay}원";
     private string PaymentSummary => string.IsNullOrWhiteSpace(SelectedVehicleType) ? "결제정보 미입력" : $"{SelectedVehicleType} · {PaymentMethod} · 예정금액 {PaymentAmount?.ToString("N0") ?? "-"}원";
+    private string FareCheckTitle => string.IsNullOrWhiteSpace(RateWarningMessage) ? "거리와 결제예정금액을 입력한 뒤 기준운임을 확인하세요." : RateWarningMessage;
+    private string EstimatedDistanceDisplay => EstimatedDistanceKm?.ToString("0.0") ?? "-";
+    private string PaymentAmountDisplay => PaymentAmount?.ToString("N0") ?? "-";
+    private string AdditionalChargeDisplay => ((WaitingFee ?? 0) + (HandlingFee ?? 0) + (Surcharge ?? 0)).ToString("N0");
+    private Severity FareCheckSeverity => HasRateWarning ? Severity.Warning : Severity.Info;
 
     protected override async Task OnInitializedAsync()
     {
@@ -167,7 +204,7 @@
         await RecalculateRateWarningAsync();
     }
 
-    private void NextStep()
+    private async Task NextStep()
     {
         if (CurrentStep == 1 && string.IsNullOrWhiteSpace(CargoType))
         {
@@ -184,6 +221,11 @@
         if (CurrentStep < TotalSteps)
         {
             CurrentStep++;
+            if (CurrentStep == 4)
+            {
+                await RecalculateRateWarningAsync();
+            }
+
             StatusMessage = CurrentStep switch
             {
                 2 => "2단계에서 운송 정보를 입력하세요.",
@@ -215,6 +257,8 @@
             StatusMessage = "필수 정보를 모두 입력해야 합니다.";
             return;
         }
+
+        await RecalculateRateWarningAsync();
 
         IsBusy = true;
         StatusMessage = "메모리에 의뢰를 저장하는 중입니다.";

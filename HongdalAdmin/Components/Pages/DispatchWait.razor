@@ -13,12 +13,17 @@
 }
 
 <table class="table table-striped table-hover">
-    <thead><tr><th>ID</th><th>의뢰ID</th><th>픽업 요약</th><th>하차 요약</th><th>상태</th><th>작업</th></tr></thead>
+    <thead><tr><th>ID</th><th>의뢰ID</th><th>픽업 요약</th><th>하차 요약</th><th>확인</th><th>상태</th><th>작업</th></tr></thead>
     <tbody>
         @foreach (var item in items)
         {
             <tr>
-                <td>@item.Id</td><td>@item.의뢰Id</td><td>@item.픽업_도로명주소</td><td>@item.하차_도로명주소</td><td>@item.상태</td>
+                <td>@item.Id</td>
+                <td>@item.의뢰Id</td>
+                <td>@item.픽업_도로명주소</td>
+                <td>@item.하차_도로명주소</td>
+                <td><span class="@ReviewBadgeClass(item.상태)">@ReviewLabel(item.상태)</span></td>
+                <td><span class="@StatusBadgeClass(item.상태)">@item.상태</span></td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary me-1" @onclick='() => ChangeAsync(item.Id, "확정")'>수동 배차</button>
                     <button class="btn btn-sm btn-outline-warning me-1" @onclick='() => ChangeAsync(item.Id, "보류")'>보류</button>
@@ -58,5 +63,55 @@
         isError = false;
         message = "배차대기를 제거했습니다.";
         await LoadAsync();
+    }
+
+    private static string ReviewLabel(string? status)
+    {
+        if (IsMatch(status, "보류"))
+        {
+            return "보류확인";
+        }
+
+        if (IsMatch(status, "확정"))
+        {
+            return "확정됨";
+        }
+
+        return "대기확인";
+    }
+
+    private static string ReviewBadgeClass(string? status)
+    {
+        if (IsMatch(status, "보류"))
+        {
+            return "badge rounded-pill text-bg-warning";
+        }
+
+        if (IsMatch(status, "확정"))
+        {
+            return "badge rounded-pill text-bg-success";
+        }
+
+        return "badge rounded-pill text-bg-info";
+    }
+
+    private static string StatusBadgeClass(string? status)
+    {
+        if (IsMatch(status, "확정"))
+        {
+            return "badge rounded-pill text-bg-success";
+        }
+
+        if (IsMatch(status, "보류"))
+        {
+            return "badge rounded-pill text-bg-warning";
+        }
+
+        return "badge rounded-pill text-bg-secondary";
+    }
+
+    private static bool IsMatch(string? value, params string[] candidates)
+    {
+        return candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
     }
 }
