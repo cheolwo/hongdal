@@ -22,6 +22,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
+        services.AddSingleton<IOrdererGroupScopeLookupService, OrdererGroupScopeLookupService>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();

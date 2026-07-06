@@ -1,4 +1,4 @@
-# Hongdal
+﻿# Hongdal
 
 Hongdal은 화주, 기사, 창고, 운영자가 같은 물류 흐름을 공유하도록 만드는 .NET 10 기반 플랫폼입니다.
 현재 개발의 중심은 **1.0 국내 화물/용달 운송 정보 서비스**입니다.
@@ -29,7 +29,7 @@ Hongdal은 화주, 기사, 창고, 운영자가 같은 물류 흐름을 공유�
 | `1.0` | 국내 화물/용달 운송 정보 서비스 안정화 |
 | `1.5` | 판매 물류와 창고 기반 입고/출고/재위탁 확장 |
 | `2.0` | 국제 물류, 통관, HS 코드 데이터 기반 확장 |
-| `2.5` | 공동주택 기반 공동 주문과 FCL/대량 입고 |
+| `2.5` | 주문자 집단 기반 공동 주문과 FCL/대량 입고 |
 | `3.0` | 음식점 일반 음식 배달 운영 |
 | `3.5` | 홍달마트와 도심 즉시배송 운영 |
 
@@ -64,6 +64,7 @@ dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 - 로드맵과 업무 흐름: [docs/ProjectOverview](docs/ProjectOverview/README.md)
 - 버전별 범위: [docs/Versions](docs/Versions/README.md)
 - 화면/컨트롤러 매핑: [docs/ViewControllerMapping](docs/ViewControllerMapping/README.md)
+- 개인정보/계약 ISMS-P 준비도: [docs/Compliance/ISMS-P-readiness.md](docs/Compliance/ISMS-P-readiness.md)
 - Command/Event 원칙: [docs/Architecture/CommandEvent리팩토링원칙.md](docs/Architecture/CommandEvent리팩토링원칙.md)
 - 참여자 중심 설계: [docs/Architecture/참여자중심설계원칙.md](docs/Architecture/참여자중심설계원칙.md)
 

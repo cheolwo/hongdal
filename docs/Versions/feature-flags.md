@@ -1,4 +1,4 @@
-# Feature Flag Policy
+﻿# Feature Flag Policy
 
 기능 플래그는 구현된 코드와 실제 운영 노출을 분리하기 위한 상위 스위치입니다. 버전별 기능이 같은 코드베이스에 존재하더라도, 현재 운영 버전 범위 밖 기능은 기본적으로 꺼져 있어야 합니다.
 
@@ -20,7 +20,7 @@
 | `CargoYongdalV1` | `1.0` | `true` | 국내 화물/용달 운송 핵심 흐름 |
 | `WarehouseV15` | `1.5` | `false` | 입고, 적재, 출고, 재위탁 창고 흐름 |
 | `CustomsHsV20` | `2.0` | `false` | HS 코드, 통관, 관세사 보정 |
-| `ApartmentGroupOrderV25` | `2.5` | `false` | 공동주택 공동 주문, FCL/대량 입고, 단지 내 분류 |
+| `OrdererGroupOrderV25` | `2.5` | `false` | 주문자 집단 공동 주문, FCL/대량 입고, 집단 내 분류 |
 | `FoodDeliveryV30` | `3.0` | `false` | 음식점 일반 음식 배달, 조리/픽업, 고객 배송 |
 | `HongdalMartV35` | `3.5` | `false` | 홍달마트, 도심 즉시배송, 피킹/포장 후 음식 배달 기사 픽업 |
 
@@ -32,7 +32,7 @@
     "CargoYongdalV1": true,
     "WarehouseV15": false,
     "CustomsHsV20": false,
-    "ApartmentGroupOrderV25": false,
+    "OrdererGroupOrderV25": false,
     "FoodDeliveryV30": false,
     "HongdalMartV35": false
   }
@@ -60,6 +60,8 @@
 
 1. `1.0` 안정화 중에는 `CargoYongdalV1=true`, 나머지는 `false`로 둡니다.
 2. `1.5` 창고 기능을 내부 테스트할 때 `WarehouseV15=true`로 바꾸되, 운영 사용자 View 가시성은 제한합니다.
-3. `2.5` 공동주택 공동 주문은 API/DB가 먼저 들어와도 `ApartmentGroupOrderV25=false`이면 기본 화면에 노출하지 않습니다.
+3. `2.5` 주문자 집단 공동 주문은 API/DB가 먼저 들어와도 `OrdererGroupOrderV25=false`이면 기본 화면에 노출하지 않습니다.
 4. `3.0` 음식점 일반 배달은 `FoodDeliveryV30=true`가 되기 전까지 음식 배달 기사 배차 흐름에 실운영 주문을 흘려보내지 않습니다.
 5. `3.5` 홍달마트는 `HongdalMartV35=true`가 되기 전까지 도심 즉시배송 주문을 피킹/포장/배차 실운영 흐름에 흘려보내지 않습니다.
+
+기존 `ApartmentGroupOrderV25` 설정 키는 공동주택 중심 명칭이므로 새 문서와 운영 화면에서는 사용하지 않습니다. 다만 기존 로컬 설정 호환을 위해 서버는 해당 키가 `true`인 경우에도 `OrdererGroupOrderV25`가 켜진 것으로 해석합니다.

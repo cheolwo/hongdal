@@ -1,4 +1,4 @@
-# Hongdal 3.0 Scope
+﻿# Hongdal 3.0 Scope
 
 | 기능 | 포함 여부 | 관련 앱/모듈 | 메모 |
 | --- | --- | --- | --- |
@@ -7,5 +7,5 @@
 | 음식 배달 배차 | 포함 | `FoodDeliveryDispatchEngine`, `Deliver` | 음식점 픽업 배달 |
 | 묶음 배달 | 포함 | 음식 배달 정책 | 거리/시간 기준 |
 | 홍달마트 도심배송 | 보류 | `WarehouseManagerApp`, `OrdererApp`, `Deliver` | 3.5 |
-| 공동주택 공동 주문 | 참조 | `OrdererApp`, 공동 주문 서비스 | 2.5 흐름과 운영 경계 유지 |
+| 주문자 집단 공동 주문 | 참조 | `OrdererApp`, 공동 주문 서비스 | 2.5 흐름과 운영 경계 유지 |
 | 국내 화물/용달 핵심 변경 | 보류 | `DriverApp`, `ShipperApp` | 1.0 안정성 유지 |

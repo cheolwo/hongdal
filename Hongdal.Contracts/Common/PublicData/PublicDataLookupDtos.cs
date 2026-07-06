@@ -102,3 +102,41 @@ public sealed class ApartmentComplexBasicItem
 
     public string? LegalDongAddress { get; init; }
 }
+
+public sealed class OrdererGroupScopeLookupRequest
+{
+    public string? RoadAddress { get; init; }
+
+    public string? JibunAddress { get; init; }
+
+    public string? KakaoRegionLevel1 { get; init; }
+
+    public string? KakaoRegionLevel2 { get; init; }
+
+    public string? KakaoRegionLevel3 { get; init; }
+
+    public int PageSize { get; init; } = 5;
+}
+
+public sealed class OrdererGroupScopeCandidateItem
+{
+    public string ScopeKey { get; init; } = string.Empty;
+
+    public string DisplayName { get; init; } = string.Empty;
+
+    public string Basis { get; init; } = string.Empty;
+
+    public string RoadAddressLevel1 { get; init; } = string.Empty;
+
+    public string RoadAddressLevel2 { get; init; } = string.Empty;
+
+    public string? RoadAddressLevel3 { get; init; }
+
+    public string AddressHint { get; init; } = string.Empty;
+
+    public bool IsDefaultScope { get; init; }
+
+    public bool SupportsApartmentSubScope { get; init; }
+
+    public string PrivacyNote { get; init; } = string.Empty;
+}

@@ -1,4 +1,4 @@
-# Hongdal 1.0 Checklist
+﻿# Hongdal 1.0 Checklist
 
 - [ ] 화주 운송 의뢰 등록 흐름 확인
 - [ ] 화물/용달 기사 추천 후보 생성 확인
@@ -25,5 +25,5 @@
 - [ ] 1.0 범위 밖 기능의 기본 노출이 꺼져 있는지 확인
 - [ ] Admin/User 기능 설정 화면에서 1.0 기능과 1.5 이후 확장 기능이 버전 그룹으로 구분되는지 확인
 - [ ] `CargoYongdalV1=true` 확인
-- [ ] `WarehouseV15`, `CustomsHsV20`, `ApartmentGroupOrderV25`, `FoodDeliveryV30`, `HongdalMartV35` 기본 비활성 확인
+- [ ] `WarehouseV15`, `CustomsHsV20`, `OrdererGroupOrderV25`, `FoodDeliveryV30`, `HongdalMartV35` 기본 비활성 확인
 - [ ] [공통 릴리즈 게이트](../release-gates.md) 통과 확인

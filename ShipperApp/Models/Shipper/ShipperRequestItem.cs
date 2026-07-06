@@ -11,6 +11,14 @@ public sealed class ShipperRequestItem
     public string 차량종류 { get; set; } = string.Empty;
     public string 결제수단 { get; set; } = string.Empty;
     public int? 결제예정금액 { get; set; }
+    public decimal? 예상거리Km { get; set; }
+    public decimal? 기준운임 { get; set; }
+    public decimal? 기사지급예정운임 { get; set; }
+    public int 알선단계 { get; set; } = 1;
+    public bool 재알선금지 { get; set; } = true;
+    public bool 정책위반 { get; set; }
+    public bool 재알선의심 { get; set; }
+    public IReadOnlyList<string> 정책경고목록 { get; set; } = [];
     public DateTime 생성일시 { get; set; }
     public string? 픽업지 { get; set; }
     public string? 하차지 { get; set; }

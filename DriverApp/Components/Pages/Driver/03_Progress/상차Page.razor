@@ -11,7 +11,7 @@
         <MudPaper Class="pa-4" Elevation="1">
             <MudStack Spacing="1">
                 <MudText Typo="Typo.h4">상차</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">상차지 도착과 상차 완료 Command를 붙일 위치를 샘플로 본다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">상차지 도착, 화물 확인, 사진 증빙을 마친 뒤 상차 완료를 처리합니다.</MudText>
             </MudStack>
         </MudPaper>
 
@@ -23,22 +23,50 @@
                 }
                 else
                 {
-                    <MudText Typo="Typo.h6">@운송.픽업지 상차</MudText>
-                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@운송.현재단계</MudChip>
-                    <MudText Typo="Typo.body1">화물: @운송.화물종류 / 의뢰: @운송.의뢰Id</MudText>
-                    <MudAlert Severity="Severity.Info">상차지 도착 → 상차 완료 순서로 Command를 붙이면 된다.</MudAlert>
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">상차지</MudText>
+                            <MudText Typo="Typo.h6">@운송.픽업지</MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">@운송.현재단계</MudChip>
+                    </MudStack>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">화물</MudText>
+                            <MudText Typo="Typo.body1">@운송.화물종류</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰</MudText>
+                            <MudText Typo="Typo.body1">@운송.의뢰Id</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">다음 이동</MudText>
+                            <MudText Typo="Typo.body1">@운송.하차지</MudText>
+                        </MudItem>
+                    </MudGrid>
 
                     <MudDivider />
 
+                    <MudPaper Elevation="0" Class="pa-3">
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.subtitle1">현장 확인</MudText>
+                            <MudCheckBox T="bool" @bind-Value="pickupPlaceConfirmed" Label="상차지에 도착했고 주소를 확인했습니다." Color="Color.Primary" />
+                            <MudCheckBox T="bool" @bind-Value="cargoConditionConfirmed" Label="화물 수량과 외관 상태를 확인했습니다." Color="Color.Primary" />
+                            <MudCheckBox T="bool" @bind-Value="shipperContactConfirmed" Label="화주 또는 현장 담당자와 상차를 확인했습니다." Color="Color.Primary" />
+                        </MudStack>
+                    </MudPaper>
+
                     <MudStack Spacing="2">
                         <MudText Typo="Typo.subtitle1">상차 완료 사진</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">상차 완료 처리는 현장 사진을 촬영한 뒤 진행한다.</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">화물과 차량 적재 상태가 보이도록 촬영합니다. 사진 확인 후 완료 처리가 가능합니다.</MudText>
 
                         @if (!string.IsNullOrWhiteSpace(photoPreviewUrl))
                         {
                             <img src="@photoPreviewUrl"
                                  alt="상차 완료 사진 미리보기"
                                  style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px;" />
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @photoFileName</MudText>
                         }
 
                         @if (!string.IsNullOrWhiteSpace(statusMessage))
@@ -52,16 +80,31 @@
                                        StartIcon="@Icons.Material.Filled.PhotoCamera"
                                        Disabled="@isCapturing"
                                        OnClick="CaptureCompletionPhotoAsync">
-                                상차 완료 사진 촬영
+                                @(HasPhoto ? "상차 사진 다시 촬영" : "상차 완료 사진 촬영")
                             </MudButton>
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Success"
                                        StartIcon="@Icons.Material.Filled.CheckCircle"
-                                       Disabled="@(!CanComplete)"
+                                       Disabled="@(!CanComplete || isCompleting)"
                                        OnClick="CompletePickupAsync">
-                                상차 완료
+                                @(isCompleting ? "상차 완료 처리 중" : "상차 완료")
                             </MudButton>
+                            @if (HasPhoto)
+                            {
+                                <MudButton Variant="Variant.Outlined"
+                                           Color="Color.Secondary"
+                                           StartIcon="@Icons.Material.Filled.Delete"
+                                           Disabled="@isCompleting"
+                                           OnClick="ClearPhoto">
+                                    사진 제거
+                                </MudButton>
+                            }
                         </MudStack>
+
+                        @if (!CanComplete)
+                        {
+                            <MudAlert Severity="Severity.Info" Dense="true">@CompletionGuide</MudAlert>
+                        }
                     </MudStack>
                 }
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/transports/current">진행 중 운송으로</MudButton>
@@ -83,8 +126,34 @@
     private string? photoPreviewUrl;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
+    private bool pickupPlaceConfirmed;
+    private bool cargoConditionConfirmed;
+    private bool shipperContactConfirmed;
+    private bool isCompleting;
 
-    private bool CanComplete => !isCapturing && photoBytes is { Length: > 0 };
+    private bool HasPhoto => photoBytes is { Length: > 0 };
+
+    private bool FieldChecksCompleted => pickupPlaceConfirmed && cargoConditionConfirmed && shipperContactConfirmed;
+
+    private bool CanComplete => !isCapturing && FieldChecksCompleted && HasPhoto;
+
+    private string CompletionGuide
+    {
+        get
+        {
+            if (!FieldChecksCompleted && !HasPhoto)
+            {
+                return "현장 확인 3가지를 체크하고 상차 완료 사진을 촬영해야 합니다.";
+            }
+
+            if (!FieldChecksCompleted)
+            {
+                return "현장 확인 체크를 모두 완료해야 합니다.";
+            }
+
+            return "상차 완료 사진을 먼저 촬영해 주세요.";
+        }
+    }
 
     private async Task CaptureCompletionPhotoAsync()
     {
@@ -118,7 +187,7 @@
             photoFileName = photo.FileName;
             photoContentType = string.IsNullOrWhiteSpace(photo.ContentType) ? "image/jpeg" : photo.ContentType;
             photoPreviewUrl = $"data:{photoContentType};base64,{Convert.ToBase64String(photoBytes)}";
-            SetStatus("상차 완료 사진이 첨부되었습니다. 서버 연동 시 상차 완료 Command와 함께 업로드됩니다.", Severity.Success);
+            SetStatus("상차 완료 사진이 첨부되었습니다. 사진을 확인한 뒤 상차 완료를 눌러 주세요.", Severity.Success);
         }
         catch (FeatureNotSupportedException)
         {
@@ -146,19 +215,43 @@
             return;
         }
 
-        var result = await CompletionPhotoService.CompleteWithPhotoAsync(new DriverTransportCompletionPhoto(
-            DriverTransportCompletionPhotoKind.Pickup,
-            운송Id,
-            photoFileName ?? $"pickup-complete-{운송Id}.jpg",
-            photoContentType,
-            photoBytes!));
+        try
+        {
+            isCompleting = true;
+            SetStatus("상차 완료를 처리하는 중입니다.", Severity.Info);
 
-        SetStatus(result.Message, result.Uploaded ? Severity.Success : Severity.Info);
+            var result = await CompletionPhotoService.CompleteWithPhotoAsync(new DriverTransportCompletionPhoto(
+                DriverTransportCompletionPhotoKind.Pickup,
+                운송Id,
+                photoFileName ?? $"pickup-complete-{운송Id}.jpg",
+                photoContentType,
+                photoBytes!));
+
+            var objectName = string.IsNullOrWhiteSpace(result.ObjectName) ? string.Empty : $" 저장 경로: {result.ObjectName}";
+            SetStatus($"{result.Message}{objectName}", result.Uploaded ? Severity.Success : Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"상차 완료 처리에 실패했습니다. 다시 시도해 주세요. {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isCompleting = false;
+        }
     }
 
     private void SetStatus(string message, Severity severity)
     {
         statusMessage = message;
         statusSeverity = severity;
+    }
+
+    private void ClearPhoto()
+    {
+        photoFileName = null;
+        photoBytes = null;
+        photoPreviewUrl = null;
+        photoContentType = "image/jpeg";
+        SetStatus("첨부된 상차 사진을 제거했습니다.", Severity.Info);
     }
 }

@@ -20,7 +20,8 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             VersionFeatureFlagKeys.CargoYongdalV1 => flags.CargoYongdalV1,
             VersionFeatureFlagKeys.WarehouseV15 => flags.WarehouseV15,
             VersionFeatureFlagKeys.CustomsHsV20 => flags.CustomsHsV20,
-            VersionFeatureFlagKeys.ApartmentGroupOrderV25 => flags.ApartmentGroupOrderV25,
+            VersionFeatureFlagKeys.OrdererGroupOrderV25 => IsOrdererGroupOrderEnabled(flags),
+            VersionFeatureFlagKeys.ApartmentGroupOrderV25 => IsOrdererGroupOrderEnabled(flags),
             VersionFeatureFlagKeys.FoodDeliveryV30 => flags.FoodDeliveryV30,
             VersionFeatureFlagKeys.HongdalMartV35 => flags.HongdalMartV35,
             _ => false
@@ -35,11 +36,14 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             [VersionFeatureFlagKeys.CargoYongdalV1] = flags.CargoYongdalV1,
             [VersionFeatureFlagKeys.WarehouseV15] = flags.WarehouseV15,
             [VersionFeatureFlagKeys.CustomsHsV20] = flags.CustomsHsV20,
-            [VersionFeatureFlagKeys.ApartmentGroupOrderV25] = flags.ApartmentGroupOrderV25,
+            [VersionFeatureFlagKeys.OrdererGroupOrderV25] = IsOrdererGroupOrderEnabled(flags),
             [VersionFeatureFlagKeys.FoodDeliveryV30] = flags.FoodDeliveryV30,
             [VersionFeatureFlagKeys.HongdalMartV35] = flags.HongdalMartV35
         };
     }
+
+    private static bool IsOrdererGroupOrderEnabled(VersionFeatureFlagsOptions flags)
+        => flags.OrdererGroupOrderV25 || flags.ApartmentGroupOrderV25;
 }
 
 public static class VersionFeatureFlagKeys
@@ -49,6 +53,8 @@ public static class VersionFeatureFlagKeys
     public const string WarehouseV15 = nameof(WarehouseV15);
 
     public const string CustomsHsV20 = nameof(CustomsHsV20);
+
+    public const string OrdererGroupOrderV25 = nameof(OrdererGroupOrderV25);
 
     public const string ApartmentGroupOrderV25 = nameof(ApartmentGroupOrderV25);
 

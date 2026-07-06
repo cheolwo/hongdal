@@ -113,7 +113,42 @@
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">부가비용</MudText>
                                             <MudText Typo="Typo.body2">@AdditionalChargeDisplay 원</MudText>
                                         </MudItem>
+                                        <MudItem xs="6" md="3">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">기사 지급 예정</MudText>
+                                            <MudText Typo="Typo.body2">@DriverFareDisplay 원</MudText>
+                                        </MudItem>
+                                        <MudItem xs="6" md="3">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">알선 단계</MudText>
+                                            <MudText Typo="Typo.body2">@BrokerageStage 단계</MudText>
+                                        </MudItem>
                                     </MudGrid>
+                                </MudStack>
+                            </MudPaper>
+
+                            <MudPaper Elevation="0" Class="pa-3 mt-3 shipper-panel" Style="border-color: var(--mud-palette-warning);">
+                                <MudStack Spacing="2">
+                                    <MudText Typo="Typo.subtitle1">요금/재알선 방지 정책</MudText>
+                                    <MudGrid>
+                                        <MudItem xs="12" md="4"><MudNumericField T="int?" Label="기사 지급 예정 운임" @bind-Value="DriverFareAmount" Variant="Variant.Outlined" /></MudItem>
+                                        <MudItem xs="12" md="4"><MudNumericField T="int" Label="알선 단계" @bind-Value="BrokerageStage" Min="1" Variant="Variant.Outlined" /></MudItem>
+                                        <MudItem xs="12" md="4"><MudTextField Label="알선소 ID" @bind-Value="BrokerOfficeId" Variant="Variant.Outlined" /></MudItem>
+                                        <MudItem xs="12">
+                                            <MudCheckBox T="bool" @bind-Value="ProhibitRebrokering" Label="재알선 금지 의뢰로 등록합니다." Color="Color.Warning" />
+                                        </MudItem>
+                                    </MudGrid>
+                                    @if (PolicyWarnings.Count == 0)
+                                    {
+                                        <MudAlert Severity="Severity.Success" Dense="true">1.0 기준 요금/재알선 정책 경고가 없습니다.</MudAlert>
+                                    }
+                                    else
+                                    {
+                                        <MudAlert Severity="Severity.Warning" Dense="true">
+                                            @foreach (var warning in PolicyWarnings)
+                                            {
+                                                <div>@warning</div>
+                                            }
+                                        </MudAlert>
+                                    }
                                 </MudStack>
                             </MudPaper>
                             @if (!string.IsNullOrWhiteSpace(RateWarningMessage))
@@ -181,6 +216,11 @@
     private string PaymentMethod { get; set; } = "카드";
     private int? PaymentAmount { get; set; }
     private string RateWarningMessage { get; set; } = string.Empty;
+    private int? DriverFareAmount { get; set; }
+    private int BrokerageStage { get; set; } = 1;
+    private bool ProhibitRebrokering { get; set; } = true;
+    private string? BrokerOfficeId { get; set; }
+    private decimal? FareReferenceAmount { get; set; }
 
     private IReadOnlyList<string> VehicleTypes { get; set; } = [];
 
@@ -194,8 +234,10 @@
     private string FareCheckTitle => string.IsNullOrWhiteSpace(RateWarningMessage) ? "거리와 결제예정금액을 입력한 뒤 기준운임을 확인하세요." : RateWarningMessage;
     private string EstimatedDistanceDisplay => EstimatedDistanceKm?.ToString("0.0") ?? "-";
     private string PaymentAmountDisplay => PaymentAmount?.ToString("N0") ?? "-";
+    private string DriverFareDisplay => DriverFareAmount?.ToString("N0") ?? "-";
     private string AdditionalChargeDisplay => ((WaitingFee ?? 0) + (HandlingFee ?? 0) + (Surcharge ?? 0)).ToString("N0");
     private Severity FareCheckSeverity => HasRateWarning ? Severity.Warning : Severity.Info;
+    private IReadOnlyList<string> PolicyWarnings => BuildPolicyWarnings();
 
     protected override async Task OnInitializedAsync()
     {
@@ -276,6 +318,14 @@
                 차량종류 = SelectedVehicleType ?? "1톤",
                 결제수단 = PaymentMethod,
                 결제예정금액 = PaymentAmount,
+                예상거리Km = EstimatedDistanceKm,
+                기준운임 = FareReferenceAmount,
+                기사지급예정운임 = DriverFareAmount,
+                알선단계 = BrokerageStage,
+                재알선금지 = ProhibitRebrokering,
+                재알선의심 = BrokerageStage > 1,
+                정책위반 = PolicyWarnings.Count > 0,
+                정책경고목록 = PolicyWarnings,
                 생성일시 = DateTime.Now,
                 픽업지 = PickupRoadAddress,
                 하차지 = DropoffRoadAddress
@@ -318,6 +368,11 @@
         EstimatedDistanceKm = null;
         PaymentMethod = "카드";
         PaymentAmount = null;
+        DriverFareAmount = null;
+        BrokerageStage = 1;
+        ProhibitRebrokering = true;
+        BrokerOfficeId = null;
+        FareReferenceAmount = null;
         RateWarningMessage = string.Empty;
     }
 
@@ -325,11 +380,13 @@
     {
         if (string.IsNullOrWhiteSpace(SelectedVehicleType) || !EstimatedDistanceKm.HasValue)
         {
+            FareReferenceAmount = null;
             RateWarningMessage = string.Empty;
             return;
         }
 
         var estimated = await ShipperOperations.EstimateFareAsync(SelectedVehicleType, EstimatedDistanceKm.Value);
+        FareReferenceAmount = estimated;
         if (PaymentAmount.HasValue && PaymentAmount.Value < estimated)
         {
             RateWarningMessage = $"경고: 입력한 결제예정금액이 예상 운임 {estimated:N0}원보다 낮습니다.";
@@ -337,5 +394,36 @@
         }
 
         RateWarningMessage = $"예상 운임 기준값: {estimated:N0}원";
+    }
+
+    private IReadOnlyList<string> BuildPolicyWarnings()
+    {
+        var warnings = new List<string>();
+
+        if (FareReferenceAmount.HasValue && PaymentAmount.HasValue && PaymentAmount.Value < FareReferenceAmount.Value)
+        {
+            warnings.Add($"기준운임미달: 결제예정금액이 기준운임 {FareReferenceAmount:N0}원보다 낮습니다.");
+        }
+
+        if (!DriverFareAmount.HasValue)
+        {
+            warnings.Add("기사 지급 예정 운임을 입력해야 재알선/수수료 구조를 확인할 수 있습니다.");
+        }
+        else if (FareReferenceAmount.HasValue && DriverFareAmount.Value < FareReferenceAmount.Value * 0.7m)
+        {
+            warnings.Add("기사 지급 예정 운임이 기준운임의 70%보다 낮아 알선 단계 확인이 필요합니다.");
+        }
+
+        if (ProhibitRebrokering && BrokerageStage > 1)
+        {
+            warnings.Add("재알선차단필요: 재알선 금지 의뢰인데 알선 단계가 2단계 이상입니다.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(BrokerOfficeId) && BrokerageStage > 1)
+        {
+            warnings.Add($"재알선의심: 알선소 {BrokerOfficeId}를 통한 {BrokerageStage}단계 알선입니다.");
+        }
+
+        return warnings;
     }
 }

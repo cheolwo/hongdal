@@ -1,3 +1,5 @@
+using Hongdal.Contracts.Common.Privacy;
+
 namespace Hongdal.Contracts.Shipper.Request;
 
 public enum 정산시점
@@ -168,15 +170,41 @@ public sealed class LocationContactDTO
 
 public sealed class AddressDTO
 {
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.RoadAddressLevel2,
+        "상차/하차 지역 확인",
+        ProtectionNote = "목록과 추천 단계에서는 지역 단위 또는 마스킹 주소 우선 표시")]
     public string 도로명주소 { get; set; } = string.Empty;
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.DetailedAddress,
+        "상차/하차 상세 위치 확인",
+        ProtectionNote = "상세주소는 배차 수락 후 필요한 단계에서만 노출")]
     public string? 상세주소 { get; set; }
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.LocationCoordinate,
+        "지도 기반 상차/하차 위치 표시",
+        DomainCode = IsmsPDomainCode.ProtectionSafeguards,
+        ProtectionNote = "정밀 좌표는 배차/운행 목적 범위로 제한")]
     public decimal? 위도 { get; set; }
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.LocationCoordinate,
+        "지도 기반 상차/하차 위치 표시",
+        DomainCode = IsmsPDomainCode.ProtectionSafeguards,
+        ProtectionNote = "정밀 좌표는 배차/운행 목적 범위로 제한")]
     public decimal? 경도 { get; set; }
 }
 
 public sealed class ContactDTO
 {
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.DisplayName,
+        "상차/하차 담당자 식별",
+        ProtectionNote = "운송 진행에 필요한 담당자명만 단계적으로 노출")]
     public string 이름 { get; set; } = string.Empty;
+    [IsmsPProtectedData(
+        PersonalDataFieldKey.PhoneNumber,
+        "상차/하차 담당자 연락",
+        ProtectionNote = "연락처는 업무 단계와 역할에 따라 마스킹/해제")]
     public string 전화번호 { get; set; } = string.Empty;
 }
 

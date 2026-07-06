@@ -10,13 +10,16 @@ public sealed class PublicDataLookupController : ControllerBase
 {
     private readonly IRoadAddressLookupService _roadAddressLookupService;
     private readonly IApartmentComplexLookupService _apartmentComplexLookupService;
+    private readonly IOrdererGroupScopeLookupService _ordererGroupScopeLookupService;
 
     public PublicDataLookupController(
         IRoadAddressLookupService roadAddressLookupService,
-        IApartmentComplexLookupService apartmentComplexLookupService)
+        IApartmentComplexLookupService apartmentComplexLookupService,
+        IOrdererGroupScopeLookupService ordererGroupScopeLookupService)
     {
         _roadAddressLookupService = roadAddressLookupService;
         _apartmentComplexLookupService = apartmentComplexLookupService;
+        _ordererGroupScopeLookupService = ordererGroupScopeLookupService;
     }
 
     [HttpGet("addresses")]
@@ -32,6 +35,28 @@ public sealed class PublicDataLookupController : ControllerBase
             Page = page,
             PageSize = pageSize
         }, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("orderer-group-scopes")]
+    public ActionResult<PublicDataLookupResponse<OrdererGroupScopeCandidateItem>> FindOrdererGroupScopes(
+        [FromQuery] string? roadAddress,
+        [FromQuery] string? jibunAddress,
+        [FromQuery] string? kakaoRegionLevel1,
+        [FromQuery] string? kakaoRegionLevel2,
+        [FromQuery] string? kakaoRegionLevel3,
+        [FromQuery] int pageSize = 5)
+    {
+        var result = _ordererGroupScopeLookupService.FindCandidates(new OrdererGroupScopeLookupRequest
+        {
+            RoadAddress = roadAddress,
+            JibunAddress = jibunAddress,
+            KakaoRegionLevel1 = kakaoRegionLevel1,
+            KakaoRegionLevel2 = kakaoRegionLevel2,
+            KakaoRegionLevel3 = kakaoRegionLevel3,
+            PageSize = pageSize
+        });
 
         return Ok(result);
     }

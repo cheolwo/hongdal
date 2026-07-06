@@ -10,6 +10,8 @@ public sealed class VersionFeatureFlagsOptions
 
     public bool CustomsHsV20 { get; set; }
 
+    public bool OrdererGroupOrderV25 { get; set; }
+
     public bool ApartmentGroupOrderV25 { get; set; }
 
     public bool FoodDeliveryV30 { get; set; }

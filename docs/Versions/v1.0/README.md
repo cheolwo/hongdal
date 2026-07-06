@@ -1,4 +1,4 @@
-# Hongdal 1.0
+﻿# Hongdal 1.0
 
 ## 목표
 
@@ -132,7 +132,7 @@ flowchart TD
 | --- | --- | --- |
 | `WarehouseV15` | `false` | 창고 입고/출고 고도화는 1.5 범위 |
 | `CustomsHsV20` | `false` | 통관/HS 데이터는 2.0 범위 |
-| `ApartmentGroupOrderV25` | `false` | 공동주택 공동 주문은 2.5 범위 |
+| `OrdererGroupOrderV25` | `false` | 주문자 집단 공동 주문은 2.5 범위 |
 | `FoodDeliveryV30` | `false` | 음식점 일반 음식 배달은 3.0 범위 |
 | `HongdalMartV35` | `false` | 홍달마트 도심 즉시배송은 3.5 범위 |
 

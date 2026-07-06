@@ -26,12 +26,76 @@ else
             </div>
         }
     </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-lg-7">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">1.0 운영 확인</h5>
+                            <div class="text-muted small">화주-기사-수령자 운송 흐름을 막는 항목만 먼저 봅니다.</div>
+                        </div>
+                        <span class="badge rounded-pill text-bg-primary">@operationIssues.Count 건</span>
+                    </div>
+
+                    @if (operationIssues.Count == 0)
+                    {
+                        <div class="alert alert-success mb-0">현재 즉시 확인할 1.0 운영 항목이 없습니다.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead><tr><th>구분</th><th>대상</th><th>확인 내용</th><th>우선도</th></tr></thead>
+                                <tbody>
+                                    @foreach (var issue in operationIssues)
+                                    {
+                                        <tr>
+                                            <td><span class="@IssueBadgeClass(issue.Kind)">@issue.Kind</span></td>
+                                            <td>@issue.Target</td>
+                                            <td>@issue.Message</td>
+                                            <td>@issue.Priority</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">운송 상태 레인</h5>
+                    <div class="vstack gap-2">
+                        @foreach (var lane in statusLanes)
+                        {
+                            <div>
+                                <div class="d-flex justify-content-between small">
+                                    <span>@lane.Label</span>
+                                    <span>@lane.Count</span>
+                                </div>
+                                <div class="progress" role="progressbar" aria-label="@lane.Label" aria-valuenow="@lane.Percent" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar @lane.BarClass" style="width: @lane.Percent%"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
     private bool isLoading = true;
     private 관리자대시보드요약응답 summary = new();
     private IReadOnlyList<(string Title, int Value)> cards = [];
+    private IReadOnlyList<OperationIssue> operationIssues = [];
+    private IReadOnlyList<StatusLane> statusLanes = [];
 
     protected override async Task OnInitializedAsync() => await LoadAsync();
 
@@ -39,6 +103,10 @@ else
     {
         isLoading = true;
         summary = await DataService.대시보드조회Async();
+        var requests = await DataService.의뢰목록조회Async();
+        var dispatchWait = await DataService.배차대기목록조회Async();
+        var transports = await DataService.운송진행목록조회Async();
+
         cards =
         [
             ("오늘 의뢰", summary.오늘의뢰수),
@@ -48,6 +116,72 @@ else
             ("운송 중", summary.운송중수),
             ("완료", summary.완료수)
         ];
+
+        operationIssues = BuildOperationIssues(requests, dispatchWait, transports);
+        statusLanes = BuildStatusLanes(summary);
         isLoading = false;
     }
+
+    private static IReadOnlyList<OperationIssue> BuildOperationIssues(
+        IReadOnlyList<화주운송의뢰응답> requests,
+        IReadOnlyList<배차대기응답> dispatchWait,
+        IReadOnlyList<운송진행응답> transports)
+    {
+        var issues = new List<OperationIssue>();
+
+        issues.AddRange(requests
+            .Where(x => IsMatch(x.결제상태, "결제대기", "미결제", "대기"))
+            .Select(x => new OperationIssue("결제확인", x.의뢰Id, $"{x.결제수단} 결제/후불 조건 확인", "높음")));
+
+        issues.AddRange(dispatchWait
+            .Where(x => !IsMatch(x.상태, "확정"))
+            .Select(x => new OperationIssue("배차확인", x.의뢰Id, $"{x.픽업_도로명주소} → {x.하차_도로명주소}", IsMatch(x.상태, "보류") ? "높음" : "보통")));
+
+        issues.AddRange(transports
+            .Where(x => IsMatch(x.상태, "배차확정", "운송중") && x.UpdatedAt < DateTime.UtcNow.AddHours(-2))
+            .Select(x => new OperationIssue("지연확인", x.운송번호, $"{x.상태} 상태가 2시간 이상 갱신되지 않았습니다.", "높음")));
+
+        issues.AddRange(requests
+            .Where(x => IsMatch(x.의뢰상태, "취소") || IsMatch(x.결제상태, "환불됨", "환불"))
+            .Select(x => new OperationIssue("취소환불", x.의뢰Id, "취소/환불 후 배차와 정산 상태 확인", "높음")));
+
+        return issues
+            .OrderByDescending(x => x.Priority == "높음")
+            .ThenBy(x => x.Kind)
+            .Take(8)
+            .ToArray();
+    }
+
+    private static IReadOnlyList<StatusLane> BuildStatusLanes(관리자대시보드요약응답 summary)
+    {
+        var total = Math.Max(1, summary.오늘의뢰수 + summary.배차대기수 + summary.운송중수 + summary.완료수);
+        return
+        [
+            new("결제 대기", summary.결제대기수, Percent(summary.결제대기수, total), "bg-warning"),
+            new("배차 대기", summary.배차대기수, Percent(summary.배차대기수, total), "bg-info"),
+            new("운송 중", summary.운송중수, Percent(summary.운송중수, total), "bg-primary"),
+            new("완료", summary.완료수, Percent(summary.완료수, total), "bg-success"),
+            new("취소/환불", summary.취소환불수, Percent(summary.취소환불수, total), "bg-danger")
+        ];
+    }
+
+    private static int Percent(int value, int total)
+        => Math.Clamp((int)Math.Round(value / (double)total * 100), 0, 100);
+
+    private static string IssueBadgeClass(string kind)
+        => kind switch
+        {
+            "결제확인" => "badge rounded-pill text-bg-warning",
+            "배차확인" => "badge rounded-pill text-bg-info",
+            "지연확인" => "badge rounded-pill text-bg-danger",
+            "취소환불" => "badge rounded-pill text-bg-dark",
+            _ => "badge rounded-pill text-bg-secondary"
+        };
+
+    private static bool IsMatch(string? value, params string[] candidates)
+        => candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
+
+    private sealed record OperationIssue(string Kind, string Target, string Message, string Priority);
+
+    private sealed record StatusLane(string Label, int Count, int Percent, string BarClass);
 }

@@ -58,6 +58,50 @@
 
                     <MudAlert Severity="Severity.Info" Class="mb-0">주소와 결제 정보는 아래 운행 상세에서 필요한 순간에만 펼쳐 확인합니다.</MudAlert>
 
+                    <MudPaper Elevation="0" Class="pa-3">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">운송 상태 타임라인</MudText>
+                            <MudGrid>
+                                @foreach (var step in TransportTimeline)
+                                {
+                                    <MudItem xs="6" sm="4" md="2">
+                                        <MudStack Spacing="1" AlignItems="AlignItems.Center">
+                                            <MudIcon Icon="@step.Icon" Color="@step.Color" Size="Size.Medium" />
+                                            <MudText Typo="Typo.caption" Align="Align.Center">@step.Label</MudText>
+                                            <MudChip T="string" Size="Size.Small" Color="@step.Color" Variant="@step.Variant">@step.Status</MudChip>
+                                        </MudStack>
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        </MudStack>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Class="pa-3">
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">수령자 최소 정보</MudText>
+                                    <MudText Typo="Typo.subtitle1">@RecipientName</MudText>
+                                </MudStack>
+                                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@RecipientPaymentMethod</MudChip>
+                            </MudStack>
+                            <MudGrid>
+                                <MudItem xs="12" sm="4">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">하차 위치</MudText>
+                                    <MudText Typo="Typo.body2">@현재운송.하차지</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">연락처</MudText>
+                                    <MudText Typo="Typo.body2">@RecipientMaskedPhone</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">인수 확인</MudText>
+                                    <MudText Typo="Typo.body2">@RecipientProofHint</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudStack>
+                    </MudPaper>
+
                     <HongdalSensitiveDisclosureList Title="운행 상세"
                                                     Summary="@현재운송.현재단계"
                                                     RelatedParties='@($"기사님 · 화주 · 하차지 담당자 / 의뢰 {현재운송.의뢰Id}")'
@@ -127,5 +171,77 @@
     private Color NextActionColor => ShouldPickup ? Color.Primary : Color.Success;
 
     private Color CurrentStageColor => ShouldPickup ? Color.Primary : Color.Success;
-}
 
+    private string RecipientName => 현재운송 is null ? "-" : $"{현재운송.하차지} 담당자";
+
+    private string RecipientMaskedPhone => "010-****-2401";
+
+    private string RecipientPaymentMethod => "인수증 또는 현장 결제 확인";
+
+    private string RecipientProofHint => "하차 사진 + 수령자 확인";
+
+    private IReadOnlyList<TransportTimelineStep> TransportTimeline =>
+    [
+        BuildTimelineStep("접수", Icons.Material.Filled.AssignmentTurnedIn, IsStepReached("접수")),
+        BuildTimelineStep("배차중", Icons.Material.Filled.ManageSearch, IsStepReached("배차중")),
+        BuildTimelineStep("배차확정", Icons.Material.Filled.LocalShipping, IsStepReached("배차확정")),
+        BuildTimelineStep("상차완료", Icons.Material.Filled.FileUpload, IsStepReached("상차완료")),
+        BuildTimelineStep("운송중", Icons.Material.Filled.Route, IsStepReached("운송중")),
+        BuildTimelineStep("하차완료", Icons.Material.Filled.TaskAlt, IsStepReached("하차완료"))
+    ];
+
+    private TransportTimelineStep BuildTimelineStep(string label, string icon, bool reached)
+    {
+        var isCurrent = IsCurrentTimelineStep(label);
+        return new TransportTimelineStep(
+            label,
+            icon,
+            isCurrent ? "현재" : reached ? "완료" : "대기",
+            isCurrent ? Color.Primary : reached ? Color.Success : Color.Default,
+            isCurrent || reached ? Variant.Filled : Variant.Outlined);
+    }
+
+    private bool IsCurrentTimelineStep(string label)
+    {
+        var stage = 현재운송?.현재단계 ?? string.Empty;
+        return label switch
+        {
+            "상차완료" => stage.Contains("상차", StringComparison.OrdinalIgnoreCase),
+            "운송중" => stage.Contains("하차지 이동", StringComparison.OrdinalIgnoreCase) || stage.Contains("운송", StringComparison.OrdinalIgnoreCase),
+            "하차완료" => stage.Contains("하차완료", StringComparison.OrdinalIgnoreCase) || stage.Contains("인수", StringComparison.OrdinalIgnoreCase),
+            _ => false
+        };
+    }
+
+    private bool IsStepReached(string label)
+    {
+        var stage = 현재운송?.현재단계 ?? string.Empty;
+        var order = label switch
+        {
+            "접수" => 0,
+            "배차중" => 1,
+            "배차확정" => 2,
+            "상차완료" => 3,
+            "운송중" => 4,
+            "하차완료" => 5,
+            _ => 0
+        };
+
+        var currentOrder = stage switch
+        {
+            var s when s.Contains("하차완료", StringComparison.OrdinalIgnoreCase) || s.Contains("인수", StringComparison.OrdinalIgnoreCase) => 5,
+            var s when s.Contains("하차지 이동", StringComparison.OrdinalIgnoreCase) || s.Contains("운송", StringComparison.OrdinalIgnoreCase) => 4,
+            var s when s.Contains("상차", StringComparison.OrdinalIgnoreCase) => 3,
+            _ => 2
+        };
+
+        return order <= currentOrder;
+    }
+
+    private sealed record TransportTimelineStep(
+        string Label,
+        string Icon,
+        string Status,
+        Color Color,
+        Variant Variant);
+}

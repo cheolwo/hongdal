@@ -1,17 +1,18 @@
 @page "/group-purchase"
+@using Hongdal.Contracts.Common.Orderer
 
-<PageTitle>수입 공동구매 의향</PageTitle>
+<PageTitle>먹거리 공동주문</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4 group-purchase-page">
     <MudStack Spacing="3">
         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
             <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">수입 공동구매 의향</MudText>
+                <MudText Typo="Typo.h4">먹거리 공동주문</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    화주가 수입을 검토 중인 상품에 주문자가 구매 의향을 남겨 수입 수량, 가격, 통관 이후 판매 준비를 함께 가늠합니다.
+                    HS 코드상 식품으로 분류되는 상품 카드를 보고, 주문자가 직접 공동 주문 집단 개설을 신청합니다.
                 </MudText>
             </MudStack>
-            <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">구매 확정 전 수요 확인</MudChip>
+            <MudChip T="string" Color="Color.Success" Variant="Variant.Filled">HS 식품 코드 우선</MudChip>
         </MudStack>
 
         @if (!string.IsNullOrWhiteSpace(statusMessage))
@@ -24,34 +25,42 @@
                 <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
                     <MudStack Spacing="3">
                         <MudStack Spacing="0">
-                            <MudText Typo="Typo.h6">진행 중인 수요 확인</MudText>
+                            <MudText Typo="Typo.h6">HS 먹거리 상품 카드</MudText>
                             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                현재는 샘플 데이터입니다. 이후 커뮤니티 게시글과 FCL/LCL 판단 초안이 서버에서 연결됩니다.
+                                먼저 먹거리 수요가 모이기 쉬운 상품부터 공동주문 후보로 노출합니다.
                             </MudText>
                         </MudStack>
 
-                        @foreach (var campaign in Campaigns)
+                        @foreach (var product in ProductCards)
                         {
-                            <MudPaper Elevation="0"
-                                      Outlined="true"
-                                      Class="@CampaignCardClass(campaign)"
-                                      @onclick="@(() => SelectCampaign(campaign.Id))">
-                                <MudStack Spacing="1">
-                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                                        <MudText Typo="Typo.subtitle1">@campaign.ProductName</MudText>
-                                        <MudChip T="string" Size="Size.Small" Color="@campaign.Color">@campaign.Status</MudChip>
+                            var plan = PlanProduct(product);
+                            <MudPaper Elevation="0" Outlined="true" Class="@ProductCardClass(product)">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle1">@product.ProductName</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">HS @product.HsCode · @product.HsDisplayName</MudText>
+                                        </MudStack>
+                                        <MudChip T="string" Size="Size.Small" Color="@PriorityColor(plan.ActivationPriority)">
+                                            @PriorityLabel(plan.ActivationPriority)
+                                        </MudChip>
                                     </MudStack>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@campaign.ShipperAlias · @campaign.ExpectedArrival</MudText>
+
                                     <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@campaign.LogisticsMode</MudChip>
-                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">@campaign.CustomsMemo</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@TemperatureLabel(product.TemperatureCode)</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@product.ExpectedLogisticsMode</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{product.SuggestedTargetQuantityKg:N0}kg 목표")</MudChip>
                                     </MudStack>
-                                    <div class="intent-meter">
-                                        <div style="@ProgressStyle(campaign)"></div>
-                                    </div>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                        의향 @campaign.InterestedQuantity:N0개 / 목표 @campaign.TargetQuantity:N0개
-                                    </MudText>
+
+                                    <MudText Typo="Typo.body2">@plan.Summary</MudText>
+
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               StartIcon="@Icons.Material.Filled.Groups"
+                                               OnClick="@(() => SelectProduct(product.ProductCardId))">
+                                        이 상품으로 집단 개설 신청
+                                    </MudButton>
                                 </MudStack>
                             </MudPaper>
                         }
@@ -62,82 +71,135 @@
             <MudItem xs="12" lg="8">
                 <MudStack Spacing="3">
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                 <MudStack Spacing="0">
-                                    <MudText Typo="Typo.h5">@SelectedCampaign.ProductName</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@SelectedCampaign.Summary</MudText>
+                                    <MudText Typo="Typo.h5">@SelectedProduct.ProductName 공동 주문 집단</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        개설 신청이 승인되면 같은 주문자 집단 범위 안의 다른 사용자들이 참여할 수 있습니다.
+                                    </MudText>
                                 </MudStack>
-                                <MudChip T="string" Color="@SelectedCampaign.Color" Variant="Variant.Filled">@SelectedCampaign.Status</MudChip>
+                                <MudChip T="string" Color="@PriorityColor(CurrentApplicationPlan.IsFoodFocusedCandidate ? GroupPurchaseActivationPriorityCode.ColdChainFoodFocused : GroupPurchaseActivationPriorityCode.Normal)"
+                                         Variant="Variant.Filled">
+                                    @StatusLabel(CurrentApplicationPlan.SuggestedStatus)
+                                </MudChip>
                             </MudStack>
 
                             <MudGrid>
-                                <MudItem xs="12" sm="4">@Metric("예상 판매가", Money(SelectedCampaign.TargetUnitPrice), Color.Success)</MudItem>
-                                <MudItem xs="12" sm="4">@Metric("수요 달성률", $"{SelectedCampaign.ProgressRate:P0}", Color.Info)</MudItem>
-                                <MudItem xs="12" sm="4">@Metric("수입 판단", SelectedCampaign.ImportDecisionHint, Color.Primary)</MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">HS 코드</MudText>
+                                        <MudText Typo="Typo.h6">@SelectedProduct.HsCode</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">예상 물류</MudText>
+                                        <MudText Typo="Typo.h6">@SelectedProduct.ExpectedLogisticsMode</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="12" sm="4">
+                                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">예상 단가</MudText>
+                                        <MudText Typo="Typo.h6">@Money(SelectedProduct.ExpectedUnitPrice)</MudText>
+                                    </MudPaper>
+                                </MudItem>
                             </MudGrid>
                         </MudStack>
                     </MudPaper>
 
-                    <HongdalSensitiveDisclosureList Title="공동구매 의향 상세"
-                                                    Summary="@SelectedCampaign.LogisticsMode"
-                                                    RelatedParties="주문자 · 화주 · 배송대행 담당자 · 관세사 · 국내 배송 담당자"
-                                                    Icon="@Icons.Material.Filled.Groups"
-                                                    Color="@SelectedCampaign.Color"
-                                                    PrivacyHint="구매 의향은 수입 판단을 돕는 참고 정보입니다. 실제 결제, 개인정보, 배송지는 확정 단계에서 별도로 확인합니다.">
-                        <MudExpansionPanel Text="상품/수입 정보" Expanded="true">
-                            <HongdalSensitiveInfoRow Label="상품" Value="@SelectedCampaign.ProductName" />
-                            <HongdalSensitiveInfoRow Label="화주" Value="@SelectedCampaign.ShipperAlias" />
-                            <HongdalSensitiveInfoRow Label="예상 입고" Value="@SelectedCampaign.ExpectedArrival" />
-                            <HongdalSensitiveInfoRow Label="수입 판단" Value="@SelectedCampaign.ImportDecisionHint" />
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Text="물류/통관 정보">
-                            <HongdalSensitiveInfoRow Label="운송 방식" Value="@SelectedCampaign.LogisticsMode" />
-                            <HongdalSensitiveInfoRow Label="통관 메모" Value="@SelectedCampaign.CustomsMemo" />
-                            <HongdalSensitiveInfoRow Label="HS 검토" Value="@SelectedCampaign.HsReviewStatus" />
-                            <HongdalSensitiveInfoRow Label="국내 배송" Value="@SelectedCampaign.DomesticDeliveryMemo" />
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Text="가격/혜택 정보">
-                            <HongdalSensitiveInfoRow Label="예상 판매가" Value="@Money(SelectedCampaign.TargetUnitPrice)" />
-                            <HongdalSensitiveInfoRow Label="의향 혜택" Value="@SelectedCampaign.EarlyIntentBenefit" />
-                            <HongdalSensitiveInfoRow Label="결제 시점" Value="수입 진행 확정 후 별도 결제 요청" />
-                        </MudExpansionPanel>
-                        <MudExpansionPanel Text="내 구매 의향">
-                            <MudGrid>
-                                <MudItem xs="12" sm="4">
-                                    <MudNumericField T="int" Label="희망 수량" @bind-Value="desiredQuantity" Min="1" Variant="Variant.Outlined" />
-                                </MudItem>
-                                <MudItem xs="12" sm="4">
-                                    <MudNumericField T="decimal" Label="희망 단가" @bind-Value="desiredUnitPrice" Min="0" Step="100M" Variant="Variant.Outlined" />
-                                </MudItem>
-                                <MudItem xs="12" sm="4">
-                                    <MudTextField T="string" Label="수령 지역" @bind-Value="deliveryRegion" Variant="Variant.Outlined" />
-                                </MudItem>
-                                <MudItem xs="12">
-                                    <MudTextField T="string" Label="화주에게 남길 메모" @bind-Value="intentMemo" Lines="3" Variant="Variant.Outlined" />
-                                </MudItem>
-                            </MudGrid>
-                            <MudCheckBox T="bool"
-                                         @bind-Value="understandsNonBinding"
-                                         Label="지금 남기는 내용은 구매 확정이 아니라 수입 검토를 돕는 구매 의향입니다."
-                                         Color="Color.Primary" />
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.AddShoppingCart"
-                                       Disabled="@(!understandsNonBinding)"
-                                       OnClick="SubmitIntent">
-                                구매 의향 남기기
-                            </MudButton>
-                        </MudExpansionPanel>
-                    </HongdalSensitiveDisclosureList>
+                    <MudGrid>
+                        <MudItem xs="12" md="6">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                                <MudStack Spacing="3">
+                                    <MudText Typo="Typo.h6">집단 개설 신청</MudText>
+                                    <MudTextField T="string" Label="주문자 집단 범위" @bind-Value="ordererGroupScopeName" Variant="Variant.Outlined" />
+                                    <MudNumericField T="decimal" Label="내 구매 의향 수량(kg)" @bind-Value="desiredQuantityKg" Min="1" Step="1M" Variant="Variant.Outlined" />
+                                    <MudNumericField T="decimal" Label="희망 단가" @bind-Value="desiredUnitPrice" Min="1" Step="100M" Variant="Variant.Outlined" />
+                                    <MudTextField T="string" Label="개설 신청 메모" @bind-Value="requestMemo" Lines="3" Variant="Variant.Outlined" />
+                                    <MudCheckBox T="bool"
+                                                 @bind-Value="nonBindingAgreementAccepted"
+                                                 Label="이 신청은 구매 확정이 아니라 공동 주문 집단 개설 의향임을 확인합니다."
+                                                 Color="Color.Primary" />
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.Send"
+                                               Disabled="@(!CurrentApplicationPlan.CanSubmit)"
+                                               OnClick="SubmitOpeningApplication">
+                                        개설 승인 요청
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        </MudItem>
+
+                        <MudItem xs="12" md="6">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                                <MudStack Spacing="3">
+                                    <MudText Typo="Typo.h6">승인 후 참여 흐름</MudText>
+                                    <MudList T="string" Dense="true">
+                                        <MudListItem Icon="@Icons.Material.Filled.Inventory2">
+                                            상품 카드와 HS 식품 코드 검토
+                                        </MudListItem>
+                                        <MudListItem Icon="@Icons.Material.Filled.Map">
+                                            주문자 집단 범위 승인
+                                        </MudListItem>
+                                        <MudListItem Icon="@Icons.Material.Filled.GroupAdd">
+                                            공동 주문 집단 생성
+                                        </MudListItem>
+                                        <MudListItem Icon="@Icons.Material.Filled.ShoppingCart">
+                                            다른 주문자의 구매 의향 참여
+                                        </MudListItem>
+                                        <MudListItem Icon="@Icons.Material.Filled.AcUnit">
+                                            냉장/냉동 보관 및 운송 검토
+                                        </MudListItem>
+                                    </MudList>
+
+                                    <MudDivider />
+
+                                    <MudText Typo="Typo.subtitle2">운영 검토 항목</MudText>
+                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                        @foreach (var step in CurrentApplicationPlan.RequiredAdminReviewSteps)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">@step</MudChip>
+                                        }
+                                    </MudStack>
+                                </MudStack>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
 
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.h6">다음 서버 골격</MudText>
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.h6">공동구매 지급 일정</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        전액 선결제 대신 상차, 하차, 분배 확인 시점에 맞춰 나누어 지급합니다.
+                                    </MudText>
+                                </MudStack>
+                                <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                                    @PaymentPlan.Summary
+                                </MudChip>
+                            </MudStack>
+
                             <MudGrid>
-                                <MudItem xs="12" md="4">@FlowStep("1", "화주 수입 검토 글", "FCL/LCL 판단 또는 커뮤니티 글에서 수요 확인 캠페인을 엽니다.")</MudItem>
-                                <MudItem xs="12" md="4">@FlowStep("2", "주문자 의향 등록", "희망 수량, 희망가, 지역, 메모를 비확정 의향으로 남깁니다.")</MudItem>
-                                <MudItem xs="12" md="4">@FlowStep("3", "수입 진행 판단", "모인 의향을 보고 화주가 수입, 취소, 가격 재협의를 결정합니다.")</MudItem>
+                                @foreach (var line in PaymentPlan.Lines)
+                                {
+                                    <MudItem xs="12" md="4">
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                            <MudStack Spacing="1">
+                                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                                    <MudText Typo="Typo.subtitle2">@line.DisplayName</MudText>
+                                                    <MudChip T="string" Size="Size.Small" Color="@PaymentStatusColor(line.Status)">
+                                                        @PaymentStatusLabel(line.Status)
+                                                    </MudChip>
+                                                </MudStack>
+                                                <MudText Typo="Typo.h6">@Money(line.Amount)</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@line.DueCondition</MudText>
+                                            </MudStack>
+                                        </MudPaper>
+                                    </MudItem>
+                                }
                             </MudGrid>
                         </MudStack>
                     </MudPaper>
@@ -148,180 +210,185 @@
 </MudContainer>
 
 <style>
-    .group-purchase-page .campaign-card {
+    .group-purchase-page .product-card {
         border-radius: 8px;
-        cursor: pointer;
         transition: border-color 120ms ease, background-color 120ms ease;
     }
 
-    .group-purchase-page .campaign-card:hover,
-    .group-purchase-page .campaign-card--selected {
+    .group-purchase-page .product-card--selected {
         border-color: var(--mud-palette-primary);
         background: color-mix(in srgb, var(--mud-palette-surface) 88%, var(--mud-palette-primary) 12%);
-    }
-
-    .group-purchase-page .intent-meter {
-        height: 8px;
-        overflow: hidden;
-        border-radius: 999px;
-        background: var(--mud-palette-lines-default);
-    }
-
-    .group-purchase-page .intent-meter > div {
-        height: 100%;
-        border-radius: inherit;
-        background: var(--mud-palette-primary);
-    }
-
-    .group-purchase-page .flow-step {
-        border-radius: 8px;
-        background: color-mix(in srgb, var(--mud-palette-surface) 90%, var(--mud-palette-info) 10%);
     }
 </style>
 
 @code {
-    private readonly List<ImportDemandCampaign> Campaigns =
+    private readonly List<HsFoodGroupPurchaseProductCard> ProductCards =
     [
-        new(1, "접이식 캠핑 테이블", "글로벌 화주 A", "수요 확인", "FCL 검토", "HS 코드 9403 후보 검토 중", "2026년 8월 말 국내 입고 예상", 500, 185, 39000, "중국 출발 물량을 팔레트 단위로 묶어 들여오는 안입니다.", "관세사 검토 대기", "도착 후 택배 또는 근거리 묶음 배송", "초기 의향 고객에게 확정 판매가 우선 안내", "FCL/LCL 비교", Color.Primary),
-        new(2, "소형 주방 정리함 세트", "생활용품 화주 B", "가격 재검토", "LCL 우선", "생활용품류 HS 후보 비교 필요", "2026년 9월 초 국내 입고 예상", 800, 520, 12900, "작은 부피 상품이라 LCL 공동 적재를 먼저 검토합니다.", "HS 코드 보정 필요", "도심 마트 출고 또는 택배", "수요가 700개 이상이면 단가 인하 검토", "수요 충분", Color.Success),
-        new(3, "반려동물 이동 가방", "펫용품 화주 C", "주의 검토", "비교 견적", "섬유/플라스틱 복합재질 확인 필요", "2026년 9월 중순 이후", 300, 74, 28000, "재질과 검역/표시 조건을 확인한 뒤 진행 여부를 판단합니다.", "관세사 문의 권장", "국내 창고 입고 후 개별 출고", "진행 확정 시 알림 우선 발송", "통관 확인 우선", Color.Warning)
+        new(
+            ProductCardId: "hs-food-0203-pork-frozen",
+            ProductName: "냉동 삼겹살",
+            HsCode: "0203.29",
+            HsDisplayName: "돼지고기 냉동 기타",
+            TemperatureCode: GroupPurchaseTemperatureCode.Frozen,
+            ExpectedLogisticsMode: GroupPurchaseLogisticsModeCode.Fcl,
+            SuggestedTargetQuantityKg: 12000m,
+            ExpectedUnitPrice: 8500m),
+        new(
+            ProductCardId: "hs-food-1602-prepared-meat",
+            ProductName: "가공육 세트",
+            HsCode: "1602.49",
+            HsDisplayName: "조제 또는 저장 처리한 육류",
+            TemperatureCode: GroupPurchaseTemperatureCode.Chilled,
+            ExpectedLogisticsMode: GroupPurchaseLogisticsModeCode.Lcl,
+            SuggestedTargetQuantityKg: 3000m,
+            ExpectedUnitPrice: 7200m),
+        new(
+            ProductCardId: "hs-food-2106-prepared-food",
+            ProductName: "간편식 소스",
+            HsCode: "2106.90",
+            HsDisplayName: "기타 조제 식료품",
+            TemperatureCode: GroupPurchaseTemperatureCode.Ambient,
+            ExpectedLogisticsMode: GroupPurchaseLogisticsModeCode.DomesticBulk,
+            SuggestedTargetQuantityKg: 1500m,
+            ExpectedUnitPrice: 3900m,
+            RequiresImportFoodReview: true,
+            RequiresMfdsManufacturerReview: true)
     ];
 
-    private int selectedCampaignId = 1;
-    private int desiredQuantity = 2;
-    private decimal desiredUnitPrice = 39000;
-    private string deliveryRegion = "서울 강서구";
-    private string intentMemo = "입고가 확정되면 알림을 받고 싶습니다.";
-    private bool understandsNonBinding;
+    private string selectedProductCardId = "hs-food-0203-pork-frozen";
+    private string ordererGroupScopeKey = "road-address-level-2:gyeonggi-suwon-yeongtong";
+    private string ordererGroupScopeName = "경기도 수원시 영통구";
+    private decimal desiredQuantityKg = 20m;
+    private decimal desiredUnitPrice = 8500m;
+    private string requestMemo = "같은 지역 주문자들과 함께 먼저 수요를 모아보고 싶습니다.";
+    private bool nonBindingAgreementAccepted;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
 
-    private ImportDemandCampaign SelectedCampaign => Campaigns.First(x => x.Id == selectedCampaignId);
+    private HsFoodGroupPurchaseProductCard SelectedProduct
+        => ProductCards.First(x => x.ProductCardId == selectedProductCardId);
 
-    private void SelectCampaign(int campaignId)
+    private OrdererGroupOpeningApplicationPlan CurrentApplicationPlan
+        => OrdererGroupOpeningApplicationPlanner.Plan(CreateApplicationDraft());
+
+    private GroupPurchasePaymentMilestonePlan PaymentPlan
+        => GroupPurchasePaymentMilestonePlanner.Plan(new GroupPurchasePaymentMilestoneDraft(
+            GroupPurchaseId: SelectedProduct.ProductCardId,
+            OrdererId: "demo-orderer",
+            TotalAmount: desiredQuantityKg * desiredUnitPrice,
+            IsPickupCompleted: true,
+            IsDropoffCompleted: false,
+            DistributionConfirmationRate: 0m));
+
+    private void SelectProduct(string productCardId)
     {
-        selectedCampaignId = campaignId;
-        desiredUnitPrice = SelectedCampaign.TargetUnitPrice;
+        selectedProductCardId = productCardId;
+        desiredQuantityKg = SelectedProduct.TemperatureCode == GroupPurchaseTemperatureCode.Frozen ? 20m : 5m;
+        desiredUnitPrice = SelectedProduct.ExpectedUnitPrice;
         statusMessage = null;
     }
 
-    private void SubmitIntent()
+    private void SubmitOpeningApplication()
     {
-        if (!understandsNonBinding)
+        var plan = CurrentApplicationPlan;
+        if (!plan.CanSubmit)
         {
             statusSeverity = Severity.Warning;
-            statusMessage = "구매 확정이 아닌 의향 표시라는 점을 확인한 뒤 등록할 수 있습니다.";
+            statusMessage = "비구속 신청 동의와 HS 식품 코드 확인이 필요합니다.";
             return;
         }
 
-        var campaign = SelectedCampaign;
-        campaign.InterestedQuantity += Math.Max(desiredQuantity, 1);
         statusSeverity = Severity.Success;
-        statusMessage = $"{campaign.ProductName}에 {desiredQuantity:N0}개 구매 의향을 남겼습니다. 실제 결제와 배송지는 수입 진행 확정 뒤 다시 확인합니다.";
+        statusMessage = $"{SelectedProduct.ProductName} 공동 주문 집단 개설 신청이 승인 대기 상태로 접수되었습니다. 승인되면 다른 주문자들이 참여할 수 있습니다.";
     }
 
-    private string CampaignCardClass(ImportDemandCampaign campaign)
+    private ColdChainFoodGroupPurchasePlan PlanProduct(HsFoodGroupPurchaseProductCard product)
     {
-        var selectedClass = campaign.Id == selectedCampaignId ? "campaign-card--selected" : string.Empty;
-        return $"pa-3 campaign-card {selectedClass}";
+        var draft = new ColdChainFoodGroupPurchaseDraft(
+            ProductName: product.ProductName,
+            OrdererGroupScopeKey: ordererGroupScopeKey,
+            TargetQuantityKg: product.SuggestedTargetQuantityKg,
+            CurrentIntentQuantityKg: 0m,
+            TargetUnitPrice: product.ExpectedUnitPrice,
+            HsCode: product.HsCode,
+            TemperatureCode: product.TemperatureCode,
+            LogisticsMode: product.ExpectedLogisticsMode,
+            RequiresImportFoodReview: product.RequiresImportFoodReview,
+            RequiresMfdsManufacturerReview: product.RequiresMfdsManufacturerReview,
+            RequiresColdStorage: product.TemperatureCode is GroupPurchaseTemperatureCode.Frozen or GroupPurchaseTemperatureCode.Chilled);
+
+        return ColdChainFoodGroupPurchasePlanner.Plan(draft);
     }
 
-    private static string ProgressStyle(ImportDemandCampaign campaign)
+    private OrdererGroupOpeningApplicationDraft CreateApplicationDraft()
     {
-        var percentage = Math.Clamp(campaign.ProgressRate * 100m, 0m, 100m);
-        return $"width: {percentage:0.##}%;";
+        return new OrdererGroupOpeningApplicationDraft(
+            ApplicantOrdererId: "demo-orderer",
+            ProductCard: SelectedProduct,
+            OrdererGroupScopeKey: ordererGroupScopeKey,
+            OrdererGroupScopeName: ordererGroupScopeName,
+            DesiredQuantityKg: desiredQuantityKg,
+            DesiredUnitPrice: desiredUnitPrice,
+            NonBindingAgreementAccepted: nonBindingAgreementAccepted,
+            RequestMemo: requestMemo);
     }
+
+    private string ProductCardClass(HsFoodGroupPurchaseProductCard product)
+        => product.ProductCardId == selectedProductCardId
+            ? "pa-3 product-card product-card--selected"
+            : "pa-3 product-card";
 
     private static string Money(decimal value) => $"{value:N0}원";
 
-    private static RenderFragment Metric(string label, string value, Color color) => builder =>
-    {
-        builder.OpenComponent<MudPaper>(0);
-        builder.AddAttribute(1, "Elevation", 0);
-        builder.AddAttribute(2, "Outlined", true);
-        builder.AddAttribute(3, "Class", "pa-3 h-100");
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
+    private static string TemperatureLabel(string value)
+        => value switch
         {
-            childBuilder.OpenComponent<MudText>(0);
-            childBuilder.AddAttribute(1, "Typo", Typo.caption);
-            childBuilder.AddAttribute(2, "Color", Color.Secondary);
-            childBuilder.AddAttribute(3, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, label)));
-            childBuilder.CloseComponent();
-            childBuilder.OpenComponent<MudText>(4);
-            childBuilder.AddAttribute(5, "Typo", Typo.h6);
-            childBuilder.AddAttribute(6, "Color", color);
-            childBuilder.AddAttribute(7, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, value)));
-            childBuilder.CloseComponent();
-        }));
-        builder.CloseComponent();
-    };
+            GroupPurchaseTemperatureCode.Frozen => "냉동",
+            GroupPurchaseTemperatureCode.Chilled => "냉장",
+            GroupPurchaseTemperatureCode.Ambient => "상온",
+            _ => value
+        };
 
-    private static RenderFragment FlowStep(string number, string title, string description) => builder =>
-    {
-        builder.OpenComponent<MudPaper>(0);
-        builder.AddAttribute(1, "Elevation", 0);
-        builder.AddAttribute(2, "Outlined", true);
-        builder.AddAttribute(3, "Class", "pa-3 h-100 flow-step");
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
+    private static string PriorityLabel(string value)
+        => value switch
         {
-            childBuilder.OpenComponent<MudStack>(0);
-            childBuilder.AddAttribute(1, "Spacing", 1);
-            childBuilder.AddAttribute(2, "ChildContent", (RenderFragment)(stackBuilder =>
-            {
-                stackBuilder.OpenComponent<MudChip<string>>(0);
-                stackBuilder.AddAttribute(1, "Color", Color.Info);
-                stackBuilder.AddAttribute(2, "Size", Size.Small);
-                stackBuilder.AddAttribute(3, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, number)));
-                stackBuilder.CloseComponent();
-                stackBuilder.OpenComponent<MudText>(4);
-                stackBuilder.AddAttribute(5, "Typo", Typo.subtitle2);
-                stackBuilder.AddAttribute(6, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, title)));
-                stackBuilder.CloseComponent();
-                stackBuilder.OpenComponent<MudText>(7);
-                stackBuilder.AddAttribute(8, "Typo", Typo.body2);
-                stackBuilder.AddAttribute(9, "Color", Color.Secondary);
-                stackBuilder.AddAttribute(10, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, description)));
-                stackBuilder.CloseComponent();
-            }));
-            childBuilder.CloseComponent();
-        }));
-        builder.CloseComponent();
-    };
+            GroupPurchaseActivationPriorityCode.ColdChainFoodFocused => "냉동/냉장 우선",
+            GroupPurchaseActivationPriorityCode.FoodFocused => "먹거리 우선",
+            _ => "일반 후보"
+        };
 
-    private sealed class ImportDemandCampaign(
-        int id,
-        string productName,
-        string shipperAlias,
-        string status,
-        string logisticsMode,
-        string customsMemo,
-        string expectedArrival,
-        int targetQuantity,
-        int interestedQuantity,
-        decimal targetUnitPrice,
-        string summary,
-        string hsReviewStatus,
-        string domesticDeliveryMemo,
-        string earlyIntentBenefit,
-        string importDecisionHint,
-        Color color)
-    {
-        public int Id { get; } = id;
-        public string ProductName { get; } = productName;
-        public string ShipperAlias { get; } = shipperAlias;
-        public string Status { get; } = status;
-        public string LogisticsMode { get; } = logisticsMode;
-        public string CustomsMemo { get; } = customsMemo;
-        public string ExpectedArrival { get; } = expectedArrival;
-        public int TargetQuantity { get; } = targetQuantity;
-        public int InterestedQuantity { get; set; } = interestedQuantity;
-        public decimal TargetUnitPrice { get; } = targetUnitPrice;
-        public string Summary { get; } = summary;
-        public string HsReviewStatus { get; } = hsReviewStatus;
-        public string DomesticDeliveryMemo { get; } = domesticDeliveryMemo;
-        public string EarlyIntentBenefit { get; } = earlyIntentBenefit;
-        public string ImportDecisionHint { get; } = importDecisionHint;
-        public Color Color { get; } = color;
-        public decimal ProgressRate => TargetQuantity <= 0 ? 0 : (decimal)InterestedQuantity / TargetQuantity;
-    }
+    private static Color PriorityColor(string value)
+        => value switch
+        {
+            GroupPurchaseActivationPriorityCode.ColdChainFoodFocused => Color.Success,
+            GroupPurchaseActivationPriorityCode.FoodFocused => Color.Primary,
+            _ => Color.Default
+        };
+
+    private static string PaymentStatusLabel(string value)
+        => value switch
+        {
+            GroupPurchasePaymentMilestoneStatusCode.Requestable => "요청 가능",
+            GroupPurchasePaymentMilestoneStatusCode.Paid => "지급 완료",
+            GroupPurchasePaymentMilestoneStatusCode.Blocked => "대기",
+            _ => "대기"
+        };
+
+    private static Color PaymentStatusColor(string value)
+        => value switch
+        {
+            GroupPurchasePaymentMilestoneStatusCode.Requestable => Color.Primary,
+            GroupPurchasePaymentMilestoneStatusCode.Paid => Color.Success,
+            GroupPurchasePaymentMilestoneStatusCode.Blocked => Color.Default,
+            _ => Color.Default
+        };
+
+    private static string StatusLabel(string value)
+        => value switch
+        {
+            OrdererGroupOpeningApplicationStatusCode.PendingApproval => "승인 대기",
+            OrdererGroupOpeningApplicationStatusCode.ApprovedGroupReady => "집단 생성",
+            OrdererGroupOpeningApplicationStatusCode.Rejected => "반려",
+            _ => "작성 중"
+        };
 }

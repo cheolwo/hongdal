@@ -1,4 +1,4 @@
-namespace Hongdal.Application.CommandProcessing;
+﻿namespace Hongdal.Application.CommandProcessing;
 
 public sealed record Command기능버전정보(string Version, string DisplayName, int SortOrder, bool IsCurrentRelease);
 
@@ -12,7 +12,7 @@ public static class Command기능버전Catalog
             ["1.0"] = new("1.0", "1.0 국내 화물/용달 운송", 100, true),
             ["1.5"] = new("1.5", "1.5 판매 물류/창고", 150, false),
             ["2.0"] = new("2.0", "2.0 통관/HS", 200, false),
-            ["2.5"] = new("2.5", "2.5 공동주택 공동 주문", 250, false),
+            ["2.5"] = new("2.5", "2.5 주문자 집단 공동 주문", 250, false),
             ["3.0"] = new("3.0", "3.0 음식점 일반 배달", 300, false),
             ["3.5"] = new("3.5", "3.5 홍달마트/도심 즉시배송", 350, false)
         };

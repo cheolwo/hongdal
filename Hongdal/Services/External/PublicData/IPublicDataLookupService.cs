@@ -19,3 +19,9 @@ public interface IApartmentComplexLookupService
         ApartmentComplexBasicRequest request,
         CancellationToken cancellationToken = default);
 }
+
+public interface IOrdererGroupScopeLookupService
+{
+    PublicDataLookupResponse<OrdererGroupScopeCandidateItem> FindCandidates(
+        OrdererGroupScopeLookupRequest request);
+}
