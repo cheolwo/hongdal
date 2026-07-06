@@ -1,6 +1,5 @@
 using Hongdal.Services.HumanResources;
 using Microsoft.Extensions.Logging;
-using 홍달.Services.Options;
 
 namespace Hongdal.Application.CommandProcessing;
 
@@ -22,15 +21,16 @@ public sealed class Command인연스냅샷Processor : ICommand후처리Processor
 
     public string Name => "WorkRelationshipSnapshot";
 
-    public bool CanProcess(CommandProcessingRule rule) => rule.WorkRelationshipSnapshotEnabled.GetValueOrDefault();
+    public int Order => 300;
+
+    public bool CanProcess(Command후처리Context context)
+    {
+        return context.Request is IWorkRelationshipSnapshotCommand
+               && Command후처리규칙.IsWorkRelationshipSnapshotEnabled(context.Rule);
+    }
 
     public async Task ProcessAsync(Command후처리Context context, CancellationToken cancellationToken)
     {
-        if (context.Request is not IWorkRelationshipSnapshotCommand)
-        {
-            return;
-        }
-
         var snapshots = _snapshotCollector.Drain()
             .Where(x => !string.IsNullOrWhiteSpace(x.WorkDomain)
                         && !string.IsNullOrWhiteSpace(x.WorkProcess)

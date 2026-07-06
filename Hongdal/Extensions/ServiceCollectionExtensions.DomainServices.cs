@@ -1,8 +1,10 @@
 using Hongdal.Application.Driver.Transport;
+using 홍달.Services.Dispatch.Engine;
 using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Dispatch.Queue;
 using 홍달.Services.Documents;
 using 홍달.Services.External.Customs;
+using 홍달.Services.External.PublicData;
 using 홍달.Services.Images;
 using 홍달.Services.Payments;
 using 홍달.Services.Sales;
@@ -18,6 +20,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I콘텐츠혜택계산Service, 콘텐츠혜택계산Service>();
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
+        services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
         services.AddSingleton<IDriverLocationStore, DriverLocationStore>();
@@ -54,6 +57,10 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
         services.AddScoped<I배차업무정책, 용달운송배차업무정책>();
         services.AddScoped<I배차업무정책, 음식배달배차업무정책>();
+        services.AddScoped<I화물용달배차흐름Resolver, 화물용달배차흐름Resolver>();
+        services.AddScoped<I음식배달배차흐름Resolver, 음식배달배차흐름Resolver>();
+        services.AddScoped<I배차엔진, 화물용달배차엔진>();
+        services.AddScoped<I배차엔진, 음식배달배차엔진>();
         services.AddScoped<I배차추천후보선정Service, 배차추천후보선정Service>();
         services.AddScoped<I공개배차Service, 공개배차Service>();
         services.AddScoped<홍달.Services.Dispatch.Recommendation.I차량화물적합성Service, 홍달.Services.Dispatch.Recommendation.차량화물적합성Service>();

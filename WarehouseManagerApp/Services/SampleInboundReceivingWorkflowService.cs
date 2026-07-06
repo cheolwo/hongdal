@@ -2,7 +2,7 @@ namespace WarehouseManagerApp.Services;
 
 public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWorkflowService
 {
-    private static readonly IReadOnlyList<InboundExpectedProductDto> ExpectedProducts =
+    private static readonly List<InboundExpectedProductDto> ExpectedProducts =
     [
         new("SKU:MILK-001", "우유 1L", "INB-20260705-001", "서울유업", 20, "냉장"),
         new("SKU:SALAD-SET", "샐러드 세트", "INB-20260705-001", "그린팜", 12, "냉장"),
@@ -13,7 +13,7 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
     public Task<IReadOnlyList<InboundExpectedProductDto>> GetExpectedProductsAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(ExpectedProducts);
+        return Task.FromResult<IReadOnlyList<InboundExpectedProductDto>>(ExpectedProducts);
     }
 
     public Task<InboundExpectedProductDto?> FindExpectedProductAsync(string productBarcode, CancellationToken cancellationToken = default)
@@ -27,6 +27,57 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
         return Task.FromResult(product);
     }
 
+    public Task<InboundReceivingConfirmationResult> RegisterUnplannedInboundAsync(
+        UnplannedInboundRegistrationRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (string.IsNullOrWhiteSpace(request.ProductBarcode))
+        {
+            throw new InvalidOperationException("상품 바코드를 입력해야 현장 입고를 등록할 수 있습니다.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.ProductName))
+        {
+            throw new InvalidOperationException("상품명을 입력해 주세요.");
+        }
+
+        if (request.ReceivedQuantity <= 0)
+        {
+            throw new InvalidOperationException("입고 수량은 1개 이상이어야 합니다.");
+        }
+
+        var normalized = NormalizeBarcode(request.ProductBarcode);
+        var existing = ExpectedProducts.FirstOrDefault(x =>
+            string.Equals(NormalizeBarcode(x.Barcode), normalized, StringComparison.OrdinalIgnoreCase));
+
+        if (existing is not null)
+        {
+            throw new InvalidOperationException("이미 입고 예정 목록에 있는 상품입니다. 예정 입고 조회 후 처리해 주세요.");
+        }
+
+        var product = new InboundExpectedProductDto(
+            request.ProductBarcode.Trim(),
+            request.ProductName.Trim(),
+            $"UNPLANNED-{DateTimeOffset.Now:yyyyMMdd-HHmmss}",
+            string.IsNullOrWhiteSpace(request.Supplier) ? "미확인 공급사" : request.Supplier.Trim(),
+            request.ReceivedQuantity,
+            string.IsNullOrWhiteSpace(request.StorageType) ? "미지정" : request.StorageType.Trim(),
+            string.IsNullOrWhiteSpace(request.ContractLinkStatus) ? "계약 미연결" : request.ContractLinkStatus.Trim(),
+            true,
+            request.ExceptionReason.Trim());
+
+        ExpectedProducts.Add(product);
+
+        return Task.FromResult(new InboundReceivingConfirmationResult(
+            product,
+            request.ReceivedQuantity,
+            true,
+            "UnplannedInboundRegistered",
+            "현장 입고로 임시 등록했습니다. 이후 계약 연결, 정산 조건, 검수 사유를 보완해야 합니다."));
+    }
+
     public async Task<InboundReceivingConfirmationResult> ConfirmReceivedAsync(
         InboundReceivingConfirmationRequest request,
         CancellationToken cancellationToken = default)
@@ -37,10 +88,15 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
             ?? throw new InvalidOperationException("입고 예정 상품을 찾지 못했습니다.");
 
         var quantityMatched = product.ExpectedQuantity == request.ReceivedQuantity;
-        var status = quantityMatched ? "ReceivedConfirmed" : "ReceivedConfirmedWithQuantityDifference";
-        var message = quantityMatched
-            ? "입고 확인 상태로 변경되었습니다. 검수 작업으로 이동할 수 있습니다."
-            : $"입고 확인 상태로 변경되었습니다. 예정 {product.ExpectedQuantity}개 / 실제 {request.ReceivedQuantity}개 차이를 검수에서 확인해야 합니다.";
+        var status = product.IsUnplannedInbound
+            ? "UnplannedInboundReceivedConfirmed"
+            : quantityMatched ? "ReceivedConfirmed" : "ReceivedConfirmedWithQuantityDifference";
+
+        var message = product.IsUnplannedInbound
+            ? "현장 입고 확인 상태로 변경되었습니다. 검수에서 계약 연결 여부와 예외 사유를 함께 확인해야 합니다."
+            : quantityMatched
+                ? "입고 확인 상태로 변경되었습니다. 검수 작업으로 이동할 수 있습니다."
+                : $"입고 확인 상태로 변경되었습니다. 예정 {product.ExpectedQuantity}개 / 실제 {request.ReceivedQuantity}개 차이를 검수에서 확인해야 합니다.";
 
         return new InboundReceivingConfirmationResult(
             product,

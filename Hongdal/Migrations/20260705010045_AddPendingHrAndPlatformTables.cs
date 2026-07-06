@@ -251,7 +251,7 @@ namespace Hongdal.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_hr_employment_contracts_worker_user_id_employer_scope_type_e~",
                 table: "hr_employment_contracts",
-                columns: new[] { "worker_user_id", "employer_scope_type", "employer_scope_id", "contract_status" });
+                columns: new[] { "worker_user_id", "employer_scope_type", "contract_status" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_hr_payroll_schedules_contract_id",
@@ -266,7 +266,7 @@ namespace Hongdal.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_hr_role_assignments_user_id_scope_type_scope_id_role_code_is~",
                 table: "hr_role_assignments",
-                columns: new[] { "user_id", "scope_type", "scope_id", "role_code", "is_active" });
+                columns: new[] { "user_id", "scope_type", "role_code", "is_active" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_platform_profit_return_policies_target_participant_category_~",

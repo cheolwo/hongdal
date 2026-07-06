@@ -21,19 +21,7 @@
                        RoleLabel="화주"
                        AppKey="shipper"
                        QuickActions="QuickActions">
-    <WorkModeContent>
-    <MudStack Spacing="3" Class="shipper-page">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="shipper-page-header">
-            <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">@L.T("Home.Title")</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("Home.Subtitle")</MudText>
-            </MudStack>
-            <MudStack Row="true" Spacing="2" Class="shipper-page-actions">
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadRequestsAsync">@L.T("Home.Refresh")</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="GoToRequestWizard">@L.T("Home.CreateRequest")</MudButton>
-            </MudStack>
-        </MudStack>
-
+    <CommunityModeContent>
         @if (_혜택콘텐츠 is not null || _공지콘텐츠 is not null)
         {
             <MudCard Elevation="0" Class="shipper-panel">
@@ -68,6 +56,20 @@
                 </MudCardContent>
             </MudCard>
         }
+    </CommunityModeContent>
+
+    <WorkModeContent>
+    <MudStack Spacing="3" Class="shipper-page">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="shipper-page-header">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">@L.T("Home.Title")</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("Home.Subtitle")</MudText>
+            </MudStack>
+            <MudStack Row="true" Spacing="2" Class="shipper-page-actions">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadRequestsAsync">@L.T("Home.Refresh")</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="GoToRequestWizard">@L.T("Home.CreateRequest")</MudButton>
+            </MudStack>
+        </MudStack>
 
         @if (!isLoggedIn)
         {
@@ -119,45 +121,6 @@
                                 </MudItem>
                             }
                         </MudGrid>
-
-                        <MudCard Elevation="0" Class="shipper-panel">
-                            <MudCardContent>
-                                <MudStack Spacing="2">
-                                    <MudText Typo="Typo.h6">@Workflow.RoleTitle</MudText>
-                                    <MudText Typo="Typo.body1">@Workflow.CurrentStateLabel</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("Home.NextAction"): @Workflow.NextActionLabel</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("Home.CurrentUser"): @(AuthSession.UserName ?? L.T("Home.NotLoggedIn"))</MudText>
-                                    @if (!string.IsNullOrWhiteSpace(statusMessage))
-                                    {
-                                        <MudAlert Severity="@statusSeverity">@statusMessage</MudAlert>
-                                    }
-                                    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="HandlePrimaryAction">@Workflow.NextActionLabel</MudButton>
-                                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Logout">@L.T("Home.Logout")</MudButton>
-                                </MudStack>
-                            </MudCardContent>
-                        </MudCard>
-
-                        <MudCard Elevation="0" Class="shipper-panel">
-                            <MudCardContent>
-                                <MudText Typo="Typo.h6" Class="mb-3">@L.T("Home.WorkflowSteps")</MudText>
-                                <MudGrid>
-                                    @foreach (var step in Workflow.Steps)
-                                    {
-                                        <MudItem xs="12" sm="6">
-                                            @{ 
-                                                var stepCardStyle = $"border:1px solid {step.AccentColor}; background:{(step.IsCurrent ? "#ECFEFF" : "#fff")};";
-                                                var stepLabelStyle = $"color:{step.AccentColor};";
-                                            }
-                                            <MudPaper Elevation="0" Class="pa-4 h-100 shipper-workflow-step" Style="@stepCardStyle">
-                                                <MudText Typo="Typo.caption" Class="mb-2 fw-bold" Style="@stepLabelStyle">@StepStateLabel(step)</MudText>
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold">@step.Title</MudText>
-                                                <MudText Typo="Typo.body2" Color="Color.Secondary">@step.Description</MudText>
-                                            </MudPaper>
-                                        </MudItem>
-                                    }
-                                </MudGrid>
-                            </MudCardContent>
-                        </MudCard>
 
                         <MudCard Elevation="0" Class="shipper-panel">
                             <MudCardContent>

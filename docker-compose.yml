@@ -14,6 +14,14 @@ services:
       Redis__ConnectionString: "${HONGDAL_REDIS_CONNECTION_STRING:-redis:6379}"
       MongoDb__ConnectionString: "${HONGDAL_MONGO_CONNECTION_STRING:-mongodb://hongdal:YOUR_LOCAL_PASSWORD@mongo:27017/?authSource=admin}"
       MongoDb__Database: hongdal_dev
+      Jwt__Issuer: Hongdal.Dev
+      Jwt__Audience: Hongdal.Client.Dev
+      Jwt__SecretKey: "${HONGDAL_JWT_SECRET_KEY:-development-only-jwt-secret-key-change-me-32bytes}"
+      TossPayments__ClientKey: "${HONGDAL_TOSS_CLIENT_KEY:-development-only-client-key}"
+      TossPayments__SecretKey: "${HONGDAL_TOSS_SECRET_KEY:-development-only-secret-key}"
+      GoogleGeocodingApiKey: "${HONGDAL_GOOGLE_GEOCODING_API_KEY:-development-only-google-geocoding-key}"
+      NaverCloudDirections__ApiKeyId: "${HONGDAL_NAVER_CLOUD_DIRECTIONS_API_KEY_ID:-development-only-naver-key-id}"
+      NaverCloudDirections__ApiKey: "${HONGDAL_NAVER_CLOUD_DIRECTIONS_API_KEY:-development-only-naver-key}"
     depends_on:
       mysql:
         condition: service_healthy

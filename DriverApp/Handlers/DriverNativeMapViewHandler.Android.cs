@@ -1,5 +1,4 @@
 #if ANDROID
-using Android.Content;
 using Android.OS;
 using Android.Views;
 using Com.Naver.Maps.Geometry;
@@ -8,6 +7,7 @@ using Com.Naver.Maps.Map.Overlay;
 using DriverApp.Controls;
 using DriverApp.Models.Driver.Map;
 using Microsoft.Maui.Handlers;
+using AndroidColor = Android.Graphics.Color;
 
 namespace DriverApp.Handlers;
 
@@ -40,6 +40,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     private void OnMapReady(NaverMap naverMap)
     {
         _naverMap = naverMap;
+        ApplyMapOptions();
         ApplyCamera();
         ApplyMarkers();
     }
@@ -54,6 +55,33 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         handler.ApplyMarkers();
     }
 
+    public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+        handler.ApplyMapOptions();
+    }
+
+    private void ApplyMapOptions()
+    {
+        if (_naverMap is null || VirtualView is null)
+        {
+            return;
+        }
+
+        _naverMap.MinZoom = VirtualView.MinZoom;
+        _naverMap.MaxZoom = VirtualView.MaxZoom;
+        _naverMap.LiteModeEnabled = false;
+        _naverMap.SetLayerGroupEnabled(NaverMap.LayerGroupTraffic, VirtualView.ShowTrafficLayer);
+
+        var uiSettings = _naverMap.UiSettings;
+        uiSettings.CompassEnabled = true;
+        uiSettings.ScaleBarEnabled = true;
+        uiSettings.ZoomControlEnabled = true;
+        uiSettings.LocationButtonEnabled = VirtualView.ShowLocationButton;
+        uiSettings.SetLogoMargin(16, 16, 16, 120);
+
+        ApplyLocationOverlay();
+    }
+
     private void ApplyCamera()
     {
         if (_naverMap is null || VirtualView is null)
@@ -64,6 +92,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         var target = new LatLng(VirtualView.CenterLatitude, VirtualView.CenterLongitude);
         var update = CameraUpdate.ScrollAndZoomTo(target, VirtualView.Zoom);
         _naverMap.MoveCamera(update);
+        ApplyLocationOverlay();
     }
 
     private void ApplyMarkers()
@@ -82,6 +111,25 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
                 AddMarker(item, item.DropoffLatitude, item.DropoffLongitude, $"{item.Title} 하차");
             }
         }
+    }
+
+    private void ApplyLocationOverlay()
+    {
+        if (_naverMap is null || VirtualView is null)
+        {
+            return;
+        }
+
+        var overlay = _naverMap.LocationOverlay;
+        overlay.Position = new LatLng(VirtualView.CenterLatitude, VirtualView.CenterLongitude);
+        overlay.CircleColor = AndroidColor.Argb(40, 25, 118, 210);
+        overlay.CircleOutlineColor = AndroidColor.Argb(120, 25, 118, 210);
+        overlay.CircleOutlineWidth = 2;
+        overlay.Visible = VirtualView.ShowCurrentLocationOverlay;
+
+        _naverMap.LocationTrackingMode = VirtualView.ShowCurrentLocationOverlay
+            ? LocationTrackingMode.NoFollow!
+            : LocationTrackingMode.None!;
     }
 
     private void AddMarker(DriverMapMarkerItem item, double latitude, double longitude, string caption)

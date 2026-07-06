@@ -6,6 +6,10 @@ public interface IInboundReceivingWorkflowService
 
     Task<InboundExpectedProductDto?> FindExpectedProductAsync(string productBarcode, CancellationToken cancellationToken = default);
 
+    Task<InboundReceivingConfirmationResult> RegisterUnplannedInboundAsync(
+        UnplannedInboundRegistrationRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<InboundReceivingConfirmationResult> ConfirmReceivedAsync(
         InboundReceivingConfirmationRequest request,
         CancellationToken cancellationToken = default);

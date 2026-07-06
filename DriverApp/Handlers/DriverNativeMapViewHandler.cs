@@ -11,7 +11,12 @@ public partial class DriverNativeMapViewHandler
             [nameof(DriverNativeMapView.CenterLatitude)] = MapCamera,
             [nameof(DriverNativeMapView.CenterLongitude)] = MapCamera,
             [nameof(DriverNativeMapView.Zoom)] = MapCamera,
-            [nameof(DriverNativeMapView.Markers)] = MapMarkers
+            [nameof(DriverNativeMapView.Markers)] = MapMarkers,
+            [nameof(DriverNativeMapView.ShowTrafficLayer)] = MapOptions,
+            [nameof(DriverNativeMapView.ShowLocationButton)] = MapOptions,
+            [nameof(DriverNativeMapView.ShowCurrentLocationOverlay)] = MapOptions,
+            [nameof(DriverNativeMapView.MinZoom)] = MapOptions,
+            [nameof(DriverNativeMapView.MaxZoom)] = MapOptions
         };
 
     public DriverNativeMapViewHandler() : base(Mapper)

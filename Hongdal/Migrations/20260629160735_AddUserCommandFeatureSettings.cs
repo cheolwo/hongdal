@@ -63,21 +63,8 @@ namespace Hongdal.Migrations
                 nullable: false)
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.AddColumn<int>(
-                name: "estimated_payment_amount",
-                table: "shipper_requests",
-                type: "int",
-                nullable: true);
-
             migrationBuilder.AddColumn<string>(
                 name: "evidence_method",
-                table: "shipper_requests",
-                type: "longtext",
-                nullable: false)
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AddColumn<string>(
-                name: "payment_method",
                 table: "shipper_requests",
                 type: "longtext",
                 nullable: false)
@@ -123,13 +110,6 @@ namespace Hongdal.Migrations
                 type: "tinyint(1)",
                 nullable: false,
                 defaultValue: false);
-
-            migrationBuilder.AddColumn<string>(
-                name: "vehicle_type",
-                table: "shipper_requests",
-                type: "longtext",
-                nullable: false)
-                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "사용자_Command_기능설정",
@@ -279,15 +259,7 @@ namespace Hongdal.Migrations
                 table: "shipper_requests");
 
             migrationBuilder.DropColumn(
-                name: "estimated_payment_amount",
-                table: "shipper_requests");
-
-            migrationBuilder.DropColumn(
                 name: "evidence_method",
-                table: "shipper_requests");
-
-            migrationBuilder.DropColumn(
-                name: "payment_method",
                 table: "shipper_requests");
 
             migrationBuilder.DropColumn(
@@ -314,9 +286,6 @@ namespace Hongdal.Migrations
                 name: "tax_invoice_required",
                 table: "shipper_requests");
 
-            migrationBuilder.DropColumn(
-                name: "vehicle_type",
-                table: "shipper_requests");
         }
     }
 }

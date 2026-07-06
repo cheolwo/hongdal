@@ -1,9 +1,11 @@
 ﻿@using HongdalAdmin.Services
+@using Hongdal.Ui.Common.Areas.App.Services
 @implements IDisposable
 @inject 관리자인증세션Service 관리자인증세션Service
 @inject 관리자인증Service 관리자인증Service
 @inject ViewPolicyService ViewPolicyService
 @inject NavigationManager NavigationManager
+@inject PlatformHomeModeStateService HomeModeState
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -74,6 +76,15 @@
                 <button type="button" class="btn btn-link nav-link text-start" @onclick="로그아웃">로그아웃</button>
             </div>
         }
+
+        <div class="nav-item px-3 mt-3">
+            <hr class="dropdown-divider" />
+            <div class="text-white-50 small mb-2">모드 전환</div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm @(HomeModeState.IsWorkMode ? "btn-outline-primary" : "btn-primary")" @onclick="@(() => SetMode(false))">커뮤니티</button>
+                <button type="button" class="btn btn-sm @(HomeModeState.IsWorkMode ? "btn-success" : "btn-outline-success")" @onclick="@(() => SetMode(true))">업무</button>
+            </div>
+        </div>
     </nav>
 </div>
 
@@ -81,7 +92,13 @@
     protected override async Task OnInitializedAsync()
     {
         ViewPolicyService.Changed += HandleChanged;
+        HomeModeState.Changed += HandleChanged;
         await ViewPolicyService.EnsureLoadedAsync();
+    }
+
+    private void SetMode(bool isWorkMode)
+    {
+        HomeModeState.SetWorkMode(isWorkMode);
     }
 
     private void HandleChanged()
@@ -115,5 +132,6 @@
     public void Dispose()
     {
         ViewPolicyService.Changed -= HandleChanged;
+        HomeModeState.Changed -= HandleChanged;
     }
 }

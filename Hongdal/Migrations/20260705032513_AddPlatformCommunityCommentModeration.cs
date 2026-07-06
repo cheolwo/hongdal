@@ -10,14 +10,6 @@ namespace Hongdal.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_platform_community_post_comments_PostId_IsDeleted_CreatedAtU~",
-                table: "platform_community_post_comments");
-
-            migrationBuilder.DropIndex(
-                name: "IX_platform_community_post_attachment_comments_AttachmentId_IsD~",
-                table: "platform_community_post_attachment_comments");
-
             migrationBuilder.AddColumn<bool>(
                 name: "IsOperatorHidden",
                 table: "platform_community_post_comments",
@@ -47,12 +39,12 @@ namespace Hongdal.Migrations
                 defaultValue: 0);
 
             migrationBuilder.CreateIndex(
-                name: "IX_platform_community_post_comments_PostId_IsDeleted_IsOperator~",
+                name: "IX_post_comments_visible_created",
                 table: "platform_community_post_comments",
                 columns: new[] { "PostId", "IsDeleted", "IsOperatorHidden", "CreatedAtUtc" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_platform_community_post_attachment_comments_AttachmentId_IsD~",
+                name: "IX_attachment_comments_visible_created",
                 table: "platform_community_post_attachment_comments",
                 columns: new[] { "AttachmentId", "IsDeleted", "IsOperatorHidden", "CreatedAtUtc" });
         }
@@ -61,11 +53,11 @@ namespace Hongdal.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
-                name: "IX_platform_community_post_comments_PostId_IsDeleted_IsOperator~",
+                name: "IX_post_comments_visible_created",
                 table: "platform_community_post_comments");
 
             migrationBuilder.DropIndex(
-                name: "IX_platform_community_post_attachment_comments_AttachmentId_IsD~",
+                name: "IX_attachment_comments_visible_created",
                 table: "platform_community_post_attachment_comments");
 
             migrationBuilder.DropColumn(
@@ -83,16 +75,6 @@ namespace Hongdal.Migrations
             migrationBuilder.DropColumn(
                 name: "ReportCount",
                 table: "platform_community_post_attachment_comments");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_platform_community_post_comments_PostId_IsDeleted_CreatedAtU~",
-                table: "platform_community_post_comments",
-                columns: new[] { "PostId", "IsDeleted", "CreatedAtUtc" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_platform_community_post_attachment_comments_AttachmentId_IsD~",
-                table: "platform_community_post_attachment_comments",
-                columns: new[] { "AttachmentId", "IsDeleted", "CreatedAtUtc" });
         }
     }
 }

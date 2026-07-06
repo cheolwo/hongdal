@@ -1,3 +1,7 @@
+﻿@using Hongdal.Ui.Common.Areas.App.Services
+@implements IDisposable
+@inject PlatformHomeModeStateService HomeModeState
+
 <MudNavMenu Class="pa-3 warehouse-navmenu">
     <MudStack Spacing="0" Class="px-2 pb-3">
         <MudText Typo="Typo.subtitle1" Class="fw-bold">Warehouse Manager</MudText>
@@ -14,10 +18,45 @@
     <MudNavLink Href="work/delivery-agency" Icon="@Icons.Material.Filled.LocalShipping">국내 배송대행</MudNavLink>
 
     <MudDivider Class="my-3" />
-    <MudNavLink Href="mart" Icon="@Icons.Material.Filled.Storefront">홈달마트</MudNavLink>
-    <MudNavLink Href="mart/work-board" Icon="@Icons.Material.Filled.Dashboard">홈달마트 작업 보드</MudNavLink>
+    <MudNavLink Href="mart" Icon="@Icons.Material.Filled.Storefront">홍달마트</MudNavLink>
+    <MudNavLink Href="mart/work-board" Icon="@Icons.Material.Filled.Dashboard">홍달마트 작업 보드</MudNavLink>
 
     <MudDivider Class="my-3" />
     <MudNavLink Href="scan" Icon="@Icons.Material.Filled.QrCodeScanner">스캔 스테이션</MudNavLink>
     <MudNavLink Href="work-board" Icon="@Icons.Material.Filled.ViewKanban">일반 작업 보드</MudNavLink>
+
+    <MudDivider Class="my-3" />
+    <MudStack Spacing="1" Class="px-2 pb-2">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">모드 전환</MudText>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudButton Variant="@CommunityModeVariant" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Forum" OnClick="@(() => SetMode(false))">커뮤니티</MudButton>
+            <MudButton Variant="@WorkModeVariant" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Work" OnClick="@(() => SetMode(true))">업무</MudButton>
+        </MudStack>
+    </MudStack>
 </MudNavMenu>
+
+@code {
+    private Variant CommunityModeVariant => HomeModeState.IsWorkMode ? Variant.Outlined : Variant.Filled;
+
+    private Variant WorkModeVariant => HomeModeState.IsWorkMode ? Variant.Filled : Variant.Outlined;
+
+    protected override void OnInitialized()
+    {
+        HomeModeState.Changed += HandleModeChanged;
+    }
+
+    private void SetMode(bool isWorkMode)
+    {
+        HomeModeState.SetWorkMode(isWorkMode);
+    }
+
+    private void HandleModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        HomeModeState.Changed -= HandleModeChanged;
+    }
+}

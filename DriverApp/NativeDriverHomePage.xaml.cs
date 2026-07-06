@@ -29,6 +29,7 @@ public partial class NativeDriverHomePage : ContentPage
         MapView.Markers = markers;
 
         StatusLabel.Text = $"{currentLocation.위치명} 기준 추천 운송 {markers.Count}건을 네이티브 지도에 표시합니다.";
+        TransportFooterBar.ShowTransport(_sampleDataService.현재운송조회());
     }
 
     protected override void OnDisappearing()
@@ -39,11 +40,15 @@ public partial class NativeDriverHomePage : ContentPage
 
     private void OnMarkerSelected(object? sender, DriverMapMarkerItem marker)
     {
-        SelectedRequestLabel.Text = marker.Title;
-        SelectedRequestSummaryLabel.Text = $"{marker.RequestId} · {marker.Summary} · {marker.PickupAddress}";
+        TransportFooterBar.ShowMarker(marker);
     }
 
     private async void OnOpenLegacyMenuClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new MainPage());
+    }
+
+    private async void OnOpenCurrentTransportClicked(object? sender, EventArgs e)
     {
         await Navigation.PushAsync(new MainPage());
     }

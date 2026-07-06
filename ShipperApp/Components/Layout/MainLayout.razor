@@ -5,10 +5,12 @@
 @inject ShipperViewVisibilityService ViewVisibilityService
 @inject ShipperOperatingProfileService ProfileService
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Routing
 
 <CascadingValue Value="L.Language">
     <MudLayout>
         <MudAppBar Dense="true" Fixed="false" Elevation="0" Class="shipper-appbar">
+            <MudButton Variant="Variant.Text" Color="Color.Inherit" Disabled="@(!CanGoBack)" OnClick="GoBack" Class="shipper-menu-button">← 뒤로가기</MudButton>
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" Class="shipper-menu-button" />
             <MudStack Spacing="0" Class="shipper-appbar-title">
                 <MudText Typo="Typo.subtitle1" Class="fw-bold">Hongdal Shipper</MudText>
@@ -61,6 +63,11 @@
 
 @code {
     private bool _drawerOpen;
+    private readonly Stack<string> _navigationHistory = new();
+    private string? _currentUri;
+    private bool _isNavigatingBack;
+
+    private bool CanGoBack => _navigationHistory.Count > 0;
 
     private IEnumerable<dynamic> VisibleMenuItems => ViewVisibilityService.VisibleItems
         .Where(item => ShouldShowForProfile(item.Route))
@@ -73,6 +80,8 @@
         L.Changed += HandleChanged;
         ViewVisibilityService.Changed += HandleChanged;
         ProfileService.Changed += HandleChanged;
+        Navigation.LocationChanged += HandleLocationChanged;
+        _currentUri = Navigation.Uri;
         _ = ViewVisibilityService.EnsureLoadedAsync();
     }
 
@@ -92,6 +101,37 @@
             : route.StartsWith('/') ? route : "/" + route;
 
         Navigation.NavigateTo(href);
+    }
+
+    private void GoBack()
+    {
+        if (_navigationHistory.Count == 0)
+        {
+            return;
+        }
+
+        var previousUri = _navigationHistory.Pop();
+        _isNavigatingBack = true;
+        Navigation.NavigateTo(previousUri);
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (_isNavigatingBack)
+        {
+            _isNavigatingBack = false;
+            _currentUri = args.Location;
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_currentUri) && !string.Equals(_currentUri, args.Location, StringComparison.OrdinalIgnoreCase))
+        {
+            _navigationHistory.Push(_currentUri);
+        }
+
+        _currentUri = args.Location;
+        InvokeAsync(StateHasChanged);
     }
 
     private bool ShouldShowForProfile(string route)
@@ -132,5 +172,6 @@
         L.Changed -= HandleChanged;
         ViewVisibilityService.Changed -= HandleChanged;
         ProfileService.Changed -= HandleChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
     }
 }

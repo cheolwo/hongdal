@@ -4048,6 +4048,12 @@ namespace Hongdal.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("계약상대방명");
 
+                    b.Property<bool>("계약선행여부")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("계약선행여부");
+
                     b.Property<DateTime?>("계약시작일")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("계약시작일");
@@ -4099,9 +4105,31 @@ namespace Hongdal.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("원주문참조번호");
 
+                    b.Property<string>("입고생성경로")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasDefaultValue("계약 DB 기반 등록")
+                        .HasColumnName("입고생성경로");
+
                     b.Property<DateTime?>("입고완료일시")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("입고완료일시");
+
+                    b.Property<string>("입고흐름유형")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasDefaultValue("ContractBased")
+                        .HasColumnName("입고흐름유형");
+
+                    b.Property<bool>("자동생성여부")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("자동생성여부");
 
                     b.Property<string>("정산방식")
                         .IsRequired()
@@ -4150,6 +4178,8 @@ namespace Hongdal.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("출고예정Id");
+
+                    b.HasIndex("입고흐름유형", "자동생성여부");
 
                     b.HasIndex("주문Id", "주문자UserId");
 

@@ -21,6 +21,12 @@ public sealed class KieAiTaskPollingWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (string.IsNullOrWhiteSpace(_options.ApiKey))
+        {
+            _logger.LogInformation("Kie.AI task polling worker is disabled because KieAi:ApiKey is not configured.");
+            return;
+        }
+
         var intervalSeconds = Math.Max(5, _options.PollingIntervalSeconds);
 
         while (!stoppingToken.IsCancellationRequested)

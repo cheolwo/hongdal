@@ -37,6 +37,7 @@
     <None Include="Hongdal.Infrastructure\Security\DataProtectionPersonalDataProtector.cs" />
     <None Include="Hongdal.Infrastructure\Security\IPersonalDataProtector.cs" />
     <None Include="Hongdal.sln" />
+    <None Include="Hongdal.Tests\CommandProcessing\Command후처리규칙Tests.cs" />
     <None Include="HongdalRestaurantDesktop\App.axaml" />
     <None Include="HongdalRestaurantDesktop\App.axaml.cs" />
     <None Include="HongdalRestaurantDesktop\app.manifest" />

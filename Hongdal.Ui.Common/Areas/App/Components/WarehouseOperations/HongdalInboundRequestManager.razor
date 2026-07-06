@@ -55,6 +55,19 @@
                                     }
                                 </MudSelect>
                             </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudSelect T="string" Label="입고 흐름" @bind-Value="inboundFlowType" Variant="Variant.Outlined">
+                                    @foreach (var flowType in inboundFlowTypes)
+                                    {
+                                        <MudSelectItem T="string" Value="@flowType">@입고흐름유형코드.GetDisplayName(flowType)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudAlert Severity="@InboundFlowSeverity" Dense="true">
+                                    @입고흐름유형코드.GetDescription(inboundFlowType)
+                                </MudAlert>
+                            </MudItem>
                             <MudItem xs="12" md="6"><MudTextField Label="공급처명" @bind-Value="supplierName" Variant="Variant.Outlined" /></MudItem>
                             <MudItem xs="12" md="6"><MudTextField Label="원주문 참조번호" @bind-Value="orderReference" Variant="Variant.Outlined" /></MudItem>
                             <MudItem xs="12" md="6"><MudDatePicker Label="예정 도착일" @bind-Date="expectedArrivalDate" Variant="Variant.Outlined" /></MudItem>
@@ -97,6 +110,7 @@
                         <HeaderContent>
                             <MudTh>입고ID</MudTh>
                             <MudTh>창고ID</MudTh>
+                            <MudTh>흐름</MudTh>
                             <MudTh>공급처</MudTh>
                             <MudTh>참조번호</MudTh>
                             <MudTh>계약</MudTh>
@@ -107,6 +121,15 @@
                         <RowTemplate>
                             <MudTd DataLabel="입고ID">@context.Id</MudTd>
                             <MudTd DataLabel="창고ID">@context.창고Id</MudTd>
+                            <MudTd DataLabel="흐름">
+                                <MudChip T="string" Size="Size.Small" Color="@GetInboundFlowColor(context.입고흐름유형)" Variant="Variant.Filled">
+                                    @입고흐름유형코드.GetDisplayName(context.입고흐름유형)
+                                </MudChip>
+                                @if (!string.IsNullOrWhiteSpace(context.입고생성경로))
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.입고생성경로</MudText>
+                                }
+                            </MudTd>
                             <MudTd DataLabel="공급처">@context.공급처명</MudTd>
                             <MudTd DataLabel="참조번호">@context.원주문참조번호</MudTd>
                             <MudTd DataLabel="계약">
@@ -177,6 +200,12 @@
         입고계약유형코드.마켓풀필먼트,
         입고계약유형코드.수입통관풀필먼트
     ];
+    private static readonly IReadOnlyList<string> inboundFlowTypes =
+    [
+        입고흐름유형코드.계약기반입고,
+        입고흐름유형코드.현장임시입고,
+        입고흐름유형코드.주문자동입고예정
+    ];
 
     private string warehouseName = string.Empty;
     private string warehouseProxySiteType = LogisticsProxySiteTypes.DeliveryAgency;
@@ -185,6 +214,7 @@
     private string warehousePhone = string.Empty;
 
     private long? selectedWarehouseId;
+    private string inboundFlowType = 입고흐름유형코드.계약기반입고;
     private string supplierName = string.Empty;
     private string orderReference = string.Empty;
     private DateTime? expectedArrivalDate = DateTime.Today;
@@ -202,6 +232,13 @@
     private int itemQuantity = 1;
     private int itemDefectQuantity;
     private string storageLocation = string.Empty;
+
+    private Severity InboundFlowSeverity => 입고흐름유형코드.Normalize(inboundFlowType) switch
+    {
+        입고흐름유형코드.현장임시입고 => Severity.Warning,
+        입고흐름유형코드.주문자동입고예정 => Severity.Info,
+        _ => Severity.Success
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -284,6 +321,10 @@
             await WarehouseService.CreateInboundAsync(new 입고요청저장요청
             {
                 창고Id = selectedWarehouseId.Value,
+                입고흐름유형 = 입고흐름유형코드.Normalize(inboundFlowType),
+                입고생성경로 = BuildInboundSourceLabel(inboundFlowType),
+                계약선행여부 = 입고흐름유형코드.RequiresExistingContract(inboundFlowType),
+                자동생성여부 = 입고흐름유형코드.IsOrderGenerated(inboundFlowType),
                 공급처명 = supplierName,
                 원주문참조번호 = orderReference,
                 예정도착일 = expectedArrivalDate,
@@ -302,6 +343,7 @@
             });
 
             supplierName = orderReference = inboundMemo = string.Empty;
+            inboundFlowType = 입고흐름유형코드.계약기반입고;
             contractNo = contractCounterpartyName = contractSettlementType = string.Empty;
             contractType = 입고계약유형코드.보관대행;
             contractCommissionRate = 0m;
@@ -337,6 +379,22 @@
     {
         selectedInbound = null;
     }
+
+    private static Color GetInboundFlowColor(string? flowType)
+        => 입고흐름유형코드.Normalize(flowType) switch
+        {
+            입고흐름유형코드.현장임시입고 => Color.Warning,
+            입고흐름유형코드.주문자동입고예정 => Color.Info,
+            _ => Color.Success
+        };
+
+    private static string BuildInboundSourceLabel(string? flowType)
+        => 입고흐름유형코드.Normalize(flowType) switch
+        {
+            입고흐름유형코드.현장임시입고 => "창고 관리자 수기 등록",
+            입고흐름유형코드.주문자동입고예정 => "주문/구매 흐름 자동 생성",
+            _ => "계약 DB 기반 등록"
+        };
 
     private async Task CompleteInboundAsync()
     {

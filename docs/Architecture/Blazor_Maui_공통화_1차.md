@@ -8,7 +8,7 @@
 ## 이번 단계에서 적용한 항목
 
 ### 1) 공통 프로젝트 추가
-- `Hongdal.BackOffice.Ui` (Razor Class Library)
+- `Hongdal.Ui.Common/Areas/BackOffice` (Hongdal.Ui.Common 내부 BackOffice 공통 UI 영역)
   - 공통 MudBlazor Provider 컴포넌트 추가
 	- `Components/BackOfficeProviders.razor`
   - 공통 MudBlazor 테마 추가
@@ -24,7 +24,7 @@
 ### 2) 앱별 연결
 - `HongdalAdmin`
   - 공통 프로젝트 참조 추가
-	- `Hongdal.BackOffice.Ui`
+	- `Hongdal.Ui.Common`
 	- `Hongdal.BackOffice.Client`
   - 루트 Provider를 공통 컴포넌트로 교체
 	- `Components/App.razor`
@@ -35,7 +35,7 @@
 
 - `RestaurantDeskApp`
   - 공통 프로젝트 참조 추가
-	- `Hongdal.BackOffice.Ui`
+	- `Hongdal.Ui.Common`
 	- `Hongdal.BackOffice.Client`
   - 루트 Provider를 공통 컴포넌트로 교체
 	- `Components/Routes.razor`
@@ -54,7 +54,7 @@
 - 공통 클라이언트/진단 계층은 뼈대 수준으로 준비됨.
 
 ## 다음(2차) 권장 작업
-1. `HongdalAdmin`와 `RestaurantDeskApp` 페이지 중 중복 UI를 `Hongdal.BackOffice.Ui`로 단계적 이관
+1. `HongdalAdmin`와 `RestaurantDeskApp` 페이지 중 중복 UI를 `Hongdal.Ui.Common/Areas/BackOffice`로 단계적 이관
 2. 공통 메뉴/레이아웃(네비, 헤더, 상태 배지) 통합
 3. `Hongdal.BackOffice.Client`에 공통 HttpClient 팩토리/인증 핸들러 추가
 4. 음식점 주문 실시간 알림(SignalR) 컴포넌트와 `I주문알림Service` 연결 확대

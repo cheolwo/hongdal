@@ -1,20 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Hongdal;
 using 홍달.도메인.공통;
+using 홍달.Services.Dispatch.Engine;
 
 namespace 홍달.Services.Dispatch.Queue
 {
     public sealed class 배차추천후보선정Service : I배차추천후보선정Service
     {
         private readonly HongdalContext _db;
-        private readonly IReadOnlyDictionary<int, I배차업무정책> _policies;
+        private readonly IReadOnlyDictionary<int, I배차엔진> _engines;
 
         public 배차추천후보선정Service(
             HongdalContext db,
-            IEnumerable<I배차업무정책> policies)
+            IEnumerable<I배차엔진> engines)
         {
             _db = db;
-            _policies = policies
+            _engines = engines
                 .GroupBy(x => x.배차업무유형)
                 .ToDictionary(x => x.Key, x => x.First());
         }
@@ -32,12 +33,12 @@ namespace 홍달.Services.Dispatch.Queue
                 return null;
             }
 
-            if (!_policies.TryGetValue(queue.배차업무유형, out var policy))
+            if (!_engines.TryGetValue(queue.배차업무유형, out var engine))
             {
                 return null;
             }
 
-            return await policy.다음후보선정Async(queue, 제외기사Id, cancellationToken);
+            return await engine.다음후보선정Async(queue, 제외기사Id, cancellationToken);
         }
     }
 }

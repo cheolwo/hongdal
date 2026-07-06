@@ -28,6 +28,36 @@ public sealed class DriverNativeMapView : View
         typeof(DriverNativeMapView),
         Array.Empty<DriverMapMarkerItem>());
 
+    public static readonly BindableProperty ShowTrafficLayerProperty = BindableProperty.Create(
+        nameof(ShowTrafficLayer),
+        typeof(bool),
+        typeof(DriverNativeMapView),
+        true);
+
+    public static readonly BindableProperty ShowLocationButtonProperty = BindableProperty.Create(
+        nameof(ShowLocationButton),
+        typeof(bool),
+        typeof(DriverNativeMapView),
+        true);
+
+    public static readonly BindableProperty ShowCurrentLocationOverlayProperty = BindableProperty.Create(
+        nameof(ShowCurrentLocationOverlay),
+        typeof(bool),
+        typeof(DriverNativeMapView),
+        true);
+
+    public static readonly BindableProperty MinZoomProperty = BindableProperty.Create(
+        nameof(MinZoom),
+        typeof(double),
+        typeof(DriverNativeMapView),
+        6d);
+
+    public static readonly BindableProperty MaxZoomProperty = BindableProperty.Create(
+        nameof(MaxZoom),
+        typeof(double),
+        typeof(DriverNativeMapView),
+        18d);
+
     public double CenterLatitude
     {
         get => (double)GetValue(CenterLatitudeProperty);
@@ -50,6 +80,36 @@ public sealed class DriverNativeMapView : View
     {
         get => (IReadOnlyList<DriverMapMarkerItem>)GetValue(MarkersProperty);
         set => SetValue(MarkersProperty, value);
+    }
+
+    public bool ShowTrafficLayer
+    {
+        get => (bool)GetValue(ShowTrafficLayerProperty);
+        set => SetValue(ShowTrafficLayerProperty, value);
+    }
+
+    public bool ShowLocationButton
+    {
+        get => (bool)GetValue(ShowLocationButtonProperty);
+        set => SetValue(ShowLocationButtonProperty, value);
+    }
+
+    public bool ShowCurrentLocationOverlay
+    {
+        get => (bool)GetValue(ShowCurrentLocationOverlayProperty);
+        set => SetValue(ShowCurrentLocationOverlayProperty, value);
+    }
+
+    public double MinZoom
+    {
+        get => (double)GetValue(MinZoomProperty);
+        set => SetValue(MinZoomProperty, value);
+    }
+
+    public double MaxZoom
+    {
+        get => (double)GetValue(MaxZoomProperty);
+        set => SetValue(MaxZoomProperty, value);
     }
 
     public event EventHandler<DriverMapMarkerItem>? MarkerSelected;

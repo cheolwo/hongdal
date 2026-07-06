@@ -1,4 +1,5 @@
 using MediatR;
+using Hongdal.Contracts.Common.Inbound;
 using 홍달.도메인.창고;
 
 namespace Hongdal.Application.Warehouse;
@@ -68,6 +69,10 @@ public sealed class 주문결제완료물류예정생성EventHandler : INotifica
             var 입고 = new 입고요청
             {
                 창고Id = 주문자창고.Id,
+                입고흐름유형 = 입고흐름유형코드.주문자동입고예정,
+                입고생성경로 = "주문/구매 흐름 자동 생성",
+                계약선행여부 = false,
+                자동생성여부 = true,
                 주문Id = notification.주문Id,
                 주문참조번호 = notification.주문참조번호,
                 주문자UserId = notification.주문자UserId,

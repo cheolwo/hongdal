@@ -6,7 +6,7 @@
     xmlns:sf="clr-namespace:Syncfusion.Maui.Toolkit.SegmentedControl;assembly=Syncfusion.Maui.Toolkit"
     xmlns:pages="clr-namespace:Deliver.Pages"
     Shell.FlyoutBehavior="Flyout"
-    Title="홍달 배달기사">
+    Title="홍달 음식 배달기사">
 
     <ShellContent
         Title="배달 홈"

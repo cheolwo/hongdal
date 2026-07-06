@@ -23,7 +23,7 @@
 		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<!-- Display name -->
-		<ApplicationTitle>홍달 배달기사</ApplicationTitle>
+		<ApplicationTitle>홍달 음식 배달기사</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.deliver</ApplicationId>

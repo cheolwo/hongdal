@@ -1,7 +1,11 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Routing
 
 <MudLayout>
     <MudAppBar Elevation="0" Dense="true">
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" Disabled="@(!CanGoBack)" OnClick="GoBack" Class="back-nav-button">← 뒤로가기</MudButton>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
         <MudText Typo="Typo.subtitle1" Class="ml-2">Warehouse Manager</MudText>
         <MudSpacer />
@@ -21,9 +25,56 @@
 
 @code {
     private bool drawerOpen = true;
+    private readonly Stack<string> _navigationHistory = new();
+    private string? _currentUri;
+    private bool _isNavigatingBack;
+
+    private bool CanGoBack => _navigationHistory.Count > 0;
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        _currentUri = NavigationManager.Uri;
+    }
 
     private void ToggleDrawer()
     {
         drawerOpen = !drawerOpen;
+    }
+
+    private void GoBack()
+    {
+        if (_navigationHistory.Count == 0)
+        {
+            return;
+        }
+
+        var previousUri = _navigationHistory.Pop();
+        _isNavigatingBack = true;
+        NavigationManager.NavigateTo(previousUri);
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (_isNavigatingBack)
+        {
+            _isNavigatingBack = false;
+            _currentUri = args.Location;
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_currentUri) && !string.Equals(_currentUri, args.Location, StringComparison.OrdinalIgnoreCase))
+        {
+            _navigationHistory.Push(_currentUri);
+        }
+
+        _currentUri = args.Location;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 }

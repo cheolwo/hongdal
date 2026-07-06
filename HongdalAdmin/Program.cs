@@ -21,6 +21,7 @@ builder.Services.AddHttpClient<PlatformCommunityService>((sp, client) =>
     var baseUrl = sp.GetRequiredService<IConfiguration>()["AdminApi:BaseUrl"] ?? "https://localhost:7117/";
     client.BaseAddress = new Uri(baseUrl);
 });
+builder.Services.AddScoped<PlatformHomeModeStateService>();
 builder.Services.AddSingleton<백오피스메모리Service>();
 builder.Services.AddSingleton<문서관리메모리Service>();
 builder.Services.AddScoped<차량관리Service>();

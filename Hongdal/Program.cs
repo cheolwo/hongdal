@@ -20,6 +20,7 @@ using 홍달.Infrastructure.BackgroundJobs.DispatchQueue;
 using 홍달.Infrastructure.BackgroundJobs.Payments;
 using Hongdal.Middleware;
 using 홍달.Services.Audit;
+using Hongdal.Services.Auth;
 using 홍달.Services.Documents;
 using 홍달.Services.External.Google;
 using 홍달.Services.External.KieAi;
@@ -41,7 +42,10 @@ var isRunningInContainer = string.Equals(
     "true",
     StringComparison.OrdinalIgnoreCase);
 
-builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+if (!isRunningInContainer)
+{
+    builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+}
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
@@ -102,9 +106,11 @@ builder.Services.Configure<CommandProcessingOptions>(builder.Configuration.GetSe
 builder.Services.Configure<WorkRelationshipSnapshotOptions>(builder.Configuration.GetSection(WorkRelationshipSnapshotOptions.SectionName));
 builder.Services.Configure<CommandFileStorageOptions>(builder.Configuration.GetSection(CommandFileStorageOptions.SectionName));
 builder.Services.Configure<CustomsOptions>(builder.Configuration.GetSection(CustomsOptions.SectionName));
+builder.Services.Configure<PublicDataOptions>(builder.Configuration.GetSection(PublicDataOptions.SectionName));
 builder.Services.Configure<SalesChannelOrderSyncOptions>(builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName));
 builder.Services.Configure<배차큐정책Options>(builder.Configuration.GetSection("DispatchQueue"));
 builder.Services.Configure<배차큐배치작업Options>(builder.Configuration.GetSection(배차큐배치작업Options.SectionName));
+builder.Services.AddScoped<I가입온보딩인연후보Service, 가입온보딩인연후보Service>();
 
 var dispatchQueueJobOptions = builder.Configuration.GetSection(배차큐배치작업Options.SectionName).Get<배차큐배치작업Options>() ?? new 배차큐배치작업Options();
 var salesOrderSyncOptions = builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName).Get<SalesChannelOrderSyncOptions>() ?? new SalesChannelOrderSyncOptions();
@@ -461,7 +467,7 @@ CREATE TABLE `hr_role_assignments` (
             await using var indexCommand = connection.CreateCommand();
             indexCommand.CommandText = @"
 CREATE INDEX `IX_hr_role_assignments_user_scope_role_active`
-ON `hr_role_assignments` (`user_id`, `scope_type`, `scope_id`, `role_code`, `is_active`);";
+ON `hr_role_assignments` (`user_id`, `scope_type`, `role_code`, `is_active`);";
             await indexCommand.ExecuteNonQueryAsync();
             logger.LogWarning("Created missing index IX_hr_role_assignments_user_scope_role_active.");
         }
@@ -555,7 +561,7 @@ CREATE TABLE `hr_payroll_schedules` (
             await using var indexCommand = connection.CreateCommand();
             indexCommand.CommandText = @"
 CREATE INDEX `IX_hr_employment_contracts_worker_scope_status`
-ON `hr_employment_contracts` (`worker_user_id`, `employer_scope_type`, `employer_scope_id`, `contract_status`);";
+ON `hr_employment_contracts` (`worker_user_id`, `employer_scope_type`, `contract_status`);";
             await indexCommand.ExecuteNonQueryAsync();
             logger.LogWarning("Created missing index IX_hr_employment_contracts_worker_scope_status.");
         }

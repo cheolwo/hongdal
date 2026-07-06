@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Hongdal.Contracts.Common.ViewSettings;
 using Microsoft.AspNetCore.Http;
-using 홍달.Services.Options;
 using 홍달.Services.Audit;
 
 namespace Hongdal.Application.CommandProcessing;
@@ -29,7 +28,9 @@ public sealed class Command감사로그Processor : ICommand후처리Processor
 
     public string Name => "AuditLog";
 
-    public bool CanProcess(CommandProcessingRule rule) => rule.AuditLogEnabled.GetValueOrDefault();
+    public int Order => 100;
+
+    public bool CanProcess(Command후처리Context context) => Command후처리규칙.IsAuditLogEnabled(context.Rule);
 
     public async Task ProcessAsync(Command후처리Context context, CancellationToken cancellationToken)
     {

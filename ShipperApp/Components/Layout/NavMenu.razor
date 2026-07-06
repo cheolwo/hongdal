@@ -1,9 +1,11 @@
 ﻿@using Hongdal.Contracts.Common.ViewSettings
+@using Hongdal.Ui.Common.Areas.App.Services
 @using ShipperApp.Services
 @implements IDisposable
 @inject ShipperViewVisibilityService ViewVisibilityService
 @inject ShipperLocalizationService L
 @inject ShipperOperatingProfileService ProfileService
+@inject PlatformHomeModeStateService HomeModeState
 
 <MudNavMenu Class="pa-3 shipper-navmenu">
     <MudStack Spacing="0" Class="px-2 pb-3">
@@ -33,6 +35,15 @@
             }
         }
     }
+
+    <MudDivider Class="my-3" />
+    <MudStack Spacing="1" Class="px-2 pb-2">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">모드 전환</MudText>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudButton Variant="@CommunityModeVariant" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Forum" OnClick="@(() => SetMode(false))">커뮤니티</MudButton>
+            <MudButton Variant="@WorkModeVariant" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Work" OnClick="@(() => SetMode(true))">업무</MudButton>
+        </MudStack>
+    </MudStack>
 </MudNavMenu>
 
 @code {
@@ -40,7 +51,17 @@
     {
         ViewVisibilityService.Changed += HandleChanged;
         ProfileService.Changed += HandleChanged;
+        HomeModeState.Changed += HandleChanged;
         await ViewVisibilityService.EnsureLoadedAsync();
+    }
+
+    private Variant CommunityModeVariant => HomeModeState.IsWorkMode ? Variant.Outlined : Variant.Filled;
+
+    private Variant WorkModeVariant => HomeModeState.IsWorkMode ? Variant.Filled : Variant.Outlined;
+
+    private void SetMode(bool isWorkMode)
+    {
+        HomeModeState.SetWorkMode(isWorkMode);
     }
 
     private void HandleChanged()
@@ -147,6 +168,7 @@
     {
         ViewVisibilityService.Changed -= HandleChanged;
         ProfileService.Changed -= HandleChanged;
+        HomeModeState.Changed -= HandleChanged;
     }
 
     private sealed record NavMenuItem(string DisplayName, string Route, string IconKey, string GroupKey, int SortOrder);

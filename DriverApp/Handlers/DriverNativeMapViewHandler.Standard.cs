@@ -44,6 +44,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     public static void MapMarkers(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
     }
+
+    public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+    }
 }
 #elif IOS || MACCATALYST
 public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapView, UIView>
@@ -60,6 +64,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     public static void MapMarkers(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
     }
+
+    public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+    }
 }
 #else
 public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapView, object>
@@ -71,6 +79,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     }
 
     public static void MapMarkers(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+    }
+
+    public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
     }
 }

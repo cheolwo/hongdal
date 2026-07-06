@@ -20,7 +20,9 @@ public sealed class Command알림의도Processor : ICommand후처리Processor
 
     public string Name => "Notification";
 
-    public bool CanProcess(CommandProcessingRule rule) => rule.SmsEnabled.GetValueOrDefault() || rule.SnsEnabled.GetValueOrDefault() || rule.PushEnabled.GetValueOrDefault();
+    public int Order => 200;
+
+    public bool CanProcess(Command후처리Context context) => Command후처리규칙.Is알림FeatureEnabled(context.Rule);
 
     public async Task ProcessAsync(Command후처리Context context, CancellationToken cancellationToken)
     {

@@ -1,4 +1,6 @@
 using Hongdal.Security;
+using Hongdal.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -23,19 +25,22 @@ namespace Hongdal.Controllers.Common
         private readonly INtsBusinessRegistrationService _ntsBusinessRegistrationService;
         private readonly JwtOptions _jwtOptions;
         private readonly I사용자행위로그Service _activityLogService;
+        private readonly I가입온보딩인연후보Service _가입온보딩인연후보Service;
 
         public 인증Controller(
             UserManager<ApplicationUser> userManager,
             AuthTokenService authTokenService,
             INtsBusinessRegistrationService ntsBusinessRegistrationService,
             IOptions<JwtOptions> jwtOptions,
-            I사용자행위로그Service activityLogService)
+            I사용자행위로그Service activityLogService,
+            I가입온보딩인연후보Service 가입온보딩인연후보Service)
         {
             _userManager = userManager;
             _authTokenService = authTokenService;
             _ntsBusinessRegistrationService = ntsBusinessRegistrationService;
             _jwtOptions = jwtOptions.Value;
             _activityLogService = activityLogService;
+            _가입온보딩인연후보Service = 가입온보딩인연후보Service;
         }
 
         [HttpPost("login")]
@@ -140,6 +145,17 @@ namespace Hongdal.Controllers.Common
             }
 
             return Ok(new { userId = user.Id, userName = user.UserName, businessRegistrationNumber = user.BusinessRegistrationNumber });
+        }
+
+        [Authorize]
+        [HttpPost("onboarding/connection-candidates")]
+        public async Task<IActionResult> 가입온보딩인연후보조회([FromBody] 가입인연후보조회요청 request, CancellationToken cancellationToken)
+        {
+            if (request == null) return BadRequest("request body is required");
+            if (string.IsNullOrWhiteSpace(request.주문참조번호)) return BadRequest("orderReference is required");
+
+            var result = await _가입온보딩인연후보Service.후보조회Async(request, cancellationToken);
+            return Ok(result);
         }
 
         [HttpPost("refresh")]

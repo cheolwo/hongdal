@@ -1,0 +1,101 @@
+using DriverApp.Models.Driver.Map;
+using DriverApp.Models.Driver.Samples;
+using System.Globalization;
+
+namespace DriverApp.Controls;
+
+public partial class DriverTransportFooterBar : ContentView
+{
+    private bool _isExpanded;
+
+    public event EventHandler? OpenMenuRequested;
+
+    public event EventHandler? OpenTransportRequested;
+
+    public DriverTransportFooterBar()
+    {
+        InitializeComponent();
+    }
+
+    public void ShowTransport(기사운송샘플항목? transport)
+    {
+        if (transport is null)
+        {
+            TitleLabel.Text = "운송요약";
+            SummaryLabel.Text = "진행 중인 운송이 없습니다.";
+            CollapsedPickupLabel.Text = "상차: -";
+            CollapsedDropoffLabel.Text = "하차: -";
+            CollapsedFareLabel.Text = "운임: -";
+            SetDetails("-", "-", "-", "-", "-", "-", "추천 목록에서 운송을 선택해 주세요.");
+            return;
+        }
+
+        TitleLabel.Text = $"{transport.화물종류} 운송";
+        SummaryLabel.Text = $"{transport.픽업지} → {transport.하차지}";
+        CollapsedPickupLabel.Text = $"상차: {transport.픽업지}";
+        CollapsedDropoffLabel.Text = $"하차: {transport.하차지}";
+        CollapsedFareLabel.Text = $"운임: {transport.예상수익.ToString("N0", CultureInfo.CurrentCulture)}원";
+
+        SetDetails(
+            $"상차지: {transport.픽업지}",
+            $"하차지: {transport.하차지}",
+            $"화물: {transport.화물종류}",
+            $"거리: {transport.운송거리Km:0.0}km · 예정 {transport.예정시각:HH:mm}",
+            $"결제/운임: {transport.예상수익.ToString("N0", CultureInfo.CurrentCulture)}원",
+            $"전달받는 자: {transport.하차지} 담당자",
+            $"요청사항: {transport.다음행동}");
+    }
+
+    public void ShowMarker(DriverMapMarkerItem marker)
+    {
+        TitleLabel.Text = marker.Title;
+        SummaryLabel.Text = marker.Summary;
+        CollapsedPickupLabel.Text = $"상차: {marker.PickupAddress}";
+        CollapsedDropoffLabel.Text = "하차: 지도 마커 상세에서 확인";
+        CollapsedFareLabel.Text = $"의뢰: {marker.RequestId}";
+
+        SetDetails(
+            $"상차지: {marker.PickupAddress}",
+            "하차지: 추천 상세에서 확인",
+            $"화물: {marker.Title}",
+            $"운송정보: {marker.Summary}",
+            $"결제/운임: 추천 상세에서 확인",
+            "전달받는 자: 배차 후 표시",
+            $"요청사항: 의뢰 {marker.RequestId} 상세 확인 필요");
+    }
+
+    private void SetDetails(
+        string pickup,
+        string dropoff,
+        string cargo,
+        string distance,
+        string fare,
+        string receiver,
+        string request)
+    {
+        PickupLabel.Text = pickup;
+        DropoffLabel.Text = dropoff;
+        CargoLabel.Text = cargo;
+        DistanceLabel.Text = distance;
+        FareLabel.Text = fare;
+        ReceiverLabel.Text = receiver;
+        RequestLabel.Text = request;
+    }
+
+    private void OnToggleClicked(object? sender, EventArgs e)
+    {
+        _isExpanded = !_isExpanded;
+        ExpandedDetailsLayout.IsVisible = _isExpanded;
+        ToggleButton.Text = _isExpanded ? "⌄" : "⌃";
+    }
+
+    private void OnOpenMenuClicked(object? sender, EventArgs e)
+    {
+        OpenMenuRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnOpenTransportClicked(object? sender, EventArgs e)
+    {
+        OpenTransportRequested?.Invoke(this, EventArgs.Empty);
+    }
+}

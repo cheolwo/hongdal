@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Routing
 
 <div class="page">
     <div class="sidebar">
@@ -7,6 +10,7 @@
 
     <main>
         <div class="top-row px-4">
+            <button class="btn btn-link p-0 me-3 back-nav-button" disabled="@(!CanGoBack)" @onclick="GoBack" type="button">← 뒤로가기</button>
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
@@ -15,6 +19,56 @@
         </article>
     </main>
 </div>
+
+@code {
+    private readonly Stack<string> _navigationHistory = new();
+    private string? _currentUri;
+    private bool _isNavigatingBack;
+
+    private bool CanGoBack => _navigationHistory.Count > 0;
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        _currentUri = NavigationManager.Uri;
+    }
+
+    private void GoBack()
+    {
+        if (_navigationHistory.Count == 0)
+        {
+            return;
+        }
+
+        var previousUri = _navigationHistory.Pop();
+        _isNavigatingBack = true;
+        NavigationManager.NavigateTo(previousUri);
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (_isNavigatingBack)
+        {
+            _isNavigatingBack = false;
+            _currentUri = args.Location;
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_currentUri) && !string.Equals(_currentUri, args.Location, StringComparison.OrdinalIgnoreCase))
+        {
+            _navigationHistory.Push(_currentUri);
+        }
+
+        _currentUri = args.Location;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+}
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

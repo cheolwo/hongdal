@@ -20,7 +20,6 @@
 
   <ItemGroup>
 	<ProjectReference Include="..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
-	<ProjectReference Include="..\Hongdal.BackOffice.Ui\Hongdal.BackOffice.Ui.csproj" />
 	<ProjectReference Include="..\Hongdal.BackOffice.Client\Hongdal.BackOffice.Client.csproj" />
 	<ProjectReference Include="..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
   </ItemGroup>

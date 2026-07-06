@@ -152,6 +152,10 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             {
                 Id = x.Id,
                 창고Id = x.창고Id,
+                입고흐름유형 = x.입고흐름유형,
+                입고생성경로 = x.입고생성경로,
+                계약선행여부 = x.계약선행여부,
+                자동생성여부 = x.자동생성여부,
                 주문Id = x.주문Id,
                 주문참조번호 = x.주문참조번호,
                 주문자UserId = x.주문자UserId,
@@ -182,6 +186,12 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         var entity = new 입고요청
         {
             창고Id = request.창고Id,
+            입고흐름유형 = 입고흐름유형코드.Normalize(request.입고흐름유형),
+            입고생성경로 = string.IsNullOrWhiteSpace(request.입고생성경로)
+                ? BuildInboundSourceLabel(request.입고흐름유형)
+                : request.입고생성경로.Trim(),
+            계약선행여부 = request.계약선행여부,
+            자동생성여부 = request.자동생성여부,
             주문Id = request.주문Id,
             주문참조번호 = request.주문참조번호.Trim(),
             주문자UserId = userId,
@@ -214,6 +224,10 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         {
             Id = entity.Id,
             창고Id = entity.창고Id,
+            입고흐름유형 = entity.입고흐름유형,
+            입고생성경로 = entity.입고생성경로,
+            계약선행여부 = entity.계약선행여부,
+            자동생성여부 = entity.자동생성여부,
             주문Id = entity.주문Id,
             주문참조번호 = entity.주문참조번호,
             주문자UserId = entity.주문자UserId,
@@ -661,6 +675,14 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             계약종료일 = inbound.계약종료일,
             계약메모 = inbound.계약메모
         }.Normalize();
+
+    private static string BuildInboundSourceLabel(string? flowType)
+        => 입고흐름유형코드.Normalize(flowType) switch
+        {
+            입고흐름유형코드.현장임시입고 => "창고 관리자 수기 등록",
+            입고흐름유형코드.주문자동입고예정 => "주문/구매 흐름 자동 생성",
+            _ => "계약 DB 기반 등록"
+        };
 
     private static 입고계약스냅샷 CreateContractSnapshot(입고상품 item)
         => new 입고계약스냅샷

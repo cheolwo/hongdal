@@ -12,7 +12,11 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Packages.props", "./"]
 COPY ["Hongdal/Hongdal.csproj", "Hongdal/"]
+COPY ["Hongdal.Contracts/Hongdal.Contracts.csproj", "Hongdal.Contracts/"]
+COPY ["Hongdal.Domain/Hongdal.Domain.csproj", "Hongdal.Domain/"]
+COPY ["Hongdal.Infrastructure/Hongdal.Infrastructure.csproj", "Hongdal.Infrastructure/"]
 RUN dotnet restore "./Hongdal/Hongdal.csproj"
 COPY . .
 WORKDIR "/src/Hongdal"

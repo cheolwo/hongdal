@@ -60,6 +60,10 @@ public sealed class InMemoryShipperStore
         {
             Id = 2001,
             창고Id = 101,
+            입고흐름유형 = 입고흐름유형코드.계약기반입고,
+            입고생성경로 = "계약 DB 기반 등록",
+            계약선행여부 = true,
+            자동생성여부 = false,
             주문자UserId = "shipper-demo",
             공급처명 = "한빛가구",
             원주문참조번호 = "PO-240701-01",
@@ -79,6 +83,10 @@ public sealed class InMemoryShipperStore
         {
             Id = 2002,
             창고Id = 102,
+            입고흐름유형 = 입고흐름유형코드.주문자동입고예정,
+            입고생성경로 = "주문/구매 흐름 자동 생성",
+            계약선행여부 = false,
+            자동생성여부 = true,
             주문자UserId = "shipper-demo",
             공급처명 = "청해푸드",
             원주문참조번호 = "PO-240701-02",
@@ -1193,6 +1201,12 @@ public sealed class InMemoryShipperStore
         {
             Id = _inboundSequence++,
             창고Id = payload.창고Id,
+            입고흐름유형 = 입고흐름유형코드.Normalize(payload.입고흐름유형),
+            입고생성경로 = string.IsNullOrWhiteSpace(payload.입고생성경로)
+                ? BuildInboundSourceLabel(payload.입고흐름유형)
+                : payload.입고생성경로.Trim(),
+            계약선행여부 = payload.계약선행여부,
+            자동생성여부 = payload.자동생성여부,
             주문자UserId = userId,
             공급처명 = payload.공급처명,
             원주문참조번호 = string.IsNullOrWhiteSpace(payload.원주문참조번호) ? $"PO-{DateTime.Now:yyMMdd}-{_inboundSequence}" : payload.원주문참조번호,
@@ -1204,6 +1218,14 @@ public sealed class InMemoryShipperStore
         _inbounds.Add(inbound);
         return inbound;
     }
+
+    private static string BuildInboundSourceLabel(string? flowType)
+        => 입고흐름유형코드.Normalize(flowType) switch
+        {
+            입고흐름유형코드.현장임시입고 => "창고 관리자 수기 등록",
+            입고흐름유형코드.주문자동입고예정 => "주문/구매 흐름 자동 생성",
+            _ => "계약 DB 기반 등록"
+        };
 
     public 입고상품목록응답 CompleteInbound(long inboundId, 입고완료요청 payload, string userId)
     {

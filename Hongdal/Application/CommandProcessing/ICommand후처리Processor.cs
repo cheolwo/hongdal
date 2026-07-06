@@ -6,7 +6,9 @@ public interface ICommand후처리Processor
 {
     string Name { get; }
 
-    bool CanProcess(CommandProcessingRule rule);
+    int Order { get; }
+
+    bool CanProcess(Command후처리Context context);
 
     Task ProcessAsync(Command후처리Context context, CancellationToken cancellationToken);
 }

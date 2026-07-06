@@ -1,5 +1,8 @@
 @namespace Hongdal.Ui.Common.Areas.App.Components.Community
+@implements IDisposable
+@using Hongdal.Ui.Common.Areas.App.Services
 @inject PlatformCommunityService CommunityService
+@inject PlatformHomeModeStateService HomeModeState
 
 <MudContainer MaxWidth="MaxWidth.False" Class="@HomeRootClass">
     <MudStack Spacing="3">
@@ -19,6 +22,11 @@
         <MudGrid Class="@CommunityGridClass">
             <MudItem xs="12" lg="8">
                 <MudStack Spacing="2">
+                    @if (CommunityModeContent is not null)
+                    {
+                        @CommunityModeContent
+                    }
+
                     @if (isLoading)
                     {
                         <MudPaper Elevation="0" Outlined="true" Class="pa-4">
@@ -410,39 +418,6 @@
             </MudStack>
         </MudPaper>
 
-        <MudPaper Elevation="6" Class="@ModeBarClass">
-            <MudStack Spacing="1">
-                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                        <MudIcon Icon="@CurrentModeIcon" Color="@CurrentModeColor" />
-                        <MudText Typo="Typo.subtitle2">@CurrentModeLabel</MudText>
-                    </MudStack>
-                    <MudIconButton Icon="@ModeBarToggleIcon"
-                                   Size="Size.Small"
-                                   Color="Color.Default"
-                                   OnClick="ToggleModeBar"
-                                   aria-label="모드 바 접기 또는 펼치기" />
-                </MudStack>
-
-                @if (isModeBarExpanded)
-                {
-                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                        <MudButton Variant="@CommunityModeVariant"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Forum"
-                                   OnClick="ShowCommunityMode">
-                            커뮤니티 모드
-                        </MudButton>
-                        <MudButton Variant="@WorkModeVariant"
-                                   Color="Color.Success"
-                                   StartIcon="@Icons.Material.Filled.Work"
-                                   OnClick="ShowWorkMode">
-                            업무 모드
-                        </MudButton>
-                    </MudStack>
-                }
-            </MudStack>
-        </MudPaper>
     </MudStack>
 </MudContainer>
 
@@ -454,7 +429,7 @@
         --platform-home-surface: #ffffff;
         --platform-home-surface-soft: #eff6ff;
         color: var(--mud-palette-text-primary);
-        padding-bottom: 112px;
+        padding-bottom: 24px;
         min-height: 100%;
         border-radius: 8px;
         transition: background-color 180ms ease, color 180ms ease;
@@ -592,25 +567,6 @@
         border-radius: 8px;
     }
 
-    .platform-home-mode-bar {
-        position: fixed;
-        left: 50%;
-        bottom: 16px;
-        z-index: 1200;
-        width: min(720px, calc(100vw - 24px));
-        transform: translateX(-50%);
-        border: 1px solid var(--mud-palette-divider);
-        border-radius: 8px;
-        padding: 10px 12px;
-        background: color-mix(in srgb, var(--platform-home-surface-soft) 82%, var(--mud-palette-surface));
-        border-color: var(--platform-home-border);
-        box-shadow: 0 12px 28px rgba(var(--platform-home-accent-rgb), 0.16);
-        transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, width 180ms ease;
-    }
-
-    .platform-home-mode-bar--collapsed {
-        width: min(360px, calc(100vw - 24px));
-    }
 </style>
 
 @code {
@@ -630,6 +586,9 @@
     public bool CanManageCommunityPosts { get; set; }
 
     [Parameter]
+    public RenderFragment? CommunityModeContent { get; set; }
+
+    [Parameter]
     public RenderFragment? WorkModeContent { get; set; }
 
     private readonly List<PlatformCommunityPostResponse> posts = [];
@@ -642,7 +601,6 @@
     private bool isLoading = true;
     private bool isSaving;
     private bool isWorkMode;
-    private bool isModeBarExpanded = true;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
     private const long MaxUploadFileBytes = 5 * 1024 * 1024;
@@ -659,40 +617,15 @@
         ? "pa-4 platform-work-panel"
         : "pa-4 platform-work-panel platform-home-section-hidden";
 
-    private string ModeBarClass => isModeBarExpanded
-        ? "platform-home-mode-bar"
-        : "platform-home-mode-bar platform-home-mode-bar--collapsed";
-
     private string CurrentModeLabel => isWorkMode ? "업무 모드" : "커뮤니티 모드";
-
-    private string CurrentModeIcon => isWorkMode ? Icons.Material.Filled.Work : Icons.Material.Filled.Forum;
 
     private Color CurrentModeColor => isWorkMode ? Color.Success : Color.Primary;
 
-    private string ModeBarToggleIcon => isModeBarExpanded ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ExpandLess;
-
-    private Variant CommunityModeVariant => isWorkMode ? Variant.Outlined : Variant.Filled;
-
-    private Variant WorkModeVariant => isWorkMode ? Variant.Filled : Variant.Outlined;
-
     protected override async Task OnInitializedAsync()
     {
+        HomeModeState.Changed += HandleModeChanged;
+        isWorkMode = HomeModeState.IsWorkMode;
         await LoadPostsAsync();
-    }
-
-    private void ShowCommunityMode()
-    {
-        isWorkMode = false;
-    }
-
-    private void ShowWorkMode()
-    {
-        isWorkMode = true;
-    }
-
-    private void ToggleModeBar()
-    {
-        isModeBarExpanded = !isModeBarExpanded;
     }
 
     private void PrepareWorkCommunityDraft(WorkCommunityDraftKind kind)
@@ -706,10 +639,20 @@
         form.IsReportBoardPost = false;
         form.ReporterDisplayName = string.Empty;
         form.ReportedDisplayName = string.Empty;
-        isWorkMode = false;
-        isModeBarExpanded = true;
+        HomeModeState.SetWorkMode(false);
         statusSeverity = Severity.Info;
         statusMessage = "업무 맥락을 커뮤니티 글 초안으로 옮겼습니다. 닉네임과 비밀번호를 입력한 뒤 필요한 내용을 보완해 등록하세요.";
+    }
+
+    private void HandleModeChanged()
+    {
+        isWorkMode = HomeModeState.IsWorkMode;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        HomeModeState.Changed -= HandleModeChanged;
     }
 
     private async Task LoadPostsAsync()

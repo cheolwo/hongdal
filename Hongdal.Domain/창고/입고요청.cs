@@ -13,6 +13,20 @@ public class 입고요청
     [Column("창고_id")]
     public long 창고Id { get; set; }
 
+    [Column("입고흐름유형")]
+    [MaxLength(50)]
+    public string 입고흐름유형 { get; set; } = "ContractBased";
+
+    [Column("입고생성경로")]
+    [MaxLength(100)]
+    public string 입고생성경로 { get; set; } = string.Empty;
+
+    [Column("계약선행여부")]
+    public bool 계약선행여부 { get; set; } = true;
+
+    [Column("자동생성여부")]
+    public bool 자동생성여부 { get; set; }
+
     [Column("주문_id")]
     public long? 주문Id { get; set; }
 

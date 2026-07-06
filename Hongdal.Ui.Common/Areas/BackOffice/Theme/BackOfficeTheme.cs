@@ -1,6 +1,6 @@
 using MudBlazor;
 
-namespace Hongdal.BackOffice.Ui.Theme;
+namespace Hongdal.Ui.Common.Areas.BackOffice.Theme;
 
 public static class BackOfficeTheme
 {

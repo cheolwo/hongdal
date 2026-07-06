@@ -1,0 +1,110 @@
+﻿@namespace Hongdal.Ui.Common.Areas.App.Components.Community
+
+<MudPaper Elevation="6" Class="@ModeBarClass">
+    <MudStack Spacing="1">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@CurrentModeIcon" Color="@CurrentModeColor" />
+                <MudText Typo="Typo.subtitle2">@CurrentModeLabel</MudText>
+            </MudStack>
+            <MudIconButton Icon="@ModeBarToggleIcon"
+                           Size="Size.Small"
+                           Color="Color.Default"
+                           OnClick="ToggleExpandedAsync"
+                           aria-label="Toggle mode bar" />
+        </MudStack>
+
+        @if (IsExpanded)
+        {
+            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudButton Variant="@CommunityModeVariant"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Forum"
+                           OnClick="@(() => SetModeAsync(false))">
+                    @CommunityModeLabel
+                </MudButton>
+                <MudButton Variant="@WorkModeVariant"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Work"
+                           OnClick="@(() => SetModeAsync(true))">
+                    @WorkModeLabel
+                </MudButton>
+            </MudStack>
+        }
+    </MudStack>
+</MudPaper>
+
+<style>
+    .platform-home-mode-bar {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        z-index: 1200;
+        width: min(720px, calc(100vw - 24px));
+        transform: translateX(-50%);
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: color-mix(in srgb, var(--platform-home-surface-soft) 82%, var(--mud-palette-surface));
+        border-color: var(--platform-home-border);
+        box-shadow: 0 12px 28px rgba(var(--platform-home-accent-rgb), 0.16);
+        transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, width 180ms ease;
+    }
+
+    .platform-home-mode-bar--collapsed {
+        width: min(360px, calc(100vw - 24px));
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool IsWorkMode { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsWorkModeChanged { get; set; }
+
+    [Parameter]
+    public bool IsExpanded { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<bool> IsExpandedChanged { get; set; }
+
+    [Parameter]
+    public string CommunityModeLabel { get; set; } = "\uCEE4\uBBA4\uB2C8\uD2F0 \uBAA8\uB4DC";
+
+    [Parameter]
+    public string WorkModeLabel { get; set; } = "\uC5C5\uBB34 \uBAA8\uB4DC";
+
+    private string ModeBarClass => IsExpanded
+        ? "platform-home-mode-bar"
+        : "platform-home-mode-bar platform-home-mode-bar--collapsed";
+
+    private string CurrentModeLabel => IsWorkMode ? WorkModeLabel : CommunityModeLabel;
+
+    private string CurrentModeIcon => IsWorkMode ? Icons.Material.Filled.Work : Icons.Material.Filled.Forum;
+
+    private Color CurrentModeColor => IsWorkMode ? Color.Success : Color.Primary;
+
+    private string ModeBarToggleIcon => IsExpanded ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ExpandLess;
+
+    private Variant CommunityModeVariant => IsWorkMode ? Variant.Outlined : Variant.Filled;
+
+    private Variant WorkModeVariant => IsWorkMode ? Variant.Filled : Variant.Outlined;
+
+    private async Task SetModeAsync(bool isWorkMode)
+    {
+        if (IsWorkMode == isWorkMode)
+        {
+            return;
+        }
+
+        IsWorkMode = isWorkMode;
+        await IsWorkModeChanged.InvokeAsync(isWorkMode);
+    }
+
+    private async Task ToggleExpandedAsync()
+    {
+        IsExpanded = !IsExpanded;
+        await IsExpandedChanged.InvokeAsync(IsExpanded);
+    }
+}

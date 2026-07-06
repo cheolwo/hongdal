@@ -2,6 +2,7 @@ using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.External.Customs;
 using 홍달.Services.External.Google;
 using 홍달.Services.External.KieAi;
+using 홍달.Services.External.PublicData;
 using 홍달.Services.Notifications;
 using 홍달.Services.Options;
 using 홍달.Services.Payments;
@@ -59,6 +60,18 @@ public static partial class ServiceCollectionExtensions
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CustomsOptions>>().Value;
             client.BaseAddress = new Uri(options.CargoTrackingBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IRoadAddressLookupService, RoadAddressLookupService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.RoadAddress.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IApartmentComplexLookupService, ApartmentComplexLookupService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.ApartmentComplex.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddHttpClient<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();

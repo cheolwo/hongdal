@@ -11,7 +11,7 @@ namespace Deliver
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell()) { Title = "홍달 배달기사" };
+            return new Window(new AppShell()) { Title = "홍달 음식 배달기사" };
         }
     }
 }

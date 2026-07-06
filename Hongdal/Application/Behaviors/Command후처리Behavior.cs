@@ -26,6 +26,11 @@ public sealed class Command후처리Behavior<TRequest, TResponse> : IPipelineBeh
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
+        if (!Command후처리규칙.IsCommandRequest(request))
+        {
+            return await next();
+        }
+
         var response = await next();
 
         if (!CommandResult판별기.TryGet성공여부(response, out var isSuccess) || !isSuccess)
@@ -35,13 +40,8 @@ public sealed class Command후처리Behavior<TRequest, TResponse> : IPipelineBeh
 
         var commandName = typeof(TRequest).Name;
         var rule = await _command기능설정Resolver.ResolveAsync(commandName, cancellationToken);
-        var hasRelationshipSnapshot = request is IWorkRelationshipSnapshotCommand
-                                      && rule.WorkRelationshipSnapshotEnabled.GetValueOrDefault();
-        if (!hasRelationshipSnapshot
-            && !rule.AuditLogEnabled.GetValueOrDefault()
-            && !rule.SmsEnabled.GetValueOrDefault()
-            && !rule.SnsEnabled.GetValueOrDefault()
-            && !rule.PushEnabled.GetValueOrDefault())
+        var canHandleWorkRelationshipSnapshot = request is IWorkRelationshipSnapshotCommand;
+        if (!Command후처리규칙.HasEnabled후처리Feature(rule, canHandleWorkRelationshipSnapshot))
         {
             return response;
         }
@@ -55,9 +55,9 @@ public sealed class Command후처리Behavior<TRequest, TResponse> : IPipelineBeh
             DateTime.UtcNow,
             rule);
 
-        foreach (var processor in _processors)
+        foreach (var processor in _processors.OrderBy(x => x.Order))
         {
-            if (!processor.CanProcess(rule))
+            if (!processor.CanProcess(context))
             {
                 continue;
             }

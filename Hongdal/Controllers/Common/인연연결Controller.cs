@@ -75,6 +75,7 @@ public sealed class 인연연결Controller : ControllerBase
         var result = await _sender.Send(new 내인연연결수신함조회Query(page, pageSize), cancellationToken);
         return Ok(result);
     }
+
 }
 
 public sealed class 인연연결요청생성요청
