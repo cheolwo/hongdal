@@ -8,6 +8,7 @@ using 홍달.Services.External.PublicData;
 using 홍달.Services.Images;
 using 홍달.Services.Payments;
 using 홍달.Services.Sales;
+using 홍달.Services.Versioning;
 
 namespace Hongdal.Extensions;
 
@@ -21,6 +22,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
+        services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
         services.AddSingleton<IDriverLocationStore, DriverLocationStore>();
@@ -67,6 +69,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<Hongdal.Application.Shipper.Request.I차량추천Service, Hongdal.Application.Shipper.Request.차량추천Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰추천Service, Hongdal.Application.Shipper.Request.화주운송의뢰추천Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰일괄등록파서Service, Hongdal.Application.Shipper.Request.화주운송의뢰일괄등록파서Service>();
+        services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송요금정책검토Service, Hongdal.Application.Shipper.Request.화주운송요금정책검토Service>();
         services.AddScoped<I판매상품샘플시드Service, 판매상품샘플시드Service>();
         services.AddScoped<I배차추천Service, 화물배차추천Service>();
         services.AddScoped<I음식배차추천Service, 음식배차추천Service>();

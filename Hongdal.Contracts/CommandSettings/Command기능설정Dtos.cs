@@ -11,6 +11,14 @@ public sealed class Command기능설정항목응답
 
     public string CommandDisplayName { get; set; } = string.Empty;
 
+    public string Version { get; set; } = string.Empty;
+
+    public string VersionDisplayName { get; set; } = string.Empty;
+
+    public int VersionSortOrder { get; set; }
+
+    public bool IsCurrentRelease { get; set; }
+
     public string FeatureName { get; set; } = string.Empty;
 
     public string FeatureDisplayName { get; set; } = string.Empty;

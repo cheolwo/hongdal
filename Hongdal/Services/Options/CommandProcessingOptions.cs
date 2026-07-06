@@ -32,6 +32,8 @@ public sealed class CommandCatalogOption
     public string DisplayName { get; set; } = string.Empty;
 
     public string Category { get; set; } = string.Empty;
+
+    public string Version { get; set; } = string.Empty;
 }
 
 public sealed class CommandFeatureCatalogOption
@@ -39,6 +41,8 @@ public sealed class CommandFeatureCatalogOption
     public string FeatureName { get; set; } = string.Empty;
 
     public string DisplayName { get; set; } = string.Empty;
+
+    public string Version { get; set; } = string.Empty;
 
     public bool? IsUserConfigurable { get; set; }
 

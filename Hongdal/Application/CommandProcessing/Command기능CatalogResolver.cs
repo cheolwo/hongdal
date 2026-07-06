@@ -19,7 +19,8 @@ public sealed class Command기능CatalogResolver : ICommand기능CatalogResolver
             .Select(x => new Command기능대상(
                 x.CommandName,
                 string.IsNullOrWhiteSpace(x.DisplayName) ? x.CommandName : x.DisplayName,
-                x.Category))
+                x.Category,
+                string.IsNullOrWhiteSpace(x.Version) ? Command기능버전Catalog.CurrentRelease : x.Version))
             .ToArray();
 
         return optionCommands.Length > 0 ? optionCommands : Command기능대상Catalog.DriverCommands;
@@ -35,7 +36,8 @@ public sealed class Command기능CatalogResolver : ICommand기능CatalogResolver
                 return new Command기능정책(
                     x.FeatureName,
                     x.IsUserConfigurable ?? defaultPolicy.IsUserConfigurable,
-                    x.IsRequired ?? defaultPolicy.IsRequired);
+                    x.IsRequired ?? defaultPolicy.IsRequired,
+                    string.IsNullOrWhiteSpace(x.Version) ? defaultPolicy.Version : x.Version);
             })
             .ToArray();
 

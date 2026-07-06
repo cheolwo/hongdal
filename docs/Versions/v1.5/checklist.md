@@ -10,3 +10,6 @@
 - [ ] 플랫폼 참여 주문자 자동 입고 예정 생성 확인
 - [ ] 외부 주문자에게 불필요한 입고 알림이 가지 않는지 확인
 - [ ] 창고 출고 연계 운송이 화물/용달 배차와 연결되는지 확인
+- [ ] 내부 테스트 또는 1.5 릴리즈에서 `WarehouseV15=true` 확인
+- [ ] `CustomsHsV20`, `ApartmentGroupOrderV25`, `FoodDeliveryV30`, `HongdalMartV35` 기본 비활성 확인
+- [ ] [공통 릴리즈 게이트](../release-gates.md) 통과 확인

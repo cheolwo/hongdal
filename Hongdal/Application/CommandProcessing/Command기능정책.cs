@@ -1,16 +1,16 @@
 namespace Hongdal.Application.CommandProcessing;
 
-public sealed record Command기능정책(string FeatureName, bool IsUserConfigurable, bool IsRequired);
+public sealed record Command기능정책(string FeatureName, bool IsUserConfigurable, bool IsRequired, string Version = Command기능버전Catalog.CurrentRelease);
 
 public static class Command기능정책Catalog
 {
     public static readonly IReadOnlyList<Command기능정책> All =
     [
-        new(Command기능명.AuditLog, false, true),
-        new(Command기능명.WorkRelationshipSnapshot, true, false),
-        new(Command기능명.Sms, true, false),
-        new(Command기능명.Sns, true, false),
-        new(Command기능명.Push, true, false)
+        new(Command기능명.AuditLog, false, true, "1.0"),
+        new(Command기능명.WorkRelationshipSnapshot, true, false, "1.0"),
+        new(Command기능명.Sms, true, false, "1.0"),
+        new(Command기능명.Sns, true, false, "1.0"),
+        new(Command기능명.Push, true, false, "1.0")
     ];
 
     public static Command기능정책 Get(string featureName)

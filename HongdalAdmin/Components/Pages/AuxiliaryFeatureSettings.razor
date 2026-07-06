@@ -18,13 +18,22 @@
 
         <MudPaper Class="pa-4" Elevation="1">
             <MudGrid>
-                <MudItem xs="12" md="5">
+                <MudItem xs="12" md="4">
                     <MudTextField Label="사용자 ID"
                                   Variant="Variant.Outlined"
                                   @bind-Value="userId"
                                   Placeholder="비워두면 전역 정책만 표시" />
                 </MudItem>
-                <MudItem xs="12" md="7" Class="d-flex align-center gap-2">
+                <MudItem xs="12" md="4">
+                    <MudSelect T="string" Label="버전 그룹" Variant="Variant.Outlined" @bind-Value="selectedVersion">
+                        <MudSelectItem Value="@AllVersionsValue">전체</MudSelectItem>
+                        @foreach (var version in versionGroups)
+                        {
+                            <MudSelectItem Value="@version.Version">@version.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="4" Class="d-flex align-center gap-2">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadAsync" Disabled="isLoading">조회</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ClearUserAsync" Disabled="isLoading">전역만 보기</MudButton>
                 </MudItem>
@@ -45,6 +54,7 @@
             <MudPaper Class="pa-4" Elevation="1">
                 <MudTable Items="filteredItems" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
+                        <MudTh>버전</MudTh>
                         <MudTh>대상</MudTh>
                         <MudTh>기능</MudTh>
                         <MudTh>앱 기본</MudTh>
@@ -54,6 +64,17 @@
                         <MudTh></MudTh>
                     </HeaderContent>
                     <RowTemplate Context="item">
+                        <MudTd DataLabel="버전">
+                            <MudStack Spacing="1">
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Color="@(item.IsCurrentRelease ? Color.Success : Color.Default)"
+                                         Variant="@(item.IsCurrentRelease ? Variant.Filled : Variant.Outlined)">
+                                    @item.Version
+                                </MudChip>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.VersionDisplayName</MudText>
+                            </MudStack>
+                        </MudTd>
                         <MudTd DataLabel="대상">
                             <MudText Typo="Typo.body2">@item.TargetDisplayName</MudText>
                             <MudText Typo="Typo.caption" Color="Color.Secondary">@item.TargetName</MudText>
@@ -126,13 +147,28 @@
 
 @code {
     private string? userId;
+    private const string AllVersionsValue = "__all";
+    private string selectedVersion = AllVersionsValue;
     private string? errorMessage;
     private bool isLoading = true;
     private bool isSaving;
     private IReadOnlyList<AuxiliaryFeatureSettingItem> items = [];
 
+    private IEnumerable<VersionFilterItem> versionGroups =>
+        items
+            .GroupBy(x => new { x.Version, x.VersionDisplayName, x.VersionSortOrder })
+            .OrderBy(x => x.Key.VersionSortOrder)
+            .ThenBy(x => x.Key.Version)
+            .Select(x => new VersionFilterItem(x.Key.Version, x.Key.VersionDisplayName));
+
     private IEnumerable<AuxiliaryFeatureSettingItem> filteredItems =>
-        items.OrderBy(x => x.Category).ThenBy(x => x.TargetDisplayName).ThenBy(x => x.FeatureDisplayName);
+        items
+            .Where(x => string.Equals(selectedVersion, AllVersionsValue, StringComparison.Ordinal)
+                        || string.Equals(x.Version, selectedVersion, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.VersionSortOrder)
+            .ThenBy(x => x.Category)
+            .ThenBy(x => x.TargetDisplayName)
+            .ThenBy(x => x.FeatureDisplayName);
 
     protected override async Task OnInitializedAsync()
     {
@@ -227,4 +263,6 @@
         builder.AddAttribute(3, "ChildContent", (RenderFragment)(childBuilder => childBuilder.AddContent(0, enabled ? "ON" : "OFF")));
         builder.CloseComponent();
     };
+
+    private sealed record VersionFilterItem(string Version, string DisplayName);
 }

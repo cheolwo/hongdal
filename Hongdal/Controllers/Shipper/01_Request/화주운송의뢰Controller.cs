@@ -17,12 +17,18 @@ namespace Hongdal.Controllers.Shipper.Request01
         private readonly ISender _sender;
         private readonly I화주운송의뢰일괄등록파서Service _bulkParser;
         private readonly I차량추천Service _vehicleRecommendationService;
+        private readonly I화주운송요금정책검토Service _farePolicyReviewService;
 
-        public 화주운송의뢰Controller(ISender sender, I화주운송의뢰일괄등록파서Service bulkParser, I차량추천Service vehicleRecommendationService)
+        public 화주운송의뢰Controller(
+            ISender sender,
+            I화주운송의뢰일괄등록파서Service bulkParser,
+            I차량추천Service vehicleRecommendationService,
+            I화주운송요금정책검토Service farePolicyReviewService)
         {
             _sender = sender;
             _bulkParser = bulkParser;
             _vehicleRecommendationService = vehicleRecommendationService;
+            _farePolicyReviewService = farePolicyReviewService;
         }
 
         [HttpGet]
@@ -62,6 +68,13 @@ namespace Hongdal.Controllers.Shipper.Request01
             var pickup = req.픽업;
             var dropoff = req.하차;
             var pricing = req.요금옵션;
+            var policyReview = _farePolicyReviewService.검토(pricing, req.결제예정금액);
+            if (policyReview.정책위반)
+            {
+                var errors = policyReview.경고목록
+                    .Concat(policyReview.이벤트코드목록.Select(x => $"요금정책이벤트:{x}"));
+                return BadRequest(new { errors });
+            }
 
             var result = await _sender.Send(new 의뢰생성Command(
                 req.화주Id,

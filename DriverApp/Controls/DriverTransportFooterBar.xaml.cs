@@ -26,12 +26,14 @@ public partial class DriverTransportFooterBar : ContentView
             CollapsedPickupLabel.Text = "상차: -";
             CollapsedDropoffLabel.Text = "하차: -";
             CollapsedFareLabel.Text = "운임: -";
+            NextActionLabel.Text = "다음 행동: 추천 목록에서 운송 선택";
             SetDetails("-", "-", "-", "-", "-", "-", "추천 목록에서 운송을 선택해 주세요.");
             return;
         }
 
         TitleLabel.Text = $"{transport.화물종류} 운송";
         SummaryLabel.Text = $"{transport.픽업지} → {transport.하차지}";
+        NextActionLabel.Text = $"다음 행동: {transport.다음행동}";
         CollapsedPickupLabel.Text = $"상차: {transport.픽업지}";
         CollapsedDropoffLabel.Text = $"하차: {transport.하차지}";
         CollapsedFareLabel.Text = $"운임: {transport.예상수익.ToString("N0", CultureInfo.CurrentCulture)}원";
@@ -50,6 +52,7 @@ public partial class DriverTransportFooterBar : ContentView
     {
         TitleLabel.Text = marker.Title;
         SummaryLabel.Text = marker.Summary;
+        NextActionLabel.Text = "다음 행동: 추천 상세 확인";
         CollapsedPickupLabel.Text = $"상차: {marker.PickupAddress}";
         CollapsedDropoffLabel.Text = "하차: 지도 마커 상세에서 확인";
         CollapsedFareLabel.Text = $"의뢰: {marker.RequestId}";

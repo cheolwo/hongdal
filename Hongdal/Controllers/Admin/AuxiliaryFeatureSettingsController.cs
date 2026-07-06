@@ -49,6 +49,7 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
 
         foreach (var command in _catalogResolver.GetDriverCommands())
         {
+            var version = Command기능버전Catalog.Get(command.Version);
             var appRule = _resolver.GetDefaultRule(command.CommandName);
             var globalRule = await _resolver.ResolveGlobalRuleAsync(command.CommandName, cancellationToken);
 
@@ -73,6 +74,10 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
                     TargetName = command.CommandName,
                     TargetDisplayName = command.DisplayName,
                     Category = command.Category,
+                    Version = version.Version,
+                    VersionDisplayName = version.DisplayName,
+                    VersionSortOrder = version.SortOrder,
+                    IsCurrentRelease = version.IsCurrentRelease,
                     FeatureName = featureName,
                     FeatureDisplayName = _catalogResolver.GetFeatureDisplayName(featureName),
                     AppDefaultEnabled = appDefault,

@@ -190,9 +190,45 @@ public sealed class PricingDTO
 {
     public string? 서비스레벨 { get; set; }
     public string? 요청사항 { get; set; }
+    public decimal? 예상거리Km { get; set; }
+    public decimal? 기본운임 { get; set; }
+    public decimal? Km당단가 { get; set; }
+    public decimal? 거리운임 { get; set; }
+    public decimal? 최소운임 { get; set; }
     public decimal? 대기료 { get; set; }
     public decimal? 수작업비 { get; set; }
     public decimal? 할증 { get; set; }
+    public decimal? 플랫폼수수료 { get; set; }
+    public decimal? 기사지급예정운임 { get; set; }
+    public 화주운송알선정책DTO? 알선정책 { get; set; }
+}
+
+public sealed class 화주운송알선정책DTO
+{
+    public string? 원의뢰Id { get; set; }
+    public int 알선단계 { get; set; } = 1;
+    public bool 재알선금지 { get; set; } = true;
+    public string? 알선소Id { get; set; }
+    public string? 요금정책버전 { get; set; }
+    public string? 정책메모 { get; set; }
+}
+
+public sealed class 화주운송요금정책검토결과
+{
+    public bool 정책위반 { get; set; }
+    public bool 재알선의심 { get; set; }
+    public decimal? 기준운임 { get; set; }
+    public decimal? 화주기사운임차액 { get; set; }
+    public IReadOnlyList<string> 이벤트코드목록 { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> 경고목록 { get; set; } = Array.Empty<string>();
+}
+
+public static class 화주운송요금정책이벤트코드
+{
+    public const string 재알선차단필요 = nameof(재알선차단필요);
+    public const string 재알선의심 = nameof(재알선의심);
+    public const string 기준운임미달 = nameof(기준운임미달);
+    public const string 기사지급운임누락 = nameof(기사지급운임누락);
 }
 
 public sealed class 화주운송의뢰응답

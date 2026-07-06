@@ -28,6 +28,7 @@ public sealed class 기사Command기능설정목록조회QueryHandler : IRequest
         var features = _catalogResolver.GetFeatures();
         foreach (var command in _catalogResolver.GetDriverCommands())
         {
+            var version = Command기능버전Catalog.Get(command.Version);
             var defaultRule = _resolver.GetDefaultRule(command.CommandName);
             foreach (var policy in features)
             {
@@ -42,6 +43,10 @@ public sealed class 기사Command기능설정목록조회QueryHandler : IRequest
                 {
                     CommandName = command.CommandName,
                     CommandDisplayName = command.DisplayName,
+                    Version = version.Version,
+                    VersionDisplayName = version.DisplayName,
+                    VersionSortOrder = version.SortOrder,
+                    IsCurrentRelease = version.IsCurrentRelease,
                     FeatureName = featureName,
                     FeatureDisplayName = _catalogResolver.GetFeatureDisplayName(featureName),
                     DefaultEnabled = defaultEnabled,

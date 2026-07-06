@@ -173,8 +173,6 @@
                                     <span>@item.의뢰.인수증표시</span>
                                 </div>
 
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">@item.의뢰.추천사유</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">@item.의뢰.상세설명</MudText>
                                 <MudStack Row="true" Spacing="2">
                                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.RecommendationDetail(item.의뢰.의뢰Id)">상세</MudButton>
                                     <MudButton Variant="Variant.Outlined" Color="Color.Success" Href="@DriverRoutes.RecommendationDecision(item.의뢰.의뢰Id)">수락/거절</MudButton>

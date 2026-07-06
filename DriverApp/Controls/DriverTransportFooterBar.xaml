@@ -65,6 +65,20 @@
             </Grid>
 
             <VerticalStackLayout x:Name="CollapsedSummaryLayout" Spacing="3">
+                <Border BackgroundColor="#ecfdf5"
+                        Stroke="#86efac"
+                        StrokeThickness="1"
+                        Padding="10,7"
+                        Margin="0,0,0,3">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Label x:Name="NextActionLabel"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           TextColor="#166534"
+                           LineBreakMode="TailTruncation" />
+                </Border>
                 <Label x:Name="CollapsedPickupLabel"
                        FontSize="13"
                        TextColor="#111827"

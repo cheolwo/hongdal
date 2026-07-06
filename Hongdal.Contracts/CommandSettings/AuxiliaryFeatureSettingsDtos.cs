@@ -11,6 +11,10 @@ public sealed class AuxiliaryFeatureSettingItem
     public string TargetName { get; set; } = string.Empty;
     public string TargetDisplayName { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+    public string Version { get; set; } = string.Empty;
+    public string VersionDisplayName { get; set; } = string.Empty;
+    public int VersionSortOrder { get; set; }
+    public bool IsCurrentRelease { get; set; }
     public string FeatureName { get; set; } = string.Empty;
     public string FeatureDisplayName { get; set; } = string.Empty;
     public bool AppDefaultEnabled { get; set; }

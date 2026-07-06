@@ -107,6 +107,7 @@ builder.Services.Configure<WorkRelationshipSnapshotOptions>(builder.Configuratio
 builder.Services.Configure<CommandFileStorageOptions>(builder.Configuration.GetSection(CommandFileStorageOptions.SectionName));
 builder.Services.Configure<CustomsOptions>(builder.Configuration.GetSection(CustomsOptions.SectionName));
 builder.Services.Configure<PublicDataOptions>(builder.Configuration.GetSection(PublicDataOptions.SectionName));
+builder.Services.Configure<VersionFeatureFlagsOptions>(builder.Configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
 builder.Services.Configure<SalesChannelOrderSyncOptions>(builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName));
 builder.Services.Configure<배차큐정책Options>(builder.Configuration.GetSection("DispatchQueue"));
 builder.Services.Configure<배차큐배치작업Options>(builder.Configuration.GetSection(배차큐배치작업Options.SectionName));
