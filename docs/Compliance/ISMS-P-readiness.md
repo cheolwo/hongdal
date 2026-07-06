@@ -49,6 +49,7 @@
 | 계좌번호 | 기본 마스킹, 저장/전송 보호, 정산 담당자 접근 제한, 접근 로그, 보유/파기 |
 | 상차/하차 완료 사진 | 증빙 목적 제한, 썸네일 기본 표시, 파일 저장 보호, 다운로드/조회 로그, 보유/파기 |
 | 계약 문서 | 문서번호/상태 중심 목록 표시, 저장/전송 보호, 당사자/운영자 접근 제한, 접근 로그 |
+| 전자서명 증적 | 서명 완료 여부, 시각, 방법, 문서/동의문/증적 해시 중심 표시, 원본 서명 접근 제한 |
 
 ## ISMS-P 보호 어트리뷰트
 
@@ -70,6 +71,56 @@ public string AccountNumber { get; set; } = string.Empty;
 - 계약 조건, 지급 조건, 계약 문서처럼 개인정보가 아니어도 계약 보호 대상이면 `IsPersonalData=false`, `IsContractData=true`로 표시합니다.
 - 속성별 예외나 단계적 노출 기준은 `ProtectionNote`에 남깁니다.
 - 리플렉션 검사에는 `IsmsPProtectedDataAttributeReader`를 사용합니다.
+
+## 전자서명 UI 원칙
+
+계약 서명 패드는 `Hongdal.Ui.Common`의 `HongdalSignatureGate`와 `HongdalSignaturePad`를 사용합니다. 서명 패드는 모든 화면에 상시 노출하지 않고, 업무 단계가 서명을 요구할 때만 렌더링합니다.
+
+예시는 다음과 같습니다.
+
+- 창고 앱: 입고 계약 또는 보관/검수 계약에 서명이 필요한 경우
+- 화주/차주 흐름: 거래 양식이나 정산 조건상 서명이 필요한 경우
+- 기사 앱: 상차지 인수, 하차지 인수, 하차 완료 확인에 서명이 필요한 경우
+- HR 앱: 근로계약서 초안이 서명 가능한 상태가 된 경우
+
+서명 입력 결과는 PNG data URL과 서명자 이름을 UI에서 만들지만, 계약 증적으로 저장할 때는 문서 해시, 동의문 해시, 증적 해시, 서명 시각, 서명 방법을 함께 기록합니다. 원본 서명 이미지나 접근 IP는 필요한 보호 저장소에 두고, 기본 화면에는 해시나 마스킹된 값만 표시합니다.
+
+## 보호 데이터 흐름
+
+ISMS-P 보호 속성이 붙은 값은 다음 흐름을 기본으로 둡니다.
+
+```mermaid
+sequenceDiagram
+    participant Client as Client App
+    participant Server as Hongdal API
+    participant Store as DB/Storage
+
+    Client->>Server: 공개키 요청
+    Server-->>Client: KeyId + RSA 공개키
+    Client->>Client: JSON payload를 AES-256-GCM으로 암호화
+    Client->>Client: AES 키를 RSA-OAEP-256 공개키로 래핑
+    Client->>Server: IsmsPEncryptedTransportEnvelope 전송
+    Server->>Server: RSA 개인키로 AES 키 복호화
+    Server->>Server: AES-256-GCM payload 복호화 후 Command/DTO 해석
+    Server->>Server: IsmsPProtectedDataAttribute + Field Catalog 확인
+    Server->>Store: AES-256-GCM 또는 SHA-256 해시로 저장
+    Store-->>Server: 보호된 저장값 조회
+    Server->>Server: 업무/역할/단계에 맞게 복호화 또는 마스킹
+    Server-->>Client: 필요한 범위만 응답
+```
+
+이 흐름은 TLS를 대체하지 않습니다. TLS 위에서 앱 레벨 보호를 한 겹 더 두는 구조입니다.
+
+| 단계 | 구현 위치 | 기준 |
+| --- | --- | --- |
+| 클라이언트 암호화 | `Hongdal.Ui.Common/Areas/App/wwwroot/js/hongdal-isms-p-transport.js` | `RSA-OAEP-256+A256GCM` |
+| 클라이언트 래퍼 | `Hongdal.Ui.Common/Areas/App/Services/HongdalIsmsPClientEncryptionService.cs` | 공개키 응답을 받아 암호화 봉투 생성 |
+| 서버 복호화 | `RsaOaepAesGcmClientTransportProtectionService` | 서버 개인키로 AES 키 복호화 후 payload 해석 |
+| 저장 전 보호 | `IsmsPProtectedDataStorePreparationService` | `IsmsPProtectedDataAttribute`와 필드 카탈로그 기반 처리 |
+| 저장 암호화 | `AesGcmIsmsPProtectedDataCryptoService` | `AES-256-GCM` |
+| 증적/검색 해시 | `AesGcmIsmsPProtectedDataCryptoService` | `SHA-256` + salt |
+
+운영 설정은 `IsmsPProtectedData` 섹션에 둡니다. `Aes256GcmKeyBase64`는 정확히 32바이트 Base64 키여야 하고, `TransportPrivateKeyPem`은 서버 비밀 저장소에서 관리합니다. 공개키는 클라이언트 암호화에 사용되지만 개인키와 저장 암호화 키는 저장소에 커밋하지 않습니다.
 
 사용 방식은 기능 프로필을 만들고 `IsmsPReadinessPlanner.Plan(profile)`으로 내부 검토 가능 여부와 빠진 필수 항목을 확인하는 형태입니다.
 

@@ -140,6 +140,40 @@ namespace 홍달.Services.Dispatch.Queue
             await _db.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task 배차수락취소처리Async(string requestId, string driverId, string? reason = null, CancellationToken cancellationToken = default)
+        {
+            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            if (queue is null) return;
+
+            var assignedToDriver = string.Equals(queue.확정기사Id, driverId, StringComparison.Ordinal)
+                                   || string.Equals(queue.현재추천대상기사Id, driverId, StringComparison.Ordinal);
+            if ((queue.확정기사Id is not null || queue.현재추천대상기사Id is not null) && !assignedToDriver)
+            {
+                return;
+            }
+
+            var dispatchRequest = await _db.화주운송의뢰.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            if (dispatchRequest is not null)
+            {
+                dispatchRequest.배차상태 = 상태값.배차상태.매칭중;
+                dispatchRequest.UpdatedAt = DateTime.UtcNow;
+            }
+
+            queue.상태 = 상태값.배차대기상태.대기;
+            queue.배차큐단계 = 상태값.배차큐단계.배차추천;
+            queue.배차노출상태 = 상태값.배차노출상태.추천대기;
+            queue.마지막거절기사Id = driverId;
+            queue.확정기사Id = null;
+            queue.현재추천대상기사Id = null;
+            queue.추천시작시각 = null;
+            queue.추천만료시각 = null;
+            queue.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync(cancellationToken);
+
+            await 추천거절후다음후보로진행Async(queue, driverId, cancellationToken);
+        }
+
         private async Task 시작Async(배차대기 queue, string driverId, int? timeoutSeconds, CancellationToken cancellationToken)
         {
             queue.배차큐단계 = 상태값.배차큐단계.배차추천;

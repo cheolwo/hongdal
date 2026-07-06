@@ -15,6 +15,7 @@ public static class PersonalDataFieldKey
     public const string WorkSchedule = "work-schedule";
     public const string DeliveryCompletionPhoto = "delivery-completion-photo";
     public const string ContractDocument = "contract-document";
+    public const string ElectronicSignatureEvidence = "electronic-signature-evidence";
     public const string CustomsClearanceReference = "customs-clearance-reference";
 }
 
@@ -39,6 +40,13 @@ public static class PersonalDataSensitivityCode
     public const string Restricted = "Restricted";
 }
 
+public static class PersonalDataStorageProtectionCode
+{
+    public const string ClassifiedOnly = "ClassifiedOnly";
+    public const string EncryptAtRest = "EncryptAtRest";
+    public const string HashForEvidence = "HashForEvidence";
+}
+
 public static class PersonalDataProtectionActionCode
 {
     public const string PurposeLimitedCollection = "PurposeLimitedCollection";
@@ -46,6 +54,7 @@ public static class PersonalDataProtectionActionCode
     public const string MaskByDefault = "MaskByDefault";
     public const string EncryptAtRest = "EncryptAtRest";
     public const string EncryptInTransit = "EncryptInTransit";
+    public const string HashForEvidence = "HashForEvidence";
     public const string RoleBasedAccess = "RoleBasedAccess";
     public const string AuditOnAccess = "AuditOnAccess";
     public const string RetentionRuleRequired = "RetentionRuleRequired";
@@ -57,6 +66,7 @@ public sealed record PersonalDataFieldProtectionRule(
     string DisplayName,
     string CategoryCode,
     string SensitivityCode,
+    string StorageProtectionCode,
     IReadOnlyList<string> RequiredActionCodes,
     string DefaultMaskingHint,
     string RetentionHint,
@@ -67,7 +77,10 @@ public sealed record PersonalDataFieldProtectionPlan(
     IReadOnlyList<string> UnknownFieldKeys,
     IReadOnlyList<string> RequiredActionCodes,
     bool HasUnknownFields,
-    string Summary);
+    string Summary,
+    bool RequiresTransportEncryption,
+    bool RequiresAtRestEncryption,
+    bool RequiresEvidenceHash);
 
 public static class PersonalDataFieldProtectionCatalog
 {
@@ -78,6 +91,7 @@ public static class PersonalDataFieldProtectionCatalog
             "표시 이름",
             PersonalDataFieldCategoryCode.Identifier,
             PersonalDataSensitivityCode.Low,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [PersonalDataProtectionActionCode.PurposeLimitedCollection, PersonalDataProtectionActionCode.RoleBasedAccess],
             "커뮤니티 닉네임 또는 역할명 우선 표시",
             "회원 탈퇴 또는 관계 기록 보존 기간까지",
@@ -87,6 +101,7 @@ public static class PersonalDataFieldProtectionCatalog
             "연락처",
             PersonalDataFieldCategoryCode.Contact,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -106,6 +121,7 @@ public static class PersonalDataFieldProtectionCatalog
             "이메일",
             PersonalDataFieldCategoryCode.Contact,
             PersonalDataSensitivityCode.Medium,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -123,6 +139,7 @@ public static class PersonalDataFieldProtectionCatalog
             "도로명주소 2단계",
             PersonalDataFieldCategoryCode.Address,
             PersonalDataSensitivityCode.Medium,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.MaskByDefault,
@@ -137,6 +154,7 @@ public static class PersonalDataFieldProtectionCatalog
             "상세 주소",
             PersonalDataFieldCategoryCode.Address,
             PersonalDataSensitivityCode.Restricted,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -156,6 +174,7 @@ public static class PersonalDataFieldProtectionCatalog
             "주문자 집단 범위",
             PersonalDataFieldCategoryCode.Address,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.MaskByDefault,
@@ -171,6 +190,7 @@ public static class PersonalDataFieldProtectionCatalog
             "계좌번호",
             PersonalDataFieldCategoryCode.Payment,
             PersonalDataSensitivityCode.Restricted,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -190,6 +210,7 @@ public static class PersonalDataFieldProtectionCatalog
             "결제수단",
             PersonalDataFieldCategoryCode.Payment,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.MaskByDefault,
@@ -207,10 +228,12 @@ public static class PersonalDataFieldProtectionCatalog
             "위치 좌표",
             PersonalDataFieldCategoryCode.Location,
             PersonalDataSensitivityCode.Restricted,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
                 PersonalDataProtectionActionCode.MaskByDefault,
+                PersonalDataProtectionActionCode.EncryptAtRest,
                 PersonalDataProtectionActionCode.EncryptInTransit,
                 PersonalDataProtectionActionCode.RoleBasedAccess,
                 PersonalDataProtectionActionCode.AuditOnAccess,
@@ -224,8 +247,10 @@ public static class PersonalDataFieldProtectionCatalog
             "접속 IP",
             PersonalDataFieldCategoryCode.Identifier,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.HashForEvidence,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
+                PersonalDataProtectionActionCode.HashForEvidence,
                 PersonalDataProtectionActionCode.RoleBasedAccess,
                 PersonalDataProtectionActionCode.AuditOnAccess,
                 PersonalDataProtectionActionCode.RetentionRuleRequired
@@ -238,6 +263,7 @@ public static class PersonalDataFieldProtectionCatalog
             "근무 일정",
             PersonalDataFieldCategoryCode.Workforce,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -254,6 +280,7 @@ public static class PersonalDataFieldProtectionCatalog
             "상차/하차 완료 사진",
             PersonalDataFieldCategoryCode.Evidence,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -273,6 +300,7 @@ public static class PersonalDataFieldProtectionCatalog
             "계약 문서",
             PersonalDataFieldCategoryCode.Contract,
             PersonalDataSensitivityCode.Restricted,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.MaskByDefault,
@@ -287,10 +315,31 @@ public static class PersonalDataFieldProtectionCatalog
             "계약 종료와 법정/분쟁 보존 기간 이후 파기",
             "서명 당사자, 운영자, 법무/분쟁 처리자 범위로 제한"),
         Rule(
+            PersonalDataFieldKey.ElectronicSignatureEvidence,
+            "전자서명 증적",
+            PersonalDataFieldCategoryCode.Contract,
+            PersonalDataSensitivityCode.Restricted,
+            PersonalDataStorageProtectionCode.EncryptAtRest,
+            [
+                PersonalDataProtectionActionCode.PurposeLimitedCollection,
+                PersonalDataProtectionActionCode.ConsentOrNotice,
+                PersonalDataProtectionActionCode.MaskByDefault,
+                PersonalDataProtectionActionCode.EncryptAtRest,
+                PersonalDataProtectionActionCode.EncryptInTransit,
+                PersonalDataProtectionActionCode.RoleBasedAccess,
+                PersonalDataProtectionActionCode.AuditOnAccess,
+                PersonalDataProtectionActionCode.RetentionRuleRequired,
+                PersonalDataProtectionActionCode.ThirdPartyOrOutsourcingReview
+            ],
+            "서명 완료 여부, 시각, 방법, 증적 해시만 기본 표시",
+            "계약 종료와 법정/분쟁 보존 기간 이후 파기",
+            "서명 당사자, 운영자, 법무/분쟁 처리자 범위로 제한"),
+        Rule(
             PersonalDataFieldKey.CustomsClearanceReference,
             "통관 참조 정보",
             PersonalDataFieldCategoryCode.Customs,
             PersonalDataSensitivityCode.High,
+            PersonalDataStorageProtectionCode.ClassifiedOnly,
             [
                 PersonalDataProtectionActionCode.PurposeLimitedCollection,
                 PersonalDataProtectionActionCode.ConsentOrNotice,
@@ -350,13 +399,23 @@ public static class PersonalDataFieldProtectionCatalog
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
+        var requiresTransportEncryption = actionCodes.Contains(
+            PersonalDataProtectionActionCode.EncryptInTransit,
+            StringComparer.OrdinalIgnoreCase);
+        var requiresAtRestEncryption = rules.Any(x =>
+            string.Equals(x.StorageProtectionCode, PersonalDataStorageProtectionCode.EncryptAtRest, StringComparison.OrdinalIgnoreCase));
+        var requiresEvidenceHash = rules.Any(x =>
+            string.Equals(x.StorageProtectionCode, PersonalDataStorageProtectionCode.HashForEvidence, StringComparison.OrdinalIgnoreCase));
 
         return new PersonalDataFieldProtectionPlan(
             rules,
             unknown,
             actionCodes,
             unknown.Count > 0,
-            BuildSummary(rules.Count, unknown.Count, actionCodes.Length));
+            BuildSummary(rules.Count, unknown.Count, actionCodes.Length),
+            requiresTransportEncryption,
+            requiresAtRestEncryption,
+            requiresEvidenceHash);
     }
 
     private static PersonalDataFieldProtectionRule Rule(
@@ -364,6 +423,7 @@ public static class PersonalDataFieldProtectionCatalog
         string displayName,
         string categoryCode,
         string sensitivityCode,
+        string storageProtectionCode,
         IReadOnlyList<string> requiredActionCodes,
         string defaultMaskingHint,
         string retentionHint,
@@ -373,6 +433,7 @@ public static class PersonalDataFieldProtectionCatalog
             displayName,
             categoryCode,
             sensitivityCode,
+            storageProtectionCode,
             requiredActionCodes,
             defaultMaskingHint,
             retentionHint,

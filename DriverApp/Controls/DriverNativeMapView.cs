@@ -28,6 +28,12 @@ public sealed class DriverNativeMapView : View
         typeof(DriverNativeMapView),
         Array.Empty<DriverMapMarkerItem>());
 
+    public static readonly BindableProperty RouteOverlaysProperty = BindableProperty.Create(
+        nameof(RouteOverlays),
+        typeof(IReadOnlyList<DriverMapRouteOverlay>),
+        typeof(DriverNativeMapView),
+        Array.Empty<DriverMapRouteOverlay>());
+
     public static readonly BindableProperty ShowTrafficLayerProperty = BindableProperty.Create(
         nameof(ShowTrafficLayer),
         typeof(bool),
@@ -80,6 +86,12 @@ public sealed class DriverNativeMapView : View
     {
         get => (IReadOnlyList<DriverMapMarkerItem>)GetValue(MarkersProperty);
         set => SetValue(MarkersProperty, value);
+    }
+
+    public IReadOnlyList<DriverMapRouteOverlay> RouteOverlays
+    {
+        get => (IReadOnlyList<DriverMapRouteOverlay>)GetValue(RouteOverlaysProperty);
+        set => SetValue(RouteOverlaysProperty, value);
     }
 
     public bool ShowTrafficLayer

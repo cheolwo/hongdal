@@ -48,6 +48,11 @@ public sealed class 기사샘플데이터Service : IDriverSampleDataService
             ]);
     }
 
+    public Task RefreshAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+
     public 기사근무샘플상태 근무상태 { get; }
 
     public 기사현재위치샘플 기사현재위치 { get; }
@@ -177,6 +182,10 @@ public sealed class 기사샘플데이터Service : IDriverSampleDataService
                 f.PickRandom("가구", "생활용품", "전자제품"),
                 f.PickRandom("서울 강서구", "서울 마포구", "인천 연수구"),
                 f.PickRandom("경기 수원시", "서울 송파구", "경기 고양시"),
+                f.Random.Decimal(37.45m, 37.58m),
+                f.Random.Decimal(126.78m, 127.02m),
+                f.Random.Decimal(37.25m, 37.55m),
+                f.Random.Decimal(126.90m, 127.18m),
                 f.PickRandom(단계),
                 DateTime.Now.AddMinutes(20 + f.IndexFaker * 35),
                 f.Random.Decimal(12m, 65m),

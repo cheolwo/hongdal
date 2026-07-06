@@ -20,8 +20,10 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<추천카드표시설정Service>();
         services.AddSingleton<DriverRecommendationDecisionService>();
         services.AddSingleton<IDriverRecommendationDecisionService>(sp => sp.GetRequiredService<DriverRecommendationDecisionService>());
+        services.AddSingleton<IDriverRecommendationNotificationService, SampleDriverRecommendationNotificationService>();
         services.AddSingleton<기사샘플데이터Service>();
-        services.AddSingleton<IDriverSampleDataService>(sp => sp.GetRequiredService<기사샘플데이터Service>());
+        services.AddSingleton<ServerBackedDriverSampleDataService>();
+        services.AddSingleton<IDriverSampleDataService>(sp => sp.GetRequiredService<ServerBackedDriverSampleDataService>());
         services.AddSingleton<탐색캠페인샘플Service>();
         services.AddSingleton<IDriverExplorationCampaignService>(sp => sp.GetRequiredService<탐색캠페인샘플Service>());
         services.AddSingleton<I공통콘텐츠Service, 샘플공통콘텐츠Service>();

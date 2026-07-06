@@ -14,5 +14,7 @@ public interface IDriverRecommendationDecisionService
 
     RecommendationDecisionState Hold(DriverRequestItem request);
 
+    RecommendationDecisionState CancelAccepted(DriverRequestItem request, string reason);
+
     RecommendationDecisionState Reject(DriverRequestItem request, string reason);
 }

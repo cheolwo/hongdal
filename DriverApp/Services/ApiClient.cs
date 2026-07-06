@@ -26,7 +26,7 @@ public sealed class ApiClient : IApiClient
 
     public async Task<TResponse?> GetJsonAsync<TResponse>(string path)
     {
-        await Task.CompletedTask;
+        await _sampleDataService.RefreshAsync();
 
         if (typeof(TResponse) == typeof(기사홈요약응답) && string.Equals(path, "api/v1/driver/home", StringComparison.OrdinalIgnoreCase))
         {

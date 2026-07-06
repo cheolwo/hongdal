@@ -5,6 +5,8 @@ namespace DriverApp.Services;
 
 public interface IDriverSampleDataService
 {
+    Task RefreshAsync(CancellationToken cancellationToken = default);
+
     기사근무샘플상태 근무상태 { get; }
 
     기사현재위치샘플 기사현재위치 { get; }

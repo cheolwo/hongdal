@@ -65,6 +65,7 @@ dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 - 버전별 범위: [docs/Versions](docs/Versions/README.md)
 - 화면/컨트롤러 매핑: [docs/ViewControllerMapping](docs/ViewControllerMapping/README.md)
 - 개인정보/계약 ISMS-P 준비도: [docs/Compliance/ISMS-P-readiness.md](docs/Compliance/ISMS-P-readiness.md)
+- ISMS-P 보호 데이터 흐름: [docs/Compliance/ISMS-P-protected-data-flow.md](docs/Compliance/ISMS-P-protected-data-flow.md)
 - Command/Event 원칙: [docs/Architecture/CommandEvent리팩토링원칙.md](docs/Architecture/CommandEvent리팩토링원칙.md)
 - 참여자 중심 설계: [docs/Architecture/참여자중심설계원칙.md](docs/Architecture/참여자중심설계원칙.md)
 

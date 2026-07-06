@@ -45,6 +45,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     {
     }
 
+    public static void MapRouteOverlays(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+    }
+
     public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
     }
@@ -65,6 +69,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     {
     }
 
+    public static void MapRouteOverlays(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+    }
+
     public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
     }
@@ -79,6 +87,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     }
 
     public static void MapMarkers(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+    }
+
+    public static void MapRouteOverlays(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
     }
 

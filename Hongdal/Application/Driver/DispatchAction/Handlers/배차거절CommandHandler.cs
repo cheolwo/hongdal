@@ -50,6 +50,7 @@ public sealed class 배차거절CommandHandler : IRequestHandler<배차거절Com
                 new 배차거절됨Event(
                     request.기사Id,
                     request.RequestId,
+                    request.사유,
                     now,
                     System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty),
                 cancellationToken);

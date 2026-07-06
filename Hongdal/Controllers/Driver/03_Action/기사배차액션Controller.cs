@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Hongdal.Controllers;
 using Hongdal.Application.Driver.DispatchAction;
+using Hongdal.Contracts.Driver.Action;
 using 홍달.도메인.공통;
 
 namespace Hongdal.Controllers.Driver.Action03
@@ -30,10 +31,18 @@ namespace Hongdal.Controllers.Driver.Action03
         }
 
         [HttpPost("{requestId}/reject")]
-        public async Task<IActionResult> 거절(string requestId)
+        public async Task<IActionResult> 거절(string requestId, [FromBody] 기사배차거절요청? request = null)
         {
             var driverId = 현재기사Id();
-            var result = await _sender.Send(new 배차거절Command(driverId, requestId));
+            var result = await _sender.Send(new 배차거절Command(driverId, requestId, request?.사유));
+            return this.ToNoContentActionResult(result);
+        }
+
+        [HttpPost("{requestId}/cancel-acceptance")]
+        public async Task<IActionResult> 수락취소(string requestId, [FromBody] 기사배차수락취소요청? request = null)
+        {
+            var driverId = 현재기사Id();
+            var result = await _sender.Send(new 배차수락취소Command(driverId, requestId, request?.사유));
             return this.ToNoContentActionResult(result);
         }
 

@@ -12,6 +12,7 @@ public partial class DriverNativeMapViewHandler
             [nameof(DriverNativeMapView.CenterLongitude)] = MapCamera,
             [nameof(DriverNativeMapView.Zoom)] = MapCamera,
             [nameof(DriverNativeMapView.Markers)] = MapMarkers,
+            [nameof(DriverNativeMapView.RouteOverlays)] = MapRouteOverlays,
             [nameof(DriverNativeMapView.ShowTrafficLayer)] = MapOptions,
             [nameof(DriverNativeMapView.ShowLocationButton)] = MapOptions,
             [nameof(DriverNativeMapView.ShowCurrentLocationOverlay)] = MapOptions,

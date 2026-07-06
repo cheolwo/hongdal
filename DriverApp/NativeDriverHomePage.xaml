@@ -9,27 +9,171 @@
         <controls:DriverNativeMapView x:Name="MapView"
                                       Grid.RowSpan="2" />
 
-        <Border Grid.Row="0"
-                Margin="16"
-                Padding="14"
-                VerticalOptions="Start"
-                BackgroundColor="#fdfdfd"
-                StrokeThickness="0">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <VerticalStackLayout Spacing="4">
-                <Label x:Name="TitleLabel"
-                       Text="운행 지역"
-                       FontAttributes="Bold"
-                       FontSize="16"
-                       TextColor="#202124" />
-                <Label x:Name="StatusLabel"
-                       FontSize="13"
-                       TextColor="#5f6368"
-                       LineBreakMode="WordWrap" />
-            </VerticalStackLayout>
-        </Border>
+        <VerticalStackLayout Grid.Row="0"
+                             Margin="16"
+                             Spacing="10"
+                             VerticalOptions="Start">
+            <Border Padding="14"
+                    BackgroundColor="#fdfdfd"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="4">
+                    <Label x:Name="TitleLabel"
+                           Text="운행 지역"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           TextColor="#202124" />
+                    <Label x:Name="StatusLabel"
+                           FontSize="13"
+                           TextColor="#5f6368"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border x:Name="RecommendationBanner"
+                    Padding="14"
+                    BackgroundColor="#111827"
+                    Stroke="#60a5fa"
+                    StrokeThickness="1"
+                    IsVisible="False">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#55000000"
+                            Offset="0,5"
+                            Radius="14"
+                            Opacity="0.28" />
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Border WidthRequest="34"
+                                HeightRequest="34"
+                                BackgroundColor="#2563eb"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="17" />
+                            </Border.StrokeShape>
+                            <Label Text="🔔"
+                                   FontSize="17"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center" />
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                            <Label Text="새 배차 추천"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="#ffffff" />
+                            <Label x:Name="RecommendationSummaryLabel"
+                                   FontSize="13"
+                                   TextColor="#dbeafe"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Button Text="나중에"
+                                BackgroundColor="#374151"
+                                TextColor="#f8fafc"
+                                CornerRadius="8"
+                                Clicked="OnDismissRecommendationClicked" />
+                        <Button Grid.Column="1"
+                                Text="지도에서 확인"
+                                BackgroundColor="#22c55e"
+                                TextColor="#052e16"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                Clicked="OnOpenIncomingRecommendationClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border x:Name="LinkedRouteCard"
+                    Padding="14"
+                    BackgroundColor="#f8fafc"
+                    Stroke="#bfdbfe"
+                    StrokeThickness="1"
+                    IsVisible="False">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="운행 연계 경로"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="#0f172a" />
+                            <Label x:Name="LinkedRouteSummaryLabel"
+                                   FontSize="13"
+                                   TextColor="#334155"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                        <Label x:Name="LinkedRouteBenefitLabel"
+                               Grid.Column="1"
+                               Padding="8,4"
+                               BackgroundColor="#dcfce7"
+                               FontAttributes="Bold"
+                               FontSize="12"
+                               TextColor="#166534"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*"
+                          RowDefinitions="Auto,Auto,Auto"
+                          RowSpacing="5"
+                          ColumnSpacing="8">
+                        <Label Grid.Row="0" Text="1" FontAttributes="Bold" TextColor="#2563eb" />
+                        <Label x:Name="CurrentDropoffRouteLabel" Grid.Row="0" Grid.Column="1" FontSize="13" TextColor="#111827" />
+
+                        <Label Grid.Row="1" Text="2" FontAttributes="Bold" TextColor="#2563eb" />
+                        <Label x:Name="RecommendationPickupRouteLabel" Grid.Row="1" Grid.Column="1" FontSize="13" TextColor="#111827" />
+
+                        <Label Grid.Row="2" Text="3" FontAttributes="Bold" TextColor="#2563eb" />
+                        <Label x:Name="RecommendationDropoffRouteLabel" Grid.Row="2" Grid.Column="1" FontSize="13" TextColor="#111827" />
+                    </Grid>
+
+                    <Label x:Name="RecommendationDecisionStatusLabel"
+                           FontSize="13"
+                           TextColor="#475569"
+                           LineBreakMode="WordWrap" />
+
+                    <Grid x:Name="RecommendationDecisionButtons"
+                          ColumnDefinitions="*,*,*,*"
+                          ColumnSpacing="8">
+                        <Button Text="수락"
+                                BackgroundColor="#16a34a"
+                                TextColor="#ffffff"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                Clicked="OnAcceptRecommendationClicked" />
+                        <Button Grid.Column="1"
+                                Text="보류"
+                                BackgroundColor="#e0f2fe"
+                                TextColor="#075985"
+                                CornerRadius="8"
+                                Clicked="OnHoldRecommendationClicked" />
+                        <Button Grid.Column="2"
+                                Text="거절"
+                                BackgroundColor="#fee2e2"
+                                TextColor="#991b1b"
+                                CornerRadius="8"
+                                Clicked="OnRejectRecommendationClicked" />
+                        <Button Grid.Column="3"
+                                Text="취소"
+                                BackgroundColor="#fef3c7"
+                                TextColor="#92400e"
+                                CornerRadius="8"
+                                Clicked="OnCancelAcceptedRecommendationClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
 
         <controls:DriverTransportFooterBar x:Name="TransportFooterBar"
                                            Grid.Row="1"

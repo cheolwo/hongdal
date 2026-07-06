@@ -14,6 +14,7 @@ public static class MauiProgram
 
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
+        builder.Services.AddHongdalUiCommonAppServices();
         builder.Services.AddSingleton(new HttpClient
         {
             BaseAddress = new Uri("https://localhost:7117/")

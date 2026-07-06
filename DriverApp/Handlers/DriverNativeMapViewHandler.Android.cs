@@ -15,6 +15,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
 {
     private NaverMap? _naverMap;
     private readonly List<Marker> _nativeMarkers = [];
+    private readonly List<PathOverlay> _nativeRouteOverlays = [];
 
     protected override MapView CreatePlatformView()
     {
@@ -43,6 +44,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         ApplyMapOptions();
         ApplyCamera();
         ApplyMarkers();
+        ApplyRouteOverlays();
     }
 
     public static void MapCamera(DriverNativeMapViewHandler handler, DriverNativeMapView view)
@@ -53,6 +55,11 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     public static void MapMarkers(DriverNativeMapViewHandler handler, DriverNativeMapView view)
     {
         handler.ApplyMarkers();
+    }
+
+    public static void MapRouteOverlays(DriverNativeMapViewHandler handler, DriverNativeMapView view)
+    {
+        handler.ApplyRouteOverlays();
     }
 
     public static void MapOptions(DriverNativeMapViewHandler handler, DriverNativeMapView view)
@@ -113,6 +120,37 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         }
     }
 
+    private void ApplyRouteOverlays()
+    {
+        if (_naverMap is null || VirtualView is null)
+        {
+            return;
+        }
+
+        ClearRouteOverlays();
+        foreach (var item in VirtualView.RouteOverlays)
+        {
+            if (item.Points.Count < 2)
+            {
+                continue;
+            }
+
+            var coords = item.Points
+                .Select(x => new LatLng(x.Latitude, x.Longitude))
+                .ToList();
+            var overlay = new PathOverlay
+            {
+                Coords = coords,
+                Width = item.Width,
+                Color = ParseColor(item.StrokeColor, AndroidColor.Rgb(37, 99, 235)),
+                OutlineColor = ParseColor(item.OutlineColor, AndroidColor.White)
+            };
+
+            overlay.Map = _naverMap;
+            _nativeRouteOverlays.Add(overlay);
+        }
+    }
+
     private void ApplyLocationOverlay()
     {
         if (_naverMap is null || VirtualView is null)
@@ -163,6 +201,34 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         }
 
         _nativeMarkers.Clear();
+    }
+
+    private void ClearRouteOverlays()
+    {
+        foreach (var overlay in _nativeRouteOverlays)
+        {
+            overlay.Map = null;
+            overlay.Dispose();
+        }
+
+        _nativeRouteOverlays.Clear();
+    }
+
+    private static AndroidColor ParseColor(string value, AndroidColor fallback)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return fallback;
+        }
+
+        try
+        {
+            return AndroidColor.ParseColor(value);
+        }
+        catch (ArgumentException)
+        {
+            return fallback;
+        }
     }
 
     private sealed class MapReadyCallback(DriverNativeMapViewHandler handler) : Java.Lang.Object, IOnMapReadyCallback

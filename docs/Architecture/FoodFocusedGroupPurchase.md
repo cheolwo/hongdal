@@ -81,8 +81,11 @@ flowchart TD
 | 마일스톤 지급 | 상차 1차, 하차 2차, 분배 확인 최종 지급 조건과 비율을 계약서에 둡니다. |
 | 분배 확인 기준 | 최종 지급이 가능한 분배 확인율과 확인 방식, 미달 시 보류/환불 조건을 둡니다. |
 | 환불/취소 | 목표 수량 미달, 통관/검역 문제, 공급 실패, 보관 실패 시 처리 기준을 둡니다. |
+| 전자서명 | 필수 당사자별 서명 요청, 서명 시각, 문서 해시, 동의문 해시, 증적 해시를 기록합니다. |
 
 초안 상태에서는 필수 조항이 빠졌는지 먼저 확인하고, 운영자가 검토한 뒤 서명 가능한 상태로 넘깁니다. 특히 공급자/화주 당사자, 비구속 수요 확인 고지, 마일스톤 지급 조항, 분배 확인 기준은 빠지면 안 됩니다.
+
+전자서명은 모든 화면에 상시 노출하지 않습니다. 창고 앱은 입고 계약처럼 서명이 필요한 계약 단계에서, 화주/차주 흐름은 거래 양식상 서명이 필요한 경우에, 기사 앱은 상차 인수나 하차 인수 확인이 필요한 경우에만 서명 패드를 노출합니다. UI 공통단에서는 `HongdalSignatureGate`가 `HongdalSignatureRequirement.IsRequired=true`일 때만 `HongdalSignaturePad`를 렌더링합니다.
 
 ## 개인정보/계약 보호 기준
 
@@ -108,9 +111,11 @@ DTO 속성에는 `IsmsPProtectedDataAttribute`를 붙여 어떤 값이 ISMS-P �
 - 공통 플래너: `Hongdal.Contracts/Common/Orderer/ColdChainFoodGroupPurchasePlanner.cs`
 - 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/GroupPurchasePaymentMilestonePlanner.cs`
 - 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/ImportFoodGroupPurchaseContract.cs`
+- 계약 전자서명 플래너: `Hongdal.Contracts/Common/ContractManagement/ContractElectronicSignature.cs`
 - 개인정보/계약 ISMS-P 준비도 플래너: `Hongdal.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
 - ISMS-P 보호 어트리뷰트: `Hongdal.Contracts/Common/Privacy/IsmsPProtectedDataAttribute.cs`
 - 개인정보 필드 보호 카탈로그: `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
+- 공통 서명 입력 UI: `Hongdal.Ui.Common/Areas/App/Components/Contracts/HongdalSignatureGate.razor`, `HongdalSignaturePad.razor`
 - 주문자 앱 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`
 - HS 식품 분류 기준: `Hongdal.Domain/HsCodes/HsCodeBusinessCategoryClassifier.cs`
 - 수입식품 조회 모듈: `Hongdal/Services/External/Mfds/*`

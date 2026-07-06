@@ -100,7 +100,8 @@ public sealed record ImportFoodGroupPurchaseContractDraft(
     bool HasDistributionConfirmationClause,
     bool HasRefundAndCancellationClause,
     string Currency = "KRW",
-    ImportFoodGroupPurchaseContractProtectionProfile? ProtectionProfile = null);
+    ImportFoodGroupPurchaseContractProtectionProfile? ProtectionProfile = null,
+    ContractElectronicSignatureBundle? SignatureBundle = null);
 
 public sealed record ImportFoodGroupPurchaseContractReviewPlan(
     ImportFoodGroupPurchaseContractDraft Draft,
@@ -110,6 +111,7 @@ public sealed record ImportFoodGroupPurchaseContractReviewPlan(
     IReadOnlyList<string> RequiredClauses,
     IReadOnlyList<string> MissingItems,
     IsmsPReadinessPlan PrivacyAndContractReadiness,
+    ContractElectronicSignaturePlan? SignaturePlan,
     string Summary);
 
 public static class ImportFoodGroupPurchaseContractPlanner
@@ -122,11 +124,14 @@ public static class ImportFoodGroupPurchaseContractPlanner
         var requiredClauses = ResolveRequiredClauses(draft);
         var missingItems = ResolveMissingItems(draft, isFoodHsCode);
         var privacyAndContractReadiness = BuildPrivacyAndContractReadiness(draft, missingItems);
+        var signaturePlan = draft.SignatureBundle is null
+            ? null
+            : ContractElectronicSignaturePlanner.Plan(draft.SignatureBundle, DateTimeOffset.UtcNow);
         var canProceedToReview = isFoodHsCode &&
             HasRole(draft, ImportFoodGroupPurchaseContractRoleCode.ApplicantOrderer) &&
             HasRole(draft, ImportFoodGroupPurchaseContractRoleCode.PlatformOperator) &&
             draft.HasNonBindingDemandNotice;
-        var status = ResolveStatus(canProceedToReview, missingItems, privacyAndContractReadiness);
+        var status = ResolveStatus(canProceedToReview, missingItems, privacyAndContractReadiness, signaturePlan);
 
         return new ImportFoodGroupPurchaseContractReviewPlan(
             draft,
@@ -136,6 +141,7 @@ public static class ImportFoodGroupPurchaseContractPlanner
             requiredClauses,
             missingItems,
             privacyAndContractReadiness,
+            signaturePlan,
             BuildSummary(draft, status));
     }
 
@@ -248,11 +254,19 @@ public static class ImportFoodGroupPurchaseContractPlanner
     private static string ResolveStatus(
         bool canProceedToReview,
         IReadOnlyList<string> missingItems,
-        IsmsPReadinessPlan privacyAndContractReadiness)
+        IsmsPReadinessPlan privacyAndContractReadiness,
+        ContractElectronicSignaturePlan? signaturePlan)
     {
         if (!canProceedToReview)
         {
             return ImportFoodGroupPurchaseContractStatusCode.Blocked;
+        }
+
+        if (missingItems.Count == 0 &&
+            privacyAndContractReadiness.IsReadyForInternalReview &&
+            signaturePlan?.IsFullySigned == true)
+        {
+            return ImportFoodGroupPurchaseContractStatusCode.Signed;
         }
 
         return missingItems.Count == 0 && privacyAndContractReadiness.IsReadyForInternalReview
@@ -295,6 +309,7 @@ public static class ImportFoodGroupPurchaseContractPlanner
             PersonalDataFieldKey.DetailedAddress,
             PersonalDataFieldKey.PaymentMethod,
             PersonalDataFieldKey.ContractDocument,
+            PersonalDataFieldKey.ElectronicSignatureEvidence,
             PersonalDataFieldKey.CustomsClearanceReference
         ];
 

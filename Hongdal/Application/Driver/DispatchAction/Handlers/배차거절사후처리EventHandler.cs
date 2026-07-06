@@ -33,7 +33,7 @@ public sealed class 배차거절사후처리EventHandler : INotificationHandler<
             notification.기사Id,
             notification.의뢰Id,
             "Success",
-            "Driver rejected recommendation",
+            string.IsNullOrWhiteSpace(notification.사유) ? "Driver rejected recommendation" : notification.사유,
             notification.TraceId,
             notification.발생시각Utc);
     }

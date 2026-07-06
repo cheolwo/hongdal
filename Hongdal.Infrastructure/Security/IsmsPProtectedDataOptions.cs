@@ -1,0 +1,18 @@
+namespace 홍달.Infrastructure.Security;
+
+public sealed class IsmsPProtectedDataOptions
+{
+    public const string SectionName = "IsmsPProtectedData";
+
+    public string? Aes256GcmKeyBase64 { get; set; }
+
+    public string? HashSalt { get; set; }
+
+    public string TransportKeyId { get; set; } = "hongdal-isms-p-transport-v1";
+
+    public string? TransportPublicKeyPem { get; set; }
+
+    public string? TransportPrivateKeyPem { get; set; }
+
+    public bool FailWhenKeyMissing { get; set; } = true;
+}

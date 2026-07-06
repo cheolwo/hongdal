@@ -20,21 +20,39 @@ flowchart TD
 ## DriverApp 추천과 배차 처리
 
 DriverApp 홈의 추천 목록, 추천 상세, 배차 처리 화면은 같은 추천 의뢰 데이터를 기준으로 움직입니다.
+네이티브 지도 홈에서는 `IDriverRecommendationNotificationService`가 추천 수신 소스를 감싸고, 현재 샘플 구현은 같은 추천 데이터를 FCM/SignalR/폴링 수신처럼 노출합니다.
 
 ```mermaid
 flowchart TD
     A["DriverApp 홈 / 추천 목록"] --> B["IDriverSampleDataService.추천의뢰목록"]
+    B --> N["IDriverRecommendationNotificationService"]
+    N --> M["네이티브 지도 추천 수신 패널"]
     B --> C["추천 상세 화면"]
     C --> D["배차 처리 화면"]
+    M --> E
     D --> E{"기사 선택"}
     E -->|수락| F["Accept: 배차상태=수락, 상태=수락완료"]
     E -->|보류| G["Hold: 배차상태=보류, 상태=검토중"]
     E -->|거절| H["Reject: 배차상태=거절, 상태=추천제외"]
-    F --> I["Changed 이벤트 / 화면 갱신"]
+    F --> K{"수락 이후"}
+    K -->|계속 진행| I["Changed 이벤트 / 화면 갱신"]
+    K -->|취소| L["CancelAccepted: 배차상태=수락취소, 상태=재배차필요"]
     G --> I
     H --> I
+    L --> I
     I --> J["서버 전환 시 Command 처리와 배차 이벤트 발행"]
 ```
+
+서버 전환 시 배차 결정 후속 처리는 다음 골격을 따른다.
+
+| 결정 | 서버 후속 처리 |
+| --- | --- |
+| 수락 | `POST api/v1/driver/dispatch-actions/{requestId}/accept`, 추천 잠금, 배차 후보 생성, 화주 수락 알림 |
+| 보류 | 기사 개인 검토 상태 유지, 서버 배차 확정은 하지 않음 |
+| 수락 취소 | `POST api/v1/driver/dispatch-actions/{requestId}/cancel-acceptance`, 추천 잠금 해제, 재배차 열기, 화주 취소 알림, 취소 사유 감사 기록 |
+| 거절 | `POST api/v1/driver/dispatch-actions/{requestId}/reject`, 해당 기사 후보 제외, 후보 기사 재계산, 거절 사유 감사/추천 품질 보정 |
+
+`배차수락취소Command`는 배차 큐를 다시 `대기/배차추천/추천대기`로 되돌리고, 기존 기사는 제외 후보로 남긴 뒤 다음 추천 후보를 찾는 골격을 가진다.
 
 ## DriverApp 상차/하차 완료 사진 처리
 

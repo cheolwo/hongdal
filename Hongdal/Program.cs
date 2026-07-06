@@ -34,6 +34,7 @@ using 홍달.Services.Dispatch.Queue;
 using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Notifications;
 using 홍달.Services.Payments;
+using Hongdal.Services.Driver.Development;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CustomsBrokerCorsPolicy = "CustomsBrokerApp";
@@ -218,6 +219,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddHongdalHttpClients();
 builder.Services.AddHongdalDomainServices();
 builder.Services.AddSingleton<Hongdal.Services.Orderer.IRestaurantSearchPolicyStore, Hongdal.Services.Orderer.InMemoryRestaurantSearchPolicyStore>();
+builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개발스냅샷Provider>();
 
 var app = builder.Build();
 

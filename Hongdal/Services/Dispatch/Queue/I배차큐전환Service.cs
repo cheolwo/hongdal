@@ -12,5 +12,6 @@ namespace 홍달.Services.Dispatch.Queue
         Task 추천만료처리Async(string requestId, CancellationToken cancellationToken = default);
         Task 공개배차로전환Async(string requestId, CancellationToken cancellationToken = default);
         Task 배차확정처리Async(string requestId, string driverId, CancellationToken cancellationToken = default);
+        Task 배차수락취소처리Async(string requestId, string driverId, string? reason = null, CancellationToken cancellationToken = default);
     }
 }

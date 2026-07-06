@@ -92,6 +92,44 @@ public sealed class ImportFoodGroupPurchaseContractPlannerTests
         Assert.Contains("S-02", plan.PrivacyAndContractReadiness.MissingRequiredCodes);
     }
 
+    [Fact]
+    public void Plan_WithCompletedElectronicSignatures_IsSigned()
+    {
+        var now = new DateTimeOffset(2026, 7, 6, 10, 0, 0, TimeSpan.Zero);
+        var parties = CreateRequiredParties();
+        var bundle = ContractElectronicSignaturePlanner.CreateBundleFromParties(
+            "IFGP-2026-0001",
+            "sha256:contract-document",
+            parties,
+            now,
+            now.AddDays(7));
+        foreach (var party in parties.Where(x => x.IsRequiredSigner))
+        {
+            bundle = ContractElectronicSignaturePlanner.AddEvidence(
+                bundle,
+                new ContractSignatureEvidence(
+                    party.PartyId,
+                    party.DisplayName,
+                    ContractSignatureMethodCode.PlatformClickSign,
+                    "sha256:contract-document",
+                    "sha256:consent-text",
+                    $"sha256:evidence-{party.PartyId}",
+                    now.AddMinutes(1),
+                    $"sha256:ip-{party.PartyId}"));
+        }
+
+        var draft = CreateDraft(parties: parties) with
+        {
+            SignatureBundle = bundle
+        };
+
+        var plan = ImportFoodGroupPurchaseContractPlanner.Plan(draft);
+
+        Assert.Equal(ImportFoodGroupPurchaseContractStatusCode.Signed, plan.SuggestedStatus);
+        Assert.NotNull(plan.SignaturePlan);
+        Assert.True(plan.SignaturePlan.IsFullySigned);
+    }
+
     private static ImportFoodGroupPurchaseContractDraft CreateDraft(
         HsFoodGroupPurchaseProductCard? productCard = null,
         IReadOnlyList<ImportFoodGroupPurchaseContractParty>? parties = null)

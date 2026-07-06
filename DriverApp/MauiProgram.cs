@@ -26,6 +26,7 @@ public static class MauiProgram
 			});
 
 		builder.Services.AddDriverAppServices();
+		builder.Services.AddHongdalUiCommonAppServices();
 		builder.Services.AddHongdalDocumentOutputServices();
 		builder.Services.AddTransient<NativeDriverHomePage>();
 		builder.Services.AddMudServices();
