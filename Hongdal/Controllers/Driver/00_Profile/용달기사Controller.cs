@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Application.Driver.Profile;
 using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,162 +14,30 @@ namespace Hongdal.Controllers.Driver.Profile01;
 [Authorize]
 public sealed class 용달기사Controller : ControllerBase
 {
-    private readonly HongdalContext _db;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IDriverPushTokenStore _pushTokenStore;
+    private readonly I용달기사프로필UseCase _useCase;
 
-    public 용달기사Controller(
-        HongdalContext db,
-        UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
-        IDriverPushTokenStore pushTokenStore)
+    public 용달기사Controller(I용달기사프로필UseCase useCase)
     {
-        _db = db;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _pushTokenStore = pushTokenStore;
+        _useCase = useCase;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> 용달기사등록([FromBody] 용달기사등록요청 request)
     {
-        if (request == null)
+        var result = await _useCase.등록Async(GetCurrentUserId(), request);
+        if (result.IsFailed)
         {
-            return this.ToProblemActionResult("request body is required");
+            return this.ToActionResult(result);
         }
 
-        if (string.IsNullOrWhiteSpace(request.기사명))
-        {
-            return this.ToProblemActionResult("기사명 is required");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.연락처))
-        {
-            return this.ToProblemActionResult("연락처 is required");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.차량))
-        {
-            return this.ToProblemActionResult("차량 is required");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.주_활동지역))
-        {
-            return this.ToProblemActionResult("주_활동지역 is required");
-        }
-
-        var driverId = GetCurrentUserId();
-        if (string.IsNullOrWhiteSpace(driverId))
-        {
-            return this.ToAuthenticationProblem("기사 인증 정보가 없습니다.");
-        }
-
-        var existing = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId);
-        if (existing != null)
-        {
-            return this.ToConflictProblem("이미 등록된 용달기사입니다.");
-        }
-
-        var user = await _userManager.FindByIdAsync(driverId);
-        if (user == null)
-        {
-            return this.ToAuthenticationProblem("기사 인증 정보가 없습니다.");
-        }
-
-        if (!await _roleManager.RoleExistsAsync(역할명.기사))
-        {
-            await _roleManager.CreateAsync(new IdentityRole(역할명.기사));
-        }
-
-        if (!await _userManager.IsInRoleAsync(user, 역할명.기사))
-        {
-            await _userManager.AddToRoleAsync(user, 역할명.기사);
-        }
-
-        var driver = new 용달기사
-        {
-            NotionPageId = Guid.NewGuid().ToString("N"),
-            기사명 = request.기사명.Trim(),
-            기사Id = driverId,
-            상태 = string.IsNullOrWhiteSpace(request.상태) ? "활동중" : request.상태.Trim(),
-            연락처 = request.연락처.Trim(),
-            차량 = request.차량.Trim(),
-            운행상태 = 상태값.기사운행상태.대기,
-            주_활동지역 = request.주_활동지역.Trim(),
-            메모 = request.메모?.Trim() ?? string.Empty,
-            기본복귀지주소 = request.기본복귀지주소?.Trim(),
-            기본복귀지위도 = request.기본복귀지위도,
-            기본복귀지경도 = request.기본복귀지경도,
-            집주소를복귀지로사용허용 = request.집주소를복귀지로사용허용,
-            등록일 = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        _db.용달기사.Add(driver);
-        await _db.SaveChangesAsync();
-
-        var vehicle = await _db.차량제원.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.차량코드 == driver.차량 || x.차량명 == driver.차량);
-
-        var pushToken = await _pushTokenStore.GetAsync(driverId);
-
-        return CreatedAtAction(nameof(내용달기사조회), new { }, new 용달기사등록응답
-        {
-            기사Id = driver.기사Id,
-            기사명 = driver.기사명,
-            연락처 = driver.연락처,
-            차량 = driver.차량,
-            차량코드 = vehicle?.차량코드,
-            차량명 = vehicle?.차량명,
-            주_활동지역 = driver.주_활동지역,
-            상태 = driver.상태,
-            운행상태 = driver.운행상태,
-            등록일 = driver.등록일,
-            메모 = driver.메모,
-            기본복귀지주소 = driver.기본복귀지주소,
-            기본복귀지위도 = driver.기본복귀지위도,
-            기본복귀지경도 = driver.기본복귀지경도,
-            집주소를복귀지로사용허용 = driver.집주소를복귀지로사용허용,
-            푸시토큰등록됨 = !string.IsNullOrWhiteSpace(pushToken)
-        });
+        return CreatedAtAction(nameof(내용달기사조회), new { }, result.Value);
     }
 
     [HttpGet("me")]
     public async Task<IActionResult> 내용달기사조회()
     {
-        var driverId = GetCurrentUserId();
-        if (string.IsNullOrWhiteSpace(driverId))
-        {
-            return this.ToAuthenticationProblem("기사 인증 정보가 없습니다.");
-        }
-
-        var driver = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId);
-        if (driver == null)
-        {
-            return this.ToNotFoundProblem("용달기사 정보를 찾을 수 없습니다.");
-        }
-
-        var vehicle = await _db.차량제원.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.차량코드 == driver.차량 || x.차량명 == driver.차량);
-        var pushToken = await _pushTokenStore.GetAsync(driverId);
-
-        return Ok(new 용달기사등록응답
-        {
-            기사Id = driver.기사Id,
-            기사명 = driver.기사명,
-            연락처 = driver.연락처,
-            차량 = driver.차량,
-            차량코드 = vehicle?.차량코드,
-            차량명 = vehicle?.차량명,
-            주_활동지역 = driver.주_활동지역,
-            상태 = driver.상태,
-            운행상태 = driver.운행상태,
-            등록일 = driver.등록일,
-            메모 = driver.메모,
-            푸시토큰등록됨 = !string.IsNullOrWhiteSpace(pushToken)
-        });
+        var result = await _useCase.내프로필조회Async(GetCurrentUserId());
+        return this.ToActionResult(result);
     }
 
     private string? GetCurrentUserId()

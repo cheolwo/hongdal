@@ -8,21 +8,21 @@ namespace Hongdal.Tests.Contracts.Common.Privacy;
 public sealed class IsmsPProtectedDataAttributeReaderTests
 {
     [Fact]
-    public void Read_ImportFoodGroupPurchaseContractDraft_ExposesIsmsPContractAndPrivacyFields()
+    public void Read_수입식품공동주문계약초안_ExposesIsmsPContractAndPrivacyFields()
     {
-        var members = IsmsPProtectedDataAttributeReader.Read<ImportFoodGroupPurchaseContractDraft>();
+        var members = IsmsPProtectedDataAttributeReader.Read<수입식품공동주문계약초안>();
 
         Assert.Contains(members, x =>
-            x.PropertyName == nameof(ImportFoodGroupPurchaseContractDraft.ContractNumber) &&
+            x.PropertyName == nameof(수입식품공동주문계약초안.ContractNumber) &&
             x.FieldKey == PersonalDataFieldKey.ContractDocument &&
             x.IsContractData &&
             !x.IsPersonalData);
         Assert.Contains(members, x =>
-            x.PropertyName == nameof(ImportFoodGroupPurchaseContractDraft.OrdererGroupScopeName) &&
+            x.PropertyName == nameof(수입식품공동주문계약초안.주문자집단배송권명) &&
             x.FieldKey == PersonalDataFieldKey.OrdererGroupScope &&
             x.FieldRule is not null);
         Assert.Contains(members, x =>
-            x.PropertyName == nameof(ImportFoodGroupPurchaseContractDraft.PaymentPolicy) &&
+            x.PropertyName == nameof(수입식품공동주문계약초안.PaymentPolicy) &&
             x.DomainCode == IsmsPDomainCode.ManagementSystem);
     }
 

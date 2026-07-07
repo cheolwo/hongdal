@@ -60,6 +60,8 @@
                                                 <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">활동 글</MudChip>
                                             }
                                             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@post.Category</MudChip>
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@post.WorkflowTag</MudChip>
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@post.RoleTag</MudChip>
                                             @if (isReportPost)
                                             {
                                                 <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Outlined">신고 게시판</MudChip>
@@ -336,6 +338,18 @@
                                 @foreach (var category in BoardCategoryOptions)
                                 {
                                     <MudSelectItem Value="@category">@category</MudSelectItem>
+                                }
+                            </MudSelect>
+                            <MudSelect T="string" Label="워크플로우 태그" @bind-Value="form.WorkflowTag" Variant="Variant.Outlined">
+                                @foreach (var workflowTag in WorkflowTagOptions)
+                                {
+                                    <MudSelectItem Value="@workflowTag">@workflowTag</MudSelectItem>
+                                }
+                            </MudSelect>
+                            <MudSelect T="string" Label="역할 태그" @bind-Value="form.RoleTag" Variant="Variant.Outlined">
+                                @foreach (var roleTag in RoleTagOptions)
+                                {
+                                    <MudSelectItem Value="@roleTag">@roleTag</MudSelectItem>
                                 }
                             </MudSelect>
                             <MudCheckBox T="bool" @bind-Value="form.IsReportBoardPost" Label="신고 게시판 글" Color="Color.Error" />
@@ -727,6 +741,8 @@
         editingPostId = null;
         selectedFiles.Clear();
         form.Category = ResolveDraftCategory(kind);
+        form.WorkflowTag = ResolveDraftWorkflowTag(kind);
+        form.RoleTag = ResolveRoleTag(RoleLabel);
         form.Title = ResolveDraftTitle(kind);
         form.Body = ResolveDraftBody(kind);
         form.SharedLinkUrl = string.Empty;
@@ -894,6 +910,8 @@
                 saved = await CommunityService.UpdatePostAsync(postId, new PlatformCommunityPostUpdateRequest
                 {
                     Category = form.Category,
+                    WorkflowTag = form.WorkflowTag,
+                    RoleTag = form.RoleTag,
                     Title = form.Title,
                     Body = form.Body,
                     SharedLinkUrl = form.SharedLinkUrl,
@@ -910,6 +928,8 @@
                 {
                     AppKey = AppKey,
                     Category = form.Category,
+                    WorkflowTag = form.WorkflowTag,
+                    RoleTag = form.RoleTag,
                     Title = form.Title,
                     Body = form.Body,
                     SharedLinkUrl = form.SharedLinkUrl,
@@ -1146,6 +1166,8 @@
         form.Nickname = post.Nickname;
         form.Password = string.Empty;
         form.Category = post.Category;
+        form.WorkflowTag = post.WorkflowTag;
+        form.RoleTag = post.RoleTag;
         form.Title = post.Title;
         form.Body = post.Body;
         form.SharedLinkUrl = post.SharedLinkUrl ?? string.Empty;
@@ -1169,6 +1191,8 @@
         form.Nickname = string.Empty;
         form.Password = string.Empty;
         form.Category = "자유";
+        form.WorkflowTag = "국내 화물 운송";
+        form.RoleTag = ResolveRoleTag(RoleLabel);
         form.Title = string.Empty;
         form.Body = string.Empty;
         form.SharedLinkUrl = string.Empty;
@@ -1198,6 +1222,97 @@
 
             return categories;
         }
+    }
+
+    private static readonly IReadOnlyList<string> WorkflowTagOptions =
+    [
+        "국내 화물 운송",
+        "공동주문 수입",
+        "창고 입출고",
+        "판매채널 출고",
+        "통관·무역 데이터",
+        "커뮤니티 신뢰",
+        "참여 인력 관리",
+        "음식 배달",
+        "홍달마트"
+    ];
+
+    private IReadOnlyList<string> RoleTagOptions
+    {
+        get
+        {
+            var tags = new List<string>(DefaultRoleTagOptions);
+            var resolvedRole = ResolveRoleTag(RoleLabel);
+            if (!tags.Contains(resolvedRole, StringComparer.OrdinalIgnoreCase))
+            {
+                tags.Insert(0, resolvedRole);
+            }
+
+            return tags;
+        }
+    }
+
+    private static readonly IReadOnlyList<string> DefaultRoleTagOptions =
+    [
+        "기사",
+        "화주",
+        "주문자",
+        "주문자 집단 대표",
+        "창고 관리자",
+        "관세사",
+        "운영자",
+        "플랫폼 구성원"
+    ];
+
+    private static string ResolveRoleTag(string? roleLabel)
+    {
+        if (string.IsNullOrWhiteSpace(roleLabel))
+        {
+            return "플랫폼 구성원";
+        }
+
+        if (roleLabel.Contains("기사", StringComparison.OrdinalIgnoreCase))
+        {
+            return "기사";
+        }
+
+        if (roleLabel.Contains("화주", StringComparison.OrdinalIgnoreCase) ||
+            roleLabel.Contains("판매자", StringComparison.OrdinalIgnoreCase))
+        {
+            return "화주";
+        }
+
+        if (roleLabel.Contains("주문", StringComparison.OrdinalIgnoreCase))
+        {
+            return "주문자";
+        }
+
+        if (roleLabel.Contains("창고", StringComparison.OrdinalIgnoreCase))
+        {
+            return "창고 관리자";
+        }
+
+        if (roleLabel.Contains("관세", StringComparison.OrdinalIgnoreCase))
+        {
+            return "관세사";
+        }
+
+        if (roleLabel.Contains("관리", StringComparison.OrdinalIgnoreCase) ||
+            roleLabel.Contains("운영", StringComparison.OrdinalIgnoreCase))
+        {
+            return "운영자";
+        }
+
+        return "플랫폼 구성원";
+    }
+
+    private static string ResolveDraftWorkflowTag(WorkCommunityDraftKind kind)
+    {
+        return kind switch
+        {
+            WorkCommunityDraftKind.InternationalCoordination => "통관·무역 데이터",
+            _ => "국내 화물 운송"
+        };
     }
 
     private void HandleFilesSelected(InputFileChangeEventArgs args)
@@ -1333,6 +1448,8 @@
         public string Nickname { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string Category { get; set; } = "자유";
+        public string WorkflowTag { get; set; } = "국내 화물 운송";
+        public string RoleTag { get; set; } = "플랫폼 구성원";
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public string SharedLinkUrl { get; set; } = string.Empty;

@@ -36,6 +36,11 @@ public sealed class 배차대기수정CommandHandler : IRequestHandler<배차대
             entity.원본의뢰Id = request.원본의뢰Id.Trim();
         }
 
+        entity.공동구매도착지유형코드 = NormalizeOptional(request.공동구매도착지유형코드);
+        entity.공동구매기사세대배송여부 = request.공동구매기사세대배송여부;
+        entity.공동구매세대배송방식코드 = NormalizeOptional(request.공동구매세대배송방식코드);
+        entity.공동구매세대배송건수 = request.공동구매세대배송건수 is > 0 ? request.공동구매세대배송건수 : null;
+        entity.공동구매분배책임코드 = NormalizeOptional(request.공동구매분배책임코드);
         entity.픽업_도로명주소 = request.픽업_도로명주소;
         entity.픽업_상세주소 = request.픽업_상세주소;
         entity.픽업_위도 = request.픽업_위도;
@@ -50,4 +55,7 @@ public sealed class 배차대기수정CommandHandler : IRequestHandler<배차대
         await _db.SaveChangesAsync(cancellationToken);
         return entity;
     }
+
+    private static string? NormalizeOptional(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

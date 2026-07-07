@@ -7,12 +7,16 @@ namespace OrdererApp.Services;
 
 public interface IGroupPurchaseShipmentTrackingService
 {
-    Task<GroupPurchaseOverseasShipmentPublicDto?> LookupAsync(
+    Task<공동구매해외선적공개Dto?> LookupAsync(
         string documentManagementNumber,
         CancellationToken cancellationToken = default);
 
     Task<HsCountryImportUnitPriceSimulationResult?> SimulateImportUnitPriceAsync(
         HsCountryMonthlyTradeUnitPriceRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<공동구매자동집단응답?> RegisterDemandAsync(
+        공동구매자동수요등록Command request,
         CancellationToken cancellationToken = default);
 }
 
@@ -25,7 +29,7 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
         _httpClient = httpClient;
     }
 
-    public async Task<GroupPurchaseOverseasShipmentPublicDto?> LookupAsync(
+    public async Task<공동구매해외선적공개Dto?> LookupAsync(
         string documentManagementNumber,
         CancellationToken cancellationToken = default)
     {
@@ -37,7 +41,7 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
         try
         {
             var encodedNumber = Uri.EscapeDataString(documentManagementNumber.Trim());
-            return await _httpClient.GetFromJsonAsync<GroupPurchaseOverseasShipmentPublicDto>(
+            return await _httpClient.GetFromJsonAsync<공동구매해외선적공개Dto>(
                 $"api/v1/orderer/group-purchase-overseas-shipments/lookup?documentManagementNumber={encodedNumber}",
                 cancellationToken);
         }
@@ -71,6 +75,34 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
             }
 
             return await response.Content.ReadFromJsonAsync<HsCountryImportUnitPriceSimulationResult>(
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+    }
+
+    public async Task<공동구매자동집단응답?> RegisterDemandAsync(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var response = await _httpClient.PostAsJsonAsync(
+                "api/v1/orderer/group-purchase-auto-groups/demands",
+                request,
+                cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<공동구매자동집단응답>(
                 cancellationToken);
         }
         catch (HttpRequestException)

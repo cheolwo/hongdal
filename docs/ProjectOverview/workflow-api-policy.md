@@ -10,6 +10,8 @@
 | --- | --- |
 | 제품 버전 | API나 기능이 처음 들어온 로드맵 단계 |
 | 워크플로우 | 하나의 업무 절차를 완성하기 위해 묶이는 API 집합 |
+| 액터 | 유스케이스를 직접 실행하거나 보조로 참여하는 사용자·운영 주체 |
+| 유스케이스 | 액터가 워크플로우 안에서 목적을 달성하기 위해 호출하는 업무 기능 단위 |
 | 워크플로우 플래그 | 해당 업무 절차를 현재 환경에서 열지 말지 결정하는 스위치 |
 | 성장 트랙 | 커뮤니티처럼 여러 워크플로우와 버전에 걸쳐 계속 커지는 기능 축 |
 
@@ -85,7 +87,7 @@
 [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
 [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
-public sealed class GroupPurchaseOverseasShipmentTrackingController : ControllerBase
+public sealed class 공동구매해외선적추적Controller : ControllerBase
 {
 }
 ```
@@ -96,7 +98,40 @@ public sealed class GroupPurchaseOverseasShipmentTrackingController : Controller
 - 업무 절차: `공동주문 수입`
 - 운영 스위치: `GroupPurchaseImportWorkflow`
 
-`GET /api/v1/version-feature-flags`는 기존 `Flags` 응답을 유지하면서 `Workflows`와 `WorkflowRelations`도 함께 반환합니다. 앱과 관리자 화면은 이 응답을 이용해 워크플로우별 메뉴 노출, 비활성 안내, 워크플로우 관계도를 구성할 수 있습니다.
+유스케이스는 `HongdalUseCaseActorAttribute`로 주 액터와 보조 액터를 기록합니다. 이 값은 권한을 강제하는 장치라기보다, 설계 문서와 코드에서 “누가 이 업무를 주로 쓰는가”를 드러내는 메타데이터입니다. 실제 권한 검사는 기존 `Authorize`, 정책, HR 역할 검사와 함께 둡니다.
+
+```csharp
+[HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
+[HongdalUseCase("기사 배차 추천 조회", Summary = "기사에게 일반 화물, 공동주문 운송, 공개 배차, 전국콜 후보를 추천하고 상세를 조회합니다.")]
+[HongdalUseCaseActor(HongdalActor.Driver)]
+[HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+public sealed class 기사배차추천UseCase : I기사배차추천UseCase
+{
+}
+```
+
+액터 메타데이터는 다음 기준으로 붙입니다.
+
+| 구분 | 의미 |
+| --- | --- |
+| `Primary` | 유스케이스를 직접 조작하고 결과에 가장 큰 책임을 지는 사용자 |
+| `Supporting` | 같은 업무를 보정, 운영, 인계, 확인하는 보조 참여자 |
+
+`GET /api/v1/version-feature-flags`는 기존 `Flags` 응답을 유지하면서 `Workflows`, `Workflows[].UseCases`, `WorkflowRelations`도 함께 반환합니다. 앱과 관리자 화면은 이 응답을 이용해 워크플로우별 메뉴 노출, 비활성 안내, 워크플로우 관계도, 워크플로우를 성립시키는 유스케이스 목록을 구성할 수 있습니다.
+
+## 워크플로우별 필수 유스케이스
+
+워크플로우는 화면이나 API 하나로 닫히지 않습니다. 아래 유스케이스들이 서로 연결될 때 실제 업무 흐름이 성립합니다.
+
+| 워크플로우 | 필요한 유스케이스 |
+| --- | --- |
+| 국내 화물 운송 | `화주운송의뢰UseCase`, `기사배차추천UseCase`, `용달기사프로필UseCase`, `기사알림UseCase` |
+| 공동주문 수입 | `공동구매자동집단화UseCase`, `공동구매커머스이행계획UseCase` |
+| 창고 입출고 | `창고작업UseCase` |
+| 판매채널 출고 | `판매채널UseCase` |
+| 커뮤니티 신뢰 | `PlatformCommunityBoardUseCase` |
+
+이 목록은 `HongdalApiWorkflowAttribute`와 `HongdalUseCaseAttribute`가 붙은 유스케이스 클래스를 서버가 읽어 구성합니다. 새 유스케이스를 추가할 때는 워크플로우, 표시 이름, 주 액터, 보조 액터를 함께 붙이는 것을 기본 규칙으로 둡니다.
 
 ## 기존 버전 플래그 호환
 

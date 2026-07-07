@@ -1,4 +1,5 @@
 using FluentResults;
+using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hongdal.Controllers;
@@ -33,6 +34,21 @@ public static class Result응답확장
         }
 
         return controller.ToFailureActionResult(result.Errors);
+    }
+
+    public static IActionResult ToActionResult<T>(this ControllerBase controller, 공동구매처리결과<T> result)
+    {
+        if (result.성공)
+        {
+            return controller.Ok(result.값);
+        }
+
+        if (result.값 is not null)
+        {
+            return controller.StatusCode(result.상태코드, result.값);
+        }
+
+        return controller.ToProblemActionResult(result.메시지, result.상태코드);
     }
 
     public static IActionResult ToProblemActionResult(this ControllerBase controller, IEnumerable<string> errors)
@@ -89,7 +105,12 @@ public static class Result응답확장
 
     private static IActionResult ToFailureActionResult(this ControllerBase controller, IReadOnlyCollection<IError> errors)
     {
-        return controller.ToProblemActionResult(errors.Select(x => x.Message), null);
+        var statusCode = errors
+            .Select(x => x.Metadata.TryGetValue("StatusCode", out var value) ? value : null)
+            .OfType<int>()
+            .FirstOrDefault();
+
+        return controller.ToProblemActionResult(errors.Select(x => x.Message), statusCode == 0 ? null : statusCode);
     }
 
     private static FailureClassification 실패분류(string message, int statusCode)

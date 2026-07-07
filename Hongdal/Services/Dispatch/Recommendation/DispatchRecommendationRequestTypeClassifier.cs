@@ -1,8 +1,9 @@
 using Hongdal.Hubs;
+using Hongdal.Contracts.Common.Orderer;
 
 namespace 홍달.Services.Dispatch.Recommendation;
 
-internal static class DispatchRecommendationRequestTypeClassifier
+public static class DispatchRecommendationRequestTypeClassifier
 {
     private const string GeneralCargoTransportCode = "GeneralCargoTransport";
     private const string GroupPurchaseCargoTransportCode = "GroupPurchaseCargoTransport";
@@ -31,9 +32,75 @@ internal static class DispatchRecommendationRequestTypeClassifier
                 GeneralWorkScopeLabel);
     }
 
+    public static DispatchRecommendationRequestTypeMetadata Classify(PlatformEntrustedDispatchQueueDraftDto draft)
+    {
+        ArgumentNullException.ThrowIfNull(draft);
+
+        return Classify(
+            draft.SourceRequestType,
+            draft.DestinationTypeCode,
+            draft.DriverPerformsApartmentUnitDistribution,
+            draft.ApartmentUnitDeliveryCount);
+    }
+
+    public static DispatchRecommendationRequestTypeMetadata Classify(
+        string? sourceType,
+        string? destinationTypeCode,
+        bool? driverPerformsApartmentUnitDistribution,
+        int? apartmentUnitDeliveryCount)
+    {
+        var metadata = Classify(sourceType);
+        if (!metadata.IsGroupPurchaseTransport)
+        {
+            return metadata;
+        }
+
+        var includesApartmentUnitDelivery =
+            string.Equals(destinationTypeCode, 공동구매국내운송도착지유형코드.ApartmentComplexDirectDistribution, StringComparison.OrdinalIgnoreCase) &&
+            driverPerformsApartmentUnitDistribution == true;
+
+        return metadata with
+        {
+            IncludesApartmentUnitDelivery = includesApartmentUnitDelivery,
+            ApartmentUnitDeliveryCount = includesApartmentUnitDelivery ? apartmentUnitDeliveryCount : null,
+            ApartmentUnitDeliveryScopeLabel = BuildGroupPurchaseWorkScopeLabel(
+                destinationTypeCode,
+                includesApartmentUnitDelivery,
+                apartmentUnitDeliveryCount)
+        };
+    }
+
     public static void ApplyTo(DispatchRecommendationDto target, string? sourceType)
     {
         var metadata = Classify(sourceType);
+        ApplyTo(target, metadata);
+    }
+
+    public static void ApplyTo(DispatchRecommendationDto target, PlatformEntrustedDispatchQueueDraftDto draft)
+    {
+        var metadata = Classify(draft);
+        ApplyTo(target, metadata);
+    }
+
+    public static void ApplyTo(
+        DispatchRecommendationDto target,
+        string? sourceType,
+        string? destinationTypeCode,
+        bool? driverPerformsApartmentUnitDistribution,
+        int? apartmentUnitDeliveryCount)
+    {
+        var metadata = Classify(
+            sourceType,
+            destinationTypeCode,
+            driverPerformsApartmentUnitDistribution,
+            apartmentUnitDeliveryCount);
+        ApplyTo(target, metadata);
+    }
+
+    private static void ApplyTo(DispatchRecommendationDto target, DispatchRecommendationRequestTypeMetadata metadata)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+
         target.운송의뢰유형코드 = metadata.RequestTypeCode;
         target.운송의뢰유형표시 = metadata.RequestTypeLabel;
         target.공동주문운송여부 = metadata.IsGroupPurchaseTransport;
@@ -46,9 +113,30 @@ internal static class DispatchRecommendationRequestTypeClassifier
         => string.Equals(sourceType, "ImportCargoTransport", StringComparison.OrdinalIgnoreCase) ||
            string.Equals(sourceType, "FclCargoTransport", StringComparison.OrdinalIgnoreCase) ||
            string.Equals(sourceType, "LclCargoTransport", StringComparison.OrdinalIgnoreCase);
+
+    private static string BuildGroupPurchaseWorkScopeLabel(
+        string? destinationTypeCode,
+        bool includesApartmentUnitDelivery,
+        int? apartmentUnitDeliveryCount)
+    {
+        if (includesApartmentUnitDelivery)
+        {
+            return apartmentUnitDeliveryCount is > 0
+                ? $"상하차 + 세대 문앞 {apartmentUnitDeliveryCount.Value:N0}건"
+                : "상하차 + 세대 문앞 배송";
+        }
+
+        return destinationTypeCode switch
+        {
+            공동구매국내운송도착지유형코드.ThreePlWarehouse => "상하차 + 3PL 입고",
+            공동구매국내운송도착지유형코드.ApartmentComplexDirectDistribution => "상하차 + 공동주택 거점 하차",
+            공동구매국내운송도착지유형코드.OrdererGroupRepresentativeDropoff => "상하차 + 집단 대표 인계",
+            _ => GroupPurchaseWorkScopeLabel
+        };
+    }
 }
 
-internal sealed record DispatchRecommendationRequestTypeMetadata(
+public sealed record DispatchRecommendationRequestTypeMetadata(
     string RequestTypeCode,
     string RequestTypeLabel,
     bool IsGroupPurchaseTransport,

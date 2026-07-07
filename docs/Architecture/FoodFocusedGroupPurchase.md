@@ -50,8 +50,8 @@ flowchart TD
 
 | 단계 | 상태 | 설명 |
 | --- | --- | --- |
-| 상품 카드 노출 | `HsFoodGroupPurchaseProductCard` | 상품명, HS 코드, 식품명, 온도 조건, 예상 물류 방식, 목표 수량, 예상 단가 표시 |
-| 개설 신청 | `OrdererGroupOpeningApplicationDraft` | 주문자, 상품 카드, 주문자 집단 범위, 구매 의향 수량, 희망 단가, 비구속 동의 저장 |
+| 상품 카드 노출 | `HS먹거리공동구매상품카드` | 상품명, HS 코드, 식품명, 온도 조건, 예상 물류 방식, 목표 수량, 예상 단가 표시 |
+| 개설 신청 | `주문자집단개설신청초안` | 주문자, 상품 카드, 주문자 집단 범위, 구매 의향 수량, 희망 단가, 비구속 동의 저장 |
 | 운영 승인 대기 | `PendingApproval` | 운영자가 HS 식품 코드, 지역 범위, 냉장/냉동, 수입식품 검토 필요성을 확인 |
 | 집단 생성 | `ApprovedGroupReady` | 승인되면 같은 주문자 집단 범위 안의 다른 주문자가 참여 가능 |
 | 참여 모집 | `DemandChecking` | 참여자의 구매 의향을 수집하고 목표 수요율을 확인 |
@@ -108,41 +108,41 @@ DTO 속성에는 `IsmsPProtectedDataAttribute`를 붙여 어떤 값이 ISMS-P �
 
 ## 코드 골격
 
-- 공통 플래너: `Hongdal.Contracts/Common/Orderer/ColdChainFoodGroupPurchasePlanner.cs`
-- 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/GroupPurchasePaymentMilestonePlanner.cs`
-- 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/ImportFoodGroupPurchaseContract.cs`
+- 공통 플래너: `Hongdal.Contracts/Common/Orderer/냉장냉동먹거리공동구매계획기.cs`
+- 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/공동구매결제단계계획기.cs`
+- 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/수입식품공동주문계약계획기.cs`
 - 계약 전자서명 플래너: `Hongdal.Contracts/Common/ContractManagement/ContractElectronicSignature.cs`
 - 개인정보/계약 ISMS-P 준비도 플래너: `Hongdal.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
 - ISMS-P 보호 어트리뷰트: `Hongdal.Contracts/Common/Privacy/IsmsPProtectedDataAttribute.cs`
 - 개인정보 필드 보호 카탈로그: `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
 - 공통 서명 입력 UI: `Hongdal.Ui.Common/Areas/App/Components/Contracts/HongdalSignatureGate.razor`, `HongdalSignaturePad.razor`
 - 주문자 앱 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`
-- HS 식품 분류 기준: `Hongdal.Domain/HsCodes/HsCodeBusinessCategoryClassifier.cs`
+- HS 식품 분류 기준: `Hongdal.Domain/HS코드s/HS코드BusinessCategoryClassifier.cs`
 - 수입식품 조회 모듈: `Hongdal/Services/External/Mfds/*`
-- 주문자 집단 범위 후보: `Hongdal/Services/External/PublicData/OrdererGroupScopeLookupService.cs`
+- 주문자 집단 범위 후보: `Hongdal/Services/External/PublicData/주문자집단배송권조회Service.cs`
 
-`ColdChainFoodGroupPurchasePlanner`는 DB 없이 캠페인 초안을 판정한다.
+`냉장냉동먹거리공동구매계획기`는 DB 없이 캠페인 초안을 판정한다.
 
-- `HsCode`가 HS chapter `01~24`이면 `IsHsFoodCandidate=true`
-- 식품 HS 코드이면서 냉장/냉동 또는 냉동창고가 필요하면 `ColdChainFoodFocused`
+- `HS코드`가 HS chapter `01~24`이면 `HS먹거리후보여부=true`
+- 식품 HS 코드이면서 냉장/냉동 또는 냉동창고가 필요하면 `냉장냉동먹거리중심`
 - 수요율이 70% 미만이면 `DemandChecking`
 - 수요율이 충분하고 검토 항목이 있으면 `ColdChainReview`
 - 검토 항목이 없고 수요율이 충분하면 `ImportDecision`
 
-`OrdererGroupOpeningApplicationPlanner`는 개인 주문자가 상품 카드에서 공동 주문 집단 개설을 신청할 수 있는지 판정한다.
+`주문자집단개설신청계획기`는 개인 주문자가 상품 카드에서 공동 주문 집단 개설을 신청할 수 있는지 판정한다.
 
 - 비구속 신청 동의가 없으면 `Draft`
 - HS 식품 코드 후보이고 비구속 신청 동의가 있으면 `PendingApproval`
 - 운영 검토 항목에는 주문자 집단 범위 승인, HS 식품 코드 확인, 수입식품/해외제조업소 조회, 냉장/냉동 검토가 포함될 수 있다.
 
-`GroupPurchasePaymentMilestonePlanner`는 공동구매 결제 금액을 상차, 하차, 분배 확인 마일스톤으로 나눈다.
+`공동구매결제단계계획기`는 공동구매 결제 금액을 상차, 하차, 분배 확인 마일스톤으로 나눈다.
 
 - 상차 완료 시 1차 지급 요청 가능
 - 하차 완료 시 2차 지급 요청 가능
 - 분배 확인율이 기준 이상이면 최종 지급 요청 가능
 - 이미 지급된 마일스톤은 중복 요청하지 않는다.
 
-`ImportFoodGroupPurchaseContractPlanner`는 수입 식품 공동 주문 계약서 초안을 검토한다.
+`수입식품공동주문계약검토계획기`는 수입 식품 공동 주문 계약서 초안을 검토한다.
 
 - HS 코드가 식품 범위인지 확인
 - 개설 신청 주문자, 공급자/화주, 플랫폼 운영자 당사자 확인

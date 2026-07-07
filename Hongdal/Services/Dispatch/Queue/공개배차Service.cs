@@ -69,7 +69,12 @@ namespace 홍달.Services.Dispatch.Queue
                     차량경고 = Array.Empty<string>()
                 };
 
-                DispatchRecommendationRequestTypeClassifier.ApplyTo(recommendation, item.원본의뢰유형);
+                DispatchRecommendationRequestTypeClassifier.ApplyTo(
+                    recommendation,
+                    item.원본의뢰유형,
+                    item.공동구매도착지유형코드,
+                    item.공동구매기사세대배송여부,
+                    item.공동구매세대배송건수);
                 return recommendation;
             }).ToArray();
         }

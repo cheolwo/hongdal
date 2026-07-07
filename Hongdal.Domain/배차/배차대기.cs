@@ -27,6 +27,21 @@ namespace 홍달.도메인.배차
         [Column("source_request_id")]
         public string 원본의뢰Id { get; set; } = string.Empty;
 
+        [Column("group_purchase_destination_type_code")]
+        public string? 공동구매도착지유형코드 { get; set; }
+
+        [Column("group_purchase_driver_unit_distribution")]
+        public bool? 공동구매기사세대배송여부 { get; set; }
+
+        [Column("group_purchase_unit_distribution_mode_code")]
+        public string? 공동구매세대배송방식코드 { get; set; }
+
+        [Column("group_purchase_unit_delivery_count")]
+        public int? 공동구매세대배송건수 { get; set; }
+
+        [Column("group_purchase_distribution_responsibility_code")]
+        public string? 공동구매분배책임코드 { get; set; }
+
         [Column("pickup_address")]
         public string 픽업_도로명주소 { get; set; } = string.Empty;
 

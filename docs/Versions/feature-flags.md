@@ -1,4 +1,4 @@
-﻿# Feature Flag Policy
+# Feature Flag Policy
 
 기능 플래그는 구현된 코드와 실제 운영 노출을 분리하기 위한 상위 스위치입니다. 버전별 기능이 같은 코드베이스에 존재하더라도, 현재 운영 버전 범위 밖 기능은 기본적으로 꺼져 있어야 합니다.
 
@@ -54,7 +54,7 @@
 ```csharp
 [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.OrdererGroupOrderV25)]
 [RequireVersionFeature(VersionFeatureFlagKeys.OrdererGroupOrderV25)]
-public sealed class GroupPurchaseOverseasShipmentTrackingController : ControllerBase
+public sealed class 공동구매해외선적추적Controller : ControllerBase
 {
 }
 ```

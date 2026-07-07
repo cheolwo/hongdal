@@ -1,9 +1,8 @@
 using System.Security.Claims;
+using Hongdal.Application.Driver.Recommendation;
 using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using 홍달.Data;
-using 홍달.Services;
 using 홍달.도메인.공통;
 using Hongdal.ApiMetadata;
 
@@ -15,22 +14,18 @@ namespace Hongdal.Controllers.Driver.Recommendation02
     [Route("api/v1/driver/recommendations")]
     public sealed class 기사배차추천Controller : ControllerBase
     {
-        private readonly I배차추천Service _dispatchRecommendationService;
-        private readonly INationalDispatchRequestService _nationalDispatchRequestService;
+        private readonly I기사배차추천UseCase _useCase;
 
-        public 기사배차추천Controller(
-            I배차추천Service dispatchRecommendationService,
-            INationalDispatchRequestService nationalDispatchRequestService)
+        public 기사배차추천Controller(I기사배차추천UseCase useCase)
         {
-            _dispatchRecommendationService = dispatchRecommendationService;
-            _nationalDispatchRequestService = nationalDispatchRequestService;
+            _useCase = useCase;
         }
 
         [HttpGet]
         public async Task<IActionResult> 조회()
         {
             var driverId = 현재기사Id();
-            var items = await _dispatchRecommendationService.GetRecommendationsAsync(driverId);
+            var items = await _useCase.추천조회Async(driverId);
             return Ok(items);
         }
 
@@ -38,7 +33,7 @@ namespace Hongdal.Controllers.Driver.Recommendation02
         public async Task<IActionResult> 비운행중조회()
         {
             var driverId = 현재기사Id();
-            var items = await _dispatchRecommendationService.GetIdleRecommendationsAsync(driverId);
+            var items = await _useCase.비운행중추천조회Async(driverId);
             return Ok(items);
         }
 
@@ -46,7 +41,7 @@ namespace Hongdal.Controllers.Driver.Recommendation02
         public async Task<IActionResult> 운행중조회()
         {
             var driverId = 현재기사Id();
-            var items = await _dispatchRecommendationService.GetDrivingRecommendationsAsync(driverId);
+            var items = await _useCase.운행중추천조회Async(driverId);
             return Ok(items);
         }
 
@@ -59,8 +54,7 @@ namespace Hongdal.Controllers.Driver.Recommendation02
                 return this.ToProblemActionResult("radiusKm must be greater than 0.");
             }
 
-            var criteria = new 배차추천검색조건(latitude, longitude, radiusKm);
-            var items = await _dispatchRecommendationService.GetRecommendationsAsync(driverId, criteria);
+            var items = await _useCase.위치기반추천검색Async(driverId, latitude, longitude, radiusKm);
             return Ok(items);
         }
 
@@ -68,7 +62,7 @@ namespace Hongdal.Controllers.Driver.Recommendation02
         public async Task<IActionResult> 전국콜조회()
         {
             var driverId = 현재기사Id();
-            var items = await _nationalDispatchRequestService.GetNationwideRequestsAsync(driverId);
+            var items = await _useCase.전국콜조회Async(driverId);
             return Ok(items);
         }
 

@@ -1,10 +1,15 @@
 using System.Reflection;
+using Hongdal.Application.Driver.Recommendation;
+using Hongdal.Application.Sales;
+using Hongdal.Application.Shipper.Request;
+using Hongdal.Application.Warehouse;
 using Hongdal.ApiMetadata;
 using Hongdal.Controllers.Admin.HumanResources;
 using Hongdal.Controllers.Admin.Orderer;
 using Hongdal.Controllers.Common;
 using Hongdal.Controllers.Orderer;
 using Hongdal.Filters;
+using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using 홍달.Services.Versioning;
@@ -54,6 +59,25 @@ public sealed class HongdalApiVersionAttributeTests
     public void GetLabel_ReturnsStableWorkflowRelationKindLabel(HongdalWorkflowRelationKind kind, string expected)
     {
         Assert.Equal(expected, HongdalWorkflowRelationKindLabels.GetLabel(kind));
+    }
+
+    [Theory]
+    [InlineData(HongdalActor.Shipper, "화주")]
+    [InlineData(HongdalActor.Driver, "기사")]
+    [InlineData(HongdalActor.OrdererGroupLeader, "주문자 집단 대표")]
+    [InlineData(HongdalActor.WarehouseManager, "창고 관리자")]
+    [InlineData(HongdalActor.PlatformOperator, "플랫폼 운영자")]
+    public void GetLabel_ReturnsStableActorLabel(HongdalActor actor, string expected)
+    {
+        Assert.Equal(expected, HongdalActorLabels.GetLabel(actor));
+    }
+
+    [Theory]
+    [InlineData(HongdalUseCaseActorRole.Primary, "주 액터")]
+    [InlineData(HongdalUseCaseActorRole.Supporting, "보조 액터")]
+    public void GetLabel_ReturnsStableUseCaseActorRoleLabel(HongdalUseCaseActorRole role, string expected)
+    {
+        Assert.Equal(expected, HongdalUseCaseActorRoleLabels.GetLabel(role));
     }
 
     [Fact]
@@ -112,6 +136,28 @@ public sealed class HongdalApiVersionAttributeTests
     }
 
     [Fact]
+    public void CoreUseCases_RecordPrimaryActorMetadata()
+    {
+        AssertUseCaseHasPrimaryActor(typeof(화주운송의뢰UseCase), HongdalActor.Shipper);
+        AssertUseCaseHasPrimaryActor(typeof(기사배차추천UseCase), HongdalActor.Driver);
+        AssertUseCaseHasPrimaryActor(typeof(공동구매자동집단화UseCase), HongdalActor.Orderer);
+        AssertUseCaseHasPrimaryActor(typeof(공동구매커머스이행계획UseCase), HongdalActor.OrdererGroupLeader);
+        AssertUseCaseHasPrimaryActor(typeof(창고작업UseCase), HongdalActor.WarehouseManager);
+        AssertUseCaseHasPrimaryActor(typeof(판매채널UseCase), HongdalActor.Seller);
+    }
+
+    [Fact]
+    public void CoreUseCases_RecordWorkflowAndDisplayNameMetadata()
+    {
+        AssertUseCaseHasWorkflow(typeof(화주운송의뢰UseCase), HongdalWorkflow.DomesticTransport);
+        AssertUseCaseHasWorkflow(typeof(기사배차추천UseCase), HongdalWorkflow.DomesticTransport);
+        AssertUseCaseHasWorkflow(typeof(공동구매자동집단화UseCase), HongdalWorkflow.GroupPurchaseImport);
+        AssertUseCaseHasWorkflow(typeof(공동구매커머스이행계획UseCase), HongdalWorkflow.GroupPurchaseImport);
+        AssertUseCaseHasWorkflow(typeof(창고작업UseCase), HongdalWorkflow.WarehouseFulfillment);
+        AssertUseCaseHasWorkflow(typeof(판매채널UseCase), HongdalWorkflow.SalesChannelFulfillment);
+    }
+
+    [Fact]
     public void WorkflowScreens_RecordAppAndScreenBoundaries()
     {
         var domesticScreens = HongdalWorkflowScreens.GetByWorkflow(HongdalWorkflow.DomesticTransport);
@@ -147,7 +193,13 @@ public sealed class HongdalApiVersionAttributeTests
             workflow.FlagKey == VersionFeatureFlagKeys.GroupPurchaseImportWorkflow &&
             workflow.Participants.Any(participant => participant.ActorName == "주문자 집단 대표" && participant.IsPrimary) &&
             workflow.Screens.Any(screen => screen.AppCode == "OrdererApp" && screen.Route == "/group-purchase") &&
+            workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(공동구매자동집단화UseCase) &&
+                useCase.PrimaryActors.Any(actor => actor.ActorCode == nameof(HongdalActor.Orderer))) &&
             !string.IsNullOrWhiteSpace(workflow.BoundarySummary));
+        Assert.Contains(response.Workflows, workflow =>
+            workflow.WorkflowCode == nameof(HongdalWorkflow.DomesticTransport) &&
+            workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(화주운송의뢰UseCase)) &&
+            workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(기사배차추천UseCase)));
         Assert.Contains(response.WorkflowRelations, relation =>
             relation.SourceWorkflowName == "공동주문 수입" &&
             relation.TargetWorkflowName == "국내 화물 운송" &&
@@ -176,7 +228,7 @@ public sealed class HongdalApiVersionAttributeTests
             var controllerVersion = controllerType.GetCustomAttribute<HongdalApiVersionAttribute>(inherit: true);
             foreach (var featureAttribute in controllerType.GetCustomAttributes<RequireVersionFeatureAttribute>(inherit: true))
             {
-                var featureKey = GetRequiredFeatureKey(featureAttribute);
+                var featureKey = Get필요FeatureKey(featureAttribute);
                 if (!string.Equals(controllerVersion?.FeatureKey, featureKey, StringComparison.Ordinal))
                 {
                     missingFeatureMetadata.Add($"{controllerType.FullName}: {featureKey}");
@@ -193,7 +245,7 @@ public sealed class HongdalApiVersionAttributeTests
                 var actionVersion = action.GetCustomAttribute<HongdalApiVersionAttribute>(inherit: true);
                 foreach (var featureAttribute in action.GetCustomAttributes<RequireVersionFeatureAttribute>(inherit: true))
                 {
-                    var featureKey = GetRequiredFeatureKey(featureAttribute);
+                    var featureKey = Get필요FeatureKey(featureAttribute);
                     if (!string.Equals(actionVersion?.FeatureKey, featureKey, StringComparison.Ordinal))
                     {
                         missingFeatureMetadata.Add($"{controllerType.FullName}.{action.Name}: {featureKey}");
@@ -215,20 +267,21 @@ public sealed class HongdalApiVersionAttributeTests
     {
         var missingWorkflow = new List<string>();
 
-        AddIfMissingWorkflow(typeof(GroupPurchaseOverseasShipmentTrackingController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(GroupPurchaseCommerceFulfillmentPlanController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(GroupPurchaseLogisticsWorkflowController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(OrdererGroupOperatingEntitiesController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(GroupPurchaseOverseasShipmentTrackingAdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(GroupPurchaseCommerceFulfillmentPlanAdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(GroupPurchaseLogisticsWorkflowAdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(OrdererGroupOperatingEntitiesAdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매해외선적추적Controller), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매커머스이행계획Controller), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매자동집단화Controller), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매물류워크플로우Controller), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(주문자집단운영주체Controller), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매해외선적추적AdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매커머스이행계획AdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매물류워크플로우AdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(주문자집단운영주체AdminController), HongdalWorkflow.GroupPurchaseImport, missingWorkflow);
         AddIfMissingWorkflow(typeof(SocialInsuranceFilingsController), HongdalWorkflow.HrParticipation, missingWorkflow);
         AddIfMissingWorkflow(typeof(WarehouseOperationsController), HongdalWorkflow.WarehouseFulfillment, missingWorkflow);
         AddIfMissingWorkflow(typeof(SalesChannelsController), HongdalWorkflow.SalesChannelFulfillment, missingWorkflow);
         AddIfMissingWorkflow(
-            typeof(PublicDataLookupController).GetMethod(nameof(PublicDataLookupController.FindOrdererGroupScopes)),
-            "Hongdal.Controllers.Orderer.PublicDataLookupController.FindOrdererGroupScopes",
+            typeof(PublicDataLookupController).GetMethod(nameof(PublicDataLookupController.주문자집단배송권검색)),
+            "Hongdal.Controllers.Orderer.PublicDataLookupController.주문자집단배송권검색",
             HongdalWorkflow.GroupPurchaseImport,
             missingWorkflow);
 
@@ -272,7 +325,7 @@ public sealed class HongdalApiVersionAttributeTests
                 || method.GetCustomAttributes<RouteAttribute>(inherit: true).Any());
     }
 
-    private static string GetRequiredFeatureKey(RequireVersionFeatureAttribute attribute)
+    private static string Get필요FeatureKey(RequireVersionFeatureAttribute attribute)
     {
         var featureKey = attribute.Arguments?.OfType<string>().FirstOrDefault();
         Assert.False(string.IsNullOrWhiteSpace(featureKey));
@@ -325,6 +378,25 @@ public sealed class HongdalApiVersionAttributeTests
         {
             missingWorkflow.Add($"{displayName}: {workflow}");
         }
+    }
+
+    private static void AssertUseCaseHasPrimaryActor(Type useCaseType, HongdalActor actor)
+    {
+        var attributes = useCaseType.GetCustomAttributes<HongdalUseCaseActorAttribute>(inherit: true);
+        Assert.Contains(attributes, attribute =>
+            attribute.Actor == actor &&
+            attribute.Role == HongdalUseCaseActorRole.Primary &&
+            !string.IsNullOrWhiteSpace(attribute.ActorLabel));
+    }
+
+    private static void AssertUseCaseHasWorkflow(Type useCaseType, HongdalWorkflow workflow)
+    {
+        var workflowAttributes = useCaseType.GetCustomAttributes<HongdalApiWorkflowAttribute>(inherit: true);
+        var useCaseAttribute = useCaseType.GetCustomAttribute<HongdalUseCaseAttribute>(inherit: true);
+
+        Assert.Contains(workflowAttributes, attribute => attribute.Workflow == workflow);
+        Assert.NotNull(useCaseAttribute);
+        Assert.False(string.IsNullOrWhiteSpace(useCaseAttribute!.Name));
     }
 
     private sealed class FakeVersionFeatureFlagService : IVersionFeatureFlagService

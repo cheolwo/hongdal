@@ -52,7 +52,12 @@ namespace Hongdal.Controllers.Admin.Inflow02
                 request.하차_상세주소,
                 request.하차_위도,
                 request.하차_경도,
-                request.상태));
+                request.상태,
+                request.공동구매도착지유형코드,
+                request.공동구매기사세대배송여부,
+                request.공동구매세대배송방식코드,
+                request.공동구매세대배송건수,
+                request.공동구매분배책임코드));
             return CreatedAtAction(nameof(단건조회), new { id = entity.Id }, entity);
         }
 
@@ -76,7 +81,12 @@ namespace Hongdal.Controllers.Admin.Inflow02
                 request.하차_상세주소,
                 request.하차_위도,
                 request.하차_경도,
-                request.상태));
+                request.상태,
+                request.공동구매도착지유형코드,
+                request.공동구매기사세대배송여부,
+                request.공동구매세대배송방식코드,
+                request.공동구매세대배송건수,
+                request.공동구매분배책임코드));
             if (entity == null) return this.ToNotFoundProblem("배차대기 정보를 찾을 수 없습니다.");
             return Ok(entity);
         }

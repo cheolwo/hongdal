@@ -1,4 +1,4 @@
-﻿# Hongdal 2.5
+# Hongdal 2.5
 
 ## 목표
 
@@ -113,11 +113,11 @@
 - 서버 카탈로그: `Hongdal/Services/External/PublicData/PublicDataApiMetadataCatalog.cs`
 - 주소 조회 서비스: `Hongdal/Services/External/PublicData/RoadAddressLookupService.cs`
 - 공동주택 조회 서비스: `Hongdal/Services/External/PublicData/ApartmentComplexLookupService.cs`
-- 주문자 집단 범위 후보 서비스: `Hongdal/Services/External/PublicData/OrdererGroupScopeLookupService.cs`
-- 먹거리 공동주문 플래너: `Hongdal.Contracts/Common/Orderer/ColdChainFoodGroupPurchasePlanner.cs`
-- 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/GroupPurchasePaymentMilestonePlanner.cs`
-- 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/ImportFoodGroupPurchaseContract.cs`
-- 플랫폼 위임 국내 운송 플래너: `Hongdal.Contracts/Common/Orderer/GroupPurchasePlatformDomesticTransportPlanner.cs`
+- 주문자 집단 범위 후보 서비스: `Hongdal/Services/External/PublicData/주문자집단배송권조회Service.cs`
+- 먹거리 공동주문 플래너: `Hongdal.Contracts/Common/Orderer/냉장냉동먹거리공동구매계획기.cs`
+- 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/공동구매결제단계계획기.cs`
+- 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/수입식품공동주문계약계획기.cs`
+- 플랫폼 위임 국내 운송 플래너: `Hongdal.Contracts/Common/Orderer/공동구매플랫폼국내운송계획기.cs`
 - 개인정보/계약 ISMS-P 준비도 플래너: `Hongdal.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
 - 개인정보 필드 보호 카탈로그: `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
 - 주문자 공동구매 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`

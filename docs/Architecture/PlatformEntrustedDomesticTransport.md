@@ -143,6 +143,18 @@ Group-purchase transport recommendations are shown separately from general cargo
 
 The driver list and detail screen surface this as chips before acceptance so the driver does not mistake a group-purchase unit-delivery job for a normal pickup/dropoff job.
 
+The current implementation keeps the database handoff intentionally small. The dispatch queue preserves the source request type in `배차대기.원본의뢰유형`; `DispatchRecommendationRequestTypeClassifier` then maps that source type to the driver-facing recommendation metadata. When a platform domestic transport draft is available, the classifier can also consume `PlatformEntrustedDispatchQueueDraftDto` directly so apartment unit-delivery count and destination-specific work scope are preserved before the job is displayed to the driver.
+
+Verified handoff cases:
+
+| Transport draft | Driver recommendation result |
+| --- | --- |
+| Apartment direct distribution with driver unit delivery | `GroupPurchaseCargoTransport`, `공동주문 운송`, `세대배송포함여부=true`, `세대배송업무표시=상하차 + 세대 문앞 N건` |
+| 3PL warehouse inbound | `GroupPurchaseCargoTransport`, `공동주문 운송`, `세대배송포함여부=false`, `세대배송업무표시=상하차 + 3PL 입고` |
+| General cargo source type | `GeneralCargoTransport`, `일반 화물`, `세대배송포함여부=false` |
+
+Next schema candidate: if the platform starts persisting unit-delivery count and destination type directly in `배차대기`, the live `api/v1/driver/recommendations` response can carry the same detailed scope without reconstructing it from the platform draft.
+
 ## Required Gates
 
 | Gate | Required action code |
@@ -172,6 +184,6 @@ The driver list and detail screen surface this as chips before acceptance so the
 
 ## Implementation
 
-- Planner: `Hongdal.Contracts/Common/Orderer/GroupPurchasePlatformDomesticTransportPlanner.cs`
+- Planner: `Hongdal.Contracts/Common/Orderer/공동구매플랫폼국내운송계획기.cs`
 - Admin API: `POST /api/v1/admin/orderer/group-purchase-commerce-fulfillment-plans/{planId}/platform-domestic-transport-draft`
-- Tests: `Hongdal.Tests/Contracts/Common/Orderer/GroupPurchasePlatformDomesticTransportPlannerTests.cs`
+- Tests: `Hongdal.Tests/Contracts/Common/Orderer/공동구매플랫폼국내운송계획기Tests.cs`

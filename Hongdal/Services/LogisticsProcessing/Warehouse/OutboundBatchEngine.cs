@@ -38,7 +38,7 @@ public sealed class OutboundBatchEngine : IOutboundBatchEngine
         var candidateMap = new Dictionary<string, IReadOnlyList<OutboundStockCandidate>>(StringComparer.OrdinalIgnoreCase);
         foreach (var line in validLines)
         {
-            candidateMap[line.LineKey] = await FindCandidatesAsync(request, line, cancellationToken);
+            candidateMap[line.LineKey] = await 후보검색Async(request, line, cancellationToken);
         }
 
         var allocations = TryCreateSingleWarehousePlan(request, validLines, candidateMap);
@@ -83,7 +83,7 @@ public sealed class OutboundBatchEngine : IOutboundBatchEngine
         };
     }
 
-    private async Task<IReadOnlyList<OutboundStockCandidate>> FindCandidatesAsync(
+    private async Task<IReadOnlyList<OutboundStockCandidate>> 후보검색Async(
         OutboundBatchPlanRequest request,
         OutboundBatchPlanLineRequest line,
         CancellationToken cancellationToken)

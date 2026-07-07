@@ -1,9 +1,8 @@
 using System.Security.Claims;
+using Hongdal.Application.Driver.Recommendation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MediatR;
 using 홍달.도메인.공통;
-using Hongdal.Application.Driver.Recommendation;
 using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Recommendation02
@@ -14,18 +13,18 @@ namespace Hongdal.Controllers.Driver.Recommendation02
     [Route("api/v1/driver/requests")]
     public sealed class 기사운송의뢰Controller : ControllerBase
     {
-        private readonly ISender _sender;
+        private readonly I기사배차추천UseCase _useCase;
 
-        public 기사운송의뢰Controller(ISender sender)
+        public 기사운송의뢰Controller(I기사배차추천UseCase useCase)
         {
-            _sender = sender;
+            _useCase = useCase;
         }
 
         [HttpGet("{requestId}")]
         public async Task<IActionResult> 상세조회(string requestId)
         {
             var driverId = 현재기사Id();
-            var result = await _sender.Send(new 운송의뢰상세조회Query(driverId, requestId));
+            var result = await _useCase.운송의뢰상세조회Async(driverId, requestId);
             return Ok(result);
         }
 

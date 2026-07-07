@@ -41,7 +41,7 @@ Future work can add structured fields to international posts or linked work reco
 - `CounterpartyType`
 - `CustomsRelated`
 - `OverseasWarehouseRelated`
-- `HsCode`
+- `HS코드`
 - `DisclosureLevel`
 - `TranslationNeeded`
 

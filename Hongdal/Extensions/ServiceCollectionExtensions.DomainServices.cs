@@ -1,4 +1,6 @@
 using Hongdal.Application.Driver.Transport;
+using Hongdal.Application.Driver.Profile;
+using Hongdal.Application.Driver.Notification;
 using 홍달.Services.Dispatch.Engine;
 using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Dispatch.Queue;
@@ -9,6 +11,7 @@ using 홍달.Services.Images;
 using 홍달.Services.Payments;
 using 홍달.Services.Sales;
 using 홍달.Services.Versioning;
+using Hongdal.Services.Auth;
 using Hongdal.Services.Orderer;
 
 namespace Hongdal.Extensions;
@@ -23,14 +26,18 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
-        services.AddSingleton<IOrdererGroupScopeLookupService, OrdererGroupScopeLookupService>();
-        services.AddSingleton<IOrdererGroupAutoAssignmentService, OrdererGroupAutoAssignmentService>();
-        services.AddSingleton<IGroupPurchaseLogisticsWorkflowStore, MongoGroupPurchaseLogisticsWorkflowStore>();
-        services.AddSingleton<IGroupPurchaseOverseasShipmentTrackingStore, MongoGroupPurchaseOverseasShipmentTrackingStore>();
-        services.AddSingleton<IGroupPurchaseCommerceFulfillmentPlanStore, MongoGroupPurchaseCommerceFulfillmentPlanStore>();
-        services.AddSingleton<IOrdererGroupOperatingEntityStore, MongoOrdererGroupOperatingEntityStore>();
-        services.AddScoped<IGroupPurchaseOverseasShipmentCustomsSyncService, GroupPurchaseOverseasShipmentCustomsSyncService>();
-        services.AddSingleton<IGroupPurchaseImportLogisticsNormalizationService, GroupPurchaseImportLogisticsNormalizationService>();
+        services.AddSingleton<I주문자집단배송권조회Service, 주문자집단배송권조회Service>();
+        services.AddSingleton<I주문자집단자동배정Service, 주문자집단자동배정Service>();
+        services.AddSingleton<I공동구매물류워크플로우저장소, Mongo공동구매물류워크플로우저장소>();
+        services.AddSingleton<I공동구매자동집단화저장소, Mongo공동구매자동집단화저장소>();
+        services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
+        services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
+        services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
+        services.AddScoped<I인증UseCase, 인증UseCase>();
+        services.AddScoped<I공동구매자동집단화UseCase, 공동구매자동집단화UseCase>();
+        services.AddScoped<I공동구매커머스이행계획UseCase, 공동구매커머스이행계획UseCase>();
+        services.AddScoped<I공동구매해외선적통관동기화Service, 공동구매해외선적통관동기화Service>();
+        services.AddSingleton<I공동구매수입물류정규화Service, 공동구매수입물류정규화Service>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
@@ -62,6 +69,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I샘플이미지대상Resolver, 상품상세이미지생성작업대상Resolver>();
         services.AddScoped<I샘플이미지생성Service, 샘플이미지생성Service>();
         services.AddScoped<I배차추천경로Service, 배차추천경로Service>();
+        services.AddScoped<I용달기사프로필UseCase, 용달기사프로필UseCase>();
+        services.AddScoped<I기사알림UseCase, 기사알림UseCase>();
         services.AddScoped<I기사운송일정구성Service, 기사운송일정구성Service>();
         services.AddScoped<I운송일정삽입평가Service, 운송일정삽입평가Service>();
         services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
@@ -74,11 +83,13 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I배차엔진, 음식배달배차엔진>();
         services.AddScoped<I배차추천후보선정Service, 배차추천후보선정Service>();
         services.AddScoped<I공개배차Service, 공개배차Service>();
+        services.AddScoped<Hongdal.Application.Driver.Recommendation.I기사배차추천UseCase, Hongdal.Application.Driver.Recommendation.기사배차추천UseCase>();
         services.AddScoped<홍달.Services.Dispatch.Recommendation.I차량화물적합성Service, 홍달.Services.Dispatch.Recommendation.차량화물적합성Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I차량추천Service, Hongdal.Application.Shipper.Request.차량추천Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰추천Service, Hongdal.Application.Shipper.Request.화주운송의뢰추천Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰일괄등록파서Service, Hongdal.Application.Shipper.Request.화주운송의뢰일괄등록파서Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송요금정책검토Service, Hongdal.Application.Shipper.Request.화주운송요금정책검토Service>();
+        services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰UseCase, Hongdal.Application.Shipper.Request.화주운송의뢰UseCase>();
         services.AddScoped<I판매상품샘플시드Service, 판매상품샘플시드Service>();
         services.AddScoped<I배차추천Service, 화물배차추천Service>();
         services.AddScoped<I음식배차추천Service, 음식배차추천Service>();

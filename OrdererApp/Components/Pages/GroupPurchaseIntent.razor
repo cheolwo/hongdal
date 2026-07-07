@@ -33,8 +33,8 @@
                     </MudStack>
                     @if (shipmentTracking is not null)
                     {
-                        <MudChip T="string" Color="@ShipmentStatusColor(shipmentTracking.CurrentStatusCode)" Variant="Variant.Filled">
-                            @ShipmentStatusLabel(shipmentTracking.CurrentStatusCode)
+                        <MudChip T="string" Color="@ShipmentStatusColor(shipmentTracking.현재상태코드)" Variant="Variant.Filled">
+                            @ShipmentStatusLabel(shipmentTracking.현재상태코드)
                         </MudChip>
                     }
                 </MudStack>
@@ -67,34 +67,34 @@
                         <MudItem xs="12" md="4">
                             <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">현재 위치</MudText>
-                                <MudText Typo="Typo.subtitle1">@shipmentTracking.CurrentLocationSummary</MudText>
+                                <MudText Typo="Typo.subtitle1">@shipmentTracking.현재위치요약</MudText>
                             </MudPaper>
                         </MudItem>
                         <MudItem xs="12" md="4">
                             <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">운송 문서</MudText>
-                                <MudText Typo="Typo.subtitle1">@TransportDocumentLabel(shipmentTracking.TransportDocumentType) @shipmentTracking.TransportDocumentNumber</MudText>
+                                <MudText Typo="Typo.subtitle1">@TransportDocumentLabel(shipmentTracking.운송문서유형) @shipmentTracking.운송문서번호</MudText>
                             </MudPaper>
                         </MudItem>
                         <MudItem xs="12" md="4">
                             <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">도착 예정</MudText>
-                                <MudText Typo="Typo.subtitle1">@DateLabel(shipmentTracking.EstimatedArrivalAtUtc)</MudText>
+                                <MudText Typo="Typo.subtitle1">@DateLabel(shipmentTracking.예상도착시각Utc)</MudText>
                             </MudPaper>
                         </MudItem>
                     </MudGrid>
 
                     <MudStack Spacing="2">
-                        @foreach (var item in shipmentTracking.Events.OrderByDescending(x => x.OccurredAtUtc))
+                        @foreach (var item in shipmentTracking.이벤트목록.OrderByDescending(x => x.발생시각Utc))
                         {
                             <MudPaper Elevation="0" Outlined="true" Class="pa-3">
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                     <MudStack Spacing="0">
-                                        <MudText Typo="Typo.subtitle2">@item.DisplayName</MudText>
-                                        <MudText Typo="Typo.body2">@item.LocationSummary</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.SourcePartyCode</MudText>
+                                        <MudText Typo="Typo.subtitle2">@item.표시명</MudText>
+                                        <MudText Typo="Typo.body2">@item.위치요약</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.출처주체코드</MudText>
                                     </MudStack>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@DateLabel(item.OccurredAtUtc)</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@DateLabel(item.발생시각Utc)</MudText>
                                 </MudStack>
                             </MudPaper>
                         }
@@ -121,27 +121,27 @@
                                 <MudStack Spacing="2">
                                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                         <MudStack Spacing="0">
-                                            <MudText Typo="Typo.subtitle1">@product.ProductName</MudText>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">HS @product.HsCode · @product.HsDisplayName</MudText>
+                                            <MudText Typo="Typo.subtitle1">@product.상품명</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">HS @product.HS코드 · @product.HS표시명</MudText>
                                         </MudStack>
-                                        <MudChip T="string" Size="Size.Small" Color="@PriorityColor(plan.ActivationPriority)">
-                                            @PriorityLabel(plan.ActivationPriority)
+                                        <MudChip T="string" Size="Size.Small" Color="@PriorityColor(plan.활성화우선순위)">
+                                            @PriorityLabel(plan.활성화우선순위)
                                         </MudChip>
                                     </MudStack>
 
                                     <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@TemperatureLabel(product.TemperatureCode)</MudChip>
-                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@product.ExpectedLogisticsMode</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@TemperatureLabel(product.온도코드)</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@product.예상물류방식</MudChip>
                                         <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{product.SuggestedTargetQuantityKg:N0}kg 목표")</MudChip>
                                     </MudStack>
 
-                                    <MudText Typo="Typo.body2">@plan.Summary</MudText>
+                                    <MudText Typo="Typo.body2">@plan.요약</MudText>
 
                                     <MudButton Variant="Variant.Filled"
                                                Color="Color.Primary"
                                                Size="Size.Small"
                                                StartIcon="@Icons.Material.Filled.Groups"
-                                               OnClick="@(() => SelectProduct(product.ProductCardId))">
+                                               OnClick="@(() => SelectProduct(product.상품카드Id))">
                                         이 상품으로 집단 개설 신청
                                     </MudButton>
                                 </MudStack>
@@ -157,14 +157,14 @@
                         <MudStack Spacing="3">
                             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                 <MudStack Spacing="0">
-                                    <MudText Typo="Typo.h5">@SelectedProduct.ProductName 공동 주문 집단</MudText>
+                                    <MudText Typo="Typo.h5">@SelectedProduct.상품명 공동 주문 집단</MudText>
                                     <MudText Typo="Typo.body2" Color="Color.Secondary">
                                         개설 신청이 승인되면 같은 주문자 집단 범위 안의 다른 사용자들이 참여할 수 있습니다.
                                     </MudText>
                                 </MudStack>
-                                <MudChip T="string" Color="@PriorityColor(CurrentApplicationPlan.IsFoodFocusedCandidate ? GroupPurchaseActivationPriorityCode.ColdChainFoodFocused : GroupPurchaseActivationPriorityCode.Normal)"
+                                <MudChip T="string" Color="@PriorityColor(CurrentApplicationPlan.IsFoodFocusedCandidate ? 공동구매활성화우선순위코드.냉장냉동먹거리중심 : 공동구매활성화우선순위코드.일반)"
                                          Variant="Variant.Filled">
-                                    @StatusLabel(CurrentApplicationPlan.SuggestedStatus)
+                                    @StatusLabel(CurrentApplicationPlan.제안상태)
                                 </MudChip>
                             </MudStack>
 
@@ -172,13 +172,13 @@
                                 <MudItem xs="12" sm="4">
                                     <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
                                         <MudText Typo="Typo.caption" Color="Color.Secondary">HS 코드</MudText>
-                                        <MudText Typo="Typo.h6">@SelectedProduct.HsCode</MudText>
+                                        <MudText Typo="Typo.h6">@SelectedProduct.HS코드</MudText>
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem xs="12" sm="4">
                                     <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
                                         <MudText Typo="Typo.caption" Color="Color.Secondary">예상 물류</MudText>
-                                        <MudText Typo="Typo.h6">@SelectedProduct.ExpectedLogisticsMode</MudText>
+                                        <MudText Typo="Typo.h6">@SelectedProduct.예상물류방식</MudText>
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem xs="12" sm="4">
@@ -255,41 +255,41 @@
                                             </MudText>
                                         </MudStack>
                                         <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
-                                            @KrwPerKg(LandedCostPlan.EstimatedLandedUnitCostKrw)
+                                            @KrwPerKg(LandedCostPlan.예상도착단가Krw)
                                         </MudChip>
                                     </MudStack>
 
                                     <MudGrid>
                                         <MudItem xs="12" sm="4">
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">Approx. CIF</MudText>
-                                            <MudText Typo="Typo.subtitle1">@KrwPerKg(LandedCostPlan.EstimatedCifUnitPriceKrw)</MudText>
+                                            <MudText Typo="Typo.subtitle1">@KrwPerKg(LandedCostPlan.예상Cif단가Krw)</MudText>
                                         </MudItem>
                                         <MudItem xs="12" sm="4">
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">After tax</MudText>
-                                            <MudText Typo="Typo.subtitle1">@KrwPerKg(LandedCostPlan.EstimatedAfterTaxUnitCostKrw)</MudText>
+                                            <MudText Typo="Typo.subtitle1">@KrwPerKg(LandedCostPlan.예상세후단가Krw)</MudText>
                                         </MudItem>
                                         <MudItem xs="12" sm="4">
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">3PL inbound total</MudText>
-                                            <MudText Typo="Typo.subtitle1">@KrwTotal(LandedCostPlan.EstimatedLandedTotalKrw)</MudText>
+                                            <MudText Typo="Typo.subtitle1">@KrwTotal(LandedCostPlan.예상도착총액Krw)</MudText>
                                         </MudItem>
                                     </MudGrid>
 
                                     <MudStack Spacing="1">
-                                        @foreach (var stage in LandedCostPlan.Stages)
+                                        @foreach (var stage in LandedCostPlan.단계목록)
                                         {
                                             <MudPaper Elevation="0" Outlined="true" Class="pa-2">
                                                 <MudStack Spacing="1">
                                                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                                         <MudStack Spacing="0">
-                                                            <MudText Typo="Typo.body2">@(stage.Sequence). @stage.DisplayName</MudText>
-                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@stage.Description</MudText>
+                                                            <MudText Typo="Typo.body2">@(stage.순서). @stage.표시명</MudText>
+                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@stage.설명</MudText>
                                                         </MudStack>
                                                         <MudStack Spacing="0" AlignItems="AlignItems.End">
-                                                            <MudText Typo="Typo.body2">@KrwPerKg(stage.UnitCostKrw)</MudText>
-                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">acc. @KrwPerKg(stage.AccumulatedUnitCostKrw)</MudText>
+                                                            <MudText Typo="Typo.body2">@KrwPerKg(stage.단가Krw)</MudText>
+                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">acc. @KrwPerKg(stage.Accumulated단가Krw)</MudText>
                                                         </MudStack>
                                                     </MudStack>
-                                                    <MudProgressLinear Color="@CostStageColor(stage.StatusCode)"
+                                                    <MudProgressLinear Color="@CostStageColor(stage.상태코드)"
                                                                        Value="@CostStagePercent(stage)"
                                                                        Rounded="true" />
                                                 </MudStack>
@@ -297,7 +297,7 @@
                                         }
                                     </MudStack>
 
-                                    @foreach (var warning in LandedCostPlan.Warnings)
+                                    @foreach (var warning in LandedCostPlan.경고목록)
                                     {
                                         <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@warning</MudAlert>
                                     }
@@ -322,9 +322,9 @@
                                     <MudButton Variant="Variant.Filled"
                                                Color="Color.Primary"
                                                StartIcon="@Icons.Material.Filled.Send"
-                                               Disabled="@(!CurrentApplicationPlan.CanSubmit)"
+                                               Disabled="@(!CurrentApplicationPlan.CanSubmit || isOpeningApplicationSubmitting)"
                                                OnClick="SubmitOpeningApplication">
-                                        개설 승인 요청
+                                        @(isOpeningApplicationSubmitting ? "등록 중" : "개설 승인 요청")
                                     </MudButton>
                                 </MudStack>
                             </MudPaper>
@@ -376,24 +376,24 @@
                                     </MudText>
                                 </MudStack>
                                 <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
-                                    @PaymentPlan.Summary
+                                    @PaymentPlan.요약
                                 </MudChip>
                             </MudStack>
 
                             <MudGrid>
-                                @foreach (var line in PaymentPlan.Lines)
+                                @foreach (var line in PaymentPlan.라인목록)
                                 {
                                     <MudItem xs="12" md="4">
                                         <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
                                             <MudStack Spacing="1">
                                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                                                    <MudText Typo="Typo.subtitle2">@line.DisplayName</MudText>
-                                                    <MudChip T="string" Size="Size.Small" Color="@PaymentStatusColor(line.Status)">
-                                                        @PaymentStatusLabel(line.Status)
+                                                    <MudText Typo="Typo.subtitle2">@line.표시명</MudText>
+                                                    <MudChip T="string" Size="Size.Small" Color="@PaymentStatusColor(line.상태)">
+                                                        @PaymentStatusLabel(line.상태)
                                                     </MudChip>
                                                 </MudStack>
-                                                <MudText Typo="Typo.h6">@Money(line.Amount)</MudText>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@line.DueCondition</MudText>
+                                                <MudText Typo="Typo.h6">@Money(line.금액)</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@line.지급조건</MudText>
                                             </MudStack>
                                         </MudPaper>
                                     </MudItem>
@@ -420,33 +420,33 @@
 </style>
 
 @code {
-    private readonly List<HsFoodGroupPurchaseProductCard> ProductCards =
+    private readonly List<HS먹거리공동구매상품카드> ProductCards =
     [
         new(
-            ProductCardId: "hs-food-0203-pork-frozen",
-            ProductName: "냉동 삼겹살",
-            HsCode: "0203.29",
-            HsDisplayName: "돼지고기 냉동 기타",
-            TemperatureCode: GroupPurchaseTemperatureCode.Frozen,
-            ExpectedLogisticsMode: GroupPurchaseLogisticsModeCode.Fcl,
+            상품카드Id: "hs-food-0203-pork-frozen",
+            상품명: "냉동 삼겹살",
+            HS코드: "0203.29",
+            HS표시명: "돼지고기 냉동 기타",
+            온도코드: 공동구매온도코드.냉동,
+            예상물류방식: 공동구매물류방식코드.FCL,
             SuggestedTargetQuantityKg: 12000m,
             ExpectedUnitPrice: 8500m),
         new(
-            ProductCardId: "hs-food-1602-prepared-meat",
-            ProductName: "가공육 세트",
-            HsCode: "1602.49",
-            HsDisplayName: "조제 또는 저장 처리한 육류",
-            TemperatureCode: GroupPurchaseTemperatureCode.Chilled,
-            ExpectedLogisticsMode: GroupPurchaseLogisticsModeCode.Lcl,
+            상품카드Id: "hs-food-1602-prepared-meat",
+            상품명: "가공육 세트",
+            HS코드: "1602.49",
+            HS표시명: "조제 또는 저장 처리한 육류",
+            온도코드: 공동구매온도코드.냉장,
+            예상물류방식: 공동구매물류방식코드.LCL,
             SuggestedTargetQuantityKg: 3000m,
             ExpectedUnitPrice: 7200m),
         new(
-            ProductCardId: "hs-food-2106-prepared-food",
-            ProductName: "간편식 소스",
-            HsCode: "2106.90",
-            HsDisplayName: "기타 조제 식료품",
-            TemperatureCode: GroupPurchaseTemperatureCode.Ambient,
-            ExpectedLogisticsMode: GroupPurchaseLogisticsModeCode.DomesticBulk,
+            상품카드Id: "hs-food-2106-prepared-food",
+            상품명: "간편식 소스",
+            HS코드: "2106.90",
+            HS표시명: "기타 조제 식료품",
+            온도코드: 공동구매온도코드.상온,
+            예상물류방식: 공동구매물류방식코드.국내벌크,
             SuggestedTargetQuantityKg: 1500m,
             ExpectedUnitPrice: 3900m,
             RequiresImportFoodReview: true,
@@ -460,10 +460,11 @@
     private decimal desiredUnitPrice = 8500m;
     private string requestMemo = "같은 지역 주문자들과 함께 먼저 수요를 모아보고 싶습니다.";
     private bool nonBindingAgreementAccepted;
+    private bool isOpeningApplicationSubmitting;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
     private string shipmentDocumentManagementNumber = "HD-GP-IMPORT-2026-0001";
-    private GroupPurchaseOverseasShipmentPublicDto? shipmentTracking;
+    private 공동구매해외선적공개Dto? shipmentTracking;
     private bool isShipmentTrackingLoading;
     private string? shipmentTrackingMessage;
     private Severity shipmentTrackingSeverity = Severity.Info;
@@ -482,34 +483,34 @@
     private decimal importDomesticTransportTo3plUnitCostKrw = 300m;
     private decimal importThreePlInboundUnitCostKrw = 400m;
 
-    private HsFoodGroupPurchaseProductCard SelectedProduct
-        => ProductCards.First(x => x.ProductCardId == selectedProductCardId);
+    private HS먹거리공동구매상품카드 SelectedProduct
+        => ProductCards.First(x => x.상품카드Id == selectedProductCardId);
 
-    private OrdererGroupOpeningApplicationPlan CurrentApplicationPlan
-        => OrdererGroupOpeningApplicationPlanner.Plan(CreateApplicationDraft());
+    private 주문자집단개설신청계획 CurrentApplicationPlan
+        => 주문자집단개설신청계획기.계획(CreateApplicationDraft());
 
-    private GroupPurchasePaymentMilestonePlan PaymentPlan
-        => GroupPurchasePaymentMilestonePlanner.Plan(new GroupPurchasePaymentMilestoneDraft(
-            GroupPurchaseId: SelectedProduct.ProductCardId,
-            OrdererId: "demo-orderer",
-            TotalAmount: desiredQuantityKg * desiredUnitPrice,
-            IsPickupCompleted: true,
-            IsDropoffCompleted: false,
-            DistributionConfirmationRate: 0m));
+    private 공동구매결제단계계획 PaymentPlan
+        => 공동구매결제단계계획기.계획(new 공동구매결제단계초안(
+            공동구매Id: SelectedProduct.상품카드Id,
+            주문자Id: "demo-orderer",
+            총금액: desiredQuantityKg * desiredUnitPrice,
+            상차완료여부: true,
+            하차완료여부: false,
+            분배확인율: 0m));
 
-    private ImportLandedCostPlan LandedCostPlan
-        => GroupPurchaseImportLandedCostPlanner.Plan(new ImportLandedCostDraft(
-            QuantityKg: desiredQuantityKg,
-            ProductPurchaseUnitPriceKrw: SelectedProduct.ExpectedUnitPrice,
-            OverseasHandlingUnitCostKrw: importOverseasHandlingUnitCostKrw,
-            InternationalFreightInsuranceUnitCostKrw: importInternationalFreightInsuranceUnitCostKrw,
-            CustomsDutyRate: importCustomsDutyRate,
-            ImportVatRate: importVatRate,
-            BondedWarehouseUnitCostKrw: importBondedWarehouseUnitCostKrw,
-            CustomsBrokerageUnitCostKrw: importCustomsBrokerageUnitCostKrw,
-            DomesticTransportTo3plUnitCostKrw: importDomesticTransportTo3plUnitCostKrw,
-            ThreePlInboundUnitCostKrw: importThreePlInboundUnitCostKrw,
-            CustomsReviewRequired: true));
+    private 수입도착원가계획 LandedCostPlan
+        => 공동구매수입도착원가계획기.계획(new 수입도착원가초안(
+            수량Kg: desiredQuantityKg,
+            상품매입단가Krw: SelectedProduct.ExpectedUnitPrice,
+            해외처리단가Krw: importOverseasHandlingUnitCostKrw,
+            국제운임보험단가Krw: importInternationalFreightInsuranceUnitCostKrw,
+            관세율: importCustomsDutyRate,
+            수입부가세율: importVatRate,
+            보세창고단가Krw: importBondedWarehouseUnitCostKrw,
+            관세사수수료단가Krw: importCustomsBrokerageUnitCostKrw,
+            국내3PL운송단가Krw: importDomesticTransportTo3plUnitCostKrw,
+            물류대행입고단가Krw: importThreePlInboundUnitCostKrw,
+            통관검토필요: true));
 
     protected override async Task OnInitializedAsync()
     {
@@ -519,7 +520,7 @@
     private async Task SelectProduct(string productCardId)
     {
         selectedProductCardId = productCardId;
-        desiredQuantityKg = SelectedProduct.TemperatureCode == GroupPurchaseTemperatureCode.Frozen ? 20m : 5m;
+        desiredQuantityKg = SelectedProduct.온도코드 == 공동구매온도코드.냉동 ? 20m : 5m;
         desiredUnitPrice = SelectedProduct.ExpectedUnitPrice;
         statusMessage = null;
         await LoadSelectedProductMarketSignal();
@@ -533,7 +534,7 @@
         {
             marketSignal = await ShipmentTrackingService.SimulateImportUnitPriceAsync(new HsCountryMonthlyTradeUnitPriceRequest
             {
-                HsCode = SelectedProduct.HsCode,
+                HsCode = SelectedProduct.HS코드,
                 CountryCode = marketSignalCountryCode,
                 Month = marketSignalMonth,
                 LookbackMonths = 3,
@@ -550,7 +551,7 @@
         }
     }
 
-    private void SubmitOpeningApplication()
+    private async Task SubmitOpeningApplication()
     {
         var plan = CurrentApplicationPlan;
         if (!plan.CanSubmit)
@@ -560,8 +561,41 @@
             return;
         }
 
-        statusSeverity = Severity.Success;
-        statusMessage = $"{SelectedProduct.ProductName} 공동 주문 집단 개설 신청이 승인 대기 상태로 접수되었습니다. 승인되면 다른 주문자들이 참여할 수 있습니다.";
+        isOpeningApplicationSubmitting = true;
+        try
+        {
+            var group = await ShipmentTrackingService.RegisterDemandAsync(new 공동구매자동수요등록Command
+            {
+                상품키 = SelectedProduct.상품카드Id,
+                상품명 = SelectedProduct.상품명,
+                HS코드 = SelectedProduct.HS코드,
+                온도코드 = SelectedProduct.온도코드,
+                물류방식 = SelectedProduct.예상물류방식,
+                주문자키 = "demo-orderer",
+                주문자표시명 = "데모 주문자",
+                배송권키 = ordererGroupScopeKey,
+                배송권명 = ordererGroupScopeName,
+                희망수량 = desiredQuantityKg,
+                수량단위 = "kg",
+                수요유형 = 공동구매자동수요유형코드.관심표시,
+                결제상태 = 공동구매자동결제상태코드.미결제,
+                메모 = requestMemo
+            });
+
+            if (group is null)
+            {
+                statusSeverity = Severity.Error;
+                statusMessage = "공동 주문 수요를 서버에 등록하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+                return;
+            }
+
+            statusSeverity = Severity.Success;
+            statusMessage = $"{SelectedProduct.상품명} 수요가 자동 집단 {group.자동집단Id}에 등록되었습니다. 현재 {group.수요건수:N0}건, {group.총희망수량:N0}kg이 모였습니다.";
+        }
+        finally
+        {
+            isOpeningApplicationSubmitting = false;
+        }
     }
 
     private async Task LookupShipmentTracking()
@@ -588,7 +622,7 @@
             }
 
             shipmentTrackingSeverity = Severity.Success;
-            shipmentTrackingMessage = $"{shipmentTracking.ProductSummary} 선적 정보를 조회했습니다.";
+            shipmentTrackingMessage = $"{shipmentTracking.상품요약} 선적 정보를 조회했습니다.";
         }
         finally
         {
@@ -596,39 +630,39 @@
         }
     }
 
-    private ColdChainFoodGroupPurchasePlan PlanProduct(HsFoodGroupPurchaseProductCard product)
+    private 냉장냉동먹거리공동구매계획 PlanProduct(HS먹거리공동구매상품카드 product)
     {
-        var draft = new ColdChainFoodGroupPurchaseDraft(
-            ProductName: product.ProductName,
-            OrdererGroupScopeKey: ordererGroupScopeKey,
+        var draft = new 냉장냉동먹거리공동구매초안(
+            상품명: product.상품명,
+            주문자집단배송권키: ordererGroupScopeKey,
             TargetQuantityKg: product.SuggestedTargetQuantityKg,
             CurrentIntentQuantityKg: 0m,
             TargetUnitPrice: product.ExpectedUnitPrice,
-            HsCode: product.HsCode,
-            TemperatureCode: product.TemperatureCode,
-            LogisticsMode: product.ExpectedLogisticsMode,
+            HS코드: product.HS코드,
+            온도코드: product.온도코드,
+            LogisticsMode: product.예상물류방식,
             RequiresImportFoodReview: product.RequiresImportFoodReview,
             RequiresMfdsManufacturerReview: product.RequiresMfdsManufacturerReview,
-            RequiresColdStorage: product.TemperatureCode is GroupPurchaseTemperatureCode.Frozen or GroupPurchaseTemperatureCode.Chilled);
+            RequiresColdStorage: product.온도코드 is 공동구매온도코드.냉동 or 공동구매온도코드.냉장);
 
-        return ColdChainFoodGroupPurchasePlanner.Plan(draft);
+        return 냉장냉동먹거리공동구매계획기.계획(draft);
     }
 
-    private OrdererGroupOpeningApplicationDraft CreateApplicationDraft()
+    private 주문자집단개설신청초안 CreateApplicationDraft()
     {
-        return new OrdererGroupOpeningApplicationDraft(
+        return new 주문자집단개설신청초안(
             ApplicantOrdererId: "demo-orderer",
-            ProductCard: SelectedProduct,
-            OrdererGroupScopeKey: ordererGroupScopeKey,
-            OrdererGroupScopeName: ordererGroupScopeName,
-            DesiredQuantityKg: desiredQuantityKg,
+            상품카드: SelectedProduct,
+            주문자집단배송권키: ordererGroupScopeKey,
+            주문자집단배송권명: ordererGroupScopeName,
+            희망수량Kg: desiredQuantityKg,
             DesiredUnitPrice: desiredUnitPrice,
             NonBindingAgreementAccepted: nonBindingAgreementAccepted,
-            RequestMemo: requestMemo);
+            Request메모: requestMemo);
     }
 
-    private string ProductCardClass(HsFoodGroupPurchaseProductCard product)
-        => product.ProductCardId == selectedProductCardId
+    private string ProductCardClass(HS먹거리공동구매상품카드 product)
+        => product.상품카드Id == selectedProductCardId
             ? "pa-3 product-card product-card--selected"
             : "pa-3 product-card";
 
@@ -656,81 +690,81 @@
             _ => Color.Default
         };
 
-    private double CostStagePercent(ImportLandedCostStage stage)
+    private double CostStagePercent(수입도착원가단계 stage)
     {
-        if (LandedCostPlan.EstimatedLandedUnitCostKrw <= 0)
+        if (LandedCostPlan.예상도착단가Krw <= 0)
         {
             return 0;
         }
 
-        return decimal.ToDouble(decimal.Round(stage.AccumulatedUnitCostKrw / LandedCostPlan.EstimatedLandedUnitCostKrw * 100m, 2));
+        return decimal.ToDouble(decimal.Round(stage.Accumulated단가Krw / LandedCostPlan.예상도착단가Krw * 100m, 2));
     }
 
     private static Color CostStageColor(string statusCode)
         => statusCode switch
         {
-            ImportLandedCostStageStatusCode.Blocked => Color.Error,
-            ImportLandedCostStageStatusCode.NeedsReview => Color.Warning,
-            ImportLandedCostStageStatusCode.Estimated => Color.Primary,
+            수입도착원가단계상태코드.차단 => Color.Error,
+            수입도착원가단계상태코드.검토필요 => Color.Warning,
+            수입도착원가단계상태코드.추정 => Color.Primary,
             _ => Color.Info
         };
 
     private static string TemperatureLabel(string value)
         => value switch
         {
-            GroupPurchaseTemperatureCode.Frozen => "냉동",
-            GroupPurchaseTemperatureCode.Chilled => "냉장",
-            GroupPurchaseTemperatureCode.Ambient => "상온",
+            공동구매온도코드.냉동 => "냉동",
+            공동구매온도코드.냉장 => "냉장",
+            공동구매온도코드.상온 => "상온",
             _ => value
         };
 
     private static string PriorityLabel(string value)
         => value switch
         {
-            GroupPurchaseActivationPriorityCode.ColdChainFoodFocused => "냉동/냉장 우선",
-            GroupPurchaseActivationPriorityCode.FoodFocused => "먹거리 우선",
+            공동구매활성화우선순위코드.냉장냉동먹거리중심 => "냉동/냉장 우선",
+            공동구매활성화우선순위코드.먹거리중심 => "먹거리 우선",
             _ => "일반 후보"
         };
 
     private static Color PriorityColor(string value)
         => value switch
         {
-            GroupPurchaseActivationPriorityCode.ColdChainFoodFocused => Color.Success,
-            GroupPurchaseActivationPriorityCode.FoodFocused => Color.Primary,
+            공동구매활성화우선순위코드.냉장냉동먹거리중심 => Color.Success,
+            공동구매활성화우선순위코드.먹거리중심 => Color.Primary,
             _ => Color.Default
         };
 
     private static string PaymentStatusLabel(string value)
         => value switch
         {
-            GroupPurchasePaymentMilestoneStatusCode.Requestable => "요청 가능",
-            GroupPurchasePaymentMilestoneStatusCode.Paid => "지급 완료",
-            GroupPurchasePaymentMilestoneStatusCode.Blocked => "대기",
+            공동구매결제단계상태코드.요청가능 => "요청 가능",
+            공동구매결제단계상태코드.지급완료 => "지급 완료",
+            공동구매결제단계상태코드.차단 => "대기",
             _ => "대기"
         };
 
     private static Color PaymentStatusColor(string value)
         => value switch
         {
-            GroupPurchasePaymentMilestoneStatusCode.Requestable => Color.Primary,
-            GroupPurchasePaymentMilestoneStatusCode.Paid => Color.Success,
-            GroupPurchasePaymentMilestoneStatusCode.Blocked => Color.Default,
+            공동구매결제단계상태코드.요청가능 => Color.Primary,
+            공동구매결제단계상태코드.지급완료 => Color.Success,
+            공동구매결제단계상태코드.차단 => Color.Default,
             _ => Color.Default
         };
 
     private static string StatusLabel(string value)
         => value switch
         {
-            OrdererGroupOpeningApplicationStatusCode.PendingApproval => "승인 대기",
-            OrdererGroupOpeningApplicationStatusCode.ApprovedGroupReady => "집단 생성",
-            OrdererGroupOpeningApplicationStatusCode.Rejected => "반려",
+            주문자집단개설신청상태코드.승인대기 => "승인 대기",
+            주문자집단개설신청상태코드.ApprovedGroupReady => "집단 생성",
+            주문자집단개설신청상태코드.반려 => "반려",
             _ => "작성 중"
         };
 
     private static string TransportDocumentLabel(string value)
         => value switch
         {
-            GroupPurchaseShipmentDocumentTypeCode.AirWaybill => "AWB",
+            공동구매선적문서유형코드.항공화물운송장 => "AWB",
             _ => "B/L"
         };
 
@@ -743,31 +777,31 @@
     private static string ShipmentStatusLabel(string value)
         => value switch
         {
-            GroupPurchaseShipmentStatusCode.DocumentRegistered => "문서 등록",
-            GroupPurchaseShipmentStatusCode.OverseasPacked => "해외 포장",
-            GroupPurchaseShipmentStatusCode.LoadedOnVesselOrFlight => "선적 완료",
-            GroupPurchaseShipmentStatusCode.InTransit => "운송 중",
-            GroupPurchaseShipmentStatusCode.ArrivedAtPort => "도착",
-            GroupPurchaseShipmentStatusCode.CustomsInProgress => "통관 중",
-            GroupPurchaseShipmentStatusCode.CustomsCleared => "통관 완료",
-            GroupPurchaseShipmentStatusCode.DomesticWarehouseReceived => "국내 입고",
-            GroupPurchaseShipmentStatusCode.DomesticCarrierPickup => "국내 기사 상차",
-            GroupPurchaseShipmentStatusCode.ApartmentDropoff => "공동주택 거점 하차",
-            GroupPurchaseShipmentStatusCode.DistributionInProgress => "분배 중",
-            GroupPurchaseShipmentStatusCode.Completed => "완료",
-            GroupPurchaseShipmentStatusCode.Exception => "예외",
+            공동구매선적상태코드.문서등록 => "문서 등록",
+            공동구매선적상태코드.해외포장완료 => "해외 포장",
+            공동구매선적상태코드.선박항공편적재 => "선적 완료",
+            공동구매선적상태코드.운송중 => "운송 중",
+            공동구매선적상태코드.항만도착 => "도착",
+            공동구매선적상태코드.통관진행중 => "통관 중",
+            공동구매선적상태코드.통관완료 => "통관 완료",
+            공동구매선적상태코드.국내창고입고 => "국내 입고",
+            공동구매선적상태코드.국내기사상차 => "국내 기사 상차",
+            공동구매선적상태코드.공동주택하차 => "공동주택 거점 하차",
+            공동구매선적상태코드.분배진행중 => "분배 중",
+            공동구매선적상태코드.완료 => "완료",
+            공동구매선적상태코드.예외 => "예외",
             _ => value
         };
 
     private static Color ShipmentStatusColor(string value)
         => value switch
         {
-            GroupPurchaseShipmentStatusCode.Completed => Color.Success,
-            GroupPurchaseShipmentStatusCode.Exception => Color.Error,
-            GroupPurchaseShipmentStatusCode.CustomsCleared => Color.Info,
-            GroupPurchaseShipmentStatusCode.DomesticWarehouseReceived => Color.Info,
-            GroupPurchaseShipmentStatusCode.DomesticCarrierPickup => Color.Primary,
-            GroupPurchaseShipmentStatusCode.ApartmentDropoff => Color.Success,
+            공동구매선적상태코드.완료 => Color.Success,
+            공동구매선적상태코드.예외 => Color.Error,
+            공동구매선적상태코드.통관완료 => Color.Info,
+            공동구매선적상태코드.국내창고입고 => Color.Info,
+            공동구매선적상태코드.국내기사상차 => Color.Primary,
+            공동구매선적상태코드.공동주택하차 => Color.Success,
             _ => Color.Default
         };
 }

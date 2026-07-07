@@ -38,8 +38,8 @@ public interface IHsCountryTradeUnitPriceLookupService
         CancellationToken cancellationToken = default);
 }
 
-public interface IOrdererGroupScopeLookupService
+public interface I주문자집단배송권조회Service
 {
-    PublicDataLookupResponse<OrdererGroupScopeCandidateItem> FindCandidates(
-        OrdererGroupScopeLookupRequest request);
+    PublicDataLookupResponse<주문자집단배송권후보항목> 후보검색(
+        주문자집단배송권조회요청 request);
 }

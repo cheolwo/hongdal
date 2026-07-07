@@ -396,6 +396,27 @@ public sealed class 백오피스메모리Service : I백오피스Service
         _payments.Add(new 결제목록응답 { 결제Id = "PAY-003", 의뢰Id = "REQ-2026-003", 화주Id = "SHIP-001", 결제금액 = 120000, 결제수단 = "카드", 결제상태 = "결제완료", OrderId = "ORDER-003", 생성일시Utc = now.AddDays(-1), 승인일시Utc = now.AddDays(-1).AddMinutes(5) });
         _dispatchWait.Add(new 배차대기응답 { Id = 1, 의뢰Id = "REQ-2026-001", 화주Id = "SHIP-001", 픽업_도로명주소 = "서울시 강남구 테헤란로", 픽업_상세주소 = "100", 하차_도로명주소 = "경기도 성남시 분당구", 하차_상세주소 = "200", 상태 = "대기", CreatedAt = now, UpdatedAt = now });
         _dispatchWait.Add(new 배차대기응답 { Id = 2, 의뢰Id = "REQ-2026-002", 화주Id = "SHIP-002", 픽업_도로명주소 = "인천시 서구", 픽업_상세주소 = "물류창고 A동", 하차_도로명주소 = "서울시 마포구", 하차_상세주소 = "상가 1층", 상태 = "결제대기", CreatedAt = now.AddHours(-2), UpdatedAt = now.AddHours(-2) });
+        _dispatchWait.Add(new 배차대기응답
+        {
+            Id = 3,
+            의뢰Id = "GP-IMPORT-DOMESTIC-APT-001",
+            화주Id = "platform",
+            배차업무유형 = 20,
+            원본의뢰유형 = "ImportCargoTransport",
+            원본의뢰Id = "GP-IMPORT-DOMESTIC-APT-001",
+            공동구매도착지유형코드 = "ApartmentComplexDirectDistribution",
+            공동구매기사세대배송여부 = true,
+            공동구매세대배송방식코드 = "DriverToUnitDoor",
+            공동구매세대배송건수 = 33,
+            공동구매분배책임코드 = "Driver",
+            픽업_도로명주소 = "평택항 보세구역",
+            픽업_상세주소 = "반출 대기장",
+            하차_도로명주소 = "홍달아파트",
+            하차_상세주소 = "101동 세대배송",
+            상태 = "대기",
+            CreatedAt = now.AddMinutes(-40),
+            UpdatedAt = now.AddMinutes(-40)
+        });
         _drivers.Add(new 기사목록응답 { 기사Id = "DRV-001", 기사명 = "홍기사", 연락처 = "010-1111-2222", 차량 = "1톤 트럭", 주_활동지역 = "서울", 운행상태 = "운행중", 최근위도 = 37.5m, 최근경도 = 127.0m, 최근위치기록시각 = now, 배차건수 = 3 });
         _drivers.Add(new 기사목록응답 { 기사Id = "DRV-002", 기사명 = "달기사", 연락처 = "010-3333-4444", 차량 = "라보", 주_활동지역 = "경기", 운행상태 = "대기", 최근위도 = 37.3m, 최근경도 = 127.1m, 최근위치기록시각 = now.AddMinutes(-20), 배차건수 = 1 });
         _driverDetails["DRV-001"] = new 기사상세응답 { 기사Id = "DRV-001", 기사명 = "홍기사", 연락처 = "010-1111-2222", 차량 = "1톤 트럭", 주_활동지역 = "서울", 운행상태 = "운행중", 메모 = "샘플 기사", 등록일 = now, 최근위도 = 37.5m, 최근경도 = 127.0m, 최근위치기록시각 = now };

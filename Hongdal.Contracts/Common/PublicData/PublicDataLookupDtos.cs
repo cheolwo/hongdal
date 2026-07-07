@@ -265,7 +265,7 @@ public sealed class HsCountryImportUnitPriceSimulationResult
     public string Summary { get; init; } = string.Empty;
 }
 
-public sealed class OrdererGroupScopeLookupRequest
+public sealed class 주문자집단배송권조회요청
 {
     public string? RoadAddress { get; init; }
 
@@ -280,7 +280,7 @@ public sealed class OrdererGroupScopeLookupRequest
     public int PageSize { get; init; } = 5;
 }
 
-public sealed class OrdererGroupScopeCandidateItem
+public sealed class 주문자집단배송권후보항목
 {
     public string ScopeKey { get; init; } = string.Empty;
 

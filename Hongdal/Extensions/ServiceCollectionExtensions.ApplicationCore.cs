@@ -3,6 +3,9 @@ using Hongdal.Application.Behaviors;
 using Hongdal.Application.CommandProcessing;
 using Hongdal.Middleware;
 using Hongdal.Application.HumanResources;
+using Hongdal.Application.Sales;
+using Hongdal.Application.ViewSettings;
+using Hongdal.Application.Warehouse;
 using Hongdal.Services.HumanResources;
 using Hongdal.Services.Community;
 using Hongdal.Services.LogisticsProcessing.SalesOrders;
@@ -38,8 +41,12 @@ public static partial class ServiceCollectionExtensions
 
         services.AddScoped<I사용자행위로그Service, 사용자행위로그Service>();
         services.AddScoped<ISalesChannelService, SalesChannelService>();
+        services.AddScoped<I판매채널UseCase, 판매채널UseCase>();
         services.AddScoped<IView가시성Service, View가시성Service>();
+        services.AddScoped<IView설정UseCase, View설정UseCase>();
+        services.AddScoped<IPlatformCommunityBoardUseCase, PlatformCommunityBoardUseCase>();
         services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();
+        services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
         services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
         services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();
         services.AddScoped<IOutboundBatchEngine, OutboundBatchEngine>();

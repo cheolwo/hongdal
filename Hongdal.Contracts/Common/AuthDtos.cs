@@ -77,3 +77,10 @@ public sealed class 기사회원가입요청
     public string Password { get; set; } = string.Empty;
     public string BusinessRegistrationNumber { get; set; } = string.Empty;
 }
+
+public sealed class 기사회원가입응답
+{
+    public string UserId { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string BusinessRegistrationNumber { get; set; } = string.Empty;
+}

@@ -158,6 +158,11 @@ namespace Hongdal.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("varchar(40)");
 
+                    b.Property<string>("RoleTag")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
                     b.Property<string>("SharedLinkUrl")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
@@ -170,11 +175,18 @@ namespace Hongdal.Migrations
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("WorkflowTag")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Category", "IsDeleted", "CreatedAtUtc");
 
                     b.HasIndex("IsReportBoardPost", "IsDeleted", "CreatedAtUtc");
+
+                    b.HasIndex("WorkflowTag", "RoleTag", "IsDeleted", "CreatedAtUtc");
 
                     b.HasIndex("AppKey", "IsDeleted", "IsOperatorPinned", "OperatorPinnedAtUtc", "RecommendationCount", "LastEngagedAtUtc", "CreatedAtUtc");
 
@@ -2039,6 +2051,26 @@ namespace Hongdal.Migrations
                     b.Property<DateTime?>("공개전환시각")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("public_transition_at");
+
+                    b.Property<bool?>("공동구매기사세대배송여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("group_purchase_driver_unit_distribution");
+
+                    b.Property<string>("공동구매도착지유형코드")
+                        .HasColumnType("longtext")
+                        .HasColumnName("group_purchase_destination_type_code");
+
+                    b.Property<string>("공동구매분배책임코드")
+                        .HasColumnType("longtext")
+                        .HasColumnName("group_purchase_distribution_responsibility_code");
+
+                    b.Property<string>("공동구매세대배송방식코드")
+                        .HasColumnType("longtext")
+                        .HasColumnName("group_purchase_unit_distribution_mode_code");
+
+                    b.Property<int?>("공동구매세대배송건수")
+                        .HasColumnType("int")
+                        .HasColumnName("group_purchase_unit_delivery_count");
 
                     b.Property<string>("마지막거절기사Id")
                         .HasColumnType("longtext")

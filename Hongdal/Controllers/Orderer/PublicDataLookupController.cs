@@ -15,14 +15,14 @@ public sealed class PublicDataLookupController : ControllerBase
     private readonly IRoadAddressLookupService _roadAddressLookupService;
     private readonly IApartmentComplexLookupService _apartmentComplexLookupService;
     private readonly IApartmentManagementFeeLookupService _apartmentManagementFeeLookupService;
-    private readonly IOrdererGroupScopeLookupService _ordererGroupScopeLookupService;
+    private readonly I주문자집단배송권조회Service _ordererGroupScopeLookupService;
     private readonly IHsCountryTradeUnitPriceLookupService _hsCountryTradeUnitPriceLookupService;
 
     public PublicDataLookupController(
         IRoadAddressLookupService roadAddressLookupService,
         IApartmentComplexLookupService apartmentComplexLookupService,
         IApartmentManagementFeeLookupService apartmentManagementFeeLookupService,
-        IOrdererGroupScopeLookupService ordererGroupScopeLookupService,
+        I주문자집단배송권조회Service ordererGroupScopeLookupService,
         IHsCountryTradeUnitPriceLookupService hsCountryTradeUnitPriceLookupService)
     {
         _roadAddressLookupService = roadAddressLookupService;
@@ -53,7 +53,7 @@ public sealed class PublicDataLookupController : ControllerBase
     [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
     [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
     [HttpGet("orderer-group-scopes")]
-    public ActionResult<PublicDataLookupResponse<OrdererGroupScopeCandidateItem>> FindOrdererGroupScopes(
+    public ActionResult<PublicDataLookupResponse<주문자집단배송권후보항목>> 주문자집단배송권검색(
         [FromQuery] string? roadAddress,
         [FromQuery] string? jibunAddress,
         [FromQuery] string? kakaoRegionLevel1,
@@ -61,7 +61,7 @@ public sealed class PublicDataLookupController : ControllerBase
         [FromQuery] string? kakaoRegionLevel3,
         [FromQuery] int pageSize = 5)
     {
-        var result = _ordererGroupScopeLookupService.FindCandidates(new OrdererGroupScopeLookupRequest
+        var result = _ordererGroupScopeLookupService.후보검색(new 주문자집단배송권조회요청
         {
             RoadAddress = roadAddress,
             JibunAddress = jibunAddress,

@@ -290,7 +290,12 @@ namespace 홍달.Services.Dispatch.Recommendation
                     배차상태 = 상태값.배차상태.대기
                 };
 
-                DispatchRecommendationRequestTypeClassifier.ApplyTo(recommendation, x.Item.원본의뢰유형);
+                DispatchRecommendationRequestTypeClassifier.ApplyTo(
+                    recommendation,
+                    x.Item.원본의뢰유형,
+                    x.Item.공동구매도착지유형코드,
+                    x.Item.공동구매기사세대배송여부,
+                    x.Item.공동구매세대배송건수);
                 result.Add(recommendation);
             }
 

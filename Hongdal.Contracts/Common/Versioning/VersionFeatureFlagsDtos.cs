@@ -24,6 +24,8 @@ public sealed class WorkflowFlagStateDto
     public IReadOnlyList<WorkflowParticipantDto> Participants { get; init; } = [];
 
     public IReadOnlyList<WorkflowScreenDto> Screens { get; init; } = [];
+
+    public IReadOnlyList<WorkflowUseCaseDto> UseCases { get; init; } = [];
 }
 
 public sealed class WorkflowParticipantDto
@@ -50,6 +52,32 @@ public sealed class WorkflowScreenDto
     public string Route { get; init; } = string.Empty;
 
     public string Purpose { get; init; } = string.Empty;
+}
+
+public sealed class WorkflowUseCaseDto
+{
+    public string UseCaseCode { get; init; } = string.Empty;
+
+    public string UseCaseName { get; init; } = string.Empty;
+
+    public string Summary { get; init; } = string.Empty;
+
+    public bool IsRequired { get; init; }
+
+    public IReadOnlyList<WorkflowUseCaseActorDto> PrimaryActors { get; init; } = [];
+
+    public IReadOnlyList<WorkflowUseCaseActorDto> SupportingActors { get; init; } = [];
+}
+
+public sealed class WorkflowUseCaseActorDto
+{
+    public string ActorCode { get; init; } = string.Empty;
+
+    public string ActorName { get; init; } = string.Empty;
+
+    public string RoleCode { get; init; } = string.Empty;
+
+    public string RoleName { get; init; } = string.Empty;
 }
 
 public sealed class WorkflowRelationDto

@@ -85,8 +85,8 @@ public sealed class ContractElectronicSignaturePlannerTests
             "IFGP-2026-0001",
             "sha256:contract-document",
             [
-                new("orderer-1", ImportFoodGroupPurchaseContractRoleCode.ApplicantOrderer, "개설 신청 주문자", true, now),
-                new("shipper-1", ImportFoodGroupPurchaseContractRoleCode.SupplierOrShipper, "공급 화주", true, now)
+                new("orderer-1", 수입식품공동주문계약역할코드.ApplicantOrderer, "개설 신청 주문자", true, now),
+                new("shipper-1", 수입식품공동주문계약역할코드.SupplierOrShipper, "공급 화주", true, now)
             ],
             now,
             now.AddDays(7));

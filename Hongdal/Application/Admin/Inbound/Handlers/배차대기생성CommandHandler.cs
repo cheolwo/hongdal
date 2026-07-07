@@ -28,6 +28,11 @@ public sealed class 배차대기생성CommandHandler : IRequestHandler<배차대
             배차업무유형 = request.배차업무유형 ?? 홍달.도메인.공통.상태값.배차업무유형.용달운송,
             원본의뢰유형 = string.IsNullOrWhiteSpace(request.원본의뢰유형) ? "CargoTransport" : request.원본의뢰유형.Trim(),
             원본의뢰Id = string.IsNullOrWhiteSpace(request.원본의뢰Id) ? request.의뢰Id : request.원본의뢰Id.Trim(),
+            공동구매도착지유형코드 = NormalizeOptional(request.공동구매도착지유형코드),
+            공동구매기사세대배송여부 = request.공동구매기사세대배송여부,
+            공동구매세대배송방식코드 = NormalizeOptional(request.공동구매세대배송방식코드),
+            공동구매세대배송건수 = request.공동구매세대배송건수 is > 0 ? request.공동구매세대배송건수 : null,
+            공동구매분배책임코드 = NormalizeOptional(request.공동구매분배책임코드),
             픽업_도로명주소 = request.픽업_도로명주소,
             픽업_상세주소 = request.픽업_상세주소,
             픽업_위도 = request.픽업_위도,
@@ -45,4 +50,7 @@ public sealed class 배차대기생성CommandHandler : IRequestHandler<배차대
         await _db.SaveChangesAsync(cancellationToken);
         return entity;
     }
+
+    private static string? NormalizeOptional(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

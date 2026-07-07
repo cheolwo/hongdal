@@ -5,6 +5,8 @@ public sealed class PlatformCommunityPost
     public long Id { get; set; }
     public string AppKey { get; set; } = "platform";
     public string Category { get; set; } = "자유";
+    public string WorkflowTag { get; set; } = "국내 화물 운송";
+    public string RoleTag { get; set; } = "플랫폼 구성원";
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }

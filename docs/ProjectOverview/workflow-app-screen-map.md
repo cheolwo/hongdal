@@ -147,6 +147,41 @@ sequenceDiagram
     end
 ```
 
+### 공동주문 수입 통관완료 후 기사 추천으로 이어지는 흐름
+
+공동주문 수입이 국내 보세구역에 들어온 뒤에는 새 운송 워크플로우를 따로 만들기보다, 홍달 1.0 국내 화물/용달 운송 흐름으로 합류한다. 이때 주문자 집단이 법적 화주가 아닐 수 있으므로 운송 의뢰 주체는 플랫폼으로 두고, 비용 부담과 정산 범위는 주문자 집단으로 남긴다.
+
+```mermaid
+sequenceDiagram
+    participant Orderer as OrdererApp /group-purchase
+    participant ImportLedger as 공동주문 수입 원장
+    participant Admin as HongdalAdmin 공동주문 운영
+    participant Dispatch as 홍달 1.0 배차대기
+    participant DriverList as DriverApp 추천목록
+    participant DriverDetail as DriverApp 추천상세
+
+    Orderer->>ImportLedger: 공동주문 참여 또는 예약결제 의사 등록
+    ImportLedger->>Admin: BL/AWB, 문서관리번호, 통관 상태 표시
+    Admin->>ImportLedger: 통관완료와 보세구역 반출 가능 상태 확인
+    Admin->>ImportLedger: 플랫폼 국내 운송 초안 생성
+    ImportLedger->>Dispatch: SourceRequestType=ImportCargoTransport/FclCargoTransport/LclCargoTransport
+    Dispatch->>DriverList: 운송의뢰유형표시=공동주문 운송
+    Dispatch->>DriverDetail: 세대배송포함여부, 세대배송건수, 세대배송업무표시 전달
+    DriverDetail->>Dispatch: 수락
+    Dispatch->>ImportLedger: 국내 기사 상차, 공동주택 하차, 분배 진행 상태 반영
+    ImportLedger->>Orderer: 주문자별 수령 또는 분배 상태 표시
+```
+
+검증 계약:
+
+| 연결 지점 | 고정해야 할 값 |
+| --- | --- |
+| 공동주문 국내 운송 초안 | `DispatchQueueDraft.SourceRequestType`가 `ImportCargoTransport`, `FclCargoTransport`, `LclCargoTransport` 중 하나여야 한다. |
+| 1.0 배차대기 | `배차대기.원본의뢰유형`에 위 SourceRequestType을 보존한다. |
+| 기사 추천 DTO | `운송의뢰유형코드=GroupPurchaseCargoTransport`, `운송의뢰유형표시=공동주문 운송`으로 표시한다. |
+| 세대 배송 선택 | `세대배송포함여부=true`, `세대배송건수`, `세대배송업무표시`를 추천 목록과 상세에 노출한다. |
+| 3PL 입고 선택 | 공동주문 운송으로 표시하되 `세대배송포함여부=false`, 업무 표시는 `상하차 + 3PL 입고`로 둔다. |
+
 ### 판매채널 주문이 창고와 기사 화면으로 전파되는 흐름
 
 ```mermaid

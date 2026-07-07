@@ -1,3 +1,4 @@
+using System.Reflection;
 using Hongdal.Contracts.Common.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services.Versioning;
@@ -58,7 +59,56 @@ public sealed class VersionFeatureFlagsController : ControllerBase
             IsEnabled = flags.TryGetValue(flagKey, out var enabled) && enabled,
             BoundarySummary = HongdalWorkflowParticipants.GetBoundarySummary(workflow),
             Participants = HongdalWorkflowParticipants.GetByWorkflow(workflow).Select(ToParticipantDto).ToArray(),
-            Screens = HongdalWorkflowScreens.GetByWorkflow(workflow).Select(ToScreenDto).ToArray()
+            Screens = HongdalWorkflowScreens.GetByWorkflow(workflow).Select(ToScreenDto).ToArray(),
+            UseCases = BuildUseCases(workflow)
+        };
+    }
+
+    private static IReadOnlyList<WorkflowUseCaseDto> BuildUseCases(HongdalWorkflow workflow)
+    {
+        return typeof(VersionFeatureFlagsController).Assembly
+            .GetTypes()
+            .Where(type => type is { IsClass: true, IsAbstract: false })
+            .Where(type => type.Name.EndsWith("UseCase", StringComparison.Ordinal))
+            .Where(type => type
+                .GetCustomAttributes<HongdalApiWorkflowAttribute>(inherit: true)
+                .Any(attribute => attribute.Workflow == workflow))
+            .Select(ToUseCaseDto)
+            .OrderBy(useCase => useCase.UseCaseCode, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static WorkflowUseCaseDto ToUseCaseDto(Type useCaseType)
+    {
+        var useCase = useCaseType.GetCustomAttribute<HongdalUseCaseAttribute>(inherit: true);
+        var actors = useCaseType
+            .GetCustomAttributes<HongdalUseCaseActorAttribute>(inherit: true)
+            .Select(ToUseCaseActorDto)
+            .ToArray();
+
+        return new WorkflowUseCaseDto
+        {
+            UseCaseCode = useCaseType.Name,
+            UseCaseName = useCase?.Name ?? useCaseType.Name,
+            Summary = useCase?.Summary ?? string.Empty,
+            IsRequired = useCase?.IsRequired ?? true,
+            PrimaryActors = actors
+                .Where(actor => actor.RoleCode == HongdalUseCaseActorRole.Primary.ToString())
+                .ToArray(),
+            SupportingActors = actors
+                .Where(actor => actor.RoleCode == HongdalUseCaseActorRole.Supporting.ToString())
+                .ToArray()
+        };
+    }
+
+    private static WorkflowUseCaseActorDto ToUseCaseActorDto(HongdalUseCaseActorAttribute actor)
+    {
+        return new WorkflowUseCaseActorDto
+        {
+            ActorCode = actor.ActorCode,
+            ActorName = actor.ActorLabel,
+            RoleCode = actor.Role.ToString(),
+            RoleName = actor.RoleLabel
         };
     }
 

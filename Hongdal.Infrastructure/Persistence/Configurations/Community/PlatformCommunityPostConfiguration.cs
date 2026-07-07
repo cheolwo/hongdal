@@ -14,6 +14,8 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
 
         builder.Property(x => x.AppKey).HasMaxLength(80).IsRequired();
         builder.Property(x => x.Category).HasMaxLength(60).IsRequired();
+        builder.Property(x => x.WorkflowTag).HasMaxLength(60).IsRequired();
+        builder.Property(x => x.RoleTag).HasMaxLength(40).IsRequired();
         builder.Property(x => x.Title).HasMaxLength(160).IsRequired();
         builder.Property(x => x.Body).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
@@ -24,6 +26,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
 
         builder.HasIndex(x => new { x.AppKey, x.IsDeleted, x.IsOperatorPinned, x.OperatorPinnedAtUtc, x.RecommendationCount, x.LastEngagedAtUtc, x.CreatedAtUtc });
         builder.HasIndex(x => new { x.Category, x.IsDeleted, x.CreatedAtUtc });
+        builder.HasIndex(x => new { x.WorkflowTag, x.RoleTag, x.IsDeleted, x.CreatedAtUtc });
         builder.HasIndex(x => new { x.IsReportBoardPost, x.IsDeleted, x.CreatedAtUtc });
 
         builder.HasMany(x => x.Attachments)

@@ -43,6 +43,41 @@ public sealed class HongdalApiGrowthTrackAttribute : Attribute
     public string TrackLabel => HongdalApiGrowthTrackLabels.GetLabel(Track);
 }
 
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+public sealed class HongdalUseCaseAttribute : Attribute
+{
+    public HongdalUseCaseAttribute(string name)
+    {
+        Name = name;
+    }
+
+    public string Name { get; }
+
+    public string Summary { get; set; } = string.Empty;
+
+    public bool IsRequired { get; set; } = true;
+}
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+public sealed class HongdalUseCaseActorAttribute : Attribute
+{
+    public HongdalUseCaseActorAttribute(HongdalActor actor, HongdalUseCaseActorRole role = HongdalUseCaseActorRole.Primary)
+    {
+        Actor = actor;
+        Role = role;
+    }
+
+    public HongdalActor Actor { get; }
+
+    public HongdalUseCaseActorRole Role { get; }
+
+    public string ActorCode => Actor.ToString();
+
+    public string ActorLabel => HongdalActorLabels.GetLabel(Actor);
+
+    public string RoleLabel => HongdalUseCaseActorRoleLabels.GetLabel(Role);
+}
+
 public enum HongdalProductVersion
 {
     V1_0 = 100,
@@ -86,6 +121,33 @@ public enum HongdalWorkflowRelationKind
     Feeds = 400,
     PublishesSignalTo = 500,
     OperatesWith = 600
+}
+
+public enum HongdalActor
+{
+    Shipper = 100,
+    Driver = 200,
+    Recipient = 300,
+    PlatformOperator = 400,
+    WarehouseManager = 500,
+    ShipperOrSeller = 600,
+    CustomsBroker = 700,
+    OrdererGroupLeader = 800,
+    Orderer = 900,
+    OverseasSellerOrForwarder = 1000,
+    Seller = 1100,
+    CommunityMember = 1200,
+    Worker = 1300,
+    EmployerOrOperatingEntity = 1400,
+    Restaurant = 1500,
+    FoodDeliveryDriver = 1600,
+    MartOperator = 1700
+}
+
+public enum HongdalUseCaseActorRole
+{
+    Primary = 100,
+    Supporting = 200
 }
 
 public sealed record HongdalWorkflowRelation(
@@ -160,6 +222,47 @@ public static class HongdalWorkflowRelationKindLabels
             HongdalWorkflowRelationKind.PublishesSignalTo => "신호 공개",
             HongdalWorkflowRelationKind.OperatesWith => "공동 운영",
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown Hongdal workflow relation kind.")
+        };
+    }
+}
+
+public static class HongdalActorLabels
+{
+    public static string GetLabel(HongdalActor actor)
+    {
+        return actor switch
+        {
+            HongdalActor.Shipper => "화주",
+            HongdalActor.Driver => "기사",
+            HongdalActor.Recipient => "수령자",
+            HongdalActor.PlatformOperator => "플랫폼 운영자",
+            HongdalActor.WarehouseManager => "창고 관리자",
+            HongdalActor.ShipperOrSeller => "화주·판매자",
+            HongdalActor.CustomsBroker => "관세사",
+            HongdalActor.OrdererGroupLeader => "주문자 집단 대표",
+            HongdalActor.Orderer => "주문자",
+            HongdalActor.OverseasSellerOrForwarder => "해외 판매자·배송대행지",
+            HongdalActor.Seller => "판매자",
+            HongdalActor.CommunityMember => "커뮤니티 참여자",
+            HongdalActor.Worker => "참여 인력",
+            HongdalActor.EmployerOrOperatingEntity => "고용·운영 주체",
+            HongdalActor.Restaurant => "음식점",
+            HongdalActor.FoodDeliveryDriver => "배달 기사",
+            HongdalActor.MartOperator => "홍달마트 운영자",
+            _ => throw new ArgumentOutOfRangeException(nameof(actor), actor, "Unknown Hongdal actor.")
+        };
+    }
+}
+
+public static class HongdalUseCaseActorRoleLabels
+{
+    public static string GetLabel(HongdalUseCaseActorRole role)
+    {
+        return role switch
+        {
+            HongdalUseCaseActorRole.Primary => "주 액터",
+            HongdalUseCaseActorRole.Supporting => "보조 액터",
+            _ => throw new ArgumentOutOfRangeException(nameof(role), role, "Unknown Hongdal use case actor role.")
         };
     }
 }

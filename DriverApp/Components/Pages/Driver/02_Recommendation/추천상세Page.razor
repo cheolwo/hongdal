@@ -71,9 +71,28 @@
                     <MudText Typo="Typo.body1">@의뢰.상세설명</MudText>
                     @if (의뢰.공동주문운송여부)
                     {
-                        <MudAlert Severity="Severity.Warning">
-                            공동주문 운송 의뢰입니다. 일반 상차/하차 외에 세대배송 범위, 상품정보 스티커, 분류 상태, 세대별 건수를 확인한 뒤 수락해야 합니다.
-                        </MudAlert>
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudText Typo="Typo.subtitle2">공동구매 운송 책임 범위</MudText>
+                                    <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">@의뢰.세대배송범위표시</MudChip>
+                                </MudStack>
+                                <MudText Typo="Typo.body2">
+                                    이 의뢰는 보세구역 또는 국내 물류 거점에서 공동주택으로 이동하는 공동구매 화물입니다. 수락 전 세대별 분류 상태와 기사 업무 범위를 확인해야 합니다.
+                                </MudText>
+                                <MudList T="string" Dense="true">
+                                    <MudListItem Icon="@Icons.Material.Filled.Inventory2">
+                                        상차 전 상품정보 스티커 또는 세대별 송장 라벨이 실제 화물과 맞는지 확인
+                                    </MudListItem>
+                                    <MudListItem Icon="@Icons.Material.Filled.QrCodeScanner">
+                                        바코드가 있는 경우 스캔 결과가 수량과 배송 대상에 맞는지 확인
+                                    </MudListItem>
+                                    <MudListItem Icon="@Icons.Material.Filled.DoorFront">
+                                        세대 문앞 배송이 포함된 경우 세대별 배송 건수와 동선 범위를 확인
+                                    </MudListItem>
+                                </MudList>
+                            </MudStack>
+                        </MudPaper>
                     }
                     <MudAlert Severity="Severity.Info">@의뢰.추천사유</MudAlert>
                     @if (!string.IsNullOrWhiteSpace(_처리상태))

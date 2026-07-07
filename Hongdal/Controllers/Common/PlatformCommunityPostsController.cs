@@ -105,6 +105,8 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         {
             AppKey = Normalize(request.AppKey, "platform", 80),
             Category = Normalize(request.Category, "자유", 60),
+            WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60),
+            RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40),
             Title = Normalize(request.Title, string.Empty, 160),
             Body = Normalize(request.Body, string.Empty, 4000),
             SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl),
@@ -245,12 +247,11 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         }
 
         entity.Category = Normalize(request.Category, "자유", 60);
+        entity.WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60);
+        entity.RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40);
         entity.Title = Normalize(request.Title, string.Empty, 160);
         entity.Body = Normalize(request.Body, string.Empty, 4000);
         entity.SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl);
-        entity.Nickname = Normalize(request.Nickname, "익명", 40);
-        entity.Category = Normalize(request.Category, "자유", 60);
-        entity.Category = Normalize(request.Category, "자유", 60);
         entity.Nickname = Normalize(request.Nickname, "익명", 40);
         entity.IsReportBoardPost = request.IsReportBoardPost || IsReportCategory(entity.Category);
         entity.ReporterDisplayName = entity.IsReportBoardPost
@@ -754,6 +755,8 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             Id = entity.Id,
             AppKey = entity.AppKey,
             Category = entity.Category,
+            WorkflowTag = entity.WorkflowTag,
+            RoleTag = entity.RoleTag,
             Title = entity.Title,
             Body = entity.Body,
             SharedLinkUrl = entity.SharedLinkUrl,

@@ -133,7 +133,7 @@ public static class ContractElectronicSignaturePlanner
     public static ContractElectronicSignatureBundle CreateBundleFromParties(
         string contractNumber,
         string documentHash,
-        IEnumerable<ImportFoodGroupPurchaseContractParty> parties,
+        IEnumerable<수입식품공동주문계약당사자> parties,
         DateTimeOffset createdAtUtc,
         DateTimeOffset? expiresAtUtc = null)
     {

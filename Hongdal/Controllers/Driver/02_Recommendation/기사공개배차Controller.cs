@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Application.Driver.Recommendation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.도메인.공통;
@@ -12,18 +13,18 @@ namespace Hongdal.Controllers.Driver.Recommendation02
     [Route("api/v1/driver/public-dispatches")]
     public sealed class 기사공개배차Controller : ControllerBase
     {
-        private readonly 홍달.Services.Dispatch.Queue.I공개배차Service _publicDispatchService;
+        private readonly I기사배차추천UseCase _useCase;
 
-        public 기사공개배차Controller(홍달.Services.Dispatch.Queue.I공개배차Service publicDispatchService)
+        public 기사공개배차Controller(I기사배차추천UseCase useCase)
         {
-            _publicDispatchService = publicDispatchService;
+            _useCase = useCase;
         }
 
         [HttpGet]
         public async Task<IActionResult> 조회()
         {
             var driverId = 현재기사Id();
-            var items = await _publicDispatchService.GetPublicDispatchesAsync(driverId);
+            var items = await _useCase.공개배차조회Async(driverId);
             return Ok(items);
         }
 

@@ -60,6 +60,23 @@ flowchart LR
     GP -.단지 내 분류·배분.-> HR
 ```
 
+## 주요 엔진
+
+홍달의 서버 판단 로직은 현재 세 엔진을 중심으로 본다. 집단화 엔진은 같은 배송권의 주문자 수요를 묶고, 출고 배치 엔진은 창고와 재고를 기준으로 출고 작업을 계획하며, 운송 의뢰 배차 엔진은 실제 기사 추천과 상하차 흐름을 책임진다.
+
+```mermaid
+flowchart LR
+    Grouping["집단화 엔진<br/>같은 상품·배송권 수요 묶음"]
+    Outbound["출고 배치 엔진<br/>창고·재고·피킹·포장 계획"]
+    Dispatch["운송 의뢰 배차 엔진<br/>기사 추천·수락·상하차·증빙"]
+
+    Grouping -->|공동주문 확정 후보| Outbound
+    Grouping -->|직접 세대 배송 또는 3PL 입고 운송| Dispatch
+    Outbound -->|출고 완료 화물| Dispatch
+```
+
+세 엔진의 역할, 입력/출력, 경계, 인계 방식은 [홍달 주요 엔진 정리](docs/Architecture/EngineOverview.md)에 둔다. 출고 배치의 상세 판단 기준은 [출고 배치 엔진](docs/Architecture/OutboundBatchEngine.md)을 따른다.
+
 ## 1.0 앱 화면 협업 지도
 
 ```mermaid
@@ -169,6 +186,7 @@ dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 - 워크플로우 앱 화면 지도: [docs/ProjectOverview/workflow-app-screen-map.md](docs/ProjectOverview/workflow-app-screen-map.md)
 - 화면 처리 흐름: [docs/ProjectOverview/screen-flows.md](docs/ProjectOverview/screen-flows.md)
 - 주문자 집단 공동주문/커머스 흐름: [docs/ProjectOverview/orderer-group-commerce-flows.md](docs/ProjectOverview/orderer-group-commerce-flows.md)
+- 주요 엔진 정리: [docs/Architecture/EngineOverview.md](docs/Architecture/EngineOverview.md)
 - 개인정보/계약 ISMS-P 준비도: [docs/Compliance/ISMS-P-readiness.md](docs/Compliance/ISMS-P-readiness.md)
 - ISMS-P 보호 데이터 흐름: [docs/Compliance/ISMS-P-protected-data-flow.md](docs/Compliance/ISMS-P-protected-data-flow.md)
 - Command/Event 원칙: [docs/Architecture/CommandEvent리팩토링원칙.md](docs/Architecture/CommandEvent리팩토링원칙.md)

@@ -13,13 +13,15 @@
 }
 
 <table class="table table-striped table-hover">
-    <thead><tr><th>ID</th><th>의뢰ID</th><th>픽업 요약</th><th>하차 요약</th><th>확인</th><th>상태</th><th>작업</th></tr></thead>
+    <thead><tr><th>ID</th><th>의뢰ID</th><th>유형</th><th>업무 범위</th><th>픽업 요약</th><th>하차 요약</th><th>확인</th><th>상태</th><th>작업</th></tr></thead>
     <tbody>
         @foreach (var item in items)
         {
             <tr>
                 <td>@item.Id</td>
                 <td>@item.의뢰Id</td>
+                <td><span class="@TransportTypeBadgeClass(item)">@TransportTypeLabel(item)</span></td>
+                <td>@WorkScopeLabel(item)</td>
                 <td>@item.픽업_도로명주소</td>
                 <td>@item.하차_도로명주소</td>
                 <td><span class="@ReviewBadgeClass(item.상태)">@ReviewLabel(item.상태)</span></td>
@@ -109,6 +111,43 @@
 
         return "badge rounded-pill text-bg-secondary";
     }
+
+    private static string TransportTypeLabel(배차대기응답 item)
+        => IsGroupPurchaseTransport(item) ? "공동구매" : "일반";
+
+    private static string TransportTypeBadgeClass(배차대기응답 item)
+        => IsGroupPurchaseTransport(item)
+            ? "badge rounded-pill text-bg-warning"
+            : "badge rounded-pill text-bg-primary";
+
+    private static string WorkScopeLabel(배차대기응답 item)
+    {
+        if (!IsGroupPurchaseTransport(item))
+        {
+            return "상하차";
+        }
+
+        if (item.공동구매도착지유형코드 == "ThreePlWarehouse")
+        {
+            return "상하차 + 3PL 입고";
+        }
+
+        if (item.공동구매기사세대배송여부 == true)
+        {
+            var count = item.공동구매세대배송건수.HasValue ? $" {item.공동구매세대배송건수.Value:N0}건" : string.Empty;
+            return $"상하차 + 세대 문앞 배송{count}";
+        }
+
+        if (item.공동구매도착지유형코드 == "OrdererGroupRepresentativeDropoff")
+        {
+            return "상하차 + 집단 대표 인계";
+        }
+
+        return "상하차 + 공동주택 거점 하차";
+    }
+
+    private static bool IsGroupPurchaseTransport(배차대기응답 item)
+        => item.원본의뢰유형 is "ImportCargoTransport" or "FclCargoTransport" or "LclCargoTransport";
 
     private static bool IsMatch(string? value, params string[] candidates)
     {
