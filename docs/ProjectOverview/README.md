@@ -14,7 +14,7 @@
 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 주문자 집단 공동주문, 해외 선적/통관, 국내 물류대행 입고, 판매채널, 출고 배치, 입주민 우선 고용 흐름 |
 | [workflow-api-policy.md](workflow-api-policy.md) | API를 버전보다 업무 처리 절차별 워크플로우로 관리하는 기준 |
-| [workflow-app-screen-map.md](workflow-app-screen-map.md) | 워크플로우가 여러 앱 화면을 거쳐 성립되는 방식과 보완할 페이지 후보 |
+| [workflow-app-screen-map.md](workflow-app-screen-map.md) | 워크플로우가 여러 앱 화면을 거쳐 성립되는 방식, 화면 간 상태 전파, 보완할 페이지 후보 |
 
 ## 관련 아키텍처 문서
 
@@ -28,4 +28,4 @@
 2. Mermaid 다이어그램은 이 폴더의 주제별 문서에 둔다.
 3. 1.0 릴리즈 판단은 [version-roadmap.md](version-roadmap.md)를 기준으로 한다.
 4. 화면과 API 연결 흐름은 [screen-flows.md](screen-flows.md)에 둔다.
-5. 워크플로우와 앱 화면의 관계는 [workflow-app-screen-map.md](workflow-app-screen-map.md)에 둔다.
+5. 워크플로우와 앱 화면의 관계, 화면 간 상태 전파 시퀀스는 [workflow-app-screen-map.md](workflow-app-screen-map.md)에 둔다.

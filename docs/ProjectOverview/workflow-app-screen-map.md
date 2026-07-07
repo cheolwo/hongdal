@@ -48,6 +48,100 @@ flowchart LR
     W -->|마트 피킹·기사 인계| D
 ```
 
+## 화면 간 상태 전파
+
+앱 화면은 각자 독립적으로 보이지만, 실제로는 같은 서버 원장을 보고 있다. 한 화면에서 버튼을 누르면 서버의 상태가 바뀌고, 그 상태를 다른 앱 화면이 목록, 상세, 작업 보드, 알림으로 다시 읽어 보여준다.
+
+| 상태 변경 | 조작 화면 | 반영 화면 | 의미 |
+| --- | --- | --- | --- |
+| 운송 의뢰 등록 | `ShipperApp` `/shipper/request` | `HongdalAdmin` `/dispatch/wait`, `DriverApp` `/driver/recommendations` | 화주의 입력이 배차 대기와 기사 추천으로 전파된다. |
+| 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `ShipperApp` 운송 의뢰 상세, `HongdalAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
+| 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `HongdalAdmin` `/documents`, `ShipperApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
+| 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `HongdalAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
+| 통관 상태 보정 | `CustomsBrokerApp` `/` 또는 `HongdalAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `ShipperApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
+| 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `ShipperApp` `/shipper/warehouse/inventory`, `ShipperApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
+| 판매채널 주문 출고 배치 | `ShipperApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
+| 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `HongdalAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
+
+### 국내 운송 상태 전파
+
+```mermaid
+sequenceDiagram
+    participant Shipper as ShipperApp /shipper/request
+    participant Server as Hongdal 운송 원장
+    participant AdminWait as HongdalAdmin /dispatch/wait
+    participant DriverReco as DriverApp /driver/recommendations
+    participant DriverRun as DriverApp /driver/transports/current
+    participant AdminTrans as HongdalAdmin /transports
+
+    Shipper->>Server: 운송 의뢰 등록
+    Server->>AdminWait: 상태=배차대기 목록 반영
+    Server->>DriverReco: 추천 후보 생성
+    DriverReco->>Server: 기사 수락
+    Server->>DriverReco: 추천 상태=수락완료
+    Server->>DriverRun: 진행 중 운송 생성
+    Server->>AdminTrans: 운송 상태=배차완료
+    DriverRun->>Server: 상차 완료, 사진/인수증/서명 제출
+    Server->>AdminTrans: 상태=상차완료, 증빙 연결
+    Server->>Shipper: 화주 화면 상태=상차완료
+    DriverRun->>Server: 하차 완료
+    Server->>AdminTrans: 상태=운송완료, 정산 후보 생성
+    Server->>Shipper: 화주 화면 상태=운송완료
+```
+
+### 공동주문 수입에서 국내 운송 또는 창고 입고로 갈라지는 흐름
+
+```mermaid
+sequenceDiagram
+    participant Orderer as OrdererApp /group-purchase
+    participant Ledger as Hongdal 공동주문 원장
+    participant Admin as HongdalAdmin 공동주문 운영 화면 후보
+    participant Broker as CustomsBrokerApp 통관 검토
+    participant Driver as DriverApp 추천/진행 화면
+    participant Warehouse as WarehouseManagerApp /work-board
+
+    Orderer->>Ledger: 공동주문 생성 또는 참여
+    Ledger->>Orderer: 상태=모집중/목표수량달성
+    Orderer->>Ledger: 운송 방식 투표 또는 대표 확정
+    Ledger->>Admin: 상태=운송방식확정, 비용/책임 경계 표시
+    Admin->>Ledger: BL/AWB, 문서관리번호, 통관 단계 등록
+    Broker->>Ledger: HS 코드/통관 리스크 보정
+    Ledger->>Orderer: 상태=국제운송중/통관진행/통관완료
+
+    alt 세대 배송 선택
+        Ledger->>Driver: 공동주문 운송 추천 생성
+        Driver->>Ledger: 상차/하차/세대 배송 증빙 제출
+        Ledger->>Orderer: 상태=세대배송중/수령완료
+    else 3PL 입고 선택
+        Ledger->>Warehouse: 입고 작업 생성
+        Warehouse->>Ledger: 입고 검수 완료, 재고 로트 생성
+        Ledger->>Orderer: 상태=3PL입고완료
+    end
+```
+
+### 판매채널 주문이 창고와 기사 화면으로 전파되는 흐름
+
+```mermaid
+sequenceDiagram
+    participant Seller as ShipperApp /shipper/sales/orders
+    participant Server as Hongdal 판매·출고 원장
+    participant Warehouse as WarehouseManagerApp /work-board
+    participant Driver as DriverApp /driver/recommendations
+    participant Admin as HongdalAdmin /transports
+
+    Seller->>Server: 판매채널 주문 동기화
+    Server->>Seller: 주문 상태=출고대기
+    Seller->>Server: 출고 배치 요청
+    Server->>Warehouse: 피킹/포장 작업 생성
+    Warehouse->>Server: 피킹 완료
+    Server->>Seller: 주문 상태=피킹완료
+    Warehouse->>Server: 포장 완료, 배송 인계 요청
+    Server->>Driver: 배송 추천 생성
+    Driver->>Server: 배송 수락
+    Server->>Admin: 운송 상태=배차완료
+    Server->>Seller: 주문 상태=배송중
+```
+
 ## 국내 화물 운송
 
 국내 화물 운송은 홍달 1.0에서 시작한 핵심 실행 워크플로우다. 공동주문 수입, 창고 입출고, 판매채널 출고, 음식 배달, 홍달마트도 실제 상차와 하차가 필요하면 이 흐름으로 합류한다.

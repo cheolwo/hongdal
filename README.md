@@ -67,6 +67,31 @@ flowchart TD
     W2 --> D1
 ```
 
+### 대표 상태 전파 예시
+
+```mermaid
+sequenceDiagram
+    participant Orderer as OrdererApp /group-purchase
+    participant Admin as HongdalAdmin 운영 화면
+    participant Broker as CustomsBrokerApp 통관 검토
+    participant Driver as DriverApp 추천/진행
+    participant Warehouse as WarehouseManagerApp 작업 보드
+
+    Orderer->>Admin: 공동주문 생성, 운송 방식 확정
+    Admin->>Broker: BL/AWB, HS 코드, 통관 검토 요청
+    Broker->>Admin: 통관 상태와 리스크 보정
+    Admin->>Orderer: 공동주문 화면에 통관 상태 반영
+    alt 세대 배송
+        Admin->>Driver: 공동주문 운송 추천 생성
+        Driver->>Admin: 상차/하차/세대 배송 증빙 제출
+        Admin->>Orderer: 수령 상태 반영
+    else 3PL 입고
+        Admin->>Warehouse: 입고 작업 생성
+        Warehouse->>Admin: 검수 완료, 재고 로트 생성
+        Admin->>Orderer: 입고 완료 상태 반영
+    end
+```
+
 ## 워크플로우와 앱 화면
 
 | 워크플로우 | 주 사용자 | 현재 주요 화면 | 다음 인계 |
@@ -81,7 +106,7 @@ flowchart TD
 | 음식 배달 | 주문자, 배달 기사, 운영자 | `OrdererApp` `/food/restaurants`, `DriverApp` 추천/진행 화면, `HongdalAdmin` `/food/operations` | 픽업, 전달, 정산 |
 | 홍달마트 | 주문자, 창고 관리자, 기사 | `OrdererApp` `/food/mart`, `WarehouseManagerApp` `/mart`, `/mart/work-board` | 피킹, 포장, 기사 인계 |
 
-상세한 화면 관계와 보완할 페이지 후보는 [워크플로우 앱 화면 지도](docs/ProjectOverview/workflow-app-screen-map.md)에 둡니다. 주문자 집단 공동주문, 해외 선적/통관 조회, 국내 물류대행 입고, 판매채널 출품, 출고 배치, 입주민 우선 고용 흐름은 [주문자 집단 공동주문/커머스 흐름](docs/ProjectOverview/orderer-group-commerce-flows.md)을 기준으로 관리합니다.
+상세한 화면 관계, 상태 전파 시퀀스, 보완할 페이지 후보는 [워크플로우 앱 화면 지도](docs/ProjectOverview/workflow-app-screen-map.md)에 둡니다. 주문자 집단 공동주문, 해외 선적/통관 조회, 국내 물류대행 입고, 판매채널 출품, 출고 배치, 입주민 우선 고용 흐름은 [주문자 집단 공동주문/커머스 흐름](docs/ProjectOverview/orderer-group-commerce-flows.md)을 기준으로 관리합니다.
 
 ## 버전 방향
 
