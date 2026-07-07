@@ -1,6 +1,6 @@
 # 워크플로우 앱 화면 지도
 
-이 문서는 홍달의 워크플로우가 실제 앱 화면에서 어떻게 성립되는지 정리한다. 워크플로우는 하나의 API나 하나의 화면이 아니라, 여러 앱의 화면이 같은 업무 원장을 보고 단계적으로 호출되면서 완성되는 흐름이다.
+이 문서는 홍달의 워크플로우가 실제 앱 화면에서 어떻게 성립되는지 정리한다. 중심은 홍달 1.0 국내 화물/용달 운송이다. 다른 워크플로우는 독립적으로 펼쳐 놓기보다, 어떤 상태에서 국내 운송으로 합류하고 기사님 화면에 어떤 의뢰로 보이는지를 기준으로 읽는다.
 
 기본 정책은 [workflow-api-policy.md](workflow-api-policy.md)를 따른다. 이 문서는 그 정책을 화면, 앱, 부족한 페이지 후보 관점으로 풀어쓴다.
 
@@ -14,6 +14,28 @@
 | 보조 참여자 | 같은 워크플로우 안에서 확인, 보정, 승인, 작업을 맡는 참여자 |
 | 인계 | 한 워크플로우의 결과가 다음 워크플로우의 입력이 되는 지점 |
 
+## 문서의 중심축
+
+가장 먼저 닫아야 할 화면 흐름은 `ShipperApp` 운송 의뢰, `HongdalAdmin` 배차 대기, `DriverApp` 추천/수락/상차/하차, `HongdalAdmin` 운송·증빙·정산 관리다.
+
+```mermaid
+flowchart TD
+    Request["ShipperApp<br/>/shipper/request<br/>운송 의뢰"]
+    Wait["HongdalAdmin<br/>/dispatch/wait<br/>배차 대기"]
+    Reco["DriverApp<br/>/driver/recommendations<br/>추천 목록"]
+    Detail["DriverApp<br/>/driver/recommendations/{의뢰Id}<br/>추천 상세"]
+    Decision["DriverApp<br/>/driver/recommendations/{의뢰Id}/decision<br/>수락·보류·거절"]
+    Current["DriverApp<br/>/driver/transports/current<br/>진행 중 운송"]
+    Pickup["DriverApp<br/>/driver/transports/{운송Id}/pickup<br/>상차·인수증·서명"]
+    Dropoff["DriverApp<br/>/driver/transports/{운송Id}/dropoff<br/>하차·완료 증빙"]
+    Admin["HongdalAdmin<br/>/transports, /documents, /settlements<br/>운송·증빙·정산"]
+
+    Request --> Wait --> Reco --> Detail --> Decision --> Current --> Pickup --> Dropoff --> Admin
+    Admin --> Request
+```
+
+확장 워크플로우는 이 중심축에 들어오는 의뢰의 출처를 늘린다. 예를 들어 공동주문 수입은 보세구역 반출 후 `공동주문 세대 배송` 또는 `3PL 입고 운송`으로 기사 추천 화면에 들어오고, 판매채널 출고는 포장 완료 후 `출고 배송`으로 들어온다.
+
 ## 앱별 기본 역할
 
 | 앱 | 주 사용자 | 현재 역할 |
@@ -25,43 +47,49 @@
 | `HongdalAdmin` | 플랫폼 운영자 | 배차 대기, 운송 진행, 기사/화주 관리, 문서, 정산, HS 코드, HR, 운영 정책 |
 | `CustomsBrokerApp` | 관세사 | 통관·무역 데이터 검토와 보정의 사용자 접점 |
 
-## 전체 연결 그림
+## 1.0 중심 연결 그림
 
 ```mermaid
 flowchart LR
-    O["OrdererApp<br/>주문자·주문자 집단"]
-    S["ShipperApp<br/>화주·판매자"]
-    D["DriverApp<br/>기사"]
-    W["WarehouseManagerApp<br/>창고"]
-    A["HongdalAdmin<br/>플랫폼 운영"]
-    C["CustomsBrokerApp<br/>관세사"]
+    Core["홍달 1.0 국내 화물/용달 운송<br/>기사 추천 → 수락 → 상차 → 하차 → 증빙 → 정산"]
+    Shipper["ShipperApp<br/>일반 화주 운송 의뢰"]
+    Group["OrdererApp<br/>공동주문 수입"]
+    Customs["CustomsBrokerApp / HongdalAdmin<br/>통관·HS 판단"]
+    Warehouse["WarehouseManagerApp<br/>창고 입출고"]
+    Sales["ShipperApp<br/>판매채널 출고"]
+    Food["OrdererApp<br/>음식 주문"]
+    Mart["OrdererApp / WarehouseManagerApp<br/>홍달마트"]
+    Community["커뮤니티 신뢰<br/>후기·활동 신호"]
+    HR["참여 인력 관리<br/>분류·배분 보조"]
 
-    O -->|공동주문·음식·마트 주문| A
-    O -->|공동수입 상태 조회| A
-    S -->|운송 의뢰·판매채널 주문| A
-    S -->|창고 입출고 요청| W
-    A -->|추천·배차·운송 상태| D
-    D -->|상차·하차·증빙| A
-    C -->|HS/통관 보정| A
-    A -->|입고·출고 작업 생성| W
-    W -->|재고·출고 결과| S
-    W -->|마트 피킹·기사 인계| D
+    Shipper --> Core
+    Group --> Customs --> Group
+    Group -->|직접 세대 배송| Core
+    Group -->|3PL 입고| Warehouse
+    Warehouse -->|입고/출고 운송 요청| Core
+    Sales --> Warehouse
+    Sales -->|직접 배송 인계| Core
+    Food --> Core
+    Mart --> Warehouse
+    Mart --> Core
+    Core -.완료 신호.-> Community
+    Group -.단지 내 업무.-> HR
 ```
 
 ## 화면 간 상태 전파
 
 앱 화면은 각자 독립적으로 보이지만, 실제로는 같은 서버 원장을 보고 있다. 한 화면에서 버튼을 누르면 서버의 상태가 바뀌고, 그 상태를 다른 앱 화면이 목록, 상세, 작업 보드, 알림으로 다시 읽어 보여준다.
 
-| 상태 변경 | 조작 화면 | 반영 화면 | 의미 |
-| --- | --- | --- | --- |
-| 운송 의뢰 등록 | `ShipperApp` `/shipper/request` | `HongdalAdmin` `/dispatch/wait`, `DriverApp` `/driver/recommendations` | 화주의 입력이 배차 대기와 기사 추천으로 전파된다. |
-| 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `ShipperApp` 운송 의뢰 상세, `HongdalAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
-| 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `HongdalAdmin` `/documents`, `ShipperApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
-| 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `HongdalAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
-| 통관 상태 보정 | `CustomsBrokerApp` `/` 또는 `HongdalAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `ShipperApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
-| 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `ShipperApp` `/shipper/warehouse/inventory`, `ShipperApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
-| 판매채널 주문 출고 배치 | `ShipperApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
-| 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `HongdalAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
+| 우선순위 | 상태 변경 | 조작 화면 | 반영 화면 | 의미 |
+| --- | --- | --- | --- | --- |
+| 1 | 운송 의뢰 등록 | `ShipperApp` `/shipper/request` | `HongdalAdmin` `/dispatch/wait`, `DriverApp` `/driver/recommendations` | 화주의 입력이 배차 대기와 기사 추천으로 전파된다. |
+| 1 | 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `ShipperApp` 운송 의뢰 상세, `HongdalAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
+| 1 | 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `HongdalAdmin` `/documents`, `ShipperApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
+| 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `HongdalAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
+| 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `ShipperApp` `/shipper/warehouse/inventory`, `ShipperApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
+| 2 | 판매채널 주문 출고 배치 | `ShipperApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
+| 3 | 통관 상태 보정 | `CustomsBrokerApp` `/` 또는 `HongdalAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `ShipperApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
+| 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `HongdalAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
 
 ### 국내 운송 상태 전파
 
@@ -362,13 +390,14 @@ flowchart LR
 
 | 순위 | 보완 항목 | 이유 |
 | --- | --- | --- |
-| 1 | `HongdalAdmin` 워크플로우 운영 보드 | 여러 워크플로우가 서로 인계되는 상태를 운영자가 먼저 볼 수 있어야 한다. |
-| 2 | 공동주문 수입 원장 콘솔 | BL/AWB, 통관, 보세구역, 국내 운송, 3PL 입고가 하나의 원장으로 이어져야 한다. |
-| 3 | `DriverApp` 추천 상세의 업무 유형 강화 | 일반 화물과 공동주문 세대 배송, 음식, 마트 배송은 기사 책임 범위가 다르다. |
-| 4 | 공동주문 투표/결정/전자문서 화면 | 주문자 집단의 합의와 책임 경계를 기록해야 이후 분쟁을 줄일 수 있다. |
-| 5 | 창고 입고 로트와 출고 배치 상세 | 공동수입, 냉장/냉동, 판매채널 출고를 창고 작업자가 이해할 수 있어야 한다. |
-| 6 | 통관 코드/보세구역 데이터 브라우저 | BL/AWB 응답값과 플랫폼 내부 원장을 안정적으로 연결해야 한다. |
-| 7 | HR 참여 인력 콘솔 | 주문자 집단의 고용, 보상, 4대보험 준비 상태는 API보다 운영 화면이 먼저 필요하다. |
+| 1 | `DriverApp` 추천 상세의 업무 유형 강화 | 홍달 1.0의 첫 판단 화면이다. 일반 화물, 공동주문 세대 배송, 음식, 마트 배송은 기사 책임 범위가 다르다. |
+| 2 | `DriverApp` 상차·하차 증빙 화면 강화 | 기사님 운행 흐름에서 실제 법적·정산 증빙이 닫히는 지점이다. 인수증, 사진, 서명, 생략 사유가 안정적으로 남아야 한다. |
+| 3 | `HongdalAdmin` 국내 운송 운영 보드 | 배차 대기, 진행 중, 상차 완료, 하차 완료, 정산 후보를 1.0 중심 상태로 먼저 볼 수 있어야 한다. |
+| 4 | 공동주문 수입 원장 콘솔 | BL/AWB, 통관, 보세구역, 국내 운송, 3PL 입고가 하나의 원장으로 이어져야 한다. |
+| 5 | 공동주문 투표/결정/전자문서 화면 | 주문자 집단의 합의와 책임 경계를 기록해야 이후 분쟁을 줄일 수 있다. |
+| 6 | 창고 입고 로트와 출고 배치 상세 | 공동수입, 냉장/냉동, 판매채널 출고를 창고 작업자가 이해할 수 있어야 한다. |
+| 7 | 통관 코드/보세구역 데이터 브라우저 | BL/AWB 응답값과 플랫폼 내부 원장을 안정적으로 연결해야 한다. |
+| 8 | HR 참여 인력 콘솔 | 주문자 집단의 고용, 보상, 4대보험 준비 상태는 API보다 운영 화면이 먼저 필요하다. |
 
 ## 화면 설계 원칙
 
