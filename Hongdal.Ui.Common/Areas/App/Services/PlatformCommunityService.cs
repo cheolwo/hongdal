@@ -26,6 +26,51 @@ public sealed class PlatformCommunityService
                ?? new PlatformCommunityPostListResponse();
     }
 
+    public async Task<PlatformCommunityBoardListResponse> GetBoardsAsync(
+        string appKey,
+        string status = PlatformCommunityBoardRequestStatuses.Approved,
+        CancellationToken cancellationToken = default)
+    {
+        var path = $"api/v1/community/boards?appKey={Uri.EscapeDataString(appKey)}&status={Uri.EscapeDataString(status)}";
+        return await _httpClient.GetFromJsonAsync<PlatformCommunityBoardListResponse>(path, cancellationToken)
+               ?? new PlatformCommunityBoardListResponse();
+    }
+
+    public async Task<PlatformCommunityBoardResponse?> CreateBoardRequestAsync(
+        PlatformCommunityBoardCreateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync("api/v1/community/boards", request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityBoardResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<PlatformCommunityBoardResponse?> ApproveBoardAsync(
+        long boardRequestId,
+        string operatorMemo,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/boards/{boardRequestId}/approve",
+            new PlatformCommunityBoardReviewRequest { OperatorMemo = operatorMemo },
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityBoardResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<PlatformCommunityBoardResponse?> RejectBoardAsync(
+        long boardRequestId,
+        string operatorMemo,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/boards/{boardRequestId}/reject",
+            new PlatformCommunityBoardReviewRequest { OperatorMemo = operatorMemo },
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityBoardResponse>(cancellationToken: cancellationToken);
+    }
+
     public async Task<PlatformCommunityPostResponse?> CreatePostAsync(
         PlatformCommunityPostCreateRequest request,
         CancellationToken cancellationToken = default)

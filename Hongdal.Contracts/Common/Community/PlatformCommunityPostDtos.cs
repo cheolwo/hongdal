@@ -8,6 +8,50 @@ public sealed class PlatformCommunityPostListResponse
     public int PageSize { get; set; } = 20;
 }
 
+public sealed class PlatformCommunityBoardListResponse
+{
+    public IReadOnlyList<PlatformCommunityBoardResponse> Items { get; set; } = [];
+}
+
+public sealed class PlatformCommunityBoardResponse
+{
+    public long Id { get; set; }
+    public string AppKey { get; set; } = string.Empty;
+    public string BoardKey { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string RequestedBy { get; set; } = string.Empty;
+    public string RequestReason { get; set; } = string.Empty;
+    public string Status { get; set; } = PlatformCommunityBoardRequestStatuses.Pending;
+    public string StatusName { get; set; } = string.Empty;
+    public string? OperatorMemo { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public DateTime UpdatedAtUtc { get; set; }
+    public DateTime? ApprovedAtUtc { get; set; }
+    public DateTime? RejectedAtUtc { get; set; }
+}
+
+public sealed class PlatformCommunityBoardCreateRequest
+{
+    public string AppKey { get; set; } = "platform";
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string RequestedBy { get; set; } = string.Empty;
+    public string RequestReason { get; set; } = string.Empty;
+}
+
+public sealed class PlatformCommunityBoardReviewRequest
+{
+    public string OperatorMemo { get; set; } = string.Empty;
+}
+
+public static class PlatformCommunityBoardRequestStatuses
+{
+    public const string Pending = "Pending";
+    public const string Approved = "Approved";
+    public const string Rejected = "Rejected";
+}
+
 public sealed class PlatformCommunityPostResponse
 {
     public long Id { get; set; }

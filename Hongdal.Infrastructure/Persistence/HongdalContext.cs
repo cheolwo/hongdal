@@ -113,6 +113,7 @@ namespace 홍달.Data
         public DbSet<PlatformProfitReturnPolicyRecord> PlatformProfitReturnPolicies { get; set; } = null!;
         public DbSet<PlatformProfitReturnScheduleRecord> PlatformProfitReturnSchedules { get; set; } = null!;
         public DbSet<PlatformCommunityPost> PlatformCommunityPosts { get; set; } = null!;
+        public DbSet<PlatformCommunityBoardRequest> PlatformCommunityBoardRequests { get; set; } = null!;
         public DbSet<PlatformCommunityPostAttachment> PlatformCommunityPostAttachments { get; set; } = null!;
         public DbSet<PlatformCommunityPostAttachmentComment> PlatformCommunityPostAttachmentComments { get; set; } = null!;
         public DbSet<PlatformCommunityPostComment> PlatformCommunityPostComments { get; set; } = null!;

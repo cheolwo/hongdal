@@ -246,10 +246,98 @@
                 <MudStack Spacing="2">
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                         <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">개설된 게시판</MudText>
+                            @if (approvedBoards.Count == 0)
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">아직 승인된 추가 게시판이 없습니다.</MudText>
+                            }
+                            else
+                            {
+                                <MudStack Spacing="1">
+                                    @foreach (var board in approvedBoards)
+                                    {
+                                        <MudButton Variant="Variant.Outlined"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.Forum"
+                                                   OnClick="@(() => SelectBoard(board.Title))">
+                                            <MudStack Spacing="0" AlignItems="AlignItems.Start">
+                                                <MudText Typo="Typo.body2">@board.Title</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@board.Description</MudText>
+                                            </MudStack>
+                                        </MudButton>
+                                    }
+                                </MudStack>
+                            }
+                        </MudStack>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">게시판 개설 신청</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                사용자가 필요한 게시판을 신청하면, 운영자가 승인한 뒤 모든 사용자에게 보입니다.
+                            </MudText>
+                            <MudTextField T="string" Label="게시판 이름" @bind-Value="boardForm.Title" MaxLength="60" />
+                            <MudTextField T="string" Label="신청자" @bind-Value="boardForm.RequestedBy" MaxLength="40" />
+                            <MudTextField T="string" Label="게시판 설명" @bind-Value="boardForm.Description" MaxLength="500" />
+                            <MudTextField T="string" Label="개설 이유" @bind-Value="boardForm.RequestReason" Lines="3" MaxLength="1000" />
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Disabled="@isSavingBoardRequest"
+                                       StartIcon="@Icons.Material.Filled.AddCircleOutline"
+                                       OnClick="SaveBoardRequestAsync">
+                                개설 신청
+                            </MudButton>
+                        </MudStack>
+                    </MudPaper>
+
+                    @if (CanManageCommunityPosts)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                            <MudStack Spacing="2">
+                                <MudText Typo="Typo.subtitle1">게시판 승인 대기</MudText>
+                                @if (pendingBoardRequests.Count == 0)
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">승인 대기 중인 게시판 신청이 없습니다.</MudText>
+                                }
+                                else
+                                {
+                                    @foreach (var board in pendingBoardRequests)
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                            <MudStack Spacing="1">
+                                                <MudText Typo="Typo.subtitle2">@board.Title</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">신청자: @board.RequestedBy · @FormatDate(board.CreatedAtUtc)</MudText>
+                                                <MudText Typo="Typo.body2">@board.RequestReason</MudText>
+                                                <MudTextField T="string" Label="운영 메모" @bind-Value="boardReviewMemo[board.Id]" MaxLength="1000" Margin="Margin.Dense" />
+                                                <MudStack Row="true" Spacing="1">
+                                                    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="@(() => ReviewBoardAsync(board, true))">
+                                                        승인
+                                                    </MudButton>
+                                                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="@(() => ReviewBoardAsync(board, false))">
+                                                        반려
+                                                    </MudButton>
+                                                </MudStack>
+                                            </MudStack>
+                                        </MudPaper>
+                                    }
+                                }
+                            </MudStack>
+                        </MudPaper>
+                    }
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
                             <MudText Typo="Typo.subtitle1">@(editingPostId is null ? "글 남기기" : "글 수정")</MudText>
                             <MudTextField T="string" Label="닉네임" @bind-Value="form.Nickname" MaxLength="40" />
                             <MudTextField T="string" Label="비밀번호" @bind-Value="form.Password" InputType="InputType.Password" HelperText="수정할 때 같은 비밀번호를 사용합니다." />
-                            <MudTextField T="string" Label="분류" @bind-Value="form.Category" MaxLength="60" />
+                            <MudSelect T="string" Label="게시판/분류" @bind-Value="form.Category" Variant="Variant.Outlined">
+                                @foreach (var category in BoardCategoryOptions)
+                                {
+                                    <MudSelectItem Value="@category">@category</MudSelectItem>
+                                }
+                            </MudSelect>
                             <MudCheckBox T="bool" @bind-Value="form.IsReportBoardPost" Label="신고 게시판 글" Color="Color.Error" />
                             @if (form.IsReportBoardPost)
                             {
@@ -592,14 +680,19 @@
     public RenderFragment? WorkModeContent { get; set; }
 
     private readonly List<PlatformCommunityPostResponse> posts = [];
+    private readonly List<PlatformCommunityBoardResponse> approvedBoards = [];
+    private readonly List<PlatformCommunityBoardResponse> pendingBoardRequests = [];
     private readonly List<IBrowserFile> selectedFiles = [];
     private readonly PlatformCommunityPostForm form = new();
+    private readonly PlatformCommunityBoardForm boardForm = new();
     private readonly Dictionary<long, PlatformCommunityCommentForm> commentForms = [];
     private readonly Dictionary<long, PlatformCommunityCommentForm> attachmentCommentForms = [];
+    private readonly Dictionary<long, string> boardReviewMemo = [];
     private readonly string recommendationSessionKey = Guid.NewGuid().ToString("N");
     private long? editingPostId;
     private bool isLoading = true;
     private bool isSaving;
+    private bool isSavingBoardRequest;
     private bool isWorkMode;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
@@ -625,6 +718,7 @@
     {
         HomeModeState.Changed += HandleModeChanged;
         isWorkMode = HomeModeState.IsWorkMode;
+        await LoadBoardsAsync();
         await LoadPostsAsync();
     }
 
@@ -673,6 +767,107 @@
         {
             isLoading = false;
         }
+    }
+
+    private async Task LoadBoardsAsync()
+    {
+        try
+        {
+            var approved = await CommunityService.GetBoardsAsync(AppKey, PlatformCommunityBoardRequestStatuses.Approved);
+            approvedBoards.Clear();
+            approvedBoards.AddRange(approved.Items);
+
+            if (CanManageCommunityPosts)
+            {
+                var pending = await CommunityService.GetBoardsAsync(AppKey, PlatformCommunityBoardRequestStatuses.Pending);
+                pendingBoardRequests.Clear();
+                pendingBoardRequests.AddRange(pending.Items);
+                foreach (var board in pendingBoardRequests)
+                {
+                    boardReviewMemo.TryAdd(board.Id, string.Empty);
+                }
+            }
+        }
+        catch
+        {
+            // Board requests are an enhancement; post loading should still work if this API is unavailable.
+        }
+    }
+
+    private async Task SaveBoardRequestAsync()
+    {
+        statusMessage = null;
+        if (string.IsNullOrWhiteSpace(boardForm.Title) ||
+            string.IsNullOrWhiteSpace(boardForm.RequestedBy) ||
+            string.IsNullOrWhiteSpace(boardForm.RequestReason))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "게시판 이름, 신청자, 개설 이유를 입력하세요.";
+            return;
+        }
+
+        isSavingBoardRequest = true;
+        try
+        {
+            await CommunityService.CreateBoardRequestAsync(new PlatformCommunityBoardCreateRequest
+            {
+                AppKey = AppKey,
+                Title = boardForm.Title,
+                Description = boardForm.Description,
+                RequestedBy = boardForm.RequestedBy,
+                RequestReason = boardForm.RequestReason
+            });
+
+            boardForm.Title = string.Empty;
+            boardForm.Description = string.Empty;
+            boardForm.RequestReason = string.Empty;
+            await LoadBoardsAsync();
+
+            statusSeverity = Severity.Success;
+            statusMessage = "게시판 개설 신청을 접수했습니다. 운영자 승인 후 게시판 목록에 표시됩니다.";
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"게시판 개설 신청에 실패했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isSavingBoardRequest = false;
+        }
+    }
+
+    private async Task ReviewBoardAsync(PlatformCommunityBoardResponse board, bool approve)
+    {
+        try
+        {
+            var memo = boardReviewMemo.TryGetValue(board.Id, out var value) ? value : string.Empty;
+            if (approve)
+            {
+                await CommunityService.ApproveBoardAsync(board.Id, memo);
+                statusMessage = $"'{board.Title}' 게시판을 승인했습니다.";
+            }
+            else
+            {
+                await CommunityService.RejectBoardAsync(board.Id, memo);
+                statusMessage = $"'{board.Title}' 게시판 신청을 반려했습니다.";
+            }
+
+            statusSeverity = Severity.Success;
+            await LoadBoardsAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"게시판 검토 처리에 실패했습니다: {ex.Message}";
+        }
+    }
+
+    private void SelectBoard(string title)
+    {
+        form.Category = title;
+        statusSeverity = Severity.Info;
+        statusMessage = $"'{title}' 게시판으로 글 분류를 선택했습니다.";
     }
 
     private async Task SavePostAsync()
@@ -979,6 +1174,32 @@
         form.SharedLinkUrl = string.Empty;
     }
 
+    private IReadOnlyList<string> BoardCategoryOptions
+    {
+        get
+        {
+            var categories = new List<string>
+            {
+                "자유",
+                "운송 실무",
+                "업무 질문",
+                "업무 기록",
+                "개선 제안",
+                "신고/분쟁"
+            };
+
+            foreach (var board in approvedBoards)
+            {
+                if (!categories.Contains(board.Title, StringComparer.OrdinalIgnoreCase))
+                {
+                    categories.Add(board.Title);
+                }
+            }
+
+            return categories;
+        }
+    }
+
     private void HandleFilesSelected(InputFileChangeEventArgs args)
     {
         selectedFiles.Clear();
@@ -1118,6 +1339,14 @@
         public bool IsReportBoardPost { get; set; }
         public string ReporterDisplayName { get; set; } = string.Empty;
         public string ReportedDisplayName { get; set; } = string.Empty;
+    }
+
+    private sealed class PlatformCommunityBoardForm
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string RequestedBy { get; set; } = string.Empty;
+        public string RequestReason { get; set; } = string.Empty;
     }
 
     private sealed class PlatformCommunityCommentForm
