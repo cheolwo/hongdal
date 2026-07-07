@@ -49,8 +49,11 @@ sequenceDiagram
 | 필드 분류와 보호 방식 | `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs` |
 | DTO 속성 표시 | `IsmsPProtectedDataAttribute` |
 | 클라이언트 전송 암호화 판단 | `HongdalIsmsPClientEncryptionService.RequiresEncryptedTransport<T>()` |
+| 클라이언트 공통 보호 전송 | `HongdalProtectedApiClient` |
 | 클라이언트 envelope 생성 | `hongdal-isms-p-transport.js`, `HongdalIsmsPClientEncryptionService` |
+| 서버 envelope 자동 복호화 | `IsmsPEncryptedTransportMiddleware` |
 | 서버 transport 복호화 | `RsaOaepAesGcmClientTransportProtectionService` |
+| transport 키 활성 메타데이터 | `RedisIsmsPTransportKeyStatusStore` |
 | 저장 전 보호 | `IsmsPProtectedDataStorePreparationService` |
 | 조회 응답 준비 | `IsmsPProtectedDataResponsePreparationService` |
 | AES-256-GCM 저장 암호화와 SHA-256 증적 해시 | `AesGcmIsmsPProtectedDataCryptoService` |
@@ -73,3 +76,10 @@ sequenceDiagram
 - 키 관리 절차, 키 교체, 백업, 폐기 기록
 - 외부 API, 클라우드 저장소, 결제대행 등 제3자 제공 또는 위탁 검토 기록
 - 침해사고 대응 훈련과 백업/복구 테스트 결과
+
+## Transport Key Metadata
+
+- Redis에는 `KeyId`, 알고리즘, 활성 상태, 발급/만료 시각 같은 transport 키 메타데이터만 저장한다.
+- 서버 개인키 원문, DB 저장 암호화 키, hash salt는 Redis가 아니라 비밀 저장소 또는 환경변수에서 관리한다.
+- 서버는 암호화 envelope를 복호화하기 전에 Redis의 KeyId 활성 상태를 확인한다.
+- Redis의 TTL은 공개키 응답의 `ExpiresAtUtc`와 맞추며, 클라이언트는 만료 전에 공개키를 다시 조회한다.

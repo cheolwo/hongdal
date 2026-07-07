@@ -1,4 +1,5 @@
 using Hongdal.Application.Exploration;
+using Hongdal.Controllers;
 using Hongdal.Contracts.Common.Exploration;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -31,14 +32,14 @@ public sealed class 화주탐색문의Controller : ControllerBase
     public async Task<IActionResult> 상세(long campaignId)
     {
         var item = await _sender.Send(new 탐색문의상세조회Query(현재사용자Id(), 역할명.화주, campaignId));
-        return item is null ? NotFound() : Ok(item);
+        return item is null ? this.ToNotFoundProblem("탐색 문의를 찾을 수 없습니다.") : Ok(item);
     }
 
     [HttpPost("{campaignId:long}/reply")]
     public async Task<IActionResult> 응답(long campaignId, [FromBody] 탐색문의응답요청 request)
     {
         var result = await _sender.Send(new 탐색문의응답Command(현재사용자Id(), 역할명.화주, campaignId, request));
-        return result.IsSuccess ? Ok() : BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
+        return result.IsSuccess ? Ok() : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
     }
 
     private string 현재사용자Id()

@@ -9,6 +9,7 @@ using 홍달.Services.Images;
 using 홍달.Services.Payments;
 using 홍달.Services.Sales;
 using 홍달.Services.Versioning;
+using Hongdal.Services.Orderer;
 
 namespace Hongdal.Extensions;
 
@@ -23,6 +24,12 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
         services.AddSingleton<IOrdererGroupScopeLookupService, OrdererGroupScopeLookupService>();
+        services.AddSingleton<IOrdererGroupAutoAssignmentService, OrdererGroupAutoAssignmentService>();
+        services.AddSingleton<IGroupPurchaseLogisticsWorkflowStore, MongoGroupPurchaseLogisticsWorkflowStore>();
+        services.AddSingleton<IGroupPurchaseOverseasShipmentTrackingStore, MongoGroupPurchaseOverseasShipmentTrackingStore>();
+        services.AddSingleton<IGroupPurchaseCommerceFulfillmentPlanStore, MongoGroupPurchaseCommerceFulfillmentPlanStore>();
+        services.AddSingleton<IOrdererGroupOperatingEntityStore, MongoOrdererGroupOperatingEntityStore>();
+        services.AddScoped<IGroupPurchaseOverseasShipmentCustomsSyncService, GroupPurchaseOverseasShipmentCustomsSyncService>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();

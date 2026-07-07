@@ -6,12 +6,12 @@ using 홍달.도메인.통관;
 
 namespace 홍달.Services.External.Customs;
 
-public sealed class 공공데이터화물통관진행조회Service : I화물통관진행조회Service
+public sealed class Unipass화물통관진행조회Service : I화물통관진행조회Service
 {
     private readonly HttpClient _httpClient;
     private readonly CustomsOptions _options;
 
-    public 공공데이터화물통관진행조회Service(HttpClient httpClient, IOptions<CustomsOptions> options)
+    public Unipass화물통관진행조회Service(HttpClient httpClient, IOptions<CustomsOptions> options)
     {
         _httpClient = httpClient;
         _options = options.Value;
@@ -33,17 +33,8 @@ public sealed class 공공데이터화물통관진행조회Service : I화물통�
             return 실패("화물관리번호 또는 MBL/HBL 중 하나는 필요합니다.");
         }
 
-        var query = new Dictionary<string, string?>
-        {
-            ["serviceKey"] = _options.ApiKey,
-            ["type"] = "xml",
-            ["cargMtNo"] = request.화물관리번호,
-            ["mblNo"] = request.MasterBl,
-            ["hblNo"] = request.HouseBl
-        };
-
         var path = _options.CargoTrackingPath.TrimStart('/');
-        var relative = QueryHelpers.AddQueryString(path, query);
+        var relative = QueryHelpers.AddQueryString(path, BuildQuery(request));
 
         try
         {
@@ -72,7 +63,7 @@ public sealed class 공공데이터화물통관진행조회Service : I화물통�
         try
         {
             var doc = XDocument.Parse(xml);
-            var item = doc.Descendants().FirstOrDefault(x => string.Equals(x.Name.LocalName, "item", StringComparison.OrdinalIgnoreCase));
+            var item = FindCargoStatusElement(doc);
             if (item is null)
             {
                 return 실패("통관 진행정보가 없습니다.");
@@ -101,6 +92,27 @@ public sealed class 공공데이터화물통관진행조회Service : I화물통�
     {
         return parent.Elements().FirstOrDefault(x => string.Equals(x.Name.LocalName, localName, StringComparison.OrdinalIgnoreCase))?.Value;
     }
+
+    private Dictionary<string, string?> BuildQuery(화물통관진행조회Request request)
+    {
+        var query = new Dictionary<string, string?>
+        {
+            ["crkyCn"] = _options.ApiKey,
+            ["cargMtNo"] = request.화물관리번호,
+            ["mblNo"] = request.MasterBl,
+            ["hblNo"] = request.HouseBl,
+            ["blYy"] = request.BlYear?.ToString(CultureInfo.InvariantCulture)
+        };
+
+        return query
+            .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+            .ToDictionary(x => x.Key, x => x.Value);
+    }
+
+    private static XElement? FindCargoStatusElement(XDocument doc)
+        => doc.Descendants()
+            .FirstOrDefault(x => string.Equals(x.Name.LocalName, "item", StringComparison.OrdinalIgnoreCase)
+                                 || x.Elements().Any(e => string.Equals(e.Name.LocalName, "csclPrgsStts", StringComparison.OrdinalIgnoreCase)));
 
     private static 통관진행단계 MapStage(string? status)
     {

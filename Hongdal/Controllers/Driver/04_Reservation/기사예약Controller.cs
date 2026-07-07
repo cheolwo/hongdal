@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -38,7 +39,7 @@ namespace Hongdal.Controllers.Driver.Reservation04
 
             if (result.IsFailed)
             {
-                return BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
+                return this.ToProblemActionResult(result.Errors.Select(x => x.Message));
             }
 
             return CreatedAtAction(nameof(상세조회), new { id = result.Value.Id }, result.Value);

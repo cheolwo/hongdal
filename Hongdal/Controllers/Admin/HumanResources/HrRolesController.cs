@@ -1,4 +1,5 @@
 using Hongdal.Application.CommandProcessing;
+using Hongdal.Controllers;
 using Hongdal.Application.HumanResources;
 using Hongdal.Contracts.Common.Hr;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +64,6 @@ public sealed class HrRolesController : ControllerBase
     public async Task<IActionResult> Revoke(Guid assignmentId, CancellationToken cancellationToken)
     {
         var removed = await _roleAssignmentStore.RevokeAsync(assignmentId, cancellationToken);
-        return removed ? NoContent() : NotFound();
+        return removed ? NoContent() : this.ToNotFoundProblem("HR 역할 배정을 찾을 수 없습니다.");
     }
 }

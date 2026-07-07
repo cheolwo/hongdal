@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.Contracts.Driver.Profile;
@@ -32,45 +33,45 @@ public sealed class 용달기사Controller : ControllerBase
     {
         if (request == null)
         {
-            return BadRequest("request body is required");
+            return this.ToProblemActionResult("request body is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.기사명))
         {
-            return BadRequest("기사명 is required");
+            return this.ToProblemActionResult("기사명 is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.연락처))
         {
-            return BadRequest("연락처 is required");
+            return this.ToProblemActionResult("연락처 is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.차량))
         {
-            return BadRequest("차량 is required");
+            return this.ToProblemActionResult("차량 is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.주_활동지역))
         {
-            return BadRequest("주_활동지역 is required");
+            return this.ToProblemActionResult("주_활동지역 is required");
         }
 
         var driverId = GetCurrentUserId();
         if (string.IsNullOrWhiteSpace(driverId))
         {
-            return Unauthorized();
+            return this.ToAuthenticationProblem("기사 인증 정보가 없습니다.");
         }
 
         var existing = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId);
         if (existing != null)
         {
-            return Conflict(new { message = "이미 등록된 용달기사입니다." });
+            return this.ToConflictProblem("이미 등록된 용달기사입니다.");
         }
 
         var user = await _userManager.FindByIdAsync(driverId);
         if (user == null)
         {
-            return Unauthorized();
+            return this.ToAuthenticationProblem("기사 인증 정보가 없습니다.");
         }
 
         if (!await _roleManager.RoleExistsAsync(역할명.기사))
@@ -138,13 +139,13 @@ public sealed class 용달기사Controller : ControllerBase
         var driverId = GetCurrentUserId();
         if (string.IsNullOrWhiteSpace(driverId))
         {
-            return Unauthorized();
+            return this.ToAuthenticationProblem("기사 인증 정보가 없습니다.");
         }
 
         var driver = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId);
         if (driver == null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("용달기사 정보를 찾을 수 없습니다.");
         }
 
         var vehicle = await _db.차량제원.AsNoTracking()

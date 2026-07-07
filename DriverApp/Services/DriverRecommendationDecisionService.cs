@@ -1,10 +1,22 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
 using DriverApp.Models.Driver;
+using Hongdal.Contracts.Driver.Action;
 
 namespace DriverApp.Services;
 
 public sealed class DriverRecommendationDecisionService : IDriverRecommendationDecisionService
 {
+    private readonly HttpClient _httpClient;
+    private readonly IAuthSession _authSession;
     private readonly Dictionary<string, RecommendationDecisionState> _decisions = new(StringComparer.OrdinalIgnoreCase);
+
+    public DriverRecommendationDecisionService(HttpClient httpClient, IAuthSession authSession)
+    {
+        _httpClient = httpClient;
+        _authSession = authSession;
+    }
 
     public event Action? Changed;
 
@@ -17,13 +29,17 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     public RecommendationDecisionState Accept(DriverRequestItem request)
     {
-        request.배차상태 = "수락";
-        request.상태 = "수락완료";
-        return Save(
+        return SaveAccepted(request, "기사님이 추천 의뢰를 수락했습니다.");
+    }
+
+    public async Task<RecommendationDecisionState> AcceptAsync(DriverRequestItem request, CancellationToken cancellationToken = default)
+    {
+        var serverProcessed = await TryPostServerAsync($"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/accept", null, cancellationToken);
+        return SaveAccepted(
             request,
-            DriverRecommendationDecisionCode.Accepted,
-            "기사님이 추천 의뢰를 수락했습니다.",
-            DriverRecommendationDecisionFollowUpPlan.ForAccepted(request.의뢰Id));
+            serverProcessed
+                ? "홍달 서버에서 배차 수락 처리되었습니다."
+                : "서버 연결 전이라 앱 로컬 상태로 수락 처리했습니다.");
     }
 
     public RecommendationDecisionState Hold(DriverRequestItem request)
@@ -39,11 +55,69 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     public RecommendationDecisionState CancelAccepted(DriverRequestItem request, string reason)
     {
-        request.배차상태 = "수락취소";
-        request.상태 = "재배차필요";
         var memo = string.IsNullOrWhiteSpace(reason)
             ? "기사님이 수락한 추천 의뢰를 취소했습니다."
             : $"기사님이 수락한 추천 의뢰를 취소했습니다. 사유: {reason}";
+        return SaveAcceptanceCanceled(request, reason, memo);
+    }
+
+    public async Task<RecommendationDecisionState> CancelAcceptedAsync(DriverRequestItem request, string reason, CancellationToken cancellationToken = default)
+    {
+        var serverProcessed = await TryPostServerAsync(
+            $"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/cancel-acceptance",
+            new 기사배차수락취소요청 { 사유 = reason },
+            cancellationToken);
+        var memo = serverProcessed
+            ? "홍달 서버에서 배차 수락 취소가 접수되었습니다."
+            : "서버 연결 전이라 앱 로컬 상태로 수락 취소 처리했습니다.";
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            memo = $"{memo} 사유: {reason}";
+        }
+
+        return SaveAcceptanceCanceled(request, reason, memo);
+    }
+
+    public RecommendationDecisionState Reject(DriverRequestItem request, string reason)
+    {
+        var memo = string.IsNullOrWhiteSpace(reason)
+            ? "기사님이 추천 의뢰를 거절했습니다."
+            : $"기사님이 추천 의뢰를 거절했습니다. 사유: {reason}";
+        return SaveRejected(request, reason, memo);
+    }
+
+    public async Task<RecommendationDecisionState> RejectAsync(DriverRequestItem request, string reason, CancellationToken cancellationToken = default)
+    {
+        var serverProcessed = await TryPostServerAsync(
+            $"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/reject",
+            new 기사배차거절요청 { 사유 = reason },
+            cancellationToken);
+        var memo = serverProcessed
+            ? "홍달 서버에서 배차 거절 처리되었습니다."
+            : "서버 연결 전이라 앱 로컬 상태로 거절 처리했습니다.";
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            memo = $"{memo} 사유: {reason}";
+        }
+
+        return SaveRejected(request, reason, memo);
+    }
+
+    private RecommendationDecisionState SaveAccepted(DriverRequestItem request, string memo)
+    {
+        request.배차상태 = "수락";
+        request.상태 = "수락완료";
+        return Save(
+            request,
+            DriverRecommendationDecisionCode.Accepted,
+            memo,
+            DriverRecommendationDecisionFollowUpPlan.ForAccepted(request.의뢰Id));
+    }
+
+    private RecommendationDecisionState SaveAcceptanceCanceled(DriverRequestItem request, string reason, string memo)
+    {
+        request.배차상태 = "수락취소";
+        request.상태 = "재배차필요";
         return Save(
             request,
             DriverRecommendationDecisionCode.AcceptanceCanceled,
@@ -51,13 +125,10 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             DriverRecommendationDecisionFollowUpPlan.ForAcceptanceCanceled(request.의뢰Id, reason));
     }
 
-    public RecommendationDecisionState Reject(DriverRequestItem request, string reason)
+    private RecommendationDecisionState SaveRejected(DriverRequestItem request, string reason, string memo)
     {
         request.배차상태 = "거절";
         request.상태 = "추천제외";
-        var memo = string.IsNullOrWhiteSpace(reason)
-            ? "기사님이 추천 의뢰를 거절했습니다."
-            : $"기사님이 추천 의뢰를 거절했습니다. 사유: {reason}";
         return Save(
             request,
             DriverRecommendationDecisionCode.Rejected,
@@ -75,6 +146,110 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
         _decisions[request.의뢰Id] = state;
         Changed?.Invoke();
         return state;
+    }
+
+    private async Task<bool> TryPostServerAsync(string path, object? payload, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
+        {
+            return false;
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
+        if (payload is not null)
+        {
+            request.Content = JsonContent.Create(payload);
+        }
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return false;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+
+        using (response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, cancellationToken));
+        }
+    }
+
+    private static async Task<string> BuildFailureMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return $"서버 배차 처리에 실패했습니다. HTTP {(int)response.StatusCode}";
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(body);
+            var root = document.RootElement;
+            var title = ReadString(root, "title");
+            var errorCode = ReadString(root, "errorCode");
+            var traceId = ReadString(root, "traceId");
+            var errors = ReadErrors(root);
+            var message = errors.Count > 0
+                ? string.Join(" / ", errors)
+                : string.IsNullOrWhiteSpace(title)
+                    ? body
+                    : title;
+
+            var suffix = new List<string>();
+            if (!string.IsNullOrWhiteSpace(errorCode))
+            {
+                suffix.Add(errorCode);
+            }
+
+            if (!string.IsNullOrWhiteSpace(traceId))
+            {
+                suffix.Add($"traceId={traceId}");
+            }
+
+            return suffix.Count == 0
+                ? $"서버 배차 처리에 실패했습니다. HTTP {(int)response.StatusCode}: {message}"
+                : $"서버 배차 처리에 실패했습니다. HTTP {(int)response.StatusCode}: {message} ({string.Join(", ", suffix)})";
+        }
+        catch (JsonException)
+        {
+            return $"서버 배차 처리에 실패했습니다. HTTP {(int)response.StatusCode}: {body}";
+        }
+    }
+
+    private static string? ReadString(JsonElement root, string propertyName)
+    {
+        return root.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
+    }
+
+    private static IReadOnlyList<string> ReadErrors(JsonElement root)
+    {
+        if (!root.TryGetProperty("errors", out var errors) || errors.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        return errors.EnumerateArray()
+            .Where(x => x.ValueKind == JsonValueKind.String)
+            .Select(x => x.GetString())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Cast<string>()
+            .ToArray();
     }
 }
 

@@ -22,6 +22,8 @@ Hongdal은 화주, 기사, 창고, 운영자가 같은 물류 흐름을 공유�
 
 1.0에서 직접 도움이 되지 않는 음식 배달, 홍달마트, 국제 통관, HS 코드, 공동주문 기능은 이후 버전 범위로 둡니다. 구현이 일부 존재하더라도 기본 노출은 1.0 운송 흐름을 해치지 않는 수준으로 제한합니다.
 
+최근 `2.5` 확장 축에는 주문자 집단 공동주문, 해외 선적/통관 조회, 국내 물류대행 입고, 판매채널 출품, 출고 배치, 주문자 집단 운영 주체와 입주민 우선 고용 흐름이 추가되었습니다. 상세 흐름과 용어 정의는 [주문자 집단 공동주문/커머스 흐름](docs/ProjectOverview/orderer-group-commerce-flows.md)을 기준으로 관리합니다.
+
 ## 버전 방향
 
 | 버전 | 목표 |
@@ -50,6 +52,15 @@ Hongdal은 화주, 기사, 창고, 운영자가 같은 물류 흐름을 공유�
 | `WarehouseManagerApp` | 창고 현장 앱 |
 | `HumanResourcesManagerApp` | 인력 관리자 앱 |
 
+## 주요 용어
+
+- 온보딩: 새 사용자가 서비스에 처음 들어왔을 때 계정, 역할, 기본 설정, 기존 주문/창고/거래 단서를 연결해 실제 업무를 시작할 수 있게 만드는 초기 절차입니다. 예를 들어 외부 주문자가 회원가입한 뒤 주문참조번호와 본인 단서로 기존 출고예정이나 관계 후보를 찾는 과정이 온보딩에 포함됩니다.
+- 출고 예약: 재고가 충분한 주문이나 운송 요청에 대해, 실제 피킹/포장 전에 해당 물량을 출고 대상으로 잡아두는 상태입니다.
+- 주문자 집단: 같은 주소, 생활권, 공동주택, 초대코드 같은 단서를 공유해 공동 주문이나 공동 입고를 함께 할 수 있는 사용자 묶음입니다.
+- 물류대행사/3PL: 보관, 입고, 피킹, 포장, 출고 같은 물류 업무를 대신 수행하는 외부 물류 업체입니다.
+- 출고 배치: 주문이 들어왔을 때 어느 창고의 어떤 재고를 어떤 수량으로 출고할지 정하는 계획입니다.
+- BL: Bill of Lading의 약자로, 선박 운송에서 화물이 선적되었음을 증명하는 선하증권입니다.
+
 ## 실행과 검증
 
 ```powershell
@@ -63,7 +74,8 @@ dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 
 - 로드맵과 업무 흐름: [docs/ProjectOverview](docs/ProjectOverview/README.md)
 - 버전별 범위: [docs/Versions](docs/Versions/README.md)
-- 화면/컨트롤러 매핑: [docs/ViewControllerMapping](docs/ViewControllerMapping/README.md)
+- 화면 처리 흐름: [docs/ProjectOverview/screen-flows.md](docs/ProjectOverview/screen-flows.md)
+- 주문자 집단 공동주문/커머스 흐름: [docs/ProjectOverview/orderer-group-commerce-flows.md](docs/ProjectOverview/orderer-group-commerce-flows.md)
 - 개인정보/계약 ISMS-P 준비도: [docs/Compliance/ISMS-P-readiness.md](docs/Compliance/ISMS-P-readiness.md)
 - ISMS-P 보호 데이터 흐름: [docs/Compliance/ISMS-P-protected-data-flow.md](docs/Compliance/ISMS-P-protected-data-flow.md)
 - Command/Event 원칙: [docs/Architecture/CommandEvent리팩토링원칙.md](docs/Architecture/CommandEvent리팩토링원칙.md)

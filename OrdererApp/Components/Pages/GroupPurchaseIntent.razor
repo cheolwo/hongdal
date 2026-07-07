@@ -1,5 +1,6 @@
 @page "/group-purchase"
 @using Hongdal.Contracts.Common.Orderer
+@inject IGroupPurchaseShipmentTrackingService ShipmentTrackingService
 
 <PageTitle>먹거리 공동주문</PageTitle>
 
@@ -19,6 +20,87 @@
         {
             <MudAlert Severity="@statusSeverity" Variant="Variant.Outlined">@statusMessage</MudAlert>
         }
+
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">해외 공동구매 화물 위치 조회</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            플랫폼에 등록된 문서관리번호로 B/L 또는 AWB 기준 선적 상태와 공개 위치 이력을 확인합니다.
+                        </MudText>
+                    </MudStack>
+                    @if (shipmentTracking is not null)
+                    {
+                        <MudChip T="string" Color="@ShipmentStatusColor(shipmentTracking.CurrentStatusCode)" Variant="Variant.Filled">
+                            @ShipmentStatusLabel(shipmentTracking.CurrentStatusCode)
+                        </MudChip>
+                    }
+                </MudStack>
+
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudTextField T="string"
+                                  Label="문서관리번호"
+                                  @bind-Value="shipmentDocumentManagementNumber"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Class="flex-grow-1" />
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               Disabled="@isShipmentTrackingLoading"
+                               OnClick="LookupShipmentTracking">
+                        조회
+                    </MudButton>
+                </MudStack>
+
+                @if (!string.IsNullOrWhiteSpace(shipmentTrackingMessage))
+                {
+                    <MudAlert Severity="@shipmentTrackingSeverity" Variant="Variant.Outlined">@shipmentTrackingMessage</MudAlert>
+                }
+
+                @if (shipmentTracking is not null)
+                {
+                    <MudGrid>
+                        <MudItem xs="12" md="4">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">현재 위치</MudText>
+                                <MudText Typo="Typo.subtitle1">@shipmentTracking.CurrentLocationSummary</MudText>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">운송 문서</MudText>
+                                <MudText Typo="Typo.subtitle1">@TransportDocumentLabel(shipmentTracking.TransportDocumentType) @shipmentTracking.TransportDocumentNumber</MudText>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">도착 예정</MudText>
+                                <MudText Typo="Typo.subtitle1">@DateLabel(shipmentTracking.EstimatedArrivalAtUtc)</MudText>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudStack Spacing="2">
+                        @foreach (var item in shipmentTracking.Events.OrderByDescending(x => x.OccurredAtUtc))
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.subtitle2">@item.DisplayName</MudText>
+                                        <MudText Typo="Typo.body2">@item.LocationSummary</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.SourcePartyCode</MudText>
+                                    </MudStack>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@DateLabel(item.OccurredAtUtc)</MudText>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                }
+            </MudStack>
+        </MudPaper>
 
         <MudGrid>
             <MudItem xs="12" lg="4">
@@ -264,6 +346,11 @@
     private bool nonBindingAgreementAccepted;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
+    private string shipmentDocumentManagementNumber = "HD-GP-IMPORT-2026-0001";
+    private GroupPurchaseOverseasShipmentPublicDto? shipmentTracking;
+    private bool isShipmentTrackingLoading;
+    private string? shipmentTrackingMessage;
+    private Severity shipmentTrackingSeverity = Severity.Info;
 
     private HsFoodGroupPurchaseProductCard SelectedProduct
         => ProductCards.First(x => x.ProductCardId == selectedProductCardId);
@@ -300,6 +387,38 @@
 
         statusSeverity = Severity.Success;
         statusMessage = $"{SelectedProduct.ProductName} 공동 주문 집단 개설 신청이 승인 대기 상태로 접수되었습니다. 승인되면 다른 주문자들이 참여할 수 있습니다.";
+    }
+
+    private async Task LookupShipmentTracking()
+    {
+        if (string.IsNullOrWhiteSpace(shipmentDocumentManagementNumber))
+        {
+            shipmentTracking = null;
+            shipmentTrackingSeverity = Severity.Warning;
+            shipmentTrackingMessage = "문서관리번호를 입력해 주세요.";
+            return;
+        }
+
+        isShipmentTrackingLoading = true;
+        shipmentTrackingMessage = null;
+
+        try
+        {
+            shipmentTracking = await ShipmentTrackingService.LookupAsync(shipmentDocumentManagementNumber);
+            if (shipmentTracking is null)
+            {
+                shipmentTrackingSeverity = Severity.Warning;
+                shipmentTrackingMessage = "해당 문서관리번호로 조회 가능한 해외 공동구매 선적 정보가 없습니다.";
+                return;
+            }
+
+            shipmentTrackingSeverity = Severity.Success;
+            shipmentTrackingMessage = $"{shipmentTracking.ProductSummary} 선적 정보를 조회했습니다.";
+        }
+        finally
+        {
+            isShipmentTrackingLoading = false;
+        }
     }
 
     private ColdChainFoodGroupPurchasePlan PlanProduct(HsFoodGroupPurchaseProductCard product)
@@ -390,5 +509,49 @@
             OrdererGroupOpeningApplicationStatusCode.ApprovedGroupReady => "집단 생성",
             OrdererGroupOpeningApplicationStatusCode.Rejected => "반려",
             _ => "작성 중"
+        };
+
+    private static string TransportDocumentLabel(string value)
+        => value switch
+        {
+            GroupPurchaseShipmentDocumentTypeCode.AirWaybill => "AWB",
+            _ => "B/L"
+        };
+
+    private static string DateLabel(DateTime? value)
+        => value.HasValue ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-";
+
+    private static string DateLabel(DateTime value)
+        => value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+
+    private static string ShipmentStatusLabel(string value)
+        => value switch
+        {
+            GroupPurchaseShipmentStatusCode.DocumentRegistered => "문서 등록",
+            GroupPurchaseShipmentStatusCode.OverseasPacked => "해외 포장",
+            GroupPurchaseShipmentStatusCode.LoadedOnVesselOrFlight => "선적 완료",
+            GroupPurchaseShipmentStatusCode.InTransit => "운송 중",
+            GroupPurchaseShipmentStatusCode.ArrivedAtPort => "도착",
+            GroupPurchaseShipmentStatusCode.CustomsInProgress => "통관 중",
+            GroupPurchaseShipmentStatusCode.CustomsCleared => "통관 완료",
+            GroupPurchaseShipmentStatusCode.DomesticWarehouseReceived => "국내 입고",
+            GroupPurchaseShipmentStatusCode.DomesticCarrierPickup => "국내 기사 상차",
+            GroupPurchaseShipmentStatusCode.ApartmentDropoff => "공동주택 거점 하차",
+            GroupPurchaseShipmentStatusCode.DistributionInProgress => "분배 중",
+            GroupPurchaseShipmentStatusCode.Completed => "완료",
+            GroupPurchaseShipmentStatusCode.Exception => "예외",
+            _ => value
+        };
+
+    private static Color ShipmentStatusColor(string value)
+        => value switch
+        {
+            GroupPurchaseShipmentStatusCode.Completed => Color.Success,
+            GroupPurchaseShipmentStatusCode.Exception => Color.Error,
+            GroupPurchaseShipmentStatusCode.CustomsCleared => Color.Info,
+            GroupPurchaseShipmentStatusCode.DomesticWarehouseReceived => Color.Info,
+            GroupPurchaseShipmentStatusCode.DomesticCarrierPickup => Color.Primary,
+            GroupPurchaseShipmentStatusCode.ApartmentDropoff => Color.Success,
+            _ => Color.Default
         };
 }

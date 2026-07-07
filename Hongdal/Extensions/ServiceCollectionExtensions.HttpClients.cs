@@ -56,7 +56,7 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri(options.UnipassBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
-        services.AddHttpClient<I화물통관진행조회Service, 공공데이터화물통관진행조회Service>((sp, client) =>
+        services.AddHttpClient<I화물통관진행조회Service, Unipass화물통관진행조회Service>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CustomsOptions>>().Value;
             client.BaseAddress = new Uri(options.CargoTrackingBaseUrl);
@@ -72,6 +72,12 @@ public static partial class ServiceCollectionExtensions
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
             client.BaseAddress = new Uri(options.ApartmentComplex.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IApartmentManagementFeeLookupService, ApartmentManagementFeeLookupService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.ApartmentManagementFee.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddHttpClient<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();

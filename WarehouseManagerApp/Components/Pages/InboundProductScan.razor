@@ -9,7 +9,7 @@
         <MudStack Spacing="0">
             <MudText Typo="Typo.h4">입고 상품 확인</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                상품 바코드를 입력하면 입고 예정 상품을 조회합니다. 예정 정보가 없어도 현장 입고로 임시 등록해 시스템에 편입할 수 있습니다.
+                상품 바코드를 입력하면 입고 예정 상품을 조회합니다. 입고 확인은 상품 바코드와 입고 묶음 바코드가 함께 확인되어야 완료됩니다.
             </MudText>
         </MudStack>
 
@@ -81,6 +81,15 @@
                                           Label="상품 바코드"
                                           @bind-Value="unplannedProductBarcode"
                                           Variant="Variant.Outlined"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string"
+                                          Label="입고 묶음 바코드"
+                                          @bind-Value="unplannedInboundBundleBarcode"
+                                          Variant="Variant.Outlined"
+                                          Placeholder="BND:IN-001"
                                           Adornment="Adornment.Start"
                                           AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" />
                         </MudItem>
@@ -189,6 +198,7 @@
                         <MudExpansionPanel Text="수량과 보관" Icon="@Icons.Material.Filled.FactCheck">
                             <HongdalSensitiveInfoRow Label="예정 수량" Value="@selectedProduct.ExpectedQuantity.ToString()" />
                             <HongdalSensitiveInfoRow Label="실제 입고 수량" Value="@receivedQuantity.ToString()" />
+                            <HongdalSensitiveInfoRow Label="입고 묶음 바코드" Value="@inboundBundleBarcode" />
                             <HongdalSensitiveInfoRow Label="보관 조건" Value="@selectedProduct.StorageType" />
                             <HongdalSensitiveInfoRow Label="수량 상태" Value="@QuantityStatus" />
                         </MudExpansionPanel>
@@ -209,8 +219,16 @@
                                      Min="0"
                                      Variant="Variant.Outlined" />
 
+                    <MudTextField T="string"
+                                  Label="입고 묶음 바코드"
+                                  @bind-Value="inboundBundleBarcode"
+                                  Variant="Variant.Outlined"
+                                  Placeholder="BND:IN-001"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" />
+
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        수량이 맞으면 입고 확인 상태로 변경하고 검수 작업으로 이동합니다. 차이가 있으면 차이 상태를 남긴 뒤 검수에서 사유를 확인합니다.
+                        수량과 입고 묶음 바코드가 확인되면 입고 확인 상태로 변경하고 검수 작업으로 이동합니다. 묶음 바코드 하나에는 상품 종류 최대 3개와 각 수량이 포함됩니다.
                     </MudText>
 
                     <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
@@ -258,7 +276,9 @@
     private int receivedQuantity;
     private bool isInboundConfirmed;
     private bool showUnplannedInboundForm;
+    private string inboundBundleBarcode = string.Empty;
     private string unplannedProductBarcode = string.Empty;
+    private string unplannedInboundBundleBarcode = string.Empty;
     private string unplannedProductName = string.Empty;
     private string unplannedSupplier = string.Empty;
     private int unplannedReceivedQuantity = 1;
@@ -291,6 +311,7 @@
         productBarcode = (value ?? string.Empty).Trim();
         message = null;
         isInboundConfirmed = false;
+        inboundBundleBarcode = string.Empty;
         showUnplannedInboundForm = false;
         return Task.CompletedTask;
     }
@@ -320,6 +341,7 @@
 
         showUnplannedInboundForm = false;
         receivedQuantity = selectedProduct.ExpectedQuantity;
+        inboundBundleBarcode = BuildDefaultBundleBarcode(selectedProduct.InboundRequestNo);
         messageSeverity = Severity.Success;
         message = $"{selectedProduct.Name} 입고 예정 정보를 불러왔습니다.";
     }
@@ -337,9 +359,11 @@
         {
             var result = await ReceivingWorkflow.ConfirmReceivedAsync(new InboundReceivingConfirmationRequest(
                 selectedProduct.Barcode,
+                inboundBundleBarcode,
                 receivedQuantity));
 
             isInboundConfirmed = true;
+            inboundBundleBarcode = result.InboundBundleBarcode;
             messageSeverity = result.QuantityMatched ? Severity.Success : Severity.Warning;
             message = result.Message;
         }
@@ -372,6 +396,7 @@
         {
             var result = await ReceivingWorkflow.RegisterUnplannedInboundAsync(new UnplannedInboundRegistrationRequest(
                 unplannedProductBarcode,
+                unplannedInboundBundleBarcode,
                 unplannedProductName,
                 unplannedSupplier,
                 unplannedReceivedQuantity,
@@ -382,6 +407,7 @@
             expectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
             selectedProduct = result.Product;
             productBarcode = result.Product.Barcode;
+            inboundBundleBarcode = result.InboundBundleBarcode;
             receivedQuantity = result.ReceivedQuantity;
             isInboundConfirmed = true;
             showUnplannedInboundForm = false;
@@ -406,6 +432,7 @@
         productBarcode = string.Empty;
         selectedProduct = null;
         receivedQuantity = 0;
+        inboundBundleBarcode = string.Empty;
         isInboundConfirmed = false;
         showUnplannedInboundForm = false;
         message = null;
@@ -414,6 +441,7 @@
     private void PrefillUnplannedInbound()
     {
         unplannedProductBarcode = productBarcode;
+        unplannedInboundBundleBarcode = BuildDefaultBundleBarcode("UNPLANNED");
         unplannedProductName = string.Empty;
         unplannedSupplier = string.Empty;
         unplannedReceivedQuantity = Math.Max(1, receivedQuantity);
@@ -431,4 +459,13 @@
         => product.IsUnplannedInbound
             ? $"{product.Supplier}, 계약 확인 담당자, 검수 담당자"
             : $"{product.Supplier}, 화주 재고 담당자, 검수 담당자";
+
+    private static string BuildDefaultBundleBarcode(string seed)
+    {
+        var value = new string((seed ?? string.Empty)
+            .Where(char.IsLetterOrDigit)
+            .TakeLast(8)
+            .ToArray());
+        return $"BND:{(string.IsNullOrWhiteSpace(value) ? "INBOUND" : value)}";
+    }
 }

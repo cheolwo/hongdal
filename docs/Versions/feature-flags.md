@@ -20,7 +20,7 @@
 | `CargoYongdalV1` | `1.0` | `true` | 국내 화물/용달 운송 핵심 흐름 |
 | `WarehouseV15` | `1.5` | `false` | 입고, 적재, 출고, 재위탁 창고 흐름 |
 | `CustomsHsV20` | `2.0` | `false` | HS 코드, 통관, 관세사 보정 |
-| `OrdererGroupOrderV25` | `2.5` | `false` | 주문자 집단 공동 주문, FCL/대량 입고, 집단 내 분류 |
+| `OrdererGroupOrderV25` | `2.5` | `false` | 주문자 집단 공동 주문, 해외 선적/통관 조회, 국내 물류대행 입고, 판매채널 출품, 집단 내 분류/배분, 입주민 우선 고용 |
 | `FoodDeliveryV30` | `3.0` | `false` | 음식점 일반 음식 배달, 조리/픽업, 고객 배송 |
 | `HongdalMartV35` | `3.5` | `false` | 홍달마트, 도심 즉시배송, 피킹/포장 후 음식 배달 기사 픽업 |
 
@@ -60,7 +60,7 @@
 
 1. `1.0` 안정화 중에는 `CargoYongdalV1=true`, 나머지는 `false`로 둡니다.
 2. `1.5` 창고 기능을 내부 테스트할 때 `WarehouseV15=true`로 바꾸되, 운영 사용자 View 가시성은 제한합니다.
-3. `2.5` 주문자 집단 공동 주문은 API/DB가 먼저 들어와도 `OrdererGroupOrderV25=false`이면 기본 화면에 노출하지 않습니다.
+3. `2.5` 주문자 집단 공동 주문, 해외 선적/통관 조회, 물류대행 입고, 판매채널 출품, 집단 내 고용 흐름은 API/DB가 먼저 들어와도 `OrdererGroupOrderV25=false`이면 기본 화면에 노출하지 않습니다.
 4. `3.0` 음식점 일반 배달은 `FoodDeliveryV30=true`가 되기 전까지 음식 배달 기사 배차 흐름에 실운영 주문을 흘려보내지 않습니다.
 5. `3.5` 홍달마트는 `HongdalMartV35=true`가 되기 전까지 도심 즉시배송 주문을 피킹/포장/배차 실운영 흐름에 흘려보내지 않습니다.
 

@@ -21,6 +21,11 @@
 | 상품 카드 기반 집단 개설 | 주문자가 HS 먹거리 상품 카드를 보고 공동 주문 집단 개설을 신청하면 운영 승인 후 다른 주문자가 참여 |
 | 수입 식품 공동 주문 계약서 | 계약 영역에서 개설 신청자, 공급자/화주, 플랫폼 운영자, HS 식품 조건, 지급/분배/환불 조항을 관리 |
 | 마일스톤 지급 | 주문자 선결제 부담을 줄이기 위해 상차, 하차, 분배 확인 기준으로 지급 시기를 분리 |
+| 해외 선적/통관 추적 | BL/AWB, 문서관리번호, UNI-PASS 통관 상태를 공동주문 원장으로 연결 |
+| 국내 물류대행 입고 | 공동수입 물품을 국내 물류대행사 또는 3PL에 입고하고, 입고상품/재고 로트/판매상품으로 연결 |
+| 판매채널 출품과 출고 배치 | 스마트스토어/쿠팡 등 판매채널 주문을 창고 재고와 출고 배치 엔진으로 연결 |
+| 주문자 집단 운영 주체 | 비사업자 모임, 개인사업자, 법인, 협동조합, 관리사무소 위임, 플랫폼 위임을 구분 |
+| 입주민 우선 고용 | 공동주문 분류/배분, 택배·공동구매 물품 집합, 공동주택 관리 보조, 경비/순찰 보조 업무를 단지 내부 주민 우선으로 설계 |
 | 화주/주문자 연결 | 화주가 수입 또는 대량 구매 예정 상품을 공개하고 주문자가 선주문 의사를 등록 |
 | FCL/대량 입고 | 컨테이너 또는 팔레트 단위 화물이 집단 대표 입고 지점으로 들어오는 흐름 |
 | 집단 내 분류 | 입고된 물품을 동, 라인, 수령 지점, 세대, 그룹 수령 지점 단위로 분류 |
@@ -44,6 +49,7 @@
 - 공동주택 식별/주소 확인 서비스
 - 공동 주문 모집 서비스
 - 먹거리/냉동 식품 공동주문 플래너
+- 1.5 출고 배치 엔진
 
 ## 안정화 기준
 
@@ -55,6 +61,11 @@
 - 운영 승인 뒤 같은 주문자 집단 범위의 다른 주문자가 구매 의향으로 참여할 수 있다.
 - 실제 공급 단계로 넘어가기 전 수입 식품 공동 주문 계약서의 필수 당사자와 조항을 확인할 수 있다.
 - 공동구매 금액은 상차 1차, 하차 2차, 분배 확인 최종 지급처럼 마일스톤으로 나눌 수 있다.
+- 해외 판매자 건은 BL/AWB와 문서관리번호로 선적/통관 상태를 조회할 수 있다.
+- 통관 완료 후 국내 물류대행 입고, 재고 로트 확정, 판매채널 출품, 출고 배치 가능 상태를 구분할 수 있다.
+- 공동수입 물품이 판매채널 주문으로 판매될 때 1.5 출고 배치 엔진을 재사용해 창고/입고상품/출고예정으로 연결할 수 있다.
+- 주문자 집단 운영 주체가 직접 수입자/고용주가 될 수 있는지 사업자 검증 상태와 함께 확인할 수 있다.
+- 단지 내부 주민을 우선 고용하는 역할 정책과 외부 인력 허용 여부를 구분할 수 있다.
 - 목표 수량 또는 FCL 가능 조건에 도달하면 화주 운송/입고 계획으로 연결된다.
 - 집단 대표 입고 지점과 동/수령 지점별 분류 작업이 기록된다.
 - 주문자 개인정보는 필요한 범위만 마스킹 또는 제한 공개된다.
@@ -86,6 +97,8 @@
 - 개인정보 필드 보호 카탈로그: `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
 - 주문자 공동구매 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`
 - 먹거리 공동주문 정책 문서: `docs/Architecture/FoodFocusedGroupPurchase.md`
+- 주문자 집단 공동주문/커머스 흐름 문서: `docs/ProjectOverview/orderer-group-commerce-flows.md`
+- 출고 배치 엔진 상세 문서: `docs/Architecture/OutboundBatchEngine.md`
 - 메타데이터 조회 API: `GET /api/v1/public-data/apis`
 - 실제 데이터 조회 API:
   - `GET /api/v1/orderer/public-data/addresses?keyword={주소}`
@@ -93,6 +106,9 @@
   - `GET /api/v1/orderer/public-data/orderer-group-scopes?kakaoRegionLevel1={시도}&kakaoRegionLevel2={시군구}`
   - `GET /api/v1/orderer/public-data/apartment-complexes?sidoCode={시도코드}`
   - `GET /api/v1/orderer/public-data/apartment-complexes/{complexCode}/basic`
+  - `GET /api/v1/orderer/group-purchase-overseas-shipments/lookup?documentManagementNumber={문서관리번호}`
+  - `GET /api/v1/orderer/group-purchase-commerce-fulfillment-plans/by-group-purchase/{groupPurchaseId}`
+  - `GET /api/v1/orderer/orderer-group-operating-entities/{ordererGroupScopeKey}`
 
 메타데이터 모듈은 공공데이터 API의 출처, 사용 목적, 버전 범위, 주요 파라미터, 개인정보/거주정보 주의 여부를 관리합니다. 실제 호출 모듈은 주소 조회와 공동주택 단지 조회부터 분리되어 있으며, API 키가 없으면 실패 응답을 반환합니다.
 

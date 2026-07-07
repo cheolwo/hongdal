@@ -34,7 +34,8 @@ public sealed record WarehouseScanRequirement(
 public sealed record WarehouseScanStepDefinition(
     string Step,
     string DisplayName,
-    IReadOnlyList<WarehouseScanRequirement> Requirements);
+    IReadOnlyList<WarehouseScanRequirement> Requirements,
+    int? MaxDistinctProductKinds = null);
 
 public sealed record WarehouseScanAction(
     string Step,
@@ -96,7 +97,8 @@ public static class WarehouseScanWorkflowPlanner
             "Inbound receive",
             [
                 new(WarehouseBarcodeKindCode.InboundRequest, "Inbound request"),
-                new(WarehouseBarcodeKindCode.Product, "Product")
+                new(WarehouseBarcodeKindCode.Product, "Product"),
+                new(WarehouseBarcodeKindCode.Bundle, "Inbound bundle")
             ]),
         new(
             WarehouseScanStepCode.SplitProduct,
@@ -111,14 +113,14 @@ public static class WarehouseScanWorkflowPlanner
             [
                 new(WarehouseBarcodeKindCode.Product, "Product"),
                 new(WarehouseBarcodeKindCode.Bundle, "Bundle")
-            ]),
+            ],
+            MaxDistinctProductKinds: 3),
         new(
             WarehouseScanStepCode.PutAway,
             "Put away",
             [
-                new(WarehouseBarcodeKindCode.Product, "Product"),
                 new(WarehouseBarcodeKindCode.StorageLocation, "Storage location"),
-                new(WarehouseBarcodeKindCode.Bundle, "Bundle", IsRequired: false),
+                new(WarehouseBarcodeKindCode.Bundle, "Inbound bundle"),
                 new(WarehouseBarcodeKindCode.HandlingUnit, "Handling unit", IsRequired: false)
             ])
     ];
@@ -147,13 +149,15 @@ public static class WarehouseScanWorkflowPlanner
             .Select(x => x.Label)
             .ToArray();
 
-        var isReady = missing.Length == 0;
+        var productKindLimitExceeded = definition.MaxDistinctProductKinds.HasValue &&
+                                       CountDistinctProductKinds(scanList) > definition.MaxDistinctProductKinds.Value;
+        var isReady = missing.Length == 0 && !productKindLimitExceeded;
         var action = new WarehouseScanAction(
             definition.Step,
             ResolveActionCode(definition.Step),
             definition.DisplayName,
             isReady,
-            isReady ? "Ready to process." : $"Scan required: {string.Join(", ", missing)}",
+            ResolveMessage(isReady, missing, productKindLimitExceeded, definition.MaxDistinctProductKinds),
             scanList);
 
         return new WarehouseScanSession(definition.Step, scanList, action);
@@ -169,6 +173,34 @@ public static class WarehouseScanWorkflowPlanner
             WarehouseScanStepCode.PutAway => "confirm-put-away",
             _ => "confirm-scan-step"
         };
+    }
+
+    private static string ResolveMessage(
+        bool isReady,
+        IReadOnlyCollection<string> missing,
+        bool productKindLimitExceeded,
+        int? maxDistinctProductKinds)
+    {
+        if (isReady)
+        {
+            return "Ready to process.";
+        }
+
+        if (productKindLimitExceeded)
+        {
+            return $"Bundle can include up to {maxDistinctProductKinds} distinct product kinds. Split the bundle and rescan.";
+        }
+
+        return $"Scan required: {string.Join(", ", missing)}";
+    }
+
+    private static int CountDistinctProductKinds(IEnumerable<WarehouseBarcodeScan> scans)
+    {
+        return scans
+            .Where(x => Matches(x.Kind, WarehouseBarcodeKindCode.Product))
+            .Select(x => x.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
     }
 
     private static bool Matches(string actual, string expected)

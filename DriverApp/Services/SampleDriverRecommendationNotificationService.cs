@@ -1,5 +1,4 @@
 using DriverApp.Models.Driver.Map;
-using System.Globalization;
 
 namespace DriverApp.Services;
 
@@ -70,13 +69,12 @@ public sealed class SampleDriverRecommendationNotificationService : IDriverRecom
         var marker = mapService
             .BuildMarkers(sampleDataService.추천의뢰목록)
             .FirstOrDefault(IsPendingMarker);
-        if (marker is null ||
-            !long.TryParse(marker.RequestId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var requestId))
+        if (marker is null)
         {
             return null;
         }
 
-        var request = sampleDataService.추천의뢰조회(requestId);
+        var request = sampleDataService.추천의뢰조회(marker.RequestId);
         if (request is null)
         {
             return null;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.Controllers;
 using 홍달.Services;
 using 홍달.Services.Storage.Local;
 
@@ -27,17 +28,17 @@ public sealed class 파일POD관리Controller : ControllerBase
     {
         if (request == null || request.File == null)
         {
-            return BadRequest("file is required");
+            return this.ToProblemActionResult("file is required");
         }
 
         if (request.File.Length <= 0)
         {
-            return BadRequest("empty file is not allowed");
+            return this.ToProblemActionResult("empty file is not allowed");
         }
 
         if (string.IsNullOrWhiteSpace(request.FileType))
         {
-            return BadRequest("fileType is required");
+            return this.ToProblemActionResult("fileType is required");
         }
 
         await using var stream = request.File.OpenReadStream();
@@ -103,13 +104,13 @@ public sealed class 파일POD관리Controller : ControllerBase
     {
         if (request == null || string.IsNullOrWhiteSpace(request.UploadStatus))
         {
-            return BadRequest("uploadStatus is required");
+            return this.ToProblemActionResult("uploadStatus is required");
         }
 
         var updated = _store.UpdateStatus(id, request.UploadStatus.Trim());
         if (updated == null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("파일 POD 정보를 찾을 수 없습니다.");
         }
 
         return Ok(new

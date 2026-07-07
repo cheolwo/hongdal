@@ -67,9 +67,9 @@ public sealed class 기사샘플데이터Service : IDriverSampleDataService
 
     public IReadOnlyList<기사알림샘플항목> 알림목록 => _알림목록;
 
-    public DriverRequestItem? 추천의뢰조회(long 의뢰Id)
+    public DriverRequestItem? 추천의뢰조회(string 의뢰Id)
     {
-        return _추천의뢰목록.FirstOrDefault(x => x.의뢰Id == 의뢰Id.ToString(CultureInfo.InvariantCulture));
+        return _추천의뢰목록.FirstOrDefault(x => string.Equals(x.의뢰Id, 의뢰Id, StringComparison.OrdinalIgnoreCase));
     }
 
     public IReadOnlyList<추천의뢰표시항목> 거리포함추천의뢰목록조회()
@@ -190,6 +190,9 @@ public sealed class 기사샘플데이터Service : IDriverSampleDataService
                 DateTime.Now.AddMinutes(20 + f.IndexFaker * 35),
                 f.Random.Decimal(12m, 65m),
                 f.Random.Decimal(65000m, 160000m),
+                f.Random.Bool(0.6f),
+                f.Random.Bool(0.35f),
+                f.PickRandom("인수증 정산", "카드 결제", "하차 후 계좌"),
                 f.PickRandom("상차지 도착", "상차 완료", "하차지 도착")))
             .Generate(3);
     }

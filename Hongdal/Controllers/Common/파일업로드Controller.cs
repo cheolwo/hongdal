@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.Controllers;
 using 홍달.Services;
 using 홍달.Services.Storage.Local;
 
@@ -23,17 +24,17 @@ namespace Hongdal.Controllers.Common
         {
             if (request == null || request.File == null)
             {
-                return BadRequest("file is required");
+                return this.ToProblemActionResult("file is required");
             }
 
             if (request.File.Length <= 0)
             {
-                return BadRequest("empty file is not allowed");
+                return this.ToProblemActionResult("empty file is not allowed");
             }
 
             if (string.IsNullOrWhiteSpace(request.CommandName))
             {
-                return BadRequest("commandName is required");
+                return this.ToProblemActionResult("commandName is required");
             }
 
             var folder = _pathResolver.ResolveCommandFolder(request.CommandName, request.ReferenceId);

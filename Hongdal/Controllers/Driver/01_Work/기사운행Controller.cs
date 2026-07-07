@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.도메인.공통;
@@ -55,7 +56,7 @@ namespace Hongdal.Controllers.Driver.Work01
 
             if (result.IsFailed)
             {
-                return BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
+                return this.ToProblemActionResult(result.Errors.Select(x => x.Message));
             }
 
             return CreatedAtAction(nameof(상태조회), new { }, result.Value);

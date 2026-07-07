@@ -27,14 +27,14 @@ namespace Hongdal.Controllers.Admin.Inflow02
         public async Task<IActionResult> 단건조회(long id)
         {
             var item = await _sender.Send(new 배차대기단건조회Query(id));
-            if (item == null) return NotFound();
+            if (item == null) return this.ToNotFoundProblem("배차대기 정보를 찾을 수 없습니다.");
             return Ok(item);
         }
 
         [HttpPost]
         public async Task<IActionResult> 생성([FromBody] 배차대기요청 request)
         {
-            if (request == null) return BadRequest();
+            if (request == null) return this.ToProblemActionResult("request body is required");
 
             var entity = await _sender.Send(new 배차대기생성Command(
                 request.의뢰Id,
@@ -57,7 +57,7 @@ namespace Hongdal.Controllers.Admin.Inflow02
         [HttpPut("{id:long}")]
         public async Task<IActionResult> 수정(long id, [FromBody] 배차대기요청 request)
         {
-            if (request == null) return BadRequest();
+            if (request == null) return this.ToProblemActionResult("request body is required");
 
             var entity = await _sender.Send(new 배차대기수정Command(
                 id,
@@ -75,7 +75,7 @@ namespace Hongdal.Controllers.Admin.Inflow02
                 request.하차_위도,
                 request.하차_경도,
                 request.상태));
-            if (entity == null) return NotFound();
+            if (entity == null) return this.ToNotFoundProblem("배차대기 정보를 찾을 수 없습니다.");
             return Ok(entity);
         }
 

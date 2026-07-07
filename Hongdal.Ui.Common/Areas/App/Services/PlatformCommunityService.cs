@@ -7,10 +7,14 @@ namespace Hongdal.Ui.Common.Areas.App.Services;
 public sealed class PlatformCommunityService
 {
     private readonly HttpClient _httpClient;
+    private readonly HongdalProtectedApiClient _protectedApiClient;
 
-    public PlatformCommunityService(HttpClient httpClient)
+    public PlatformCommunityService(
+        HttpClient httpClient,
+        HongdalProtectedApiClient protectedApiClient)
     {
         _httpClient = httpClient;
+        _protectedApiClient = protectedApiClient;
     }
 
     public async Task<PlatformCommunityPostListResponse> GetPostsAsync(
@@ -26,7 +30,7 @@ public sealed class PlatformCommunityService
         PlatformCommunityPostCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync("api/v1/community/posts", request, cancellationToken);
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync("api/v1/community/posts", request, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PlatformCommunityPostResponse>(cancellationToken: cancellationToken);
     }
@@ -36,7 +40,7 @@ public sealed class PlatformCommunityService
         PlatformCommunityPostUpdateRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PutAsJsonAsync($"api/v1/community/posts/{postId}", request, cancellationToken);
+        using var response = await _protectedApiClient.PutAsProtectedJsonAsync($"api/v1/community/posts/{postId}", request, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PlatformCommunityPostResponse>(cancellationToken: cancellationToken);
     }
@@ -46,7 +50,7 @@ public sealed class PlatformCommunityService
         bool isOperatorPinned,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync(
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
             $"api/v1/community/posts/{postId}/operator-pin",
             new PlatformCommunityPostOperatorPinRequest { IsOperatorPinned = isOperatorPinned },
             cancellationToken);
@@ -59,7 +63,7 @@ public sealed class PlatformCommunityService
         string recommenderKey,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync(
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
             $"api/v1/community/posts/{postId}/recommendations",
             new PlatformCommunityPostRecommendationRequest { RecommenderKey = recommenderKey },
             cancellationToken);
@@ -82,7 +86,7 @@ public sealed class PlatformCommunityService
         PlatformCommunityPostCommentCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync($"api/v1/community/posts/{postId}/comments", request, cancellationToken);
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync($"api/v1/community/posts/{postId}/comments", request, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PlatformCommunityPostCommentResponse>(cancellationToken: cancellationToken);
     }
@@ -93,11 +97,11 @@ public sealed class PlatformCommunityService
         string password,
         CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/v1/community/posts/{postId}/comments/{commentId}")
-        {
-            Content = JsonContent.Create(new PlatformCommunityPostPasswordRequest { Password = password })
-        };
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var response = await _protectedApiClient.SendAsProtectedJsonAsync(
+            HttpMethod.Delete,
+            $"api/v1/community/posts/{postId}/comments/{commentId}",
+            new PlatformCommunityPostPasswordRequest { Password = password },
+            cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
@@ -122,7 +126,7 @@ public sealed class PlatformCommunityService
         PlatformCommunityPostAttachmentCommentCreateRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync(
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
             $"api/v1/community/posts/attachments/{attachmentId}/comments",
             request,
             cancellationToken);
@@ -136,11 +140,11 @@ public sealed class PlatformCommunityService
         string password,
         CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/v1/community/posts/attachments/{attachmentId}/comments/{commentId}")
-        {
-            Content = JsonContent.Create(new PlatformCommunityPostPasswordRequest { Password = password })
-        };
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var response = await _protectedApiClient.SendAsProtectedJsonAsync(
+            HttpMethod.Delete,
+            $"api/v1/community/posts/attachments/{attachmentId}/comments/{commentId}",
+            new PlatformCommunityPostPasswordRequest { Password = password },
+            cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 

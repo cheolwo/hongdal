@@ -132,10 +132,10 @@ flowchart TD
     C --> D{"계약상 마켓 판매 가능?"}
     D -->|아니오| X["출고 알림 Blocked"]
     D -->|예| E["적재함 재고 조회"]
-    E --> F["WarehousePickingPlanner"]
-    F --> G{"피킹 계획 완성?"}
+    E --> F["OutboundBatchEngine"]
+    F --> G{"출고 배치 계획 완성?"}
     G -->|아니오| X
-    G -->|예| H["재고/적재함 예약"]
+    G -->|예| H["출고 예약"]
     H --> I["창고 출고 알림 생성"]
     I --> J["피킹 작업 생성"]
     J --> K["적재함 바코드 스캔"]
@@ -150,13 +150,15 @@ flowchart TD
 이 흐름의 중요한 규칙은 다음과 같다.
 
 - 주문 가능 재고는 `계약정보.마켓판매가능여부`가 참인 재고만 계산한다.
-- 예약은 재고와 적재함을 한 번에 검증한 뒤 적용한다.
+- 출고 예약은 재고와 적재함을 한 번에 검증한 뒤 적용한다.
+- `OutboundBatchEngine`은 단일 상품/복수 상품 주문을 창고별 출고 계획으로 나누고, `WarehousePickingPlanner`는 확정된 창고별 계획을 현장 피킹 wave와 작업으로 변환한다.
 - 피킹은 적재함 바코드와 상품 바코드 순서로 검증한다.
 - 피킹 완료가 포장 작업 생성의 조건이다.
 
 대표 파일:
 
 - `ShipperApp/Services/Commerce/Orders/Commands/ProcessCommerceOrderCommandHandler.cs`
+- `docs/Architecture/OutboundBatchEngine.md`
 - `ShipperApp/Services/Warehouse/Fulfillment/WarehousePickingPlanner.cs`
 - `ShipperApp/Services/Warehouse/Fulfillment/WarehouseOrderPickingTask.cs`
 - `ShipperApp/Services/Warehouse/Fulfillment/WarehousePackingTask.cs`

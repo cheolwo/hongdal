@@ -59,6 +59,20 @@ internal static class PublicDataParsing
         return TryInt(FirstValue(item, keys));
     }
 
+    public static decimal? FirstDecimal(Dictionary<string, string?> item, params string[] keys)
+    {
+        return TryDecimal(FirstValue(item, keys));
+    }
+
+    public static IReadOnlyList<KeyValuePair<string, decimal>> NumericValues(Dictionary<string, string?> item)
+    {
+        return item
+            .Select(x => new KeyValuePair<string, decimal?>(x.Key, TryDecimal(x.Value)))
+            .Where(x => x.Value.HasValue)
+            .Select(x => new KeyValuePair<string, decimal>(x.Key, x.Value!.Value))
+            .ToArray();
+    }
+
     private static IReadOnlyList<Dictionary<string, string?>> ReadXmlItems(string body)
     {
         var doc = XDocument.Parse(body);
@@ -183,5 +197,16 @@ internal static class PublicDataParsing
     private static int? TryInt(string? value)
     {
         return int.TryParse(value, out var result) ? result : null;
+    }
+
+    private static decimal? TryDecimal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = value.Replace(",", string.Empty).Trim();
+        return decimal.TryParse(normalized, out var result) ? result : null;
     }
 }

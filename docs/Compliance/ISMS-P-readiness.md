@@ -1,5 +1,13 @@
 # ISMS-P Readiness
 
+## 현재 보안 구현 범위와 후속 관리 계획
+
+현재 단계에서는 ISMS-P 보호 속성, 클라이언트 전송 암호화, 서버 복호화, Redis 기반 transport KeyId 메타데이터 관리, 저장 전 보호 서비스 같은 기술적 골격을 우선 마련합니다. 이 골격은 개인정보와 계약 데이터를 다루는 기능을 만들 때 빠뜨리기 쉬운 보호 지점을 코드에서 확인하기 위한 내부 기준입니다.
+
+다만 이 문서는 ISMS-P 검증 통과 또는 인증 적합 상태를 선언하지 않습니다. 실제 검증을 준비하는 단계에서는 별도의 관리 계획을 세우고, 관리체계 범위, 책임자, 자산 목록, 위험평가, 접근권한 검토, 개인정보 생명주기, 위탁/제3자 제공, 침해사고 대응, 백업/복구, 운영 로그와 보안 검토 증적을 문서화해야 합니다.
+
+따라서 보안 관련 구현은 현재 수준을 기준선으로 두고, 인증 또는 외부 검증이 필요한 시점에 ISMS-P 운영 관리 계획과 증적 문서를 별도 프로젝트 작업으로 보강합니다.
+
 이 문서는 Hongdal의 개인정보 및 계약 데이터 처리 기능을 ISMS-P 관점에서 점검하기 위한 내부 준비도 문서입니다. 실제 ISMS-P 인증 적합 판정은 인증기관/심사기관의 심사, 운영 증적, 보완 조치 결과를 통해 확인되어야 하므로 이 문서는 인증 취득을 보장하지 않습니다.
 
 ## 공식 기준 요약
@@ -114,7 +122,9 @@ sequenceDiagram
 | 단계 | 구현 위치 | 기준 |
 | --- | --- | --- |
 | 클라이언트 암호화 | `Hongdal.Ui.Common/Areas/App/wwwroot/js/hongdal-isms-p-transport.js` | `RSA-OAEP-256+A256GCM` |
+| 클라이언트 공통 보호 전송 | `Hongdal.Ui.Common/Areas/App/Services/HongdalProtectedApiClient.cs` | DTO 보호 계획을 확인하고 필요한 경우 암호화 envelope로 전송 |
 | 클라이언트 래퍼 | `Hongdal.Ui.Common/Areas/App/Services/HongdalIsmsPClientEncryptionService.cs` | 공개키 응답을 받아 암호화 봉투 생성 |
+| 서버 envelope 미들웨어 | `Hongdal/Middleware/IsmsPEncryptedTransportMiddleware.cs` | 암호화 envelope 요청 본문을 모델 바인딩 전에 원래 JSON으로 복호화 |
 | 서버 복호화 | `RsaOaepAesGcmClientTransportProtectionService` | 서버 개인키로 AES 키 복호화 후 payload 해석 |
 | 저장 전 보호 | `IsmsPProtectedDataStorePreparationService` | `IsmsPProtectedDataAttribute`와 필드 카탈로그 기반 처리 |
 | 저장 암호화 | `AesGcmIsmsPProtectedDataCryptoService` | `AES-256-GCM` |
@@ -203,3 +213,10 @@ ISMS-P 인증을 실제로 준비하려면 코드 외에도 다음 증적을 남
 - 개인정보 필드 카탈로그를 Admin 화면에서 조회하고 필드별 보호 기준 변경 이력을 남긴다.
 - 감사 로그 이벤트명을 Command/Event 카탈로그와 연결한다.
 - 계약 템플릿마다 개인정보/위탁/제3자 제공/분쟁/파기 조항 체크리스트를 붙인다.
+
+## Transport Key Metadata
+
+- Redis는 transport 공개키 `KeyId`의 활성 상태와 TTL을 서버 간에 공유하는 저장소로 사용한다.
+- Redis에는 개인키 원문을 저장하지 않는다.
+- 서버 개인키, DB 저장 암호화 키, hash salt는 비밀 저장소 또는 환경변수에서 관리한다.
+- 암호화 envelope 요청은 Redis에서 KeyId가 활성 상태일 때만 서버 개인키 복호화 단계로 넘어간다.

@@ -31,7 +31,7 @@ namespace Hongdal.Controllers.Admin.Master06
         public async Task<IActionResult> 단건조회(long id)
         {
             var item = await _sender.Send(new 차량단가단건조회Query(id));
-            if (item == null) return NotFound();
+            if (item == null) return this.ToNotFoundProblem("차량단가 정보를 찾을 수 없습니다.");
             return Ok(item);
         }
 
@@ -39,7 +39,7 @@ namespace Hongdal.Controllers.Admin.Master06
         [Authorize(Policy = "서버관리자전용")]
         public async Task<IActionResult> 생성([FromBody] 차량단가요청 request)
         {
-            if (request == null) return BadRequest();
+            if (request == null) return this.ToProblemActionResult("request body is required");
 
             var entity = await _sender.Send(new 차량단가생성Command(
                 request.차량종류,
@@ -55,7 +55,7 @@ namespace Hongdal.Controllers.Admin.Master06
         [Authorize(Policy = "서버관리자전용")]
         public async Task<IActionResult> 수정(long id, [FromBody] 차량단가요청 request)
         {
-            if (request == null) return BadRequest();
+            if (request == null) return this.ToProblemActionResult("request body is required");
 
             var entity = await _sender.Send(new 차량단가수정Command(
                 id,
@@ -65,7 +65,7 @@ namespace Hongdal.Controllers.Admin.Master06
                 request.야간할증,
                 request.우천할증,
                 request.최소운임));
-            if (entity == null) return NotFound();
+            if (entity == null) return this.ToNotFoundProblem("차량단가 정보를 찾을 수 없습니다.");
             return Ok(entity);
         }
 

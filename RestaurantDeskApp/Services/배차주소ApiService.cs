@@ -1,13 +1,14 @@
 using System.Net.Http.Json;
+using Hongdal.Ui.Common.Areas.App.Services;
 using RestaurantDeskApp.Models.Restaurant;
 
 namespace RestaurantDeskApp.Services;
 
-public sealed class 배차주소ApiService(HttpClient httpClient)
+public sealed class 배차주소ApiService(HongdalProtectedApiClient protectedApiClient)
 {
     public async Task<배차주소저장결과> 저장Async(배차주소저장요청 request, CancellationToken cancellationToken = default)
     {
-        var response = await httpClient.PostAsJsonAsync("api/v1/food-orders/dispatch/address-form", request, cancellationToken);
+        var response = await protectedApiClient.PostAsProtectedJsonAsync("api/v1/food-orders/dispatch/address-form", request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken);

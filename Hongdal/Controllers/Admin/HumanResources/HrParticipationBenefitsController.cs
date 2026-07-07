@@ -1,4 +1,5 @@
 using Hongdal.Contracts.Common.Hr;
+using Hongdal.Controllers;
 using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ public sealed class HrParticipationBenefitsController : ControllerBase
     }
 
     [HttpPost("transfer")]
-    public async Task<ActionResult<HrParticipationBenefitRecordResponse>> Transfer(
+    public async Task<IActionResult> Transfer(
         [FromBody] HrParticipationBenefitTransferRequest request,
         CancellationToken cancellationToken)
     {
@@ -39,7 +40,7 @@ public sealed class HrParticipationBenefitsController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return this.ToProblemActionResult(ex.Message);
         }
     }
 }

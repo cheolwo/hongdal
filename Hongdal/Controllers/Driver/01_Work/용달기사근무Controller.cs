@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -23,10 +24,10 @@ namespace Hongdal.Controllers.Driver.Work01
         [HttpGet("{id:long}")]
         public async Task<IActionResult> 근무조회(string driverId, long id)
         {
-            if (!현재기사확인(driverId)) return Forbid();
+            if (!현재기사확인(driverId)) return this.ToForbiddenProblem("다른 기사의 근무 정보는 조회할 수 없습니다.");
 
             var s = await _sender.Send(new Hongdal.Application.Driver.Work.기사근무상세조회Query(driverId, id));
-            return s == null ? NotFound() : Ok(s);
+            return s == null ? this.ToNotFoundProblem("기사 근무 정보를 찾을 수 없습니다.") : Ok(s);
         }
 
         private bool 현재기사확인(string driverId)

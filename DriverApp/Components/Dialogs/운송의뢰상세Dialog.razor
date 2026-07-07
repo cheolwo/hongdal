@@ -154,17 +154,25 @@
         }
     }
 
-    private void Accept()
+    private async Task Accept()
     {
         if (의뢰 is null)
         {
             return;
         }
 
-        var decision = DecisionService.Accept(의뢰);
-        _처리Severity = Severity.Success;
-        _처리메시지 = decision.Memo;
-        MudDialog.Close(DialogResult.Ok(decision));
+        try
+        {
+            var decision = await DecisionService.AcceptAsync(의뢰);
+            _처리Severity = Severity.Success;
+            _처리메시지 = decision.Memo;
+            MudDialog.Close(DialogResult.Ok(decision));
+        }
+        catch (Exception ex)
+        {
+            _처리Severity = Severity.Error;
+            _처리메시지 = ex.Message;
+        }
     }
 
     private void Hold()
@@ -185,17 +193,25 @@
         _거절입력표시 = true;
     }
 
-    private void Reject()
+    private async Task Reject()
     {
         if (의뢰 is null)
         {
             return;
         }
 
-        var decision = DecisionService.Reject(의뢰, _거절사유);
-        _처리Severity = Severity.Warning;
-        _처리메시지 = decision.Memo;
-        MudDialog.Close(DialogResult.Ok(decision));
+        try
+        {
+            var decision = await DecisionService.RejectAsync(의뢰, _거절사유);
+            _처리Severity = Severity.Warning;
+            _처리메시지 = decision.Memo;
+            MudDialog.Close(DialogResult.Ok(decision));
+        }
+        catch (Exception ex)
+        {
+            _처리Severity = Severity.Error;
+            _처리메시지 = ex.Message;
+        }
     }
 
     private void Close()

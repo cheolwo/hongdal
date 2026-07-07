@@ -32,6 +32,7 @@ public static class DriverServiceCollectionExtensions
         {
             BaseAddress = ApiEnvironment.CreateBaseAddress()
         });
+        services.AddScoped<AuthApiService>();
         services.AddSingleton<HttpDriverTransportCompletionPhotoService>();
         services.AddSingleton<IDriverTransportCompletionPhotoService, SampleDriverTransportCompletionPhotoService>();
         services.AddScoped<IApiClient, ApiClient>();

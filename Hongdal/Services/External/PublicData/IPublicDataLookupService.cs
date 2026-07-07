@@ -20,6 +20,17 @@ public interface IApartmentComplexLookupService
         CancellationToken cancellationToken = default);
 }
 
+public interface IApartmentManagementFeeLookupService
+{
+    Task<PublicDataLookupResponse<ApartmentManagementFeeSnapshotItem>> GetSnapshotAsync(
+        ApartmentManagementFeeSnapshotRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<ApartmentGroupCommerceOffsetSimulationResult> SimulateGroupCommerceOffsetAsync(
+        ApartmentGroupCommerceOffsetSimulationRequest request,
+        CancellationToken cancellationToken = default);
+}
+
 public interface IOrdererGroupScopeLookupService
 {
     PublicDataLookupResponse<OrdererGroupScopeCandidateItem> FindCandidates(

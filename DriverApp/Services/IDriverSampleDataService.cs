@@ -21,7 +21,7 @@ public interface IDriverSampleDataService
 
     IReadOnlyList<기사알림샘플항목> 알림목록 { get; }
 
-    DriverRequestItem? 추천의뢰조회(long 의뢰Id);
+    DriverRequestItem? 추천의뢰조회(string 의뢰Id);
 
     IReadOnlyList<추천의뢰표시항목> 거리포함추천의뢰목록조회();
 

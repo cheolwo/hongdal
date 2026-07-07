@@ -14,5 +14,7 @@ public sealed class IsmsPProtectedDataOptions
 
     public string? TransportPrivateKeyPem { get; set; }
 
+    public int TransportPublicKeyTtlMinutes { get; set; } = 43200;
+
     public bool FailWhenKeyMissing { get; set; } = true;
 }

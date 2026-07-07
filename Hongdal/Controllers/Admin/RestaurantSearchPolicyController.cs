@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Hongdal.Contracts.Common.Orderer;
+using Hongdal.Controllers;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ public sealed class RestaurantSearchPolicyController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult<RestaurantSearchPolicyDto>> Update(
+    public async Task<IActionResult> Update(
         [FromBody] RestaurantSearchPolicyUpdateRequest request,
         CancellationToken cancellationToken)
     {
@@ -35,7 +36,7 @@ public sealed class RestaurantSearchPolicyController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex.Message);
+            return this.ToProblemActionResult(ex.Message);
         }
     }
 

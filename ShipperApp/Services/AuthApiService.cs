@@ -1,40 +1,47 @@
+using System.Net.Http.Json;
 using Hongdal.Contracts.Common;
 
 namespace ShipperApp.Services;
 
 public sealed class AuthApiService
 {
+    private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
 
-    public AuthApiService(IAuthSession authSession)
+    public AuthApiService(HttpClient httpClient, IAuthSession authSession)
     {
+        _httpClient = httpClient;
         _authSession = authSession;
     }
 
     public async Task<(bool IsSuccess, string ErrorMessage)> LoginAsync(string userNameOrEmail, string password, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         if (string.IsNullOrWhiteSpace(userNameOrEmail) || string.IsNullOrWhiteSpace(password))
         {
             return (false, "아이디와 비밀번호를 입력해 주세요.");
         }
 
-        var displayName = userNameOrEmail.Contains('@', StringComparison.Ordinal)
-            ? userNameOrEmail.Split('@')[0]
-            : userNameOrEmail;
+        using var response = await _httpClient.PostAsJsonAsync(
+            "api/v1/auth/login",
+            new 로그인요청
+            {
+                UserNameOrEmail = userNameOrEmail.Trim(),
+                Password = password
+            },
+            cancellationToken);
 
-        await _authSession.ApplyAsync(new 토큰응답
+        if (!response.IsSuccessStatusCode)
         {
-            AccessToken = $"offline-token-{Guid.NewGuid():N}",
-            RefreshToken = $"offline-refresh-{Guid.NewGuid():N}",
-            AccessTokenExpiresAtUtc = DateTime.UtcNow.AddHours(8),
-            RefreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(7),
-            UserId = $"shipper-{displayName}".ToLowerInvariant(),
-            UserName = displayName,
-            Roles = ["화주"]
-        }, cancellationToken);
+            return (false, "서버 로그인에 실패했습니다. 아이디, 비밀번호, 서버 실행 상태를 확인해 주세요.");
+        }
 
+        var token = await response.Content.ReadFromJsonAsync<토큰응답>(cancellationToken);
+        if (token is null)
+        {
+            return (false, "서버 로그인 응답을 읽을 수 없습니다.");
+        }
+
+        await _authSession.ApplyAsync(token, cancellationToken);
         return (true, string.Empty);
     }
 

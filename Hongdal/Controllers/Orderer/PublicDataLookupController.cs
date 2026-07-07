@@ -10,15 +10,18 @@ public sealed class PublicDataLookupController : ControllerBase
 {
     private readonly IRoadAddressLookupService _roadAddressLookupService;
     private readonly IApartmentComplexLookupService _apartmentComplexLookupService;
+    private readonly IApartmentManagementFeeLookupService _apartmentManagementFeeLookupService;
     private readonly IOrdererGroupScopeLookupService _ordererGroupScopeLookupService;
 
     public PublicDataLookupController(
         IRoadAddressLookupService roadAddressLookupService,
         IApartmentComplexLookupService apartmentComplexLookupService,
+        IApartmentManagementFeeLookupService apartmentManagementFeeLookupService,
         IOrdererGroupScopeLookupService ordererGroupScopeLookupService)
     {
         _roadAddressLookupService = roadAddressLookupService;
         _apartmentComplexLookupService = apartmentComplexLookupService;
+        _apartmentManagementFeeLookupService = apartmentManagementFeeLookupService;
         _ordererGroupScopeLookupService = ordererGroupScopeLookupService;
     }
 
@@ -96,6 +99,30 @@ public sealed class PublicDataLookupController : ControllerBase
             ComplexCode = complexCode
         }, cancellationToken);
 
+        return Ok(result);
+    }
+
+    [HttpGet("apartment-complexes/{complexCode}/management-fee-snapshot")]
+    public async Task<ActionResult<PublicDataLookupResponse<ApartmentManagementFeeSnapshotItem>>> GetApartmentManagementFeeSnapshot(
+        string complexCode,
+        [FromQuery] string month,
+        CancellationToken cancellationToken)
+    {
+        var result = await _apartmentManagementFeeLookupService.GetSnapshotAsync(new ApartmentManagementFeeSnapshotRequest
+        {
+            ComplexCode = complexCode,
+            Month = month
+        }, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpPost("apartment-complexes/group-commerce-offset-simulation")]
+    public async Task<ActionResult<ApartmentGroupCommerceOffsetSimulationResult>> SimulateGroupCommerceOffset(
+        [FromBody] ApartmentGroupCommerceOffsetSimulationRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _apartmentManagementFeeLookupService.SimulateGroupCommerceOffsetAsync(request, cancellationToken);
         return Ok(result);
     }
 }

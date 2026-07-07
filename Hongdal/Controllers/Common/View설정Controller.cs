@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Hongdal.Contracts.Common.ViewSettings;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Data;
 using 홍달.Services.Audit;
@@ -24,11 +25,11 @@ public sealed class View설정Controller : ControllerBase
     }
 
     [HttpGet("effective")]
-    public async Task<ActionResult<View가시성목록응답>> 조회([FromQuery] string appKey, CancellationToken cancellationToken)
+    public async Task<IActionResult> 조회([FromQuery] string appKey, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(appKey))
         {
-            return BadRequest("appKey is required");
+            return this.ToProblemActionResult("appKey is required");
         }
 
         var normalizedAppKey = appKey.Trim();
@@ -47,17 +48,17 @@ public sealed class View설정Controller : ControllerBase
     {
         if (request is null)
         {
-            return BadRequest("request body is required");
+            return this.ToProblemActionResult("request body is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.AppKey))
         {
-            return BadRequest("appKey is required");
+            return this.ToProblemActionResult("appKey is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.ViewKey))
         {
-            return BadRequest("viewKey is required");
+            return this.ToProblemActionResult("viewKey is required");
         }
 
         var appKey = request.AppKey.Trim();
@@ -65,7 +66,7 @@ public sealed class View설정Controller : ControllerBase
         var userId = ResolveUserId();
         if (string.IsNullOrWhiteSpace(userId))
         {
-            return BadRequest("userId could not be resolved");
+            return this.ToProblemActionResult("userId could not be resolved");
         }
 
         try
@@ -90,11 +91,7 @@ public sealed class View설정Controller : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Title = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
+            return this.ToProblemActionResult(ex.Message);
         }
     }
 

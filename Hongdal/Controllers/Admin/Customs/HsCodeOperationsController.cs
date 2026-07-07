@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Hongdal.Contracts.Admin.Customs;
+using Hongdal.Controllers;
 using Hongdal.Contracts.Common.ViewSettings;
 using Hongdal.Domain.HsCodes;
 using Microsoft.AspNetCore.Authorization;
@@ -90,14 +91,14 @@ public sealed class HsCodeOperationsController : ControllerBase
     }
 
     [HttpPut("{entryId:long}/business-category")]
-    public async Task<ActionResult<AdminHsCodeEntryResponse>> 대분류수정(
+    public async Task<IActionResult> 대분류수정(
         long entryId,
         [FromBody] AdminHsCodeBusinessCategoryUpdateRequest request,
         CancellationToken cancellationToken)
     {
         if (!Enum.IsDefined(typeof(HsCodeBusinessCategory), request.BusinessCategory))
         {
-            return BadRequest("지원하지 않는 HS 코드 업무 분류입니다.");
+            return this.ToProblemActionResult("지원하지 않는 HS 코드 업무 분류입니다.");
         }
 
         var entry = await _db.HsCodeEntries
@@ -106,7 +107,7 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (entry is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("HS 코드 항목을 찾을 수 없습니다.");
         }
 
         entry.BusinessCategory = (HsCodeBusinessCategory)request.BusinessCategory;
@@ -122,14 +123,14 @@ public sealed class HsCodeOperationsController : ControllerBase
     }
 
     [HttpPost("{entryId:long}/risk-tags")]
-    public async Task<ActionResult<AdminHsCodeEntryResponse>> 태그저장(
+    public async Task<IActionResult> 태그저장(
         long entryId,
         [FromBody] AdminHsCodeRiskTagUpdateRequest request,
         CancellationToken cancellationToken)
     {
         if (!Enum.IsDefined(typeof(HsCodeRiskTagType), request.TagType))
         {
-            return BadRequest("지원하지 않는 HS 코드 주의 태그입니다.");
+            return this.ToProblemActionResult("지원하지 않는 HS 코드 주의 태그입니다.");
         }
 
         var entry = await _db.HsCodeEntries
@@ -138,7 +139,7 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (entry is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("HS 코드 항목을 찾을 수 없습니다.");
         }
 
         var tagType = (HsCodeRiskTagType)request.TagType;
@@ -165,14 +166,14 @@ public sealed class HsCodeOperationsController : ControllerBase
     }
 
     [HttpPut("risk-tags/{tagId:long}")]
-    public async Task<ActionResult<AdminHsCodeEntryResponse>> 태그수정(
+    public async Task<IActionResult> 태그수정(
         long tagId,
         [FromBody] AdminHsCodeRiskTagUpdateRequest request,
         CancellationToken cancellationToken)
     {
         if (!Enum.IsDefined(typeof(HsCodeRiskTagType), request.TagType))
         {
-            return BadRequest("지원하지 않는 HS 코드 주의 태그입니다.");
+            return this.ToProblemActionResult("지원하지 않는 HS 코드 주의 태그입니다.");
         }
 
         var tag = await _db.HsCodeEntryRiskTags
@@ -181,7 +182,7 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (tag?.HsCodeEntry is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("HS 코드 주의 태그를 찾을 수 없습니다.");
         }
 
         ApplyTagUpdate(tag, request, ResolveTagSource());

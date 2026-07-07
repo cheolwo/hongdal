@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -36,7 +37,7 @@ namespace Hongdal.Controllers.Driver.Work01
             var shift = await _sender.Send(new Hongdal.Application.Driver.Work.기사근무상세조회Query(driverId, id));
             if (shift == null)
             {
-                return NotFound();
+                return this.ToNotFoundProblem("기사 근무 정보를 찾을 수 없습니다.");
             }
 
             return Ok(shift);

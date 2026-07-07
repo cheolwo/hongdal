@@ -7,6 +7,7 @@ public sealed class 화물통관진행조회Request
     public string? 화물관리번호 { get; init; }
     public string? MasterBl { get; init; }
     public string? HouseBl { get; init; }
+    public int? BlYear { get; init; }
 }
 
 public sealed class 화물통관진행조회Result

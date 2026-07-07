@@ -10,6 +10,12 @@
 | HS 상품 카드 기반 집단 개설 신청 | 포함 | `OrdererApp`, 공동 주문 서비스 | 개인 주문자가 상품 카드에서 개설 신청, 운영 승인 후 참여 모집 |
 | 수입 식품 공동 주문 계약서 | 포함 | 계약 영역, 공동 주문 서비스 | 개설 신청자, 공급자/화주, 플랫폼 운영자, 필수 조항, 마일스톤 지급 조건 관리 |
 | 공동구매 마일스톤 지급 | 포함 | 결제/정산 서비스, 공동 주문 서비스 | 상차 1차, 하차 2차, 분배 확인 최종 지급으로 선결제 부담 완화 |
+| 해외 선적/통관 추적 | 포함 | `GroupPurchaseOverseasShipmentTrackingStore`, UNI-PASS 화물통관 조회 | BL/AWB, 문서관리번호, 선박/항공편, 통관 이벤트를 공동주문 원장에 연결 |
+| 국내 물류대행 입고 | 포함 | `GroupPurchaseCommerceFulfillmentPlanStore`, `WarehouseManagerApp` | 공동수입 물품을 국내 물류대행사/3PL 입고, 입고상품, 재고 로트로 연결 |
+| 판매채널 출품/출고 배치 연결 | 포함 | `SalesChannelOrderSyncService`, `OutboundBatchEngine` | 스마트스토어/쿠팡 주문을 판매상품/입고상품 재고와 출고예정으로 연결 |
+| 공동주택 관리비/수익 시뮬레이션 | 포함 | `ApartmentManagementFeeLookupService`, 공공데이터 조회 | 관리비 스냅샷과 공동판매 예상 수익을 비교해 비용 완화 효과 표시 |
+| 주문자 집단 운영 주체 | 포함 | `OrdererGroupOperatingEntityStore`, HR 계약/역할 | 비사업자/사업자/법인/협동조합/관리사무소 위임/플랫폼 위임 구분 |
+| 입주민 우선 고용 정책 | 포함 | `HrRoleDtos`, `OrdererGroupOperatingEntityStore` | 공동주문 분류, 배분, 물품 집합, 공동주택 관리 보조, 경비/순찰 보조 역할을 입주민 우선으로 관리 |
 | 화주 대량 구매 공개 | 포함 | `ShipperApp` | 수입/국내 대량 구매 모두 고려 |
 | FCL 가능 조건 계산 | 포함 | `ShipperApp`, 화물 계획 서비스 | 목표 수량/부피/중량 기준 |
 | 집단 대표 입고 | 포함 | `WarehouseManagerApp`, `CargoYongdalDispatchEngine` | 집단 대표 입고지로 운송 연결 |

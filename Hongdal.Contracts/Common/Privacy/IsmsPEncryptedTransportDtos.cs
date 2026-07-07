@@ -9,7 +9,8 @@ public sealed record IsmsPClientEncryptionPublicKeyResponse(
     string KeyId,
     string AlgorithmCode,
     string PublicKeyPem,
-    DateTimeOffset IssuedAtUtc);
+    DateTimeOffset IssuedAtUtc,
+    DateTimeOffset ExpiresAtUtc);
 
 public sealed record IsmsPEncryptedTransportEnvelope(
     string KeyId,

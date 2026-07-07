@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using 홍달.Services.Audit;
 using 홍달.Services.Documents;
 using Microsoft.AspNetCore.Authorization;
@@ -27,15 +28,15 @@ public sealed class 문서관리Controller : ControllerBase
     }
 
     [HttpPut("policies/{documentCode}")]
-    public async Task<ActionResult<문서정책요약응답>> 정책수정(string documentCode, [FromBody] 문서정책수정요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 정책수정(string documentCode, [FromBody] 문서정책수정요청 request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(documentCode))
         {
-            return BadRequest("documentCode is required");
+            return this.ToProblemActionResult("documentCode is required");
         }
 
         var updated = await _documentService.UpdatePolicyAsync(documentCode.Trim(), request, cancellationToken);
-        return updated is null ? NotFound() : Ok(updated);
+        return updated is null ? this.ToNotFoundProblem("문서 정책을 찾을 수 없습니다.") : Ok(updated);
     }
 
     [HttpGet]
@@ -52,11 +53,11 @@ public sealed class 문서관리Controller : ControllerBase
 
     [HttpPost]
     [RequestSizeLimit(50_000_000)]
-    public async Task<ActionResult<문서조회요약응답>> 업로드([FromForm] 문서업로드요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 업로드([FromForm] 문서업로드요청 request, CancellationToken cancellationToken)
     {
         if (request?.File is null || request.File.Length <= 0)
         {
-            return BadRequest("file is required");
+            return this.ToProblemActionResult("file is required");
         }
 
         await using var stream = request.File.OpenReadStream();
@@ -82,7 +83,7 @@ public sealed class 문서관리Controller : ControllerBase
         var result = await _documentService.DownloadAsync(id, cancellationToken);
         if (result is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("문서를 찾을 수 없습니다.");
         }
 
         await _activityLogService.기록Async(new 사용자행위로그기록

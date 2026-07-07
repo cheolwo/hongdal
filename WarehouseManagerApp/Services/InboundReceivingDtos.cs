@@ -13,10 +13,12 @@ public sealed record InboundExpectedProductDto(
 
 public sealed record InboundReceivingConfirmationRequest(
     string ProductBarcode,
+    string InboundBundleBarcode,
     int ReceivedQuantity);
 
 public sealed record UnplannedInboundRegistrationRequest(
     string ProductBarcode,
+    string InboundBundleBarcode,
     string ProductName,
     string Supplier,
     int ReceivedQuantity,
@@ -26,6 +28,7 @@ public sealed record UnplannedInboundRegistrationRequest(
 
 public sealed record InboundReceivingConfirmationResult(
     InboundExpectedProductDto Product,
+    string InboundBundleBarcode,
     int ReceivedQuantity,
     bool QuantityMatched,
     string Status,

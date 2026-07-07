@@ -1,4 +1,5 @@
 using Hongdal.Contracts.Common.ViewSettings;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -32,11 +33,11 @@ public sealed class View정책Controller : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<관리자View정책항목응답>> 수정(long id, [FromBody] 관리자View정책수정요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 수정(long id, [FromBody] 관리자View정책수정요청 request, CancellationToken cancellationToken)
     {
         if (request is null)
         {
-            return BadRequest("request body is required");
+            return this.ToProblemActionResult("request body is required");
         }
 
         try
@@ -44,7 +45,7 @@ public sealed class View정책Controller : ControllerBase
             var updated = await _viewVisibilityService.UpdatePolicyAsync(id, request.PolicyEnabled, cancellationToken);
             if (updated is null)
             {
-                return NotFound();
+                return this.ToNotFoundProblem("View 정책을 찾을 수 없습니다.");
             }
 
             await _activityLogService.기록Async(new 사용자행위로그기록
@@ -68,11 +69,7 @@ public sealed class View정책Controller : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Title = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
+            return this.ToProblemActionResult(ex.Message);
         }
     }
 }

@@ -173,7 +173,7 @@ public partial class NativeDriverHomePage : ContentPage
         RecommendationDecisionStatusLabel.Text = "경로와 수익을 확인한 뒤 수락, 보류, 거절을 선택할 수 있습니다.";
     }
 
-    private void OnAcceptRecommendationClicked(object? sender, EventArgs e)
+    private async void OnAcceptRecommendationClicked(object? sender, EventArgs e)
     {
         if (_incomingRecommendationRequest is null)
         {
@@ -181,7 +181,19 @@ public partial class NativeDriverHomePage : ContentPage
             return;
         }
 
-        var decision = _decisionService.Accept(_incomingRecommendationRequest);
+        RecommendationDecisionButtons.IsEnabled = false;
+        RecommendationDecisionState decision;
+        try
+        {
+            decision = await _decisionService.AcceptAsync(_incomingRecommendationRequest);
+        }
+        catch (Exception ex)
+        {
+            RecommendationDecisionStatusLabel.Text = ex.Message;
+            RecommendationDecisionButtons.IsEnabled = true;
+            return;
+        }
+
         _acceptedRecommendationRequest = _incomingRecommendationRequest;
         RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
         RecommendationBanner.IsVisible = false;
@@ -203,7 +215,7 @@ public partial class NativeDriverHomePage : ContentPage
         StatusLabel.Text = "추천을 보류했습니다. 지도나 추천 목록에서 다시 확인할 수 있습니다.";
     }
 
-    private void OnRejectRecommendationClicked(object? sender, EventArgs e)
+    private async void OnRejectRecommendationClicked(object? sender, EventArgs e)
     {
         if (_incomingRecommendationRequest is null)
         {
@@ -211,16 +223,27 @@ public partial class NativeDriverHomePage : ContentPage
             return;
         }
 
-        var decision = _decisionService.Reject(_incomingRecommendationRequest, "지도 연계 경로에서 거절");
-        RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
         RecommendationDecisionButtons.IsEnabled = false;
+        RecommendationDecisionState decision;
+        try
+        {
+            decision = await _decisionService.RejectAsync(_incomingRecommendationRequest, "지도 연계 경로에서 거절");
+        }
+        catch (Exception ex)
+        {
+            RecommendationDecisionStatusLabel.Text = ex.Message;
+            RecommendationDecisionButtons.IsEnabled = true;
+            return;
+        }
+
+        RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
         LinkedRouteBenefitLabel.Text = "거절됨";
         MapView.RouteOverlays = [];
         _recommendationNotificationService.MarkHandled(_incomingRecommendationRequest.의뢰Id);
         StatusLabel.Text = "추천을 거절했습니다. 다른 추천이 들어오면 다시 알려드립니다.";
     }
 
-    private void OnCancelAcceptedRecommendationClicked(object? sender, EventArgs e)
+    private async void OnCancelAcceptedRecommendationClicked(object? sender, EventArgs e)
     {
         var request = _acceptedRecommendationRequest ?? _incomingRecommendationRequest;
         if (request is null)
@@ -236,9 +259,20 @@ public partial class NativeDriverHomePage : ContentPage
             return;
         }
 
-        var decision = _decisionService.CancelAccepted(request, "지도 화면에서 수락 취소");
-        RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
         RecommendationDecisionButtons.IsEnabled = false;
+        RecommendationDecisionState decision;
+        try
+        {
+            decision = await _decisionService.CancelAcceptedAsync(request, "지도 화면에서 수락 취소");
+        }
+        catch (Exception ex)
+        {
+            RecommendationDecisionStatusLabel.Text = ex.Message;
+            RecommendationDecisionButtons.IsEnabled = true;
+            return;
+        }
+
+        RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
         LinkedRouteBenefitLabel.Text = "재배차";
         MapView.RouteOverlays = [];
         _recommendationNotificationService.MarkHandled(request.의뢰Id);

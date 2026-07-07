@@ -1,4 +1,5 @@
 using Hongdal.Contracts.CommonContents;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,7 @@ public sealed class 공통콘텐츠관리Controller : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<관리자공통콘텐츠상세응답>> 상세조회(long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> 상세조회(long id, CancellationToken cancellationToken)
     {
         var entity = await _db.홍달공통콘텐츠
             .AsNoTracking()
@@ -48,7 +49,7 @@ public sealed class 공통콘텐츠관리Controller : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (entity is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("공통 콘텐츠를 찾을 수 없습니다.");
         }
 
         return Ok(ToDetail(entity));
@@ -72,12 +73,12 @@ public sealed class 공통콘텐츠관리Controller : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    public async Task<ActionResult<관리자공통콘텐츠상세응답>> 수정(long id, [FromBody] 관리자공통콘텐츠저장요청 request, CancellationToken cancellationToken)
+    public async Task<IActionResult> 수정(long id, [FromBody] 관리자공통콘텐츠저장요청 request, CancellationToken cancellationToken)
     {
         var entity = await _db.홍달공통콘텐츠.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (entity is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("공통 콘텐츠를 찾을 수 없습니다.");
         }
 
         Apply(entity, request);
@@ -97,7 +98,7 @@ public sealed class 공통콘텐츠관리Controller : ControllerBase
         var entity = await _db.홍달공통콘텐츠.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (entity is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("공통 콘텐츠를 찾을 수 없습니다.");
         }
 
         entity.활성화여부 = enabled;

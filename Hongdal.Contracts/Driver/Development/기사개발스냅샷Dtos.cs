@@ -116,6 +116,9 @@ public sealed class 기사개발운송응답
     public DateTime 예정시각 { get; set; }
     public decimal 운송거리Km { get; set; }
     public decimal 예상수익 { get; set; }
+    public bool 인수증필요 { get; set; }
+    public bool 인수증서명필수 { get; set; }
+    public string 결제방식 { get; set; } = string.Empty;
     public string 다음행동 { get; set; } = string.Empty;
 }
 

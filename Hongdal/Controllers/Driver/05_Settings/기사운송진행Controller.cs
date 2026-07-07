@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MediatR;
 using Hongdal.Controllers;
 using Hongdal.Application.Driver.Transport;
@@ -36,7 +37,7 @@ namespace Hongdal.Controllers.Driver.Progress05
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송현재조회Query(driverId));
 
-            if (result is null) return NotFound();
+            if (result is null) return this.ToNotFoundProblem("현재 운송 정보를 찾을 수 없습니다.");
             return Ok(result);
         }
 
@@ -46,7 +47,7 @@ namespace Hongdal.Controllers.Driver.Progress05
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 운송상세조회Query(driverId, id));
 
-            if (result is null) return NotFound();
+            if (result is null) return this.ToNotFoundProblem("운송 정보를 찾을 수 없습니다.");
             return Ok(result);
         }
 
@@ -59,10 +60,22 @@ namespace Hongdal.Controllers.Driver.Progress05
         }
 
         [HttpPost("{id:long}/pickup-complete")]
-        public async Task<IActionResult> 상차완료(long id)
+        public async Task<IActionResult> 상차완료(long id, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] 기사운송상차완료요청? request)
         {
             var driverId = 현재기사Id();
-            var result = await _sender.Send(new 운송상차완료Command(driverId, id));
+            var result = await _sender.Send(new 운송상차완료Command(driverId, id)
+            {
+                상차사진ObjectName = request?.상차사진ObjectName,
+                상차사진Url = request?.상차사진Url,
+                인수증증빙방식 = request?.인수증증빙방식,
+                인수자명 = request?.인수자명,
+                인수자소속 = request?.인수자소속,
+                인수자서명 = request?.인수자서명,
+                기사서명 = request?.기사서명,
+                인수증확인완료 = request?.인수증확인완료 ?? false,
+                인수증서명생략확인 = request?.인수증서명생략확인 ?? false,
+                인수증서명생략사유 = request?.인수증서명생략사유
+            });
             return this.ToActionResult(result);
         }
 

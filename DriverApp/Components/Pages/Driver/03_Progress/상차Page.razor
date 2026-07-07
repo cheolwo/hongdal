@@ -44,6 +44,16 @@
                             <MudText Typo="Typo.caption" Color="Color.Secondary">다음 이동</MudText>
                             <MudText Typo="Typo.body1">@운송.하차지</MudText>
                         </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">결제/증빙</MudText>
+                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudText Typo="Typo.body1">@PaymentEvidenceLabel</MudText>
+                                @if (ReceiptEvidenceRequired)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Color="@ReceiptSignatureChipColor" Variant="Variant.Filled">@ReceiptSignatureChipLabel</MudChip>
+                                }
+                            </MudStack>
+                        </MudItem>
                     </MudGrid>
 
                     <MudDivider />
@@ -56,6 +66,80 @@
                             <MudCheckBox T="bool" @bind-Value="shipperContactConfirmed" Label="화주 또는 현장 담당자와 상차를 확인했습니다." Color="Color.Primary" />
                         </MudStack>
                     </MudPaper>
+
+                    @if (ReceiptEvidenceRequired)
+                    {
+                        <MudPaper Elevation="0" Class="pa-3">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudText Typo="Typo.subtitle1">인수증 증빙</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@ReceiptSignatureChipColor" Variant="Variant.Outlined">@ReceiptSignatureChipLabel</MudChip>
+                                </MudStack>
+
+                                <MudSelect T="string" Label="증빙 방식" @bind-Value="receiptEvidenceMethod" Variant="Variant.Outlined">
+                                    <MudSelectItem Value="@ReceiptEvidenceModeDocumentPhoto">서명 문서 사진</MudSelectItem>
+                                    <MudSelectItem Value="@ReceiptEvidenceModeDirectSignature">직접 서명 입력</MudSelectItem>
+                                    @if (!ReceiptSignatureMandatory)
+                                    {
+                                        <MudSelectItem Value="@ReceiptEvidenceModeOmitted">서명 없이 진행</MudSelectItem>
+                                    }
+                                </MudSelect>
+
+                                @if (DocumentPhotoEvidenceSelected)
+                                {
+                                    <MudCheckBox T="bool"
+                                                 @bind-Value="receiptDocumentPhotoConfirmed"
+                                                 Label="상차 사진에 서명된 인수증 또는 현장 문서가 함께 보이도록 촬영했습니다."
+                                                 Color="Color.Primary" />
+                                }
+                                else if (DirectSignatureEvidenceSelected)
+                                {
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField @bind-Value="receiptRecipientName"
+                                                          Label="인수자명"
+                                                          Variant="Variant.Outlined"
+                                                          MaxLength="100"
+                                                          Immediate="true" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField @bind-Value="receiptRecipientOrganization"
+                                                          Label="인수자 소속"
+                                                          Variant="Variant.Outlined"
+                                                          MaxLength="100"
+                                                          Immediate="true" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField @bind-Value="receiptRecipientSignature"
+                                                          Label="인수자 서명"
+                                                          Variant="Variant.Outlined"
+                                                          MaxLength="200"
+                                                          Immediate="true" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField @bind-Value="driverSignature"
+                                                          Label="기사 서명"
+                                                          Variant="Variant.Outlined"
+                                                          MaxLength="200"
+                                                          Immediate="true" />
+                                        </MudItem>
+                                    </MudGrid>
+                                    <MudCheckBox T="bool"
+                                                 @bind-Value="receiptEvidenceConfirmed"
+                                                 Label="인수자와 기사가 상차 인수 사실을 확인하고 서명했습니다."
+                                                 Color="Color.Primary" />
+                                }
+                                else
+                                {
+                                    <MudTextField @bind-Value="receiptSignatureOmissionReason"
+                                                  Label="서명 생략 사유"
+                                                  Variant="Variant.Outlined"
+                                                  MaxLength="300"
+                                                  Immediate="true" />
+                                }
+                            </MudStack>
+                        </MudPaper>
+                    }
 
                     <MudStack Spacing="2">
                         <MudText Typo="Typo.subtitle1">상차 완료 사진</MudText>
@@ -129,13 +213,65 @@
     private bool pickupPlaceConfirmed;
     private bool cargoConditionConfirmed;
     private bool shipperContactConfirmed;
+    private string? receiptRecipientName;
+    private string? receiptRecipientOrganization;
+    private string? receiptRecipientSignature;
+    private string? driverSignature;
+    private bool receiptEvidenceConfirmed;
+    private bool receiptDocumentPhotoConfirmed;
+    private string? receiptSignatureOmissionReason;
+    private string receiptEvidenceMethod = ReceiptEvidenceModeDocumentPhoto;
     private bool isCompleting;
+
+    private const string ReceiptEvidenceModeDocumentPhoto = "문서사진";
+    private const string ReceiptEvidenceModeDirectSignature = "직접서명";
+    private const string ReceiptEvidenceModeOmitted = "서명생략";
 
     private bool HasPhoto => photoBytes is { Length: > 0 };
 
     private bool FieldChecksCompleted => pickupPlaceConfirmed && cargoConditionConfirmed && shipperContactConfirmed;
 
-    private bool CanComplete => !isCapturing && FieldChecksCompleted && HasPhoto;
+    private bool ReceiptEvidenceRequired
+        => 운송?.인수증필요 == true
+           || (운송?.결제방식.Contains("인수증", StringComparison.OrdinalIgnoreCase) ?? false);
+
+    private bool ReceiptSignatureMandatory => ReceiptEvidenceRequired && 운송?.인수증서명필수 == true;
+
+    private bool DocumentPhotoEvidenceSelected => string.Equals(receiptEvidenceMethod, ReceiptEvidenceModeDocumentPhoto, StringComparison.Ordinal);
+
+    private bool DirectSignatureEvidenceSelected => string.Equals(receiptEvidenceMethod, ReceiptEvidenceModeDirectSignature, StringComparison.Ordinal);
+
+    private bool OmittedEvidenceSelected => string.Equals(receiptEvidenceMethod, ReceiptEvidenceModeOmitted, StringComparison.Ordinal) && !ReceiptSignatureMandatory;
+
+    private bool ReceiptDocumentPhotoCompleted => DocumentPhotoEvidenceSelected && receiptDocumentPhotoConfirmed && HasPhoto;
+
+    private bool ReceiptSignatureCompleted
+        => DirectSignatureEvidenceSelected
+           && receiptEvidenceConfirmed
+           && !string.IsNullOrWhiteSpace(receiptRecipientName)
+           && !string.IsNullOrWhiteSpace(receiptRecipientSignature)
+           && !string.IsNullOrWhiteSpace(driverSignature);
+
+    private bool ReceiptSignatureSkipped => ReceiptEvidenceRequired && OmittedEvidenceSelected;
+
+    private bool ReceiptEvidenceCompleted
+        => !ReceiptEvidenceRequired
+           || ReceiptDocumentPhotoCompleted
+           || ReceiptSignatureCompleted
+           || ReceiptSignatureSkipped;
+
+    private string PaymentEvidenceLabel
+        => 운송 is null
+            ? "-"
+            : string.IsNullOrWhiteSpace(운송.결제방식)
+                ? ReceiptEvidenceRequired ? "인수증" : "확인 필요"
+                : 운송.결제방식;
+
+    private string ReceiptSignatureChipLabel => ReceiptSignatureMandatory ? "서명 필수" : "서명 선택";
+
+    private Color ReceiptSignatureChipColor => ReceiptSignatureMandatory ? Color.Warning : Color.Info;
+
+    private bool CanComplete => !isCapturing && FieldChecksCompleted && ReceiptEvidenceCompleted && HasPhoto;
 
     private string CompletionGuide
     {
@@ -143,12 +279,23 @@
         {
             if (!FieldChecksCompleted && !HasPhoto)
             {
-                return "현장 확인 3가지를 체크하고 상차 완료 사진을 촬영해야 합니다.";
+                return ReceiptEvidenceRequired
+                    ? ReceiptSignatureMandatory
+                        ? "현장 확인 3가지, 인수증 증빙, 상차 완료 사진을 모두 완료해야 합니다."
+                        : "현장 확인 3가지, 인수증 증빙 또는 생략 사유, 상차 완료 사진을 모두 완료해야 합니다."
+                    : "현장 확인 3가지를 체크하고 상차 완료 사진을 촬영해야 합니다.";
             }
 
             if (!FieldChecksCompleted)
             {
                 return "현장 확인 체크를 모두 완료해야 합니다.";
+            }
+
+            if (!ReceiptEvidenceCompleted)
+            {
+                return ReceiptSignatureMandatory
+                    ? "이 거래는 서명된 문서 사진 또는 직접 서명 입력이 필요합니다."
+                    : "인수증 증빙 방식을 완료하거나 현장 합의에 따른 서명 생략 사유를 남겨야 합니다.";
             }
 
             return "상차 완료 사진을 먼저 촬영해 주세요.";
@@ -211,7 +358,7 @@
     {
         if (!CanComplete)
         {
-            SetStatus("상차 완료 사진을 먼저 촬영해 주세요.", Severity.Warning);
+            SetStatus(CompletionGuide, Severity.Warning);
             return;
         }
 
@@ -225,7 +372,8 @@
                 운송Id,
                 photoFileName ?? $"pickup-complete-{운송Id}.jpg",
                 photoContentType,
-                photoBytes!));
+                photoBytes!,
+                BuildReceiptEvidence()));
 
             var objectName = string.IsNullOrWhiteSpace(result.ObjectName) ? string.Empty : $" 저장 경로: {result.ObjectName}";
             SetStatus($"{result.Message}{objectName}", result.Uploaded ? Severity.Success : Severity.Info);
@@ -253,5 +401,51 @@
         photoPreviewUrl = null;
         photoContentType = "image/jpeg";
         SetStatus("첨부된 상차 사진을 제거했습니다.", Severity.Info);
+    }
+
+    private DriverTransportPickupReceiptEvidence? BuildReceiptEvidence()
+    {
+        if (!ReceiptEvidenceRequired)
+        {
+            return null;
+        }
+
+        if (ReceiptSignatureCompleted)
+        {
+            return new DriverTransportPickupReceiptEvidence(
+                EvidenceMethod: ReceiptEvidenceModeDirectSignature,
+                Signed: true,
+                SignatureOmitted: false,
+                SignatureOmissionReason: null,
+                RecipientName: receiptRecipientName?.Trim(),
+                RecipientOrganization: receiptRecipientOrganization?.Trim(),
+                RecipientSignature: receiptRecipientSignature?.Trim(),
+                DriverSignature: driverSignature?.Trim());
+        }
+
+        if (ReceiptDocumentPhotoCompleted)
+        {
+            return new DriverTransportPickupReceiptEvidence(
+                EvidenceMethod: ReceiptEvidenceModeDocumentPhoto,
+                Signed: true,
+                SignatureOmitted: false,
+                SignatureOmissionReason: null,
+                RecipientName: null,
+                RecipientOrganization: null,
+                RecipientSignature: null,
+                DriverSignature: null);
+        }
+
+        return new DriverTransportPickupReceiptEvidence(
+            EvidenceMethod: ReceiptEvidenceModeOmitted,
+            Signed: false,
+            SignatureOmitted: true,
+            SignatureOmissionReason: string.IsNullOrWhiteSpace(receiptSignatureOmissionReason)
+                ? "현장 합의에 따라 상차 인수 서명 없이 진행"
+                : receiptSignatureOmissionReason.Trim(),
+            RecipientName: null,
+            RecipientOrganization: null,
+            RecipientSignature: null,
+            DriverSignature: null);
     }
 }

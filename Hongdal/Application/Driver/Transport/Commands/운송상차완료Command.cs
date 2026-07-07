@@ -18,4 +18,24 @@ public sealed record 운송상차완료Command : 홍달CommandBase, IRequest<Res
     public string 기사Id { get; init; } = string.Empty;
 
     public long Id { get; init; }
+
+    public string? 상차사진ObjectName { get; init; }
+
+    public string? 상차사진Url { get; init; }
+
+    public string? 인수증증빙방식 { get; init; }
+
+    public string? 인수자명 { get; init; }
+
+    public string? 인수자소속 { get; init; }
+
+    public string? 인수자서명 { get; init; }
+
+    public string? 기사서명 { get; init; }
+
+    public bool 인수증확인완료 { get; init; }
+
+    public bool 인수증서명생략확인 { get; init; }
+
+    public string? 인수증서명생략사유 { get; init; }
 }

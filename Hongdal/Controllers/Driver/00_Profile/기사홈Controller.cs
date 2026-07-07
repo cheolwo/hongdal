@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -26,7 +27,7 @@ namespace Hongdal.Controllers.Driver.Profile00
 
             if (result == null)
             {
-                return NotFound("용달기사 정보를 찾을 수 없습니다.");
+                return this.ToNotFoundProblem("용달기사 정보를 찾을 수 없습니다.");
             }
 
             return Ok(result);

@@ -50,6 +50,9 @@ public sealed record 기사운송샘플항목(
     DateTime 예정시각,
     decimal 운송거리Km,
     decimal 예상수익,
+    bool 인수증필요,
+    bool 인수증서명필수,
+    string 결제방식,
     string 다음행동);
 
 public sealed record 기사정산샘플요약(

@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Hongdal.Controllers;
 using Hongdal.Application.Shipper.Request;
 using Hongdal.Contracts.Shipper.Request;
 using MediatR;
@@ -73,7 +74,7 @@ namespace Hongdal.Controllers.Shipper.Request01
             {
                 var errors = policyReview.경고목록
                     .Concat(policyReview.이벤트코드목록.Select(x => $"요금정책이벤트:{x}"));
-                return BadRequest(new { errors });
+                return this.ToProblemActionResult(errors);
             }
 
             var result = await _sender.Send(new 의뢰생성Command(
@@ -119,14 +120,14 @@ namespace Hongdal.Controllers.Shipper.Request01
                 req.결제상태));
             return result.IsSuccess
                 ? CreatedAtAction(nameof(의뢰단건조회), new { requestId = result.Value.의뢰Id }, result.Value)
-                : ToActionResult(result.Errors.Select(x => x.Message));
+                : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpGet("{requestId}")]
         public async Task<IActionResult> 의뢰단건조회(string requestId)
         {
             var item = await _sender.Send(new 의뢰단건조회Query(requestId));
-            return item == null ? NotFound() : Ok(item);
+            return item == null ? this.ToNotFoundProblem("운송의뢰 데이터를 찾을 수 없습니다.") : Ok(item);
         }
 
         [HttpPut("{requestId}")]
@@ -140,14 +141,14 @@ namespace Hongdal.Controllers.Shipper.Request01
                 new 위치정보입력값(req.하차?.주소?.도로명주소, req.하차?.주소?.상세주소, req.하차?.주소?.위도, req.하차?.주소?.경도, req.하차?.연락처?.이름, req.하차?.연락처?.전화번호, req.하차?.시간창?.시작일시, req.하차?.시간창?.종료일시),
                 new 요청조건입력값(req.요금옵션?.요청사항),
                 req.정산조건 is null ? null : new 정산조건입력값(req.결제수단, req.정산조건)));
-            return result.IsSuccess ? Ok(result.Value) : ToActionResult(result.Errors.Select(x => x.Message));
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpDelete("{requestId}")]
         public async Task<IActionResult> 의뢰삭제(string requestId)
         {
             var result = await _sender.Send(new 의뢰삭제Command(requestId));
-            return result.IsSuccess ? NoContent() : ToActionResult(result.Errors.Select(x => x.Message));
+            return result.IsSuccess ? NoContent() : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpPost("bulk/preview")]
@@ -182,52 +183,35 @@ namespace Hongdal.Controllers.Shipper.Request01
             };
 
             var result = await _sender.Send(new 화주운송의뢰일괄확정등록Command(confirmRequest.행목록), cancellationToken);
-            return result.IsSuccess ? Ok(result.Value) : ToActionResult(result.Errors.Select(x => x.Message));
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpPost("bulk/confirm-preview")]
         public async Task<IActionResult> 일괄미리보기확정등록([FromBody] 화주운송의뢰일괄확정등록요청 request, CancellationToken cancellationToken)
         {
             var result = await _sender.Send(new 화주운송의뢰일괄확정등록Command(request.행목록), cancellationToken);
-            return result.IsSuccess ? Ok(result.Value) : ToActionResult(result.Errors.Select(x => x.Message));
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpPost("{requestId}/settlement/offline")]
         public async Task<IActionResult> 현장지급처리(string requestId, [FromBody] 화주운송의뢰현장지급처리요청 req)
         {
             var result = await _sender.Send(new 화주운송의뢰현장지급처리Command(requestId, req.현장지급메모));
-            return result.IsSuccess ? Ok(result.Value) : ToActionResult(result.Errors.Select(x => x.Message));
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpPost("{requestId}/settlement/postpay/approve")]
         public async Task<IActionResult> 후불승인(string requestId, [FromBody] 화주운송의뢰후불승인요청 req)
         {
             var result = await _sender.Send(new 화주운송의뢰후불승인Command(requestId, req.승인메모));
-            return result.IsSuccess ? Ok(result.Value) : ToActionResult(result.Errors.Select(x => x.Message));
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         [HttpPost("{requestId}/settlement/receipt")]
         public async Task<IActionResult> 인수증등록(string requestId, [FromBody] 화주운송의뢰인수증등록요청 req)
         {
             var result = await _sender.Send(new 화주운송의뢰인수증등록Command(requestId, req.인수증번호, req.등록메모));
-            return result.IsSuccess ? Ok(result.Value) : ToActionResult(result.Errors.Select(x => x.Message));
-        }
-
-        private IActionResult ToActionResult(IEnumerable<string> errors)
-        {
-            var messages = errors.ToArray();
-            if (messages.Any(x => x.Contains("찾을 수 없습니다.", StringComparison.OrdinalIgnoreCase)))
-            {
-                return NotFound(new { errors = messages });
-            }
-
-            if (messages.Any(x => x.Contains("이미", StringComparison.OrdinalIgnoreCase)) ||
-                messages.Any(x => x.Contains("동일한", StringComparison.OrdinalIgnoreCase)))
-            {
-                return Conflict(new { errors = messages });
-            }
-
-            return BadRequest(new { errors = messages });
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
         private async Task<IActionResult> ProcessBulkPreviewAsync(IFormFile? file, CancellationToken cancellationToken)
@@ -245,25 +229,25 @@ namespace Hongdal.Controllers.Shipper.Request01
         {
             if (file == null)
             {
-                return (BadRequest(new { errors = new[] { "file is required" } }), null);
+                return (this.ToProblemActionResult("file is required"), null);
             }
 
             if (file.Length <= 0)
             {
-                return (BadRequest(new { errors = new[] { "empty file is not allowed" } }), null);
+                return (this.ToProblemActionResult("empty file is not allowed"), null);
             }
 
             await using var stream = file.OpenReadStream();
             var parsed = await _bulkParser.ParseAsync(stream, file.FileName, cancellationToken);
             if (parsed.행목록.Count == 0 && parsed.오류목록.Count > 0)
             {
-                return (BadRequest(new { errors = parsed.오류목록 }), null);
+                return (this.ToProblemActionResult(parsed.오류목록), null);
             }
 
             var result = await _sender.Send(new 화주운송의뢰일괄미리보기Command(parsed.행목록, parsed.오류목록), cancellationToken);
             return result.IsSuccess
                 ? (null, result.Value)
-                : (ToActionResult(result.Errors.Select(x => x.Message)), null);
+                : (this.ToProblemActionResult(result.Errors.Select(x => x.Message)), null);
         }
     }
 }

@@ -1,4 +1,5 @@
 using Hongdal.Contracts.Admin.Audit;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -115,7 +116,7 @@ public sealed class ActivityLogsController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<사용자행위로그상세응답>> 상세(long id, CancellationToken cancellationToken)
+    public async Task<IActionResult> 상세(long id, CancellationToken cancellationToken)
     {
         var item = await _db.사용자행위로그.AsNoTracking()
             .Where(x => x.Id == id)
@@ -142,15 +143,15 @@ public sealed class ActivityLogsController : ControllerBase
             })
             .FirstOrDefaultAsync(cancellationToken);
 
-        return item is null ? NotFound() : Ok(item);
+        return item is null ? this.ToNotFoundProblem("사용자 행위 로그를 찾을 수 없습니다.") : Ok(item);
     }
 
     [HttpGet("trace/{traceId}")]
-    public async Task<ActionResult<Trace행위로그묶음응답>> Trace조회(string traceId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Trace조회(string traceId, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(traceId))
         {
-            return BadRequest("traceId is required");
+            return this.ToProblemActionResult("traceId is required");
         }
 
         var normalizedTraceId = traceId.Trim();

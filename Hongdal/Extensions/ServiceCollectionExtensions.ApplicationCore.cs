@@ -39,6 +39,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ISalesChannelService, SalesChannelService>();
         services.AddScoped<IView가시성Service, View가시성Service>();
         services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();
+        services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
+        services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();
+        services.AddScoped<IOutboundBatchEngine, OutboundBatchEngine>();
         services.AddScoped<IWorkRelationshipSnapshotService, WorkRelationshipSnapshotService>();
         services.AddScoped<ISalesChannelOrderSyncService, SalesChannelOrderSyncService>();
         services.AddSingleton<ISalesChannelOrderFeedClient, EmptySalesChannelOrderFeedClient>();

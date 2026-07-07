@@ -12,10 +12,17 @@
 | [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차 엔진과 음식 배달 배차 엔진의 경계 |
 | [screen-flows.md](screen-flows.md) | 앱 화면의 버튼, 카드, 모드 전환이 내부 처리로 이어지는 흐름 |
 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
+| [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 주문자 집단 공동주문, 해외 선적/통관, 국내 물류대행 입고, 판매채널, 출고 배치, 입주민 우선 고용 흐름 |
+
+## 관련 아키텍처 문서
+
+| 문서 | 내용 |
+| --- | --- |
+| [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 단일/복수 상품 주문을 단일/복수 창고 출고 배치로 나누는 계획 계층 |
 
 ## 관리 원칙
 
 1. README에는 핵심 요약만 둔다.
 2. Mermaid 다이어그램은 이 폴더의 주제별 문서에 둔다.
 3. 1.0 릴리즈 판단은 [version-roadmap.md](version-roadmap.md)를 기준으로 한다.
-4. 화면과 API 연결 흐름은 [screen-flows.md](screen-flows.md) 또는 `docs/ViewControllerMapping`에 둔다.
+4. 화면과 API 연결 흐름은 [screen-flows.md](screen-flows.md)에 둔다.

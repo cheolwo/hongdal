@@ -1,4 +1,5 @@
 using Hongdal.Application.Exploration;
+using Hongdal.Controllers;
 using Hongdal.Contracts.Common.Exploration;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -33,14 +34,14 @@ public sealed class 기사탐색캠페인Controller : ControllerBase
         request.개시자역할 = 역할명.기사;
         request.대상역할 = string.IsNullOrWhiteSpace(request.대상역할) ? 역할명.화주 : request.대상역할;
         var result = await _sender.Send(new 탐색캠페인생성Command(request));
-        return result.IsSuccess ? CreatedAtAction(nameof(상세), new { id = result.Value.Id }, result.Value) : BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
+        return result.IsSuccess ? CreatedAtAction(nameof(상세), new { id = result.Value.Id }, result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
     }
 
     [HttpGet("{id:long}")]
     public async Task<IActionResult> 상세(long id)
     {
         var item = await _sender.Send(new 탐색캠페인상세조회Query(현재사용자Id(), 역할명.기사, id));
-        return item is null ? NotFound() : Ok(item);
+        return item is null ? this.ToNotFoundProblem("탐색 캠페인을 찾을 수 없습니다.") : Ok(item);
     }
 
     [HttpGet("{id:long}/recommendations")]
@@ -54,7 +55,7 @@ public sealed class 기사탐색캠페인Controller : ControllerBase
     public async Task<IActionResult> 발송(long id, [FromBody] 탐색캠페인발송요청 request)
     {
         var result = await _sender.Send(new 탐색캠페인발송Command(현재사용자Id(), 역할명.기사, id, request));
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
     }
 
     private string 현재사용자Id()

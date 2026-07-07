@@ -1,4 +1,6 @@
 using Hongdal.Contracts.Common.Sales;
+using Hongdal.Contracts.Common.Warehouse;
+using Hongdal.Services.LogisticsProcessing.Warehouse;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 
@@ -13,17 +15,20 @@ public sealed class SalesChannelOrderSyncService : ISalesChannelOrderSyncService
 {
     private readonly HongdalContext _db;
     private readonly IReadOnlyList<ISalesChannelOrderFeedClient> _feedClients;
+    private readonly IOutboundBatchEngine _outboundBatchEngine;
     private readonly SalesChannelOrderSyncOptions _options;
     private readonly ILogger<SalesChannelOrderSyncService> _logger;
 
     public SalesChannelOrderSyncService(
         HongdalContext db,
         IEnumerable<ISalesChannelOrderFeedClient> feedClients,
+        IOutboundBatchEngine outboundBatchEngine,
         Microsoft.Extensions.Options.IOptions<SalesChannelOrderSyncOptions> options,
         ILogger<SalesChannelOrderSyncService> logger)
     {
         _db = db;
         _feedClients = feedClients.ToArray();
+        _outboundBatchEngine = outboundBatchEngine;
         _options = options.Value;
         _logger = logger;
     }
@@ -105,8 +110,8 @@ public sealed class SalesChannelOrderSyncService : ISalesChannelOrderSyncService
         }
 
         var orderReference = CreateOrderReference(order.ChannelType, order.ChannelOrderNo);
-        var createdCount = 0;
         var now = DateTime.UtcNow;
+        var lines = new List<OutboundBatchPlanLineRequest>();
 
         foreach (var item in order.Items.Where(x => x.Quantity > 0))
         {
@@ -142,26 +147,61 @@ public sealed class SalesChannelOrderSyncService : ISalesChannelOrderSyncService
                 continue;
             }
 
+            lines.Add(new OutboundBatchPlanLineRequest
+            {
+                LineKey = CreateLineKey(mapped.product.판매SKU, lines.Count + 1),
+                SalesProductId = mapped.product.Id,
+                PreferredInboundProductId = mapped.inboundItem.Id,
+                Sku = mapped.product.판매SKU,
+                ProductName = string.IsNullOrWhiteSpace(item.ProductName) ? mapped.product.대표상품명 : item.ProductName,
+                Quantity = item.Quantity
+            });
+        }
+
+        if (lines.Count == 0)
+        {
+            return 0;
+        }
+
+        var plan = await _outboundBatchEngine.PlanAsync(new OutboundBatchPlanRequest
+        {
+            OrderReference = orderReference,
+            SellerUserId = account.UserId,
+            OrdererUserId = string.IsNullOrWhiteSpace(order.BuyerName) ? order.RecipientName : order.BuyerName,
+            DestinationAddress = order.RecipientAddress,
+            Lines = lines
+        }, cancellationToken);
+
+        foreach (var allocation in plan.Allocations)
+        {
             _db.출고예정.Add(new 홍달.도메인.창고.출고예정
             {
                 주문참조번호 = orderReference,
-                판매상품Id = mapped.product.Id,
-                입고상품Id = mapped.inboundItem.Id,
+                판매상품Id = allocation.SalesProductId,
+                입고상품Id = allocation.InboundProductId,
                 판매자UserId = account.UserId,
                 주문자UserId = string.IsNullOrWhiteSpace(order.BuyerName) ? order.RecipientName : order.BuyerName,
-                출고창고Id = mapped.inboundItem.창고Id,
-                상품명 = string.IsNullOrWhiteSpace(item.ProductName) ? mapped.product.대표상품명 : item.ProductName,
-                SKU = mapped.product.판매SKU,
-                수량 = item.Quantity,
+                출고창고Id = allocation.WarehouseId,
+                상품명 = allocation.ProductName,
+                SKU = allocation.Sku,
+                수량 = allocation.Quantity,
                 상태 = 홍달.도메인.창고.출고상태.예정,
                 CreatedAt = now,
                 UpdatedAt = now
             });
-
-            createdCount++;
         }
 
-        return createdCount;
+        if (plan.UnallocatedLines.Count > 0)
+        {
+            _logger.LogInformation(
+                "Action={Action} OrderReference={OrderReference} UnallocatedLineCount={UnallocatedLineCount} Message={Message}",
+                "OutboundBatchPlanPartiallyUnallocated",
+                orderReference,
+                plan.UnallocatedLines.Count,
+                plan.Message);
+        }
+
+        return plan.Allocations.Count;
     }
 
     private static string NormalizeScope(string syncScope)
@@ -171,4 +211,7 @@ public sealed class SalesChannelOrderSyncService : ISalesChannelOrderSyncService
 
     private static string CreateOrderReference(string channelType, string channelOrderNo)
         => $"{channelType.Trim()}:{channelOrderNo.Trim()}";
+
+    private static string CreateLineKey(string sku, int sequence)
+        => $"{sku.Trim()}#{sequence}";
 }

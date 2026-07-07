@@ -6,8 +6,8 @@ public sealed class CustomsOptions
 
     public string UnipassBaseUrl { get; set; } = "https://unipass.customs.go.kr";
     public string PersonalCodeValidationPath { get; set; } = "/csp/persEcmRdcnt/retrievePersEcmRdcnt.do";
-    public string CargoTrackingBaseUrl { get; set; } = "https://apis.data.go.kr";
-    public string CargoTrackingPath { get; set; } = "/1220000/CargoTracingService/getCargoInfo";
+    public string CargoTrackingBaseUrl { get; set; } = "https://unipass.customs.go.kr:38010";
+    public string CargoTrackingPath { get; set; } = "/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo";
     public string? ApiKey { get; set; }
     public int TimeoutSeconds { get; set; } = 20;
 }

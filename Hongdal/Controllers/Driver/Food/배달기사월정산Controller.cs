@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ namespace Hongdal.Controllers.Driver.Food
         [HttpGet("current")]
         public async Task<IActionResult> 당월조회(string driverId)
         {
-            if (!현재기사확인(driverId)) return Forbid();
+            if (!현재기사확인(driverId)) return this.ToForbiddenProblem("다른 기사의 월정산은 조회할 수 없습니다.");
 
             var now = DateTime.UtcNow;
             var settlement = await _db.기사월정산
@@ -51,11 +52,11 @@ namespace Hongdal.Controllers.Driver.Food
         [HttpPost("{year:int}/{month:int}/mark-paid")]
         public async Task<IActionResult> 결제완료처리(string driverId, int year, int month)
         {
-            if (!현재기사확인(driverId)) return Forbid();
+            if (!현재기사확인(driverId)) return this.ToForbiddenProblem("다른 기사의 월정산은 변경할 수 없습니다.");
 
             if (month < 1 || month > 12)
             {
-                return BadRequest("month must be between 1 and 12");
+                return this.ToProblemActionResult("month must be between 1 and 12");
             }
 
             var settlement = await _driverMonthlySettlementService.월말청구결제완료처리Async(driverId, year, month, DateTime.UtcNow);

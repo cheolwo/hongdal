@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.Controllers;
 using Hongdal.Application.ProductJourney.Queries;
 
 namespace Hongdal.Controllers.Common;
@@ -23,7 +24,7 @@ public sealed class 상품여정Controller : ControllerBase
         var result = await _sender.Send(new 스캔코드기반상품여정조회Query(code), cancellationToken);
         if (result is null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("상품 여정 정보를 찾을 수 없습니다.");
         }
 
         return Ok(result);

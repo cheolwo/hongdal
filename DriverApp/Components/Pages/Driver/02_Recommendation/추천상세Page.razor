@@ -1,4 +1,4 @@
-﻿@page "/driver/recommendations/{의뢰Id:long}"
+﻿@page "/driver/recommendations/{의뢰Id}"
 @inject IDriverSampleDataService Samples
 @inject IDriverRecommendationDecisionService DecisionService
 
@@ -77,7 +77,7 @@
                         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Accept">수락</MudButton>
                         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Hold">보류</MudButton>
                         <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="Reject">거절</MudButton>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@DriverRoutes.RecommendationDecision(의뢰Id.ToString())">배차 처리 화면</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@DriverRoutes.RecommendationDecision(의뢰Id)">배차 처리 화면</MudButton>
                         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Recommendations">추천 목록으로</MudButton>
                     </MudStack>
                 </MudStack>
@@ -93,7 +93,7 @@
 
 @code {
     [Parameter]
-    public long 의뢰Id { get; set; }
+    public string 의뢰Id { get; set; } = string.Empty;
 
     private DriverRequestItem? 의뢰 => Samples.추천의뢰조회(의뢰Id);
     private string? _처리상태;
@@ -119,16 +119,24 @@
         }
     }
 
-    private void Accept()
+    private async Task Accept()
     {
         if (의뢰 is null)
         {
             return;
         }
 
-        var decision = DecisionService.Accept(의뢰);
-        _처리상태 = decision.Memo;
-        _처리Severity = Severity.Success;
+        try
+        {
+            var decision = await DecisionService.AcceptAsync(의뢰);
+            _처리상태 = decision.Memo;
+            _처리Severity = Severity.Success;
+        }
+        catch (Exception ex)
+        {
+            _처리상태 = ex.Message;
+            _처리Severity = Severity.Error;
+        }
     }
 
     private void Hold()
@@ -143,16 +151,24 @@
         _처리Severity = Severity.Info;
     }
 
-    private void Reject()
+    private async Task Reject()
     {
         if (의뢰 is null)
         {
             return;
         }
 
-        var decision = DecisionService.Reject(의뢰, "추천 상세에서 거절");
-        _처리상태 = decision.Memo;
-        _처리Severity = Severity.Warning;
+        try
+        {
+            var decision = await DecisionService.RejectAsync(의뢰, "추천 상세에서 거절");
+            _처리상태 = decision.Memo;
+            _처리Severity = Severity.Warning;
+        }
+        catch (Exception ex)
+        {
+            _처리상태 = ex.Message;
+            _처리Severity = Severity.Error;
+        }
     }
 
     private DriverWarningBadgeState WarningState => DriverWarningBadgeStateFactory.Create(의뢰);

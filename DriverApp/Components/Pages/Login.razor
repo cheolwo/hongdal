@@ -1,6 +1,6 @@
 @page "/login"
-@using DriverApp.Models.Auth
 @inject IAuthSession AuthSession
+@inject AuthApiService AuthApi
 @inject NavigationManager NavigationManager
 
 <PageTitle>로그인</PageTitle>
@@ -89,20 +89,26 @@
             return;
         }
 
-        await AuthSession.ApplyAsync(new TokenResponse
+        try
         {
-            AccessToken = "demo-token",
-            RefreshToken = "demo-refresh-token",
-            AccessTokenExpiresAtUtc = DateTime.UtcNow.AddHours(8),
-            RefreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(7),
-            UserId = _loginId,
-            UserName = _loginId,
-            Roles = ["Driver"]
-        });
+            var result = await AuthApi.LoginAsync(_loginId, _password);
+            if (!result.IsSuccess)
+            {
+                _statusSeverity = Severity.Error;
+                _statusMessage = result.ErrorMessage;
+                return;
+            }
+        }
+        catch
+        {
+            _statusSeverity = Severity.Error;
+            _statusMessage = "Hongdal 서버에 연결하지 못했습니다. 서버 실행 상태와 HTTPS 포트를 확인해 주세요.";
+            return;
+        }
 
         _isLoggedIn = true;
         _statusSeverity = Severity.Success;
-        _statusMessage = $"{_loginId} 님, 로그인되었습니다.";
+        _statusMessage = $"{AuthSession.UserName ?? _loginId} 님, 서버 로그인되었습니다.";
     }
 
     private async Task Logout()

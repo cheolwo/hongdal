@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Hongdal.Application.CommandProcessing;
+using Hongdal.Controllers;
 using Hongdal.Contracts.Common.ViewSettings;
 using Hongdal.Contracts.CommandSettings;
 using Microsoft.AspNetCore.Authorization;
@@ -150,7 +151,7 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
         var normalizedUserId = NormalizeUserId(userId);
         if (normalizedUserId is null)
         {
-            return BadRequest("userId is required.");
+            return this.ToProblemActionResult("userId is required.");
         }
 
         var validation = ValidateTarget(targetType, targetName, featureName);
@@ -181,7 +182,7 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
         var normalizedUserId = NormalizeUserId(userId);
         if (normalizedUserId is null)
         {
-            return BadRequest("userId is required.");
+            return this.ToProblemActionResult("userId is required.");
         }
 
         var validation = ValidateTarget(targetType, targetName, featureName);
@@ -256,22 +257,22 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(targetName) || string.IsNullOrWhiteSpace(featureName))
         {
-            return BadRequest("targetName and featureName are required.");
+            return this.ToProblemActionResult("targetName and featureName are required.");
         }
 
         if (!string.Equals(targetType, AuxiliaryFeatureTargetTypes.Command, StringComparison.OrdinalIgnoreCase))
         {
-            return BadRequest("Only Command targets are catalog-backed in the current admin screen.");
+            return this.ToProblemActionResult("Only Command targets are catalog-backed in the current admin screen.");
         }
 
         if (!_catalogResolver.IsSupportedDriverCommand(targetName))
         {
-            return BadRequest("Unsupported command target.");
+            return this.ToProblemActionResult("Unsupported command target.");
         }
 
         if (!_catalogResolver.IsSupportedFeature(featureName))
         {
-            return BadRequest("Unsupported feature.");
+            return this.ToProblemActionResult("Unsupported feature.");
         }
 
         return null;
@@ -282,12 +283,12 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
         var policy = _catalogResolver.GetFeatures().FirstOrDefault(x => string.Equals(x.FeatureName, featureName, StringComparison.Ordinal));
         if (policy is null)
         {
-            return BadRequest("Unsupported feature.");
+            return this.ToProblemActionResult("Unsupported feature.");
         }
 
         if (policy.IsRequired)
         {
-            return BadRequest("Required workflow features cannot be disabled or overridden.");
+            return this.ToConflictProblem("Required workflow features cannot be disabled or overridden.");
         }
 
         return null;

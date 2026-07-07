@@ -103,6 +103,91 @@ public sealed class ApartmentComplexBasicItem
     public string? LegalDongAddress { get; init; }
 }
 
+public sealed class ApartmentManagementFeeSnapshotRequest
+{
+    public string ComplexCode { get; init; } = string.Empty;
+
+    public string Month { get; init; } = string.Empty;
+}
+
+public sealed class ApartmentManagementFeeSnapshotItem
+{
+    public string ComplexCode { get; init; } = string.Empty;
+
+    public string Month { get; init; } = string.Empty;
+
+    public int? HouseholdCount { get; init; }
+
+    public decimal PublicManagementFeeAmount { get; init; }
+
+    public decimal IndividualUsageFeeAmount { get; init; }
+
+    public decimal LongTermRepairReserveMonthlyAmount { get; init; }
+
+    public decimal EstimatedTotalMonthlyFeeAmount { get; init; }
+
+    public decimal? EstimatedFeePerHousehold { get; init; }
+
+    public IReadOnlyList<ApartmentManagementFeeLineItem> LineItems { get; init; } = [];
+
+    public string DataSource { get; init; } = "K-apt public data";
+}
+
+public sealed class ApartmentManagementFeeLineItem
+{
+    public string Category { get; init; } = string.Empty;
+
+    public string Code { get; init; } = string.Empty;
+
+    public string DisplayName { get; init; } = string.Empty;
+
+    public decimal Amount { get; init; }
+}
+
+public sealed class ApartmentGroupCommerceOffsetSimulationRequest
+{
+    public string ComplexCode { get; init; } = string.Empty;
+
+    public string Month { get; init; } = string.Empty;
+
+    public int ParticipantHouseholdCount { get; init; }
+
+    public decimal ExpectedSalesAmount { get; init; }
+
+    public decimal ExpectedPurchaseCost { get; init; }
+
+    public decimal ExpectedLogisticsCost { get; init; }
+
+    public decimal ExpectedPlatformFee { get; init; }
+
+    public decimal ExpectedOtherCost { get; init; }
+
+    public decimal ProfitSharingRate { get; init; } = 1m;
+}
+
+public sealed class ApartmentGroupCommerceOffsetSimulationResult
+{
+    public ApartmentManagementFeeSnapshotItem FeeSnapshot { get; init; } = new();
+
+    public int ParticipantHouseholdCount { get; init; }
+
+    public decimal ExpectedSalesAmount { get; init; }
+
+    public decimal ExpectedTotalCost { get; init; }
+
+    public decimal ExpectedGrossProfit { get; init; }
+
+    public decimal ProfitSharingRate { get; init; }
+
+    public decimal ExpectedSharedProfit { get; init; }
+
+    public decimal? ExpectedMonthlyOffsetPerParticipant { get; init; }
+
+    public decimal? EstimatedManagementFeeOffsetRate { get; init; }
+
+    public string Summary { get; init; } = string.Empty;
+}
+
 public sealed class OrdererGroupScopeLookupRequest
 {
     public string? RoadAddress { get; init; }

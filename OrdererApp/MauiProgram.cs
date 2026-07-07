@@ -21,6 +21,7 @@ public static class MauiProgram
         });
         builder.Services.AddScoped<PlatformCommunityService>();
         builder.Services.AddSingleton<IRestaurantSearchPolicyService, HttpRestaurantSearchPolicyService>();
+        builder.Services.AddSingleton<IGroupPurchaseShipmentTrackingService, HttpGroupPurchaseShipmentTrackingService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

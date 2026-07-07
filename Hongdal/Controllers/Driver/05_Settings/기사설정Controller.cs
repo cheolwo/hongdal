@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services;
@@ -36,7 +37,7 @@ namespace Hongdal.Controllers.Driver.Settings05
             var driverId = 현재기사Id();
             if (request == null)
             {
-                return BadRequest("request body is required");
+                return this.ToProblemActionResult("request body is required");
             }
 
             await _callScopeStore.SetNationwideEnabledAsync(driverId, request.NationwideEnabled);

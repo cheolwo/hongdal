@@ -80,7 +80,7 @@ MAUI 화주 앱의 샘플/프로토타입 서비스에도 동일한 경계를 �
   - 후속 처리: 이벤트 로그, 수출입 흐름이면 `RequestCustomsHsReviewCommand`로 HS 검토 요청 생성
 
 - `ProcessCommerceOrderCommand`
-  - 핵심 처리: 외부 주문 중복 방지, 국내/해외 분류, 재고 예약, 피킹 계획, 창고 출고 알림 생성
+  - 핵심 처리: 외부 주문 중복 방지, 국내/해외 분류, 출고 예약, 피킹 계획, 창고 출고 알림 생성
   - 이벤트: `CommerceOrderProcessedEvent`
   - 후속 처리: 이벤트 로그
 

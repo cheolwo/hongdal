@@ -1,4 +1,5 @@
 using Hongdal.Contracts.Common.Hr;
+using Hongdal.Controllers;
 using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,10 +30,10 @@ public sealed class HrEmploymentContractsController : ControllerBase
     }
 
     [HttpGet("{contractId:guid}")]
-    public async Task<ActionResult<HrEmploymentContractResponse>> Get(Guid contractId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get(Guid contractId, CancellationToken cancellationToken)
     {
         var contract = await _contractService.GetAsync(contractId, cancellationToken);
-        return contract is null ? NotFound() : Ok(contract);
+        return contract is null ? this.ToNotFoundProblem("HR 고용계약을 찾을 수 없습니다.") : Ok(contract);
     }
 
     [HttpPost]

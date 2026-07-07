@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Hongdal.Controllers;
 using Hongdal.Application.Admin.Operating;
 using Hongdal.Contracts.Admin.Progress;
 
@@ -37,7 +38,7 @@ public sealed class 배차계획관리Controller : ControllerBase
 
         if (item == null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("배차계획 정보를 찾을 수 없습니다.");
         }
 
         return Ok(item);

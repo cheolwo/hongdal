@@ -1,4 +1,4 @@
-﻿@page "/driver/recommendations/{의뢰Id:long}/decision"
+﻿@page "/driver/recommendations/{의뢰Id}/decision"
 @inject IDriverSampleDataService Samples
 @inject IDriverRecommendationDecisionService DecisionService
 
@@ -49,7 +49,7 @@
                         <MudButton Variant="Variant.Outlined" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="@(() => _거절입력표시 = true)">거절</MudButton>
                     }
                 </MudStack>
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.RecommendationDetail(의뢰Id.ToString())">추천 상세로</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.RecommendationDetail(의뢰Id)">추천 상세로</MudButton>
             </MudStack>
         </MudPaper>
     </MudStack>
@@ -57,7 +57,7 @@
 
 @code {
     [Parameter]
-    public long 의뢰Id { get; set; }
+    public string 의뢰Id { get; set; } = string.Empty;
 
     private DriverRequestItem? 의뢰 => Samples.추천의뢰조회(의뢰Id);
     private string _처리상태 = "아직 처리 전입니다.";
@@ -85,16 +85,24 @@
         }
     }
 
-    private void 배차수락샘플()
+    private async Task 배차수락샘플()
     {
         if (의뢰 is null)
         {
             return;
         }
 
-        var decision = DecisionService.Accept(의뢰);
-        _처리상태 = decision.Memo;
-        _처리Severity = Severity.Success;
+        try
+        {
+            var decision = await DecisionService.AcceptAsync(의뢰);
+            _처리상태 = decision.Memo;
+            _처리Severity = Severity.Success;
+        }
+        catch (Exception ex)
+        {
+            _처리상태 = ex.Message;
+            _처리Severity = Severity.Error;
+        }
     }
 
     private void 배차보류샘플()
@@ -109,16 +117,24 @@
         _처리Severity = Severity.Info;
     }
 
-    private void 배차거절샘플()
+    private async Task 배차거절샘플()
     {
         if (의뢰 is null)
         {
             return;
         }
 
-        var decision = DecisionService.Reject(의뢰, _거절사유);
-        _처리상태 = decision.Memo;
-        _처리Severity = Severity.Warning;
+        try
+        {
+            var decision = await DecisionService.RejectAsync(의뢰, _거절사유);
+            _처리상태 = decision.Memo;
+            _처리Severity = Severity.Warning;
+        }
+        catch (Exception ex)
+        {
+            _처리상태 = ex.Message;
+            _처리Severity = Severity.Error;
+        }
     }
 }
 

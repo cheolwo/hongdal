@@ -1,3 +1,5 @@
+using Hongdal.Contracts.Common.WarehouseScanning;
+
 namespace WarehouseManagerApp.Services;
 
 public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWorkflowService
@@ -38,6 +40,8 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
             throw new InvalidOperationException("상품 바코드를 입력해야 현장 입고를 등록할 수 있습니다.");
         }
 
+        ValidateInboundBundleBarcode(request.InboundBundleBarcode);
+
         if (string.IsNullOrWhiteSpace(request.ProductName))
         {
             throw new InvalidOperationException("상품명을 입력해 주세요.");
@@ -72,10 +76,11 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
 
         return Task.FromResult(new InboundReceivingConfirmationResult(
             product,
+            NormalizeBarcode(request.InboundBundleBarcode),
             request.ReceivedQuantity,
             true,
             "UnplannedInboundRegistered",
-            "현장 입고로 임시 등록했습니다. 이후 계약 연결, 정산 조건, 검수 사유를 보완해야 합니다."));
+            "현장 입고로 임시 등록했습니다. 입고 묶음 바코드와 함께 검수 단계에서 계약 연결, 정산 조건, 검수 사유를 보완해야 합니다."));
     }
 
     public async Task<InboundReceivingConfirmationResult> ConfirmReceivedAsync(
@@ -83,6 +88,8 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        ValidateInboundBundleBarcode(request.InboundBundleBarcode);
 
         var product = await FindExpectedProductAsync(request.ProductBarcode, cancellationToken)
             ?? throw new InvalidOperationException("입고 예정 상품을 찾지 못했습니다.");
@@ -100,10 +107,25 @@ public sealed class SampleInboundReceivingWorkflowService : IInboundReceivingWor
 
         return new InboundReceivingConfirmationResult(
             product,
+            NormalizeBarcode(request.InboundBundleBarcode),
             request.ReceivedQuantity,
             quantityMatched,
             status,
             message);
+    }
+
+    private static void ValidateInboundBundleBarcode(string inboundBundleBarcode)
+    {
+        if (string.IsNullOrWhiteSpace(inboundBundleBarcode))
+        {
+            throw new InvalidOperationException("입고 묶음 바코드를 스캔해야 입고 확인을 완료할 수 있습니다.");
+        }
+
+        var parsed = WarehouseBarcodeParser.Parse(inboundBundleBarcode);
+        if (parsed.Kind != WarehouseBarcodeKindCode.Bundle)
+        {
+            throw new InvalidOperationException("입고 묶음 바코드는 BND: 또는 BUNDLE: 형식이어야 합니다.");
+        }
     }
 
     private static string NormalizeBarcode(string value)

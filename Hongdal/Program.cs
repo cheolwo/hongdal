@@ -3,6 +3,7 @@ using System.Data.Common;
 using Hongdal.Hubs;
 using Hongdal.Application.Behaviors;
 using Hongdal.Application.CommandProcessing;
+using Hongdal.Controllers;
 using Hongdal.Security;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
@@ -35,6 +36,8 @@ using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Notifications;
 using 홍달.Services.Payments;
 using Hongdal.Services.Driver.Development;
+using Hongdal.Services.Development;
+using Hongdal.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CustomsBrokerCorsPolicy = "CustomsBrokerApp";
@@ -144,6 +147,7 @@ if (string.IsNullOrWhiteSpace(redisConnectionString))
 }
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddSingleton<IIsmsPTransportKeyStatusStore, RedisIsmsPTransportKeyStatusStore>();
 
 var mongoOptions = builder.Configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();
 var mongoConnectionString = string.IsNullOrWhiteSpace(mongoOptions.ConnectionString)
@@ -231,7 +235,7 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<HongdalContext>();
-    await InitializeDatabaseAsync(db, app.Services, app.Logger);
+    await InitializeDatabaseAsync(db, app.Services, app.Environment, app.Logger);
 }
 
 if (!isRunningInContainer)
@@ -271,17 +275,48 @@ app.UseExceptionHandler(errorApp =>
                 Title = "요청값 검증에 실패했습니다.",
                 Status = StatusCodes.Status400BadRequest
             };
+            problem.Extensions["errorCode"] = "ValidationFailed";
+            problem.Extensions["traceId"] = context.TraceIdentifier;
+
+            await context.Response.WriteAsJsonAsync(problem);
+            return;
+        }
+
+        if (exception is InvalidOperationException invalidOperationException)
+        {
+            var failure = Result응답확장.실패분류(invalidOperationException.Message);
+            context.Response.StatusCode = failure.StatusCode;
+            context.Response.ContentType = "application/problem+json";
+
+            var problem = new ProblemDetails
+            {
+                Title = invalidOperationException.Message,
+                Status = failure.StatusCode,
+                Type = failure.Type,
+                Detail = failure.Detail,
+                Instance = context.Request.Path.Value
+            };
+            problem.Extensions["errors"] = new[] { invalidOperationException.Message };
+            problem.Extensions["errorCode"] = failure.Code;
+            problem.Extensions["traceId"] = context.TraceIdentifier;
 
             await context.Response.WriteAsJsonAsync(problem);
             return;
         }
 
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        await context.Response.WriteAsJsonAsync(new ProblemDetails
+        context.Response.ContentType = "application/problem+json";
+        var serverProblem = new ProblemDetails
         {
             Title = "서버 오류가 발생했습니다.",
-            Status = StatusCodes.Status500InternalServerError
-        });
+            Status = StatusCodes.Status500InternalServerError,
+            Type = "https://httpstatuses.com/500",
+            Detail = "예상하지 못한 서버 오류입니다. traceId로 서버 로그를 확인해야 합니다.",
+            Instance = context.Request.Path.Value
+        };
+        serverProblem.Extensions["errorCode"] = "ServerError";
+        serverProblem.Extensions["traceId"] = context.TraceIdentifier;
+        await context.Response.WriteAsJsonAsync(serverProblem);
     });
 });
 
@@ -289,6 +324,7 @@ app.UseAuthentication();
 app.UseCors(CustomsBrokerCorsPolicy);
 app.UseAuthorization();
 
+app.UseMiddleware<IsmsPEncryptedTransportMiddleware>();
 app.UseMiddleware<HrRoleAccessMiddleware>();
 app.UseMiddleware<사용자행위로그Middleware>();
 app.MapControllers();
@@ -296,7 +332,7 @@ app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
 
 app.Run();
 
-static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider services, Microsoft.Extensions.Logging.ILogger logger)
+static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider services, IWebHostEnvironment environment, Microsoft.Extensions.Logging.ILogger logger)
 {
     var migrationDelays = new[]
     {
@@ -340,6 +376,10 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
         await viewVisibilityService.SeedPoliciesAsync();
         var documentService = services.GetRequiredService<I문서관리Service>();
         await documentService.SeedDefaultsAsync();
+        if (environment.IsDevelopment())
+        {
+            await HongdalV1DevelopmentDataSeeder.SeedAsync(services, logger);
+        }
     }
     catch (Exception ex)
     {

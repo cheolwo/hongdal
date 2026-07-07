@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Data;
@@ -53,7 +54,7 @@ namespace Hongdal.Controllers.Driver.Recommendation02
             var driverId = 현재기사Id();
             if (radiusKm <= 0)
             {
-                return BadRequest("radiusKm must be greater than 0.");
+                return this.ToProblemActionResult("radiusKm must be greater than 0.");
             }
 
             var criteria = new 배차추천검색조건(latitude, longitude, radiusKm);

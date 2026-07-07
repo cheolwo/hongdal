@@ -48,12 +48,16 @@ public static class HrParticipantCategoryCodes
     public const string CounterpartyRepresentative = "CounterpartyRepresentative";
     public const string InternalProjectOperator = "InternalProjectOperator";
     public const string ExternalProfessional = "ExternalProfessional";
+    public const string OrdererGroupMember = "OrdererGroupMember";
+    public const string CommunityPartTimeWorker = "CommunityPartTimeWorker";
 
     public static string Normalize(string? value)
         => value?.Trim() switch
         {
             CounterpartyRepresentative => CounterpartyRepresentative,
             ExternalProfessional => ExternalProfessional,
+            OrdererGroupMember => OrdererGroupMember,
+            CommunityPartTimeWorker => CommunityPartTimeWorker,
             _ => InternalProjectOperator
         };
 
@@ -62,6 +66,8 @@ public static class HrParticipantCategoryCodes
         {
             CounterpartyRepresentative => "거래 상대/대표",
             ExternalProfessional => "외부 전문 참여자",
+            OrdererGroupMember => "주문자 집단 구성원",
+            CommunityPartTimeWorker => "공동주문 단기 근로자",
             _ => "내부 실무/프로젝트 담당자"
         };
 }
@@ -73,6 +79,7 @@ public static class HrScopeTypes
     public const string Immigration = "Immigration";
     public const string PurchasingAgency = "PurchasingAgency";
     public const string ShippingAgency = "ShippingAgency";
+    public const string OrdererGroup = "OrdererGroup";
 }
 
 public static class HrScopeIds
@@ -94,4 +101,11 @@ public static class HrDetailedRoleCodes
     public const string ImmigrationVisaAgent = "Immigration.VisaAgent";
     public const string PurchasingAgencyOperator = "PurchasingAgency.Operator";
     public const string ShippingAgencyOperator = "ShippingAgency.Operator";
+    public const string OrdererGroupRepresentative = "OrdererGroup.Representative";
+    public const string OrdererGroupImportCoordinator = "OrdererGroup.ImportCoordinator";
+    public const string OrdererGroupSortingWorker = "OrdererGroup.SortingWorker";
+    public const string OrdererGroupDistributionWorker = "OrdererGroup.DistributionWorker";
+    public const string OrdererGroupSecurityWorker = "OrdererGroup.SecurityWorker";
+    public const string OrdererGroupParcelAggregationWorker = "OrdererGroup.ParcelAggregationWorker";
+    public const string OrdererGroupCommunityFacilityWorker = "OrdererGroup.CommunityFacilityWorker";
 }

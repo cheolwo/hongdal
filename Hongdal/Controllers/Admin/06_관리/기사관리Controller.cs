@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Hongdal.Controllers;
 using Hongdal.Application.Admin.Management;
 using Hongdal.Contracts.Admin.Management;
 
@@ -36,7 +37,7 @@ public sealed class 기사관리Controller : ControllerBase
 
         if (item == null)
         {
-            return NotFound();
+            return this.ToNotFoundProblem("기사 정보를 찾을 수 없습니다.");
         }
 
         return Ok(item);

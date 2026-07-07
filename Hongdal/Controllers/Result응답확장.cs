@@ -35,35 +35,131 @@ public static class Result응답확장
         return controller.ToFailureActionResult(result.Errors);
     }
 
-    private static IActionResult ToFailureActionResult(this ControllerBase controller, IReadOnlyCollection<IError> errors)
+    public static IActionResult ToProblemActionResult(this ControllerBase controller, IEnumerable<string> errors)
     {
-        var messages = errors.Select(x => x.Message).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+        return controller.ToProblemActionResult(errors, null);
+    }
+
+    public static IActionResult ToProblemActionResult(this ControllerBase controller, string message, int? statusCode = null)
+    {
+        return controller.ToProblemActionResult([message], statusCode);
+    }
+
+    public static IActionResult ToAuthenticationProblem(this ControllerBase controller, string message)
+    {
+        return controller.ToProblemActionResult(message, StatusCodes.Status401Unauthorized);
+    }
+
+    public static IActionResult ToNotFoundProblem(this ControllerBase controller, string message = "요청한 데이터를 찾을 수 없습니다.")
+    {
+        return controller.ToProblemActionResult(message, StatusCodes.Status404NotFound);
+    }
+
+    public static IActionResult ToConflictProblem(this ControllerBase controller, string message)
+    {
+        return controller.ToProblemActionResult(message, StatusCodes.Status409Conflict);
+    }
+
+    public static IActionResult ToForbiddenProblem(this ControllerBase controller, string message = "현재 사용자 또는 역할로는 이 작업을 수행할 수 없습니다.")
+    {
+        return controller.ToProblemActionResult(message, StatusCodes.Status403Forbidden);
+    }
+
+    private static IActionResult ToProblemActionResult(this ControllerBase controller, IEnumerable<string> errors, int? statusCode)
+    {
+        var messages = errors.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
         var firstMessage = messages.FirstOrDefault() ?? "요청을 처리할 수 없습니다.";
-        var statusCode = 실패상태코드(firstMessage);
+        var failure = statusCode.HasValue
+            ? 실패분류(firstMessage, statusCode.Value)
+            : 실패분류(firstMessage);
         var problem = new ProblemDetails
         {
             Title = firstMessage,
-            Status = statusCode
+            Status = failure.StatusCode,
+            Type = failure.Type,
+            Detail = failure.Detail,
+            Instance = controller.HttpContext?.Request?.Path.Value
         };
         problem.Extensions["errors"] = messages;
+        problem.Extensions["errorCode"] = failure.Code;
+        problem.Extensions["traceId"] = controller.HttpContext?.TraceIdentifier ?? string.Empty;
 
-        return controller.StatusCode(statusCode, problem);
+        return controller.StatusCode(failure.StatusCode, problem);
     }
 
-    private static int 실패상태코드(string message)
+    private static IActionResult ToFailureActionResult(this ControllerBase controller, IReadOnlyCollection<IError> errors)
     {
+        return controller.ToProblemActionResult(errors.Select(x => x.Message), null);
+    }
+
+    private static FailureClassification 실패분류(string message, int statusCode)
+    {
+        return statusCode switch
+        {
+            StatusCodes.Status401Unauthorized => new FailureClassification(statusCode, "AuthenticationRequired", "https://httpstatuses.com/401", "로그인 세션을 확인한 뒤 다시 시도해야 합니다."),
+            StatusCodes.Status403Forbidden => new FailureClassification(statusCode, "Forbidden", "https://httpstatuses.com/403", "현재 사용자 또는 역할로는 이 작업을 수행할 수 없습니다."),
+            StatusCodes.Status404NotFound => new FailureClassification(statusCode, "NotFound", "https://httpstatuses.com/404", "요청한 대상 데이터가 존재하지 않거나 조회 범위에 없습니다."),
+            StatusCodes.Status409Conflict => new FailureClassification(statusCode, "InvalidState", "https://httpstatuses.com/409", "요청 대상의 현재 상태가 이 작업을 허용하지 않습니다."),
+            _ => new FailureClassification(statusCode, "BadRequest", $"https://httpstatuses.com/{statusCode}", "요청값 또는 업무 조건을 확인해야 합니다.")
+        };
+    }
+
+    internal static FailureClassification 실패분류(string message)
+    {
+        if (message.Contains("인증 정보", StringComparison.Ordinal)
+            || message.Contains("인증이 필요", StringComparison.Ordinal))
+        {
+            return new FailureClassification(
+                StatusCodes.Status401Unauthorized,
+                "AuthenticationRequired",
+                "https://httpstatuses.com/401",
+                "로그인 세션을 확인한 뒤 다시 시도해야 합니다.");
+        }
+
+        if (message.Contains("권한", StringComparison.Ordinal)
+            || message.Contains("실행할 수 없습니다", StringComparison.Ordinal)
+            || message.Contains("접근 조건", StringComparison.Ordinal))
+        {
+            return new FailureClassification(
+                StatusCodes.Status403Forbidden,
+                "Forbidden",
+                "https://httpstatuses.com/403",
+                "현재 사용자 또는 역할로는 이 작업을 수행할 수 없습니다.");
+        }
+
         if (message.Contains("찾을 수 없습니다", StringComparison.Ordinal))
         {
-            return StatusCodes.Status404NotFound;
+            return new FailureClassification(
+                StatusCodes.Status404NotFound,
+                "NotFound",
+                "https://httpstatuses.com/404",
+                "요청한 대상 데이터가 존재하지 않거나 조회 범위에 없습니다.");
         }
 
         if (message.Contains("이미", StringComparison.Ordinal)
+            || message.Contains("다른 기사", StringComparison.Ordinal)
             || message.Contains("현재 상태", StringComparison.Ordinal)
-            || message.Contains("수락할 수 없습니다", StringComparison.Ordinal))
+            || message.Contains("가능한 배차가 아닙니다", StringComparison.Ordinal)
+            || message.Contains("수락할 수 없습니다", StringComparison.Ordinal)
+            || message.Contains("결제완료 의뢰만", StringComparison.Ordinal))
         {
-            return StatusCodes.Status409Conflict;
+            return new FailureClassification(
+                StatusCodes.Status409Conflict,
+                "InvalidState",
+                "https://httpstatuses.com/409",
+                "요청 대상의 현재 상태가 이 작업을 허용하지 않습니다.");
         }
 
-        return StatusCodes.Status400BadRequest;
+        return new FailureClassification(
+            StatusCodes.Status400BadRequest,
+            "BadRequest",
+            "https://httpstatuses.com/400",
+            "요청값 또는 업무 조건을 확인해야 합니다.");
     }
+
+    internal sealed record FailureClassification(
+        int StatusCode,
+        string Code,
+        string Type,
+        string Detail);
 }

@@ -17,7 +17,11 @@ namespace Hongdal.Security
             _jwtOptions = jwtOptions.Value;
         }
 
-        public string CreateAccessToken(ApplicationUser user, IEnumerable<string> roles, out DateTime expiresAtUtc)
+        public string CreateAccessToken(
+            ApplicationUser user,
+            IEnumerable<string> roles,
+            out DateTime expiresAtUtc,
+            IEnumerable<Claim>? additionalClaims = null)
         {
             var now = DateTime.UtcNow;
             expiresAtUtc = now.AddMinutes(_jwtOptions.AccessTokenMinutes);
@@ -36,6 +40,10 @@ namespace Hongdal.Security
             }
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            if (additionalClaims is not null)
+            {
+                claims.AddRange(additionalClaims);
+            }
 
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);

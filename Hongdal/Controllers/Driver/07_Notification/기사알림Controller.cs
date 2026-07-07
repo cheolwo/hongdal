@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -43,12 +44,12 @@ namespace Hongdal.Controllers.Driver.Notification07
             var driverId = 현재기사Id();
             if (request == null)
             {
-                return BadRequest("request body is required");
+                return this.ToProblemActionResult("request body is required");
             }
 
             if (string.IsNullOrWhiteSpace(request.PushToken))
             {
-                return BadRequest("pushToken is required");
+                return this.ToProblemActionResult("pushToken is required");
             }
 
             await _pushTokenStore.SetAsync(driverId, request.PushToken.Trim());
@@ -95,7 +96,7 @@ namespace Hongdal.Controllers.Driver.Notification07
             var driverId = 현재기사Id();
             if (request == null)
             {
-                return BadRequest("request body is required");
+                return this.ToProblemActionResult("request body is required");
             }
 
             var settings = new DriverNotificationSettings(

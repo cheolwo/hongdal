@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.Controllers;
 using 홍달.Services.Images;
 
 namespace Hongdal.Controllers.Common;
@@ -47,17 +48,17 @@ public sealed class SampleImagesController : ControllerBase
     {
         if (request is null)
         {
-            return BadRequest("request is required");
+            return this.ToProblemActionResult("request is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.대상타입))
         {
-            return BadRequest("targetType is required");
+            return this.ToProblemActionResult("targetType is required");
         }
 
         if (string.IsNullOrWhiteSpace(request.이미지용도))
         {
-            return BadRequest("imageUsage is required");
+            return this.ToProblemActionResult("imageUsage is required");
         }
 
         var jobs = await _sampleImageGenerationService.누락샘플이미지생성Async(
@@ -84,12 +85,7 @@ public sealed class SampleImagesController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "샘플 이미지 작업 재시도에 실패했습니다.",
-                Detail = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
+            return this.ToProblemActionResult(["샘플 이미지 작업 재시도에 실패했습니다.", ex.Message]);
         }
     }
 

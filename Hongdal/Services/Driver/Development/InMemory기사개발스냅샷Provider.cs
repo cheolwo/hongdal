@@ -55,6 +55,9 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
                     예정시각 = now.AddMinutes(35),
                     운송거리Km = 12.4m,
                     예상수익 = 65000m,
+                    인수증필요 = true,
+                    인수증서명필수 = false,
+                    결제방식 = "인수증 정산",
                     다음행동 = "하차지 도착"
                 }
             ],

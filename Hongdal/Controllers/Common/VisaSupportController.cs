@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using FluentResults;
 using Hongdal.Application.Immigration;
+using Hongdal.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ public sealed class VisaSupportController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId))
         {
-            return Unauthorized(new { message = "로그인 사용자 정보를 확인할 수 없습니다." });
+            return this.ToAuthenticationProblem("로그인 사용자 정보를 확인할 수 없습니다.");
         }
 
         var result = await _sender.Send(
@@ -43,14 +44,14 @@ public sealed class VisaSupportController : ControllerBase
         return ToActionResult(result);
     }
 
-    private ActionResult ToActionResult(Result<VisaSupportRequestResult> result)
+    private IActionResult ToActionResult(Result<VisaSupportRequestResult> result)
     {
         if (result.IsSuccess)
         {
             return Ok(result.Value);
         }
 
-        return BadRequest(new { errors = result.Errors.Select(x => x.Message).ToArray() });
+        return this.ToProblemActionResult(result.Errors.Select(x => x.Message));
     }
 }
 

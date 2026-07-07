@@ -176,9 +176,13 @@
 
     private string RecipientMaskedPhone => "010-****-2401";
 
-    private string RecipientPaymentMethod => "인수증 또는 현장 결제 확인";
+    private string RecipientPaymentMethod => 현재운송 is null || string.IsNullOrWhiteSpace(현재운송.결제방식)
+        ? "인수증 또는 현장 결제 확인"
+        : 현재운송.결제방식;
 
-    private string RecipientProofHint => "하차 사진 + 수령자 확인";
+    private string RecipientProofHint => 현재운송?.인수증필요 == true
+        ? 현재운송.인수증서명필수 ? "상차 인수증 서명 필수 + 하차 사진" : "상차 인수증 서명 선택 + 하차 사진"
+        : "하차 사진 + 수령자 확인";
 
     private IReadOnlyList<TransportTimelineStep> TransportTimeline =>
     [

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Contracts.Driver.Transport;
 
 namespace DriverApp.Services;
 
@@ -15,7 +16,18 @@ public sealed record DriverTransportCompletionPhoto(
     long TransportId,
     string FileName,
     string ContentType,
-    byte[] Bytes);
+    byte[] Bytes,
+    DriverTransportPickupReceiptEvidence? ReceiptEvidence = null);
+
+public sealed record DriverTransportPickupReceiptEvidence(
+    string EvidenceMethod,
+    bool Signed,
+    bool SignatureOmitted,
+    string? SignatureOmissionReason,
+    string? RecipientName,
+    string? RecipientOrganization,
+    string? RecipientSignature,
+    string? DriverSignature);
 
 public sealed record DriverTransportCompletionPhotoResult(
     bool Uploaded,
@@ -73,7 +85,7 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
         await _authSession.RestoreAsync(cancellationToken);
 
         var upload = await UploadPhotoAsync(photo, cancellationToken);
-        await CompleteTransportAsync(photo, cancellationToken);
+        await CompleteTransportAsync(photo, upload, cancellationToken);
 
         var stepName = photo.Kind == DriverTransportCompletionPhotoKind.Pickup ? "상차 완료" : "하차 완료";
         return new DriverTransportCompletionPhotoResult(
@@ -110,6 +122,7 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
 
     private async Task CompleteTransportAsync(
         DriverTransportCompletionPhoto photo,
+        FileUploadResponse upload,
         CancellationToken cancellationToken)
     {
         var path = photo.Kind == DriverTransportCompletionPhotoKind.Pickup
@@ -117,6 +130,23 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
             : $"api/v1/driver/transports/{photo.TransportId}/complete";
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        if (photo.Kind == DriverTransportCompletionPhotoKind.Pickup)
+        {
+            request.Content = JsonContent.Create(new 기사운송상차완료요청
+            {
+                상차사진ObjectName = upload.ObjectName,
+                상차사진Url = upload.Url,
+                인수증증빙방식 = photo.ReceiptEvidence?.EvidenceMethod,
+                인수자명 = photo.ReceiptEvidence?.RecipientName,
+                인수자소속 = photo.ReceiptEvidence?.RecipientOrganization,
+                인수자서명 = photo.ReceiptEvidence?.RecipientSignature,
+                기사서명 = photo.ReceiptEvidence?.DriverSignature,
+                인수증확인완료 = photo.ReceiptEvidence?.Signed == true,
+                인수증서명생략확인 = photo.ReceiptEvidence?.SignatureOmitted == true,
+                인수증서명생략사유 = photo.ReceiptEvidence?.SignatureOmissionReason
+            });
+        }
+
         ApplyAuthorization(request);
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);

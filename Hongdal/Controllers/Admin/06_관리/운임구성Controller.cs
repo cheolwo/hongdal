@@ -31,7 +31,7 @@ namespace Hongdal.Controllers.Admin.Master06
         public async Task<IActionResult> 단건조회(long id)
         {
             var item = await _sender.Send(new 운임구성단건조회Query(id));
-            if (item == null) return NotFound();
+            if (item == null) return this.ToNotFoundProblem("운임구성 정보를 찾을 수 없습니다.");
             return Ok(item);
         }
 
@@ -39,7 +39,7 @@ namespace Hongdal.Controllers.Admin.Master06
         [Authorize(Policy = "서버관리자전용")]
         public async Task<IActionResult> 생성([FromBody] 운임구성요청 request)
         {
-            if (request == null) return BadRequest();
+            if (request == null) return this.ToProblemActionResult("request body is required");
 
             var entity = await _sender.Send(new 운임구성생성Command(
                 request.의뢰Id,
@@ -56,7 +56,7 @@ namespace Hongdal.Controllers.Admin.Master06
         [Authorize(Policy = "서버관리자전용")]
         public async Task<IActionResult> 수정(long id, [FromBody] 운임구성요청 request)
         {
-            if (request == null) return BadRequest();
+            if (request == null) return this.ToProblemActionResult("request body is required");
 
             var entity = await _sender.Send(new 운임구성수정Command(
                 id,
@@ -67,7 +67,7 @@ namespace Hongdal.Controllers.Admin.Master06
                 request.대기료,
                 request.수작업비,
                 request.최종운임));
-            if (entity == null) return NotFound();
+            if (entity == null) return this.ToNotFoundProblem("운임구성 정보를 찾을 수 없습니다.");
             return Ok(entity);
         }
 

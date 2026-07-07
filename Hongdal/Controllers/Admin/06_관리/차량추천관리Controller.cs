@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.Controllers;
 using Hongdal.Application.Admin.Management;
 using Hongdal.Contracts.Admin.Management;
 
@@ -29,7 +30,7 @@ namespace Hongdal.Controllers.Admin.Master06
         {
             if (request == null)
             {
-                return BadRequest();
+                return this.ToProblemActionResult("request body is required");
             }
 
             var item = await _sender.Send(new 차량추천기준수정Command(
@@ -42,7 +43,7 @@ namespace Hongdal.Controllers.Admin.Master06
 
             if (item == null)
             {
-                return NotFound();
+                return this.ToNotFoundProblem("차량추천 기준을 찾을 수 없습니다.");
             }
 
             return Ok(item);
@@ -53,7 +54,7 @@ namespace Hongdal.Controllers.Admin.Master06
         {
             if (request == null)
             {
-                return BadRequest();
+                return this.ToProblemActionResult("request body is required");
             }
 
             return Ok(await _sender.Send(new 차량추천시뮬레이션Query(request)));

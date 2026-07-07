@@ -25,11 +25,15 @@ public sealed class RsaOaepAesGcmClientTransportProtectionService : IIsmsPClient
             throw new InvalidOperationException("ISMS-P transport public key is missing. Configure IsmsPProtectedData:TransportPublicKeyPem.");
         }
 
+        var issuedAtUtc = DateTimeOffset.UtcNow;
+        var ttl = TimeSpan.FromMinutes(Math.Max(1, options.TransportPublicKeyTtlMinutes));
+
         return new IsmsPClientEncryptionPublicKeyResponse(
             options.TransportKeyId,
             IsmsPTransportEncryptionAlgorithmCode.RsaOaepSha256Aes256Gcm,
             options.TransportPublicKeyPem,
-            DateTimeOffset.UtcNow);
+            issuedAtUtc,
+            issuedAtUtc.Add(ttl));
     }
 
     public IsmsPDecryptedTransportPayload Decrypt(IsmsPEncryptedTransportEnvelope envelope)

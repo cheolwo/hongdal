@@ -57,7 +57,8 @@ public static class ShipperServiceCollectionExtensions
     private static IServiceCollection AddShipperCoreServices(this IServiceCollection services)
     {
         services.AddSingleton<InMemoryShipperStore>();
-        services.AddSingleton<IShipperOperationsService, SampleShipperOperationsService>();
+        services.AddSingleton<SampleShipperOperationsService>();
+        services.AddScoped<IShipperOperationsService, ServerBackedShipperOperationsService>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<IAuthSession, AuthSession>();
@@ -123,11 +124,7 @@ public static class ShipperServiceCollectionExtensions
 
     private static IServiceCollection AddShipperExternalApiClients(this IServiceCollection services)
     {
-        services.AddHttpClient<배차주소ApiService>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<FoodApiOptions>>().Value;
-            client.BaseAddress = new Uri(options.BaseUrl);
-        });
+        services.AddScoped<배차주소ApiService>();
         services.AddSingleton<INaverCommerceSignatureGenerator, BCryptNaverCommerceSignatureGenerator>();
         services.AddHttpClient<INaverCommerceTokenProvider, NaverCommerceTokenProvider>((sp, client) =>
         {

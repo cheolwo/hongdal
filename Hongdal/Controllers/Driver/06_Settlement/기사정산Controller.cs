@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -36,7 +37,7 @@ namespace Hongdal.Controllers.Driver.Settlement06
             var settlement = await _sender.Send(new Hongdal.Application.Driver.Settlement.기사정산월별조회Query(driverId, year, month));
             if (settlement == null)
             {
-                return NotFound();
+                return this.ToNotFoundProblem("기사 정산 정보를 찾을 수 없습니다.");
             }
 
             return Ok(settlement);

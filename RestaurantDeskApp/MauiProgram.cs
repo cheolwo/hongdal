@@ -17,11 +17,8 @@ public static class MauiProgram
         builder.Services.Configure<FoodApiOptions>(builder.Configuration.GetSection(FoodApiOptions.SectionName));
         builder.Services.AddSingleton<RestaurantDeskSampleService>();
         builder.Services.AddSingleton<I주문알림Service, 주문알림Service>();
-        builder.Services.AddHttpClient<배차주소ApiService>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<FoodApiOptions>>().Value;
-            client.BaseAddress = new Uri(options.BaseUrl);
-        });
+        builder.Services.AddHongdalUiCommonAppServices();
+        builder.Services.AddScoped<배차주소ApiService>();
         builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7117/") });
         builder.Services.AddScoped<PlatformCommunityService>();
         builder.Services.AddScoped<PlatformHomeModeStateService>();
