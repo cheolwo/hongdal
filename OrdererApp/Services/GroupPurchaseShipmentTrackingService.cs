@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Hongdal.Contracts.Common.Orderer;
+using Hongdal.Contracts.Common.PublicData;
 
 namespace OrdererApp.Services;
 
@@ -8,6 +9,10 @@ public interface IGroupPurchaseShipmentTrackingService
 {
     Task<GroupPurchaseOverseasShipmentPublicDto?> LookupAsync(
         string documentManagementNumber,
+        CancellationToken cancellationToken = default);
+
+    Task<HsCountryImportUnitPriceSimulationResult?> SimulateImportUnitPriceAsync(
+        HsCountryMonthlyTradeUnitPriceRequest request,
         CancellationToken cancellationToken = default);
 }
 
@@ -39,6 +44,34 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound || ex.StatusCode == HttpStatusCode.BadRequest)
         {
             return null;
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+    }
+
+    public async Task<HsCountryImportUnitPriceSimulationResult?> SimulateImportUnitPriceAsync(
+        HsCountryMonthlyTradeUnitPriceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var response = await _httpClient.PostAsJsonAsync(
+                "api/v1/orderer/public-data/customs/hs-country-import-unit-price-simulation",
+                request,
+                cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<HsCountryImportUnitPriceSimulationResult>(
+                cancellationToken);
         }
         catch (HttpRequestException)
         {

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Hongdal;
 using Hongdal.Hubs;
+using 홍달.Services.Dispatch.Recommendation;
 using 홍달.도메인.공통;
 
 namespace 홍달.Services.Dispatch.Queue
@@ -46,7 +47,7 @@ namespace 홍달.Services.Dispatch.Queue
                 requestMap.TryGetValue(item.의뢰Id, out var request);
                 cargoMap.TryGetValue(item.의뢰Id, out var cargo);
 
-                return new DispatchRecommendationDto
+                var recommendation = new DispatchRecommendationDto
                 {
                     의뢰Id = item.의뢰Id,
                     화물종류 = request?.화물종류 ?? cargo?.주의사항 ?? item.픽업_도로명주소,
@@ -67,6 +68,9 @@ namespace 홍달.Services.Dispatch.Queue
                     차량부적합사유 = Array.Empty<string>(),
                     차량경고 = Array.Empty<string>()
                 };
+
+                DispatchRecommendationRequestTypeClassifier.ApplyTo(recommendation, item.원본의뢰유형);
+                return recommendation;
             }).ToArray();
         }
     }

@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Hongdal.Application.Connections.Commands;
 using Hongdal.Application.Connections.Queries;
 using 홍달.도메인.사용자;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
+[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Authorize]
 [Route("api/v1/connections")]

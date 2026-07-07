@@ -8,9 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using Hongdal.Security;
 using 홍달.Services.Audit;
 using Hongdal.Services.LogisticsProcessing.Warehouse;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_5)]
+[HongdalApiWorkflow(HongdalWorkflow.WarehouseFulfillment)]
 [ApiController]
 [Authorize(Policy = "운영사용자전용")]
 [Route("api/v1/warehouse-operations")]

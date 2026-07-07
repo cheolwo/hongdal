@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using 홍달.Services;
 using Hongdal.Contracts.Driver.Notification;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Notification07
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/notifications")]

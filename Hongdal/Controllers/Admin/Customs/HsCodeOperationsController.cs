@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.Services.Audit;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Customs;
 
+[HongdalApiVersion(HongdalProductVersion.V2_0)]
 [ApiController]
 [Authorize(Policy = "HsCode운영자전용")]
 [Route("api/v1/admin/hs-codes")]

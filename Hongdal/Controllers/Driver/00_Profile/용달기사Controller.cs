@@ -3,9 +3,11 @@ using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.Contracts.Driver.Profile;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Profile01;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/drivers")]
 [Authorize]

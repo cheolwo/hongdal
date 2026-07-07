@@ -1,0 +1,163 @@
+# 워크플로우 API 정책
+
+홍달 API는 버전별 기능 묶음에서 업무 처리 절차별 워크플로우 묶음으로 이동합니다.
+
+`1.0`, `1.5`, `2.5`, `3.5` 같은 제품 버전은 기능이 처음 정리된 시점을 기록합니다. 실제 API 노출, 메뉴 노출, 권한, 운영 가능 여부는 워크플로우 기준으로 관리합니다.
+
+## 핵심 개념
+
+| 개념 | 의미 |
+| --- | --- |
+| 제품 버전 | API나 기능이 처음 들어온 로드맵 단계 |
+| 워크플로우 | 하나의 업무 절차를 완성하기 위해 묶이는 API 집합 |
+| 워크플로우 플래그 | 해당 업무 절차를 현재 환경에서 열지 말지 결정하는 스위치 |
+| 성장 트랙 | 커뮤니티처럼 여러 워크플로우와 버전에 걸쳐 계속 커지는 기능 축 |
+
+## 워크플로우 목록
+
+| 한글 이름 | 코드 식별자 | 플래그 키 | 포함 API 예 |
+| --- | --- | --- | --- |
+| 국내 화물 운송 | `DomesticTransport` | `DomesticTransportWorkflow` | 화주 의뢰, 기사 추천, 수락/거절, 상차, 하차, 증빙, 정산 |
+| 창고 입출고 | `WarehouseFulfillment` | `WarehouseFulfillmentWorkflow` | 입고, 적재, 재고, 포장, 출고 배치, 재위탁 |
+| 통관·무역 데이터 | `CustomsAndTradeData` | `CustomsAndTradeDataWorkflow` | HS 코드, 통관 조회, 관세사 보정, 수출입 단가 데이터 |
+| 공동주문 수입 | `GroupPurchaseImport` | `GroupPurchaseImportWorkflow` | 주문자 집단, 해외 선적 추적, 통관 단계, 보세구역 반출, 국내 운송 인계 |
+| 판매채널 출고 | `SalesChannelFulfillment` | `SalesChannelFulfillmentWorkflow` | 판매채널 계정, 상품 출품, 주문 수집, 창고 재고 연결, 출고 요청 |
+| 커뮤니티 신뢰 | `CommunityTrust` | `CommunityTrustWorkflow` | 커뮤니티 글, 댓글, 후기, 활동 신호, 투표, 관계 기록 |
+| 참여 인력 관리 | `HrParticipation` | `HrParticipationWorkflow` | 역할, 근로계약, 4대보험 신고 준비, 참여 보상 |
+| 음식 배달 | `FoodDelivery` | `FoodDeliveryWorkflow` | 음식점 주문, 조리 상태, 픽업, 고객 전달 |
+| 홍달마트 | `HongdalMart` | `HongdalMartWorkflow` | 마트 주문, 도심 재고, 피킹, 포장, 기사 인계 |
+
+## 사용자와 책임 경계
+
+워크플로우는 API 목록만으로 정의하지 않습니다. 주 사용자, 보조 참여자, 책임 경계를 함께 둡니다. 이 기준이 있어야 화면 권한, 메뉴 노출, 알림, 예외 처리 책임을 정할 수 있습니다.
+
+| 워크플로우 | 주 사용자 | 보조 참여자 | 책임 경계 |
+| --- | --- | --- | --- |
+| 국내 화물 운송 | 화주, 기사 | 수령자, 플랫폼 운영자 | 운송 의뢰가 배차되어 상차, 하차, 증빙, 정산 후보 상태까지 진행되는 범위 |
+| 창고 입출고 | 창고 관리자 | 화주·판매자 | 물품이 창고에 들어온 뒤 재고화되고 출고 가능 상태가 되거나 출고 배치로 넘어가는 범위 |
+| 통관·무역 데이터 | 관세사 | 플랫폼 운영자 | 수출입 판단에 필요한 공공 데이터, HS 코드, 통관 상태, 관세사 검토 정보를 제공하는 범위 |
+| 공동주문 수입 | 주문자 집단 대표, 주문자 | 해외 판매자·배송대행지, 플랫폼 운영자 | 주문자 집단이 해외 상품을 공동으로 들여와 통관, 국내 반출, 분배 또는 3PL 입고로 넘기는 범위 |
+| 판매채널 출고 | 판매자 | 창고 관리자 | 상품을 판매채널에 출품하고 주문을 창고 출고 또는 운송 인계로 연결하는 범위 |
+| 커뮤니티 신뢰 | 커뮤니티 참여자 | 플랫폼 운영자 | 업무 활동에서 공개 가능한 신뢰 신호, 후기, 투표, 관계 기록을 개인정보 보호 범위 안에서 다루는 범위 |
+| 참여 인력 관리 | 참여 인력, 고용·운영 주체 | 플랫폼 운영자 | 역할, 계약, 보상, 4대보험 신고 준비 상태를 관리하는 범위 |
+| 음식 배달 | 음식점, 배달 기사 | 주문자, 플랫폼 운영자 | 음식 주문이 조리, 픽업, 고객 전달, 완료 증빙으로 이어지는 범위 |
+| 홍달마트 | 홍달마트 운영자 | 기사, 플랫폼 운영자 | 마트 주문이 도심 재고, 피킹, 포장, 기사 인계로 이어지는 범위 |
+
+`GET /api/v1/version-feature-flags`의 `Workflows` 항목은 각 워크플로우의 `BoundarySummary`와 `Participants`를 함께 반환합니다. 앱은 이 정보를 이용해 “이 업무는 누가 주로 쓰는가”, “사용자가 여기서 할 수 있는 일은 어디까지인가”를 설명할 수 있습니다.
+
+## 앱과 화면 경계
+
+워크플로우를 구현할 때는 “주 사용자”를 실제 앱과 화면으로 연결합니다. 같은 워크플로우라도 화주 앱과 기사 앱에서 보는 화면은 다릅니다.
+
+여러 앱 화면이 이어지면서 하나의 워크플로우가 완성되는 상세 관계와 보완할 페이지 후보는 [workflow-app-screen-map.md](workflow-app-screen-map.md)에 둡니다.
+
+| 워크플로우 | 사용자 | 앱 | 화면 | 라우트 | 용도 |
+| --- | --- | --- | --- | --- | --- |
+| 국내 화물 운송 | 화주 | 화주 앱 | 운송 의뢰 | `/shipper/request` | 상차지, 하차지, 화물 조건, 결제 조건 입력 |
+| 국내 화물 운송 | 기사 | 기사 앱 | 추천 목록 | `/driver/recommendations` | 추천된 일반 화물, 공동주문 운송, 배송 의뢰 확인 |
+| 국내 화물 운송 | 기사 | 기사 앱 | 진행 중 운송 | `/driver/transports/current` | 상차, 하차, 인수 확인, 증빙 제출 |
+| 국내 화물 운송 | 기사 | 기사 앱 | 월 정산 | `/driver/settlements/current-month` | 정산 후보, 지급 상태, 이용료 확인 |
+| 국내 화물 운송 | 플랫폼 운영자 | 관리자 앱 | 운송 관리 | `/transports` | 운송 진행, 예외, 분쟁, 운영 상태 관리 |
+| 창고 입출고 | 창고 관리자 | 창고 관리자 앱 | 입고 작업 | `/work/inbound` | 입고 시작과 검수 흐름 진입 |
+| 창고 입출고 | 창고 관리자 | 창고 관리자 앱 | 작업 보드 | `/work-board` | 대기 중인 입고, 포장, 출고 작업 확인 |
+| 창고 입출고 | 화주·판매자 | 화주 앱 | 창고 재고 | `/shipper/warehouse/inventory` | 입고상품, 재고, 출고 가능 상태 확인 |
+| 통관·무역 데이터 | 관세사 | 관세사 앱 | 관세사 홈 | `/` | HS 코드, 식품/일반화물 분류, 통관 주의 태그 보정 |
+| 통관·무역 데이터 | 화주·판매자 | 화주 앱 | HS 코드 검토 | `/shipper/customs/hs-reviews` | HS 코드 후보, 통관 리스크, 관세사 검토 필요성 확인 |
+| 공동주문 수입 | 주문자 | 주문자 앱 | 수입 공동구매 | `/group-purchase` | 공동주문 상품, 비용, 선적·통관 상태, 분배 조건 확인 |
+| 공동주문 수입 | 주문자 집단 대표 | 주문자 앱 | 수입 공동구매 | `/group-purchase` | 공동주문 개설, 운송 방식, 분배 기준 조정 |
+| 판매채널 출고 | 판매자 | 화주 앱 | 판매채널 연결 | `/shipper/sales/channels` | 판매채널 계정 연결 |
+| 판매채널 출고 | 판매자 | 화주 앱 | 상품 출품 | `/shipper/sales/listings` | 판매상품을 채널별 출품 후보로 준비 |
+| 판매채널 출고 | 판매자 | 화주 앱 | 주문 이행 | `/shipper/sales/orders` | 판매채널 주문을 창고 출고와 운송 인계로 연결 |
+| 커뮤니티 신뢰 | 커뮤니티 참여자 | 주문자 앱 | 홈 커뮤니티 | `/` | 글, 후기, 활동 신호 확인 |
+| 참여 인력 관리 | 고용·운영 주체 | 관리자 앱 | 인력·4대보험 신고 준비 | `/dashboard` | 역할, 근로계약, 4대보험 신고 준비 상태 관리 |
+| 음식 배달 | 주문자 | 주문자 앱 | 음식점 | `/food/restaurants` | 음식점과 메뉴 확인 |
+| 음식 배달 | 배달 기사 | 기사 앱 | 추천 목록 | `/driver/recommendations` | 음식 픽업·전달 추천 의뢰 확인 |
+| 홍달마트 | 홍달마트 운영자 | 창고 관리자 앱 | 홍달마트 작업 홈 | `/mart` | 도심 재고, 피킹, 포장, 기사 인계 작업 진입 |
+| 홍달마트 | 주문자 | 주문자 앱 | 홍달마트 주문 | `/food/mart` | 도심 창고 재고 기반 마트 상품 주문 |
+
+`GET /api/v1/version-feature-flags`의 `Workflows[].Screens`는 위 앱/화면 매핑을 반환합니다. 메뉴, 권한, 온보딩 안내, 비활성 기능 안내는 이 값을 기준으로 구성할 수 있습니다.
+
+## 메타데이터 규칙
+
+컨트롤러와 action은 `HongdalApiVersionAttribute`를 유지합니다. 이 값은 도입 시점을 기록합니다. 워크플로우에 속한 API는 `HongdalApiWorkflowAttribute`도 함께 붙입니다.
+
+```csharp
+[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+public sealed class GroupPurchaseOverseasShipmentTrackingController : ControllerBase
+{
+}
+```
+
+위 예시는 다음 뜻입니다.
+
+- 도입 시점: `2.5`
+- 업무 절차: `공동주문 수입`
+- 운영 스위치: `GroupPurchaseImportWorkflow`
+
+`GET /api/v1/version-feature-flags`는 기존 `Flags` 응답을 유지하면서 `Workflows`와 `WorkflowRelations`도 함께 반환합니다. 앱과 관리자 화면은 이 응답을 이용해 워크플로우별 메뉴 노출, 비활성 안내, 워크플로우 관계도를 구성할 수 있습니다.
+
+## 기존 버전 플래그 호환
+
+기존 버전명 플래그는 설정 호환을 위해 계속 지원합니다. 서버는 기존 키와 새 워크플로우 키를 같은 운영 판단으로 해석합니다.
+
+| 기존 키 | 새 워크플로우 키 | 한글 이름 |
+| --- | --- | --- |
+| `CargoYongdalV1` | `DomesticTransportWorkflow` | 국내 화물 운송 |
+| `WarehouseV15` | `WarehouseFulfillmentWorkflow` | 창고 입출고 |
+| `CustomsHsV20` | `CustomsAndTradeDataWorkflow` | 통관·무역 데이터 |
+| `OrdererGroupOrderV25`, `ApartmentGroupOrderV25` | `GroupPurchaseImportWorkflow` | 공동주문 수입 |
+| `FoodDeliveryV30` | `FoodDeliveryWorkflow` | 음식 배달 |
+| `HongdalMartV35` | `HongdalMartWorkflow` | 홍달마트 |
+
+## 워크플로우 관계
+
+워크플로우는 서로 독립된 섬이 아닙니다. 하나의 업무가 끝나면 다른 워크플로우로 인계되거나, 중간에 다른 워크플로우의 데이터를 참조하거나, 공개 가능한 활동 신호를 커뮤니티로 보낼 수 있습니다.
+
+| 출발 워크플로우 | 관계 | 대상 워크플로우 | 의미 |
+| --- | --- | --- | --- |
+| 공동주문 수입 | 참조 | 통관·무역 데이터 | HS 코드, BL/AWB, 문서관리번호, 통관 단계, 수출입 단가를 조회합니다. |
+| 공동주문 수입 | 인계 | 국내 화물 운송 | 보세구역 반출 뒤 아파트 직행 배송이나 국내 3PL 이동을 운송 의뢰로 넘깁니다. |
+| 공동주문 수입 | 인계 | 창고 입출고 | 국내 3PL 입고를 선택하면 공동수입 물품을 입고, 재고, 출고 가능 상태로 넘깁니다. |
+| 공동주문 수입 | 공급 | 판매채널 출고 | 공동수입 재고를 스마트스토어, 쿠팡, Amazon 같은 판매채널 출품 후보로 공급합니다. |
+| 공동주문 수입 | 공동 운영 | 참여 인력 관리 | 공동주문 분류, 배분, 단지 내부 보조 업무에 필요한 인력 역할과 보상을 연결합니다. |
+| 판매채널 출고 | 호출 | 창고 입출고 | 판매채널 주문이 들어오면 재고 확인과 출고 배치를 요청합니다. |
+| 판매채널 출고 | 인계 | 국내 화물 운송 | 출고 뒤 화물 배송이나 재위탁 운송이 필요하면 운송 의뢰로 넘깁니다. |
+| 홍달마트 | 호출 | 창고 입출고 | 도심 재고, 피킹, 포장 처리를 창고 흐름과 연결합니다. |
+| 홍달마트 | 인계 | 국내 화물 운송 | 포장 완료 뒤 기사 인계와 배송 증빙 흐름으로 넘깁니다. |
+| 음식 배달 | 인계 | 국내 화물 운송 | 픽업, 이동, 고객 전달, 완료 증빙 흐름으로 합류합니다. |
+| 국내 화물 운송 | 신호 공개 | 커뮤니티 신뢰 | 상하차 완료, 감사, 후기 같은 공개 가능한 활동 신호를 보냅니다. |
+| 공동주문 수입 | 신호 공개 | 커뮤니티 신뢰 | 모집, 투표, 진행 상태, 분배 후기를 개인정보 보호 범위에서 보냅니다. |
+| 판매채널 출고 | 신호 공개 | 커뮤니티 신뢰 | 판매 후기와 상품 여정 신호를 동의된 범위에서 보냅니다. |
+
+```mermaid
+flowchart LR
+    Customs["통관·무역 데이터"]
+    GroupImport["공동주문 수입"]
+    Domestic["국내 화물 운송"]
+    Warehouse["창고 입출고"]
+    Sales["판매채널 출고"]
+    Hr["참여 인력 관리"]
+    Food["음식 배달"]
+    Mart["홍달마트"]
+    Community["커뮤니티 신뢰"]
+
+    GroupImport -->|참조| Customs
+    GroupImport -->|인계| Domestic
+    GroupImport -->|인계| Warehouse
+    GroupImport -->|공급| Sales
+    GroupImport -->|공동 운영| Hr
+    Sales -->|호출| Warehouse
+    Sales -->|인계| Domestic
+    Mart -->|호출| Warehouse
+    Mart -->|인계| Domestic
+    Food -->|인계| Domestic
+    Domestic -->|신호 공개| Community
+    GroupImport -->|신호 공개| Community
+    Sales -->|신호 공개| Community
+```
+
+## 통합 규칙
+
+1.0 국내 화물 운송은 낮은 버전의 기능이 아니라 공통 실행 워크플로우입니다. 공동주문 수입, 창고 입출고, 판매채널 출고, 음식 배달, 홍달마트는 실제 상차, 하차, 증빙, 정산이 필요할 때 국내 화물 운송 워크플로우로 합류합니다.

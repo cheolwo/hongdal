@@ -1,5 +1,6 @@
 @page "/group-purchase"
 @using Hongdal.Contracts.Common.Orderer
+@using Hongdal.Contracts.Common.PublicData
 @inject IGroupPurchaseShipmentTrackingService ShipmentTrackingService
 
 <PageTitle>먹거리 공동주문</PageTitle>
@@ -187,6 +188,121 @@
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
+
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle2">HS import price signal</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                HS + country + month customs statistics are used as a market reference.
+                                            </MudText>
+                                        </MudStack>
+                                        <MudButton Variant="Variant.Outlined"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.QueryStats"
+                                                   Disabled="@isMarketSignalLoading"
+                                                   OnClick="LoadSelectedProductMarketSignal">
+                                            Refresh
+                                        </MudButton>
+                                    </MudStack>
+
+                                    @if (isMarketSignalLoading)
+                                    {
+                                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                                    }
+                                    else if (marketSignal is not null && marketSignal.Success)
+                                    {
+                                        <MudGrid>
+                                            <MudItem xs="12" sm="3">
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">Avg import</MudText>
+                                                <MudText Typo="Typo.subtitle1">@UsdPerKg(marketSignal.AverageImportUnitValueUsdPerKg)</MudText>
+                                            </MudItem>
+                                            <MudItem xs="12" sm="3">
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">KRW estimate</MudText>
+                                                <MudText Typo="Typo.subtitle1">@KrwPerKg(marketSignal.AverageImportUnitValueKrwPerKg)</MudText>
+                                            </MudItem>
+                                            <MudItem xs="12" sm="3">
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">Landed cost</MudText>
+                                                <MudText Typo="Typo.subtitle1">@KrwPerKg(marketSignal.ExpectedLandedCostKrwPerKg)</MudText>
+                                            </MudItem>
+                                            <MudItem xs="12" sm="3">
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">Signal</MudText>
+                                                <MudChip T="string" Size="Size.Small" Color="@MarketSignalColor(marketSignal.PriceSignalCode)">
+                                                    @marketSignal.PriceSignalCode
+                                                </MudChip>
+                                            </MudItem>
+                                        </MudGrid>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@marketSignal.Summary</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                                            @(marketSignal?.Summary ?? "No customs import price signal has been loaded yet.")
+                                        </MudAlert>
+                                    }
+                                </MudStack>
+                            </MudPaper>
+
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle2">Import landed cost path</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                From overseas seller payment to domestic 3PL inbound, each estimated cost is shown as a separate step.
+                                            </MudText>
+                                        </MudStack>
+                                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                                            @KrwPerKg(LandedCostPlan.EstimatedLandedUnitCostKrw)
+                                        </MudChip>
+                                    </MudStack>
+
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">Approx. CIF</MudText>
+                                            <MudText Typo="Typo.subtitle1">@KrwPerKg(LandedCostPlan.EstimatedCifUnitPriceKrw)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">After tax</MudText>
+                                            <MudText Typo="Typo.subtitle1">@KrwPerKg(LandedCostPlan.EstimatedAfterTaxUnitCostKrw)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="4">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">3PL inbound total</MudText>
+                                            <MudText Typo="Typo.subtitle1">@KrwTotal(LandedCostPlan.EstimatedLandedTotalKrw)</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+
+                                    <MudStack Spacing="1">
+                                        @foreach (var stage in LandedCostPlan.Stages)
+                                        {
+                                            <MudPaper Elevation="0" Outlined="true" Class="pa-2">
+                                                <MudStack Spacing="1">
+                                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                                        <MudStack Spacing="0">
+                                                            <MudText Typo="Typo.body2">@(stage.Sequence). @stage.DisplayName</MudText>
+                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@stage.Description</MudText>
+                                                        </MudStack>
+                                                        <MudStack Spacing="0" AlignItems="AlignItems.End">
+                                                            <MudText Typo="Typo.body2">@KrwPerKg(stage.UnitCostKrw)</MudText>
+                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">acc. @KrwPerKg(stage.AccumulatedUnitCostKrw)</MudText>
+                                                        </MudStack>
+                                                    </MudStack>
+                                                    <MudProgressLinear Color="@CostStageColor(stage.StatusCode)"
+                                                                       Value="@CostStagePercent(stage)"
+                                                                       Rounded="true" />
+                                                </MudStack>
+                                            </MudPaper>
+                                        }
+                                    </MudStack>
+
+                                    @foreach (var warning in LandedCostPlan.Warnings)
+                                    {
+                                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@warning</MudAlert>
+                                    }
+                                </MudStack>
+                            </MudPaper>
                         </MudStack>
                     </MudPaper>
 
@@ -351,6 +467,20 @@
     private bool isShipmentTrackingLoading;
     private string? shipmentTrackingMessage;
     private Severity shipmentTrackingSeverity = Severity.Info;
+    private HsCountryImportUnitPriceSimulationResult? marketSignal;
+    private bool isMarketSignalLoading;
+    private string marketSignalCountryCode = "CN";
+    private string marketSignalMonth = DateTime.UtcNow.AddMonths(-2).ToString("yyyyMM");
+    private decimal marketSignalFxRateKrwPerUsd = 1350m;
+    private decimal marketSignalDomesticLogisticsCostKrwPerKg = 1000m;
+    private decimal importOverseasHandlingUnitCostKrw = 500m;
+    private decimal importInternationalFreightInsuranceUnitCostKrw = 1000m;
+    private decimal importCustomsDutyRate = 0.08m;
+    private decimal importVatRate = 0.1m;
+    private decimal importBondedWarehouseUnitCostKrw = 200m;
+    private decimal importCustomsBrokerageUnitCostKrw = 100m;
+    private decimal importDomesticTransportTo3plUnitCostKrw = 300m;
+    private decimal importThreePlInboundUnitCostKrw = 400m;
 
     private HsFoodGroupPurchaseProductCard SelectedProduct
         => ProductCards.First(x => x.ProductCardId == selectedProductCardId);
@@ -367,12 +497,57 @@
             IsDropoffCompleted: false,
             DistributionConfirmationRate: 0m));
 
-    private void SelectProduct(string productCardId)
+    private ImportLandedCostPlan LandedCostPlan
+        => GroupPurchaseImportLandedCostPlanner.Plan(new ImportLandedCostDraft(
+            QuantityKg: desiredQuantityKg,
+            ProductPurchaseUnitPriceKrw: SelectedProduct.ExpectedUnitPrice,
+            OverseasHandlingUnitCostKrw: importOverseasHandlingUnitCostKrw,
+            InternationalFreightInsuranceUnitCostKrw: importInternationalFreightInsuranceUnitCostKrw,
+            CustomsDutyRate: importCustomsDutyRate,
+            ImportVatRate: importVatRate,
+            BondedWarehouseUnitCostKrw: importBondedWarehouseUnitCostKrw,
+            CustomsBrokerageUnitCostKrw: importCustomsBrokerageUnitCostKrw,
+            DomesticTransportTo3plUnitCostKrw: importDomesticTransportTo3plUnitCostKrw,
+            ThreePlInboundUnitCostKrw: importThreePlInboundUnitCostKrw,
+            CustomsReviewRequired: true));
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSelectedProductMarketSignal();
+    }
+
+    private async Task SelectProduct(string productCardId)
     {
         selectedProductCardId = productCardId;
         desiredQuantityKg = SelectedProduct.TemperatureCode == GroupPurchaseTemperatureCode.Frozen ? 20m : 5m;
         desiredUnitPrice = SelectedProduct.ExpectedUnitPrice;
         statusMessage = null;
+        await LoadSelectedProductMarketSignal();
+    }
+
+    private async Task LoadSelectedProductMarketSignal()
+    {
+        isMarketSignalLoading = true;
+
+        try
+        {
+            marketSignal = await ShipmentTrackingService.SimulateImportUnitPriceAsync(new HsCountryMonthlyTradeUnitPriceRequest
+            {
+                HsCode = SelectedProduct.HsCode,
+                CountryCode = marketSignalCountryCode,
+                Month = marketSignalMonth,
+                LookbackMonths = 3,
+                ExpectedFxRateKrwPerUsd = marketSignalFxRateKrwPerUsd,
+                ExpectedPurchaseUnitPriceKrwPerKg = SelectedProduct.ExpectedUnitPrice,
+                ExpectedDomesticLogisticsCostKrwPerKg = marketSignalDomesticLogisticsCostKrwPerKg,
+                ExpectedSellingUnitPriceKrwPerKg = SelectedProduct.ExpectedUnitPrice * 1.35m,
+                ParticipantQuantityKg = desiredQuantityKg
+            });
+        }
+        finally
+        {
+            isMarketSignalLoading = false;
+        }
     }
 
     private void SubmitOpeningApplication()
@@ -458,6 +633,47 @@
             : "pa-3 product-card";
 
     private static string Money(decimal value) => $"{value:N0}원";
+
+    private static string UsdPerKg(decimal? value)
+        => value.HasValue ? $"${value.Value:N2}/kg" : "-";
+
+    private static string KrwPerKg(decimal? value)
+        => value.HasValue ? $"{value.Value:N0} KRW/kg" : "-";
+
+    private static string KrwTotal(decimal? value)
+        => value.HasValue ? $"{value.Value:N0} KRW" : "-";
+
+    private static Color MarketSignalColor(string value)
+        => value switch
+        {
+            "Attractive" => Color.Success,
+            "Viable" => Color.Primary,
+            "ThinMargin" => Color.Warning,
+            "LossRisk" => Color.Error,
+            "BelowMarketImportAverage" => Color.Success,
+            "NearMarketImportAverage" => Color.Info,
+            "AboveMarketImportAverage" => Color.Warning,
+            _ => Color.Default
+        };
+
+    private double CostStagePercent(ImportLandedCostStage stage)
+    {
+        if (LandedCostPlan.EstimatedLandedUnitCostKrw <= 0)
+        {
+            return 0;
+        }
+
+        return decimal.ToDouble(decimal.Round(stage.AccumulatedUnitCostKrw / LandedCostPlan.EstimatedLandedUnitCostKrw * 100m, 2));
+    }
+
+    private static Color CostStageColor(string statusCode)
+        => statusCode switch
+        {
+            ImportLandedCostStageStatusCode.Blocked => Color.Error,
+            ImportLandedCostStageStatusCode.NeedsReview => Color.Warning,
+            ImportLandedCostStageStatusCode.Estimated => Color.Primary,
+            _ => Color.Info
+        };
 
     private static string TemperatureLabel(string value)
         => value switch

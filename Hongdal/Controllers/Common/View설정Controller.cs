@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using 홍달.Data;
 using 홍달.Services.Audit;
 using 홍달.Services.ViewSettings;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/view-settings")]
 public sealed class View설정Controller : ControllerBase

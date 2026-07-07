@@ -1,4 +1,5 @@
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Client.Infrastructure.Security;
 using Hongdal.Contracts.Common.Sales;
 using Hongdal.Contracts.Shipper.Request;
@@ -47,9 +48,22 @@ public static class ShipperServiceCollectionExtensions
 
     private static IServiceCollection AddShipperOptions(this IServiceCollection services, IConfiguration configuration)
     {
+        var hasClientDataModeConfig = configuration.GetSection(ClientDataModeOptions.SectionName).Exists();
+
+        services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
         services.Configure<FoodApiOptions>(configuration.GetSection(FoodApiOptions.SectionName));
         services.Configure<CoupangWingOptions>(configuration.GetSection(CoupangWingOptions.SectionName));
         services.Configure<NaverCommerceOptions>(configuration.GetSection(NaverCommerceOptions.SectionName));
+        services.PostConfigure<ClientDataModeOptions>(options =>
+        {
+#if DEBUG
+            if (!hasClientDataModeConfig)
+            {
+                options.AllowSampleFallback = true;
+                options.AllowDevelopmentSnapshotFallback = true;
+            }
+#endif
+        });
 
         return services;
     }

@@ -15,6 +15,7 @@ Hongdal community is a gathering and coordination layer, not a paywalled social 
 These functions are treated as community infrastructure:
 
 - General posts and comments
+- Privacy-safe activity signals derived from successful work logs
 - Image attachments and image-level comments within normal limits
 - Recommendations and engagement-based sorting
 - Report-board posting and observer-safe masking
@@ -23,6 +24,36 @@ These functions are treated as community infrastructure:
 - Basic event, education, and offline meeting announcements
 
 The goal is to let people gather first. A community that charges too early loses the social density that makes the platform useful.
+
+## Activity Signal Policy
+
+The platform records work logs for audit, debugging, and operational accountability. Those raw logs are not community content. Community mode may use them only after converting them into privacy-safe activity signals.
+
+Activity signals should:
+
+- show that similar work is happening nearby in time, domain, or topic;
+- help users discover related reviews, coordination needs, and peer behavior;
+- use role-level labels such as anonymous driver, anonymous shipper, or anonymous warehouse worker;
+- keep raw user identity, contact details, trace ids, IP addresses, user agents, raw URLs, query strings, and raw metadata out of the response.
+
+The first implementation exposes `GET api/v1/community/activity-signals`. It reads successful work logs and returns anonymized signal cards for driver work, shipper transport, warehouse work, product journey, sales commerce, and community trust.
+
+## Voting And Resolution Policy
+
+Community voting is an information-exchange and coordination tool. It can help participants decide what to buy together, how to operate a shared process, whether to open a demand campaign, or which work rule should be adopted.
+
+The platform should keep these stages separate:
+
+1. Vote creation and participation
+2. Vote close and result calculation
+3. Resolution document draft
+4. Legal or operator review
+5. Participant signature
+6. Signed resolution record
+
+The platform must not label a vote result as legally effective merely because a majority option won. A resolution document may become useful evidence only after the right parties, authority, notice, consent, document text, signature evidence, and receiving-party requirements are checked.
+
+The first implementation exposes `api/v1/community/votes`. Resolution documents store a document hash and use the shared electronic signature evidence model. Legal review is represented explicitly by `LegalReviewRequired` and `ReadyToSign` states.
 
 ## Small Paid Utility Surface
 

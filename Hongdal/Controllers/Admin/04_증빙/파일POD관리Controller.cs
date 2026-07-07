@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Hongdal.Controllers;
 using 홍달.Services;
 using 홍달.Services.Storage.Local;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Evidence04;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/admin/files/pod")]
 [Authorize(Policy = "서버관리자전용")]

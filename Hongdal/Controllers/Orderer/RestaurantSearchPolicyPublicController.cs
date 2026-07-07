@@ -1,9 +1,11 @@
 using Hongdal.Contracts.Common.Orderer;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Orderer;
 
+[HongdalApiVersion(HongdalProductVersion.V3_0)]
 [ApiController]
 [Route("api/v1/orderer/restaurant-search-policy")]
 public sealed class RestaurantSearchPolicyPublicController : ControllerBase

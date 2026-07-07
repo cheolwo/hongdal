@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services;
 using Hongdal.Contracts.Driver.Settings;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Settings05
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/preferences")]

@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/activity-logs")]

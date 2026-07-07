@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Hongdal.Application.Admin.Operating;
 using Hongdal.Contracts.Admin.Progress;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Progress03
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/admin/drivers/operating")]
     [Authorize(Policy = "서버관리자전용")]

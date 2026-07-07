@@ -8,9 +8,12 @@ using Microsoft.Extensions.Options;
 using 홍달.Data;
 using 홍달.Services.External.Google;
 using 홍달.Services.Options;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
+[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/posts")]
 public sealed class PlatformCommunityPostsController : ControllerBase

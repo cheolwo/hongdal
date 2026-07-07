@@ -39,6 +39,59 @@
 }
 ```
 
+## 서버 API 차단
+
+서버는 버전 범위 밖 기능을 문서나 화면에서만 숨기지 않고, 컨트롤러 진입점에서도 차단합니다. `RequireVersionFeatureAttribute`는 `VersionFeatureFlags` 설정을 조회해 플래그가 꺼진 API에 `404 Not Found`와 `FeatureDisabled` 오류 코드를 반환합니다.
+
+현재 `OrdererGroupOrderV25`가 꺼져 있으면 주문자 집단 공동 주문, 해외 선적/통관 추적, 커머스 출품/출고 연계, 주문자 집단 운영 주체, 4대보험 신고 준비 API는 기본 운영 흐름에서 호출할 수 없습니다. 주소 검색처럼 1.0에서도 재사용 가능한 기반 조회는 별도 기능으로 남겨두고, 공동주택/주문자 집단 후보와 비용/수익 시뮬레이션 조회만 2.5 플래그로 제한합니다.
+
+## API 제품 버전 메타데이터
+
+모든 서버 컨트롤러는 `HongdalApiVersionAttribute`로 제품 로드맵 버전을 기록합니다. 이 버전은 `/api/v1/...`의 HTTP 계약 버전과 다르며, 홍달 기능 로드맵의 `1.0`, `1.5`, `2.0`, `2.5`, `3.0`, `3.5`를 뜻합니다.
+
+버전 값은 문자열을 직접 쓰지 않고 `HongdalProductVersion` enum으로 관리합니다. 사람이 읽는 `1.0`, `2.5` 같은 라벨은 `HongdalProductVersionLabels`에서만 변환합니다.
+
+```csharp
+[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.OrdererGroupOrderV25)]
+[RequireVersionFeature(VersionFeatureFlagKeys.OrdererGroupOrderV25)]
+public sealed class GroupPurchaseOverseasShipmentTrackingController : ControllerBase
+{
+}
+```
+
+한 컨트롤러 안에 여러 제품 버전 API가 섞이는 경우에는 컨트롤러에 기본 버전을 붙이고 action에 더 구체적인 버전을 붙입니다. 예를 들어 주소 검색은 1.0 기반 조회로 남기고, 공동주택/주문자 집단 조회 action은 2.5로 표시합니다.
+
+테스트는 모든 컨트롤러에 제품 버전 메타데이터가 있는지, `RequireVersionFeatureAttribute`로 막는 API가 같은 feature key를 `HongdalApiVersionAttribute`에도 기록하는지 확인합니다.
+
+## API 성장 트랙 메타데이터
+
+제품 버전은 특정 API가 어느 릴리즈 범위에서 안정화되는지를 나타냅니다. 반면 커뮤니티처럼 여러 버전에 걸쳐 계속 자라야 하는 기능은 `HongdalApiGrowthTrackAttribute`로 별도 성장 트랙을 기록합니다.
+
+```csharp
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
+[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
+public sealed class PlatformCommunityPostsController : ControllerBase
+{
+}
+```
+
+커뮤니티 트랙은 특정 버전 하나에 종속하지 않습니다. 1.0에서는 후기, 문의, 감사, 인연 연결, 관계 스냅샷, 개인정보 보호 활동 신호, 커뮤니티 투표와 결의문 초안 같은 기본 신뢰 기록을 보조 모드로 제공하고, 2.5에서는 주문자 집단 공동 주문과 모집/공유로 확장하며, 3.0 이후에는 음식점/배달/홍달마트의 지역 소통과 운영 공유로 이어질 수 있습니다.
+
+## 클라이언트 샘플 데이터 정책
+
+DriverApp과 ShipperApp은 `ClientDataMode` 옵션으로 서버 데이터 호출 실패 시 샘플 데이터를 사용할지 결정합니다.
+
+```json
+{
+  "ClientDataMode": {
+    "AllowSampleFallback": false,
+    "AllowDevelopmentSnapshotFallback": false
+  }
+}
+```
+
+`AllowSampleFallback=false`이면 앱은 서버 인증 또는 서버 API 실패를 샘플 데이터로 조용히 덮지 않습니다. 읽기 화면은 빈 상태를 보여주고, 운송 의뢰 등록 같은 쓰기 요청은 실패를 드러내도록 처리합니다. `DEBUG` 빌드에서 설정이 없을 때만 개발 편의를 위해 샘플 fallback과 개발 스냅샷 fallback을 기본 허용합니다.
+
 ## 기존 설정과의 관계
 
 | 기존 장치 | 역할 | 버전 플래그와의 관계 |

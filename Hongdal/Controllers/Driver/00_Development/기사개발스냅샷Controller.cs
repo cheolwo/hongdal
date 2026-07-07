@@ -2,9 +2,11 @@ using Hongdal.Contracts.Driver.Development;
 using Hongdal.Services.Driver.Development;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Development00;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [AllowAnonymous]
 [Route("api/v1/driver/dev-snapshot")]

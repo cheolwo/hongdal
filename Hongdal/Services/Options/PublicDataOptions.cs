@@ -15,6 +15,8 @@ public sealed class PublicDataOptions
     public ApartmentComplexOptions ApartmentComplex { get; set; } = new();
 
     public ApartmentManagementFeeOptions ApartmentManagementFee { get; set; } = new();
+
+    public CustomsTradeStatisticsOptions CustomsTradeStatistics { get; set; } = new();
 }
 
 public sealed class RoadAddressOptions
@@ -48,4 +50,13 @@ public sealed class ApartmentManagementFeeOptions
     public string IndividualUsageFeePath { get; set; } = "/1613000/AptIndvdlzManageCostService/getHsmpIndvdlzManageCostInfo";
 
     public string LongTermRepairReservePath { get; set; } = "/1613000/AptLongTermRepairReserveService/getHsmpLongTermRepairReserveInfo";
+}
+
+public sealed class CustomsTradeStatisticsOptions
+{
+    public string ServiceKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://apis.data.go.kr";
+
+    public string HsCountryMonthlyPath { get; set; } = "/1220000/nitemtrade/getNitemtradeList";
 }

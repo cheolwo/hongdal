@@ -1,13 +1,19 @@
 using System.Security.Claims;
 using Hongdal.Contracts.Common.Orderer;
 using Hongdal.Controllers;
+using Hongdal.ApiMetadata;
+using Hongdal.Filters;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using 홍달.Services.Versioning;
 
 namespace Hongdal.Controllers.Admin.Orderer;
 
 [ApiController]
+[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/orderer/group-purchase-logistics-workflows")]
 public sealed class GroupPurchaseLogisticsWorkflowAdminController : ControllerBase

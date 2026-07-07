@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Hongdal.Controllers;
 using 홍달.Services;
 using 홍달.Services.Storage.Local;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/files")]
     public class 파일업로드Controller : ControllerBase

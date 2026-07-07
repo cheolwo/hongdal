@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.Services;
 using Hongdal.Contracts.Driver.Food;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Food
 {
+    [HongdalApiVersion(HongdalProductVersion.V3_0)]
     [ApiController]
     [Route("api/v1/drivers/{driverId}/monthly-settlements")]
     [Authorize(Roles = 역할명.기사)]

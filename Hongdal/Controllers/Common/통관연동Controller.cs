@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.Application.Warehouse;
 using 홍달.도메인.사용자;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V2_0)]
 [ApiController]
 [Authorize]
 [Route("api/v1/customs")]

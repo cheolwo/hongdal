@@ -54,11 +54,17 @@ public sealed class 기사개발추천의뢰응답
     public string 의뢰Id { get; set; } = string.Empty;
     public string 화물종류 { get; set; } = string.Empty;
     public string 운송방식 { get; set; } = string.Empty;
+    public string 운송의뢰유형코드 { get; set; } = "GeneralCargoTransport";
+    public string 운송의뢰유형표시 { get; set; } = "일반 화물";
     public bool 당일상차필수 { get; set; }
     public bool 당일하차필수 { get; set; }
     public string 차량톤수 { get; set; } = string.Empty;
     public string 차량형태 { get; set; } = string.Empty;
     public bool 인수증필요 { get; set; }
+    public bool 공동주문운송여부 { get; set; }
+    public bool 세대배송포함여부 { get; set; }
+    public int? 세대배송건수 { get; set; }
+    public string 세대배송업무표시 { get; set; } = "상하차";
     public string 결제방식 { get; set; } = string.Empty;
     public string 픽업지 { get; set; } = string.Empty;
     public string 하차지 { get; set; } = string.Empty;

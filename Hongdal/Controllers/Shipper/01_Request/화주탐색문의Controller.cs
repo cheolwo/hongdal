@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using 홍달.Data;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Shipper.Request01;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Authorize(Roles = 역할명.화주)]
 [Route("api/v1/shipper/exploration-inbox")]

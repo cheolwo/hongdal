@@ -4,9 +4,11 @@ using MediatR;
 using Hongdal.Controllers;
 using Hongdal.Application.Admin.Management;
 using Hongdal.Contracts.Admin.Management;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Master06
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/fare-configurations")]
     [Authorize]

@@ -7,9 +7,11 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Shipper.Request01
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/shipper/requests")]
     [Authorize]

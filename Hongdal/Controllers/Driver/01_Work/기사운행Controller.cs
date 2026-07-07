@@ -7,9 +7,11 @@ using MediatR;
 using FluentResults;
 using Hongdal.Contracts.Driver.Work;
 using Hongdal.Application.Driver.Work;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Work01
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/work")]

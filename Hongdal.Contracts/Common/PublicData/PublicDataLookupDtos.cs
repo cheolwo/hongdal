@@ -188,6 +188,83 @@ public sealed class ApartmentGroupCommerceOffsetSimulationResult
     public string Summary { get; init; } = string.Empty;
 }
 
+public sealed class HsCountryMonthlyTradeUnitPriceRequest
+{
+    public string HsCode { get; init; } = string.Empty;
+
+    public string CountryCode { get; init; } = string.Empty;
+
+    public string Month { get; init; } = string.Empty;
+
+    public int LookbackMonths { get; init; } = 1;
+
+    public decimal? ExpectedFxRateKrwPerUsd { get; init; }
+
+    public decimal? ExpectedPurchaseUnitPriceKrwPerKg { get; init; }
+
+    public decimal? ExpectedDomesticLogisticsCostKrwPerKg { get; init; }
+
+    public decimal? ExpectedSellingUnitPriceKrwPerKg { get; init; }
+
+    public decimal? ParticipantQuantityKg { get; init; }
+}
+
+public sealed class HsCountryMonthlyTradeUnitPriceItem
+{
+    public string HsCode { get; init; } = string.Empty;
+
+    public string CountryCode { get; init; } = string.Empty;
+
+    public string Month { get; init; } = string.Empty;
+
+    public decimal ImportWeightKg { get; init; }
+
+    public decimal ImportValueUsd { get; init; }
+
+    public decimal? AverageImportUnitValueUsdPerKg { get; init; }
+
+    public decimal? AverageImportUnitValueKrwPerKg { get; init; }
+
+    public string DataSource { get; init; } = "Korea Customs Service import/export statistics";
+}
+
+public sealed class HsCountryImportUnitPriceSimulationResult
+{
+    public bool Success { get; init; }
+
+    public string? ErrorMessage { get; init; }
+
+    public string HsCode { get; init; } = string.Empty;
+
+    public string CountryCode { get; init; } = string.Empty;
+
+    public string StartMonth { get; init; } = string.Empty;
+
+    public string EndMonth { get; init; } = string.Empty;
+
+    public IReadOnlyList<HsCountryMonthlyTradeUnitPriceItem> MonthlyItems { get; init; } = [];
+
+    public decimal TotalImportWeightKg { get; init; }
+
+    public decimal TotalImportValueUsd { get; init; }
+
+    public decimal? AverageImportUnitValueUsdPerKg { get; init; }
+
+    public decimal? AverageImportUnitValueKrwPerKg { get; init; }
+
+    public decimal? ExpectedLandedCostKrwPerKg { get; init; }
+
+    public decimal? ExpectedGrossMarginKrwPerKg { get; init; }
+
+    public decimal? ExpectedGrossMarginRate { get; init; }
+
+    public decimal? ExpectedParticipantGrossMarginKrw { get; init; }
+
+    public string PriceSignalCode { get; init; } = "Unknown";
+
+    public string Summary { get; init; } = string.Empty;
+}
+
 public sealed class OrdererGroupScopeLookupRequest
 {
     public string? RoadAddress { get; init; }

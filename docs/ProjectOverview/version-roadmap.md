@@ -38,6 +38,16 @@ flowchart TD
 | `3.0` | 음식점 일반 음식 배달 운영 | 음식점 주문, 조리/픽업 상태, 음식 배달 기사 배차, 고객 배송 완료 |
 | `3.5` | 홍달마트와 도심 즉시배송 운영 | 홍달마트 주문, 도심 재고 보충, 피킹/포장, 음식 배달 기사 픽업 |
 
+## 장기 성장 축
+
+일부 기능은 특정 버전 하나에 닫히지 않고 여러 버전을 관통하며 커집니다. 이런 기능은 제품 버전과 별도로 API 성장 트랙을 기록합니다.
+
+| 성장 트랙 | 시작점 | 진화 방향 |
+| --- | --- | --- |
+| `Community` | `1.0` 보조 모드 | 후기, 문의, 감사, 인연 연결, 관계 스냅샷을 시작점으로 두고 2.5 공동주문 모집/공유, 3.0 음식점 지역 소통, 3.5 홍달마트 운영 공유까지 확장 |
+
+커뮤니티는 국내 화물/용달 1.0에만 속한 기능이 아니라 플랫폼 신뢰와 참여 밀도를 쌓는 장기 축입니다. 따라서 `HongdalApiVersionAttribute`는 최초 안정화 버전을 기록하고, `HongdalApiGrowthTrackAttribute`는 커뮤니티처럼 계속 성장하는 기능 계열을 기록합니다.
+
 ## 판단 기준
 
 ```mermaid
@@ -65,4 +75,4 @@ flowchart TD
 | 화주 요금 정책 | 기본운임, km당 단가, 최소운임, 기사 지급 예정 운임, 알선 단계를 기록합니다. |
 | 알선소/재알선 방지 | 재알선금지 의뢰에서 2차 이상 알선 단계가 들어오면 정책 이벤트로 차단합니다. |
 
-세부 릴리즈 게이트는 [../Versions/release-gates.md](../Versions/release-gates.md), 기능 플래그 정책은 [../Versions/feature-flags.md](../Versions/feature-flags.md)를 따릅니다.
+세부 릴리즈 게이트는 [../Versions/release-gates.md](../Versions/release-gates.md), 기능 플래그 정책은 [../Versions/feature-flags.md](../Versions/feature-flags.md)를 따릅니다. API와 운영 노출을 실제 업무 처리 절차별로 묶는 기준은 [workflow-api-policy.md](./workflow-api-policy.md)를 따릅니다.

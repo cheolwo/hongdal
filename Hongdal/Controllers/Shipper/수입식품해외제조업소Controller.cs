@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Hongdal.Application.Shipper.ImportFood;
 using Hongdal.Contracts.Shipper.ImportFood;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Shipper
 {
+    [HongdalApiVersion(HongdalProductVersion.V2_0)]
     [ApiController]
     [Route("api/v1/shipper/import-food/oversea-manufacturers")]
     [Authorize(Roles = 역할명.화주)]

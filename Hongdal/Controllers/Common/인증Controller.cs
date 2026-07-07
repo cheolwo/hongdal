@@ -13,9 +13,11 @@ using 홍달.Data;
 using 홍달.Services;
 using 홍달.Services.Audit;
 using Hongdal.Contracts.Common;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/auth")]
     public class 인증Controller : ControllerBase
@@ -145,6 +147,7 @@ namespace Hongdal.Controllers.Common
             return Ok(new { userId = user.Id, userName = user.UserName, businessRegistrationNumber = user.BusinessRegistrationNumber });
         }
 
+        [HongdalApiVersion(HongdalProductVersion.V2_5)]
         [HttpPost("register/orderer")]
         public async Task<IActionResult> 주문자회원가입([FromBody] 주문자회원가입요청 request)
         {
@@ -191,6 +194,7 @@ namespace Hongdal.Controllers.Common
             });
         }
 
+        [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
         [Authorize]
         [HttpPost("onboarding/connection-candidates")]
         public async Task<IActionResult> 가입온보딩인연후보조회([FromBody] 가입인연후보조회요청 request, CancellationToken cancellationToken)
@@ -202,6 +206,7 @@ namespace Hongdal.Controllers.Common
             return Ok(result);
         }
 
+        [HongdalApiVersion(HongdalProductVersion.V2_5)]
         [Authorize]
         [HttpPost("onboarding/orderer-group-scope")]
         public async Task<IActionResult> 주문자집단온보딩([FromBody] 주문자집단온보딩요청 request)

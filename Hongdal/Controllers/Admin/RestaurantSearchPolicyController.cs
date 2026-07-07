@@ -4,9 +4,11 @@ using Hongdal.Controllers;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin;
 
+[HongdalApiVersion(HongdalProductVersion.V3_0)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/orderer/restaurant-search-policy")]

@@ -23,7 +23,28 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
                 CreateRequest("101", "냉장식품", "혼적", "1톤", "냉동탑", "서울 양천구 목동", "경기 수원시 영통구", 37.5268m, 126.8755m, 37.2636m, 127.0286m, 88000m, 92m, "적합추천"),
                 CreateRequest("102", "전자제품", "독차", "2.5톤", "윙", "서울 마포구 성산동", "경기 고양시 덕양구", 37.5638m, 126.9084m, 37.6374m, 126.8320m, 132000m, 86m, "추천"),
                 CreateRequest("103", "생활용품", "혼적", "1톤", "탑", "경기 부천시 중동", "인천 연수구 송도동", 37.5034m, 126.7660m, 37.3896m, 126.6426m, 74000m, 81m, "추천"),
-                CreateRequest("104", "소형 이사", "독차", "1톤", "카고", "서울 송파구 문정동", "서울 강서구 마곡동", 37.4861m, 127.1226m, 37.5668m, 126.8298m, 118000m, 78m, "긴급추천")
+                CreateRequest("104", "소형 이사", "독차", "1톤", "카고", "서울 송파구 문정동", "서울 강서구 마곡동", 37.4861m, 127.1226m, 37.5668m, 126.8298m, 118000m, 78m, "긴급추천"),
+                CreateRequest(
+                    "GP-201",
+                    "수입 냉장식품 공동주문",
+                    "공동주문 세대배송",
+                    "1톤",
+                    "냉동탑",
+                    "인천항 보세창고",
+                    "서울 강서구 홍달아파트",
+                    37.4559m,
+                    126.6243m,
+                    37.5610m,
+                    126.8370m,
+                    176000m,
+                    94m,
+                    "공동주문추천",
+                    requestTypeCode: "GroupPurchaseCargoTransport",
+                    requestTypeLabel: "공동주문 운송",
+                    isGroupPurchaseTransport: true,
+                    includesApartmentUnitDelivery: true,
+                    apartmentUnitDeliveryCount: 33,
+                    apartmentUnitDeliveryScopeLabel: "상하차 + 세대 문앞 33건")
             ],
             예약목록 =
             [
@@ -119,7 +140,13 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
         decimal dropoffLng,
         decimal expectedProfit,
         decimal score,
-        string status)
+        string status,
+        string requestTypeCode = "GeneralCargoTransport",
+        string requestTypeLabel = "일반 화물",
+        bool isGroupPurchaseTransport = false,
+        bool includesApartmentUnitDelivery = false,
+        int? apartmentUnitDeliveryCount = null,
+        string apartmentUnitDeliveryScopeLabel = "상하차")
     {
         var lineDistance = Math.Abs(pickupLat - dropoffLat) * 111m + Math.Abs(pickupLng - dropoffLng) * 88m;
         var drivingDistance = decimal.Round(lineDistance * 1.25m, 1);
@@ -131,11 +158,17 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
             의뢰Id = requestId,
             화물종류 = cargoType,
             운송방식 = transportMode,
+            운송의뢰유형코드 = requestTypeCode,
+            운송의뢰유형표시 = requestTypeLabel,
             당일상차필수 = true,
             당일하차필수 = status == "긴급추천",
             차량톤수 = tonnage,
             차량형태 = vehicleType,
             인수증필요 = true,
+            공동주문운송여부 = isGroupPurchaseTransport,
+            세대배송포함여부 = includesApartmentUnitDelivery,
+            세대배송건수 = apartmentUnitDeliveryCount,
+            세대배송업무표시 = apartmentUnitDeliveryScopeLabel,
             결제방식 = "하차 후 계좌",
             픽업지 = pickup,
             하차지 = dropoff,
@@ -157,12 +190,18 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
             예상총비용 = 21200m,
             예상수익 = expectedProfit,
             추천점수 = score,
-            추천사유 = "현재 운송 하차지 이후 연계하기 좋은 후보입니다.",
+            추천사유 = isGroupPurchaseTransport
+                ? "공동주문 수입 화물이며 세대배송 범위와 분류 상태를 확인해야 하는 추천입니다."
+                : "현재 운송 하차지 이후 연계하기 좋은 후보입니다.",
             복귀지기준추천여부 = true,
             복귀지출처 = "오늘복귀지",
             복귀추천사유 = "오늘 복귀지와 다음 상차 동선이 크게 어긋나지 않습니다.",
-            요약설명 = $"{cargoType} 운송, {pickup}에서 {dropoff}까지",
-            상세설명 = $"{pickup} 상차 후 {dropoff} 하차 예정입니다. 비용과 경로를 확인한 뒤 수락 여부를 결정합니다.",
+            요약설명 = isGroupPurchaseTransport
+                ? $"{cargoType} 운송, {pickup}에서 {dropoff}까지 · {apartmentUnitDeliveryScopeLabel}"
+                : $"{cargoType} 운송, {pickup}에서 {dropoff}까지",
+            상세설명 = isGroupPurchaseTransport
+                ? $"{pickup} 상차 후 {dropoff} 하차와 세대배송 범위를 함께 확인합니다. 상품정보 스티커, 분류 상태, 세대배송 건수를 확인한 뒤 수락 여부를 결정합니다."
+                : $"{pickup} 상차 후 {dropoff} 하차 예정입니다. 비용과 경로를 확인한 뒤 수락 여부를 결정합니다.",
             상태 = status,
             배차상태 = "배차대기"
         };

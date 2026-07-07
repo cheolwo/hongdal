@@ -25,6 +25,7 @@
                         <MudStack Spacing="0">
                             <MudText Typo="Typo.h6">@의뢰.화물종류</MudText>
                             <MudText Typo="Typo.body2" Color="Color.Secondary">@의뢰.요약설명</MudText>
+                            <DriverRecommendationTypeChips Request="@의뢰" />
                         </MudStack>
                         <MudStack Spacing="0" AlignItems="AlignItems.End" Class="driver-recommendation-card__fare">
                             <MudText Typo="Typo.caption" Color="Color.Secondary">예상 수익</MudText>
@@ -68,6 +69,12 @@
                     </div>
 
                     <MudText Typo="Typo.body1">@의뢰.상세설명</MudText>
+                    @if (의뢰.공동주문운송여부)
+                    {
+                        <MudAlert Severity="Severity.Warning">
+                            공동주문 운송 의뢰입니다. 일반 상차/하차 외에 세대배송 범위, 상품정보 스티커, 분류 상태, 세대별 건수를 확인한 뒤 수락해야 합니다.
+                        </MudAlert>
+                    }
                     <MudAlert Severity="Severity.Info">@의뢰.추천사유</MudAlert>
                     @if (!string.IsNullOrWhiteSpace(_처리상태))
                     {

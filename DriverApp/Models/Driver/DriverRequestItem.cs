@@ -5,11 +5,17 @@ public sealed class DriverRequestItem
     public string 의뢰Id { get; set; } = string.Empty;
     public string 화물종류 { get; set; } = string.Empty;
     public string 운송방식 { get; set; } = "혼적";
+    public string 운송의뢰유형코드 { get; set; } = "GeneralCargoTransport";
+    public string 운송의뢰유형표시 { get; set; } = "일반 화물";
     public bool 당일상차필수 { get; set; }
     public bool 당일하차필수 { get; set; }
     public string 차량톤수 { get; set; } = string.Empty;
     public string 차량형태 { get; set; } = string.Empty;
     public bool 인수증필요 { get; set; }
+    public bool 공동주문운송여부 { get; set; }
+    public bool 세대배송포함여부 { get; set; }
+    public int? 세대배송건수 { get; set; }
+    public string 세대배송업무표시 { get; set; } = "상하차";
     public string 결제방식 { get; set; } = "하차 후 계좌";
     public string 픽업지 { get; set; } = string.Empty;
     public string 하차지 { get; set; } = string.Empty;
@@ -41,6 +47,18 @@ public sealed class DriverRequestItem
     public string 배차상태 { get; set; } = string.Empty;
 
     public string 경로표시 => $"{픽업지} → {하차지}";
+    public string 추천업무유형표시 => 공동주문운송여부
+        ? $"{운송의뢰유형표시} · {세대배송업무표시}"
+        : 운송의뢰유형표시;
+    public string 세대배송범위표시
+    {
+        get
+        {
+            var count = 세대배송건수.HasValue ? $" · {세대배송건수.Value:N0}건" : string.Empty;
+            return $"{세대배송업무표시}{count}";
+        }
+    }
+
     public string 운송조건표시 => string.IsNullOrWhiteSpace(운송방식) ? "운송방식 미정" : 운송방식;
     public string 시간조건표시 => (당일상차필수, 당일하차필수) switch
     {

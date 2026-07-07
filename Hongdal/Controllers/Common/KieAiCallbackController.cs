@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.Services.Images;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/kie-ai")]
 public class KieAiCallbackController : ControllerBase

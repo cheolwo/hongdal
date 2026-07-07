@@ -8,6 +8,29 @@
 - Admin configuration should distinguish free communication, required work, optional utility, and paid utility features.
 - See [Community Operating Policy](Architecture/CommunityOperatingPolicy.md) for the operating model.
 
+## API Metadata
+
+- Community APIs are tracked with `HongdalApiGrowthTrack.Community` in addition to their product version.
+- The product version records where an API first stabilizes. The community growth track records that the feature continues to evolve across 1.0, 2.5, 3.0, and later scopes.
+- Current community-track API surfaces include community posts, community activity signals, gratitude messages, connection requests, work relationship snapshots, and onboarding connection-candidate lookup.
+
+## Activity Signals
+
+- Community mode should not be only a manual board. It should also show privacy-safe signs of real platform activity so users can see how others are working, buying, transporting, reviewing, and coordinating.
+- Raw activity logs remain private/admin data. Community reads use `GET api/v1/community/activity-signals`, which converts successful work logs into anonymized signals.
+- Activity signals never expose user id, user name, email, phone, trace id, IP address, user agent, raw URL, query string, or raw metadata JSON.
+- Default signal reads exclude simple `Read` logs to avoid filling the community with passive page views. Clients can request `includeRead=true` when a product journey or similar read signal is useful.
+- Supported initial scopes are driver work, shipper transport, warehouse work, product journey, sales commerce, and community trust.
+
+## Voting And Resolutions
+
+- Community mode can host lightweight votes for coordination, purchase intent, work scheduling, shared facility decisions, and dispute/operation preferences.
+- The first server surface is `api/v1/community/votes`.
+- A vote can be closed and converted into a resolution document draft.
+- Resolution documents can request participant signatures through the platform signature evidence model.
+- A vote result is not treated as automatically legally effective. The resolution document moves through explicit states such as `LegalReviewRequired`, `ReadyToSign`, `PartiallySigned`, and `Signed`.
+- The document response includes a legal-effect notice because actual enforceability or submission acceptance depends on the document type, participant authority, notice/consent, counterparty or agency rules, and legal review.
+
 ## Role Profile Badges
 
 - Community author and commenter displays use a lightweight role-profile badge.

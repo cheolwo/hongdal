@@ -1,15 +1,40 @@
 using DriverApp.Services.CommonContents;
 using DriverApp.Services.Samples;
 using DriverApp.Services.Security;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Client.Infrastructure.Security;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DriverApp.Services;
 
 public static class DriverServiceCollectionExtensions
 {
-    public static IServiceCollection AddDriverAppServices(this IServiceCollection services)
+    public static IServiceCollection AddDriverAppServices(
+        this IServiceCollection services,
+        IConfiguration? configuration = null)
     {
+        var hasClientDataModeConfig = configuration?.GetSection(ClientDataModeOptions.SectionName).Exists() == true;
+        if (configuration is not null)
+        {
+            services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
+        }
+        else
+        {
+            services.Configure<ClientDataModeOptions>(_ => { });
+        }
+
+        services.PostConfigure<ClientDataModeOptions>(options =>
+        {
+#if DEBUG
+            if (!hasClientDataModeConfig)
+            {
+                options.AllowSampleFallback = true;
+                options.AllowDevelopmentSnapshotFallback = true;
+            }
+#endif
+        });
+
         services.AddSingleton<DriverAppProfile>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
@@ -34,7 +59,14 @@ public static class DriverServiceCollectionExtensions
         });
         services.AddScoped<AuthApiService>();
         services.AddSingleton<HttpDriverTransportCompletionPhotoService>();
-        services.AddSingleton<IDriverTransportCompletionPhotoService, SampleDriverTransportCompletionPhotoService>();
+        services.AddSingleton<SampleDriverTransportCompletionPhotoService>();
+        services.AddSingleton<IDriverTransportCompletionPhotoService>(sp =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ClientDataModeOptions>>().Value;
+            return options.AllowSampleFallback
+                ? sp.GetRequiredService<SampleDriverTransportCompletionPhotoService>()
+                : sp.GetRequiredService<HttpDriverTransportCompletionPhotoService>();
+        });
         services.AddScoped<IApiClient, ApiClient>();
 
         return services;

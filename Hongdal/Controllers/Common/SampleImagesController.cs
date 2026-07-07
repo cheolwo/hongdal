@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.Controllers;
 using 홍달.Services.Images;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Authorize(Policy = "운영사용자전용")]
 [Route("api/v1/sample-images")]

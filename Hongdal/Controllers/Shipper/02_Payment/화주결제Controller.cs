@@ -6,9 +6,11 @@ using Hongdal.Contracts.Shipper.Payment;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Shipper.Payment02
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/payments")]
     public class 화주결제Controller : ControllerBase

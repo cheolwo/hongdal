@@ -7,9 +7,11 @@ using Hongdal.Controllers;
 using Hongdal.Application.Driver.Transport;
 using 홍달.도메인.공통;
 using Hongdal.Contracts.Driver.Transport;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Progress05
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/transports")]

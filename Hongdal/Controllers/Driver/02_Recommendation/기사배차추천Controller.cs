@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using 홍달.Data;
 using 홍달.Services;
 using 홍달.도메인.공통;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Recommendation02
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/recommendations")]

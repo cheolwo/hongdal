@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Hongdal.Application.Admin.Settlement;
 using Hongdal.Contracts.Admin.Settlement;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Settlement05;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/admin/driver-settlements")]
 [Authorize(Policy = "서버관리자전용")]

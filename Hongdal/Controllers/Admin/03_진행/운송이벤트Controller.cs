@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Hongdal.Application.Admin.Operating;
 using Hongdal.Contracts.Admin.Progress;
 using 홍달.도메인.운송;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Progress03
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/transport-events")]
     public class 운송이벤트Controller : ControllerBase

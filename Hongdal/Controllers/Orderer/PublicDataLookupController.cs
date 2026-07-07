@@ -1,9 +1,13 @@
 using Hongdal.Contracts.Common.PublicData;
+using Hongdal.Filters;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services.External.PublicData;
+using 홍달.Services.Versioning;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Orderer;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/orderer/public-data")]
 public sealed class PublicDataLookupController : ControllerBase
@@ -12,17 +16,20 @@ public sealed class PublicDataLookupController : ControllerBase
     private readonly IApartmentComplexLookupService _apartmentComplexLookupService;
     private readonly IApartmentManagementFeeLookupService _apartmentManagementFeeLookupService;
     private readonly IOrdererGroupScopeLookupService _ordererGroupScopeLookupService;
+    private readonly IHsCountryTradeUnitPriceLookupService _hsCountryTradeUnitPriceLookupService;
 
     public PublicDataLookupController(
         IRoadAddressLookupService roadAddressLookupService,
         IApartmentComplexLookupService apartmentComplexLookupService,
         IApartmentManagementFeeLookupService apartmentManagementFeeLookupService,
-        IOrdererGroupScopeLookupService ordererGroupScopeLookupService)
+        IOrdererGroupScopeLookupService ordererGroupScopeLookupService,
+        IHsCountryTradeUnitPriceLookupService hsCountryTradeUnitPriceLookupService)
     {
         _roadAddressLookupService = roadAddressLookupService;
         _apartmentComplexLookupService = apartmentComplexLookupService;
         _apartmentManagementFeeLookupService = apartmentManagementFeeLookupService;
         _ordererGroupScopeLookupService = ordererGroupScopeLookupService;
+        _hsCountryTradeUnitPriceLookupService = hsCountryTradeUnitPriceLookupService;
     }
 
     [HttpGet("addresses")]
@@ -42,6 +49,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return Ok(result);
     }
 
+    [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
     [HttpGet("orderer-group-scopes")]
     public ActionResult<PublicDataLookupResponse<OrdererGroupScopeCandidateItem>> FindOrdererGroupScopes(
         [FromQuery] string? roadAddress,
@@ -64,6 +74,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return Ok(result);
     }
 
+    [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
     [HttpGet("apartment-complexes")]
     public async Task<ActionResult<PublicDataLookupResponse<ApartmentComplexItem>>> SearchApartmentComplexes(
         [FromQuery] string? sidoCode,
@@ -89,6 +102,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return Ok(result);
     }
 
+    [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
     [HttpGet("apartment-complexes/{complexCode}/basic")]
     public async Task<ActionResult<PublicDataLookupResponse<ApartmentComplexBasicItem>>> GetApartmentComplexBasicInfo(
         string complexCode,
@@ -102,6 +118,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return Ok(result);
     }
 
+    [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
     [HttpGet("apartment-complexes/{complexCode}/management-fee-snapshot")]
     public async Task<ActionResult<PublicDataLookupResponse<ApartmentManagementFeeSnapshotItem>>> GetApartmentManagementFeeSnapshot(
         string complexCode,
@@ -117,6 +136,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return Ok(result);
     }
 
+    [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
     [HttpPost("apartment-complexes/group-commerce-offset-simulation")]
     public async Task<ActionResult<ApartmentGroupCommerceOffsetSimulationResult>> SimulateGroupCommerceOffset(
         [FromBody] ApartmentGroupCommerceOffsetSimulationRequest request,
@@ -124,5 +146,32 @@ public sealed class PublicDataLookupController : ControllerBase
     {
         var result = await _apartmentManagementFeeLookupService.SimulateGroupCommerceOffsetAsync(request, cancellationToken);
         return Ok(result);
+    }
+
+    [HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HttpPost("customs/hs-country-import-unit-price-simulation")]
+    public async Task<ActionResult<HsCountryImportUnitPriceSimulationResult>> SimulateHsCountryImportUnitPrice(
+        [FromBody] HsCountryMonthlyTradeUnitPriceRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _hsCountryTradeUnitPriceLookupService.SimulateImportUnitPriceAsync(request, cancellationToken);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Ok(new HsCountryImportUnitPriceSimulationResult
+            {
+                Success = false,
+                ErrorMessage = ex.Message,
+                HsCode = request.HsCode,
+                CountryCode = request.CountryCode,
+                EndMonth = request.Month,
+                Summary = ex.Message
+            });
+        }
     }
 }

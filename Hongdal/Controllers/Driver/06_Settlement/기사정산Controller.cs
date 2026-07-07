@@ -6,9 +6,11 @@ using MediatR;
 using Hongdal.Application.Driver.Settlement;
 using 홍달.도메인.공통;
 using Hongdal.Contracts.Driver.Settlement;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Settlement06
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/settlements")]

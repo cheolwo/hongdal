@@ -3,10 +3,12 @@ using System.Net.Http.Json;
 using DriverApp.Models.Driver;
 using DriverApp.Models.Driver.Samples;
 using DriverApp.Services.Geo;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Contracts.Driver.Development;
 using Hongdal.Contracts.Driver.Reservation;
 using Hongdal.Contracts.Driver.Settlement;
 using Hongdal.Contracts.Driver.Transport;
+using Microsoft.Extensions.Options;
 
 namespace DriverApp.Services.Samples;
 
@@ -15,28 +17,36 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
     private readonly 기사샘플데이터Service _fallback;
+    private readonly ClientDataModeOptions _dataModeOptions;
     private bool _loaded;
 
-    private 기사근무샘플상태 _근무상태;
-    private 기사현재위치샘플 _기사현재위치;
-    private 기사정산샘플요약 _정산요약;
-    private IReadOnlyList<DriverRequestItem> _추천의뢰목록;
-    private IReadOnlyList<기사예약샘플항목> _예약목록;
-    private IReadOnlyList<기사운송샘플항목> _운송목록;
-    private IReadOnlyList<기사알림샘플항목> _알림목록;
+    private 기사근무샘플상태 _근무상태 = null!;
+    private 기사현재위치샘플 _기사현재위치 = null!;
+    private 기사정산샘플요약 _정산요약 = null!;
+    private IReadOnlyList<DriverRequestItem> _추천의뢰목록 = [];
+    private IReadOnlyList<기사예약샘플항목> _예약목록 = [];
+    private IReadOnlyList<기사운송샘플항목> _운송목록 = [];
+    private IReadOnlyList<기사알림샘플항목> _알림목록 = [];
 
-    public ServerBackedDriverSampleDataService(HttpClient httpClient, IAuthSession authSession, 기사샘플데이터Service fallback)
+    public ServerBackedDriverSampleDataService(
+        HttpClient httpClient,
+        IAuthSession authSession,
+        기사샘플데이터Service fallback,
+        IOptions<ClientDataModeOptions> dataModeOptions)
     {
         _httpClient = httpClient;
         _authSession = authSession;
         _fallback = fallback;
-        _근무상태 = fallback.근무상태;
-        _기사현재위치 = fallback.기사현재위치;
-        _정산요약 = fallback.정산요약;
-        _추천의뢰목록 = fallback.추천의뢰목록;
-        _예약목록 = fallback.예약목록;
-        _운송목록 = fallback.운송목록;
-        _알림목록 = fallback.알림목록;
+        _dataModeOptions = dataModeOptions.Value;
+
+        if (_dataModeOptions.AllowSampleFallback)
+        {
+            ApplyFallback();
+        }
+        else
+        {
+            ApplyEmptyState();
+        }
     }
 
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
@@ -54,6 +64,11 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
                 return;
             }
 
+            if (!_dataModeOptions.AllowDevelopmentSnapshotFallback)
+            {
+                return;
+            }
+
             var snapshot = await _httpClient.GetFromJsonAsync<기사개발스냅샷응답>(
                 "api/v1/driver/dev-snapshot",
                 cancellationToken);
@@ -68,7 +83,7 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         }
         catch
         {
-            // 개발 서버가 아직 켜지지 않은 경우 기존 샘플을 유지하고 다음 화면 진입 때 다시 시도한다.
+            // 개발 서버가 아직 켜지지 않은 경우 다음 화면 진입 때 다시 시도한다.
         }
     }
 
@@ -251,11 +266,17 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             의뢰Id = source.의뢰Id,
             화물종류 = source.화물종류,
             운송방식 = source.운송방식,
+            운송의뢰유형코드 = source.운송의뢰유형코드,
+            운송의뢰유형표시 = source.운송의뢰유형표시,
             당일상차필수 = source.당일상차필수,
             당일하차필수 = source.당일하차필수,
             차량톤수 = source.차량톤수,
             차량형태 = source.차량형태,
             인수증필요 = source.인수증필요,
+            공동주문운송여부 = source.공동주문운송여부,
+            세대배송포함여부 = source.세대배송포함여부,
+            세대배송건수 = source.세대배송건수,
+            세대배송업무표시 = source.세대배송업무표시,
             결제방식 = source.결제방식,
             픽업지 = source.픽업지,
             하차지 = source.하차지,
@@ -295,9 +316,15 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             의뢰Id = source.의뢰Id,
             화물종류 = source.화물종류,
             운송방식 = "서버 추천",
+            운송의뢰유형코드 = source.운송의뢰유형코드,
+            운송의뢰유형표시 = source.운송의뢰유형표시,
             차량톤수 = "조건 확인",
             차량형태 = source.차량적합여부 ? "적합" : "부적합",
             인수증필요 = true,
+            공동주문운송여부 = source.공동주문운송여부,
+            세대배송포함여부 = source.세대배송포함여부,
+            세대배송건수 = source.세대배송건수,
+            세대배송업무표시 = source.세대배송업무표시,
             결제방식 = "서버 정산",
             픽업지 = source.픽업지,
             하차지 = source.하차지,
@@ -391,10 +418,53 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         };
     }
 
+    private void ApplyFallback()
+    {
+        _근무상태 = _fallback.근무상태;
+        _기사현재위치 = _fallback.기사현재위치;
+        _정산요약 = _fallback.정산요약;
+        _추천의뢰목록 = _fallback.추천의뢰목록;
+        _예약목록 = _fallback.예약목록;
+        _운송목록 = _fallback.운송목록;
+        _알림목록 = _fallback.알림목록;
+    }
+
+    private void ApplyEmptyState()
+    {
+        _근무상태 = new 기사근무샘플상태(
+            "기사",
+            "서버 연결 대기",
+            "미정",
+            "위치 미확인",
+            null,
+            DateTime.Now,
+            0,
+            0);
+        _기사현재위치 = new 기사현재위치샘플("위치 미확인", 0m, 0m, DateTime.Now);
+        _정산요약 = new 기사정산샘플요약(
+            DateTime.Today.Year,
+            DateTime.Today.Month,
+            0,
+            0m,
+            0m,
+            false,
+            []);
+        _추천의뢰목록 = [];
+        _예약목록 = [];
+        _운송목록 = [];
+        _알림목록 = [];
+    }
+
     private sealed class ServerDispatchRecommendationDto
     {
         public string 의뢰Id { get; set; } = string.Empty;
         public string 화물종류 { get; set; } = string.Empty;
+        public string 운송의뢰유형코드 { get; set; } = "GeneralCargoTransport";
+        public string 운송의뢰유형표시 { get; set; } = "일반 화물";
+        public bool 공동주문운송여부 { get; set; }
+        public bool 세대배송포함여부 { get; set; }
+        public int? 세대배송건수 { get; set; }
+        public string 세대배송업무표시 { get; set; } = "상하차";
         public string 픽업지 { get; set; } = string.Empty;
         public string 하차지 { get; set; } = string.Empty;
         public decimal? 픽업_위도 { get; set; }

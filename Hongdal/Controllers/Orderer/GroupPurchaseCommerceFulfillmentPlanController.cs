@@ -1,11 +1,17 @@
 using Hongdal.Contracts.Common.Orderer;
 using Hongdal.Controllers;
+using Hongdal.ApiMetadata;
+using Hongdal.Filters;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Mvc;
+using 홍달.Services.Versioning;
 
 namespace Hongdal.Controllers.Orderer;
 
 [ApiController]
+[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
 [Route("api/v1/orderer/group-purchase-commerce-fulfillment-plans")]
 public sealed class GroupPurchaseCommerceFulfillmentPlanController : ControllerBase
 {

@@ -25,7 +25,7 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		builder.Services.AddDriverAppServices();
+		builder.Services.AddDriverAppServices(builder.Configuration);
 		builder.Services.AddHongdalUiCommonAppServices();
 		builder.Services.AddHongdalDocumentOutputServices();
 		builder.Services.AddTransient<NativeDriverHomePage>();

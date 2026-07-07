@@ -3,9 +3,11 @@ using Hongdal.Controllers;
 using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.HumanResources;
 
+[HongdalApiVersion(HongdalProductVersion.V2_5)]
 [ApiController]
 [Authorize(Roles = "서버관리자")]
 [Route("api/v1/admin/hr-employment-contracts")]

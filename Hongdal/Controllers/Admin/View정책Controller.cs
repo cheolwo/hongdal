@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using 홍달.Services.Audit;
 using 홍달.Services.ViewSettings;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/view-policies")]

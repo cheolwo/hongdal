@@ -1,9 +1,11 @@
 using Hongdal.Contracts.Common.PublicData;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services.External.PublicData;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V2_5)]
 [ApiController]
 [Route("api/v1/public-data/apis")]
 public sealed class PublicDataApiMetadataController : ControllerBase

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.Controllers;
 using Hongdal.Application.ProductJourney.Queries;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Authorize]
 [Route("api/v1/products")]

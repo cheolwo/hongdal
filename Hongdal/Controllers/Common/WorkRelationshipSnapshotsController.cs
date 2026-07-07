@@ -2,9 +2,12 @@ using Hongdal.Contracts.Common.Hr;
 using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
+[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Authorize]
 [Route("api/v1/work-relationship-snapshots")]

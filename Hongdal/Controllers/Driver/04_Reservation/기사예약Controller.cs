@@ -7,9 +7,11 @@ using FluentResults;
 using Hongdal.Application.Driver.Reservation;
 using Hongdal.Contracts.Driver.Reservation;
 using 홍달.도메인.공통;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Reservation04
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/reservations")]

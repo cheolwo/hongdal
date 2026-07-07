@@ -16,6 +16,7 @@
 | 공동주택 관리비/수익 시뮬레이션 | 포함 | `ApartmentManagementFeeLookupService`, 공공데이터 조회 | 관리비 스냅샷과 공동판매 예상 수익을 비교해 비용 완화 효과 표시 |
 | 주문자 집단 운영 주체 | 포함 | `OrdererGroupOperatingEntityStore`, HR 계약/역할 | 비사업자/사업자/법인/협동조합/관리사무소 위임/플랫폼 위임 구분 |
 | 입주민 우선 고용 정책 | 포함 | `HrRoleDtos`, `OrdererGroupOperatingEntityStore` | 공동주문 분류, 배분, 물품 집합, 공동주택 관리 보조, 경비/순찰 보조 역할을 입주민 우선으로 관리 |
+| 4대보험 신고 준비 | 포함 | `SocialInsuranceFilingService`, HR 계약/역할 | 직접 신고 API 연동 대신 건강보험/국민연금/고용보험/산재보험 대상 판정, EDI 또는 수기 제출 준비, 제출 결과 기록으로 관리 |
 | 화주 대량 구매 공개 | 포함 | `ShipperApp` | 수입/국내 대량 구매 모두 고려 |
 | FCL 가능 조건 계산 | 포함 | `ShipperApp`, 화물 계획 서비스 | 목표 수량/부피/중량 기준 |
 | 집단 대표 입고 | 포함 | `WarehouseManagerApp`, `CargoYongdalDispatchEngine` | 집단 대표 입고지로 운송 연결 |

@@ -8,6 +8,7 @@
 
 - SmartStore: Naver Commerce API
 - Coupang: Coupang WING Open API
+- Amazon: Amazon Selling Partner API, export readiness skeleton first
 - ElevenStreet: 후속 연동 후보
 
 ## 모듈 경계
@@ -23,6 +24,7 @@
 
 - `ShipperApp.Services.Commerce.Naver`
 - `ShipperApp.Services.Commerce.Coupang`
+- `ShipperApp.Services.Commerce.Amazon`
 
 ## 현재 동작
 
@@ -35,6 +37,8 @@
 - 미지원 채널: `동기화상태 = 수동관리`
 
 외부 API 실제 호출은 네이버/쿠팡의 저수준 클라이언트에 이미 분리되어 있으며, 실제 운영 credential과 상품 payload mapper가 준비된 뒤 상위 출품 서비스에서 호출하도록 확장한다.
+
+Amazon은 실제 SP-API 호출 전에 `AmazonExportReadinessPlanner`로 수출 준비 게이트를 먼저 확인한다. Amazon 출품은 단순 채널출품이 아니라 수입 참여자 자격, 국내 물류 이력, 후기 사용 동의, 이미지형 상세페이지/광고 소재, 수출 HS 검토, 관세사 수임과 비용, 상업송장/패킹리스트, 재고 예약, 출고 배치, 국제배송, 반품/정산 정책까지 함께 확인해야 하므로 별도 readiness 골격을 둔다.
 
 ## 왜 실제 호출을 아직 자동화하지 않는가
 
@@ -52,3 +56,4 @@
 3. 출품 생성 시 `연동준비` 상태에서 사용자가 payload를 보정하고 `외부 등록`을 실행하는 워크플로 추가
 4. 외부 등록 성공 시 네이버 `originProductNo/channelProductNo`, 쿠팡 `sellerProductId/vendorItemId`를 내부 채널출품에 저장
 5. 가격, 재고, 판매상태 변경 API를 채널별 커맨드로 추가
+6. Amazon은 `AmazonExportReadinessPlanner`의 게이트가 닫힌 뒤 marketplaceId, sellerId, productType, Product Type Definitions JSON Schema를 이용해 Listings Items API payload를 완성

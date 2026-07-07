@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Hongdal.Application.Admin.Partners;
 using Hongdal.Contracts.Admin.Management;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Master06;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/admin/partners")]
 [Authorize(Policy = "서버관리자전용")]

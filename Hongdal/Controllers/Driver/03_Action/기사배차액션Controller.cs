@@ -6,9 +6,11 @@ using Hongdal.Controllers;
 using Hongdal.Application.Driver.DispatchAction;
 using Hongdal.Contracts.Driver.Action;
 using 홍달.도메인.공통;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Action03
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/dispatch-actions")]

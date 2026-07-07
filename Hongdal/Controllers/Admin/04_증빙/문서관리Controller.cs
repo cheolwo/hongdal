@@ -4,9 +4,11 @@ using 홍달.Services.Audit;
 using 홍달.Services.Documents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Evidence04;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/documents")]

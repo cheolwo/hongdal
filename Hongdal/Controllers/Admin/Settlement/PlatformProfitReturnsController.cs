@@ -2,9 +2,11 @@ using Hongdal.Contracts.Common.PlatformProfit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services.Settlement;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Settlement;
 
+[HongdalApiVersion(HongdalProductVersion.V2_5)]
 [ApiController]
 [Authorize(Roles = "서버관리자")]
 [Route("api/v1/admin/platform-profit-returns")]

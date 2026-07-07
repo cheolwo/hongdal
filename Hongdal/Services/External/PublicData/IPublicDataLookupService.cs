@@ -31,6 +31,13 @@ public interface IApartmentManagementFeeLookupService
         CancellationToken cancellationToken = default);
 }
 
+public interface IHsCountryTradeUnitPriceLookupService
+{
+    Task<HsCountryImportUnitPriceSimulationResult> SimulateImportUnitPriceAsync(
+        HsCountryMonthlyTradeUnitPriceRequest request,
+        CancellationToken cancellationToken = default);
+}
+
 public interface IOrdererGroupScopeLookupService
 {
     PublicDataLookupResponse<OrdererGroupScopeCandidateItem> FindCandidates(

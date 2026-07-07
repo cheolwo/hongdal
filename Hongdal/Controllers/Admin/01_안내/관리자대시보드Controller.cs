@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Hongdal.Application.Admin.Dashboard;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Home01;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/admin/dashboard")]
 [Authorize(Policy = "서버관리자전용")]

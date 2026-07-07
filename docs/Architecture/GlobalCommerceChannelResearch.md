@@ -72,6 +72,7 @@
 - `CommerceChannelCatalog`: Shopify, Amazon, eBay, Walmart, Etsy, TikTok Shop, Shopee, Lazada 추가
 - `ShopifyProductPayloadBuilder`: Shopify 상품 생성 payload 초안
 - `AmazonSpApiProductPayloadBuilder`: Amazon SP-API Listings Items payload 초안
+- `AmazonExportReadinessPlanner`: Amazon 출품 전에 수입 참여자 자격, 국내 물류 이력, 후기 사용 동의, 이미지형 상세페이지/광고 소재, 수출 HS 검토, 관세사 수임/비용, 서류, 재고 예약, 출고 배치, 국제배송, 반품/정산 정책을 확인하는 골격
 - `EbayInventoryProductPayloadBuilder`: eBay inventory item/offer workflow payload 초안
 
 실제 API 클라이언트 구현은 다음 순서가 적절하다.

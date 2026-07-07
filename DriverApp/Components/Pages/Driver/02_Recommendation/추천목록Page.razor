@@ -71,6 +71,7 @@
                                 <MudStack Spacing="0">
                                     <MudText Typo="Typo.subtitle1">@item.의뢰.화물종류</MudText>
                                     <MudText Typo="Typo.body2" Color="Color.Secondary">@간단부제(item)</MudText>
+                                    <DriverRecommendationTypeChips Request="@item.의뢰" />
                                 </MudStack>
                                 <MudStack Spacing="0" AlignItems="AlignItems.End" Class="driver-recommendation-card__fare">
                                     <MudText Typo="Typo.caption" Color="Color.Secondary">예상 수익</MudText>
@@ -132,6 +133,7 @@
                                     <MudStack Spacing="0">
                                         <MudText Typo="Typo.h6">@item.의뢰.화물종류</MudText>
                                         <MudText Typo="Typo.body2" Color="Color.Secondary">@자세히부제(item)</MudText>
+                                        <DriverRecommendationTypeChips Request="@item.의뢰" />
                                     </MudStack>
                                     <MudStack Spacing="0" AlignItems="AlignItems.End" Class="driver-recommendation-card__fare">
                                         <MudText Typo="Typo.caption" Color="Color.Secondary">예상 수익</MudText>

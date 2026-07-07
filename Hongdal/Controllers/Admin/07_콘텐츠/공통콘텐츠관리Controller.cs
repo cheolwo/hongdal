@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.도메인.공통콘텐츠;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Content07;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/admin/common-contents")]
 [Authorize(Policy = "서버관리자전용")]

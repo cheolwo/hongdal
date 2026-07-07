@@ -1,13 +1,19 @@
 using System.Security.Claims;
 using Hongdal.Contracts.Common.Orderer;
 using Hongdal.Controllers;
+using Hongdal.ApiMetadata;
+using Hongdal.Filters;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using 홍달.Services.Versioning;
 
 namespace Hongdal.Controllers.Admin.Orderer;
 
 [ApiController]
+[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/orderer/group-purchase-commerce-fulfillment-plans")]
 public sealed class GroupPurchaseCommerceFulfillmentPlanAdminController : ControllerBase
@@ -88,6 +94,29 @@ public sealed class GroupPurchaseCommerceFulfillmentPlanAdminController : Contro
         catch (InvalidOperationException ex)
         {
             return Problem(title: "공동주문 커머스 풀필먼트 플랜 입력값이 올바르지 않습니다.", detail: ex.Message, statusCode: StatusCodes.Status400BadRequest);
+        }
+    }
+
+    [HttpPost("{planId}/platform-domestic-transport-draft")]
+    public async Task<IActionResult> CreatePlatformDomesticTransportDraft(
+        string planId,
+        [FromBody] GroupPurchasePlatformDomesticTransportDraftRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var plan = await _store.GetAsync(planId, cancellationToken);
+            if (plan is null)
+            {
+                return this.ToNotFoundProblem("Group purchase commerce fulfillment plan was not found.");
+            }
+
+            var result = GroupPurchasePlatformDomesticTransportPlanner.Plan(plan, request);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(title: "Platform domestic transport draft input is invalid.", detail: ex.Message, statusCode: StatusCodes.Status400BadRequest);
         }
     }
 

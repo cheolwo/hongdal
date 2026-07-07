@@ -7,9 +7,11 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Data;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.App;
 
+[HongdalApiVersion(HongdalProductVersion.V1_0)]
 [ApiController]
 [Route("api/v1/app/common-contents")]
 [Authorize]

@@ -236,7 +236,7 @@ namespace 홍달.Services.Dispatch.Recommendation
                     returnDestination.복귀지기준사용됨,
                     returnDestination.출처);
 
-                result.Add(new DispatchRecommendationDto
+                var recommendation = new DispatchRecommendationDto
                 {
                     의뢰Id = x.Item.의뢰Id,
                     화물종류 = request?.화물종류 ?? x.Item.픽업_도로명주소,
@@ -288,7 +288,10 @@ namespace 홍달.Services.Dispatch.Recommendation
                     차량경고 = fit?.경고 ?? Array.Empty<string>(),
                     상태 = x.Item.상태,
                     배차상태 = 상태값.배차상태.대기
-                });
+                };
+
+                DispatchRecommendationRequestTypeClassifier.ApplyTo(recommendation, x.Item.원본의뢰유형);
+                result.Add(recommendation);
             }
 
             return result;
@@ -308,5 +311,6 @@ namespace 홍달.Services.Dispatch.Recommendation
 
             return request.결제예정금액.HasValue ? request.결제예정금액.Value : null;
         }
+
     }
 }

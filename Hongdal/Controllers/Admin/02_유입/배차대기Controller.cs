@@ -3,9 +3,11 @@ using MediatR;
 using Hongdal.Controllers;
 using Hongdal.Application.Admin.Inbound;
 using Hongdal.Contracts.Admin.Inbound;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Inflow02
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/dispatch/wait")]
     public class 배차대기Controller : ControllerBase

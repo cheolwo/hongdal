@@ -4,6 +4,7 @@ using Hongdal.Application.CommandProcessing;
 using Hongdal.Middleware;
 using Hongdal.Application.HumanResources;
 using Hongdal.Services.HumanResources;
+using Hongdal.Services.Community;
 using Hongdal.Services.LogisticsProcessing.SalesOrders;
 using 홍달.Infrastructure;
 using 홍달.Services.Audit;
@@ -43,11 +44,14 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();
         services.AddScoped<IOutboundBatchEngine, OutboundBatchEngine>();
         services.AddScoped<IWorkRelationshipSnapshotService, WorkRelationshipSnapshotService>();
+        services.AddScoped<ICommunityActivitySignalService, CommunityActivitySignalService>();
+        services.AddSingleton<ICommunityVoteService, InMemoryCommunityVoteService>();
         services.AddScoped<ISalesChannelOrderSyncService, SalesChannelOrderSyncService>();
         services.AddSingleton<ISalesChannelOrderFeedClient, EmptySalesChannelOrderFeedClient>();
         services.AddScoped<IHrRoleAssignmentStore, EfCoreHrRoleAssignmentStore>();
         services.AddScoped<IHrEmploymentContractService, HrEmploymentContractService>();
         services.AddSingleton<IHrParticipationBenefitRecordService, InMemoryHrParticipationBenefitRecordService>();
+        services.AddSingleton<ISocialInsuranceFilingService, InMemorySocialInsuranceFilingService>();
         services.AddScoped<HrRoleAccessMiddleware>();
         services.AddScoped<사용자행위로그Middleware>();
 

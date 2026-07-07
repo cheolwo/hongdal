@@ -80,6 +80,12 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri(options.ApartmentManagementFee.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
+        services.AddHttpClient<IHsCountryTradeUnitPriceLookupService, HsCountryTradeUnitPriceLookupService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.CustomsTradeStatistics.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
         services.AddHttpClient<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();
         services.AddHttpClient<IFcmPushService, FirebaseFcmPushService>();
 

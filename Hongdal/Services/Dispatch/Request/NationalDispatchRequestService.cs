@@ -3,6 +3,7 @@ using Hongdal.Hubs;
 using 홍달.도메인.공통;
 using 홍달.도메인.배차;
 using 홍달.도메인.화주;
+using 홍달.Services.Dispatch.Recommendation;
 using 홍달.Services.Storage.Local;
 
 namespace 홍달.Services.Dispatch.Request
@@ -42,20 +43,26 @@ namespace 홍달.Services.Dispatch.Request
 
             return items
                 .Where(q => rejectedRequestIdSet == null || !rejectedRequestIdSet.Contains(q.의뢰Id))
-                .Select(q => new DispatchRecommendationDto
+                .Select(q =>
                 {
-                    의뢰Id = q.의뢰Id,
-                    화물종류 = requestMap.TryGetValue(q.의뢰Id, out var request) ? request.화물종류 : q.픽업_도로명주소,
-                    픽업지 = q.픽업_도로명주소,
-                    하차지 = q.하차_도로명주소,
-                    픽업_위도 = q.픽업_위도,
-                    픽업_경도 = q.픽업_경도,
-                    하차_위도 = q.하차_위도,
-                    하차_경도 = q.하차_경도,
-                    직선거리Km = null,
-                    주행거리Km = null,
-                    상태 = q.상태,
-                    배차상태 = 상태값.배차상태.대기
+                    var recommendation = new DispatchRecommendationDto
+                    {
+                        의뢰Id = q.의뢰Id,
+                        화물종류 = requestMap.TryGetValue(q.의뢰Id, out var request) ? request.화물종류 : q.픽업_도로명주소,
+                        픽업지 = q.픽업_도로명주소,
+                        하차지 = q.하차_도로명주소,
+                        픽업_위도 = q.픽업_위도,
+                        픽업_경도 = q.픽업_경도,
+                        하차_위도 = q.하차_위도,
+                        하차_경도 = q.하차_경도,
+                        직선거리Km = null,
+                        주행거리Km = null,
+                        상태 = q.상태,
+                        배차상태 = 상태값.배차상태.대기
+                    };
+
+                    DispatchRecommendationRequestTypeClassifier.ApplyTo(recommendation, q.원본의뢰유형);
+                    return recommendation;
                 })
                 .ToList();
         }

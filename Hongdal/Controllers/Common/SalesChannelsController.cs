@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using 홍달.Services.Audit;
 using 홍달.Services.Sales;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalApiVersion(HongdalProductVersion.V2_5)]
+[HongdalApiWorkflow(HongdalWorkflow.SalesChannelFulfillment)]
 [ApiController]
 [Authorize(Policy = "운영사용자전용")]
 [Route("api/v1/sales-channels")]

@@ -1,9 +1,11 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Shipper.Request;
+using Microsoft.Extensions.Options;
 using ShipperApp.Models.Shipper;
 using ShipperApp.Services.Samples;
 
@@ -14,15 +16,18 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
     private readonly SampleShipperOperationsService _fallback;
+    private readonly ClientDataModeOptions _dataModeOptions;
 
     public ServerBackedShipperOperationsService(
         HttpClient httpClient,
         IAuthSession authSession,
-        SampleShipperOperationsService fallback)
+        SampleShipperOperationsService fallback,
+        IOptions<ClientDataModeOptions> dataModeOptions)
     {
         _httpClient = httpClient;
         _authSession = authSession;
         _fallback = fallback;
+        _dataModeOptions = dataModeOptions.Value;
     }
 
     public async Task<IReadOnlyList<ShipperRequestItem>> GetRequestsAsync(CancellationToken cancellationToken = default)
@@ -30,7 +35,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
         var userId = ResolveUserId();
         if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
         {
-            return await _fallback.GetRequestsAsync(cancellationToken);
+            return await GetFallbackOrEmptyAsync(_fallback.GetRequestsAsync, cancellationToken);
         }
 
         try
@@ -38,11 +43,11 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             var path = $"api/v1/shipper/requests?shipperId={Uri.EscapeDataString(userId)}";
             var response = await GetAuthorizedJsonAsync<IReadOnlyList<화주운송의뢰응답>>(path, cancellationToken);
             return response?.Select(ToRequestItem).ToArray()
-                   ?? await _fallback.GetRequestsAsync(cancellationToken);
+                   ?? await GetFallbackOrEmptyAsync(_fallback.GetRequestsAsync, cancellationToken);
         }
         catch
         {
-            return await _fallback.GetRequestsAsync(cancellationToken);
+            return await GetFallbackOrEmptyAsync(_fallback.GetRequestsAsync, cancellationToken);
         }
     }
 
@@ -53,44 +58,50 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             return await _httpClient.GetFromJsonAsync<IReadOnlyList<공개화물요약응답>>(
                        "api/v1/shipper/requests/public",
                        cancellationToken)
-                   ?? await _fallback.GetPublicCargoAsync(cancellationToken);
+                   ?? await GetFallbackOrEmptyAsync(_fallback.GetPublicCargoAsync, cancellationToken);
         }
         catch
         {
-            return await _fallback.GetPublicCargoAsync(cancellationToken);
+            return await GetFallbackOrEmptyAsync(_fallback.GetPublicCargoAsync, cancellationToken);
         }
     }
 
     public Task<IReadOnlyList<창고요약응답>> GetWarehousesAsync(CancellationToken cancellationToken = default)
     {
-        return _fallback.GetWarehousesAsync(cancellationToken);
+        return GetFallbackOrEmptyAsync(_fallback.GetWarehousesAsync, cancellationToken);
     }
 
     public Task<IReadOnlyList<입고요청항목응답>> GetInboundsAsync(CancellationToken cancellationToken = default)
     {
-        return _fallback.GetInboundsAsync(cancellationToken);
+        return GetFallbackOrEmptyAsync(_fallback.GetInboundsAsync, cancellationToken);
     }
 
     public Task<IReadOnlyList<재고항목응답>> GetInventoryAsync(CancellationToken cancellationToken = default)
     {
-        return _fallback.GetInventoryAsync(cancellationToken);
+        return GetFallbackOrEmptyAsync(_fallback.GetInventoryAsync, cancellationToken);
     }
 
     public Task<IReadOnlyList<string>> GetVehicleTypesAsync(CancellationToken cancellationToken = default)
     {
-        return _fallback.GetVehicleTypesAsync(cancellationToken);
+        return GetFallbackOrEmptyAsync(_fallback.GetVehicleTypesAsync, cancellationToken);
     }
 
     public Task<decimal> EstimateFareAsync(string vehicleType, decimal distanceKm, CancellationToken cancellationToken = default)
     {
-        return _fallback.EstimateFareAsync(vehicleType, distanceKm, cancellationToken);
+        if (_dataModeOptions.AllowSampleFallback)
+        {
+            return _fallback.EstimateFareAsync(vehicleType, distanceKm, cancellationToken);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(0m);
     }
 
     public async Task AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
         {
-            await _fallback.AddRequestAsync(request, cancellationToken);
+            await AddFallbackOrThrowAsync(request, "서버 인증 정보가 없어 의뢰를 등록할 수 없습니다.", cancellationToken);
             return;
         }
 
@@ -102,12 +113,16 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             using var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                await _fallback.AddRequestAsync(request, cancellationToken);
+                await AddFallbackOrThrowAsync(request, "서버가 의뢰 등록을 거부했습니다.", cancellationToken);
             }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch
         {
-            await _fallback.AddRequestAsync(request, cancellationToken);
+            await AddFallbackOrThrowAsync(request, "서버에 의뢰 등록 요청을 보낼 수 없습니다.", cancellationToken);
         }
     }
 
@@ -133,6 +148,30 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
     private string ResolveUserId()
     {
         return string.IsNullOrWhiteSpace(_authSession.UserId) ? "shipper-demo" : _authSession.UserId!;
+    }
+
+    private Task<IReadOnlyList<T>> GetFallbackOrEmptyAsync<T>(
+        Func<CancellationToken, Task<IReadOnlyList<T>>> fallback,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return _dataModeOptions.AllowSampleFallback
+            ? fallback(cancellationToken)
+            : Task.FromResult<IReadOnlyList<T>>(Array.Empty<T>());
+    }
+
+    private async Task AddFallbackOrThrowAsync(
+        ShipperRequestItem request,
+        string message,
+        CancellationToken cancellationToken)
+    {
+        if (_dataModeOptions.AllowSampleFallback)
+        {
+            await _fallback.AddRequestAsync(request, cancellationToken);
+            return;
+        }
+
+        throw new InvalidOperationException(message);
     }
 
     private 화주운송의뢰생성요청 ToCreateRequest(ShipperRequestItem source)

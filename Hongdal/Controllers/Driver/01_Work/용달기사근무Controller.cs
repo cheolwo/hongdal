@@ -6,9 +6,11 @@ using MediatR;
 using Hongdal.Application.Driver.Work;
 using Hongdal.Contracts.Driver.Work;
 using 홍달.도메인.공통;
+using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Driver.Work01
 {
+    [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/drivers/{driverId}/shifts")]
     [Authorize(Roles = 역할명.기사)]

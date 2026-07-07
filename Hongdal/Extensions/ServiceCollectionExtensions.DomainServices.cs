@@ -30,6 +30,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IGroupPurchaseCommerceFulfillmentPlanStore, MongoGroupPurchaseCommerceFulfillmentPlanStore>();
         services.AddSingleton<IOrdererGroupOperatingEntityStore, MongoOrdererGroupOperatingEntityStore>();
         services.AddScoped<IGroupPurchaseOverseasShipmentCustomsSyncService, GroupPurchaseOverseasShipmentCustomsSyncService>();
+        services.AddSingleton<IGroupPurchaseImportLogisticsNormalizationService, GroupPurchaseImportLogisticsNormalizationService>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
