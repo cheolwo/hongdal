@@ -54,6 +54,10 @@ namespace 홍달.Services.Dispatch.Queue
             var vehicles = await _db.용달기사.AsNoTracking()
                 .Where(x => x.상태 == "활동중")
                 .ToListAsync(cancellationToken);
+            var driverLastRecommendationTimes = await 최근추천상호작용시각조회Async(
+                vehicles.Select(x => x.기사Id),
+                cancellationToken);
+            var now = DateTime.UtcNow;
 
             배차추천후보? bestCandidate = null;
             decimal bestDistance = decimal.MaxValue;
@@ -98,17 +102,85 @@ namespace 홍달.Services.Dispatch.Queue
                     false,
                     null);
 
-                var score = 평가결과.추천점수 ?? 0m;
+                var agingScore = 기사대기Aging점수계산(driver, driverLastRecommendationTimes, now);
+                var score = (평가결과.추천점수 ?? 0m) + agingScore;
+                var reason = agingScore > 0m
+                    ? $"{평가결과.추천사유} · 기사대기보정 +{agingScore:0}"
+                    : 평가결과.추천사유;
+
                 if (bestCandidate is null
                     || score > bestCandidate.추천점수
                     || (score == bestCandidate.추천점수 && distanceKm.Value < bestDistance))
                 {
-                    bestCandidate = new 배차추천후보(driver.기사Id, score, 평가결과.추천사유);
+                    bestCandidate = new 배차추천후보(driver.기사Id, score, reason);
                     bestDistance = distanceKm.Value;
                 }
             }
 
             return bestCandidate;
+        }
+
+        private async Task<IReadOnlyDictionary<string, DateTime>> 최근추천상호작용시각조회Async(
+            IEnumerable<string> driverIds,
+            CancellationToken cancellationToken)
+        {
+            var ids = driverIds
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            if (ids.Length == 0)
+            {
+                return new Dictionary<string, DateTime>(StringComparer.Ordinal);
+            }
+
+            var interactions = await _db.배차대기
+                .AsNoTracking()
+                .Where(x =>
+                    (x.현재추천대상기사Id != null && ids.Contains(x.현재추천대상기사Id)) ||
+                    (x.확정기사Id != null && ids.Contains(x.확정기사Id)) ||
+                    (x.마지막거절기사Id != null && ids.Contains(x.마지막거절기사Id)))
+                .Select(x => new
+                {
+                    x.현재추천대상기사Id,
+                    x.확정기사Id,
+                    x.마지막거절기사Id,
+                    기준시각 = x.추천시작시각 ?? x.UpdatedAt
+                })
+                .ToListAsync(cancellationToken);
+
+            var result = new Dictionary<string, DateTime>(StringComparer.Ordinal);
+            foreach (var interaction in interactions)
+            {
+                AddLatest(result, interaction.현재추천대상기사Id, interaction.기준시각);
+                AddLatest(result, interaction.확정기사Id, interaction.기준시각);
+                AddLatest(result, interaction.마지막거절기사Id, interaction.기준시각);
+            }
+
+            return result;
+        }
+
+        private static decimal 기사대기Aging점수계산(
+            용달기사 driver,
+            IReadOnlyDictionary<string, DateTime> driverLastRecommendationTimes,
+            DateTime now)
+        {
+            var basis = driverLastRecommendationTimes.TryGetValue(driver.기사Id, out var lastRecommendationAt)
+                ? lastRecommendationAt
+                : driver.등록일 ?? driver.CreatedAt;
+            return 기사대기Aging점수정책.계산(basis, now);
+        }
+
+        private static void AddLatest(Dictionary<string, DateTime> target, string? driverId, DateTime value)
+        {
+            if (string.IsNullOrWhiteSpace(driverId))
+            {
+                return;
+            }
+
+            if (!target.TryGetValue(driverId, out var existing) || value > existing)
+            {
+                target[driverId] = value;
+            }
         }
     }
 }
