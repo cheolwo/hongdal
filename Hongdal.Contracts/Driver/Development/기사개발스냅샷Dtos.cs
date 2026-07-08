@@ -94,6 +94,8 @@ public sealed class 기사개발추천의뢰응답
     public string 상세설명 { get; set; } = string.Empty;
     public string 상태 { get; set; } = string.Empty;
     public string 배차상태 { get; set; } = string.Empty;
+    public DateTime? 추천시작시각 { get; set; }
+    public DateTime? 추천만료시각 { get; set; }
 }
 
 public sealed class 기사개발예약응답

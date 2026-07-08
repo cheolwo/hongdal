@@ -17,6 +17,7 @@ namespace 홍달.Services.Dispatch.Queue
         private readonly I차량화물적합성Service _적합성Service;
         private readonly I배차추천판정Service _판정Service;
         private readonly I배차추천평가Service _평가Service;
+        private readonly IDriverRejectedRequestStore _rejectedRequestStore;
 
         public 용달운송배차업무정책(
             HongdalContext db,
@@ -26,7 +27,8 @@ namespace 홍달.Services.Dispatch.Queue
             I배차추천경로Service routeService,
             I차량화물적합성Service 적합성Service,
             I배차추천판정Service 판정Service,
-            I배차추천평가Service 평가Service)
+            I배차추천평가Service 평가Service,
+            IDriverRejectedRequestStore rejectedRequestStore)
         {
             _db = db;
             _driverLocationStore = driverLocationStore;
@@ -36,6 +38,7 @@ namespace 홍달.Services.Dispatch.Queue
             _적합성Service = 적합성Service;
             _판정Service = 판정Service;
             _평가Service = 평가Service;
+            _rejectedRequestStore = rejectedRequestStore;
         }
 
         public int 배차업무유형 => 홍달.도메인.공통.상태값.배차업무유형.용달운송;
@@ -70,6 +73,7 @@ namespace 홍달.Services.Dispatch.Queue
                 return null;
             }
 
+            var rejectedDriverIds = await _rejectedRequestStore.GetRejectedDriverIdsAsync(queue.의뢰Id, cancellationToken);
             var candidateDriverIds = candidateStates
                 .Select(x => x.DriverId)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -91,6 +95,11 @@ namespace 홍달.Services.Dispatch.Queue
                 }
 
                 if (!string.IsNullOrWhiteSpace(제외기사Id) && string.Equals(driver.기사Id, 제외기사Id, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (rejectedDriverIds.Contains(driver.기사Id))
                 {
                     continue;
                 }

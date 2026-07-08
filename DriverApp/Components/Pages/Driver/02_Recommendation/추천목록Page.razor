@@ -1,7 +1,9 @@
 ﻿@page "/driver/recommendations"
 @inject IDriverSampleDataService Samples
 @inject 추천카드표시설정Service CardPreferenceService
+@inject IDriverRecommendationDecisionService DecisionService
 @using DriverApp.Models.Driver
+@implements IDisposable
 
 <PageTitle>추천목록</PageTitle>
 
@@ -112,6 +114,8 @@
                                 <span>@item.의뢰.인수증표시</span>
                             </div>
 
+                            @응답제한표시(item.의뢰)
+
                             <MudStack Row="true" Spacing="2">
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Href="@DriverRoutes.RecommendationDetail(item.의뢰.의뢰Id)">상세</MudButton>
                                 <MudButton Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" Href="@DriverRoutes.RecommendationDecision(item.의뢰.의뢰Id)">수락/거절</MudButton>
@@ -175,6 +179,8 @@
                                     <span>@item.의뢰.인수증표시</span>
                                 </div>
 
+                                @응답제한표시(item.의뢰)
+
                                 <MudStack Row="true" Spacing="2">
                                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.RecommendationDetail(item.의뢰.의뢰Id)">상세</MudButton>
                                     <MudButton Variant="Variant.Outlined" Color="Color.Success" Href="@DriverRoutes.RecommendationDecision(item.의뢰.의뢰Id)">수락/거절</MudButton>
@@ -193,6 +199,8 @@
 @code {
     private decimal? _선택반경Km;
     private string _정렬기준 = "거리";
+    private readonly HashSet<string> _자동거절처리중 = new(StringComparer.OrdinalIgnoreCase);
+    private CancellationTokenSource? _타이머취소;
 
     private static readonly IReadOnlyList<반경옵션항목> 반경옵션 =
     [
@@ -243,6 +251,115 @@
         추천카드표시모드.표준 when 보기모드 == "표준" => Variant.Filled,
         추천카드표시모드.자세히 when 보기모드 == "자세히" => Variant.Filled,
         _ => Variant.Outlined
+    };
+
+    protected override void OnInitialized()
+    {
+        DecisionService.Changed += OnDecisionChanged;
+        _타이머취소 = new CancellationTokenSource();
+        _ = RunTimerAsync(_타이머취소.Token);
+    }
+
+    public void Dispose()
+    {
+        DecisionService.Changed -= OnDecisionChanged;
+        _타이머취소?.Cancel();
+        _타이머취소?.Dispose();
+    }
+
+    private async Task RunTimerAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(async () =>
+                {
+                    await 자동미응답거절처리Async(cancellationToken);
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private async Task 자동미응답거절처리Async(CancellationToken cancellationToken)
+    {
+        foreach (var item in 표시목록)
+        {
+            var request = item.의뢰;
+            if (!자동거절대상(request))
+            {
+                continue;
+            }
+
+            _자동거절처리중.Add(request.의뢰Id);
+            try
+            {
+                await DecisionService.RejectAsync(request, "60초 미응답 자동 거절", cancellationToken);
+            }
+            catch
+            {
+                _자동거절처리중.Remove(request.의뢰Id);
+            }
+        }
+    }
+
+    private bool 자동거절대상(DriverRequestItem request)
+        => request.추천응답만료
+           && DecisionService.GetDecision(request.의뢰Id) is null
+           && !_자동거절처리중.Contains(request.의뢰Id);
+
+    private void OnDecisionChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private RenderFragment 응답제한표시(DriverRequestItem request) => builder =>
+    {
+        if (!request.서버지정추천)
+        {
+            return;
+        }
+
+        var decision = DecisionService.GetDecision(request.의뢰Id);
+        var isHandled = decision is not null;
+        var seconds = request.추천남은초;
+        var label = isHandled
+            ? $"처리됨 · {decision!.Decision}"
+            : seconds > 0
+                ? $"남은 시간 {seconds}초"
+                : "미응답 자동 거절 처리 중";
+
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "driver-recommendation-timeout");
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "driver-recommendation-timeout__head");
+        builder.OpenElement(4, "span");
+        builder.AddContent(5, "신규 배차");
+        builder.CloseElement();
+        builder.OpenElement(6, "span");
+        builder.AddContent(7, label);
+        builder.CloseElement();
+        builder.CloseElement();
+
+        builder.OpenComponent<MudProgressLinear>(8);
+        builder.AddAttribute(9, "Color", seconds > 10 || isHandled ? Color.Primary : Color.Warning);
+        builder.AddAttribute(10, "Rounded", true);
+        builder.AddAttribute(11, "Size", Size.Medium);
+        builder.AddAttribute(12, "Value", isHandled ? 100d : request.추천진행률);
+        builder.CloseComponent();
+
+        builder.OpenElement(13, "div");
+        builder.AddAttribute(14, "class", "driver-recommendation-timeout__caption");
+        builder.AddContent(15, isHandled
+            ? decision!.Memo
+            : "제한 시간 안에 수락하지 않으면 서버에 미응답 거절로 보냅니다.");
+        builder.CloseElement();
+        builder.CloseElement();
     };
 
     private sealed record 반경옵션항목(string Label, decimal? Km);

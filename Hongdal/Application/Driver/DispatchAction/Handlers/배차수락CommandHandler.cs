@@ -60,12 +60,15 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
         }
 
         var now = DateTime.UtcNow;
-        var canAcceptRecommendation = queue.배차큐단계 == 상태값.배차큐단계.배차추천
+        var isWaitingQueue = queue.상태 == 상태값.배차대기상태.대기;
+        var canAcceptRecommendation = isWaitingQueue
+                                       && queue.배차큐단계 == 상태값.배차큐단계.배차추천
                                        && queue.배차노출상태 == 상태값.배차노출상태.추천중
                                        && string.Equals(queue.현재추천대상기사Id, request.기사Id, StringComparison.Ordinal)
                                        && queue.추천만료시각.HasValue
                                        && queue.추천만료시각 > now;
-        var canAcceptPublic = queue.배차큐단계 == 상태값.배차큐단계.공개배차
+        var canAcceptPublic = isWaitingQueue
+                              && queue.배차큐단계 == 상태값.배차큐단계.공개배차
                               && queue.배차노출상태 == 상태값.배차노출상태.공개중
                               && queue.확정기사Id is null;
 
@@ -75,6 +78,12 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
         }
 
         queue.상태 = 상태값.배차대기상태.확정;
+        queue.배차큐단계 = 상태값.배차큐단계.확정;
+        queue.배차노출상태 = 상태값.배차노출상태.확정;
+        queue.확정기사Id = request.기사Id;
+        queue.현재추천대상기사Id = null;
+        queue.추천시작시각 = null;
+        queue.추천만료시각 = null;
         dispatchRequest.배차상태 = 상태값.배차상태.매칭중;
         dispatchRequest.UpdatedAt = now;
         queue.UpdatedAt = now;

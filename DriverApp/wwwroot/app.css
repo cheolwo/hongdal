@@ -175,6 +175,30 @@ body {
     color: #ffffff;
 }
 
+.driver-recommendation-timeout {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+}
+
+.driver-recommendation-timeout__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: #1e3a8a;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.driver-recommendation-timeout__caption {
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 @media (max-width: 420px) {
     .driver-warning-badge-group {
         min-height: 84px;

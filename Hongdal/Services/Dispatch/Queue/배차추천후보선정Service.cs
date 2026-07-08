@@ -33,6 +33,13 @@ namespace 홍달.Services.Dispatch.Queue
                 return null;
             }
 
+            if (queue.배차노출상태 == 상태값.배차노출상태.추천중
+                && !string.IsNullOrWhiteSpace(queue.현재추천대상기사Id)
+                && (!queue.추천만료시각.HasValue || queue.추천만료시각 > DateTime.UtcNow))
+            {
+                return null;
+            }
+
             if (!_engines.TryGetValue(queue.배차업무유형, out var engine))
             {
                 return null;

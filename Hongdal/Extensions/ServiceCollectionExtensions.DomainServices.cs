@@ -48,6 +48,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I국내화물운송기사상태Service, 국내화물운송기사상태Service>();
         services.AddSingleton<IDriverRejectedRequestStore, RedisDriverRejectedRequestStore>();
         services.AddSingleton<IDriverPushTokenStore, RedisDriverPushTokenStore>();
+        services.AddSingleton<I사용자PushTokenStore, Redis사용자PushTokenStore>();
         services.AddSingleton<IDriverRecommendationPushStateStore, RedisDriverRecommendationPushStateStore>();
         services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>();
         services.AddSingleton<IDriverNotificationSettingsStore, RedisDriverNotificationSettingsStore>();
@@ -56,6 +57,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
         services.AddScoped<I배차큐전환Service, 배차큐전환Service>();
         services.AddScoped<I배차추천알림Service, 배차추천알림Service>();
+        services.AddScoped<I상차접근알림Service, 상차접근알림Service>();
+        services.AddScoped<ICommand알림Outbox발송Service, Command알림Outbox발송Service>();
         services.AddSingleton<I탐색캠페인이벤트저장소, 탐색캠페인이벤트저장소>();
         services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
         services.AddSingleton<I문서관리Store, 문서관리Store>();

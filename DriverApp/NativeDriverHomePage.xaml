@@ -38,6 +38,9 @@
                     Stroke="#60a5fa"
                     StrokeThickness="1"
                     IsVisible="False">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnOpenIncomingRecommendationClicked" />
+                </Border.GestureRecognizers>
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="10" />
                 </Border.StrokeShape>
@@ -72,6 +75,26 @@
                                    FontSize="13"
                                    TextColor="#dbeafe"
                                    LineBreakMode="WordWrap" />
+                            <Grid RowDefinitions="Auto,Auto"
+                                  RowSpacing="5"
+                                  Margin="0,6,0,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="신규 배차 응답 제한"
+                                           FontAttributes="Bold"
+                                           FontSize="12"
+                                           TextColor="#bfdbfe" />
+                                    <Label x:Name="RecommendationCountdownLabel"
+                                           Grid.Column="1"
+                                           FontAttributes="Bold"
+                                           FontSize="12"
+                                           TextColor="#ffffff" />
+                                </Grid>
+                                <ProgressBar x:Name="RecommendationCountdownProgress"
+                                             Grid.Row="1"
+                                             HeightRequest="8"
+                                             Progress="0"
+                                             ProgressColor="#22c55e" />
+                            </Grid>
                         </VerticalStackLayout>
                     </Grid>
 
@@ -137,6 +160,11 @@
                         <Label Grid.Row="2" Text="3" FontAttributes="Bold" TextColor="#2563eb" />
                         <Label x:Name="RecommendationDropoffRouteLabel" Grid.Row="2" Grid.Column="1" FontSize="13" TextColor="#111827" />
                     </Grid>
+
+                    <Label x:Name="RecommendationCompactInfoLabel"
+                           FontSize="13"
+                           TextColor="#334155"
+                           LineBreakMode="WordWrap" />
 
                     <Label x:Name="RecommendationDecisionStatusLabel"
                            FontSize="13"

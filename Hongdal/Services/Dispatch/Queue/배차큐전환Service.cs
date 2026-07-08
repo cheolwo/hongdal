@@ -36,6 +36,7 @@ namespace 홍달.Services.Dispatch.Queue
         {
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
+            if (queue.상태 != 상태값.배차대기상태.대기) return;
 
             queue.배차큐단계 = 상태값.배차큐단계.배차추천;
             queue.배차노출상태 = 상태값.배차노출상태.추천대기;
@@ -51,6 +52,7 @@ namespace 홍달.Services.Dispatch.Queue
         {
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
+            if (queue.상태 != 상태값.배차대기상태.대기) return;
 
             if (queue.배차큐단계 != 상태값.배차큐단계.배차추천 || queue.배차노출상태 != 상태값.배차노출상태.추천대기)
             {
@@ -64,6 +66,7 @@ namespace 홍달.Services.Dispatch.Queue
         {
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
+            if (queue.상태 != 상태값.배차대기상태.대기) return;
 
             await 시작Async(queue, driverId, timeoutSeconds, cancellationToken);
         }
@@ -72,6 +75,7 @@ namespace 홍달.Services.Dispatch.Queue
         {
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
+            if (queue.상태 != 상태값.배차대기상태.대기) return;
 
             // only process if the driver was indeed the current recommended
             if (!string.Equals(queue.현재추천대상기사Id, driverId, StringComparison.Ordinal))
@@ -96,6 +100,7 @@ namespace 홍달.Services.Dispatch.Queue
         {
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
+            if (queue.상태 != 상태값.배차대기상태.대기) return;
 
             if (!queue.추천만료시각.HasValue || queue.추천만료시각 > DateTime.UtcNow) return;
 
@@ -117,6 +122,7 @@ namespace 홍달.Services.Dispatch.Queue
         {
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
+            if (queue.상태 != 상태값.배차대기상태.대기) return;
 
             queue.배차큐단계 = 상태값.배차큐단계.공개배차;
             queue.배차노출상태 = 상태값.배차노출상태.공개중;
@@ -134,10 +140,13 @@ namespace 홍달.Services.Dispatch.Queue
             var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null) return;
 
+            queue.상태 = 상태값.배차대기상태.확정;
             queue.배차큐단계 = 상태값.배차큐단계.확정;
             queue.배차노출상태 = 상태값.배차노출상태.확정;
             queue.확정기사Id = driverId;
-            queue.현재추천대상기사Id = driverId;
+            queue.현재추천대상기사Id = null;
+            queue.추천시작시각 = null;
+            queue.추천만료시각 = null;
             queue.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync(cancellationToken);
@@ -179,6 +188,18 @@ namespace 홍달.Services.Dispatch.Queue
 
         private async Task 시작Async(배차대기 queue, string driverId, int? timeoutSeconds, CancellationToken cancellationToken)
         {
+            if (queue.상태 != 상태값.배차대기상태.대기)
+            {
+                return;
+            }
+
+            if (queue.배차노출상태 == 상태값.배차노출상태.추천중
+                && !string.IsNullOrWhiteSpace(queue.현재추천대상기사Id)
+                && (!queue.추천만료시각.HasValue || queue.추천만료시각 > DateTime.UtcNow))
+            {
+                return;
+            }
+
             queue.배차큐단계 = 상태값.배차큐단계.배차추천;
             queue.배차노출상태 = 상태값.배차노출상태.추천중;
             queue.현재추천대상기사Id = driverId;
@@ -205,6 +226,11 @@ namespace 홍달.Services.Dispatch.Queue
 
         private async Task 추천거절후다음후보로진행Async(배차대기 queue, string? excludeDriverId, CancellationToken cancellationToken)
         {
+            if (queue.상태 != 상태값.배차대기상태.대기)
+            {
+                return;
+            }
+
             if (queue.배차큐단계 == 상태값.배차큐단계.공개배차)
             {
                 return;

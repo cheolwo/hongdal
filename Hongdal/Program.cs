@@ -107,6 +107,7 @@ builder.Services.Configure<기사이용료정책Options>(builder.Configuration.G
 builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
 builder.Services.Configure<PushNotificationsOptions>(builder.Configuration.GetSection(PushNotificationsOptions.SectionName));
+builder.Services.Configure<KakaoAlimTalkOptions>(builder.Configuration.GetSection(KakaoAlimTalkOptions.SectionName));
 builder.Services.Configure<CommandProcessingOptions>(builder.Configuration.GetSection(CommandProcessingOptions.SectionName));
 builder.Services.Configure<WorkRelationshipSnapshotOptions>(builder.Configuration.GetSection(WorkRelationshipSnapshotOptions.SectionName));
 builder.Services.Configure<CommandFileStorageOptions>(builder.Configuration.GetSection(CommandFileStorageOptions.SectionName));

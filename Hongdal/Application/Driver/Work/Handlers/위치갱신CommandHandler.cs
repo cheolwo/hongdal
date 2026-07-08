@@ -1,5 +1,6 @@
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
+using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Driver.Work;
@@ -9,21 +10,27 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
     private readonly HongdalContext _db;
     private readonly IDriverLocationStore _driverLocationStore;
     private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
+    private readonly I상차접근알림Service _상차접근알림Service;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
+    private readonly ILogger<위치갱신CommandHandler> _logger;
 
     public 위치갱신CommandHandler(
         HongdalContext db,
         IDriverLocationStore driverLocationStore,
         I국내화물운송기사상태Service 국내화물운송기사상태Service,
+        I상차접근알림Service 상차접근알림Service,
         ICurrentUserAccessor currentUserAccessor,
-        I참여자실행권한검사 권한검사)
+        I참여자실행권한검사 권한검사,
+        ILogger<위치갱신CommandHandler> logger)
     {
         _db = db;
         _driverLocationStore = driverLocationStore;
         _국내화물운송기사상태Service = 국내화물운송기사상태Service;
+        _상차접근알림Service = 상차접근알림Service;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
+        _logger = logger;
     }
 
     public async Task<Result<기사위치갱신응답>> Handle(위치갱신Command request, CancellationToken cancellationToken)
@@ -84,6 +91,15 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
             상차접근허용반경Km: request.상차접근허용반경Km,
             cancellationToken: cancellationToken);
 
+        try
+        {
+            await _상차접근알림Service.상차지접근알림검사Async(snapshot, cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "상차지 접근 알림 검사 중 예외가 발생했습니다. DriverId={DriverId}", request.기사Id);
+        }
+
         return Result.Ok(new 기사위치갱신응답
         {
             DriverId = request.기사Id,
@@ -94,7 +110,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
             Aging점수 = osState.Aging점수,
             Aging기준시각 = osState.Aging기준시각Utc,
             상차접근허용반경Km = osState.상차접근허용반경Km,
-            권장위치전송간격초 = 30
+            권장위치전송간격초 = 300
         });
     }
 }

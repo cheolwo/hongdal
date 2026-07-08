@@ -3,6 +3,7 @@ using Hongdal.Infrastructure.BackgroundJobs.SalesOrders;
 using Hongdal.Services.LogisticsProcessing.SalesOrders;
 using 홍달.Infrastructure.BackgroundJobs.Customs;
 using 홍달.Infrastructure.BackgroundJobs.DispatchQueue;
+using 홍달.Infrastructure.BackgroundJobs.Notifications;
 using 홍달.Infrastructure.BackgroundJobs.Payments;
 using 홍달.Services.Options;
 
@@ -36,6 +37,13 @@ public static partial class ServiceCollectionExtensions
             q.AddTrigger(opts => opts
                 .ForJob(pushJobKey)
                 .WithIdentity("DispatchRecommendationPush-trigger")
+                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
+
+            var commandNotificationJobKey = new JobKey("CommandNotificationOutboxSend");
+            q.AddJob<Command알림Outbox발송Job>(opts => opts.WithIdentity(commandNotificationJobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(commandNotificationJobKey)
+                .WithIdentity("CommandNotificationOutboxSend-trigger")
                 .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
 
             var paymentOutboxJobKey = new JobKey("PaymentApprovedOutboxPublish");

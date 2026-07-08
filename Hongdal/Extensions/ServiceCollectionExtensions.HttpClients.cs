@@ -95,6 +95,16 @@ public static partial class ServiceCollectionExtensions
         });
         services.AddHttpClient<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();
         services.AddHttpClient<IFcmPushService, FirebaseFcmPushService>();
+        services.AddHttpClient<IKakaoAlimTalkService, KakaoAlimTalkService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<KakaoAlimTalkOptions>>().Value;
+            if (!string.IsNullOrWhiteSpace(options.BaseUrl))
+            {
+                client.BaseAddress = new Uri(options.BaseUrl);
+            }
+
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
 
         return services;
     }

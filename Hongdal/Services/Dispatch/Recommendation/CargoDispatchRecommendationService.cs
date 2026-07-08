@@ -68,6 +68,7 @@ namespace 홍달.Services.Dispatch.Recommendation
             var activeQueue = await _db.배차대기
                 .AsNoTracking()
                 .Where(q => q.배차업무유형 == 상태값.배차업무유형.용달운송
+                            && q.상태 == 상태값.배차대기상태.대기
                             && q.배차큐단계 == 상태값.배차큐단계.배차추천
                             && q.배차노출상태 == 상태값.배차노출상태.추천중
                             && q.현재추천대상기사Id == driverId)
@@ -99,6 +100,7 @@ namespace 홍달.Services.Dispatch.Recommendation
 
             var items = await _db.배차대기
                 .Where(q => q.배차업무유형 == 상태값.배차업무유형.용달운송
+                            && q.상태 == 상태값.배차대기상태.대기
                             && q.배차큐단계 == 상태값.배차큐단계.배차추천
                             && q.배차노출상태 == 상태값.배차노출상태.추천중
                             && q.현재추천대상기사Id == driverId)
@@ -286,6 +288,8 @@ namespace 홍달.Services.Dispatch.Recommendation
                     차량적합여부 = fit?.적합여부 ?? true,
                     차량부적합사유 = fit?.부적합사유 ?? Array.Empty<string>(),
                     차량경고 = fit?.경고 ?? Array.Empty<string>(),
+                    추천시작시각 = x.Item.추천시작시각,
+                    추천만료시각 = x.Item.추천만료시각,
                     상태 = x.Item.상태,
                     배차상태 = 상태값.배차상태.대기
                 };

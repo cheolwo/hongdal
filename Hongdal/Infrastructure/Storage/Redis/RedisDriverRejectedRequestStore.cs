@@ -6,6 +6,7 @@ namespace 홍달.Infrastructure.Storage.Redis
     public sealed class RedisDriverRejectedRequestStore : IDriverRejectedRequestStore
     {
         private const string KeyPrefix = "hongdal:driver-rejected-requests:";
+        private const string RequestKeyPrefix = "hongdal:request-rejected-drivers:";
         private static readonly TimeSpan DefaultTtl = TimeSpan.FromDays(14);
 
         private readonly IDatabase _database;
@@ -27,6 +28,10 @@ namespace 홍달.Infrastructure.Storage.Redis
             var key = BuildKey(driverId);
             await _database.SetAddAsync(key, requestId).ConfigureAwait(false);
             await _database.KeyExpireAsync(key, DefaultTtl).ConfigureAwait(false);
+
+            var requestKey = BuildRequestKey(requestId);
+            await _database.SetAddAsync(requestKey, driverId).ConfigureAwait(false);
+            await _database.KeyExpireAsync(requestKey, DefaultTtl).ConfigureAwait(false);
         }
 
         public async Task<bool> IsRejectedAsync(string driverId, string requestId, CancellationToken cancellationToken = default)
@@ -67,6 +72,34 @@ namespace 홍달.Infrastructure.Storage.Redis
             return set;
         }
 
+        public async Task<IReadOnlySet<string>> GetRejectedDriverIdsAsync(string requestId, CancellationToken cancellationToken = default)
+        {
+            requestId = requestId.Trim();
+            if (string.IsNullOrWhiteSpace(requestId))
+            {
+                return new HashSet<string>(StringComparer.Ordinal);
+            }
+
+            var values = await _database.SetMembersAsync(BuildRequestKey(requestId)).ConfigureAwait(false);
+            if (values.Length == 0)
+            {
+                return new HashSet<string>(StringComparer.Ordinal);
+            }
+
+            var set = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var value in values)
+            {
+                if (!value.IsNullOrEmpty)
+                {
+                    set.Add(value.ToString());
+                }
+            }
+
+            return set;
+        }
+
         private static string BuildKey(string driverId) => $"{KeyPrefix}{driverId.Trim()}";
+
+        private static string BuildRequestKey(string requestId) => $"{RequestKeyPrefix}{requestId.Trim()}";
     }
 }

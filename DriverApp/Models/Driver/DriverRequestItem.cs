@@ -45,6 +45,31 @@ public sealed class DriverRequestItem
     public string 상세설명 { get; set; } = string.Empty;
     public string 상태 { get; set; } = string.Empty;
     public string 배차상태 { get; set; } = string.Empty;
+    public DateTime? 추천시작시각 { get; set; }
+    public DateTime? 추천만료시각 { get; set; }
+    public bool 서버지정추천 => 추천시작시각.HasValue && 추천만료시각.HasValue;
+    public TimeSpan 추천제한시간 => 서버지정추천
+        ? 추천만료시각!.Value.ToLocalTime() - 추천시작시각!.Value.ToLocalTime()
+        : TimeSpan.FromSeconds(60);
+    public TimeSpan 추천남은시간 => 추천만료시각.HasValue
+        ? 추천만료시각.Value.ToLocalTime() - DateTime.Now
+        : TimeSpan.Zero;
+    public bool 추천응답만료 => 서버지정추천 && 추천남은시간 <= TimeSpan.Zero;
+    public int 추천남은초 => Math.Max(0, (int)Math.Ceiling(추천남은시간.TotalSeconds));
+    public double 추천진행률
+    {
+        get
+        {
+            if (!서버지정추천)
+            {
+                return 0d;
+            }
+
+            var totalSeconds = Math.Max(1d, 추천제한시간.TotalSeconds);
+            var elapsedSeconds = totalSeconds - Math.Max(0d, 추천남은시간.TotalSeconds);
+            return Math.Clamp(elapsedSeconds / totalSeconds * 100d, 0d, 100d);
+        }
+    }
 
     public string 경로표시 => $"{픽업지} → {하차지}";
     public string 추천업무유형표시 => 공동주문운송여부

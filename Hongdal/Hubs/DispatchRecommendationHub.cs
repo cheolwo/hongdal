@@ -218,6 +218,8 @@ namespace Hongdal.Hubs
         public bool 차량적합여부 { get; set; } = true;
         public string[] 차량부적합사유 { get; set; } = Array.Empty<string>();
         public string[] 차량경고 { get; set; } = Array.Empty<string>();
+        public DateTime? 추천시작시각 { get; set; }
+        public DateTime? 추천만료시각 { get; set; }
 
         public new decimal? 직선거리Km
         {

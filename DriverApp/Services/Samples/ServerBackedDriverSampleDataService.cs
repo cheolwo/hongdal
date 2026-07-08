@@ -305,7 +305,9 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             요약설명 = source.요약설명,
             상세설명 = source.상세설명,
             상태 = source.상태,
-            배차상태 = source.배차상태
+            배차상태 = source.배차상태,
+            추천시작시각 = source.추천시작시각,
+            추천만료시각 = source.추천만료시각
         };
     }
 
@@ -353,7 +355,9 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             요약설명 = $"{source.화물종류} 운송, {source.픽업지}에서 {source.하차지}까지",
             상세설명 = "홍달 서버의 기사 추천 API에서 내려온 의뢰입니다.",
             상태 = source.상태,
-            배차상태 = source.배차상태
+            배차상태 = source.배차상태,
+            추천시작시각 = source.추천시작시각,
+            추천만료시각 = source.추천만료시각
         };
     }
 
@@ -492,5 +496,7 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         public bool 차량적합여부 { get; set; } = true;
         public string 상태 { get; set; } = string.Empty;
         public string 배차상태 { get; set; } = string.Empty;
+        public DateTime? 추천시작시각 { get; set; }
+        public DateTime? 추천만료시각 { get; set; }
     }
 }

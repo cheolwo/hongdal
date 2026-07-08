@@ -42,6 +42,12 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<DriverAccessPolicyService>();
         services.AddSingleton<DriverHomeDisplayPreferenceService>();
         services.AddSingleton<IDriverHomeMapService, DriverHomeMapService>();
+        services.AddSingleton<IDriverWorkApiService, DriverWorkApiService>();
+#if ANDROID
+        services.AddSingleton<I기사위치송신Service, Android기사위치송신Service>();
+#else
+        services.AddSingleton<I기사위치송신Service, Noop기사위치송신Service>();
+#endif
         services.AddSingleton<추천카드표시설정Service>();
         services.AddSingleton<DriverRecommendationDecisionService>();
         services.AddSingleton<IDriverRecommendationDecisionService>(sp => sp.GetRequiredService<DriverRecommendationDecisionService>());
