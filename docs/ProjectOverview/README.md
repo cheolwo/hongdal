@@ -4,27 +4,30 @@
 
 루트 README는 프로젝트의 핵심 요약만 유지하고, 긴 설명과 흐름도는 아래 문서에서 주제별로 관리합니다.
 
+처음 읽는 경우 [00. 첨부 문서 목차](00-첨부문서목차.md)를 먼저 봅니다.
+
 ## 문서 목록
 
-| 문서 | 내용 |
-| --- | --- |
-| [version-roadmap.md](version-roadmap.md) | 1.0부터 3.5까지의 단계별 제품 방향과 기능 판단 기준 |
-| [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차 엔진과 음식 배달 배차 엔진의 경계 |
-| [screen-flows.md](screen-flows.md) | 앱 화면의 버튼, 카드, 모드 전환이 내부 처리로 이어지는 흐름 |
-| [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
-| [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 주문자 집단 공동주문, 해외 선적/통관, 국내 물류대행 입고, 판매채널, 출고 배치, 입주민 우선 고용 흐름 |
-| [workflow-api-policy.md](workflow-api-policy.md) | API를 버전보다 업무 처리 절차별 워크플로우로 관리하는 기준 |
-| [workflow-app-screen-map.md](workflow-app-screen-map.md) | 워크플로우가 여러 앱 화면을 거쳐 성립되는 방식, 화면 간 상태 전파, 보완할 페이지 후보 |
-| [hiops-ai-judgment-cases.md](hiops-ai-judgment-cases.md) | HIOPS AI 판단 보조를 만들기 위한 상황별 판단 사례와 사용자 판정 기록 |
-| [glossary.md](glossary.md) | OS, 워크플로우, 엔진, POD, BL, 3PL 같은 주요 용어 정의 |
+| 번호 | 문서 | 내용 |
+| --- | --- | --- |
+| 00 | [첨부 문서 목차](00-첨부문서목차.md) | 루트 README 뒤에 붙는 번호형 첨부 문서 안내 |
+| 01 | [version-roadmap.md](version-roadmap.md) | 1.0부터 3.5까지의 단계별 제품 방향과 기능 판단 기준 |
+| 02 | [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차 엔진과 음식 배달 배차 엔진의 경계 |
+| 03 | [screen-flows.md](screen-flows.md) | 앱 화면의 버튼, 카드, 모드 전환이 내부 처리로 이어지는 흐름 |
+| 04 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
+| 05 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 주문자 집단 공동주문, 해외 선적/통관, 국내 물류대행 입고, 판매채널, 출고 배치, 입주민 우선 고용 흐름 |
+| 06 | [workflow-api-policy.md](workflow-api-policy.md) | API를 버전보다 업무 처리 절차별 워크플로우로 관리하는 기준 |
+| 07 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 워크플로우가 여러 앱 화면을 거쳐 성립되는 방식, 화면 간 상태 전파, 보완할 페이지 후보 |
+| 08 | [hiops-ai-judgment-cases.md](hiops-ai-judgment-cases.md) | HIOPS AI 판단 보조를 만들기 위한 상황별 판단 사례와 사용자 판정 기록 |
+| 09 | [glossary.md](glossary.md) | OS, 워크플로우, 엔진, POD, BL, 3PL 같은 주요 용어 정의 |
 
 ## 관련 아키텍처 문서
 
-| 문서 | 내용 |
-| --- | --- |
-| [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 홍달 1.0 기준 OS인 국내 화물 운송 OS의 큐, 스케줄링 정책, 엔진 호출, 화면 반영 기준 |
-| [HIOPSAI.md](../Architecture/HIOPSAI.md) | 홍달 1.0에 먼저 붙일 참여자 입장 해석 AI와 국내 화물 운송 배차 조율 AI의 입출력, 화면/API 연결 기준 |
-| [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 단일/복수 상품 주문을 단일/복수 창고 출고 배치로 나누고, 피킹 배치 엔진으로 현장 작업자를 배정하는 계획 계층 |
+| 번호 | 문서 | 내용 |
+| --- | --- | --- |
+| A-01 | [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 홍달 1.0 기준 OS인 국내 화물 운송 OS의 큐, 스케줄링 정책, 엔진 호출, 화면 반영 기준 |
+| A-02 | [HIOPSAI.md](../Architecture/HIOPSAI.md) | 홍달 1.0에 먼저 붙일 참여자 입장 해석 AI와 국내 화물 운송 배차 조율 AI의 입출력, 화면/API 연결 기준 |
+| A-03 | [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 단일/복수 상품 주문을 단일/복수 창고 출고 배치로 나누고, 피킹 배치 엔진으로 현장 작업자를 배정하는 계획 계층 |
 
 ## 관리 원칙
 
