@@ -3,7 +3,7 @@ using 홍달.Services.Dispatch.Queue;
 
 namespace 홍달.Services.Dispatch.Engine;
 
-public abstract class 정책기반배차엔진 : I배차엔진
+public abstract class 정책기반배차엔진 : I운송의뢰배차엔진
 {
     private readonly IReadOnlyDictionary<int, I배차업무정책> _policies;
 

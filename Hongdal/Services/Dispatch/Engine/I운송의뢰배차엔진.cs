@@ -3,7 +3,7 @@ using 홍달.Services.Dispatch.Queue;
 
 namespace 홍달.Services.Dispatch.Engine;
 
-public interface I배차엔진
+public interface I운송의뢰배차엔진
 {
     string 엔진코드 { get; }
 

@@ -4,18 +4,15 @@ namespace 홍달.Services.Dispatch.Engine;
 
 public static class 음식배달배차원본유형
 {
-    public const string 음식점주문 = "RestaurantFoodOrder";
-    public const string 홍달마트주문 = "HongdalMartOrder";
-    public const string 홍달마트포장완료주문 = "HongdalMartPackedOrder";
+    public const string 음식점주문 = 운송의뢰배차원천유형.음식점주문;
+    public const string 홍달마트주문 = 운송의뢰배차원천유형.홍달마트주문;
+    public const string 홍달마트포장완료주문 = 운송의뢰배차원천유형.홍달마트포장완료주문;
 
     public static bool IsRestaurantOrder(string? sourceType)
-        => string.Equals(sourceType, 음식점주문, StringComparison.OrdinalIgnoreCase)
-           || string.Equals(sourceType, "FoodOrder", StringComparison.OrdinalIgnoreCase);
+        => 운송의뢰배차원천유형.Is음식점주문(sourceType);
 
     public static bool IsMartOrder(string? sourceType)
-        => string.Equals(sourceType, 홍달마트주문, StringComparison.OrdinalIgnoreCase)
-           || string.Equals(sourceType, 홍달마트포장완료주문, StringComparison.OrdinalIgnoreCase)
-           || string.Equals(sourceType, "MartFoodOrder", StringComparison.OrdinalIgnoreCase);
+        => 운송의뢰배차원천유형.Is홍달마트음식주문(sourceType);
 }
 
 public sealed record 음식배달배차흐름(

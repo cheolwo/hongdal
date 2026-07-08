@@ -8,11 +8,11 @@ namespace 홍달.Services.Dispatch.Queue
     public sealed class 배차추천후보선정Service : I배차추천후보선정Service
     {
         private readonly HongdalContext _db;
-        private readonly IReadOnlyDictionary<int, I배차엔진> _engines;
+        private readonly IReadOnlyDictionary<int, I운송의뢰배차엔진> _engines;
 
         public 배차추천후보선정Service(
             HongdalContext db,
-            IEnumerable<I배차엔진> engines)
+            IEnumerable<I운송의뢰배차엔진> engines)
         {
             _db = db;
             _engines = engines

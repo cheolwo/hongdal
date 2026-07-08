@@ -15,11 +15,13 @@
 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 주문자 집단 공동주문, 해외 선적/통관, 국내 물류대행 입고, 판매채널, 출고 배치, 입주민 우선 고용 흐름 |
 | [workflow-api-policy.md](workflow-api-policy.md) | API를 버전보다 업무 처리 절차별 워크플로우로 관리하는 기준 |
 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 워크플로우가 여러 앱 화면을 거쳐 성립되는 방식, 화면 간 상태 전파, 보완할 페이지 후보 |
+| [glossary.md](glossary.md) | OS, 워크플로우, 엔진, POD, BL, 3PL 같은 주요 용어 정의 |
 
 ## 관련 아키텍처 문서
 
 | 문서 | 내용 |
 | --- | --- |
+| [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 홍달 1.0 기준 OS인 국내 화물 운송 OS의 큐, 스케줄링 정책, 엔진 호출, 화면 반영 기준 |
 | [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 단일/복수 상품 주문을 단일/복수 창고 출고 배치로 나누고, 피킹 배치 엔진으로 현장 작업자를 배정하는 계획 계층 |
 
 ## 관리 원칙

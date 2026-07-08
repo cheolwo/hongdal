@@ -120,6 +120,31 @@ public enum HongdalApiGrowthTrack
     PlatformOperations = 800
 }
 
+public enum HongdalOperatingSystem
+{
+    DomesticCargoTransport = 100,
+    WarehouseCommerceFulfillment = 200,
+    GroupPurchaseImport = 300,
+    FoodDelivery = 400,
+    HongdalMartUrbanLogistics = 500,
+    CommunityTrust = 600,
+    PlatformOperations = 700
+}
+
+public enum HongdalSchedulingPolicyKind
+{
+    Fcfs = 100,
+    Sjf = 200,
+    Priority = 300,
+    Edf = 400,
+    Mlfq = 500,
+    Aging = 600,
+    Batching = 700,
+    Affinity = 800,
+    GeoNearest = 900,
+    FitFirst = 1000
+}
+
 public enum HongdalWorkflow
 {
     DomesticTransport = 100,
@@ -198,6 +223,28 @@ public sealed record HongdalWorkflowScreen(
     string Route,
     string Purpose);
 
+public sealed record HongdalOperatingSystemEngine(
+    string EngineCode,
+    string EngineName,
+    string AdjustmentPolicy);
+
+public sealed record HongdalSchedulingPolicy(
+    HongdalSchedulingPolicyKind Kind,
+    string PolicyCode,
+    string PolicyName,
+    string TargetQueue,
+    string AppliedEngineCode,
+    string Rule,
+    string StarvationGuard);
+
+public sealed record HongdalOperatingSystemDefinition(
+    HongdalOperatingSystem OperatingSystem,
+    string Name,
+    string Purpose,
+    IReadOnlyList<HongdalWorkflow> Workflows,
+    IReadOnlyList<HongdalOperatingSystemEngine> Engines,
+    IReadOnlyList<HongdalSchedulingPolicy> SchedulingPolicies);
+
 public static class HongdalProductVersionLabels
 {
     public static string GetLabel(HongdalProductVersion version)
@@ -211,6 +258,45 @@ public static class HongdalProductVersionLabels
             HongdalProductVersion.V3_0 => "3.0",
             HongdalProductVersion.V3_5 => "3.5",
             _ => throw new ArgumentOutOfRangeException(nameof(version), version, "Unknown Hongdal product version.")
+        };
+    }
+}
+
+public static class HongdalOperatingSystemLabels
+{
+    public static string GetLabel(HongdalOperatingSystem operatingSystem)
+    {
+        return operatingSystem switch
+        {
+            HongdalOperatingSystem.DomesticCargoTransport => "국내 화물 운송 OS",
+            HongdalOperatingSystem.WarehouseCommerceFulfillment => "창고·커머스 이행 OS",
+            HongdalOperatingSystem.GroupPurchaseImport => "공동주문 수입 OS",
+            HongdalOperatingSystem.FoodDelivery => "음식 배달 OS",
+            HongdalOperatingSystem.HongdalMartUrbanLogistics => "홍달마트 도심 물류 OS",
+            HongdalOperatingSystem.CommunityTrust => "커뮤니티 신뢰 OS",
+            HongdalOperatingSystem.PlatformOperations => "플랫폼 운영 OS",
+            _ => throw new ArgumentOutOfRangeException(nameof(operatingSystem), operatingSystem, "Unknown Hongdal operating system.")
+        };
+    }
+}
+
+public static class HongdalSchedulingPolicyKindLabels
+{
+    public static string GetLabel(HongdalSchedulingPolicyKind kind)
+    {
+        return kind switch
+        {
+            HongdalSchedulingPolicyKind.Fcfs => "FCFS",
+            HongdalSchedulingPolicyKind.Sjf => "SJF",
+            HongdalSchedulingPolicyKind.Priority => "Priority",
+            HongdalSchedulingPolicyKind.Edf => "EDF",
+            HongdalSchedulingPolicyKind.Mlfq => "MLFQ",
+            HongdalSchedulingPolicyKind.Aging => "Aging",
+            HongdalSchedulingPolicyKind.Batching => "Batching",
+            HongdalSchedulingPolicyKind.Affinity => "Affinity",
+            HongdalSchedulingPolicyKind.GeoNearest => "Geo Nearest",
+            HongdalSchedulingPolicyKind.FitFirst => "Fit First",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown Hongdal scheduling policy kind.")
         };
     }
 }
@@ -233,6 +319,120 @@ public static class HongdalWorkflowLabels
             _ => throw new ArgumentOutOfRangeException(nameof(workflow), workflow, "Unknown Hongdal workflow.")
         };
     }
+}
+
+public static class HongdalOperatingSystems
+{
+    private static readonly IReadOnlyList<HongdalOperatingSystemDefinition> Items =
+    [
+        new(
+            HongdalOperatingSystem.DomesticCargoTransport,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.DomesticCargoTransport),
+            "화주 의뢰, 창고 출고품, 공동주문 국내 운송, 음식/마트 배송처럼 실제 이동이 필요한 대상을 기사 추천, 상차, 하차, 증빙, 정산 후보 흐름으로 실행합니다.",
+            [HongdalWorkflow.DomesticTransport, HongdalWorkflow.WarehouseFulfillment, HongdalWorkflow.GroupPurchaseImport, HongdalWorkflow.SalesChannelFulfillment, HongdalWorkflow.FoodDelivery, HongdalWorkflow.HongdalMart],
+            [
+                new("TransportRequestDispatchEngine", "운송 의뢰 배차 엔진", "운송 의뢰 원천을 분류한 뒤 차량 적합성, 거리, 일정 삽입 가능성, 기사 상태를 기준으로 화물 기사 또는 음식 배달 기사 후보를 조정합니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.FitFirst, "CargoFitFirst", "차량·화물 적합성 우선", "배차대기", "TransportRequestDispatchEngine", "차량 제원, 온도 조건, 파손 주의, FCL/LCL, 상하차 장비 조건을 먼저 통과한 기사만 후보로 둡니다.", "적합 기사 없음 상태가 반복되면 공개배차 또는 운영자 보류 큐로 승격합니다."),
+                new(HongdalSchedulingPolicyKind.Edf, "PickupDeadlineEdf", "상차 마감 임박 우선", "배차대기", "TransportRequestDispatchEngine", "상차 시간창 종료가 가까운 운송 의뢰에 우선 점수를 부여합니다.", "마감이 여유로운 의뢰도 대기 시간이 길어지면 Aging 점수를 더합니다."),
+                new(HongdalSchedulingPolicyKind.GeoNearest, "NearestDriver", "상차지 근접 기사 우선", "배차추천", "TransportRequestDispatchEngine", "상차지까지의 거리와 현재 기사 위치를 기준으로 추천 점수를 보정합니다.", "가까운 기사에게만 반복 노출되지 않도록 추천 라운드와 거절 이력을 반영합니다."),
+                new(HongdalSchedulingPolicyKind.Mlfq, "DispatchQueueMlfq", "계획배차·추천배차·공개배차 단계 큐", "배차대기", "TransportRequestDispatchEngine", "계획배차에서 후보가 실패하면 추천배차, 공개배차 단계로 큐를 승격합니다.", "최대 추천 라운드를 넘기면 공개배차로 전환해 기아 상태를 막습니다."),
+                new(HongdalSchedulingPolicyKind.Aging, "DispatchAging", "장기 대기 보정", "배차대기", "TransportRequestDispatchEngine", "오래 대기한 운송 의뢰에는 추천 점수와 노출 우선순위를 점진적으로 보정합니다.", "대기 시간이 임계값을 넘으면 운영자 확인 또는 공개배차 전환 대상으로 표시합니다.")
+            ]),
+        new(
+            HongdalOperatingSystem.WarehouseCommerceFulfillment,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.WarehouseCommerceFulfillment),
+            "입고상품을 재고화하고 판매채널 주문이나 화주 출고 요청을 출고, 피킹, 포장, 운송 인계로 연결합니다.",
+            [HongdalWorkflow.WarehouseFulfillment, HongdalWorkflow.SalesChannelFulfillment, HongdalWorkflow.DomesticTransport],
+            [
+                new("OutboundBatchEngine", "출고 배치 엔진", "주문/출고 요청을 어느 창고와 재고로 처리할지 조정합니다."),
+                new("PickingBatchEngine", "피킹 배치 엔진", "출고 라인을 적재대, 피킹 작업자, 포장 작업자 단위로 조정합니다."),
+                new("TransportRequestDispatchEngine", "운송 의뢰 배차 엔진", "포장 완료 또는 출고 예정 화물을 운송 의뢰로 넘깁니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.Sjf, "SimpleOutboundSjf", "단순 출고 우선", "출고예정", "OutboundBatchEngine", "단일 상품, 단일 창고, 재고 충분 주문처럼 처리 시간이 짧은 출고 요청을 먼저 계획합니다.", "마감 임박 또는 장기 대기 주문은 Priority/Aging 점수로 SJF 뒤에 밀리지 않게 합니다."),
+                new(HongdalSchedulingPolicyKind.Batching, "WarehouseZoneBatching", "창고·배송권 묶음 처리", "출고예정", "OutboundBatchEngine", "같은 창고, 같은 배송권, 같은 상품군을 묶어 출고 계획과 운송 인계를 줄입니다.", "묶음 형성 대기 시간이 길어지면 단독 출고로 풀어줍니다."),
+                new(HongdalSchedulingPolicyKind.Affinity, "PickerZoneAffinity", "작업자·구역 친화도", "피킹대기", "PickingBatchEngine", "작업자가 익숙한 구역, 현재 위치와 가까운 적재대, 같은 로트 작업을 우선 배정합니다.", "특정 작업자에게 몰리지 않도록 작업자 부하와 장기 대기 작업을 같이 반영합니다."),
+                new(HongdalSchedulingPolicyKind.Priority, "ColdChainPriority", "냉장·냉동 우선", "출고예정", "OutboundBatchEngine", "온도 민감 상품과 보관 시간 제한이 있는 상품에 우선순위를 부여합니다.", "냉장·냉동 작업이 일반 작업을 계속 밀어내지 않도록 일반 작업 Aging 점수를 유지합니다.")
+            ]),
+        new(
+            HongdalOperatingSystem.GroupPurchaseImport,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.GroupPurchaseImport),
+            "주문자 수요를 모으고 해외 선적, 통관, 보세구역 반출, 국내 3PL 입고 또는 세대 배송까지 이어지는 공동주문 실행을 조정합니다.",
+            [HongdalWorkflow.GroupPurchaseImport, HongdalWorkflow.CustomsAndTradeData, HongdalWorkflow.WarehouseFulfillment, HongdalWorkflow.DomesticTransport, HongdalWorkflow.CommunityTrust],
+            [
+                new("GroupPurchaseClusteringEngine", "집단화 엔진", "같은 상품과 배송권 안의 수요를 자동으로 묶습니다."),
+                new("OutboundBatchEngine", "출고 배치 엔진", "국내 3PL 입고 뒤 판매나 재출고가 필요한 물량을 창고 기준으로 조정합니다."),
+                new("TransportRequestDispatchEngine", "운송 의뢰 배차 엔진", "보세구역 반출 뒤 3PL 입고 운송 또는 세대 직배송을 조정합니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.Batching, "DemandClusterBatching", "수요 집단화 묶음", "구매의사대기", "GroupPurchaseClusteringEngine", "같은 상품, 같은 배송권, 비슷한 수령 조건을 가진 주문자 수요를 묶습니다.", "모집 기간이 끝났거나 최소 수량에 못 미치면 보류·환불·단독 구매 후보로 전환합니다."),
+                new(HongdalSchedulingPolicyKind.Priority, "CustomsReadyPriority", "통관·반출 가능 우선", "수입반출대기", "TransportRequestDispatchEngine", "통관 완료, 반출 가능 시각 확정, BL/AWB 확인 완료 건을 국내 운송 후보로 우선 올립니다.", "통관 지연 건은 장기 보류 알림과 운영자 확인 큐로 분리합니다."),
+                new(HongdalSchedulingPolicyKind.Edf, "BondedReleaseEdf", "보세구역 반출 마감 우선", "수입반출대기", "TransportRequestDispatchEngine", "보세구역 반출 가능 시간창과 보관 비용 증가 시점을 기준으로 우선순위를 계산합니다.", "마감 임박 건만 계속 선점하지 않도록 집단별 비용 부담과 Aging을 같이 반영합니다."),
+                new(HongdalSchedulingPolicyKind.Aging, "GroupPurchaseAging", "공동주문 장기 대기 보정", "공동주문원장", "GroupPurchaseClusteringEngine", "모집, 통관, 반출, 분배 단계에서 오래 머문 원장의 운영 우선순위를 높입니다.", "장기 정체 원장은 투표, 운영자 승인, 환불 후보로 전환합니다.")
+            ]),
+        new(
+            HongdalOperatingSystem.FoodDelivery,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.FoodDelivery),
+            "음식 주문의 조리 상태, 픽업 가능 시각, 고객 전달 시간창을 기준으로 배달 기사 배차를 조정합니다.",
+            [HongdalWorkflow.FoodDelivery, HongdalWorkflow.DomesticTransport],
+            [
+                new("TransportRequestDispatchEngine", "운송 의뢰 배차 엔진", "음식점 주문은 조리/픽업 시간과 짧은 반경 기사 위치를 중심으로 조정합니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.Edf, "FoodPickupEdf", "픽업·전달 마감 우선", "음식배달대기", "TransportRequestDispatchEngine", "조리 완료 예상 시각, 픽업 마감, 고객 전달 마감이 가까운 주문을 우선 배차합니다.", "짧은 마감 주문이 몰리면 오래 대기한 일반 주문에 Aging 점수를 부여합니다."),
+                new(HongdalSchedulingPolicyKind.GeoNearest, "FoodNearestRider", "근접 배달 기사 우선", "음식배달대기", "TransportRequestDispatchEngine", "음식점과 가까운 배달 기사, 픽업 후 고객까지의 이동거리를 기준으로 후보를 보정합니다.", "같은 기사에게 연속 배차가 몰리지 않도록 휴식/부하 상태를 반영합니다."),
+                new(HongdalSchedulingPolicyKind.Batching, "FoodRouteBatching", "동선 묶음 배달", "음식배달대기", "TransportRequestDispatchEngine", "같은 생활권, 유사 도착 방향, 품질 저하 허용 범위 안의 주문을 묶음 후보로 둡니다.", "품질 저하 예상 시간이 임계값을 넘으면 묶음을 해제합니다.")
+            ]),
+        new(
+            HongdalOperatingSystem.HongdalMartUrbanLogistics,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.HongdalMartUrbanLogistics),
+            "도심 내 협소한 창고 재고를 피킹/포장 통합 방식으로 처리하고 포장 완료 뒤 배달 기사 인계로 연결합니다.",
+            [HongdalWorkflow.HongdalMart, HongdalWorkflow.WarehouseFulfillment, HongdalWorkflow.FoodDelivery, HongdalWorkflow.DomesticTransport],
+            [
+                new("OutboundBatchEngine", "출고 배치 엔진", "도심 재고와 가까운 배송권을 우선해 출고 물량을 조정합니다."),
+                new("PickingBatchEngine", "피킹 배치 엔진", "홍달마트 도심 창고는 피킹·포장 통합 옵션을 우선 적용합니다."),
+                new("TransportRequestDispatchEngine", "운송 의뢰 배차 엔진", "포장 완료 시점과 묶음 배송 가능성을 기준으로 기사 후보를 조정합니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.Sjf, "MartSmallPickSjf", "소량 피킹 우선", "마트피킹대기", "PickingBatchEngine", "도심 창고의 협소한 공간을 고려해 소량·단순 위치 피킹을 빠르게 처리합니다.", "대량 주문은 마감 시간과 Aging 점수로 별도 보정합니다."),
+                new(HongdalSchedulingPolicyKind.Affinity, "MartPickPackAffinity", "피킹·포장 통합 작업자 우선", "마트피킹대기", "PickingBatchEngine", "홍달마트 도심 창고는 같은 작업자가 피킹과 포장을 함께 처리하는 옵션을 우선 적용합니다.", "특정 작업자에게 몰리면 포장 분리 모드로 전환할 수 있게 합니다."),
+                new(HongdalSchedulingPolicyKind.Edf, "MartPromiseEdf", "즉시배송 약속 시간 우선", "마트배송대기", "TransportRequestDispatchEngine", "고객 약속 시간과 포장 완료 예상 시각이 가까운 주문을 먼저 기사 인계합니다.", "묶음 배송 대기 시간이 길어지면 단독 배송으로 전환합니다."),
+                new(HongdalSchedulingPolicyKind.Batching, "ApartmentDropBatching", "단지·동선 묶음 배송", "마트배송대기", "TransportRequestDispatchEngine", "같은 아파트 단지, 같은 동선, 유사 도착 시간대의 주문을 묶습니다.", "묶음 때문에 약속 시간이 깨지는 주문은 EDF 정책으로 분리합니다.")
+            ]),
+        new(
+            HongdalOperatingSystem.CommunityTrust,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.CommunityTrust),
+            "각 운영 체제에서 발생한 공개 가능한 활동 신호를 후기, 투표, 문서, 관계 기록으로 전환합니다.",
+            [HongdalWorkflow.CommunityTrust, HongdalWorkflow.DomesticTransport, HongdalWorkflow.GroupPurchaseImport, HongdalWorkflow.SalesChannelFulfillment],
+            [
+                new("CommunitySignalEngine", "커뮤니티 활동 신호 엔진", "개인정보 보호 범위 안에서 공개 가능한 업무 행동을 커뮤니티 신호로 조정합니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.Priority, "SafetyModerationPriority", "신고·안전 이슈 우선", "커뮤니티운영대기", "CommunitySignalEngine", "신고, 개인정보 노출 가능성, 분쟁 관련 글을 운영자 확인 큐에서 우선 처리합니다.", "일반 게시판 개설 요청은 FCFS와 Aging으로 장기 대기를 막습니다."),
+                new(HongdalSchedulingPolicyKind.Fcfs, "BoardRequestFcfs", "게시판 개설 신청 순서 처리", "게시판개설대기", "CommunitySignalEngine", "사용자 게시판 개설 신청은 접수 순서를 기본으로 처리합니다.", "오래 대기한 신청은 운영자 알림 우선순위를 높입니다."),
+                new(HongdalSchedulingPolicyKind.Aging, "CommunitySignalAging", "활동 신호 장기 미처리 보정", "활동신호대기", "CommunitySignalEngine", "공개 가능 여부 판단이 오래 걸린 활동 신호를 운영자 검토 대상으로 올립니다.", "민감도가 높은 신호는 자동 공개하지 않고 보류합니다.")
+            ]),
+        new(
+            HongdalOperatingSystem.PlatformOperations,
+            HongdalOperatingSystemLabels.GetLabel(HongdalOperatingSystem.PlatformOperations),
+            "운영자 승인, 기능 플래그, 참여 인력, 정산, 예외 처리를 여러 운영 체제 위에 공통 정책으로 적용합니다.",
+            [HongdalWorkflow.HrParticipation, HongdalWorkflow.CommunityTrust, HongdalWorkflow.DomesticTransport, HongdalWorkflow.WarehouseFulfillment],
+            [
+                new("WorkflowPolicyEngine", "워크플로우 정책 엔진", "기능 노출, 권한, 보조 기능, 예외 처리를 운영 목적에 맞게 조정합니다.")
+            ],
+            [
+                new(HongdalSchedulingPolicyKind.Priority, "IncidentPriority", "운영 사고 우선", "운영예외대기", "WorkflowPolicyEngine", "결제, 정산, 개인정보, 운송 지연, 냉장/냉동 사고처럼 손실 위험이 큰 예외를 먼저 처리합니다.", "낮은 심각도 예외도 Aging으로 장기 미처리를 막습니다."),
+                new(HongdalSchedulingPolicyKind.Fcfs, "ApprovalFcfs", "운영 승인 접수 순서 처리", "운영승인대기", "WorkflowPolicyEngine", "일반 승인 요청은 접수 순서를 기본으로 처리합니다.", "업무 마감이나 법정 신고 기한이 있으면 Priority/EDF로 승격합니다."),
+                new(HongdalSchedulingPolicyKind.Edf, "LegalDeadlineEdf", "신고·정산 기한 우선", "기한업무대기", "WorkflowPolicyEngine", "4대보험 신고 준비, 정산 지급, 문서 제출처럼 기한이 있는 업무는 마감이 가까운 순서로 처리합니다.", "기한 없는 운영 업무도 Aging 점수를 부여합니다.")
+            ])
+    ];
+
+    public static IReadOnlyList<HongdalOperatingSystemDefinition> GetAll() => Items;
+
+    public static IReadOnlyList<HongdalOperatingSystemDefinition> GetByWorkflow(HongdalWorkflow workflow)
+        => Items.Where(item => item.Workflows.Contains(workflow)).ToArray();
 }
 
 public static class HongdalWorkflowRelationKindLabels

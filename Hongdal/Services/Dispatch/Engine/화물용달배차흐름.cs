@@ -5,12 +5,15 @@ namespace 홍달.Services.Dispatch.Engine;
 
 public static class 화물용달배차원본유형
 {
-    public const string 화주운송의뢰 = "CargoTransport";
-    public const string 주문자화물주문 = "OrdererCargoOrder";
-    public const string 수입화물운송 = "ImportCargoTransport";
-    public const string 창고출고연계운송 = "WarehouseOutboundCargo";
-    public const string Fcl연계운송 = "FclCargoTransport";
-    public const string Lcl연계운송 = "LclCargoTransport";
+    public const string 화주운송의뢰 = 운송의뢰배차원천유형.화주운송의뢰;
+    public const string 주문자화물주문 = 운송의뢰배차원천유형.주문자화물주문;
+    public const string 수입화물운송 = 운송의뢰배차원천유형.수입화물운송;
+    public const string 창고출고연계운송 = 운송의뢰배차원천유형.창고출고연계운송;
+    public const string 판매채널출고 = 운송의뢰배차원천유형.판매채널출고;
+    public const string 홍달마트출고 = 운송의뢰배차원천유형.홍달마트출고;
+    public const string 공동주문국내운송 = 운송의뢰배차원천유형.공동주문국내운송;
+    public const string Fcl연계운송 = 운송의뢰배차원천유형.Fcl연계운송;
+    public const string Lcl연계운송 = 운송의뢰배차원천유형.Lcl연계운송;
 }
 
 public sealed record 화물용달배차흐름(
@@ -51,20 +54,20 @@ public sealed class 화물용달배차흐름Resolver : I화물용달배차흐름
                 "혼적 조건과 시간창이 맞는 후보 기사에게만 추천합니다.");
         }
 
-        if (string.Equals(queue.원본의뢰유형, 화물용달배차원본유형.수입화물운송, StringComparison.OrdinalIgnoreCase))
+        if (운송의뢰배차원천유형.Is수입통관연계운송(queue.원본의뢰유형))
         {
             return new 화물용달배차흐름(
-                화물용달배차원본유형.수입화물운송,
+                string.IsNullOrWhiteSpace(queue.원본의뢰유형) ? 화물용달배차원본유형.수입화물운송 : queue.원본의뢰유형,
                 "수입/통관 연계 화물 운송",
                 "통관 완료 또는 반출 가능 화물 단위",
                 "통관 상태, 보세/창고 위치, 반출 가능 시각, HS 코드 위험 태그",
                 "통관 또는 반출 가능 상태가 확인된 뒤 배차를 시작합니다.");
         }
 
-        if (string.Equals(queue.원본의뢰유형, 화물용달배차원본유형.창고출고연계운송, StringComparison.OrdinalIgnoreCase))
+        if (운송의뢰배차원천유형.Is창고출고연계운송(queue.원본의뢰유형))
         {
             return new 화물용달배차흐름(
-                화물용달배차원본유형.창고출고연계운송,
+                string.IsNullOrWhiteSpace(queue.원본의뢰유형) ? 화물용달배차원본유형.창고출고연계운송 : queue.원본의뢰유형,
                 "창고 출고 연계 화물 운송",
                 "피킹/포장 완료 출고 단위",
                 "출고 준비 상태, 적재 위치, 상차 가능 시각, 하차지 결제 조건",

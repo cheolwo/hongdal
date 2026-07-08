@@ -8,17 +8,20 @@ namespace 홍달.Services.Dispatch.Engine;
 public sealed class 화물용달배차엔진 : 정책기반배차엔진
 {
     private readonly HongdalContext _db;
+    private readonly I운송의뢰배차원천분류Service _sourceClassifier;
     private readonly I화물용달배차흐름Resolver _flowResolver;
     private readonly ILogger<화물용달배차엔진> _logger;
 
     public 화물용달배차엔진(
         IEnumerable<I배차업무정책> policies,
         HongdalContext db,
+        I운송의뢰배차원천분류Service sourceClassifier,
         I화물용달배차흐름Resolver flowResolver,
         ILogger<화물용달배차엔진> logger)
         : base(policies)
     {
         _db = db;
+        _sourceClassifier = sourceClassifier;
         _flowResolver = flowResolver;
         _logger = logger;
     }
@@ -37,13 +40,15 @@ public sealed class 화물용달배차엔진 : 정책기반배차엔진
         var request = await _db.화주운송의뢰
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.의뢰Id == queue.의뢰Id, cancellationToken);
+        var source = _sourceClassifier.분류(queue);
         var flow = _flowResolver.Resolve(queue, request);
 
         _logger.LogDebug(
-            "화물/용달 배차 흐름을 확인했습니다. QueueId={QueueId} RequestId={RequestId} SourceType={SourceType} Flow={Flow} Unit={Unit}",
+            "화물/용달 운송의뢰 배차 흐름을 확인했습니다. QueueId={QueueId} RequestId={RequestId} SourceType={SourceType} SourceFlow={SourceFlow} Flow={Flow} Unit={Unit}",
             queue.Id,
             queue.의뢰Id,
             queue.원본의뢰유형,
+            source.상위흐름,
             flow.표시명,
             flow.운송단위);
 

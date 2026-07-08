@@ -195,18 +195,21 @@ flowchart TD
 
 현재 `DriverApp`은 공통 기사 앱 껍데기와 화물/용달 기사 흐름을 기본값으로 사용합니다. 이후 음식 배달 기사 앱은 같은 공통 컴포넌트를 공유하되 추천 목록, 진행 중 업무 카드, 정산 문구, 알림 정책을 `FoodDeliveryDriverApp` 식별자 기준으로 분리합니다.
 
-## 배차 엔진 경계
+## 운송 의뢰 배차 엔진 경계
 
-배차는 주문 유입 경로보다 실제 운송 성격을 기준으로 엔진을 나눕니다. 음식 주문은 음식 배달 배차 엔진으로 보내고, 화물 운송 의뢰나 주문자가 직접 만든 화물/공산품 운송 요청은 화물/용달 배차 엔진으로 보냅니다.
+운송 의뢰 배차 엔진은 “기사에게 맡길 실제 이동 업무”를 통합해서 보는 상위 개념입니다. 화면에는 화주 운송 의뢰, 창고 출고품 배송, 홍달마트 즉시배송, 음식점 주문처럼 다르게 보이더라도 서버에서는 `배차대기`에 들어온 운송 의뢰를 `원본의뢰유형`과 `배차업무유형`으로 분류한 뒤 기사 후보를 찾습니다.
+
+배차는 주문 유입 경로보다 실제 운송 성격을 기준으로 하위 엔진을 나눕니다. 음식 주문은 음식 배달 배차 엔진으로 보내고, 화물 운송 의뢰나 주문자가 직접 만든 화물/공산품 운송 요청은 화물/용달 배차 엔진으로 보냅니다.
 
 | 엔진 | 배차업무유형 | 주요 대상 | 우선 판단 기준 |
 | --- | --- | --- | --- |
-| `CargoYongdalDispatchEngine` | `용달운송` | 화주 운송 의뢰, 주문자 화물/공산품 운송 요청, FCL/LCL 연계 운송 | 차량 적합성, 상하차 조건, 거리/복귀지, 운임/비용, 일정 삽입 가능성 |
+| `CargoYongdalDispatchEngine` | `용달운송` | 화주 운송 의뢰, 창고 출고품 운송, 홍달마트 출고 운송, 주문자 화물/공산품 운송 요청, FCL/LCL 연계 운송 | 차량 적합성, 상하차 조건, 거리/복귀지, 운임/비용, 일정 삽입 가능성 |
 | `FoodDeliveryDispatchEngine` | `음식배달` | 음식점 주문, 홍달마트 주문, 즉시 픽업 배달 | 조리/픽업 시간, 고객 도착 시간, 묶음 배달 가능성, 짧은 반경 기사 위치 |
 
 ```mermaid
 flowchart TD
-    A["주문 / 운송 의뢰 유입"] --> B{"운송 성격 판정"}
+    A["화주 의뢰 / 창고 출고 / 홍달마트 / 음식점 주문"] --> A1["운송 의뢰 배차 엔진"]
+    A1 --> B{"운송 성격 판정"}
     B -->|음식점 / 홍달마트 음식 배달| C["FoodDeliveryDispatchEngine"]
     B -->|창고 출고 / 수입 통관 연계 운송| D["CargoYongdalDispatchEngine"]
     C --> E["음식배달배차업무정책"]
@@ -217,7 +220,32 @@ flowchart TD
     H --> I
 ```
 
-현재 코드에서는 `배차추천후보선정Service`가 `배차대기.배차업무유형`을 보고 `I배차엔진`을 선택합니다. 엔진은 다시 세부 `I배차업무정책`으로 후보 선정 알고리즘을 위임합니다. 이 구조 덕분에 음식 배달은 짧은 시간창과 묶음 배달 중심으로, 화물/용달은 차량 제원과 상하차 조건 중심으로 독립적으로 발전시킬 수 있습니다.
+현재 코드에서는 `배차추천후보선정Service`가 `배차대기.배차업무유형`을 보고 `I운송의뢰배차엔진`을 선택합니다. 엔진은 다시 세부 `I배차업무정책`으로 후보 선정 알고리즘을 위임합니다. 이 구조 덕분에 음식 배달은 짧은 시간창과 묶음 배달 중심으로, 화물/용달은 차량 제원과 상하차 조건 중심으로 독립적으로 발전시킬 수 있습니다.
+
+```csharp
+public interface I운송의뢰배차엔진
+{
+    string 엔진코드 { get; }
+    string 표시명 { get; }
+    int 배차업무유형 { get; }
+
+    Task<배차추천후보?> 다음후보선정Async(
+        배차대기 queue,
+        string? 제외기사Id = null,
+        CancellationToken cancellationToken = default);
+}
+```
+
+```csharp
+운송의뢰배차원천분류 source = sourceClassifier.분류(queue);
+
+// CargoTransport, WarehouseOutboundCargo, HongdalMartOutboundCargo는
+// 출고 예정 운송 대상으로 보고 화물/용달 기사 배차 흐름으로 연결할 수 있다.
+if (source.출고예정대상여부 && source.배차업무유형 == 상태값.배차업무유형.용달운송)
+{
+    return await cargoYongdalDispatchEngine.다음후보선정Async(queue, 제외기사Id, cancellationToken);
+}
+```
 
 ### 화물 배달 건 정리
 
@@ -225,10 +253,10 @@ flowchart TD
 
 | 흐름 | 원본의뢰유형 | 배차 시작 조건 | 배차 시 우선 확인 |
 | --- | --- | --- | --- |
-| 창고 출고 연계 운송 - 화주 출고 | `WarehouseOutboundCargo`, `CargoTransport` | 결제/승인 조건과 출고 예정 또는 출고 준비 상태 확인 | 판매자/화주 출고지, 주문자 입고지, 화물 제원, 운임, 결제/정산 조건 |
+| 창고 출고 연계 운송 - 화주 출고 | `CargoTransport`, `WarehouseOutboundCargo`, `SalesChannelOutboundCargo`, `HongdalMartOutboundCargo` | 결제/승인 조건과 출고 예정 또는 출고 준비 상태 확인 | 판매자/화주 출고지, 주문자 입고지, 화물 제원, 운임, 결제/정산 조건 |
 | 창고 출고 연계 운송 - 주문자 화물/공산품 | `WarehouseOutboundCargo`, `OrdererCargoOrder` | 주문 확정, 출고 예정, 주문자 인수 조건 확인 | 주문자 연락 가능 여부, 상품 크기, 파손 주의, 픽업/하차 주소 |
-| 수입/통관 연계 FCL | `ImportCargoTransport`, `FclCargoTransport` | 통관 또는 반출 가능 상태와 컨테이너/독차 조건 확정 | 통관 상태, 컨테이너/차량 제원, 팔레트 수, 중량, 상하차 장비 |
-| 수입/통관 연계 LCL | `ImportCargoTransport`, `LclCargoTransport` | 통관 또는 반출 가능 상태와 혼적 가능 조건 확인 | HS 코드 위험 태그, 온도/파손 민감도, 하차 순서, 경유 가능 시간 |
+| 수입/통관 연계 FCL | `ImportCargoTransport`, `GroupPurchaseCargoTransport`, `FclCargoTransport` | 통관 또는 반출 가능 상태와 컨테이너/독차 조건 확정 | 통관 상태, 컨테이너/차량 제원, 팔레트 수, 중량, 상하차 장비 |
+| 수입/통관 연계 LCL | `ImportCargoTransport`, `GroupPurchaseCargoTransport`, `LclCargoTransport` | 통관 또는 반출 가능 상태와 혼적 가능 조건 확인 | HS 코드 위험 태그, 온도/파손 민감도, 하차 순서, 경유 가능 시간 |
 
 ```mermaid
 flowchart TD

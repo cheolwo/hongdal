@@ -7,6 +7,8 @@ public sealed class VersionFeatureFlagsResponse
     public IReadOnlyList<WorkflowFlagStateDto> Workflows { get; init; } = [];
 
     public IReadOnlyList<WorkflowRelationDto> WorkflowRelations { get; init; } = [];
+
+    public IReadOnlyList<OperatingSystemDto> OperatingSystems { get; init; } = [];
 }
 
 public sealed class WorkflowFlagStateDto
@@ -110,4 +112,54 @@ public sealed class WorkflowRelationDto
     public string RelationKindName { get; init; } = string.Empty;
 
     public string Summary { get; init; } = string.Empty;
+}
+
+public sealed class OperatingSystemDto
+{
+    public string OperatingSystemCode { get; init; } = string.Empty;
+
+    public string OperatingSystemName { get; init; } = string.Empty;
+
+    public string Purpose { get; init; } = string.Empty;
+
+    public IReadOnlyList<OperatingSystemWorkflowDto> Workflows { get; init; } = [];
+
+    public IReadOnlyList<OperatingSystemEngineDto> Engines { get; init; } = [];
+
+    public IReadOnlyList<OperatingSystemSchedulingPolicyDto> SchedulingPolicies { get; init; } = [];
+}
+
+public sealed class OperatingSystemWorkflowDto
+{
+    public string WorkflowCode { get; init; } = string.Empty;
+
+    public string WorkflowName { get; init; } = string.Empty;
+}
+
+public sealed class OperatingSystemEngineDto
+{
+    public string EngineCode { get; init; } = string.Empty;
+
+    public string EngineName { get; init; } = string.Empty;
+
+    public string AdjustmentPolicy { get; init; } = string.Empty;
+}
+
+public sealed class OperatingSystemSchedulingPolicyDto
+{
+    public string PolicyKindCode { get; init; } = string.Empty;
+
+    public string PolicyKindName { get; init; } = string.Empty;
+
+    public string PolicyCode { get; init; } = string.Empty;
+
+    public string PolicyName { get; init; } = string.Empty;
+
+    public string TargetQueue { get; init; } = string.Empty;
+
+    public string AppliedEngineCode { get; init; } = string.Empty;
+
+    public string Rule { get; init; } = string.Empty;
+
+    public string StarvationGuard { get; init; } = string.Empty;
 }

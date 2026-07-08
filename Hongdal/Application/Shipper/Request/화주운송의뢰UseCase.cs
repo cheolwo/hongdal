@@ -78,6 +78,11 @@ public interface I화주운송의뢰UseCase
 [HongdalUseCaseActor(HongdalActor.Recipient, HongdalUseCaseActorRole.Supporting)]
 [HongdalUseCaseRelation(
     HongdalUseCaseRelationKind.Extend,
+    "창고작업UseCase",
+    Condition = "화주 의뢰 화물이 창고 재고 또는 출고 예정 상품처럼 관리되는 경우",
+    Summary = "화주 화면에서는 운송 의뢰로 보이지만 서버 내부에서는 출고 예정 운송 대상으로 정규화해 창고 출고·배차 파이프라인으로 연결합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
     "문서관리UseCase",
     Condition = "인수증 거래, 전자서명, POD 증빙이 필요한 경우",
     Summary = "운송 의뢰의 상차·하차 증빙을 문서 관리 흐름으로 확장합니다.")]

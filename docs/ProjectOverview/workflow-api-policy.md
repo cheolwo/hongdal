@@ -9,11 +9,25 @@
 | 개념 | 의미 |
 | --- | --- |
 | 제품 버전 | API나 기능이 처음 들어온 로드맵 단계 |
+| 홍달 운영 체제(OS) | 특정 운영 목적을 달성하기 위해 워크플로우와 엔진을 조합하는 상위 운영 단위 |
 | 워크플로우 | 하나의 업무 절차를 완성하기 위해 묶이는 API 집합 |
 | 액터 | 유스케이스를 직접 실행하거나 보조로 참여하는 사용자·운영 주체 |
 | 유스케이스 | 액터가 워크플로우 안에서 목적을 달성하기 위해 호출하는 업무 기능 단위 |
 | 워크플로우 플래그 | 해당 업무 절차를 현재 환경에서 열지 말지 결정하는 스위치 |
 | 성장 트랙 | 커뮤니티처럼 여러 워크플로우와 버전에 걸쳐 계속 커지는 기능 축 |
+
+OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업무 절차와 책임 경계를 설명하고, OS는 그 절차들을 어떤 목적과 정책으로 묶어 엔진을 호출할지 결정합니다. 예를 들어 `공동주문 수입 OS`는 `공동주문 수입`, `통관·무역 데이터`, `창고 입출고`, `국내 화물 운송` 워크플로우를 조합하고, 필요할 때 집단화 엔진, 출고 배치 엔진, 피킹 배치 엔진, 운송 의뢰 배차 엔진을 호출합니다.
+
+`GET /api/v1/version-feature-flags`의 `OperatingSystems` 항목은 각 OS가 사용하는 워크플로우, 엔진, 스케줄링 정책을 반환합니다. 서버와 앱은 이 정보를 기준으로 “이 업무는 어떤 OS에서 운영되는가”, “어떤 엔진이 호출되는가”, “대기 큐를 어떤 정책으로 처리하는가”를 설명할 수 있습니다.
+
+| 정책 계열 | 쓰임 |
+| --- | --- |
+| FCFS | 일반 승인, 게시판 개설 신청처럼 접수 순서가 중요한 큐 |
+| SJF | 단순 출고, 소량 피킹처럼 빨리 끝낼 수 있는 작업 우선 |
+| Priority | 냉장/냉동, 통관 완료, 운영 사고처럼 위험도나 중요도가 높은 작업 우선 |
+| EDF | 상차 마감, 반출 마감, 음식 픽업 마감처럼 시간 제한이 있는 작업 우선 |
+| MLFQ | 계획배차, 추천배차, 공개배차처럼 큐 단계가 있는 작업 |
+| Aging | 장기 대기 작업이 계속 밀리는 것을 막는 보정 |
 
 ## 워크플로우 목록
 
@@ -136,6 +150,44 @@ public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
 ```
 
 관계 판단은 보수적으로 합니다. 항상 필요한 선행 판단이나 공통 조회는 `Include`로 두고, 거래 조건, 증빙 방식, 고용 여부, 판매채널 출품 여부처럼 선택적으로 붙는 흐름은 `Extend`로 둡니다.
+
+컨트롤러는 이 유스케이스를 주입받아 HTTP 요청을 넘기는 역할만 맡습니다. 아래처럼 컨트롤러에 업무 판단을 쌓지 않고, 유스케이스 이름이 다이어그램의 노드와 대응되도록 둡니다.
+
+```csharp
+[ApiController]
+[Route("api/v1/driver/recommendations")]
+public sealed class 기사배차추천Controller : ControllerBase
+{
+    private readonly I기사배차추천UseCase _useCase;
+
+    public 기사배차추천Controller(I기사배차추천UseCase useCase)
+    {
+        _useCase = useCase;
+    }
+
+    [HttpGet]
+    public async Task<IReadOnlyList<DispatchRecommendationDto>> Get(CancellationToken cancellationToken)
+        => await _useCase.추천조회Async(User.Identity?.Name ?? string.Empty, cancellationToken);
+}
+```
+
+새 유스케이스를 추가할 때는 attribute, 인터페이스, 구현체, DI 등록을 한 묶음으로 본다.
+
+```csharp
+[HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
+[HongdalUseCase("파일 POD 관리", Summary = "하차 완료 사진과 배송 완료 증빙 파일 상태를 관리합니다.")]
+[HongdalUseCaseActor(HongdalActor.PlatformOperator)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Include,
+    "파일업로드UseCase",
+    Condition = "POD 파일을 저장하거나 상태를 확인할 때",
+    Summary = "POD 관리는 업로드된 파일을 전제로 합니다.")]
+public sealed class 파일POD관리UseCase : I파일POD관리UseCase
+{
+}
+
+services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
+```
 
 `GET /api/v1/version-feature-flags`는 기존 `Flags` 응답을 유지하면서 `Workflows`, `Workflows[].UseCases`, `WorkflowRelations`도 함께 반환합니다. 앱과 관리자 화면은 이 응답을 이용해 워크플로우별 메뉴 노출, 비활성 안내, 워크플로우 관계도, 워크플로우를 성립시키는 유스케이스 목록을 구성할 수 있습니다.
 

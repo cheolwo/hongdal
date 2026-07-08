@@ -29,7 +29,8 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
         {
             Flags = flags,
             Workflows = BuildWorkflowStates(flags),
-            WorkflowRelations = HongdalWorkflowRelations.GetAll().Select(ToDto).ToArray()
+            WorkflowRelations = HongdalWorkflowRelations.GetAll().Select(ToDto).ToArray(),
+            OperatingSystems = HongdalOperatingSystems.GetAll().Select(ToDto).ToArray()
         };
     }
 
@@ -167,6 +168,53 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
             RelationKindCode = relation.Kind.ToString(),
             RelationKindName = HongdalWorkflowRelationKindLabels.GetLabel(relation.Kind),
             Summary = relation.Summary
+        };
+    }
+
+    private static OperatingSystemDto ToDto(HongdalOperatingSystemDefinition operatingSystem)
+    {
+        return new OperatingSystemDto
+        {
+            OperatingSystemCode = operatingSystem.OperatingSystem.ToString(),
+            OperatingSystemName = operatingSystem.Name,
+            Purpose = operatingSystem.Purpose,
+            Workflows = operatingSystem.Workflows.Select(ToOperatingSystemWorkflowDto).ToArray(),
+            Engines = operatingSystem.Engines.Select(ToOperatingSystemEngineDto).ToArray(),
+            SchedulingPolicies = operatingSystem.SchedulingPolicies.Select(ToOperatingSystemSchedulingPolicyDto).ToArray()
+        };
+    }
+
+    private static OperatingSystemWorkflowDto ToOperatingSystemWorkflowDto(HongdalWorkflow workflow)
+    {
+        return new OperatingSystemWorkflowDto
+        {
+            WorkflowCode = workflow.ToString(),
+            WorkflowName = HongdalWorkflowLabels.GetLabel(workflow)
+        };
+    }
+
+    private static OperatingSystemEngineDto ToOperatingSystemEngineDto(HongdalOperatingSystemEngine engine)
+    {
+        return new OperatingSystemEngineDto
+        {
+            EngineCode = engine.EngineCode,
+            EngineName = engine.EngineName,
+            AdjustmentPolicy = engine.AdjustmentPolicy
+        };
+    }
+
+    private static OperatingSystemSchedulingPolicyDto ToOperatingSystemSchedulingPolicyDto(HongdalSchedulingPolicy policy)
+    {
+        return new OperatingSystemSchedulingPolicyDto
+        {
+            PolicyKindCode = policy.Kind.ToString(),
+            PolicyKindName = HongdalSchedulingPolicyKindLabels.GetLabel(policy.Kind),
+            PolicyCode = policy.PolicyCode,
+            PolicyName = policy.PolicyName,
+            TargetQueue = policy.TargetQueue,
+            AppliedEngineCode = policy.AppliedEngineCode,
+            Rule = policy.Rule,
+            StarvationGuard = policy.StarvationGuard
         };
     }
 }

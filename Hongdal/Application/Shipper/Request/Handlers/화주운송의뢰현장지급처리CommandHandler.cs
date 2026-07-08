@@ -1,5 +1,6 @@
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
+using 홍달.Services.Dispatch.Queue;
 using ShipRequest = Hongdal.Contracts.Shipper.Request;
 
 namespace Hongdal.Application.Shipper.Request;
@@ -8,11 +9,16 @@ public sealed class 화주운송의뢰현장지급처리CommandHandler : IReques
 {
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly I운송의뢰배차대기Service _dispatchQueueService;
 
-    public 화주운송의뢰현장지급처리CommandHandler(HongdalContext db, ICurrentUserAccessor currentUserAccessor)
+    public 화주운송의뢰현장지급처리CommandHandler(
+        HongdalContext db,
+        ICurrentUserAccessor currentUserAccessor,
+        I운송의뢰배차대기Service dispatchQueueService)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
+        _dispatchQueueService = dispatchQueueService;
     }
 
     public async Task<Result<ShipRequest.화주운송의뢰응답>> Handle(화주운송의뢰현장지급처리Command request, CancellationToken cancellationToken)
@@ -42,38 +48,16 @@ public sealed class 화주운송의뢰현장지급처리CommandHandler : IReques
         entity.배차상태 = 상태값.배차상태.매칭중;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await EnsureDispatchQueueAsync(entity, cancellationToken);
+        await _dispatchQueueService.생성또는조회Async(
+            화주운송의뢰출고예정정규화.To출고예정운송대상(entity),
+            new 운송의뢰배차대기생성옵션
+            {
+                픽업상세주소 = entity.픽업_상세주소,
+                하차상세주소 = entity.하차_상세주소
+            },
+            cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         return Result.Ok(화주운송의뢰매퍼.To응답(entity));
-    }
-
-    private async Task EnsureDispatchQueueAsync(홍달.도메인.화주.화주운송의뢰 entity, CancellationToken cancellationToken)
-    {
-        var existingQueue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == entity.의뢰Id, cancellationToken);
-        if (existingQueue != null)
-        {
-            return;
-        }
-
-        _db.배차대기.Add(new 홍달.도메인.배차.배차대기
-        {
-            의뢰Id = entity.의뢰Id,
-            화주Id = entity.화주Id,
-            배차업무유형 = 상태값.배차업무유형.용달운송,
-            원본의뢰유형 = "CargoTransport",
-            원본의뢰Id = entity.의뢰Id,
-            픽업_도로명주소 = entity.픽업_도로명주소,
-            픽업_상세주소 = entity.픽업_상세주소,
-            픽업_위도 = entity.픽업_위도,
-            픽업_경도 = entity.픽업_경도,
-            하차_도로명주소 = entity.하차_도로명주소,
-            하차_상세주소 = entity.하차_상세주소,
-            하차_위도 = entity.하차_위도,
-            하차_경도 = entity.하차_경도,
-            상태 = 상태값.배차대기상태.대기,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        });
     }
 
     private static string MergeMemo(string? origin, string? memo)

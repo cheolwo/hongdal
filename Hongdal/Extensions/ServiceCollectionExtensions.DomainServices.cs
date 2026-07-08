@@ -77,10 +77,14 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
         services.AddScoped<I배차업무정책, 용달운송배차업무정책>();
         services.AddScoped<I배차업무정책, 음식배달배차업무정책>();
+        services.AddScoped<I운송의뢰배차원천분류Service, 운송의뢰배차원천분류Service>();
+        services.AddScoped<I운송의뢰배차대기Service, 운송의뢰배차대기Service>();
         services.AddScoped<I화물용달배차흐름Resolver, 화물용달배차흐름Resolver>();
         services.AddScoped<I음식배달배차흐름Resolver, 음식배달배차흐름Resolver>();
-        services.AddScoped<I배차엔진, 화물용달배차엔진>();
-        services.AddScoped<I배차엔진, 음식배달배차엔진>();
+        services.AddScoped<화물용달배차엔진>();
+        services.AddScoped<음식배달배차엔진>();
+        services.AddScoped<I운송의뢰배차엔진>(sp => sp.GetRequiredService<화물용달배차엔진>());
+        services.AddScoped<I운송의뢰배차엔진>(sp => sp.GetRequiredService<음식배달배차엔진>());
         services.AddScoped<I배차추천후보선정Service, 배차추천후보선정Service>();
         services.AddScoped<I공개배차Service, 공개배차Service>();
         services.AddScoped<Hongdal.Application.Driver.Recommendation.I기사배차추천UseCase, Hongdal.Application.Driver.Recommendation.기사배차추천UseCase>();

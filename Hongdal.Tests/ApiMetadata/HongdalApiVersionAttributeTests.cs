@@ -230,6 +230,15 @@ public sealed class HongdalApiVersionAttributeTests
             relation.SourceWorkflowName == "공동주문 수입" &&
             relation.TargetWorkflowName == "국내 화물 운송" &&
             relation.RelationKindName == "인계");
+        Assert.Contains(response.OperatingSystems, operatingSystem =>
+            operatingSystem.OperatingSystemCode == nameof(HongdalOperatingSystem.DomesticCargoTransport) &&
+            operatingSystem.Engines.Any(engine => engine.EngineCode == "TransportRequestDispatchEngine") &&
+            operatingSystem.SchedulingPolicies.Any(policy => policy.PolicyKindCode == nameof(HongdalSchedulingPolicyKind.Mlfq)) &&
+            operatingSystem.SchedulingPolicies.Any(policy => policy.PolicyKindCode == nameof(HongdalSchedulingPolicyKind.Aging)));
+        Assert.Contains(response.OperatingSystems, operatingSystem =>
+            operatingSystem.OperatingSystemCode == nameof(HongdalOperatingSystem.WarehouseCommerceFulfillment) &&
+            operatingSystem.SchedulingPolicies.Any(policy => policy.PolicyKindCode == nameof(HongdalSchedulingPolicyKind.Sjf)) &&
+            operatingSystem.SchedulingPolicies.Any(policy => policy.PolicyKindCode == nameof(HongdalSchedulingPolicyKind.Affinity)));
     }
 
     [Fact]
