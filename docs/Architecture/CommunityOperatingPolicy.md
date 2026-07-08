@@ -38,6 +38,14 @@ Activity signals should:
 
 The first implementation exposes `GET api/v1/community/activity-signals`. It reads successful work logs and returns anonymized signal cards for driver work, shipper transport, warehouse work, product journey, sales commerce, and community trust.
 
+## Implementation Boundary
+
+Community controllers should stay thin. HTTP routing, authorization policy, request binding, and file stream opening can remain in controllers. Post creation, comment handling, recommendations, reports, moderation state, response projection, and validation belong in `커뮤니티게시글UseCase` so that community behavior can be tested and reused by app-specific community modes.
+
+Community voting follows the same boundary. `커뮤니티투표Controller` delegates voting, closing, resolution document draft creation, and signature state changes to `커뮤니티투표UseCase`; the controller only maps the HTTP route and response shape.
+
+Activity signals also use the same boundary. `커뮤니티활동신호Controller` delegates privacy-safe work-log projection to `커뮤니티활동신호UseCase`, while `CommunityActivitySignalService` remains the lower-level query/projection service.
+
 ## Voting And Resolution Policy
 
 Community voting is an information-exchange and coordination tool. It can help participants decide what to buy together, how to operate a shared process, whether to open a demand campaign, or which work rule should be adopted.

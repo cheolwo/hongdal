@@ -1,7 +1,6 @@
 using Hongdal.Contracts.Common.Privacy;
-using Hongdal.Services.Security;
+using Hongdal.Application.Security;
 using Microsoft.AspNetCore.Mvc;
-using 홍달.Infrastructure.Security;
 using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Security;
@@ -11,23 +10,17 @@ namespace Hongdal.Controllers.Security;
 [Route("api/v1/security/isms-p/transport")]
 public sealed class IsmsPTransportProtectionController : ControllerBase
 {
-    private readonly IIsmsPClientTransportProtectionService protectionService;
-    private readonly IIsmsPTransportKeyStatusStore keyStatusStore;
+    private readonly IISMSP전송보호UseCase _useCase;
 
-    public IsmsPTransportProtectionController(
-        IIsmsPClientTransportProtectionService protectionService,
-        IIsmsPTransportKeyStatusStore keyStatusStore)
+    public IsmsPTransportProtectionController(IISMSP전송보호UseCase useCase)
     {
-        this.protectionService = protectionService;
-        this.keyStatusStore = keyStatusStore;
+        _useCase = useCase;
     }
 
     [HttpGet("public-key")]
     public async Task<ActionResult<IsmsPClientEncryptionPublicKeyResponse>> GetPublicKey(
         CancellationToken cancellationToken)
     {
-        var publicKey = protectionService.GetPublicKey();
-        await keyStatusStore.MarkActiveAsync(publicKey, cancellationToken);
-        return Ok(publicKey);
+        return Ok(await _useCase.공개키발급Async(cancellationToken));
     }
 }

@@ -18,6 +18,16 @@ public interface I기사알림UseCase
 [HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
 [HongdalUseCase("기사 알림 설정", Summary = "기사 추천, 배차, 운송 진행 알림을 받을 수 있도록 푸시토큰과 알림 설정을 관리합니다.")]
 [HongdalUseCaseActor(HongdalActor.Driver)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Include,
+    "용달기사프로필UseCase",
+    Condition = "기사 식별자와 기사 역할을 기준으로 알림 설정을 저장하는 경우",
+    Summary = "기사 알림 설정은 기사 프로필과 역할 준비 상태를 전제로 합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "기사배차추천UseCase",
+    Condition = "추천 화물, 배차 변경, 운송 진행 상태를 기사에게 알려야 하는 경우",
+    Summary = "기사 알림 설정을 배차 추천과 운송 진행 알림 흐름으로 확장합니다.")]
 public sealed class 기사알림UseCase : I기사알림UseCase
 {
     private readonly IDriverPushTokenStore _pushTokenStore;

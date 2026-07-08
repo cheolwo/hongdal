@@ -19,6 +19,16 @@ public interface I공동구매자동집단화UseCase
 [HongdalUseCaseActor(HongdalActor.Orderer)]
 [HongdalUseCaseActor(HongdalActor.OrdererGroupLeader, HongdalUseCaseActorRole.Supporting)]
 [HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Include,
+    "공공데이터조회UseCase",
+    Condition = "주소, 공동주택, 배송권 기준으로 주문자를 묶는 경우",
+    Summary = "주문자 집단화는 주소와 생활권 판단에 필요한 공공 데이터 조회를 포함합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "커뮤니티게시글UseCase",
+    Condition = "구매 의사를 다른 주문자에게 공개해 모집하거나 토론하는 경우",
+    Summary = "자동 집단화 후보를 커뮤니티 게시글과 태그 기반 모집 흐름으로 확장합니다.")]
 public sealed class 공동구매자동집단화UseCase : I공동구매자동집단화UseCase
 {
     private readonly I공동구매자동집단화저장소 _저장소;

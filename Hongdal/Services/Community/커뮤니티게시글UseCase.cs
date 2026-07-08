@@ -1,28 +1,130 @@
+using FluentResults;
+using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Community;
-using Hongdal.Controllers;
 using Hongdal.Domain.Community;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 홍달.Data;
 using 홍달.Services.External.Google;
 using 홍달.Services.Options;
-using Hongdal.ApiMetadata;
 
-namespace Hongdal.Controllers.Common;
+namespace Hongdal.Services.Community;
 
-[HongdalApiVersion(HongdalProductVersion.V1_0)]
-[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
-[ApiController]
-[Route("api/v1/community/posts")]
-public sealed class PlatformCommunityPostsController : ControllerBase
+public interface I커뮤니티게시글UseCase
+{
+    Task<Result<PlatformCommunityPostListResponse>> 목록Async(
+        string? appKey,
+        string? category,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostResponse>> 생성Async(
+        PlatformCommunityPostCreateRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostResponse>> 상세Async(long id, CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostAttachmentResponse>> 첨부업로드Async(
+        long id,
+        커뮤니티게시글첨부업로드Command? command,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostResponse>> 수정Async(
+        long id,
+        PlatformCommunityPostUpdateRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostResponse>> 운영자고정Async(
+        long id,
+        PlatformCommunityPostOperatorPinRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostResponse>> 추천Async(
+        long id,
+        PlatformCommunityPostRecommendationRequest? request,
+        string fallbackRecommenderKey,
+        CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<PlatformCommunityPostCommentResponse>>> 댓글목록Async(
+        long id,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostCommentResponse>> 댓글작성Async(
+        long id,
+        PlatformCommunityPostCommentCreateRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result> 댓글삭제Async(
+        long id,
+        long commentId,
+        PlatformCommunityPostPasswordRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result> 댓글신고Async(long commentId, CancellationToken cancellationToken);
+
+    Task<Result> 댓글운영자숨김Async(
+        long commentId,
+        PlatformCommunityOperatorHiddenRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<PlatformCommunityPostAttachmentCommentResponse>>> 첨부댓글목록Async(
+        long attachmentId,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostAttachmentCommentResponse>> 첨부댓글작성Async(
+        long attachmentId,
+        PlatformCommunityPostAttachmentCommentCreateRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result> 첨부댓글삭제Async(
+        long attachmentId,
+        long commentId,
+        PlatformCommunityPostPasswordRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result> 첨부댓글신고Async(long commentId, CancellationToken cancellationToken);
+
+    Task<Result> 첨부댓글운영자숨김Async(
+        long commentId,
+        PlatformCommunityOperatorHiddenRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result> 삭제Async(
+        long id,
+        PlatformCommunityPostPasswordRequest? request,
+        CancellationToken cancellationToken);
+}
+
+public sealed record 커뮤니티게시글첨부업로드Command(
+    string Password,
+    Stream FileStream,
+    string FileName,
+    string ContentType,
+    long Length);
+
+[HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
+[HongdalUseCase("커뮤니티 게시글 운영", Summary = "참여자가 워크플로우/역할 태그가 붙은 게시글, 첨부, 댓글, 추천, 신고를 처리합니다.")]
+[HongdalUseCaseActor(HongdalActor.CommunityMember)]
+[HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "커뮤니티투표UseCase",
+    Condition = "게시글 토론이 투표, 결의문, 전자서명 필요 상태로 발전하는 경우",
+    Summary = "커뮤니티 게시글을 투표와 결의문 작성 흐름으로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "인연스냅샷조회UseCase",
+    Condition = "게시글 작성자 또는 참여자의 업무 관계 신뢰 신호를 함께 보여주는 경우",
+    Summary = "게시글의 역할 태그와 활동 신호를 업무 인연 스냅샷 조회로 확장합니다.")]
+public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 {
     private readonly HongdalContext _db;
     private readonly IGoogleCloudStorageService _storageService;
     private readonly CommunityPostStorageOptions _storageOptions;
 
-    public PlatformCommunityPostsController(
+    public 커뮤니티게시글UseCase(
         HongdalContext db,
         IGoogleCloudStorageService storageService,
         IOptions<CommunityPostStorageOptions> storageOptions)
@@ -32,14 +134,12 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         _storageOptions = storageOptions.Value;
     }
 
-    [HttpGet]
-    [AllowAnonymous]
-    public async Task<ActionResult<PlatformCommunityPostListResponse>> List(
-        [FromQuery] string? appKey,
-        [FromQuery] string? category,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<PlatformCommunityPostListResponse>> 목록Async(
+        string? appKey,
+        string? category,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 50);
@@ -76,7 +176,7 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .Select(x => ToResponse(x))
             .ToListAsync(cancellationToken);
 
-        return Ok(new PlatformCommunityPostListResponse
+        return Result.Ok(new PlatformCommunityPostListResponse
         {
             Items = items,
             TotalCount = totalCount,
@@ -85,16 +185,19 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         });
     }
 
-    [HttpPost]
-    [AllowAnonymous]
-    public async Task<IActionResult> Create(
-        [FromBody] PlatformCommunityPostCreateRequest request,
+    public async Task<Result<PlatformCommunityPostResponse>> 생성Async(
+        PlatformCommunityPostCreateRequest? request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>("request body is required");
+        }
+
         var validation = ValidatePost(request.Nickname, request.Password, request.Title, request.Body, request.SharedLinkUrl);
         if (validation is not null)
         {
-            return this.ToProblemActionResult(validation.Title ?? "게시글 입력값을 확인해야 합니다.");
+            return BadRequest<PlatformCommunityPostResponse>(validation);
         }
 
         var now = DateTime.UtcNow;
@@ -104,64 +207,55 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         var entity = new PlatformCommunityPost
         {
             AppKey = Normalize(request.AppKey, "platform", 80),
-            Category = Normalize(request.Category, "자유", 60),
+            Category = normalizedCategory,
             WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60),
             RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40),
             Title = Normalize(request.Title, string.Empty, 160),
             Body = Normalize(request.Body, string.Empty, 4000),
             SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl),
-            Nickname = Normalize(request.Nickname, "익명", 40),
+            Nickname = normalizedNickname,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
+            IsReportBoardPost = isReportBoardPost,
+            ReporterDisplayName = isReportBoardPost
+                ? Normalize(request.ReporterDisplayName, normalizedNickname, 40)
+                : null,
+            ReportedDisplayName = isReportBoardPost
+                ? Normalize(request.ReportedDisplayName, string.Empty, 40)
+                : null,
             CreatedAtUtc = now,
             UpdatedAtUtc = now
         };
 
-        entity.Category = normalizedCategory;
-        entity.Nickname = normalizedNickname;
-        entity.IsReportBoardPost = isReportBoardPost;
-        entity.ReporterDisplayName = isReportBoardPost
-            ? Normalize(request.ReporterDisplayName, normalizedNickname, 40)
-            : null;
-        entity.ReportedDisplayName = isReportBoardPost
-            ? Normalize(request.ReportedDisplayName, string.Empty, 40)
-            : null;
-
         _db.PlatformCommunityPosts.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return CreatedAtAction(nameof(Get), new { id = entity.Id }, ToResponse(entity));
+        return Result.Ok(ToResponse(entity));
     }
 
-    [HttpGet("{id:long}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Get(long id, CancellationToken cancellationToken)
+    public async Task<Result<PlatformCommunityPostResponse>> 상세Async(long id, CancellationToken cancellationToken)
     {
-        var entity = await _db.PlatformCommunityPosts
+        var entity = await PostWithDisplayIncludes()
             .AsNoTracking()
-            .Include(x => x.Attachments)
-                .ThenInclude(x => x.Comments)
-            .Include(x => x.Comments.Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden))
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
 
-        return entity is null ? this.ToNotFoundProblem("게시글을 찾을 수 없습니다.") : Ok(ToResponse(entity));
+        return entity is null
+            ? NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.")
+            : Result.Ok(ToResponse(entity));
     }
 
-    [HttpPost("{id:long}/attachments")]
-    [AllowAnonymous]
-    [RequestSizeLimit(20_000_000)]
-    public async Task<IActionResult> UploadAttachment(
+    public async Task<Result<PlatformCommunityPostAttachmentResponse>> 첨부업로드Async(
         long id,
-        [FromForm] PlatformCommunityPostAttachmentUploadRequest request,
+        커뮤니티게시글첨부업로드Command? command,
         CancellationToken cancellationToken)
     {
-        if (request.File is null || request.File.Length <= 0)
+        if (command is null || command.Length <= 0)
         {
-            return this.ToProblemActionResult("업로드할 이미지 파일을 선택해야 합니다.");
+            return BadRequest<PlatformCommunityPostAttachmentResponse>("업로드할 이미지 파일을 선택해야 합니다.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(command.Password))
         {
-            return this.ToProblemActionResult("게시글 비밀번호를 입력해야 합니다.");
+            return BadRequest<PlatformCommunityPostAttachmentResponse>("게시글 비밀번호를 입력해야 합니다.");
         }
 
         var entity = await _db.PlatformCommunityPosts
@@ -170,35 +264,34 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound<PlatformCommunityPostAttachmentResponse>("게시글을 찾을 수 없습니다.");
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
+        if (!BCrypt.Net.BCrypt.Verify(command.Password.Trim(), entity.PasswordHash))
         {
-            return this.ToForbiddenProblem("게시글 비밀번호가 일치하지 않습니다.");
+            return Forbidden<PlatformCommunityPostAttachmentResponse>("게시글 비밀번호가 일치하지 않습니다.");
         }
 
         if (entity.Attachments.Count >= _storageOptions.MaxAttachmentsPerPost)
         {
-            return this.ToProblemActionResult($"게시글당 이미지는 최대 {_storageOptions.MaxAttachmentsPerPost}개까지 업로드할 수 있습니다.");
+            return BadRequest<PlatformCommunityPostAttachmentResponse>($"게시글당 이미지는 최대 {_storageOptions.MaxAttachmentsPerPost}개까지 업로드할 수 있습니다.");
         }
 
-        if (request.File.Length > _storageOptions.MaxImageBytes)
+        if (command.Length > _storageOptions.MaxImageBytes)
         {
-            return this.ToProblemActionResult($"이미지 크기는 최대 {_storageOptions.MaxImageBytes / 1024 / 1024}MB까지 허용됩니다.");
+            return BadRequest<PlatformCommunityPostAttachmentResponse>($"이미지 크기는 최대 {_storageOptions.MaxImageBytes / 1024 / 1024}MB까지 허용됩니다.");
         }
 
-        if (!_storageOptions.AllowedContentTypes.Contains(request.File.ContentType, StringComparer.OrdinalIgnoreCase))
+        if (!_storageOptions.AllowedContentTypes.Contains(command.ContentType, StringComparer.OrdinalIgnoreCase))
         {
-            return this.ToProblemActionResult("허용되지 않은 이미지 형식입니다.");
+            return BadRequest<PlatformCommunityPostAttachmentResponse>("허용되지 않은 이미지 형식입니다.");
         }
 
-        await using var stream = request.File.OpenReadStream();
         var folder = $"{_storageOptions.Folder.Trim().Trim('/')}/{entity.Id}";
         var uploadResult = await _storageService.UploadAsync(
-            stream,
-            request.File.FileName,
-            request.File.ContentType,
+            command.FileStream,
+            command.FileName,
+            command.ContentType,
             folder,
             cancellationToken);
 
@@ -208,9 +301,9 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             BucketName = uploadResult.BucketName,
             ObjectName = uploadResult.ObjectName,
             Url = uploadResult.PublicUrl,
-            OriginalFileName = Path.GetFileName(request.File.FileName),
-            ContentType = request.File.ContentType,
-            FileSizeBytes = request.File.Length,
+            OriginalFileName = Path.GetFileName(command.FileName),
+            ContentType = command.ContentType,
+            FileSizeBytes = command.Length,
             UploadedAtUtc = DateTime.UtcNow
         };
 
@@ -218,32 +311,35 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         entity.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToAttachmentResponse(attachment));
+        return Result.Ok(ToAttachmentResponse(attachment));
     }
 
-    [HttpPut("{id:long}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Update(
+    public async Task<Result<PlatformCommunityPostResponse>> 수정Async(
         long id,
-        [FromBody] PlatformCommunityPostUpdateRequest request,
+        PlatformCommunityPostUpdateRequest? request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>("request body is required");
+        }
+
         var validation = ValidatePost(request.Nickname, request.Password, request.Title, request.Body, request.SharedLinkUrl);
         if (validation is not null)
         {
-            return this.ToProblemActionResult(validation.Title ?? "게시글 입력값을 확인해야 합니다.");
+            return BadRequest<PlatformCommunityPostResponse>(validation);
         }
 
         var entity = await _db.PlatformCommunityPosts
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
         {
-            return this.ToForbiddenProblem("게시글 비밀번호가 일치하지 않습니다.");
+            return Forbidden<PlatformCommunityPostResponse>("게시글 비밀번호가 일치하지 않습니다.");
         }
 
         entity.Category = Normalize(request.Category, "자유", 60);
@@ -263,24 +359,24 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         entity.UpdatedAtUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
-        return Ok(ToResponse(entity));
+        return Result.Ok(ToResponse(entity));
     }
 
-    [HttpPost("{id:long}/operator-pin")]
-    [Authorize(Policy = "서버관리자전용")]
-    public async Task<IActionResult> SetOperatorPin(
+    public async Task<Result<PlatformCommunityPostResponse>> 운영자고정Async(
         long id,
-        [FromBody] PlatformCommunityPostOperatorPinRequest request,
+        PlatformCommunityPostOperatorPinRequest? request,
         CancellationToken cancellationToken)
     {
-        var entity = await _db.PlatformCommunityPosts
-            .Include(x => x.Attachments)
-                .ThenInclude(x => x.Comments)
-            .Include(x => x.Comments.Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden))
+        if (request is null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>("request body is required");
+        }
+
+        var entity = await PostWithDisplayIncludes()
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
         }
 
         entity.IsOperatorPinned = request.IsOperatorPinned;
@@ -288,25 +384,21 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         entity.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToResponse(entity));
+        return Result.Ok(ToResponse(entity));
     }
 
-    [HttpPost("{id:long}/recommendations")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Recommend(
+    public async Task<Result<PlatformCommunityPostResponse>> 추천Async(
         long id,
-        [FromBody] PlatformCommunityPostRecommendationRequest request,
+        PlatformCommunityPostRecommendationRequest? request,
+        string fallbackRecommenderKey,
         CancellationToken cancellationToken)
     {
-        var recommenderKey = Normalize(request.RecommenderKey, HttpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous", 120);
-        var entity = await _db.PlatformCommunityPosts
-            .Include(x => x.Attachments)
-                .ThenInclude(x => x.Comments)
-            .Include(x => x.Comments.Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden))
+        var recommenderKey = Normalize(request?.RecommenderKey, fallbackRecommenderKey, 120);
+        var entity = await PostWithDisplayIncludes()
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
         }
 
         var alreadyRecommended = await _db.PlatformCommunityPostRecommendations
@@ -325,12 +417,10 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             await _db.SaveChangesAsync(cancellationToken);
         }
 
-        return Ok(ToResponse(entity));
+        return Result.Ok(ToResponse(entity));
     }
 
-    [HttpGet("{id:long}/comments")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ListComments(
+    public async Task<Result<IReadOnlyList<PlatformCommunityPostCommentResponse>>> 댓글목록Async(
         long id,
         CancellationToken cancellationToken)
     {
@@ -338,7 +428,7 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .AnyAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (!exists)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound<IReadOnlyList<PlatformCommunityPostCommentResponse>>("게시글을 찾을 수 없습니다.");
         }
 
         var comments = await _db.PlatformCommunityPostComments
@@ -349,27 +439,30 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .Select(x => ToCommentResponse(x))
             .ToListAsync(cancellationToken);
 
-        return Ok(comments);
+        return Result.Ok<IReadOnlyList<PlatformCommunityPostCommentResponse>>(comments);
     }
 
-    [HttpPost("{id:long}/comments")]
-    [AllowAnonymous]
-    public async Task<IActionResult> CreateComment(
+    public async Task<Result<PlatformCommunityPostCommentResponse>> 댓글작성Async(
         long id,
-        [FromBody] PlatformCommunityPostCommentCreateRequest request,
+        PlatformCommunityPostCommentCreateRequest? request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<PlatformCommunityPostCommentResponse>("request body is required");
+        }
+
         var validation = ValidateComment(request);
         if (validation is not null)
         {
-            return this.ToProblemActionResult(validation.Title ?? "댓글 입력값을 확인해야 합니다.");
+            return BadRequest<PlatformCommunityPostCommentResponse>(validation);
         }
 
         var entity = await _db.PlatformCommunityPosts
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound<PlatformCommunityPostCommentResponse>("게시글을 찾을 수 없습니다.");
         }
 
         var now = DateTime.UtcNow;
@@ -389,86 +482,85 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         entity.UpdatedAtUtc = now;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToCommentResponse(comment));
+        return Result.Ok(ToCommentResponse(comment));
     }
 
-    [HttpDelete("{id:long}/comments/{commentId:long}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> DeleteComment(
+    public async Task<Result> 댓글삭제Async(
         long id,
         long commentId,
-        [FromBody] PlatformCommunityPostPasswordRequest request,
+        PlatformCommunityPostPasswordRequest? request,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request?.Password))
         {
-            return this.ToProblemActionResult("Password is required.");
+            return BadRequest("Password is required.");
         }
 
         var comment = await _db.PlatformCommunityPostComments
             .Include(x => x.Post)
-            .FirstOrDefaultAsync(x => x.Id == commentId && x.PostId == id && !x.IsDeleted && x.Post != null && !x.Post.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(
+                x => x.Id == commentId && x.PostId == id && !x.IsDeleted && x.Post != null && !x.Post.IsDeleted,
+                cancellationToken);
         if (comment is null)
         {
-            return this.ToNotFoundProblem("댓글을 찾을 수 없습니다.");
+            return NotFound("댓글을 찾을 수 없습니다.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), comment.PasswordHash))
         {
-            return this.ToForbiddenProblem("댓글 비밀번호가 일치하지 않습니다.");
+            return Forbidden("댓글 비밀번호가 일치하지 않습니다.");
         }
 
         comment.IsDeleted = true;
         comment.UpdatedAtUtc = DateTime.UtcNow;
-        comment.Post.CommentCount = Math.Max(0, comment.Post.CommentCount - 1);
+        comment.Post!.CommentCount = Math.Max(0, comment.Post.CommentCount - 1);
         comment.Post.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    [HttpPost("comments/{commentId:long}/reports")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ReportComment(long commentId, CancellationToken cancellationToken)
+    public async Task<Result> 댓글신고Async(long commentId, CancellationToken cancellationToken)
     {
         var comment = await _db.PlatformCommunityPostComments
             .FirstOrDefaultAsync(x => x.Id == commentId && !x.IsDeleted, cancellationToken);
         if (comment is null)
         {
-            return this.ToNotFoundProblem("댓글을 찾을 수 없습니다.");
+            return NotFound("댓글을 찾을 수 없습니다.");
         }
 
         comment.ReportCount += 1;
         comment.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    [HttpPost("comments/{commentId:long}/operator-hidden")]
-    [Authorize(Policy = "서버관리자전용")]
-    public async Task<IActionResult> SetCommentOperatorHidden(
+    public async Task<Result> 댓글운영자숨김Async(
         long commentId,
-        [FromBody] PlatformCommunityOperatorHiddenRequest request,
+        PlatformCommunityOperatorHiddenRequest? request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest("request body is required");
+        }
+
         var comment = await _db.PlatformCommunityPostComments
             .FirstOrDefaultAsync(x => x.Id == commentId && !x.IsDeleted, cancellationToken);
         if (comment is null)
         {
-            return this.ToNotFoundProblem("댓글을 찾을 수 없습니다.");
+            return NotFound("댓글을 찾을 수 없습니다.");
         }
 
         comment.IsOperatorHidden = request.IsOperatorHidden;
         comment.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    [HttpGet("attachments/{attachmentId:long}/comments")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ListAttachmentComments(
+    public async Task<Result<IReadOnlyList<PlatformCommunityPostAttachmentCommentResponse>>> 첨부댓글목록Async(
         long attachmentId,
         CancellationToken cancellationToken)
     {
@@ -476,7 +568,7 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .AnyAsync(x => x.Id == attachmentId && x.Post != null && !x.Post.IsDeleted, cancellationToken);
         if (!exists)
         {
-            return this.ToNotFoundProblem("첨부 이미지를 찾을 수 없습니다.");
+            return NotFound<IReadOnlyList<PlatformCommunityPostAttachmentCommentResponse>>("첨부 이미지를 찾을 수 없습니다.");
         }
 
         var comments = await _db.PlatformCommunityPostAttachmentComments
@@ -487,20 +579,23 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .Select(x => ToAttachmentCommentResponse(x))
             .ToListAsync(cancellationToken);
 
-        return Ok(comments);
+        return Result.Ok<IReadOnlyList<PlatformCommunityPostAttachmentCommentResponse>>(comments);
     }
 
-    [HttpPost("attachments/{attachmentId:long}/comments")]
-    [AllowAnonymous]
-    public async Task<IActionResult> CreateAttachmentComment(
+    public async Task<Result<PlatformCommunityPostAttachmentCommentResponse>> 첨부댓글작성Async(
         long attachmentId,
-        [FromBody] PlatformCommunityPostAttachmentCommentCreateRequest request,
+        PlatformCommunityPostAttachmentCommentCreateRequest? request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<PlatformCommunityPostAttachmentCommentResponse>("request body is required");
+        }
+
         var validation = ValidateAttachmentComment(request);
         if (validation is not null)
         {
-            return this.ToProblemActionResult(validation.Title ?? "첨부 댓글 입력값을 확인해야 합니다.");
+            return BadRequest<PlatformCommunityPostAttachmentCommentResponse>(validation);
         }
 
         var attachment = await _db.PlatformCommunityPostAttachments
@@ -508,7 +603,7 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == attachmentId && x.Post != null && !x.Post.IsDeleted, cancellationToken);
         if (attachment is null)
         {
-            return this.ToNotFoundProblem("첨부 이미지를 찾을 수 없습니다.");
+            return NotFound<PlatformCommunityPostAttachmentCommentResponse>("첨부 이미지를 찾을 수 없습니다.");
         }
 
         var now = DateTime.UtcNow;
@@ -528,34 +623,34 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         attachment.Post.UpdatedAtUtc = now;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Ok(ToAttachmentCommentResponse(comment));
+        return Result.Ok(ToAttachmentCommentResponse(comment));
     }
 
-    [HttpDelete("attachments/{attachmentId:long}/comments/{commentId:long}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> DeleteAttachmentComment(
+    public async Task<Result> 첨부댓글삭제Async(
         long attachmentId,
         long commentId,
-        [FromBody] PlatformCommunityPostPasswordRequest request,
+        PlatformCommunityPostPasswordRequest? request,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request?.Password))
         {
-            return this.ToProblemActionResult("Password is required.");
+            return BadRequest("Password is required.");
         }
 
         var comment = await _db.PlatformCommunityPostAttachmentComments
             .Include(x => x.Attachment)
                 .ThenInclude(x => x.Post)
-            .FirstOrDefaultAsync(x => x.Id == commentId && x.AttachmentId == attachmentId && !x.IsDeleted && x.Attachment.Post != null && !x.Attachment.Post.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(
+                x => x.Id == commentId && x.AttachmentId == attachmentId && !x.IsDeleted && x.Attachment.Post != null && !x.Attachment.Post.IsDeleted,
+                cancellationToken);
         if (comment is null)
         {
-            return this.ToNotFoundProblem("첨부 댓글을 찾을 수 없습니다.");
+            return NotFound("첨부 댓글을 찾을 수 없습니다.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), comment.PasswordHash))
         {
-            return this.ToForbiddenProblem("첨부 댓글 비밀번호가 일치하지 않습니다.");
+            return Forbidden("첨부 댓글 비밀번호가 일치하지 않습니다.");
         }
 
         comment.IsDeleted = true;
@@ -564,104 +659,109 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         comment.Attachment.Post!.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    [HttpPost("attachments/comments/{commentId:long}/reports")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ReportAttachmentComment(long commentId, CancellationToken cancellationToken)
+    public async Task<Result> 첨부댓글신고Async(long commentId, CancellationToken cancellationToken)
     {
         var comment = await _db.PlatformCommunityPostAttachmentComments
             .FirstOrDefaultAsync(x => x.Id == commentId && !x.IsDeleted, cancellationToken);
         if (comment is null)
         {
-            return this.ToNotFoundProblem("첨부 댓글을 찾을 수 없습니다.");
+            return NotFound("첨부 댓글을 찾을 수 없습니다.");
         }
 
         comment.ReportCount += 1;
         comment.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    [HttpPost("attachments/comments/{commentId:long}/operator-hidden")]
-    [Authorize(Policy = "서버관리자전용")]
-    public async Task<IActionResult> SetAttachmentCommentOperatorHidden(
+    public async Task<Result> 첨부댓글운영자숨김Async(
         long commentId,
-        [FromBody] PlatformCommunityOperatorHiddenRequest request,
+        PlatformCommunityOperatorHiddenRequest? request,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest("request body is required");
+        }
+
         var comment = await _db.PlatformCommunityPostAttachmentComments
             .FirstOrDefaultAsync(x => x.Id == commentId && !x.IsDeleted, cancellationToken);
         if (comment is null)
         {
-            return this.ToNotFoundProblem("첨부 댓글을 찾을 수 없습니다.");
+            return NotFound("첨부 댓글을 찾을 수 없습니다.");
         }
 
         comment.IsOperatorHidden = request.IsOperatorHidden;
         comment.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    [HttpDelete("{id:long}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Delete(
+    public async Task<Result> 삭제Async(
         long id,
-        [FromBody] PlatformCommunityPostPasswordRequest request,
+        PlatformCommunityPostPasswordRequest? request,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request?.Password))
         {
-            return this.ToProblemActionResult("비밀번호를 입력해야 합니다.");
+            return BadRequest("비밀번호를 입력해야 합니다.");
         }
 
         var entity = await _db.PlatformCommunityPosts
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
-            return this.ToNotFoundProblem("게시글을 찾을 수 없습니다.");
+            return NotFound("게시글을 찾을 수 없습니다.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
         {
-            return this.ToForbiddenProblem("게시글 비밀번호가 일치하지 않습니다.");
+            return Forbidden("게시글 비밀번호가 일치하지 않습니다.");
         }
 
         entity.IsDeleted = true;
         entity.UpdatedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        return Result.Ok();
     }
 
-    private static ProblemDetails? ValidatePost(string nickname, string password, string title, string body, string? sharedLinkUrl)
+    private IQueryable<PlatformCommunityPost> PostWithDisplayIncludes()
+        => _db.PlatformCommunityPosts
+            .Include(x => x.Attachments)
+                .ThenInclude(x => x.Comments)
+            .Include(x => x.Comments.Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden));
+
+    private static string? ValidatePost(string nickname, string password, string title, string body, string? sharedLinkUrl)
     {
         if (string.IsNullOrWhiteSpace(nickname) || nickname.Trim().Length > 40)
         {
-            return new ProblemDetails { Title = "닉네임은 1자 이상 40자 이하로 입력해야 합니다." };
+            return "닉네임은 1자 이상 40자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(password) || password.Trim().Length < 4 || password.Trim().Length > 100)
         {
-            return new ProblemDetails { Title = "비밀번호는 4자 이상 100자 이하로 입력해야 합니다." };
+            return "비밀번호는 4자 이상 100자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(title) || title.Trim().Length > 160)
         {
-            return new ProblemDetails { Title = "제목은 1자 이상 160자 이하로 입력해야 합니다." };
+            return "제목은 1자 이상 160자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(body) && string.IsNullOrWhiteSpace(sharedLinkUrl))
         {
-            return new ProblemDetails { Title = "본문 또는 공유 링크 중 하나는 입력해야 합니다." };
+            return "본문 또는 공유 링크 중 하나는 입력해야 합니다.";
         }
 
         if (!string.IsNullOrWhiteSpace(body) && body.Trim().Length > 4000)
         {
-            return new ProblemDetails { Title = "본문은 1자 이상 4000자 이하로 입력해야 합니다." };
+            return "본문은 1자 이상 4000자 이하로 입력해야 합니다.";
         }
 
         if (!string.IsNullOrWhiteSpace(sharedLinkUrl) &&
@@ -669,7 +769,7 @@ public sealed class PlatformCommunityPostsController : ControllerBase
              (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps) ||
              sharedLinkUrl.Trim().Length > 1000))
         {
-            return new ProblemDetails { Title = "공유 링크는 http 또는 https URL로 입력해야 합니다." };
+            return "공유 링크는 http 또는 https URL로 입력해야 합니다.";
         }
 
         return null;
@@ -692,41 +792,41 @@ public sealed class PlatformCommunityPostsController : ControllerBase
         return text.Length <= 1000 ? text : text[..1000];
     }
 
-    private static ProblemDetails? ValidateComment(PlatformCommunityPostCommentCreateRequest request)
+    private static string? ValidateComment(PlatformCommunityPostCommentCreateRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Nickname) || request.Nickname.Trim().Length > 40)
         {
-            return new ProblemDetails { Title = "닉네임은 1자 이상 40자 이하로 입력해야 합니다." };
+            return "닉네임은 1자 이상 40자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Trim().Length < 4 || request.Password.Trim().Length > 100)
         {
-            return new ProblemDetails { Title = "비밀번호는 4자 이상 100자 이하로 입력해야 합니다." };
+            return "비밀번호는 4자 이상 100자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(request.Body) || request.Body.Trim().Length > 1000)
         {
-            return new ProblemDetails { Title = "댓글은 1자 이상 1000자 이하로 입력해야 합니다." };
+            return "댓글은 1자 이상 1000자 이하로 입력해야 합니다.";
         }
 
         return null;
     }
 
-    private static ProblemDetails? ValidateAttachmentComment(PlatformCommunityPostAttachmentCommentCreateRequest request)
+    private static string? ValidateAttachmentComment(PlatformCommunityPostAttachmentCommentCreateRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Nickname) || request.Nickname.Trim().Length > 40)
         {
-            return new ProblemDetails { Title = "Nickname must be 1 to 40 characters." };
+            return "닉네임은 1자 이상 40자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Trim().Length < 4 || request.Password.Trim().Length > 100)
         {
-            return new ProblemDetails { Title = "Password must be 4 to 100 characters." };
+            return "비밀번호는 4자 이상 100자 이하로 입력해야 합니다.";
         }
 
         if (string.IsNullOrWhiteSpace(request.Body) || request.Body.Trim().Length > 1000)
         {
-            return new ProblemDetails { Title = "Comment must be 1 to 1000 characters." };
+            return "첨부 댓글은 1자 이상 1000자 이하로 입력해야 합니다.";
         }
 
         return null;
@@ -788,8 +888,7 @@ public sealed class PlatformCommunityPostsController : ControllerBase
     }
 
     private static PlatformCommunityPostCommentResponse ToCommentResponse(PlatformCommunityPostComment entity)
-    {
-        return new PlatformCommunityPostCommentResponse
+        => new()
         {
             Id = entity.Id,
             Nickname = entity.Nickname,
@@ -797,11 +896,9 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             ReportCount = entity.ReportCount,
             CreatedAtUtc = entity.CreatedAtUtc
         };
-    }
 
     private static PlatformCommunityPostAttachmentResponse ToAttachmentResponse(PlatformCommunityPostAttachment entity)
-    {
-        return new PlatformCommunityPostAttachmentResponse
+        => new()
         {
             Id = entity.Id,
             Url = entity.Url,
@@ -819,11 +916,9 @@ public sealed class PlatformCommunityPostsController : ControllerBase
                 .Select(ToAttachmentCommentResponse)
                 .ToArray()
         };
-    }
 
     private static PlatformCommunityPostAttachmentCommentResponse ToAttachmentCommentResponse(PlatformCommunityPostAttachmentComment entity)
-    {
-        return new PlatformCommunityPostAttachmentCommentResponse
+        => new()
         {
             Id = entity.Id,
             AttachmentId = entity.AttachmentId,
@@ -832,11 +927,20 @@ public sealed class PlatformCommunityPostsController : ControllerBase
             ReportCount = entity.ReportCount,
             CreatedAtUtc = entity.CreatedAtUtc
         };
-    }
-}
 
-public sealed class PlatformCommunityPostAttachmentUploadRequest
-{
-    public string Password { get; set; } = string.Empty;
-    public IFormFile File { get; set; } = null!;
+    private static Result<T> BadRequest<T>(string message) => Result.Fail<T>(message);
+
+    private static Result BadRequest(string message) => Result.Fail(message);
+
+    private static Result<T> NotFound<T>(string message)
+        => Result.Fail<T>(new Error(message).WithMetadata("StatusCode", StatusCodes.Status404NotFound));
+
+    private static Result NotFound(string message)
+        => Result.Fail(new Error(message).WithMetadata("StatusCode", StatusCodes.Status404NotFound));
+
+    private static Result<T> Forbidden<T>(string message)
+        => Result.Fail<T>(new Error(message).WithMetadata("StatusCode", StatusCodes.Status403Forbidden));
+
+    private static Result Forbidden(string message)
+        => Result.Fail(new Error(message).WithMetadata("StatusCode", StatusCodes.Status403Forbidden));
 }

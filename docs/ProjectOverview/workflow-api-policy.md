@@ -117,6 +117,26 @@ public sealed class 기사배차추천UseCase : I기사배차추천UseCase
 | `Primary` | 유스케이스를 직접 조작하고 결과에 가장 큰 책임을 지는 사용자 |
 | `Supporting` | 같은 업무를 보정, 운영, 인계, 확인하는 보조 참여자 |
 
+유스케이스 사이에는 UML의 `include`, `extend` 개념을 메타데이터로 기록합니다. 이 값은 런타임 호출을 강제하지 않고, 설계 문서와 앱 화면에서 “어떤 기능이 항상 포함되는가”, “어떤 기능이 조건부로 붙는가”를 보여주는 용도입니다.
+
+| 관계 | 한글 이름 | 적용 기준 | 예시 |
+| --- | --- | --- | --- |
+| `Include` | 포함 | 원 유스케이스가 성립하려면 사실상 함께 필요한 공통 하위 기능 | `공동구매자동집단화UseCase` → `공공데이터조회UseCase` |
+| `Extend` | 확장 | 기본 유스케이스는 독립적으로 성립하지만 특정 조건에서 추가되는 기능 | `화주운송의뢰UseCase` → `문서관리UseCase` |
+
+```csharp
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "문서관리UseCase",
+    Condition = "인수증 거래, 전자서명, POD 증빙이 필요한 경우",
+    Summary = "운송 의뢰의 상차·하차 증빙을 문서 관리 흐름으로 확장합니다.")]
+public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
+{
+}
+```
+
+관계 판단은 보수적으로 합니다. 항상 필요한 선행 판단이나 공통 조회는 `Include`로 두고, 거래 조건, 증빙 방식, 고용 여부, 판매채널 출품 여부처럼 선택적으로 붙는 흐름은 `Extend`로 둡니다.
+
 `GET /api/v1/version-feature-flags`는 기존 `Flags` 응답을 유지하면서 `Workflows`, `Workflows[].UseCases`, `WorkflowRelations`도 함께 반환합니다. 앱과 관리자 화면은 이 응답을 이용해 워크플로우별 메뉴 노출, 비활성 안내, 워크플로우 관계도, 워크플로우를 성립시키는 유스케이스 목록을 구성할 수 있습니다.
 
 ## 워크플로우별 필수 유스케이스
@@ -125,13 +145,38 @@ public sealed class 기사배차추천UseCase : I기사배차추천UseCase
 
 | 워크플로우 | 필요한 유스케이스 |
 | --- | --- |
-| 국내 화물 운송 | `화주운송의뢰UseCase`, `기사배차추천UseCase`, `용달기사프로필UseCase`, `기사알림UseCase` |
-| 공동주문 수입 | `공동구매자동집단화UseCase`, `공동구매커머스이행계획UseCase` |
+| 국내 화물 운송 | `화주운송의뢰UseCase`, `기사배차추천UseCase`, `용달기사프로필UseCase`, `기사알림UseCase`, `파일업로드UseCase`, `파일POD관리UseCase`, `문서관리UseCase`, `ISMSP전송보호UseCase`, `버전워크플로우UseCase` |
+| 공동주문 수입 | `공동구매자동집단화UseCase`, `공동구매커머스이행계획UseCase`, `공동구매해외선적추적UseCase`, `공공데이터조회UseCase` |
 | 창고 입출고 | `창고작업UseCase` |
-| 판매채널 출고 | `판매채널UseCase` |
-| 커뮤니티 신뢰 | `PlatformCommunityBoardUseCase` |
+| 통관·무역 데이터 | `HS코드운영UseCase` |
+| 판매채널 출고 | `판매채널UseCase`, `샘플이미지작업UseCase` |
+| 커뮤니티 신뢰 | `커뮤니티게시판UseCase`, `커뮤니티게시글UseCase`, `커뮤니티투표UseCase`, `커뮤니티활동신호UseCase`, `인연스냅샷조회UseCase` |
+| 참여 인력 관리 | `HR참여운영UseCase`, `사회보험신고UseCase`, `플랫폼수익환급UseCase` |
 
 이 목록은 `HongdalApiWorkflowAttribute`와 `HongdalUseCaseAttribute`가 붙은 유스케이스 클래스를 서버가 읽어 구성합니다. 새 유스케이스를 추가할 때는 워크플로우, 표시 이름, 주 액터, 보조 액터를 함께 붙이는 것을 기본 규칙으로 둡니다.
+
+컨트롤러는 HTTP 라우팅, 인증 정책, 파일 스트림 열기처럼 웹 계층에 가까운 일만 담당합니다. 게시글 작성, 댓글 작성, 추천 중복 방지, 신고 수 증가, 운영자 숨김 같은 업무 처리는 유스케이스에 둡니다.
+
+## 한글 도메인 명명 규칙
+
+코드에서 도메인을 설명하는 명사는 가능한 한 한글로 둡니다. 반면 계층이나 기술 역할을 나타내는 접미사는 기존 .NET 관례를 유지합니다.
+
+| 구분 | 규칙 | 예시 |
+| --- | --- | --- |
+| 도메인 명사 | 한글 사용 | `커뮤니티게시글`, `공동구매자동집단화`, `기사배차추천` |
+| 기술 접미사 | 영어 관례 유지 | `UseCase`, `Service`, `Controller`, `Dto`, `Command` |
+| 외부 계약 DTO | API 호환성을 우선 | `PlatformCommunityPostResponse`, `CommunityVoteCreateRequest` |
+| 인프라/외부 서비스 | 기존 라이브러리 용어 유지 | `GoogleCloudStorage`, `InMemory`, `HttpContext` |
+
+따라서 새 유스케이스는 `커뮤니티투표UseCase`처럼 작성합니다. API 계약 DTO는 기존 클라이언트 호환이 필요하므로 `CommunityVoteCreateRequest`처럼 유지할 수 있고, 컨트롤러는 API 경로를 유지하면서 `커뮤니티투표Controller`처럼 도메인 이름을 한글화할 수 있습니다.
+
+관리자 운영 기능도 같은 규칙을 따릅니다. 예를 들어 `api/v1/admin/auxiliary-feature-settings` 경로는 유지하되, 서버 코드에서는 `보조기능설정Controller`와 `보조기능설정UseCase`가 전역/사용자별 설정 변경과 감사 로그 기록을 나눠 맡습니다.
+
+통관·무역 데이터 워크플로우에서도 같은 원칙을 적용합니다. `api/v1/admin/hs-codes` 경로는 유지하되, 서버 코드에서는 `HS코드운영Controller`가 HTTP 요청을 받고 `HS코드운영UseCase`가 HS 코드 조회, 업무 분류 보정, 위험 태그 저장, 관세사/운영자 보정 출처 판단을 담당합니다.
+
+공동주문 수입 워크플로우에서도 같은 원칙을 적용합니다. `api/v1/orderer/group-purchase-overseas-shipments`와 관리자 원장 API 경로는 유지하되, 서버 코드에서는 `공동구매해외선적추적UseCase`가 문서관리번호 조회, BL 기반 공개 조회, 수입 물류 정규화, 통관 동기화, 원장 이벤트 추가를 담당합니다.
+
+증빙과 운영 보조 기능도 컨트롤러 밖 유스케이스에서 처리합니다. `파일업로드UseCase`, `파일POD관리UseCase`, `문서관리UseCase`는 파일 검증, 저장 경로 결정, 문서 다운로드 감사 로그를 담당하고, 컨트롤러는 파일 바인딩과 HTTP 응답만 처리합니다.
 
 ## 기존 버전 플래그 호환
 

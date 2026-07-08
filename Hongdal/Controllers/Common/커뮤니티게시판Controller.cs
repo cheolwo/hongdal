@@ -10,11 +10,11 @@ namespace Hongdal.Controllers.Common;
 [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/boards")]
-public sealed class PlatformCommunityBoardsController : ControllerBase
+public sealed class 커뮤니티게시판Controller : ControllerBase
 {
-    private readonly IPlatformCommunityBoardUseCase _useCase;
+    private readonly I커뮤니티게시판UseCase _useCase;
 
-    public PlatformCommunityBoardsController(IPlatformCommunityBoardUseCase useCase)
+    public 커뮤니티게시판Controller(I커뮤니티게시판UseCase useCase)
     {
         _useCase = useCase;
     }

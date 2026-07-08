@@ -1,10 +1,9 @@
 using Hongdal.Contracts.Common.ViewSettings;
+using Hongdal.Application.ViewSettings;
 using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using 홍달.Services.Audit;
-using 홍달.Services.ViewSettings;
 using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin;
@@ -15,63 +14,32 @@ namespace Hongdal.Controllers.Admin;
 [Route("api/v1/admin/view-policies")]
 public sealed class View정책Controller : ControllerBase
 {
-    private readonly IView가시성Service _viewVisibilityService;
-    private readonly I사용자행위로그Service _activityLogService;
+    private readonly I관리자View정책UseCase _useCase;
 
-    public View정책Controller(IView가시성Service viewVisibilityService, I사용자행위로그Service activityLogService)
+    public View정책Controller(I관리자View정책UseCase useCase)
     {
-        _viewVisibilityService = viewVisibilityService;
-        _activityLogService = activityLogService;
+        _useCase = useCase;
     }
 
     [HttpGet]
-    public async Task<ActionResult<관리자View정책목록응답>> 조회([FromQuery] string? appKey, CancellationToken cancellationToken)
+    public async Task<IActionResult> 조회([FromQuery] string? appKey, CancellationToken cancellationToken)
     {
-        var items = await _viewVisibilityService.GetPoliciesAsync(appKey, cancellationToken);
-        return Ok(new 관리자View정책목록응답
-        {
-            Items = items
-        });
+        var result = await _useCase.조회Async(appKey, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPut("{id:long}")]
     public async Task<IActionResult> 수정(long id, [FromBody] 관리자View정책수정요청 request, CancellationToken cancellationToken)
     {
-        if (request is null)
-        {
-            return this.ToProblemActionResult("request body is required");
-        }
+        var result = await _useCase.수정Async(id, request, new 관리자View정책Context(
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
+            User.Identity?.Name ?? string.Empty,
+            User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
+            Request.Path.Value ?? string.Empty,
+            HttpContext.TraceIdentifier,
+            HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
+            Request.Headers.UserAgent.ToString()), cancellationToken);
 
-        try
-        {
-            var updated = await _viewVisibilityService.UpdatePolicyAsync(id, request.PolicyEnabled, cancellationToken);
-            if (updated is null)
-            {
-                return this.ToNotFoundProblem("View 정책을 찾을 수 없습니다.");
-            }
-
-            await _activityLogService.기록Async(new 사용자행위로그기록
-            {
-                AppKey = App식별자.HongdalAdmin,
-                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
-                UserName = User.Identity?.Name ?? string.Empty,
-                RoleName = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
-                ActionType = "ViewPolicy",
-                ActionName = "PolicyChanged",
-                Route = Request.Path.Value ?? string.Empty,
-                TraceId = HttpContext.TraceIdentifier,
-                IsSuccess = true,
-                ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
-                UserAgent = Request.Headers.UserAgent.ToString(),
-                OccurredAtUtc = DateTime.UtcNow,
-                MetadataJson = $"{{\"policyId\":{id},\"enabled\":{request.PolicyEnabled.ToString().ToLowerInvariant()}}}"
-            }, cancellationToken);
-
-            return Ok(updated);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return this.ToProblemActionResult(ex.Message);
-        }
+        return this.ToActionResult(result);
     }
 }

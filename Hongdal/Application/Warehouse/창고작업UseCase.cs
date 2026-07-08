@@ -30,6 +30,16 @@ public interface I창고작업UseCase
 [HongdalUseCaseActor(HongdalActor.WarehouseManager)]
 [HongdalUseCaseActor(HongdalActor.ShipperOrSeller, HongdalUseCaseActorRole.Supporting)]
 [HongdalUseCaseActor(HongdalActor.Shipper, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "화주운송의뢰UseCase",
+    Condition = "창고 출고 또는 재위탁 운송이 필요한 경우",
+    Summary = "창고 작업 결과를 국내 화물 운송 의뢰로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "판매채널UseCase",
+    Condition = "창고 재고가 판매채널 주문 이행에 쓰이는 경우",
+    Summary = "창고 재고와 출고 작업을 판매채널 주문 이행 흐름으로 확장합니다.")]
 public sealed class 창고작업UseCase : I창고작업UseCase
 {
     private readonly IWarehouseOperationService _warehouseOperationService;

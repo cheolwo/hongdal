@@ -43,6 +43,26 @@ public interface I공동구매커머스이행계획UseCase
 [HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
 [HongdalUseCaseActor(HongdalActor.Driver, HongdalUseCaseActorRole.Supporting)]
 [HongdalUseCaseActor(HongdalActor.WarehouseManager, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "화주운송의뢰UseCase",
+    Condition = "보세구역 반출 후 아파트 직행 배송 또는 국내 3PL 이동 운송을 의뢰하는 경우",
+    Summary = "공동수입 물품을 국내 화물 운송 의뢰 흐름으로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "창고작업UseCase",
+    Condition = "공동수입 물품을 국내 3PL 창고에 입고시키는 경우",
+    Summary = "공동수입 물품을 창고 입고, 재고, 출고 가능 상태로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "판매채널UseCase",
+    Condition = "공동수입 재고를 스마트스토어, 쿠팡, Amazon 등 판매채널 출품 후보로 전환하는 경우",
+    Summary = "공동수입 재고를 판매채널 출품과 주문 이행 흐름으로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "HR참여운영UseCase",
+    Condition = "단지 내부 분류, 배분, 보조 업무에 참여 인력을 운영하는 경우",
+    Summary = "공동주문 운영 업무를 고용, 계약, 참여 보상 흐름으로 확장합니다.")]
 public sealed class 공동구매커머스이행계획UseCase : I공동구매커머스이행계획UseCase
 {
     private readonly I공동구매커머스이행계획저장소 _store;

@@ -1,42 +1,79 @@
-using System.Security.Claims;
 using System.Text.Json;
+using FluentResults;
+using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Admin.Customs;
-using Hongdal.Controllers;
 using Hongdal.Contracts.Common.ViewSettings;
 using Hongdal.Domain.HsCodes;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.Services.Audit;
-using Hongdal.ApiMetadata;
 
-namespace Hongdal.Controllers.Admin.Customs;
+namespace Hongdal.Application.Customs;
 
-[HongdalApiVersion(HongdalProductVersion.V2_0)]
-[ApiController]
-[Authorize(Policy = "HsCode운영자전용")]
-[Route("api/v1/admin/hs-codes")]
-public sealed class HsCodeOperationsController : ControllerBase
+public interface IHS코드운영UseCase
+{
+    Task<Result<AdminHsCodeListResponse>> 목록Async(
+        string? query,
+        int? businessCategory,
+        int? tagType,
+        bool includeInactive,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken);
+
+    Task<Result<AdminHsCodeEntryResponse>> 대분류수정Async(
+        long entryId,
+        AdminHsCodeBusinessCategoryUpdateRequest? request,
+        HS코드운영자Context context,
+        CancellationToken cancellationToken);
+
+    Task<Result<AdminHsCodeEntryResponse>> 태그저장Async(
+        long entryId,
+        AdminHsCodeRiskTagUpdateRequest? request,
+        HS코드운영자Context context,
+        CancellationToken cancellationToken);
+
+    Task<Result<AdminHsCodeEntryResponse>> 태그수정Async(
+        long tagId,
+        AdminHsCodeRiskTagUpdateRequest? request,
+        HS코드운영자Context context,
+        CancellationToken cancellationToken);
+}
+
+public sealed record HS코드운영자Context(
+    bool IsBrokerReviewer,
+    string UserId,
+    string UserName,
+    string RoleName,
+    string Route,
+    string TraceId,
+    string ClientIp,
+    string UserAgent);
+
+[HongdalApiWorkflow(HongdalWorkflow.CustomsAndTradeData)]
+[HongdalUseCase("HS 코드 운영", Summary = "운영자와 관세사가 HS 코드 업무 분류와 통관 주의 태그를 조회하고 보정합니다.")]
+[HongdalUseCaseActor(HongdalActor.CustomsBroker)]
+[HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+public sealed class HS코드운영UseCase : IHS코드운영UseCase
 {
     private readonly HongdalContext _db;
     private readonly I사용자행위로그Service _activityLogService;
 
-    public HsCodeOperationsController(HongdalContext db, I사용자행위로그Service activityLogService)
+    public HS코드운영UseCase(HongdalContext db, I사용자행위로그Service activityLogService)
     {
         _db = db;
         _activityLogService = activityLogService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<AdminHsCodeListResponse>> 목록(
-        [FromQuery] string? query,
-        [FromQuery] int? businessCategory,
-        [FromQuery] int? tagType,
-        [FromQuery] bool includeInactive = false,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 50,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<AdminHsCodeListResponse>> 목록Async(
+        string? query,
+        int? businessCategory,
+        int? tagType,
+        bool includeInactive,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 10, 100);
@@ -66,12 +103,22 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (businessCategory.HasValue)
         {
+            if (!Enum.IsDefined(typeof(HsCodeBusinessCategory), businessCategory.Value))
+            {
+                return BadRequest<AdminHsCodeListResponse>("지원하지 않는 HS 코드 업무 분류입니다.");
+            }
+
             var category = (HsCodeBusinessCategory)businessCategory.Value;
             hsCodes = hsCodes.Where(x => x.BusinessCategory == category);
         }
 
         if (tagType.HasValue)
         {
+            if (!Enum.IsDefined(typeof(HsCodeRiskTagType), tagType.Value))
+            {
+                return BadRequest<AdminHsCodeListResponse>("지원하지 않는 HS 코드 주의 태그입니다.");
+            }
+
             var tag = (HsCodeRiskTagType)tagType.Value;
             hsCodes = hsCodes.Where(x => x.RiskTags.Any(t => t.TagType == tag && (includeInactive || t.IsActive)));
         }
@@ -83,7 +130,7 @@ public sealed class HsCodeOperationsController : ControllerBase
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return Ok(new AdminHsCodeListResponse
+        return Result.Ok(new AdminHsCodeListResponse
         {
             Items = items.Select(Map).ToArray(),
             TotalCount = totalCount,
@@ -92,15 +139,20 @@ public sealed class HsCodeOperationsController : ControllerBase
         });
     }
 
-    [HttpPut("{entryId:long}/business-category")]
-    public async Task<IActionResult> 대분류수정(
+    public async Task<Result<AdminHsCodeEntryResponse>> 대분류수정Async(
         long entryId,
-        [FromBody] AdminHsCodeBusinessCategoryUpdateRequest request,
+        AdminHsCodeBusinessCategoryUpdateRequest? request,
+        HS코드운영자Context context,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<AdminHsCodeEntryResponse>("request body is required");
+        }
+
         if (!Enum.IsDefined(typeof(HsCodeBusinessCategory), request.BusinessCategory))
         {
-            return this.ToProblemActionResult("지원하지 않는 HS 코드 업무 분류입니다.");
+            return BadRequest<AdminHsCodeEntryResponse>("지원하지 않는 HS 코드 업무 분류입니다.");
         }
 
         var entry = await _db.HsCodeEntries
@@ -109,30 +161,35 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (entry is null)
         {
-            return this.ToNotFoundProblem("HS 코드 항목을 찾을 수 없습니다.");
+            return NotFound<AdminHsCodeEntryResponse>("HS 코드 항목을 찾을 수 없습니다.");
         }
 
         entry.BusinessCategory = (HsCodeBusinessCategory)request.BusinessCategory;
         entry.BusinessCategoryReason = string.IsNullOrWhiteSpace(request.Reason)
-            ? DefaultCorrectionReason()
+            ? DefaultCorrectionReason(context)
             : request.Reason.Trim();
         entry.UpdatedAtUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
-        await LogAsync("HsCodeBusinessCategoryUpdated", new { entryId, entry.Code, request.BusinessCategory }, cancellationToken);
+        await LogAsync("HsCodeBusinessCategoryUpdated", new { entryId, entry.Code, request.BusinessCategory }, context, cancellationToken);
 
-        return Ok(Map(entry));
+        return Result.Ok(Map(entry));
     }
 
-    [HttpPost("{entryId:long}/risk-tags")]
-    public async Task<IActionResult> 태그저장(
+    public async Task<Result<AdminHsCodeEntryResponse>> 태그저장Async(
         long entryId,
-        [FromBody] AdminHsCodeRiskTagUpdateRequest request,
+        AdminHsCodeRiskTagUpdateRequest? request,
+        HS코드운영자Context context,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<AdminHsCodeEntryResponse>("request body is required");
+        }
+
         if (!Enum.IsDefined(typeof(HsCodeRiskTagType), request.TagType))
         {
-            return this.ToProblemActionResult("지원하지 않는 HS 코드 주의 태그입니다.");
+            return BadRequest<AdminHsCodeEntryResponse>("지원하지 않는 HS 코드 주의 태그입니다.");
         }
 
         var entry = await _db.HsCodeEntries
@@ -141,7 +198,7 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (entry is null)
         {
-            return this.ToNotFoundProblem("HS 코드 항목을 찾을 수 없습니다.");
+            return NotFound<AdminHsCodeEntryResponse>("HS 코드 항목을 찾을 수 없습니다.");
         }
 
         var tagType = (HsCodeRiskTagType)request.TagType;
@@ -158,24 +215,29 @@ public sealed class HsCodeOperationsController : ControllerBase
             entry.RiskTags.Add(tag);
         }
 
-        ApplyTagUpdate(tag, request, ResolveTagSource());
+        ApplyTagUpdate(tag, request, ResolveTagSource(context));
         entry.UpdatedAtUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
-        await LogAsync("HsCodeRiskTagSaved", new { entryId, entry.Code, request.TagType, request.IsActive }, cancellationToken);
+        await LogAsync("HsCodeRiskTagSaved", new { entryId, entry.Code, request.TagType, request.IsActive }, context, cancellationToken);
 
-        return Ok(Map(entry));
+        return Result.Ok(Map(entry));
     }
 
-    [HttpPut("risk-tags/{tagId:long}")]
-    public async Task<IActionResult> 태그수정(
+    public async Task<Result<AdminHsCodeEntryResponse>> 태그수정Async(
         long tagId,
-        [FromBody] AdminHsCodeRiskTagUpdateRequest request,
+        AdminHsCodeRiskTagUpdateRequest? request,
+        HS코드운영자Context context,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest<AdminHsCodeEntryResponse>("request body is required");
+        }
+
         if (!Enum.IsDefined(typeof(HsCodeRiskTagType), request.TagType))
         {
-            return this.ToProblemActionResult("지원하지 않는 HS 코드 주의 태그입니다.");
+            return BadRequest<AdminHsCodeEntryResponse>("지원하지 않는 HS 코드 주의 태그입니다.");
         }
 
         var tag = await _db.HsCodeEntryRiskTags
@@ -184,10 +246,10 @@ public sealed class HsCodeOperationsController : ControllerBase
 
         if (tag?.HsCodeEntry is null)
         {
-            return this.ToNotFoundProblem("HS 코드 주의 태그를 찾을 수 없습니다.");
+            return NotFound<AdminHsCodeEntryResponse>("HS 코드 주의 태그를 찾을 수 없습니다.");
         }
 
-        ApplyTagUpdate(tag, request, ResolveTagSource());
+        ApplyTagUpdate(tag, request, ResolveTagSource(context));
         tag.HsCodeEntry.UpdatedAtUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
@@ -197,9 +259,9 @@ public sealed class HsCodeOperationsController : ControllerBase
             .Include(x => x.RiskTags)
             .FirstAsync(x => x.Id == tag.HsCodeEntryId, cancellationToken);
 
-        await LogAsync("HsCodeRiskTagUpdated", new { tagId, tag.HsCodeEntryId, request.TagType, request.IsActive }, cancellationToken);
+        await LogAsync("HsCodeRiskTagUpdated", new { tagId, tag.HsCodeEntryId, request.TagType, request.IsActive }, context, cancellationToken);
 
-        return Ok(Map(entry));
+        return Result.Ok(Map(entry));
     }
 
     private static void ApplyTagUpdate(
@@ -219,15 +281,13 @@ public sealed class HsCodeOperationsController : ControllerBase
         tag.UpdatedAtUtc = DateTime.UtcNow;
     }
 
-    private HsCodeRiskTagSource ResolveTagSource()
-    {
-        return User.IsInRole(역할명.관세사) && !User.IsInRole(역할명.서버관리자)
+    private static HsCodeRiskTagSource ResolveTagSource(HS코드운영자Context context)
+        => context.IsBrokerReviewer
             ? HsCodeRiskTagSource.BrokerReview
             : HsCodeRiskTagSource.AdminOverride;
-    }
 
-    private string DefaultCorrectionReason()
-        => User.IsInRole(역할명.관세사) && !User.IsInRole(역할명.서버관리자)
+    private static string DefaultCorrectionReason(HS코드운영자Context context)
+        => context.IsBrokerReviewer
             ? "관세사 검토 보정"
             : "관리자 수동 보정";
 
@@ -300,23 +360,28 @@ public sealed class HsCodeOperationsController : ControllerBase
             _ => source.ToString()
         };
 
-    private Task LogAsync(string actionName, object metadata, CancellationToken cancellationToken)
+    private Task LogAsync(string actionName, object metadata, HS코드운영자Context context, CancellationToken cancellationToken)
     {
         return _activityLogService.기록Async(new 사용자행위로그기록
         {
             AppKey = App식별자.HongdalAdmin,
-            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
-            UserName = User.Identity?.Name ?? string.Empty,
-            RoleName = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
+            UserId = context.UserId,
+            UserName = context.UserName,
+            RoleName = context.RoleName,
             ActionType = "HsCodeOperations",
             ActionName = actionName,
-            Route = Request.Path.Value ?? string.Empty,
-            TraceId = HttpContext.TraceIdentifier,
+            Route = context.Route,
+            TraceId = context.TraceId,
             IsSuccess = true,
-            ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
-            UserAgent = Request.Headers.UserAgent.ToString(),
+            ClientIp = context.ClientIp,
+            UserAgent = context.UserAgent,
             OccurredAtUtc = DateTime.UtcNow,
             MetadataJson = JsonSerializer.Serialize(metadata)
         }, cancellationToken);
     }
+
+    private static Result<T> BadRequest<T>(string message) => Result.Fail<T>(message);
+
+    private static Result<T> NotFound<T>(string message)
+        => Result.Fail<T>(new Error(message).WithMetadata("StatusCode", StatusCodes.Status404NotFound));
 }

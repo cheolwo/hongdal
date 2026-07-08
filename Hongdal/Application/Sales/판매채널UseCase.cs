@@ -21,6 +21,16 @@ public interface I판매채널UseCase
 [HongdalUseCase("판매채널 출품 관리", Summary = "판매자가 판매채널 계정, 판매상품, 채널 출품을 만들고 출고 이행의 시작점을 준비합니다.")]
 [HongdalUseCaseActor(HongdalActor.Seller)]
 [HongdalUseCaseActor(HongdalActor.WarehouseManager, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "샘플이미지작업UseCase",
+    Condition = "상품 상세 페이지, 판매 이미지, 광고 소재 생성을 보조하는 경우",
+    Summary = "판매채널 출품을 샘플 이미지 생성과 상세 이미지 작업 흐름으로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "창고작업UseCase",
+    Condition = "판매채널 주문을 창고 재고 확인과 출고 배치로 연결하는 경우",
+    Summary = "판매채널 주문 이행을 창고 출고 작업으로 확장합니다.")]
 public sealed class 판매채널UseCase : I판매채널UseCase
 {
     private readonly ISalesChannelService _salesChannelService;

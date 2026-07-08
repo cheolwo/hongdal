@@ -78,6 +78,26 @@ public sealed class HongdalUseCaseActorAttribute : Attribute
     public string RoleLabel => HongdalUseCaseActorRoleLabels.GetLabel(Role);
 }
 
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
+public sealed class HongdalUseCaseRelationAttribute : Attribute
+{
+    public HongdalUseCaseRelationAttribute(HongdalUseCaseRelationKind kind, string targetUseCaseCode)
+    {
+        Kind = kind;
+        TargetUseCaseCode = targetUseCaseCode;
+    }
+
+    public HongdalUseCaseRelationKind Kind { get; }
+
+    public string TargetUseCaseCode { get; }
+
+    public string KindLabel => HongdalUseCaseRelationKindLabels.GetLabel(Kind);
+
+    public string Condition { get; set; } = string.Empty;
+
+    public string Summary { get; set; } = string.Empty;
+}
+
 public enum HongdalProductVersion
 {
     V1_0 = 100,
@@ -148,6 +168,12 @@ public enum HongdalUseCaseActorRole
 {
     Primary = 100,
     Supporting = 200
+}
+
+public enum HongdalUseCaseRelationKind
+{
+    Include = 100,
+    Extend = 200
 }
 
 public sealed record HongdalWorkflowRelation(
@@ -263,6 +289,19 @@ public static class HongdalUseCaseActorRoleLabels
             HongdalUseCaseActorRole.Primary => "주 액터",
             HongdalUseCaseActorRole.Supporting => "보조 액터",
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, "Unknown Hongdal use case actor role.")
+        };
+    }
+}
+
+public static class HongdalUseCaseRelationKindLabels
+{
+    public static string GetLabel(HongdalUseCaseRelationKind kind)
+    {
+        return kind switch
+        {
+            HongdalUseCaseRelationKind.Include => "포함",
+            HongdalUseCaseRelationKind.Extend => "확장",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown Hongdal use case relation kind.")
         };
     }
 }

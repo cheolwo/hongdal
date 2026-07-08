@@ -1,29 +1,49 @@
+using FluentResults;
+using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Admin.Audit;
-using Hongdal.Controllers;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
-using Hongdal.ApiMetadata;
 
-namespace Hongdal.Controllers.Admin;
+namespace Hongdal.Application.Audit;
 
-[HongdalApiVersion(HongdalProductVersion.V1_0)]
-[ApiController]
-[Authorize(Policy = "서버관리자전용")]
-[Route("api/v1/admin/activity-logs")]
-public sealed class ActivityLogsController : ControllerBase
+public interface I사용자행위로그조회UseCase
+{
+    Task<Result<사용자행위로그목록응답>> 조회Async(
+        사용자행위로그검색요청? request,
+        CancellationToken cancellationToken);
+
+    Task<Result<사용자행위로그상세응답>> 상세Async(
+        long id,
+        CancellationToken cancellationToken);
+
+    Task<Result<Trace행위로그묶음응답>> Trace조회Async(
+        string? traceId,
+        CancellationToken cancellationToken);
+}
+
+[HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
+[HongdalUseCase("사용자 행위 로그 조회", Summary = "운영자가 사용자 행위 로그를 조회하고 커뮤니티 활동 신호의 원천 기록을 확인합니다.")]
+[HongdalUseCaseActor(HongdalActor.PlatformOperator)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "커뮤니티활동신호UseCase",
+    Condition = "공개 가능한 활동만 커뮤니티 신뢰 신호로 투영하는 경우",
+    Summary = "행위 로그 조회를 개인정보 보호 필터가 적용된 커뮤니티 활동 신호로 확장합니다.")]
+public sealed class 사용자행위로그조회UseCase : I사용자행위로그조회UseCase
 {
     private readonly HongdalContext _db;
 
-    public ActivityLogsController(HongdalContext db)
+    public 사용자행위로그조회UseCase(HongdalContext db)
     {
         _db = db;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<사용자행위로그목록응답>> 조회([FromQuery] 사용자행위로그검색요청 request, CancellationToken cancellationToken)
+    public async Task<Result<사용자행위로그목록응답>> 조회Async(
+        사용자행위로그검색요청? request,
+        CancellationToken cancellationToken)
     {
+        request ??= new 사용자행위로그검색요청();
         var page = request.Page <= 0 ? 1 : request.Page;
         var pageSize = request.PageSize <= 0 ? 50 : Math.Min(request.PageSize, 200);
 
@@ -108,7 +128,7 @@ public sealed class ActivityLogsController : ControllerBase
             })
             .ToArrayAsync(cancellationToken);
 
-        return Ok(new 사용자행위로그목록응답
+        return Result.Ok(new 사용자행위로그목록응답
         {
             Items = items,
             Page = page,
@@ -117,8 +137,7 @@ public sealed class ActivityLogsController : ControllerBase
         });
     }
 
-    [HttpGet("{id:long}")]
-    public async Task<IActionResult> 상세(long id, CancellationToken cancellationToken)
+    public async Task<Result<사용자행위로그상세응답>> 상세Async(long id, CancellationToken cancellationToken)
     {
         var item = await _db.사용자행위로그.AsNoTracking()
             .Where(x => x.Id == id)
@@ -145,15 +164,18 @@ public sealed class ActivityLogsController : ControllerBase
             })
             .FirstOrDefaultAsync(cancellationToken);
 
-        return item is null ? this.ToNotFoundProblem("사용자 행위 로그를 찾을 수 없습니다.") : Ok(item);
+        return item is null
+            ? NotFound<사용자행위로그상세응답>("사용자 행위 로그를 찾을 수 없습니다.")
+            : Result.Ok(item);
     }
 
-    [HttpGet("trace/{traceId}")]
-    public async Task<IActionResult> Trace조회(string traceId, CancellationToken cancellationToken)
+    public async Task<Result<Trace행위로그묶음응답>> Trace조회Async(
+        string? traceId,
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(traceId))
         {
-            return this.ToProblemActionResult("traceId is required");
+            return Result.Fail<Trace행위로그묶음응답>("traceId is required");
         }
 
         var normalizedTraceId = traceId.Trim();
@@ -178,7 +200,7 @@ public sealed class ActivityLogsController : ControllerBase
             })
             .ToArrayAsync(cancellationToken);
 
-        return Ok(new Trace행위로그묶음응답
+        return Result.Ok(new Trace행위로그묶음응답
         {
             TraceId = normalizedTraceId,
             Items = items
@@ -203,11 +225,9 @@ public sealed class ActivityLogsController : ControllerBase
     private static string GetPhoneLast4(string phoneNumber)
     {
         var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
-        if (digits.Length <= 4)
-        {
-            return digits;
-        }
-
-        return digits[^4..];
+        return digits.Length <= 4 ? digits : digits[^4..];
     }
+
+    private static Result<T> NotFound<T>(string message)
+        => Result.Fail<T>(new Error(message).WithMetadata("StatusCode", StatusCodes.Status404NotFound));
 }

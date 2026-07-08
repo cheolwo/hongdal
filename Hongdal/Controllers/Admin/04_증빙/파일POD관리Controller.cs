@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Hongdal.Application.Evidence;
 using Hongdal.Controllers;
-using 홍달.Services;
-using 홍달.Services.Storage.Local;
 using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Evidence04;
@@ -13,120 +12,35 @@ namespace Hongdal.Controllers.Admin.Evidence04;
 [Authorize(Policy = "서버관리자전용")]
 public sealed class 파일POD관리Controller : ControllerBase
 {
-    private readonly IGoogleCloudStorageService _googleCloudStorageService;
-    private readonly ICommandFileStoragePathResolver _pathResolver;
-    private readonly IAdminFilePodStore _store;
+    private readonly I파일POD관리UseCase _useCase;
 
-    public 파일POD관리Controller(IGoogleCloudStorageService googleCloudStorageService, ICommandFileStoragePathResolver pathResolver, IAdminFilePodStore store)
+    public 파일POD관리Controller(I파일POD관리UseCase useCase)
     {
-        _googleCloudStorageService = googleCloudStorageService;
-        _pathResolver = pathResolver;
-        _store = store;
+        _useCase = useCase;
     }
 
     [HttpPost("upload")]
     [RequestSizeLimit(50_000_000)]
     public async Task<IActionResult> 업로드([FromForm] 파일POD업로드요청 request, CancellationToken cancellationToken)
     {
-        if (request == null || request.File == null)
-        {
-            return this.ToProblemActionResult("file is required");
-        }
-
-        if (request.File.Length <= 0)
-        {
-            return this.ToProblemActionResult("empty file is not allowed");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.FileType))
-        {
-            return this.ToProblemActionResult("fileType is required");
-        }
-
-        await using var stream = request.File.OpenReadStream();
-        var folder = _pathResolver.ResolveAdminFilePodFolder(request.FileType, request.RequestId);
-        var uploadResult = await _googleCloudStorageService.UploadAsync(
-            stream,
-            request.File.FileName,
-            request.File.ContentType,
-            folder,
+        var result = await _useCase.업로드Async(
+            new 파일POD업로드Command(request?.File, request?.FileType, request?.RequestId),
             cancellationToken);
 
-        var metadata = _store.Add(new AdminFilePodMetadata(
-            Id: Guid.NewGuid(),
-            FileType: request.FileType.Trim(),
-            RequestId: request.RequestId?.Trim() ?? string.Empty,
-            BucketName: uploadResult.BucketName,
-            ObjectName: uploadResult.ObjectName,
-            Url: uploadResult.PublicUrl,
-            OriginalFileName: request.File.FileName,
-            UploadStatus: "업로드완료",
-            UploadedAtUtc: DateTime.UtcNow,
-            UpdatedAtUtc: DateTime.UtcNow));
-
-        return Ok(new
-        {
-            Id = metadata.Id,
-            FileType = metadata.FileType,
-            RequestId = metadata.RequestId,
-            BucketName = metadata.BucketName,
-            ObjectName = metadata.ObjectName,
-            Url = metadata.Url,
-            OriginalFileName = metadata.OriginalFileName,
-            UploadStatus = metadata.UploadStatus,
-            UploadedAtUtc = metadata.UploadedAtUtc,
-            UpdatedAtUtc = metadata.UpdatedAtUtc
-        });
+        return this.ToActionResult(result);
     }
 
     [HttpGet]
     public IActionResult 목록조회([FromQuery] string? fileType, [FromQuery] string? requestId)
     {
-        var items = _store.List(fileType, requestId)
-            .Select(x => new
-            {
-                Id = x.Id,
-                FileType = x.FileType,
-                RequestId = x.RequestId,
-                BucketName = x.BucketName,
-                ObjectName = x.ObjectName,
-                Url = x.Url,
-                OriginalFileName = x.OriginalFileName,
-                UploadStatus = x.UploadStatus,
-                UploadedAtUtc = x.UploadedAtUtc,
-                UpdatedAtUtc = x.UpdatedAtUtc
-            })
-            .ToList();
-
-        return Ok(items);
+        var result = _useCase.목록조회(fileType, requestId);
+        return this.ToActionResult(result);
     }
 
     [HttpPatch("{id:guid}/status")]
     public IActionResult 업로드상태변경(Guid id, [FromBody] 파일POD상태변경요청 request)
     {
-        if (request == null || string.IsNullOrWhiteSpace(request.UploadStatus))
-        {
-            return this.ToProblemActionResult("uploadStatus is required");
-        }
-
-        var updated = _store.UpdateStatus(id, request.UploadStatus.Trim());
-        if (updated == null)
-        {
-            return this.ToNotFoundProblem("파일 POD 정보를 찾을 수 없습니다.");
-        }
-
-        return Ok(new
-        {
-            Id = updated.Id,
-            FileType = updated.FileType,
-            RequestId = updated.RequestId,
-            BucketName = updated.BucketName,
-            ObjectName = updated.ObjectName,
-            Url = updated.Url,
-            OriginalFileName = updated.OriginalFileName,
-            UploadStatus = updated.UploadStatus,
-            UploadedAtUtc = updated.UploadedAtUtc,
-            UpdatedAtUtc = updated.UpdatedAtUtc
-        });
+        var result = _useCase.업로드상태변경(id, request?.UploadStatus);
+        return this.ToActionResult(result);
     }
 }

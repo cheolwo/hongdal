@@ -1,5 +1,5 @@
 using Hongdal.Contracts.Common.Hr;
-using Hongdal.Services.HumanResources;
+using Hongdal.Application.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.ApiMetadata;
@@ -13,11 +13,11 @@ namespace Hongdal.Controllers.Common;
 [Route("api/v1/work-relationship-snapshots")]
 public sealed class WorkRelationshipSnapshotsController : ControllerBase
 {
-    private readonly IWorkRelationshipSnapshotService _snapshotService;
+    private readonly I인연스냅샷조회UseCase _useCase;
 
-    public WorkRelationshipSnapshotsController(IWorkRelationshipSnapshotService snapshotService)
+    public WorkRelationshipSnapshotsController(I인연스냅샷조회UseCase useCase)
     {
-        _snapshotService = snapshotService;
+        _useCase = useCase;
     }
 
     [HttpGet("me")]
@@ -25,6 +25,6 @@ public sealed class WorkRelationshipSnapshotsController : ControllerBase
         [FromQuery] int take = 50,
         CancellationToken cancellationToken = default)
     {
-        return Ok(await _snapshotService.GetMineAsync(take, cancellationToken));
+        return Ok(await _useCase.내목록Async(take, cancellationToken));
     }
 }

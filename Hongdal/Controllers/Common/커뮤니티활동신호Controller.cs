@@ -7,24 +7,26 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hongdal.Controllers.Common;
 
 [HongdalApiVersion(HongdalProductVersion.V1_0)]
+[HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
 [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/activity-signals")]
-public sealed class CommunityActivitySignalsController : ControllerBase
+public sealed class 커뮤니티활동신호Controller : ControllerBase
 {
-    private readonly ICommunityActivitySignalService _signalService;
+    private readonly I커뮤니티활동신호UseCase _useCase;
 
-    public CommunityActivitySignalsController(ICommunityActivitySignalService signalService)
+    public 커뮤니티활동신호Controller(I커뮤니티활동신호UseCase useCase)
     {
-        _signalService = signalService;
+        _useCase = useCase;
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<CommunityActivitySignalListResponse>> Get(
+    public async Task<IActionResult> Get(
         [FromQuery] CommunityActivitySignalQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await _signalService.GetSignalsAsync(query, cancellationToken));
+        var result = await _useCase.조회Async(query, cancellationToken);
+        return this.ToActionResult(result);
     }
 }

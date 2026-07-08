@@ -76,6 +76,16 @@ public interface I화주운송의뢰UseCase
 [HongdalUseCaseActor(HongdalActor.Shipper)]
 [HongdalUseCaseActor(HongdalActor.Driver, HongdalUseCaseActorRole.Supporting)]
 [HongdalUseCaseActor(HongdalActor.Recipient, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "문서관리UseCase",
+    Condition = "인수증 거래, 전자서명, POD 증빙이 필요한 경우",
+    Summary = "운송 의뢰의 상차·하차 증빙을 문서 관리 흐름으로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "파일업로드UseCase",
+    Condition = "사진, 인수증, 서명 파일 같은 첨부 증빙이 제출되는 경우",
+    Summary = "운송 증빙 파일을 플랫폼 저장소 업로드 흐름으로 확장합니다.")]
 public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
 {
     private readonly ISender _sender;

@@ -15,6 +15,11 @@ public interface I용달기사프로필UseCase
 [HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
 [HongdalUseCase("기사 프로필 등록/조회", Summary = "기사가 운송 추천과 진행 업무에 참여할 수 있도록 기사 프로필과 역할 상태를 준비합니다.")]
 [HongdalUseCaseActor(HongdalActor.Driver)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "기사알림UseCase",
+    Condition = "기사 프로필 등록 후 추천, 배차, 운송 진행 알림을 받을 수 있게 하는 경우",
+    Summary = "기사 프로필 준비를 푸시 토큰과 알림 설정 흐름으로 확장합니다.")]
 public sealed class 용달기사프로필UseCase : I용달기사프로필UseCase
 {
     private readonly HongdalContext _db;

@@ -1,6 +1,7 @@
 using System.Security.Claims;
+using FluentResults;
+using Hongdal.Application.Evidence;
 using Hongdal.Controllers;
-using 홍달.Services.Audit;
 using 홍달.Services.Documents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,97 +15,74 @@ namespace Hongdal.Controllers.Admin.Evidence04;
 [Route("api/v1/admin/documents")]
 public sealed class 문서관리Controller : ControllerBase
 {
-    private readonly I문서관리Service _documentService;
-    private readonly I사용자행위로그Service _activityLogService;
+    private readonly I문서관리UseCase _useCase;
 
-    public 문서관리Controller(I문서관리Service documentService, I사용자행위로그Service activityLogService)
+    public 문서관리Controller(I문서관리UseCase useCase)
     {
-        _documentService = documentService;
-        _activityLogService = activityLogService;
+        _useCase = useCase;
     }
 
     [HttpGet("policies")]
-    public async Task<ActionResult<IReadOnlyList<문서정책요약응답>>> 정책목록조회(CancellationToken cancellationToken)
+    public async Task<IActionResult> 정책목록조회(CancellationToken cancellationToken)
     {
-        return Ok(await _documentService.GetPoliciesAsync(cancellationToken));
+        var result = await _useCase.정책목록조회Async(cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPut("policies/{documentCode}")]
     public async Task<IActionResult> 정책수정(string documentCode, [FromBody] 문서정책수정요청 request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(documentCode))
-        {
-            return this.ToProblemActionResult("documentCode is required");
-        }
-
-        var updated = await _documentService.UpdatePolicyAsync(documentCode.Trim(), request, cancellationToken);
-        return updated is null ? this.ToNotFoundProblem("문서 정책을 찾을 수 없습니다.") : Ok(updated);
+        var result = await _useCase.정책수정Async(documentCode, request, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<문서조회요약응답>>> 목록조회([FromQuery] string? documentCode, [FromQuery] string? requestId, [FromQuery] string? status, CancellationToken cancellationToken)
+    public async Task<IActionResult> 목록조회([FromQuery] string? documentCode, [FromQuery] string? requestId, [FromQuery] string? status, CancellationToken cancellationToken)
     {
-        return Ok(await _documentService.ListDocumentsAsync(documentCode, requestId, status, cancellationToken));
+        var result = await _useCase.목록조회Async(documentCode, requestId, status, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("logs")]
-    public async Task<ActionResult<IReadOnlyList<문서조회로그요약응답>>> 로그목록조회([FromQuery] long? documentId, CancellationToken cancellationToken)
+    public async Task<IActionResult> 로그목록조회([FromQuery] long? documentId, CancellationToken cancellationToken)
     {
-        return Ok(await _documentService.ListLogsAsync(documentId, cancellationToken));
+        var result = await _useCase.로그목록조회Async(documentId, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
     [RequestSizeLimit(50_000_000)]
     public async Task<IActionResult> 업로드([FromForm] 문서업로드요청 request, CancellationToken cancellationToken)
     {
-        if (request?.File is null || request.File.Length <= 0)
-        {
-            return this.ToProblemActionResult("file is required");
-        }
+        var result = await _useCase.업로드Async(new 문서업로드Command(
+            request?.File,
+            request?.의뢰Id,
+            request?.배송운송Id,
+            request?.문서코드,
+            request?.문서명,
+            request?.암호화여부,
+            request?.다운로드허용여부,
+            User.Identity?.Name), cancellationToken);
 
-        await using var stream = request.File.OpenReadStream();
-        var created = await _documentService.CreateDocumentAsync(new 문서생성요청
-        {
-            의뢰Id = request.의뢰Id,
-            배송운송Id = request.배송운송Id,
-            문서코드 = request.문서코드,
-            문서명 = request.문서명,
-            파일명 = request.File.FileName,
-            ContentType = request.File.ContentType,
-            암호화여부 = request.암호화여부,
-            다운로드허용여부 = request.다운로드허용여부,
-            생성자 = User.Identity?.Name
-        }, stream, cancellationToken);
-
-        return CreatedAtAction(nameof(문서다운로드), new { id = created!.Id }, created);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(문서다운로드), new { id = result.Value.Id }, result.Value)
+            : this.ToActionResult(result);
     }
 
     [HttpGet("{id:long}/download")]
     public async Task<IActionResult> 문서다운로드(long id, CancellationToken cancellationToken)
     {
-        var result = await _documentService.DownloadAsync(id, cancellationToken);
-        if (result is null)
-        {
-            return this.ToNotFoundProblem("문서를 찾을 수 없습니다.");
-        }
+        var result = await _useCase.다운로드Async(id, new 문서다운로드Context(
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
+            User.Identity?.Name ?? string.Empty,
+            User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
+            Request.Path.Value ?? string.Empty,
+            HttpContext.TraceIdentifier,
+            HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
+            Request.Headers.UserAgent.ToString()), cancellationToken);
 
-        await _activityLogService.기록Async(new 사용자행위로그기록
-        {
-            AppKey = Hongdal.Contracts.Common.ViewSettings.App식별자.HongdalAdmin,
-            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
-            UserName = User.Identity?.Name ?? string.Empty,
-            RoleName = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
-            ActionType = "Document",
-            ActionName = "Download",
-            Route = Request.Path.Value ?? string.Empty,
-            TraceId = HttpContext.TraceIdentifier,
-            IsSuccess = true,
-            ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
-            UserAgent = Request.Headers.UserAgent.ToString(),
-            OccurredAtUtc = DateTime.UtcNow,
-            MetadataJson = $"{{\"documentId\":{id}}}"
-        }, cancellationToken);
-
-        return File(result.내용, result.ContentType, result.파일명);
+        return result.IsSuccess
+            ? File(result.Value.내용, result.Value.ContentType, result.Value.파일명)
+            : this.ToActionResult(result);
     }
 }

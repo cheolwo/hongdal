@@ -9,8 +9,15 @@ Hongdal은 주문자, 화주, 기사, 창고, 관세사, 운영자가 같은 업
 2026-07-08 기준 최신 반영본은 홍달 1.0 국내 화물/용달 운송을 중심축으로 두고, 공동주문 수입, 창고 입출고, 판매채널 출고, 커뮤니티 신뢰 흐름이 어떤 유스케이스와 액터로 성립되는지 코드와 문서에 함께 드러나도록 정리했습니다.
 
 - `HongdalUseCaseAttribute`, `HongdalUseCaseActorAttribute`를 추가해 유스케이스의 워크플로우, 주 액터, 보조 액터, 표시 이름을 메타데이터로 기록합니다.
-- `GET /api/v1/version-feature-flags` 응답에 워크플로우별 `UseCases`를 포함해 앱과 운영 화면에서 필요한 유스케이스 목록을 조회할 수 있게 했습니다.
-- 인증, 화주 운송 의뢰, 기사 추천, 기사 프로필, 기사 알림, 창고 작업, 판매채널, 커뮤니티 게시판, 공동구매 자동 집단화, 공동구매 커머스 이행 계획을 유스케이스 중심 구조로 정리했습니다.
+- `HongdalUseCaseRelationAttribute`를 추가해 유스케이스 사이의 `Include`/`Extend` 관계를 기록하고, `GET /api/v1/version-feature-flags` 응답에서 워크플로우별 `UseCases[].Relations`로 조회할 수 있게 했습니다.
+- 인증, 화주 운송 의뢰, 기사 추천, 기사 프로필, 기사 알림, 창고 작업, 판매채널, 커뮤니티 게시판, 커뮤니티 게시글, 커뮤니티 투표, 커뮤니티 활동 신호, 공동구매 자동 집단화, 공동구매 커머스 이행 계획, 공동구매 해외 선적 추적을 유스케이스 중심 구조로 정리했습니다.
+- 커뮤니티 게시글, 첨부, 댓글, 추천, 신고, 운영자 고정/숨김 처리는 `커뮤니티게시글UseCase`로 옮겨 컨트롤러가 HTTP 라우팅과 응답 변환만 맡도록 정리했습니다.
+- 한글 도메인 명명 규칙에 따라 커뮤니티 유스케이스와 컨트롤러는 `커뮤니티게시판UseCase`, `커뮤니티게시글Controller`, `커뮤니티투표UseCase`, `커뮤니티활동신호UseCase`처럼 도메인 명사는 한글로 두고 `UseCase`, `Service`, `Controller` 같은 기술 접미사는 유지합니다.
+- 공공 데이터 조회, 파일 업로드, 파일 POD, 문서 관리, 샘플 이미지 작업, ISMS-P 전송 보호도 유스케이스로 분리해 컨트롤러가 HTTP 경계만 맡도록 정리했습니다.
+- 관리자 보조 기능 설정은 `보조기능설정UseCase`로 분리해 전역/사용자별 기능 설정, 초기화, 감사 로그 기록을 컨트롤러 밖에서 처리하도록 정리했습니다.
+- HS 코드 운영은 `HS코드운영UseCase`로 분리해 코드 목록 조회, 업무 분류 보정, 통관 주의 태그 저장, 관세사/운영자 감사 로그 기록을 컨트롤러 밖에서 처리하도록 정리했습니다.
+- 참여 인력 관리 흐름은 `HR참여운영UseCase`, `사회보험신고UseCase`, `인연스냅샷조회UseCase`, `플랫폼수익환급UseCase`로 나누어 계약, 급여 스케줄, 4대보험 신고 준비, 참여 보상 환급을 컨트롤러 밖에서 처리합니다.
+- `VersionFeatureFlagsController`의 워크플로우/유스케이스 조립 로직은 `버전워크플로우UseCase`로 이동해 버전 플래그 API도 같은 유스케이스 메타데이터 규칙을 따릅니다.
 - 공동주문 수입이 보세구역 반출 뒤 국내 화물 운송이나 3PL 입고로 이어질 수 있도록 배차대기, 기사 추천 표시, 관리자/주문자 앱 샘플 데이터를 연결했습니다.
 - 공동구매, 주문자 집단, 해외 선적, 수입 물류, 커머스 이행 관련 도메인 파일명을 한글 중심으로 정리하고 기존 테스트도 같은 기준으로 맞췄습니다.
 - 주요 엔진 정리는 `docs/Architecture/EngineOverview.md`, 워크플로우/유스케이스/액터 정책은 `docs/ProjectOverview/workflow-api-policy.md`에 둡니다.
@@ -41,6 +48,70 @@ flowchart TD
 
     Shipper --> AdminWait --> DriverReco --> DriverDecision --> DriverRun --> PickupDropoff --> AdminTrans
     AdminTrans --> Shipper
+```
+
+### 1.0 유스케이스 관계
+
+아래 다이어그램은 홍달 1.0 국내 화물/용달 운송에 직접 적용되는 유스케이스 관계만 추린 것입니다. 화살표는 코드에 기록된 `HongdalUseCaseRelationAttribute`의 `Source UseCase -> Target UseCase` 방향을 따릅니다.
+
+```mermaid
+flowchart LR
+    ShipperActor(["화주"])
+    DriverActor(["기사"])
+    RecipientActor(["수령자"])
+    OperatorActor(["플랫폼 운영자"])
+
+    subgraph Core["운송 실행"]
+        Request["화주운송의뢰UseCase<br/>의뢰·결제·인수증"]
+        Recommendation["기사배차추천UseCase<br/>추천 목록·상세"]
+        DriverProfile["용달기사프로필UseCase<br/>기사 등록·차량·역할"]
+        DriverNotification["기사알림UseCase<br/>푸시토큰·알림 설정"]
+    end
+
+    subgraph Evidence["증빙·문서"]
+        FileUpload["파일업로드UseCase<br/>사진·서명·첨부 업로드"]
+        Document["문서관리UseCase<br/>인수증·POD 문서·감사 로그"]
+        FilePod["파일POD관리UseCase<br/>POD 파일 상태 관리"]
+        AuditLog["사용자행위로그조회UseCase<br/>다운로드·조회 이력"]
+    end
+
+    subgraph Operation["운영·화면·보안"]
+        ViewSetting["View설정UseCase<br/>사용자 화면 설정"]
+        AdminViewPolicy["관리자View정책UseCase<br/>화면 노출 정책"]
+        AuxiliaryFeature["보조기능설정UseCase<br/>Command 보조 기능"]
+        TransportSecurity["ISMSP전송보호UseCase<br/>전송 공개키"]
+        WorkflowVersion["버전워크플로우UseCase<br/>워크플로우·관계 조회"]
+    end
+
+    ShipperActor --> Request
+    RecipientActor --> Request
+    DriverActor --> DriverProfile
+    DriverActor --> Recommendation
+    DriverActor --> DriverNotification
+    OperatorActor --> FilePod
+    OperatorActor --> Document
+    OperatorActor --> AdminViewPolicy
+    OperatorActor --> AuxiliaryFeature
+    OperatorActor --> TransportSecurity
+    OperatorActor --> WorkflowVersion
+
+    Recommendation -. "<<include>>" .-> DriverProfile
+    DriverNotification -. "<<include>>" .-> DriverProfile
+    DriverProfile -. "<<extend>>" .-> DriverNotification
+    DriverNotification -. "<<extend>>" .-> Recommendation
+
+    Request -. "<<extend>>" .-> Document
+    Request -. "<<extend>>" .-> FileUpload
+    Document -. "<<include>>" .-> FileUpload
+    Document -. "<<include>>" .-> AuditLog
+    FilePod -. "<<include>>" .-> FileUpload
+    FilePod -. "<<extend>>" .-> Document
+
+    ViewSetting -. "<<include>>" .-> AdminViewPolicy
+    ViewSetting -. "<<extend>>" .-> AuxiliaryFeature
+    AdminViewPolicy -. "<<extend>>" .-> ViewSetting
+    AdminViewPolicy -. "<<extend>>" .-> AuxiliaryFeature
+    AuxiliaryFeature -. "<<include>>" .-> AdminViewPolicy
 ```
 
 ## 확장 워크플로우의 합류 지점

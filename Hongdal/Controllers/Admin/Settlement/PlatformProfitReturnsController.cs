@@ -1,7 +1,7 @@
 using Hongdal.Contracts.Common.PlatformProfit;
+using Hongdal.Application.Settlement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using 홍달.Services.Settlement;
 using Hongdal.ApiMetadata;
 
 namespace Hongdal.Controllers.Admin.Settlement;
@@ -12,48 +12,48 @@ namespace Hongdal.Controllers.Admin.Settlement;
 [Route("api/v1/admin/platform-profit-returns")]
 public sealed class PlatformProfitReturnsController : ControllerBase
 {
-    private readonly IPlatformProfitReturnService _profitReturnService;
+    private readonly I플랫폼수익환급UseCase _useCase;
 
-    public PlatformProfitReturnsController(IPlatformProfitReturnService profitReturnService)
+    public PlatformProfitReturnsController(I플랫폼수익환급UseCase useCase)
     {
-        _profitReturnService = profitReturnService;
+        _useCase = useCase;
     }
 
     [HttpPost("revenues")]
-    public async Task<ActionResult<PlatformRevenueEntryResponse>> RecordRevenue(
+    public async Task<IActionResult> RecordRevenue(
         [FromBody] PlatformRevenueEntryRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await _profitReturnService.RecordRevenueAsync(request, cancellationToken);
-        return Ok(response);
+        var result = await _useCase.수익기록Async(request, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost("policies")]
-    public async Task<ActionResult<PlatformProfitReturnPolicyResponse>> CreatePolicy(
+    public async Task<IActionResult> CreatePolicy(
         [FromBody] PlatformProfitReturnPolicyRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await _profitReturnService.CreatePolicyAsync(request, cancellationToken);
-        return Ok(response);
+        var result = await _useCase.정책생성Async(request, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost("schedules")]
-    public async Task<ActionResult<PlatformProfitReturnPlanResponse>> CreateSchedules(
+    public async Task<IActionResult> CreateSchedules(
         [FromBody] PlatformProfitReturnScheduleCreateRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await _profitReturnService.CreateReturnSchedulesAsync(request, cancellationToken);
-        return Ok(response);
+        var result = await _useCase.스케줄생성Async(request, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("schedules")]
-    public async Task<ActionResult<PlatformProfitReturnScheduleListResponse>> ListSchedules(
+    public async Task<IActionResult> ListSchedules(
         [FromQuery] string? participantUserId,
         [FromQuery] DateOnly? from,
         [FromQuery] DateOnly? to,
         CancellationToken cancellationToken)
     {
-        var items = await _profitReturnService.ListSchedulesAsync(participantUserId, from, to, cancellationToken);
-        return Ok(new PlatformProfitReturnScheduleListResponse { Items = items });
+        var result = await _useCase.스케줄목록Async(participantUserId, from, to, cancellationToken);
+        return this.ToActionResult(result);
     }
 }

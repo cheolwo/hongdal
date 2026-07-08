@@ -67,6 +67,8 @@ public sealed class WorkflowUseCaseDto
     public IReadOnlyList<WorkflowUseCaseActorDto> PrimaryActors { get; init; } = [];
 
     public IReadOnlyList<WorkflowUseCaseActorDto> SupportingActors { get; init; } = [];
+
+    public IReadOnlyList<WorkflowUseCaseRelationDto> Relations { get; init; } = [];
 }
 
 public sealed class WorkflowUseCaseActorDto
@@ -78,6 +80,19 @@ public sealed class WorkflowUseCaseActorDto
     public string RoleCode { get; init; } = string.Empty;
 
     public string RoleName { get; init; } = string.Empty;
+}
+
+public sealed class WorkflowUseCaseRelationDto
+{
+    public string RelationKindCode { get; init; } = string.Empty;
+
+    public string RelationKindName { get; init; } = string.Empty;
+
+    public string TargetUseCaseCode { get; init; } = string.Empty;
+
+    public string Condition { get; init; } = string.Empty;
+
+    public string Summary { get; init; } = string.Empty;
 }
 
 public sealed class WorkflowRelationDto

@@ -13,9 +13,21 @@ public interface IView설정UseCase
     Task<Result> 저장Async(사용자View가시성수정요청? request, View설정요청Context context, CancellationToken cancellationToken);
 }
 
+[HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
+[HongdalUseCase("사용자 View 설정", Summary = "사용자가 역할과 앱에 맞는 화면 노출 상태를 조회하고 개인별 화면 설정을 저장합니다.")]
 [HongdalUseCaseActor(HongdalActor.Driver)]
 [HongdalUseCaseActor(HongdalActor.Shipper)]
 [HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Include,
+    "관리자View정책UseCase",
+    Condition = "사용자별 화면 노출 가능 여부를 계산하는 경우",
+    Summary = "사용자 View 설정은 관리자가 정한 화면 정책을 포함해 최종 노출 상태를 결정합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "보조기능설정UseCase",
+    Condition = "화면 안의 선택 기능이나 Command 보조 기능을 사용자별로 켜고 끄는 경우",
+    Summary = "화면 노출 설정을 보조 기능 설정과 Command 기능 정책으로 확장합니다.")]
 public sealed class View설정UseCase : IView설정UseCase
 {
     private readonly IView가시성Service _viewVisibilityService;

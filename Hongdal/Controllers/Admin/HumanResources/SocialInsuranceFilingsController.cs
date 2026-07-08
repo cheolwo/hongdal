@@ -1,8 +1,8 @@
 using Hongdal.Contracts.Common.Hr;
+using Hongdal.Application.HumanResources;
 using Hongdal.Controllers;
 using Hongdal.ApiMetadata;
 using Hongdal.Filters;
-using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using 홍달.Services.Versioning;
@@ -17,38 +17,36 @@ namespace Hongdal.Controllers.Admin.HumanResources;
 [Route("api/v1/admin/hr-social-insurance-filings")]
 public sealed class SocialInsuranceFilingsController : ControllerBase
 {
-    private readonly ISocialInsuranceFilingService _filingService;
+    private readonly I사회보험신고UseCase _useCase;
 
-    public SocialInsuranceFilingsController(ISocialInsuranceFilingService filingService)
+    public SocialInsuranceFilingsController(I사회보험신고UseCase useCase)
     {
-        _filingService = filingService;
+        _useCase = useCase;
     }
 
     [HttpGet]
-    public async Task<ActionResult<SocialInsuranceFilingPlanListResponse>> List(
+    public async Task<IActionResult> List(
         [FromQuery] string? workerUserId,
         [FromQuery] string? employerScopeType,
         [FromQuery] string? employerScopeId,
         [FromQuery] string? filingStatus,
         CancellationToken cancellationToken)
     {
-        var items = await _filingService.ListAsync(
+        var result = await _useCase.목록Async(
             workerUserId,
             employerScopeType,
             employerScopeId,
             filingStatus,
             cancellationToken);
 
-        return Ok(new SocialInsuranceFilingPlanListResponse { Items = items });
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
-        var plan = await _filingService.GetAsync(id, cancellationToken);
-        return plan is null
-            ? this.ToNotFoundProblem("Social insurance filing plan was not found.")
-            : Ok(plan);
+        var result = await _useCase.상세Async(id, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost("assess")]
@@ -56,15 +54,8 @@ public sealed class SocialInsuranceFilingsController : ControllerBase
         [FromBody] SocialInsuranceEligibilityAssessmentRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var assessment = await _filingService.AssessAsync(request, cancellationToken);
-            return Ok(assessment);
-        }
-        catch (ArgumentException ex)
-        {
-            return this.ToProblemActionResult(ex.Message);
-        }
+        var result = await _useCase.가입요건평가Async(request, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
@@ -72,15 +63,10 @@ public sealed class SocialInsuranceFilingsController : ControllerBase
         [FromBody] SocialInsuranceFilingPlanCreateRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var plan = await _filingService.CreatePlanAsync(request, cancellationToken);
-            return CreatedAtAction(nameof(Get), new { id = plan.Id }, plan);
-        }
-        catch (ArgumentException ex)
-        {
-            return this.ToProblemActionResult(ex.Message);
-        }
+        var result = await _useCase.계획생성Async(request, cancellationToken);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
+            : this.ToActionResult(result);
     }
 
     [HttpPatch("{id:guid}/status")]
@@ -89,18 +75,7 @@ public sealed class SocialInsuranceFilingsController : ControllerBase
         [FromBody] SocialInsuranceFilingStatusUpdateRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var plan = await _filingService.UpdateStatusAsync(id, request, cancellationToken);
-            return Ok(plan);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return this.ToNotFoundProblem(ex.Message);
-        }
-        catch (ArgumentException ex)
-        {
-            return this.ToProblemActionResult(ex.Message);
-        }
+        var result = await _useCase.상태수정Async(id, request, cancellationToken);
+        return this.ToActionResult(result);
     }
 }

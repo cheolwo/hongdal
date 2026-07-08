@@ -7,7 +7,7 @@ using 홍달.Data;
 
 namespace Hongdal.Services.Community;
 
-public interface IPlatformCommunityBoardUseCase
+public interface I커뮤니티게시판UseCase
 {
     Task<Result<PlatformCommunityBoardListResponse>> 목록Async(string? appKey, string? status, CancellationToken cancellationToken);
     Task<Result<PlatformCommunityBoardResponse>> 신청Async(PlatformCommunityBoardCreateRequest? request, CancellationToken cancellationToken);
@@ -19,11 +19,16 @@ public interface IPlatformCommunityBoardUseCase
 [HongdalUseCase("커뮤니티 게시판 개설", Summary = "커뮤니티 참여자가 게시판 개설을 신청하고 운영자가 승인 또는 반려합니다.")]
 [HongdalUseCaseActor(HongdalActor.CommunityMember)]
 [HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
-public sealed class PlatformCommunityBoardUseCase : IPlatformCommunityBoardUseCase
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "커뮤니티게시글UseCase",
+    Condition = "게시판 개설 신청이 승인되어 실제 글 작성 공간이 열리는 경우",
+    Summary = "게시판 개설 흐름을 게시글 작성과 댓글 운영 흐름으로 확장합니다.")]
+public sealed class 커뮤니티게시판UseCase : I커뮤니티게시판UseCase
 {
     private readonly HongdalContext _db;
 
-    public PlatformCommunityBoardUseCase(HongdalContext db)
+    public 커뮤니티게시판UseCase(HongdalContext db)
     {
         _db = db;
     }

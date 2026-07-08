@@ -2,6 +2,7 @@ using System.Reflection;
 using Hongdal.Application.Driver.Recommendation;
 using Hongdal.Application.Sales;
 using Hongdal.Application.Shipper.Request;
+using Hongdal.Application.Versioning;
 using Hongdal.Application.Warehouse;
 using Hongdal.ApiMetadata;
 using Hongdal.Controllers.Admin.HumanResources;
@@ -9,6 +10,7 @@ using Hongdal.Controllers.Admin.Orderer;
 using Hongdal.Controllers.Common;
 using Hongdal.Controllers.Orderer;
 using Hongdal.Filters;
+using Hongdal.Services.Community;
 using Hongdal.Services.Orderer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -78,6 +80,14 @@ public sealed class HongdalApiVersionAttributeTests
     public void GetLabel_ReturnsStableUseCaseActorRoleLabel(HongdalUseCaseActorRole role, string expected)
     {
         Assert.Equal(expected, HongdalUseCaseActorRoleLabels.GetLabel(role));
+    }
+
+    [Theory]
+    [InlineData(HongdalUseCaseRelationKind.Include, "포함")]
+    [InlineData(HongdalUseCaseRelationKind.Extend, "확장")]
+    public void GetLabel_ReturnsStableUseCaseRelationKindLabel(HongdalUseCaseRelationKind kind, string expected)
+    {
+        Assert.Equal(expected, HongdalUseCaseRelationKindLabels.GetLabel(kind));
     }
 
     [Fact]
@@ -158,6 +168,15 @@ public sealed class HongdalApiVersionAttributeTests
     }
 
     [Fact]
+    public void CoreUseCases_RecordIncludeAndExtendRelations()
+    {
+        AssertUseCaseHasRelation(typeof(공동구매자동집단화UseCase), HongdalUseCaseRelationKind.Include, "공공데이터조회UseCase");
+        AssertUseCaseHasRelation(typeof(화주운송의뢰UseCase), HongdalUseCaseRelationKind.Extend, "문서관리UseCase");
+        AssertUseCaseHasRelation(typeof(공동구매커머스이행계획UseCase), HongdalUseCaseRelationKind.Extend, "화주운송의뢰UseCase");
+        AssertUseCaseHasRelation(typeof(커뮤니티게시글UseCase), HongdalUseCaseRelationKind.Extend, "커뮤니티투표UseCase");
+    }
+
+    [Fact]
     public void WorkflowScreens_RecordAppAndScreenBoundaries()
     {
         var domesticScreens = HongdalWorkflowScreens.GetByWorkflow(HongdalWorkflow.DomesticTransport);
@@ -181,7 +200,8 @@ public sealed class HongdalApiVersionAttributeTests
     [Fact]
     public void VersionFeatureFlagsController_ReturnsWorkflowStatesAndRelations()
     {
-        var controller = new VersionFeatureFlagsController(new FakeVersionFeatureFlagService());
+        var controller = new VersionFeatureFlagsController(
+            new 버전워크플로우UseCase(new FakeVersionFeatureFlagService()));
 
         var result = controller.Get();
         var ok = Assert.IsType<OkObjectResult>(result.Result);
@@ -194,11 +214,17 @@ public sealed class HongdalApiVersionAttributeTests
             workflow.Participants.Any(participant => participant.ActorName == "주문자 집단 대표" && participant.IsPrimary) &&
             workflow.Screens.Any(screen => screen.AppCode == "OrdererApp" && screen.Route == "/group-purchase") &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(공동구매자동집단화UseCase) &&
-                useCase.PrimaryActors.Any(actor => actor.ActorCode == nameof(HongdalActor.Orderer))) &&
+                useCase.PrimaryActors.Any(actor => actor.ActorCode == nameof(HongdalActor.Orderer)) &&
+                useCase.Relations.Any(relation =>
+                    relation.RelationKindCode == nameof(HongdalUseCaseRelationKind.Include) &&
+                    relation.TargetUseCaseCode == "공공데이터조회UseCase")) &&
             !string.IsNullOrWhiteSpace(workflow.BoundarySummary));
         Assert.Contains(response.Workflows, workflow =>
             workflow.WorkflowCode == nameof(HongdalWorkflow.DomesticTransport) &&
-            workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(화주운송의뢰UseCase)) &&
+            workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(화주운송의뢰UseCase) &&
+                useCase.Relations.Any(relation =>
+                    relation.RelationKindCode == nameof(HongdalUseCaseRelationKind.Extend) &&
+                    relation.TargetUseCaseCode == "문서관리UseCase")) &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(기사배차추천UseCase)));
         Assert.Contains(response.WorkflowRelations, relation =>
             relation.SourceWorkflowName == "공동주문 수입" &&
@@ -293,9 +319,9 @@ public sealed class HongdalApiVersionAttributeTests
     {
         var missingCommunityTrack = new List<string>();
 
-        AddIfMissingCommunityTrack(typeof(PlatformCommunityPostsController), missingCommunityTrack);
-        AddIfMissingCommunityTrack(typeof(CommunityActivitySignalsController), missingCommunityTrack);
-        AddIfMissingCommunityTrack(typeof(CommunityVotesController), missingCommunityTrack);
+        AddIfMissingCommunityTrack(typeof(커뮤니티게시글Controller), missingCommunityTrack);
+        AddIfMissingCommunityTrack(typeof(커뮤니티활동신호Controller), missingCommunityTrack);
+        AddIfMissingCommunityTrack(typeof(커뮤니티투표Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(인연연결Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(감사메시지Controller), missingCommunityTrack);
         AddIfMissingCommunityTrack(typeof(WorkRelationshipSnapshotsController), missingCommunityTrack);
@@ -397,6 +423,15 @@ public sealed class HongdalApiVersionAttributeTests
         Assert.Contains(workflowAttributes, attribute => attribute.Workflow == workflow);
         Assert.NotNull(useCaseAttribute);
         Assert.False(string.IsNullOrWhiteSpace(useCaseAttribute!.Name));
+    }
+
+    private static void AssertUseCaseHasRelation(Type useCaseType, HongdalUseCaseRelationKind kind, string targetUseCaseCode)
+    {
+        var relationAttributes = useCaseType.GetCustomAttributes<HongdalUseCaseRelationAttribute>(inherit: true);
+        Assert.Contains(relationAttributes, attribute =>
+            attribute.Kind == kind &&
+            attribute.TargetUseCaseCode == targetUseCaseCode &&
+            !string.IsNullOrWhiteSpace(attribute.Summary));
     }
 
     private sealed class FakeVersionFeatureFlagService : IVersionFeatureFlagService

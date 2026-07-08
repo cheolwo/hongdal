@@ -1,6 +1,6 @@
 using Hongdal.Contracts.Common.Hr;
+using Hongdal.Application.HumanResources;
 using Hongdal.Controllers;
-using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.ApiMetadata;
@@ -13,21 +13,21 @@ namespace Hongdal.Controllers.Admin.HumanResources;
 [Route("api/v1/admin/hr-participation-benefits")]
 public sealed class HrParticipationBenefitsController : ControllerBase
 {
-    private readonly IHrParticipationBenefitRecordService _recordService;
+    private readonly IHR참여운영UseCase _useCase;
 
-    public HrParticipationBenefitsController(IHrParticipationBenefitRecordService recordService)
+    public HrParticipationBenefitsController(IHR참여운영UseCase useCase)
     {
-        _recordService = recordService;
+        _useCase = useCase;
     }
 
     [HttpGet]
-    public async Task<ActionResult<HrParticipationBenefitRecordListResponse>> List(
+    public async Task<IActionResult> List(
         [FromQuery] string? userId,
         [FromQuery] string? sourceType,
         CancellationToken cancellationToken)
     {
-        var items = await _recordService.ListAsync(userId, sourceType, cancellationToken);
-        return Ok(new HrParticipationBenefitRecordListResponse { Items = items });
+        var result = await _useCase.참여혜택목록Async(userId, sourceType, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost("transfer")]
@@ -35,14 +35,9 @@ public sealed class HrParticipationBenefitsController : ControllerBase
         [FromBody] HrParticipationBenefitTransferRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var record = await _recordService.TransferAsync(request, cancellationToken);
-            return CreatedAtAction(nameof(List), new { userId = record.UserId }, record);
-        }
-        catch (ArgumentException ex)
-        {
-            return this.ToProblemActionResult(ex.Message);
-        }
+        var result = await _useCase.참여혜택전환Async(request, cancellationToken);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(List), new { userId = result.Value.UserId }, result.Value)
+            : this.ToActionResult(result);
     }
 }

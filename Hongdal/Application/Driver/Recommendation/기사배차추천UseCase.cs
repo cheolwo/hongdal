@@ -51,6 +51,11 @@ public interface I기사배차추천UseCase
 [HongdalUseCase("기사 배차 추천 조회", Summary = "기사에게 일반 화물, 공동주문 운송, 공개 배차, 전국콜 후보를 추천하고 상세를 조회합니다.")]
 [HongdalUseCaseActor(HongdalActor.Driver)]
 [HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Include,
+    "용달기사프로필UseCase",
+    Condition = "기사 추천 후보를 산정하기 전",
+    Summary = "기사 추천은 기사 프로필, 차량, 운행 가능 상태를 전제로 합니다.")]
 public sealed class 기사배차추천UseCase : I기사배차추천UseCase
 {
     private readonly I배차추천Service _배차추천Service;

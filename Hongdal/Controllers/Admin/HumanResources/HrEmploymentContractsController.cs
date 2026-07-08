@@ -1,6 +1,6 @@
 using Hongdal.Contracts.Common.Hr;
+using Hongdal.Application.HumanResources;
 using Hongdal.Controllers;
-using Hongdal.Services.HumanResources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hongdal.ApiMetadata;
@@ -13,62 +13,59 @@ namespace Hongdal.Controllers.Admin.HumanResources;
 [Route("api/v1/admin/hr-employment-contracts")]
 public sealed class HrEmploymentContractsController : ControllerBase
 {
-    private readonly IHrEmploymentContractService _contractService;
+    private readonly IHR참여운영UseCase _useCase;
 
-    public HrEmploymentContractsController(IHrEmploymentContractService contractService)
+    public HrEmploymentContractsController(IHR참여운영UseCase useCase)
     {
-        _contractService = contractService;
+        _useCase = useCase;
     }
 
     [HttpGet]
-    public async Task<ActionResult<HrEmploymentContractListResponse>> List(
+    public async Task<IActionResult> List(
         [FromQuery] string? workerUserId,
         [FromQuery] string? employerScopeType,
         [FromQuery] string? employerScopeId,
         CancellationToken cancellationToken)
     {
-        var items = await _contractService.ListAsync(workerUserId, employerScopeType, employerScopeId, cancellationToken);
-        return Ok(new HrEmploymentContractListResponse { Items = items });
+        var result = await _useCase.고용계약목록Async(workerUserId, employerScopeType, employerScopeId, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{contractId:guid}")]
     public async Task<IActionResult> Get(Guid contractId, CancellationToken cancellationToken)
     {
-        var contract = await _contractService.GetAsync(contractId, cancellationToken);
-        return contract is null ? this.ToNotFoundProblem("HR 고용계약을 찾을 수 없습니다.") : Ok(contract);
+        var result = await _useCase.고용계약상세Async(contractId, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<HrEmploymentContractResponse>> CreateDraft(
+    public async Task<IActionResult> CreateDraft(
         [FromBody] HrEmploymentContractDraftRequest request,
         CancellationToken cancellationToken)
     {
-        var contract = await _contractService.CreateDraftAsync(request, cancellationToken);
-        return CreatedAtAction(nameof(Get), new { contractId = contract.Id }, contract);
+        var result = await _useCase.고용계약초안생성Async(request, cancellationToken);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(Get), new { contractId = result.Value.Id }, result.Value)
+            : this.ToActionResult(result);
     }
 
     [HttpPost("{contractId:guid}/sign")]
-    public async Task<ActionResult<HrEmploymentContractResponse>> Sign(
+    public async Task<IActionResult> Sign(
         Guid contractId,
         [FromBody] HrEmploymentContractSignRequest request,
         CancellationToken cancellationToken)
     {
-        var contract = await _contractService.SignAsync(contractId, request.SignedByUserId, cancellationToken);
-        return Ok(contract);
+        var result = await _useCase.고용계약서명Async(contractId, request, cancellationToken);
+        return this.ToActionResult(result);
     }
 
     [HttpPost("{contractId:guid}/payroll-schedules")]
-    public async Task<ActionResult<HrPayrollScheduleListResponse>> CreatePayrollSchedules(
+    public async Task<IActionResult> CreatePayrollSchedules(
         Guid contractId,
         [FromBody] HrPayrollScheduleCreateRequest request,
         CancellationToken cancellationToken)
     {
-        var schedules = await _contractService.CreatePayrollSchedulesAsync(
-            contractId,
-            request.ScheduleStartDate,
-            request.ScheduleEndDate,
-            cancellationToken);
-
-        return Ok(new HrPayrollScheduleListResponse { Items = schedules });
+        var result = await _useCase.급여스케줄생성Async(contractId, request, cancellationToken);
+        return this.ToActionResult(result);
     }
 }

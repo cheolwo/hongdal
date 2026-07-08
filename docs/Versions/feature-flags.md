@@ -70,7 +70,7 @@ public sealed class 공동구매해외선적추적Controller : ControllerBase
 ```csharp
 [HongdalApiVersion(HongdalProductVersion.V1_0)]
 [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
-public sealed class PlatformCommunityPostsController : ControllerBase
+public sealed class 커뮤니티게시글Controller : ControllerBase
 {
 }
 ```

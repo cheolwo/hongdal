@@ -1,30 +1,81 @@
-using System.Security.Claims;
-using Hongdal.Application.CommandProcessing;
-using Hongdal.Controllers;
-using Hongdal.Contracts.Common.ViewSettings;
+using System.Text.Json;
+using FluentResults;
+using Hongdal.ApiMetadata;
 using Hongdal.Contracts.CommandSettings;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Hongdal.Contracts.Common.ViewSettings;
+using Hongdal.Application.CommandProcessing;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
-using 홍달.도메인.설정;
 using 홍달.Services.Audit;
-using Hongdal.ApiMetadata;
+using 홍달.도메인.설정;
 
-namespace Hongdal.Controllers.Admin;
+namespace Hongdal.Application.ViewSettings;
 
-[HongdalApiVersion(HongdalProductVersion.V1_0)]
-[ApiController]
-[Authorize(Policy = "서버관리자전용")]
-[Route("api/v1/admin/auxiliary-feature-settings")]
-public sealed class AuxiliaryFeatureSettingsController : ControllerBase
+public interface I보조기능설정UseCase
+{
+    Task<Result<AuxiliaryFeatureSettingsResponse>> 목록Async(
+        string? userId,
+        CancellationToken cancellationToken);
+
+    Task<Result> 전역설정Async(
+        string targetType,
+        string targetName,
+        string featureName,
+        AuxiliaryFeatureSettingUpdateRequest? request,
+        보조기능설정감사Context auditContext,
+        CancellationToken cancellationToken);
+
+    Task<Result> 전역초기화Async(
+        string targetType,
+        string targetName,
+        string featureName,
+        보조기능설정감사Context auditContext,
+        CancellationToken cancellationToken);
+
+    Task<Result> 사용자설정Async(
+        string userId,
+        string targetType,
+        string targetName,
+        string featureName,
+        AuxiliaryFeatureSettingUpdateRequest? request,
+        보조기능설정감사Context auditContext,
+        CancellationToken cancellationToken);
+
+    Task<Result> 사용자초기화Async(
+        string userId,
+        string targetType,
+        string targetName,
+        string featureName,
+        보조기능설정감사Context auditContext,
+        CancellationToken cancellationToken);
+}
+
+public sealed record 보조기능설정감사Context(
+    string AdminUserId,
+    string AdminUserName,
+    string AdminRoleName,
+    string Route,
+    string TraceId,
+    string ClientIp,
+    string UserAgent);
+
+[HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
+[HongdalUseCase("보조 기능 설정", Summary = "운영자가 Command와 화면 보조 기능의 전역/사용자별 활성 상태를 관리합니다.")]
+[HongdalUseCaseActor(HongdalActor.PlatformOperator)]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Include,
+    "관리자View정책UseCase",
+    Condition = "보조 기능이 특정 앱 화면의 운영 정책과 함께 적용되는 경우",
+    Summary = "보조 기능 설정은 관리자 View 정책과 함께 화면·기능 노출 판단을 구성합니다.")]
+public sealed class 보조기능설정UseCase : I보조기능설정UseCase
 {
     private readonly HongdalContext _db;
     private readonly ICommand기능설정Resolver _resolver;
     private readonly ICommand기능CatalogResolver _catalogResolver;
     private readonly I사용자행위로그Service _activityLogService;
 
-    public AuxiliaryFeatureSettingsController(
+    public 보조기능설정UseCase(
         HongdalContext db,
         ICommand기능설정Resolver resolver,
         ICommand기능CatalogResolver catalogResolver,
@@ -36,9 +87,8 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
         _activityLogService = activityLogService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<AuxiliaryFeatureSettingsResponse>> List(
-        [FromQuery] string? userId,
+    public async Task<Result<AuxiliaryFeatureSettingsResponse>> 목록Async(
+        string? userId,
         CancellationToken cancellationToken)
     {
         var normalizedUserId = NormalizeUserId(userId);
@@ -95,107 +145,117 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
             }
         }
 
-        return Ok(new AuxiliaryFeatureSettingsResponse { Items = items });
+        return Result.Ok(new AuxiliaryFeatureSettingsResponse { Items = items });
     }
 
-    [HttpPut("global/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> UpdateGlobal(
+    public async Task<Result> 전역설정Async(
         string targetType,
         string targetName,
         string featureName,
-        [FromBody] AuxiliaryFeatureSettingUpdateRequest request,
+        AuxiliaryFeatureSettingUpdateRequest? request,
+        보조기능설정감사Context auditContext,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest("request body is required");
+        }
+
         var validation = ValidateTarget(targetType, targetName, featureName);
-        if (validation is not null)
+        if (validation.IsFailed)
         {
             return validation;
         }
 
         var mutability = ValidateMutableFeature(featureName);
-        if (mutability is not null)
+        if (mutability.IsFailed)
         {
             return mutability;
         }
 
         await UpsertAsync(Command기능설정Resolver.GlobalUserId, ToStorageTargetName(targetType, targetName), featureName, request.IsEnabled, cancellationToken);
-        await LogAsync("GlobalFeatureChanged", targetType, targetName, featureName, request.IsEnabled, cancellationToken);
-        return NoContent();
+        await LogAsync("GlobalFeatureChanged", targetType, targetName, featureName, request.IsEnabled, auditContext, cancellationToken);
+        return Result.Ok();
     }
 
-    [HttpDelete("global/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> ResetGlobal(
+    public async Task<Result> 전역초기화Async(
         string targetType,
         string targetName,
         string featureName,
+        보조기능설정감사Context auditContext,
         CancellationToken cancellationToken)
     {
         var validation = ValidateTarget(targetType, targetName, featureName);
-        if (validation is not null)
+        if (validation.IsFailed)
         {
             return validation;
         }
 
         await DeleteAsync(Command기능설정Resolver.GlobalUserId, ToStorageTargetName(targetType, targetName), featureName, cancellationToken);
-        await LogAsync("GlobalFeatureReset", targetType, targetName, featureName, null, cancellationToken);
-        return NoContent();
+        await LogAsync("GlobalFeatureReset", targetType, targetName, featureName, null, auditContext, cancellationToken);
+        return Result.Ok();
     }
 
-    [HttpPut("users/{userId}/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> UpdateUser(
+    public async Task<Result> 사용자설정Async(
         string userId,
         string targetType,
         string targetName,
         string featureName,
-        [FromBody] AuxiliaryFeatureSettingUpdateRequest request,
+        AuxiliaryFeatureSettingUpdateRequest? request,
+        보조기능설정감사Context auditContext,
         CancellationToken cancellationToken)
     {
+        if (request is null)
+        {
+            return BadRequest("request body is required");
+        }
+
         var normalizedUserId = NormalizeUserId(userId);
         if (normalizedUserId is null)
         {
-            return this.ToProblemActionResult("userId is required.");
+            return BadRequest("userId is required.");
         }
 
         var validation = ValidateTarget(targetType, targetName, featureName);
-        if (validation is not null)
+        if (validation.IsFailed)
         {
             return validation;
         }
 
         var mutability = ValidateMutableFeature(featureName);
-        if (mutability is not null)
+        if (mutability.IsFailed)
         {
             return mutability;
         }
 
         await UpsertAsync(normalizedUserId, ToStorageTargetName(targetType, targetName), featureName, request.IsEnabled, cancellationToken);
-        await LogAsync("UserFeatureChanged", targetType, targetName, featureName, request.IsEnabled, cancellationToken, normalizedUserId);
-        return NoContent();
+        await LogAsync("UserFeatureChanged", targetType, targetName, featureName, request.IsEnabled, auditContext, cancellationToken, normalizedUserId);
+        return Result.Ok();
     }
 
-    [HttpDelete("users/{userId}/{targetType}/{targetName}/{featureName}")]
-    public async Task<IActionResult> ResetUser(
+    public async Task<Result> 사용자초기화Async(
         string userId,
         string targetType,
         string targetName,
         string featureName,
+        보조기능설정감사Context auditContext,
         CancellationToken cancellationToken)
     {
         var normalizedUserId = NormalizeUserId(userId);
         if (normalizedUserId is null)
         {
-            return this.ToProblemActionResult("userId is required.");
+            return BadRequest("userId is required.");
         }
 
         var validation = ValidateTarget(targetType, targetName, featureName);
-        if (validation is not null)
+        if (validation.IsFailed)
         {
             return validation;
         }
 
         await DeleteAsync(normalizedUserId, ToStorageTargetName(targetType, targetName), featureName, cancellationToken);
-        await LogAsync("UserFeatureReset", targetType, targetName, featureName, null, cancellationToken, normalizedUserId);
-        return NoContent();
+        await LogAsync("UserFeatureReset", targetType, targetName, featureName, null, auditContext, cancellationToken, normalizedUserId);
+        return Result.Ok();
     }
 
     private async Task<IReadOnlyList<사용자Command기능설정>> LoadOverridesAsync(string userId, CancellationToken cancellationToken)
@@ -255,45 +315,45 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
         _resolver.Invalidate(userId, storageTargetName);
     }
 
-    private IActionResult? ValidateTarget(string targetType, string targetName, string featureName)
+    private Result ValidateTarget(string targetType, string targetName, string featureName)
     {
         if (string.IsNullOrWhiteSpace(targetName) || string.IsNullOrWhiteSpace(featureName))
         {
-            return this.ToProblemActionResult("targetName and featureName are required.");
+            return BadRequest("targetName and featureName are required.");
         }
 
         if (!string.Equals(targetType, AuxiliaryFeatureTargetTypes.Command, StringComparison.OrdinalIgnoreCase))
         {
-            return this.ToProblemActionResult("Only Command targets are catalog-backed in the current admin screen.");
+            return BadRequest("Only Command targets are catalog-backed in the current admin screen.");
         }
 
         if (!_catalogResolver.IsSupportedDriverCommand(targetName))
         {
-            return this.ToProblemActionResult("Unsupported command target.");
+            return BadRequest("Unsupported command target.");
         }
 
         if (!_catalogResolver.IsSupportedFeature(featureName))
         {
-            return this.ToProblemActionResult("Unsupported feature.");
+            return BadRequest("Unsupported feature.");
         }
 
-        return null;
+        return Result.Ok();
     }
 
-    private IActionResult? ValidateMutableFeature(string featureName)
+    private Result ValidateMutableFeature(string featureName)
     {
         var policy = _catalogResolver.GetFeatures().FirstOrDefault(x => string.Equals(x.FeatureName, featureName, StringComparison.Ordinal));
         if (policy is null)
         {
-            return this.ToProblemActionResult("Unsupported feature.");
+            return BadRequest("Unsupported feature.");
         }
 
         if (policy.IsRequired)
         {
-            return this.ToConflictProblem("Required workflow features cannot be disabled or overridden.");
+            return Conflict("Required workflow features cannot be disabled or overridden.");
         }
 
-        return null;
+        return Result.Ok();
     }
 
     private static 사용자Command기능설정? FindOverride(IEnumerable<사용자Command기능설정> overrides, string commandName, string featureName)
@@ -315,30 +375,31 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
         return string.IsNullOrWhiteSpace(userId) ? null : userId.Trim();
     }
 
-    private async Task LogAsync(
+    private Task LogAsync(
         string actionName,
         string targetType,
         string targetName,
         string featureName,
         bool? enabled,
+        보조기능설정감사Context auditContext,
         CancellationToken cancellationToken,
         string? targetUserId = null)
     {
-        await _activityLogService.기록Async(new 사용자행위로그기록
+        return _activityLogService.기록Async(new 사용자행위로그기록
         {
             AppKey = App식별자.HongdalAdmin,
-            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
-            UserName = User.Identity?.Name ?? string.Empty,
-            RoleName = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
+            UserId = auditContext.AdminUserId,
+            UserName = auditContext.AdminUserName,
+            RoleName = auditContext.AdminRoleName,
             ActionType = "AuxiliaryFeatureSetting",
             ActionName = actionName,
-            Route = Request.Path.Value ?? string.Empty,
-            TraceId = HttpContext.TraceIdentifier,
+            Route = auditContext.Route,
+            TraceId = auditContext.TraceId,
             IsSuccess = true,
-            ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
-            UserAgent = Request.Headers.UserAgent.ToString(),
+            ClientIp = auditContext.ClientIp,
+            UserAgent = auditContext.UserAgent,
             OccurredAtUtc = DateTime.UtcNow,
-            MetadataJson = System.Text.Json.JsonSerializer.Serialize(new
+            MetadataJson = JsonSerializer.Serialize(new
             {
                 targetType,
                 targetName,
@@ -348,4 +409,9 @@ public sealed class AuxiliaryFeatureSettingsController : ControllerBase
             })
         }, cancellationToken);
     }
+
+    private static Result BadRequest(string message) => Result.Fail(message);
+
+    private static Result Conflict(string message)
+        => Result.Fail(new Error(message).WithMetadata("StatusCode", StatusCodes.Status409Conflict));
 }
