@@ -73,6 +73,27 @@ namespace Hongdal.Controllers.Driver.Work01
             return NoContent();
         }
 
+        [HttpPost("location")]
+        public async Task<IActionResult> 위치갱신([FromBody] 기사위치갱신요청 request)
+        {
+            var driverId = 현재기사Id();
+            var result = await _sender.Send(new 위치갱신Command(
+                driverId,
+                request.위도,
+                request.경도,
+                request.정확도_m,
+                request.상차접근허용반경Km,
+                request.운행상태,
+                request.기록시각));
+
+            if (result.IsFailed)
+            {
+                return this.ToProblemActionResult(result.Errors.Select(x => x.Message));
+            }
+
+            return Ok(result.Value);
+        }
+
         private string 현재기사Id()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier)

@@ -7,6 +7,7 @@ using 홍달.Services.Dispatch.Queue;
 using 홍달.Services.Documents;
 using 홍달.Services.External.Customs;
 using 홍달.Services.External.PublicData;
+using 홍달.Services.HIOPSAI;
 using 홍달.Services.Images;
 using 홍달.Services.Payments;
 using 홍달.Services.Sales;
@@ -43,6 +44,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
         services.AddSingleton<IDriverLocationStore, DriverLocationStore>();
         services.AddSingleton<IDriverWorkQueueStore, RedisDriverWorkQueueStore>();
+        services.AddSingleton<I국내화물운송기사상태Store, Redis국내화물운송기사상태Store>();
+        services.AddScoped<I국내화물운송기사상태Service, 국내화물운송기사상태Service>();
         services.AddSingleton<IDriverRejectedRequestStore, RedisDriverRejectedRequestStore>();
         services.AddSingleton<IDriverPushTokenStore, RedisDriverPushTokenStore>();
         services.AddSingleton<IDriverRecommendationPushStateStore, RedisDriverRecommendationPushStateStore>();
@@ -57,6 +60,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IAdminFilePodStore, AdminFilePodStore>();
         services.AddSingleton<I문서관리Store, 문서관리Store>();
         services.AddSingleton<I문서관리Service, 문서관리Service>();
+        services.AddSingleton<IHIOPSAIUsageBudgetStore, FileHIOPSAIUsageBudgetStore>();
         services.AddSingleton<이미지프롬프트생성기Resolver, 기본이미지프롬프트생성기Resolver>();
         services.AddScoped<I샘플이미지대상ResolverResolver, 샘플이미지대상ResolverResolver>();
         services.AddSingleton<I이미지프롬프트생성기, 화주상품사진프롬프트생성기>();

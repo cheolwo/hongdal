@@ -1,0 +1,100 @@
+using FluentResults;
+using Hongdal.Application.CommandProcessing;
+using 홍달.Services.Dispatch.Queue;
+
+namespace Hongdal.Application.Driver.Work;
+
+public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Command, Result<기사위치갱신응답>>
+{
+    private readonly HongdalContext _db;
+    private readonly IDriverLocationStore _driverLocationStore;
+    private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly I참여자실행권한검사 _권한검사;
+
+    public 위치갱신CommandHandler(
+        HongdalContext db,
+        IDriverLocationStore driverLocationStore,
+        I국내화물운송기사상태Service 국내화물운송기사상태Service,
+        ICurrentUserAccessor currentUserAccessor,
+        I참여자실행권한검사 권한검사)
+    {
+        _db = db;
+        _driverLocationStore = driverLocationStore;
+        _국내화물운송기사상태Service = 국내화물운송기사상태Service;
+        _currentUserAccessor = currentUserAccessor;
+        _권한검사 = 권한검사;
+    }
+
+    public async Task<Result<기사위치갱신응답>> Handle(위치갱신Command request, CancellationToken cancellationToken)
+    {
+        if (!_권한검사.Try검증(_currentUserAccessor.UserId, _currentUserAccessor.Role, request.참여자Id, request.실행역할, out var 권한오류))
+        {
+            return Result.Fail<기사위치갱신응답>(권한오류);
+        }
+
+        if (!request.위도.HasValue || !request.경도.HasValue)
+        {
+            return Result.Fail<기사위치갱신응답>("위도와 경도가 필요합니다.");
+        }
+
+        var driver = await _db.용달기사.FirstOrDefaultAsync(x => x.기사Id == request.기사Id, cancellationToken);
+        if (driver is null)
+        {
+            return Result.Fail<기사위치갱신응답>("용달기사 정보를 찾을 수 없습니다.");
+        }
+
+        var status = string.IsNullOrWhiteSpace(request.운행상태)
+            ? driver.운행상태
+            : request.운행상태.Trim();
+        if (!string.Equals(status, 상태값.기사운행상태.운행중, StringComparison.OrdinalIgnoreCase))
+        {
+            return Result.Fail<기사위치갱신응답>("운행중 상태에서만 위치를 전송할 수 있습니다.");
+        }
+
+        driver.운행상태 = 상태값.기사운행상태.운행중;
+        driver.UpdatedAt = DateTime.UtcNow;
+
+        var recordedAt = request.기록시각 ?? DateTime.UtcNow;
+        var receivedAt = DateTime.UtcNow;
+        var snapshot = new DriverLocationSnapshot(
+            request.기사Id,
+            request.위도.Value,
+            request.경도.Value,
+            request.정확도_m,
+            상태값.기사운행상태.운행중,
+            recordedAt,
+            receivedAt);
+
+        _driverLocationStore.Upsert(snapshot);
+        _db.기사위치기록.Add(new 기사위치기록
+        {
+            기사Id = snapshot.DriverId,
+            위도 = snapshot.Latitude,
+            경도 = snapshot.Longitude,
+            정확도_m = snapshot.AccuracyM,
+            기록시각 = snapshot.RecordedAtUtc,
+            CreatedAt = snapshot.ReceivedAtUtc,
+            UpdatedAt = snapshot.ReceivedAtUtc
+        });
+
+        await _db.SaveChangesAsync(cancellationToken);
+        var osState = await _국내화물운송기사상태Service.위치갱신Async(
+            snapshot,
+            상차접근허용반경Km: request.상차접근허용반경Km,
+            cancellationToken: cancellationToken);
+
+        return Result.Ok(new 기사위치갱신응답
+        {
+            DriverId = request.기사Id,
+            Status = 상태값.기사운행상태.운행중,
+            현재위도 = osState.Latitude,
+            현재경도 = osState.Longitude,
+            최근위치수신시각 = osState.위치수신시각Utc,
+            Aging점수 = osState.Aging점수,
+            Aging기준시각 = osState.Aging기준시각Utc,
+            상차접근허용반경Km = osState.상차접근허용반경Km,
+            권장위치전송간격초 = 30
+        });
+    }
+}

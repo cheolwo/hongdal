@@ -8,6 +8,8 @@
 
 AI를 배차나 추천에 사용할 때도 같은 원칙을 따른다. AI는 단순히 가까운 기사나 가장 싼 비용만 고르는 도구가 아니라, 거리, 시간창, 차량 적합성, 기사 대기, 상하차 부담, 인수증 증빙, 정산 조건을 함께 보고 지금 이 일을 어느 기사에게 맡기는 것이 가장 알맞은지 판단을 돕는 도구다. 국내 화물 운송 OS에서 `중용`은 화주 편의, 기사 부담, 수령자 확인, 운영자 책임 사이에서 과하거나 모자라지 않은 배정과 인계를 찾는 기준이다.
 
+홍달 1.0에서는 AI를 한 번에 넓게 붙이지 않고 `참여자 입장 해석 AI`와 `국내 화물 운송 배차 조율 AI`부터 붙인다. 참여자 입장 해석 AI는 주로 사용자 뷰에서 상대방의 마음과 업무 부담을 헤아릴 수 있도록 작동하고, 국내 화물 운송 배차 조율 AI는 서버에서 기사 실시간 위치, 기사 상태, 현재 운송 의뢰 데이터를 보고 추천 후보를 좁히는 역할을 맡는다. 두 AI의 입출력, 화면/API 연결 기준은 [HIOPS AI 우선 도입 기준](HIOPSAI.md)에 둔다.
+
 이 문서의 목적은 국내 화물 운송 OS를 먼저 안정화하기 위한 운영 기준을 정리하는 것이다.
 
 ## OS 경계
@@ -71,6 +73,29 @@ flowchart TD
 
 국내 화물 운송 OS의 기본 큐는 `배차대기`다. 큐 단계는 운영체제의 Ready Queue와 유사하게 본다.
 
+단, 기사 위치와 운행 판단 상태는 FIFO 큐로 보지 않는다. 운행 시작을 누른 기사는 `기사Id`를 키로 하는 key-value 상태 객체에 올라가고, 위치 heartbeat가 들어올 때마다 같은 key의 value가 갱신된다. 이 value에는 최신 위치, 위치 수신 시각, 운행 시작 시각, Aging 기준 시각, Aging 점수, 최근 추천 시각, 후보 없음 흔적이 들어간다.
+
+따라서 국내 화물 운송 OS는 `배차대기` 큐에서 운송 의뢰를 보고, `geo-index`로 상차지 반경 안의 기사Id를 먼저 좁힌다. 그 다음 `국내화물운송기사상태` key-value 저장소에서 각 기사 상태를 조회해 Aging, 차량 적합성, 위치 최신성, 거리 점수를 계산한다.
+
+`active-index`는 현재 운행 중인 기사Id를 Aging 기준 시각 순서로 보관한다. 이 인덱스는 위치 반경 검색이 아니라 “누가 오래 기다렸는가”를 볼 때 쓰고, `geo-index`는 “상차지 주변에 누가 있는가”를 볼 때 쓴다.
+
+```text
+운행 시작 / 위치 heartbeat
+-> state:{기사Id} 갱신
+-> active-index 갱신
+-> geo-index 갱신
+
+배차 후보 선정
+-> 배차대기 의뢰의 상차지 위도/경도 확인
+-> geo-index에서 반경 50km 안 기사Id 조회
+-> active-index에서 원거리 상차 접근 의사를 밝힌 기사Id 추가 검토
+-> state:{기사Id}를 읽어 운행상태, Aging, 위치 최신성 확인
+-> 차량 적합성, 거리, 상차 시간창 도착 가능성 계산
+-> 가장 알맞은 기사에게 추천
+```
+
+기본 반경 50km 안의 기사는 geo-index에서 먼저 검토한다. 기사님이 위치 heartbeat에서 `상차접근허용반경Km`를 보낸 경우에는 그 허용 반경과 OS의 최대 원거리 검토 범위를 함께 보고, 상차 시간창 종료 전 도착 가능하다고 판단될 때 원거리 지원 후보로 함께 검토한다. 이 기준은 화주 입장에서는 제시간 상차 가능성을 지키고, 기사 입장에서는 조금 멀더라도 본인이 감당하겠다는 의사를 반영하기 위한 장치다.
+
 | 큐 단계 | 의미 | 다음 전이 |
 | --- | --- | --- |
 | 계획배차 | 서버가 후보를 계산하기 전 또는 계획 배차를 시도하는 단계 | 추천배차, 보류 |
@@ -129,15 +154,21 @@ sequenceDiagram
     participant Source as 운송 입력 원장
     participant OS as 국내 화물 운송 OS
     participant Queue as 배차대기
+    participant AI1 as 참여자 입장 해석 AI
     participant Classifier as 운송의뢰배차원천분류Service
+    participant AI2 as 국내 화물 운송 배차 조율 AI
     participant Engine as 운송 의뢰 배차 엔진
     participant Policy as 용달운송배차업무정책
     participant Driver as DriverApp
 
     Source->>OS: 운송 필요 상태 도달
     OS->>Queue: 출고예정운송대상 또는 운송 의뢰를 배차대기로 정규화
+    Queue->>AI1: 화주·기사·수령자·운영자 입장 해석
+    AI1-->>OS: 입장 요약·충돌 지점·보호 조건
     Queue->>Classifier: 원본의뢰유형/배차업무유형 분류
     Classifier-->>OS: 창고 출고 / 수입 통관 / 일반 화주 / 음식 배달 성격
+    OS->>AI2: 입장 해석 결과와 스케줄링 정책 기준 후보 조율
+    AI2-->>Engine: 추천·제외·보류·공개배차 전환 제안
     OS->>Engine: OS 스케줄링 정책과 큐 상태 기준 후보 요청
     Engine->>Policy: 용달운송 후보 선정
     Policy-->>Engine: 차량 적합성 + 거리 + 시간창 + 기사대기 Aging 점수
@@ -152,6 +183,7 @@ sequenceDiagram
 | 배차 대기 운영 | `HongdalAdmin` `/dispatch/wait` | 원본의뢰유형, 큐 단계, 적용 정책, 후보 없음 사유 |
 | 기사 추천 | `DriverApp` `/driver/recommendations` | 일반 화물/창고 출고/공동주문 운송 구분, 차량 적합성 사유, 픽업 거리 |
 | 수락/거절 | `DriverApp` 추천 상세 | 수락, 거절, 보류 사유, 추천 만료 시간 |
+| 위치 heartbeat | `DriverApp` 운행 중 백그라운드 전송 | 약 30초 간격 위치, 운행 상태, 정확도. 서버는 기사Id key-value 상태를 갱신 |
 | 상차 | `DriverApp` 진행 중 운송 | LCL/FCL 구분, 적재 순번, 상차 체크리스트, 사진/서명 |
 | 하차 | `DriverApp` 진행 중 운송 | 세대 배송 여부, 하차 순서, POD 사진, 인수 확인 |
 | 운영/정산 | `HongdalAdmin` 운송·문서·정산 | 운송 완료, 증빙, 분쟁, 정산 후보 |
@@ -173,6 +205,7 @@ sequenceDiagram
 | `DriverApp` | `/driver/transports/{운송Id}/dropoff` | 기사 | 하차 확인, 세대/하차지별 바코드 확인, POD 사진, 완료 처리 | 사진 업로드 뒤 `POST /api/v1/driver/transports/{id}/complete` 호출 |
 | `DriverApp` | `/driver/transports/history` | 기사 | 운송 이력 확인 | `GET /api/v1/driver/transports` 연동 대상 |
 | `DriverApp` | `/driver/settlements/current-month` | 기사 | 기사 월 정산, 이용료 확인 | `GET /api/v1/driver/settlements/current-month` 호출 |
+| `DriverApp` | 운행 중 위치 heartbeat | 기사 | 운행 시작 후 약 30초 간격으로 현재 위치 전송 | `POST /api/v1/driver/work/location` 호출. SignalR `SubmitLocationUpdate`도 같은 상태 저장소를 갱신 |
 | `HongdalAdmin` | `/dispatch/wait` | 플랫폼 운영자 | 배차대기 원장 확인, 보류/수동 배차/삭제 | 목록과 상태 변경은 현재 메모리 서비스 기반, 삭제는 `DELETE /api/v1/dispatch/wait/{id}` 호출 |
 | `HongdalAdmin` | `/transports` | 플랫폼 운영자 | 운송 진행 목록과 운송 이벤트 확인 | 현재 메모리 서비스 기반. 서버 API는 `GET /api/v1/admin/transports`, `GET /api/v1/admin/transports/events` |
 | `HongdalAdmin` | `/files/pod` | 플랫폼 운영자 | POD 파일 업로드, 검수 상태 변경 | `POST /api/v1/admin/files/pod/upload`, `PATCH /api/v1/admin/files/pod/{id}/status` 호출 |
@@ -218,6 +251,7 @@ sequenceDiagram
 | `POST` | `/api/v1/driver/dispatch-actions/{requestId}/reject` | 배차 처리 | 추천 거절과 다음 후보 진행 |
 | `POST` | `/api/v1/driver/dispatch-actions/{requestId}/cancel-acceptance` | 배차 처리 | 수락 취소와 재배차 처리 |
 | `GET` | `/api/v1/driver/public-dispatches` | 공개배차 | 공개배차 목록 조회 |
+| `POST` | `/api/v1/driver/work/location` | 운행 중 위치 heartbeat | 기사Id key-value 상태와 최신 위치 저장소 갱신 |
 
 ### 기사 운송 진행
 
@@ -273,6 +307,10 @@ sequenceDiagram
 | 원천 분류 | `운송의뢰배차원천분류Service` |
 | 배차대기 정규화 | `운송의뢰배차대기Service` |
 | 화주 의뢰 정규화 | `화주운송의뢰출고예정정규화` |
+| AI 우선 도입 기준 | `docs/Architecture/HIOPSAI.md` |
+| 기사 위치 최신값 | `IDriverLocationStore`, `DriverLocationStore` |
+| 기사 운행 판단 key-value 상태 | `I국내화물운송기사상태Store`, `Redis국내화물운송기사상태Store`, `국내화물운송기사상태Service` |
+| 기사 후보 인덱스 | `hongdal:domestic-cargo-driver-state:active-index`, `hongdal:domestic-cargo-driver-state:geo-index` |
 
 ## 먼저 닫을 구현 단위
 
@@ -282,6 +320,8 @@ sequenceDiagram
 4. DriverApp 추천 목록에 `원본의뢰유형`, `운송의뢰유형표시`, `적용 정책 요약`을 내려준다.
 5. 후보 없음, 적합 차량 없음, 시간창 충돌, 장기 대기 상태를 Admin에서 보류 사유로 볼 수 있게 한다.
 6. MLFQ 전이를 테스트로 고정한다: 계획배차, 추천배차, 추천만료, 공개배차, 확정.
+7. `참여자 입장 해석 AI` 결과를 DriverApp 추천 상세와 HongdalAdmin 배차대기 상세에 설명 필드로 노출한다.
+8. `국내 화물 운송 배차 조율 AI` 결과를 추천 후보, 제외 후보, 운영자 확인 사유, 공개배차 전환 권장으로 나누어 저장한다.
 
 ## 운영 판단 원칙
 

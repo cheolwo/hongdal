@@ -97,6 +97,7 @@ builder.Services.Configure<TossPaymentsOptions>(builder.Configuration.GetSection
 builder.Services.Configure<GoogleCloudStorageOptions>(builder.Configuration.GetSection(GoogleCloudStorageOptions.SectionName));
 builder.Services.Configure<CommunityPostStorageOptions>(builder.Configuration.GetSection(CommunityPostStorageOptions.SectionName));
 builder.Services.Configure<KieAiOptions>(builder.Configuration.GetSection(KieAiOptions.SectionName));
+builder.Services.Configure<HIOPSAIOptions>(builder.Configuration.GetSection(HIOPSAIOptions.SectionName));
 builder.Services.Configure<NaverCloudDirectionsOptions>(builder.Configuration.GetSection(NaverCloudDirectionsOptions.SectionName));
 builder.Services.Configure<OpinetOptions>(builder.Configuration.GetSection(OpinetOptions.SectionName));
 builder.Services.Configure<NtsBusinessRegistrationOptions>(builder.Configuration.GetSection(NtsBusinessRegistrationOptions.SectionName));

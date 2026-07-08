@@ -16,17 +16,20 @@ namespace 홍달.Services.Dispatch.Queue
         private readonly 배차큐정책Options _options;
         private readonly I배차추천후보선정Service _candidateSelectionService;
         private readonly I배차추천알림Service _recommendationNotificationService;
+        private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
 
         public 배차큐전환Service(
             HongdalContext db,
             IOptions<배차큐정책Options> options,
             I배차추천후보선정Service candidateSelectionService,
-            I배차추천알림Service recommendationNotificationService)
+            I배차추천알림Service recommendationNotificationService,
+            I국내화물운송기사상태Service 국내화물운송기사상태Service)
         {
             _db = db;
             _options = options.Value;
             _candidateSelectionService = candidateSelectionService;
             _recommendationNotificationService = recommendationNotificationService;
+            _국내화물운송기사상태Service = 국내화물운송기사상태Service;
         }
 
         public async Task 계획배차에서추천으로전환Async(string requestId, CancellationToken cancellationToken = default)
@@ -192,6 +195,11 @@ namespace 홍달.Services.Dispatch.Queue
                 queue.의뢰Id,
                 driverId,
                 queue.추천라운드,
+                cancellationToken);
+
+            await _국내화물운송기사상태Service.추천기록Async(
+                driverId,
+                queue.추천시작시각.Value,
                 cancellationToken);
         }
 

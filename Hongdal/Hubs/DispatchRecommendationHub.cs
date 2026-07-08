@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.Services;
+using 홍달.Services.Dispatch.Queue;
 using 홍달.도메인.공통;
 using 홍달.도메인.기사;
 
@@ -15,15 +16,18 @@ namespace Hongdal.Hubs
     {
         private readonly HongdalContext _db;
         private readonly IDriverLocationStore _driverLocationStore;
+        private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
         private readonly I배차추천Service _dispatchRecommendationService;
 
         public DispatchRecommendationHub(
             HongdalContext db,
             IDriverLocationStore driverLocationStore,
+            I국내화물운송기사상태Service 국내화물운송기사상태Service,
             I배차추천Service dispatchRecommendationService)
         {
             _db = db;
             _driverLocationStore = driverLocationStore;
+            _국내화물운송기사상태Service = 국내화물운송기사상태Service;
             _dispatchRecommendationService = dispatchRecommendationService;
         }
 
@@ -87,6 +91,9 @@ namespace Hongdal.Hubs
 
             _driverLocationStore.Upsert(snapshot);
             await StoreLocationAsync(snapshot);
+            await _국내화물운송기사상태Service.위치갱신Async(
+                snapshot,
+                상차접근허용반경Km: request.상차접근허용반경Km);
             await UpdateDriverStatusAsync(driverId, requestedStatus);
 
             await _dispatchRecommendationService.SendToDriverAsync(driverId);
@@ -237,6 +244,7 @@ namespace Hongdal.Hubs
         public decimal? 위도 { get; set; }
         public decimal? 경도 { get; set; }
         public decimal? 정확도_m { get; set; }
+        public decimal? 상차접근허용반경Km { get; set; }
         public string? 운행상태 { get; set; }
         public DateTime? 기록시각 { get; set; }
     }

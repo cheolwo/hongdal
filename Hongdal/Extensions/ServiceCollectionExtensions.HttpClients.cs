@@ -3,6 +3,7 @@ using 홍달.Services.External.Customs;
 using 홍달.Services.External.Google;
 using 홍달.Services.External.KieAi;
 using 홍달.Services.External.PublicData;
+using 홍달.Services.HIOPSAI;
 using 홍달.Services.Notifications;
 using 홍달.Services.Options;
 using 홍달.Services.Payments;
@@ -49,6 +50,12 @@ public static partial class ServiceCollectionExtensions
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<KieAiOptions>>().Value;
             client.BaseAddress = new Uri(options.BaseUrl);
+        });
+        services.AddHttpClient<IHIOPSAIClient, HIOPSAIClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<HIOPSAIOptions>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddHttpClient<I개인통관부호검증Service, Unipass개인통관부호검증Service>((sp, client) =>
         {

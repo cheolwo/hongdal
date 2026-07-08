@@ -28,6 +28,34 @@ public sealed class 기사운행상태응답
     public string DriverId { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public DateTime UpdatedAt { get; set; }
+    public decimal? 현재위도 { get; set; }
+    public decimal? 현재경도 { get; set; }
+    public DateTime? 최근위치수신시각 { get; set; }
+    public decimal? Aging점수 { get; set; }
+    public DateTime? Aging기준시각 { get; set; }
+}
+
+public sealed class 기사위치갱신요청
+{
+    public decimal? 위도 { get; set; }
+    public decimal? 경도 { get; set; }
+    public decimal? 정확도_m { get; set; }
+    public decimal? 상차접근허용반경Km { get; set; }
+    public string? 운행상태 { get; set; }
+    public DateTime? 기록시각 { get; set; }
+}
+
+public sealed class 기사위치갱신응답
+{
+    public string DriverId { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public decimal? 현재위도 { get; set; }
+    public decimal? 현재경도 { get; set; }
+    public DateTime? 최근위치수신시각 { get; set; }
+    public decimal Aging점수 { get; set; }
+    public DateTime Aging기준시각 { get; set; }
+    public decimal? 상차접근허용반경Km { get; set; }
+    public int 권장위치전송간격초 { get; set; } = 30;
 }
 
 public sealed class 기사현재근무응답

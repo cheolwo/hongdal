@@ -2,6 +2,7 @@ using Hongdal.Contracts.Driver.Work;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Hongdal.Application.CommandProcessing;
+using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Driver.Work;
 
@@ -10,6 +11,7 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
     private readonly HongdalContext _db;
     private readonly I배차추천Service _dispatchRecommendationService;
     private readonly IDriverWorkQueueStore _driverWorkQueueStore;
+    private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
     private readonly ILogger<운행시작CommandHandler> _logger;
@@ -18,6 +20,7 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
         HongdalContext db,
         I배차추천Service dispatchRecommendationService,
         IDriverWorkQueueStore driverWorkQueueStore,
+        I국내화물운송기사상태Service 국내화물운송기사상태Service,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
         ILogger<운행시작CommandHandler> logger)
@@ -25,6 +28,7 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
         _db = db;
         _dispatchRecommendationService = dispatchRecommendationService;
         _driverWorkQueueStore = driverWorkQueueStore;
+        _국내화물운송기사상태Service = 국내화물운송기사상태Service;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
         _logger = logger;
@@ -82,6 +86,14 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             shift.시작모드,
             shift.시작위치,
             shift.오늘의복귀지주소 ?? shift.복귀지), cancellationToken);
+        await _국내화물운송기사상태Service.운행시작Async(
+            request.기사Id,
+            shift.Id,
+            shift.시작시각 ?? DateTime.UtcNow,
+            shift.시작모드,
+            shift.시작위치,
+            shift.오늘의복귀지주소 ?? shift.복귀지,
+            cancellationToken);
         await tx.CommitAsync(cancellationToken);
 
         await _dispatchRecommendationService.SendToDriverAsync(request.기사Id);

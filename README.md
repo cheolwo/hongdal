@@ -14,7 +14,7 @@ HIOPS는 AI를 사용할 수 있지만, 그 목적은 사람을 대체하거나 
 
 국내 화물 운송 OS는 화주 운송 의뢰, 창고 출고품, 공동주문 국내 운송, 홍달마트 출고처럼 실제 이동이 필요한 대상을 `배차대기`로 모으고, 운송 의뢰 배차 엔진을 통해 기사 추천, 수락, 상차, 하차, POD, 정산 후보 흐름으로 연결합니다.
 
-상세 기준은 [국내 화물 운송 OS](docs/Architecture/DomesticCargoTransportOS.md)를 봅니다.
+상세 기준은 [국내 화물 운송 OS](docs/Architecture/DomesticCargoTransportOS.md)를 봅니다. 홍달 1.0에 먼저 붙일 AI는 [HIOPS AI 우선 도입 기준](docs/Architecture/HIOPSAI.md)에 따라 `참여자 입장 해석 AI`와 `국내 화물 운송 배차 조율 AI`부터 고도화합니다.
 
 ## 큰 구조
 
@@ -68,14 +68,20 @@ dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 | --- | --- |
 | [국내 화물 운송 OS](docs/Architecture/DomesticCargoTransportOS.md) | 홍달 1.0 기준 OS의 큐, 스케줄링 정책, 엔진 호출, 화면 반영 기준 |
 | [HIOPS와 엔진](docs/Architecture/EngineOverview.md) | HIOPS, 하위 OS, 엔진, 스케줄링 정책 카탈로그 |
+| [HIOPS AI 우선 도입 기준](docs/Architecture/HIOPSAI.md) | 홍달 1.0에 먼저 붙일 참여자 입장 해석 AI와 국내 화물 운송 배차 조율 AI의 입출력, 화면/API 연결 기준 |
 | [워크플로우 API 정책](docs/ProjectOverview/workflow-api-policy.md) | API를 버전보다 워크플로우와 액터 기준으로 관리하는 기준 |
 | [워크플로우 앱 화면 지도](docs/ProjectOverview/workflow-app-screen-map.md) | 여러 앱 화면이 하나의 업무 흐름을 완성하는 방식 |
+| [HIOPS AI 판단 사례집](docs/ProjectOverview/hiops-ai-judgment-cases.md) | 참여자 입장, 충돌 지점, AI 초안 판단, 사용자 판정을 쌓는 사례집 |
 | [배차 흐름](docs/ProjectOverview/dispatch-flows.md) | 화물/용달 배차와 음식 배달 배차의 경계 |
 | [출고 배치 엔진](docs/Architecture/OutboundBatchEngine.md) | 출고 배치와 피킹 배치 판단 기준 |
 | [주문자 집단 공동주문/커머스](docs/ProjectOverview/orderer-group-commerce-flows.md) | 공동주문 수입, 물류대행 입고, 판매채널 출고 흐름 |
 | [용어집](docs/ProjectOverview/glossary.md) | POD, BL, 3PL, 출고 배치 같은 주요 용어 정의 |
 
 전체 문서 목록은 [프로젝트 문서 안내](docs/ProjectOverview/README.md)를 봅니다.
+
+## 문서 작성 배경
+
+루트 README는 아직 완성된 형식이라기보다, 저자 이윤석의 [『논스톱 보고서』](https://product.kyobobook.co.kr/detail/S000218640179)에서 영향을 받아 1페이지 보고서식 정리를 지향합니다. 처음 읽는 사람은 이 파일에서 핵심 방향과 이동 경로를 빠르게 잡고, 세부 설계와 판단 근거는 `docs/`의 주제별 문서에서 확인합니다.
 
 ## 개발 원칙
 
