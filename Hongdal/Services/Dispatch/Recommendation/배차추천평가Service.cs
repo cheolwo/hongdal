@@ -37,7 +37,7 @@ namespace 홍달.Services.Dispatch.Recommendation
             string? 복귀지출처)
         {
             var 추천점수 = ScoreRecommendation(일정삽입평가결과, 예상추가순이익, 추가지연분, 경로기준거리Km, 판정결과.추천유형, 판정결과.화물민감여부, 복귀우회증가거리Km, 복귀지기준사용됨);
-            var 배지 = BuildBadges(판정결과.추천유형, 예상추가순이익, 추가지연분, 경로기준거리Km, 판정결과.화물민감여부, 복귀우회증가거리Km, 복귀지기준사용됨, 복귀지출처);
+            var 배지 = BuildBadges(판정결과.추천유형, 예상추가순이익, 추가지연분, 경로기준거리Km, 판정결과.화물민감여부, 복귀우회증가거리Km, 복귀지기준사용됨, 복귀지출처, 일정삽입평가결과);
             var 경고 = BuildWarnings(request, 판정결과, 일정삽입평가결과, 추가지연분, 픽업시간창여유분);
             var 추천사유 = BuildRecommendationReason(일정삽입평가결과, 추가예상시간분, 예상추가순이익, 추가지연분, 경로기준거리Km, 추천점수);
             var 복귀추천사유 = BuildReturnReason(복귀우회증가거리Km, 복귀지기준사용됨, 복귀지출처);
@@ -58,6 +58,11 @@ namespace 홍달.Services.Dispatch.Recommendation
                 else if (scheduleEvaluation.삽입가능여부)
                 {
                     score += 10m;
+                }
+
+                if (scheduleEvaluation.경로변경이점여부)
+                {
+                    score += 15m;
                 }
             }
 
@@ -108,7 +113,7 @@ namespace 홍달.Services.Dispatch.Recommendation
             return score;
         }
 
-        private static string[] BuildBadges(string recommendationType, decimal? estimatedExtraProfit, decimal? additionalDelayMinutes, decimal? routeAnchorDistanceKm, bool cargoSensitive, decimal? returnDetourDistanceKm, bool returnBasisUsed, string? returnSource)
+        private static string[] BuildBadges(string recommendationType, decimal? estimatedExtraProfit, decimal? additionalDelayMinutes, decimal? routeAnchorDistanceKm, bool cargoSensitive, decimal? returnDetourDistanceKm, bool returnBasisUsed, string? returnSource, 운송삽입평가결과? scheduleEvaluation)
         {
             var badges = new List<string>();
 
@@ -133,6 +138,11 @@ namespace 홍달.Services.Dispatch.Recommendation
             if (additionalDelayMinutes.HasValue && additionalDelayMinutes.Value <= 지연적음기준분)
             {
                 badges.Add("지연 적음");
+            }
+
+            if (scheduleEvaluation?.경로변경이점여부 == true)
+            {
+                badges.Add("경로 변경 이점");
             }
 
             if (routeAnchorDistanceKm.HasValue && routeAnchorDistanceKm.Value <= 5m)
@@ -219,6 +229,11 @@ namespace 홍달.Services.Dispatch.Recommendation
                 if (scheduleEvaluation.최적삽입인덱스.HasValue)
                 {
                     reasons.Add($"삽입위치 {scheduleEvaluation.최적삽입인덱스.Value}");
+                }
+
+                if (scheduleEvaluation.경로변경이점여부 && scheduleEvaluation.경로변경절감분.HasValue)
+                {
+                    reasons.Add($"경로변경 {scheduleEvaluation.경로변경절감분.Value:0.0}분 절감");
                 }
             }
 

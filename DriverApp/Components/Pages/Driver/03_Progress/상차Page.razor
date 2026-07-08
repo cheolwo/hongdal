@@ -1,6 +1,7 @@
 @page "/driver/transports/{운송Id:long}/pickup"
 @inject IDriverSampleDataService Samples
 @inject IDriverTransportCompletionPhotoService CompletionPhotoService
+@inject NavigationManager NavigationManager
 @using Microsoft.Maui.ApplicationModel
 @using Microsoft.Maui.Media
 
@@ -723,6 +724,10 @@
 
             var objectName = string.IsNullOrWhiteSpace(result.ObjectName) ? string.Empty : $" 저장 경로: {result.ObjectName}";
             SetStatus($"{result.Message}{objectName}", result.Uploaded ? Severity.Success : Severity.Info);
+            if (result.Uploaded)
+            {
+                NavigationManager.NavigateTo(DriverRoutes.TransportDropoff(운송Id));
+            }
         }
         catch (Exception ex)
         {

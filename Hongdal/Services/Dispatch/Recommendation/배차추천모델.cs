@@ -68,23 +68,30 @@ namespace 홍달.Services.Dispatch.Recommendation
 
     public sealed record 운송삽입시도결과(
         int 삽입인덱스,
+        string 시도유형,
+        bool 경로변경시도여부,
         bool 전체완수가능여부,
         decimal? 총소요시간분,
         decimal? 총거리Km,
         decimal? 총추가지연분,
+        decimal? 단순이어가기대비절감분,
         decimal? 최대시간위반분,
         string[] 위반사유,
+        IReadOnlyList<string> 경로순서,
         IReadOnlyList<운송일정도착예상항목> 도착예상목록);
 
     public sealed record 운송삽입평가결과(
         bool 삽입가능여부,
         bool 전체완수가능여부,
         int? 최적삽입인덱스,
+        bool 경로변경이점여부,
+        decimal? 경로변경절감분,
         decimal? 총소요시간분,
         decimal? 총거리Km,
         decimal? 총추가지연분,
         decimal? 최대시간위반분,
         string[] 위반사유,
+        IReadOnlyList<string> 권장경로순서,
         IReadOnlyList<운송일정도착예상항목> 도착예상목록,
         IReadOnlyList<운송삽입시도결과> 시도목록);
 }

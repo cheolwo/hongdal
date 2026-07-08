@@ -25,7 +25,8 @@ public sealed record 기사운송상태변경요청(
     홍달역할유형 실행역할,
     string 목표상태,
     string 이벤트명,
-    Func<기사운송상태변경Context, INotification> 이벤트생성);
+    Func<기사운송상태변경Context, INotification> 이벤트생성,
+    Action<배송_운송, DateTime>? 상태변경전처리 = null);
 
 public sealed record 기사운송상태변경Context(
     배송_운송 운송,
@@ -81,6 +82,8 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
         {
             return Result.Fail<기사운송상태변경응답>(상태변경.Errors.Select(x => x.Message));
         }
+
+        request.상태변경전처리?.Invoke(entity, now);
 
         await _db.SaveChangesAsync(cancellationToken);
         await PublishAfterCommitAsync(request, entity, 이전상태, now, cancellationToken);

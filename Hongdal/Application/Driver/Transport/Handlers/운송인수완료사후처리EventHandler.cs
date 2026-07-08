@@ -66,7 +66,9 @@ public sealed class 운송인수완료사후처리EventHandler : INotificationHa
             $"출발지: {notification.출발지}",
             $"도착지: {notification.도착지}",
             $"상태: {notification.상태}",
-            $"완료시각: {notification.발생시각Utc:yyyy-MM-dd HH:mm:ss} UTC"
+            $"완료시각: {notification.발생시각Utc:yyyy-MM-dd HH:mm:ss} UTC",
+            $"하차사진ObjectName: {notification.하차완료증빙?.하차사진ObjectName ?? string.Empty}",
+            $"하차사진Url: {notification.하차완료증빙?.하차사진Url ?? string.Empty}"
         };
 
         return BuildMinimalPdf(lines);

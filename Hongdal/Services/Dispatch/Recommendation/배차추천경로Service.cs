@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using 홍달.Data;
 using 홍달.도메인.기사;
 using 홍달.Services.External.Google;
 using 홍달.Services.External.Naver;
+using 홍달.Services.Options;
 using 홍달.Services.Storage.Local;
 
 namespace 홍달.Services.Dispatch.Recommendation
@@ -22,17 +24,24 @@ namespace 홍달.Services.Dispatch.Recommendation
         private readonly IDriverWorkQueueStore _driverWorkQueueStore;
         private readonly IGeocodingService _geocodingService;
         private readonly INaverCloudDirectionsService _routeService;
+        private readonly NaverCloudDirectionsOptions _routeOptions;
+        private readonly ILogger<배차추천경로Service> _logger;
+        private readonly Dictionary<배차경로CacheKey, Task<배차경로예상결과?>> _routeEstimateCache = [];
 
         public 배차추천경로Service(
             HongdalContext db,
             IDriverWorkQueueStore driverWorkQueueStore,
             IGeocodingService geocodingService,
-            INaverCloudDirectionsService routeService)
+            INaverCloudDirectionsService routeService,
+            IOptions<NaverCloudDirectionsOptions> routeOptions,
+            ILogger<배차추천경로Service> logger)
         {
             _db = db;
             _driverWorkQueueStore = driverWorkQueueStore;
             _geocodingService = geocodingService;
             _routeService = routeService;
+            _routeOptions = routeOptions.Value;
+            _logger = logger;
         }
 
         public async Task<배차경로좌표?> ResolveOriginLocationAsync(string driverId, 용달기사? driver, DriverLocationSnapshot? currentLocation, 배차추천검색조건? criteria)
@@ -127,8 +136,52 @@ namespace 홍달.Services.Dispatch.Recommendation
                 return null;
             }
 
-            var route = await _routeService.GetDrivingRouteAsync(origin.Latitude, origin.Longitude, destination.Latitude, destination.Longitude);
-            return route is null ? null : new 배차경로예상결과(route.DistanceKm, route.Duration, route.TollFare);
+            var cacheKey = 배차경로CacheKey.Create(origin, destination);
+            if (_routeEstimateCache.TryGetValue(cacheKey, out var cachedTask))
+            {
+                return await cachedTask;
+            }
+
+            var task = EstimateRouteCoreAsync(origin, destination);
+            _routeEstimateCache[cacheKey] = task;
+
+            try
+            {
+                return await task;
+            }
+            catch
+            {
+                _routeEstimateCache.Remove(cacheKey);
+                throw;
+            }
+        }
+
+        private async Task<배차경로예상결과?> EstimateRouteCoreAsync(배차경로좌표 origin, 배차경로좌표 destination)
+        {
+            try
+            {
+                var route = await _routeService.GetDrivingRouteAsync(origin.Latitude, origin.Longitude, destination.Latitude, destination.Longitude);
+                if (route?.Duration is not null || route?.DistanceKm is not null)
+                {
+                    return new 배차경로예상결과(route.DistanceKm, route.Duration, route.TollFare);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "네이버 경로 API 호출에 실패해 fallback 경로 추정을 사용합니다. Origin={OriginLat},{OriginLng} Destination={DestinationLat},{DestinationLng}",
+                    origin.Latitude,
+                    origin.Longitude,
+                    destination.Latitude,
+                    destination.Longitude);
+            }
+
+            return EstimateFallbackRoute(origin, destination);
         }
 
         public async Task<배차삽입경로예상결과?> EstimateInsertionDelayAsync(배차경로좌표? origin, 배차경로좌표? routeAnchor, 배차경로좌표? pickup, 배차경로좌표? dropoff)
@@ -201,6 +254,36 @@ namespace 홍달.Services.Dispatch.Recommendation
             return (decimal)(earthRadiusKm * c);
         }
 
+        private 배차경로예상결과? EstimateFallbackRoute(배차경로좌표 origin, 배차경로좌표 destination)
+        {
+            if (!_routeOptions.EnableFallbackRouteEstimate)
+            {
+                return null;
+            }
+
+            var directDistanceKm = CalculateDistanceKm(origin, destination);
+            if (!directDistanceKm.HasValue)
+            {
+                return null;
+            }
+
+            var multiplier = _routeOptions.FallbackDistanceMultiplier <= 0m
+                ? 1.25m
+                : _routeOptions.FallbackDistanceMultiplier;
+            var averageSpeedKmH = _routeOptions.FallbackAverageSpeedKmH <= 0m
+                ? 45m
+                : _routeOptions.FallbackAverageSpeedKmH;
+            var estimatedDistanceKm = Math.Round(directDistanceKm.Value * multiplier, 2);
+            var estimatedMinutes = estimatedDistanceKm == 0m
+                ? 0m
+                : estimatedDistanceKm / averageSpeedKmH * 60m;
+
+            return new 배차경로예상결과(
+                estimatedDistanceKm,
+                TimeSpan.FromMinutes((double)estimatedMinutes),
+                null);
+        }
+
         private static decimal? SumMinutes(params TimeSpan?[] durations)
         {
             var values = durations.Where(x => x.HasValue).Select(x => (decimal)x!.Value.TotalMinutes).ToList();
@@ -214,5 +297,15 @@ namespace 홍달.Services.Dispatch.Recommendation
         }
 
         private static double ToRadians(double angle) => angle * Math.PI / 180.0;
+
+        private readonly record struct 배차경로CacheKey(
+            decimal OriginLatitude,
+            decimal OriginLongitude,
+            decimal DestinationLatitude,
+            decimal DestinationLongitude)
+        {
+            public static 배차경로CacheKey Create(배차경로좌표 origin, 배차경로좌표 destination)
+                => new(origin.Latitude, origin.Longitude, destination.Latitude, destination.Longitude);
+        }
     }
 }

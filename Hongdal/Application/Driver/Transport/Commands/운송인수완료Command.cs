@@ -18,4 +18,8 @@ public sealed record 운송인수완료Command : 홍달CommandBase, IRequest<Res
     public string 기사Id { get; init; } = string.Empty;
 
     public long Id { get; init; }
+
+    public string? 하차사진ObjectName { get; init; }
+
+    public string? 하차사진Url { get; init; }
 }

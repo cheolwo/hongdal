@@ -47,6 +47,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IHR참여운영UseCase, HR참여운영UseCase>();
         services.AddScoped<I인연스냅샷조회UseCase, 인연스냅샷조회UseCase>();
         services.AddScoped<I기사운송상태변경CommandExecutor, 기사운송상태변경CommandExecutor>();
+        services.AddScoped<I운송증빙첨부JsonWriter, 운송증빙첨부JsonWriter>();
         services.AddScoped<ICommand기능설정Resolver, Command기능설정Resolver>();
         services.AddScoped<ICommand기능CatalogResolver, Command기능CatalogResolver>();
         services.AddScoped<IWorkRelationshipSnapshotCollector, WorkRelationshipSnapshotCollector>();

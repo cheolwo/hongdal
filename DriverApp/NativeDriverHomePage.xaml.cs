@@ -12,6 +12,7 @@ public partial class NativeDriverHomePage : ContentPage
     private readonly IDriverHomeMapService _mapService;
     private readonly IDriverRecommendationDecisionService _decisionService;
     private readonly IDriverRecommendationNotificationService _recommendationNotificationService;
+    private readonly DriverHomeRoutePlanningService _routePlanningService;
     private bool _isSubscribed;
     private DriverMapMarkerItem? _incomingRecommendation;
     private DriverRequestItem? _incomingRecommendationRequest;
@@ -28,13 +29,15 @@ public partial class NativeDriverHomePage : ContentPage
         IDriverSampleDataService sampleDataService,
         IDriverHomeMapService mapService,
         IDriverRecommendationDecisionService decisionService,
-        IDriverRecommendationNotificationService recommendationNotificationService)
+        IDriverRecommendationNotificationService recommendationNotificationService,
+        DriverHomeRoutePlanningService routePlanningService)
     {
         InitializeComponent();
         _sampleDataService = sampleDataService;
         _mapService = mapService;
         _decisionService = decisionService;
         _recommendationNotificationService = recommendationNotificationService;
+        _routePlanningService = routePlanningService;
     }
 
     protected override async void OnAppearing()
@@ -170,11 +173,11 @@ public partial class NativeDriverHomePage : ContentPage
         MapView.CenterLongitude = _incomingRecommendation.PickupLongitude;
         MapView.Zoom = 13d;
         MapView.Markers = [_incomingRecommendation];
-        MapView.RouteOverlays = BuildLinkedRouteOverlays(_currentTransport, _incomingRecommendation);
+        MapView.RouteOverlays = _routePlanningService.BuildLinkedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation, "#16a34a", "연계 추천 경로");
         TransportFooterBar.ShowMarker(_incomingRecommendation);
-        ShowLinkedRouteCard(_currentTransport, _incomingRecommendation, _incomingRecommendationRequest);
+        ShowLinkedRouteCard(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation, _incomingRecommendationRequest);
         TitleLabel.Text = "배차 추천 확인";
-        StatusLabel.Text = "현재 운송 하차 이후 이어 받을 수 있는 추천 경로를 지도에 표시했습니다.";
+        StatusLabel.Text = "현재 이동 단계와 추천 운송 의뢰의 상차/하차 경로를 함께 표시했습니다.";
         RecommendationBanner.IsVisible = false;
     }
 
@@ -189,94 +192,19 @@ public partial class NativeDriverHomePage : ContentPage
         StatusLabel.Text = "추천 알림을 잠시 접었습니다. 지도 마커나 하단 목록에서 다시 확인할 수 있습니다.";
     }
 
-    private IReadOnlyList<DriverMapRouteOverlay> BuildLinkedRouteOverlays(
-        기사운송샘플항목? currentTransport,
-        DriverMapMarkerItem recommendation)
-    {
-        var points = new List<DriverMapRoutePoint>();
-        if (HasDropoffCoordinate(currentTransport))
-        {
-            points.Add(new DriverMapRoutePoint(
-                (double)currentTransport!.하차위도!.Value,
-                (double)currentTransport.하차경도!.Value,
-                "현재 운송 하차지"));
-        }
-
-        points.Add(new DriverMapRoutePoint(
-            recommendation.PickupLatitude,
-            recommendation.PickupLongitude,
-            "추천 상차지"));
-
-        if (recommendation.DropoffLatitude != 0d && recommendation.DropoffLongitude != 0d)
-        {
-            points.Add(new DriverMapRoutePoint(
-                recommendation.DropoffLatitude,
-                recommendation.DropoffLongitude,
-                "추천 하차지"));
-        }
-
-        return points.Count < 2
-            ? []
-            :
-            [
-                new DriverMapRouteOverlay(
-                    recommendation.RequestId,
-                    "연계 추천 경로",
-                    points,
-                    "#16a34a",
-                    "#ecfdf5",
-                    10)
-            ];
-    }
-
-    private static IReadOnlyList<DriverMapRouteOverlay> BuildAcceptedRouteOverlays(DriverMapMarkerItem recommendation)
-    {
-        if (recommendation.DropoffLatitude == 0d || recommendation.DropoffLongitude == 0d)
-        {
-            return [];
-        }
-
-        return
-        [
-            new DriverMapRouteOverlay(
-                recommendation.RequestId,
-                "수락 운송 경로",
-                [
-                    new DriverMapRoutePoint(
-                        recommendation.PickupLatitude,
-                        recommendation.PickupLongitude,
-                        "상차지"),
-                    new DriverMapRoutePoint(
-                        recommendation.DropoffLatitude,
-                        recommendation.DropoffLongitude,
-                        "하차지")
-                ],
-                "#2563eb",
-                "#eff6ff",
-                11)
-        ];
-    }
-
     private void ShowLinkedRouteCard(
+        기사현재위치샘플 currentLocation,
         기사운송샘플항목? currentTransport,
         DriverMapMarkerItem recommendation,
         DriverRequestItem? request)
     {
         LinkedRouteCard.IsVisible = true;
-        var emptyDistance = CalculateDistanceKm(currentTransport, recommendation);
-        LinkedRouteSummaryLabel.Text = emptyDistance.HasValue
-            ? $"현재 하차 후 추천 상차지까지 약 {emptyDistance.Value.ToString("0.0", CultureInfo.CurrentCulture)}km 연계됩니다."
-            : "현재 하차 후 추천 상차지로 이어지는 후보 경로입니다.";
-        LinkedRouteBenefitLabel.Text = emptyDistance.HasValue && emptyDistance.Value <= 8d
-            ? "공차 유리"
-            : "연계 검토";
-        CurrentDropoffRouteLabel.Text = currentTransport is null
-            ? "현재 운송 하차지: 진행 중 운송 없음"
-            : $"현재 하차지: {currentTransport.하차지}";
-        RecommendationPickupRouteLabel.Text = $"추천 상차지: {recommendation.PickupAddress}";
-        RecommendationDropoffRouteLabel.Text = recommendation.DropoffLatitude != 0d && recommendation.DropoffLongitude != 0d
-            ? $"추천 하차지: {recommendation.Summary}"
-            : "추천 하차지: 추천 상세에서 확인";
+        var routeState = _routePlanningService.BuildLinkedRouteCardState(currentLocation, currentTransport, recommendation);
+        LinkedRouteSummaryLabel.Text = routeState.Summary;
+        LinkedRouteBenefitLabel.Text = routeState.Benefit;
+        CurrentDropoffRouteLabel.Text = routeState.CurrentRouteLabel;
+        RecommendationPickupRouteLabel.Text = routeState.RecommendationPickupRouteLabel;
+        RecommendationDropoffRouteLabel.Text = routeState.RecommendationDropoffRouteLabel;
         RecommendationCompactInfoLabel.Text = BuildRecommendationCompactInfo(request);
         RecommendationDecisionStatusLabel.Text = "경로와 수익을 확인한 뒤 수락, 보류, 거절을 선택할 수 있습니다.";
         RecommendationDecisionButtons.IsEnabled = true;
@@ -425,10 +353,10 @@ public partial class NativeDriverHomePage : ContentPage
         MapView.CenterLongitude = _incomingRecommendation.PickupLongitude;
         MapView.Zoom = 13d;
         MapView.Markers = [_incomingRecommendation];
-        var acceptedRoute = BuildAcceptedRouteOverlays(_incomingRecommendation);
+        var acceptedRoute = _routePlanningService.BuildAcceptedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation);
         MapView.RouteOverlays = acceptedRoute.Count > 0
             ? acceptedRoute
-            : BuildLinkedRouteOverlays(_currentTransport, _incomingRecommendation);
+            : _routePlanningService.BuildLinkedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation);
         TransportFooterBar.ShowMarker(_incomingRecommendation);
     }
 
@@ -488,36 +416,6 @@ public partial class NativeDriverHomePage : ContentPage
         _recommendationNotificationService.Changed -= OnIncomingRecommendationChanged;
         _isSubscribed = false;
     }
-
-    private static double? CalculateDistanceKm(
-        기사운송샘플항목? currentTransport,
-        DriverMapMarkerItem recommendation)
-    {
-        if (!HasDropoffCoordinate(currentTransport))
-        {
-            return null;
-        }
-
-        var lat1 = DegreesToRadians((double)currentTransport!.하차위도!.Value);
-        var lon1 = DegreesToRadians((double)currentTransport.하차경도!.Value);
-        var lat2 = DegreesToRadians(recommendation.PickupLatitude);
-        var lon2 = DegreesToRadians(recommendation.PickupLongitude);
-        var deltaLat = lat2 - lat1;
-        var deltaLon = lon2 - lon1;
-        var a = Math.Pow(Math.Sin(deltaLat / 2d), 2d) +
-            Math.Cos(lat1) * Math.Cos(lat2) * Math.Pow(Math.Sin(deltaLon / 2d), 2d);
-        var c = 2d * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1d - a));
-
-        return 6371d * c;
-    }
-
-    private static bool HasDropoffCoordinate(기사운송샘플항목? currentTransport)
-        => currentTransport?.하차위도 is not null &&
-            currentTransport.하차경도 is not null &&
-            currentTransport.하차위도 != 0m &&
-            currentTransport.하차경도 != 0m;
-
-    private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
 
     private async void OnOpenLegacyMenuClicked(object? sender, EventArgs e)
     {

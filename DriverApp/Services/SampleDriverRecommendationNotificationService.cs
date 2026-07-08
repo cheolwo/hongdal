@@ -1,4 +1,6 @@
 using DriverApp.Models.Driver.Map;
+using Hongdal.Client.Infrastructure;
+using Microsoft.Extensions.Options;
 
 namespace DriverApp.Services;
 
@@ -7,23 +9,26 @@ public sealed class SampleDriverRecommendationNotificationService : IDriverRecom
     private readonly IDriverSampleDataService sampleDataService;
     private readonly IDriverHomeMapService mapService;
     private readonly IDriverRecommendationDecisionService decisionService;
+    private readonly ClientDataModeOptions dataModeOptions;
     private readonly HashSet<string> dismissedRequestIds = new(StringComparer.OrdinalIgnoreCase);
     private DriverIncomingRecommendation? publishedRecommendation;
 
     public SampleDriverRecommendationNotificationService(
         IDriverSampleDataService sampleDataService,
         IDriverHomeMapService mapService,
-        IDriverRecommendationDecisionService decisionService)
+        IDriverRecommendationDecisionService decisionService,
+        IOptions<ClientDataModeOptions> dataModeOptions)
     {
         this.sampleDataService = sampleDataService;
         this.mapService = mapService;
         this.decisionService = decisionService;
+        this.dataModeOptions = dataModeOptions.Value;
     }
 
     public event Action<DriverIncomingRecommendation?>? Changed;
 
     public DriverIncomingRecommendation? GetCurrent()
-        => publishedRecommendation ?? BuildSampleRecommendation();
+        => publishedRecommendation ?? (dataModeOptions.AllowSampleFallback ? BuildSampleRecommendation() : null);
 
     public void Publish(DriverIncomingRecommendation recommendation)
     {

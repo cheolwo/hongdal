@@ -45,6 +45,12 @@ public sealed class 기사운송상차완료요청
     public string? 인수증서명생략사유 { get; set; }
 }
 
+public sealed class 기사운송하차완료요청
+{
+    public string? 하차사진ObjectName { get; set; }
+    public string? 하차사진Url { get; set; }
+}
+
 public sealed class 기사운송문제신고요청
 {
     public string 사유 { get; set; } = string.Empty;

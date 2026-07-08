@@ -10,4 +10,9 @@ public sealed record 운송인수완료됨Event(
     string 도착지,
     string 상태,
     DateTime 발생시각Utc,
-    string TraceId) : INotification;
+    string TraceId,
+    운송하차완료증빙? 하차완료증빙) : INotification;
+
+public sealed record 운송하차완료증빙(
+    string 하차사진ObjectName,
+    string? 하차사진Url);

@@ -208,6 +208,9 @@ namespace Hongdal.Hubs
         public bool 일정삽입가능여부 { get; set; }
         public bool 전체일정완수가능여부 { get; set; }
         public int? 최적삽입인덱스 { get; set; }
+        public bool 경로변경이점여부 { get; set; }
+        public decimal? 경로변경절감분 { get; set; }
+        public string[] 권장경로순서 { get; set; } = Array.Empty<string>();
         public decimal? 최대시간위반분 { get; set; }
         public string[] 일정위반사유 { get; set; } = Array.Empty<string>();
         public bool 복귀지기준추천여부 { get; set; }

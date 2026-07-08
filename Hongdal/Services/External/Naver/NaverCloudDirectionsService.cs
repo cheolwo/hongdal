@@ -24,16 +24,6 @@ namespace 홍달.Services.External.Naver
         {
             _httpClient = httpClient;
             _options = options.Value;
-
-            if (string.IsNullOrWhiteSpace(_options.ApiKeyId))
-            {
-                throw new InvalidOperationException("NaverCloudDirections:ApiKeyId configuration is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(_options.ApiKey))
-            {
-                throw new InvalidOperationException("NaverCloudDirections:ApiKey configuration is required.");
-            }
         }
 
         public async Task<NaverCloudDrivingRoute?> GetDrivingRouteAsync(
@@ -44,6 +34,11 @@ namespace 홍달.Services.External.Naver
             string? option = null,
             CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(_options.ApiKeyId) || string.IsNullOrWhiteSpace(_options.ApiKey))
+            {
+                return null;
+            }
+
             var start = FormattableString.Invariant($"{startLng},{startLat}");
             var goal = FormattableString.Invariant($"{goalLng},{goalLat}");
             var routeOption = string.IsNullOrWhiteSpace(option) ? _options.DefaultOption : option.Trim();

@@ -84,7 +84,6 @@ if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
     throw new InvalidOperationException("Jwt:SecretKey configuration is required.");
 }
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.AddScoped<AuthTokenService>();
 
 var tossOptions = builder.Configuration.GetSection(TossPaymentsOptions.SectionName).Get<TossPaymentsOptions>() ?? new TossPaymentsOptions();
@@ -93,74 +92,14 @@ if (string.IsNullOrWhiteSpace(tossOptions.SecretKey))
     throw new InvalidOperationException("TossPayments:SecretKey configuration is required.");
 }
 
-builder.Services.Configure<TossPaymentsOptions>(builder.Configuration.GetSection(TossPaymentsOptions.SectionName));
-builder.Services.Configure<GoogleCloudStorageOptions>(builder.Configuration.GetSection(GoogleCloudStorageOptions.SectionName));
-builder.Services.Configure<CommunityPostStorageOptions>(builder.Configuration.GetSection(CommunityPostStorageOptions.SectionName));
-builder.Services.Configure<KieAiOptions>(builder.Configuration.GetSection(KieAiOptions.SectionName));
-builder.Services.Configure<HIOPSAIOptions>(builder.Configuration.GetSection(HIOPSAIOptions.SectionName));
-builder.Services.Configure<NaverCloudDirectionsOptions>(builder.Configuration.GetSection(NaverCloudDirectionsOptions.SectionName));
-builder.Services.Configure<OpinetOptions>(builder.Configuration.GetSection(OpinetOptions.SectionName));
-builder.Services.Configure<NtsBusinessRegistrationOptions>(builder.Configuration.GetSection(NtsBusinessRegistrationOptions.SectionName));
-builder.Services.Configure<해외제조업소조회Options>(builder.Configuration.GetSection(해외제조업소조회Options.SectionName));
-builder.Services.Configure<수입식품제품조회Options>(builder.Configuration.GetSection(수입식품제품조회Options.SectionName));
-builder.Services.Configure<기사이용료정책Options>(builder.Configuration.GetSection(기사이용료정책Options.SectionName));
-builder.Services.Configure<RedisOptions>(builder.Configuration.GetSection(RedisOptions.SectionName));
-builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection(MongoDbOptions.SectionName));
-builder.Services.Configure<PushNotificationsOptions>(builder.Configuration.GetSection(PushNotificationsOptions.SectionName));
-builder.Services.Configure<KakaoAlimTalkOptions>(builder.Configuration.GetSection(KakaoAlimTalkOptions.SectionName));
-builder.Services.Configure<CommandProcessingOptions>(builder.Configuration.GetSection(CommandProcessingOptions.SectionName));
-builder.Services.Configure<WorkRelationshipSnapshotOptions>(builder.Configuration.GetSection(WorkRelationshipSnapshotOptions.SectionName));
-builder.Services.Configure<CommandFileStorageOptions>(builder.Configuration.GetSection(CommandFileStorageOptions.SectionName));
-builder.Services.Configure<CustomsOptions>(builder.Configuration.GetSection(CustomsOptions.SectionName));
-builder.Services.Configure<PublicDataOptions>(builder.Configuration.GetSection(PublicDataOptions.SectionName));
-builder.Services.Configure<VersionFeatureFlagsOptions>(builder.Configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
-builder.Services.Configure<SalesChannelOrderSyncOptions>(builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName));
-builder.Services.Configure<배차큐정책Options>(builder.Configuration.GetSection("DispatchQueue"));
-builder.Services.Configure<배차큐배치작업Options>(builder.Configuration.GetSection(배차큐배치작업Options.SectionName));
+builder.Services.AddHongdalOptions(builder.Configuration);
 builder.Services.AddScoped<I가입온보딩인연후보Service, 가입온보딩인연후보Service>();
 
 var dispatchQueueJobOptions = builder.Configuration.GetSection(배차큐배치작업Options.SectionName).Get<배차큐배치작업Options>() ?? new 배차큐배치작업Options();
 var salesOrderSyncOptions = builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName).Get<SalesChannelOrderSyncOptions>() ?? new SalesChannelOrderSyncOptions();
 
 builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions);
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                       ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-    throw new InvalidOperationException("ConnectionStrings:DefaultConnection configuration is required.");
-}
-
-builder.Services.AddDbContext<HongdalContext>(options =>
-    options.UseMySql(
-        connectionString,
-        new MySqlServerVersion(new Version(8, 4, 0)),
-        mysqlOptions =>
-        {
-            mysqlOptions.MigrationsAssembly("Hongdal");
-            mysqlOptions.EnableRetryOnFailure();
-        }));
-
-var redisConnectionString = builder.Configuration.GetSection(RedisOptions.SectionName).GetValue<string>(nameof(RedisOptions.ConnectionString))
-                            ?? Environment.GetEnvironmentVariable("Redis__ConnectionString");
-if (string.IsNullOrWhiteSpace(redisConnectionString))
-{
-    throw new InvalidOperationException("Redis:ConnectionString configuration is required.");
-}
-
-builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
-builder.Services.AddSingleton<IIsmsPTransportKeyStatusStore, RedisIsmsPTransportKeyStatusStore>();
-
-var mongoOptions = builder.Configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();
-var mongoConnectionString = string.IsNullOrWhiteSpace(mongoOptions.ConnectionString)
-    ? Environment.GetEnvironmentVariable("MongoDb__ConnectionString")
-    : mongoOptions.ConnectionString;
-if (string.IsNullOrWhiteSpace(mongoConnectionString))
-{
-    throw new InvalidOperationException("MongoDb:ConnectionString configuration is required.");
-}
-
-builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
+builder.Services.AddHongdalPersistence(builder.Configuration);
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {

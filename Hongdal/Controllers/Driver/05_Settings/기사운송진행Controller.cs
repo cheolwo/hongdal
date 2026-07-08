@@ -90,10 +90,14 @@ namespace Hongdal.Controllers.Driver.Progress05
         }
 
         [HttpPost("{id:long}/complete")]
-        public async Task<IActionResult> 완료(long id)
+        public async Task<IActionResult> 완료(long id, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] 기사운송하차완료요청? request)
         {
             var driverId = 현재기사Id();
-            var result = await _sender.Send(new 운송인수완료Command(driverId, id));
+            var result = await _sender.Send(new 운송인수완료Command(driverId, id)
+            {
+                하차사진ObjectName = request?.하차사진ObjectName,
+                하차사진Url = request?.하차사진Url
+            });
             return this.ToActionResult(result);
         }
 

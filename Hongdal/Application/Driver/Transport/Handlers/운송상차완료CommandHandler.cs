@@ -7,11 +7,16 @@ public sealed class 운송상차완료CommandHandler : IRequestHandler<운송상
 {
     private readonly HongdalContext _db;
     private readonly I기사운송상태변경CommandExecutor _executor;
+    private readonly I운송증빙첨부JsonWriter _attachmentWriter;
 
-    public 운송상차완료CommandHandler(HongdalContext db, I기사운송상태변경CommandExecutor executor)
+    public 운송상차완료CommandHandler(
+        HongdalContext db,
+        I기사운송상태변경CommandExecutor executor,
+        I운송증빙첨부JsonWriter attachmentWriter)
     {
         _db = db;
         _executor = executor;
+        _attachmentWriter = attachmentWriter;
     }
 
     public async Task<Result<기사운송상태변경응답>> Handle(운송상차완료Command request, CancellationToken cancellationToken)
@@ -22,6 +27,11 @@ public sealed class 운송상차완료CommandHandler : IRequestHandler<운송상
         if (transport is null)
         {
             return Result.Fail<기사운송상태변경응답>("운송을 찾을 수 없습니다.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.상차사진ObjectName))
+        {
+            return Result.Fail<기사운송상태변경응답>("상차 완료 사진 업로드가 확인되어야 상차 완료 처리할 수 있습니다.");
         }
 
         var receiptRequired = await _db.화주운송의뢰
@@ -87,7 +97,21 @@ public sealed class 운송상차완료CommandHandler : IRequestHandler<운송상
                     context.운송.상태,
                     context.발생시각Utc,
                     context.TraceId,
-                    receiptEvidence)),
+                    receiptEvidence),
+                (entity, changedAt) => _attachmentWriter.추가(
+                    entity,
+                    new 운송증빙첨부(
+                        "pickup-complete-photo",
+                        request.상차사진ObjectName,
+                        request.상차사진Url,
+                        request.기사Id,
+                        changedAt,
+                        new Dictionary<string, object?>
+                        {
+                            ["receiptEvidenceMethod"] = request.인수증증빙방식?.Trim(),
+                            ["receiptConfirmed"] = request.인수증확인완료,
+                            ["receiptSignatureOmitted"] = request.인수증서명생략확인
+                        }))),
             cancellationToken);
     }
 

@@ -42,6 +42,7 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<DriverAccessPolicyService>();
         services.AddSingleton<DriverHomeDisplayPreferenceService>();
         services.AddSingleton<IDriverHomeMapService, DriverHomeMapService>();
+        services.AddSingleton<DriverHomeRoutePlanningService>();
         services.AddSingleton<IDriverWorkApiService, DriverWorkApiService>();
 #if ANDROID
         services.AddSingleton<I기사위치송신Service, Android기사위치송신Service>();
@@ -65,14 +66,7 @@ public static class DriverServiceCollectionExtensions
         });
         services.AddScoped<AuthApiService>();
         services.AddSingleton<HttpDriverTransportCompletionPhotoService>();
-        services.AddSingleton<SampleDriverTransportCompletionPhotoService>();
-        services.AddSingleton<IDriverTransportCompletionPhotoService>(sp =>
-        {
-            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ClientDataModeOptions>>().Value;
-            return options.AllowSampleFallback
-                ? sp.GetRequiredService<SampleDriverTransportCompletionPhotoService>()
-                : sp.GetRequiredService<HttpDriverTransportCompletionPhotoService>();
-        });
+        services.AddSingleton<IDriverTransportCompletionPhotoService>(sp => sp.GetRequiredService<HttpDriverTransportCompletionPhotoService>());
         services.AddScoped<IApiClient, ApiClient>();
 
         return services;

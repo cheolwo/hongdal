@@ -9,6 +9,9 @@
         public string ApiKeyId { get; set; } = string.Empty;
         public string ApiKey { get; set; } = string.Empty;
         public string DefaultOption { get; set; } = "trafast";
+        public bool EnableFallbackRouteEstimate { get; set; } = true;
+        public decimal FallbackDistanceMultiplier { get; set; } = 1.25m;
+        public decimal FallbackAverageSpeedKmH { get; set; } = 45m;
     }
 }
 

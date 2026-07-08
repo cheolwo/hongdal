@@ -146,6 +146,14 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
                 인수증서명생략사유 = photo.ReceiptEvidence?.SignatureOmissionReason
             });
         }
+        else
+        {
+            request.Content = JsonContent.Create(new 기사운송하차완료요청
+            {
+                하차사진ObjectName = upload.ObjectName,
+                하차사진Url = upload.Url
+            });
+        }
 
         ApplyAuthorization(request);
 
