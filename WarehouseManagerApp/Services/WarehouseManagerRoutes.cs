@@ -11,6 +11,7 @@ public static class WarehouseManagerRoutes
     public const string DeliveryAgencyWorkStart = "/work/delivery-agency";
     public const string Scan = "/scan";
     public const string WorkBoard = "/work-board";
+    public const string PickingBatch = "/work/picking-batch";
     public const string InboundProductScan = "/work/inbound/products";
     public const string InboundInspection = "/work/inbound/inspection";
     public const string MartHome = "/mart";

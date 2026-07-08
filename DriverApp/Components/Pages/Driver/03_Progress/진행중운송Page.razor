@@ -49,6 +49,10 @@
                             <MudText Typo="Typo.caption" Color="Color.Secondary">예상수익</MudText>
                             <MudText Typo="Typo.body1">@현재운송.예상수익.ToString("N0")원</MudText>
                         </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">상차 유형</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="@CargoLoadTypeColor" Variant="Variant.Filled">@현재운송.수입화물유형표시</MudChip>
+                        </MudItem>
                     </MudGrid>
 
                     <MudStack Row="true" Spacing="2" Class="flex-wrap">
@@ -110,8 +114,11 @@
                                                     PrivacyHint="운행 중 필요한 정보만 펼쳐 확인합니다.">
                         <MudExpansionPanel Text="화물 정보">
                             <HongdalSensitiveInfoRow Label="화물 종류" Value="@현재운송.화물종류" />
+                            <HongdalSensitiveInfoRow Label="상차 유형" Value="@현재운송.수입화물유형표시" />
+                            <HongdalSensitiveInfoRow Label="BL/반출 문서" Value="@DocumentNumberLabel" />
+                            <HongdalSensitiveInfoRow Label="컨테이너" Value="@ContainerNumberLabel" />
                             <HongdalSensitiveInfoRow Label="의뢰 번호" Value="@현재운송.의뢰Id" />
-                            <HongdalSensitiveInfoRow Label="작업 메모" Value="상차 전 화물 상태와 수량을 확인합니다." />
+                            <HongdalSensitiveInfoRow Label="작업 메모" Value="@현재운송.상차주의사항" />
                         </MudExpansionPanel>
 
                         <MudExpansionPanel Text="운송 정보">
@@ -171,6 +178,21 @@
     private Color NextActionColor => ShouldPickup ? Color.Primary : Color.Success;
 
     private Color CurrentStageColor => ShouldPickup ? Color.Primary : Color.Success;
+
+    private Color CargoLoadTypeColor
+        => 현재운송?.IsFcl == true
+            ? Color.Warning
+            : 현재운송?.IsLcl == true
+                ? Color.Info
+                : Color.Default;
+
+    private string DocumentNumberLabel
+        => string.IsNullOrWhiteSpace(현재운송?.선하증권번호) ? "현장 확인" : 현재운송.선하증권번호;
+
+    private string ContainerNumberLabel
+        => 현재운송?.IsFcl == true
+            ? $"{현재운송.컨테이너번호} / 봉인 {현재운송.봉인번호}"
+            : "해당 없음";
 
     private string RecipientName => 현재운송 is null ? "-" : $"{현재운송.하차지} 담당자";
 

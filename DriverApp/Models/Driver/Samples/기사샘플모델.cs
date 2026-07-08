@@ -53,7 +53,79 @@ public sealed record 기사운송샘플항목(
     bool 인수증필요,
     bool 인수증서명필수,
     string 결제방식,
-    string 다음행동);
+    string 다음행동)
+{
+    public string 수입화물유형 { get; init; } = "일반";
+
+    public string 선하증권번호 { get; init; } = string.Empty;
+
+    public string 컨테이너번호 { get; init; } = string.Empty;
+
+    public string 봉인번호 { get; init; } = string.Empty;
+
+    public string 상차작업방식 { get; init; } = "일반 상차";
+
+    public string 상차주의사항 { get; init; } = "상차지, 화물 수량, 외관 상태를 확인합니다.";
+
+    public IReadOnlyList<기사상차체크항목> 상차체크목록 { get; init; } = [];
+
+    public IReadOnlyList<기사상차대상화물> 상차대상화물목록 { get; init; } = [];
+
+    public bool IsLcl => string.Equals(수입화물유형, "LCL", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsFcl => string.Equals(수입화물유형, "FCL", StringComparison.OrdinalIgnoreCase);
+
+    public string 수입화물유형표시 => IsLcl
+        ? "LCL 혼재화물"
+        : IsFcl
+            ? "FCL 컨테이너"
+            : 수입화물유형;
+
+    public bool 적재순번필요
+    {
+        get
+        {
+            if (상차대상화물목록.Count <= 1)
+            {
+                return false;
+            }
+
+            var 기준화물 = 상차대상화물목록[0];
+            return 상차대상화물목록.Any(item =>
+                !string.Equals(item.Label, 기준화물.Label, StringComparison.Ordinal)
+                || item.수량 != 기준화물.수량
+                || item.중량Kg != 기준화물.중량Kg);
+        }
+    }
+
+    public string 적재순번운영안내 => 적재순번필요
+        ? "상품 구성, 수량, 중량이 달라 하차 순서에 맞춘 적재순번을 표시합니다."
+        : "동일 상품, 동일 수량, 동일 중량이면 적재순번 없이 수량 확인 중심으로 상차합니다.";
+}
+
+public sealed record 기사상차체크항목(
+    string Code,
+    string Label,
+    string HelpText);
+
+public sealed record 기사상차대상화물(
+    string Code,
+    string Barcode,
+    string Label,
+    string 하차위치,
+    int 하차순번,
+    int 적재순번,
+    string 차량적재위치,
+    int 수량,
+    decimal 중량Kg,
+    string 작업메모)
+{
+    public string 적재순번표시 => $"{적재순번}번";
+
+    public string 하차순번표시 => $"{하차순번}번째 하차";
+
+    public string 수량중량표시 => $"{수량:N0}개 / {중량Kg:0.##}kg";
+}
 
 public sealed record 기사정산샘플요약(
     int 년도,

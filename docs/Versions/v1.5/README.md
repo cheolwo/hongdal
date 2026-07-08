@@ -12,7 +12,7 @@
 | --- | --- |
 | 입고 | 계약 기반 입고, 현장 임시 입고, 주문 자동 입고 예정 |
 | 적재 | 검수 후 보관 위치 확정, 입고 묶음 해제, 재고 이동 기록 |
-| 출고 | 출고 배치 엔진, 주문 출고 알림, 출고 예약, 피킹, 포장, 출고 예정 |
+| 출고 | 출고 배치 엔진, 피킹 배치 엔진, 주문 출고 알림, 출고 예약, 피킹, 포장, 출고 예정 |
 | 재위탁 | 창고 출고 후 화물/용달 운송 연결 |
 | 작업자 검증 | 휴대폰 뒤 8자리, 작업대 바코드, 역할 확인 |
 
@@ -37,6 +37,9 @@
 | 출고 배치 요청 DTO | 주문 참조번호, 판매자, 주문자, 하차 주소, 상품 라인을 전달 | `Hongdal.Contracts/Common/Warehouse/OutboundBatchDtos.cs` |
 | `IOutboundBatchEngine` | 출고 계획을 만드는 인터페이스 | `Hongdal/Services/LogisticsProcessing/Warehouse/IOutboundBatchEngine.cs` |
 | `OutboundBatchEngine` | 입고상품 재고, 창고 배송권, 거리/운송비 점수를 보고 출고 배분 계산 | `Hongdal/Services/LogisticsProcessing/Warehouse/OutboundBatchEngine.cs` |
+| 피킹 배치 DTO | 출고 라인, 적재대/보관 위치, 피킹/포장 처리 방식, 작업자 후보를 전달 | `Hongdal.Contracts/Common/Warehouse/PickingBatchDtos.cs` |
+| `I피킹배치Engine` | 출고 배치 결과를 현장 피킹/포장 작업으로 나누는 인터페이스 | `Hongdal/Services/LogisticsProcessing/Warehouse/I피킹배치Engine.cs` |
+| `피킹배치Engine` | 피킹 작업자와 포장 작업자를 통합 또는 분리 방식으로 배정 | `Hongdal/Services/LogisticsProcessing/Warehouse/피킹배치Engine.cs` |
 | `WarehouseServiceAreaPolicy` | 주문자 주소가 창고 기본 배송권에 들어가는지 판단 | `Hongdal/Services/LogisticsProcessing/Warehouse/WarehouseServiceAreaPolicy.cs` |
 | `WarehouseDistanceCostEstimator` | 창고와 주문자 주소 사이의 거리/운송비를 추정 | `Hongdal/Services/LogisticsProcessing/Warehouse/WarehouseDistanceCostEstimator.cs` |
 | 판매채널 주문 동기화 | 채널 주문을 판매상품/입고상품과 매핑하고 출고 배치 엔진을 호출 | `Hongdal/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncService.cs` |
@@ -59,7 +62,14 @@ flowchart TD
     J -->|아니오| L["라인별 복수 창고 배분"]
     K --> M["OutboundBatchAllocation"]
     L --> M
-    M --> N["출고예정 생성"]
+    M --> N["피킹배치Engine.계획Async"]
+    N --> P{"피킹/포장 처리 방식"}
+    P -->|통합| Q["같은 작업자 피킹+포장"]
+    P -->|분리| R["피킹 작업자 → 포장 작업자 인계"]
+    P -->|피킹만| S["피킹 작업만 생성"]
+    Q --> T["출고예정 생성"]
+    R --> T
+    S --> T
     F --> O["부족 라인 / 미배분 사유 반환"]
 ```
 
@@ -86,6 +96,11 @@ flowchart TD
 | 선택 점수 | 재고 충족, 배송권 포함, 기본창고 여부, 선호 입고상품, 거리/운송비를 합산한 창고 후보 점수 |
 | 분할 출고 | 한 주문을 여러 창고 또는 여러 출고 단위로 나누는 처리 |
 | 미배분 라인 | 출고 계획을 만들지 못한 상품 라인. 재고 부족 등 사유를 함께 보관 |
+| 피킹 배치 엔진 | 출고 배치 결과를 적재대, 피킹 작업자, 포장 작업자, 피킹/포장 처리 방식으로 나누는 현장 작업 배정 모듈 |
+| 창고별 피킹 옵션 | 창고마다 피킹/포장 통합, 피킹/포장 분리, 피킹만, 상품 바코드 검증 필수 여부를 조정하는 설정 |
+| 피킹/포장 통합 | 피킹한 작업자가 같은 물량을 포장까지 이어서 처리하는 방식 |
+| 피킹/포장 분리 | 피킹 작업자가 물건을 꺼낸 뒤 별도 포장 작업자에게 넘기는 방식 |
+| 적재대 위치 바코드 | 피킹 작업자가 실제 보관 위치에 접근했는지 확인하기 위해 스캔하는 위치 식별값 |
 
 ## 보류 범위
 

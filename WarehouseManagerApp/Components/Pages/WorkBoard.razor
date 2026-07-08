@@ -11,7 +11,10 @@
                     입고, 적재, 출고, 포장 업무가 누구와 직접 연결되는지 먼저 확인한 뒤 상세 업무를 펼쳐봅니다.
                 </MudText>
             </MudStack>
-            <MudButton Href="scan" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner">스캔</MudButton>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudButton Href="@WarehouseManagerRoutes.PickingBatch" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Inventory2">피킹 배치</MudButton>
+                <MudButton Href="scan" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner">스캔</MudButton>
+            </MudStack>
         </MudStack>
 
         <MudGrid>

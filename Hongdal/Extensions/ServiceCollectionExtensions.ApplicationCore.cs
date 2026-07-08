@@ -84,6 +84,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
         services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();
         services.AddScoped<IOutboundBatchEngine, OutboundBatchEngine>();
+        services.AddScoped<I피킹배치Engine, 피킹배치Engine>();
         services.AddScoped<IWorkRelationshipSnapshotService, WorkRelationshipSnapshotService>();
         services.AddScoped<ICommunityActivitySignalService, CommunityActivitySignalService>();
         services.AddSingleton<ICommunityVoteService, InMemoryCommunityVoteService>();

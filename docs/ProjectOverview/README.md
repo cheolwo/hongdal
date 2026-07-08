@@ -20,7 +20,7 @@
 
 | 문서 | 내용 |
 | --- | --- |
-| [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 단일/복수 상품 주문을 단일/복수 창고 출고 배치로 나누는 계획 계층 |
+| [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 단일/복수 상품 주문을 단일/복수 창고 출고 배치로 나누고, 피킹 배치 엔진으로 현장 작업자를 배정하는 계획 계층 |
 
 ## 관리 원칙
 

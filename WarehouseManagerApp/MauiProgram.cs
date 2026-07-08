@@ -25,6 +25,7 @@ public static class MauiProgram
         builder.Services.AddScoped<PlatformHomeModeStateService>();
         builder.Services.AddSingleton<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();
         builder.Services.AddSingleton<IInboundReceivingWorkflowService, SampleInboundReceivingWorkflowService>();
+        builder.Services.AddSingleton<IWarehousePickingBatchWorkspaceService, SampleWarehousePickingBatchWorkspaceService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
