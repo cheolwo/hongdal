@@ -4,15 +4,31 @@
 
 루트 README는 홍달 1.0의 1페이지 요약만 유지합니다. 앱별 화면, 캡처 이미지, 화면 간 관계, 업무 흐름, 기술 설명은 이 첨부 문서에서 순서대로 봅니다.
 
+## 화면으로 먼저 보기
+
+첨부 문서도 기술 구조보다 화면을 먼저 봅니다. 아래 이미지는 실제 캡처 파일을 README 안에 직접 렌더링한 것입니다.
+
+| 화주 의뢰 상세 | 기사 지도 홈 |
+| --- | --- |
+| <img src="assets/app-pages/ShipperApp/ShipperApp-P03.png" alt="화주 의뢰 상세 화면" width="260"> | <img src="assets/app-pages/DriverApp/DriverApp-P07.png" alt="기사 지도 홈 화면" width="260"> |
+
+| 기사 추천 상세 | 기사 상하차 증빙 |
+| --- | --- |
+| <img src="assets/app-pages/DriverApp/DriverApp-P09.png" alt="기사 추천 상세 화면" width="260"> | <img src="assets/app-pages/DriverApp/DriverApp-P12.png" alt="기사 상차 증빙 화면" width="220"> <img src="assets/app-pages/DriverApp/DriverApp-P13.png" alt="기사 하차 증빙 화면" width="220"> |
+
+| 관리자 운송 원장 | 창고 피킹 배치 |
+| --- | --- |
+| <img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="관리자 운송 원장 화면" width="300"> | <img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P04.png" alt="창고 피킹 배치 화면" width="260"> |
+
 ## 먼저 볼 화면 문서
 
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
 | 00 | [첨부 문서 목차](00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
-| 01 | [app-page-catalog.md](app-page-catalog.md) | 각 앱 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 캡처 PNG 링크 |
+| 01 | [app-page-catalog.md](app-page-catalog.md) | 각 앱 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
 | 02 | [hongdal-v1-required-pages.md](hongdal-v1-required-pages.md) | 홍달 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
 | 03 | [hongdal-v1-render-capture-summary.md](hongdal-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
-| 04 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 앱 화면이 하나의 업무 흐름을 완성하는 관계 |
+| 04 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 앱 화면이 하나의 업무 흐름을 완성하는 관계를 세부적으로 설명 |
 | 05 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 카드, 모드 전환이 다음 행동으로 이어지는 흐름 |
 
 ## 업무 흐름 문서
