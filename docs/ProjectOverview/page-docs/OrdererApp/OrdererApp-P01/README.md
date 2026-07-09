@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | OrdererApp |
-| 페이지 ID | OrdererApp-P01 |
+| 페이지 ID / 제목 | OrdererApp-P01 - 주문자 홈 |
 | 라우트 | / |
 | 소스 파일 | [OrdererApp/Components/Pages/Home.razor](../../../../../OrdererApp/Components/Pages/Home.razor) |
 | 분류 | 보조 |
@@ -38,7 +38,7 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: 없음
-- 다음 화면: [OrdererApp-P02](../OrdererApp-P02/)
+- 다음 화면: [OrdererApp-P02 - 공동구매 의사 표시/집단화](../OrdererApp-P02/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

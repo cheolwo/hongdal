@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P01 |
+| 페이지 ID / 제목 | DriverApp-P01 - 로그인 |
 | 라우트 | /login |
 | 소스 파일 | [DriverApp/Components/Pages/Login.razor](../../../../../DriverApp/Components/Pages/Login.razor) |
 | 분류 | 시스템 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P00](../DriverApp-P00/)
-- 다음 화면: [DriverApp-P02](../DriverApp-P02/)
+- 이전 화면: [DriverApp-P00 - 기사 앱 시작 라우트 리다이렉트](../DriverApp-P00/)
+- 다음 화면: [DriverApp-P02 - 기사 앱 메뉴](../DriverApp-P02/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

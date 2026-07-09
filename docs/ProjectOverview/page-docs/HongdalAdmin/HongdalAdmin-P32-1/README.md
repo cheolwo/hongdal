@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P32-1 |
+| 페이지 ID / 제목 | HongdalAdmin-P32-1 - 차량 관리 |
 | 라우트 | /vehicle-management |
 | 소스 파일 | [HongdalAdmin/Components/Pages/VehicleManagement.razor](../../../../../HongdalAdmin/Components/Pages/VehicleManagement.razor) |
 | 분류 | 운영 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P32](../HongdalAdmin-P32/)
-- 다음 화면: [HongdalAdmin-P33](../HongdalAdmin-P33/)
-- 상위 화면: [HongdalAdmin-P32](../HongdalAdmin-P32/)
+- 이전 화면: [HongdalAdmin-P32 - 기사 목록/관리](../HongdalAdmin-P32/)
+- 다음 화면: [HongdalAdmin-P33 - 파트너 관리](../HongdalAdmin-P33/)
+- 상위 화면: [HongdalAdmin-P32 - 기사 목록/관리](../HongdalAdmin-P32/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 관리자는 여러 앱에서 발생한 상태 변경을 모아 보고, 막힌 배차·증빙·정산·문서 문제에 개입합니다.

@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P16 |
+| 페이지 ID / 제목 | HongdalAdmin-P16 - 운영 대시보드 |
 | 라우트 | /dashboard |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Dashboard.razor](../../../../../HongdalAdmin/Components/Pages/Dashboard.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [HongdalAdmin-P16](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [HongdalAdmin-P16 - 운영 대시보드](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P00-2](../HongdalAdmin-P00-2/)
-- 다음 화면: [HongdalAdmin-P17](../HongdalAdmin-P17/)
+- 이전 화면: [HongdalAdmin-P00-2 - 오류 화면](../HongdalAdmin-P00-2/)
+- 다음 화면: [HongdalAdmin-P17 - 의뢰 목록](../HongdalAdmin-P17/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

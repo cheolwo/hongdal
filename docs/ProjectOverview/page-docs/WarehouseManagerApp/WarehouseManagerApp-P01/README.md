@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID | WarehouseManagerApp-P01 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P01 - 창고 관리자 홈 |
 | 라우트 | / |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/Home.razor](../../../../../WarehouseManagerApp/Components/Pages/Home.razor) |
 | 분류 | 보조 |
@@ -38,7 +38,7 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: 없음
-- 다음 화면: [WarehouseManagerApp-P02](../WarehouseManagerApp-P02/)
+- 다음 화면: [WarehouseManagerApp-P02 - 일반 창고 작업 보드](../WarehouseManagerApp-P02/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

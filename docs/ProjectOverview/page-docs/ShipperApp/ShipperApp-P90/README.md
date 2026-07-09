@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P90 |
+| 페이지 ID / 제목 | ShipperApp-P90 - 템플릿/샘플성 날씨 화면 |
 | 라우트 | /weather |
 | 소스 파일 | [ShipperApp/Components/Pages/Weather.razor](../../../../../ShipperApp/Components/Pages/Weather.razor) |
 | 분류 | 시스템 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P08](../ShipperApp-P08/)
-- 다음 화면: [ShipperApp-P91](../ShipperApp-P91/)
+- 이전 화면: [ShipperApp-P08 - 재위탁/재운송 주문](../ShipperApp-P08/)
+- 다음 화면: [ShipperApp-P91 - 템플릿/샘플성 카운터 화면](../ShipperApp-P91/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

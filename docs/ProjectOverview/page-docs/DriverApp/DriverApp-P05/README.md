@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P05 |
+| 페이지 ID / 제목 | DriverApp-P05 - 운송/배달 이력 조회 |
 | 라우트 | /driver/transports/history |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/03_Progress/배달내역Page.razor](../../../../../DriverApp/Components/Pages/Driver/03_Progress/배달내역Page.razor) |
 | 분류 | 보조 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P04](../DriverApp-P04/)
-- 다음 화면: [DriverApp-P06](../DriverApp-P06/)
+- 이전 화면: [DriverApp-P04 - 탐색 캠페인/추천 확장](../DriverApp-P04/)
+- 다음 화면: [DriverApp-P06 - 운행 시작, 위치 송신 시작](../DriverApp-P06/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

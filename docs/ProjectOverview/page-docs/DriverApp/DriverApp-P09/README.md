@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P09 |
+| 페이지 ID / 제목 | DriverApp-P09 - 추천 상세와 판단 정보 |
 | 라우트 | /driver/recommendations/{의뢰Id} |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/02_Recommendation/추천상세Page.razor](../../../../../DriverApp/Components/Pages/Driver/02_Recommendation/추천상세Page.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [DriverApp-P09](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [DriverApp-P09 - 추천 상세와 판단 정보](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P08](../DriverApp-P08/)
-- 다음 화면: [DriverApp-P10](../DriverApp-P10/)
+- 이전 화면: [DriverApp-P08 - 추천 목록](../DriverApp-P08/)
+- 다음 화면: [DriverApp-P10 - 추천 수락/거절/보류 처리](../DriverApp-P10/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

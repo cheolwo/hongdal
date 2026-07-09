@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P34 |
+| 페이지 ID / 제목 | HongdalAdmin-P34 - 수익/요율 정책 |
 | 라우트 | /revenue-policies |
 | 소스 파일 | [HongdalAdmin/Components/Pages/RevenuePolicies.razor](../../../../../HongdalAdmin/Components/Pages/RevenuePolicies.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P33](../HongdalAdmin-P33/)
-- 다음 화면: [HongdalAdmin-P35](../HongdalAdmin-P35/)
+- 이전 화면: [HongdalAdmin-P33 - 파트너 관리](../HongdalAdmin-P33/)
+- 다음 화면: [HongdalAdmin-P35 - 보조 기능 설정](../HongdalAdmin-P35/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

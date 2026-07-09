@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID | WarehouseManagerApp-P05-1 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P05-1 - 홍달마트 작업 보드 |
 | 라우트 | /mart/work-board |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/MartWorkBoard.razor](../../../../../WarehouseManagerApp/Components/Pages/MartWorkBoard.razor) |
 | 분류 | 확장 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P05](../WarehouseManagerApp-P05/)
-- 다음 화면: [WarehouseManagerApp-P05-2](../WarehouseManagerApp-P05-2/)
-- 상위 화면: [WarehouseManagerApp-P05](../WarehouseManagerApp-P05/)
+- 이전 화면: [WarehouseManagerApp-P05 - 홍달마트 창고 홈](../WarehouseManagerApp-P05/)
+- 다음 화면: [WarehouseManagerApp-P05-2 - 홍달마트 프로세스별 작업 시작](../WarehouseManagerApp-P05-2/)
+- 상위 화면: [WarehouseManagerApp-P05 - 홍달마트 창고 홈](../WarehouseManagerApp-P05/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 창고 작업자가 입력한 입고, 스캔, 피킹 결과는 화주 재고/출고 상태와 기사 운송 의뢰 흐름으로 연결됩니다.

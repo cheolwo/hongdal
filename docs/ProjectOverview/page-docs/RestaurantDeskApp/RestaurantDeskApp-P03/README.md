@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | RestaurantDeskApp |
-| 페이지 ID | RestaurantDeskApp-P03 |
+| 페이지 ID / 제목 | RestaurantDeskApp-P03 - 리뷰 관리 |
 | 라우트 | /reviews/moderation |
 | 소스 파일 | [RestaurantDeskApp/Components/Pages/ReviewModeration.razor](../../../../../RestaurantDeskApp/Components/Pages/ReviewModeration.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [RestaurantDeskApp-P02-1](../RestaurantDeskApp-P02-1/)
-- 다음 화면: [RestaurantDeskApp-P04](../RestaurantDeskApp-P04/)
+- 이전 화면: [RestaurantDeskApp-P02-1 - 인기 음식점 조회](../RestaurantDeskApp-P02-1/)
+- 다음 화면: [RestaurantDeskApp-P04 - 배차 주소 입력/검증 폼](../RestaurantDeskApp-P04/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

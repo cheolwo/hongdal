@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P21 |
+| 페이지 ID / 제목 | HongdalAdmin-P21 - 운송 목록 |
 | 라우트 | /transports |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Transports.razor](../../../../../HongdalAdmin/Components/Pages/Transports.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [HongdalAdmin-P21](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [HongdalAdmin-P21 - 운송 목록](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P20](../HongdalAdmin-P20/)
-- 다음 화면: [HongdalAdmin-P22](../HongdalAdmin-P22/)
+- 이전 화면: [HongdalAdmin-P20 - 운행 중 기사 현황](../HongdalAdmin-P20/)
+- 다음 화면: [HongdalAdmin-P22 - 운송 상세 원장](../HongdalAdmin-P22/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

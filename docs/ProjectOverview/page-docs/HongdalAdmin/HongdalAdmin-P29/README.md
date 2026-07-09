@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P29 |
+| 페이지 ID / 제목 | HongdalAdmin-P29 - HS 코드/통관 운영 |
 | 라우트 | /customs/hs-codes |
 | 소스 파일 | [HongdalAdmin/Components/Pages/HsCodeOperations.razor](../../../../../HongdalAdmin/Components/Pages/HsCodeOperations.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P28](../HongdalAdmin-P28/)
-- 다음 화면: [HongdalAdmin-P30](../HongdalAdmin-P30/)
+- 이전 화면: [HongdalAdmin-P28 - 공개 화물/화물 운영 화면](../HongdalAdmin-P28/)
+- 다음 화면: [HongdalAdmin-P30 - 음식 주문/배달 운영](../HongdalAdmin-P30/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

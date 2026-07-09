@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P15 |
+| 페이지 ID / 제목 | DriverApp-P15 - 알림함 |
 | 라우트 | /driver/notifications |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/06_Notification/알림함Page.razor](../../../../../DriverApp/Components/Pages/Driver/06_Notification/알림함Page.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [DriverApp-P15](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [DriverApp-P15 - 알림함](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P14-2](../DriverApp-P14-2/)
-- 다음 화면: [DriverApp-P15-1](../DriverApp-P15-1/)
+- 이전 화면: [DriverApp-P14-2 - 기사 정산 계좌 정보](../DriverApp-P14-2/)
+- 다음 화면: [DriverApp-P15-1 - 알림 수신 설정](../DriverApp-P15-1/)
 - 상위 화면: 없음
-- 하위 화면: [DriverApp-P15-1](../DriverApp-P15-1/), [DriverApp-P15-2](../DriverApp-P15-2/)
+- 하위 화면: [DriverApp-P15-1 - 알림 수신 설정](../DriverApp-P15-1/), [DriverApp-P15-2 - 푸시 토큰/권한 설정](../DriverApp-P15-2/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 기사의 수락, 거절, 상차, 하차, 증빙, 정산 관련 조작은 화주 상세와 관리자 원장에 상태 변경으로 반영됩니다.
 

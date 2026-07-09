@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | OrdererApp |
-| 페이지 ID | OrdererApp-P04 |
+| 페이지 ID / 제목 | OrdererApp-P04 - 음식 주문 홈 |
 | 라우트 | /food |
 | 소스 파일 | [OrdererApp/Components/Pages/FoodOrderHome.razor](../../../../../OrdererApp/Components/Pages/FoodOrderHome.razor) |
 | 분류 | 확장 |
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [OrdererApp-P03](../OrdererApp-P03/)
-- 다음 화면: [OrdererApp-P04-1](../OrdererApp-P04-1/)
+- 이전 화면: [OrdererApp-P03 - 주문자 화물 주문](../OrdererApp-P03/)
+- 다음 화면: [OrdererApp-P04-1 - 음식점 주문](../OrdererApp-P04-1/)
 - 상위 화면: 없음
-- 하위 화면: [OrdererApp-P04-1](../OrdererApp-P04-1/), [OrdererApp-P04-2](../OrdererApp-P04-2/)
+- 하위 화면: [OrdererApp-P04-1 - 음식점 주문](../OrdererApp-P04-1/), [OrdererApp-P04-2 - 마트 주문](../OrdererApp-P04-2/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 주문자의 의사 표시와 주문 상태는 공동주문 집단화, 해외 물류, 국내 운송, 판매채널 이행 흐름으로 이어질 수 있습니다.
 

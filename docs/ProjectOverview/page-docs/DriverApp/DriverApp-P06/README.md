@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P06 |
+| 페이지 ID / 제목 | DriverApp-P06 - 운행 시작, 위치 송신 시작 |
 | 라우트 | /driver/work/start |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/01_Work/운행시작Page.razor](../../../../../DriverApp/Components/Pages/Driver/01_Work/운행시작Page.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [DriverApp-P06](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [DriverApp-P06 - 운행 시작, 위치 송신 시작](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P05](../DriverApp-P05/)
-- 다음 화면: [DriverApp-P06-1](../DriverApp-P06-1/)
+- 이전 화면: [DriverApp-P05 - 운송/배달 이력 조회](../DriverApp-P05/)
+- 다음 화면: [DriverApp-P06-1 - 운행 조건과 선호 설정](../DriverApp-P06-1/)
 - 상위 화면: 없음
-- 하위 화면: [DriverApp-P06-1](../DriverApp-P06-1/)
+- 하위 화면: [DriverApp-P06-1 - 운행 조건과 선호 설정](../DriverApp-P06-1/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 기사의 수락, 거절, 상차, 하차, 증빙, 정산 관련 조작은 화주 상세와 관리자 원장에 상태 변경으로 반영됩니다.
 

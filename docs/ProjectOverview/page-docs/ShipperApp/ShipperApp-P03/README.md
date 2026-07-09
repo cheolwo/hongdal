@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P03 |
+| 페이지 ID / 제목 | ShipperApp-P03 - 의뢰 상세, 결제/배차/상차/하차/정산 타임라인 |
 | 라우트 | /shipper/request/{RequestId} |
 | 소스 파일 | [ShipperApp/Components/Pages/ShipperRequestDetail.razor](../../../../../ShipperApp/Components/Pages/ShipperRequestDetail.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [ShipperApp-P03](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [ShipperApp-P03 - 의뢰 상세, 결제/배차/상차/하차/정산 타임라인](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P02-2](../ShipperApp-P02-2/)
-- 다음 화면: [ShipperApp-P04](../ShipperApp-P04/)
+- 이전 화면: [ShipperApp-P02-2 - 배차 주소 입력/검증 폼](../ShipperApp-P02-2/)
+- 다음 화면: [ShipperApp-P04 - 화주 입고 업무 대시보드](../ShipperApp-P04/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

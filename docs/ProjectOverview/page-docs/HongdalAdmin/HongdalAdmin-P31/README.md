@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P31 |
+| 페이지 ID / 제목 | HongdalAdmin-P31 - 탐색 캠페인 운영 |
 | 라우트 | /exploration/campaigns |
 | 소스 파일 | [HongdalAdmin/Components/Pages/ExplorationCampaigns.razor](../../../../../HongdalAdmin/Components/Pages/ExplorationCampaigns.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P30-1](../HongdalAdmin-P30-1/)
-- 다음 화면: [HongdalAdmin-P32](../HongdalAdmin-P32/)
+- 이전 화면: [HongdalAdmin-P30-1 - 음식점 검색 정책](../HongdalAdmin-P30-1/)
+- 다음 화면: [HongdalAdmin-P32 - 기사 목록/관리](../HongdalAdmin-P32/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

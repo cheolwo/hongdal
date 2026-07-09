@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P33 |
+| 페이지 ID / 제목 | HongdalAdmin-P33 - 파트너 관리 |
 | 라우트 | /partners |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Partners.razor](../../../../../HongdalAdmin/Components/Pages/Partners.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P32-1](../HongdalAdmin-P32-1/)
-- 다음 화면: [HongdalAdmin-P34](../HongdalAdmin-P34/)
+- 이전 화면: [HongdalAdmin-P32-1 - 차량 관리](../HongdalAdmin-P32-1/)
+- 다음 화면: [HongdalAdmin-P34 - 수익/요율 정책](../HongdalAdmin-P34/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

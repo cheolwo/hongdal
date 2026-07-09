@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | OrdererApp |
-| 페이지 ID | OrdererApp-P02 |
+| 페이지 ID / 제목 | OrdererApp-P02 - 공동구매 의사 표시/집단화 |
 | 라우트 | /group-purchase |
 | 소스 파일 | [OrdererApp/Components/Pages/GroupPurchaseIntent.razor](../../../../../OrdererApp/Components/Pages/GroupPurchaseIntent.razor) |
 | 분류 | 확장 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [OrdererApp-P01](../OrdererApp-P01/)
-- 다음 화면: [OrdererApp-P03](../OrdererApp-P03/)
+- 이전 화면: [OrdererApp-P01 - 주문자 홈](../OrdererApp-P01/)
+- 다음 화면: [OrdererApp-P03 - 주문자 화물 주문](../OrdererApp-P03/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

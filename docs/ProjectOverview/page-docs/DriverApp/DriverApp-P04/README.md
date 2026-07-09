@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P04 |
+| 페이지 ID / 제목 | DriverApp-P04 - 탐색 캠페인/추천 확장 |
 | 라우트 | /driver/exploration/campaigns |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/02_Recommendation/탐색캠페인Page.razor](../../../../../DriverApp/Components/Pages/Driver/02_Recommendation/탐색캠페인Page.razor) |
 | 분류 | 확장 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P03](../DriverApp-P03/)
-- 다음 화면: [DriverApp-P05](../DriverApp-P05/)
+- 이전 화면: [DriverApp-P03 - 예약 운송 또는 예약 업무](../DriverApp-P03/)
+- 다음 화면: [DriverApp-P05 - 운송/배달 이력 조회](../DriverApp-P05/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

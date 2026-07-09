@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P32 |
+| 페이지 ID / 제목 | HongdalAdmin-P32 - 기사 목록/관리 |
 | 라우트 | /drivers |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Drivers.razor](../../../../../HongdalAdmin/Components/Pages/Drivers.razor) |
 | 분류 | 운영 |
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P31](../HongdalAdmin-P31/)
-- 다음 화면: [HongdalAdmin-P32-1](../HongdalAdmin-P32-1/)
+- 이전 화면: [HongdalAdmin-P31 - 탐색 캠페인 운영](../HongdalAdmin-P31/)
+- 다음 화면: [HongdalAdmin-P32-1 - 차량 관리](../HongdalAdmin-P32-1/)
 - 상위 화면: 없음
-- 하위 화면: [HongdalAdmin-P32-1](../HongdalAdmin-P32-1/)
+- 하위 화면: [HongdalAdmin-P32-1 - 차량 관리](../HongdalAdmin-P32-1/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 관리자는 여러 앱에서 발생한 상태 변경을 모아 보고, 막힌 배차·증빙·정산·문서 문제에 개입합니다.
 

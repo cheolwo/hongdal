@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P08 |
+| 페이지 ID / 제목 | DriverApp-P08 - 추천 목록 |
 | 라우트 | /driver/recommendations |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/02_Recommendation/추천목록Page.razor](../../../../../DriverApp/Components/Pages/Driver/02_Recommendation/추천목록Page.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [DriverApp-P08](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [DriverApp-P08 - 추천 목록](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P07-1](../DriverApp-P07-1/)
-- 다음 화면: [DriverApp-P09](../DriverApp-P09/)
+- 이전 화면: [DriverApp-P07-1 - 기사 업무 허브/요약](../DriverApp-P07-1/)
+- 다음 화면: [DriverApp-P09 - 추천 상세와 판단 정보](../DriverApp-P09/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

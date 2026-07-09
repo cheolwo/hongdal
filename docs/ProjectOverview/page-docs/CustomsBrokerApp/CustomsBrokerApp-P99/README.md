@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | CustomsBrokerApp |
-| 페이지 ID | CustomsBrokerApp-P99 |
+| 페이지 ID / 제목 | CustomsBrokerApp-P99 - 미발견 페이지 |
 | 라우트 | /not-found |
 | 소스 파일 | [CustomsBrokerApp/Pages/NotFound.razor](../../../../../CustomsBrokerApp/Pages/NotFound.razor) |
 | 분류 | 시스템 |
@@ -37,7 +37,7 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [CustomsBrokerApp-P01](../CustomsBrokerApp-P01/)
+- 이전 화면: [CustomsBrokerApp-P01 - 관세사/통관 담당자 홈](../CustomsBrokerApp-P01/)
 - 다음 화면: 없음
 - 상위 화면: 없음
 - 하위 화면: 없음

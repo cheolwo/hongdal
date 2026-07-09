@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | OrdererApp |
-| 페이지 ID | OrdererApp-P05 |
+| 페이지 ID / 제목 | OrdererApp-P05 - 주문 이력 |
 | 라우트 | /orders |
 | 소스 파일 | [OrdererApp/Components/Pages/OrderHistory.razor](../../../../../OrdererApp/Components/Pages/OrderHistory.razor) |
 | 분류 | 보조 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [OrdererApp-P04-2](../OrdererApp-P04-2/)
-- 다음 화면: [OrdererApp-P99](../OrdererApp-P99/)
+- 이전 화면: [OrdererApp-P04-2 - 마트 주문](../OrdererApp-P04-2/)
+- 다음 화면: [OrdererApp-P99 - 미발견 페이지](../OrdererApp-P99/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

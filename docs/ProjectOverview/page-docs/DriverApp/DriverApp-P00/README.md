@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P00 |
+| 페이지 ID / 제목 | DriverApp-P00 - 기사 앱 시작 라우트 리다이렉트 |
 | 라우트 | / |
 | 소스 파일 | [DriverApp/Components/Pages/RootRedirect.razor](../../../../../DriverApp/Components/Pages/RootRedirect.razor) |
 | 분류 | 시스템 |
@@ -38,7 +38,7 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: 없음
-- 다음 화면: [DriverApp-P01](../DriverApp-P01/)
+- 다음 화면: [DriverApp-P01 - 로그인](../DriverApp-P01/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

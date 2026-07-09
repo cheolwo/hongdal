@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P04 |
+| 페이지 ID / 제목 | ShipperApp-P04 - 화주 입고 업무 대시보드 |
 | 라우트 | /shipper/inbound/dashboard |
 | 소스 파일 | [ShipperApp/Components/Pages/InboundDashboard.razor](../../../../../ShipperApp/Components/Pages/InboundDashboard.razor) |
 | 분류 | 확장 |
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P03](../ShipperApp-P03/)
-- 다음 화면: [ShipperApp-P04-1](../ShipperApp-P04-1/)
+- 이전 화면: [ShipperApp-P03 - 의뢰 상세, 결제/배차/상차/하차/정산 타임라인](../ShipperApp-P03/)
+- 다음 화면: [ShipperApp-P04-1 - 입고 요청 목록과 처리](../ShipperApp-P04-1/)
 - 상위 화면: 없음
-- 하위 화면: [ShipperApp-P04-1](../ShipperApp-P04-1/)
+- 하위 화면: [ShipperApp-P04-1 - 입고 요청 목록과 처리](../ShipperApp-P04-1/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 화주가 입력하거나 확인한 의뢰/결제/창고 상태는 기사 앱의 추천, 관리자 원장, 창고 작업 화면으로 이어질 수 있습니다.
 

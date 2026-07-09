@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P22 |
+| 페이지 ID / 제목 | HongdalAdmin-P22 - 운송 상세 원장 |
 | 라우트 | /transports/{RequestId} |
 | 소스 파일 | [HongdalAdmin/Components/Pages/TransportWorkflowDetail.razor](../../../../../HongdalAdmin/Components/Pages/TransportWorkflowDetail.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [HongdalAdmin-P22](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [HongdalAdmin-P22 - 운송 상세 원장](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P21](../HongdalAdmin-P21/)
-- 다음 화면: [HongdalAdmin-P22-1](../HongdalAdmin-P22-1/)
+- 이전 화면: [HongdalAdmin-P21 - 운송 목록](../HongdalAdmin-P21/)
+- 다음 화면: [HongdalAdmin-P22-1 - 운송 이벤트 감사](../HongdalAdmin-P22-1/)
 - 상위 화면: 없음
-- 하위 화면: [HongdalAdmin-P22-1](../HongdalAdmin-P22-1/), [HongdalAdmin-P22-2](../HongdalAdmin-P22-2/), [HongdalAdmin-P22-3](../HongdalAdmin-P22-3/)
+- 하위 화면: [HongdalAdmin-P22-1 - 운송 이벤트 감사](../HongdalAdmin-P22-1/), [HongdalAdmin-P22-2 - 운송 증빙/POD](../HongdalAdmin-P22-2/), [HongdalAdmin-P22-3 - 운송 정산 상세](../HongdalAdmin-P22-3/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 관리자는 여러 앱에서 발생한 상태 변경을 모아 보고, 막힌 배차·증빙·정산·문서 문제에 개입합니다.
 

@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P01-1 |
+| 페이지 ID / 제목 | ShipperApp-P01-1 - 화주 프로필과 운영 프로필 설정 |
 | 라우트 | /shipper/settings/profile |
 | 소스 파일 | [ShipperApp/Components/Pages/ShipperProfileSettings.razor](../../../../../ShipperApp/Components/Pages/ShipperProfileSettings.razor) |
 | 분류 | 보조 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P01](../ShipperApp-P01/)
-- 다음 화면: [ShipperApp-P01-2](../ShipperApp-P01-2/)
-- 상위 화면: [ShipperApp-P01](../ShipperApp-P01/)
+- 이전 화면: [ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입](../ShipperApp-P01/)
+- 다음 화면: [ShipperApp-P01-2 - 화주 앱 메뉴/화면 노출 설정](../ShipperApp-P01-2/)
+- 상위 화면: [ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입](../ShipperApp-P01/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 화주가 입력하거나 확인한 의뢰/결제/창고 상태는 기사 앱의 추천, 관리자 원장, 창고 작업 화면으로 이어질 수 있습니다.

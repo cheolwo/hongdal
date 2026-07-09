@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P91 |
+| 페이지 ID / 제목 | HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면 |
 | 라우트 | /counter |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Counter.razor](../../../../../HongdalAdmin/Components/Pages/Counter.razor) |
 | 분류 | 시스템 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P90](../HongdalAdmin-P90/)
-- 다음 화면: [HongdalAdmin-P99](../HongdalAdmin-P99/)
+- 이전 화면: [HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면](../HongdalAdmin-P90/)
+- 다음 화면: [HongdalAdmin-P99 - 미발견 페이지](../HongdalAdmin-P99/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

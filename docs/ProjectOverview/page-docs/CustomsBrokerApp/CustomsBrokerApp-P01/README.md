@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | CustomsBrokerApp |
-| 페이지 ID | CustomsBrokerApp-P01 |
+| 페이지 ID / 제목 | CustomsBrokerApp-P01 - 관세사/통관 담당자 홈 |
 | 라우트 | / |
 | 소스 파일 | [CustomsBrokerApp/Pages/Home.razor](../../../../../CustomsBrokerApp/Pages/Home.razor) |
 | 분류 | 확장 |
@@ -38,7 +38,7 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: 없음
-- 다음 화면: [CustomsBrokerApp-P99](../CustomsBrokerApp-P99/)
+- 다음 화면: [CustomsBrokerApp-P99 - 미발견 페이지](../CustomsBrokerApp-P99/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

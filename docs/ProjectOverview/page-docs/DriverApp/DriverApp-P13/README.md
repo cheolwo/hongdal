@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P13 |
+| 페이지 ID / 제목 | DriverApp-P13 - 하차 증빙, POD, 하차 예외 |
 | 라우트 | /driver/transports/{운송Id:long}/dropoff |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/03_Progress/하차Page.razor](../../../../../DriverApp/Components/Pages/Driver/03_Progress/하차Page.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [DriverApp-P13](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [DriverApp-P13 - 하차 증빙, POD, 하차 예외](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P12](../DriverApp-P12/)
-- 다음 화면: [DriverApp-P14](../DriverApp-P14/)
+- 이전 화면: [DriverApp-P12 - 상차 증빙, 상차 예외](../DriverApp-P12/)
+- 다음 화면: [DriverApp-P14 - 월정산 확인](../DriverApp-P14/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

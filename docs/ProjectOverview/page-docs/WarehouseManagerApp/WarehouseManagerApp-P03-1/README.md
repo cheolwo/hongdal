@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID | WarehouseManagerApp-P03-1 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P03-1 - 입고 상품 스캔 |
 | 라우트 | /work/inbound/products |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/InboundProductScan.razor](../../../../../WarehouseManagerApp/Components/Pages/InboundProductScan.razor) |
 | 분류 | 확장 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P03](../WarehouseManagerApp-P03/)
-- 다음 화면: [WarehouseManagerApp-P04](../WarehouseManagerApp-P04/)
-- 상위 화면: [WarehouseManagerApp-P03](../WarehouseManagerApp-P03/)
+- 이전 화면: [WarehouseManagerApp-P03 - 입고 검수](../WarehouseManagerApp-P03/)
+- 다음 화면: [WarehouseManagerApp-P04 - 피킹 배치 작업](../WarehouseManagerApp-P04/)
+- 상위 화면: [WarehouseManagerApp-P03 - 입고 검수](../WarehouseManagerApp-P03/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 창고 작업자가 입력한 입고, 스캔, 피킹 결과는 화주 재고/출고 상태와 기사 운송 의뢰 흐름으로 연결됩니다.

@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P07-1 |
+| 페이지 ID / 제목 | ShipperApp-P07-1 - HS 코드/통관 검토 |
 | 라우트 | /shipper/customs/hs-reviews |
 | 소스 파일 | [ShipperApp/Components/Pages/CustomsHsReviews.razor](../../../../../ShipperApp/Components/Pages/CustomsHsReviews.razor) |
 | 분류 | 확장 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P07](../ShipperApp-P07/)
-- 다음 화면: [ShipperApp-P08](../ShipperApp-P08/)
-- 상위 화면: [ShipperApp-P07](../ShipperApp-P07/)
+- 이전 화면: [ShipperApp-P07 - FCL/LCL 해외 물류 계획](../ShipperApp-P07/)
+- 다음 화면: [ShipperApp-P08 - 재위탁/재운송 주문](../ShipperApp-P08/)
+- 상위 화면: [ShipperApp-P07 - FCL/LCL 해외 물류 계획](../ShipperApp-P07/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 화주가 입력하거나 확인한 의뢰/결제/창고 상태는 기사 앱의 추천, 관리자 원장, 창고 작업 화면으로 이어질 수 있습니다.

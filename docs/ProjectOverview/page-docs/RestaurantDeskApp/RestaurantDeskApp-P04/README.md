@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | RestaurantDeskApp |
-| 페이지 ID | RestaurantDeskApp-P04 |
+| 페이지 ID / 제목 | RestaurantDeskApp-P04 - 배차 주소 입력/검증 폼 |
 | 라우트 | /dispatch/address-form |
 | 소스 파일 | [RestaurantDeskApp/Components/Pages/DispatchAddressForm.razor](../../../../../RestaurantDeskApp/Components/Pages/DispatchAddressForm.razor) |
 | 분류 | 보조 |
@@ -37,7 +37,7 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [RestaurantDeskApp-P03](../RestaurantDeskApp-P03/)
+- 이전 화면: [RestaurantDeskApp-P03 - 리뷰 관리](../RestaurantDeskApp-P03/)
 - 다음 화면: 없음
 - 상위 화면: 없음
 - 하위 화면: 없음

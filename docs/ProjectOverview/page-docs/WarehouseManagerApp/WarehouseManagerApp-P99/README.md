@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID | WarehouseManagerApp-P99 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P99 - 미발견 페이지 |
 | 라우트 | /not-found |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/NotFound.razor](../../../../../WarehouseManagerApp/Components/Pages/NotFound.razor) |
 | 분류 | 시스템 |
@@ -37,7 +37,7 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P05-2](../WarehouseManagerApp-P05-2/)
+- 이전 화면: [WarehouseManagerApp-P05-2 - 홍달마트 프로세스별 작업 시작](../WarehouseManagerApp-P05-2/)
 - 다음 화면: 없음
 - 상위 화면: 없음
 - 하위 화면: 없음

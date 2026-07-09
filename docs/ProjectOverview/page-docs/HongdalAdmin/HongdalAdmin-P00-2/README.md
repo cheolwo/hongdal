@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P00-2 |
+| 페이지 ID / 제목 | HongdalAdmin-P00-2 - 오류 화면 |
 | 라우트 | /Error |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Error.razor](../../../../../HongdalAdmin/Components/Pages/Error.razor) |
 | 분류 | 시스템 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P00-1](../HongdalAdmin-P00-1/)
-- 다음 화면: [HongdalAdmin-P16](../HongdalAdmin-P16/)
-- 상위 화면: [HongdalAdmin-P00](../HongdalAdmin-P00/)
+- 이전 화면: [HongdalAdmin-P00-1 - 관리자 로그인](../HongdalAdmin-P00-1/)
+- 다음 화면: [HongdalAdmin-P16 - 운영 대시보드](../HongdalAdmin-P16/)
+- 상위 화면: [HongdalAdmin-P00 - 관리자 홈](../HongdalAdmin-P00/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 관리자는 여러 앱에서 발생한 상태 변경을 모아 보고, 막힌 배차·증빙·정산·문서 문제에 개입합니다.

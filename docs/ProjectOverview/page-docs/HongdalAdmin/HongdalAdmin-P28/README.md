@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P28 |
+| 페이지 ID / 제목 | HongdalAdmin-P28 - 공개 화물/화물 운영 화면 |
 | 라우트 | /cargo |
 | 소스 파일 | [HongdalAdmin/Components/Pages/PublicCargo.razor](../../../../../HongdalAdmin/Components/Pages/PublicCargo.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P27-5](../HongdalAdmin-P27-5/)
-- 다음 화면: [HongdalAdmin-P29](../HongdalAdmin-P29/)
+- 이전 화면: [HongdalAdmin-P27-5 - 파일/POD 관리](../HongdalAdmin-P27-5/)
+- 다음 화면: [HongdalAdmin-P29 - HS 코드/통관 운영](../HongdalAdmin-P29/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HumanResourcesManagerApp |
-| 페이지 ID | HumanResourcesManagerApp-P01 |
+| 페이지 ID / 제목 | HumanResourcesManagerApp-P01 - 인사/고용 관리 홈 |
 | 라우트 | / |
 | 소스 파일 | [HumanResourcesManagerApp/Components/Pages/Home.razor](../../../../../HumanResourcesManagerApp/Components/Pages/Home.razor) |
 | 분류 | 확장 |

@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P35 |
+| 페이지 ID / 제목 | HongdalAdmin-P35 - 보조 기능 설정 |
 | 라우트 | /auxiliary-feature-settings |
 | 소스 파일 | [HongdalAdmin/Components/Pages/AuxiliaryFeatureSettings.razor](../../../../../HongdalAdmin/Components/Pages/AuxiliaryFeatureSettings.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P34](../HongdalAdmin-P34/)
-- 다음 화면: [HongdalAdmin-P90](../HongdalAdmin-P90/)
+- 이전 화면: [HongdalAdmin-P34 - 수익/요율 정책](../HongdalAdmin-P34/)
+- 다음 화면: [HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면](../HongdalAdmin-P90/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

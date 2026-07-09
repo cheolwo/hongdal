@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P17 |
+| 페이지 ID / 제목 | HongdalAdmin-P17 - 의뢰 목록 |
 | 라우트 | /requests |
 | 소스 파일 | [HongdalAdmin/Components/Pages/Requests.razor](../../../../../HongdalAdmin/Components/Pages/Requests.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [HongdalAdmin-P17](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [HongdalAdmin-P17 - 의뢰 목록](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P16](../HongdalAdmin-P16/)
-- 다음 화면: [HongdalAdmin-P18](../HongdalAdmin-P18/)
+- 이전 화면: [HongdalAdmin-P16 - 운영 대시보드](../HongdalAdmin-P16/)
+- 다음 화면: [HongdalAdmin-P18 - 의뢰 상세](../HongdalAdmin-P18/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P01 |
-| 라우트 | /`, `/shipper |
+| 페이지 ID / 제목 | ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입 |
+| 라우트 | `/`, `/shipper` |
 | 소스 파일 | [ShipperApp/Components/Pages/Home.razor](../../../../../ShipperApp/Components/Pages/Home.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [ShipperApp-P01](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -38,9 +38,9 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: 없음
-- 다음 화면: [ShipperApp-P01-1](../ShipperApp-P01-1/)
+- 다음 화면: [ShipperApp-P01-1 - 화주 프로필과 운영 프로필 설정](../ShipperApp-P01-1/)
 - 상위 화면: 없음
-- 하위 화면: [ShipperApp-P01-1](../ShipperApp-P01-1/), [ShipperApp-P01-2](../ShipperApp-P01-2/), [ShipperApp-P01-3](../ShipperApp-P01-3/), [ShipperApp-P01-4](../ShipperApp-P01-4/)
+- 하위 화면: [ShipperApp-P01-1 - 화주 프로필과 운영 프로필 설정](../ShipperApp-P01-1/), [ShipperApp-P01-2 - 화주 앱 메뉴/화면 노출 설정](../ShipperApp-P01-2/), [ShipperApp-P01-3 - 공개 화물 또는 공개 의뢰 확인](../ShipperApp-P01-3/), [ShipperApp-P01-4 - 탐색/제안성 업무 수신함](../ShipperApp-P01-4/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 화주가 입력하거나 확인한 의뢰/결제/창고 상태는 기사 앱의 추천, 관리자 원장, 창고 작업 화면으로 이어질 수 있습니다.
 

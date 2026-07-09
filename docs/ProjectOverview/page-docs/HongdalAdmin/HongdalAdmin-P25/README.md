@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P25 |
+| 페이지 ID / 제목 | HongdalAdmin-P25 - 공통 콘텐츠 관리 |
 | 라우트 | /common-contents |
 | 소스 파일 | [HongdalAdmin/Components/Pages/CommonContents.razor](../../../../../HongdalAdmin/Components/Pages/CommonContents.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P24](../HongdalAdmin-P24/)
-- 다음 화면: [HongdalAdmin-P26](../HongdalAdmin-P26/)
+- 이전 화면: [HongdalAdmin-P24 - 화면/기능 노출 정책](../HongdalAdmin-P24/)
+- 다음 화면: [HongdalAdmin-P26 - 결제 목록](../HongdalAdmin-P26/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

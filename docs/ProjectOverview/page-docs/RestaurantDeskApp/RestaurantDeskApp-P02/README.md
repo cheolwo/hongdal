@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | RestaurantDeskApp |
-| 페이지 ID | RestaurantDeskApp-P02 |
+| 페이지 ID / 제목 | RestaurantDeskApp-P02 - 주변 음식점 조회 |
 | 라우트 | /restaurants/nearby |
 | 소스 파일 | [RestaurantDeskApp/Components/Pages/NearbyRestaurants.razor](../../../../../RestaurantDeskApp/Components/Pages/NearbyRestaurants.razor) |
 | 분류 | 확장 |
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [RestaurantDeskApp-P01](../RestaurantDeskApp-P01/)
-- 다음 화면: [RestaurantDeskApp-P02-1](../RestaurantDeskApp-P02-1/)
+- 이전 화면: [RestaurantDeskApp-P01 - 음식점 데스크 홈](../RestaurantDeskApp-P01/)
+- 다음 화면: [RestaurantDeskApp-P02-1 - 인기 음식점 조회](../RestaurantDeskApp-P02-1/)
 - 상위 화면: 없음
-- 하위 화면: [RestaurantDeskApp-P02-1](../RestaurantDeskApp-P02-1/)
+- 하위 화면: [RestaurantDeskApp-P02-1 - 인기 음식점 조회](../RestaurantDeskApp-P02-1/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 매장 또는 음식점 업무 상태는 주문자 화면, 배달 기사 추천, 관리자 음식 운영 화면과 연결될 수 있습니다.
 

@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P24 |
+| 페이지 ID / 제목 | HongdalAdmin-P24 - 화면/기능 노출 정책 |
 | 라우트 | /view-policies |
 | 소스 파일 | [HongdalAdmin/Components/Pages/ViewPolicies.razor](../../../../../HongdalAdmin/Components/Pages/ViewPolicies.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P23](../HongdalAdmin-P23/)
-- 다음 화면: [HongdalAdmin-P25](../HongdalAdmin-P25/)
+- 이전 화면: [HongdalAdmin-P23 - 관리자 활동 로그](../HongdalAdmin-P23/)
+- 다음 화면: [HongdalAdmin-P25 - 공통 콘텐츠 관리](../HongdalAdmin-P25/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

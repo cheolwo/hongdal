@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P08 |
+| 페이지 ID / 제목 | ShipperApp-P08 - 재위탁/재운송 주문 |
 | 라우트 | /shipper/reconsignment/orders |
 | 소스 파일 | [ShipperApp/Components/Pages/ReconsignmentOrders.razor](../../../../../ShipperApp/Components/Pages/ReconsignmentOrders.razor) |
 | 분류 | 확장 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P07-1](../ShipperApp-P07-1/)
-- 다음 화면: [ShipperApp-P90](../ShipperApp-P90/)
+- 이전 화면: [ShipperApp-P07-1 - HS 코드/통관 검토](../ShipperApp-P07-1/)
+- 다음 화면: [ShipperApp-P90 - 템플릿/샘플성 날씨 화면](../ShipperApp-P90/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

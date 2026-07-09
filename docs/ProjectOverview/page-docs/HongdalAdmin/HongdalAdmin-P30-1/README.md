@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P30-1 |
+| 페이지 ID / 제목 | HongdalAdmin-P30-1 - 음식점 검색 정책 |
 | 라우트 | /restaurant-search-policy |
 | 소스 파일 | [HongdalAdmin/Components/Pages/RestaurantSearchPolicySettings.razor](../../../../../HongdalAdmin/Components/Pages/RestaurantSearchPolicySettings.razor) |
 | 분류 | 운영 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P30](../HongdalAdmin-P30/)
-- 다음 화면: [HongdalAdmin-P31](../HongdalAdmin-P31/)
-- 상위 화면: [HongdalAdmin-P30](../HongdalAdmin-P30/)
+- 이전 화면: [HongdalAdmin-P30 - 음식 주문/배달 운영](../HongdalAdmin-P30/)
+- 다음 화면: [HongdalAdmin-P31 - 탐색 캠페인 운영](../HongdalAdmin-P31/)
+- 상위 화면: [HongdalAdmin-P30 - 음식 주문/배달 운영](../HongdalAdmin-P30/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 관리자는 여러 앱에서 발생한 상태 변경을 모아 보고, 막힌 배차·증빙·정산·문서 문제에 개입합니다.

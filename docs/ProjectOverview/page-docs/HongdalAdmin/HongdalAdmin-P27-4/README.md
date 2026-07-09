@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P27-4 |
+| 페이지 ID / 제목 | HongdalAdmin-P27-4 - 문서 조회 로그 |
 | 라우트 | /documents/logs |
 | 소스 파일 | [HongdalAdmin/Components/Pages/DocumentLogs.razor](../../../../../HongdalAdmin/Components/Pages/DocumentLogs.razor) |
 | 분류 | 필수 |
-| 1.0 필수 연결 | [HongdalAdmin-P27-4](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [HongdalAdmin-P27-4 - 문서 조회 로그](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 인증 필요 |
 
 ## 왜 필요한가
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P27-3](../HongdalAdmin-P27-3/)
-- 다음 화면: [HongdalAdmin-P27-5](../HongdalAdmin-P27-5/)
-- 상위 화면: [HongdalAdmin-P27](../HongdalAdmin-P27/)
+- 이전 화면: [HongdalAdmin-P27-3 - 문서 정책 상세](../HongdalAdmin-P27-3/)
+- 다음 화면: [HongdalAdmin-P27-5 - 파일/POD 관리](../HongdalAdmin-P27-5/)
+- 상위 화면: [HongdalAdmin-P27 - 문서 목록](../HongdalAdmin-P27/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 관리자는 여러 앱에서 발생한 상태 변경을 모아 보고, 막힌 배차·증빙·정산·문서 문제에 개입합니다.

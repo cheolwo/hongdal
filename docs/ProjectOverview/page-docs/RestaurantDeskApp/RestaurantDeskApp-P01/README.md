@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | RestaurantDeskApp |
-| 페이지 ID | RestaurantDeskApp-P01 |
+| 페이지 ID / 제목 | RestaurantDeskApp-P01 - 음식점 데스크 홈 |
 | 라우트 | / |
 | 소스 파일 | [RestaurantDeskApp/Components/Pages/Home.razor](../../../../../RestaurantDeskApp/Components/Pages/Home.razor) |
 | 분류 | 보조 |
@@ -38,7 +38,7 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: 없음
-- 다음 화면: [RestaurantDeskApp-P02](../RestaurantDeskApp-P02/)
+- 다음 화면: [RestaurantDeskApp-P02 - 주변 음식점 조회](../RestaurantDeskApp-P02/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

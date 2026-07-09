@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P99 |
+| 페이지 ID / 제목 | HongdalAdmin-P99 - 미발견 페이지 |
 | 라우트 | /not-found |
 | 소스 파일 | [HongdalAdmin/Components/Pages/NotFound.razor](../../../../../HongdalAdmin/Components/Pages/NotFound.razor) |
 | 분류 | 시스템 |
@@ -37,7 +37,7 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P91](../HongdalAdmin-P91/)
+- 이전 화면: [HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면](../HongdalAdmin-P91/)
 - 다음 화면: 없음
 - 상위 화면: 없음
 - 하위 화면: 없음

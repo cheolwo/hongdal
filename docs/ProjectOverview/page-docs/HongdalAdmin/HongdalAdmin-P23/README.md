@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HongdalAdmin |
-| 페이지 ID | HongdalAdmin-P23 |
+| 페이지 ID / 제목 | HongdalAdmin-P23 - 관리자 활동 로그 |
 | 라우트 | /activity-logs |
 | 소스 파일 | [HongdalAdmin/Components/Pages/ActivityLogs.razor](../../../../../HongdalAdmin/Components/Pages/ActivityLogs.razor) |
 | 분류 | 운영 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [HongdalAdmin-P22-3](../HongdalAdmin-P22-3/)
-- 다음 화면: [HongdalAdmin-P24](../HongdalAdmin-P24/)
+- 이전 화면: [HongdalAdmin-P22-3 - 운송 정산 상세](../HongdalAdmin-P22-3/)
+- 다음 화면: [HongdalAdmin-P24 - 화면/기능 노출 정책](../HongdalAdmin-P24/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

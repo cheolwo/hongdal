@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID | WarehouseManagerApp-P02-2 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P02-2 - 작업대 스캔 |
 | 라우트 | /work/{ProcessCode}/workbench |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/WorkbenchScan.razor](../../../../../WarehouseManagerApp/Components/Pages/WorkbenchScan.razor) |
 | 분류 | 확장 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P02-1](../WarehouseManagerApp-P02-1/)
-- 다음 화면: [WarehouseManagerApp-P02-3](../WarehouseManagerApp-P02-3/)
-- 상위 화면: [WarehouseManagerApp-P02](../WarehouseManagerApp-P02/)
+- 이전 화면: [WarehouseManagerApp-P02-1 - 프로세스별 창고 작업 시작](../WarehouseManagerApp-P02-1/)
+- 다음 화면: [WarehouseManagerApp-P02-3 - 범용 스캔 스테이션](../WarehouseManagerApp-P02-3/)
+- 상위 화면: [WarehouseManagerApp-P02 - 일반 창고 작업 보드](../WarehouseManagerApp-P02/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 창고 작업자가 입력한 입고, 스캔, 피킹 결과는 화주 재고/출고 상태와 기사 운송 의뢰 흐름으로 연결됩니다.

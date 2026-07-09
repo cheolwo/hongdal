@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID | WarehouseManagerApp-P04 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P04 - 피킹 배치 작업 |
 | 라우트 | /work/picking-batch |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/PickingBatchWorkspace.razor](../../../../../WarehouseManagerApp/Components/Pages/PickingBatchWorkspace.razor) |
 | 분류 | 확장 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P03-1](../WarehouseManagerApp-P03-1/)
-- 다음 화면: [WarehouseManagerApp-P05](../WarehouseManagerApp-P05/)
+- 이전 화면: [WarehouseManagerApp-P03-1 - 입고 상품 스캔](../WarehouseManagerApp-P03-1/)
+- 다음 화면: [WarehouseManagerApp-P05 - 홍달마트 창고 홈](../WarehouseManagerApp-P05/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

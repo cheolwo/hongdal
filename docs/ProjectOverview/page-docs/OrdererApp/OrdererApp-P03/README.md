@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | OrdererApp |
-| 페이지 ID | OrdererApp-P03 |
+| 페이지 ID / 제목 | OrdererApp-P03 - 주문자 화물 주문 |
 | 라우트 | /cargo |
 | 소스 파일 | [OrdererApp/Components/Pages/CargoOrder.razor](../../../../../OrdererApp/Components/Pages/CargoOrder.razor) |
 | 분류 | 확장 |
@@ -37,8 +37,8 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [OrdererApp-P02](../OrdererApp-P02/)
-- 다음 화면: [OrdererApp-P04](../OrdererApp-P04/)
+- 이전 화면: [OrdererApp-P02 - 공동구매 의사 표시/집단화](../OrdererApp-P02/)
+- 다음 화면: [OrdererApp-P04 - 음식 주문 홈](../OrdererApp-P04/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 

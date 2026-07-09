@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P02-1 |
+| 페이지 ID / 제목 | DriverApp-P02-1 - 기사 앱 화면 노출 설정 |
 | 라우트 | /driver/settings/views |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/04_Settings/화면설정Page.razor](../../../../../DriverApp/Components/Pages/Driver/04_Settings/화면설정Page.razor) |
 | 분류 | 보조 |
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P02](../DriverApp-P02/)
-- 다음 화면: [DriverApp-P03](../DriverApp-P03/)
-- 상위 화면: [DriverApp-P02](../DriverApp-P02/)
+- 이전 화면: [DriverApp-P02 - 기사 앱 메뉴](../DriverApp-P02/)
+- 다음 화면: [DriverApp-P03 - 예약 운송 또는 예약 업무](../DriverApp-P03/)
+- 상위 화면: [DriverApp-P02 - 기사 앱 메뉴](../DriverApp-P02/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 기사의 수락, 거절, 상차, 하차, 증빙, 정산 관련 조작은 화주 상세와 관리자 원장에 상태 변경으로 반영됩니다.

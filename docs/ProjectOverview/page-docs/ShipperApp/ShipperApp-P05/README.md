@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | ShipperApp |
-| 페이지 ID | ShipperApp-P05 |
+| 페이지 ID / 제목 | ShipperApp-P05 - 화주 관점 창고 업무 허브 |
 | 라우트 | /shipper/warehouse/workspace |
 | 소스 파일 | [ShipperApp/Components/Pages/WarehouseWorkspace.razor](../../../../../ShipperApp/Components/Pages/WarehouseWorkspace.razor) |
 | 분류 | 확장 |
@@ -37,10 +37,10 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [ShipperApp-P04-1](../ShipperApp-P04-1/)
-- 다음 화면: [ShipperApp-P05-1](../ShipperApp-P05-1/)
+- 이전 화면: [ShipperApp-P04-1 - 입고 요청 목록과 처리](../ShipperApp-P04-1/)
+- 다음 화면: [ShipperApp-P05-1 - 창고 재고 조회](../ShipperApp-P05-1/)
 - 상위 화면: 없음
-- 하위 화면: [ShipperApp-P05-1](../ShipperApp-P05-1/), [ShipperApp-P05-2](../ShipperApp-P05-2/), [ShipperApp-P05-3](../ShipperApp-P05-3/)
+- 하위 화면: [ShipperApp-P05-1 - 창고 재고 조회](../ShipperApp-P05-1/), [ShipperApp-P05-2 - 창고 스캔 작업](../ShipperApp-P05-2/), [ShipperApp-P05-3 - 창고 프로세스별 작업 시작](../ShipperApp-P05-3/)
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 화주가 입력하거나 확인한 의뢰/결제/창고 상태는 기사 앱의 추천, 관리자 원장, 창고 작업 화면으로 이어질 수 있습니다.
 

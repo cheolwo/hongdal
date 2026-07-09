@@ -11,11 +11,11 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | DriverApp |
-| 페이지 ID | DriverApp-P07-1 |
+| 페이지 ID / 제목 | DriverApp-P07-1 - 기사 업무 허브/요약 |
 | 라우트 | /driver/home/summary |
 | 소스 파일 | [DriverApp/Components/Pages/Driver/Home/기사홈Page.razor](../../../../../DriverApp/Components/Pages/Driver/Home/기사홈Page.razor) |
 | 분류 | 보조 |
-| 1.0 필수 연결 | [DriverApp-P07-1](../../../hongdal-v1-required-pages.md) |
+| 1.0 필수 연결 | [DriverApp-P07-1 - 기사 업무 허브/요약](../../../hongdal-v1-required-pages.md) |
 | 캡처 상태 | 완료 |
 
 ## 왜 필요한가
@@ -37,9 +37,9 @@
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [DriverApp-P07](../DriverApp-P07/)
-- 다음 화면: [DriverApp-P08](../DriverApp-P08/)
-- 상위 화면: [DriverApp-P07](../DriverApp-P07/)
+- 이전 화면: [DriverApp-P07 - 지도 홈, 추천 배너, 현재 운송 진입](../DriverApp-P07/)
+- 다음 화면: [DriverApp-P08 - 추천 목록](../DriverApp-P08/)
+- 상위 화면: [DriverApp-P07 - 지도 홈, 추천 배너, 현재 운송 진입](../DriverApp-P07/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 기사의 수락, 거절, 상차, 하차, 증빙, 정산 관련 조작은 화주 상세와 관리자 원장에 상태 변경으로 반영됩니다.
