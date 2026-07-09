@@ -1,4 +1,3 @@
-using System.Text;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using 홍달.Services.Documents;
@@ -27,7 +26,7 @@ public sealed class 운송상차완료사후처리EventHandler : INotificationHa
 
         try
         {
-            await using var content = new MemoryStream(CreateReceiptPickupEvidenceBytes(notification));
+            await using var content = new MemoryStream(운송인수증문서Factory.Create상차인수확인서Bytes(notification));
             await _문서관리Service.CreateDocumentAsync(new 문서생성요청
             {
                 의뢰Id = notification.운송번호,
@@ -51,31 +50,4 @@ public sealed class 운송상차완료사후처리EventHandler : INotificationHa
         }
     }
 
-    private static byte[] CreateReceiptPickupEvidenceBytes(운송상차완료됨Event notification)
-    {
-        var evidence = notification.인수증증빙!;
-        var lines = new[]
-        {
-            "홍달 상차 인수 확인서",
-            $"운송번호: {notification.운송번호}",
-            $"기사ID: {notification.기사Id}",
-            $"출발지: {notification.출발지}",
-            $"도착지: {notification.도착지}",
-            $"상태: {notification.현재상태}",
-            $"상차확인시각: {notification.발생시각Utc:yyyy-MM-dd HH:mm:ss} UTC",
-            $"서명필수여부: {(evidence.서명필수여부 ? "필수" : "선택")}",
-            $"서명확보여부: {(evidence.서명확보됨 ? "확보" : "생략")}",
-            $"증빙방식: {evidence.증빙방식}",
-            $"인수자명: {evidence.인수자명 ?? string.Empty}",
-            $"인수자소속: {evidence.인수자소속 ?? string.Empty}",
-            $"인수자서명: {evidence.인수자서명 ?? string.Empty}",
-            $"기사서명: {evidence.기사서명 ?? string.Empty}",
-            $"서명생략사유: {evidence.서명생략사유 ?? string.Empty}",
-            $"상차사진ObjectName: {evidence.상차사진ObjectName ?? string.Empty}",
-            $"상차사진Url: {evidence.상차사진Url ?? string.Empty}",
-            $"TraceId: {notification.TraceId}"
-        };
-
-        return Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, lines));
-    }
 }

@@ -11,14 +11,14 @@
         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
             <MudStack Spacing="0">
                 <MudText Typo="Typo.h4">공개 화물</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">회원가입 없이 볼 수 있는 메모리 기반 샘플 목록입니다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">홍달 서버 API에서 공개 상태의 화물 목록을 조회합니다.</MudText>
             </MudStack>
             <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="LoadAsync">새로고침</MudButton>
         </MudStack>
 
         @if (!string.IsNullOrWhiteSpace(Message))
         {
-            <MudAlert Severity="Severity.Info">@Message</MudAlert>
+            <MudAlert Severity="@MessageSeverity">@Message</MudAlert>
         }
 
         <MudGrid>
@@ -47,6 +47,7 @@
 @code {
     private List<공개화물요약응답> publicCargo = [];
     private string? Message;
+    private Severity MessageSeverity = Severity.Info;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,7 +56,17 @@
 
     private async Task LoadAsync()
     {
-        publicCargo = (await ShipperOperations.GetPublicCargoAsync()).ToList();
-        Message = publicCargo.Count == 0 ? "공개 화물이 없습니다." : $"공개 화물 {publicCargo.Count}건을 불러왔습니다.";
+        try
+        {
+            publicCargo = (await ShipperOperations.GetPublicCargoAsync()).ToList();
+            MessageSeverity = Severity.Info;
+            Message = publicCargo.Count == 0 ? "공개 화물이 없습니다." : $"공개 화물 {publicCargo.Count}건을 불러왔습니다.";
+        }
+        catch (Exception ex)
+        {
+            publicCargo = [];
+            MessageSeverity = Severity.Error;
+            Message = $"서버 API 조회 실패: {ex.Message}";
+        }
     }
 }

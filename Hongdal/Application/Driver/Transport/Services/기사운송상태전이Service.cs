@@ -10,21 +10,18 @@ public interface I기사운송상태전이Service
 
 public sealed class 기사운송상태전이Service : I기사운송상태전이Service
 {
-    private const string 배차대기 = "배차대기";
-    private const string 매칭중 = "매칭중";
-    private const string 이동중 = "이동중";
-    private const string 운송중 = "운송중";
-    private const string 상차지도착 = "상차지도착";
-    private const string 상차완료 = "상차완료";
-    private const string 하차지도착 = "하차지도착";
-    private const string 인수완료 = "인수완료";
-
     private static readonly IReadOnlyDictionary<string, string[]> 허용전이 = new Dictionary<string, string[]>
     {
-        [상차지도착] = [배차대기, 매칭중, 이동중],
-        [상차완료] = [상차지도착],
-        [하차지도착] = [상차완료, 운송중],
-        [인수완료] = [하차지도착]
+        [기사운송상태코드.상차지도착] =
+        [
+            기사운송상태코드.배차대기,
+            기사운송상태코드.매칭중,
+            기사운송상태코드.배차확정,
+            기사운송상태코드.이동중
+        ],
+        [기사운송상태코드.상차완료] = [기사운송상태코드.상차지도착],
+        [기사운송상태코드.하차지도착] = [기사운송상태코드.상차완료, 기사운송상태코드.운송중],
+        [기사운송상태코드.인수완료] = [기사운송상태코드.하차지도착]
     };
 
     public Result 상태변경(배송_운송 운송, string 목표상태, DateTime 변경시각)
@@ -35,7 +32,7 @@ public sealed class 기사운송상태전이Service : I기사운송상태전이S
             return Result.Ok();
         }
 
-        if (string.Equals(운송.상태, 인수완료, StringComparison.Ordinal))
+        if (string.Equals(운송.상태, 기사운송상태코드.인수완료, StringComparison.Ordinal))
         {
             return Result.Fail("이미 완료된 운송입니다.");
         }
@@ -49,11 +46,11 @@ public sealed class 기사운송상태전이Service : I기사운송상태전이S
         운송.상태 = 목표상태;
         운송.UpdatedAt = 변경시각;
 
-        if (string.Equals(목표상태, 상차완료, StringComparison.Ordinal))
+        if (string.Equals(목표상태, 기사운송상태코드.상차완료, StringComparison.Ordinal))
         {
             운송.출발_픽업 ??= 변경시각;
         }
-        else if (string.Equals(목표상태, 인수완료, StringComparison.Ordinal))
+        else if (string.Equals(목표상태, 기사운송상태코드.인수완료, StringComparison.Ordinal))
         {
             운송.도착 ??= 변경시각;
         }

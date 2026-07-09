@@ -14,7 +14,6 @@ public static class DriverServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration? configuration = null)
     {
-        var hasClientDataModeConfig = configuration?.GetSection(ClientDataModeOptions.SectionName).Exists() == true;
         if (configuration is not null)
         {
             services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
@@ -23,17 +22,6 @@ public static class DriverServiceCollectionExtensions
         {
             services.Configure<ClientDataModeOptions>(_ => { });
         }
-
-        services.PostConfigure<ClientDataModeOptions>(options =>
-        {
-#if DEBUG
-            if (!hasClientDataModeConfig)
-            {
-                options.AllowSampleFallback = true;
-                options.AllowDevelopmentSnapshotFallback = true;
-            }
-#endif
-        });
 
         services.AddSingleton<DriverAppProfile>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
@@ -67,6 +55,8 @@ public static class DriverServiceCollectionExtensions
         services.AddScoped<AuthApiService>();
         services.AddSingleton<HttpDriverTransportCompletionPhotoService>();
         services.AddSingleton<IDriverTransportCompletionPhotoService>(sp => sp.GetRequiredService<HttpDriverTransportCompletionPhotoService>());
+        services.AddSingleton<HttpDriverTransportExceptionService>();
+        services.AddSingleton<IDriverTransportExceptionService>(sp => sp.GetRequiredService<HttpDriverTransportExceptionService>());
         services.AddScoped<IApiClient, ApiClient>();
 
         return services;

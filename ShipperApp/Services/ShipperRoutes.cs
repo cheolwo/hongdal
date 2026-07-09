@@ -6,6 +6,7 @@ public static class ShipperRoutes
     public const string ShipperHome = "/shipper";
     public const string Request = "/shipper/request";
     public const string RequestBulk = "/shipper/request/bulk";
+    public const string RequestDetail = "/shipper/request";
     public const string PublicCargo = "/shipper/public-cargo";
     public const string ExplorationInbox = "/shipper/exploration/inbox";
     public const string InboundDashboard = "/shipper/inbound/dashboard";
@@ -31,4 +32,7 @@ public static class ShipperRoutes
 
     public static string ReconsignmentOrdersForInventory(long inventoryItemId)
         => $"{ReconsignmentOrders}?inventoryItemId={inventoryItemId}";
+
+    public static string RequestDetailFor(string requestId)
+        => $"{RequestDetail}/{Uri.EscapeDataString(requestId)}";
 }

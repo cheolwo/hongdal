@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 홍달.Services.Options;
@@ -8,7 +7,6 @@ namespace 홍달.Services.Notifications;
 
 public sealed class Command알림Outbox발송Service : ICommand알림Outbox발송Service
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private const string 상태_대기 = "Pending";
     private const string 상태_성공 = "Succeeded";
     private const string 상태_실패 = "Failed";
@@ -40,8 +38,7 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
     {
         var items = await _db.Command알림Outbox
             .Where(x => x.Status == 상태_대기
-                        && (x.FeatureName == "DispatchAccepted"
-                            || x.FeatureName == "DispatchPickupApproach")
+                        && Command알림FeatureNames.발송지원목록.Contains(x.FeatureName)
                         && x.Target == "Shipper")
             .OrderBy(x => x.CreatedAt)
             .Take(take)
@@ -56,13 +53,20 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
         foreach (var item in items)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            processed++;
-            item.RetryCount += 1;
-            item.UpdatedAt = DateTime.UtcNow;
 
             try
             {
                 var payload = Command알림Payload.Parse(item.PayloadJson);
+                var now = DateTime.UtcNow;
+                if (payload.IsScheduledForFuture(now))
+                {
+                    continue;
+                }
+
+                processed++;
+                item.RetryCount += 1;
+                item.UpdatedAt = now;
+
                 var pushRequested = payload.Channels.Contains("Push");
                 var alimTalkRequested = payload.Channels.Contains("AlimTalk");
 
@@ -115,7 +119,9 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
             {
                 ["type"] = payload.NotificationType,
                 ["requestId"] = payload.RequestId,
-                ["driverId"] = payload.DriverId
+                ["driverId"] = payload.DriverId,
+                ["paymentId"] = payload.PaymentId,
+                ["orderId"] = payload.OrderId
             },
             cancellationToken);
     }
@@ -128,90 +134,28 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
             ["driverId"] = payload.DriverId,
             ["cargoType"] = payload.CargoType,
             ["pickupAddress"] = payload.PickupAddress,
-            ["pickupWindow"] = payload.PickupWindowText
+            ["dropoffAddress"] = payload.DropoffAddress,
+            ["pickupWindow"] = payload.PickupWindowText,
+            ["paymentId"] = payload.PaymentId,
+            ["orderId"] = payload.OrderId,
+            ["amount"] = payload.AmountText,
+            ["paymentFlow"] = payload.PaymentFlow,
+            ["reminderDay"] = payload.ReminderDay.ToString()
         };
-        var templateCode = string.Equals(featureName, "DispatchPickupApproach", StringComparison.Ordinal)
-            ? _kakaoOptions.DispatchPickupApproachTemplateCode
-            : _kakaoOptions.DispatchAcceptedTemplateCode;
+        var templateCode = featureName switch
+        {
+            Command알림FeatureNames.상차접근 => _kakaoOptions.DispatchPickupApproachTemplateCode,
+            Command알림FeatureNames.운송완료입금요청 => _kakaoOptions.SettlementDepositReminderTemplateCode,
+            _ => _kakaoOptions.DispatchAcceptedTemplateCode
+        };
 
         return _kakaoAlimTalkService.SendAsync(
             new KakaoAlimTalkMessage(
-                payload.PickupContactPhone,
+                payload.RecipientPhone,
                 templateCode,
                 payload.Title,
                 payload.Body,
                 variables),
             cancellationToken);
-    }
-
-    private sealed record Command알림Payload(
-        string NotificationType,
-        string TargetUserId,
-        string DriverId,
-        string RequestId,
-        string CargoType,
-        string PickupAddress,
-        string PickupContactPhone,
-        string PickupWindowText,
-        string Title,
-        string Body,
-        IReadOnlySet<string> Channels)
-    {
-        public static Command알림Payload Parse(string payloadJson)
-        {
-            using var document = JsonDocument.Parse(payloadJson);
-            var root = document.RootElement;
-            var pickupWindowStart = ReadString(root, "pickupWindowStartUtc");
-            var pickupWindowEnd = ReadString(root, "pickupWindowEndUtc");
-            var pickupWindowText = string.IsNullOrWhiteSpace(pickupWindowStart) && string.IsNullOrWhiteSpace(pickupWindowEnd)
-                ? "상차 시간 협의"
-                : $"{pickupWindowStart} ~ {pickupWindowEnd}";
-
-            return new Command알림Payload(
-                ReadString(root, "알림유형", "DispatchAccepted"),
-                ReadString(root, "targetUserId", ReadString(root, "shipperUserId")),
-                ReadString(root, "driverId"),
-                ReadString(root, "requestId"),
-                ReadString(root, "cargoType"),
-                ReadString(root, "pickupAddress"),
-                ReadString(root, "pickupContactPhone"),
-                pickupWindowText,
-                ReadString(root, "title", "기사님이 운송 의뢰를 수락했습니다."),
-                ReadString(root, "body", "기사님이 운송 의뢰를 수락했습니다. 상차 준비를 확인해 주세요."),
-                ReadStringSet(root, "channels", new[] { "Push" }));
-        }
-
-        private static string ReadString(JsonElement root, string propertyName, string fallback = "")
-        {
-            if (!root.TryGetProperty(propertyName, out var value) || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
-            {
-                return fallback;
-            }
-
-            return value.ValueKind == JsonValueKind.String
-                ? value.GetString() ?? fallback
-                : value.ToString();
-        }
-
-        private static IReadOnlySet<string> ReadStringSet(JsonElement root, string propertyName, IReadOnlyList<string> fallback)
-        {
-            if (!root.TryGetProperty(propertyName, out var value) || value.ValueKind != JsonValueKind.Array)
-            {
-                return new HashSet<string>(fallback, StringComparer.OrdinalIgnoreCase);
-            }
-
-            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var item in value.EnumerateArray())
-            {
-                if (item.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(item.GetString()))
-                {
-                    result.Add(item.GetString()!);
-                }
-            }
-
-            return result.Count == 0
-                ? new HashSet<string>(fallback, StringComparer.OrdinalIgnoreCase)
-                : result;
-        }
     }
 }

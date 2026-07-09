@@ -1,6 +1,7 @@
 using Hongdal.Application.CommandProcessing;
 using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.공통;
+using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Driver.DispatchAction;
 
@@ -8,6 +9,7 @@ public sealed class 배차거절CommandHandler : IRequestHandler<배차거절Com
 {
     private readonly HongdalContext _db;
     private readonly IDriverRejectedRequestStore _rejectedRequestStore;
+    private readonly I배차대기원장전환Service _원장전환Service;
     private readonly IPublisher _publisher;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
@@ -16,6 +18,7 @@ public sealed class 배차거절CommandHandler : IRequestHandler<배차거절Com
     public 배차거절CommandHandler(
         HongdalContext db,
         IDriverRejectedRequestStore rejectedRequestStore,
+        I배차대기원장전환Service 원장전환Service,
         IPublisher publisher,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
@@ -23,6 +26,7 @@ public sealed class 배차거절CommandHandler : IRequestHandler<배차거절Com
     {
         _db = db;
         _rejectedRequestStore = rejectedRequestStore;
+        _원장전환Service = 원장전환Service;
         _publisher = publisher;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
@@ -55,18 +59,32 @@ public sealed class 배차거절CommandHandler : IRequestHandler<배차거절Com
             return FluentResults.Result.Fail<배차거절결과>("배차대기 데이터를 찾을 수 없습니다.");
         }
 
-        var canRejectRecommendation = queue.상태 == 상태값.배차대기상태.대기
-                                      && queue.배차큐단계 == 상태값.배차큐단계.배차추천
-                                      && queue.배차노출상태 == 상태값.배차노출상태.추천중
-                                      && string.Equals(queue.현재추천대상기사Id, request.기사Id, StringComparison.Ordinal)
-                                      && queue.추천만료시각.HasValue
-                                      && queue.추천만료시각 > now;
+        var canRejectRecommendation = 배차응답가능정책.추천거절가능(queue, request.기사Id, now);
         if (!canRejectRecommendation)
         {
             return FluentResults.Result.Fail<배차거절결과>("거절 가능한 추천 배차가 아닙니다.");
         }
 
-        await _rejectedRequestStore.RejectAsync(request.기사Id, request.RequestId, cancellationToken);
+        try
+        {
+            await _rejectedRequestStore.RejectAsync(request.기사Id, request.RequestId, cancellationToken);
+            var 전환결과 = await _원장전환Service.추천거절처리Async(request.RequestId, request.기사Id, cancellationToken);
+            if (!전환결과.전환여부)
+            {
+                _logger.LogWarning(
+                    "배차거절 원장 전환이 적용되지 않았습니다. RequestId={RequestId} DriverId={DriverId} ResultCode={ResultCode} Message={Message}",
+                    request.RequestId,
+                    request.기사Id,
+                    전환결과.결과코드,
+                    전환결과.메시지);
+                return FluentResults.Result.Fail<배차거절결과>("거절 가능한 추천 배차가 아닙니다.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "배차거절 필수 처리 중 예외가 발생했습니다. RequestId={RequestId} DriverId={DriverId}", request.RequestId, request.기사Id);
+            return FluentResults.Result.Fail<배차거절결과>("거절 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        }
 
         try
         {

@@ -18,5 +18,7 @@ public sealed class KakaoAlimTalkOptions
 
     public string DispatchPickupApproachTemplateCode { get; set; } = "dispatch_pickup_approach";
 
+    public string SettlementDepositReminderTemplateCode { get; set; } = "settlement_deposit_reminder";
+
     public int TimeoutSeconds { get; set; } = 10;
 }

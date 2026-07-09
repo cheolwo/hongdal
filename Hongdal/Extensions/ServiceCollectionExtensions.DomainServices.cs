@@ -2,6 +2,7 @@ using Hongdal.Application.Driver.Transport;
 using Hongdal.Application.Driver.Profile;
 using Hongdal.Application.Driver.Notification;
 using 홍달.Services.Dispatch.Engine;
+using 홍달.Services.Dispatch.Coordination;
 using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Dispatch.Queue;
 using 홍달.Services.Documents;
@@ -55,7 +56,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<ICommandFileStoragePathResolver, CommandFileStoragePathResolver>();
         services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
         services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
-        services.AddScoped<I배차큐전환Service, 배차큐전환Service>();
+        services.AddScoped<I배차대기원장전환Service, 배차대기원장전환Service>();
+        services.AddScoped<I배차실행인덱스예열Service, 배차실행인덱스예열Service>();
         services.AddScoped<I배차추천알림Service, 배차추천알림Service>();
         services.AddScoped<I상차접근알림Service, 상차접근알림Service>();
         services.AddScoped<ICommand알림Outbox발송Service, Command알림Outbox발송Service>();
@@ -82,6 +84,13 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I운송일정삽입평가Service, 운송일정삽입평가Service>();
         services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
         services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
+        services.AddSingleton<I배달권실행공간Store, InMemory배달권실행공간Store>();
+        services.AddScoped<I배달권기반배차조율계획Service, 배달권기반배차조율계획Service>();
+        services.AddScoped<I배달권기반배차조율실행Service, 배달권기반배차조율실행Service>();
+        services.AddScoped<I국내화물배차조율입력Factory, 국내화물배차조율입력Factory>();
+        services.AddScoped<I국내화물배차조율Service, 국내화물배차조율Service>();
+        services.AddScoped<I국내화물배차조율적용Service, 국내화물배차조율적용Service>();
+        services.AddScoped<I국내화물배차조율실행Service, 국내화물배차조율실행Service>();
         services.AddScoped<I배차업무정책, 용달운송배차업무정책>();
         services.AddScoped<I배차업무정책, 음식배달배차업무정책>();
         services.AddScoped<I운송의뢰배차원천분류Service, 운송의뢰배차원천분류Service>();
@@ -112,6 +121,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<INationalDispatchRequestService, NationalDispatchRequestService>();
         services.AddScoped<I기사월정산Service, 기사월정산Service>();
         services.AddScoped<IPlatformProfitReturnService, PlatformProfitReturnService>();
+        services.AddHostedService<배차실행인덱스예열HostedService>();
         services.AddHostedService<KieAiTaskPollingWorker>();
 
         return services;

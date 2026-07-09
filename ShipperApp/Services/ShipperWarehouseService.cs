@@ -1,77 +1,90 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
-using Hongdal.Contracts.Common.ViewSettings;
 using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Shipper.Request;
-using Hongdal.Ui.Common.Areas.App.Services;
-using ShipperApp.Services.Application;
-using ShipperApp.Services.Warehouse.Reconsignment.Commands;
 
 namespace ShipperApp.Services;
 
 public sealed class ShipperWarehouseService : IShipperWarehouseWorkflowService
 {
-    private readonly InMemoryShipperStore _store;
+    private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
-    private readonly IAppCommandHandler<CreateReconsignmentOrderCommand, 화주운송의뢰응답?> _createReconsignmentHandler;
 
-    public ShipperWarehouseService(
-        InMemoryShipperStore store,
-        IAuthSession authSession,
-        IAppCommandHandler<CreateReconsignmentOrderCommand, 화주운송의뢰응답?> createReconsignmentHandler)
+    public ShipperWarehouseService(HttpClient httpClient, IAuthSession authSession)
     {
-        _store = store;
+        _httpClient = httpClient;
         _authSession = authSession;
-        _createReconsignmentHandler = createReconsignmentHandler;
     }
 
     public Task<창고목록응답?> GetWarehousesAsync(CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult<창고목록응답?>(new 창고목록응답 { Items = _store.GetWarehouses() });
-    }
+        => GetAuthorizedJsonAsync<창고목록응답>("api/v1/warehouse-operations/warehouses", cancellationToken);
 
     public Task<창고요약응답?> CreateWarehouseAsync(창고저장요청 payload, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var created = _store.CreateWarehouse(payload, ResolveUserId());
-        return Task.FromResult<창고요약응답?>(created);
-    }
+        => PostAuthorizedJsonAsync<창고저장요청, 창고요약응답>("api/v1/warehouse-operations/warehouses", payload, cancellationToken);
 
     public Task<입고요청목록응답?> GetInboundsAsync(CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult<입고요청목록응답?>(new 입고요청목록응답 { Items = _store.GetInbounds() });
-    }
+        => GetAuthorizedJsonAsync<입고요청목록응답>("api/v1/warehouse-operations/inbounds", cancellationToken);
 
     public Task<입고요청항목응답?> CreateInboundAsync(입고요청저장요청 payload, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var created = _store.CreateInbound(payload, ResolveUserId());
-        return Task.FromResult<입고요청항목응답?>(created);
-    }
+        => PostAuthorizedJsonAsync<입고요청저장요청, 입고요청항목응답>("api/v1/warehouse-operations/inbounds", payload, cancellationToken);
 
     public Task<입고상품목록응답?> CompleteInboundAsync(long inboundId, 입고완료요청 payload, CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var completed = _store.CompleteInbound(inboundId, payload, ResolveUserId());
-        return Task.FromResult<입고상품목록응답?>(completed);
-    }
+        => PostAuthorizedJsonAsync<입고완료요청, 입고상품목록응답>($"api/v1/warehouse-operations/inbounds/{inboundId}/complete", payload, cancellationToken);
 
     public Task<재고목록응답?> GetInventoryAsync(CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult<재고목록응답?>(new 재고목록응답 { Items = _store.GetInventory() });
-    }
+        => GetAuthorizedJsonAsync<재고목록응답>("api/v1/warehouse-operations/inventory", cancellationToken);
 
     public Task<화주운송의뢰응답?> CreateReconsignmentAsync(재고운송의뢰생성요청 payload, CancellationToken cancellationToken = default)
+        => PostAuthorizedJsonAsync<재고운송의뢰생성요청, 화주운송의뢰응답>("api/v1/warehouse-operations/inventory/reconsignment", payload, cancellationToken);
+
+    private async Task<T?> GetAuthorizedJsonAsync<T>(string path, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        return _createReconsignmentHandler.HandleAsync(new CreateReconsignmentOrderCommand(payload, ResolveUserId()), cancellationToken);
+        using var request = CreateAuthorizedRequest(HttpMethod.Get, path);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, path, cancellationToken));
+        }
+
+        return await response.Content.ReadFromJsonAsync<T>(cancellationToken);
     }
 
-    private string ResolveUserId()
+    private async Task<TResponse?> PostAuthorizedJsonAsync<TRequest, TResponse>(string path, TRequest payload, CancellationToken cancellationToken)
     {
-        return string.IsNullOrWhiteSpace(_authSession.UserId) ? "shipper-demo" : _authSession.UserId!;
+        using var request = CreateAuthorizedRequest(HttpMethod.Post, path);
+        request.Content = JsonContent.Create(payload);
+
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, path, cancellationToken));
+        }
+
+        return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
+    }
+
+    private HttpRequestMessage CreateAuthorizedRequest(HttpMethod method, string path)
+    {
+        if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
+        {
+            throw new InvalidOperationException("서버 인증 정보가 없어 창고 API를 호출할 수 없습니다.");
+        }
+
+        var request = new HttpRequestMessage(method, path);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
+        return request;
+    }
+
+    private static async Task<string> BuildFailureMessageAsync(HttpResponseMessage response, string path, CancellationToken cancellationToken)
+    {
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return $"창고 서버 API 요청에 실패했습니다. path={path}, HTTP {(int)response.StatusCode}";
+        }
+
+        return $"창고 서버 API 요청에 실패했습니다. path={path}, HTTP {(int)response.StatusCode}: {body}";
     }
 }

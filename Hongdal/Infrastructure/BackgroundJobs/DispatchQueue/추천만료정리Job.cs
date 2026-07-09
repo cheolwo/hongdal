@@ -10,18 +10,18 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
     public sealed class 추천만료정리Job : IJob
     {
         private readonly HongdalContext _db;
-        private readonly I배차큐전환Service _queueTransitionService;
+        private readonly I배차대기원장전환Service _원장전환Service;
         private readonly 배차큐배치작업Options _options;
         private readonly ILogger<추천만료정리Job> _logger;
 
         public 추천만료정리Job(
             HongdalContext db,
-            I배차큐전환Service queueTransitionService,
+            I배차대기원장전환Service 원장전환Service,
             Microsoft.Extensions.Options.IOptions<배차큐배치작업Options> options,
             ILogger<추천만료정리Job> logger)
         {
             _db = db;
-            _queueTransitionService = queueTransitionService;
+            _원장전환Service = 원장전환Service;
             _options = options.Value;
             _logger = logger;
         }
@@ -44,7 +44,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
 
             foreach (var requestId in expiredRequestIds)
             {
-                await _queueTransitionService.추천만료처리Async(requestId, cancellationToken);
+                await _원장전환Service.추천만료처리Async(requestId, cancellationToken);
             }
 
             _logger.LogDebug("Action={Action} ExpiredCount={ExpiredCount} OccurredAt={OccurredAt}",

@@ -13,14 +13,42 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 builder.Services.Configure<관리자ApiOptions>(builder.Configuration.GetSection(관리자ApiOptions.SectionName));
 builder.Services.Configure<FoodApiOptions>(builder.Configuration.GetSection(FoodApiOptions.SectionName));
+builder.Services.AddHongdalUiCommonAppServices();
+builder.Services.AddScoped(sp =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", false);
+    return new HttpClient
+    {
+        BaseAddress = new Uri(options.BaseUrl),
+        Timeout = useMemory ? TimeSpan.FromSeconds(2) : TimeSpan.FromSeconds(100)
+    };
+});
 builder.Services.AddScoped<관리자인증세션Service>();
-builder.Services.AddScoped<ViewPolicyService>();
+builder.Services.AddHttpClient<ViewPolicyService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
 builder.Services.AddScoped<ActivityLogService>();
 builder.Services.AddHttpClient<PlatformCommunityService>((sp, client) =>
-{
-    var baseUrl = sp.GetRequiredService<IConfiguration>()["AdminApi:BaseUrl"] ?? "https://localhost:7117/";
-    client.BaseAddress = new Uri(baseUrl);
-});
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        var baseUrl = configuration["AdminApi:BaseUrl"] ?? "https://localhost:7117/";
+        client.BaseAddress = new Uri(baseUrl);
+        if (configuration.GetValue("AdminData:UseMemory", false))
+        {
+            client.Timeout = TimeSpan.FromSeconds(2);
+        }
+    })
+    .ConfigurePrimaryHttpMessageHandler(sp =>
+    {
+        var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", false);
+        return new SocketsHttpHandler
+        {
+            ConnectTimeout = useMemory ? TimeSpan.FromMilliseconds(500) : TimeSpan.FromSeconds(10)
+        };
+    });
 builder.Services.AddScoped<PlatformHomeModeStateService>();
 builder.Services.AddSingleton<백오피스메모리Service>();
 builder.Services.AddSingleton<문서관리메모리Service>();
@@ -47,7 +75,7 @@ builder.Services.AddHttpClient<백오피스조회Service>((sp, client) =>
 });
 builder.Services.AddScoped<I백오피스Service>(sp =>
 {
-    var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", true);
+    var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", false);
     return useMemory
         ? sp.GetRequiredService<백오피스메모리Service>()
         : sp.GetRequiredService<백오피스조회Service>();
@@ -72,10 +100,23 @@ builder.Services.AddHttpClient<AuxiliaryFeatureSettingsService>((sp, client) =>
 });
 
 builder.Services.AddHttpClient<음식운영Service>((sp, client) =>
-{
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<FoodApiOptions>>().Value;
-    client.BaseAddress = new Uri(options.BaseUrl);
-});
+    {
+        var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<FoodApiOptions>>().Value;
+        var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", false);
+        client.BaseAddress = new Uri(options.BaseUrl);
+        if (useMemory)
+        {
+            client.Timeout = TimeSpan.FromSeconds(2);
+        }
+    })
+    .ConfigurePrimaryHttpMessageHandler(sp =>
+    {
+        var useMemory = sp.GetRequiredService<IConfiguration>().GetValue("AdminData:UseMemory", false);
+        return new SocketsHttpHandler
+        {
+            ConnectTimeout = useMemory ? TimeSpan.FromMilliseconds(500) : TimeSpan.FromSeconds(10)
+        };
+    });
 
 builder.Services.AddHttpClient<RestaurantSearchPolicyAdminService>((sp, client) =>
 {

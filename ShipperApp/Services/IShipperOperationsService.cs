@@ -10,6 +10,8 @@ public interface IShipperOperationsService
 {
     Task<IReadOnlyList<ShipperRequestItem>> GetRequestsAsync(CancellationToken cancellationToken = default);
 
+    Task<ShipperRequestItem?> GetRequestAsync(string requestId, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<공개화물요약응답>> GetPublicCargoAsync(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<창고요약응답>> GetWarehousesAsync(CancellationToken cancellationToken = default);

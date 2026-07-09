@@ -241,8 +241,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        VehicleTypes = await ShipperOperations.GetVehicleTypesAsync();
-        SelectedVehicleType ??= VehicleTypes.FirstOrDefault();
+        try
+        {
+            VehicleTypes = await ShipperOperations.GetVehicleTypesAsync();
+            SelectedVehicleType ??= VehicleTypes.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            VehicleTypes = [];
+            StatusMessage = $"차량 후보 서버 조회 실패: {ex.Message}";
+        }
+
         await RecalculateRateWarningAsync();
     }
 
@@ -303,7 +312,7 @@
         await RecalculateRateWarningAsync();
 
         IsBusy = true;
-        StatusMessage = "메모리에 의뢰를 저장하는 중입니다.";
+        StatusMessage = "서버 API로 의뢰를 등록하는 중입니다.";
 
         try
         {
@@ -332,9 +341,13 @@
             };
 
             await ShipperOperations.AddRequestAsync(request);
-            StatusMessage = "의뢰를 메모리에 저장했습니다.";
+            StatusMessage = "서버에 의뢰를 등록했습니다.";
             CurrentStep = 1;
             ClearForm();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"서버 의뢰 등록 실패: {ex.Message}";
         }
         finally
         {
@@ -385,7 +398,18 @@
             return;
         }
 
-        var estimated = await ShipperOperations.EstimateFareAsync(SelectedVehicleType, EstimatedDistanceKm.Value);
+        decimal estimated;
+        try
+        {
+            estimated = await ShipperOperations.EstimateFareAsync(SelectedVehicleType, EstimatedDistanceKm.Value);
+        }
+        catch (Exception ex)
+        {
+            FareReferenceAmount = null;
+            RateWarningMessage = ex.Message;
+            return;
+        }
+
         FareReferenceAmount = estimated;
         if (PaymentAmount.HasValue && PaymentAmount.Value < estimated)
         {

@@ -33,7 +33,7 @@ public sealed class 운송인수완료CommandHandler : IRequestHandler<운송인
                 request.Id,
                 request.참여자Id,
                 request.실행역할,
-                "인수완료",
+                기사운송상태코드.인수완료,
                 nameof(운송인수완료됨Event),
                 context => new 운송인수완료됨Event(
                     context.운송.Id,

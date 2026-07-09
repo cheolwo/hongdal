@@ -13,6 +13,7 @@ public sealed class Result응답확장Tests
     [InlineData("배차대기 데이터를 찾을 수 없습니다.", StatusCodes.Status404NotFound, "NotFound")]
     [InlineData("수락 가능한 배차가 아닙니다.", StatusCodes.Status409Conflict, "InvalidState")]
     [InlineData("결제완료 의뢰만 수락할 수 있습니다.", StatusCodes.Status409Conflict, "InvalidState")]
+    [InlineData("거절 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.", StatusCodes.Status503ServiceUnavailable, "TemporaryFailure")]
     public void ToActionResult_MapsKnownFailuresToProblemDetails(string message, int expectedStatus, string expectedCode)
     {
         var controller = new TestController();

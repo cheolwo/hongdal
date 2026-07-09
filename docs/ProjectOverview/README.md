@@ -25,20 +25,21 @@
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
 | 00 | [첨부 문서 목차](00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
-| 01 | [app-page-catalog.md](app-page-catalog.md) | 각 앱 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
-| 02 | [hongdal-v1-required-pages.md](hongdal-v1-required-pages.md) | 홍달 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
-| 03 | [hongdal-v1-render-capture-summary.md](hongdal-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
-| 04 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 앱 화면이 하나의 업무 흐름을 완성하는 관계를 세부적으로 설명 |
-| 05 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 카드, 모드 전환이 다음 행동으로 이어지는 흐름 |
+| 01 | [page-docs/README.md](page-docs/README.md) | 각 화면별 독립 README와 인라인 캡처, 상세 설명 |
+| 02 | [app-page-catalog.md](app-page-catalog.md) | 각 앱 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
+| 03 | [hongdal-v1-required-pages.md](hongdal-v1-required-pages.md) | 홍달 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
+| 04 | [hongdal-v1-render-capture-summary.md](hongdal-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
+| 05 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 앱 화면이 하나의 업무 흐름을 완성하는 관계를 세부적으로 설명 |
+| 06 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 카드, 모드 전환이 다음 행동으로 이어지는 흐름 |
 
 ## 업무 흐름 문서
 
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
-| 06 | [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차와 음식 배달 배차의 경계 |
-| 07 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
-| 08 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 공동주문, 해외 선적/통관, 국내 운송, 판매채널 출고 흐름 |
-| 09 | [version-roadmap.md](version-roadmap.md) | 1.0부터 3.5까지의 단계별 제품 방향 |
+| 07 | [dispatch-flows.md](dispatch-flows.md) | 화물/용달 배차와 음식 배달 배차의 경계 |
+| 08 | [warehouse-flows.md](warehouse-flows.md) | 입고, 적재, 출고, 주문 발생 시 창고 알림 흐름 |
+| 09 | [orderer-group-commerce-flows.md](orderer-group-commerce-flows.md) | 공동주문, 해외 선적/통관, 국내 운송, 판매채널 출고 흐름 |
+| 10 | [version-roadmap.md](version-roadmap.md) | 1.0부터 3.5까지의 단계별 제품 방향 |
 
 ## 기술 참고 문서
 
@@ -58,7 +59,7 @@
 ## 관리 원칙
 
 1. 루트 README에는 홍달 1.0과 대표 화면만 둔다.
-2. 화면 캡처와 전체 페이지 카탈로그를 첨부 문서의 앞순위에 둔다.
+2. 화면별 README와 전체 페이지 카탈로그를 첨부 문서의 앞순위에 둔다.
 3. OS, 엔진, AI, API 같은 기술 설명은 뒤쪽 참고 문서로 둔다.
-4. 새 화면을 추가하면 `app-page-catalog.md`와 캡처 이미지부터 갱신한다.
+4. 새 화면을 추가하면 `app-page-catalog.md`, `page-docs/`, 캡처 이미지부터 갱신한다.
 5. 화면 간 상태 전파나 시퀀스는 `workflow-app-screen-map.md`에 둔다.

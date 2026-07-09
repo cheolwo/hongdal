@@ -37,5 +37,13 @@
                          Version="4.10.0"
                          Bind="false"
                          VerifyDependencies="false" />
+    <AndroidMavenLibrary Include="com.squareup.okio:okio-jvm"
+                         Version="3.0.0"
+                         Bind="false"
+                         VerifyDependencies="false" />
+    <AndroidMavenLibrary Include="org.brotli:dec"
+                         Version="0.1.2"
+                         Bind="false"
+                         VerifyDependencies="false" />
   </ItemGroup>
 </Project>

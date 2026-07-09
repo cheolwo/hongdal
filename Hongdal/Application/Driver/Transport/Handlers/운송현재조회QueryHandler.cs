@@ -42,20 +42,9 @@ public sealed class 운송현재조회QueryHandler : IRequestHandler<운송현�
             도착 = entity.도착,
             운임 = entity.운임,
             결제방식 = shipperRequest?.결제수단 ?? string.Empty,
-            인수증필요 = IsReceiptRequired(shipperRequest?.증빙방식, shipperRequest?.결제수단),
-            인수증서명필수 = IsReceiptSignatureRequired(shipperRequest?.요청사항, shipperRequest?.정산메모),
+            인수증필요 = 기사운송증빙조건정책.인수증필요(shipperRequest?.증빙방식, shipperRequest?.결제수단),
+            인수증서명필수 = 기사운송증빙조건정책.인수증서명필수(shipperRequest?.요청사항, shipperRequest?.정산메모),
             UpdatedAt = entity.UpdatedAt
         };
     }
-
-    private static bool IsReceiptRequired(string? evidenceMethod, string? paymentMethod)
-        => string.Equals(evidenceMethod, "인수증", StringComparison.Ordinal)
-           || (paymentMethod?.Contains("인수증", StringComparison.Ordinal) ?? false);
-
-    private static bool IsReceiptSignatureRequired(string? requestText, string? settlementMemo)
-        => ContainsSignatureRequired(requestText) || ContainsSignatureRequired(settlementMemo);
-
-    private static bool ContainsSignatureRequired(string? value)
-        => value?.Contains("서명필수", StringComparison.Ordinal) == true
-           || value?.Contains("서명 필수", StringComparison.Ordinal) == true;
 }

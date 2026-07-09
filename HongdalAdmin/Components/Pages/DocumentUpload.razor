@@ -1,0 +1,149 @@
+@page "/documents/upload"
+@rendermode InteractiveServer
+@inject 문서관리메모리Service 문서관리메모리Service
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>문서 업로드</PageTitle>
+
+<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">문서 업로드</h1>
+        <div class="text-muted">문서 파일을 선택하고 원장에 등록합니다.</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" href="@관리자문서Routes.목록">문서 목록</a>
+        <a class="btn btn-outline-primary" href="@관리자문서Routes.정책목록">문서 정책</a>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">업로드 정보</h5>
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="form-label">문서코드</label>
+                <input class="form-control" @bind="uploadDocumentCode" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">의뢰Id</label>
+                <input class="form-control" @bind="uploadRequestId" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">문서명</label>
+                <input class="form-control" @bind="uploadDocumentName" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">파일</label>
+                <InputFile OnChange="OnFileSelected" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">배송운송Id</label>
+                <input class="form-control" @bind="uploadTransportIdText" placeholder="선택" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">암호화</label>
+                <select class="form-select" @bind="uploadEncryptText">
+                    <option value="">정책 따름</option>
+                    <option value="true">암호화</option>
+                    <option value="false">비암호화</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">다운로드</label>
+                <select class="form-select" @bind="uploadDownloadText">
+                    <option value="">정책 따름</option>
+                    <option value="true">허용</option>
+                    <option value="false">차단</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn btn-primary mt-3" @onclick="UploadAsync" disabled="@isUploading">업로드</button>
+    </div>
+</div>
+
+@code {
+    private bool isUploading;
+    private bool isError;
+    private string? message;
+    private IBrowserFile? selectedFile;
+
+    private string uploadDocumentCode = "인수증";
+    private string uploadDocumentName = "인수증";
+    private string uploadRequestId = string.Empty;
+    private string uploadTransportIdText = string.Empty;
+    private string uploadEncryptText = string.Empty;
+    private string uploadDownloadText = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (!관리자인증세션Service.서버관리자인가)
+        {
+            NavigationManager.NavigateTo(관리자문서Routes.로그인ReturnUrl(관리자문서Routes.업로드));
+        }
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task UploadAsync()
+    {
+        if (selectedFile is null)
+        {
+            isError = true;
+            message = "업로드할 파일을 선택하세요.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(uploadDocumentCode) || string.IsNullOrWhiteSpace(uploadRequestId))
+        {
+            isError = true;
+            message = "문서코드와 의뢰Id는 필수입니다.";
+            return;
+        }
+
+        isUploading = true;
+        message = null;
+
+        try
+        {
+            await using var stream = selectedFile.OpenReadStream(50_000_000);
+            bool? encrypt = bool.TryParse(uploadEncryptText, out var encryptValue) ? encryptValue : null;
+            bool? allowDownload = bool.TryParse(uploadDownloadText, out var downloadValue) ? downloadValue : null;
+            long? transportId = long.TryParse(uploadTransportIdText, out var transportValue) ? transportValue : null;
+
+            await 문서관리메모리Service.UploadDocumentAsync(
+                stream,
+                selectedFile.Name,
+                selectedFile.ContentType,
+                uploadDocumentCode,
+                string.IsNullOrWhiteSpace(uploadDocumentName) ? uploadDocumentCode : uploadDocumentName,
+                uploadRequestId,
+                transportId,
+                encrypt,
+                allowDownload,
+                관리자인증세션Service.UserName);
+
+            selectedFile = null;
+            isError = false;
+            message = "문서를 업로드했습니다.";
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            message = ex.Message;
+        }
+        finally
+        {
+            isUploading = false;
+        }
+    }
+}

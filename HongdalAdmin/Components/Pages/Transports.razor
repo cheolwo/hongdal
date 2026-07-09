@@ -5,43 +5,204 @@
 
 <h1>06. 운송 진행</h1>
 
-<div class="row g-2 mb-3">
+<div class="row g-2 mb-3 align-items-center">
     <div class="col-md-3"><input class="form-control" @bind="statusFilter" placeholder="운송상태" /></div>
     <div class="col-md-3"><input class="form-control" @bind="eventRequestFilter" placeholder="이벤트 의뢰ID" /></div>
+    <div class="col-md-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="adminReviewOnly" @bind="관리자확인만" />
+            <label class="form-check-label" for="adminReviewOnly">관리자 확인 필요만 보기</label>
+        </div>
+    </div>
     <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync">조회</button></div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">전체 운송</div>
+                <div class="fs-3 fw-bold">@transports.Count</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">관리자 확인 필요</div>
+                <div class="fs-3 fw-bold text-danger">@transports.Count(x => x.관리자확인필요)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">예외 신고</div>
+                <div class="fs-3 fw-bold text-warning">@transports.Count(x => x.예외신고됨)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">지연 확인</div>
+                <div class="fs-3 fw-bold text-danger">@transports.Count(IsStale)</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-3">
     <div class="col-lg-7">
-        <h5>운송 목록</h5>
-        <table class="table table-striped"><thead><tr><th>번호</th><th>상태</th><th>기사</th><th>출발</th><th>도착</th><th>운임</th></tr></thead><tbody>
-        @foreach (var item in transports)
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">운송 운영 레인</h5>
+            <span class="badge rounded-pill text-bg-primary">@운영확인대상.Count 건</span>
+        </div>
+        @if (운영확인대상.Count == 0)
         {
-            <tr><td>@item.운송번호</td><td>@item.상태</td><td>@item.기사_운송자</td><td>@item.출발지</td><td>@item.도착지</td><td>@(item.운임?.ToString("N0") ?? "-")</td></tr>
+            <div class="alert alert-success">현재 관리자 확인이 필요한 운송 예외가 없습니다.</div>
         }
-        </tbody></table>
+        else
+        {
+            <div class="table-responsive mb-3">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>운송</th><th>운영상태</th><th>예외 내용</th><th>갱신</th><th>관제</th></tr></thead>
+                    <tbody>
+                    @foreach (var item in 운영확인대상)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@item.운송번호</div>
+                                <div class="text-muted small">@item.기사_운송자</div>
+                            </td>
+                            <td><span class="@TransportBadgeClass(item)">@TransportBadgeText(item)</span></td>
+                            <td class="small">@ExceptionSummary(item)</td>
+                            <td class="small">@item.UpdatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="@WorkflowDetailHref(item.운송번호)">상세</a></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <h5>운송 목록</h5>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>번호</th><th>상태</th><th>기사</th><th>구간</th><th>운임</th><th>예외</th><th>관제</th></tr></thead>
+                <tbody>
+                @foreach (var item in 표시운송목록)
+                {
+                    <tr>
+                        <td>@item.운송번호</td>
+                        <td><span class="@TransportBadgeClass(item)">@item.상태</span></td>
+                        <td>@item.기사_운송자</td>
+                    <td class="small">@item.출발지 → @item.도착지</td>
+                    <td>@(item.운임?.ToString("N0") ?? "-")</td>
+                    <td class="small">@ExceptionSummary(item)</td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="@WorkflowDetailHref(item.운송번호)">상세</a></td>
+                </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-lg-5">
         <h5>이벤트 로그</h5>
-        <table class="table table-sm table-striped"><thead><tr><th>의뢰ID</th><th>이벤트</th><th>시각</th></tr></thead><tbody>
-        @foreach (var item in events)
-        {
-            <tr><td>@item.의뢰Id</td><td>@item.이벤트타입</td><td>@item.이벤트시각.ToLocalTime().ToString("MM-dd HH:mm")</td></tr>
-        }
-        </tbody></table>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+                <thead><tr><th>의뢰ID</th><th>이벤트</th><th>시각</th><th>메타</th></tr></thead>
+                <tbody>
+                @foreach (var item in events)
+                {
+                    <tr>
+                        <td>@item.의뢰Id</td>
+                        <td>@item.이벤트타입</td>
+                        <td>@item.이벤트시각.ToLocalTime().ToString("MM-dd HH:mm")</td>
+                        <td class="small text-truncate" style="max-width: 240px;" title="@item.메타데이터">@ShortMetadata(item.메타데이터)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 @code {
     private string? statusFilter;
     private string? eventRequestFilter;
+    private bool 관리자확인만;
     private IReadOnlyList<운송진행응답> transports = [];
     private IReadOnlyList<운송이벤트로그응답> events = [];
 
+    private IReadOnlyList<운송진행응답> 운영확인대상 => transports
+        .Where(x => x.관리자확인필요 || x.예외신고됨 || IsStale(x))
+        .OrderByDescending(x => x.관리자확인필요)
+        .ThenByDescending(x => x.예외신고됨)
+        .ThenBy(x => x.UpdatedAt)
+        .ToArray();
+
+    private IReadOnlyList<운송진행응답> 표시운송목록 => 관리자확인만
+        ? transports.Where(x => x.관리자확인필요 || x.예외신고됨 || IsStale(x)).ToArray()
+        : transports;
+
     protected override async Task OnInitializedAsync() => await LoadAsync();
+
     private async Task LoadAsync()
     {
         transports = await DataService.운송진행목록조회Async(statusFilter);
         events = await DataService.운송이벤트조회Async(eventRequestFilter);
     }
+
+    private static string TransportBadgeClass(운송진행응답 item)
+        => item.관리자확인필요 ? "badge rounded-pill text-bg-danger"
+            : item.예외신고됨 ? "badge rounded-pill text-bg-warning"
+            : IsStale(item) ? "badge rounded-pill text-bg-danger"
+            : item.상태 switch
+            {
+                "운송중" => "badge rounded-pill text-bg-primary",
+                "인수완료" or "완료" => "badge rounded-pill text-bg-success",
+                "배차확정" => "badge rounded-pill text-bg-info",
+                _ => "badge rounded-pill text-bg-secondary"
+            };
+
+    private static string TransportBadgeText(운송진행응답 item)
+        => item.관리자확인필요 ? "관리자 확인"
+            : item.예외신고됨 ? "예외 신고"
+            : IsStale(item) ? "지연 확인"
+            : item.상태;
+
+    private static string ExceptionSummary(운송진행응답 item)
+    {
+        if (!item.예외신고됨 && !item.관리자확인필요 && !IsStale(item))
+        {
+            return "-";
+        }
+
+        if (IsStale(item) && !item.예외신고됨)
+        {
+            return $"{item.상태} 상태가 2시간 이상 갱신되지 않았습니다.";
+        }
+
+        var stage = string.IsNullOrWhiteSpace(item.최근예외단계) ? "단계 미확인" : item.최근예외단계;
+        var code = string.IsNullOrWhiteSpace(item.최근예외코드) ? "예외코드 없음" : item.최근예외코드;
+        var message = string.IsNullOrWhiteSpace(item.최근예외메시지) ? "기사님 예외 신고 내용을 확인하세요." : item.최근예외메시지;
+        return $"{stage} · {code} · {message}";
+    }
+
+    private static bool IsStale(운송진행응답 item)
+        => (item.상태 == "배차확정" || item.상태 == "운송중") && item.UpdatedAt < DateTime.UtcNow.AddHours(-2);
+
+    private static string ShortMetadata(string? metadata)
+    {
+        if (string.IsNullOrWhiteSpace(metadata))
+        {
+            return "-";
+        }
+
+        return metadata.Length <= 80 ? metadata : metadata[..80] + "...";
+    }
+
+    private static string WorkflowDetailHref(string requestId)
+        => $"/transports/{Uri.EscapeDataString(requestId)}";
 }

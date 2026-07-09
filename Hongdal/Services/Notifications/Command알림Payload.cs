@@ -1,0 +1,138 @@
+using System.Text.Json;
+
+namespace 홍달.Services.Notifications;
+
+public static class Command알림FeatureNames
+{
+    public const string 배차수락 = "DispatchAccepted";
+    public const string 상차접근 = "DispatchPickupApproach";
+    public const string 운송완료입금요청 = "TransportSettlementDepositReminder";
+
+    public static readonly string[] 발송지원목록 = [배차수락, 상차접근, 운송완료입금요청];
+}
+
+public sealed record Command알림Payload(
+    string NotificationType,
+    string TargetUserId,
+    string DriverId,
+    string RequestId,
+    string PaymentId,
+    string OrderId,
+    string PaymentFlow,
+    int Amount,
+    int ReminderDay,
+    string CargoType,
+    string PickupAddress,
+    string DropoffAddress,
+    string PickupContactPhone,
+    string RecipientPhone,
+    string PickupWindowText,
+    string Title,
+    string Body,
+    DateTime? ScheduledAtUtc,
+    IReadOnlySet<string> Channels)
+{
+    public string AmountText => Amount <= 0 ? string.Empty : $"{Amount:N0}원";
+
+    public bool IsScheduledForFuture(DateTime nowUtc)
+        => ScheduledAtUtc is { } scheduledAtUtc && scheduledAtUtc > nowUtc;
+
+    public static Command알림Payload Parse(string payloadJson)
+    {
+        using var document = JsonDocument.Parse(payloadJson);
+        var root = document.RootElement;
+        var pickupWindowStart = ReadString(root, "pickupWindowStartUtc");
+        var pickupWindowEnd = ReadString(root, "pickupWindowEndUtc");
+        var pickupWindowText = string.IsNullOrWhiteSpace(pickupWindowStart) && string.IsNullOrWhiteSpace(pickupWindowEnd)
+            ? "상차 시간 협의"
+            : $"{pickupWindowStart} ~ {pickupWindowEnd}";
+
+        return new Command알림Payload(
+            ReadString(root, "알림유형", Command알림FeatureNames.배차수락),
+            ReadString(root, "targetUserId", ReadString(root, "shipperUserId")),
+            ReadString(root, "driverId"),
+            ReadString(root, "requestId"),
+            ReadString(root, "paymentId"),
+            ReadString(root, "orderId"),
+            ReadString(root, "paymentFlow"),
+            ReadInt(root, "amount"),
+            ReadInt(root, "reminderDay"),
+            ReadString(root, "cargoType"),
+            ReadString(root, "pickupAddress"),
+            ReadString(root, "dropoffAddress"),
+            ReadString(root, "pickupContactPhone"),
+            ReadString(root, "recipientPhone", ReadString(root, "pickupContactPhone")),
+            pickupWindowText,
+            ReadString(root, "title", "기사님이 운송 의뢰를 수락했습니다."),
+            ReadString(root, "body", "기사님이 운송 의뢰를 수락했습니다. 상차 준비를 확인해 주세요."),
+            ReadDateTime(root, "scheduledAtUtc"),
+            ReadStringSet(root, "channels", new[] { "Push" }));
+    }
+
+    private static string ReadString(JsonElement root, string propertyName, string fallback = "")
+    {
+        if (!root.TryGetProperty(propertyName, out var value) || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+        {
+            return fallback;
+        }
+
+        return value.ValueKind == JsonValueKind.String
+            ? value.GetString() ?? fallback
+            : value.ToString();
+    }
+
+    private static IReadOnlySet<string> ReadStringSet(JsonElement root, string propertyName, IReadOnlyList<string> fallback)
+    {
+        if (!root.TryGetProperty(propertyName, out var value) || value.ValueKind != JsonValueKind.Array)
+        {
+            return new HashSet<string>(fallback, StringComparer.OrdinalIgnoreCase);
+        }
+
+        var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in value.EnumerateArray())
+        {
+            if (item.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(item.GetString()))
+            {
+                result.Add(item.GetString()!);
+            }
+        }
+
+        return result.Count == 0
+            ? new HashSet<string>(fallback, StringComparer.OrdinalIgnoreCase)
+            : result;
+    }
+
+    private static int ReadInt(JsonElement root, string propertyName)
+    {
+        if (!root.TryGetProperty(propertyName, out var value) || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+        {
+            return 0;
+        }
+
+        if (value.TryGetInt32(out var number))
+        {
+            return number;
+        }
+
+        return int.TryParse(value.ToString(), out var parsed) ? parsed : 0;
+    }
+
+    private static DateTime? ReadDateTime(JsonElement root, string propertyName)
+    {
+        if (!root.TryGetProperty(propertyName, out var value) || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+        {
+            return null;
+        }
+
+        if (value.ValueKind == JsonValueKind.String && DateTime.TryParse(value.GetString(), out var parsed))
+        {
+            return parsed.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(parsed, DateTimeKind.Utc)
+                : parsed.ToUniversalTime();
+        }
+
+        return DateTime.TryParse(value.ToString(), out parsed)
+            ? DateTime.SpecifyKind(parsed, DateTimeKind.Utc)
+            : null;
+    }
+}

@@ -3,9 +3,9 @@ using Hongdal.Contracts.CommonContents;
 
 namespace HongdalAdmin.Services;
 
-public sealed class 백오피스메모리Service : I백오피스Service
+public sealed partial class 백오피스메모리Service : I백오피스Service
 {
-    private readonly List<관리자대시보드요약응답> _dashboard = [new() { 오늘의뢰수 = 12, 결제대기수 = 3, 결제완료수 = 9, 배차대기수 = 4, 배차확정수 = 8, 운송중수 = 5, 완료수 = 18, 취소환불수 = 1 }];
+    private readonly List<관리자대시보드요약응답> _dashboard = [new() { 오늘의뢰수 = 12, 결제대기수 = 3, 결제완료수 = 9, 배차대기수 = 4, 배차확정수 = 8, 운송중수 = 5, 완료수 = 18, 취소환불수 = 1, 운송예외수 = 1, 관리자확인필요수 = 1 }];
     private readonly List<화주운송의뢰응답> _requests = [];
     private readonly List<결제목록응답> _payments = [];
     private readonly List<배차대기응답> _dispatchWait = [];
@@ -170,142 +170,6 @@ public sealed class 백오피스메모리Service : I백오피스Service
     public Task<IReadOnlyList<화주관리응답>> 화주목록조회Async(CancellationToken cancellationToken = default)
         => Task.FromResult<IReadOnlyList<화주관리응답>>(_shippers.ToArray());
 
-    public Task<IReadOnlyList<파일POD응답>> 파일POD목록조회Async(string? fileType = null, string? requestId = null, CancellationToken cancellationToken = default)
-    {
-        IEnumerable<파일POD응답> query = _filePods;
-        if (!string.IsNullOrWhiteSpace(fileType)) query = query.Where(x => x.FileType == fileType.Trim());
-        if (!string.IsNullOrWhiteSpace(requestId)) query = query.Where(x => x.RequestId == requestId.Trim());
-        return Task.FromResult<IReadOnlyList<파일POD응답>>(query.ToArray());
-    }
-
-    public Task<파일POD응답?> 파일POD상태변경Async(Guid id, string uploadStatus, CancellationToken cancellationToken = default)
-    {
-        var item = _filePods.FirstOrDefault(x => x.Id == id);
-        if (item is null) return Task.FromResult<파일POD응답?>(null);
-        item.UploadStatus = uploadStatus;
-        item.UpdatedAtUtc = DateTime.UtcNow;
-        return Task.FromResult<파일POD응답?>(item);
-    }
-
-    public async Task<파일POD응답?> 파일POD업로드Async(Stream fileStream, string fileName, string contentType, string fileType, string? requestId, CancellationToken cancellationToken = default)
-    {
-        await using var _ = fileStream;
-        using var memory = new MemoryStream();
-        await fileStream.CopyToAsync(memory, cancellationToken);
-        var item = new 파일POD응답
-        {
-            Id = Guid.NewGuid(),
-            FileType = fileType,
-            RequestId = requestId ?? string.Empty,
-            BucketName = "local",
-            ObjectName = fileName,
-            Url = "#",
-            OriginalFileName = fileName,
-            UploadStatus = "업로드완료",
-            UploadedAtUtc = DateTime.UtcNow,
-            UpdatedAtUtc = DateTime.UtcNow
-        };
-        _filePods.Insert(0, item);
-        return item;
-    }
-
-    public Task<IReadOnlyList<관리자공통콘텐츠요약응답>> 공통콘텐츠목록조회Async(CancellationToken cancellationToken = default)
-        => Task.FromResult<IReadOnlyList<관리자공통콘텐츠요약응답>>(_commonContents.OrderByDescending(x => x.Id).ToArray());
-
-    public Task<관리자공통콘텐츠상세응답?> 공통콘텐츠상세조회Async(long id, CancellationToken cancellationToken = default)
-    {
-        _commonContentDetails.TryGetValue(id, out var detail);
-        return Task.FromResult(detail);
-    }
-
-    public Task<관리자공통콘텐츠상세응답?> 공통콘텐츠등록Async(관리자공통콘텐츠저장요청 request, CancellationToken cancellationToken = default)
-    {
-        var nextId = _commonContents.Count == 0 ? 1 : _commonContents.Max(x => x.Id) + 1;
-        var detail = BuildDetail(nextId, request);
-        _commonContentDetails[nextId] = detail;
-        UpsertSummary(detail);
-        return Task.FromResult<관리자공통콘텐츠상세응답?>(detail);
-    }
-
-    public Task<관리자공통콘텐츠상세응답?> 공통콘텐츠수정Async(long id, 관리자공통콘텐츠저장요청 request, CancellationToken cancellationToken = default)
-    {
-        if (!_commonContentDetails.TryGetValue(id, out var existing))
-        {
-            return Task.FromResult<관리자공통콘텐츠상세응답?>(null);
-        }
-
-        var updated = BuildDetail(id, request, existing.생성시각);
-        _commonContentDetails[id] = updated;
-        UpsertSummary(updated);
-        return Task.FromResult<관리자공통콘텐츠상세응답?>(updated);
-    }
-
-    public Task 공통콘텐츠활성화변경Async(long id, bool enabled, CancellationToken cancellationToken = default)
-    {
-        if (_commonContentDetails.TryGetValue(id, out var detail))
-        {
-            detail.활성화여부 = enabled;
-            UpsertSummary(detail);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task<IReadOnlyList<공통콘텐츠보상정책Dto>> 공통콘텐츠보상정책목록조회Async(CancellationToken cancellationToken = default)
-        => Task.FromResult<IReadOnlyList<공통콘텐츠보상정책Dto>>(_commonContentRewardPolicies.OrderByDescending(x => x.Id).ToArray());
-
-    public Task<공통콘텐츠보상정책Dto?> 공통콘텐츠보상정책등록Async(공통콘텐츠보상정책Dto request, CancellationToken cancellationToken = default)
-    {
-        var nextId = _commonContentRewardPolicies.Count == 0 ? 1 : _commonContentRewardPolicies.Max(x => x.Id) + 1;
-        request.Id = nextId;
-        _commonContentRewardPolicies.RemoveAll(x => x.Id == request.Id);
-        _commonContentRewardPolicies.Add(request);
-        return Task.FromResult<공통콘텐츠보상정책Dto?>(request);
-    }
-
-    private 관리자공통콘텐츠상세응답 BuildDetail(long id, 관리자공통콘텐츠저장요청 request, DateTimeOffset? createdAt = null)
-    {
-        공통콘텐츠보상정책Dto? policy = null;
-        if (request.보상정책Id.HasValue)
-        {
-            policy = _commonContentRewardPolicies.FirstOrDefault(x => x.Id == request.보상정책Id.Value);
-        }
-
-        return new 관리자공통콘텐츠상세응답
-        {
-            Id = id,
-            제목 = request.제목,
-            설명 = request.설명,
-            콘텐츠유형 = request.콘텐츠유형,
-            이미지Url = request.이미지Url,
-            영상Url = request.영상Url,
-            외부링크Url = request.외부링크Url,
-            노출위치 = request.노출위치,
-            기사노출 = request.기사노출,
-            화주노출 = request.화주노출,
-            운영자노출 = request.운영자노출,
-            활성화여부 = request.활성화여부,
-            노출시작시각 = request.노출시작시각,
-            노출종료시각 = request.노출종료시각,
-            보상정책 = policy,
-            생성시각 = createdAt ?? DateTimeOffset.UtcNow
-        };
-    }
-
-    private void UpsertSummary(관리자공통콘텐츠상세응답 detail)
-    {
-        _commonContents.RemoveAll(x => x.Id == detail.Id);
-        _commonContents.Add(new 관리자공통콘텐츠요약응답
-        {
-            Id = detail.Id,
-            제목 = detail.제목,
-            콘텐츠유형 = detail.콘텐츠유형,
-            노출위치 = detail.노출위치,
-            활성화여부 = detail.활성화여부,
-            생성시각 = detail.생성시각
-        });
-    }
-
     private void Seed()
     {
         var now = DateTime.UtcNow;
@@ -425,10 +289,28 @@ public sealed class 백오피스메모리Service : I백오피스Service
         _driverDispatches["DRV-002"] = [new 기사배차내역응답 { Id = 2, 배차명 = "경기권 예약", 상태 = "예약", 배차일 = now.Date.AddDays(1), 픽업지 = "수원", 배송지 = "대전", 배차점수 = 91, 실패사유 = string.Empty, 배차생성시각 = now.AddHours(-5) }];
         _settlements.Add(new 기사월정산관리응답 { 기사Id = "DRV-001", 년도 = now.Year, 월 = now.Month, 배차건수 = 3, 이용료 = 15000, 월상한적용여부 = false, 결제완료 = true, UpdatedAt = now });
         _settlements.Add(new 기사월정산관리응답 { 기사Id = "DRV-002", 년도 = now.Year, 월 = now.Month, 배차건수 = 1, 이용료 = 5000, 월상한적용여부 = false, 결제완료 = false, UpdatedAt = now.AddMinutes(-30) });
-        _transports.Add(new 운송진행응답 { Id = 101, 운송번호 = "TR-101", 상태 = "운송중", 출발_픽업 = now.AddHours(-2), 도착 = null, 기사_운송자 = "DRV-001", 출발지 = "서울", 도착지 = "성남", 운임 = 45000, UpdatedAt = now });
+        _transports.Add(new 운송진행응답
+        {
+            Id = 101,
+            운송번호 = "TR-101",
+            상태 = "운송중",
+            출발_픽업 = now.AddHours(-2),
+            도착 = null,
+            기사_운송자 = "DRV-001",
+            출발지 = "서울",
+            도착지 = "성남",
+            운임 = 45000,
+            예외신고됨 = true,
+            최근예외단계 = "상차",
+            최근예외코드 = "CargoMismatch",
+            최근예외메시지 = "상차지 도착 후 실제 수량이 의뢰 수량과 다릅니다.",
+            관리자확인필요 = true,
+            UpdatedAt = now.AddMinutes(-12)
+        });
         _transports.Add(new 운송진행응답 { Id = 102, 운송번호 = "REQ-2026-003", 상태 = "인수완료", 출발_픽업 = now.AddDays(-1).AddHours(1), 도착 = now.AddDays(-1).AddHours(4), 기사_운송자 = "DRV-002", 출발지 = "수원", 도착지 = "대전", 운임 = 120000, UpdatedAt = now.AddDays(-1).AddHours(4) });
         _transportEvents.Add(new 운송이벤트로그응답 { Id = 1, 의뢰Id = "REQ-2026-001", 이벤트타입 = "상차완료", 이벤트시각 = now.AddHours(-1), 메타데이터 = "{}" });
         _transportEvents.Add(new 운송이벤트로그응답 { Id = 2, 의뢰Id = "REQ-2026-003", 이벤트타입 = "인수완료", 이벤트시각 = now.AddDays(-1).AddHours(4), 메타데이터 = "{\"receipt\":\"created\"}" });
+        _transportEvents.Add(new 운송이벤트로그응답 { Id = 3, 의뢰Id = "TR-101", 이벤트타입 = "운송예외신고", 이벤트시각 = now.AddMinutes(-12), 메타데이터 = "{\"stage\":\"상차\",\"exceptionCode\":\"CargoMismatch\",\"reason\":\"상차지 도착 후 실제 수량이 의뢰 수량과 다릅니다.\",\"adminReviewRequired\":true}" });
         _companies.Add(new 업체관리응답 { Id = 1, 업체명 = "홍달물류", 상태 = "거래중", 대표연락처 = "02-1234-5678", 담당자 = "김담당", 이메일 = "biz@example.com", 주소 = "서울", 정산결제조건 = "월말", 등록일 = now });
         _companies.Add(new 업체관리응답 { Id = 2, 업체명 = "달빛상사", 상태 = "심사중", 대표연락처 = "032-555-0000", 담당자 = "이담당", 이메일 = "moon@example.com", 주소 = "인천", 정산결제조건 = "선결제", 등록일 = now.AddDays(-3) });
         _shippers.Add(new 화주관리응답 { 화주Id = "SHIP-001", 사용자명 = "화주A", 이메일 = "shipper@example.com", 연락처 = "010-2222-3333", 의뢰건수 = 5, 최근의뢰일시 = now, 거래상태 = "거래중" });

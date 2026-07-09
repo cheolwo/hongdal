@@ -11,6 +11,7 @@ public sealed class 기사운행시작요청
     public decimal? 오늘의복귀지경도 { get; set; }
     public bool 기본복귀지사용 { get; set; }
     public string? 복귀지출처 { get; set; }
+    public string? 복귀콜선호 { get; set; }
 }
 
 public sealed class 기사운행시작응답
@@ -21,6 +22,7 @@ public sealed class 기사운행시작응답
     public DateTime? StartedAt { get; set; }
     public string? 적용복귀지 { get; set; }
     public string? 복귀지출처 { get; set; }
+    public string? 복귀콜선호 { get; set; }
 }
 
 public sealed class 기사운행상태응답
@@ -33,6 +35,7 @@ public sealed class 기사운행상태응답
     public DateTime? 최근위치수신시각 { get; set; }
     public decimal? Aging점수 { get; set; }
     public DateTime? Aging기준시각 { get; set; }
+    public string? 복귀콜선호 { get; set; }
 }
 
 public sealed class 기사위치갱신요청

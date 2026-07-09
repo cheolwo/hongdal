@@ -1,16 +1,23 @@
 using Hongdal.Application.Shipper.Payment.Events;
+using Hongdal.Application.Shipper.Request;
 using Hongdal.Contracts.Shipper.Request;
+using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Shipper.Payment.Handlers;
 
 public sealed class 용달운송의뢰결제승인완료EventHandler : INotificationHandler<결제승인완료Event>
 {
     private readonly HongdalContext _db;
+    private readonly I운송의뢰배차대기Service _dispatchQueueService;
     private readonly ILogger<용달운송의뢰결제승인완료EventHandler> _logger;
 
-    public 용달운송의뢰결제승인완료EventHandler(HongdalContext db, ILogger<용달운송의뢰결제승인완료EventHandler> logger)
+    public 용달운송의뢰결제승인완료EventHandler(
+        HongdalContext db,
+        I운송의뢰배차대기Service dispatchQueueService,
+        ILogger<용달운송의뢰결제승인완료EventHandler> logger)
     {
         _db = db;
+        _dispatchQueueService = dispatchQueueService;
         _logger = logger;
     }
 
@@ -37,31 +44,14 @@ public sealed class 용달운송의뢰결제승인완료EventHandler : INotifica
         {
             shipperRequest.배차상태 = 상태값.배차상태.매칭중;
 
-            var existingQueue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == shipperRequest.의뢰Id, cancellationToken);
-            if (existingQueue == null)
-            {
-                _db.배차대기.Add(new 홍달.도메인.배차.배차대기
+            await _dispatchQueueService.생성또는조회Async(
+                화주운송의뢰출고예정정규화.To출고예정운송대상(shipperRequest),
+                new 운송의뢰배차대기생성옵션
                 {
-                    의뢰Id = shipperRequest.의뢰Id,
-                    화주Id = shipperRequest.화주Id,
-                    배차업무유형 = 상태값.배차업무유형.용달운송,
-                    원본의뢰유형 = "CargoTransport",
-                    원본의뢰Id = shipperRequest.의뢰Id,
-                    픽업_도로명주소 = shipperRequest.픽업_도로명주소,
-                    픽업_상세주소 = shipperRequest.픽업_상세주소,
-                    픽업_위도 = shipperRequest.픽업_위도,
-                    픽업_경도 = shipperRequest.픽업_경도,
-                    하차_도로명주소 = shipperRequest.하차_도로명주소,
-                    하차_상세주소 = shipperRequest.하차_상세주소,
-                    하차_위도 = shipperRequest.하차_위도,
-                    하차_경도 = shipperRequest.하차_경도,
-                    상태 = 상태값.배차대기상태.대기,
-                    배차큐단계 = 상태값.배차큐단계.계획배차,
-                    배차노출상태 = 상태값.배차노출상태.계획대기,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
-            }
+                    픽업상세주소 = shipperRequest.픽업_상세주소,
+                    하차상세주소 = shipperRequest.하차_상세주소
+                },
+                cancellationToken);
         }
         else
         {

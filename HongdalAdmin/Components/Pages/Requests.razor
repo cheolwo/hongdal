@@ -11,80 +11,53 @@
     <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">조회</button></div>
 </div>
 
-@if (!string.IsNullOrWhiteSpace(message))
+@if (isLoading)
 {
-    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+    <div class="alert alert-info">의뢰 목록을 불러오는 중입니다...</div>
 }
-
-<div class="row g-3">
-    <div class="col-lg-7">
-        <table class="table table-striped table-hover">
-            <thead><tr><th>의뢰ID</th><th>확인</th><th>결제</th><th>배차</th><th>픽업</th><th>하차</th></tr></thead>
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead><tr><th>의뢰ID</th><th>확인</th><th>결제</th><th>배차</th><th>픽업</th><th>하차</th><th>의뢰</th><th>관제</th></tr></thead>
             <tbody>
                 @foreach (var item in items)
                 {
-                    <tr style="cursor:pointer" @onclick="() => SelectAsync(item.의뢰Id)">
+                    <tr>
                         <td>@item.의뢰Id</td>
                         <td><span class="@ReviewBadgeClass(item)">@ReviewLabel(item)</span></td>
-                        <td><span class="@StatusBadgeClass(item.결제상태)">@item.결제상태</span></td>
-                        <td><span class="@StatusBadgeClass(item.배차상태)">@item.배차상태</span></td>
+                        <td><span class="@관리자화면Ui.상태Badge(item.결제상태)">@item.결제상태</span></td>
+                        <td><span class="@관리자화면Ui.상태Badge(item.배차상태)">@item.배차상태</span></td>
                         <td>@(item.요약?.픽업지 ?? item.픽업지)</td>
                         <td>@(item.요약?.하차지 ?? item.하차지)</td>
+                        <td><a class="btn btn-sm btn-outline-secondary" href="@RequestDetailHref(item.의뢰Id)">상세</a></td>
+                        <td><a class="btn btn-sm btn-outline-primary" href="@WorkflowDetailHref(item.의뢰Id)">관제</a></td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-    <div class="col-lg-5">
-        @if (selected is null)
-        {
-            <p class="text-muted">의뢰를 선택하세요.</p>
-        }
-        else
-        {
-            <div class="card"><div class="card-body">
-                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                    <h5 class="card-title mb-0">@selected.의뢰Id</h5>
-                    <span class="@ReviewBadgeClass(selected)">@ReviewLabel(selected)</span>
-                </div>
-                <div>상태: @selected.의뢰상태 / @selected.배차상태</div>
-                <div>결제: @selected.결제상태 / @selected.결제수단</div>
-                <div>정산: @selected.정산상태 / @selected.정산시점</div>
-                <div>운임: @(selected.최종운임?.ToString("N0") ?? "-") 원</div>
-                <div>경로: @selected.픽업지 → @selected.하차지</div>
-                <button class="btn btn-outline-danger mt-3" @onclick="CancelAsync">취소/환불 처리</button>
-            </div></div>
-        }
-    </div>
-</div>
+}
 
 @code {
     private bool isLoading;
-    private bool isError;
-    private string? message;
     private string? paymentFilter;
     private string? dispatchFilter;
     private IReadOnlyList<화주운송의뢰응답> items = [];
-    private 화주운송의뢰응답? selected;
 
     protected override async Task OnInitializedAsync() => await LoadAsync();
 
     private async Task LoadAsync()
     {
         isLoading = true;
-        items = await DataService.의뢰목록조회Async(paymentFilter, dispatchFilter);
-        isLoading = false;
-    }
-
-    private async Task SelectAsync(string id) => selected = await DataService.의뢰상세조회Async(id);
-
-    private async Task CancelAsync()
-    {
-        if (selected is null) return;
-        selected = await DataService.의뢰취소환불처리Async(selected.의뢰Id);
-        isError = false;
-        message = "취소/환불 처리했습니다.";
-        await LoadAsync();
+        try
+        {
+            items = await DataService.의뢰목록조회Async(paymentFilter, dispatchFilter);
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private static string ReviewLabel(화주운송의뢰응답 item)
@@ -119,28 +92,14 @@
         };
     }
 
-    private static string StatusBadgeClass(string? status)
-    {
-        if (IsMatch(status, "결제완료", "배송완료", "하차완료", "완료", "확정"))
-        {
-            return "badge rounded-pill text-bg-success";
-        }
-
-        if (IsMatch(status, "결제대기", "미결제", "대기", "매칭중", "배차대기"))
-        {
-            return "badge rounded-pill text-bg-warning";
-        }
-
-        if (IsMatch(status, "취소", "환불", "보류"))
-        {
-            return "badge rounded-pill text-bg-danger";
-        }
-
-        return "badge rounded-pill text-bg-secondary";
-    }
-
     private static bool IsMatch(string? value, params string[] candidates)
     {
         return candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
     }
+
+    private static string RequestDetailHref(string requestId)
+        => $"/requests/{Uri.EscapeDataString(requestId)}";
+
+    private static string WorkflowDetailHref(string requestId)
+        => $"/transports/{Uri.EscapeDataString(requestId)}";
 }

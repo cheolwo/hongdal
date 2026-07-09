@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Hongdal.Contracts.Driver.Transport;
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
@@ -9,12 +10,18 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
+    private readonly I운송증빙첨부JsonWriter _attachmentWriter;
 
-    public 운송문제신고CommandHandler(HongdalContext db, ICurrentUserAccessor currentUserAccessor, I참여자실행권한검사 권한검사)
+    public 운송문제신고CommandHandler(
+        HongdalContext db,
+        ICurrentUserAccessor currentUserAccessor,
+        I참여자실행권한검사 권한검사,
+        I운송증빙첨부JsonWriter attachmentWriter)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
+        _attachmentWriter = attachmentWriter;
     }
 
     public async Task<Result<기사운송요약응답>> Handle(운송문제신고Command request, CancellationToken cancellationToken)
@@ -32,10 +39,35 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
             return Result.Fail<기사운송요약응답>("운송을 찾을 수 없습니다.");
         }
 
-        var issueText = string.IsNullOrWhiteSpace(request.사유) ? "문제 신고" : request.사유.Trim();
-        var memo = string.IsNullOrWhiteSpace(request.메모) ? issueText : $"{issueText}: {request.메모!.Trim()}";
+        var now = DateTime.UtcNow;
+        var 예외 = 운송현장예외정책.정리(
+            request.단계,
+            request.예외코드,
+            request.사유,
+            request.관리자확인요청);
+        var memo = BuildMemoLine(예외, request.메모);
         entity.메모 = string.IsNullOrWhiteSpace(entity.메모) ? memo : $"{entity.메모}\n{memo}";
-        entity.UpdatedAt = DateTime.UtcNow;
+        _attachmentWriter.추가(
+            entity,
+            new 운송증빙첨부(
+                "transport-field-exception",
+                request.증빙ObjectName,
+                request.증빙Url,
+                request.기사Id,
+                now,
+                new Dictionary<string, object?>
+                {
+                    ["stage"] = 예외.단계,
+                    ["exceptionCode"] = 예외.예외코드,
+                    ["reason"] = 예외.사유,
+                    ["memo"] = request.메모?.Trim(),
+                    ["nextAction"] = 예외.다음행동안내,
+                    ["adminReviewRequired"] = 예외.관리자확인필요,
+                    ["adminReviewRequested"] = request.관리자확인요청,
+                    ["transportStatus"] = entity.상태,
+                    ["traceId"] = Activity.Current?.TraceId.ToString()
+                }));
+        entity.UpdatedAt = now;
 
         await _db.SaveChangesAsync(cancellationToken);
 
@@ -50,7 +82,20 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
             출발_픽업 = entity.출발_픽업,
             도착 = entity.도착,
             운임 = entity.운임,
+            예외신고됨 = true,
+            최근예외단계 = 예외.단계,
+            최근예외코드 = 예외.예외코드,
+            최근예외메시지 = 예외.사유,
+            다음행동안내 = 예외.다음행동안내,
+            관리자확인필요 = 예외.관리자확인필요,
             UpdatedAt = entity.UpdatedAt
         });
+    }
+
+    private static string BuildMemoLine(운송현장예외정리결과 예외, string? requestMemo)
+    {
+        var memo = string.IsNullOrWhiteSpace(requestMemo) ? string.Empty : $" 메모={requestMemo.Trim()}";
+        var admin = 예외.관리자확인필요 ? " 관리자확인필요" : string.Empty;
+        return $"[운송예외][{예외.단계}][{예외.예외코드}] {예외.사유}{memo}{admin}";
     }
 }

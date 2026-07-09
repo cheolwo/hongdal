@@ -25,6 +25,8 @@ public sealed class 관리자대시보드요약조회QueryHandler : IRequestHand
 
         var 운송중수Task = _db.배송_운송.CountAsync(x => x.상태 == "운송중", cancellationToken);
         var 완료수Task = _db.배송_운송.CountAsync(x => x.상태 == "완료", cancellationToken);
+        var 운송예외수Task = _db.배송_운송.CountAsync(x => x.첨부_json.Contains("transport-field-exception"), cancellationToken);
+        var 관리자확인필요수Task = _db.배송_운송.CountAsync(x => x.첨부_json.Contains("adminReviewRequired\":true"), cancellationToken);
 
         var 취소수Task = _db.화주운송의뢰.CountAsync(x => x.상태 == "취소", cancellationToken);
         var 환불수Task = _db.결제.CountAsync(x => x.결제상태 == 상태값.결제상태.환불됨, cancellationToken);
@@ -37,6 +39,8 @@ public sealed class 관리자대시보드요약조회QueryHandler : IRequestHand
             배차확정수Task,
             운송중수Task,
             완료수Task,
+            운송예외수Task,
+            관리자확인필요수Task,
             취소수Task,
             환불수Task);
 
@@ -49,7 +53,9 @@ public sealed class 관리자대시보드요약조회QueryHandler : IRequestHand
             배차확정수 = 배차확정수Task.Result,
             운송중수 = 운송중수Task.Result,
             완료수 = 완료수Task.Result,
-            취소환불수 = 취소수Task.Result + 환불수Task.Result
+            취소환불수 = 취소수Task.Result + 환불수Task.Result,
+            운송예외수 = 운송예외수Task.Result,
+            관리자확인필요수 = 관리자확인필요수Task.Result
         };
     }
 }

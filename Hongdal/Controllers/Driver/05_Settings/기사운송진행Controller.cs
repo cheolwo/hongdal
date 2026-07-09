@@ -103,9 +103,26 @@ namespace Hongdal.Controllers.Driver.Progress05
 
         [HttpPost("{id:long}/report-issue")]
         public async Task<IActionResult> 문제신고(long id, [FromBody] 기사운송문제신고요청 request)
+            => await 운송예외신고Core(id, request);
+
+        [HttpPost("{id:long}/report-exception")]
+        public async Task<IActionResult> 예외신고(long id, [FromBody] 기사운송문제신고요청 request)
+            => await 운송예외신고Core(id, request);
+
+        private async Task<IActionResult> 운송예외신고Core(long id, 기사운송문제신고요청 request)
         {
             var driverId = 현재기사Id();
-            var result = await _sender.Send(new 운송문제신고Command(driverId, id, request.사유, request.메모));
+            request ??= new 기사운송문제신고요청();
+            var result = await _sender.Send(new 운송문제신고Command(
+                driverId,
+                id,
+                request.단계,
+                request.예외코드,
+                request.사유,
+                request.메모,
+                request.증빙ObjectName,
+                request.증빙Url,
+                request.관리자확인요청));
 
             return this.ToActionResult(result);
         }

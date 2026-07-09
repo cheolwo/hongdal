@@ -34,12 +34,10 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     public async Task<RecommendationDecisionState> AcceptAsync(DriverRequestItem request, CancellationToken cancellationToken = default)
     {
-        var serverProcessed = await TryPostServerAsync($"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/accept", null, cancellationToken);
+        await PostServerAsync($"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/accept", null, cancellationToken);
         return SaveAccepted(
             request,
-            serverProcessed
-                ? "홍달 서버에서 배차 수락 처리되었습니다."
-                : "서버 연결 전이라 앱 로컬 상태로 수락 처리했습니다.");
+            "홍달 서버에서 배차 수락 처리되었습니다.");
     }
 
     public RecommendationDecisionState Hold(DriverRequestItem request)
@@ -63,13 +61,11 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     public async Task<RecommendationDecisionState> CancelAcceptedAsync(DriverRequestItem request, string reason, CancellationToken cancellationToken = default)
     {
-        var serverProcessed = await TryPostServerAsync(
+        await PostServerAsync(
             $"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/cancel-acceptance",
             new 기사배차수락취소요청 { 사유 = reason },
             cancellationToken);
-        var memo = serverProcessed
-            ? "홍달 서버에서 배차 수락 취소가 접수되었습니다."
-            : "서버 연결 전이라 앱 로컬 상태로 수락 취소 처리했습니다.";
+        var memo = "홍달 서버에서 배차 수락 취소가 접수되었습니다.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
             memo = $"{memo} 사유: {reason}";
@@ -88,13 +84,11 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     public async Task<RecommendationDecisionState> RejectAsync(DriverRequestItem request, string reason, CancellationToken cancellationToken = default)
     {
-        var serverProcessed = await TryPostServerAsync(
+        await PostServerAsync(
             $"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/reject",
             new 기사배차거절요청 { 사유 = reason },
             cancellationToken);
-        var memo = serverProcessed
-            ? "홍달 서버에서 배차 거절 처리되었습니다."
-            : "서버 연결 전이라 앱 로컬 상태로 거절 처리했습니다.";
+        var memo = "홍달 서버에서 배차 거절 처리되었습니다.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
             memo = $"{memo} 사유: {reason}";
@@ -148,11 +142,11 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
         return state;
     }
 
-    private async Task<bool> TryPostServerAsync(string path, object? payload, CancellationToken cancellationToken)
+    private async Task PostServerAsync(string path, object? payload, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
         {
-            return false;
+            throw new InvalidOperationException("서버 인증 정보가 없어 배차 처리를 요청할 수 없습니다.");
         }
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
@@ -167,20 +161,20 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
         {
             response = await _httpClient.SendAsync(request, cancellationToken);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
-            return false;
+            throw new InvalidOperationException("서버 배차 처리 API에 연결할 수 없습니다.", ex);
         }
-        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
-            return false;
+            throw new InvalidOperationException("서버 배차 처리 API 응답이 지연되어 요청이 중단되었습니다.", ex);
         }
 
         using (response)
         {
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                return;
             }
 
             throw new InvalidOperationException(await BuildFailureMessageAsync(response, cancellationToken));

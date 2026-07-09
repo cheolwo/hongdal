@@ -1,4 +1,5 @@
 using 홍달.Services.Storage.Local;
+using 홍달.Services.Dispatch.Coordination;
 
 namespace 홍달.Services.Dispatch.Queue;
 
@@ -11,6 +12,7 @@ public interface I국내화물운송기사상태Service
         string startMode,
         string startLocation,
         string? returnDestination,
+        string? 복귀콜선호 = null,
         CancellationToken cancellationToken = default);
 
     Task<국내화물운송기사상태Snapshot> 위치갱신Async(
@@ -48,6 +50,7 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
         string startMode,
         string startLocation,
         string? returnDestination,
+        string? 복귀콜선호 = null,
         CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -69,7 +72,8 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
             후보없음횟수: 0,
             startMode,
             startLocation,
-            returnDestination);
+            returnDestination,
+            복귀콜선호: 기사복귀선호코드.Normalize(복귀콜선호));
 
         await _store.UpsertAsync(snapshot, cancellationToken);
         return snapshot;
@@ -107,7 +111,8 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
             existing?.StartMode,
             existing?.StartLocation,
             existing?.ReturnDestination,
-            Normalize상차접근허용반경(상차접근허용반경Km) ?? existing?.상차접근허용반경Km);
+            Normalize상차접근허용반경(상차접근허용반경Km) ?? existing?.상차접근허용반경Km,
+            existing?.복귀콜선호);
 
         await _store.UpsertAsync(snapshot, cancellationToken);
         return snapshot;

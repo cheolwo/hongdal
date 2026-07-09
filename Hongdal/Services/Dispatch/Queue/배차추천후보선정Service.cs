@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Hongdal;
-using 홍달.도메인.공통;
 using 홍달.Services.Dispatch.Engine;
 
 namespace 홍달.Services.Dispatch.Queue
@@ -28,14 +27,7 @@ namespace 홍달.Services.Dispatch.Queue
                 return null;
             }
 
-            if (queue.배차큐단계 is 상태값.배차큐단계.확정 or 상태값.배차큐단계.종료)
-            {
-                return null;
-            }
-
-            if (queue.배차노출상태 == 상태값.배차노출상태.추천중
-                && !string.IsNullOrWhiteSpace(queue.현재추천대상기사Id)
-                && (!queue.추천만료시각.HasValue || queue.추천만료시각 > DateTime.UtcNow))
+            if (!배차실행인덱스재구성정책.미처리운송의뢰인가(queue, DateTime.UtcNow))
             {
                 return null;
             }

@@ -4,12 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Hongdal.Application.CommandProcessing;
 using 홍달.도메인.공통;
+using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Driver.DispatchAction;
 
 public sealed class 배차수락취소CommandHandler : IRequestHandler<배차수락취소Command, Result<배차수락취소결과>>
 {
     private readonly HongdalContext _db;
+    private readonly I배차대기원장전환Service _원장전환Service;
     private readonly IPublisher _publisher;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
@@ -17,12 +19,14 @@ public sealed class 배차수락취소CommandHandler : IRequestHandler<배차수
 
     public 배차수락취소CommandHandler(
         HongdalContext db,
+        I배차대기원장전환Service 원장전환Service,
         IPublisher publisher,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
         ILogger<배차수락취소CommandHandler> logger)
     {
         _db = db;
+        _원장전환Service = 원장전환Service;
         _publisher = publisher;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
@@ -42,15 +46,36 @@ public sealed class 배차수락취소CommandHandler : IRequestHandler<배차수
             return Result.Fail<배차수락취소결과>("배차대기 데이터를 찾을 수 없습니다.");
         }
 
-        var acceptedByDriver = string.Equals(queue.확정기사Id, request.기사Id, StringComparison.Ordinal)
-                               || string.Equals(queue.현재추천대상기사Id, request.기사Id, StringComparison.Ordinal);
-        var cancelableState = queue.상태 == 상태값.배차대기상태.확정 || queue.배차큐단계 == 상태값.배차큐단계.확정;
-        if (!cancelableState || !acceptedByDriver)
+        if (!배차응답가능정책.수락취소가능(queue, request.기사Id))
         {
             return Result.Fail<배차수락취소결과>("수락 취소 가능한 배차가 아닙니다.");
         }
 
         var now = DateTime.UtcNow;
+        try
+        {
+            var 전환결과 = await _원장전환Service.배차수락취소처리Async(
+                request.RequestId,
+                request.기사Id,
+                request.사유,
+                cancellationToken);
+            if (!전환결과.전환여부)
+            {
+                _logger.LogWarning(
+                    "배차수락취소 원장 전환이 적용되지 않았습니다. RequestId={RequestId} DriverId={DriverId} ResultCode={ResultCode} Message={Message}",
+                    request.RequestId,
+                    request.기사Id,
+                    전환결과.결과코드,
+                    전환결과.메시지);
+                return Result.Fail<배차수락취소결과>("수락 취소 가능한 배차가 아닙니다.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "배차수락취소 필수 처리 중 예외가 발생했습니다. RequestId={RequestId} DriverId={DriverId}", request.RequestId, request.기사Id);
+            return Result.Fail<배차수락취소결과>("수락 취소 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        }
+
         try
         {
             await _publisher.Publish(

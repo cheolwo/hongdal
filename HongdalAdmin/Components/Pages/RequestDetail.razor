@@ -1,0 +1,224 @@
+@page "/requests/{RequestId}"
+@inject I백오피스Service DataService
+@inject NavigationManager NavigationManager
+
+<PageTitle>의뢰 상세</PageTitle>
+
+<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">04-1. 의뢰 상세</h1>
+        <div class="text-muted">화주 의뢰 원장의 결제, 배차, 정산 값을 확인합니다.</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-secondary" @onclick="@(() => NavigationManager.NavigateTo("/requests"))">의뢰 목록</button>
+        <a class="btn btn-outline-primary" href="@WorkflowDetailHref">1.0 관제 개요</a>
+        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+}
+
+@if (isLoading)
+{
+    <div class="alert alert-info">의뢰 상세를 불러오는 중입니다...</div>
+}
+else if (request is null)
+{
+    <div class="alert alert-warning">의뢰 @RequestId 정보를 찾지 못했습니다.</div>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                <div>
+                    <div class="text-muted small">의뢰ID</div>
+                    <h2 class="h4 mb-1">@request.의뢰Id</h2>
+                    <div>@request.픽업지 → @request.하차지</div>
+                </div>
+                <span class="@ReviewBadgeClass(request)">@ReviewLabel(request)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">의뢰 상태</h5>
+                    <div class="row g-2">
+                        <div class="col-md-6">@관리자화면Ui.정보칸("의뢰 상태", request.의뢰상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("운송 방식", request.운송방식)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("배차 상태", request.배차상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("증빙 방식", request.증빙방식)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("생성 시각", request.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm"))</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("화물", request.요약?.화물종류)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">결제/정산</h5>
+                    <div class="row g-2">
+                        <div class="col-md-6">@관리자화면Ui.정보칸("결제 상태", request.결제상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("결제 수단", request.결제수단)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("정산 상태", request.정산상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("정산 시점", request.정산시점)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("최종 운임", request.최종운임 is null ? null : $"{request.최종운임:N0}원")</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("수납 주체", request.수납주체)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">상차/하차</h5>
+            <div class="row g-2">
+                <div class="col-lg-6">@관리자화면Ui.정보칸("상차지", BuildAddress(request.픽업지, request.픽업상세지))</div>
+                <div class="col-lg-6">@관리자화면Ui.정보칸("하차지", BuildAddress(request.하차지, request.하차상세지))</div>
+                <div class="col-md-6">@관리자화면Ui.정보칸("상차 좌표", BuildPoint(request.픽업위도, request.픽업경도))</div>
+                <div class="col-md-6">@관리자화면Ui.정보칸("하차 좌표", BuildPoint(request.하차위도, request.하차경도))</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">취소/환불</h5>
+            <p class="text-muted mb-3">취소 또는 환불이 필요한 의뢰만 처리합니다.</p>
+            <button class="btn btn-outline-danger" @onclick="CancelAsync" disabled="@isSaving">취소/환불 처리</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string RequestId { get; set; } = string.Empty;
+
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isError;
+    private string? message;
+    private 화주운송의뢰응답? request;
+
+    private string WorkflowDetailHref => $"/transports/{Uri.EscapeDataString(RequestId)}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (string.IsNullOrWhiteSpace(RequestId))
+        {
+            request = null;
+            isLoading = false;
+            return;
+        }
+
+        isLoading = true;
+        message = null;
+
+        try
+        {
+            request = await DataService.의뢰상세조회Async(RequestId);
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            message = $"의뢰 상세 조회 실패: {ex.Message}";
+            request = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        if (request is null)
+        {
+            return;
+        }
+
+        isSaving = true;
+        message = null;
+
+        try
+        {
+            request = await DataService.의뢰취소환불처리Async(request.의뢰Id);
+            isError = false;
+            message = "취소/환불 처리했습니다.";
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            message = $"취소/환불 처리 실패: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private static string ReviewLabel(화주운송의뢰응답 item)
+    {
+        if (IsMatch(item.의뢰상태, "취소", "환불"))
+        {
+            return "취소/환불";
+        }
+
+        if (IsMatch(item.결제상태, "결제대기", "미결제", "대기"))
+        {
+            return "결제확인";
+        }
+
+        if (IsMatch(item.배차상태, "매칭중", "배차대기", "대기"))
+        {
+            return "배차확인";
+        }
+
+        return "정상";
+    }
+
+    private static string ReviewBadgeClass(화주운송의뢰응답 item)
+    {
+        var label = ReviewLabel(item);
+        return label switch
+        {
+            "취소/환불" => "badge rounded-pill text-bg-danger",
+            "결제확인" => "badge rounded-pill text-bg-warning",
+            "배차확인" => "badge rounded-pill text-bg-info",
+            _ => "badge rounded-pill text-bg-success"
+        };
+    }
+
+    private static string BuildAddress(string? address, string? detail)
+    {
+        if (string.IsNullOrWhiteSpace(detail))
+        {
+            return 관리자화면Ui.표시값(address);
+        }
+
+        return $"{관리자화면Ui.표시값(address)} {detail}";
+    }
+
+    private static string BuildPoint(decimal? latitude, decimal? longitude)
+        => latitude is null || longitude is null ? "-" : $"{latitude:F6}, {longitude:F6}";
+
+    private static bool IsMatch(string? value, params string[] candidates)
+    {
+        return candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
+    }
+
+}

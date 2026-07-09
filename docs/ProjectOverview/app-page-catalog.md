@@ -15,6 +15,8 @@
 
 전체 페이지 캡처 파일은 `docs/ProjectOverview/assets/app-pages/{앱명}/{페이지ID}.png`에 둔다. 기존 1.0 대표 캡처는 링크 안정성을 위해 `docs/ProjectOverview/assets/v1-pages/`에도 남긴다.
 
+화면별 상세 설명은 [화면별 상세 README](page-docs/README.md)에서 앱별/페이지별로 확인한다. 이 카탈로그는 빠른 색인이고, 개별 README는 캡처와 화면 책임, 사용자/참여자, API/보안 점검을 함께 둔다.
+
 ## 앱 요약
 
 | 앱 | 페이지 수 | 주 사용자 | 성격 |
@@ -196,6 +198,6 @@
 | 라우트 충돌 후보 | `ShipperApp`과 `RestaurantDeskApp` 모두 `/dispatch/address-form`을 가진다. 앱이 다르므로 런타임 충돌은 아니지만 문서에서 책임을 구분해야 한다. |
 | 템플릿성 화면 | `Counter`, `Weather`는 시스템/샘플 화면으로 분류했다. 출시 전 제거 또는 숨김 여부를 따로 판단한다. |
 | 미발견 페이지 | `NotFound`는 사용자 업무 화면이 아니지만 앱 운영에 필요한 라우트로 남긴다. |
-| 다음 문서화 단계 | 각 페이지별 캡처는 이 카탈로그의 페이지 ID를 기준으로 `assets/app-pages/{앱명}/` 아래 추가한다. |
+| 다음 문서화 단계 | 각 페이지별 상세 README는 `page-docs/{앱명}/{페이지ID}/README.md`에 두고, 캡처는 `assets/app-pages/{앱명}/` 아래 추가한다. |
 | 인증 필요 캡처 | 관리자 보호 화면은 현재 로그인 장벽까지 캡처했다. 실제 운영 화면 캡처가 필요하면 개발용 관리자 인증 세션을 만든 뒤 다시 캡처한다. |
-| MAUI 캡처 | Android/Windows MAUI 앱의 Blazor 페이지는 문서용 캡처 호스트에서 실제 Razor 컴포넌트를 렌더링해 PNG로 남겼다. |
+| MAUI 캡처 | Android/Windows MAUI 앱의 Blazor 페이지는 문서용 캡처 호스트에서 실제 Razor 컴포넌트를 렌더링하고, Chrome DevTools 전체 페이지 캡처로 내부 스크롤 높이까지 반영해 PNG로 남긴다. |

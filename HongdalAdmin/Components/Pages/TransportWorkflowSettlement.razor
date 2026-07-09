@@ -1,0 +1,174 @@
+@page "/transports/{RequestId}/settlement"
+@inject I백오피스Service DataService
+@inject NavigationManager NavigationManager
+
+<PageTitle>1.0 운송 결제/정산</PageTitle>
+
+<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">06-1. 운송 결제/정산</h1>
+        <div class="text-muted">화주 결제, 운송 완료 기준, 기사 정산 후보를 확인합니다.</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-secondary" @onclick="@(() => NavigationManager.NavigateTo(OverviewHref))">관제 개요</button>
+        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+    </div>
+</div>
+
+@if (isLoading)
+{
+    <div class="alert alert-info">결제/정산 정보를 불러오는 중입니다...</div>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (detail is null)
+{
+    <div class="alert alert-warning">의뢰 @RequestId 관제 정보를 찾지 못했습니다.</div>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                <div>
+                    <div class="text-muted small">의뢰ID</div>
+                    <h2 class="h5 mb-1">@detail.의뢰Id</h2>
+                    <div>@detail.경로표시</div>
+                </div>
+                <span class="@관리자화면Ui.색상Badge(detail.현재상태색상)">@detail.현재상태라벨</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">화주 결제</h5>
+                    <div class="row g-2">
+                        <div class="col-md-6">@관리자화면Ui.정보칸("결제 상태", detail.결제?.결제상태 ?? detail.의뢰?.결제상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("결제 수단", detail.결제?.결제수단 ?? detail.의뢰?.결제수단)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("결제 금액", detail.결제 is null ? null : $"{detail.결제.결제금액:N0}원")</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("승인 시각", detail.결제?.승인일시Utc is null ? null : detail.결제.승인일시Utc.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm"))</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("OrderId", detail.결제?.OrderId)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("PaymentKey", detail.결제?.PaymentKey)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">정산 기준</h5>
+                    <div class="row g-2">
+                        <div class="col-md-6">@관리자화면Ui.정보칸("정산 상태", detail.의뢰?.정산상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("정산 시점", detail.의뢰?.정산시점)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("최종 운임", detail.의뢰?.최종운임 is null ? null : $"{detail.의뢰.최종운임:N0}원")</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("수납 주체", detail.의뢰?.수납주체)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("운송 상태", detail.운송?.상태)</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("하차 시각", detail.운송?.도착 is null ? null : detail.운송.도착.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm"))</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("세금계산서", detail.의뢰 is null ? null : (detail.의뢰.세금계산서필요 ? "필요" : "미필요"))</div>
+                        <div class="col-md-6">@관리자화면Ui.정보칸("현금영수증", detail.의뢰 is null ? null : (detail.의뢰.현금영수증필요 ? "필요" : "미필요"))</div>
+                        <div class="col-12">@관리자화면Ui.정보칸("정산 메모", detail.의뢰?.정산메모)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">기사 정산 후보</h5>
+                <span class="badge rounded-pill text-bg-primary">@detail.정산후보목록.Count 건</span>
+            </div>
+            @if (detail.정산후보목록.Count == 0)
+            {
+                <div class="alert alert-secondary mb-0">연결된 기사 정산 후보가 없습니다.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle">
+                        <thead><tr><th>기사</th><th>정산월</th><th>배차</th><th>이용료</th><th>상한</th><th>상태</th><th>갱신</th></tr></thead>
+                        <tbody>
+                        @foreach (var item in detail.정산후보목록)
+                        {
+                            <tr>
+                                <td>@item.기사Id</td>
+                                <td>@item.년도-@item.월.ToString("00")</td>
+                                <td>@item.배차건수.ToString("N0")건</td>
+                                <td>@item.이용료.ToString("N0")원</td>
+                                <td>@(item.월상한적용여부 ? "적용" : "미적용")</td>
+                                <td><span class="badge rounded-pill @(item.결제완료 ? "text-bg-success" : "text-bg-warning")">@(item.결제완료 ? "완료" : "미완료")</span></td>
+                                <td>@item.UpdatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        <a class="btn btn-outline-primary" href="@EventsHref">이벤트 로그</a>
+        <a class="btn btn-outline-primary" href="@ProofsHref">증빙/POD</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string RequestId { get; set; } = string.Empty;
+
+    private bool isLoading = true;
+    private string? errorMessage;
+    private 운송워크플로우관제상세응답? detail;
+
+    private string OverviewHref => BuildHref(null);
+    private string EventsHref => BuildHref("events");
+    private string ProofsHref => BuildHref("proofs");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (string.IsNullOrWhiteSpace(RequestId))
+        {
+            detail = null;
+            errorMessage = "의뢰ID가 없습니다.";
+            isLoading = false;
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            detail = await DataService.운송워크플로우관제상세조회Async(RequestId);
+        }
+        catch (Exception ex)
+        {
+            detail = null;
+            errorMessage = $"결제/정산 조회 실패: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string BuildHref(string? segment)
+    {
+        var baseHref = $"/transports/{Uri.EscapeDataString(RequestId)}";
+        return string.IsNullOrWhiteSpace(segment) ? baseHref : $"{baseHref}/{segment}";
+    }
+
+}

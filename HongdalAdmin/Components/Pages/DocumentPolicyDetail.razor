@@ -1,0 +1,203 @@
+@page "/documents/policies/{DocumentCode}"
+@rendermode InteractiveServer
+@inject 문서관리메모리Service 문서관리메모리Service
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>문서 정책 편집</PageTitle>
+
+<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">문서 정책 편집</h1>
+        <div class="text-muted">선택한 문서 종류의 운영 정책만 수정합니다.</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" href="@관리자문서Routes.정책목록">문서 정책</a>
+        <a class="btn btn-outline-primary" href="@관리자문서Routes.목록">문서 목록</a>
+        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+}
+
+@if (isLoading)
+{
+    <div class="alert alert-info">문서 정책을 불러오는 중입니다...</div>
+}
+else if (selectedPolicy is null)
+{
+    <div class="alert alert-warning">문서코드 @DocumentCode 정책을 찾지 못했습니다.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@selectedPolicy.문서코드</h5>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label">문서코드</label>
+                    <input class="form-control" value="@selectedPolicy.문서코드" disabled />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">문서명</label>
+                    <input class="form-control" @bind="selectedPolicy.문서명" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">자동생성시점</label>
+                    <input class="form-control" @bind="selectedPolicy.자동생성시점" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">보관일수</label>
+                    <input class="form-control" type="number" @bind="selectedPolicy.보관일수" />
+                </div>
+                <div class="col-md-3 form-check mt-4 ms-3">
+                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.사용여부" />
+                    <label class="form-check-label">사용</label>
+                </div>
+                <div class="col-md-3 form-check mt-4 ms-3">
+                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.암호화여부" />
+                    <label class="form-check-label">암호화</label>
+                </div>
+                <div class="col-md-3 form-check mt-4 ms-3">
+                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.다운로드허용여부" />
+                    <label class="form-check-label">다운로드 허용</label>
+                </div>
+                <div class="col-md-3 form-check ms-3">
+                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.서명필요여부" />
+                    <label class="form-check-label">서명 필요</label>
+                </div>
+                <div class="col-md-3 form-check ms-3">
+                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.수정가능여부" />
+                    <label class="form-check-label">수정 가능</label>
+                </div>
+                <div class="col-md-3 form-check ms-3">
+                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.감사로그여부" />
+                    <label class="form-check-label">감사로그</label>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">조회 가능 역할 목록 JSON</label>
+                    <textarea class="form-control" rows="3" @bind="selectedPolicy.조회가능역할목록Json"></textarea>
+                </div>
+            </div>
+
+            <button class="btn btn-primary mt-3" @onclick="SavePolicyAsync" disabled="@isSaving">정책 저장</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string DocumentCode { get; set; } = string.Empty;
+
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isError;
+    private string? message;
+    private 문서정책요약응답? selectedPolicy;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!관리자인증세션Service.서버관리자인가)
+        {
+            NavigationManager.NavigateTo(관리자문서Routes.로그인ReturnUrl(관리자문서Routes.정책상세(DocumentCode)));
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private Task LoadAsync()
+    {
+        isLoading = true;
+        message = null;
+
+        try
+        {
+            var source = 문서관리메모리Service.GetPolicies()
+                .FirstOrDefault(x => string.Equals(x.문서코드, DocumentCode, StringComparison.OrdinalIgnoreCase));
+            selectedPolicy = source is null ? null : CopyPolicy(source);
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            message = ex.Message;
+            selectedPolicy = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task SavePolicyAsync()
+    {
+        if (selectedPolicy is null)
+        {
+            return;
+        }
+
+        isSaving = true;
+        message = null;
+
+        try
+        {
+            var updated = 문서관리메모리Service.UpdatePolicy(selectedPolicy.문서코드, new 문서정책수정요청
+            {
+                사용여부 = selectedPolicy.사용여부,
+                암호화여부 = selectedPolicy.암호화여부,
+                다운로드허용여부 = selectedPolicy.다운로드허용여부,
+                서명필요여부 = selectedPolicy.서명필요여부,
+                자동생성시점 = selectedPolicy.자동생성시점,
+                조회가능역할목록Json = selectedPolicy.조회가능역할목록Json,
+                보관일수 = selectedPolicy.보관일수,
+                수정가능여부 = selectedPolicy.수정가능여부,
+                감사로그여부 = selectedPolicy.감사로그여부
+            });
+
+            if (updated is null)
+            {
+                throw new InvalidOperationException("정책을 찾을 수 없습니다.");
+            }
+
+            selectedPolicy = CopyPolicy(updated);
+            isError = false;
+            message = "정책을 저장했습니다.";
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            message = ex.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private static 문서정책요약응답 CopyPolicy(문서정책요약응답 item)
+        => new()
+        {
+            Id = item.Id,
+            문서코드 = item.문서코드,
+            문서명 = item.문서명,
+            사용여부 = item.사용여부,
+            암호화여부 = item.암호화여부,
+            다운로드허용여부 = item.다운로드허용여부,
+            서명필요여부 = item.서명필요여부,
+            자동생성시점 = item.자동생성시점,
+            조회가능역할목록Json = item.조회가능역할목록Json,
+            보관일수 = item.보관일수,
+            수정가능여부 = item.수정가능여부,
+            감사로그여부 = item.감사로그여부,
+            생성일시 = item.생성일시,
+            수정일시 = item.수정일시
+        };
+}

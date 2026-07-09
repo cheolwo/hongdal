@@ -11,6 +11,11 @@ public sealed class 운송진행응답
     public string 출발지 { get; set; } = string.Empty;
     public string 도착지 { get; set; } = string.Empty;
     public decimal? 운임 { get; set; }
+    public bool 예외신고됨 { get; set; }
+    public string 최근예외단계 { get; set; } = string.Empty;
+    public string 최근예외코드 { get; set; } = string.Empty;
+    public string 최근예외메시지 { get; set; } = string.Empty;
+    public bool 관리자확인필요 { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 

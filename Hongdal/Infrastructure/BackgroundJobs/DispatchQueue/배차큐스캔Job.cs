@@ -10,18 +10,18 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
     public sealed class 배차큐스캔Job : IJob
     {
         private readonly HongdalContext _db;
-        private readonly I배차큐전환Service _queueTransitionService;
+        private readonly I배차대기원장전환Service _원장전환Service;
         private readonly 배차큐배치작업Options _options;
         private readonly ILogger<배차큐스캔Job> _logger;
 
         public 배차큐스캔Job(
             HongdalContext db,
-            I배차큐전환Service queueTransitionService,
+            I배차대기원장전환Service 원장전환Service,
             Microsoft.Extensions.Options.IOptions<배차큐배치작업Options> options,
             ILogger<배차큐스캔Job> logger)
         {
             _db = db;
-            _queueTransitionService = queueTransitionService;
+            _원장전환Service = 원장전환Service;
             _options = options.Value;
             _logger = logger;
         }
@@ -41,7 +41,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
 
             foreach (var requestId in plannedIds)
             {
-                await _queueTransitionService.계획배차에서추천으로전환Async(requestId, cancellationToken);
+                await _원장전환Service.계획배차에서추천으로전환Async(requestId, cancellationToken);
             }
 
             var recommendWaitingIds = await _db.배차대기.AsNoTracking()
@@ -56,7 +56,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
 
             foreach (var requestId in recommendWaitingIds)
             {
-                await _queueTransitionService.추천대기처리Async(requestId, cancellationToken);
+                await _원장전환Service.추천대기처리Async(requestId, cancellationToken);
             }
 
             var cargoWaitingCount = await _db.배차대기.AsNoTracking()

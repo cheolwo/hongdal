@@ -1,6 +1,7 @@
 @page "/driver/transports/{운송Id:long}/pickup"
 @inject IDriverSampleDataService Samples
 @inject IDriverTransportCompletionPhotoService CompletionPhotoService
+@inject IDriverTransportExceptionService ExceptionService
 @inject NavigationManager NavigationManager
 @using Microsoft.Maui.ApplicationModel
 @using Microsoft.Maui.Media
@@ -20,7 +21,7 @@
             <MudStack Spacing="2">
                 @if (운송 is null)
                 {
-                    <MudAlert Severity="Severity.Warning">운송 샘플을 찾지 못했습니다.</MudAlert>
+                    <MudAlert Severity="Severity.Warning">운송 정보를 찾지 못했습니다.</MudAlert>
                 }
                 else
                 {
@@ -286,8 +287,9 @@
                                 <MudButton Variant="Variant.Filled"
                                            Color="Color.Warning"
                                            StartIcon="@Icons.Material.Filled.Save"
-                                           OnClick="RecordPickupIssue">
-                                    문제 기록
+                                           Disabled="@isIssueReporting"
+                                           OnClick="RecordPickupIssueAsync">
+                                    @(isIssueReporting ? "문제 신고 중" : "문제 기록")
                                 </MudButton>
                             }
                         </MudStack>
@@ -454,6 +456,7 @@
     private bool pickupIssuePanelOpen;
     private string pickupIssueType = "수량 부족";
     private string? pickupIssueMemo;
+    private bool isIssueReporting;
     private bool isCompleting;
 
     private const string ReceiptEvidenceModeDocumentPhoto = "문서사진";
@@ -643,10 +646,36 @@
         return 운송?.적재순번필요 == true ? Color.Warning : Color.Info;
     }
 
-    private void RecordPickupIssue()
+    private async Task RecordPickupIssueAsync()
     {
         var memo = string.IsNullOrWhiteSpace(pickupIssueMemo) ? "메모 없음" : pickupIssueMemo.Trim();
-        SetStatus($"상차 문제 기록: {pickupIssueType} · {memo}", Severity.Warning);
+        try
+        {
+            isIssueReporting = true;
+            SetStatus("상차 문제를 서버에 신고하는 중입니다.", Severity.Info);
+
+            var result = await ExceptionService.ReportAsync(new DriverTransportExceptionReport(
+                TransportId: 운송Id,
+                Stage: "상차",
+                ExceptionCode: ToPickupExceptionCode(pickupIssueType),
+                Reason: pickupIssueType,
+                Memo: memo,
+                RequestAdminReview: true));
+
+            SetStatus(
+                result.Reported
+                    ? $"{result.Message} {pickupIssueType} · {memo}"
+                    : result.Message,
+                result.Reported ? Severity.Warning : Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"상차 문제 신고 중 오류가 발생했습니다. 다시 시도해 주세요. {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isIssueReporting = false;
+        }
     }
 
     private async Task CaptureCompletionPhotoAsync()
@@ -744,6 +773,17 @@
         statusMessage = message;
         statusSeverity = severity;
     }
+
+    private static string ToPickupExceptionCode(string issueType)
+        => issueType switch
+        {
+            "수량 부족" => "Pickup.QuantityShortage",
+            "다른 화물 혼입" => "Pickup.MixedCargo",
+            "바코드 훼손" => "Pickup.BarcodeDamaged",
+            "문서 번호 불일치" => "Pickup.DocumentMismatch",
+            "파손 의심" => "Pickup.DamageSuspected",
+            _ => "Pickup.FieldIssue"
+        };
 
     private void ClearPhoto()
     {

@@ -17,7 +17,7 @@
                 <MudText Typo="Typo.h6">안내 항목</MudText>
                 <MudText Typo="Typo.body1">오픈 베타 기간에는 이용료 0원으로 안내한다.</MudText>
                 <MudText Typo="Typo.body1">@정식이용료안내</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">@현재샘플안내</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@현재정산안내</MudText>
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/settlements/current-month">월 정산으로</MudButton>
             </MudStack>
         </MudPaper>
@@ -26,5 +26,5 @@
 
 @code {
     private string 정식이용료안내 => string.Format("정식 전환 후에는 건당 500원, 월 최대 {0:0}원 상한으로 표시한다.", Samples.정산요약.월상한);
-    private string 현재샘플안내 => string.Format("현재 샘플 기준 배차 {0}건 / 이용료 {1:0}원", Samples.정산요약.배차건수, Samples.정산요약.이용료);
+    private string 현재정산안내 => string.Format("현재 조회 기준 배차 {0}건 / 이용료 {1:0}원", Samples.정산요약.배차건수, Samples.정산요약.이용료);
 }

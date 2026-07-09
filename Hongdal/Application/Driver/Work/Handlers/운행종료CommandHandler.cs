@@ -2,6 +2,7 @@ namespace Hongdal.Application.Driver.Work;
 
 using Hongdal.Application.CommandProcessing;
 using Microsoft.Extensions.Logging;
+using 홍달.Services.Dispatch.Coordination;
 using 홍달.Services.Dispatch.Queue;
 
 public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Command, Unit>
@@ -9,6 +10,7 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
     private readonly HongdalContext _db;
     private readonly IDriverWorkQueueStore _driverWorkQueueStore;
     private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
+    private readonly I배달권실행공간Store _배달권실행공간Store;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
     private readonly ILogger<운행종료CommandHandler> _logger;
@@ -17,6 +19,7 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         HongdalContext db,
         IDriverWorkQueueStore driverWorkQueueStore,
         I국내화물운송기사상태Service 국내화물운송기사상태Service,
+        I배달권실행공간Store 배달권실행공간Store,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
         ILogger<운행종료CommandHandler> logger)
@@ -24,6 +27,7 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         _db = db;
         _driverWorkQueueStore = driverWorkQueueStore;
         _국내화물운송기사상태Service = 국내화물운송기사상태Service;
+        _배달권실행공간Store = 배달권실행공간Store;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
         _logger = logger;
@@ -46,6 +50,7 @@ public sealed class 운행종료CommandHandler : IRequestHandler<운행종료Com
         await _db.SaveChangesAsync(cancellationToken);
         await _driverWorkQueueStore.RemoveAsync(request.기사Id, cancellationToken);
         await _국내화물운송기사상태Service.운행종료Async(request.기사Id, cancellationToken);
+        await _배달권실행공간Store.Remove기사Async(request.기사Id, cancellationToken);
         await tx.CommitAsync(cancellationToken);
 
         _logger.LogInformation(

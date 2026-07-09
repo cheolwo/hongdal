@@ -4,6 +4,8 @@
 
 기본 정책은 [workflow-api-policy.md](workflow-api-policy.md)를 따른다. 이 문서는 그 정책을 화면, 앱, 부족한 페이지 후보 관점으로 풀어쓴다.
 
+홍달 1.0을 실제로 닫기 위한 필수 화면 체크리스트는 [홍달 1.0 필수 페이지 기준](hongdal-v1-required-pages.md)에 둔다. 이 문서는 여러 워크플로우가 앱 화면 사이에서 어떻게 이어지는지를 설명하고, 필수 페이지 기준 문서는 그중 1.0 국내 화물/용달 운송을 완성하는 화면 단위를 고정한다.
+
 ## 읽는 방법
 
 | 구분 | 의미 |
@@ -85,6 +87,7 @@ flowchart LR
 | 1 | 운송 의뢰 등록 | `ShipperApp` `/shipper/request` | `HongdalAdmin` `/dispatch/wait`, `DriverApp` `/driver/recommendations` | 화주의 입력이 배차 대기와 기사 추천으로 전파된다. |
 | 1 | 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `ShipperApp` 운송 의뢰 상세, `HongdalAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
 | 1 | 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `HongdalAdmin` `/documents`, `ShipperApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
+| 1 | 현장 예외 신고 | `DriverApp` `/driver/transports/{운송Id}/pickup`, `/driver/transports/{운송Id}/dropoff`, `/driver/transports/current` | `HongdalAdmin` `/transports`, `ShipperApp` 운송 의뢰 상세 후보 | 상차물건없음, 수량불일치, 담당자부재, 하차지부재, 증빙업로드실패 같은 상황이 단계와 예외코드로 남고 다음 행동 안내가 내려간다. |
 | 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `HongdalAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
 | 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `ShipperApp` `/shipper/warehouse/inventory`, `ShipperApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
 | 2 | 판매채널 주문 출고 배치 | `ShipperApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
@@ -92,6 +95,10 @@ flowchart LR
 | 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `HongdalAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
 
 ### 국내 운송 상태 전파
+
+기사에게 추천이 노출되는 순간에는 `DriverApp`이 추천 배너, 추천 카드, 추천 상세를 단계적으로 보여준다. 추천 배너는 신규 추천과 응답 제한 시간을 알리고, 추천 카드는 거리·운임·시간·업무유형을 요약하며, 추천 상세는 상하차 조건, 세대 배송, 인수증/서명/POD, 기존 운행 중 추가 추천의 경로 삽입 결과까지 확인하게 한다.
+
+화주 화면은 같은 원장을 다른 관점으로 읽는다. 화주는 의뢰 상세에서 배차대기, 추천중, 추천만료/재추천중, 후보부족/보류, 기사수락, 상차접근중, 상차완료 상태를 확인하고, 수락 이후에는 기사 도착 전 상차 준비 알림을 받을 수 있어야 한다.
 
 ```mermaid
 sequenceDiagram
@@ -114,6 +121,7 @@ sequenceDiagram
     Server->>Shipper: 화주 화면 상태=상차완료
     DriverRun->>Server: 하차 완료
     Server->>AdminTrans: 상태=운송완료, 정산 후보 생성
+    Server->>Shipper: 운송완료후정산이면 토스 가상계좌 입금대기와 1/3/7일 입금 요청 알림 예약
     Server->>Shipper: 화주 화면 상태=운송완료
 ```
 
@@ -237,6 +245,7 @@ sequenceDiagram
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
 | 운송 의뢰 상세/분쟁 상세 | `ShipperApp` | 화주가 비용, 증빙, 정산 예정, 분쟁 상태를 한 화면에서 확인해야 한다. |
+| 운송 완료 후 입금 요청 화면 | `ShipperApp` | 운송완료후정산 건에서 토스페이먼츠 가상계좌 결제대기 건, 입금 기한, 1/3/7일 알림 상태를 확인해야 한다. |
 | 업무 유형이 강조된 추천 상세 | `DriverApp` | 일반 화물, 공동주문 세대 배송, 음식, 마트 인계를 기사에게 명확히 구분해 보여야 한다. |
 | 수령자 확인 화면 | `OrdererApp` 또는 별도 공개 화면 | 하차 완료 후 수령자가 확인, 이의 제기, 사진 확인을 할 수 있어야 한다. |
 | 운송 워크플로우 운영 보드 | `HongdalAdmin` | 모든 운송 건을 워크플로우 단계 기준으로 모아 보고 예외를 처리해야 한다. |

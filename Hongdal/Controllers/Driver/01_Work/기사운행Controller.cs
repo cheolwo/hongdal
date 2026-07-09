@@ -54,7 +54,8 @@ namespace Hongdal.Controllers.Driver.Work01
                 request.오늘의복귀지위도,
                 request.오늘의복귀지경도,
                 request.기본복귀지사용,
-                request.복귀지출처));
+                request.복귀지출처,
+                request.복귀콜선호));
 
             if (result.IsFailed)
             {

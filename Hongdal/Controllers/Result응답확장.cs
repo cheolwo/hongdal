@@ -171,6 +171,16 @@ public static class Result응답확장
                 "요청 대상의 현재 상태가 이 작업을 허용하지 않습니다.");
         }
 
+        if (message.Contains("처리 중 오류", StringComparison.Ordinal)
+            || message.Contains("잠시 후 다시 시도", StringComparison.Ordinal))
+        {
+            return new FailureClassification(
+                StatusCodes.Status503ServiceUnavailable,
+                "TemporaryFailure",
+                "https://httpstatuses.com/503",
+                "일시적인 처리 실패입니다. 같은 요청을 다시 시도할 수 있습니다.");
+        }
+
         return new FailureClassification(
             StatusCodes.Status400BadRequest,
             "BadRequest",

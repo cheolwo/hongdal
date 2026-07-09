@@ -3,12 +3,10 @@ using System.Net.Http.Json;
 using DriverApp.Models.Driver;
 using DriverApp.Models.Driver.Samples;
 using DriverApp.Services.Geo;
-using Hongdal.Client.Infrastructure;
-using Hongdal.Contracts.Driver.Development;
 using Hongdal.Contracts.Driver.Reservation;
 using Hongdal.Contracts.Driver.Settlement;
 using Hongdal.Contracts.Driver.Transport;
-using Microsoft.Extensions.Options;
+using Hongdal.Contracts.Driver.Work;
 
 namespace DriverApp.Services.Samples;
 
@@ -16,8 +14,6 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
-    private readonly 기사샘플데이터Service _fallback;
-    private readonly ClientDataModeOptions _dataModeOptions;
     private bool _loaded;
 
     private 기사근무샘플상태 _근무상태 = null!;
@@ -30,23 +26,11 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 
     public ServerBackedDriverSampleDataService(
         HttpClient httpClient,
-        IAuthSession authSession,
-        기사샘플데이터Service fallback,
-        IOptions<ClientDataModeOptions> dataModeOptions)
+        IAuthSession authSession)
     {
         _httpClient = httpClient;
         _authSession = authSession;
-        _fallback = fallback;
-        _dataModeOptions = dataModeOptions.Value;
-
-        if (_dataModeOptions.AllowSampleFallback)
-        {
-            ApplyFallback();
-        }
-        else
-        {
-            ApplyEmptyState();
-        }
+        ApplyEmptyState();
     }
 
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
@@ -56,35 +40,14 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             return;
         }
 
-        try
+        if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
         {
-            if (await TryLoadLiveServerDataAsync(cancellationToken))
-            {
-                _loaded = true;
-                return;
-            }
-
-            if (!_dataModeOptions.AllowDevelopmentSnapshotFallback)
-            {
-                return;
-            }
-
-            var snapshot = await _httpClient.GetFromJsonAsync<기사개발스냅샷응답>(
-                "api/v1/driver/dev-snapshot",
-                cancellationToken);
-
-            if (snapshot is null)
-            {
-                return;
-            }
-
-            Apply(snapshot);
-            _loaded = true;
+            ApplyEmptyState();
+            return;
         }
-        catch
-        {
-            // 개발 서버가 아직 켜지지 않은 경우 다음 화면 진입 때 다시 시도한다.
-        }
+
+        await LoadLiveServerDataAsync(cancellationToken);
+        _loaded = true;
     }
 
     public 기사근무샘플상태 근무상태 => _근무상태;
@@ -133,13 +96,8 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         return _운송목록.FirstOrDefault();
     }
 
-    private async Task<bool> TryLoadLiveServerDataAsync(CancellationToken cancellationToken)
+    private async Task LoadLiveServerDataAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
-        {
-            return false;
-        }
-
         var recommendations = await GetAuthorizedJsonAsync<IReadOnlyList<ServerDispatchRecommendationDto>>(
             "api/v1/driver/recommendations",
             cancellationToken);
@@ -152,11 +110,12 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         var reservations = await GetAuthorizedJsonAsync<IReadOnlyList<기사예약목록응답>>(
             "api/v1/driver/reservations",
             cancellationToken);
-
-        if (recommendations is null && transports is null && settlement is null && reservations is null)
-        {
-            return false;
-        }
+        var workStatus = await GetAuthorizedJsonAsync<기사운행상태응답>(
+            "api/v1/driver/work/status",
+            cancellationToken);
+        var currentWork = await GetAuthorizedJsonAsync<기사현재근무응답>(
+            "api/v1/driver/work/current",
+            cancellationToken);
 
         if (recommendations is not null)
         {
@@ -178,13 +137,7 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             _예약목록 = reservations.Select(ToReservationItem).ToArray();
         }
 
-        _근무상태 = _근무상태 with
-        {
-            추천콜수 = _추천의뢰목록.Count,
-            오늘예약수 = _예약목록.Count
-        };
-
-        return true;
+        ApplyWorkState(workStatus, currentWork);
     }
 
     private async Task<T?> GetAuthorizedJsonAsync<T>(string path, CancellationToken cancellationToken)
@@ -195,120 +148,48 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            return default;
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, path, cancellationToken));
         }
 
         return await response.Content.ReadFromJsonAsync<T>(cancellationToken);
     }
 
-    private void Apply(기사개발스냅샷응답 snapshot)
+    private void ApplyWorkState(기사운행상태응답? workStatus, 기사현재근무응답? currentWork)
     {
-        _기사현재위치 = new 기사현재위치샘플(
-            snapshot.현재위치.위치명,
-            snapshot.현재위치.위도,
-            snapshot.현재위치.경도,
-            snapshot.현재위치.갱신시각);
+        var currentLatitude = workStatus?.현재위도 ?? currentWork?.오늘의복귀지위도;
+        var currentLongitude = workStatus?.현재경도 ?? currentWork?.오늘의복귀지경도;
+        var currentLabel = !string.IsNullOrWhiteSpace(currentWork?.시작위치)
+            ? currentWork!.시작위치
+            : currentLatitude.HasValue && currentLongitude.HasValue
+                ? "서버 위치"
+                : "위치 미확인";
 
-        _추천의뢰목록 = snapshot.추천의뢰목록.Select(ToRequestItem).ToArray();
-        _예약목록 = snapshot.예약목록
-            .Select(x => new 기사예약샘플항목(x.Id, x.시작시각, x.시작모드, x.시작위치, x.복귀지, x.상태, x.메모))
-            .ToArray();
-        _운송목록 = snapshot.운송목록
-            .Select(x => new 기사운송샘플항목(
-                x.Id,
-                x.의뢰Id,
-                x.화물종류,
-                x.픽업지,
-                x.하차지,
-                x.픽업위도,
-                x.픽업경도,
-                x.하차위도,
-                x.하차경도,
-                x.현재단계,
-                x.예정시각,
-                x.운송거리Km,
-                x.예상수익,
-                x.인수증필요,
-                x.인수증서명필수,
-                x.결제방식,
-                x.다음행동))
-            .ToArray();
-        _알림목록 = snapshot.알림목록
-            .Select(x => new 기사알림샘플항목(x.Id, x.종류, x.제목, x.내용, x.발생시각, x.읽음))
-            .ToArray();
+        _기사현재위치 = new 기사현재위치샘플(
+            currentLabel,
+            currentLatitude ?? 0m,
+            currentLongitude ?? 0m,
+            workStatus?.최근위치수신시각 ?? workStatus?.UpdatedAt ?? DateTime.Now);
 
         _근무상태 = new 기사근무샘플상태(
-            snapshot.근무상태.기사명,
-            snapshot.근무상태.운행상태,
-            snapshot.근무상태.시작모드,
-            snapshot.근무상태.시작위치,
-            snapshot.근무상태.복귀지,
-            snapshot.근무상태.시작시각,
-            snapshot.근무상태.추천콜수,
-            snapshot.근무상태.오늘예약수);
-
-        _정산요약 = new 기사정산샘플요약(
-            snapshot.정산요약.년도,
-            snapshot.정산요약.월,
-            snapshot.정산요약.배차건수,
-            snapshot.정산요약.이용료,
-            snapshot.정산요약.월상한,
-            snapshot.정산요약.결제완료,
-            snapshot.정산요약.상세항목
-                .Select(x => new 기사정산샘플상세항목(x.항목명, x.설명, x.금액))
-                .ToArray());
+            string.IsNullOrWhiteSpace(_authSession.UserName) ? "기사" : _authSession.UserName!,
+            currentWork?.운행상태 ?? workStatus?.Status ?? "서버 연결",
+            string.IsNullOrWhiteSpace(currentWork?.시작모드) ? "서버 조회" : currentWork!.시작모드,
+            currentLabel,
+            currentWork?.복귀지 ?? currentWork?.오늘의복귀지주소,
+            currentWork?.시작시각 ?? workStatus?.UpdatedAt ?? DateTime.Now,
+            _추천의뢰목록.Count,
+            _예약목록.Count);
     }
 
-    private static DriverRequestItem ToRequestItem(기사개발추천의뢰응답 source)
+    private static async Task<string> BuildFailureMessageAsync(HttpResponseMessage response, string path, CancellationToken cancellationToken)
     {
-        return new DriverRequestItem
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (string.IsNullOrWhiteSpace(body))
         {
-            의뢰Id = source.의뢰Id,
-            화물종류 = source.화물종류,
-            운송방식 = source.운송방식,
-            운송의뢰유형코드 = source.운송의뢰유형코드,
-            운송의뢰유형표시 = source.운송의뢰유형표시,
-            당일상차필수 = source.당일상차필수,
-            당일하차필수 = source.당일하차필수,
-            차량톤수 = source.차량톤수,
-            차량형태 = source.차량형태,
-            인수증필요 = source.인수증필요,
-            공동주문운송여부 = source.공동주문운송여부,
-            세대배송포함여부 = source.세대배송포함여부,
-            세대배송건수 = source.세대배송건수,
-            세대배송업무표시 = source.세대배송업무표시,
-            결제방식 = source.결제방식,
-            픽업지 = source.픽업지,
-            하차지 = source.하차지,
-            픽업_위도 = source.픽업_위도,
-            픽업_경도 = source.픽업_경도,
-            하차_위도 = source.하차_위도,
-            하차_경도 = source.하차_경도,
-            직선거리Km = source.직선거리Km,
-            픽업거리Km = source.픽업거리Km,
-            공차거리Km = source.공차거리Km,
-            운송거리Km = source.운송거리Km,
-            복귀예상거리Km = source.복귀예상거리Km,
-            지금바로복귀거리Km = source.지금바로복귀거리Km,
-            복귀우회증가거리Km = source.복귀우회증가거리Km,
-            총공차거리Km = source.총공차거리Km,
-            주행거리Km = source.주행거리Km,
-            예상톨비 = source.예상톨비,
-            예상연료비 = source.예상연료비,
-            예상총비용 = source.예상총비용,
-            예상수익 = source.예상수익,
-            추천점수 = source.추천점수,
-            추천사유 = source.추천사유,
-            복귀지기준추천여부 = source.복귀지기준추천여부,
-            복귀지출처 = source.복귀지출처,
-            복귀추천사유 = source.복귀추천사유,
-            요약설명 = source.요약설명,
-            상세설명 = source.상세설명,
-            상태 = source.상태,
-            배차상태 = source.배차상태,
-            추천시작시각 = source.추천시작시각,
-            추천만료시각 = source.추천만료시각
-        };
+            return $"기사 서버 API 조회에 실패했습니다. path={path}, HTTP {(int)response.StatusCode}";
+        }
+
+        return $"기사 서버 API 조회에 실패했습니다. path={path}, HTTP {(int)response.StatusCode}: {body}";
     }
 
     private static DriverRequestItem ToRequestItem(ServerDispatchRecommendationDto source)
@@ -416,21 +297,14 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         return status switch
         {
             "배차확정" => "상차지 도착",
+            "매칭중" => "상차지 도착",
+            "상차지도착" => "상차 완료",
             "상차완료" => "하차지 도착",
+            "하차지도착" => "하차 완료",
+            "인수완료" => "운송 완료",
             "하차완료" => "운송 완료",
             _ => "상태 갱신"
         };
-    }
-
-    private void ApplyFallback()
-    {
-        _근무상태 = _fallback.근무상태;
-        _기사현재위치 = _fallback.기사현재위치;
-        _정산요약 = _fallback.정산요약;
-        _추천의뢰목록 = _fallback.추천의뢰목록;
-        _예약목록 = _fallback.예약목록;
-        _운송목록 = _fallback.운송목록;
-        _알림목록 = _fallback.알림목록;
     }
 
     private void ApplyEmptyState()

@@ -44,7 +44,14 @@ public partial class NativeDriverHomePage : ContentPage
     {
         base.OnAppearing();
         SubscribeEvents();
-        await _sampleDataService.RefreshAsync();
+        try
+        {
+            await _sampleDataService.RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusLabel.Text = $"서버 API 조회 실패: {ex.Message}";
+        }
 
         var currentLocation = _sampleDataService.기사현재위치;
         var markers = _mapService.BuildMarkers(_sampleDataService.추천의뢰목록);
@@ -58,7 +65,10 @@ public partial class NativeDriverHomePage : ContentPage
 
         RestoreDefaultMapState();
 
-        StatusLabel.Text = $"{currentLocation.위치명} 기준 추천 운송 {markers.Count}건을 네이티브 지도에 표시합니다.";
+        if (string.IsNullOrWhiteSpace(StatusLabel.Text) || !StatusLabel.Text.StartsWith("서버 API 조회 실패:", StringComparison.Ordinal))
+        {
+            StatusLabel.Text = $"{currentLocation.위치명} 기준 추천 운송 {markers.Count}건을 네이티브 지도에 표시합니다.";
+        }
         TransportFooterBar.ShowTransport(_currentTransport);
         ShowIncomingRecommendation(incoming);
         LinkedRouteCard.IsVisible = false;

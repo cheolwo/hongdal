@@ -28,7 +28,8 @@ public sealed class 운행상태조회QueryHandler : IRequestHandler<운행상�
             현재경도 = osState?.Longitude,
             최근위치수신시각 = osState?.위치수신시각Utc,
             Aging점수 = osState?.Aging점수,
-            Aging기준시각 = osState?.Aging기준시각Utc
+            Aging기준시각 = osState?.Aging기준시각Utc,
+            복귀콜선호 = osState?.복귀콜선호
         };
     }
 }

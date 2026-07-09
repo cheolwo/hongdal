@@ -8,12 +8,20 @@ public sealed class ViewPolicyService
 {
     private readonly HttpClient _httpClient;
     private readonly 관리자인증세션Service _session;
+    private readonly ILogger<ViewPolicyService> _logger;
+    private readonly bool _useMemoryFallback;
     private IReadOnlyList<View가시성항목응답> _visibleItems = [];
 
-    public ViewPolicyService(HttpClient httpClient, 관리자인증세션Service session)
+    public ViewPolicyService(
+        HttpClient httpClient,
+        관리자인증세션Service session,
+        IConfiguration configuration,
+        ILogger<ViewPolicyService> logger)
     {
         _httpClient = httpClient;
         _session = session;
+        _logger = logger;
+        _useMemoryFallback = configuration.GetValue("AdminData:UseMemory", false);
     }
 
     public event Action? Changed;
@@ -28,19 +36,39 @@ public sealed class ViewPolicyService
             return;
         }
 
+        if (_useMemoryFallback)
+        {
+            _visibleItems = [];
+            IsLoaded = true;
+            Changed?.Invoke();
+            return;
+        }
+
         await ReloadVisibleViewsAsync(cancellationToken);
     }
 
     public async Task ReloadVisibleViewsAsync(CancellationToken cancellationToken = default)
     {
-        using var request = CreateRequest(HttpMethod.Get, $"api/v1/view-settings/effective?appKey={Uri.EscapeDataString(App식별자.HongdalAdmin)}");
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            using var request = CreateRequest(HttpMethod.Get, $"api/v1/view-settings/effective?appKey={Uri.EscapeDataString(App식별자.HongdalAdmin)}");
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-        var payload = await response.Content.ReadFromJsonAsync<View가시성목록응답>(cancellationToken: cancellationToken);
-        _visibleItems = payload?.Items?.OrderBy(x => x.SortOrder).ToArray() ?? [];
-        IsLoaded = true;
-        Changed?.Invoke();
+            var payload = await response.Content.ReadFromJsonAsync<View가시성목록응답>(cancellationToken: cancellationToken);
+            _visibleItems = payload?.Items?.OrderBy(x => x.SortOrder).ToArray() ?? [];
+            IsLoaded = true;
+            Changed?.Invoke();
+        }
+        catch (Exception ex) when (_useMemoryFallback && IsViewPolicyUnavailable(ex))
+        {
+            _logger.LogInformation(
+                "AdminData 메모리 모드에서 View 정책 API를 사용할 수 없어 전체 화면을 임시 노출합니다. 사유: {Message}",
+                ex.Message);
+            _visibleItems = [];
+            IsLoaded = true;
+            Changed?.Invoke();
+        }
     }
 
     public async Task<관리자View정책목록응답> GetPoliciesAsync(string? appKey = null, CancellationToken cancellationToken = default)
@@ -126,4 +154,7 @@ public sealed class ViewPolicyService
         var normalized = path.StartsWith('/') ? path : "/" + path;
         return normalized.Length > 1 ? normalized.TrimEnd('/') : normalized;
     }
+
+    private static bool IsViewPolicyUnavailable(Exception exception)
+        => exception is HttpRequestException or TaskCanceledException or InvalidOperationException;
 }

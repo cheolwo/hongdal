@@ -1,6 +1,7 @@
 @page "/driver/transports/{운송Id:long}/dropoff"
 @inject IDriverSampleDataService Samples
 @inject IDriverTransportCompletionPhotoService CompletionPhotoService
+@inject IDriverTransportExceptionService ExceptionService
 @using Microsoft.Maui.ApplicationModel
 @using Microsoft.Maui.Media
 
@@ -19,7 +20,7 @@
             <MudStack Spacing="2">
                 @if (운송 is null)
                 {
-                    <MudAlert Severity="Severity.Warning">운송 샘플을 찾지 못했습니다.</MudAlert>
+                    <MudAlert Severity="Severity.Warning">운송 정보를 찾지 못했습니다.</MudAlert>
                 }
                 else
                 {
@@ -192,8 +193,9 @@
                                 <MudButton Variant="Variant.Filled"
                                            Color="Color.Warning"
                                            StartIcon="@Icons.Material.Filled.Save"
-                                           OnClick="RecordDropoffIssue">
-                                    문제 기록
+                                           Disabled="@isIssueReporting"
+                                           OnClick="RecordDropoffIssueAsync">
+                                    @(isIssueReporting ? "문제 신고 중" : "문제 기록")
                                 </MudButton>
                             }
                         </MudStack>
@@ -279,6 +281,7 @@
     private bool dropoffIssuePanelOpen;
     private string dropoffIssueType = "수량 부족";
     private string? dropoffIssueMemo;
+    private bool isIssueReporting;
 
     private bool HasPhoto => photoBytes is { Length: > 0 };
 
@@ -401,10 +404,36 @@
         return 운송?.적재순번필요 == true ? Color.Info : Color.Default;
     }
 
-    private void RecordDropoffIssue()
+    private async Task RecordDropoffIssueAsync()
     {
         var memo = string.IsNullOrWhiteSpace(dropoffIssueMemo) ? "메모 없음" : dropoffIssueMemo.Trim();
-        SetStatus($"하차 문제 기록: {dropoffIssueType} · {memo}", Severity.Warning);
+        try
+        {
+            isIssueReporting = true;
+            SetStatus("하차 문제를 서버에 신고하는 중입니다.", Severity.Info);
+
+            var result = await ExceptionService.ReportAsync(new DriverTransportExceptionReport(
+                TransportId: 운송Id,
+                Stage: "하차",
+                ExceptionCode: ToDropoffExceptionCode(dropoffIssueType),
+                Reason: dropoffIssueType,
+                Memo: memo,
+                RequestAdminReview: true));
+
+            SetStatus(
+                result.Reported
+                    ? $"{result.Message} {dropoffIssueType} · {memo}"
+                    : result.Message,
+                result.Reported ? Severity.Warning : Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"하차 문제 신고 중 오류가 발생했습니다. 다시 시도해 주세요. {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isIssueReporting = false;
+        }
     }
 
     private async Task CaptureCompletionPhotoAsync()
@@ -497,6 +526,17 @@
         statusMessage = message;
         statusSeverity = severity;
     }
+
+    private static string ToDropoffExceptionCode(string issueType)
+        => issueType switch
+        {
+            "수량 부족" => "Dropoff.QuantityShortage",
+            "다른 화물" => "Dropoff.WrongCargo",
+            "바코드 훼손" => "Dropoff.BarcodeDamaged",
+            "수령자 부재" => "Dropoff.RecipientAbsent",
+            "파손 의심" => "Dropoff.DamageSuspected",
+            _ => "Dropoff.FieldIssue"
+        };
 
     private void ClearPhoto()
     {

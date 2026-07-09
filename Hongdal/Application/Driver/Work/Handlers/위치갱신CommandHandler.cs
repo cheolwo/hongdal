@@ -1,7 +1,9 @@
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
+using 홍달.Services.Dispatch.Coordination;
 using 홍달.Services.Dispatch.Notification;
 using 홍달.Services.Dispatch.Queue;
+using 홍달.Services.Dispatch.Recommendation;
 
 namespace Hongdal.Application.Driver.Work;
 
@@ -10,6 +12,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
     private readonly HongdalContext _db;
     private readonly IDriverLocationStore _driverLocationStore;
     private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
+    private readonly I배달권실행공간Store _배달권실행공간Store;
     private readonly I상차접근알림Service _상차접근알림Service;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
@@ -19,6 +22,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         HongdalContext db,
         IDriverLocationStore driverLocationStore,
         I국내화물운송기사상태Service 국내화물운송기사상태Service,
+        I배달권실행공간Store 배달권실행공간Store,
         I상차접근알림Service 상차접근알림Service,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
@@ -27,6 +31,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         _db = db;
         _driverLocationStore = driverLocationStore;
         _국내화물운송기사상태Service = 국내화물운송기사상태Service;
+        _배달권실행공간Store = 배달권실행공간Store;
         _상차접근알림Service = 상차접근알림Service;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
@@ -90,6 +95,14 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
             snapshot,
             상차접근허용반경Km: request.상차접근허용반경Km,
             cancellationToken: cancellationToken);
+        var 배달권 = 국내화물배달권정책.판정(
+            new 배차경로좌표(snapshot.Latitude, snapshot.Longitude),
+            driver.주_활동지역);
+        await _배달권실행공간Store.Upsert기사Async(
+            배달권.배달권키,
+            request.기사Id,
+            국내행정구역배달권Catalog.인접배달권키조회(배달권.배달권키),
+            cancellationToken);
 
         try
         {

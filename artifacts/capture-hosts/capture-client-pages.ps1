@@ -7,6 +7,7 @@ if (-not (Test-Path $chrome)) {
 }
 
 $captureRoot = Join-Path $repoRoot "docs\ProjectOverview\assets\app-pages"
+$minimumCaptureHeight = 1800
 
 function Wait-HttpReady {
     param(
@@ -36,6 +37,191 @@ function Wait-HttpReady {
     throw "Capture host on port $Port did not become ready."
 }
 
+function Get-FreeTcpPort {
+    $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
+    try {
+        $listener.Start()
+        return [int]$listener.LocalEndpoint.Port
+    }
+    finally {
+        $listener.Stop()
+    }
+}
+
+function Wait-DevToolsReady {
+    param(
+        [Parameter(Mandatory = $true)][int] $Port
+    )
+
+    $deadline = (Get-Date).AddSeconds(20)
+    do {
+        try {
+            Invoke-RestMethod -Uri "http://127.0.0.1:$Port/json/version" -TimeoutSec 1 | Out-Null
+            return
+        }
+        catch {
+            Start-Sleep -Milliseconds 250
+        }
+    } while ((Get-Date) -lt $deadline)
+
+    throw "Chrome DevTools on port $Port did not become ready."
+}
+
+function Receive-CdpMessage {
+    param(
+        [Parameter(Mandatory = $true)][System.Net.WebSockets.ClientWebSocket] $Socket
+    )
+
+    $buffer = New-Object byte[] 65536
+    $stream = [System.IO.MemoryStream]::new()
+
+    try {
+        do {
+            $segment = [System.ArraySegment[byte]]::new($buffer)
+            $result = $Socket.ReceiveAsync($segment, [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
+
+            if ($result.MessageType -eq [System.Net.WebSockets.WebSocketMessageType]::Close) {
+                throw "Chrome DevTools websocket closed unexpectedly."
+            }
+
+            $stream.Write($buffer, 0, $result.Count)
+        } while (-not $result.EndOfMessage)
+
+        $json = [System.Text.Encoding]::UTF8.GetString($stream.ToArray())
+        return $json | ConvertFrom-Json
+    }
+    finally {
+        $stream.Dispose()
+    }
+}
+
+function Invoke-CdpCommand {
+    param(
+        [Parameter(Mandatory = $true)][System.Net.WebSockets.ClientWebSocket] $Socket,
+        [Parameter(Mandatory = $true)][ref] $CommandId,
+        [Parameter(Mandatory = $true)][string] $Method,
+        [hashtable] $Params
+    )
+
+    $CommandId.Value++
+    $id = $CommandId.Value
+    $message = @{
+        id = $id
+        method = $Method
+    }
+
+    if ($Params) {
+        $message.params = $Params
+    }
+
+    $json = $message | ConvertTo-Json -Depth 20 -Compress
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+    $segment = [System.ArraySegment[byte]]::new($bytes)
+    $Socket.SendAsync($segment, [System.Net.WebSockets.WebSocketMessageType]::Text, $true, [System.Threading.CancellationToken]::None).GetAwaiter().GetResult() | Out-Null
+
+    while ($true) {
+        $response = Receive-CdpMessage -Socket $Socket
+        if ($response.id -ne $id) {
+            continue
+        }
+
+        if ($response.error) {
+            throw "Chrome DevTools command failed: $Method - $($response.error.message)"
+        }
+
+        return $response.result
+    }
+}
+
+function Wait-CdpPageReady {
+    param(
+        [Parameter(Mandatory = $true)][System.Net.WebSockets.ClientWebSocket] $Socket,
+        [Parameter(Mandatory = $true)][ref] $CommandId
+    )
+
+    $deadline = (Get-Date).AddSeconds(12)
+    do {
+        $readyState = Invoke-CdpCommand -Socket $Socket -CommandId $CommandId -Method "Runtime.evaluate" -Params @{
+            expression = "document.readyState"
+            returnByValue = $true
+        }
+
+        if ($readyState.result.value -eq "complete") {
+            break
+        }
+
+        Start-Sleep -Milliseconds 250
+    } while ((Get-Date) -lt $deadline)
+
+    Invoke-CdpCommand -Socket $Socket -CommandId $CommandId -Method "Runtime.evaluate" -Params @{
+        expression = "new Promise(resolve => { if (document.fonts && document.fonts.ready) { document.fonts.ready.then(() => resolve(true)); } else { resolve(true); } })"
+        awaitPromise = $true
+        returnByValue = $true
+    } | Out-Null
+
+    Start-Sleep -Milliseconds 750
+}
+
+function Resolve-CaptureDimensions {
+    param(
+        [Parameter(Mandatory = $true)][object] $Metrics,
+        [int] $DocumentHeight = 0
+    )
+
+    $contentSize = $Metrics.cssContentSize
+    if (-not $contentSize) {
+        $contentSize = $Metrics.contentSize
+    }
+
+    $width = [Math]::Max(1440, [Math]::Ceiling([double]$contentSize.width))
+    $contentHeight = [Math]::Ceiling([double]$contentSize.height)
+    $height = [Math]::Max($minimumCaptureHeight, [Math]::Max($contentHeight, $DocumentHeight))
+
+    [PSCustomObject]@{
+        Width = [int]$width
+        Height = [int]$height
+    }
+}
+
+function Get-CdpDocumentHeight {
+    param(
+        [Parameter(Mandatory = $true)][System.Net.WebSockets.ClientWebSocket] $Socket,
+        [Parameter(Mandatory = $true)][ref] $CommandId
+    )
+
+    $expression = @"
+(() => {
+  const values = [
+    document.documentElement?.scrollHeight || 0,
+    document.body?.scrollHeight || 0,
+    document.documentElement?.offsetHeight || 0,
+    document.body?.offsetHeight || 0
+  ];
+
+  for (const el of document.querySelectorAll('*')) {
+    const rect = el.getBoundingClientRect();
+    if (Number.isFinite(rect.top)) {
+      values.push(rect.bottom);
+      values.push(rect.top + el.scrollHeight);
+    }
+  }
+
+  return Math.ceil(Math.max(...values.filter(value => Number.isFinite(value))));
+})()
+"@
+
+    $result = Invoke-CdpCommand -Socket $Socket -CommandId $CommandId -Method "Runtime.evaluate" -Params @{
+        expression = $expression
+        returnByValue = $true
+    }
+
+    if ($result.result.value) {
+        return [int][Math]::Ceiling([double]$result.result.value)
+    }
+
+    return 0
+}
+
 function Invoke-PageCapture {
     param(
         [Parameter(Mandatory = $true)][string] $AppName,
@@ -47,14 +233,96 @@ function Invoke-PageCapture {
     New-Item -ItemType Directory -Force -Path $appDir | Out-Null
     $output = Join-Path $appDir "$PageId.png"
 
-    & $chrome `
-        --headless=new `
-        --disable-gpu `
-        --hide-scrollbars `
-        --window-size=390,844 `
-        --virtual-time-budget=8000 `
-        "--screenshot=$output" `
-        $Url | Out-Null
+    $debugPort = Get-FreeTcpPort
+    $userDataDir = Join-Path ([System.IO.Path]::GetTempPath()) "hongdal-capture-$([Guid]::NewGuid().ToString("N"))"
+    $chromeProcess = $null
+    $socket = $null
+
+    try {
+        $chromeProcess = Start-Process -FilePath $chrome `
+            -ArgumentList @(
+                "--headless=new",
+                "--disable-gpu",
+                "--hide-scrollbars",
+                "--no-first-run",
+                "--no-default-browser-check",
+                "--window-size=1440,1600",
+                "--remote-debugging-port=$debugPort",
+                "--user-data-dir=$userDataDir",
+                "about:blank"
+            ) `
+            -WindowStyle Hidden `
+            -PassThru
+
+        Wait-DevToolsReady -Port $debugPort
+
+        $target = Invoke-RestMethod -Method Put -Uri "http://127.0.0.1:$debugPort/json/new?about:blank"
+        $socket = [System.Net.WebSockets.ClientWebSocket]::new()
+        $socket.ConnectAsync([Uri]$target.webSocketDebuggerUrl, [System.Threading.CancellationToken]::None).GetAwaiter().GetResult() | Out-Null
+
+        $commandId = [ref]0
+        Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Page.enable" | Out-Null
+        Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Runtime.enable" | Out-Null
+        Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Page.navigate" -Params @{ url = $Url } | Out-Null
+        Wait-CdpPageReady -Socket $socket -CommandId $commandId
+
+        $metrics = Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Page.getLayoutMetrics"
+        $documentHeight = Get-CdpDocumentHeight -Socket $socket -CommandId $commandId
+        $dimensions = Resolve-CaptureDimensions -Metrics $metrics -DocumentHeight $documentHeight
+
+        Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Emulation.setDeviceMetricsOverride" -Params @{
+            width = $dimensions.Width
+            height = $dimensions.Height
+            deviceScaleFactor = 1
+            mobile = $false
+        } | Out-Null
+
+        Start-Sleep -Milliseconds 300
+
+        $metrics = Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Page.getLayoutMetrics"
+        $documentHeight = Get-CdpDocumentHeight -Socket $socket -CommandId $commandId
+        $dimensions = Resolve-CaptureDimensions -Metrics $metrics -DocumentHeight $documentHeight
+
+        $screenshot = Invoke-CdpCommand -Socket $socket -CommandId $commandId -Method "Page.captureScreenshot" -Params @{
+            format = "png"
+            fromSurface = $true
+            captureBeyondViewport = $true
+            clip = @{
+                x = 0
+                y = 0
+                width = $dimensions.Width
+                height = $dimensions.Height
+                scale = 1
+            }
+        }
+
+        [System.IO.File]::WriteAllBytes($output, [Convert]::FromBase64String($screenshot.data))
+    }
+    finally {
+        if ($socket) {
+            $socket.Dispose()
+        }
+
+        if ($chromeProcess -and -not $chromeProcess.HasExited) {
+            Stop-Process -Id $chromeProcess.Id -Force
+            $chromeProcess.WaitForExit(2000) | Out-Null
+        }
+
+        Get-CimInstance Win32_Process |
+            Where-Object { $_.Name -eq "chrome.exe" -and $_.CommandLine -like "*$userDataDir*" } |
+            ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+
+        Start-Sleep -Milliseconds 200
+
+        if (Test-Path $userDataDir) {
+            try {
+                Remove-Item -LiteralPath $userDataDir -Recurse -Force -ErrorAction Stop
+            }
+            catch {
+                Write-Verbose "Chrome temporary profile cleanup skipped: $userDataDir"
+            }
+        }
+    }
 
     if (-not (Test-Path $output)) {
         throw "Screenshot was not created: $output"

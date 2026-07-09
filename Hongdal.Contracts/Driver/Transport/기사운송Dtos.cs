@@ -14,6 +14,12 @@ public class 기사운송요약응답
     public string 결제방식 { get; set; } = string.Empty;
     public bool 인수증필요 { get; set; }
     public bool 인수증서명필수 { get; set; }
+    public bool 예외신고됨 { get; set; }
+    public string 최근예외단계 { get; set; } = string.Empty;
+    public string 최근예외코드 { get; set; } = string.Empty;
+    public string 최근예외메시지 { get; set; } = string.Empty;
+    public string 다음행동안내 { get; set; } = string.Empty;
+    public bool 관리자확인필요 { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 
@@ -53,6 +59,11 @@ public sealed class 기사운송하차완료요청
 
 public sealed class 기사운송문제신고요청
 {
+    public string? 단계 { get; set; }
+    public string? 예외코드 { get; set; }
     public string 사유 { get; set; } = string.Empty;
     public string? 메모 { get; set; }
+    public string? 증빙ObjectName { get; set; }
+    public string? 증빙Url { get; set; }
+    public bool 관리자확인요청 { get; set; }
 }

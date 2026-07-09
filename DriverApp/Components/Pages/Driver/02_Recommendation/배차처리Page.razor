@@ -17,7 +17,7 @@
             <MudStack Spacing="2">
                 @if (의뢰 is null)
                 {
-                    <MudAlert Severity="Severity.Warning">배차 처리할 추천 의뢰 샘플을 찾지 못했습니다.</MudAlert>
+                    <MudAlert Severity="Severity.Warning">배차 처리할 추천 의뢰 정보를 찾지 못했습니다.</MudAlert>
                 }
                 else
                 {
@@ -25,7 +25,7 @@
                     <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">의뢰 @의뢰Id</MudChip>
                     <MudText Typo="Typo.body1">@의뢰.경로표시</MudText>
                     <MudText Typo="Typo.body2">예상수익 @((의뢰.예상수익 ?? 0m).ToString("0"))원 / 추천점수 @((의뢰.추천점수 ?? 0m).ToString("0"))점</MudText>
-                    <MudAlert Severity="Severity.Info">지금은 실제 Command 대신 앱 공통 추천 처리 상태를 갱신합니다.</MudAlert>
+                    <MudAlert Severity="Severity.Info">서버 배차 처리 API로 수락, 보류, 거절 상태를 갱신합니다.</MudAlert>
                 }
                 <MudAlert Severity="@_처리Severity">@_처리상태</MudAlert>
                 @if (_거절입력표시)
@@ -38,11 +38,11 @@
                     </MudSelect>
                 }
                 <MudStack Row="true" Spacing="2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(의뢰 is null)" OnClick="배차수락샘플">배차 수락</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(의뢰 is null)" OnClick="배차보류샘플">보류</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(의뢰 is null)" OnClick="배차수락">배차 수락</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(의뢰 is null)" OnClick="배차보류">보류</MudButton>
                     @if (_거절입력표시)
                     {
-                        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="배차거절샘플">거절 확정</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(의뢰 is null)" OnClick="배차거절">거절 확정</MudButton>
                     }
                     else
                     {
@@ -85,7 +85,7 @@
         }
     }
 
-    private async Task 배차수락샘플()
+    private async Task 배차수락()
     {
         if (의뢰 is null)
         {
@@ -105,7 +105,7 @@
         }
     }
 
-    private void 배차보류샘플()
+    private void 배차보류()
     {
         if (의뢰 is null)
         {
@@ -117,7 +117,7 @@
         _처리Severity = Severity.Info;
     }
 
-    private async Task 배차거절샘플()
+    private async Task 배차거절()
     {
         if (의뢰 is null)
         {

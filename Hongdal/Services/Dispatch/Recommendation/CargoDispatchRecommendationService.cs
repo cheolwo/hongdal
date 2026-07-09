@@ -8,10 +8,10 @@ using 홍달.도메인.차량;
 
 namespace 홍달.Services.Dispatch.Recommendation
 {
-    public sealed class 화물배차추천Service : 배차추천Service, I배차추천Service
+    public sealed partial class 화물배차추천Service : 배차추천Service, I배차추천Service
     {
         private readonly I차량화물적합성Service _적합성Service;
-        private readonly 홍달.Services.Dispatch.Queue.I배차큐전환Service _queueTransitionService;
+        private readonly 홍달.Services.Dispatch.Queue.I배차대기원장전환Service _원장전환Service;
 
         public 화물배차추천Service(
             HongdalContext db,
@@ -28,7 +28,7 @@ namespace 홍달.Services.Dispatch.Recommendation
             I운송일정삽입평가Service 운송일정삽입평가Service,
             IOpinetAveragePriceService averagePriceService,
             IGeocodingService geocodingService,
-            홍달.Services.Dispatch.Queue.I배차큐전환Service queueTransitionService)
+            홍달.Services.Dispatch.Queue.I배차대기원장전환Service 원장전환Service)
             : base(
                 db,
                 driverLocationStore,
@@ -44,7 +44,7 @@ namespace 홍달.Services.Dispatch.Recommendation
                 averagePriceService)
         {
             _적합성Service = 적합성Service;
-            _queueTransitionService = queueTransitionService;
+            _원장전환Service = 원장전환Service;
         }
 
         protected override async Task<bool> IsDrivingAsync(string driverId)
@@ -65,20 +65,7 @@ namespace 홍달.Services.Dispatch.Recommendation
 
         private async Task<IReadOnlyList<DispatchRecommendationDto>> GetRecommendationsCoreAsync(string driverId, 배차추천검색조건? criteria, bool isDriving)
         {
-            var activeQueue = await _db.배차대기
-                .AsNoTracking()
-                .Where(q => q.배차업무유형 == 상태값.배차업무유형.용달운송
-                            && q.상태 == 상태값.배차대기상태.대기
-                            && q.배차큐단계 == 상태값.배차큐단계.배차추천
-                            && q.배차노출상태 == 상태값.배차노출상태.추천중
-                            && q.현재추천대상기사Id == driverId)
-                .OrderByDescending(q => q.추천시작시각)
-                .FirstOrDefaultAsync();
-
-            if (activeQueue is not null && activeQueue.추천만료시각.HasValue && activeQueue.추천만료시각 <= DateTime.UtcNow)
-            {
-                await _queueTransitionService.추천만료처리Async(activeQueue.의뢰Id);
-            }
+            await 추천만료정리Async(driverId);
 
             var driver = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == driverId);
             _driverLocationStore.TryGetLatest(driverId, out DriverLocationSnapshot? currentLocation);
@@ -107,38 +94,9 @@ namespace 홍달.Services.Dispatch.Recommendation
                 .ToListAsync();
 
             var requestIds = items.Select(q => q.의뢰Id).Distinct().ToList();
-            Dictionary<string, 화주운송의뢰> requestMap;
-            if (requestIds.Count == 0)
-            {
-                requestMap = new Dictionary<string, 화주운송의뢰>(StringComparer.Ordinal);
-            }
-            else
-            {
-                requestMap = await _db.화주운송의뢰
-                    .AsNoTracking()
-                    .Where(r => requestIds.Contains(r.의뢰Id))
-                    .ToDictionaryAsync(r => r.의뢰Id, StringComparer.Ordinal);
-            }
-
-            Dictionary<string, 화물요구조건> cargoMap;
-            if (requestIds.Count == 0)
-            {
-                cargoMap = new Dictionary<string, 화물요구조건>(StringComparer.Ordinal);
-            }
-            else
-            {
-                cargoMap = await _db.화물요구조건
-                    .AsNoTracking()
-                    .Where(r => requestIds.Contains(r.의뢰Id))
-                    .ToDictionaryAsync(r => r.의뢰Id, StringComparer.Ordinal);
-            }
-
-            var driverVehicle = driver?.차량;
-            var vehicleSpec = driverVehicle is null
-                ? null
-                : await _db.차량제원
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.차량코드 == driverVehicle || x.차량명 == driverVehicle);
+            var requestMap = await LoadRequestMapAsync(requestIds);
+            var cargoMap = await LoadCargoMapAsync(requestIds);
+            var vehicleSpec = await LoadVehicleSpecAsync(driver?.차량);
 
             var hasSearchCriteria = criteria is not null && criteria.RadiusKm > 0;
             var searchLatitude = hasSearchCriteria ? criteria!.Latitude : originLocation?.Latitude ?? currentLocation?.Latitude;
@@ -307,21 +265,6 @@ namespace 홍달.Services.Dispatch.Recommendation
             }
 
             return result;
-        }
-
-        private static decimal? ResolveEstimatedRevenue(화주운송의뢰? request)
-        {
-            if (request is null)
-            {
-                return null;
-            }
-
-            if (request.최종운임.HasValue)
-            {
-                return request.최종운임.Value;
-            }
-
-            return request.결제예정금액.HasValue ? request.결제예정금액.Value : null;
         }
 
     }

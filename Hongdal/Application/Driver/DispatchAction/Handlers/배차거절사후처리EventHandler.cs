@@ -5,14 +5,14 @@ namespace Hongdal.Application.Driver.DispatchAction;
 
 public sealed class 배차거절사후처리EventHandler : INotificationHandler<배차거절됨Event>
 {
-    private readonly 홍달.Services.Dispatch.Queue.I배차큐전환Service _queueTransitionService;
+    private readonly 홍달.Services.Dispatch.Queue.I배차대기원장전환Service _원장전환Service;
     private readonly ILogger<배차거절사후처리EventHandler> _logger;
 
     public 배차거절사후처리EventHandler(
-        홍달.Services.Dispatch.Queue.I배차큐전환Service queueTransitionService,
+        홍달.Services.Dispatch.Queue.I배차대기원장전환Service 원장전환Service,
         ILogger<배차거절사후처리EventHandler> logger)
     {
-        _queueTransitionService = queueTransitionService;
+        _원장전환Service = 원장전환Service;
         _logger = logger;
     }
 
@@ -20,7 +20,16 @@ public sealed class 배차거절사후처리EventHandler : INotificationHandler<
     {
         try
         {
-            await _queueTransitionService.추천거절처리Async(notification.의뢰Id, notification.기사Id, cancellationToken);
+            var 전환결과 = await _원장전환Service.추천거절처리Async(notification.의뢰Id, notification.기사Id, cancellationToken);
+            if (!전환결과.전환여부)
+            {
+                _logger.LogDebug(
+                    "배차거절 사후처리 원장 전환이 생략되었습니다. RequestId={RequestId} DriverId={DriverId} ResultCode={ResultCode} Message={Message}",
+                    notification.의뢰Id,
+                    notification.기사Id,
+                    전환결과.결과코드,
+                    전환결과.메시지);
+            }
         }
         catch (Exception ex)
         {

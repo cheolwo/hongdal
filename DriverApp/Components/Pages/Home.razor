@@ -2,7 +2,6 @@
 @inject IAuthSession AuthSession
 @inject IDriverSampleDataService SampleDataService
 @inject DriverAppProfile DriverProfile
-@inject NavigationManager NavigationManager
 
 <PageTitle>홍달 기사 업무 허브</PageTitle>
 
@@ -29,40 +28,68 @@
         <MudGrid>
             @foreach (var profile in DriverProfile.WorkProfiles)
             {
+                var isCurrentApp = string.Equals(profile.AppKey, DriverProfile.AppKey, StringComparison.Ordinal);
+
                 <MudItem xs="12" md="4">
-                    @DriverWorkProfileCard(profile)
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudText Typo="Typo.h6">@profile.DisplayName</MudText>
+                                <MudChip T="string"
+                                         Color="@(isCurrentApp ? Color.Success : Color.Default)"
+                                         Variant="@(isCurrentApp ? Variant.Filled : Variant.Outlined)"
+                                         Size="Size.Small">
+                                    @(isCurrentApp ? "현재 앱" : "분리 후보")
+                                </MudChip>
+                            </MudStack>
+
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@profile.Description</MudText>
+
+                            <MudAlert Severity="Severity.Info" Dense="true" Class="mt-1">
+                                @profile.Focus
+                            </MudAlert>
+
+                            <MudButton Variant="@(isCurrentApp ? Variant.Filled : Variant.Outlined)"
+                                       Color="@ProfileColor(profile)"
+                                       Disabled="@(!isCurrentApp)"
+                                       Href="@DriverRoutes.Recommendations">
+                                @(isCurrentApp ? "추천 보기" : "별도 앱 분리 예정")
+                            </MudButton>
+                        </MudStack>
+                    </MudPaper>
                 </MudItem>
             }
         </MudGrid>
 
         <MudGrid>
-            <MudItem xs="12" md="6" lg="3">
-                @ActionCard("운행 시작", "배차 수신 비콘과 운행 상태를 확인합니다.", Icons.Material.Filled.PlayArrow, Color.Success, DriverRoutes.WorkStart)
-            </MudItem>
-            <MudItem xs="12" md="6" lg="3">
-                @ActionCard("추천 목록", $"현재 추천 {RecommendationCount:N0}건을 확인합니다.", Icons.Material.Filled.ListAlt, Color.Primary, DriverRoutes.Recommendations)
-            </MudItem>
-            <MudItem xs="12" md="6" lg="3">
-                @ActionCard("진행 중 운송", "상차, 하차, 인수 완료 흐름으로 이동합니다.", Icons.Material.Filled.LocalShipping, Color.Secondary, DriverRoutes.CurrentTransport)
-            </MudItem>
-            <MudItem xs="12" md="6" lg="3">
-                @ActionCard("전체 메뉴", "계좌, 정산, 알림, 화면 설정을 확인합니다.", Icons.Material.Filled.Menu, Color.Info, DriverRoutes.Menu)
-            </MudItem>
+            @foreach (var action in Actions)
+            {
+                <MudItem xs="12" md="6" lg="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                        <MudStack Spacing="2">
+                            <MudIcon Icon="@action.Icon" Color="@action.Color" Size="Size.Large" />
+                            <MudText Typo="Typo.h6">@action.Title</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
+                            <MudButton Variant="Variant.Filled" Color="@action.Color" Href="@action.Route">이동</MudButton>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
         </MudGrid>
 
         <MudPaper Elevation="0" Outlined="true" Class="pa-4">
             <MudStack Spacing="2">
-                <MudText Typo="Typo.h6">현재 샘플 상태</MudText>
+                <MudText Typo="Typo.h6">현재 운행 상태</MudText>
                 <MudGrid>
-                    <MudItem xs="12" sm="4">
-                        @Metric("현재 위치", CurrentLocationName, Color.Primary)
-                    </MudItem>
-                    <MudItem xs="12" sm="4">
-                        @Metric("추천 운송", $"{RecommendationCount:N0}건", Color.Success)
-                    </MudItem>
-                    <MudItem xs="12" sm="4">
-                        @Metric("로그인 상태", AuthSession.IsAuthenticated ? "로그인됨" : "로그인 필요", AuthSession.IsAuthenticated ? Color.Success : Color.Warning)
-                    </MudItem>
+                    @foreach (var metric in Metrics)
+                    {
+                        <MudItem xs="12" sm="4">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@metric.Label</MudText>
+                                <MudText Typo="Typo.h6" Color="@metric.Color">@metric.Value</MudText>
+                            </MudPaper>
+                        </MudItem>
+                    }
                 </MudGrid>
             </MudStack>
         </MudPaper>
@@ -74,143 +101,45 @@
 
     private string CurrentLocationName => SampleDataService.기사현재위치.위치명;
 
+    private IReadOnlyList<HomeAction> Actions =>
+    [
+        new("운행 시작", "배차 수신 비콘과 운행 상태를 확인합니다.", Icons.Material.Filled.PlayArrow, Color.Success, DriverRoutes.WorkStart),
+        new("추천 목록", $"현재 추천 {RecommendationCount:N0}건을 확인합니다.", Icons.Material.Filled.ListAlt, Color.Primary, DriverRoutes.Recommendations),
+        new("진행 중 운송", "상차, 하차, 인수 완료 흐름으로 이동합니다.", Icons.Material.Filled.LocalShipping, Color.Secondary, DriverRoutes.CurrentTransport),
+        new("전체 메뉴", "계좌, 정산, 알림, 화면 설정을 확인합니다.", Icons.Material.Filled.Menu, Color.Info, DriverRoutes.Menu)
+    ];
+
+    private IReadOnlyList<HomeMetric> Metrics =>
+    [
+        new("현재 위치", CurrentLocationName, Color.Primary),
+        new("추천 운송", $"{RecommendationCount:N0}건", Color.Success),
+        new("로그인 상태", AuthSession.IsAuthenticated ? "로그인됨" : "로그인 필요", AuthSession.IsAuthenticated ? Color.Success : Color.Warning)
+    ];
+
     protected override async Task OnInitializedAsync()
     {
         await AuthSession.RestoreAsync();
     }
 
-    private void NavigateTo(string route)
+    private static Color ProfileColor(DriverWorkProfile profile)
     {
-        NavigationManager.NavigateTo(route);
-    }
-
-    private RenderFragment DriverWorkProfileCard(DriverWorkProfile profile) => builder =>
-    {
-        var isCurrent = string.Equals(profile.AppKey, DriverProfile.AppKey, StringComparison.Ordinal);
-        var color = profile.WorkType switch
+        return profile.WorkType switch
         {
             Hongdal.Contracts.Common.Drivers.기사업무유형코드.화물운송 => Color.Secondary,
             Hongdal.Contracts.Common.Drivers.기사업무유형코드.음식배달 => Color.Warning,
             _ => Color.Primary
         };
+    }
 
-        builder.OpenComponent<MudPaper>(0);
-        builder.AddAttribute(1, "Elevation", 0);
-        builder.AddAttribute(2, "Outlined", true);
-        builder.AddAttribute(3, "Class", "pa-4 h-100");
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
-        {
-            childBuilder.OpenComponent<MudStack>(0);
-            childBuilder.AddAttribute(1, "Spacing", 2);
-            childBuilder.AddAttribute(2, "ChildContent", (RenderFragment)(stackBuilder =>
-            {
-                stackBuilder.OpenComponent<MudStack>(0);
-                stackBuilder.AddAttribute(1, "Row", true);
-                stackBuilder.AddAttribute(2, "Justify", Justify.SpaceBetween);
-                stackBuilder.AddAttribute(3, "AlignItems", AlignItems.Center);
-                stackBuilder.AddAttribute(4, "ChildContent", (RenderFragment)(rowBuilder =>
-                {
-                    rowBuilder.OpenComponent<MudText>(0);
-                    rowBuilder.AddAttribute(1, "Typo", Typo.h6);
-                    rowBuilder.AddAttribute(2, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, profile.DisplayName)));
-                    rowBuilder.CloseComponent();
+    private sealed record HomeAction(
+        string Title,
+        string Description,
+        string Icon,
+        Color Color,
+        string Route);
 
-                    rowBuilder.OpenComponent<MudChip<string>>(3);
-                    rowBuilder.AddAttribute(4, "Color", isCurrent ? Color.Success : Color.Default);
-                    rowBuilder.AddAttribute(5, "Variant", isCurrent ? Variant.Filled : Variant.Outlined);
-                    rowBuilder.AddAttribute(6, "Size", Size.Small);
-                    rowBuilder.AddAttribute(7, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, isCurrent ? "현재 앱" : "분리 후보")));
-                    rowBuilder.CloseComponent();
-                }));
-                stackBuilder.CloseComponent();
-
-                stackBuilder.OpenComponent<MudText>(5);
-                stackBuilder.AddAttribute(6, "Typo", Typo.body2);
-                stackBuilder.AddAttribute(7, "Color", Color.Secondary);
-                stackBuilder.AddAttribute(8, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, profile.Description)));
-                stackBuilder.CloseComponent();
-
-                stackBuilder.OpenComponent<MudAlert>(9);
-                stackBuilder.AddAttribute(10, "Severity", Severity.Info);
-                stackBuilder.AddAttribute(11, "Dense", true);
-                stackBuilder.AddAttribute(12, "Class", "mt-1");
-                stackBuilder.AddAttribute(13, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, profile.Focus)));
-                stackBuilder.CloseComponent();
-
-                stackBuilder.OpenComponent<MudButton>(14);
-                stackBuilder.AddAttribute(15, "Variant", isCurrent ? Variant.Filled : Variant.Outlined);
-                stackBuilder.AddAttribute(16, "Color", color);
-                stackBuilder.AddAttribute(17, "Disabled", !isCurrent);
-                stackBuilder.AddAttribute(18, "OnClick", EventCallback.Factory.Create(this, () => NavigateTo(DriverRoutes.Recommendations)));
-                stackBuilder.AddAttribute(19, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, isCurrent ? "추천 보기" : "별도 앱 분리 예정")));
-                stackBuilder.CloseComponent();
-            }));
-            childBuilder.CloseComponent();
-        }));
-        builder.CloseComponent();
-    };
-
-    private RenderFragment ActionCard(string title, string description, string icon, Color color, string route) => builder =>
-    {
-        builder.OpenComponent<MudPaper>(0);
-        builder.AddAttribute(1, "Elevation", 0);
-        builder.AddAttribute(2, "Outlined", true);
-        builder.AddAttribute(3, "Class", "pa-4 h-100");
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
-        {
-            childBuilder.OpenComponent<MudStack>(0);
-            childBuilder.AddAttribute(1, "Spacing", 2);
-            childBuilder.AddAttribute(2, "ChildContent", (RenderFragment)(stackBuilder =>
-            {
-                stackBuilder.OpenComponent<MudIcon>(0);
-                stackBuilder.AddAttribute(1, "Icon", icon);
-                stackBuilder.AddAttribute(2, "Color", color);
-                stackBuilder.AddAttribute(3, "Size", Size.Large);
-                stackBuilder.CloseComponent();
-
-                stackBuilder.OpenComponent<MudText>(4);
-                stackBuilder.AddAttribute(5, "Typo", Typo.h6);
-                stackBuilder.AddAttribute(6, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, title)));
-                stackBuilder.CloseComponent();
-
-                stackBuilder.OpenComponent<MudText>(7);
-                stackBuilder.AddAttribute(8, "Typo", Typo.body2);
-                stackBuilder.AddAttribute(9, "Color", Color.Secondary);
-                stackBuilder.AddAttribute(10, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, description)));
-                stackBuilder.CloseComponent();
-
-                stackBuilder.OpenComponent<MudButton>(11);
-                stackBuilder.AddAttribute(12, "Variant", Variant.Filled);
-                stackBuilder.AddAttribute(13, "Color", color);
-                stackBuilder.AddAttribute(14, "OnClick", EventCallback.Factory.Create(this, () => NavigateTo(route)));
-                stackBuilder.AddAttribute(15, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, "이동")));
-                stackBuilder.CloseComponent();
-            }));
-            childBuilder.CloseComponent();
-        }));
-        builder.CloseComponent();
-    };
-
-    private static RenderFragment Metric(string label, string value, Color color) => builder =>
-    {
-        builder.OpenComponent<MudPaper>(0);
-        builder.AddAttribute(1, "Elevation", 0);
-        builder.AddAttribute(2, "Outlined", true);
-        builder.AddAttribute(3, "Class", "pa-3 h-100");
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
-        {
-            childBuilder.OpenComponent<MudText>(0);
-            childBuilder.AddAttribute(1, "Typo", Typo.caption);
-            childBuilder.AddAttribute(2, "Color", Color.Secondary);
-            childBuilder.AddAttribute(3, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, label)));
-            childBuilder.CloseComponent();
-
-            childBuilder.OpenComponent<MudText>(4);
-            childBuilder.AddAttribute(5, "Typo", Typo.h6);
-            childBuilder.AddAttribute(6, "Color", color);
-            childBuilder.AddAttribute(7, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, value)));
-            childBuilder.CloseComponent();
-        }));
-        builder.CloseComponent();
-    };
+    private sealed record HomeMetric(
+        string Label,
+        string Value,
+        Color Color);
 }

@@ -2,7 +2,9 @@ using Hongdal.Contracts.Common.Warehouse;
 using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.공통;
 using 홍달.도메인.배차;
+using 홍달.Services.Dispatch.Coordination;
 using 홍달.Services.Dispatch.Engine;
+using 홍달.Services.Dispatch.Recommendation;
 
 namespace 홍달.Services.Dispatch.Queue;
 
@@ -47,13 +49,16 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
 {
     private readonly HongdalContext _db;
     private readonly I운송의뢰배차원천분류Service _sourceClassifier;
+    private readonly I배달권실행공간Store _배달권실행공간Store;
 
     public 운송의뢰배차대기Service(
         HongdalContext db,
-        I운송의뢰배차원천분류Service sourceClassifier)
+        I운송의뢰배차원천분류Service sourceClassifier,
+        I배달권실행공간Store 배달권실행공간Store)
     {
         _db = db;
         _sourceClassifier = sourceClassifier;
+        _배달권실행공간Store = 배달권실행공간Store;
     }
 
     public async Task<배차대기> 생성또는조회Async(
@@ -65,6 +70,7 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
         var existing = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
         if (existing is not null)
         {
+            await Upsert배달권실행공간Async(existing, cancellationToken);
             return existing;
         }
 
@@ -102,8 +108,33 @@ public sealed class 운송의뢰배차대기Service : I운송의뢰배차대기S
         entity.배차업무유형 = options?.배차업무유형 ?? source.배차업무유형;
 
         _db.배차대기.Add(entity);
+        await Upsert배달권실행공간Async(entity, cancellationToken);
         return entity;
     }
+
+    private async Task Upsert배달권실행공간Async(배차대기 배차대기, CancellationToken cancellationToken)
+    {
+        if (배차대기.상태 != 상태값.배차대기상태.대기
+            || 배차대기.배차큐단계 is 상태값.배차큐단계.확정 or 상태값.배차큐단계.종료)
+        {
+            await _배달권실행공간Store.Remove운송의뢰Async(배차대기.의뢰Id, cancellationToken);
+            return;
+        }
+
+        var 상차배달권 = 국내화물배달권정책.판정(
+            CreatePoint(배차대기.픽업_위도, 배차대기.픽업_경도),
+            배차대기.픽업_도로명주소);
+        await _배달권실행공간Store.Upsert운송의뢰Async(
+            상차배달권.배달권키,
+            배차대기.의뢰Id,
+            국내행정구역배달권Catalog.인접배달권키조회(상차배달권.배달권키),
+            cancellationToken);
+    }
+
+    private static 배차경로좌표? CreatePoint(decimal? latitude, decimal? longitude)
+        => latitude.HasValue && longitude.HasValue
+            ? new 배차경로좌표(latitude.Value, longitude.Value)
+            : null;
 
     private static string To배차원천유형(string? sourceType)
     {

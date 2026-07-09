@@ -60,17 +60,8 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
         }
 
         var now = DateTime.UtcNow;
-        var isWaitingQueue = queue.상태 == 상태값.배차대기상태.대기;
-        var canAcceptRecommendation = isWaitingQueue
-                                       && queue.배차큐단계 == 상태값.배차큐단계.배차추천
-                                       && queue.배차노출상태 == 상태값.배차노출상태.추천중
-                                       && string.Equals(queue.현재추천대상기사Id, request.기사Id, StringComparison.Ordinal)
-                                       && queue.추천만료시각.HasValue
-                                       && queue.추천만료시각 > now;
-        var canAcceptPublic = isWaitingQueue
-                              && queue.배차큐단계 == 상태값.배차큐단계.공개배차
-                              && queue.배차노출상태 == 상태값.배차노출상태.공개중
-                              && queue.확정기사Id is null;
+        var canAcceptRecommendation = 배차응답가능정책.추천수락가능(queue, request.기사Id, now);
+        var canAcceptPublic = 배차응답가능정책.공개배차수락가능(queue);
 
         if (!canAcceptRecommendation && !canAcceptPublic)
         {
@@ -97,6 +88,11 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
         {
             _logger.LogWarning(ex, "배차 수락 중 동시성 충돌이 발생했습니다. RequestId={RequestId} DriverId={DriverId}", request.RequestId, request.기사Id);
             return Result.Fail<배차수락결과>("다른 기사에 의해 이미 수락되었습니다.");
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogWarning(ex, "배차 수락 저장 중 DB 예외가 발생했습니다. RequestId={RequestId} DriverId={DriverId}", request.RequestId, request.기사Id);
+            return Result.Fail<배차수락결과>("수락 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
         }
 
         _relationshipSnapshotCollector.Add(new WorkRelationshipSnapshotRecordRequest

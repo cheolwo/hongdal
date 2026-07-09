@@ -53,7 +53,7 @@ else
                                     {
                                         <tr>
                                             <td><span class="@IssueBadgeClass(issue.Kind)">@issue.Kind</span></td>
-                                            <td>@issue.Target</td>
+                                            <td><a href="@WorkflowDetailHref(issue.Target)">@issue.Target</a></td>
                                             <td>@issue.Message</td>
                                             <td>@issue.Priority</td>
                                         </tr>
@@ -114,6 +114,8 @@ else
             ("결제 완료", summary.결제완료수),
             ("배차 대기", summary.배차대기수),
             ("운송 중", summary.운송중수),
+            ("관리자 확인", summary.관리자확인필요수),
+            ("운송 예외", summary.운송예외수),
             ("완료", summary.완료수)
         ];
 
@@ -128,6 +130,22 @@ else
         IReadOnlyList<운송진행응답> transports)
     {
         var issues = new List<OperationIssue>();
+
+        issues.AddRange(transports
+            .Where(x => x.관리자확인필요)
+            .Select(x => new OperationIssue(
+                "관리자확인",
+                x.운송번호,
+                BuildExceptionMessage(x),
+                "높음")));
+
+        issues.AddRange(transports
+            .Where(x => x.예외신고됨 && !x.관리자확인필요)
+            .Select(x => new OperationIssue(
+                "예외신고",
+                x.운송번호,
+                BuildExceptionMessage(x),
+                "보통")));
 
         issues.AddRange(requests
             .Where(x => IsMatch(x.결제상태, "결제대기", "미결제", "대기"))
@@ -160,9 +178,19 @@ else
             new("결제 대기", summary.결제대기수, Percent(summary.결제대기수, total), "bg-warning"),
             new("배차 대기", summary.배차대기수, Percent(summary.배차대기수, total), "bg-info"),
             new("운송 중", summary.운송중수, Percent(summary.운송중수, total), "bg-primary"),
+            new("관리자 확인", summary.관리자확인필요수, Percent(summary.관리자확인필요수, total), "bg-danger"),
+            new("운송 예외", summary.운송예외수, Percent(summary.운송예외수, total), "bg-warning"),
             new("완료", summary.완료수, Percent(summary.완료수, total), "bg-success"),
             new("취소/환불", summary.취소환불수, Percent(summary.취소환불수, total), "bg-danger")
         ];
+    }
+
+    private static string BuildExceptionMessage(운송진행응답 item)
+    {
+        var code = string.IsNullOrWhiteSpace(item.최근예외코드) ? "예외코드 없음" : item.최근예외코드;
+        var stage = string.IsNullOrWhiteSpace(item.최근예외단계) ? "단계 미확인" : item.최근예외단계;
+        var message = string.IsNullOrWhiteSpace(item.최근예외메시지) ? "기사님 예외 신고 내용을 확인하세요." : item.최근예외메시지;
+        return $"{stage} · {code} · {message}";
     }
 
     private static int Percent(int value, int total)
@@ -173,6 +201,8 @@ else
         {
             "결제확인" => "badge rounded-pill text-bg-warning",
             "배차확인" => "badge rounded-pill text-bg-info",
+            "관리자확인" => "badge rounded-pill text-bg-danger",
+            "예외신고" => "badge rounded-pill text-bg-warning",
             "지연확인" => "badge rounded-pill text-bg-danger",
             "취소환불" => "badge rounded-pill text-bg-dark",
             _ => "badge rounded-pill text-bg-secondary"
@@ -180,6 +210,9 @@ else
 
     private static bool IsMatch(string? value, params string[] candidates)
         => candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
+
+    private static string WorkflowDetailHref(string requestId)
+        => $"/transports/{Uri.EscapeDataString(requestId)}";
 
     private sealed record OperationIssue(string Kind, string Target, string Message, string Priority);
 

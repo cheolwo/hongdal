@@ -20,7 +20,7 @@ public sealed class 운송상차지도착CommandHandler : IRequestHandler<운송
                 request.Id,
                 request.참여자Id,
                 request.실행역할,
-                "상차지도착",
+                기사운송상태코드.상차지도착,
                 nameof(운송상차지도착됨Event),
                 context => new 운송상차지도착됨Event(
                     request.기사Id,

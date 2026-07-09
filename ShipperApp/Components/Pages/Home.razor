@@ -203,10 +203,13 @@
                                                                 </MudExpansionPanel>
                                                             </HongdalSensitiveDisclosureList>
 
-                                                            @if (request.CanPay)
-                                                            {
-                                                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="() => ShowPayMessage(request)">@L.T("Home.Pay")</MudButton>
-                                                            }
+                                                            <MudStack Row="true" Spacing="1" Class="flex-wrap">
+                                                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Timeline" OnClick="@(() => NavigateToRequestDetail(request))">타임라인</MudButton>
+                                                                @if (request.CanPay)
+                                                                {
+                                                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="() => ShowPayMessage(request)">@L.T("Home.Pay")</MudButton>
+                                                                }
+                                                            </MudStack>
                                                         </MudStack>
                                                     </MudCardContent>
                                                 </MudPaper>
@@ -514,10 +517,33 @@
 
     private async Task LoadRequestsAsync()
     {
-        requests = (await ShipperOperations.GetRequestsAsync()).ToList();
-        warehouses = await ShipperOperations.GetWarehousesAsync();
-        inbounds = await ShipperOperations.GetInboundsAsync();
-        inventory = await ShipperOperations.GetInventoryAsync();
+        if (!isLoggedIn)
+        {
+            requests = [];
+            warehouses = [];
+            inbounds = [];
+            inventory = [];
+            RefreshWorkflow();
+            return;
+        }
+
+        try
+        {
+            requests = (await ShipperOperations.GetRequestsAsync()).ToList();
+            warehouses = await ShipperOperations.GetWarehousesAsync();
+            inbounds = await ShipperOperations.GetInboundsAsync();
+            inventory = await ShipperOperations.GetInventoryAsync();
+        }
+        catch (Exception ex)
+        {
+            requests = [];
+            warehouses = [];
+            inbounds = [];
+            inventory = [];
+            statusSeverity = Severity.Error;
+            statusMessage = $"서버 API 조회 실패: {ex.Message}";
+        }
+
         RefreshWorkflow();
     }
 
@@ -654,6 +680,16 @@
     }
 
     private void GoToRequestWizard() => Navigation.NavigateTo(ShipperRoutes.Request);
+
+    private void NavigateToRequestDetail(ShipperRequestItem request)
+    {
+        if (string.IsNullOrWhiteSpace(request.의뢰Id))
+        {
+            return;
+        }
+
+        Navigation.NavigateTo(ShipperRoutes.RequestDetailFor(request.의뢰Id));
+    }
 
     private void NavigateTo(string route)
     {

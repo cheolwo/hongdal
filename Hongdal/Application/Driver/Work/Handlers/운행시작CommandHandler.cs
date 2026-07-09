@@ -2,6 +2,7 @@ using Hongdal.Contracts.Driver.Work;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Hongdal.Application.CommandProcessing;
+using 홍달.Services.Dispatch.Coordination;
 using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Driver.Work;
@@ -93,6 +94,7 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             shift.시작모드,
             shift.시작위치,
             shift.오늘의복귀지주소 ?? shift.복귀지,
+            기사복귀선호코드.Normalize(request.복귀콜선호),
             cancellationToken);
         await tx.CommitAsync(cancellationToken);
 
@@ -115,7 +117,8 @@ public sealed class 운행시작CommandHandler : IRequestHandler<운행시작Com
             ShiftId = shift.Id,
             StartedAt = shift.시작시각,
             적용복귀지 = shift.오늘의복귀지주소 ?? shift.복귀지,
-            복귀지출처 = shift.복귀지출처
+            복귀지출처 = shift.복귀지출처,
+            복귀콜선호 = 기사복귀선호코드.Normalize(request.복귀콜선호)
         });
     }
 

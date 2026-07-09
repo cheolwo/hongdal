@@ -1,0 +1,118 @@
+@page "/documents/policies"
+@rendermode InteractiveServer
+@inject 문서관리메모리Service 문서관리메모리Service
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>문서 정책</PageTitle>
+
+<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">문서 정책</h1>
+        <div class="text-muted">문서 종류별 보관, 암호화, 서명 정책을 조회합니다.</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" href="@관리자문서Routes.목록">문서 목록</a>
+        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+}
+
+@if (isLoading)
+{
+    <div class="alert alert-info">문서 정책을 불러오는 중입니다...</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">문서 종류 정책</h5>
+                <span class="badge rounded-pill text-bg-primary">@policies.Count 건</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>코드</th>
+                            <th>이름</th>
+                            <th>사용</th>
+                            <th>암호화</th>
+                            <th>다운로드</th>
+                            <th>서명</th>
+                            <th>보관일수</th>
+                            <th>편집</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in policies)
+                        {
+                            <tr>
+                                <td>@item.문서코드</td>
+                                <td>@item.문서명</td>
+                                <td>@YesNo(item.사용여부)</td>
+                                <td>@YesNo(item.암호화여부)</td>
+                                <td>@(item.다운로드허용여부 ? "허용" : "차단")</td>
+                                <td>@(item.서명필요여부 ? "필요" : "미필요")</td>
+                                <td>@item.보관일수.ToString("N0")일</td>
+                                <td><a class="btn btn-sm btn-outline-primary" href="@PolicyDetailHref(item.문서코드)">편집</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isLoading = true;
+    private bool isError;
+    private string? message;
+    private IReadOnlyList<문서정책요약응답> policies = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!관리자인증세션Service.서버관리자인가)
+        {
+            NavigationManager.NavigateTo(관리자문서Routes.로그인ReturnUrl(관리자문서Routes.정책목록));
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private Task LoadAsync()
+    {
+        isLoading = true;
+        message = null;
+
+        try
+        {
+            policies = 문서관리메모리Service.GetPolicies();
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            message = ex.Message;
+            policies = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static string PolicyDetailHref(string documentCode)
+        => 관리자문서Routes.정책상세(documentCode);
+
+    private static string YesNo(bool value)
+        => value ? "예" : "아니오";
+}
