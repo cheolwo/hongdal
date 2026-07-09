@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>OrdererApp</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCssItems>false</EnableDefaultCssItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\OrdererApp\Components\**\*.razor" LinkBase="Components" />
+    <Compile Include="..\..\..\OrdererApp\Services\**\*.cs" LinkBase="Services" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>WarehouseManagerApp</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCssItems>false</EnableDefaultCssItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\WarehouseManagerApp\Components\**\*.razor" LinkBase="Components" />
+    <Compile Include="..\..\..\WarehouseManagerApp\Services\**\*.cs" LinkBase="Services" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+</Project>

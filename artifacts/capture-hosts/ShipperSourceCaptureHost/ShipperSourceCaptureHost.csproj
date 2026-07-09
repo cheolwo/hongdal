@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>ShipperApp</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCssItems>false</EnableDefaultCssItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\ShipperApp\Components\**\*.razor" LinkBase="Components" />
+    <Content Include="..\..\..\ShipperApp\wwwroot\**\*" LinkBase="wwwroot" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Include="..\..\..\ShipperApp\Models\**\*.cs" LinkBase="Models" />
+    <Compile Include="..\..\..\ShipperApp\Options\**\*.cs" LinkBase="Options" />
+    <Compile Include="..\..\..\ShipperApp\Services\**\*.cs" LinkBase="Services" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Hongdal.Client.Infrastructure\Hongdal.Client.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+</Project>

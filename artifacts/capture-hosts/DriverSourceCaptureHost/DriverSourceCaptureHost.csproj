@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>DriverApp</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCssItems>false</EnableDefaultCssItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\DriverApp\Components\**\*.razor" LinkBase="Components" />
+    <Compile Include="..\..\..\DriverApp\Models\**\*.cs" LinkBase="Models" />
+    <Compile Include="..\..\..\DriverApp\Services\**\*.cs" LinkBase="Services" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Hongdal.Client.Infrastructure\Hongdal.Client.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="MudBlazor" />
+  </ItemGroup>
+</Project>
