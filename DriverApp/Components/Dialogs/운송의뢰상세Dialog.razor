@@ -41,35 +41,13 @@
                     }
                 </MudStack>
 
-                <div class="driver-route-card-grid">
-                    <section class="driver-route-section driver-route-section--pickup">
-                        <div class="driver-route-section__label">상차</div>
-                        <MudText Typo="Typo.subtitle2">@의뢰.픽업지</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">상차지까지 @((의뢰.픽업거리Km ?? 0m).ToString("0.0"))km</MudText>
-                        <div class="driver-route-meta">
-                            <span>@의뢰.운송조건표시</span>
-                            <span>@의뢰.차량조건표시</span>
-                            <span>@의뢰.상차시간표시</span>
-                        </div>
-                    </section>
-
-                    <section class="driver-route-section driver-route-section--dropoff">
-                        <div class="driver-route-section__label">하차</div>
-                        <MudText Typo="Typo.subtitle2">@의뢰.하차지</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @((의뢰.운송거리Km ?? 0m).ToString("0.0"))km</MudText>
-                        <div class="driver-route-meta">
-                            <span>@의뢰.하차시간표시</span>
-                            <span>@의뢰.인수증표시</span>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="driver-payment-strip">
-                    <span class="driver-payment-strip__label">하차 정산</span>
-                    <span>@의뢰.결제방식</span>
-                    <span>@의뢰.인수증표시</span>
-                    <span>예상비용 @((의뢰.예상총비용 ?? 0m).ToString("0"))원</span>
-                </div>
+                <DriverRoutePaymentSummary PickupTitle="@의뢰.픽업지"
+                                           PickupSubtitle="@PickupDistanceText(의뢰)"
+                                           PickupMeta="@PickupMeta(의뢰)"
+                                           DropoffTitle="@의뢰.하차지"
+                                           DropoffSubtitle="@TransportDistanceText(의뢰)"
+                                           DropoffMeta="@DropoffMeta(의뢰)"
+                                           PaymentItems="@PaymentItems(의뢰)" />
 
                 <MudText Typo="Typo.body2" Color="Color.Secondary">@의뢰.상세설명</MudText>
 
@@ -225,4 +203,19 @@
         "거절" => Severity.Warning,
         _ => Severity.Info
     };
+
+    private static string PickupDistanceText(DriverRequestItem request)
+        => $"상차지까지 {(request.픽업거리Km ?? 0m):0.0}km";
+
+    private static string TransportDistanceText(DriverRequestItem request)
+        => $"운송 {(request.운송거리Km ?? 0m):0.0}km";
+
+    private static IReadOnlyList<string> PickupMeta(DriverRequestItem request)
+        => [request.운송조건표시, request.차량조건표시, request.상차시간표시];
+
+    private static IReadOnlyList<string> DropoffMeta(DriverRequestItem request)
+        => [request.하차시간표시, request.인수증표시];
+
+    private static IReadOnlyList<string> PaymentItems(DriverRequestItem request)
+        => [request.결제방식, request.인수증표시, $"예상비용 {(request.예상총비용 ?? 0m):0}원"];
 }

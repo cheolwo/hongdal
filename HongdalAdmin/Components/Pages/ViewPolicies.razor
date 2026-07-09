@@ -2,35 +2,40 @@
 
 <PageTitle>화면 정책</PageTitle>
 
-<h1>화면 정책</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">화면 정책</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">앱과 백오피스 화면의 노출 및 접근 정책을 관리할 운영 화면입니다.</MudText>
+    </MudStack>
 
-<div class="alert alert-info">
-    빌드 복구를 위해 화면 정책 관리 화면을 기본 운영 화면으로 정리했습니다.
-</div>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        빌드 복구를 위해 화면 정책 관리 화면을 기본 운영 화면으로 정리했습니다.
+    </MudAlert>
 
-<div class="row g-3">
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">앱 화면</h5>
-                <p class="card-text text-muted mb-0">사용자 앱의 화면 노출 정책을 관리할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">관리자 화면</h5>
-                <p class="card-text text-muted mb-0">백오피스 메뉴와 접근 정책을 조정할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">정책 적용</h5>
-                <p class="card-text text-muted mb-0">변경된 화면 정책의 적용 상태를 확인할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-</div>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">앱 화면</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">사용자 앱의 화면 노출 정책을 관리할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">관리자 화면</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">백오피스 메뉴와 접근 정책을 조정할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">정책 적용</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">변경된 화면 정책의 적용 상태를 확인할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>

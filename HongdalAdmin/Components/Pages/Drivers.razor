@@ -3,84 +3,129 @@
 
 <PageTitle>09. 기사 관리</PageTitle>
 
-<h1>09. 기사 관리</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">09. 기사 관리</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">기사 상태, 차량, 활동지역, 최근 배차 내역을 확인합니다.</MudText>
+    </MudStack>
 
-<div class="row g-2 mb-3">
-    <div class="col-md-3"><input class="form-control" @bind="statusFilter" placeholder="운행상태" /></div>
-    <div class="col-md-3"><input class="form-control" @bind="areaFilter" placeholder="활동지역" /></div>
-    <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">조회</button></div>
-</div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="3">
+                <MudTextField Label="운행상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="statusFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="활동지역" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="areaFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Disabled="@isLoading" FullWidth="true" OnClick="LoadAsync">조회</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
 
-@if (isLoading)
-{
-    <p>기사 목록을 불러오는 중입니다...</p>
-}
-else if (!string.IsNullOrWhiteSpace(errorMessage))
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-else
-{
-    <div class="row g-3">
-        <div class="col-lg-7">
-            <table class="table table-striped table-hover">
-                <thead><tr><th>기사</th><th>운행상태</th><th>차량</th><th>활동지역</th><th>배차건수</th></tr></thead>
-                <tbody>
-                    @foreach (var item in drivers)
-                    {
-                        <tr style="cursor:pointer" @onclick="() => SelectDriverAsync(item.기사Id)">
-                            <td>@item.기사명</td>
-                            <td>@item.운행상태</td>
-                            <td>@item.차량</td>
-                            <td>@item.주_활동지역</td>
-                            <td>@item.배차건수</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="col-lg-5">
-            @if (selectedDriver is null)
-            {
-                <p class="text-muted">기사를 선택하면 상세 정보와 배차 내역이 표시됩니다.</p>
-            }
-            else
-            {
-                <div class="card mb-3"><div class="card-body">
-                    <h5 class="card-title">@selectedDriver.기사명</h5>
-                    <div>기사ID: @selectedDriver.기사Id</div>
-                    <div>연락처: @selectedDriver.연락처</div>
-                    <div>차량: @selectedDriver.차량</div>
-                    <div>활동지역: @selectedDriver.주_활동지역</div>
-                    <div>운행상태: @selectedDriver.운행상태</div>
-                    <div>최근 위치: @FormatCoord(selectedDriver.최근위도, selectedDriver.최근경도)</div>
-                    <div>최근 위치 시각: @FormatDateTime(selectedDriver.최근위치기록시각)</div>
-                </div></div>
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">기사 목록을 불러오는 중입니다...</MudAlert>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+    }
+    else
+    {
+        <MudGrid Spacing="3">
+            <MudItem xs="12" lg="7">
+                <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6">기사 목록</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@drivers.Count 건</MudChip>
+                        </MudStack>
 
-                <div class="card"><div class="card-body">
-                    <h6 class="card-title">배차 내역</h6>
-                    @if (dispatches.Count == 0)
-                    {
-                        <p class="mb-0 text-muted">배차 내역이 없습니다.</p>
-                    }
-                    else
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var d in dispatches)
-                            {
-                                <li class="list-group-item px-0">
-                                    <div><strong>@d.배차명</strong> (@d.상태)</div>
-                                    <div class="small text-muted">@d.픽업지 → @d.배송지</div>
-                                    <div class="small text-muted">배차일: @FormatDateTime(d.배차일)</div>
-                                </li>
-                            }
-                        </ul>
-                    }
-                </div></div>
-            }
-        </div>
-    </div>
-}
+                        @if (drivers.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Info" Dense="true">조회된 기사가 없습니다.</MudAlert>
+                        }
+                        else
+                        {
+                            <MudTable Items="@drivers" Dense="true" Hover="true" Elevation="0">
+                                <HeaderContent>
+                                    <MudTh>기사</MudTh>
+                                    <MudTh>운행상태</MudTh>
+                                    <MudTh>차량</MudTh>
+                                    <MudTh>활동지역</MudTh>
+                                    <MudTh>배차건수</MudTh>
+                                    <MudTh></MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="기사">@context.기사명</MudTd>
+                                    <MudTd DataLabel="운행상태">
+                                        <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.운행상태)" Variant="Variant.Filled">@context.운행상태</MudChip>
+                                    </MudTd>
+                                    <MudTd DataLabel="차량">@context.차량</MudTd>
+                                    <MudTd DataLabel="활동지역">@context.주_활동지역</MudTd>
+                                    <MudTd DataLabel="배차건수">@context.배차건수</MudTd>
+                                    <MudTd>
+                                        <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectDriverAsync(context.기사Id))">상세</MudButton>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" lg="5">
+                @if (selectedDriver is null)
+                {
+                    <MudPaper Elevation="1" Class="pa-4">
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">기사를 선택하면 상세 정보와 배차 내역이 표시됩니다.</MudText>
+                    </MudPaper>
+                }
+                else
+                {
+                    <MudStack Spacing="3">
+                        <MudPaper Elevation="1" Class="pa-4">
+                            <MudStack Spacing="2">
+                                <MudText Typo="Typo.h6">@selectedDriver.기사명</MudText>
+                                <AdminInfoField Label="기사ID" Value="@selectedDriver.기사Id" />
+                                <AdminInfoField Label="연락처" Value="@selectedDriver.연락처" />
+                                <AdminInfoField Label="차량" Value="@selectedDriver.차량" />
+                                <AdminInfoField Label="활동지역" Value="@selectedDriver.주_활동지역" />
+                                <AdminInfoField Label="운행상태" Value="@selectedDriver.운행상태" />
+                                <AdminInfoField Label="최근 위치" Value="@FormatCoord(selectedDriver.최근위도, selectedDriver.최근경도)" />
+                                <AdminInfoField Label="최근 위치 시각" Value="@FormatDateTime(selectedDriver.최근위치기록시각)" />
+                            </MudStack>
+                        </MudPaper>
+
+                        <MudPaper Elevation="1" Class="pa-4">
+                            <MudStack Spacing="2">
+                                <MudText Typo="Typo.h6">배차 내역</MudText>
+                                @if (dispatches.Count == 0)
+                                {
+                                    <MudAlert Severity="Severity.Info" Dense="true">배차 내역이 없습니다.</MudAlert>
+                                }
+                                else
+                                {
+                                    @foreach (var item in dispatches)
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                            <MudStack Spacing="0">
+                                                <MudText Typo="Typo.body2">@item.배차명 (@item.상태)</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.픽업지 → @item.배송지</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">배차일: @FormatDateTime(item.배차일)</MudText>
+                                            </MudStack>
+                                        </MudPaper>
+                                    }
+                                }
+                            </MudStack>
+                        </MudPaper>
+                    </MudStack>
+                }
+            </MudItem>
+        </MudGrid>
+    }
+</MudStack>
 
 @code {
     private bool isLoading = true;

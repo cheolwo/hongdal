@@ -249,51 +249,13 @@
                         </MudStack>
                     </MudPaper>
 
-                    <MudPaper Elevation="0" Class="pa-3">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                                <MudStack Spacing="0">
-                                    <MudText Typo="Typo.subtitle1">현장 문제 기록</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">상차 수량 부족, 다른 화물 혼입, 바코드 훼손 같은 예외를 즉시 남깁니다.</MudText>
-                                </MudStack>
-                                <MudButton Variant="Variant.Outlined"
-                                           Color="Color.Warning"
-                                           StartIcon="@Icons.Material.Filled.ReportProblem"
-                                           OnClick="@(() => pickupIssuePanelOpen = !pickupIssuePanelOpen)">
-                                    문제 발생
-                                </MudButton>
-                            </MudStack>
-
-                            @if (pickupIssuePanelOpen)
-                            {
-                                <MudGrid>
-                                    <MudItem xs="12" sm="5">
-                                        <MudSelect T="string" Label="문제 유형" @bind-Value="pickupIssueType" Variant="Variant.Outlined">
-                                            <MudSelectItem Value="@("수량 부족")">수량 부족</MudSelectItem>
-                                            <MudSelectItem Value="@("다른 화물 혼입")">다른 화물 혼입</MudSelectItem>
-                                            <MudSelectItem Value="@("바코드 훼손")">바코드 훼손</MudSelectItem>
-                                            <MudSelectItem Value="@("문서 번호 불일치")">문서 번호 불일치</MudSelectItem>
-                                            <MudSelectItem Value="@("파손 의심")">파손 의심</MudSelectItem>
-                                        </MudSelect>
-                                    </MudItem>
-                                    <MudItem xs="12" sm="7">
-                                        <MudTextField @bind-Value="pickupIssueMemo"
-                                                      Label="현장 메모"
-                                                      Variant="Variant.Outlined"
-                                                      MaxLength="300"
-                                                      Immediate="true" />
-                                    </MudItem>
-                                </MudGrid>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Warning"
-                                           StartIcon="@Icons.Material.Filled.Save"
-                                           Disabled="@isIssueReporting"
-                                           OnClick="RecordPickupIssueAsync">
-                                    @(isIssueReporting ? "문제 신고 중" : "문제 기록")
-                                </MudButton>
-                            }
-                        </MudStack>
-                    </MudPaper>
+                    <DriverTransportIssuePanel Description="상차 수량 부족, 다른 화물 혼입, 바코드 훼손 같은 예외를 즉시 남깁니다."
+                                               IssueTypes="PickupIssueTypes"
+                                               @bind-Open="pickupIssuePanelOpen"
+                                               @bind-IssueType="pickupIssueType"
+                                               @bind-Memo="pickupIssueMemo"
+                                               IsReporting="@isIssueReporting"
+                                               OnSubmit="RecordPickupIssueAsync" />
 
                     @if (ReceiptEvidenceRequired)
                     {
@@ -369,55 +331,25 @@
                         </MudPaper>
                     }
 
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.subtitle1">상차 완료 사진</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">화물과 차량 적재 상태가 보이도록 촬영합니다. 사진 확인 후 완료 처리가 가능합니다.</MudText>
-
-                        @if (!string.IsNullOrWhiteSpace(photoPreviewUrl))
-                        {
-                            <img src="@photoPreviewUrl"
-                                 alt="상차 완료 사진 미리보기"
-                                 style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px;" />
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @photoFileName</MudText>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(statusMessage))
-                        {
-                            <MudAlert Severity="@statusSeverity" Dense="true">@statusMessage</MudAlert>
-                        }
-
-                        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.PhotoCamera"
-                                       Disabled="@isCapturing"
-                                       OnClick="CaptureCompletionPhotoAsync">
-                                @(HasPhoto ? "상차 사진 다시 촬영" : "상차 완료 사진 촬영")
-                            </MudButton>
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Success"
-                                       StartIcon="@Icons.Material.Filled.CheckCircle"
-                                       Disabled="@(!CanComplete || isCompleting)"
-                                       OnClick="CompletePickupAsync">
-                                @(isCompleting ? "상차 완료 처리 중" : "상차 완료")
-                            </MudButton>
-                            @if (HasPhoto)
-                            {
-                                <MudButton Variant="Variant.Outlined"
-                                           Color="Color.Secondary"
-                                           StartIcon="@Icons.Material.Filled.Delete"
-                                           Disabled="@isCompleting"
-                                           OnClick="ClearPhoto">
-                                    사진 제거
-                                </MudButton>
-                            }
-                        </MudStack>
-
-                        @if (!CanComplete)
-                        {
-                            <MudAlert Severity="Severity.Info" Dense="true">@CompletionGuide</MudAlert>
-                        }
-                    </MudStack>
+                    <DriverTransportProofPanel Title="상차 완료 사진"
+                                               Description="화물과 차량 적재 상태가 보이도록 촬영합니다. 사진 확인 후 완료 처리가 가능합니다."
+                                               PreviewUrl="@photoPreviewUrl"
+                                               PreviewAlt="상차 완료 사진 미리보기"
+                                               FileName="@photoFileName"
+                                               StatusMessage="@statusMessage"
+                                               StatusSeverity="@statusSeverity"
+                                               HasPhoto="@HasPhoto"
+                                               IsCapturing="@isCapturing"
+                                               CanComplete="@CanComplete"
+                                               IsCompleting="@isCompleting"
+                                               CompletionGuide="@CompletionGuide"
+                                               CaptureButtonText="상차 완료 사진 촬영"
+                                               RetakeButtonText="상차 사진 다시 촬영"
+                                               CompleteButtonText="상차 완료"
+                                               CompletingText="상차 완료 처리 중"
+                                               OnCapture="CaptureCompletionPhotoAsync"
+                                               OnComplete="CompletePickupAsync"
+                                               OnClear="ClearPhoto" />
                 }
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/transports/current">진행 중 운송으로</MudButton>
             </MudStack>
@@ -430,6 +362,15 @@
     public long 운송Id { get; set; }
 
     private 기사운송샘플항목? 운송 => Samples.운송조회(운송Id);
+
+    private static readonly string[] PickupIssueTypes =
+    [
+        "수량 부족",
+        "다른 화물 혼입",
+        "바코드 훼손",
+        "문서 번호 불일치",
+        "파손 의심"
+    ];
 
     private bool isCapturing;
     private string? photoFileName;

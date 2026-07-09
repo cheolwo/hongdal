@@ -1,0 +1,50 @@
+<MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Class="mb-3" Style="flex-wrap: wrap;">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">@Title</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">@Subtitle</MudText>
+    </MudStack>
+    <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+        @if (!string.IsNullOrWhiteSpace(BackButtonText))
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.ArrowBack"
+                       OnClick="BackAsync">
+                @BackButtonText
+            </MudButton>
+        }
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   Disabled="@IsLoading"
+                   OnClick="RefreshAsync">
+            새로고침
+        </MudButton>
+    </MudStack>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? BackButtonText { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public EventCallback OnBack { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    private Task BackAsync()
+        => OnBack.InvokeAsync();
+
+    private Task RefreshAsync()
+        => OnRefresh.InvokeAsync();
+}

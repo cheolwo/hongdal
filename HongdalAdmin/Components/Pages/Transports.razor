@@ -3,130 +3,174 @@
 
 <PageTitle>06. 운송 진행</PageTitle>
 
-<h1>06. 운송 진행</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">06. 운송 진행</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">관리자 확인이 필요한 운송 예외와 이벤트 흐름을 확인합니다.</MudText>
+    </MudStack>
 
-<div class="row g-2 mb-3 align-items-center">
-    <div class="col-md-3"><input class="form-control" @bind="statusFilter" placeholder="운송상태" /></div>
-    <div class="col-md-3"><input class="form-control" @bind="eventRequestFilter" placeholder="이벤트 의뢰ID" /></div>
-    <div class="col-md-3">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="adminReviewOnly" @bind="관리자확인만" />
-            <label class="form-check-label" for="adminReviewOnly">관리자 확인 필요만 보기</label>
-        </div>
-    </div>
-    <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync">조회</button></div>
-</div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="3">
+                <MudTextField Label="운송상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="statusFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="이벤트 의뢰ID" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="eventRequestFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudCheckBox T="bool" @bind-Value="관리자확인만" Label="관리자 확인 필요만 보기" Color="Color.Primary" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" FullWidth="true" OnClick="LoadAsync">조회</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
 
-<div class="row g-3 mb-3">
-    <div class="col-sm-6 col-xl-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">전체 운송</div>
-                <div class="fs-3 fw-bold">@transports.Count</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">관리자 확인 필요</div>
-                <div class="fs-3 fw-bold text-danger">@transports.Count(x => x.관리자확인필요)</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">예외 신고</div>
-                <div class="fs-3 fw-bold text-warning">@transports.Count(x => x.예외신고됨)</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="text-muted small">지연 확인</div>
-                <div class="fs-3 fw-bold text-danger">@transports.Count(IsStale)</div>
-            </div>
-        </div>
-    </div>
-</div>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" xl="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">전체 운송</MudText>
+                <MudText Typo="Typo.h4">@transports.Count</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" xl="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">관리자 확인 필요</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Error">@transports.Count(x => x.관리자확인필요)</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" xl="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">예외 신고</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Warning">@transports.Count(x => x.예외신고됨)</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" xl="3">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">지연 확인</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Error">@transports.Count(IsStale)</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-<div class="row g-3">
-    <div class="col-lg-7">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="mb-0">운송 운영 레인</h5>
-            <span class="badge rounded-pill text-bg-primary">@운영확인대상.Count 건</span>
-        </div>
-        @if (운영확인대상.Count == 0)
-        {
-            <div class="alert alert-success">현재 관리자 확인이 필요한 운송 예외가 없습니다.</div>
-        }
-        else
-        {
-            <div class="table-responsive mb-3">
-                <table class="table table-sm align-middle">
-                    <thead><tr><th>운송</th><th>운영상태</th><th>예외 내용</th><th>갱신</th><th>관제</th></tr></thead>
-                    <tbody>
-                    @foreach (var item in 운영확인대상)
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="7">
+            <MudStack Spacing="3">
+                <MudPaper Elevation="1" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6">운송 운영 레인</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@운영확인대상.Count 건</MudChip>
+                        </MudStack>
+
+                        @if (운영확인대상.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Success" Dense="true">현재 관리자 확인이 필요한 운송 예외가 없습니다.</MudAlert>
+                        }
+                        else
+                        {
+                            <MudTable Items="@운영확인대상" Dense="true" Hover="true" Elevation="0">
+                                <HeaderContent>
+                                    <MudTh>운송</MudTh>
+                                    <MudTh>운영상태</MudTh>
+                                    <MudTh>예외 내용</MudTh>
+                                    <MudTh>갱신</MudTh>
+                                    <MudTh>관제</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="운송">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.body2">@context.운송번호</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@context.기사_운송자</MudText>
+                                        </MudStack>
+                                    </MudTd>
+                                    <MudTd DataLabel="운영상태">
+                                        <MudChip T="string" Size="Size.Small" Color="@TransportColor(context)" Variant="Variant.Filled">@TransportBadgeText(context)</MudChip>
+                                    </MudTd>
+                                    <MudTd DataLabel="예외 내용">@ExceptionSummary(context)</MudTd>
+                                    <MudTd DataLabel="갱신">@context.UpdatedAt.ToLocalTime().ToString("MM-dd HH:mm")</MudTd>
+                                    <MudTd DataLabel="관제">
+                                        <MudButton Href="@WorkflowDetailHref(context.운송번호)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">상세</MudButton>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
+                    </MudStack>
+                </MudPaper>
+
+                <MudPaper Elevation="1" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6">운송 목록</MudText>
+                        @if (표시운송목록.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Info" Dense="true">조회된 운송이 없습니다.</MudAlert>
+                        }
+                        else
+                        {
+                            <MudTable Items="@표시운송목록" Dense="true" Hover="true" Elevation="0">
+                                <HeaderContent>
+                                    <MudTh>번호</MudTh>
+                                    <MudTh>상태</MudTh>
+                                    <MudTh>기사</MudTh>
+                                    <MudTh>구간</MudTh>
+                                    <MudTh>운임</MudTh>
+                                    <MudTh>예외</MudTh>
+                                    <MudTh>관제</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="번호">@context.운송번호</MudTd>
+                                    <MudTd DataLabel="상태">
+                                        <MudChip T="string" Size="Size.Small" Color="@TransportColor(context)" Variant="Variant.Filled">@context.상태</MudChip>
+                                    </MudTd>
+                                    <MudTd DataLabel="기사">@context.기사_운송자</MudTd>
+                                    <MudTd DataLabel="구간">@context.출발지 → @context.도착지</MudTd>
+                                    <MudTd DataLabel="운임">@(context.운임?.ToString("N0") ?? "-")</MudTd>
+                                    <MudTd DataLabel="예외">@ExceptionSummary(context)</MudTd>
+                                    <MudTd DataLabel="관제">
+                                        <MudButton Href="@WorkflowDetailHref(context.운송번호)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">상세</MudButton>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudStack>
+        </MudItem>
+
+        <MudItem xs="12" lg="5">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">이벤트 로그</MudText>
+                    @if (events.Count == 0)
                     {
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">@item.운송번호</div>
-                                <div class="text-muted small">@item.기사_운송자</div>
-                            </td>
-                            <td><span class="@TransportBadgeClass(item)">@TransportBadgeText(item)</span></td>
-                            <td class="small">@ExceptionSummary(item)</td>
-                            <td class="small">@item.UpdatedAt.ToLocalTime().ToString("MM-dd HH:mm")</td>
-                            <td><a class="btn btn-sm btn-outline-primary" href="@WorkflowDetailHref(item.운송번호)">상세</a></td>
-                        </tr>
+                        <MudAlert Severity="Severity.Info" Dense="true">조회된 이벤트가 없습니다.</MudAlert>
                     }
-                    </tbody>
-                </table>
-            </div>
-        }
-
-        <h5>운송 목록</h5>
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead><tr><th>번호</th><th>상태</th><th>기사</th><th>구간</th><th>운임</th><th>예외</th><th>관제</th></tr></thead>
-                <tbody>
-                @foreach (var item in 표시운송목록)
-                {
-                    <tr>
-                        <td>@item.운송번호</td>
-                        <td><span class="@TransportBadgeClass(item)">@item.상태</span></td>
-                        <td>@item.기사_운송자</td>
-                    <td class="small">@item.출발지 → @item.도착지</td>
-                    <td>@(item.운임?.ToString("N0") ?? "-")</td>
-                    <td class="small">@ExceptionSummary(item)</td>
-                    <td><a class="btn btn-sm btn-outline-primary" href="@WorkflowDetailHref(item.운송번호)">상세</a></td>
-                </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-lg-5">
-        <h5>이벤트 로그</h5>
-        <div class="table-responsive">
-            <table class="table table-sm table-striped align-middle">
-                <thead><tr><th>의뢰ID</th><th>이벤트</th><th>시각</th><th>메타</th></tr></thead>
-                <tbody>
-                @foreach (var item in events)
-                {
-                    <tr>
-                        <td>@item.의뢰Id</td>
-                        <td>@item.이벤트타입</td>
-                        <td>@item.이벤트시각.ToLocalTime().ToString("MM-dd HH:mm")</td>
-                        <td class="small text-truncate" style="max-width: 240px;" title="@item.메타데이터">@ShortMetadata(item.메타데이터)</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    else
+                    {
+                        <MudTable Items="@events" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>의뢰ID</MudTh>
+                                <MudTh>이벤트</MudTh>
+                                <MudTh>시각</MudTh>
+                                <MudTh>메타</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="의뢰ID">@context.의뢰Id</MudTd>
+                                <MudTd DataLabel="이벤트">@context.이벤트타입</MudTd>
+                                <MudTd DataLabel="시각">@context.이벤트시각.ToLocalTime().ToString("MM-dd HH:mm")</MudTd>
+                                <MudTd DataLabel="메타">
+                                    <MudTooltip Text="@관리자화면Ui.표시값(context.메타데이터)">
+                                        <MudText Typo="Typo.body2">@ShortMetadata(context.메타데이터)</MudText>
+                                    </MudTooltip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
 
 @code {
     private string? statusFilter;
@@ -154,16 +198,16 @@
         events = await DataService.운송이벤트조회Async(eventRequestFilter);
     }
 
-    private static string TransportBadgeClass(운송진행응답 item)
-        => item.관리자확인필요 ? "badge rounded-pill text-bg-danger"
-            : item.예외신고됨 ? "badge rounded-pill text-bg-warning"
-            : IsStale(item) ? "badge rounded-pill text-bg-danger"
+    private static Color TransportColor(운송진행응답 item)
+        => item.관리자확인필요 ? Color.Error
+            : item.예외신고됨 ? Color.Warning
+            : IsStale(item) ? Color.Error
             : item.상태 switch
             {
-                "운송중" => "badge rounded-pill text-bg-primary",
-                "인수완료" or "완료" => "badge rounded-pill text-bg-success",
-                "배차확정" => "badge rounded-pill text-bg-info",
-                _ => "badge rounded-pill text-bg-secondary"
+                "운송중" => Color.Primary,
+                "인수완료" or "완료" => Color.Success,
+                "배차확정" => Color.Info,
+                _ => Color.Default
             };
 
     private static string TransportBadgeText(운송진행응답 item)

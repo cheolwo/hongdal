@@ -1,29 +1,42 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @implements IDisposable
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Routing
 
-<div class="page">
-    <div class="sidebar">
+<MudLayout>
+    <MudAppBar Dense="true" Fixed="false" Elevation="0" Color="Color.Default">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" Disabled="@(!CanGoBack)" OnClick="GoBack" StartIcon="@Icons.Material.Filled.ArrowBack">뒤로가기</MudButton>
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.subtitle1">HongdalAdmin</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">운영자 백오피스</MudText>
+        </MudStack>
+        <MudSpacer />
+        <MudButton Href="https://learn.microsoft.com/aspnet/core/"
+                   Target="_blank"
+                   Variant="Variant.Text"
+                   Color="Color.Inherit"
+                   EndIcon="@Icons.Material.Filled.OpenInNew">
+            About
+        </MudButton>
+    </MudAppBar>
+
+    <MudDrawer Open="@_drawerOpen" Variant="DrawerVariant.Persistent" Elevation="1" ClipMode="DrawerClipMode.Always">
         <NavMenu />
-    </div>
+    </MudDrawer>
 
-    <main>
-        <div class="top-row px-4">
-            <button class="btn btn-link p-0 me-3 back-nav-button" disabled="@(!CanGoBack)" @onclick="GoBack" type="button">← 뒤로가기</button>
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="pa-4">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
 @code {
     private readonly Stack<string> _navigationHistory = new();
     private string? _currentUri;
     private bool _isNavigatingBack;
+    private bool _drawerOpen = true;
 
     private bool CanGoBack => _navigationHistory.Count > 0;
 
@@ -31,6 +44,11 @@
     {
         NavigationManager.LocationChanged += HandleLocationChanged;
         _currentUri = NavigationManager.Uri;
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
     }
 
     private void GoBack()
@@ -73,5 +91,5 @@
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+    <span class="dismiss">x</span>
 </div>

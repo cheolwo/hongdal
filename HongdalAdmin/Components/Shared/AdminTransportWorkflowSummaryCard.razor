@@ -1,0 +1,39 @@
+<MudPaper Elevation="1" Class="pa-4 mb-3">
+    <MudStack Spacing="2">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰ID</MudText>
+                <MudText Typo="@HeadingTypo">@Detail.의뢰Id</MudText>
+                <MudText Typo="Typo.body1">@Detail.경로표시</MudText>
+                @if (ShowTransportMeta)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Detail.운송방식 · 화주 @관리자화면Ui.표시값(Detail.화주Id)</MudText>
+                }
+            </MudStack>
+            <MudChip T="string" Color="@AdminMudUi.색상(Detail.현재상태색상)" Variant="Variant.Filled">
+                @Detail.현재상태라벨
+            </MudChip>
+        </MudStack>
+        @if (ShowNextAction)
+        {
+            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                <MudText Typo="Typo.subtitle2">관리자 다음 행동</MudText>
+                <MudText Typo="Typo.body2">@Detail.관리자다음행동</MudText>
+            </MudAlert>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 운송워크플로우관제상세응답 Detail { get; set; } = default!;
+
+    [Parameter]
+    public bool ShowTransportMeta { get; set; }
+
+    [Parameter]
+    public bool ShowNextAction { get; set; }
+
+    [Parameter]
+    public Typo HeadingTypo { get; set; } = Typo.h5;
+}

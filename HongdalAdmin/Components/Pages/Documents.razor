@@ -6,85 +6,92 @@
 
 <PageTitle>문서 목록</PageTitle>
 
-<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-    <div>
-        <h1 class="mb-1">문서 목록</h1>
-        <div class="text-muted">생성된 문서 원장을 조회합니다.</div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-primary" href="@관리자문서Routes.업로드">문서 업로드</a>
-        <a class="btn btn-outline-primary" href="@관리자문서Routes.정책목록">문서 정책</a>
-        <a class="btn btn-outline-secondary" href="@관리자문서Routes.로그목록">조회 로그</a>
-        <button class="btn btn-outline-secondary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
-    </div>
-</div>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">문서 목록</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">생성된 문서 원장을 조회합니다.</MudText>
+        </MudStack>
+        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+            <MudButton Href="@관리자문서Routes.업로드" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload">문서 업로드</MudButton>
+            <MudButton Href="@관리자문서Routes.정책목록" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Policy">문서 정책</MudButton>
+            <MudButton Href="@관리자문서Routes.로그목록" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.History">조회 로그</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isLoading" OnClick="LoadAsync">새로고침</MudButton>
+        </MudStack>
+    </MudStack>
 
-<div class="row g-2 mb-3">
-    <div class="col-md-3">
-        <input class="form-control" @bind="documentCodeFilter" placeholder="문서코드" />
-    </div>
-    <div class="col-md-3">
-        <input class="form-control" @bind="requestIdFilter" placeholder="의뢰Id" />
-    </div>
-    <div class="col-md-3">
-        <input class="form-control" @bind="statusFilter" placeholder="생성상태" />
-    </div>
-    <div class="col-md-3">
-        <button class="btn btn-primary w-100" @onclick="LoadAsync" disabled="@isLoading">조회</button>
-    </div>
-</div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="3">
+                <MudTextField Label="문서코드" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="documentCodeFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="의뢰Id" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="requestIdFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="생성상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="statusFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Disabled="@isLoading" FullWidth="true" OnClick="LoadAsync">조회</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
 
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
-}
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@MessageSeverity">@message</MudAlert>
+    }
 
-@if (isLoading)
-{
-    <div class="alert alert-info">문서 목록을 불러오는 중입니다...</div>
-}
-else
-{
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="card-title mb-0">문서 목록</h5>
-                <span class="badge rounded-pill text-bg-primary">@documents.Count 건</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>시각</th>
-                            <th>문서</th>
-                            <th>의뢰</th>
-                            <th>파일명</th>
-                            <th>상태</th>
-                            <th>암호화</th>
-                            <th>다운로드</th>
-                            <th>로그</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in documents)
-                        {
-                            <tr>
-                                <td>@item.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@item.문서명</td>
-                                <td>@item.의뢰Id</td>
-                                <td>@item.파일명</td>
-                                <td><span class="@관리자화면Ui.상태Badge(item.생성상태)">@item.생성상태</span></td>
-                                <td>@(item.암호화됨 ? "예" : "아니오")</td>
-                                <td>@(item.다운로드허용여부 ? "허용" : "차단")</td>
-                                <td><a class="btn btn-sm btn-outline-secondary" href="@DocumentLogHref(item.Id)">보기</a></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-}
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">문서 목록을 불러오는 중입니다...</MudAlert>
+    }
+    else
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h6">문서 목록</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@documents.Count 건</MudChip>
+                </MudStack>
+
+                @if (documents.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info" Dense="true">조회된 문서가 없습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="@documents" Dense="true" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>시각</MudTh>
+                            <MudTh>문서</MudTh>
+                            <MudTh>의뢰</MudTh>
+                            <MudTh>파일명</MudTh>
+                            <MudTh>상태</MudTh>
+                            <MudTh>암호화</MudTh>
+                            <MudTh>다운로드</MudTh>
+                            <MudTh>로그</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="시각">@context.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+                            <MudTd DataLabel="문서">@context.문서명</MudTd>
+                            <MudTd DataLabel="의뢰">@context.의뢰Id</MudTd>
+                            <MudTd DataLabel="파일명">@context.파일명</MudTd>
+                            <MudTd DataLabel="상태">
+                                <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.생성상태)" Variant="Variant.Filled">@context.생성상태</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="암호화">@(context.암호화됨 ? "예" : "아니오")</MudTd>
+                            <MudTd DataLabel="다운로드">@(context.다운로드허용여부 ? "허용" : "차단")</MudTd>
+                            <MudTd DataLabel="로그">
+                                <MudButton Href="@DocumentLogHref(context.Id)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">보기</MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
 
 @code {
     private bool isLoading = true;
@@ -94,6 +101,7 @@ else
     private string? requestIdFilter;
     private string? statusFilter;
     private IReadOnlyList<문서조회요약응답> documents = [];
+    private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
 
     protected override async Task OnInitializedAsync()
     {

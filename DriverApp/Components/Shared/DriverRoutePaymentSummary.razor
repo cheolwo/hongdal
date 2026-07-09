@@ -1,0 +1,101 @@
+<MudStack Spacing="2">
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="6">
+            <MudPaper Outlined="true" Class="pa-3 h-100">
+                <MudStack Spacing="1">
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Color="Color.Primary"
+                             Variant="Variant.Filled"
+                             Icon="@Icons.Material.Filled.Upload">
+                        @PickupLabel
+                    </MudChip>
+                    <MudText Typo="Typo.subtitle2">@PickupTitle</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@PickupSubtitle</MudText>
+                    @if (NonEmpty(PickupMeta).Any())
+                    {
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            @foreach (var meta in NonEmpty(PickupMeta))
+                            {
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@meta</MudChip>
+                            }
+                        </MudStack>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudPaper Outlined="true" Class="pa-3 h-100">
+                <MudStack Spacing="1">
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Color="Color.Success"
+                             Variant="Variant.Filled"
+                             Icon="@Icons.Material.Filled.Download">
+                        @DropoffLabel
+                    </MudChip>
+                    <MudText Typo="Typo.subtitle2">@DropoffTitle</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@DropoffSubtitle</MudText>
+                    @if (NonEmpty(DropoffMeta).Any())
+                    {
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            @foreach (var meta in NonEmpty(DropoffMeta))
+                            {
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@meta</MudChip>
+                            }
+                        </MudStack>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @if (NonEmpty(PaymentItems).Any())
+    {
+        <MudPaper Outlined="true" Class="pa-3">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@PaymentLabel</MudChip>
+                @foreach (var item in NonEmpty(PaymentItems))
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item</MudChip>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public string PickupLabel { get; set; } = "상차";
+
+    [Parameter]
+    public string PickupTitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string PickupSubtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public IReadOnlyList<string> PickupMeta { get; set; } = [];
+
+    [Parameter]
+    public string DropoffLabel { get; set; } = "하차";
+
+    [Parameter]
+    public string DropoffTitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string DropoffSubtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public IReadOnlyList<string> DropoffMeta { get; set; } = [];
+
+    [Parameter]
+    public string PaymentLabel { get; set; } = "하차 정산";
+
+    [Parameter]
+    public IReadOnlyList<string> PaymentItems { get; set; } = [];
+
+    private static IReadOnlyList<string> NonEmpty(IReadOnlyList<string>? values)
+        => values?.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray() ?? [];
+}

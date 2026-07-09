@@ -26,25 +26,12 @@
                                 <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@item.현재단계</MudChip>
                             </MudStack>
 
-                            <div class="driver-route-card-grid">
-                                <section class="driver-route-section driver-route-section--pickup">
-                                    <div class="driver-route-section__label">상차</div>
-                                    <MudText Typo="Typo.subtitle2">@item.픽업지</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">예정 @item.예정시각.ToString("MM-dd HH:mm")</MudText>
-                                </section>
-
-                                <section class="driver-route-section driver-route-section--dropoff">
-                                    <div class="driver-route-section__label">하차</div>
-                                    <MudText Typo="Typo.subtitle2">@item.하차지</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @item.운송거리Km.ToString("0.0")km</MudText>
-                                </section>
-                            </div>
-
-                            <div class="driver-payment-strip">
-                                <span class="driver-payment-strip__label">수익</span>
-                                <span>@item.예상수익.ToString("N0")원</span>
-                                <span>다음 처리 @item.다음행동</span>
-                            </div>
+                            <DriverRoutePaymentSummary PickupTitle="@item.픽업지"
+                                                       PickupSubtitle="@PickupScheduleText(item)"
+                                                       DropoffTitle="@item.하차지"
+                                                       DropoffSubtitle="@TransportDistanceText(item)"
+                                                       PaymentLabel="수익"
+                                                       PaymentItems="@HistoryPaymentItems(item)" />
                         </MudStack>
                     </MudPaper>
                 </MudItem>
@@ -54,3 +41,14 @@
         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Menu">사용자 메뉴로</MudButton>
     </MudStack>
 </MudContainer>
+
+@code {
+    private static string PickupScheduleText(기사운송샘플항목 item)
+        => $"예정 {item.예정시각:MM-dd HH:mm}";
+
+    private static string TransportDistanceText(기사운송샘플항목 item)
+        => $"운송 {item.운송거리Km:0.0}km";
+
+    private static IReadOnlyList<string> HistoryPaymentItems(기사운송샘플항목 item)
+        => [$"{item.예상수익:N0}원", $"다음 처리 {item.다음행동}"];
+}

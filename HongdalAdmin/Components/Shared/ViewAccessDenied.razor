@@ -1,10 +1,17 @@
 <PageTitle>접근 제한</PageTitle>
 
-<div class="alert alert-warning">
-    <h4>숨겨진 화면입니다.</h4>
-    <p>"@ViewName" 화면은 현재 사용자 설정 또는 관리자 정책에 따라 표시되지 않습니다.</p>
-    <a class="btn btn-primary" href="/view-policies">화면 정책으로 이동</a>
-</div>
+<MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.h6">숨겨진 화면입니다.</MudText>
+        <MudText Typo="Typo.body2">"@ViewName" 화면은 현재 사용자 설정 또는 관리자 정책에 따라 표시되지 않습니다.</MudText>
+        <MudButton Href="/view-policies"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Tune">
+            화면 정책으로 이동
+        </MudButton>
+    </MudStack>
+</MudAlert>
 
 @code {
     [Parameter, EditorRequired] public string ViewName { get; set; } = string.Empty;

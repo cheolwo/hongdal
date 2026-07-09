@@ -3,36 +3,96 @@
 
 <PageTitle>11. 업체/화주 관리</PageTitle>
 
-<h1>11. 업체/화주 관리</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">11. 업체/화주 관리</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">업체 상태와 화주 계정을 함께 확인합니다.</MudText>
+    </MudStack>
 
-<div class="row g-2 mb-3"><div class="col-md-3"><input class="form-control" @bind="statusFilter" placeholder="업체 상태" /></div><div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync">조회</button></div></div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="3">
+                <MudTextField Label="업체 상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="statusFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" FullWidth="true" OnClick="LoadAsync">조회</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
 
-<div class="row g-3">
-    <div class="col-lg-6">
-        <h5>업체 목록</h5>
-        <table class="table table-striped"><thead><tr><th>업체명</th><th>상태</th><th>연락처</th><th>담당자</th></tr></thead><tbody>
-        @foreach (var item in companies)
-        {
-            <tr><td>@item.업체명</td><td>@item.상태</td><td>@item.대표연락처</td><td>@item.담당자</td></tr>
-        }
-        </tbody></table>
-    </div>
-    <div class="col-lg-6">
-        <h5>화주 계정</h5>
-        <table class="table table-striped"><thead><tr><th>사용자명</th><th>이메일</th><th>연락처</th><th>의뢰건수</th><th>상태</th></tr></thead><tbody>
-        @foreach (var item in shippers)
-        {
-            <tr><td>@item.사용자명</td><td>@item.이메일</td><td>@item.연락처</td><td>@item.의뢰건수</td><td>@item.거래상태</td></tr>
-        }
-        </tbody></table>
-    </div>
-</div>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="6">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">업체 목록</MudText>
+                    @if (companies.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Dense="true">조회된 업체가 없습니다.</MudAlert>
+                    }
+                    else
+                    {
+                        <MudTable Items="@companies" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>업체명</MudTh>
+                                <MudTh>상태</MudTh>
+                                <MudTh>연락처</MudTh>
+                                <MudTh>담당자</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="업체명">@context.업체명</MudTd>
+                                <MudTd DataLabel="상태">
+                                    <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.상태)" Variant="Variant.Filled">@context.상태</MudChip>
+                                </MudTd>
+                                <MudTd DataLabel="연락처">@context.대표연락처</MudTd>
+                                <MudTd DataLabel="담당자">@context.담당자</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">화주 계정</MudText>
+                    @if (shippers.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Dense="true">조회된 화주 계정이 없습니다.</MudAlert>
+                    }
+                    else
+                    {
+                        <MudTable Items="@shippers" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>사용자명</MudTh>
+                                <MudTh>이메일</MudTh>
+                                <MudTh>연락처</MudTh>
+                                <MudTh>의뢰건수</MudTh>
+                                <MudTh>상태</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="사용자명">@context.사용자명</MudTd>
+                                <MudTd DataLabel="이메일">@context.이메일</MudTd>
+                                <MudTd DataLabel="연락처">@context.연락처</MudTd>
+                                <MudTd DataLabel="의뢰건수">@context.의뢰건수</MudTd>
+                                <MudTd DataLabel="상태">
+                                    <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.거래상태)" Variant="Variant.Filled">@context.거래상태</MudChip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
 
 @code {
     private string? statusFilter;
     private IReadOnlyList<업체관리응답> companies = [];
     private IReadOnlyList<화주관리응답> shippers = [];
+
     protected override async Task OnInitializedAsync() => await LoadAsync();
+
     private async Task LoadAsync()
     {
         companies = await DataService.업체목록조회Async(statusFilter);

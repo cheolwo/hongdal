@@ -1,12 +1,4 @@
-<PageTitle>접근 제한</PageTitle>
-
-<MudPaper Class="pa-4">
-    <MudStack Spacing="2">
-        <MudText Typo="Typo.h5">숨겨진 화면입니다.</MudText>
-        <MudText Typo="Typo.body2" Color="Color.Secondary">"@ViewName" 화면은 현재 사용자 설정 또는 관리자 정책에 따라 표시되지 않습니다.</MudText>
-        <MudButton Href="shipper/settings/views" Variant="Variant.Filled" Color="Color.Primary">화면 설정으로 이동</MudButton>
-    </MudStack>
-</MudPaper>
+<HongdalHiddenViewNotice ViewName="@ViewName" SettingsHref="/shipper/settings/views" />
 
 @code {
     [Parameter, EditorRequired] public string ViewName { get; set; } = string.Empty;

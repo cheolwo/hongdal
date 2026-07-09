@@ -6,69 +6,77 @@
 
 <PageTitle>문서 업로드</PageTitle>
 
-<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-    <div>
-        <h1 class="mb-1">문서 업로드</h1>
-        <div class="text-muted">문서 파일을 선택하고 원장에 등록합니다.</div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-secondary" href="@관리자문서Routes.목록">문서 목록</a>
-        <a class="btn btn-outline-primary" href="@관리자문서Routes.정책목록">문서 정책</a>
-    </div>
-</div>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">문서 업로드</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">문서 파일을 선택하고 원장에 등록합니다.</MudText>
+        </MudStack>
+        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+            <MudButton Href="@관리자문서Routes.목록" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.List">문서 목록</MudButton>
+            <MudButton Href="@관리자문서Routes.정책목록" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Policy">문서 정책</MudButton>
+        </MudStack>
+    </MudStack>
 
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
-}
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@MessageSeverity">@message</MudAlert>
+    }
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">업로드 정보</h5>
-        <div class="row g-2">
-            <div class="col-md-3">
-                <label class="form-label">문서코드</label>
-                <input class="form-control" @bind="uploadDocumentCode" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">의뢰Id</label>
-                <input class="form-control" @bind="uploadRequestId" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">문서명</label>
-                <input class="form-control" @bind="uploadDocumentName" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">파일</label>
-                <InputFile OnChange="OnFileSelected" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">배송운송Id</label>
-                <input class="form-control" @bind="uploadTransportIdText" placeholder="선택" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">암호화</label>
-                <select class="form-select" @bind="uploadEncryptText">
-                    <option value="">정책 따름</option>
-                    <option value="true">암호화</option>
-                    <option value="false">비암호화</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">다운로드</label>
-                <select class="form-select" @bind="uploadDownloadText">
-                    <option value="">정책 따름</option>
-                    <option value="true">허용</option>
-                    <option value="false">차단</option>
-                </select>
-            </div>
-        </div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">업로드 정보</MudText>
+            <MudGrid Spacing="2">
+                <MudItem xs="12" md="3">
+                    <MudTextField Label="문서코드" Variant="Variant.Outlined" @bind-Value="uploadDocumentCode" />
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudTextField Label="의뢰Id" Variant="Variant.Outlined" @bind-Value="uploadRequestId" />
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudTextField Label="문서명" Variant="Variant.Outlined" @bind-Value="uploadDocumentName" />
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3" Style="height: 100%;">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">파일</MudText>
+                        <InputFile OnChange="OnFileSelected" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudTextField Label="배송운송Id" Placeholder="선택" Variant="Variant.Outlined" @bind-Value="uploadTransportIdText" />
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string" Label="암호화" Variant="Variant.Outlined" @bind-Value="uploadEncryptText">
+                        <MudSelectItem T="string" Value="@EmptyValue">정책 따름</MudSelectItem>
+                        <MudSelectItem T="string" Value="@TrueValue">암호화</MudSelectItem>
+                        <MudSelectItem T="string" Value="@FalseValue">비암호화</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string" Label="다운로드" Variant="Variant.Outlined" @bind-Value="uploadDownloadText">
+                        <MudSelectItem T="string" Value="@EmptyValue">정책 따름</MudSelectItem>
+                        <MudSelectItem T="string" Value="@TrueValue">허용</MudSelectItem>
+                        <MudSelectItem T="string" Value="@FalseValue">차단</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
 
-        <button class="btn btn-primary mt-3" @onclick="UploadAsync" disabled="@isUploading">업로드</button>
-    </div>
-</div>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Upload"
+                       Disabled="@isUploading"
+                       OnClick="UploadAsync">
+                업로드
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+</MudStack>
 
 @code {
+    private const string EmptyValue = "";
+    private const string TrueValue = "true";
+    private const string FalseValue = "false";
+
     private bool isUploading;
     private bool isError;
     private string? message;
@@ -80,6 +88,7 @@
     private string uploadTransportIdText = string.Empty;
     private string uploadEncryptText = string.Empty;
     private string uploadDownloadText = string.Empty;
+    private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
 
     protected override void OnInitialized()
     {

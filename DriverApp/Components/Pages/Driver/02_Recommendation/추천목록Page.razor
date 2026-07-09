@@ -86,33 +86,13 @@
                                                          RequiresSpecialDropoff="@warningState.RequiresSpecialDropoff"
                                                          ShowReceipt="@warningState.ShowReceipt" />
 
-                            <div class="driver-route-card-grid">
-                                <section class="driver-route-section driver-route-section--pickup">
-                                    <div class="driver-route-section__label">상차</div>
-                                    <MudText Typo="Typo.subtitle2">@item.의뢰.픽업지</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">현재 위치에서 @item.상차지까지거리표시</MudText>
-                                    <div class="driver-route-meta">
-                                        <span>@item.의뢰.운송조건표시</span>
-                                        <span>@item.의뢰.차량조건표시</span>
-                                    </div>
-                                </section>
-
-                                <section class="driver-route-section driver-route-section--dropoff">
-                                    <div class="driver-route-section__label">하차</div>
-                                    <MudText Typo="Typo.subtitle2">@item.의뢰.하차지</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @item.운송거리표시</MudText>
-                                    <div class="driver-route-meta">
-                                        <span>@item.의뢰.시간조건표시</span>
-                                        <span>@item.의뢰.인수증표시</span>
-                                    </div>
-                                </section>
-                            </div>
-
-                            <div class="driver-payment-strip">
-                                <span class="driver-payment-strip__label">하차 정산</span>
-                                <span>@item.의뢰.결제방식</span>
-                                <span>@item.의뢰.인수증표시</span>
-                            </div>
+                            <DriverRoutePaymentSummary PickupTitle="@item.의뢰.픽업지"
+                                                       PickupSubtitle="@상차지거리문구(item)"
+                                                       PickupMeta="@(new[] { item.의뢰.운송조건표시, item.의뢰.차량조건표시 })"
+                                                       DropoffTitle="@item.의뢰.하차지"
+                                                       DropoffSubtitle="@운송거리문구(item)"
+                                                       DropoffMeta="@(new[] { item.의뢰.시간조건표시, item.의뢰.인수증표시 })"
+                                                       PaymentItems="@(new[] { item.의뢰.결제방식, item.의뢰.인수증표시 })" />
 
                             @응답제한표시(item.의뢰)
 
@@ -150,34 +130,13 @@
                                                              RequiresSpecialDropoff="@warningState.RequiresSpecialDropoff"
                                                              ShowReceipt="@warningState.ShowReceipt" />
 
-                                <div class="driver-route-card-grid">
-                                    <section class="driver-route-section driver-route-section--pickup">
-                                        <div class="driver-route-section__label">상차</div>
-                                        <MudText Typo="Typo.subtitle2">@item.의뢰.픽업지</MudText>
-                                        <MudText Typo="Typo.body2" Color="Color.Secondary">현재 위치에서 @item.상차지까지거리표시</MudText>
-                                        <div class="driver-route-meta">
-                                            <span>@item.의뢰.운송조건표시</span>
-                                            <span>@item.의뢰.차량조건표시</span>
-                                            <span>@item.의뢰.상차시간표시</span>
-                                        </div>
-                                    </section>
-
-                                    <section class="driver-route-section driver-route-section--dropoff">
-                                        <div class="driver-route-section__label">하차</div>
-                                        <MudText Typo="Typo.subtitle2">@item.의뢰.하차지</MudText>
-                                        <MudText Typo="Typo.body2" Color="Color.Secondary">운송 @item.운송거리표시</MudText>
-                                        <div class="driver-route-meta">
-                                            <span>@item.의뢰.하차시간표시</span>
-                                            <span>@item.의뢰.인수증표시</span>
-                                        </div>
-                                    </section>
-                                </div>
-
-                                <div class="driver-payment-strip">
-                                    <span class="driver-payment-strip__label">하차 정산</span>
-                                    <span>@item.의뢰.결제방식</span>
-                                    <span>@item.의뢰.인수증표시</span>
-                                </div>
+                                <DriverRoutePaymentSummary PickupTitle="@item.의뢰.픽업지"
+                                                           PickupSubtitle="@상차지거리문구(item)"
+                                                           PickupMeta="@(new[] { item.의뢰.운송조건표시, item.의뢰.차량조건표시, item.의뢰.상차시간표시 })"
+                                                           DropoffTitle="@item.의뢰.하차지"
+                                                           DropoffSubtitle="@운송거리문구(item)"
+                                                           DropoffMeta="@(new[] { item.의뢰.하차시간표시, item.의뢰.인수증표시 })"
+                                                           PaymentItems="@(new[] { item.의뢰.결제방식, item.의뢰.인수증표시 })" />
 
                                 @응답제한표시(item.의뢰)
 

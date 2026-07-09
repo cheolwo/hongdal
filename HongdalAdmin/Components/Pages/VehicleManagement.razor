@@ -2,35 +2,40 @@
 
 <PageTitle>차량 관리</PageTitle>
 
-<h1>차량 관리</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">차량 관리</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">차량 단가, 추천 기준, 운송 조건 시뮬레이션을 연결할 운영 화면입니다.</MudText>
+    </MudStack>
 
-<div class="alert alert-info">
-    빌드 복구를 위해 차량 관리 화면을 기본 운영 화면으로 정리했습니다.
-</div>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        빌드 복구를 위해 차량 관리 화면을 기본 운영 화면으로 정리했습니다.
+    </MudAlert>
 
-<div class="row g-3">
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">차량 단가</h5>
-                <p class="card-text text-muted mb-0">차량별 기본 단가와 요율을 관리할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">추천 기준</h5>
-                <p class="card-text text-muted mb-0">적재량, 거리, 조건에 따른 차량 추천 기준을 조정할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">시뮬레이션</h5>
-                <p class="card-text text-muted mb-0">운송 조건을 입력해 추천 차량을 검토할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-</div>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">차량 단가</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">차량별 기본 단가와 요율을 관리할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">추천 기준</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">적재량, 거리, 조건에 따른 차량 추천 기준을 조정할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">시뮬레이션</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">운송 조건을 입력해 추천 차량을 검토할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>

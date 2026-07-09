@@ -3,41 +3,82 @@
 
 <PageTitle>04. 의뢰 관리</PageTitle>
 
-<h1>04. 의뢰 관리</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">04. 의뢰 관리</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">화주 의뢰의 결제, 배차, 관제 연결 상태를 확인합니다.</MudText>
+    </MudStack>
 
-<div class="row g-2 mb-3">
-    <div class="col-md-3"><input class="form-control" @bind="paymentFilter" placeholder="결제상태" /></div>
-    <div class="col-md-3"><input class="form-control" @bind="dispatchFilter" placeholder="배차상태" /></div>
-    <div class="col-md-3"><button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">조회</button></div>
-</div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="3">
+                <MudTextField Label="결제상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="paymentFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="배차상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="dispatchFilter" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Disabled="@isLoading" FullWidth="true" OnClick="LoadAsync">조회</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
 
-@if (isLoading)
-{
-    <div class="alert alert-info">의뢰 목록을 불러오는 중입니다...</div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead><tr><th>의뢰ID</th><th>확인</th><th>결제</th><th>배차</th><th>픽업</th><th>하차</th><th>의뢰</th><th>관제</th></tr></thead>
-            <tbody>
-                @foreach (var item in items)
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">의뢰 목록을 불러오는 중입니다...</MudAlert>
+    }
+    else
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h6">의뢰 목록</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@items.Count 건</MudChip>
+                </MudStack>
+
+                @if (items.Count == 0)
                 {
-                    <tr>
-                        <td>@item.의뢰Id</td>
-                        <td><span class="@ReviewBadgeClass(item)">@ReviewLabel(item)</span></td>
-                        <td><span class="@관리자화면Ui.상태Badge(item.결제상태)">@item.결제상태</span></td>
-                        <td><span class="@관리자화면Ui.상태Badge(item.배차상태)">@item.배차상태</span></td>
-                        <td>@(item.요약?.픽업지 ?? item.픽업지)</td>
-                        <td>@(item.요약?.하차지 ?? item.하차지)</td>
-                        <td><a class="btn btn-sm btn-outline-secondary" href="@RequestDetailHref(item.의뢰Id)">상세</a></td>
-                        <td><a class="btn btn-sm btn-outline-primary" href="@WorkflowDetailHref(item.의뢰Id)">관제</a></td>
-                    </tr>
+                    <MudAlert Severity="Severity.Info" Dense="true">조회된 의뢰가 없습니다.</MudAlert>
                 }
-            </tbody>
-        </table>
-    </div>
-}
+                else
+                {
+                    <MudTable Items="@items" Dense="true" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>의뢰ID</MudTh>
+                            <MudTh>확인</MudTh>
+                            <MudTh>결제</MudTh>
+                            <MudTh>배차</MudTh>
+                            <MudTh>픽업</MudTh>
+                            <MudTh>하차</MudTh>
+                            <MudTh>의뢰</MudTh>
+                            <MudTh>관제</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="의뢰ID">@context.의뢰Id</MudTd>
+                            <MudTd DataLabel="확인">
+                                <MudChip T="string" Size="Size.Small" Color="@ReviewColor(context)" Variant="Variant.Filled">@ReviewLabel(context)</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="결제">
+                                <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.결제상태)" Variant="Variant.Outlined">@context.결제상태</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="배차">
+                                <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(context.배차상태)" Variant="Variant.Outlined">@context.배차상태</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="픽업">@(context.요약?.픽업지 ?? context.픽업지)</MudTd>
+                            <MudTd DataLabel="하차">@(context.요약?.하차지 ?? context.하차지)</MudTd>
+                            <MudTd DataLabel="의뢰">
+                                <MudButton Href="@RequestDetailHref(context.의뢰Id)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">상세</MudButton>
+                            </MudTd>
+                            <MudTd DataLabel="관제">
+                                <MudButton Href="@WorkflowDetailHref(context.의뢰Id)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">관제</MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
 
 @code {
     private bool isLoading;
@@ -80,17 +121,14 @@ else
         return "정상";
     }
 
-    private static string ReviewBadgeClass(화주운송의뢰응답 item)
-    {
-        var label = ReviewLabel(item);
-        return label switch
+    private static Color ReviewColor(화주운송의뢰응답 item)
+        => ReviewLabel(item) switch
         {
-            "취소/환불" => "badge rounded-pill text-bg-danger",
-            "결제확인" => "badge rounded-pill text-bg-warning",
-            "배차확인" => "badge rounded-pill text-bg-info",
-            _ => "badge rounded-pill text-bg-success"
+            "취소/환불" => Color.Error,
+            "결제확인" => Color.Warning,
+            "배차확인" => Color.Info,
+            _ => Color.Success
         };
-    }
 
     private static bool IsMatch(string? value, params string[] candidates)
     {

@@ -1,0 +1,232 @@
+﻿[
+    {
+        "App":  "DriverApp",
+        "Route":  "/",
+        "Status":  "OK",
+        "TextLength":  707,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/home",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 기사 업무 허브 기사 앱은 화물/용달 운송과 음식 배달 운송으로 나누고, 현재 앱은 홍달 화물/용달기사 업무 흐름을 기본값으로 사용합니다. 홍달 화물/용달기사 지도는 앱 첫 화면의 네이티브 Naver SDK 지도에서 처리합니다. 이 화면은 화물/용달과 음식 배달의 앱 경계를 확인하고 추천, 운행, 정산, 설정 업무로 이동하는 허브입니다. 화물 기사 현재 앱 팔레트, 박스, 수입/통관 물류처럼 화주 운송 중심의 중량 화물을 처리합니다. 차량 제원, FCL/LCL, 상하차 조건, 운임 정산을 우선 확인합니다. 추천 보기 용달 기사 현재 앱 당일/근거리 생활 화물, 소형 이사, 일적/입차 운송을 처리합니다. 현재 위치, 픽업 거리, 복귀 동선, 현장 결제 조건을 우선 확인합니다. 추천 보기 음식 배달 기사 분리 후보 음식점과 홍달마트 픽업처럼 짧은 시간창의 즉시 배달을 처리합니다. 조리/픽업 시간, 고객 도착 시간, 묶음"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/login",
+        "Status":  "OK",
+        "TextLength":  236,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/login",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 기사 로그인 지금은 선택적으로 로그인해 배차신청 같은 동작만 확인하고, 홈 화면은 비로그인 상태에서도 바로 볼 수 있다. 개발 단계에서는 홈을 바로 볼 수 있고, 필요할 때만 여기서 로그인하면 된다. 아이디 또는 이메일 비밀번호 개발용 기사: driver1@hongdal.local 비밀번호: Driver123! 로그인 홈으로 이동 현재 사용자: 미로그인"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/home",
+        "Status":  "OK",
+        "TextLength":  707,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/home",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 기사 업무 허브 기사 앱은 화물/용달 운송과 음식 배달 운송으로 나누고, 현재 앱은 홍달 화물/용달기사 업무 흐름을 기본값으로 사용합니다. 홍달 화물/용달기사 지도는 앱 첫 화면의 네이티브 Naver SDK 지도에서 처리합니다. 이 화면은 화물/용달과 음식 배달의 앱 경계를 확인하고 추천, 운행, 정산, 설정 업무로 이동하는 허브입니다. 화물 기사 현재 앱 팔레트, 박스, 수입/통관 물류처럼 화주 운송 중심의 중량 화물을 처리합니다. 차량 제원, FCL/LCL, 상하차 조건, 운임 정산을 우선 확인합니다. 추천 보기 용달 기사 현재 앱 당일/근거리 생활 화물, 소형 이사, 일적/입차 운송을 처리합니다. 현재 위치, 픽업 거리, 복귀 동선, 현장 결제 조건을 우선 확인합니다. 추천 보기 음식 배달 기사 분리 후보 음식점과 홍달마트 픽업처럼 짧은 시간창의 즉시 배달을 처리합니다. 조리/픽업 시간, 고객 도착 시간, 묶음"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/home/summary",
+        "Status":  "OK",
+        "TextLength":  37,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/home/summary",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다."
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/work/start",
+        "Status":  "OK",
+        "TextLength":  195,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/work/start",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 운행 시작 운행을 시작하면 현재 위치를 서버에 등록하고 Android 백그라운드 위치 송신을 시작한다. 운행 시작 기준 시작 모드: 미정 기본 시작 위치: 위치 미확인 복귀지: 미설정 위치 송신 간격: 서버 권장값 기준, 기본 5분 운행 시작 운행 종료 근무 상태 보기 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/recommendations",
+        "Status":  "OK",
+        "TextLength":  210,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/recommendations",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 추천 목록 기사님 현재 위치에서 가까운 상차지부터 추천콜을 확인한다. 현재 위치 위치 미확인 11:10 갱신 · 상차지까지 직선거리 기준 추천 0건 상차지까지 거리 전체 5KM 10KM 20KM 50KM 정렬 가까운순 수익순 보기 방식 간단히 표준 자세히 선택한 반경 안에 추천 의뢰가 없습니다. 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/recommendations/REQ-20260709-001",
+        "Status":  "OK",
+        "TextLength":  94,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/recommendations/REQ-20260709-001",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 추천 상세 추천 사유, 거리, 수익을 보고 수락/거절을 판단한다. 추천 의뢰 정보를 찾지 못했습니다."
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/recommendations/REQ-20260709-001/decision",
+        "Status":  "OK",
+        "TextLength":  133,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/recommendations/REQ-20260709-001/decision",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 배차 처리 추천 상세를 본 다음 수락이나 거절을 처리하는 화면이다. 배차 처리할 추천 의뢰 정보를 찾지 못했습니다. 아직 처리 전입니다. 배차 수락 보류 거절 추천 상세로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/exploration/campaigns",
+        "Status":  "OK",
+        "TextLength":  451,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/exploration/campaigns",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 보낸 탐색 문의함 기사님이 먼저 보낸 탐색 캠페인과 응답 흐름을 확인합니다. {campaigns.Count}건 수도권 오전 회차 물량 탐색 경기 남부 → 서울 서북권 응답수집중 3 / 5 인천항 오후 냉장 회차 탐색 인천항 → 경기 북부 실행검토 4 / 6 부천-안양 야간 상온 물량 탐색 부천 → 안양 초안 0 / 0 수도권 오전 회차 물량 탐색 응답수집중 경기 남부 → 서울 서북권 · 1톤 카고 모집 12명 · 응답 5건 · 가능 3건 선정 대상 현황 화주 A 있음응답 · 최근 거래 빈도 높음 화주 B 발송됨 · 응답률 우수 화주 C 없음응답 · 선호 도착권역 일치 추가 추천 대상 화주 A 점수 0.868 · 최근 거래 12건 · 응답률 우수 화주 D 점수 0.77 · 회차 노선 일치 화주 E 점수 0.671 · 야간 대응 경험"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/transports/history",
+        "Status":  "OK",
+        "TextLength":  75,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/transports/history",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 배달 내역 최근 운송 기록과 예상 수익을 확인합니다. 사용자 메뉴로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/transports/current",
+        "Status":  "OK",
+        "TextLength":  84,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/transports/current",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 진행 중 운송 현재 운송과 다음 행동을 서버 운송 데이터로 확인합니다. 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/transports/1/pickup",
+        "Status":  "OK",
+        "TextLength":  108,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/transports/1/pickup",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 상차 상차지 도착, 화물 확인, 사진 증빙을 마친 뒤 상차 완료를 처리합니다. 운송 정보를 찾지 못했습니다. 진행 중 운송으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/transports/1/dropoff",
+        "Status":  "OK",
+        "TextLength":  111,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/transports/1/dropoff",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 하차 하차지 도착, 인수 확인, 결제 또는 인수증 확인 후 하차 완료를 처리합니다. 운송 정보를 찾지 못했습니다. 진행 중 운송으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/reservations",
+        "Status":  "OK",
+        "TextLength":  86,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/reservations",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 예약 오늘 잡아둔 예약과 운행 전 확인할 내용을 확인합니다. 운행 시작으로 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/menu",
+        "Status":  "OK",
+        "TextLength":  245,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/menu",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 사용자 메뉴 배달 내역, 계좌 정보, 정산 정보를 먼저 확인합니다. 배달 내역 완료/진행 운송 기록 계좌 정보 정산 받을 계좌 확인 정산 정보 이번 달 정산과 이용료 알림 설정 추천콜과 운송 알림 전체 메뉴 빠른 이동 알림, 설정, 진행 화면처럼 홈에서 바로 펼치지 않는 항목을 여기서 연다. 추천 목록 예약 진행 중 운송 월 정산 알림함 화면 설정 기사 홈으로 돌아가기"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/notifications/settings",
+        "Status":  "OK",
+        "TextLength":  166,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/notifications/settings",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 알림 설정 추천콜과 운송 알림을 어떻게 받을지 확인하는 설정 화면이다. 현재 알림 상태 안읽은 알림 0건 / 전체 0건 나중에 푸시 토큰 등록, 권한 확인, 알림 수신 범위를 여기서 연결한다. 푸시 설정으로 알림함으로 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/work/settings",
+        "Status":  "OK",
+        "TextLength":  172,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/work/settings",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 운행 설정 운행 시작 전에 기본 위치와 복귀 기준을 확인한다. 운행 기본값 시작 모드: 미정 시작 위치: 위치 미확인 복귀지: 미설정 나중에 위치 권한과 선호 권역 설정을 붙이면 추천 품질을 바로 확인할 수 있다. 운행 시작으로 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/settings/views",
+        "Status":  "OK",
+        "TextLength":  324,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/settings/views",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 화면 설정 우측 상단 프로필 버튼으로 들어오는 메뉴 화면에서 진입하는 관리 화면이다. 홈은 운행과 추천 중심으로 두고, 여기서만 보조 화면 노출을 조정한다. 홈 추천 보기 방식 지도를 먼저 볼지, 리스트를 먼저 볼지, 둘 다 같이 볼지 지금 여기서 고를 수 있다. 지도 우선 리스트 우선 둘 다 표시 추천카드 표시 방식 간단히 표준 자세히 미리보기 기사 홈으로 돌아가기 기사 홈 예 허용 추천 목록 아니오 허용 예약 아니오 허용 진행 중 운송 예 허용 월 정산 아니오 허용 알림함 아니오 허용 화면 설정 예 허용"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/account/bank",
+        "Status":  "OK",
+        "TextLength":  219,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/account/bank",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 계좌 정보 정산금을 받을 계좌와 이번 달 정산 상태를 확인합니다. 국민은행 홍길동 기사님 정산 계좌 ***-**-8901 계좌 상태 확인 완료 이번 달 배차 0 건 이번 달 이용료 0원 계좌번호는 기본적으로 마스킹됩니다. 전체 보기와 계좌 변경은 본인 확인 후 처리합니다. 본인 확인 계좌 변경 요청 정산 정보 사용자 메뉴로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/settlements/current-month",
+        "Status":  "OK",
+        "TextLength":  136,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/settlements/current-month",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 월 정산 이번 달 이용료와 정산 내역을 확인합니다. 2026년 7월 배차 0건 이용료 0원 월 상한 0원 상세 내역 이번 달 이용료 확인이 필요합니다. 이용료 안내 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/settlements/info",
+        "Status":  "OK",
+        "TextLength":  182,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/settlements/info",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 이용료 안내 오픈 베타와 정식 전환 후 기사 이용료 정책을 화면에서 확인한다. 안내 항목 오픈 베타 기간에는 이용료 0원으로 안내한다. 정식 전환 후에는 건당 500원, 월 최대 0원 상한으로 표시한다. 현재 조회 기준 배차 0건 / 이용료 0원 월 정산으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/notifications",
+        "Status":  "OK",
+        "TextLength":  83,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/notifications",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 알림함 배차추천, 운행, 정산 알림을 한곳에서 확인합니다. 알림 설정 기사 홈으로"
+    },
+    {
+        "App":  "DriverApp",
+        "Route":  "/driver/notifications/push",
+        "Status":  "OK",
+        "TextLength":  140,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/driver/notifications/push",
+        "Sample":  "← 뒤로가기 기사 홈 운행 중 지금 봐야 할 화면만 먼저 확인한다. 푸시 설정 FCM 토큰 등록과 테스트 발송 흐름을 붙일 자리다. 푸시 상태 안 읽은 알림: 0건 기기 권한 확인 → 토큰 등록 → 테스트 알림 발송 순서로 붙이면 된다. 알림 설정으로"
+    }
+]

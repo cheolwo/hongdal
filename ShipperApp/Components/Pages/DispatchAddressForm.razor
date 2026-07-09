@@ -3,59 +3,13 @@
 
 <PageTitle>상차/하차 주소 입력</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-    <MudStack Spacing="3">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">상차/하차 주소 입력 폼</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                공통 주소 컴포넌트(HongdalAddressInput)와 사업자등록번호 컴포넌트(BusinessNumberInput) 재사용 적용 예시다.
-            </MudText>
-        </MudStack>
-
-        <MudGrid>
-            <MudItem xs="12" md="6">
-                <MudCard Elevation="2">
-                    <MudCardContent>
-                        <MudText Typo="Typo.h6" Class="mb-3">상차지 주소</MudText>
-                        <HongdalAddressInput @bind-Value="PickupAddress" />
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-
-            <MudItem xs="12" md="6">
-                <MudCard Elevation="2">
-                    <MudCardContent>
-                        <MudText Typo="Typo.h6" Class="mb-3">하차지 주소</MudText>
-                        <HongdalAddressInput @bind-Value="DropoffAddress" />
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-
-            <MudItem xs="12" md="6">
-                <MudCard Elevation="2">
-                    <MudCardContent>
-                        <MudText Typo="Typo.h6" Class="mb-3">사업자등록번호</MudText>
-                        <BusinessNumberInput @bind-Value="BusinessNumber" />
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-        </MudGrid>
-
-        <MudStack Row="true" Spacing="2">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="저장Async" Disabled="@Saving">
-                @(Saving ? "저장 중..." : "저장")
-            </MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="초기화" Disabled="@Saving">
-                초기화
-            </MudButton>
-        </MudStack>
-
-        @if (!string.IsNullOrWhiteSpace(Message))
-        {
-            <MudAlert Severity="Severity.Info">@Message</MudAlert>
-        }
-    </MudStack>
-</MudContainer>
+<HongdalDispatchAddressFormPanel @bind-PickupAddress="PickupAddress"
+                                 @bind-DropoffAddress="DropoffAddress"
+                                 @bind-BusinessNumber="BusinessNumber"
+                                 Saving="@Saving"
+                                 Message="@Message"
+                                 OnSave="저장Async"
+                                 OnReset="초기화" />
 
 @code {
     private 주소입력값Dto PickupAddress { get; set; } = new();

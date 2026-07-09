@@ -3,137 +3,136 @@
 
 <PageTitle>15. 공통콘텐츠 관리</PageTitle>
 
-<h1>15. 공통콘텐츠 관리</h1>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">15. 공통콘텐츠 관리</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">기사, 화주, 운영자 화면에 공통 노출되는 콘텐츠를 관리합니다.</MudText>
+        </MudStack>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="LoadAsync">
+            새로고침
+        </MudButton>
+    </MudStack>
 
-<div class="row g-3 mb-3">
-    <div class="col-lg-7">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="card-title mb-0">콘텐츠 목록</h5>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="LoadAsync">새로고침</button>
-                </div>
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="Severity.Info">@message</MudAlert>
+    }
 
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>제목</th>
-                                <th>유형</th>
-                                <th>노출위치</th>
-                                <th>활성</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in contents)
-                            {
-                                <tr style="cursor:pointer" @onclick="() => SelectAsync(item.Id)">
-                                    <td>@item.Id</td>
-                                    <td>@item.제목</td>
-                                    <td>@item.콘텐츠유형</td>
-                                    <td>@item.노출위치</td>
-                                    <td>
-                                        <input type="checkbox" checked="@item.활성화여부" @onchange="async e => await ToggleActiveAsync(item.Id, (bool?)e.Value ?? false)" />
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="7">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">콘텐츠 목록</MudText>
 
-    <div class="col-lg-5">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">콘텐츠 등록/수정</h5>
+                    @if (contents.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Dense="true">등록된 공통콘텐츠가 없습니다.</MudAlert>
+                    }
+                    else
+                    {
+                        <MudTable Items="@contents" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>ID</MudTh>
+                                <MudTh>제목</MudTh>
+                                <MudTh>유형</MudTh>
+                                <MudTh>노출위치</MudTh>
+                                <MudTh>활성</MudTh>
+                                <MudTh></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="ID">@context.Id</MudTd>
+                                <MudTd DataLabel="제목">@context.제목</MudTd>
+                                <MudTd DataLabel="유형">@context.콘텐츠유형</MudTd>
+                                <MudTd DataLabel="노출위치">@context.노출위치</MudTd>
+                                <MudTd DataLabel="활성">
+                                    <MudSwitch T="bool"
+                                               Value="@context.활성화여부"
+                                               ValueChanged="@((bool enabled) => ToggleActiveAsync(context.Id, enabled))"
+                                               Color="Color.Primary" />
+                                </MudTd>
+                                <MudTd>
+                                    <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectAsync(context.Id))">편집</MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
 
-                <div class="mb-2">
-                    <label class="form-label">제목</label>
-                    <input class="form-control" @bind="model.제목" />
-                </div>
+        <MudItem xs="12" lg="5">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">콘텐츠 등록/수정</MudText>
 
-                <div class="mb-2">
-                    <label class="form-label">설명</label>
-                    <textarea class="form-control" rows="2" @bind="model.설명"></textarea>
-                </div>
+                    <MudTextField Label="제목" Variant="Variant.Outlined" @bind-Value="model.제목" />
+                    <MudTextField Label="설명" Variant="Variant.Outlined" Lines="2" @bind-Value="model.설명" />
 
-                <div class="mb-2">
-                    <label class="form-label">콘텐츠 유형</label>
-                    <select class="form-select" @bind="model.콘텐츠유형">
+                    <MudSelect T="계약홍달콘텐츠유형" Label="콘텐츠 유형" Variant="Variant.Outlined" @bind-Value="model.콘텐츠유형">
                         @foreach (var type in Enum.GetValues<계약홍달콘텐츠유형>())
                         {
-                            <option value="@type">@type</option>
+                            <MudSelectItem T="계약홍달콘텐츠유형" Value="@type">@type</MudSelectItem>
                         }
-                    </select>
-                </div>
+                    </MudSelect>
 
-                <div class="mb-2">
-                    <label class="form-label">이미지 URL</label>
-                    <input class="form-control" @bind="model.이미지Url" />
-                </div>
+                    <MudTextField Label="이미지 URL" Variant="Variant.Outlined" @bind-Value="model.이미지Url" />
+                    <MudTextField Label="영상 URL" Variant="Variant.Outlined" @bind-Value="model.영상Url" />
+                    <MudTextField Label="외부링크 URL" Variant="Variant.Outlined" @bind-Value="model.외부링크Url" />
 
-                <div class="mb-2">
-                    <label class="form-label">영상 URL</label>
-                    <input class="form-control" @bind="model.영상Url" />
-                </div>
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2">노출위치</MudText>
+                        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                            @foreach (var placement in Enum.GetValues<계약홍달노출위치>().Where(x => x != 계약홍달노출위치.없음))
+                            {
+                                <MudCheckBox T="bool"
+                                             Value="@HasPlacement(placement)"
+                                             ValueChanged="@((bool enabled) => SetPlacement(placement, enabled))"
+                                             Label="@placement.ToString()"
+                                             Color="Color.Primary" />
+                            }
+                        </MudStack>
+                    </MudStack>
 
-                <div class="mb-2">
-                    <label class="form-label">외부링크 URL</label>
-                    <input class="form-control" @bind="model.외부링크Url" />
-                </div>
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2">노출대상</MudText>
+                        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                            <MudCheckBox T="bool" @bind-Value="model.기사노출" Label="기사" Color="Color.Primary" />
+                            <MudCheckBox T="bool" @bind-Value="model.화주노출" Label="화주" Color="Color.Primary" />
+                            <MudCheckBox T="bool" @bind-Value="model.운영자노출" Label="운영자" Color="Color.Primary" />
+                        </MudStack>
+                    </MudStack>
 
-                <div class="mb-2">
-                    <label class="form-label d-block">노출위치</label>
-                    @foreach (var placement in Enum.GetValues<계약홍달노출위치>().Where(x => x != 계약홍달노출위치.없음))
-                    {
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" checked="@HasPlacement(placement)" @onchange="e => SetPlacement(placement, (bool?)e.Value ?? false)" />
-                            <label class="form-check-label">@placement</label>
-                        </div>
-                    }
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label d-block">노출대상</label>
-                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" @bind="model.기사노출" /><label class="form-check-label">기사</label></div>
-                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" @bind="model.화주노출" /><label class="form-check-label">화주</label></div>
-                    <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" @bind="model.운영자노출" /><label class="form-check-label">운영자</label></div>
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label">보상정책</label>
-                    <select class="form-select" @bind="rewardPolicyIdText">
-                        <option value="">없음</option>
+                    <MudSelect T="string" Label="보상정책" Variant="Variant.Outlined" @bind-Value="rewardPolicyIdText">
+                        <MudSelectItem T="string" Value="@EmptyValue">없음</MudSelectItem>
                         @foreach (var policy in rewardPolicies)
                         {
-                            <option value="@policy.Id">@policy.Id - @policy.보상유형</option>
+                            <MudSelectItem T="string" Value="@policy.Id.ToString()">@policy.Id - @policy.보상유형</MudSelectItem>
                         }
-                    </select>
-                </div>
+                    </MudSelect>
 
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" @bind="model.활성화여부" />
-                    <label class="form-check-label">활성화</label>
-                </div>
+                    <MudCheckBox T="bool" @bind-Value="model.활성화여부" Label="활성화" Color="Color.Primary" />
 
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary" @onclick="SaveAsync">@(selectedId.HasValue ? "수정" : "등록")</button>
-                    <button class="btn btn-outline-secondary" @onclick="ResetForm">신규</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert alert-info">@message</div>
-}
+                    <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveAsync">
+                            @(selectedId.HasValue ? "수정" : "등록")
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" OnClick="ResetForm">
+                            신규
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
 
 @code {
+    private const string EmptyValue = "";
+
     private IReadOnlyList<관리자공통콘텐츠요약응답> contents = [];
     private IReadOnlyList<공통콘텐츠보상정책Dto> rewardPolicies = [];
     private 관리자공통콘텐츠저장요청 model = new();

@@ -6,226 +6,372 @@
 
 @if (!AuthService.IsSignedIn)
 {
-    <section class="login-shell">
-        <div class="login-panel">
-            <div>
-                <p class="eyebrow">Customs Broker</p>
-                <h1>HS 코드 보정</h1>
-                <p class="login-copy">관세사 권한으로 로그인한 뒤 식품/일반화물 분류와 통관 주의 태그를 보정합니다.</p>
-            </div>
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-8">
+        <MudPaper Outlined="true" Class="pa-6">
+            <MudGrid Spacing="4">
+                <MudItem xs="12" md="5">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.overline" Color="Color.Secondary">Customs Broker</MudText>
+                        <MudText Typo="Typo.h4">HS 코드 보정</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            관세사 권한으로 로그인한 뒤 식품/일반화물 분류와 통관 주의 태그를 보정합니다.
+                        </MudText>
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12" md="7">
+                    <EditForm Model="loginModel" OnValidSubmit="LoginAsync">
+                        <DataAnnotationsValidator />
+                        <MudStack Spacing="2">
+                            <MudTextField T="string"
+                                          Label="계정"
+                                          @bind-Value="loginModel.UserNameOrEmail"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                            <MudTextField T="string"
+                                          Label="비밀번호"
+                                          @bind-Value="loginModel.Password"
+                                          InputType="InputType.Password"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
 
-            <EditForm Model="loginModel" OnValidSubmit="LoginAsync" class="login-form">
-                <DataAnnotationsValidator />
-                <div>
-                    <label class="form-label" for="userNameOrEmail">계정</label>
-                    <InputText id="userNameOrEmail" class="form-control" @bind-Value="loginModel.UserNameOrEmail" autocomplete="username" />
-                </div>
-                <div>
-                    <label class="form-label" for="password">비밀번호</label>
-                    <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" autocomplete="current-password" />
-                </div>
-                @if (!string.IsNullOrWhiteSpace(message))
-                {
-                    <div class="alert @messageClass">@message</div>
-                }
-                <button class="btn btn-primary w-100" type="submit" disabled="@isBusy">로그인</button>
-            </EditForm>
-        </div>
-    </section>
+                            @if (!string.IsNullOrWhiteSpace(message))
+                            {
+                                <MudAlert Severity="@messageSeverity" Dense="true">@message</MudAlert>
+                            }
+
+                            <MudButton ButtonType="ButtonType.Submit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       FullWidth="true"
+                                       Disabled="@isBusy"
+                                       StartIcon="@Icons.Material.Filled.Login">
+                                로그인
+                            </MudButton>
+                        </MudStack>
+                    </EditForm>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudContainer>
 }
 else
 {
-    <section class="workspace">
-        <header class="workspace-header">
-            <div>
-                <p class="eyebrow">HS Code Correction</p>
-                <h1>관세사 보정 워크벤치</h1>
-                <p>화주에게 공개될 HS 코드 데이터의 업무 분류와 통관 리스크 태그를 검토합니다.</p>
-            </div>
-            <div class="user-chip">
-                <span>@AuthService.UserName</span>
-                <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="Logout">로그아웃</button>
-            </div>
-        </header>
+    <MudStack Spacing="3">
+        <MudPaper Outlined="true" Class="pa-4">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Spacing="2">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.overline" Color="Color.Secondary">HS Code Correction</MudText>
+                    <MudText Typo="Typo.h4">관세사 보정 워크벤치</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        화주에게 공개될 HS 코드 데이터의 업무 분류와 통관 리스크 태그를 검토합니다.
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@AuthService.UserName</MudChip>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Logout"
+                               OnClick="Logout">
+                        로그아웃
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
 
-        <section class="filter-bar">
-            <div class="filter-field filter-query">
-                <label class="form-label" for="query">검색</label>
-                <InputText id="query" class="form-control" @bind-Value="searchQuery" placeholder="HS 코드, 한글명, 영문명" />
-            </div>
-            <div class="filter-field">
-                <label class="form-label" for="businessCategory">업무 분류</label>
-                <InputSelect id="businessCategory" class="form-select" @bind-Value="selectedBusinessCategory">
-                    <option value="">전체</option>
-                    @foreach (var option in BusinessCategoryOptions)
-                    {
-                        <option value="@option.Value">@option.Label</option>
-                    }
-                </InputSelect>
-            </div>
-            <div class="filter-field">
-                <label class="form-label" for="tagType">주의 태그</label>
-                <InputSelect id="tagType" class="form-select" @bind-Value="selectedTagType">
-                    <option value="">전체</option>
-                    @foreach (var option in RiskTagOptions)
-                    {
-                        <option value="@option.Value">@option.Label</option>
-                    }
-                </InputSelect>
-            </div>
-            <div class="filter-check">
-                <InputCheckbox id="includeInactive" class="form-check-input" @bind-Value="includeInactive" />
-                <label class="form-check-label" for="includeInactive">비활성 포함</label>
-            </div>
-            <button class="btn btn-primary" type="button" @onclick="SearchAsync" disabled="@isBusy">조회</button>
-        </section>
+        <MudPaper Outlined="true" Class="pa-4">
+            <MudGrid Spacing="2">
+                <MudItem xs="12" md="4">
+                    <MudTextField T="string"
+                                  Label="검색"
+                                  @bind-Value="searchQuery"
+                                  Placeholder="HS 코드, 한글명, 영문명"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                </MudItem>
+                <MudItem xs="12" md="2">
+                    <MudSelect T="string"
+                               Label="업무 분류"
+                               @bind-Value="selectedBusinessCategory"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        <MudSelectItem T="string" Value="@AllOption">전체</MudSelectItem>
+                        @foreach (var option in BusinessCategoryOptions)
+                        {
+                            <MudSelectItem T="string" Value="@option.Value.ToString()">@option.Label</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string"
+                               Label="주의 태그"
+                               @bind-Value="selectedTagType"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        <MudSelectItem T="string" Value="@AllOption">전체</MudSelectItem>
+                        @foreach (var option in RiskTagOptions)
+                        {
+                            <MudSelectItem T="string" Value="@option.Value.ToString()">@option.Label</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="2">
+                    <MudCheckBox T="bool"
+                                 Label="비활성 포함"
+                                 @bind-Value="includeInactive"
+                                 Color="Color.Primary" />
+                </MudItem>
+                <MudItem xs="12" md="1">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               FullWidth="true"
+                               Disabled="@isBusy"
+                               OnClick="SearchAsync"
+                               StartIcon="@Icons.Material.Filled.Refresh">
+                        조회
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
-            <div class="alert @messageClass">@message</div>
+            <MudAlert Severity="@messageSeverity" Dense="true">@message</MudAlert>
         }
 
-        <section class="correction-grid">
-            <div class="result-panel">
-                <div class="panel-heading">
-                    <div>
-                        <h2>HS 코드 목록</h2>
-                        <span>총 @(result.TotalCount)건</span>
-                    </div>
-                    <div class="pager">
-                        <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="PreviousPageAsync" disabled="@(page <= 1 || isBusy)">이전</button>
-                        <span>@(page)</span>
-                        <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="NextPageAsync" disabled="@(IsLastPage || isBusy)">다음</button>
-                    </div>
-                </div>
+        <MudGrid Spacing="3">
+            <MudItem xs="12" lg="5">
+                <MudPaper Outlined="true" Class="pa-4">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Class="mb-3">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">HS 코드 목록</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">총 @(result.TotalCount)건</MudText>
+                        </MudStack>
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudButton Variant="Variant.Outlined"
+                                       Size="Size.Small"
+                                       Disabled="@(page <= 1 || isBusy)"
+                                       OnClick="PreviousPageAsync"
+                                       StartIcon="@Icons.Material.Filled.ChevronLeft">
+                                이전
+                            </MudButton>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{page}쪽")</MudChip>
+                            <MudButton Variant="Variant.Outlined"
+                                       Size="Size.Small"
+                                       Disabled="@(IsLastPage || isBusy)"
+                                       OnClick="NextPageAsync"
+                                       EndIcon="@Icons.Material.Filled.ChevronRight">
+                                다음
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
 
-                @if (isBusy)
-                {
-                    <div class="empty-state">데이터를 불러오는 중입니다.</div>
-                }
-                else if (result.Items.Count == 0)
-                {
-                    <div class="empty-state">조회된 HS 코드가 없습니다.</div>
-                }
-                else
-                {
-                    <div class="hs-list">
-                        @foreach (var item in result.Items)
-                        {
-                            <button type="button" class="hs-list-item @(selectedEntry?.Id == item.Id ? "selected" : string.Empty)" @onclick="() => SelectEntry(item)">
-                                <span class="hs-code">@item.Code</span>
-                                <span class="hs-title">@DisplayName(item)</span>
-                                <span class="hs-meta">
-                                    <span class="badge category">@item.BusinessCategoryLabel</span>
-                                    @foreach (var tag in item.RiskTags.Where(x => x.IsActive).Take(2))
-                                    {
-                                        <span class="badge risk">@tag.Label</span>
-                                    }
-                                </span>
-                            </button>
-                        }
-                    </div>
-                }
-            </div>
-
-            <div class="detail-panel">
-                @if (selectedEntry is null)
-                {
-                    <div class="empty-state tall">왼쪽 목록에서 보정할 HS 코드를 선택하세요.</div>
-                }
-                else
-                {
-                    <div class="detail-title">
-                        <div>
-                            <h2>@selectedEntry.Code</h2>
-                            <p>@DisplayName(selectedEntry)</p>
-                        </div>
-                        <span class="badge @(selectedEntry.IsActive ? "active" : "inactive")">@(selectedEntry.IsActive ? "활성" : "비활성")</span>
-                    </div>
-
-                    <div class="edit-section">
-                        <h3>업무 분류</h3>
-                        <div class="edit-row">
-                            <div>
-                                <label class="form-label" for="editBusinessCategory">분류</label>
-                                <InputSelect id="editBusinessCategory" class="form-select" @bind-Value="editBusinessCategory">
-                                    @foreach (var option in BusinessCategoryOptions)
-                                    {
-                                        <option value="@option.Value">@option.Label</option>
-                                    }
-                                </InputSelect>
-                            </div>
-                            <div>
-                                <label class="form-label" for="editBusinessReason">보정 사유</label>
-                                <InputText id="editBusinessReason" class="form-control" @bind-Value="editBusinessCategoryReason" />
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" type="button" @onclick="SaveBusinessCategoryAsync" disabled="@isSaving">분류 저장</button>
-                    </div>
-
-                    <div class="edit-section">
-                        <div class="section-heading">
-                            <h3>통관 주의 태그</h3>
-                            <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="ResetTagForm">새 태그</button>
-                        </div>
-
-                        @if (selectedEntry.RiskTags.Count == 0)
-                        {
-                            <div class="empty-state compact">등록된 주의 태그가 없습니다.</div>
-                        }
-                        else
-                        {
-                            <div class="tag-list">
-                                @foreach (var tag in selectedEntry.RiskTags)
-                                {
-                                    <div class="tag-item">
-                                        <div>
-                                            <strong>@tag.Label</strong>
-                                            <span>@tag.SourceLabel</span>
-                                            <p>@tag.Reason</p>
-                                        </div>
-                                        <div class="tag-actions">
-                                            <span class="badge @(tag.IsActive ? "active" : "inactive")">@(tag.IsActive ? "사용" : "숨김")</span>
-                                            <button class="btn btn-sm btn-outline-primary" type="button" @onclick="() => EditTag(tag)">수정</button>
-                                            <button class="btn btn-sm btn-outline-secondary" type="button" @onclick="() => ToggleTagAsync(tag)" disabled="@isSaving">@(tag.IsActive ? "숨김" : "사용")</button>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-
-                        <div class="tag-form">
-                            <div class="edit-row">
-                                <div>
-                                    <label class="form-label" for="editTagType">태그 유형</label>
-                                    <InputSelect id="editTagType" class="form-select" @bind-Value="editTagType">
-                                        @foreach (var option in RiskTagOptions)
+                    @if (isBusy)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Class="py-8">
+                            <MudProgressCircular Indeterminate="true" />
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">데이터를 불러오는 중입니다.</MudText>
+                        </MudStack>
+                    }
+                    else if (result.Items.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">조회된 HS 코드가 없습니다.</MudAlert>
+                    }
+                    else
+                    {
+                        <MudStack Spacing="1">
+                            @foreach (var item in result.Items)
+                            {
+                                <MudPaper Outlined="true"
+                                          Class="@EntryCardClass(item)"
+                                          @onclick="() => SelectEntry(item)">
+                                    <MudStack Spacing="1">
+                                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                            <MudText Typo="Typo.subtitle2" Color="Color.Primary">@item.Code</MudText>
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item.BusinessCategoryLabel</MudChip>
+                                        </MudStack>
+                                        <MudText Typo="Typo.body2">@DisplayName(item)</MudText>
+                                        @if (item.RiskTags.Any(x => x.IsActive))
                                         {
-                                            <option value="@option.Value">@option.Label</option>
+                                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                                @foreach (var tag in item.RiskTags.Where(x => x.IsActive).Take(2))
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">@tag.Label</MudChip>
+                                                }
+                                            </MudStack>
                                         }
-                                    </InputSelect>
-                                </div>
-                                <div>
-                                    <label class="form-label" for="editTagLabel">표시명</label>
-                                    <InputText id="editTagLabel" class="form-control" @bind-Value="editTagLabel" />
-                                </div>
-                            </div>
-                            <label class="form-label" for="editTagReason">보정 사유</label>
-                            <InputTextArea id="editTagReason" class="form-control" rows="3" @bind-Value="editTagReason" />
-                            <div class="form-check mt-2">
-                                <InputCheckbox id="editTagActive" class="form-check-input" @bind-Value="editTagIsActive" />
-                                <label class="form-check-label" for="editTagActive">활성 태그로 사용</label>
-                            </div>
-                            <button class="btn btn-primary btn-sm mt-3" type="button" @onclick="SaveTagAsync" disabled="@isSaving">태그 저장</button>
-                        </div>
-                    </div>
-                }
-            </div>
-        </section>
-    </section>
+                                    </MudStack>
+                                </MudPaper>
+                            }
+                        </MudStack>
+                    }
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" lg="7">
+                <MudPaper Outlined="true" Class="pa-4">
+                    @if (selectedEntry is null)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                            왼쪽 목록에서 보정할 HS 코드를 선택하세요.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.h5">@selectedEntry.Code</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@DisplayName(selectedEntry)</MudText>
+                                </MudStack>
+                                <MudChip T="string"
+                                         Color="@(selectedEntry.IsActive ? Color.Success : Color.Default)"
+                                         Variant="Variant.Filled">
+                                    @(selectedEntry.IsActive ? "활성" : "비활성")
+                                </MudChip>
+                            </MudStack>
+
+                            <MudDivider />
+
+                            <MudStack Spacing="2">
+                                <MudText Typo="Typo.h6">업무 분류</MudText>
+                                <MudGrid Spacing="2">
+                                    <MudItem xs="12" md="4">
+                                        <MudSelect T="int"
+                                                   Label="분류"
+                                                   @bind-Value="editBusinessCategory"
+                                                   Variant="Variant.Outlined"
+                                                   Margin="Margin.Dense">
+                                            @foreach (var option in BusinessCategoryOptions)
+                                            {
+                                                <MudSelectItem T="int" Value="@option.Value">@option.Label</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="12" md="8">
+                                        <MudTextField T="string"
+                                                      Label="보정 사유"
+                                                      @bind-Value="editBusinessCategoryReason"
+                                                      Variant="Variant.Outlined"
+                                                      Margin="Margin.Dense" />
+                                    </MudItem>
+                                </MudGrid>
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           Disabled="@isSaving"
+                                           OnClick="SaveBusinessCategoryAsync"
+                                           StartIcon="@Icons.Material.Filled.Save">
+                                    분류 저장
+                                </MudButton>
+                            </MudStack>
+
+                            <MudDivider />
+
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudText Typo="Typo.h6">통관 주의 태그</MudText>
+                                    <MudButton Variant="Variant.Outlined"
+                                               Size="Size.Small"
+                                               OnClick="ResetTagForm"
+                                               StartIcon="@Icons.Material.Filled.Add">
+                                        새 태그
+                                    </MudButton>
+                                </MudStack>
+
+                                @if (selectedEntry.RiskTags.Count == 0)
+                                {
+                                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">등록된 주의 태그가 없습니다.</MudAlert>
+                                }
+                                else
+                                {
+                                    <MudStack Spacing="1">
+                                        @foreach (var tag in selectedEntry.RiskTags)
+                                        {
+                                            <MudPaper Outlined="true" Class="pa-3">
+                                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap" Spacing="2">
+                                                    <MudStack Spacing="0">
+                                                        <MudText Typo="Typo.subtitle2">@tag.Label</MudText>
+                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@tag.SourceLabel</MudText>
+                                                        <MudText Typo="Typo.body2">@tag.Reason</MudText>
+                                                    </MudStack>
+                                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                                        <MudChip T="string"
+                                                                 Size="Size.Small"
+                                                                 Color="@(tag.IsActive ? Color.Success : Color.Default)"
+                                                                 Variant="Variant.Outlined">
+                                                            @(tag.IsActive ? "사용" : "숨김")
+                                                        </MudChip>
+                                                        <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="() => EditTag(tag)">수정</MudButton>
+                                                        <MudButton Variant="Variant.Text"
+                                                                   Size="Size.Small"
+                                                                   Color="Color.Secondary"
+                                                                   Disabled="@isSaving"
+                                                                   OnClick="() => ToggleTagAsync(tag)">
+                                                            @(tag.IsActive ? "숨김" : "사용")
+                                                        </MudButton>
+                                                    </MudStack>
+                                                </MudStack>
+                                            </MudPaper>
+                                        }
+                                    </MudStack>
+                                }
+
+                                <MudPaper Outlined="true" Class="pa-3">
+                                    <MudStack Spacing="2">
+                                        <MudGrid Spacing="2">
+                                            <MudItem xs="12" md="4">
+                                                <MudSelect T="int"
+                                                           Label="태그 유형"
+                                                           @bind-Value="editTagType"
+                                                           Variant="Variant.Outlined"
+                                                           Margin="Margin.Dense">
+                                                    @foreach (var option in RiskTagOptions)
+                                                    {
+                                                        <MudSelectItem T="int" Value="@option.Value">@option.Label</MudSelectItem>
+                                                    }
+                                                </MudSelect>
+                                            </MudItem>
+                                            <MudItem xs="12" md="8">
+                                                <MudTextField T="string"
+                                                              Label="표시명"
+                                                              @bind-Value="editTagLabel"
+                                                              Variant="Variant.Outlined"
+                                                              Margin="Margin.Dense" />
+                                            </MudItem>
+                                        </MudGrid>
+                                        <MudTextField T="string"
+                                                      Label="보정 사유"
+                                                      @bind-Value="editTagReason"
+                                                      Variant="Variant.Outlined"
+                                                      Lines="3" />
+                                        <MudCheckBox T="bool"
+                                                     Label="활성 태그로 사용"
+                                                     @bind-Value="editTagIsActive"
+                                                     Color="Color.Primary" />
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   Disabled="@isSaving"
+                                                   OnClick="SaveTagAsync"
+                                                   StartIcon="@Icons.Material.Filled.Save">
+                                            태그 저장
+                                        </MudButton>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudStack>
+                        </MudStack>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
 }
 
 @code {
+    private const string AllOption = "";
+
     private static readonly IReadOnlyList<OptionItem> BusinessCategoryOptions =
     [
         new(0, "미분류"),
@@ -251,15 +397,15 @@ else
     private AdminHsCodeListResponse result = new();
     private AdminHsCodeEntryResponse? selectedEntry;
     private string? searchQuery;
-    private string selectedBusinessCategory = string.Empty;
-    private string selectedTagType = string.Empty;
+    private string selectedBusinessCategory = AllOption;
+    private string selectedTagType = AllOption;
     private bool includeInactive;
     private int page = 1;
     private const int PageSize = 25;
     private bool isBusy;
     private bool isSaving;
     private string? message;
-    private string messageClass = "alert-success";
+    private Severity messageSeverity = Severity.Success;
 
     private int editBusinessCategory = 20;
     private string editBusinessCategoryReason = string.Empty;
@@ -505,6 +651,12 @@ else
         }
     }
 
+    private string EntryCardClass(AdminHsCodeEntryResponse item)
+    {
+        const string baseClass = "pa-3 customs-entry-card";
+        return selectedEntry?.Id == item.Id ? $"{baseClass} customs-entry-card--selected" : baseClass;
+    }
+
     private static string DisplayName(AdminHsCodeEntryResponse item)
     {
         if (!string.IsNullOrWhiteSpace(item.KoreanName))
@@ -518,13 +670,13 @@ else
     private void ShowSuccess(string text)
     {
         message = text;
-        messageClass = "alert-success";
+        messageSeverity = Severity.Success;
     }
 
     private void ShowError(string text)
     {
         message = text;
-        messageClass = "alert-danger";
+        messageSeverity = Severity.Error;
     }
 
     private sealed class LoginModel

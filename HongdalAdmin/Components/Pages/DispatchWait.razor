@@ -3,44 +3,86 @@
 
 <PageTitle>02. 유입/배차대기</PageTitle>
 
-<h1>02. 유입/배차대기</h1>
-
-<button class="btn btn-primary mb-3" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+<MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Class="mb-3" Style="flex-wrap: wrap;">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">02. 유입/배차대기</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">배차 확정 전 의뢰를 확인하고 수동 조치를 남깁니다.</MudText>
+    </MudStack>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Refresh"
+               Disabled="@isLoading"
+               OnClick="LoadAsync">
+        새로고침
+    </MudButton>
+</MudStack>
 
 @if (!string.IsNullOrWhiteSpace(message))
 {
-    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
+    <MudAlert Severity="@MessageSeverity" Class="mb-3">@message</MudAlert>
 }
 
-<table class="table table-striped table-hover">
-    <thead><tr><th>ID</th><th>의뢰ID</th><th>유형</th><th>업무 범위</th><th>픽업 요약</th><th>하차 요약</th><th>확인</th><th>상태</th><th>작업</th></tr></thead>
-    <tbody>
-        @foreach (var item in items)
+<MudPaper Elevation="1" Class="pa-4">
+    <MudStack Spacing="2">
+        @if (isLoading)
         {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.의뢰Id</td>
-                <td><span class="@TransportTypeBadgeClass(item)">@TransportTypeLabel(item)</span></td>
-                <td>@WorkScopeLabel(item)</td>
-                <td>@item.픽업_도로명주소</td>
-                <td>@item.하차_도로명주소</td>
-                <td><span class="@ReviewBadgeClass(item.상태)">@ReviewLabel(item.상태)</span></td>
-                <td><span class="@StatusBadgeClass(item.상태)">@item.상태</span></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" @onclick='() => ChangeAsync(item.Id, "확정")'>수동 배차</button>
-                    <button class="btn btn-sm btn-outline-warning me-1" @onclick='() => ChangeAsync(item.Id, "보류")'>보류</button>
-                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteAsync(item.Id)">제거</button>
-                </td>
-            </tr>
+            <MudAlert Severity="Severity.Info" Dense="true">배차대기 목록을 불러오는 중입니다...</MudAlert>
         }
-    </tbody>
-</table>
+        else if (items.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Dense="true">배차대기 항목이 없습니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@items" Dense="true" Hover="true" Elevation="0">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>의뢰ID</MudTh>
+                    <MudTh>유형</MudTh>
+                    <MudTh>업무 범위</MudTh>
+                    <MudTh>픽업 요약</MudTh>
+                    <MudTh>하차 요약</MudTh>
+                    <MudTh>확인</MudTh>
+                    <MudTh>상태</MudTh>
+                    <MudTh>작업</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID">@context.Id</MudTd>
+                    <MudTd DataLabel="의뢰ID">@context.의뢰Id</MudTd>
+                    <MudTd DataLabel="유형">
+                        <MudChip T="string" Size="Size.Small" Color="@TransportTypeColor(context)" Variant="Variant.Filled">@TransportTypeLabel(context)</MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="업무 범위">@WorkScopeLabel(context)</MudTd>
+                    <MudTd DataLabel="픽업 요약">@context.픽업_도로명주소</MudTd>
+                    <MudTd DataLabel="하차 요약">@context.하차_도로명주소</MudTd>
+                    <MudTd DataLabel="확인">
+                        <MudChip T="string" Size="Size.Small" Color="@ReviewColor(context.상태)" Variant="Variant.Outlined">@ReviewLabel(context.상태)</MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="상태">
+                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.상태)" Variant="Variant.Filled">@context.상태</MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="작업">
+                        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => ChangeAsync(context.Id, 확정상태))">수동 배차</MudButton>
+                            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Warning" OnClick="@(() => ChangeAsync(context.Id, 보류상태))">보류</MudButton>
+                            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Error" OnClick="@(() => DeleteAsync(context.Id))">제거</MudButton>
+                        </MudStack>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudStack>
+</MudPaper>
 
 @code {
+    private const string 확정상태 = "확정";
+    private const string 보류상태 = "보류";
+
     private bool isLoading;
     private bool isError;
     private string? message;
     private IReadOnlyList<배차대기응답> items = [];
+    private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
 
     protected override async Task OnInitializedAsync() => await LoadAsync();
 
@@ -82,43 +124,43 @@
         return "대기확인";
     }
 
-    private static string ReviewBadgeClass(string? status)
+    private static Color ReviewColor(string? status)
     {
         if (IsMatch(status, "보류"))
         {
-            return "badge rounded-pill text-bg-warning";
+            return Color.Warning;
         }
 
         if (IsMatch(status, "확정"))
         {
-            return "badge rounded-pill text-bg-success";
+            return Color.Success;
         }
 
-        return "badge rounded-pill text-bg-info";
+        return Color.Info;
     }
 
-    private static string StatusBadgeClass(string? status)
+    private static Color StatusColor(string? status)
     {
         if (IsMatch(status, "확정"))
         {
-            return "badge rounded-pill text-bg-success";
+            return Color.Success;
         }
 
         if (IsMatch(status, "보류"))
         {
-            return "badge rounded-pill text-bg-warning";
+            return Color.Warning;
         }
 
-        return "badge rounded-pill text-bg-secondary";
+        return Color.Default;
     }
 
     private static string TransportTypeLabel(배차대기응답 item)
         => IsGroupPurchaseTransport(item) ? "공동구매" : "일반";
 
-    private static string TransportTypeBadgeClass(배차대기응답 item)
+    private static Color TransportTypeColor(배차대기응답 item)
         => IsGroupPurchaseTransport(item)
-            ? "badge rounded-pill text-bg-warning"
-            : "badge rounded-pill text-bg-primary";
+            ? Color.Warning
+            : Color.Primary;
 
     private static string WorkScopeLabel(배차대기응답 item)
     {

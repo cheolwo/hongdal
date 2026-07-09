@@ -3,131 +3,118 @@
 
 <PageTitle>음식 운영</PageTitle>
 
-<h1>음식 운영</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">음식 운영</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">배달 요금 정책과 음식점 리뷰 운영 상태를 관리합니다.</MudText>
+    </MudStack>
 
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert @messageClass">@message</div>
-}
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@messageSeverity">@message</MudAlert>
+    }
 
-@if (isLoading)
-{
-    <div class="d-flex align-items-center gap-2">
-        <div class="spinner-border spinner-border-sm" role="status"></div>
-        <span>음식 운영 정책을 불러오는 중입니다.</span>
-    </div>
-}
-else
-{
-    <div class="row g-3">
-        <div class="col-xl-7">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h5 class="card-title mb-1">배달 요금 정책</h5>
-                            <p class="text-muted mb-0">플랫폼 배달요금과 기사 지급액 산정 기준을 조정합니다.</p>
-                        </div>
-                        <button class="btn btn-primary" @onclick="SavePricingPolicyAsync" disabled="@isSaving">
-                            @(isSaving ? "저장 중" : "정책 저장")
-                        </button>
-                    </div>
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="me-2" />
+            음식 운영 정책을 불러오는 중입니다.
+        </MudAlert>
+    }
+    else
+    {
+        <MudGrid Spacing="3">
+            <MudItem xs="12" xl="7">
+                <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                    <MudStack Spacing="3">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">배달 요금 정책</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">플랫폼 배달요금과 기사 지급액 산정 기준을 조정합니다.</MudText>
+                            </MudStack>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Save"
+                                       Disabled="@isSaving"
+                                       OnClick="SavePricingPolicyAsync">
+                                @(isSaving ? "저장 중" : "정책 저장")
+                            </MudButton>
+                        </MudStack>
 
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">기본요금</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.BaseFee" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">최소요금</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.MinimumFee" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">기본 포함거리(m)</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.IncludedDistanceMeters" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">거리 단위(m)</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.DistanceUnitMeters" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">거리 단위 요금</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.DistanceUnitFee" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">기사 기본 지급액</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.DriverBasePayout" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">기사 최소 지급액</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.DriverMinimumPayout" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">기사 거리 지급액</label>
-                            <InputNumber class="form-control" @bind-Value="pricingPolicy.DriverDistanceUnitPayout" />
-                        </div>
-                    </div>
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="기본요금" Variant="Variant.Outlined" @bind-Value="pricingPolicy.BaseFee" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="최소요금" Variant="Variant.Outlined" @bind-Value="pricingPolicy.MinimumFee" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="int" Label="기본 포함거리(m)" Variant="Variant.Outlined" Min="0" @bind-Value="pricingPolicy.IncludedDistanceMeters" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="int" Label="거리 단위(m)" Variant="Variant.Outlined" Min="1" @bind-Value="pricingPolicy.DistanceUnitMeters" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="거리 단위 요금" Variant="Variant.Outlined" @bind-Value="pricingPolicy.DistanceUnitFee" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="기사 기본 지급액" Variant="Variant.Outlined" @bind-Value="pricingPolicy.DriverBasePayout" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="기사 최소 지급액" Variant="Variant.Outlined" @bind-Value="pricingPolicy.DriverMinimumPayout" /></MudItem>
+                            <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="기사 거리 지급액" Variant="Variant.Outlined" @bind-Value="pricingPolicy.DriverDistanceUnitPayout" /></MudItem>
+                        </MudGrid>
 
-                    <hr />
+                        <MudDivider />
 
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">견적 테스트 거리(m)</label>
-                            <InputNumber class="form-control" @bind-Value="previewDistanceMeters" />
-                        </div>
-                        <div class="col-md-8">
-                            <div class="border rounded p-3 bg-light">
-                                <div>플랫폼 배달요금: <strong>@PreviewPlatformFee.ToString("N0")원</strong></div>
-                                <div>기사 지급액: <strong>@PreviewDriverPayout.ToString("N0")원</strong></div>
-                                <div>플랫폼 마진: <strong>@PreviewMargin.ToString("N0")원</strong></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4">
+                                <MudNumericField T="int" Label="견적 테스트 거리(m)" Variant="Variant.Outlined" Min="0" @bind-Value="previewDistanceMeters" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudStack Spacing="1">
+                                        <MudText Typo="Typo.body2">플랫폼 배달요금: <strong>@PreviewPlatformFee.ToString("N0")원</strong></MudText>
+                                        <MudText Typo="Typo.body2">기사 지급액: <strong>@PreviewDriverPayout.ToString("N0")원</strong></MudText>
+                                        <MudText Typo="Typo.body2">플랫폼 마진: <strong>@PreviewMargin.ToString("N0")원</strong></MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
 
-        <div class="col-xl-5">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">리뷰 운영</h5>
-                    <p class="text-muted">음식점 리뷰 운영 정책과 관리자 검토 대상을 확인합니다.</p>
+            <MudItem xs="12" xl="5">
+                <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                    <MudStack Spacing="2">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">리뷰 운영</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">음식점 리뷰 운영 정책과 관리자 검토 대상을 확인합니다.</MudText>
+                        </MudStack>
 
-                    <dl class="row mb-3">
-                        <dt class="col-7">기본 저평점 게시일수</dt>
-                        <dd class="col-5 text-end">@reviewPolicy.기본저평점게시일수</dd>
-                        <dt class="col-7">검토 대상 리뷰</dt>
-                        <dd class="col-5 text-end">@reviewItems.Items.Count</dd>
-                        <dt class="col-7">연속 저평점 주의</dt>
-                        <dd class="col-5 text-end">@reviewItems.Items.Count(x => x.같은음식점기준저평점3회연속여부)</dd>
-                    </dl>
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4"><AdminInfoField Label="기본 저평점 게시일수" Value="@reviewPolicy.기본저평점게시일수.ToString()" /></MudItem>
+                            <MudItem xs="12" md="4"><AdminInfoField Label="검토 대상 리뷰" Value="@reviewItems.Items.Count.ToString()" /></MudItem>
+                            <MudItem xs="12" md="4"><AdminInfoField Label="연속 저평점 주의" Value="@reviewItems.Items.Count(x => x.같은음식점기준저평점3회연속여부).ToString()" /></MudItem>
+                        </MudGrid>
 
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle">
-                            <thead>
-                                <tr>
-                                    <th>음식점</th>
-                                    <th>별점</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in reviewItems.Items.Take(5))
-                                {
-                                    <tr>
-                                        <td>@item.음식점명</td>
-                                        <td>@item.별점</td>
-                                        <td>@(item.관리자게시강제여부 ? "강제게시" : "대기")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+                        @if (reviewItems.Items.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Info" Dense="true">검토 대상 리뷰가 없습니다.</MudAlert>
+                        }
+                        else
+                        {
+                            <MudTable Items="@reviewItems.Items.Take(5)" Dense="true" Hover="true" Elevation="0">
+                                <HeaderContent>
+                                    <MudTh>음식점</MudTh>
+                                    <MudTh>별점</MudTh>
+                                    <MudTh>상태</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="음식점">@context.음식점명</MudTd>
+                                    <MudTd DataLabel="별점">@context.별점</MudTd>
+                                    <MudTd DataLabel="상태">
+                                        <MudChip T="string" Size="Size.Small" Color="@(context.관리자게시강제여부 ? Color.Success : Color.Warning)" Variant="Variant.Filled">
+                                            @(context.관리자게시강제여부 ? "강제게시" : "대기")
+                                        </MudChip>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+</MudStack>
 
 @code {
     private 음식배달요금정책응답 pricingPolicy = new();
@@ -137,7 +124,7 @@ else
     private bool isLoading = true;
     private bool isSaving;
     private string? message;
-    private string messageClass = "alert-info";
+    private Severity messageSeverity = Severity.Info;
 
     private decimal PreviewPlatformFee => CalculatePlatformFee(previewDistanceMeters);
     private decimal PreviewDriverPayout => CalculateDriverPayout(previewDistanceMeters);
@@ -153,7 +140,7 @@ else
         }
         catch (Exception ex)
         {
-            messageClass = "alert-danger";
+            messageSeverity = Severity.Error;
             message = $"음식 운영 정보를 불러오지 못했습니다: {ex.Message}";
         }
         finally
@@ -175,12 +162,12 @@ else
         try
         {
             pricingPolicy = await FoodService.배달요금정책수정Async(pricingPolicy);
-            messageClass = "alert-success";
+            messageSeverity = Severity.Success;
             message = "배달 요금 정책을 저장했습니다.";
         }
         catch (Exception ex)
         {
-            messageClass = "alert-danger";
+            messageSeverity = Severity.Error;
             message = $"정책 저장에 실패했습니다: {ex.Message}";
         }
         finally

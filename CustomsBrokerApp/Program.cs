@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CustomsBrokerApp;
 using CustomsBrokerApp.Options;
 using CustomsBrokerApp.Services;
+using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -19,5 +20,6 @@ builder.Services.AddScoped(sp =>
 });
 builder.Services.AddScoped<CustomsBrokerAuthService>();
 builder.Services.AddScoped<HsCodeCorrectionService>();
+builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

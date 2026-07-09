@@ -1,0 +1,302 @@
+﻿[
+    {
+        "App":  "ShipperApp",
+        "Route":  "/",
+        "Status":  "OK",
+        "TextLength":  1223,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 Hongdal Shipper 플랫폼 커뮤니티  알림과 현장"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper",
+        "Status":  "OK",
+        "TextLength":  1223,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 Hongdal Shipper 플랫폼 커뮤니티  알림과 현장"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/counter",
+        "Status":  "OK",
+        "TextLength":  223,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/counter",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 Counter  Current count: 0  CLICK"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/weather",
+        "Status":  "OK",
+        "TextLength":  360,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/weather",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 Weather  This component demonstr"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/customs/hs-reviews",
+        "Status":  "OK",
+        "TextLength":  704,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/customs/hs-reviews",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 HS 코드 검토  수출입 물류 흐름이 감지되면 관세사 검토"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/dispatch/address-form",
+        "Status":  "OK",
+        "TextLength":  385,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/dispatch/address-form",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 상차/하차 주소 입력 폼  공통 주소 컴포넌트(Hongda"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/exploration/inbox",
+        "Status":  "OK",
+        "TextLength":  518,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/exploration/inbox",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 받은 탐색 문의함  샘플데이터로 기사님이 먼저 보낸 문의와"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/international/fcl-lcl",
+        "Status":  "OK",
+        "TextLength":  1213,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/international/fcl-lcl",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 FCL/LCL 판단 및 수입 판매 협의  구매 전 단계에서"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/inbound/dashboard",
+        "Status":  "OK",
+        "TextLength":  450,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/inbound/dashboard",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 입고 대시보드  입고 현황, 재고, 재위탁, 판매 등록 흐"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/inbound/requests",
+        "Status":  "OK",
+        "TextLength":  514,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/inbound/requests",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 입고 현황  창고를 만들고 입고 요청을 등록한 뒤, 도착 "
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/not-found",
+        "Status":  "OK",
+        "TextLength":  253,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/not-found",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 Not Found  Sorry, the content yo"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/sales/orders",
+        "Status":  "OK",
+        "TextLength":  796,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/sales/orders",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 주문 출고 알림  판매채널 주문을 국내/해외로 분류하고 재"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/sales/listings",
+        "Status":  "OK",
+        "TextLength":  533,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/sales/listings",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 출품 관리  판매상품과 채널출품 상태를 조회하고 기존 판매"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/public-cargo",
+        "Status":  "OK",
+        "TextLength":  266,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/public-cargo",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 공개 화물  홍달 서버 API에서 공개 상태의 화물 목록을"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/reconsignment/orders",
+        "Status":  "OK",
+        "TextLength":  292,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/reconsignment/orders",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 재위탁 운송  입고된 재고를 기사님에게 다시 운송위탁하는 "
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/sales/channels",
+        "Status":  "OK",
+        "TextLength":  646,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/sales/channels",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 판매채널 연결  스마트스토어, 쿠팡 등 판매채널 계정을 연"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/request/bulk",
+        "Status":  "OK",
+        "TextLength":  300,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/request/bulk",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 CSV 일괄등록  CSV를 업로드하면 서버가 행별 차량 추"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/settings/profile",
+        "Status":  "OK",
+        "TextLength":  391,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/settings/profile",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 화주 프로필 설정  화주가 국내에 있는지, 국외에 있는지에"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/request/REQ-20260709-001",
+        "Status":  "OK",
+        "TextLength":  310,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/request/REQ-20260709-001",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 운송 의뢰 상세  결제, 배차, 수락, 상차, 하차, 정산"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/request",
+        "Status":  "OK",
+        "TextLength":  395,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/request",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 화물운송의뢰 등록  단건 등록과 CSV 일괄등록을 한 화면"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/settings/views",
+        "Status":  "OK",
+        "TextLength":  463,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/settings/views",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 화면 설정  필수 화면은 항상 표시되고, 선택 화면만 숨기"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/inventory",
+        "Status":  "OK",
+        "TextLength":  347,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/inventory",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 재고 허브  주문자, 화주, 창고관리자가 같은 앱 안에서 "
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/scan",
+        "Status":  "OK",
+        "TextLength":  658,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/scan",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 Warehouse scan  Receive inbound,"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/workspace",
+        "Status":  "OK",
+        "TextLength":  1060,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/workspace",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 창고 운영 허브  ShipperApp은 입고, 재고, 주문"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/work/inbound",
+        "Status":  "OK",
+        "TextLength":  480,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/work/inbound",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 입고 작업 시작  입고 검수와 적재 작업을 시작하기 전에 "
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/work/outbound",
+        "Status":  "OK",
+        "TextLength":  476,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/work/outbound",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 출고 작업 시작  출고 피킹 작업을 시작하기 전에 작업자와"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/work/packing",
+        "Status":  "OK",
+        "TextLength":  473,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/work/packing",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 포장 작업 시작  포장 작업을 시작하기 전에 작업자와 포장"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/work/market-fulfillment",
+        "Status":  "OK",
+        "TextLength":  496,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/work/market-fulfillment",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 마켓 출고 작업 시작  이커머스 주문 출고, 피킹, 포장 "
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/work/international-forwarding",
+        "Status":  "OK",
+        "TextLength":  502,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/work/international-forwarding",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 해외 배송대행 작업 시작  해외 배송대행 입고, 검수, 통"
+    },
+    {
+        "App":  "ShipperApp",
+        "Route":  "/shipper/warehouse/work/delivery-agency",
+        "Status":  "OK",
+        "TextLength":  498,
+        "H1":  "",
+        "H2":  "",
+        "Href":  "https://0.0.0.1/shipper/warehouse/work/delivery-agency",
+        "Sample":  "← 뒤로가기  Hongdal Shipper  국내 운송 운영  Hongdal Shipper  국내 운송 운영 홈 Home 운송 화물운송의뢰 등록 공개 화물정보 받은 탐색 문의함 HS 코드 검토 상차/하차 주소 입력 FCL/LCL 판단 창고/재고 창고 작업대 재고 목록 재위탁 운송 창고 현장 앱 안내 판매 설정 모드 전환 커뮤니티 업무 국내 배송대행 작업 시작  국내 배송대행 접수와 운송 연결"
+    }
+]

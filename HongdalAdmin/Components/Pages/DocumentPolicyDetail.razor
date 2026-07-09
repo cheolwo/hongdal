@@ -6,87 +6,80 @@
 
 <PageTitle>문서 정책 편집</PageTitle>
 
-<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-    <div>
-        <h1 class="mb-1">문서 정책 편집</h1>
-        <div class="text-muted">선택한 문서 종류의 운영 정책만 수정합니다.</div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-secondary" href="@관리자문서Routes.정책목록">문서 정책</a>
-        <a class="btn btn-outline-primary" href="@관리자문서Routes.목록">문서 목록</a>
-        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
-    </div>
-</div>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">문서 정책 편집</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">선택한 문서 종류의 운영 정책만 수정합니다.</MudText>
+        </MudStack>
+        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+            <MudButton Href="@관리자문서Routes.정책목록" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Policy">문서 정책</MudButton>
+            <MudButton Href="@관리자문서Routes.목록" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.List">문서 목록</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isLoading" OnClick="LoadAsync">새로고침</MudButton>
+        </MudStack>
+    </MudStack>
 
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
-}
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@MessageSeverity">@message</MudAlert>
+    }
 
-@if (isLoading)
-{
-    <div class="alert alert-info">문서 정책을 불러오는 중입니다...</div>
-}
-else if (selectedPolicy is null)
-{
-    <div class="alert alert-warning">문서코드 @DocumentCode 정책을 찾지 못했습니다.</div>
-}
-else
-{
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">@selectedPolicy.문서코드</h5>
-            <div class="row g-2">
-                <div class="col-md-4">
-                    <label class="form-label">문서코드</label>
-                    <input class="form-control" value="@selectedPolicy.문서코드" disabled />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">문서명</label>
-                    <input class="form-control" @bind="selectedPolicy.문서명" />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">자동생성시점</label>
-                    <input class="form-control" @bind="selectedPolicy.자동생성시점" />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">보관일수</label>
-                    <input class="form-control" type="number" @bind="selectedPolicy.보관일수" />
-                </div>
-                <div class="col-md-3 form-check mt-4 ms-3">
-                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.사용여부" />
-                    <label class="form-check-label">사용</label>
-                </div>
-                <div class="col-md-3 form-check mt-4 ms-3">
-                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.암호화여부" />
-                    <label class="form-check-label">암호화</label>
-                </div>
-                <div class="col-md-3 form-check mt-4 ms-3">
-                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.다운로드허용여부" />
-                    <label class="form-check-label">다운로드 허용</label>
-                </div>
-                <div class="col-md-3 form-check ms-3">
-                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.서명필요여부" />
-                    <label class="form-check-label">서명 필요</label>
-                </div>
-                <div class="col-md-3 form-check ms-3">
-                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.수정가능여부" />
-                    <label class="form-check-label">수정 가능</label>
-                </div>
-                <div class="col-md-3 form-check ms-3">
-                    <input class="form-check-input" type="checkbox" @bind="selectedPolicy.감사로그여부" />
-                    <label class="form-check-label">감사로그</label>
-                </div>
-                <div class="col-12">
-                    <label class="form-label">조회 가능 역할 목록 JSON</label>
-                    <textarea class="form-control" rows="3" @bind="selectedPolicy.조회가능역할목록Json"></textarea>
-                </div>
-            </div>
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">문서 정책을 불러오는 중입니다...</MudAlert>
+    }
+    else if (selectedPolicy is null)
+    {
+        <MudAlert Severity="Severity.Warning">문서코드 @DocumentCode 정책을 찾지 못했습니다.</MudAlert>
+    }
+    else
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">@selectedPolicy.문서코드</MudText>
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="문서코드" Value="@selectedPolicy.문서코드" Variant="Variant.Outlined" ReadOnly="true" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="문서명" Variant="Variant.Outlined" @bind-Value="selectedPolicy.문서명" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField Label="자동생성시점" Variant="Variant.Outlined" @bind-Value="selectedPolicy.자동생성시점" />
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudNumericField T="int" Label="보관일수" Variant="Variant.Outlined" Min="0" @bind-Value="selectedPolicy.보관일수" />
+                    </MudItem>
+                </MudGrid>
 
-            <button class="btn btn-primary mt-3" @onclick="SavePolicyAsync" disabled="@isSaving">정책 저장</button>
-        </div>
-    </div>
-}
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle2">정책 플래그</MudText>
+                    <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                        <MudCheckBox T="bool" @bind-Value="selectedPolicy.사용여부" Label="사용" Color="Color.Primary" />
+                        <MudCheckBox T="bool" @bind-Value="selectedPolicy.암호화여부" Label="암호화" Color="Color.Primary" />
+                        <MudCheckBox T="bool" @bind-Value="selectedPolicy.다운로드허용여부" Label="다운로드 허용" Color="Color.Primary" />
+                        <MudCheckBox T="bool" @bind-Value="selectedPolicy.서명필요여부" Label="서명 필요" Color="Color.Primary" />
+                        <MudCheckBox T="bool" @bind-Value="selectedPolicy.수정가능여부" Label="수정 가능" Color="Color.Primary" />
+                        <MudCheckBox T="bool" @bind-Value="selectedPolicy.감사로그여부" Label="감사로그" Color="Color.Primary" />
+                    </MudStack>
+                </MudStack>
+
+                <MudTextField Label="조회 가능 역할 목록 JSON"
+                              Variant="Variant.Outlined"
+                              Lines="3"
+                              @bind-Value="selectedPolicy.조회가능역할목록Json" />
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           Disabled="@isSaving"
+                           OnClick="SavePolicyAsync">
+                    정책 저장
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
 
 @code {
     [Parameter]
@@ -97,6 +90,7 @@ else
     private bool isError;
     private string? message;
     private 문서정책요약응답? selectedPolicy;
+    private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
 
     protected override async Task OnParametersSetAsync()
     {

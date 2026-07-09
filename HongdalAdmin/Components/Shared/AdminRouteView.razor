@@ -3,9 +3,9 @@
 
 @if (!ViewPolicyService.IsLoaded)
 {
-    <div class="p-4 text-center">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Class="pa-4">
         <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
-    </div>
+    </MudStack>
 }
 else if (blockedItem is not null)
 {

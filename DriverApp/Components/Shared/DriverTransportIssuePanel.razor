@@ -1,0 +1,117 @@
+<MudPaper Elevation="0" Class="@Class">
+    <MudStack Spacing="2">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.subtitle1">@Title</MudText>
+                @if (!string.IsNullOrWhiteSpace(Description))
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@Description</MudText>
+                }
+            </MudStack>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Warning"
+                       StartIcon="@Icons.Material.Filled.ReportProblem"
+                       OnClick="ToggleOpenAsync">
+                @ToggleButtonText
+            </MudButton>
+        </MudStack>
+
+        @if (Open)
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="5">
+                    <MudSelect T="string" Label="@IssueTypeLabel" Value="@IssueType" ValueChanged="SetIssueTypeAsync" Variant="Variant.Outlined">
+                        @foreach (var issueType in IssueTypes)
+                        {
+                            <MudSelectItem T="string" Value="@issueType">@issueType</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="7">
+                    <MudTextField T="string"
+                                  Value="@Memo"
+                                  ValueChanged="SetMemoAsync"
+                                  Label="@MemoLabel"
+                                  Variant="Variant.Outlined"
+                                  MaxLength="@MemoMaxLength"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Warning"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       Disabled="@IsReporting"
+                       OnClick="SubmitAsync">
+                @(IsReporting ? ReportingText : SubmitText)
+            </MudButton>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "현장 문제 기록";
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "pa-3";
+
+    [Parameter]
+    public bool Open { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<string> IssueTypes { get; set; } = [];
+
+    [Parameter]
+    public string IssueType { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> IssueTypeChanged { get; set; }
+
+    [Parameter]
+    public string? Memo { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> MemoChanged { get; set; }
+
+    [Parameter]
+    public bool IsReporting { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public string ToggleButtonText { get; set; } = "문제 발생";
+
+    [Parameter]
+    public string IssueTypeLabel { get; set; } = "문제 유형";
+
+    [Parameter]
+    public string MemoLabel { get; set; } = "현장 메모";
+
+    [Parameter]
+    public int MemoMaxLength { get; set; } = 300;
+
+    [Parameter]
+    public string SubmitText { get; set; } = "문제 기록";
+
+    [Parameter]
+    public string ReportingText { get; set; } = "문제 신고 중";
+
+    private Task ToggleOpenAsync()
+        => OpenChanged.InvokeAsync(!Open);
+
+    private Task SetIssueTypeAsync(string issueType)
+        => IssueTypeChanged.InvokeAsync(issueType);
+
+    private Task SetMemoAsync(string? memo)
+        => MemoChanged.InvokeAsync(memo);
+
+    private Task SubmitAsync()
+        => OnSubmit.InvokeAsync();
+}

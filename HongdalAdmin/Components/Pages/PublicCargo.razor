@@ -3,47 +3,54 @@
 
 <PageTitle>11. 공개 화물정보</PageTitle>
 
-<h1>11. 공개 화물정보</h1>
-<p class="text-muted">비회원도 조회 가능한 공개 화물 요약 목록입니다. 상세 정보는 로그인 후 확인할 수 있습니다.</p>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">11. 공개 화물정보</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">비회원도 조회 가능한 공개 화물 요약 목록입니다. 상세 정보는 로그인 후 확인할 수 있습니다.</MudText>
+        </MudStack>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isLoading" OnClick="LoadAsync">새로고침</MudButton>
+    </MudStack>
 
-<button class="btn btn-primary mb-3" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
-
-@if (isLoading)
-{
-    <p>공개 화물 요약을 불러오는 중입니다...</p>
-}
-else if (!string.IsNullOrWhiteSpace(errorMessage))
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-else if (items.Count == 0)
-{
-    <div class="alert alert-info">공개된 화물정보가 없습니다.</div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-lg-2 g-3">
-        @foreach (var item in items)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">@item.화물종류</h5>
-                        <div class="text-muted small">@item.의뢰Id</div>
-                        <hr />
-                        <div><strong>운송방식:</strong> @item.운송방식</div>
-                        <div><strong>차량종류:</strong> @item.차량종류</div>
-                        <div><strong>수량:</strong> @(item.화물수량?.ToString() ?? "-")</div>
-                        <div><strong>중량:</strong> @(item.화물중량Kg?.ToString("N1") ?? "-") Kg</div>
-                        <div><strong>의뢰상태:</strong> @item.의뢰상태</div>
-                        <div><strong>배차상태:</strong> @item.배차상태</div>
-                        <div><strong>등록일시:</strong> @item.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-}
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">공개 화물 요약을 불러오는 중입니다...</MudAlert>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+    }
+    else if (items.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">공개된 화물정보가 없습니다.</MudAlert>
+    }
+    else
+    {
+        <MudGrid Spacing="3">
+            @foreach (var item in items)
+            {
+                <MudItem xs="12" lg="6">
+                    <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                        <MudStack Spacing="2">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">@item.화물종류</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.의뢰Id</MudText>
+                            </MudStack>
+                            <MudDivider />
+                            <AdminInfoField Label="운송방식" Value="@item.운송방식" />
+                            <AdminInfoField Label="차량종류" Value="@item.차량종류" />
+                            <AdminInfoField Label="수량" Value="@(item.화물수량?.ToString() ?? "-")" />
+                            <AdminInfoField Label="중량" Value="@(item.화물중량Kg is null ? "-" : $"{item.화물중량Kg:N1} Kg")" />
+                            <AdminInfoField Label="의뢰상태" Value="@item.의뢰상태" />
+                            <AdminInfoField Label="배차상태" Value="@item.배차상태" />
+                            <AdminInfoField Label="등록일시" Value="@item.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")" />
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudStack>
 
 @code {
     private bool isLoading = true;

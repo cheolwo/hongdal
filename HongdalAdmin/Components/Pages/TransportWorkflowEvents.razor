@@ -4,79 +4,63 @@
 
 <PageTitle>1.0 운송 이벤트 로그</PageTitle>
 
-<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-    <div>
-        <h1 class="mb-1">06-1. 운송 이벤트 로그</h1>
-        <div class="text-muted">서버에 남은 이벤트 시각과 메타데이터를 확인합니다.</div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <button class="btn btn-outline-secondary" @onclick="@(() => NavigationManager.NavigateTo(OverviewHref))">관제 개요</button>
-        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
-    </div>
-</div>
+<AdminTransportWorkflowHeader Title="06-1. 운송 이벤트 로그"
+                              Subtitle="서버에 남은 이벤트 시각과 메타데이터를 확인합니다."
+                              BackButtonText="관제 개요"
+                              IsLoading="@isLoading"
+                              OnBack="NavigateToOverview"
+                              OnRefresh="LoadAsync" />
 
 @if (isLoading)
 {
-    <div class="alert alert-info">이벤트 로그를 불러오는 중입니다...</div>
+    <MudAlert Severity="Severity.Info">이벤트 로그를 불러오는 중입니다...</MudAlert>
 }
 else if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <div class="alert alert-danger">@errorMessage</div>
+    <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
 }
 else if (detail is null)
 {
-    <div class="alert alert-warning">의뢰 @RequestId 관제 정보를 찾지 못했습니다.</div>
+    <MudAlert Severity="Severity.Warning">의뢰 @RequestId 관제 정보를 찾지 못했습니다.</MudAlert>
 }
 else
 {
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-                <div>
-                    <div class="text-muted small">의뢰ID</div>
-                    <h2 class="h5 mb-1">@detail.의뢰Id</h2>
-                    <div>@detail.경로표시</div>
-                </div>
-                <span class="@관리자화면Ui.색상Badge(detail.현재상태색상)">@detail.현재상태라벨</span>
-            </div>
-        </div>
-    </div>
+    <AdminTransportWorkflowSummaryCard Detail="@detail" />
 
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="card-title mb-0">이벤트 로그</h5>
-                <span class="badge rounded-pill text-bg-primary">@detail.이벤트목록.Count 건</span>
-            </div>
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6">이벤트 로그</MudText>
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@detail.이벤트목록.Count 건</MudChip>
+            </MudStack>
             @if (detail.이벤트목록.Count == 0)
             {
-                <div class="alert alert-secondary mb-0">등록된 이벤트가 없습니다.</div>
+                <MudAlert Severity="Severity.Info" Dense="true">등록된 이벤트가 없습니다.</MudAlert>
             }
             else
             {
-                <div class="table-responsive">
-                    <table class="table table-sm table-striped align-middle">
-                        <thead><tr><th>시각</th><th>이벤트</th><th>메타데이터</th></tr></thead>
-                        <tbody>
-                        @foreach (var item in detail.이벤트목록)
-                        {
-                            <tr>
-                                <td>@item.이벤트시각.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@item.이벤트타입</td>
-                                <td class="small text-break">@관리자화면Ui.표시값(item.메타데이터)</td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                </div>
+                <MudTable Items="@detail.이벤트목록" Dense="true" Hover="true" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>시각</MudTh>
+                        <MudTh>이벤트</MudTh>
+                        <MudTh>메타데이터</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="시각">@context.이벤트시각.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+                        <MudTd DataLabel="이벤트">@context.이벤트타입</MudTd>
+                        <MudTd DataLabel="메타데이터">
+                            <MudText Typo="Typo.body2" Class="text-break">@관리자화면Ui.표시값(context.메타데이터)</MudText>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
             }
-        </div>
-    </div>
+        </MudStack>
+    </MudPaper>
 
-    <div class="d-flex gap-2 mt-3">
-        <a class="btn btn-outline-primary" href="@ProofsHref">증빙/POD</a>
-        <a class="btn btn-outline-primary" href="@SettlementHref">결제/정산</a>
-    </div>
+    <MudStack Row="true" Spacing="1" Class="mt-3" Style="flex-wrap: wrap;">
+        <MudButton Href="@ProofsHref" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChevronRight">증빙/POD</MudButton>
+        <MudButton Href="@SettlementHref" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChevronRight">결제/정산</MudButton>
+    </MudStack>
 }
 
 @code {
@@ -129,5 +113,8 @@ else
         var baseHref = $"/transports/{Uri.EscapeDataString(RequestId)}";
         return string.IsNullOrWhiteSpace(segment) ? baseHref : $"{baseHref}/{segment}";
     }
+
+    private void NavigateToOverview()
+        => NavigationManager.NavigateTo(OverviewHref);
 
 }

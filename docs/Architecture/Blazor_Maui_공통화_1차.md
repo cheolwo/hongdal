@@ -1,9 +1,16 @@
-# Blazor/Maui 공통화 1차 적용 (2026-07-02)
+# MudBlazor/Maui 공통화 1차 적용 (2026-07-02)
 
 ## 목표
-- Blazor/MudBlazor 중심 UI 구조를 유지하면서 공통 UI 자산을 재사용 가능한 형태로 분리한다.
+- MudBlazor 컴포넌트 중심 UI 구조를 유지하면서 공통 UI 자산을 재사용 가능한 형태로 분리한다.
 - `HongdalAdmin`(Blazor Web)과 `RestaurantDeskApp`(MAUI Blazor Hybrid)에서 동일한 루트 Provider/테마 구성을 사용한다.
 - 이후 2차 리팩터링(공통 페이지/공통 서비스 확장)을 위한 기반을 만든다.
+
+## UI 구성 원칙
+- 기본 UI 표현은 MudBlazor 컴포넌트로 구성한다.
+- 네이티브 UI나 플랫폼별 구현은 DriverApp의 지도, 위치 백그라운드 송신, 카메라, 푸시 알림처럼 OS 권한이나 디바이스 기능이 직접 필요한 경우에만 사용한다.
+- 네이티브 기능이 필요한 앱도 업무 화면 자체는 가능하면 MudBlazor 컴포넌트로 유지하고, 네이티브 영역은 지도/센서/권한 처리 같은 경계 역할로 제한한다.
+- Blazor는 렌더링 기반으로 사용하되, 화면을 구성하는 버튼, 카드, 탭, 다이얼로그, 폼, 알림 같은 UI 단위는 MudBlazor를 우선 적용한다.
+- 이 기준을 따르면 `Hongdal.Ui.Common`의 공통 컴포넌트를 ShipperApp, WarehouseManagerApp, RestaurantDeskApp, OrdererApp, HongdalAdmin에서 재사용하기 쉽다.
 
 ## 이번 단계에서 적용한 항목
 

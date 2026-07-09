@@ -1,0 +1,37 @@
+<PageTitle>@PageTitle</PageTitle>
+
+<MudPaper Class="@Class" Elevation="@Elevation">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.h5">@Title</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">@Message</MudText>
+        @if (!string.IsNullOrWhiteSpace(SettingsHref))
+        {
+            <MudButton Href="@SettingsHref" Variant="Variant.Filled" Color="Color.Primary">@SettingsButtonText</MudButton>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string PageTitle { get; set; } = "접근 제한";
+
+    [Parameter]
+    public string Title { get; set; } = "숨겨진 화면입니다.";
+
+    [Parameter, EditorRequired]
+    public string ViewName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? SettingsHref { get; set; }
+
+    [Parameter]
+    public string SettingsButtonText { get; set; } = "화면 설정으로 이동";
+
+    [Parameter]
+    public string Class { get; set; } = "pa-4";
+
+    [Parameter]
+    public int Elevation { get; set; }
+
+    private string Message => $"\"{ViewName}\" 화면은 현재 사용자 설정 또는 관리자 정책에 따라 표시되지 않습니다.";
+}

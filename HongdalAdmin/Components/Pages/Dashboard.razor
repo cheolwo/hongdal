@@ -3,91 +3,97 @@
 
 <PageTitle>01. 업무 안내판</PageTitle>
 
-<h1>01. 업무 안내판</h1>
-
-<button class="btn btn-primary mb-3" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
+<MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Class="mb-3" Style="flex-wrap: wrap;">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">01. 업무 안내판</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">1.0 운송 흐름에서 막히는 운영 항목을 먼저 봅니다.</MudText>
+    </MudStack>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Refresh"
+               Disabled="@isLoading"
+               OnClick="LoadAsync">
+        새로고침
+    </MudButton>
+</MudStack>
 
 @if (isLoading)
 {
-    <p>집계 데이터를 불러오는 중입니다...</p>
+    <MudAlert Severity="Severity.Info">집계 데이터를 불러오는 중입니다...</MudAlert>
 }
 else
 {
-    <div class="row g-3">
+    <MudGrid Spacing="3">
         @foreach (var item in cards)
         {
-            <div class="col-md-4 col-xl-2">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="text-muted small">@item.Title</div>
-                        <div class="fs-3 fw-bold">@item.Value</div>
-                    </div>
-                </div>
-            </div>
+            <MudItem xs="12" sm="6" md="4" xl="3">
+                <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Title</MudText>
+                    <MudText Typo="Typo.h4">@item.Value</MudText>
+                </MudPaper>
+            </MudItem>
         }
-    </div>
+    </MudGrid>
 
-    <div class="row g-3 mt-1">
-        <div class="col-lg-7">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-                        <div>
-                            <h5 class="card-title mb-1">1.0 운영 확인</h5>
-                            <div class="text-muted small">화주-기사-수령자 운송 흐름을 막는 항목만 먼저 봅니다.</div>
-                        </div>
-                        <span class="badge rounded-pill text-bg-primary">@operationIssues.Count 건</span>
-                    </div>
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="7">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">1.0 운영 확인</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">화주-기사-수령자 운송 흐름을 막는 항목만 먼저 봅니다.</MudText>
+                        </MudStack>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@operationIssues.Count 건</MudChip>
+                    </MudStack>
 
                     @if (operationIssues.Count == 0)
                     {
-                        <div class="alert alert-success mb-0">현재 즉시 확인할 1.0 운영 항목이 없습니다.</div>
+                        <MudAlert Severity="Severity.Success" Dense="true">현재 즉시 확인할 1.0 운영 항목이 없습니다.</MudAlert>
                     }
                     else
                     {
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle">
-                                <thead><tr><th>구분</th><th>대상</th><th>확인 내용</th><th>우선도</th></tr></thead>
-                                <tbody>
-                                    @foreach (var issue in operationIssues)
-                                    {
-                                        <tr>
-                                            <td><span class="@IssueBadgeClass(issue.Kind)">@issue.Kind</span></td>
-                                            <td><a href="@WorkflowDetailHref(issue.Target)">@issue.Target</a></td>
-                                            <td>@issue.Message</td>
-                                            <td>@issue.Priority</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                        <MudTable Items="@operationIssues" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>구분</MudTh>
+                                <MudTh>대상</MudTh>
+                                <MudTh>확인 내용</MudTh>
+                                <MudTh>우선도</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="구분">
+                                    <MudChip T="string" Size="Size.Small" Color="@IssueColor(context.Kind)" Variant="Variant.Filled">@context.Kind</MudChip>
+                                </MudTd>
+                                <MudTd DataLabel="대상">
+                                    <MudLink Href="@WorkflowDetailHref(context.Target)">@context.Target</MudLink>
+                                </MudTd>
+                                <MudTd DataLabel="확인 내용">@context.Message</MudTd>
+                                <MudTd DataLabel="우선도">@context.Priority</MudTd>
+                            </RowTemplate>
+                        </MudTable>
                     }
-                </div>
-            </div>
-        </div>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
 
-        <div class="col-lg-5">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">운송 상태 레인</h5>
-                    <div class="vstack gap-2">
-                        @foreach (var lane in statusLanes)
-                        {
-                            <div>
-                                <div class="d-flex justify-content-between small">
-                                    <span>@lane.Label</span>
-                                    <span>@lane.Count</span>
-                                </div>
-                                <div class="progress" role="progressbar" aria-label="@lane.Label" aria-valuenow="@lane.Percent" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="progress-bar @lane.BarClass" style="width: @lane.Percent%"></div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <MudItem xs="12" lg="5">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">운송 상태 레인</MudText>
+                    @foreach (var lane in statusLanes)
+                    {
+                        <MudStack Spacing="1">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.body2">@lane.Label</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@lane.Count</MudText>
+                            </MudStack>
+                            <MudProgressLinear Value="@lane.Percent" Color="@lane.Color" Rounded="true" />
+                        </MudStack>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 }
 
 @code {
@@ -175,13 +181,13 @@ else
         var total = Math.Max(1, summary.오늘의뢰수 + summary.배차대기수 + summary.운송중수 + summary.완료수);
         return
         [
-            new("결제 대기", summary.결제대기수, Percent(summary.결제대기수, total), "bg-warning"),
-            new("배차 대기", summary.배차대기수, Percent(summary.배차대기수, total), "bg-info"),
-            new("운송 중", summary.운송중수, Percent(summary.운송중수, total), "bg-primary"),
-            new("관리자 확인", summary.관리자확인필요수, Percent(summary.관리자확인필요수, total), "bg-danger"),
-            new("운송 예외", summary.운송예외수, Percent(summary.운송예외수, total), "bg-warning"),
-            new("완료", summary.완료수, Percent(summary.완료수, total), "bg-success"),
-            new("취소/환불", summary.취소환불수, Percent(summary.취소환불수, total), "bg-danger")
+            new("결제 대기", summary.결제대기수, Percent(summary.결제대기수, total), Color.Warning),
+            new("배차 대기", summary.배차대기수, Percent(summary.배차대기수, total), Color.Info),
+            new("운송 중", summary.운송중수, Percent(summary.운송중수, total), Color.Primary),
+            new("관리자 확인", summary.관리자확인필요수, Percent(summary.관리자확인필요수, total), Color.Error),
+            new("운송 예외", summary.운송예외수, Percent(summary.운송예외수, total), Color.Warning),
+            new("완료", summary.완료수, Percent(summary.완료수, total), Color.Success),
+            new("취소/환불", summary.취소환불수, Percent(summary.취소환불수, total), Color.Error)
         ];
     }
 
@@ -196,16 +202,16 @@ else
     private static int Percent(int value, int total)
         => Math.Clamp((int)Math.Round(value / (double)total * 100), 0, 100);
 
-    private static string IssueBadgeClass(string kind)
+    private static Color IssueColor(string kind)
         => kind switch
         {
-            "결제확인" => "badge rounded-pill text-bg-warning",
-            "배차확인" => "badge rounded-pill text-bg-info",
-            "관리자확인" => "badge rounded-pill text-bg-danger",
-            "예외신고" => "badge rounded-pill text-bg-warning",
-            "지연확인" => "badge rounded-pill text-bg-danger",
-            "취소환불" => "badge rounded-pill text-bg-dark",
-            _ => "badge rounded-pill text-bg-secondary"
+            "결제확인" => Color.Warning,
+            "배차확인" => Color.Info,
+            "관리자확인" => Color.Error,
+            "예외신고" => Color.Warning,
+            "지연확인" => Color.Error,
+            "취소환불" => Color.Dark,
+            _ => Color.Default
         };
 
     private static bool IsMatch(string? value, params string[] candidates)
@@ -216,5 +222,5 @@ else
 
     private sealed record OperationIssue(string Kind, string Target, string Message, string Priority);
 
-    private sealed record StatusLane(string Label, int Count, int Percent, string BarClass);
+    private sealed record StatusLane(string Label, int Count, int Percent, Color Color);
 }

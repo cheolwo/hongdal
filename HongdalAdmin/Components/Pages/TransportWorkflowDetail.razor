@@ -4,124 +4,114 @@
 
 <PageTitle>1.0 운송 관제 개요</PageTitle>
 
-<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-    <div>
-        <h1 class="mb-1">06-1. 1.0 운송 관제 개요</h1>
-        <div class="text-muted">진행 단계와 운영 확인 항목을 중심으로 봅니다.</div>
-    </div>
-    <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary" @onclick="@(() => NavigationManager.NavigateTo("/transports"))">운송 목록</button>
-        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
-    </div>
-</div>
+<AdminTransportWorkflowHeader Title="06-1. 1.0 운송 관제 개요"
+                              Subtitle="진행 단계와 운영 확인 항목을 중심으로 봅니다."
+                              BackButtonText="운송 목록"
+                              IsLoading="@isLoading"
+                              OnBack="NavigateToTransportList"
+                              OnRefresh="LoadAsync" />
 
 @if (isLoading)
 {
-    <div class="alert alert-info">관제 정보를 불러오는 중입니다...</div>
+    <MudAlert Severity="Severity.Info">관제 정보를 불러오는 중입니다...</MudAlert>
 }
 else if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <div class="alert alert-danger">@errorMessage</div>
+    <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
 }
 else if (detail is null)
 {
-    <div class="alert alert-warning">의뢰 @RequestId 관제 정보를 찾지 못했습니다.</div>
+    <MudAlert Severity="Severity.Warning">의뢰 @RequestId 관제 정보를 찾지 못했습니다.</MudAlert>
 }
 else
 {
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-                <div>
-                    <div class="text-muted small">의뢰ID</div>
-                    <h2 class="h4 mb-1">@detail.의뢰Id</h2>
-                    <div>@detail.경로표시</div>
-                    <div class="text-muted small">@detail.운송방식 · 화주 @관리자화면Ui.표시값(detail.화주Id)</div>
-                </div>
-                <span class="@관리자화면Ui.색상Badge(detail.현재상태색상)">@detail.현재상태라벨</span>
-            </div>
-            <div class="alert alert-info mt-3 mb-0">
-                <strong>관리자 다음 행동</strong>
-                <div>@detail.관리자다음행동</div>
-            </div>
-        </div>
-    </div>
+    <AdminTransportWorkflowSummaryCard Detail="@detail"
+                                       HeadingTypo="Typo.h4"
+                                       ShowTransportMeta="true"
+                                       ShowNextAction="true" />
 
-    <div class="row g-3 mb-3">
+    <MudGrid Spacing="3" Class="mb-3">
         @foreach (var step in detail.단계목록)
         {
-            <div class="col-md-6 col-xl-3">
-                <div class="card h-100 border-@step.색상">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start gap-2">
-                            <div class="text-muted small">@step.순번. @step.제목</div>
-                            <span class="@관리자화면Ui.색상Badge(step.색상)">@StepLabel(step)</span>
-                        </div>
-                        <div class="fw-semibold mt-2">@step.상태</div>
-                        <div class="small text-muted mt-1">@step.설명</div>
-                        <div class="small mt-2">@step.증빙</div>
-                    </div>
-                </div>
-            </div>
+            <MudItem xs="12" md="6" xl="3">
+                <MudPaper Elevation="1" Class="pa-4" Style="@StepBorderStyle(step)">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="1">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@step.순번. @step.제목</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.색상(step.색상)" Variant="Variant.Filled">
+                                @StepLabel(step)
+                            </MudChip>
+                        </MudStack>
+                        <MudText Typo="Typo.subtitle1">@step.상태</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@step.설명</MudText>
+                        <MudText Typo="Typo.body2">@step.증빙</MudText>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
         }
-    </div>
+    </MudGrid>
 
-    <div class="row g-3 mb-3">
-        <div class="col-lg-8">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0">운영 확인</h5>
-                        <span class="badge rounded-pill text-bg-primary">@detail.운영확인목록.Count 건</span>
-                    </div>
+    <MudGrid Spacing="3" Class="mb-3">
+        <MudItem xs="12" lg="8">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h6">운영 확인</MudText>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@detail.운영확인목록.Count 건</MudChip>
+                    </MudStack>
                     @if (detail.운영확인목록.Count == 0)
                     {
-                        <div class="alert alert-success mb-0">현재 즉시 확인할 운영 항목이 없습니다.</div>
+                        <MudAlert Severity="Severity.Success" Dense="true">현재 즉시 확인할 운영 항목이 없습니다.</MudAlert>
                     }
                     else
                     {
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle">
-                                <thead><tr><th>구분</th><th>우선도</th><th>조치 안내</th></tr></thead>
-                                <tbody>
-                                @foreach (var item in detail.운영확인목록)
-                                {
-                                    <tr>
-                                        <td>@item.구분</td>
-                                        <td><span class="badge rounded-pill @(item.우선도 == "높음" ? "text-bg-danger" : "text-bg-warning")">@item.우선도</span></td>
-                                        <td>@item.조치안내</td>
-                                    </tr>
-                                }
-                                </tbody>
-                            </table>
-                        </div>
+                        <MudTable Items="@detail.운영확인목록" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>구분</MudTh>
+                                <MudTh>우선도</MudTh>
+                                <MudTh>조치 안내</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="구분">@context.구분</MudTd>
+                                <MudTd DataLabel="우선도">
+                                    <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.우선도색상(context.우선도)" Variant="Variant.Filled">
+                                        @context.우선도
+                                    </MudChip>
+                                </MudTd>
+                                <MudTd DataLabel="조치 안내">@context.조치안내</MudTd>
+                            </RowTemplate>
+                        </MudTable>
                     }
-                </div>
-            </div>
-        </div>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
 
-        <div class="col-lg-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">연결 화면</h5>
-                    <div class="list-group list-group-flush">
-                        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0" href="@EventsHref">
-                            <span>이벤트 로그</span>
-                            <span class="badge rounded-pill text-bg-secondary">@detail.이벤트목록.Count</span>
-                        </a>
-                        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0" href="@ProofsHref">
-                            <span>증빙/POD</span>
-                            <span class="badge rounded-pill text-bg-secondary">@detail.증빙목록.Count</span>
-                        </a>
-                        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0" href="@SettlementHref">
-                            <span>결제/정산</span>
-                            <span class="badge rounded-pill text-bg-secondary">@detail.정산후보목록.Count</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">연결 화면</MudText>
+                    <MudButton Href="@EventsHref" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChevronRight" FullWidth="true">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%;">
+                            <MudText>이벤트 로그</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Default">@detail.이벤트목록.Count</MudChip>
+                        </MudStack>
+                    </MudButton>
+                    <MudButton Href="@ProofsHref" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChevronRight" FullWidth="true">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%;">
+                            <MudText>증빙/POD</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Default">@detail.증빙목록.Count</MudChip>
+                        </MudStack>
+                    </MudButton>
+                    <MudButton Href="@SettlementHref" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChevronRight" FullWidth="true">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%;">
+                            <MudText>결제/정산</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Default">@detail.정산후보목록.Count</MudChip>
+                        </MudStack>
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 }
 
 @code {
@@ -172,6 +162,9 @@ else
     private string BuildSubPageHref(string segment)
         => $"/transports/{Uri.EscapeDataString(RequestId)}/{segment}";
 
+    private void NavigateToTransportList()
+        => NavigationManager.NavigateTo("/transports");
+
     private static string StepLabel(운송워크플로우단계응답 step)
     {
         if (step.확인필요)
@@ -192,4 +185,16 @@ else
         return "대기";
     }
 
+    private static string StepBorderStyle(운송워크플로우단계응답 step)
+        => $"height: 100%; border-left: 4px solid {StepBorderColor(step.색상)};";
+
+    private static string StepBorderColor(string? color)
+        => color switch
+        {
+            "success" => "var(--mud-palette-success)",
+            "primary" => "var(--mud-palette-primary)",
+            "danger" => "var(--mud-palette-error)",
+            "warning" => "var(--mud-palette-warning)",
+            _ => "var(--mud-palette-lines-default)"
+        };
 }

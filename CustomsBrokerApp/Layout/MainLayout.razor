@@ -3,25 +3,41 @@
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Routing
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudLayout>
+    <MudAppBar Dense="true" Fixed="false" Elevation="0" Color="Color.Default">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="ToggleDrawer" />
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Inherit"
+                   Disabled="@(!CanGoBack)"
+                   OnClick="GoBack"
+                   StartIcon="@Icons.Material.Filled.ArrowBack">
+            뒤로가기
+        </MudButton>
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.subtitle1">Hongdal Customs</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">관세사 HS 코드 보정</MudText>
+        </MudStack>
+    </MudAppBar>
 
-    <main>
-        <div class="top-row px-4 py-2">
-            <button class="btn btn-link p-0 back-nav-button" disabled="@(!CanGoBack)" @onclick="GoBack" type="button">← 뒤로가기</button>
-        </div>
-        <article class="content">
+    <MudDrawer Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="1" ClipMode="DrawerClipMode.Always">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="pa-4 customs-main">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
 @code {
     private readonly Stack<string> _navigationHistory = new();
     private string? _currentUri;
     private bool _isNavigatingBack;
+    private bool drawerOpen = true;
 
     private bool CanGoBack => _navigationHistory.Count > 0;
 
@@ -29,6 +45,11 @@
     {
         NavigationManager.LocationChanged += HandleLocationChanged;
         _currentUri = NavigationManager.Uri;
+    }
+
+    private void ToggleDrawer()
+    {
+        drawerOpen = !drawerOpen;
     }
 
     private void GoBack()

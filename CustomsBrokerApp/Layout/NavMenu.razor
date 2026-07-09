@@ -1,29 +1,12 @@
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Hongdal Customs</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+<MudNavMenu Class="pa-3">
+    <MudStack Spacing="0" Class="px-2 pb-3">
+        <MudText Typo="Typo.subtitle1">Hongdal Customs</MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">통관 보정 워크스페이스</MudText>
+    </MudStack>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-tags-fill-nav-menu" aria-hidden="true"></span> HS 코드 보정
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    <MudDivider Class="mb-3" />
 
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.FactCheck">
+        HS 코드 보정
+    </MudNavLink>
+</MudNavMenu>

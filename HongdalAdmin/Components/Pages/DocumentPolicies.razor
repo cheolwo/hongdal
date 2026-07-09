@@ -6,74 +6,80 @@
 
 <PageTitle>문서 정책</PageTitle>
 
-<div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-    <div>
-        <h1 class="mb-1">문서 정책</h1>
-        <div class="text-muted">문서 종류별 보관, 암호화, 서명 정책을 조회합니다.</div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-secondary" href="@관리자문서Routes.목록">문서 목록</a>
-        <button class="btn btn-primary" @onclick="LoadAsync" disabled="@isLoading">새로고침</button>
-    </div>
-</div>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">문서 정책</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">문서 종류별 보관, 암호화, 서명 정책을 조회합니다.</MudText>
+        </MudStack>
+        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+            <MudButton Href="@관리자문서Routes.목록" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.List">문서 목록</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isLoading" OnClick="LoadAsync">새로고침</MudButton>
+        </MudStack>
+    </MudStack>
 
-@if (!string.IsNullOrWhiteSpace(message))
-{
-    <div class="alert @(isError ? "alert-danger" : "alert-success")">@message</div>
-}
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <MudAlert Severity="@MessageSeverity">@message</MudAlert>
+    }
 
-@if (isLoading)
-{
-    <div class="alert alert-info">문서 정책을 불러오는 중입니다...</div>
-}
-else
-{
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="card-title mb-0">문서 종류 정책</h5>
-                <span class="badge rounded-pill text-bg-primary">@policies.Count 건</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>코드</th>
-                            <th>이름</th>
-                            <th>사용</th>
-                            <th>암호화</th>
-                            <th>다운로드</th>
-                            <th>서명</th>
-                            <th>보관일수</th>
-                            <th>편집</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in policies)
-                        {
-                            <tr>
-                                <td>@item.문서코드</td>
-                                <td>@item.문서명</td>
-                                <td>@YesNo(item.사용여부)</td>
-                                <td>@YesNo(item.암호화여부)</td>
-                                <td>@(item.다운로드허용여부 ? "허용" : "차단")</td>
-                                <td>@(item.서명필요여부 ? "필요" : "미필요")</td>
-                                <td>@item.보관일수.ToString("N0")일</td>
-                                <td><a class="btn btn-sm btn-outline-primary" href="@PolicyDetailHref(item.문서코드)">편집</a></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-}
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">문서 정책을 불러오는 중입니다...</MudAlert>
+    }
+    else
+    {
+        <MudPaper Elevation="1" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h6">문서 종류 정책</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@policies.Count 건</MudChip>
+                </MudStack>
+
+                @if (policies.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info" Dense="true">등록된 문서 정책이 없습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="@policies" Dense="true" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>코드</MudTh>
+                            <MudTh>이름</MudTh>
+                            <MudTh>사용</MudTh>
+                            <MudTh>암호화</MudTh>
+                            <MudTh>다운로드</MudTh>
+                            <MudTh>서명</MudTh>
+                            <MudTh>보관일수</MudTh>
+                            <MudTh>편집</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="코드">@context.문서코드</MudTd>
+                            <MudTd DataLabel="이름">@context.문서명</MudTd>
+                            <MudTd DataLabel="사용">
+                                <MudChip T="string" Size="Size.Small" Color="@BoolColor(context.사용여부)" Variant="Variant.Outlined">@YesNo(context.사용여부)</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="암호화">@YesNo(context.암호화여부)</MudTd>
+                            <MudTd DataLabel="다운로드">@(context.다운로드허용여부 ? "허용" : "차단")</MudTd>
+                            <MudTd DataLabel="서명">@(context.서명필요여부 ? "필요" : "미필요")</MudTd>
+                            <MudTd DataLabel="보관일수">@context.보관일수.ToString("N0")일</MudTd>
+                            <MudTd DataLabel="편집">
+                                <MudButton Href="@PolicyDetailHref(context.문서코드)" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">편집</MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</MudStack>
 
 @code {
     private bool isLoading = true;
     private bool isError;
     private string? message;
     private IReadOnlyList<문서정책요약응답> policies = [];
+    private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,4 +121,7 @@ else
 
     private static string YesNo(bool value)
         => value ? "예" : "아니오";
+
+    private static Color BoolColor(bool value)
+        => value ? Color.Success : Color.Default;
 }

@@ -2,35 +2,40 @@
 
 <PageTitle>탐색 캠페인</PageTitle>
 
-<h1>탐색 캠페인</h1>
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">탐색 캠페인</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">기사와 화주 사이의 탐색 반응과 반복 거래 관계를 확인할 운영 화면입니다.</MudText>
+    </MudStack>
 
-<div class="alert alert-info">
-    빌드 복구를 위해 탐색 캠페인 화면을 기본 운영 화면으로 정리했습니다.
-</div>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        빌드 복구를 위해 탐색 캠페인 화면을 기본 운영 화면으로 정리했습니다.
+    </MudAlert>
 
-<div class="row g-3">
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">캠페인 목록</h5>
-                <p class="card-text text-muted mb-0">노출 중인 탐색 캠페인과 운영 상태를 관리할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">응답 통계</h5>
-                <p class="card-text text-muted mb-0">기사와 화주의 반응 지표를 요약할 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">관계 집계</h5>
-                <p class="card-text text-muted mb-0">기사와 화주 사이의 반복 거래 관계를 살펴볼 영역입니다.</p>
-            </div>
-        </div>
-    </div>
-</div>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">캠페인 목록</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">노출 중인 탐색 캠페인과 운영 상태를 관리할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">응답 통계</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">기사와 화주의 반응 지표를 요약할 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">관계 집계</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">기사와 화주 사이의 반복 거래 관계를 살펴볼 영역입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>

@@ -1,0 +1,14 @@
+<MudPaper Elevation="0" Outlined="true" Class="pa-3" Style="height: 100%;">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">@Label</MudText>
+        <MudText Typo="Typo.body2" Class="text-break">@관리자화면Ui.표시값(Value)</MudText>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Value { get; set; }
+}

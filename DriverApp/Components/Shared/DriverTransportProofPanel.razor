@@ -1,0 +1,123 @@
+<MudStack Spacing="2" Class="@Class">
+    <MudText Typo="Typo.subtitle1">@Title</MudText>
+    <MudText Typo="Typo.body2" Color="Color.Secondary">@Description</MudText>
+
+    @if (!string.IsNullOrWhiteSpace(PreviewUrl))
+    {
+        <img src="@PreviewUrl"
+             alt="@PreviewAlt"
+             style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px;" />
+        <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @FileName</MudText>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <MudAlert Severity="@StatusSeverity" Dense="true">@StatusMessage</MudAlert>
+    }
+
+    <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.PhotoCamera"
+                   Disabled="@IsCapturing"
+                   OnClick="CaptureAsync">
+            @(HasPhoto ? RetakeButtonText : CaptureButtonText)
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.CheckCircle"
+                   Disabled="@(!CanComplete || IsCompleting)"
+                   OnClick="CompleteAsync">
+            @(IsCompleting ? CompletingText : CompleteButtonText)
+        </MudButton>
+        @if (HasPhoto)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Delete"
+                       Disabled="@IsCompleting"
+                       OnClick="ClearAsync">
+                @ClearButtonText
+            </MudButton>
+        }
+    </MudStack>
+
+    @if (!CanComplete)
+    {
+        <MudAlert Severity="Severity.Info" Dense="true">@CompletionGuide</MudAlert>
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "완료 사진";
+
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? PreviewUrl { get; set; }
+
+    [Parameter]
+    public string? PreviewAlt { get; set; }
+
+    [Parameter]
+    public string? FileName { get; set; }
+
+    [Parameter]
+    public string? StatusMessage { get; set; }
+
+    [Parameter]
+    public Severity StatusSeverity { get; set; } = Severity.Info;
+
+    [Parameter]
+    public bool HasPhoto { get; set; }
+
+    [Parameter]
+    public bool IsCapturing { get; set; }
+
+    [Parameter]
+    public bool CanComplete { get; set; }
+
+    [Parameter]
+    public bool IsCompleting { get; set; }
+
+    [Parameter]
+    public string CompletionGuide { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnCapture { get; set; }
+
+    [Parameter]
+    public EventCallback OnComplete { get; set; }
+
+    [Parameter]
+    public EventCallback OnClear { get; set; }
+
+    [Parameter]
+    public string CaptureButtonText { get; set; } = "완료 사진 촬영";
+
+    [Parameter]
+    public string RetakeButtonText { get; set; } = "사진 다시 촬영";
+
+    [Parameter]
+    public string CompleteButtonText { get; set; } = "완료";
+
+    [Parameter]
+    public string CompletingText { get; set; } = "완료 처리 중";
+
+    [Parameter]
+    public string ClearButtonText { get; set; } = "사진 제거";
+
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    private Task CaptureAsync()
+        => OnCapture.InvokeAsync();
+
+    private Task CompleteAsync()
+        => OnComplete.InvokeAsync();
+
+    private Task ClearAsync()
+        => OnClear.InvokeAsync();
+}
