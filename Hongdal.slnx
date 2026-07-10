@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/Apps/">
-    <Project Path="Deliver/Deliver.csproj" />
+    <Project Path="FDriverApp/FDriverApp.csproj" />
     <Project Path="DriverApp/DriverApp.csproj" />
     <Project Path="HumanResourcesManagerApp/HumanResourcesManagerApp.csproj">
       <Deploy Solution="Debug|*" />

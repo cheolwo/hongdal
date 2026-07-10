@@ -13,6 +13,7 @@ DriverApp uses NAVER Maps through the Android native map path.
 - Pickup and dropoff markers are supplied through `DriverMapMarkerItem`.
 - Traffic layer, compass, scale bar, zoom controls, location button, zoom limits, and current location overlay are controlled by `DriverNativeMapView`.
 - Map locale is forced to `ko-KR` when the NAVER map is ready so base map labels prefer Korean in the driver experience.
+- Pickup markers use an orange tinted built-in NAVER marker icon, and dropoff markers use a blue tinted built-in NAVER marker icon.
 
 ## Required Android Permissions
 

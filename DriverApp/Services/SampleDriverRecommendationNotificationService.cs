@@ -1,6 +1,6 @@
-using DriverApp.Models.Driver.Map;
 using DriverApp.Services.Samples;
 using Hongdal.Client.Infrastructure;
+using Hongdal.Contracts.Common.Drivers;
 using Microsoft.Extensions.Options;
 
 namespace DriverApp.Services;

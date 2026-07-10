@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hongdal.Ui.Common", "Hongda
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HumanResourcesManagerApp", "HumanResourcesManagerApp\HumanResourcesManagerApp.csproj", "{CC216107-3CBC-4339-94E3-0B1283CBF146}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deliver", "Deliver\Deliver.csproj", "{4990BC08-7876-4608-8377-70852118AE77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDriverApp", "FDriverApp\FDriverApp.csproj", "{4990BC08-7876-4608-8377-70852118AE77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipperApp", "ShipperApp\ShipperApp.csproj", "{D70EF643-3447-4079-A0B0-1B1722525A4B}"
 EndProject

@@ -21,6 +21,6 @@
 | FCL 가능 조건 계산 | 포함 | `ShipperApp`, 화물 계획 서비스 | 목표 수량/부피/중량 기준 |
 | 집단 대표 입고 | 포함 | `WarehouseManagerApp`, `CargoYongdalDispatchEngine` | 집단 대표 입고지로 운송 연결 |
 | 집단 내 분류/배분 | 포함 | 집단 분류 작업 서비스 | 동/수령 지점/그룹 수령 지점 단위 |
-| 음식점 일반 음식 배달 | 보류 | `Deliver`, `FoodDeliveryDispatchEngine` | 3.0 |
-| 홍달마트 즉시배송 | 보류 | `Deliver`, `FoodDeliveryDispatchEngine`, `WarehouseManagerApp` | 3.5 |
+| 음식점 일반 음식 배달 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine` | 3.0 |
+| 홍달마트 즉시배송 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine`, `WarehouseManagerApp` | 3.5 |
 | 관리사무소 공식 승인 자동화 | 보류 | Admin/외부 협약 | 운영 정책 확정 후 |

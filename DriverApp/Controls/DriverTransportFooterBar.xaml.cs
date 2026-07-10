@@ -1,5 +1,5 @@
-using DriverApp.Models.Driver.Map;
 using DriverApp.Models.Driver.Samples;
+using Hongdal.Contracts.Common.Drivers;
 using System.Globalization;
 
 namespace DriverApp.Controls;
@@ -54,12 +54,16 @@ public partial class DriverTransportFooterBar : ContentView
         SummaryLabel.Text = marker.Summary;
         NextActionLabel.Text = "다음 행동: 추천 상세 확인";
         CollapsedPickupLabel.Text = $"상차: {marker.PickupAddress}";
-        CollapsedDropoffLabel.Text = "하차: 지도 마커 상세에서 확인";
+        CollapsedDropoffLabel.Text = string.IsNullOrWhiteSpace(marker.DropoffAddress)
+            ? "하차: 추천 상세에서 확인"
+            : $"하차: {marker.DropoffAddress}";
         CollapsedFareLabel.Text = $"의뢰: {marker.RequestId}";
 
         SetDetails(
             $"상차지: {marker.PickupAddress}",
-            "하차지: 추천 상세에서 확인",
+            string.IsNullOrWhiteSpace(marker.DropoffAddress)
+                ? "하차지: 추천 상세에서 확인"
+                : $"하차지: {marker.DropoffAddress}",
             $"화물: {marker.Title}",
             $"운송정보: {marker.Summary}",
             $"결제/운임: 추천 상세에서 확인",

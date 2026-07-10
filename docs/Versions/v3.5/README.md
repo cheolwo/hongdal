@@ -1,4 +1,4 @@
-﻿# Hongdal 3.5
+# Hongdal 3.5
 
 ## 목표
 
@@ -28,7 +28,7 @@
 - `OrdererApp`
 - `FoodDeliveryDispatchEngine`
 - `피킹배치Engine`
-- `Deliver`
+- `FDriverApp`
 
 ## 안정화 기준
 

@@ -27,7 +27,7 @@
 - `OrdererApp`
 - `RestaurantDeskApp`
 - `FoodDeliveryDispatchEngine`
-- `Deliver`
+- `FDriverApp`
 
 ## 안정화 기준
 

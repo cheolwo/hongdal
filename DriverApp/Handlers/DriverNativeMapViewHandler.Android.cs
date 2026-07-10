@@ -4,8 +4,9 @@ using Android.Views;
 using Com.Naver.Maps.Geometry;
 using Com.Naver.Maps.Map;
 using Com.Naver.Maps.Map.Overlay;
+using Com.Naver.Maps.Map.Util;
 using DriverApp.Controls;
-using DriverApp.Models.Driver.Map;
+using Hongdal.Contracts.Common.Drivers;
 using Microsoft.Maui.Handlers;
 using AndroidColor = Android.Graphics.Color;
 
@@ -16,6 +17,8 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     private NaverMap? _naverMap;
     private readonly List<Marker> _nativeMarkers = [];
     private readonly List<PathOverlay> _nativeRouteOverlays = [];
+    private static readonly int PickupMarkerTintColor = AndroidColor.Rgb(245, 124, 0);
+    private static readonly int DropoffMarkerTintColor = AndroidColor.Rgb(37, 99, 235);
 
     protected override MapView CreatePlatformView()
     {
@@ -32,6 +35,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     protected override void DisconnectHandler(MapView platformView)
     {
         ClearMarkers();
+        ClearRouteOverlays();
         platformView.OnPause();
         platformView.OnStop();
         platformView.OnDestroy();
@@ -121,10 +125,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         ClearMarkers();
         foreach (var item in VirtualView.Markers)
         {
-            AddMarker(item, item.PickupLatitude, item.PickupLongitude, "추천 상차지");
+            AddMarker(item, item.PickupLatitude, item.PickupLongitude, item.PickupLabel, item.PickupAddress, PickupMarkerTintColor);
             if (item.DropoffLatitude != 0d && item.DropoffLongitude != 0d)
             {
-                AddMarker(item, item.DropoffLatitude, item.DropoffLongitude, "추천 하차지");
+                AddMarker(item, item.DropoffLatitude, item.DropoffLongitude, item.DropoffLabel, item.DropoffAddress, DropoffMarkerTintColor);
             }
         }
     }
@@ -179,7 +183,13 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
             : LocationTrackingMode.None!;
     }
 
-    private void AddMarker(DriverMapMarkerItem item, double latitude, double longitude, string caption)
+    private void AddMarker(
+        DriverMapMarkerItem item,
+        double latitude,
+        double longitude,
+        string caption,
+        string subCaption,
+        int iconTintColor)
     {
         if (_naverMap is null || VirtualView is null)
         {
@@ -189,8 +199,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         var marker = new Marker
         {
             Position = new LatLng(latitude, longitude),
+            Icon = MarkerIcons.Black,
+            IconTintColor = iconTintColor,
             CaptionText = caption,
-            SubCaptionText = string.Empty
+            SubCaptionText = subCaption
         };
 
         marker.Click += (_, _) =>

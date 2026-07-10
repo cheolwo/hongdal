@@ -1,4 +1,4 @@
-using DriverApp.Models.Driver.Map;
+using Hongdal.Contracts.Common.Drivers;
 
 namespace DriverApp.Controls;
 

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:FDriverApp.Controls"
+             xmlns:pageModels="clr-namespace:FDriverApp.PageModels"
+             xmlns:pullToRefresh="clr-namespace:Syncfusion.Maui.Toolkit.PullToRefresh;assembly=Syncfusion.Maui.Toolkit"
+             x:Class="FDriverApp.Pages.MainPage"
+             x:DataType="pageModels:MainPageModel"
+             Title="{Binding AppName}"
+             BackgroundColor="#F8FAFC">
+
+    <pullToRefresh:SfPullToRefresh
+        IsRefreshing="{Binding IsRefreshing}"
+        RefreshCommand="{Binding RefreshCommand}">
+        <pullToRefresh:SfPullToRefresh.PullableContent>
+            <Grid RowDefinitions="*,Auto">
+                <maps:FDriverNativeMapView x:Name="FoodDeliveryMap"
+                                           Grid.Row="0"
+                                           CenterLatitude="{Binding MapCenterLatitude}"
+                                           CenterLongitude="{Binding MapCenterLongitude}"
+                                           Zoom="14"
+                                           Markers="{Binding MapMarkers}"
+                                           RouteOverlays="{Binding SelectedRouteOverlays}"
+                                           ShowTrafficLayer="True"
+                                           ShowLocationButton="True"
+                                           ShowCurrentLocationOverlay="True"
+                                           MarkerSelected="OnMapMarkerSelected" />
+
+                <HorizontalStackLayout Grid.Row="0"
+                                       Spacing="8"
+                                       Margin="16"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Start">
+                    <Button Text="내 정보"
+                            Padding="12,8"
+                            BackgroundColor="#FFFFFF"
+                            BorderColor="#CBD5E1"
+                            BorderWidth="1"
+                            TextColor="#0F172A"
+                            Command="{Binding OpenProfileCommand}" />
+                    <Button Text="현재 배달"
+                            Padding="12,8"
+                            BackgroundColor="#FFFFFF"
+                            BorderColor="#CBD5E1"
+                            BorderWidth="1"
+                            TextColor="#0F172A"
+                            Command="{Binding OpenCurrentDeliveryCommand}" />
+                </HorizontalStackLayout>
+
+                <Border Grid.Row="0"
+                        BackgroundColor="#F8FAFC"
+                        Stroke="#CBD5E1"
+                        StrokeThickness="1"
+                        Padding="10"
+                        Margin="16,70,16,0"
+                        HorizontalOptions="End"
+                        VerticalOptions="Start">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6">
+                            <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="5" Color="#F57C00" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="픽업: 음식점" FontSize="12" TextColor="#111827" />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6">
+                            <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="5" Color="#2563EB" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="전달: 고객 주소" FontSize="12" TextColor="#111827" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Row="0"
+                        BackgroundColor="#FFFFFF"
+                        Stroke="#CBD5E1"
+                        StrokeThickness="1"
+                        Padding="14"
+                        Margin="16"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding SelectedRouteText}" FontSize="15" FontAttributes="Bold" TextColor="#0F172A" LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding PickupPointText}" FontSize="12" TextColor="#374151" LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding DropoffPointText}" FontSize="12" TextColor="#374151" LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="3" HorizontalOptions="End">
+                            <Label Text="{Binding WorkStage}" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" HorizontalTextAlignment="End" />
+                            <Label Text="{Binding ActiveWorkPayoutText}" FontSize="12" TextColor="#475569" HorizontalTextAlignment="End" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <ScrollView Grid.Row="1"
+                            BackgroundColor="#FFFFFF"
+                            HeightRequest="330">
+                    <Grid Padding="16" RowSpacing="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="3">
+                                <Label Text="{Binding AppName}" FontSize="20" FontAttributes="Bold" TextColor="#0F172A" />
+                                <Label Text="{Binding CurrentArea}" FontSize="13" TextColor="#475569" />
+                                <Label Text="{Binding StatusMessage}" FontSize="13" TextColor="#334155" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="3" HorizontalOptions="End">
+                                <Label Text="{Binding Today}" FontSize="12" TextColor="#64748B" HorizontalTextAlignment="End" />
+                                <Label Text="{Binding PendingDeliveryTickets, StringFormat='대기 {0}건'}" FontSize="13" TextColor="#0F172A" HorizontalTextAlignment="End" />
+                                <Label Text="{Binding RecommendedTickets, StringFormat='추천 {0}건'}" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" HorizontalTextAlignment="End" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Border Grid.Row="1"
+                                Stroke="#DBEAFE"
+                                StrokeThickness="1"
+                                BackgroundColor="#EFF6FF"
+                                Padding="12">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="{Binding ActiveWorkSummary}" FontSize="15" FontAttributes="Bold" TextColor="#0F172A" />
+                                        <Label Text="{Binding ActiveWorkRouteText}" FontSize="13" TextColor="#334155" />
+                                        <Label Text="{Binding NextActionGuide}" FontSize="12" TextColor="#2563EB" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding ActiveWorkPayoutText}"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="#0F172A"
+                                           HorizontalTextAlignment="End" />
+                                </Grid>
+
+                                <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                    <Border Stroke="#BFDBFE" StrokeThickness="1" BackgroundColor="#FFFFFF" Padding="8">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="2">
+                                            <Label Text="1" FontSize="11" TextColor="#2563EB" />
+                                            <Label Text="수락" FontSize="12" FontAttributes="Bold" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                    <Border Grid.Column="1" Stroke="#BFDBFE" StrokeThickness="1" BackgroundColor="#FFFFFF" Padding="8">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="2">
+                                            <Label Text="2" FontSize="11" TextColor="#2563EB" />
+                                            <Label Text="픽업 확인" FontSize="12" FontAttributes="Bold" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                    <Border Grid.Column="2" Stroke="#BFDBFE" StrokeThickness="1" BackgroundColor="#FFFFFF" Padding="8">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="2">
+                                            <Label Text="3" FontSize="11" TextColor="#2563EB" />
+                                            <Label Text="전달 완료" FontSize="12" FontAttributes="Bold" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button Text="픽업 확인"
+                                            Command="{Binding ConfirmPickupCommand}"
+                                            IsEnabled="{Binding CanConfirmPickup}"
+                                            BackgroundColor="#2563EB"
+                                            TextColor="#FFFFFF" />
+                                    <Button Grid.Column="1"
+                                            Text="전달 완료"
+                                            Command="{Binding CompleteDeliveryCommand}"
+                                            IsEnabled="{Binding CanCompleteDelivery}"
+                                            BackgroundColor="#0F766E"
+                                            TextColor="#FFFFFF" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Row="2" Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="추천 배달권" FontSize="16" FontAttributes="Bold" TextColor="#0F172A" />
+                                <Label Grid.Column="1" Text="{Binding TodayExpectedPayout, StringFormat='예상 정산 {0:N0}원'}" FontSize="12" TextColor="#475569" />
+                            </Grid>
+                            <CollectionView ItemsSource="{Binding RecommendedTicketItems}"
+                                            SelectionMode="None"
+                                            HeightRequest="210">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="pageModels:DeliveryTicketPreview">
+                                        <Border Stroke="#E5E7EB" StrokeThickness="1" BackgroundColor="#FFFFFF" Padding="12" Margin="0,0,0,10">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="8" />
+                                            </Border.StrokeShape>
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                                <VerticalStackLayout Spacing="3">
+                                                    <Label Text="{Binding OrderSummary}" FontSize="15" FontAttributes="Bold" TextColor="#111827" />
+                                                    <Label Text="{Binding RestaurantName}" FontSize="13" TextColor="#374151" />
+                                                    <Label Text="{Binding RestaurantAddress}" FontSize="12" TextColor="#6B7280" LineBreakMode="TailTruncation" />
+                                                    <Label Text="{Binding DropoffAddress, StringFormat='전달지 {0}'}" FontSize="12" TextColor="#6B7280" LineBreakMode="TailTruncation" />
+                                                    <Label Text="{Binding RecommendationReason}" FontSize="12" TextColor="#2563EB" />
+                                                </VerticalStackLayout>
+
+                                                <VerticalStackLayout Grid.Column="1" Spacing="5" HorizontalOptions="End">
+                                                    <Label Text="{Binding DistanceText}" FontSize="12" HorizontalTextAlignment="End" />
+                                                    <Label Text="{Binding DriverPayoutText}" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                                                    <Button Text="선택"
+                                                            Padding="12,6"
+                                                            Command="{Binding BindingContext.SelectTicketCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                                            CommandParameter="{Binding .}" />
+                                                    <Button Text="수락"
+                                                            Padding="12,6"
+                                                            BackgroundColor="#2563EB"
+                                                            TextColor="#FFFFFF"
+                                                            Command="{Binding BindingContext.AcceptTicketCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                                            CommandParameter="{Binding .}"
+                                                            IsEnabled="{Binding BindingContext.CanAcceptSelectedTicket, Source={RelativeSource AncestorType={x:Type ContentPage}}}" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Grid>
+                </ScrollView>
+            </Grid>
+        </pullToRefresh:SfPullToRefresh.PullableContent>
+    </pullToRefresh:SfPullToRefresh>
+</ContentPage>

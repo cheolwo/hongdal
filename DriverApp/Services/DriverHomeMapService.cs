@@ -1,5 +1,5 @@
 using DriverApp.Models.Driver;
-using DriverApp.Models.Driver.Map;
+using Hongdal.Contracts.Common.Drivers;
 
 namespace DriverApp.Services;
 
@@ -17,7 +17,10 @@ public sealed class DriverHomeMapService : IDriverHomeMapService
                 ToDouble(x.하차_경도),
                 x.화물종류,
                 x.요약설명,
-                x.픽업지))
+                x.픽업지,
+                x.하차지,
+                "추천 상차지",
+                "추천 하차지"))
             .ToArray();
     }
 

@@ -95,8 +95,8 @@ flowchart TD
 | `1.5` | 판매 물류와 창고 기반 출고/재위탁 확장 | `WarehouseManagerApp`, `ShipperApp`, `OrdererApp` | 판매상품 재고, 입고/적재/출고, 주문 출고 알림, 재위탁 운송, 창고 작업자 검증, 판매자 물류 운영 | 홍달마트 도심 즉시배송, 해외/통관 자동화 |
 | `2.0` | 국제 물류/통관/HS 데이터 기반 확장 | `Hongdal.WebApp`, `HongdalAdmin`, HS 코드 DB, 해외/통관 서비스, `CargoYongdalDispatchEngine` | HS 코드 DB, 통관/수입 대행 조회, 관세사 보정 화면, FCL/LCL 판단, 수입 예정 수요 확인, 통관 데이터 공개/결제 정책 | 홍달마트 즉시배송 실운영 |
 | `2.5` | 주문자 집단 기반 공동 주문과 FCL/대량 입고 | `OrdererApp`, `ShipperApp`, `WarehouseManagerApp`, 공동 주문 서비스 | 도로명주소/Kakao 지역 2단계 주문자 집단 구성, 공동주택/생활권 하위 식별, 주문자 공동 주문 모집, 화주 대량 구매 공개, FCL 가능 조건 계산, 집단 대표 입고, 동/수령 지점별 분류/배분 | 홍달마트 즉시배송 실운영, 관리사무소 공식 승인 자동화 |
-| `3.0` | 음식점 일반 음식 배달 운영 | `OrdererApp`, `RestaurantDeskApp`, `FoodDeliveryDispatchEngine`, `Deliver` | 음식점 주문, 조리/픽업 상태, 음식 배달 기사 배차, 고객 배송 완료, 묶음 배달 | 홍달마트 도심 즉시배송, 창고형 피킹/포장 배송 |
-| `3.5` | 홍달마트와 도심 즉시배송 운영 | `WarehouseManagerApp`, `OrdererApp`, `FoodDeliveryDispatchEngine`, `Deliver` | 홍달마트 주문, 도심 재고 보충, 피킹/포장, 음식 배달 기사 픽업, 묶음 배달, 도심 마트 커뮤니티 운영 | 1.0 핵심 운송 흐름을 흔드는 대규모 구조 변경 |
+| `3.0` | 음식점 일반 음식 배달 운영 | `OrdererApp`, `RestaurantDeskApp`, `FoodDeliveryDispatchEngine`, `FDriverApp` | 음식점 주문, 조리/픽업 상태, 음식 배달 기사 배차, 고객 배송 완료, 묶음 배달 | 홍달마트 도심 즉시배송, 창고형 피킹/포장 배송 |
+| `3.5` | 홍달마트와 도심 즉시배송 운영 | `WarehouseManagerApp`, `OrdererApp`, `FoodDeliveryDispatchEngine`, `FDriverApp` | 홍달마트 주문, 도심 재고 보충, 피킹/포장, 음식 배달 기사 픽업, 묶음 배달, 도심 마트 커뮤니티 운영 | 1.0 핵심 운송 흐름을 흔드는 대규모 구조 변경 |
 
 ### 브랜치와 릴리스
 
@@ -154,7 +154,7 @@ flowchart TD
 | `Hongdal.Ui.Common` | 공통 UI/백오피스 영역 컴포넌트 | `net10.0` |
 | `HongdalAdmin` | 관리자 앱(운영 제어) | `net10.0` |
 | `Hongdal.BackOffice.Client` | 백오피스 클라이언트 계층 | `net10.0` |
-| `Hongdal.FoodApi` | 음식 도메인 API 분리 영역 | `net10.0` |
+| `Hongdal.FoodApi` | 음식 도메인 호환 API 영역(메인 `Hongdal` 서버로 이관 중) | `net10.0` |
 | `DriverApp` | 기사 앱 (.NET MAUI Android) | `net10.0-android` |
 | `ShipperApp` | 화주/판매자 앱 (.NET MAUI Android) | `net10.0-android` |
 | `WarehouseManagerApp` | 창고 현장 앱 (.NET MAUI Android) | `net10.0-android` |
@@ -193,7 +193,7 @@ flowchart TD
 | 화물/용달 기사 | `CargoYongdalDriverApp` | `CargoTransport`, `YongdalTransport` | 차량 제원, FCL/LCL, 상하차 조건, 현재 위치, 픽업 거리, 현장 결제 |
 | 음식 배달 기사 | `FoodDeliveryDriverApp` | `FoodDelivery` | 조리/픽업 시간, 고객 도착 시간, 묶음 배달 가능 여부 |
 
-현재 `DriverApp`은 공통 기사 앱 껍데기와 화물/용달 기사 흐름을 기본값으로 사용합니다. 이후 음식 배달 기사 앱은 같은 공통 컴포넌트를 공유하되 추천 목록, 진행 중 업무 카드, 정산 문구, 알림 정책을 `FoodDeliveryDriverApp` 식별자 기준으로 분리합니다.
+현재 `DriverApp`은 공통 기사 앱 껍데기와 화물/용달 기사 흐름을 기본값으로 사용합니다. 음식 배달 기사 앱은 `FDriverApp`으로 분리하고, 같은 공통 컴포넌트를 공유하되 추천 목록, 진행 중 업무 카드, 정산 문구, 알림 정책을 `FoodDeliveryDriverApp` 식별자 기준으로 나눕니다.
 
 ## 운송 의뢰 배차 엔진 경계
 

@@ -1,9 +1,9 @@
 using Android.App;
 using Android.Content;
 using Android.Util;
-using DriverApp.Models.Driver.Map;
 using DriverApp.Services;
 using Firebase.Messaging;
+using Hongdal.Contracts.Common.Drivers;
 using Microsoft.Extensions.DependencyInjection;
 
 #pragma warning disable CS0618, CS0672

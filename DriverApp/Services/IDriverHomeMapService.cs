@@ -1,5 +1,5 @@
 using DriverApp.Models.Driver;
-using DriverApp.Models.Driver.Map;
+using Hongdal.Contracts.Common.Drivers;
 
 namespace DriverApp.Services;
 

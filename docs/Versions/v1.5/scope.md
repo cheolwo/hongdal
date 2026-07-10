@@ -10,5 +10,5 @@
 | 창고 출고 연계 운송 | 포함 | `CargoYongdalDispatchEngine` | 1.0 화물/용달 운송 흐름 재사용 |
 | 작업자/작업대 검증 | 포함 | 창고 앱 공통 진입 | 휴대폰 뒤 8자리 + 작업대 바코드 + 역할 확인 |
 | 통관/HS 데이터 | 보류 | `Hongdal.WebApp`, `HongdalAdmin` | 2.0 |
-| 음식점 일반 음식 배달 | 보류 | `Deliver`, `FoodDeliveryDispatchEngine` | 3.0 |
-| 홍달마트 도심 즉시배송 | 보류 | `Deliver`, `WarehouseManagerApp` | 3.5 |
+| 음식점 일반 음식 배달 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine` | 3.0 |
+| 홍달마트 도심 즉시배송 | 보류 | `FDriverApp`, `WarehouseManagerApp` | 3.5 |
