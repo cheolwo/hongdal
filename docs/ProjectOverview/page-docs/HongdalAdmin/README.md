@@ -40,6 +40,7 @@
 | [HongdalAdmin-P33 - 파트너 관리](HongdalAdmin-P33/) | /partners | 운영 | 파트너 관리 | 완료 |
 | [HongdalAdmin-P34 - 수익/요율 정책](HongdalAdmin-P34/) | /revenue-policies | 운영 | 수익/요율 정책 | 완료 |
 | [HongdalAdmin-P35 - 보조 기능 설정](HongdalAdmin-P35/) | /auxiliary-feature-settings | 운영 | 보조 기능 설정 | 인증 필요 |
+| [HongdalAdmin-P36 - 연락처 통합 검색](HongdalAdmin-P36/) | /contact-search | 운영 | 전화번호 뒤 8자리 기준 인물/역할 통합 조회 | 캡처 대기 |
 | [HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면](HongdalAdmin-P90/) | /weather | 시스템 | 템플릿/샘플성 날씨 화면 | 완료 |
 | [HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면](HongdalAdmin-P91/) | /counter | 시스템 | 템플릿/샘플성 카운터 화면 | 완료 |
 | [HongdalAdmin-P99 - 미발견 페이지](HongdalAdmin-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

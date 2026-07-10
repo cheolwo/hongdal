@@ -64,6 +64,7 @@ namespace 홍달.도메인.공통
             public const string 미시작 = "미시작";
             public const string 대기 = "대기";
             public const string 매칭중 = "매칭중";
+            public const string 배차확정 = "배차확정";
             public const string 상차중 = "상차중";
             public const string 상차완료 = "상차완료";
             public const string 운송중 = "운송중";

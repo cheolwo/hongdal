@@ -22,6 +22,10 @@
 
 이 화면은 운송 의뢰 작성을 담당하므로, 1.0 업무 흐름이 실제 사용자 행동으로 닫히기 위해 필요합니다.
 
+현재 단건 등록 입력부는 화주 전용 화면 안에 직접 박아 두지 않고, 공통 운송 컴포넌트인 `Hongdal운송모델작성Panel`을 사용합니다. 이 컴포넌트는 화주 운송 의뢰뿐 아니라 주문자 집단, 공동주문, 창고 출고품처럼 “운송이 필요해지는 대상”이 생겼을 때 같은 운송 모델 초안을 만들 수 있도록 분리한 것입니다.
+
+요금이나 차량 선택이 애매한 사용자는 작성 중인 운송 조건을 바탕으로 커뮤니티 상담 글을 바로 등록할 수 있습니다. 이때 글에는 상세주소, 담당자 이름, 전화번호를 넣지 않고 화물, 차량 후보, 상하차 지역, 예상거리, 결제예정금액, 기준운임 같은 판단 정보만 요약합니다.
+
 ## 사용자와 참여자
 
 주 사용자: 화주, 판매자, 물류 의뢰자 / 보조 참여자: 기사, 관리자, 창고 관리자
@@ -31,6 +35,8 @@
 ## 화면에서 다루는 일
 
 - 주 책임: 운송 의뢰 작성
+- 공통 책임: 화물, 상하차지, 차량, 운임, 결제 조건을 `운송모델작성Draft`로 만드는 일
+- 상담 보조: 단가/차량 선택이 어려울 때 커뮤니티 `업무 질문` 글로 조건 요약을 등록하는 일
 - 사용자가 확인해야 하는 것: 이 화면에서 상태, 입력값, 다음 행동이 명확히 보이는지 확인합니다.
 - 사용자가 조작해야 하는 것: 버튼, 입력, 선택, 업로드, 조회 같은 조작이 이 화면의 책임 안에 머무는지 확인합니다.
 - 화면 밖으로 넘길 일: 다른 앱이나 관리자 화면에서 처리해야 하는 상태 변경은 이 화면에 과하게 넣지 않습니다.
@@ -47,6 +53,8 @@
 ## API 경로와 코드 연결
 
 - 화면 소스: [ShipperApp/Components/Pages/ShipperRequestWizard.razor](../../../../../ShipperApp/Components/Pages/ShipperRequestWizard.razor)
+- 공통 컴포넌트: [Hongdal.Ui.Common/Areas/App/Components/Transport/Hongdal운송모델작성Panel.razor](../../../../../Hongdal.Ui.Common/Areas/App/Components/Transport/Hongdal운송모델작성Panel.razor)
+- 공통 Draft: [Hongdal.Ui.Common/Areas/App/Models/운송모델작성Draft.cs](../../../../../Hongdal.Ui.Common/Areas/App/Models/운송모델작성Draft.cs)
 - 클라이언트 서비스/계약: [ShipperApp/Services/IShipperOperationsService.cs](../../../../../ShipperApp/Services/IShipperOperationsService.cs), [ShipperApp/Services/Samples/SampleShipperOperationsService.cs](../../../../../ShipperApp/Services/Samples/SampleShipperOperationsService.cs), [ShipperApp/Services/ServerBackedShipperOperationsService.cs](../../../../../ShipperApp/Services/ServerBackedShipperOperationsService.cs)
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |

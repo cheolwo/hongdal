@@ -17,14 +17,14 @@
                               OnPasswordLogin="HandlePasswordLoginAsync"
                               OnSocialLogin="HandleSocialLoginAsync">
             <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
-                로그인에 성공하면 브라우저 localStorage에 웹앱용 토큰을 보관하고, 화주 운송 의뢰 등록 API에서 Bearer 토큰으로 사용합니다.
+                로그인에 성공하면 브라우저 localStorage에 웹앱용 토큰을 보관하고, 대표 역할에 맞춰 웹앱 레이아웃 색상이 바뀝니다.
             </MudAlert>
         </Hongdal공통로그인Panel>
     </MudItem>
 </MudGrid>
 
 @code {
-    private static readonly IReadOnlyList<string> Hints = ["화주", "기사", "창고관리자", "주문자"];
+    private static readonly IReadOnlyList<string> Hints = ["화주", "기사", "창고관리자", "주문자", "흥여회"];
     private string? StatusMessage { get; set; }
     private Severity StatusSeverity { get; set; } = Severity.Info;
 
@@ -39,7 +39,7 @@
         if (AuthSession.IsLoggedIn)
         {
             StatusSeverity = Severity.Success;
-            StatusMessage = $"{AuthSession.UserName ?? AuthSession.UserId} 계정의 서버 인증 토큰을 복구했습니다.";
+            StatusMessage = $"{AuthSession.UserName ?? AuthSession.UserId} 계정의 서버 인증 토큰을 복구했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
             StateHasChanged();
         }
     }
@@ -54,7 +54,7 @@
             await AuthSession.LoginAsync(request.UserNameOrEmail, request.Password);
 
             StatusSeverity = Severity.Success;
-            StatusMessage = $"{AuthSession.UserName ?? request.UserNameOrEmail} 계정으로 서버 인증을 완료했습니다.";
+            StatusMessage = $"{AuthSession.UserName ?? request.UserNameOrEmail} 계정으로 서버 인증을 완료했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
         }
         catch (Exception ex)
         {

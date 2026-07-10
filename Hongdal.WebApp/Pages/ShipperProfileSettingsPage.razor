@@ -1,0 +1,52 @@
+@page "/shipper/settings/profile"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="화주 운영 프로필"
+               Description="국내 운송 중심인지, 해외 수입/통관 중심인지에 따라 기본 업무 진입점을 구분합니다."
+               Badge="@SelectedProfile" />
+
+<MudGrid>
+    @foreach (var profile in Profiles)
+    {
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100" Style="@CardStyle(profile.Key)">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">@profile.Title</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@profile.Description</MudText>
+                    <MudButton Variant="@ButtonVariant(profile.Key)" Color="Color.Primary" OnClick="@(() => SelectProfile(profile.Key))">@profile.Title</MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">@CurrentPolicy</MudAlert>
+
+@code {
+    private string SelectedProfile = "국내 운송 운영";
+
+    private static readonly IReadOnlyList<ProfileOption> Profiles =
+    [
+        new("국내 운송 운영", "국내 운송 운영", "운송 의뢰, 공개 화물, 기사 배차, 결제/정산 흐름을 우선 표시합니다."),
+        new("글로벌 물류 운영", "글로벌 물류 운영", "입고, 통관, FCL/LCL, 판매채널, 주문 출고 흐름을 우선 표시합니다.")
+    ];
+
+    private string CurrentPolicy => SelectedProfile == "국내 운송 운영"
+        ? "국내 프로필에서는 운송 의뢰와 배차 상태 확인을 먼저 노출합니다."
+        : "글로벌 프로필에서는 입고, 통관, 판매채널, 주문 출고 화면을 먼저 노출합니다.";
+
+    private void SelectProfile(string profile)
+    {
+        SelectedProfile = profile;
+    }
+
+    private Variant ButtonVariant(string profile)
+        => SelectedProfile == profile ? Variant.Filled : Variant.Outlined;
+
+    private string CardStyle(string profile)
+        => SelectedProfile == profile
+            ? "border:2px solid var(--web-primary); border-radius:8px;"
+            : "border:1px solid var(--web-border); border-radius:8px;";
+
+    private sealed record ProfileOption(string Key, string Title, string Description);
+}

@@ -10,7 +10,7 @@
 | --- | ---: | ---: | ---: |
 | [CustomsBrokerApp](CustomsBrokerApp/) | 2 | 0 | 0 |
 | [DriverApp](DriverApp/) | 23 | 10 | 0 |
-| [HongdalAdmin](HongdalAdmin/) | 37 | 18 | 9 |
+| [HongdalAdmin](HongdalAdmin/) | 38 | 18 | 9 |
 | [HumanResourcesManagerApp](HumanResourcesManagerApp/) | 1 | 0 | 0 |
 | [OrdererApp](OrdererApp/) | 8 | 0 | 0 |
 | [RestaurantDeskApp](RestaurantDeskApp/) | 5 | 0 | 0 |

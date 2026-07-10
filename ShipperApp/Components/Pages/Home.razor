@@ -73,21 +73,20 @@
 
         @if (!isLoggedIn)
         {
-            <MudCard Elevation="0" Class="shipper-panel">
-                <MudCardContent>
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.h6">@L.T("Home.LoginTitle")</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("Home.LoginDescription")</MudText>
-                        <MudTextField @bind-Value="loginId" Label='@L.T("Home.LoginId")' Variant="Variant.Outlined" />
-                        <MudTextField @bind-Value="password" Label='@L.T("Home.Password")' InputType="InputType.Password" Variant="Variant.Outlined" />
-                        <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="isBusy" OnClick="LoginAsync">@(isBusy ? L.T("Home.LoggingIn") : L.T("Home.Login"))</MudButton>
-                        @if (!string.IsNullOrWhiteSpace(statusMessage))
-                        {
-                            <MudAlert Severity="@statusSeverity">@statusMessage</MudAlert>
-                        }
-                    </MudStack>
-                </MudCardContent>
-            </MudCard>
+            <Hongdal공통로그인Panel 제목='@L.T("Home.LoginTitle")'
+                             설명='@L.T("Home.LoginDescription")'
+                             아이디Label='@L.T("Home.LoginId")'
+                             비밀번호Label='@L.T("Home.Password")'
+                             일반로그인버튼텍스트='@L.T("Home.Login")'
+                             로그인진행텍스트='@L.T("Home.LoggingIn")'
+                             일반로그인Color="Color.Success"
+                             Class="pa-4 shipper-panel"
+                             Elevation="0"
+                             상태메시지="@statusMessage"
+                             상태Severity="@statusSeverity"
+                             IsBusy="@isBusy"
+                             OnPasswordLogin="LoginAsync"
+                             OnSocialLogin="SocialLoginAsync" />
         }
         else
         {
@@ -180,6 +179,7 @@
                                                                                             PrivacyHint="주소와 결제 정보는 필요한 순간에만 펼쳐 확인합니다.">
                                                                 <MudExpansionPanel Text="화물 정보" Expanded="true">
                                                                     <HongdalSensitiveInfoRow Label='@L.T("Home.CargoType")' Value="@request.화물종류" />
+                                                                    <HongdalSensitiveInfoRow Label="화물 적재 형태" Value='@(string.IsNullOrWhiteSpace(request.화물적재형태) ? "-" : request.화물적재형태)' />
                                                                     <HongdalSensitiveInfoRow Label="의뢰 상태" Value="@request.의뢰상태" />
                                                                     <HongdalSensitiveInfoRow Label='@L.T("Home.CreatedAt")' Value='@request.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")' />
                                                                 </MudExpansionPanel>
@@ -355,8 +355,6 @@
     private IReadOnlyList<창고요약응답> warehouses = [];
     private IReadOnlyList<입고요청항목응답> inbounds = [];
     private IReadOnlyList<재고항목응답> inventory = [];
-    private string loginId = string.Empty;
-    private string password = string.Empty;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
     private bool isBusy;
@@ -467,17 +465,10 @@
         }
     }
 
-    private async Task LoginAsync()
+    private async Task LoginAsync(공통로그인요청 request)
     {
         if (isBusy)
         {
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(loginId) || string.IsNullOrWhiteSpace(password))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = L.T("Home.Validation.LoginRequired");
             return;
         }
 
@@ -486,7 +477,7 @@
 
         try
         {
-            var result = await AuthApi.LoginAsync(loginId, password);
+            var result = await AuthApi.LoginAsync(request.UserNameOrEmail, request.Password);
             if (!result.IsSuccess)
             {
                 statusSeverity = Severity.Error;
@@ -504,6 +495,13 @@
         }
 
         await LoadRequestsAsync();
+    }
+
+    private Task SocialLoginAsync(공통소셜로그인요청 request)
+    {
+        statusSeverity = Severity.Info;
+        statusMessage = $"{request.ProviderDisplayName} 요청을 받았습니다. ProviderId={request.ProviderId}. 화주 계정 연결 정책이 준비되면 활성화합니다.";
+        return Task.CompletedTask;
     }
 
     private async Task Logout()

@@ -1,0 +1,163 @@
+@page "/driver/transports/history"
+@using Hongdal.Contracts.Driver.Transport
+@inject 기사운송증빙Service 증빙Service
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="운송 내역"
+               Description="완료/진행 운송 기록과 다음 행동을 확인합니다."
+               Badge="운송 목록" />
+
+<MudStack Spacing="3">
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <MudAlert Severity="@StatusSeverity" Variant="Variant.Outlined">@StatusMessage</MudAlert>
+    }
+
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+        <MudText Typo="Typo.h6">최근 운송</MudText>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Disabled="@IsBusy" StartIcon="@Icons.Material.Filled.Sync" OnClick="LoadAsync">
+            새로고침
+        </MudButton>
+    </MudStack>
+
+    @if (Items.Count == 0)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudText Typo="Typo.body2" Color="Color.Secondary">표시할 운송 내역이 없습니다.</MudText>
+        </MudPaper>
+    }
+    else
+    {
+        <MudGrid>
+            @foreach (var item in Items)
+            {
+                <MudItem xs="12" md="6">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                        <MudStack Spacing="2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.subtitle1">@Display(item.운송번호, $"운송 {item.Id}")</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@Display(item.출발지, "-") → @Display(item.도착지, "-")</MudText>
+                                </MudStack>
+                                <MudChip T="string" Color="@ResolveTransportStateColor(item.상태)" Size="Size.Small">@Display(item.상태, "상태 미확인")</MudChip>
+                            </MudStack>
+
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">운임</MudText>
+                                    <MudText Typo="Typo.body2">@DisplayMoney(item.운임)</MudText>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">최근 갱신</MudText>
+                                    <MudText Typo="Typo.body2">@item.UpdatedAt.ToLocalTime().ToString("MM-dd HH:mm")</MudText>
+                                </MudItem>
+                            </MudGrid>
+
+                            <MudButton Href="@BuildTransportHref(item)"
+                                       Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       EndIcon="@Icons.Material.Filled.ChevronRight">
+                                상세/다음 행동
+                            </MudButton>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudStack>
+
+@code {
+    private List<기사운송요약응답> Items { get; } = [];
+    private bool IsBusy { get; set; }
+    private string? StatusMessage { get; set; }
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TryLoadAsync();
+    }
+
+    private async Task TryLoadAsync()
+    {
+        try
+        {
+            await LoadCoreAsync();
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"운송 내역을 아직 불러오지 못했습니다. {ex.Message}", Severity.Info);
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        IsBusy = true;
+        SetStatus("운송 내역을 조회하는 중입니다.", Severity.Info);
+
+        try
+        {
+            await LoadCoreAsync();
+            SetStatus("운송 내역을 조회했습니다.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadCoreAsync()
+    {
+        Items.Clear();
+        var items = await 증빙Service.목록조회Async();
+        Items.AddRange(items.OrderByDescending(x => x.UpdatedAt));
+    }
+
+    private void SetStatus(string message, Severity severity)
+    {
+        StatusMessage = message;
+        StatusSeverity = severity;
+    }
+
+    private static string BuildTransportHref(기사운송요약응답 item)
+        => ShouldPickup(item.상태)
+            ? $"/driver/transports/{item.Id}/pickup"
+            : $"/driver/transports/{item.Id}/dropoff";
+
+    private static bool ShouldPickup(string? status)
+        => !ContainsAny(status, "상차완료", "하차", "인수", "완료");
+
+    private static Color ResolveTransportStateColor(string? status)
+    {
+        if (ContainsAny(status, "완료", "인수"))
+        {
+            return Color.Success;
+        }
+
+        if (ContainsAny(status, "예외", "실패", "문제"))
+        {
+            return Color.Error;
+        }
+
+        if (ContainsAny(status, "도착", "상차", "하차", "운송"))
+        {
+            return Color.Info;
+        }
+
+        return Color.Default;
+    }
+
+    private static bool ContainsAny(string? value, params string[] tokens)
+        => !string.IsNullOrWhiteSpace(value)
+           && tokens.Any(token => value.Contains(token, StringComparison.OrdinalIgnoreCase));
+
+    private static string Display(params string?[] values)
+        => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+
+    private static string DisplayMoney(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}원" : "금액 미정";
+}

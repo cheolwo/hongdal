@@ -23,6 +23,7 @@ public interface I백오피스Service
     Task<IReadOnlyList<운송이벤트로그응답>> 운송이벤트조회Async(string? requestId = null, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<업체관리응답>> 업체목록조회Async(string? 상태 = null, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<화주관리응답>> 화주목록조회Async(CancellationToken cancellationToken = default);
+    Task<관리자연락처검색응답> 연락처뒤8자리검색Async(string phoneLast8, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<파일POD응답>> 파일POD목록조회Async(string? fileType = null, string? requestId = null, CancellationToken cancellationToken = default);
     Task<파일POD응답?> 파일POD상태변경Async(Guid id, string uploadStatus, CancellationToken cancellationToken = default);
     Task<파일POD응답?> 파일POD업로드Async(Stream fileStream, string fileName, string contentType, string fileType, string? requestId, CancellationToken cancellationToken = default);

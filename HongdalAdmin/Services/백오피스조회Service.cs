@@ -154,6 +154,12 @@ public sealed partial class 백오피스조회Service : I백오피스Service
             cancellationToken);
     }
 
+    public async Task<관리자연락처검색응답> 연락처뒤8자리검색Async(string phoneLast8, CancellationToken cancellationToken = default)
+    {
+        var query = BuildQuery("api/v1/admin/contact-search", ("phoneLast8", phoneLast8));
+        return await 서버단건조회Async<관리자연락처검색응답>(query, cancellationToken);
+    }
+
     private void ApplyAuthorizationHeader()
     {
         _httpClient.DefaultRequestHeaders.Authorization = null;

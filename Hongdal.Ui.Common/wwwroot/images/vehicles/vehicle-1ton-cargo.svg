@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-label="1 ton cargo truck">
+  <rect width="480" height="320" fill="#f8fafc"/>
+  <rect x="32" y="218" width="416" height="18" rx="9" fill="#cbd5e1"/>
+  <rect x="92" y="134" width="214" height="70" rx="10" fill="#2563eb"/>
+  <rect x="306" y="114" width="74" height="90" rx="12" fill="#1d4ed8"/>
+  <path d="M328 126h37c8 0 15 5 18 12l14 34v32h-91v-78c0-7 5-12 12-12z" fill="#1e40af"/>
+  <rect x="333" y="132" width="35" height="29" rx="5" fill="#bfdbfe"/>
+  <rect x="116" y="146" width="162" height="12" rx="6" fill="#93c5fd"/>
+  <rect x="84" y="202" width="318" height="18" rx="9" fill="#334155"/>
+  <circle cx="149" cy="224" r="31" fill="#0f172a"/>
+  <circle cx="149" cy="224" r="14" fill="#94a3b8"/>
+  <circle cx="344" cy="224" r="31" fill="#0f172a"/>
+  <circle cx="344" cy="224" r="14" fill="#94a3b8"/>
+  <path d="M92 128h196l-16-24H108z" fill="#3b82f6"/>
+  <rect x="76" y="106" width="208" height="12" rx="6" fill="#475569"/>
+  <rect x="113" y="82" width="26" height="28" rx="6" fill="#64748b"/>
+  <rect x="214" y="82" width="26" height="28" rx="6" fill="#64748b"/>
+</svg>

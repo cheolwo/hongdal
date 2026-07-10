@@ -1,0 +1,54 @@
+@page "/driver/settings/views"
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="화면 설정"
+               Description="기사 홈은 지도 우선으로 유지하고, 추천 카드와 보조 메뉴 표시 방식을 확인합니다."
+               Badge="화면 설정" />
+
+<MudGrid>
+    <MudItem xs="12" lg="7">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6">홈 표시 방식</MudText>
+                <MudRadioGroup T="string" @bind-Value="HomeMode">
+                    <MudRadio T="string" Value="@("지도 우선")" Color="Color.Primary">지도 우선</MudRadio>
+                    <MudRadio T="string" Value="@("추천 배너만")" Color="Color.Primary">지도 + 추천 배너만</MudRadio>
+                    <MudRadio T="string" Value="@("상세 패널")" Color="Color.Primary">지도 + 상세 패널</MudRadio>
+                </MudRadioGroup>
+
+                <MudDivider />
+
+                <MudText Typo="Typo.h6">추천 카드 표시</MudText>
+                <MudRadioGroup T="string" @bind-Value="RecommendationCardMode">
+                    <MudRadio T="string" Value="@("간단히")" Color="Color.Primary">간단히</MudRadio>
+                    <MudRadio T="string" Value="@("표준")" Color="Color.Primary">표준</MudRadio>
+                    <MudRadio T="string" Value="@("자세히")" Color="Color.Primary">자세히</MudRadio>
+                </MudRadioGroup>
+
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    WebApp의 기사 홈은 현재 지도 우선으로 고정되어 있습니다. 실제 저장 API 연결 전까지 이 화면은 표시 정책 확인용입니다.
+                </MudAlert>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" lg="5">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">현재 기준</MudText>
+                <MudText Typo="Typo.body2">홈: @HomeMode</MudText>
+                <MudText Typo="Typo.body2">추천 카드: @RecommendationCardMode</MudText>
+                <MudButton Href="/driver/home" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Map">
+                    지도 홈
+                </MudButton>
+                <MudButton Href="/driver/me" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.AccountCircle">
+                    내 정보 메뉴
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private string HomeMode { get; set; } = "지도 우선";
+    private string RecommendationCardMode { get; set; } = "표준";
+}

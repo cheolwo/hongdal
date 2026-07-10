@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Options;
 using 홍달.Services.Options;
 
@@ -8,7 +9,9 @@ namespace 홍달.Services.Notifications
 {
     public sealed class FirebaseFcmPushService : IFcmPushService
     {
+        private const string FirebaseMessagingScope = "https://www.googleapis.com/auth/firebase.messaging";
         private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
         private readonly HttpClient _httpClient;
         private readonly PushNotificationsOptions _options;
         private readonly ILogger<FirebaseFcmPushService> _logger;
@@ -30,11 +33,105 @@ namespace 홍달.Services.Notifications
             IReadOnlyDictionary<string, string> data,
             CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(_options.ServerKey))
+            if (string.IsNullOrWhiteSpace(token))
             {
                 return false;
             }
 
+            var serviceAccountJsonPath = ResolveServiceAccountJsonPath();
+            if (!string.IsNullOrWhiteSpace(serviceAccountJsonPath))
+            {
+                return await SendHttpV1Async(token, title, body, data, serviceAccountJsonPath, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_options.ServerKey))
+            {
+                return await SendLegacyAsync(token, title, body, data, cancellationToken).ConfigureAwait(false);
+            }
+
+            _logger.LogDebug(
+                "Action={Action} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}",
+                "FcmSend",
+                "Skipped",
+                "PushNotifications:ServiceAccountJsonPath or GOOGLE_APPLICATION_CREDENTIALS is not configured",
+                System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+                DateTime.UtcNow);
+
+            return false;
+        }
+
+        private async Task<bool> SendHttpV1Async(
+            string token,
+            string title,
+            string body,
+            IReadOnlyDictionary<string, string> data,
+            string serviceAccountJsonPath,
+            CancellationToken cancellationToken)
+        {
+            if (!File.Exists(serviceAccountJsonPath))
+            {
+                _logger.LogWarning(
+                    "Action={Action} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}",
+                    "FcmSend",
+                    "Failed",
+                    "Firebase service account file was not found",
+                    System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+                    DateTime.UtcNow);
+                return false;
+            }
+
+            var projectId = await ResolveProjectIdAsync(serviceAccountJsonPath, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(projectId))
+            {
+                _logger.LogWarning(
+                    "Action={Action} Result={Result} Reason={Reason} TraceId={TraceId} OccurredAt={OccurredAt}",
+                    "FcmSend",
+                    "Failed",
+                    "Firebase project id is not configured",
+                    System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+                    DateTime.UtcNow);
+                return false;
+            }
+
+            var accessToken = await CreateAccessTokenAsync(serviceAccountJsonPath, cancellationToken).ConfigureAwait(false);
+            var payload = new
+            {
+                message = new
+                {
+                    token,
+                    notification = new
+                    {
+                        title,
+                        body
+                    },
+                    data,
+                    android = new
+                    {
+                        priority = "HIGH"
+                    }
+                }
+            };
+
+            var json = JsonSerializer.Serialize(payload, JsonOptions);
+            using var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"https://fcm.googleapis.com/v1/projects/{projectId}/messages:send")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            return await SendAndLogAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<bool> SendLegacyAsync(
+            string token,
+            string title,
+            string body,
+            IReadOnlyDictionary<string, string> data,
+            CancellationToken cancellationToken)
+        {
             var payload = new
             {
                 to = token,
@@ -54,21 +151,70 @@ namespace 홍달.Services.Notifications
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("key", _options.ServerKey);
 
+            return await SendAndLogAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<bool> SendAndLogAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                var errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                _logger.LogWarning("Action={Action} Result={Result} Reason={Reason} StatusCode={StatusCode} TraceId={TraceId} OccurredAt={OccurredAt}",
-                    "FcmSend",
-                    "Failed",
-                    errorBody,
-                    response.StatusCode,
-                    System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
-                    DateTime.UtcNow);
-                return false;
+                return true;
             }
 
-            return true;
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogWarning(
+                "Action={Action} Result={Result} Reason={Reason} StatusCode={StatusCode} TraceId={TraceId} OccurredAt={OccurredAt}",
+                "FcmSend",
+                "Failed",
+                errorBody,
+                response.StatusCode,
+                System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+                DateTime.UtcNow);
+
+            return false;
+        }
+
+        private string ResolveServiceAccountJsonPath()
+        {
+            var configuredPath = string.IsNullOrWhiteSpace(_options.ServiceAccountJsonPath)
+                ? Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")
+                : _options.ServiceAccountJsonPath;
+
+            return string.IsNullOrWhiteSpace(configuredPath)
+                ? string.Empty
+                : Environment.ExpandEnvironmentVariables(configuredPath);
+        }
+
+        private async Task<string> ResolveProjectIdAsync(string serviceAccountJsonPath, CancellationToken cancellationToken)
+        {
+            if (!string.IsNullOrWhiteSpace(_options.ProjectId))
+            {
+                return _options.ProjectId;
+            }
+
+            await using var stream = File.OpenRead(serviceAccountJsonPath);
+            using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return document.RootElement.TryGetProperty("project_id", out var projectIdElement)
+                ? projectIdElement.GetString() ?? string.Empty
+                : string.Empty;
+        }
+
+        private static async Task<string> CreateAccessTokenAsync(
+            string serviceAccountJsonPath,
+            CancellationToken cancellationToken)
+        {
+            await using var stream = File.OpenRead(serviceAccountJsonPath);
+            var credential = ServiceAccountCredential
+                .FromServiceAccountData(stream)
+                .ToGoogleCredential()
+                .CreateScoped(FirebaseMessagingScope);
+
+            return await ((ITokenAccess)credential)
+                .GetAccessTokenForRequestAsync(null, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

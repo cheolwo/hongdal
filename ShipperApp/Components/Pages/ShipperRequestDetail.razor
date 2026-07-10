@@ -57,6 +57,10 @@
                                     <MudText Typo="Typo.caption" Color="Color.Secondary">차량</MudText>
                                     <MudText Typo="Typo.body2">@Display(request.차량종류)</MudText>
                                 </MudItem>
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">화물 적재 형태</MudText>
+                                    <MudText Typo="Typo.body2">@Display(request.화물적재형태)</MudText>
+                                </MudItem>
                                 <MudItem xs="6">
                                     <MudText Typo="Typo.caption" Color="Color.Secondary">결제 예정</MudText>
                                     <MudText Typo="Typo.body2">@(request.결제예정금액?.ToString("N0") ?? "-")원</MudText>

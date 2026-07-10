@@ -1,0 +1,126 @@
+@page "/shipper/exploration/inbox"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="받은 탐색 문의함"
+               Description="기사나 물류 파트너가 먼저 보낸 운행 가능성 문의에 응답합니다."
+               Badge="@($"{Inquiries.Count}건")" />
+
+<MudGrid>
+    <MudItem xs="12" lg="5">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">문의 목록</MudText>
+                <MudTable Items="Inquiries" Dense="true" Hover="true" OnRowClick="@((TableRowClickEventArgs<ExplorationInquiry> args) => SelectInquiry(args.Item))">
+                    <HeaderContent>
+                        <MudTh>개시자</MudTh>
+                        <MudTh>구간</MudTh>
+                        <MudTh>상태</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="개시자">@context.Initiator</MudTd>
+                        <MudTd DataLabel="구간">
+                            <MudText Typo="Typo.body2">@context.Title</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@context.FromArea → @context.ToArea</MudText>
+                        </MudTd>
+                        <MudTd DataLabel="상태">
+                            <MudChip T="string" Size="Size.Small" Color="@context.Color" Variant="Variant.Outlined">@context.Status</MudChip>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="7">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            @if (SelectedInquiry is null)
+            {
+                <MudAlert Severity="Severity.Info">왼쪽 목록에서 문의를 선택해 주세요.</MudAlert>
+            }
+            else
+            {
+                <MudStack Spacing="3">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">@SelectedInquiry.Title</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            @SelectedInquiry.Initiator · @SelectedInquiry.VehicleType · @SelectedInquiry.FromArea → @SelectedInquiry.ToArea
+                        </MudText>
+                    </MudStack>
+                    <MudAlert Severity="Severity.Info">@SelectedInquiry.Message</MudAlert>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <MudButton FullWidth="true" Variant="@ResponseVariant("가능")" Color="Color.Success" OnClick="@(() => SetResponse("가능"))">가능</MudButton>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudButton FullWidth="true" Variant="@ResponseVariant("미정")" Color="Color.Warning" OnClick="@(() => SetResponse("미정"))">미정</MudButton>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <MudButton FullWidth="true" Variant="@ResponseVariant("불가")" Color="Color.Error" OnClick="@(() => SetResponse("불가"))">불가</MudButton>
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudTextField Label="응답 메모" @bind-Value="Memo" Variant="Variant.Outlined" Lines="3" />
+                    <MudNumericField T="decimal?" Label="예상 중량 kg" @bind-Value="Weight" Variant="Variant.Outlined" />
+                    <MudNumericField T="decimal?" Label="예상 부피 CBM" @bind-Value="Cbm" Variant="Variant.Outlined" />
+                    <MudAlert Severity="@ResponseSeverity" Variant="Variant.Outlined">@ResponseMessage</MudAlert>
+                </MudStack>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private static readonly IReadOnlyList<ExplorationInquiry> Inquiries =
+    [
+        new(1, "김기사", "강서 냉장 소형차 가능 문의", "서울 강서", "경기 김포", "냉동탑차", "미응답", Color.Warning, "오늘 오후 냉장 소형차로 픽업 가능 여부를 먼저 확인하고 싶습니다."),
+        new(2, "서부운송", "인천 통관 대행지 출고 문의", "인천 중구", "서울 마포", "1톤 카고", "미정응답", Color.Info, "수입 통관 완료 재고 중 일부를 당일 출고할 수 있는지 문의합니다."),
+        new(3, "한강물류", "행사 비품 예약 가능 문의", "경기 고양", "서울 송파", "1.4톤 윙바디", "있음응답", Color.Success, "예약 운송 후보가 있어 물량과 시간창을 확인하고 싶습니다.")
+    ];
+
+    private ExplorationInquiry? SelectedInquiry { get; set; } = Inquiries[0];
+    private string? SelectedResponse { get; set; } = "미정";
+    private string? Memo { get; set; } = "상차 가능 시간 확인 후 확정";
+    private decimal? Weight { get; set; } = 520m;
+    private decimal? Cbm { get; set; } = 3.8m;
+
+    private Severity ResponseSeverity => SelectedResponse == "불가" ? Severity.Warning : Severity.Success;
+
+    private string ResponseMessage => SelectedResponse is null
+        ? "응답을 선택하면 화면에 즉시 반영됩니다."
+        : $"샘플 모드: '{SelectedResponse}' 응답이 선택되었습니다.";
+
+    private void SelectInquiry(ExplorationInquiry? inquiry)
+    {
+        if (inquiry is null)
+        {
+            return;
+        }
+
+        SelectedInquiry = inquiry;
+        SelectedResponse = inquiry.Status.Contains("있음", StringComparison.OrdinalIgnoreCase)
+            ? "가능"
+            : inquiry.Status.Contains("없음", StringComparison.OrdinalIgnoreCase)
+                ? "불가"
+                : "미정";
+    }
+
+    private void SetResponse(string response)
+    {
+        SelectedResponse = response;
+    }
+
+    private Variant ResponseVariant(string response)
+        => SelectedResponse == response ? Variant.Filled : Variant.Outlined;
+
+    private sealed record ExplorationInquiry(
+        long Id,
+        string Initiator,
+        string Title,
+        string FromArea,
+        string ToArea,
+        string VehicleType,
+        string Status,
+        Color Color,
+        string Message);
+}

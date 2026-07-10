@@ -75,7 +75,7 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
         queue.현재추천대상기사Id = null;
         queue.추천시작시각 = null;
         queue.추천만료시각 = null;
-        dispatchRequest.배차상태 = 상태값.배차상태.매칭중;
+        dispatchRequest.배차상태 = 상태값.배차상태.배차확정;
         dispatchRequest.UpdatedAt = now;
         queue.UpdatedAt = now;
 

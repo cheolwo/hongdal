@@ -1,6 +1,7 @@
 @page "/login"
 @inject IAuthSession AuthSession
 @inject AuthApiService AuthApi
+@inject I기사푸시토큰등록Service 푸시토큰등록Service
 @inject NavigationManager NavigationManager
 
 <PageTitle>로그인</PageTitle>
@@ -19,59 +20,50 @@
             <MudAlert Severity="@_statusSeverity">@_statusMessage</MudAlert>
         }
 
-        <MudPaper Class="pa-4" Elevation="2">
-            <MudStack Spacing="2">
-                <MudTextField @bind-Value="_loginId"
-                              Label="아이디 또는 이메일"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense" />
-                <MudTextField @bind-Value="_password"
-                              Label="비밀번호"
-                              InputType="InputType.Password"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense" />
+        <Hongdal공통로그인Panel 제목="기사 로그인"
+                         설명="기사 앱은 카카오, 구글, 네이버 로그인 버튼을 같은 위치에 두고, 실제 OAuth 연결은 서버 설정이 준비된 뒤 활성화합니다."
+                         초기아이디="@_loginId"
+                         현재사용자표시="@CurrentUserLabel"
+                         상태메시지="@_statusMessage"
+                         상태Severity="@_statusSeverity"
+                         일반로그인버튼텍스트="@(_isLoggedIn ? "세션 갱신" : "로그인")"
+                         개발힌트목록="DriverLoginHints"
+                         IsBusy="@_isBusy"
+                         OnPasswordLogin="LoginAsync"
+                         OnSocialLogin="SocialLoginAsync">
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       FullWidth="true"
+                       OnClick="GoHome">
+                홈으로 이동
+            </MudButton>
 
-                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">개발용 기사: driver1@hongdal.local</MudChip>
-                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">비밀번호: Driver123!</MudChip>
-                </MudStack>
-
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           FullWidth="true"
-                           OnClick="LoginAsync">
-                    @(_isLoggedIn ? "세션 갱신" : "로그인")
-                </MudButton>
-
-                <MudButton Variant="Variant.Outlined"
+            @if (_isLoggedIn)
+            {
+                <MudButton Variant="Variant.Text"
                            Color="Color.Secondary"
                            FullWidth="true"
-                           OnClick="GoHome">
-                    홈으로 이동
+                           OnClick="Logout">
+                    로그아웃
                 </MudButton>
-
-                @if (_isLoggedIn)
-                {
-                    <MudButton Variant="Variant.Text"
-                               Color="Color.Secondary"
-                               FullWidth="true"
-                               OnClick="Logout">
-                        로그아웃
-                    </MudButton>
-                }
-
-                <MudText Typo="Typo.body2">현재 사용자: @(AuthSession.UserName ?? "미로그인")</MudText>
-            </MudStack>
-        </MudPaper>
+            }
+        </Hongdal공통로그인Panel>
     </MudStack>
 </MudContainer>
 
 @code {
     private string _loginId = string.Empty;
-    private string _password = string.Empty;
+    private bool _isBusy;
     private bool _isLoggedIn;
     private string? _statusMessage = "개발 단계에서는 홈을 바로 볼 수 있고, 필요할 때만 여기서 로그인하면 된다.";
     private Severity _statusSeverity = Severity.Info;
+    private static readonly IReadOnlyList<string> DriverLoginHints =
+    [
+        "개발용 기사: driver1@hongdal.local",
+        "비밀번호: Driver123!"
+    ];
+
+    private string CurrentUserLabel => AuthSession.UserName ?? "미로그인";
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,18 +72,19 @@
         _loginId = AuthSession.UserName ?? string.Empty;
     }
 
-    private async Task LoginAsync()
+    private async Task LoginAsync(공통로그인요청 request)
     {
-        if (string.IsNullOrWhiteSpace(_loginId))
+        if (_isBusy)
         {
-            _statusSeverity = Severity.Warning;
-            _statusMessage = "아이디를 입력하세요.";
             return;
         }
 
+        _loginId = request.UserNameOrEmail;
+        _isBusy = true;
+
         try
         {
-            var result = await AuthApi.LoginAsync(_loginId, _password);
+            var result = await AuthApi.LoginAsync(request.UserNameOrEmail, request.Password);
             if (!result.IsSuccess)
             {
                 _statusSeverity = Severity.Error;
@@ -105,17 +98,28 @@
             _statusMessage = "Hongdal 서버에 연결하지 못했습니다. 서버 실행 상태와 HTTPS 포트를 확인해 주세요.";
             return;
         }
+        finally
+        {
+            _isBusy = false;
+        }
 
         _isLoggedIn = true;
+        await 푸시토큰등록Service.저장토큰등록Async();
         _statusSeverity = Severity.Success;
         _statusMessage = $"{AuthSession.UserName ?? _loginId} 님, 서버 로그인되었습니다.";
+    }
+
+    private Task SocialLoginAsync(공통소셜로그인요청 request)
+    {
+        _statusSeverity = Severity.Info;
+        _statusMessage = $"{request.ProviderDisplayName} 요청을 받았습니다. ProviderId={request.ProviderId}. 서버 OAuth 설정이 준비되면 이 버튼에서 인증 흐름을 시작합니다.";
+        return Task.CompletedTask;
     }
 
     private async Task Logout()
     {
         await AuthSession.ClearAsync();
         _isLoggedIn = false;
-        _password = string.Empty;
         _statusSeverity = Severity.Info;
         _statusMessage = "로그아웃했습니다.";
     }

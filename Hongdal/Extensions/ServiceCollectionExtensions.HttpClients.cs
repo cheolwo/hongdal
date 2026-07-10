@@ -93,7 +93,7 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri(options.CustomsTradeStatistics.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
-        services.AddHttpClient<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();
+        services.AddScoped<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();
         services.AddHttpClient<IFcmPushService, FirebaseFcmPushService>();
         services.AddHttpClient<IKakaoAlimTalkService, KakaoAlimTalkService>((sp, client) =>
         {

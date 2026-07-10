@@ -2,26 +2,33 @@ using System.Diagnostics;
 using Hongdal.Contracts.Driver.Transport;
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
+using MediatR;
 
 namespace Hongdal.Application.Driver.Transport;
 
 public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문제신고Command, Result<기사운송요약응답>>
 {
     private readonly HongdalContext _db;
+    private readonly IPublisher _publisher;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
     private readonly I운송증빙첨부JsonWriter _attachmentWriter;
+    private readonly ILogger<운송문제신고CommandHandler> _logger;
 
     public 운송문제신고CommandHandler(
         HongdalContext db,
+        IPublisher publisher,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
-        I운송증빙첨부JsonWriter attachmentWriter)
+        I운송증빙첨부JsonWriter attachmentWriter,
+        ILogger<운송문제신고CommandHandler> logger)
     {
         _db = db;
+        _publisher = publisher;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
         _attachmentWriter = attachmentWriter;
+        _logger = logger;
     }
 
     public async Task<Result<기사운송요약응답>> Handle(운송문제신고Command request, CancellationToken cancellationToken)
@@ -70,6 +77,7 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
         entity.UpdatedAt = now;
 
         await _db.SaveChangesAsync(cancellationToken);
+        await PublishAfterCommitAsync(entity, 예외, request, now, cancellationToken);
 
         return Result.Ok(new 기사운송요약응답
         {
@@ -97,5 +105,39 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
         var memo = string.IsNullOrWhiteSpace(requestMemo) ? string.Empty : $" 메모={requestMemo.Trim()}";
         var admin = 예외.관리자확인필요 ? " 관리자확인필요" : string.Empty;
         return $"[운송예외][{예외.단계}][{예외.예외코드}] {예외.사유}{memo}{admin}";
+    }
+
+    private async Task PublishAfterCommitAsync(
+        배송_운송 entity,
+        운송현장예외정리결과 예외,
+        운송문제신고Command request,
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _publisher.Publish(
+                new 운송문제신고됨Event(
+                    request.기사Id,
+                    entity.Id,
+                    entity.운송번호,
+                    예외.단계,
+                    예외.예외코드,
+                    예외.사유,
+                    request.메모,
+                    request.증빙ObjectName,
+                    request.증빙Url,
+                    예외.관리자확인필요,
+                    now,
+                    Activity.Current?.TraceId.ToString() ?? string.Empty),
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "운송 문제 신고 사후처리 이벤트 발행 중 예외가 발생했습니다. TransportId={TransportId}",
+                entity.Id);
+        }
     }
 }

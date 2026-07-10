@@ -170,6 +170,87 @@ public sealed partial class 백오피스메모리Service : I백오피스Service
     public Task<IReadOnlyList<화주관리응답>> 화주목록조회Async(CancellationToken cancellationToken = default)
         => Task.FromResult<IReadOnlyList<화주관리응답>>(_shippers.ToArray());
 
+    public Task<관리자연락처검색응답> 연락처뒤8자리검색Async(string phoneLast8, CancellationToken cancellationToken = default)
+    {
+        var last8 = OnlyDigits(phoneLast8);
+        if (last8.Length > 8)
+        {
+            last8 = last8[^8..];
+        }
+
+        var people = new List<관리자연락처인물응답>();
+
+        foreach (var driver in _drivers.Where(x => EndsWithLast8(x.연락처, last8)))
+        {
+            people.Add(new 관리자연락처인물응답
+            {
+                UserId = driver.기사Id,
+                사용자명 = driver.기사명,
+                연락처 = driver.연락처,
+                전화번호뒤8자리 = last8,
+                역할목록 = ["용달기사"],
+                연락처출처목록 = ["기사 프로필 연락처"],
+                기사정보 = new 관리자연락처기사정보응답
+                {
+                    기사명 = driver.기사명,
+                    연락처 = driver.연락처,
+                    차량 = driver.차량,
+                    운행상태 = driver.운행상태,
+                    활동지역 = driver.주_활동지역
+                }
+            });
+        }
+
+        foreach (var shipper in _shippers.Where(x => EndsWithLast8(x.연락처, last8)))
+        {
+            people.Add(new 관리자연락처인물응답
+            {
+                UserId = shipper.화주Id,
+                사용자명 = shipper.사용자명,
+                이메일 = shipper.이메일,
+                연락처 = shipper.연락처,
+                전화번호뒤8자리 = last8,
+                역할목록 = ["화주"],
+                연락처출처목록 = ["화주 계정 연락처"],
+                화주정보 = new 관리자연락처화주요약응답
+                {
+                    의뢰건수 = shipper.의뢰건수,
+                    진행중의뢰건수 = Math.Max(0, shipper.의뢰건수 - 1),
+                    최근의뢰일시 = shipper.최근의뢰일시
+                }
+            });
+        }
+
+        return Task.FromResult(new 관리자연락처검색응답
+        {
+            전화번호뒤8자리 = last8,
+            검색결과수 = people.Count,
+            조회일시Utc = DateTime.UtcNow,
+            인물목록 = people.OrderBy(x => x.사용자명).ToArray()
+        });
+    }
+
+    private static bool EndsWithLast8(string? phoneNumber, string last8)
+    {
+        if (last8.Length != 8)
+        {
+            return false;
+        }
+
+        var digits = OnlyDigits(phoneNumber);
+        return digits.Length >= 8 && digits.EndsWith(last8, StringComparison.Ordinal);
+    }
+
+    private static string OnlyDigits(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        return new string(value.Where(char.IsDigit).ToArray());
+    }
+
     private void Seed()
     {
         var now = DateTime.UtcNow;

@@ -1,19 +1,40 @@
 <MudNavMenu Class="px-2 py-3">
-    <MudText Typo="Typo.overline" Color="Color.Secondary" Class="px-4">웹앱 역할</MudText>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">통합 홈</MudNavLink>
+    <MudText Typo="Typo.overline" Color="Color.Secondary" Class="px-4">통달 업무 영역</MudText>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">업무 홈</MudNavLink>
     <MudNavLink Href="/login" Icon="@Icons.Material.Filled.Login">웹 로그인</MudNavLink>
-    <MudNavLink Href="/shipper" Icon="@Icons.Material.Filled.LocalShipping">화주 웹</MudNavLink>
+    <MudNavLink Href="/shipper" Icon="@Icons.Material.Filled.LocalShipping">화주·판매자</MudNavLink>
     <MudNavLink Href="/shipper/request" Icon="@Icons.Material.Filled.PostAdd">운송 의뢰 작성</MudNavLink>
+    <MudNavLink Href="/shipper/request/bulk" Icon="@Icons.Material.Filled.UploadFile">운송 의뢰 일괄등록</MudNavLink>
+    <MudNavLink Href="/shipper/request/payment-status" Icon="@Icons.Material.Filled.Payments">결제/정산 상태 점검</MudNavLink>
     <MudNavLink Href="/shipper/request/HD-WEB-001" Icon="@Icons.Material.Filled.Timeline">의뢰 상세 타임라인</MudNavLink>
-    <MudNavLink Href="/driver" Icon="@Icons.Material.Filled.Route">기사 웹</MudNavLink>
+    <MudNavLink Href="/shipper/public-cargo" Icon="@Icons.Material.Filled.ViewList">공개 화물정보</MudNavLink>
+    <MudNavLink Href="/shipper/exploration/inbox" Icon="@Icons.Material.Filled.Inbox">받은 탐색 문의함</MudNavLink>
+    <MudNavLink Href="/shipper/warehouse/workspace" Icon="@Icons.Material.Filled.Warehouse">화주 창고 작업대</MudNavLink>
+    <MudNavLink Href="/shipper/warehouse/inventory" Icon="@Icons.Material.Filled.Inventory2">화주 재고 목록</MudNavLink>
+    <MudNavLink Href="/shipper/sales/channels" Icon="@Icons.Material.Filled.Storefront">판매채널 연결</MudNavLink>
+    <MudNavLink Href="/shipper/sales/orders" Icon="@Icons.Material.Filled.Outbox">주문 출고 알림</MudNavLink>
+    <MudNavLink Href="/shipper/customs/hs-reviews" Icon="@Icons.Material.Filled.FactCheck">HS 코드 검토</MudNavLink>
+    <MudNavLink Href="/shipper/international/fcl-lcl" Icon="@Icons.Material.Filled.Public">FCL/LCL 판단</MudNavLink>
+    <MudNavLink Href="/driver/home" Icon="@Icons.Material.Filled.Route">기사</MudNavLink>
+    <MudNavLink Href="/driver/me" Icon="@Icons.Material.Filled.AccountCircle">기사 내 정보</MudNavLink>
+    <MudNavLink Href="/driver/work/start" Icon="@Icons.Material.Filled.PlayArrow">운행 시작</MudNavLink>
     <MudNavLink Href="/driver/recommendations" Icon="@Icons.Material.Filled.TaskAlt">추천 배차</MudNavLink>
-    <MudNavLink Href="/driver/transport/proof" Icon="@Icons.Material.Filled.PhotoCamera">상하차 증빙</MudNavLink>
-    <MudNavLink Href="/warehouse" Icon="@Icons.Material.Filled.Warehouse">창고 관리자 웹</MudNavLink>
+    <MudNavLink Href="/driver/transports/current" Icon="@Icons.Material.Filled.LocalShipping">진행 중 운송</MudNavLink>
+    <MudNavLink Href="/driver/transports/history" Icon="@Icons.Material.Filled.History">운송 내역</MudNavLink>
+    <MudNavLink Href="/driver/settlements/current-month" Icon="@Icons.Material.Filled.ReceiptLong">기사 정산</MudNavLink>
+    <MudNavLink Href="/driver/transport/proof" Icon="@Icons.Material.Filled.PhotoCamera">통합 증빙 검증</MudNavLink>
+    <MudNavLink Href="/warehouse" Icon="@Icons.Material.Filled.Warehouse">창고·현장</MudNavLink>
     <MudNavLink Href="/warehouse/scan" Icon="@Icons.Material.Filled.QrCodeScanner">창고 스캔</MudNavLink>
-    <MudNavLink Href="/orderer" Icon="@Icons.Material.Filled.Groups">주문자 웹</MudNavLink>
+    <MudNavLink Href="/warehouse/work-board" Icon="@Icons.Material.Filled.ViewKanban">창고 작업 보드</MudNavLink>
+    <MudNavLink Href="/warehouse/work/picking-batch" Icon="@Icons.Material.Filled.Inventory2">피킹 배치</MudNavLink>
+    <MudNavLink Href="/warehouse/work/inbound/products" Icon="@Icons.Material.Filled.MoveToInbox">입고 상품 확인</MudNavLink>
+    <MudNavLink Href="/warehouse/work/inbound/inspection" Icon="@Icons.Material.Filled.FactCheck">입고 검수</MudNavLink>
+    <MudNavLink Href="/warehouse/mart" Icon="@Icons.Material.Filled.Storefront">홍달마트</MudNavLink>
+    <MudNavLink Href="/warehouse/mart/work-board" Icon="@Icons.Material.Filled.Dashboard">홍달마트 작업 보드</MudNavLink>
+    <MudNavLink Href="/orderer" Icon="@Icons.Material.Filled.Groups">주문자·공동주문</MudNavLink>
     <MudNavLink Href="/community" Icon="@Icons.Material.Filled.Forum">커뮤니티</MudNavLink>
     <MudDivider Class="my-3" />
     <MudText Typo="Typo.caption" Color="Color.Secondary" Class="px-4">
-        네이티브 센서가 필요한 기능은 모바일 앱에 남기고, 업무 화면은 웹에서 먼저 검증합니다.
+        하나의 WebAssembly 셸 안에서 업무 화면을 먼저 검증하고, 네이티브 센서가 필요한 기능만 모바일 앱에 남깁니다.
     </MudText>
 </MudNavMenu>

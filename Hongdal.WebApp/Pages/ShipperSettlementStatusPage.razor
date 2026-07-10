@@ -1,0 +1,434 @@
+@page "/shipper/request/payment-status"
+@inject 화주결제정산Service 결제정산Service
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="결제/정산 상태 점검"
+               Description="외부 결제 API 키가 없어도 운송 의뢰의 결제상태와 정산상태 변화가 화면에 반영되는지 먼저 검증합니다."
+               Badge="상태 검증" />
+
+<MudGrid>
+    <MudItem xs="12" lg="4">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">조회 대상</MudText>
+                    <MudTextField @bind-Value="RequestId"
+                                  Label="운송 의뢰 ID"
+                                  Variant="Variant.Outlined"
+                                  Placeholder="예: HD-WEB-001" />
+                    <MudNumericField T="int" @bind-Value="PaymentAmount"
+                                     Label="결제 준비 금액"
+                                     Variant="Variant.Outlined"
+                                     Min="0" />
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Refresh"
+                                   OnClick="LoadRequestAsync">
+                            상태 조회
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.ReceiptLong"
+                                   OnClick="LoadPaymentsAsync">
+                            결제 기록 조회
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">토스 결제 준비</MudText>
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                        실제 PG 승인 호출은 API 키와 결제창이 준비된 뒤 사용합니다. 여기서는 서버가 결제대기 레코드를 만들 수 있는지까지만 검증합니다.
+                    </MudAlert>
+                    <MudTextField @bind-Value="OrderName"
+                                  Label="주문명"
+                                  Variant="Variant.Outlined" />
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Info"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Settings"
+                                   OnClick="LoadTossConfigAsync">
+                            결제 환경 확인
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Payments"
+                                   OnClick="PreparePaymentAsync">
+                            결제대기 생성
+                        </MudButton>
+                    </MudStack>
+
+                    @if (TossConfig is not null)
+                    {
+                        <MudAlert Severity="@(TossConfig.IsConfigured ? Severity.Success : Severity.Warning)" Dense="true" Variant="Variant.Outlined">
+                            @(TossConfig.IsConfigured
+                                ? $"토스 ClientKey가 설정되어 있습니다. BaseUrl={TossConfig.BaseUrl}"
+                                : "토스 API 키가 아직 설정되지 않았습니다. 결제창 호출은 나중에 연결하세요.")
+                        </MudAlert>
+                    }
+
+                    @if (PreparedPayment is not null)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.subtitle2">결제대기 생성 결과</MudText>
+                                <MudText Typo="Typo.body2">결제 ID: @PreparedPayment.결제Id</MudText>
+                                <MudText Typo="Typo.body2">OrderId: @PreparedPayment.OrderId</MudText>
+                                <MudText Typo="Typo.body2">금액: @PreparedPayment.Amount.ToString("N0")원</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">외부 승인 호출 보호</MudText>
+                    <MudAlert Severity="Severity.Warning" Dense="true" Variant="Variant.Outlined">
+                        API 키와 실제 결제창 검증 전에는 승인 호출을 켜지 않는 것을 기본값으로 둡니다.
+                    </MudAlert>
+                    <MudSwitch T="bool"
+                               @bind-Value="외부승인호출허용"
+                               Color="Color.Warning"
+                               Label="실제 외부 승인 호출 허용" />
+                    <MudTextField @bind-Value="PaymentKey" Label="PaymentKey" Variant="Variant.Outlined" Disabled="@(!외부승인호출허용)" />
+                    <MudTextField @bind-Value="ConfirmOrderId" Label="OrderId" Variant="Variant.Outlined" Disabled="@(!외부승인호출허용)" />
+                    <MudNumericField T="int" @bind-Value="ConfirmAmount" Label="승인 금액" Variant="Variant.Outlined" Disabled="@(!외부승인호출허용)" />
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Warning"
+                               Disabled="@(!외부승인호출허용 || IsBusy)"
+                               StartIcon="@Icons.Material.Filled.Verified"
+                               OnClick="ConfirmPaymentAsync">
+                        승인 호출
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" lg="8">
+        <MudStack Spacing="3">
+            @if (!string.IsNullOrWhiteSpace(StatusMessage))
+            {
+                <MudAlert Severity="@StatusSeverity">@StatusMessage</MudAlert>
+            }
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">현재 운송 의뢰 상태</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">상태 변경 API를 누른 뒤 다시 조회해서 화면 반영을 확인합니다.</MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="@ResolvePaymentColor(CurrentRequest?.결제상태)" Variant="Variant.Filled">
+                            결제 @Display(CurrentRequest?.결제상태)
+                        </MudChip>
+                    </MudStack>
+
+                    @if (CurrentRequest is null)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                            운송 의뢰 ID를 입력하고 상태 조회를 실행하세요.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰 상태</MudText>
+                                    <MudText Typo="Typo.h6">@Display(CurrentRequest.의뢰상태)</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">배차 상태</MudText>
+                                    <MudText Typo="Typo.h6">@Display(CurrentRequest.배차상태)</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">정산 상태</MudText>
+                                    <MudText Typo="Typo.h6">@Display(CurrentRequest.정산상태)</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudText Typo="Typo.subtitle2">결제 조건</MudText>
+                                <MudText Typo="Typo.body2">@Display(CurrentRequest.결제수단) · @CurrentRequest.결제예정금액?.ToString("N0")원</MudText>
+                                <MudText Typo="Typo.body2">정산시점: @Display(CurrentRequest.정산시점?.ToString())</MudText>
+                                <MudText Typo="Typo.body2">증빙방식: @Display(CurrentRequest.증빙방식?.ToString())</MudText>
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudText Typo="Typo.subtitle2">현장 증빙</MudText>
+                                <MudText Typo="Typo.body2">인수증 번호: @Display(CurrentRequest.인수증번호)</MudText>
+                                <MudText Typo="Typo.body2">현장수금 확인: @(CurrentRequest.현장수금확인일시?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "미확인")</MudText>
+                                <MudText Typo="Typo.body2">정산 메모: @Display(CurrentRequest.정산메모)</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">내부 정산 상태 변경 액션</MudText>
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                        외부 결제 API 없이도 서버 내부 상태가 바뀌는지 확인할 수 있는 액션입니다.
+                    </MudAlert>
+                    <MudGrid>
+                        <MudItem xs="12" md="5">
+                            <MudTextField @bind-Value="ReceiptNo"
+                                          Label="인수증 번호"
+                                          Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="12" md="7">
+                            <MudTextField @bind-Value="SettlementMemo"
+                                          Label="처리 메모"
+                                          Variant="Variant.Outlined" />
+                        </MudItem>
+                    </MudGrid>
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.ReceiptLong"
+                                   OnClick="RegisterReceiptAsync">
+                            인수증 등록
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Info"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Approval"
+                                   OnClick="ApprovePostpayAsync">
+                            후불 승인
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Success"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Payments"
+                                   OnClick="MarkOfflinePaidAsync">
+                            현장 지급 처리
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">결제 기록</MudText>
+                    @if (PaymentItems.Count == 0)
+                    {
+                        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                            아직 조회된 결제 기록이 없습니다. 결제대기 생성 또는 결제 기록 조회를 실행하세요.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudTable Items="PaymentItems" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>결제 ID</MudTh>
+                                <MudTh>상태</MudTh>
+                                <MudTh>금액</MudTh>
+                                <MudTh>OrderId</MudTh>
+                                <MudTh>생성</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="결제 ID">@context.결제Id</MudTd>
+                                <MudTd DataLabel="상태">@context.결제상태</MudTd>
+                                <MudTd DataLabel="금액">@context.결제금액.ToString("N0")원</MudTd>
+                                <MudTd DataLabel="OrderId">@context.OrderId</MudTd>
+                                <MudTd DataLabel="생성">@context.생성일시Utc.ToLocalTime().ToString("MM-dd HH:mm")</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private string RequestId { get; set; } = "HD-WEB-001";
+    private int PaymentAmount { get; set; } = 128000;
+    private string OrderName { get; set; } = "홍달 용달 운송의뢰";
+    private string ReceiptNo { get; set; } = "RCPT-WEB-001";
+    private string? SettlementMemo { get; set; }
+    private string? PaymentKey { get; set; }
+    private string? ConfirmOrderId { get; set; }
+    private int ConfirmAmount { get; set; }
+    private bool 외부승인호출허용 { get; set; }
+    private bool IsBusy { get; set; }
+    private string StatusMessage { get; set; } = string.Empty;
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+    private Hongdal.Contracts.Shipper.Request.화주운송의뢰응답? CurrentRequest { get; set; }
+    private Hongdal.Contracts.Shipper.Payment.토스결제환경응답? TossConfig { get; set; }
+    private Hongdal.Contracts.Shipper.Payment.토스결제준비응답? PreparedPayment { get; set; }
+    private List<Hongdal.Contracts.Shipper.Payment.결제목록응답> PaymentItems { get; } = [];
+
+    private async Task LoadRequestAsync()
+    {
+        await RunAsync("운송 의뢰 상태를 조회했습니다.", async () =>
+        {
+            CurrentRequest = await 결제정산Service.의뢰조회Async(RequestId);
+            if (CurrentRequest.결제예정금액.HasValue && CurrentRequest.결제예정금액.Value > 0)
+            {
+                PaymentAmount = CurrentRequest.결제예정금액.Value;
+                ConfirmAmount = CurrentRequest.결제예정금액.Value;
+            }
+        });
+    }
+
+    private async Task LoadPaymentsAsync()
+    {
+        await RunAsync("결제 기록을 조회했습니다.", async () =>
+        {
+            PaymentItems.Clear();
+            PaymentItems.AddRange(await 결제정산Service.결제목록조회Async(RequestId, paymentStatus: null));
+        });
+    }
+
+    private async Task LoadTossConfigAsync()
+    {
+        await RunAsync("결제 환경을 확인했습니다.", async () =>
+        {
+            TossConfig = await 결제정산Service.토스결제환경조회Async();
+        });
+    }
+
+    private async Task PreparePaymentAsync()
+    {
+        await RunAsync("결제대기 레코드를 생성했습니다. 실제 결제창 호출은 API 키 설정 후 연결하세요.", async () =>
+        {
+            PreparedPayment = await 결제정산Service.토스결제준비Async(RequestId, PaymentAmount);
+            ConfirmOrderId = PreparedPayment.OrderId;
+            ConfirmAmount = PreparedPayment.Amount;
+            await LoadPaymentsWithoutStatusMessageAsync();
+            await LoadRequestWithoutStatusMessageAsync();
+        });
+    }
+
+    private async Task ConfirmPaymentAsync()
+    {
+        if (!외부승인호출허용)
+        {
+            SetStatus("외부 승인 호출은 보호 토글을 켠 뒤에만 실행할 수 있습니다.", Severity.Warning);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(PaymentKey) || string.IsNullOrWhiteSpace(ConfirmOrderId))
+        {
+            SetStatus("PaymentKey와 OrderId를 입력해야 승인 호출을 실행할 수 있습니다.", Severity.Warning);
+            return;
+        }
+
+        await RunAsync("결제 승인을 요청했습니다. 서버 상태를 다시 조회하세요.", async () =>
+        {
+            await 결제정산Service.토스결제승인Async(PaymentKey, ConfirmOrderId, ConfirmAmount);
+            await LoadPaymentsWithoutStatusMessageAsync();
+            await LoadRequestWithoutStatusMessageAsync();
+        });
+    }
+
+    private async Task RegisterReceiptAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ReceiptNo))
+        {
+            SetStatus("인수증 번호를 입력해 주세요.", Severity.Warning);
+            return;
+        }
+
+        await RunAsync("인수증 등록 요청을 처리했습니다.", async () =>
+        {
+            await 결제정산Service.인수증등록Async(RequestId, ReceiptNo, SettlementMemo);
+            await LoadRequestWithoutStatusMessageAsync();
+        });
+    }
+
+    private async Task ApprovePostpayAsync()
+    {
+        await RunAsync("후불 승인 요청을 처리했습니다.", async () =>
+        {
+            await 결제정산Service.후불승인Async(RequestId, SettlementMemo);
+            await LoadRequestWithoutStatusMessageAsync();
+        });
+    }
+
+    private async Task MarkOfflinePaidAsync()
+    {
+        await RunAsync("현장 지급 처리 요청을 처리했습니다.", async () =>
+        {
+            await 결제정산Service.현장지급처리Async(RequestId, SettlementMemo);
+            await LoadRequestWithoutStatusMessageAsync();
+        });
+    }
+
+    private async Task LoadRequestWithoutStatusMessageAsync()
+    {
+        CurrentRequest = await 결제정산Service.의뢰조회Async(RequestId);
+    }
+
+    private async Task LoadPaymentsWithoutStatusMessageAsync()
+    {
+        PaymentItems.Clear();
+        PaymentItems.AddRange(await 결제정산Service.결제목록조회Async(RequestId, paymentStatus: null));
+    }
+
+    private async Task RunAsync(string successMessage, Func<Task> action)
+    {
+        IsBusy = true;
+        SetStatus("서버 요청을 처리하는 중입니다.", Severity.Info);
+
+        try
+        {
+            await action();
+            SetStatus(successMessage, Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void SetStatus(string message, Severity severity)
+    {
+        StatusMessage = message;
+        StatusSeverity = severity;
+    }
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "미확인" : value;
+
+    private static Color ResolvePaymentColor(string? status)
+    {
+        if (ContainsAny(status, "완료", "승인", "입금확인"))
+        {
+            return Color.Success;
+        }
+
+        if (ContainsAny(status, "실패", "취소", "미수", "반려"))
+        {
+            return Color.Error;
+        }
+
+        if (ContainsAny(status, "대기", "청구", "요청"))
+        {
+            return Color.Warning;
+        }
+
+        return Color.Default;
+    }
+
+    private static bool ContainsAny(string? value, params string[] tokens)
+        => !string.IsNullOrWhiteSpace(value)
+           && tokens.Any(token => value.Contains(token, StringComparison.OrdinalIgnoreCase));
+}

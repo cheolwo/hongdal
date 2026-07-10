@@ -1159,12 +1159,13 @@ public sealed class InMemoryShipperStore
         });
     }
 
-    public IReadOnlyList<string> GetVehicleTypes() => new[] { "1톤", "1.4톤", "냉동탑차" };
+    public IReadOnlyList<string> GetVehicleTypes() => new[] { "오토바이 퀵", "1톤", "1.4톤", "냉동탑차" };
 
     public decimal EstimateFare(string vehicleType, decimal distanceKm)
     {
         var baseFare = vehicleType switch
         {
+            "오토바이 퀵" => 35000m,
             "냉동탑차" => 240000m,
             "1.4톤" => 180000m,
             _ => 120000m

@@ -1,131 +1,521 @@
 @page "/shipper/request/{RequestId}"
+@inject 화주결제정산Service 결제정산Service
+@inject NavigationManager Navigation
 
 <WebPageHeader Eyebrow="Shipper Web"
                Title="운송 의뢰 상세 타임라인"
-               Description="결제, 배차, 수락, 상차, 하차, 정산 상태가 한 화면에서 이어지는지 웹에서 검증합니다."
-               Badge="@RequestId" />
+               Description="결제, 배차, 수락, 상차, 하차, 정산 상태가 서버 API 상태와 맞물려 이어지는지 검증합니다."
+               Badge="@Display(RequestId)" />
 
-<MudGrid>
-    <MudItem xs="12" lg="4">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudStack Spacing="2">
-                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h6">@RequestId</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">냉장식품 · 혼적 · 냉동탑차</MudText>
-                    </MudStack>
-                    <MudChip T="string" Color="Color.Info" Variant="Variant.Filled">상차 대기</MudChip>
-                </MudStack>
-                <MudDivider />
-                <MudGrid>
-                    <MudItem xs="6">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제</MudText>
-                        <MudText Typo="Typo.body2">결제완료</MudText>
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">배차</MudText>
-                        <MudText Typo="Typo.body2">기사수락</MudText>
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제 예정</MudText>
-                        <MudText Typo="Typo.body2">128,000원</MudText>
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">기사 지급 예정</MudText>
-                        <MudText Typo="Typo.body2">108,000원</MudText>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">상차지</MudText>
-                        <MudText Typo="Typo.body2">서울 양천구 목동 물류센터</MudText>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">하차지</MudText>
-                        <MudText Typo="Typo.body2">경기 수원시 영통구 공동주문 거점</MudText>
-                    </MudItem>
-                </MudGrid>
+<MudStack Spacing="3">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.body2" Color="Color.Secondary">화주 운송 의뢰 ID</MudText>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                <MudTextField @bind-Value="LookupRequestId"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Label="의뢰 ID"
+                              Style="min-width: 220px;" />
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@IsBusy"
+                           OnClick="LoadRequestAsync">
+                    상태 조회
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Payments"
+                           OnClick="GoPaymentStatus">
+                    결제 점검
+                </MudButton>
             </MudStack>
-        </MudPaper>
-    </MudItem>
-
-    <MudItem xs="12" lg="8">
-        <MudStack Spacing="3">
-            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                <MudStack Spacing="2">
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h6">1.0 운송 워크플로우</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">화주가 한눈에 확인해야 하는 상태 흐름입니다.</MudText>
-                    </MudStack>
-                    <MudGrid>
-                        @foreach (var step in Timeline)
-                        {
-                            <MudItem xs="12" md="6">
-                                <MudPaper Elevation="0" Outlined="true" Class="pa-3" Style="@BuildStepStyle(step.State)">
-                                    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Start">
-                                        <MudAvatar Color="@ResolveStepColor(step.State)" Variant="Variant.Filled" Size="Size.Medium">
-                                            <MudIcon Icon="@ResolveStepIcon(step.State)" Size="Size.Small" />
-                                        </MudAvatar>
-                                        <MudStack Spacing="1" Class="flex-grow-1">
-                                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                                <MudText Typo="Typo.subtitle2">@step.Title</MudText>
-                                                <MudChip T="string" Size="Size.Small" Color="@ResolveStepColor(step.State)" Variant="Variant.Outlined">@ResolveStepLabel(step.State)</MudChip>
-                                            </MudStack>
-                                            <MudText Typo="Typo.body2">@step.Status</MudText>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@step.Description</MudText>
-                                        </MudStack>
-                                    </MudStack>
-                                </MudPaper>
-                            </MudItem>
-                        }
-                    </MudGrid>
-                </MudStack>
-            </MudPaper>
-
-            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                <MudStack Spacing="2">
-                    <MudText Typo="Typo.h6">화주 확인 항목</MudText>
-                    <MudGrid>
-                        @foreach (var item in ReviewItems)
-                        {
-                            <MudItem xs="12" md="6">
-                                <MudAlert Severity="@item.Severity" Variant="Variant.Outlined">
-                                    <strong>@item.Title</strong><br />
-                                    @item.Description
-                                </MudAlert>
-                            </MudItem>
-                        }
-                    </MudGrid>
-                </MudStack>
-            </MudPaper>
         </MudStack>
-    </MudItem>
-</MudGrid>
+        @if (Request is not null)
+        {
+            <MudChip T="string" Color="@ResolveOverallColor(Request)" Variant="Variant.Filled">
+                @ResolveOverallLabel(Request)
+            </MudChip>
+        }
+    </MudStack>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <MudAlert Severity="@StatusSeverity">@StatusMessage</MudAlert>
+    }
+
+    @if (IsBusy)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (Request is null)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            의뢰 ID를 입력하고 상태 조회를 실행하세요. 이 화면은 화주 의뢰 단건 API를 기준으로 타임라인을 그립니다.
+        </MudAlert>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="12" lg="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">@Request.의뢰Id</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@Display(Request.요약?.화물종류) · @Display(Request.운송방식) · @Display(Request.차량종류)</MudText>
+                            </MudStack>
+                            <MudChip T="string" Color="@ResolveDispatchColor(Request.배차상태)" Variant="Variant.Outlined">
+                                @Display(Request.배차상태)
+                            </MudChip>
+                        </MudStack>
+
+                        <MudDivider />
+
+                        <MudGrid>
+                            <MudItem xs="6">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">결제</MudText>
+                                <MudText Typo="Typo.body2">@Display(Request.결제상태)</MudText>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">정산</MudText>
+                                <MudText Typo="Typo.body2">@Display(Request.정산상태)</MudText>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">결제 예정</MudText>
+                                <MudText Typo="Typo.body2">@(Request.결제예정금액?.ToString("N0") ?? "-")원</MudText>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">최종 운임</MudText>
+                                <MudText Typo="Typo.body2">@(Request.최종운임?.ToString("N0") ?? "-")원</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">상차지</MudText>
+                                <MudText Typo="Typo.body2">@Display(Request.픽업지)</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">하차지</MudText>
+                                <MudText Typo="Typo.body2">@Display(Request.하차지)</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">증빙/정산 조건</MudText>
+                                <MudText Typo="Typo.body2">@Display(Request.증빙방식?.ToString()) · @Display(Request.정산시점?.ToString()) · @Display(Request.결제수단)</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" lg="8">
+                <MudStack Spacing="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">1.0 운송 워크플로우</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">서버 원장 상태를 화주가 이해해야 하는 단계로 다시 묶어 표시합니다.</MudText>
+                            </MudStack>
+
+                            <MudGrid>
+                                @foreach (var step in BuildTimeline(Request))
+                                {
+                                    <MudItem xs="12" md="6">
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3" Style="@BuildStepStyle(step.State)">
+                                            <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Start">
+                                                <MudAvatar Color="@ResolveStepColor(step.State)" Variant="Variant.Filled" Size="Size.Medium">
+                                                    <MudIcon Icon="@ResolveStepIcon(step.State)" Size="Size.Small" />
+                                                </MudAvatar>
+                                                <MudStack Spacing="1" Class="flex-grow-1">
+                                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                                        <MudText Typo="Typo.subtitle2">@step.Title</MudText>
+                                                        <MudChip T="string" Size="Size.Small" Color="@ResolveStepColor(step.State)" Variant="Variant.Outlined">
+                                                            @ResolveStepLabel(step.State)
+                                                        </MudChip>
+                                                    </MudStack>
+                                                    <MudText Typo="Typo.body2">@step.Status</MudText>
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@step.Description</MudText>
+                                                    <MudText Typo="Typo.caption">@step.Detail</MudText>
+                                                </MudStack>
+                                            </MudStack>
+                                        </MudPaper>
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        </MudStack>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">화주 확인 항목</MudText>
+                            <MudGrid>
+                                @foreach (var item in BuildReviewItems(Request))
+                                {
+                                    <MudItem xs="12" md="6">
+                                        <MudAlert Severity="@ResolveReviewSeverity(item.State)" Variant="Variant.Outlined">
+                                            <strong>@item.Title</strong><br />
+                                            @item.Description<br />
+                                            <span>@item.Detail</span>
+                                        </MudAlert>
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        </MudStack>
+                    </MudPaper>
+                </MudStack>
+            </MudItem>
+        </MudGrid>
+    }
+</MudStack>
 
 @code {
     [Parameter] public string? RequestId { get; set; }
 
-    private static readonly IReadOnlyList<WorkflowStep> Timeline =
-    [
-        new("결제", "결제완료", "화주 결제 또는 플랫폼 예치금이 확인된 상태입니다.", StepState.Completed),
-        new("배차", "기사 추천 완료", "운송 의뢰 배차 엔진이 후보 기사에게 추천을 보냈습니다.", StepState.Completed),
-        new("기사 수락", "기사수락", "기사님이 제한 시간 안에 추천을 수락했습니다.", StepState.Completed),
-        new("상차", "상차 대기", "상차지 접근 알림과 현장 준비가 필요한 단계입니다.", StepState.Active),
-        new("하차", "대기", "상차 사진 업로드 후 운송 중 상태로 이동합니다.", StepState.Pending),
-        new("정산", "대기", "하차 완료 후 1일, 3일, 7일 알림 기준으로 입금 확인을 진행합니다.", StepState.Pending)
-    ];
+    private string LookupRequestId { get; set; } = "HD-WEB-001";
+    private bool IsBusy { get; set; }
+    private string? StatusMessage { get; set; }
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+    private Hongdal.Contracts.Shipper.Request.화주운송의뢰응답? Request { get; set; }
 
-    private static readonly IReadOnlyList<(string Title, string Description, Severity Severity)> ReviewItems =
-    [
-        ("상차 준비 알림", "기사 수락 후 화주 담당자에게 상차 준비 알림을 보내야 합니다.", Severity.Info),
-        ("증빙 업로드", "상차와 하차는 사진 업로드 성공 후에만 상태를 완료로 바꿉니다.", Severity.Success),
-        ("예외 처리", "물건 없음, 수량 다름, 담당자 부재는 별도 사유 기록이 필요합니다.", Severity.Warning),
-        ("정산 신뢰", "하차 완료 후 입금 요청과 입금 완료 상태를 분리해서 보여줍니다.", Severity.Info)
-    ];
+    protected override async Task OnParametersSetAsync()
+    {
+        LookupRequestId = string.IsNullOrWhiteSpace(RequestId) ? LookupRequestId : RequestId;
+        await LoadRequestAsync();
+    }
+
+    private async Task LoadRequestAsync()
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(LookupRequestId))
+        {
+            Request = null;
+            SetStatus("의뢰 ID를 입력해 주세요.", Severity.Warning);
+            return;
+        }
+
+        IsBusy = true;
+        SetStatus("서버에서 운송 의뢰 상태를 조회하는 중입니다.", Severity.Info);
+
+        try
+        {
+            Request = await 결제정산Service.의뢰조회Async(LookupRequestId);
+            SetStatus($"{Request.의뢰Id} 상태를 서버 API에서 불러왔습니다.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Request = null;
+            SetStatus($"운송 의뢰 조회 실패: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void GoPaymentStatus()
+    {
+        Navigation.NavigateTo("/shipper/request/payment-status");
+    }
+
+    private static IReadOnlyList<WorkflowStep> BuildTimeline(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+        =>
+        [
+            new(
+                "결제",
+                Display(item.결제상태),
+                "화주 결제 또는 후불/현장 지급 조건이 확정되는 단계입니다.",
+                $"결제수단 {Display(item.결제수단)} · 예정금액 {(item.결제예정금액?.ToString("N0") ?? "-")}원",
+                ResolvePaymentState(item)),
+            new(
+                "배차",
+                Display(item.배차상태),
+                "배차 엔진이 의뢰를 기사 추천 또는 공개 배차 대상으로 올리는 단계입니다.",
+                $"차량 {Display(item.차량종류)} · 운송방식 {Display(item.운송방식)}",
+                ResolveDispatchState(item)),
+            new(
+                "기사 수락",
+                ResolveAcceptedStatusText(item),
+                "기사님이 제한 시간 안에 추천을 수락해 실제 운송 진행 건이 생기는 단계입니다.",
+                $"상차지 {Display(item.픽업지)}",
+                ResolveAcceptedState(item)),
+            new(
+                "상차",
+                ResolvePickupStatusText(item),
+                "기사님이 상차지에 도착하고 사진 또는 인수증 증빙을 남기는 단계입니다.",
+                $"상차 상태 {Display(item.배차상태)}",
+                ResolvePickupState(item)),
+            new(
+                "하차",
+                ResolveDropoffStatusText(item),
+                "기사님이 하차지에 도착해 하차 증빙과 인수 확인을 남기는 단계입니다.",
+                $"하차지 {Display(item.하차지)}",
+                ResolveDropoffState(item)),
+            new(
+                "정산",
+                Display(item.정산상태),
+                "하차 완료 이후 입금 요청, 입금 확인, 기사 정산으로 이어지는 단계입니다.",
+                $"정산시점 {Display(item.정산시점?.ToString())} · 정산메모 {Display(item.정산메모)}",
+                ResolveSettlementState(item))
+        ];
+
+    private static IReadOnlyList<ReviewItem> BuildReviewItems(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+        =>
+        [
+            new(
+                "상태 동기화",
+                "기사 앱의 수락, 상차, 하차 이벤트가 화주 의뢰 원장의 배차상태에 반영되는지 확인합니다.",
+                $"현재 배차상태 {Display(item.배차상태)}",
+                HasProblem(item.배차상태) ? StepState.Attention : ResolveDispatchState(item)),
+            new(
+                "화주 알림",
+                "상태 변경 주체가 아닌 화주에게 Push/알림톡 의도가 적재되어야 합니다.",
+                $"결제 {Display(item.결제상태)} · 정산 {Display(item.정산상태)}",
+                ResolveAcceptedState(item) == StepState.Completed ? StepState.Active : StepState.Pending),
+            new(
+                "증빙/POD",
+                "상차와 하차는 사진 업로드 성공 후 상태가 바뀌고, 인수증 거래는 서명 또는 생략 사유가 남아야 합니다.",
+                $"증빙방식 {Display(item.증빙방식?.ToString())} · 인수증 {Display(item.인수증번호)}",
+                ResolveProofState(item)),
+            new(
+                "정산 신뢰",
+                "운송완료후정산 또는 입금대기 건은 1일, 3일, 7일 입금 요청 알림 대상이 됩니다.",
+                $"정산상태 {Display(item.정산상태)} · 결제수단 {Display(item.결제수단)}",
+                ResolveSettlementState(item))
+        ];
+
+    private static StepState ResolvePaymentState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.결제상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ContainsAny(item.결제상태, "결제완료", "승인", "입금확인", "완료"))
+        {
+            return StepState.Completed;
+        }
+
+        if (ContainsAny(item.결제상태, "결제대기", "미결제", "입금대기", "청구", "대기"))
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static StepState ResolveDispatchState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.배차상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ContainsAny(item.배차상태, "배차확정", "기사배정", "수락", "상차", "운송", "하차", "인수", "완료"))
+        {
+            return StepState.Completed;
+        }
+
+        if (ContainsAny(item.배차상태, "매칭", "배차대기", "추천", "대기"))
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static StepState ResolveAcceptedState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.배차상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ContainsAny(item.배차상태, "배차확정", "기사배정", "수락", "상차", "운송", "하차", "인수", "완료"))
+        {
+            return StepState.Completed;
+        }
+
+        if (ContainsAny(item.배차상태, "추천", "매칭"))
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static StepState ResolvePickupState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.배차상태) || HasProblem(item.의뢰상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ContainsAny(item.배차상태, "상차완료", "운송", "하차", "인수", "완료"))
+        {
+            return StepState.Completed;
+        }
+
+        if (ContainsAny(item.배차상태, "상차지도착", "상차대기", "배차확정", "기사배정", "수락"))
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static StepState ResolveDropoffState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.배차상태) || HasProblem(item.의뢰상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ContainsAny(item.배차상태, "하차완료", "배송완료", "인수완료", "완료"))
+        {
+            return StepState.Completed;
+        }
+
+        if (ContainsAny(item.배차상태, "운송중", "하차지도착", "하차대기", "상차완료"))
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static StepState ResolveSettlementState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.정산상태) || HasProblem(item.결제상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ContainsAny(item.정산상태, "정산완료", "입금확인완료", "완료"))
+        {
+            return StepState.Completed;
+        }
+
+        if (ContainsAny(item.정산상태, "입금대기", "정산대기", "청구대기", "입금요청", "대기")
+            || ResolveDropoffState(item) == StepState.Completed)
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static StepState ResolveProofState(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (HasProblem(item.의뢰상태) || HasProblem(item.배차상태))
+        {
+            return StepState.Attention;
+        }
+
+        if (ResolveDropoffState(item) == StepState.Completed || ResolvePickupState(item) == StepState.Completed)
+        {
+            return StepState.Active;
+        }
+
+        return StepState.Pending;
+    }
+
+    private static string ResolveAcceptedStatusText(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+        => ResolveAcceptedState(item) switch
+        {
+            StepState.Completed => "기사 수락 완료",
+            StepState.Active => "기사 응답 대기",
+            StepState.Attention => "수락 흐름 확인 필요",
+            _ => "수락 전"
+        };
+
+    private static string ResolvePickupStatusText(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+        => ResolvePickupState(item) switch
+        {
+            StepState.Completed => "상차 완료",
+            StepState.Active => ContainsAny(item.배차상태, "상차지도착") ? "상차지 도착" : "상차 준비",
+            StepState.Attention => "상차 흐름 확인 필요",
+            _ => "상차 전"
+        };
+
+    private static string ResolveDropoffStatusText(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+        => ResolveDropoffState(item) switch
+        {
+            StepState.Completed => "하차 완료",
+            StepState.Active => ContainsAny(item.배차상태, "하차지도착") ? "하차지 도착" : "하차 진행",
+            StepState.Attention => "하차 흐름 확인 필요",
+            _ => "하차 전"
+        };
+
+    private static string ResolveOverallLabel(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (ResolveSettlementState(item) == StepState.Completed)
+        {
+            return "정산 완료";
+        }
+
+        if (ResolveDropoffState(item) == StepState.Completed)
+        {
+            return "하차 완료";
+        }
+
+        if (ResolvePickupState(item) == StepState.Completed)
+        {
+            return "운송 중";
+        }
+
+        if (ResolveAcceptedState(item) == StepState.Completed)
+        {
+            return "기사 수락";
+        }
+
+        if (ResolveDispatchState(item) == StepState.Active)
+        {
+            return "배차 진행";
+        }
+
+        return "접수";
+    }
+
+    private static Color ResolveOverallColor(Hongdal.Contracts.Shipper.Request.화주운송의뢰응답 item)
+    {
+        if (BuildTimeline(item).Any(x => x.State == StepState.Attention))
+        {
+            return Color.Error;
+        }
+
+        return ResolveSettlementState(item) == StepState.Completed
+            ? Color.Success
+            : Color.Primary;
+    }
+
+    private static Color ResolveDispatchColor(string? status)
+    {
+        if (HasProblem(status))
+        {
+            return Color.Error;
+        }
+
+        if (ContainsAny(status, "확정", "수락", "상차", "하차", "인수", "완료"))
+        {
+            return Color.Success;
+        }
+
+        if (ContainsAny(status, "대기", "매칭", "추천"))
+        {
+            return Color.Warning;
+        }
+
+        return Color.Default;
+    }
 
     private static Color ResolveStepColor(StepState state) => state switch
     {
         StepState.Completed => Color.Success,
         StepState.Active => Color.Primary,
-        StepState.Attention => Color.Warning,
+        StepState.Attention => Color.Error,
         _ => Color.Default
     };
 
@@ -134,7 +524,7 @@
         StepState.Completed => Icons.Material.Filled.Check,
         StepState.Active => Icons.Material.Filled.PlayArrow,
         StepState.Attention => Icons.Material.Filled.PriorityHigh,
-        _ => Icons.Material.Filled.Schedule
+        _ => Icons.Material.Filled.HourglassEmpty
     };
 
     private static string ResolveStepLabel(StepState state) => state switch
@@ -146,11 +536,51 @@
     };
 
     private static string BuildStepStyle(StepState state)
-        => state == StepState.Active
-            ? "border-color: var(--mud-palette-primary); background: rgba(37, 99, 235, 0.04);"
-            : string.Empty;
+        => state switch
+        {
+            StepState.Completed => "border-color: var(--mud-palette-success);",
+            StepState.Active => "border-color: var(--mud-palette-primary);",
+            StepState.Attention => "border-color: var(--mud-palette-error);",
+            _ => string.Empty
+        };
 
-    private sealed record WorkflowStep(string Title, string Status, string Description, StepState State);
+    private static Severity ResolveReviewSeverity(StepState state)
+        => state switch
+        {
+            StepState.Completed => Severity.Success,
+            StepState.Active => Severity.Info,
+            StepState.Attention => Severity.Warning,
+            _ => Severity.Normal
+        };
+
+    private static bool ContainsAny(string? value, params string[] tokens)
+        => !string.IsNullOrWhiteSpace(value)
+           && tokens.Any(token => value.Contains(token, StringComparison.OrdinalIgnoreCase));
+
+    private static bool HasProblem(string? value)
+        => ContainsAny(value, "취소", "환불", "거절", "실패", "반려", "예외", "미수발생");
+
+    private static string Display(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "미확인" : value;
+
+    private void SetStatus(string message, Severity severity)
+    {
+        StatusMessage = message;
+        StatusSeverity = severity;
+    }
+
+    private sealed record WorkflowStep(
+        string Title,
+        string Status,
+        string Description,
+        string Detail,
+        StepState State);
+
+    private sealed record ReviewItem(
+        string Title,
+        string Description,
+        string Detail,
+        StepState State);
 
     private enum StepState
     {

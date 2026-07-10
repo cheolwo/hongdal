@@ -5,5 +5,5 @@ public sealed record WebAppPageLink(
     string Description,
     string Href,
     string Icon,
-    string AppName,
+    string AreaLabel,
     string Status = "웹 검증 가능");

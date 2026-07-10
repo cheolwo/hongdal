@@ -1,0 +1,146 @@
+@page "/shipper/sales/listings"
+@inject WebShipperSalesWorkspaceService SalesService
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="출품 관리"
+               Description="판매상품과 채널출품 상태를 조회하고 기존 판매상품을 다른 채널로 추가 출품합니다."
+               Badge="출품" />
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <MudAlert Severity="@MessageSeverity" Class="mb-4">@Message</MudAlert>
+}
+
+<MudGrid>
+    <MudItem xs="12" lg="6">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">판매상품 목록</MudText>
+                <MudTable Items="Products.OrderByDescending(x => x.Id)" Dense="true" Hover="true">
+                    <HeaderContent>
+                        <MudTh>ID</MudTh>
+                        <MudTh>상품명</MudTh>
+                        <MudTh>판매SKU</MudTh>
+                        <MudTh>판매가</MudTh>
+                        <MudTh>상태</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="ID">@context.Id</MudTd>
+                        <MudTd DataLabel="상품명">@context.대표상품명</MudTd>
+                        <MudTd DataLabel="판매SKU">@context.판매SKU</MudTd>
+                        <MudTd DataLabel="판매가">@context.판매가.ToString("N0")</MudTd>
+                        <MudTd DataLabel="상태">@context.상태</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="6">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">채널출품 목록</MudText>
+                <MudTable Items="Listings.OrderByDescending(x => x.Id)" Dense="true" Hover="true">
+                    <HeaderContent>
+                        <MudTh>ID</MudTh>
+                        <MudTh>판매상품ID</MudTh>
+                        <MudTh>채널계정ID</MudTh>
+                        <MudTh>채널상품번호</MudTh>
+                        <MudTh>상태</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="ID">@context.Id</MudTd>
+                        <MudTd DataLabel="판매상품ID">@context.판매상품Id</MudTd>
+                        <MudTd DataLabel="채널계정ID">@context.판매채널계정Id</MudTd>
+                        <MudTd DataLabel="채널상품번호">@context.채널상품번호</MudTd>
+                        <MudTd DataLabel="상태">@context.출품상태 · @context.동기화상태</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4 mt-4">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h6">기존 판매상품 추가 출품</MudText>
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudSelect T="long?" Label="판매상품" @bind-Value="SelectedProductId" Variant="Variant.Outlined">
+                    @foreach (var product in Products)
+                    {
+                        <MudSelectItem T="long?" Value="@product.Id">@product.대표상품명 (@product.판매SKU)</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSelect T="long?" Label="판매채널 계정" @bind-Value="SelectedAccountId" Variant="Variant.Outlined">
+                    @foreach (var account in Accounts)
+                    {
+                        <MudSelectItem T="long?" Value="@account.Id">@account.채널종류 - @account.상점명</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="IsBusy || !SelectedProductId.HasValue || !SelectedAccountId.HasValue" OnClick="CreateListingAsync">채널출품 생성</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="LoadAsync">새로고침</MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private readonly List<판매상품항목응답> Products = [];
+    private readonly List<채널출품항목응답> Listings = [];
+    private readonly List<판매채널계정항목응답> Accounts = [];
+    private bool IsBusy;
+    private string? Message;
+    private Severity MessageSeverity = Severity.Info;
+    private long? SelectedProductId;
+    private long? SelectedAccountId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        Products.Clear();
+        Listings.Clear();
+        Accounts.Clear();
+        Products.AddRange((await SalesService.GetProductsAsync()).Items);
+        Listings.AddRange((await SalesService.GetListingsAsync()).Items);
+        Accounts.AddRange((await SalesService.GetAccountsAsync()).Items);
+        SelectedProductId ??= Products.FirstOrDefault()?.Id;
+        SelectedAccountId ??= Accounts.FirstOrDefault()?.Id;
+        MessageSeverity = Severity.Info;
+        Message = $"판매상품 {Products.Count}건, 채널출품 {Listings.Count}건을 불러왔습니다.";
+    }
+
+    private async Task CreateListingAsync()
+    {
+        if (IsBusy || !SelectedProductId.HasValue || !SelectedAccountId.HasValue)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var created = await SalesService.CreateListingAsync(new 채널출품저장요청
+            {
+                판매상품Id = SelectedProductId.Value,
+                판매채널계정Id = SelectedAccountId.Value
+            });
+
+            MessageSeverity = Severity.Success;
+            Message = $"채널출품 {created.채널상품번호}을 생성했습니다.";
+            await LoadAsync();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+}

@@ -1,0 +1,24 @@
+@page "/shipper/warehouse/workspace"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="창고 운영 허브"
+               Description="화주·판매자가 입고, 재고, 재위탁 운송, 주문 출고로 이동하는 작업대입니다."
+               Badge="창고/재고" />
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+    입고 검수, 적재, 포장 같은 현장 작업은 별도 창고관리자 앱 성격을 유지하고, 이 화면은 화주가 봐야 할 운영 현황과 후속 처리만 모읍니다.
+</MudAlert>
+
+<WebPageLinkGrid Items="WorkspaceLinks" />
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> WorkspaceLinks =
+    [
+        new("입고 대시보드", "입고 예정, 검수 진행, 재고 전환 흐름을 운영자 관점에서 확인합니다.", ShipperRoutes.InboundDashboard, Icons.Material.Filled.Dashboard, "입고"),
+        new("입고 현황", "입고 예정 상품과 창고 입고 처리 대상을 확인합니다.", ShipperRoutes.InboundRequests, Icons.Material.Filled.MoveToInbox, "입고"),
+        new("재고 목록", "가용 재고를 판매 등록 또는 재위탁 운송으로 연결합니다.", ShipperRoutes.WarehouseInventory, Icons.Material.Filled.Inventory2, "재고"),
+        new("스캔 스테이션", "입고, 상품, 번들, 적재 위치 바코드 흐름을 검증합니다.", ShipperRoutes.WarehouseScan, Icons.Material.Filled.QrCodeScanner, "재고"),
+        new("재위탁 운송", "창고 재고를 다른 목적지로 보내는 운송 흐름을 관리합니다.", ShipperRoutes.ReconsignmentOrders, Icons.Material.Filled.LocalShipping, "배송"),
+        new("주문 출고 알림", "판매채널 주문을 창고 출고 작업으로 전환해야 하는 대상을 확인합니다.", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Outbox, "출고")
+    ];
+}

@@ -1,0 +1,87 @@
+@page "/shipper/request/bulk"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="CSV 일괄등록"
+               Description="ShipperApp의 일괄 운송 의뢰 등록 흐름을 WebApp에서 표 입력으로 먼저 검증합니다."
+               Badge="@($"{PreviewRows.Count}건")" />
+
+<MudGrid>
+    <MudItem xs="12" lg="5">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6">붙여넣기 입력</MudText>
+                <MudTextField T="string" Label="CSV 텍스트" @bind-Value="CsvText" Variant="Variant.Outlined" Lines="12" />
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="BuildPreview">미리보기</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadSample">샘플 입력</MudButton>
+                </MudStack>
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">열 순서: 화물종류, 상차지, 하차지, 차량종류, 결제금액</MudAlert>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="7">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudText Typo="Typo.h6" Class="mb-3">미리보기</MudText>
+            <MudTable Items="PreviewRows" Dense="true" Hover="true">
+                <HeaderContent>
+                    <MudTh>화물</MudTh>
+                    <MudTh>상차지</MudTh>
+                    <MudTh>하차지</MudTh>
+                    <MudTh>차량</MudTh>
+                    <MudTh>결제금액</MudTh>
+                    <MudTh>상태</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="화물">@context.Cargo</MudTd>
+                    <MudTd DataLabel="상차지">@context.Pickup</MudTd>
+                    <MudTd DataLabel="하차지">@context.Dropoff</MudTd>
+                    <MudTd DataLabel="차량">@context.Vehicle</MudTd>
+                    <MudTd DataLabel="결제금액">@context.Amount.ToString("N0")</MudTd>
+                    <MudTd DataLabel="상태"><MudChip T="string" Size="Size.Small" Color="@context.Color" Variant="Variant.Outlined">@context.Status</MudChip></MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">CSV 텍스트를 입력하고 미리보기를 눌러 주세요.</MudText>
+                </NoRecordsContent>
+            </MudTable>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private readonly List<BulkPreviewRow> PreviewRows = [];
+    private string CsvText = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        LoadSample();
+        BuildPreview();
+    }
+
+    private void LoadSample()
+    {
+        CsvText = """
+냉장 간편식 세트,서울 강서구,경기 김포시,냉동탑차,186000
+캠핑 테이블,인천 중구,서울 마포구,1톤 카고,142000
+행사 비품,경기 고양시,서울 송파구,1.4톤 윙바디,210000
+""";
+    }
+
+    private void BuildPreview()
+    {
+        PreviewRows.Clear();
+        foreach (var line in CsvText.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Split(',', StringSplitOptions.TrimEntries);
+            if (parts.Length < 5 || !int.TryParse(parts[4], out var amount))
+            {
+                PreviewRows.Add(new(parts.ElementAtOrDefault(0) ?? "-", "-", "-", "-", 0, "확인필요", Color.Warning));
+                continue;
+            }
+
+            PreviewRows.Add(new(parts[0], parts[1], parts[2], parts[3], amount, "등록가능", Color.Success));
+        }
+    }
+
+    private sealed record BulkPreviewRow(string Cargo, string Pickup, string Dropoff, string Vehicle, int Amount, string Status, Color Color);
+}

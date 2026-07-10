@@ -1,0 +1,354 @@
+@page "/driver/recommendations/{RequestId}"
+@implements IDisposable
+@using Hongdal.Contracts.Driver.Recommendation
+@inject I기사추천수신Service 추천Service
+@inject NavigationManager Navigation
+
+<PageTitle>배차 추천 지도</PageTitle>
+
+@if (Recommendation is null)
+{
+    <WebPageHeader Eyebrow="Driver Web"
+                   Title="배차 추천 지도"
+                   Description="선택된 추천 배차 건을 찾을 수 없습니다. 추천 수신 화면에서 다시 선택해 주세요."
+                   Badge="추천 없음" />
+
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        표시할 추천 배차 건이 없습니다.
+    </MudAlert>
+    <MudButton Href="/driver/recommendations"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ArrowBack">
+        추천 수신 화면으로 돌아가기
+    </MudButton>
+}
+else
+{
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">Driver Web · @RecommendationSource</MudText>
+                <MudText Typo="Typo.h5">예상 운행 경로</MudText>
+            </MudStack>
+            <MudButton Href="/driver/recommendations"
+                       Variant="Variant.Text"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                추천 목록
+            </MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(StatusMessage))
+        {
+            <MudAlert Severity="@StatusSeverity" Dense="true" Variant="Variant.Outlined">
+                @StatusMessage
+            </MudAlert>
+        }
+
+        <MudPaper Elevation="0" Outlined="true" Class="driver-recommendation-shell driver-recommendation-shell--page">
+            <div class="driver-recommendation-map">
+                <div class="driver-route-line driver-route-line-primary"></div>
+                <div class="driver-route-line driver-route-line-secondary"></div>
+                <div class="driver-map-pin driver-map-pin-current">현위치</div>
+                <div class="driver-map-pin driver-map-pin-pickup">상차</div>
+                <div class="driver-map-pin driver-map-pin-dropoff">하차</div>
+            </div>
+
+            <MudPaper Elevation="8" Class="driver-recommendation-top-strip px-3 py-2">
+                <MudStack Spacing="1">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.NotificationsActive" Color="Color.Primary" />
+                            <MudText Typo="Typo.subtitle2">추천 반영 예상 경로</MudText>
+                        </MudStack>
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@DisplayMoney(Recommendation.예상수익)</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="10" Class="driver-recommendation-bottom-card pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">추천을 수락할 경우의 운행 경로</MudText>
+                            <MudText Typo="Typo.h6">현재 위치 → 추천 상차지 → 추천 하차지</MudText>
+                        </MudStack>
+                    </MudStack>
+
+                    <div class="driver-recommendation-status-grid">
+                        <div class="driver-recommendation-status-column">
+                            <MudText Typo="Typo.subtitle2" Class="driver-recommendation-status-title">상차 정보</MudText>
+                            <div class="driver-recommendation-status-row">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">상차지</MudText>
+                                <MudText Typo="Typo.subtitle2">@Display(Recommendation.픽업지)</MudText>
+                            </div>
+                            <div class="driver-recommendation-status-row">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">현재 거리</MudText>
+                                <MudText Typo="Typo.subtitle2">@DisplayDistance(Recommendation.픽업거리Km)</MudText>
+                            </div>
+                            <div class="driver-recommendation-status-row">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">화물</MudText>
+                                <MudText Typo="Typo.subtitle2">@DisplayCargo(Recommendation)</MudText>
+                            </div>
+                        </div>
+
+                        <div class="driver-recommendation-status-column driver-recommendation-status-column--right">
+                            <MudText Typo="Typo.subtitle2" Class="driver-recommendation-status-title">하차 정보</MudText>
+                            <div class="driver-recommendation-status-row">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">하차지</MudText>
+                                <MudText Typo="Typo.subtitle2">@Display(Recommendation.하차지)</MudText>
+                            </div>
+                            <div class="driver-recommendation-status-row">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">운송 거리</MudText>
+                                <MudText Typo="Typo.subtitle2">@DisplayDistance(Recommendation.운송거리Km)</MudText>
+                            </div>
+                            <div class="driver-recommendation-status-row">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">추가 시간</MudText>
+                                <MudText Typo="Typo.subtitle2">@DisplayMinutes(Recommendation.추가예상시간분)</MudText>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="driver-recommendation-fare-panel">
+                        <div class="driver-recommendation-fare-item">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">운송 요금</MudText>
+                            <MudText Typo="Typo.subtitle2">@DisplayMoney(Recommendation.예상수익)</MudText>
+                        </div>
+                        <div class="driver-recommendation-fare-item">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 비용</MudText>
+                            <MudText Typo="Typo.subtitle2">@DisplayMoney(Recommendation.예상총비용)</MudText>
+                        </div>
+                        <div class="driver-recommendation-fare-item">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">추가 순이익</MudText>
+                            <MudText Typo="Typo.subtitle2">@DisplayMoney(Recommendation.예상추가순이익)</MudText>
+                        </div>
+                    </div>
+
+                    <MudProgressLinear Value="@ProgressPercent" Color="@ResolveCountdownColor()" Rounded="true" />
+
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.Center" Class="driver-recommendation-actions">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@(IsBusy || IsExpired)"
+                                   StartIcon="@Icons.Material.Filled.CheckCircle"
+                                   OnClick="AcceptAsync">
+                            @(IsExpired ? "수락 만료" : $"수락 {RemainingSeconds:N0}초")
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   OnClick="RejectAsync">
+                            @(IsExpired ? "거절 재시도" : "거절")
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudPaper>
+    </MudStack>
+}
+
+@code {
+    private const int DefaultResponseSeconds = 60;
+
+    [Parameter] public string? RequestId { get; set; }
+
+    private 기사추천수신항목? Recommendation { get; set; }
+    private string RecommendationSource { get; set; } = string.Empty;
+    private bool IsBusy { get; set; }
+    private bool IsExpired { get; set; }
+    private int RemainingSeconds { get; set; }
+    private int ResponseSeconds { get; set; } = DefaultResponseSeconds;
+    private DateTimeOffset? DeadlineUtc { get; set; }
+    private CancellationTokenSource? CountdownCts { get; set; }
+    private string StatusMessage { get; set; } = string.Empty;
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+
+    private double ProgressPercent
+        => ResponseSeconds <= 0
+            ? 100
+            : Math.Clamp((double)(ResponseSeconds - RemainingSeconds) / ResponseSeconds * 100, 0, 100);
+
+    protected override void OnParametersSet()
+    {
+        Recommendation = 추천Service.선택추천조회(RequestId);
+        RecommendationSource = string.IsNullOrWhiteSpace(추천Service.선택추천출처)
+            ? "추천 선택"
+            : 추천Service.선택추천출처;
+
+        if (Recommendation is not null)
+        {
+            StartCountdown(Recommendation);
+        }
+    }
+
+    private async Task AcceptAsync()
+    {
+        if (Recommendation is null)
+        {
+            return;
+        }
+
+        await RunAsync("추천을 수락했습니다. 배차 확정 후 상차지 이동 화면으로 이어질 수 있습니다.", async () =>
+        {
+            await 추천Service.수락Async(Recommendation.의뢰Id);
+            추천Service.선택추천해제(Recommendation.의뢰Id);
+        });
+    }
+
+    private async Task RejectAsync()
+    {
+        if (Recommendation is null)
+        {
+            return;
+        }
+
+        await RunAsync(IsExpired ? "만료된 추천 거절을 전송했습니다." : "추천을 거절했습니다.", async () =>
+        {
+            await 추천Service.거절Async(Recommendation.의뢰Id, IsExpired ? "추천 응답 시간 만료" : "기사 직접 거절");
+            추천Service.선택추천해제(Recommendation.의뢰Id);
+        });
+    }
+
+    private void StartCountdown(기사추천수신항목 item)
+    {
+        CountdownCts?.Cancel();
+        CountdownCts?.Dispose();
+        CountdownCts = new CancellationTokenSource();
+
+        var now = DateTimeOffset.UtcNow;
+        var savedDeadline = 추천Service.선택추천마감시각;
+        var deadline = savedDeadline
+            ?? (item.추천만료시각.HasValue
+            ? ToUtcOffset(item.추천만료시각.Value)
+            : now.AddSeconds(DefaultResponseSeconds));
+
+        if (deadline <= now && savedDeadline is null && !item.추천만료시각.HasValue)
+        {
+            deadline = now.AddSeconds(DefaultResponseSeconds);
+        }
+
+        DeadlineUtc = deadline;
+        ResponseSeconds = Math.Max(1, 추천Service.선택추천응답초 ?? (int)Math.Ceiling((deadline - now).TotalSeconds));
+        UpdateRemaining();
+        _ = RunCountdownAsync(CountdownCts.Token);
+    }
+
+    private async Task RunCountdownAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested && Recommendation is not null)
+        {
+            UpdateRemaining();
+            await InvokeAsync(StateHasChanged);
+
+            if (RemainingSeconds <= 0)
+            {
+                await InvokeAsync(HandleExpiredAsync);
+                return;
+            }
+
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+    }
+
+    private async Task HandleExpiredAsync()
+    {
+        if (Recommendation is null || IsExpired || IsBusy)
+        {
+            return;
+        }
+
+        IsExpired = true;
+        await RunAsync("응답 제한 시간이 지나 자동 거절을 서버에 전송했습니다.", async () =>
+        {
+            await 추천Service.거절Async(Recommendation.의뢰Id, "추천 응답 시간 만료");
+            추천Service.선택추천해제(Recommendation.의뢰Id);
+        });
+    }
+
+    private void UpdateRemaining()
+    {
+        if (DeadlineUtc is null)
+        {
+            RemainingSeconds = 0;
+            return;
+        }
+
+        RemainingSeconds = Math.Max(0, (int)Math.Ceiling((DeadlineUtc.Value - DateTimeOffset.UtcNow).TotalSeconds));
+    }
+
+    private async Task RunAsync(string successMessage, Func<Task> action)
+    {
+        IsBusy = true;
+        StatusSeverity = Severity.Info;
+        StatusMessage = "서버 요청을 처리하는 중입니다.";
+
+        try
+        {
+            await action();
+            StatusSeverity = Severity.Success;
+            StatusMessage = successMessage;
+        }
+        catch (Exception ex)
+        {
+            StatusSeverity = Severity.Error;
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private Color ResolveCountdownColor()
+    {
+        if (IsExpired)
+        {
+            return Color.Error;
+        }
+
+        return RemainingSeconds <= 10 ? Color.Warning : Color.Success;
+    }
+
+    private static DateTimeOffset ToUtcOffset(DateTime value)
+        => value.Kind switch
+        {
+            DateTimeKind.Utc => new DateTimeOffset(value),
+            DateTimeKind.Local => new DateTimeOffset(value.ToUniversalTime()),
+            _ => new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc))
+        };
+
+    private static string DisplayCargo(기사추천수신항목 item)
+    {
+        var type = string.IsNullOrWhiteSpace(item.운송의뢰유형표시) ? "일반 화물" : item.운송의뢰유형표시;
+        var cargo = string.IsNullOrWhiteSpace(item.화물종류) ? "화물" : item.화물종류;
+        return $"{cargo} · {type}";
+    }
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "미확인" : value;
+
+    private static string DisplayMoney(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}원" : "금액 미정";
+
+    private static string DisplayDistance(decimal? value)
+        => value.HasValue ? $"{value.Value:N1}km" : "거리 미정";
+
+    private static string DisplayMinutes(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}분" : "시간 미정";
+
+    public void Dispose()
+    {
+        CountdownCts?.Cancel();
+        CountdownCts?.Dispose();
+    }
+}

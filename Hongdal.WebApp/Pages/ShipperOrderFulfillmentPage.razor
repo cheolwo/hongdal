@@ -1,0 +1,143 @@
+@page "/shipper/sales/orders"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="주문 출고 알림"
+               Description="판매채널 주문을 국내/해외로 분류하고 재고가 있는 창고의 출고 준비 상태를 확인합니다."
+               Badge="주문 출고" />
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <MudAlert Severity="@MessageSeverity" Class="mb-4">@Message</MudAlert>
+}
+
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2" Wrap="Wrap.Wrap">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ResetSamples">초기화</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="ProcessSampleOrdersAsync">샘플 주문 수집</MudButton>
+    </MudStack>
+
+    <MudGrid>
+        <MudItem xs="12" md="3">@Metric("국내 주문", DomesticCount.ToString(), Color.Primary)</MudItem>
+        <MudItem xs="12" md="3">@Metric("해외 주문", InternationalCount.ToString(), Color.Info)</MudItem>
+        <MudItem xs="12" md="3">@Metric("출고대기 알림", Notifications.Count.ToString(), Color.Success)</MudItem>
+        <MudItem xs="12" md="3">@Metric("입고 필요", RestockCount.ToString(), Color.Warning)</MudItem>
+    </MudGrid>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">창고 출고 알림</MudText>
+        @if (Notifications.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info">샘플 주문 수집을 실행하면 출고 알림이 생성됩니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="Notifications.OrderByDescending(x => x.CreatedAt)" Dense="true" Hover="true">
+                <HeaderContent>
+                    <MudTh>구분</MudTh>
+                    <MudTh>채널</MudTh>
+                    <MudTh>주문번호</MudTh>
+                    <MudTh>창고</MudTh>
+                    <MudTh>상품</MudTh>
+                    <MudTh>수량</MudTh>
+                    <MudTh>상태</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="구분">@context.Scope</MudTd>
+                    <MudTd DataLabel="채널">@context.Channel</MudTd>
+                    <MudTd DataLabel="주문번호">@context.OrderNo</MudTd>
+                    <MudTd DataLabel="창고">@context.Warehouse</MudTd>
+                    <MudTd DataLabel="상품">@context.Product</MudTd>
+                    <MudTd DataLabel="수량">@context.Quantity</MudTd>
+                    <MudTd DataLabel="상태"><MudChip T="string" Size="Size.Small" Color="@context.Color" Variant="Variant.Outlined">@context.Status</MudChip></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudText Typo="Typo.h6" Class="mb-3">피킹/포장 작업</MudText>
+        <MudTable Items="PickingTasks" Dense="true" Hover="true">
+            <HeaderContent>
+                <MudTh>작업</MudTh>
+                <MudTh>주문번호</MudTh>
+                <MudTh>추천 적재함</MudTh>
+                <MudTh>상태</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="작업">@context.TaskName</MudTd>
+                <MudTd DataLabel="주문번호">@context.OrderNo</MudTd>
+                <MudTd DataLabel="추천 적재함">@context.Bin</MudTd>
+                <MudTd DataLabel="상태">@context.Status</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">출고 알림 생성 후 피킹 작업을 확인합니다.</MudText>
+            </NoRecordsContent>
+        </MudTable>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private readonly List<OrderNotification> Notifications = [];
+    private readonly List<PickingTaskRow> PickingTasks = [];
+    private string? Message;
+    private Severity MessageSeverity = Severity.Info;
+
+    private int DomesticCount => Notifications.Count(x => x.Scope == "Domestic");
+    private int InternationalCount => Notifications.Count(x => x.Scope == "International");
+    private int RestockCount => Notifications.Count(x => x.Status == "입고필요");
+
+    private Task ProcessSampleOrdersAsync()
+    {
+        if (Notifications.Count == 0)
+        {
+            Notifications.AddRange([
+                new("Domestic", "SmartStore", "N-240710-01", "김포 물류 허브", "냉장 간편식 세트", 3, "출고대기", Color.Success, DateTime.Now),
+                new("International", "Amazon", "A-260710-88", "인천 통관 대행지", "접이식 캠핑 테이블", 2, "출고대기", Color.Success, DateTime.Now.AddMinutes(-3)),
+                new("Domestic", "Coupang", "C-260710-21", "김포 물류 허브", "냉장 간편식 세트", 12, "입고필요", Color.Warning, DateTime.Now.AddMinutes(-8))
+            ]);
+
+            PickingTasks.AddRange([
+                new("피킹", "N-240710-01", "A-01-03", "피킹대기"),
+                new("피킹", "A-260710-88", "B-04-01", "피킹대기")
+            ]);
+        }
+
+        MessageSeverity = Severity.Success;
+        Message = $"샘플 주문을 처리하고 출고 알림 {Notifications.Count}건을 생성했습니다.";
+        return Task.CompletedTask;
+    }
+
+    private void ResetSamples()
+    {
+        Notifications.Clear();
+        PickingTasks.Clear();
+        MessageSeverity = Severity.Info;
+        Message = "샘플 주문 출고 상태를 초기화했습니다.";
+    }
+
+    private static RenderFragment Metric(string label, string value, Color color) => builder =>
+    {
+        builder.OpenComponent<MudPaper>(0);
+        builder.AddAttribute(1, "Elevation", 0);
+        builder.AddAttribute(2, "Outlined", true);
+        builder.AddAttribute(3, "Class", "pa-4 h-100");
+        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
+        {
+            childBuilder.OpenComponent<MudText>(0);
+            childBuilder.AddAttribute(1, "Typo", Typo.subtitle2);
+            childBuilder.AddAttribute(2, "Color", Color.Secondary);
+            childBuilder.AddAttribute(3, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, label)));
+            childBuilder.CloseComponent();
+            childBuilder.OpenComponent<MudText>(4);
+            childBuilder.AddAttribute(5, "Typo", Typo.h4);
+            childBuilder.AddAttribute(6, "Color", color);
+            childBuilder.AddAttribute(7, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, value)));
+            childBuilder.CloseComponent();
+        }));
+        builder.CloseComponent();
+    };
+
+    private sealed record OrderNotification(string Scope, string Channel, string OrderNo, string Warehouse, string Product, int Quantity, string Status, Color Color, DateTime CreatedAt);
+
+    private sealed record PickingTaskRow(string TaskName, string OrderNo, string Bin, string Status);
+}

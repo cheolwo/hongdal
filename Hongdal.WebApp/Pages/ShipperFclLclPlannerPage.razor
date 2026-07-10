@@ -1,0 +1,150 @@
+@page "/shipper/international/fcl-lcl"
+@inject NavigationManager Navigation
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="FCL/LCL 판단 및 수입 판매 협의"
+               Description="구매 전 화물량, 팔레트 배송대행 비용, 통관 비용, 예상 판매가를 함께 보고 수입 여부를 판단합니다."
+               Badge="@Recommendation.Mode" />
+
+<MudGrid>
+    <MudItem xs="12" lg="5">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6">구매 전 입력값</MudText>
+                <MudTextField T="string" Label="수입 검토 상품" @bind-Value="ProductName" Variant="Variant.Outlined" />
+                <MudGrid>
+                    <MudItem xs="12" sm="6"><MudNumericField T="decimal" Label="총 부피 CBM" @bind-Value="CargoCbm" Min="0" Step="0.5M" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="decimal" Label="총 중량 kg" @bind-Value="CargoWeightKg" Min="0" Step="50M" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="int" Label="팔레트 수" @bind-Value="PalletCount" Min="0" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="int" Label="예상 수량" @bind-Value="UnitCount" Min="1" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="decimal" Label="매입 단가" @bind-Value="PurchaseUnitPrice" Min="0" Step="100M" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="decimal" Label="예상 판매가" @bind-Value="SaleUnitPrice" Min="0" Step="100M" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="decimal" Label="팔레트당 배송대행비" @bind-Value="AgencyFeePerPallet" Min="0" Step="10000M" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="6"><MudNumericField T="decimal" Label="관세/부가세 예상률 %" @bind-Value="CustomsTaxRatePercent" Min="0" Step="1M" Variant="Variant.Outlined" /></MudItem>
+                </MudGrid>
+                <MudCheckBox T="bool" @bind-Value="CanBeConsolidated" Label="다른 화물과 혼재 가능" Color="Color.Primary" />
+                <MudCheckBox T="bool" @bind-Value="NeedsExclusiveHandling" Label="파손/온도/브랜드 사유로 단독 취급 선호" Color="Color.Warning" />
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="7">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">추천 판단</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@Recommendation.Reason</MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="@Recommendation.Color" Variant="Variant.Filled">@Recommendation.Mode</MudChip>
+                </MudStack>
+                <MudGrid Class="mt-3">
+                    <MudItem xs="12" sm="4">@Metric("20ft 사용률", $"{TwentyFootUtilization:P0}", Color.Info)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("40ft 사용률", $"{FortyFootUtilization:P0}", Color.Secondary)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("협의 우선도", Recommendation.Priority, Recommendation.Color)</MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudText Typo="Typo.h6" Class="mb-3">수입 판매 예측</MudText>
+                <MudGrid>
+                    <MudItem xs="12" sm="4">@Metric("예상 배송대행비", Money(TotalAgencyFee), Color.Info)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("예상 통관/세금", Money(EstimatedCustomsTax), Color.Warning)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("단위당 예상 원가", Money(EstimatedUnitCost), MarginColor)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("총 예상 매출", Money(ExpectedRevenue), Color.Success)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("예상 이익", Money(ExpectedProfit), MarginColor)</MudItem>
+                    <MudItem xs="12" sm="4">@Metric("예상 마진율", $"{ExpectedMarginRate:P1}", MarginColor)</MudItem>
+                </MudGrid>
+                <MudAlert Severity="@MarginSeverity" Dense="true" Variant="Variant.Outlined" Class="mt-3">@MarginMessage</MudAlert>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudText Typo="Typo.h6" Class="mb-3">다음 액션</MudText>
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.FactCheck" Href="@ShipperRoutes.CustomsHsReviews">HS/통관 검토</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.LocalShipping" Href="@ShipperRoutes.Request">국내 운송 의뢰로 전환</MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Info" Href="@ShipperRoutes.WarehouseWorkspace">창고 입고 흐름 확인</MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private string ProductName = "접이식 캠핑 테이블";
+    private decimal CargoCbm = 18;
+    private decimal CargoWeightKg = 6800;
+    private int PalletCount = 10;
+    private int UnitCount = 240;
+    private decimal PurchaseUnitPrice = 18500;
+    private decimal SaleUnitPrice = 39000;
+    private decimal AgencyFeePerPallet = 85000;
+    private decimal CustomsTaxRatePercent = 18;
+    private bool CanBeConsolidated = true;
+    private bool NeedsExclusiveHandling;
+
+    private FclLclRecommendation Recommendation => BuildRecommendation();
+    private decimal TwentyFootUtilization => Math.Clamp(CargoCbm / 28m, 0m, 1.5m);
+    private decimal FortyFootUtilization => Math.Clamp(CargoCbm / 58m, 0m, 1.5m);
+    private decimal TotalPurchaseAmount => PurchaseUnitPrice * Math.Max(UnitCount, 0);
+    private decimal TotalAgencyFee => AgencyFeePerPallet * Math.Max(PalletCount, 0);
+    private decimal EstimatedCustomsTax => TotalPurchaseAmount * (CustomsTaxRatePercent / 100m);
+    private decimal EstimatedTotalCost => TotalPurchaseAmount + TotalAgencyFee + EstimatedCustomsTax;
+    private decimal EstimatedUnitCost => UnitCount <= 0 ? 0 : EstimatedTotalCost / UnitCount;
+    private decimal ExpectedRevenue => SaleUnitPrice * Math.Max(UnitCount, 0);
+    private decimal ExpectedProfit => ExpectedRevenue - EstimatedTotalCost;
+    private decimal ExpectedMarginRate => ExpectedRevenue <= 0 ? 0 : ExpectedProfit / ExpectedRevenue;
+    private Color MarginColor => ExpectedProfit > 0 && ExpectedMarginRate >= 0.15m ? Color.Success : ExpectedProfit > 0 ? Color.Warning : Color.Error;
+    private Severity MarginSeverity => ExpectedProfit > 0 && ExpectedMarginRate >= 0.15m ? Severity.Success : ExpectedProfit > 0 ? Severity.Warning : Severity.Error;
+    private string MarginMessage => ExpectedProfit > 0 && ExpectedMarginRate >= 0.15m
+        ? "현재 입력값 기준으로 판매 여지가 있어 보입니다. 선구매 관심 수량을 먼저 확인해도 좋습니다."
+        : ExpectedProfit > 0
+            ? "이익은 남지만 마진이 얇습니다. 배송대행비, 통관 비용, 판매가를 다시 확인하는 편이 좋습니다."
+            : "현재 판매가로는 손실 가능성이 있습니다. 구매 전 수요 확인과 비용 재검토가 필요합니다.";
+
+    private FclLclRecommendation BuildRecommendation()
+    {
+        if (NeedsExclusiveHandling || !CanBeConsolidated)
+        {
+            return new("FCL 우선", Color.Primary, "단독 취급 조건이 있어 FCL 또는 단독 공간 확보 협의가 우선입니다.", "높음");
+        }
+
+        if (CargoCbm >= 18 || CargoWeightKg >= 8000 || PalletCount >= 10)
+        {
+            return new("FCL 검토", Color.Primary, "화물량이 20ft 컨테이너 일부 이상을 차지해 FCL 견적 비교가 필요합니다.", "중간");
+        }
+
+        if (CargoCbm <= 12 && CanBeConsolidated)
+        {
+            return new("LCL 우선", Color.Success, "화물량이 작고 혼재 가능하므로 LCL로 배송대행 협의를 시작하는 것이 자연스럽습니다.", "낮음");
+        }
+
+        return new("비교 견적", Color.Warning, "화물량이 중간 구간이라 FCL과 LCL 견적, 국내 운송 연결을 함께 비교해야 합니다.", "중간");
+    }
+
+    private static string Money(decimal value) => $"{value:N0}원";
+
+    private static RenderFragment Metric(string label, string value, Color color) => builder =>
+    {
+        builder.OpenComponent<MudPaper>(0);
+        builder.AddAttribute(1, "Elevation", 0);
+        builder.AddAttribute(2, "Outlined", true);
+        builder.AddAttribute(3, "Class", "pa-3 h-100");
+        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
+        {
+            childBuilder.OpenComponent<MudText>(0);
+            childBuilder.AddAttribute(1, "Typo", Typo.caption);
+            childBuilder.AddAttribute(2, "Color", Color.Secondary);
+            childBuilder.AddAttribute(3, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, label)));
+            childBuilder.CloseComponent();
+            childBuilder.OpenComponent<MudText>(4);
+            childBuilder.AddAttribute(5, "Typo", Typo.h6);
+            childBuilder.AddAttribute(6, "Color", color);
+            childBuilder.AddAttribute(7, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, value)));
+            childBuilder.CloseComponent();
+        }));
+        builder.CloseComponent();
+    };
+
+    private sealed record FclLclRecommendation(string Mode, Color Color, string Reason, string Priority);
+}

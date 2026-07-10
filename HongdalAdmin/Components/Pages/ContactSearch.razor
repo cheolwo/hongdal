@@ -1,0 +1,267 @@
+@page "/contact-search"
+@inject I백오피스Service DataService
+
+<PageTitle>연락처 통합 검색</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">연락처 통합 검색</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">전화번호 뒤 8자리로 기사, 화주, 창고 관리자 관련 정보를 함께 확인합니다.</MudText>
+    </MudStack>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="5">
+                <MudTextField Label="전화번호 뒤 8자리"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              InputType="InputType.Telephone"
+                              HelperText="예: 11112222 또는 010-1111-2222"
+                              MaxLength="13"
+                              Immediate="true"
+                              @bind-Value="phoneInput" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           Disabled="@(!CanSearch)"
+                           FullWidth="true"
+                           OnClick="SearchAsync">
+                    검색
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                    동명이인처럼 전화번호 뒤 8자리가 겹칠 수 있어 결과는 목록으로 표시합니다.
+                </MudAlert>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">연락처 정보를 조회하는 중입니다...</MudAlert>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+    }
+    else if (result is not null)
+    {
+        <MudStack Spacing="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6">검색 결과</MudText>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small">@result.검색결과수 건</MudChip>
+            </MudStack>
+
+            @if (result.검색결과수 == 0)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">해당 전화번호 뒷자리와 연결된 사용자를 찾지 못했습니다.</MudAlert>
+            }
+            else
+            {
+                @foreach (var person in result.인물목록)
+                {
+                    <MudPaper Elevation="1" Class="pa-4">
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Style="gap: 12px; flex-wrap: wrap;">
+                                <MudStack Spacing="1">
+                                    <MudText Typo="Typo.h6">@person.사용자명</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@person.UserId</MudText>
+                                </MudStack>
+                                <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                    @foreach (var role in person.역할목록)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Color="@RoleColor(role)" Variant="Variant.Filled">@role</MudChip>
+                                    }
+                                    @if (person.역할목록.Count == 0)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">역할 없음</MudChip>
+                                    }
+                                </MudStack>
+                            </MudStack>
+
+                            <MudGrid Spacing="2">
+                                <MudItem xs="12" md="3">
+                                    <AdminInfoField Label="연락처" Value="@ValueOrDash(person.연락처)" />
+                                </MudItem>
+                                <MudItem xs="12" md="3">
+                                    <AdminInfoField Label="이메일" Value="@ValueOrDash(person.이메일)" />
+                                </MudItem>
+                                <MudItem xs="12" md="3">
+                                    <AdminInfoField Label="사업자번호" Value="@ValueOrDash(person.사업자번호)" />
+                                </MudItem>
+                                <MudItem xs="12" md="3">
+                                    <AdminInfoField Label="검색 뒷자리" Value="@person.전화번호뒤8자리" />
+                                </MudItem>
+                            </MudGrid>
+
+                            @if (person.연락처출처목록.Count > 0)
+                            {
+                                <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                    @foreach (var source in person.연락처출처목록)
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@source</MudChip>
+                                    }
+                                </MudStack>
+                            }
+
+                            <MudExpansionPanels MultiExpansion="true" Elevation="0">
+                                @if (person.기사정보 is not null)
+                                {
+                                    <MudExpansionPanel Text="기사 정보" Expanded="true">
+                                        <MudGrid Spacing="2">
+                                            <MudItem xs="12" md="3"><AdminInfoField Label="기사명" Value="@person.기사정보.기사명" /></MudItem>
+                                            <MudItem xs="12" md="3"><AdminInfoField Label="차량" Value="@person.기사정보.차량" /></MudItem>
+                                            <MudItem xs="12" md="3"><AdminInfoField Label="운행상태" Value="@person.기사정보.운행상태" /></MudItem>
+                                            <MudItem xs="12" md="3"><AdminInfoField Label="활동지역" Value="@person.기사정보.활동지역" /></MudItem>
+                                        </MudGrid>
+                                    </MudExpansionPanel>
+                                }
+
+                                @if (person.화주정보 is not null)
+                                {
+                                    <MudExpansionPanel Text="화주 정보" Expanded="true">
+                                        <MudGrid Spacing="2">
+                                            <MudItem xs="12" md="4"><AdminInfoField Label="의뢰건수" Value="@person.화주정보.의뢰건수.ToString()" /></MudItem>
+                                            <MudItem xs="12" md="4"><AdminInfoField Label="진행중 의뢰" Value="@person.화주정보.진행중의뢰건수.ToString()" /></MudItem>
+                                            <MudItem xs="12" md="4"><AdminInfoField Label="최근 의뢰" Value="@FormatDateTime(person.화주정보.최근의뢰일시)" /></MudItem>
+                                        </MudGrid>
+                                    </MudExpansionPanel>
+                                }
+
+                                @if (person.주문자프로필 is not null)
+                                {
+                                    <MudExpansionPanel Text="주문자 프로필">
+                                        <MudGrid Spacing="2">
+                                            <MudItem xs="12" md="4"><AdminInfoField Label="표시명" Value="@person.주문자프로필.표시명" /></MudItem>
+                                            <MudItem xs="12" md="4"><AdminInfoField Label="연락처" Value="@person.주문자프로필.연락처" /></MudItem>
+                                            <MudItem xs="12" md="4"><AdminInfoField Label="기본주소" Value="@ValueOrDash(person.주문자프로필.기본주소)" /></MudItem>
+                                        </MudGrid>
+                                    </MudExpansionPanel>
+                                }
+
+                                @if (person.창고참여목록.Count > 0)
+                                {
+                                    <MudExpansionPanel Text="창고 참여">
+                                        <MudTable Items="@person.창고참여목록" Dense="true" Hover="true" Elevation="0">
+                                            <HeaderContent>
+                                                <MudTh>창고명</MudTh>
+                                                <MudTh>역할</MudTh>
+                                                <MudTh>유형</MudTh>
+                                                <MudTh>담당자</MudTh>
+                                                <MudTh>연락처</MudTh>
+                                            </HeaderContent>
+                                            <RowTemplate Context="warehouse">
+                                                <MudTd DataLabel="창고명">@warehouse.창고명</MudTd>
+                                                <MudTd DataLabel="역할">
+                                                    <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">@warehouse.역할명</MudChip>
+                                                </MudTd>
+                                                <MudTd DataLabel="유형">@warehouse.창고유형</MudTd>
+                                                <MudTd DataLabel="담당자">@warehouse.담당자명</MudTd>
+                                                <MudTd DataLabel="연락처">@warehouse.연락처</MudTd>
+                                            </RowTemplate>
+                                        </MudTable>
+                                    </MudExpansionPanel>
+                                }
+
+                                @if (person.최근의뢰목록.Count > 0)
+                                {
+                                    <MudExpansionPanel Text="최근 운송 의뢰">
+                                        <MudTable Items="@person.최근의뢰목록" Dense="true" Hover="true" Elevation="0">
+                                            <HeaderContent>
+                                                <MudTh>의뢰ID</MudTh>
+                                                <MudTh>화물</MudTh>
+                                                <MudTh>상태</MudTh>
+                                                <MudTh>구간</MudTh>
+                                                <MudTh>생성일시</MudTh>
+                                            </HeaderContent>
+                                            <RowTemplate Context="request">
+                                                <MudTd DataLabel="의뢰ID">@request.의뢰Id</MudTd>
+                                                <MudTd DataLabel="화물">@request.화물종류</MudTd>
+                                                <MudTd DataLabel="상태">
+                                                    <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                                        <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(request.의뢰상태)" Variant="Variant.Filled">@request.의뢰상태</MudChip>
+                                                        <MudChip T="string" Size="Size.Small" Color="@AdminMudUi.상태색상(request.배차상태)" Variant="Variant.Outlined">@request.배차상태</MudChip>
+                                                    </MudStack>
+                                                </MudTd>
+                                                <MudTd DataLabel="구간">@request.픽업지 → @request.하차지</MudTd>
+                                                <MudTd DataLabel="생성일시">@FormatDateTime(request.생성일시)</MudTd>
+                                            </RowTemplate>
+                                        </MudTable>
+                                    </MudExpansionPanel>
+                                }
+                            </MudExpansionPanels>
+                        </MudStack>
+                    </MudPaper>
+                }
+            }
+        </MudStack>
+    }
+</MudStack>
+
+@code {
+    private string? phoneInput;
+    private bool isLoading;
+    private string? errorMessage;
+    private 관리자연락처검색응답? result;
+
+    private bool CanSearch => !isLoading && NormalizeSearchInput(phoneInput).Length >= 8;
+
+    private async Task SearchAsync()
+    {
+        var digits = NormalizeSearchInput(phoneInput);
+        if (digits.Length < 8)
+        {
+            errorMessage = "전화번호 뒤 8자리 숫자를 입력해야 합니다.";
+            return;
+        }
+
+        if (digits.Length > 8)
+        {
+            digits = digits[^8..];
+        }
+
+        isLoading = true;
+        errorMessage = null;
+        result = null;
+
+        try
+        {
+            result = await DataService.연락처뒤8자리검색Async(digits);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"연락처 검색 실패: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string NormalizeSearchInput(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        return new string(value.Where(char.IsDigit).ToArray());
+    }
+
+    private static string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private static string FormatDateTime(DateTime? value) => value.HasValue ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-";
+
+    private static Color RoleColor(string role) => role switch
+    {
+        "서버관리자" => Color.Error,
+        "창고관리자" => Color.Success,
+        "용달기사" or "기사" => Color.Primary,
+        "화주" => Color.Info,
+        "판매자" => Color.Warning,
+        _ => Color.Default
+    };
+}

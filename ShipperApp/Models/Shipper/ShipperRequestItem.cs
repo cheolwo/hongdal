@@ -4,6 +4,7 @@ public sealed class ShipperRequestItem
 {
     public string 의뢰Id { get; set; } = string.Empty;
     public string 화물종류 { get; set; } = string.Empty;
+    public string 화물적재형태 { get; set; } = string.Empty;
     public string 의뢰상태 { get; set; } = string.Empty;
     public string 결제상태 { get; set; } = string.Empty;
     public string 배차상태 { get; set; } = string.Empty;

@@ -24,7 +24,11 @@ public sealed class WebAuthSessionService
     public string? AccessToken => _snapshot?.AccessToken;
     public string? UserId => _snapshot?.UserId;
     public string? UserName => _snapshot?.UserName;
+    public IReadOnlyList<string> Roles => _snapshot?.Roles ?? [];
+    public string PrimaryRole => WebRoleThemeResolver.ResolvePrimaryRole(Roles);
+    public WebRoleTheme CurrentTheme => WebRoleThemeResolver.Resolve(Roles);
     public bool IsLoggedIn => IsAccessTokenUsable(_snapshot);
+    public event Action? Changed;
 
     public async Task RestoreAsync(CancellationToken cancellationToken = default)
     {
@@ -32,6 +36,7 @@ public sealed class WebAuthSessionService
         if (string.IsNullOrWhiteSpace(json))
         {
             _snapshot = null;
+            NotifyChanged();
             return;
         }
 
@@ -47,6 +52,8 @@ public sealed class WebAuthSessionService
         {
             _snapshot = null;
         }
+
+        NotifyChanged();
     }
 
     public async Task LoginAsync(string userNameOrEmail, string password, CancellationToken cancellationToken = default)
@@ -91,12 +98,14 @@ public sealed class WebAuthSessionService
         };
 
         await SaveSnapshotAsync(cancellationToken);
+        NotifyChanged();
     }
 
     public async Task ClearAsync(CancellationToken cancellationToken = default)
     {
         _snapshot = null;
         await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", cancellationToken, StorageKey);
+        NotifyChanged();
     }
 
     private async Task SaveSnapshotAsync(CancellationToken cancellationToken)
@@ -109,6 +118,11 @@ public sealed class WebAuthSessionService
         => snapshot is not null
            && !string.IsNullOrWhiteSpace(snapshot.AccessToken)
            && snapshot.AccessTokenExpiresAtUtc > DateTime.UtcNow.AddMinutes(2);
+
+    private void NotifyChanged()
+    {
+        Changed?.Invoke();
+    }
 }
 
 public sealed class WebAuthSessionSnapshot

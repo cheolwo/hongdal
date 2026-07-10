@@ -1,14 +1,17 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@inject WebAuthSessionService AuthSession
 
-<MudLayout>
-    <MudAppBar Elevation="1" Color="Color.Default" Dense="true">
+<MudLayout Class="@CurrentTheme.ShellClass">
+    <MudAppBar Elevation="1" Color="Color.Default" Dense="true" Class="web-appbar">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Color="Color.Inherit" OnClick="ToggleDrawer" />
-        <MudText Typo="Typo.h6">홍달 웹앱</MudText>
+        <MudText Typo="Typo.h6">통달 웹앱</MudText>
         <MudSpacer />
+        <MudChip T="string" Class="web-role-chip" Variant="Variant.Filled" Size="Size.Small">@CurrentTheme.RoleLabel</MudChip>
         <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">Blazor WebAssembly</MudChip>
     </MudAppBar>
 
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="DrawerVariant.Responsive">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="DrawerVariant.Responsive" Class="web-drawer">
         <NavMenu />
     </MudDrawer>
 
@@ -21,9 +24,35 @@
 
 @code {
     private bool _drawerOpen = true;
+    private WebRoleTheme CurrentTheme => AuthSession.CurrentTheme;
+
+    protected override void OnInitialized()
+    {
+        AuthSession.Changed += HandleAuthChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await AuthSession.RestoreAsync();
+    }
 
     private void ToggleDrawer()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private void HandleAuthChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthSession.Changed -= HandleAuthChanged;
     }
 }

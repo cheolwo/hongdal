@@ -1,0 +1,67 @@
+@page "/shipper/settings/views"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="화주 화면 설정"
+               Description="통합 WebApp에서 화주·판매자에게 보일 업무 화면을 확인합니다."
+               Badge="설정" />
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudTable Items="Items.OrderBy(x => x.SortOrder)" Dense="true" Hover="true">
+        <HeaderContent>
+            <MudTh>화면</MudTh>
+            <MudTh>라우트</MudTh>
+            <MudTh>필수</MudTh>
+            <MudTh>표시</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="화면">@context.Title</MudTd>
+            <MudTd DataLabel="라우트">@context.Route</MudTd>
+            <MudTd DataLabel="필수">@(context.Required ? "예" : "아니오")</MudTd>
+            <MudTd DataLabel="표시">
+                <MudSwitch T="bool" Value="@context.Visible" ValueChanged="@((bool value) => Toggle(context.Route, value))" Disabled="@context.Required" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private readonly List<ViewSettingRow> Items =
+    [
+        new("운송 의뢰 작성", ShipperRoutes.Request, true, true, 10),
+        new("공개 화물정보", ShipperRoutes.PublicCargo, false, true, 20),
+        new("받은 탐색 문의함", ShipperRoutes.ExplorationInbox, false, true, 30),
+        new("창고 작업대", ShipperRoutes.WarehouseWorkspace, false, true, 40),
+        new("입고 대시보드", ShipperRoutes.InboundDashboard, false, true, 50),
+        new("재고 목록", ShipperRoutes.WarehouseInventory, false, true, 60),
+        new("판매채널 연결", ShipperRoutes.SalesChannels, false, true, 70),
+        new("주문 출고 알림", ShipperRoutes.OrderFulfillment, false, true, 80),
+        new("HS 코드 검토", ShipperRoutes.CustomsHsReviews, false, true, 90)
+    ];
+
+    private void Toggle(string route, bool visible)
+    {
+        var item = Items.FirstOrDefault(x => x.Route == route);
+        if (item is not null)
+        {
+            item.Visible = visible;
+        }
+    }
+
+    private sealed class ViewSettingRow
+    {
+        public ViewSettingRow(string title, string route, bool required, bool visible, int sortOrder)
+        {
+            Title = title;
+            Route = route;
+            Required = required;
+            Visible = visible;
+            SortOrder = sortOrder;
+        }
+
+        public string Title { get; }
+        public string Route { get; }
+        public bool Required { get; }
+        public bool Visible { get; set; }
+        public int SortOrder { get; }
+    }
+}

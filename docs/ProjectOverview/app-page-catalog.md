@@ -23,7 +23,7 @@
 | --- | ---: | --- | --- |
 | `ShipperApp` | 24 | 화주, 판매자, 물류 의뢰자 | 운송 의뢰, 창고/입고, 판매채널, 통관/해외 물류 |
 | `DriverApp` | 23 | 기사 | 운행 시작, 추천, 수락/거절, 상차/하차, 정산, 알림 |
-| `HongdalAdmin` | 37 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
+| `HongdalAdmin` | 38 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
 | `WarehouseManagerApp` | 12 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 홍달마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
@@ -36,7 +36,7 @@
 | --- | ---: | --- |
 | 완료 | 103 | 현재 문서에서 인라인 이미지로 바로 확인할 수 있는 화면 |
 | 인증 필요 | 9 | 관리자 보호 라우트라 현재 캡처는 로그인 화면까지 남긴 상태 |
-| 캡처 대기 | 0 | 캡처 호스트로 전체 클라이언트 앱 라우트를 실제 PNG로 남긴 상태 |
+| 캡처 대기 | 1 | 캡처 호스트로 아직 PNG를 남기지 못한 신규 화면 |
 
 ## ShipperApp
 
@@ -133,6 +133,7 @@
 | `HongdalAdmin-P33 - 파트너 관리` | `/partners` | `HongdalAdmin/Components/Pages/Partners.razor` | 운영 | 파트너 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P33.png" alt="HongdalAdmin-P33" width="160"> |
 | `HongdalAdmin-P34 - 수익/요율 정책` | `/revenue-policies` | `HongdalAdmin/Components/Pages/RevenuePolicies.razor` | 운영 | 수익/요율 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P34.png" alt="HongdalAdmin-P34" width="160"> |
 | `HongdalAdmin-P35 - 보조 기능 설정` | `/auxiliary-feature-settings` | `HongdalAdmin/Components/Pages/AuxiliaryFeatureSettings.razor` | 운영 | 보조 기능 설정 | - | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P35.png" alt="HongdalAdmin-P35" width="160"> |
+| `HongdalAdmin-P36 - 연락처 통합 검색` | `/contact-search` | `HongdalAdmin/Components/Pages/ContactSearch.razor` | 운영 | 전화번호 뒤 8자리 기준 인물/역할 통합 조회 | - | 캡처 대기 |
 | `HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `HongdalAdmin/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P90.png" alt="HongdalAdmin-P90" width="160"> |
 | `HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `HongdalAdmin/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P91.png" alt="HongdalAdmin-P91" width="160"> |
 | `HongdalAdmin-P99 - 미발견 페이지` | `/not-found` | `HongdalAdmin/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P99.png" alt="HongdalAdmin-P99" width="160"> |

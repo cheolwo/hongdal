@@ -1,0 +1,50 @@
+@page "/shipper/warehouse/work/{ProcessCode}"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="@Title"
+               Description="ShipperApp 창고 작업 진입 라우트를 WebApp에서 확인합니다."
+               Badge="@ProcessCode" />
+
+<MudGrid>
+    @foreach (var step in Steps)
+    {
+        <MudItem xs="12" md="4">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                <MudStack Spacing="2">
+                    <MudIcon Icon="@step.Icon" Color="@step.Color" />
+                    <MudText Typo="Typo.h6">@step.Title</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@step.Description</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap" Class="mt-4">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@ShipperRoutes.WarehouseScan">스캔으로 이동</MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@ShipperRoutes.WarehouseWorkspace">작업대</MudButton>
+</MudStack>
+
+@code {
+    [Parameter] public string ProcessCode { get; set; } = string.Empty;
+
+    private string Title => ProcessCode switch
+    {
+        "inbound" => "입고 작업 시작",
+        "outbound" => "출고 작업 시작",
+        "packing" => "포장 작업 시작",
+        "market-fulfillment" => "마켓 풀필먼트 작업 시작",
+        "international-forwarding" => "배송대행 작업 시작",
+        "delivery-agency" => "배송 대행 작업 시작",
+        _ => "창고 작업 시작"
+    };
+
+    private static readonly IReadOnlyList<WorkStep> Steps =
+    [
+        new("작업 대상 확인", "입고 요청, 재고, 주문 출고 알림 중 이번 작업 대상을 확인합니다.", Icons.Material.Filled.Assignment, Color.Primary),
+        new("바코드 스캔", "입고, SKU, 적재 위치, 번들 바코드를 스캔해 작업 조건을 채웁니다.", Icons.Material.Filled.QrCodeScanner, Color.Success),
+        new("상태 전환", "검수완료, 피킹완료, 포장완료 같은 다음 상태로 전환합니다.", Icons.Material.Filled.DoneAll, Color.Info)
+    ];
+
+    private sealed record WorkStep(string Title, string Description, string Icon, Color Color);
+}

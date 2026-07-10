@@ -7,8 +7,23 @@ public static class Command알림FeatureNames
     public const string 배차수락 = "DispatchAccepted";
     public const string 상차접근 = "DispatchPickupApproach";
     public const string 운송완료입금요청 = "TransportSettlementDepositReminder";
+    public const string 운송상차지도착 = "TransportArrivedPickup";
+    public const string 운송상차완료 = "TransportPickupCompleted";
+    public const string 운송하차지도착 = "TransportArrivedDropoff";
+    public const string 운송인수완료 = "TransportDropoffCompleted";
+    public const string 운송현장예외신고 = "TransportFieldIssueReported";
 
-    public static readonly string[] 발송지원목록 = [배차수락, 상차접근, 운송완료입금요청];
+    public static readonly string[] 발송지원목록 =
+    [
+        배차수락,
+        상차접근,
+        운송완료입금요청,
+        운송상차지도착,
+        운송상차완료,
+        운송하차지도착,
+        운송인수완료,
+        운송현장예외신고
+    ];
 }
 
 public sealed record Command알림Payload(

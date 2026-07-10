@@ -4,12 +4,23 @@ namespace Hongdal.Services.Driver.Development;
 
 public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅샷Provider
 {
-    private readonly 기사개발스냅샷응답 _snapshot;
+    private 기사개발스냅샷응답 _snapshot;
 
     public InMemory기사개발스냅샷Provider()
     {
-        var now = DateTime.Now;
-        _snapshot = new 기사개발스냅샷응답
+        _snapshot = CreateDefaultSnapshot(DateTime.Now);
+    }
+
+    public 기사개발스냅샷응답 GetSnapshot() => _snapshot;
+
+    public void ReplaceSnapshot(기사개발스냅샷응답 snapshot)
+    {
+        _snapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
+    }
+
+    private static 기사개발스냅샷응답 CreateDefaultSnapshot(DateTime now)
+    {
+        var snapshot = new 기사개발스냅샷응답
         {
             현재위치 = new 기사개발현재위치응답
             {
@@ -96,19 +107,19 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
             ]
         };
 
-        _snapshot.근무상태 = new 기사개발근무상태응답
+        snapshot.근무상태 = new 기사개발근무상태응답
         {
             기사명 = "홍길동 기사님",
             운행상태 = "운행중",
             시작모드 = "일반 운행",
-            시작위치 = _snapshot.현재위치.위치명,
+            시작위치 = snapshot.현재위치.위치명,
             복귀지 = "서울 양천구 목동",
             시작시각 = DateTime.Today.AddHours(8).AddMinutes(30),
-            추천콜수 = _snapshot.추천의뢰목록.Count,
-            오늘예약수 = _snapshot.예약목록.Count
+            추천콜수 = snapshot.추천의뢰목록.Count,
+            오늘예약수 = snapshot.예약목록.Count
         };
 
-        _snapshot.정산요약 = new 기사개발정산요약응답
+        snapshot.정산요약 = new 기사개발정산요약응답
         {
             년도 = DateTime.Today.Year,
             월 = DateTime.Today.Month,
@@ -122,9 +133,9 @@ public sealed class InMemory기사개발스냅샷Provider : I기사개발스냅�
                 new 기사개발정산상세응답 { 항목명 = "월 상한 조정", 설명 = "월 이용료 상한 적용", 금액 = 0m }
             ]
         };
-    }
 
-    public 기사개발스냅샷응답 GetSnapshot() => _snapshot;
+        return snapshot;
+    }
 
     private static 기사개발추천의뢰응답 CreateRequest(
         string requestId,
