@@ -1,0 +1,15 @@
+@page "/not-found"
+
+<WebPageHeader Title="페이지를 찾을 수 없습니다"
+               Description="아직 웹앱으로 옮겨지지 않았거나 잘못된 주소입니다."
+               Badge="404"
+               BadgeColor="Color.Warning" />
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.body1">통합 홈에서 현재 웹으로 검증 가능한 화면을 다시 선택하세요.</MudText>
+        <MudButton Href="/" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Home">
+            통합 홈으로 이동
+        </MudButton>
+    </MudStack>
+</MudPaper>

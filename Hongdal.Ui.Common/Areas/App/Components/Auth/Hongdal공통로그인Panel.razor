@@ -1,0 +1,165 @@
+@using Hongdal.Ui.Common.Areas.App.Models.Auth
+
+<MudPaper Class="@Class" Elevation="@Elevation" Style="@Style">
+    <MudStack Spacing="2">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h6">@제목</MudText>
+            @if (!string.IsNullOrWhiteSpace(설명))
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@설명</MudText>
+            }
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(DisplayStatusMessage))
+        {
+            <MudAlert Severity="@DisplayStatusSeverity" Dense="true">@DisplayStatusMessage</MudAlert>
+        }
+
+        @if (일반로그인표시)
+        {
+            <MudTextField @bind-Value="_userNameOrEmail"
+                          Label="@아이디Label"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          FullWidth="true" />
+            <MudTextField @bind-Value="_password"
+                          Label="@비밀번호Label"
+                          InputType="InputType.Password"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          FullWidth="true" />
+
+            @if (개발힌트목록.Count > 0)
+            {
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    @foreach (var hint in 개발힌트목록)
+                    {
+                        <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">@hint</MudChip>
+                    }
+                </MudStack>
+            }
+
+            <MudButton Variant="Variant.Filled"
+                       Color="@일반로그인Color"
+                       FullWidth="true"
+                       Disabled="@IsBusy"
+                       OnClick="PasswordLoginAsync">
+                @(IsBusy ? 로그인진행텍스트 : 일반로그인버튼텍스트)
+            </MudButton>
+        }
+
+        @if (소셜로그인표시)
+        {
+            @if (일반로그인표시)
+            {
+                <MudDivider Class="my-1" />
+            }
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@소셜로그인제목</MudText>
+            <MudGrid>
+                @foreach (var provider in 소셜로그인Provider목록)
+                {
+                    <MudItem xs="12" sm="4">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="@provider.Color"
+                                   FullWidth="true"
+                                   StartIcon="@provider.Icon"
+                                   Disabled="@IsBusy"
+                                   OnClick="() => SocialLoginAsync(provider)">
+                            @provider.DisplayName
+                        </MudButton>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(현재사용자표시))
+        {
+            <MudText Typo="Typo.body2">현재 사용자: @현재사용자표시</MudText>
+        }
+
+        @ChildContent
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public string 제목 { get; set; } = "로그인";
+    [Parameter] public string? 설명 { get; set; }
+    [Parameter] public string 아이디Label { get; set; } = "아이디 또는 이메일";
+    [Parameter] public string 비밀번호Label { get; set; } = "비밀번호";
+    [Parameter] public string 일반로그인버튼텍스트 { get; set; } = "로그인";
+    [Parameter] public string 로그인진행텍스트 { get; set; } = "로그인 중...";
+    [Parameter] public string 소셜로그인제목 { get; set; } = "소셜 계정으로 시작";
+    [Parameter] public string? 초기아이디 { get; set; }
+    [Parameter] public string? 현재사용자표시 { get; set; }
+    [Parameter] public string? 상태메시지 { get; set; }
+    [Parameter] public Severity 상태Severity { get; set; } = Severity.Info;
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public bool 일반로그인표시 { get; set; } = true;
+    [Parameter] public bool 소셜로그인표시 { get; set; } = true;
+    [Parameter] public Color 일반로그인Color { get; set; } = Color.Primary;
+    [Parameter] public int Elevation { get; set; } = 2;
+    [Parameter] public string Class { get; set; } = "pa-4";
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public IReadOnlyList<string> 개발힌트목록 { get; set; } = [];
+    [Parameter] public IReadOnlyList<소셜로그인ProviderOption> 소셜로그인Provider목록 { get; set; } = 소셜로그인ProviderOption.기본목록;
+    [Parameter] public EventCallback<공통로그인요청> OnPasswordLogin { get; set; }
+    [Parameter] public EventCallback<공통소셜로그인요청> OnSocialLogin { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string _userNameOrEmail = string.Empty;
+    private string _password = string.Empty;
+    private string? _localStatusMessage;
+    private Severity _localStatusSeverity = Severity.Info;
+    private bool _initialized;
+
+    private string? DisplayStatusMessage => !string.IsNullOrWhiteSpace(_localStatusMessage)
+        ? _localStatusMessage
+        : 상태메시지;
+
+    private Severity DisplayStatusSeverity => !string.IsNullOrWhiteSpace(_localStatusMessage)
+        ? _localStatusSeverity
+        : 상태Severity;
+
+    protected override void OnParametersSet()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _userNameOrEmail = 초기아이디 ?? string.Empty;
+        _initialized = true;
+    }
+
+    private async Task PasswordLoginAsync()
+    {
+        _localStatusMessage = null;
+
+        if (string.IsNullOrWhiteSpace(_userNameOrEmail) || string.IsNullOrWhiteSpace(_password))
+        {
+            _localStatusSeverity = Severity.Warning;
+            _localStatusMessage = "아이디 또는 이메일과 비밀번호를 입력해 주세요.";
+            return;
+        }
+
+        if (OnPasswordLogin.HasDelegate)
+        {
+            await OnPasswordLogin.InvokeAsync(new 공통로그인요청(_userNameOrEmail.Trim(), _password));
+        }
+    }
+
+    private async Task SocialLoginAsync(소셜로그인ProviderOption provider)
+    {
+        _localStatusMessage = null;
+
+        if (OnSocialLogin.HasDelegate)
+        {
+            await OnSocialLogin.InvokeAsync(new 공통소셜로그인요청(provider.ProviderId, provider.DisplayName));
+            return;
+        }
+
+        _localStatusSeverity = Severity.Info;
+        _localStatusMessage = $"{provider.DisplayName}은 서버 OAuth 연결 후 활성화됩니다.";
+    }
+}

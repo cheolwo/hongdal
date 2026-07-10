@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/Apps/">
     <Project Path="CustomsBrokerApp/CustomsBrokerApp.csproj" />
     <Project Path="Deliver/Deliver.csproj" />
@@ -40,4 +40,5 @@
       <Build Solution="Debug|*" Project="false" />
     </Project>
   </Folder>
+  <Project Path="Hongdal.WebApp/Hongdal.WebApp.csproj" />
 </Solution>

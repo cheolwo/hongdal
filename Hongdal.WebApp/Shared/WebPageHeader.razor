@@ -1,0 +1,22 @@
+<div class="web-page-header">
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.overline" Color="Color.Secondary">@Eyebrow</MudText>
+        <MudText Typo="Typo.h4">@Title</MudText>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <MudText Typo="Typo.body2" Color="Color.Secondary">@Description</MudText>
+        }
+    </MudStack>
+    @if (!string.IsNullOrWhiteSpace(Badge))
+    {
+        <MudChip T="string" Color="@BadgeColor" Variant="Variant.Outlined">@Badge</MudChip>
+    }
+</div>
+
+@code {
+    [Parameter] public string Eyebrow { get; set; } = "Hongdal WebApp";
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Badge { get; set; }
+    [Parameter] public Color BadgeColor { get; set; } = Color.Primary;
+}

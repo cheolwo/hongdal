@@ -1,0 +1,55 @@
+@page "/driver/recommendations"
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="추천 배차 웹 검증"
+               Description="모바일 배차 추천 배너를 WebAssembly에서 먼저 점검하기 위한 단일 책임 화면입니다."
+               Badge="추천 카드" />
+
+<MudGrid>
+    @foreach (var item in Recommendations)
+    {
+        <MudItem xs="12" md="6" xl="4">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                        <MudText Typo="Typo.h6">@item.Cargo</MudText>
+                        <MudChip T="string" Color="Color.Warning" Size="Size.Small">@(item.SecondsLeft)초</MudChip>
+                    </MudStack>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@item.Route</MudText>
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">추가 시간</MudText>
+                            <MudText Typo="Typo.subtitle2">@(item.AdditionalMinutes)분</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 운임</MudText>
+                            <MudText Typo="Typo.subtitle2">@item.Fare.ToString("N0")원</MudText>
+                        </MudItem>
+                    </MudGrid>
+                    <MudProgressLinear Value="@item.Progress" Color="Color.Warning" />
+                    <MudStack Row="true" Spacing="1">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">수락</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">거절</MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private static readonly IReadOnlyList<RecommendationPreview> Recommendations =
+    [
+        new("냉장식품", "서울 양천구 목동 → 경기 수원시 영통구", 44, 18, 88000, 27),
+        new("전자제품", "서울 마포구 성산동 → 경기 고양시 덕양구", 31, 12, 132000, 48),
+        new("소형 서류", "서울 중구 → 서울 강남구", 52, 9, 35000, 13)
+    ];
+
+    private sealed record RecommendationPreview(
+        string Cargo,
+        string Route,
+        int SecondsLeft,
+        int AdditionalMinutes,
+        int Fare,
+        double Progress);
+}

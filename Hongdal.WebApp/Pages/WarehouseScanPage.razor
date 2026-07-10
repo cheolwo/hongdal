@@ -1,0 +1,126 @@
+@page "/warehouse/scan"
+
+<WebPageHeader Eyebrow="Warehouse Web"
+               Title="창고 스캔 스테이션"
+               Description="적재대, 상품, 번들 바코드 스캔 흐름을 브라우저 입력으로 먼저 검증합니다."
+               Badge="스캔 웹 검증" />
+
+<MudGrid>
+    <MudItem xs="12" lg="5">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6">스캔 입력</MudText>
+                <MudTextField T="string"
+                              Label="바코드 또는 QR 값"
+                              @bind-Value="RawScan"
+                              Variant="Variant.Outlined"
+                              Immediate="true"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                              OnKeyDown="HandleKeyDown" />
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddScan">
+                        스캔 추가
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadSamples">
+                        샘플 입력
+                    </MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="ClearScans">
+                        초기화
+                    </MudButton>
+                </MudStack>
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    실제 장비 연결 전에는 키보드 입력 또는 스캐너 HID 입력을 같은 화면에서 검증합니다.
+                </MudAlert>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="7">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText Typo="Typo.h6">스캔 결과</MudText>
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">@(Scans.Count)건</MudChip>
+                </MudStack>
+                <MudTable Items="Scans" Dense="true" Hover="true">
+                    <HeaderContent>
+                        <MudTh>시간</MudTh>
+                        <MudTh>종류</MudTh>
+                        <MudTh>원본값</MudTh>
+                        <MudTh>처리 상태</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="시간">@context.ScannedAt.ToString("HH:mm:ss")</MudTd>
+                        <MudTd DataLabel="종류">@context.Kind</MudTd>
+                        <MudTd DataLabel="원본값">@context.RawValue</MudTd>
+                        <MudTd DataLabel="처리 상태">
+                            <MudChip T="string" Size="Size.Small" Color="@context.Color" Variant="Variant.Outlined">@context.Status</MudChip>
+                        </MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">아직 스캔한 값이 없습니다.</MudText>
+                    </NoRecordsContent>
+                </MudTable>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private readonly List<ScanRow> Scans = [];
+    private string? RawScan { get; set; }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddScan();
+        }
+    }
+
+    private void AddScan()
+    {
+        if (string.IsNullOrWhiteSpace(RawScan))
+        {
+            return;
+        }
+
+        Scans.Insert(0, BuildScanRow(RawScan.Trim()));
+        RawScan = string.Empty;
+    }
+
+    private void LoadSamples()
+    {
+        foreach (var sample in new[] { "LOC-A-03-02", "SKU-PORK-003KG", "BND-20260710-0001", "INB-CN-20260710" })
+        {
+            Scans.Insert(0, BuildScanRow(sample));
+        }
+    }
+
+    private void ClearScans()
+    {
+        Scans.Clear();
+    }
+
+    private static ScanRow BuildScanRow(string value)
+    {
+        var kind = value switch
+        {
+            var text when text.StartsWith("LOC", StringComparison.OrdinalIgnoreCase) => "적재대",
+            var text when text.StartsWith("SKU", StringComparison.OrdinalIgnoreCase) => "상품",
+            var text when text.StartsWith("BND", StringComparison.OrdinalIgnoreCase) => "번들",
+            var text when text.StartsWith("INB", StringComparison.OrdinalIgnoreCase) => "입고",
+            _ => "미분류"
+        };
+
+        return new ScanRow(
+            DateTime.Now,
+            kind,
+            value,
+            kind == "미분류" ? "관리자 확인 필요" : "인식 완료",
+            kind == "미분류" ? Color.Warning : Color.Success);
+    }
+
+    private sealed record ScanRow(DateTime ScannedAt, string Kind, string RawValue, string Status, Color Color);
+}

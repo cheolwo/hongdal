@@ -1,0 +1,50 @@
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">등록 전 점검</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    서버 등록 전에 막히는 입력과 현장 예외 가능성을 먼저 정리합니다.
+                </MudText>
+            </MudStack>
+            <MudChip T="string"
+                     Size="Size.Small"
+                     Color="@(ViewModel.서버등록가능 ? Color.Success : Color.Warning)"
+                     Variant="Variant.Filled">
+                @(ViewModel.서버등록가능 ? "서버 등록 가능" : "보완 필요")
+            </MudChip>
+        </MudStack>
+
+        @if (ViewModel.입력검증메시지목록.Count == 0)
+        {
+            <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+                필수 입력과 기본 업무 경고가 없습니다.
+            </MudAlert>
+        }
+        else
+        {
+            <MudList T="운송의뢰검증메시지" Dense="true">
+                @foreach (var item in ViewModel.입력검증메시지목록)
+                {
+                    <MudListItem Icon="@(item.필수 ? Icons.Material.Filled.ErrorOutline : Icons.Material.Filled.Info)">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="w-100" Wrap="Wrap.Wrap">
+                            <MudText Typo="Typo.body2">
+                                <b>@item.구분</b> · @item.내용
+                            </MudText>
+                            <MudButton Href="@item.이동Href"
+                                       Variant="Variant.Text"
+                                       Color="@(item.필수 ? Color.Warning : Color.Info)"
+                                       Size="Size.Small">
+                                보완
+                            </MudButton>
+                        </MudStack>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+}

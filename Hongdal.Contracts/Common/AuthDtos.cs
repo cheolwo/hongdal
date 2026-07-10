@@ -6,6 +6,45 @@ public sealed class 로그인요청
     public string Password { get; set; } = string.Empty;
 }
 
+public static class 소셜로그인ProviderIds
+{
+    public const string Kakao = "kakao";
+    public const string Google = "google";
+    public const string Naver = "naver";
+
+    public static readonly string[] 지원Provider목록 = [Kakao, Google, Naver];
+
+    public static bool 지원여부(string? providerId)
+        => !string.IsNullOrWhiteSpace(providerId)
+            && 지원Provider목록.Contains(providerId.Trim(), StringComparer.OrdinalIgnoreCase);
+}
+
+public sealed class 소셜로그인시작요청
+{
+    public string ProviderId { get; set; } = string.Empty;
+    public string? AppKey { get; set; }
+    public string? ReturnUrl { get; set; }
+}
+
+public sealed class 소셜로그인시작응답
+{
+    public string ProviderId { get; set; } = string.Empty;
+    public string ProviderDisplayName { get; set; } = string.Empty;
+    public string AuthorizationUrl { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public bool IsConfigured { get; set; }
+    public string Message { get; set; } = string.Empty;
+}
+
+public sealed class 소셜로그인완료요청
+{
+    public string ProviderId { get; set; } = string.Empty;
+    public string AuthorizationCode { get; set; } = string.Empty;
+    public string RedirectUri { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public string? AppKey { get; set; }
+}
+
 public sealed class 토큰갱신요청
 {
     public string UserId { get; set; } = string.Empty;

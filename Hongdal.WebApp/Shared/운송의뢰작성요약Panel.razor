@@ -1,0 +1,52 @@
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.h6">운송 의뢰 작성 상태</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                한 화면 입력과 단계별 입력 모두 같은 ViewModel을 공유합니다.
+            </MudText>
+        </MudStack>
+
+        <MudStack Row="true" Spacing="1" Class="flex-wrap">
+            @foreach (var 단계 in ViewModel.단계목록.Take(3))
+            {
+                <MudChip T="string"
+                         Size="Size.Small"
+                         Color="@GetStepColor(단계)"
+                         Variant="Variant.Outlined"
+                         Icon="@GetStepIcon(단계)">
+                    @단계.제목
+                </MudChip>
+            }
+        </MudStack>
+
+        <MudDivider />
+
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.subtitle2">현재 초안</MudText>
+            <MudText Typo="Typo.body2">화물: @Display(ViewModel.화물종류)</MudText>
+            <MudText Typo="Typo.body2">적재: @Display(ViewModel.화물적재형태)</MudText>
+            <MudText Typo="Typo.body2">구간: @Display(ViewModel.상차도로명주소) → @Display(ViewModel.하차도로명주소)</MudText>
+            <MudText Typo="Typo.body2">차량/결제: @Display(ViewModel.차량종류) · @ViewModel.결제수단</MudText>
+            <MudText Typo="Typo.body2">추천 차량: @(string.Join(", ", ViewModel.추천차량종류목록))</MudText>
+            <MudText Typo="Typo.body2">부가비용: @ViewModel.부가비용합계.ToString("N0")원</MudText>
+        </MudStack>
+
+        <MudAlert Severity="@(ViewModel.서버등록가능 ? Severity.Success : Severity.Warning)" Dense="true" Variant="Variant.Outlined">
+            @(ViewModel.서버등록가능
+                ? "서버 등록에 필요한 필수 입력이 채워졌습니다."
+                : $"필수 보완 {ViewModel.필수입력오류목록.Count}건이 남아 있습니다.")
+        </MudAlert>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+
+    private static Color GetStepColor(운송의뢰작성단계 단계) => 단계.완료 ? Color.Success : Color.Default;
+
+    private static string GetStepIcon(운송의뢰작성단계 단계) =>
+        단계.완료 ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked;
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "미입력" : value;
+}

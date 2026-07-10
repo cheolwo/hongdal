@@ -1,0 +1,46 @@
+@page "/driver"
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="기사 웹 작업공간"
+               Description="지도 중심 홈, 추천 배차, 현재 운송 상태를 웹에서 먼저 확인하는 화면입니다."
+               Badge="모바일 이관 전 검증" />
+
+<MudGrid>
+    <MudItem xs="12" lg="5">
+        <div class="web-phone-frame">
+            <div class="web-phone-map"></div>
+            <MudStack Spacing="2" Class="pa-4">
+                <MudText Typo="Typo.h6">운행 대기 중</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">웹에서는 지도 SDK 대신 추천 배너와 다음 행동 흐름을 먼저 검증합니다.</MudText>
+                <MudButton Href="/driver/recommendations" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.NotificationsActive">
+                    추천 배차 보기
+                </MudButton>
+            </MudStack>
+        </div>
+    </MudItem>
+    <MudItem xs="12" lg="7">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">기사 화면 이관 원칙</MudText>
+                    <MudList T="string" Dense="true">
+                        <MudListItem Icon="@Icons.Material.Filled.Map">홈은 지도와 다음 행동 중심으로 유지</MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Timer">추천 배너는 수락 제한 시간을 명확히 표시</MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.PhotoCamera">상차/하차 증빙은 사진 업로드 성공 후 상태 변경</MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Payments">완료 후 정산 예정일과 증빙 상태를 함께 표시</MudListItem>
+                    </MudList>
+                </MudStack>
+            </MudPaper>
+            <WebPageLinkGrid Items="Links" />
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> Links =
+    [
+        new("추천 배차", "신규 추천 카드, 수락/거절, 제한 시간 표시를 웹에서 검증합니다.", "/driver/recommendations", Icons.Material.Filled.TaskAlt, "Driver"),
+        new("상하차 증빙", "사진 업로드 성공 후 완료 처리와 예외 사유 기록을 검증합니다.", "/driver/transport/proof", Icons.Material.Filled.PhotoCamera, "Driver"),
+        new("커뮤니티", "기사 입장에서 같은 시간대/장소의 경험을 공유합니다.", "/community", Icons.Material.Filled.Forum, "Common")
+    ];
+}

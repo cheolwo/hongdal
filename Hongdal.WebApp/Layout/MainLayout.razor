@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+
+<MudLayout>
+    <MudAppBar Elevation="1" Color="Color.Default" Dense="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Color="Color.Inherit" OnClick="ToggleDrawer" />
+        <MudText Typo="Typo.h6">홍달 웹앱</MudText>
+        <MudSpacer />
+        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">Blazor WebAssembly</MudChip>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="DrawerVariant.Responsive">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent Class="web-main">
+        <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

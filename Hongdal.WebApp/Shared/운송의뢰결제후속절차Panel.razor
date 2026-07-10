@@ -1,0 +1,24 @@
+<MudPaper Elevation="0" Outlined="true" Class="pa-3">
+    <MudStack Spacing="2">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.subtitle2">결제 후속 절차</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                선택한 결제 방식에 따라 서버 등록 뒤 이어질 업무입니다.
+            </MudText>
+        </MudStack>
+
+        <MudList T="string" Dense="true">
+            @for (var index = 0; index < ViewModel.결제후속절차목록.Count; index++)
+            {
+                var step = ViewModel.결제후속절차목록[index];
+                <MudListItem Icon="@(index == 0 ? Icons.Material.Filled.Payments : Icons.Material.Filled.CheckCircleOutline)">
+                    @($"{index + 1}. {step}")
+                </MudListItem>
+            }
+        </MudList>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+}

@@ -1,0 +1,29 @@
+<div class="web-page-grid">
+    @foreach (var item in Items)
+    {
+        <MudCard Elevation="0" Outlined="true" Class="web-link-card">
+            <MudCardContent>
+                <MudStack Spacing="2">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                        <MudIcon Icon="@item.Icon" Color="Color.Primary" />
+                        <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@item.AppName</MudChip>
+                    </MudStack>
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle1">@item.Title</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@item.Description</MudText>
+                    </MudStack>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Text">@item.Status</MudChip>
+                        <MudButton Href="@item.Href" Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ArrowForward">
+                            열기
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<WebAppPageLink> Items { get; set; } = [];
+}

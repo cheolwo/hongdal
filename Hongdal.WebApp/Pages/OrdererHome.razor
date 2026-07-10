@@ -1,0 +1,34 @@
+@page "/orderer"
+
+<WebPageHeader Eyebrow="Orderer Web"
+               Title="주문자 웹 작업공간"
+               Description="공동주문 의사 표시, 주문자 집단 형성, 커뮤니티 흐름을 웹에서 먼저 확인합니다."
+               Badge="공동주문 웹 검증" />
+
+<MudGrid>
+    <MudItem xs="12" lg="8">
+        <WebPageLinkGrid Items="Links" />
+    </MudItem>
+    <MudItem xs="12" lg="4">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">자동 집단화 관점</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    주문자가 가볍게 의사를 남기면 서버가 배송권, 품목, 시기 기준으로 주문자 집단 후보를 형성하는 방향으로 확장합니다.
+                </MudText>
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    현재 웹앱은 흐름 검증용 골격이며, 실제 결제/집단화 API 연결은 다음 단계입니다.
+                </MudAlert>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> Links =
+    [
+        new("공동주문 의사 표시", "구매 의사를 가볍게 남기고 주문자 집단 형성을 기다립니다.", "/orderer", Icons.Material.Filled.GroupAdd, "Orderer", "이관 예정"),
+        new("주문 내역", "수입, 통관, 국내 운송, 세대 배송 상태를 한 화면에서 확인합니다.", "/orderer", Icons.Material.Filled.ReceiptLong, "Orderer", "이관 예정"),
+        new("커뮤니티", "같은 품목, 같은 배송권의 사용자 경험을 공유합니다.", "/community", Icons.Material.Filled.Forum, "Common")
+    ];
+}

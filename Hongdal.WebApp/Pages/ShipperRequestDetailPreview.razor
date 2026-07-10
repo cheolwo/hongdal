@@ -1,0 +1,162 @@
+@page "/shipper/request/{RequestId}"
+
+<WebPageHeader Eyebrow="Shipper Web"
+               Title="운송 의뢰 상세 타임라인"
+               Description="결제, 배차, 수락, 상차, 하차, 정산 상태가 한 화면에서 이어지는지 웹에서 검증합니다."
+               Badge="@RequestId" />
+
+<MudGrid>
+    <MudItem xs="12" lg="4">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">@RequestId</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">냉장식품 · 혼적 · 냉동탑차</MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Filled">상차 대기</MudChip>
+                </MudStack>
+                <MudDivider />
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제</MudText>
+                        <MudText Typo="Typo.body2">결제완료</MudText>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">배차</MudText>
+                        <MudText Typo="Typo.body2">기사수락</MudText>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제 예정</MudText>
+                        <MudText Typo="Typo.body2">128,000원</MudText>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">기사 지급 예정</MudText>
+                        <MudText Typo="Typo.body2">108,000원</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">상차지</MudText>
+                        <MudText Typo="Typo.body2">서울 양천구 목동 물류센터</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">하차지</MudText>
+                        <MudText Typo="Typo.body2">경기 수원시 영통구 공동주문 거점</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="8">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">1.0 운송 워크플로우</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">화주가 한눈에 확인해야 하는 상태 흐름입니다.</MudText>
+                    </MudStack>
+                    <MudGrid>
+                        @foreach (var step in Timeline)
+                        {
+                            <MudItem xs="12" md="6">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3" Style="@BuildStepStyle(step.State)">
+                                    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Start">
+                                        <MudAvatar Color="@ResolveStepColor(step.State)" Variant="Variant.Filled" Size="Size.Medium">
+                                            <MudIcon Icon="@ResolveStepIcon(step.State)" Size="Size.Small" />
+                                        </MudAvatar>
+                                        <MudStack Spacing="1" Class="flex-grow-1">
+                                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                                <MudText Typo="Typo.subtitle2">@step.Title</MudText>
+                                                <MudChip T="string" Size="Size.Small" Color="@ResolveStepColor(step.State)" Variant="Variant.Outlined">@ResolveStepLabel(step.State)</MudChip>
+                                            </MudStack>
+                                            <MudText Typo="Typo.body2">@step.Status</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@step.Description</MudText>
+                                        </MudStack>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">화주 확인 항목</MudText>
+                    <MudGrid>
+                        @foreach (var item in ReviewItems)
+                        {
+                            <MudItem xs="12" md="6">
+                                <MudAlert Severity="@item.Severity" Variant="Variant.Outlined">
+                                    <strong>@item.Title</strong><br />
+                                    @item.Description
+                                </MudAlert>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public string? RequestId { get; set; }
+
+    private static readonly IReadOnlyList<WorkflowStep> Timeline =
+    [
+        new("결제", "결제완료", "화주 결제 또는 플랫폼 예치금이 확인된 상태입니다.", StepState.Completed),
+        new("배차", "기사 추천 완료", "운송 의뢰 배차 엔진이 후보 기사에게 추천을 보냈습니다.", StepState.Completed),
+        new("기사 수락", "기사수락", "기사님이 제한 시간 안에 추천을 수락했습니다.", StepState.Completed),
+        new("상차", "상차 대기", "상차지 접근 알림과 현장 준비가 필요한 단계입니다.", StepState.Active),
+        new("하차", "대기", "상차 사진 업로드 후 운송 중 상태로 이동합니다.", StepState.Pending),
+        new("정산", "대기", "하차 완료 후 1일, 3일, 7일 알림 기준으로 입금 확인을 진행합니다.", StepState.Pending)
+    ];
+
+    private static readonly IReadOnlyList<(string Title, string Description, Severity Severity)> ReviewItems =
+    [
+        ("상차 준비 알림", "기사 수락 후 화주 담당자에게 상차 준비 알림을 보내야 합니다.", Severity.Info),
+        ("증빙 업로드", "상차와 하차는 사진 업로드 성공 후에만 상태를 완료로 바꿉니다.", Severity.Success),
+        ("예외 처리", "물건 없음, 수량 다름, 담당자 부재는 별도 사유 기록이 필요합니다.", Severity.Warning),
+        ("정산 신뢰", "하차 완료 후 입금 요청과 입금 완료 상태를 분리해서 보여줍니다.", Severity.Info)
+    ];
+
+    private static Color ResolveStepColor(StepState state) => state switch
+    {
+        StepState.Completed => Color.Success,
+        StepState.Active => Color.Primary,
+        StepState.Attention => Color.Warning,
+        _ => Color.Default
+    };
+
+    private static string ResolveStepIcon(StepState state) => state switch
+    {
+        StepState.Completed => Icons.Material.Filled.Check,
+        StepState.Active => Icons.Material.Filled.PlayArrow,
+        StepState.Attention => Icons.Material.Filled.PriorityHigh,
+        _ => Icons.Material.Filled.Schedule
+    };
+
+    private static string ResolveStepLabel(StepState state) => state switch
+    {
+        StepState.Completed => "완료",
+        StepState.Active => "진행 중",
+        StepState.Attention => "확인 필요",
+        _ => "대기"
+    };
+
+    private static string BuildStepStyle(StepState state)
+        => state == StepState.Active
+            ? "border-color: var(--mud-palette-primary); background: rgba(37, 99, 235, 0.04);"
+            : string.Empty;
+
+    private sealed record WorkflowStep(string Title, string Status, string Description, StepState State);
+
+    private enum StepState
+    {
+        Pending,
+        Active,
+        Completed,
+        Attention
+    }
+}

@@ -1,0 +1,126 @@
+html,
+body {
+    font-family: "Malgun Gothic", "Segoe UI", Arial, sans-serif;
+    background: #f8fafc;
+    color: #111827;
+}
+
+h1:focus {
+    outline: none;
+}
+
+.web-main {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.web-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.web-page-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.web-link-card {
+    height: 100%;
+    border-radius: 8px;
+}
+
+.web-phone-frame {
+    max-width: 430px;
+    min-height: 640px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 28px;
+    background: #ffffff;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+    overflow: hidden;
+}
+
+.web-phone-map {
+    min-height: 320px;
+    background:
+        linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+        linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+        #e0f2fe;
+    background-size: 32px 32px;
+    position: relative;
+}
+
+.web-phone-map::after {
+    content: "";
+    position: absolute;
+    inset: 38% 12% auto 12%;
+    height: 8px;
+    border-radius: 999px;
+    background: #2563eb;
+    transform: rotate(-10deg);
+    box-shadow: 60px 42px 0 #14b8a6;
+}
+
+.web-timeline {
+    border-left: 3px solid #2563eb;
+    padding-left: 14px;
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: #fef3c7;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.loading-progress {
+    position: absolute;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    inset: 20vh 0 auto 0;
+    margin: 0 auto;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #dbeafe;
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #2563eb;
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: 700;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}

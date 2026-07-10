@@ -1,0 +1,42 @@
+@page "/warehouse"
+
+<WebPageHeader Eyebrow="Warehouse Web"
+               Title="창고 관리자 웹 작업공간"
+               Description="입고, 스캔, 피킹, 포장 화면을 웹에서 먼저 단일 책임 화면으로 정리합니다."
+               Badge="공통 창고 UI 이관 후보" />
+
+<WebPageLinkGrid Items="Links" />
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4 mt-4">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.h6">웹앱에서 우선 완성할 창고 화면</MudText>
+        <MudGrid>
+            @foreach (var item in WorkItems)
+            {
+                <MudItem xs="12" md="6" lg="3">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudText Typo="Typo.subtitle2">@item.Title</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Description</MudText>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> Links =
+    [
+        new("피킹 배치", "출고 배치 이후 작업자에게 피킹/포장 일을 배정합니다.", "/warehouse", Icons.Material.Filled.Inventory, "Warehouse", "이관 예정"),
+        new("스캔 스테이션", "적재대, 상품, 번들 바코드 스캔 흐름을 검증합니다.", "/warehouse/scan", Icons.Material.Filled.QrCodeScanner, "Warehouse"),
+        new("홍달마트 작업", "협소한 도심 창고 기준으로 피킹+포장을 함께 검토합니다.", "/warehouse", Icons.Material.Filled.Storefront, "Warehouse", "이관 예정")
+    ];
+
+    private static readonly IReadOnlyList<(string Title, string Description)> WorkItems =
+    [
+        ("입고 검수", "상품 정보, 보관 조건, 라벨 필요 여부 확인"),
+        ("적재대 스캔", "위치 바코드와 상품 바코드 매칭"),
+        ("피킹", "할당된 수량만큼 상품을 꺼내는 작업"),
+        ("포장", "피킹 완료 상품을 주문/배송 단위로 묶는 작업")
+    ];
+}

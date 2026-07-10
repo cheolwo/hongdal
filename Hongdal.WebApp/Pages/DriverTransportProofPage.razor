@@ -1,0 +1,158 @@
+@page "/driver/transport/proof"
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="상하차 증빙/예외 처리"
+               Description="모바일 카메라 촬영 전, 웹에서는 파일 선택 방식으로 사진 업로드 성공 후 상태 변경 흐름을 검증합니다."
+               Badge="증빙 흐름" />
+
+<MudGrid>
+    <MudItem xs="12" lg="7">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudTabs Rounded="true" Elevation="0">
+                <MudTabPanel Text="상차 증빙">
+                    <MudStack Spacing="3" Class="pt-3">
+                        <MudText Typo="Typo.h6">상차 완료 사진</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">사진을 선택하면 서버 업로드 성공을 가정한 뒤 상차 완료 버튼을 활성화합니다.</MudText>
+                        <InputFile OnChange="OnPickupPhotoSelectedAsync" accept="image/*" />
+                        @if (!string.IsNullOrWhiteSpace(PickupPreviewUrl))
+                        {
+                            <img src="@PickupPreviewUrl" alt="상차 증빙 미리보기" style="width:100%;max-height:360px;object-fit:cover;border-radius:8px;" />
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @PickupFileName</MudText>
+                        }
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(!PickupUploaded)" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="CompletePickupProof">
+                            상차 완료 처리
+                        </MudButton>
+                    </MudStack>
+                </MudTabPanel>
+                <MudTabPanel Text="하차 증빙">
+                    <MudStack Spacing="3" Class="pt-3">
+                        <MudText Typo="Typo.h6">하차 완료 사진</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">하차도 사진 업로드 성공 응답 이후 완료 상태로 바뀌는 흐름을 검증합니다.</MudText>
+                        <InputFile OnChange="OnDropoffPhotoSelectedAsync" accept="image/*" />
+                        @if (!string.IsNullOrWhiteSpace(DropoffPreviewUrl))
+                        {
+                            <img src="@DropoffPreviewUrl" alt="하차 증빙 미리보기" style="width:100%;max-height:360px;object-fit:cover;border-radius:8px;" />
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @DropoffFileName</MudText>
+                        }
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(!DropoffUploaded)" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="CompleteDropoffProof">
+                            하차 완료 처리
+                        </MudButton>
+                    </MudStack>
+                </MudTabPanel>
+            </MudTabs>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="5">
+        <MudStack Spacing="3">
+            @if (!string.IsNullOrWhiteSpace(StatusMessage))
+            {
+                <MudAlert Severity="@StatusSeverity">@StatusMessage</MudAlert>
+            }
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">현장 예외 신고</MudText>
+                    <MudSelect T="string" Label="예외 사유" @bind-Value="IssueReason" Variant="Variant.Outlined">
+                        @foreach (var reason in IssueReasons)
+                        {
+                            <MudSelectItem Value="@reason">@reason</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField T="string" Label="현장 메모" @bind-Value="IssueMemo" Lines="4" Variant="Variant.Outlined" />
+                    <MudButton Variant="Variant.Outlined" Color="Color.Warning" StartIcon="@Icons.Material.Filled.ReportProblem" OnClick="ReportIssue">
+                        예외 사유 기록
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">웹 검증 기준</MudText>
+                    <MudList T="string" Dense="true">
+                        <MudListItem Icon="@Icons.Material.Filled.CloudUpload">사진 파일 선택 후 업로드 완료 상태 표시</MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.LockClock">업로드 성공 전 완료 버튼 비활성화</MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.EditNote">예외 사유와 메모를 별도 기록</MudListItem>
+                    </MudList>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private const long MaxImageBytes = 5 * 1024 * 1024;
+
+    private static readonly IReadOnlyList<string> IssueReasons =
+    [
+        "상차지 담당자 부재",
+        "물건 없음",
+        "수량 다름",
+        "화물 훼손",
+        "하차지 부재",
+        "사진 재촬영 필요"
+    ];
+
+    private string? PickupPreviewUrl { get; set; }
+    private string? PickupFileName { get; set; }
+    private bool PickupUploaded { get; set; }
+    private string? DropoffPreviewUrl { get; set; }
+    private string? DropoffFileName { get; set; }
+    private bool DropoffUploaded { get; set; }
+    private string IssueReason { get; set; } = IssueReasons[0];
+    private string? IssueMemo { get; set; }
+    private string? StatusMessage { get; set; }
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+
+    private async Task OnPickupPhotoSelectedAsync(InputFileChangeEventArgs e)
+    {
+        (PickupPreviewUrl, PickupFileName) = await BuildPreviewAsync(e.File);
+        PickupUploaded = true;
+        SetStatus("상차 사진 업로드 성공을 확인했습니다. 이제 상차 완료 처리가 가능합니다.", Severity.Success);
+    }
+
+    private async Task OnDropoffPhotoSelectedAsync(InputFileChangeEventArgs e)
+    {
+        (DropoffPreviewUrl, DropoffFileName) = await BuildPreviewAsync(e.File);
+        DropoffUploaded = true;
+        SetStatus("하차 사진 업로드 성공을 확인했습니다. 이제 하차 완료 처리가 가능합니다.", Severity.Success);
+    }
+
+    private static async Task<(string PreviewUrl, string FileName)> BuildPreviewAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(MaxImageBytes);
+        using var memory = new MemoryStream();
+        await stream.CopyToAsync(memory);
+        var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "image/png" : file.ContentType;
+        return ($"data:{contentType};base64,{Convert.ToBase64String(memory.ToArray())}", file.Name);
+    }
+
+    private void CompleteProof(string stage)
+    {
+        SetStatus($"{stage} 완료 상태로 변경했습니다. 실제 서버 연결 시에는 증빙 파일 저장 응답 이후 상태를 바꿉니다.", Severity.Success);
+    }
+
+    private void CompletePickupProof()
+    {
+        CompleteProof("상차");
+    }
+
+    private void CompleteDropoffProof()
+    {
+        CompleteProof("하차");
+    }
+
+    private void ReportIssue()
+    {
+        SetStatus($"예외 사유를 기록했습니다: {IssueReason} / {Fallback(IssueMemo, "메모 없음")}", Severity.Warning);
+    }
+
+    private void SetStatus(string message, Severity severity)
+    {
+        StatusMessage = message;
+        StatusSeverity = severity;
+    }
+
+    private static string Fallback(string? value, string fallback)
+        => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+}
