@@ -8,17 +8,17 @@ Hongdal은 **화주가 운송을 의뢰하고, 기사님이 추천을 받아 운
 
 아래 화면들은 링크를 눌러 들어가지 않아도 README에서 바로 보이는 대표 캡처입니다. 전체 화면 목록과 나머지 캡처는 [앱별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md)에서 봅니다.
 
+### 대표 화면: 기사 지도 홈
+
+기사님이 운행을 시작하고 추천 배너와 현재 운송으로 들어갑니다.
+
+<img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P07.png" alt="DriverApp 기사 지도 홈 화면" width="360">
+
 ### 화주: 의뢰 상세
 
 화주가 결제, 배차, 수락, 상차, 하차, 정산 상태를 한 화면에서 확인합니다.
 
 <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P03.png" alt="ShipperApp 의뢰 상세 화면" width="280">
-
-### 기사: 지도 홈
-
-기사님이 운행을 시작하고 추천 배너와 현재 운송으로 들어갑니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P07.png" alt="DriverApp 기사 지도 홈 화면" width="280">
 
 ### 기사: 추천 상세
 
