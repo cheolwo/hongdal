@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "924994414102",
+    "project_id": "hongdal-136eb",
+    "storage_bucket": "hongdal-136eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924994414102:android:8d98d90b3b19fc59673737",
+        "android_client_info": {
+          "package_name": "kr.hongdal.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3nMXstoWlaTYBeegTOw6moXiITPdTNIk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

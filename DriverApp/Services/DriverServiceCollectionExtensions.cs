@@ -14,6 +14,14 @@ public static class DriverServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration? configuration = null)
     {
+#if DEBUG
+        services.Configure<ClientDataModeOptions>(options =>
+        {
+            options.AllowSampleFallback = true;
+            options.AllowDevelopmentSnapshotFallback = true;
+        });
+#endif
+
         if (configuration is not null)
         {
             services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
@@ -32,6 +40,7 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<IDriverHomeMapService, DriverHomeMapService>();
         services.AddSingleton<DriverHomeRoutePlanningService>();
         services.AddSingleton<IDriverWorkApiService, DriverWorkApiService>();
+        services.AddSingleton<I기사푸시토큰등록Service, 기사푸시토큰등록Service>();
 #if ANDROID
         services.AddSingleton<I기사위치송신Service, Android기사위치송신Service>();
 #else

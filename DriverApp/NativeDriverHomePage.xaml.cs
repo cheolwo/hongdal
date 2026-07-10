@@ -13,6 +13,7 @@ public partial class NativeDriverHomePage : ContentPage
     private readonly IDriverRecommendationDecisionService _decisionService;
     private readonly IDriverRecommendationNotificationService _recommendationNotificationService;
     private readonly DriverHomeRoutePlanningService _routePlanningService;
+    private readonly I기사푸시토큰등록Service _pushTokenRegistrationService;
     private bool _isSubscribed;
     private DriverMapMarkerItem? _incomingRecommendation;
     private DriverRequestItem? _incomingRecommendationRequest;
@@ -30,7 +31,8 @@ public partial class NativeDriverHomePage : ContentPage
         IDriverHomeMapService mapService,
         IDriverRecommendationDecisionService decisionService,
         IDriverRecommendationNotificationService recommendationNotificationService,
-        DriverHomeRoutePlanningService routePlanningService)
+        DriverHomeRoutePlanningService routePlanningService,
+        I기사푸시토큰등록Service pushTokenRegistrationService)
     {
         InitializeComponent();
         _sampleDataService = sampleDataService;
@@ -38,6 +40,7 @@ public partial class NativeDriverHomePage : ContentPage
         _decisionService = decisionService;
         _recommendationNotificationService = recommendationNotificationService;
         _routePlanningService = routePlanningService;
+        _pushTokenRegistrationService = pushTokenRegistrationService;
     }
 
     protected override async void OnAppearing()
@@ -71,8 +74,10 @@ public partial class NativeDriverHomePage : ContentPage
         }
         TransportFooterBar.ShowTransport(_currentTransport);
         ShowIncomingRecommendation(incoming);
+        RecommendationDetailBanner.IsVisible = false;
         LinkedRouteCard.IsVisible = false;
         RecommendationDecisionButtons.IsEnabled = true;
+        await RegisterStoredPushTokenQuietlyAsync();
     }
 
     protected override void OnDisappearing()
@@ -84,7 +89,25 @@ public partial class NativeDriverHomePage : ContentPage
 
     private void OnMarkerSelected(object? sender, DriverMapMarkerItem marker)
     {
+        if (LinkedRouteCard.IsVisible)
+        {
+            return;
+        }
+
+        TransportFooterBar.IsVisible = true;
         TransportFooterBar.ShowMarker(marker);
+    }
+
+    private async Task RegisterStoredPushTokenQuietlyAsync()
+    {
+        try
+        {
+            await _pushTokenRegistrationService.저장토큰등록Async();
+        }
+        catch (Exception ex)
+        {
+            StatusLabel.Text = $"푸시 토큰 등록 확인 실패: {ex.Message}";
+        }
     }
 
     private void ShowIncomingRecommendation(DriverIncomingRecommendation? incoming)
@@ -95,12 +118,18 @@ public partial class NativeDriverHomePage : ContentPage
         {
             RecommendationSummaryLabel.Text = string.Empty;
             RecommendationCountdownLabel.Text = string.Empty;
+            RecommendationDetailCountdownLabel.Text = string.Empty;
             RecommendationCountdownProgress.Progress = 0d;
+            RecommendationDetailCountdownProgress.Progress = 0d;
+            RecommendationDetailBanner.IsVisible = false;
             StopRecommendationCountdown();
             return;
         }
 
+        TransportFooterBar.IsVisible = true;
         RecommendationSummaryLabel.Text = $"{marker.Title} · {marker.PickupAddress} 상차 추천이 도착했습니다. 대기 {incoming!.PendingCount}건";
+        RecommendationDetailBanner.IsVisible = false;
+        LinkedRouteCard.IsVisible = false;
         StartRecommendationCountdown(incoming);
     }
 
@@ -137,11 +166,17 @@ public partial class NativeDriverHomePage : ContentPage
         var remainingSeconds = Math.Max(0d, (expiresAt - DateTime.Now).TotalSeconds);
         var progress = Math.Clamp((totalSeconds - remainingSeconds) / totalSeconds, 0d, 1d);
 
-        RecommendationCountdownLabel.Text = remainingSeconds > 0d
+        var countdownText = remainingSeconds > 0d
             ? $"{Math.Ceiling(remainingSeconds):0}초"
             : "미응답 처리";
+        var progressColor = remainingSeconds > 10d ? Color.FromArgb("#22c55e") : Color.FromArgb("#f59e0b");
+
+        RecommendationCountdownLabel.Text = countdownText;
+        RecommendationDetailCountdownLabel.Text = countdownText;
         RecommendationCountdownProgress.Progress = progress;
-        RecommendationCountdownProgress.ProgressColor = remainingSeconds > 10d ? Color.FromArgb("#22c55e") : Color.FromArgb("#f59e0b");
+        RecommendationDetailCountdownProgress.Progress = progress;
+        RecommendationCountdownProgress.ProgressColor = progressColor;
+        RecommendationDetailCountdownProgress.ProgressColor = progressColor;
 
         if (remainingSeconds > 0d || _autoRejectingRecommendation || _decisionService.GetDecision(request.의뢰Id) is not null)
         {
@@ -153,9 +188,12 @@ public partial class NativeDriverHomePage : ContentPage
         {
             var decision = await _decisionService.RejectAsync(request, "60초 미응답 자동 거절");
             RecommendationCountdownLabel.Text = "자동 거절";
+            RecommendationDetailCountdownLabel.Text = "자동 거절";
             RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
             _recommendationNotificationService.MarkHandled(request.의뢰Id);
             RecommendationBanner.IsVisible = false;
+            RecommendationDetailBanner.IsVisible = false;
+            LinkedRouteCard.IsVisible = false;
             RestoreDefaultMapState();
             StatusLabel.Text = "응답 제한 시간이 지나 추천이 자동 거절되었습니다.";
         }
@@ -163,6 +201,7 @@ public partial class NativeDriverHomePage : ContentPage
         {
             _autoRejectingRecommendation = false;
             RecommendationCountdownLabel.Text = "처리 실패";
+            RecommendationDetailCountdownLabel.Text = "처리 실패";
             StatusLabel.Text = ex.Message;
         }
         finally
@@ -179,12 +218,12 @@ public partial class NativeDriverHomePage : ContentPage
             return;
         }
 
-        MapView.CenterLatitude = _incomingRecommendation.PickupLatitude;
-        MapView.CenterLongitude = _incomingRecommendation.PickupLongitude;
-        MapView.Zoom = 13d;
+        var routeOverlays = _routePlanningService.BuildLinkedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation, "#16a34a", "연계 추천 경로");
+        FocusMapOnRoute(routeOverlays, _incomingRecommendation, reserveBottomSpace: true);
         MapView.Markers = [_incomingRecommendation];
-        MapView.RouteOverlays = _routePlanningService.BuildLinkedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation, "#16a34a", "연계 추천 경로");
-        TransportFooterBar.ShowMarker(_incomingRecommendation);
+        MapView.RouteOverlays = routeOverlays;
+        TransportFooterBar.IsVisible = false;
+        RecommendationDetailBanner.IsVisible = false;
         ShowLinkedRouteCard(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation, _incomingRecommendationRequest);
         TitleLabel.Text = "배차 추천 확인";
         StatusLabel.Text = "현재 이동 단계와 추천 운송 의뢰의 상차/하차 경로를 함께 표시했습니다.";
@@ -199,6 +238,10 @@ public partial class NativeDriverHomePage : ContentPage
         }
 
         RecommendationBanner.IsVisible = false;
+        RecommendationDetailBanner.IsVisible = false;
+        LinkedRouteCard.IsVisible = false;
+        TransportFooterBar.IsVisible = true;
+        RestoreDefaultMapState();
         StatusLabel.Text = "추천 알림을 잠시 접었습니다. 지도 마커나 하단 목록에서 다시 확인할 수 있습니다.";
     }
 
@@ -244,6 +287,7 @@ public partial class NativeDriverHomePage : ContentPage
         _acceptedRecommendationRequest = _incomingRecommendationRequest;
         RecommendationDecisionStatusLabel.Text = BuildDecisionMessage(decision);
         RecommendationBanner.IsVisible = false;
+        RecommendationDetailBanner.IsVisible = false;
         StopRecommendationCountdown();
         LinkedRouteBenefitLabel.Text = "수락됨";
         ShowAcceptedRecommendationOnMap();
@@ -291,6 +335,7 @@ public partial class NativeDriverHomePage : ContentPage
         _recommendationNotificationService.MarkHandled(_incomingRecommendationRequest.의뢰Id);
         LinkedRouteCard.IsVisible = false;
         RecommendationBanner.IsVisible = false;
+        RecommendationDetailBanner.IsVisible = false;
         _incomingRecommendation = null;
         _incomingRecommendationRequest = null;
         RestoreDefaultMapState();
@@ -333,6 +378,7 @@ public partial class NativeDriverHomePage : ContentPage
         _acceptedRecommendationRequest = null;
         LinkedRouteCard.IsVisible = false;
         RecommendationBanner.IsVisible = false;
+        RecommendationDetailBanner.IsVisible = false;
         _incomingRecommendation = null;
         _incomingRecommendationRequest = null;
         RestoreDefaultMapState();
@@ -349,6 +395,7 @@ public partial class NativeDriverHomePage : ContentPage
         MapView.Zoom = DefaultMapZoom;
         MapView.Markers = _defaultRecommendationMarkers;
         MapView.RouteOverlays = [];
+        TransportFooterBar.IsVisible = true;
         TransportFooterBar.ShowTransport(_currentTransport);
     }
 
@@ -359,15 +406,14 @@ public partial class NativeDriverHomePage : ContentPage
             return;
         }
 
-        MapView.CenterLatitude = _incomingRecommendation.PickupLatitude;
-        MapView.CenterLongitude = _incomingRecommendation.PickupLongitude;
-        MapView.Zoom = 13d;
         MapView.Markers = [_incomingRecommendation];
         var acceptedRoute = _routePlanningService.BuildAcceptedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation);
-        MapView.RouteOverlays = acceptedRoute.Count > 0
+        var routeOverlays = acceptedRoute.Count > 0
             ? acceptedRoute
             : _routePlanningService.BuildLinkedRouteOverlays(_sampleDataService.기사현재위치, _currentTransport, _incomingRecommendation);
-        TransportFooterBar.ShowMarker(_incomingRecommendation);
+        FocusMapOnRoute(routeOverlays, _incomingRecommendation, reserveBottomSpace: true);
+        MapView.RouteOverlays = routeOverlays;
+        TransportFooterBar.IsVisible = false;
     }
 
     private static string BuildRecommendationCompactInfo(DriverRequestItem? request)
@@ -389,6 +435,53 @@ public partial class NativeDriverHomePage : ContentPage
         return $"{request.추천업무유형표시} · {request.차량조건표시} · {request.시간조건표시} · {fare} · {distance}";
     }
 
+    private void FocusMapOnRoute(
+        IReadOnlyList<DriverMapRouteOverlay> routeOverlays,
+        DriverMapMarkerItem recommendation,
+        bool reserveBottomSpace = false)
+    {
+        var points = routeOverlays
+            .SelectMany(x => x.Points)
+            .Where(x => x.Latitude != 0d && x.Longitude != 0d)
+            .ToList();
+
+        if (points.Count == 0)
+        {
+            MapView.CenterLatitude = reserveBottomSpace
+                ? recommendation.PickupLatitude + 0.015d
+                : recommendation.PickupLatitude;
+            MapView.CenterLongitude = recommendation.PickupLongitude;
+            MapView.Zoom = reserveBottomSpace ? 12.5d : 13d;
+            return;
+        }
+
+        var minLatitude = points.Min(x => x.Latitude);
+        var maxLatitude = points.Max(x => x.Latitude);
+        var minLongitude = points.Min(x => x.Longitude);
+        var maxLongitude = points.Max(x => x.Longitude);
+        var span = Math.Max(maxLatitude - minLatitude, maxLongitude - minLongitude);
+
+        var latitudeSpan = maxLatitude - minLatitude;
+        var centerLatitude = (minLatitude + maxLatitude) / 2d;
+        if (reserveBottomSpace)
+        {
+            centerLatitude += Math.Max(latitudeSpan * 0.18d, 0.012d);
+        }
+
+        MapView.CenterLatitude = centerLatitude;
+        MapView.CenterLongitude = (minLongitude + maxLongitude) / 2d;
+        var zoom = span switch
+        {
+            <= 0.03d => 13.5d,
+            <= 0.08d => 12.5d,
+            <= 0.18d => 11.5d,
+            <= 0.35d => 10.5d,
+            <= 0.7d => 9.5d,
+            _ => 8.5d
+        };
+        MapView.Zoom = reserveBottomSpace ? Math.Max(8d, zoom - 1.25d) : zoom;
+    }
+
     private void OnIncomingRecommendationChanged(DriverIncomingRecommendation? incoming)
     {
         MainThread.BeginInvokeOnMainThread(() =>
@@ -398,7 +491,9 @@ public partial class NativeDriverHomePage : ContentPage
             ShowIncomingRecommendation(incoming);
             if (incoming is not null)
             {
+                RecommendationDetailBanner.IsVisible = false;
                 LinkedRouteCard.IsVisible = false;
+                RestoreDefaultMapState();
             }
         });
     }

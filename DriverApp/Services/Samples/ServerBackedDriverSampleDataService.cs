@@ -3,10 +3,12 @@ using System.Net.Http.Json;
 using DriverApp.Models.Driver;
 using DriverApp.Models.Driver.Samples;
 using DriverApp.Services.Geo;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Contracts.Driver.Reservation;
 using Hongdal.Contracts.Driver.Settlement;
 using Hongdal.Contracts.Driver.Transport;
 using Hongdal.Contracts.Driver.Work;
+using Microsoft.Extensions.Options;
 
 namespace DriverApp.Services.Samples;
 
@@ -14,6 +16,8 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly 기사샘플데이터Service _sampleFallback;
+    private readonly IOptions<ClientDataModeOptions> _dataModeOptions;
     private bool _loaded;
 
     private 기사근무샘플상태 _근무상태 = null!;
@@ -26,10 +30,14 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 
     public ServerBackedDriverSampleDataService(
         HttpClient httpClient,
-        IAuthSession authSession)
+        IAuthSession authSession,
+        기사샘플데이터Service sampleFallback,
+        IOptions<ClientDataModeOptions> dataModeOptions)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _sampleFallback = sampleFallback;
+        _dataModeOptions = dataModeOptions;
         ApplyEmptyState();
     }
 
@@ -42,12 +50,19 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 
         if (string.IsNullOrWhiteSpace(_authSession.AccessToken))
         {
-            ApplyEmptyState();
+            ApplyDisconnectedState();
             return;
         }
 
-        await LoadLiveServerDataAsync(cancellationToken);
-        _loaded = true;
+        try
+        {
+            await LoadLiveServerDataAsync(cancellationToken);
+            _loaded = true;
+        }
+        catch when (CanUseSampleFallback())
+        {
+            ApplySampleFallback();
+        }
     }
 
     public 기사근무샘플상태 근무상태 => _근무상태;
@@ -331,6 +346,33 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
         _예약목록 = [];
         _운송목록 = [];
         _알림목록 = [];
+    }
+
+    private void ApplyDisconnectedState()
+    {
+        if (CanUseSampleFallback())
+        {
+            ApplySampleFallback();
+            return;
+        }
+
+        ApplyEmptyState();
+    }
+
+    private bool CanUseSampleFallback()
+    {
+        return _dataModeOptions.Value.AllowSampleFallback;
+    }
+
+    private void ApplySampleFallback()
+    {
+        _근무상태 = _sampleFallback.근무상태;
+        _기사현재위치 = _sampleFallback.기사현재위치;
+        _정산요약 = _sampleFallback.정산요약;
+        _추천의뢰목록 = _sampleFallback.추천의뢰목록;
+        _예약목록 = _sampleFallback.예약목록;
+        _운송목록 = _sampleFallback.운송목록;
+        _알림목록 = _sampleFallback.알림목록;
     }
 
     private sealed class ServerDispatchRecommendationDto

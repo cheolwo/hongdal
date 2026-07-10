@@ -112,10 +112,10 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         ClearMarkers();
         foreach (var item in VirtualView.Markers)
         {
-            AddMarker(item, item.PickupLatitude, item.PickupLongitude, $"{item.Title} 상차");
+            AddMarker(item, item.PickupLatitude, item.PickupLongitude, "추천 상차지");
             if (item.DropoffLatitude != 0d && item.DropoffLongitude != 0d)
             {
-                AddMarker(item, item.DropoffLatitude, item.DropoffLongitude, $"{item.Title} 하차");
+                AddMarker(item, item.DropoffLatitude, item.DropoffLongitude, "추천 하차지");
             }
         }
     }
@@ -181,7 +181,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         {
             Position = new LatLng(latitude, longitude),
             CaptionText = caption,
-            SubCaptionText = item.Summary
+            SubCaptionText = string.Empty
         };
 
         marker.Click += (_, _) =>

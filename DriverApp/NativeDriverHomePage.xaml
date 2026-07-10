@@ -4,36 +4,22 @@
              xmlns:controls="clr-namespace:DriverApp.Controls"
              x:Class="DriverApp.NativeDriverHomePage"
              BackgroundColor="#f7f8fa"
-             Title="홍달 용달기사">
+             NavigationPage.HasNavigationBar="False">
     <Grid RowDefinitions="*,Auto">
         <controls:DriverNativeMapView x:Name="MapView"
                                       Grid.RowSpan="2" />
 
         <VerticalStackLayout Grid.Row="0"
-                             Margin="16"
-                             Spacing="10"
+                             Margin="16,8,16,0"
+                             Spacing="0"
                              VerticalOptions="Start">
-            <Border Padding="14"
-                    BackgroundColor="#fdfdfd"
-                    StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="8" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="4">
-                    <Label x:Name="TitleLabel"
-                           Text="운행 지역"
-                           FontAttributes="Bold"
-                           FontSize="16"
-                           TextColor="#202124" />
-                    <Label x:Name="StatusLabel"
-                           FontSize="13"
-                           TextColor="#5f6368"
-                           LineBreakMode="WordWrap" />
-                </VerticalStackLayout>
-            </Border>
+            <Label x:Name="TitleLabel"
+                   IsVisible="False" />
+            <Label x:Name="StatusLabel"
+                   IsVisible="False" />
 
             <Border x:Name="RecommendationBanner"
-                    Padding="14"
+                    Padding="12,9"
                     BackgroundColor="#111827"
                     Stroke="#60a5fa"
                     StrokeThickness="1"
@@ -42,17 +28,17 @@
                     <TapGestureRecognizer Tapped="OnOpenIncomingRecommendationClicked" />
                 </Border.GestureRecognizers>
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="9" />
                 </Border.StrokeShape>
                 <Border.Shadow>
                     <Shadow Brush="#55000000"
-                            Offset="0,5"
-                            Radius="14"
-                            Opacity="0.28" />
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.24" />
                 </Border.Shadow>
 
-                <VerticalStackLayout Spacing="10">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="7">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                         <Border WidthRequest="34"
                                 HeightRequest="34"
                                 BackgroundColor="#2563eb"
@@ -60,59 +46,86 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="17" />
                             </Border.StrokeShape>
-                            <Label Text="🔔"
-                                   FontSize="17"
+                            <Label Text="!"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   TextColor="#ffffff"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center" />
                         </Border>
 
-                        <VerticalStackLayout Grid.Column="1" Spacing="2">
-                            <Label Text="새 배차 추천"
-                                   FontAttributes="Bold"
-                                   FontSize="15"
-                                   TextColor="#ffffff" />
+                        <Label Grid.Column="1"
+                               Text="신규 배차 추천"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="#ffffff"
+                               VerticalTextAlignment="Center"
+                               LineBreakMode="TailTruncation" />
+
+                        <Label x:Name="RecommendationCountdownLabel"
+                               Grid.Column="2"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               TextColor="#ffffff"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+
+                    <ProgressBar x:Name="RecommendationCountdownProgress"
+                                 Grid.Row="1"
+                                 HeightRequest="5"
+                                 Progress="0"
+                                 ProgressColor="#22c55e" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1"
+                             Margin="16,0,16,16"
+                             Spacing="10"
+                             VerticalOptions="End">
+            <Border x:Name="RecommendationDetailBanner"
+                    Padding="12"
+                    BackgroundColor="#0f172a"
+                    Stroke="#38bdf8"
+                    StrokeThickness="1"
+                    IsVisible="False">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#55000000"
+                            Offset="0,-3"
+                            Radius="14"
+                            Opacity="0.24" />
+                </Border.Shadow>
+
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="7">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="신규 배차 추천 확인"
+                                FontAttributes="Bold"
+                                FontSize="15"
+                                TextColor="#ffffff" />
                             <Label x:Name="RecommendationSummaryLabel"
                                    FontSize="13"
                                    TextColor="#dbeafe"
                                    LineBreakMode="WordWrap" />
-                            <Grid RowDefinitions="Auto,Auto"
-                                  RowSpacing="5"
-                                  Margin="0,6,0,0">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="신규 배차 응답 제한"
-                                           FontAttributes="Bold"
-                                           FontSize="12"
-                                           TextColor="#bfdbfe" />
-                                    <Label x:Name="RecommendationCountdownLabel"
-                                           Grid.Column="1"
-                                           FontAttributes="Bold"
-                                           FontSize="12"
-                                           TextColor="#ffffff" />
-                                </Grid>
-                                <ProgressBar x:Name="RecommendationCountdownProgress"
-                                             Grid.Row="1"
-                                             HeightRequest="8"
-                                             Progress="0"
-                                             ProgressColor="#22c55e" />
-                            </Grid>
                         </VerticalStackLayout>
+
+                        <Label x:Name="RecommendationDetailCountdownLabel"
+                               Grid.Column="1"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               TextColor="#ffffff"
+                               VerticalTextAlignment="Center" />
                     </Grid>
 
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                        <Button Text="나중에"
-                                BackgroundColor="#374151"
-                                TextColor="#f8fafc"
-                                CornerRadius="8"
-                                Clicked="OnDismissRecommendationClicked" />
-                        <Button Grid.Column="1"
-                                Text="지도에서 확인"
-                                BackgroundColor="#22c55e"
-                                TextColor="#052e16"
-                                CornerRadius="8"
-                                FontAttributes="Bold"
-                                Clicked="OnOpenIncomingRecommendationClicked" />
-                    </Grid>
-                </VerticalStackLayout>
+                    <ProgressBar x:Name="RecommendationDetailCountdownProgress"
+                                 Grid.Row="1"
+                                 HeightRequest="7"
+                                 Progress="0"
+                                 ProgressColor="#22c55e" />
+                </Grid>
             </Border>
 
             <Border x:Name="LinkedRouteCard"
@@ -201,12 +214,10 @@
                     </Grid>
                 </VerticalStackLayout>
             </Border>
-        </VerticalStackLayout>
 
-        <controls:DriverTransportFooterBar x:Name="TransportFooterBar"
-                                           Grid.Row="1"
-                                           Margin="16"
-                                           OpenMenuRequested="OnOpenLegacyMenuClicked"
-                                           OpenTransportRequested="OnOpenCurrentTransportClicked" />
+            <controls:DriverTransportFooterBar x:Name="TransportFooterBar"
+                                               OpenMenuRequested="OnOpenLegacyMenuClicked"
+                                               OpenTransportRequested="OnOpenCurrentTransportClicked" />
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

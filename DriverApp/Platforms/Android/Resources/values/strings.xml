@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-    <string name="naver_map_sdk_ncp_key_id">zAjYsypH3OCWkg2oenDz</string>
+    <string name="naver_map_sdk_ncp_key_id">9eswvqwwod</string>
+    <string name="naver_map_sdk_legacy_client_id">9eswvqwwod</string>
 </resources>

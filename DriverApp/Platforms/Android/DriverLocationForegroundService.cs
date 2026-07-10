@@ -12,13 +12,13 @@ using Microsoft.Maui.Devices.Sensors;
 namespace DriverApp.Services;
 
 [Service(
-    Name = "com.companyname.driverapp.DriverLocationForegroundService",
+    Name = "kr.hongdal.driver.DriverLocationForegroundService",
     Exported = false,
     ForegroundServiceType = ForegroundService.TypeLocation)]
 public sealed class DriverLocationForegroundService : Service
 {
-    public const string ActionStart = "com.companyname.driverapp.action.START_LOCATION_STREAM";
-    public const string ActionStop = "com.companyname.driverapp.action.STOP_LOCATION_STREAM";
+    public const string ActionStart = "kr.hongdal.driver.action.START_LOCATION_STREAM";
+    public const string ActionStop = "kr.hongdal.driver.action.STOP_LOCATION_STREAM";
     public const string ExtraIntervalSeconds = "intervalSeconds";
     public const string ExtraPickupApproachRadiusKm = "pickupApproachRadiusKm";
     public const string ExtraDrivingStatus = "drivingStatus";
