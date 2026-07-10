@@ -27,7 +27,6 @@
 | `WarehouseManagerApp` | 12 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 홍달마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
-| `CustomsBrokerApp` | 2 | 관세사/통관 담당자 | 통관사 홈, 미발견 페이지 |
 | `HumanResourcesManagerApp` | 1 | 인사/고용 담당자 | 인사 관리 홈 |
 
 ## 캡처 진행 현황
@@ -177,13 +176,6 @@
 | `RestaurantDeskApp-P02-1 - 인기 음식점 조회` | `/restaurants/popular` | `RestaurantDeskApp/Components/Pages/PopularRestaurants.razor` | 확장 | 인기 음식점 조회 | - | 완료<br><img src="assets/app-pages/RestaurantDeskApp/RestaurantDeskApp-P02-1.png" alt="RestaurantDeskApp-P02-1" width="160"> |
 | `RestaurantDeskApp-P03 - 리뷰 관리` | `/reviews/moderation` | `RestaurantDeskApp/Components/Pages/ReviewModeration.razor` | 운영 | 리뷰 관리 | - | 완료<br><img src="assets/app-pages/RestaurantDeskApp/RestaurantDeskApp-P03.png" alt="RestaurantDeskApp-P03" width="160"> |
 | `RestaurantDeskApp-P04 - 배차 주소 입력/검증 폼` | `/dispatch/address-form` | `RestaurantDeskApp/Components/Pages/DispatchAddressForm.razor` | 보조 | 배차 주소 입력/검증 폼 | - | 완료<br><img src="assets/app-pages/RestaurantDeskApp/RestaurantDeskApp-P04.png" alt="RestaurantDeskApp-P04" width="160"> |
-
-## CustomsBrokerApp
-
-| 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
-| --- | --- | --- | --- | --- | --- | --- |
-| `CustomsBrokerApp-P01 - 관세사/통관 담당자 홈` | `/` | `CustomsBrokerApp/Pages/Home.razor` | 확장 | 관세사/통관 담당자 홈 | - | 완료<br><img src="assets/app-pages/CustomsBrokerApp/CustomsBrokerApp-P01.png" alt="CustomsBrokerApp-P01" width="160"> |
-| `CustomsBrokerApp-P99 - 미발견 페이지` | `/not-found` | `CustomsBrokerApp/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/CustomsBrokerApp/CustomsBrokerApp-P99.png" alt="CustomsBrokerApp-P99" width="160"> |
 
 ## HumanResourcesManagerApp
 

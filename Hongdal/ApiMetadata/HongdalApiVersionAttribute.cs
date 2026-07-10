@@ -826,8 +826,8 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.CustomsAndTradeData,
             "CustomsBroker",
-            "CustomsBrokerApp",
-            "관세사 앱",
+            "Hongdal.WebApp",
+            "통합 웹앱",
             "관세사 홈",
             "/",
             "관세사가 HS 코드, 식품/일반화물 분류, 통관 주의 태그를 보정합니다."),

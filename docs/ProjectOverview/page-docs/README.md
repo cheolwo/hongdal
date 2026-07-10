@@ -8,7 +8,6 @@
 
 | 앱 | 화면 수 | 필수 화면 수 | 인증 필요 캡처 수 |
 | --- | ---: | ---: | ---: |
-| [CustomsBrokerApp](CustomsBrokerApp/) | 2 | 0 | 0 |
 | [DriverApp](DriverApp/) | 23 | 10 | 0 |
 | [HongdalAdmin](HongdalAdmin/) | 38 | 18 | 9 |
 | [HumanResourcesManagerApp](HumanResourcesManagerApp/) | 1 | 0 | 0 |

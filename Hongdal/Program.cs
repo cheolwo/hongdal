@@ -40,7 +40,7 @@ using Hongdal.Services.Development;
 using Hongdal.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
-const string CustomsBrokerCorsPolicy = "CustomsBrokerApp";
+const string CustomsWebCorsPolicy = "HongdalWebCustoms";
 var isRunningInContainer = string.Equals(
     Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"),
     "true",
@@ -69,7 +69,7 @@ builder.Services.AddHongdalPresentation();
 builder.Services.AddHongdalApplicationCore();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(CustomsBrokerCorsPolicy, policy =>
+    options.AddPolicy(CustomsWebCorsPolicy, policy =>
     {
         var allowedOrigins = builder.Configuration.GetSection("CustomsBrokerCors:AllowedOrigins").Get<string[]>() ?? [];
         policy.WithOrigins(allowedOrigins)
@@ -262,7 +262,7 @@ app.UseExceptionHandler(errorApp =>
 });
 
 app.UseAuthentication();
-app.UseCors(CustomsBrokerCorsPolicy);
+app.UseCors(CustomsWebCorsPolicy);
 app.UseAuthorization();
 
 app.UseMiddleware<IsmsPEncryptedTransportMiddleware>();

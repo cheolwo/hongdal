@@ -93,7 +93,7 @@ flowchart TD
 | --- | --- | --- | --- | --- |
 | `1.0` | 국내 화물/용달 운송 정보 서비스 안정화 | `ShipperApp`, `DriverApp`, `HongdalAdmin`, `CargoYongdalDispatchEngine` | 화주 의뢰, 용달기사 추천/수락/거절, 상차/하차 증빙, 수령자 정보, 결제/정산 기본, 커뮤니티 보조 모드 | 음식 배달 실운영, 홍달마트 실운영, 해외/통관 자동화, HS 데이터 유료 공유 |
 | `1.5` | 판매 물류와 창고 기반 출고/재위탁 확장 | `WarehouseManagerApp`, `ShipperApp`, `OrdererApp` | 판매상품 재고, 입고/적재/출고, 주문 출고 알림, 재위탁 운송, 창고 작업자 검증, 판매자 물류 운영 | 홍달마트 도심 즉시배송, 해외/통관 자동화 |
-| `2.0` | 국제 물류/통관/HS 데이터 기반 확장 | `CustomsBrokerApp`, HS 코드 DB, 해외/통관 서비스, `CargoYongdalDispatchEngine` | HS 코드 DB, 통관/수입 대행 조회, 관세사 전용 앱, FCL/LCL 판단, 수입 예정 수요 확인, 통관 데이터 공개/결제 정책 | 홍달마트 즉시배송 실운영 |
+| `2.0` | 국제 물류/통관/HS 데이터 기반 확장 | `Hongdal.WebApp`, `HongdalAdmin`, HS 코드 DB, 해외/통관 서비스, `CargoYongdalDispatchEngine` | HS 코드 DB, 통관/수입 대행 조회, 관세사 보정 화면, FCL/LCL 판단, 수입 예정 수요 확인, 통관 데이터 공개/결제 정책 | 홍달마트 즉시배송 실운영 |
 | `2.5` | 주문자 집단 기반 공동 주문과 FCL/대량 입고 | `OrdererApp`, `ShipperApp`, `WarehouseManagerApp`, 공동 주문 서비스 | 도로명주소/Kakao 지역 2단계 주문자 집단 구성, 공동주택/생활권 하위 식별, 주문자 공동 주문 모집, 화주 대량 구매 공개, FCL 가능 조건 계산, 집단 대표 입고, 동/수령 지점별 분류/배분 | 홍달마트 즉시배송 실운영, 관리사무소 공식 승인 자동화 |
 | `3.0` | 음식점 일반 음식 배달 운영 | `OrdererApp`, `RestaurantDeskApp`, `FoodDeliveryDispatchEngine`, `Deliver` | 음식점 주문, 조리/픽업 상태, 음식 배달 기사 배차, 고객 배송 완료, 묶음 배달 | 홍달마트 도심 즉시배송, 창고형 피킹/포장 배송 |
 | `3.5` | 홍달마트와 도심 즉시배송 운영 | `WarehouseManagerApp`, `OrdererApp`, `FoodDeliveryDispatchEngine`, `Deliver` | 홍달마트 주문, 도심 재고 보충, 피킹/포장, 음식 배달 기사 픽업, 묶음 배달, 도심 마트 커뮤니티 운영 | 1.0 핵심 운송 흐름을 흔드는 대규모 구조 변경 |

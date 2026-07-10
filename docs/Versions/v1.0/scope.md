@@ -11,6 +11,6 @@
 | 수령자 정보 단계별 마스킹 | 포함 | 운송 상세 DTO, DriverApp | 배차 전/수락 후/하차 직전/완료 후 구분 |
 | 커뮤니티 보조 모드 | 제한 포함 | `Hongdal.Ui.Common` | 업무 흐름 보조 |
 | 창고 입고/출고 고도화 | 보류 | `WarehouseManagerApp` | 1.5 |
-| 통관/HS 데이터 | 보류 | `CustomsBrokerApp` | 2.0 |
+| 통관/HS 데이터 | 보류 | `Hongdal.WebApp`, `HongdalAdmin` | 2.0 |
 | 음식점 일반 음식 배달 | 보류 | `Deliver`, `FoodDeliveryDispatchEngine` | 3.0 |
 | 홍달마트 즉시배송 | 보류 | `Deliver`, `FoodDeliveryDispatchEngine`, `WarehouseManagerApp` | 3.5 |

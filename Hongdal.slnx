@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/Apps/">
-    <Project Path="CustomsBrokerApp/CustomsBrokerApp.csproj" />
     <Project Path="Deliver/Deliver.csproj" />
     <Project Path="DriverApp/DriverApp.csproj" />
     <Project Path="HumanResourcesManagerApp/HumanResourcesManagerApp.csproj">

@@ -47,7 +47,7 @@ flowchart TD
 | `DriverApp` | 용달 기사, 배달 기사 | 운행 시작, 추천 의뢰 확인, 배차 수락/거절, 상차/하차 증빙, 정산 |
 | `WarehouseManagerApp` | 창고 관리자, 현장 작업자 | 입고, 검수, 스캔, 피킹, 포장, 출고, 홍달마트 작업 |
 | `HongdalAdmin` | 플랫폼 운영자 | 배차 대기, 운송 진행, 기사/화주 관리, 문서, 정산, HS 코드, HR, 운영 정책 |
-| `CustomsBrokerApp` | 관세사 | 통관·무역 데이터 검토와 보정의 사용자 접점 |
+| `Hongdal.WebApp` | 관세사, 화주, 판매자 | 통관·무역 데이터 검토와 보정의 사용자 접점 |
 
 ## 1.0 중심 연결 그림
 
@@ -56,7 +56,7 @@ flowchart LR
     Core["홍달 1.0 국내 화물/용달 운송<br/>기사 추천 → 수락 → 상차 → 하차 → 증빙 → 정산"]
     Shipper["ShipperApp<br/>일반 화주 운송 의뢰"]
     Group["OrdererApp<br/>공동주문 수입"]
-    Customs["CustomsBrokerApp / HongdalAdmin<br/>통관·HS 판단"]
+    Customs["Hongdal.WebApp / HongdalAdmin<br/>통관·HS 판단"]
     Warehouse["WarehouseManagerApp<br/>창고 입출고"]
     Sales["ShipperApp<br/>판매채널 출고"]
     Food["OrdererApp<br/>음식 주문"]
@@ -91,7 +91,7 @@ flowchart LR
 | 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `HongdalAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
 | 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `ShipperApp` `/shipper/warehouse/inventory`, `ShipperApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
 | 2 | 판매채널 주문 출고 배치 | `ShipperApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
-| 3 | 통관 상태 보정 | `CustomsBrokerApp` `/` 또는 `HongdalAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `ShipperApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
+| 3 | 통관 상태 보정 | `Hongdal.WebApp` `/shipper/customs/hs-reviews` 또는 `HongdalAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `ShipperApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
 | 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `HongdalAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
 
 ### 국내 운송 상태 전파
@@ -132,7 +132,7 @@ sequenceDiagram
     participant Orderer as OrdererApp /group-purchase
     participant Ledger as Hongdal 공동주문 원장
     participant Admin as HongdalAdmin 공동주문 운영 화면 후보
-    participant Broker as CustomsBrokerApp 통관 검토
+    participant Broker as Hongdal.WebApp 통관 검토
     participant Driver as DriverApp 추천/진행 화면
     participant Warehouse as WarehouseManagerApp /work-board
 
@@ -259,7 +259,7 @@ sequenceDiagram
 | 주문자, 주문자 집단 대표 | `OrdererApp` `/group-purchase` | `api/v1/orderer/group-purchase-logistics-workflows`, `api/v1/orderer/group-purchase-overseas-shipments` |
 | 주문자 | `OrdererApp` `/orders` | 공동주문 상태와 개인 주문 확인 |
 | 플랫폼 운영자 | `HongdalAdmin` `/dashboard`, `/documents`, `/activity-logs` | `api/v1/admin/orderer/group-purchase-*`, `api/v1/admin/documents` |
-| 관세사 | `CustomsBrokerApp` `/` | `api/v1/customs`, `api/v1/admin/hs-codes` |
+| 관세사 | `Hongdal.WebApp` `/shipper/customs/hs-reviews` 또는 `HongdalAdmin` `/customs/hs-codes` | `api/v1/customs`, `api/v1/admin/hs-codes` |
 | 화주·판매자 | `ShipperApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 검토, FCL/LCL 계획 |
 | 기사 | `DriverApp` 국내 화물 운송 화면 | 국내 보세구역 반출 이후 운송 |
 | 창고 관리자 | `WarehouseManagerApp` `/work/inbound`, `/work-board` | 3PL 입고 또는 판매채널 출고 준비 |
@@ -347,7 +347,7 @@ flowchart LR
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
 | 화주·판매자 | `ShipperApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 코드 검토, FCL/LCL 판단 |
-| 관세사 | `CustomsBrokerApp` `/` | 관세사 검토와 보정 |
+| 관세사 | `Hongdal.WebApp` `/shipper/customs/hs-reviews` 또는 `HongdalAdmin` `/customs/hs-codes` | 관세사 검토와 보정 |
 | 플랫폼 운영자 | `HongdalAdmin` `/customs/hs-codes` | HS 코드 운영 |
 | 주문자 | `OrdererApp` `/group-purchase` | 공동수입 상태와 예상 단가 확인 |
 
@@ -357,7 +357,7 @@ flowchart LR
 | --- | --- | --- |
 | BL/AWB 조회 상세 | `OrdererApp` 또는 공개 조회 화면 | 주문자가 자신의 공동수입 화물이 어디 있는지 문서관리번호로 확인해야 한다. |
 | 항구/공항/세관/보세구역 코드 브라우저 | `HongdalAdmin` | 공공 데이터를 정규화해 통관 응답값과 연결해야 한다. |
-| 관세사 작업 보드 | `CustomsBrokerApp` | HS 코드 보정, 수입 가능성 검토, 보류 사유를 관세사 업무 단위로 처리해야 한다. |
+| 관세사 작업 보드 | `Hongdal.WebApp` 또는 `HongdalAdmin` | HS 코드 보정, 수입 가능성 검토, 보류 사유를 관세사 업무 단위로 처리해야 한다. |
 
 ## 커뮤니티 신뢰
 
