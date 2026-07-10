@@ -22,6 +22,10 @@
 - 홍달마트 도심 즉시배송 실운영
 - 창고형 재고 보충, 피킹, 포장과 음식점 배달의 강한 결합
 
+## 정책 메모
+
+- [음식 배달 요금/정산 임시 분석 노트](./food-delivery-pricing-settlement-notes.md)
+
 ## 우선 앱/모듈
 
 - `OrdererApp`
