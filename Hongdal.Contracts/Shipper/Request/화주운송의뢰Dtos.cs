@@ -226,9 +226,40 @@ public sealed class PricingDTO
     public decimal? 대기료 { get; set; }
     public decimal? 수작업비 { get; set; }
     public decimal? 할증 { get; set; }
+    public decimal? 최종운임 { get; set; }
     public decimal? 플랫폼수수료 { get; set; }
     public decimal? 기사지급예정운임 { get; set; }
     public 화주운송알선정책DTO? 알선정책 { get; set; }
+}
+
+public sealed class 화주운송기준운임견적요청
+{
+    public string? 차량종류 { get; set; }
+    public decimal? 예상거리Km { get; set; }
+    public decimal? 상차위도 { get; set; }
+    public decimal? 상차경도 { get; set; }
+    public decimal? 하차위도 { get; set; }
+    public decimal? 하차경도 { get; set; }
+    public decimal? 대기료 { get; set; }
+    public decimal? 수작업비 { get; set; }
+    public decimal? 할증 { get; set; }
+}
+
+public sealed class 화주운송기준운임견적응답
+{
+    public string 차량종류 { get; set; } = string.Empty;
+    public decimal 예상거리Km { get; set; }
+    public decimal 기본운임 { get; set; }
+    public decimal Km당단가 { get; set; }
+    public decimal 거리운임 { get; set; }
+    public decimal 최소운임 { get; set; }
+    public decimal 대기료 { get; set; }
+    public decimal 수작업비 { get; set; }
+    public decimal 할증 { get; set; }
+    public decimal 최종운임 { get; set; }
+    public bool 직선거리기준 { get; set; } = true;
+    public string? 단가출처 { get; set; }
+    public IReadOnlyList<string> 경고목록 { get; set; } = Array.Empty<string>();
 }
 
 public sealed class 화주운송알선정책DTO

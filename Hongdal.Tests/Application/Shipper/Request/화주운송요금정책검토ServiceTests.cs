@@ -45,6 +45,21 @@ public class 화주운송요금정책검토ServiceTests
     }
 
     [Fact]
+    public void 검토_최종운임만_있어도_기준운임으로_판정한다()
+    {
+        var pricing = new PricingDTO
+        {
+            최종운임 = 45000
+        };
+
+        var result = _service.검토(pricing, 결제예정금액: 40000);
+
+        Assert.True(result.정책위반);
+        Assert.Equal(45000, result.기준운임);
+        Assert.Contains(화주운송요금정책이벤트코드.기준운임미달, result.이벤트코드목록);
+    }
+
+    [Fact]
     public void 검토_화주결제액과_기사지급액_사이에_설명되지않은_차액이_있으면_재알선의심으로_판정한다()
     {
         var pricing = new PricingDTO

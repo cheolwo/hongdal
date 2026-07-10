@@ -63,7 +63,7 @@ public sealed class 기사홈조회QueryHandler : IRequestHandler<기사홈조�
             .CountAsync(x => x.기사_운송자 == driver.기사명 && x.상태 != "인수완료", cancellationToken);
 
         var usageFee = settlement?.이용료 ?? 0m;
-        var monthlyCap = _policy.무료배차 ? 0m : _policy.추가이용료;
+        var monthlyCap = _policy.적용월상한이용료;
 
         return new 기사홈요약응답
         {

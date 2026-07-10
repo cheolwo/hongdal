@@ -7,6 +7,7 @@ using 홍달.Services.HIOPSAI;
 using 홍달.Services.Notifications;
 using 홍달.Services.Options;
 using 홍달.Services.Payments;
+using Hongdal.Services.Food;
 
 namespace Hongdal.Extensions;
 
@@ -105,6 +106,7 @@ public static partial class ServiceCollectionExtensions
 
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
+        services.AddHttpClient<IKakao좌표변환Service, Kakao좌표변환Service>();
 
         return services;
     }

@@ -192,10 +192,12 @@ else
             return;
         }
 
-        await RunAsync("추천을 수락했습니다. 배차 확정 후 상차지 이동 화면으로 이어질 수 있습니다.", async () =>
+        var requestId = Recommendation.의뢰Id;
+        await RunAsync("추천을 수락했습니다. 진행 중 운송 화면으로 이동합니다.", async () =>
         {
-            await 추천Service.수락Async(Recommendation.의뢰Id);
-            추천Service.선택추천해제(Recommendation.의뢰Id);
+            await 추천Service.수락Async(requestId);
+            추천Service.선택추천해제(requestId);
+            Navigation.NavigateTo(CurrentTransportHref(requestId));
         });
     }
 
@@ -345,6 +347,9 @@ else
 
     private static string DisplayMinutes(decimal? value)
         => value.HasValue ? $"{value.Value:N0}분" : "시간 미정";
+
+    private static string CurrentTransportHref(string requestId)
+        => $"/driver/transports/current?acceptedRequestId={Uri.EscapeDataString(requestId)}";
 
     public void Dispose()
     {

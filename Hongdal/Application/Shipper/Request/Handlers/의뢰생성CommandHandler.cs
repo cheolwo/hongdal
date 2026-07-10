@@ -76,6 +76,8 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
         var evidenceMethod = settlementCondition?.증빙방식.ToString() ?? 증빙방식.없음.ToString();
         var collector = settlementCondition?.수납주체.ToString() ?? 수납주체.플랫폼.ToString();
         var settlementStatus = GetSettlementStatus(settlementTime, settlementCondition?.증빙방식);
+        var finalFare = request.최종운임 ?? request.결제예정금액;
+        var paymentAmount = request.결제예정금액 ?? (finalFare.HasValue ? decimal.ToInt32(finalFare.Value) : null);
 
         var (pickupLat, pickupLng) = await ResolveCoordinatesAsync(request.픽업도로명주소, request.픽업상세주소, cancellationToken);
         var (dropoffLat, dropoffLng) = await ResolveCoordinatesAsync(request.하차도로명주소, request.하차상세주소, cancellationToken);
@@ -102,7 +104,7 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             정산메모 = settlementCondition?.정산메모 ?? string.Empty,
             세금계산서필요 = settlementCondition?.세금계산서필요 ?? false,
             현금영수증필요 = settlementCondition?.현금영수증필요 ?? false,
-            결제예정금액 = request.결제예정금액,
+            결제예정금액 = paymentAmount,
             픽업_도로명주소 = request.픽업도로명주소,
             픽업_상세주소 = request.픽업상세주소 ?? string.Empty,
             픽업_위도 = pickupLat,
@@ -124,6 +126,7 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             대기료 = request.대기료,
             수작업비 = request.수작업비,
             할증 = request.할증,
+            최종운임 = finalFare,
             클라이언트요청Id = clientRequestId,
             상태 = 상태값.의뢰상태.생성됨,
             결제상태 = paymentStatus,
@@ -136,8 +139,38 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
         await 화주운송의뢰매퍼.UpsertCargoRequirementAsync(_db, entity, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
+        if (ShouldCreateFareComposition(request))
+        {
+            var fareComposition = new 운임구성
+            {
+                의뢰Id = entity.의뢰Id,
+                기본운임 = request.기본운임 ?? 0m,
+                거리운임 = request.거리운임 ?? 0m,
+                할증 = request.할증 ?? 0m,
+                대기료 = request.대기료 ?? 0m,
+                수작업비 = request.수작업비 ?? 0m,
+                최종운임 = entity.최종운임 ?? 0m,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _db.운임구성.AddAsync(fareComposition, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
+
+            entity.운임구성Id = fareComposition.Id;
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+
         return Result.Ok(화주운송의뢰매퍼.To응답(entity));
     }
+
+    private static bool ShouldCreateFareComposition(의뢰생성Command request)
+        => request.최종운임.HasValue
+           || request.기본운임.HasValue
+           || request.거리운임.HasValue
+           || request.최소운임.HasValue
+           || request.Km당단가.HasValue
+           || request.예상거리Km.HasValue;
 
     private static string GetSettlementStatus(정산시점 settlementTime, 증빙방식? evidenceMethod)
     {

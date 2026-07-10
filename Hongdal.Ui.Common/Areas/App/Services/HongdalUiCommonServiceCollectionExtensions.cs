@@ -8,6 +8,7 @@ public static class HongdalUiCommonServiceCollectionExtensions
     {
         services.AddScoped<HongdalIsmsPClientEncryptionService>();
         services.AddScoped<HongdalProtectedApiClient>();
+        services.AddSingleton<IHongdalIdentifierCodeGenerator, ZxingHongdalIdentifierCodeGenerator>();
         return services;
     }
 }

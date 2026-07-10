@@ -49,7 +49,6 @@ public static class ShipperServiceCollectionExtensions
     private static IServiceCollection AddShipperOptions(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
-        services.Configure<FoodApiOptions>(configuration.GetSection(FoodApiOptions.SectionName));
         services.Configure<CoupangWingOptions>(configuration.GetSection(CoupangWingOptions.SectionName));
         services.Configure<NaverCommerceOptions>(configuration.GetSection(NaverCommerceOptions.SectionName));
 

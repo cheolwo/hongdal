@@ -14,6 +14,7 @@ using 홍달.Services.Payments;
 using 홍달.Services.Sales;
 using 홍달.Services.Versioning;
 using Hongdal.Services.Auth;
+using Hongdal.Services.Food;
 using Hongdal.Services.Orderer;
 
 namespace Hongdal.Extensions;
@@ -41,6 +42,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I공동구매해외선적통관동기화Service, 공동구매해외선적통관동기화Service>();
         services.AddSingleton<I공동구매수입물류정규화Service, 공동구매수입물류정규화Service>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
+        services.AddSingleton<IHongdalFoodOrderStore, InMemoryHongdalFoodOrderStore>();
+        services.AddSingleton<배차주소Store>();
+        services.AddScoped<I음식점주문실시간알림Service, 음식점주문SignalR알림Service>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
         services.AddSingleton<IDriverLocationStore, DriverLocationStore>();
@@ -82,6 +86,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I기사알림UseCase, 기사알림UseCase>();
         services.AddScoped<I기사운송일정구성Service, 기사운송일정구성Service>();
         services.AddScoped<I운송일정삽입평가Service, 운송일정삽입평가Service>();
+        services.AddScoped<I픽업하차경로최적화Service, 픽업하차경로최적화Service>();
+        services.AddScoped<I음식멀티배차조합Service, 음식멀티배차조합Service>();
         services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
         services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
         services.AddSingleton<I배달권실행공간Store, InMemory배달권실행공간Store>();
@@ -108,6 +114,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<Hongdal.Application.Shipper.Request.I차량추천Service, Hongdal.Application.Shipper.Request.차량추천Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰추천Service, Hongdal.Application.Shipper.Request.화주운송의뢰추천Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰일괄등록파서Service, Hongdal.Application.Shipper.Request.화주운송의뢰일괄등록파서Service>();
+        services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송기준운임Service, Hongdal.Application.Shipper.Request.화주운송기준운임Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송요금정책검토Service, Hongdal.Application.Shipper.Request.화주운송요금정책검토Service>();
         services.AddScoped<Hongdal.Application.Shipper.Request.I화주운송의뢰UseCase, Hongdal.Application.Shipper.Request.화주운송의뢰UseCase>();
         services.AddScoped<I판매상품샘플시드Service, 판매상품샘플시드Service>();

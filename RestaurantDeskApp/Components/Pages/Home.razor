@@ -1,7 +1,11 @@
 @page "/"
-@using RestaurantDeskApp.Models.Restaurant
+@implements IAsyncDisposable
 @inject RestaurantDeskSampleService SampleService
-@inject I주문알림Service OrderAlertService
+@inject I음식점주문DeskService OrderDeskService
+@inject I음식점주문SignalRClientService RestaurantRealtimeService
+@inject IHongdalDocumentOutputService DocumentOutputService
+@inject IOptions<RestaurantDeskOptions> DeskOptions
+@inject IJSRuntime JS
 
 <PageTitle>주문 대시보드</PageTitle>
 
@@ -14,64 +18,109 @@
         <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
             <MudStack Spacing="0">
                 <MudText Typo="Typo.h4">음식점 주문 데스크</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">신규 주문 알림, 가까운 상점 흐름, 리뷰 운영을 데스크톱에서 바로 확인합니다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">실시간 주문 수신, 주문 수락, 열전사 전표 출력을 한 화면에서 처리합니다.</MudText>
             </MudStack>
-            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="SimulateOrderAlertAsync">신규 주문 알림 재생</MudButton>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudChip T="string" Color="@GetRealtimeStatusColor()" Variant="Variant.Outlined">@realtimeStatus</MudChip>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Error"
+                           StartIcon="@Icons.Material.Filled.NotificationsActive"
+                           OnClick="SimulateOrderAlertAsync"
+                           Disabled="@isBusy">
+                    수신 테스트
+                </MudButton>
+            </MudStack>
         </MudStack>
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
-            <MudAlert Severity="Severity.Success">@message</MudAlert>
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
         }
 
         <MudGrid>
-            <MudItem xs="12" md="5">
+            <MudItem xs="12" md="7">
                 <MudCard Elevation="2">
                     <MudCardContent>
-                        <MudText Typo="Typo.h6" Class="mb-3">신규 주문 수신함</MudText>
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+                            <MudText Typo="Typo.h6">신규 주문 수신함</MudText>
+                            <MudChip T="string" Color="Color.Error" Variant="Variant.Filled">@orders.Count(x => x.미확인)건 대기</MudChip>
+                        </MudStack>
+
                         @foreach (var order in orders)
                         {
                             <MudPaper Elevation="0" Class="pa-3 mb-2">
-                                <MudStack Row="true" Justify="Justify.SpaceBetween">
-                                    <div>
-                                        <MudText Typo="Typo.subtitle2">@order.주문번호</MudText>
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start">
+                                    <MudStack Spacing="1">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                            <MudText Typo="Typo.subtitle2">@order.주문번호</MudText>
+                                            <MudChip T="string" Size="Size.Small" Color="@GetStatusColor(order.상태)">@order.상태</MudChip>
+                                        </MudStack>
                                         <MudText Typo="Typo.body2">@order.고객명 · @order.메뉴요약</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@order.접수시각.ToString("HH:mm") 접수</MudText>
-                                    </div>
-                                    <MudChip T="string" Color="@(order.미확인 ? Color.Error : Color.Success)">@((order.미확인 ? "미확인" : "확인"))</MudChip>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @order.접수시각.ToLocalTime().ToString("HH:mm") 접수 · @order.주문금액.ToString("N0")원
+                                        </MudText>
+                                        @if (!string.IsNullOrWhiteSpace(order.최근메시지))
+                                        {
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@order.최근메시지</MudText>
+                                        }
+                                    </MudStack>
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.ReceiptLong"
+                                                   OnClick="@(() => AcceptAndPrintAsync(order.주문번호))"
+                                                   Disabled="@(!order.수락가능 || IsProcessing(order.주문번호))">
+                                            주문 수락
+                                        </MudButton>
+                                    </MudStack>
                                 </MudStack>
                             </MudPaper>
                         }
                     </MudCardContent>
                 </MudCard>
             </MudItem>
-            <MudItem xs="12" md="7">
+            <MudItem xs="12" md="5">
                 <MudCard Elevation="2">
                     <MudCardContent>
-                        <MudText Typo="Typo.h6" Class="mb-3">운영 요약</MudText>
+                        <MudText Typo="Typo.h6" Class="mb-3">주문 처리 흐름</MudText>
+                        <MudTimeline TimelineOrientation="TimelineOrientation.Vertical">
+                            <MudTimelineItem Color="Color.Error" Icon="@Icons.Material.Filled.Notifications">
+                                <MudText Typo="Typo.subtitle2">실시간 수신</MudText>
+                                <MudText Typo="Typo.body2">서버가 보낸 주문번호를 대기 주문으로 등록합니다.</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem Color="Color.Primary" Icon="@Icons.Material.Filled.CheckCircle">
+                                <MudText Typo="Typo.subtitle2">음식점 수락</MudText>
+                                <MudText Typo="Typo.body2">수락 시점에 Hongdal 서버에서 주문 상세를 다시 조회합니다.</MudText>
+                            </MudTimelineItem>
+                            <MudTimelineItem Color="Color.Success" Icon="@Icons.Material.Filled.Print">
+                                <MudText Typo="Typo.subtitle2">전표 출력</MudText>
+                                <MudText Typo="Typo.body2">80mm 영수증형 전표에 주문번호와 품목 바코드를 포함합니다.</MudText>
+                            </MudTimelineItem>
+                        </MudTimeline>
+
+                        <MudDivider Class="my-3" />
                         <MudGrid>
                             <MudItem xs="12" sm="4">
-                                <MudPaper Class="pa-4">
+                                <MudPaper Class="pa-3">
                                     <MudText Typo="Typo.caption">가까운 음식점</MudText>
-                                    <MudText Typo="Typo.h4">@nearbyRestaurants.Count</MudText>
+                                    <MudText Typo="Typo.h5">@nearbyRestaurants.Count</MudText>
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="12" sm="4">
-                                <MudPaper Class="pa-4">
+                                <MudPaper Class="pa-3">
                                     <MudText Typo="Typo.caption">인기 음식점</MudText>
-                                    <MudText Typo="Typo.h4">@popularRestaurants.Count</MudText>
+                                    <MudText Typo="Typo.h5">@popularRestaurants.Count</MudText>
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="12" sm="4">
-                                <MudPaper Class="pa-4">
-                                    <MudText Typo="Typo.caption">리뷰 운영 대상</MudText>
-                                    <MudText Typo="Typo.h4">@reviewModerationItems.Count(x => x.같은음식점기준저평점3회연속여부)</MudText>
+                                <MudPaper Class="pa-3">
+                                    <MudText Typo="Typo.caption">리뷰 운영</MudText>
+                                    <MudText Typo="Typo.h5">@reviewModerationItems.Count(x => x.같은음식점기준저평점3회연속여부)</MudText>
                                 </MudPaper>
                             </MudItem>
                         </MudGrid>
-                        <MudDivider Class="my-3" />
-                        <MudText Typo="Typo.body2">관리자 기본 게시 정책: 저평점 리뷰 @(policy.기본저평점게시일수)일 공개</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">같은 음식점에서 1~2점 사진 리뷰가 3회 연속이면 관리자 운영 대상으로 올립니다.</MudText>
+                        <MudText Typo="Typo.body2" Class="mt-3">관리자 기본 게시 정책: 저평점 리뷰 @(policy.기본저평점게시일수)일 공개</MudText>
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -81,12 +130,18 @@
 </PlatformCommunityHome>
 
 @code {
-    private IReadOnlyList<주문알림항목> orders = [];
+    private IReadOnlyList<음식점주문DeskItem> orders = [];
     private IReadOnlyList<음식점요약응답> nearbyRestaurants = [];
     private IReadOnlyList<음식점요약응답> popularRestaurants = [];
     private IReadOnlyList<음식점리뷰관리항목응답> reviewModerationItems = [];
     private 음식점리뷰운영정책응답 policy = new();
     private string? message;
+    private Severity messageSeverity = Severity.Success;
+    private bool isBusy;
+    private string? processingOrderNo;
+    private int simulatedOrderIndex;
+    private string realtimeStatus = "실시간 연결 대기";
+
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [
         new("주문 대시보드", "신규 주문과 운영 요약을 확인합니다.", "/", Icons.Material.Filled.Dashboard, Color.Primary),
@@ -95,18 +150,165 @@
         new("리뷰 운영", "저평점 사진 리뷰와 게시 정책을 관리합니다.", "/reviews/moderation", Icons.Material.Filled.RateReview, Color.Warning)
     ];
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        orders = SampleService.Get신규주문목록();
         nearbyRestaurants = SampleService.Get가까운음식점목록();
         popularRestaurants = SampleService.Get인기음식점목록();
         reviewModerationItems = SampleService.Get리뷰운영목록();
         policy = SampleService.Get운영정책();
+        RestaurantRealtimeService.주문수신 += HandleRealtimeOrderReceivedAsync;
+        RestaurantRealtimeService.상태변경 += HandleRealtimeStatusChangedAsync;
+        await ReloadOrdersAsync();
+        await ConnectRealtimeAsync();
     }
 
     private async Task SimulateOrderAlertAsync()
     {
-        await OrderAlertService.신규주문알림재생Async();
-        message = "신규 주문 알림을 재생했습니다. 데스크톱 스피커 연동 지점을 이 서비스에 확장할 수 있습니다.";
+        var samples = SampleService.Get음식주문목록();
+        if (samples.Count == 0)
+        {
+            return;
+        }
+
+        var sample = samples[simulatedOrderIndex % samples.Count];
+        simulatedOrderIndex++;
+
+        await OrderDeskService.주문알림수신Async(new 음식점주문수신Payload
+        {
+            주문번호 = sample.주문번호,
+            음식점Id = sample.음식점Id,
+            고객명 = sample.수령인정보.수령인명,
+            메뉴요약 = BuildMenuSummary(sample),
+            주문금액 = sample.총주문금액,
+            제목 = "신규 음식 주문",
+            본문 = "실시간 신규 주문 수신"
+        });
+
+        messageSeverity = Severity.Success;
+        message = $"{sample.주문번호} 주문을 대기 상태로 수신했습니다.";
+        await ReloadOrdersAsync();
+    }
+
+    private async Task AcceptAndPrintAsync(string orderNo)
+    {
+        isBusy = true;
+        processingOrderNo = orderNo;
+        message = null;
+
+        try
+        {
+            var result = await OrderDeskService.주문수락후전표준비Async(orderNo);
+            if (!result.성공 || result.전표Draft is null)
+            {
+                messageSeverity = Severity.Error;
+                message = result.메시지;
+                return;
+            }
+
+            var output = DocumentOutputService.CreateOutboundExpectedItems(result.전표Draft);
+            await JS.InvokeVoidAsync("hongdalDocumentOutput.printHtml", output.Title, output.Html);
+            await OrderDeskService.전표출력완료Async(orderNo);
+
+            messageSeverity = Severity.Success;
+            message = $"{orderNo} 주문을 수락하고 전표 출력 요청을 보냈습니다.";
+        }
+        finally
+        {
+            isBusy = false;
+            processingOrderNo = null;
+            await ReloadOrdersAsync();
+        }
+    }
+
+    private async Task ReloadOrdersAsync()
+    {
+        orders = await OrderDeskService.주문목록조회Async();
+    }
+
+    private async Task ConnectRealtimeAsync()
+    {
+        try
+        {
+            await RestaurantRealtimeService.연결Async(DeskOptions.Value.RestaurantId);
+            realtimeStatus = $"실시간 연결됨 · 음식점 {DeskOptions.Value.RestaurantId}";
+        }
+        catch (Exception ex)
+        {
+            realtimeStatus = "실시간 연결 실패";
+            messageSeverity = Severity.Warning;
+            message = $"음식점 주문 실시간 연결에 실패했습니다. {ex.Message}";
+        }
+    }
+
+    private async Task HandleRealtimeOrderReceivedAsync(음식점주문수신알림 notification)
+    {
+        await InvokeAsync(async () =>
+        {
+            await OrderDeskService.주문알림수신Async(new 음식점주문수신Payload
+            {
+                주문번호 = notification.주문번호,
+                음식점Id = notification.음식점Id,
+                고객명 = notification.고객명,
+                메뉴요약 = notification.메뉴요약,
+                주문금액 = notification.주문금액,
+                수신시각 = notification.수신시각,
+                제목 = notification.제목,
+                본문 = notification.본문
+            });
+
+            messageSeverity = Severity.Success;
+            message = $"{notification.주문번호} 주문 알림을 서버에서 수신했습니다.";
+            await ReloadOrdersAsync();
+            StateHasChanged();
+        });
+    }
+
+    private async Task HandleRealtimeStatusChangedAsync(string status)
+    {
+        await InvokeAsync(() =>
+        {
+            realtimeStatus = status;
+            StateHasChanged();
+        });
+    }
+
+    private bool IsProcessing(string orderNo)
+    {
+        return isBusy && string.Equals(processingOrderNo, orderNo, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static Color GetStatusColor(string status)
+    {
+        return status switch
+        {
+            음식점주문Desk상태코드.주문대기 => Color.Error,
+            음식점주문Desk상태코드.수락처리중 => Color.Info,
+            음식점주문Desk상태코드.수락됨 => Color.Primary,
+            음식점주문Desk상태코드.전표출력됨 => Color.Success,
+            음식점주문Desk상태코드.상세조회실패 => Color.Warning,
+            _ => Color.Default
+        };
+    }
+
+    private Color GetRealtimeStatusColor()
+    {
+        return RestaurantRealtimeService.연결상태 switch
+        {
+            "Connected" => Color.Success,
+            "Reconnecting" => Color.Warning,
+            _ => Color.Default
+        };
+    }
+
+    private static string BuildMenuSummary(음식주문응답 order)
+    {
+        return string.Join(", ", order.상품목록.Select(x => $"{x.상품명} {x.수량}"));
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        RestaurantRealtimeService.주문수신 -= HandleRealtimeOrderReceivedAsync;
+        RestaurantRealtimeService.상태변경 -= HandleRealtimeStatusChangedAsync;
+        return ValueTask.CompletedTask;
     }
 }

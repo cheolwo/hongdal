@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Hongdal.Ui.Common.Areas.App.Services;
 using MudBlazor.Services;
 using RestaurantDeskApp.Options;
@@ -14,12 +15,31 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>();
 
-        builder.Services.Configure<FoodApiOptions>(builder.Configuration.GetSection(FoodApiOptions.SectionName));
+        builder.Services.Configure<RestaurantDeskOptions>(builder.Configuration.GetSection(RestaurantDeskOptions.SectionName));
+        builder.Services.Configure<RestaurantOrderAlertOptions>(builder.Configuration.GetSection(RestaurantOrderAlertOptions.SectionName));
         builder.Services.AddSingleton<RestaurantDeskSampleService>();
         builder.Services.AddSingleton<I주문알림Service, 주문알림Service>();
+        builder.Services.AddSingleton<I음식점주문SignalRClientService, 음식점주문SignalRClientService>();
         builder.Services.AddHongdalUiCommonAppServices();
+        builder.Services.AddHongdalDocumentOutputServices();
+        builder.Services.AddHttpClient<I음식주문ApiClient, Hongdal음식주문Client>();
+        builder.Services.AddSingleton<음식점전표DraftFactory>();
+        builder.Services.AddSingleton<I음식점주문DeskService, 음식점주문DeskService>();
         builder.Services.AddScoped<배차주소ApiService>();
-        builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7117/") });
+        builder.Services.AddScoped(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<RestaurantDeskOptions>>().Value;
+            var baseUrl = string.IsNullOrWhiteSpace(options.ServerBaseUrl)
+                ? "https://localhost:7117/"
+                : options.ServerBaseUrl.Trim();
+
+            if (!baseUrl.EndsWith('/'))
+            {
+                baseUrl += "/";
+            }
+
+            return new HttpClient { BaseAddress = new Uri(baseUrl) };
+        });
         builder.Services.AddScoped<PlatformCommunityService>();
         builder.Services.AddScoped<PlatformHomeModeStateService>();
         builder.Services.AddMudServices();

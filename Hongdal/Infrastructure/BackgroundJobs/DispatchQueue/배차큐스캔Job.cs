@@ -12,23 +12,27 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
         private readonly HongdalContext _db;
         private readonly I배차대기원장전환Service _원장전환Service;
         private readonly 배차큐배치작업Options _options;
+        private readonly 배차큐정책Options _queuePolicyOptions;
         private readonly ILogger<배차큐스캔Job> _logger;
 
         public 배차큐스캔Job(
             HongdalContext db,
             I배차대기원장전환Service 원장전환Service,
             Microsoft.Extensions.Options.IOptions<배차큐배치작업Options> options,
+            Microsoft.Extensions.Options.IOptions<배차큐정책Options> queuePolicyOptions,
             ILogger<배차큐스캔Job> logger)
         {
             _db = db;
             _원장전환Service = 원장전환Service;
             _options = options.Value;
+            _queuePolicyOptions = queuePolicyOptions.Value;
             _logger = logger;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
             var cancellationToken = context.CancellationToken;
+            var 자동공개전환Count = await 공개전환기한초과처리Async(cancellationToken);
 
             var plannedIds = await _db.배차대기.AsNoTracking()
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
@@ -73,13 +77,68 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
                                  && x.배차노출상태 == 상태값.배차노출상태.추천대기,
                     cancellationToken);
 
-            _logger.LogDebug("Action={Action} PlannedCount={PlannedCount} RecommendWaitingCount={RecommendWaitingCount} CargoWaitingCount={CargoWaitingCount} FoodWaitingCount={FoodWaitingCount} OccurredAt={OccurredAt}",
+            _logger.LogDebug("Action={Action} AutoPublicCount={AutoPublicCount} PlannedCount={PlannedCount} RecommendWaitingCount={RecommendWaitingCount} CargoWaitingCount={CargoWaitingCount} FoodWaitingCount={FoodWaitingCount} OccurredAt={OccurredAt}",
                 "DispatchQueueScanned",
+                자동공개전환Count,
                 plannedIds.Count,
                 recommendWaitingIds.Count,
                 cargoWaitingCount,
                 foodWaitingCount,
                 DateTime.UtcNow);
+        }
+
+        private async Task<int> 공개전환기한초과처리Async(CancellationToken cancellationToken)
+        {
+            if (_queuePolicyOptions.당일미배정공개전환분 <= 0)
+            {
+                return 0;
+            }
+
+            var now = DateTime.UtcNow;
+            var immediateDeadline = now.AddMinutes(-_queuePolicyOptions.당일미배정공개전환분);
+            var scanLimit = Math.Max(_options.처리배치크기, _options.처리배치크기 * 5);
+
+            var candidates = await (
+                from queue in _db.배차대기.AsNoTracking()
+                join request in _db.화주운송의뢰.AsNoTracking()
+                    on queue.의뢰Id equals request.의뢰Id into requestGroup
+                from request in requestGroup.DefaultIfEmpty()
+                where queue.상태 == 상태값.배차대기상태.대기
+                      && queue.배차업무유형 == 상태값.배차업무유형.용달운송
+                      && queue.배차큐단계 != 상태값.배차큐단계.공개배차
+                      && queue.배차큐단계 != 상태값.배차큐단계.확정
+                      && queue.배차큐단계 != 상태값.배차큐단계.종료
+                      && queue.배차노출상태 != 상태값.배차노출상태.공개중
+                      && queue.확정기사Id == null
+                      && queue.CreatedAt <= immediateDeadline
+                orderby queue.CreatedAt
+                select new
+                {
+                    queue.의뢰Id,
+                    queue.CreatedAt,
+                    상차시간창시작Utc = request == null ? (DateTime?)null : request.픽업_시간창_시작일시
+                })
+                .Take(scanLimit)
+                .ToListAsync(cancellationToken);
+
+            var overdueRequestIds = candidates
+                .Where(x => 배차공개전환시점정책.공개전환대상(
+                    now,
+                    x.CreatedAt,
+                    x.상차시간창시작Utc,
+                    _queuePolicyOptions.당일미배정공개전환분,
+                    _queuePolicyOptions.예약상차전공개전환시간,
+                    _queuePolicyOptions.예약최소추천유지분))
+                .Select(x => x.의뢰Id)
+                .Take(_options.처리배치크기)
+                .ToArray();
+
+            foreach (var requestId in overdueRequestIds)
+            {
+                await _원장전환Service.공개배차로전환Async(requestId, cancellationToken);
+            }
+
+            return overdueRequestIds.Length;
         }
     }
 }

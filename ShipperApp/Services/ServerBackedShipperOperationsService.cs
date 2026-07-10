@@ -90,10 +90,19 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
                ?? [];
     }
 
-    public Task<decimal> EstimateFareAsync(string vehicleType, decimal distanceKm, CancellationToken cancellationToken = default)
+    public async Task<decimal> EstimateFareAsync(string vehicleType, decimal distanceKm, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        throw new NotSupportedException("서버 운임 견적 API가 아직 연결되지 않았습니다. 기준운임은 서버 전용 견적 API가 마련된 뒤 계산할 수 있습니다.");
+        var response = await PostAuthorizedJsonAsync<화주운송기준운임견적요청, 화주운송기준운임견적응답>(
+            "api/v1/shipper/requests/fare-estimate",
+            new 화주운송기준운임견적요청
+            {
+                차량종류 = vehicleType,
+                예상거리Km = distanceKm
+            },
+            cancellationToken);
+
+        return response?.최종운임
+            ?? throw new InvalidOperationException("서버 기준운임 견적 응답이 비어 있습니다.");
     }
 
     public async Task AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
@@ -171,7 +180,8 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 
     private 화주운송의뢰생성요청 ToCreateRequest(ShipperRequestItem source)
     {
-        var amount = source.결제예정금액 ?? decimal.ToInt32(source.기준운임 ?? source.기사지급예정운임 ?? 0m);
+        var amount = source.결제예정금액
+            ?? (source.기준운임.HasValue ? decimal.ToInt32(source.기준운임.Value) : null);
         var pickupAddress = string.IsNullOrWhiteSpace(source.픽업지) ? "상차지 미정" : source.픽업지!;
         var dropoffAddress = string.IsNullOrWhiteSpace(source.하차지) ? "하차지 미정" : source.하차지!;
         var now = DateTime.UtcNow;
@@ -203,7 +213,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
                 서비스레벨 = "standard",
                 요청사항 = "ShipperApp 서버 API 생성",
                 예상거리Km = source.예상거리Km,
-                기본운임 = source.기준운임,
+                최종운임 = source.기준운임,
                 기사지급예정운임 = source.기사지급예정운임,
                 알선정책 = new 화주운송알선정책DTO
                 {

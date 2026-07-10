@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
+using Hongdal.Contracts.Food;
 using Hongdal.Ui.Common.Areas.App.Services;
-using RestaurantDeskApp.Models.Restaurant;
 
 namespace RestaurantDeskApp.Services;
 
@@ -15,7 +15,7 @@ public sealed class 배차주소ApiService(HongdalProtectedApiClient protectedAp
             throw new InvalidOperationException($"배차주소 저장 실패: {(int)response.StatusCode} {error}");
         }
 
-        var payload = await response.Content.ReadFromJsonAsync<저장응답>(cancellationToken: cancellationToken);
+        var payload = await response.Content.ReadFromJsonAsync<배차주소저장응답>(cancellationToken: cancellationToken);
         return new 배차주소저장결과
         {
             메시지 = payload?.메시지 ?? "저장 완료",
@@ -35,12 +35,4 @@ public sealed class 배차주소ApiService(HongdalProtectedApiClient protectedAp
         public double? 하차지경도 { get; set; }
     }
 
-    private sealed class 저장응답
-    {
-        public string 메시지 { get; set; } = string.Empty;
-        public double? 상차지위도 { get; set; }
-        public double? 상차지경도 { get; set; }
-        public double? 하차지위도 { get; set; }
-        public double? 하차지경도 { get; set; }
-    }
 }

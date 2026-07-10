@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Hongdal.Domain\Hongdal.Domain.csproj" />
     <ProjectReference Include="..\Hongdal\Hongdal.csproj" />
+    <ProjectReference Include="..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

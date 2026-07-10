@@ -270,6 +270,7 @@ app.UseMiddleware<HrRoleAccessMiddleware>();
 app.UseMiddleware<사용자행위로그Middleware>();
 app.MapControllers();
 app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
+app.MapHub<RestaurantOrderHub>("/hubs/restaurant-orders");
 
 app.Run();
 

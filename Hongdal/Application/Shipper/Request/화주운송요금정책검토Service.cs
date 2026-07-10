@@ -73,7 +73,7 @@ public sealed class 화주운송요금정책검토Service : I화주운송요금�
 
         if (!pricing.기본운임.HasValue && !distanceFare.HasValue && !pricing.최소운임.HasValue)
         {
-            return null;
+            return pricing.최종운임;
         }
 
         var subtotal =

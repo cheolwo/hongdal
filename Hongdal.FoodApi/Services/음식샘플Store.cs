@@ -40,33 +40,7 @@ public sealed class 음식샘플Store
             new 음식점리뷰관리항목응답 { 리뷰Id = 7001, 음식점Id = 103, 음식점명 = "가양국수", 주문자UserId = "orderer-a", 주문번호 = "FOOD-10001", 별점 = 1, 내용 = "면이 불고 사진과 다르게 나왔습니다.", 사진포함여부 = true, 같은음식점기준저평점3회연속여부 = true, 사장노출허용여부 = false, 관리자게시강제여부 = true, 현재노출여부 = true, CreatedAt = DateTime.UtcNow.AddDays(-1), 게시종료일시Utc = DateTime.UtcNow.AddDays(2), 최근조치사유 = "같은 음식점 기준 1~2점 사진 리뷰 3회 연속" }
         ];
 
-        _orders =
-        [
-            new 음식주문
-            {
-                주문번호 = "FOOD-20260701-001",
-                음식점Id = 101,
-                주문자UserId = "orderer-a",
-                수령인정보 = new 음식주문수령인정보 { 수령인명 = "홍길동", 연락처 = "010-1234-5678", 주소 = "서울 강서구 화곡동 100", 상세주소 = "101호", 요청사항 = "문 앞에 두고 벨 눌러주세요.", 주문자본인수령여부 = true },
-                상품목록 = [new 음식주문상품 { 상품명 = "제육덮밥", 수량 = 2, 단가 = 9500m }],
-                총주문금액 = 19000m,
-                상태 = "주문접수",
-                결제수단 = "카드",
-                CreatedAt = DateTime.UtcNow.AddMinutes(-20)
-            },
-            new 음식주문
-            {
-                주문번호 = "FOOD-20260701-002",
-                음식점Id = 102,
-                주문자UserId = "orderer-b",
-                수령인정보 = new 음식주문수령인정보 { 수령인명 = "김부모", 연락처 = "010-4444-1111", 주소 = "서울 양천구 목동 200", 상세주소 = "1203호", 요청사항 = "경비실 전달", 주문자본인수령여부 = false },
-                상품목록 = [new 음식주문상품 { 상품명 = "돈까스", 수량 = 1, 단가 = 11000m }, new 음식주문상품 { 상품명 = "우동", 수량 = 1, 단가 = 8000m }],
-                총주문금액 = 19000m,
-                상태 = "배차대기",
-                결제수단 = "간편결제",
-                CreatedAt = DateTime.UtcNow.AddMinutes(-8)
-            }
-        ];
+        _orders = FoodOrderSampleData.CreateOrders().Select(MapSampleOrder).ToList();
 
         _policy = new 음식점리뷰운영정책응답
         {
@@ -181,6 +155,35 @@ public sealed class 음식샘플Store
     public 음식점요약응답? 음식점조회(long 음식점Id)
     {
         return _restaurants.FirstOrDefault(x => x.Id == 음식점Id);
+    }
+
+    private static 음식주문 MapSampleOrder(음식주문응답 order)
+    {
+        return new 음식주문
+        {
+            주문번호 = order.주문번호,
+            음식점Id = order.음식점Id,
+            주문자UserId = order.주문자UserId,
+            수령인정보 = new 음식주문수령인정보
+            {
+                수령인명 = order.수령인정보.수령인명,
+                연락처 = order.수령인정보.연락처,
+                주소 = order.수령인정보.주소,
+                상세주소 = order.수령인정보.상세주소,
+                요청사항 = order.수령인정보.요청사항,
+                주문자본인수령여부 = order.수령인정보.주문자본인수령여부
+            },
+            상품목록 = order.상품목록.Select(x => new 음식주문상품
+            {
+                상품명 = x.상품명,
+                수량 = x.수량,
+                단가 = x.단가
+            }).ToList(),
+            총주문금액 = order.총주문금액,
+            상태 = order.상태,
+            결제수단 = order.결제수단,
+            CreatedAt = order.CreatedAt
+        };
     }
 
     private static 음식주문응답 MapOrder(음식주문 order)

@@ -13,6 +13,15 @@ namespace 홍달.Services.External.Naver
             decimal goalLng,
             string? option = null,
             CancellationToken cancellationToken = default);
+
+        Task<NaverCloudDrivingRoute?> GetDrivingRouteAsync(
+            decimal startLat,
+            decimal startLng,
+            decimal goalLat,
+            decimal goalLng,
+            IReadOnlyList<NaverCloudRouteWaypoint> waypoints,
+            string? option = null,
+            CancellationToken cancellationToken = default);
     }
 
     public sealed class NaverCloudDirectionsService : INaverCloudDirectionsService
@@ -34,16 +43,52 @@ namespace 홍달.Services.External.Naver
             string? option = null,
             CancellationToken cancellationToken = default)
         {
+            return await GetDrivingRouteAsync(
+                startLat,
+                startLng,
+                goalLat,
+                goalLng,
+                [],
+                option,
+                cancellationToken);
+        }
+
+        public async Task<NaverCloudDrivingRoute?> GetDrivingRouteAsync(
+            decimal startLat,
+            decimal startLng,
+            decimal goalLat,
+            decimal goalLng,
+            IReadOnlyList<NaverCloudRouteWaypoint> waypoints,
+            string? option = null,
+            CancellationToken cancellationToken = default)
+        {
             if (string.IsNullOrWhiteSpace(_options.ApiKeyId) || string.IsNullOrWhiteSpace(_options.ApiKey))
             {
                 return null;
             }
 
-            var start = FormattableString.Invariant($"{startLng},{startLat}");
-            var goal = FormattableString.Invariant($"{goalLng},{goalLat}");
+            if (waypoints.Count > 5)
+            {
+                throw new ArgumentOutOfRangeException(nameof(waypoints), waypoints.Count, "Directions5는 경유지를 최대 5개까지 허용합니다.");
+            }
+
+            var start = FormatPosition(startLat, startLng);
+            var goal = FormatPosition(goalLat, goalLng);
             var routeOption = string.IsNullOrWhiteSpace(option) ? _options.DefaultOption : option.Trim();
 
-            var requestUrl = $"{_options.Path.TrimStart('/')}?start={Uri.EscapeDataString(start)}&goal={Uri.EscapeDataString(goal)}&option={Uri.EscapeDataString(routeOption)}";
+            var query = new List<string>
+            {
+                $"start={Uri.EscapeDataString(start)}",
+                $"goal={Uri.EscapeDataString(goal)}",
+                $"option={Uri.EscapeDataString(routeOption)}"
+            };
+            if (waypoints.Count > 0)
+            {
+                var waypointValue = string.Join("|", waypoints.Select(x => FormatPosition(x.Latitude, x.Longitude)));
+                query.Add($"waypoints={Uri.EscapeDataString(waypointValue)}");
+            }
+
+            var requestUrl = $"{_options.Path.TrimStart('/')}?{string.Join("&", query)}";
 
             using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
             request.Headers.TryAddWithoutValidation("x-ncp-apigw-api-key-id", _options.ApiKeyId);
@@ -62,6 +107,9 @@ namespace 홍달.Services.External.Naver
 
             return route;
         }
+
+        private static string FormatPosition(decimal latitude, decimal longitude)
+            => FormattableString.Invariant($"{longitude},{latitude}");
 
         private static bool TryGetRouteSummary(JsonElement root, out NaverCloudDrivingRoute route)
         {
@@ -122,6 +170,8 @@ namespace 홍달.Services.External.Naver
             return element.TryGetProperty(propertyName, out var valueElement) ? valueElement.GetString() : null;
         }
     }
+
+    public sealed record NaverCloudRouteWaypoint(decimal Latitude, decimal Longitude);
 
     public sealed class NaverCloudDrivingRoute
     {

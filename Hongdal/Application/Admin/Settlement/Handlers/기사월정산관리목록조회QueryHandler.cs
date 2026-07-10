@@ -1,15 +1,18 @@
 using Hongdal.Contracts.Admin.Settlement;
+using Microsoft.Extensions.Options;
+using 홍달.Services.Options;
 
 namespace Hongdal.Application.Admin.Settlement;
 
 public sealed class 기사월정산관리목록조회QueryHandler : IRequestHandler<기사월정산관리목록조회Query, IReadOnlyList<기사월정산관리응답>>
 {
-    private const decimal 월상한금액 = 5000m;
     private readonly HongdalContext _db;
+    private readonly 기사이용료정책Options _policy;
 
-    public 기사월정산관리목록조회QueryHandler(HongdalContext db)
+    public 기사월정산관리목록조회QueryHandler(HongdalContext db, IOptions<기사이용료정책Options> policy)
     {
         _db = db;
+        _policy = policy.Value;
     }
 
     public async Task<IReadOnlyList<기사월정산관리응답>> Handle(기사월정산관리목록조회Query request, CancellationToken cancellationToken)
@@ -17,6 +20,7 @@ public sealed class 기사월정산관리목록조회QueryHandler : IRequestHand
         var now = DateTime.UtcNow;
         var targetYear = request.Year ?? now.Year;
         var targetMonth = request.Month ?? now.Month;
+        var monthlyFeeCap = _policy.적용월상한이용료;
 
         var query = _db.기사월정산.AsNoTracking().Where(x => x.년도 == targetYear && x.월 == targetMonth);
 
@@ -35,7 +39,7 @@ public sealed class 기사월정산관리목록조회QueryHandler : IRequestHand
                 월 = x.월,
                 배차건수 = x.배차건수,
                 이용료 = x.이용료,
-                월상한적용여부 = x.이용료 >= 월상한금액,
+                월상한적용여부 = monthlyFeeCap > 0m && x.이용료 >= monthlyFeeCap,
                 결제완료 = x.결제완료,
                 UpdatedAt = x.UpdatedAt
             })

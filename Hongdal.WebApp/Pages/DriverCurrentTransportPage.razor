@@ -4,10 +4,17 @@
 
 <WebPageHeader Eyebrow="Driver Web"
                Title="진행 중 운송"
-               Description="현재 운송의 다음 행동을 확인하고 상차/하차 증빙 화면으로 이어지는 흐름을 검증합니다."
+               Description="추천 수락 이후 생성된 현재 운송의 다음 행동을 확인하고 상차/하차 증빙 화면으로 이어갑니다."
                Badge="현재 운송 API" />
 
 <MudStack Spacing="3">
+    @if (HasAcceptedRequestContext)
+    {
+        <MudAlert Severity="@(IsWaitingForAcceptedTransport ? Severity.Info : IsAcceptedRequestLoaded ? Severity.Success : Severity.Warning)" Dense="true" Variant="Variant.Outlined">
+            @AcceptedTransportGuideText
+        </MudAlert>
+    }
+
     @if (!string.IsNullOrWhiteSpace(StatusMessage))
     {
         <MudAlert Severity="@StatusSeverity" Variant="Variant.Outlined">
@@ -178,11 +185,29 @@
 </MudStack>
 
 @code {
+    private const int AcceptedTransportRetryCount = 5;
+    private static readonly TimeSpan AcceptedTransportRetryDelay = TimeSpan.FromMilliseconds(700);
+
+    [SupplyParameterFromQuery(Name = "acceptedRequestId")]
+    public string? AcceptedRequestId { get; set; }
+
     private 기사운송요약응답? CurrentTransport { get; set; }
     private bool IsBusy { get; set; }
+    private bool IsWaitingForAcceptedTransport { get; set; }
+    private int AcceptedTransportRetryAttempt { get; set; }
     private string? StatusMessage { get; set; }
     private Severity StatusSeverity { get; set; } = Severity.Info;
 
+    private bool HasAcceptedRequestContext => !string.IsNullOrWhiteSpace(AcceptedRequestId);
+    private bool IsAcceptedRequestLoaded
+        => !HasAcceptedRequestContext
+           || string.Equals(CurrentTransport?.운송번호, AcceptedRequestId, StringComparison.OrdinalIgnoreCase);
+    private string AcceptedTransportGuideText
+        => IsWaitingForAcceptedTransport
+            ? $"{AcceptedRequestId} 수락을 현재 운송으로 전환하는 중입니다. 자동 조회 {AcceptedTransportRetryAttempt}/{AcceptedTransportRetryCount}"
+            : IsAcceptedRequestLoaded
+                ? $"{AcceptedRequestId} 수락 건이 현재 운송으로 연결되었습니다."
+                : $"{AcceptedRequestId} 수락 건과 다른 현재 운송이 조회되었습니다. 새로고침으로 다시 확인해 주세요.";
     private bool ShouldPickup => CurrentStageOrder <= 2;
     private int CurrentStageOrder => ResolveStageOrder(CurrentTransport?.상태);
     private string NextActionLabel => ShouldPickup ? "상차 준비" : "하차/인수 확인";
@@ -215,9 +240,25 @@
         try
         {
             await LoadCurrentTransportCoreAsync();
+            if (HasAcceptedRequestContext && !IsAcceptedRequestLoaded)
+            {
+                await WaitForAcceptedTransportAsync();
+                return;
+            }
+
+            if (HasAcceptedRequestContext && IsAcceptedRequestLoaded)
+            {
+                SetStatus("추천 수락 후 현재 운송을 조회했습니다. 다음 행동을 확인해 주세요.", Severity.Success);
+            }
         }
         catch (Exception ex)
         {
+            if (HasAcceptedRequestContext)
+            {
+                await WaitForAcceptedTransportAsync(ex.Message);
+                return;
+            }
+
             SetStatus($"현재 운송을 아직 불러오지 못했습니다. {ex.Message}", Severity.Info);
         }
     }
@@ -230,6 +271,55 @@
     private async Task LoadCurrentTransportCoreAsync()
     {
         CurrentTransport = await 증빙Service.현재운송조회Async();
+    }
+
+    private async Task WaitForAcceptedTransportAsync(string? firstFailureMessage = null)
+    {
+        IsWaitingForAcceptedTransport = true;
+
+        try
+        {
+            for (var attempt = 1; attempt <= AcceptedTransportRetryCount; attempt++)
+            {
+                AcceptedTransportRetryAttempt = attempt;
+                await InvokeAsync(StateHasChanged);
+
+                if (attempt > 1)
+                {
+                    await Task.Delay(AcceptedTransportRetryDelay);
+                }
+
+                try
+                {
+                    await LoadCurrentTransportCoreAsync();
+                    if (IsAcceptedRequestLoaded)
+                    {
+                        SetStatus("배차 수락으로 생성된 현재 운송을 확인했습니다.", Severity.Success);
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var message = attempt == 1 && !string.IsNullOrWhiteSpace(firstFailureMessage)
+                        ? firstFailureMessage
+                        : ex.Message;
+                    SetStatus($"현재 운송 생성 여부를 확인하는 중입니다. {message}", Severity.Info);
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+
+            if (CurrentTransport is null)
+            {
+                SetStatus("수락은 전송됐지만 현재 운송 건을 아직 찾지 못했습니다. 잠시 후 현재 운송 새로고침을 눌러 주세요.", Severity.Warning);
+                return;
+            }
+
+            SetStatus($"{AcceptedRequestId} 수락 건 대신 {CurrentTransport.운송번호} 운송이 조회되었습니다. 기존 진행 운송이 있거나 서버 사후처리를 확인해야 합니다.", Severity.Warning);
+        }
+        finally
+        {
+            IsWaitingForAcceptedTransport = false;
+        }
     }
 
     private async Task ArrivePickupAsync()

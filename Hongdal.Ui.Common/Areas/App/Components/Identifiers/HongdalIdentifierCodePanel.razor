@@ -1,0 +1,93 @@
+@namespace Hongdal.Ui.Common.Areas.App.Components.Identifiers
+@inject IHongdalIdentifierCodeGenerator CodeGenerator
+
+<MudPaper Elevation="@Elevation" Outlined="@Outlined" Class="@PanelClass">
+    <MudStack Spacing="2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.subtitle1">@TitleText</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@DisplayNameText</MudText>
+            </MudStack>
+            <MudChip T="string" Color="@ChipColor" Variant="Variant.Outlined" Size="Size.Small">@FormatText</MudChip>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense="true">@_errorMessage</MudAlert>
+        }
+        else if (_image is not null)
+        {
+            <div class="hongdal-identifier-code">
+                @((MarkupString)_image.SvgMarkup)
+            </div>
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="hongdal-identifier-raw">
+                @_image.RawCode
+            </MudText>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    private HongdalIdentifierCodeImage? _image;
+    private string? _errorMessage;
+
+    [Parameter, EditorRequired]
+    public HongdalIdentifierCodePayload Payload { get; set; } = default!;
+
+    [Parameter]
+    public string Format { get; set; } = HongdalMachineReadableCodeFormatCode.QrCode;
+
+    [Parameter]
+    public int Width { get; set; } = 240;
+
+    [Parameter]
+    public int Height { get; set; } = 240;
+
+    [Parameter]
+    public int Margin { get; set; } = 2;
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string PanelClass { get; set; } = "pa-3";
+
+    [Parameter]
+    public int Elevation { get; set; }
+
+    [Parameter]
+    public bool Outlined { get; set; } = true;
+
+    private string TitleText => string.IsNullOrWhiteSpace(Title) ? Payload?.HumanReadableText ?? "번호" : Title;
+
+    private string DisplayNameText => Payload?.DisplayName ?? "식별 번호";
+
+    private string FormatText => IsCode128 ? "Code128" : "QR";
+
+    private Color ChipColor => IsCode128 ? Color.Secondary : Color.Primary;
+
+    private bool IsCode128 => string.Equals(Format, HongdalMachineReadableCodeFormatCode.Code128, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(Format, "code128", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(Format, "barcode", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnParametersSet()
+    {
+        _image = null;
+        _errorMessage = null;
+
+        if (Payload is null)
+        {
+            _errorMessage = "생성할 번호가 없습니다.";
+            return;
+        }
+
+        try
+        {
+            _image = CodeGenerator.Generate(new HongdalIdentifierCodeImageRequest(Payload, Format, Width, Height, Margin));
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+}

@@ -41,5 +41,12 @@ public sealed record 의뢰생성Command(
     decimal? 대기료,
     decimal? 수작업비,
     decimal? 할증,
+    decimal? 예상거리Km,
+    decimal? 기본운임,
+    decimal? Km당단가,
+    decimal? 거리운임,
+    decimal? 최소운임,
+    decimal? 최종운임,
+    decimal? 기사지급예정운임,
     string? 클라이언트요청Id,
     string? 결제상태) : IRequest<Result<Hongdal.Contracts.Shipper.Request.화주운송의뢰응답>>;

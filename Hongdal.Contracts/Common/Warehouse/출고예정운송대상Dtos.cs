@@ -6,6 +6,7 @@ public static class 출고예정운송대상원천유형
     public const string 창고출고예정 = "WarehouseOutboundPlanned";
     public const string 판매채널주문 = "SalesChannelOrder";
     public const string 공동주문수입 = "GroupPurchaseImport";
+    public const string 음식주문 = "FoodOrder";
 }
 
 public sealed class 출고예정운송대상

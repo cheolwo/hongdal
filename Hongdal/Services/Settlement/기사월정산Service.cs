@@ -124,12 +124,7 @@ namespace 홍달.Services.Settlement
 
         private decimal CalculateFee(int dispatchCount)
         {
-            if (_policy.무료배차)
-            {
-                return 0;
-            }
-
-            return Math.Min(dispatchCount * _policy.기본이용료, _policy.추가이용료);
+            return _policy.월누적이용료계산(dispatchCount);
         }
     }
 }

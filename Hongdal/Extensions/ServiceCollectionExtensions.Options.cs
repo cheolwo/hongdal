@@ -35,6 +35,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<MongoDbOptions>(configuration.GetSection(MongoDbOptions.SectionName));
         services.Configure<PushNotificationsOptions>(configuration.GetSection(PushNotificationsOptions.SectionName));
         services.Configure<KakaoAlimTalkOptions>(configuration.GetSection(KakaoAlimTalkOptions.SectionName));
+        services.Configure<KakaoLocalOptions>(configuration.GetSection(KakaoLocalOptions.SectionName));
         services.Configure<CommandProcessingOptions>(configuration.GetSection(CommandProcessingOptions.SectionName));
         services.Configure<WorkRelationshipSnapshotOptions>(configuration.GetSection(WorkRelationshipSnapshotOptions.SectionName));
         services.Configure<CommandFileStorageOptions>(configuration.GetSection(CommandFileStorageOptions.SectionName));

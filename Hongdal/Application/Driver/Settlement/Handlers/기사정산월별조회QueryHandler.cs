@@ -30,6 +30,6 @@ public sealed class 기사정산월별조회QueryHandler : IRequestHandler<기�
 
     private decimal MonthCap()
     {
-        return _policy.무료배차 ? 0 : _policy.추가이용료;
+        return _policy.적용월상한이용료;
     }
 }

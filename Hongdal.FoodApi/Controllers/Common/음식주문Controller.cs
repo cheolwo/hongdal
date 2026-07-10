@@ -8,6 +8,7 @@ namespace Hongdal.FoodApi.Controllers.Common;
 
 [ApiController]
 [Route("api/v1/food-orders")]
+[Obsolete("Food order endpoints are moving to the main Hongdal server. Use Hongdal.Controllers.Food endpoints.", false)]
 public sealed class 음식주문Controller : ControllerBase
 {
     private readonly 음식샘플Store _store;

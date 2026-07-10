@@ -1163,15 +1163,16 @@ public sealed class InMemoryShipperStore
 
     public decimal EstimateFare(string vehicleType, decimal distanceKm)
     {
-        var baseFare = vehicleType switch
+        var (baseFare, unitRate, minimumFare) = vehicleType switch
         {
-            "오토바이 퀵" => 35000m,
-            "냉동탑차" => 240000m,
-            "1.4톤" => 180000m,
-            _ => 120000m
+            "오토바이 퀵" => (5000m, 1000m, 5000m),
+            "1.4톤" => (45000m, 1550m, 45000m),
+            "냉동탑차" => (35000m, 1500m, 35000m),
+            _ => (35000m, 1300m, 35000m)
         };
 
-        return baseFare + (distanceKm * 2500m);
+        var fare = baseFare + decimal.Round(Math.Max(0m, distanceKm) * unitRate, 0, MidpointRounding.AwayFromZero);
+        return fare < minimumFare ? minimumFare : fare;
     }
 
     public void AddRequest(ShipperRequestItem request)

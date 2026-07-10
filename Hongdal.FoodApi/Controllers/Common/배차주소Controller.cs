@@ -6,6 +6,7 @@ namespace Hongdal.FoodApi.Controllers.Common;
 
 [ApiController]
 [Route("api/v1/food-orders/dispatch/address-form")]
+[Obsolete("Dispatch address endpoints are moving to the main Hongdal server. Use Hongdal.Controllers.Food endpoints.", false)]
 public sealed class 배차주소Controller : ControllerBase
 {
     private readonly 배차주소샘플Store _store;

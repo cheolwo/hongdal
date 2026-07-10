@@ -37,7 +37,7 @@ public sealed class 음식주문결제승인완료EventHandler : INotificationHa
             CommandName = "결제승인완료EventHandler",
             EventName = nameof(결제승인완료Event),
             FeatureName = "FoodOrderPayment",
-            Target = "FoodApi",
+            Target = "HongdalFoodOrder",
             PayloadJson = payloadJson,
             Status = "Pending",
             TraceId = System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,

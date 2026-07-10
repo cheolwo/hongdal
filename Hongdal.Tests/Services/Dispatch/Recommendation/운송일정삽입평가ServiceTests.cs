@@ -65,6 +65,30 @@ public class 운송일정삽입평가ServiceTests
             return Task.FromResult<배차경로예상결과?>(new 배차경로예상결과(distance, duration, null));
         }
 
+        public async Task<배차경로예상결과?> EstimateOrderedRouteAsync(
+            배차경로좌표? origin,
+            IReadOnlyList<배차경로좌표> orderedStops,
+            CancellationToken cancellationToken = default)
+        {
+            if (origin is null || orderedStops.Count == 0)
+            {
+                return null;
+            }
+
+            var current = origin;
+            decimal distance = 0m;
+            TimeSpan duration = TimeSpan.Zero;
+            foreach (var stop in orderedStops)
+            {
+                var route = await EstimateRouteAsync(current, stop);
+                distance += route?.DistanceKm ?? 0m;
+                duration += route?.Duration ?? TimeSpan.Zero;
+                current = stop;
+            }
+
+            return new 배차경로예상결과(distance, duration, null);
+        }
+
         public Task<배차삽입경로예상결과?> EstimateInsertionDelayAsync(배차경로좌표? origin, 배차경로좌표? routeAnchor, 배차경로좌표? pickup, 배차경로좌표? dropoff)
             => Task.FromResult<배차삽입경로예상결과?>(null);
 

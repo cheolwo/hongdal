@@ -150,7 +150,7 @@
                 }
                 else
                 {
-                    <MudPaper Elevation="8" Class="driver-recommendation-top-strip px-3 py-2" @onclick="NavigateToRecommendationMapPage">
+                    <MudPaper Elevation="8" Class="driver-recommendation-top-strip px-3 py-2">
                         <MudStack Spacing="1">
                             <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
                                 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
@@ -165,6 +165,40 @@
                                 </MudStack>
                             </MudStack>
                             <MudProgressLinear Value="@ProgressPercent" Color="@ResolveCountdownColor()" Rounded="true" />
+                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd" Class="driver-recommendation-actions">
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           Disabled="@IsBusy"
+                                           StartIcon="@Icons.Material.Filled.Article"
+                                           OnClick="OpenDetailAsync">
+                                    상세
+                                </MudButton>
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           Disabled="@IsBusy"
+                                           StartIcon="@Icons.Material.Filled.Map"
+                                           OnClick="NavigateToRecommendationMapPage">
+                                    지도
+                                </MudButton>
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Success"
+                                           Disabled="@(IsBusy || IsExpired)"
+                                           StartIcon="@Icons.Material.Filled.CheckCircle"
+                                           OnClick="AcceptAsync">
+                                    수락
+                                </MudButton>
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Secondary"
+                                           Disabled="@IsBusy"
+                                           StartIcon="@Icons.Material.Filled.Cancel"
+                                           OnClick="RejectAsync">
+                                    거절
+                                </MudButton>
+                            </MudStack>
                         </MudStack>
                     </MudPaper>
                 }
@@ -242,6 +276,30 @@
                                 </MudGrid>
                             </MudPaper>
                         }
+
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd">
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       Disabled="@IsBusy"
+                                       StartIcon="@Icons.Material.Filled.Map"
+                                       OnClick="NavigateToRecommendationMapPage">
+                                지도 상세로
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       Disabled="@(IsBusy || IsExpired)"
+                                       StartIcon="@Icons.Material.Filled.CheckCircle"
+                                       OnClick="AcceptAsync">
+                                수락하고 운송 시작
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Disabled="@IsBusy"
+                                       StartIcon="@Icons.Material.Filled.Cancel"
+                                       OnClick="RejectAsync">
+                                거절
+                            </MudButton>
+                        </MudStack>
                     </MudStack>
                 </MudPaper>
             }
@@ -344,9 +402,12 @@
         var target = ActiveRecommendation;
         await RunAsync("추천을 수락했습니다. 서버가 배차 확정과 화주 알림 사후처리를 진행합니다.", async () =>
         {
-            await 추천Service.수락Async(target.의뢰Id);
+            var requestId = target.의뢰Id;
+            await 추천Service.수락Async(requestId);
             AcceptedRecommendation = target;
             ClearActiveRecommendation();
+            추천Service.선택추천해제(requestId);
+            Navigation.NavigateTo(CurrentTransportHref(requestId));
         });
     }
 
@@ -362,6 +423,7 @@
         {
             await 추천Service.거절Async(target.의뢰Id, RejectReason);
             ClearActiveRecommendation();
+            추천Service.선택추천해제(target.의뢰Id);
         });
     }
 
@@ -596,6 +658,9 @@
 
     private static string DisplayScore(decimal? value)
         => value.HasValue ? $"{value.Value:N1}" : "미정";
+
+    private static string CurrentTransportHref(string requestId)
+        => $"/driver/transports/current?acceptedRequestId={Uri.EscapeDataString(requestId)}";
 
     public async ValueTask DisposeAsync()
     {

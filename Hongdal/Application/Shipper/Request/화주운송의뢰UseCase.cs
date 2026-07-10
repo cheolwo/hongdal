@@ -24,6 +24,10 @@ public interface I화주운송의뢰UseCase
         차량추천요청 request,
         CancellationToken cancellationToken = default);
 
+    Task<Result<화주운송기준운임견적응답>> 기준운임견적Async(
+        화주운송기준운임견적요청 request,
+        CancellationToken cancellationToken = default);
+
     Task<Result<화주운송의뢰응답>> 의뢰생성Async(
         화주운송의뢰생성요청 request,
         CancellationToken cancellationToken = default);
@@ -96,17 +100,20 @@ public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
     private readonly ISender _sender;
     private readonly I화주운송의뢰일괄등록파서Service _bulkParser;
     private readonly I차량추천Service _vehicleRecommendationService;
+    private readonly I화주운송기준운임Service _fareEstimateService;
     private readonly I화주운송요금정책검토Service _farePolicyReviewService;
 
     public 화주운송의뢰UseCase(
         ISender sender,
         I화주운송의뢰일괄등록파서Service bulkParser,
         I차량추천Service vehicleRecommendationService,
+        I화주운송기준운임Service fareEstimateService,
         I화주운송요금정책검토Service farePolicyReviewService)
     {
         _sender = sender;
         _bulkParser = bulkParser;
         _vehicleRecommendationService = vehicleRecommendationService;
+        _fareEstimateService = fareEstimateService;
         _farePolicyReviewService = farePolicyReviewService;
     }
 
@@ -131,10 +138,27 @@ public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
         CancellationToken cancellationToken = default)
         => await _vehicleRecommendationService.추천Async(request, cancellationToken);
 
+    public async Task<Result<화주운송기준운임견적응답>> 기준운임견적Async(
+        화주운송기준운임견적요청 request,
+        CancellationToken cancellationToken = default)
+        => await _fareEstimateService.견적Async(request, cancellationToken);
+
     public async Task<Result<화주운송의뢰응답>> 의뢰생성Async(
         화주운송의뢰생성요청 request,
         CancellationToken cancellationToken = default)
     {
+        var pricingResult = await BuildServerPricingAsync(request, cancellationToken);
+        if (pricingResult.IsFailed)
+        {
+            return Result.Fail<화주운송의뢰응답>(pricingResult.Errors);
+        }
+
+        request.요금옵션 = pricingResult.Value;
+        if (!request.결제예정금액.HasValue && request.요금옵션?.최종운임.HasValue == true)
+        {
+            request.결제예정금액 = decimal.ToInt32(request.요금옵션.최종운임.Value);
+        }
+
         var policyReview = _farePolicyReviewService.검토(request.요금옵션, request.결제예정금액);
         if (policyReview.정책위반)
         {
@@ -282,7 +306,74 @@ public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
             pricing?.대기료,
             pricing?.수작업비,
             pricing?.할증,
+            pricing?.예상거리Km,
+            pricing?.기본운임,
+            pricing?.Km당단가,
+            pricing?.거리운임,
+            pricing?.최소운임,
+            pricing?.최종운임,
+            pricing?.기사지급예정운임,
             request.클라이언트요청Id,
             request.결제상태);
+    }
+
+    private async Task<Result<PricingDTO?>> BuildServerPricingAsync(
+        화주운송의뢰생성요청 request,
+        CancellationToken cancellationToken)
+    {
+        var pricing = request.요금옵션;
+        if (!ShouldEstimateFare(request, pricing))
+        {
+            return Result.Ok(pricing);
+        }
+
+        var estimateResult = await _fareEstimateService.견적Async(new 화주운송기준운임견적요청
+        {
+            차량종류 = request.차량종류,
+            예상거리Km = pricing?.예상거리Km,
+            상차위도 = request.픽업?.주소.위도,
+            상차경도 = request.픽업?.주소.경도,
+            하차위도 = request.하차?.주소.위도,
+            하차경도 = request.하차?.주소.경도,
+            대기료 = pricing?.대기료,
+            수작업비 = pricing?.수작업비,
+            할증 = pricing?.할증
+        }, cancellationToken);
+
+        if (estimateResult.IsFailed)
+        {
+            return Result.Fail<PricingDTO?>(estimateResult.Errors);
+        }
+
+        var estimate = estimateResult.Value;
+        return Result.Ok<PricingDTO?>(new PricingDTO
+        {
+            서비스레벨 = pricing?.서비스레벨,
+            요청사항 = pricing?.요청사항,
+            예상거리Km = estimate.예상거리Km,
+            기본운임 = estimate.기본운임,
+            Km당단가 = estimate.Km당단가,
+            거리운임 = estimate.거리운임,
+            최소운임 = estimate.최소운임,
+            대기료 = estimate.대기료,
+            수작업비 = estimate.수작업비,
+            할증 = estimate.할증,
+            최종운임 = estimate.최종운임,
+            플랫폼수수료 = pricing?.플랫폼수수료,
+            기사지급예정운임 = pricing?.기사지급예정운임,
+            알선정책 = pricing?.알선정책
+        });
+    }
+
+    private static bool ShouldEstimateFare(화주운송의뢰생성요청 request, PricingDTO? pricing)
+    {
+        if (string.IsNullOrWhiteSpace(request.차량종류))
+        {
+            return false;
+        }
+
+        return pricing?.예상거리Km is > 0m
+            || request.픽업?.주소.위도 is not null && request.픽업?.주소.경도 is not null
+            && request.하차?.주소.위도 is not null && request.하차?.주소.경도 is not null;
     }
 }

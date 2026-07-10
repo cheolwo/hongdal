@@ -131,6 +131,13 @@ internal static class 화주운송의뢰일괄등록지원
             null,
             null,
             null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             row.클라이언트행Id,
             null);
     }

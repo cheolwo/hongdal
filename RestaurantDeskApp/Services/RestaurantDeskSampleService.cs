@@ -1,4 +1,6 @@
 using Hongdal.Contracts.Admin.Restaurants;
+using Hongdal.Contracts.Common.Participants;
+using Hongdal.Contracts.Food;
 using Hongdal.Contracts.Restaurants;
 using RestaurantDeskApp.Models.Restaurant;
 
@@ -10,16 +12,25 @@ public sealed class RestaurantDeskSampleService
     private readonly IReadOnlyList<음식점요약응답> _nearbyRestaurants;
     private readonly IReadOnlyList<음식점요약응답> _popularRestaurants;
     private readonly IReadOnlyList<음식점리뷰관리항목응답> _reviewModerationItems;
+    private readonly IReadOnlyList<음식주문응답> _foodOrders;
     private readonly 음식점리뷰운영정책응답 _policy;
 
     public RestaurantDeskSampleService()
     {
-        _orderAlerts =
-        [
-            new 주문알림항목 { Id = 1, 주문번호 = "ORD-20260701-001", 고객명 = "김주문", 메뉴요약 = "제육덮밥 2, 김치찌개 1", 주문금액 = 28500m, 접수시각 = DateTime.Now.AddMinutes(-2), 미확인 = true },
-            new 주문알림항목 { Id = 2, 주문번호 = "ORD-20260701-002", 고객명 = "박고객", 메뉴요약 = "돈까스 1, 우동 1", 주문금액 = 19000m, 접수시각 = DateTime.Now.AddMinutes(-9), 미확인 = true },
-            new 주문알림항목 { Id = 3, 주문번호 = "ORD-20260701-003", 고객명 = "이배달", 메뉴요약 = "비빔밥 3", 주문금액 = 33000m, 접수시각 = DateTime.Now.AddMinutes(-18), 미확인 = false }
-        ];
+        _foodOrders = FoodOrderSampleData.CreateOrders();
+        _orderAlerts = FoodOrderSampleData.CreateRestaurantOrderNotifications()
+            .Select((notification, index) => new 주문알림항목
+            {
+                Id = index + 1,
+                주문번호 = notification.주문번호,
+                음식점Id = notification.음식점Id,
+                고객명 = notification.고객명,
+                메뉴요약 = notification.메뉴요약,
+                주문금액 = notification.주문금액,
+                접수시각 = notification.수신시각.LocalDateTime,
+                미확인 = index < 2
+            })
+            .ToArray();
 
         _nearbyRestaurants =
         [
@@ -51,6 +62,8 @@ public sealed class RestaurantDeskSampleService
     }
 
     public IReadOnlyList<주문알림항목> Get신규주문목록() => _orderAlerts;
+
+    public IReadOnlyList<음식주문응답> Get음식주문목록() => _foodOrders;
 
     public IReadOnlyList<음식점요약응답> Get가까운음식점목록() => _nearbyRestaurants;
 

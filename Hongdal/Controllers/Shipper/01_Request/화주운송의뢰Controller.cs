@@ -51,6 +51,13 @@ namespace Hongdal.Controllers.Shipper.Request01
             return Ok(result);
         }
 
+        [HttpPost("fare-estimate")]
+        public async Task<IActionResult> 기준운임견적([FromBody] 화주운송기준운임견적요청 request, CancellationToken cancellationToken)
+        {
+            var result = await _useCase.기준운임견적Async(request, cancellationToken);
+            return this.ToActionResult(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> 의뢰생성([FromBody] 화주운송의뢰생성요청 req)
         {

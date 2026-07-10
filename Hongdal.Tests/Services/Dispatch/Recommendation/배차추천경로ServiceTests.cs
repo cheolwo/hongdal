@@ -59,6 +59,35 @@ public class 배차추천경로ServiceTests
         Assert.Equal(1, callCount);
     }
 
+    [Fact]
+    public async Task EstimateOrderedRouteAsync_경유지_경로는_한번의_호출로_요약을_반환한다()
+    {
+        var callCount = 0;
+        var service = CreateService((_, _, _, _, _, _) =>
+        {
+            callCount++;
+            return Task.FromResult<NaverCloudDrivingRoute?>(new NaverCloudDrivingRoute
+            {
+                DistanceMeters = 3500m,
+                DurationMilliseconds = 900000m,
+                TollFare = 0m
+            });
+        });
+
+        var route = await service.EstimateOrderedRouteAsync(
+            new 배차경로좌표(37.5m, 127.0m),
+            [
+                new 배차경로좌표(37.51m, 127.01m),
+                new 배차경로좌표(37.52m, 127.02m),
+                new 배차경로좌표(37.53m, 127.03m)
+            ]);
+
+        Assert.NotNull(route);
+        Assert.Equal(3.5m, route!.DistanceKm);
+        Assert.Equal(TimeSpan.FromMinutes(15), route.Duration);
+        Assert.Equal(1, callCount);
+    }
+
     private static 배차추천경로Service CreateService(
         Func<decimal, decimal, decimal, decimal, string?, CancellationToken, Task<NaverCloudDrivingRoute?>> routeFunc)
     {
@@ -91,6 +120,18 @@ public class 배차추천경로ServiceTests
             decimal startLng,
             decimal goalLat,
             decimal goalLng,
+            string? option = null,
+            CancellationToken cancellationToken = default)
+        {
+            return _routeFunc(startLat, startLng, goalLat, goalLng, option, cancellationToken);
+        }
+
+        public Task<NaverCloudDrivingRoute?> GetDrivingRouteAsync(
+            decimal startLat,
+            decimal startLng,
+            decimal goalLat,
+            decimal goalLng,
+            IReadOnlyList<NaverCloudRouteWaypoint> waypoints,
             string? option = null,
             CancellationToken cancellationToken = default)
         {
