@@ -12,6 +12,7 @@ DriverApp uses NAVER Maps through the Android native map path.
 - Driver current location is represented by `DriverNativeMapView.CenterLatitude` and `CenterLongitude`.
 - Pickup and dropoff markers are supplied through `DriverMapMarkerItem`.
 - Traffic layer, compass, scale bar, zoom controls, location button, zoom limits, and current location overlay are controlled by `DriverNativeMapView`.
+- Map locale is forced to `ko-KR` when the NAVER map is ready so base map labels prefer Korean in the driver experience.
 
 ## Required Android Permissions
 

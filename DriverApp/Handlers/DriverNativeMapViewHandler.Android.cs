@@ -41,6 +41,7 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
     private void OnMapReady(NaverMap naverMap)
     {
         _naverMap = naverMap;
+        ApplyKoreanMapLocale();
         ApplyMapOptions();
         ApplyCamera();
         ApplyMarkers();
@@ -87,6 +88,14 @@ public partial class DriverNativeMapViewHandler : ViewHandler<DriverNativeMapVie
         uiSettings.SetLogoMargin(16, 16, 16, 120);
 
         ApplyLocationOverlay();
+    }
+
+    private void ApplyKoreanMapLocale()
+    {
+        if (_naverMap is not null)
+        {
+            _naverMap.Locale = Java.Util.Locale.ForLanguageTag("ko-KR");
+        }
     }
 
     private void ApplyCamera()
