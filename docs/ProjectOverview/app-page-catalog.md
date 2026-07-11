@@ -23,7 +23,7 @@
 | --- | ---: | --- | --- |
 | `ShipperApp` | 24 | 화주, 판매자, 물류 의뢰자 | 운송 의뢰, 창고/입고, 판매채널, 통관/해외 물류 |
 | `DriverApp` | 23 | 기사 | 운행 시작, 추천, 수락/거절, 상차/하차, 정산, 알림 |
-| `HongdalAdmin` | 38 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
+| `HongdalAdmin` | 41 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
 | `WarehouseManagerApp` | 12 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 홍달마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
@@ -33,9 +33,9 @@
 
 | 상태 | 수 | 의미 |
 | --- | ---: | --- |
-| 완료 | 103 | 현재 문서에서 인라인 이미지로 바로 확인할 수 있는 화면 |
-| 인증 필요 | 9 | 관리자 보호 라우트라 현재 캡처는 로그인 화면까지 남긴 상태 |
-| 캡처 대기 | 1 | 캡처 호스트로 아직 PNG를 남기지 못한 신규 화면 |
+| 완료 | 114 | 현재 문서에서 인라인 이미지로 바로 확인할 수 있는 화면 |
+| 인증 필요 | 0 | 관리자 보호 라우트도 개발용 인증 세션과 문서용 메모리 데이터로 운영 화면까지 캡처한 상태 |
+| 캡처 대기 | 0 | 현재 카탈로그 기준 PNG를 아직 남기지 못한 화면 없음 |
 
 ## ShipperApp
 
@@ -111,28 +111,31 @@
 | `HongdalAdmin-P22-1 - 운송 이벤트 감사` | `/transports/{RequestId}/events` | `HongdalAdmin/Components/Pages/TransportWorkflowEvents.razor` | 필수 | 운송 이벤트 감사 | `HongdalAdmin-P22-1` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22-1.png" alt="HongdalAdmin-P22-1" width="160"> |
 | `HongdalAdmin-P22-2 - 운송 증빙/POD` | `/transports/{RequestId}/proofs` | `HongdalAdmin/Components/Pages/TransportWorkflowProofs.razor` | 필수 | 운송 증빙/POD | `HongdalAdmin-P22-2` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22-2.png" alt="HongdalAdmin-P22-2" width="160"> |
 | `HongdalAdmin-P22-3 - 운송 정산 상세` | `/transports/{RequestId}/settlement` | `HongdalAdmin/Components/Pages/TransportWorkflowSettlement.razor` | 필수 | 운송 정산 상세 | `HongdalAdmin-P22-3` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22-3.png" alt="HongdalAdmin-P22-3" width="160"> |
-| `HongdalAdmin-P23 - 관리자 활동 로그` | `/activity-logs` | `HongdalAdmin/Components/Pages/ActivityLogs.razor` | 운영 | 관리자 활동 로그 | - | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P23.png" alt="HongdalAdmin-P23" width="160"> |
+| `HongdalAdmin-P23 - 관리자 활동 로그` | `/activity-logs` | `HongdalAdmin/Components/Pages/ActivityLogs.razor` | 운영 | 관리자 활동 로그 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P23.png" alt="HongdalAdmin-P23" width="160"> |
 | `HongdalAdmin-P24 - 화면/기능 노출 정책` | `/view-policies` | `HongdalAdmin/Components/Pages/ViewPolicies.razor` | 운영 | 화면/기능 노출 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P24.png" alt="HongdalAdmin-P24" width="160"> |
 | `HongdalAdmin-P25 - 공통 콘텐츠 관리` | `/common-contents` | `HongdalAdmin/Components/Pages/CommonContents.razor` | 운영 | 공통 콘텐츠 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P25.png" alt="HongdalAdmin-P25" width="160"> |
 | `HongdalAdmin-P26 - 결제 목록` | `/payments` | `HongdalAdmin/Components/Pages/Payments.razor` | 필수 | 결제 목록 | `HongdalAdmin-P26` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P26.png" alt="HongdalAdmin-P26" width="160"> |
 | `HongdalAdmin-P26-1 - 정산 목록` | `/settlements` | `HongdalAdmin/Components/Pages/Settlements.razor` | 필수 | 정산 목록 | `HongdalAdmin-P26-1` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P26-1.png" alt="HongdalAdmin-P26-1" width="160"> |
-| `HongdalAdmin-P27 - 문서 목록` | `/documents` | `HongdalAdmin/Components/Pages/Documents.razor` | 필수 | 문서 목록 | `HongdalAdmin-P27` | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27.png" alt="HongdalAdmin-P27" width="160"> |
-| `HongdalAdmin-P27-1 - 문서 업로드` | `/documents/upload` | `HongdalAdmin/Components/Pages/DocumentUpload.razor` | 필수 | 문서 업로드 | `HongdalAdmin-P27-1` | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-1.png" alt="HongdalAdmin-P27-1" width="160"> |
-| `HongdalAdmin-P27-2 - 문서 정책 목록` | `/documents/policies` | `HongdalAdmin/Components/Pages/DocumentPolicies.razor` | 필수 | 문서 정책 목록 | `HongdalAdmin-P27-2` | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-2.png" alt="HongdalAdmin-P27-2" width="160"> |
-| `HongdalAdmin-P27-3 - 문서 정책 상세` | `/documents/policies/{DocumentCode}` | `HongdalAdmin/Components/Pages/DocumentPolicyDetail.razor` | 필수 | 문서 정책 상세 | `HongdalAdmin-P27-3` | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-3.png" alt="HongdalAdmin-P27-3" width="160"> |
-| `HongdalAdmin-P27-4 - 문서 조회 로그` | `/documents/logs` | `HongdalAdmin/Components/Pages/DocumentLogs.razor` | 필수 | 문서 조회 로그 | `HongdalAdmin-P27-4` | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-4.png" alt="HongdalAdmin-P27-4" width="160"> |
+| `HongdalAdmin-P27 - 문서 목록` | `/documents` | `HongdalAdmin/Components/Pages/Documents.razor` | 필수 | 문서 목록 | `HongdalAdmin-P27` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27.png" alt="HongdalAdmin-P27" width="160"> |
+| `HongdalAdmin-P27-1 - 문서 업로드` | `/documents/upload` | `HongdalAdmin/Components/Pages/DocumentUpload.razor` | 필수 | 문서 업로드 | `HongdalAdmin-P27-1` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-1.png" alt="HongdalAdmin-P27-1" width="160"> |
+| `HongdalAdmin-P27-2 - 문서 정책 목록` | `/documents/policies` | `HongdalAdmin/Components/Pages/DocumentPolicies.razor` | 필수 | 문서 정책 목록 | `HongdalAdmin-P27-2` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-2.png" alt="HongdalAdmin-P27-2" width="160"> |
+| `HongdalAdmin-P27-3 - 문서 정책 상세` | `/documents/policies/{DocumentCode}` | `HongdalAdmin/Components/Pages/DocumentPolicyDetail.razor` | 필수 | 문서 정책 상세 | `HongdalAdmin-P27-3` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-3.png" alt="HongdalAdmin-P27-3" width="160"> |
+| `HongdalAdmin-P27-4 - 문서 조회 로그` | `/documents/logs` | `HongdalAdmin/Components/Pages/DocumentLogs.razor` | 필수 | 문서 조회 로그 | `HongdalAdmin-P27-4` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-4.png" alt="HongdalAdmin-P27-4" width="160"> |
 | `HongdalAdmin-P27-5 - 파일/POD 관리` | `/files/pod` | `HongdalAdmin/Components/Pages/FilesPod.razor` | 필수 | 파일/POD 관리 | `HongdalAdmin-P27-5` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-5.png" alt="HongdalAdmin-P27-5" width="160"> |
 | `HongdalAdmin-P28 - 공개 화물/화물 운영 화면` | `/cargo` | `HongdalAdmin/Components/Pages/PublicCargo.razor` | 운영 | 공개 화물/화물 운영 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P28.png" alt="HongdalAdmin-P28" width="160"> |
-| `HongdalAdmin-P29 - HS 코드/통관 운영` | `/customs/hs-codes` | `HongdalAdmin/Components/Pages/HsCodeOperations.razor` | 운영 | HS 코드/통관 운영 | - | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P29.png" alt="HongdalAdmin-P29" width="160"> |
+| `HongdalAdmin-P29 - HS 코드/통관 운영` | `/customs/hs-codes` | `HongdalAdmin/Components/Pages/HsCodeOperations.razor` | 운영 | HS 코드/통관 운영 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P29.png" alt="HongdalAdmin-P29" width="160"> |
 | `HongdalAdmin-P30 - 음식 주문/배달 운영` | `/food/operations` | `HongdalAdmin/Components/Pages/FoodOperations.razor` | 운영 | 음식 주문/배달 운영 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P30.png" alt="HongdalAdmin-P30" width="160"> |
-| `HongdalAdmin-P30-1 - 음식점 검색 정책` | `/restaurant-search-policy` | `HongdalAdmin/Components/Pages/RestaurantSearchPolicySettings.razor` | 운영 | 음식점 검색 정책 | - | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P30-1.png" alt="HongdalAdmin-P30-1" width="160"> |
+| `HongdalAdmin-P30-1 - 음식점 검색 정책` | `/restaurant-search-policy` | `HongdalAdmin/Components/Pages/RestaurantSearchPolicySettings.razor` | 운영 | 음식점 검색 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P30-1.png" alt="HongdalAdmin-P30-1" width="160"> |
 | `HongdalAdmin-P31 - 탐색 캠페인 운영` | `/exploration/campaigns` | `HongdalAdmin/Components/Pages/ExplorationCampaigns.razor` | 운영 | 탐색 캠페인 운영 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P31.png" alt="HongdalAdmin-P31" width="160"> |
 | `HongdalAdmin-P32 - 기사 목록/관리` | `/drivers` | `HongdalAdmin/Components/Pages/Drivers.razor` | 운영 | 기사 목록/관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P32.png" alt="HongdalAdmin-P32" width="160"> |
 | `HongdalAdmin-P32-1 - 차량 관리` | `/vehicle-management` | `HongdalAdmin/Components/Pages/VehicleManagement.razor` | 운영 | 차량 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P32-1.png" alt="HongdalAdmin-P32-1" width="160"> |
 | `HongdalAdmin-P33 - 파트너 관리` | `/partners` | `HongdalAdmin/Components/Pages/Partners.razor` | 운영 | 파트너 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P33.png" alt="HongdalAdmin-P33" width="160"> |
 | `HongdalAdmin-P34 - 수익/요율 정책` | `/revenue-policies` | `HongdalAdmin/Components/Pages/RevenuePolicies.razor` | 운영 | 수익/요율 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P34.png" alt="HongdalAdmin-P34" width="160"> |
-| `HongdalAdmin-P35 - 보조 기능 설정` | `/auxiliary-feature-settings` | `HongdalAdmin/Components/Pages/AuxiliaryFeatureSettings.razor` | 운영 | 보조 기능 설정 | - | 인증 필요<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P35.png" alt="HongdalAdmin-P35" width="160"> |
-| `HongdalAdmin-P36 - 연락처 통합 검색` | `/contact-search` | `HongdalAdmin/Components/Pages/ContactSearch.razor` | 운영 | 전화번호 뒤 8자리 기준 인물/역할 통합 조회 | - | 캡처 대기 |
+| `HongdalAdmin-P35 - 보조 기능 설정` | `/auxiliary-feature-settings` | `HongdalAdmin/Components/Pages/AuxiliaryFeatureSettings.razor` | 운영 | 보조 기능 설정 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P35.png" alt="HongdalAdmin-P35" width="160"> |
+| `HongdalAdmin-P36 - 연락처 통합 검색` | `/contact-search` | `HongdalAdmin/Components/Pages/ContactSearch.razor` | 운영 | 전화번호 뒤 8자리 기준 인물/역할 통합 조회 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P36.png" alt="HongdalAdmin-P36" width="160"> |
+| `HongdalAdmin-P37 - 국내화물 AI 배차 검토` | `/dispatch/ai-review` | `HongdalAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor` | 운영 | 국내화물 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P37.png" alt="HongdalAdmin-P37" width="160"> |
+| `HongdalAdmin-P38 - 음식배달 AI 배차 검토` | `/dispatch/food-ai-review` | `HongdalAdmin/Components/Pages/FoodDeliveryDispatchAIReview.razor` | 운영 | 음식배달 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P38.png" alt="HongdalAdmin-P38" width="160"> |
+| `HongdalAdmin-P39 - 배차 AI 판단 사례` | `/dispatch-ai-judgment-cases` | `HongdalAdmin/Components/Pages/DispatchAIJudgmentCases.razor` | 운영 | 배차 AI 판단 사례 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P39.png" alt="HongdalAdmin-P39" width="160"> |
 | `HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `HongdalAdmin/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P90.png" alt="HongdalAdmin-P90" width="160"> |
 | `HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `HongdalAdmin/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P91.png" alt="HongdalAdmin-P91" width="160"> |
 | `HongdalAdmin-P99 - 미발견 페이지` | `/not-found` | `HongdalAdmin/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P99.png" alt="HongdalAdmin-P99" width="160"> |
@@ -192,5 +195,5 @@
 | 템플릿성 화면 | `Counter`, `Weather`는 시스템/샘플 화면으로 분류했다. 출시 전 제거 또는 숨김 여부를 따로 판단한다. |
 | 미발견 페이지 | `NotFound`는 사용자 업무 화면이 아니지만 앱 운영에 필요한 라우트로 남긴다. |
 | 다음 문서화 단계 | 각 페이지별 상세 README는 `page-docs/{앱명}/{페이지ID}/README.md`에 두고, 캡처는 `assets/app-pages/{앱명}/` 아래 추가한다. |
-| 인증 필요 캡처 | 관리자 보호 화면은 현재 로그인 장벽까지 캡처했다. 실제 운영 화면 캡처가 필요하면 개발용 관리자 인증 세션을 만든 뒤 다시 캡처한다. |
+| 관리자 캡처 | 관리자 보호 화면은 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 실제 운영 화면까지 캡처한다. |
 | MAUI 캡처 | Android/Windows MAUI 앱의 Blazor 페이지는 문서용 캡처 호스트에서 실제 Razor 컴포넌트를 렌더링하고, Chrome DevTools 전체 페이지 캡처로 내부 스크롤 높이까지 반영해 PNG로 남긴다. |

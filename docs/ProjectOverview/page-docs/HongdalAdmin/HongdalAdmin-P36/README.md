@@ -4,7 +4,7 @@
 
 ## 화면 캡처
 
-캡처 대기: `docs/ProjectOverview/assets/app-pages/HongdalAdmin/HongdalAdmin-P36.png`
+<img src="../../../assets/app-pages/HongdalAdmin/HongdalAdmin-P36.png" alt="HongdalAdmin-P36 화면 캡처" width="720">
 
 ## 기본 정보
 
@@ -16,7 +16,7 @@
 | 소스 파일 | [HongdalAdmin/Components/Pages/ContactSearch.razor](../../../../../HongdalAdmin/Components/Pages/ContactSearch.razor) |
 | 분류 | 운영 |
 | 1.0 필수 연결 | 운영 보조 |
-| 캡처 상태 | 캡처 대기 |
+| 캡처 상태 | 완료 |
 
 ## 왜 필요한가
 
@@ -66,7 +66,9 @@
 
 ## 캡처와 문서 상태
 
-현재 화면은 코드와 API가 추가되었고, 문서에는 캡처 예정 경로만 남겨 둔다. 다음 캡처 작업에서 `HongdalAdmin-P36.png`를 생성하면 이 README의 화면 캡처 섹션을 인라인 이미지로 바꾼다.
+현재 캡처는 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 실제 운영 화면까지 렌더링한 결과입니다.
+
+이미지 파일을 다시 생성하면 이 README는 같은 경로의 이미지를 참조하므로 자동으로 최신 캡처를 보여줍니다.
 
 ## 보완 메모
 

@@ -8,15 +8,29 @@ public sealed class ActivityLogService
 {
     private readonly HttpClient _httpClient;
     private readonly 관리자인증세션Service _session;
+    private readonly bool _useMemoryFallback;
 
-    public ActivityLogService(HttpClient httpClient, 관리자인증세션Service session)
+    public ActivityLogService(HttpClient httpClient, 관리자인증세션Service session, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _session = session;
+        _useMemoryFallback = configuration.GetValue("AdminData:UseMemory", false);
     }
 
     public async Task<사용자행위로그목록응답> SearchAsync(사용자행위로그검색요청 request, CancellationToken cancellationToken = default)
     {
+        if (_useMemoryFallback)
+        {
+            var items = BuildMemoryItems();
+            return new 사용자행위로그목록응답
+            {
+                Items = items,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalCount = items.Count
+            };
+        }
+
         using var message = CreateRequest(HttpMethod.Get, BuildSearchPath(request));
         using var response = await _httpClient.SendAsync(message, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -26,6 +40,12 @@ public sealed class ActivityLogService
 
     public async Task<사용자행위로그상세응답?> GetDetailAsync(long id, CancellationToken cancellationToken = default)
     {
+        if (_useMemoryFallback)
+        {
+            var item = BuildMemoryItems().FirstOrDefault(x => x.Id == id);
+            return item is null ? null : BuildMemoryDetail(item);
+        }
+
         using var message = CreateRequest(HttpMethod.Get, $"api/v1/admin/activity-logs/{id}");
         using var response = await _httpClient.SendAsync(message, cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -38,6 +58,18 @@ public sealed class ActivityLogService
 
     public async Task<Trace행위로그묶음응답?> GetTraceAsync(string traceId, CancellationToken cancellationToken = default)
     {
+        if (_useMemoryFallback)
+        {
+            var items = BuildMemoryItems()
+                .Where(x => string.Equals(x.TraceId, traceId, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            return new Trace행위로그묶음응답
+            {
+                TraceId = traceId,
+                Items = items
+            };
+        }
+
         using var message = CreateRequest(HttpMethod.Get, $"api/v1/admin/activity-logs/trace/{Uri.EscapeDataString(traceId)}");
         using var response = await _httpClient.SendAsync(message, cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -99,4 +131,83 @@ public sealed class ActivityLogService
             query.Add($"{key}={Uri.EscapeDataString(value.Trim())}");
         }
     }
+
+    private static IReadOnlyList<사용자행위로그요약응답> BuildMemoryItems()
+    {
+        var now = DateTime.UtcNow;
+        return
+        [
+            new()
+            {
+                Id = 1,
+                AppKey = "HongdalAdmin",
+                UserId = "admin-sample",
+                UserName = "운영자",
+                RoleName = "서버관리자",
+                EmailMasked = "op***@hongdal.local",
+                PhoneLast4 = "2222",
+                ActionType = "Read",
+                ActionName = "운송 관제 조회",
+                Route = "/transports/TR-101",
+                TraceId = "TRACE-ADMIN-001",
+                IsSuccess = true,
+                OccurredAtUtc = now.AddMinutes(-12)
+            },
+            new()
+            {
+                Id = 2,
+                AppKey = "DriverApp",
+                UserId = "DRV-001",
+                UserName = "홍기사",
+                RoleName = "용달기사",
+                EmailMasked = "dr***@hongdal.local",
+                PhoneLast4 = "2222",
+                ActionType = "Command",
+                ActionName = "상차 예외 신고",
+                Route = "/driver/transports/current",
+                TraceId = "TRACE-ADMIN-001",
+                IsSuccess = true,
+                OccurredAtUtc = now.AddMinutes(-15)
+            },
+            new()
+            {
+                Id = 3,
+                AppKey = "HongdalAdmin",
+                UserId = "admin-sample",
+                UserName = "운영자",
+                RoleName = "서버관리자",
+                EmailMasked = "op***@hongdal.local",
+                PhoneLast4 = "2222",
+                ActionType = "Update",
+                ActionName = "화면 정책 변경",
+                Route = "/view-policies",
+                TraceId = "TRACE-ADMIN-002",
+                IsSuccess = false,
+                OccurredAtUtc = now.AddMinutes(-40)
+            }
+        ];
+    }
+
+    private static 사용자행위로그상세응답 BuildMemoryDetail(사용자행위로그요약응답 item)
+        => new()
+        {
+            Id = item.Id,
+            AppKey = item.AppKey,
+            UserId = item.UserId,
+            UserName = item.UserName,
+            RoleName = item.RoleName,
+            EmailMasked = item.EmailMasked,
+            PhoneLast4 = item.PhoneLast4,
+            ActionType = item.ActionType,
+            ActionName = item.ActionName,
+            Route = item.Route,
+            TraceId = item.TraceId,
+            IsSuccess = item.IsSuccess,
+            ErrorCode = item.IsSuccess ? string.Empty : "PolicyValidation",
+            ErrorMessage = item.IsSuccess ? string.Empty : "화면 정책 변경 전 승인 범위를 확인해야 합니다.",
+            ClientIp = "127.0.0.1",
+            UserAgent = "HongdalAdmin memory capture",
+            OccurredAtUtc = item.OccurredAtUtc,
+            MetadataJson = "{\"source\":\"memory\",\"purpose\":\"admin-capture\"}"
+        };
 }

@@ -1,0 +1,471 @@
+@page "/dispatch/ai-review"
+@rendermode InteractiveServer
+@inject DomesticCargoDispatchAIReviewAdminService ReviewService
+@inject 관리자인증세션Service AdminSession
+@inject NavigationManager NavigationManager
+
+<PageTitle>국내화물 AI 배차 검토</PageTitle>
+
+<style>
+    .dispatch-review-map {
+        position: relative;
+        min-height: 440px;
+        overflow: hidden;
+        border: 1px solid var(--mud-palette-lines-default);
+        border-radius: 8px;
+        background:
+            linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(0,0,0,.04) 1px, transparent 1px),
+            #f8fafc;
+        background-size: 48px 48px;
+    }
+
+    .review-pin {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, .22);
+        border: 2px solid white;
+        z-index: 2;
+    }
+
+    .review-pin.pickup {
+        background: #f97316;
+    }
+
+    .review-pin.dropoff {
+        background: #2563eb;
+    }
+
+    .review-pin.driver {
+        width: 34px;
+        height: 34px;
+        background: #16a34a;
+        z-index: 3;
+    }
+
+    .review-pin.selected {
+        outline: 3px solid #111827;
+        outline-offset: 2px;
+    }
+</style>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">국내화물 AI 배차 검토</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    기사 위치와 의뢰 묶음을 지도에서 확인한 뒤 AI 제안 승인, 보류, 수동 묶음 판정을 RAG 사례로 남깁니다.
+                </MudText>
+            </MudStack>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="@isLoading"
+                       OnClick="LoadAsync">
+                새로고침
+            </MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <MudAlert Severity="Severity.Success">@successMessage</MudAlert>
+        }
+
+        @if (isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                <MudItem xs="12" xl="7">
+                    <MudPaper Class="pa-4 h-100" Elevation="1">
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Style="flex-wrap: wrap;">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.h6">지도형 검토</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@workspace.Source · @workspace.GeneratedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudText>
+                                </MudStack>
+                                <MudStack Row="true" Spacing="1">
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">상차</MudChip>
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">하차</MudChip>
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">기사</MudChip>
+                                </MudStack>
+                            </MudStack>
+
+                            <div class="dispatch-review-map">
+                                @foreach (var item in workspace.Requests)
+                                {
+                                    <div class="@MarkerClass("pickup", IsSelectedRequest(item.RequestId))"
+                                         style="@MarkerStyle(item.PickupLatitude, item.PickupLongitude)"
+                                         title="@($"{item.RequestId} 상차: {item.PickupAddress}")">
+                                        상
+                                    </div>
+                                    <div class="@MarkerClass("dropoff", IsSelectedRequest(item.RequestId))"
+                                         style="@MarkerStyle(item.DropoffLatitude, item.DropoffLongitude)"
+                                         title="@($"{item.RequestId} 하차: {item.DropoffAddress}")">
+                                        하
+                                    </div>
+                                }
+
+                                @foreach (var driver in workspace.Drivers)
+                                {
+                                    <div class="@MarkerClass("driver", string.Equals(selectedDriverId, driver.DriverId, StringComparison.Ordinal))"
+                                         style="@MarkerStyle(driver.Latitude, driver.Longitude)"
+                                         title="@($"{driver.DriverName} · {driver.VehicleType}")">
+                                        기
+                                    </div>
+                                }
+                            </div>
+
+                            <MudGrid Spacing="2">
+                                @foreach (var item in workspace.Requests)
+                                {
+                                    <MudItem xs="12" md="6">
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                            <MudStack Spacing="1">
+                                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                                    <MudText Typo="Typo.subtitle2">@item.RequestId</MudText>
+                                                    <MudButton Size="Size.Small"
+                                                               Variant="@RequestVariant(item.RequestId)"
+                                                               Color="Color.Primary"
+                                                               OnClick="@(() => ToggleRequest(item.RequestId))">
+                                                        선택
+                                                    </MudButton>
+                                                </MudStack>
+                                                <MudText Typo="Typo.body2">@item.CargoType · @item.Fare?.ToString("N0")원</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.PickupAddress → @item.DropoffAddress</MudText>
+                                            </MudStack>
+                                        </MudPaper>
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" xl="5">
+                    <MudStack Spacing="3">
+                        <MudPaper Class="pa-4" Elevation="1">
+                            <MudStack Spacing="3">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                    <MudText Typo="Typo.h6">AI 묶음 제안</MudText>
+                                    <MudChip T="string" Color="Color.Info" Size="Size.Small" Variant="Variant.Filled">@workspace.Bundles.Count 개</MudChip>
+                                </MudStack>
+
+                                @foreach (var bundle in workspace.Bundles)
+                                {
+                                    <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                                        <MudStack Spacing="2">
+                                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+                                                <MudStack Spacing="0">
+                                                    <MudText Typo="Typo.subtitle2">@bundle.BundleKey</MudText>
+                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@bundle.BundleType · @bundle.BundleSize 건 · 기사 @DisplayDriver(bundle.SuggestedDriverId)</MudText>
+                                                </MudStack>
+                                                <MudButton Size="Size.Small"
+                                                           Variant="@BundleVariant(bundle.BundleKey)"
+                                                           Color="Color.Primary"
+                                                           Disabled="@(!bundle.IsBundleAvailable)"
+                                                           OnClick="@(() => SelectBundle(bundle))">
+                                                    제안 선택
+                                                </MudButton>
+                                            </MudStack>
+
+                                            <MudText Typo="Typo.body2">@bundle.Reason</MudText>
+                                            <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                                @foreach (var badge in bundle.Badges)
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@badge</MudChip>
+                                                }
+                                            </MudStack>
+                                        </MudStack>
+                                    </MudPaper>
+                                }
+                            </MudStack>
+                        </MudPaper>
+
+                        <MudPaper Class="pa-4" Elevation="1">
+                            <MudStack Spacing="3">
+                                <MudText Typo="Typo.h6">기사 선택</MudText>
+                                <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                                    @foreach (var driver in workspace.Drivers)
+                                    {
+                                        <MudButton Variant="@DriverVariant(driver.DriverId)"
+                                                   Color="Color.Success"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => SelectDriver(driver.DriverId))">
+                                            @driver.DriverName · @driver.VehicleType
+                                        </MudButton>
+                                    }
+                                </MudStack>
+
+                                <MudDivider />
+
+                                <MudStack Spacing="2">
+                                    <MudText Typo="Typo.subtitle2">운영자 판정</MudText>
+                                    <MudSwitch T="bool" Label="수동 묶음 판정" @bind-Value="manualBundle" Color="Color.Primary" />
+                                    <MudSwitch T="bool" Label="승인 판정" @bind-Value="accepted" Color="Color.Success" />
+                                    <MudSelect T="string" Label="판정 유형" @bind-Value="decisionType" Variant="Variant.Outlined">
+                                        @foreach (var item in decisionTypes)
+                                        {
+                                            <MudSelectItem Value="@item">@item</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                    <MudTextField Label="판정 메모"
+                                                  @bind-Value="adminNote"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="3" />
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.Save"
+                                               Disabled="@isSaving"
+                                               OnClick="SaveDecisionAsync">
+                                        RAG 판단 사례로 저장
+                                    </MudButton>
+                                </MudStack>
+                            </MudStack>
+                        </MudPaper>
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private static readonly IReadOnlyList<string> decisionTypes = ["운영자승인", "운영자보류", "수동묶음승인", "수동기사배정", "AI제안수정"];
+
+    private DomesticCargoDispatchAIReviewWorkspaceDto workspace = new();
+    private readonly HashSet<string> selectedRequestIds = new(StringComparer.Ordinal);
+    private string selectedDriverId = string.Empty;
+    private string selectedBundleKey = string.Empty;
+    private string decisionType = "운영자승인";
+    private string adminNote = string.Empty;
+    private bool manualBundle;
+    private bool accepted = true;
+    private bool isLoading = true;
+    private bool isSaving;
+    private string? errorMessage;
+    private string? successMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AdminSession.서버관리자인가)
+        {
+            NavigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString("/dispatch/ai-review")}");
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            workspace = await ReviewService.GetWorkspaceAsync();
+            SelectInitialBundle();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"국내화물 AI 배차 검토 데이터를 불러오지 못했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SelectInitialBundle()
+    {
+        selectedRequestIds.Clear();
+        var first = workspace.Bundles.FirstOrDefault(x => x.IsAISuggested && x.IsBundleAvailable)
+                    ?? workspace.Bundles.FirstOrDefault(x => x.IsBundleAvailable);
+        if (first is not null)
+        {
+            SelectBundle(first);
+            return;
+        }
+
+        selectedBundleKey = string.Empty;
+        selectedDriverId = workspace.Drivers.FirstOrDefault()?.DriverId ?? string.Empty;
+        foreach (var id in workspace.Requests.Take(1).Select(x => x.RequestId))
+        {
+            selectedRequestIds.Add(id);
+        }
+    }
+
+    private void SelectBundle(DomesticCargoDispatchAIReviewBundleDto bundle)
+    {
+        selectedBundleKey = bundle.BundleKey;
+        selectedRequestIds.Clear();
+        foreach (var id in bundle.RequestIds)
+        {
+            selectedRequestIds.Add(id);
+        }
+
+        if (!string.IsNullOrWhiteSpace(bundle.SuggestedDriverId))
+        {
+            selectedDriverId = bundle.SuggestedDriverId;
+        }
+
+        manualBundle = false;
+        decisionType = accepted ? "운영자승인" : "운영자보류";
+    }
+
+    private void ToggleRequest(string requestId)
+    {
+        selectedBundleKey = string.Empty;
+        manualBundle = true;
+        decisionType = "수동묶음승인";
+        if (!selectedRequestIds.Add(requestId))
+        {
+            selectedRequestIds.Remove(requestId);
+        }
+    }
+
+    private void SelectDriver(string driverId)
+    {
+        selectedDriverId = driverId;
+    }
+
+    private async Task SaveDecisionAsync()
+    {
+        errorMessage = null;
+        successMessage = null;
+
+        if (selectedRequestIds.Count == 0)
+        {
+            errorMessage = "운송 의뢰를 하나 이상 선택해야 합니다.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(selectedDriverId))
+        {
+            errorMessage = "기사님을 선택해야 합니다.";
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            var response = await ReviewService.RecordDecisionAsync(new DomesticCargoDispatchAIReviewDecisionRequest
+            {
+                DecisionType = decisionType,
+                BundleKey = selectedBundleKey,
+                RequestIds = selectedRequestIds.ToList(),
+                DriverId = selectedDriverId,
+                AdminNote = adminNote,
+                ManualBundle = manualBundle,
+                Accepted = accepted
+            });
+            successMessage = response.Message;
+            adminNote = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"판단 사례 저장 실패: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private string MarkerStyle(decimal? latitude, decimal? longitude)
+    {
+        if (!latitude.HasValue || !longitude.HasValue)
+        {
+            return "display:none;";
+        }
+
+        var (minLat, maxLat, minLng, maxLng) = Bounds();
+        var x = Normalize(longitude.Value, minLng, maxLng);
+        var y = 100m - Normalize(latitude.Value, minLat, maxLat);
+        return $"left:{ToCss(x)}%;top:{ToCss(y)}%;";
+    }
+
+    private (decimal MinLat, decimal MaxLat, decimal MinLng, decimal MaxLng) Bounds()
+    {
+        var points = workspace.Requests
+            .SelectMany(x => new[]
+            {
+                (Lat: x.PickupLatitude, Lng: x.PickupLongitude),
+                (Lat: x.DropoffLatitude, Lng: x.DropoffLongitude)
+            })
+            .Concat(workspace.Drivers.Select(x => (Lat: x.Latitude, Lng: x.Longitude)))
+            .Where(x => x.Lat.HasValue && x.Lng.HasValue)
+            .Select(x => (Lat: x.Lat!.Value, Lng: x.Lng!.Value))
+            .ToArray();
+
+        if (points.Length == 0)
+        {
+            return (0m, 1m, 0m, 1m);
+        }
+
+        var minLat = points.Min(x => x.Lat);
+        var maxLat = points.Max(x => x.Lat);
+        var minLng = points.Min(x => x.Lng);
+        var maxLng = points.Max(x => x.Lng);
+        if (minLat == maxLat)
+        {
+            minLat -= 0.01m;
+            maxLat += 0.01m;
+        }
+
+        if (minLng == maxLng)
+        {
+            minLng -= 0.01m;
+            maxLng += 0.01m;
+        }
+
+        var latPadding = (maxLat - minLat) * 0.15m;
+        var lngPadding = (maxLng - minLng) * 0.15m;
+        return (minLat - latPadding, maxLat + latPadding, minLng - lngPadding, maxLng + lngPadding);
+    }
+
+    private static decimal Normalize(decimal value, decimal min, decimal max)
+        => Math.Clamp((value - min) / (max - min) * 100m, 4m, 96m);
+
+    private static string ToCss(decimal value)
+        => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string MarkerClass(string type, bool selected)
+        => selected ? $"review-pin {type} selected" : $"review-pin {type}";
+
+    private bool IsSelectedRequest(string requestId)
+        => selectedRequestIds.Contains(requestId);
+
+    private Variant RequestVariant(string requestId)
+        => selectedRequestIds.Contains(requestId) ? Variant.Filled : Variant.Outlined;
+
+    private Variant DriverVariant(string driverId)
+        => string.Equals(selectedDriverId, driverId, StringComparison.Ordinal) ? Variant.Filled : Variant.Outlined;
+
+    private Variant BundleVariant(string bundleKey)
+        => string.Equals(selectedBundleKey, bundleKey, StringComparison.Ordinal) ? Variant.Filled : Variant.Outlined;
+
+    private string DisplayDriver(string? driverId)
+        => string.IsNullOrWhiteSpace(driverId)
+            ? "미정"
+            : workspace.Drivers.FirstOrDefault(x => string.Equals(x.DriverId, driverId, StringComparison.Ordinal))?.DriverName ?? driverId;
+}

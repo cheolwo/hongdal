@@ -1,0 +1,1185 @@
+[
+  {
+    "id": "HongdalAdmin-P00",
+    "title": "관리자 홈",
+    "route": "/",
+    "url": "http://localhost:5031/",
+    "status": "OK",
+    "elapsedMs": 372,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P00.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 1061,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 Hongdal Admin 플랫폼 커뮤니티 알림과 현장 의견, 운영 공유, 개선 제안, 업무 경험을 함께 남기는 공간입니다. 관리자 · 커뮤니티 모드 아직 등록된 커뮤니티 글이 없습니다. 첫 글을 남겨 보세요. 운영 공유 HS 코드 데이터 보정 흐름을 관세사 경험 중심으로 분리 운영 공유 화주가 조회하는 통관 가능성 데이터는 공개 여부와 보정 출처를 구분해서 운영합니다. 오늘 창고 업무 첫 화면은 공정별 인증 게이트로 통일",
+      "currentUrl": "http://localhost:5031/",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "플랫폼 커뮤니티",
+        "업무 모드"
+      ],
+      "readyState": "complete",
+      "title": "Hongdal Admin",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P00-1",
+    "title": "관리자 로그인",
+    "route": "/login",
+    "url": "http://localhost:5031/login",
+    "status": "OK",
+    "elapsedMs": 353,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P00-1.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 1013,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 Hongdal Admin 플랫폼 커뮤니티 알림과 현장 의견, 운영 공유, 개선 제안, 업무 경험을 함께 남기는 공간입니다. 관리자 · 커뮤니티 모드 커뮤니티 글을 불러오는 중입니다. 운영 공유 HS 코드 데이터 보정 흐름을 관세사 경험 중심으로 분리 운영 공유 화주가 조회하는 통관 가능성 데이터는 공개 여부와 보정 출처를 구분해서 운영합니다. 오늘 창고 업무 첫 화면은 공정별 인증 게이트로 통일 업무 표준 입고, 출고, ",
+      "currentUrl": "http://localhost:5031/",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "플랫폼 커뮤니티",
+        "업무 모드"
+      ],
+      "readyState": "complete",
+      "title": "Hongdal Admin",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P00-2",
+    "title": "오류 화면",
+    "route": "/Error",
+    "url": "http://localhost:5031/Error",
+    "status": "OK",
+    "elapsedMs": 230,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P00-2.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 598,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 An error occurred while processing your request. Development Mode Swapping to Development environment will display more detailed information about the error that occurred. The Development environment should not be enabled for deployed ap",
+      "currentUrl": "http://localhost:5031/Error",
+      "errorAlerts": [
+        "An error occurred while processing your request."
+      ],
+      "hasUnhandledText": false,
+      "headings": [
+        "Development Mode"
+      ],
+      "readyState": "complete",
+      "title": "Error",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P16",
+    "title": "운영 대시보드",
+    "route": "/dashboard",
+    "url": "http://localhost:5031/dashboard",
+    "status": "OK",
+    "elapsedMs": 319,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P16.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 659,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 01. 업무 안내판 1.0 운송 흐름에서 막히는 운영 항목을 먼저 봅니다. 새로고침 오늘 의뢰 12 결제 대기 3 결제 완료 9 배차 대기 4 운송 중 5 관리자 확인 1 운송 예외 1 완료 18 1.0 운영 확인 화주-기사-수령자 운송 흐름을 막는 항목만 먼저 봅니다. 5 건 구분 대상 확인 내용 우선도 결제확인 REQ-2026-002 가상계좌 결제/후불 조건 확인 높음 관리자확인 TR-101 상차 · CargoMism",
+      "currentUrl": "http://localhost:5031/dashboard",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "01. 업무 안내판",
+        "12",
+        "3",
+        "9",
+        "4"
+      ],
+      "readyState": "complete",
+      "title": "01. 업무 안내판",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P17",
+    "title": "의뢰 목록",
+    "route": "/requests",
+    "url": "http://localhost:5031/requests",
+    "status": "OK",
+    "elapsedMs": 267,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P17.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 416,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 04. 의뢰 관리 화주 의뢰의 결제, 배차, 관제 연결 상태를 확인합니다. 결제상태 배차상태 조회 의뢰 목록 3 건 의뢰ID 확인 결제 배차 픽업 하차 의뢰 관제 REQ-2026-001 정상 결제완료 운송중 서울시 강남구 경기도 성남시 상세 관제 REQ-2026-002 결제확인 결제대기 미시작 인천시 서구 서울시 마포구 상세 관제 REQ-2026-003 정상 결제완료 인수완료 경기도 수원시 대전시 유성구 상세 관제",
+      "currentUrl": "http://localhost:5031/requests",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "04. 의뢰 관리",
+        "의뢰 목록"
+      ],
+      "readyState": "complete",
+      "title": "04. 의뢰 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P18",
+    "title": "의뢰 상세",
+    "route": "/requests/REQ-2026-001",
+    "url": "http://localhost:5031/requests/REQ-2026-001",
+    "status": "OK",
+    "elapsedMs": 233,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P18.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 545,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 04-1. 의뢰 상세 화주 의뢰 원장의 결제, 배차, 정산 값을 확인합니다. 의뢰 목록 1.0 관제 개요 새로고침 의뢰ID REQ-2026-001 서울시 강남구 테헤란로 → 경기도 성남시 분당구 정상 의뢰 상태 의뢰 상태 생성됨 운송 방식 혼적 배차 상태 운송중 증빙 방식 인수증 생성 시각 2026-07-11 14:07 화물 전자부품 결제/정산 결제 상태 결제완료 결제 수단 카드 정산 상태 인수증대기 정산 시점 선결제 최",
+      "currentUrl": "http://localhost:5031/requests/REQ-2026-001",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "04-1. 의뢰 상세",
+        "REQ-2026-001",
+        "의뢰 상태",
+        "결제/정산",
+        "상차/하차"
+      ],
+      "readyState": "complete",
+      "title": "의뢰 상세",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P19",
+    "title": "배차대기/추천 잠금 상태",
+    "route": "/dispatch/wait",
+    "url": "http://localhost:5031/dispatch/wait",
+    "status": "OK",
+    "elapsedMs": 211,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P19.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 481,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 02. 유입/배차대기 배차 확정 전 의뢰를 확인하고 수동 조치를 남깁니다. 새로고침 ID 의뢰ID 유형 업무 범위 픽업 요약 하차 요약 확인 상태 작업 1 REQ-2026-001 일반 상하차 서울시 강남구 테헤란로 경기도 성남시 분당구 대기확인 대기 수동 배차 보류 제거 2 REQ-2026-002 일반 상하차 인천시 서구 서울시 마포구 대기확인 결제대기 수동 배차 보류 제거 3 GP-IMPORT-DOMESTIC-APT-0",
+      "currentUrl": "http://localhost:5031/dispatch/wait",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "02. 유입/배차대기"
+      ],
+      "readyState": "complete",
+      "title": "02. 유입/배차대기",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P20",
+    "title": "운행 중 기사 현황",
+    "route": "/drivers/operating",
+    "url": "http://localhost:5031/drivers/operating",
+    "status": "OK",
+    "elapsedMs": 232,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P20.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 375,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 기사 운행 현황 운행 중인 기사, 최근 위치, 배차 이력을 연결할 운영 화면입니다. 빌드 복구를 위해 기사 운행 현황 화면을 기본 운영 화면으로 정리했습니다. 현재 운행 운행 중인 기사 목록과 상태를 연결할 영역입니다. 위치 확인 기사의 최근 위치와 갱신 시각을 확인할 영역입니다. 배차 이력 선택한 기사의 최근 배차 이력을 표시할 영역입니다.",
+      "currentUrl": "http://localhost:5031/drivers/operating",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "기사 운행 현황",
+        "현재 운행",
+        "위치 확인",
+        "배차 이력"
+      ],
+      "readyState": "complete",
+      "title": "기사 운행 현황",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P21",
+    "title": "운송 목록",
+    "route": "/transports",
+    "url": "http://localhost:5031/transports",
+    "status": "OK",
+    "elapsedMs": 235,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P21.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 791,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 06. 운송 진행 관리자 확인이 필요한 운송 예외와 이벤트 흐름을 확인합니다. 운송상태 이벤트 의뢰ID 관리자 확인 필요만 보기 조회 전체 운송 2 관리자 확인 필요 1 예외 신고 1 지연 확인 0 운송 운영 레인 1 건 운송 운영상태 예외 내용 갱신 관제 TR-101 DRV-001 관리자 확인 상차 · CargoMismatch · 상차지 도착 후 실제 수량이 의뢰 수량과 다릅니다. 07-11 13:55 상세 운송 목록 ",
+      "currentUrl": "http://localhost:5031/transports",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "06. 운송 진행",
+        "2",
+        "1",
+        "1",
+        "0"
+      ],
+      "readyState": "complete",
+      "title": "06. 운송 진행",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P22",
+    "title": "운송 상세 원장",
+    "route": "/transports/TR-101",
+    "url": "http://localhost:5031/transports/TR-101",
+    "status": "OK",
+    "elapsedMs": 265,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P22.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 961,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 06-1. 1.0 운송 관제 개요 진행 단계와 운영 확인 항목을 중심으로 봅니다. 운송 목록 새로고침 의뢰ID TR-101 서울 → 성남 미확인 · 화주 - 진행 중 관리자 다음 행동 상차 · CargoMismatch · 상차지 도착 후 실제 수량이 의뢰 수량과 다릅니다. 1. 의뢰 접수 대기 의뢰 정보 미확인 화주 입력값과 경로를 확인합니다. 서버 원장에서 의뢰 상세를 찾지 못했습니다. 2. 결제 대기 미확인 화주 결제",
+      "currentUrl": "http://localhost:5031/transports/TR-101",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "06-1. 1.0 운송 관제 개요",
+        "TR-101",
+        "운영 확인",
+        "연결 화면"
+      ],
+      "readyState": "complete",
+      "title": "1.0 운송 관제 개요",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P22-1",
+    "title": "운송 이벤트 감사",
+    "route": "/transports/TR-101/events",
+    "url": "http://localhost:5031/transports/TR-101/events",
+    "status": "OK",
+    "elapsedMs": 211,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P22-1.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 438,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 06-1. 운송 이벤트 로그 서버에 남은 이벤트 시각과 메타데이터를 확인합니다. 관제 개요 새로고침 의뢰ID TR-101 서울 → 성남 진행 중 이벤트 로그 1 건 시각 이벤트 메타데이터 2026-07-11 13:55 운송예외신고 {\"stage\":\"상차\",\"exceptionCode\":\"CargoMismatch\",\"reason\":\"상차지 도착 후 실제 수량이 의뢰 수량과 다릅니다.\",\"adminReviewRequired\":",
+      "currentUrl": "http://localhost:5031/transports/TR-101/events",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "06-1. 운송 이벤트 로그",
+        "TR-101",
+        "이벤트 로그"
+      ],
+      "readyState": "complete",
+      "title": "1.0 운송 이벤트 로그",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P22-2",
+    "title": "운송 증빙/POD",
+    "route": "/transports/TR-101/proofs",
+    "url": "http://localhost:5031/transports/TR-101/proofs",
+    "status": "OK",
+    "elapsedMs": 197,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P22-2.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 337,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 06-1. 운송 증빙/POD 상차·하차 사진과 인수증 파일의 업로드 상태를 확인합니다. 관제 개요 새로고침 의뢰ID TR-101 서울 → 성남 진행 중 증빙/POD 0 건 업로드된 증빙이 없습니다. 운송 완료 상태라면 기사 앱 업로드 결과를 확인하세요. 이벤트 로그 결제/정산",
+      "currentUrl": "http://localhost:5031/transports/TR-101/proofs",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "06-1. 운송 증빙/POD",
+        "TR-101",
+        "증빙/POD"
+      ],
+      "readyState": "complete",
+      "title": "1.0 운송 증빙/POD",
+      "visibleBlazorError": false,
+      "warningAlerts": [
+        "업로드된 증빙이 없습니다. 운송 완료 상태라면 기사 앱 업로드 결과를 확인하세요."
+      ]
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P22-3",
+    "title": "운송 정산 상세",
+    "route": "/transports/TR-101/settlement",
+    "url": "http://localhost:5031/transports/TR-101/settlement",
+    "status": "OK",
+    "elapsedMs": 233,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P22-3.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 509,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 06-1. 운송 결제/정산 화주 결제, 운송 완료 기준, 기사 정산 후보를 확인합니다. 관제 개요 새로고침 의뢰ID TR-101 서울 → 성남 진행 중 화주 결제 결제 상태 - 결제 수단 - 결제 금액 - 승인 시각 - OrderId - PaymentKey - 정산 기준 정산 상태 - 정산 시점 - 최종 운임 - 수납 주체 - 운송 상태 운송중 하차 시각 - 세금계산서 - 현금영수증 - 정산 메모 - 기사 정산 후보 1 ",
+      "currentUrl": "http://localhost:5031/transports/TR-101/settlement",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "06-1. 운송 결제/정산",
+        "TR-101",
+        "화주 결제",
+        "정산 기준",
+        "기사 정산 후보"
+      ],
+      "readyState": "complete",
+      "title": "1.0 운송 결제/정산",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P23",
+    "title": "관리자 활동 로그",
+    "route": "/activity-logs",
+    "url": "http://localhost:5031/activity-logs",
+    "status": "OK",
+    "elapsedMs": 287,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P23.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 805,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 사용자 행위 로그 앱, 사용자, TraceId 기준으로 서버 행위 기록을 확인합니다. 앱 사용자 Id 이메일 전화 끝 4자리 행위 유형 행위명 TraceId 전체 성공 여부 조회 초기화 총 3 건 페이지 1 / 크기 50 시각 앱 사용자 행위 결과 TraceId 2026-07-11 13:55:25 HongdalAdmin 운영자 admin-sample op***@hongdal.local / 2222 Read 운송 관제 조회",
+      "currentUrl": "http://localhost:5031/activity-logs",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "사용자 행위 로그",
+        "상세",
+        "Trace 묶음"
+      ],
+      "readyState": "complete",
+      "title": "사용자 행위 로그",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P24",
+    "title": "화면/기능 노출 정책",
+    "route": "/view-policies",
+    "url": "http://localhost:5031/view-policies",
+    "status": "OK",
+    "elapsedMs": 234,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P24.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 370,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 화면 정책 앱과 백오피스 화면의 노출 및 접근 정책을 관리할 운영 화면입니다. 빌드 복구를 위해 화면 정책 관리 화면을 기본 운영 화면으로 정리했습니다. 앱 화면 사용자 앱의 화면 노출 정책을 관리할 영역입니다. 관리자 화면 백오피스 메뉴와 접근 정책을 조정할 영역입니다. 정책 적용 변경된 화면 정책의 적용 상태를 확인할 영역입니다.",
+      "currentUrl": "http://localhost:5031/view-policies",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "화면 정책",
+        "앱 화면",
+        "관리자 화면",
+        "정책 적용"
+      ],
+      "readyState": "complete",
+      "title": "화면 정책",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P25",
+    "title": "공통 콘텐츠 관리",
+    "route": "/common-contents",
+    "url": "http://localhost:5031/common-contents",
+    "status": "OK",
+    "elapsedMs": 405,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P25.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 397,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 15. 공통콘텐츠 관리 기사, 화주, 운영자 화면에 공통 노출되는 콘텐츠를 관리합니다. 새로고침 콘텐츠 목록 ID 제목 유형 노출위치 활성 1 홍달 소개 영상 영상링크 홈화면위젯, 결제전혜택 편집 콘텐츠 등록/수정 제목 설명 콘텐츠 유형 이미지 URL 영상 URL 외부링크 URL 노출위치 홈화면위젯 잠금화면위젯 결제전혜택 앱공지 노출대상 기사 화주 운영자 보상정책 활성화 등록 신규",
+      "currentUrl": "http://localhost:5031/common-contents",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "15. 공통콘텐츠 관리",
+        "콘텐츠 목록",
+        "콘텐츠 등록/수정"
+      ],
+      "readyState": "complete",
+      "title": "15. 공통콘텐츠 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P26",
+    "title": "결제 목록",
+    "route": "/payments",
+    "url": "http://localhost:5031/payments",
+    "status": "OK",
+    "elapsedMs": 229,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P26.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 476,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 05. 결제 관리 Toss 결제 환경과 의뢰별 결제 상태를 확인합니다. 결제상태 의뢰ID 조회 Toss 설정: 미설정 / https://example.invalid 결제 목록 3 건 결제ID 의뢰ID 금액 수단 상태 생성시각 PAY-001 REQ-2026-001 45,000 원 카드 결제완료 2026-07-11 14:07 PAY-002 REQ-2026-002 80,000 원 가상계좌 결제대기 2026-07-11 12:07",
+      "currentUrl": "http://localhost:5031/payments",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "05. 결제 관리",
+        "결제 목록"
+      ],
+      "readyState": "complete",
+      "title": "05. 결제 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P26-1",
+    "title": "정산 목록",
+    "route": "/settlements",
+    "url": "http://localhost:5031/settlements",
+    "status": "OK",
+    "elapsedMs": 249,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P26-1.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 383,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 08. 정산 관리 기사 월정산 후보와 이용료 상태를 확인합니다. 년도 월 기사ID 조회 기사 월정산 2 건 기사ID 년월 배차건수 이용료 월 5,000원 상한 결제완료 갱신시각 DRV-001 2026-07 3 15,000 원 미적용 완료 2026-07-11 14:07 DRV-002 2026-07 1 5,000 원 미적용 미완료 2026-07-11 13:37",
+      "currentUrl": "http://localhost:5031/settlements",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "08. 정산 관리",
+        "기사 월정산"
+      ],
+      "readyState": "complete",
+      "title": "08. 정산 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P27",
+    "title": "문서 목록",
+    "route": "/documents",
+    "url": "http://localhost:5031/documents",
+    "status": "OK",
+    "elapsedMs": 232,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P27.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 358,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 문서 목록 생성된 문서 원장을 조회합니다. 문서 업로드 문서 정책 조회 로그 새로고침 문서코드 의뢰Id 생성상태 조회 문서 목록 1 건 시각 문서 의뢰 파일명 상태 암호화 다운로드 로그 2026-07-11 14:07 인수증 REQ-SAMPLE-001 인수증-REQ-SAMPLE-001.pdf 생성완료 예 허용 보기",
+      "currentUrl": "http://localhost:5031/documents",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "문서 목록",
+        "문서 목록"
+      ],
+      "readyState": "complete",
+      "title": "문서 목록",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P27-1",
+    "title": "문서 업로드",
+    "route": "/documents/upload",
+    "url": "http://localhost:5031/documents/upload",
+    "status": "OK",
+    "elapsedMs": 249,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P27-1.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 280,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 문서 업로드 문서 파일을 선택하고 원장에 등록합니다. 문서 목록 문서 정책 업로드 정보 문서코드 의뢰Id 문서명 파일 배송운송Id 정책 따름 암호화 정책 따름 다운로드 업로드",
+      "currentUrl": "http://localhost:5031/documents/upload",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "문서 업로드",
+        "업로드 정보"
+      ],
+      "readyState": "complete",
+      "title": "문서 업로드",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P27-2",
+    "title": "문서 정책 목록",
+    "route": "/documents/policies",
+    "url": "http://localhost:5031/documents/policies",
+    "status": "OK",
+    "elapsedMs": 231,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P27-2.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 544,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 문서 정책 문서 종류별 보관, 암호화, 서명 정책을 조회합니다. 문서 목록 새로고침 문서 종류 정책 8 건 코드 이름 사용 암호화 다운로드 서명 보관일수 편집 결제영수증 결제영수증 예 예 허용 미필요 1,095일 편집 배차확정서 배차확정서 예 아니오 허용 미필요 1,095일 편집 사고분쟁기록 사고/분쟁기록 예 예 차단 미필요 1,825일 편집 세금계산서연결정보 세금계산서 연결정보 예 예 차단 미필요 1,825일 편집 운송",
+      "currentUrl": "http://localhost:5031/documents/policies",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "문서 정책",
+        "문서 종류 정책"
+      ],
+      "readyState": "complete",
+      "title": "문서 정책",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P27-3",
+    "title": "문서 정책 상세",
+    "route": "/documents/policies/%EC%9D%B8%EC%88%98%EC%A6%9D",
+    "url": "http://localhost:5031/documents/policies/%EC%9D%B8%EC%88%98%EC%A6%9D",
+    "status": "OK",
+    "elapsedMs": 248,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P27-3.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 320,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 문서 정책 편집 선택한 문서 종류의 운영 정책만 수정합니다. 문서 정책 문서 목록 새로고침 인수증 문서코드 문서명 자동생성시점 보관일수 정책 플래그 사용 암호화 다운로드 허용 서명 필요 수정 가능 감사로그 조회 가능 역할 목록 JSON 정책 저장",
+      "currentUrl": "http://localhost:5031/documents/policies/%EC%9D%B8%EC%88%98%EC%A6%9D",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "문서 정책 편집",
+        "인수증"
+      ],
+      "readyState": "complete",
+      "title": "문서 정책 편집",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P27-4",
+    "title": "문서 조회 로그",
+    "route": "/documents/logs",
+    "url": "http://localhost:5031/documents/logs",
+    "status": "OK",
+    "elapsedMs": 231,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P27-4.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 287,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 문서 조회 로그 문서 접근 이력을 확인합니다. 문서 목록 새로고침 문서Id 조회 조회 로그 1 건 시각 문서Id 행위 사용자 역할 IP 2026-07-11 14:07 1 생성 sample",
+      "currentUrl": "http://localhost:5031/documents/logs",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "문서 조회 로그",
+        "조회 로그"
+      ],
+      "readyState": "complete",
+      "title": "문서 조회 로그",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P27-5",
+    "title": "파일/POD 관리",
+    "route": "/files/pod",
+    "url": "http://localhost:5031/files/pod",
+    "status": "OK",
+    "elapsedMs": 235,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P27-5.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 410,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 08. 파일/POD 상차·하차 증빙 파일을 업로드하고 검수 상태를 확인합니다. 새로고침 파일 업로드 파일 타입 의뢰ID 파일 업로드 POD 파일 목록 업로드시각 파일타입 의뢰ID 파일명 상태 작업 2026-07-11 14:07 인수증 REQ-2026-001 receipt.pdf 업로드완료 검수완료 2026-07-10 14:07 배송완료사진 REQ-2026-003 pod-photo.jpg 검수완료 검수완료",
+      "currentUrl": "http://localhost:5031/files/pod",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "08. 파일/POD",
+        "파일 업로드",
+        "POD 파일 목록"
+      ],
+      "readyState": "complete",
+      "title": "08. 파일/POD",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P28",
+    "title": "공개 화물/화물 운영 화면",
+    "route": "/cargo",
+    "url": "http://localhost:5031/cargo",
+    "status": "OK",
+    "elapsedMs": 230,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P28.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 436,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 11. 공개 화물정보 비회원도 조회 가능한 공개 화물 요약 목록입니다. 상세 정보는 로그인 후 확인할 수 있습니다. 새로고침 전자부품 REQ-2026-001 운송방식 혼적 차량종류 1톤 수량 10 중량 120.0 Kg 의뢰상태 생성됨 배차상태 운송중 등록일시 2026-07-11 14:07 생활용품 REQ-2026-002 운송방식 전세 차량종류 1톤 수량 25 중량 300.0 Kg 의뢰상태 생성됨 배차상태 미시작 등록일시 ",
+      "currentUrl": "http://localhost:5031/cargo",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "11. 공개 화물정보",
+        "전자부품",
+        "생활용품"
+      ],
+      "readyState": "complete",
+      "title": "11. 공개 화물정보",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P29",
+    "title": "HS 코드/통관 운영",
+    "route": "/customs/hs-codes",
+    "url": "http://localhost:5031/customs/hs-codes",
+    "status": "OK",
+    "elapsedMs": 267,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P29.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 531,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 HS 코드 운영 자동 분류된 HS 코드의 업무 분류와 주의 태그를 운영자와 관세사가 보정합니다. 보정 결과는 화주 조회 화면과 통관 검토 흐름의 기준 데이터로 사용됩니다. 검색 전체 업무 분류 전체 주의 태그 50 페이지 크기 비활성 포함 조회 총 2 건 이전 페이지 1 다음 HS 코드 품목명 분류 주의 태그 8504.40 850440 정지형 변환기 Static converters 일반 화물 KC 인증 검토 보정 2106",
+      "currentUrl": "http://localhost:5031/customs/hs-codes",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "HS 코드 운영",
+        "보정 대상"
+      ],
+      "readyState": "complete",
+      "title": "HS 코드 운영",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P30",
+    "title": "음식 주문/배달 운영",
+    "route": "/food/operations",
+    "url": "http://localhost:5031/food/operations",
+    "status": "OK",
+    "elapsedMs": 1822,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P30.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 240,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 음식 운영 배달 요금 정책과 음식점 리뷰 운영 상태를 관리합니다. 음식 운영 정책을 불러오는 중입니다.",
+      "currentUrl": "http://localhost:5031/food/operations",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "음식 운영"
+      ],
+      "readyState": "complete",
+      "title": "음식 운영",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P30-1",
+    "title": "음식점 검색 정책",
+    "route": "/restaurant-search-policy",
+    "url": "http://localhost:5031/restaurant-search-policy",
+    "status": "OK",
+    "elapsedMs": 272,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P30-1.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 544,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 음식점 주문 반경 정책 주문자가 음식점을 조회할 때 사용할 기본 반경과 운영상 허용 범위를 조정합니다. 조회 반경 km 기본 반경 km 권장 반경 km 최소 반경 km 최대 반경 km 조정 단위 km 배달료 주의 반경 빠른 선택 반경 쉼표로 구분합니다. 예: 3, 5, 7, 10 저장 기본값 복원 운영 기준 기본값은 현재 주문자 앱 첫 진입 반경입니다. 권장 반경은 UI에서 강조할 기준이고, 배달료 주의 반경은 너무 넓은",
+      "currentUrl": "http://localhost:5031/restaurant-search-policy",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "음식점 주문 반경 정책",
+        "조회 반경",
+        "운영 기준"
+      ],
+      "readyState": "complete",
+      "title": "음식점 주문 반경 정책",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P31",
+    "title": "탐색 캠페인 운영",
+    "route": "/exploration/campaigns",
+    "url": "http://localhost:5031/exploration/campaigns",
+    "status": "OK",
+    "elapsedMs": 189,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P31.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 380,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 탐색 캠페인 기사와 화주 사이의 탐색 반응과 반복 거래 관계를 확인할 운영 화면입니다. 빌드 복구를 위해 탐색 캠페인 화면을 기본 운영 화면으로 정리했습니다. 캠페인 목록 노출 중인 탐색 캠페인과 운영 상태를 관리할 영역입니다. 응답 통계 기사와 화주의 반응 지표를 요약할 영역입니다. 관계 집계 기사와 화주 사이의 반복 거래 관계를 살펴볼 영역입니다.",
+      "currentUrl": "http://localhost:5031/exploration/campaigns",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "탐색 캠페인",
+        "캠페인 목록",
+        "응답 통계",
+        "관계 집계"
+      ],
+      "readyState": "complete",
+      "title": "탐색 캠페인",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P32",
+    "title": "기사 목록/관리",
+    "route": "/drivers",
+    "url": "http://localhost:5031/drivers",
+    "status": "OK",
+    "elapsedMs": 232,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P32.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 340,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 09. 기사 관리 기사 상태, 차량, 활동지역, 최근 배차 내역을 확인합니다. 운행상태 활동지역 조회 기사 목록 2 건 기사 운행상태 차량 활동지역 배차건수 홍기사 운행중 1톤 트럭 서울 3 상세 달기사 대기 라보 경기 1 상세 기사를 선택하면 상세 정보와 배차 내역이 표시됩니다.",
+      "currentUrl": "http://localhost:5031/drivers",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "09. 기사 관리",
+        "기사 목록"
+      ],
+      "readyState": "complete",
+      "title": "09. 기사 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P32-1",
+    "title": "차량 관리",
+    "route": "/vehicle-management",
+    "url": "http://localhost:5031/vehicle-management",
+    "status": "OK",
+    "elapsedMs": 253,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P32-1.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 378,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 차량 관리 차량 단가, 추천 기준, 운송 조건 시뮬레이션을 연결할 운영 화면입니다. 빌드 복구를 위해 차량 관리 화면을 기본 운영 화면으로 정리했습니다. 차량 단가 차량별 기본 단가와 요율을 관리할 영역입니다. 추천 기준 적재량, 거리, 조건에 따른 차량 추천 기준을 조정할 영역입니다. 시뮬레이션 운송 조건을 입력해 추천 차량을 검토할 영역입니다.",
+      "currentUrl": "http://localhost:5031/vehicle-management",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "차량 관리",
+        "차량 단가",
+        "추천 기준",
+        "시뮬레이션"
+      ],
+      "readyState": "complete",
+      "title": "차량 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P33",
+    "title": "파트너 관리",
+    "route": "/partners",
+    "url": "http://localhost:5031/partners",
+    "status": "OK",
+    "elapsedMs": 266,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P33.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 417,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 11. 업체/화주 관리 업체 상태와 화주 계정을 함께 확인합니다. 업체 상태 조회 업체 목록 업체명 상태 연락처 담당자 홍달물류 거래중 02-1234-5678 김담당 달빛상사 심사중 032-555-0000 이담당 화주 계정 사용자명 이메일 연락처 의뢰건수 상태 화주A shipper@example.com 010-2222-3333 5 거래중 화주B shipper-b@example.com 010-5555-6666 1 신규",
+      "currentUrl": "http://localhost:5031/partners",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "11. 업체/화주 관리",
+        "업체 목록",
+        "화주 계정"
+      ],
+      "readyState": "complete",
+      "title": "11. 업체/화주 관리",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P34",
+    "title": "수익/요율 정책",
+    "route": "/revenue-policies",
+    "url": "http://localhost:5031/revenue-policies",
+    "status": "OK",
+    "elapsedMs": 267,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P34.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 779,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 구독료 운영 정책 플랫폼 수익은 구독료를 중심으로 보고, API 비용과 서버 비용을 넘는 여유가 생기면 다음 구독료를 낮추는 방식으로 운영합니다. 구독 수익과 운영비 명 활성 구독자 원 현재 월 구독료 원 API 사용 비용 원 서버 이용 비용 원 기타 운영비 원 유지할 최소 여유액 원 최소 구독료 % 비용 상승 완충률 원 월 인하 한도 다음 구독료 판단 월 구독 수익 1,188,000원 월 운영 비용 500,000원 완충",
+      "currentUrl": "http://localhost:5031/revenue-policies",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "구독료 운영 정책",
+        "구독 수익과 운영비",
+        "다음 구독료 판단",
+        "운영 원칙"
+      ],
+      "readyState": "complete",
+      "title": "구독료 운영 정책",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P35",
+    "title": "보조 기능 설정",
+    "route": "/auxiliary-feature-settings",
+    "url": "http://localhost:5031/auxiliary-feature-settings",
+    "status": "OK",
+    "elapsedMs": 318,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P35.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 574,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 부가 기능 설정 필수 업무 흐름은 고정하고, 알림이나 인연 스냅샷처럼 업무를 보조하는 기능만 전역 또는 사용자별로 조정합니다. 사용자 ID 전체 버전 그룹 조회 전역만 보기 버전 대상 기능 앱 기본 전역 사용자 최종 v1.0 홍달 1.0 운송 예외 신고 운송예외신고Command 운영 보조 관리자 알림 관리자알림 부가 ON ON 사용자 ID 입력 ON 조정 v1.0 홍달 1.0 운송 예외 신고 운송예외신고Command 필수",
+      "currentUrl": "http://localhost:5031/auxiliary-feature-settings",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "부가 기능 설정"
+      ],
+      "readyState": "complete",
+      "title": "부가 기능 설정",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P36",
+    "title": "연락처 통합 검색",
+    "route": "/contact-search",
+    "url": "http://localhost:5031/contact-search",
+    "status": "OK",
+    "elapsedMs": 231,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P36.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 322,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 연락처 통합 검색 전화번호 뒤 8자리로 기사, 화주, 창고 관리자 관련 정보를 함께 확인합니다. 전화번호 뒤 8자리 예: 11112222 또는 010-1111-2222 검색 동명이인처럼 전화번호 뒤 8자리가 겹칠 수 있어 결과는 목록으로 표시합니다.",
+      "currentUrl": "http://localhost:5031/contact-search",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "연락처 통합 검색"
+      ],
+      "readyState": "complete",
+      "title": "연락처 통합 검색",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P37",
+    "title": "국내화물 AI 배차 검토",
+    "route": "/dispatch/ai-review",
+    "url": "http://localhost:5031/dispatch/ai-review",
+    "status": "OK",
+    "elapsedMs": 249,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P37.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 662,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 국내화물 AI 배차 검토 기사 위치와 의뢰 묶음을 지도에서 확인한 뒤 AI 제안 승인, 보류, 수동 묶음 판정을 RAG 사례로 남깁니다. 새로고침 지도형 검토 memory · 2026-07-11 14:07 상차 하차 기사 상 하 상 하 기 기 REQ-AI-001 선택 전자부품 12박스 · 45,000원 서울 강남구 테헤란로 → 경기 성남시 분당구 REQ-AI-002 선택 생활용품 25박스 · 62,000원 서울 송파구 문",
+      "currentUrl": "http://localhost:5031/dispatch/ai-review",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "국내화물 AI 배차 검토",
+        "지도형 검토",
+        "AI 묶음 제안",
+        "기사 선택"
+      ],
+      "readyState": "complete",
+      "title": "국내화물 AI 배차 검토",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P38",
+    "title": "음식배달 AI 배차 검토",
+    "route": "/dispatch/food-ai-review",
+    "url": "http://localhost:5031/dispatch/food-ai-review",
+    "status": "OK",
+    "elapsedMs": 268,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P38.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 918,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 음식배달 AI 배차 검토 음식점 픽업지, 고객 전달지, F드라이버 위치를 함께 보고 AI 묶음 제안이나 운영자 수동 묶음을 RAG 판단 사례로 저장합니다. 새로고침 음식점 주문 지도 검토 memory · 2026-07-11 14:07 음식점 고객 F드라이버 주요 배달권: 강남/서초 배달권 · 인접 배달권: 송파, 분당 식 고 식 고 F F FOOD-2026-001 선택 홍달분식 강남점 · 김밥 3, 떡볶이 2 서울 강남구",
+      "currentUrl": "http://localhost:5031/dispatch/food-ai-review",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "음식배달 AI 배차 검토",
+        "음식점 주문 지도 검토",
+        "1단계 AI 고객권 묶음 제안",
+        "2단계 AI 기사 배정"
+      ],
+      "readyState": "complete",
+      "title": "음식배달 AI 배차 검토",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P39",
+    "title": "배차 AI 판단 사례",
+    "route": "/dispatch-ai-judgment-cases",
+    "url": "http://localhost:5031/dispatch-ai-judgment-cases",
+    "status": "OK",
+    "elapsedMs": 281,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P39.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 815,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 배차 AI 판단 사례 운영자가 예시 판단을 승인하거나 직접 입력하면 다음 배차 판단근거 검색에 사례가 누적됩니다. 새로고침 선택 가능한 예시 현재 정책과 대화에서 나온 판단 기준을 먼저 사례 후보로 제공합니다. 2 개 근접 기사에게 국내화물 묶음 제안 국내 화물 운송 OS · domestic-bundle-nearby-driver 사례로 쌓기 상차지가 가까운 두 의뢰가 같은 권역 하차지로 이동하고 근처 기사가 대기 중입니다",
+      "currentUrl": "http://localhost:5031/dispatch-ai-judgment-cases",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "배차 AI 판단 사례",
+        "선택 가능한 예시",
+        "직접 사례 입력",
+        "누적된 사례"
+      ],
+      "readyState": "complete",
+      "title": "배차 AI 판단 사례",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P90",
+    "title": "템플릿/샘플성 날씨 화면",
+    "route": "/weather",
+    "url": "http://localhost:5031/weather",
+    "status": "OK",
+    "elapsedMs": 708,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P90.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 243,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 Weather This component demonstrates showing data. Loading...",
+      "currentUrl": "http://localhost:5031/weather",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "Weather"
+      ],
+      "readyState": "complete",
+      "title": "Weather",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P91",
+    "title": "템플릿/샘플성 카운터 화면",
+    "route": "/counter",
+    "url": "http://localhost:5031/counter",
+    "status": "OK",
+    "elapsedMs": 211,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P91.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 243,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 Counter MudBlazor 동작 확인용 샘플 화면입니다. Current count: 0 CLICK ME",
+      "currentUrl": "http://localhost:5031/counter",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "Counter",
+        "Current count: 0"
+      ],
+      "readyState": "complete",
+      "title": "Counter",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  },
+  {
+    "id": "HongdalAdmin-P99",
+    "title": "미발견 페이지",
+    "route": "/not-found",
+    "url": "http://localhost:5031/not-found",
+    "status": "OK",
+    "elapsedMs": 195,
+    "navError": null,
+    "screenshotOk": true,
+    "screenshotFile": "C:\\Users\\user\\source\\repos\\Hongdal\\artifacts\\page-capture-check\\HongdalAdmin-all-pages-final-2026-07-11\\HongdalAdmin-P99.png",
+    "screenshotError": null,
+    "info": {
+      "bodyLength": 247,
+      "bodyStart": "뒤로가기 HongdalAdmin 운영자 백오피스 ABOUT HongdalAdmin 운영자 백오피스 서버 관리자 구독료 운영 정책 공통콘텐츠 관리 부가 기능 설정 음식점 반경 정책 국내화물 AI 배차 검토 음식배달 AI 배차 검토 배차 AI 판단 사례 연락처 통합 검색 capture-admin 로그아웃 모드 전환 커뮤니티 업무 Not Found Sorry, the content you are looking for does not exist.",
+      "currentUrl": "http://localhost:5031/not-found",
+      "errorAlerts": [],
+      "hasUnhandledText": false,
+      "headings": [
+        "Not Found"
+      ],
+      "readyState": "complete",
+      "title": "",
+      "visibleBlazorError": false,
+      "warningAlerts": []
+    },
+    "loginRedirect": false
+  }
+]

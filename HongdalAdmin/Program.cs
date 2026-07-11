@@ -5,6 +5,15 @@ using Hongdal.Ui.Common.Areas.App.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var isRunningInContainer = string.Equals(
+    Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
+
+if (!isRunningInContainer)
+{
+    builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+}
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -119,6 +128,24 @@ builder.Services.AddHttpClient<음식운영Service>((sp, client) =>
     });
 
 builder.Services.AddHttpClient<RestaurantSearchPolicyAdminService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+
+builder.Services.AddHttpClient<DispatchAIJudgmentCaseAdminService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+
+builder.Services.AddHttpClient<DomesticCargoDispatchAIReviewAdminService>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+});
+
+builder.Services.AddHttpClient<FoodDeliveryDispatchAIReviewAdminService>((sp, client) =>
 {
     var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<관리자ApiOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseUrl);

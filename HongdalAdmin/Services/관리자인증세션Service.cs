@@ -2,12 +2,40 @@ namespace HongdalAdmin.Services;
 
 public sealed class 관리자인증세션Service
 {
+    private const string DevelopmentBootstrapSectionName = "AdminAuth:DevelopmentBootstrap";
+
     public string AccessToken { get; private set; } = string.Empty;
     public string RefreshToken { get; private set; } = string.Empty;
     public DateTime AccessTokenExpiresAtUtc { get; private set; }
     public string UserId { get; private set; } = string.Empty;
     public string UserName { get; private set; } = string.Empty;
     public string[] Roles { get; private set; } = Array.Empty<string>();
+
+    public 관리자인증세션Service(IConfiguration configuration, IWebHostEnvironment environment)
+    {
+        if (!environment.IsDevelopment()
+            || !configuration.GetValue($"{DevelopmentBootstrapSectionName}:Enabled", false))
+        {
+            return;
+        }
+
+        var accessToken = configuration[$"{DevelopmentBootstrapSectionName}:AccessToken"];
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            return;
+        }
+
+        AccessToken = accessToken;
+        RefreshToken = configuration[$"{DevelopmentBootstrapSectionName}:RefreshToken"] ?? string.Empty;
+        UserId = configuration[$"{DevelopmentBootstrapSectionName}:UserId"] ?? string.Empty;
+        UserName = configuration[$"{DevelopmentBootstrapSectionName}:UserName"] ?? "development-admin";
+        Roles = configuration
+            .GetSection($"{DevelopmentBootstrapSectionName}:Roles")
+            .Get<string[]>()
+            ?? ["서버관리자"];
+        AccessTokenExpiresAtUtc = configuration.GetValue<DateTime?>($"{DevelopmentBootstrapSectionName}:AccessTokenExpiresAtUtc")
+                                  ?? DateTime.UtcNow.AddHours(1);
+    }
 
     public bool 로그인됨 => !string.IsNullOrWhiteSpace(AccessToken);
 

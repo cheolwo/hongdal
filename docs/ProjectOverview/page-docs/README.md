@@ -9,7 +9,7 @@
 | 앱 | 화면 수 | 필수 화면 수 | 인증 필요 캡처 수 |
 | --- | ---: | ---: | ---: |
 | [DriverApp](DriverApp/) | 23 | 10 | 0 |
-| [HongdalAdmin](HongdalAdmin/) | 38 | 18 | 9 |
+| [HongdalAdmin](HongdalAdmin/) | 41 | 18 | 0 |
 | [HumanResourcesManagerApp](HumanResourcesManagerApp/) | 1 | 0 | 0 |
 | [OrdererApp](OrdererApp/) | 8 | 0 | 0 |
 | [RestaurantDeskApp](RestaurantDeskApp/) | 5 | 0 | 0 |

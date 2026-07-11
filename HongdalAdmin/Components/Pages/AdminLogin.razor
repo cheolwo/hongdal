@@ -16,6 +16,7 @@
                      OnSocialLogin="SocialLoginAsync" />
 
 @code {
+    [Parameter]
     [SupplyParameterFromQuery(Name = "returnUrl")]
     public string? ReturnUrl { get; set; }
 

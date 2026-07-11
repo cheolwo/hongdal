@@ -1,4 +1,4 @@
-# HongdalAdmin-P27 - 문서 목록
+﻿# HongdalAdmin-P27 - 문서 목록
 
 [전체 화면 문서](../../README.md) / [HongdalAdmin 화면 목록](../README.md) / [앱 전체 카탈로그](../../../app-page-catalog.md)
 
@@ -16,7 +16,7 @@
 | 소스 파일 | [HongdalAdmin/Components/Pages/Documents.razor](../../../../../HongdalAdmin/Components/Pages/Documents.razor) |
 | 분류 | 필수 |
 | 1.0 필수 연결 | [HongdalAdmin-P27 - 문서 목록](../../../hongdal-v1-required-pages.md) |
-| 캡처 상태 | 인증 필요 |
+| 캡처 상태 | 완료 |
 
 ## 왜 필요한가
 
@@ -64,7 +64,7 @@
 
 ## 캡처와 문서 상태
 
-이 화면은 현재 인증 장벽까지 캡처되어 있으므로, 실제 운영 화면 설명은 인증 세션을 붙인 재캡처 뒤 보완해야 합니다.
+현재 캡처는 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 실제 운영 화면까지 렌더링한 결과입니다.
 
 이미지 파일을 다시 생성하면 이 README는 같은 경로의 이미지를 참조하므로 자동으로 최신 캡처를 보여줍니다.
 

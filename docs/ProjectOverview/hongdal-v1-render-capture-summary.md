@@ -16,6 +16,8 @@
 
 `HongdalAdmin-P16`~`HongdalAdmin-P22` 및 `HongdalAdmin-P22-1` 화면은 로컬 개발 서버를 메모리 데이터 모드로 실행한 뒤 Chrome headless로 캡처했다. 관리자 화면은 Android 앱 라우트 스모크와 별도로, 1.0 운영 확인에 필요한 8개 웹 라우트(`/dashboard`, `/requests`, `/requests/{RequestId}`, `/dispatch/wait`, `/drivers/operating`, `/transports`, `/transports/{RequestId}`, `/transports/{RequestId}/events`)를 기준으로 문서 캡처를 만들었다.
 
+2026-07-11에는 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 `HongdalAdmin` 전체 41개 라우트를 다시 캡처했다. 최종 판정은 41 OK / 0 CHECK이며 결과 파일은 [`capture-results.json`](../../artifacts/page-capture-check/HongdalAdmin-all-pages-final-2026-07-11/capture-results.json)에 둔다. 오래 남길 이미지는 `docs/ProjectOverview/assets/app-pages/HongdalAdmin/` 아래의 페이지 ID 파일명으로 정리했다.
+
 ## 대표 캡처
 
 아래 캡처는 README 본문에 직접 많이 넣기보다는, 홍달 1.0 필수 페이지 설명에서 필요한 곳에 연결한다. 실제 고객 정보, 주소, 연락처, 계좌, POD 원본은 캡처에 넣지 않는다.
@@ -80,20 +82,16 @@
 | S04 수락/거절 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | 수락, 거절, 보류, 만료 이후 서버 상태 전이를 설명한다. |
 | S05 상차/하차 증빙 | `DriverApp` `/driver/transports/current`, `/pickup`, `/dropoff` | 사진 업로드, POD, 인수증/서명, 예외 신고가 운송 상태를 닫는 지점을 설명한다. |
 | S06 창고 작업 | `WarehouseManagerApp` `/work-board`, `/work/{ProcessCode}`, `/work/picking-batch` | 출고 배치와 피킹 배치가 창고 현장 화면으로 이어지는 방식을 설명한다. |
-| S07 운영 확인 | `HongdalAdmin` 운송 상세, 이벤트, 증빙, 정산 화면 | `HongdalAdmin-P16`~`HongdalAdmin-P22` 및 `HongdalAdmin-P22-1` 캡처로 운송 원장과 분쟁 대비 기록을 확인하는 기준을 둔다. |
+| S07 운영 확인 | `HongdalAdmin` 운송 상세, 이벤트, 증빙, 정산, AI 배차 검토 화면 | `HongdalAdmin-P16`~`HongdalAdmin-P39` 캡처로 운송 원장, 분쟁 대비 기록, AI 배차 판단 사례를 확인하는 기준을 둔다. |
 
 ## 남은 캡처 정리
 
-상위 페이지와 현재 실제 캡처한 하위 페이지는 문서용 캡처를 붙였다. 다음 단계에서는 아직 캡처하지 않은 하위 페이지와 창고 작업 세부 화면을 추가하면 README와 상세 문서의 설명력이 좋아진다.
+상위 페이지와 현재 실제 캡처한 하위 페이지는 문서용 캡처를 붙였다. `HongdalAdmin` 전체 화면은 2026-07-11 기준으로 캡처가 완료되었으므로, 다음 단계에서는 앱 보조 화면과 창고 작업 세부 화면을 보강하면 README와 상세 문서의 설명력이 좋아진다.
 
 | 우선순위 | 캡처 대상 | 이유 |
 | --- | --- | --- |
-| 1 | HongdalAdmin-P22-2 운송 증빙 | 사진, POD, 인수증, 서명, 문서 연결을 별도 화면으로 확인할 때 필요하다. |
-| 2 | HongdalAdmin-P22-3 운송 정산 | 입금 요청, 입금 완료, 기사 정산 후보를 운영자가 상세히 볼 때 필요하다. |
-| 3 | HongdalAdmin-P26/HongdalAdmin-P26-1 결제/정산 목록 | 결제대기, 입금완료, 정산예정/완료를 운영 목록에서 볼 때 필요하다. |
-| 4 | HongdalAdmin-P27/HongdalAdmin-P27-* 문서/POD | 문서 업로드, 정책, 조회 로그, POD 상태를 별도 관리할 때 필요하다. |
-| 5 | ShipperApp-P02-1/DriverApp-P06-1/DriverApp-P14-1/DriverApp-P15-1/DriverApp-P15-2 보조 화면 | 대량 등록, 운행 설정, 정산 안내, 알림/푸시 설정을 하위 페이지로 확인할 때 필요하다. |
-| 6 | `WarehouseManagerApp` 피킹 배치 | 출고 배치 이후 창고 작업자에게 일이 어떻게 배정되는지 보여준다. |
+| 1 | ShipperApp-P02-1/DriverApp-P06-1/DriverApp-P14-1/DriverApp-P15-1/DriverApp-P15-2 보조 화면 | 대량 등록, 운행 설정, 정산 안내, 알림/푸시 설정을 하위 페이지로 확인할 때 필요하다. |
+| 2 | `WarehouseManagerApp` 피킹 배치 | 출고 배치 이후 창고 작업자에게 일이 어떻게 배정되는지 보여준다. |
 
 ## 캡처 파일명 원칙
 
