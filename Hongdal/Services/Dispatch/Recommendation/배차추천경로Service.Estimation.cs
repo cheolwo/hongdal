@@ -38,7 +38,7 @@ namespace 홍달.Services.Dispatch.Recommendation
                 var route = await _routeService.GetDrivingRouteAsync(origin.Latitude, origin.Longitude, destination.Latitude, destination.Longitude);
                 if (route?.Duration is not null || route?.DistanceKm is not null)
                 {
-                    return new 배차경로예상결과(route.DistanceKm, route.Duration, route.TollFare);
+                    return new 배차경로예상결과(route.DistanceKm, route.Duration, route.TollFare, "Directions5", true);
                 }
             }
             catch (OperationCanceledException)
@@ -93,7 +93,7 @@ namespace 홍달.Services.Dispatch.Recommendation
                         cancellationToken: cancellationToken);
                     if (route?.Duration is not null || route?.DistanceKm is not null)
                     {
-                        return new 배차경로예상결과(route.DistanceKm, route.Duration, route.TollFare);
+                        return new 배차경로예상결과(route.DistanceKm, route.Duration, route.TollFare, "Directions5", true);
                     }
                 }
                 catch (OperationCanceledException)
@@ -120,10 +120,18 @@ namespace 홍달.Services.Dispatch.Recommendation
             decimal? totalTollFare = null;
             var hasAnyDistance = false;
             var hasAnyDuration = false;
+            var allActualRoutes = true;
+            var anySegment = false;
 
             foreach (var stop in orderedStops)
             {
                 var segment = await EstimateRouteAsync(current, stop);
+                if (segment is not null)
+                {
+                    anySegment = true;
+                    allActualRoutes &= segment.실제경로여부;
+                }
+
                 if (segment?.DistanceKm is decimal distance)
                 {
                     totalDistance += distance;
@@ -152,7 +160,9 @@ namespace 홍달.Services.Dispatch.Recommendation
             return new 배차경로예상결과(
                 hasAnyDistance ? Math.Round(totalDistance, 2) : null,
                 hasAnyDuration ? totalDuration : null,
-                totalTollFare);
+                totalTollFare,
+                anySegment && allActualRoutes ? "Directions5-구간합산" : "구간합산",
+                anySegment && allActualRoutes);
         }
 
         public decimal? CalculateDistanceKm(배차경로좌표 source, 배차경로좌표 target)
@@ -194,7 +204,9 @@ namespace 홍달.Services.Dispatch.Recommendation
             return new 배차경로예상결과(
                 estimatedDistanceKm,
                 TimeSpan.FromMinutes((double)estimatedMinutes),
-                null);
+                null,
+                "좌표기반도로보정",
+                false);
         }
 
         private static double ToRadians(double angle) => angle * Math.PI / 180.0;

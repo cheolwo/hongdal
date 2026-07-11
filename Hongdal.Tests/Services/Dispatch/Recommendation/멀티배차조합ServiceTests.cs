@@ -28,6 +28,8 @@ public sealed class 음식멀티배차조합ServiceTests
         Assert.True(result[0].조합가능여부);
         Assert.Contains("상차지근접", result[0].배지);
         Assert.Contains("하차권역근접", result[0].배지);
+        Assert.Contains("판단근거반영", result[0].배지);
+        Assert.Contains(result[0].경고, x => x.StartsWith("판단근거=", StringComparison.Ordinal));
     }
 
     [Fact]

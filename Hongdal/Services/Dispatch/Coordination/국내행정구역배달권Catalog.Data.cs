@@ -62,7 +62,7 @@ public static partial class 국내행정구역배달권Catalog
         ["bjd-sigungu:11200"] = ["bjd-sigungu:11140", "bjd-sigungu:11215", "bjd-sigungu:11230", "bjd-sigungu:11680"],
         ["bjd-sigungu:11215"] = ["bjd-sigungu:11200", "bjd-sigungu:11230", "bjd-sigungu:11260", "bjd-sigungu:11710", "bjd-sigungu:11740"],
         ["bjd-sigungu:11230"] = ["bjd-sigungu:11200", "bjd-sigungu:11215", "bjd-sigungu:11260", "bjd-sigungu:11290"],
-        ["bjd-sigungu:11260"] = ["bjd-sigungu:11215", "bjd-sigungu:11230", "bjd-sigungu:11350"],
+        ["bjd-sigungu:11260"] = ["bjd-sigungu:11215", "bjd-sigungu:11230", "bjd-sigungu:11350", "bjd-sigungu:41310"],
         ["bjd-sigungu:11290"] = ["bjd-sigungu:11110", "bjd-sigungu:11140", "bjd-sigungu:11230", "bjd-sigungu:11305", "bjd-sigungu:11350"],
         ["bjd-sigungu:11305"] = ["bjd-sigungu:11290", "bjd-sigungu:11320", "bjd-sigungu:11350"],
         ["bjd-sigungu:11320"] = ["bjd-sigungu:11305", "bjd-sigungu:11350"],
@@ -80,6 +80,7 @@ public static partial class 국내행정구역배달권Catalog
         ["bjd-sigungu:11650"] = ["bjd-sigungu:11170", "bjd-sigungu:11590", "bjd-sigungu:11620", "bjd-sigungu:11680"],
         ["bjd-sigungu:11680"] = ["bjd-sigungu:11200", "bjd-sigungu:11650", "bjd-sigungu:11710"],
         ["bjd-sigungu:11710"] = ["bjd-sigungu:11215", "bjd-sigungu:11680", "bjd-sigungu:11740"],
-        ["bjd-sigungu:11740"] = ["bjd-sigungu:11215", "bjd-sigungu:11710"]
+        ["bjd-sigungu:11740"] = ["bjd-sigungu:11215", "bjd-sigungu:11710"],
+        ["bjd-sigungu:41310"] = ["bjd-sigungu:11260", "bjd-sigungu:11215"]
     };
 }

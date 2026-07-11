@@ -262,7 +262,7 @@ public sealed class 픽업하차경로최적화ServiceTests
 
             var distance = Math.Abs(destination.Latitude - origin.Latitude) + Math.Abs(destination.Longitude - origin.Longitude);
             var duration = TimeSpan.FromMinutes((double)(distance * 10m));
-            return Task.FromResult<배차경로예상결과?>(new 배차경로예상결과(distance, duration, null));
+            return Task.FromResult<배차경로예상결과?>(new 배차경로예상결과(distance, duration, null, "Directions5", true));
         }
 
         public Task<배차경로예상결과?> EstimateOrderedRouteAsync(
@@ -285,7 +285,7 @@ public sealed class 픽업하차경로최적화ServiceTests
             }
 
             var duration = TimeSpan.FromMinutes((double)(distance * 10m));
-            return Task.FromResult<배차경로예상결과?>(new 배차경로예상결과(distance, duration, null));
+            return Task.FromResult<배차경로예상결과?>(new 배차경로예상결과(distance, duration, null, "Directions5", true));
         }
 
         public Task<배차삽입경로예상결과?> EstimateInsertionDelayAsync(배차경로좌표? origin, 배차경로좌표? routeAnchor, 배차경로좌표? pickup, 배차경로좌표? dropoff)

@@ -18,14 +18,15 @@ public sealed class GoogleRouteDistanceService : IRouteDistanceService
     {
         _httpClient = httpClient;
         _apiKey = configuration["GoogleGeocodingApiKey"] ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(_apiKey))
-        {
-            throw new InvalidOperationException("GoogleGeocodingApiKey configuration is required.");
-        }
     }
 
     public async Task<decimal?> GetDrivingDistanceKmAsync(decimal originLat, decimal originLng, decimal destinationLat, decimal destinationLng)
     {
+        if (string.IsNullOrWhiteSpace(_apiKey))
+        {
+            return null;
+        }
+
         var origin = string.Create(CultureInfo.InvariantCulture, $"{originLat},{originLng}");
         var destination = string.Create(CultureInfo.InvariantCulture, $"{destinationLat},{destinationLng}");
         var url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={Uri.EscapeDataString(origin)}&destinations={Uri.EscapeDataString(destination)}&mode=driving&key={_apiKey}";

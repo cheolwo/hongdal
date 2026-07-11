@@ -46,6 +46,29 @@ public class 화주운송기준운임계산기Tests
         Assert.Equal(12000m, result.거리운임);
         Assert.Equal(27000m, result.최종운임);
         Assert.True(result.직선거리기준);
+        Assert.Equal("직선거리", result.거리계산방식);
+    }
+
+    [Fact]
+    public void Calculate_Directions5_거리이면_직선거리기준을_끄고_실제경로방식을_남긴다()
+    {
+        var request = new 화주운송기준운임견적요청
+        {
+            차량종류 = "다마스"
+        };
+        var rate = new 화주운송기준운임단가("다마스", 15000m, 1200m, 15000m, "test");
+
+        var result = 화주운송기준운임계산기.Calculate(
+            request,
+            rate,
+            12.34m,
+            직선거리기준: false,
+            거리계산방식: "Directions5");
+
+        Assert.False(result.직선거리기준);
+        Assert.Equal("Directions5", result.거리계산방식);
+        Assert.Equal(12.34m, result.예상거리Km);
+        Assert.Equal(14808m, result.거리운임);
     }
 
     [Fact]
@@ -76,6 +99,24 @@ public class 화주운송기준운임계산기Tests
         };
 
         var distanceKm = 화주운송기준운임계산기.ResolveDistanceKm(request);
+
+        Assert.NotNull(distanceKm);
+        Assert.InRange(distanceKm.Value, 1.8m, 2.1m);
+    }
+
+    [Fact]
+    public void ResolveStraightLineDistanceKm_예상거리보다_좌표_직선거리만_계산한다()
+    {
+        var request = new 화주운송기준운임견적요청
+        {
+            예상거리Km = 99m,
+            상차위도 = 37.5665m,
+            상차경도 = 126.9780m,
+            하차위도 = 37.5512m,
+            하차경도 = 126.9882m
+        };
+
+        var distanceKm = 화주운송기준운임계산기.ResolveStraightLineDistanceKm(request);
 
         Assert.NotNull(distanceKm);
         Assert.InRange(distanceKm.Value, 1.8m, 2.1m);

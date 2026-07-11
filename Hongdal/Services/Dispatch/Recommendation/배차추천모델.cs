@@ -4,7 +4,12 @@ namespace 홍달.Services.Dispatch.Recommendation
 {
     public sealed record 배차경로좌표(decimal Latitude, decimal Longitude);
 
-    public sealed record 배차경로예상결과(decimal? DistanceKm, TimeSpan? Duration, decimal? TollFare);
+    public sealed record 배차경로예상결과(
+        decimal? DistanceKm,
+        TimeSpan? Duration,
+        decimal? TollFare,
+        string 계산방식 = "좌표근사",
+        bool 실제경로여부 = false);
 
     public sealed record 배차삽입경로예상결과(
         decimal? 기존경로거리Km,

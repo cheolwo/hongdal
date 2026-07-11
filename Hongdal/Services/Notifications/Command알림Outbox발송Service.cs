@@ -38,8 +38,15 @@ public sealed class Command알림Outbox발송Service : ICommand알림Outbox발�
     {
         var items = await _db.Command알림Outbox
             .Where(x => x.Status == 상태_대기
-                        && Command알림FeatureNames.발송지원목록.Contains(x.FeatureName)
-                        && x.Target == "Shipper")
+                        && x.Target == "Shipper"
+                        && (x.FeatureName == Command알림FeatureNames.배차수락
+                            || x.FeatureName == Command알림FeatureNames.상차접근
+                            || x.FeatureName == Command알림FeatureNames.운송완료입금요청
+                            || x.FeatureName == Command알림FeatureNames.운송상차지도착
+                            || x.FeatureName == Command알림FeatureNames.운송상차완료
+                            || x.FeatureName == Command알림FeatureNames.운송하차지도착
+                            || x.FeatureName == Command알림FeatureNames.운송인수완료
+                            || x.FeatureName == Command알림FeatureNames.운송현장예외신고))
             .OrderBy(x => x.CreatedAt)
             .Take(take)
             .ToListAsync(cancellationToken);

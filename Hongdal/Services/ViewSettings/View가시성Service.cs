@@ -71,17 +71,23 @@ public sealed class View가시성Service : IView가시성Service
     public async Task<IReadOnlyList<View가시성항목응답>> GetEffectiveViewsAsync(string appKey, string roleName, string? userId, CancellationToken cancellationToken = default)
     {
         var definitions = View카탈로그.앱별(appKey, roleName);
-        var viewKeys = definitions.Select(x => x.ViewKey).ToArray();
-        var policies = await _db.플랫폼View정책.AsNoTracking()
-            .Where(x => x.AppKey == appKey && x.RoleName == roleName && viewKeys.Contains(x.ViewKey))
-            .ToDictionaryAsync(x => x.ViewKey, cancellationToken);
+        var viewKeys = definitions.Select(x => x.ViewKey).ToHashSet(StringComparer.Ordinal);
+        var policyItems = await _db.플랫폼View정책.AsNoTracking()
+            .Where(x => x.AppKey == appKey && x.RoleName == roleName)
+            .ToListAsync(cancellationToken);
+        var policies = policyItems
+            .Where(x => viewKeys.Contains(x.ViewKey))
+            .ToDictionary(x => x.ViewKey, StringComparer.Ordinal);
 
         Dictionary<string, 사용자View설정> userSettings = [];
         if (!string.IsNullOrWhiteSpace(userId))
         {
-            userSettings = await _db.사용자View설정.AsNoTracking()
-                .Where(x => x.UserId == userId && x.AppKey == appKey && viewKeys.Contains(x.ViewKey))
-                .ToDictionaryAsync(x => x.ViewKey, cancellationToken);
+            var userSettingItems = await _db.사용자View설정.AsNoTracking()
+                .Where(x => x.UserId == userId && x.AppKey == appKey)
+                .ToListAsync(cancellationToken);
+            userSettings = userSettingItems
+                .Where(x => viewKeys.Contains(x.ViewKey))
+                .ToDictionary(x => x.ViewKey, StringComparer.Ordinal);
         }
 
         return definitions.Select(definition =>

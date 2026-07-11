@@ -186,6 +186,36 @@ public sealed class 국내화물배차조율ServiceTests
     }
 
     [Fact]
+    public void 조율은_기사_목표_건당지급액에_가까운_기사후보를_우선한다()
+    {
+        var service = new 국내화물배차조율Service();
+        var input = new 국내화물배차조율입력(
+            DateTime.UtcNow,
+            기사당최대추천건수: 1,
+            운송의뢰목록:
+            [
+                Request("REQ-1")
+            ],
+            기사후보목록:
+            [
+                Driver("DRV-LOW"),
+                Driver("DRV-TARGET")
+            ],
+            조합평가목록:
+            [
+                Candidate("REQ-1", "DRV-LOW", 80m, expectedCost: 1_000m, pickupDistanceKm: 1m),
+                Candidate("REQ-1", "DRV-TARGET", 80m, expectedCost: 5_000m, pickupDistanceKm: 1m)
+            ],
+            기사배정AI정책: new 국내화물기사배정AI정책(목표기사건당지급액: 5_000m));
+
+        var result = service.조율(input);
+
+        Assert.Single(result.추천배정목록);
+        Assert.Equal("DRV-TARGET", result.추천배정목록[0].기사Id);
+        Assert.Contains("기사목표단가회귀", result.추천배정목록[0].배지);
+    }
+
+    [Fact]
     public void 조율은_의뢰가_많은_상황에서_경로삽입효율_알고리즘을_적용한다()
     {
         var service = new 국내화물배차조율Service();
@@ -214,6 +244,204 @@ public sealed class 국내화물배차조율ServiceTests
         Assert.Equal("의뢰많음_경로삽입효율우선", result.적용알고리즘);
         Assert.Equal(0.33m, result.가용기사운송의뢰비율);
         Assert.Equal(2, result.추천배정목록.Count);
+    }
+
+    [Fact]
+    public void 조율은_수익묶음_후보에_포함된_의뢰를_우선한다()
+    {
+        var service = new 국내화물배차조율Service();
+        var input = new 국내화물배차조율입력(
+            DateTime.UtcNow,
+            기사당최대추천건수: 2,
+            운송의뢰목록:
+            [
+                Request("REQ-A"),
+                Request("REQ-B"),
+                Request("REQ-C")
+            ],
+            기사후보목록:
+            [
+                Driver("DRV-1")
+            ],
+            조합평가목록:
+            [
+                Candidate("REQ-A", "DRV-1", 80m, expectedCost: 40_000m),
+                Candidate("REQ-B", "DRV-1", 80m, expectedCost: 42_000m),
+                Candidate("REQ-C", "DRV-1", 95m, expectedCost: 10_000m)
+            ],
+            수익묶음후보목록:
+            [
+                new 운송의뢰수익묶음후보(
+                    "REQ-A+REQ-B",
+                    "수익우선묶음",
+                    ["REQ-A", "REQ-B"],
+                    예상운임합계: 160_000m,
+                    예상원가합계: 80_000m,
+                    예상플랫폼순이익: 80_000m,
+                    우선순위점수: 90_000m,
+                    묶음크기: 2,
+                    묶음의뢰Ids: ["REQ-A", "REQ-B"],
+                    배지: ["2건묶음"],
+                    경고: [],
+                    묶음가능여부: true,
+                    제외사유: [])
+            ]);
+
+        var result = service.조율(input);
+
+        Assert.Equal(["REQ-A", "REQ-B"], result.추천배정목록.Select(x => x.의뢰Id).Order(StringComparer.Ordinal).ToArray());
+        Assert.Single(result.보류목록, x => x.의뢰Id == "REQ-C");
+        Assert.All(result.추천배정목록, x => Assert.Contains("수익묶음우선", x.배지));
+    }
+
+    [Fact]
+    public void 조율은_수익묶음_후보를_가능하면_한_명의_기사에게_동시배정한다()
+    {
+        var service = new 국내화물배차조율Service();
+        var input = new 국내화물배차조율입력(
+            DateTime.UtcNow,
+            기사당최대추천건수: 2,
+            운송의뢰목록:
+            [
+                Request("REQ-A"),
+                Request("REQ-B")
+            ],
+            기사후보목록:
+            [
+                Driver("DRV-BUNDLE"),
+                Driver("DRV-SPLIT")
+            ],
+            조합평가목록:
+            [
+                Candidate("REQ-A", "DRV-BUNDLE", 80m, expectedCost: 20_000m),
+                Candidate("REQ-B", "DRV-BUNDLE", 80m, expectedCost: 20_000m),
+                Candidate("REQ-A", "DRV-SPLIT", 95m, expectedCost: 5_000m)
+            ],
+            수익묶음후보목록:
+            [
+                new 운송의뢰수익묶음후보(
+                    "REQ-A+REQ-B",
+                    "수익우선묶음",
+                    ["REQ-A", "REQ-B"],
+                    예상운임합계: 160_000m,
+                    예상원가합계: 40_000m,
+                    예상플랫폼순이익: 120_000m,
+                    우선순위점수: 130_000m,
+                    묶음크기: 2,
+                    묶음의뢰Ids: ["REQ-A", "REQ-B"],
+                    배지: ["2건묶음"],
+                    경고: [],
+                    묶음가능여부: true,
+                    제외사유: [])
+            ]);
+
+        var result = service.조율(input);
+
+        Assert.Equal(2, result.추천배정목록.Count);
+        Assert.All(result.추천배정목록, x => Assert.Equal("DRV-BUNDLE", x.기사Id));
+        Assert.All(result.추천배정목록, x => Assert.Contains("한 명의 기사에게 묶음 동시 배정", x.배지));
+    }
+
+    [Fact]
+    public void 조율은_수익묶음도_기사_목표_평균지급액에_가까운_기사에게_배정한다()
+    {
+        var service = new 국내화물배차조율Service();
+        var input = new 국내화물배차조율입력(
+            DateTime.UtcNow,
+            기사당최대추천건수: 2,
+            운송의뢰목록:
+            [
+                Request("REQ-A"),
+                Request("REQ-B")
+            ],
+            기사후보목록:
+            [
+                Driver("DRV-LOW"),
+                Driver("DRV-TARGET")
+            ],
+            조합평가목록:
+            [
+                Candidate("REQ-A", "DRV-LOW", 80m, expectedCost: 1_000m),
+                Candidate("REQ-B", "DRV-LOW", 80m, expectedCost: 1_000m),
+                Candidate("REQ-A", "DRV-TARGET", 80m, expectedCost: 5_000m),
+                Candidate("REQ-B", "DRV-TARGET", 80m, expectedCost: 5_000m)
+            ],
+            수익묶음후보목록:
+            [
+                new 운송의뢰수익묶음후보(
+                    "REQ-A+REQ-B",
+                    "수익우선묶음",
+                    ["REQ-A", "REQ-B"],
+                    예상운임합계: 160_000m,
+                    예상원가합계: 40_000m,
+                    예상플랫폼순이익: 120_000m,
+                    우선순위점수: 130_000m,
+                    묶음크기: 2,
+                    묶음의뢰Ids: ["REQ-A", "REQ-B"],
+                    배지: ["2건묶음"],
+                    경고: [],
+                    묶음가능여부: true,
+                    제외사유: [])
+            ],
+            기사배정AI정책: new 국내화물기사배정AI정책(목표기사건당지급액: 5_000m));
+
+        var result = service.조율(input);
+
+        Assert.Equal(2, result.추천배정목록.Count);
+        Assert.All(result.추천배정목록, x => Assert.Equal("DRV-TARGET", x.기사Id));
+        Assert.All(result.추천배정목록, x => Assert.Contains("기사목표단가회귀", x.배지));
+        Assert.All(result.추천배정목록, x => Assert.Contains("한 명의 기사에게 묶음 동시 배정", x.배지));
+    }
+
+    [Fact]
+    public void 조율은_정책상_세건_수익묶음도_한_명의_기사에게_동시배정할_수_있다()
+    {
+        var service = new 국내화물배차조율Service();
+        var input = new 국내화물배차조율입력(
+            DateTime.UtcNow,
+            기사당최대추천건수: 3,
+            운송의뢰목록:
+            [
+                Request("REQ-A"),
+                Request("REQ-B"),
+                Request("REQ-C")
+            ],
+            기사후보목록:
+            [
+                Driver("DRV-BUNDLE")
+            ],
+            조합평가목록:
+            [
+                Candidate("REQ-A", "DRV-BUNDLE", 80m, expectedCost: 20_000m),
+                Candidate("REQ-B", "DRV-BUNDLE", 80m, expectedCost: 20_000m),
+                Candidate("REQ-C", "DRV-BUNDLE", 80m, expectedCost: 20_000m)
+            ],
+            수익묶음후보목록:
+            [
+                new 운송의뢰수익묶음후보(
+                    "REQ-A+REQ-B+REQ-C",
+                    "수익우선묶음",
+                    ["REQ-A", "REQ-B", "REQ-C"],
+                    예상운임합계: 240_000m,
+                    예상원가합계: 60_000m,
+                    예상플랫폼순이익: 180_000m,
+                    우선순위점수: 160_000m,
+                    묶음크기: 3,
+                    묶음의뢰Ids: ["REQ-A", "REQ-B", "REQ-C"],
+                    배지: ["3건묶음"],
+                    경고: [],
+                    묶음가능여부: true,
+                    제외사유: [],
+                    예상건당플랫폼순이익: 60_000m,
+                    목표수익회귀점수: 20_000m,
+                    선택근거: "테스트")
+            ]);
+
+        var result = service.조율(input);
+
+        Assert.Equal(3, result.추천배정목록.Count);
+        Assert.All(result.추천배정목록, x => Assert.Equal("DRV-BUNDLE", x.기사Id));
+        Assert.All(result.추천배정목록, x => Assert.Contains("한 명의 기사에게 묶음 동시 배정", x.배지));
     }
 
     [Fact]

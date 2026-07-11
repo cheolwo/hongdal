@@ -13,6 +13,12 @@ public sealed record 국내화물배차조율입력요청
     public int 최대기사수 { get; init; } = 100;
 
     public int 기사당최대추천건수 { get; init; } = 2;
+
+    public decimal? 목표기사건당지급액 { get; init; }
+
+    public decimal? 기사목표지급액미달패널티배수 { get; init; }
+
+    public decimal? 기사목표지급액초과패널티배수 { get; init; }
 }
 
 public sealed record 국내화물배차조율입력(
@@ -20,7 +26,9 @@ public sealed record 국내화물배차조율입력(
     int 기사당최대추천건수,
     IReadOnlyList<운송의뢰조율입력> 운송의뢰목록,
     IReadOnlyList<기사후보조율입력> 기사후보목록,
-    IReadOnlyList<운송의뢰기사조합평가> 조합평가목록);
+    IReadOnlyList<운송의뢰기사조합평가> 조합평가목록,
+    IReadOnlyList<운송의뢰수익묶음후보>? 수익묶음후보목록 = null,
+    국내화물기사배정AI정책? 기사배정AI정책 = null);
 
 public sealed record 운송의뢰조율입력(
     long 배차대기Id,

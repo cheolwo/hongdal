@@ -1,5 +1,6 @@
 using FluentResults;
 using Hongdal.Contracts.Shipper.Request;
+using 홍달.Services.Dispatch.Recommendation;
 
 namespace Hongdal.Application.Shipper.Request;
 
@@ -13,10 +14,12 @@ public interface I화주운송기준운임Service
 public sealed class 화주운송기준운임Service : I화주운송기준운임Service
 {
     private readonly HongdalContext _db;
+    private readonly I배차추천경로Service _경로Service;
 
-    public 화주운송기준운임Service(HongdalContext db)
+    public 화주운송기준운임Service(HongdalContext db, I배차추천경로Service 경로Service)
     {
         _db = db;
+        _경로Service = 경로Service;
     }
 
     public async Task<Result<화주운송기준운임견적응답>> 견적Async(
@@ -28,11 +31,12 @@ public sealed class 화주운송기준운임Service : I화주운송기준운임S
             return Result.Fail<화주운송기준운임견적응답>("차량종류는 기준운임 견적에 필요합니다.");
         }
 
-        var distanceKm = 화주운송기준운임계산기.ResolveDistanceKm(request);
-        if (!distanceKm.HasValue || distanceKm.Value <= 0m)
+        var distance = await ResolveDistanceAsync(request, cancellationToken);
+        if (!distance.HasValue || distance.Value.DistanceKm <= 0m)
         {
             return Result.Fail<화주운송기준운임견적응답>("예상거리Km 또는 상차/하차 좌표가 기준운임 견적에 필요합니다.");
         }
+        var resolvedDistance = distance.Value;
 
         var rate = await ResolveRateAsync(request.차량종류, cancellationToken);
         if (rate is null)
@@ -40,7 +44,52 @@ public sealed class 화주운송기준운임Service : I화주운송기준운임S
             return Result.Fail<화주운송기준운임견적응답>($"차량종류 '{request.차량종류}'에 대한 차량단가를 찾을 수 없습니다.");
         }
 
-        return Result.Ok(화주운송기준운임계산기.Calculate(request, rate.Value, distanceKm.Value));
+        return Result.Ok(화주운송기준운임계산기.Calculate(
+            request,
+            rate.Value,
+            resolvedDistance.DistanceKm,
+            resolvedDistance.직선거리기준,
+            resolvedDistance.거리계산방식));
+    }
+
+    private async Task<화주운송거리판정?> ResolveDistanceAsync(
+        화주운송기준운임견적요청 request,
+        CancellationToken cancellationToken)
+    {
+        if (TryCreatePoint(request.상차위도, request.상차경도, out var pickup)
+            && TryCreatePoint(request.하차위도, request.하차경도, out var dropoff))
+        {
+            var route = await _경로Service.EstimateRouteAsync(pickup, dropoff);
+            if (route?.DistanceKm is > 0m)
+            {
+                return new 화주운송거리판정(
+                    route.DistanceKm.Value,
+                    직선거리기준: false,
+                    string.IsNullOrWhiteSpace(route.계산방식) ? "경로추정" : route.계산방식);
+            }
+        }
+
+        if (request.예상거리Km.HasValue && request.예상거리Km.Value > 0m)
+        {
+            return new 화주운송거리판정(request.예상거리Km.Value, true, "입력거리");
+        }
+
+        var straightLineDistanceKm = 화주운송기준운임계산기.ResolveStraightLineDistanceKm(request);
+        return straightLineDistanceKm.HasValue
+            ? new 화주운송거리판정(straightLineDistanceKm.Value, true, "직선거리")
+            : null;
+    }
+
+    private static bool TryCreatePoint(decimal? latitude, decimal? longitude, out 배차경로좌표 point)
+    {
+        if (latitude.HasValue && longitude.HasValue)
+        {
+            point = new 배차경로좌표(latitude.Value, longitude.Value);
+            return true;
+        }
+
+        point = default!;
+        return false;
     }
 
     private async Task<화주운송기준운임단가?> ResolveRateAsync(string vehicleType, CancellationToken cancellationToken)
@@ -66,6 +115,11 @@ public readonly record struct 화주운송기준운임단가(
     decimal Km당단가,
     decimal 최소운임,
     string 단가출처);
+
+public readonly record struct 화주운송거리판정(
+    decimal DistanceKm,
+    bool 직선거리기준,
+    string 거리계산방식);
 
 public static class 화주운송기준운임계산기
 {
@@ -102,7 +156,9 @@ public static class 화주운송기준운임계산기
     public static 화주운송기준운임견적응답 Calculate(
         화주운송기준운임견적요청 request,
         화주운송기준운임단가 rate,
-        decimal distanceKm)
+        decimal distanceKm,
+        bool 직선거리기준 = true,
+        string 거리계산방식 = "직선거리")
     {
         var roundedDistanceKm = decimal.Round(distanceKm, 2, MidpointRounding.AwayFromZero);
         var waitingFee = NormalizeMoney(request.대기료);
@@ -124,9 +180,10 @@ public static class 화주운송기준운임계산기
             수작업비 = manualFee,
             할증 = surcharge,
             최종운임 = finalFare,
-            직선거리기준 = true,
+            직선거리기준 = 직선거리기준,
+            거리계산방식 = string.IsNullOrWhiteSpace(거리계산방식) ? "직선거리" : 거리계산방식,
             단가출처 = rate.단가출처,
-            경고목록 = BuildWarnings(request, rate)
+            경고목록 = BuildWarnings(request, rate, 거리계산방식)
         };
     }
 
@@ -137,6 +194,11 @@ public static class 화주운송기준운임계산기
             return request.예상거리Km.Value;
         }
 
+        return ResolveStraightLineDistanceKm(request);
+    }
+
+    public static decimal? ResolveStraightLineDistanceKm(화주운송기준운임견적요청 request)
+    {
         if (request.상차위도.HasValue
             && request.상차경도.HasValue
             && request.하차위도.HasValue
@@ -209,14 +271,38 @@ public static class 화주운송기준운임계산기
             ? decimal.Round(Math.Max(0m, value.Value), 0, MidpointRounding.AwayFromZero)
             : 0m;
 
-    private static IReadOnlyList<string> BuildWarnings(화주운송기준운임견적요청 request, 화주운송기준운임단가 rate)
+    private static IReadOnlyList<string> BuildWarnings(
+        화주운송기준운임견적요청 request,
+        화주운송기준운임단가 rate,
+        string 거리계산방식)
     {
+        var warnings = new List<string>();
         if (string.Equals(rate.단가출처, "차량단가", StringComparison.Ordinal))
         {
-            return [];
+            return BuildDistanceWarnings(request, 거리계산방식, warnings);
         }
 
-        return [$"차량단가 테이블에서 '{request.차량종류}' 단가를 찾지 못해 {rate.단가출처}를 적용했습니다."];
+        warnings.Add($"차량단가 테이블에서 '{request.차량종류}' 단가를 찾지 못해 {rate.단가출처}를 적용했습니다.");
+        return BuildDistanceWarnings(request, 거리계산방식, warnings);
+    }
+
+    private static IReadOnlyList<string> BuildDistanceWarnings(
+        화주운송기준운임견적요청 request,
+        string 거리계산방식,
+        List<string> warnings)
+    {
+        var hasCoordinates = request.상차위도.HasValue
+            && request.상차경도.HasValue
+            && request.하차위도.HasValue
+            && request.하차경도.HasValue;
+        if (hasCoordinates
+            && !string.Equals(거리계산방식, "Directions5", StringComparison.Ordinal)
+            && !string.Equals(거리계산방식, "Directions5-구간합산", StringComparison.Ordinal))
+        {
+            warnings.Add($"Directions5 실제 운행거리를 확보하지 못해 {거리계산방식} 기준으로 산정했습니다.");
+        }
+
+        return warnings;
     }
 
     private static decimal CalculateStraightLineKm(

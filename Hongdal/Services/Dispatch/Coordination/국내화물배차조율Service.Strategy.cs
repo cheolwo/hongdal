@@ -43,13 +43,24 @@ public sealed partial class 국내화물배차조율Service
             ratio);
     }
 
-    private static long ToOptimizationCost(운송의뢰기사조합평가 candidate, 배차수급상태 supplyState)
-        => supplyState switch
+    private static long ToOptimizationCost(
+        운송의뢰기사조합평가 candidate,
+        배차수급상태 supplyState,
+        IReadOnlyDictionary<string, decimal> revenueBundleCostBenefitMap)
+    {
+        var baseCost = supplyState switch
         {
             배차수급상태.의뢰많음 => ToManyRequestsCost(candidate),
             배차수급상태.기사여유 => ToSurplusCost(candidate),
             _ => ToBalancedCost(candidate)
         };
+        if (!revenueBundleCostBenefitMap.TryGetValue(candidate.의뢰Id, out var benefit) || benefit <= 0m)
+        {
+            return baseCost;
+        }
+
+        return baseCost - (long)Math.Round(benefit, 0, MidpointRounding.AwayFromZero);
+    }
 
     private static long ToBalancedCost(운송의뢰기사조합평가 candidate)
     {

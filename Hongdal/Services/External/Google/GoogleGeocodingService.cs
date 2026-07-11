@@ -20,15 +20,12 @@ namespace 홍달.Services.External.Google
         {
             _httpClient = httpClient;
             _apiKey = configuration["GoogleGeocodingApiKey"] ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(_apiKey))
-            {
-                throw new InvalidOperationException("GoogleGeocodingApiKey configuration is required.");
-            }
         }
 
         public async Task<(decimal lat, decimal lng)?> GeocodeAsync(string address)
         {
             if (string.IsNullOrWhiteSpace(address)) return null;
+            if (string.IsNullOrWhiteSpace(_apiKey)) return null;
 
             var encoded = Uri.EscapeDataString(address);
             var response = await _httpClient.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={encoded}&key={_apiKey}");

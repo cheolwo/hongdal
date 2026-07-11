@@ -258,6 +258,7 @@ public sealed class 화주운송기준운임견적응답
     public decimal 할증 { get; set; }
     public decimal 최종운임 { get; set; }
     public bool 직선거리기준 { get; set; } = true;
+    public string 거리계산방식 { get; set; } = "직선거리";
     public string? 단가출처 { get; set; }
     public IReadOnlyList<string> 경고목록 { get; set; } = Array.Empty<string>();
 }

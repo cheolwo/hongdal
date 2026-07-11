@@ -13,6 +13,11 @@ public interface I음식멀티배차조합Service
     IReadOnlyList<멀티배차조합후보> 조합생성(멀티배차조합요청 request);
 }
 
+public interface I음식멀티배차조합AIService
+{
+    IReadOnlyList<멀티배차조합후보> 후보정렬(음식멀티배차조합AI요청 request);
+}
+
 [Obsolete("음식 배달 묶음은 I음식멀티배차조합Service/음식멀티배차조합Service를 사용하세요. 용달 멀티배차는 별도 정책으로 분리합니다.")]
 public sealed class 멀티배차조합Service(I배차추천경로Service routeService) : I멀티배차조합Service
 {
@@ -22,10 +27,29 @@ public sealed class 멀티배차조합Service(I배차추천경로Service routeSe
         => _inner.조합생성(request);
 }
 
-public sealed class 음식멀티배차조합Service(I배차추천경로Service routeService) : I음식멀티배차조합Service
+public sealed class 음식멀티배차조합Service : I음식멀티배차조합Service
 {
+    private readonly I배차추천경로Service _routeService;
+    private readonly I음식멀티배차조합AIService _aiService;
+    private readonly I배차AI판단근거조회Service _판단근거조회Service;
+
     private const string 단건배차 = "단건배차";
     private const string 멀티배차 = "멀티배차";
+
+    public 음식멀티배차조합Service(I배차추천경로Service routeService)
+        : this(routeService, new 규칙기반음식멀티배차조합AIService(), new 규칙기반배차AI판단근거조회Service())
+    {
+    }
+
+    public 음식멀티배차조합Service(
+        I배차추천경로Service routeService,
+        I음식멀티배차조합AIService aiService,
+        I배차AI판단근거조회Service 판단근거조회Service)
+    {
+        _routeService = routeService;
+        _aiService = aiService;
+        _판단근거조회Service = 판단근거조회Service;
+    }
 
     public IReadOnlyList<멀티배차조합후보> 조합생성(멀티배차조합요청 request)
     {
@@ -58,11 +82,20 @@ public sealed class 음식멀티배차조합Service(I배차추천경로Service r
             }
         }
 
-        return candidates
-            .OrderByDescending(x => x.조합가능여부)
-            .ThenByDescending(x => x.배차묶음유형 == 멀티배차)
-            .ThenByDescending(x => x.조합점수)
-            .ThenBy(x => x.조합키, StringComparer.Ordinal)
+        var 판단근거 = _판단근거조회Service.조회(new 배차AI판단근거요청(
+            "음식배달OS:멀티배차",
+            jobs.Select(x => x.의뢰Id).ToArray(),
+            [],
+            jobs.SelectMany(x => new[] { x.픽업배달권키, x.하차배달권키 })
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x!)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray(),
+            묶음크기: Math.Min(request.최대묶음크기, jobs.Length),
+            키워드: ["음식", "조리완료", "픽업", "고객전달", "배달완료시간", "멀티배차", "배달권"]));
+
+        return _aiService
+            .후보정렬(new 음식멀티배차조합AI요청(candidates, request, 판단근거))
             .Take(request.최대조합수 <= 0 ? candidates.Count : request.최대조합수)
             .ToArray();
     }
@@ -202,7 +235,7 @@ public sealed class 음식멀티배차조합Service(I배차추천경로Service r
             return null;
         }
 
-        return routeService.CalculateDistanceKm(source, target);
+        return _routeService.CalculateDistanceKm(source, target);
     }
 
     private decimal? CalculateBestPairRouteDistance(픽업하차경로작업 first, 픽업하차경로작업 second)
@@ -235,7 +268,7 @@ public sealed class 음식멀티배차조합Service(I배차추천경로Service r
                 return null;
             }
 
-            var segment = routeService.CalculateDistanceKm(stops[i - 1]!, stops[i]!);
+            var segment = _routeService.CalculateDistanceKm(stops[i - 1]!, stops[i]!);
             if (!segment.HasValue)
             {
                 return null;
@@ -318,6 +351,76 @@ public sealed class 음식멀티배차조합Service(I배차추천경로Service r
             ? Math.Abs((decimal)(left.Value - right.Value).TotalMinutes)
             : null;
 }
+
+public sealed class 규칙기반음식멀티배차조합AIService : I음식멀티배차조합AIService
+{
+    private const string 멀티배차 = "멀티배차";
+
+    public IReadOnlyList<멀티배차조합후보> 후보정렬(음식멀티배차조합AI요청 request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var 판단근거요약 = 배차AI판단근거Formatter.요약(request.판단근거);
+        return request.후보목록
+            .Select(x => string.IsNullOrWhiteSpace(판단근거요약) ? x : AddEvidence(x, 판단근거요약))
+            .OrderByDescending(x => x.조합가능여부)
+            .ThenByDescending(x => x.배차묶음유형 == 멀티배차)
+            .ThenByDescending(FoodDeliveryScore)
+            .ThenBy(x => x.조합키, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static decimal FoodDeliveryScore(멀티배차조합후보 candidate)
+    {
+        var score = candidate.조합점수;
+        if (!candidate.조합가능여부)
+        {
+            score -= 1_000m;
+        }
+
+        if (candidate.배지.Contains("같은배달권", StringComparer.Ordinal))
+        {
+            score += 10m;
+        }
+
+        if (candidate.배지.Contains("인접배달권", StringComparer.Ordinal))
+        {
+            score += 3m;
+        }
+
+        if (candidate.배지.Contains("동일상차지", StringComparer.Ordinal))
+        {
+            score += 8m;
+        }
+
+        if (candidate.묶음내예상거리Km is > 0m and <= 6m)
+        {
+            score += 6m;
+        }
+
+        score -= candidate.경고.Count * 2m;
+        score -= (candidate.제외사유?.Count ?? 0) * 20m;
+        return score;
+    }
+
+    private static 멀티배차조합후보 AddEvidence(멀티배차조합후보 candidate, string 판단근거요약)
+        => candidate with
+        {
+            배지 = candidate.배지
+                .Concat(["판단근거반영"])
+                .Distinct(StringComparer.Ordinal)
+                .ToArray(),
+            경고 = candidate.경고
+                .Concat([판단근거요약])
+                .Distinct(StringComparer.Ordinal)
+                .ToArray()
+        };
+}
+
+public sealed record 음식멀티배차조합AI요청(
+    IReadOnlyList<멀티배차조합후보> 후보목록,
+    멀티배차조합요청 원요청,
+    배차AI판단근거? 판단근거 = null);
 
 public sealed record 멀티배차조합요청(
     IReadOnlyList<픽업하차경로작업> 작업목록,

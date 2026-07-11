@@ -126,7 +126,9 @@ public sealed class 픽업하차경로최적화Service(I배차추천경로Servic
         return new 배차경로예상결과(
             estimatedDistanceKm,
             TimeSpan.FromMinutes((double)estimatedMinutes),
-            null);
+            null,
+            "좌표근사",
+            false);
     }
 
     private async Task<픽업하차경로최적화결과> VerifySelectedRouteAsync(
@@ -195,8 +197,8 @@ public sealed class 픽업하차경로최적화Service(I배차추천경로Servic
             총거리Km = totalDistanceKm,
             방문순서 = visitOrder,
             위반사유 = violations,
-            비용계산방식 = "Directions5",
-            실제경로검증여부 = true,
+            비용계산방식 = verified.계산방식,
+            실제경로검증여부 = verified.실제경로여부,
             좌표근사총소요시간분 = approximateResult.총소요시간분,
             좌표근사총거리Km = approximateResult.총거리Km
         };

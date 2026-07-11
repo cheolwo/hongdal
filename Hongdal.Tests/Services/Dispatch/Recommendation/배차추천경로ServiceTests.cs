@@ -19,6 +19,8 @@ public class 배차추천경로ServiceTests
         Assert.True(route!.DistanceKm > 0m);
         Assert.True(route.Duration > TimeSpan.Zero);
         Assert.Null(route.TollFare);
+        Assert.False(route.실제경로여부);
+        Assert.Equal("좌표기반도로보정", route.계산방식);
     }
 
     [Fact]
@@ -57,6 +59,8 @@ public class 배차추천경로ServiceTests
         Assert.NotNull(second);
         Assert.Equal(first!.Duration, second!.Duration);
         Assert.Equal(1, callCount);
+        Assert.True(first.실제경로여부);
+        Assert.Equal("Directions5", first.계산방식);
     }
 
     [Fact]
@@ -86,6 +90,8 @@ public class 배차추천경로ServiceTests
         Assert.Equal(3.5m, route!.DistanceKm);
         Assert.Equal(TimeSpan.FromMinutes(15), route.Duration);
         Assert.Equal(1, callCount);
+        Assert.True(route.실제경로여부);
+        Assert.Equal("Directions5", route.계산방식);
     }
 
     private static 배차추천경로Service CreateService(

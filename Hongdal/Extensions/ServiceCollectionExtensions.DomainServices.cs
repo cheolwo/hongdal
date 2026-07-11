@@ -87,6 +87,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I기사운송일정구성Service, 기사운송일정구성Service>();
         services.AddScoped<I운송일정삽입평가Service, 운송일정삽입평가Service>();
         services.AddScoped<I픽업하차경로최적화Service, 픽업하차경로최적화Service>();
+        services.AddScoped<I음식멀티배차조합AIService, 규칙기반음식멀티배차조합AIService>();
         services.AddScoped<I음식멀티배차조합Service, 음식멀티배차조합Service>();
         services.AddScoped<I배차추천판정Service, 배차추천판정Service>();
         services.AddScoped<I배차추천평가Service, 배차추천평가Service>();
@@ -94,9 +95,18 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I배달권기반배차조율계획Service, 배달권기반배차조율계획Service>();
         services.AddScoped<I배달권기반배차조율실행Service, 배달권기반배차조율실행Service>();
         services.AddScoped<I국내화물배차조율입력Factory, 국내화물배차조율입력Factory>();
+        services.AddSingleton<File배차AI판단사례LedgerStore>();
+        services.AddSingleton<I배차AI판단사례LedgerStore>(sp => sp.GetRequiredService<File배차AI판단사례LedgerStore>());
+        services.AddSingleton<I배차AI판단근거Source>(sp => sp.GetRequiredService<File배차AI판단사례LedgerStore>());
+        services.AddScoped<I배차AI판단근거조회Service, 규칙기반배차AI판단근거조회Service>();
+        services.AddScoped<I운송의뢰수익묶음AIService, 규칙기반운송의뢰수익묶음AIService>();
+        services.AddScoped<I운송의뢰수익묶음Service, 운송의뢰수익묶음Service>();
+        services.AddScoped<I국내화물기사배정AIService, 규칙기반국내화물기사배정AIService>();
         services.AddScoped<I국내화물배차조율Service, 국내화물배차조율Service>();
         services.AddScoped<I국내화물배차조율적용Service, 국내화물배차조율적용Service>();
         services.AddScoped<I국내화물배차조율실행Service, 국내화물배차조율실행Service>();
+        services.AddScoped<IDomesticCargoDispatchAIReviewService, DomesticCargoDispatchAIReviewService>();
+        services.AddScoped<IFoodDeliveryDispatchAIReviewService, FoodDeliveryDispatchAIReviewService>();
         services.AddScoped<I배차업무정책, 용달운송배차업무정책>();
         services.AddScoped<I배차업무정책, 음식배달배차업무정책>();
         services.AddScoped<I운송의뢰배차원천분류Service, 운송의뢰배차원천분류Service>();

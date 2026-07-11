@@ -6,7 +6,10 @@ public sealed partial class 국내화물배차조율Service
         IReadOnlyList<string> requestIds,
         IReadOnlyList<string> driverIds,
         IReadOnlyList<운송의뢰기사조합평가> candidates,
-        배차조율전략 strategy)
+        배차조율전략 strategy,
+        IReadOnlyDictionary<string, decimal> revenueBundleCostBenefitMap,
+        I국내화물기사배정AIService driverAssignmentAiService,
+        국내화물기사배정AI정책? driverAssignmentPolicy)
     {
         if (requestIds.Count == 0 || driverIds.Count == 0 || candidates.Count == 0)
         {
@@ -43,7 +46,8 @@ public sealed partial class 국내화물배차조율Service
                 requestOffset + req,
                 driverOffset + drv,
                 1,
-                ToOptimizationCost(candidate, strategy.수급상태),
+                ToOptimizationCost(candidate, strategy.수급상태, revenueBundleCostBenefitMap)
+                + driverAssignmentAiService.비용보정(candidate, driverAssignmentPolicy),
                 candidate);
         }
 
@@ -78,7 +82,10 @@ public sealed partial class 국내화물배차조율Service
         IReadOnlyList<운송의뢰기사조합평가> candidates,
         배차조율전략 strategy,
         IReadOnlyDictionary<string, string> requestScopeMap,
-        IReadOnlyDictionary<string, string> driverScopeMap)
+        IReadOnlyDictionary<string, string> driverScopeMap,
+        IReadOnlyDictionary<string, decimal> revenueBundleCostBenefitMap,
+        I국내화물기사배정AIService driverAssignmentAiService,
+        국내화물기사배정AI정책? driverAssignmentPolicy)
     {
         if (requestIds.Count == 0 || driverIds.Count == 0 || candidates.Count == 0)
         {
@@ -117,7 +124,14 @@ public sealed partial class 국내화물배차조율Service
                 .Where(x => scopedRequests.Contains(x.의뢰Id, StringComparer.Ordinal))
                 .Where(x => scopedDrivers.Contains(x.기사Id, StringComparer.Ordinal))
                 .ToArray();
-            var scopedMatched = Optimize(scopedRequests, scopedDrivers, scopedCandidates, strategy with { 기사용량 = scopedCapacity });
+            var scopedMatched = Optimize(
+                scopedRequests,
+                scopedDrivers,
+                scopedCandidates,
+                strategy with { 기사용량 = scopedCapacity },
+                revenueBundleCostBenefitMap,
+                driverAssignmentAiService,
+                driverAssignmentPolicy);
             foreach (var candidate in scopedMatched)
             {
                 matched.Add(candidate);
@@ -138,7 +152,14 @@ public sealed partial class 국내화물배차조율Service
                 .Where(x => fallbackRequests.Contains(x.의뢰Id, StringComparer.Ordinal))
                 .Where(x => fallbackDrivers.Contains(x.기사Id, StringComparer.Ordinal))
                 .ToArray();
-            matched.AddRange(Optimize(fallbackRequests, fallbackDrivers, fallbackCandidates, strategy with { 기사용량 = remainingCapacity }));
+            matched.AddRange(Optimize(
+                fallbackRequests,
+                fallbackDrivers,
+                fallbackCandidates,
+                strategy with { 기사용량 = remainingCapacity },
+                revenueBundleCostBenefitMap,
+                driverAssignmentAiService,
+                driverAssignmentPolicy));
         }
 
         return matched;
