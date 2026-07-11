@@ -52,4 +52,43 @@ public sealed partial class 백오피스메모리Service
         _filePods.Insert(0, item);
         return item;
     }
+
+    public Task<IReadOnlyList<문서정책요약응답>> 문서정책목록조회Async(CancellationToken cancellationToken = default)
+        => Task.FromResult(_documentMemory.GetPolicies());
+
+    public Task<문서정책요약응답?> 문서정책수정Async(string documentCode, 문서정책수정요청 request, CancellationToken cancellationToken = default)
+        => Task.FromResult(_documentMemory.UpdatePolicy(documentCode, request));
+
+    public Task<IReadOnlyList<문서조회요약응답>> 문서목록조회Async(string? documentCode = null, string? requestId = null, string? status = null, CancellationToken cancellationToken = default)
+        => Task.FromResult(_documentMemory.GetDocuments(documentCode, requestId, status));
+
+    public Task<IReadOnlyList<문서조회로그요약응답>> 문서로그목록조회Async(long? documentId = null, CancellationToken cancellationToken = default)
+        => Task.FromResult(_documentMemory.GetLogs(documentId));
+
+    public async Task<문서조회요약응답?> 문서업로드Async(
+        Stream fileStream,
+        string fileName,
+        string contentType,
+        string documentCode,
+        string documentName,
+        string requestId,
+        long? transportId = null,
+        bool? encrypt = null,
+        bool? allowDownload = null,
+        string? createdBy = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await _documentMemory.UploadDocumentAsync(
+            fileStream,
+            fileName,
+            contentType,
+            documentCode,
+            documentName,
+            requestId,
+            transportId,
+            encrypt,
+            allowDownload,
+            createdBy,
+            cancellationToken);
+    }
 }

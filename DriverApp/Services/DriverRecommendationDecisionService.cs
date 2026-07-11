@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using DriverApp.Models.Driver;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Driver.Action;
 
 namespace DriverApp.Services;
@@ -10,12 +11,17 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
     private readonly Dictionary<string, RecommendationDecisionState> _decisions = new(StringComparer.OrdinalIgnoreCase);
 
-    public DriverRecommendationDecisionService(HttpClient httpClient, IAuthSession authSession)
+    public DriverRecommendationDecisionService(
+        HttpClient httpClient,
+        IAuthSession authSession,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _ledgerObserver = ledgerObserver;
     }
 
     public event Action? Changed;
@@ -35,6 +41,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
     public async Task<RecommendationDecisionState> AcceptAsync(DriverRequestItem request, CancellationToken cancellationToken = default)
     {
         await PostServerAsync($"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/accept", null, cancellationToken);
+        _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.Accepted");
         return SaveAccepted(
             request,
             "홍달 서버에서 배차 수락 처리되었습니다.");
@@ -65,6 +72,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             $"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/cancel-acceptance",
             new 기사배차수락취소요청 { 사유 = reason },
             cancellationToken);
+        _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.AcceptanceCanceled");
         var memo = "홍달 서버에서 배차 수락 취소가 접수되었습니다.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
@@ -88,6 +96,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             $"api/v1/driver/dispatch-actions/{Uri.EscapeDataString(request.의뢰Id)}/reject",
             new 기사배차거절요청 { 사유 = reason },
             cancellationToken);
+        _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.Rejected");
         var memo = "홍달 서버에서 배차 거절 처리되었습니다.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
@@ -99,7 +108,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
 
     private RecommendationDecisionState SaveAccepted(DriverRequestItem request, string memo)
     {
-        request.배차상태 = "수락";
+        request.배차상태 = "배차확정";
         request.상태 = "수락완료";
         return Save(
             request,
@@ -138,8 +147,28 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
     {
         var state = new RecommendationDecisionState(request.의뢰Id, decision, memo, DateTime.Now, followUpPlan);
         _decisions[request.의뢰Id] = state;
+        Observe(request, $"DriverApp.Decision.{decision}");
         Changed?.Invoke();
         return state;
+    }
+
+    private void Observe(DriverRequestItem request, string source)
+    {
+        if (string.IsNullOrWhiteSpace(request.의뢰Id))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                request.의뢰Id,
+                request.상태,
+                null,
+                request.배차상태,
+                null,
+                DateTimeOffset.UtcNow,
+                source),
+            source);
     }
 
     private async Task PostServerAsync(string path, object? payload, CancellationToken cancellationToken)

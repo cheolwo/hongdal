@@ -1,6 +1,9 @@
 @page "/requests/{RequestId}"
+@using Hongdal.Client.Infrastructure.Transport
 @inject I백오피스Service DataService
+@inject ITransportRequestLedgerObserver LedgerObserver
 @inject NavigationManager NavigationManager
+@implements IDisposable
 
 <PageTitle>의뢰 상세</PageTitle>
 
@@ -109,15 +112,19 @@
     private string? message;
     private 화주운송의뢰응답? request;
     private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
+    private CancellationTokenSource? pollingCts;
 
     private string WorkflowDetailHref => $"/transports/{Uri.EscapeDataString(RequestId)}";
 
     protected override async Task OnParametersSetAsync()
     {
+        EnsureObserverStarted();
         await LoadAsync();
     }
 
-    private async Task LoadAsync()
+    private Task LoadAsync() => LoadAsync(showMessage: true);
+
+    private async Task LoadAsync(bool showMessage)
     {
         if (string.IsNullOrWhiteSpace(RequestId))
         {
@@ -127,16 +134,23 @@
         }
 
         isLoading = true;
-        message = null;
+        if (showMessage)
+        {
+            message = null;
+        }
 
         try
         {
             request = await DataService.의뢰상세조회Async(RequestId);
+            isError = false;
         }
         catch (Exception ex)
         {
-            isError = true;
-            message = $"의뢰 상세 조회 실패: {ex.Message}";
+            if (showMessage)
+            {
+                isError = true;
+                message = $"의뢰 상세 조회 실패: {ex.Message}";
+            }
             request = null;
         }
         finally
@@ -170,6 +184,83 @@
         {
             isSaving = false;
         }
+    }
+
+    private void EnsureObserverStarted()
+    {
+        if (pollingCts is not null)
+        {
+            return;
+        }
+
+        LedgerObserver.Changed += OnLedgerChanged;
+        LedgerObserver.RefreshRequested += OnLedgerRefreshRequested;
+        pollingCts = new CancellationTokenSource();
+        _ = RunPollingAsync(pollingCts.Token);
+    }
+
+    private async Task RunPollingAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(15));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                if (string.IsNullOrWhiteSpace(RequestId) || isLoading || isSaving)
+                {
+                    continue;
+                }
+
+                await InvokeAsync(async () =>
+                {
+                    await LoadAsync(showMessage: false);
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void OnLedgerChanged(TransportRequestLedgerChange change)
+    {
+        if (!IsCurrentRequest(change.RequestId))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await LoadAsync(showMessage: false);
+            StateHasChanged();
+        });
+    }
+
+    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest request)
+    {
+        if (!IsCurrentRequest(request.RequestId))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await LoadAsync(showMessage: false);
+            StateHasChanged();
+        });
+    }
+
+    private bool IsCurrentRequest(string requestId)
+        => !string.IsNullOrWhiteSpace(RequestId)
+           && string.Equals(RequestId.Trim(), requestId.Trim(), StringComparison.OrdinalIgnoreCase);
+
+    public void Dispose()
+    {
+        LedgerObserver.Changed -= OnLedgerChanged;
+        LedgerObserver.RefreshRequested -= OnLedgerRefreshRequested;
+        pollingCts?.Cancel();
+        pollingCts?.Dispose();
     }
 
     private static string ReviewLabel(화주운송의뢰응답 item)

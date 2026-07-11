@@ -1,6 +1,9 @@
 @page "/driver/transports/current"
+@using Hongdal.Client.Infrastructure.Transport
 @using Hongdal.Contracts.Driver.Transport
 @inject 기사운송증빙Service 증빙Service
+@inject ITransportRequestLedgerObserver LedgerObserver
+@implements IDisposable
 
 <WebPageHeader Eyebrow="Driver Web"
                Title="진행 중 운송"
@@ -197,6 +200,7 @@
     private int AcceptedTransportRetryAttempt { get; set; }
     private string? StatusMessage { get; set; }
     private Severity StatusSeverity { get; set; } = Severity.Info;
+    private CancellationTokenSource? pollingCts;
 
     private bool HasAcceptedRequestContext => !string.IsNullOrWhiteSpace(AcceptedRequestId);
     private bool IsAcceptedRequestLoaded
@@ -232,6 +236,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnsureObserverStarted();
         await TryLoadCurrentTransportAsync();
     }
 
@@ -272,6 +277,77 @@
     {
         CurrentTransport = await 증빙Service.현재운송조회Async();
     }
+
+    private void EnsureObserverStarted()
+    {
+        if (pollingCts is not null)
+        {
+            return;
+        }
+
+        LedgerObserver.Changed += OnLedgerChanged;
+        LedgerObserver.RefreshRequested += OnLedgerRefreshRequested;
+        pollingCts = new CancellationTokenSource();
+        _ = RunPollingAsync(pollingCts.Token);
+    }
+
+    private async Task RunPollingAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(15));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                if (IsBusy || (CurrentTransport is null && !HasAcceptedRequestContext))
+                {
+                    continue;
+                }
+
+                await InvokeAsync(async () =>
+                {
+                    await LoadCurrentTransportCoreAsync();
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void OnLedgerChanged(TransportRequestLedgerChange change)
+    {
+        if (!IsCurrentTransportRequest(change.RequestId))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await LoadCurrentTransportCoreAsync();
+            StateHasChanged();
+        });
+    }
+
+    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest request)
+    {
+        if (!IsCurrentTransportRequest(request.RequestId))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await LoadCurrentTransportCoreAsync();
+            StateHasChanged();
+        });
+    }
+
+    private bool IsCurrentTransportRequest(string requestId)
+        => (!string.IsNullOrWhiteSpace(CurrentTransport?.운송번호)
+            && string.Equals(CurrentTransport.운송번호, requestId, StringComparison.OrdinalIgnoreCase))
+           || (!string.IsNullOrWhiteSpace(AcceptedRequestId)
+               && string.Equals(AcceptedRequestId, requestId, StringComparison.OrdinalIgnoreCase));
 
     private async Task WaitForAcceptedTransportAsync(string? firstFailureMessage = null)
     {
@@ -449,6 +525,14 @@
 
     private static string DisplayMoney(decimal? value)
         => value.HasValue ? $"{value.Value:N0}원" : "금액 미정";
+
+    public void Dispose()
+    {
+        LedgerObserver.Changed -= OnLedgerChanged;
+        LedgerObserver.RefreshRequested -= OnLedgerRefreshRequested;
+        pollingCts?.Cancel();
+        pollingCts?.Dispose();
+    }
 
     private sealed record TimelineStep(
         string Label,

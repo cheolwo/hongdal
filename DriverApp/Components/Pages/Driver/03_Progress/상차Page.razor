@@ -377,6 +377,8 @@
     private string photoContentType = "image/jpeg";
     private byte[]? photoBytes;
     private string? photoPreviewUrl;
+    private string? uploadedObjectName;
+    private string? uploadedUrl;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
     private bool pickupPlaceConfirmed;
@@ -651,6 +653,8 @@
             photoFileName = photo.FileName;
             photoContentType = string.IsNullOrWhiteSpace(photo.ContentType) ? "image/jpeg" : photo.ContentType;
             photoPreviewUrl = $"data:{photoContentType};base64,{Convert.ToBase64String(photoBytes)}";
+            uploadedObjectName = null;
+            uploadedUrl = null;
             SetStatus("상차 완료 사진이 첨부되었습니다. 사진을 확인한 뒤 상차 완료를 눌러 주세요.", Severity.Success);
         }
         catch (FeatureNotSupportedException)
@@ -690,11 +694,19 @@
                 photoFileName ?? $"pickup-complete-{운송Id}.jpg",
                 photoContentType,
                 photoBytes!,
-                BuildReceiptEvidence()));
+                BuildReceiptEvidence(),
+                uploadedObjectName,
+                uploadedUrl));
 
             var objectName = string.IsNullOrWhiteSpace(result.ObjectName) ? string.Empty : $" 저장 경로: {result.ObjectName}";
-            SetStatus($"{result.Message}{objectName}", result.Uploaded ? Severity.Success : Severity.Info);
             if (result.Uploaded)
+            {
+                uploadedObjectName = result.ObjectName;
+                uploadedUrl = result.Url;
+            }
+
+            SetStatus($"{result.Message}{objectName}", result.CompletionRecorded ? Severity.Success : Severity.Warning);
+            if (result.CompletionRecorded)
             {
                 NavigationManager.NavigateTo(DriverRoutes.TransportDropoff(운송Id));
             }
@@ -732,6 +744,8 @@
         photoBytes = null;
         photoPreviewUrl = null;
         photoContentType = "image/jpeg";
+        uploadedObjectName = null;
+        uploadedUrl = null;
         SetStatus("첨부된 상차 사진을 제거했습니다.", Severity.Info);
     }
 

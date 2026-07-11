@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Driver.Transport;
 
 namespace Hongdal.WebApp.Services;
@@ -8,11 +9,16 @@ public sealed class 기사운송증빙Service
 {
     private readonly HttpClient _httpClient;
     private readonly WebAuthSessionService _authSession;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
 
-    public 기사운송증빙Service(HttpClient httpClient, WebAuthSessionService authSession)
+    public 기사운송증빙Service(
+        HttpClient httpClient,
+        WebAuthSessionService authSession,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _ledgerObserver = ledgerObserver;
     }
 
     public async Task<IReadOnlyList<기사운송요약응답>> 목록조회Async(CancellationToken cancellationToken = default)
@@ -20,7 +26,13 @@ public sealed class 기사운송증빙Service
         using var request = await CreateAuthorizedRequestAsync(HttpMethod.Get, "api/v1/driver/transports", cancellationToken);
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "운송 목록 조회", cancellationToken);
-        return await response.Content.ReadFromJsonAsync<IReadOnlyList<기사운송요약응답>>(cancellationToken) ?? [];
+        var items = await response.Content.ReadFromJsonAsync<IReadOnlyList<기사운송요약응답>>(cancellationToken) ?? [];
+        foreach (var item in items)
+        {
+            Observe(item, "Hongdal.WebApp.DriverTransportList");
+        }
+
+        return items;
     }
 
     public async Task<기사운송요약응답> 현재운송조회Async(CancellationToken cancellationToken = default)
@@ -28,8 +40,10 @@ public sealed class 기사운송증빙Service
         using var request = await CreateAuthorizedRequestAsync(HttpMethod.Get, "api/v1/driver/transports/current", cancellationToken);
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "현재 운송 조회", cancellationToken);
-        return await response.Content.ReadFromJsonAsync<기사운송요약응답>(cancellationToken)
-               ?? throw new InvalidOperationException("현재 운송 조회 응답을 읽을 수 없습니다.");
+        var item = await response.Content.ReadFromJsonAsync<기사운송요약응답>(cancellationToken)
+                   ?? throw new InvalidOperationException("현재 운송 조회 응답을 읽을 수 없습니다.");
+        Observe(item, "Hongdal.WebApp.DriverCurrentTransport");
+        return item;
     }
 
     public async Task<기사운송상세응답> 상세조회Async(long transportId, CancellationToken cancellationToken = default)
@@ -37,8 +51,10 @@ public sealed class 기사운송증빙Service
         using var request = await CreateAuthorizedRequestAsync(HttpMethod.Get, $"api/v1/driver/transports/{transportId}", cancellationToken);
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "운송 상세 조회", cancellationToken);
-        return await response.Content.ReadFromJsonAsync<기사운송상세응답>(cancellationToken)
-               ?? throw new InvalidOperationException("운송 상세 조회 응답을 읽을 수 없습니다.");
+        var item = await response.Content.ReadFromJsonAsync<기사운송상세응답>(cancellationToken)
+                   ?? throw new InvalidOperationException("운송 상세 조회 응답을 읽을 수 없습니다.");
+        Observe(item, "Hongdal.WebApp.DriverTransportDetail");
+        return item;
     }
 
     public Task<기사운송상태변경응답> 상차지도착Async(long transportId, CancellationToken cancellationToken = default)
@@ -145,8 +161,10 @@ public sealed class 기사운송증빙Service
         using var request = await CreateAuthorizedRequestAsync(HttpMethod.Post, path, cancellationToken);
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, actionName, cancellationToken);
-        return await response.Content.ReadFromJsonAsync<기사운송상태변경응답>(cancellationToken)
-               ?? throw new InvalidOperationException($"{actionName} 응답을 읽을 수 없습니다.");
+        var item = await response.Content.ReadFromJsonAsync<기사운송상태변경응답>(cancellationToken)
+                   ?? throw new InvalidOperationException($"{actionName} 응답을 읽을 수 없습니다.");
+        Observe(item, $"Hongdal.WebApp.{actionName}");
+        return item;
     }
 
     private async Task<TResponse> PostJsonAsync<TRequest, TResponse>(
@@ -160,8 +178,14 @@ public sealed class 기사운송증빙Service
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, actionName, cancellationToken);
-        return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken)
-               ?? throw new InvalidOperationException($"{actionName} 응답을 읽을 수 없습니다.");
+        var item = await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken)
+                   ?? throw new InvalidOperationException($"{actionName} 응답을 읽을 수 없습니다.");
+        if (item is 기사운송상태변경응답 state)
+        {
+            Observe(state, $"Hongdal.WebApp.{actionName}");
+        }
+
+        return item;
     }
 
     private async Task<HttpRequestMessage> CreateAuthorizedRequestAsync(
@@ -199,6 +223,45 @@ public sealed class 기사운송증빙Service
         throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
             ? $"{actionName} 실패: HTTP {(int)response.StatusCode}"
             : $"{actionName} 실패: HTTP {(int)response.StatusCode}: {body}");
+    }
+
+    private void Observe(기사운송요약응답 item, string source)
+    {
+        if (string.IsNullOrWhiteSpace(item.운송번호))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.운송번호,
+                item.상태,
+                null,
+                item.상태,
+                null,
+                DateTimeOffset.UtcNow,
+                source),
+            source);
+    }
+
+    private void Observe(기사운송상태변경응답 item, string source)
+    {
+        if (string.IsNullOrWhiteSpace(item.운송번호))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.운송번호,
+                item.상태,
+                null,
+                item.상태,
+                null,
+                DateTimeOffset.UtcNow,
+                source),
+            source);
+        _ledgerObserver.RequestRefresh(item.운송번호, source);
     }
 }
 

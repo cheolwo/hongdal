@@ -56,6 +56,7 @@ public sealed class 화주운송의뢰수정요청
 {
     public string? 상태 { get; set; }
     public string? 결제상태 { get; set; }
+    public string? 배차상태 { get; set; }
 }
 
 public sealed class 결제목록응답

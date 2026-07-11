@@ -89,7 +89,7 @@ public sealed partial class 백오피스조회Service
         return result ?? [];
     }
 
-    public async Task<문서조회요약응답?> 문서업로드Async(Stream fileStream, string fileName, string contentType, string documentCode, string documentName, string requestId, long? transportId = null, bool? encrypt = null, bool? allowDownload = null, CancellationToken cancellationToken = default)
+    public async Task<문서조회요약응답?> 문서업로드Async(Stream fileStream, string fileName, string contentType, string documentCode, string documentName, string requestId, long? transportId = null, bool? encrypt = null, bool? allowDownload = null, string? createdBy = null, CancellationToken cancellationToken = default)
     {
         ApplyAuthorizationHeader();
 

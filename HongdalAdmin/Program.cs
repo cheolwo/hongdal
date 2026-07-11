@@ -1,6 +1,7 @@
 using HongdalAdmin.Components;
 using HongdalAdmin.Options;
 using HongdalAdmin.Services;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Ui.Common.Areas.App.Services;
 using MudBlazor.Services;
 
@@ -22,6 +23,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 builder.Services.Configure<관리자ApiOptions>(builder.Configuration.GetSection(관리자ApiOptions.SectionName));
 builder.Services.Configure<FoodApiOptions>(builder.Configuration.GetSection(FoodApiOptions.SectionName));
+builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
 builder.Services.AddHongdalUiCommonAppServices();
 builder.Services.AddScoped(sp =>
 {

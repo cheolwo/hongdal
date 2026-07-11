@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FluentResults;
+using Hongdal.Application.CommandProcessing;
 using Hongdal.Application.Shipper.Payment.Events;
 using Hongdal.Contracts.Shipper.Payment;
 using 홍달.도메인.설정;
@@ -15,12 +16,18 @@ public sealed class 토스결제승인CommandHandler : IRequestHandler<토스결
     private readonly HongdalContext _db;
     private readonly I공통결제Service _paymentService;
     private readonly I콘텐츠혜택계산Service _benefitService;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public 토스결제승인CommandHandler(HongdalContext db, I공통결제Service paymentService, I콘텐츠혜택계산Service benefitService)
+    public 토스결제승인CommandHandler(
+        HongdalContext db,
+        I공통결제Service paymentService,
+        I콘텐츠혜택계산Service benefitService,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _paymentService = paymentService;
         _benefitService = benefitService;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<Result<토스결제승인응답>> Handle(토스결제승인Command request, CancellationToken cancellationToken)
@@ -46,12 +53,21 @@ public sealed class 토스결제승인CommandHandler : IRequestHandler<토스결
             return Result.Fail<토스결제승인응답>("결제 요청을 찾을 수 없습니다.");
         }
 
-        if (payment.결제금액 != request.Amount)
+        var targetId = string.IsNullOrWhiteSpace(payment.대상Id) ? payment.의뢰Id : payment.대상Id;
+        var shipperRequest = await _db.화주운송의뢰
+            .FirstOrDefaultAsync(x => x.의뢰Id == targetId, cancellationToken);
+        var 진행검증 = 화주운송결제진행정책.결제승인요청검증(
+            payment,
+            shipperRequest,
+            _currentUserAccessor.UserId,
+            _currentUserAccessor.Role,
+            request.Amount);
+        if (!진행검증.통과)
         {
-            return Result.Fail<토스결제승인응답>("결제 금액이 일치하지 않습니다.");
+            return Result.Fail<토스결제승인응답>(진행검증.실패사유);
         }
 
-        if (payment.결제상태 == 상태값.결제상태.결제완료)
+        if (진행검증.이미완료됨)
         {
             return Result.Ok(new 토스결제승인응답
             {

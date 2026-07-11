@@ -1,6 +1,6 @@
 @page "/documents/upload"
 @rendermode InteractiveServer
-@inject 문서관리메모리Service 문서관리메모리Service
+@inject I백오피스Service DataService
 @inject 관리자인증세션Service 관리자인증세션Service
 @inject NavigationManager NavigationManager
 
@@ -129,7 +129,7 @@
             bool? allowDownload = bool.TryParse(uploadDownloadText, out var downloadValue) ? downloadValue : null;
             long? transportId = long.TryParse(uploadTransportIdText, out var transportValue) ? transportValue : null;
 
-            await 문서관리메모리Service.UploadDocumentAsync(
+            await DataService.문서업로드Async(
                 stream,
                 selectedFile.Name,
                 selectedFile.ContentType,

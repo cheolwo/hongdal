@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Driver.Action;
 using Hongdal.Contracts.Driver.Recommendation;
 using Hongdal.Contracts.Driver.Work;
@@ -11,12 +12,17 @@ public sealed class 기사추천수신Service : I기사추천수신Service
 {
     private readonly HttpClient _httpClient;
     private readonly WebAuthSessionService _authSession;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
     private HubConnection? _connection;
 
-    public 기사추천수신Service(HttpClient httpClient, WebAuthSessionService authSession)
+    public 기사추천수신Service(
+        HttpClient httpClient,
+        WebAuthSessionService authSession,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _ledgerObserver = ledgerObserver;
     }
 
     public event Func<IReadOnlyList<기사추천수신항목>, Task>? 추천수신;
@@ -232,6 +238,17 @@ public sealed class 기사추천수신Service : I기사추천수신Service
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "배차 수락", cancellationToken);
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                requestId.Trim(),
+                "수락완료",
+                null,
+                "배차확정",
+                null,
+                DateTimeOffset.UtcNow,
+                "Hongdal.WebApp.DriverAccepted"),
+            "Hongdal.WebApp.DriverAccepted");
+        _ledgerObserver.RequestRefresh(requestId, "Hongdal.WebApp.DriverAccepted");
         return new 기사추천처리결과(requestId, "Accepted", await ReadMessageAsync(response, "수락되었습니다.", cancellationToken));
     }
 
@@ -248,6 +265,7 @@ public sealed class 기사추천수신Service : I기사추천수신Service
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "배차 거절", cancellationToken);
+        _ledgerObserver.RequestRefresh(requestId, "Hongdal.WebApp.DriverRejected");
         return new 기사추천처리결과(requestId, "Rejected", await ReadMessageAsync(response, "거절되었습니다.", cancellationToken));
     }
 
@@ -305,6 +323,11 @@ public sealed class 기사추천수신Service : I기사추천수신Service
 
     private async Task Publish추천수신Async(IReadOnlyList<기사추천수신항목> items)
     {
+        foreach (var item in items)
+        {
+            Observe(item);
+        }
+
         var handler = 추천수신;
         if (handler is null)
         {
@@ -315,6 +338,25 @@ public sealed class 기사추천수신Service : I기사추천수신Service
         {
             await callback(items);
         }
+    }
+
+    private void Observe(기사추천수신항목 item)
+    {
+        if (string.IsNullOrWhiteSpace(item.의뢰Id))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.의뢰Id,
+                item.상태,
+                null,
+                item.배차상태,
+                null,
+                DateTimeOffset.UtcNow,
+                "Hongdal.WebApp.DriverRecommendation"),
+            "Hongdal.WebApp.DriverRecommendation");
     }
 
     private async Task Publish상태Async(string message)

@@ -1,4 +1,5 @@
 using FluentResults;
+using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Shipper.Payment;
 using Microsoft.Extensions.Options;
 using 홍달.Services.Payments;
@@ -12,12 +13,18 @@ public sealed class 토스결제준비CommandHandler : IRequestHandler<토스결
     private readonly HongdalContext _db;
     private readonly IOptions<TossPaymentsOptions> _options;
     private readonly I콘텐츠혜택계산Service _benefitService;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public 토스결제준비CommandHandler(HongdalContext db, IOptions<TossPaymentsOptions> options, I콘텐츠혜택계산Service benefitService)
+    public 토스결제준비CommandHandler(
+        HongdalContext db,
+        IOptions<TossPaymentsOptions> options,
+        I콘텐츠혜택계산Service benefitService,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _db = db;
         _options = options;
         _benefitService = benefitService;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<Result<토스결제준비응답>> Handle(토스결제준비Command request, CancellationToken cancellationToken)
@@ -38,14 +45,13 @@ public sealed class 토스결제준비CommandHandler : IRequestHandler<토스결
             return Result.Fail<토스결제준비응답>("의뢰를 찾을 수 없습니다.");
         }
 
-        if (!string.Equals(shipperRequest.배차상태, 상태값.배차상태.상차완료, StringComparison.Ordinal))
+        var 진행검증 = 화주운송결제진행정책.결제준비요청검증(
+            shipperRequest,
+            _currentUserAccessor.UserId,
+            _currentUserAccessor.Role);
+        if (!진행검증.통과)
         {
-            return Result.Fail<토스결제준비응답>("상차완료 이후에만 결제를 진행할 수 있습니다.");
-        }
-
-        if (shipperRequest.결제상태 == 상태값.결제상태.결제완료)
-        {
-            return Result.Fail<토스결제준비응답>("이미 결제완료된 의뢰입니다.");
+            return Result.Fail<토스결제준비응답>(진행검증.실패사유);
         }
 
         var requestedAmount = request.Amount > 0 ? request.Amount : shipperRequest.결제예정금액 ?? 0;

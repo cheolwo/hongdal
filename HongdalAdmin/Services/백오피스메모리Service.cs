@@ -22,9 +22,11 @@ public sealed partial class 백오피스메모리Service : I백오피스Service
     private readonly List<관리자공통콘텐츠요약응답> _commonContents = [];
     private readonly Dictionary<long, 관리자공통콘텐츠상세응답> _commonContentDetails = new();
     private readonly List<공통콘텐츠보상정책Dto> _commonContentRewardPolicies = [];
+    private readonly 문서관리메모리Service _documentMemory;
 
-    public 백오피스메모리Service()
+    public 백오피스메모리Service(문서관리메모리Service documentMemory)
     {
+        _documentMemory = documentMemory;
         Seed();
     }
 

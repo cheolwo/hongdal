@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.CommonContents;
 
 namespace HongdalAdmin.Services;
@@ -8,13 +9,16 @@ public sealed partial class 백오피스조회Service : I백오피스Service
 {
     private readonly HttpClient _httpClient;
     private readonly 관리자인증세션Service _session;
-    private readonly 백오피스메모리Service _memory;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
 
-    public 백오피스조회Service(HttpClient httpClient, 관리자인증세션Service session, 백오피스메모리Service memory)
+    public 백오피스조회Service(
+        HttpClient httpClient,
+        관리자인증세션Service session,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _session = session;
-        _memory = memory;
+        _ledgerObserver = ledgerObserver;
     }
 
     public async Task<관리자대시보드요약응답> 대시보드조회Async(CancellationToken cancellationToken = default)
@@ -26,22 +30,77 @@ public sealed partial class 백오피스조회Service : I백오피스Service
 
     public async Task<IReadOnlyList<화주운송의뢰응답>> 의뢰목록조회Async(string? 결제상태 = null, string? 배차상태 = null, CancellationToken cancellationToken = default)
     {
-        return await _memory.의뢰목록조회Async(결제상태, 배차상태, cancellationToken);
+        var query = BuildQuery(
+            "api/v1/shipper/requests",
+            ("paymentStatus", 결제상태),
+            ("dispatchStatus", 배차상태),
+            ("pageSize", "200"));
+
+        var items = await 서버목록조회Async<화주운송의뢰응답>(
+            query,
+            cancellationToken);
+        foreach (var item in items)
+        {
+            Observe(item, "HongdalAdmin.RequestList");
+        }
+
+        return items;
     }
 
     public async Task<IReadOnlyList<공개화물요약응답>> 공개화물요약조회Async(CancellationToken cancellationToken = default)
     {
-        return await _memory.공개화물요약조회Async(cancellationToken);
+        return await 서버목록조회Async<공개화물요약응답>(
+            "api/v1/shipper/requests/public?pageSize=200",
+            cancellationToken);
     }
 
     public async Task<화주운송의뢰응답?> 의뢰상세조회Async(string requestId, CancellationToken cancellationToken = default)
     {
-        return await _memory.의뢰상세조회Async(requestId, cancellationToken);
+        if (string.IsNullOrWhiteSpace(requestId))
+        {
+            return null;
+        }
+
+        var item = await 서버단건조회Async<화주운송의뢰응답>(
+            $"api/v1/shipper/requests/{Uri.EscapeDataString(requestId.Trim())}",
+            cancellationToken);
+        Observe(item, "HongdalAdmin.RequestDetail");
+        return item;
     }
 
     public async Task<화주운송의뢰응답?> 의뢰취소환불처리Async(string requestId, CancellationToken cancellationToken = default)
     {
-        return await _memory.의뢰취소환불처리Async(requestId, cancellationToken);
+        if (string.IsNullOrWhiteSpace(requestId))
+        {
+            return null;
+        }
+
+        ApplyAuthorizationHeader();
+
+        var response = await _httpClient.PutAsJsonAsync(
+            $"api/v1/shipper/requests/{Uri.EscapeDataString(requestId.Trim())}",
+            new 화주운송의뢰수정요청
+            {
+                상태 = "취소",
+                결제상태 = "환불됨",
+                배차상태 = "취소"
+            },
+            cancellationToken);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        response.EnsureSuccessStatusCode();
+        var item = await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken: cancellationToken);
+        if (item is not null)
+        {
+            Observe(item, "HongdalAdmin.RequestCanceled");
+            _ledgerObserver.RequestRefresh(item.의뢰Id, "HongdalAdmin.RequestCanceled");
+        }
+
+        return item;
     }
 
     public async Task<IReadOnlyList<결제목록응답>> 결제목록조회Async(string? 결제상태 = null, string? 의뢰Id = null, CancellationToken cancellationToken = default)
@@ -97,17 +156,38 @@ public sealed partial class 백오피스조회Service : I백오피스Service
 
     public async Task<IReadOnlyList<기사목록응답>> 기사목록조회Async(string? 운행상태 = null, string? 활동지역검색어 = null, CancellationToken cancellationToken = default)
     {
-        return await _memory.기사목록조회Async(운행상태, 활동지역검색어, cancellationToken);
+        var query = BuildQuery(
+            "api/v1/admin/drivers",
+            ("운행상태", 운행상태),
+            ("활동지역검색어", 활동지역검색어));
+
+        return await 서버목록조회Async<기사목록응답>(
+            query,
+            cancellationToken);
     }
 
     public async Task<기사상세응답?> 기사상세조회Async(string driverId, CancellationToken cancellationToken = default)
     {
-        return await _memory.기사상세조회Async(driverId, cancellationToken);
+        if (string.IsNullOrWhiteSpace(driverId))
+        {
+            return null;
+        }
+
+        return await 서버단건조회Async<기사상세응답>(
+            $"api/v1/admin/drivers/{Uri.EscapeDataString(driverId.Trim())}",
+            cancellationToken);
     }
 
     public async Task<IReadOnlyList<기사배차내역응답>> 기사배차내역조회Async(string driverId, CancellationToken cancellationToken = default)
     {
-        return await _memory.기사배차내역조회Async(driverId, cancellationToken);
+        if (string.IsNullOrWhiteSpace(driverId))
+        {
+            return [];
+        }
+
+        return await 서버목록조회Async<기사배차내역응답>(
+            $"api/v1/admin/drivers/{Uri.EscapeDataString(driverId.Trim())}/dispatches",
+            cancellationToken);
     }
 
     public async Task<IReadOnlyList<기사월정산관리응답>> 기사월정산목록조회Async(int? year = null, int? month = null, string? driverId = null, CancellationToken cancellationToken = default)
@@ -201,5 +281,24 @@ public sealed partial class 백오피스조회Service : I백오피스Service
         return args.Length == 0
             ? path
             : $"{path}?{string.Join("&", args)}";
+    }
+
+    private void Observe(화주운송의뢰응답? item, string source)
+    {
+        if (item is null || string.IsNullOrWhiteSpace(item.의뢰Id))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.의뢰Id,
+                item.의뢰상태,
+                item.결제상태,
+                item.배차상태,
+                item.정산상태,
+                DateTimeOffset.UtcNow,
+                source),
+            source);
     }
 }

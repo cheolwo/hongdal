@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Warehouse;
@@ -12,11 +13,16 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
 
-    public ServerBackedShipperOperationsService(HttpClient httpClient, IAuthSession authSession)
+    public ServerBackedShipperOperationsService(
+        HttpClient httpClient,
+        IAuthSession authSession,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _ledgerObserver = ledgerObserver;
     }
 
     public async Task<IReadOnlyList<ShipperRequestItem>> GetRequestsAsync(CancellationToken cancellationToken = default)
@@ -24,7 +30,13 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
         var userId = ResolveUserId();
         var path = $"api/v1/shipper/requests?shipperId={Uri.EscapeDataString(userId)}";
         var response = await GetAuthorizedJsonAsync<IReadOnlyList<화주운송의뢰응답>>(path, cancellationToken);
-        return response?.Select(ToRequestItem).ToArray() ?? [];
+        var items = response?.Select(ToRequestItem).ToArray() ?? [];
+        foreach (var item in items)
+        {
+            Observe(item, "ShipperApp.RequestList");
+        }
+
+        return items;
     }
 
     public async Task<ShipperRequestItem?> GetRequestAsync(string requestId, CancellationToken cancellationToken = default)
@@ -37,7 +49,14 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
         var response = await GetAuthorizedJsonAsync<화주운송의뢰응답>(
             $"api/v1/shipper/requests/{Uri.EscapeDataString(requestId.Trim())}",
             cancellationToken);
-        return response is null ? null : ToRequestItem(response);
+        if (response is null)
+        {
+            return null;
+        }
+
+        var item = ToRequestItem(response);
+        Observe(item, "ShipperApp.RequestDetail");
+        return item;
     }
 
     public async Task<IReadOnlyList<공개화물요약응답>> GetPublicCargoAsync(CancellationToken cancellationToken = default)
@@ -114,6 +133,11 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
         if (!response.IsSuccessStatusCode)
         {
             throw new InvalidOperationException(await BuildFailureMessageAsync(response, "api/v1/shipper/requests", cancellationToken));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.의뢰Id))
+        {
+            _ledgerObserver.RequestRefresh(request.의뢰Id, "ShipperApp.RequestCreated");
         }
     }
 
@@ -267,5 +291,24 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             픽업지 = source.픽업지,
             하차지 = source.하차지
         };
+    }
+
+    private void Observe(ShipperRequestItem item, string source)
+    {
+        if (string.IsNullOrWhiteSpace(item.의뢰Id))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.의뢰Id,
+                item.의뢰상태,
+                item.결제상태,
+                item.배차상태,
+                item.정산상태,
+                DateTimeOffset.UtcNow,
+                source),
+            source);
     }
 }

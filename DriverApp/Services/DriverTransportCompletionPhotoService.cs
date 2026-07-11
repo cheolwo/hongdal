@@ -17,7 +17,9 @@ public sealed record DriverTransportCompletionPhoto(
     string FileName,
     string ContentType,
     byte[] Bytes,
-    DriverTransportPickupReceiptEvidence? ReceiptEvidence = null);
+    DriverTransportPickupReceiptEvidence? ReceiptEvidence = null,
+    string? ExistingObjectName = null,
+    string? ExistingUrl = null);
 
 public sealed record DriverTransportPickupReceiptEvidence(
     string EvidenceMethod,
@@ -31,6 +33,7 @@ public sealed record DriverTransportPickupReceiptEvidence(
 
 public sealed record DriverTransportCompletionPhotoResult(
     bool Uploaded,
+    bool CompletionRecorded,
     string Message,
     string? Url = null,
     string? ObjectName = null);
@@ -53,6 +56,7 @@ public sealed class SampleDriverTransportCompletionPhotoService : IDriverTranspo
 
         return Task.FromResult(new DriverTransportCompletionPhotoResult(
             Uploaded: false,
+            CompletionRecorded: false,
             Message: message,
             ObjectName: BuildSampleObjectName(photo)));
     }
@@ -84,15 +88,44 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
     {
         await _authSession.RestoreAsync(cancellationToken);
 
-        var upload = await UploadPhotoAsync(photo, cancellationToken);
-        await CompleteTransportAsync(photo, upload, cancellationToken);
+        var upload = await ResolveUploadAsync(photo, cancellationToken);
+        try
+        {
+            await CompleteTransportAsync(photo, upload, cancellationToken);
+        }
+        catch (Exception ex) when (IsCompletionRetryableFailure(ex))
+        {
+            return new DriverTransportCompletionPhotoResult(
+                Uploaded: true,
+                CompletionRecorded: false,
+                Message: $"사진은 서버에 업로드됐지만 완료 처리는 저장되지 않았습니다. 네트워크 확인 후 다시 완료 버튼을 눌러 주세요. {ex.Message}",
+                Url: upload.Url,
+                ObjectName: upload.ObjectName);
+        }
 
         var stepName = photo.Kind == DriverTransportCompletionPhotoKind.Pickup ? "상차 완료" : "하차 완료";
         return new DriverTransportCompletionPhotoResult(
             Uploaded: true,
+            CompletionRecorded: true,
             Message: $"{stepName} 사진 업로드와 완료 처리가 끝났습니다.",
             Url: upload.Url,
             ObjectName: upload.ObjectName);
+    }
+
+    private async Task<FileUploadResponse> ResolveUploadAsync(
+        DriverTransportCompletionPhoto photo,
+        CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrWhiteSpace(photo.ExistingObjectName))
+        {
+            return new FileUploadResponse
+            {
+                ObjectName = photo.ExistingObjectName,
+                Url = photo.ExistingUrl ?? string.Empty
+            };
+        }
+
+        return await UploadPhotoAsync(photo, cancellationToken);
     }
 
     private async Task<FileUploadResponse> UploadPhotoAsync(
@@ -114,7 +147,10 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
         ApplyAuthorization(request);
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, "파일 업로드", cancellationToken));
+        }
 
         var upload = await response.Content.ReadFromJsonAsync<FileUploadResponse>(cancellationToken: cancellationToken);
         return upload ?? throw new InvalidOperationException("파일 업로드 응답을 읽지 못했습니다.");
@@ -158,7 +194,10 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
         ApplyAuthorization(request);
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, "운송 완료", cancellationToken));
+        }
     }
 
     private void ApplyAuthorization(HttpRequestMessage request)
@@ -174,6 +213,20 @@ public sealed class HttpDriverTransportCompletionPhotoService : IDriverTransport
         return kind == DriverTransportCompletionPhotoKind.Pickup
             ? "TransportPickupComplete"
             : "TransportDropoffComplete";
+    }
+
+    private static bool IsCompletionRetryableFailure(Exception exception)
+        => exception is HttpRequestException or TaskCanceledException or InvalidOperationException;
+
+    private static async Task<string> BuildFailureMessageAsync(
+        HttpResponseMessage response,
+        string operationName,
+        CancellationToken cancellationToken)
+    {
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        return string.IsNullOrWhiteSpace(body)
+            ? $"{operationName} API 실패: HTTP {(int)response.StatusCode}"
+            : $"{operationName} API 실패: HTTP {(int)response.StatusCode}: {body}";
     }
 
     private sealed class FileUploadResponse

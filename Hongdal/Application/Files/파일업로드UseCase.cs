@@ -1,5 +1,7 @@
 using FluentResults;
 using Hongdal.ApiMetadata;
+using Hongdal.Application.CommandProcessing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using 홍달.Services.External.Google;
 using 홍달.Services.Storage.Local;
@@ -30,13 +32,19 @@ public sealed class 파일업로드UseCase : I파일업로드UseCase
 {
     private readonly IGoogleCloudStorageService _googleCloudStorageService;
     private readonly ICommandFileStoragePathResolver _pathResolver;
+    private readonly HongdalContext _db;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public 파일업로드UseCase(
         IGoogleCloudStorageService googleCloudStorageService,
-        ICommandFileStoragePathResolver pathResolver)
+        ICommandFileStoragePathResolver pathResolver,
+        HongdalContext db,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _googleCloudStorageService = googleCloudStorageService;
         _pathResolver = pathResolver;
+        _db = db;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<Result<파일업로드응답>> 업로드Async(파일업로드Command command, CancellationToken cancellationToken)
@@ -56,6 +64,12 @@ public sealed class 파일업로드UseCase : I파일업로드UseCase
             return Result.Fail<파일업로드응답>("commandName is required");
         }
 
+        var authorizationResult = await ValidateReferenceOwnershipAsync(command, cancellationToken);
+        if (authorizationResult.IsFailed)
+        {
+            return Result.Fail<파일업로드응답>(authorizationResult.Errors.Select(x => x.Message));
+        }
+
         var folder = _pathResolver.ResolveCommandFolder(command.CommandName, command.ReferenceId);
         await using var stream = command.File.OpenReadStream();
         var result = await _googleCloudStorageService.UploadAsync(
@@ -69,5 +83,30 @@ public sealed class 파일업로드UseCase : I파일업로드UseCase
             result.BucketName,
             result.ObjectName,
             result.PublicUrl));
+    }
+
+    private async Task<Result> ValidateReferenceOwnershipAsync(파일업로드Command command, CancellationToken cancellationToken)
+    {
+        if (!파일업로드권한정책.운송증빙업로드인가(command.CommandName))
+        {
+            return Result.Ok();
+        }
+
+        if (!long.TryParse(command.ReferenceId, out var transportId) || transportId <= 0)
+        {
+            return Result.Fail("운송 증빙 업로드에는 유효한 referenceId가 필요합니다.");
+        }
+
+        var transport = await _db.배송_운송
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == transportId, cancellationToken);
+        if (transport is null)
+        {
+            return Result.Fail("참조 운송을 찾을 수 없습니다.");
+        }
+
+        return 파일업로드권한정책.운송증빙업로드권한있음(transport, _currentUserAccessor.UserId, _currentUserAccessor.Role)
+            ? Result.Ok()
+            : Result.Fail("파일 업로드 권한이 없습니다.");
     }
 }

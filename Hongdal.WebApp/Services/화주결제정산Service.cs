@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Common.Payments;
 using Hongdal.Contracts.Shipper.Payment;
 using Hongdal.Contracts.Shipper.Request;
@@ -10,11 +11,16 @@ public sealed class 화주결제정산Service
 {
     private readonly HttpClient _httpClient;
     private readonly WebAuthSessionService _authSession;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
 
-    public 화주결제정산Service(HttpClient httpClient, WebAuthSessionService authSession)
+    public 화주결제정산Service(
+        HttpClient httpClient,
+        WebAuthSessionService authSession,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _ledgerObserver = ledgerObserver;
     }
 
     public async Task<화주운송의뢰응답> 의뢰조회Async(string requestId, CancellationToken cancellationToken = default)
@@ -32,8 +38,10 @@ public sealed class 화주결제정산Service
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, "운송 의뢰 조회", cancellationToken);
 
-        return await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken)
-               ?? throw new InvalidOperationException("운송 의뢰 조회 응답을 읽을 수 없습니다.");
+        var item = await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken)
+                   ?? throw new InvalidOperationException("운송 의뢰 조회 응답을 읽을 수 없습니다.");
+        Observe(item, "Hongdal.WebApp.ShipperRequest");
+        return item;
     }
 
     public async Task<IReadOnlyList<결제목록응답>> 결제목록조회Async(
@@ -93,7 +101,7 @@ public sealed class 화주결제정산Service
                 주문명 = orderName
             },
             "공통 결제 준비",
-            requireAuth: false,
+            requireAuth: true,
             cancellationToken);
     }
 
@@ -110,7 +118,7 @@ public sealed class 화주결제정산Service
                 Amount = amount
             },
             "토스 결제 준비",
-            requireAuth: false,
+            requireAuth: true,
             cancellationToken);
     }
 
@@ -129,7 +137,7 @@ public sealed class 화주결제정산Service
                 Amount = amount
             },
             "토스 결제 승인",
-            requireAuth: false,
+            requireAuth: true,
             cancellationToken);
     }
 
@@ -147,6 +155,7 @@ public sealed class 화주결제정산Service
                 등록메모 = memo
             },
             "인수증 등록",
+            requestId,
             cancellationToken);
     }
 
@@ -162,6 +171,7 @@ public sealed class 화주결제정산Service
                 승인메모 = memo
             },
             "후불 승인",
+            requestId,
             cancellationToken);
     }
 
@@ -177,6 +187,7 @@ public sealed class 화주결제정산Service
                 현장지급메모 = memo
             },
             "현장 지급 처리",
+            requestId,
             cancellationToken);
     }
 
@@ -184,6 +195,7 @@ public sealed class 화주결제정산Service
         string path,
         TRequest payload,
         string actionName,
+        string? requestId,
         CancellationToken cancellationToken)
     {
         using var request = await CreateAuthorizedRequestAsync(HttpMethod.Post, path, cancellationToken);
@@ -191,6 +203,11 @@ public sealed class 화주결제정산Service
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         await EnsureSuccessAsync(response, actionName, cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(requestId))
+        {
+            _ledgerObserver.RequestRefresh(requestId, $"Hongdal.WebApp.{actionName}");
+        }
 
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         return string.IsNullOrWhiteSpace(body) ? $"{actionName} 처리가 완료되었습니다." : body;
@@ -259,5 +276,24 @@ public sealed class 화주결제정산Service
         throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
             ? $"{actionName} 실패: HTTP {(int)response.StatusCode}"
             : $"{actionName} 실패: HTTP {(int)response.StatusCode}: {body}");
+    }
+
+    private void Observe(화주운송의뢰응답 item, string source)
+    {
+        if (string.IsNullOrWhiteSpace(item.의뢰Id))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.의뢰Id,
+                item.의뢰상태,
+                item.결제상태,
+                item.배차상태,
+                item.정산상태,
+                DateTimeOffset.UtcNow,
+                source),
+            source);
     }
 }

@@ -7,7 +7,7 @@ public sealed partial class 운송완료입금요청Service
 {
     private async Task<홍달.도메인.결제.결제> 결제대기건가져오거나생성Async(
         홍달.도메인.화주.화주운송의뢰 request,
-        운송인수완료됨Event notification,
+        운송입금요청Context context,
         int amount,
         CancellationToken cancellationToken)
     {
@@ -25,7 +25,7 @@ public sealed partial class 운송완료입금요청Service
         }
 
         var paymentId = Guid.NewGuid().ToString("N");
-        var orderId = 운송완료입금요청정책.주문번호생성(request.의뢰Id, notification.운송Id);
+        var orderId = 운송완료입금요청정책.주문번호생성(request.의뢰Id, context.운송Id);
         var payment = new 홍달.도메인.결제.결제
         {
             결제Id = paymentId,
@@ -41,9 +41,9 @@ public sealed partial class 운송완료입금요청Service
             결제금액 = amount,
             통화 = "KRW",
             OrderId = orderId,
-            주문명 = $"홍달 운송 완료 후 정산 {request.의뢰Id}",
+            주문명 = $"홍달 {context.정산메모} {request.의뢰Id}",
             원본응답Json = 운송완료입금요청정책.원본응답초안Json(request.의뢰Id, paymentId, orderId),
-            CreatedAt = notification.발생시각Utc
+            CreatedAt = context.발생시각Utc
         };
 
         await _db.결제.AddAsync(payment, cancellationToken);

@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Shipper.Request;
 using Hongdal.WebApp.Models;
 
@@ -9,11 +10,16 @@ public sealed class 화주운송의뢰등록Service
 {
     private readonly HttpClient _httpClient;
     private readonly WebAuthSessionService _authSession;
+    private readonly ITransportRequestLedgerObserver _ledgerObserver;
 
-    public 화주운송의뢰등록Service(HttpClient httpClient, WebAuthSessionService authSession)
+    public 화주운송의뢰등록Service(
+        HttpClient httpClient,
+        WebAuthSessionService authSession,
+        ITransportRequestLedgerObserver ledgerObserver)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _ledgerObserver = ledgerObserver;
     }
 
     public async Task<화주운송의뢰응답> 등록Async(운송의뢰작성ViewModel viewModel, CancellationToken cancellationToken = default)
@@ -41,7 +47,33 @@ public sealed class 화주운송의뢰등록Service
         }
 
         var created = await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken);
-        return created ?? throw new InvalidOperationException("서버 등록 응답을 읽을 수 없습니다.");
+        if (created is null)
+        {
+            throw new InvalidOperationException("서버 등록 응답을 읽을 수 없습니다.");
+        }
+
+        Observe(created);
+        _ledgerObserver.RequestRefresh(created.의뢰Id, "Hongdal.WebApp.RequestCreated");
+        return created;
+    }
+
+    private void Observe(화주운송의뢰응답 item)
+    {
+        if (string.IsNullOrWhiteSpace(item.의뢰Id))
+        {
+            return;
+        }
+
+        _ledgerObserver.Observe(
+            new TransportRequestLedgerSnapshot(
+                item.의뢰Id,
+                item.의뢰상태,
+                item.결제상태,
+                item.배차상태,
+                item.정산상태,
+                DateTimeOffset.UtcNow,
+                "Hongdal.WebApp.RequestCreated"),
+            "Hongdal.WebApp.RequestCreated");
     }
 
     private static 화주운송의뢰생성요청 ToCreateRequest(운송의뢰작성ViewModel source, string? userId)

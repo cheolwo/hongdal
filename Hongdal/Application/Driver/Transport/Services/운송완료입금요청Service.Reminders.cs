@@ -9,7 +9,7 @@ public sealed partial class 운송완료입금요청Service
 
     private async Task<int> 입금요청알림예약Async(
         홍달.도메인.화주.화주운송의뢰 request,
-        운송인수완료됨Event notification,
+        운송입금요청Context context,
         홍달.도메인.결제.결제 payment,
         CancellationToken cancellationToken)
     {
@@ -20,7 +20,7 @@ public sealed partial class 운송완료입금요청Service
             .ToListAsync(cancellationToken);
 
         var count = 0;
-        foreach (var schedule in 운송완료입금요청정책.알림예약목록(notification.발생시각Utc))
+        foreach (var schedule in 운송완료입금요청정책.알림예약목록(context.발생시각Utc))
         {
             if (existing.Any(payload => IsSameReminder(payload, request.의뢰Id, schedule.경과일수)))
             {
@@ -29,8 +29,8 @@ public sealed partial class 운송완료입금요청Service
 
             _db.Command알림Outbox.Add(new Command알림Outbox
             {
-                CommandName = nameof(운송인수완료Command),
-                EventName = nameof(운송인수완료됨Event),
+                CommandName = context.CommandName,
+                EventName = context.EventName,
                 FeatureName = 운송완료입금요청정책.알림FeatureName,
                 Target = "Shipper",
                 PayloadJson = JsonSerializer.Serialize(new
@@ -38,13 +38,15 @@ public sealed partial class 운송완료입금요청Service
                     알림유형 = 운송완료입금요청정책.알림FeatureName,
                     TargetUserId = request.화주Id,
                     ShipperUserId = request.화주Id,
-                    DriverId = notification.기사Id,
+                    DriverId = context.기사Id,
                     RequestId = request.의뢰Id,
-                    TransportId = notification.운송Id,
+                    TransportId = context.운송Id,
                     PaymentId = payment.결제Id,
                     OrderId = payment.OrderId,
                     PaymentFlow = 운송완료입금요청정책.토스가상계좌흐름,
                     PaymentMethod = 운송완료입금요청정책.토스가상계좌결제수단,
+                    SettlementTrigger = context.EventName,
+                    SettlementMemo = context.정산메모,
                     Amount = payment.결제금액,
                     CargoType = request.화물종류,
                     PickupAddress = request.픽업_도로명주소,
@@ -53,13 +55,13 @@ public sealed partial class 운송완료입금요청Service
                     ReminderDay = schedule.경과일수,
                     ReminderRound = schedule.회차,
                     ScheduledAtUtc = schedule.예약시각Utc,
-                    CompletedAtUtc = notification.발생시각Utc,
-                    Title = $"운송 완료 정산 입금 요청 안내({schedule.경과일수}일차)",
-                    Body = $"{request.화물종류} 운송 완료 정산금 {payment.결제금액:N0}원을 토스페이먼츠 가상계좌 결제 흐름으로 입금해 주세요.",
+                    CompletedAtUtc = context.발생시각Utc,
+                    Title = $"{context.정산메모} 입금 요청 안내({schedule.경과일수}일차)",
+                    Body = $"{request.화물종류} {context.정산메모} 금액 {payment.결제금액:N0}원을 토스페이먼츠 가상계좌 결제 흐름으로 입금해 주세요.",
                     Channels = new[] { "Push", "AlimTalk" }
                 }, JsonOptions),
                 Status = "Pending",
-                TraceId = notification.TraceId,
+                TraceId = context.TraceId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });

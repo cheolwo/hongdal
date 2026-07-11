@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Hongdal.Application.Driver.Transport;
+using Hongdal.Application.Shipper.Payment;
 using Hongdal.Contracts.Shipper.Request;
 using 홍달.도메인.공통;
 using 홍달.도메인.화주;
@@ -20,6 +21,79 @@ public class 운송완료입금요청정책Tests
         };
 
         Assert.True(운송완료입금요청정책.입금요청대상인가(request));
+    }
+
+    [Fact]
+    public void 입금요청대상인가_이미입금대기이면_false()
+    {
+        var request = new 화주운송의뢰
+        {
+            정산시점 = 정산시점.운송완료후정산.ToString(),
+            수납주체 = 수납주체.플랫폼.ToString(),
+            결제상태 = 상태값.결제상태.결제대기,
+            정산상태 = 운임정산상태.입금대기.ToString()
+        };
+
+        Assert.False(운송완료입금요청정책.입금요청대상인가(request));
+    }
+
+    [Fact]
+    public void 조기입금요청대상인가_상차완료이고_화주승인된_플랫폼정산이면_true()
+    {
+        var request = new 화주운송의뢰
+        {
+            정산시점 = 정산시점.운송완료후정산.ToString(),
+            수납주체 = 수납주체.플랫폼.ToString(),
+            결제상태 = 상태값.결제상태.결제대기,
+            정산상태 = 운임정산상태.후불승인완료.ToString(),
+            배차상태 = 상태값.배차상태.상차완료
+        };
+
+        Assert.True(운송완료입금요청정책.조기입금요청대상인가(request));
+    }
+
+    [Theory]
+    [InlineData("후불승인대기")]
+    [InlineData("인수증대기")]
+    public void 조기입금요청대상인가_화주승인전이면_false(string 정산상태값)
+    {
+        var request = new 화주운송의뢰
+        {
+            정산시점 = 정산시점.운송완료후정산.ToString(),
+            수납주체 = 수납주체.플랫폼.ToString(),
+            결제상태 = 상태값.결제상태.결제대기,
+            정산상태 = 정산상태값,
+            배차상태 = 상태값.배차상태.상차완료
+        };
+
+        Assert.False(운송완료입금요청정책.조기입금요청대상인가(request));
+    }
+
+    [Fact]
+    public void 상차완료조기정산_스모크_입금대기후_중복요청을_막는다()
+    {
+        var request = new 화주운송의뢰
+        {
+            정산시점 = 정산시점.운송완료후정산.ToString(),
+            수납주체 = 수납주체.플랫폼.ToString(),
+            결제상태 = 상태값.결제상태.결제대기,
+            정산상태 = 운임정산상태.후불승인완료.ToString(),
+            배차상태 = 상태값.배차상태.상차완료,
+            결제예정금액 = 120000
+        };
+
+        Assert.True(화주운송결제진행정책.상차완료이후인가(request.배차상태));
+        var 조기판정 = 운송완료입금요청정책.입금요청가능여부(request, 운송입금요청종류.상차완료조기정산);
+        Assert.True(조기판정.가능);
+        Assert.Equal(120000, 운송완료입금요청정책.입금요청금액(request));
+
+        request.정산상태 = 운임정산상태.입금대기.ToString();
+
+        var 조기중복판정 = 운송완료입금요청정책.입금요청가능여부(request, 운송입금요청종류.상차완료조기정산);
+        var 일반중복판정 = 운송완료입금요청정책.입금요청가능여부(request, 운송입금요청종류.운송완료후정산);
+        Assert.False(조기중복판정.가능);
+        Assert.False(일반중복판정.가능);
+        Assert.Equal("이미 입금 요청 또는 정산 처리된 의뢰입니다.", 조기중복판정.사유);
     }
 
     [Theory]
@@ -73,5 +147,25 @@ public class 운송완료입금요청정책Tests
         Assert.Equal("pay-1", root.GetProperty("paymentId").GetString());
         Assert.Equal("order-1", root.GetProperty("orderId").GetString());
         Assert.Equal("PendingTossVirtualAccountIssue", root.GetProperty("status").GetString());
+    }
+
+    [Theory]
+    [InlineData("상차완료")]
+    [InlineData("운송중")]
+    [InlineData("하차지도착")]
+    [InlineData("하차완료")]
+    [InlineData("인수완료")]
+    public void 화주운송결제진행정책_상차완료이후상태면_true(string 배차상태)
+    {
+        Assert.True(화주운송결제진행정책.상차완료이후인가(배차상태));
+    }
+
+    [Theory]
+    [InlineData("미시작")]
+    [InlineData("매칭중")]
+    [InlineData("배차확정")]
+    public void 화주운송결제진행정책_상차완료전상태면_false(string 배차상태)
+    {
+        Assert.False(화주운송결제진행정책.상차완료이후인가(배차상태));
     }
 }

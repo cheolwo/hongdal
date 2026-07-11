@@ -1,6 +1,6 @@
 @page "/documents/policies"
 @rendermode InteractiveServer
-@inject 문서관리메모리Service 문서관리메모리Service
+@inject I백오피스Service DataService
 @inject 관리자인증세션Service 관리자인증세션Service
 @inject NavigationManager NavigationManager
 
@@ -92,14 +92,14 @@
         await LoadAsync();
     }
 
-    private Task LoadAsync()
+    private async Task LoadAsync()
     {
         isLoading = true;
         message = null;
 
         try
         {
-            policies = 문서관리메모리Service.GetPolicies();
+            policies = await DataService.문서정책목록조회Async();
             isError = false;
         }
         catch (Exception ex)
@@ -112,8 +112,6 @@
         {
             isLoading = false;
         }
-
-        return Task.CompletedTask;
     }
 
     private static string PolicyDetailHref(string documentCode)

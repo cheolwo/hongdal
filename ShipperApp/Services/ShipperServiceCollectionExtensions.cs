@@ -1,6 +1,7 @@
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Client.Infrastructure;
 using Hongdal.Client.Infrastructure.Security;
+using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Common.Sales;
 using Hongdal.Contracts.Shipper.Request;
 using Microsoft.Extensions.Configuration;
@@ -59,6 +60,7 @@ public static class ShipperServiceCollectionExtensions
     {
         services.AddSingleton<InMemoryShipperStore>();
         services.AddSingleton<SampleShipperOperationsService>();
+        services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
         services.AddScoped<IShipperOperationsService, ServerBackedShipperOperationsService>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();

@@ -3,6 +3,7 @@ using DriverApp.Services.Samples;
 using DriverApp.Services.Security;
 using Hongdal.Client.Infrastructure;
 using Hongdal.Client.Infrastructure.Security;
+using Hongdal.Client.Infrastructure.Transport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,14 +15,6 @@ public static class DriverServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration? configuration = null)
     {
-#if DEBUG
-        services.Configure<ClientDataModeOptions>(options =>
-        {
-            options.AllowSampleFallback = true;
-            options.AllowDevelopmentSnapshotFallback = true;
-        });
-#endif
-
         if (configuration is not null)
         {
             services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
@@ -34,6 +27,7 @@ public static class DriverServiceCollectionExtensions
         services.AddSingleton<DriverAppProfile>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
+        services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
         services.AddSingleton<IAuthSession, AuthSession>();
         services.AddSingleton<DriverAccessPolicyService>();
         services.AddSingleton<DriverHomeDisplayPreferenceService>();

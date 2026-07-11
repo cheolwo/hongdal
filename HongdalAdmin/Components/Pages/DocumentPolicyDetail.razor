@@ -1,6 +1,6 @@
 @page "/documents/policies/{DocumentCode}"
 @rendermode InteractiveServer
-@inject 문서관리메모리Service 문서관리메모리Service
+@inject I백오피스Service DataService
 @inject 관리자인증세션Service 관리자인증세션Service
 @inject NavigationManager NavigationManager
 
@@ -103,14 +103,14 @@
         await LoadAsync();
     }
 
-    private Task LoadAsync()
+    private async Task LoadAsync()
     {
         isLoading = true;
         message = null;
 
         try
         {
-            var source = 문서관리메모리Service.GetPolicies()
+            var source = (await DataService.문서정책목록조회Async())
                 .FirstOrDefault(x => string.Equals(x.문서코드, DocumentCode, StringComparison.OrdinalIgnoreCase));
             selectedPolicy = source is null ? null : CopyPolicy(source);
             isError = false;
@@ -125,8 +125,6 @@
         {
             isLoading = false;
         }
-
-        return Task.CompletedTask;
     }
 
     private async Task SavePolicyAsync()
@@ -141,7 +139,7 @@
 
         try
         {
-            var updated = 문서관리메모리Service.UpdatePolicy(selectedPolicy.문서코드, new 문서정책수정요청
+            var updated = await DataService.문서정책수정Async(selectedPolicy.문서코드, new 문서정책수정요청
             {
                 사용여부 = selectedPolicy.사용여부,
                 암호화여부 = selectedPolicy.암호화여부,
@@ -173,7 +171,6 @@
             isSaving = false;
         }
 
-        await Task.CompletedTask;
     }
 
     private static 문서정책요약응답 CopyPolicy(문서정책요약응답 item)

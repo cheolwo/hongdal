@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Hongdal.Application.Files;
 using Hongdal.Controllers;
 using Hongdal.ApiMetadata;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hongdal.Controllers.Common
 {
@@ -18,6 +19,7 @@ namespace Hongdal.Controllers.Common
         }
 
         [HttpPost("upload")]
+        [Authorize(Policy = "물류운영사용자전용")]
         [RequestSizeLimit(50_000_000)]
         public async Task<IActionResult> 업로드([FromForm] 파일업로드요청 request, CancellationToken cancellationToken)
         {

@@ -1,0 +1,91 @@
+using 홍달.도메인.결제;
+using 홍달.도메인.공통;
+using 홍달.도메인.화주;
+
+namespace Hongdal.Application.Shipper.Payment;
+
+public static class 화주운송결제진행정책
+{
+    private static readonly string[] 상차완료이후상태목록 =
+    [
+        상태값.배차상태.상차완료,
+        상태값.배차상태.운송중,
+        "하차지도착",
+        상태값.배차상태.하차완료,
+        상태값.배차상태.인수완료
+    ];
+
+    public static bool 상차완료이후인가(string? 배차상태)
+        => !string.IsNullOrWhiteSpace(배차상태)
+           && 상차완료이후상태목록.Contains(배차상태.Trim(), StringComparer.Ordinal);
+
+    public static 화주운송결제검증결과 결제준비요청검증(
+        화주운송의뢰 request,
+        string? userId,
+        string? role)
+    {
+        if (!화주결제권한정책.의뢰결제권한있음(request, userId, role))
+        {
+            return 화주운송결제검증결과.실패("의뢰를 찾을 수 없습니다.");
+        }
+
+        if (!상차완료이후인가(request.배차상태))
+        {
+            return 화주운송결제검증결과.실패("상차완료 이후에만 결제를 진행할 수 있습니다.");
+        }
+
+        if (request.결제상태 == 상태값.결제상태.결제완료)
+        {
+            return 화주운송결제검증결과.실패("이미 결제완료된 의뢰입니다.");
+        }
+
+        return 화주운송결제검증결과.통과함();
+    }
+
+    public static 화주운송결제검증결과 결제승인요청검증(
+        결제 payment,
+        화주운송의뢰? request,
+        string? userId,
+        string? role,
+        int amount)
+    {
+        if (!화주결제권한정책.결제승인권한있음(payment, request, userId, role))
+        {
+            return 화주운송결제검증결과.실패("결제 요청을 찾을 수 없습니다.");
+        }
+
+        if (payment.결제금액 != amount)
+        {
+            return 화주운송결제검증결과.실패("결제 금액이 일치하지 않습니다.");
+        }
+
+        if (payment.결제상태 == 상태값.결제상태.결제완료)
+        {
+            return 화주운송결제검증결과.완료됨();
+        }
+
+        if (payment.결제상태 != 상태값.결제상태.결제대기)
+        {
+            return 화주운송결제검증결과.실패("결제 승인 대상 상태가 아닙니다.");
+        }
+
+        if (request?.결제상태 == 상태값.결제상태.결제완료)
+        {
+            return 화주운송결제검증결과.실패("이미 결제완료된 의뢰입니다.");
+        }
+
+        return 화주운송결제검증결과.통과함();
+    }
+}
+
+public sealed record 화주운송결제검증결과(bool 통과, string 실패사유, bool 이미완료됨 = false)
+{
+    public static 화주운송결제검증결과 통과함()
+        => new(true, string.Empty);
+
+    public static 화주운송결제검증결과 실패(string 실패사유)
+        => new(false, 실패사유);
+
+    public static 화주운송결제검증결과 완료됨()
+        => new(true, string.Empty, 이미완료됨: true);
+}

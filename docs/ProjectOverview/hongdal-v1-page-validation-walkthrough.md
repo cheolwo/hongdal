@@ -36,6 +36,34 @@ flowchart LR
     A2 --> S3
 ```
 
+## E2E 스모크 실행 기준
+
+1.0 E2E 스모크는 상세 기능을 모두 검수하기 전, 운송 한 건이 화주, 기사, 관리자 화면을 거쳐 끊기지 않고 닫히는지만 빠르게 확인하는 운영 점검이다. 이 점검에서는 렌더링만 통과하거나 샘플 데이터가 보이는 상태를 성공으로 보지 않는다.
+
+| 단계 | 필수 조건 | 실패로 보는 경우 |
+| --- | --- | --- |
+| 환경 | `AdminData:UseMemory=false`, `ClientDataMode:AllowSampleFallback=false` 기준으로 실행한다. | 관리자 화면이 메모리 데이터로 정상처럼 보이거나, 기사 앱이 서버 장애를 샘플 추천/정산으로 대체한다. |
+| 인증 | 화주, 기사, 서버관리자 토큰이 각각 발급되고 만료 시 재로그인 경로가 보인다. | 401/403이 빈 화면이나 샘플 화면으로 가려진다. |
+| 의뢰 생성 | `POST api/v1/shipper/requests` 이후 `GET api/v1/shipper/requests/{requestId}`에서 같은 의뢰가 보인다. | 생성은 성공했지만 상세, 관리자 목록, 배차대기에 이어지지 않는다. |
+| 배차/추천 | `GET api/v1/dispatch/wait`, `GET api/v1/driver/recommendations`, `POST api/v1/driver/dispatch-actions/{requestId}/accept`가 같은 의뢰를 기준으로 이어진다. | 보류/수락/거절 상태가 기사 화면에만 남고 서버 원장에 남지 않는다. |
+| 상차/하차 증빙 | `POST api/v1/files/upload` 뒤 `pickup-complete` 또는 `complete` Command가 성공한다. 완료 Command가 실패하면 업로드된 `ObjectName`으로 재시도한다. | 파일 업로드 성공 뒤 완료 처리 실패가 단순 에러로 끝나고, 같은 사진을 중복 업로드해야만 재시도된다. |
+| 관리자 확인 | `HongdalAdmin-P21/P22/P22-1/P22-2/P22-3/P26/P26-1`에서 운송, 이벤트, 증빙, 결제, 정산이 같은 `requestId`로 연결된다. | 관리자 페이지가 메모리 문서/POD 또는 메모리 의뢰 목록만 보여준다. |
+
+스모크 결과를 기록할 때는 `requestId`, 기사 ID, 운송 ID, 생성된 파일 `ObjectName`, 결제 ID, 정산 조회 월을 함께 남긴다. 민감한 주소, 연락처, 계좌, POD 원본 URL은 문서에는 마스킹해서 적는다.
+
+### ShipperApp 1.0 E2E 점검 범위
+
+ShipperApp은 1.0 스모크에서 운송 의뢰를 만들고, 같은 의뢰가 화주 홈과 상세 타임라인에서 다시 조회되는지를 우선 확인한다. 판매채널, HS 검토, 창고 출고 알림처럼 운영 콘솔에 보이는 보조 흐름은 아직 일부 샘플/인메모리 서비스가 남아 있으므로, 아래 표의 핵심 운송 경로와 분리해서 판단한다.
+
+| 화면/기능 | 1.0 확인 API | 판정 기준 |
+| --- | --- | --- |
+| 홈 `/shipper` | `GET api/v1/shipper/requests?shipperId={userId}`, `GET api/v1/warehouse-operations/warehouses` | 최근 의뢰와 타임라인 진입이 서버 의뢰 목록 기준으로 보인다. |
+| 운송 의뢰 작성 `/shipper/request` | `POST api/v1/shipper/requests/recommend-vehicle`, `POST api/v1/shipper/requests/fare-estimate`, `POST api/v1/shipper/requests` | 차량 후보, 기준 운임, 의뢰 생성이 같은 인증 세션으로 이어진다. |
+| 의뢰 상세 `/shipper/request/{requestId}` | `GET api/v1/shipper/requests/{requestId}` | 결제, 배차, 수락, 상차, 하차, 정산 상태가 방금 만든 `requestId`로 다시 보인다. |
+| CSV 일괄등록 `/shipper/request/bulk` | `POST api/v1/shipper/requests/bulk/preview`, `POST api/v1/shipper/requests/bulk/confirm-preview` | 미리보기와 확정 등록이 인메모리 결과가 아니라 서버 파서/검증 결과로 표시된다. |
+| 공개 화물 `/shipper/public-cargo` | `GET api/v1/shipper/requests/public` | 공개 상태 의뢰만 익명 요약으로 조회된다. |
+| 결제 진입 | `POST api/v1/payments/prepare`, `POST api/v1/payments/toss/prepare`, 승인 API | 현재 ShipperApp은 결제 상태 표시 중심이다. 실제 결제창 준비/승인 호출이 없으면 1.0 결제 E2E 완료로 보지 않는다. |
+
 ## 필수 화면 검증 표
 
 | 순서 | 페이지 | 앱/라우트 | 주 사용자 | 검증할 상태 | 서버/API 확인 | 현재 문서 |
