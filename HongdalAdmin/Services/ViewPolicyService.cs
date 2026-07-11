@@ -10,18 +10,21 @@ public sealed class ViewPolicyService
     private readonly 관리자인증세션Service _session;
     private readonly ILogger<ViewPolicyService> _logger;
     private readonly bool _useMemoryFallback;
+    private readonly bool _allowUnavailableFallback;
     private IReadOnlyList<View가시성항목응답> _visibleItems = [];
 
     public ViewPolicyService(
         HttpClient httpClient,
         관리자인증세션Service session,
         IConfiguration configuration,
+        IHostEnvironment environment,
         ILogger<ViewPolicyService> logger)
     {
         _httpClient = httpClient;
         _session = session;
         _logger = logger;
         _useMemoryFallback = configuration.GetValue("AdminData:UseMemory", false);
+        _allowUnavailableFallback = _useMemoryFallback || environment.IsDevelopment();
     }
 
     public event Action? Changed;
@@ -60,10 +63,10 @@ public sealed class ViewPolicyService
             IsLoaded = true;
             Changed?.Invoke();
         }
-        catch (Exception ex) when (_useMemoryFallback && IsViewPolicyUnavailable(ex))
+        catch (Exception ex) when (_allowUnavailableFallback && IsViewPolicyUnavailable(ex))
         {
             _logger.LogInformation(
-                "AdminData 메모리 모드에서 View 정책 API를 사용할 수 없어 전체 화면을 임시 노출합니다. 사유: {Message}",
+                "View 정책 API를 사용할 수 없어 로컬 개발 fallback으로 전체 화면을 임시 노출합니다. 사유: {Message}",
                 ex.Message);
             _visibleItems = [];
             IsLoaded = true;

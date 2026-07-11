@@ -15,6 +15,7 @@ public static class 계약결제제공자
     public const int NaverPay = 20;
     public const int KakaoPay = 30;
     public const int ManualBankTransfer = 90;
+    public const int FakePG = 990;
 }
 
 public sealed class 공통결제준비요청

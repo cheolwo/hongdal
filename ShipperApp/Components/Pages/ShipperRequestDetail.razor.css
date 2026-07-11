@@ -1,0 +1,33 @@
+.fake-payment-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.48);
+}
+
+.fake-payment-window {
+    width: min(560px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border: 1px solid var(--mud-palette-lines-default);
+}
+
+.fake-payment-summary {
+    border: 1px solid var(--mud-palette-warning);
+    background: rgba(255, 193, 7, 0.08);
+}
+
+@media (max-width: 600px) {
+    .fake-payment-backdrop {
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .fake-payment-window {
+        max-height: calc(100vh - 24px);
+    }
+}

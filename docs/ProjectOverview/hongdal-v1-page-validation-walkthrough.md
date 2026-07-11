@@ -42,7 +42,7 @@ flowchart LR
 
 | 단계 | 필수 조건 | 실패로 보는 경우 |
 | --- | --- | --- |
-| 환경 | `AdminData:UseMemory=false`, `ClientDataMode:AllowSampleFallback=false` 기준으로 실행한다. | 관리자 화면이 메모리 데이터로 정상처럼 보이거나, 기사 앱이 서버 장애를 샘플 추천/정산으로 대체한다. |
+| 환경 | `AdminData:UseMemory=false`, `ClientDataMode:AllowSampleFallback=false`, `ClientDataMode:RequireServerLedgerForV1Smoke=true` 기준으로 실행한다. | 관리자 화면이 메모리 데이터로 정상처럼 보이거나, 기사 앱이 서버 장애를 샘플 추천/정산으로 대체한다. |
 | 인증 | 화주, 기사, 서버관리자 토큰이 각각 발급되고 만료 시 재로그인 경로가 보인다. | 401/403이 빈 화면이나 샘플 화면으로 가려진다. |
 | 의뢰 생성 | `POST api/v1/shipper/requests` 이후 `GET api/v1/shipper/requests/{requestId}`에서 같은 의뢰가 보인다. | 생성은 성공했지만 상세, 관리자 목록, 배차대기에 이어지지 않는다. |
 | 배차/추천 | `GET api/v1/dispatch/wait`, `GET api/v1/driver/recommendations`, `POST api/v1/driver/dispatch-actions/{requestId}/accept`가 같은 의뢰를 기준으로 이어진다. | 보류/수락/거절 상태가 기사 화면에만 남고 서버 원장에 남지 않는다. |
@@ -50,6 +50,8 @@ flowchart LR
 | 관리자 확인 | `HongdalAdmin-P21/P22/P22-1/P22-2/P22-3/P26/P26-1`에서 운송, 이벤트, 증빙, 결제, 정산이 같은 `requestId`로 연결된다. | 관리자 페이지가 메모리 문서/POD 또는 메모리 의뢰 목록만 보여준다. |
 
 스모크 결과를 기록할 때는 `requestId`, 기사 ID, 운송 ID, 생성된 파일 `ObjectName`, 결제 ID, 정산 조회 월을 함께 남긴다. 민감한 주소, 연락처, 계좌, POD 원본 URL은 문서에는 마스킹해서 적는다.
+
+서버 원장 상태 전파는 `GET api/v1/transport-request-ledgers/{requestId}/events`도 함께 확인한다. 이 응답의 의뢰, 결제, 배차, 정산, 운송 상태가 화주 상세, 기사 현재 운송, 관리자 운송 상세의 표시값과 어긋나면 1.0 스모크 실패로 본다.
 
 ### ShipperApp 1.0 E2E 점검 범위
 

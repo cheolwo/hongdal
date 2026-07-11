@@ -1,9 +1,11 @@
 @page "/shipper/request/{RequestId}"
+@using Hongdal.Contracts.Common.Payments
 @using Hongdal.Client.Infrastructure.Transport
 @using ShipperApp.Models.Shipper
 @using ShipperApp.Services
 @inject IShipperOperationsService ShipperOperations
 @inject ITransportRequestLedgerObserver LedgerObserver
+@inject FakeShipperPaymentService FakePayments
 @inject NavigationManager Navigation
 @implements IDisposable
 
@@ -17,6 +19,10 @@
                 <MudText Typo="Typo.body2" Color="Color.Secondary">결제, 배차, 수락, 상차, 하차, 정산 상태를 한 화면에서 확인합니다.</MudText>
             </MudStack>
             <MudStack Row="true" Spacing="2">
+                @if (request?.CanPay == true)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.CreditCard" OnClick="OpenFakePaymentWindow">Fake 결제창</MudButton>
+                }
                 <MudButton Variant="Variant.Outlined" Color="Color.Default" StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="@(() => Navigation.NavigateTo(ShipperRoutes.ShipperHome))">홈</MudButton>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isBusy" OnClick="LoadAsync">새로고침</MudButton>
             </MudStack>
@@ -81,6 +87,33 @@
                                     <MudText Typo="Typo.body2">@Display(request.하차지)</MudText>
                                 </MudItem>
                             </MudGrid>
+
+                            <MudDivider />
+
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudText Typo="Typo.subtitle2">Fake 결제</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@ResolveFakePaymentChipColor()" Variant="Variant.Outlined">@ResolveFakePaymentChipText()</MudChip>
+                                </MudStack>
+
+                                @if (fakeReceipt is not null)
+                                {
+                                    <MudAlert Severity="Severity.Success" Dense="true">
+                                        @fakeReceipt.PaymentMethodText · @fakeReceipt.Amount.ToString("N0")원 승인
+                                    </MudAlert>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">승인번호 @fakeReceipt.ReceiptId</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">승인시각 @fakeReceipt.ApprovedAt.ToString("yyyy-MM-dd HH:mm")</MudText>
+                                }
+                                else if (request.CanPay)
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">상차 완료 이후 운송료 확보를 가정해 개발용 결제창을 열 수 있습니다.</MudText>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.CreditCard" OnClick="OpenFakePaymentWindow">Fake 결제창 열기</MudButton>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">상차 완료 전이거나 이미 결제가 확보된 의뢰입니다.</MudText>
+                                }
+                            </MudStack>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
@@ -150,12 +183,76 @@
     </MudStack>
 </MudContainer>
 
+@if (isFakePaymentWindowOpen && request is not null)
+{
+    <div class="fake-payment-backdrop" role="dialog" aria-modal="true" aria-labelledby="fake-payment-title">
+        <MudPaper Elevation="8" Class="pa-4 fake-payment-window">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6" id="fake-payment-title">FakePG 결제창</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@request.의뢰Id · 서버 개발용 승인 API로 원장 상태를 갱신합니다.</MudText>
+                    </MudStack>
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" Disabled="@isFakePaymentCompleting" OnClick="CloseFakePaymentWindow" />
+                </MudStack>
+
+                <MudPaper Elevation="0" Class="pa-3 fake-payment-summary">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">결제 금액</MudText>
+                            <MudText Typo="Typo.h5">@FakePaymentAmount.ToString("N0")원</MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">개발용</MudChip>
+                    </MudStack>
+                </MudPaper>
+
+                @if (FakePaymentAmount <= 0)
+                {
+                    <MudAlert Severity="Severity.Warning">결제 예정 금액이 없어 Fake 결제를 진행할 수 없습니다.</MudAlert>
+                }
+
+                <HongdalPaymentCheckoutPanel TargetType="20"
+                                             TargetId="@request.의뢰Id"
+                                             ProviderType="990"
+                                             Amount="@FakePaymentAmount"
+                                             OrderName="@FakePaymentOrderName"
+                                             PaymentMethod="@fakePaymentMethod"
+                                             PaymentMethodChanged="OnFakePaymentMethodChangedAsync"
+                                             SettlementMode="@fakeSettlementMode"
+                                             SettlementModeChanged="OnFakeSettlementModeChangedAsync"
+                                             AllowMonthlySettlement="false"
+                                             AllowSubscription="false"
+                                             Disabled="@isFakePaymentCompleting"
+                                             PaymentRequested="CompleteFakePaymentAsync" />
+
+                <MudTextField T="string"
+                              Label="메모"
+                              Variant="Variant.Outlined"
+                              Lines="2"
+                              @bind-Value="fakePaymentMemo"
+                              Disabled="@isFakePaymentCompleting"
+                              Placeholder="예: 화주가 샘플 결제를 승인함" />
+
+                <MudAlert Severity="Severity.Info" Dense="true">
+                    이 창은 화주 앱 개발용입니다. 서버 원장에는 FakePG 결제 레코드를 남기지만 실제 카드 승인, 계좌이체, 가상계좌 발급, 정산 송금은 발생하지 않습니다.
+                </MudAlert>
+            </MudStack>
+        </MudPaper>
+    </div>
+}
+
 @code {
     [Parameter]
     public string? RequestId { get; set; }
 
     private ShipperRequestItem? request;
+    private FakeShipperPaymentReceipt? fakeReceipt;
     private bool isBusy;
+    private bool isFakePaymentWindowOpen;
+    private bool isFakePaymentCompleting;
+    private string fakePaymentMethod = PaymentMethodCode.TossCard;
+    private string fakeSettlementMode = SettlementModeCode.Prepaid;
+    private string? fakePaymentMemo;
     private string? message;
     private Severity messageSeverity = Severity.Info;
     private CancellationTokenSource? pollingCts;
@@ -192,6 +289,7 @@
         try
         {
             request = await ShipperOperations.GetRequestAsync(RequestId);
+            ApplyFakeReceipt();
             if (showMessage)
             {
                 messageSeverity = Severity.Info;
@@ -211,6 +309,122 @@
         {
             isBusy = false;
         }
+    }
+
+    private int FakePaymentAmount
+    {
+        get
+        {
+            if (request is null)
+            {
+                return 0;
+            }
+
+            if (request.결제예정금액 is > 0)
+            {
+                return request.결제예정금액.Value;
+            }
+
+            if (request.기준운임 is > 0)
+            {
+                return decimal.ToInt32(decimal.Round(request.기준운임.Value, 0, MidpointRounding.AwayFromZero));
+            }
+
+            return 0;
+        }
+    }
+
+    private string FakePaymentOrderName => request is null
+        ? "홍달 운송 의뢰"
+        : $"홍달 운송 의뢰 {request.의뢰Id}";
+
+    private void OpenFakePaymentWindow()
+    {
+        fakePaymentMethod = string.IsNullOrWhiteSpace(request?.결제수단)
+            ? PaymentMethodCode.TossCard
+            : ResolvePaymentMethodCode(request.결제수단);
+        fakeSettlementMode = SettlementModeCode.Prepaid;
+        fakePaymentMemo = null;
+        isFakePaymentWindowOpen = true;
+    }
+
+    private void CloseFakePaymentWindow()
+    {
+        if (isFakePaymentCompleting)
+        {
+            return;
+        }
+
+        isFakePaymentWindowOpen = false;
+    }
+
+    private Task OnFakePaymentMethodChangedAsync(string value)
+    {
+        fakePaymentMethod = value;
+        return Task.CompletedTask;
+    }
+
+    private Task OnFakeSettlementModeChangedAsync(string value)
+    {
+        fakeSettlementMode = value;
+        return Task.CompletedTask;
+    }
+
+    private async Task CompleteFakePaymentAsync(PaymentRequestPlan plan)
+    {
+        if (request is null)
+        {
+            return;
+        }
+
+        isFakePaymentCompleting = true;
+        try
+        {
+            fakeReceipt = await FakePayments.ConfirmAsync(request, plan, fakePaymentMemo);
+            messageSeverity = Severity.Success;
+            message = $"{request.의뢰Id} FakePG 결제가 서버 원장에 승인되어 결제 상태를 {request.결제상태}로 반영했습니다.";
+            isFakePaymentWindowOpen = false;
+            await LoadAsync(showMessage: false);
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = $"FakePG 승인 실패: {ex.Message}";
+        }
+        finally
+        {
+            isFakePaymentCompleting = false;
+        }
+    }
+
+    private void ApplyFakeReceipt()
+    {
+        fakeReceipt = request is null ? null : FakePayments.GetReceipt(request.의뢰Id);
+        if (fakeReceipt is not null)
+        {
+            FakePayments.TryApplyReceipt(request);
+        }
+    }
+
+    private Color ResolveFakePaymentChipColor()
+        => fakeReceipt is null ? Color.Default : Color.Success;
+
+    private string ResolveFakePaymentChipText()
+        => fakeReceipt is null ? "대기" : "승인됨";
+
+    private static string ResolvePaymentMethodCode(string paymentMethod)
+    {
+        if (ContainsAny(paymentMethod, "계좌"))
+        {
+            return PaymentMethodCode.TossTransfer;
+        }
+
+        if (ContainsAny(paymentMethod, "가상"))
+        {
+            return PaymentMethodCode.TossVirtualAccount;
+        }
+
+        return PaymentMethodCode.TossCard;
     }
 
     private void EnsureObserverStarted()
@@ -338,7 +552,7 @@
             return WorkflowStepState.Attention;
         }
 
-        if (ContainsAny(item.결제상태, "결제완료", "승인", "완료", "입금확인"))
+        if (ContainsAny(item.결제상태, "결제완료", "결제확보", "승인", "완료", "입금확인"))
         {
             return WorkflowStepState.Completed;
         }

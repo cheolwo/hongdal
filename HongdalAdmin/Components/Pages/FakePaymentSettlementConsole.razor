@@ -1,0 +1,236 @@
+@page "/development/fake-payment-settlement"
+@inject FakePaymentSettlementSimulationService SimulationService
+
+<PageTitle>Fake PG/정산 콘솔</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Class="mb-1" Style="flex-wrap: wrap;">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h4">Fake PG/정산 콘솔</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">개발용 샘플 운송 원장으로 결제 보증과 기사 정산을 검증합니다.</MudText>
+        </MudStack>
+        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="ResetAll">샘플 초기화</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateScenario">샘플 원장 생성</MudButton>
+        </MudStack>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        실결제, 실정산, 실제 운송계약을 만들지 않는 Admin 메모리 시뮬레이션입니다.
+    </MudAlert>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="4">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">샘플 원장</MudText>
+                    <MudSelect T="string" Label="선택 원장" Variant="Variant.Outlined" Margin="Margin.Dense" Value="@selectedScenarioId" ValueChanged="SelectScenario">
+                        @foreach (var scenario in scenarios)
+                        {
+                            <MudSelectItem T="string" Value="@(scenario.Id.ToString("N"))">@scenario.RequestId · @(scenario.Amount.ToString("N0"))원</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudTextField Label="의뢰ID" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="requestId" />
+                    <MudTextField Label="화주ID" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="shipperId" />
+                    <MudTextField Label="기사ID" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="driverId" />
+                    <MudNumericField T="int" Label="운송료" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1000" Step="1000" @bind-Value="amount" />
+                    <MudSelect T="string" Label="정산 기준" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="settlementTiming">
+                        <MudSelectItem T="string" Value="@("선결제")">선결제</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("상차완료후조기정산")">상차완료후조기정산</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("하차완료후정산")">하차완료후정산</MudSelectItem>
+                    </MudSelect>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" lg="8">
+            <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
+                @if (selected is null)
+                {
+                    <MudAlert Severity="Severity.Info">선택된 샘플 원장이 없습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudStack Spacing="3">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">@selected.RequestId</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@selected.ShipperId → @selected.DriverId · @(selected.Amount.ToString("N0"))원</MudText>
+                            </MudStack>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Dark" Variant="Variant.Filled">SIMULATION</MudChip>
+                        </MudStack>
+
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 border">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">Fake PG</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(selected.PaymentStatus)" Variant="Variant.Filled">@selected.PaymentStatus</MudChip>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 border">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">운송 원장</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(selected.TransportStatus)" Variant="Variant.Filled">@selected.TransportStatus</MudChip>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudPaper Elevation="0" Class="pa-3 border">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">Fake 정산</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(selected.SettlementStatus)" Variant="Variant.Filled">@selected.SettlementStatus</MudChip>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Payments" OnClick="@(() => Run(FakePaymentSettlementAction.SecurePayment))">결제확보</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile" OnClick="@(() => Run(FakePaymentSettlementAction.CompletePickup))">상차완료</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FactCheck" OnClick="@(() => Run(FakePaymentSettlementAction.CompleteDropoff))">하차/POD</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.AccountBalance" OnClick="@(() => Run(FakePaymentSettlementAction.RequestPayout))">정산실행</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Warning" StartIcon="@Icons.Material.Filled.PauseCircle" OnClick="@(() => Run(FakePaymentSettlementAction.HoldSettlement))">보류</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.PlayCircle" OnClick="@(() => Run(FakePaymentSettlementAction.ReleaseHold))">보류해제</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" OnClick="@(() => Run(FakePaymentSettlementAction.Refund))">환불종료</MudButton>
+                            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@(() => Run(FakePaymentSettlementAction.ResetScenario))">원장 리셋</MudButton>
+                        </MudStack>
+
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" md="6"><AdminInfoField Label="PaymentIntentId" Value="@selected.PaymentIntentId" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="ProviderPaymentKey" Value="@selected.ProviderPaymentKey" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="SettlementInstructionId" Value="@selected.SettlementInstructionId" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="ProviderTransferKey" Value="@selected.ProviderTransferKey" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="정산 기준" Value="@selected.SettlementTiming" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="갱신 시각" Value="@selected.UpdatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")" /></MudItem>
+                        </MudGrid>
+                    </MudStack>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6">시뮬레이션 이벤트</MudText>
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@(selected?.Events.Count ?? 0) 건</MudChip>
+            </MudStack>
+
+            @if (selected is null || selected.Events.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">이벤트가 없습니다.</MudAlert>
+            }
+            else
+            {
+                <MudTable Items="@selected.Events" Dense="true" Hover="true" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>시각</MudTh>
+                        <MudTh>단계</MudTh>
+                        <MudTh>이벤트</MudTh>
+                        <MudTh>내용</MudTh>
+                        <MudTh>상태</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="시각">@context.OccurredAtUtc.ToLocalTime().ToString("HH:mm:ss")</MudTd>
+                        <MudTd DataLabel="단계">
+                            <MudChip T="string" Size="Size.Small" Color="@SeverityColor(context.Severity)" Variant="Variant.Filled">@context.Stage</MudChip>
+                        </MudTd>
+                        <MudTd DataLabel="이벤트">@context.EventType</MudTd>
+                        <MudTd DataLabel="내용">@context.Message</MudTd>
+                        <MudTd DataLabel="상태">@context.Snapshot</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private IReadOnlyList<FakePaymentSettlementScenario> scenarios = [];
+    private FakePaymentSettlementScenario? selected;
+    private string selectedScenarioId = string.Empty;
+    private string requestId = "SIM-REQ-NEW";
+    private string shipperId = "SIM-SHIPPER-NEW";
+    private string driverId = "SIM-DRV-NEW";
+    private int amount = 120000;
+    private string settlementTiming = "선결제";
+
+    protected override void OnInitialized()
+    {
+        Reload();
+    }
+
+    private void Reload()
+    {
+        scenarios = SimulationService.GetScenarios();
+        if (string.IsNullOrWhiteSpace(selectedScenarioId) && scenarios.Count > 0)
+        {
+            selectedScenarioId = scenarios[0].Id.ToString("N");
+        }
+
+        selected = TryGetSelected();
+    }
+
+    private void SelectScenario(string value)
+    {
+        selectedScenarioId = value;
+        selected = TryGetSelected();
+    }
+
+    private void CreateScenario()
+    {
+        var created = SimulationService.CreateScenario(requestId, shipperId, driverId, amount, settlementTiming);
+        selectedScenarioId = created.Id.ToString("N");
+        requestId = NextRequestId(created.Sequence + 1);
+        Reload();
+    }
+
+    private void ResetAll()
+    {
+        scenarios = SimulationService.Reset();
+        selectedScenarioId = scenarios.FirstOrDefault()?.Id.ToString("N") ?? string.Empty;
+        selected = TryGetSelected();
+    }
+
+    private void Run(FakePaymentSettlementAction action)
+    {
+        if (!Guid.TryParse(selectedScenarioId, out var id))
+        {
+            return;
+        }
+
+        selected = SimulationService.Run(id, action, "admin");
+        scenarios = SimulationService.GetScenarios();
+    }
+
+    private FakePaymentSettlementScenario? TryGetSelected()
+    {
+        if (!Guid.TryParse(selectedScenarioId, out var id))
+        {
+            return scenarios.FirstOrDefault();
+        }
+
+        return SimulationService.GetScenario(id) ?? scenarios.FirstOrDefault();
+    }
+
+    private static string NextRequestId(int sequence)
+        => $"SIM-REQ-{sequence:000}";
+
+    private static Color StatusColor(string status)
+        => status switch
+        {
+            "결제확보됨" or "상차완료" or "하차완료" or "정산대기" or "정산완료" => Color.Success,
+            "결제확보대기" or "운송대기" or "정산대기전" or "조기정산후보" => Color.Info,
+            "정산보류" => Color.Warning,
+            "취소" or "환불완료" or "환불종료" => Color.Error,
+            _ => Color.Default
+        };
+
+    private static Color SeverityColor(Severity severity)
+        => severity switch
+        {
+            Severity.Success => Color.Success,
+            Severity.Warning => Color.Warning,
+            Severity.Error => Color.Error,
+            Severity.Info => Color.Info,
+            _ => Color.Default
+        };
+}

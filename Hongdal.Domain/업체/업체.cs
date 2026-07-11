@@ -11,9 +11,6 @@ namespace 홍달.도메인.업체
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("notion_page_id")]
-        public string NotionPageId { get; set; } = string.Empty;
-
         [Column("업체명")]
         public string 업체명 { get; set; } = string.Empty;
 

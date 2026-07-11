@@ -12,6 +12,7 @@ public sealed class OperationalEndpointAuthorizationTests
     [Theory]
     [InlineData(nameof(화주결제Controller.공통결제준비))]
     [InlineData(nameof(화주결제Controller.공통결제승인))]
+    [InlineData(nameof(화주결제Controller.페이크결제승인))]
     [InlineData(nameof(화주결제Controller.토스결제준비))]
     [InlineData(nameof(화주결제Controller.토스결제승인))]
     public void PaymentWriteEndpoints_RequireShipperSellerOrAdminRole(string methodName)

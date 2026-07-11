@@ -14,6 +14,7 @@ var isRunningInContainer = string.Equals(
 if (!isRunningInContainer)
 {
     builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+    builder.Configuration.AddCommandLine(args);
 }
 
 // Add services to the container.
@@ -66,6 +67,7 @@ builder.Services.AddSingleton<문서관리메모리Service>();
 builder.Services.AddScoped<차량관리Service>();
 builder.Services.AddScoped<음식운영Service>();
 builder.Services.AddScoped<탐색캠페인샘플Service>();
+builder.Services.AddSingleton<FakePaymentSettlementSimulationService>();
 
 builder.Services.AddHttpClient<관리자인증Service>((sp, client) =>
 {

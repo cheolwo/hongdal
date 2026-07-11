@@ -176,7 +176,7 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<HongdalContext>();
-    await InitializeDatabaseAsync(db, app.Services, app.Environment, app.Logger);
+    await InitializeDatabaseAsync(db, scope.ServiceProvider, app.Environment, app.Logger);
 }
 
 if (!isRunningInContainer)

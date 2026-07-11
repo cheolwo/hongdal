@@ -63,6 +63,19 @@ namespace Hongdal.Controllers.Shipper.Payment02
             return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
         }
 
+        [HttpPost("fake/confirm")]
+        [Authorize(Roles = 역할명.화주 + "," + 역할명.판매자 + "," + 역할명.서버관리자)]
+        public async Task<IActionResult> 페이크결제승인([FromBody] 페이크결제승인요청 request)
+        {
+            var result = await _sender.Send(new 페이크결제승인Command(
+                request.의뢰Id,
+                request.Amount,
+                request.결제수단,
+                request.메모,
+                request.IdempotencyKey));
+            return result.IsSuccess ? Ok(result.Value) : this.ToProblemActionResult(result.Errors.Select(x => x.Message));
+        }
+
         [HttpPost("toss/prepare")]
         [Authorize(Roles = 역할명.화주 + "," + 역할명.판매자 + "," + 역할명.서버관리자)]
         public async Task<IActionResult> 토스결제준비([FromBody] 토스결제준비요청 request)

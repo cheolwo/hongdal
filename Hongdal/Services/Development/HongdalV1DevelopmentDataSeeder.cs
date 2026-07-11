@@ -55,9 +55,12 @@ public static class HongdalV1DevelopmentDataSeeder
         await EnsureDriverShiftAsync(db, driverUser.Id, now, cancellationToken);
         EnsureDriverLocation(locationStore, driverUser.Id, now);
 
+        var sampleRequestId1 = SampleRequestIds[0];
+        var sampleRequestId2 = SampleRequestIds[1];
+        var sampleRequestId3 = SampleRequestIds[2];
         var existingRequestIds = await db.화주운송의뢰
             .AsNoTracking()
-            .Where(x => SampleRequestIds.Contains(x.의뢰Id))
+            .Where(x => x.의뢰Id == sampleRequestId1 || x.의뢰Id == sampleRequestId2 || x.의뢰Id == sampleRequestId3)
             .Select(x => x.의뢰Id)
             .ToListAsync(cancellationToken);
         var existingRequestIdSet = existingRequestIds.ToHashSet(StringComparer.Ordinal);
@@ -87,7 +90,6 @@ public static class HongdalV1DevelopmentDataSeeder
         {
             db.용달기사.Add(new 용달기사
             {
-                NotionPageId = Guid.NewGuid().ToString("N"),
                 기사명 = "개발용 기사",
                 기사Id = driverId,
                 상태 = "활동중",
@@ -395,19 +397,20 @@ public static class HongdalV1DevelopmentDataSeeder
 
     private static async Task EnsureTransportAsync(HongdalContext db, string driverId, DateTime now, CancellationToken cancellationToken)
     {
-        var transportNumbers = new[] { "V1-DEV-TRN-001", "V1-DEV-TRN-002" };
+        const string transportNumber1 = "V1-DEV-TRN-001";
+        const string transportNumber2 = "V1-DEV-TRN-002";
         var existing = await db.배송_운송
             .AsNoTracking()
-            .Where(x => transportNumbers.Contains(x.운송번호))
+            .Where(x => x.운송번호 == transportNumber1 || x.운송번호 == transportNumber2)
             .Select(x => x.운송번호)
             .ToListAsync(cancellationToken);
         var existingSet = existing.ToHashSet(StringComparer.Ordinal);
 
-        if (!existingSet.Contains("V1-DEV-TRN-001"))
+        if (!existingSet.Contains(transportNumber1))
         {
             db.배송_운송.Add(new 배송_운송
             {
-                운송번호 = "V1-DEV-TRN-001",
+                운송번호 = transportNumber1,
                 상태 = "상차지도착",
                 기사_운송자 = driverId,
                 출발지 = "서울 강서구 마곡동",
@@ -420,11 +423,11 @@ public static class HongdalV1DevelopmentDataSeeder
             });
         }
 
-        if (!existingSet.Contains("V1-DEV-TRN-002"))
+        if (!existingSet.Contains(transportNumber2))
         {
             db.배송_운송.Add(new 배송_운송
             {
-                운송번호 = "V1-DEV-TRN-002",
+                운송번호 = transportNumber2,
                 상태 = "인수완료",
                 출발_픽업 = now.AddDays(-2).AddHours(1),
                 도착 = now.AddDays(-2).AddHours(4),

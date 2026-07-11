@@ -25,6 +25,19 @@ public sealed class ShipperRequestItem
     public string? 픽업지 { get; set; }
     public string? 하차지 { get; set; }
 
-    public bool CanPay => string.Equals(배차상태, "상차완료", StringComparison.OrdinalIgnoreCase)
-        && !string.Equals(결제상태, "결제완료", StringComparison.OrdinalIgnoreCase);
+    public bool CanPay => ContainsAny(배차상태, "상차완료", "운송중", "하차지도착", "하차완료", "인수완료")
+        && !IsPaymentSecured(결제상태);
+
+    private static bool IsPaymentSecured(string? paymentStatus)
+        => ContainsAny(paymentStatus, "결제완료", "결제확보", "입금확인", "승인완료");
+
+    private static bool ContainsAny(string? value, params string[] tokens)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        return tokens.Any(token => value.Contains(token, StringComparison.OrdinalIgnoreCase));
+    }
 }

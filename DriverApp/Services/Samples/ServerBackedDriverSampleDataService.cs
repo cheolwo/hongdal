@@ -361,7 +361,7 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
 
     private bool CanUseSampleFallback()
     {
-        return _dataModeOptions.Value.AllowSampleFallback;
+        return _dataModeOptions.Value.CanUseSampleFallback;
     }
 
     private void ApplySampleFallback()

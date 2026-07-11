@@ -17,6 +17,7 @@ public static class 결제공통정의
         public const int NaverPay = 20;
         public const int KakaoPay = 30;
         public const int ManualBankTransfer = 90;
+        public const int FakePG = 990;
     }
 
     public static class 결제상태

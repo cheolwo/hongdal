@@ -4,12 +4,14 @@ using Hongdal.Controllers;
 using Hongdal.Application.Admin.Inbound;
 using Hongdal.Contracts.Admin.Inbound;
 using Hongdal.ApiMetadata;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hongdal.Controllers.Admin.Inflow02
 {
     [HongdalApiVersion(HongdalProductVersion.V1_0)]
     [ApiController]
     [Route("api/v1/dispatch/wait")]
+    [Authorize(Policy = "서버관리자전용")]
     public class 배차대기Controller : ControllerBase
     {
         private readonly ISender _sender;

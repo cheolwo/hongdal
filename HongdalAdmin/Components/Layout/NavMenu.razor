@@ -5,12 +5,11 @@
 @inject 관리자인증Service 관리자인증Service
 @inject ViewPolicyService ViewPolicyService
 @inject NavigationManager NavigationManager
-@inject PlatformHomeModeStateService HomeModeState
 
 <MudNavMenu Class="pa-3">
     <MudStack Spacing="0" Class="px-2 pb-3">
         <MudText Typo="Typo.subtitle1">HongdalAdmin</MudText>
-        <MudText Typo="Typo.caption" Color="Color.Secondary">운영자 백오피스</MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">홍달 1.0 운영</MudText>
     </MudStack>
     <MudDivider Class="mb-3" />
 
@@ -20,28 +19,14 @@
     }
     else
     {
-        @foreach (var item in ViewPolicyService.VisibleItems.Where(x => x.EffectiveVisible))
+        @foreach (var item in AdminV1NavigationPolicy.MenuItems.Where(x => IsVisible(x.Route)))
         {
-            <MudNavLink Href="@ToHref(item.Route)"
-                        Match="@(item.Route == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)"
+            <MudNavLink Href="@AdminV1NavigationPolicy.ToHref(item.Route)"
+                        Match="@(item.Exact ? NavLinkMatch.All : NavLinkMatch.Prefix)"
                         Icon="@ResolveIcon(item.IconKey)">
-                @item.DisplayName
+                @item.Label
             </MudNavLink>
         }
-    }
-
-    @if (관리자인증세션Service.서버관리자인가)
-    {
-        <MudDivider Class="my-3" />
-        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="px-2">서버 관리자</MudText>
-        <MudNavLink Href="revenue-policies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Calculate">구독료 운영 정책</MudNavLink>
-        <MudNavLink Href="common-contents" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Image">공통콘텐츠 관리</MudNavLink>
-        <MudNavLink Href="auxiliary-feature-settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">부가 기능 설정</MudNavLink>
-        <MudNavLink Href="restaurant-search-policy" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocationOn">음식점 반경 정책</MudNavLink>
-        <MudNavLink Href="dispatch/ai-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Route">국내화물 AI 배차 검토</MudNavLink>
-        <MudNavLink Href="dispatch/food-ai-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DeliveryDining">음식배달 AI 배차 검토</MudNavLink>
-        <MudNavLink Href="dispatch-ai-judgment-cases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FactCheck">배차 AI 판단 사례</MudNavLink>
-        <MudNavLink Href="contact-search" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ContactPhone">연락처 통합 검색</MudNavLink>
     }
 
     <MudDivider Class="my-3" />
@@ -57,32 +42,13 @@
             <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Logout" OnClick="로그아웃">로그아웃</MudButton>
         </MudStack>
     }
-
-    <MudDivider Class="my-3" />
-    <MudStack Spacing="1" Class="px-2 pb-2">
-        <MudText Typo="Typo.caption" Color="Color.Secondary">모드 전환</MudText>
-        <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
-            <MudButton Variant="@CommunityModeVariant" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Forum" OnClick="@(() => SetMode(false))">커뮤니티</MudButton>
-            <MudButton Variant="@WorkModeVariant" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Work" OnClick="@(() => SetMode(true))">업무</MudButton>
-        </MudStack>
-    </MudStack>
 </MudNavMenu>
 
 @code {
     protected override async Task OnInitializedAsync()
     {
         ViewPolicyService.Changed += HandleChanged;
-        HomeModeState.Changed += HandleChanged;
         await ViewPolicyService.EnsureLoadedAsync();
-    }
-
-    private Variant CommunityModeVariant => HomeModeState.IsWorkMode ? Variant.Outlined : Variant.Filled;
-
-    private Variant WorkModeVariant => HomeModeState.IsWorkMode ? Variant.Filled : Variant.Outlined;
-
-    private void SetMode(bool isWorkMode)
-    {
-        HomeModeState.SetWorkMode(isWorkMode);
     }
 
     private void HandleChanged()
@@ -90,15 +56,8 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private static string ToHref(string route)
-    {
-        if (string.IsNullOrWhiteSpace(route) || route == "/")
-        {
-            return string.Empty;
-        }
-
-        return route.TrimStart('/');
-    }
+    private bool IsVisible(string route)
+        => ViewPolicyService.GetBlockingItem(route) is null;
 
     private static string ResolveIcon(string iconKey) => iconKey switch
     {
@@ -119,6 +78,10 @@
         "public" => Icons.Material.Filled.Public,
         "fact_check" => Icons.Material.Filled.FactCheck,
         "calculate" => Icons.Material.Filled.Calculate,
+        "route" => Icons.Material.Filled.Route,
+        "payments" => Icons.Material.Filled.Payments,
+        "account_balance" => Icons.Material.Filled.AccountBalance,
+        "description" => Icons.Material.Filled.Description,
         _ => Icons.Material.Filled.ChevronRight
     };
 
@@ -131,6 +94,5 @@
     public void Dispose()
     {
         ViewPolicyService.Changed -= HandleChanged;
-        HomeModeState.Changed -= HandleChanged;
     }
 }

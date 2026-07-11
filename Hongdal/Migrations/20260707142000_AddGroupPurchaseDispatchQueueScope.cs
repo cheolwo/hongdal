@@ -1,9 +1,13 @@
+using Hongdal.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Hongdal.Migrations
 {
+    [DbContext(typeof(HongdalContext))]
+    [Migration("20260707142000_AddGroupPurchaseDispatchQueueScope")]
     public partial class AddGroupPurchaseDispatchQueueScope : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

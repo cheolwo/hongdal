@@ -53,3 +53,26 @@ public sealed class 토스결제승인응답
     public string 결제상태 { get; set; } = string.Empty;
     public string 결제응답 { get; set; } = string.Empty;
 }
+
+public sealed class 페이크결제승인요청
+{
+    public string 의뢰Id { get; set; } = string.Empty;
+    public int Amount { get; set; }
+    public string? 결제수단 { get; set; }
+    public string? 메모 { get; set; }
+    public string? IdempotencyKey { get; set; }
+}
+
+public sealed class 페이크결제승인응답
+{
+    public string 결제Id { get; set; } = string.Empty;
+    public string 의뢰Id { get; set; } = string.Empty;
+    public int 결제제공자 { get; set; }
+    public string OrderId { get; set; } = string.Empty;
+    public string PaymentKey { get; set; } = string.Empty;
+    public int Amount { get; set; }
+    public string 결제상태 { get; set; } = string.Empty;
+    public string 결제응답 { get; set; } = string.Empty;
+    public DateTime 승인일시Utc { get; set; }
+    public bool 이미완료됨 { get; set; }
+}

@@ -60,6 +60,7 @@ public static class ShipperServiceCollectionExtensions
     {
         services.AddSingleton<InMemoryShipperStore>();
         services.AddSingleton<SampleShipperOperationsService>();
+        services.AddScoped<FakeShipperPaymentService>();
         services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
         services.AddScoped<IShipperOperationsService, ServerBackedShipperOperationsService>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();

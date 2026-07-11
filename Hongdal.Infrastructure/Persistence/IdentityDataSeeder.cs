@@ -157,7 +157,6 @@ namespace 홍달.Data
             {
                 db.용달기사.Add(new 용달기사
                 {
-                    NotionPageId = Guid.NewGuid().ToString("N"),
                     기사명 = "개발용 기사",
                     기사Id = driverUser.Id,
                     상태 = "활동중",

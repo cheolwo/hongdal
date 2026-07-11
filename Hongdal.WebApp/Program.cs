@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Driver.Recommendation;
 using Hongdal.WebApp;
@@ -19,6 +20,7 @@ if (string.IsNullOrWhiteSpace(apiBaseAddress))
 }
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
+builder.Services.Configure<ClientDataModeOptions>(builder.Configuration.GetSection(ClientDataModeOptions.SectionName));
 builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
 builder.Services.AddHongdalUiCommonAppServices();
 builder.Services.AddHongdalDocumentOutputServices();

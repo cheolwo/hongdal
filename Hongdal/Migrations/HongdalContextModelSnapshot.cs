@@ -1700,11 +1700,6 @@ namespace Hongdal.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("NotionPageId")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("notion_page_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -1830,11 +1825,6 @@ namespace Hongdal.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("NotionPageId")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("notion_page_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -1916,11 +1906,6 @@ namespace Hongdal.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
-
-                    b.Property<string>("NotionPageId")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("notion_page_id");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)")
@@ -3316,11 +3301,6 @@ namespace Hongdal.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
-
-                    b.Property<string>("NotionPageId")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("notion_page_id");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)")

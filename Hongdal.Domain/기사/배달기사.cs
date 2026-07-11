@@ -12,9 +12,6 @@ namespace 홍달.도메인.기사
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("notion_page_id")]
-        public string NotionPageId { get; set; } = string.Empty;
-
         [Column("기사명")]
         public string 기사명 { get; set; } = string.Empty;
 

@@ -2,6 +2,8 @@
 
 > 이 문서는 Toss 결제 연동의 상세 흐름을 담는다.
 > 솔루션 전체 요약은 루트 `README.md`를 참고한다.
+> 2026-07-12 현재 홍달 1.0의 기본 개발 경로는 Toss 직접 연동이 아니라 `docs/Architecture/TransportPaymentSettlementPolicy.md`의 FakePG/제공자 중립 결제 원장이다.
+> 이 문서는 Toss를 선택할 경우 참고하는 보관 문서이며, 새 결제 기능의 기본 기준 문서가 아니다.
 
 ## Overview
 

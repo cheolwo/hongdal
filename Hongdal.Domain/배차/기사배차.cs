@@ -11,9 +11,6 @@ namespace 홍달.도메인.배차
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("notion_page_id")]
-        public string NotionPageId { get; set; } = string.Empty;
-
         [Column("배차Id")]
         public long? 배차Id { get; set; }
 

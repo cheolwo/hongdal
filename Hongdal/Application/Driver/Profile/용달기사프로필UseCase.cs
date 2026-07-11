@@ -81,7 +81,6 @@ public sealed class 용달기사프로필UseCase : I용달기사프로필UseCase
         var now = DateTime.UtcNow;
         var driver = new 용달기사
         {
-            NotionPageId = Guid.NewGuid().ToString("N"),
             기사명 = request.기사명.Trim(),
             기사Id = 기사Id,
             상태 = string.IsNullOrWhiteSpace(request.상태) ? "활동중" : request.상태.Trim(),

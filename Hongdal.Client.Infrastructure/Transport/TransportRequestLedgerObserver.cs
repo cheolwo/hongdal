@@ -27,6 +27,17 @@ public sealed record TransportRequestLedgerRefreshRequest(
     string Reason,
     DateTimeOffset RequestedAtUtc);
 
+public sealed record TransportRequestLedgerServerEvent(
+    string RequestId,
+    string? RequestStatus,
+    string? PaymentStatus,
+    string? DispatchStatus,
+    string? SettlementStatus,
+    string? TransportStatus,
+    DateTimeOffset ChangedAtUtc,
+    string Source,
+    string? EventType = null);
+
 public interface ITransportRequestLedgerObserver
 {
     event Action<TransportRequestLedgerChange>? Changed;
@@ -36,6 +47,8 @@ public interface ITransportRequestLedgerObserver
     TransportRequestLedgerSnapshot? GetSnapshot(string requestId);
 
     bool Observe(TransportRequestLedgerSnapshot snapshot, string reason);
+
+    bool ObserveServerEvent(TransportRequestLedgerServerEvent serverEvent);
 
     void RequestRefresh(string requestId, string reason);
 }
@@ -97,6 +110,36 @@ public sealed class TransportRequestLedgerObserver : ITransportRequestLedgerObse
 
         Changed?.Invoke(change);
         return true;
+    }
+
+    public bool ObserveServerEvent(TransportRequestLedgerServerEvent serverEvent)
+    {
+        ArgumentNullException.ThrowIfNull(serverEvent);
+
+        if (string.IsNullOrWhiteSpace(serverEvent.RequestId))
+        {
+            return false;
+        }
+
+        var source = string.IsNullOrWhiteSpace(serverEvent.Source)
+            ? "ServerLedger"
+            : serverEvent.Source.Trim();
+        var reason = string.IsNullOrWhiteSpace(serverEvent.EventType)
+            ? source
+            : $"{source}:{serverEvent.EventType.Trim()}";
+
+        return Observe(
+            new TransportRequestLedgerSnapshot(
+                serverEvent.RequestId,
+                serverEvent.RequestStatus,
+                serverEvent.PaymentStatus,
+                string.IsNullOrWhiteSpace(serverEvent.DispatchStatus)
+                    ? serverEvent.TransportStatus
+                    : serverEvent.DispatchStatus,
+                serverEvent.SettlementStatus,
+                serverEvent.ChangedAtUtc,
+                source),
+            reason);
     }
 
     public void RequestRefresh(string requestId, string reason)

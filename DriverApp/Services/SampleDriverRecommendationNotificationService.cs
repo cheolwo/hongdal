@@ -21,7 +21,7 @@ public sealed class SampleDriverRecommendationNotificationService(
 #if DEBUG
         if (publishedRecommendation is null
             && !sampleRecommendationInitialized
-            && dataModeOptions.Value.AllowSampleFallback)
+            && dataModeOptions.Value.CanUseSampleFallback)
         {
             publishedRecommendation = CreateSampleRecommendation();
             sampleRecommendationInitialized = true;

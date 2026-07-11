@@ -1,19 +1,11 @@
 @page "/"
+@inject NavigationManager NavigationManager
 
 <PageTitle>Hongdal Admin</PageTitle>
 
-<PlatformCommunityHome AppName="Hongdal Admin"
-                       RoleLabel="관리자"
-                       CanManageCommunityPosts="true"
-                       QuickActions="QuickActions" />
+<MudAlert Severity="Severity.Info">홍달 1.0 운영 대시보드로 이동합니다.</MudAlert>
 
 @code {
-    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
-    [
-        new("기사 운행현황", "현재 운행과 배차 흐름 확인", "/drivers/operating", Icons.Material.Filled.LocalShipping, Color.Primary),
-        new("화면 정책", "역할별 화면 노출 조정", "/view-policies", Icons.Material.Filled.Tune, Color.Secondary),
-        new("부가기능 설정", "무료 소통과 업무 보조 기능의 사용 범위 조정", "/auxiliary-feature-settings", Icons.Material.Filled.Extension, Color.Warning),
-        new("구독료 운영 정책", "운영비와 인하 권고 검토", "/revenue-policies", Icons.Material.Filled.Calculate, Color.Success),
-        new("HS 코드 운영", "상품/화물 분류와 주의 태그 보정", "/customs/hs-codes", Icons.Material.Filled.FactCheck, Color.Info)
-    ];
+    protected override void OnInitialized()
+        => NavigationManager.NavigateTo("/dashboard", replace: true);
 }
