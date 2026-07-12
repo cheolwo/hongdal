@@ -143,6 +143,7 @@ public static class 노드스티커Catalog
     public static 노드스티커이미지Response? 노드기본이미지찾기(노드스티커매칭Request request)
         => 전체이미지목록
             .Where(이미지 => string.Equals(이미지.검수상태, 노드스티커검수상태.승인, StringComparison.OrdinalIgnoreCase))
+            .Where(무료팩이미지인가)
             .Select(이미지 => new
             {
                 이미지,
@@ -186,6 +187,11 @@ public static class 노드스티커Catalog
              (후보값.Contains(값, StringComparison.OrdinalIgnoreCase) ||
               값.Contains(후보값, StringComparison.OrdinalIgnoreCase))));
     }
+
+    private static bool 무료팩이미지인가(노드스티커이미지Response 이미지)
+        => 기본팩목록.Any(팩 =>
+            string.Equals(팩.팩Key, 이미지.팩Key, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(팩.거래정책.가격모드, 노드스티커가격모드.무료, StringComparison.OrdinalIgnoreCase));
 
     private static 노드스티커이미지Response 이미지(
         string 이미지Key,
