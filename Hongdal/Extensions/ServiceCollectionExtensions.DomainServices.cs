@@ -16,6 +16,7 @@ using 홍달.Services.Versioning;
 using Hongdal.Services.Auth;
 using Hongdal.Services.Community;
 using Hongdal.Services.Food;
+using Hongdal.Services.LogisticsProcessing.Warehouse;
 using Hongdal.Services.Orderer;
 
 namespace Hongdal.Extensions;
@@ -41,6 +42,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I커뮤니티원장저장소, 투영갱신커뮤니티원장저장소>();
         services.AddSingleton<I커뮤니티대화저장소, Mongo커뮤니티대화저장소>();
         services.AddScoped<I커뮤니티원장블록관계투영Service, 커뮤니티원장블록관계투영Service>();
+        services.AddScoped<I커뮤니티원장상태이벤트Service, 커뮤니티원장상태이벤트Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();
         services.AddScoped<I원장업무투영동기화Handler, 운송원장업무투영Handler>();
         services.AddScoped<I원장업무투영동기화Handler, 창고원장업무투영Handler>();
@@ -74,6 +76,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();
         services.AddScoped<I배차대기원장전환Service, 배차대기원장전환Service>();
         services.AddScoped<I배차실행인덱스예열Service, 배차실행인덱스예열Service>();
+        services.AddScoped<I피킹포장작업투영Service, 피킹포장작업투영Service>();
         services.AddScoped<I배차추천알림Service, 배차추천알림Service>();
         services.AddScoped<I상차접근알림Service, 상차접근알림Service>();
         services.AddScoped<ICommand알림Outbox발송Service, Command알림Outbox발송Service>();

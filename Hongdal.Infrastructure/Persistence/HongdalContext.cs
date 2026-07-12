@@ -88,6 +88,7 @@ namespace 홍달.Data
         public DbSet<재고이력> 재고이력 { get; set; } = null!;
         public DbSet<출고묶음> 출고묶음 { get; set; } = null!;
         public DbSet<출고예정> 출고예정 { get; set; } = null!;
+        public DbSet<피킹포장작업> 피킹포장작업 { get; set; } = null!;
         public DbSet<재고이동> 재고이동 { get; set; } = null!;
         public DbSet<통관절차> 통관절차 { get; set; } = null!;
         public DbSet<통관수임> 통관수임 { get; set; } = null!;
@@ -127,6 +128,7 @@ namespace 홍달.Data
         public DbSet<PlatformCommunityPostRecommendation> PlatformCommunityPostRecommendations { get; set; } = null!;
         public DbSet<커뮤니티원장블록투영> 커뮤니티원장블록투영 { get; set; } = null!;
         public DbSet<커뮤니티원장블록관계투영> 커뮤니티원장블록관계투영 { get; set; } = null!;
+        public DbSet<커뮤니티원장상태이벤트> 커뮤니티원장상태이벤트 { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
