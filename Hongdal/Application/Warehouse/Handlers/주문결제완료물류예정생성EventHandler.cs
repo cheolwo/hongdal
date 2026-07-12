@@ -1,4 +1,5 @@
 using MediatR;
+using Hongdal.Services.Community;
 using Hongdal.Contracts.Common.Inbound;
 using 홍달.도메인.창고;
 
@@ -7,10 +8,14 @@ namespace Hongdal.Application.Warehouse;
 public sealed class 주문결제완료물류예정생성EventHandler : INotificationHandler<주문결제완료됨Event>
 {
     private readonly HongdalContext _db;
+    private readonly I음식마트원장Mongo동기화Service _ledgerSync;
 
-    public 주문결제완료물류예정생성EventHandler(HongdalContext db)
+    public 주문결제완료물류예정생성EventHandler(
+        HongdalContext db,
+        I음식마트원장Mongo동기화Service ledgerSync)
     {
         _db = db;
+        _ledgerSync = ledgerSync;
     }
 
     public async Task Handle(주문결제완료됨Event notification, CancellationToken cancellationToken)
@@ -94,6 +99,29 @@ public sealed class 주문결제완료물류예정생성EventHandler : INotifica
         }
 
         await _db.SaveChangesAsync(cancellationToken);
+
+        var 출고Query = _db.출고예정.AsQueryable();
+        출고Query = notification.주문Id.HasValue
+            ? 출고Query.Where(x => x.주문Id == notification.주문Id || x.주문참조번호 == notification.주문참조번호)
+            : 출고Query.Where(x => x.주문참조번호 == notification.주문참조번호);
+
+        var 출고목록 = await 출고Query.ToListAsync(cancellationToken);
+        var 입고Ids = 출고목록
+            .Select(x => x.입고요청Id)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .Distinct()
+            .ToArray();
+        List<입고요청> 입고목록 = 입고Ids.Length == 0
+            ? []
+            : await _db.입고요청.Where(x => 입고Ids.Contains(x.Id)).ToListAsync(cancellationToken);
+
+        await _ledgerSync.출고원장동기화Async(
+            출고목록,
+            입고목록,
+            notification.판매자UserId,
+            "출고 예정",
+            cancellationToken: cancellationToken);
     }
 
     private async Task<창고> EnsureDefaultWarehouseAsync(

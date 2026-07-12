@@ -90,7 +90,7 @@ public partial class PlatformCommunityHome
 
         if (창고또는재고를사용하는가(template))
         {
-            rules.Add("창고와 창고를 잇는 흐름은 중간에 배송/운송 블록을 끼워 창고 A -> 배송 -> 창고 B로 표시합니다.");
+            rules.Add("창고와 창고를 잇는 흐름은 중간에 운송/전달 블록을 끼워 창고 A -> 배송 -> 창고 B로 표시합니다.");
         }
 
         rules.Add("배송 블록은 포장, 검수, 출고 준비처럼 앞선 조건이 충족된 뒤 열리는 후속 블록입니다.");

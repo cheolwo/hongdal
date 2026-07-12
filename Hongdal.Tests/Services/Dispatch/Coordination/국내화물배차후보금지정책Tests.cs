@@ -13,7 +13,7 @@ public sealed class 국내화물배차후보금지정책Tests
     public void 운송의뢰후보금지는_추천잠금과_좌표누락을_하드_금지로_본다()
     {
         var now = DateTime.UtcNow;
-        var queue = new 배차대기
+        var queue = new 운송원장
         {
             의뢰Id = "REQ-1",
             배차업무유형 = 상태값.배차업무유형.용달운송,

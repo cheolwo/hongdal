@@ -14,3 +14,13 @@ public interface IHongdalFoodOrderStore
 
     음식주문응답? 배차대기반영(string orderNo, long dispatchWaitId, DateTime dispatchRequestedAtUtc);
 }
+
+public interface I커뮤니티원장반영가능음식주문Store
+{
+    음식주문응답? 커뮤니티원장반영(
+        string orderNo,
+        string ledgerId,
+        string ledgerTemplateKey,
+        string ledgerState,
+        DateTime syncedAtUtc);
+}

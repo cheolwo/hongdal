@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.도메인.공통;
 using 홍달.Services.Dispatch.Coordination;
@@ -135,7 +135,7 @@ public sealed class 배차실행인덱스예열Service : I배차실행인덱스�
                 cancellationToken);
         }
 
-        var 미처리운송의뢰목록 = await _db.배차대기
+        var 미처리운송의뢰목록 = await _db.운송원장
             .AsNoTracking()
             .미처리운송의뢰쿼리(기준시각Utc)
             .ToListAsync(cancellationToken);

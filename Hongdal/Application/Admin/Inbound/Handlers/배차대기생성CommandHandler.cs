@@ -1,32 +1,41 @@
-using Hongdal.Contracts.Admin.Inbound;
+﻿using Hongdal.Contracts.Admin.Inbound;
+using Hongdal.Services.Community;
 using Microsoft.EntityFrameworkCore;
+using 홍달.도메인.운송;
+using 홍달.Services.Dispatch.Engine;
 
 namespace Hongdal.Application.Admin.Inbound;
 
-public sealed class 배차대기생성CommandHandler : IRequestHandler<배차대기생성Command, 홍달.도메인.배차.배차대기>
+public sealed class 배차대기생성CommandHandler : IRequestHandler<배차대기생성Command, 운송원장>
 {
     private readonly HongdalContext _db;
+    private readonly I운송원장Mongo동기화Service _transportLedgerSync;
 
-    public 배차대기생성CommandHandler(HongdalContext db)
+    public 배차대기생성CommandHandler(
+        HongdalContext db,
+        I운송원장Mongo동기화Service transportLedgerSync)
     {
         _db = db;
+        _transportLedgerSync = transportLedgerSync;
     }
 
-    public async Task<홍달.도메인.배차.배차대기> Handle(배차대기생성Command request, CancellationToken cancellationToken)
+    public async Task<운송원장> Handle(배차대기생성Command request, CancellationToken cancellationToken)
     {
-        var existing = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == request.의뢰Id, cancellationToken);
+        var existing = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == request.의뢰Id, cancellationToken);
         if (existing is not null)
         {
+            await _transportLedgerSync.운송실행투영동기화Async(existing, "admin", cancellationToken);
             return existing;
         }
 
         var now = DateTime.UtcNow;
-        var entity = new 홍달.도메인.배차.배차대기
+        var entity = new 운송원장
         {
+            운송번호 = request.의뢰Id,
             의뢰Id = request.의뢰Id,
             화주Id = request.화주Id,
             배차업무유형 = request.배차업무유형 ?? 홍달.도메인.공통.상태값.배차업무유형.용달운송,
-            원본의뢰유형 = string.IsNullOrWhiteSpace(request.원본의뢰유형) ? "CargoTransport" : request.원본의뢰유형.Trim(),
+            원본의뢰유형 = string.IsNullOrWhiteSpace(request.원본의뢰유형) ? 운송의뢰배차원천유형.화주운송의뢰 : request.원본의뢰유형.Trim(),
             원본의뢰Id = string.IsNullOrWhiteSpace(request.원본의뢰Id) ? request.의뢰Id : request.원본의뢰Id.Trim(),
             공동구매도착지유형코드 = NormalizeOptional(request.공동구매도착지유형코드),
             공동구매기사세대배송여부 = request.공동구매기사세대배송여부,
@@ -46,8 +55,9 @@ public sealed class 배차대기생성CommandHandler : IRequestHandler<배차대
             UpdatedAt = now
         };
 
-        await _db.배차대기.AddAsync(entity, cancellationToken);
+        await _db.운송원장.AddAsync(entity, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
+        await _transportLedgerSync.운송실행투영동기화Async(entity, "admin", cancellationToken);
         return entity;
     }
 

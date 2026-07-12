@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Quartz;
 using 홍달.Data;
 using 홍달.도메인.공통;
@@ -34,7 +34,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
             var cancellationToken = context.CancellationToken;
             var 자동공개전환Count = await 공개전환기한초과처리Async(cancellationToken);
 
-            var plannedIds = await _db.배차대기.AsNoTracking()
+            var plannedIds = await _db.운송원장.AsNoTracking()
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
                             && x.배차큐단계 == 상태값.배차큐단계.계획배차
                             && x.배차노출상태 == 상태값.배차노출상태.계획대기)
@@ -48,7 +48,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
                 await _원장전환Service.계획배차에서추천으로전환Async(requestId, cancellationToken);
             }
 
-            var recommendWaitingIds = await _db.배차대기.AsNoTracking()
+            var recommendWaitingIds = await _db.운송원장.AsNoTracking()
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
                             && x.배차큐단계 == 상태값.배차큐단계.배차추천
                             && x.배차노출상태 == 상태값.배차노출상태.추천대기
@@ -63,14 +63,14 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
                 await _원장전환Service.추천대기처리Async(requestId, cancellationToken);
             }
 
-            var cargoWaitingCount = await _db.배차대기.AsNoTracking()
+            var cargoWaitingCount = await _db.운송원장.AsNoTracking()
                 .CountAsync(x => x.상태 == 상태값.배차대기상태.대기
                                  && x.배차업무유형 == 상태값.배차업무유형.용달운송
                                  && x.배차큐단계 == 상태값.배차큐단계.배차추천
                                  && x.배차노출상태 == 상태값.배차노출상태.추천대기,
                     cancellationToken);
 
-            var foodWaitingCount = await _db.배차대기.AsNoTracking()
+            var foodWaitingCount = await _db.운송원장.AsNoTracking()
                 .CountAsync(x => x.상태 == 상태값.배차대기상태.대기
                                  && x.배차업무유형 == 상태값.배차업무유형.음식배달
                                  && x.배차큐단계 == 상태값.배차큐단계.배차추천
@@ -99,7 +99,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
             var scanLimit = Math.Max(_options.처리배치크기, _options.처리배치크기 * 5);
 
             var candidates = await (
-                from queue in _db.배차대기.AsNoTracking()
+                from queue in _db.운송원장.AsNoTracking()
                 join request in _db.화주운송의뢰.AsNoTracking()
                     on queue.의뢰Id equals request.의뢰Id into requestGroup
                 from request in requestGroup.DefaultIfEmpty()

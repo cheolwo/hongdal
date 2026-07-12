@@ -1,4 +1,4 @@
-using FluentResults;
+﻿using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -40,7 +40,7 @@ public sealed class 배차수락취소CommandHandler : IRequestHandler<배차수
             return Result.Fail<배차수락취소결과>(권한오류);
         }
 
-        var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
+        var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
         if (queue is null)
         {
             return Result.Fail<배차수락취소결과>("배차대기 데이터를 찾을 수 없습니다.");

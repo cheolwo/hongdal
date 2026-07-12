@@ -11,7 +11,7 @@ public class 기사운송상태전이ServiceTests
     public void 상태변경_1_0_핵심운송흐름은_순서대로_완료된다()
     {
         var 시작시각 = new DateTime(2026, 7, 1, 9, 0, 0, DateTimeKind.Utc);
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "배차대기",
             UpdatedAt = 시작시각
@@ -36,7 +36,7 @@ public class 기사운송상태전이ServiceTests
     public void 상태변경_상차완료로_전이하면_출발픽업시각을_설정한다()
     {
         var 변경시각 = new DateTime(2026, 7, 1, 9, 30, 0, DateTimeKind.Utc);
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "상차지도착",
             UpdatedAt = 변경시각.AddMinutes(-5)
@@ -54,7 +54,7 @@ public class 기사운송상태전이ServiceTests
     public void 상태변경_배차확정후_상차지도착으로_전이할수있다()
     {
         var 변경시각 = new DateTime(2026, 7, 1, 9, 10, 0, DateTimeKind.Utc);
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "배차확정",
             UpdatedAt = 변경시각.AddMinutes(-5)
@@ -72,7 +72,7 @@ public class 기사운송상태전이ServiceTests
     {
         var 기존출발시각 = new DateTime(2026, 7, 1, 8, 0, 0, DateTimeKind.Utc);
         var 변경시각 = 기존출발시각.AddMinutes(15);
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "상차완료",
             출발_픽업 = 기존출발시각,
@@ -90,7 +90,7 @@ public class 기사운송상태전이ServiceTests
     [Fact]
     public void 상태변경_완료된운송은_다른상태로_변경할수없다()
     {
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "인수완료"
         };
@@ -105,7 +105,7 @@ public class 기사운송상태전이ServiceTests
     [Fact]
     public void 상태변경_허용되지않은전이는_실패한다()
     {
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "배차대기"
         };
@@ -121,7 +121,7 @@ public class 기사운송상태전이ServiceTests
     public void 상태변경_인수완료로_전이하면_도착시각을_설정한다()
     {
         var 변경시각 = new DateTime(2026, 7, 1, 12, 0, 0, DateTimeKind.Utc);
-        var 운송 = new 배송_운송
+        var 운송 = new 운송원장
         {
             상태 = "하차지도착",
             UpdatedAt = 변경시각.AddMinutes(-5)

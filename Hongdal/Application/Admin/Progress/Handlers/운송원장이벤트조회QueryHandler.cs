@@ -1,6 +1,7 @@
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Admin.Progress;
+using Hongdal.Services.Community;
 using 홍달.도메인.공통;
 using 홍달.도메인.운송;
 using 홍달.도메인.화주;
@@ -11,13 +12,16 @@ public sealed class 운송원장이벤트조회QueryHandler : IRequestHandler<�
 {
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly I운송원장Mongo동기화Service _원장동기화Service;
 
     public 운송원장이벤트조회QueryHandler(
         HongdalContext db,
-        ICurrentUserAccessor currentUserAccessor)
+        ICurrentUserAccessor currentUserAccessor,
+        I운송원장Mongo동기화Service 원장동기화Service)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
+        _원장동기화Service = 원장동기화Service;
     }
 
     public async Task<Result<운송원장이벤트응답>> Handle(운송원장이벤트조회Query request, CancellationToken cancellationToken)
@@ -31,7 +35,7 @@ public sealed class 운송원장이벤트조회QueryHandler : IRequestHandler<�
         var shipperRequest = await _db.화주운송의뢰
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
-        var transport = await _db.배송_운송
+        var transport = await _db.운송원장
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.운송번호 == requestId, cancellationToken);
 
@@ -64,6 +68,7 @@ public sealed class 운송원장이벤트조회QueryHandler : IRequestHandler<�
                 메타데이터 = x.메타데이터
             })
             .ToListAsync(cancellationToken);
+        var 동기화상태 = await _원장동기화Service.상태조회Async(requestId, cancellationToken);
 
         return Result.Ok(new 운송원장이벤트응답
         {
@@ -76,12 +81,21 @@ public sealed class 운송원장이벤트조회QueryHandler : IRequestHandler<�
             운송Id = transport?.Id,
             운송상태 = transport?.상태 ?? string.Empty,
             운송UpdatedAt = transport?.UpdatedAt,
+            Mongo원장Id = 동기화상태.원장Id,
+            Mongo원장존재 = 동기화상태.Mongo원장존재,
+            Mongo원장상태 = 동기화상태.Mongo원장상태 ?? string.Empty,
+            Mongo원장현재단계Key = 동기화상태.현재단계Key ?? string.Empty,
+            Mongo원장대상OsCode = 동기화상태.대상OsCode ?? string.Empty,
+            Mongo원장UpdatedAtUtc = 동기화상태.Mongo원장UpdatedAtUtc,
+            Mongo원장블록수 = 동기화상태.Mongo원장블록수,
+            Rdb블록투영수 = 동기화상태.Rdb블록투영수,
+            원장동기화메시지 = 동기화상태.메시지,
             마지막변경시각 = ResolveLatestChangedAt(shipperRequest, transport, events),
             이벤트목록 = events
         });
     }
 
-    private bool CanReadLedger(화주운송의뢰? shipperRequest, 배송_운송? transport)
+    private bool CanReadLedger(화주운송의뢰? shipperRequest, 운송원장? transport)
     {
         var role = _currentUserAccessor.Role;
         var userId = _currentUserAccessor.UserId;
@@ -116,7 +130,7 @@ public sealed class 운송원장이벤트조회QueryHandler : IRequestHandler<�
 
     private static DateTime ResolveLatestChangedAt(
         화주운송의뢰? shipperRequest,
-        배송_운송? transport,
+        운송원장? transport,
         IReadOnlyList<운송원장이벤트항목응답> events)
     {
         var latest = DateTime.MinValue;

@@ -94,6 +94,21 @@ public class 입고상품
     [Column("입고완료일시")]
     public DateTime? 입고완료일시 { get; set; }
 
+    [Column("community_ledger_id")]
+    [MaxLength(120)]
+    public string? 커뮤니티원장Id { get; set; }
+
+    [Column("community_ledger_template_key")]
+    [MaxLength(120)]
+    public string? 커뮤니티원장템플릿Key { get; set; }
+
+    [Column("community_ledger_state")]
+    [MaxLength(80)]
+    public string? 커뮤니티원장상태 { get; set; }
+
+    [Column("community_ledger_synced_at_utc")]
+    public DateTime? 커뮤니티원장동기화시각Utc { get; set; }
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

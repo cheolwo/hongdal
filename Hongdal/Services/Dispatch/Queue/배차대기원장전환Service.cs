@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +34,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 계획배차에서추천으로전환Async(string requestId, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId);
@@ -57,7 +57,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 추천대기처리Async(string requestId, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId);
@@ -81,7 +81,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 추천시작Async(string requestId, string driverId, int? timeoutSeconds = null, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId, driverId);
@@ -97,7 +97,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 추천거절처리Async(string requestId, string driverId, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId, driverId);
@@ -133,7 +133,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 추천만료처리Async(string requestId, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId);
@@ -169,7 +169,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 공개배차로전환Async(string requestId, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId);
@@ -198,7 +198,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 배차확정처리Async(string requestId, string driverId, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId, driverId);
@@ -224,7 +224,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<배차대기원장전환결과> 배차수락취소처리Async(string requestId, string driverId, string? reason = null, CancellationToken cancellationToken = default)
         {
-            var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
+            var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == requestId, cancellationToken);
             if (queue is null)
             {
                 return 대상없음(requestId, driverId);

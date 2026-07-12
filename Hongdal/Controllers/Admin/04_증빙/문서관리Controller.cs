@@ -57,7 +57,7 @@ public sealed class 문서관리Controller : ControllerBase
         var result = await _useCase.업로드Async(new 문서업로드Command(
             request?.File,
             request?.의뢰Id,
-            request?.배송운송Id,
+            request?.운송원장Id,
             request?.문서코드,
             request?.문서명,
             request?.암호화여부,

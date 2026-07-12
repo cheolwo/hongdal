@@ -1,4 +1,4 @@
-using Hongdal.Application.CommandProcessing;
+﻿using Hongdal.Application.CommandProcessing;
 using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.공통;
 using 홍달.Services.Dispatch.Queue;
@@ -51,7 +51,7 @@ public sealed class 배차거절CommandHandler : IRequestHandler<배차거절Com
         }
 
         var now = DateTime.UtcNow;
-        var queue = await _db.배차대기
+        var queue = await _db.운송원장
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
         if (queue is null)

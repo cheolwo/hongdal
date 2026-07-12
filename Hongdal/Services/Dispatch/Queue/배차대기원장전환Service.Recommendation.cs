@@ -5,7 +5,7 @@ namespace 홍달.Services.Dispatch.Queue
 {
     public sealed partial class 배차대기원장전환Service
     {
-        private async Task<배차대기원장전환결과> 시작Async(배차대기 queue, string driverId, int? timeoutSeconds, CancellationToken cancellationToken)
+        private async Task<배차대기원장전환결과> 시작Async(운송원장 queue, string driverId, int? timeoutSeconds, CancellationToken cancellationToken)
         {
             if (queue.상태 != 상태값.배차대기상태.대기)
             {
@@ -53,7 +53,7 @@ namespace 홍달.Services.Dispatch.Queue
                 driverId);
         }
 
-        private async Task<배차대기원장전환결과> 추천거절후다음후보로진행Async(배차대기 queue, string? excludeDriverId, CancellationToken cancellationToken)
+        private async Task<배차대기원장전환결과> 추천거절후다음후보로진행Async(운송원장 queue, string? excludeDriverId, CancellationToken cancellationToken)
         {
             if (queue.상태 != 상태값.배차대기상태.대기)
             {

@@ -75,7 +75,7 @@ public sealed class 배차실행인덱스재구성정책Tests
         Assert.Equal(["REQ-ACTIVE"], result);
     }
 
-    private static 배차대기 CreateQueue(string requestId = "REQ-1")
+    private static 운송원장 CreateQueue(string requestId = "REQ-1")
         => new()
         {
             의뢰Id = requestId,

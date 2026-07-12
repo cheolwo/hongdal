@@ -43,7 +43,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public int 배차업무유형 => 홍달.도메인.공통.상태값.배차업무유형.용달운송;
 
-        public async Task<배차추천후보?> 다음후보선정Async(홍달.도메인.배차.배차대기 queue, string? 제외기사Id = null, CancellationToken cancellationToken = default)
+        public async Task<배차추천후보?> 다음후보선정Async(홍달.도메인.운송.운송원장 queue, string? 제외기사Id = null, CancellationToken cancellationToken = default)
         {
             var request = await _db.화주운송의뢰.AsNoTracking().FirstOrDefaultAsync(x => x.의뢰Id == queue.의뢰Id, cancellationToken);
             if (request is null)

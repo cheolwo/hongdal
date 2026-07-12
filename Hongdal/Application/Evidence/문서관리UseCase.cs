@@ -20,7 +20,7 @@ public interface I문서관리UseCase
 public sealed record 문서업로드Command(
     IFormFile? File,
     string? 의뢰Id,
-    long? 배송운송Id,
+    long? 운송원장Id,
     string? 문서코드,
     string? 문서명,
     bool? 암호화여부,
@@ -110,7 +110,7 @@ public sealed class 문서관리UseCase : I문서관리UseCase
             var created = await _documentService.CreateDocumentAsync(new 문서생성요청
             {
                 의뢰Id = command.의뢰Id ?? string.Empty,
-                배송운송Id = command.배송운송Id,
+                운송원장Id = command.운송원장Id,
                 문서코드 = command.문서코드 ?? string.Empty,
                 문서명 = command.문서명 ?? string.Empty,
                 파일명 = command.File.FileName,

@@ -58,7 +58,7 @@ public sealed class 기사홈조회QueryHandler : IRequestHandler<기사홈조�
 
         var pushToken = await _pushTokenStore.GetAsync(request.기사Id, cancellationToken);
         var nationwideEnabled = await _callScopeStore.IsNationwideEnabledAsync(request.기사Id, cancellationToken);
-        var inProgressTransportCount = await _db.배송_운송
+        var inProgressTransportCount = await _db.운송원장
             .AsNoTracking()
             .CountAsync(x => x.기사_운송자 == driver.기사명 && x.상태 != "인수완료", cancellationToken);
 

@@ -98,6 +98,8 @@ public sealed class CommunityLedgerTemplateCatalogTests
             Assert.Contains(template.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Participant);
             Assert.Contains(template.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State);
             Assert.Contains(template.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.OpensApiHandoff);
+            Assert.NotEmpty(template.BlockRelations);
+            Assert.Contains(template.BlockRelations, relation => relation.RelationType == CommunityLedgerRelationTypes.Flow);
             Assert.All(template.LedgerBlocks, block =>
             {
                 Assert.False(string.IsNullOrWhiteSpace(block.Code));
@@ -121,6 +123,61 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(mart.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Inventory && block.UiSectionHint == "도심 재고");
         Assert.Contains(mart.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "기사 픽업");
         Assert.Contains(mart.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.MartOrderBeforePickingPacking));
+    }
+
+    [Fact]
+    public void PriorityModules_MapLedgersAndInterLedgerRelations()
+    {
+        var modules = CommunityLedgerTemplateCatalog.PriorityImplementationModules;
+
+        Assert.Equal(10, modules.Count);
+        Assert.Equal("커뮤니티 대화 원장", modules[0].DisplayName);
+        Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment);
+        Assert.Contains(modules, module => module.DisplayName == "마트 배송 원장");
+
+        var relations = CommunityLedgerTemplateCatalog.LedgerRelations;
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.CommunityConversation
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment
+            && relation.RelationType == CommunityLedgerRelationTypes.Handoff
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.PickingPacking
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.HongdalMartDelivery
+            && relation.Cardinality == CommunityLedgerRelationCardinality.ManyToOne
+            && relation.Required);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.TransportProgress
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.ReportDispute);
+    }
+
+    [Fact]
+    public void HongdalMartTemplate_UsesDeliveryLedgerNameAndImmediateDeliveryAsAttribute()
+    {
+        var mart = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.HongdalMart);
+
+        Assert.Equal("알뜰살뜰 마트 배송 원장", mart.DisplayName);
+        Assert.Contains("배송유형", mart.Summary);
+        Assert.Contains("즉시배송", mart.Summary);
+        Assert.DoesNotContain("즉시배송 원장", mart.DisplayName);
+        Assert.Contains(mart.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "마트 배송 배차");
+    }
+
+    [Fact]
+    public void BlockRelations_ExposeRequiredRelationsFromCompositionRules()
+    {
+        var mart = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.HongdalMart);
+
+        Assert.Contains(mart.BlockRelations, relation =>
+            relation.RelationType == CommunityLedgerRelationTypes.Requires
+            && relation.Required
+            && relation.CompositionRuleCode == CommunityLedgerCompositionRuleCodes.MartOrderBeforePickingPacking
+            && relation.FromBlockCode.Contains("order", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(mart.BlockRelations, relation =>
+            relation.RelationType == CommunityLedgerRelationTypes.Requires
+            && relation.Required
+            && relation.CompositionRuleCode == CommunityLedgerCompositionRuleCodes.MartPackedBeforeDeliveryPickup
+            && relation.FromBlockCode.Contains("packing-complete", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -345,6 +402,8 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains("참여자 블록", body);
         Assert.Contains("판매 물건 블록", body);
         Assert.Contains("AI 판단근거", body);
+        Assert.Contains("원장 모듈/관계:", body);
+        Assert.Contains("블록 관계:", body);
         Assert.Contains("구성 규칙:", body);
         Assert.Contains("판매 물건과 상대가 먼저 정해져야 합니다.", body);
         Assert.Contains("베스트 원장 공유 포인트:", body);

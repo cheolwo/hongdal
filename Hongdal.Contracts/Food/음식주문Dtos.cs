@@ -89,6 +89,10 @@ public sealed class 음식주문응답
     public DateTime? 조리예상완료시각Utc { get; set; }
     public DateTime? 배차요청시각Utc { get; set; }
     public string? 수락메모 { get; set; }
+    public string? 커뮤니티원장Id { get; set; }
+    public string? 커뮤니티원장템플릿Key { get; set; }
+    public string? 커뮤니티원장상태 { get; set; }
+    public DateTime? 커뮤니티원장동기화시각Utc { get; set; }
     public DateTime CreatedAt { get; set; }
     public IReadOnlyList<음식주문상태전이기록Dto> 상태이력 { get; set; } = [];
 }

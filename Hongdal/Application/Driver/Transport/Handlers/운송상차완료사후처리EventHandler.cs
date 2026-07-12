@@ -30,7 +30,7 @@ public sealed class 운송상차완료사후처리EventHandler : INotificationHa
             await _문서관리Service.CreateDocumentAsync(new 문서생성요청
             {
                 의뢰Id = notification.운송번호,
-                배송운송Id = notification.운송Id,
+                운송원장Id = notification.운송Id,
                 문서코드 = "상차인수확인서",
                 문서명 = "상차 인수 확인서",
                 파일명 = $"상차인수확인서-{notification.운송번호}.txt",

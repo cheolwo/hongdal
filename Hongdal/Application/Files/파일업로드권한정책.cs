@@ -18,7 +18,7 @@ public static class 파일업로드권한정책
         => !string.IsNullOrWhiteSpace(commandName)
            && 운송증빙CommandNames.Contains(commandName.Trim(), StringComparer.Ordinal);
 
-    public static bool 운송증빙업로드권한있음(배송_운송 transport, string? userId, string? role)
+    public static bool 운송증빙업로드권한있음(운송원장 transport, string? userId, string? role)
         => string.Equals(role, 역할명.서버관리자, StringComparison.OrdinalIgnoreCase)
            || (!string.IsNullOrWhiteSpace(userId)
                && string.Equals(transport.기사_운송자, userId, StringComparison.Ordinal));

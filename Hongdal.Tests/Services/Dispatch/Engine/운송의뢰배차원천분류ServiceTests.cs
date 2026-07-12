@@ -63,7 +63,7 @@ public sealed class 운송의뢰배차원천분류ServiceTests
         Assert.True(result.창고선행작업필요);
     }
 
-    private static 배차대기 CreateQueue(int businessType, string sourceType)
+    private static 운송원장 CreateQueue(int businessType, string sourceType)
         => new()
         {
             의뢰Id = $"REQ-{sourceType}",

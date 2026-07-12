@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.Warehouse;
+﻿using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Driver.Development;
 using Hongdal.Services.Driver.Development;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +72,7 @@ public static class HongdalV1DevelopmentDataSeeder
             {
                 db.화주운송의뢰.Add(scenario.Request);
                 db.화물요구조건.Add(scenario.CargoRequirement);
-                db.배차대기.Add(scenario.Queue);
+                db.운송원장.Add(scenario.Queue);
             }
         }
 
@@ -346,7 +346,7 @@ public static class HongdalV1DevelopmentDataSeeder
             UpdatedAt = now
         };
 
-        var queue = new 배차대기
+        var queue = new 운송원장
         {
             의뢰Id = requestId,
             화주Id = shipperId,
@@ -399,7 +399,7 @@ public static class HongdalV1DevelopmentDataSeeder
     {
         const string transportNumber1 = "V1-DEV-TRN-001";
         const string transportNumber2 = "V1-DEV-TRN-002";
-        var existing = await db.배송_운송
+        var existing = await db.운송원장
             .AsNoTracking()
             .Where(x => x.운송번호 == transportNumber1 || x.운송번호 == transportNumber2)
             .Select(x => x.운송번호)
@@ -408,7 +408,7 @@ public static class HongdalV1DevelopmentDataSeeder
 
         if (!existingSet.Contains(transportNumber1))
         {
-            db.배송_운송.Add(new 배송_운송
+            db.운송원장.Add(new 운송원장
             {
                 운송번호 = transportNumber1,
                 상태 = "상차지도착",
@@ -425,7 +425,7 @@ public static class HongdalV1DevelopmentDataSeeder
 
         if (!existingSet.Contains(transportNumber2))
         {
-            db.배송_운송.Add(new 배송_운송
+            db.운송원장.Add(new 운송원장
             {
                 운송번호 = transportNumber2,
                 상태 = "인수완료",
@@ -1078,6 +1078,6 @@ public static class HongdalV1DevelopmentDataSeeder
 
     private sealed record V1DispatchScenario(
         화주운송의뢰 Request,
-        배차대기 Queue,
+        운송원장 Queue,
         화물요구조건 CargoRequirement);
 }

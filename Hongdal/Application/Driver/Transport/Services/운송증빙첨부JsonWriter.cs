@@ -5,12 +5,12 @@ namespace Hongdal.Application.Driver.Transport;
 
 public interface I운송증빙첨부JsonWriter
 {
-    void 추가(배송_운송 entity, 운송증빙첨부 attachment);
+    void 추가(운송원장 entity, 운송증빙첨부 attachment);
 }
 
 public sealed class 운송증빙첨부JsonWriter : I운송증빙첨부JsonWriter
 {
-    public void 추가(배송_운송 entity, 운송증빙첨부 attachment)
+    public void 추가(운송원장 entity, 운송증빙첨부 attachment)
     {
         var attachments = ParseAttachments(entity.첨부_json);
         var node = new JsonObject

@@ -64,12 +64,12 @@ public sealed record 운송의뢰배차원천분류(
 
 public interface I운송의뢰배차원천분류Service
 {
-    운송의뢰배차원천분류 분류(배차대기 queue);
+    운송의뢰배차원천분류 분류(운송원장 queue);
 }
 
 public sealed class 운송의뢰배차원천분류Service : I운송의뢰배차원천분류Service
 {
-    public 운송의뢰배차원천분류 분류(배차대기 queue)
+    public 운송의뢰배차원천분류 분류(운송원장 queue)
     {
         if (queue.배차업무유형 == 상태값.배차업무유형.음식배달
             || 운송의뢰배차원천유형.Is음식배달운송(queue.원본의뢰유형))
@@ -80,7 +80,7 @@ public sealed class 운송의뢰배차원천분류Service : I운송의뢰배차�
         return 분류화물용달(queue);
     }
 
-    private static 운송의뢰배차원천분류 분류화물용달(배차대기 queue)
+    private static 운송의뢰배차원천분류 분류화물용달(운송원장 queue)
     {
         if (운송의뢰배차원천유형.Is수입통관연계운송(queue.원본의뢰유형))
         {
@@ -116,7 +116,7 @@ public sealed class 운송의뢰배차원천분류Service : I운송의뢰배차�
             창고선행작업필요: false);
     }
 
-    private static 운송의뢰배차원천분류 분류음식배달(배차대기 queue)
+    private static 운송의뢰배차원천분류 분류음식배달(운송원장 queue)
     {
         if (운송의뢰배차원천유형.Is홍달마트음식주문(queue.원본의뢰유형))
         {

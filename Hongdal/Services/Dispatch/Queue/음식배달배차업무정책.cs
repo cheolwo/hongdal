@@ -12,7 +12,7 @@ namespace 홍달.Services.Dispatch.Queue
         public int 배차업무유형 => 홍달.도메인.공통.상태값.배차업무유형.음식배달;
 
         public Task<배차추천후보?> 다음후보선정Async(
-            홍달.도메인.배차.배차대기 queue,
+            홍달.도메인.운송.운송원장 queue,
             string? 제외기사Id = null,
             CancellationToken cancellationToken = default)
         {

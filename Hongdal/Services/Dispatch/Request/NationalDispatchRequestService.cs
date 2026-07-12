@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Hongdal.Hubs;
 using 홍달.도메인.공통;
 using 홍달.도메인.배차;
@@ -26,7 +26,7 @@ namespace 홍달.Services.Dispatch.Request
                 ? new HashSet<string>(rejectedRequestIds, StringComparer.Ordinal)
                 : null;
 
-            var items = await _db.배차대기
+            var items = await _db.운송원장
                 .AsNoTracking()
                 .Where(q => q.상태 == 상태값.배차대기상태.대기)
                 .OrderByDescending(q => q.CreatedAt)

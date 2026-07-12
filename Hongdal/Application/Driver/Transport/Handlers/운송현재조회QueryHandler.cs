@@ -13,7 +13,7 @@ public sealed class 운송현재조회QueryHandler : IRequestHandler<운송현�
 
     public async Task<기사운송요약응답?> Handle(운송현재조회Query request, CancellationToken cancellationToken)
     {
-        var entity = await _db.배송_운송
+        var entity = await _db.운송원장
             .AsNoTracking()
             .Where(x => x.기사_운송자 == request.기사Id && x.상태 != "인수완료")
             .OrderByDescending(x => x.UpdatedAt)

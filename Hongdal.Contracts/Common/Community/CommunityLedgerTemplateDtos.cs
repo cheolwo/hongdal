@@ -41,6 +41,7 @@ public sealed class CommunityLedgerTemplateResponse
     public IReadOnlyList<string> UiSectionHints { get; set; } = [];
     public IReadOnlyList<string> ActionHints { get; set; } = [];
     public IReadOnlyList<CommunityLedgerBlockResponse> LedgerBlocks { get; set; } = [];
+    public IReadOnlyList<CommunityLedgerBlockRelationResponse> BlockRelations { get; set; } = [];
     public IReadOnlyList<CommunityLedgerCompositionRuleResponse> CompositionRules { get; set; } = [];
     public IReadOnlyList<CommunityLedgerProcessingSurfaceResponse> ProcessingSurfaces { get; set; } = [];
     public CommunityLedgerPersistencePolicyResponse PersistencePolicy { get; set; } = CommunityLedgerPersistencePolicyResponse.MongoDefault();
@@ -64,6 +65,43 @@ public sealed class CommunityLedgerBlockResponse
     public IReadOnlyList<string> CompositionRuleCodes { get; set; } = [];
     public bool RequiredForAiJudgment { get; set; }
     public bool OpensApiHandoff { get; set; }
+}
+
+public sealed class CommunityLedgerBlockRelationResponse
+{
+    public string FromBlockCode { get; set; } = string.Empty;
+    public string ToBlockCode { get; set; } = string.Empty;
+    public string RelationType { get; set; } = CommunityLedgerRelationTypes.Flow;
+    public string Cardinality { get; set; } = CommunityLedgerRelationCardinality.OneToOne;
+    public bool Required { get; set; }
+    public string CompositionRuleCode { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+}
+
+public sealed class CommunityLedgerImplementationModuleResponse
+{
+    public int Priority { get; set; }
+    public string ModuleCode { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string LedgerTemplateKey { get; set; } = string.Empty;
+    public string TargetOperatingSystemCode { get; set; } = CommunityLedgerOperatingSystemCodes.CommunityTrust;
+    public string TargetOperatingSystemName { get; set; } = "커뮤니티 신뢰 OS";
+    public string Summary { get; set; } = string.Empty;
+    public IReadOnlyList<string> IncludedLedgerNames { get; set; } = [];
+    public IReadOnlyList<string> PrimaryBlockHints { get; set; } = [];
+}
+
+public sealed class CommunityLedgerRelationResponse
+{
+    public string FromModuleCode { get; set; } = string.Empty;
+    public string ToModuleCode { get; set; } = string.Empty;
+    public string FromLedgerTemplateKey { get; set; } = string.Empty;
+    public string ToLedgerTemplateKey { get; set; } = string.Empty;
+    public string RelationType { get; set; } = CommunityLedgerRelationTypes.Handoff;
+    public string Cardinality { get; set; } = CommunityLedgerRelationCardinality.OneToOne;
+    public bool Required { get; set; }
+    public string Trigger { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 }
 
 public sealed class CommunityLedgerCompositionRuleResponse
@@ -397,6 +435,37 @@ public static class CommunityLedgerTemplateKeys
     public const string LocalSale = "local-sale";
     public const string GroupPurchase = "group-purchase";
     public const string Errand = "errand";
+}
+
+public static class CommunityLedgerImplementationModuleCodes
+{
+    public const string CommunityConversation = "community-conversation";
+    public const string WishLedgerAssessment = "wish-ledger-assessment";
+    public const string CargoTransport = "cargo-transport";
+    public const string TransportProgress = "transport-progress";
+    public const string WarehouseOutbound = "warehouse-outbound";
+    public const string PickingPacking = "picking-packing";
+    public const string HongdalMartOrder = "hongdal-mart-order";
+    public const string HongdalMartDelivery = "hongdal-mart-delivery";
+    public const string SettlementMark = "settlement-mark";
+    public const string ReportDispute = "report-dispute";
+}
+
+public static class CommunityLedgerRelationTypes
+{
+    public const string Flow = "Flow";
+    public const string Contains = "Contains";
+    public const string Requires = "Requires";
+    public const string Handoff = "Handoff";
+    public const string Reference = "Reference";
+}
+
+public static class CommunityLedgerRelationCardinality
+{
+    public const string OneToOne = "1:1";
+    public const string OneToMany = "1:N";
+    public const string ManyToOne = "N:1";
+    public const string ManyToMany = "N:M";
 }
 
 public static class CommunityLedgerPermissionCodes

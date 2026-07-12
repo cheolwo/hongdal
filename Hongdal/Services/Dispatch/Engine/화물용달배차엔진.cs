@@ -33,7 +33,7 @@ public sealed class 화물용달배차엔진 : 정책기반배차엔진
     public override int 배차업무유형 => 상태값.배차업무유형.용달운송;
 
     public override async Task<배차추천후보?> 다음후보선정Async(
-        배차대기 queue,
+        운송원장 queue,
         string? 제외기사Id = null,
         CancellationToken cancellationToken = default)
     {

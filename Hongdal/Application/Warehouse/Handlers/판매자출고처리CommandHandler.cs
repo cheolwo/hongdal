@@ -1,4 +1,5 @@
 using FluentResults;
+using Hongdal.Services.Community;
 using 홍달.도메인.창고;
 
 namespace Hongdal.Application.Warehouse;
@@ -7,11 +8,16 @@ public sealed class 판매자출고처리CommandHandler : IRequestHandler<판매
 {
     private readonly HongdalContext _db;
     private readonly IPublisher _publisher;
+    private readonly I음식마트원장Mongo동기화Service _ledgerSync;
 
-    public 판매자출고처리CommandHandler(HongdalContext db, IPublisher publisher)
+    public 판매자출고처리CommandHandler(
+        HongdalContext db,
+        IPublisher publisher,
+        I음식마트원장Mongo동기화Service ledgerSync)
     {
         _db = db;
         _publisher = publisher;
+        _ledgerSync = ledgerSync;
     }
 
     public async Task<Result<Unit>> Handle(판매자출고처리Command request, CancellationToken cancellationToken)
@@ -79,6 +85,23 @@ public sealed class 판매자출고처리CommandHandler : IRequestHandler<판매
                 now,
                 System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty),
             cancellationToken);
+
+        var 입고Ids = 출고목록
+            .Select(x => x.입고요청Id)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .Distinct()
+            .ToArray();
+        List<입고요청> 입고목록 = 입고Ids.Length == 0
+            ? []
+            : await _db.입고요청.Where(x => 입고Ids.Contains(x.Id)).ToListAsync(cancellationToken);
+
+        await _ledgerSync.출고원장동기화Async(
+            출고목록,
+            입고목록,
+            request.판매자UserId,
+            "출고 완료",
+            cancellationToken: cancellationToken);
 
         return Result.Ok(Unit.Value);
     }

@@ -101,7 +101,7 @@ public sealed partial class 백오피스조회Service
         content.Add(new StringContent(requestId ?? string.Empty), "의뢰Id");
         if (transportId.HasValue)
         {
-            content.Add(new StringContent(transportId.Value.ToString()), "배송운송Id");
+            content.Add(new StringContent(transportId.Value.ToString()), "운송원장Id");
         }
 
         content.Add(new StringContent(documentCode), "문서코드");

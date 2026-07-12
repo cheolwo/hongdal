@@ -10,7 +10,7 @@ public class 운송증빙첨부JsonWriterTests
     public void 추가_운송예외_메타데이터를_첨부Json에_보존한다()
     {
         var writer = new 운송증빙첨부JsonWriter();
-        var 운송 = new 배송_운송 { 첨부_json = "[]" };
+        var 운송 = new 운송원장 { 첨부_json = "[]" };
 
         writer.추가(
             운송,

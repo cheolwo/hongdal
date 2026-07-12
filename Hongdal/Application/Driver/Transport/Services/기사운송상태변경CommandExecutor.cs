@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Driver.Transport;
+using Hongdal.Services.Community;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,10 +27,10 @@ public sealed record 기사운송상태변경요청(
     string 목표상태,
     string 이벤트명,
     Func<기사운송상태변경Context, INotification> 이벤트생성,
-    Action<배송_운송, DateTime>? 상태변경전처리 = null);
+    Action<운송원장, DateTime>? 상태변경전처리 = null);
 
 public sealed record 기사운송상태변경Context(
-    배송_운송 운송,
+    운송원장 운송,
     string 이전상태,
     DateTime 발생시각Utc,
     string TraceId);
@@ -41,6 +42,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
     private readonly IPublisher _publisher;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I참여자실행권한검사 _권한검사;
+    private readonly I운송원장Mongo동기화Service _원장동기화Service;
     private readonly ILogger<기사운송상태변경CommandExecutor> _logger;
 
     public 기사운송상태변경CommandExecutor(
@@ -49,6 +51,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
         IPublisher publisher,
         ICurrentUserAccessor currentUserAccessor,
         I참여자실행권한검사 권한검사,
+        I운송원장Mongo동기화Service 원장동기화Service,
         ILogger<기사운송상태변경CommandExecutor> logger)
     {
         _db = db;
@@ -56,6 +59,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
         _publisher = publisher;
         _currentUserAccessor = currentUserAccessor;
         _권한검사 = 권한검사;
+        _원장동기화Service = 원장동기화Service;
         _logger = logger;
     }
 
@@ -68,7 +72,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
             return Result.Fail<기사운송상태변경응답>(권한오류);
         }
 
-        var entity = await _db.배송_운송
+        var entity = await _db.운송원장
             .FirstOrDefaultAsync(x => x.Id == request.운송Id && x.기사_운송자 == request.기사Id, cancellationToken);
         if (entity is null)
         {
@@ -86,6 +90,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
         request.상태변경전처리?.Invoke(entity, now);
 
         await _db.SaveChangesAsync(cancellationToken);
+        await _원장동기화Service.운송실행투영동기화Async(entity, request.기사Id, cancellationToken);
         await PublishAfterCommitAsync(request, entity, 이전상태, now, cancellationToken);
 
         return Result.Ok(new 기사운송상태변경응답
@@ -99,7 +104,7 @@ public sealed class 기사운송상태변경CommandExecutor : I기사운송상�
 
     private async Task PublishAfterCommitAsync(
         기사운송상태변경요청 request,
-        배송_운송 entity,
+        운송원장 entity,
         string 이전상태,
         DateTime now,
         CancellationToken cancellationToken)

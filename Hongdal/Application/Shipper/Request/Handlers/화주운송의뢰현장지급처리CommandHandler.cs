@@ -1,5 +1,6 @@
 using FluentResults;
 using Hongdal.Application.CommandProcessing;
+using Hongdal.Services.Community;
 using 홍달.Services.Dispatch.Queue;
 using ShipRequest = Hongdal.Contracts.Shipper.Request;
 
@@ -10,15 +11,18 @@ public sealed class 화주운송의뢰현장지급처리CommandHandler : IReques
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly I운송의뢰배차대기Service _dispatchQueueService;
+    private readonly I운송원장Mongo동기화Service _transportLedgerSync;
 
     public 화주운송의뢰현장지급처리CommandHandler(
         HongdalContext db,
         ICurrentUserAccessor currentUserAccessor,
-        I운송의뢰배차대기Service dispatchQueueService)
+        I운송의뢰배차대기Service dispatchQueueService,
+        I운송원장Mongo동기화Service transportLedgerSync)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
         _dispatchQueueService = dispatchQueueService;
+        _transportLedgerSync = transportLedgerSync;
     }
 
     public async Task<Result<ShipRequest.화주운송의뢰응답>> Handle(화주운송의뢰현장지급처리Command request, CancellationToken cancellationToken)
@@ -57,6 +61,7 @@ public sealed class 화주운송의뢰현장지급처리CommandHandler : IReques
             },
             cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
+        await _transportLedgerSync.화주운송의뢰동기화Async(entity, _currentUserAccessor.UserId ?? entity.화주Id, cancellationToken);
         return Result.Ok(화주운송의뢰매퍼.To응답(entity));
     }
 

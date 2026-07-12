@@ -8,18 +8,18 @@ namespace 홍달.Services.Dispatch.Coordination;
 
 public static class 국내화물배차후보금지정책
 {
-    public static bool 추천잠금가능(배차대기 배차대기, DateTime 기준시각Utc)
+    public static bool 추천잠금가능(운송원장 배차대기, DateTime 기준시각Utc)
         => 배차대기.상태 == 상태값.배차대기상태.대기
            && 배차대기.배차큐단계 is not (상태값.배차큐단계.확정 or 상태값.배차큐단계.종료)
            && !유효추천잠금중(배차대기, 기준시각Utc);
 
-    public static bool 유효추천잠금중(배차대기 배차대기, DateTime 기준시각Utc)
+    public static bool 유효추천잠금중(운송원장 배차대기, DateTime 기준시각Utc)
         => 배차대기.배차노출상태 == 상태값.배차노출상태.추천중
            && !string.IsNullOrWhiteSpace(배차대기.현재추천대상기사Id)
            && (!배차대기.추천만료시각.HasValue || 배차대기.추천만료시각 > 기준시각Utc);
 
     public static IReadOnlyList<string> 운송의뢰후보금지사유(
-        배차대기 배차대기,
+        운송원장 배차대기,
         화주운송의뢰? 운송의뢰,
         DateTime 기준시각Utc)
     {

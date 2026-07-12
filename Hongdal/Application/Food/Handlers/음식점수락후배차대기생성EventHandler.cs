@@ -1,6 +1,7 @@
 using Hongdal.Application.Food.Events;
 using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Food;
+using Hongdal.Services.Community;
 using Hongdal.Services.Food;
 using MediatR;
 using 홍달.도메인.공통;
@@ -11,6 +12,8 @@ namespace Hongdal.Application.Food.Handlers;
 
 public sealed class 음식점수락후배차대기생성EventHandler(
     I운송의뢰배차대기Service dispatchQueueService,
+    I운송원장Mongo동기화Service transportLedgerSync,
+    I음식마트원장Mongo동기화Service foodMartLedgerSync,
     IHongdalFoodOrderStore orderStore,
     IKakao좌표변환Service kakaoGeoService,
     HongdalContext db,
@@ -65,7 +68,12 @@ public sealed class 음식점수락후배차대기생성EventHandler(
             cancellationToken);
 
         await db.SaveChangesAsync(cancellationToken);
-        orderStore.배차대기반영(order.주문번호, queue.Id, DateTime.UtcNow);
+        await transportLedgerSync.운송실행투영동기화Async(queue, $"restaurant:{order.음식점Id}", cancellationToken);
+        var updatedOrder = orderStore.배차대기반영(order.주문번호, queue.Id, DateTime.UtcNow);
+        if (updatedOrder is not null)
+        {
+            await foodMartLedgerSync.음식주문동기화Async(updatedOrder, $"restaurant:{order.음식점Id}", cancellationToken);
+        }
 
         logger.LogInformation(
             "음식점 주문 수락 후 배차대기 생성 완료. EventId={EventId}, 주문번호={OrderNo}, 배차대기Id={DispatchWaitId}",

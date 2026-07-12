@@ -93,7 +93,7 @@ public sealed class 문서관리메모리Service
         {
             Id = id,
             의뢰Id = requestId.Trim(),
-            배송운송Id = transportId,
+            운송원장Id = transportId,
             문서코드 = policy.문서코드,
             문서명 = string.IsNullOrWhiteSpace(documentName) ? policy.문서명 : documentName.Trim(),
             파일명 = fileName,
@@ -152,7 +152,7 @@ public sealed class 문서관리메모리Service
             {
                 Id = sampleId,
                 의뢰Id = "REQ-SAMPLE-001",
-                배송운송Id = 101,
+                운송원장Id = 101,
                 문서코드 = "인수증",
                 문서명 = "인수증",
                 파일명 = "인수증-REQ-SAMPLE-001.pdf",

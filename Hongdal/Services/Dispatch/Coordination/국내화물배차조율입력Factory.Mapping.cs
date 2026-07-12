@@ -8,7 +8,7 @@ namespace 홍달.Services.Dispatch.Coordination;
 
 public sealed partial class 국내화물배차조율입력Factory
 {
-    private static 운송의뢰조율입력 ToRequestInput(배차대기 queue, 화주운송의뢰 request)
+    private static 운송의뢰조율입력 ToRequestInput(운송원장 queue, 화주운송의뢰 request)
     {
         var pickupPoint = CreatePoint(queue.픽업_위도, queue.픽업_경도);
         var deliveryScope = 국내화물배달권정책.판정(pickupPoint, queue.픽업_도로명주소);

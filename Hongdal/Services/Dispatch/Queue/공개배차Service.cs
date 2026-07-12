@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Hongdal;
 using Hongdal.Hubs;
 using 홍달.Services.Dispatch.Recommendation;
@@ -17,7 +17,7 @@ namespace 홍달.Services.Dispatch.Queue
 
         public async Task<IReadOnlyList<DispatchRecommendationDto>> GetPublicDispatchesAsync(string driverId, CancellationToken cancellationToken = default)
         {
-            var items = await _db.배차대기
+            var items = await _db.운송원장
                 .AsNoTracking()
                 .Where(q => q.배차업무유형 == 상태값.배차업무유형.용달운송
                             && q.배차큐단계 == 상태값.배차큐단계.공개배차

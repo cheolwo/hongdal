@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Hongdal.Services.Community;
 
 namespace Hongdal.Application.Driver.DispatchAction;
 
@@ -8,17 +9,20 @@ public sealed partial class 배차수락사후처리EventHandler : INotification
     private readonly HongdalContext _db;
     private readonly IDispatchAcceptanceLogStore _acceptanceLogStore;
     private readonly 홍달.Services.Dispatch.Queue.I배차대기원장전환Service _원장전환Service;
+    private readonly I운송원장Mongo동기화Service _원장동기화Service;
     private readonly ILogger<배차수락사후처리EventHandler> _logger;
 
     public 배차수락사후처리EventHandler(
         HongdalContext db,
         IDispatchAcceptanceLogStore acceptanceLogStore,
         홍달.Services.Dispatch.Queue.I배차대기원장전환Service 원장전환Service,
+        I운송원장Mongo동기화Service 원장동기화Service,
         ILogger<배차수락사후처리EventHandler> logger)
     {
         _db = db;
         _acceptanceLogStore = acceptanceLogStore;
         _원장전환Service = 원장전환Service;
+        _원장동기화Service = 원장동기화Service;
         _logger = logger;
     }
 

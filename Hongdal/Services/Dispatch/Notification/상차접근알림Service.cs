@@ -41,7 +41,7 @@ public sealed class 상차접근알림Service : I상차접근알림Service
             return 0;
         }
 
-        var activeTransports = await _db.배송_운송
+        var activeTransports = await _db.운송원장
             .AsNoTracking()
             .Where(x => x.기사_운송자 == location.DriverId
                         && 상차접근검사대상상태.Contains(x.상태))

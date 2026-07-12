@@ -1,6 +1,7 @@
 using FluentResults;
 using Hongdal.Contracts.Shipper.Request;
 using Hongdal.Application.CommandProcessing;
+using Hongdal.Services.Community;
 using 홍달.Services.External.Google;
 
 namespace Hongdal.Application.Shipper.Request;
@@ -12,12 +13,18 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IGeocodingService _geocodingService;
+    private readonly I운송원장Mongo동기화Service _원장동기화Service;
 
-    public 의뢰생성CommandHandler(HongdalContext db, IGeocodingService geocodingService, ICurrentUserAccessor currentUserAccessor)
+    public 의뢰생성CommandHandler(
+        HongdalContext db,
+        IGeocodingService geocodingService,
+        ICurrentUserAccessor currentUserAccessor,
+        I운송원장Mongo동기화Service 원장동기화Service)
     {
         _db = db;
         _geocodingService = geocodingService;
         _currentUserAccessor = currentUserAccessor;
+        _원장동기화Service = 원장동기화Service;
     }
 
     public async Task<Result<화주운송의뢰응답>> Handle(의뢰생성Command request, CancellationToken cancellationToken)
@@ -160,6 +167,8 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             entity.운임구성Id = fareComposition.Id;
             await _db.SaveChangesAsync(cancellationToken);
         }
+
+        await _원장동기화Service.화주운송의뢰동기화Async(entity, currentUserId, cancellationToken);
 
         return Result.Ok(화주운송의뢰매퍼.To응답(entity));
     }

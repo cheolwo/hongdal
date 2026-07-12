@@ -7,7 +7,7 @@ namespace 홍달.Services.Dispatch.Queue
         int 배차업무유형 { get; }
 
         Task<배차추천후보?> 다음후보선정Async(
-            배차대기 queue,
+            운송원장 queue,
             string? 제외기사Id = null,
             CancellationToken cancellationToken = default);
     }

@@ -23,7 +23,7 @@ namespace 홍달.Services.Dispatch.Recommendation
 
         public async Task<기사운송일정계획> 구성Async(string 기사Id, 배차경로좌표? 시작좌표, CancellationToken cancellationToken = default)
         {
-            var transports = await _db.배송_운송
+            var transports = await _db.운송원장
                 .AsNoTracking()
                 .Where(x => x.기사_운송자 == 기사Id && x.상태 != "인수완료")
                 .OrderBy(x => x.출발_픽업 ?? x.UpdatedAt)

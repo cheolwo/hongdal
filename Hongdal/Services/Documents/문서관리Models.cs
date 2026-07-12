@@ -75,8 +75,8 @@ public sealed class 운송문서
     [MaxLength(100)]
     public string 의뢰Id { get; set; } = string.Empty;
 
-    [Column("배송_운송_id")]
-    public long? 배송운송Id { get; set; }
+    [Column("운송실행투영_id")]
+    public long? 운송원장Id { get; set; }
 
     [Column("문서코드")]
     [MaxLength(100)]
@@ -171,7 +171,7 @@ public sealed class 문서조회요약응답
 {
     public long Id { get; set; }
     public string 의뢰Id { get; set; } = string.Empty;
-    public long? 배송운송Id { get; set; }
+    public long? 운송원장Id { get; set; }
     public string 문서코드 { get; set; } = string.Empty;
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;
@@ -230,7 +230,7 @@ public sealed class 문서정책수정요청
 public sealed class 문서생성요청
 {
     public string 의뢰Id { get; set; } = string.Empty;
-    public long? 배송운송Id { get; set; }
+    public long? 운송원장Id { get; set; }
     public string 문서코드 { get; set; } = string.Empty;
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Quartz;
 using 홍달.Data;
 using 홍달.도메인.공통;
@@ -31,7 +31,7 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
             var cancellationToken = context.CancellationToken;
             var now = DateTime.UtcNow;
 
-            var expiredRequestIds = await _db.배차대기.AsNoTracking()
+            var expiredRequestIds = await _db.운송원장.AsNoTracking()
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
                             && x.배차큐단계 == 상태값.배차큐단계.배차추천
                             && x.배차노출상태 == 상태값.배차노출상태.추천중

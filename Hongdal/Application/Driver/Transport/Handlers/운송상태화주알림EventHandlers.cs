@@ -181,11 +181,11 @@ public sealed class 운송상태화주알림EventHandlers :
         운송상태화주알림요청 요청,
         CancellationToken cancellationToken)
     {
-        배송_운송? transport = null;
+        운송원장? transport = null;
         var 운송번호 = 요청.운송번호;
         if (string.IsNullOrWhiteSpace(운송번호))
         {
-            transport = await _db.배송_운송
+            transport = await _db.운송원장
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == 요청.운송Id, cancellationToken);
             운송번호 = transport?.운송번호;
@@ -212,7 +212,7 @@ public sealed class 운송상태화주알림EventHandlers :
             return null;
         }
 
-        transport ??= await _db.배송_운송
+        transport ??= await _db.운송원장
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == 요청.운송Id, cancellationToken);
 
@@ -323,7 +323,7 @@ public sealed class 운송상태화주알림EventHandlers :
 
     private sealed record 운송상태화주알림Context(
         화주운송의뢰 화주운송의뢰,
-        배송_운송? 운송,
+        운송원장? 운송,
         string 의뢰Id);
 }
 

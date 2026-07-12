@@ -357,7 +357,7 @@ public sealed class 문서조회요약응답
 {
     public long Id { get; set; }
     public string 의뢰Id { get; set; } = string.Empty;
-    public long? 배송운송Id { get; set; }
+    public long? 운송원장Id { get; set; }
     public string 문서코드 { get; set; } = string.Empty;
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;
@@ -385,7 +385,7 @@ public sealed class 문서조회로그요약응답
 public sealed class 문서생성요청
 {
     public string 의뢰Id { get; set; } = string.Empty;
-    public long? 배송운송Id { get; set; }
+    public long? 운송원장Id { get; set; }
     public string 문서코드 { get; set; } = string.Empty;
     public string 문서명 { get; set; } = string.Empty;
     public string 파일명 { get; set; } = string.Empty;

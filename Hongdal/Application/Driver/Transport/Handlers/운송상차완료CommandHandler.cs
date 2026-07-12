@@ -21,7 +21,7 @@ public sealed class 운송상차완료CommandHandler : IRequestHandler<운송상
 
     public async Task<Result<기사운송상태변경응답>> Handle(운송상차완료Command request, CancellationToken cancellationToken)
     {
-        var transport = await _db.배송_운송
+        var transport = await _db.운송원장
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == request.Id && x.기사_운송자 == request.기사Id, cancellationToken);
         if (transport is null)

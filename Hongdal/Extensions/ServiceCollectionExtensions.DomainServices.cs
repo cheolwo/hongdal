@@ -37,8 +37,16 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
-        services.AddSingleton<I커뮤니티원장저장소, Mongo커뮤니티원장저장소>();
+        services.AddSingleton<Mongo커뮤니티원장저장소>();
+        services.AddSingleton<I커뮤니티원장저장소, 투영갱신커뮤니티원장저장소>();
         services.AddSingleton<I커뮤니티대화저장소, Mongo커뮤니티대화저장소>();
+        services.AddScoped<I커뮤니티원장블록관계투영Service, 커뮤니티원장블록관계투영Service>();
+        services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();
+        services.AddScoped<I원장업무투영동기화Handler, 운송원장업무투영Handler>();
+        services.AddScoped<I원장업무투영동기화Handler, 창고원장업무투영Handler>();
+        services.AddScoped<I원장업무투영동기화Handler, 음식주문원장업무투영Handler>();
+        services.AddScoped<I운송원장Mongo동기화Service, 운송원장Mongo동기화Service>();
+        services.AddScoped<I음식마트원장Mongo동기화Service, 음식마트원장Mongo동기화Service>();
         services.AddScoped<I인증UseCase, 인증UseCase>();
         services.AddScoped<I커뮤니티대화UseCase, 커뮤니티대화UseCase>();
         services.AddScoped<I공동구매자동집단화UseCase, 공동구매자동집단화UseCase>();
@@ -46,7 +54,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I공동구매해외선적통관동기화Service, 공동구매해외선적통관동기화Service>();
         services.AddSingleton<I공동구매수입물류정규화Service, 공동구매수입물류정규화Service>();
         services.AddSingleton<IVersionFeatureFlagService, VersionFeatureFlagService>();
-        services.AddSingleton<IHongdalFoodOrderStore, InMemoryHongdalFoodOrderStore>();
+        services.AddScoped<IHongdalFoodOrderStore, EfHongdalFoodOrderStore>();
         services.AddSingleton<배차주소Store>();
         services.AddScoped<I음식점주문실시간알림Service, 음식점주문SignalR알림Service>();
 

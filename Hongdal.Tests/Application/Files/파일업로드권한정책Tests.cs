@@ -20,7 +20,7 @@ public sealed class 파일업로드권한정책Tests
     [Fact]
     public void 운송증빙업로드권한있음_배정기사이면_true()
     {
-        var transport = new 배송_운송
+        var transport = new 운송원장
         {
             기사_운송자 = "driver-1"
         };
@@ -31,7 +31,7 @@ public sealed class 파일업로드권한정책Tests
     [Fact]
     public void 운송증빙업로드권한있음_다른기사이면_false()
     {
-        var transport = new 배송_운송
+        var transport = new 운송원장
         {
             기사_운송자 = "driver-1"
         };
@@ -42,7 +42,7 @@ public sealed class 파일업로드권한정책Tests
     [Fact]
     public void 운송증빙업로드권한있음_서버관리자이면_true()
     {
-        var transport = new 배송_운송
+        var transport = new 운송원장
         {
             기사_운송자 = "driver-1"
         };

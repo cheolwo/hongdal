@@ -1,6 +1,7 @@
 using Hongdal.Application.Shipper.Payment.Events;
 using Hongdal.Application.Shipper.Request;
 using Hongdal.Contracts.Shipper.Request;
+using Hongdal.Services.Community;
 using 홍달.Services.Dispatch.Queue;
 
 namespace Hongdal.Application.Shipper.Payment.Handlers;
@@ -9,15 +10,18 @@ public sealed class 용달운송의뢰결제승인완료EventHandler : INotifica
 {
     private readonly HongdalContext _db;
     private readonly I운송의뢰배차대기Service _dispatchQueueService;
+    private readonly I운송원장Mongo동기화Service _transportLedgerSync;
     private readonly ILogger<용달운송의뢰결제승인완료EventHandler> _logger;
 
     public 용달운송의뢰결제승인완료EventHandler(
         HongdalContext db,
         I운송의뢰배차대기Service dispatchQueueService,
+        I운송원장Mongo동기화Service transportLedgerSync,
         ILogger<용달운송의뢰결제승인완료EventHandler> logger)
     {
         _db = db;
         _dispatchQueueService = dispatchQueueService;
+        _transportLedgerSync = transportLedgerSync;
         _logger = logger;
     }
 
@@ -59,6 +63,7 @@ public sealed class 용달운송의뢰결제승인완료EventHandler : INotifica
         }
 
         await _db.SaveChangesAsync(cancellationToken);
+        await _transportLedgerSync.화주운송의뢰동기화Async(shipperRequest, "payment", cancellationToken);
 
         _logger.LogInformation(
             "결제승인완료 후처리 완료(용달운송의뢰): 결제Id={결제Id}, 대상Id={대상Id}, 금액={금액}{통화}",

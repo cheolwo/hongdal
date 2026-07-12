@@ -34,6 +34,9 @@ public class 출고예정
     [Column("출고창고_id")]
     public long 출고창고Id { get; set; }
 
+    [Column("출고묶음_id")]
+    public long? 출고묶음Id { get; set; }
+
     [Column("상품명")]
     [MaxLength(200)]
     public string 상품명 { get; set; } = string.Empty;
@@ -58,6 +61,21 @@ public class 출고예정
 
     [Column("출고처리일시")]
     public DateTime? 출고처리일시 { get; set; }
+
+    [Column("community_ledger_id")]
+    [MaxLength(120)]
+    public string? 커뮤니티원장Id { get; set; }
+
+    [Column("community_ledger_template_key")]
+    [MaxLength(120)]
+    public string? 커뮤니티원장템플릿Key { get; set; }
+
+    [Column("community_ledger_state")]
+    [MaxLength(80)]
+    public string? 커뮤니티원장상태 { get; set; }
+
+    [Column("community_ledger_synced_at_utc")]
+    public DateTime? 커뮤니티원장동기화시각Utc { get; set; }
 
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

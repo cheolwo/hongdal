@@ -3,7 +3,7 @@ using Hongdal.Contracts.Food;
 
 namespace Hongdal.Services.Food;
 
-public sealed class InMemoryHongdalFoodOrderStore : IHongdalFoodOrderStore
+public sealed class InMemoryHongdalFoodOrderStore : IHongdalFoodOrderStore, I커뮤니티원장반영가능음식주문Store
 {
     private readonly object _gate = new();
     private readonly List<음식주문응답> _orders;
@@ -143,6 +143,35 @@ public sealed class InMemoryHongdalFoodOrderStore : IHongdalFoodOrderStore
             order.배차상태 = 음식주문배차상태코드.배차대기;
             order.배차대기Id = dispatchWaitId;
             order.배차요청시각Utc = dispatchRequestedAtUtc;
+
+            return FoodOrderSampleData.Clone(order);
+        }
+    }
+
+    public 음식주문응답? 커뮤니티원장반영(
+        string orderNo,
+        string ledgerId,
+        string ledgerTemplateKey,
+        string ledgerState,
+        DateTime syncedAtUtc)
+    {
+        if (string.IsNullOrWhiteSpace(orderNo))
+        {
+            return null;
+        }
+
+        lock (_gate)
+        {
+            var order = _orders.FirstOrDefault(x => string.Equals(x.주문번호, orderNo, StringComparison.OrdinalIgnoreCase));
+            if (order is null)
+            {
+                return null;
+            }
+
+            order.커뮤니티원장Id = ledgerId;
+            order.커뮤니티원장템플릿Key = ledgerTemplateKey;
+            order.커뮤니티원장상태 = ledgerState;
+            order.커뮤니티원장동기화시각Utc = syncedAtUtc;
 
             return FoodOrderSampleData.Clone(order);
         }

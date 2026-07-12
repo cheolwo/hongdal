@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Admin.Dashboard;
+﻿using Hongdal.Contracts.Admin.Dashboard;
 
 namespace Hongdal.Application.Admin.Dashboard;
 
@@ -20,13 +20,13 @@ public sealed class 관리자대시보드요약조회QueryHandler : IRequestHand
         var 결제대기수Task = _db.화주운송의뢰.CountAsync(x => x.결제상태 == 상태값.결제상태.결제대기, cancellationToken);
         var 결제완료수Task = _db.화주운송의뢰.CountAsync(x => x.결제상태 == 상태값.결제상태.결제완료, cancellationToken);
 
-        var 배차대기수Task = _db.배차대기.CountAsync(x => x.상태 == 상태값.배차대기상태.대기, cancellationToken);
-        var 배차확정수Task = _db.배차대기.CountAsync(x => x.상태 == 상태값.배차대기상태.확정, cancellationToken);
+        var 배차대기수Task = _db.운송원장.CountAsync(x => x.상태 == 상태값.배차대기상태.대기, cancellationToken);
+        var 배차확정수Task = _db.운송원장.CountAsync(x => x.상태 == 상태값.배차대기상태.확정, cancellationToken);
 
-        var 운송중수Task = _db.배송_운송.CountAsync(x => x.상태 == "운송중", cancellationToken);
-        var 완료수Task = _db.배송_운송.CountAsync(x => x.상태 == "완료", cancellationToken);
-        var 운송예외수Task = _db.배송_운송.CountAsync(x => x.첨부_json.Contains("transport-field-exception"), cancellationToken);
-        var 관리자확인필요수Task = _db.배송_운송.CountAsync(x => x.첨부_json.Contains("adminReviewRequired\":true"), cancellationToken);
+        var 운송중수Task = _db.운송원장.CountAsync(x => x.상태 == "운송중", cancellationToken);
+        var 완료수Task = _db.운송원장.CountAsync(x => x.상태 == "완료", cancellationToken);
+        var 운송예외수Task = _db.운송원장.CountAsync(x => x.첨부_json.Contains("transport-field-exception"), cancellationToken);
+        var 관리자확인필요수Task = _db.운송원장.CountAsync(x => x.첨부_json.Contains("adminReviewRequired\":true"), cancellationToken);
 
         var 취소수Task = _db.화주운송의뢰.CountAsync(x => x.상태 == "취소", cancellationToken);
         var 환불수Task = _db.결제.CountAsync(x => x.결제상태 == 상태값.결제상태.환불됨, cancellationToken);

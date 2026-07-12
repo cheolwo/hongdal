@@ -132,6 +132,10 @@ public static class FoodOrderSampleData
             조리예상완료시각Utc = source.조리예상완료시각Utc,
             배차요청시각Utc = source.배차요청시각Utc,
             수락메모 = source.수락메모,
+            커뮤니티원장Id = source.커뮤니티원장Id,
+            커뮤니티원장템플릿Key = source.커뮤니티원장템플릿Key,
+            커뮤니티원장상태 = source.커뮤니티원장상태,
+            커뮤니티원장동기화시각Utc = source.커뮤니티원장동기화시각Utc,
             CreatedAt = source.CreatedAt,
             상태이력 = source.상태이력.Select(x => new 음식주문상태전이기록Dto
             {

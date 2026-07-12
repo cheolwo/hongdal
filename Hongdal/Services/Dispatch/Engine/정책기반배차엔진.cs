@@ -21,7 +21,7 @@ public abstract class 정책기반배차엔진 : I운송의뢰배차엔진
     public abstract int 배차업무유형 { get; }
 
     public virtual Task<배차추천후보?> 다음후보선정Async(
-        배차대기 queue,
+        운송원장 queue,
         string? 제외기사Id = null,
         CancellationToken cancellationToken = default)
     {

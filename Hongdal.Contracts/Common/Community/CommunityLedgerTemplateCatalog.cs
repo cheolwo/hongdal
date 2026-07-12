@@ -146,12 +146,12 @@ public static class CommunityLedgerTemplateCatalog
         new()
         {
             Key = CommunityLedgerTemplateKeys.HongdalMart,
-            DisplayName = "알뜰살뜰 마트 즉시배송 원장",
+            DisplayName = "알뜰살뜰 마트 배송 원장",
             Category = "생활 원장",
             WorkflowTag = "알뜰살뜰 마트",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.HongdalMartUrbanLogistics,
             TargetOperatingSystemName = "알뜰살뜰 마트 도심 물류 OS",
-            Summary = "도심 재고, 피킹·포장, 기사 픽업, 고객 전달을 하나의 즉시배송 흐름으로 공유하는 원장입니다.",
+            Summary = "도심 재고, 피킹·포장, 기사 픽업, 고객 전달을 마트 배송 흐름으로 공유하는 원장입니다. 즉시배송, 예약배송, 묶음배송은 배송유형 속성으로 둡니다.",
             EngineHints = [CommunityLedgerEngineHints.PickingBatch, CommunityLedgerEngineHints.FoodDeliveryDispatch, CommunityLedgerEngineHints.TransportDispatch],
             UiSectionHints = ["참여자", "주문", "도심 재고", "피킹/포장", "포장 완료", "기사 픽업", "고객 전달", "증빙"],
             ActionHints = ["재고 확인", "피킹 시작", "피킹 완료", "포장 완료", "픽업 준비", "기사 인계", "전달 완료", "사진 첨부"],
@@ -174,15 +174,15 @@ public static class CommunityLedgerTemplateCatalog
             [
                 PlannedApi("POST", "api/v1/hongdal-mart/orders", "알뜰살뜰 마트 주문 원장을 생성하고 도심 재고 후보를 연결합니다."),
                 PlannedApi("POST", "api/v1/warehouse-operations/picking-tasks/{taskKey}/complete", "알뜰살뜰 마트 도심 창고 피킹 완료를 처리하고 창고피킹완료됨Event를 발행합니다."),
-                PlannedApi("POST", "api/v1/hongdal-mart/orders/{orderId}/packing-complete", "포장 완료 뒤 알뜰살뜰 마트 즉시배송 배차 대기 후보를 엽니다."),
+                PlannedApi("POST", "api/v1/hongdal-mart/orders/{orderId}/packing-complete", "포장 완료 뒤 알뜰살뜰 마트 배송 배차 대기 후보를 엽니다."),
                 ApiEndpoint("GET", "기사배차추천Controller", "조회", "포장 완료 또는 곧 포장될 주문에 대해 근거리 기사 후보와 추천 배차를 조회합니다.", "기사배차추천Controller")
             ],
             PersistencePolicy = MongoPolicy(
-                Projection("알뜰살뜰 마트 주문", "HongdalMartOrder / CommunityLedger", "OrderId + CommunityLedgerId", "주문과 커뮤니티 원장이 연결되면 도심 즉시배송 원장으로 투영합니다."),
+                Projection("알뜰살뜰 마트 주문", "HongdalMartOrder / CommunityLedger", "OrderId + CommunityLedgerId", "주문과 커뮤니티 원장이 연결되면 마트 배송 원장으로 투영합니다."),
                 Projection("도심 재고 피킹", "WarehousePickingTask", "TaskKey + CommunityLedgerId", "도심 재고가 예약되면 알뜰살뜰 마트 전용 피킹 작업으로 투영합니다."),
-                Projection("즉시배송 배차", "DriverDispatchRecommendation / HongdalMartPackedOrder", "OrderId + CommunityLedgerId", "포장 완료 또는 포장 임박 상태에서 기사 추천과 픽업 대기열로 투영합니다.")),
-            BestLedgerPatternTitle = "도심 재고와 배달 픽업이 맞물리는 알뜰살뜰 마트 즉시배송 원장",
-            BestLedgerPatternSummary = "일반 창고 출고와 분리해 마트 주문, 피킹·포장, 기사 픽업, 고객 전달을 짧은 시간 단위로 이어줍니다.",
+                Projection("마트 배송 배차", "DriverDispatchRecommendation / HongdalMartPackedOrder", "OrderId + CommunityLedgerId", "포장 완료 또는 포장 임박 상태에서 기사 추천과 픽업 대기열로 투영합니다.")),
+            BestLedgerPatternTitle = "도심 재고와 배달 픽업이 맞물리는 알뜰살뜰 마트 배송 원장",
+            BestLedgerPatternSummary = "일반 창고 출고와 분리해 마트 주문, 피킹·포장, 기사 픽업, 고객 전달을 짧은 시간 단위로 이어줍니다. 즉시배송 여부는 배송유형으로 남깁니다.",
             CommunityDiscussionPrompts = ["피킹 중 기사 추천을 언제 열면 좋을까요?", "품절이나 대체 상품은 원장에 어떻게 남길까요?", "포장 완료 뒤 픽업 지연은 누가 확인해야 할까요?"],
             Roles =
             [
@@ -412,8 +412,241 @@ public static class CommunityLedgerTemplateCatalog
         }
     ];
 
+    private static readonly IReadOnlyList<CommunityLedgerImplementationModuleResponse> PriorityModules =
+    [
+        Module(
+            1,
+            CommunityLedgerImplementationModuleCodes.CommunityConversation,
+            "커뮤니티 대화 원장",
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "사용자가 아직 업무로 확정하지 않은 대화, 모집, 질문, 제안을 담는 진입 원장입니다.",
+            ["커뮤니티 대화", "참여자 모집", "가벼운 요청"],
+            ["참여자", "요청 내용", "메모", "타임라인"]),
+        Module(
+            2,
+            CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
+            "원함-원장 판단 원장",
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "사용자의 원함을 어떤 업무 원장으로 만들 수 있는지 판단하고 필요한 블록을 제안하는 원장입니다.",
+            ["원함 확인", "원장화 판정", "추가 정보 요청"],
+            ["원함", "지원 범위", "사용자 확인 책임", "후속 원장 후보"]),
+        Module(
+            3,
+            CommunityLedgerImplementationModuleCodes.CargoTransport,
+            "운송의뢰 원장",
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerOperatingSystemCodes.DomesticCargoTransport,
+            "국내 화물 운송 OS",
+            "상차지, 하차지, 화물 조건, 정산 조건을 기준으로 실제 운송 의뢰를 구성하는 원장입니다.",
+            ["화물 운송 원장", "화주 운송 의뢰"],
+            ["참여자", "상차지", "하차지", "화물 조건", "정산 표시"]),
+        Module(
+            4,
+            CommunityLedgerImplementationModuleCodes.TransportProgress,
+            "운송진행 원장",
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerOperatingSystemCodes.DomesticCargoTransport,
+            "국내 화물 운송 OS",
+            "배차 확정 뒤 상차, 이동, 하차, 수령 확인과 증빙을 남기는 진행 원장입니다.",
+            ["기사 운송 진행", "운송 증빙", "수령 확인"],
+            ["상차지", "하차지", "증빙", "타임라인", "정산 표시"]),
+        Module(
+            5,
+            CommunityLedgerImplementationModuleCodes.WarehouseOutbound,
+            "창고출고 원장",
+            CommunityLedgerTemplateKeys.WarehouseOutbound,
+            CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
+            "창고·커머스 이행 OS",
+            "출고 품목, 재고 근거, 피킹, 검수, 포장, 운송 인계를 묶는 원장입니다.",
+            ["창고 출고", "판매채널 출고", "재위탁 운송 준비"],
+            ["출고 품목", "피킹 작업", "검수", "포장", "운송 인계"]),
+        Module(
+            6,
+            CommunityLedgerImplementationModuleCodes.PickingPacking,
+            "피킹/포장 원장",
+            CommunityLedgerTemplateKeys.WarehouseOutbound,
+            CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
+            "창고·커머스 이행 OS",
+            "상품을 꺼내고 검수하고 포장하는 현장 작업을 독립적으로 추적하는 원장입니다.",
+            ["피킹 작업", "검수", "포장 완료"],
+            ["피킹 작업", "검수", "포장", "증빙"]),
+        Module(
+            7,
+            CommunityLedgerImplementationModuleCodes.HongdalMartOrder,
+            "마트주문 원장",
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerOperatingSystemCodes.HongdalMartUrbanLogistics,
+            "알뜰살뜰 마트 도심 물류 OS",
+            "사용자가 원하는 마트 상품, 수령 조건, 도심 재고 후보를 연결하는 원장입니다.",
+            ["알뜰살뜰 마트 주문", "도심 재고 확인"],
+            ["주문", "도심 재고", "참여자"]),
+        Module(
+            8,
+            CommunityLedgerImplementationModuleCodes.HongdalMartDelivery,
+            "마트 배송 원장",
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerOperatingSystemCodes.HongdalMartUrbanLogistics,
+            "알뜰살뜰 마트 도심 물류 OS",
+            "포장된 마트 주문을 기사 픽업과 고객 전달로 이어주는 배송 원장입니다. 즉시배송은 배송유형입니다.",
+            ["기사 픽업", "고객 전달", "수령 확인"],
+            ["포장 완료", "기사 픽업", "고객 전달", "수령 확인"]),
+        Module(
+            9,
+            CommunityLedgerImplementationModuleCodes.SettlementMark,
+            "결제/정산 표시 원장",
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "플랫폼 보증이 아니라 참여자 간 결제 표시, 상대방 확인, 보류, 정산 메모를 남기는 원장입니다.",
+            ["결제 표시", "정산 확인", "FakePG 개발 검증"],
+            ["정산 표시", "결제 표시", "확인", "메모"]),
+        Module(
+            10,
+            CommunityLedgerImplementationModuleCodes.ReportDispute,
+            "신고/분쟁 원장",
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "문제 신고, 이견, 보류, 운영자 검토, 제한 신호를 별도로 추적하는 원장입니다.",
+            ["문제 신고", "이견 있음", "운영자 검토"],
+            ["증빙", "메모", "확인", "타임라인"])
+    ];
+
+    private static readonly IReadOnlyList<CommunityLedgerRelationResponse> PriorityLedgerRelations =
+    [
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.CommunityConversation,
+            CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: true,
+            "커뮤니티 대화가 실제 업무 의도로 읽힐 때",
+            "대화 원장은 여러 원함-원장 판단 원장을 만들 수 있습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
+            CommunityLedgerImplementationModuleCodes.CargoTransport,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "상차지, 하차지, 화물 조건이 확인될 때",
+            "원함 판단이 국내 운송 업무로 판정되면 운송의뢰 원장으로 넘깁니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.CargoTransport,
+            CommunityLedgerImplementationModuleCodes.TransportProgress,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerRelationTypes.Flow,
+            CommunityLedgerRelationCardinality.OneToOne,
+            required: true,
+            "배차가 확정될 때",
+            "운송의뢰 원장은 배차 확정 뒤 운송진행 원장 상태로 이어집니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.WarehouseOutbound,
+            CommunityLedgerImplementationModuleCodes.PickingPacking,
+            CommunityLedgerTemplateKeys.WarehouseOutbound,
+            CommunityLedgerTemplateKeys.WarehouseOutbound,
+            CommunityLedgerRelationTypes.Contains,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: true,
+            "출고 품목이 피킹 작업으로 분해될 때",
+            "창고출고 원장은 하나 이상의 피킹/포장 원장을 포함할 수 있습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.PickingPacking,
+            CommunityLedgerImplementationModuleCodes.CargoTransport,
+            CommunityLedgerTemplateKeys.WarehouseOutbound,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "포장 완료 뒤 외부 이동이 필요할 때",
+            "피킹/포장 완료 뒤 운송 인계가 필요하면 운송의뢰 원장으로 넘깁니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.HongdalMartOrder,
+            CommunityLedgerImplementationModuleCodes.PickingPacking,
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerRelationTypes.Requires,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: true,
+            "마트 주문과 도심 재고가 확인될 때",
+            "마트주문 원장은 도심 재고 기준 피킹/포장 원장을 열어야 합니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.PickingPacking,
+            CommunityLedgerImplementationModuleCodes.HongdalMartDelivery,
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.ManyToOne,
+            required: true,
+            "포장 완료 뒤 기사 픽업이 가능할 때",
+            "여러 포장 완료 주문이 하나의 마트 배송 원장으로 묶일 수 있습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.HongdalMartDelivery,
+            CommunityLedgerImplementationModuleCodes.SettlementMark,
+            CommunityLedgerTemplateKeys.HongdalMart,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerRelationTypes.Reference,
+            CommunityLedgerRelationCardinality.OneToOne,
+            required: false,
+            "수령 확인 또는 전달 완료 뒤",
+            "마트 배송 완료 뒤 참여자 중심 결제/정산 표시를 연결합니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.TransportProgress,
+            CommunityLedgerImplementationModuleCodes.SettlementMark,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerRelationTypes.Reference,
+            CommunityLedgerRelationCardinality.OneToOne,
+            required: false,
+            "하차 완료 또는 수령 확인 뒤",
+            "운송 완료 뒤 결제/정산 표시 원장을 참조합니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.TransportProgress,
+            CommunityLedgerImplementationModuleCodes.ReportDispute,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerRelationTypes.Reference,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "문제 신고, 지연, 파손, 이견이 생길 때",
+            "운송진행 원장은 필요 시 신고/분쟁 원장을 열 수 있습니다.")
+    ];
+
     public static IReadOnlyList<CommunityLedgerTemplateResponse> All
         => Templates.Select(EnsureLedgerBlocks).ToList();
+
+    public static IReadOnlyList<CommunityLedgerImplementationModuleResponse> PriorityImplementationModules
+        => PriorityModules;
+
+    public static IReadOnlyList<CommunityLedgerRelationResponse> LedgerRelations
+        => PriorityLedgerRelations;
+
+    public static IReadOnlyList<CommunityLedgerRelationResponse> FindLedgerRelations(string? moduleCodeOrTemplateKey)
+    {
+        if (string.IsNullOrWhiteSpace(moduleCodeOrTemplateKey))
+        {
+            return [];
+        }
+
+        var key = moduleCodeOrTemplateKey.Trim();
+        return PriorityLedgerRelations
+            .Where(relation => string.Equals(relation.FromModuleCode, key, StringComparison.OrdinalIgnoreCase)
+                               || string.Equals(relation.ToModuleCode, key, StringComparison.OrdinalIgnoreCase)
+                               || string.Equals(relation.FromLedgerTemplateKey, key, StringComparison.OrdinalIgnoreCase)
+                               || string.Equals(relation.ToLedgerTemplateKey, key, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    public static IReadOnlyList<CommunityLedgerBlockRelationResponse> FindBlockRelations(string? templateKey)
+        => Find(templateKey).BlockRelations;
 
     public static CommunityLedgerTemplateResponse Find(string? key)
     {
@@ -460,6 +693,11 @@ public static class CommunityLedgerTemplateCatalog
         var blockLines = template.LedgerBlocks.Count > 0
             ? template.LedgerBlocks.Select(BuildLedgerBlockLine)
             : ["- 원장 블록은 참여자, 대상, 상태, 증빙, 인계 조각으로 구성합니다."];
+        var moduleLines = BuildPriorityModuleLines(template).ToList();
+        var ledgerRelationLines = BuildLedgerRelationLines(template).ToList();
+        var blockRelationLines = template.BlockRelations.Count > 0
+            ? template.BlockRelations.Select(BuildLedgerBlockRelationLine)
+            : ["- 블록 관계는 원장 블록 순서와 구성 규칙을 기준으로 계산합니다."];
         var compositionRuleLines = template.CompositionRules.Count > 0
             ? template.CompositionRules.SelectMany(rule => BuildCompositionRuleLines(rule))
             : ["- 참여자, 대상, 상태가 정리된 뒤 필요한 화면과 행동을 구성합니다."];
@@ -519,6 +757,13 @@ public static class CommunityLedgerTemplateCatalog
             "원장 블록:",
             string.Join(Environment.NewLine, blockLines),
             string.Empty,
+            "원장 모듈/관계:",
+            string.Join(Environment.NewLine, moduleLines),
+            string.Join(Environment.NewLine, ledgerRelationLines),
+            string.Empty,
+            "블록 관계:",
+            string.Join(Environment.NewLine, blockRelationLines),
+            string.Empty,
             "구성 규칙:",
             string.Join(Environment.NewLine, compositionRuleLines),
             string.Empty,
@@ -551,12 +796,16 @@ public static class CommunityLedgerTemplateCatalog
 
     private static CommunityLedgerTemplateResponse EnsureLedgerBlocks(CommunityLedgerTemplateResponse template)
     {
-        if (template.LedgerBlocks.Count > 0)
+        if (template.LedgerBlocks.Count == 0)
         {
-            return template;
+            template.LedgerBlocks = BuildLedgerBlocks(template).ToList();
         }
 
-        template.LedgerBlocks = BuildLedgerBlocks(template).ToList();
+        if (template.BlockRelations.Count == 0)
+        {
+            template.BlockRelations = BuildLedgerBlockRelations(template).ToList();
+        }
+
         return template;
     }
 
@@ -632,6 +881,98 @@ public static class CommunityLedgerTemplateCatalog
         }
 
         return blocks;
+    }
+
+    private static IEnumerable<CommunityLedgerBlockRelationResponse> BuildLedgerBlockRelations(CommunityLedgerTemplateResponse template)
+    {
+        var relations = new List<CommunityLedgerBlockRelationResponse>();
+        var blocks = template.LedgerBlocks.ToList();
+
+        for (var i = 0; i < blocks.Count - 1; i++)
+        {
+            AddBlockRelation(
+                relations,
+                blocks[i],
+                blocks[i + 1],
+                CommunityLedgerRelationTypes.Flow,
+                CommunityLedgerRelationCardinality.OneToOne,
+                required: false,
+                compositionRuleCode: string.Empty,
+                $"{blocks[i].DisplayName} 다음에 {blocks[i + 1].DisplayName} 정보를 확인합니다.");
+        }
+
+        var handoffBlocks = blocks
+            .Where(block => block.OpensApiHandoff || block.BlockType == CommunityLedgerBlockTypes.Handoff)
+            .ToList();
+
+        foreach (var rule in template.CompositionRules)
+        {
+            var requiredBlocks = blocks
+                .Where(block => rule.RequiredUiSectionHints.Any(section => string.Equals(section, block.UiSectionHint, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+            var targetBlocks = handoffBlocks
+                .Where(block => block.CompositionRuleCodes.Contains(rule.Code, StringComparer.OrdinalIgnoreCase)
+                                || block.BlockType == CommunityLedgerBlockTypes.Handoff)
+                .DefaultIfEmpty(handoffBlocks.LastOrDefault())
+                .Where(block => block is not null)
+                .Cast<CommunityLedgerBlockResponse>()
+                .DistinctBy(block => block.Code)
+                .ToList();
+
+            foreach (var requiredBlock in requiredBlocks)
+            {
+                foreach (var targetBlock in targetBlocks)
+                {
+                    if (string.Equals(requiredBlock.Code, targetBlock.Code, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    AddBlockRelation(
+                        relations,
+                        requiredBlock,
+                        targetBlock,
+                        CommunityLedgerRelationTypes.Requires,
+                        CommunityLedgerRelationCardinality.ManyToOne,
+                        required: true,
+                        rule.Code,
+                        $"{requiredBlock.DisplayName}이 채워져야 {targetBlock.DisplayName} 행동을 열 수 있습니다.");
+                }
+            }
+        }
+
+        return relations;
+    }
+
+    private static void AddBlockRelation(
+        ICollection<CommunityLedgerBlockRelationResponse> relations,
+        CommunityLedgerBlockResponse from,
+        CommunityLedgerBlockResponse to,
+        string relationType,
+        string cardinality,
+        bool required,
+        string compositionRuleCode,
+        string description)
+    {
+        if (relations.Any(relation =>
+                string.Equals(relation.FromBlockCode, from.Code, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(relation.ToBlockCode, to.Code, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(relation.RelationType, relationType, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(relation.CompositionRuleCode, compositionRuleCode, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        relations.Add(new()
+        {
+            FromBlockCode = from.Code,
+            ToBlockCode = to.Code,
+            RelationType = relationType,
+            Cardinality = cardinality,
+            Required = required,
+            CompositionRuleCode = compositionRuleCode,
+            Description = description
+        });
     }
 
     private static void AddBlock(
@@ -925,6 +1266,97 @@ public static class CommunityLedgerTemplateCatalog
 
         return $"- {block.DisplayName} [{block.BlockType}, {required}{handoff}]: {block.Purpose} / 행동: {actions}{rules}";
     }
+
+    private static string BuildLedgerBlockRelationLine(CommunityLedgerBlockRelationResponse relation)
+    {
+        var required = relation.Required ? "필수" : "선택";
+        var rule = string.IsNullOrWhiteSpace(relation.CompositionRuleCode)
+            ? string.Empty
+            : $" / 규칙: {relation.CompositionRuleCode}";
+
+        return $"- {relation.FromBlockCode} -> {relation.ToBlockCode} [{relation.RelationType}, {relation.Cardinality}, {required}]: {relation.Description}{rule}";
+    }
+
+    private static IEnumerable<string> BuildPriorityModuleLines(CommunityLedgerTemplateResponse template)
+    {
+        var modules = PriorityModules
+            .Where(module => string.Equals(module.LedgerTemplateKey, template.Key, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(module => module.Priority)
+            .ToList();
+
+        if (modules.Count == 0)
+        {
+            yield return $"- 우선 구현 모듈: {template.DisplayName}";
+            yield break;
+        }
+
+        foreach (var module in modules)
+        {
+            yield return $"- P{module.Priority:00} {module.DisplayName} ({module.ModuleCode}): {module.Summary}";
+        }
+    }
+
+    private static IEnumerable<string> BuildLedgerRelationLines(CommunityLedgerTemplateResponse template)
+    {
+        var relations = FindLedgerRelations(template.Key);
+        if (relations.Count == 0)
+        {
+            yield return "- 연결 원장: 아직 명시된 우선 관계가 없습니다.";
+            yield break;
+        }
+
+        foreach (var relation in relations)
+        {
+            var required = relation.Required ? "필수" : "선택";
+            yield return $"- {relation.FromModuleCode} -> {relation.ToModuleCode} [{relation.RelationType}, {relation.Cardinality}, {required}]: {relation.Trigger} / {relation.Description}";
+        }
+    }
+
+    private static CommunityLedgerImplementationModuleResponse Module(
+        int priority,
+        string moduleCode,
+        string displayName,
+        string ledgerTemplateKey,
+        string targetOperatingSystemCode,
+        string targetOperatingSystemName,
+        string summary,
+        IReadOnlyList<string> includedLedgerNames,
+        IReadOnlyList<string> primaryBlockHints)
+        => new()
+        {
+            Priority = priority,
+            ModuleCode = moduleCode,
+            DisplayName = displayName,
+            LedgerTemplateKey = ledgerTemplateKey,
+            TargetOperatingSystemCode = targetOperatingSystemCode,
+            TargetOperatingSystemName = targetOperatingSystemName,
+            Summary = summary,
+            IncludedLedgerNames = includedLedgerNames,
+            PrimaryBlockHints = primaryBlockHints
+        };
+
+    private static CommunityLedgerRelationResponse LedgerRelation(
+        string fromModuleCode,
+        string toModuleCode,
+        string fromLedgerTemplateKey,
+        string toLedgerTemplateKey,
+        string relationType,
+        string cardinality,
+        bool required,
+        string trigger,
+        string description)
+        => new()
+        {
+            FromModuleCode = fromModuleCode,
+            ToModuleCode = toModuleCode,
+            FromLedgerTemplateKey = fromLedgerTemplateKey,
+            ToLedgerTemplateKey = toLedgerTemplateKey,
+            RelationType = relationType,
+            Cardinality = cardinality,
+            Required = required,
+            Trigger = trigger,
+            Description = description
+        };
 
     private static CommunityLedgerCompositionRuleResponse Rule(
         string code,

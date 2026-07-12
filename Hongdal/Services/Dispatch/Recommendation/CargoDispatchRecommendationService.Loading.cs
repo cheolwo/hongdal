@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.공통;
 using 홍달.도메인.차량;
 using 홍달.도메인.화물;
@@ -10,7 +10,7 @@ namespace 홍달.Services.Dispatch.Recommendation
     {
         private async Task 추천만료정리Async(string driverId)
         {
-            var activeQueue = await _db.배차대기
+            var activeQueue = await _db.운송원장
                 .AsNoTracking()
                 .Where(q => q.배차업무유형 == 상태값.배차업무유형.용달운송
                             && q.상태 == 상태값.배차대기상태.대기

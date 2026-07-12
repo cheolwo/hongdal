@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using FluentResults;
 using Microsoft.Extensions.Logging;
@@ -42,7 +42,7 @@ public sealed class 배차수락CommandHandler : IRequestHandler<배차수락Com
 
         await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
 
-        var queue = await _db.배차대기.FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
+        var queue = await _db.운송원장.FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
         if (queue is null)
         {
             return Result.Fail<배차수락결과>("배차대기 데이터를 찾을 수 없습니다.");

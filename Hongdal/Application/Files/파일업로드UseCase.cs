@@ -97,7 +97,7 @@ public sealed class 파일업로드UseCase : I파일업로드UseCase
             return Result.Fail("운송 증빙 업로드에는 유효한 referenceId가 필요합니다.");
         }
 
-        var transport = await _db.배송_운송
+        var transport = await _db.운송원장
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == transportId, cancellationToken);
         if (transport is null)

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.배차;
 using 홍달.도메인.기사;
 using 홍달.도메인.차량;
@@ -11,14 +11,14 @@ namespace 홍달.Services.Dispatch.Coordination;
 
 public sealed partial class 국내화물배차조율입력Factory
 {
-    private async Task<List<배차대기>> LoadQueuesAsync(
+    private async Task<List<운송원장>> LoadQueuesAsync(
         국내화물배차조율입력요청 request,
         DateTime now,
         CancellationToken cancellationToken)
     {
         // 배차대기는 업무 상태의 DB 원장이다. 서버 메모리 큐가 사라져도
         // 이 조건으로 미처리 운송 의뢰를 다시 읽어 실행 큐를 재구성한다.
-        var query = _db.배차대기
+        var query = _db.운송원장
             .AsNoTracking()
             .미처리운송의뢰쿼리(now);
 
@@ -67,7 +67,7 @@ public sealed partial class 국내화물배차조율입력Factory
         CancellationToken cancellationToken)
     {
         // 기사 상태 Store는 배차 판단을 빠르게 하기 위한 실행 인덱스다.
-        // 업무 확정은 배차대기, 화주운송의뢰, 배송_운송 DB 상태로만 판단한다.
+        // 업무 확정은 배차대기, 화주운송의뢰, 운송원장 DB 상태로만 판단한다.
         if (request.기사Ids is { Count: > 0 })
         {
             var result = new List<국내화물운송기사상태Snapshot>();
@@ -157,7 +157,7 @@ public sealed partial class 국내화물배차조율입력Factory
             return new Dictionary<string, int>(StringComparer.Ordinal);
         }
 
-        return await _db.배송_운송
+        return await _db.운송원장
             .AsNoTracking()
             .Where(x => ids.Contains(x.기사_운송자) && x.상태 != "인수완료")
             .GroupBy(x => x.기사_운송자)

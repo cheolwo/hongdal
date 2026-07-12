@@ -11,7 +11,7 @@ namespace 홍달.Services.Dispatch.Coordination;
 public sealed partial class 국내화물배차조율입력Factory
 {
     private async Task<운송의뢰기사조합평가> EvaluateAsync(
-        배차대기 queue,
+        운송원장 queue,
         화주운송의뢰 request,
         화물요구조건? cargoRequirement,
         국내화물운송기사상태Snapshot state,

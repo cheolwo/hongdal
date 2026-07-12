@@ -1,4 +1,4 @@
-using 홍달.도메인.배차;
+using 홍달.도메인.운송;
 
 namespace Hongdal.Application.Admin.Inbound;
 
@@ -21,4 +21,4 @@ public sealed record 배차대기생성Command(
     bool? 공동구매기사세대배송여부 = null,
     string? 공동구매세대배송방식코드 = null,
     int? 공동구매세대배송건수 = null,
-    string? 공동구매분배책임코드 = null) : IRequest<배차대기>;
+    string? 공동구매분배책임코드 = null) : IRequest<운송원장>;

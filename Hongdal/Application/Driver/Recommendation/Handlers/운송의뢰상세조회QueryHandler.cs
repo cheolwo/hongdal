@@ -1,4 +1,4 @@
-using Request = Hongdal.Contracts.Shipper.Request;
+﻿using Request = Hongdal.Contracts.Shipper.Request;
 
 namespace Hongdal.Application.Driver.Recommendation;
 
@@ -18,7 +18,7 @@ public sealed class 운송의뢰상세조회QueryHandler : IRequestHandler<운�
         var dispatchRequest = await _db.화주운송의뢰.AsNoTracking().FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken)
             ?? throw new InvalidOperationException("의뢰를 찾을 수 없습니다.");
 
-        var queue = await _db.배차대기.AsNoTracking().FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
+        var queue = await _db.운송원장.AsNoTracking().FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
         var cargoRequirement = await _db.화물요구조건.AsNoTracking().FirstOrDefaultAsync(x => x.의뢰Id == request.RequestId, cancellationToken);
         var driver = await _db.용달기사.AsNoTracking().FirstOrDefaultAsync(x => x.기사Id == request.기사Id, cancellationToken);
         var vehicle = driver is null

@@ -14,7 +14,7 @@ public sealed class 관리자운송목록조회QueryHandler : IRequestHandler<�
 
     public async Task<IReadOnlyList<운송진행응답>> Handle(관리자운송목록조회Query request, CancellationToken cancellationToken)
     {
-        var query = _db.배송_운송.AsNoTracking().AsQueryable();
+        var query = _db.운송원장.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.상태))
         {
@@ -31,7 +31,7 @@ public sealed class 관리자운송목록조회QueryHandler : IRequestHandler<�
             .ToArray();
     }
 
-    private static 운송진행응답 Map(배송_운송 entity)
+    private static 운송진행응답 Map(운송원장 entity)
     {
         var 예외 = ExtractLatestException(entity.첨부_json);
         return new 운송진행응답

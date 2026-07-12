@@ -24,12 +24,12 @@ public sealed record 음식배달배차흐름(
 
 public interface I음식배달배차흐름Resolver
 {
-    음식배달배차흐름 Resolve(배차대기 queue);
+    음식배달배차흐름 Resolve(운송원장 queue);
 }
 
 public sealed class 음식배달배차흐름Resolver : I음식배달배차흐름Resolver
 {
-    public 음식배달배차흐름 Resolve(배차대기 queue)
+    public 음식배달배차흐름 Resolve(운송원장 queue)
     {
         if (음식배달배차원본유형.IsRestaurantOrder(queue.원본의뢰유형))
         {

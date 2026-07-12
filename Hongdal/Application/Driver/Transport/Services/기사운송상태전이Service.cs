@@ -5,7 +5,7 @@ namespace Hongdal.Application.Driver.Transport;
 
 public interface I기사운송상태전이Service
 {
-    Result 상태변경(배송_운송 운송, string 목표상태, DateTime 변경시각);
+    Result 상태변경(운송원장 운송, string 목표상태, DateTime 변경시각);
 }
 
 public sealed class 기사운송상태전이Service : I기사운송상태전이Service
@@ -24,7 +24,7 @@ public sealed class 기사운송상태전이Service : I기사운송상태전이S
         [기사운송상태코드.인수완료] = [기사운송상태코드.하차지도착]
     };
 
-    public Result 상태변경(배송_운송 운송, string 목표상태, DateTime 변경시각)
+    public Result 상태변경(운송원장 운송, string 목표상태, DateTime 변경시각)
     {
         if (string.Equals(운송.상태, 목표상태, StringComparison.Ordinal))
         {

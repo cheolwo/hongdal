@@ -1,13 +1,15 @@
-using Hongdal.Application.CommandProcessing;
+﻿using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Warehouse;
+using Hongdal.Services.Community;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.도메인.배차;
 using 홍달.도메인.운송;
 using 홍달.도메인.창고;
 using 홍달.도메인.화주;
+using 홍달.Services.Dispatch.Engine;
 
 namespace Hongdal.Services.LogisticsProcessing.Warehouse;
 
@@ -15,11 +17,16 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
 {
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
+    private readonly I운송원장Mongo동기화Service _transportLedgerSync;
 
-    public WarehouseOperationService(HongdalContext db, ICurrentUserAccessor currentUserAccessor)
+    public WarehouseOperationService(
+        HongdalContext db,
+        ICurrentUserAccessor currentUserAccessor,
+        I운송원장Mongo동기화Service transportLedgerSync)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
+        _transportLedgerSync = transportLedgerSync;
     }
 
     public async Task<창고목록응답> GetWarehousesAsync(CancellationToken cancellationToken)
@@ -570,13 +577,14 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             CreatedAt = now
         });
 
-        _db.배차대기.Add(new 배차대기
+        var transportProjection = new 운송원장
         {
+            운송번호 = shipRequest.의뢰Id,
             의뢰Id = shipRequest.의뢰Id,
             화주Id = shipRequest.화주Id,
             배차업무유형 = 상태값.배차업무유형.용달운송,
-            원본의뢰유형 = "CargoTransport",
-            원본의뢰Id = shipRequest.의뢰Id,
+            원본의뢰유형 = 운송의뢰배차원천유형.창고출고연계운송,
+            원본의뢰Id = item.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
             픽업_도로명주소 = shipRequest.픽업_도로명주소,
             픽업_상세주소 = shipRequest.픽업_상세주소,
             픽업_위도 = shipRequest.픽업_위도,
@@ -588,7 +596,8 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             상태 = 상태값.배차대기상태.대기,
             CreatedAt = now,
             UpdatedAt = now
-        });
+        };
+        _db.운송원장.Add(transportProjection);
 
         _db.재고이력.Add(new 재고이력
         {
@@ -618,6 +627,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
 
         await Hongdal.Application.Shipper.Request.화주운송의뢰매퍼.UpsertCargoRequirementAsync(_db, shipRequest, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
+        await _transportLedgerSync.화주운송의뢰동기화Async(shipRequest, userId, cancellationToken);
 
         return Hongdal.Application.Shipper.Request.화주운송의뢰매퍼.To응답(shipRequest);
     }

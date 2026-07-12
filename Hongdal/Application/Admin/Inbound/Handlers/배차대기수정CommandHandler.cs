@@ -1,19 +1,25 @@
-using Hongdal.Contracts.Admin.Inbound;
+﻿using Hongdal.Contracts.Admin.Inbound;
+using Hongdal.Services.Community;
+using 홍달.도메인.운송;
 
 namespace Hongdal.Application.Admin.Inbound;
 
-public sealed class 배차대기수정CommandHandler : IRequestHandler<배차대기수정Command, 홍달.도메인.배차.배차대기?>
+public sealed class 배차대기수정CommandHandler : IRequestHandler<배차대기수정Command, 운송원장?>
 {
     private readonly HongdalContext _db;
+    private readonly I운송원장Mongo동기화Service _transportLedgerSync;
 
-    public 배차대기수정CommandHandler(HongdalContext db)
+    public 배차대기수정CommandHandler(
+        HongdalContext db,
+        I운송원장Mongo동기화Service transportLedgerSync)
     {
         _db = db;
+        _transportLedgerSync = transportLedgerSync;
     }
 
-    public async Task<홍달.도메인.배차.배차대기?> Handle(배차대기수정Command request, CancellationToken cancellationToken)
+    public async Task<운송원장?> Handle(배차대기수정Command request, CancellationToken cancellationToken)
     {
-        var entity = await _db.배차대기.FindAsync([request.Id], cancellationToken);
+        var entity = await _db.운송원장.FindAsync([request.Id], cancellationToken);
         if (entity == null)
         {
             return null;
@@ -53,6 +59,7 @@ public sealed class 배차대기수정CommandHandler : IRequestHandler<배차대
         entity.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
+        await _transportLedgerSync.운송실행투영동기화Async(entity, "admin", cancellationToken);
         return entity;
     }
 

@@ -9,7 +9,7 @@ public sealed class 배차큐책임경계Tests
     {
         Assert.True(배차큐책임경계.업무확정근거인가("배차대기"));
         Assert.True(배차큐책임경계.업무확정근거인가("화주운송의뢰"));
-        Assert.True(배차큐책임경계.업무확정근거인가("배송_운송"));
+        Assert.True(배차큐책임경계.업무확정근거인가("운송원장"));
     }
 
     [Fact]

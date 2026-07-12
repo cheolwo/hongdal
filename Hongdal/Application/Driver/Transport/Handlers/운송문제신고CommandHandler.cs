@@ -38,7 +38,7 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
             return Result.Fail<기사운송요약응답>(권한오류);
         }
 
-        var entity = await _db.배송_운송
+        var entity = await _db.운송원장
             .FirstOrDefaultAsync(x => x.Id == request.Id && x.기사_운송자 == request.기사Id, cancellationToken);
 
         if (entity is null)
@@ -108,7 +108,7 @@ public sealed class 운송문제신고CommandHandler : IRequestHandler<운송문
     }
 
     private async Task PublishAfterCommitAsync(
-        배송_운송 entity,
+        운송원장 entity,
         운송현장예외정리결과 예외,
         운송문제신고Command request,
         DateTime now,

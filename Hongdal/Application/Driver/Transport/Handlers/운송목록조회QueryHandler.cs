@@ -13,7 +13,7 @@ public sealed class 운송목록조회QueryHandler : IRequestHandler<운송목�
 
     public async Task<IReadOnlyList<기사운송요약응답>> Handle(운송목록조회Query request, CancellationToken cancellationToken)
     {
-        var transports = await _db.배송_운송
+        var transports = await _db.운송원장
             .AsNoTracking()
             .Where(x => x.기사_운송자 == request.기사Id)
             .OrderByDescending(x => x.UpdatedAt)

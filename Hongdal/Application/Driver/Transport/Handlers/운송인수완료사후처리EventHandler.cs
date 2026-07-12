@@ -38,7 +38,7 @@ public sealed class 운송인수완료사후처리EventHandler : INotificationHa
             await _문서관리Service.CreateDocumentAsync(new 문서생성요청
             {
                 의뢰Id = notification.운송번호,
-                배송운송Id = notification.운송Id,
+                운송원장Id = notification.운송Id,
                 문서코드 = "인수증",
                 문서명 = "인수증",
                 파일명 = $"인수증-{notification.운송번호}.pdf",

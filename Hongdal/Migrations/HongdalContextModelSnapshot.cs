@@ -370,6 +370,168 @@ namespace Hongdal.Migrations
                     b.ToTable("platform_community_post_recommendations", (string)null);
                 });
 
+            modelBuilder.Entity("Hongdal.Domain.Community.커뮤니티원장블록관계투영", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Cardinality")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DiagramEdgeId")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("FromBlockId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<long>("FromBlockProjectionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("MeaningCode")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ToBlockId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<long>("ToBlockProjectionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("관계유형")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("조건식Json")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("커뮤니티원장Id")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<bool>("필수여부")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiagramEdgeId");
+
+                    b.HasIndex("FromBlockProjectionId");
+
+                    b.HasIndex("ToBlockProjectionId");
+
+                    b.HasIndex("커뮤니티원장Id", "Cardinality");
+
+                    b.HasIndex("커뮤니티원장Id", "FromBlockId", "ToBlockId", "관계유형");
+
+                    b.ToTable("community_ledger_block_relation_projections", (string)null);
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.커뮤니티원장블록투영", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BlockId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("BlockType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DiagramNodeId")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("RelatedRoute")
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("UiSectionHint")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("속성Json")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("원장템플릿Key")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("커뮤니티Id")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<string>("커뮤니티원장Id")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiagramNodeId");
+
+                    b.HasIndex("커뮤니티원장Id", "BlockId")
+                        .IsUnique();
+
+                    b.HasIndex("커뮤니티원장Id", "SortOrder");
+
+                    b.HasIndex("커뮤니티Id", "원장템플릿Key", "BlockType");
+
+                    b.ToTable("community_ledger_block_projections", (string)null);
+                });
+
             modelBuilder.Entity("Hongdal.Domain.HsCodes.HsCodeCatalogVersion", b =>
                 {
                     b.Property<long>("Id")
@@ -1594,7 +1756,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("driver_shifts");
+                    b.ToTable("driver_shifts", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.기사.기사월정산", b =>
@@ -1641,7 +1803,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("기사월정산");
+                    b.ToTable("기사월정산", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.기사.기사위치기록", b =>
@@ -1684,7 +1846,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("driver_location_history");
+                    b.ToTable("driver_location_history", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.기사.배달기사", b =>
@@ -1894,6 +2056,148 @@ namespace Hongdal.Migrations
                     b.ToTable("용달기사");
                 });
 
+            modelBuilder.Entity("홍달.도메인.마트.마트주문", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("상태");
+
+                    b.Property<long?>("주문Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("주문_id");
+
+                    b.Property<string>("주문자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("주문자_user_id");
+
+                    b.Property<string>("주문참조번호")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("주문참조번호");
+
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
+
+                    b.Property<string>("판매자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("판매자_user_id");
+
+                    b.Property<string>("현재단계")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("현재단계");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("주문참조번호")
+                        .IsUnique();
+
+                    b.HasIndex("커뮤니티원장Id");
+
+                    b.HasIndex("주문자UserId", "상태", "CreatedAt");
+
+                    b.HasIndex("판매자UserId", "상태", "CreatedAt");
+
+                    b.ToTable("마트주문", (string)null);
+                });
+
+            modelBuilder.Entity("홍달.도메인.마트.마트주문상품", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("sku");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long>("마트주문Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("마트주문_id");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("상태");
+
+                    b.Property<string>("상품명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("상품명");
+
+                    b.Property<int>("수량")
+                        .HasColumnType("int")
+                        .HasColumnName("수량");
+
+                    b.Property<long?>("출고예정Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("출고예정_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SKU");
+
+                    b.HasIndex("출고예정Id");
+
+                    b.HasIndex("마트주문Id", "출고예정Id")
+                        .IsUnique();
+
+                    b.ToTable("마트주문상품", (string)null);
+                });
+
             modelBuilder.Entity("홍달.도메인.배차.기사배차", b =>
                 {
                     b.Property<long>("Id")
@@ -2003,160 +2307,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("기사배차");
-                });
-
-            modelBuilder.Entity("홍달.도메인.배차.배차대기", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)")
-                        .HasColumnName("row_version");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int>("계획배차시도횟수")
-                        .HasColumnType("int")
-                        .HasColumnName("plan_attempts");
-
-                    b.Property<DateTime?>("공개전환시각")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("public_transition_at");
-
-                    b.Property<bool?>("공동구매기사세대배송여부")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("group_purchase_driver_unit_distribution");
-
-                    b.Property<string>("공동구매도착지유형코드")
-                        .HasColumnType("longtext")
-                        .HasColumnName("group_purchase_destination_type_code");
-
-                    b.Property<string>("공동구매분배책임코드")
-                        .HasColumnType("longtext")
-                        .HasColumnName("group_purchase_distribution_responsibility_code");
-
-                    b.Property<string>("공동구매세대배송방식코드")
-                        .HasColumnType("longtext")
-                        .HasColumnName("group_purchase_unit_distribution_mode_code");
-
-                    b.Property<int?>("공동구매세대배송건수")
-                        .HasColumnType("int")
-                        .HasColumnName("group_purchase_unit_delivery_count");
-
-                    b.Property<string>("마지막거절기사Id")
-                        .HasColumnType("longtext")
-                        .HasColumnName("last_rejected_driver_id");
-
-                    b.Property<int>("배차노출상태")
-                        .HasColumnType("int")
-                        .HasColumnName("exposure_state");
-
-                    b.Property<int>("배차업무유형")
-                        .HasColumnType("int")
-                        .HasColumnName("business_type");
-
-                    b.Property<int>("배차큐단계")
-                        .HasColumnType("int")
-                        .HasColumnName("queue_stage");
-
-                    b.Property<string>("상태")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("status");
-
-                    b.Property<string>("원본의뢰Id")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("source_request_id");
-
-                    b.Property<string>("원본의뢰유형")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("source_type");
-
-                    b.Property<string>("의뢰Id")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("request_id");
-
-                    b.Property<int>("추천라운드")
-                        .HasColumnType("int")
-                        .HasColumnName("recommendation_round");
-
-                    b.Property<DateTime?>("추천만료시각")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("recommendation_expires_at");
-
-                    b.Property<DateTime?>("추천시작시각")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("recommendation_started_at");
-
-                    b.Property<decimal?>("픽업_경도")
-                        .HasColumnType("decimal(65,30)")
-                        .HasColumnName("pickup_longitude");
-
-                    b.Property<string>("픽업_도로명주소")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("pickup_address");
-
-                    b.Property<string>("픽업_상세주소")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("pickup_address_detail");
-
-                    b.Property<decimal?>("픽업_위도")
-                        .HasColumnType("decimal(65,30)")
-                        .HasColumnName("pickup_latitude");
-
-                    b.Property<decimal?>("하차_경도")
-                        .HasColumnType("decimal(65,30)")
-                        .HasColumnName("dropoff_longitude");
-
-                    b.Property<string>("하차_도로명주소")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("dropoff_address");
-
-                    b.Property<string>("하차_상세주소")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("dropoff_address_detail");
-
-                    b.Property<decimal?>("하차_위도")
-                        .HasColumnType("decimal(65,30)")
-                        .HasColumnName("dropoff_latitude");
-
-                    b.Property<string>("현재추천대상기사Id")
-                        .HasColumnType("longtext")
-                        .HasColumnName("current_recommended_driver_id");
-
-                    b.Property<string>("화주Id")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("shipper_id");
-
-                    b.Property<string>("확정기사Id")
-                        .HasColumnType("longtext")
-                        .HasColumnName("confirmed_driver_id");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("배차_대기");
+                    b.ToTable("기사배차", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.HrEmploymentContractRecord", b =>
@@ -3008,7 +3159,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("배차대기Id", "기사Id", "추천라운드")
                         .IsUnique();
 
-                    b.ToTable("배차추천_알림_Outbox");
+                    b.ToTable("배차추천_알림_Outbox", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.사용자Command기능설정", b =>
@@ -3360,7 +3511,7 @@ namespace Hongdal.Migrations
                     b.ToTable("업체");
                 });
 
-            modelBuilder.Entity("홍달.도메인.운송.배송_운송", b =>
+            modelBuilder.Entity("홍달.도메인.운송.운송원장", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3373,9 +3524,43 @@ namespace Hongdal.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
+                    b.Property<DateTime?>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("timestamp(6)")
+                        .HasColumnName("row_version");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
+
+                    b.Property<int>("계획배차시도횟수")
+                        .HasColumnType("int")
+                        .HasColumnName("plan_attempts");
+
+                    b.Property<DateTime?>("공개전환시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("public_transition_at");
+
+                    b.Property<bool?>("공동구매기사세대배송여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("group_purchase_driver_unit_distribution");
+
+                    b.Property<string>("공동구매도착지유형코드")
+                        .HasColumnType("longtext")
+                        .HasColumnName("group_purchase_destination_type_code");
+
+                    b.Property<string>("공동구매분배책임코드")
+                        .HasColumnType("longtext")
+                        .HasColumnName("group_purchase_distribution_responsibility_code");
+
+                    b.Property<int?>("공동구매세대배송건수")
+                        .HasColumnType("int")
+                        .HasColumnName("group_purchase_unit_delivery_count");
+
+                    b.Property<string>("공동구매세대배송방식코드")
+                        .HasColumnType("longtext")
+                        .HasColumnName("group_purchase_unit_distribution_mode_code");
 
                     b.Property<string>("기사_운송자")
                         .IsRequired()
@@ -3391,10 +3576,26 @@ namespace Hongdal.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("도착지");
 
+                    b.Property<string>("마지막거절기사Id")
+                        .HasColumnType("longtext")
+                        .HasColumnName("last_rejected_driver_id");
+
                     b.Property<string>("메모")
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("메모");
+
+                    b.Property<int>("배차노출상태")
+                        .HasColumnType("int")
+                        .HasColumnName("exposure_state");
+
+                    b.Property<int>("배차업무유형")
+                        .HasColumnType("int")
+                        .HasColumnName("business_type");
+
+                    b.Property<int>("배차큐단계")
+                        .HasColumnType("int")
+                        .HasColumnName("queue_stage");
 
                     b.Property<string>("상태")
                         .IsRequired()
@@ -3410,10 +3611,37 @@ namespace Hongdal.Migrations
                         .HasColumnType("decimal(65,30)")
                         .HasColumnName("운임");
 
+                    b.Property<string>("원본의뢰Id")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("source_request_id");
+
+                    b.Property<string>("원본의뢰유형")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("source_type");
+
+                    b.Property<string>("의뢰Id")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("request_id");
+
                     b.Property<string>("첨부_json")
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("첨부_json");
+
+                    b.Property<int>("추천라운드")
+                        .HasColumnType("int")
+                        .HasColumnName("recommendation_round");
+
+                    b.Property<DateTime?>("추천만료시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("recommendation_expires_at");
+
+                    b.Property<DateTime?>("추천시작시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("recommendation_started_at");
 
                     b.Property<DateTime?>("출발_픽업")
                         .HasColumnType("datetime(6)")
@@ -3424,9 +3652,79 @@ namespace Hongdal.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("출발지");
 
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
+
+                    b.Property<decimal?>("픽업_경도")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("pickup_longitude");
+
+                    b.Property<string>("픽업_도로명주소")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("pickup_address");
+
+                    b.Property<string>("픽업_상세주소")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("pickup_address_detail");
+
+                    b.Property<decimal?>("픽업_위도")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("pickup_latitude");
+
+                    b.Property<decimal?>("하차_경도")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("dropoff_longitude");
+
+                    b.Property<string>("하차_도로명주소")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("dropoff_address");
+
+                    b.Property<string>("하차_상세주소")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("dropoff_address_detail");
+
+                    b.Property<decimal?>("하차_위도")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("dropoff_latitude");
+
+                    b.Property<string>("현재추천대상기사Id")
+                        .HasColumnType("longtext")
+                        .HasColumnName("current_recommended_driver_id");
+
+                    b.Property<string>("화주Id")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("shipper_id");
+
+                    b.Property<string>("확정기사Id")
+                        .HasColumnType("longtext")
+                        .HasColumnName("confirmed_driver_id");
+
                     b.HasKey("Id");
 
-                    b.ToTable("배송_운송");
+                    b.HasIndex("커뮤니티원장Id");
+
+                    b.ToTable("운송실행투영", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.운송.운송의뢰상품연결", b =>
@@ -3460,7 +3758,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("운송의뢰Id", "입고상품Id");
 
-                    b.ToTable("운송의뢰상품연결");
+                    b.ToTable("운송의뢰상품연결", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.운송.운송이벤트", b =>
@@ -3493,7 +3791,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("운송이벤트");
+                    b.ToTable("운송이벤트", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.운송.운임구성", b =>
@@ -3544,7 +3842,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("운임구성");
+                    b.ToTable("운임구성", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.운송.차량단가", b =>
@@ -3591,7 +3889,259 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("차량단가");
+                    b.ToTable("차량단가", (string)null);
+                });
+
+            modelBuilder.Entity("홍달.도메인.음식.음식주문", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("결제수단")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("결제수단");
+
+                    b.Property<long?>("배차대기Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("배차대기_id");
+
+                    b.Property<string>("배차상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("배차상태");
+
+                    b.Property<DateTime?>("배차요청시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("배차요청시각_utc");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("상태");
+
+                    b.Property<string>("수락메모")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("수락메모");
+
+                    b.Property<string>("수령요청사항")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("수령요청사항");
+
+                    b.Property<string>("수령인명")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("수령인명");
+
+                    b.Property<string>("수령인연락처")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("수령인연락처");
+
+                    b.Property<string>("수령지상세주소")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("수령지상세주소");
+
+                    b.Property<string>("수령지주소")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("수령지주소");
+
+                    b.Property<long>("음식점Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("음식점_id");
+
+                    b.Property<decimal?>("음식점경도")
+                        .HasColumnType("decimal(18,10)")
+                        .HasColumnName("음식점경도");
+
+                    b.Property<string>("음식점명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("음식점명");
+
+                    b.Property<string>("음식점상세주소")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("음식점상세주소");
+
+                    b.Property<DateTime?>("음식점수락시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("음식점수락시각_utc");
+
+                    b.Property<decimal?>("음식점위도")
+                        .HasColumnType("decimal(18,10)")
+                        .HasColumnName("음식점위도");
+
+                    b.Property<string>("음식점주소")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("음식점주소");
+
+                    b.Property<DateTime?>("조리예상완료시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("조리예상완료시각_utc");
+
+                    b.Property<string>("주문번호")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("주문번호");
+
+                    b.Property<string>("주문자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("주문자_user_id");
+
+                    b.Property<bool>("주문자본인수령여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("주문자본인수령여부");
+
+                    b.Property<decimal>("총주문금액")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("총주문금액");
+
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("배차대기Id");
+
+                    b.HasIndex("주문번호")
+                        .IsUnique();
+
+                    b.HasIndex("커뮤니티원장Id");
+
+                    b.HasIndex("음식점Id", "상태", "CreatedAt");
+
+                    b.HasIndex("주문자UserId", "상태", "CreatedAt");
+
+                    b.ToTable("음식주문", (string)null);
+                });
+
+            modelBuilder.Entity("홍달.도메인.음식.음식주문상태이력", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("다음상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("다음상태");
+
+                    b.Property<string>("사유")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("사유");
+
+                    b.Property<long>("음식주문Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("음식주문_id");
+
+                    b.Property<string>("이전상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("이전상태");
+
+                    b.Property<DateTime>("전이시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("전이시각_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("음식주문Id", "전이시각Utc");
+
+                    b.ToTable("음식주문상태이력", (string)null);
+                });
+
+            modelBuilder.Entity("홍달.도메인.음식.음식주문상품", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("단가")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("단가");
+
+                    b.Property<string>("상품명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("상품명");
+
+                    b.Property<int>("수량")
+                        .HasColumnType("int")
+                        .HasColumnName("수량");
+
+                    b.Property<long>("음식주문Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("음식주문_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("상품명");
+
+                    b.HasIndex("음식주문Id");
+
+                    b.ToTable("음식주문상품", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.정산.PlatformProfitReturnPolicyRecord", b =>
@@ -4075,6 +4625,25 @@ namespace Hongdal.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("창고_id");
 
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
+
                     b.Property<bool>("통관필요여부")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("통관필요여부");
@@ -4090,6 +4659,8 @@ namespace Hongdal.Migrations
                         .HasColumnName("판매자_user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("커뮤니티원장Id");
 
                     b.HasIndex("창고Id", "소유자UserId", "상태");
 
@@ -4244,6 +4815,25 @@ namespace Hongdal.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("출고예정_id");
 
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
+
                     b.Property<bool>("통관필요여부")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("통관필요여부");
@@ -4261,6 +4851,8 @@ namespace Hongdal.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("출고예정Id");
+
+                    b.HasIndex("커뮤니티원장Id");
 
                     b.HasIndex("입고흐름유형", "자동생성여부");
 
@@ -4570,6 +5162,111 @@ namespace Hongdal.Migrations
                     b.ToTable("창고사용자");
                 });
 
+            modelBuilder.Entity("홍달.도메인.창고.출고묶음", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("상태")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("상태");
+
+                    b.Property<string>("운송의뢰Id")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("운송의뢰_id");
+
+                    b.Property<string>("주문자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("주문자_user_id");
+
+                    b.Property<string>("주문참조번호")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("주문참조번호");
+
+                    b.Property<string>("출고묶음번호")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("출고묶음번호");
+
+                    b.Property<DateTime?>("출고완료일시")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("출고완료일시");
+
+                    b.Property<long>("출고창고Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("출고창고_id");
+
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
+
+                    b.Property<string>("판매자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("판매자_user_id");
+
+                    b.Property<DateTime?>("포장완료일시")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("포장완료일시");
+
+                    b.Property<DateTime?>("피킹시작일시")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("피킹시작일시");
+
+                    b.Property<DateTime?>("피킹완료일시")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("피킹완료일시");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("운송의뢰Id");
+
+                    b.HasIndex("출고묶음번호")
+                        .IsUnique();
+
+                    b.HasIndex("커뮤니티원장Id");
+
+                    b.HasIndex("출고창고Id", "상태", "CreatedAt");
+
+                    b.ToTable("출고묶음", (string)null);
+                });
+
             modelBuilder.Entity("홍달.도메인.창고.출고예정", b =>
                 {
                     b.Property<long>("Id")
@@ -4638,6 +5335,10 @@ namespace Hongdal.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("주문참조번호");
 
+                    b.Property<long?>("출고묶음Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("출고묶음_id");
+
                     b.Property<long>("출고창고Id")
                         .HasColumnType("bigint")
                         .HasColumnName("출고창고_id");
@@ -4645,6 +5346,25 @@ namespace Hongdal.Migrations
                     b.Property<DateTime?>("출고처리일시")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("출고처리일시");
+
+                    b.Property<string>("커뮤니티원장Id")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_id");
+
+                    b.Property<DateTime?>("커뮤니티원장동기화시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("community_ledger_synced_at_utc");
+
+                    b.Property<string>("커뮤니티원장상태")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("community_ledger_state");
+
+                    b.Property<string>("커뮤니티원장템플릿Key")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("community_ledger_template_key");
 
                     b.Property<long?>("판매상품Id")
                         .HasColumnType("bigint")
@@ -4659,6 +5379,10 @@ namespace Hongdal.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("입고요청Id");
+
+                    b.HasIndex("출고묶음Id");
+
+                    b.HasIndex("커뮤니티원장Id");
 
                     b.HasIndex("주문Id", "판매자UserId");
 
@@ -5874,7 +6598,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("의뢰Id");
 
-                    b.ToTable("화물요구조건");
+                    b.ToTable("화물요구조건", (string)null);
                 });
 
             modelBuilder.Entity("홍달.도메인.화주.화주운송의뢰", b =>
@@ -6150,7 +6874,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("shipper_requests");
+                    b.ToTable("shipper_requests", (string)null);
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAttachment", b =>
@@ -6195,6 +6919,26 @@ namespace Hongdal.Migrations
                         .IsRequired();
 
                     b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.커뮤니티원장블록관계투영", b =>
+                {
+                    b.HasOne("Hongdal.Domain.Community.커뮤니티원장블록투영", "FromBlock")
+                        .WithMany("출력관계목록")
+                        .HasForeignKey("FromBlockProjectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Hongdal.Domain.Community.커뮤니티원장블록투영", "ToBlock")
+                        .WithMany("입력관계목록")
+                        .HasForeignKey("ToBlockProjectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_ledger_block_relation_projections_community_ledge~1");
+
+                    b.Navigation("FromBlock");
+
+                    b.Navigation("ToBlock");
                 });
 
             modelBuilder.Entity("Hongdal.Domain.HsCodes.HsCodeClassificationCase", b =>
@@ -6301,6 +7045,17 @@ namespace Hongdal.Migrations
                     b.Navigation("콘텐츠");
                 });
 
+            modelBuilder.Entity("홍달.도메인.마트.마트주문상품", b =>
+                {
+                    b.HasOne("홍달.도메인.마트.마트주문", "마트주문")
+                        .WithMany("상품목록")
+                        .HasForeignKey("마트주문Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("마트주문");
+                });
+
             modelBuilder.Entity("홍달.도메인.사용자.HrPayrollScheduleRecord", b =>
                 {
                     b.HasOne("홍달.도메인.사용자.HrEmploymentContractRecord", "Contract")
@@ -6321,6 +7076,28 @@ namespace Hongdal.Migrations
                         .IsRequired();
 
                     b.Navigation("참여자");
+                });
+
+            modelBuilder.Entity("홍달.도메인.음식.음식주문상태이력", b =>
+                {
+                    b.HasOne("홍달.도메인.음식.음식주문", "음식주문")
+                        .WithMany("상태이력")
+                        .HasForeignKey("음식주문Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("음식주문");
+                });
+
+            modelBuilder.Entity("홍달.도메인.음식.음식주문상품", b =>
+                {
+                    b.HasOne("홍달.도메인.음식.음식주문", "음식주문")
+                        .WithMany("상품목록")
+                        .HasForeignKey("음식주문Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("음식주문");
                 });
 
             modelBuilder.Entity("홍달.도메인.정산.PlatformProfitReturnScheduleRecord", b =>
@@ -6348,6 +7125,13 @@ namespace Hongdal.Migrations
                     b.Navigation("Comments");
                 });
 
+            modelBuilder.Entity("Hongdal.Domain.Community.커뮤니티원장블록투영", b =>
+                {
+                    b.Navigation("입력관계목록");
+
+                    b.Navigation("출력관계목록");
+                });
+
             modelBuilder.Entity("Hongdal.Domain.HsCodes.HsCodeCatalogVersion", b =>
                 {
                     b.Navigation("Entries");
@@ -6358,6 +7142,11 @@ namespace Hongdal.Migrations
                     b.Navigation("RiskTags");
                 });
 
+            modelBuilder.Entity("홍달.도메인.마트.마트주문", b =>
+                {
+                    b.Navigation("상품목록");
+                });
+
             modelBuilder.Entity("홍달.도메인.사용자.HrEmploymentContractRecord", b =>
                 {
                     b.Navigation("PayrollSchedules");
@@ -6366,6 +7155,13 @@ namespace Hongdal.Migrations
             modelBuilder.Entity("홍달.도메인.사용자.홍달참여자", b =>
                 {
                     b.Navigation("역할목록");
+                });
+
+            modelBuilder.Entity("홍달.도메인.음식.음식주문", b =>
+                {
+                    b.Navigation("상태이력");
+
+                    b.Navigation("상품목록");
                 });
 #pragma warning restore 612, 618
         }

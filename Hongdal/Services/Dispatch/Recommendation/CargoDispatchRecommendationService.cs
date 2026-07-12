@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Hongdal.Hubs;
 using 홍달.도메인.공통;
@@ -85,7 +85,7 @@ namespace 홍달.Services.Dispatch.Recommendation
             var fuelPricePerLiter = await ResolveFuelPricePerLiterAsync();
             var fuelEfficiencyKmPerLiter = ResolveFuelEfficiencyKmPerLiter(driver?.차량);
 
-            var items = await _db.배차대기
+            var items = await _db.운송원장
                 .Where(q => q.배차업무유형 == 상태값.배차업무유형.용달운송
                             && q.상태 == 상태값.배차대기상태.대기
                             && q.배차큐단계 == 상태값.배차큐단계.배차추천

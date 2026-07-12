@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using 홍달.도메인.공통;
 using 홍달.도메인.배차;
 
@@ -16,7 +16,7 @@ public sealed partial class 국내화물배차조율적용Service
 
         // 추천 잠금은 메모리 큐가 아니라 DB 원장인 배차대기에 기록한다.
         // 서버가 재시작되면 만료되지 않은 추천중 의뢰는 이 상태를 보고 중복 추천을 막는다.
-        var 배차대기 = await _db.배차대기
+        var 배차대기 = await _db.운송원장
             .FirstOrDefaultAsync(x => x.의뢰Id == 배차제안.의뢰Id, cancellationToken);
         if (배차대기 is null || !국내화물배차후보금지정책.추천잠금가능(배차대기, DateTime.UtcNow))
         {
@@ -24,12 +24,12 @@ public sealed partial class 국내화물배차조율적용Service
             return null;
         }
 
-        var 현재수락운송건수 = await _db.배송_운송
+        var 현재수락운송건수 = await _db.운송원장
             .AsNoTracking()
             .CountAsync(
                 x => x.기사_운송자 == 배차제안.기사Id && x.상태 != "인수완료",
                 cancellationToken);
-        var 현재추천잠금건수 = await _db.배차대기
+        var 현재추천잠금건수 = await _db.운송원장
             .AsNoTracking()
             .CountAsync(
                 x => x.현재추천대상기사Id == 배차제안.기사Id

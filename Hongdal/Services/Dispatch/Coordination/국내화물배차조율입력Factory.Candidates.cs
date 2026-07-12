@@ -9,8 +9,8 @@ namespace 홍달.Services.Dispatch.Coordination;
 
 public sealed partial class 국내화물배차조율입력Factory
 {
-    private static 배차대기[] FilterCandidateQueues(
-        IEnumerable<배차대기> queues,
+    private static 운송원장[] FilterCandidateQueues(
+        IEnumerable<운송원장> queues,
         IReadOnlyDictionary<string, 화주운송의뢰> requestMap,
         DateTime now)
     {
@@ -44,7 +44,7 @@ public sealed partial class 국내화물배차조율입력Factory
     }
 
     private async Task<IReadOnlyList<운송의뢰기사조합평가>> BuildEvaluationsAsync(
-        IReadOnlyList<배차대기> candidateQueues,
+        IReadOnlyList<운송원장> candidateQueues,
         IReadOnlyDictionary<string, 화주운송의뢰> requestMap,
         IReadOnlyDictionary<string, 화물요구조건> cargoMap,
         IReadOnlyList<국내화물운송기사상태Snapshot> candidateDriverStates,

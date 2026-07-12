@@ -92,7 +92,7 @@ public sealed class 문서관리Service : I문서관리Service
         var document = new 운송문서
         {
             의뢰Id = request.의뢰Id.Trim(),
-            배송운송Id = request.배송운송Id,
+            운송원장Id = request.운송원장Id,
             문서코드 = policy.문서코드,
             문서명 = string.IsNullOrWhiteSpace(request.문서명) ? policy.문서명 : request.문서명.Trim(),
             파일명 = request.파일명.Trim(),
@@ -201,7 +201,7 @@ public sealed class 문서관리Service : I문서관리Service
         {
             Id = entity.Id,
             의뢰Id = entity.의뢰Id,
-            배송운송Id = entity.배송운송Id,
+            운송원장Id = entity.운송원장Id,
             문서코드 = entity.문서코드,
             문서명 = entity.문서명,
             파일명 = entity.파일명,
