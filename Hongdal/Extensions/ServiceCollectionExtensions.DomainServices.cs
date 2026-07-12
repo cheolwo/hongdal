@@ -77,6 +77,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I배차대기원장전환Service, 배차대기원장전환Service>();
         services.AddScoped<I배차실행인덱스예열Service, 배차실행인덱스예열Service>();
         services.AddScoped<I피킹포장작업투영Service, 피킹포장작업투영Service>();
+        services.AddScoped<I알뜰살뜰마트배차대기Service, 알뜰살뜰마트배차대기Service>();
         services.AddScoped<I배차추천알림Service, 배차추천알림Service>();
         services.AddScoped<I상차접근알림Service, 상차접근알림Service>();
         services.AddScoped<ICommand알림Outbox발송Service, Command알림Outbox발송Service>();

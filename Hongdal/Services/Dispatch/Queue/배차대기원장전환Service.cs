@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Hongdal;
 using 홍달.도메인.공통;
 using 홍달.도메인.배차;
+using 홍달.Services.Dispatch.Engine;
 using 홍달.Services.Dispatch.Notification;
 
 namespace 홍달.Services.Dispatch.Queue
@@ -17,19 +18,22 @@ namespace 홍달.Services.Dispatch.Queue
         private readonly I배차추천후보선정Service _candidateSelectionService;
         private readonly I배차추천알림Service _recommendationNotificationService;
         private readonly I국내화물운송기사상태Service _국내화물운송기사상태Service;
+        private readonly I음식배달배차흐름Resolver _음식배달배차흐름Resolver;
 
         public 배차대기원장전환Service(
             HongdalContext db,
             IOptions<배차큐정책Options> options,
             I배차추천후보선정Service candidateSelectionService,
             I배차추천알림Service recommendationNotificationService,
-            I국내화물운송기사상태Service 국내화물운송기사상태Service)
+            I국내화물운송기사상태Service 국내화물운송기사상태Service,
+            I음식배달배차흐름Resolver 음식배달배차흐름Resolver)
         {
             _db = db;
             _options = options.Value;
             _candidateSelectionService = candidateSelectionService;
             _recommendationNotificationService = recommendationNotificationService;
             _국내화물운송기사상태Service = 국내화물운송기사상태Service;
+            _음식배달배차흐름Resolver = 음식배달배차흐름Resolver;
         }
 
         public async Task<배차대기원장전환결과> 계획배차에서추천으로전환Async(string requestId, CancellationToken cancellationToken = default)
@@ -43,6 +47,11 @@ namespace 홍달.Services.Dispatch.Queue
             if (queue.상태 != 상태값.배차대기상태.대기)
             {
                 return 대기상태아님(queue);
+            }
+
+            if (창고선행작업대기이면전환안됨(queue) is { } blocked)
+            {
+                return blocked;
             }
 
             queue.배차큐단계 = 상태값.배차큐단계.배차추천;
@@ -68,6 +77,11 @@ namespace 홍달.Services.Dispatch.Queue
                 return 대기상태아님(queue);
             }
 
+            if (창고선행작업대기이면전환안됨(queue) is { } blocked)
+            {
+                return blocked;
+            }
+
             if (queue.배차큐단계 != 상태값.배차큐단계.배차추천 || queue.배차노출상태 != 상태값.배차노출상태.추천대기)
             {
                 return 전환안됨(
@@ -90,6 +104,11 @@ namespace 홍달.Services.Dispatch.Queue
             if (queue.상태 != 상태값.배차대기상태.대기)
             {
                 return 대기상태아님(queue, driverId);
+            }
+
+            if (창고선행작업대기이면전환안됨(queue, driverId) is { } blocked)
+            {
+                return blocked;
             }
 
             return await 시작Async(queue, driverId, timeoutSeconds, cancellationToken);
@@ -263,5 +282,24 @@ namespace 홍달.Services.Dispatch.Queue
             return await 추천거절후다음후보로진행Async(queue, driverId, cancellationToken);
         }
 
+        private 배차대기원장전환결과? 창고선행작업대기이면전환안됨(운송원장 queue, string? driverId = null)
+        {
+            if (queue.배차업무유형 != 상태값.배차업무유형.음식배달)
+            {
+                return null;
+            }
+
+            var flow = _음식배달배차흐름Resolver.Resolve(queue);
+            if (flow.배차시작가능)
+            {
+                return null;
+            }
+
+            return 전환안됨(
+                queue,
+                배차대기원장전환결과코드.창고선행작업대기,
+                flow.배차시작조건,
+                driverId);
+        }
     }
 }

@@ -43,5 +43,6 @@ namespace 홍달.Services.Dispatch.Queue
         public const string 확정됨 = "확정됨";
         public const string 후보없음 = "후보없음";
         public const string 수락취소됨 = "수락취소됨";
+        public const string 창고선행작업대기 = "창고선행작업대기";
     }
 }

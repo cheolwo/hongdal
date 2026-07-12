@@ -63,6 +63,32 @@ public sealed class 운송의뢰배차원천분류ServiceTests
         Assert.True(result.창고선행작업필요);
     }
 
+    [Theory]
+    [InlineData(운송의뢰배차원천유형.홍달마트주문)]
+    [InlineData(운송의뢰배차원천유형.홍달마트음식주문)]
+    public void 홍달마트주문은_포장완료전_음식배달배차를_시작하지_않는다(string sourceType)
+    {
+        var resolver = new 음식배달배차흐름Resolver();
+
+        var result = resolver.Resolve(CreateQueue(상태값.배차업무유형.음식배달, sourceType));
+
+        Assert.True(result.창고선행작업필요);
+        Assert.False(result.배차시작가능);
+        Assert.Contains("포장 완료 전", result.배차시작조건);
+    }
+
+    [Fact]
+    public void 홍달마트포장완료주문은_음식배달배차를_시작할_수_있다()
+    {
+        var resolver = new 음식배달배차흐름Resolver();
+
+        var result = resolver.Resolve(CreateQueue(상태값.배차업무유형.음식배달, 운송의뢰배차원천유형.홍달마트포장완료주문));
+
+        Assert.True(result.창고선행작업필요);
+        Assert.True(result.배차시작가능);
+        Assert.Equal("알뜰살뜰 마트 포장 완료 배달", result.표시명);
+    }
+
     private static 운송원장 CreateQueue(int businessType, string sourceType)
         => new()
         {

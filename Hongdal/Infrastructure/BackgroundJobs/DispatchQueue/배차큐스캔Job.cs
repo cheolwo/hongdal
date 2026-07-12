@@ -2,6 +2,7 @@
 using Quartz;
 using 홍달.Data;
 using 홍달.도메인.공통;
+using 홍달.Services.Dispatch.Engine;
 using 홍달.Services.Dispatch.Queue;
 
 namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
@@ -37,7 +38,9 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
             var plannedIds = await _db.운송원장.AsNoTracking()
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
                             && x.배차큐단계 == 상태값.배차큐단계.계획배차
-                            && x.배차노출상태 == 상태값.배차노출상태.계획대기)
+                            && x.배차노출상태 == 상태값.배차노출상태.계획대기
+                            && x.원본의뢰유형 != 운송의뢰배차원천유형.홍달마트주문
+                            && x.원본의뢰유형 != 운송의뢰배차원천유형.홍달마트음식주문)
                 .OrderBy(x => x.CreatedAt)
                 .Select(x => x.의뢰Id)
                 .Take(_options.처리배치크기)
@@ -52,7 +55,9 @@ namespace 홍달.Infrastructure.BackgroundJobs.DispatchQueue
                 .Where(x => x.상태 == 상태값.배차대기상태.대기
                             && x.배차큐단계 == 상태값.배차큐단계.배차추천
                             && x.배차노출상태 == 상태값.배차노출상태.추천대기
-                            && x.현재추천대상기사Id == null)
+                            && x.현재추천대상기사Id == null
+                            && x.원본의뢰유형 != 운송의뢰배차원천유형.홍달마트주문
+                            && x.원본의뢰유형 != 운송의뢰배차원천유형.홍달마트음식주문)
                 .OrderBy(x => x.UpdatedAt)
                 .Select(x => x.의뢰Id)
                 .Take(_options.처리배치크기)

@@ -1,0 +1,359 @@
+using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Warehouse;
+using Hongdal.Services.Community;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using 홍달.Data;
+using 홍달.도메인.공통;
+using 홍달.도메인.창고;
+using 홍달.Services.Dispatch.Engine;
+using 홍달.Services.Dispatch.Queue;
+
+namespace Hongdal.Services.LogisticsProcessing.Warehouse;
+
+public interface I알뜰살뜰마트배차대기Service
+{
+    Task<IReadOnlyList<알뜰살뜰마트배차대기생성결과>> 입고상품포장완료반영Async(
+        long 입고상품Id,
+        string updatedBy,
+        CancellationToken cancellationToken = default);
+
+    Task<알뜰살뜰마트배차대기생성결과> 주문포장완료후배차대기생성Async(
+        string 주문참조번호,
+        string updatedBy,
+        CancellationToken cancellationToken = default);
+}
+
+public sealed class 알뜰살뜰마트배차대기Service : I알뜰살뜰마트배차대기Service
+{
+    private readonly HongdalContext _db;
+    private readonly I운송의뢰배차대기Service _dispatchQueueService;
+    private readonly I운송원장Mongo동기화Service _transportLedgerSync;
+    private readonly I음식마트원장Mongo동기화Service _foodMartLedgerSync;
+    private readonly ILogger<알뜰살뜰마트배차대기Service> _logger;
+
+    public 알뜰살뜰마트배차대기Service(
+        HongdalContext db,
+        I운송의뢰배차대기Service dispatchQueueService,
+        I운송원장Mongo동기화Service transportLedgerSync,
+        I음식마트원장Mongo동기화Service foodMartLedgerSync,
+        ILogger<알뜰살뜰마트배차대기Service> logger)
+    {
+        _db = db;
+        _dispatchQueueService = dispatchQueueService;
+        _transportLedgerSync = transportLedgerSync;
+        _foodMartLedgerSync = foodMartLedgerSync;
+        _logger = logger;
+    }
+
+    public async Task<IReadOnlyList<알뜰살뜰마트배차대기생성결과>> 입고상품포장완료반영Async(
+        long 입고상품Id,
+        string updatedBy,
+        CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        var 포장작업목록 = await _db.피킹포장작업
+            .Where(x => x.입고상품Id == 입고상품Id && x.작업유형 == 피킹포장작업유형.포장)
+            .ToListAsync(cancellationToken);
+
+        foreach (var 작업 in 포장작업목록)
+        {
+            작업.상태 = 피킹포장작업상태.완료;
+            작업.시작일시Utc ??= now;
+            작업.완료일시Utc = now;
+            작업.UpdatedAt = now;
+        }
+
+        var 주문참조번호목록 = 포장작업목록
+            .Select(x => x.주문참조번호)
+            .Concat(await _db.출고예정
+                .AsNoTracking()
+                .Where(x => x.입고상품Id == 입고상품Id)
+                .Select(x => x.주문참조번호)
+                .ToListAsync(cancellationToken))
+            .Select(Clean)
+            .Where(x => x is not null)
+            .Cast<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        if (포장작업목록.Count > 0)
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+
+        var results = new List<알뜰살뜰마트배차대기생성결과>();
+        foreach (var 주문참조번호 in 주문참조번호목록)
+        {
+            results.Add(await 주문포장완료후배차대기생성Async(주문참조번호, updatedBy, cancellationToken));
+        }
+
+        return results;
+    }
+
+    public async Task<알뜰살뜰마트배차대기생성결과> 주문포장완료후배차대기생성Async(
+        string 주문참조번호,
+        string updatedBy,
+        CancellationToken cancellationToken = default)
+    {
+        var orderRef = Clean(주문참조번호);
+        if (orderRef is null)
+        {
+            return 알뜰살뜰마트배차대기생성결과.보류(
+                string.Empty,
+                알뜰살뜰마트배차대기결과코드.주문참조번호없음,
+                "주문참조번호가 없어 마트 배차대기를 만들지 않았습니다.");
+        }
+
+        var 출고목록 = await _db.출고예정
+            .Where(x => x.주문참조번호 == orderRef)
+            .OrderBy(x => x.Id)
+            .ToListAsync(cancellationToken);
+
+        if (출고목록.Count == 0)
+        {
+            return 알뜰살뜰마트배차대기생성결과.보류(
+                orderRef,
+                알뜰살뜰마트배차대기결과코드.출고예정없음,
+                "마트 주문에 연결된 출고예정이 없어 배차대기를 만들지 않았습니다.");
+        }
+
+        if (!await 포장완료여부Async(orderRef, 출고목록, cancellationToken))
+        {
+            return 알뜰살뜰마트배차대기생성결과.보류(
+                orderRef,
+                알뜰살뜰마트배차대기결과코드.포장대기,
+                "포장 완료 전이라 음식 배달 배차대기를 만들지 않았습니다.");
+        }
+
+        var target = await BuildDispatchTargetAsync(orderRef, 출고목록, cancellationToken);
+        var queue = await _dispatchQueueService.생성또는조회Async(
+            target,
+            new 운송의뢰배차대기생성옵션
+            {
+                의뢰Id = orderRef,
+                화주Id = target.판매자UserId,
+                배차업무유형 = 상태값.배차업무유형.음식배달,
+                원본의뢰유형 = 운송의뢰배차원천유형.홍달마트포장완료주문,
+                원본의뢰Id = orderRef,
+                상태 = 상태값.배차대기상태.대기
+            },
+            cancellationToken);
+
+        var now = DateTime.UtcNow;
+        foreach (var 출고 in 출고목록)
+        {
+            출고.운송의뢰Id = queue.의뢰Id;
+            if (출고.상태 != 출고상태.출고완료)
+            {
+                출고.상태 = 출고상태.준비중;
+            }
+
+            출고.UpdatedAt = now;
+        }
+
+        var 마트주문 = await _db.마트주문
+            .Include(x => x.상품목록)
+            .FirstOrDefaultAsync(x => x.주문참조번호 == orderRef, cancellationToken);
+
+        if (마트주문 is not null)
+        {
+            마트주문.상태 = "포장 완료";
+            마트주문.현재단계 = "배차대기";
+            마트주문.UpdatedAt = now;
+
+            foreach (var 상품 in 마트주문.상품목록)
+            {
+                상품.상태 = "포장 완료";
+                상품.UpdatedAt = now;
+            }
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+        await _transportLedgerSync.운송실행투영동기화Async(queue, updatedBy, cancellationToken);
+        await 출고원장동기화Async(출고목록, updatedBy, cancellationToken);
+
+        return 알뜰살뜰마트배차대기생성결과.생성됨(
+            orderRef,
+            queue.Id,
+            queue.의뢰Id,
+            "포장 완료 뒤 HongdalMartPackedOrder 배차대기를 생성하거나 갱신했습니다.");
+    }
+
+    private async Task<bool> 포장완료여부Async(
+        string 주문참조번호,
+        IReadOnlyList<출고예정> 출고목록,
+        CancellationToken cancellationToken)
+    {
+        var 포장작업목록 = await _db.피킹포장작업
+            .AsNoTracking()
+            .Where(x => x.주문참조번호 == 주문참조번호 && x.작업유형 == 피킹포장작업유형.포장)
+            .ToListAsync(cancellationToken);
+
+        if (포장작업목록.Count > 0)
+        {
+            return 포장작업목록.All(x => x.상태 == 피킹포장작업상태.완료);
+        }
+
+        var 출고묶음목록 = await _db.출고묶음
+            .AsNoTracking()
+            .Where(x => x.주문참조번호 == 주문참조번호)
+            .ToListAsync(cancellationToken);
+
+        if (출고묶음목록.Count > 0)
+        {
+            return 출고묶음목록.All(x => x.포장완료일시.HasValue || x.상태 == 출고상태.출고완료);
+        }
+
+        var 입고상품Ids = 출고목록
+            .Select(x => x.입고상품Id)
+            .Where(x => x.HasValue)
+            .Select(x => x!.Value)
+            .Distinct()
+            .ToArray();
+
+        if (입고상품Ids.Length > 0)
+        {
+            var 포장된입고상품수 = await _db.입고상품
+                .AsNoTracking()
+                .Where(x => 입고상품Ids.Contains(x.Id) && x.상태.StartsWith("포장완료"))
+                .CountAsync(cancellationToken);
+
+            return 포장된입고상품수 == 입고상품Ids.Length;
+        }
+
+        return 출고목록.All(x => x.상태 == 출고상태.출고완료);
+    }
+
+    private async Task<출고예정운송대상> BuildDispatchTargetAsync(
+        string 주문참조번호,
+        IReadOnlyList<출고예정> 출고목록,
+        CancellationToken cancellationToken)
+    {
+        var first = 출고목록[0];
+        var warehouse = await _db.창고
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == first.출고창고Id, cancellationToken);
+
+        var foodOrder = await _db.음식주문
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.주문번호 == 주문참조번호, cancellationToken);
+
+        return new 출고예정운송대상
+        {
+            원천유형 = 출고예정운송대상원천유형.음식주문,
+            원천참조번호 = 주문참조번호,
+            운송의뢰Id = 주문참조번호,
+            표시명 = string.Join(", ", 출고목록.Select(x => $"{x.상품명} {x.수량}")),
+            출고예정Id = 출고목록.Count == 1 ? first.Id : null,
+            판매자UserId = first.판매자UserId,
+            주문자UserId = first.주문자UserId,
+            상차주소 = Clean(warehouse?.주소) ?? $"창고:{first.출고창고Id}",
+            상차위도 = warehouse?.위도,
+            상차경도 = warehouse?.경도,
+            하차주소 = Clean(foodOrder?.수령지주소) ?? $"주문자:{first.주문자UserId}",
+            하차위도 = null,
+            하차경도 = null,
+            온도조건 = ResolveTemperatureBand(출고목록),
+            파손주의 = false,
+            Lines = 출고목록.Select(x => new 출고예정운송대상라인
+            {
+                LineKey = x.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                InboundProductId = x.입고상품Id,
+                SalesProductId = x.판매상품Id,
+                Sku = x.SKU,
+                ProductName = x.상품명,
+                Quantity = x.수량
+            }).ToArray()
+        };
+    }
+
+    private async Task 출고원장동기화Async(
+        IReadOnlyList<출고예정> 출고목록,
+        string updatedBy,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var 입고요청Ids = 출고목록
+                .Select(x => x.입고요청Id)
+                .Where(x => x.HasValue)
+                .Select(x => x!.Value)
+                .Distinct()
+                .ToArray();
+            IReadOnlyList<입고요청> 입고목록 = 입고요청Ids.Length == 0
+                ? []
+                : await _db.입고요청
+                    .AsNoTracking()
+                    .Where(x => 입고요청Ids.Contains(x.Id))
+                    .ToListAsync(cancellationToken);
+
+            await _foodMartLedgerSync.출고원장동기화Async(
+                출고목록,
+                입고목록,
+                updatedBy,
+                현재단계Key: "배차대기",
+                원장템플릿Key: CommunityLedgerTemplateKeys.HongdalMart,
+                cancellationToken);
+        }
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            var orderRef = 출고목록.Select(x => x.주문참조번호).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            _logger.LogWarning(ex, "알뜰살뜰 마트 포장 완료 후 출고 원장 동기화에 실패했습니다. 주문참조번호={주문참조번호}", orderRef);
+        }
+    }
+
+    private static string ResolveTemperatureBand(IReadOnlyList<출고예정> 출고목록)
+    {
+        var joined = string.Join(" ", 출고목록.Select(x => $"{x.상품명} {x.SKU}"));
+        if (ContainsAny(joined, "냉동", "frozen"))
+        {
+            return "냉동";
+        }
+
+        if (ContainsAny(joined, "냉장", "chilled", "fresh"))
+        {
+            return "냉장";
+        }
+
+        return "상온";
+    }
+
+    private static bool ContainsAny(string? source, params string[] terms)
+        => !string.IsNullOrWhiteSpace(source)
+           && terms.Any(term => source.Contains(term, StringComparison.OrdinalIgnoreCase));
+
+    private static string? Clean(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+}
+
+public sealed record 알뜰살뜰마트배차대기생성결과(
+    bool 생성또는조회됨,
+    bool 포장완료,
+    string 결과코드,
+    string 메시지,
+    string 주문참조번호,
+    long? 배차대기Id = null,
+    string? 의뢰Id = null)
+{
+    public static 알뜰살뜰마트배차대기생성결과 생성됨(string 주문참조번호, long 배차대기Id, string 의뢰Id, string 메시지)
+        => new(
+            true,
+            true,
+            알뜰살뜰마트배차대기결과코드.생성또는조회됨,
+            메시지,
+            주문참조번호,
+            배차대기Id,
+            의뢰Id);
+
+    public static 알뜰살뜰마트배차대기생성결과 보류(string 주문참조번호, string 결과코드, string 메시지)
+        => new(false, false, 결과코드, 메시지, 주문참조번호);
+}
+
+public static class 알뜰살뜰마트배차대기결과코드
+{
+    public const string 생성또는조회됨 = "생성또는조회됨";
+    public const string 주문참조번호없음 = "주문참조번호없음";
+    public const string 출고예정없음 = "출고예정없음";
+    public const string 포장대기 = "포장대기";
+}
