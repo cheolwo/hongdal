@@ -86,7 +86,7 @@ Initial ledger-to-OS routing:
 | Cargo transport ledger | Domestic cargo transport OS | Transport request dispatch engine |
 | Food order ledger | Food delivery OS | Food delivery dispatch engine |
 | Food delivery ledger | Food delivery OS | Food delivery dispatch engine, transport request dispatch engine |
-| HongdalMart instant-delivery ledger | HongdalMart urban logistics OS | Picking batch engine, food delivery dispatch engine, transport request dispatch engine |
+| HongdalMart delivery ledger | HongdalMart urban logistics OS | Picking batch engine, food delivery dispatch engine, transport request dispatch engine |
 | Warehouse outbound ledger | Warehouse-commerce fulfillment OS | Outbound batch engine, picking batch engine, transport request dispatch engine |
 | Warehouse inbound ledger | Warehouse-commerce fulfillment OS | Community activity signal engine first, then warehouse workflow policy |
 | Local sale ledger | Warehouse-commerce fulfillment OS | Outbound batch engine, transport request dispatch engine |
@@ -110,12 +110,45 @@ Supported starter ledger templates:
 - Cargo transport ledger: requester, carrier, pickup confirmer, receiver, settlement confirmer
 - Food order ledger: orderer, seller, cook, handoff person, receiver
 - Food delivery ledger: delivery requester, pickup handler, deliverer, receiver confirmer, settlement confirmer
-- HongdalMart instant-delivery ledger: orderer, mart picker, packer, deliverer, receiver confirmer
+- HongdalMart delivery ledger: orderer, mart picker, packer, deliverer, receiver confirmer
 - Warehouse outbound ledger: outbound requester, picker, inspector, packer, carrier
 - Warehouse inbound ledger: inbound requester, supplier, inbound inspector, storage handler, close confirmer
 - Local sale ledger: seller, buyer, handoff person, confirmer, settlement confirmer
 - Group purchase ledger: recruiter, participant, buyer, distributor, settlement confirmer
 - Errand or generic life-request ledger: requester, performer, confirmer, participant, closer
+
+## Priority Ledger Modules
+
+The first implementation should organize ledgers as modules before adding more screens. This lets the system understand relationships between ledgers and then derive block-to-block relationships inside each ledger.
+
+Priority modules:
+
+| Priority | Module | Main template | Reason |
+| ---: | --- | --- | --- |
+| 1 | 커뮤니티 대화 원장 | Errand or generic life-request ledger | Community is the intake surface. Loose posts, questions, and recruitment should stay lightweight until they become work. |
+| 2 | 원함-원장 판단 원장 | Errand or generic life-request ledger | A wish should be classified before the platform opens a work ledger. |
+| 3 | 운송의뢰 원장 | Cargo transport ledger | Pickup, dropoff, cargo condition, and settlement condition form the transport request. |
+| 4 | 운송진행 원장 | Cargo transport ledger | Dispatch acceptance, pickup, dropoff, evidence, and receiver confirmation need state history. |
+| 5 | 창고출고 원장 | Warehouse outbound ledger | Outbound items, stock basis, picking, inspection, packing, and handoff need a shared work record. |
+| 6 | 피킹/포장 원장 | Warehouse outbound or HongdalMart delivery ledger | Field work should be trackable independently from the broader order or outbound ledger. |
+| 7 | 마트주문 원장 | HongdalMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
+| 8 | 마트 배송 원장 | HongdalMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
+| 9 | 결제/정산 표시 원장 | Cargo transport or related work ledger | Payment marks, counterpart confirmation, holds, and notes should remain participant-centered. |
+| 10 | 신고/분쟁 원장 | Errand or generic life-request ledger | Reports and disputes should not pollute ordinary workflow state, but they must remain linked. |
+
+Representative ledger relationships:
+
+| From | To | Relation | Cardinality | Trigger |
+| --- | --- | --- | --- | --- |
+| 커뮤니티 대화 원장 | 원함-원장 판단 원장 | Handoff | `1:N` | A conversation starts to look like executable work. |
+| 원함-원장 판단 원장 | 운송의뢰 원장 | Handoff | `1:N` | Pickup, dropoff, and cargo conditions are present. |
+| 운송의뢰 원장 | 운송진행 원장 | Flow | `1:1` | Dispatch is confirmed. |
+| 창고출고 원장 | 피킹/포장 원장 | Contains | `1:N` | Outbound items become picking or packing tasks. |
+| 피킹/포장 원장 | 운송의뢰 원장 | Handoff | `1:N` | Packed items need external movement. |
+| 마트주문 원장 | 피킹/포장 원장 | Requires | `1:N` | Mart order and urban stock are confirmed. |
+| 피킹/포장 원장 | 마트 배송 원장 | Handoff | `N:1` | Packed mart orders can be bundled into one delivery run. |
+| 마트 배송 원장 | 결제/정산 표시 원장 | Reference | `1:1` | Delivery or receiver confirmation is complete. |
+| 운송진행 원장 | 신고/분쟁 원장 | Reference | `1:N` | Delay, damage, disagreement, or issue report appears. |
 
 The template roles are defaults only. Participants should be able to rename, add, remove, and reassign roles. By default, a normal user should be able to participate across roles when the ledger context makes it reasonable. A role is therefore a visible participation label and work-context hint, not a hard authorization boundary.
 
@@ -138,7 +171,7 @@ The classifier response should include:
 - related composition rule codes and processing surface hints;
 - a human-review flag when top candidates are too close or the shape is too weak.
 
-This keeps AI in the interpretation layer. The AI may say that a draft looks like a HongdalMart instant-delivery flow, a warehouse outbound flow, a cargo transport flow, or only a loose community request. It should not directly create relational work records, award experience, or call operational APIs until the ledger is confirmed and handed to the proper OS/API boundary.
+This keeps AI in the interpretation layer. The AI may say that a draft looks like a HongdalMart delivery flow with an immediate-delivery attribute, a warehouse outbound flow, a cargo transport flow, or only a loose community request. It should not directly create relational work records, award experience, or call operational APIs until the ledger is confirmed and handed to the proper OS/API boundary.
 
 The system should reason about action hints such as state change, evidence attachment, payment marking, completion confirmation, participant invitation, and ledger closing separately from the visible role name. These action hints can guide UI layout and audit messages, but they should not prevent ordinary participation merely because the user picked a different role label.
 
@@ -254,6 +287,16 @@ Relational DB records should be projections or linked work entities, not the fle
 Every relational projection should keep a reverse link such as `CommunityLedgerId` or a domain-specific equivalent. This lets MongoDB preserve the full community-ledger shape while the relational DB keeps the stable data needed for transactional workflows, indexed queries, authorization, settlement, and reporting.
 
 The OS handoff remains conceptual and scheduling-oriented. In code, the handoff can be an HTTP API call, a controller/use-case boundary, a message, or an internal application service call. The ledger template should therefore record both the target OS scheduler and the practical processing surfaces that currently exist.
+
+현재 구현 기준은 다음과 같이 둔다.
+
+- MongoDB `community_ledgers` 컬렉션은 커뮤니티 원장의 원본이다. 블록 목록, 참여자, 다이어그램 스냅샷, 유연 속성은 이 문서에 남긴다.
+- MySQL `community_ledger_block_projections` 테이블은 원장 블록을 조회 가능한 도메인 엔티티 투영으로 보관한다.
+- MySQL `community_ledger_block_relation_projections` 테이블은 블록 간 관계를 보관한다. 관계 값은 `Flow`, `Contains`, `Requires`, `Handoff`, `Reference`를 기본으로 보고, 관계 수는 `1:1`, `1:N`, `N:1`, `N:M`으로 정규화한다.
+- EF `IEntityTypeConfiguration`은 블록과 관계 투영의 테이블명, 인덱스, self-reference 관계를 명시한다. 이 관계는 Mongo 원장 원본을 대체하지 않고, 조회와 규칙 판단을 빠르게 하기 위한 RDB 투영이다.
+- `I커뮤니티원장블록관계투영Service`는 Mongo 원장 DTO를 RDB 투영으로 갱신하는 경계다. `투영갱신커뮤니티원장저장소`는 Mongo 저장 성공 뒤 별도 scope에서 이 서비스를 호출한다. 원본 저장소가 직접 `HongdalContext`를 만지지 않게 해서 원본 저장 책임과 투영 갱신 책임을 분리한다.
+
+For Hongdal 1.0 domestic cargo transport, `transport:{화주운송의뢰Id}` in MongoDB is the transport ledger source. The relational table formerly treated as `운송원장` should be read as `운송실행투영`: a dispatch and driver-progress projection used for queue scans, recommendations, admin lists, event joins, file/POD links, and indexed authorization checks. A shipper request or driver state transition should upsert the Mongo ledger first-class shape, while the RDB projection keeps only stable execution fields and reverse references needed by SQL workflows.
 
 ## Best Ledger Pattern Sharing
 

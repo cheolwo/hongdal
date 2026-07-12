@@ -147,7 +147,9 @@
 | created_at | DateTime | Date | Y | now |
 | updated_at | DateTime | Date | Y | now |
 
-## 3.6 `배차_대기`
+## 3.6 배차 대기 필드 (`운송원장` 통합)
+
+`배차_대기`는 별도 테이블로 유지하지 않고 `운송원장`에 통합한다. 아래 필드는 운송원장이 배차 대기, 추천 잠금, 공개배차, 확정 상태를 처리할 때 쓰는 확장 필드다.
 
 | 컬럼명 | C# 타입 | Notion 타입 권장 | 필수 | 기본값 |
 |---|---|---|---|---|
@@ -163,6 +165,16 @@
 | dropoff_latitude | decimal? | Number | N | null |
 | dropoff_longitude | decimal? | Number | N | null |
 | status | string | Select | Y | 대기 |
+| business_type | int | Select/Number | Y | 용달운송 |
+| source_type | string | Select/Text | Y | "" |
+| source_request_id | string | Text | Y | "" |
+| queue_stage | int | Select/Number | Y | 계획배차 |
+| exposure_state | int | Select/Number | Y | 계획대기 |
+| current_recommended_driver_id | string? | Text | N | null |
+| recommendation_started_at | DateTime? | Date | N | null |
+| recommendation_expires_at | DateTime? | Date | N | null |
+| recommendation_round | int | Number | Y | 0 |
+| confirmed_driver_id | string? | Text | N | null |
 | created_at | DateTime | Date | Y | now |
 | updated_at | DateTime | Date | Y | now |
 
@@ -196,7 +208,7 @@
 | created_at | DateTime | Date | Y | now |
 | updated_at | DateTime | Date | Y | now |
 
-## 3.8 `배송_운송`
+## 3.8 `운송원장`
 
 | 컬럼명 | C# 타입 | Notion 타입 권장 | 필수 | 기본값 |
 |---|---|---|---|---|
