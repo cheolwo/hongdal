@@ -14,6 +14,7 @@ using 홍달.Services.Payments;
 using 홍달.Services.Sales;
 using 홍달.Services.Versioning;
 using Hongdal.Services.Auth;
+using Hongdal.Services.Community;
 using Hongdal.Services.Food;
 using Hongdal.Services.Orderer;
 
@@ -36,7 +37,10 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
+        services.AddSingleton<I커뮤니티원장저장소, Mongo커뮤니티원장저장소>();
+        services.AddSingleton<I커뮤니티대화저장소, Mongo커뮤니티대화저장소>();
         services.AddScoped<I인증UseCase, 인증UseCase>();
+        services.AddScoped<I커뮤니티대화UseCase, 커뮤니티대화UseCase>();
         services.AddScoped<I공동구매자동집단화UseCase, 공동구매자동집단화UseCase>();
         services.AddScoped<I공동구매커머스이행계획UseCase, 공동구매커머스이행계획UseCase>();
         services.AddScoped<I공동구매해외선적통관동기화Service, 공동구매해외선적통관동기화Service>();

@@ -140,7 +140,9 @@ builder.Services
                 var accessToken = context.Request.Query["access_token"];
                 var path = context.HttpContext.Request.Path;
 
-                if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/hubs/dispatch-recommendations"))
+                if (!string.IsNullOrWhiteSpace(accessToken) &&
+                    (path.StartsWithSegments("/hubs/dispatch-recommendations") ||
+                     path.StartsWithSegments(DiagramCollaborationHub.HubPath)))
                 {
                     context.Token = accessToken;
                 }
@@ -271,6 +273,7 @@ app.UseMiddleware<사용자행위로그Middleware>();
 app.MapControllers();
 app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
 app.MapHub<RestaurantOrderHub>("/hubs/restaurant-orders");
+app.MapHub<DiagramCollaborationHub>(DiagramCollaborationHub.HubPath);
 
 app.Run();
 

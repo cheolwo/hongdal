@@ -50,6 +50,9 @@ public static class ShipperServiceCollectionExtensions
     private static IServiceCollection AddShipperOptions(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<ClientDataModeOptions>(configuration.GetSection(ClientDataModeOptions.SectionName));
+        services.Configure<ClientDataModeOptions>(ApplyClientDataModeEnvironmentOverrides);
+        services.Configure<ShipperSmokeOptions>(configuration.GetSection(ShipperSmokeOptions.SectionName));
+        services.Configure<ShipperSmokeOptions>(ApplyShipperSmokeEnvironmentOverrides);
         services.Configure<CoupangWingOptions>(configuration.GetSection(CoupangWingOptions.SectionName));
         services.Configure<NaverCommerceOptions>(configuration.GetSection(NaverCommerceOptions.SectionName));
 
@@ -62,7 +65,8 @@ public static class ShipperServiceCollectionExtensions
         services.AddSingleton<SampleShipperOperationsService>();
         services.AddScoped<FakeShipperPaymentService>();
         services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
-        services.AddScoped<IShipperOperationsService, ServerBackedShipperOperationsService>();
+        services.AddScoped<ServerBackedShipperOperationsService>();
+        services.AddScoped<IShipperOperationsService, SmokeAwareShipperOperationsService>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<IAuthSession, AuthSession>();
@@ -89,6 +93,31 @@ public static class ShipperServiceCollectionExtensions
         services.AddSingleton<IAppEventHandler<ShipperRequestAddedEvent>, ShipperRequestAddedEventHandler>();
 
         return services;
+    }
+
+    private static void ApplyClientDataModeEnvironmentOverrides(ClientDataModeOptions options)
+    {
+        ApplyBooleanEnvironmentOverride("ClientDataMode__AllowSampleFallback", value => options.AllowSampleFallback = value);
+        ApplyBooleanEnvironmentOverride("ClientDataMode__AllowDevelopmentSnapshotFallback", value => options.AllowDevelopmentSnapshotFallback = value);
+        ApplyBooleanEnvironmentOverride("ClientDataMode__RequireServerLedgerForV1Smoke", value => options.RequireServerLedgerForV1Smoke = value);
+    }
+
+    private static void ApplyShipperSmokeEnvironmentOverrides(ShipperSmokeOptions options)
+    {
+        var startPath = Environment.GetEnvironmentVariable("ShipperSmoke__StartPath");
+        if (!string.IsNullOrWhiteSpace(startPath))
+        {
+            options.StartPath = startPath;
+        }
+    }
+
+    private static void ApplyBooleanEnvironmentOverride(string name, Action<bool> apply)
+    {
+        var rawValue = Environment.GetEnvironmentVariable(name);
+        if (bool.TryParse(rawValue, out var value))
+        {
+            apply(value);
+        }
     }
 
     private static IServiceCollection AddShipperWarehouseServices(this IServiceCollection services)

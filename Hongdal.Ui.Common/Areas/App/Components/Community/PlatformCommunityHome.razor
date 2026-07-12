@@ -1,6 +1,7 @@
 @namespace Hongdal.Ui.Common.Areas.App.Components.Community
 @implements IDisposable
 @using System.Globalization
+@using Hongdal.Contracts.Common.Community
 @using Hongdal.Contracts.Common.Inbound
 @using Hongdal.Contracts.Common.Versioning
 @using Hongdal.Contracts.Common.Warehouse
@@ -465,6 +466,130 @@
                             </MudStack>
                         </aside>
                     }
+                    @if (다이어그램대화방패널열림)
+                    {
+                        <aside class="platform-diagram-room-panel"
+                               role="dialog"
+                               aria-label="다이어그램 대화방"
+                               @onclick:stopPropagation="true"
+                               @onpointerdown:stopPropagation="true"
+                               @onpointerup:stopPropagation="true">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="1">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.subtitle2">다이어그램 대화방</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@다이어그램대화방이름</MudText>
+                                    </MudStack>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                                   Size="Size.Small"
+                                                   Color="Color.Default"
+                                                   OnClick="다이어그램대화방패널닫기"
+                                                   aria-label="다이어그램 대화방 닫기" />
+                                </MudStack>
+                                <div class="platform-diagram-room-status">
+                                    <span>
+                                        <MudIcon Icon="@Icons.Material.Filled.WifiTethering" Size="Size.Small" />
+                                        @다이어그램대화방연결라벨
+                                    </span>
+                                    <strong>@DiagramCollaborationHubPath</strong>
+                                </div>
+                                <div class="platform-diagram-room-meta-grid">
+                                    <div>
+                                        <span>원장</span>
+                                        <strong>@SelectedLedgerTemplate.DisplayName</strong>
+                                    </div>
+                                    <div>
+                                        <span>현재 원장</span>
+                                        <strong>@다이어그램대화방현재원장라벨</strong>
+                                    </div>
+                                    <div>
+                                        <span>방 ID</span>
+                                        <strong>@다이어그램대화방Id</strong>
+                                    </div>
+                                </div>
+                                <div @ref="다이어그램대화방FeedElement"
+                                     class="platform-diagram-room-feed"
+                                     aria-label="다이어그램 대화방 메시지">
+                                    @if (다이어그램대화방이력로딩중)
+                                    {
+                                        <div class="platform-diagram-room-loading">
+                                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Secondary" />
+                                            <span>이전 대화를 불러오는 중</span>
+                                        </div>
+                                    }
+                                    @foreach (var message in 다이어그램대화방표시메시지목록)
+                                    {
+                                        <div class="@다이어그램대화방메시지클래스(message)">
+                                            @if (!message.IsMine && !message.IsSystem)
+                                            {
+                                                <span class="platform-diagram-room-avatar"
+                                                      style="@다이어그램대화방아이콘Style(message.SenderUserId)"
+                                                      title="@message.SenderDisplayName">
+                                                    @다이어그램대화방아이콘텍스트(message.SenderDisplayName)
+                                                </span>
+                                            }
+                                            <div class="platform-diagram-room-bubble">
+                                                <span class="platform-diagram-room-message-meta">
+                                                    @다이어그램대화방메시지작성자라벨(message)
+                                                    <small>@다이어그램대화방시각라벨(message.SentAt)</small>
+                                                </span>
+                                                <strong>@message.Message</strong>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(다이어그램대화방알림문구))
+                                {
+                                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                                        @다이어그램대화방알림문구
+                                    </MudAlert>
+                                }
+                                <div class="platform-diagram-room-composer">
+                                    <MudTextField T="string"
+                                                  Value="@다이어그램대화방메시지입력"
+                                                  ValueChanged="@((string value) => 다이어그램대화방메시지입력 = value)"
+                                                  Placeholder="메시지를 입력하세요"
+                                                  Immediate="true"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense"
+                                                  Lines="2"
+                                                  aria-label="다이어그램 대화방 메시지 입력" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Send"
+                                                   Color="Color.Primary"
+                                                   Disabled="@(!다이어그램대화방메시지전송가능)"
+                                                   OnClick="다이어그램대화방메시지전송Async"
+                                                   aria-label="다이어그램 대화방 메시지 전송" />
+                                </div>
+                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               StartIcon="@Icons.Material.Filled.Send"
+                                               OnClick="@(() => 다이어그램대화방공유상태표시(flowNodes, diagramEdges))">
+                                        현재 다이어그램 공유
+                                    </MudButton>
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Secondary"
+                                               Size="Size.Small"
+                                               StartIcon="@Icons.Material.Filled.OpenInNew"
+                                               Disabled="@(선택흐름노드 is null)"
+                                               OnClick="NavigateToNodeDetailPage">
+                                        업무 화면 열기
+                                    </MudButton>
+                                </MudStack>
+                            </MudStack>
+                        </aside>
+                    }
+                    <button type="button"
+                            class="platform-diagram-room-fab"
+                            title="다이어그램 대화방"
+                            aria-label="다이어그램 대화방"
+                            @onclick="다이어그램대화방패널토글Async"
+                            @onclick:stopPropagation="true"
+                            @onpointerdown:stopPropagation="true"
+                            @onpointerup:stopPropagation="true">
+                        <MudIcon Icon="@Icons.Material.Filled.Forum" Size="Size.Medium" />
+                    </button>
                     <button type="button"
                             class="platform-diagram-community-fab"
                             title="다이어그램으로 커뮤니티 글쓰기"
@@ -723,7 +848,14 @@
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                         <MudStack Spacing="2">
                             <MudText Typo="Typo.subtitle1">개설된 게시판</MudText>
-                            @if (approvedBoards.Count == 0)
+                            @if (isBoardLoading && approvedBoards.Count == 0)
+                            {
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">게시판 목록을 불러오는 중입니다.</MudText>
+                                </MudStack>
+                            }
+                            else if (approvedBoards.Count == 0)
                             {
                                 <MudText Typo="Typo.body2" Color="Color.Secondary">아직 승인된 추가 게시판이 없습니다.</MudText>
                             }
@@ -773,7 +905,14 @@
                         <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                             <MudStack Spacing="2">
                                 <MudText Typo="Typo.subtitle1">게시판 승인 대기</MudText>
-                                @if (pendingBoardRequests.Count == 0)
+                                @if (isBoardLoading && pendingBoardRequests.Count == 0)
+                                {
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">승인 대기 목록을 확인하는 중입니다.</MudText>
+                                    </MudStack>
+                                }
+                                else if (pendingBoardRequests.Count == 0)
                                 {
                                     <MudText Typo="Typo.body2" Color="Color.Secondary">승인 대기 중인 게시판 신청이 없습니다.</MudText>
                                 }
@@ -2616,11 +2755,11 @@
         box-shadow: -8px 0 18px rgba(var(--platform-home-accent-rgb), 0.18), 0 0 0 3px rgba(var(--platform-home-accent-rgb), 0.16);
     }
 
-    .platform-diagram-community-fab {
+    .platform-diagram-community-fab,
+    .platform-diagram-room-fab {
         appearance: none;
         display: inline-flex;
         position: fixed;
-        right: 24px;
         bottom: 24px;
         z-index: 1202;
         align-items: center;
@@ -2637,12 +2776,201 @@
         transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
     }
 
+    .platform-diagram-community-fab {
+        right: 24px;
+        background: var(--mud-palette-secondary);
+        color: var(--mud-palette-secondary-text);
+    }
+
+    .platform-diagram-room-fab {
+        right: 100px;
+        background: var(--mud-palette-primary);
+        color: var(--mud-palette-primary-text);
+    }
+
     .platform-diagram-community-fab:hover,
-    .platform-diagram-community-fab:focus-visible {
+    .platform-diagram-community-fab:focus-visible,
+    .platform-diagram-room-fab:hover,
+    .platform-diagram-room-fab:focus-visible {
         transform: translateY(-2px);
         filter: brightness(1.03);
         outline: none;
         box-shadow: 0 18px 38px rgba(var(--platform-home-accent-rgb), 0.32), 0 0 0 4px rgba(var(--platform-home-accent-rgb), 0.16);
+    }
+
+    .platform-diagram-room-panel {
+        position: fixed;
+        right: 24px;
+        bottom: 104px;
+        z-index: 1204;
+        width: min(420px, calc(100vw - 48px));
+        max-height: min(620px, calc(100vh - 136px));
+        overflow: auto;
+        padding: 14px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.26);
+        border-radius: 10px;
+        background: var(--platform-home-surface);
+        box-shadow: 0 20px 48px rgba(var(--platform-home-accent-rgb), 0.2);
+    }
+
+    .platform-diagram-room-status {
+        display: grid;
+        gap: 4px;
+        padding: 10px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.16);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--platform-home-surface-soft) 56%, var(--platform-home-surface));
+    }
+
+    .platform-diagram-room-status span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .platform-diagram-room-status strong {
+        color: var(--mud-palette-text-primary);
+        font-size: 0.88rem;
+        overflow-wrap: anywhere;
+    }
+
+    .platform-diagram-room-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .platform-diagram-room-meta-grid div {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+        padding: 8px 10px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.12);
+        border-radius: 8px;
+        background: rgba(var(--platform-home-accent-rgb), 0.04);
+    }
+
+    .platform-diagram-room-meta-grid div:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .platform-diagram-room-meta-grid span {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .platform-diagram-room-meta-grid strong {
+        color: var(--mud-palette-text-primary);
+        font-size: 0.82rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .platform-diagram-room-feed {
+        display: grid;
+        gap: 8px;
+        max-height: 258px;
+        overflow: auto;
+        padding: 2px 4px;
+    }
+
+    .platform-diagram-room-loading {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 34px;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .platform-diagram-room-message {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .platform-diagram-room-message--mine {
+        justify-content: flex-end;
+    }
+
+    .platform-diagram-room-message--system {
+        justify-content: center;
+    }
+
+    .platform-diagram-room-avatar {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: var(--diagram-room-avatar-color, var(--platform-home-accent));
+        color: #fff;
+        font-size: 0.76rem;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(var(--platform-home-accent-rgb), 0.18);
+    }
+
+    .platform-diagram-room-bubble {
+        display: grid;
+        gap: 3px;
+        max-width: min(284px, 82%);
+        min-width: 0;
+        padding: 9px 10px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.12);
+        border-radius: 8px;
+        background: var(--platform-home-surface);
+    }
+
+    .platform-diagram-room-message--mine .platform-diagram-room-bubble {
+        border-color: rgba(var(--platform-home-accent-rgb), 0.28);
+        background: color-mix(in srgb, var(--platform-home-accent) 14%, var(--platform-home-surface));
+    }
+
+    .platform-diagram-room-message--system .platform-diagram-room-bubble {
+        max-width: 100%;
+        border-style: dashed;
+        background: rgba(var(--platform-home-accent-rgb), 0.06);
+        text-align: center;
+    }
+
+    .platform-diagram-room-message-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .platform-diagram-room-message-meta small {
+        font-size: 0.68rem;
+        font-weight: 600;
+    }
+
+    .platform-diagram-room-bubble strong {
+        color: var(--mud-palette-text-primary);
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+    }
+
+    .platform-diagram-room-composer {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 42px;
+        gap: 8px;
+        align-items: center;
+        padding-top: 2px;
     }
 
     .platform-diagram-node-detail-panel {
@@ -3090,6 +3418,7 @@
     private readonly List<string> diagramNodeOrder = [];
     private readonly List<원장블록연결선> customDiagramEdges = [];
     private readonly List<다이어그램창고대행후보> 창고대행후보목록 = [];
+    private readonly List<다이어그램대화방표시메시지> 다이어그램대화방표시메시지목록 = [];
     private readonly Dictionary<string, string> diagramEdgeLabels = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DiagramEdgeStyleKind> diagramEdgeStyles = new(StringComparer.OrdinalIgnoreCase);
     private static readonly IReadOnlyList<DiagramConnectionHandleKind> DiagramConnectionHandles =
@@ -3190,8 +3519,11 @@
     ];
 
     private readonly string recommendationSessionKey = Guid.NewGuid().ToString("N");
+    private readonly string 다이어그램대화방로컬사용자Id = $"local-{Guid.NewGuid():N}";
     private ElementReference diagramCanvasElement;
+    private ElementReference 다이어그램대화방FeedElement;
     private IJSObjectReference? diagramJsModule;
+    private IDiagramCollaborationClientService? 다이어그램대화방Client;
     private string selectedLedgerTemplateKey = CommunityLedgerTemplateKeys.CargoTransport;
     private string? 선택현재원장Id;
     private string? 선택원장블록노드제목;
@@ -3201,6 +3533,7 @@
     private 원장블록노드? nodeDetailPanelNode;
     private 원장블록노드? 창고대행신청노드;
     private bool isDiagramEdgeOptionDockCollapsed = true;
+    private bool 다이어그램대화방패널열림;
     private bool 창고대행후보목록로딩중;
     private bool 창고대행신청제출중;
     private DiagramHandleDrag? activeDiagramHandleDrag;
@@ -3218,21 +3551,32 @@
     private decimal warehouseProxyContractCommissionRate;
     private decimal warehouseProxyContractDailyStorageFee;
     private string 창고대행메모 = string.Empty;
+    private string 다이어그램대화방메시지입력 = string.Empty;
     private string 원함입력 = string.Empty;
     private string 원함조건입력 = string.Empty;
     private CommunityLedgerFlowAnalysisResponse? 원함분석결과;
     private long? editingPostId;
     private bool isLoading = true;
+    private bool isBoardLoading;
+    private bool isApiEndpointMetadataLoading;
     private bool isSaving;
     private bool isSavingBoardRequest;
     private bool isWorkMode;
     private string? statusMessage;
     private string? 창고대행신청알림문구;
     private string? 원장전송결과메시지;
+    private string? 다이어그램대화방알림문구;
+    private string? 연결된다이어그램대화방Id;
+    private string? 다이어그램대화방이력조회완료방Id;
+    private bool 다이어그램대화방입장중;
+    private bool 다이어그램대화방이력로딩중;
+    private bool 다이어그램대화방FeedScroll필요;
     private Severity statusSeverity = Severity.Info;
     private Severity 창고대행신청알림수준 = Severity.Info;
     private Severity 원장전송결과Severity = Severity.Info;
+    private bool isDisposed;
     private const long MaxUploadFileBytes = 5 * 1024 * 1024;
+    private const string DiagramCollaborationHubPath = "/hubs/diagram-collaboration";
 
     private bool IsDiagramMode => DiagramPalette.IsDiagramMode;
 
@@ -3289,6 +3633,293 @@
     private string CurrentModeLabel => IsDiagramMode ? "다이어그램 모드" : isWorkMode ? "업무 모드" : "커뮤니티 모드";
 
     private Color CurrentModeColor => IsDiagramMode ? Color.Secondary : isWorkMode ? Color.Success : Color.Primary;
+
+    private IDiagramCollaborationClientService Diagram대화방Client
+        => 다이어그램대화방Client ??= Services.GetService<IDiagramCollaborationClientService>()
+           ?? NoopDiagramCollaborationClientService.Instance;
+
+    private string 다이어그램대화방Id
+        => $"community:{selectedLedgerTemplateKey}:diagram";
+
+    private string 다이어그램대화방이름
+        => $"{SelectedLedgerTemplate.DisplayName} 대화방";
+
+    private string 다이어그램대화방현재원장라벨
+        => 선택현재원장?.Title ?? "현재 원장 선택 전";
+
+    private string 다이어그램대화방연결라벨
+        => 다이어그램대화방입장중
+            ? "SignalR 연결 중"
+            : Diagram대화방Client.연결됨
+                ? "SignalR 연결됨"
+                : "로컬 미리보기";
+
+    private bool 다이어그램대화방메시지전송가능
+        => !다이어그램대화방입장중 && !다이어그램대화방이력로딩중 && !string.IsNullOrWhiteSpace(다이어그램대화방메시지입력);
+
+    private async Task 다이어그램대화방패널토글Async()
+    {
+        다이어그램대화방패널열림 = !다이어그램대화방패널열림;
+        if (다이어그램대화방패널열림 && string.IsNullOrWhiteSpace(다이어그램대화방알림문구))
+        {
+            다이어그램대화방알림문구 = "대화방을 열었습니다. 메시지 이력과 실시간 연결을 차례로 준비합니다.";
+        }
+
+        if (다이어그램대화방패널열림)
+        {
+            다이어그램대화방기본메시지보장();
+            await InvokeAsync(StateHasChanged);
+            await 다이어그램대화방단계로딩Async();
+        }
+    }
+
+    private void 다이어그램대화방패널닫기()
+    {
+        다이어그램대화방패널열림 = false;
+    }
+
+    private void 다이어그램대화방공유상태표시(
+        IReadOnlyList<원장블록노드> flowNodes,
+        IReadOnlyList<원장블록연결선> diagramEdges)
+    {
+        다이어그램대화방패널열림 = true;
+        다이어그램대화방알림문구 = $"{flowNodes.Count}개 노드와 {diagramEdges.Count}개 연결선이 {다이어그램대화방이름} 공유 payload로 준비되었습니다.";
+        다이어그램대화방메시지추가(new(
+            Guid.NewGuid().ToString("N"),
+            다이어그램대화방로컬사용자Id,
+            "나",
+            $"{flowNodes.Count}개 노드와 {diagramEdges.Count}개 연결선을 공유할 준비가 됐습니다.",
+            DiagramCollaborationMessageKinds.DiagramNote,
+            DateTime.UtcNow,
+            true,
+            false));
+    }
+
+    private async Task 다이어그램대화방입장Async()
+    {
+        if (다이어그램대화방입장중 ||
+            Diagram대화방Client.연결됨 &&
+            string.Equals(연결된다이어그램대화방Id, 다이어그램대화방Id, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        다이어그램대화방입장중 = true;
+        try
+        {
+            var connected = await Diagram대화방Client.방입장Async(new DiagramRoomJoinRequest
+            {
+                RoomId = 다이어그램대화방Id,
+                CommunityId = AppKey,
+                LedgerId = 선택현재원장?.Id,
+                DiagramId = 다이어그램대화방Id,
+                DiagramName = SelectedLedgerTemplate.DisplayName,
+                LedgerTemplateKey = selectedLedgerTemplateKey,
+                WorkContext = new DiagramWorkContextDto
+                {
+                    WorkType = selectedLedgerTemplateKey,
+                    WorkLabel = SelectedLedgerTemplate.DisplayName,
+                    AppKey = AppKey,
+                    PrimaryRoute = "/community",
+                    PrimaryActionLabel = "다이어그램 보기",
+                    Parameters = new Dictionary<string, string>
+                    {
+                        ["ledgerTemplateKey"] = selectedLedgerTemplateKey,
+                        ["roomId"] = 다이어그램대화방Id
+                    }
+                }
+            });
+
+            연결된다이어그램대화방Id = connected ? 다이어그램대화방Id : null;
+        }
+        finally
+        {
+            다이어그램대화방입장중 = false;
+        }
+    }
+
+    private async Task 다이어그램대화방단계로딩Async()
+    {
+        await 다이어그램대화방이력조회Async();
+        await InvokeAsync(StateHasChanged);
+        await 다이어그램대화방입장Async();
+    }
+
+    private async Task 다이어그램대화방이력조회Async()
+    {
+        var roomId = 다이어그램대화방Id;
+        if (string.Equals(다이어그램대화방이력조회완료방Id, roomId, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        다이어그램대화방이력로딩중 = true;
+        다이어그램대화방알림문구 = "저장된 대화 이력을 먼저 불러오고 있습니다.";
+        try
+        {
+            await InvokeAsync(StateHasChanged);
+            var messages = await Diagram대화방Client.메시지목록조회Async(roomId, 40);
+            if (messages.Count > 0)
+            {
+                다이어그램대화방표시메시지목록.Clear();
+                foreach (var message in messages.OrderBy(item => item.SentAtUtc == default ? DateTime.MinValue : item.SentAtUtc))
+                {
+                    다이어그램대화방메시지추가(To다이어그램대화방표시메시지(message));
+                }
+
+                다이어그램대화방알림문구 = $"최근 대화 {messages.Count}개를 먼저 불러왔습니다.";
+            }
+            else
+            {
+                다이어그램대화방알림문구 = "저장된 대화가 아직 없어 로컬 미리보기 메시지를 유지합니다.";
+            }
+
+            다이어그램대화방이력조회완료방Id = roomId;
+        }
+        finally
+        {
+            다이어그램대화방이력로딩중 = false;
+        }
+    }
+
+    private async Task 다이어그램대화방메시지전송Async()
+    {
+        var message = 다이어그램대화방메시지입력.Trim();
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        다이어그램대화방메시지입력 = string.Empty;
+        var sent = await Diagram대화방Client.메시지전송Async(new DiagramChatMessageRequest
+        {
+            RoomId = 다이어그램대화방Id,
+            Message = message,
+            DiagramId = 다이어그램대화방Id,
+            DiagramName = SelectedLedgerTemplate.DisplayName,
+            MessageKind = DiagramCollaborationMessageKinds.Text
+        });
+
+        if (!sent)
+        {
+            다이어그램대화방메시지추가(new(
+                Guid.NewGuid().ToString("N"),
+                다이어그램대화방로컬사용자Id,
+                "나",
+                message,
+                DiagramCollaborationMessageKinds.Text,
+                DateTime.UtcNow,
+                true,
+                false));
+        }
+    }
+
+    private Task Handle다이어그램대화방메시지수신Async(DiagramChatMessageResponse message)
+    {
+        다이어그램대화방메시지추가(To다이어그램대화방표시메시지(message));
+
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private 다이어그램대화방표시메시지 To다이어그램대화방표시메시지(DiagramChatMessageResponse message)
+    {
+        var senderUserId = string.IsNullOrWhiteSpace(message.SenderUserId)
+            ? Guid.NewGuid().ToString("N")
+            : message.SenderUserId.Trim();
+        var currentUserId = Diagram대화방Client.현재사용자Id;
+        var isMine = !string.IsNullOrWhiteSpace(currentUserId) &&
+                     string.Equals(senderUserId, currentUserId, StringComparison.OrdinalIgnoreCase);
+
+        return new(
+            string.IsNullOrWhiteSpace(message.MessageId) ? Guid.NewGuid().ToString("N") : message.MessageId,
+            senderUserId,
+            string.IsNullOrWhiteSpace(message.SenderDisplayName) ? "익명 참여자" : message.SenderDisplayName,
+            message.Message,
+            message.MessageKind,
+            message.SentAtUtc == default ? DateTime.UtcNow : message.SentAtUtc,
+            isMine,
+            string.Equals(message.MessageKind, DiagramCollaborationMessageKinds.System, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private Task Handle다이어그램대화방상태변경Async(string message)
+    {
+        다이어그램대화방알림문구 = message;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private void 다이어그램대화방기본메시지보장()
+    {
+        if (다이어그램대화방표시메시지목록.Count > 0)
+        {
+            return;
+        }
+
+        다이어그램대화방메시지추가(new(
+            "sample-partner-1",
+            "sample-partner-user",
+            "익명 참여자",
+            "다이어그램을 보면서 상차와 하차 증빙 위치를 같이 확인할게요.",
+            DiagramCollaborationMessageKinds.Text,
+            DateTime.UtcNow.AddMinutes(-2),
+            false,
+            false));
+        다이어그램대화방메시지추가(new(
+            "sample-me-1",
+            다이어그램대화방로컬사용자Id,
+            "나",
+            "좋아요. 저는 결제/정산 노드까지 이어지는 흐름을 보고 있습니다.",
+            DiagramCollaborationMessageKinds.Text,
+            DateTime.UtcNow.AddMinutes(-1),
+            true,
+            false));
+    }
+
+    private void 다이어그램대화방메시지추가(다이어그램대화방표시메시지 message)
+    {
+        if (다이어그램대화방표시메시지목록.Any(item => string.Equals(item.Id, message.Id, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        다이어그램대화방표시메시지목록.Add(message);
+        다이어그램대화방FeedScroll필요 = 다이어그램대화방패널열림;
+        if (다이어그램대화방표시메시지목록.Count > 80)
+        {
+            다이어그램대화방표시메시지목록.RemoveRange(0, 다이어그램대화방표시메시지목록.Count - 80);
+        }
+    }
+
+    private static string 다이어그램대화방메시지클래스(다이어그램대화방표시메시지 message)
+    {
+        var mine = message.IsMine ? " platform-diagram-room-message--mine" : string.Empty;
+        var system = message.IsSystem ? " platform-diagram-room-message--system" : string.Empty;
+        return $"platform-diagram-room-message{mine}{system}";
+    }
+
+    private static string 다이어그램대화방메시지작성자라벨(다이어그램대화방표시메시지 message)
+        => message.IsSystem ? "시스템" : message.IsMine ? "나" : message.SenderDisplayName;
+
+    private static string 다이어그램대화방시각라벨(DateTime sentAtUtc)
+    {
+        var local = sentAtUtc.Kind == DateTimeKind.Utc ? sentAtUtc.ToLocalTime() : sentAtUtc;
+        return local.ToString("HH:mm", CultureInfo.CurrentCulture);
+    }
+
+    private static string 다이어그램대화방아이콘텍스트(string displayName)
+    {
+        var text = string.IsNullOrWhiteSpace(displayName) ? "익명" : displayName.Trim();
+        return text.Length <= 2 ? text : text[..1];
+    }
+
+    private static string 다이어그램대화방아이콘Style(string senderUserId)
+    {
+        var colors = new[] { "#2563eb", "#0891b2", "#7c3aed", "#16a34a", "#be123c", "#c2410c" };
+        var hash = string.IsNullOrWhiteSpace(senderUserId)
+            ? 0
+            : senderUserId.Aggregate(0, (current, ch) => unchecked(current * 31 + ch));
+        var index = Math.Abs(hash % colors.Length);
+        return $"--diagram-room-avatar-color: {colors[index]};";
+    }
 
     private static 다이어그램레이어정의? FindDiagramLayer(string key)
         => 다이어그램레이어정의s.FirstOrDefault(layer => string.Equals(layer.Key, key, StringComparison.OrdinalIgnoreCase));
@@ -3365,6 +3996,21 @@
         if (firstRender && ApplyCommunityQueryParameters())
         {
             StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!다이어그램대화방FeedScroll필요)
+        {
+            return;
+        }
+
+        다이어그램대화방FeedScroll필요 = false;
+        var module = await GetDiagramJsModuleAsync();
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("scrollToBottom", 다이어그램대화방FeedElement);
         }
     }
 
@@ -5736,22 +6382,58 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         HomeModeState.Changed += HandleModeChanged;
         DiagramPalette.Changed += HandleDiagramPaletteChanged;
         DiagramPalette.BlockRequested += HandlePaletteBlockRequested;
         DiagramPalette.WorkflowPresetRequested += HandleWorkflowPresetRequested;
+        Diagram대화방Client.메시지수신 += Handle다이어그램대화방메시지수신Async;
+        Diagram대화방Client.상태변경 += Handle다이어그램대화방상태변경Async;
         isWorkMode = HomeModeState.IsWorkMode;
         HandlePaletteBlockRequested();
         HandleWorkflowPresetRequested();
-        await LoadApiEndpointMetadataAsync();
-        await LoadBoardsAsync();
-        await LoadPostsAsync();
+        _ = LoadCommunityDataInStagesAsync();
+        return Task.CompletedTask;
+    }
+
+    private async Task LoadCommunityDataInStagesAsync()
+    {
+        try
+        {
+            await InvokeAsync(StateHasChanged);
+
+            await LoadPostsAsync();
+            if (isDisposed)
+            {
+                return;
+            }
+
+            await InvokeAsync(StateHasChanged);
+
+            await LoadBoardsAsync();
+            if (isDisposed)
+            {
+                return;
+            }
+
+            await InvokeAsync(StateHasChanged);
+
+            await LoadApiEndpointMetadataAsync();
+            if (!isDisposed)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch when (isDisposed)
+        {
+            // 화면이 닫힌 뒤 남은 단계 로딩 결과는 버립니다.
+        }
     }
 
     private async Task LoadApiEndpointMetadataAsync()
     {
+        isApiEndpointMetadataLoading = true;
         try
         {
             var metadata = await CommunityService.GetVersionWorkflowMetadataAsync();
@@ -5767,6 +6449,10 @@
         catch
         {
             // API metadata는 화면 보강 정보입니다. 서버가 꺼져 있어도 원장 초안 입력은 계속 가능해야 합니다.
+        }
+        finally
+        {
+            isApiEndpointMetadataLoading = false;
         }
     }
 
@@ -6247,6 +6933,11 @@
             return "계획 API";
         }
 
+        if (isApiEndpointMetadataLoading)
+        {
+            return "metadata 확인 중";
+        }
+
         return ResolveApiEndpoint(surface) is null ? "metadata 대기" : "기존 API metadata";
     }
 
@@ -6255,6 +6946,11 @@
         if (!surface.IsExistingSurface)
         {
             return Color.Info;
+        }
+
+        if (isApiEndpointMetadataLoading)
+        {
+            return Color.Secondary;
         }
 
         return ResolveApiEndpoint(surface) is null ? Color.Warning : Color.Success;
@@ -6356,15 +7052,27 @@
 
     private void HandleDiagramPaletteChanged()
     {
+        if (!DiagramPalette.IsDiagramMode)
+        {
+            다이어그램대화방패널열림 = false;
+        }
+
         InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
+        isDisposed = true;
         HomeModeState.Changed -= HandleModeChanged;
         DiagramPalette.Changed -= HandleDiagramPaletteChanged;
         DiagramPalette.BlockRequested -= HandlePaletteBlockRequested;
         DiagramPalette.WorkflowPresetRequested -= HandleWorkflowPresetRequested;
+        if (다이어그램대화방Client is not null)
+        {
+            다이어그램대화방Client.메시지수신 -= Handle다이어그램대화방메시지수신Async;
+            다이어그램대화방Client.상태변경 -= Handle다이어그램대화방상태변경Async;
+            _ = 다이어그램대화방Client.연결해제Async();
+        }
     }
 
     private async Task LoadPostsAsync()
@@ -6389,6 +7097,7 @@
 
     private async Task LoadBoardsAsync()
     {
+        isBoardLoading = true;
         try
         {
             var approved = await CommunityService.GetBoardsAsync(AppKey, PlatformCommunityBoardRequestStatuses.Approved);
@@ -6409,6 +7118,10 @@
         catch
         {
             // Board requests are an enhancement; post loading should still work if this API is unavailable.
+        }
+        finally
+        {
+            isBoardLoading = false;
         }
     }
 

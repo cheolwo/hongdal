@@ -245,6 +245,9 @@
     [Parameter]
     public string? RequestId { get; set; }
 
+    [SupplyParameterFromQuery(Name = "openFakePayment")]
+    public bool OpenFakePaymentOnLoad { get; set; }
+
     private ShipperRequestItem? request;
     private FakeShipperPaymentReceipt? fakeReceipt;
     private bool isBusy;
@@ -256,11 +259,13 @@
     private string? message;
     private Severity messageSeverity = Severity.Info;
     private CancellationTokenSource? pollingCts;
+    private string? autoOpenedFakePaymentRequestId;
 
     protected override async Task OnParametersSetAsync()
     {
         EnsureObserverStarted();
         await LoadAsync();
+        TryOpenFakePaymentFromQuery();
     }
 
     private Task LoadAsync() => LoadAsync(showMessage: true);
@@ -348,6 +353,22 @@
         isFakePaymentWindowOpen = true;
     }
 
+    private void TryOpenFakePaymentFromQuery()
+    {
+        if (!OpenFakePaymentOnLoad || request?.CanPay != true)
+        {
+            return;
+        }
+
+        if (string.Equals(autoOpenedFakePaymentRequestId, request.의뢰Id, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        autoOpenedFakePaymentRequestId = request.의뢰Id;
+        OpenFakePaymentWindow();
+    }
+
     private void CloseFakePaymentWindow()
     {
         if (isFakePaymentCompleting)
@@ -382,7 +403,7 @@
         {
             fakeReceipt = await FakePayments.ConfirmAsync(request, plan, fakePaymentMemo);
             messageSeverity = Severity.Success;
-            message = $"{request.의뢰Id} FakePG 결제가 서버 원장에 승인되어 결제 상태를 {request.결제상태}로 반영했습니다.";
+            message = $"{request.의뢰Id} FakePG 결제가 승인되어 결제 상태를 {request.결제상태}로 반영했습니다.";
             isFakePaymentWindowOpen = false;
             await LoadAsync(showMessage: false);
         }

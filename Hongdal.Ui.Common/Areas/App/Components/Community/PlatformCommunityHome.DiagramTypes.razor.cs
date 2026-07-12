@@ -105,6 +105,16 @@ public partial class PlatformCommunityHome
         string Reason,
         bool IsReportBoardPost);
 
+    private sealed record 다이어그램대화방표시메시지(
+        string Id,
+        string SenderUserId,
+        string SenderDisplayName,
+        string Message,
+        string MessageKind,
+        DateTime SentAt,
+        bool IsMine,
+        bool IsSystem);
+
     private sealed record 다이어그램창고대행후보(
         string Key,
         long? WarehouseId,

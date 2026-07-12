@@ -1,8 +1,10 @@
 using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure;
 using Hongdal.Contracts.Common.Payments;
 using Hongdal.Contracts.Shipper.Payment;
+using Microsoft.Extensions.Options;
 using ShipperApp.Models.Shipper;
 
 namespace ShipperApp.Services;
@@ -14,11 +16,16 @@ public sealed class FakeShipperPaymentService
     private readonly ConcurrentDictionary<string, FakeShipperPaymentReceipt> _receipts = new(StringComparer.OrdinalIgnoreCase);
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly IOptions<ClientDataModeOptions> _dataModeOptions;
 
-    public FakeShipperPaymentService(HttpClient httpClient, IAuthSession authSession)
+    public FakeShipperPaymentService(
+        HttpClient httpClient,
+        IAuthSession authSession,
+        IOptions<ClientDataModeOptions> dataModeOptions)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _dataModeOptions = dataModeOptions;
     }
 
     public FakeShipperPaymentReceipt? GetReceipt(string? requestId)
@@ -53,12 +60,22 @@ public sealed class FakeShipperPaymentService
             IdempotencyKey = $"shipper-fake-{request.의뢰Id}-{plan.OrderId}"
         };
 
+        if (string.IsNullOrWhiteSpace(_authSession.AccessToken) && CanUseLocalFakePayment())
+        {
+            return CreateLocalSmokeReceipt(request, plan, memo);
+        }
+
         using var httpRequest = CreateAuthorizedRequest(HttpMethod.Post, "api/v1/payments/fake/confirm");
         httpRequest.Content = JsonContent.Create(payload);
 
         using var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
+            if (CanUseLocalFakePayment())
+            {
+                return CreateLocalSmokeReceipt(request, plan, memo);
+            }
+
             throw new InvalidOperationException(await BuildFailureMessageAsync(response, cancellationToken));
         }
 
@@ -80,8 +97,7 @@ public sealed class FakeShipperPaymentService
             ApprovedAt: ToLocalTime(result.승인일시Utc),
             PayerMemo: string.IsNullOrWhiteSpace(memo) ? null : memo.Trim());
 
-        _receipts[request.의뢰Id] = receipt;
-        ApplyReceipt(request, receipt);
+        StoreReceipt(request, receipt);
         return receipt;
     }
 
@@ -108,6 +124,36 @@ public sealed class FakeShipperPaymentService
         request.결제수단 = receipt.PaymentMethodText;
         request.결제예정금액 ??= receipt.Amount;
     }
+
+    private FakeShipperPaymentReceipt CreateLocalSmokeReceipt(ShipperRequestItem request, PaymentRequestPlan plan, string? memo)
+    {
+        var receipt = new FakeShipperPaymentReceipt(
+            ReceiptId: $"smoke-fakepg-{Guid.NewGuid():N}",
+            RequestId: request.의뢰Id,
+            OrderId: plan.OrderId,
+            Amount: plan.Draft.Amount,
+            Currency: plan.Draft.Currency,
+            PaymentMethod: plan.Draft.PaymentMethod,
+            PaymentMethodText: ToPaymentMethodText(plan.Draft.PaymentMethod),
+            SettlementMode: plan.Draft.SettlementMode,
+            SettlementModeText: ToSettlementModeText(plan.Draft.SettlementMode),
+            PaymentStatus: SecuredStatus,
+            ProviderTransactionKey: $"smoke-local-{plan.OrderId}",
+            ApprovedAt: DateTimeOffset.Now,
+            PayerMemo: string.IsNullOrWhiteSpace(memo) ? null : memo.Trim());
+
+        StoreReceipt(request, receipt);
+        return receipt;
+    }
+
+    private void StoreReceipt(ShipperRequestItem request, FakeShipperPaymentReceipt receipt)
+    {
+        _receipts[request.의뢰Id] = receipt;
+        ApplyReceipt(request, receipt);
+    }
+
+    private bool CanUseLocalFakePayment()
+        => _dataModeOptions.Value.CanUseSampleFallback;
 
     private HttpRequestMessage CreateAuthorizedRequest(HttpMethod method, string path)
     {

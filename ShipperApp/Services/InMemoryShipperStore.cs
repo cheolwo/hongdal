@@ -429,6 +429,28 @@ public sealed class InMemoryShipperStore
             생성일시 = DateTime.Now.AddHours(-1),
             픽업지 = "인천 연수구",
             하차지 = "서울 송파구"
+        },
+        new ShipperRequestItem
+        {
+            의뢰Id = "SHP-SMOKE-PAY",
+            의뢰상태 = "진행중",
+            결제상태 = "결제대기",
+            배차상태 = "상차완료",
+            정산상태 = "입금대기",
+            운송방식 = "냉동운송",
+            차량종류 = "냉동탑차",
+            결제수단 = "카드",
+            결제예정금액 = 420000,
+            예상거리Km = 31m,
+            기준운임 = 317500,
+            기사지급예정운임 = 240000,
+            알선단계 = 1,
+            재알선금지 = true,
+            정책위반 = false,
+            재알선의심 = false,
+            생성일시 = DateTime.Now.AddMinutes(-30),
+            픽업지 = "인천 연수구",
+            하차지 = "서울 송파구"
         }
     };
 

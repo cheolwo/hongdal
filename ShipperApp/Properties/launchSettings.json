@@ -3,6 +3,16 @@
     "Windows Machine": {
       "commandName": "Project",
       "nativeDebugging": false
+    },
+    "Shipper Smoke Demo": {
+      "commandName": "Project",
+      "nativeDebugging": false,
+      "environmentVariables": {
+        "ClientDataMode__AllowSampleFallback": "true",
+        "ClientDataMode__AllowDevelopmentSnapshotFallback": "true",
+        "ClientDataMode__RequireServerLedgerForV1Smoke": "false",
+        "ShipperSmoke__StartPath": "/shipper/request/SHP-SMOKE-PAY?openFakePayment=true"
+      }
     }
   }
 }

@@ -44,6 +44,14 @@ function findNearestConnectionHandle(clientX, clientY) {
   return nearestDistance <= 24 ? nearest : null;
 }
 
+export function scrollToBottom(element) {
+  if (!element) {
+    return;
+  }
+
+  element.scrollTop = element.scrollHeight;
+}
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
