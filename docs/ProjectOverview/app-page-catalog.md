@@ -1,4 +1,4 @@
-# 앱별 전체 페이지 카탈로그
+﻿# 앱별 전체 페이지 카탈로그
 
 이 문서는 홍달 저장소 안의 앱 프로젝트에 선언된 `@page` 라우트를 앱별로 모은 전체 페이지 카탈로그다. [홍달 1.0 필수 페이지 기준](hongdal-v1-required-pages.md)이 1.0 워크플로우를 닫기 위한 최소 화면만 다룬다면, 이 문서는 실제 앱에 노출된 화면 전체를 보고 어디를 수정해야 하는지 찾기 위한 색인이다.
 
@@ -24,7 +24,7 @@
 | `ShipperApp` | 24 | 화주, 판매자, 물류 의뢰자 | 운송 의뢰, 창고/입고, 판매채널, 통관/해외 물류 |
 | `DriverApp` | 23 | 기사 | 운행 시작, 추천, 수락/거절, 상차/하차, 정산, 알림 |
 | `HongdalAdmin` | 41 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
-| `WarehouseManagerApp` | 12 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 홍달마트 창고 |
+| `WarehouseManagerApp` | 12 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 알뜰살뜰 마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
 | `HumanResourcesManagerApp` | 1 | 인사/고용 담당자 | 인사 관리 홈 |
@@ -152,9 +152,9 @@
 | `WarehouseManagerApp-P03 - 입고 검수` | `/work/inbound/inspection` | `WarehouseManagerApp/Components/Pages/InboundInspection.razor` | 확장 | 입고 검수 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P03.png" alt="WarehouseManagerApp-P03" width="160"> |
 | `WarehouseManagerApp-P03-1 - 입고 상품 스캔` | `/work/inbound/products` | `WarehouseManagerApp/Components/Pages/InboundProductScan.razor` | 확장 | 입고 상품 스캔 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P03-1.png" alt="WarehouseManagerApp-P03-1" width="160"> |
 | `WarehouseManagerApp-P04 - 피킹 배치 작업` | `/work/picking-batch` | `WarehouseManagerApp/Components/Pages/PickingBatchWorkspace.razor` | 확장 | 피킹 배치 작업 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P04.png" alt="WarehouseManagerApp-P04" width="160"> |
-| `WarehouseManagerApp-P05 - 홍달마트 창고 홈` | `/mart` | `WarehouseManagerApp/Components/Pages/MartHome.razor` | 확장 | 홍달마트 창고 홈 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05.png" alt="WarehouseManagerApp-P05" width="160"> |
-| `WarehouseManagerApp-P05-1 - 홍달마트 작업 보드` | `/mart/work-board` | `WarehouseManagerApp/Components/Pages/MartWorkBoard.razor` | 확장 | 홍달마트 작업 보드 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05-1.png" alt="WarehouseManagerApp-P05-1" width="160"> |
-| `WarehouseManagerApp-P05-2 - 홍달마트 프로세스별 작업 시작` | `/mart/work/{ProcessCode}` | `WarehouseManagerApp/Components/Pages/MartWorkStart.razor` | 확장 | 홍달마트 프로세스별 작업 시작 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05-2.png" alt="WarehouseManagerApp-P05-2" width="160"> |
+| `WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈` | `/mart` | `WarehouseManagerApp/Components/Pages/MartHome.razor` | 확장 | 알뜰살뜰 마트 창고 홈 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05.png" alt="WarehouseManagerApp-P05" width="160"> |
+| `WarehouseManagerApp-P05-1 - 알뜰살뜰 마트 작업 보드` | `/mart/work-board` | `WarehouseManagerApp/Components/Pages/MartWorkBoard.razor` | 확장 | 알뜰살뜰 마트 작업 보드 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05-1.png" alt="WarehouseManagerApp-P05-1" width="160"> |
+| `WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작` | `/mart/work/{ProcessCode}` | `WarehouseManagerApp/Components/Pages/MartWorkStart.razor` | 확장 | 알뜰살뜰 마트 프로세스별 작업 시작 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05-2.png" alt="WarehouseManagerApp-P05-2" width="160"> |
 | `WarehouseManagerApp-P99 - 미발견 페이지` | `/not-found` | `WarehouseManagerApp/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P99.png" alt="WarehouseManagerApp-P99" width="160"> |
 
 ## OrdererApp

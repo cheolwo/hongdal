@@ -1,4 +1,4 @@
-# Hongdal 3.0 Checklist
+﻿# Hongdal 3.0 Checklist
 
 - [ ] 음식점 상품 주문 흐름 확인
 - [ ] 음식점 주문 접수/조리 상태 확인
@@ -8,5 +8,5 @@
 - [ ] 묶음 배달 가능성 판단 확인
 - [ ] 1.0 화물/용달 운송 흐름과 UI가 섞이지 않는지 확인
 - [ ] 내부 테스트 또는 3.0 릴리즈에서 `FoodDeliveryV30=true` 확인
-- [ ] 홍달마트/도심 즉시배송 기능은 `HongdalMartV35=false` 상태로 기본 비활성 확인
+- [ ] 알뜰살뜰 마트/도심 즉시배송 기능은 `HongdalMartV35=false` 상태로 기본 비활성 확인
 - [ ] [공통 릴리즈 게이트](../release-gates.md) 통과 확인

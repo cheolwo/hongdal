@@ -1,4 +1,4 @@
-# Hongdal 1.0 Scope
+﻿# Hongdal 1.0 Scope
 
 | 기능 | 포함 여부 | 관련 앱/모듈 | 메모 |
 | --- | --- | --- | --- |
@@ -13,4 +13,4 @@
 | 창고 입고/출고 고도화 | 보류 | `WarehouseManagerApp` | 1.5 |
 | 통관/HS 데이터 | 보류 | `Hongdal.WebApp`, `HongdalAdmin` | 2.0 |
 | 음식점 일반 음식 배달 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine` | 3.0 |
-| 홍달마트 즉시배송 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine`, `WarehouseManagerApp` | 3.5 |
+| 알뜰살뜰 마트 즉시배송 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine`, `WarehouseManagerApp` | 3.5 |

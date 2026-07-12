@@ -1,4 +1,4 @@
-# WarehouseManagerApp-P05-2 - 홍달마트 프로세스별 작업 시작
+﻿# WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작
 
 [전체 화면 문서](../../README.md) / [WarehouseManagerApp 화면 목록](../README.md) / [앱 전체 카탈로그](../../../app-page-catalog.md)
 
@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp |
-| 페이지 ID / 제목 | WarehouseManagerApp-P05-2 - 홍달마트 프로세스별 작업 시작 |
+| 페이지 ID / 제목 | WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작 |
 | 라우트 | /mart/work/{ProcessCode} |
 | 소스 파일 | [WarehouseManagerApp/Components/Pages/MartWorkStart.razor](../../../../../WarehouseManagerApp/Components/Pages/MartWorkStart.razor) |
 | 분류 | 확장 |
@@ -20,26 +20,26 @@
 
 ## 왜 필요한가
 
-이 화면은 홍달마트 프로세스별 작업 시작을 담당하므로, 1.0 이후의 해외 물류, 창고, 주문자 집단, 판매채널 확장을 화면 단위로 검증하기 위해 필요합니다.
+이 화면은 알뜰살뜰 마트 프로세스별 작업 시작을 담당하므로, 1.0 이후의 해외 물류, 창고, 주문자 집단, 판매채널 확장을 화면 단위로 검증하기 위해 필요합니다.
 
 ## 사용자와 참여자
 
 주 사용자: 창고 관리자, 창고 작업자 / 보조 참여자: 화주, 기사, 관리자
 
-이 화면은 창고/출고/피킹 확장 워크플로우 안에서 홍달마트 프로세스별 작업 시작 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
+이 화면은 창고/출고/피킹 확장 워크플로우 안에서 알뜰살뜰 마트 프로세스별 작업 시작 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
 
 ## 화면에서 다루는 일
 
-- 주 책임: 홍달마트 프로세스별 작업 시작
+- 주 책임: 알뜰살뜰 마트 프로세스별 작업 시작
 - 사용자가 확인해야 하는 것: 이 화면에서 상태, 입력값, 다음 행동이 명확히 보이는지 확인합니다.
 - 사용자가 조작해야 하는 것: 버튼, 입력, 선택, 업로드, 조회 같은 조작이 이 화면의 책임 안에 머무는지 확인합니다.
 - 화면 밖으로 넘길 일: 다른 앱이나 관리자 화면에서 처리해야 하는 상태 변경은 이 화면에 과하게 넣지 않습니다.
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P05-1 - 홍달마트 작업 보드](../WarehouseManagerApp-P05-1/)
+- 이전 화면: [WarehouseManagerApp-P05-1 - 알뜰살뜰 마트 작업 보드](../WarehouseManagerApp-P05-1/)
 - 다음 화면: [WarehouseManagerApp-P99 - 미발견 페이지](../WarehouseManagerApp-P99/)
-- 상위 화면: [WarehouseManagerApp-P05 - 홍달마트 창고 홈](../WarehouseManagerApp-P05/)
+- 상위 화면: [WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈](../WarehouseManagerApp-P05/)
 - 하위 화면: 없음
 
 상호작용 관점에서는 다음 흐름을 우선 봅니다. 창고 작업자가 입력한 입고, 스캔, 피킹 결과는 화주 재고/출고 상태와 기사 운송 의뢰 흐름으로 연결됩니다.

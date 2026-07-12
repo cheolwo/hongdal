@@ -49,14 +49,15 @@
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
 | T-01 | [workflow-api-policy.md](workflow-api-policy.md) | API를 화면과 업무 절차 기준으로 관리하는 기준 |
-| T-02 | [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 국내 화물 운송을 운영하는 내부 기준 |
-| T-03 | [EngineOverview.md](../Architecture/EngineOverview.md) | OS, 워크플로우, 엔진의 관계 |
-| T-04 | [HIOPSAI.md](../Architecture/HIOPSAI.md) | 참여자 입장 해석과 배차 조율을 돕는 AI 방향 |
-| T-05 | [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 출고 배치와 피킹 배치 판단 기준 |
-| T-06 | [DispatchQueueResponsibility.md](../Architecture/DispatchQueueResponsibility.md) | 배차 상태 저장과 실행 자료의 책임 경계 |
-| T-07 | [hiops-ai-judgment-cases.md](hiops-ai-judgment-cases.md) | AI 판단 보조를 만들기 위한 상황별 판단 사례 |
-| T-08 | [glossary.md](glossary.md) | POD, BL, 3PL, 레그, RAG 같은 주요 용어 정의 |
-| T-09 | [Blazor_Maui_공통화_1차.md](../Architecture/Blazor_Maui_공통화_1차.md) | 네이티브 기능이 꼭 필요한 경우를 제외하고 MudBlazor 컴포넌트 UI를 기본으로 삼는 기준 |
+| T-02 | [HIOPSLayerModel.md](../Architecture/HIOPSLayerModel.md) | 원장 블록, OS, 엔진, API의 층위와 책임 경계 |
+| T-03 | [DomesticCargoTransportOS.md](../Architecture/DomesticCargoTransportOS.md) | 국내 화물 운송을 운영하는 내부 기준 |
+| T-04 | [EngineOverview.md](../Architecture/EngineOverview.md) | OS, 워크플로우, 엔진의 관계 |
+| T-05 | [HIOPSAI.md](../Architecture/HIOPSAI.md) | 참여자 입장 해석과 배차 조율을 돕는 AI 방향 |
+| T-06 | [OutboundBatchEngine.md](../Architecture/OutboundBatchEngine.md) | 출고 배치와 피킹 배치 판단 기준 |
+| T-07 | [DispatchQueueResponsibility.md](../Architecture/DispatchQueueResponsibility.md) | 배차 상태 저장과 실행 자료의 책임 경계 |
+| T-08 | [hiops-ai-judgment-cases.md](hiops-ai-judgment-cases.md) | AI 판단 보조를 만들기 위한 상황별 판단 사례 |
+| T-09 | [glossary.md](glossary.md) | POD, BL, 3PL, 레그, RAG 같은 주요 용어 정의 |
+| T-10 | [Blazor_Maui_공통화_1차.md](../Architecture/Blazor_Maui_공통화_1차.md) | 네이티브 기능이 꼭 필요한 경우를 제외하고 MudBlazor 컴포넌트 UI를 기본으로 삼는 기준 |
 
 ## 관리 원칙
 

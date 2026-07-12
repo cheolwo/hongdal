@@ -1,4 +1,4 @@
-# Hongdal 1.5 Scope
+﻿# Hongdal 1.5 Scope
 
 | 기능 | 포함 여부 | 관련 모듈 | 메모 |
 | --- | --- | --- | --- |
@@ -11,4 +11,4 @@
 | 작업자/작업대 검증 | 포함 | 창고 앱 공통 진입 | 휴대폰 뒤 8자리 + 작업대 바코드 + 역할 확인 |
 | 통관/HS 데이터 | 보류 | `Hongdal.WebApp`, `HongdalAdmin` | 2.0 |
 | 음식점 일반 음식 배달 | 보류 | `FDriverApp`, `FoodDeliveryDispatchEngine` | 3.0 |
-| 홍달마트 도심 즉시배송 | 보류 | `FDriverApp`, `WarehouseManagerApp` | 3.5 |
+| 알뜰살뜰 마트 도심 즉시배송 | 보류 | `FDriverApp`, `WarehouseManagerApp` | 3.5 |

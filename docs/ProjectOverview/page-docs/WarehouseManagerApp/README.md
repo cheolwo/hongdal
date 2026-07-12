@@ -1,4 +1,4 @@
-# WarehouseManagerApp 화면 문서
+﻿# WarehouseManagerApp 화면 문서
 
 [전체 화면 문서](../README.md) / [앱 전체 카탈로그](../../app-page-catalog.md)
 
@@ -14,7 +14,7 @@
 | [WarehouseManagerApp-P03 - 입고 검수](WarehouseManagerApp-P03/) | /work/inbound/inspection | 확장 | 입고 검수 | 완료 |
 | [WarehouseManagerApp-P03-1 - 입고 상품 스캔](WarehouseManagerApp-P03-1/) | /work/inbound/products | 확장 | 입고 상품 스캔 | 완료 |
 | [WarehouseManagerApp-P04 - 피킹 배치 작업](WarehouseManagerApp-P04/) | /work/picking-batch | 확장 | 피킹 배치 작업 | 완료 |
-| [WarehouseManagerApp-P05 - 홍달마트 창고 홈](WarehouseManagerApp-P05/) | /mart | 확장 | 홍달마트 창고 홈 | 완료 |
-| [WarehouseManagerApp-P05-1 - 홍달마트 작업 보드](WarehouseManagerApp-P05-1/) | /mart/work-board | 확장 | 홍달마트 작업 보드 | 완료 |
-| [WarehouseManagerApp-P05-2 - 홍달마트 프로세스별 작업 시작](WarehouseManagerApp-P05-2/) | /mart/work/{ProcessCode} | 확장 | 홍달마트 프로세스별 작업 시작 | 완료 |
+| [WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈](WarehouseManagerApp-P05/) | /mart | 확장 | 알뜰살뜰 마트 창고 홈 | 완료 |
+| [WarehouseManagerApp-P05-1 - 알뜰살뜰 마트 작업 보드](WarehouseManagerApp-P05-1/) | /mart/work-board | 확장 | 알뜰살뜰 마트 작업 보드 | 완료 |
+| [WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작](WarehouseManagerApp-P05-2/) | /mart/work/{ProcessCode} | 확장 | 알뜰살뜰 마트 프로세스별 작업 시작 | 완료 |
 | [WarehouseManagerApp-P99 - 미발견 페이지](WarehouseManagerApp-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

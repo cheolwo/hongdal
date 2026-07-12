@@ -41,7 +41,7 @@
 - [ ] 수입 식품 공동 주문 계약서 DTO의 개인정보/계약 속성에 `IsmsPProtectedDataAttribute`가 붙어 있는지 확인
 - [ ] 주문자 집단 소속 정보의 공개 범위 확인
 - [ ] 공동 주문 정산 항목 분리 확인
-- [ ] 3.0 음식점 일반 배달, 3.5 홍달마트 즉시배송과 기능 경계가 섞이지 않는지 확인
+- [ ] 3.0 음식점 일반 배달, 3.5 알뜰살뜰 마트 즉시배송과 기능 경계가 섞이지 않는지 확인
 - [ ] 내부 테스트 또는 2.5 릴리즈에서 `OrdererGroupOrderV25=true` 확인
 - [ ] `OrdererGroupOrderV25=false` 환경에서는 2.5 전용 서버 API가 `FeatureDisabled`로 차단되는지 확인
 - [ ] `FoodDeliveryV30`, `HongdalMartV35` 기본 비활성 확인

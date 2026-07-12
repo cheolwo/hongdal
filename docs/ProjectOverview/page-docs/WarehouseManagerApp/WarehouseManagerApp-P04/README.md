@@ -1,4 +1,4 @@
-# WarehouseManagerApp-P04 - 피킹 배치 작업
+﻿# WarehouseManagerApp-P04 - 피킹 배치 작업
 
 [전체 화면 문서](../../README.md) / [WarehouseManagerApp 화면 목록](../README.md) / [앱 전체 카탈로그](../../../app-page-catalog.md)
 
@@ -38,7 +38,7 @@
 ## 다른 화면과의 관계
 
 - 이전 화면: [WarehouseManagerApp-P03-1 - 입고 상품 스캔](../WarehouseManagerApp-P03-1/)
-- 다음 화면: [WarehouseManagerApp-P05 - 홍달마트 창고 홈](../WarehouseManagerApp-P05/)
+- 다음 화면: [WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈](../WarehouseManagerApp-P05/)
 - 상위 화면: 없음
 - 하위 화면: 없음
 
