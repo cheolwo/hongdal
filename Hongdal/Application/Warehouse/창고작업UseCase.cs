@@ -4,7 +4,9 @@ using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Shipper.Request;
+using Hongdal.Application.Warehouse.Events;
 using Hongdal.Services.LogisticsProcessing.Warehouse;
+using MediatR;
 using 홍달.Services.Audit;
 
 namespace Hongdal.Application.Warehouse;
@@ -44,13 +46,16 @@ public sealed class 창고작업UseCase : I창고작업UseCase
 {
     private readonly IWarehouseOperationService _warehouseOperationService;
     private readonly I사용자행위로그Service _activityLogService;
+    private readonly IPublisher _publisher;
 
     public 창고작업UseCase(
         IWarehouseOperationService warehouseOperationService,
-        I사용자행위로그Service activityLogService)
+        I사용자행위로그Service activityLogService,
+        IPublisher publisher)
     {
         _warehouseOperationService = warehouseOperationService;
         _activityLogService = activityLogService;
+        _publisher = publisher;
     }
 
     public async Task<Result<창고목록응답>> 창고목록Async(CancellationToken cancellationToken)
@@ -87,6 +92,17 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     {
         var result = await _warehouseOperationService.CompleteInboundAsync(inboundId, request, cancellationToken);
         await 로그Async("Inbound", "Completed", context, cancellationToken, entityId: inboundId, metadataJson: $"{{\"createdItems\":{result.Items.Count}}}");
+        await _publisher.Publish(
+            new 창고입고완료됨Event(
+                context.UserId,
+                context.RoleName,
+                inboundId,
+                result.Items.Count,
+                context.Route,
+                context.TraceId,
+                DateTime.UtcNow,
+                context.AppKey),
+            cancellationToken);
         return result;
     }
 
@@ -97,6 +113,18 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     {
         var result = await _warehouseOperationService.InspectInboundItemAsync(inboundItemId, request, cancellationToken);
         await 로그Async("WarehouseWork", "InboundInspected", context, cancellationToken, entityId: inboundItemId, metadataJson: $"{{\"available\":{result.가용수량},\"defect\":{result.불량수량}}}");
+        await _publisher.Publish(
+            new 창고입고검수완료됨Event(
+                context.UserId,
+                context.RoleName,
+                inboundItemId,
+                result.가용수량,
+                result.불량수량,
+                context.Route,
+                context.TraceId,
+                DateTime.UtcNow,
+                context.AppKey),
+            cancellationToken);
         return result;
     }
 
@@ -104,6 +132,17 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     {
         var result = await _warehouseOperationService.PutAwayInventoryItemAsync(inboundItemId, request, cancellationToken);
         await 로그Async("WarehouseWork", "PutAwayCompleted", context, cancellationToken, entityId: inboundItemId, metadataJson: $"{{\"location\":\"{result.보관위치}\"}}");
+        await _publisher.Publish(
+            new 창고적재위치배정됨Event(
+                context.UserId,
+                context.RoleName,
+                inboundItemId,
+                result.보관위치,
+                context.Route,
+                context.TraceId,
+                DateTime.UtcNow,
+                context.AppKey),
+            cancellationToken);
         return result;
     }
 
@@ -111,6 +150,17 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     {
         var result = await _warehouseOperationService.PackInventoryItemAsync(inboundItemId, request, cancellationToken);
         await 로그Async("WarehouseWork", "Packed", context, cancellationToken, entityId: inboundItemId, metadataJson: $"{{\"quantity\":{request.포장수량}}}");
+        await _publisher.Publish(
+            new 창고포장완료됨Event(
+                context.UserId,
+                context.RoleName,
+                inboundItemId,
+                request.포장수량,
+                context.Route,
+                context.TraceId,
+                DateTime.UtcNow,
+                context.AppKey),
+            cancellationToken);
         return result;
     }
 
@@ -118,6 +168,18 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     {
         var result = await _warehouseOperationService.CreateReconsignmentRequestAsync(request, cancellationToken);
         await 로그Async("Reconsignment", "Created", context, cancellationToken, metadataJson: $"{{\"requestId\":\"{result.의뢰Id}\",\"inventoryItemId\":{request.입고상품Id},\"quantity\":{request.요청수량}}}");
+        await _publisher.Publish(
+            new 창고재위탁운송생성됨Event(
+                context.UserId,
+                context.RoleName,
+                request.입고상품Id,
+                request.요청수량,
+                result.의뢰Id,
+                context.Route,
+                context.TraceId,
+                DateTime.UtcNow,
+                context.AppKey),
+            cancellationToken);
         return result;
     }
 

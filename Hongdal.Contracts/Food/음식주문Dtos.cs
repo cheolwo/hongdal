@@ -57,6 +57,7 @@ public sealed class 음식주문등록요청
 
 public sealed class 음식점주문수락요청
 {
+    public string? 처리UserId { get; set; }
     public string 음식점명 { get; set; } = string.Empty;
     public string 음식점주소 { get; set; } = string.Empty;
     public string 음식점상세주소 { get; set; } = string.Empty;

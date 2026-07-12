@@ -2,6 +2,7 @@ using Hongdal.ApiMetadata;
 using Hongdal.Application.Food;
 using Hongdal.Contracts.Food;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using 홍달.Services.Versioning;
 
 namespace Hongdal.Controllers.Food;
@@ -38,7 +39,12 @@ public sealed class 음식주문Controller(I음식주문접수UseCase useCase) :
         [FromBody] 음식점주문수락요청 request,
         CancellationToken cancellationToken)
     {
-        var order = await useCase.음식점수락Async(orderNo, request, cancellationToken);
+        var order = await useCase.음식점수락Async(orderNo, request, 현재사용자Id() ?? request.처리UserId, cancellationToken);
         return order is null ? NotFound() : Ok(order);
     }
+
+    private string? 현재사용자Id()
+        => User.FindFirstValue(ClaimTypes.NameIdentifier)
+           ?? User.FindFirstValue("sub")
+           ?? User.Identity?.Name;
 }

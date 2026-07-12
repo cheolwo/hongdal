@@ -21,7 +21,11 @@ public sealed class 음식점주문수락CommandHandler(
         }
 
         await publisher.Publish(
-            new 음식점주문수락됨Event(accepted, DateTime.UtcNow, Guid.NewGuid().ToString("N")),
+            new 음식점주문수락됨Event(
+                accepted,
+                NormalizeUserId(request.처리UserId) ?? NormalizeUserId(request.Payload.처리UserId),
+                DateTime.UtcNow,
+                Guid.NewGuid().ToString("N")),
             cancellationToken);
 
         return orderStore.GetOrder(request.주문번호) ?? accepted;
@@ -39,4 +43,7 @@ public sealed class 음식점주문수락CommandHandler(
             throw new ArgumentException("음식점 수락 요청 본문이 필요합니다.");
         }
     }
+
+    private static string? NormalizeUserId(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

@@ -14,7 +14,7 @@ public interface I음식주문접수UseCase
 
     Task<음식주문응답> 등록Async(음식주문등록요청 request, CancellationToken cancellationToken);
 
-    Task<음식주문응답?> 음식점수락Async(string orderNo, 음식점주문수락요청 request, CancellationToken cancellationToken);
+    Task<음식주문응답?> 음식점수락Async(string orderNo, 음식점주문수락요청 request, string? 처리UserId, CancellationToken cancellationToken);
 }
 
 [HongdalApiWorkflow(HongdalWorkflow.FoodDelivery)]
@@ -50,8 +50,8 @@ public sealed class 음식주문접수UseCase(ISender sender) : I음식주문접
         return sender.Send(new 음식주문등록Command(request), cancellationToken);
     }
 
-    public Task<음식주문응답?> 음식점수락Async(string orderNo, 음식점주문수락요청 request, CancellationToken cancellationToken)
+    public Task<음식주문응답?> 음식점수락Async(string orderNo, 음식점주문수락요청 request, string? 처리UserId, CancellationToken cancellationToken)
     {
-        return sender.Send(new 음식점주문수락Command(orderNo, request), cancellationToken);
+        return sender.Send(new 음식점주문수락Command(orderNo, request, 처리UserId), cancellationToken);
     }
 }
