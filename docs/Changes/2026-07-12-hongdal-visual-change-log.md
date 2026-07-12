@@ -16,6 +16,7 @@
 | `d169812a` | 쿠팡 카테고리 API 계약 정리 | API 계약 중심 변경입니다. 카탈로그 UI가 붙으면 별도 화면을 추가합니다. |
 | `ae1be206` | 노드 스티커 상점 FakePG 결제 API 추가 | FakePG 정산 콘솔 초기 상태, 결제확보 후 상태 |
 | `0e5a5f24` | 노드 스티커 기본 추천 후보 제한 | 노드 상세 패널과 추천 후보 맥락 |
+| `e9f5abf0` | 커뮤니티 원장 협업 기반 보강 | 홍달 1.0 다이어그램 캔버스, 다이어그램 대화방 패널 |
 
 ## 커뮤니티 원장 다이어그램 작업대
 
@@ -72,6 +73,16 @@ API 경로는 별도 컨트롤러를 새로 늘리기보다 기존 경로를 메
 `결제확보`를 실행하면 Fake PG 상태가 `결제확보됨`으로 바뀌고, `PaymentIntentId`, `ProviderPaymentKey`, 시뮬레이션 이벤트가 함께 기록됩니다.
 
 ![FakePG 결제확보 후 상태](../assets/changes/2026-07-12-hongdal-visual-summary/fake-pg-settlement-console-after-payment-secured.png)
+
+## 커뮤니티 원장 협업 기반
+
+`e9f5abf0`에서는 커뮤니티에서 만든 원장 다이어그램을 기준으로 대화방을 열고, 다이어그램 이름, 원장 맥락, 방 ID, 메시지 흐름을 함께 확인할 수 있게 했습니다. 홍달 1.0 운송 흐름은 노드 수를 운송 의뢰, 상차, 하차, 결제/정산 중심으로 압축해 캔버스에서 확인합니다.
+
+![홍달 1.0 다이어그램 캔버스](../assets/changes/2026-07-12-hongdal-visual-summary/diagram-cargo-transport-stage.png)
+
+다이어그램 대화방은 SignalR 허브 경로와 연결 상태를 표시하고, 상대방 메시지는 사용자 아이콘과 함께 왼쪽에, 내 메시지는 오른쪽 말풍선으로 보여줍니다. 서버 허브가 없는 로컬 문서 캡처에서는 로컬 미리보기 상태로 표시됩니다.
+
+![다이어그램 대화방 패널](../assets/changes/2026-07-12-hongdal-visual-summary/diagram-room-chat-panel.png)
 
 ## API 중심 변경의 시각 기록 방식
 
