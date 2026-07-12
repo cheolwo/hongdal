@@ -30,6 +30,17 @@ public sealed class OperationalEndpointAuthorizationTests
         Assert.Equal("물류운영사용자전용", authorize.Policy);
     }
 
+    [Fact]
+    public void NodeStickerStoreFakePgConfirm_RequiresAuthenticatedUser()
+    {
+        var authorize = GetAuthorizeAttribute(
+            typeof(노드스티커상점Controller),
+            nameof(노드스티커상점Controller.ConfirmFakePg));
+
+        Assert.Null(authorize.Policy);
+        Assert.Null(authorize.Roles);
+    }
+
     private static AuthorizeAttribute GetAuthorizeAttribute(Type controllerType, string methodName)
     {
         var method = controllerType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public)

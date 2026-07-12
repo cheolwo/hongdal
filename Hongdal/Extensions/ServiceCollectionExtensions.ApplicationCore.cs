@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hongdal.Application.Behaviors;
 using Hongdal.Application.CommandProcessing;
+using Hongdal.Application.Community;
 using Hongdal.Middleware;
 using Hongdal.Application.HumanResources;
 using Hongdal.Application.Sales;
@@ -83,6 +84,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티게시글UseCase, 커뮤니티게시글UseCase>();
         services.AddScoped<I커뮤니티투표UseCase, 커뮤니티투표UseCase>();
         services.AddScoped<I커뮤니티활동신호UseCase, 커뮤니티활동신호UseCase>();
+        services.AddScoped<I노드스티커상점UseCase, 노드스티커상점UseCase>();
+        services.AddScoped<ICommunityExperienceAwardService, CommunityExperienceAwardService>();
+        services.AddScoped<ICommunityExperienceEventRecorder, CommunityExperienceEventRecorder>();
         services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
         services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
