@@ -9,6 +9,8 @@ public sealed class VersionFeatureFlagsResponse
     public IReadOnlyList<WorkflowRelationDto> WorkflowRelations { get; init; } = [];
 
     public IReadOnlyList<OperatingSystemDto> OperatingSystems { get; init; } = [];
+
+    public IReadOnlyList<WorkflowApiEndpointDto> ApiEndpoints { get; init; } = [];
 }
 
 public sealed class WorkflowFlagStateDto
@@ -95,6 +97,37 @@ public sealed class WorkflowUseCaseRelationDto
     public string Condition { get; init; } = string.Empty;
 
     public string Summary { get; init; } = string.Empty;
+}
+
+public sealed class WorkflowApiEndpointDto
+{
+    public string EndpointKey { get; init; } = string.Empty;
+
+    public string ControllerName { get; init; } = string.Empty;
+
+    public string ActionName { get; init; } = string.Empty;
+
+    public string Method { get; init; } = string.Empty;
+
+    public string RoutePattern { get; init; } = string.Empty;
+
+    public string ProductVersionCode { get; init; } = string.Empty;
+
+    public string ProductVersionName { get; init; } = string.Empty;
+
+    public IReadOnlyList<string> WorkflowCodes { get; init; } = [];
+
+    public IReadOnlyList<string> WorkflowNames { get; init; } = [];
+
+    public IReadOnlyList<string> GrowthTrackCodes { get; init; } = [];
+
+    public IReadOnlyList<string> GrowthTrackNames { get; init; } = [];
+
+    public string AuthorizationPolicy { get; init; } = string.Empty;
+
+    public string AuthorizationRoles { get; init; } = string.Empty;
+
+    public bool AllowsAnonymous { get; init; }
 }
 
 public sealed class WorkflowRelationDto

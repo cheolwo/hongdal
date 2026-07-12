@@ -1,0 +1,375 @@
+using Hongdal.Contracts.Common.Community;
+
+namespace Hongdal.Tests.Services.Community;
+
+public sealed class CommunityLedgerTemplateCatalogTests
+{
+    [Fact]
+    public void All_IncludesCommunityLedgerWorkTypes()
+    {
+        var keys = CommunityLedgerTemplateCatalog.All.Select(x => x.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Assert.Contains(CommunityLedgerTemplateKeys.CargoTransport, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.FoodOrder, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.FoodDelivery, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.HongdalMart, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.WarehouseOutbound, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.WarehouseInbound, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.LocalSale, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.GroupPurchase, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.Errand, keys);
+    }
+
+    [Fact]
+    public void Templates_TreatRoleNamesAsLabelsAndPermissionsAsActionHints()
+    {
+        var template = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
+        var settlementRole = template.Roles.Single(x => x.RoleName == "정산 확인자");
+
+        Assert.Equal(CommunityLedgerParticipationModes.OpenRoleParticipation, template.ParticipationPolicy.DefaultParticipationMode);
+        Assert.Contains("라벨", template.ParticipationPolicy.RoleLabelPolicy);
+        Assert.Contains("실명", template.ParticipationPolicy.IdentityDisplayPolicy);
+        Assert.Contains("닉네임", template.ParticipationPolicy.IdentityDisplayPolicy);
+        Assert.Contains("익명", template.ParticipationPolicy.IdentityDisplayPolicy);
+        Assert.Contains("선택적 신뢰 신호", template.ParticipationPolicy.IdentityDisplayPolicy);
+        Assert.Contains("행동 힌트", template.ParticipationPolicy.PermissionInterpretation);
+        Assert.Contains(CommunityLedgerPermissionCodes.MarkPayment, settlementRole.Permissions);
+        Assert.Contains(CommunityLedgerPermissionCodes.CloseLedger, settlementRole.Permissions);
+        Assert.DoesNotContain("플랫폼 결제 대행", settlementRole.Permissions);
+    }
+
+    [Fact]
+    public void Templates_ClassifyLedgerToTargetOperatingSystemAndEngines()
+    {
+        var cargo = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.CargoTransport);
+        var mart = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.HongdalMart);
+        var outbound = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.WarehouseOutbound);
+
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.DomesticCargoTransport, cargo.TargetOperatingSystemCode);
+        Assert.Contains(CommunityLedgerEngineHints.TransportDispatch, cargo.EngineHints);
+
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.HongdalMartUrbanLogistics, mart.TargetOperatingSystemCode);
+        Assert.Contains(CommunityLedgerEngineHints.PickingBatch, mart.EngineHints);
+        Assert.Contains(CommunityLedgerEngineHints.FoodDeliveryDispatch, mart.EngineHints);
+
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment, outbound.TargetOperatingSystemCode);
+        Assert.Contains(CommunityLedgerEngineHints.OutboundBatch, outbound.EngineHints);
+        Assert.Contains(CommunityLedgerEngineHints.PickingBatch, outbound.EngineHints);
+    }
+
+    [Fact]
+    public void Templates_ProvideDynamicUiAndBestLedgerConversationHints()
+    {
+        foreach (var template in CommunityLedgerTemplateCatalog.All)
+        {
+            Assert.NotEmpty(template.UiSectionHints);
+            Assert.NotEmpty(template.ActionHints);
+            Assert.False(string.IsNullOrWhiteSpace(template.원함확인질문));
+            Assert.False(string.IsNullOrWhiteSpace(template.원함확인설명));
+            Assert.NotEmpty(template.원함확인질문목록);
+            Assert.NotEmpty(template.홍달지원범위안내목록);
+            Assert.NotEmpty(template.사용자확인책임안내목록);
+            Assert.NotEmpty(template.LedgerBlocks);
+            Assert.NotEmpty(template.CompositionRules);
+            Assert.NotEmpty(template.ProcessingSurfaces);
+            Assert.Equal(CommunityLedgerOperatingSystemRoleCodes.Scheduler, template.OperatingSystemRoleCode);
+            Assert.Contains("API", template.OperatingSystemRoleSummary);
+            Assert.NotEmpty(template.SchedulingHints);
+            Assert.Equal(CommunityLedgerParticipationModes.OpenRoleParticipation, template.ParticipationPolicy.DefaultParticipationMode);
+            Assert.NotEmpty(template.ParticipationPolicy.RestrictionTriggers);
+            Assert.NotEmpty(template.ParticipationPolicy.RestrictableActionCodes);
+            Assert.Equal(1, template.ParticipationPolicy.ExperiencePolicy.InitialLevel);
+            Assert.NotEmpty(template.ParticipationPolicy.ExperiencePolicy.LevelTiers);
+            Assert.NotEmpty(template.ParticipationPolicy.ExperiencePolicy.ExperienceEvents);
+            Assert.Equal(CommunityLedgerPrimaryStoreKinds.MongoDocument, template.PersistencePolicy.PrimaryStoreKind);
+            Assert.Equal("community_ledgers", template.PersistencePolicy.PrimaryStoreName);
+            Assert.NotEmpty(template.PersistencePolicy.RelationalProjectionTargets);
+            Assert.False(string.IsNullOrWhiteSpace(template.BestLedgerPatternTitle));
+            Assert.False(string.IsNullOrWhiteSpace(template.BestLedgerPatternSummary));
+            Assert.NotEmpty(template.CommunityDiscussionPrompts);
+        }
+    }
+
+    [Fact]
+    public void Templates_StructureLedgersIntoReusableBlocks()
+    {
+        foreach (var template in CommunityLedgerTemplateCatalog.All)
+        {
+            Assert.Contains(template.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Participant);
+            Assert.Contains(template.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State);
+            Assert.Contains(template.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.OpensApiHandoff);
+            Assert.All(template.LedgerBlocks, block =>
+            {
+                Assert.False(string.IsNullOrWhiteSpace(block.Code));
+                Assert.False(string.IsNullOrWhiteSpace(block.DisplayName));
+                Assert.False(string.IsNullOrWhiteSpace(block.Purpose));
+                Assert.NotEmpty(block.DataHints);
+                Assert.NotEmpty(block.ActionHints);
+            });
+            Assert.Contains(template.LedgerBlocks, block => block.RequiredForAiJudgment);
+        }
+
+        var cargo = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.CargoTransport);
+        Assert.Contains(cargo.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Place && block.UiSectionHint == "상차지");
+        Assert.Contains(cargo.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Place && block.UiSectionHint == "하차지");
+        Assert.Contains(cargo.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Item && block.UiSectionHint == "화물 조건");
+        Assert.Contains(cargo.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Evidence);
+        Assert.Contains(cargo.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Settlement);
+
+        var mart = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.HongdalMart);
+        Assert.Contains(mart.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "주문");
+        Assert.Contains(mart.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Inventory && block.UiSectionHint == "도심 재고");
+        Assert.Contains(mart.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "기사 픽업");
+        Assert.Contains(mart.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.MartOrderBeforePickingPacking));
+    }
+
+    [Fact]
+    public void Templates_DeclareExistingOrPlannedProcessingSurfaces()
+    {
+        string[] allowedHandoffModes =
+        [
+            CommunityLedgerHandoffModes.HttpApi,
+            CommunityLedgerHandoffModes.InternalService,
+            CommunityLedgerHandoffModes.PlannedApi
+        ];
+
+        foreach (var template in CommunityLedgerTemplateCatalog.All)
+        {
+            Assert.All(template.ProcessingSurfaces, surface =>
+            {
+                Assert.Contains(surface.HandoffMode, allowedHandoffModes);
+                Assert.False(string.IsNullOrWhiteSpace(surface.Purpose));
+                Assert.False(string.IsNullOrWhiteSpace(surface.RoutePattern) && string.IsNullOrWhiteSpace(surface.ApiEndpointKey));
+            });
+        }
+
+        var cargo = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.CargoTransport);
+        Assert.Contains(cargo.ProcessingSurfaces, surface => surface.ApiEndpointKey == "화주운송의뢰Controller.의뢰생성");
+        Assert.Contains(cargo.ProcessingSurfaces, surface => surface.ApiEndpointKey == "기사운송진행Controller.상차완료");
+    }
+
+    [Fact]
+    public void Templates_StartMembersAtLevelOneAndGrowByHelpfulLedgerActions()
+    {
+        foreach (var template in CommunityLedgerTemplateCatalog.All)
+        {
+            var policy = template.ParticipationPolicy.ExperiencePolicy;
+
+            Assert.Equal(1, policy.InitialLevel);
+            Assert.Contains("가입 시 1레벨", policy.InitialLevelSummary);
+            Assert.Contains("고정 역할 권한이 아니라", policy.LevelBasis);
+            Assert.Contains("신고", policy.RestrictionInteractionPolicy);
+            Assert.Contains(policy.LevelTiers, tier => tier.Level == 1 && tier.RequiredExperience == 0);
+            Assert.Contains(policy.LevelTiers, tier => tier.Level == 2 && tier.RequiredExperience > 0);
+            Assert.Contains(policy.LevelTiers, tier => tier.Label.Contains("신뢰", StringComparison.Ordinal));
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.LedgerDraftCreated);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.CompletionConfirmed);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WorkStateChanged);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.TransportPickupArrived);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.TransportPickupCompleted);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.TransportDropoffArrived);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.TransportDropoffCompleted);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.TransportIssueReported);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.FoodOrderAccepted);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WarehouseInboundCompleted);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WarehouseInboundInspected);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WarehousePutAwayCompleted);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WarehousePickingCompleted);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WarehouseInventoryPacked);
+            Assert.Contains(policy.ExperienceEvents, item => item.EventCode == CommunityLedgerExperienceEventCodes.WarehouseReconsignmentCreated);
+            Assert.All(policy.ExperienceEvents, item => Assert.True(item.BaseExperience > 0));
+        }
+    }
+
+    [Fact]
+    public void Templates_TreatOperatingSystemAsSchedulerAndApiAsExecutor()
+    {
+        foreach (var template in CommunityLedgerTemplateCatalog.All)
+        {
+            Assert.Equal(CommunityLedgerOperatingSystemRoleCodes.Scheduler, template.OperatingSystemRoleCode);
+            Assert.Contains("호출 순서", template.OperatingSystemRoleSummary);
+            Assert.Contains("실제 처리 API/엔진 호출 순서 결정", template.SchedulingHints);
+            Assert.NotEmpty(template.ProcessingSurfaces);
+        }
+    }
+
+    [Fact]
+    public void Templates_RestrictRolesOnlyAfterReportDisputeOrModerationSignals()
+    {
+        foreach (var template in CommunityLedgerTemplateCatalog.All)
+        {
+            Assert.Equal(CommunityLedgerParticipationModes.OpenRoleParticipation, template.ParticipationPolicy.DefaultParticipationMode);
+            Assert.Contains("신고", template.ParticipationPolicy.RestrictionPolicy);
+            Assert.Contains("분쟁", template.ParticipationPolicy.RestrictionPolicy);
+            Assert.Contains("신고 접수", template.ParticipationPolicy.RestrictionTriggers);
+            Assert.Contains("운영자 검토", template.ParticipationPolicy.RestrictionTriggers);
+            Assert.Contains(CommunityLedgerPermissionCodes.ChangeState, template.ParticipationPolicy.RestrictableActionCodes);
+            Assert.Contains(CommunityLedgerPermissionCodes.CloseLedger, template.ParticipationPolicy.RestrictableActionCodes);
+        }
+    }
+
+    [Fact]
+    public void Templates_TreatMongoAsFlexibleLedgerSourceAndRelationalDbAsProjection()
+    {
+        var outbound = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.WarehouseOutbound);
+
+        Assert.Equal(CommunityLedgerPrimaryStoreKinds.MongoDocument, outbound.PersistencePolicy.PrimaryStoreKind);
+        Assert.Contains("MongoDB", outbound.PersistencePolicy.FlexibleAttributeStrategy);
+        Assert.Contains("관계형 DB", outbound.PersistencePolicy.RelationalProjectionPolicy);
+        Assert.Contains(outbound.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "창고 재고");
+        Assert.Contains(outbound.PersistencePolicy.RelationalProjectionTargets, target => target.LinkFieldHint.Contains("CommunityLedgerId", StringComparison.OrdinalIgnoreCase));
+
+        var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
+        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동구매 수요");
+        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 운송 의뢰");
+    }
+
+    [Fact]
+    public void Templates_GateActionsBehindCompositionRules()
+    {
+        var cargo = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.CargoTransport);
+        var cargoRule = cargo.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.TransportRequestBeforePickupDropoff);
+
+        Assert.Contains("상차지", cargoRule.RequiredUiSectionHints);
+        Assert.Contains("하차지", cargoRule.RequiredUiSectionHints);
+        Assert.Contains("상차 확인", cargoRule.GatedActionHints);
+        Assert.Contains("하차 완료", cargoRule.GatedActionHints);
+
+        var outbound = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.WarehouseOutbound);
+        var inboundRule = outbound.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.InboundOrStockBeforeOutbound);
+
+        Assert.Contains(CommunityLedgerTemplateKeys.WarehouseInbound, inboundRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("출고 품목", inboundRule.RequiredUiSectionHints);
+        Assert.Contains("피킹 시작", inboundRule.GatedActionHints);
+
+        var mart = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.HongdalMart);
+        var martOrderRule = mart.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.MartOrderBeforePickingPacking);
+        var martPickupRule = mart.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.MartPackedBeforeDeliveryPickup);
+
+        Assert.Contains("주문", martOrderRule.RequiredUiSectionHints);
+        Assert.Contains("도심 재고", martOrderRule.RequiredUiSectionHints);
+        Assert.Contains("포장 완료", martOrderRule.GatedActionHints);
+        Assert.Contains("포장 완료", martPickupRule.RequiredUiSectionHints);
+        Assert.Contains("기사 인계", martPickupRule.GatedActionHints);
+        Assert.DoesNotContain(CommunityLedgerTemplateKeys.WarehouseOutbound, martOrderRule.RequiredLedgerTemplateKeys);
+        Assert.DoesNotContain(CommunityLedgerTemplateKeys.WarehouseOutbound, martPickupRule.RequiredLedgerTemplateKeys);
+    }
+
+    [Fact]
+    public void DeliveryLedgers_DeclareTheirSourceLedgers()
+    {
+        var foodDelivery = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.FoodDelivery);
+        var orderRule = foodDelivery.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.FoodOrderBeforeDelivery);
+
+        Assert.Contains(CommunityLedgerTemplateKeys.FoodOrder, orderRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("픽업지", orderRule.RequiredUiSectionHints);
+        Assert.Contains("도착지", orderRule.RequiredUiSectionHints);
+
+        var outbound = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.WarehouseOutbound);
+        var transportRule = outbound.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.OutboundBeforeHandoffTransport);
+
+        Assert.Contains(CommunityLedgerTemplateKeys.CargoTransport, transportRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("운송 인계", transportRule.GatedActionHints);
+    }
+
+    [Fact]
+    public void FlowClassifier_IdentifiesHongdalMartFlowFromLedgerShape()
+    {
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "알뜰살뜰 마트 장보기 즉시배송",
+            Body = "도심 재고를 피킹하고 포장 완료 뒤 기사 픽업으로 고객에게 전달합니다.",
+            UiSectionHints = ["참여자", "주문", "도심 재고", "피킹/포장", "포장 완료", "기사 픽업"],
+            ActionHints = ["재고 확인", "피킹 시작", "피킹 완료", "포장 완료", "기사 인계", "전달 완료"]
+        });
+
+        Assert.Equal(CommunityLedgerTemplateKeys.HongdalMart, result.PrimaryCandidate.TemplateKey);
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.HongdalMartUrbanLogistics, result.PrimaryCandidate.TargetOperatingSystemCode);
+        Assert.Equal(CommunityLedgerFlowRelationCodes.StrongFlowMatch, result.PrimaryCandidate.RelationCode);
+        Assert.False(result.RequiresHumanReview);
+        Assert.Contains(CommunityLedgerEngineHints.FoodDeliveryDispatch, result.PrimaryCandidate.EngineHints);
+        Assert.Contains(CommunityLedgerCompositionRuleCodes.MartOrderBeforePickingPacking, result.PrimaryCandidate.RelatedCompositionRuleCodes);
+        Assert.Contains(CommunityLedgerCompositionRuleCodes.MartPackedBeforeDeliveryPickup, result.PrimaryCandidate.RelatedCompositionRuleCodes);
+        Assert.Contains(result.PrimaryCandidate.RelatedProcessingSurfaceHints, surface => surface == "GET 기사배차추천Controller.조회");
+        Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("urban-inventory", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("driver-pickup", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void FlowClassifier_SeparatesGenericWarehouseOutboundFromHongdalMart()
+    {
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "판매채널 창고 출고",
+            Body = "출고 품목을 피킹하고 검수와 포장을 마친 뒤 운송 인계합니다.",
+            UiSectionHints = ["참여자", "출고 품목", "피킹 작업", "검수", "포장", "운송 인계"],
+            ActionHints = ["피킹 시작", "피킹 완료", "검수 요청", "포장 완료", "운송 인계"]
+        });
+
+        Assert.Equal(CommunityLedgerTemplateKeys.WarehouseOutbound, result.PrimaryCandidate.TemplateKey);
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment, result.PrimaryCandidate.TargetOperatingSystemCode);
+        Assert.NotEqual(CommunityLedgerTemplateKeys.HongdalMart, result.PrimaryCandidate.TemplateKey);
+        Assert.Contains(CommunityLedgerCompositionRuleCodes.InboundOrStockBeforeOutbound, result.PrimaryCandidate.RelatedCompositionRuleCodes);
+        Assert.Contains(CommunityLedgerCompositionRuleCodes.OutboundBeforeHandoffTransport, result.PrimaryCandidate.RelatedCompositionRuleCodes);
+    }
+
+    [Fact]
+    public void BuildDraftBody_UsesOptionalEvidenceAndParticipantConfirmationTone()
+    {
+        var body = CommunityLedgerTemplateCatalog.BuildDraftBody(
+            CommunityLedgerTemplateKeys.LocalSale,
+            "Hongdal Community",
+            "동네 판매자");
+
+        Assert.Contains("원장 유형: 생활 판매 원장", body);
+        Assert.Contains("스케줄링 OS: 창고·커머스 이행 OS", body);
+        Assert.Contains("원함 확인:", body);
+        Assert.Contains("질문: 무엇을 원하나요?", body);
+        Assert.Contains("홍달이 도울 수 있는 범위:", body);
+        Assert.Contains("사용자가 직접 확인해야 하는 것:", body);
+        Assert.Contains("OS/엔진 인계:", body);
+        Assert.Contains("OS는 실행 주체라기보다 스케줄러", body);
+        Assert.Contains("실제 처리 API/엔진 호출 순서 결정", body);
+        Assert.Contains("실제 처리 표면:", body);
+        Assert.Contains("저장/반영 방식:", body);
+        Assert.Contains("community_ledgers", body);
+        Assert.Contains("동적 UI 힌트:", body);
+        Assert.Contains("가능한 행동:", body);
+        Assert.Contains("원장 블록:", body);
+        Assert.Contains("참여자 블록", body);
+        Assert.Contains("판매 물건 블록", body);
+        Assert.Contains("AI 판단근거", body);
+        Assert.Contains("구성 규칙:", body);
+        Assert.Contains("판매 물건과 상대가 먼저 정해져야 합니다.", body);
+        Assert.Contains("베스트 원장 공유 포인트:", body);
+        Assert.Contains("참여/역할 정책:", body);
+        Assert.Contains("기본 참여 방식: OpenRoleParticipation", body);
+        Assert.Contains("제한 트리거: 신고 접수", body);
+        Assert.Contains("성장/레벨 정책:", body);
+        Assert.Contains("시작 레벨: 가입 시 1레벨", body);
+        Assert.Contains("경험치 행동: 원장 초안 작성", body);
+        Assert.Contains("경험치 행동: 업무 상태 변경", body);
+        Assert.Contains("경험치 행동: 운송 상차지 도착", body);
+        Assert.Contains("경험치 행동: 운송 상차 완료", body);
+        Assert.Contains("경험치 행동: 운송 하차지 도착", body);
+        Assert.Contains("경험치 행동: 운송 하차 완료", body);
+        Assert.Contains("경험치 행동: 운송 문제 신고", body);
+        Assert.Contains("경험치 행동: 음식 주문 수락", body);
+        Assert.Contains("경험치 행동: 창고 입고 완료", body);
+        Assert.Contains("경험치 행동: 창고 피킹 완료", body);
+        Assert.Contains("경험치 행동: 창고 포장 완료", body);
+        Assert.Contains("경험치 행동: 창고 재위탁 운송 생성", body);
+        Assert.Contains("성장 단계: Lv.3 신뢰 구성원", body);
+        Assert.Contains("참여자/역할 라벨:", body);
+        Assert.Contains("표시 이름:", body);
+        Assert.Contains("실명이 아니라 닉네임", body);
+        Assert.Contains("사진, 메모, 링크 증빙은 필요할 때만 첨부합니다.", body);
+        Assert.Contains("결제나 입금 표시는 참여자 간 확인용으로 남깁니다.", body);
+    }
+}

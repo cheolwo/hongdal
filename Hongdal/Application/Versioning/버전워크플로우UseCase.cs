@@ -1,6 +1,9 @@
 using System.Reflection;
 using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Versioning;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using 홍달.Services.Versioning;
 
 namespace Hongdal.Application.Versioning;
@@ -30,7 +33,8 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
             Flags = flags,
             Workflows = BuildWorkflowStates(flags),
             WorkflowRelations = HongdalWorkflowRelations.GetAll().Select(ToDto).ToArray(),
-            OperatingSystems = HongdalOperatingSystems.GetAll().Select(ToDto).ToArray()
+            OperatingSystems = HongdalOperatingSystems.GetAll().Select(ToDto).ToArray(),
+            ApiEndpoints = BuildApiEndpoints()
         };
     }
 
@@ -131,6 +135,95 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
             Condition = relation.Condition,
             Summary = relation.Summary
         };
+    }
+
+    private static IReadOnlyList<WorkflowApiEndpointDto> BuildApiEndpoints()
+    {
+        return typeof(버전워크플로우UseCase).Assembly
+            .GetTypes()
+            .Where(type => typeof(ControllerBase).IsAssignableFrom(type)
+                && !type.IsAbstract
+                && type.Name.EndsWith("Controller", StringComparison.Ordinal))
+            .SelectMany(BuildControllerEndpoints)
+            .OrderBy(endpoint => endpoint.RoutePattern, StringComparer.Ordinal)
+            .ThenBy(endpoint => endpoint.Method, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static IEnumerable<WorkflowApiEndpointDto> BuildControllerEndpoints(Type controllerType)
+    {
+        var controllerRoute = controllerType.GetCustomAttribute<RouteAttribute>(inherit: true)?.Template ?? string.Empty;
+        var controllerVersion = controllerType.GetCustomAttribute<HongdalApiVersionAttribute>(inherit: true);
+        var controllerWorkflows = controllerType.GetCustomAttributes<HongdalApiWorkflowAttribute>(inherit: true).ToArray();
+        var controllerGrowthTracks = controllerType.GetCustomAttributes<HongdalApiGrowthTrackAttribute>(inherit: true).ToArray();
+        var controllerAuthorize = controllerType.GetCustomAttributes<AuthorizeAttribute>(inherit: true).ToArray();
+        var controllerAllowsAnonymous = controllerType.GetCustomAttributes<AllowAnonymousAttribute>(inherit: true).Any();
+
+        foreach (var action in GetActionMethods(controllerType))
+        {
+            var actionVersion = action.GetCustomAttribute<HongdalApiVersionAttribute>(inherit: true) ?? controllerVersion;
+            var actionWorkflows = action.GetCustomAttributes<HongdalApiWorkflowAttribute>(inherit: true).DefaultIfEmpty().Where(x => x is not null).Cast<HongdalApiWorkflowAttribute>().ToArray();
+            if (actionWorkflows.Length == 0)
+            {
+                actionWorkflows = controllerWorkflows;
+            }
+
+            var actionGrowthTracks = action.GetCustomAttributes<HongdalApiGrowthTrackAttribute>(inherit: true).DefaultIfEmpty().Where(x => x is not null).Cast<HongdalApiGrowthTrackAttribute>().ToArray();
+            if (actionGrowthTracks.Length == 0)
+            {
+                actionGrowthTracks = controllerGrowthTracks;
+            }
+
+            var authorizeAttributes = controllerAuthorize
+                .Concat(action.GetCustomAttributes<AuthorizeAttribute>(inherit: true))
+                .ToArray();
+            var allowsAnonymous = controllerAllowsAnonymous ||
+                action.GetCustomAttributes<AllowAnonymousAttribute>(inherit: true).Any();
+
+            foreach (var httpAttribute in action.GetCustomAttributes<HttpMethodAttribute>(inherit: true))
+            {
+                foreach (var method in httpAttribute.HttpMethods)
+                {
+                    yield return new WorkflowApiEndpointDto
+                    {
+                        EndpointKey = $"{controllerType.Name}.{action.Name}",
+                        ControllerName = controllerType.Name,
+                        ActionName = action.Name,
+                        Method = method,
+                        RoutePattern = CombineRoutes(controllerRoute, httpAttribute.Template),
+                        ProductVersionCode = actionVersion?.Version.ToString() ?? string.Empty,
+                        ProductVersionName = actionVersion?.VersionLabel ?? string.Empty,
+                        WorkflowCodes = actionWorkflows.Select(attribute => attribute.Workflow.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
+                        WorkflowNames = actionWorkflows.Select(attribute => attribute.WorkflowLabel).Distinct(StringComparer.Ordinal).ToArray(),
+                        GrowthTrackCodes = actionGrowthTracks.Select(attribute => attribute.Track.ToString()).Distinct(StringComparer.Ordinal).ToArray(),
+                        GrowthTrackNames = actionGrowthTracks.Select(attribute => attribute.TrackLabel).Distinct(StringComparer.Ordinal).ToArray(),
+                        AuthorizationPolicy = string.Join(", ", authorizeAttributes.Select(x => x.Policy).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.Ordinal)),
+                        AuthorizationRoles = string.Join(", ", authorizeAttributes.Select(x => x.Roles).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.Ordinal)),
+                        AllowsAnonymous = allowsAnonymous
+                    };
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<MethodInfo> GetActionMethods(Type controllerType)
+    {
+        return controllerType
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            .Where(method => method.GetCustomAttributes<HttpMethodAttribute>(inherit: true).Any());
+    }
+
+    private static string CombineRoutes(string controllerRoute, string? actionRoute)
+    {
+        var left = (controllerRoute ?? string.Empty).Trim('/');
+        var right = (actionRoute ?? string.Empty).Trim('/');
+
+        if (string.IsNullOrWhiteSpace(left))
+        {
+            return right;
+        }
+
+        return string.IsNullOrWhiteSpace(right) ? left : $"{left}/{right}";
     }
 
     private static WorkflowParticipantDto ToParticipantDto(HongdalWorkflowParticipant participant)

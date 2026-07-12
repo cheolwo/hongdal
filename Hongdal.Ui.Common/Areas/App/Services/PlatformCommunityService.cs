@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Versioning;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
@@ -34,6 +35,15 @@ public sealed class PlatformCommunityService
         var path = $"api/v1/community/boards?appKey={Uri.EscapeDataString(appKey)}&status={Uri.EscapeDataString(status)}";
         return await _httpClient.GetFromJsonAsync<PlatformCommunityBoardListResponse>(path, cancellationToken)
                ?? new PlatformCommunityBoardListResponse();
+    }
+
+    public async Task<VersionFeatureFlagsResponse> GetVersionWorkflowMetadataAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _httpClient.GetFromJsonAsync<VersionFeatureFlagsResponse>(
+                   "api/v1/version-feature-flags",
+                   cancellationToken)
+               ?? new VersionFeatureFlagsResponse();
     }
 
     public async Task<PlatformCommunityBoardResponse?> CreateBoardRequestAsync(

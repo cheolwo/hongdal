@@ -1,8 +1,8 @@
 @page "/"
 
-<WebPageHeader Title="통달 웹앱 업무 홈"
+<WebPageHeader Title="홍달 웹앱 업무 홈"
                Description="기사, 화주, 창고, 주문자 화면을 앱별 복제판으로 나누지 않고 하나의 WebAssembly 업무 셸 안에서 검증합니다."
-               Badge="통달 1.0 통합 웹" />
+               Badge="홍달 1.0 통합 웹" />
 
 <MudGrid>
     <MudItem xs="12" lg="8">
@@ -48,7 +48,7 @@
                 <MudStack Spacing="1">
                     <MudText Typo="Typo.h6">정리 방향</MudText>
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        기존 MAUI 화면 이름을 그대로 복사하기보다, 통달 웹앱 안에서 업무 단위 라우트와 공통 서비스를 먼저 안정화합니다.
+                        기존 MAUI 화면 이름을 그대로 복사하기보다, 홍달 웹앱 안에서 업무 단위 라우트와 공통 서비스를 먼저 안정화합니다.
                     </MudText>
                 </MudStack>
             </MudPaper>
@@ -71,7 +71,7 @@
     [
         new("화주·판매자 작업공간", "운송 의뢰와 판매/입고 확장 업무의 출발점입니다.", "/shipper", Icons.Material.Filled.LocalShipping, "화주·판매자"),
         new("기사 작업공간", "운행 시작, 추천, 현재 운송, 정산으로 이어질 기사 업무 홈입니다.", "/driver/home", Icons.Material.Filled.Route, "기사"),
-        new("창고·현장 작업공간", "스캔, 피킹, 포장, 홍달마트 현장 작업을 하나의 영역으로 정리합니다.", "/warehouse", Icons.Material.Filled.Warehouse, "창고·현장"),
+        new("창고·현장 작업공간", "스캔, 피킹, 포장, 알뜰살뜰 마트 현장 작업을 하나의 영역으로 정리합니다.", "/warehouse", Icons.Material.Filled.Warehouse, "창고·현장"),
         new("주문자·공동주문", "공동주문 의사 표시와 주문 내역 확인을 담을 영역입니다.", "/orderer", Icons.Material.Filled.Groups, "주문자"),
         new("커뮤니티", "역할별 업무 경험과 문의를 같은 셸 안에서 연결합니다.", "/community", Icons.Material.Filled.Forum, "공통")
     ];

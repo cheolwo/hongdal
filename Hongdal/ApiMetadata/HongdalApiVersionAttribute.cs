@@ -272,7 +272,7 @@ public static class HongdalOperatingSystemLabels
             HongdalOperatingSystem.WarehouseCommerceFulfillment => "창고·커머스 이행 OS",
             HongdalOperatingSystem.GroupPurchaseImport => "공동주문 수입 OS",
             HongdalOperatingSystem.FoodDelivery => "음식 배달 OS",
-            HongdalOperatingSystem.HongdalMartUrbanLogistics => "홍달마트 도심 물류 OS",
+            HongdalOperatingSystem.HongdalMartUrbanLogistics => "알뜰살뜰 마트 도심 물류 OS",
             HongdalOperatingSystem.CommunityTrust => "커뮤니티 신뢰 OS",
             HongdalOperatingSystem.PlatformOperations => "플랫폼 운영 OS",
             _ => throw new ArgumentOutOfRangeException(nameof(operatingSystem), operatingSystem, "Unknown Hongdal operating system.")
@@ -315,7 +315,7 @@ public static class HongdalWorkflowLabels
             HongdalWorkflow.CommunityTrust => "커뮤니티 신뢰",
             HongdalWorkflow.HrParticipation => "참여 인력 관리",
             HongdalWorkflow.FoodDelivery => "음식 배달",
-            HongdalWorkflow.HongdalMart => "홍달마트",
+            HongdalWorkflow.HongdalMart => "알뜰살뜰 마트",
             _ => throw new ArgumentOutOfRangeException(nameof(workflow), workflow, "Unknown Hongdal workflow.")
         };
     }
@@ -392,12 +392,12 @@ public static class HongdalOperatingSystems
             [HongdalWorkflow.HongdalMart, HongdalWorkflow.WarehouseFulfillment, HongdalWorkflow.FoodDelivery, HongdalWorkflow.DomesticTransport],
             [
                 new("OutboundBatchEngine", "출고 배치 엔진", "도심 재고와 가까운 배송권을 우선해 출고 물량을 조정합니다."),
-                new("PickingBatchEngine", "피킹 배치 엔진", "홍달마트 도심 창고는 피킹·포장 통합 옵션을 우선 적용합니다."),
+                new("PickingBatchEngine", "피킹 배치 엔진", "알뜰살뜰 마트 도심 창고는 피킹·포장 통합 옵션을 우선 적용합니다."),
                 new("TransportRequestDispatchEngine", "운송 의뢰 배차 엔진", "포장 완료 시점과 묶음 배송 가능성을 기준으로 기사 후보를 조정합니다.")
             ],
             [
                 new(HongdalSchedulingPolicyKind.Sjf, "MartSmallPickSjf", "소량 피킹 우선", "마트피킹대기", "PickingBatchEngine", "도심 창고의 협소한 공간을 고려해 소량·단순 위치 피킹을 빠르게 처리합니다.", "대량 주문은 마감 시간과 Aging 점수로 별도 보정합니다."),
-                new(HongdalSchedulingPolicyKind.Affinity, "MartPickPackAffinity", "피킹·포장 통합 작업자 우선", "마트피킹대기", "PickingBatchEngine", "홍달마트 도심 창고는 같은 작업자가 피킹과 포장을 함께 처리하는 옵션을 우선 적용합니다.", "특정 작업자에게 몰리면 포장 분리 모드로 전환할 수 있게 합니다."),
+                new(HongdalSchedulingPolicyKind.Affinity, "MartPickPackAffinity", "피킹·포장 통합 작업자 우선", "마트피킹대기", "PickingBatchEngine", "알뜰살뜰 마트 도심 창고는 같은 작업자가 피킹과 포장을 함께 처리하는 옵션을 우선 적용합니다.", "특정 작업자에게 몰리면 포장 분리 모드로 전환할 수 있게 합니다."),
                 new(HongdalSchedulingPolicyKind.Edf, "MartPromiseEdf", "즉시배송 약속 시간 우선", "마트배송대기", "TransportRequestDispatchEngine", "고객 약속 시간과 포장 완료 예상 시각이 가까운 주문을 먼저 기사 인계합니다.", "묶음 배송 대기 시간이 길어지면 단독 배송으로 전환합니다."),
                 new(HongdalSchedulingPolicyKind.Batching, "ApartmentDropBatching", "단지·동선 묶음 배송", "마트배송대기", "TransportRequestDispatchEngine", "같은 아파트 단지, 같은 동선, 유사 도착 시간대의 주문을 묶습니다.", "묶음 때문에 약속 시간이 깨지는 주문은 EDF 정책으로 분리합니다.")
             ]),
@@ -474,7 +474,7 @@ public static class HongdalActorLabels
             HongdalActor.EmployerOrOperatingEntity => "고용·운영 주체",
             HongdalActor.Restaurant => "음식점",
             HongdalActor.FoodDeliveryDriver => "배달 기사",
-            HongdalActor.MartOperator => "홍달마트 운영자",
+            HongdalActor.MartOperator => "알뜰살뜰 마트 운영자",
             _ => throw new ArgumentOutOfRangeException(nameof(actor), actor, "Unknown Hongdal actor.")
         };
     }
@@ -549,7 +549,7 @@ public static class HongdalWorkflowRelations
             HongdalWorkflow.HongdalMart,
             HongdalWorkflow.WarehouseFulfillment,
             HongdalWorkflowRelationKind.Calls,
-            "홍달마트 주문은 도심 재고, 피킹, 포장 처리를 창고 입출고 흐름과 연결합니다."),
+            "알뜰살뜰 마트 주문은 도심 재고, 피킹, 포장 처리를 창고 입출고 흐름과 연결합니다."),
         new(
             HongdalWorkflow.HongdalMart,
             HongdalWorkflow.DomesticTransport,
@@ -713,7 +713,7 @@ public static class HongdalWorkflowParticipants
         new(
             HongdalWorkflow.HongdalMart,
             "MartOperator",
-            "홍달마트 운영자",
+            "알뜰살뜰 마트 운영자",
             true,
             "상품, 도심 재고, 피킹·포장 기준을 관리합니다."),
         new(
@@ -741,7 +741,7 @@ public static class HongdalWorkflowParticipants
             HongdalWorkflow.CommunityTrust => "업무 활동에서 공개 가능한 신뢰 신호, 후기, 투표, 관계 기록을 개인정보 보호 범위 안에서 다루는 책임을 가집니다.",
             HongdalWorkflow.HrParticipation => "플랫폼 업무에 참여하는 인력의 역할, 계약, 보상, 신고 준비 상태를 관리하는 범위를 책임집니다.",
             HongdalWorkflow.FoodDelivery => "음식 주문이 조리, 픽업, 고객 전달, 완료 증빙으로 이어지는 범위를 책임집니다.",
-            HongdalWorkflow.HongdalMart => "홍달마트 주문이 도심 재고, 피킹, 포장, 기사 인계로 이어지는 범위를 책임집니다.",
+            HongdalWorkflow.HongdalMart => "알뜰살뜰 마트 주문이 도심 재고, 피킹, 포장, 기사 인계로 이어지는 범위를 책임집니다.",
             _ => throw new ArgumentOutOfRangeException(nameof(workflow), workflow, "Unknown Hongdal workflow.")
         };
     }
@@ -940,7 +940,7 @@ public static class HongdalWorkflowScreens
             "MartOperator",
             "WarehouseManagerApp",
             "창고 관리자 앱",
-            "홍달마트 작업 홈",
+            "알뜰살뜰 마트 작업 홈",
             "/mart",
             "마트 운영자가 도심 재고, 피킹, 포장, 기사 인계 작업으로 진입합니다."),
         new(
@@ -948,7 +948,7 @@ public static class HongdalWorkflowScreens
             "Orderer",
             "OrdererApp",
             "주문자 앱",
-            "홍달마트 주문",
+            "알뜰살뜰 마트 주문",
             "/food/mart",
             "주문자가 도심 창고 재고 기반 마트 상품을 주문합니다.")
     ];

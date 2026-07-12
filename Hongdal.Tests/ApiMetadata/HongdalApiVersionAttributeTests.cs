@@ -242,6 +242,32 @@ public sealed class HongdalApiVersionAttributeTests
     }
 
     [Fact]
+    public void VersionFeatureFlagsController_ReturnsApiEndpointMetadataFromExistingRoutes()
+    {
+        var controller = new VersionFeatureFlagsController(
+            new 버전워크플로우UseCase(new FakeVersionFeatureFlagService()));
+
+        var result = controller.Get();
+        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        var response = Assert.IsType<Hongdal.Contracts.Common.Versioning.VersionFeatureFlagsResponse>(ok.Value);
+
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "화주운송의뢰Controller.의뢰생성" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/shipper/requests" &&
+            endpoint.ProductVersionName == "1.0");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "기사운송진행Controller.상차완료" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/driver/transports/{id:long}/pickup-complete");
+        Assert.Contains(response.ApiEndpoints, endpoint =>
+            endpoint.EndpointKey == "커뮤니티게시글Controller.Create" &&
+            endpoint.Method == "POST" &&
+            endpoint.RoutePattern == "api/v1/community/posts" &&
+            endpoint.AllowsAnonymous);
+    }
+
+    [Fact]
     public void Controllers_HaveHongdalProductVersionMetadata()
     {
         var missingControllers = GetControllerTypes()

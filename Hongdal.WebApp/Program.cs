@@ -26,6 +26,7 @@ builder.Services.AddHongdalUiCommonAppServices();
 builder.Services.AddHongdalDocumentOutputServices();
 builder.Services.AddScoped<PlatformCommunityService>();
 builder.Services.AddScoped<PlatformHomeModeStateService>();
+builder.Services.AddScoped<PlatformDiagramPaletteStateService>();
 builder.Services.AddScoped<WebAuthSessionService>();
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkspaceService>(sp => sp.GetRequiredService<WebShipperWarehouseWorkspaceService>());
