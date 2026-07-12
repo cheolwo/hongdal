@@ -215,7 +215,7 @@ public sealed class PickingBatchEngineTests
                 new 피킹배치창고옵션
                 {
                     WarehouseId = 35,
-                    WarehouseName = "홍달마트 도심 창고",
+                    WarehouseName = "알뜰살뜰 마트 도심 창고",
                     홍달마트도심창고여부 = true,
                     기본처리방식 = 피킹포장처리방식.피킹포장통합,
                     운영메모 = "협소한 도심 창고라 피킹 작업자가 포장까지 이어서 처리합니다."

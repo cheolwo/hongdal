@@ -1,6 +1,9 @@
+@using System.Globalization
 @using Hongdal.Contracts.Common.Inbound
 @using Hongdal.Contracts.Common.Warehouse
 @using Hongdal.Ui.Common.Areas.App.Services
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
 @inject IWarehouseWorkspaceService WarehouseService
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-6">
@@ -185,6 +188,7 @@
 
     private bool isLoading;
     private bool isBusy;
+    private bool initialDiagramWarehouseProxyApplied;
     private string? message;
     private Severity messageSeverity = Severity.Info;
     private static readonly IReadOnlyList<string> proxySiteTypes =
@@ -243,6 +247,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadAsync();
+        ApplyDiagramWarehouseProxyRequestFromQuery();
     }
 
     private async Task LoadAsync()
@@ -395,6 +400,123 @@
             입고흐름유형코드.주문자동입고예정 => "주문/구매 흐름 자동 생성",
             _ => "계약 DB 기반 등록"
         };
+
+    private void ApplyDiagramWarehouseProxyRequestFromQuery()
+    {
+        if (initialDiagramWarehouseProxyApplied)
+        {
+            return;
+        }
+
+        var query = ParseQueryParameters(Navigation.Uri);
+        if (!string.Equals(GetQueryValue(query, "source"), "diagram-warehouse-proxy", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        initialDiagramWarehouseProxyApplied = true;
+
+        var warehouseIdText = GetQueryValue(query, "warehouseId");
+        if (long.TryParse(warehouseIdText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var warehouseId) &&
+            warehouses.Any(warehouse => warehouse.Id == warehouseId))
+        {
+            selectedWarehouseId = warehouseId;
+        }
+
+        var warehouseNameFromQuery = GetQueryValue(query, "warehouseName") ?? string.Empty;
+        var proxyType = LogisticsProxySiteTypes.Normalize(GetQueryValue(query, "proxyType"));
+        var warehouseAddressFromQuery = GetQueryValue(query, "warehouseAddress") ?? string.Empty;
+
+        if (!selectedWarehouseId.HasValue)
+        {
+            warehouseName = warehouseNameFromQuery;
+            warehouseProxySiteType = proxyType;
+            warehouseAddress = warehouseAddressFromQuery;
+        }
+
+        inboundFlowType = 입고흐름유형코드.계약기반입고;
+        supplierName = "다이어그램 물류 대행 신청";
+        orderReference = $"DIAGRAM-{DateTime.Today:yyyyMMdd}";
+        expectedArrivalDate = DateTime.Today.AddDays(1);
+        contractType = ResolveInboundContractType(proxyType);
+        contractCounterpartyName = warehouseNameFromQuery;
+        contractSettlementType = "보관료/작업비 협의";
+        inboundMemo = BuildDiagramWarehouseProxyMemo(query, warehouseNameFromQuery, proxyType);
+        messageSeverity = Severity.Info;
+        message = selectedWarehouseId.HasValue
+            ? "다이어그램 창고 블록에서 넘어온 물류 대행 신청서 초안을 채웠습니다."
+            : "다이어그램 창고 블록에서 넘어온 후보를 창고 빠른 등록과 입고 요청 신청서에 채웠습니다. 먼저 창고를 등록하거나 기존 창고를 선택하세요.";
+    }
+
+    private static string ResolveInboundContractType(string proxyType)
+        => LogisticsProxySiteTypes.Normalize(proxyType) switch
+        {
+            LogisticsProxySiteTypes.MarketFulfillment => 입고계약유형코드.마켓풀필먼트,
+            LogisticsProxySiteTypes.OverseasCustomsAgency => 입고계약유형코드.수입통관풀필먼트,
+            _ => 입고계약유형코드.보관대행
+        };
+
+    private static string BuildDiagramWarehouseProxyMemo(
+        IReadOnlyDictionary<string, string> query,
+        string warehouseName,
+        string proxyType)
+    {
+        var nodeTitle = GetQueryValue(query, "nodeTitle") ?? "창고 블록";
+        var nodeGroup = GetQueryValue(query, "nodeGroup") ?? string.Empty;
+        var nodeDescription = GetQueryValue(query, "nodeDescription") ?? string.Empty;
+        var scope = GetQueryValue(query, "scope") ?? string.Empty;
+
+        return string.Join(Environment.NewLine, new[]
+        {
+            "다이어그램 창고 블록에서 시작한 판매자 물류 대행 신청입니다.",
+            $"- 창고 후보: {warehouseName}",
+            $"- 물류 대행 유형: {LogisticsProxySiteTypes.GetDisplayName(proxyType)}",
+            $"- 후보 범위: {scope}",
+            $"- 다이어그램 노드: {nodeTitle}",
+            $"- 블록 그룹: {nodeGroup}",
+            $"- 노드 설명: {nodeDescription}",
+            "- 보완 필요: 품목, 수량, 희망 입고일, 보관 기간, 피킹/포장/출고 대행 필요 여부"
+        });
+    }
+
+    private static IReadOnlyDictionary<string, string> ParseQueryParameters(string uri)
+    {
+        var queryStart = uri.IndexOf('?', StringComparison.Ordinal);
+        if (queryStart < 0 || queryStart == uri.Length - 1)
+        {
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        var query = uri[(queryStart + 1)..];
+        var fragmentStart = query.IndexOf('#', StringComparison.Ordinal);
+        if (fragmentStart >= 0)
+        {
+            query = query[..fragmentStart];
+        }
+
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in query.Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var separator = pair.IndexOf('=', StringComparison.Ordinal);
+            var key = separator >= 0 ? pair[..separator] : pair;
+            var value = separator >= 0 ? pair[(separator + 1)..] : string.Empty;
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                continue;
+            }
+
+            result[DecodeQueryValue(key)] = DecodeQueryValue(value);
+        }
+
+        return result;
+    }
+
+    private static string? GetQueryValue(IReadOnlyDictionary<string, string> query, string key)
+        => query.TryGetValue(key, out var value) ? value : null;
+
+    private static string DecodeQueryValue(string value)
+        => Uri.UnescapeDataString(value.Replace("+", " ", StringComparison.Ordinal));
 
     private async Task CompleteInboundAsync()
     {

@@ -2,9 +2,18 @@
 @page "/mart/work-board"
 
 <WebPageHeader Eyebrow="Warehouse Web"
-               Title="홍달마트 작업 보드"
+               Title="알뜰살뜰 마트 작업 보드"
                Description="음식점 주문 보드처럼 빠르게 보되, 기준 데이터는 창고 재고, 피킹 위치, 포장 완료, 배달 기사 픽업입니다."
                Badge="마트 작업 보드" />
+
+<MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-3">
+    <MudButton Href="@WarehouseManagerRoutes.MartPickingPacking"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
+        피킹/포장 작업
+    </MudButton>
+</MudStack>
 
 <MudGrid Class="mb-4">
     @foreach (var summary in Summaries)

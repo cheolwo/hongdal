@@ -58,7 +58,7 @@ public sealed class 운송의뢰배차원천분류ServiceTests
     {
         var result = _service.분류(CreateQueue(상태값.배차업무유형.음식배달, sourceType));
 
-        Assert.Equal("홍달마트 즉시배송", result.상위흐름);
+        Assert.Equal("알뜰살뜰 마트 즉시배송", result.상위흐름);
         Assert.True(result.출고예정대상여부);
         Assert.True(result.창고선행작업필요);
     }

@@ -2,7 +2,7 @@
 
 <WebPageHeader Eyebrow="Warehouse Web"
                Title="창고 관리자 웹 작업공간"
-               Description="WarehouseManagerApp의 입고, 스캔, 피킹, 포장, 홍달마트 흐름을 통합 WebAssembly 셸 안에서 검증합니다."
+               Description="WarehouseManagerApp의 입고, 스캔, 피킹, 포장, 알뜰살뜰 마트 흐름을 통합 WebAssembly 셸 안에서 검증합니다."
                Badge="WarehouseManagerApp 통합" />
 
 <MudGrid>
@@ -21,7 +21,7 @@
             <MudStack Spacing="3">
                 <MudStack Spacing="1">
                     <MudText Typo="Typo.h6">도심 마트 풀필먼트</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">홍달마트처럼 좁은 도심 창고에서 피킹, 포장, 배달 기사 픽업까지 빠르게 처리합니다.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">알뜰살뜰 마트처럼 좁은 도심 창고에서 피킹, 포장, 배달 기사 픽업까지 빠르게 처리합니다.</MudText>
                 </MudStack>
                 <WebPageLinkGrid Items="MartLinks" />
             </MudStack>
@@ -56,10 +56,10 @@
 
     private static readonly IReadOnlyList<WebAppPageLink> MartLinks =
     [
-        new("홍달마트 홈", "도심 입고, 보충, 주문 피킹/포장, 배달 픽업 진입점을 모읍니다.", WarehouseManagerRoutes.MartHome, Icons.Material.Filled.Storefront, "홍달마트"),
-        new("홍달마트 작업 보드", "음식점 주문 보드처럼 빠르게 보되 창고 재고와 배달 픽업을 기준으로 처리합니다.", WarehouseManagerRoutes.MartWorkBoard, Icons.Material.Filled.Dashboard, "홍달마트"),
-        new("도심 입고", "납품, 반품, 거점 이동 물량을 창고 재고로 확인합니다.", WarehouseManagerRoutes.MartInboundWorkStart, Icons.Material.Filled.MoveToInbox, "홍달마트"),
-        new("피킹/포장", "고객 주문별로 상품을 피킹하고 포장 완료 상태까지 처리합니다.", WarehouseManagerRoutes.MartPickingWorkStart, Icons.Material.Filled.ShoppingCartCheckout, "홍달마트")
+        new("알뜰살뜰 마트 홈", "도심 입고, 보충, 주문 피킹/포장, 배달 픽업 진입점을 모읍니다.", WarehouseManagerRoutes.MartHome, Icons.Material.Filled.Storefront, "알뜰살뜰 마트"),
+        new("알뜰살뜰 마트 작업 보드", "음식점 주문 보드처럼 빠르게 보되 창고 재고와 배달 픽업을 기준으로 처리합니다.", WarehouseManagerRoutes.MartWorkBoard, Icons.Material.Filled.Dashboard, "알뜰살뜰 마트"),
+        new("도심 입고", "납품, 반품, 거점 이동 물량을 창고 재고로 확인합니다.", WarehouseManagerRoutes.MartInboundWorkStart, Icons.Material.Filled.MoveToInbox, "알뜰살뜰 마트"),
+        new("피킹/포장", "고객 주문별로 상품을 피킹하고 포장 완료 상태까지 처리합니다.", WarehouseManagerRoutes.MartPickingWorkStart, Icons.Material.Filled.ShoppingCartCheckout, "알뜰살뜰 마트")
     ];
 
     private static readonly IReadOnlyList<(string Title, string Description)> WorkItems =

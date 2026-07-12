@@ -1,0 +1,24 @@
+@page "/mart/picking"
+
+<PageTitle>알뜰살뜰 마트 피킹/포장</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">알뜰살뜰 마트 피킹/포장</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    출고 예정품을 주문별로 피킹하고 포장 완료, 출고 완료 요청까지 조작하는 알뜰살뜰 마트 작업 화면입니다.
+                </MudText>
+            </MudStack>
+            <MudButton Href="@WarehouseManagerRoutes.MartHome"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       StartIcon="@Icons.Material.Filled.Storefront">
+                알뜰살뜰 마트 홈
+            </MudButton>
+        </MudStack>
+
+        <HongdalMartPickingPackingWorkflow WorkBoardUrl="@WarehouseManagerRoutes.MartWorkBoard" />
+    </MudStack>
+</MudContainer>

@@ -14,7 +14,7 @@ public static class Command기능버전Catalog
             ["2.0"] = new("2.0", "2.0 통관/HS", 200, false),
             ["2.5"] = new("2.5", "2.5 주문자 집단 공동 주문", 250, false),
             ["3.0"] = new("3.0", "3.0 음식점 일반 배달", 300, false),
-            ["3.5"] = new("3.5", "3.5 홍달마트/도심 즉시배송", 350, false)
+            ["3.5"] = new("3.5", "3.5 알뜰살뜰 마트/도심 즉시배송", 350, false)
         };
 
     public static Command기능버전정보 Get(string? version)

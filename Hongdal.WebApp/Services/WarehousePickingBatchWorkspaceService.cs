@@ -63,7 +63,7 @@ public sealed class SampleWarehousePickingBatchWorkspaceService : IWarehousePick
     private readonly List<WarehousePickingWarehouseOption> _options =
     [
         new(10, "송파 상온 창고", 피킹포장처리방식.피킹포장분리, true, false, "일반 출고 창고는 피킹과 포장을 분리해 운영합니다."),
-        new(20, "홍달마트 도심 창고", 피킹포장처리방식.피킹포장통합, true, true, "장소가 협소한 도심 창고라 피킹 작업자가 포장까지 이어서 처리합니다.")
+        new(20, "알뜰살뜰 마트 도심 창고", 피킹포장처리방식.피킹포장통합, true, true, "장소가 협소한 도심 창고라 피킹 작업자가 포장까지 이어서 처리합니다.")
     ];
 
     private readonly List<WarehousePickingTaskItem> _tasks =
@@ -110,7 +110,7 @@ public sealed class SampleWarehousePickingBatchWorkspaceService : IWarehousePick
         {
             TaskKey = "PICK-20-001",
             WarehouseId = 20,
-            WarehouseName = "홍달마트 도심 창고",
+            WarehouseName = "알뜰살뜰 마트 도심 창고",
             PickerName = "도심피킹",
             PickerPhoneLast8 = "77773333",
             WorkerBundleBarcode = "77773333",
