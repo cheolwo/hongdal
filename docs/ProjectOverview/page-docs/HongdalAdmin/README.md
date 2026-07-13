@@ -44,6 +44,7 @@
 | [HongdalAdmin-P37 - 국내화물 AI 배차 검토](HongdalAdmin-P37/) | /dispatch/ai-review | 운영 | 국내화물 AI 배차 검토 | 완료 |
 | [HongdalAdmin-P38 - 음식배달 AI 배차 검토](HongdalAdmin-P38/) | /dispatch/food-ai-review | 운영 | 음식배달 AI 배차 검토 | 완료 |
 | [HongdalAdmin-P39 - 배차 AI 판단 사례](HongdalAdmin-P39/) | /dispatch-ai-judgment-cases | 운영 | 배차 AI 판단 사례 | 완료 |
+| [HongdalAdmin-P40 - 개발용 Fake PG/정산 콘솔](HongdalAdmin-P40/) | /development/fake-payment-settlement | 개발 | 결제 보증과 기사 정산 상태 전이 시뮬레이션 | 캡처 대기 |
 | [HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면](HongdalAdmin-P90/) | /weather | 시스템 | 템플릿/샘플성 날씨 화면 | 완료 |
 | [HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면](HongdalAdmin-P91/) | /counter | 시스템 | 템플릿/샘플성 카운터 화면 | 완료 |
 | [HongdalAdmin-P99 - 미발견 페이지](HongdalAdmin-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

@@ -17,4 +17,5 @@
 | [WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈](WarehouseManagerApp-P05/) | /mart | 확장 | 알뜰살뜰 마트 창고 홈 | 완료 |
 | [WarehouseManagerApp-P05-1 - 알뜰살뜰 마트 작업 보드](WarehouseManagerApp-P05-1/) | /mart/work-board | 확장 | 알뜰살뜰 마트 작업 보드 | 완료 |
 | [WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작](WarehouseManagerApp-P05-2/) | /mart/work/{ProcessCode} | 확장 | 알뜰살뜰 마트 프로세스별 작업 시작 | 완료 |
+| [WarehouseManagerApp-P05-3 - 알뜰살뜰 마트 피킹/포장](WarehouseManagerApp-P05-3/) | /mart/picking | 확장 | 주문별 피킹·포장·출고 완료 요청 | 캡처 대기 |
 | [WarehouseManagerApp-P99 - 미발견 페이지](WarehouseManagerApp-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

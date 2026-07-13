@@ -1,107 +1,71 @@
 # Platform Community Home
 
-## Operating Policy
+`PlatformCommunityHome`은 Hongdal 클라이언트에서 커뮤니티, 업무 진입, 원장 다이어그램을 조합하는 공통 화면 컴포넌트다. 제품 화면과 사용자 흐름은 [통합 커뮤니티 클라이언트와 꾸미기 상점](ProjectOverview/unified-community-client.md)에서 캡처와 함께 본다.
 
-- The community surface is free by default. General posts, comments, image comments, recommendations, report-board posts, suggestions, and coordination posts are treated as basic communication infrastructure.
-- The platform should charge only for optional tools that help users perform work more easily, such as legal/document helpers, business exports, promoted posts, advanced matching, bulk notifications, scheduled posts, or customs/HS-code support workflows.
-- Required work features stay outside this optional fee layer. For example, transport completion photos, required file uploads, warehouse state changes, and legally necessary audit records must keep working regardless of auxiliary feature settings.
-- Admin configuration should distinguish free communication, required work, optional utility, and paid utility features.
-- See [Community Operating Policy](Architecture/CommunityOperatingPolicy.md) for the operating model.
+## 책임 경계
 
-## API Metadata
+| 책임 | 위치 |
+| --- | --- |
+| 역할에 맞는 홈 선택 | `ShipperApp/Components/Pages/UnifiedHome.razor` |
+| 화주·창고 관리자 업무 콘텐츠 구성 | 각 역할 홈의 `WorkModeContent` |
+| 게시판·글쓰기·원장 다이어그램 UI | `PlatformCommunityHome` |
+| 실제 운송·창고·판매 처리 | 목적별 업무 페이지와 API |
+| 꾸미기 상품·보유·적용 상태 | `PlatformCommunityDecorationStateService` |
 
-- Community APIs are tracked with `HongdalApiGrowthTrack.Community` in addition to their product version.
-- The product version records where an API first stabilizes. The community growth track records that the feature continues to evolve across 1.0, 2.5, 3.0, and later scopes.
-- Current community-track API surfaces include community posts, community activity signals, gratitude messages, connection requests, work relationship snapshots, and onboarding connection-candidate lookup.
+공통 홈은 모든 업무를 직접 처리하지 않는다. 커뮤니티에서 초안을 만들고, 사방괘에서 영역을 고르고, 다이어그램 노드의 행동을 통해 목적별 데이터 페이지로 이어주는 접수·탐색 표면이다. 세 단계의 책임은 [통합 클라이언트 3단계 내비게이션](Architecture/ThreeStageClientNavigation.md)을 따른다.
 
-## Activity Signals
+## 현재 사용자 모드
 
-- Community mode should not be only a manual board. It should also show privacy-safe signs of real platform activity so users can see how others are working, buying, transporting, reviewing, and coordinating.
-- Raw activity logs remain private/admin data. Community reads use `GET api/v1/community/activity-signals`, which converts successful work logs into anonymized signals.
-- Activity signals never expose user id, user name, email, phone, trace id, IP address, user agent, raw URL, query string, or raw metadata JSON.
-- Default signal reads exclude simple `Read` logs to avoid filling the community with passive page views. Clients can request `includeRead=true` when a product journey or similar read signal is useful.
-- Supported initial scopes are driver work, shipper transport, warehouse work, product journey, sales commerce, and community trust.
+- 커뮤니티: 게시판 선택, 글 피드, 댓글·추천, 글쓰기, README형 다이어그램 미리보기
+- 업무: 역할별 상태 요약과 목적별 업무 페이지 진입
+- 다이어그램: 단일·연결·복합 원장 경계, 원장 노드·연결선·레이어·입력 준비도 편집
 
-## Voting And Resolutions
+모바일 하단에는 `커뮤니티`, `게시판`, `글쓰기`, `업무`를 둔다. 역할 변경은 우측 상단 사람 버튼에서 수행하므로 하단 핵심 행동을 침범하지 않는다.
 
-- Community mode can host lightweight votes for coordination, purchase intent, work scheduling, shared facility decisions, and dispute/operation preferences.
-- The first server surface is `api/v1/community/votes`.
-- A vote can be closed and converted into a resolution document draft.
-- Resolution documents can request participant signatures through the platform signature evidence model.
-- A vote result is not treated as automatically legally effective. The resolution document moves through explicit states such as `LegalReviewRequired`, `ReadyToSign`, `PartiallySigned`, and `Signed`.
-- The document response includes a legal-effect notice because actual enforceability or submission acceptance depends on the document type, participant authority, notice/consent, counterparty or agency rules, and legal review.
+음식 주문 원장과 음식 배달 원장은 별도 수명주기를 유지한 연결 원장 묶음으로 표시한다. 음식 주문은 준비 완료에서 끝나며 직접 수령은 배달 원장 0건, 첫 배달·분할·재배달은 회차별 배달 원장 1건 이상으로 연결한다. 공동구매 원장은 수요, 수입 결정, 선적/통관, 입고/분배 원장을 포함·조정하는 복합 원장으로 표시한다. 묶음 또는 복합 원장의 내부 원장을 선택하는 동작은 2단계 다이어그램 탐색이고, 실제 목록·상세·처리는 노드 행동을 거쳐 3단계 페이지에서 수행한다.
 
-## Role Profile Badges
+창고 간 이동은 `창고 출고 → 운송 상차 → 운송 하차 → 창고 입고`의 연결 원장 흐름으로 표시한다. `창고 출고` 노드는 오른쪽·아래쪽 출력 포트만, `창고 입고` 노드는 왼쪽·위쪽 입력 포트만 제공한다. 운송 하차의 품목·인수 상태·증빙은 창고 입고 입력과 검수 근거로 이어진다.
 
-- Community author and commenter displays use a lightweight role-profile badge.
-- The badge shows a small avatar ring and role chip so readers can quickly understand whether a participant mainly appears as a driver, shipper, orderer, seller, warehouse operator, customs broker, HR manager, operator, or general participant.
-- The current implementation infers the role from app/context/category/nickname because community DTOs do not yet store a primary role field.
-- Report-board posts keep masked participants as anonymous role badges.
-- Later, when participant/profile tables become the source of truth, the same component should receive the user's declared or system-derived primary role instead of relying on context inference.
+다이어그램의 `입력 폼`은 일반 업무 노드와 구분되는 별도 노드 종류다. 기본 폼 유형은 일반 입력, 운송의뢰, 창고 출고, 창고 입고, 상차 확인, 하차 확인이며 각 유형은 서로 다른 필수·선택 필드를 제공한다. 사용자는 다이어그램 도구의 `폼 추가` 메뉴에서 폼 노드를 넣고 노드 상세에서 값을 입력한다. 필수 필드 입력 비율은 기존 노드 준비도 색상 채움과 퍼센트에 즉시 반영된다.
 
-## Photo Attachments
+폼에서 업무 노드로 나가는 연결은 폼 유형별 `허용 대상 조건 목록`과 노드 연결점의 입력·출력 방향을 검사한다. 허용 대상 조건들은 OR 관계이므로 종류, 제목 키워드 등 여러 대안 중 하나만 만족해도 연결할 수 있다. 운송의뢰 폼은 `delivery` 종류이거나 제목에 `운송·배차·상차` 중 하나가 있는 노드, 창고 출고 폼은 `warehouse` 종류이거나 제목에 `창고·출고·피킹·포장` 중 하나가 있는 노드, 창고 입고 폼은 `warehouse` 종류이거나 제목에 `창고·입고·검수·하역` 중 하나가 있는 노드를 허용한다. 상·하차 확인 폼도 각 확인 의미에 해당하는 여러 제목 키워드 중 하나를 만족하면 된다. 연결선에는 각각 `운송 의뢰 제출`, `상차 확인 제출`, `하차 확인 제출`, `입고 요청 제출`, `출고 요청 제출` 라벨을 기본 적용한다. 일반 입력 폼은 연결점 방향을 만족하는 모든 업무 노드를 대상으로 한다. 허용되지 않은 대상을 선택하면 연결을 만들지 않고 현재 폼의 대안 조건을 화면에 안내한다.
 
-- Community posts can include image attachments so the hub can handle field photos, notices, reference screenshots, and lightweight visual reports.
-- Attachments are uploaded after the post is created or edited, and the post password is checked again before each upload.
-- The server stores attachment metadata in `platform_community_post_attachments` and cascades deletion when the parent post is deleted.
-- Image files are uploaded through `IGoogleCloudStorageService`; the root folder, maximum file size, attachment count, and allowed content types are controlled by `CommunityPostStorage` in `appsettings`.
-- The default storage folder is `community/posts`, while development uses `community/dev-posts`.
+캔버스 노드는 흐름 배치 순서와 별도의 겹침 순서를 가진다. 선택 노드는 다이어그램 툴바, 모바일 노드 집중 영역 또는 노드 상세 패널에서 `맨 앞으로`와 `맨 뒤로` 이동할 수 있다. 노드 상세에는 현재 겹침 위치를 `맨 앞`, `맨 뒤`, `겹침 n/N`으로 표시하며 연결점은 해당 노드의 겹침 층을 함께 따른다. 배치 초기화 또는 워크플로우 교체 시 겹침 순서도 현재 노드 목록 기준으로 다시 구성한다.
 
-## Promotion And Engagement
+## 모바일 UX
 
-- Public users can share text, image attachments, and external links such as video URLs.
-- Public create/update APIs do not accept direct top-pinning authority.
-- Operator-pinned posts are controlled through `POST api/v1/community/posts/{id}/operator-pin` and require the `서버관리자전용` authorization policy.
-- Normal posts rise in the list through server-side engagement signals: recommendation count, comment count, and latest engagement time.
-- Recommendations are recorded in `platform_community_post_recommendations` with a per-post recommender key to avoid repeated recommendations from the same client session.
-- Comments are stored in `platform_community_post_comments`; the post keeps `CommentCount` and `LastEngagedAtUtc` so active conversations can appear higher without becoming operator-pinned notices.
-- `PlatformCommunityHome` now exposes inline recommendation and comment entry controls on each post card.
-- Admin hosts can pass `CanManageCommunityPosts="true"` to show operator pin/unpin controls; ordinary app hosts leave this disabled.
-- Image attachments support their own comment stream, stored in `platform_community_post_attachment_comments`.
-- Attachment comments update the parent post engagement timestamp so active image discussions can also raise the post in the community feed.
-- Each image card shows its recent image comments and provides an inline nickname/password/comment form.
-- Post comments and image comments can be deleted with the original comment password.
-- Post comments and image comments can be reported; report counts are stored on the comment records.
-- Operators can hide post comments and image comments through server-admin-only moderation endpoints. Hidden comments are excluded from community reads without deleting the underlying record.
+- `760px` 이하에서는 다이어그램을 위에서 아래로 읽는 세로 흐름으로 전환한다.
+- 선택 노드의 상세와 필수 입력은 하단 집중 패널에 표시한다.
+- 연결선 옵션은 데스크톱 우측 도크, 모바일 하단 시트로 구분한다.
+- 노드 입력 준비도는 색상 채움과 함께 퍼센트·입력 개수·안내 문구를 표시한다.
+- 후천 사방 이동판은 모바일 오른쪽 벽면의 반원 손잡이에서 펼친다.
 
-## Report Board Privacy
+## 커뮤니티 API
 
-- Community posts can be marked as report-board posts with `IsReportBoardPost`.
-- Report-board posts store `ReporterDisplayName` and `ReportedDisplayName` separately from the public post nickname.
-- Public/community list responses use observer-safe labels for report subjects by default: reporter and reported party are masked.
-- The UI shows report-board posts with a warning notice and displays report subjects as anonymous observer labels.
-- The intended visibility split is:
-  - observers see masked report subjects and masked participant labels;
-  - reporter, reported party, and operators may receive a future role-checked response with the minimum necessary identity range;
-  - operator moderation remains separate from normal top-pinning and engagement sorting.
-- Server-side masking is the primary rule. Client-side masking is kept as an additional display guard.
+| 영역 | 경로 |
+| --- | --- |
+| 게시글·첨부·댓글·추천·신고 | `api/v1/community/posts` |
+| 게시판 | `api/v1/community/boards` |
+| 개인정보가 제거된 활동 신호 | `api/v1/community/activity-signals` |
+| 투표·결의문·서명 | `api/v1/community/votes` |
+| 다이어그램 대화 | `api/v1/community/diagram-conversations` |
+| 노드 스티커 상품·FakePG | `api/v1/community/node-sticker-store` |
 
-## Community Hub Posts
+컨트롤러는 HTTP와 권한 경계를 담당하고, 게시글·투표·활동 신호·상점의 판단은 각 UseCase에 둔다. 원시 활동 로그, 연락처, 주소, 결제 증빙, 추적 ID는 커뮤니티 응답에 그대로 노출하지 않는다.
 
-- 플랫폼 홈에는 로그인 역할과 무관하게 쓸 수 있는 커뮤니티 글 영역을 둔다.
-- 작성자는 글마다 닉네임과 비밀번호를 입력한다.
-- 비밀번호는 서버에 평문 저장하지 않고 BCrypt 해시로 저장한다.
-- 글 수정과 삭제는 작성 시 입력한 비밀번호가 맞을 때만 허용한다.
-- 1차 API는 `api/v1/community/posts`이며, 목록 조회와 작성은 공개하고 수정/삭제는 게시글 비밀번호로 보호한다.
+## 운영 원칙
 
-Hongdal 앱들의 기본 홈 화면은 업무 대시보드 하나로 고정하지 않고, 플랫폼 커뮤니티와 공지 흐름을 먼저 보여주는 방향으로 둔다.
+- 일반 게시글, 댓글, 이미지 댓글, 추천, 신고·분쟁 글, 개선 제안은 기본 소통 기능으로 둔다.
+- 운송 완료 증빙, 창고 상태 변경, 법적·운영상 필수 감사 기록은 유료 꾸미기와 분리한다.
+- 괘상과 노드 이미지는 선택형 표현 기능이다. 끄더라도 내비게이션과 업무 기능은 유지되어야 한다.
+- 유료 꾸미기는 소속·소통의 입장료가 아니라 선택형 창작물 사용권이어야 한다.
+- 신고 게시판은 관찰자에게 참여자를 익명화하고, 필요한 당사자·운영자만 최소 범위로 확인한다.
 
-## 기본 원칙
+세부 운영 기준은 [Community Operating Policy](Architecture/CommunityOperatingPolicy.md)를 따른다.
 
-- 기본 홈(`/`)은 공지, 운영 공유, 개선 제안, 정책 변경처럼 플랫폼 전체 참여자가 같이 보는 내용을 우선한다.
-- 앱별 핵심 업무는 홈 안의 빠른 실행과 좌측 메뉴에서 바로 진입한다.
-- 관리자가 설정하는 화면 정책에서는 홈을 기본 노출값으로 유지하고, 개별 업무 화면은 역할별로 조정한다.
-- 특정 역할 전용 앱은 예외적으로 로그인 전 화면이나 핵심 업무 화면을 먼저 둘 수 있지만, 플랫폼 소속감이 필요한 앱은 커뮤니티 홈을 기본값으로 삼는다.
+## 현재 한계
 
-## 현재 반영
-
-- `Hongdal.Ui.Common`에 `PlatformCommunityHome` 공통 컴포넌트를 추가했다.
-- `HongdalAdmin`의 `/` 홈은 플랫폼 커뮤니티 홈으로 전환했다.
-- `WarehouseManagerApp`의 `/` 홈은 플랫폼 커뮤니티 홈으로 전환하고, 입고/출고/포장/스캔/작업 보드를 빠른 실행으로 배치했다.
-- 서버관리자 로그인 후 기본 이동은 `/drivers/operating`이 아니라 `/`로 조정했다.
-
-## 다음 단계
-
-- 커뮤니티 게시글을 정적 샘플에서 서버 API 기반 게시판으로 전환한다.
-- 앱별/역할별 게시글 공개 범위를 설계한다.
-- 화주 앱과 기사 앱의 홈 전환은 기존 업무 시작 UX와 충돌하지 않게 설정값으로 분리한다.
+- 꾸미기 상점 페이지는 현재 클라이언트 실행 상태를 사용하며 서버 계정 보유권과 아직 연결되지 않았다.
+- FakePG 페이지는 실제 승인·환불·창작자 정산을 수행하지 않는다.
+- 직접 만든 꾸미기는 개인 보유함에 즉시 적용되며 공개 판매 검수 흐름은 아직 없다.
+- 역할은 현재 `화주`, `창고 관리자` 두 가지이며 이후 역할 카탈로그로 확장할 수 있다.

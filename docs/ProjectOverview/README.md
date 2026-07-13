@@ -2,7 +2,7 @@
 
 이 폴더는 루트 `README.md`에서 덜어낸 상세 문서를 모아 둡니다. 처음에는 기술 구조보다 **현재 존재하는 화면과 캡처**를 먼저 봅니다.
 
-루트 README는 홍달 1.0의 1페이지 요약만 유지합니다. 앱별 화면, 캡처 이미지, 화면 간 관계, 업무 흐름, 기술 설명은 이 첨부 문서에서 순서대로 봅니다.
+루트 README는 홍달 1.0의 1페이지 요약만 유지합니다. 통합 클라이언트의 3단계 화면 구조를 먼저 보고, 코드 프로젝트별 화면, 캡처 이미지, 업무 흐름, 기술 설명은 이 첨부 문서에서 순서대로 봅니다.
 
 ## 화면으로 먼저 보기
 
@@ -20,18 +20,26 @@
 | --- | --- |
 | <img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="관리자 운송 원장 화면" width="300"> | <img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P04.png" alt="창고 피킹 배치 화면" width="260"> |
 
+### 새 통합 클라이언트
+
+<img src="assets/app-pages/ShipperApp/ShipperApp-P00.png" alt="역할 기반 통합 커뮤니티 홈" width="360">
+
+[통합 커뮤니티 클라이언트와 꾸미기 상점](unified-community-client.md)에서 역할 전환, 모바일 세로 다이어그램, 후천 사방 이동판, 꾸미기 구매·제작 흐름을 확인합니다. 화면을 구성하는 상위 원칙은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)에 둡니다.
+
 ## 먼저 볼 화면 문서
 
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
 | 00 | [첨부 문서 목차](00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
 | 01 | [page-docs/README.md](page-docs/README.md) | 각 화면별 독립 README와 인라인 캡처, 상세 설명 |
-| 02 | [app-page-catalog.md](app-page-catalog.md) | 각 앱 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
-| 03 | [hongdal-v1-required-pages.md](hongdal-v1-required-pages.md) | 홍달 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
-| 04 | [hongdal-v1-page-validation-walkthrough.md](hongdal-v1-page-validation-walkthrough.md) | 1.0 필수 페이지를 하나씩 검증하는 순례 순서와 확인 항목 |
-| 05 | [hongdal-v1-render-capture-summary.md](hongdal-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
-| 06 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 앱 화면이 하나의 업무 흐름을 완성하는 관계를 세부적으로 설명 |
-| 07 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 카드, 모드 전환이 다음 행동으로 이어지는 흐름 |
+| 02 | [unified-community-client.md](unified-community-client.md) | 통합 홈, 역할, 모바일 다이어그램, 사방 이동, 꾸미기 상점 |
+| 03 | [ThreeStageClientNavigation.md](../Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지의 사용자 화면 구조 |
+| 04 | [app-page-catalog.md](app-page-catalog.md) | 코드 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
+| 05 | [hongdal-v1-required-pages.md](hongdal-v1-required-pages.md) | 홍달 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
+| 06 | [hongdal-v1-page-validation-walkthrough.md](hongdal-v1-page-validation-walkthrough.md) | 1.0 필수 페이지를 하나씩 검증하는 순례 순서와 확인 항목 |
+| 07 | [hongdal-v1-render-capture-summary.md](hongdal-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
+| 08 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 코드 프로젝트의 화면이 하나의 업무 흐름을 완성하는 관계를 설명 |
+| 09 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 노드 행동, 모드 전환이 다음 행동으로 이어지는 흐름 |
 
 ## 업무 흐름 문서
 
@@ -66,3 +74,4 @@
 3. OS, 엔진, AI, API 같은 기술 설명은 뒤쪽 참고 문서로 둔다.
 4. 새 화면을 추가하면 `app-page-catalog.md`, `page-docs/`, 캡처 이미지부터 갱신한다.
 5. 화면 간 상태 전파나 시퀀스는 `workflow-app-screen-map.md`에 둔다.
+6. 사용자 내비게이션은 3단계 화면 구조로 먼저 설명하고, 프로젝트별 표는 코드 위치를 찾는 용도로 사용한다.

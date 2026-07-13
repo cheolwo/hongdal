@@ -6,7 +6,8 @@
 
 | 페이지 ID / 제목 | 라우트 | 분류 | 화면 책임 | 캡처 |
 | --- | --- | --- | --- | --- |
-| [ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입](ShipperApp-P01/) | `/`, `/shipper` | 필수 | 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입 | 완료 |
+| [ShipperApp-P00 - 역할 기반 통합 커뮤니티 홈](ShipperApp-P00/) | / | 필수 | 현재 역할에 맞는 홈 선택 | 완료 |
+| [ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입](ShipperApp-P01/) | /shipper | 필수 | 커뮤니티와 화주 업무 요약 조합 | 완료 |
 | [ShipperApp-P01-1 - 화주 프로필과 운영 프로필 설정](ShipperApp-P01-1/) | /shipper/settings/profile | 보조 | 화주 프로필과 운영 프로필 설정 | 완료 |
 | [ShipperApp-P01-2 - 화주 앱 메뉴/화면 노출 설정](ShipperApp-P01-2/) | /shipper/settings/views | 보조 | 화주 앱 메뉴/화면 노출 설정 | 완료 |
 | [ShipperApp-P01-3 - 공개 화물 또는 공개 의뢰 확인](ShipperApp-P01-3/) | /shipper/public-cargo | 확장 | 공개 화물 또는 공개 의뢰 확인 | 완료 |
@@ -27,6 +28,11 @@
 | [ShipperApp-P07 - FCL/LCL 해외 물류 계획](ShipperApp-P07/) | /shipper/international/fcl-lcl | 확장 | FCL/LCL 해외 물류 계획 | 완료 |
 | [ShipperApp-P07-1 - HS 코드/통관 검토](ShipperApp-P07-1/) | /shipper/customs/hs-reviews | 확장 | HS 코드/통관 검토 | 완료 |
 | [ShipperApp-P08 - 재위탁/재운송 주문](ShipperApp-P08/) | /shipper/reconsignment/orders | 확장 | 재위탁/재운송 주문 | 완료 |
+| [ShipperApp-P09 - 운송 업무 워크스페이스](ShipperApp-P09/) | /shipper/transport | 필수 | 의뢰별 결제·배차·운송 상태 처리 | 캡처 대기 |
+| [ShipperApp-P10 - 꾸미기 상점](ShipperApp-P10/) | /community/decorations | 확장 | 플랫폼·크리에이터·보유 상품 탐색 | 완료 |
+| [ShipperApp-P10-1 - 꾸미기 상품 상세](ShipperApp-P10-1/) | /community/decorations/{ProductKey} | 확장 | 상품 확인, 구매·적용 판단 | 완료 |
+| [ShipperApp-P10-2 - 꾸미기 FakePG 결제](ShipperApp-P10-2/) | /community/decorations/{ProductKey}/checkout | 개발·확장 | 개발용 구매 승인 흐름 | 완료 |
+| [ShipperApp-P10-3 - 내 꾸미기 만들기](ShipperApp-P10-3/) | /community/decorations/create | 확장 | 개인 괘상·노드 이미지 제작 | 캡처 대기 |
 | [ShipperApp-P90 - 템플릿/샘플성 날씨 화면](ShipperApp-P90/) | /weather | 시스템 | 템플릿/샘플성 날씨 화면 | 완료 |
 | [ShipperApp-P91 - 템플릿/샘플성 카운터 화면](ShipperApp-P91/) | /counter | 시스템 | 템플릿/샘플성 카운터 화면 | 완료 |
 | [ShipperApp-P99 - 미발견 페이지](ShipperApp-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

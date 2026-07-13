@@ -6,7 +6,7 @@ Hongdal은 **화주가 운송을 의뢰하고, 기사님이 추천을 받아 운
 
 ## 먼저 볼 화면
 
-아래 화면들은 링크를 눌러 들어가지 않아도 README에서 바로 보이는 대표 캡처입니다. 전체 화면 목록과 나머지 캡처는 [앱별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md)에서 봅니다.
+아래 화면들은 링크를 눌러 들어가지 않아도 README에서 바로 보이는 대표 캡처입니다. 전체 화면 목록과 나머지 캡처는 [코드 프로젝트별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md)에서 봅니다.
 
 ### 대표 화면: 기사 지도 홈
 
@@ -39,6 +39,24 @@ Hongdal은 **화주가 운송을 의뢰하고, 기사님이 추천을 받아 운
 
 <img src="docs/ProjectOverview/assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="HongdalAdmin 운송 원장 화면" width="320">
 
+### 통합 클라이언트: 사람과 업무가 이어지는 커뮤니티
+
+같은 앱에서 역할을 바꾸고, 게시판과 세로 다이어그램을 보다가 화주·창고 업무로 이어갑니다. 괘상과 노드 이미지는 독립 상점에서 선택하거나 직접 만들 수 있습니다.
+
+<img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P00.png" alt="Hongdal 역할 기반 통합 커뮤니티 홈" width="360">
+
+[통합 커뮤니티 클라이언트와 꾸미기 상점 문서](docs/ProjectOverview/unified-community-client.md)에서 역할 전환, 모바일 다이어그램, 후천 사방 이동판, 상점·상세·FakePG·제작 흐름을 봅니다.
+
+## 통합 클라이언트 화면 구조
+
+```mermaid
+flowchart LR
+    A["1단계 · 사방괘"] --> B["2단계 · 다이어그램"]
+    B --> C["3단계 · 구체 데이터 페이지"]
+```
+
+사방괘에서 업무 영역을 고르고, 다이어그램에서 창고·주문·사람·운송 같은 노드의 관계와 상태를 파악한 뒤, 노드의 행동 메뉴에서 입고 내역·재고·운송 상세 같은 구체 페이지를 엽니다. 음식 주문·배달은 주문 1건에 배달 회차 0..N건을 연결하는 묶음으로, 공동구매는 수요·수입 결정·선적/통관·입고/분배를 조정하는 복합 원장으로 표시합니다. 데스크톱은 오른쪽 클릭 또는 `⋮`, 모바일은 길게 누르기 또는 `⋮`를 사용합니다. 상세 기준은 [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md)에 둡니다.
+
 ## 홍달 1.0 흐름
 
 ```mermaid
@@ -54,14 +72,16 @@ flowchart LR
 
 홍달 1.0은 화면 기준으로 보면 단순합니다. 화주는 의뢰를 만들고 상태를 확인합니다. 기사님은 추천을 받고, 수락하거나 거절하고, 상차와 하차 사진을 남깁니다. 관리자는 그 과정에서 막힌 지점, 증빙 누락, 정산 대기 상태를 확인합니다.
 
-## 앱별 화면 묶음
+## 코드 프로젝트별 화면 묶음
 
-| 앱 | 화면 수 | 1.0에서 먼저 보는 화면 |
+아래 프로젝트명은 사용자에게 별도 앱을 강제하는 내비게이션 분류가 아니라, 현재 코드와 라우트가 들어 있는 위치를 찾기 위한 물리 색인입니다.
+
+| 코드 프로젝트 | 화면 수 | 1.0에서 먼저 보는 화면 |
 | --- | ---: | --- |
-| `ShipperApp` | 24 | 운송 의뢰 작성, 의뢰 상세, 결제/배차/상차/하차/정산 타임라인 |
+| `ShipperApp` | 30 | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점, 의뢰 타임라인 |
 | `DriverApp` | 23 | 운행 시작, 지도 홈, 추천, 수락/거절, 상차/하차 증빙, 정산 |
-| `HongdalAdmin` | 37 | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
-| `WarehouseManagerApp` | 12 | 창고 작업 보드, 입고, 스캔, 피킹 배치 |
+| `HongdalAdmin` | 42 | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
+| `WarehouseManagerApp` | 13 | 창고 작업 보드, 입고, 스캔, 피킹 배치, 마트 피킹/포장 |
 | `OrdererApp` | 8 | 주문자 홈, 공동구매, 음식/마트 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영 화면 |
 
@@ -72,7 +92,9 @@ flowchart LR
 | 문서 | 용도 |
 | --- | --- |
 | [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
-| [앱별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md) | 각 앱의 전체 화면과 인라인 캡처 |
+| [통합 커뮤니티 클라이언트](docs/ProjectOverview/unified-community-client.md) | 역할 전환, 모바일 다이어그램, 후천 사방 이동, 꾸미기 상점 |
+| [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지 구성 원칙 |
+| [코드 프로젝트별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md) | 통합 클라이언트 화면의 실제 코드 위치와 인라인 캡처 |
 | [홍달 1.0 필수 페이지 기준](docs/ProjectOverview/hongdal-v1-required-pages.md) | 1.0 운송 흐름에 꼭 필요한 화면 |
 | [렌더링/캡처 검증 요약](docs/ProjectOverview/hongdal-v1-render-capture-summary.md) | 화면 캡처 방식과 검증 결과 |
 

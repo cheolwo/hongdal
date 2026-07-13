@@ -16,7 +16,7 @@
 
 `HongdalAdmin-P16`~`HongdalAdmin-P22` 및 `HongdalAdmin-P22-1` 화면은 로컬 개발 서버를 메모리 데이터 모드로 실행한 뒤 Chrome headless로 캡처했다. 관리자 화면은 Android 앱 라우트 스모크와 별도로, 1.0 운영 확인에 필요한 8개 웹 라우트(`/dashboard`, `/requests`, `/requests/{RequestId}`, `/dispatch/wait`, `/drivers/operating`, `/transports`, `/transports/{RequestId}`, `/transports/{RequestId}/events`)를 기준으로 문서 캡처를 만들었다.
 
-2026-07-11에는 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 `HongdalAdmin` 전체 41개 라우트를 다시 캡처했다. 최종 판정은 41 OK / 0 CHECK이며 결과 파일은 [`capture-results.json`](../../artifacts/page-capture-check/HongdalAdmin-all-pages-final-2026-07-11/capture-results.json)에 둔다. 오래 남길 이미지는 `docs/ProjectOverview/assets/app-pages/HongdalAdmin/` 아래의 페이지 ID 파일명으로 정리했다.
+2026-07-11에는 당시 존재하던 `HongdalAdmin` 41개 라우트에 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 다시 캡처했다. 최종 판정은 41 OK / 0 CHECK이며 결과 파일은 [`capture-results.json`](../../artifacts/page-capture-check/HongdalAdmin-all-pages-final-2026-07-11/capture-results.json)에 둔다. 이후 추가된 `HongdalAdmin-P40` 개발용 Fake PG/정산 콘솔은 전용 캡처 대기 상태이며, 현재 전체 페이지 현황은 [코드 프로젝트별 전체 페이지 카탈로그](app-page-catalog.md)를 기준으로 한다. 오래 남길 이미지는 `docs/ProjectOverview/assets/app-pages/HongdalAdmin/` 아래의 페이지 ID 파일명으로 정리했다.
 
 ## 대표 캡처
 

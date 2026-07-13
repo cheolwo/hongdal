@@ -1,6 +1,6 @@
-﻿# 앱별 전체 페이지 카탈로그
+﻿# 코드 프로젝트별 전체 페이지 카탈로그
 
-이 문서는 홍달 저장소 안의 앱 프로젝트에 선언된 `@page` 라우트를 앱별로 모은 전체 페이지 카탈로그다. [홍달 1.0 필수 페이지 기준](hongdal-v1-required-pages.md)이 1.0 워크플로우를 닫기 위한 최소 화면만 다룬다면, 이 문서는 실제 앱에 노출된 화면 전체를 보고 어디를 수정해야 하는지 찾기 위한 색인이다.
+이 문서는 홍달 저장소 안의 클라이언트 프로젝트에 선언된 `@page` 라우트를 코드 위치별로 모은 전체 페이지 카탈로그다. 사용자에게 별도 앱을 강제하는 내비게이션 목록이 아니라, 통합 클라이언트 화면의 구현 파일을 찾기 위한 물리 색인이다. 사용자 화면은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)의 `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 이해한다.
 
 ## 문서 기준
 
@@ -15,16 +15,49 @@
 
 전체 페이지 캡처 파일은 `docs/ProjectOverview/assets/app-pages/{앱명}/{페이지ID}.png`에 둔다. 기존 1.0 대표 캡처는 링크 안정성을 위해 `docs/ProjectOverview/assets/v1-pages/`에도 남긴다.
 
-화면별 상세 설명은 [화면별 상세 README](page-docs/README.md)에서 앱별/페이지별로 확인한다. 이 카탈로그는 빠른 색인이고, 개별 README는 캡처와 화면 책임, 사용자/참여자, API/보안 점검을 함께 둔다.
+화면별 상세 설명은 [화면별 상세 README](page-docs/README.md)에서 코드 프로젝트별/페이지별로 확인한다. 이 카탈로그는 빠른 색인이고, 개별 README는 캡처와 화면 책임, 사용자/참여자, API/보안 점검을 함께 둔다.
 
-## 앱 요약
+## 통합 클라이언트 3단계 색인
 
-| 앱 | 페이지 수 | 주 사용자 | 성격 |
+| 단계 | 화면 형태 | 현재 구현 위치 | 문서에서 확인할 것 |
+| --- | --- | --- | --- |
+| 공통 셸 | 역할 선택, 커뮤니티, 하단 내비게이션 | `ShipperApp`의 `/`, `/shipper`, `MainLayout` | 역할이 바뀔 때 세 단계의 메뉴와 문맥이 함께 바뀌는가 |
+| 1단계 | 후천 사방 이동판 | `PlatformCommunityHome` 내부의 `HongdalLaterHeavenBaguaNavigator` | 역할별 네 방향과 관련 다이어그램 진입 |
+| 2단계 | 원장 관계·흐름 다이어그램 | `PlatformCommunityHome` 다이어그램 모드 | 단일·연결·복합 원장 경계, 노드 요약, 상태, 진행도, 행동 메뉴 |
+| 3단계 | 목록·상세·작업 페이지 | 아래 `@page` 카탈로그 | 한 페이지가 한 가지 조회·입력·처리 책임을 갖는가 |
+
+### 대표 원장 구성
+
+| 2단계 표시 단위 | 원장 구성 | 다음 탐색 |
+| --- | --- | --- |
+| 음식 주문·배달 연결 묶음 | 음식 주문 원장 1건 → 음식 배달 원장 0..N건 | 묶음 개요 → 주문 또는 첫 배달·분할·재배달 회차 → 노드별 데이터 페이지 |
+| 공동구매 복합 원장 | 수요 → 수입 결정 → 선적/통관 → 입고/분배 | 복합 개요 → 하위 원장 세부 다이어그램 → 창고·운송을 포함한 데이터 페이지 |
+
+연결 묶음의 원장은 각각 별도 상태와 권한을 유지한다. 복합 원장은 하위 원장의 진행을 요약하고 필요한 외부 원장으로 인계한다. 자세한 원장 관계는 [3단계 내비게이션 문서](../Architecture/ThreeStageClientNavigation.md)의 원장 다이어그램 기준을 따른다.
+
+### 대표 노드에서 3단계 페이지로
+
+| 2단계 노드 | 행동 메뉴 | 현재 3단계 라우트 예시 |
+| --- | --- | --- |
+| 창고 | 입고 내역 | `/shipper/inbound/requests` |
+| 창고 | 재고 목록 | `/shipper/warehouse/inventory` |
+| 창고 | 현장 스캔 | `/shipper/warehouse/scan` |
+| 운송 | 운송 업무 | `/shipper/transport` |
+| 운송 의뢰 | 의뢰 상세 | `/shipper/request/{RequestId}` |
+| 상품·판매채널 | 판매 주문 | `/shipper/sales/orders` |
+| 마트 주문 | 피킹·포장 | `/mart/picking` |
+| 운송 원장 | 이벤트·증빙·정산 | `/transports/{RequestId}/events`, `/proofs`, `/settlement` |
+
+위 표는 내비게이션 계약의 목표 연결이다. 공통 노드 행동 메뉴와 다이어그램 문맥 전달이 아직 연결되지 않은 항목은 기존 페이지가 있어도 3단계 연결 완료로 보지 않는다.
+
+## 코드 프로젝트 요약
+
+| 코드 프로젝트 | 페이지 수 | 주 사용자 | 현재 포함 화면 |
 | --- | ---: | --- | --- |
-| `ShipperApp` | 24 | 화주, 판매자, 물류 의뢰자 | 운송 의뢰, 창고/입고, 판매채널, 통관/해외 물류 |
+| `ShipperApp` | 30 | 화주, 창고 관리자, 판매자, 물류 의뢰자 | 통합 커뮤니티, 역할 전환, 운송 의뢰, 창고/입고, 꾸미기 상점 |
 | `DriverApp` | 23 | 기사 | 운행 시작, 추천, 수락/거절, 상차/하차, 정산, 알림 |
-| `HongdalAdmin` | 41 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
-| `WarehouseManagerApp` | 12 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 알뜰살뜰 마트 창고 |
+| `HongdalAdmin` | 42 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
+| `WarehouseManagerApp` | 13 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 알뜰살뜰 마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
 | `HumanResourcesManagerApp` | 1 | 인사/고용 담당자 | 인사 관리 홈 |
@@ -33,15 +66,16 @@
 
 | 상태 | 수 | 의미 |
 | --- | ---: | --- |
-| 완료 | 114 | 현재 문서에서 인라인 이미지로 바로 확인할 수 있는 화면 |
+| 완료 | 118 | 현재 문서에서 인라인 이미지로 바로 확인할 수 있는 화면 |
 | 인증 필요 | 0 | 관리자 보호 라우트도 개발용 인증 세션과 문서용 메모리 데이터로 운영 화면까지 캡처한 상태 |
-| 캡처 대기 | 0 | 현재 카탈로그 기준 PNG를 아직 남기지 못한 화면 없음 |
+| 캡처 대기 | 4 | 운송 업무, 내 꾸미기 만들기, Admin Fake PG/정산, 마트 피킹/포장 전용 캡처 필요 |
 
 ## ShipperApp
 
 | 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입` | `/`, `/shipper` | `ShipperApp/Components/Pages/Home.razor` | 필수 | 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입 | `ShipperApp-P01` | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P01.png" alt="ShipperApp-P01" width="160"> |
+| `ShipperApp-P00 - 역할 기반 통합 커뮤니티 홈` | `/` | `ShipperApp/Components/Pages/UnifiedHome.razor` | 필수 | 현재 역할에 맞는 화주 또는 창고 관리자 홈 선택 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P00.png" alt="ShipperApp-P00" width="160"> |
+| `ShipperApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입` | `/shipper` | `ShipperApp/Components/Pages/Home.razor` | 필수 | 커뮤니티와 화주 업무 요약, 목적별 업무 진입 | `ShipperApp-P01` | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P01.png" alt="ShipperApp-P01" width="160"> |
 | `ShipperApp-P01-1 - 화주 프로필과 운영 프로필 설정` | `/shipper/settings/profile` | `ShipperApp/Components/Pages/ShipperProfileSettings.razor` | 보조 | 화주 프로필과 운영 프로필 설정 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P01-1.png" alt="ShipperApp-P01-1" width="160"> |
 | `ShipperApp-P01-2 - 화주 앱 메뉴/화면 노출 설정` | `/shipper/settings/views` | `ShipperApp/Components/Pages/ShipperViewSettings.razor` | 보조 | 화주 앱 메뉴/화면 노출 설정 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P01-2.png" alt="ShipperApp-P01-2" width="160"> |
 | `ShipperApp-P01-3 - 공개 화물 또는 공개 의뢰 확인` | `/shipper/public-cargo` | `ShipperApp/Components/Pages/PublicCargo.razor` | 확장 | 공개 화물 또는 공개 의뢰 확인 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P01-3.png" alt="ShipperApp-P01-3" width="160"> |
@@ -62,6 +96,11 @@
 | `ShipperApp-P07 - FCL/LCL 해외 물류 계획` | `/shipper/international/fcl-lcl` | `ShipperApp/Components/Pages/FclLclPlanner.razor` | 확장 | FCL/LCL 해외 물류 계획 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P07.png" alt="ShipperApp-P07" width="160"> |
 | `ShipperApp-P07-1 - HS 코드/통관 검토` | `/shipper/customs/hs-reviews` | `ShipperApp/Components/Pages/CustomsHsReviews.razor` | 확장 | HS 코드/통관 검토 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P07-1.png" alt="ShipperApp-P07-1" width="160"> |
 | `ShipperApp-P08 - 재위탁/재운송 주문` | `/shipper/reconsignment/orders` | `ShipperApp/Components/Pages/ReconsignmentOrders.razor` | 확장 | 재위탁/재운송 주문 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P08.png" alt="ShipperApp-P08" width="160"> |
+| `ShipperApp-P09 - 운송 업무 워크스페이스` | `/shipper/transport` | `ShipperApp/Components/Pages/TransportWorkspace.razor` | 필수 | 의뢰별 결제·배차·운송 진행 상태와 다음 행동 처리 | - | 캡처 대기 |
+| `ShipperApp-P10 - 꾸미기 상점` | `/community/decorations` | `ShipperApp/Components/Pages/CommunityDecorationStorePage.razor` | 확장 | 플랫폼·크리에이터·보유 꾸미기 상품 탐색 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P10.png" alt="ShipperApp-P10" width="160"> |
+| `ShipperApp-P10-1 - 꾸미기 상품 상세` | `/community/decorations/{ProductKey}` | `ShipperApp/Components/Pages/CommunityDecorationDetailPage.razor` | 확장 | 상품 미리보기, 구매·적용 판단 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P10-1.png" alt="ShipperApp-P10-1" width="160"> |
+| `ShipperApp-P10-2 - 꾸미기 FakePG 결제` | `/community/decorations/{ProductKey}/checkout` | `ShipperApp/Components/Pages/CommunityDecorationCheckoutPage.razor` | 개발·확장 | 실제 청구 없는 개발용 구매 승인 흐름 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P10-2.png" alt="ShipperApp-P10-2" width="160"> |
+| `ShipperApp-P10-3 - 내 꾸미기 만들기` | `/community/decorations/create` | `ShipperApp/Components/Pages/CommunityDecorationCreatePage.razor` | 확장 | 개인 괘상·다이어그램 노드 이미지 제작 | - | 캡처 대기 |
 | `ShipperApp-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `ShipperApp/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P90.png" alt="ShipperApp-P90" width="160"> |
 | `ShipperApp-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `ShipperApp/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P91.png" alt="ShipperApp-P91" width="160"> |
 | `ShipperApp-P99 - 미발견 페이지` | `/not-found` | `ShipperApp/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/ShipperApp/ShipperApp-P99.png" alt="ShipperApp-P99" width="160"> |
@@ -136,6 +175,7 @@
 | `HongdalAdmin-P37 - 국내화물 AI 배차 검토` | `/dispatch/ai-review` | `HongdalAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor` | 운영 | 국내화물 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P37.png" alt="HongdalAdmin-P37" width="160"> |
 | `HongdalAdmin-P38 - 음식배달 AI 배차 검토` | `/dispatch/food-ai-review` | `HongdalAdmin/Components/Pages/FoodDeliveryDispatchAIReview.razor` | 운영 | 음식배달 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P38.png" alt="HongdalAdmin-P38" width="160"> |
 | `HongdalAdmin-P39 - 배차 AI 판단 사례` | `/dispatch-ai-judgment-cases` | `HongdalAdmin/Components/Pages/DispatchAIJudgmentCases.razor` | 운영 | 배차 AI 판단 사례 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P39.png" alt="HongdalAdmin-P39" width="160"> |
+| `HongdalAdmin-P40 - 개발용 Fake PG/정산 콘솔` | `/development/fake-payment-settlement` | `HongdalAdmin/Components/Pages/FakePaymentSettlementConsole.razor` | 개발 | 결제 보증·상하차·정산·보류·환불 상태 전이 시뮬레이션 | - | 캡처 대기 |
 | `HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `HongdalAdmin/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P90.png" alt="HongdalAdmin-P90" width="160"> |
 | `HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `HongdalAdmin/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P91.png" alt="HongdalAdmin-P91" width="160"> |
 | `HongdalAdmin-P99 - 미발견 페이지` | `/not-found` | `HongdalAdmin/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P99.png" alt="HongdalAdmin-P99" width="160"> |
@@ -155,6 +195,7 @@
 | `WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈` | `/mart` | `WarehouseManagerApp/Components/Pages/MartHome.razor` | 확장 | 알뜰살뜰 마트 창고 홈 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05.png" alt="WarehouseManagerApp-P05" width="160"> |
 | `WarehouseManagerApp-P05-1 - 알뜰살뜰 마트 작업 보드` | `/mart/work-board` | `WarehouseManagerApp/Components/Pages/MartWorkBoard.razor` | 확장 | 알뜰살뜰 마트 작업 보드 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05-1.png" alt="WarehouseManagerApp-P05-1" width="160"> |
 | `WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작` | `/mart/work/{ProcessCode}` | `WarehouseManagerApp/Components/Pages/MartWorkStart.razor` | 확장 | 알뜰살뜰 마트 프로세스별 작업 시작 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P05-2.png" alt="WarehouseManagerApp-P05-2" width="160"> |
+| `WarehouseManagerApp-P05-3 - 알뜰살뜰 마트 피킹/포장` | `/mart/picking` | `WarehouseManagerApp/Components/Pages/MartPickingPacking.razor` | 확장 | 주문별 피킹·포장·출고 완료 요청 | - | 캡처 대기 |
 | `WarehouseManagerApp-P99 - 미발견 페이지` | `/not-found` | `WarehouseManagerApp/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P99.png" alt="WarehouseManagerApp-P99" width="160"> |
 
 ## OrdererApp
@@ -190,10 +231,11 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 필수 페이지와 전체 페이지의 관계 | 필수 페이지는 1.0 운송 루프를 닫는 최소 화면이고, 이 문서는 앱 전체 화면을 찾기 위한 색인이다. |
+| 필수 페이지와 전체 페이지의 관계 | 필수 페이지는 1.0 운송 루프를 닫는 최소 화면이고, 이 문서는 코드 프로젝트 전체 화면을 찾기 위한 색인이다. |
 | 라우트 충돌 후보 | `ShipperApp`과 `RestaurantDeskApp` 모두 `/dispatch/address-form`을 가진다. 앱이 다르므로 런타임 충돌은 아니지만 문서에서 책임을 구분해야 한다. |
 | 템플릿성 화면 | `Counter`, `Weather`는 시스템/샘플 화면으로 분류했다. 출시 전 제거 또는 숨김 여부를 따로 판단한다. |
 | 미발견 페이지 | `NotFound`는 사용자 업무 화면이 아니지만 앱 운영에 필요한 라우트로 남긴다. |
 | 다음 문서화 단계 | 각 페이지별 상세 README는 `page-docs/{앱명}/{페이지ID}/README.md`에 두고, 캡처는 `assets/app-pages/{앱명}/` 아래 추가한다. |
+| 통합 클라이언트 단계 | 새 페이지에는 가능한 경우 진입 사방괘, 다이어그램·노드 행동, 필요한 식별자와 복원 문맥을 기록한다. |
 | 관리자 캡처 | 관리자 보호 화면은 개발용 관리자 인증 세션과 문서용 메모리 데이터를 붙여 실제 운영 화면까지 캡처한다. |
 | MAUI 캡처 | Android/Windows MAUI 앱의 Blazor 페이지는 문서용 캡처 호스트에서 실제 Razor 컴포넌트를 렌더링하고, Chrome DevTools 전체 페이지 캡처로 내부 스크롤 높이까지 반영해 PNG로 남긴다. |

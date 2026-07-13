@@ -370,7 +370,7 @@ flowchart LR
 
 | 번호 | 필수 화면 | 현재 라우트/파일 | 주 책임 | 연결 API/상태 | 현재 판정 |
 | --- | --- | --- | --- | --- | --- |
-| ShipperApp-P01 | 화주 홈/업무 진입 | `/`, `/shipper`<br>`ShipperApp/Components/Pages/Home.razor` | 운송 의뢰, 의뢰 타임라인, 창고/판매 업무로 이동 | 서버 상태 요약, 최근 의뢰 | 라우트 확인 |
+| ShipperApp-P01 | 화주 홈/업무 진입 | `/shipper`<br>`ShipperApp/Components/Pages/Home.razor`<br>`/`는 `UnifiedHome.razor`의 역할 진입점 | 운송 의뢰, 의뢰 타임라인, 창고/판매 업무로 이동 | 서버 상태 요약, 최근 의뢰 | 라우트 확인 |
 | ShipperApp-P02 | 운송 의뢰 작성 | `/shipper/request`<br>`ShipperApp/Components/Pages/ShipperRequestWizard.razor` | 상차지, 하차지, 화물, 차량 조건, 결제 조건을 입력해 의뢰를 생성 | `api/v1/shipper/requests` | 1.0 필수 |
 | ShipperApp-P02-1 | 운송 의뢰 대량 등록 | `/shipper/request/bulk`<br>`ShipperApp/Components/Pages/ShipperBulkImport.razor` | 여러 의뢰를 한 번에 등록 | `api/v1/shipper/requests` 대량 등록 후보 | ShipperApp-P02의 보조 화면 |
 | ShipperApp-P03 | 의뢰 상세/타임라인 | `/shipper/request/{RequestId}`<br>`ShipperApp/Components/Pages/ShipperRequestDetail.razor` | 결제, 배차, 수락, 상차, 하차, POD, 정산 상태를 한 화면에서 확인 | `api/v1/shipper/requests`, `api/v1/payments`, 운송 이벤트 | 1.0 필수 |
