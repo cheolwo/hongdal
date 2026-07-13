@@ -10,7 +10,7 @@ using 홍달.Services.Notifications;
 
 namespace Hongdal.Application.Driver.Transport;
 
-public sealed class 운송상태화주알림EventHandlers :
+public sealed class 운송상태화주알림EventHandler :
     INotificationHandler<운송상차지도착됨Event>,
     INotificationHandler<운송상차완료됨Event>,
     INotificationHandler<운송하차지도착됨Event>,
@@ -20,11 +20,11 @@ public sealed class 운송상태화주알림EventHandlers :
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly HongdalContext _db;
-    private readonly ILogger<운송상태화주알림EventHandlers> _logger;
+    private readonly ILogger<운송상태화주알림EventHandler> _logger;
 
-    public 운송상태화주알림EventHandlers(
+    public 운송상태화주알림EventHandler(
         HongdalContext db,
-        ILogger<운송상태화주알림EventHandlers> logger)
+        ILogger<운송상태화주알림EventHandler> logger)
     {
         _db = db;
         _logger = logger;
@@ -326,4 +326,3 @@ public sealed class 운송상태화주알림EventHandlers :
         운송원장? 운송,
         string 의뢰Id);
 }
-

@@ -1,7 +1,6 @@
 using Hongdal.Application.Food.Commands;
 using Hongdal.Application.Food.Events;
 using Hongdal.Contracts.Food;
-using Hongdal.Services.Community;
 using Hongdal.Services.Food;
 using MediatR;
 
@@ -9,7 +8,6 @@ namespace Hongdal.Application.Food.Handlers;
 
 public sealed class 음식점주문수락CommandHandler(
     IHongdalFoodOrderStore orderStore,
-    I음식마트원장Mongo동기화Service ledgerSync,
     IPublisher publisher) : IRequestHandler<음식점주문수락Command, 음식주문응답?>
 {
     public async Task<음식주문응답?> Handle(음식점주문수락Command request, CancellationToken cancellationToken)
@@ -21,11 +19,6 @@ public sealed class 음식점주문수락CommandHandler(
         {
             return null;
         }
-
-        await ledgerSync.음식주문동기화Async(
-            accepted,
-            NormalizeUserId(request.처리UserId) ?? NormalizeUserId(request.Payload.처리UserId) ?? $"restaurant:{accepted.음식점Id}",
-            cancellationToken);
 
         await publisher.Publish(
             new 음식점주문수락됨Event(

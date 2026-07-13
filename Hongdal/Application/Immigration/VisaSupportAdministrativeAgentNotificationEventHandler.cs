@@ -7,16 +7,16 @@ using 홍달.Data;
 
 namespace Hongdal.Application.Immigration;
 
-public sealed class VisaSupportAdministrativeAgentNotificationHandler : INotificationHandler<VisaSupportRequestedEvent>
+public sealed class VisaSupportAdministrativeAgentNotificationEventHandler : INotificationHandler<VisaSupportRequestedEvent>
 {
     private readonly HongdalContext _db;
     private readonly IHrRoleAssignmentStore _roleAssignmentStore;
-    private readonly ILogger<VisaSupportAdministrativeAgentNotificationHandler> _logger;
+    private readonly ILogger<VisaSupportAdministrativeAgentNotificationEventHandler> _logger;
 
-    public VisaSupportAdministrativeAgentNotificationHandler(
+    public VisaSupportAdministrativeAgentNotificationEventHandler(
         HongdalContext db,
         IHrRoleAssignmentStore roleAssignmentStore,
-        ILogger<VisaSupportAdministrativeAgentNotificationHandler> logger)
+        ILogger<VisaSupportAdministrativeAgentNotificationEventHandler> logger)
     {
         _db = db;
         _roleAssignmentStore = roleAssignmentStore;

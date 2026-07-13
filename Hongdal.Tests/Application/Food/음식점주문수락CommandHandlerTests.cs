@@ -3,10 +3,8 @@ using Hongdal.Application.Food.Events;
 using Hongdal.Application.Food.Handlers;
 using Hongdal.Contracts.Common.Participants;
 using Hongdal.Contracts.Food;
-using Hongdal.Services.Community;
 using Hongdal.Services.Food;
 using MediatR;
-using 홍달.도메인.창고;
 
 namespace Hongdal.Tests.Application.Food;
 
@@ -17,7 +15,7 @@ public sealed class 음식점주문수락CommandHandlerTests
     {
         var store = new InMemoryHongdalFoodOrderStore();
         var publisher = new RecordingPublisher();
-        var handler = new 음식점주문수락CommandHandler(store, new NoopFoodMartLedgerSync(), publisher);
+        var handler = new 음식점주문수락CommandHandler(store, publisher);
         var order = store.AddOrder(CreateOrderRequest());
 
         var result = await handler.Handle(
@@ -44,7 +42,7 @@ public sealed class 음식점주문수락CommandHandlerTests
     {
         var store = new InMemoryHongdalFoodOrderStore();
         var publisher = new RecordingPublisher();
-        var handler = new 음식점주문수락CommandHandler(store, new NoopFoodMartLedgerSync(), publisher);
+        var handler = new 음식점주문수락CommandHandler(store, publisher);
         var order = store.AddOrder(CreateOrderRequest());
 
         await handler.Handle(
@@ -106,21 +104,4 @@ public sealed class 음식점주문수락CommandHandlerTests
         }
     }
 
-    private sealed class NoopFoodMartLedgerSync : I음식마트원장Mongo동기화Service
-    {
-        public Task<커뮤니티원장Dto?> 음식주문동기화Async(
-            음식주문응답 주문,
-            string updatedBy,
-            CancellationToken cancellationToken = default)
-            => Task.FromResult<커뮤니티원장Dto?>(null);
-
-        public Task<커뮤니티원장Dto?> 출고원장동기화Async(
-            IReadOnlyList<출고예정> 출고목록,
-            IReadOnlyList<입고요청> 입고목록,
-            string updatedBy,
-            string? 현재단계Key = null,
-            string? 원장템플릿Key = null,
-            CancellationToken cancellationToken = default)
-            => Task.FromResult<커뮤니티원장Dto?>(null);
-    }
 }
