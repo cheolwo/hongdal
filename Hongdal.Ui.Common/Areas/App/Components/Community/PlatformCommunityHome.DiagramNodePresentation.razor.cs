@@ -5,6 +5,58 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
+    private 노드입력준비도 노드입력준비도해결(
+        원장블록노드 node,
+        원장블록처리상태 state)
+    {
+        if (node.Kind.Equals("form", StringComparison.OrdinalIgnoreCase))
+        {
+            return 폼노드입력준비도해결(node);
+        }
+
+        var relatedBlocks = 흐름노드관련블록해결(node);
+        var directMatches = relatedBlocks
+            .Where(block => $"{block.DisplayName} {block.UiSectionHint} {block.Purpose}"
+                .Contains(node.Title, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        var candidateBlocks = directMatches.Count > 0 ? directMatches : relatedBlocks;
+        var requiredBlocks = candidateBlocks
+            .Where(block => block.RequiredForAiJudgment)
+            .ToList();
+        var trackedBlocks = requiredBlocks.Count > 0 ? requiredBlocks : candidateBlocks;
+
+        if (trackedBlocks.Count == 0)
+        {
+            var statePercent = state switch
+            {
+                원장블록처리상태.완료 => 100,
+                원장블록처리상태.진행중 => 50,
+                _ => 0
+            };
+            return new 노드입력준비도(statePercent, 0, 0, false, [], []);
+        }
+
+        var completedBlocks = trackedBlocks
+            .Where(block => !string.IsNullOrWhiteSpace(Get원장블록입력값(block.Code)))
+            .ToList();
+        var missingBlockNames = trackedBlocks
+            .Except(completedBlocks)
+            .Select(block => block.DisplayName)
+            .ToList();
+        var percent = (int)Math.Round(completedBlocks.Count * 100d / trackedBlocks.Count);
+
+        return new 노드입력준비도(
+            percent,
+            completedBlocks.Count,
+            trackedBlocks.Count,
+            requiredBlocks.Count > 0,
+            missingBlockNames,
+            trackedBlocks);
+    }
+
+    private static string BuildNodeReadinessStyle(노드입력준비도 readiness)
+        => $"--node-readiness: {readiness.Percent}%;";
+
     private 도형레이어신호? 최우선도형레이어신호해결(
         원장블록노드 node,
         int nodeIndex,
@@ -146,6 +198,11 @@ public partial class PlatformCommunityHome
 
     private static string 흐름노드역할라벨해결(원장블록노드 node)
     {
+        if (node.Kind.Equals("form", StringComparison.OrdinalIgnoreCase))
+        {
+            return "작성자";
+        }
+
         var text = $"{node.Title} {node.GroupLabel} {node.Description}";
 
         if (ContainsAny(text, "관리자", "운영 점검"))
@@ -207,11 +264,22 @@ public partial class PlatformCommunityHome
             "work" => Icons.Material.Filled.Inventory,
             "delivery" => Icons.Material.Filled.LocalShipping,
             "confirm" => Icons.Material.Filled.TaskAlt,
+            "form" => Icons.Material.Filled.DynamicForm,
             _ => Icons.Material.Filled.Hub
         };
 
     private 노드스티커이미지Response? 원장블록노드스티커해결(원장블록노드 node)
     {
+        if (!DecorationState.IsNodeDecorationEnabled)
+        {
+            return null;
+        }
+
+        if (DecorationState.ActiveNodeSticker is { } selectedSticker)
+        {
+            return selectedSticker;
+        }
+
         var pinnedSticker = 노드스티커Catalog.이미지찾기(node.스티커이미지Key);
         if (pinnedSticker is not null)
         {
@@ -238,13 +306,14 @@ public partial class PlatformCommunityHome
             "work" => Color.Warning,
             "delivery" => Color.Secondary,
             "confirm" => Color.Info,
+            "form" => Color.Info,
             _ => Color.Default
         };
 
     private static string 원장블록종류정규화(string kind)
         => kind switch
         {
-            "product" or "sales-channel" or "place" or "warehouse" or "work" or "delivery" or "confirm" => kind,
+            "product" or "sales-channel" or "place" or "warehouse" or "work" or "delivery" or "confirm" or "form" => kind,
             _ => "work"
         };
 }

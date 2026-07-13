@@ -1,0 +1,213 @@
+.decoration-maker-page {
+    display: grid;
+    gap: 18px;
+    max-width: 900px;
+    margin-inline: auto;
+    padding: 4px 0 110px;
+}
+
+.decoration-maker-page__breadcrumb button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--mud-palette-primary);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.decoration-maker-page > header {
+    display: grid;
+    gap: 4px;
+}
+
+.decoration-maker-page > header > span {
+    color: #ec4899;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+}
+
+.decoration-maker-page h1,
+.decoration-maker-page p {
+    margin: 0;
+}
+
+.decoration-maker-page h1 {
+    font-size: clamp(1.55rem, 5vw, 2.2rem);
+}
+
+.decoration-maker-page > header p {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.76rem;
+    line-height: 1.55;
+}
+
+.decoration-maker-page__layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.decoration-maker-page__preview {
+    display: grid;
+    min-height: 430px;
+    place-items: center;
+    align-content: center;
+    gap: 8px;
+    padding: 22px;
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--maker-accent) 10%, #f8fafc);
+    text-align: center;
+}
+
+.decoration-maker-page__preview > span {
+    color: var(--maker-accent);
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+}
+
+.decoration-maker-page__preview > div {
+    display: grid;
+    width: min(72%, 230px);
+    aspect-ratio: 1;
+    border-radius: 28%;
+    place-items: center;
+    overflow: hidden;
+    background: var(--maker-accent);
+    box-shadow: 0 18px 42px color-mix(in srgb, var(--maker-accent) 28%, transparent);
+}
+
+.decoration-maker-page__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.decoration-maker-page__preview b {
+    color: white;
+    font-size: 3.2rem;
+}
+
+.decoration-maker-page__preview > strong {
+    margin-top: 6px;
+    font-size: 0.95rem;
+}
+
+.decoration-maker-page__preview > small {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.66rem;
+}
+
+.decoration-maker-page__form {
+    display: grid;
+    gap: 13px;
+    padding: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 22px;
+    background: var(--mud-palette-surface);
+}
+
+.decoration-maker-page__form label {
+    display: grid;
+    gap: 5px;
+}
+
+.decoration-maker-page__form label > span {
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.decoration-maker-page__form label small {
+    color: var(--mud-palette-text-secondary);
+    font-weight: 500;
+}
+
+.decoration-maker-page__form input,
+.decoration-maker-page__form select {
+    width: 100%;
+    min-height: 43px;
+    padding: 9px 11px;
+    border: 1px solid rgba(100, 116, 139, 0.25);
+    border-radius: 11px;
+    background: var(--mud-palette-surface);
+    color: var(--mud-palette-text-primary);
+    font: inherit;
+    font-size: 0.75rem;
+}
+
+.decoration-maker-page__form input[type="color"] {
+    padding: 4px;
+}
+
+.decoration-maker-page__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px;
+    gap: 10px;
+}
+
+.decoration-maker-page__upload > small {
+    font-size: 0.62rem;
+}
+
+.decoration-maker-page__standard {
+    display: flex;
+    gap: 9px;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(var(--mud-palette-primary-rgb), 0.07);
+}
+
+.decoration-maker-page__standard > div {
+    display: grid;
+    gap: 3px;
+}
+
+.decoration-maker-page__standard strong {
+    font-size: 0.72rem;
+}
+
+.decoration-maker-page__standard p {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.64rem;
+    line-height: 1.5;
+}
+
+.decoration-maker-page__rights {
+    grid-template-columns: 20px 1fr;
+    align-items: start;
+}
+
+.decoration-maker-page__rights input {
+    width: 18px;
+    min-height: 18px;
+    margin-top: 1px;
+}
+
+.decoration-maker-page__rights span {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.66rem !important;
+    font-weight: 500 !important;
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+    .decoration-maker-page {
+        padding-top: 0;
+    }
+
+    .decoration-maker-page__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .decoration-maker-page__preview {
+        min-height: 300px;
+    }
+}

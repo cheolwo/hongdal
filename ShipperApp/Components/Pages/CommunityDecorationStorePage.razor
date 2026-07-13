@@ -1,0 +1,150 @@
+@page "/community/decorations"
+@using Hongdal.Ui.Common.Areas.App.Services
+@inject PlatformCommunityDecorationStateService DecorationState
+@inject NavigationManager Navigation
+
+<PageTitle>꾸미기 상점 · Hongdal</PageTitle>
+
+<main class="decoration-market">
+    <header class="decoration-market__hero">
+        <button type="button" class="decoration-market__back" @onclick="@(() => Navigation.NavigateTo(ShipperRoutes.Home))">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            커뮤니티
+        </button>
+        <div class="decoration-market__hero-copy">
+            <span>COMMUNITY MAKER SHOP</span>
+            <h1>꾸미기 상점</h1>
+            <p>플랫폼 기본 이미지부터 커뮤니티 창작자의 괘상과 노드 이미지까지 둘러보세요.</p>
+        </div>
+        <div class="decoration-market__summary">
+            <span><b>@DecorationState.Products.Count</b>개 팩</span>
+            <span><b>@OwnedProductCount</b>개 보유</span>
+        </div>
+        <button type="button" class="decoration-market__create" @onclick="OpenMaker">
+            <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" Size="Size.Small" />
+            내 꾸미기 만들기
+        </button>
+    </header>
+
+    <nav class="decoration-market__tabs" aria-label="꾸미기 상품 분류">
+        <button type="button" class="@(activeTab == PlatformTab ? "is-active" : null)" @onclick="@(() => activeTab = PlatformTab)">
+            <MudIcon Icon="@Icons.Material.Filled.Verified" Size="Size.Small" />
+            플랫폼 기본
+        </button>
+        <button type="button" class="@(activeTab == CreatorTab ? "is-active" : null)" @onclick="@(() => activeTab = CreatorTab)">
+            <MudIcon Icon="@Icons.Material.Filled.Palette" Size="Size.Small" />
+            크리에이터
+        </button>
+        <button type="button" class="@(activeTab == OwnedTab ? "is-active" : null)" @onclick="@(() => activeTab = OwnedTab)">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" />
+            내 보유
+        </button>
+    </nav>
+
+    <section class="decoration-market__section">
+        <div class="decoration-market__heading">
+            <div>
+                <span>@CurrentEyebrow</span>
+                <h2>@CurrentTitle</h2>
+            </div>
+            <small>@($"{VisibleProducts.Count}개 상품")</small>
+        </div>
+
+        @if (VisibleProducts.Count == 0)
+        {
+            <div class="decoration-market__empty">
+                <MudIcon Icon="@Icons.Material.Filled.ShoppingBag" />
+                <strong>아직 보유한 크리에이터 상품이 없습니다.</strong>
+                <p>크리에이터 탭에서 상품을 살펴보고 상세 페이지에서 구매할 수 있습니다.</p>
+            </div>
+        }
+        else
+        {
+            <div class="decoration-market__grid">
+                @foreach (var product in VisibleProducts)
+                {
+                    <button type="button"
+                            class="decoration-market-card"
+                            @onclick="@(() => OpenDetail(product))">
+                        <div class="decoration-market-card__preview" style="@($"--product-accent: {product.Assets.FirstOrDefault()?.AccentColor ?? "#2563eb"};")">
+                            @foreach (var asset in product.Assets.Take(4))
+                            {
+                                @if (asset.NodeSticker is not null)
+                                {
+                                    <img src="@asset.NodeSticker.이미지Url" alt="@asset.NodeSticker.대체Text" />
+                                }
+                                else
+                                {
+                                    <span>@asset.PreviewSymbol</span>
+                                }
+                            }
+                            <em>@(product.Target == CommunityDecorationTarget.Bagua ? "괘상" : "노드 이미지")</em>
+                        </div>
+                        <div class="decoration-market-card__copy">
+                            <span class="decoration-market-card__creator">
+                                @(IsPlatformProduct(product) ? "플랫폼 기본" : product.CreatorName)
+                            </span>
+                            <strong>@product.Title</strong>
+                            <p>@product.Summary</p>
+                            <div>
+                                <b>@FormatPrice(product)</b>
+                                <span>상세 보기 <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" /></span>
+                            </div>
+                        </div>
+                    </button>
+                }
+            </div>
+        }
+    </section>
+</main>
+
+@code {
+    private const string PlatformTab = "platform";
+    private const string CreatorTab = "creator";
+    private const string OwnedTab = "owned";
+    private string activeTab = PlatformTab;
+
+    private IReadOnlyList<CommunityDecorationProduct> VisibleProducts
+        => activeTab switch
+        {
+            CreatorTab => DecorationState.Products.Where(product => !IsPlatformProduct(product) && !IsMyProduct(product)).ToArray(),
+            OwnedTab => DecorationState.Products.Where(DecorationState.IsProductOwned).ToArray(),
+            _ => DecorationState.Products.Where(IsPlatformProduct).ToArray()
+        };
+
+    private int OwnedProductCount
+        => DecorationState.Products.Count(DecorationState.IsProductOwned);
+
+    private string CurrentEyebrow => activeTab switch
+    {
+        CreatorTab => "CREATOR MARKET",
+        OwnedTab => "MY LIBRARY",
+        _ => "HONGDAL ORIGINAL"
+    };
+
+    private string CurrentTitle => activeTab switch
+    {
+        CreatorTab => "다른 사용자가 만든 꾸미기",
+        OwnedTab => "내가 사용할 수 있는 꾸미기",
+        _ => "플랫폼에서 제공하는 기본 꾸미기"
+    };
+
+    private void OpenDetail(CommunityDecorationProduct product)
+        => Navigation.NavigateTo(ShipperRoutes.CommunityDecorationDetailFor(product.Key));
+
+    private void OpenMaker()
+        => Navigation.NavigateTo(ShipperRoutes.CommunityDecorationCreate);
+
+    private static bool IsPlatformProduct(CommunityDecorationProduct product)
+        => product.CreatorName.StartsWith("Hongdal", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsMyProduct(CommunityDecorationProduct product)
+        => product.CreatorName.Equals("내 제작함", StringComparison.OrdinalIgnoreCase);
+
+    private static string FormatPrice(CommunityDecorationProduct product)
+        => product.IsFree
+            ? "무료"
+            : product.CurrencyCode.Equals("KRW", StringComparison.OrdinalIgnoreCase)
+                ? $"₩{product.PriceAmount:N0}"
+                : $"{product.PriceAmount:N2} {product.CurrencyCode}";
+}

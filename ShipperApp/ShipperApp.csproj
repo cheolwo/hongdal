@@ -21,7 +21,7 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>ShipperApp</ApplicationTitle>
+        <ApplicationTitle>홍달 앱</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>com.companyname.shipperapp</ApplicationId>

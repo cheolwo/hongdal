@@ -45,6 +45,27 @@ public partial class PlatformCommunityHome
         string Description,
         bool IsRequired);
 
+    private sealed record 노드입력준비도(
+        int Percent,
+        int CompletedCount,
+        int TrackedCount,
+        bool TracksRequiredBlocks,
+        IReadOnlyList<string> MissingBlockNames,
+        IReadOnlyList<CommunityLedgerBlockResponse> TrackedBlocks)
+    {
+        public string CountLabel => TrackedCount == 0
+            ? "상태 기준"
+            : $"{(TracksRequiredBlocks ? "필수" : "입력")} {CompletedCount}/{TrackedCount}";
+
+        public string GuidanceLabel => MissingBlockNames.Count switch
+        {
+            0 when Percent >= 100 => "필요한 정보가 모두 준비됐어요",
+            0 => "처리 상태를 따라 준비도를 표시해요",
+            1 => $"{MissingBlockNames[0]} 입력이 남았어요",
+            _ => $"{MissingBlockNames.Count}개 입력이 남았어요"
+        };
+    }
+
     private enum 원장블록처리상태
     {
         대기,
@@ -85,7 +106,9 @@ public partial class PlatformCommunityHome
         string Kind,
         Color Color,
         string? Condition = null,
-        string? 스티커이미지Key = null);
+        string? 스티커이미지Key = null,
+        DiagramNodeConnectionRole ConnectionRole = DiagramNodeConnectionRole.Standard,
+        string? FormKind = null);
 
     private sealed record 원장블록연결선(
         string Id,
@@ -132,6 +155,13 @@ public partial class PlatformCommunityHome
         Right,
         Bottom,
         Left
+    }
+
+    private enum DiagramNodeConnectionRole
+    {
+        Standard,
+        WarehouseOutbound,
+        WarehouseInbound
     }
 
     private enum DiagramEdgeStyleKind

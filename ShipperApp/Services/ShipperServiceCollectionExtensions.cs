@@ -71,6 +71,7 @@ public static class ShipperServiceCollectionExtensions
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<IAuthSession, AuthSession>();
         services.AddScoped<AuthApiService>();
+        services.AddSingleton<HongdalClientRoleService>();
         services.AddSingleton<ShipperOperatingProfileService>();
         services.AddSingleton<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();
         services.AddSingleton<ShipperViewVisibilityService>();

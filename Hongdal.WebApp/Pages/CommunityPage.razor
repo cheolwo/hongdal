@@ -2,20 +2,13 @@
 @implements IDisposable
 @inject PlatformDiagramPaletteStateService DiagramPalette
 
-@if (!DiagramPalette.IsDiagramMode)
-{
-    <WebPageHeader Eyebrow="Community Web"
-                   Title="웹 커뮤니티"
-                   Description="역할과 워크플로우 태그를 가진 게시글을 웹앱에서 확인합니다."
-                   Badge="공통 커뮤니티" />
-}
-
 <PlatformCommunityHome AppName="홍달 웹앱"
                        RoleLabel="웹 사용자"
                        AppKey="shipper"
                        QuickActions="QuickActions"
                        QueryLedgerTemplateKey="QueryLedgerTemplateKey"
-                       QueryDiagramMode="QueryDiagramMode" />
+                       QueryDiagramMode="QueryDiagramMode"
+                       QueryPostId="QueryPostId" />
 
 @code {
     [Parameter]
@@ -25,6 +18,10 @@
     [Parameter]
     [SupplyParameterFromQuery(Name = "diagram")]
     public string? QueryDiagramMode { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "postId")]
+    public long? QueryPostId { get; set; }
 
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [

@@ -1,11 +1,7 @@
-﻿@page "/"
 @page "/shipper"
-@using System.Collections.ObjectModel
 @using Hongdal.Contracts.Common.Inbound
 @using Hongdal.Contracts.Common.Inventory
-@using Hongdal.Contracts.Common.Warehouse
 @using ShipperApp.Models.Shipper
-@using ShipperApp.Models.Workflow
 @using ShipperApp.Services
 @inject AuthApiService AuthApi
 @inject IAuthSession AuthSession
@@ -17,9 +13,10 @@
 
 <PageTitle>@L.T("Home.PageTitle")</PageTitle>
 
-<PlatformCommunityHome AppName="Hongdal Shipper"
+<PlatformCommunityHome AppName="홍달 앱"
                        RoleLabel="화주"
                        AppKey="shipper"
+                       ShowRealtimeBest="true"
                        QuickActions="QuickActions">
     <CommunityModeContent>
         @if (_혜택콘텐츠 is not null || _공지콘텐츠 is not null)
@@ -59,300 +56,108 @@
     </CommunityModeContent>
 
     <WorkModeContent>
-    <MudStack Spacing="3" Class="shipper-page">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="shipper-page-header">
-            <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">@L.T("Home.Title")</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">@L.T("Home.Subtitle")</MudText>
+        <MudStack Spacing="3" Class="shipper-page">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="shipper-page-header">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h4">@L.T("Home.Title")</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">홈에서는 현재 상태를 요약하고, 실제 처리는 각 업무 화면에서 진행합니다.</MudText>
+                </MudStack>
+                @if (isLoggedIn)
+                {
+                    <MudStack Row="true" Spacing="2" Class="shipper-page-actions">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadDashboardAsync">@L.T("Home.Refresh")</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="GoToRequestWizard">@L.T("Home.CreateRequest")</MudButton>
+                    </MudStack>
+                }
             </MudStack>
-            <MudStack Row="true" Spacing="2" Class="shipper-page-actions">
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadRequestsAsync">@L.T("Home.Refresh")</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="GoToRequestWizard">@L.T("Home.CreateRequest")</MudButton>
-            </MudStack>
+
+            @if (!string.IsNullOrWhiteSpace(statusMessage))
+            {
+                <MudAlert Severity="@statusSeverity" Dense="true">@statusMessage</MudAlert>
+            }
+
+            @if (!isLoggedIn)
+            {
+                <Hongdal공통로그인Panel 제목='@L.T("Home.LoginTitle")'
+                                 설명='@L.T("Home.LoginDescription")'
+                                 아이디Label='@L.T("Home.LoginId")'
+                                 비밀번호Label='@L.T("Home.Password")'
+                                 일반로그인버튼텍스트='@L.T("Home.Login")'
+                                 로그인진행텍스트='@L.T("Home.LoggingIn")'
+                                 일반로그인Color="Color.Success"
+                                 Class="pa-4 shipper-panel"
+                                 Elevation="0"
+                                 상태메시지="@statusMessage"
+                                 상태Severity="@statusSeverity"
+                                 IsBusy="@isBusy"
+                                 OnPasswordLogin="LoginAsync"
+                                 OnSocialLogin="SocialLoginAsync" />
+            }
+            else
+            {
+                <MudPaper Elevation="0" Class="pa-4 shipper-panel" Style="border-color: var(--mud-palette-primary);">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap" Spacing="2">
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.overline" Color="Color.Primary">지금 확인할 일</MudText>
+                            @if (LatestRequest is null)
+                            {
+                                <MudText Typo="Typo.h6">첫 운송 의뢰를 등록해 주세요.</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">운송 조건을 입력하면 결제와 배차 흐름을 시작할 수 있습니다.</MudText>
+                            }
+                            else
+                            {
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                    <MudText Typo="Typo.h6">@LatestRequest.의뢰Id</MudText>
+                                    <MudChip T="string" Size="Size.Small" Color="@ResolvePaymentColor(LatestRequest.결제상태)" Variant="Variant.Outlined">@LatestRequest.결제상태</MudChip>
+                                    <MudChip T="string" Size="Size.Small" Color="@ResolveDispatchColor(LatestRequest.배차상태)" Variant="Variant.Outlined">@LatestRequest.배차상태</MudChip>
+                                </MudStack>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">다음 확인: @BuildRequestNextCheck(LatestRequest)</MudText>
+                            }
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1">
+                            @if (LatestRequest is not null)
+                            {
+                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="GoToLatestRequest">상세 보기</MudButton>
+                            }
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToTransportWorkspace">운송 업무 열기</MudButton>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h6">업무 영역</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">처리할 업무를 선택하면 해당 목적에 집중된 화면으로 이동합니다.</MudText>
+                </MudStack>
+
+                <MudGrid>
+                    @foreach (var area in DashboardAreas)
+                    {
+                        <MudItem xs="12" sm="6" lg="3">
+                            <MudPaper Elevation="0" Class="pa-4 h-100 shipper-action-card">
+                                <MudStack Spacing="2" Class="h-100">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                        <MudIcon Icon="@area.Icon" Color="@area.Color" Size="Size.Large" />
+                                        <MudChip T="string" Size="Size.Small" Color="@area.Color" Variant="Variant.Outlined">@area.Status</MudChip>
+                                    </MudStack>
+                                    <MudStack Spacing="0" Class="flex-grow-1">
+                                        <MudText Typo="Typo.subtitle1" Class="fw-bold">@area.Title</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@area.Description</MudText>
+                                    </MudStack>
+                                    <MudButton Variant="Variant.Text" Color="@area.Color" EndIcon="@Icons.Material.Filled.ChevronRight" OnClick="@(() => NavigateTo(area.Route))">
+                                        업무 열기
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
         </MudStack>
-
-        @if (!isLoggedIn)
-        {
-            <Hongdal공통로그인Panel 제목='@L.T("Home.LoginTitle")'
-                             설명='@L.T("Home.LoginDescription")'
-                             아이디Label='@L.T("Home.LoginId")'
-                             비밀번호Label='@L.T("Home.Password")'
-                             일반로그인버튼텍스트='@L.T("Home.Login")'
-                             로그인진행텍스트='@L.T("Home.LoggingIn")'
-                             일반로그인Color="Color.Success"
-                             Class="pa-4 shipper-panel"
-                             Elevation="0"
-                             상태메시지="@statusMessage"
-                             상태Severity="@statusSeverity"
-                             IsBusy="@isBusy"
-                             OnPasswordLogin="LoginAsync"
-                             OnSocialLogin="SocialLoginAsync" />
-        }
-        else
-        {
-            <MudTabs Class="shipper-work-tabs" Rounded="true">
-                <MudTabPanel Text="운송">
-                    <MudStack Spacing="3" Class="pt-3">
-                        <MudStack Spacing="1">
-                            <MudText Typo="Typo.h6">운송 업무</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">결제, 배차, 운송 의뢰 진행 상태를 먼저 확인합니다.</MudText>
-                        </MudStack>
-
-                        <MudGrid>
-                            @foreach (var action in TransportActions)
-                            {
-                                <MudItem xs="12" sm="6" lg="3">
-                                    <MudPaper Elevation="0" Class="pa-4 h-100 shipper-action-card">
-                                        <MudStack Spacing="2">
-                                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                <MudIcon Icon="@action.Icon" Color="@action.Color" />
-                                                <MudChip T="string" Size="Size.Small" Color="@action.Color" Variant="Variant.Outlined">@action.Count</MudChip>
-                                            </MudStack>
-                                            <MudStack Spacing="0">
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
-                                                <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
-                                            </MudStack>
-                                            <MudButton Variant="Variant.Text" Color="@action.Color" EndIcon="@Icons.Material.Filled.ChevronRight" OnClick="() => NavigateTo(action.Route)">
-                                                @action.ActionLabel
-                                            </MudButton>
-                                        </MudStack>
-                                    </MudPaper>
-                                </MudItem>
-                            }
-                        </MudGrid>
-
-                        <MudCard Elevation="0" Class="shipper-panel">
-                            <MudCardContent>
-                                <MudText Typo="Typo.h6" Class="mb-3">@L.T("Home.RequestList")</MudText>
-
-                                @if (requests.Count == 0)
-                                {
-                                    <MudAlert Severity="Severity.Info">@L.T("Home.NoRequests")</MudAlert>
-                                }
-                                else
-                                {
-                                    <MudGrid>
-                                        @foreach (var request in requests)
-                                        {
-                                            <MudItem xs="12" md="6">
-                                                <MudPaper Elevation="0" Class="pa-0 shipper-panel">
-                                                    <MudCardContent>
-                                                        <MudStack Spacing="1">
-                                                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                                                <MudStack Spacing="0">
-                                                                    <MudText Typo="Typo.subtitle1">@request.의뢰Id</MudText>
-                                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@request.화물종류 · @request.의뢰상태</MudText>
-                                                                </MudStack>
-                                                                <MudStack Row="true" Spacing="1" Class="flex-wrap">
-                                                                    <MudChip T="string" Size="Size.Small" Color="@ResolvePaymentColor(request.결제상태)" Variant="Variant.Outlined">@request.결제상태</MudChip>
-                                                                    <MudChip T="string" Size="Size.Small" Color="@ResolveDispatchColor(request.배차상태)" Variant="Variant.Outlined">@request.배차상태</MudChip>
-                                                                    <MudChip T="string" Size="Size.Small" Color="@ResolvePolicyColor(request)" Variant="Variant.Outlined">@BuildPolicyLabel(request)</MudChip>
-                                                                </MudStack>
-                                                            </MudStack>
-
-                                                            <MudPaper Elevation="0" Class="pa-3 shipper-panel" Style="border-color: var(--mud-palette-primary);">
-                                                                <MudGrid>
-                                                                    <MudItem xs="6" md="4">
-                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제예정</MudText>
-                                                                        <MudText Typo="Typo.body2">@(request.결제예정금액?.ToString("N0") ?? "-")원</MudText>
-                                                                    </MudItem>
-                                                                    <MudItem xs="6" md="4">
-                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제</MudText>
-                                                                        <MudText Typo="Typo.body2">@request.결제상태</MudText>
-                                                                    </MudItem>
-                                                                    <MudItem xs="12" md="4">
-                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">다음 확인</MudText>
-                                                                        <MudText Typo="Typo.body2">@BuildRequestNextCheck(request)</MudText>
-                                                                    </MudItem>
-                                                                    <MudItem xs="12" md="4">
-                                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">요금 정책</MudText>
-                                                                        <MudText Typo="Typo.body2">@BuildFarePolicySummary(request)</MudText>
-                                                                    </MudItem>
-                                                                </MudGrid>
-                                                            </MudPaper>
-
-                                                            <HongdalSensitiveDisclosureList Title="의뢰 상세"
-                                                                                            Summary="@request.결제상태"
-                                                                                            RelatedParties="@BuildRequestRelatedParties(request)"
-                                                                                            Icon="@Icons.Material.Filled.LocalShipping"
-                                                                                            Color="Color.Primary"
-                                                                                            PrivacyHint="주소와 결제 정보는 필요한 순간에만 펼쳐 확인합니다.">
-                                                                <MudExpansionPanel Text="화물 정보" Expanded="true">
-                                                                    <HongdalSensitiveInfoRow Label='@L.T("Home.CargoType")' Value="@request.화물종류" />
-                                                                    <HongdalSensitiveInfoRow Label="화물 적재 형태" Value='@(string.IsNullOrWhiteSpace(request.화물적재형태) ? "-" : request.화물적재형태)' />
-                                                                    <HongdalSensitiveInfoRow Label="의뢰 상태" Value="@request.의뢰상태" />
-                                                                    <HongdalSensitiveInfoRow Label='@L.T("Home.CreatedAt")' Value='@request.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")' />
-                                                                </MudExpansionPanel>
-                                                                <MudExpansionPanel Text="운송 정보">
-                                                                    <HongdalSensitiveInfoRow Label='@L.T("Home.Pickup")' Value='@(request.픽업지 ?? "-")' />
-                                                                    <HongdalSensitiveInfoRow Label="하차지" Value='@(request.하차지 ?? "-")' />
-                                                                    <HongdalSensitiveInfoRow Label='@L.T("Home.Dispatch")' Value="@request.배차상태" />
-                                                                </MudExpansionPanel>
-                                                                <MudExpansionPanel Text="결제 정보">
-                                                                    <HongdalSensitiveInfoRow Label='@L.T("Home.Payment")' Value="@request.결제상태" />
-                                                                    <HongdalSensitiveInfoRow Label='@L.T("Home.PaymentMethod")' Value="@request.결제수단" />
-                                                                    <HongdalSensitiveInfoRow Label="예정 금액" Value='@(request.결제예정금액?.ToString("N0") ?? "-")' />
-                                                                    <HongdalSensitiveInfoRow Label="기준 운임" Value='@(request.기준운임?.ToString("N0") ?? "-")' />
-                                                                    <HongdalSensitiveInfoRow Label="기사 지급 예정" Value='@(request.기사지급예정운임?.ToString("N0") ?? "-")' />
-                                                                </MudExpansionPanel>
-                                                                <MudExpansionPanel Text="요금/알선 정책">
-                                                                    <HongdalSensitiveInfoRow Label="알선 단계" Value='@($"{request.알선단계}단계")' />
-                                                                    <HongdalSensitiveInfoRow Label="재알선 금지" Value='@(request.재알선금지 ? "적용" : "미적용")' />
-                                                                    <HongdalSensitiveInfoRow Label="정책 상태" Value="@BuildPolicyLabel(request)" />
-                                                                    <HongdalSensitiveInfoRow Label="경고" Value="@BuildPolicyWarningText(request)" />
-                                                                </MudExpansionPanel>
-                                                            </HongdalSensitiveDisclosureList>
-
-                                                            <MudStack Row="true" Spacing="1" Class="flex-wrap">
-                                                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Timeline" OnClick="@(() => NavigateToRequestDetail(request))">타임라인</MudButton>
-                                                                @if (request.CanPay)
-                                                                {
-                                                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="() => ShowPayMessage(request)">@L.T("Home.Pay")</MudButton>
-                                                                }
-                                                            </MudStack>
-                                                        </MudStack>
-                                                    </MudCardContent>
-                                                </MudPaper>
-                                            </MudItem>
-                                        }
-                                    </MudGrid>
-                                }
-                            </MudCardContent>
-                        </MudCard>
-                    </MudStack>
-                </MudTabPanel>
-
-                <MudTabPanel Text="창고">
-                    <MudStack Spacing="3" Class="pt-3">
-                        <MudStack Spacing="1">
-                            <MudText Typo="Typo.h6">창고 업무</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">입고 예정, 재고, 작업대 스캔 흐름을 창고 업무로 모아 확인합니다.</MudText>
-                        </MudStack>
-
-                        <MudGrid>
-                            @foreach (var action in WarehouseActions)
-                            {
-                                <MudItem xs="12" sm="6" lg="3">
-                                    <MudPaper Elevation="0" Class="pa-4 h-100 shipper-action-card">
-                                        <MudStack Spacing="2">
-                                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                <MudIcon Icon="@action.Icon" Color="@action.Color" />
-                                                <MudChip T="string" Size="Size.Small" Color="@action.Color" Variant="Variant.Outlined">@action.Count</MudChip>
-                                            </MudStack>
-                                            <MudStack Spacing="0">
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
-                                                <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
-                                            </MudStack>
-                                            <MudButton Variant="Variant.Text" Color="@action.Color" EndIcon="@Icons.Material.Filled.ChevronRight" OnClick="() => NavigateTo(action.Route)">
-                                                @action.ActionLabel
-                                            </MudButton>
-                                        </MudStack>
-                                    </MudPaper>
-                                </MudItem>
-                            }
-
-                            @foreach (var action in WarehouseShortcutActions)
-                            {
-                                <MudItem xs="12" sm="6" lg="3">
-                                    <MudPaper Elevation="0" Class="pa-4 h-100 shipper-action-card">
-                                        <MudStack Spacing="2">
-                                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                <MudIcon Icon="@action.Icon" Color="@action.Color" />
-                                                <MudChip T="string" Size="Size.Small" Color="@action.Color" Variant="Variant.Outlined">@action.Count</MudChip>
-                                            </MudStack>
-                                            <MudStack Spacing="0">
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
-                                                <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
-                                            </MudStack>
-                                            <MudButton Variant="Variant.Text" Color="@action.Color" EndIcon="@Icons.Material.Filled.ChevronRight" OnClick="() => NavigateTo(action.Route)">
-                                                @action.ActionLabel
-                                            </MudButton>
-                                        </MudStack>
-                                    </MudPaper>
-                                </MudItem>
-                            }
-                        </MudGrid>
-
-                        <ShipperOperationsWorkspace />
-                    </MudStack>
-                </MudTabPanel>
-
-                <MudTabPanel Text="판매">
-                    <MudStack Spacing="3" Class="pt-3">
-                        <MudStack Spacing="1">
-                            <MudText Typo="Typo.h6">판매 업무</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">판매채널 연결, 상품 출품, 주문 출고 알림을 한 곳에서 시작합니다.</MudText>
-                        </MudStack>
-
-                        <MudGrid>
-                            @foreach (var action in SalesActions)
-                            {
-                                <MudItem xs="12" sm="6" lg="4">
-                                    <MudPaper Elevation="0" Class="pa-4 h-100 shipper-action-card">
-                                        <MudStack Spacing="2">
-                                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                <MudIcon Icon="@action.Icon" Color="@action.Color" />
-                                                <MudChip T="string" Size="Size.Small" Color="@action.Color" Variant="Variant.Outlined">@action.Count</MudChip>
-                                            </MudStack>
-                                            <MudStack Spacing="0">
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
-                                                <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
-                                            </MudStack>
-                                            <MudButton Variant="Variant.Text" Color="@action.Color" EndIcon="@Icons.Material.Filled.ChevronRight" OnClick="() => NavigateTo(action.Route)">
-                                                @action.ActionLabel
-                                            </MudButton>
-                                        </MudStack>
-                                    </MudPaper>
-                                </MudItem>
-                            }
-                        </MudGrid>
-                    </MudStack>
-                </MudTabPanel>
-
-                <MudTabPanel Text="통관">
-                    <MudStack Spacing="3" Class="pt-3">
-                        <MudStack Spacing="1">
-                            <MudText Typo="Typo.h6">통관 업무</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">HS 코드 검토와 관세사 확인이 필요한 건을 분리해서 확인합니다.</MudText>
-                        </MudStack>
-
-                        <MudGrid>
-                            @foreach (var action in CustomsActions)
-                            {
-                                <MudItem xs="12" sm="6" lg="4">
-                                    <MudPaper Elevation="0" Class="pa-4 h-100 shipper-action-card">
-                                        <MudStack Spacing="2">
-                                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                                <MudIcon Icon="@action.Icon" Color="@action.Color" />
-                                                <MudChip T="string" Size="Size.Small" Color="@action.Color" Variant="Variant.Outlined">@action.Count</MudChip>
-                                            </MudStack>
-                                            <MudStack Spacing="0">
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
-                                                <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
-                                            </MudStack>
-                                            <MudButton Variant="Variant.Text" Color="@action.Color" EndIcon="@Icons.Material.Filled.ChevronRight" OnClick="() => NavigateTo(action.Route)">
-                                                @action.ActionLabel
-                                            </MudButton>
-                                        </MudStack>
-                                    </MudPaper>
-                                </MudItem>
-                            }
-                        </MudGrid>
-                    </MudStack>
-                </MudTabPanel>
-            </MudTabs>
-        }
-    </MudStack>
     </WorkModeContent>
 </PlatformCommunityHome>
 
 @code {
-    [CascadingParameter]
-    public string Language { get; set; } = string.Empty;
-
-    private readonly WorkflowOverview Workflow = new();
     private List<ShipperRequestItem> requests = [];
-    private IReadOnlyList<창고요약응답> warehouses = [];
     private IReadOnlyList<입고요청항목응답> inbounds = [];
     private IReadOnlyList<재고항목응답> inventory = [];
     private string? statusMessage;
@@ -360,87 +165,57 @@
     private bool isBusy;
     private 홍달위젯콘텐츠Dto? _혜택콘텐츠;
     private 홍달위젯콘텐츠Dto? _공지콘텐츠;
+
     private bool isLoggedIn => AuthSession.IsLoggedIn;
-    private IReadOnlyList<WorkActionItem> WorkActions => BuildWorkActions();
-    private IReadOnlyList<WorkActionItem> TransportActions => WorkActions
-        .Where(x => x.Route == ShipperRoutes.Request || x.Route == ShipperRoutes.PublicCargo || x.Route == ShipperRoutes.FclLclPlanner)
-        .ToArray();
-    private IReadOnlyList<WorkActionItem> WarehouseActions => WorkActions
-        .Where(x => x.Route == ShipperRoutes.InboundRequests || x.Route == ShipperRoutes.WarehouseInventory)
-        .ToArray();
-    private static readonly IReadOnlyList<WorkActionItem> WarehouseShortcutActions =
+    private ShipperRequestItem? LatestRequest => requests.OrderByDescending(x => x.생성일시).FirstOrDefault();
+
+    private IReadOnlyList<DashboardArea> DashboardAreas =>
     [
         new(
-            "창고 작업대",
-            "입고, 출고, 포장 작업의 시작 화면으로 이동합니다.",
-            "바로가기",
-            "작업대 열기",
+            "운송 관리",
+            "의뢰별 결제, 배차, 운송 진행 상태를 확인하고 후속 작업을 처리합니다.",
+            $"{ActiveRequestCount:N0}건 진행",
+            ShipperRoutes.TransportWorkspace,
+            Icons.Material.Filled.LocalShipping,
+            Color.Primary),
+        new(
+            "창고 운영",
+            "입고, 재고, 스캔과 출고 작업을 창고 작업대에서 처리합니다.",
+            $"입고 {PendingInboundCount:N0} · 재고 {ActionableInventoryCount:N0}",
             ShipperRoutes.WarehouseWorkspace,
             Icons.Material.Filled.Warehouse,
             Color.Warning),
         new(
-            "스캔 스테이션",
-            "작업대 바코드와 상품 바코드를 스캔하는 화면으로 이동합니다.",
-            "스캔",
-            "스캔하기",
-            ShipperRoutes.WarehouseScan,
-            Icons.Material.Filled.QrCodeScanner,
-            Color.Success)
-    ];
-    private static readonly IReadOnlyList<WorkActionItem> SalesActions =
-    [
-        new(
-            "판매채널 연결",
-            "마켓, 주문 채널, 상품 출품 연동 상태를 관리합니다.",
-            "채널",
-            "연결 관리",
-            ShipperRoutes.SalesChannels,
-            Icons.Material.Filled.Storefront,
-            Color.Primary),
-        new(
-            "상품 출품",
-            "재고를 판매 상품으로 전환하고 판매 정보를 관리합니다.",
-            "상품",
-            "상품 관리",
-            ShipperRoutes.ProductListings,
-            Icons.Material.Filled.Inventory,
-            Color.Success),
-        new(
-            "주문 출고",
-            "판매 주문 출고 알림과 창고 출고 연결 상태를 확인합니다.",
-            "주문",
-            "출고 확인",
+            "판매 운영",
+            "판매채널 주문과 출고 연결 상태를 확인합니다.",
+            "채널 · 출고",
             ShipperRoutes.OrderFulfillment,
-            Icons.Material.Filled.Outbox,
-            Color.Info)
-    ];
-    private static readonly IReadOnlyList<WorkActionItem> CustomsActions =
-    [
+            Icons.Material.Filled.Storefront,
+            Color.Info),
         new(
-            "FCL/LCL 판단",
-            "화물량에 따라 FCL, LCL, 비교 견적 여부를 판단하고 배송대행 협의 항목을 정리합니다.",
-            "협의",
-            "판단하기",
+            "통관 · 국제",
+            "FCL/LCL 판단과 HS 코드 검토처럼 국제 운송에 필요한 업무를 시작합니다.",
+            "검토 업무",
             ShipperRoutes.FclLclPlanner,
             Icons.Material.Filled.Public,
-            Color.Primary),
-        new(
-            "HS 코드 검토",
-            "통관 대행이나 수입 대행 전에 HS 코드 검토 요청을 확인합니다.",
-            "검토",
-            "검토 보기",
-            ShipperRoutes.CustomsHsReviews,
-            Icons.Material.Filled.FactCheck,
             Color.Secondary)
     ];
+
+    private int ActiveRequestCount => requests.Count(x =>
+        !IsMatch(x.의뢰상태, "취소", "환불") &&
+        !IsMatch(x.배차상태, "배송완료", "하차완료", "완료"));
+
+    private int PendingInboundCount => inbounds.Count(x =>
+        string.Equals(x.상태, "입고예정", StringComparison.OrdinalIgnoreCase));
+
+    private int ActionableInventoryCount => inventory.Count(x => x.가용수량 > 0);
+
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [
+        new("운송 업무", "결제, 배차, 운송 상태를 의뢰별로 관리합니다.", ShipperRoutes.TransportWorkspace, Icons.Material.Filled.LocalShipping, Color.Primary),
         new("운송 의뢰", "화물 운송 의뢰를 새로 등록합니다.", ShipperRoutes.Request, Icons.Material.Filled.AddRoad, Color.Primary),
-        new("FCL/LCL 판단", "해외 화물량 기준으로 FCL/LCL 협의 방향을 잡습니다.", ShipperRoutes.FclLclPlanner, Icons.Material.Filled.Public, Color.Primary),
-        new("입고 현황", "입고 요청과 입고 예정 상태를 확인합니다.", ShipperRoutes.InboundRequests, Icons.Material.Filled.Warehouse, Color.Warning),
-        new("재고 조회", "창고 재고와 재위탁 가능 수량을 확인합니다.", ShipperRoutes.WarehouseInventory, Icons.Material.Filled.Inventory2, Color.Success),
-        new("판매 주문", "판매 채널 주문 출고 알림을 확인합니다.", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Storefront, Color.Info),
-        new("HS 검토", "통관/HS 코드 검토 요청을 확인합니다.", ShipperRoutes.CustomsHsReviews, Icons.Material.Filled.FactCheck, Color.Secondary)
+        new("창고 작업대", "입고, 재고, 스캔과 출고 작업을 시작합니다.", ShipperRoutes.WarehouseWorkspace, Icons.Material.Filled.Warehouse, Color.Warning),
+        new("판매 주문", "판매 채널 주문 출고 알림을 확인합니다.", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Storefront, Color.Info)
     ];
 
     protected override async Task OnInitializedAsync()
@@ -448,7 +223,7 @@
         await AuthSession.RestoreAsync();
         await ViewVisibilityService.EnsureLoadedAsync();
         await LoadCommonContentsAsync();
-        await LoadRequestsAsync();
+        await LoadDashboardAsync();
     }
 
     private async Task LoadCommonContentsAsync()
@@ -494,7 +269,7 @@
             isBusy = false;
         }
 
-        await LoadRequestsAsync();
+        await LoadDashboardAsync();
     }
 
     private Task SocialLoginAsync(공통소셜로그인요청 request)
@@ -504,207 +279,37 @@
         return Task.CompletedTask;
     }
 
-    private async Task Logout()
-    {
-        await AuthApi.LogoutAsync();
-        statusSeverity = Severity.Info;
-        statusMessage = L.T("Home.Message.LoggedOut");
-        await ViewVisibilityService.ReloadAsync();
-        await LoadRequestsAsync();
-    }
-
-    private async Task LoadRequestsAsync()
+    private async Task LoadDashboardAsync()
     {
         if (!isLoggedIn)
         {
             requests = [];
-            warehouses = [];
             inbounds = [];
             inventory = [];
-            RefreshWorkflow();
             return;
         }
 
         try
         {
             requests = (await ShipperOperations.GetRequestsAsync()).ToList();
-            warehouses = await ShipperOperations.GetWarehousesAsync();
             inbounds = await ShipperOperations.GetInboundsAsync();
             inventory = await ShipperOperations.GetInventoryAsync();
+            statusMessage = null;
         }
         catch (Exception ex)
         {
             requests = [];
-            warehouses = [];
             inbounds = [];
             inventory = [];
             statusSeverity = Severity.Error;
             statusMessage = $"서버 API 조회 실패: {ex.Message}";
         }
-
-        RefreshWorkflow();
-    }
-
-    protected override void OnParametersSet()
-    {
-        RefreshWorkflow();
-    }
-
-    private void RefreshWorkflow()
-    {
-        var latest = requests.OrderByDescending(x => x.생성일시).FirstOrDefault();
-        var currentState = latest is null
-            ? L.T("Home.Workflow.NoRequest")
-            : L.T("Home.Workflow.LatestRequest", latest.의뢰상태, latest.결제상태, latest.배차상태);
-
-        var currentIndex = ResolveCurrentStepIndex(latest);
-        Workflow.RoleTitle = L.T("Home.WorkflowTitle");
-        Workflow.CurrentStateLabel = currentState;
-        Workflow.NextActionLabel = ResolveNextActionLabel(currentIndex);
-        Workflow.PrimaryActionKey = currentIndex == 0 ? "create-request" : "review-request";
-        Workflow.Steps = new ObservableCollection<WorkflowStepItem>(BuildSteps(currentIndex));
-    }
-
-    private static int ResolveCurrentStepIndex(ShipperRequestItem? latest)
-    {
-        if (latest is null)
-        {
-            return 0;
-        }
-
-        if (IsMatch(latest.결제상태, "결제대기", "미결제", "대기"))
-        {
-            return 1;
-        }
-
-        if (IsMatch(latest.결제상태, "결제완료") && IsMatch(latest.배차상태, "매칭중", "배차대기", "대기"))
-        {
-            return 2;
-        }
-
-        if (IsMatch(latest.배차상태, "기사배정", "배차확정"))
-        {
-            return 3;
-        }
-
-        if (IsMatch(latest.배차상태, "운송중", "상차완료", "운송"))
-        {
-            return 4;
-        }
-
-        if (IsMatch(latest.배차상태, "배송완료", "하차완료", "완료"))
-        {
-            return 5;
-        }
-
-        if (IsMatch(latest.의뢰상태, "취소", "환불"))
-        {
-            return 5;
-        }
-
-        return 2;
-    }
-
-    private string ResolveNextActionLabel(int currentIndex)
-    {
-        return currentIndex switch
-        {
-            0 => L.T("Home.Action.NewRequest"),
-            1 => L.T("Home.Action.Pay"),
-            2 => L.T("Home.Action.CheckDispatch"),
-            3 => L.T("Home.Action.TransportStatus"),
-            4 => L.T("Home.Action.DeliveryComplete"),
-            5 => L.T("Home.Action.AllRequests"),
-            _ => L.T("Home.Action.CheckWork")
-        };
-    }
-
-    private IReadOnlyList<WorkflowStepItem> BuildSteps(int currentIndex)
-    {
-        var labels = new[]
-        {
-            ("request", L.T("Home.Step.Request.Title"), L.T("Home.Step.Request.Description")),
-            ("payment", L.T("Home.Step.Payment.Title"), L.T("Home.Step.Payment.Description")),
-            ("dispatch", L.T("Home.Step.Dispatch.Title"), L.T("Home.Step.Dispatch.Description")),
-            ("transport", L.T("Home.Step.Transport.Title"), L.T("Home.Step.Transport.Description")),
-            ("complete", L.T("Home.Step.Complete.Title"), L.T("Home.Step.Complete.Description")),
-            ("history", L.T("Home.Step.History.Title"), L.T("Home.Step.History.Description"))
-        };
-
-        var steps = new List<WorkflowStepItem>();
-        for (var index = 0; index < labels.Length; index++)
-        {
-            var (key, title, description) = labels[index];
-            steps.Add(new WorkflowStepItem
-            {
-                Key = key,
-                Title = title,
-                Description = description,
-                IsCurrent = index == currentIndex,
-                IsCompleted = index < currentIndex,
-                IsAvailable = index <= currentIndex + 1,
-                AccentColor = index == currentIndex ? "#0F766E" : index < currentIndex ? "#16A34A" : "#94A3B8"
-            });
-        }
-
-        return steps;
-    }
-
-    private string StepStateLabel(WorkflowStepItem step)
-    {
-        return step.IsCurrent
-            ? L.T("Home.CurrentStep")
-            : step.IsCompleted
-                ? L.T("Home.Completed")
-                : L.T("Home.NextStep");
     }
 
     private static bool IsMatch(string? value, params string[] keywords)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return keywords.Any(keyword => value.Contains(keyword, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private void HandlePrimaryAction()
-    {
-        if (string.Equals(Workflow.PrimaryActionKey, "create-request", StringComparison.OrdinalIgnoreCase))
-        {
-            Navigation.NavigateTo(ShipperRoutes.Request);
-        }
-    }
-
-    private void GoToRequestWizard() => Navigation.NavigateTo(ShipperRoutes.Request);
-
-    private void NavigateToRequestDetail(ShipperRequestItem request)
-    {
-        if (string.IsNullOrWhiteSpace(request.의뢰Id))
-        {
-            return;
-        }
-
-        Navigation.NavigateTo(ShipperRoutes.RequestDetailFor(request.의뢰Id));
-    }
-
-    private void NavigateTo(string route)
-    {
-        Navigation.NavigateTo(route);
-    }
-
-    private static string BuildRequestRelatedParties(ShipperRequestItem request)
-    {
-        var dispatchParty = string.IsNullOrWhiteSpace(request.배차상태)
-            ? "기사 매칭 대상"
-            : $"기사 {request.배차상태}";
-
-        var dropoffParty = string.IsNullOrWhiteSpace(request.하차지)
-            ? "하차지 담당자"
-            : $"하차지 {request.하차지}";
-
-        return $"화주 · {dispatchParty} · {dropoffParty}";
+        return !string.IsNullOrWhiteSpace(value) &&
+               keywords.Any(keyword => value.Contains(keyword, StringComparison.OrdinalIgnoreCase));
     }
 
     private static string BuildRequestNextCheck(ShipperRequestItem request)
@@ -732,50 +337,6 @@
         return "상세 확인";
     }
 
-    private static string BuildPolicyLabel(ShipperRequestItem request)
-    {
-        if (request.정책위반)
-        {
-            return "정책확인";
-        }
-
-        if (request.재알선의심)
-        {
-            return "재알선의심";
-        }
-
-        return "정책정상";
-    }
-
-    private static string BuildFarePolicySummary(ShipperRequestItem request)
-    {
-        var baseFare = request.기준운임?.ToString("N0") ?? "-";
-        var driverFare = request.기사지급예정운임?.ToString("N0") ?? "-";
-        return $"기준 {baseFare}원 / 기사 {driverFare}원";
-    }
-
-    private static string BuildPolicyWarningText(ShipperRequestItem request)
-    {
-        return request.정책경고목록.Count == 0
-            ? "경고 없음"
-            : string.Join(" / ", request.정책경고목록);
-    }
-
-    private static Color ResolvePolicyColor(ShipperRequestItem request)
-    {
-        if (request.정책위반)
-        {
-            return Color.Warning;
-        }
-
-        if (request.재알선의심)
-        {
-            return Color.Error;
-        }
-
-        return Color.Success;
-    }
-
     private static Color ResolvePaymentColor(string status)
     {
         if (IsMatch(status, "결제완료"))
@@ -783,12 +344,7 @@
             return Color.Success;
         }
 
-        if (IsMatch(status, "결제대기", "미결제", "대기"))
-        {
-            return Color.Warning;
-        }
-
-        return Color.Default;
+        return IsMatch(status, "결제대기", "미결제", "대기") ? Color.Warning : Color.Default;
     }
 
     private static Color ResolveDispatchColor(string status)
@@ -803,85 +359,25 @@
             return Color.Info;
         }
 
-        if (IsMatch(status, "매칭중", "배차대기", "대기"))
-        {
-            return Color.Warning;
-        }
-
-        return Color.Primary;
+        return IsMatch(status, "매칭중", "배차대기", "대기") ? Color.Warning : Color.Primary;
     }
 
-    private IReadOnlyList<WorkActionItem> BuildWorkActions()
+    private void GoToLatestRequest()
     {
-        var paymentWaitingCount = requests.Count(x => IsMatch(x.결제상태, "결제대기", "미결제", "대기"));
-        var dispatchWaitingCount = requests.Count(x => IsMatch(x.배차상태, "매칭중", "배차대기", "대기"));
-        var pendingInboundCount = inbounds.Count(x => string.Equals(x.상태, "입고예정", StringComparison.OrdinalIgnoreCase));
-        var actionableInventoryCount = inventory.Count(x => x.가용수량 > 0);
-
-        return
-        [
-            new WorkActionItem(
-                L.T("Home.Console.Payment.Title"),
-                L.T("Home.Console.Payment.Description"),
-                paymentWaitingCount.ToString(),
-                L.T("Home.Console.Payment.Action"),
-                ShipperRoutes.Request,
-                Icons.Material.Filled.Payments,
-                Color.Primary),
-            new WorkActionItem(
-                L.T("Home.Console.Dispatch.Title"),
-                L.T("Home.Console.Dispatch.Description"),
-                dispatchWaitingCount.ToString(),
-                L.T("Home.Console.Dispatch.Action"),
-                ShipperRoutes.PublicCargo,
-                Icons.Material.Filled.LocalShipping,
-                Color.Info),
-            new WorkActionItem(
-                "FCL/LCL 판단",
-                "해외 화물량과 혼재 가능 여부를 기준으로 배송대행 협의 방향을 잡습니다.",
-                "국제",
-                "판단하기",
-                ShipperRoutes.FclLclPlanner,
-                Icons.Material.Filled.Public,
-                Color.Primary),
-            new WorkActionItem(
-                L.T("Home.Console.Inbound.Title"),
-                L.T("Home.Console.Inbound.Description"),
-                pendingInboundCount.ToString(),
-                L.T("Home.Console.Inbound.Action"),
-                ShipperRoutes.InboundRequests,
-                Icons.Material.Filled.Warehouse,
-                Color.Warning),
-            new WorkActionItem(
-                L.T("Home.Console.Inventory.Title"),
-                L.T("Home.Console.Inventory.Description"),
-                actionableInventoryCount.ToString(),
-                L.T("Home.Console.Inventory.Action"),
-                ShipperRoutes.WarehouseInventory,
-                Icons.Material.Filled.Inventory2,
-                Color.Success)
-        ];
-    }
-
-    private async Task ShowPayMessage(ShipperRequestItem request)
-    {
-        var page = Application.Current?.Windows.FirstOrDefault()?.Page;
-        if (page is null)
+        if (LatestRequest is not null && !string.IsNullOrWhiteSpace(LatestRequest.의뢰Id))
         {
-            return;
+            Navigation.NavigateTo(ShipperRoutes.RequestDetailFor(LatestRequest.의뢰Id));
         }
-
-        await page.DisplayAlertAsync(
-            L.T("Home.Alert.PaymentTitle"),
-            L.T("Home.Alert.PaymentMessage", request.의뢰Id),
-            L.T("Home.Alert.Confirm"));
     }
 
-    private sealed record WorkActionItem(
+    private void GoToRequestWizard() => Navigation.NavigateTo(ShipperRoutes.Request);
+    private void GoToTransportWorkspace() => Navigation.NavigateTo(ShipperRoutes.TransportWorkspace);
+    private void NavigateTo(string route) => Navigation.NavigateTo(route);
+
+    private sealed record DashboardArea(
         string Title,
         string Description,
-        string Count,
-        string ActionLabel,
+        string Status,
         string Route,
         string Icon,
         Color Color);

@@ -29,6 +29,7 @@ public static class View카탈로그
         new(App식별자.DriverApp, View식별자.Driver.ViewSettings, "화면 설정", "/driver/settings/views", Icons.Common.Settings, 역할명.기사, true, true, 100),
 
         new(App식별자.ShipperApp, View식별자.Shipper.Home, "Home", "/", Icons.Common.Home, 역할명.화주, true, true, 10),
+        new(App식별자.ShipperApp, View식별자.Shipper.TransportWorkspace, "운송 업무", "/shipper/transport", Icons.Shipper.TransportWorkspace, 역할명.화주, true, true, 15),
         new(App식별자.ShipperApp, View식별자.Shipper.Request, "화물운송의뢰 등록", "/shipper/request", Icons.Shipper.Request, 역할명.화주, true, true, 20),
         new(App식별자.ShipperApp, View식별자.Shipper.PublicCargo, "공개 화물정보", "/shipper/public-cargo", Icons.Shipper.PublicCargo, 역할명.화주, false, true, 30),
         new(App식별자.ShipperApp, View식별자.Shipper.ExplorationInbox, "받은 탐색 문의함", "/shipper/exploration/inbox", Icons.Shipper.ExplorationInbox, 역할명.화주, false, true, 40),
@@ -103,6 +104,7 @@ public static class View카탈로그
 
         public static class Shipper
         {
+            public const string TransportWorkspace = "local_shipping";
             public const string Request = "add_box";
             public const string PublicCargo = "view_list";
             public const string ExplorationInbox = "inbox";

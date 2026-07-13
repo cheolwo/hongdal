@@ -4,6 +4,7 @@ public static class ShipperRoutes
 {
     public const string Home = "/";
     public const string ShipperHome = "/shipper";
+    public const string TransportWorkspace = "/shipper/transport";
     public const string Request = "/shipper/request";
     public const string RequestBulk = "/shipper/request/bulk";
     public const string RequestDetail = "/shipper/request";
@@ -28,6 +29,8 @@ public static class ShipperRoutes
     public const string FclLclPlanner = "/shipper/international/fcl-lcl";
     public const string ViewSettings = "/shipper/settings/views";
     public const string ProfileSettings = "/shipper/settings/profile";
+    public const string CommunityDecorations = "/community/decorations";
+    public const string CommunityDecorationCreate = "/community/decorations/create";
     public const string DispatchAddressForm = "/dispatch/address-form";
 
     public static string ReconsignmentOrdersForInventory(long inventoryItemId)
@@ -35,4 +38,10 @@ public static class ShipperRoutes
 
     public static string RequestDetailFor(string requestId)
         => $"{RequestDetail}/{Uri.EscapeDataString(requestId)}";
+
+    public static string CommunityDecorationDetailFor(string productKey)
+        => $"{CommunityDecorations}/{Uri.EscapeDataString(productKey)}";
+
+    public static string CommunityDecorationCheckoutFor(string productKey)
+        => $"{CommunityDecorationDetailFor(productKey)}/checkout";
 }

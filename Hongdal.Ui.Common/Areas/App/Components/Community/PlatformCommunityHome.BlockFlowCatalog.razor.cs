@@ -20,13 +20,17 @@ public partial class PlatformCommunityHome
             [
                 상품노드("출고 요청", "출고 품목 블록", "출고할 상품, 수량, 목적, 도착 조건을 먼저 정리합니다."),
                 작업노드("피킹/검수", "피킹·검수 블록", "창고 안에서 찾고 수량과 상태를 확인하는 단계를 묶습니다."),
-                작업노드("포장", "포장 블록", "포장 완료, 라벨, 송장, 출고 가능 상태를 처리합니다.", "포장 완료 뒤 운송 인계가 열립니다."),
-                배송노드("운송 인계", "운송 인계/화물 운송 원장", "창고 밖으로 나가는 재위탁 운송, 택배, 기사 픽업을 한 노드에서 넘깁니다.")
+                작업노드("포장", "포장 블록", "포장 완료, 라벨, 송장, 출고 가능 상태를 처리합니다.", "포장 완료 뒤 창고 출고가 열립니다."),
+                창고노드("창고 출고", "출고 경계 블록", "확정된 출고 품목을 운송 원장으로 넘기는 경계입니다. 오른쪽 또는 아래쪽 출력으로만 연결합니다.", connectionRole: DiagramNodeConnectionRole.WarehouseOutbound),
+                배송노드("운송 상차", "운송 상차 블록", "창고 출고 품목과 증빙을 입력으로 받아 상차 완료와 출발 가능 상태를 기록합니다."),
+                배송노드("운송 하차", "운송 하차 블록", "이동을 마친 품목과 하차 증빙을 도착 창고의 입고 입력으로 넘깁니다."),
+                창고노드("창고 입고", "입고 경계 블록", "운송 하차 품목과 증빙을 받아 입고 검수로 넘기는 경계입니다. 왼쪽 또는 위쪽 입력으로만 연결합니다.", connectionRole: DiagramNodeConnectionRole.WarehouseInbound)
             ],
             CommunityLedgerTemplateKeys.WarehouseInbound =>
             [
                 상품노드("입고 요청", "입고 예정 블록", "입고될 상품, 수량, 납품 조건을 먼저 정리합니다."),
-                배송노드("납품/도착", "납품 상태 블록", "외부에서 창고로 들어오는 도착 예정, 도착, 지연 상태를 묶습니다."),
+                배송노드("운송 하차", "운송 하차 블록", "연결된 운송 원장이 있으면 도착, 하차, 지연과 인수 증빙을 함께 확인합니다.", "운송 원장이 없는 직접 납품에서는 도착 확인 단계로 사용합니다."),
+                창고노드("창고 입고", "입고 경계 블록", "운송 하차 또는 직접 납품 내용을 입력으로 받아 입고 검수를 엽니다. 왼쪽 또는 위쪽 입력으로만 연결합니다.", connectionRole: DiagramNodeConnectionRole.WarehouseInbound),
                 작업노드("검수/이상", "검수·이상 블록", "수량, 파손, 누락, 보완 조치를 한 노드에서 확인합니다."),
                 창고노드("보관/재고화", "보관 위치/재고 전환", "검수 뒤 보관 위치를 잡고 실제 재고로 전환합니다.")
             ],
@@ -39,25 +43,27 @@ public partial class PlatformCommunityHome
             ],
             CommunityLedgerTemplateKeys.GroupPurchase =>
             [
-                상품노드("수요 모집", "수요/참여 블록", "참여자, 희망 수량, 희망가, 비확정 의향을 모읍니다."),
+                상품노드("수요 모집", "공동주문 수요 블록", "참여자, 희망 수량, 희망가, 비확정 의향을 모읍니다."),
                 작업노드("수입 결정", "수량·가격·방식 결정", "모인 수요를 보고 수입 진행 여부, FCL/LCL, 공급자 조건을 정합니다."),
-                작업노드("해외 구매/선적", "해외 발주·선적 블록", "발주, 인보이스, 패킹리스트, B/L 또는 AWB 추적을 묶습니다."),
-                작업노드("통관/검토", "통관·관세사 검토", "HS 코드, 통관 리스크, 관세사 검토, 보완 서류를 한 노드에서 봅니다."),
-                배송노드("국내 인계/마감", "창고·운송·판매 전환", "창고 입고, 국내 운송, 실제 주문/결제 전환, 정산 마감을 묶습니다.")
+                작업노드("해외 선적", "해외 발주·선적 블록", "발주, 인보이스, 패킹리스트, B/L 또는 AWB 추적을 묶습니다."),
+                작업노드("통관/반출", "통관 상태·국내 반출 블록", "HS 코드, 문서관리번호, 통관 상태, 반출 가능 조건을 한 노드에서 봅니다.", "통관과 반출 조건이 확인되어야 국내 분배가 열립니다."),
+                창고노드("3PL 입고", "창고 입고 블록", "국내 3PL 창고에 입고할지, 바로 세대 분배할지 판단할 재고 근거를 잡습니다."),
+                배송노드("세대 분배", "세대 배송·거점 분배 블록", "국내 운송, 세대 배송, 거점 분배, 수령 확인을 한 노드에서 넘깁니다."),
+                확인노드("정산/수령", "정산 표시·수령 확인", "입금 표시, 수령 확인, 분배 마감 메모를 남깁니다.")
             ],
             CommunityLedgerTemplateKeys.FoodOrder =>
             [
-                상품노드("음식 주문", "메뉴/주문 블록", "메뉴, 수량, 수령 또는 배달 조건을 먼저 정리합니다."),
-                작업노드("조리", "조리 상태 블록", "접수, 조리 중, 조리 완료, 품절 변경을 한 노드에서 봅니다."),
-                배송노드("픽업/배달", "픽업·배달 블록", "픽업 대기, 픽업 완료, 이동 중 상태를 묶습니다."),
-                확인노드("전달/정산", "전달 확인/정산 표시", "전달 결과, 수령 증빙, 정산 상태를 한 노드에서 닫습니다.")
+                상품노드("음식 주문", "메뉴/주문 블록", "메뉴, 수량, 주문자와 수령 방식을 먼저 정리합니다."),
+                작업노드("주문 수락", "음식점 수락 블록", "주문 가능 여부, 품절 변경, 예상 준비 시간을 확인합니다."),
+                작업노드("조리", "조리 상태 블록", "조리 시작부터 준비 완료까지 주문 원장 안에서 추적합니다."),
+                확인노드("준비 완료", "수령 방식/배달 인계", "직접 수령이면 주문 원장을 닫고, 배달이 필요하면 분할·재배달을 포함해 별도 배달 원장을 필요한 수만큼 엽니다.")
             ],
             CommunityLedgerTemplateKeys.FoodDelivery =>
             [
-                상품노드("음식 주문", "픽업 의뢰 블록", "배달할 음식, 픽업지, 전달 조건을 먼저 정리합니다."),
-                작업노드("조리", "픽업 준비 블록", "조리 완료 또는 픽업 준비 상태를 확인합니다."),
-                배송노드("픽업/배달", "픽업·배달 블록", "픽업, 이동, 전달 전 상태를 한 노드에서 처리합니다."),
-                확인노드("전달/정산", "전달 확인/정산 표시", "전달 완료, 수령 증빙, 배달비 정산 표시를 묶습니다.")
+                상품노드("배달 회차", "원주문/분할 항목 블록", "원주문, 배달 회차, 이번에 전달할 메뉴와 수량, 재배달 사유를 정리합니다."),
+                작업노드("배차", "기사 배정 블록", "이 배달 회차만을 위한 기사 추천, 배정, 재배차 상태를 확인합니다."),
+                배송노드("픽업/이동", "픽업·이동 블록", "해당 회차의 픽업 도착, 픽업 완료, 이동 중 상태를 추적합니다."),
+                확인노드("전달/수령", "전달 증빙/배달비 정산", "해당 회차의 전달 결과, 수령 증빙, 실패 사유와 배달비 정산 표시를 남깁니다.")
             ],
             CommunityLedgerTemplateKeys.Errand =>
             [
@@ -90,10 +96,32 @@ public partial class PlatformCommunityHome
 
         if (창고또는재고를사용하는가(template))
         {
-            rules.Add("창고와 창고를 잇는 흐름은 중간에 운송/전달 블록을 끼워 창고 A -> 배송 -> 창고 B로 표시합니다.");
+            rules.Add("창고 간 이동은 창고 출고 -> 운송 상차 -> 운송 하차 -> 창고 입고 순서로 연결합니다.");
+            rules.Add("창고 출고는 오른쪽·아래쪽 출력만, 창고 입고는 왼쪽·위쪽 입력만 사용하며 운송 하차의 품목과 증빙을 입고의 근거로 넘깁니다.");
         }
 
-        rules.Add("배송 블록은 포장, 검수, 출고 준비처럼 앞선 조건이 충족된 뒤 열리는 후속 블록입니다.");
+        if (string.Equals(template.Key, CommunityLedgerTemplateKeys.GroupPurchase, StringComparison.OrdinalIgnoreCase))
+        {
+            rules.Add("공동주문 수입은 수요 모집 -> 수입 결정 -> 해외 선적 -> 통관/반출 -> 3PL 입고 또는 세대 분배 순서로 배치합니다.");
+            rules.Add("통관 상태와 국내 반출 조건이 확인되기 전에는 3PL 입고, 국내 운송, 세대 분배 노드를 실제 처리 단계로 열지 않습니다.");
+        }
+
+        if (string.Equals(template.Key, CommunityLedgerTemplateKeys.FoodOrder, StringComparison.OrdinalIgnoreCase))
+        {
+            rules.Add("음식 주문 원장은 준비 완료까지를 담당하며 픽업, 이동, 전달 상태를 직접 포함하지 않습니다.");
+            rules.Add("직접 수령이면 배달 원장이 없고, 분할 배달이나 재배달이 필요하면 하나의 주문에 여러 음식 배달 원장을 연결합니다.");
+        }
+
+        if (string.Equals(template.Key, CommunityLedgerTemplateKeys.FoodDelivery, StringComparison.OrdinalIgnoreCase))
+        {
+            rules.Add("음식 배달 원장 하나는 한 번의 배달 회차를 나타내며 원주문, 분할 항목, 배달 회차를 함께 기록합니다.");
+            rules.Add("재배달은 기존 실패 원장을 덮어쓰지 않고 다음 회차의 새 배달 원장으로 남깁니다.");
+        }
+
+        if (!string.Equals(template.Key, CommunityLedgerTemplateKeys.FoodOrder, StringComparison.OrdinalIgnoreCase))
+        {
+            rules.Add("배송 블록은 포장, 검수, 출고 준비처럼 앞선 조건이 충족된 뒤 열리는 후속 블록입니다.");
+        }
         rules.Add("이 다이어그램은 화면 구성과 원장 조건을 보여주는 연결도이며, 실제 처리는 아래 API 경로 후보나 OS 스케줄링 단계에서 이어집니다.");
 
         return rules;
@@ -134,13 +162,19 @@ public partial class PlatformCommunityHome
     }
 
     private static bool 상품수요원장인가(CommunityLedgerTemplateResponse template)
-        => template.Key is CommunityLedgerTemplateKeys.HongdalMart
+    {
+        if (string.Equals(template.Key, CommunityLedgerTemplateKeys.FoodOrder, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return template.Key is CommunityLedgerTemplateKeys.HongdalMart
             or CommunityLedgerTemplateKeys.WarehouseOutbound
             or CommunityLedgerTemplateKeys.WarehouseInbound
             or CommunityLedgerTemplateKeys.LocalSale
             or CommunityLedgerTemplateKeys.GroupPurchase
-            or CommunityLedgerTemplateKeys.FoodOrder
             || template.UiSectionHints.Any(상품성격섹션인가);
+    }
 
     private static bool 창고또는재고를사용하는가(CommunityLedgerTemplateResponse template)
         => template.UiSectionHints.Any(창고성격섹션인가)
@@ -170,8 +204,13 @@ public partial class PlatformCommunityHome
     private static 원장블록노드 상품노드(string title, string groupLabel, string description, string? condition = null)
         => new(title, groupLabel, description, "product", Color.Primary, condition);
 
-    private static 원장블록노드 창고노드(string title, string groupLabel, string description, string? condition = null)
-        => new(title, groupLabel, description, "warehouse", Color.Success, condition);
+    private static 원장블록노드 창고노드(
+        string title,
+        string groupLabel,
+        string description,
+        string? condition = null,
+        DiagramNodeConnectionRole connectionRole = DiagramNodeConnectionRole.Standard)
+        => new(title, groupLabel, description, "warehouse", Color.Success, condition, ConnectionRole: connectionRole);
 
     private static 원장블록노드 작업노드(string title, string groupLabel, string description, string? condition = null)
         => new(title, groupLabel, description, "work", Color.Warning, condition);

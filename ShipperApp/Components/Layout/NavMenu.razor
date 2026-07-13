@@ -5,12 +5,31 @@
 @inject ShipperViewVisibilityService ViewVisibilityService
 @inject ShipperLocalizationService L
 @inject ShipperOperatingProfileService ProfileService
+@inject HongdalClientRoleService RoleService
 @inject PlatformHomeModeStateService HomeModeState
+@inject NavigationManager Navigation
 
 <MudNavMenu Class="pa-3 shipper-navmenu">
     <MudStack Spacing="0" Class="px-2 pb-3">
-        <MudText Typo="Typo.subtitle1" Class="fw-bold">Hongdal Shipper</MudText>
+        <MudText Typo="Typo.subtitle1" Class="fw-bold">홍달 앱</MudText>
         <MudText Typo="Typo.caption" Color="Color.Secondary">@ProfileLabel</MudText>
+    </MudStack>
+    <MudStack Spacing="1" Class="px-2 pb-3">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">현재 역할</MudText>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudButton Variant="@RoleVariant(HongdalClientRole.Shipper)"
+                       Color="Color.Primary"
+                       Size="Size.Small"
+                       OnClick="@(() => SetRole(HongdalClientRole.Shipper))">
+                화주
+            </MudButton>
+            <MudButton Variant="@RoleVariant(HongdalClientRole.WarehouseManager)"
+                       Color="Color.Success"
+                       Size="Size.Small"
+                       OnClick="@(() => SetRole(HongdalClientRole.WarehouseManager))">
+                창고 관리자
+            </MudButton>
+        </MudStack>
     </MudStack>
     <MudDivider Class="mb-3" />
 
@@ -51,6 +70,7 @@
     {
         ViewVisibilityService.Changed += HandleChanged;
         ProfileService.Changed += HandleChanged;
+        RoleService.Changed += HandleChanged;
         HomeModeState.Changed += HandleChanged;
         await ViewVisibilityService.EnsureLoadedAsync();
     }
@@ -58,6 +78,16 @@
     private Variant CommunityModeVariant => HomeModeState.IsWorkMode ? Variant.Outlined : Variant.Filled;
 
     private Variant WorkModeVariant => HomeModeState.IsWorkMode ? Variant.Filled : Variant.Outlined;
+
+    private Variant RoleVariant(HongdalClientRole role) => RoleService.CurrentRole == role
+        ? Variant.Filled
+        : Variant.Outlined;
+
+    private void SetRole(HongdalClientRole role)
+    {
+        RoleService.SetRole(role);
+        Navigation.NavigateTo(ShipperRoutes.Home);
+    }
 
     private void SetMode(bool isWorkMode)
     {
@@ -102,20 +132,25 @@
 
     private IReadOnlyList<NavGroupItem> BuildGroups()
     {
-        var visibleItems = ViewVisibilityService.VisibleItems
-            .Where(x => ShouldShowForProfile(x.Route))
-            .Select(x => new NavMenuItem(
-                L.ViewName(x.Route, x.DisplayName),
-                x.Route,
-                x.IconKey,
-                ResolveGroupKey(x.Route),
-                x.SortOrder))
-            .ToList();
+        var visibleItems = RoleService.IsWarehouseManager
+            ? BuildWarehouseManagerItems().ToList()
+            : ViewVisibilityService.VisibleItems
+                .Where(x => ShouldShowForProfile(x.Route))
+                .Select(x => new NavMenuItem(
+                    L.ViewName(x.Route, x.DisplayName),
+                    x.Route,
+                    x.IconKey,
+                    ResolveGroupKey(x.Route),
+                    x.SortOrder))
+                .ToList();
 
-        visibleItems.Add(new NavMenuItem(L.T("Nav.DispatchAddress"), ShipperRoutes.DispatchAddressForm, "local_shipping", "transport", 900));
-        visibleItems.Add(new NavMenuItem("FCL/LCL 판단", ShipperRoutes.FclLclPlanner, "public", "transport", 905));
-        visibleItems.Add(new NavMenuItem("창고 현장 앱 안내", ShipperRoutes.WarehouseWorkspace, "warehouse", "warehouse", 910));
-        visibleItems.Add(new NavMenuItem(L.T("ProfileSettings.Nav"), ShipperRoutes.ProfileSettings, "person", "settings", 920));
+        if (RoleService.IsShipper)
+        {
+            visibleItems.Add(new NavMenuItem(L.T("Nav.DispatchAddress"), ShipperRoutes.DispatchAddressForm, "local_shipping", "transport", 900));
+            visibleItems.Add(new NavMenuItem("FCL/LCL 판단", ShipperRoutes.FclLclPlanner, "public", "transport", 905));
+            visibleItems.Add(new NavMenuItem("창고 작업대", ShipperRoutes.WarehouseWorkspace, "warehouse", "warehouse", 910));
+            visibleItems.Add(new NavMenuItem(L.T("ProfileSettings.Nav"), ShipperRoutes.ProfileSettings, "person", "settings", 920));
+        }
 
         return
         [
@@ -125,6 +160,13 @@
             CreateGroup("sales", L.T("Nav.Group.Sales"), Icons.Material.Filled.Storefront, visibleItems, expanded: false),
             CreateGroup("settings", L.T("Nav.Group.Settings"), Icons.Material.Filled.Settings, visibleItems, expanded: false)
         ];
+    }
+
+    private static IReadOnlyList<NavMenuItem> BuildWarehouseManagerItems()
+    {
+        return HongdalClientNavigationCatalog.WarehouseManagerItems
+            .Select(x => new NavMenuItem(x.DisplayName, x.Route, x.IconKey, x.GroupKey, x.SortOrder))
+            .ToArray();
     }
 
     private static NavGroupItem CreateGroup(string key, string title, string icon, IReadOnlyList<NavMenuItem> allItems, bool expanded)
@@ -143,7 +185,7 @@
         return normalizedRoute switch
         {
             "" or ShipperRoutes.Home => "primary",
-            ShipperRoutes.Request or ShipperRoutes.PublicCargo or ShipperRoutes.ExplorationInbox or ShipperRoutes.DispatchAddressForm or ShipperRoutes.CustomsHsReviews or ShipperRoutes.FclLclPlanner => "transport",
+            ShipperRoutes.TransportWorkspace or ShipperRoutes.Request or ShipperRoutes.PublicCargo or ShipperRoutes.ExplorationInbox or ShipperRoutes.DispatchAddressForm or ShipperRoutes.CustomsHsReviews or ShipperRoutes.FclLclPlanner => "transport",
             ShipperRoutes.WarehouseWorkspace or ShipperRoutes.InboundDashboard or ShipperRoutes.InboundRequests or ShipperRoutes.WarehouseInventory or ShipperRoutes.ReconsignmentOrders or ShipperRoutes.WarehouseScan => "warehouse",
             ShipperRoutes.SalesChannels or ShipperRoutes.ProductListings or ShipperRoutes.OrderFulfillment => "sales",
             _ when normalizedRoute.StartsWith("/shipper/settings", StringComparison.OrdinalIgnoreCase) => "settings",
@@ -162,12 +204,15 @@
         return normalizedRoute is not ShipperRoutes.SalesChannels and not ShipperRoutes.ProductListings and not ShipperRoutes.OrderFulfillment;
     }
 
-    private string ProfileLabel => ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영";
+    private string ProfileLabel => RoleService.IsWarehouseManager
+        ? RoleService.RoleDescription
+        : $"{RoleService.RoleLabel} · {(ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영")}";
 
     public void Dispose()
     {
         ViewVisibilityService.Changed -= HandleChanged;
         ProfileService.Changed -= HandleChanged;
+        RoleService.Changed -= HandleChanged;
         HomeModeState.Changed -= HandleChanged;
     }
 

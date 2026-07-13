@@ -1,0 +1,175 @@
+@page "/community/decorations/create"
+@using Hongdal.Ui.Common.Areas.App.Services
+@inject PlatformCommunityDecorationStateService DecorationState
+@inject NavigationManager Navigation
+
+<PageTitle>내 꾸미기 만들기 · Hongdal</PageTitle>
+
+<main class="decoration-maker-page">
+    <nav class="decoration-maker-page__breadcrumb">
+        <button type="button" @onclick="BackToStore">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            꾸미기 상점
+        </button>
+    </nav>
+
+    <header>
+        <span>MY DECORATION MAKER</span>
+        <h1>내 꾸미기 만들기</h1>
+        <p>기호와 색상만으로 빠르게 만들거나, 직접 제작하고 사용권을 가진 이미지를 등록할 수 있습니다.</p>
+    </header>
+
+    <div class="decoration-maker-page__layout">
+        <section class="decoration-maker-page__preview" style="@($"--maker-accent: {customAccentColor};")">
+            <span>미리보기</span>
+            <div>
+                @if (!string.IsNullOrWhiteSpace(customImageUrl))
+                {
+                    <img src="@customImageUrl" alt="사용자 꾸미기 미리보기" />
+                }
+                else
+                {
+                    <b>@(string.IsNullOrWhiteSpace(customSymbol) ? "나" : customSymbol)</b>
+                }
+            </div>
+            <strong>@(string.IsNullOrWhiteSpace(customTitle) ? "내 꾸미기" : customTitle)</strong>
+            <small>@(customTarget == CommunityDecorationTarget.Bagua ? "괘상·사방 이동판" : "다이어그램 노드 이미지")</small>
+        </section>
+
+        <section class="decoration-maker-page__form">
+            @if (!string.IsNullOrWhiteSpace(statusMessage))
+            {
+                <MudAlert Severity="@statusSeverity" Dense="true">@statusMessage</MudAlert>
+            }
+
+            <label>
+                <span>사용 위치</span>
+                <select @bind="customTarget">
+                    <option value="@CommunityDecorationTarget.Bagua">괘상·사방 이동판</option>
+                    <option value="@CommunityDecorationTarget.DiagramNode">다이어그램 노드</option>
+                </select>
+            </label>
+            <label>
+                <span>꾸미기 이름</span>
+                <input type="text" maxlength="30" placeholder="예: 우리 창고 준비 표시" @bind="customTitle" />
+            </label>
+            <div class="decoration-maker-page__row">
+                <label>
+                    <span>표시 기호</span>
+                    <input type="text" maxlength="2" placeholder="예: 창" @bind="customSymbol" />
+                </label>
+                <label>
+                    <span>강조 색상</span>
+                    <input type="color" @bind="customAccentColor" />
+                </label>
+            </div>
+
+            @if (customTarget == CommunityDecorationTarget.DiagramNode)
+            {
+                <label class="decoration-maker-page__upload">
+                    <span>직접 만든 이미지 <small>선택</small></span>
+                    <InputFile OnChange="HandleImageSelectedAsync" accept="image/png,image/webp,image/svg+xml" />
+                    <small>PNG, WebP, SVG · 정사각형 512px 권장 · 최대 2MB</small>
+                </label>
+                <label>
+                    <span>또는 이미지 주소 <small>선택</small></span>
+                    <input type="url" placeholder="https://..." @bind="customImageUrl" />
+                </label>
+            }
+
+            <div class="decoration-maker-page__standard">
+                <MudIcon Icon="@Icons.Material.Filled.Rule" Color="Color.Primary" />
+                <div>
+                    <strong>등록 양식</strong>
+                    <p>핵심 도형은 중앙 80% 안에 두고, 축소해도 구분되도록 긴 문구는 피하세요. 공개 판매를 원할 경우에는 이후 커뮤니티 검수 단계가 필요합니다.</p>
+                </div>
+            </div>
+
+            <label class="decoration-maker-page__rights">
+                <input type="checkbox" @bind="hasImageRights" />
+                <span>직접 제작했거나 플랫폼 꾸미기에 사용할 권리가 있는 이미지 또는 기호입니다.</span>
+            </label>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       FullWidth="true"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       OnClick="SaveAsync">
+                내 보유함에 저장
+            </MudButton>
+        </section>
+    </div>
+</main>
+
+@code {
+    private const long MaxImageBytes = 2 * 1024 * 1024;
+    private CommunityDecorationTarget customTarget = CommunityDecorationTarget.DiagramNode;
+    private string customTitle = string.Empty;
+    private string customSymbol = string.Empty;
+    private string customAccentColor = "#2563eb";
+    private string customImageUrl = string.Empty;
+    private bool hasImageRights;
+    private string? statusMessage;
+    private Severity statusSeverity = Severity.Info;
+
+    private void BackToStore()
+        => Navigation.NavigateTo(ShipperRoutes.CommunityDecorations);
+
+    private async Task HandleImageSelectedAsync(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (file.Size > MaxImageBytes)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "이미지는 2MB 이하로 등록해 주세요.";
+            return;
+        }
+
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxImageBytes);
+            using var memory = new MemoryStream();
+            await stream.CopyToAsync(memory);
+            customImageUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(memory.ToArray())}";
+            statusSeverity = Severity.Success;
+            statusMessage = $"{file.Name} 이미지를 미리보기에 불러왔습니다.";
+        }
+        catch (Exception)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = "이미지를 읽지 못했습니다. PNG, WebP 또는 SVG 파일인지 확인해 주세요.";
+        }
+    }
+
+    private Task SaveAsync()
+    {
+        if (!hasImageRights)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "이미지 또는 기호의 사용 권한을 확인해 주세요.";
+            return Task.CompletedTask;
+        }
+
+        if (!DecorationState.TryCreateCustomAsset(
+                customTarget,
+                customTitle,
+                customSymbol,
+                customAccentColor,
+                customImageUrl,
+                out var asset,
+                out var message))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = message;
+            return Task.CompletedTask;
+        }
+
+        if (asset is not null)
+        {
+            Navigation.NavigateTo(ShipperRoutes.CommunityDecorationDetailFor($"store-{asset.Key}"));
+        }
+
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,200 @@
+@using Microsoft.AspNetCore.Components.Web
+
+<section class="hongdal-bagua" style="@BuildRootStyle()" aria-label="후천팔괘 빠른 이동">
+    <header>
+        <div>
+            <span>後天八卦 · 四方</span>
+            <strong>@RoleLabel 역할의 네 방향</strong>
+        </div>
+        <small>@CurrentGuide</small>
+    </header>
+
+    <div class="hongdal-bagua-wheel"
+         @onpointermove="HandlePointerMove"
+         @onpointerup="HandlePointerUpAsync"
+         @onpointercancel="CancelDrag"
+         @onpointerleave="HandlePointerLeave">
+        <span class="hongdal-bagua-octagon" aria-hidden="true"></span>
+        <span class="hongdal-bagua-direction hongdal-bagua-direction--south">남</span>
+        <span class="hongdal-bagua-direction hongdal-bagua-direction--north">북</span>
+        <span class="hongdal-bagua-direction hongdal-bagua-direction--east">동</span>
+        <span class="hongdal-bagua-direction hongdal-bagua-direction--west">서</span>
+        @foreach (var item in NavigationItems)
+        {
+            <button type="button"
+                    class="@BuildItemClass(item)"
+                    style="@BuildItemStyle(item)"
+                    title="@($"{item.TrigramName}괘 · {item.Direction} · {item.DestinationLabel}")"
+                    aria-label="@($"{item.TrigramName}괘, {item.Direction}, {item.DestinationLabel}로 이동")"
+                    @onclick="@(() => SelectAsync(item))">
+                <span>@ResolveItemSymbol(item)</span>
+                <b>@item.TrigramName</b>
+                <small>@item.DestinationLabel</small>
+            </button>
+        }
+        <button type="button"
+                class="@BuildDotClass()"
+                style="@BuildDotStyle()"
+                aria-label="이동점. 동서남북 네 괘 방향으로 끌어 놓으세요."
+                @onpointerdown="BeginDrag"
+                @onpointerdown:preventDefault="true"
+                @onpointerdown:stopPropagation="true">
+            <span>@ResolveCenterSymbol()</span>
+        </button>
+    </div>
+
+    <footer>
+        <span>점을 끌거나</span>
+        <span>괘를 바로 눌러도 됩니다</span>
+    </footer>
+</section>
+
+@code {
+    [Parameter]
+    public string RoleLabel { get; set; } = "플랫폼 구성원";
+
+    [Parameter]
+    public IReadOnlyList<HongdalCardinalNavigationOption> NavigationItems { get; set; } = DefaultItems;
+
+    [Parameter]
+    public EventCallback<HongdalCardinalNavigationOption> DestinationSelected { get; set; }
+
+    [Parameter]
+    public string AccentColor { get; set; } = "#2563eb";
+
+    [Parameter]
+    public string CenterSymbol { get; set; } = "☵";
+
+    [Parameter]
+    public bool ShowTrigramSymbols { get; set; } = true;
+
+    private static readonly IReadOnlyList<HongdalCardinalNavigationOption> DefaultItems =
+    [
+        new("li", "리", "☲", "남", "다이어그램", HongdalCardinalNavigationActionKinds.Diagram),
+        new("dui", "태", "☱", "서", "업무", HongdalCardinalNavigationActionKinds.Work),
+        new("kan", "감", "☵", "북", "커뮤니티 홈", HongdalCardinalNavigationActionKinds.CommunityHome),
+        new("zhen", "진", "☳", "동", "글쓰기", HongdalCardinalNavigationActionKinds.Compose)
+    ];
+
+    private bool isDragging;
+    private double dragStartX;
+    private double dragStartY;
+    private string? activeKey;
+
+    private HongdalCardinalNavigationOption? ActiveItem
+        => NavigationItems.FirstOrDefault(item => item.TrigramKey == activeKey);
+
+    private string CurrentGuide => ActiveItem is { } item
+        ? $"{item.TrigramName}괘 · {item.DestinationLabel}"
+        : "가운데 점에서 시작";
+
+    private void BeginDrag(PointerEventArgs args)
+    {
+        isDragging = true;
+        dragStartX = args.ClientX;
+        dragStartY = args.ClientY;
+        activeKey = null;
+    }
+
+    private void HandlePointerMove(PointerEventArgs args)
+    {
+        if (!isDragging)
+        {
+            return;
+        }
+
+        var deltaX = args.ClientX - dragStartX;
+        var deltaY = args.ClientY - dragStartY;
+        var distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (distance < 22)
+        {
+            activeKey = null;
+            return;
+        }
+
+        activeKey = Math.Abs(deltaX) > Math.Abs(deltaY)
+            ? deltaX < 0 ? "zhen" : "dui"
+            : deltaY < 0 ? "li" : "kan";
+    }
+
+    private async Task HandlePointerUpAsync()
+    {
+        if (!isDragging)
+        {
+            return;
+        }
+
+        isDragging = false;
+        if (ActiveItem is { } item)
+        {
+            await DestinationSelected.InvokeAsync(item);
+        }
+    }
+
+    private void HandlePointerLeave()
+    {
+        if (isDragging)
+        {
+            CancelDrag();
+        }
+    }
+
+    private void CancelDrag()
+    {
+        isDragging = false;
+        activeKey = null;
+    }
+
+    private async Task SelectAsync(HongdalCardinalNavigationOption item)
+    {
+        activeKey = item.TrigramKey;
+        await DestinationSelected.InvokeAsync(item);
+    }
+
+    private string BuildItemClass(HongdalCardinalNavigationOption item)
+        => item.TrigramKey == activeKey
+            ? "hongdal-bagua-item hongdal-bagua-item--active"
+            : "hongdal-bagua-item";
+
+    private static string BuildItemStyle(HongdalCardinalNavigationOption item)
+        => item.TrigramKey switch
+        {
+            "li" => "--bagua-x: 50%; --bagua-y: 10%;",
+            "dui" => "--bagua-x: 90%; --bagua-y: 50%;",
+            "kan" => "--bagua-x: 50%; --bagua-y: 90%;",
+            _ => "--bagua-x: 10%; --bagua-y: 50%;"
+        };
+
+    private string BuildDotClass()
+        => isDragging ? "hongdal-bagua-dot hongdal-bagua-dot--dragging" : "hongdal-bagua-dot";
+
+    private string BuildDotStyle()
+        => ActiveItem is { } item
+            ? item.TrigramKey switch
+            {
+                "li" => "--dot-x: 50%; --dot-y: 10%;",
+                "dui" => "--dot-x: 90%; --dot-y: 50%;",
+                "kan" => "--dot-x: 50%; --dot-y: 90%;",
+                _ => "--dot-x: 10%; --dot-y: 50%;"
+            }
+            : "--dot-x: 50%; --dot-y: 50%;";
+
+    private string BuildRootStyle()
+        => $"--hongdal-bagua-accent: {AccentColor};";
+
+    private string ResolveItemSymbol(HongdalCardinalNavigationOption item)
+        => ShowTrigramSymbols
+            ? item.TrigramSymbol
+            : item.TrigramKey switch
+            {
+                "li" => "↑",
+                "dui" => "→",
+                "kan" => "↓",
+                _ => "←"
+            };
+
+    private string ResolveCenterSymbol()
+        => string.IsNullOrWhiteSpace(CenterSymbol)
+            ? "•"
+            : System.Globalization.StringInfo.GetNextTextElement(CenterSymbol.Trim());
+}

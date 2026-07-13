@@ -29,6 +29,7 @@ public static class View식별자
     public static class Shipper
     {
         public const string Home = "shipper.home";
+        public const string TransportWorkspace = "shipper.transport-workspace";
         public const string Request = "shipper.request";
         public const string PublicCargo = "shipper.public-cargo";
         public const string ExplorationInbox = "shipper.exploration-inbox";

@@ -114,6 +114,7 @@ public sealed class ShipperViewVisibilityService
         return
         [
             CreateItem(View식별자.Shipper.Home, "Home", ShipperRoutes.Home, "home", isRequired: true, sortOrder: 10),
+            CreateItem(View식별자.Shipper.TransportWorkspace, "운송 업무", ShipperRoutes.TransportWorkspace, "local_shipping", isRequired: true, sortOrder: 15),
             CreateItem(View식별자.Shipper.Request, "화물운송의뢰 등록", ShipperRoutes.Request, "add_box", isRequired: true, sortOrder: 20),
             CreateItem(View식별자.Shipper.PublicCargo, "공개 화물정보", ShipperRoutes.PublicCargo, "view_list", sortOrder: 30),
             CreateItem(View식별자.Shipper.ExplorationInbox, "받은 탐색 문의함", ShipperRoutes.ExplorationInbox, "inbox", sortOrder: 40),

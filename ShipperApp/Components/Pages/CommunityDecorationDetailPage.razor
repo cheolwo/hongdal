@@ -1,0 +1,214 @@
+@page "/community/decorations/{ProductKey}"
+@using Hongdal.Ui.Common.Areas.App.Services
+@inject PlatformCommunityDecorationStateService DecorationState
+@inject NavigationManager Navigation
+
+<PageTitle>@(product?.Title ?? "꾸미기 상품") · Hongdal</PageTitle>
+
+@if (product is null)
+{
+    <main class="decoration-detail decoration-detail--missing">
+        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+        <h1>상품을 찾을 수 없습니다.</h1>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="BackToStore">상점으로 돌아가기</MudButton>
+    </main>
+}
+else
+{
+    <main class="decoration-detail">
+        <nav class="decoration-detail__breadcrumb" aria-label="꾸미기 상점 이동 경로">
+            <button type="button" @onclick="BackToStore">
+                <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+                꾸미기 상점
+            </button>
+            <span>/</span>
+            <small>@product.Title</small>
+        </nav>
+
+        <section class="decoration-detail__product">
+            <div class="decoration-detail__gallery">
+                <div class="decoration-detail__stage" style="@($"--detail-accent: {selectedAsset?.AccentColor ?? "#2563eb"};")">
+                    @if (selectedAsset?.NodeSticker is not null)
+                    {
+                        <img src="@selectedAsset.NodeSticker.이미지Url" alt="@selectedAsset.NodeSticker.대체Text" />
+                    }
+                    else
+                    {
+                        <span>@(selectedAsset?.PreviewSymbol ?? "○")</span>
+                    }
+                    <small>실제 적용 미리보기</small>
+                </div>
+                <div class="decoration-detail__thumbs" aria-label="상품 이미지 선택">
+                    @foreach (var asset in product.Assets)
+                    {
+                        <button type="button"
+                                class="@(string.Equals(selectedAsset?.Key, asset.Key, StringComparison.OrdinalIgnoreCase) ? "is-selected" : null)"
+                                title="@asset.Title"
+                                @onclick="@(() => selectedAsset = asset)">
+                            @if (asset.NodeSticker is not null)
+                            {
+                                <img src="@asset.NodeSticker.이미지Url" alt="@asset.NodeSticker.대체Text" />
+                            }
+                            else
+                            {
+                                <span style="@($"background: {asset.AccentColor};")">@asset.PreviewSymbol</span>
+                            }
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="decoration-detail__info">
+                <div class="decoration-detail__badges">
+                    <span>@(IsPlatformProduct ? "플랫폼 기본" : "커뮤니티 크리에이터")</span>
+                    <span>@(product.Target == CommunityDecorationTarget.Bagua ? "괘상" : "다이어그램 노드")</span>
+                </div>
+                <h1>@product.Title</h1>
+                <button type="button" class="decoration-detail__creator">
+                    <span>@CreatorInitial</span>
+                    <span>
+                        <b>@product.CreatorName</b>
+                        <small>@(IsPlatformProduct ? "Hongdal 공식 제공" : "커뮤니티 창작자")</small>
+                    </span>
+                </button>
+                <p>@product.Summary</p>
+
+                <div class="decoration-detail__price">
+                    <strong>@FormatPrice(product)</strong>
+                    <span>@(product.IsFree ? "결제 없이 바로 사용할 수 있습니다." : "개발용 FakePG 결제 화면에서 구매 흐름을 확인합니다.")</span>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(statusMessage))
+                {
+                    <MudAlert Severity="@statusSeverity" Dense="true">@statusMessage</MudAlert>
+                }
+
+                @if (!DecorationState.IsProductOwned(product))
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.Payment"
+                               OnClick="OpenCheckout">
+                        결제하기
+                    </MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.CheckCircle"
+                               Disabled="@(selectedAsset is null)"
+                               OnClick="ApplySelectedAsync">
+                        @(selectedAsset is not null && DecorationState.IsAssetActive(selectedAsset) ? "현재 사용 중" : "선택한 꾸미기 적용")
+                    </MudButton>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Default"
+                               FullWidth="true"
+                               OnClick="DisableDecorationAsync">
+                        이 꾸미기 종류 표시 안 함
+                    </MudButton>
+                }
+            </div>
+        </section>
+
+        <section class="decoration-detail__description">
+            <article>
+                <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Color="Color.Primary" />
+                <div>
+                    <strong>포함된 꾸미기</strong>
+                    <p>@($"{product.Assets.Count}개 항목 · {string.Join(", ", product.Assets.Select(asset => asset.Title))}")</p>
+                </div>
+            </article>
+            <article>
+                <MudIcon Icon="@Icons.Material.Filled.Devices" Color="Color.Info" />
+                <div>
+                    <strong>사용 위치</strong>
+                    <p>@(product.Target == CommunityDecorationTarget.Bagua ? "홈의 사방 이동판과 벽면 반원 손잡이" : "모바일 세로 다이어그램과 데스크톱 다이어그램 노드")</p>
+                </div>
+            </article>
+            <article>
+                <MudIcon Icon="@Icons.Material.Filled.Copyright" Color="Color.Secondary" />
+                <div>
+                    <strong>사용권과 검수</strong>
+                    <p>플랫폼 안의 꾸미기 기능에서 사용할 수 있습니다. 크리에이터 상품은 등록 권리와 표시 규격을 확인한 뒤 노출합니다.</p>
+                </div>
+            </article>
+        </section>
+    </main>
+}
+
+@code {
+    [Parameter]
+    public string ProductKey { get; set; } = string.Empty;
+
+    private CommunityDecorationProduct? product;
+    private CommunityDecorationAsset? selectedAsset;
+    private string? statusMessage;
+    private Severity statusSeverity = Severity.Info;
+
+    private bool IsPlatformProduct
+        => product?.CreatorName.StartsWith("Hongdal", StringComparison.OrdinalIgnoreCase) == true;
+
+    private string CreatorInitial
+        => string.IsNullOrWhiteSpace(product?.CreatorName)
+            ? "H"
+            : System.Globalization.StringInfo.GetNextTextElement(product.CreatorName);
+
+    protected override void OnParametersSet()
+    {
+        product = DecorationState.Products.FirstOrDefault(item =>
+            string.Equals(item.Key, ProductKey, StringComparison.OrdinalIgnoreCase));
+        selectedAsset = product?.Assets.FirstOrDefault();
+    }
+
+    private void BackToStore()
+        => Navigation.NavigateTo(ShipperRoutes.CommunityDecorations);
+
+    private void OpenCheckout()
+    {
+        if (product is not null)
+        {
+            Navigation.NavigateTo(ShipperRoutes.CommunityDecorationCheckoutFor(product.Key));
+        }
+    }
+
+    private Task ApplySelectedAsync()
+    {
+        if (selectedAsset is null || !DecorationState.Apply(selectedAsset))
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "이 꾸미기를 적용하려면 먼저 구매가 필요합니다.";
+            return Task.CompletedTask;
+        }
+
+        statusSeverity = Severity.Success;
+        statusMessage = $"{selectedAsset.Title}을(를) 적용했습니다. 홈과 다이어그램에서 바로 확인할 수 있습니다.";
+        return Task.CompletedTask;
+    }
+
+    private Task DisableDecorationAsync()
+    {
+        if (product is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        DecorationState.SetTargetEnabled(product.Target, false);
+        statusSeverity = Severity.Info;
+        statusMessage = product.Target == CommunityDecorationTarget.Bagua
+            ? "괘상 그림을 숨겼습니다. 이동 기능은 그대로 유지됩니다."
+            : "노드 이미지를 숨기고 기본 업무 아이콘으로 표시합니다.";
+        return Task.CompletedTask;
+    }
+
+    private static string FormatPrice(CommunityDecorationProduct item)
+        => item.IsFree
+            ? "무료"
+            : item.CurrencyCode.Equals("KRW", StringComparison.OrdinalIgnoreCase)
+                ? $"₩{item.PriceAmount:N0}"
+                : $"{item.PriceAmount:N2} {item.CurrencyCode}";
+}

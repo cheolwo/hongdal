@@ -1,0 +1,26 @@
+@using Hongdal.Ui.Common.Areas.App.Services
+
+<MudMenu Label="폼 추가"
+         StartIcon="@Icons.Material.Filled.DynamicForm"
+         Variant="Variant.Outlined"
+         Color="Color.Info"
+         Size="Size.Small"
+         Dense="true">
+    @foreach (var formNode in FormNodes)
+    {
+        <MudMenuItem OnClick="@(() => SelectFormNodeAsync(formNode))">
+            @formNode.Title
+        </MudMenuItem>
+    }
+</MudMenu>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformDiagramPaletteBlock> FormNodes { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public EventCallback<PlatformDiagramPaletteBlock> FormNodeSelected { get; set; }
+
+    private Task SelectFormNodeAsync(PlatformDiagramPaletteBlock formNode)
+        => FormNodeSelected.InvokeAsync(formNode);
+}

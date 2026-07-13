@@ -1,0 +1,210 @@
+.hongdal-bagua {
+    display: grid;
+    gap: 12px;
+    width: min(100%, 360px);
+    margin-inline: auto;
+    padding: 14px;
+    border: 1px solid rgba(var(--platform-home-accent-rgb), 0.2);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--platform-home-surface) 88%, rgba(var(--platform-home-accent-rgb), 0.1));
+    box-shadow: 0 12px 28px rgba(var(--platform-home-accent-rgb), 0.1);
+}
+
+.hongdal-bagua header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.hongdal-bagua header > div {
+    display: grid;
+    gap: 2px;
+}
+
+.hongdal-bagua header span {
+    color: var(--hongdal-bagua-accent, var(--platform-home-accent));
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+}
+
+.hongdal-bagua header strong {
+    color: var(--mud-palette-text-primary);
+    font-size: 0.86rem;
+}
+
+.hongdal-bagua header small {
+    max-width: 116px;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.66rem;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: right;
+}
+
+.hongdal-bagua-wheel {
+    position: relative;
+    width: min(76vw, 292px);
+    aspect-ratio: 1;
+    margin-inline: auto;
+    touch-action: none;
+    user-select: none;
+}
+
+.hongdal-bagua-octagon {
+    position: absolute;
+    inset: 5%;
+    clip-path: polygon(29% 0, 71% 0, 100% 29%, 100% 71%, 71% 100%, 29% 100%, 0 71%, 0 29%);
+    background:
+        radial-gradient(circle at center, var(--platform-home-surface) 0 23%, transparent 23.5%),
+        repeating-conic-gradient(from -45deg, rgba(var(--platform-home-accent-rgb), 0.28) 0 1deg, transparent 1deg 90deg),
+        conic-gradient(from -45deg,
+            rgba(14, 165, 233, 0.12) 0 25%,
+            rgba(16, 185, 129, 0.12) 25% 50%,
+            rgba(139, 92, 246, 0.12) 50% 75%,
+            rgba(249, 115, 22, 0.12) 75% 100%);
+    box-shadow: inset 0 0 0 2px rgba(var(--platform-home-accent-rgb), 0.22);
+}
+
+.hongdal-bagua-direction {
+    position: absolute;
+    z-index: 1;
+    color: color-mix(in srgb, var(--hongdal-bagua-accent, var(--platform-home-accent)) 56%, var(--mud-palette-text-secondary));
+    font-size: 0.58rem;
+    font-weight: 900;
+    pointer-events: none;
+}
+
+.hongdal-bagua-direction--south {
+    top: 1%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.hongdal-bagua-direction--north {
+    bottom: 1%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.hongdal-bagua-direction--east {
+    top: 50%;
+    left: 1%;
+    transform: translateY(-50%);
+}
+
+.hongdal-bagua-direction--west {
+    top: 50%;
+    right: 1%;
+    transform: translateY(-50%);
+}
+
+.hongdal-bagua-item {
+    appearance: none;
+    display: grid;
+    position: absolute;
+    z-index: 2;
+    top: var(--bagua-y);
+    left: var(--bagua-x);
+    min-width: 58px;
+    min-height: 52px;
+    padding: 3px 5px;
+    border: 0;
+    border-radius: 12px;
+    place-items: center;
+    background: color-mix(in srgb, var(--platform-home-surface) 82%, transparent);
+    color: var(--mud-palette-text-primary);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: color 150ms ease, background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.hongdal-bagua-item > span {
+    color: var(--hongdal-bagua-accent, var(--platform-home-accent));
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+.hongdal-bagua-item > b {
+    font-size: 0.7rem;
+}
+
+.hongdal-bagua-item > small {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.55rem;
+    white-space: nowrap;
+}
+
+.hongdal-bagua-item:hover,
+.hongdal-bagua-item:focus-visible,
+.hongdal-bagua-item--active {
+    z-index: 3;
+    outline: none;
+    background: var(--platform-home-surface);
+    box-shadow: 0 0 0 2px rgba(var(--platform-home-accent-rgb), 0.3), 0 8px 18px rgba(var(--platform-home-accent-rgb), 0.16);
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+.hongdal-bagua-dot {
+    appearance: none;
+    position: absolute;
+    z-index: 5;
+    top: var(--dot-y);
+    left: var(--dot-x);
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 5px solid var(--platform-home-surface);
+    border-radius: 999px;
+    background: var(--hongdal-bagua-accent, var(--platform-home-accent));
+    box-shadow: 0 5px 14px rgba(var(--platform-home-accent-rgb), 0.36), 0 0 0 2px rgba(var(--platform-home-accent-rgb), 0.2);
+    cursor: grab;
+    transform: translate(-50%, -50%);
+    transition: top 160ms ease, left 160ms ease, transform 120ms ease;
+}
+
+.hongdal-bagua-dot > span {
+    display: grid;
+    width: 18px;
+    height: 18px;
+    margin: auto;
+    border-radius: 999px;
+    place-items: center;
+    background: white;
+    color: var(--hongdal-bagua-accent, var(--platform-home-accent));
+    font-size: 0.55rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.hongdal-bagua-dot--dragging {
+    cursor: grabbing;
+    transform: translate(-50%, -50%) scale(1.12);
+}
+
+.hongdal-bagua footer {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
+.hongdal-bagua footer span + span::before {
+    content: "·";
+    margin-right: 6px;
+}
+
+@media (max-width: 380px) {
+    .hongdal-bagua-wheel {
+        width: min(82vw, 268px);
+    }
+
+    .hongdal-bagua-item {
+        min-width: 52px;
+    }
+}

@@ -3,8 +3,9 @@
 <PageTitle>Warehouse Manager</PageTitle>
 
 <PlatformCommunityHome AppName="Warehouse Manager"
-                       RoleLabel="창고 운영"
-                       QuickActions="QuickActions" />
+                       RoleLabel="창고 관리자"
+                       QuickActions="QuickActions"
+                       CardinalNavigationOptions="CardinalNavigationOptions" />
 
 @code {
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
@@ -16,5 +17,41 @@
         new("스캔 스테이션", "공정 스캔과 현장 확인", WarehouseManagerRoutes.Scan, Icons.Material.Filled.QrCodeScanner, Color.Info),
         new("일반 작업 보드", "대기 중인 창고 작업 확인", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban, Color.Secondary),
         new("알뜰살뜰 마트", "창고 재고 기반 도심 마트 풀필먼트", WarehouseManagerRoutes.MartHome, Icons.Material.Filled.Storefront, Color.Success)
+    ];
+
+    private static readonly IReadOnlyList<HongdalCardinalNavigationOption> CardinalNavigationOptions =
+    [
+        new(
+            "li",
+            "리",
+            "☲",
+            "남",
+            "판매",
+            HongdalCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.MarketFulfillmentWorkStart),
+        new(
+            "dui",
+            "태",
+            "☱",
+            "서",
+            "출고",
+            HongdalCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.OutboundWorkStart),
+        new(
+            "kan",
+            "감",
+            "☵",
+            "북",
+            "배송",
+            HongdalCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.DeliveryAgencyWorkStart),
+        new(
+            "zhen",
+            "진",
+            "☳",
+            "동",
+            "입고",
+            HongdalCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.InboundWorkStart)
     ];
 }
