@@ -8,6 +8,8 @@ using 홍달.Services.Notifications;
 using 홍달.Services.Options;
 using 홍달.Services.Payments;
 using Hongdal.Services.Food;
+using Hongdal.Services.Education;
+using Hongdal.Services.External.Typecast;
 
 namespace Hongdal.Extensions;
 
@@ -15,6 +17,13 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHongdalHttpClients(this IServiceCollection services)
     {
+        services.AddHttpClient<I교육기관제출전송Service, 교육기관제출전송Service>();
+        services.AddHttpClient<ITypecastClient, TypecastClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<TypecastOptions>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
         services.AddHttpClient<IGeocodingService, GoogleGeocodingService>();
         services.AddHttpClient<IRouteDistanceService, GoogleRouteDistanceService>();
         services.AddHttpClient<INaverCloudDirectionsService, NaverCloudDirectionsService>((sp, client) =>

@@ -16,8 +16,10 @@ using 홍달.Services.Versioning;
 using Hongdal.Services.Auth;
 using Hongdal.Services.Community;
 using Hongdal.Services.Food;
+using Hongdal.Services.Education;
 using Hongdal.Services.LogisticsProcessing.Warehouse;
 using Hongdal.Services.Orderer;
+using Hongdal.Services.Speech;
 
 namespace Hongdal.Extensions;
 
@@ -39,7 +41,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
         services.AddSingleton<Mongo커뮤니티원장저장소>();
-        services.AddSingleton<I커뮤니티원장저장소, 투영갱신커뮤니티원장저장소>();
+        services.AddSingleton<I커뮤니티원장저장소, 이벤트발행커뮤니티원장저장소>();
         services.AddSingleton<I커뮤니티대화저장소, Mongo커뮤니티대화저장소>();
         services.AddScoped<I커뮤니티원장블록관계투영Service, 커뮤니티원장블록관계투영Service>();
         services.AddScoped<I커뮤니티원장상태이벤트Service, 커뮤니티원장상태이벤트Service>();
@@ -49,6 +51,17 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I원장업무투영동기화Handler, 음식주문원장업무투영Handler>();
         services.AddScoped<I운송원장Mongo동기화Service, 운송원장Mongo동기화Service>();
         services.AddScoped<I음식마트원장Mongo동기화Service, 음식마트원장Mongo동기화Service>();
+        services.AddSingleton<I교육기관제출대기열, Mongo교육기관제출대기열>();
+        services.AddScoped<I현장체험활동UseCase, 현장체험활동UseCase>();
+        services.AddScoped<ITypecast음성카탈로그저장소, EfTypecast음성카탈로그저장소>();
+        services.AddScoped<ITypecast음성카탈로그Service, Typecast음성카탈로그Service>();
+        services.AddSingleton<I커뮤니티게시글음성본문분할기, 커뮤니티게시글음성본문분할기>();
+        services.AddSingleton<I커뮤니티게시글음성작업예약Service, 커뮤니티게시글음성작업예약Service>();
+        services.AddSingleton<I커뮤니티게시글음성작업신호, 커뮤니티게시글음성작업신호>();
+        services.AddScoped<I커뮤니티게시글음성작업Processor, 커뮤니티게시글음성작업Processor>();
+        services.AddScoped<I커뮤니티게시글음성조회Service, 커뮤니티게시글음성조회Service>();
+        services.AddHostedService<교육기관제출Worker>();
+        services.AddHostedService<커뮤니티게시글음성Worker>();
         services.AddScoped<I인증UseCase, 인증UseCase>();
         services.AddScoped<I커뮤니티대화UseCase, 커뮤니티대화UseCase>();
         services.AddScoped<I공동구매자동집단화UseCase, 공동구매자동집단화UseCase>();

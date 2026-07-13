@@ -46,6 +46,9 @@ public static partial class ServiceCollectionExtensions
         services.Configure<배차큐정책Options>(configuration.GetSection("DispatchQueue"));
         services.Configure<국내화물배차AI정책Options>(configuration.GetSection(국내화물배차AI정책Options.SectionName));
         services.Configure<배차큐배치작업Options>(configuration.GetSection(배차큐배치작업Options.SectionName));
+        services.Configure<교육기관제출Options>(configuration.GetSection(교육기관제출Options.SectionName));
+        services.Configure<TypecastOptions>(configuration.GetSection(TypecastOptions.SectionName));
+        services.Configure<CommunityPostAudioOptions>(configuration.GetSection(CommunityPostAudioOptions.SectionName));
 
         return services;
     }
