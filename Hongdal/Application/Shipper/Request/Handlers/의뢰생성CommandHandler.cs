@@ -55,6 +55,18 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             return Result.Fail<화주운송의뢰응답>("pickup.window.startAt must be before endAt");
         }
 
+        if (string.IsNullOrWhiteSpace(request.하차도로명주소))
+        {
+            return Result.Fail<화주운송의뢰응답>("하차 주소 도로명주소 is required");
+        }
+
+        if (request.하차시간창시작일시.HasValue
+            && request.하차시간창종료일시.HasValue
+            && request.하차시간창시작일시 >= request.하차시간창종료일시)
+        {
+            return Result.Fail<화주운송의뢰응답>("dropoff.window.startAt must be before endAt");
+        }
+
         var shipperId = string.IsNullOrWhiteSpace(request.화주Id) ? currentUserId : request.화주Id.Trim();
         var clientRequestId = request.클라이언트요청Id?.Trim() ?? string.Empty;
         if (!string.IsNullOrWhiteSpace(clientRequestId))
@@ -142,7 +154,21 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             UpdatedAt = DateTime.UtcNow
         };
 
-        await _db.AddAsync(entity, cancellationToken);
+        var ledger = await _원장동기화Service.화주운송의뢰동기화Async(entity, currentUserId, cancellationToken);
+        if (ledger is null)
+        {
+            return Result.Fail<화주운송의뢰응답>("운송 의뢰 원장을 저장하지 못했습니다.");
+        }
+
+        var projectedEntity = await _db.화주운송의뢰
+            .FirstOrDefaultAsync(x => x.의뢰Id == entity.의뢰Id, cancellationToken);
+        if (projectedEntity is null)
+        {
+            return Result.Fail<화주운송의뢰응답>(
+                $"운송 의뢰 원장은 저장됐지만 RDB 업무 투영이 아직 완료되지 않았습니다. 원장Id={ledger.원장Id}");
+        }
+
+        entity = projectedEntity;
         await 화주운송의뢰매퍼.UpsertCargoRequirementAsync(_db, entity, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
@@ -167,8 +193,6 @@ public sealed class 의뢰생성CommandHandler : IRequestHandler<의뢰생성Com
             entity.운임구성Id = fareComposition.Id;
             await _db.SaveChangesAsync(cancellationToken);
         }
-
-        await _원장동기화Service.화주운송의뢰동기화Async(entity, currentUserId, cancellationToken);
 
         return Result.Ok(화주운송의뢰매퍼.To응답(entity));
     }

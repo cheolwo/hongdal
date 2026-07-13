@@ -211,8 +211,22 @@ public static class 운송원장Mongo동기화Builder
                     ("주문자UserId", 의뢰?.주문자UserId),
                     ("화물종류", 의뢰?.화물종류),
                     ("화물설명", 의뢰?.화물설명),
+                    ("화물수량", Format(의뢰?.화물수량)),
+                    ("화물길이Mm", Format(의뢰?.화물길이Mm)),
+                    ("화물폭Mm", Format(의뢰?.화물폭Mm)),
+                    ("화물높이Mm", Format(의뢰?.화물높이Mm)),
+                    ("화물중량Kg", Format(의뢰?.화물중량Kg)),
+                    ("화물부피Cbm", Format(의뢰?.화물부피Cbm)),
+                    ("팔레트개수", Format(의뢰?.화물팔레트개수)),
+                    ("화물파손주의여부", Format(의뢰?.화물파손주의여부)),
+                    ("화물온도조건", 의뢰?.화물온도조건),
                     ("운송방식", 의뢰?.운송방식),
                     ("차량종류", 의뢰?.차량종류),
+                    ("서비스레벨", 의뢰?.서비스레벨),
+                    ("요청사항", 의뢰?.요청사항),
+                    ("클라이언트요청Id", 의뢰?.클라이언트요청Id),
+                    ("의뢰상태", 의뢰?.상태),
+                    ("결제상태", 의뢰?.결제상태),
                     ("배차상태", 의뢰?.배차상태),
                     ("원천유형", 운송실행투영?.원본의뢰유형),
                     ("원천Id", 운송실행투영?.원본의뢰Id),
@@ -266,11 +280,17 @@ public static class 운송원장Mongo동기화Builder
                     ("업무엔티티", "화주운송의뢰.정산"),
                     ("결제수단", 의뢰?.결제수단),
                     ("정산시점", 의뢰?.정산시점),
+                    ("증빙방식", 의뢰?.증빙방식),
                     ("수납주체", 의뢰?.수납주체),
                     ("정산상태", 의뢰?.정산상태),
                     ("결제상태", 의뢰?.결제상태),
                     ("결제예정금액", Format(의뢰?.결제예정금액)),
                     ("최종운임", Format(의뢰?.최종운임 ?? 운송실행투영?.운임)),
+                    ("대기료", Format(의뢰?.대기료)),
+                    ("수작업비", Format(의뢰?.수작업비)),
+                    ("할증", Format(의뢰?.할증)),
+                    ("세금계산서필요", Format(의뢰?.세금계산서필요)),
+                    ("현금영수증필요", Format(의뢰?.현금영수증필요)),
                     ("정산메모", 의뢰?.정산메모),
                     ("이벤트조회Api", "GET api/v1/transport-request-ledgers/{requestId}/events"))
             }
@@ -584,6 +604,9 @@ public static class 운송원장Mongo동기화Builder
         => value?.ToString(CultureInfo.InvariantCulture);
 
     private static string? Format(int? value)
+        => value?.ToString(CultureInfo.InvariantCulture);
+
+    private static string? Format(bool? value)
         => value?.ToString(CultureInfo.InvariantCulture);
 
     private static string? Format(long? value)

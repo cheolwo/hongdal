@@ -43,9 +43,33 @@ public sealed class FoodMartLedgerMongoSyncBuilderTests
         Assert.Equal(CommunityLedgerOperatingSystemCodes.FoodDelivery, request.대상OsCode);
         Assert.Equal(커뮤니티원장상태.진행중, request.상태);
         Assert.Equal("FOOD-100", request.외부참조["음식주문번호"]);
-        Assert.Contains(request.블록목록, block => block.BlockId == "delivery-handoff" && block.BlockType == CommunityLedgerBlockTypes.Handoff);
+        Assert.Contains(request.블록목록, block => block.BlockId == "food-preparation" && block.BlockType == CommunityLedgerBlockTypes.State);
+        Assert.DoesNotContain(request.블록목록, block => block.BlockId == "delivery-handoff");
+        Assert.DoesNotContain(request.블록목록, block => block.BlockId == "recipient");
         Assert.NotNull(request.다이어그램스냅샷);
         Assert.Equal(CommunityLedgerTemplateKeys.FoodOrder, request.다이어그램스냅샷!.LedgerTemplateKey);
+        Assert.DoesNotContain(request.다이어그램스냅샷.Nodes, node => node.NodeId == "delivery-handoff");
+    }
+
+    [Fact]
+    public void Food_order_builder_keeps_order_complete_when_delivery_progresses()
+    {
+        var order = new 음식주문응답
+        {
+            주문번호 = "FOOD-READY-1",
+            음식점Id = 10,
+            주문자UserId = "orderer-1",
+            수령인정보 = new 음식주문수령인정보Dto(),
+            상태 = 음식주문상태코드.기사배정,
+            배차상태 = 음식주문배차상태코드.기사배정,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var request = 음식마트원장Mongo동기화Builder.음식주문저장요청생성(order);
+
+        Assert.Equal(커뮤니티원장상태.완료, request.상태);
+        Assert.Equal(음식주문상태코드.픽업대기, request.현재단계Key);
+        Assert.False(request.외부참조.ContainsKey("배차대기Id"));
     }
 
     [Fact]

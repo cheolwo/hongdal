@@ -66,38 +66,36 @@ public static class CommunityLedgerTemplateCatalog
             WorkflowTag = "음식 주문",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.FoodDelivery,
             TargetOperatingSystemName = "음식 배달 OS",
-            Summary = "주문, 조리, 전달, 수령 확인을 느슨하게 공유하는 원장입니다.",
+            Summary = "메뉴 주문, 음식점 수락, 조리, 준비 완료까지를 추적하고 필요한 경우 하나 이상의 음식 배달 원장으로 인계하는 원장입니다.",
             EngineHints = [CommunityLedgerEngineHints.FoodDeliveryDispatch],
-            UiSectionHints = ["참여자", "메뉴", "조리 상태", "픽업", "전달", "수령 확인", "정산 표시"],
-            ActionHints = ["주문 확인", "조리 시작", "준비 완료", "픽업 요청", "전달 완료", "수령 확인"],
+            UiSectionHints = ["참여자", "메뉴", "주문 상태", "조리 상태", "수령 방식", "정산 표시"],
+            ActionHints = ["주문 확인", "음식점 수락", "조리 시작", "준비 완료", "수령 방식 확정", "배달 원장 추가"],
             CompositionRules =
             [
                 Rule(
                     CommunityLedgerCompositionRuleCodes.RequestAndParticipantBeforeProgress,
                     "주문 내용과 참여자가 먼저 필요합니다.",
-                    "메뉴, 주문자, 판매자 또는 조리자가 정해져야 조리와 픽업 흐름을 구성할 수 있습니다.",
+                    "메뉴, 주문자, 판매자 또는 조리자가 정해져야 주문 수락과 조리 흐름을 구성할 수 있습니다.",
                     requiredUiSectionHints: ["참여자", "메뉴"],
-                    gatedActionHints: ["조리 시작", "준비 완료", "픽업 요청"])
+                    gatedActionHints: ["음식점 수락", "조리 시작", "준비 완료"])
             ],
             ProcessingSurfaces =
             [
                 ApiEndpoint("POST", "음식주문Controller", "등록", "커뮤니티 원장을 음식 주문으로 접수합니다.", "I음식주문접수UseCase.등록Async"),
-                ApiEndpoint("POST", "음식주문Controller", "음식점수락", "음식점 주문 수락과 준비 상태를 처리합니다.", "I음식주문접수UseCase.음식점수락Async"),
-                ApiEndpoint("POST", "배차주소Controller", "저장", "픽업/전달 주소를 배차 가능한 형태로 정리합니다.", "배차주소Controller")
+                ApiEndpoint("POST", "음식주문Controller", "음식점수락", "음식점 주문 수락과 준비 상태를 처리합니다.", "I음식주문접수UseCase.음식점수락Async")
             ],
             PersistencePolicy = MongoPolicy(
                 Projection("음식 주문", "FoodOrder / 음식주문", "CommunityLedgerId", "메뉴, 주문자, 판매자 정보가 확정되면 생성합니다."),
                 Projection("음식점 수락", "RestaurantAcceptance / 음식점주문수락", "OrderNo + CommunityLedgerId", "음식점이 주문을 수락할 때 상태를 투영합니다.")),
-            BestLedgerPatternTitle = "조리와 전달이 끊기지 않는 음식 주문 원장",
-            BestLedgerPatternSummary = "주문자, 판매자, 조리자, 전달자가 각자 상태를 남겨 음식 준비와 전달 타이밍을 맞춥니다.",
-            CommunityDiscussionPrompts = ["주문 변경은 어느 시점까지 허용할까요?", "조리 완료와 픽업 요청은 한 버튼으로 묶어도 될까요?", "수령 확인은 주문자와 수령자를 나눠야 할까요?"],
+            BestLedgerPatternTitle = "주문과 조리 준비에 집중하는 음식 주문 원장",
+            BestLedgerPatternSummary = "주문자, 판매자, 조리자가 주문 수락과 준비 완료를 함께 확인하고, 배달이 필요하면 독립된 배달 원장을 필요한 수만큼 연결합니다.",
+            CommunityDiscussionPrompts = ["주문 변경은 어느 시점까지 허용할까요?", "직접 수령과 배달 요청을 언제 확정할까요?", "분할 배달이 필요한 메뉴와 수량은 어떻게 나눌까요?"],
             Roles =
             [
                 Role("주문자", "메뉴와 수령 조건을 남깁니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.MarkPayment),
                 Role("판매자", "주문 가능 여부와 준비 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
                 Role("조리자", "조리 시작과 준비 완료 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState),
-                Role("전달자", "픽업과 전달 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
-                Role("수령자", "수령 여부를 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion)
+                Role("수령 방식 확인자", "직접 수령인지 배달이 필요한지와 분할 조건을 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion)
             ]
         },
         new()
@@ -108,16 +106,16 @@ public static class CommunityLedgerTemplateCatalog
             WorkflowTag = "음식 배달",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.FoodDelivery,
             TargetOperatingSystemName = "음식 배달 OS",
-            Summary = "픽업, 이동, 문앞 전달, 수령 확인을 공유하는 원장입니다.",
+            Summary = "한 번의 픽업·이동·전달 시도를 추적하는 원장입니다. 하나의 음식 주문에서 분할 배달이나 재배달을 위해 여러 배달 원장이 파생될 수 있습니다.",
             EngineHints = [CommunityLedgerEngineHints.FoodDeliveryDispatch, CommunityLedgerEngineHints.TransportDispatch],
-            UiSectionHints = ["참여자", "픽업지", "도착지", "배달 상태", "전달 증빙", "수령 확인", "타임라인"],
-            ActionHints = ["픽업 도착", "픽업 완료", "이동 시작", "전달 완료", "사진 첨부", "수령 확인"],
+            UiSectionHints = ["원주문", "배달 회차", "분할 항목", "재배달 사유", "참여자", "픽업지", "도착지", "배달 상태", "전달 증빙", "수령 확인", "타임라인"],
+            ActionHints = ["배달 회차 생성", "픽업 도착", "픽업 완료", "이동 시작", "전달 완료", "사진 첨부", "수령 확인", "재배달 원장 추가"],
             CompositionRules =
             [
                 Rule(
                     CommunityLedgerCompositionRuleCodes.FoodOrderBeforeDelivery,
-                    "음식 주문 또는 픽업 의뢰가 먼저 필요합니다.",
-                    "배달 화면은 음식 주문 원장이나 별도 픽업 의뢰에서 픽업지, 도착지, 수령 조건을 넘겨받아 구성되어야 합니다.",
+                    "원본 음식 주문이 먼저 필요합니다.",
+                    "각 배달 원장은 원본 음식 주문을 참조하고 배달 회차, 분할 항목 또는 재배달 사유를 독립적으로 기록합니다. 한 주문에는 선택적으로 여러 배달 원장을 연결할 수 있습니다.",
                     requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.FoodOrder],
                     requiredUiSectionHints: ["참여자", "픽업지", "도착지"],
                     gatedActionHints: ["픽업 도착", "픽업 완료", "전달 완료", "수령 확인"])
@@ -129,11 +127,11 @@ public static class CommunityLedgerTemplateCatalog
                 ApiEndpoint("POST", "기사배차액션Controller", "수락", "기사 배차 수락을 처리합니다.", "기사배차액션Controller")
             ],
             PersistencePolicy = MongoPolicy(
-                Projection("음식 배달 주소", "FoodDispatchAddress / 배차주소", "OrderNo + CommunityLedgerId", "픽업지와 도착지가 정리되면 배차 주소로 투영합니다."),
-                Projection("배차 추천", "DriverDispatchRecommendation", "CommunityLedgerId", "배달권과 기사 후보를 계산할 때 실행 인덱스로 투영합니다.")),
-            BestLedgerPatternTitle = "픽업과 수령 확인이 빠른 음식 배달 원장",
-            BestLedgerPatternSummary = "픽업 담당자와 수령 확인자를 분리해 짧은 시간 안에 배달 상태를 빠르게 맞춥니다.",
-            CommunityDiscussionPrompts = ["문앞 전달 사진은 언제 필요한가요?", "수령자가 부재하면 어떤 상태로 남기는 게 좋을까요?", "짧은 거리 배달도 정산 확인자를 둘까요?"],
+                Projection("음식 배달 주소", "FoodDispatchAddress / 배차주소", "OrderNo + CommunityLedgerId", "원주문과 배달 원장별 픽업지·도착지가 정리되면 배차 주소로 투영합니다."),
+                Projection("배차 추천", "DriverDispatchRecommendation", "CommunityLedgerId", "배달 회차별 배달권과 기사 후보를 계산할 때 실행 인덱스로 투영합니다.")),
+            BestLedgerPatternTitle = "배달 회차와 재시도를 독립적으로 추적하는 음식 배달 원장",
+            BestLedgerPatternSummary = "분할 배달과 재배달을 별도 원장으로 남겨 이전 시도의 증빙과 실패 사유를 덮어쓰지 않습니다.",
+            CommunityDiscussionPrompts = ["어떤 메뉴를 별도 배달 회차로 나눌까요?", "재배달 원장은 어떤 실패 원장을 참조해야 할까요?", "문앞 전달 사진은 어느 회차에 필요한가요?"],
             Roles =
             [
                 Role("배달 요청자", "픽업지와 도착지를 정리합니다.", CommunityLedgerPermissionCodes.InviteParticipant),
@@ -332,41 +330,65 @@ public static class CommunityLedgerTemplateCatalog
             Key = CommunityLedgerTemplateKeys.GroupPurchase,
             DisplayName = "공동구매 원장",
             Category = "생활 원장",
-            WorkflowTag = "공동구매",
+            WorkflowTag = "공동주문 수입",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
             TargetOperatingSystemName = "공동주문 수입 OS",
-            Summary = "모집, 구매, 분배, 정산 표시를 참여자들이 함께 보는 원장입니다.",
-            EngineHints = [CommunityLedgerEngineHints.Grouping, CommunityLedgerEngineHints.OutboundBatch, CommunityLedgerEngineHints.TransportDispatch],
-            UiSectionHints = ["참여자", "모집 수량", "구매 진행", "분배", "정산 표시", "수령 확인", "투표/결정"],
-            ActionHints = ["참여 신청", "수량 확정", "구매 진행", "분배 시작", "입금 표시", "수령 확인"],
+            Summary = "커뮤니티 공동주문 수요를 모으고 수입 결정, 해외 선적, 통관, 국내 반출, 3PL 입고 또는 세대 분배까지 이어지는 원장입니다.",
+            EngineHints = [CommunityLedgerEngineHints.Grouping, CommunityLedgerEngineHints.ImportCustoms, CommunityLedgerEngineHints.OutboundBatch, CommunityLedgerEngineHints.TransportDispatch],
+            UiSectionHints = ["참여자", "모집 수량", "투표/결정", "수입 결정", "해외 선적", "통관 상태", "국내 반출", "3PL 입고", "세대 분배", "정산 표시", "수령 확인"],
+            ActionHints = ["참여 신청", "수량 확정", "수입 진행 결정", "해외 발주/선적 등록", "통관 상태 동기화", "국내 반출 준비", "3PL 입고 인계", "세대 분배 시작", "입금 표시", "수령 확인"],
             CompositionRules =
             [
                 Rule(
                     CommunityLedgerCompositionRuleCodes.RecruitmentBeforePurchaseDistribution,
                     "모집과 수량 확정이 먼저 필요합니다.",
-                    "구매 진행, 분배, 정산 화면은 참여자와 수량이 확정된 뒤에 구성되어야 합니다.",
+                    "수입 결정, 선적, 통관, 분배, 정산 화면은 참여자와 수량이 확정된 뒤에 구성되어야 합니다.",
                     requiredUiSectionHints: ["참여자", "모집 수량", "투표/결정"],
-                    gatedActionHints: ["수량 확정", "구매 진행", "분배 시작", "입금 표시"])
+                    gatedActionHints: ["수량 확정", "수입 진행 결정", "해외 발주/선적 등록", "입금 표시"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.GroupPurchaseDemandBeforeImportDecision,
+                    "공동주문 수요가 모여야 수입 결정을 열 수 있습니다.",
+                    "참여 수량과 투표/결정 근거가 부족하면 수입 진행 여부를 확정하지 않고 보류합니다.",
+                    requiredUiSectionHints: ["참여자", "모집 수량", "투표/결정"],
+                    gatedActionHints: ["수입 진행 결정"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.GroupPurchaseImportDecisionBeforeShipment,
+                    "수입 결정 뒤에 해외 발주와 선적 추적을 시작합니다.",
+                    "수입 방식, 수량, 가격, FCL/LCL 같은 조건이 정해진 뒤 해외 선적과 통관 상태를 연결합니다.",
+                    requiredUiSectionHints: ["수입 결정"],
+                    gatedActionHints: ["해외 발주/선적 등록", "통관 상태 동기화"]),
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution,
+                    "통관과 반출 가능 상태가 국내 분배의 전제입니다.",
+                    "통관 상태와 국내 반출 조건이 확인되어야 3PL 입고, 운송 인계, 세대 분배를 열 수 있습니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.WarehouseInbound, CommunityLedgerTemplateKeys.CargoTransport],
+                    requiredUiSectionHints: ["통관 상태", "국내 반출"],
+                    gatedActionHints: ["3PL 입고 인계", "세대 분배 시작", "수령 확인"])
             ],
             ProcessingSurfaces =
             [
                 ApiEndpoint("POST", "공동구매자동집단화Controller", "수요등록", "커뮤니티 수요를 공동구매 자동 집단화로 등록합니다.", "I공동구매자동집단화UseCase.수요등록Async"),
+                ApiEndpoint("GET", "공동구매물류워크플로우Controller", "Resolve", "공동주문 수입 물류 흐름 정의를 조회합니다.", "I공동구매물류워크플로우저장소.ResolveAsync"),
                 ApiEndpoint("GET", "공동구매해외선적추적Controller", "Lookup", "공동구매 선적 또는 진행 정보를 조회합니다.", "I공동구매해외선적추적UseCase.공개조회Async"),
+                ApiEndpoint("POST", "공동구매해외선적추적Controller", "통관동기화", "문서관리번호 기준 수입 통관 상태를 공동주문 원장에 동기화합니다.", "I공동구매해외선적추적UseCase.통관동기화Async"),
                 ApiEndpoint("POST", "WarehouseOperationsController", "재위탁운송생성", "국내 분배가 필요하면 운송 의뢰로 넘깁니다.", "I창고작업UseCase.재위탁운송생성Async")
             ],
             PersistencePolicy = MongoPolicy(
                 Projection("공동구매 수요", "GroupPurchaseDemand / 공동구매자동수요", "CommunityLedgerId", "참여 수요가 생기면 공동구매 자동 집단으로 투영합니다."),
+                Projection("공동구매 수입 결정", "GroupPurchaseImportDecision / 공동구매물류워크플로우", "CommunityLedgerId + GroupPurchaseId", "수입 진행 여부와 FCL/LCL, 가격, 수량 결정이 확정되면 투영합니다."),
                 Projection("공동구매 선적", "GroupPurchaseShipment / 공동구매해외선적", "GroupPurchaseId + CommunityLedgerId", "선적 문서나 통관 상태가 연결되면 참조 링크를 남깁니다."),
-                Projection("국내 운송 의뢰", "TransportRequest / 공동구매국내운송", "CommunityLedgerId", "국내 분배가 확정되면 운송 의뢰로 투영합니다.")),
-            BestLedgerPatternTitle = "모집·구매·분배가 한눈에 보이는 공동구매 원장",
-            BestLedgerPatternSummary = "모집자, 구매 담당자, 분배 담당자, 정산 확인자를 나눠 공동구매가 사람 한 명에게 몰리지 않게 합니다.",
-            CommunityDiscussionPrompts = ["참여 수량 변경은 언제까지 받는 게 좋을까요?", "정산 확인은 개인별로 볼까요, 전체로 볼까요?", "분배 담당자는 몇 명이 적당할까요?"],
+                Projection("국내 3PL 입고", "WarehouseInbound / 공동구매입고", "CommunityLedgerId + DocumentManagementNumber", "통관 뒤 3PL 창고 입고를 선택하면 입고 원장과 연결합니다."),
+                Projection("국내 운송 의뢰", "TransportRequest / 공동구매국내운송", "CommunityLedgerId", "국내 반출 또는 세대 분배가 확정되면 운송 의뢰로 투영합니다.")),
+            BestLedgerPatternTitle = "모집·수입·통관·분배가 한눈에 보이는 공동주문 수입 원장",
+            BestLedgerPatternSummary = "모집자, 수입 결정자, 선적/통관 확인자, 입고/분배 담당자, 정산 확인자를 나눠 공동주문 수입이 사람 한 명에게 몰리지 않게 합니다.",
+            CommunityDiscussionPrompts = ["참여 수량 변경은 언제까지 받는 게 좋을까요?", "통관 지연이 생기면 분배 일정을 어떻게 조정할까요?", "3PL 입고와 세대 직접 분배 중 어느 방식이 적당할까요?"],
             Roles =
             [
                 Role("모집자", "참여자와 조건을 모읍니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ChangeState),
                 Role("참여자", "참여 수량과 확인 상태를 남깁니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
-                Role("구매 담당자", "구매 진행과 주문 정보를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
-                Role("분배 담당자", "수령 장소와 분배 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState),
+                Role("수입 결정자", "수량, 가격, 수입 방식, 진행 여부를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("선적/통관 확인자", "해외 선적, 문서관리번호, 통관 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("입고/분배 담당자", "3PL 입고 또는 세대 분배 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState),
                 Role("정산 확인자", "각자 입금 표시와 확인 메모를 정리합니다.", CommunityLedgerPermissionCodes.MarkPayment, CommunityLedgerPermissionCodes.CloseLedger)
             ]
         },
@@ -496,6 +518,46 @@ public static class CommunityLedgerTemplateCatalog
             ["포장 완료", "기사 픽업", "고객 전달", "수령 확인"]),
         Module(
             9,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
+            "공동주문 수요 원장",
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            "공동주문 수입 OS",
+            "커뮤니티 대화에서 나온 참여 의사를 상품, 수량, 배송권 기준으로 묶는 원장입니다.",
+            ["공동주문 수요", "참여 신청", "모집 수량"],
+            ["참여자", "모집 수량", "투표/결정"]),
+        Module(
+            10,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision,
+            "공동주문 수입 결정 원장",
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            "공동주문 수입 OS",
+            "모인 수요를 보고 수입 진행 여부, FCL/LCL, 가격, 수량, 진행 조건을 확정하는 원장입니다.",
+            ["수입 결정", "FCL/LCL", "가격·수량 결정"],
+            ["수입 결정", "투표/결정", "정산 표시"]),
+        Module(
+            11,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseShipmentCustoms,
+            "공동주문 선적/통관 원장",
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            "공동주문 수입 OS",
+            "해외 발주, BL/AWB, 문서관리번호, 통관 상태, 반출 가능 상태를 추적하는 원장입니다.",
+            ["해외 선적", "통관 상태", "국내 반출"],
+            ["해외 선적", "통관 상태", "국내 반출", "증빙"]),
+        Module(
+            12,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution,
+            "공동주문 입고/분배 원장",
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            "공동주문 수입 OS",
+            "통관 이후 3PL 입고, 국내 운송 인계, 세대 분배, 수령 확인을 관리하는 원장입니다.",
+            ["3PL 입고", "세대 분배", "수령 확인"],
+            ["3PL 입고", "세대 분배", "수령 확인", "정산 표시"]),
+        Module(
+            13,
             CommunityLedgerImplementationModuleCodes.SettlementMark,
             "결제/정산 표시 원장",
             CommunityLedgerTemplateKeys.CargoTransport,
@@ -505,7 +567,7 @@ public static class CommunityLedgerTemplateCatalog
             ["결제 표시", "정산 확인", "FakePG 개발 검증"],
             ["정산 표시", "결제 표시", "확인", "메모"]),
         Module(
-            10,
+            14,
             CommunityLedgerImplementationModuleCodes.ReportDispute,
             "신고/분쟁 원장",
             CommunityLedgerTemplateKeys.Errand,
@@ -513,7 +575,37 @@ public static class CommunityLedgerTemplateCatalog
             "커뮤니티 신뢰 OS",
             "문제 신고, 이견, 보류, 운영자 검토, 제한 신호를 별도로 추적하는 원장입니다.",
             ["문제 신고", "이견 있음", "운영자 검토"],
-            ["증빙", "메모", "확인", "타임라인"])
+            ["증빙", "메모", "확인", "타임라인"]),
+        Module(
+            15,
+            CommunityLedgerImplementationModuleCodes.FoodOrder,
+            "음식 주문 원장",
+            CommunityLedgerTemplateKeys.FoodOrder,
+            CommunityLedgerOperatingSystemCodes.FoodDelivery,
+            "음식 배달 OS",
+            "메뉴 주문부터 음식점 수락, 조리, 준비 완료까지를 독립적으로 추적하는 원장입니다.",
+            ["음식 주문", "음식점 수락", "조리 준비"],
+            ["메뉴", "주문 상태", "조리 상태", "수령 방식", "정산 표시"]),
+        Module(
+            16,
+            CommunityLedgerImplementationModuleCodes.FoodDelivery,
+            "음식 배달 원장",
+            CommunityLedgerTemplateKeys.FoodDelivery,
+            CommunityLedgerOperatingSystemCodes.FoodDelivery,
+            "음식 배달 OS",
+            "한 번의 픽업과 전달 시도를 추적하며 분할 배달과 재배달은 별도 원장으로 만듭니다.",
+            ["배달 회차", "분할 배달", "재배달 시도"],
+            ["원주문", "배달 회차", "픽업지", "도착지", "배달 상태", "전달 증빙"]),
+        Module(
+            17,
+            CommunityLedgerImplementationModuleCodes.WarehouseInbound,
+            "창고입고 원장",
+            CommunityLedgerTemplateKeys.WarehouseInbound,
+            CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
+            "창고·커머스 이행 OS",
+            "입고 예정 품목과 운송 하차 인계 내용을 받아 검수, 이상 처리, 보관과 재고 전환을 추적하는 원장입니다.",
+            ["창고 입고", "운송 하차 인계", "입고 검수"],
+            ["입고 예정", "운송 하차", "검수", "보관 위치", "이상 기록"])
     ];
 
     private static readonly IReadOnlyList<CommunityLedgerRelationResponse> PriorityLedgerRelations =
@@ -538,6 +630,76 @@ public static class CommunityLedgerTemplateCatalog
             required: false,
             "상차지, 하차지, 화물 조건이 확인될 때",
             "원함 판단이 국내 운송 업무로 판정되면 운송의뢰 원장으로 넘깁니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.WishLedgerAssessment,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
+            CommunityLedgerTemplateKeys.Errand,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "커뮤니티 대화가 공동주문 수요로 읽힐 때",
+            "원함 판단이 공동주문 수입 업무로 판정되면 공동주문 수요 원장으로 넘깁니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.FoodOrder,
+            CommunityLedgerImplementationModuleCodes.FoodDelivery,
+            CommunityLedgerTemplateKeys.FoodOrder,
+            CommunityLedgerTemplateKeys.FoodDelivery,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "주문 준비가 완료되고 배달, 분할 배달 또는 재배달이 필요할 때",
+            "하나의 음식 주문 원장은 배달이 없을 수도 있고, 분할 배달이나 재배달을 위해 여러 음식 배달 원장과 연결될 수 있습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerRelationTypes.Flow,
+            CommunityLedgerRelationCardinality.ManyToOne,
+            required: true,
+            "모집 수량과 참여 조건이 판단 가능한 수준으로 모일 때",
+            "공동주문 수요 원장은 수입 진행 여부와 FCL/LCL, 가격, 수량을 결정하는 원장으로 이어집니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseShipmentCustoms,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerRelationTypes.Flow,
+            CommunityLedgerRelationCardinality.OneToOne,
+            required: true,
+            "수입 진행이 확정되고 해외 발주가 시작될 때",
+            "수입 결정 원장은 해외 선적, 문서관리번호, 통관 상태를 추적하는 원장으로 이어집니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseShipmentCustoms,
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: true,
+            "통관 완료 또는 반출 가능 상태가 확인될 때",
+            "선적/통관 원장은 3PL 입고, 국내 운송 인계, 세대 분배 원장으로 넘어갑니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution,
+            CommunityLedgerImplementationModuleCodes.WarehouseOutbound,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerTemplateKeys.WarehouseOutbound,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "3PL 입고 뒤 창고 피킹/출고가 필요할 때",
+            "공동주문 입고/분배 원장은 창고 출고 원장과 연결될 수 있습니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution,
+            CommunityLedgerImplementationModuleCodes.CargoTransport,
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "세대 배송 또는 거점 배송이 필요할 때",
+            "공동주문 입고/분배 원장은 국내 운송 의뢰 원장으로 넘어갈 수 있습니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.CargoTransport,
             CommunityLedgerImplementationModuleCodes.TransportProgress,
@@ -568,6 +730,16 @@ public static class CommunityLedgerTemplateCatalog
             required: false,
             "포장 완료 뒤 외부 이동이 필요할 때",
             "피킹/포장 완료 뒤 운송 인계가 필요하면 운송의뢰 원장으로 넘깁니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.TransportProgress,
+            CommunityLedgerImplementationModuleCodes.WarehouseInbound,
+            CommunityLedgerTemplateKeys.CargoTransport,
+            CommunityLedgerTemplateKeys.WarehouseInbound,
+            CommunityLedgerRelationTypes.Handoff,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: false,
+            "운송 하차가 완료되고 도착 창고에서 입고 처리가 필요할 때",
+            "운송진행 원장의 하차 품목과 증빙을 하나 이상의 창고입고 원장 입력으로 넘길 수 있습니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.HongdalMartOrder,
             CommunityLedgerImplementationModuleCodes.PickingPacking,
@@ -719,7 +891,7 @@ public static class CommunityLedgerTemplateCatalog
             $"앱: {Normalize(appName, "Hongdal")}",
             $"작성자 역할: {Normalize(roleLabel, "플랫폼 구성원")}",
             $"원장 유형: {template.DisplayName}",
-            $"스케줄링 OS: {template.TargetOperatingSystemName}",
+            $"처리 체계: {처리체계표시명(template.TargetOperatingSystemName)}",
             string.Empty,
             "원함 확인:",
             $"- 질문: {template.원함확인질문}",
@@ -735,10 +907,10 @@ public static class CommunityLedgerTemplateCatalog
             "원장 목적:",
             "- ",
             string.Empty,
-            "OS/엔진 인계:",
-            $"- 대상 OS: {template.TargetOperatingSystemName} ({template.TargetOperatingSystemCode})",
-            $"- OS 역할: {template.OperatingSystemRoleSummary}",
-            "- OS는 실행 주체라기보다 스케줄러이며, 실제 처리는 API 또는 내부 application service 호출이 담당합니다.",
+            "처리 체계/엔진 인계:",
+            $"- 대상 처리 체계: {처리체계표시명(template.TargetOperatingSystemName)} ({template.TargetOperatingSystemCode})",
+            $"- 처리 체계 역할: {template.OperatingSystemRoleSummary}",
+            "- 처리 체계는 실행 주체라기보다 스케줄러이며, 실제 처리는 API 또는 내부 application service 호출이 담당합니다.",
             string.Join(Environment.NewLine, schedulingLines),
             string.Join(Environment.NewLine, engineLines),
             string.Empty,
@@ -1036,6 +1208,12 @@ public static class CommunityLedgerTemplateCatalog
             "요청 내용" => "request-body",
             "모집 수량" => "recruitment-quantity",
             "투표/결정" => "decision",
+            "수입 결정" => "import-decision",
+            "해외 선적" => "overseas-shipment",
+            "통관 상태" => "customs-state",
+            "국내 반출" => "domestic-release",
+            "3PL 입고" => "third-party-logistics-inbound",
+            "세대 분배" => "household-distribution",
             "정산 표시" => "settlement",
             "결제 표시" => "settlement",
             "증빙" => "evidence",
@@ -1112,6 +1290,12 @@ public static class CommunityLedgerTemplateCatalog
             return CommunityLedgerBlockTypes.Decision;
         }
 
+        if (uiSectionHint.Contains("선적", StringComparison.Ordinal)
+            || uiSectionHint.Contains("통관", StringComparison.Ordinal))
+        {
+            return CommunityLedgerBlockTypes.State;
+        }
+
         if (uiSectionHint.Contains("증빙", StringComparison.Ordinal)
             || uiSectionHint.Contains("사진", StringComparison.Ordinal)
             || uiSectionHint.Contains("확인", StringComparison.Ordinal)
@@ -1130,7 +1314,8 @@ public static class CommunityLedgerTemplateCatalog
         if (uiSectionHint.Contains("인계", StringComparison.Ordinal)
             || uiSectionHint.Contains("픽업", StringComparison.Ordinal)
             || uiSectionHint.Contains("전달", StringComparison.Ordinal)
-            || uiSectionHint.Contains("분배", StringComparison.Ordinal))
+            || uiSectionHint.Contains("분배", StringComparison.Ordinal)
+            || uiSectionHint.Contains("반출", StringComparison.Ordinal))
         {
             return CommunityLedgerBlockTypes.Handoff;
         }
@@ -1184,7 +1369,7 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerBlockTypes.State => ["현재 상태", "이전 상태", "다음 가능 상태", "상태 변경자"],
             CommunityLedgerBlockTypes.Evidence => ["이미지", "메모", "서명", "바코드", "링크"],
             CommunityLedgerBlockTypes.Settlement => ["결제 표시", "상대방 확인", "정산 메모", "보류 사유"],
-            CommunityLedgerBlockTypes.Handoff => ["인계 대상 OS", "API 경로", "서비스 힌트", "외부/내부 참조 id"],
+            CommunityLedgerBlockTypes.Handoff => ["인계 대상 처리 체계", "API 경로", "서비스 힌트", "외부/내부 참조 id"],
             _ => [uiSectionHint]
         };
 
@@ -1226,10 +1411,10 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerBlockTypes.Inventory => action.Contains("재고", StringComparison.Ordinal) || action.Contains("피킹", StringComparison.Ordinal) || action.Contains("검수", StringComparison.Ordinal) || action.Contains("입고", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Quantity => action.Contains("수량", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Decision => action.Contains("확정", StringComparison.Ordinal) || action.Contains("결정", StringComparison.Ordinal),
-            CommunityLedgerBlockTypes.State => action.Contains("시작", StringComparison.Ordinal) || action.Contains("완료", StringComparison.Ordinal) || action.Contains("보류", StringComparison.Ordinal),
+            CommunityLedgerBlockTypes.State => action.Contains("시작", StringComparison.Ordinal) || action.Contains("완료", StringComparison.Ordinal) || action.Contains("보류", StringComparison.Ordinal) || action.Contains("선적", StringComparison.Ordinal) || action.Contains("통관", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Evidence => action.Contains("사진", StringComparison.Ordinal) || action.Contains("첨부", StringComparison.Ordinal) || action.Contains("보고", StringComparison.Ordinal),
             CommunityLedgerBlockTypes.Settlement => action.Contains("입금", StringComparison.Ordinal) || action.Contains("정산", StringComparison.Ordinal) || action.Contains("결제", StringComparison.Ordinal),
-            CommunityLedgerBlockTypes.Handoff => action.Contains("인계", StringComparison.Ordinal) || action.Contains("픽업", StringComparison.Ordinal) || action.Contains("전달", StringComparison.Ordinal) || action.Contains("분배", StringComparison.Ordinal),
+            CommunityLedgerBlockTypes.Handoff => action.Contains("인계", StringComparison.Ordinal) || action.Contains("픽업", StringComparison.Ordinal) || action.Contains("전달", StringComparison.Ordinal) || action.Contains("분배", StringComparison.Ordinal) || action.Contains("반출", StringComparison.Ordinal),
             _ => false
         };
     }
@@ -1551,5 +1736,15 @@ public static class CommunityLedgerTemplateCatalog
     {
         var text = string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
         return text.Length <= maxLength ? text : text[..maxLength];
+    }
+
+    private static string 처리체계표시명(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "처리 체계";
+        }
+
+        return value.Trim().Replace(" OS", " 처리 체계", StringComparison.OrdinalIgnoreCase);
     }
 }

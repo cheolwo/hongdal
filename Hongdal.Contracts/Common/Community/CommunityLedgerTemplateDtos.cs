@@ -445,8 +445,15 @@ public static class CommunityLedgerImplementationModuleCodes
     public const string TransportProgress = "transport-progress";
     public const string WarehouseOutbound = "warehouse-outbound";
     public const string PickingPacking = "picking-packing";
+    public const string WarehouseInbound = "warehouse-inbound";
+    public const string FoodOrder = "food-order";
+    public const string FoodDelivery = "food-delivery";
     public const string HongdalMartOrder = "hongdal-mart-order";
     public const string HongdalMartDelivery = "hongdal-mart-delivery";
+    public const string GroupPurchaseDemand = "group-purchase-demand";
+    public const string GroupPurchaseImportDecision = "group-purchase-import-decision";
+    public const string GroupPurchaseShipmentCustoms = "group-purchase-shipment-customs";
+    public const string GroupPurchaseDistribution = "group-purchase-distribution";
     public const string SettlementMark = "settlement-mark";
     public const string ReportDispute = "report-dispute";
 }
@@ -530,6 +537,7 @@ public static class CommunityLedgerEngineHints
     public const string OutboundBatch = "출고 배치 엔진";
     public const string PickingBatch = "피킹 배치 엔진";
     public const string Grouping = "집단화 엔진";
+    public const string ImportCustoms = "수입 통관 엔진";
 }
 
 public static class CommunityLedgerCompositionRuleCodes
@@ -542,6 +550,9 @@ public static class CommunityLedgerCompositionRuleCodes
     public const string OutboundBeforeHandoffTransport = "OutboundBeforeHandoffTransport";
     public const string SaleItemBeforeReservationSettlement = "SaleItemBeforeReservationSettlement";
     public const string RecruitmentBeforePurchaseDistribution = "RecruitmentBeforePurchaseDistribution";
+    public const string GroupPurchaseDemandBeforeImportDecision = "GroupPurchaseDemandBeforeImportDecision";
+    public const string GroupPurchaseImportDecisionBeforeShipment = "GroupPurchaseImportDecisionBeforeShipment";
+    public const string GroupPurchaseCustomsBeforeDomesticDistribution = "GroupPurchaseCustomsBeforeDomesticDistribution";
     public const string RequestAndParticipantBeforeProgress = "RequestAndParticipantBeforeProgress";
 }
 

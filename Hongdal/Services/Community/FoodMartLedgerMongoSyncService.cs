@@ -198,7 +198,7 @@ public static class 음식마트원장Mongo동기화Builder
         }
 
         var 원장Id = 음식주문원장Id생성(주문.주문번호);
-        var 현재단계 = ResolveFoodStage(주문);
+        var 현재단계 = ResolveFoodOrderStage(주문);
 
         return new 커뮤니티원장저장요청
         {
@@ -220,7 +220,6 @@ public static class 음식마트원장Mongo동기화Builder
                 ("음식주문번호", 주문.주문번호),
                 ("주문번호", 주문.주문번호),
                 ("음식점Id", Format(주문.음식점Id)),
-                ("배차대기Id", Format(주문.배차대기Id)),
                 ("원천유형", "FoodOrder"),
                 ("원천Id", 주문.주문번호),
                 ("RdbFoodProjectionType", "음식주문")),
@@ -329,29 +328,17 @@ public static class 음식마트원장Mongo동기화Builder
             },
             new()
             {
-                BlockId = "recipient",
-                BlockType = CommunityLedgerBlockTypes.Place,
-                Title = "수령지",
-                State = 주문.수령인정보.주문자본인수령여부 ? "본인 수령" : "대리 수령",
+                BlockId = "food-preparation",
+                BlockType = CommunityLedgerBlockTypes.State,
+                Title = "조리 준비",
+                State = ResolveFoodOrderStage(주문),
                 Data = Data(
-                    ("업무엔티티", "음식주문.수령지"),
-                    ("수령인명", 주문.수령인정보.수령인명),
-                    ("주소", 주문.수령인정보.주소),
-                    ("상세주소", 주문.수령인정보.상세주소),
-                    ("요청사항", 주문.수령인정보.요청사항))
-            },
-            new()
-            {
-                BlockId = "delivery-handoff",
-                BlockType = CommunityLedgerBlockTypes.Handoff,
-                Title = "배달 인계",
-                State = 주문.배차상태,
-                Data = Data(
-                    ("업무엔티티", "음식배달.배차"),
-                    ("배차상태", 주문.배차상태),
-                    ("배차대기Id", Format(주문.배차대기Id)),
-                    ("배차요청시각Utc", Format(주문.배차요청시각Utc)),
-                    ("연결원장템플릿Key", CommunityLedgerTemplateKeys.FoodDelivery))
+                    ("업무엔티티", "음식주문.조리준비"),
+                    ("음식점수락시각Utc", Format(주문.음식점수락시각Utc)),
+                    ("조리예상완료시각Utc", Format(주문.조리예상완료시각Utc)),
+                    ("수락메모", 주문.수락메모),
+                    ("후속원장템플릿Key", CommunityLedgerTemplateKeys.FoodDelivery),
+                    ("후속원장관계", "선택 0..N"))
             },
             new()
             {
@@ -371,7 +358,6 @@ public static class 음식마트원장Mongo동기화Builder
         var participants = new List<커뮤니티원장참여자Dto>();
         AddParticipant(participants, 주문.주문자UserId, "주문자", "주문자");
         AddParticipant(participants, $"restaurant:{주문.음식점Id}", string.IsNullOrWhiteSpace(주문.음식점명) ? "음식점" : 주문.음식점명, "음식점");
-        AddParticipant(participants, null, string.IsNullOrWhiteSpace(주문.수령인정보.수령인명) ? "수령자" : 주문.수령인정보.수령인명, "수령 확인자");
         return participants;
     }
 
@@ -460,16 +446,14 @@ public static class 음식마트원장Mongo동기화Builder
             Nodes =
             [
                 Node("food-order", "음식 주문", CommunityLedgerBlockTypes.Order, "주문", 120, 160),
-                Node("restaurant", "음식점", CommunityLedgerBlockTypes.Place, "조리", 360, 160),
-                Node("delivery-handoff", "배달 인계", CommunityLedgerBlockTypes.Handoff, "배달", 600, 160),
-                Node("recipient", "수령지", CommunityLedgerBlockTypes.Place, "수령", 840, 160),
+                Node("restaurant", "음식점 수락", CommunityLedgerBlockTypes.Place, "수락", 360, 160),
+                Node("food-preparation", "조리 준비", CommunityLedgerBlockTypes.State, "준비 완료", 600, 160),
                 Node("food-settlement", "결제 표시", CommunityLedgerBlockTypes.Settlement, "결제", 600, 320)
             ],
             Edges =
             [
                 Edge("edge-food-restaurant", "food-order", "restaurant", "주문 수락", CommunityLedgerRelationTypes.Flow),
-                Edge("edge-restaurant-delivery", "restaurant", "delivery-handoff", "조리 후 배달", CommunityLedgerRelationTypes.Handoff),
-                Edge("edge-delivery-recipient", "delivery-handoff", "recipient", "전달", CommunityLedgerRelationTypes.Flow),
+                Edge("edge-restaurant-preparation", "restaurant", "food-preparation", "조리·준비", CommunityLedgerRelationTypes.Flow),
                 Edge("edge-order-settlement", "food-order", "food-settlement", "결제 표시", CommunityLedgerRelationTypes.Reference)
             ],
             Metadata = Data(
@@ -508,23 +492,31 @@ public static class 음식마트원장Mongo동기화Builder
         var state = 음식주문상태코드.Normalize(주문.상태);
         return state switch
         {
-            음식주문상태코드.전달완료 => 커뮤니티원장상태.완료,
             음식주문상태코드.취소 => 커뮤니티원장상태.닫힘,
+            음식주문상태코드.픽업대기
+                or 음식주문상태코드.기사배정
+                or 음식주문상태코드.픽업완료
+                or 음식주문상태코드.전달완료 => 커뮤니티원장상태.완료,
             _ => 커뮤니티원장상태.진행중
         };
     }
 
-    private static string ResolveFoodStage(음식주문응답 주문)
-        => !string.IsNullOrWhiteSpace(주문.배차상태) && 주문.배차상태 != 음식주문배차상태코드.미요청
-            ? 주문.배차상태
-            : 음식주문상태코드.Normalize(주문.상태);
+    private static string ResolveFoodOrderStage(음식주문응답 주문)
+    {
+        var state = 음식주문상태코드.Normalize(주문.상태);
+        return state is 음식주문상태코드.기사배정
+            or 음식주문상태코드.픽업완료
+            or 음식주문상태코드.전달완료
+            ? 음식주문상태코드.픽업대기
+            : state;
+    }
 
     private static string BuildFoodWish(음식주문응답 주문)
     {
         var menu = FoodOrderSampleData.BuildMenuSummary(주문.상품목록);
         return string.IsNullOrWhiteSpace(menu)
-            ? "음식 주문을 음식점, 배달, 수령 흐름으로 처리하고 싶습니다."
-            : $"{menu} 주문을 음식점, 배달, 수령 흐름으로 처리하고 싶습니다.";
+            ? "음식 주문을 음식점 수락, 조리, 준비 완료 흐름으로 처리하고 싶습니다."
+            : $"{menu} 주문을 음식점 수락, 조리, 준비 완료 흐름으로 처리하고 싶습니다.";
     }
 
     private static string ResolveOutboundTemplateKey(string 주문참조번호, string? 원장템플릿Key)
