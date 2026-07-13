@@ -23,6 +23,20 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
   </tr>
   <tr>
     <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/community-board-desktop.png" alt="홍달 생활 게시판" width="100%">
+      <br>
+      <b>홍달 생활 게시판</b><br>
+      추천, 분류, 댓글 수가 보이는 게시판형 글 목록입니다.
+    </td>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/community-board-mobile.png" alt="모바일 홍달 생활 게시판" width="100%">
+      <br>
+      <b>모바일 생활 게시판</b><br>
+      작은 화면에서도 게시판 탭과 글 목록을 먼저 훑습니다.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
       <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/mobile-ledger-diagram.png" alt="모바일 원장 다이어그램" width="100%">
       <br>
       <b>모바일 원장 다이어그램</b><br>

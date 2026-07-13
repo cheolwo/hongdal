@@ -30,6 +30,12 @@
 
 ![역할 기반 통합 홍달 커뮤니티 홈](../assets/changes/2026-07-13-hongdal-visual-summary/unified-community-home.png)
 
+홍달 생활 게시판은 커뮤니티 글을 추천, 분류, 제목, 글쓴이, 추천 수, 댓글 수로 빠르게 훑는 게시판형 목록입니다. README 첫 화면에서는 업무 구조 설명보다 이 게시판 화면을 먼저 보여 주고, 데스크톱과 모바일 캡처를 함께 둡니다.
+
+![홍달 생활 게시판](../assets/changes/2026-07-13-hongdal-visual-summary/community-board-desktop.png)
+
+![모바일 홍달 생활 게시판](../assets/changes/2026-07-13-hongdal-visual-summary/community-board-mobile.png)
+
 역할 패널에서는 화주, 기사, 창고 관리자처럼 현재 사용할 업무 관점을 선택합니다. 역할이 바뀌면 홈과 내비게이션, 업무 진입점이 같은 앱 안에서 함께 바뀝니다.
 
 ![통합 홍달 앱 역할 전환 패널](../assets/changes/2026-07-13-hongdal-visual-summary/role-switch-panel.png)
