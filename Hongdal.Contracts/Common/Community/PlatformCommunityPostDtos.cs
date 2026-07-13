@@ -96,6 +96,29 @@ public sealed class PlatformCommunityPostCreateRequest
     public string Password { get; set; } = string.Empty;
 }
 
+public sealed class PlatformCommunityPostAudioResponse
+{
+    public long PostId { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public bool IsReady { get; set; }
+    public string Provider { get; set; } = string.Empty;
+    public string VoiceId { get; set; } = string.Empty;
+    public string ModelVersion { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public DateTime UpdatedAtUtc { get; set; }
+    public DateTime? CompletedAtUtc { get; set; }
+    public IReadOnlyList<PlatformCommunityPostAudioSegmentResponse> Segments { get; set; } = [];
+}
+
+public sealed class PlatformCommunityPostAudioSegmentResponse
+{
+    public int Sequence { get; set; }
+    public int CharacterCount { get; set; }
+    public string ContentType { get; set; } = string.Empty;
+    public long FileSizeBytes { get; set; }
+    public string DownloadPath { get; set; } = string.Empty;
+}
+
 public sealed class PlatformCommunityPostUpdateRequest
 {
     public string Category { get; set; } = "자유";

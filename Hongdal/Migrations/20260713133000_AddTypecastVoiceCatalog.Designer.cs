@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using 홍달.Data;
 
@@ -11,9 +12,11 @@ using 홍달.Data;
 namespace Hongdal.Migrations
 {
     [DbContext(typeof(HongdalContext))]
-    partial class HongdalContextModelSnapshot : ModelSnapshot
+    [Migration("20260713133000_AddTypecastVoiceCatalog")]
+    partial class AddTypecastVoiceCatalog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -291,203 +294,6 @@ namespace Hongdal.Migrations
                     b.HasIndex("AttachmentId", "IsDeleted", "IsOperatorHidden", "CreatedAtUtc");
 
                     b.ToTable("platform_community_post_attachment_comments", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudio", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("int")
-                        .HasColumnName("attempt_count");
-
-                    b.Property<string>("AudioFormat")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("audio_format");
-
-                    b.Property<DateTime?>("CompletedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("completed_at_utc");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("LanguageCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("language_code");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)")
-                        .HasColumnName("last_error");
-
-                    b.Property<string>("ModelVersion")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("model_version");
-
-                    b.Property<DateTime?>("NextAttemptAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("next_attempt_at_utc");
-
-                    b.Property<long>("PostId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("post_id");
-
-                    b.Property<string>("ProcessingToken")
-                        .IsConcurrencyToken()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("processing_token");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("provider");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("VoiceId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("voice_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId")
-                        .IsUnique();
-
-                    b.HasIndex("ProcessingToken");
-
-                    b.HasIndex("Status", "NextAttemptAtUtc", "UpdatedAtUtc");
-
-                    b.ToTable("platform_community_post_audio", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudioAccessLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AccessType")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("access_type");
-
-                    b.Property<DateTime>("AccessedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("accessed_at_utc");
-
-                    b.Property<long>("AudioId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("audio_id");
-
-                    b.Property<long>("PostId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("post_id");
-
-                    b.Property<string>("RequesterUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("requester_user_id");
-
-                    b.Property<int?>("SegmentSequence")
-                        .HasColumnType("int")
-                        .HasColumnName("segment_sequence");
-
-                    b.Property<string>("TraceId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("trace_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AudioId");
-
-                    b.HasIndex("PostId", "AccessedAtUtc");
-
-                    b.HasIndex("RequesterUserId", "AccessedAtUtc");
-
-                    b.ToTable("platform_community_post_audio_access_logs", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudioSegment", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("AudioId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("audio_id");
-
-                    b.Property<string>("BucketName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("bucket_name");
-
-                    b.Property<int>("CharacterCount")
-                        .HasColumnType("int")
-                        .HasColumnName("character_count");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("content_type");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<long>("FileSizeBytes")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_size_bytes");
-
-                    b.Property<string>("ObjectName")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("object_name");
-
-                    b.Property<int>("Sequence")
-                        .HasColumnType("int")
-                        .HasColumnName("sequence");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AudioId", "Sequence")
-                        .IsUnique();
-
-                    b.ToTable("platform_community_post_audio_segments", (string)null);
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostComment", b =>
@@ -7480,39 +7286,6 @@ namespace Hongdal.Migrations
                     b.Navigation("Attachment");
                 });
 
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudio", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Community.PlatformCommunityPost", "Post")
-                        .WithOne("Audio")
-                        .HasForeignKey("Hongdal.Domain.Community.PlatformCommunityPostAudio", "PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudioAccessLog", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Community.PlatformCommunityPostAudio", "Audio")
-                        .WithMany("AccessLogs")
-                        .HasForeignKey("AudioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Audio");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudioSegment", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Community.PlatformCommunityPostAudio", "Audio")
-                        .WithMany("Segments")
-                        .HasForeignKey("AudioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Audio");
-                });
-
             modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostComment", b =>
                 {
                     b.HasOne("Hongdal.Domain.Community.PlatformCommunityPost", "Post")
@@ -7761,8 +7534,6 @@ namespace Hongdal.Migrations
                 {
                     b.Navigation("Attachments");
 
-                    b.Navigation("Audio");
-
                     b.Navigation("Comments");
 
                     b.Navigation("Recommendations");
@@ -7771,13 +7542,6 @@ namespace Hongdal.Migrations
             modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAttachment", b =>
                 {
                     b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAudio", b =>
-                {
-                    b.Navigation("AccessLogs");
-
-                    b.Navigation("Segments");
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Community.커뮤니티원장블록투영", b =>

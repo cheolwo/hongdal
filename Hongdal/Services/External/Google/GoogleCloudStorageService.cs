@@ -12,6 +12,11 @@ namespace 홍달.Services.External.Google
             string? contentType,
             string? folder,
             CancellationToken cancellationToken = default);
+
+        Task<byte[]> DownloadAsync(
+            string bucketName,
+            string objectName,
+            CancellationToken cancellationToken = default);
     }
 
     public sealed class GoogleCloudStorageService : IGoogleCloudStorageService
@@ -56,6 +61,23 @@ namespace 홍달.Services.External.Google
 
             var publicUrl = $"{_options.PublicBaseUrl.TrimEnd('/')}/{_options.BucketName}/{objectName}";
             return new GoogleCloudStorageUploadResult(_options.BucketName, objectName, publicUrl);
+        }
+
+        public async Task<byte[]> DownloadAsync(
+            string bucketName,
+            string objectName,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(objectName);
+
+            await using var stream = new MemoryStream();
+            await _storageClient.DownloadObjectAsync(
+                bucketName,
+                objectName,
+                stream,
+                cancellationToken: cancellationToken);
+            return stream.ToArray();
         }
 
         private static StorageClient CreateStorageClient(GoogleCloudStorageOptions options)

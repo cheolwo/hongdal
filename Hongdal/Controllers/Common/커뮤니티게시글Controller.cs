@@ -3,6 +3,7 @@ using Hongdal.Contracts.Common.Community;
 using Hongdal.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Hongdal.Controllers.Common;
 
@@ -14,10 +15,14 @@ namespace Hongdal.Controllers.Common;
 public sealed class 커뮤니티게시글Controller : ControllerBase
 {
     private readonly I커뮤니티게시글UseCase _useCase;
+    private readonly I커뮤니티게시글음성조회Service _audioService;
 
-    public 커뮤니티게시글Controller(I커뮤니티게시글UseCase useCase)
+    public 커뮤니티게시글Controller(
+        I커뮤니티게시글UseCase useCase,
+        I커뮤니티게시글음성조회Service audioService)
     {
         _useCase = useCase;
+        _audioService = audioService;
     }
 
     [HttpGet]
@@ -51,6 +56,36 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     {
         var result = await _useCase.상세Async(id, cancellationToken);
         return this.ToActionResult(result);
+    }
+
+    [HttpGet("{id:long}/audio")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAudio(long id, CancellationToken cancellationToken)
+    {
+        var audio = await _audioService.조회Async(
+            id,
+            CurrentUserId(),
+            HttpContext.TraceIdentifier,
+            cancellationToken);
+        return audio is null ? NotFound() : Ok(audio);
+    }
+
+    [HttpGet("{id:long}/audio/segments/{sequence:int}/download")]
+    [AllowAnonymous]
+    public async Task<IActionResult> DownloadAudio(
+        long id,
+        int sequence,
+        CancellationToken cancellationToken)
+    {
+        var audio = await _audioService.다운로드Async(
+            id,
+            sequence,
+            CurrentUserId(),
+            HttpContext.TraceIdentifier,
+            cancellationToken);
+        return audio is null
+            ? NotFound()
+            : File(audio.Content, audio.ContentType, audio.FileName, enableRangeProcessing: true);
     }
 
     [HttpPost("{id:long}/attachments")]
@@ -223,6 +258,10 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
         var result = await _useCase.삭제Async(id, request, cancellationToken);
         return this.ToNoContentActionResult(result);
     }
+
+    private string? CurrentUserId()
+        => User.FindFirstValue(ClaimTypes.NameIdentifier)
+           ?? User.FindFirstValue("sub");
 }
 
 public sealed class PlatformCommunityPostAttachmentUploadRequest

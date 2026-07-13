@@ -26,4 +26,5 @@ public sealed class PlatformCommunityPost
     public ICollection<PlatformCommunityPostAttachment> Attachments { get; set; } = new List<PlatformCommunityPostAttachment>();
     public ICollection<PlatformCommunityPostComment> Comments { get; set; } = new List<PlatformCommunityPostComment>();
     public ICollection<PlatformCommunityPostRecommendation> Recommendations { get; set; } = new List<PlatformCommunityPostRecommendation>();
+    public PlatformCommunityPostAudio? Audio { get; set; }
 }

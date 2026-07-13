@@ -1,7 +1,9 @@
 using FluentResults;
 using Hongdal.ApiMetadata;
+using Hongdal.Application.Community;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Domain.Community;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -123,15 +125,24 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
     private readonly HongdalContext _db;
     private readonly IGoogleCloudStorageService _storageService;
     private readonly CommunityPostStorageOptions _storageOptions;
+    private readonly I커뮤니티게시글음성작업예약Service _음성작업예약Service;
+    private readonly IPublisher _publisher;
+    private readonly ILogger<커뮤니티게시글UseCase> _logger;
 
     public 커뮤니티게시글UseCase(
         HongdalContext db,
         IGoogleCloudStorageService storageService,
-        IOptions<CommunityPostStorageOptions> storageOptions)
+        IOptions<CommunityPostStorageOptions> storageOptions,
+        I커뮤니티게시글음성작업예약Service 음성작업예약Service,
+        IPublisher publisher,
+        ILogger<커뮤니티게시글UseCase> logger)
     {
         _db = db;
         _storageService = storageService;
         _storageOptions = storageOptions.Value;
+        _음성작업예약Service = 음성작업예약Service;
+        _publisher = publisher;
+        _logger = logger;
     }
 
     public async Task<Result<PlatformCommunityPostListResponse>> 목록Async(
@@ -227,7 +238,20 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         };
 
         _db.PlatformCommunityPosts.Add(entity);
+        _음성작업예약Service.예약(entity, now);
         await _db.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _publisher.Publish(new 커뮤니티게시글등록됨Event(entity.Id), cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "게시글 등록 이벤트 발행에 실패했습니다. 음성 작업은 DB 대기열에서 복구됩니다. PostId={PostId}",
+                entity.Id);
+        }
 
         return Result.Ok(ToResponse(entity));
     }
