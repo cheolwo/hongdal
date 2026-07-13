@@ -17,6 +17,12 @@
     <MudStack Spacing="1" Class="px-2 pb-3">
         <MudText Typo="Typo.caption" Color="Color.Secondary">현재 역할</MudText>
         <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            <MudButton Variant="@RoleVariant(HongdalClientRole.Unspecified)"
+                       Color="Color.Secondary"
+                       Size="Size.Small"
+                       OnClick="@(() => SetRole(HongdalClientRole.Unspecified))">
+                공통 홈
+            </MudButton>
             <MudButton Variant="@RoleVariant(HongdalClientRole.Shipper)"
                        Color="Color.Primary"
                        Size="Size.Small"
@@ -132,9 +138,14 @@
 
     private IReadOnlyList<NavGroupItem> BuildGroups()
     {
-        var visibleItems = RoleService.IsWarehouseManager
-            ? BuildWarehouseManagerItems().ToList()
-            : ViewVisibilityService.VisibleItems
+        var visibleItems = RoleService.CurrentRole switch
+        {
+            HongdalClientRole.Unspecified =>
+            [
+                new NavMenuItem("홈", ShipperRoutes.Home, "home", "primary", 0)
+            ],
+            HongdalClientRole.WarehouseManager => BuildWarehouseManagerItems().ToList(),
+            _ => ViewVisibilityService.VisibleItems
                 .Where(x => ShouldShowForProfile(x.Route))
                 .Select(x => new NavMenuItem(
                     L.ViewName(x.Route, x.DisplayName),
@@ -142,7 +153,8 @@
                     x.IconKey,
                     ResolveGroupKey(x.Route),
                     x.SortOrder))
-                .ToList();
+                .ToList()
+        };
 
         if (RoleService.IsShipper)
         {
@@ -204,9 +216,12 @@
         return normalizedRoute is not ShipperRoutes.SalesChannels and not ShipperRoutes.ProductListings and not ShipperRoutes.OrderFulfillment;
     }
 
-    private string ProfileLabel => RoleService.IsWarehouseManager
-        ? RoleService.RoleDescription
-        : $"{RoleService.RoleLabel} · {(ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영")}";
+    private string ProfileLabel => RoleService.CurrentRole switch
+    {
+        HongdalClientRole.WarehouseManager => RoleService.RoleDescription,
+        HongdalClientRole.Shipper => $"{RoleService.RoleLabel} · {(ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영")}",
+        _ => RoleService.RoleDescription
+    };
 
     public void Dispose()
     {

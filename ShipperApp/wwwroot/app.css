@@ -342,6 +342,10 @@ h1:focus {
     background: #2563eb;
 }
 
+.hongdal-role-option-icon--common {
+    background: #7c3aed;
+}
+
 .hongdal-role-option-icon--warehouse {
     background: #059669;
 }

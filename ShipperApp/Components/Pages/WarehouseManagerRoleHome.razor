@@ -22,7 +22,7 @@
             <MudStack Spacing="1">
                 <MudText Typo="Typo.h4">창고 운영</MudText>
                 <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    입고·출고·판매·배송 중 지금 처리할 흐름 하나를 선택하세요.
+                    입고·출고·판매·운송 중 지금 처리할 흐름 하나를 선택하세요.
                 </MudText>
             </MudStack>
 
@@ -65,14 +65,14 @@
         new("입고", "입고 확인과 적재 흐름을 시작합니다.", ShipperRoutes.WarehouseInboundWorkStart, Icons.Material.Filled.MoveToInbox, Color.Warning),
         new("출고", "피킹과 출고 흐름을 시작합니다.", ShipperRoutes.WarehouseOutboundWorkStart, Icons.Material.Filled.Outbox, Color.Primary),
         new("판매", "판매 주문의 창고 처리 흐름을 시작합니다.", ShipperRoutes.MarketFulfillmentWorkStart, Icons.Material.Filled.Storefront, Color.Info),
-        new("배송", "배송대행과 운송 연결 흐름을 시작합니다.", ShipperRoutes.DeliveryAgencyWorkStart, Icons.Material.Filled.LocalShipping, Color.Success)
+        new("운송", "배송대행과 운송 연결 흐름을 시작합니다.", ShipperRoutes.DeliveryAgencyWorkStart, Icons.Material.Filled.LocalShipping, Color.Success)
     ];
 
     private static readonly IReadOnlyList<HongdalCardinalNavigationOption> CardinalNavigationOptions =
     [
         new("li", "리", "☲", "남", "판매", HongdalCardinalNavigationActionKinds.Route, ShipperRoutes.MarketFulfillmentWorkStart),
         new("dui", "태", "☱", "서", "출고", HongdalCardinalNavigationActionKinds.Route, ShipperRoutes.WarehouseOutboundWorkStart),
-        new("kan", "감", "☵", "북", "배송", HongdalCardinalNavigationActionKinds.Route, ShipperRoutes.DeliveryAgencyWorkStart),
+        new("kan", "감", "☵", "북", "운송", HongdalCardinalNavigationActionKinds.Route, ShipperRoutes.DeliveryAgencyWorkStart),
         new("zhen", "진", "☳", "동", "입고", HongdalCardinalNavigationActionKinds.Route, ShipperRoutes.WarehouseInboundWorkStart)
     ];
 
@@ -81,7 +81,7 @@
         new("입고", "입고 예정 확인과 상품 검수를 진행합니다.", ShipperRoutes.WarehouseInboundWorkStart, Icons.Material.Filled.MoveToInbox, Color.Warning),
         new("출고", "주문에 맞춰 피킹하고 출고를 확정합니다.", ShipperRoutes.WarehouseOutboundWorkStart, Icons.Material.Filled.Outbox, Color.Primary),
         new("판매", "판매 주문과 마켓 풀필먼트 작업을 연결합니다.", ShipperRoutes.MarketFulfillmentWorkStart, Icons.Material.Filled.Storefront, Color.Info),
-        new("배송", "배송대행 접수와 후속 운송을 연결합니다.", ShipperRoutes.DeliveryAgencyWorkStart, Icons.Material.Filled.LocalShipping, Color.Success)
+        new("운송", "배송대행 접수와 후속 운송을 연결합니다.", ShipperRoutes.DeliveryAgencyWorkStart, Icons.Material.Filled.LocalShipping, Color.Success)
     ];
 
     private void NavigateTo(string route) => Navigation.NavigateTo(route);

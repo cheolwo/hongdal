@@ -150,15 +150,20 @@
 
 .hongdal-bagua-dot {
     appearance: none;
+    display: grid;
     position: absolute;
     z-index: 5;
     top: var(--dot-y);
     left: var(--dot-x);
-    width: 34px;
-    height: 34px;
+    width: 46px;
+    height: 46px;
     padding: 0;
-    border: 5px solid var(--platform-home-surface);
+    border: 4px solid var(--platform-home-surface);
     border-radius: 999px;
+    gap: 1px;
+    grid-template-rows: 22px 10px;
+    place-content: center;
+    place-items: center;
     background: var(--hongdal-bagua-accent, var(--platform-home-accent));
     box-shadow: 0 5px 14px rgba(var(--platform-home-accent-rgb), 0.36), 0 0 0 2px rgba(var(--platform-home-accent-rgb), 0.2);
     cursor: grab;
@@ -168,14 +173,21 @@
 
 .hongdal-bagua-dot > span {
     display: grid;
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     margin: auto;
     border-radius: 999px;
     place-items: center;
     background: white;
     color: var(--hongdal-bagua-accent, var(--platform-home-accent));
-    font-size: 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.hongdal-bagua-dot > small {
+    color: white;
+    font-size: 0.52rem;
     font-weight: 900;
     line-height: 1;
 }
@@ -183,6 +195,104 @@
 .hongdal-bagua-dot--dragging {
     cursor: grabbing;
     transform: translate(-50%, -50%) scale(1.12);
+}
+
+.hongdal-bagua-taegeuk-center {
+    --taegeuk-yang: #cd2e3a;
+    --taegeuk-yin: #0047a0;
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    left: 50%;
+    width: clamp(118px, 42%, 136px);
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 5px solid var(--platform-home-surface);
+    border-radius: 50%;
+    background: var(--taegeuk-yin);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24), 0 0 0 2px rgba(var(--platform-home-accent-rgb), 0.2);
+    transform: translate(-50%, -50%);
+}
+
+.hongdal-bagua-taegeuk-art {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.hongdal-bagua-taegeuk-region {
+    cursor: pointer;
+    outline: none;
+    transition: filter 140ms ease;
+}
+
+.hongdal-bagua-taegeuk-region:hover,
+.hongdal-bagua-taegeuk-region:focus-visible {
+    filter: brightness(1.12) drop-shadow(0 0 3px rgba(255, 255, 255, 0.88));
+}
+
+.hongdal-bagua-taegeuk-yang-shape {
+    fill: var(--taegeuk-yang);
+}
+
+.hongdal-bagua-taegeuk-yin-shape {
+    fill: var(--taegeuk-yin);
+}
+
+.hongdal-bagua-taegeuk-label {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.46);
+    color: white;
+    font-size: 0.57rem;
+    font-weight: 900;
+    line-height: 1.2;
+    pointer-events: none;
+    white-space: nowrap;
+    transform: translateX(-50%);
+}
+
+.hongdal-bagua-taegeuk-label--yang {
+    top: 9px;
+}
+
+.hongdal-bagua-taegeuk-label--yin {
+    bottom: 9px;
+}
+
+.hongdal-bagua-taegeuk-mark {
+    display: flex;
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: auto;
+    padding: 3px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.62);
+    border-radius: 999px;
+    gap: 2px;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.42);
+    color: white;
+    line-height: 1;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.hongdal-bagua-taegeuk-mark > b {
+    font-size: 0.62rem;
+}
+
+.hongdal-bagua-taegeuk-mark > small {
+    font-size: 0.44rem;
+    font-weight: 900;
 }
 
 .hongdal-bagua footer {

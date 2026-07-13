@@ -1,4 +1,5 @@
 @page "/community/decorations/{ProductKey}/checkout"
+@using Hongdal.Ui.Common.Areas.App.Components.Community
 @using Hongdal.Ui.Common.Areas.App.Services
 @inject PlatformCommunityDecorationStateService DecorationState
 @inject NavigationManager Navigation
@@ -20,14 +21,38 @@ else if (paymentCompleted)
         </span>
         <small>FAKEPG PAYMENT APPROVED</small>
         <h1>꾸미기를 구매했습니다.</h1>
-        <p>@(product.Title)을(를) 내 보유함에 추가하고 첫 번째 꾸미기를 적용했습니다.</p>
+        <p>@product.Title 상품을 내 보유함에 추가했습니다. 적용 여부는 사용자가 직접 선택합니다.</p>
+        @if (product.HomeTheme is { } completedTheme)
+        {
+            <div class="decoration-checkout__complete-preview">
+                <HongdalHomeNavigatorThemePreview Theme="@completedTheme" Title="@product.Title" Compact="true" />
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(applyMessage))
+        {
+            <MudAlert Severity="Severity.Success" Dense="true">@applyMessage</MudAlert>
+        }
         <dl>
             <div><dt>주문 번호</dt><dd>@orderId</dd></div>
             <div><dt>결제 수단</dt><dd>@paymentMethod</dd></div>
             <div><dt>승인 금액</dt><dd>@FormatPrice(product)</dd></div>
             <div><dt>결제 환경</dt><dd>Development · FakePG</dd></div>
         </dl>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="OpenDetail">상품에서 적용 항목 고르기</MudButton>
+        @if (product.IsHomeTheme)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       StartIcon="@Icons.Material.Filled.AutoAwesome"
+                       Disabled="@DecorationState.IsProductActive(product)"
+                       OnClick="ApplyPurchasedAsync">
+                @(DecorationState.IsProductActive(product) ? "현재 홈에 적용 중" : "구매한 전체 테마 적용")
+            </MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="OpenDetail">상품에서 적용 항목 고르기</MudButton>
+        }
         <MudButton Variant="Variant.Text" Color="Color.Default" FullWidth="true" OnClick="BackToStore">상점 계속 둘러보기</MudButton>
     </main>
 }
@@ -75,7 +100,15 @@ else
                     </div>
                 </div>
                 <div class="decoration-checkout__notices">
-                    <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 플랫폼 안의 괘상 또는 다이어그램 노드 꾸미기에 사용할 수 있습니다.</p>
+                    @if (product.IsHomeTheme)
+                    {
+                        <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 방편·반야·커뮤니티·상점·간괘·테두리·라벨·손잡이 8개 슬롯이 하나의 패키지로 제공됩니다.</p>
+                        <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 구매 후 명시적으로 적용할 때 전체 슬롯이 한 번에 변경됩니다.</p>
+                    }
+                    else
+                    {
+                        <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 플랫폼 안의 괘상 또는 다이어그램 노드 꾸미기에 사용할 수 있습니다.</p>
+                    }
                     <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 크리에이터 상품은 등록 권리와 규격 검수를 통과한 항목으로 가정합니다.</p>
                     <p><MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" /> 현재 FakePG에서는 실제 카드 승인과 창작자 정산을 수행하지 않습니다.</p>
                 </div>
@@ -87,21 +120,35 @@ else
 
             <aside class="decoration-checkout__summary">
                 <span>주문 상품</span>
-                <div class="decoration-checkout__product">
-                    @if (product.Assets.FirstOrDefault()?.NodeSticker is { } sticker)
-                    {
-                        <img src="@sticker.이미지Url" alt="@sticker.대체Text" />
-                    }
-                    else
-                    {
-                        <span style="@($"background: {product.Assets.FirstOrDefault()?.AccentColor ?? "#2563eb"};")">@product.Assets.FirstOrDefault()?.PreviewSymbol</span>
-                    }
-                    <div>
-                        <strong>@product.Title</strong>
-                        <small>@product.CreatorName</small>
-                        <small>@($"꾸미기 {product.Assets.Count}개 포함")</small>
+                @if (product.HomeTheme is { } theme)
+                {
+                    <div class="decoration-checkout__theme-product">
+                        <HongdalHomeNavigatorThemePreview Theme="@theme" Title="@product.Title" Compact="true" />
+                        <div>
+                            <strong>@product.Title</strong>
+                            <small>@product.CreatorName</small>
+                            <small>@($"전체 테마 {theme.Slots.Count}개 슬롯 · v{theme.Version}")</small>
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="decoration-checkout__product">
+                        @if (product.Assets.FirstOrDefault()?.NodeSticker is { } sticker)
+                        {
+                            <img src="@sticker.이미지Url" alt="@sticker.대체Text" />
+                        }
+                        else
+                        {
+                            <span style="@($"background: {product.Assets.FirstOrDefault()?.AccentColor ?? "#2563eb"};")">@product.Assets.FirstOrDefault()?.PreviewSymbol</span>
+                        }
+                        <div>
+                            <strong>@product.Title</strong>
+                            <small>@product.CreatorName</small>
+                            <small>@($"꾸미기 {product.Assets.Count}개 포함")</small>
+                        </div>
+                    </div>
+                }
                 <dl>
                     <div><dt>상품 금액</dt><dd>@FormatPrice(product)</dd></div>
                     <div><dt>수수료</dt><dd>₩0</dd></div>
@@ -122,7 +169,7 @@ else
                         <span>@($"{FormatPrice(product)} 페이크 결제")</span>
                     }
                 </button>
-                <small>승인 시 개발용 구매·보유권 상태만 저장됩니다.</small>
+                <small>승인 시 개발용 구매·보유권 상태만 저장되며 자동 적용하지 않습니다.</small>
             </aside>
         </div>
     </main>
@@ -144,6 +191,7 @@ else
     private bool isProcessing;
     private bool paymentCompleted;
     private string orderId = string.Empty;
+    private string? applyMessage;
 
     protected override void OnParametersSet()
     {
@@ -166,14 +214,19 @@ else
         isProcessing = true;
         await Task.Delay(450);
         DecorationState.Purchase(product);
-        if (product.Assets.FirstOrDefault() is { } firstAsset)
-        {
-            DecorationState.Apply(firstAsset);
-        }
-
         orderId = $"FAKE-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}"[..34];
         paymentCompleted = true;
         isProcessing = false;
+    }
+
+    private Task ApplyPurchasedAsync()
+    {
+        if (product is not null && DecorationState.ApplyProduct(product))
+        {
+            applyMessage = $"{product.Title}의 전체 영역을 홈에 적용했습니다.";
+        }
+
+        return Task.CompletedTask;
     }
 
     private void BackToStore()

@@ -32,15 +32,67 @@
                 <small>@item.DestinationLabel</small>
             </button>
         }
-        <button type="button"
-                class="@BuildDotClass()"
-                style="@BuildDotStyle()"
-                aria-label="이동점. 동서남북 네 괘 방향으로 끌어 놓으세요."
-                @onpointerdown="BeginDrag"
-                @onpointerdown:preventDefault="true"
-                @onpointerdown:stopPropagation="true">
-            <span>@ResolveCenterSymbol()</span>
-        </button>
+        @if (ShowTaegeukCenter)
+        {
+            <div class="hongdal-bagua-taegeuk-center"
+                 role="group"
+                 aria-label="@($"{CenterTrigramName}괘 태극 중심 이동")">
+                <svg class="hongdal-bagua-taegeuk-art"
+                     viewBox="-50 -50 100 100"
+                     focusable="false"
+                     aria-hidden="true">
+                    <g transform="rotate(-56.3099325)">
+                        <path d="M 50 0 a 25 25 0 1 1 -50 0 a 25 25 0 1 0 -50 0 a 50 50 0 1 1 100 0 Z"
+                              class="hongdal-bagua-taegeuk-region hongdal-bagua-taegeuk-yang-shape"
+                              role="button"
+                              tabindex="0"
+                              aria-label="@($"빨간 양효 영역, {TaegeukYangDestinationLabel}로 이동")"
+                              @onclick="SelectTaegeukYangAsync"
+                              @onkeydown="HandleTaegeukYangKeyDownAsync">
+                            <title>@($"빨간 양효 · {TaegeukYangDestinationLabel}")</title>
+                        </path>
+                        <path d="M -50 0 a 25 25 0 1 1 50 0 a 25 25 0 1 0 50 0 a 50 50 0 1 1 -100 0 Z"
+                              class="hongdal-bagua-taegeuk-region hongdal-bagua-taegeuk-yin-shape"
+                              role="button"
+                              tabindex="0"
+                              aria-label="@($"파란 음효 영역, {TaegeukYinDestinationLabel}으로 이동")"
+                              @onclick="SelectTaegeukYinAsync"
+                              @onkeydown="HandleTaegeukYinKeyDownAsync">
+                            <title>@($"파란 음효 · {TaegeukYinDestinationLabel}")</title>
+                        </path>
+                    </g>
+                </svg>
+                <span class="hongdal-bagua-taegeuk-label hongdal-bagua-taegeuk-label--yang" aria-hidden="true">
+                    @TaegeukYangDestinationLabel
+                </span>
+                <span class="hongdal-bagua-taegeuk-label hongdal-bagua-taegeuk-label--yin" aria-hidden="true">
+                    @TaegeukYinDestinationLabel
+                </span>
+                <span class="hongdal-bagua-taegeuk-mark" aria-hidden="true">
+                    <b>@ResolveCenterSymbol()</b>
+                    <small>@CenterTrigramName</small>
+                </span>
+            </div>
+        }
+        else
+        {
+            <button type="button"
+                    class="@BuildDotClass()"
+                    style="@BuildDotStyle()"
+                    title="@BuildCenterTitle()"
+                    aria-label="@BuildCenterAriaLabel()"
+                    @onpointerdown="BeginDrag"
+                    @onpointerdown:preventDefault="true"
+                    @onpointerdown:stopPropagation="true"
+                    @onkeydown="HandleCenterKeyDownAsync"
+                    @onkeydown:preventDefault="true">
+                <span>@ResolveCenterSymbol()</span>
+                @if (CenterSelected.HasDelegate)
+                {
+                    <small>@CenterTrigramName</small>
+                }
+            </button>
+        }
     </div>
 
     <footer>
@@ -60,10 +112,34 @@
     public EventCallback<HongdalCardinalNavigationOption> DestinationSelected { get; set; }
 
     [Parameter]
+    public EventCallback CenterSelected { get; set; }
+
+    [Parameter]
+    public bool ShowTaegeukCenter { get; set; } = true;
+
+    [Parameter]
+    public string TaegeukYangDestinationLabel { get; set; } = "커뮤니티";
+
+    [Parameter]
+    public string TaegeukYinDestinationLabel { get; set; } = "상점";
+
+    [Parameter]
+    public EventCallback TaegeukYangSelected { get; set; }
+
+    [Parameter]
+    public EventCallback TaegeukYinSelected { get; set; }
+
+    [Parameter]
     public string AccentColor { get; set; } = "#2563eb";
 
     [Parameter]
-    public string CenterSymbol { get; set; } = "☵";
+    public string CenterSymbol { get; set; } = "☶";
+
+    [Parameter]
+    public string CenterTrigramName { get; set; } = "간";
+
+    [Parameter]
+    public string CenterDestinationLabel { get; set; } = "커뮤니티";
 
     [Parameter]
     public bool ShowTrigramSymbols { get; set; } = true;
@@ -86,7 +162,11 @@
 
     private string CurrentGuide => ActiveItem is { } item
         ? $"{item.TrigramName}괘 · {item.DestinationLabel}"
-        : "가운데 점에서 시작";
+        : ShowTaegeukCenter
+            ? $"{CenterTrigramName}괘 · {TaegeukYangDestinationLabel}와 {TaegeukYinDestinationLabel}"
+            : CenterSelected.HasDelegate
+            ? $"{CenterTrigramName}괘 · {CenterDestinationLabel}"
+            : "가운데 점에서 시작";
 
     private void BeginDrag(PointerEventArgs args)
     {
@@ -128,8 +208,42 @@
         if (ActiveItem is { } item)
         {
             await DestinationSelected.InvokeAsync(item);
+            return;
+        }
+
+        if (CenterSelected.HasDelegate)
+        {
+            await CenterSelected.InvokeAsync();
         }
     }
+
+    private async Task HandleCenterKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (CenterSelected.HasDelegate && args.Key is "Enter" or " ")
+        {
+            await CenterSelected.InvokeAsync();
+        }
+    }
+
+    private Task SelectTaegeukYangAsync()
+        => TaegeukYangSelected.HasDelegate
+            ? TaegeukYangSelected.InvokeAsync()
+            : Task.CompletedTask;
+
+    private Task SelectTaegeukYinAsync()
+        => TaegeukYinSelected.HasDelegate
+            ? TaegeukYinSelected.InvokeAsync()
+            : Task.CompletedTask;
+
+    private Task HandleTaegeukYangKeyDownAsync(KeyboardEventArgs args)
+        => args.Key is "Enter" or " "
+            ? SelectTaegeukYangAsync()
+            : Task.CompletedTask;
+
+    private Task HandleTaegeukYinKeyDownAsync(KeyboardEventArgs args)
+        => args.Key is "Enter" or " "
+            ? SelectTaegeukYinAsync()
+            : Task.CompletedTask;
 
     private void HandlePointerLeave()
     {
@@ -197,4 +311,14 @@
         => string.IsNullOrWhiteSpace(CenterSymbol)
             ? "•"
             : System.Globalization.StringInfo.GetNextTextElement(CenterSymbol.Trim());
+
+    private string BuildCenterTitle()
+        => CenterSelected.HasDelegate
+            ? $"{CenterTrigramName}괘 · 산 · {CenterDestinationLabel}"
+            : "동서남북 네 괘 방향으로 끌기";
+
+    private string BuildCenterAriaLabel()
+        => CenterSelected.HasDelegate
+            ? $"{CenterTrigramName}괘, 산, {CenterDestinationLabel}로 이동. 누르거나 동서남북 네 괘 방향으로 끌 수 있습니다."
+            : "이동점. 동서남북 네 괘 방향으로 끌어 놓으세요.";
 }

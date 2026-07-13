@@ -29,10 +29,12 @@
 | [ShipperApp-P07-1 - HS 코드/통관 검토](ShipperApp-P07-1/) | /shipper/customs/hs-reviews | 확장 | HS 코드/통관 검토 | 완료 |
 | [ShipperApp-P08 - 재위탁/재운송 주문](ShipperApp-P08/) | /shipper/reconsignment/orders | 확장 | 재위탁/재운송 주문 | 완료 |
 | [ShipperApp-P09 - 운송 업무 워크스페이스](ShipperApp-P09/) | /shipper/transport | 필수 | 의뢰별 결제·배차·운송 상태 처리 | 캡처 대기 |
-| [ShipperApp-P10 - 꾸미기 상점](ShipperApp-P10/) | /community/decorations | 확장 | 플랫폼·크리에이터·보유 상품 탐색 | 완료 |
-| [ShipperApp-P10-1 - 꾸미기 상품 상세](ShipperApp-P10-1/) | /community/decorations/{ProductKey} | 확장 | 상품 확인, 구매·적용 판단 | 완료 |
+| [ShipperApp-P10 - 꾸미기 상점](ShipperApp-P10/) | /community/decorations | 확장 | 홈 테마·노드·괘상 상품 탐색 | 완료 |
+| [ShipperApp-P10-1 - 꾸미기 상품 상세](ShipperApp-P10-1/) | /community/decorations/{ProductKey} | 확장 | 전체 테마 미리보기, 구매·적용 판단 | 완료 |
 | [ShipperApp-P10-2 - 꾸미기 FakePG 결제](ShipperApp-P10-2/) | /community/decorations/{ProductKey}/checkout | 개발·확장 | 개발용 구매 승인 흐름 | 완료 |
+| [ShipperApp-P10-2-1 - 홈 테마 구매 완료와 적용 선택](ShipperApp-P10-2-1/) | /community/decorations/{ProductKey}/checkout | 개발·확장 | 구매 완료 확인과 명시적 전체 적용 | 완료 |
 | [ShipperApp-P10-3 - 내 꾸미기 만들기](ShipperApp-P10-3/) | /community/decorations/create | 확장 | 개인 괘상·노드 이미지 제작 | 캡처 대기 |
+| [ShipperApp-P10-4 - 디자이너 홈 테마 패키지 등록](ShipperApp-P10-4/) | /community/decorations/themes/submit | 확장·제작 | 8개 슬롯 패키지 제작과 미리보기 | 완료 |
 | [ShipperApp-P90 - 템플릿/샘플성 날씨 화면](ShipperApp-P90/) | /weather | 시스템 | 템플릿/샘플성 날씨 화면 | 완료 |
 | [ShipperApp-P91 - 템플릿/샘플성 카운터 화면](ShipperApp-P91/) | /counter | 시스템 | 템플릿/샘플성 카운터 화면 | 완료 |
 | [ShipperApp-P99 - 미발견 페이지](ShipperApp-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

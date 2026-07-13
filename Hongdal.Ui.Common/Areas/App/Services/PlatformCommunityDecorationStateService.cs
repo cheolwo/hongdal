@@ -5,8 +5,49 @@ namespace Hongdal.Ui.Common.Areas.App.Services;
 
 public enum CommunityDecorationTarget
 {
+    HomeNavigatorTheme,
     Bagua,
     DiagramNode
+}
+
+public sealed record HomeNavigatorThemeSlot(
+    string Key,
+    string Title,
+    string Color,
+    string? ImageUrl = null,
+    string? AltText = null)
+{
+    public bool HasImage => !string.IsNullOrWhiteSpace(ImageUrl);
+}
+
+public sealed record HomeNavigatorThemeManifest(
+    string Version,
+    string RendererProfile,
+    string ReviewStatus,
+    string LicenseLabel,
+    string PreviewBackground,
+    HomeNavigatorThemeSlot OuterUpaya,
+    HomeNavigatorThemeSlot OuterPrajna,
+    HomeNavigatorThemeSlot InnerCommunity,
+    HomeNavigatorThemeSlot InnerStore,
+    HomeNavigatorThemeSlot CenterGen,
+    HomeNavigatorThemeSlot Frame,
+    HomeNavigatorThemeSlot Labels,
+    HomeNavigatorThemeSlot ClosedHandle)
+{
+    public IReadOnlyList<HomeNavigatorThemeSlot> Slots =>
+    [
+        OuterUpaya,
+        OuterPrajna,
+        InnerCommunity,
+        InnerStore,
+        CenterGen,
+        Frame,
+        Labels,
+        ClosedHandle
+    ];
+
+    public string AccentColor => ClosedHandle.Color;
 }
 
 public sealed record CommunityDecorationAsset(
@@ -30,14 +71,19 @@ public sealed record CommunityDecorationProduct(
     CommunityDecorationTarget Target,
     decimal PriceAmount,
     string CurrencyCode,
-    IReadOnlyList<CommunityDecorationAsset> Assets)
+    IReadOnlyList<CommunityDecorationAsset> Assets,
+    HomeNavigatorThemeManifest? HomeTheme = null,
+    bool IsCustom = false)
 {
     public bool IsFree => PriceAmount <= 0;
+
+    public bool IsHomeTheme => Target == CommunityDecorationTarget.HomeNavigatorTheme && HomeTheme is not null;
 }
 
 public sealed class PlatformCommunityDecorationStateService
 {
     private const string BasicBaguaAssetKey = "bagua-basic-blue";
+    public const string DefaultHomeThemePackKey = "home-theme-hongdal-default-v1";
     private readonly HashSet<string> ownedPackKeys = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<CommunityDecorationAsset> customAssets = [];
     private readonly List<CommunityDecorationProduct> products;
@@ -61,9 +107,13 @@ public sealed class PlatformCommunityDecorationStateService
 
     public bool IsNodeDecorationEnabled { get; private set; } = true;
 
+    public bool IsHomeThemeEnabled { get; private set; } = true;
+
     public string? ActiveBaguaAssetKey { get; private set; } = BasicBaguaAssetKey;
 
     public string? ActiveNodeAssetKey { get; private set; }
+
+    public string ActiveHomeThemePackKey { get; private set; } = DefaultHomeThemePackKey;
 
     public CommunityDecorationAsset? ActiveBaguaAsset
         => FindAsset(ActiveBaguaAssetKey);
@@ -74,11 +124,20 @@ public sealed class PlatformCommunityDecorationStateService
     public 노드스티커이미지Response? ActiveNodeSticker
         => ActiveNodeAsset?.NodeSticker;
 
+    public HomeNavigatorThemeManifest ActiveHomeTheme
+        => products.FirstOrDefault(item => item.IsHomeTheme &&
+               string.Equals(item.PackKey, ActiveHomeThemePackKey, StringComparison.OrdinalIgnoreCase))?.HomeTheme
+           ?? products.First(item => item.IsHomeTheme &&
+               string.Equals(item.PackKey, DefaultHomeThemePackKey, StringComparison.OrdinalIgnoreCase)).HomeTheme!;
+
     public string BaguaSymbol
         => IsBaguaDecorationEnabled ? ActiveBaguaAsset?.PreviewSymbol ?? "☵" : "◎";
 
     public string BaguaAccentColor
         => IsBaguaDecorationEnabled ? ActiveBaguaAsset?.AccentColor ?? "#2563eb" : "#64748b";
+
+    public string HomeThemeAccentColor
+        => IsHomeThemeEnabled ? ActiveHomeTheme.AccentColor : "#64748b";
 
     public bool IsProductOwned(CommunityDecorationProduct product)
         => product.IsFree || ownedPackKeys.Contains(product.PackKey);
@@ -92,9 +151,39 @@ public sealed class PlatformCommunityDecorationStateService
                 string.Equals(ActiveNodeAssetKey, asset.Key, StringComparison.OrdinalIgnoreCase)
         };
 
+    public bool IsProductActive(CommunityDecorationProduct product)
+        => product.IsHomeTheme
+            ? IsHomeThemeEnabled && string.Equals(ActiveHomeThemePackKey, product.PackKey, StringComparison.OrdinalIgnoreCase)
+            : product.Assets.Any(IsAssetActive);
+
     public void Purchase(CommunityDecorationProduct product)
     {
         ownedPackKeys.Add(product.PackKey);
+        Changed?.Invoke();
+    }
+
+    public bool ApplyProduct(CommunityDecorationProduct product)
+    {
+        if (!IsProductOwned(product))
+        {
+            return false;
+        }
+
+        if (product.IsHomeTheme)
+        {
+            ActiveHomeThemePackKey = product.PackKey;
+            IsHomeThemeEnabled = true;
+            Changed?.Invoke();
+            return true;
+        }
+
+        return product.Assets.FirstOrDefault() is { } firstAsset && Apply(firstAsset);
+    }
+
+    public void RestoreDefaultHomeTheme()
+    {
+        ActiveHomeThemePackKey = DefaultHomeThemePackKey;
+        IsHomeThemeEnabled = true;
         Changed?.Invoke();
     }
 
@@ -131,7 +220,11 @@ public sealed class PlatformCommunityDecorationStateService
 
     public void SetTargetEnabled(CommunityDecorationTarget target, bool enabled)
     {
-        if (target == CommunityDecorationTarget.Bagua)
+        if (target == CommunityDecorationTarget.HomeNavigatorTheme)
+        {
+            IsHomeThemeEnabled = enabled;
+        }
+        else if (target == CommunityDecorationTarget.Bagua)
         {
             IsBaguaDecorationEnabled = enabled;
         }
@@ -218,10 +311,74 @@ public sealed class PlatformCommunityDecorationStateService
             target,
             0,
             "KRW",
-            [asset]));
+            [asset],
+            IsCustom: true));
         ownedPackKeys.Add("user-custom");
         Apply(asset);
         message = $"{normalizedTitle}을(를) 내 제작함에 저장하고 적용했습니다.";
+        return true;
+    }
+
+    public bool TryCreateHomeThemePackage(
+        string? title,
+        string? creatorName,
+        string? summary,
+        decimal priceAmount,
+        HomeNavigatorThemeManifest manifest,
+        out CommunityDecorationProduct? product,
+        out string message)
+    {
+        var normalizedTitle = title?.Trim();
+        var normalizedCreator = creatorName?.Trim();
+        var normalizedSummary = summary?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedTitle))
+        {
+            product = null;
+            message = "테마 상품명을 입력해 주세요.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(normalizedCreator))
+        {
+            product = null;
+            message = "디자이너 표시명을 입력해 주세요.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(normalizedSummary))
+        {
+            product = null;
+            message = "테마 설명을 입력해 주세요.";
+            return false;
+        }
+
+        if (priceAmount < 0)
+        {
+            product = null;
+            message = "판매 가격은 0원 이상이어야 합니다.";
+            return false;
+        }
+
+        var keySuffix = Guid.NewGuid().ToString("N");
+        var packKey = $"home-theme-draft-{keySuffix}";
+        var normalizedManifest = NormalizeThemeManifest(manifest with { ReviewStatus = "초안" });
+        product = new(
+            $"store-{packKey}",
+            packKey,
+            normalizedTitle,
+            normalizedCreator,
+            normalizedSummary,
+            CommunityDecorationTarget.HomeNavigatorTheme,
+            priceAmount,
+            "KRW",
+            [],
+            normalizedManifest,
+            IsCustom: true);
+
+        products.Insert(0, product);
+        ownedPackKeys.Add(packKey);
+        ApplyProduct(product);
+        message = $"{normalizedTitle} 패키지를 내 제작함에 초안으로 저장하고 적용했습니다.";
         return true;
     }
 
@@ -241,6 +398,41 @@ public sealed class PlatformCommunityDecorationStateService
     {
         var products = new List<CommunityDecorationProduct>
         {
+            new(
+                "store-home-theme-hongdal-default-v1",
+                DefaultHomeThemePackKey,
+                "홍달 반야·방편 기본",
+                "Hongdal",
+                "방편의 붉은 흐름과 반야의 푸른 물결, 검은 커뮤니티와 나무빛 상점을 담은 기본 홈 테마입니다.",
+                CommunityDecorationTarget.HomeNavigatorTheme,
+                0,
+                "KRW",
+                [],
+                CreateDefaultHomeTheme()),
+            new(
+                "store-home-theme-moonlit-voyage-v1",
+                "home-theme-moonlit-voyage-v1",
+                "달빛 항해",
+                "모래별 공방",
+                "깊은 물 위에 나무배가 떠 있는 인상을 살린 차분한 야간형 홈 테마입니다.",
+                CommunityDecorationTarget.HomeNavigatorTheme,
+                4900,
+                "KRW",
+                [],
+                new(
+                    "1.0.0",
+                    "neutral-taegeuk-v1",
+                    "승인",
+                    "홍달 앱 내 개인 사용",
+                    "#071426",
+                    new("outer-upaya", "바깥 방편", "#7A2E2E", AltText: "짙은 적갈색 방편 영역"),
+                    new("outer-prajna", "바깥 반야", "#103D66", AltText: "깊은 물빛 반야 영역"),
+                    new("inner-community", "커뮤니티", "#090D12", AltText: "밤하늘색 커뮤니티 영역"),
+                    new("inner-store", "상점", "#9A6238", AltText: "나무배색 상점 영역"),
+                    new("center-gen", "가운데 간괘", "#D6B77A", AltText: "달빛 간괘 중심"),
+                    new("frame", "원형 테두리", "#E8D6AD", AltText: "모래빛 테두리"),
+                    new("labels", "라벨", "#FFF6DD", AltText: "달빛 라벨"),
+                    new("closed-handle", "접힌 손잡이", "#C18C45", AltText: "황동색 접힌 손잡이"))),
             new(
                 "store-bagua-basic",
                 "bagua-basic",
@@ -301,6 +493,43 @@ public sealed class PlatformCommunityDecorationStateService
 
         return products;
     }
+
+    public static HomeNavigatorThemeManifest CreateDefaultHomeTheme()
+        => new(
+            "1.0.0",
+            "neutral-taegeuk-v1",
+            "승인",
+            "홍달 앱 내 개인 사용",
+            "#F8FAFC",
+            new("outer-upaya", "바깥 방편", "#CD2E3A", AltText: "붉은 방편 영역"),
+            new("outer-prajna", "바깥 반야", "#0047A0", AltText: "푸른 반야 영역"),
+            new("inner-community", "커뮤니티", "#171717", AltText: "검은 커뮤니티 영역"),
+            new("inner-store", "상점", "#8B5E3C", AltText: "나무빛 상점 영역"),
+            new("center-gen", "가운데 간괘", "#1F2937", AltText: "간괘 중심"),
+            new("frame", "원형 테두리", "#F4EADC", AltText: "상아색 테두리"),
+            new("labels", "라벨", "#FFFFFF", AltText: "흰색 라벨"),
+            new("closed-handle", "접힌 손잡이", "#7C3AED", AltText: "보라색 접힌 손잡이"));
+
+    private static HomeNavigatorThemeManifest NormalizeThemeManifest(HomeNavigatorThemeManifest manifest)
+        => manifest with
+        {
+            PreviewBackground = NormalizeColor(manifest.PreviewBackground),
+            OuterUpaya = NormalizeThemeSlot(manifest.OuterUpaya),
+            OuterPrajna = NormalizeThemeSlot(manifest.OuterPrajna),
+            InnerCommunity = NormalizeThemeSlot(manifest.InnerCommunity),
+            InnerStore = NormalizeThemeSlot(manifest.InnerStore),
+            CenterGen = NormalizeThemeSlot(manifest.CenterGen),
+            Frame = NormalizeThemeSlot(manifest.Frame),
+            Labels = NormalizeThemeSlot(manifest.Labels),
+            ClosedHandle = NormalizeThemeSlot(manifest.ClosedHandle)
+        };
+
+    private static HomeNavigatorThemeSlot NormalizeThemeSlot(HomeNavigatorThemeSlot slot)
+        => slot with
+        {
+            Color = NormalizeColor(slot.Color),
+            ImageUrl = string.IsNullOrWhiteSpace(slot.ImageUrl) ? null : slot.ImageUrl.Trim()
+        };
 
     private static string NormalizeColor(string? color)
     {

@@ -57,10 +57,61 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
       화물 운송, 창고, 음식, 마트, 공동주문 원장 단위로 노드를 고릅니다.
     </td>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/decoration-fakepg-complete.png" alt="꾸미기 FakePG 완료" width="100%">
+      <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료" width="100%">
       <br>
-      <b>꾸미기 상점과 FakePG</b><br>
-      개발용 결제로 괘상과 다이어그램 꾸미기 흐름을 확인합니다.
+      <b>홈 테마 상점과 FakePG</b><br>
+      태극 패키지를 구매하고 전체 테마 적용 여부를 직접 선택합니다.
+    </td>
+  </tr>
+</table>
+
+## 홈 테마 상점 화면 흐름
+
+<table>
+  <tr>
+    <td width="50%">
+      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10/">
+        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10.png" alt="홈 테마 꾸미기 상점" width="100%">
+      </a>
+      <br>
+      <b>1. 홈 테마 탐색</b><br>
+      플랫폼 기본, 크리에이터, 내 보유 상품을 화면 단위로 살펴봅니다.
+    </td>
+    <td width="50%">
+      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-1/">
+        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-1.png" alt="홈 테마 상품 상세" width="100%">
+      </a>
+      <br>
+      <b>2. 테마 상세와 슬롯 확인</b><br>
+      펼친 패널과 8개 시각 슬롯을 실제 태극 형태로 미리 봅니다.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-4/">
+        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-4.png" alt="디자이너 홈 테마 등록" width="100%">
+      </a>
+      <br>
+      <b>3. 디자이너 패키지 등록</b><br>
+      방편, 반야, 커뮤니티, 상점, 간괘와 테두리를 하나의 패키지로 만듭니다.
+    </td>
+    <td width="50%">
+      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-2/">
+        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-2.png" alt="홈 테마 FakePG 결제" width="100%">
+      </a>
+      <br>
+      <b>4. 개발용 구매 확인</b><br>
+      전체 테마 구성과 가격을 확인하고 실제 청구 없는 FakePG를 진행합니다.
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-2-1/">
+        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-2-1.png" alt="홈 테마 구매 완료와 적용 선택" width="50%">
+      </a>
+      <br>
+      <b>5. 구매 완료와 명시적 적용</b><br>
+      구매와 적용을 분리하고 사용자가 전체 테마를 홈에 적용할지 결정합니다.
     </td>
   </tr>
 </table>

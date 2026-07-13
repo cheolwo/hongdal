@@ -10,13 +10,13 @@
 <CascadingValue Value="L.Language">
     <MudLayout>
         <MudAppBar Dense="true" Fixed="false" Elevation="0" Class="shipper-appbar">
-            <MudButton Variant="Variant.Text" Color="Color.Inherit" Disabled="@(!CanGoBack)" OnClick="GoBack" Class="shipper-menu-button">← 뒤로가기</MudButton>
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" Class="shipper-menu-button" />
             <MudStack Spacing="0" Class="shipper-appbar-title">
                 <MudText Typo="Typo.subtitle1" Class="fw-bold">홍달 앱</MudText>
                 <MudText Typo="Typo.caption" Class="shipper-appbar-subtitle">@ProfileLabel</MudText>
             </MudStack>
             <MudSpacer />
+            <MudButton Variant="Variant.Text" Color="Color.Inherit" Disabled="@(!CanGoBack)" OnClick="GoBack" Class="shipper-menu-button">← 뒤로가기</MudButton>
             <MudButtonGroup Color="Color.Inherit" Size="Size.Small" Class="shipper-language-toggle">
                 <MudButton Variant='@LanguageButtonVariant("ko")' OnClick='@(() => L.SetLanguage("ko"))'>@L.T("Language.Korean")</MudButton>
                 <MudButton Variant='@LanguageButtonVariant("en")' OnClick='@(() => L.SetLanguage("en"))'>@L.T("Language.English")</MudButton>
@@ -38,13 +38,29 @@
                         <div class="hongdal-role-panel-header">
                             <div>
                                 <span>활동 역할</span>
-                                <strong>현재 @RoleService.RoleLabel 역할입니다.</strong>
+                                <strong>@RolePanelCurrentState</strong>
                                 <small>역할을 고르면 홈의 사방괘와 업무 메뉴가 함께 바뀝니다.</small>
                             </div>
                             <button type="button" aria-label="닫기" @onclick="CloseRolePanel">
                                 <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
                             </button>
                         </div>
+
+                        <button type="button"
+                                class="@BuildRoleOptionClass(HongdalClientRole.Unspecified)"
+                                @onclick="@(() => SetRole(HongdalClientRole.Unspecified))">
+                            <span class="hongdal-role-option-icon hongdal-role-option-icon--common">
+                                <MudIcon Icon="@Icons.Material.Filled.AllInclusive" Size="Size.Small" />
+                            </span>
+                            <span class="hongdal-role-option-copy">
+                                <strong>공통 홈</strong>
+                                <small>역할 없이 반야 · 방편의 두 겹 태극에서 시작</small>
+                            </span>
+                            @if (RoleService.IsUnspecified)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Secondary" Size="Size.Small" />
+                            }
+                        </button>
 
                         <button type="button"
                                 class="@BuildRoleOptionClass(HongdalClientRole.Shipper)"
@@ -101,9 +117,16 @@
 
     private bool CanGoBack => _navigationHistory.Count > 0;
 
-    private string ProfileLabel => RoleService.IsWarehouseManager
-        ? "창고 관리자 · 통합 창고 운영"
-        : $"화주 · {(ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영")}";
+    private string ProfileLabel => RoleService.CurrentRole switch
+    {
+        HongdalClientRole.WarehouseManager => "창고 관리자 · 통합 창고 운영",
+        HongdalClientRole.Shipper => $"화주 · {(ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영")}",
+        _ => "공통 홈 · 반야와 방편"
+    };
+
+    private string RolePanelCurrentState => RoleService.HasRole
+        ? $"현재 {RoleService.RoleLabel} 역할입니다."
+        : "아직 역할을 정하지 않았습니다.";
 
     protected override void OnInitialized()
     {

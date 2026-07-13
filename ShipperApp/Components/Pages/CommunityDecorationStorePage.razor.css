@@ -73,10 +73,16 @@
     gap: 8px;
 }
 
+.decoration-market__hero-actions {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .decoration-market__create {
     appearance: none;
     display: inline-flex;
-    grid-column: 1 / -1;
     width: max-content;
     align-items: center;
     gap: 6px;
@@ -88,6 +94,10 @@
     font: inherit;
     font-size: 0.72rem;
     font-weight: 800;
+}
+
+.decoration-market__create--designer {
+    background: rgba(249, 168, 212, 0.16);
 }
 
 .decoration-market__summary span {
@@ -104,6 +114,7 @@
     font-size: 1rem;
 }
 
+.decoration-market__types,
 .decoration-market__tabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -113,6 +124,13 @@
     background: rgba(148, 163, 184, 0.13);
 }
 
+.decoration-market__types {
+    max-width: 520px;
+    margin-inline: auto;
+    background: rgba(var(--mud-palette-primary-rgb), 0.08);
+}
+
+.decoration-market__types button,
 .decoration-market__tabs button {
     appearance: none;
     display: flex;
@@ -130,6 +148,7 @@
     font-weight: 800;
 }
 
+.decoration-market__types button.is-active,
 .decoration-market__tabs button.is-active {
     background: var(--mud-palette-surface);
     color: var(--mud-palette-primary);
@@ -189,6 +208,16 @@
     background: color-mix(in srgb, var(--product-accent) 12%, #f8fafc);
 }
 
+.decoration-market-card__preview ::deep .home-theme-preview {
+    min-height: 154px;
+    padding: 5px;
+    border-radius: 15px;
+}
+
+.decoration-market-card__preview ::deep .home-theme-preview__wheel {
+    width: 138px;
+}
+
 .decoration-market-card__preview img,
 .decoration-market-card__preview > span {
     width: 64px;
@@ -222,6 +251,19 @@
     font-weight: 800;
 }
 
+.decoration-market-card__state {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    z-index: 5;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.82);
+    color: white;
+    font-size: 0.58rem;
+    font-weight: 900;
+}
+
 .decoration-market-card__copy {
     display: grid;
     gap: 4px;
@@ -244,6 +286,12 @@
     line-height: 1.45;
 }
 
+.decoration-market-card__copy > small {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.58rem;
+    line-height: 1.4;
+}
+
 .decoration-market-card__copy > div {
     display: flex;
     align-items: center;
@@ -256,10 +304,17 @@
     font-size: 0.9rem;
 }
 
-.decoration-market-card__copy > div > span {
+.decoration-market-card__copy > div > button {
+    appearance: none;
     display: inline-flex;
     align-items: center;
+    gap: 2px;
+    padding: 5px 7px;
+    border: 0;
+    border-radius: 9px;
+    background: rgba(var(--mud-palette-primary-rgb), 0.07);
     color: var(--mud-palette-primary);
+    font: inherit;
     font-size: 0.65rem;
     font-weight: 800;
 }
@@ -298,6 +353,7 @@
         justify-content: start;
     }
 
+    .decoration-market__types button,
     .decoration-market__tabs button {
         display: grid;
         gap: 2px;
@@ -326,5 +382,10 @@
 
     .decoration-market-card__preview img:nth-of-type(n+3) {
         display: none;
+    }
+
+    .decoration-market-card__preview ::deep .home-theme-preview,
+    .decoration-market-card__preview ::deep .home-theme-preview__wheel {
+        width: 100%;
     }
 }

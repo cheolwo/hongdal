@@ -857,28 +857,46 @@
                     <button type="button"
                             class="platform-community-bagua-toggle"
                             aria-expanded="@isBaguaNavigatorOpen"
-                            aria-label="후천 사방 이동판을 끌어 펼치거나 접기"
+                            aria-label="@BaguaToggleAriaLabel"
                             @onpointerdown="BeginBaguaDockDrag"
                             @onpointermove="HandleBaguaDockDrag"
                             @onpointerup="EndBaguaDockDrag"
                             @onpointercancel="CancelBaguaDockDrag"
                             @onkeydown="HandleBaguaDockKeyDown"
                             @onkeydown:preventDefault="true">
-                        <span class="platform-community-bagua-toggle-mark">@DecorationState.BaguaSymbol</span>
+                        <span class="platform-community-bagua-toggle-mark">@BaguaToggleSymbol</span>
                         <span>
-                            <strong>후천 사방 이동</strong>
-                            <small>@RoleLabel 역할의 동서남북 기능</small>
+                            <strong>@BaguaToggleTitle</strong>
+                            <small>@BaguaToggleDescription</small>
                         </span>
                         <MudIcon Icon="@(isBaguaNavigatorOpen ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" />
                     </button>
                     @if (isBaguaNavigatorOpen)
                     {
-                        <HongdalLaterHeavenBaguaNavigator RoleLabel="@RoleLabel"
-                                                           NavigationItems="@EffectiveCardinalNavigationOptions"
-                                                           AccentColor="@DecorationState.BaguaAccentColor"
-                                                           CenterSymbol="@DecorationState.BaguaSymbol"
-                                                           ShowTrigramSymbols="@DecorationState.IsBaguaDecorationEnabled"
-                                                           DestinationSelected="HandleBaguaDestinationSelectedAsync" />
+                        @if (ShowPrajnaUpayaNavigator)
+                        {
+                            <HongdalPrajnaUpayaTaegeukNavigator AccentColor="@DecorationState.HomeThemeAccentColor"
+                                                               Theme="@DecorationState.ActiveHomeTheme"
+                                                               CommunitySelected="@BaguaTaegeukYangSelectedCallback"
+                                                               StoreSelected="@BaguaTaegeukYinSelectedCallback" />
+                        }
+                        else
+                        {
+                            <HongdalLaterHeavenBaguaNavigator RoleLabel="@RoleLabel"
+                                                               NavigationItems="@EffectiveCardinalNavigationOptions"
+                                                               AccentColor="@DecorationState.BaguaAccentColor"
+                                                               CenterSymbol="@EffectiveBaguaCenterSymbol"
+                                                               CenterTrigramName="@BaguaCenterTrigramName"
+                                                               CenterDestinationLabel="@BaguaCenterDestinationLabel"
+                                                               CenterSelected="@BaguaCenterSelectedCallback"
+                                                               ShowTaegeukCenter="@BaguaCenterShowsTaegeuk"
+                                                               TaegeukYangDestinationLabel="커뮤니티"
+                                                               TaegeukYinDestinationLabel="상점"
+                                                               TaegeukYangSelected="@BaguaTaegeukYangSelectedCallback"
+                                                               TaegeukYinSelected="@BaguaTaegeukYinSelectedCallback"
+                                                               ShowTrigramSymbols="@DecorationState.IsBaguaDecorationEnabled"
+                                                               DestinationSelected="HandleBaguaDestinationSelectedAsync" />
+                        }
                     }
                 </div>
             </MudStack>
@@ -5975,6 +5993,24 @@
     public IReadOnlyList<HongdalCardinalNavigationOption> CardinalNavigationOptions { get; set; } = [];
 
     [Parameter]
+    public bool ShowPrajnaUpayaNavigator { get; set; }
+
+    [Parameter]
+    public bool BaguaCenterOpensCommunity { get; set; }
+
+    [Parameter]
+    public bool BaguaCenterShowsTaegeuk { get; set; } = true;
+
+    [Parameter]
+    public string? BaguaCenterSymbol { get; set; } = "☶";
+
+    [Parameter]
+    public string BaguaCenterTrigramName { get; set; } = "간";
+
+    [Parameter]
+    public string BaguaCenterDestinationLabel { get; set; } = "커뮤니티";
+
+    [Parameter]
     public bool CanManageCommunityPosts { get; set; }
 
     [Parameter]
@@ -6570,6 +6606,26 @@
         }
     }
 
+    private string EffectiveBaguaCenterSymbol
+        => string.IsNullOrWhiteSpace(BaguaCenterSymbol)
+            ? DecorationState.BaguaSymbol
+            : BaguaCenterSymbol;
+
+    private EventCallback BaguaCenterSelectedCallback
+        => BaguaCenterOpensCommunity && !BaguaCenterShowsTaegeuk
+            ? EventCallback.Factory.Create(this, HandleBaguaCenterSelectedAsync)
+            : default;
+
+    private EventCallback BaguaTaegeukYangSelectedCallback
+        => BaguaCenterShowsTaegeuk
+            ? EventCallback.Factory.Create(this, HandleBaguaCenterSelectedAsync)
+            : default;
+
+    private EventCallback BaguaTaegeukYinSelectedCallback
+        => BaguaCenterShowsTaegeuk
+            ? EventCallback.Factory.Create(this, HandleBaguaCenterStoreSelected)
+            : default;
+
     private IReadOnlyList<HongdalCardinalNavigationOption> BuildRoleCardinalNavigationOptions()
     {
         var roleActions = QuickActions
@@ -6626,12 +6682,40 @@
         }
     }
 
+    private async Task HandleBaguaCenterSelectedAsync()
+    {
+        isBaguaNavigatorOpen = false;
+        await OpenBaguaAnchorAsync(workMode: false, "community-forum-list");
+    }
+
+    private void HandleBaguaCenterStoreSelected()
+    {
+        isBaguaNavigatorOpen = false;
+        OpenDecorationStore();
+    }
+
     private string BuildBaguaEntryClass() => isBaguaNavigatorOpen
         ? "platform-community-bagua-entry platform-community-bagua-entry--open"
         : "platform-community-bagua-entry platform-community-bagua-entry--closed";
 
+    private string BaguaToggleAriaLabel => ShowPrajnaUpayaNavigator
+        ? "반야와 방편의 두 겹 태극을 끌어 펼치거나 접기"
+        : "후천 사방 이동판을 끌어 펼치거나 접기";
+
+    private string BaguaToggleSymbol => ShowPrajnaUpayaNavigator
+        ? "☯"
+        : DecorationState.BaguaSymbol;
+
+    private string BaguaToggleTitle => ShowPrajnaUpayaNavigator
+        ? "반야 · 방편"
+        : "후천 사방 이동";
+
+    private string BaguaToggleDescription => ShowPrajnaUpayaNavigator
+        ? "역할을 정하기 전의 두 겹 태극"
+        : $"{RoleLabel} 역할의 동서남북 기능";
+
     private string BuildBaguaEntryStyle()
-        => $"--bagua-decoration-accent: {DecorationState.BaguaAccentColor};";
+        => $"--bagua-decoration-accent: {(ShowPrajnaUpayaNavigator ? DecorationState.HomeThemeAccentColor : DecorationState.BaguaAccentColor)};";
 
     private void OpenDecorationStore()
         => Navigation.NavigateTo("/community/decorations");

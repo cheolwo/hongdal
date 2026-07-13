@@ -1,0 +1,125 @@
+@using Hongdal.Ui.Common.Areas.App.Services
+
+<div class="@RootClass"
+     style="@BuildRootStyle()"
+     role="img"
+     aria-label="@($"{Title} 홈 내비게이터 테마 미리보기")">
+    @if (Collapsed)
+    {
+        <div class="home-theme-preview__collapsed" style="@BuildBackgroundStyle(Theme.ClosedHandle)">
+            @if (Theme.ClosedHandle.HasImage)
+            {
+                <img src="@Theme.ClosedHandle.ImageUrl" alt="@Theme.ClosedHandle.AltText" />
+            }
+            <span>☯</span>
+        </div>
+        <small>접힌 손잡이</small>
+    }
+    else
+    {
+        <div class="home-theme-preview__wheel">
+            <div class="home-theme-preview__outer" style="@($"border-color: {Theme.Frame.Color};")">
+                <svg viewBox="-50 -50 100 100" focusable="false" aria-hidden="true">
+                    <defs>
+                        @Pattern(OuterUpayaPatternId, Theme.OuterUpaya)
+                        @Pattern(OuterPrajnaPatternId, Theme.OuterPrajna)
+                    </defs>
+                    <circle cx="0" cy="0" r="50" style="@BuildFillStyle(Theme.OuterUpaya, OuterUpayaPatternId)" />
+                    <path d="M -42 17 C -27 4 -15 29 0 18 C 15 7 29 7 42 18 C 39 35 23 48 0 50 C -23 48 -39 35 -42 17 Z"
+                          style="@BuildFillStyle(Theme.OuterPrajna, OuterPrajnaPatternId)" />
+                </svg>
+                <span class="home-theme-preview__label home-theme-preview__label--upaya">방편</span>
+                <span class="home-theme-preview__label home-theme-preview__label--prajna">반야</span>
+            </div>
+
+            <div class="home-theme-preview__inner" style="@($"border-color: {Theme.Frame.Color};")">
+                <svg viewBox="-50 -50 100 100" focusable="false" aria-hidden="true">
+                    <defs>
+                        @Pattern(CommunityPatternId, Theme.InnerCommunity)
+                        @Pattern(StorePatternId, Theme.InnerStore)
+                    </defs>
+                    <g transform="rotate(-56.3099325)">
+                        <path d="M 50 0 a 25 25 0 1 1 -50 0 a 25 25 0 1 0 -50 0 a 50 50 0 1 1 100 0 Z"
+                              style="@BuildFillStyle(Theme.InnerCommunity, CommunityPatternId)" />
+                        <path d="M -50 0 a 25 25 0 1 1 50 0 a 25 25 0 1 0 50 0 a 50 50 0 1 1 -100 0 Z"
+                              style="@BuildFillStyle(Theme.InnerStore, StorePatternId)" />
+                    </g>
+                </svg>
+                <span class="home-theme-preview__inner-label home-theme-preview__inner-label--community">커뮤니티</span>
+                <span class="home-theme-preview__inner-label home-theme-preview__inner-label--store">상점</span>
+                <span class="home-theme-preview__center" style="@BuildBackgroundStyle(Theme.CenterGen)">
+                    @if (Theme.CenterGen.HasImage)
+                    {
+                        <img src="@Theme.CenterGen.ImageUrl" alt="@Theme.CenterGen.AltText" />
+                    }
+                    <b>☶</b><small>간</small>
+                </span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public HomeNavigatorThemeManifest Theme { get; set; } = default!;
+
+    [Parameter]
+    public string Title { get; set; } = "홈 테마";
+
+    [Parameter]
+    public bool Compact { get; set; }
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    [Parameter]
+    public bool DarkBackground { get; set; }
+
+    private readonly string instanceId = $"theme-{Guid.NewGuid():N}";
+
+    private string OuterUpayaPatternId => $"{instanceId}-outer-upaya";
+    private string OuterPrajnaPatternId => $"{instanceId}-outer-prajna";
+    private string CommunityPatternId => $"{instanceId}-community";
+    private string StorePatternId => $"{instanceId}-store";
+
+    private string RootClass
+        => $"home-theme-preview{(Compact ? " home-theme-preview--compact" : string.Empty)}{(Collapsed ? " home-theme-preview--collapsed" : string.Empty)}";
+
+    private string BuildRootStyle()
+    {
+        var background = DarkBackground ? "#07111f" : Theme.PreviewBackground;
+        return $"--theme-label: {Theme.Labels.Color}; --theme-frame: {Theme.Frame.Color}; --theme-preview-bg: {background};";
+    }
+
+    private static string BuildFillStyle(HomeNavigatorThemeSlot slot, string patternId)
+        => slot.HasImage ? $"fill: url(#{patternId});" : $"fill: {slot.Color};";
+
+    private static string BuildBackgroundStyle(HomeNavigatorThemeSlot slot)
+        => $"background-color: {slot.Color}; color: inherit;";
+
+    private RenderFragment Pattern(string id, HomeNavigatorThemeSlot slot) => builder =>
+    {
+        if (!slot.HasImage)
+        {
+            return;
+        }
+
+        var sequence = 0;
+        builder.OpenElement(sequence++, "pattern");
+        builder.AddAttribute(sequence++, "id", id);
+        builder.AddAttribute(sequence++, "patternUnits", "userSpaceOnUse");
+        builder.AddAttribute(sequence++, "x", "-50");
+        builder.AddAttribute(sequence++, "y", "-50");
+        builder.AddAttribute(sequence++, "width", "100");
+        builder.AddAttribute(sequence++, "height", "100");
+        builder.OpenElement(sequence++, "image");
+        builder.AddAttribute(sequence++, "href", slot.ImageUrl);
+        builder.AddAttribute(sequence++, "x", "-50");
+        builder.AddAttribute(sequence++, "y", "-50");
+        builder.AddAttribute(sequence++, "width", "100");
+        builder.AddAttribute(sequence++, "height", "100");
+        builder.AddAttribute(sequence++, "preserveAspectRatio", "xMidYMid slice");
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+}

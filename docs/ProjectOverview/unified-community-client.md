@@ -14,6 +14,7 @@
 | 화면 | 라우트 | 내비게이션 단계 | 한 가지 주 책임 |
 | --- | --- | --- | --- |
 | 통합 홈 | `/` | 공통 셸 | 현재 역할에 맞는 홈을 선택한다. |
+| 역할 미설정 홈 | `/` | 공통 셸 | 반야·방편 두 겹 태극과 공통 커뮤니티를 보여준다. |
 | 화주 홈 | `/shipper` | 공통 셸·1단계 진입 | 커뮤니티와 화주 업무 요약을 조합한다. |
 | 사방 이동판 | 홈 내부 | 1단계 | 역할별 네 업무 영역 중 하나를 선택한다. |
 | 원장 다이어그램 | 홈의 다이어그램 모드 | 2단계 | 단일·연결·복합 원장의 경계, 노드 관계·상태·진행도와 다음 행동을 보여준다. |
@@ -23,7 +24,7 @@
 | FakePG 결제 | `/community/decorations/{ProductKey}/checkout` | 3단계 보조 기능 | 개발용 구매 승인 흐름만 담당한다. |
 | 내 꾸미기 만들기 | `/community/decorations/create` | 3단계 보조 기능 | 사용자 기호·색상·이미지를 검증해 개인 꾸미기로 만든다. |
 
-`UnifiedHome.razor`는 역할만 판별하고 화주 홈 또는 `WarehouseManagerRoleHome`을 선택한다. 커뮤니티, 다이어그램, 업무 데이터 조회, 결제를 이 파일에 넣지 않는 것이 단일 책임의 기준이다.
+`UnifiedHome.razor`는 역할만 판별하고 `RoleNeutralHome`, 화주 홈 또는 `WarehouseManagerRoleHome`을 선택한다. 커뮤니티, 다이어그램, 업무 데이터 조회, 결제를 이 파일에 넣지 않는 것이 단일 책임의 기준이다.
 
 ## 3단계 페이지 구성
 
@@ -54,7 +55,7 @@ flowchart LR
 
 ## 역할 전환과 내비게이션
 
-우측 상단의 사람 모양 원형 버튼은 기존 상단 메뉴를 바꾸지 않고 역할 선택 패널만 연다. 현재 구현 역할은 `화주`와 `창고 관리자`이며, 선택값은 `Preferences`의 `hongdal.client.active_role`에 저장된다.
+우측 상단의 사람 모양 원형 버튼은 기존 상단 메뉴를 바꾸지 않고 역할 선택 패널만 연다. 상태는 `역할 미설정`, `화주`, `창고 관리자`이며, 선택값은 `Preferences`의 `hongdal.client.active_role`에 저장된다. 저장값이 없는 새 사용자는 역할 미설정 상태로 시작하고, `공통 홈`을 선택하면 다시 역할을 비울 수 있다.
 
 <img src="assets/unified-community-client/role-switch.png" alt="우측 상단 역할 전환 패널" width="360">
 
@@ -102,16 +103,18 @@ flowchart LR
 
 ## 후천 사방 이동판
 
+역할 미설정 상태에서 오른쪽 하단 손잡이를 펼치면 사방괘 대신 두 겹 태극을 연다. 바깥 태극은 위·왼쪽·오른쪽을 넓게 감싸는 빨간 `방편`과 아래 중앙의 곡선 영역만 차지하는 파란 `반야`로 구성한다. 안쪽 태극은 먹색 `커뮤니티`와 목재 갈색 `상점`으로 구분하고 상아색 테두리와 간괘 `☶`를 유지한다. 갈색 상점이 파란 반야 위에 놓여 물 위에 뜬 배처럼 읽히도록 한다. 역할을 고르면 바깥 태극만 해당 역할의 사방괘로 바뀐다.
+
 후천팔괘의 여덟 방향을 모두 메뉴로 쓰지 않고, 모바일에서 판단하기 쉬운 동서남북 네 괘만 노출한다. 이 화면은 북쪽을 아래에 두므로 화면 배치는 다음과 같다.
 
 | 화면 위치 | 방위·괘 | 창고 관리자 영역 | 목표 다이어그램 문맥 |
 | --- | --- | --- | --- |
 | 위 | 남·리괘 `☲` | 판매 | 상품·판매채널·주문·출고 관계 |
 | 오른쪽 | 서·태괘 `☱` | 출고 | 주문·피킹·포장·출고 관계 |
-| 아래 | 북·감괘 `☵` | 배송 | 출고·기사·차량·인도 관계 |
+| 아래 | 북·감괘 `☵` | 운송 | 출고·기사·차량·인도 관계 |
 | 왼쪽 | 동·진괘 `☳` | 입고 | 공급처·입고·검수·보관 관계 |
 
-가운데 점을 원하는 방향으로 끌거나 괘를 직접 누르면 관련 다이어그램을 연다. 모바일에서는 오른쪽 아래 벽면에 정확한 반원 손잡이만 보이고, 펼치면 원형 판 안에 네 괘가 나타난다. 하단 업무 버튼과 겹치지 않도록 안전 영역 위에 고정한다.
+공통 사방괘의 가운데에는 산을 뜻하는 간괘 `☶`를 둔다. 펼친 이동판은 외곽 사방괘 원과 내부 간괘 원의 두 동심원이다. 내부 원은 태극 문양처럼 위쪽 빨간 양효 영역과 아래쪽 파란 음효 영역으로 나누고, 빨간 영역은 커뮤니티 글 목록, 파란 영역은 꾸미기 상점을 연다. 이 중심 디자인은 특정 역할 설정이 아니라 `PlatformCommunityHome`과 `HongdalLaterHeavenBaguaNavigator`의 공통 기본값이다. 역할별 차이는 외곽 사방괘의 목적지에만 적용한다. 모바일에서는 오른쪽 아래 벽면에 정확한 반원 손잡이만 보이도록 접고, 하단 업무 버튼과 겹치지 않도록 안전 영역 위에 고정한다.
 
 <img src="assets/unified-community-client/bagua-closed.png" alt="오른쪽 벽면의 닫힌 반원 손잡이" width="260">
 <img src="assets/unified-community-client/bagua-taegeuk-open.png" alt="펼쳐진 태극 중심 후천 사방 이동판" width="260">
@@ -121,18 +124,18 @@ flowchart LR
 
 ## 꾸미기 상점
 
-상점은 홈 위에 뜨는 임시 패널이 아니라 독립 페이지다. `플랫폼 기본`, `크리에이터`, `내 보유` 탭을 제공하며 카드를 선택하면 상세 페이지로 이동한다.
+상점은 홈 위에 뜨는 임시 패널이 아니라 독립 페이지다. `전체`, `홈 테마`, `노드·괘상` 상품 종류와 `플랫폼 기본`, `크리에이터`, `내 보유` 출처 탭을 조합해 탐색한다. 홈 테마 카드는 실제 태극 마스크로 합성한 축소판과 `보유 중`, `현재 적용 중` 상태를 표시한다.
 
 <img src="assets/app-pages/ShipperApp/ShipperApp-P10.png" alt="꾸미기 상점" width="360">
 
-상품 상세에서는 사용 위치가 `괘상·사방 이동판`인지 `다이어그램 노드`인지 확인하고, 보유한 항목을 선택해 적용한다. 무료 상품은 결제 없이 사용할 수 있고 유료 샘플은 FakePG로 이동한다.
+상품 상세에서는 사용 위치가 `홈 내비게이터 테마`, `괘상·사방 이동판`, `다이어그램 노드` 중 무엇인지 확인한다. 홈 테마는 펼친 패널·접힌 손잡이·밝고 어두운 배경을 전환하며 실제 결과를 미리 보고, 방편·반야·커뮤니티·상점·간괘·테두리·라벨·손잡이 8개 슬롯을 확인한 뒤 전체 패키지를 한 번에 적용한다.
 
 <img src="assets/app-pages/ShipperApp/ShipperApp-P10-1.png" alt="꾸미기 상품 상세" width="360">
 
-FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다. 가상 결제 수단과 약관을 확인하면 현재 앱 실행 동안 구매·보유·적용 상태만 갱신한다.
+FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다. 가상 결제 수단과 약관을 확인하면 현재 앱 실행 동안 구매·보유 상태만 갱신한다. 결제 완료 뒤에는 첫 자산을 자동 적용하지 않으며 사용자가 `구매한 전체 테마 적용` 또는 `상품에서 적용 항목 고르기`를 명시적으로 선택한다.
 
 <img src="assets/app-pages/ShipperApp/ShipperApp-P10-2.png" alt="개발용 FakePG 결제" width="360">
-<img src="assets/unified-community-client/fakepg-complete.png" alt="FakePG 구매 완료" width="360">
+<img src="assets/app-pages/ShipperApp/ShipperApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료와 적용 선택" width="360">
 
 ## 내 꾸미기 등록 규격
 
@@ -150,9 +153,13 @@ FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다.
 
 현재 제작 페이지는 개인 보유함에 저장하고 즉시 적용하는 클라이언트 기능이다. 공개 판매 등록, 서버 영속 보유권, 실제 결제, 환불, 창작자 정산은 아직 연결하지 않았다.
 
+디자이너 홈 테마 등록은 `/community/decorations/themes/submit`에서 별도 처리한다. 8개 슬롯마다 필수 대체색과 선택 PNG·WebP·SVG 이미지를 입력하고, 펼친 패널·접힌 손잡이·배경별 미리보기를 확인한다. 저장 결과는 `초안`으로 내 제작함에만 추가되며 현재 홈에 적용된다. 클릭 영역과 커뮤니티·상점 이동 의미는 패키지가 변경하지 못한다.
+
+<img src="assets/app-pages/ShipperApp/ShipperApp-P10-4.png" alt="디자이너 홈 테마 패키지 등록" width="360">
+
 ## 현재 상태와 서버 연결 경계
 
-`PlatformCommunityDecorationStateService`는 상품, 보유 팩, 활성 괘상, 활성 노드 이미지, 직접 만든 항목을 앱 실행 상태로 관리한다. 앱을 완전히 종료하거나 서비스 수명이 끝난 뒤에도 보존해야 하는 데이터는 서버 계정 보유권으로 옮겨야 한다.
+`PlatformCommunityDecorationStateService`는 상품, 보유 팩, 활성 홈 테마 패키지, 활성 괘상, 활성 노드 이미지, 직접 만든 항목을 앱 실행 상태로 관리한다. 홈 테마는 `neutral-taegeuk-v1` 렌더러와 버전형 8개 슬롯 manifest를 사용한다. 앱을 완전히 종료하거나 서비스 수명이 끝난 뒤에도 보존해야 하는 데이터는 서버 계정 보유권으로 옮겨야 한다.
 
 서버에는 다음 노드 스티커 상점 API 골격이 있다.
 
@@ -173,14 +180,16 @@ FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다.
 | 역할별 메뉴 | `ShipperApp/Services/HongdalClientNavigationCatalog.cs` |
 | 공통 커뮤니티·다이어그램 | `Hongdal.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor` |
 | 후천 사방 이동판 | `Hongdal.Ui.Common/Areas/App/Components/Community/HongdalLaterHeavenBaguaNavigator.razor` |
+| 반야·방편 홈 테마 렌더러 | `HongdalPrajnaUpayaTaegeukNavigator.razor`, `HongdalHomeNavigatorThemePreview.razor` |
 | 원방각 표시 | `Hongdal.Ui.Common/Areas/App/Components/Community/HongdalWonBangGakMark.razor` |
 | 꾸미기 상태 | `Hongdal.Ui.Common/Areas/App/Services/PlatformCommunityDecorationStateService.cs` |
 | 상점 페이지 | `ShipperApp/Components/Pages/CommunityDecorationStorePage.razor` |
 | 상세·결제·제작 | `CommunityDecorationDetailPage.razor`, `CommunityDecorationCheckoutPage.razor`, `CommunityDecorationCreatePage.razor` |
+| 디자이너 테마 등록 | `CommunityDecorationThemeSubmitPage.razor` |
 
 ## 검증 기준
 
-- Android `1080 × 2400` 화면에서 역할 패널, 모바일 세로 다이어그램, 반원 도크, 상점·상세·FakePG·적용 결과를 확인한다.
+- Android `1080 × 2400` 화면에서 역할 패널, 모바일 세로 다이어그램, 반원 도크, 홈 테마 상점·상세·디자이너 등록·FakePG·적용 결과를 확인한다.
 - 화주 역할과 창고 관리자 역할을 바꾼 뒤 `/`의 홈, 좌측 메뉴, 사방 기능이 함께 바뀌는지 확인한다.
 - 사방괘를 선택하면 관련 다이어그램이 열리고 역할과 방향에 맞는 초점 노드가 선택되는지 확인한다. 이 항목은 현재 전환기 구현이 끝난 뒤 필수 검증한다.
 - 노드 행동 메뉴가 데스크톱 우클릭·키보드와 모바일 길게 누르기·`⋮` 버튼에서 같은 행동을 제공하는지 확인한다.
