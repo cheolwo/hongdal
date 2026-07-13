@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Education;
 using Hongdal.Domain.Community;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
@@ -89,7 +90,7 @@ public static class 커뮤니티원장블록관계투영Builder
                 Title = Clean(block.Title) ?? blockId,
                 State = Clean(block.State),
                 SortOrder = sortOrder++,
-                속성Json = ToJson(block.Data),
+                속성Json = ShouldRedactData(원장) ? "{}" : ToJson(block.Data),
                 CreatedAtUtc = now,
                 UpdatedAtUtc = now
             };
@@ -117,7 +118,7 @@ public static class 커뮤니티원장블록관계투영Builder
                         BlockType = Clean(node.Kind) ?? CommunityLedgerBlockTypes.Generic,
                         Title = Clean(node.Title) ?? blockId,
                         SortOrder = sortOrder++,
-                        속성Json = ToJson(node.Data),
+                        속성Json = ShouldRedactData(원장) ? "{}" : ToJson(node.Data),
                         CreatedAtUtc = now,
                         UpdatedAtUtc = now
                     };
@@ -226,6 +227,12 @@ public static class 커뮤니티원장블록관계투영Builder
             : nodeToBlockId.TryGetValue(nodeId.Trim(), out var blockId)
                 ? blockId
                 : nodeId.Trim();
+
+    private static bool ShouldRedactData(커뮤니티원장Dto ledger)
+        => string.Equals(
+            ledger.원장템플릿Key,
+            현장체험활동원장상수.원장템플릿Key,
+            StringComparison.OrdinalIgnoreCase);
 
     private static string? ResolveNodeBlockId(DiagramNodeDto node)
         => FirstNonEmpty(

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Hongdal.Contracts.Common.Education;
 using Hongdal.Domain.Community;
 using 홍달.Data;
 
@@ -74,23 +75,7 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
         }
 
         var now = DateTime.UtcNow;
-        var snapshot = new
-        {
-            원장.원장Id,
-            원장.커뮤니티Id,
-            원장.원장템플릿Key,
-            원장.제목,
-            원장.원함,
-            상태,
-            현재단계Key,
-            대상OsCode = 원장.대상OsCode,
-            대상OsName = 원장.대상OsName,
-            블록수 = 원장.블록목록.Count,
-            참여자수 = 원장.참여자목록.Count,
-            원장.외부참조,
-            원장.확장속성,
-            원장.수정시각Utc
-        };
+        var snapshot = BuildSnapshot(원장, 상태, 현재단계Key);
 
         _db.커뮤니티원장상태이벤트.Add(new 커뮤니티원장상태이벤트
         {
@@ -111,6 +96,46 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
         });
 
         await _db.SaveChangesAsync(cancellationToken);
+    }
+
+    private static object BuildSnapshot(커뮤니티원장Dto ledger, string state, string? currentStep)
+    {
+        if (string.Equals(
+                ledger.원장템플릿Key,
+                현장체험활동원장상수.원장템플릿Key,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return new
+            {
+                ledger.원장Id,
+                ledger.커뮤니티Id,
+                ledger.원장템플릿Key,
+                상태 = state,
+                현재단계Key = currentStep,
+                블록수 = ledger.블록목록.Count,
+                참여자수 = ledger.참여자목록.Count,
+                개인정보비식별투영 = true,
+                ledger.수정시각Utc
+            };
+        }
+
+        return new
+        {
+            ledger.원장Id,
+            ledger.커뮤니티Id,
+            ledger.원장템플릿Key,
+            ledger.제목,
+            ledger.원함,
+            상태 = state,
+            현재단계Key = currentStep,
+            대상OsCode = ledger.대상OsCode,
+            대상OsName = ledger.대상OsName,
+            블록수 = ledger.블록목록.Count,
+            참여자수 = ledger.참여자목록.Count,
+            ledger.외부참조,
+            ledger.확장속성,
+            ledger.수정시각Utc
+        };
     }
 
     private static string Clean(string? value)
