@@ -133,8 +133,15 @@ Priority modules:
 | 6 | 피킹/포장 원장 | Warehouse outbound or HongdalMart delivery ledger | Field work should be trackable independently from the broader order or outbound ledger. |
 | 7 | 마트주문 원장 | HongdalMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
 | 8 | 마트 배송 원장 | HongdalMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
-| 9 | 결제/정산 표시 원장 | Cargo transport or related work ledger | Payment marks, counterpart confirmation, holds, and notes should remain participant-centered. |
-| 10 | 신고/분쟁 원장 | Errand or generic life-request ledger | Reports and disputes should not pollute ordinary workflow state, but they must remain linked. |
+| 9 | 공동주문 수요 원장 | Group purchase ledger | Participant demand, quantities, and delivery zones should be grouped before import decisions. |
+| 10 | 공동주문 수입 결정 원장 | Group purchase ledger | Import go/no-go, FCL/LCL, price, and quantity decisions need an explicit boundary. |
+| 11 | 공동주문 선적/통관 원장 | Group purchase ledger | Overseas shipment, documents, customs, and release state need their own lifecycle. |
+| 12 | 공동주문 입고/분배 원장 | Group purchase ledger | Domestic 3PL inbound and participant distribution coordinate downstream handoffs. |
+| 13 | 결제/정산 표시 원장 | Cargo transport or related work ledger | Payment marks, counterpart confirmation, holds, and notes should remain participant-centered. |
+| 14 | 신고/분쟁 원장 | Errand or generic life-request ledger | Reports and disputes should not pollute ordinary workflow state, but they must remain linked. |
+| 15 | 음식 주문 원장 | Food delivery ledger | Menu order, restaurant acceptance, cooking, and ready state end before delivery begins. |
+| 16 | 음식 배달 원장 | Food delivery ledger | Each first, split, or retry delivery attempt keeps its own dispatch and proof lifecycle. |
+| 17 | 창고입고 원장 | Warehouse inbound ledger | Dropoff handoff, inspection, exceptions, put-away, and inventory conversion need a destination record. |
 
 Representative ledger relationships:
 
@@ -145,10 +152,13 @@ Representative ledger relationships:
 | 운송의뢰 원장 | 운송진행 원장 | Flow | `1:1` | Dispatch is confirmed. |
 | 창고출고 원장 | 피킹/포장 원장 | Contains | `1:N` | Outbound items become picking or packing tasks. |
 | 피킹/포장 원장 | 운송의뢰 원장 | Handoff | `1:N` | Packed items need external movement. |
+| 운송진행 원장 | 창고입고 원장 | Handoff | `1:N` | Dropoff is complete and the destination warehouse needs inbound processing. |
 | 마트주문 원장 | 피킹/포장 원장 | Requires | `1:N` | Mart order and urban stock are confirmed. |
 | 피킹/포장 원장 | 마트 배송 원장 | Handoff | `N:1` | Packed mart orders can be bundled into one delivery run. |
 | 마트 배송 원장 | 결제/정산 표시 원장 | Reference | `1:1` | Delivery or receiver confirmation is complete. |
 | 운송진행 원장 | 신고/분쟁 원장 | Reference | `1:N` | Delay, damage, disagreement, or issue report appears. |
+
+For a warehouse-to-warehouse movement, the diagram and ledger handoff must read `warehouse outbound -> transport pickup -> transport dropoff -> warehouse inbound`. The outbound boundary exposes right and bottom output ports, while the inbound boundary exposes left and top input ports. Dropoff items and evidence become inbound input; they are not copied into an unrelated standalone warehouse record.
 
 The template roles are defaults only. Participants should be able to rename, add, remove, and reassign roles. By default, a normal user should be able to participate across roles when the ledger context makes it reasonable. A role is therefore a visible participation label and work-context hint, not a hard authorization boundary.
 
@@ -382,8 +392,17 @@ Fees can be considered for tools that help users complete work faster or with lo
 - Work relationship snapshot analytics beyond the basic personal view
 - Bulk notifications, scheduled posts, and campaign tools for businesses
 - Customs, HS code, import agency, or legal-review support workflows
+- Optional visual decoration packs for the four-direction navigator or diagram nodes
 
 These features should be optional. The base platform should still work without them.
+
+### Community decoration marketplace
+
+Visual decorations may be free, paid, or creator-provided, but they must remain cosmetic. A user who does not buy a pack must still be able to read community posts, create work ledgers, navigate by the four directions, edit diagrams, and complete required work.
+
+The store should use dedicated list, detail, checkout, and creator pages rather than mixing commerce controls into the community feed. Every item needs an intended-use scope, creator label, preview, price mode, license, review state, and accessible fallback. User-provided images require a declaration that the uploader created the work or holds the necessary rights.
+
+Development FakePG may test purchase and ownership flows, but it must clearly say that no real charge or creator settlement occurs. Production payment, refund, ownership persistence, moderation, and creator settlement require separate server-backed policies before launch. See [the unified community client guide](../ProjectOverview/unified-community-client.md) for the current implementation boundary.
 
 ## Admin Controls
 
