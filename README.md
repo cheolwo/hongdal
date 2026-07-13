@@ -92,6 +92,7 @@ flowchart LR
 | 문서 | 용도 |
 | --- | --- |
 | [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
+| [커밋별 시각 변경 기록](docs/Changes/README.md) | 커밋 해시별 화면 변화와 실제 렌더링 캡처 |
 | [통합 커뮤니티 클라이언트](docs/ProjectOverview/unified-community-client.md) | 역할 전환, 모바일 다이어그램, 후천 사방 이동, 꾸미기 상점 |
 | [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지 구성 원칙 |
 | [코드 프로젝트별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md) | 통합 클라이언트 화면의 실제 코드 위치와 인라인 캡처 |
