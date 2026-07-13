@@ -1,0 +1,531 @@
+@implements IDisposable
+@inject PlatformCommunityService CommunityService
+
+@if (Compact)
+{
+    var leadingItem = items[0];
+    <section class="moment-best-strip" aria-labelledby="moment-best-strip-title">
+        <span class="moment-best-strip-label" id="moment-best-strip-title">실시간 베스트</span>
+        <span class="moment-best-strip-rank">1</span>
+        <a class="moment-best-strip-subject" href="@leadingItem.Href">
+            <span>@leadingItem.Category</span>
+            <strong>@leadingItem.Title</strong>
+        </a>
+        <span class="moment-best-strip-activity">@leadingItem.ActivityLabel</span>
+        <span class="moment-best-strip-comments" title="댓글 수">
+            <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" />
+            @leadingItem.CommentCount
+        </span>
+        <MudIconButton Href="/community#community-board-list"
+                       Icon="@Icons.Material.Filled.ArrowForward"
+                       Size="Size.Small"
+                       Color="Color.Primary"
+                       aria-label="실시간 베스트 전체 보기" />
+    </section>
+}
+else
+{
+    <section class="moment-best" aria-labelledby="moment-best-title">
+        <header class="moment-best-header">
+            <div>
+                <span>COMMUNITY NOW</span>
+                <MudText Typo="Typo.h5" id="moment-best-title">실시간 베스트</MudText>
+            </div>
+            <div class="moment-best-header-actions">
+                <span aria-live="polite">@(isRefreshing ? "새 글 확인 중" : "최근 반응 기준")</span>
+                <MudButton Href="/community#community-board-list"
+                           Variant="Variant.Text"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">
+                    전체 보기
+                </MudButton>
+            </div>
+        </header>
+
+        <ol class="moment-best-list">
+            @for (var index = 0; index < items.Count; index++)
+            {
+                var item = items[index];
+                <li @key="item.Key">
+                    <a href="@item.Href" aria-label="@($"{index + 1}위 {item.Title}")">
+                        <span class="moment-best-rank">@((index + 1).ToString("00"))</span>
+                        <span class="moment-best-category">@item.Category</span>
+                        <span class="moment-best-subject">
+                            <strong>@item.Title</strong>
+                            <small>@item.Author · @item.ActivityLabel</small>
+                        </span>
+                        @if (item.IsTrending)
+                        {
+                            <span class="moment-best-live">화제</span>
+                        }
+                        else
+                        {
+                            <span class="moment-best-live moment-best-live--quiet">반응</span>
+                        }
+                        <span class="moment-best-reaction" title="추천 수">
+                            <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="Size.Small" />
+                            @item.RecommendationCount
+                        </span>
+                        <span class="moment-best-reaction" title="댓글 수">
+                            <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" />
+                            @item.CommentCount
+                        </span>
+                    </a>
+                </li>
+            }
+        </ol>
+    </section>
+}
+
+<style>
+    .moment-best-strip {
+        display: grid;
+        grid-template-columns: auto 28px minmax(0, 1fr) auto auto 36px;
+        align-items: center;
+        gap: 8px;
+        min-height: 46px;
+        margin: -4px 0 16px;
+        padding: 4px 6px 4px 12px;
+        border-top: 2px solid #0f766e;
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+        background: var(--mud-palette-surface);
+    }
+
+    .moment-best-strip-label {
+        color: #0f766e;
+        font-size: 0.74rem;
+        font-weight: 850;
+        white-space: nowrap;
+    }
+
+    .moment-best-strip-rank {
+        color: #b45309;
+        font-size: 0.78rem;
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .moment-best-strip-subject {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .moment-best-strip-subject > span {
+        flex: 0 0 auto;
+        color: var(--mud-palette-primary);
+        font-size: 0.7rem;
+        font-weight: 750;
+    }
+
+    .moment-best-strip-subject > strong {
+        overflow: hidden;
+        min-width: 0;
+        color: var(--mud-palette-text-primary);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .moment-best-strip-subject:hover > strong,
+    .moment-best-strip-subject:focus-visible > strong {
+        color: var(--mud-palette-primary);
+        text-decoration: underline;
+    }
+
+    .moment-best-strip-activity,
+    .moment-best-strip-comments {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+
+    .moment-best-strip-comments {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .moment-best {
+        margin-top: 28px;
+        border-top: 3px solid #0f766e;
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+        background: var(--mud-palette-surface);
+    }
+
+    .moment-best-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 70px;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+    }
+
+    .moment-best-header > div:first-child {
+        display: grid;
+        gap: 1px;
+    }
+
+    .moment-best-header > div:first-child > span {
+        color: #0f766e;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+    }
+
+    .moment-best-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .moment-best-header-actions > span {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+    }
+
+    .moment-best-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .moment-best-list li {
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+    }
+
+    .moment-best-list li:last-child {
+        border-bottom: 0;
+    }
+
+    .moment-best-list a {
+        display: grid;
+        grid-template-columns: 48px 112px minmax(240px, 1fr) 52px 64px 64px;
+        align-items: center;
+        min-height: 58px;
+        color: inherit;
+        text-decoration: none;
+        transition: background-color 140ms ease;
+    }
+
+    .moment-best-list a:hover,
+    .moment-best-list a:focus-visible {
+        background: color-mix(in srgb, #0f766e 6%, var(--mud-palette-surface));
+        outline: none;
+    }
+
+    .moment-best-list a > span {
+        min-width: 0;
+        padding: 8px 10px;
+    }
+
+    .moment-best-rank {
+        color: #0f766e;
+        font-size: 0.88rem;
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .moment-best-list li:first-child .moment-best-rank {
+        color: #b45309;
+    }
+
+    .moment-best-category {
+        overflow: hidden;
+        color: var(--mud-palette-primary);
+        font-size: 0.72rem;
+        font-weight: 750;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .moment-best-subject {
+        display: grid;
+        gap: 3px;
+    }
+
+    .moment-best-subject strong,
+    .moment-best-subject small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .moment-best-subject strong {
+        color: var(--mud-palette-text-primary);
+        font-size: 0.86rem;
+        font-weight: 700;
+    }
+
+    .moment-best-subject small {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.68rem;
+    }
+
+    .moment-best-live {
+        justify-self: center;
+        padding: 3px 7px !important;
+        border: 1px solid color-mix(in srgb, var(--mud-palette-error) 42%, transparent);
+        border-radius: 3px;
+        color: var(--mud-palette-error);
+        font-size: 0.66rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .moment-best-live--quiet {
+        border-color: var(--mud-palette-lines-default);
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .moment-best-reaction {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+    }
+
+    @@media (max-width: 720px) {
+        .moment-best-strip {
+            grid-template-columns: auto 22px minmax(0, 1fr) auto 32px;
+            gap: 5px;
+            min-height: 42px;
+            margin: -4px -12px 12px;
+            padding-left: 10px;
+        }
+
+        .moment-best-strip-label {
+            font-size: 0.68rem;
+        }
+
+        .moment-best-strip-subject {
+            gap: 6px;
+        }
+
+        .moment-best-strip-subject > span,
+        .moment-best-strip-activity {
+            display: none;
+        }
+
+        .moment-best-strip-subject > strong {
+            font-size: 0.76rem;
+        }
+
+        .moment-best {
+            margin: 22px -12px 0;
+        }
+
+        .moment-best-header {
+            align-items: flex-start;
+            padding: 12px;
+        }
+
+        .moment-best-header-actions {
+            align-items: flex-end;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .moment-best-list a {
+            grid-template-columns: 42px 76px minmax(0, 1fr) 48px;
+            min-height: 62px;
+        }
+
+        .moment-best-list a > span {
+            padding: 7px 6px;
+        }
+
+        .moment-best-live,
+        .moment-best-reaction {
+            display: none;
+        }
+
+        .moment-best-reaction:last-child {
+            display: inline-flex;
+            grid-column: 4;
+        }
+
+        .moment-best-category {
+            font-size: 0.68rem;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool Compact { get; set; }
+
+    private static readonly IReadOnlyList<실시간베스트항목> FallbackItems =
+    [
+        new("seed-diagram", "시스템 다이어그램", "커뮤니티에서 시작해 업무로 이어지는 흐름", "홍달 아키텍처 모임", "오늘", 18, 7, true, "/community#community-board-list"),
+        new("seed-warehouse", "업무 기록", "창고 업무 첫 화면은 공정별 인증 게이트로 통일", "공유창고 실무자들", "이번 주", 12, 4, true, "/community#community-board-list"),
+        new("seed-operation", "개선 제안", "구독료 인하 권고와 운영비 우선 기준 공유", "화주 운영 모임", "검토 중", 9, 3, false, "/community#community-board-list"),
+        new("seed-transport", "운송 실무", "상차 전 확인해야 할 현장 조건을 함께 정리해요", "동네 운송 모임", "최근", 7, 5, false, "/community#community-board-list"),
+        new("seed-mart", "생활 원장", "공동 장보기와 가까운 배송을 연결한 기록", "알뜰살뜰 이웃", "최근", 6, 2, false, "/community#community-board-list")
+    ];
+
+    private readonly CancellationTokenSource cancellationTokenSource = new();
+    private IReadOnlyList<실시간베스트항목> items = FallbackItems;
+    private Task? refreshLoopTask;
+    private bool isRefreshing = true;
+    private bool isDisposed;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            refreshLoopTask = RefreshBestPostsLoopAsync();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task RefreshBestPostsLoopAsync()
+    {
+        try
+        {
+            await LoadBestPostsAsync();
+            using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+            while (await timer.WaitForNextTickAsync(cancellationTokenSource.Token))
+            {
+                await LoadBestPostsAsync();
+            }
+        }
+        catch (OperationCanceledException) when (cancellationTokenSource.IsCancellationRequested)
+        {
+        }
+    }
+
+    private async Task LoadBestPostsAsync()
+    {
+        if (!isDisposed)
+        {
+            isRefreshing = true;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        try
+        {
+            var response = await CommunityService.GetPostsAsync("shipper", cancellationTokenSource.Token);
+            var nowUtc = DateTime.UtcNow;
+            var loadedItems = response.Items
+                .Where(IsEligibleForBest)
+                .OrderByDescending(post => CalculateBestScore(post, nowUtc))
+                .ThenByDescending(post => post.LastEngagedAtUtc ?? post.CreatedAtUtc)
+                .Take(8)
+                .Select(ToBestItem)
+                .ToArray();
+
+            if (loadedItems.Length > 0 && !isDisposed)
+            {
+                items = loadedItems;
+            }
+        }
+        catch (OperationCanceledException) when (cancellationTokenSource.IsCancellationRequested)
+        {
+        }
+        catch
+        {
+            // The home remains usable with immediate fallback items when the API is unavailable.
+        }
+        finally
+        {
+            if (!isDisposed)
+            {
+                isRefreshing = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    private static bool IsEligibleForBest(PlatformCommunityPostResponse post)
+        => !post.IsOperatorPinned
+           && !post.IsReportBoardPost
+           && !post.Category.Contains("신고", StringComparison.OrdinalIgnoreCase)
+           && !post.Category.Contains("분쟁", StringComparison.OrdinalIgnoreCase);
+
+    private static int CalculateBestScore(PlatformCommunityPostResponse post, DateTime nowUtc)
+    {
+        var activityAtUtc = post.LastEngagedAtUtc ?? post.CreatedAtUtc;
+        var ageHours = Math.Max(0, (nowUtc - activityAtUtc).TotalHours);
+        var freshnessScore = ageHours switch
+        {
+            <= 1 => 18,
+            <= 6 => 12,
+            <= 24 => 7,
+            <= 72 => 3,
+            _ => 0
+        };
+
+        return (post.IsTrending ? 20 : 0)
+             + (post.RecommendationCount * 4)
+             + (post.CommentCount * 3)
+             + freshnessScore;
+    }
+
+    private static 실시간베스트항목 ToBestItem(PlatformCommunityPostResponse post)
+    {
+        var activityAtUtc = post.LastEngagedAtUtc ?? post.CreatedAtUtc;
+        return new 실시간베스트항목(
+            $"post-{post.Id}",
+            post.Category,
+            post.Title,
+            string.IsNullOrWhiteSpace(post.Nickname) ? "익명 참여자" : post.Nickname,
+            FormatRelativeActivity(activityAtUtc),
+            post.RecommendationCount,
+            post.CommentCount,
+            post.IsTrending,
+            $"/community?postId={post.Id}#community-board-list");
+    }
+
+    private static string FormatRelativeActivity(DateTime activityAtUtc)
+    {
+        var elapsed = DateTime.UtcNow - activityAtUtc;
+        if (elapsed.TotalMinutes < 1)
+        {
+            return "방금";
+        }
+
+        if (elapsed.TotalHours < 1)
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalMinutes)}분 전";
+        }
+
+        if (elapsed.TotalDays < 1)
+        {
+            return $"{Math.Max(1, (int)elapsed.TotalHours)}시간 전";
+        }
+
+        return elapsed.TotalDays < 7
+            ? $"{Math.Max(1, (int)elapsed.TotalDays)}일 전"
+            : activityAtUtc.ToLocalTime().ToString("MM.dd");
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+        cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
+    }
+
+    private sealed record 실시간베스트항목(
+        string Key,
+        string Category,
+        string Title,
+        string Author,
+        string ActivityLabel,
+        int RecommendationCount,
+        int CommentCount,
+        bool IsTrending,
+        string Href);
+}
