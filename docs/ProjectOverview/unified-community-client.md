@@ -114,7 +114,7 @@ flowchart LR
 가운데 점을 원하는 방향으로 끌거나 괘를 직접 누르면 관련 다이어그램을 연다. 모바일에서는 오른쪽 아래 벽면에 정확한 반원 손잡이만 보이고, 펼치면 원형 판 안에 네 괘가 나타난다. 하단 업무 버튼과 겹치지 않도록 안전 영역 위에 고정한다.
 
 <img src="assets/unified-community-client/bagua-closed.png" alt="오른쪽 벽면의 닫힌 반원 손잡이" width="260">
-<img src="assets/unified-community-client/bagua-open.png" alt="펼쳐진 후천 사방 이동판" width="260">
+<img src="assets/unified-community-client/bagua-taegeuk-open.png" alt="펼쳐진 태극 중심 후천 사방 이동판" width="260">
 <img src="assets/unified-community-client/warehouse-bagua.png" alt="창고 관리자 역할의 입고 출고 판매 배송 사방 이동" width="260">
 
 원방각 표시는 `원=열린 관계`, `방=함께 쓰는 터`, `각=행동하는 사람`이라는 홈의 시각 언어로 사용한다. 필수 기능은 아니며 꾸미기 설정에서 괘상 표시를 끌 수 있다.

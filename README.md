@@ -29,10 +29,10 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
       운송 의뢰, 상차, 하차, 정산 흐름을 세로로 확인합니다.
     </td>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/bagua-navigation-open.png" alt="후천 사방 이동판" width="100%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/bagua-navigation-taegeuk-open.png" alt="태극 중심 후천 사방 이동판" width="100%">
       <br>
-      <b>사방괘 업무 이동</b><br>
-      입고, 출고, 판매, 배송 같은 업무 영역을 빠르게 고릅니다.
+      <b>태극 사방괘 업무 이동</b><br>
+      오른쪽 하단 패널을 열어 업무 방향과 중심 행동을 고릅니다.
     </td>
   </tr>
   <tr>

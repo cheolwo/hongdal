@@ -34,9 +34,9 @@
 
 ![통합 홍달 앱 역할 전환 패널](../assets/changes/2026-07-13-hongdal-visual-summary/role-switch-panel.png)
 
-후천 사방 이동판은 역할별 주요 업무 방향을 화면 오른쪽에서 펼쳐 선택하는 보조 내비게이션입니다. 세부 데이터 페이지를 모두 나열하기보다 먼저 업무 영역과 다이어그램 문맥을 선택합니다.
+후천 사방 이동판은 역할별 주요 업무 방향을 화면 오른쪽 하단에서 펼쳐 선택하는 보조 내비게이션입니다. 가운데는 공통 태극 중심으로 커뮤니티 글 목록과 꾸미기 상점을 나누고, 바깥 사방은 역할별 업무 방향을 고릅니다.
 
-![후천 사방 이동판](../assets/changes/2026-07-13-hongdal-visual-summary/bagua-navigation-open.png)
+![태극 중심 후천 사방 이동판](../assets/changes/2026-07-13-hongdal-visual-summary/bagua-navigation-taegeuk-open.png)
 
 ## 모바일 원장 다이어그램
 
