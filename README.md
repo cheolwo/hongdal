@@ -1,118 +1,127 @@
 # Hongdal
 
-Hongdal은 **사람들이 커뮤니티에서 만나 필요한 일을 이야기하고, 공동 원장과 다이어그램으로 정리해 함께 처리하는 생활 물류 플랫폼**입니다.
+Hongdal은 커뮤니티에서 생긴 생활 가까운 일을 **공동 원장과 다이어그램**으로 정리하고, 필요한 업무 화면으로 이어 주는 생활 물류 플랫폼입니다.
 
-이 README는 **홍달 1.0에서 실제로 볼 수 있는 화면**을 먼저 보여줍니다. 기술 구조, OS, 엔진, AI 같은 설명은 앞에 두지 않고 [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) 뒤쪽에 따로 정리합니다.
+GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세한 정책과 구조는 아래 문서 링크에서 확인합니다.
 
-## 홍달 1.0 제품 중심
+## 먼저 보는 화면
 
-홍달 1.0의 첫 화면과 첫 판단 기준은 커뮤니티입니다. 사용자는 게시글과 대화로 사람을 만나고, 필요한 경우 공동 원장과 다이어그램을 만들어 참여자·상태·증빙을 함께 확인합니다. 운송·창고·주문 화면은 이 커뮤니티 활동에서 구체적인 일이 생겼을 때 사용하는 업무 도구입니다.
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/unified-community-home.png" alt="통합 커뮤니티 홈" width="100%">
+      <br>
+      <b>통합 커뮤니티 홈</b><br>
+      커뮤니티, 게시판, 업무 진입을 한 앱에서 시작합니다.
+    </td>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/role-switch-panel.png" alt="역할 전환 패널" width="100%">
+      <br>
+      <b>역할 전환</b><br>
+      화주, 기사, 창고 관리자 같은 업무 관점을 바꿉니다.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/mobile-ledger-diagram.png" alt="모바일 원장 다이어그램" width="100%">
+      <br>
+      <b>모바일 원장 다이어그램</b><br>
+      운송 의뢰, 상차, 하차, 정산 흐름을 세로로 확인합니다.
+    </td>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/bagua-navigation-open.png" alt="후천 사방 이동판" width="100%">
+      <br>
+      <b>사방괘 업무 이동</b><br>
+      입고, 출고, 판매, 배송 같은 업무 영역을 빠르게 고릅니다.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/ledger-centered-diagram-palette.png" alt="원장 중심 다이어그램 팔레트" width="100%">
+      <br>
+      <b>원장 중심 웹 팔레트</b><br>
+      화물 운송, 창고, 음식, 마트, 공동주문 원장 단위로 노드를 고릅니다.
+    </td>
+    <td width="50%">
+      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/decoration-fakepg-complete.png" alt="꾸미기 FakePG 완료" width="100%">
+      <br>
+      <b>꾸미기 상점과 FakePG</b><br>
+      개발용 결제로 괘상과 다이어그램 꾸미기 흐름을 확인합니다.
+    </td>
+  </tr>
+</table>
 
-```mermaid
-flowchart LR
-    A["커뮤니티 대화"] --> B["공동 원장·다이어그램"]
-    B --> C["참여자 직접 합의"]
-    C --> D["업무 상태·증빙 기록"]
-    D --> A
-```
+## 화면으로 보는 현재 범위
 
-실제 유상 화물 배차·주선·운임 수취·정산은 별도 허가, 제휴와 법률 검토가 끝나기 전까지 운영 기능으로 활성화하지 않습니다. 자세한 기준은 [홍달 1.0 커뮤니티 중심 제품 원칙](docs/Architecture/CommunityFirstV1Policy.md)에 둡니다.
+| 묶음 | 바로 보기 |
+| --- | --- |
+| 통합 커뮤니티 앱 | [통합 커뮤니티 클라이언트](docs/ProjectOverview/unified-community-client.md) |
+| 커밋별 화면 변화 | [커밋별 시각 변경 기록](docs/Changes/README.md) |
+| 전체 앱 화면 카탈로그 | [코드 프로젝트별 전체 페이지](docs/ProjectOverview/app-page-catalog.md) |
+| 홍달 1.0 필수 화면 | [필수 페이지 기준](docs/ProjectOverview/hongdal-v1-required-pages.md) |
+| 실제 렌더링 검증 | [렌더링/캡처 검증 요약](docs/ProjectOverview/hongdal-v1-render-capture-summary.md) |
 
-## 먼저 볼 화면
+## 대표 업무 화면
 
-아래 화면들은 링크를 눌러 들어가지 않아도 README에서 바로 보이는 대표 캡처입니다. 전체 화면 목록과 나머지 캡처는 [코드 프로젝트별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md)에서 봅니다.
+<table>
+  <tr>
+    <td width="33%">
+      <img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P07.png" alt="기사 지도 홈" width="100%">
+      <br><b>기사 지도 홈</b>
+    </td>
+    <td width="33%">
+      <img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P09.png" alt="기사 추천 상세" width="100%">
+      <br><b>기사 추천 상세</b>
+    </td>
+    <td width="33%">
+      <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P03.png" alt="화주 의뢰 상세" width="100%">
+      <br><b>화주 의뢰 상세</b>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%">
+      <img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P12.png" alt="상차 증빙" width="100%">
+      <br><b>상차 증빙</b>
+    </td>
+    <td width="33%">
+      <img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P13.png" alt="하차 증빙" width="100%">
+      <br><b>하차 증빙</b>
+    </td>
+    <td width="33%">
+      <img src="docs/ProjectOverview/assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="관리자 운송 원장" width="100%">
+      <br><b>관리자 운송 원장</b>
+    </td>
+  </tr>
+</table>
 
-### 대표 화면: 통합 커뮤니티 홈
+## 이 프로젝트가 보여주려는 것
 
-같은 앱에서 게시판과 다이어그램을 오가고, 구체적인 일이 생기면 역할에 맞는 업무 화면으로 이어갑니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P00.png" alt="Hongdal 역할 기반 통합 커뮤니티 홈" width="360">
-
-[통합 커뮤니티 클라이언트와 꾸미기 상점 문서](docs/ProjectOverview/unified-community-client.md)에서 역할 전환, 모바일 다이어그램, 후천 사방 이동판, 상점·상세·FakePG·제작 흐름을 봅니다.
-
-### 대표 화면: 기사 지도 홈
-
-기사님이 운행을 시작하고 추천 배너와 현재 운송으로 들어갑니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P07.png" alt="DriverApp 기사 지도 홈 화면" width="360">
-
-### 화주: 의뢰 상세
-
-화주가 결제, 배차, 수락, 상차, 하차, 정산 상태를 한 화면에서 확인합니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P03.png" alt="ShipperApp 의뢰 상세 화면" width="280">
-
-### 기사: 추천 상세
-
-기사님이 추천받은 운송 의뢰의 상차지, 하차지, 운임, 제한 시간을 확인합니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P09.png" alt="DriverApp 추천 상세 화면" width="280">
-
-### 기사: 상차와 하차 증빙
-
-기사님이 상차와 하차 사진을 남기고 운송 상태를 다음 단계로 넘깁니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P12.png" alt="DriverApp 상차 증빙 화면" width="260">
-<img src="docs/ProjectOverview/assets/app-pages/DriverApp/DriverApp-P13.png" alt="DriverApp 하차 증빙 화면" width="260">
-
-### 관리자: 운송 원장
-
-운영자가 의뢰, 배차, 증빙, 정산 흐름을 점검합니다.
-
-<img src="docs/ProjectOverview/assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="HongdalAdmin 운송 원장 화면" width="320">
-
-## 통합 클라이언트 화면 구조
-
-```mermaid
-flowchart LR
-    A["1단계 · 사방괘"] --> B["2단계 · 다이어그램"]
-    B --> C["3단계 · 구체 데이터 페이지"]
-```
-
-사방괘에서 업무 영역을 고르고, 다이어그램에서 창고·주문·사람·운송 같은 노드의 관계와 상태를 파악한 뒤, 노드의 행동 메뉴에서 입고 내역·재고·운송 상세 같은 구체 페이지를 엽니다. 음식 주문·배달은 주문 1건에 배달 회차 0..N건을 연결하는 묶음으로, 공동구매는 수요·수입 결정·선적/통관·입고/분배를 조정하는 복합 원장으로 표시합니다. 데스크톱은 오른쪽 클릭 또는 `⋮`, 모바일은 길게 누르기 또는 `⋮`를 사용합니다. 상세 기준은 [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md)에 둡니다.
-
-## 홍달 1.0 운송 기술 검증 흐름
-
-```mermaid
-flowchart LR
-    A["화주 의뢰 화면"] --> B["기사 추천 화면"]
-    B --> C{"수락 또는 거절"}
-    C -->|수락| D["상차 증빙 화면"]
-    C -->|거절/만료| B
-    D --> E["운송 진행 화면"]
-    E --> F["하차 증빙 화면"]
-    F --> G["관리자 확인/정산 화면"]
-```
-
-이 흐름은 공동 원장이 실제 업무 상태와 증빙을 끝까지 기록할 수 있는지 확인하는 첫 번째 기술 검증 절차입니다. 화주는 의뢰를 만들고, 기사 역할 사용자는 추천·상차·하차 화면을 검증하며, 관리자는 막힌 상태와 증빙 누락을 확인합니다. 이 코드와 화면의 존재가 실제 유상 배차·주선 영업의 활성화를 뜻하지는 않습니다.
+- 커뮤니티에서 대화와 모집이 시작됩니다.
+- 대화가 구체적인 일이 되면 공동 원장과 다이어그램으로 정리합니다.
+- 사용자는 역할을 바꿔가며 필요한 업무 화면으로 들어갑니다.
+- 운송, 창고, 음식, 마트, 공동주문은 원장 위에 붙는 업무 도구입니다.
+- 실제 유상 화물 배차, 주선, 운임 수취, 정산은 허가·제휴·법률 검토 전 운영 기능으로 켜지지 않습니다.
 
 ## 코드 프로젝트별 화면 묶음
 
-아래 프로젝트명은 사용자에게 별도 앱을 강제하는 내비게이션 분류가 아니라, 현재 코드와 라우트가 들어 있는 위치를 찾기 위한 물리 색인입니다.
-
-| 코드 프로젝트 | 화면 수 | 1.0에서 먼저 보는 화면 |
-| --- | ---: | --- |
-| `ShipperApp` | 30 | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점, 의뢰 타임라인 |
-| `DriverApp` | 23 | 운행 시작, 지도 홈, 추천, 수락/거절, 상차/하차 증빙, 정산 |
-| `HongdalAdmin` | 42 | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
-| `WarehouseManagerApp` | 13 | 창고 작업 보드, 입고, 스캔, 피킹 배치, 마트 피킹/포장 |
-| `OrdererApp` | 8 | 주문자 홈, 공동구매, 음식/마트 주문, 주문 이력 |
-| `RestaurantDeskApp` | 5 | 음식점/매장 운영 화면 |
-
-## 첨부 문서
-
-화면과 화면 사이의 더 자세한 흐름은 README 본문에 길게 펼치지 않고 첨부 문서로 둡니다.
-
-| 문서 | 용도 |
+| 코드 프로젝트 | 먼저 보는 화면 |
 | --- | --- |
-| [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
-| [커밋별 시각 변경 기록](docs/Changes/README.md) | 커밋 해시별 화면 변화와 실제 렌더링 캡처 |
+| `ShipperApp` | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점 |
+| `DriverApp` | 운행 시작, 지도 홈, 추천, 상차/하차 증빙, 정산 |
+| `HongdalAdmin` | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
+| `WarehouseManagerApp` | 창고 작업 보드, 입고, 스캔, 피킹 배치, 마트 피킹/포장 |
+| `OrdererApp` | 주문자 홈, 공동구매, 음식/마트 주문, 주문 이력 |
+| `RestaurantDeskApp` | 음식점 주문 접수와 매장 운영 화면 |
+
+## 자세한 문서
+
+| 문서 | 내용 |
+| --- | --- |
+| [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서와 기술 문서를 보는 순서 |
 | [홍달 1.0 커뮤니티 중심 제품 원칙](docs/Architecture/CommunityFirstV1Policy.md) | 커뮤니티 우선순위와 실운영 배차·주선 경계 |
-| [통합 커뮤니티 클라이언트](docs/ProjectOverview/unified-community-client.md) | 역할 전환, 모바일 다이어그램, 후천 사방 이동, 꾸미기 상점 |
-| [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지 구성 원칙 |
-| [코드 프로젝트별 전체 페이지 카탈로그](docs/ProjectOverview/app-page-catalog.md) | 통합 클라이언트 화면의 실제 코드 위치와 인라인 캡처 |
-| [홍달 1.0 필수 페이지 기준](docs/ProjectOverview/hongdal-v1-required-pages.md) | 1.0 운송 흐름에 꼭 필요한 화면 |
-| [렌더링/캡처 검증 요약](docs/ProjectOverview/hongdal-v1-render-capture-summary.md) | 화면 캡처 방식과 검증 결과 |
+| [커뮤니티 운영 정책](docs/Architecture/CommunityOperatingPolicy.md) | 원함, 원장, 참여자, 경험치, 유틸리티 정책 |
+| [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md) | 원장, 블록, OS, 엔진, API 책임 경계 |
+| [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md) | 사방괘, 다이어그램, 구체 데이터 페이지 |
 
 ## 실행과 검증
 
@@ -120,7 +129,3 @@ flowchart LR
 dotnet build Hongdal.slnx /p:UseSharedCompilation=false
 dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 ```
-
-## 문서 작성 배경
-
-루트 README는 저자 이윤석의 [『논스톱 보고서』](https://product.kyobobook.co.kr/detail/S000218640179)에서 영향을 받아 1페이지 보고서식 요약을 지향합니다.
