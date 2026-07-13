@@ -2,6 +2,12 @@
 
 Hongdal community is a gathering and coordination layer, not a paywalled social network. The platform should keep ordinary communication free so people can meet, ask, share, report, and coordinate without feeling forced into payment.
 
+## 홍달 1.0 제품 중심
+
+홍달 1.0은 커뮤니티를 제품의 시작점으로 둔다. 사용자는 대화와 모집에서 공동 원장과 다이어그램을 만들고, 참여자가 직접 합의한 업무의 상태와 선택적 증빙을 기록한다. 운송·창고·주문 기능은 이 흐름을 처리하는 업무 도구이며, 커뮤니티를 단순 보조 레이어로 낮추지 않는다.
+
+플랫폼이 개입하는 유상 화물 배차·주선·운임 수취·정산은 허가·제휴·법률 검토 전 실운영하지 않는다. 코드와 화면은 샘플 데이터, FakePG와 모의 배차를 이용한 기술 검증에 한정할 수 있다. 상세 경계와 공식 근거는 [홍달 1.0 커뮤니티 중심 제품 원칙](CommunityFirstV1Policy.md)을 따른다.
+
 ## Development Philosophy
 
 Hongdal is built around the idea of helping people live more `알뜰살뜰`: careful with money, time, movement, labor, trust, and relationships. This is not only a brand phrase for mart workflows. It is the product philosophy behind the community-first platform.
