@@ -12,6 +12,7 @@ namespace 홍달.Data
         public const string 창고관리자 = "창고관리자";
         public const string 선생님 = "선생님";
         public const string 현장체험지도자 = "현장체험지도자";
+        public const string 교육과정멘토 = "교육과정멘토";
         public const string 서버관리자 = "서버관리자";
     }
 }

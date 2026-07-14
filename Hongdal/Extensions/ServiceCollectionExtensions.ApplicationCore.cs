@@ -71,6 +71,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IKieAi콜백UseCase, KieAi콜백UseCase>();
         services.AddScoped<I샘플이미지작업UseCase, 샘플이미지작업UseCase>();
         services.AddScoped<I배달기사월정산UseCase, 배달기사월정산UseCase>();
+        services.AddScoped<IFoodDeliveryDriverWorkspaceUseCase, FoodDeliveryDriverWorkspaceUseCase>();
+        services.AddScoped<IFoodDeliveryDriverRouteService, FoodDeliveryDriverRouteService>();
         services.AddScoped<I음식주문접수UseCase, 음식주문접수UseCase>();
         services.AddScoped<I공공데이터조회UseCase, 공공데이터조회UseCase>();
         services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
@@ -95,7 +97,12 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I피킹배치Engine, 피킹배치Engine>();
         services.AddScoped<IWorkRelationshipSnapshotService, WorkRelationshipSnapshotService>();
         services.AddScoped<ICommunityActivitySignalService, CommunityActivitySignalService>();
-        services.AddSingleton<ICommunityVoteService, InMemoryCommunityVoteService>();
+        services.AddSingleton<ICommunityVoteStore, MongoCommunityVoteStore>();
+        services.AddScoped<ICommunityGroupPurchaseDemandOutboxProcessor, CommunityGroupPurchaseDemandOutboxProcessor>();
+        services.AddScoped<ICommunityVoteService>(serviceProvider =>
+            new CommunityVoteService(
+                serviceProvider.GetRequiredService<ICommunityVoteStore>(),
+                serviceProvider.GetRequiredService<ICommunityGroupPurchaseDemandOutboxProcessor>()));
         services.AddScoped<ISalesChannelOrderSyncService, SalesChannelOrderSyncService>();
         services.AddSingleton<ISalesChannelOrderFeedClient, EmptySalesChannelOrderFeedClient>();
         services.AddScoped<IHrRoleAssignmentStore, EfCoreHrRoleAssignmentStore>();

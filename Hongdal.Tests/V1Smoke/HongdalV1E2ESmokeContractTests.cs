@@ -50,6 +50,7 @@ public sealed class HongdalV1E2ESmokeContractTests
         AssertRoute<노드스티커상점Controller>("api/v1/community/node-sticker-store");
         AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.List), "GET", "items");
         AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.Get), "GET", "items/{itemKey}");
+        AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.GetMyEntitlements), "GET", "entitlements/me");
         AssertHttpMethod<노드스티커상점Controller>(nameof(노드스티커상점Controller.ConfirmFakePg), "POST", "fake-pg/confirm");
     }
 

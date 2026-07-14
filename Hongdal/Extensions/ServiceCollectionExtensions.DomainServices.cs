@@ -11,14 +11,17 @@ using 홍달.Services.External.PublicData;
 using 홍달.Services.HIOPSAI;
 using 홍달.Services.Images;
 using 홍달.Services.Payments;
+using 홍달.Services.Options;
 using 홍달.Services.Sales;
 using 홍달.Services.Versioning;
 using Hongdal.Services.Auth;
 using Hongdal.Services.Community;
+using Hongdal.Services.Content;
 using Hongdal.Services.Food;
 using Hongdal.Services.Education;
 using Hongdal.Services.LogisticsProcessing.Warehouse;
 using Hongdal.Services.Orderer;
+using Hongdal.Services.Notifications;
 using Hongdal.Services.Speech;
 
 namespace Hongdal.Extensions;
@@ -27,6 +30,7 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHongdalDomainServices(this IServiceCollection services)
     {
+        services.AddSingleton<IHongdalExecutionModePolicy, HongdalExecutionModePolicy>();
         services.AddScoped<I결제Provider, Toss결제Provider>();
         services.AddScoped<I공통결제Service, 공통결제Service>();
         services.AddScoped<I콘텐츠혜택계산Service, 콘텐츠혜택계산Service>();
@@ -37,14 +41,25 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I주문자집단자동배정Service, 주문자집단자동배정Service>();
         services.AddSingleton<I공동구매물류워크플로우저장소, Mongo공동구매물류워크플로우저장소>();
         services.AddSingleton<I공동구매자동집단화저장소, Mongo공동구매자동집단화저장소>();
+        services.AddSingleton<ICommunityGroupPurchaseDemandHandoff, CommunityVoteOrdererDemandHandoff>();
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
         services.AddSingleton<Mongo커뮤니티원장저장소>();
+        services.AddSingleton<I커뮤니티원장투영작업저장소>(sp => sp.GetRequiredService<Mongo커뮤니티원장저장소>());
         services.AddSingleton<I커뮤니티원장저장소, 이벤트발행커뮤니티원장저장소>();
+        services.AddSingleton<I커뮤니티원장공유정책저장소, Mongo커뮤니티원장공유정책저장소>();
+        services.AddScoped<I커뮤니티원장공유Service, 커뮤니티원장공유Service>();
+        services.AddSingleton<I주문원장서명저장소, Mongo주문원장서명저장소>();
+        services.AddSingleton<I주문원장공개요청저장소, Mongo주문원장공개요청저장소>();
+        services.AddScoped<I주문원장통합UseCase, 주문원장통합UseCase>();
+        services.AddScoped<I주문원장서명UseCase, 주문원장서명UseCase>();
+        services.AddScoped<I주문원장역할별조회Service, 주문원장역할별조회Service>();
+        services.AddScoped<I주문원장공개요청Service, 주문원장공개요청Service>();
         services.AddSingleton<I커뮤니티대화저장소, Mongo커뮤니티대화저장소>();
-        services.AddScoped<I커뮤니티원장블록관계투영Service, 커뮤니티원장블록관계투영Service>();
         services.AddScoped<I커뮤니티원장상태이벤트Service, 커뮤니티원장상태이벤트Service>();
+        services.AddScoped<I게시글원장ContextService, 게시글원장ContextService>();
+        services.AddScoped<I원장다이어그램실시간알림Service, 원장다이어그램SignalR알림Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();
         services.AddScoped<I원장업무투영동기화Handler, 운송원장업무투영Handler>();
         services.AddScoped<I원장업무투영동기화Handler, 창고원장업무투영Handler>();
@@ -53,8 +68,22 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I음식마트원장Mongo동기화Service, 음식마트원장Mongo동기화Service>();
         services.AddSingleton<I교육기관제출대기열, Mongo교육기관제출대기열>();
         services.AddScoped<I현장체험활동UseCase, 현장체험활동UseCase>();
+        services.AddScoped<I교육과정정의Service, 교육과정정의Service>();
+        services.AddScoped<I교육과정참여Service, 교육과정참여Service>();
         services.AddScoped<ITypecast음성카탈로그저장소, EfTypecast음성카탈로그저장소>();
         services.AddScoped<ITypecast음성카탈로그Service, Typecast음성카탈로그Service>();
+        services.AddScoped<IYouTube채널감시저장소, EfYouTube채널감시저장소>();
+        services.AddScoped<IYouTube채널감시Service, YouTube채널감시Service>();
+        services.AddSingleton<IHongikHakdangCardPageParser, HongikHakdangCardPageParser>();
+        services.AddSingleton<IHongikHakdangCardImageStore, HongikHakdangCardImageStore>();
+        services.AddSingleton<IHongikHakdangCardVariantRenderer, HongikHakdangCardVariantRenderer>();
+        services.AddSingleton<IHongikHakdangCardSelectionPolicy, HongikHakdangCardSelectionPolicy>();
+        services.AddSingleton<IHongikHakdangCardMediaTokenService, HongikHakdangCardMediaTokenService>();
+        services.AddScoped<IHongikHakdangCardRepository, EfHongikHakdangCardRepository>();
+        services.AddScoped<IHongikHakdangCardService, HongikHakdangCardService>();
+        services.AddScoped<IHongikHakdangCardVariantService, HongikHakdangCardVariantService>();
+        services.AddScoped<IHongikHakdangCardDeliveryService, HongikHakdangCardDeliveryService>();
+        services.AddScoped<IHongdalMobilePushInstallationService, HongdalMobilePushInstallationService>();
         services.AddSingleton<I커뮤니티게시글음성본문분할기, 커뮤니티게시글음성본문분할기>();
         services.AddSingleton<I커뮤니티게시글음성작업예약Service, 커뮤니티게시글음성작업예약Service>();
         services.AddSingleton<I커뮤니티게시글음성작업신호, 커뮤니티게시글음성작업신호>();
@@ -62,6 +91,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티게시글음성조회Service, 커뮤니티게시글음성조회Service>();
         services.AddHostedService<교육기관제출Worker>();
         services.AddHostedService<커뮤니티게시글음성Worker>();
+        services.AddHostedService<커뮤니티원장투영Worker>();
+        services.AddHostedService<CommunityGroupPurchaseDemandOutboxWorker>();
         services.AddScoped<I인증UseCase, 인증UseCase>();
         services.AddScoped<I커뮤니티대화UseCase, 커뮤니티대화UseCase>();
         services.AddScoped<I공동구매자동집단화UseCase, 공동구매자동집단화UseCase>();
@@ -159,6 +190,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I판매상품샘플시드Service, 판매상품샘플시드Service>();
         services.AddScoped<I배차추천Service, 화물배차추천Service>();
         services.AddScoped<I음식배차추천Service, 음식배차추천Service>();
+        services.AddScoped<I음식배달기사업무Service, 음식배달기사업무Service>();
         services.AddScoped<I운행중배차추천Service, 운행중배차추천Service>();
         services.AddScoped<I비운행중배차추천Service, 비운행중배차추천Service>();
         services.AddScoped<I기사운송상태전이Service, 기사운송상태전이Service>();

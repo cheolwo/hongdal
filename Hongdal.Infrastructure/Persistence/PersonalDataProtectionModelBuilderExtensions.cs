@@ -4,6 +4,7 @@ using 홍달.도메인.기사;
 using 홍달.도메인.업체;
 using 홍달.도메인.화주;
 using 홍달.Infrastructure.Security;
+using Hongdal.Domain.Notifications;
 
 namespace 홍달.Infrastructure.Persistence
 {
@@ -77,6 +78,10 @@ namespace 홍달.Infrastructure.Persistence
 
             modelBuilder.Entity<화주운송의뢰>()
                 .Property(x => x.하차_연락처_전화번호)
+                .HasConversion(v => protector.Protect(v)!, v => protector.Unprotect(v)!);
+
+            modelBuilder.Entity<HongdalMobilePushInstallation>()
+                .Property(x => x.PushToken)
                 .HasConversion(v => protector.Protect(v)!, v => protector.Unprotect(v)!);
         }
     }

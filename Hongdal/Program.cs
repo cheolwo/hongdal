@@ -38,6 +38,8 @@ using 홍달.Services.Payments;
 using Hongdal.Services.Driver.Development;
 using Hongdal.Services.Development;
 using Hongdal.Services.Security;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CustomsWebCorsPolicy = "HongdalWebCustoms";
@@ -86,19 +88,30 @@ if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
 
 builder.Services.AddScoped<AuthTokenService>();
 
-var tossOptions = builder.Configuration.GetSection(TossPaymentsOptions.SectionName).Get<TossPaymentsOptions>() ?? new TossPaymentsOptions();
-if (string.IsNullOrWhiteSpace(tossOptions.SecretKey))
+var executionOptions = builder.Configuration
+    .GetSection(HongdalExecutionOptions.SectionName)
+    .Get<HongdalExecutionOptions>() ?? new HongdalExecutionOptions();
+if (!Enum.IsDefined(executionOptions.Mode))
 {
-    throw new InvalidOperationException("TossPayments:SecretKey configuration is required.");
+    throw new InvalidOperationException("HongdalExecution:Mode must be Simulation or Operational.");
+}
+
+var tossOptions = builder.Configuration.GetSection(TossPaymentsOptions.SectionName).Get<TossPaymentsOptions>() ?? new TossPaymentsOptions();
+if (executionOptions.Mode == HongdalExecutionMode.Operational && string.IsNullOrWhiteSpace(tossOptions.SecretKey))
+{
+    throw new InvalidOperationException("TossPayments:SecretKey configuration is required in Operational mode.");
 }
 
 builder.Services.AddHongdalOptions(builder.Configuration);
+builder.Services.AddHongdalOperatingMarketServices(builder.Configuration);
 builder.Services.AddScoped<I가입온보딩인연후보Service, 가입온보딩인연후보Service>();
 
 var dispatchQueueJobOptions = builder.Configuration.GetSection(배차큐배치작업Options.SectionName).Get<배차큐배치작업Options>() ?? new 배차큐배치작업Options();
 var salesOrderSyncOptions = builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName).Get<SalesChannelOrderSyncOptions>() ?? new SalesChannelOrderSyncOptions();
+var youTubeOptions = builder.Configuration.GetSection(YouTubeOptions.SectionName).Get<YouTubeOptions>() ?? new YouTubeOptions();
+var hongikHakdangCardOptions = builder.Configuration.GetSection(HongikHakdangCardOptions.SectionName).Get<HongikHakdangCardOptions>() ?? new HongikHakdangCardOptions();
 
-builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions);
+builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions, youTubeOptions, hongikHakdangCardOptions, executionOptions);
 builder.Services.AddHongdalPersistence(builder.Configuration);
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -165,14 +178,29 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddHongdalHttpClients();
 builder.Services.AddHongdalDomainServices();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Replace(ServiceDescriptor.Singleton<IGoogleCloudStorageService, DevelopmentLocalCloudStorageService>());
+}
 builder.Services.AddSingleton<Hongdal.Services.Orderer.IRestaurantSearchPolicyStore, Hongdal.Services.Orderer.InMemoryRestaurantSearchPolicyStore>();
 builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개발스냅샷Provider>();
 
 var app = builder.Build();
+app.Logger.LogInformation("Hongdal execution mode: {ExecutionMode}", executionOptions.Mode);
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    var localStorageRoot = Path.Combine(
+        app.Environment.ContentRootPath,
+        DevelopmentLocalCloudStorageService.StorageDirectoryName);
+    Directory.CreateDirectory(localStorageRoot);
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(localStorageRoot),
+        RequestPath = DevelopmentLocalCloudStorageService.RequestPath
+    });
 }
 
 using (var scope = app.Services.CreateScope())
@@ -324,6 +352,7 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
         if (environment.IsDevelopment())
         {
             await HongdalV1DevelopmentDataSeeder.SeedAsync(services, logger);
+            await CommunityLedgerDevelopmentDataSeeder.SeedAsync(services, logger);
         }
     }
     catch (Exception ex)

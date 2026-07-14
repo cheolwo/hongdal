@@ -1,4 +1,5 @@
 using Quartz;
+using Hongdal.Infrastructure.BackgroundJobs.Content;
 using Hongdal.Infrastructure.BackgroundJobs.SalesOrders;
 using Hongdal.Services.LogisticsProcessing.SalesOrders;
 using 홍달.Infrastructure.BackgroundJobs.Customs;
@@ -14,37 +15,43 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddHongdalBackgroundJobs(
         this IServiceCollection services,
         배차큐배치작업Options jobOptions,
-        SalesChannelOrderSyncOptions salesOrderSyncOptions)
+        SalesChannelOrderSyncOptions salesOrderSyncOptions,
+        YouTubeOptions youTubeOptions,
+        HongikHakdangCardOptions hongikHakdangCardOptions,
+        HongdalExecutionOptions executionOptions)
     {
         services.AddQuartz(q =>
         {
-            var scanJobKey = new JobKey("DispatchQueueScan");
-            q.AddJob<배차큐스캔Job>(opts => opts.WithIdentity(scanJobKey));
-            q.AddTrigger(opts => opts
-                .ForJob(scanJobKey)
-                .WithIdentity("DispatchQueueScan-trigger")
-                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.큐스캔주기초))).RepeatForever()));
+            if (executionOptions.Mode == HongdalExecutionMode.Operational)
+            {
+                var scanJobKey = new JobKey("DispatchQueueScan");
+                q.AddJob<배차큐스캔Job>(opts => opts.WithIdentity(scanJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(scanJobKey)
+                    .WithIdentity("DispatchQueueScan-trigger")
+                    .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.큐스캔주기초))).RepeatForever()));
 
-            var expireJobKey = new JobKey("DispatchRecommendationExpire");
-            q.AddJob<추천만료정리Job>(opts => opts.WithIdentity(expireJobKey));
-            q.AddTrigger(opts => opts
-                .ForJob(expireJobKey)
-                .WithIdentity("DispatchRecommendationExpire-trigger")
-                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.추천만료정리주기초))).RepeatForever()));
+                var expireJobKey = new JobKey("DispatchRecommendationExpire");
+                q.AddJob<추천만료정리Job>(opts => opts.WithIdentity(expireJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(expireJobKey)
+                    .WithIdentity("DispatchRecommendationExpire-trigger")
+                    .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.추천만료정리주기초))).RepeatForever()));
 
-            var pushJobKey = new JobKey("DispatchRecommendationPush");
-            q.AddJob<배차추천알림발송Job>(opts => opts.WithIdentity(pushJobKey));
-            q.AddTrigger(opts => opts
-                .ForJob(pushJobKey)
-                .WithIdentity("DispatchRecommendationPush-trigger")
-                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
+                var pushJobKey = new JobKey("DispatchRecommendationPush");
+                q.AddJob<배차추천알림발송Job>(opts => opts.WithIdentity(pushJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(pushJobKey)
+                    .WithIdentity("DispatchRecommendationPush-trigger")
+                    .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
 
-            var commandNotificationJobKey = new JobKey("CommandNotificationOutboxSend");
-            q.AddJob<Command알림Outbox발송Job>(opts => opts.WithIdentity(commandNotificationJobKey));
-            q.AddTrigger(opts => opts
-                .ForJob(commandNotificationJobKey)
-                .WithIdentity("CommandNotificationOutboxSend-trigger")
-                .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
+                var commandNotificationJobKey = new JobKey("CommandNotificationOutboxSend");
+                q.AddJob<Command알림Outbox발송Job>(opts => opts.WithIdentity(commandNotificationJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(commandNotificationJobKey)
+                    .WithIdentity("CommandNotificationOutboxSend-trigger")
+                    .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(5, jobOptions.알림발송주기초))).RepeatForever()));
+            }
 
             var paymentOutboxJobKey = new JobKey("PaymentApprovedOutboxPublish");
             q.AddJob<결제승인완료Outbox발행Job>(opts => opts.WithIdentity(paymentOutboxJobKey));
@@ -73,6 +80,46 @@ public static partial class ServiceCollectionExtensions
                 .ForJob(overseasSalesOrderSyncJobKey)
                 .WithIdentity("OverseasSalesChannelOrderSync-trigger")
                 .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromSeconds(Math.Max(60, salesOrderSyncOptions.OverseasSyncIntervalSeconds))).RepeatForever()));
+
+            if (youTubeOptions.Enabled)
+            {
+                var youTubeSyncJobKey = new JobKey("YouTubeChannelSync");
+                q.AddJob<YouTube채널동기화Job>(opts => opts.WithIdentity(youTubeSyncJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(youTubeSyncJobKey)
+                    .WithIdentity("YouTubeChannelSync-trigger")
+                    .WithSimpleSchedule(x => x
+                        .WithInterval(TimeSpan.FromSeconds(Math.Max(60, youTubeOptions.SyncIntervalSeconds)))
+                        .RepeatForever()));
+            }
+
+            if (hongikHakdangCardOptions.Enabled)
+            {
+                var cardSyncJobKey = new JobKey("HongikHakdangCardSync");
+                q.AddJob<HongikHakdangCardSyncJob>(opts => opts.WithIdentity(cardSyncJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(cardSyncJobKey)
+                    .WithIdentity("HongikHakdangCardSync-trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x
+                        .WithInterval(TimeSpan.FromHours(Math.Max(1, hongikHakdangCardOptions.SyncIntervalHours)))
+                        .RepeatForever()));
+
+                if (hongikHakdangCardOptions.DeliveryEnabled)
+                {
+                    var cardDeliveryJobKey = new JobKey("HongikHakdangCardDelivery");
+                    q.AddJob<HongikHakdangCardDeliveryJob>(opts => opts.WithIdentity(cardDeliveryJobKey));
+                    q.AddTrigger(opts => opts
+                        .ForJob(cardDeliveryJobKey)
+                        .WithIdentity("HongikHakdangCardDelivery-trigger")
+                        .StartNow()
+                        .WithSimpleSchedule(x => x
+                            .WithInterval(TimeSpan.FromSeconds(Math.Max(
+                                30,
+                                hongikHakdangCardOptions.DeliveryPollingSeconds)))
+                            .RepeatForever()));
+                }
+            }
         });
 
         services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });

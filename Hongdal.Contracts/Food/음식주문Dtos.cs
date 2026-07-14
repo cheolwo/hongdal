@@ -36,6 +36,7 @@ public static class 음식주문배차상태코드
     public const string 배차대기 = "배차대기";
     public const string 추천중 = "추천중";
     public const string 기사배정 = "기사배정";
+    public const string 배달완료 = "배달완료";
     public const string 배차불가 = "배차불가";
 }
 

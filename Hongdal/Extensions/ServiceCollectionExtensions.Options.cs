@@ -42,13 +42,17 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CustomsOptions>(configuration.GetSection(CustomsOptions.SectionName));
         services.Configure<PublicDataOptions>(configuration.GetSection(PublicDataOptions.SectionName));
         services.Configure<VersionFeatureFlagsOptions>(configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
+        services.Configure<HongdalExecutionOptions>(configuration.GetSection(HongdalExecutionOptions.SectionName));
         services.Configure<SalesChannelOrderSyncOptions>(configuration.GetSection(SalesChannelOrderSyncOptions.SectionName));
         services.Configure<배차큐정책Options>(configuration.GetSection("DispatchQueue"));
         services.Configure<국내화물배차AI정책Options>(configuration.GetSection(국내화물배차AI정책Options.SectionName));
         services.Configure<배차큐배치작업Options>(configuration.GetSection(배차큐배치작업Options.SectionName));
         services.Configure<교육기관제출Options>(configuration.GetSection(교육기관제출Options.SectionName));
         services.Configure<TypecastOptions>(configuration.GetSection(TypecastOptions.SectionName));
+        services.Configure<YouTubeOptions>(configuration.GetSection(YouTubeOptions.SectionName));
+        services.Configure<HongikHakdangCardOptions>(configuration.GetSection(HongikHakdangCardOptions.SectionName));
         services.Configure<CommunityPostAudioOptions>(configuration.GetSection(CommunityPostAudioOptions.SectionName));
+        services.Configure<CommunityLedgerProjectionOptions>(configuration.GetSection(CommunityLedgerProjectionOptions.SectionName));
 
         return services;
     }

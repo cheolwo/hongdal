@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Hongdal.Domain.Community;
+using Hongdal.Domain.Content;
+using Hongdal.Domain.Education;
 using Hongdal.Domain.HumanResources;
 using Hongdal.Domain.HsCodes;
 using Hongdal.Domain.Speech;
@@ -102,6 +104,23 @@ namespace 홍달.Data
         public DbSet<Typecast음성> Typecast음성 { get; set; } = null!;
         public DbSet<Typecast음성모델> Typecast음성모델 { get; set; } = null!;
         public DbSet<Typecast음성용도> Typecast음성용도 { get; set; } = null!;
+        public DbSet<YouTube감시채널> YouTube감시채널 { get; set; } = null!;
+        public DbSet<YouTube채널영상> YouTube채널영상 { get; set; } = null!;
+        public DbSet<HongikHakdangCardCollection> HongikHakdangCardCollections { get; set; } = null!;
+        public DbSet<HongikHakdangCard> HongikHakdangCards { get; set; } = null!;
+        public DbSet<HongikHakdangCardCollectionItem> HongikHakdangCardCollectionItems { get; set; } = null!;
+        public DbSet<HongikHakdangCardImageVariant> HongikHakdangCardImageVariants { get; set; } = null!;
+        public DbSet<HongikHakdangCardDeliveryPreference> HongikHakdangCardDeliveryPreferences { get; set; } = null!;
+        public DbSet<HongikHakdangDailyCardSelection> HongikHakdangDailyCardSelections { get; set; } = null!;
+        public DbSet<HongikHakdangCardDeliveryOutbox> HongikHakdangCardDeliveryOutbox { get; set; } = null!;
+        public DbSet<Hongdal.Domain.Notifications.HongdalMobilePushInstallation> HongdalMobilePushInstallations { get; set; } = null!;
+        public DbSet<교육과정> 교육과정 { get; set; } = null!;
+        public DbSet<교육과정과목> 교육과정과목 { get; set; } = null!;
+        public DbSet<교육과정양식> 교육과정양식 { get; set; } = null!;
+        public DbSet<교육과정신청> 교육과정신청 { get; set; } = null!;
+        public DbSet<교육과정등록> 교육과정등록 { get; set; } = null!;
+        public DbSet<교육과정참석기록> 교육과정참석기록 { get; set; } = null!;
+        public DbSet<교육과정과제제출> 교육과정과제제출 { get; set; } = null!;
 
         public DbSet<판매채널계정> 판매채널계정 { get; set; } = null!;
         public DbSet<판매상품> 판매상품 { get; set; } = null!;
@@ -133,8 +152,6 @@ namespace 홍달.Data
         public DbSet<PlatformCommunityPostAudio> PlatformCommunityPostAudio { get; set; } = null!;
         public DbSet<PlatformCommunityPostAudioSegment> PlatformCommunityPostAudioSegments { get; set; } = null!;
         public DbSet<PlatformCommunityPostAudioAccessLog> PlatformCommunityPostAudioAccessLogs { get; set; } = null!;
-        public DbSet<커뮤니티원장블록투영> 커뮤니티원장블록투영 { get; set; } = null!;
-        public DbSet<커뮤니티원장블록관계투영> 커뮤니티원장블록관계투영 { get; set; } = null!;
         public DbSet<커뮤니티원장상태이벤트> 커뮤니티원장상태이벤트 { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

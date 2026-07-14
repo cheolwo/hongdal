@@ -27,6 +27,8 @@ public static partial class ServiceCollectionExtensions
                     mysqlOptions.EnableRetryOnFailure();
                 }));
 
+        services.AddTraditionalMarketModule(connectionString);
+
         var redisConnectionString = configuration.GetSection(RedisOptions.SectionName).GetValue<string>(nameof(RedisOptions.ConnectionString))
                                     ?? Environment.GetEnvironmentVariable("Redis__ConnectionString");
         if (string.IsNullOrWhiteSpace(redisConnectionString))

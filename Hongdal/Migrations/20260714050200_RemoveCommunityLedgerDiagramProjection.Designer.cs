@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using 홍달.Data;
 
@@ -11,9 +12,11 @@ using 홍달.Data;
 namespace Hongdal.Migrations
 {
     [DbContext(typeof(HongdalContext))]
-    partial class HongdalContextModelSnapshot : ModelSnapshot
+    [Migration("20260714050200_RemoveCommunityLedgerDiagramProjection")]
+    partial class RemoveCommunityLedgerDiagramProjection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,13 +183,7 @@ namespace Hongdal.Migrations
                         .HasMaxLength(60)
                         .HasColumnType("varchar(60)");
 
-                    b.Property<string>("커뮤니티원장Id")
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("커뮤니티원장Id");
 
                     b.HasIndex("Category", "IsDeleted", "CreatedAtUtc");
 
@@ -656,574 +653,6 @@ namespace Hongdal.Migrations
                     b.ToTable("community_ledger_state_events", (string)null);
                 });
 
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCard", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<string>("ImageContentType")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("image_content_type");
-
-                    b.Property<string>("ImageDownloadError")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("image_download_error");
-
-                    b.Property<string>("ImageDownloadStatus")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("image_download_status");
-
-                    b.Property<DateTime?>("ImageDownloadedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("image_downloaded_at_utc");
-
-                    b.Property<string>("ImageSha256")
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("image_sha256");
-
-                    b.Property<long?>("ImageSizeBytes")
-                        .HasColumnType("bigint")
-                        .HasColumnName("image_size_bytes");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<string>("LocalImagePath")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("local_image_path");
-
-                    b.Property<string>("OriginalImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(1500)
-                        .HasColumnType("varchar(1500)")
-                        .HasColumnName("original_image_url");
-
-                    b.Property<string>("RelatedUrl")
-                        .HasMaxLength(1500)
-                        .HasColumnType("varchar(1500)")
-                        .HasColumnName("related_url");
-
-                    b.Property<string>("SourceKey")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("source_key");
-
-                    b.Property<string>("ThumbnailImageUrl")
-                        .HasMaxLength(1500)
-                        .HasColumnType("varchar(1500)")
-                        .HasColumnName("thumbnail_image_url");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("title");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ImageDownloadStatus")
-                        .HasDatabaseName("IX_hh_cards_download_status");
-
-                    b.HasIndex("SourceKey")
-                        .HasDatabaseName("IX_hh_cards_source_key")
-                        .IsUnique();
-
-                    b.HasIndex("IsActive", "LastSeenAtUtc")
-                        .HasDatabaseName("IX_hh_cards_active_last_seen");
-
-                    b.ToTable("hongik_hakdang_cards", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardDeliveryOutbox", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("int")
-                        .HasColumnName("attempt_count");
-
-                    b.Property<long>("CardId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("card_id");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("IdempotencyKey")
-                        .IsRequired()
-                        .HasMaxLength(240)
-                        .HasColumnType("varchar(240)")
-                        .HasColumnName("idempotency_key");
-
-                    b.Property<long>("InstallationId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("installation_id");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("last_error");
-
-                    b.Property<DateTime>("NextAttemptAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("next_attempt_at_utc");
-
-                    b.Property<DateOnly>("SelectionDate")
-                        .HasColumnType("date")
-                        .HasColumnName("selection_date");
-
-                    b.Property<DateTime?>("SentAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("sent_at_utc");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CardId")
-                        .HasDatabaseName("IX_hh_card_outbox_card");
-
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasDatabaseName("UX_hh_card_outbox_idempotency");
-
-                    b.HasIndex("InstallationId")
-                        .HasDatabaseName("IX_hh_card_outbox_installation");
-
-                    b.HasIndex("Status", "NextAttemptAtUtc")
-                        .HasDatabaseName("IX_hh_card_outbox_due");
-
-                    b.ToTable("hongik_hakdang_card_delivery_outbox", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardDeliveryPreference", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("DeliveryMode")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("delivery_mode");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("enabled");
-
-                    b.Property<int>("LocalDeliveryMinute")
-                        .HasColumnType("int")
-                        .HasColumnName("local_delivery_minute");
-
-                    b.Property<string>("PreferredCollectionKey")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("preferred_collection_key");
-
-                    b.Property<bool>("PushEnabled")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("push_enabled");
-
-                    b.Property<bool>("ShuffleWithoutRepeats")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("shuffle_without_repeats");
-
-                    b.Property<string>("TimeZoneId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("time_zone_id");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("Enabled", "PushEnabled")
-                        .HasDatabaseName("IX_hh_card_preferences_delivery");
-
-                    b.ToTable("hongik_hakdang_card_delivery_preferences", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardImageVariant", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("CardId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("card_id");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("content_type");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<int>("Height")
-                        .HasColumnType("int")
-                        .HasColumnName("height");
-
-                    b.Property<string>("LocalImagePath")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("local_image_path");
-
-                    b.Property<string>("Sha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("sha256");
-
-                    b.Property<long>("SizeBytes")
-                        .HasColumnType("bigint")
-                        .HasColumnName("size_bytes");
-
-                    b.Property<string>("SourceImageSha256")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("source_image_sha256");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("VariantKind")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("variant_kind");
-
-                    b.Property<int>("Width")
-                        .HasColumnType("int")
-                        .HasColumnName("width");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Sha256")
-                        .HasDatabaseName("IX_hh_card_variants_sha256");
-
-                    b.HasIndex("CardId", "VariantKind")
-                        .IsUnique()
-                        .HasDatabaseName("UX_hh_card_variants_card_kind");
-
-                    b.ToTable("hongik_hakdang_card_image_variants", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangDailyCardSelection", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("CardId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("card_id");
-
-                    b.Property<DateOnly>("SelectionDate")
-                        .HasColumnType("date")
-                        .HasColumnName("selection_date");
-
-                    b.Property<DateTime>("SelectedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("selected_at_utc");
-
-                    b.Property<string>("TimeZoneId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("time_zone_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CardId")
-                        .HasDatabaseName("IX_hh_daily_cards_card");
-
-                    b.HasIndex("SelectionDate", "TimeZoneId")
-                        .IsUnique()
-                        .HasDatabaseName("UX_hh_daily_cards_date_zone");
-
-                    b.ToTable("hongik_hakdang_daily_card_selections", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Notifications.HongdalMobilePushInstallation", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AppKey")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("app_key");
-
-                    b.Property<string>("AppVersion")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("app_version");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("DeviceModel")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("device_model");
-
-                    b.Property<string>("InstallationId")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("installation_id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<string>("Platform")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("platform");
-
-                    b.Property<string>("PushToken")
-                        .IsRequired()
-                        .HasMaxLength(4096)
-                        .HasColumnType("varchar(4096)")
-                        .HasColumnName("push_token");
-
-                    b.Property<string>("PushTokenHash")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("push_token_hash");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PushTokenHash")
-                        .HasDatabaseName("IX_mobile_push_token_hash");
-
-                    b.HasIndex("UserId", "IsActive")
-                        .HasDatabaseName("IX_mobile_push_user_active");
-
-                    b.HasIndex("AppKey", "InstallationId")
-                        .IsUnique()
-                        .HasDatabaseName("UX_mobile_push_app_installation");
-
-                    b.ToTable("hongdal_mobile_push_installations", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardCollection", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("name");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("sort_order");
-
-                    b.Property<string>("SourceKey")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("source_key");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SourceKey")
-                        .HasDatabaseName("IX_hh_card_collections_source_key")
-                        .IsUnique();
-
-                    b.HasIndex("IsActive", "SortOrder")
-                        .HasDatabaseName("IX_hh_card_collections_active_order");
-
-                    b.ToTable("hongik_hakdang_card_collections", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardDeliveryOutbox", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_card_outbox_cards")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Hongdal.Domain.Notifications.HongdalMobilePushInstallation", "Installation")
-                        .WithMany()
-                        .HasForeignKey("InstallationId")
-                        .HasConstraintName("FK_hh_card_outbox_installations")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-
-                    b.Navigation("Installation");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardImageVariant", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany("ImageVariants")
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_card_variants_cards")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangDailyCardSelection", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_daily_cards_cards")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardCollectionItem", b =>
-                {
-                    b.Property<long>("CollectionId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("collection_id");
-
-                    b.Property<long>("CardId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("card_id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("sort_order");
-
-                    b.HasKey("CollectionId", "CardId");
-
-                    b.HasIndex("CardId", "IsActive")
-                        .HasDatabaseName("IX_hh_card_items_card_active");
-
-                    b.HasIndex("CollectionId", "IsActive", "SortOrder")
-                        .HasDatabaseName("IX_hh_card_items_collection_active_order");
-
-                    b.ToTable("hongik_hakdang_card_collection_items", (string)null);
-                });
-
             modelBuilder.Entity("Hongdal.Domain.Content.YouTube감시채널", b =>
                 {
                     b.Property<long>("Id")
@@ -1292,27 +721,6 @@ namespace Hongdal.Migrations
                     b.HasIndex("활성화여부", "마지막동기화일시Utc");
 
                     b.ToTable("youtube_watched_channels", (string)null);
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardCollectionItem", b =>
-                {
-                    b.HasOne("Hongdal.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany("Collections")
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_card_items_cards")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hongdal.Domain.Content.HongikHakdangCardCollection", "Collection")
-                        .WithMany("Items")
-                        .HasForeignKey("CollectionId")
-                        .HasConstraintName("FK_hh_card_items_collections")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-
-                    b.Navigation("Collection");
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Content.YouTube채널영상", b =>
@@ -2762,7 +2170,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("결제", (string)null);
+                    b.ToTable("결제");
                 });
 
             modelBuilder.Entity("홍달.도메인.공통.생성이미지작업", b =>
@@ -2906,7 +2314,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("이미지용도", "대상타입", "대상식별자", "상태");
 
-                    b.ToTable("생성이미지작업", (string)null);
+                    b.ToTable("생성이미지작업");
                 });
 
             modelBuilder.Entity("홍달.도메인.공통콘텐츠.홍달공통콘텐츠", b =>
@@ -2991,7 +2399,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("활성화여부", "노출시작시각", "노출종료시각");
 
-                    b.ToTable("홍달_공통콘텐츠", (string)null);
+                    b.ToTable("홍달_공통콘텐츠");
                 });
 
             modelBuilder.Entity("홍달.도메인.공통콘텐츠.홍달콘텐츠보상정책", b =>
@@ -3037,7 +2445,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("홍달_콘텐츠보상정책", (string)null);
+                    b.ToTable("홍달_콘텐츠보상정책");
                 });
 
             modelBuilder.Entity("홍달.도메인.공통콘텐츠.홍달콘텐츠보상지급", b =>
@@ -3094,7 +2502,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("사용자Id", "결제사용여부", "지급시각");
 
-                    b.ToTable("홍달_콘텐츠보상지급", (string)null);
+                    b.ToTable("홍달_콘텐츠보상지급");
                 });
 
             modelBuilder.Entity("홍달.도메인.공통콘텐츠.홍달콘텐츠시청세션", b =>
@@ -3150,7 +2558,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("사용자Id", "콘텐츠Id", "시작시각");
 
-                    b.ToTable("홍달_콘텐츠시청세션", (string)null);
+                    b.ToTable("홍달_콘텐츠시청세션");
                 });
 
             modelBuilder.Entity("홍달.도메인.기사.기사근무", b =>
@@ -3372,7 +2780,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("배달기사", (string)null);
+                    b.ToTable("배달기사");
                 });
 
             modelBuilder.Entity("홍달.도메인.기사.배차계획신청", b =>
@@ -3431,7 +2839,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("배차계획신청", (string)null);
+                    b.ToTable("배차계획신청");
                 });
 
             modelBuilder.Entity("홍달.도메인.기사.용달기사", b =>
@@ -3513,7 +2921,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("용달기사", (string)null);
+                    b.ToTable("용달기사");
                 });
 
             modelBuilder.Entity("홍달.도메인.마트.마트주문", b =>
@@ -3919,7 +3327,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("WorkerUserId", "EmployerScopeType", "EmployerScopeId", "ContractStatus");
 
-                    b.ToTable("hr_employment_contracts", (string)null);
+                    b.ToTable("hr_employment_contracts");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.HrPayrollScheduleRecord", b =>
@@ -4005,7 +3413,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("WorkerUserId", "ScheduledPaymentDate", "Status");
 
-                    b.ToTable("hr_payroll_schedules", (string)null);
+                    b.ToTable("hr_payroll_schedules");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.HrRoleAssignmentRecord", b =>
@@ -4113,7 +3521,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("UserId", "ScopeType", "ScopeId", "RoleCode", "IsActive");
 
-                    b.ToTable("hr_role_assignments", (string)null);
+                    b.ToTable("hr_role_assignments");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.연락처공개동의", b =>
@@ -4180,7 +3588,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("인연연결요청Id", "동의자참여자Id")
                         .IsUnique();
 
-                    b.ToTable("연락처공개동의", (string)null);
+                    b.ToTable("연락처공개동의");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.인연연결요청", b =>
@@ -4261,7 +3669,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("요청자참여자Id", "상태", "요청일시");
 
-                    b.ToTable("인연연결요청", (string)null);
+                    b.ToTable("인연연결요청");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.주문자프로필", b =>
@@ -4310,7 +3718,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("주문자프로필", (string)null);
+                    b.ToTable("주문자프로필");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.홍달참여자", b =>
@@ -4346,7 +3754,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("활성화여부");
 
-                    b.ToTable("홍달참여자", (string)null);
+                    b.ToTable("홍달참여자");
                 });
 
             modelBuilder.Entity("홍달.도메인.사용자.홍달참여자역할", b =>
@@ -4388,7 +3796,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("참여자Id", "역할유형", "활성화여부");
 
-                    b.ToTable("홍달참여자역할", (string)null);
+                    b.ToTable("홍달참여자역할");
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.Command알림Outbox", b =>
@@ -4457,7 +3865,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("Status", "CreatedAt");
 
-                    b.ToTable("Command_알림_Outbox", (string)null);
+                    b.ToTable("Command_알림_Outbox");
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.결제승인완료Outbox", b =>
@@ -4541,7 +3949,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("처리상태", "CreatedAt");
 
-                    b.ToTable("결제승인완료_Outbox", (string)null);
+                    b.ToTable("결제승인완료_Outbox");
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.배차추천알림Outbox", b =>
@@ -4666,7 +4074,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("사용자Id", "CommandName", "FeatureName")
                         .IsUnique();
 
-                    b.ToTable("사용자_Command_기능설정", (string)null);
+                    b.ToTable("사용자_Command_기능설정");
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.사용자View설정", b =>
@@ -4713,7 +4121,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("UserId", "AppKey", "ViewKey")
                         .IsUnique();
 
-                    b.ToTable("사용자_View_설정", (string)null);
+                    b.ToTable("사용자_View_설정");
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.사용자행위로그", b =>
@@ -4824,7 +4232,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("사용자_행위_로그", (string)null);
+                    b.ToTable("사용자_행위_로그");
                 });
 
             modelBuilder.Entity("홍달.도메인.설정.플랫폼View정책", b =>
@@ -4897,7 +4305,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("AppKey", "ViewKey", "RoleName")
                         .IsUnique();
 
-                    b.ToTable("플랫폼_View_정책", (string)null);
+                    b.ToTable("플랫폼_View_정책");
                 });
 
             modelBuilder.Entity("홍달.도메인.업체.업체", b =>
@@ -4968,7 +4376,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("업체", (string)null);
+                    b.ToTable("업체");
                 });
 
             modelBuilder.Entity("홍달.도메인.운송.운송원장", b =>
@@ -5665,7 +5073,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("TargetParticipantCategory", "IsActive", "EffectiveStartDate");
 
-                    b.ToTable("platform_profit_return_policies", (string)null);
+                    b.ToTable("platform_profit_return_policies");
                 });
 
             modelBuilder.Entity("홍달.도메인.정산.PlatformProfitReturnScheduleRecord", b =>
@@ -5759,7 +5167,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("ParticipantUserId", "ScheduledPaymentDate", "Status");
 
-                    b.ToTable("platform_profit_return_schedules", (string)null);
+                    b.ToTable("platform_profit_return_schedules");
                 });
 
             modelBuilder.Entity("홍달.도메인.정산.PlatformRevenueEntryRecord", b =>
@@ -5833,7 +5241,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("SourceReferenceType", "SourceReferenceId");
 
-                    b.ToTable("platform_revenue_entries", (string)null);
+                    b.ToTable("platform_revenue_entries");
                 });
 
             modelBuilder.Entity("홍달.도메인.차량.차량제원", b =>
@@ -5959,7 +5367,7 @@ namespace Hongdal.Migrations
 
                     b.HasKey("차량코드");
 
-                    b.ToTable("차량제원", (string)null);
+                    b.ToTable("차량제원");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.입고상품", b =>
@@ -6124,7 +5532,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("창고Id", "소유자UserId", "상태");
 
-                    b.ToTable("입고상품", (string)null);
+                    b.ToTable("입고상품");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.입고요청", b =>
@@ -6320,7 +5728,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("창고Id", "주문자UserId", "상태");
 
-                    b.ToTable("입고요청", (string)null);
+                    b.ToTable("입고요청");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.재고이동", b =>
@@ -6410,7 +5818,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("창고Id", "SKU", "발생일시");
 
-                    b.ToTable("재고이동", (string)null);
+                    b.ToTable("재고이동");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.재고이력", b =>
@@ -6470,7 +5878,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("입고상품Id", "처리일시");
 
-                    b.ToTable("재고이력", (string)null);
+                    b.ToTable("재고이력");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.창고", b =>
@@ -6574,7 +5982,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("소유자UserId", "소유자유형", "기본창고여부");
 
-                    b.ToTable("창고", (string)null);
+                    b.ToTable("창고");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.창고사용자", b =>
@@ -6619,7 +6027,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("창고Id", "UserId", "역할명")
                         .IsUnique();
 
-                    b.ToTable("창고사용자", (string)null);
+                    b.ToTable("창고사용자");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.출고묶음", b =>
@@ -6848,7 +6256,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("판매자UserId", "상태", "CreatedAt");
 
-                    b.ToTable("출고예정", (string)null);
+                    b.ToTable("출고예정");
                 });
 
             modelBuilder.Entity("홍달.도메인.창고.피킹포장작업", b =>
@@ -7105,7 +6513,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("기사Id", "화주UserId")
                         .IsUnique();
 
-                    b.ToTable("기사화주관계집계", (string)null);
+                    b.ToTable("기사화주관계집계");
                 });
 
             modelBuilder.Entity("홍달.도메인.탐색캠페인.탐색캠페인", b =>
@@ -7208,7 +6616,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("개시자UserId", "운행예정일", "탐색상태");
 
-                    b.ToTable("탐색캠페인", (string)null);
+                    b.ToTable("탐색캠페인");
                 });
 
             modelBuilder.Entity("홍달.도메인.탐색캠페인.탐색캠페인대상자", b =>
@@ -7283,7 +6691,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("탐색캠페인Id", "대상UserId")
                         .IsUnique();
 
-                    b.ToTable("탐색캠페인대상자", (string)null);
+                    b.ToTable("탐색캠페인대상자");
                 });
 
             modelBuilder.Entity("홍달.도메인.탐색캠페인.탐색캠페인응답", b =>
@@ -7361,7 +6769,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("탐색캠페인Id", "응답자UserId")
                         .IsUnique();
 
-                    b.ToTable("탐색캠페인응답", (string)null);
+                    b.ToTable("탐색캠페인응답");
                 });
 
             modelBuilder.Entity("홍달.도메인.통관.관세사프로필", b =>
@@ -7431,7 +6839,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("관리자승인여부", "수임가능여부");
 
-                    b.ToTable("관세사프로필", (string)null);
+                    b.ToTable("관세사프로필");
                 });
 
             modelBuilder.Entity("홍달.도메인.통관.통관수임", b =>
@@ -7482,7 +6890,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("통관절차Id", "관세사참여자Id", "상태");
 
-                    b.ToTable("통관수임", (string)null);
+                    b.ToTable("통관수임");
                 });
 
             modelBuilder.Entity("홍달.도메인.통관.통관절차", b =>
@@ -7557,7 +6965,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("주문Id", "주문참조번호", "상태");
 
-                    b.ToTable("통관절차", (string)null);
+                    b.ToTable("통관절차");
                 });
 
             modelBuilder.Entity("홍달.도메인.통관.통관조회연동", b =>
@@ -7645,7 +7053,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("화물관리번호", "MasterBl", "HouseBl");
 
-                    b.ToTable("통관조회연동", (string)null);
+                    b.ToTable("통관조회연동");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.감사메시지", b =>
@@ -7727,7 +7135,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("대상역할", "대상참여자Id", "작성일시");
 
-                    b.ToTable("감사메시지", (string)null);
+                    b.ToTable("감사메시지");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.상품물류자산", b =>
@@ -7786,7 +7194,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("상품Id", "자산유형", "등록시각");
 
-                    b.ToTable("상품물류자산", (string)null);
+                    b.ToTable("상품물류자산");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.상품상세이미지생성작업", b =>
@@ -7850,7 +7258,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("상품Id", "상태", "생성시각");
 
-                    b.ToTable("상품상세이미지생성작업", (string)null);
+                    b.ToTable("상품상세이미지생성작업");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.상품식별코드맵", b =>
@@ -7895,7 +7303,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("상품Id", "활성여부");
 
-                    b.ToTable("상품식별코드맵", (string)null);
+                    b.ToTable("상품식별코드맵");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.상품판매이미지초안", b =>
@@ -7957,7 +7365,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("상품Id", "생성시각");
 
-                    b.ToTable("상품판매이미지초안", (string)null);
+                    b.ToTable("상품판매이미지초안");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.채널출품", b =>
@@ -8014,7 +7422,7 @@ namespace Hongdal.Migrations
                     b.HasIndex("판매상품Id", "판매채널계정Id")
                         .IsUnique();
 
-                    b.ToTable("채널출품", (string)null);
+                    b.ToTable("채널출품");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.판매상품", b =>
@@ -8100,7 +7508,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("샘플데이터여부", "이미지생성상태", "UpdatedAt");
 
-                    b.ToTable("판매상품", (string)null);
+                    b.ToTable("판매상품");
                 });
 
             modelBuilder.Entity("홍달.도메인.판매.판매채널계정", b =>
@@ -8158,7 +7566,7 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("UserId", "채널종류", "상점명");
 
-                    b.ToTable("판매채널계정", (string)null);
+                    b.ToTable("판매채널계정");
                 });
 
             modelBuilder.Entity("홍달.도메인.화물.화물요구조건", b =>
@@ -8914,18 +8322,6 @@ namespace Hongdal.Migrations
                     b.Navigation("AccessLogs");
 
                     b.Navigation("Segments");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCard", b =>
-                {
-                    b.Navigation("Collections");
-
-                    b.Navigation("ImageVariants");
-                });
-
-            modelBuilder.Entity("Hongdal.Domain.Content.HongikHakdangCardCollection", b =>
-                {
-                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Content.YouTube감시채널", b =>

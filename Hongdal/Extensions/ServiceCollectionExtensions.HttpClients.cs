@@ -10,6 +10,8 @@ using 홍달.Services.Payments;
 using Hongdal.Services.Food;
 using Hongdal.Services.Education;
 using Hongdal.Services.External.Typecast;
+using Hongdal.Services.External.YouTube;
+using Hongdal.Services.External.HongikHakdang;
 
 namespace Hongdal.Extensions;
 
@@ -23,6 +25,17 @@ public static partial class ServiceCollectionExtensions
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<TypecastOptions>>().Value;
             client.BaseAddress = new Uri(options.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IYouTubeDataApiClient, YouTubeDataApiClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<YouTubeOptions>>().Value;
+            client.BaseAddress = new Uri($"{options.BaseUrl.TrimEnd('/')}/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IHongikHakdangCardSourceClient, HongikHakdangCardSourceClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<HongikHakdangCardOptions>>().Value;
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(10, options.TimeoutSeconds));
         });
         services.AddHttpClient<IGeocodingService, GoogleGeocodingService>();
         services.AddHttpClient<IRouteDistanceService, GoogleRouteDistanceService>();
