@@ -17,6 +17,8 @@ public sealed class PublicDataOptions
     public ApartmentManagementFeeOptions ApartmentManagementFee { get; set; } = new();
 
     public CustomsTradeStatisticsOptions CustomsTradeStatistics { get; set; } = new();
+
+    public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
 }
 
 public sealed class RoadAddressOptions
@@ -59,4 +61,19 @@ public sealed class CustomsTradeStatisticsOptions
     public string BaseUrl { get; set; } = "https://apis.data.go.kr";
 
     public string HsCountryMonthlyPath { get; set; } = "/1220000/nitemtrade/getNitemtradeList";
+}
+
+public sealed class TraditionalMarketOptions
+{
+    public string ServiceKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://api.odcloud.kr";
+
+    public string ApiPath { get; set; } = "/api/15052837/v1/uddi:1fd54eb7-0565-4755-8ec7-a70931b6dc77";
+
+    public string DatasetKey { get; set; } = "semas-traditional-market-status";
+
+    public string SourceReferenceDate { get; set; } = "2025-07-22";
+
+    public int PageSize { get; set; } = 1000;
 }

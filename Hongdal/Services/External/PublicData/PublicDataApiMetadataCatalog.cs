@@ -100,6 +100,29 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
         },
         new()
         {
+            Key = "semas-traditional-market-status",
+            Provider = "소상공인시장진흥공단",
+            DisplayName = "전통시장 현황",
+            Purpose = "시장코드와 지역, 편의·안전·물류시설 현황을 동기화해 소상공인 중심의 지역 기준정보로 사용합니다.",
+            Domain = "TraditionalMarket",
+            VersionScope = "1.0",
+            ApiType = "REST/File",
+            DataFormat = "JSON/CSV",
+            BaseUrl = "https://api.odcloud.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15052837/fileData.do?recommendDataYn=Y",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "page", "perPage", "returnType"],
+            MainResponseFields = ["시장코드", "시장명", "시장 유형", "도로명주소", "시도", "시군구", "공동물류창고_보유여부", "시장전용 고객주차장_보유여부"],
+            UsageNotes =
+            [
+                "시장코드를 내부 안정 식별자와 시장 단위 커뮤니티 범위 키의 기반으로 사용합니다.",
+                "연간 기준 데이터이므로 시설의 현재 운영 여부나 입점 사업자의 권한을 증명하는 자료로 사용하지 않습니다."
+            ]
+        },
+        new()
+        {
             Key = "customs-cargo-tracking",
             Provider = "관세청/공공데이터포털",
             DisplayName = "화물 통관 진행 정보 조회",
