@@ -82,29 +82,69 @@
     fill: var(--taegeuk-yin);
 }
 
-.hongdal-prajna-upaya-outer-label {
+.hongdal-prajna-upaya-outer-action {
+    appearance: none;
+    display: flex;
     position: absolute;
     z-index: 2;
-    left: 50%;
+    right: 3%;
+    left: 3%;
+    border: 0;
+    justify-content: center;
+    background: transparent;
+    color: var(--theme-label, white);
+    font: inherit;
+    cursor: pointer;
+}
+
+.hongdal-prajna-upaya-outer-action > span {
+    display: inline-flex;
     padding: 5px 12px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 999px;
+    align-items: center;
     background: rgba(15, 23, 42, 0.42);
-    color: var(--theme-label, white);
     font-size: 0.78rem;
     font-weight: 900;
     letter-spacing: 0.08em;
     line-height: 1;
     white-space: nowrap;
-    transform: translateX(-50%);
 }
 
-.hongdal-prajna-upaya-outer-label--yang {
-    top: 13%;
+.hongdal-prajna-upaya-outer-action--upaya {
+    top: 3%;
+    height: 54%;
+    padding-top: 10%;
+    align-items: flex-start;
+    border-radius: 999px 999px 32% 32%;
 }
 
-.hongdal-prajna-upaya-outer-label--yin {
-    bottom: 13%;
+.hongdal-prajna-upaya-outer-action--prajna {
+    z-index: 3;
+    bottom: 3%;
+    height: 45%;
+    padding-bottom: 10%;
+    align-items: flex-end;
+    border-radius: 30% 30% 999px 999px;
+}
+
+.hongdal-prajna-upaya-outer-action:hover > span,
+.hongdal-prajna-upaya-outer-action:focus-visible > span {
+    outline: 2px solid white;
+    outline-offset: 2px;
+    background: rgba(15, 23, 42, 0.68);
+}
+
+.hongdal-prajna-upaya-outer-action:focus-visible {
+    outline: none;
+}
+
+.hongdal-prajna-upaya-outer-action:disabled {
+    cursor: default;
+}
+
+.hongdal-prajna-upaya-outer-action:disabled > span {
+    opacity: 0.82;
 }
 
 .hongdal-prajna-upaya-inner {

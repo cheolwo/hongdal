@@ -5,6 +5,7 @@
 @using ShipperApp.Services
 @inject AuthApiService AuthApi
 @inject IAuthSession AuthSession
+@inject 꾸미기보유권동기화Service 꾸미기보유권동기화Service
 @inject IShipperOperationsService ShipperOperations
 @inject NavigationManager Navigation
 @inject ShipperViewVisibilityService ViewVisibilityService
@@ -16,6 +17,7 @@
 <PlatformCommunityHome AppName="홍달 앱"
                        RoleLabel="화주"
                        AppKey="shipper"
+                       UseBaguaRoleTransitionPages="true"
                        ShowRealtimeBest="true"
                        QuickActions="QuickActions">
     <CommunityModeContent>
@@ -221,6 +223,7 @@
     protected override async Task OnInitializedAsync()
     {
         await AuthSession.RestoreAsync();
+        await 꾸미기보유권동기화Service.RestoreAndSynchronizeAsync();
         await ViewVisibilityService.EnsureLoadedAsync();
         await LoadCommonContentsAsync();
         await LoadDashboardAsync();

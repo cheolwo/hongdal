@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using 홍달.Data;
 using 홍달.도메인.결제;
 using 홍달.도메인.공통;
+using 홍달.Services.Options;
 
 namespace Hongdal.Services.Community;
 
@@ -15,6 +16,7 @@ public interface I노드스티커상점UseCase
 {
     Task<Result<IReadOnlyList<노드스티커상점상품Response>>> 상품목록Async(CancellationToken cancellationToken);
     Task<Result<노드스티커상점상품Response>> 상품상세Async(string 상품Key, CancellationToken cancellationToken);
+    Task<Result<노드스티커보유권동기화Response>> 내보유권목록Async(CancellationToken cancellationToken);
     Task<Result<노드스티커FakePg결제승인Response>> 페이크결제승인Async(
         노드스티커FakePg결제승인Request? request,
         CancellationToken cancellationToken);
@@ -32,15 +34,18 @@ public sealed class 노드스티커상점UseCase : I노드스티커상점UseCase
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IHongdalExecutionModePolicy _executionModePolicy;
 
     public 노드스티커상점UseCase(
         HongdalContext db,
         ICurrentUserAccessor currentUserAccessor,
-        IHostEnvironment hostEnvironment)
+        IHostEnvironment hostEnvironment,
+        IHongdalExecutionModePolicy executionModePolicy)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
         _hostEnvironment = hostEnvironment;
+        _executionModePolicy = executionModePolicy;
     }
 
     public Task<Result<IReadOnlyList<노드스티커상점상품Response>>> 상품목록Async(CancellationToken cancellationToken)
@@ -57,13 +62,51 @@ public sealed class 노드스티커상점UseCase : I노드스티커상점UseCase
             : Result.Ok(상품));
     }
 
+    public async Task<Result<노드스티커보유권동기화Response>> 내보유권목록Async(
+        CancellationToken cancellationToken)
+    {
+        var 사용자UserId = Normalize(_currentUserAccessor.UserId);
+        if (string.IsNullOrWhiteSpace(사용자UserId))
+        {
+            return Result.Fail<노드스티커보유권동기화Response>("인증 정보가 필요합니다.");
+        }
+
+        var payments = await _db.결제
+            .AsNoTracking()
+            .Where(x => x.화주Id == 사용자UserId
+                        && x.결제대상유형 == 결제공통정의.결제대상유형.노드스티커팩
+                        && x.공통결제상태 == 결제공통정의.결제상태.승인완료)
+            .OrderByDescending(x => x.승인일시 ?? x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var 보유권목록 = payments
+            .GroupBy(x => x.대상Id, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .Select(payment =>
+            {
+                var 상품 = 상품찾기(null, payment.대상Id);
+                return 상품 is null ? null : To보유권(payment, 상품, 사용자UserId);
+            })
+            .Where(x => x is not null)
+            .Cast<노드스티커보유권Response>()
+            .OrderBy(x => x.팩Key, StringComparer.Ordinal)
+            .ToArray();
+
+        return Result.Ok(new 노드스티커보유권동기화Response
+        {
+            사용자UserId = 사용자UserId,
+            서버기준시각Utc = DateTime.UtcNow,
+            보유권목록 = 보유권목록
+        });
+    }
+
     public async Task<Result<노드스티커FakePg결제승인Response>> 페이크결제승인Async(
         노드스티커FakePg결제승인Request? request,
         CancellationToken cancellationToken)
     {
-        if (!_hostEnvironment.IsDevelopment())
+        if (!_hostEnvironment.IsDevelopment() && !_executionModePolicy.IsSimulation)
         {
-            return Result.Fail<노드스티커FakePg결제승인Response>("FakePG 결제 승인 API는 Development 환경에서만 사용할 수 있습니다.");
+            return Result.Fail<노드스티커FakePg결제승인Response>("FakePG 결제 승인 API는 Simulation 또는 Development 환경에서만 사용할 수 있습니다.");
         }
 
         if (request is null)
@@ -125,7 +168,15 @@ public sealed class 노드스티커상점UseCase : I노드스티커상점UseCase
 
         var now = DateTime.UtcNow;
         var paymentKey = $"fake_pg_node_sticker_{Guid.NewGuid():N}";
-        var responseJson = BuildFakeResponseJson(상품, 구매자UserId, requestedAmount, paymentKey, idempotencyKey, request.메모, now);
+        var responseJson = BuildFakeResponseJson(
+            상품,
+            구매자UserId,
+            requestedAmount,
+            paymentKey,
+            idempotencyKey,
+            request.메모,
+            now,
+            _executionModePolicy.Mode);
         var payment = new 결제
         {
             결제Id = $"SIM-FPG-STICKER-{Guid.NewGuid():N}",
@@ -221,14 +272,20 @@ public sealed class 노드스티커상점UseCase : I노드스티커상점UseCase
                 결제금액 = payment.결제금액,
                 통화Code = payment.통화
             },
-            보유권 = new()
-            {
-                보유권Id = $"entitlement-{payment.결제Id}",
-                사용자UserId = string.IsNullOrWhiteSpace(payment.화주Id) ? 구매자UserId : payment.화주Id,
-                팩Key = 상품.팩Key,
-                이미지Keys = 상품.이미지목록.Select(이미지 => 이미지.이미지Key).ToArray(),
-                보유권출처 = 노드스티커보유권출처.구매
-            }
+            보유권 = To보유권(payment, 상품, 구매자UserId)
+        };
+
+    private static 노드스티커보유권Response To보유권(
+        결제 payment,
+        노드스티커상점상품Response 상품,
+        string 사용자UserId)
+        => new()
+        {
+            보유권Id = $"entitlement-{payment.결제Id}",
+            사용자UserId = string.IsNullOrWhiteSpace(payment.화주Id) ? 사용자UserId : payment.화주Id,
+            팩Key = 상품.팩Key,
+            이미지Keys = 상품.이미지목록.Select(이미지 => 이미지.이미지Key).ToArray(),
+            보유권출처 = 노드스티커보유권출처.구매
         };
 
     private static int ToIntAmount(decimal amount)
@@ -244,12 +301,13 @@ public sealed class 노드스티커상점UseCase : I노드스티커상점UseCase
         string paymentKey,
         string? idempotencyKey,
         string? memo,
-        DateTime approvedAtUtc)
+        DateTime approvedAtUtc,
+        HongdalExecutionMode executionMode)
     {
         return JsonSerializer.Serialize(new
         {
             provider = ProviderName,
-            mode = "DevelopmentOnly",
+            mode = executionMode.ToString(),
             targetType = "NodeStickerPack",
             productKey = 상품.상품Key,
             packKey = 상품.팩Key,

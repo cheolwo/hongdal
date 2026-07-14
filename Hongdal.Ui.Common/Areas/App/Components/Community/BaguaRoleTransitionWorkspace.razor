@@ -1,0 +1,809 @@
+@inject NavigationManager Navigation
+
+<PageTitle>@PageTitleText</PageTitle>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <section class="bagua-transition-error">
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@errorMessage</MudAlert>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.ArrowBack"
+                   OnClick="GoToCommunity">
+            커뮤니티로 돌아가기
+        </MudButton>
+    </section>
+}
+else if (transition is not null && pageModel is null)
+{
+    <div class="bagua-transition-page">
+        <header class="bagua-transition-hero bagua-transition-hero--picker">
+            <button type="button" class="bagua-transition-back" @onclick="GoToCommunity">← 커뮤니티</button>
+            <div class="bagua-transition-path" aria-label="괘 전환">
+                <span class="bagua-transition-trigram">
+                    <b>@sourceArea?.TrigramSymbol</b>
+                    <small>@sourceArea?.TrigramName · @sourceArea?.BusinessName</small>
+                </span>
+                <span class="bagua-transition-arrow" aria-hidden="true">→</span>
+                <span class="bagua-transition-trigram">
+                    <b>@targetArea?.TrigramSymbol</b>
+                    <small>@targetArea?.TrigramName · @targetArea?.BusinessName</small>
+                </span>
+            </div>
+            <div class="bagua-transition-hero-copy">
+                <span class="bagua-transition-eyebrow">역할 관점 선택</span>
+                <h1>@transition.PageTitle</h1>
+                <p>@transition.Purpose</p>
+            </div>
+        </header>
+
+        <section class="bagua-role-picker" aria-labelledby="bagua-role-picker-title">
+            <div>
+                <span>ROLE PERSPECTIVE</span>
+                <h2 id="bagua-role-picker-title">이 전환을 어떤 역할의 입장에서 볼까요?</h2>
+                <p>관점은 화면의 설명과 우선 행동을 바꾸지만 실제 업무 권한을 부여하지는 않습니다.</p>
+            </div>
+            <div class="bagua-role-picker-grid">
+                @foreach (var role in BaguaTransitionCatalog.Roles)
+                {
+                    var perspective = BaguaTransitionCatalog.FindPerspective(
+                        role.RoleCode,
+                        transition.SourceTrigramKey,
+                        transition.TargetTrigramKey);
+                    <button type="button"
+                            class="bagua-role-picker-card"
+                            @onclick="@(() => SelectRole(role.RoleCode))">
+                        <span class="bagua-role-picker-icon">@GetRoleSymbol(role.RoleCode)</span>
+                        <strong>@role.RoleName</strong>
+                        <small>@GetModeLabel(perspective.PerspectiveMode)</small>
+                        <p>@perspective.PrimaryAction</p>
+                        <span class="bagua-role-picker-open">이 관점으로 열기 →</span>
+                    </button>
+                }
+            </div>
+        </section>
+    </div>
+}
+else if (pageModel is not null)
+{
+    <div class="bagua-transition-page">
+        <header class="bagua-transition-hero">
+            <button type="button" class="bagua-transition-back" @onclick="GoToCommunity">← 커뮤니티</button>
+
+            <div class="bagua-transition-path" aria-label="괘 전환">
+                <span class="bagua-transition-trigram">
+                    <b>@pageModel.SourceArea.TrigramSymbol</b>
+                    <small>@pageModel.SourceArea.TrigramName · @pageModel.SourceArea.BusinessName</small>
+                </span>
+                <span class="bagua-transition-arrow" aria-hidden="true">→</span>
+                <span class="bagua-transition-trigram">
+                    <b>@pageModel.TargetArea.TrigramSymbol</b>
+                    <small>@pageModel.TargetArea.TrigramName · @pageModel.TargetArea.BusinessName</small>
+                </span>
+            </div>
+
+            <div class="bagua-transition-hero-copy">
+                <span class="bagua-transition-eyebrow">@pageModel.Role.RoleName 관점 · @GetWorkflowLabel(pageModel.Transition.WorkflowKind)</span>
+                <h1>@pageModel.Perspective.ViewTitle</h1>
+                <p>@pageModel.Transition.Purpose</p>
+            </div>
+
+            <div class="bagua-transition-mode @BuildModeClass(pageModel.Perspective.PerspectiveMode)">
+                <span>@GetModeLabel(pageModel.Perspective.PerspectiveMode)</span>
+                <strong>@GetModeDescription(pageModel.Perspective.PerspectiveMode)</strong>
+            </div>
+        </header>
+
+        <nav class="bagua-role-tabs" aria-label="역할 관점 바꾸기">
+            @foreach (var role in BaguaTransitionCatalog.Roles)
+            {
+                <button type="button"
+                        class="@(role.RoleCode == pageModel.Role.RoleCode ? "is-active" : null)"
+                        aria-current="@(role.RoleCode == pageModel.Role.RoleCode ? "page" : null)"
+                        @onclick="@(() => SelectRole(role.RoleCode))">
+                    <span>@GetRoleSymbol(role.RoleCode)</span>
+                    @role.RoleName
+                </button>
+            }
+        </nav>
+
+        <BaguaRoleTransitionMotion Scene="@pageModel.Animation"
+                                   Role="@pageModel.Role"
+                                   SourceArea="@pageModel.SourceArea"
+                                   TargetArea="@pageModel.TargetArea" />
+
+        <div class="bagua-transition-content">
+            <main>
+                <section class="bagua-transition-panel bagua-transition-responsibility">
+                    <div class="bagua-transition-section-heading">
+                        <div>
+                            <span>MY RESPONSIBILITY</span>
+                            <h2>이 역할에서는 이렇게 봅니다</h2>
+                        </div>
+                        <span class="bagua-transition-owner-tag">@pageModel.Role.RoleName</span>
+                    </div>
+                    <p class="bagua-transition-interpretation">@pageModel.Perspective.Interpretation</p>
+                    <div class="bagua-transition-primary-action">
+                        <span>우선 확인하거나 수행할 일</span>
+                        <strong>@pageModel.Perspective.PrimaryAction</strong>
+                    </div>
+                </section>
+
+                <section class="bagua-transition-panel">
+                    <div class="bagua-transition-section-heading">
+                        <div>
+                            <span>WORKFLOW</span>
+                            <h2>@GetWorkflowHeading(pageModel.Transition.WorkflowKind)</h2>
+                        </div>
+                        <small>@($"{pageModel.Steps.Count}단계")</small>
+                    </div>
+                    <ol class="bagua-transition-flow">
+                        @foreach (var step in pageModel.Steps)
+                        {
+                            <li>
+                                <span class="bagua-transition-step-number">@step.Number</span>
+                                <div>
+                                    <strong>@step.Title</strong>
+                                    <p>@step.Description</p>
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                </section>
+
+                <section class="bagua-transition-panel bagua-transition-handoff">
+                    <div>
+                        <span>PROCESSOR HANDOFF</span>
+                        <h2>@pageModel.TargetWorkspaceName 화면으로 이어가기</h2>
+                        <p>이 페이지는 전환의 뜻과 역할을 정리하는 입구입니다. 실제 등록·처리·확정은 대상 업무 화면과 서버 권한 안에서 진행합니다.</p>
+                    </div>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               EndIcon="@Icons.Material.Filled.ArrowForward"
+                               OnClick="OpenTargetWorkspace">
+                        @pageModel.TargetWorkspaceName 열기
+                    </MudButton>
+                </section>
+
+                <MudAlert Severity="Severity.Info"
+                          Variant="Variant.Outlined"
+                          Icon="@Icons.Material.Filled.AdminPanelSettings"
+                          Class="bagua-transition-permission-note">
+                    <strong>관점과 권한은 다릅니다.</strong><br />
+                    @pageModel.PermissionNotice
+                </MudAlert>
+            </main>
+
+            <aside class="bagua-transition-panel bagua-transition-matrix-panel">
+                <div class="bagua-transition-section-heading">
+                    <div>
+                        <span>5 × 5 MATRIX</span>
+                        <h2>@(pageModel.Role.RoleName)의 전체 전환표</h2>
+                    </div>
+                </div>
+                <p>다른 셀을 누르면 같은 역할 관점을 유지한 채 해당 페이지로 이동합니다.</p>
+                <div class="bagua-transition-matrix-scroll">
+                    <table class="bagua-transition-matrix">
+                        <thead>
+                            <tr>
+                                <th scope="col">출발 ↓<br />도착 →</th>
+                                @foreach (var target in BaguaTransitionCatalog.Areas)
+                                {
+                                    <th scope="col">
+                                        <span>@target.TrigramSymbol</span>
+                                        <small>@target.BusinessName</small>
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var source in BaguaTransitionCatalog.Areas)
+                            {
+                                <tr>
+                                    <th scope="row">
+                                        <span>@source.TrigramSymbol</span>
+                                        <small>@source.BusinessName</small>
+                                    </th>
+                                    @foreach (var target in BaguaTransitionCatalog.Areas)
+                                    {
+                                        var cell = BaguaTransitionCatalog.FindPerspective(
+                                            pageModel.Role.RoleCode,
+                                            source.TrigramKey,
+                                            target.TrigramKey);
+                                        <td>
+                                            <button type="button"
+                                                    class="@BuildMatrixCellClass(source.TrigramKey, target.TrigramKey)"
+                                                    title="@cell.ViewTitle"
+                                                    aria-label="@cell.ViewTitle"
+                                                    @onclick="@(() => SelectTransition(source.TrigramKey, target.TrigramKey))">
+                                                <strong>@GetModeLabel(cell.PerspectiveMode)</strong>
+                                                <small>@ShortenTitle(cell.ViewTitle)</small>
+                                            </button>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </aside>
+        </div>
+    </div>
+}
+
+<style>
+    .bagua-transition-page {
+        --bagua-ink: #172033;
+        --bagua-muted: #64748b;
+        --bagua-line: #dbe4ee;
+        --bagua-blue: #2457d6;
+        --bagua-blue-soft: #eef4ff;
+        max-width: 1360px;
+        margin: 0 auto;
+        padding: 20px 12px 48px;
+        color: var(--bagua-ink);
+    }
+
+    .bagua-transition-error {
+        display: grid;
+        gap: 16px;
+        max-width: 760px;
+        margin: 40px auto;
+    }
+
+    .bagua-transition-hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(220px, .7fr) minmax(340px, 1.5fr) auto;
+        gap: 28px;
+        align-items: center;
+        overflow: hidden;
+        padding: 58px 34px 34px;
+        border: 1px solid #cfdcf0;
+        border-radius: 28px;
+        background:
+            radial-gradient(circle at 10% 15%, rgba(96, 165, 250, .25), transparent 32%),
+            linear-gradient(135deg, #f7faff 0%, #edf4ff 52%, #f8fafc 100%);
+        box-shadow: 0 18px 48px rgba(34, 74, 140, .10);
+    }
+
+    .bagua-transition-hero--picker {
+        grid-template-columns: minmax(220px, .7fr) minmax(340px, 1.5fr);
+    }
+
+    .bagua-transition-back {
+        position: absolute;
+        top: 18px;
+        left: 24px;
+        border: 0;
+        background: transparent;
+        color: #31558d;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .bagua-transition-path {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+    }
+
+    .bagua-transition-trigram {
+        display: grid;
+        place-items: center;
+        gap: 4px;
+        min-width: 96px;
+        padding: 14px 12px;
+        border: 1px solid rgba(58, 91, 148, .18);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, .8);
+    }
+
+    .bagua-transition-trigram b {
+        font-size: 38px;
+        line-height: 1;
+    }
+
+    .bagua-transition-trigram small {
+        color: #475569;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .bagua-transition-arrow {
+        color: var(--bagua-blue);
+        font-size: 28px;
+        font-weight: 900;
+    }
+
+    .bagua-transition-hero-copy h1,
+    .bagua-transition-panel h2,
+    .bagua-role-picker h2 {
+        margin: 0;
+        line-height: 1.25;
+    }
+
+    .bagua-transition-hero-copy h1 {
+        margin: 7px 0 10px;
+        font-size: clamp(26px, 3vw, 42px);
+    }
+
+    .bagua-transition-hero-copy p,
+    .bagua-transition-panel p,
+    .bagua-role-picker p {
+        margin: 0;
+        color: var(--bagua-muted);
+        line-height: 1.65;
+    }
+
+    .bagua-transition-eyebrow,
+    .bagua-transition-section-heading span,
+    .bagua-role-picker > div:first-child > span,
+    .bagua-transition-handoff > div > span {
+        color: var(--bagua-blue);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: .08em;
+    }
+
+    .bagua-transition-mode {
+        display: grid;
+        gap: 5px;
+        min-width: 150px;
+        padding: 15px 17px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .08);
+    }
+
+    .bagua-transition-mode span {
+        font-size: 18px;
+        font-weight: 900;
+    }
+
+    .bagua-transition-mode strong {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .bagua-transition-mode--owner span { color: #0f766e; }
+    .bagua-transition-mode--initiator span { color: #1d4ed8; }
+    .bagua-transition-mode--receiver span { color: #7c3aed; }
+    .bagua-transition-mode--governor span { color: #b45309; }
+    .bagua-transition-mode--observer span { color: #64748b; }
+
+    .bagua-role-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        margin: 18px 0;
+        padding: 7px;
+        border: 1px solid var(--bagua-line);
+        border-radius: 16px;
+        background: #fff;
+    }
+
+    .bagua-role-tabs button {
+        display: flex;
+        flex: 1 0 max-content;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 42px;
+        padding: 8px 14px;
+        border: 0;
+        border-radius: 11px;
+        background: transparent;
+        color: #475569;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .bagua-role-tabs button.is-active {
+        background: var(--bagua-blue);
+        color: #fff;
+        box-shadow: 0 7px 16px rgba(36, 87, 214, .22);
+    }
+
+    .bagua-transition-content {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(340px, .8fr);
+        gap: 18px;
+        align-items: start;
+        margin-top: 18px;
+    }
+
+    .bagua-transition-content main {
+        display: grid;
+        gap: 18px;
+    }
+
+    .bagua-transition-panel,
+    .bagua-role-picker {
+        padding: 24px;
+        border: 1px solid var(--bagua-line);
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, .05);
+    }
+
+    .bagua-transition-section-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 17px;
+    }
+
+    .bagua-transition-section-heading h2,
+    .bagua-role-picker h2 {
+        margin-top: 4px;
+        font-size: 21px;
+    }
+
+    .bagua-transition-owner-tag {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: var(--bagua-blue-soft);
+        font-size: 12px !important;
+        letter-spacing: 0 !important;
+    }
+
+    .bagua-transition-interpretation {
+        font-size: 17px;
+    }
+
+    .bagua-transition-primary-action {
+        display: grid;
+        gap: 5px;
+        margin-top: 18px;
+        padding: 17px;
+        border-left: 4px solid var(--bagua-blue);
+        border-radius: 8px 14px 14px 8px;
+        background: var(--bagua-blue-soft);
+    }
+
+    .bagua-transition-primary-action span {
+        color: #5270a5;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .bagua-transition-primary-action strong {
+        line-height: 1.5;
+    }
+
+    .bagua-transition-flow {
+        display: grid;
+        gap: 0;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .bagua-transition-flow li {
+        position: relative;
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 13px;
+        padding-bottom: 20px;
+    }
+
+    .bagua-transition-flow li:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        top: 34px;
+        bottom: 2px;
+        left: 18px;
+        width: 2px;
+        background: #cfdbef;
+    }
+
+    .bagua-transition-step-number {
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--bagua-blue);
+        color: #fff;
+        font-weight: 900;
+    }
+
+    .bagua-transition-flow strong { display: block; margin: 5px 0 3px; }
+    .bagua-transition-flow p { font-size: 14px; }
+
+    .bagua-transition-handoff {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 22px;
+        background: linear-gradient(135deg, #f8fbff, #f1f5f9);
+    }
+
+    .bagua-transition-handoff h2 { margin: 4px 0 7px; font-size: 20px; }
+    .bagua-transition-permission-note { border-radius: 16px; }
+
+    .bagua-transition-matrix-panel {
+        position: sticky;
+        top: 12px;
+    }
+
+    .bagua-transition-matrix-panel > p {
+        margin: -8px 0 15px;
+        font-size: 13px;
+    }
+
+    .bagua-transition-matrix-scroll { overflow-x: auto; }
+
+    .bagua-transition-matrix {
+        width: 100%;
+        min-width: 470px;
+        border-collapse: separate;
+        border-spacing: 5px;
+        table-layout: fixed;
+    }
+
+    .bagua-transition-matrix th {
+        color: #53657e;
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .bagua-transition-matrix th span,
+    .bagua-transition-matrix th small { display: block; }
+    .bagua-transition-matrix th span { font-size: 18px; color: var(--bagua-ink); }
+
+    .bagua-transition-matrix td { padding: 0; }
+
+    .bagua-transition-matrix button {
+        display: grid;
+        place-items: center;
+        gap: 3px;
+        width: 100%;
+        aspect-ratio: 1;
+        padding: 4px;
+        border: 1px solid #d7e0eb;
+        border-radius: 11px;
+        background: #f8fafc;
+        color: #334155;
+        cursor: pointer;
+    }
+
+    .bagua-transition-matrix button:hover,
+    .bagua-transition-matrix button:focus-visible {
+        border-color: var(--bagua-blue);
+        background: var(--bagua-blue-soft);
+        outline: none;
+    }
+
+    .bagua-transition-matrix button.is-current {
+        border-color: var(--bagua-blue);
+        background: var(--bagua-blue);
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(36, 87, 214, .22);
+    }
+
+    .bagua-transition-matrix button strong { font-size: 11px; }
+    .bagua-transition-matrix button small {
+        display: -webkit-box;
+        overflow: hidden;
+        font-size: 9px;
+        line-height: 1.15;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .bagua-role-picker {
+        margin-top: 18px;
+    }
+
+    .bagua-role-picker-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .bagua-role-picker-card {
+        display: grid;
+        align-content: start;
+        gap: 8px;
+        min-height: 230px;
+        padding: 18px;
+        border: 1px solid var(--bagua-line);
+        border-radius: 18px;
+        background: #fbfdff;
+        color: var(--bagua-ink);
+        text-align: left;
+        cursor: pointer;
+        transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .bagua-role-picker-card:hover,
+    .bagua-role-picker-card:focus-visible {
+        transform: translateY(-3px);
+        border-color: var(--bagua-blue);
+        outline: none;
+        box-shadow: 0 12px 24px rgba(36, 87, 214, .12);
+    }
+
+    .bagua-role-picker-icon { font-size: 28px; }
+    .bagua-role-picker-card strong { font-size: 17px; }
+    .bagua-role-picker-card > small { color: var(--bagua-blue); font-weight: 900; }
+    .bagua-role-picker-card p { font-size: 13px; }
+    .bagua-role-picker-open { align-self: end; color: var(--bagua-blue); font-size: 12px; font-weight: 900; }
+
+    @@media (max-width: 1040px) {
+        .bagua-transition-content { grid-template-columns: 1fr; }
+        .bagua-transition-matrix-panel { position: static; }
+        .bagua-role-picker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @@media (max-width: 760px) {
+        .bagua-transition-page { padding-inline: 0; }
+        .bagua-transition-hero,
+        .bagua-transition-hero--picker {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 56px 20px 24px;
+            border-radius: 20px;
+        }
+        .bagua-transition-mode { min-width: 0; }
+        .bagua-transition-panel,
+        .bagua-role-picker { padding: 19px; border-radius: 18px; }
+        .bagua-transition-handoff { align-items: stretch; flex-direction: column; }
+        .bagua-role-picker-grid { grid-template-columns: 1fr; }
+        .bagua-role-picker-card { min-height: 0; }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string? RoleCode { get; set; }
+
+    [Parameter]
+    public string SourceTrigramKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TargetTrigramKey { get; set; } = string.Empty;
+
+    private BaguaRoleTransitionPageModel? pageModel;
+    private BaguaTransitionDefinition? transition;
+    private BaguaBusinessAreaDefinition? sourceArea;
+    private BaguaBusinessAreaDefinition? targetArea;
+    private string? errorMessage;
+
+    private string PageTitleText
+        => pageModel?.Perspective.ViewTitle
+           ?? transition?.PageTitle
+           ?? "괘 전환";
+
+    protected override void OnParametersSet()
+    {
+        pageModel = null;
+        transition = null;
+        sourceArea = null;
+        targetArea = null;
+        errorMessage = null;
+
+        try
+        {
+            transition = BaguaTransitionCatalog.Find(SourceTrigramKey, TargetTrigramKey);
+            sourceArea = BaguaTransitionCatalog.FindArea(transition.SourceTrigramKey);
+            targetArea = BaguaTransitionCatalog.FindArea(transition.TargetTrigramKey);
+
+            if (!string.IsNullOrWhiteSpace(RoleCode))
+            {
+                pageModel = BaguaRoleTransitionPageCatalog.Build(
+                    RoleCode,
+                    SourceTrigramKey,
+                    TargetTrigramKey);
+            }
+        }
+        catch (KeyNotFoundException)
+        {
+            errorMessage = "요청한 역할 또는 괘 전환을 찾을 수 없습니다. 역할과 출발·도착 괘를 다시 선택해 주세요.";
+        }
+    }
+
+    private void SelectRole(string roleCode)
+        => Navigation.NavigateTo(BaguaRoleTransitionRoutes.Build(
+            roleCode,
+            SourceTrigramKey,
+            TargetTrigramKey));
+
+    private void SelectTransition(string sourceTrigramKey, string targetTrigramKey)
+    {
+        if (pageModel is null)
+        {
+            return;
+        }
+
+        Navigation.NavigateTo(BaguaRoleTransitionRoutes.Build(
+            pageModel.Role.RoleCode,
+            sourceTrigramKey,
+            targetTrigramKey));
+    }
+
+    private void OpenTargetWorkspace()
+    {
+        if (pageModel is not null)
+        {
+            Navigation.NavigateTo(pageModel.TargetWorkspaceHref);
+        }
+    }
+
+    private void GoToCommunity() => Navigation.NavigateTo("/community");
+
+    private string BuildMatrixCellClass(string sourceTrigramKey, string targetTrigramKey)
+        => sourceTrigramKey == SourceTrigramKey && targetTrigramKey == TargetTrigramKey
+            ? "is-current"
+            : string.Empty;
+
+    private static string BuildModeClass(string perspectiveMode)
+        => perspectiveMode switch
+        {
+            BaguaRolePerspectiveModes.Owner => "bagua-transition-mode--owner",
+            BaguaRolePerspectiveModes.Initiator => "bagua-transition-mode--initiator",
+            BaguaRolePerspectiveModes.Receiver => "bagua-transition-mode--receiver",
+            BaguaRolePerspectiveModes.Governor => "bagua-transition-mode--governor",
+            _ => "bagua-transition-mode--observer"
+        };
+
+    private static string GetModeLabel(string perspectiveMode)
+        => perspectiveMode switch
+        {
+            BaguaRolePerspectiveModes.Owner => "주관",
+            BaguaRolePerspectiveModes.Initiator => "발신",
+            BaguaRolePerspectiveModes.Receiver => "접수",
+            BaguaRolePerspectiveModes.Governor => "의결",
+            _ => "참조"
+        };
+
+    private static string GetModeDescription(string perspectiveMode)
+        => perspectiveMode switch
+        {
+            BaguaRolePerspectiveModes.Owner => "내 업무를 직접 관리",
+            BaguaRolePerspectiveModes.Initiator => "조건을 정해 요청·인계",
+            BaguaRolePerspectiveModes.Receiver => "요청을 받아 확인·실행",
+            BaguaRolePerspectiveModes.Governor => "안건·투표·서명 관리",
+            _ => "진행과 업무 영향 확인"
+        };
+
+    private static string GetWorkflowLabel(string workflowKind)
+        => workflowKind switch
+        {
+            BaguaTransitionWorkflowKinds.Home => "업무 홈",
+            BaguaTransitionWorkflowKinds.Conversion => "업무 변환",
+            BaguaTransitionWorkflowKinds.Handoff => "업무 인계",
+            BaguaTransitionWorkflowKinds.Governance => "합의·의결",
+            BaguaTransitionWorkflowKinds.Execution => "확정안 실행",
+            BaguaTransitionWorkflowKinds.Result => "결과 반영",
+            BaguaTransitionWorkflowKinds.Return => "반품·회수",
+            _ => "업무 전환"
+        };
+
+    private static string GetWorkflowHeading(string workflowKind)
+        => workflowKind == BaguaTransitionWorkflowKinds.Governance
+            ? "제안부터 전자서명과 실행까지"
+            : $"{GetWorkflowLabel(workflowKind)} 절차";
+
+    private static string GetRoleSymbol(string roleCode)
+        => roleCode switch
+        {
+            BaguaActorRoleCodes.Orderer => "🧾",
+            BaguaActorRoleCodes.Seller => "🏪",
+            BaguaActorRoleCodes.WarehouseManager => "📦",
+            BaguaActorRoleCodes.TransportOperator => "🚚",
+            _ => "🤝"
+        };
+
+    private static string ShortenTitle(string viewTitle)
+    {
+        var separator = viewTitle.IndexOf(" · ", StringComparison.Ordinal);
+        return separator > 0 ? viewTitle[..separator] : viewTitle;
+    }
+}

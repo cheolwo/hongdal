@@ -64,6 +64,23 @@ else
                         }
                     </div>
                 }
+                else if (product.BaguaMotion is { } motion)
+                {
+                    <div class="decoration-detail__motion-stage">
+                        <BaguaMotionPackPreview Manifest="@motion" Title="@product.Title" />
+                        <small>실제 괘 전환 장면과 같은 슬롯 해석 규칙으로 반복 미리보기를 표시합니다.</small>
+                    </div>
+                    <div class="decoration-detail__motion-scope">
+                        <article>
+                            <MudIcon Icon="@Icons.Material.Filled.AccountTree" Color="Color.Primary" />
+                            <div><strong>적용 슬롯</strong><small>@MotionScopeLabel(motion)</small></div>
+                        </article>
+                        <article>
+                            <MudIcon Icon="@Icons.Material.Filled.AccessibilityNew" Color="Color.Secondary" />
+                            <div><strong>캐릭터·경로</strong><small>@motion.CharacterLabel · @motion.TrailLabel</small></div>
+                        </article>
+                    </div>
+                }
                 else
                 {
                     <div class="decoration-detail__stage" style="@($"--detail-accent: {selectedAsset?.AccentColor ?? "#2563eb"};")">
@@ -106,6 +123,10 @@ else
                     {
                         <span>@manifest.ReviewStatus</span>
                     }
+                    else if (product.BaguaMotion is { } motionManifest)
+                    {
+                        <span>@motionManifest.ReviewStatus</span>
+                    }
                 </div>
                 <h1>@product.Title</h1>
                 <button type="button" class="decoration-detail__creator">
@@ -129,6 +150,15 @@ else
                         <div><dt>호환 화면</dt><dd>@metadata.RendererProfile</dd></div>
                         <div><dt>포함 슬롯</dt><dd>@(metadata.Slots.Count)개</dd></div>
                         <div><dt>사용권</dt><dd>@metadata.LicenseLabel</dd></div>
+                    </dl>
+                }
+                else if (product.BaguaMotion is { } motionMetadata)
+                {
+                    <dl class="decoration-detail__metadata">
+                        <div><dt>작품 버전</dt><dd>v@(motionMetadata.Version)</dd></div>
+                        <div><dt>렌더러</dt><dd>@motionMetadata.RendererProfile</dd></div>
+                        <div><dt>적용 슬롯</dt><dd>@(motionMetadata.CoveredPerspectiveSlotCount) / 125</dd></div>
+                        <div><dt>사용권</dt><dd>@motionMetadata.LicenseLabel</dd></div>
                     </dl>
                 }
 
@@ -155,16 +185,26 @@ else
                                Size="Size.Large"
                                FullWidth="true"
                                StartIcon="@Icons.Material.Filled.CheckCircle"
-                               Disabled="@(product.IsHomeTheme ? DecorationState.IsProductActive(product) : selectedAsset is null)"
+                               Disabled="@((product.IsHomeTheme || product.IsBaguaMotion) ? DecorationState.IsProductActive(product) : selectedAsset is null)"
                                OnClick="ApplySelectedAsync">
-                        @(DecorationState.IsProductActive(product) ? "현재 사용 중" : product.IsHomeTheme ? "전체 홈 테마 적용" : "선택한 꾸미기 적용")
+                        @(DecorationState.IsProductActive(product)
+                            ? "현재 사용 중"
+                            : product.IsHomeTheme
+                                ? "전체 홈 테마 적용"
+                                : product.IsBaguaMotion
+                                    ? "이 애니메이션 슬롯에 적용"
+                                    : "선택한 꾸미기 적용")
                     </MudButton>
                     <MudButton Variant="Variant.Text"
                                Color="Color.Default"
                                FullWidth="true"
                                StartIcon="@Icons.Material.Filled.RestartAlt"
                                OnClick="DisableDecorationAsync">
-                        @(product.IsHomeTheme ? "홍달 기본 테마로 복원" : "이 꾸미기 종류 표시 안 함")
+                        @(product.IsHomeTheme
+                            ? "홍달 기본 테마로 복원"
+                            : product.IsBaguaMotion
+                                ? "기본 전환 애니메이션으로 복원"
+                                : "이 꾸미기 종류 표시 안 함")
                     </MudButton>
                 }
             </div>
@@ -240,7 +280,7 @@ else
             return Task.CompletedTask;
         }
 
-        var applied = product.IsHomeTheme
+        var applied = product.IsHomeTheme || product.IsBaguaMotion
             ? DecorationState.ApplyProduct(product)
             : selectedAsset is not null && DecorationState.Apply(selectedAsset);
         if (!applied)
@@ -253,7 +293,9 @@ else
         statusSeverity = Severity.Success;
         statusMessage = product.IsHomeTheme
             ? $"{product.Title}의 8개 영역을 홈에 한 번에 적용했습니다."
-            : $"{selectedAsset!.Title}을(를) 적용했습니다. 홈과 다이어그램에서 바로 확인할 수 있습니다.";
+            : product.IsBaguaMotion
+                ? $"{product.Title}을(를) {MotionScopeLabel(product.BaguaMotion!)}에 적용했습니다."
+                : $"{selectedAsset!.Title}을(를) 적용했습니다. 홈과 다이어그램에서 바로 확인할 수 있습니다.";
         return Task.CompletedTask;
     }
 
@@ -268,6 +310,11 @@ else
         {
             DecorationState.RestoreDefaultHomeTheme();
             statusMessage = "홍달 반야·방편 기본 테마로 복원했습니다.";
+        }
+        else if (product.IsBaguaMotion)
+        {
+            DecorationState.RestoreDefaultBaguaMotion();
+            statusMessage = "모든 전환 슬롯을 홍달 기본 업무 달리기로 복원했습니다.";
         }
         else
         {
@@ -286,21 +333,37 @@ else
         {
             CommunityDecorationTarget.HomeNavigatorTheme => "홈 내비게이터 테마",
             CommunityDecorationTarget.Bagua => "괘상",
-            _ => "다이어그램 노드"
+            CommunityDecorationTarget.DiagramNode => "다이어그램 노드",
+            CommunityDecorationTarget.BaguaTransitionMotion => "괘 전환 애니메이션",
+            _ => "꾸미기"
         };
 
     private static string IncludedDescription(CommunityDecorationProduct item)
         => item.HomeTheme is { } theme
             ? $"{theme.Slots.Count}개 영역 · {string.Join(", ", theme.Slots.Select(slot => slot.Title))}"
-            : $"{item.Assets.Count}개 항목 · {string.Join(", ", item.Assets.Select(asset => asset.Title))}";
+            : item.BaguaMotion is { } motion
+                ? $"애니메이션 작품 1개 · {motion.CharacterLabel} · {motion.TrailLabel}"
+                : $"{item.Assets.Count}개 항목 · {string.Join(", ", item.Assets.Select(asset => asset.Title))}";
 
     private static string UsageDescription(CommunityDecorationProduct item)
         => item.Target switch
         {
             CommunityDecorationTarget.HomeNavigatorTheme => "공통 홈의 펼친 반야·방편 태극과 접힌 오른쪽 하단 손잡이",
             CommunityDecorationTarget.Bagua => "홈의 사방 이동판과 벽면 반원 손잡이",
-            _ => "모바일 세로 다이어그램과 데스크톱 다이어그램 노드"
+            CommunityDecorationTarget.DiagramNode => "모바일 세로 다이어그램과 데스크톱 다이어그램 노드",
+            CommunityDecorationTarget.BaguaTransitionMotion => item.BaguaMotion is { } motion
+                ? $"역할별 괘 전환 페이지 · {MotionScopeLabel(motion)}"
+                : "역할별 괘 전환 페이지",
+            _ => "홍달 꾸미기 화면"
         };
+
+    private static string MotionScopeLabel(BaguaTransitionMotionManifest motion)
+        => motion.SlotPatterns.Any(pattern =>
+               pattern.Contains("order-to-transport", StringComparison.OrdinalIgnoreCase))
+            ? "주문 → 운송 전환의 5개 역할 관점"
+            : motion.CoveredPerspectiveSlotCount >= BaguaTransitionMotionManifest.TotalPerspectiveSlotCount
+                ? "5개 역할 × 25개 전환, 전체 125개 관점"
+                : $"전체 125개 중 {motion.CoveredPerspectiveSlotCount}개 관점";
 
     private static string FormatPrice(CommunityDecorationProduct item)
         => item.IsFree

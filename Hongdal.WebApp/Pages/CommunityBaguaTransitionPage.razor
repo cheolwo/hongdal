@@ -1,0 +1,17 @@
+@page "/community/bagua/{SourceTrigramKey}/{TargetTrigramKey}"
+@page "/community/bagua/{RoleCode}/{SourceTrigramKey}/{TargetTrigramKey}"
+
+<BaguaRoleTransitionWorkspace RoleCode="@RoleCode"
+                              SourceTrigramKey="@SourceTrigramKey"
+                              TargetTrigramKey="@TargetTrigramKey" />
+
+@code {
+    [Parameter]
+    public string? RoleCode { get; set; }
+
+    [Parameter]
+    public string SourceTrigramKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TargetTrigramKey { get; set; } = string.Empty;
+}

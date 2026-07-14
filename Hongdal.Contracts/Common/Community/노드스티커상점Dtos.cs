@@ -80,6 +80,13 @@ public sealed class 노드스티커보유권Response
     public string 보유권출처 { get; set; } = 노드스티커보유권출처.구매;
 }
 
+public sealed class 노드스티커보유권동기화Response
+{
+    public string 사용자UserId { get; set; } = string.Empty;
+    public DateTime 서버기준시각Utc { get; set; }
+    public IReadOnlyList<노드스티커보유권Response> 보유권목록 { get; set; } = [];
+}
+
 public sealed class 노드스티커FakePg결제승인Request
 {
     public string 상품Key { get; set; } = string.Empty;

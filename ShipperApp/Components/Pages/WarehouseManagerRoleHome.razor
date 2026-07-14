@@ -1,8 +1,11 @@
 @inject NavigationManager Navigation
+@using Hongdal.Contracts.Common.Community
 
 <PlatformCommunityHome AppName="홍달 앱"
                        RoleLabel="창고 관리자"
                        AppKey="warehouse-manager"
+                       UseBaguaRoleTransitionPages="true"
+                       BaguaPerspectiveRoleCode="@BaguaActorRoleCodes.WarehouseManager"
                        QuickActions="QuickActions"
                        CardinalNavigationOptions="CardinalNavigationOptions">
     <CommunityModeContent>

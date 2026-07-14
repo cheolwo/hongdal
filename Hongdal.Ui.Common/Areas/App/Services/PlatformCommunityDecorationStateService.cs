@@ -7,7 +7,28 @@ public enum CommunityDecorationTarget
 {
     HomeNavigatorTheme,
     Bagua,
-    DiagramNode
+    DiagramNode,
+    BaguaTransitionMotion
+}
+
+public sealed record BaguaTransitionMotionManifest(
+    string Version,
+    string RendererProfile,
+    string ReviewStatus,
+    string LicenseLabel,
+    string PreviewSymbol,
+    string AccentColor,
+    double DurationScale,
+    bool UseRoleAccent,
+    string CharacterLabel,
+    string TrailLabel,
+    IReadOnlyList<string>? AppliesToSlotPatterns = null,
+    int CoveredPerspectiveSlotCount = 125)
+{
+    public const int TotalPerspectiveSlotCount = 125;
+
+    public IReadOnlyList<string> SlotPatterns
+        => AppliesToSlotPatterns is { Count: > 0 } ? AppliesToSlotPatterns : ["*"];
 }
 
 public sealed record HomeNavigatorThemeSlot(
@@ -73,18 +94,26 @@ public sealed record CommunityDecorationProduct(
     string CurrencyCode,
     IReadOnlyList<CommunityDecorationAsset> Assets,
     HomeNavigatorThemeManifest? HomeTheme = null,
+    BaguaTransitionMotionManifest? BaguaMotion = null,
     bool IsCustom = false)
 {
     public bool IsFree => PriceAmount <= 0;
 
     public bool IsHomeTheme => Target == CommunityDecorationTarget.HomeNavigatorTheme && HomeTheme is not null;
+
+    public bool IsBaguaMotion
+        => Target == CommunityDecorationTarget.BaguaTransitionMotion && BaguaMotion is not null;
 }
 
 public sealed class PlatformCommunityDecorationStateService
 {
     private const string BasicBaguaAssetKey = "bagua-basic-blue";
     public const string DefaultHomeThemePackKey = "home-theme-hongdal-default-v1";
+    public const string DefaultBaguaMotionPackKey = "bagua-motion-basic-runner-v1";
     private readonly HashSet<string> ownedPackKeys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> sessionPurchasedPackKeys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> serverOwnedPackKeys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> activeBaguaMotionPackByScope = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<CommunityDecorationAsset> customAssets = [];
     private readonly List<CommunityDecorationProduct> products;
 
@@ -95,6 +124,8 @@ public sealed class PlatformCommunityDecorationStateService
         {
             ownedPackKeys.Add(product.PackKey);
         }
+
+        activeBaguaMotionPackByScope["*"] = DefaultBaguaMotionPackKey;
     }
 
     public event Action? Changed;
@@ -109,11 +140,18 @@ public sealed class PlatformCommunityDecorationStateService
 
     public bool IsHomeThemeEnabled { get; private set; } = true;
 
+    public bool IsBaguaMotionEnabled { get; private set; } = true;
+
     public string? ActiveBaguaAssetKey { get; private set; } = BasicBaguaAssetKey;
 
     public string? ActiveNodeAssetKey { get; private set; }
 
     public string ActiveHomeThemePackKey { get; private set; } = DefaultHomeThemePackKey;
+
+    public string ActiveBaguaMotionPackKey
+        => activeBaguaMotionPackByScope.TryGetValue("*", out var packKey)
+            ? packKey
+            : DefaultBaguaMotionPackKey;
 
     public CommunityDecorationAsset? ActiveBaguaAsset
         => FindAsset(ActiveBaguaAssetKey);
@@ -130,6 +168,10 @@ public sealed class PlatformCommunityDecorationStateService
            ?? products.First(item => item.IsHomeTheme &&
                string.Equals(item.PackKey, DefaultHomeThemePackKey, StringComparison.OrdinalIgnoreCase)).HomeTheme!;
 
+    public BaguaTransitionMotionManifest ActiveBaguaMotion
+        => FindOwnedBaguaMotionProduct(ActiveBaguaMotionPackKey)?.BaguaMotion
+           ?? DefaultBaguaMotion;
+
     public string BaguaSymbol
         => IsBaguaDecorationEnabled ? ActiveBaguaAsset?.PreviewSymbol ?? "☵" : "◎";
 
@@ -140,25 +182,103 @@ public sealed class PlatformCommunityDecorationStateService
         => IsHomeThemeEnabled ? ActiveHomeTheme.AccentColor : "#64748b";
 
     public bool IsProductOwned(CommunityDecorationProduct product)
-        => product.IsFree || ownedPackKeys.Contains(product.PackKey);
+        => product.IsFree
+           || ownedPackKeys.Contains(product.PackKey)
+           || sessionPurchasedPackKeys.Contains(product.PackKey)
+           || serverOwnedPackKeys.Contains(product.PackKey);
 
     public bool IsAssetActive(CommunityDecorationAsset asset)
         => asset.Target switch
         {
             CommunityDecorationTarget.Bagua => IsBaguaDecorationEnabled &&
                 string.Equals(ActiveBaguaAssetKey, asset.Key, StringComparison.OrdinalIgnoreCase),
-            _ => IsNodeDecorationEnabled &&
-                string.Equals(ActiveNodeAssetKey, asset.Key, StringComparison.OrdinalIgnoreCase)
+            CommunityDecorationTarget.DiagramNode => IsNodeDecorationEnabled &&
+                string.Equals(ActiveNodeAssetKey, asset.Key, StringComparison.OrdinalIgnoreCase),
+            _ => false
         };
 
     public bool IsProductActive(CommunityDecorationProduct product)
-        => product.IsHomeTheme
+    {
+        if (!IsProductOwned(product))
+        {
+            return false;
+        }
+
+        return product.IsHomeTheme
             ? IsHomeThemeEnabled && string.Equals(ActiveHomeThemePackKey, product.PackKey, StringComparison.OrdinalIgnoreCase)
-            : product.Assets.Any(IsAssetActive);
+            : product.IsBaguaMotion
+                ? IsBaguaMotionEnabled && product.BaguaMotion!.SlotPatterns.All(pattern =>
+                    activeBaguaMotionPackByScope.TryGetValue(pattern, out var packKey) &&
+                    string.Equals(packKey, product.PackKey, StringComparison.OrdinalIgnoreCase))
+                : product.Assets.Any(IsAssetActive);
+    }
+
+    public BaguaTransitionMotionManifest? ResolveBaguaMotion(
+        string assetSlotKey,
+        string motionKind)
+    {
+        if (!IsBaguaMotionEnabled)
+        {
+            return null;
+        }
+
+        foreach (var scope in BuildBaguaMotionScopePriority(assetSlotKey, motionKind))
+        {
+            if (activeBaguaMotionPackByScope.TryGetValue(scope, out var packKey) &&
+                FindOwnedBaguaMotionProduct(packKey)?.BaguaMotion is { } manifest)
+            {
+                return manifest;
+            }
+        }
+
+        return DefaultBaguaMotion;
+    }
 
     public void Purchase(CommunityDecorationProduct product)
     {
-        ownedPackKeys.Add(product.PackKey);
+        sessionPurchasedPackKeys.Add(product.PackKey);
+        Changed?.Invoke();
+    }
+
+    public void SynchronizeServerOwnedPacks(IEnumerable<string> packKeys)
+    {
+        ArgumentNullException.ThrowIfNull(packKeys);
+
+        serverOwnedPackKeys.Clear();
+        foreach (var packKey in packKeys)
+        {
+            if (!string.IsNullOrWhiteSpace(packKey))
+            {
+                serverOwnedPackKeys.Add(packKey.Trim());
+            }
+        }
+
+        RemoveInactiveBaguaMotionSelections();
+        Changed?.Invoke();
+    }
+
+    public void ClearServerOwnedPacks()
+    {
+        if (serverOwnedPackKeys.Count == 0)
+        {
+            return;
+        }
+
+        serverOwnedPackKeys.Clear();
+        RemoveInactiveBaguaMotionSelections();
+        Changed?.Invoke();
+    }
+
+    public void ClearAccountOwnedPacks()
+    {
+        if (serverOwnedPackKeys.Count == 0 && sessionPurchasedPackKeys.Count == 0)
+        {
+            return;
+        }
+
+        serverOwnedPackKeys.Clear();
+        sessionPurchasedPackKeys.Clear();
+        RemoveInactiveBaguaMotionSelections();
         Changed?.Invoke();
     }
 
@@ -177,6 +297,23 @@ public sealed class PlatformCommunityDecorationStateService
             return true;
         }
 
+        if (product.IsBaguaMotion)
+        {
+            if (product.BaguaMotion!.SlotPatterns.Contains("*", StringComparer.OrdinalIgnoreCase))
+            {
+                activeBaguaMotionPackByScope.Clear();
+            }
+
+            foreach (var pattern in product.BaguaMotion!.SlotPatterns)
+            {
+                activeBaguaMotionPackByScope[pattern] = product.PackKey;
+            }
+
+            IsBaguaMotionEnabled = true;
+            Changed?.Invoke();
+            return true;
+        }
+
         return product.Assets.FirstOrDefault() is { } firstAsset && Apply(firstAsset);
     }
 
@@ -184,6 +321,14 @@ public sealed class PlatformCommunityDecorationStateService
     {
         ActiveHomeThemePackKey = DefaultHomeThemePackKey;
         IsHomeThemeEnabled = true;
+        Changed?.Invoke();
+    }
+
+    public void RestoreDefaultBaguaMotion()
+    {
+        activeBaguaMotionPackByScope.Clear();
+        activeBaguaMotionPackByScope["*"] = DefaultBaguaMotionPackKey;
+        IsBaguaMotionEnabled = true;
         Changed?.Invoke();
     }
 
@@ -201,10 +346,14 @@ public sealed class PlatformCommunityDecorationStateService
             ActiveBaguaAssetKey = asset.Key;
             IsBaguaDecorationEnabled = true;
         }
-        else
+        else if (asset.Target == CommunityDecorationTarget.DiagramNode)
         {
             ActiveNodeAssetKey = asset.Key;
             IsNodeDecorationEnabled = true;
+        }
+        else
+        {
+            return false;
         }
 
         Changed?.Invoke();
@@ -220,17 +369,22 @@ public sealed class PlatformCommunityDecorationStateService
 
     public void SetTargetEnabled(CommunityDecorationTarget target, bool enabled)
     {
-        if (target == CommunityDecorationTarget.HomeNavigatorTheme)
+        switch (target)
         {
-            IsHomeThemeEnabled = enabled;
-        }
-        else if (target == CommunityDecorationTarget.Bagua)
-        {
-            IsBaguaDecorationEnabled = enabled;
-        }
-        else
-        {
-            IsNodeDecorationEnabled = enabled;
+            case CommunityDecorationTarget.HomeNavigatorTheme:
+                IsHomeThemeEnabled = enabled;
+                break;
+            case CommunityDecorationTarget.Bagua:
+                IsBaguaDecorationEnabled = enabled;
+                break;
+            case CommunityDecorationTarget.DiagramNode:
+                IsNodeDecorationEnabled = enabled;
+                break;
+            case CommunityDecorationTarget.BaguaTransitionMotion:
+                IsBaguaMotionEnabled = enabled;
+                break;
+            default:
+                return;
         }
 
         Changed?.Invoke();
@@ -245,6 +399,13 @@ public sealed class PlatformCommunityDecorationStateService
         out CommunityDecorationAsset? asset,
         out string message)
     {
+        if (target is not CommunityDecorationTarget.Bagua and not CommunityDecorationTarget.DiagramNode)
+        {
+            asset = null;
+            message = "사용자 제작 항목은 괘상 또는 다이어그램 노드 유형으로 만들어 주세요.";
+            return false;
+        }
+
         var normalizedTitle = title?.Trim();
         var normalizedSymbol = symbol?.Trim();
         if (string.IsNullOrWhiteSpace(normalizedTitle))
@@ -394,6 +555,54 @@ public sealed class PlatformCommunityDecorationStateService
                    .FirstOrDefault(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase));
     }
 
+    private BaguaTransitionMotionManifest DefaultBaguaMotion
+        => products.First(item => item.IsBaguaMotion &&
+            string.Equals(item.PackKey, DefaultBaguaMotionPackKey, StringComparison.OrdinalIgnoreCase)).BaguaMotion!;
+
+    private CommunityDecorationProduct? FindOwnedBaguaMotionProduct(string packKey)
+    {
+        var product = products.FirstOrDefault(item => item.IsBaguaMotion &&
+            string.Equals(item.PackKey, packKey, StringComparison.OrdinalIgnoreCase));
+        return product is not null && IsProductOwned(product) ? product : null;
+    }
+
+    private void RemoveInactiveBaguaMotionSelections()
+    {
+        foreach (var scope in activeBaguaMotionPackByScope
+                     .Where(pair => FindOwnedBaguaMotionProduct(pair.Value) is null)
+                     .Select(pair => pair.Key)
+                     .ToArray())
+        {
+            activeBaguaMotionPackByScope.Remove(scope);
+        }
+
+        activeBaguaMotionPackByScope.TryAdd("*", DefaultBaguaMotionPackKey);
+    }
+
+    private static IEnumerable<string> BuildBaguaMotionScopePriority(
+        string assetSlotKey,
+        string motionKind)
+    {
+        if (!string.IsNullOrWhiteSpace(assetSlotKey))
+        {
+            yield return assetSlotKey;
+
+            var parts = assetSlotKey.Split(':', 3, StringSplitOptions.TrimEntries);
+            if (parts.Length == 3)
+            {
+                yield return $"bagua-motion:*:{parts[2]}";
+                yield return $"bagua-motion:{parts[1]}:*";
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(motionKind))
+        {
+            yield return $"motion-kind:{motionKind.Trim()}";
+        }
+
+        yield return "*";
+    }
+
     private static List<CommunityDecorationProduct> BuildProducts()
     {
         var products = new List<CommunityDecorationProduct>
@@ -462,7 +671,72 @@ public sealed class PlatformCommunityDecorationStateService
                 CommunityDecorationTarget.Bagua,
                 900,
                 "KRW",
-                [new("bagua-night-star", "bagua-night", "별빛 중심", "모래별 공방", "별빛 사방판 중심 표시", CommunityDecorationTarget.Bagua, "✦", "#7c3aed")])
+                [new("bagua-night-star", "bagua-night", "별빛 중심", "모래별 공방", "별빛 사방판 중심 표시", CommunityDecorationTarget.Bagua, "✦", "#7c3aed")]),
+            new(
+                "store-bagua-motion-basic-runner-v1",
+                DefaultBaguaMotionPackKey,
+                "기본 업무 달리기",
+                "Hongdal Motion",
+                "작은 벡터 인물이 역할별 업무를 들고 출발괘에서 도착괘까지 달리는 기본 전환 모션입니다.",
+                CommunityDecorationTarget.BaguaTransitionMotion,
+                0,
+                "KRW",
+                [],
+                BaguaMotion: new(
+                    "1.0.0",
+                    "runner-v1",
+                    "승인",
+                    "홍달 앱 내 개인 사용",
+                    "🏃",
+                    "#2563eb",
+                    1.0,
+                    true,
+                    "기본 벡터 주자",
+                    "점선 업무 경로")),
+            new(
+                "store-bagua-motion-courier-sprint-v1",
+                "bagua-motion-courier-sprint-v1",
+                "꼬마 운반대 릴레이",
+                "달리는상자 스튜디오",
+                "문서와 상자를 등에 멘 꼬마 운반대가 업무를 빠르게 인계하는 경쾌한 모션 팩입니다.",
+                CommunityDecorationTarget.BaguaTransitionMotion,
+                1900,
+                "KRW",
+                [],
+                BaguaMotion: new(
+                    "1.0.0",
+                    "courier-sprint-v1",
+                    "승인",
+                    "홍달 앱 내 개인 사용",
+                    "📦",
+                    "#0ea5e9",
+                    0.82,
+                    false,
+                    "꼬마 운반대",
+                    "두 줄 릴레이 궤적",
+                    ["bagua-motion:*:order-to-transport"],
+                    5)),
+            new(
+                "store-bagua-motion-light-trail-v1",
+                "bagua-motion-light-trail-v1",
+                "빛의 서명 전달자",
+                "모래별 모션 공방",
+                "합의와 전자서명의 확정 기록이 빛의 궤적을 따라 다음 업무로 전달되는 모션 팩입니다.",
+                CommunityDecorationTarget.BaguaTransitionMotion,
+                2900,
+                "KRW",
+                [],
+                BaguaMotion: new(
+                    "1.0.0",
+                    "light-trail-v1",
+                    "승인",
+                    "홍달 앱 내 개인 사용",
+                    "✦",
+                    "#f59e0b",
+                    1.08,
+                    false,
+                    "빛의 전달자",
+                    "발광 서명 궤적"))
         };
 
         foreach (var pack in 노드스티커Catalog.기본팩목록)

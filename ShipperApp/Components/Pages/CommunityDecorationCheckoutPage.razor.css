@@ -194,6 +194,26 @@
     gap: 9px;
 }
 
+.decoration-checkout__motion-product {
+    display: grid;
+    gap: 9px;
+}
+
+.decoration-checkout__motion-product ::deep .bagua-motion-pack-preview {
+    min-height: 176px;
+}
+
+.decoration-checkout__motion-product > div:last-child {
+    display: grid;
+    gap: 2px;
+}
+
+.decoration-checkout__motion-product strong { font-size: 0.76rem; }
+.decoration-checkout__motion-product small {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.6rem;
+}
+
 .decoration-checkout__theme-product ::deep .home-theme-preview {
     min-height: 180px;
 }
@@ -334,6 +354,10 @@
 
 .decoration-checkout__complete-preview ::deep .home-theme-preview__wheel {
     width: 190px;
+}
+
+.decoration-checkout__complete-preview ::deep .bagua-motion-pack-preview {
+    min-height: 190px;
 }
 
 .decoration-checkout--missing {

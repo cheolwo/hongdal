@@ -14,13 +14,147 @@
 @inject PlatformHomeModeStateService HomeModeState
 @inject PlatformDiagramPaletteStateService DiagramPalette
 @inject PlatformCommunityDecorationStateService DecorationState
+@inject PlatformCommunityPostDraftStateService CommunityPostDrafts
 @inject IServiceProvider Services
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
 <MudContainer MaxWidth="MaxWidth.False" Class="@HomeRootClass">
     <MudStack Spacing="3">
-        @if (IsDiagramMode)
+        @if (isLedgerDetailOpen)
+        {
+            <CommunityLedgerDiagramDetail Context="ledgerDetailContext"
+                                          IsLoading="isLedgerDetailLoading"
+                                          ErrorMessage="@ledgerDetailErrorMessage"
+                                          OnBack="ReturnToLedgerPicker"
+                                          OnAttach="AttachPendingLedgerAndReturn"
+                                          OnRefreshRequested="RefreshLedgerDetailAsync" />
+        }
+        else if (isLedgerPickerOpen)
+        {
+            var filteredLedgers = FilteredLedgerPickerChoices;
+            var pendingLedger = myLedgers.FirstOrDefault(ledger =>
+                string.Equals(ledger.원장Id, pendingLedgerId, StringComparison.OrdinalIgnoreCase));
+
+            <section class="platform-ledger-picker-page" aria-label="첨부할 원장 선택">
+                <header class="platform-ledger-picker-header">
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                                   Color="Color.Default"
+                                   OnClick="ReturnToComposeFromLedgerPicker"
+                                   aria-label="글쓰기로 돌아가기" />
+                    <div>
+                        <MudText Typo="Typo.overline" Color="Color.Primary">살뜰 게시판 글쓰기</MudText>
+                        <MudText Typo="Typo.h5">원장 목록</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">글에 첨부할 원장을 선택하세요.</MudText>
+                    </div>
+                </header>
+
+                <div class="platform-ledger-picker-tools">
+                    <MudTextField T="string"
+                                  Label="원장 검색"
+                                  @bind-Value="ledgerPickerSearchText"
+                                  Immediate="true"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search"
+                                  Class="platform-ledger-picker-search" />
+                    <div class="platform-ledger-picker-segments" role="group" aria-label="원장 범위">
+                        @foreach (var scope in LedgerPickerScopes)
+                        {
+                            <button type="button"
+                                    class="@BuildLedgerPickerScopeClass(scope)"
+                                    aria-pressed="@string.Equals(ledgerPickerScope, scope, StringComparison.Ordinal)"
+                                    @onclick="@(() => ledgerPickerScope = scope)">
+                                @scope
+                            </button>
+                        }
+                    </div>
+                    <span class="platform-ledger-picker-count">@($"{filteredLedgers.Count}개 원장")</span>
+                </div>
+
+                <div class="platform-ledger-picker-content">
+                    @if (isMyLedgersLoading)
+                    {
+                        <div class="platform-ledger-picker-state" aria-live="polite">
+                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+                            <span>원장을 불러오는 중입니다.</span>
+                        </div>
+                    }
+                    else if (myLedgers.Count == 0)
+                    {
+                        <div class="platform-ledger-picker-state">
+                            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Default" Size="Size.Large" />
+                            <strong>첨부할 수 있는 원장이 없습니다.</strong>
+                            <span>@(myLedgerLoadMessage ?? "로그인 상태와 원장 공유 범위를 확인해 주세요.")</span>
+                        </div>
+                    }
+                    else if (filteredLedgers.Count == 0)
+                    {
+                        <div class="platform-ledger-picker-state">
+                            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Color="Color.Default" Size="Size.Large" />
+                            <strong>조건에 맞는 원장이 없습니다.</strong>
+                            <button type="button" class="platform-ledger-picker-reset" @onclick="ResetLedgerPickerFilters">검색 조건 지우기</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="platform-ledger-picker-list">
+                            @foreach (var ledger in filteredLedgers)
+                            {
+                                <button type="button"
+                                        class="@BuildLedgerPickerItemClass(ledger)"
+                                        aria-pressed="@IsPendingLedger(ledger)"
+                                        @onclick="@(() => pendingLedgerId = ledger.원장Id)">
+                                    <span class="platform-ledger-picker-item-icon">
+                                        <MudIcon Icon="@Icons.Material.Filled.Description" Color="Color.Primary" />
+                                    </span>
+                                    <span class="platform-ledger-picker-item-main">
+                                        <span class="platform-ledger-picker-item-heading">
+                                            <strong>@ledger.제목</strong>
+                                            <small>@(ledger.내접근원장여부 ? "내 원장" : "공개 원장")</small>
+                                        </span>
+                                        <span>@ledger.원장템플릿명 · @ledger.상태</span>
+                                        <small>@ledger.참여역할 · @FormatDate(ledger.수정시각Utc)</small>
+                                    </span>
+                                    <MudIcon Icon="@(IsPendingLedger(ledger) ? Icons.Material.Filled.CheckCircle : Icons.Material.Outlined.RadioButtonUnchecked)"
+                                             Color="@(IsPendingLedger(ledger) ? Color.Primary : Color.Default)" />
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <footer class="platform-ledger-picker-actions">
+                    <div>
+                        <span>선택한 원장</span>
+                        <strong>@(pendingLedger?.제목 ?? "아직 선택하지 않음")</strong>
+                    </div>
+                    <MudStack Row="true" Spacing="1">
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Default"
+                                   OnClick="ReturnToComposeFromLedgerPicker">
+                            취소
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.AccountTree"
+                                   Disabled="@(pendingLedger is null)"
+                                   OnClick="OpenPendingLedgerDetailAsync">
+                            다이어그램 보기
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.AttachFile"
+                                   Disabled="@(pendingLedger is null)"
+                                   OnClick="AttachPendingLedgerAndReturn">
+                            선택한 원장 첨부
+                        </MudButton>
+                    </MudStack>
+                </footer>
+            </section>
+        }
+        else if (IsDiagramMode)
         {
             var blockFlowDiagram = 선택원장블록흐름도;
             var flowNodes = 정렬된원장블록노드목록가져오기(blockFlowDiagram);
@@ -809,7 +943,7 @@
                     <div class="platform-community-forum-title">
                         <HongdalWonBangGakMark Size="48" />
                         <div>
-                            <span>@AppName COMMUNITY BOARD</span>
+                            <span>@AppName · 살뜰 커뮤니티</span>
                             <MudText Typo="Typo.h4" Class="platform-community-hero-title">@CurrentCommunityBoardTitle</MudText>
                             <MudText Typo="Typo.body2" Color="Color.Secondary" Class="platform-community-hero-copy">
                                 @CurrentCommunityBoardDescription
@@ -831,6 +965,12 @@
                                    StartIcon="@Icons.Material.Filled.Edit"
                                    OnClick="OpenCompose">
                             글쓰기
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   StartIcon="@Icons.Material.Filled.Description"
+                                   OnClick="OpenMyLedgerComposeAsync">
+                            원장으로 글쓰기
                         </MudButton>
                         <MudButton Variant="Variant.Outlined"
                                    Color="Color.Info"
@@ -877,6 +1017,8 @@
                         {
                             <HongdalPrajnaUpayaTaegeukNavigator AccentColor="@DecorationState.HomeThemeAccentColor"
                                                                Theme="@DecorationState.ActiveHomeTheme"
+                                                               UpayaSelected="@PrajnaUpayaUpayaSelectedCallback"
+                                                               PrajnaSelected="@PrajnaUpayaPrajnaSelectedCallback"
                                                                CommunitySelected="@BaguaTaegeukYangSelectedCallback"
                                                                StoreSelected="@BaguaTaegeukYinSelectedCallback" />
                         }
@@ -895,6 +1037,9 @@
                                                                TaegeukYangSelected="@BaguaTaegeukYangSelectedCallback"
                                                                TaegeukYinSelected="@BaguaTaegeukYinSelectedCallback"
                                                                ShowTrigramSymbols="@DecorationState.IsBaguaDecorationEnabled"
+                                                               CenterTransferTrigramKey="zhen"
+                                                               CenterTransferDestinationLabel="공동구매"
+                                                               CenterTransferCompleted="HandleBaguaCenterTransferCompletedAsync"
                                                                DestinationSelected="HandleBaguaDestinationSelectedAsync" />
                         }
                     }
@@ -1017,7 +1162,7 @@
                                         <span class="platform-community-forum-subject" role="cell">
                                             <button type="button"
                                                     aria-expanded="@IsForumPostSelected(post)"
-                                                    @onclick="@(() => ToggleForumPost(post))">
+                                                    @onclick="@(async () => await ToggleForumPostAsync(post))">
                                                 @if (post.IsOperatorPinned)
                                                 {
                                                     <MudIcon Icon="@Icons.Material.Filled.Campaign" Size="Size.Small" />
@@ -1141,6 +1286,76 @@
 
                                     <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
 
+                                    @if (post.원장Context is { } 원장Context)
+                                    {
+                                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                                            <MudStack Spacing="1">
+                                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                                        <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
+                                                        <strong>현재 원장 · @원장Context.원장템플릿명</strong>
+                                                    </MudStack>
+                                                    <MudStack Row="true" Spacing="1">
+                                                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@원장Context.상태</MudChip>
+                                                        <MudChip T="string"
+                                                                 Size="Size.Small"
+                                                                 Color="@(원장Context.기능활성화여부 ? Color.Success : Color.Warning)"
+                                                                 Variant="Variant.Outlined">
+                                                            @(원장Context.기능활성화여부 ? "업무 기능 사용" : "업무 기능 준비 중")
+                                                        </MudChip>
+                                                    </MudStack>
+                                                </MudStack>
+                                                <MudText Typo="Typo.body2">@원장Context.제목</MudText>
+                                                @if (!string.IsNullOrWhiteSpace(원장Context.현재단계))
+                                                {
+                                                    <MudText Typo="Typo.caption">현재 단계 · @원장Context.현재단계</MudText>
+                                                }
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@원장Context.처리체계명 · @원장Context.원장Id</MudText>
+                                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                                    @foreach (var 행동 in 원장Context.가능한행동목록.Take(5))
+                                                    {
+                                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@행동</MudChip>
+                                                    }
+                                                </MudStack>
+                                                @if (원장Context.참여요청필요여부)
+                                                {
+                                                    <MudText Typo="Typo.caption" Color="Color.Warning">원장 상세와 업무 처리는 참여 승인 후 열립니다.</MudText>
+                                                }
+                                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                                    @if (원장Context.다이어그램 is not null)
+                                                    {
+                                                        <MudButton Variant="Variant.Outlined"
+                                                                   Color="Color.Info"
+                                                                   Size="Size.Small"
+                                                                   StartIcon="@Icons.Material.Filled.AccountTree"
+                                                                   OnClick="@(() => OpenSharedLedgerDiagram(원장Context))">
+                                                            다이어그램 같이 보기
+                                                        </MudButton>
+                                                    }
+                                                    @if (원장Context.재공유허용여부)
+                                                    {
+                                                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">재공유 허용</MudChip>
+                                                    }
+                                                    @if (원장Context.재사용허용여부)
+                                                    {
+                                                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">재사용 허용</MudChip>
+                                                    }
+                                                    @if (!원장Context.상세조회가능여부 && 원장Context.재사용허용여부)
+                                                    {
+                                                        <MudButton Variant="Variant.Filled"
+                                                                   Color="Color.Primary"
+                                                                   Size="Size.Small"
+                                                                   StartIcon="@Icons.Material.Filled.ContentCopy"
+                                                                   Disabled="@isSharedLedgerReusing"
+                                                                   OnClick="@(() => ReuseSharedLedgerAsync(원장Context))">
+                                                            내 원장으로 가져오기
+                                                        </MudButton>
+                                                    }
+                                                </MudStack>
+                                            </MudStack>
+                                        </MudAlert>
+                                    }
+
                                     @if (IsDiagramBoardPost(post.Category, post.Body))
                                     {
                                         var diagramNodes = BuildCommunityDiagramPreviewNodes(post.Body, post.WorkflowTag);
@@ -1188,15 +1403,39 @@
 
                                     @if (!string.IsNullOrWhiteSpace(post.SharedLinkUrl))
                                     {
-                                        <MudButton Href="@post.SharedLinkUrl"
-                                                   Target="_blank"
-                                                   Rel="noopener noreferrer"
-                                                   Variant="Variant.Outlined"
-                                                   Color="Color.Info"
-                                                   Size="Size.Small"
-                                                   StartIcon="@Icons.Material.Filled.Link">
-                                            공유 링크 열기
-                                        </MudButton>
+                                        @if (IsYouTubeSharedLink(post.SharedLinkUrl))
+                                        {
+                                            <div class="platform-community-lecture-share-card">
+                                                <span class="platform-community-lecture-share-icon">
+                                                    <MudIcon Icon="@Icons.Material.Filled.FormatQuote" Size="Size.Medium" />
+                                                </span>
+                                                <span class="platform-community-lecture-share-copy">
+                                                    <small>영상과 함께 나눈 글귀</small>
+                                                    <strong>@ResolveSharedLectureTitle(post.Title)</strong>
+                                                </span>
+                                                <MudButton Href="@post.SharedLinkUrl"
+                                                           Target="_blank"
+                                                           Rel="noopener noreferrer"
+                                                           Variant="Variant.Filled"
+                                                           Color="Color.Info"
+                                                           Size="Size.Small"
+                                                           StartIcon="@Icons.Material.Filled.PlayCircleOutline">
+                                                    해당 위치에서 보기
+                                                </MudButton>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <MudButton Href="@post.SharedLinkUrl"
+                                                       Target="_blank"
+                                                       Rel="noopener noreferrer"
+                                                       Variant="Variant.Outlined"
+                                                       Color="Color.Info"
+                                                       Size="Size.Small"
+                                                       StartIcon="@Icons.Material.Filled.Link">
+                                                공유 링크 열기
+                                            </MudButton>
+                                        }
                                     }
 
                                     @if (post.Attachments.Count > 0)
@@ -2188,6 +2427,81 @@
                                                aria-label="글쓰기 닫기" />
                             </MudStack>
 
+                            <section class="platform-community-compose-ledger-shortcut" aria-label="원장 바로가기">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.subtitle2">원장 바로가기</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">내 원장 또는 생성자가 재공유를 허용한 공개 원장을 글에 첨부합니다.</MudText>
+                                    </MudStack>
+                                    <MudButton Variant="Variant.Text"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               StartIcon="@Icons.Material.Filled.FolderOpen"
+                                               Disabled="@isMyLedgersLoading"
+                                               OnClick="OpenLedgerPickerAsync">
+                                        원장 목록에서 선택
+                                    </MudButton>
+                                </MudStack>
+
+                                @if (!string.IsNullOrWhiteSpace(form.커뮤니티원장Id))
+                                {
+                                    var selectedMyLedger = myLedgers.FirstOrDefault(x =>
+                                        string.Equals(x.원장Id, form.커뮤니티원장Id, StringComparison.OrdinalIgnoreCase));
+                                    <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
+                                            <span>
+                                                <strong>@(selectedMyLedger?.제목 ?? "선택한 원장")</strong>
+                                                <small class="platform-community-ledger-choice-meta">@form.커뮤니티원장Id</small>
+                                            </span>
+                                            <MudStack Row="true" Spacing="1">
+                                                @if (selectedMyLedger?.내가만든원장 == true)
+                                                {
+                                                    <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" OnClick="OpenLedgerSharingSettingsAsync">공개 설정</MudButton>
+                                                }
+                                                <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small" OnClick="ClearSelectedLedger">첨부 해제</MudButton>
+                                            </MudStack>
+                                        </MudStack>
+                                    </MudAlert>
+                                }
+
+                                @if (ledgerSharingSettings is not null)
+                                {
+                                    <div class="platform-community-ledger-sharing-settings">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                            <MudText Typo="Typo.subtitle2">원장 공개 설정</MudText>
+                                            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="CloseLedgerSharingSettings" aria-label="공개 설정 닫기" />
+                                        </MudStack>
+                                        <MudSelect T="string" Label="원장 공개 범위" @bind-Value="ledgerSharingSettings.공개범위" Variant="Variant.Outlined">
+                                            <MudSelectItem Value="@커뮤니티원장공개범위.비공개">비공개</MudSelectItem>
+                                            <MudSelectItem Value="@커뮤니티원장공개범위.커뮤니티">홍달 커뮤니티 공개</MudSelectItem>
+                                            <MudSelectItem Value="@커뮤니티원장공개범위.전체공개">링크 전체 공개</MudSelectItem>
+                                        </MudSelect>
+                                        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                                            <MudSwitch T="bool" Label="다른 사용자 재사용 허용" @bind-Value="ledgerSharingSettings.재사용허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
+                                            <MudSwitch T="bool" Label="게시글 재공유 허용" @bind-Value="ledgerSharingSettings.재공유허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
+                                        </MudStack>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">공개할 항목만 선택하세요. 선택하지 않은 값은 다른 사용자에게 전달되지 않습니다.</MudText>
+                                        <div class="platform-community-ledger-sharing-item-list">
+                                            @foreach (var item in ledgerSharingSettings.항목목록)
+                                            {
+                                                <MudCheckBox T="bool"
+                                                             @bind-Value="item.공개여부"
+                                                             Label="@item.표시명"
+                                                             Color="Color.Primary"
+                                                             Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
+                                            }
+                                        </div>
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   StartIcon="@Icons.Material.Filled.Save"
+                                                   Disabled="@isLedgerSharingSaving"
+                                                   OnClick="SaveLedgerSharingSettingsAsync">
+                                            공개 설정 저장
+                                        </MudButton>
+                                    </div>
+                                }
+                            </section>
+
                             <section class="platform-community-compose-section platform-community-compose-section--main" aria-label="글 내용">
                                 <MudTextField T="string"
                                               Label="제목"
@@ -2227,12 +2541,28 @@
                             <MudExpansionPanels Elevation="0" Class="platform-community-compose-options">
                                 <MudExpansionPanel Text="태그·신고·첨부 설정">
                                     <MudStack Spacing="2" Class="pt-2">
-                                        <MudSelect T="string" Label="워크플로우 태그" @bind-Value="form.WorkflowTag" Variant="Variant.Outlined">
-                                            @foreach (var workflowTag in WorkflowTagOptions)
+                                        <MudSelect T="string" Label="업무 분류" @bind-Value="form.WorkflowTag" Variant="Variant.Outlined">
+                                            @foreach (var 업무분류 in CommunityWorkClassificationCatalog.All)
                                             {
-                                                <MudSelectItem Value="@workflowTag">@workflowTag</MudSelectItem>
+                                                <MudSelectItem Value="@업무분류.WorkflowTag">@업무분류.DisplayName</MudSelectItem>
                                             }
                                         </MudSelect>
+                                        @if (SelectedWorkClassification is { } 선택업무분류)
+                                        {
+                                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                                <MudChip T="string"
+                                                         Size="Size.Small"
+                                                         Color="@(SelectedWorkFeatureEnabled ? Color.Success : Color.Warning)"
+                                                         Variant="Variant.Outlined">
+                                                    @(SelectedWorkFeatureEnabled ? "원장 연결 가능" : "대화만 가능")
+                                                </MudChip>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                    @(선택업무분류.LedgerTemplateKeys.Count == 0
+                                                        ? "원장 연결 없는 대화 분류"
+                                                        : string.Join(" · ", 선택업무분류.LedgerTemplateKeys.Select(key => CommunityLedgerTemplateCatalog.Find(key).DisplayName)))
+                                                </MudText>
+                                            </MudStack>
+                                        }
                                         <MudSelect T="string" Label="역할 태그" @bind-Value="form.RoleTag" Variant="Variant.Outlined">
                                             @foreach (var roleTag in RoleTagOptions)
                                             {
@@ -2249,6 +2579,13 @@
                                             <MudTextField T="string" Label="신고받는 사람 표시명" @bind-Value="form.ReportedDisplayName" MaxLength="40" />
                                         }
                                         <MudTextField T="string" Label="공유 링크 또는 영상 링크" @bind-Value="form.SharedLinkUrl" MaxLength="1000" Variant="Variant.Outlined" />
+                                        <MudTextField T="string"
+                                                      Label="연결할 주 원장 ID"
+                                                      @bind-Value="form.커뮤니티원장Id"
+                                                      MaxLength="120"
+                                                      Variant="Variant.Outlined"
+                                                      Disabled="@(!SelectedWorkFeatureEnabled)"
+                                                      HelperText="본인이 참여 중이거나 생성자가 재공유를 허용한 원장을 연결할 수 있습니다." />
                                         <label class="platform-community-file-picker">
                                             <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" Color="Color.Primary" />
                                             <span>
@@ -3534,6 +3871,358 @@
 
     .platform-community-compose-section--main {
         border-color: rgba(var(--platform-home-accent-rgb), 0.24);
+    }
+
+    .platform-home--ledger-picker {
+        padding-bottom: 0;
+        background: var(--mud-palette-background);
+    }
+
+    .platform-ledger-picker-page {
+        display: grid;
+        grid-template-rows: auto auto minmax(300px, 1fr) auto;
+        gap: 20px;
+        width: min(100%, 960px);
+        min-height: calc(100dvh - 116px);
+        margin: 0 auto;
+        padding: 20px 24px 0;
+        background: var(--mud-palette-surface);
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.14);
+        border-radius: 8px 8px 0 0;
+    }
+
+    .platform-ledger-picker-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .platform-ledger-picker-header > div:last-child {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .platform-ledger-picker-tools {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto auto;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(var(--platform-home-accent-rgb), 0.14);
+    }
+
+    .platform-ledger-picker-search {
+        min-width: 0;
+    }
+
+    .platform-ledger-picker-segments {
+        display: inline-grid;
+        grid-template-columns: repeat(3, minmax(76px, 1fr));
+        padding: 3px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.18);
+        border-radius: 8px;
+        background: rgba(var(--platform-home-accent-rgb), 0.04);
+    }
+
+    .platform-ledger-picker-segment {
+        min-height: 34px;
+        padding: 4px 10px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--mud-palette-text-secondary);
+        font: inherit;
+        font-size: 0.82rem;
+        cursor: pointer;
+    }
+
+    .platform-ledger-picker-segment--active {
+        background: var(--mud-palette-surface);
+        color: var(--platform-home-accent);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+        font-weight: 700;
+    }
+
+    .platform-ledger-picker-count {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .platform-ledger-picker-content {
+        min-height: 0;
+    }
+
+    .platform-ledger-picker-list {
+        display: grid;
+        align-content: start;
+        gap: 8px;
+    }
+
+    .platform-ledger-picker-item {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) 24px;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 82px;
+        padding: 12px 14px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.17);
+        border-radius: 8px;
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 120ms ease, background-color 120ms ease;
+    }
+
+    .platform-ledger-picker-item:hover,
+    .platform-ledger-picker-item--selected {
+        border-color: var(--platform-home-accent);
+        background: rgba(var(--platform-home-accent-rgb), 0.06);
+    }
+
+    .platform-ledger-picker-item-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        background: rgba(var(--platform-home-accent-rgb), 0.1);
+    }
+
+    .platform-ledger-picker-item-main {
+        display: grid;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .platform-ledger-picker-item-main > span,
+    .platform-ledger-picker-item-main > small,
+    .platform-ledger-picker-item-heading strong {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-ledger-picker-item-main > span:not(.platform-ledger-picker-item-heading),
+    .platform-ledger-picker-item-main > small {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.76rem;
+    }
+
+    .platform-ledger-picker-item-heading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .platform-ledger-picker-item-heading strong {
+        min-width: 0;
+    }
+
+    .platform-ledger-picker-item-heading small {
+        flex: 0 0 auto;
+        color: var(--platform-home-accent);
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    .platform-ledger-picker-state {
+        display: grid;
+        place-items: center;
+        align-content: center;
+        gap: 8px;
+        min-height: 300px;
+        padding: 28px;
+        color: var(--mud-palette-text-secondary);
+        text-align: center;
+    }
+
+    .platform-ledger-picker-state strong {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .platform-ledger-picker-reset {
+        border: 0;
+        background: transparent;
+        color: var(--platform-home-accent);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .platform-ledger-picker-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 76px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(var(--platform-home-accent-rgb), 0.16);
+        background: color-mix(in srgb, var(--mud-palette-surface) 96%, transparent);
+        backdrop-filter: blur(10px);
+    }
+
+    .platform-ledger-picker-actions > div:first-child {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .platform-ledger-picker-actions span {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+    }
+
+    .platform-ledger-picker-actions strong {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 720px) {
+        .platform-home--ledger-picker {
+            padding-top: 0 !important;
+        }
+
+        .platform-ledger-picker-page {
+            gap: 14px;
+            min-height: calc(100dvh - 64px);
+            padding: 14px 12px 0;
+            border-width: 0;
+            border-radius: 0;
+        }
+
+        .platform-ledger-picker-tools {
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        .platform-ledger-picker-search,
+        .platform-ledger-picker-segments {
+            grid-column: 1 / -1;
+        }
+
+        .platform-ledger-picker-segments {
+            width: 100%;
+        }
+
+        .platform-ledger-picker-count {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .platform-ledger-picker-item {
+            grid-template-columns: 40px minmax(0, 1fr) 22px;
+            min-height: 76px;
+            padding: 10px;
+        }
+
+        .platform-ledger-picker-item-icon {
+            width: 40px;
+        }
+
+        .platform-ledger-picker-actions {
+            align-items: stretch;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+
+        .platform-ledger-picker-actions .mud-stack {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+    }
+
+    .platform-community-compose-ledger-shortcut {
+        display: grid;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(var(--platform-home-accent-rgb), 0.16);
+        border-bottom: 1px solid rgba(var(--platform-home-accent-rgb), 0.16);
+    }
+
+    .platform-community-ledger-choice-list {
+        display: grid;
+        gap: 8px;
+        max-height: 260px;
+        overflow-y: auto;
+    }
+
+    .platform-community-ledger-choice {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        min-height: 64px;
+        padding: 10px 12px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.2);
+        border-radius: 8px;
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .platform-community-ledger-choice:hover,
+    .platform-community-ledger-choice--selected {
+        border-color: var(--platform-home-accent);
+        background: rgba(var(--platform-home-accent-rgb), 0.07);
+    }
+
+    .platform-community-ledger-choice-main,
+    .platform-community-ledger-choice-side {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .platform-community-ledger-choice-main {
+        flex: 1 1 auto;
+    }
+
+    .platform-community-ledger-choice-main strong,
+    .platform-community-ledger-choice-main small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-ledger-choice-main small,
+    .platform-community-ledger-choice-side small,
+    .platform-community-ledger-choice-meta {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+    }
+
+    .platform-community-ledger-choice-side {
+        flex: 0 0 auto;
+        text-align: right;
+    }
+
+    .platform-community-ledger-sharing-settings {
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.24);
+        border-radius: 8px;
+        background: rgba(var(--platform-home-accent-rgb), 0.04);
+    }
+
+    .platform-community-ledger-sharing-item-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px 12px;
+        max-height: 260px;
+        overflow-y: auto;
     }
 
     .platform-community-compose-options {
@@ -5966,8 +6655,62 @@
 
     @@media (max-width: 680px) {
         .platform-current-ledger-list,
-        .platform-ledger-context-grid {
+        .platform-ledger-context-grid,
+        .platform-community-ledger-sharing-item-list {
             grid-template-columns: 1fr;
+        }
+    }
+
+    .platform-community-lecture-share-card {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        padding: 12px 13px;
+        border: 1px solid color-mix(in srgb, #0b4c8c 22%, var(--mud-palette-lines-default));
+        border-radius: 16px;
+        gap: 11px;
+        align-items: center;
+        background:
+            radial-gradient(circle at 90% 10%, rgba(125, 211, 252, 0.22), transparent 38%),
+            color-mix(in srgb, #eaf4fb 62%, var(--mud-palette-surface));
+    }
+
+    .platform-community-lecture-share-icon {
+        display: grid;
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        place-items: center;
+        background: #0b4c8c;
+        color: white;
+    }
+
+    .platform-community-lecture-share-copy {
+        display: grid;
+        min-width: 0;
+        gap: 2px;
+    }
+
+    .platform-community-lecture-share-copy small {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.7rem;
+    }
+
+    .platform-community-lecture-share-copy strong {
+        overflow: hidden;
+        color: #0b4c8c;
+        line-height: 1.35;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 680px) {
+        .platform-community-lecture-share-card {
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .platform-community-lecture-share-card .mud-button-root {
+            grid-column: 1 / -1;
+            width: 100%;
         }
     }
 
@@ -5996,6 +6739,12 @@
     public bool ShowPrajnaUpayaNavigator { get; set; }
 
     [Parameter]
+    public string? UpayaHref { get; set; }
+
+    [Parameter]
+    public string? PrajnaHref { get; set; }
+
+    [Parameter]
     public bool BaguaCenterOpensCommunity { get; set; }
 
     [Parameter]
@@ -6009,6 +6758,12 @@
 
     [Parameter]
     public string BaguaCenterDestinationLabel { get; set; } = "커뮤니티";
+
+    [Parameter]
+    public bool UseBaguaRoleTransitionPages { get; set; }
+
+    [Parameter]
+    public string? BaguaPerspectiveRoleCode { get; set; }
 
     [Parameter]
     public bool CanManageCommunityPosts { get; set; }
@@ -6032,6 +6787,7 @@
     public long? QueryPostId { get; set; }
 
     private readonly List<PlatformCommunityPostResponse> posts = [];
+    private readonly List<PlatformCommunityPostLedgerChoiceResponse> myLedgers = [];
     private readonly List<PlatformCommunityBoardResponse> approvedBoards = [];
     private readonly List<PlatformCommunityBoardResponse> pendingBoardRequests = [];
     private readonly List<IBrowserFile> selectedFiles = [];
@@ -6045,6 +6801,7 @@
     private readonly Dictionary<string, string> diagramFormValues = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> 원장Api경로변수값 = [];
     private readonly Dictionary<string, WorkflowApiEndpointDto> apiEndpointMetadata = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, bool> featureFlagStates = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<원장블록노드> 팔레트원장블록노드목록 = [];
     private readonly List<string> diagramNodeOrder = [];
     private readonly List<원장블록연결선> customDiagramEdges = [];
@@ -6159,6 +6916,9 @@
     private string selectedBoardFilter = "전체";
     private string selectedForumListFilter = "전체글";
     private string communityPostSearchText = string.Empty;
+    private string ledgerPickerSearchText = string.Empty;
+    private string ledgerPickerScope = "전체";
+    private string? pendingLedgerId;
     private long? selectedForumPostId;
     private string? selectedForumSeedPostTitle;
     private string? 선택현재원장Id;
@@ -6175,6 +6935,7 @@
     private bool 창고대행신청제출중;
     private DiagramHandleDrag? activeDiagramHandleDrag;
     private DiagramDragPoint? diagramDragPointer;
+    private DiagramSnapshotDto? sharedLedgerDiagramSnapshot;
     private bool diagramHandleDragMoved;
     private bool suppressNextDiagramHandleClick;
     private string newConnectionLabel = "다음 단계";
@@ -6197,6 +6958,12 @@
     private bool isBoardLoading;
     private bool isApiEndpointMetadataLoading;
     private bool isSaving;
+    private bool isMyLedgersLoading;
+    private bool isLedgerPickerOpen;
+    private bool isLedgerDetailOpen;
+    private bool isLedgerDetailLoading;
+    private bool isLedgerSharingSaving;
+    private bool isSharedLedgerReusing;
     private bool isSavingBoardRequest;
     private bool isWorkMode;
     private bool isComposeOpen;
@@ -6205,6 +6972,10 @@
     private bool hasBaguaDockDragMoved;
     private double baguaDockDragStartX;
     private string? statusMessage;
+    private string? myLedgerLoadMessage;
+    private string? ledgerDetailErrorMessage;
+    private 커뮤니티원장공개설정Response? ledgerSharingSettings;
+    private PlatformCommunityPostLedgerContextResponse? ledgerDetailContext;
     private string? 창고대행신청알림문구;
     private string? 원장전송결과메시지;
     private string? 다이어그램대화방알림문구;
@@ -6221,6 +6992,7 @@
     private const long MaxUploadFileBytes = 5 * 1024 * 1024;
     private const string DiagramCollaborationHubPath = "/hubs/diagram-collaboration";
     private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체글", "추천글", "공지"];
+    private static readonly IReadOnlyList<string> LedgerPickerScopes = ["전체", "내 원장", "공개 원장"];
 
     private bool IsDiagramMode => DiagramPalette.IsDiagramMode;
 
@@ -6228,7 +7000,9 @@
         ? "pa-4 platform-community-compose-card platform-community-compose-card--open"
         : "pa-4 platform-community-compose-card";
 
-    private string HomeRootClass => IsDiagramMode
+    private string HomeRootClass => isLedgerPickerOpen || isLedgerDetailOpen
+        ? "py-4 platform-community-home platform-home--ledger-picker"
+        : IsDiagramMode
         ? "py-4 platform-community-home platform-home--diagram"
         : isWorkMode
         ? "py-4 platform-community-home platform-home--work"
@@ -6339,7 +7113,7 @@
 
     private string CurrentCommunityBoardTitle
         => string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
-            ? "홍달 생활 게시판"
+            ? "살뜰 게시판"
             : $"{selectedBoardFilter} 게시판";
 
     private string CurrentCommunityBoardDescription
@@ -6459,10 +7233,26 @@
             ? "platform-community-forum-view-tab platform-community-forum-view-tab--selected"
             : "platform-community-forum-view-tab";
 
-    private void ToggleForumPost(PlatformCommunityPostResponse post)
+    private async Task ToggleForumPostAsync(PlatformCommunityPostResponse post)
     {
-        selectedForumPostId = selectedForumPostId == post.Id ? null : post.Id;
+        if (selectedForumPostId == post.Id)
+        {
+            selectedForumPostId = null;
+            return;
+        }
+
+        selectedForumPostId = post.Id;
         selectedForumSeedPostTitle = null;
+
+        try
+        {
+            await LoadPostDetailAsync(post.Id);
+        }
+        catch (HttpRequestException)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "게시글의 원장 정보를 불러오지 못했습니다.";
+        }
     }
 
     private void 실시간베스트글열기(실시간베스트글항목 베스트글)
@@ -6570,9 +7360,355 @@
         isComposeOpen = true;
     }
 
+    private async Task OpenMyLedgerComposeAsync()
+    {
+        OpenCompose();
+        await OpenLedgerPickerAsync();
+    }
+
+    private async Task OpenLedgerPickerAsync()
+    {
+        OpenCommunityMode();
+        isComposeOpen = true;
+        isLedgerPickerOpen = true;
+        isLedgerDetailOpen = false;
+        ledgerDetailContext = null;
+        ledgerDetailErrorMessage = null;
+        nodeDetailPanelNode = null;
+        ledgerSharingSettings = null;
+        ledgerPickerSearchText = string.Empty;
+        ledgerPickerScope = "전체";
+        pendingLedgerId = form.커뮤니티원장Id;
+        await LoadMyLedgersAsync();
+    }
+
+    private async Task LoadMyLedgersAsync()
+    {
+        isMyLedgersLoading = true;
+        myLedgerLoadMessage = null;
+        myLedgers.Clear();
+        var loginRequired = false;
+        var sharedLoadFailed = false;
+        try
+        {
+            var ledgers = await CommunityService.GetMyLedgersAsync();
+            myLedgers.AddRange(ledgers);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            loginRequired = true;
+        }
+        catch (Exception)
+        {
+            loginRequired = true;
+        }
+
+        try
+        {
+            var sharedLedgers = await CommunityService.GetSharedLedgersAsync();
+            foreach (var ledger in sharedLedgers)
+            {
+                if (!myLedgers.Any(x => string.Equals(x.원장Id, ledger.원장Id, StringComparison.OrdinalIgnoreCase)))
+                {
+                    myLedgers.Add(ledger);
+                }
+            }
+        }
+        catch (Exception)
+        {
+            sharedLoadFailed = true;
+        }
+
+        if (myLedgers.Count == 0)
+        {
+            myLedgerLoadMessage = sharedLoadFailed
+                ? "원장 목록을 불러오지 못했습니다. 서버 연결 상태를 확인해 주세요."
+                : loginRequired
+                    ? "로그인하면 내 원장을 함께 볼 수 있습니다. 현재 재공유가 허용된 공개 원장은 없습니다."
+                    : "내 원장과 재공유가 허용된 공개 원장이 아직 없습니다.";
+        }
+
+        isMyLedgersLoading = false;
+    }
+
+    private async Task OpenPendingLedgerDetailAsync()
+    {
+        var ledger = myLedgers.FirstOrDefault(item =>
+            string.Equals(item.원장Id, pendingLedgerId, StringComparison.OrdinalIgnoreCase));
+        if (ledger is null)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "내부 데이터를 확인할 원장을 먼저 선택해 주세요.";
+            return;
+        }
+
+        isLedgerDetailOpen = true;
+        isLedgerDetailLoading = true;
+        ledgerDetailContext = null;
+        ledgerDetailErrorMessage = null;
+        try
+        {
+            ledgerDetailContext = await CommunityService.GetLedgerContextAsync(ledger.원장Id);
+            if (ledgerDetailContext is null)
+            {
+                ledgerDetailErrorMessage = "이 원장의 공개 범위 또는 참여 권한을 확인해 주세요.";
+            }
+        }
+        catch (Exception)
+        {
+            ledgerDetailErrorMessage = "원장 내부 데이터를 불러오지 못했습니다. 서버 연결 상태를 확인해 주세요.";
+        }
+        finally
+        {
+            isLedgerDetailLoading = false;
+        }
+    }
+
+    private async Task RefreshLedgerDetailAsync()
+    {
+        var ledgerId = ledgerDetailContext?.원장Id ?? pendingLedgerId;
+        if (string.IsNullOrWhiteSpace(ledgerId))
+        {
+            return;
+        }
+
+        try
+        {
+            var refreshed = await CommunityService.GetLedgerContextAsync(ledgerId);
+            if (refreshed is not null)
+            {
+                ledgerDetailContext = refreshed;
+                ledgerDetailErrorMessage = null;
+            }
+        }
+        catch (Exception)
+        {
+            ledgerDetailErrorMessage = "원장 최신 상태를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
+        }
+    }
+
+    private void SelectMyLedger(PlatformCommunityPostLedgerChoiceResponse ledger)
+    {
+        form.커뮤니티원장Id = ledger.원장Id;
+        form.WorkflowTag = ledger.WorkflowTag;
+        if (string.Equals(form.Category, "자유", StringComparison.OrdinalIgnoreCase))
+        {
+            form.Category = "생활 원장";
+        }
+
+        if (string.IsNullOrWhiteSpace(form.Title))
+        {
+            form.Title = $"[{ledger.원장템플릿명}] {ledger.제목}";
+        }
+
+        if (string.IsNullOrWhiteSpace(form.Body))
+        {
+            form.Body = $"{ledger.제목} 원장의 진행 상황과 관련해 이야기를 나눕니다.\n\n확인하고 싶은 내용: ";
+        }
+
+        ledgerSharingSettings = null;
+        statusSeverity = Severity.Success;
+        statusMessage = $"'{ledger.제목}' 원장을 글에 첨부했습니다.";
+    }
+
+    private IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse> FilteredLedgerPickerChoices
+        => myLedgers
+            .Where(MatchesLedgerPickerScope)
+            .Where(MatchesLedgerPickerSearch)
+            .OrderByDescending(ledger => ledger.내접근원장여부)
+            .ThenByDescending(ledger => ledger.수정시각Utc)
+            .ToArray();
+
+    private bool MatchesLedgerPickerScope(PlatformCommunityPostLedgerChoiceResponse ledger)
+        => ledgerPickerScope switch
+        {
+            "내 원장" => ledger.내접근원장여부,
+            "공개 원장" => !ledger.내접근원장여부,
+            _ => true
+        };
+
+    private bool MatchesLedgerPickerSearch(PlatformCommunityPostLedgerChoiceResponse ledger)
+    {
+        var searchText = ledgerPickerSearchText.Trim();
+        return searchText.Length == 0
+            || ContainsCommunitySearchText(ledger.제목, searchText)
+            || ContainsCommunitySearchText(ledger.원장템플릿명, searchText)
+            || ContainsCommunitySearchText(ledger.상태, searchText)
+            || ContainsCommunitySearchText(ledger.WorkflowTag, searchText)
+            || ContainsCommunitySearchText(ledger.참여역할, searchText)
+            || ContainsCommunitySearchText(ledger.원장Id, searchText);
+    }
+
+    private bool IsPendingLedger(PlatformCommunityPostLedgerChoiceResponse ledger)
+        => string.Equals(ledger.원장Id, pendingLedgerId, StringComparison.OrdinalIgnoreCase);
+
+    private string BuildLedgerPickerItemClass(PlatformCommunityPostLedgerChoiceResponse ledger)
+        => IsPendingLedger(ledger)
+            ? "platform-ledger-picker-item platform-ledger-picker-item--selected"
+            : "platform-ledger-picker-item";
+
+    private string BuildLedgerPickerScopeClass(string scope)
+        => string.Equals(ledgerPickerScope, scope, StringComparison.Ordinal)
+            ? "platform-ledger-picker-segment platform-ledger-picker-segment--active"
+            : "platform-ledger-picker-segment";
+
+    private void ResetLedgerPickerFilters()
+    {
+        ledgerPickerSearchText = string.Empty;
+        ledgerPickerScope = "전체";
+    }
+
+    private void ReturnToComposeFromLedgerPicker()
+    {
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = false;
+        isComposeOpen = true;
+        pendingLedgerId = null;
+    }
+
+    private void ReturnToLedgerPicker()
+    {
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = true;
+        ledgerDetailContext = null;
+        ledgerDetailErrorMessage = null;
+    }
+
+    private void AttachPendingLedgerAndReturn()
+    {
+        var ledger = myLedgers.FirstOrDefault(item =>
+            string.Equals(item.원장Id, pendingLedgerId, StringComparison.OrdinalIgnoreCase));
+        if (ledger is null)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "첨부할 원장을 다시 선택해 주세요.";
+            return;
+        }
+
+        SelectMyLedger(ledger);
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = false;
+        isComposeOpen = true;
+        pendingLedgerId = null;
+    }
+
+    private void ClearSelectedLedger()
+    {
+        form.커뮤니티원장Id = string.Empty;
+        pendingLedgerId = null;
+        ledgerSharingSettings = null;
+        statusSeverity = Severity.Info;
+        statusMessage = "글에서 원장 첨부를 해제했습니다.";
+    }
+
+    private async Task OpenLedgerSharingSettingsAsync()
+    {
+        var selected = myLedgers.FirstOrDefault(x =>
+            string.Equals(x.원장Id, form.커뮤니티원장Id, StringComparison.OrdinalIgnoreCase));
+        if (selected?.내가만든원장 != true)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "원장 생성자만 공개 설정을 변경할 수 있습니다.";
+            return;
+        }
+
+        try
+        {
+            ledgerSharingSettings = await CommunityService.GetLedgerSharingSettingsAsync(selected.원장Id);
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"원장 공개 설정을 불러오지 못했습니다: {ex.Message}";
+        }
+    }
+
+    private async Task SaveLedgerSharingSettingsAsync()
+    {
+        if (ledgerSharingSettings is null) return;
+        isLedgerSharingSaving = true;
+        try
+        {
+            ledgerSharingSettings = await CommunityService.UpdateLedgerSharingSettingsAsync(
+                ledgerSharingSettings.원장Id,
+                new 커뮤니티원장공개설정변경Request
+                {
+                    공개범위 = ledgerSharingSettings.공개범위,
+                    재사용허용여부 = ledgerSharingSettings.재사용허용여부,
+                    재공유허용여부 = ledgerSharingSettings.재공유허용여부,
+                    기대Revision = ledgerSharingSettings.Revision,
+                    공개항목Key목록 = ledgerSharingSettings.항목목록
+                        .Where(x => x.공개여부)
+                        .Select(x => x.항목Key)
+                        .ToArray()
+                });
+            statusSeverity = Severity.Success;
+            statusMessage = ledgerSharingSettings?.공개범위 == 커뮤니티원장공개범위.비공개
+                ? "원장을 비공개로 전환했습니다."
+                : "선택한 항목만 공개되도록 원장 공유 설정을 저장했습니다.";
+            await LoadMyLedgersAsync();
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"원장 공개 설정 저장에 실패했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isLedgerSharingSaving = false;
+        }
+    }
+
+    private void CloseLedgerSharingSettings()
+    {
+        ledgerSharingSettings = null;
+    }
+
+    private async Task ReuseSharedLedgerAsync(PlatformCommunityPostLedgerContextResponse context)
+    {
+        if (isSharedLedgerReusing) return;
+        isSharedLedgerReusing = true;
+        try
+        {
+            var reused = await CommunityService.ReuseSharedLedgerAsync(context.원장Id);
+            if (reused is null)
+            {
+                statusSeverity = Severity.Error;
+                statusMessage = "원장 사본을 만들지 못했습니다.";
+                return;
+            }
+
+            OpenCompose();
+            form.커뮤니티원장Id = reused.원장Id;
+            form.WorkflowTag = CommunityWorkClassificationCatalog.FindByLedgerTemplate(reused.원장템플릿Key)?.WorkflowTag
+                               ?? form.WorkflowTag;
+            if (string.IsNullOrWhiteSpace(form.Title))
+            {
+                form.Title = $"[{CommunityLedgerTemplateCatalog.Find(reused.원장템플릿Key).DisplayName}] {reused.제목}";
+            }
+            await LoadMyLedgersAsync();
+            isLedgerPickerOpen = false;
+            statusSeverity = Severity.Success;
+            statusMessage = $"'{reused.제목}'을 내 비공개 원장으로 가져와 글에 첨부했습니다.";
+        }
+        catch (Exception ex)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"원장을 가져오지 못했습니다: {ex.Message}";
+        }
+        finally
+        {
+            isSharedLedgerReusing = false;
+        }
+    }
+
     private void CloseCompose()
     {
         isComposeOpen = false;
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = false;
+        pendingLedgerId = null;
+        ledgerSharingSettings = null;
     }
 
     private void OpenCommunityMode()
@@ -6585,6 +7721,8 @@
     private void OpenWorkMode()
     {
         isComposeOpen = false;
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = false;
         DiagramPalette.SetDiagramMode(false);
         HomeModeState.SetWorkMode(true);
     }
@@ -6626,6 +7764,16 @@
             ? EventCallback.Factory.Create(this, HandleBaguaCenterStoreSelected)
             : default;
 
+    private EventCallback PrajnaUpayaUpayaSelectedCallback
+        => !string.IsNullOrWhiteSpace(UpayaHref)
+            ? EventCallback.Factory.Create(this, () => NavigateFromPrajnaUpaya(UpayaHref))
+            : default;
+
+    private EventCallback PrajnaUpayaPrajnaSelectedCallback
+        => !string.IsNullOrWhiteSpace(PrajnaHref)
+            ? EventCallback.Factory.Create(this, () => NavigateFromPrajnaUpaya(PrajnaHref))
+            : default;
+
     private IReadOnlyList<HongdalCardinalNavigationOption> BuildRoleCardinalNavigationOptions()
     {
         var roleActions = QuickActions
@@ -6637,10 +7785,10 @@
             .ToArray();
         var defaults = new[]
         {
-            new HongdalCardinalNavigationOption("li", "리", "☲", "남", "다이어그램", HongdalCardinalNavigationActionKinds.Diagram),
-            new HongdalCardinalNavigationOption("dui", "태", "☱", "서", "업무", HongdalCardinalNavigationActionKinds.Work),
-            new HongdalCardinalNavigationOption("kan", "감", "☵", "북", "커뮤니티 홈", HongdalCardinalNavigationActionKinds.CommunityHome),
-            new HongdalCardinalNavigationOption("zhen", "진", "☳", "동", "글쓰기", HongdalCardinalNavigationActionKinds.Compose)
+            new HongdalCardinalNavigationOption("li", "리", "☲", "남", "판매", HongdalCardinalNavigationActionKinds.Diagram),
+            new HongdalCardinalNavigationOption("dui", "태", "☱", "서", "창고", HongdalCardinalNavigationActionKinds.Work),
+            new HongdalCardinalNavigationOption("kan", "감", "☵", "북", "운송", HongdalCardinalNavigationActionKinds.CommunityHome),
+            new HongdalCardinalNavigationOption("zhen", "진", "☳", "동", "주문", HongdalCardinalNavigationActionKinds.Compose)
         };
 
         return defaults
@@ -6682,6 +7830,25 @@
         }
     }
 
+    private Task HandleBaguaCenterTransferCompletedAsync(HongdalCardinalNavigationOption option)
+    {
+        isBaguaNavigatorOpen = false;
+        if (UseBaguaRoleTransitionPages)
+        {
+            var route = string.IsNullOrWhiteSpace(BaguaPerspectiveRoleCode)
+                ? BaguaRoleTransitionRoutes.BuildRolePicker(option.TrigramKey, BaguaTrigramKeys.Gen)
+                : BaguaRoleTransitionRoutes.Build(
+                    BaguaPerspectiveRoleCode,
+                    option.TrigramKey,
+                    BaguaTrigramKeys.Gen);
+            Navigation.NavigateTo(route);
+            return Task.CompletedTask;
+        }
+
+        Navigation.NavigateTo("/community/group-purchase");
+        return Task.CompletedTask;
+    }
+
     private async Task HandleBaguaCenterSelectedAsync()
     {
         isBaguaNavigatorOpen = false;
@@ -6692,6 +7859,17 @@
     {
         isBaguaNavigatorOpen = false;
         OpenDecorationStore();
+    }
+
+    private void NavigateFromPrajnaUpaya(string? href)
+    {
+        if (string.IsNullOrWhiteSpace(href))
+        {
+            return;
+        }
+
+        isBaguaNavigatorOpen = false;
+        Navigation.NavigateTo(href);
     }
 
     private string BuildBaguaEntryClass() => isBaguaNavigatorOpen
@@ -6819,13 +7997,17 @@
            ?? NoopDiagramCollaborationClientService.Instance;
 
     private string 다이어그램대화방Id
-        => $"community:{selectedLedgerTemplateKey}:diagram";
+        => string.IsNullOrWhiteSpace(선택현재원장Id)
+            ? $"community:{selectedLedgerTemplateKey}:diagram"
+            : $"community:ledger:{선택현재원장Id}:diagram";
 
     private string 다이어그램대화방이름
         => $"{SelectedLedgerTemplate.DisplayName} 대화방";
 
     private string 다이어그램대화방현재원장라벨
-        => 선택현재원장?.Title ?? "현재 원장 선택 전";
+        => 선택현재원장?.Title
+           ?? sharedLedgerDiagramSnapshot?.DiagramName
+           ?? "현재 원장 선택 전";
 
     private string 다이어그램대화방연결라벨
         => 다이어그램대화방입장중
@@ -6891,7 +8073,7 @@
             {
                 RoomId = 다이어그램대화방Id,
                 CommunityId = AppKey,
-                LedgerId = 선택현재원장?.Id,
+                LedgerId = 선택현재원장Id,
                 DiagramId = 다이어그램대화방Id,
                 DiagramName = SelectedLedgerTemplate.DisplayName,
                 LedgerTemplateKey = selectedLedgerTemplateKey,
@@ -7169,6 +8351,7 @@
     protected override void OnParametersSet()
     {
         ApplyCommunityQueryParameters();
+        ApplyPendingCommunityPostDraft();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -7474,6 +8657,13 @@
     {
         get
         {
+            if (sharedLedgerDiagramSnapshot is { Nodes.Count: > 0 } sharedDiagram)
+            {
+                return new 원장블록흐름도(
+                    sharedDiagram.Nodes.Select(ToSharedLedgerDiagramNode).ToArray(),
+                    ["생성자가 공개를 허용한 다이어그램 구조만 표시합니다."]);
+            }
+
             var diagram = 원장블록흐름도생성(SelectedLedgerTemplate);
             if (팔레트원장블록노드목록.Count == 0)
             {
@@ -8231,6 +9421,24 @@
         }
     }
 
+    private static 원장블록노드 ToSharedLedgerDiagramNode(DiagramNodeDto node)
+        => new(
+            node.Title,
+            string.IsNullOrWhiteSpace(node.GroupLabel) ? "공개 원장" : node.GroupLabel,
+            string.IsNullOrWhiteSpace(node.Description) ? "공개된 다이어그램 노드" : node.Description,
+            string.IsNullOrWhiteSpace(node.Kind) ? "state" : node.Kind,
+            ResolveSharedDiagramNodeColor(node.Kind));
+
+    private static Color ResolveSharedDiagramNodeColor(string? kind)
+        => kind?.Trim().ToLowerInvariant() switch
+        {
+            "order" or "request" => Color.Primary,
+            "warehouse" or "inventory" => Color.Warning,
+            "delivery" or "transport" => Color.Info,
+            "payment" or "settlement" => Color.Success,
+            _ => Color.Secondary
+        };
+
     private void CancelDiagramEdgeCreation()
     {
         connectionStartNodeTitle = null;
@@ -8802,20 +10010,23 @@
     private IReadOnlyList<원장블록연결선> BuildDiagramEdges(IReadOnlyList<원장블록노드> nodes)
     {
         var edges = new List<원장블록연결선>();
-        for (var i = 0; i < nodes.Count - 1; i++)
+        if (sharedLedgerDiagramSnapshot is null)
         {
-            var from = nodes[i];
-            var to = nodes[i + 1];
-            var edgeId = $"default:{from.Title}->{to.Title}";
-            edges.Add(new 원장블록연결선(
-                edgeId,
-                from.Title,
-                to.Title,
-                ResolveDiagramEdgeLabel(edgeId, BuildDefaultEdgeLabel(from, to)),
-                IsCustom: false,
-                DiagramConnectionHandleKind.Right,
-                DiagramConnectionHandleKind.Left,
-                ResolveDiagramEdgeStyle(edgeId, DiagramEdgeStyleKind.Curve)));
+            for (var i = 0; i < nodes.Count - 1; i++)
+            {
+                var from = nodes[i];
+                var to = nodes[i + 1];
+                var edgeId = $"default:{from.Title}->{to.Title}";
+                edges.Add(new 원장블록연결선(
+                    edgeId,
+                    from.Title,
+                    to.Title,
+                    ResolveDiagramEdgeLabel(edgeId, BuildDefaultEdgeLabel(from, to)),
+                    IsCustom: false,
+                    DiagramConnectionHandleKind.Right,
+                    DiagramConnectionHandleKind.Left,
+                    ResolveDiagramEdgeStyle(edgeId, DiagramEdgeStyleKind.Curve)));
+            }
         }
 
         var nodeTitles = nodes
@@ -9115,6 +10326,7 @@
 
     private void 원장블록흐름도배치초기화()
     {
+        sharedLedgerDiagramSnapshot = null;
         diagramNodeOrder.Clear();
         diagramNodeStackOrder.Clear();
         customDiagramEdges.Clear();
@@ -9837,6 +11049,12 @@
         try
         {
             var metadata = await CommunityService.GetVersionWorkflowMetadataAsync();
+            featureFlagStates.Clear();
+            foreach (var flag in metadata.Flags)
+            {
+                featureFlagStates[flag.Key] = flag.Value;
+            }
+
             apiEndpointMetadata.Clear();
             foreach (var endpoint in metadata.ApiEndpoints)
             {
@@ -9907,10 +11125,103 @@
 
     private void 현재원장다이어그램열기()
     {
+        원장블록흐름도배치초기화();
         HomeModeState.SetWorkMode(false);
         DiagramPalette.SetDiagramMode(true);
         statusSeverity = Severity.Info;
         statusMessage = $"{SelectedLedgerTemplate.DisplayName} 원장 컨텍스트를 다이어그램 모드로 열었습니다.";
+    }
+
+    private void OpenSharedLedgerDiagram(PlatformCommunityPostLedgerContextResponse context)
+    {
+        if (context.다이어그램 is not { Nodes.Count: > 0 } diagram)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "공개된 다이어그램 구조가 없습니다.";
+            return;
+        }
+
+        selectedLedgerTemplateKey = context.원장템플릿Key;
+        선택현재원장Id = context.원장Id;
+        원장블록흐름도배치초기화();
+
+        sharedLedgerDiagramSnapshot = NormalizeSharedLedgerDiagramSnapshot(diagram);
+        diagramNodeOrder.AddRange(sharedLedgerDiagramSnapshot.Nodes.Select(node => node.Title));
+        diagramNodeStackOrder.Synchronize(diagramNodeOrder);
+        선택원장블록노드제목 = diagramNodeOrder.FirstOrDefault();
+
+        var nodeTitlesById = sharedLedgerDiagramSnapshot.Nodes
+            .Where(node => !string.IsNullOrWhiteSpace(node.NodeId))
+            .GroupBy(node => node.NodeId, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First().Title, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var edge in sharedLedgerDiagramSnapshot.Edges)
+        {
+            if (!nodeTitlesById.TryGetValue(edge.FromNodeId, out var fromTitle) ||
+                !nodeTitlesById.TryGetValue(edge.ToNodeId, out var toTitle))
+            {
+                continue;
+            }
+
+            customDiagramEdges.Add(new 원장블록연결선(
+                $"shared:{context.원장Id}:{edge.EdgeId}",
+                fromTitle,
+                toTitle,
+                string.IsNullOrWhiteSpace(edge.Label) ? "연결" : edge.Label,
+                IsCustom: true,
+                DiagramConnectionHandleKind.Right,
+                DiagramConnectionHandleKind.Left,
+                DiagramEdgeStyleKind.Curve));
+        }
+
+        원장Api경로변수값["communityLedgerId"] = context.원장Id;
+        원장Api경로변수값["ledgerId"] = context.원장Id;
+        isComposeOpen = false;
+        HomeModeState.SetWorkMode(false);
+        DiagramPalette.SetDiagramMode(true);
+        statusSeverity = Severity.Info;
+        statusMessage = $"{context.제목} 공개 다이어그램과 대화방을 열었습니다.";
+    }
+
+    private static DiagramSnapshotDto NormalizeSharedLedgerDiagramSnapshot(DiagramSnapshotDto diagram)
+    {
+        var usedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var nodes = new List<DiagramNodeDto>(diagram.Nodes.Count);
+        foreach (var node in diagram.Nodes)
+        {
+            var baseTitle = string.IsNullOrWhiteSpace(node.Title) ? "공개 노드" : node.Title.Trim();
+            var title = baseTitle;
+            var sequence = 2;
+            while (!usedTitles.Add(title))
+            {
+                title = $"{baseTitle} {sequence++}";
+            }
+
+            nodes.Add(new DiagramNodeDto
+            {
+                NodeId = node.NodeId,
+                Kind = node.Kind,
+                Title = title,
+                GroupLabel = node.GroupLabel,
+                Description = node.Description,
+                X = node.X,
+                Y = node.Y,
+                RelatedRoute = node.RelatedRoute,
+                Data = node.Data
+            });
+        }
+
+        return new DiagramSnapshotDto
+        {
+            DiagramId = diagram.DiagramId,
+            DiagramName = diagram.DiagramName,
+            LedgerId = diagram.LedgerId,
+            LedgerTemplateKey = diagram.LedgerTemplateKey,
+            WorkflowModeKey = diagram.WorkflowModeKey,
+            Nodes = nodes,
+            Edges = diagram.Edges,
+            Metadata = diagram.Metadata
+        };
     }
 
     private void 다이어그램커뮤니티초안준비(
@@ -10529,6 +11840,11 @@
                     selectedForumSeedPostTitle = null;
                 }
             }
+
+            if (selectedForumPostId is long selectedPostId)
+            {
+                await LoadPostDetailAsync(selectedPostId);
+            }
         }
         catch
         {
@@ -10568,6 +11884,21 @@
         finally
         {
             isBoardLoading = false;
+        }
+    }
+
+    private async Task LoadPostDetailAsync(long postId)
+    {
+        var detail = await CommunityService.GetPostAsync(postId);
+        if (detail is null)
+        {
+            return;
+        }
+
+        var index = posts.FindIndex(item => item.Id == postId);
+        if (index >= 0)
+        {
+            posts[index] = detail;
         }
     }
 
@@ -10679,6 +12010,7 @@
                     Title = form.Title,
                     Body = form.Body,
                     SharedLinkUrl = form.SharedLinkUrl,
+                    커뮤니티원장Id = form.커뮤니티원장Id,
                     Nickname = form.Nickname,
                     IsReportBoardPost = form.IsReportBoardPost,
                     ReporterDisplayName = form.ReporterDisplayName,
@@ -10697,6 +12029,7 @@
                     Title = form.Title,
                     Body = form.Body,
                     SharedLinkUrl = form.SharedLinkUrl,
+                    커뮤니티원장Id = form.커뮤니티원장Id,
                     Nickname = form.Nickname,
                     IsReportBoardPost = form.IsReportBoardPost,
                     ReporterDisplayName = form.ReporterDisplayName,
@@ -10936,6 +12269,7 @@
         form.Title = post.Title;
         form.Body = post.Body;
         form.SharedLinkUrl = post.SharedLinkUrl ?? string.Empty;
+        form.커뮤니티원장Id = post.커뮤니티원장Id ?? string.Empty;
         form.IsReportBoardPost = IsReportPost(post);
         form.ReporterDisplayName = post.ReporterDisplayName;
         form.ReportedDisplayName = post.ReportedDisplayName;
@@ -10951,18 +12285,69 @@
         isComposeOpen = false;
     }
 
+    private bool ApplyPendingCommunityPostDraft()
+    {
+        var draft = CommunityPostDrafts.Consume();
+        if (draft is null)
+        {
+            return false;
+        }
+
+        ResetForm();
+        form.Category = draft.Category;
+        form.WorkflowTag = draft.WorkflowTag;
+        form.RoleTag = ResolveRoleTag(RoleLabel);
+        form.Title = draft.Title;
+        form.Body = draft.Body;
+        form.SharedLinkUrl = draft.SharedLinkUrl;
+        selectedBoardFilter = BoardCategoryOptions.Contains(draft.Category, StringComparer.OrdinalIgnoreCase)
+            ? draft.Category
+            : "전체";
+        OpenCompose();
+        statusSeverity = Severity.Info;
+        statusMessage = $"{draft.SourceLabel}에서 가져온 글귀 초안입니다. 공개할 내용을 확인한 뒤 등록하세요.";
+        return true;
+    }
+
+    private static bool IsYouTubeSharedLink(string? url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        var host = uri.Host.TrimStart('.');
+        return host.Equals("youtu.be", StringComparison.OrdinalIgnoreCase)
+               || host.Equals("youtube.com", StringComparison.OrdinalIgnoreCase)
+               || host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase)
+               || host.Equals("youtube-nocookie.com", StringComparison.OrdinalIgnoreCase)
+               || host.EndsWith(".youtube-nocookie.com", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ResolveSharedLectureTitle(string title)
+    {
+        const string prefix = "[반야 나눔] ";
+        return title.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            ? title[prefix.Length..]
+            : title;
+    }
+
     private void ResetForm()
     {
         editingPostId = null;
         selectedFiles.Clear();
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = false;
+        pendingLedgerId = null;
         form.Nickname = string.Empty;
         form.Password = string.Empty;
         form.Category = "자유";
-        form.WorkflowTag = "국내 화물 운송";
+        form.WorkflowTag = "커뮤니티 신뢰";
         form.RoleTag = ResolveRoleTag(RoleLabel);
         form.Title = string.Empty;
         form.Body = string.Empty;
         form.SharedLinkUrl = string.Empty;
+        form.커뮤니티원장Id = string.Empty;
         form.IsReportBoardPost = false;
         form.ReporterDisplayName = string.Empty;
         form.ReportedDisplayName = string.Empty;
@@ -10996,28 +12381,14 @@
         }
     }
 
-    private IReadOnlyList<string> WorkflowTagOptions
-        => DefaultWorkflowTagOptions
-            .Concat(CommunityLedgerTemplateCatalog.All.Select(x => x.WorkflowTag))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+    private CommunityWorkClassificationResponse? SelectedWorkClassification
+        => CommunityWorkClassificationCatalog.FindByWorkflowTag(form.WorkflowTag);
 
-    private static readonly IReadOnlyList<string> DefaultWorkflowTagOptions =
-    [
-        "국내 화물 운송",
-        "공동주문 수입",
-        "창고 입출고",
-        "판매채널 출고",
-        "통관·무역 데이터",
-        "커뮤니티 신뢰",
-        "참여 인력 관리",
-        "음식 주문",
-        "음식 배달",
-        "생활 판매",
-        "공동구매",
-        "생활 요청 원장",
-        "알뜰살뜰 마트"
-    ];
+    private bool SelectedWorkFeatureEnabled
+        => SelectedWorkClassification is { } classification
+           && classification.LedgerTemplateKeys.Count > 0
+           && featureFlagStates.TryGetValue(classification.FeatureFlagKey, out var enabled)
+           && enabled;
 
     private IReadOnlyList<string> RoleTagOptions
     {
@@ -11283,11 +12654,12 @@
         public string Nickname { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string Category { get; set; } = "자유";
-        public string WorkflowTag { get; set; } = "국내 화물 운송";
+        public string WorkflowTag { get; set; } = "커뮤니티 신뢰";
         public string RoleTag { get; set; } = "플랫폼 구성원";
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public string SharedLinkUrl { get; set; } = string.Empty;
+        public string 커뮤니티원장Id { get; set; } = string.Empty;
         public bool IsReportBoardPost { get; set; }
         public string ReporterDisplayName { get; set; } = string.Empty;
         public string ReportedDisplayName { get; set; } = string.Empty;

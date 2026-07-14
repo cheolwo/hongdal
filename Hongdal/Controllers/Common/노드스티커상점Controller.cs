@@ -38,6 +38,14 @@ public sealed class 노드스티커상점Controller : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpGet("entitlements/me")]
+    [Authorize]
+    public async Task<IActionResult> GetMyEntitlements(CancellationToken cancellationToken)
+    {
+        var result = await _useCase.내보유권목록Async(cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpPost("fake-pg/confirm")]
     [Authorize]
     public async Task<IActionResult> ConfirmFakePg(

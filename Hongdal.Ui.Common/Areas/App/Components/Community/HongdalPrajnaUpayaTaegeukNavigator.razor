@@ -14,7 +14,7 @@
     <div class="hongdal-bagua-wheel hongdal-prajna-upaya-wheel"
          role="img"
          aria-label="바깥쪽 빨간 영역은 방편, 파란 영역은 반야인 태극과 안쪽 커뮤니티·상점 태극">
-        <div class="hongdal-prajna-upaya-outer" aria-hidden="true">
+        <div class="hongdal-prajna-upaya-outer" role="group" aria-label="방편과 반야 이동">
             <svg viewBox="-50 -50 100 100" focusable="false">
                 <defs>
                     @Pattern(OuterUpayaPatternId, Theme.OuterUpaya)
@@ -28,8 +28,20 @@
                          C -23 48 -39 35 -42 17 Z"
                       style="@BuildFillStyle(Theme.OuterPrajna, OuterPrajnaPatternId)" />
             </svg>
-            <span class="hongdal-prajna-upaya-outer-label hongdal-prajna-upaya-outer-label--yang">@UpayaLabel</span>
-            <span class="hongdal-prajna-upaya-outer-label hongdal-prajna-upaya-outer-label--yin">@PrajnaLabel</span>
+            <button type="button"
+                    class="hongdal-prajna-upaya-outer-action hongdal-prajna-upaya-outer-action--upaya"
+                    aria-label="@($"{UpayaLabel} 영역으로 이동")"
+                    disabled="@(!UpayaSelected.HasDelegate)"
+                    @onclick="UpayaSelected">
+                <span>@UpayaLabel</span>
+            </button>
+            <button type="button"
+                    class="hongdal-prajna-upaya-outer-action hongdal-prajna-upaya-outer-action--prajna"
+                    aria-label="@($"{PrajnaLabel} 강의 영상으로 이동")"
+                    disabled="@(!PrajnaSelected.HasDelegate)"
+                    @onclick="PrajnaSelected">
+                <span>@PrajnaLabel</span>
+            </button>
         </div>
 
         <div class="hongdal-prajna-upaya-inner"
@@ -95,6 +107,12 @@
 
     [Parameter]
     public EventCallback StoreSelected { get; set; }
+
+    [Parameter]
+    public EventCallback UpayaSelected { get; set; }
+
+    [Parameter]
+    public EventCallback PrajnaSelected { get; set; }
 
     private readonly string instanceId = $"navigator-{Guid.NewGuid():N}";
 

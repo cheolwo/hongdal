@@ -125,7 +125,8 @@
 }
 
 .decoration-market__types {
-    max-width: 520px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 680px;
     margin-inline: auto;
     background: rgba(var(--mud-palette-primary-rgb), 0.08);
 }
@@ -216,6 +217,11 @@
 
 .decoration-market-card__preview ::deep .home-theme-preview__wheel {
     width: 138px;
+}
+
+.decoration-market-card__preview ::deep .bagua-motion-pack-preview {
+    min-height: 154px;
+    border-radius: 15px;
 }
 
 .decoration-market-card__preview img,
@@ -358,6 +364,10 @@
         display: grid;
         gap: 2px;
         font-size: 0.62rem;
+    }
+
+    .decoration-market__types {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .decoration-market__grid {

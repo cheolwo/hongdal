@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Hongdal.Client.Infrastructure.Security;
 using Hongdal.Contracts.Common;
 
 namespace ShipperApp.Services;
@@ -7,11 +8,16 @@ public sealed class AuthApiService
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly 꾸미기보유권동기화Service _꾸미기보유권동기화Service;
 
-    public AuthApiService(HttpClient httpClient, IAuthSession authSession)
+    public AuthApiService(
+        HttpClient httpClient,
+        IAuthSession authSession,
+        꾸미기보유권동기화Service 꾸미기보유권동기화Service)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _꾸미기보유권동기화Service = 꾸미기보유권동기화Service;
     }
 
     public async Task<(bool IsSuccess, string ErrorMessage)> LoginAsync(string userNameOrEmail, string password, CancellationToken cancellationToken = default)
@@ -41,12 +47,14 @@ public sealed class AuthApiService
             return (false, "서버 로그인 응답을 읽을 수 없습니다.");
         }
 
-        await _authSession.ApplyAsync(token, cancellationToken);
+        await _authSession.ApplyAsync(token.ToClientAuthTokenSnapshot(), cancellationToken);
+        await _꾸미기보유권동기화Service.RestoreAndSynchronizeAsync(cancellationToken);
         return (true, string.Empty);
     }
 
-    public Task LogoutAsync(CancellationToken cancellationToken = default)
+    public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
-        return _authSession.ClearAsync(cancellationToken);
+        _꾸미기보유권동기화Service.ClearVisibleEntitlements();
+        await _authSession.ClearAsync(cancellationToken);
     }
 }

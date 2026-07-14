@@ -15,7 +15,7 @@
         <div class="decoration-market__hero-copy">
             <span>COMMUNITY MAKER SHOP</span>
             <h1>꾸미기 상점</h1>
-            <p>방편·반야·커뮤니티·상점·간괘까지 한 번에 바꾸는 홈 테마와 다이어그램 꾸미기를 만나보세요.</p>
+            <p>홈 테마, 괘상과 노드 이미지, 역할별 괘 이동 장면에 적용하는 전환 애니메이션을 한곳에서 만나보세요.</p>
         </div>
         <div class="decoration-market__summary">
             <span><b>@DecorationState.Products.Count</b>개 상품</span>
@@ -45,6 +45,10 @@
         <button type="button" class="@(activeType == AssetType ? "is-active" : null)" @onclick="@(() => activeType = AssetType)">
             <MudIcon Icon="@Icons.Material.Filled.Category" Size="Size.Small" />
             노드·괘상
+        </button>
+        <button type="button" class="@(activeType == MotionType ? "is-active" : null)" @onclick="@(() => activeType = MotionType)">
+            <MudIcon Icon="@Icons.Material.Filled.Animation" Size="Size.Small" />
+            애니메이션
         </button>
     </nav>
 
@@ -91,6 +95,10 @@
                             {
                                 <HongdalHomeNavigatorThemePreview Theme="@theme" Title="@product.Title" Compact="true" />
                             }
+                            else if (product.BaguaMotion is { } motion)
+                            {
+                                <BaguaMotionPackPreview Manifest="@motion" Title="@product.Title" Compact="true" />
+                            }
                             else
                             {
                                 @foreach (var asset in product.Assets.Take(4))
@@ -125,6 +133,10 @@
                             {
                                 <small>@($"{manifest.RendererProfile} · {manifest.Slots.Count}개 슬롯 · v{manifest.Version}")</small>
                             }
+                            else if (product.BaguaMotion is { } motion)
+                            {
+                                <small>@($"{motion.CharacterLabel} · 125개 중 {motion.CoveredPerspectiveSlotCount}개 슬롯 · v{motion.Version}")</small>
+                            }
                             <div>
                                 <b>@FormatPrice(product)</b>
                                 <button type="button" @onclick="@(() => OpenDetail(product))">
@@ -146,9 +158,10 @@
     private const string AllType = "all";
     private const string HomeThemeType = "home-theme";
     private const string AssetType = "asset";
+    private const string MotionType = "motion";
 
     private string activeTab = PlatformTab;
-    private string activeType = HomeThemeType;
+    private string activeType = AllType;
 
     private IReadOnlyList<CommunityDecorationProduct> VisibleProducts
     {
@@ -164,7 +177,8 @@
             return activeType switch
             {
                 HomeThemeType => bySource.Where(product => product.IsHomeTheme).ToArray(),
-                AssetType => bySource.Where(product => !product.IsHomeTheme).ToArray(),
+                AssetType => bySource.Where(product => !product.IsHomeTheme && !product.IsBaguaMotion).ToArray(),
+                MotionType => bySource.Where(product => product.IsBaguaMotion).ToArray(),
                 _ => bySource.ToArray()
             };
         }
@@ -204,11 +218,16 @@
         {
             CommunityDecorationTarget.HomeNavigatorTheme => "홈 테마",
             CommunityDecorationTarget.Bagua => "괘상",
-            _ => "노드 이미지"
+            CommunityDecorationTarget.DiagramNode => "노드 이미지",
+            CommunityDecorationTarget.BaguaTransitionMotion => "전환 애니메이션",
+            _ => "꾸미기"
         };
 
     private static string ProductAccent(CommunityDecorationProduct product)
-        => product.HomeTheme?.AccentColor ?? product.Assets.FirstOrDefault()?.AccentColor ?? "#2563eb";
+        => product.HomeTheme?.AccentColor
+           ?? product.BaguaMotion?.AccentColor
+           ?? product.Assets.FirstOrDefault()?.AccentColor
+           ?? "#2563eb";
 
     private static string FormatPrice(CommunityDecorationProduct product)
         => product.IsFree

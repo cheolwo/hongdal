@@ -1,0 +1,137 @@
+using Hongdal.Ui.Common.Areas.App.Services;
+
+namespace Hongdal.Tests.Services.Community;
+
+public sealed class PlatformCommunityDecorationStateServiceTests
+{
+    [Fact]
+    public void 기본전환애니메이션_전체125개슬롯에_활성화된다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var defaultMotion = service.Products.Single(product =>
+            string.Equals(
+                product.PackKey,
+                PlatformCommunityDecorationStateService.DefaultBaguaMotionPackKey,
+                StringComparison.OrdinalIgnoreCase));
+
+        var resolved = service.ResolveBaguaMotion(
+            "bagua-motion:orderer:order-to-transport",
+            "relay");
+
+        Assert.True(defaultMotion.IsBaguaMotion);
+        Assert.True(service.IsProductOwned(defaultMotion));
+        Assert.True(service.IsProductActive(defaultMotion));
+        Assert.Equal(125, resolved?.CoveredPerspectiveSlotCount);
+        Assert.Equal("runner-v1", resolved?.RendererProfile);
+    }
+
+    [Fact]
+    public void 주문운송애니메이션_구매후_해당전환슬롯에만_적용된다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var motion = service.Products.Single(product =>
+            string.Equals(product.PackKey, "bagua-motion-courier-sprint-v1", StringComparison.OrdinalIgnoreCase));
+        var originalNodeAssetKey = service.ActiveNodeAssetKey;
+
+        Assert.False(service.ApplyProduct(motion));
+
+        service.Purchase(motion);
+        var applied = service.ApplyProduct(motion);
+
+        var matching = service.ResolveBaguaMotion(
+            "bagua-motion:seller:order-to-transport",
+            "relay");
+        var unrelated = service.ResolveBaguaMotion(
+            "bagua-motion:seller:sales-to-warehouse",
+            "relay");
+
+        Assert.True(applied);
+        Assert.True(service.IsProductActive(motion));
+        Assert.Equal("courier-sprint-v1", matching?.RendererProfile);
+        Assert.Equal("runner-v1", unrelated?.RendererProfile);
+        Assert.Equal(originalNodeAssetKey, service.ActiveNodeAssetKey);
+    }
+
+    [Fact]
+    public void 전체애니메이션팩을_나중에적용하면_부분슬롯오버레이를_정리한다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var targetedMotion = service.Products.Single(product =>
+            string.Equals(product.PackKey, "bagua-motion-courier-sprint-v1", StringComparison.OrdinalIgnoreCase));
+        var globalMotion = service.Products.Single(product =>
+            string.Equals(product.PackKey, "bagua-motion-light-trail-v1", StringComparison.OrdinalIgnoreCase));
+
+        service.Purchase(targetedMotion);
+        service.ApplyProduct(targetedMotion);
+        service.Purchase(globalMotion);
+        service.ApplyProduct(globalMotion);
+
+        var resolved = service.ResolveBaguaMotion(
+            "bagua-motion:orderer:order-to-transport",
+            "relay");
+
+        Assert.Equal("light-trail-v1", resolved?.RendererProfile);
+        Assert.False(service.IsProductActive(targetedMotion));
+        Assert.True(service.IsProductActive(globalMotion));
+    }
+
+    [Fact]
+    public void 임시보유권초기화시_유료애니메이션활성표시도_기본값으로돌아간다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var motion = service.Products.Single(product =>
+            string.Equals(product.PackKey, "bagua-motion-courier-sprint-v1", StringComparison.OrdinalIgnoreCase));
+
+        service.Purchase(motion);
+        service.ApplyProduct(motion);
+        service.ClearAccountOwnedPacks();
+
+        Assert.False(service.IsProductOwned(motion));
+        Assert.False(service.IsProductActive(motion));
+        Assert.Equal(
+            "runner-v1",
+            service.ResolveBaguaMotion("bagua-motion:orderer:order-to-transport", "relay")?.RendererProfile);
+    }
+
+    [Fact]
+    public void 전환애니메이션표시를끄면_내장장면으로폴백하도록_null을반환한다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+
+        service.SetTargetEnabled(CommunityDecorationTarget.BaguaTransitionMotion, false);
+
+        Assert.Null(service.ResolveBaguaMotion(
+            "bagua-motion:orderer:order-to-transport",
+            "relay"));
+    }
+
+    [Fact]
+    public void 서버보유권동기화_유료상품보유상태를_교체한다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var paidProduct = service.Products.First(product =>
+            !product.IsFree && product.Assets.Any(asset => asset.NodeSticker is not null));
+
+        Assert.False(service.IsProductOwned(paidProduct));
+
+        service.SynchronizeServerOwnedPacks([paidProduct.PackKey]);
+
+        Assert.True(service.IsProductOwned(paidProduct));
+
+        service.SynchronizeServerOwnedPacks([]);
+
+        Assert.False(service.IsProductOwned(paidProduct));
+    }
+
+    [Fact]
+    public void 서버보유권초기화_무료상품보유상태는_유지한다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var freeProduct = service.Products.First(product => product.IsFree);
+
+        service.SynchronizeServerOwnedPacks(["temporary-paid-pack"]);
+        service.ClearServerOwnedPacks();
+
+        Assert.True(service.IsProductOwned(freeProduct));
+    }
+}

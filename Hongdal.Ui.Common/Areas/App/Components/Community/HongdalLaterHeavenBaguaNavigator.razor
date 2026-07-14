@@ -12,7 +12,7 @@
     <div class="hongdal-bagua-wheel"
          @onpointermove="HandlePointerMove"
          @onpointerup="HandlePointerUpAsync"
-         @onpointercancel="CancelDrag"
+         @onpointercancel="CancelAllDrags"
          @onpointerleave="HandlePointerLeave">
         <span class="hongdal-bagua-octagon" aria-hidden="true"></span>
         <span class="hongdal-bagua-direction hongdal-bagua-direction--south">남</span>
@@ -24,17 +24,22 @@
             <button type="button"
                     class="@BuildItemClass(item)"
                     style="@BuildItemStyle(item)"
-                    title="@($"{item.TrigramName}괘 · {item.Direction} · {item.DestinationLabel}")"
-                    aria-label="@($"{item.TrigramName}괘, {item.Direction}, {item.DestinationLabel}로 이동")"
+                    title="@BuildItemTitle(item)"
+                    aria-label="@BuildItemAriaLabel(item)"
+                    disabled="@isCenterTransferAnimating"
+                    @onpointerdown="@((PointerEventArgs args) => BeginItemDrag(item, args))"
                     @onclick="@(() => SelectAsync(item))">
                 <span>@ResolveItemSymbol(item)</span>
-                <b>@item.TrigramName</b>
-                <small>@item.DestinationLabel</small>
+                <b>@item.TrigramName · @ResolveBusinessLabel(item)</b>
+                @if (ShouldShowDestinationLabel(item))
+                {
+                    <small>@item.DestinationLabel</small>
+                }
             </button>
         }
         @if (ShowTaegeukCenter)
         {
-            <div class="hongdal-bagua-taegeuk-center"
+            <div class="@BuildTaegeukCenterClass()"
                  role="group"
                  aria-label="@($"{CenterTrigramName}괘 태극 중심 이동")">
                 <svg class="hongdal-bagua-taegeuk-art"
@@ -70,7 +75,7 @@
                 </span>
                 <span class="hongdal-bagua-taegeuk-mark" aria-hidden="true">
                     <b>@ResolveCenterSymbol()</b>
-                    <small>@CenterTrigramName</small>
+                    <small>@BuildCenterMarkLabel()</small>
                 </span>
             </div>
         }
@@ -96,8 +101,16 @@
     </div>
 
     <footer>
-        <span>점을 끌거나</span>
-        <span>괘를 바로 눌러도 됩니다</span>
+        @if (CenterTransferCompleted.HasDelegate)
+        {
+            <span>@ResolveCenterTransferTrigramName()괘를 가운데로 끌면</span>
+            <span>@CenterTransferDestinationLabel 화면이 열립니다</span>
+        }
+        else
+        {
+            <span>점을 끌거나</span>
+            <span>괘를 바로 눌러도 됩니다</span>
+        }
     </footer>
 </section>
 
@@ -144,24 +157,47 @@
     [Parameter]
     public bool ShowTrigramSymbols { get; set; } = true;
 
+    [Parameter]
+    public string CenterTransferTrigramKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public string CenterTransferDestinationLabel { get; set; } = "공동구매";
+
+    [Parameter]
+    public EventCallback<HongdalCardinalNavigationOption> CenterTransferCompleted { get; set; }
+
     private static readonly IReadOnlyList<HongdalCardinalNavigationOption> DefaultItems =
     [
-        new("li", "리", "☲", "남", "다이어그램", HongdalCardinalNavigationActionKinds.Diagram),
-        new("dui", "태", "☱", "서", "업무", HongdalCardinalNavigationActionKinds.Work),
-        new("kan", "감", "☵", "북", "커뮤니티 홈", HongdalCardinalNavigationActionKinds.CommunityHome),
-        new("zhen", "진", "☳", "동", "글쓰기", HongdalCardinalNavigationActionKinds.Compose)
+        new("li", "리", "☲", "남", "판매", HongdalCardinalNavigationActionKinds.Diagram),
+        new("dui", "태", "☱", "서", "창고", HongdalCardinalNavigationActionKinds.Work),
+        new("kan", "감", "☵", "북", "운송", HongdalCardinalNavigationActionKinds.CommunityHome),
+        new("zhen", "진", "☳", "동", "주문", HongdalCardinalNavigationActionKinds.Compose)
     ];
 
     private bool isDragging;
     private double dragStartX;
     private double dragStartY;
     private string? activeKey;
+    private bool isCenterTransferDragging;
+    private bool isCenterTransferAnimating;
+    private HongdalCardinalNavigationOption? centerTransferItem;
+    private double centerTransferStartX;
+    private double centerTransferStartY;
+    private double centerTransferDragX;
+    private double centerTransferDragY;
+    private bool isCenterTransferDropReady;
+    private string? suppressedClickKey;
+    private DateTimeOffset suppressedClickUntil;
 
     private HongdalCardinalNavigationOption? ActiveItem
         => NavigationItems.FirstOrDefault(item => item.TrigramKey == activeKey);
 
     private string CurrentGuide => ActiveItem is { } item
-        ? $"{item.TrigramName}괘 · {item.DestinationLabel}"
+        ? isCenterTransferDragging && IsCenterTransferItem(item)
+            ? isCenterTransferDropReady
+                ? $"{CenterTrigramName}괘에 놓아 {CenterTransferDestinationLabel} 열기"
+                : $"{item.TrigramName}괘를 가운데 {CenterTrigramName}괘로 이동"
+            : $"{item.TrigramName}괘 · {ResolveBusinessLabel(item)} · {item.DestinationLabel}"
         : ShowTaegeukCenter
             ? $"{CenterTrigramName}괘 · {TaegeukYangDestinationLabel}와 {TaegeukYinDestinationLabel}"
             : CenterSelected.HasDelegate
@@ -178,6 +214,17 @@
 
     private void HandlePointerMove(PointerEventArgs args)
     {
+        if (isCenterTransferDragging && centerTransferItem is { } transferItem)
+        {
+            centerTransferDragX = args.ClientX - centerTransferStartX;
+            centerTransferDragY = args.ClientY - centerTransferStartY;
+            isCenterTransferDropReady = IsCenterDropTarget(
+                transferItem,
+                centerTransferDragX,
+                centerTransferDragY);
+            return;
+        }
+
         if (!isDragging)
         {
             return;
@@ -197,8 +244,14 @@
             : deltaY < 0 ? "li" : "kan";
     }
 
-    private async Task HandlePointerUpAsync()
+    private async Task HandlePointerUpAsync(PointerEventArgs args)
     {
+        if (isCenterTransferDragging)
+        {
+            await CompleteCenterTransferDragAsync(args);
+            return;
+        }
+
         if (!isDragging)
         {
             return;
@@ -247,37 +300,221 @@
 
     private void HandlePointerLeave()
     {
-        if (isDragging)
+        if (isDragging || isCenterTransferDragging)
         {
-            CancelDrag();
+            CancelAllDrags();
         }
     }
 
-    private void CancelDrag()
+    private void CancelAllDrags()
     {
         isDragging = false;
+        isCenterTransferDragging = false;
+        isCenterTransferDropReady = false;
+        centerTransferItem = null;
+        centerTransferDragX = 0;
+        centerTransferDragY = 0;
         activeKey = null;
     }
 
     private async Task SelectAsync(HongdalCardinalNavigationOption item)
     {
+        if (string.Equals(item.TrigramKey, suppressedClickKey, StringComparison.OrdinalIgnoreCase)
+            && DateTimeOffset.UtcNow <= suppressedClickUntil)
+        {
+            suppressedClickKey = null;
+            return;
+        }
+
         activeKey = item.TrigramKey;
         await DestinationSelected.InvokeAsync(item);
     }
 
-    private string BuildItemClass(HongdalCardinalNavigationOption item)
-        => item.TrigramKey == activeKey
-            ? "hongdal-bagua-item hongdal-bagua-item--active"
-            : "hongdal-bagua-item";
+    private void BeginItemDrag(HongdalCardinalNavigationOption item, PointerEventArgs args)
+    {
+        if (!IsCenterTransferItem(item) || isCenterTransferAnimating)
+        {
+            return;
+        }
 
-    private static string BuildItemStyle(HongdalCardinalNavigationOption item)
-        => item.TrigramKey switch
+        isCenterTransferDragging = true;
+        isCenterTransferDropReady = false;
+        centerTransferItem = item;
+        centerTransferStartX = args.ClientX;
+        centerTransferStartY = args.ClientY;
+        centerTransferDragX = 0;
+        centerTransferDragY = 0;
+        activeKey = item.TrigramKey;
+    }
+
+    private bool IsCenterTransferItem(HongdalCardinalNavigationOption item)
+        => CenterTransferCompleted.HasDelegate
+           && !string.IsNullOrWhiteSpace(CenterTransferTrigramKey)
+           && string.Equals(
+               item.TrigramKey,
+               CenterTransferTrigramKey,
+               StringComparison.OrdinalIgnoreCase);
+
+    private async Task CompleteCenterTransferDragAsync(PointerEventArgs args)
+    {
+        if (centerTransferItem is not { } item)
+        {
+            CancelAllDrags();
+            return;
+        }
+
+        centerTransferDragX = args.ClientX - centerTransferStartX;
+        centerTransferDragY = args.ClientY - centerTransferStartY;
+        var distance = Math.Sqrt(
+            centerTransferDragX * centerTransferDragX
+            + centerTransferDragY * centerTransferDragY);
+        var droppedOnCenter = IsCenterDropTarget(item, centerTransferDragX, centerTransferDragY);
+
+        isCenterTransferDragging = false;
+        isCenterTransferDropReady = droppedOnCenter;
+        if (distance >= 8)
+        {
+            suppressedClickKey = item.TrigramKey;
+            suppressedClickUntil = DateTimeOffset.UtcNow.AddMilliseconds(900);
+        }
+
+        if (!droppedOnCenter)
+        {
+            isCenterTransferDropReady = false;
+            centerTransferItem = null;
+            centerTransferDragX = 0;
+            centerTransferDragY = 0;
+            activeKey = null;
+            return;
+        }
+
+        isCenterTransferAnimating = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(520);
+
+        try
+        {
+            await CenterTransferCompleted.InvokeAsync(item);
+        }
+        finally
+        {
+            isCenterTransferAnimating = false;
+            isCenterTransferDropReady = false;
+            centerTransferItem = null;
+            centerTransferDragX = 0;
+            centerTransferDragY = 0;
+            activeKey = null;
+        }
+    }
+
+    private static bool IsCenterDropTarget(
+        HongdalCardinalNavigationOption item,
+        double deltaX,
+        double deltaY)
+    {
+        const double inwardThreshold = 56;
+        const double crossAxisTolerance = 86;
+
+        return item.TrigramKey switch
+        {
+            "li" => deltaY >= inwardThreshold && Math.Abs(deltaX) <= crossAxisTolerance,
+            "dui" => deltaX <= -inwardThreshold && Math.Abs(deltaY) <= crossAxisTolerance,
+            "kan" => deltaY <= -inwardThreshold && Math.Abs(deltaX) <= crossAxisTolerance,
+            _ => deltaX >= inwardThreshold && Math.Abs(deltaY) <= crossAxisTolerance
+        };
+    }
+
+    private string BuildItemClass(HongdalCardinalNavigationOption item)
+    {
+        var classes = new List<string> { "hongdal-bagua-item" };
+        if (IsCenterTransferItem(item))
+        {
+            classes.Add("hongdal-bagua-item--center-transfer-enabled");
+        }
+
+        if (item.TrigramKey == activeKey)
+        {
+            classes.Add("hongdal-bagua-item--active");
+        }
+
+        if (centerTransferItem?.TrigramKey == item.TrigramKey)
+        {
+            if (isCenterTransferDragging)
+            {
+                classes.Add("hongdal-bagua-item--dragging-to-center");
+            }
+
+            if (isCenterTransferDropReady)
+            {
+                classes.Add("hongdal-bagua-item--center-ready");
+            }
+
+            if (isCenterTransferAnimating)
+            {
+                classes.Add("hongdal-bagua-item--center-transfer-completing");
+            }
+        }
+
+        return string.Join(' ', classes);
+    }
+
+    private string BuildItemStyle(HongdalCardinalNavigationOption item)
+    {
+        var position = item.TrigramKey switch
         {
             "li" => "--bagua-x: 50%; --bagua-y: 10%;",
             "dui" => "--bagua-x: 90%; --bagua-y: 50%;",
             "kan" => "--bagua-x: 50%; --bagua-y: 90%;",
             _ => "--bagua-x: 10%; --bagua-y: 50%;"
         };
+
+        if (centerTransferItem?.TrigramKey != item.TrigramKey)
+        {
+            return position;
+        }
+
+        return $"{position} --bagua-drag-x: {centerTransferDragX:0.##}px; --bagua-drag-y: {centerTransferDragY:0.##}px;";
+    }
+
+    private string BuildItemTitle(HongdalCardinalNavigationOption item)
+        => IsCenterTransferItem(item)
+            ? $"{item.TrigramName}괘 · {ResolveBusinessLabel(item)} · 누르면 {item.DestinationLabel}, 가운데 {CenterTrigramName}괘로 끌면 {CenterTransferDestinationLabel}"
+            : $"{item.TrigramName}괘 · {ResolveBusinessLabel(item)} · {item.Direction} · {item.DestinationLabel}";
+
+    private string BuildItemAriaLabel(HongdalCardinalNavigationOption item)
+        => IsCenterTransferItem(item)
+            ? $"{item.TrigramName}괘, {ResolveBusinessLabel(item)}. 누르면 {item.DestinationLabel}로 이동. 가운데 {CenterTrigramName}괘로 끌어 놓으면 {CenterTransferDestinationLabel} 열기"
+            : $"{item.TrigramName}괘, {ResolveBusinessLabel(item)}, {item.Direction}, {item.DestinationLabel}로 이동";
+
+    private static string ResolveBusinessLabel(HongdalCardinalNavigationOption item)
+        => item.TrigramKey switch
+        {
+            "li" => "판매",
+            "dui" => "창고",
+            "kan" => "운송",
+            _ => "주문"
+        };
+
+    private static bool ShouldShowDestinationLabel(HongdalCardinalNavigationOption item)
+        => !string.Equals(
+            item.DestinationLabel,
+            ResolveBusinessLabel(item),
+            StringComparison.OrdinalIgnoreCase);
+
+    private string BuildTaegeukCenterClass()
+        => isCenterTransferDropReady
+            ? "hongdal-bagua-taegeuk-center hongdal-bagua-taegeuk-center--drop-ready"
+            : "hongdal-bagua-taegeuk-center";
+
+    private string BuildCenterMarkLabel()
+        => isCenterTransferDragging || isCenterTransferAnimating
+            ? isCenterTransferDropReady
+                ? $"{CenterTrigramName} · 놓기"
+                : CenterTrigramName
+            : CenterTrigramName;
+
+    private string ResolveCenterTransferTrigramName()
+        => NavigationItems.FirstOrDefault(IsCenterTransferItem)?.TrigramName ?? "진";
 
     private string BuildDotClass()
         => isDragging ? "hongdal-bagua-dot hongdal-bagua-dot--dragging" : "hongdal-bagua-dot";

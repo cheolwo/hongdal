@@ -32,6 +32,7 @@ public static class ShipperRoutes
     public const string CommunityDecorations = "/community/decorations";
     public const string CommunityDecorationCreate = "/community/decorations/create";
     public const string CommunityDecorationThemeSubmit = "/community/decorations/themes/submit";
+    public const string PrajnaLectures = "/learn/prajna";
     public const string DispatchAddressForm = "/dispatch/address-form";
 
     public static string ReconsignmentOrdersForInventory(long inventoryItemId)
