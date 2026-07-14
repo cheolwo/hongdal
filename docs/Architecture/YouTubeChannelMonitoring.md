@@ -1,0 +1,94 @@
+# YouTube 채널 새 영상 감지 모듈
+
+## 목적
+
+홍달 서버가 관리자가 등록한 YouTube 채널의 공개 업로드를 확인하고, 처음 발견한 영상과 이후 새로 올라온 영상을 구분해 저장한다. UI나 커뮤니티 게시글 생성은 이 모듈에 포함하지 않고, `공유대기` 영상 조회 결과를 다음 처리기가 사용할 수 있게 한다.
+
+## 서버 흐름
+
+```mermaid
+flowchart LR
+    A["기본 채널 자동 등록 또는 관리자 등록"] --> B["channels.list"]
+    B --> C["업로드 재생목록 ID 저장"]
+    C --> D["Quartz 주기 동기화"]
+    D --> E["playlistItems.list"]
+    E --> F{"이미 저장된 VideoId인가"}
+    F -->|예| G["건너뜀"]
+    F -->|아니오·최초 동기화| H["기준선 영상 저장"]
+    F -->|아니오·후속 동기화| I["신규 업로드·공유대기 저장"]
+```
+
+`search.list`로 채널 영상을 검색하지 않는다. `channels.list`의 `contentDetails.relatedPlaylists.uploads`로 업로드 재생목록 ID를 얻은 뒤 `playlistItems.list`를 사용한다. 공식 문서상 두 목록 조회는 각각 기본 1 쿼터 단위이며, 채널별 최신 업로드 확인에 필요한 데이터만 읽을 수 있다.
+
+`YouTube:DefaultChannels`에 지정된 채널은 전체 동기화가 시작될 때 DB에 없으면 자동 등록된다. 홍익학당 공식 홈페이지가 연결하는 YouTube 채널(`youtube.com/user/HongikHd`)은 채널 ID `UCI8HW08rOSlvweOjJ9Gp2Ng`로 기본 등록한다. 관리자가 같은 채널을 이미 등록했거나 비활성화한 경우에는 기존 DB 상태를 덮어쓰지 않는다.
+
+## 책임 분리
+
+| 구성 | 책임 |
+| --- | --- |
+| `YouTubeDataApiClient` | Google JSON 요청·응답과 API 오류 처리 |
+| `YouTube채널감시Service` | 최초 기준선, 신규 업로드와 중복 판정 |
+| `IYouTube채널감시저장소` | 감시 채널, 후보 영상 ID와 발견 영상 영속화 |
+| `YouTube채널동기화Job` | 설정된 주기로 전체 활성 채널 동기화 |
+| `YouTube채널감시Controller` | 관리자 채널 등록·조회·수동 동기화 API |
+| `YouTube공개재생목록Controller` | 채널의 현재 공개 재생목록과 재생목록별 영상 조회 API |
+
+## 관리자 API
+
+| Method | Path | 용도 |
+| --- | --- | --- |
+| `GET` | `/api/v1/admin/content/youtube/channels` | 감시 채널 목록 |
+| `POST` | `/api/v1/admin/content/youtube/channels` | 채널 ID 등록 |
+| `GET` | `/api/v1/admin/content/youtube/videos` | 발견 영상 목록 |
+| `PUT` | `/api/v1/admin/content/youtube/videos/{videoId}/publication` | 영상 공개 또는 숨김 설정 |
+| `POST` | `/api/v1/admin/content/youtube/sync` | 전체 또는 단일 채널 수동 동기화 |
+
+위 관리자 API는 모두 `서버관리자전용` 정책을 사용한다.
+
+홍달 앱 등 일반 클라이언트는 인증 없이 `GET /api/v1/content/youtube/videos`를 호출해 관리자가 `공개`로 설정한 영상만 최신순으로 조회할 수 있다. `channelId`, `take` 쿼리를 지원하며, `take`는 서비스에서 최대 200건으로 제한한다. 최초 동기화의 `기준선`, 새로 수집된 `공유대기`, 관리자가 숨긴 `숨김` 상태는 공개 API에 포함하지 않는다. 공개 API에는 채널 등록, 공개 설정, 외부 API 동기화 기능을 포함하지 않는다.
+
+채널이 직접 구성한 현재 공개 재생목록은 YouTube Data API를 실시간으로 조회한다.
+
+| Method | Path | 용도 |
+| --- | --- | --- |
+| `GET` | `/api/v1/content/youtube/playlists?channelId={channelId}` | 채널의 공개 재생목록 전체 조회 |
+| `GET` | `/api/v1/content/youtube/playlists/{playlistId}/videos?take=50` | 재생목록에 포함된 영상 조회 |
+
+재생목록 목록은 `playlists.list`의 `nextPageToken`을 끝까지 따라가므로 50개를 넘는 채널도 전체 목록을 반환한다. 재생목록별 영상은 `playlistItems.list`를 페이지 단위로 조회하며 한 요청에서 최대 200건까지 반환한다. 이 두 API는 DB에 저장된 영상 공개 상태를 변경하지 않는다.
+
+## 로컬 설정
+
+API 키는 추적되는 `appsettings.json`에 넣지 않는다. 무시되는 `Hongdal/appsettings.Local.json`에 다음 형식으로 둔다.
+
+```json
+{
+  "YouTube": {
+    "Enabled": true,
+    "ApiKey": "YOUR_YOUTUBE_DATA_API_KEY",
+    "SyncIntervalSeconds": 300,
+    "MaxResultsPerChannel": 20,
+    "DefaultChannels": [
+      {
+        "ChannelId": "UCI8HW08rOSlvweOjJ9Gp2Ng",
+        "DisplayName": "홍익학당"
+      }
+    ]
+  }
+}
+```
+
+Google Cloud 프로젝트에서 YouTube Data API v3를 활성화하고, 운영 키에는 사용 API와 서버 주소 제한을 적용한다.
+
+## 다음 확장
+
+YouTube는 PubSubHubbub 기반 푸시 알림을 지원한다. 공개 콜백 서버가 준비되면 업로드·제목·설명 변경 알림에서 `VideoId`와 `ChannelId`를 읽고, 현재 동기화 서비스를 호출하는 입력 어댑터를 추가한다. 웹훅은 알림 신호만 담당하고 최종 메타데이터와 중복 판정은 기존 API 클라이언트와 저장소가 계속 책임진다.
+
+커뮤니티 공유는 `sharing_status = 공유대기` 영상을 읽는 별도 이벤트 처리기로 구현한다. 동기화 트랜잭션 안에서 게시글을 직접 생성하지 않아 외부 API 실패와 커뮤니티 쓰기 실패가 서로 영향을 주지 않게 한다.
+
+## 공식 참고
+
+- [YouTube Data API 시작하기](https://developers.google.com/youtube/v3/getting-started)
+- [Channels: list](https://developers.google.com/youtube/v3/docs/channels/list)
+- [PlaylistItems: list](https://developers.google.com/youtube/v3/docs/playlistItems/list)
+- [Playlists: list](https://developers.google.com/youtube/v3/docs/playlists/list)
+- [Push Notifications](https://developers.google.com/youtube/v3/guides/push_notifications)

@@ -22,12 +22,14 @@ namespace 홍달.Services.External.Google
     public sealed class GoogleCloudStorageService : IGoogleCloudStorageService
     {
         private readonly GoogleCloudStorageOptions _options;
-        private readonly StorageClient _storageClient;
+        private readonly Lazy<StorageClient> _storageClient;
 
         public GoogleCloudStorageService(IOptions<GoogleCloudStorageOptions> options)
         {
             _options = options.Value;
-            _storageClient = CreateStorageClient(_options);
+            _storageClient = new Lazy<StorageClient>(
+                () => CreateStorageClient(_options),
+                LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         public async Task<GoogleCloudStorageUploadResult> UploadAsync(
@@ -52,7 +54,7 @@ namespace 홍달.Services.External.Google
                 ? "application/octet-stream"
                 : contentType;
 
-            await _storageClient.UploadObjectAsync(
+            await _storageClient.Value.UploadObjectAsync(
                 bucket: _options.BucketName,
                 objectName: objectName,
                 contentType: resolvedContentType,
@@ -72,7 +74,7 @@ namespace 홍달.Services.External.Google
             ArgumentException.ThrowIfNullOrWhiteSpace(objectName);
 
             await using var stream = new MemoryStream();
-            await _storageClient.DownloadObjectAsync(
+            await _storageClient.Value.DownloadObjectAsync(
                 bucketName,
                 objectName,
                 stream,
