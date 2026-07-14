@@ -4,6 +4,7 @@ using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Shipper.Payment;
 using Microsoft.Extensions.Hosting;
 using 홍달.도메인.결제;
+using 홍달.Services.Options;
 
 namespace Hongdal.Application.Shipper.Payment;
 
@@ -15,22 +16,25 @@ public sealed class 페이크결제승인CommandHandler : IRequestHandler<페이
     private readonly HongdalContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IHongdalExecutionModePolicy _executionModePolicy;
 
     public 페이크결제승인CommandHandler(
         HongdalContext db,
         ICurrentUserAccessor currentUserAccessor,
-        IHostEnvironment hostEnvironment)
+        IHostEnvironment hostEnvironment,
+        IHongdalExecutionModePolicy executionModePolicy)
     {
         _db = db;
         _currentUserAccessor = currentUserAccessor;
         _hostEnvironment = hostEnvironment;
+        _executionModePolicy = executionModePolicy;
     }
 
     public async Task<Result<페이크결제승인응답>> Handle(페이크결제승인Command request, CancellationToken cancellationToken)
     {
-        if (!_hostEnvironment.IsDevelopment())
+        if (!_hostEnvironment.IsDevelopment() && !_executionModePolicy.IsSimulation)
         {
-            return Result.Fail<페이크결제승인응답>("FakePG 결제 승인 API는 Development 환경에서만 사용할 수 있습니다.");
+            return Result.Fail<페이크결제승인응답>("FakePG 결제 승인 API는 Simulation 또는 Development 환경에서만 사용할 수 있습니다.");
         }
 
         if (string.IsNullOrWhiteSpace(request.의뢰Id))
@@ -82,7 +86,14 @@ public sealed class 페이크결제승인CommandHandler : IRequestHandler<페이
 
         var now = DateTime.UtcNow;
         var paymentKey = $"fake_pg_{Guid.NewGuid():N}";
-        var responseJson = BuildFakeResponseJson(requestId, amount, paymentKey, idempotencyKey, request.메모, now);
+        var responseJson = BuildFakeResponseJson(
+            requestId,
+            amount,
+            paymentKey,
+            idempotencyKey,
+            request.메모,
+            now,
+            _executionModePolicy.Mode);
         var payment = new 결제
         {
             결제Id = $"SIM-FPG-{Guid.NewGuid():N}",
@@ -160,12 +171,13 @@ public sealed class 페이크결제승인CommandHandler : IRequestHandler<페이
         string paymentKey,
         string? idempotencyKey,
         string? memo,
-        DateTime approvedAtUtc)
+        DateTime approvedAtUtc,
+        HongdalExecutionMode executionMode)
     {
         return JsonSerializer.Serialize(new
         {
             provider = ProviderName,
-            mode = "DevelopmentOnly",
+            mode = executionMode.ToString(),
             requestId,
             amount,
             currency = "KRW",
