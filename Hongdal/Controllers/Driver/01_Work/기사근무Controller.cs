@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +13,7 @@ namespace Hongdal.Controllers.Driver.Work01
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/shifts")]
-    public sealed class 기사근무Controller : ControllerBase
+    public sealed class 기사근무Controller : DriverControllerBase
     {
         private readonly ISender _sender;
 
@@ -45,10 +44,5 @@ namespace Hongdal.Controllers.Driver.Work01
             return Ok(shift);
         }
 
-        private string 현재기사Id()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                   ?? throw new InvalidOperationException("기사 인증 정보가 없습니다.");
-        }
     }
 }

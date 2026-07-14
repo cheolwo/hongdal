@@ -1,4 +1,4 @@
-using System.Security.Claims;
+using Hongdal.Controllers;
 using Hongdal.Application.Driver.Recommendation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ namespace Hongdal.Controllers.Driver.Recommendation02
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/recommendations")]
-    public sealed class 기사배차추천요약Controller : ControllerBase
+    public sealed class 기사배차추천요약Controller : DriverControllerBase
     {
         private readonly I기사배차추천UseCase _useCase;
 
@@ -28,10 +28,5 @@ namespace Hongdal.Controllers.Driver.Recommendation02
             return Ok(result);
         }
 
-        private string 현재기사Id()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                   ?? throw new InvalidOperationException("기사 인증 정보가 없습니다.");
-        }
     }
 }

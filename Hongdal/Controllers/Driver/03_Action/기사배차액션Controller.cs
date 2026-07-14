@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
@@ -14,7 +13,7 @@ namespace Hongdal.Controllers.Driver.Action03
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/dispatch-actions")]
-    public sealed class 기사배차액션Controller : ControllerBase
+    public sealed class 기사배차액션Controller : DriverControllerBase
     {
         private readonly ISender _sender;
 
@@ -48,10 +47,5 @@ namespace Hongdal.Controllers.Driver.Action03
             return this.ToNoContentActionResult(result);
         }
 
-        private string 현재기사Id()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                   ?? throw new InvalidOperationException("기사 인증 정보가 없습니다.");
-        }
     }
 }
