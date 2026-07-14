@@ -33,6 +33,7 @@ public sealed class 커뮤니티원장업무투영EventHandler : INotificationHa
                 "커뮤니티 원장 변경 업무 투영에 실패했습니다. EventId={EventId}, 원장Id={원장Id}",
                 notification.EventId,
                 notification.원장.원장Id);
+            throw;
         }
     }
 }

@@ -426,6 +426,7 @@ public sealed class CommunityLedgerExperienceEventResponse
 
 public static class CommunityLedgerTemplateKeys
 {
+    public const string Order = "order";
     public const string CargoTransport = "cargo-transport";
     public const string FoodOrder = "food-order";
     public const string FoodDelivery = "food-delivery";
@@ -441,6 +442,7 @@ public static class CommunityLedgerImplementationModuleCodes
 {
     public const string CommunityConversation = "community-conversation";
     public const string WishLedgerAssessment = "wish-ledger-assessment";
+    public const string OrderRoot = "order-root";
     public const string CargoTransport = "cargo-transport";
     public const string TransportProgress = "transport-progress";
     public const string WarehouseOutbound = "warehouse-outbound";
@@ -465,6 +467,26 @@ public static class CommunityLedgerRelationTypes
     public const string Requires = "Requires";
     public const string Handoff = "Handoff";
     public const string Reference = "Reference";
+}
+
+public static class 주문원장포함역할
+{
+    public const string 개별주문 = "개별주문";
+    public const string 판매 = "판매";
+    public const string 창고입고 = "창고입고";
+    public const string 창고출고 = "창고출고";
+    public const string 배송 = "배송";
+    public const string 운송 = "운송";
+
+    public static IReadOnlySet<string> All { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        개별주문,
+        판매,
+        창고입고,
+        창고출고,
+        배송,
+        운송
+    };
 }
 
 public static class CommunityLedgerRelationCardinality
@@ -542,6 +564,8 @@ public static class CommunityLedgerEngineHints
 
 public static class CommunityLedgerCompositionRuleCodes
 {
+    public const string OrderBeforeFulfillment = "OrderBeforeFulfillment";
+    public const string GroupPurchaseRequiresIndividualOrders = "GroupPurchaseRequiresIndividualOrders";
     public const string TransportRequestBeforePickupDropoff = "TransportRequestBeforePickupDropoff";
     public const string FoodOrderBeforeDelivery = "FoodOrderBeforeDelivery";
     public const string MartOrderBeforePickingPacking = "MartOrderBeforePickingPacking";

@@ -1,5 +1,4 @@
 using Hongdal.Contracts.Common.Community;
-using Hongdal.Domain.Community;
 using Hongdal.Services.Community;
 using 홍달.도메인.공통;
 using 홍달.도메인.운송;
@@ -44,32 +43,18 @@ public sealed class 운송원장Mongo동기화BuilderTests
     }
 
     [Fact]
-    public void Builder_snapshot_projects_to_rdb_block_relations()
+    public void Builder_uses_the_ledger_linked_to_the_transport_projection()
     {
-        var request = CreateRequest();
-        var projection = CreateProjection(request.의뢰Id);
-        var saveRequest = 운송원장Mongo동기화Builder.저장요청생성(request, projection);
-        var ledger = new 커뮤니티원장Dto
-        {
-            원장Id = saveRequest.원장Id!,
-            커뮤니티Id = saveRequest.커뮤니티Id,
-            원장템플릿Key = saveRequest.원장템플릿Key,
-            블록목록 = saveRequest.블록목록,
-            다이어그램스냅샷 = saveRequest.다이어그램스냅샷
-        };
+        var projection = CreateProjection("REQ-LINKED");
+        projection.커뮤니티원장Id = "community-ledger-linked";
 
-        var result = 커뮤니티원장블록관계투영Builder.생성(ledger);
+        var saveRequest = 운송원장Mongo동기화Builder.저장요청생성(null, projection);
 
-        Assert.Equal(4, result.블록목록.Count);
-        Assert.Equal(4, result.관계목록.Count);
-        Assert.Contains(result.관계목록, relation =>
-            relation.FromBlockId == "transport-request"
-            && relation.ToBlockId == "pickup"
-            && relation.관계유형 == 원장블록관계유형.선행필수);
-        Assert.Contains(result.관계목록, relation =>
-            relation.FromBlockId == "pickup"
-            && relation.ToBlockId == "dropoff"
-            && relation.관계유형 == 원장블록관계유형.흐름);
+        Assert.Equal("community-ledger-linked", saveRequest.원장Id);
+        Assert.Equal("community-ledger-linked", saveRequest.외부참조["커뮤니티원장Id"]);
+        Assert.Contains("/arrive-pickup", saveRequest.블록목록
+            .Single(block => block.BlockId == "pickup")
+            .Data["상태변경Api"]);
     }
 
     [Fact]

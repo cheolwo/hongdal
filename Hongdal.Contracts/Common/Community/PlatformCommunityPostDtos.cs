@@ -62,6 +62,8 @@ public sealed class PlatformCommunityPostResponse
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public string? 커뮤니티원장Id { get; set; }
+    public PlatformCommunityPostLedgerContextResponse? 원장Context { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsReportBoardPost { get; set; }
     public string ReporterDisplayName { get; set; } = string.Empty;
@@ -89,6 +91,7 @@ public sealed class PlatformCommunityPostCreateRequest
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public string? 커뮤니티원장Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsReportBoardPost { get; set; }
     public string? ReporterDisplayName { get; set; }
@@ -127,11 +130,86 @@ public sealed class PlatformCommunityPostUpdateRequest
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public string? 커뮤니티원장Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsReportBoardPost { get; set; }
     public string? ReporterDisplayName { get; set; }
     public string? ReportedDisplayName { get; set; }
     public string Password { get; set; } = string.Empty;
+}
+
+public sealed class PlatformCommunityPostLedgerContextResponse
+{
+    public string 원장Id { get; set; } = string.Empty;
+    public long Revision { get; set; }
+    public string 원장템플릿Key { get; set; } = string.Empty;
+    public string 원장템플릿명 { get; set; } = string.Empty;
+    public string 제목 { get; set; } = string.Empty;
+    public string 상태 { get; set; } = string.Empty;
+    public string 현재단계 { get; set; } = string.Empty;
+    public string 처리체계명 { get; set; } = string.Empty;
+    public string 업무분류Code { get; set; } = string.Empty;
+    public string 업무분류명 { get; set; } = string.Empty;
+    public string 기능설정Key { get; set; } = string.Empty;
+    public bool 기능활성화여부 { get; set; }
+    public bool 상세조회가능여부 { get; set; }
+    public bool 참여요청필요여부 { get; set; }
+    public bool 재사용허용여부 { get; set; }
+    public bool 재공유허용여부 { get; set; }
+    public DiagramSnapshotDto? 다이어그램 { get; set; }
+    public IReadOnlyList<PlatformCommunityLedgerBlockResponse> 블록목록 { get; set; } = [];
+    public IReadOnlyList<string> 가능한행동목록 { get; set; } = [];
+    public IReadOnlyList<PlatformCommunityLedgerNodeActionResponse> 노드행동목록 { get; set; } = [];
+}
+
+public sealed class PlatformCommunityLedgerBlockResponse
+{
+    public string 블록Id { get; set; } = string.Empty;
+    public string 블록유형 { get; set; } = string.Empty;
+    public string 제목 { get; set; } = string.Empty;
+    public string? 상태 { get; set; }
+    public IReadOnlyDictionary<string, string> 항목 { get; set; } = new Dictionary<string, string>();
+}
+
+public sealed class PlatformCommunityLedgerNodeActionResponse
+{
+    public string 행동Code { get; set; } = string.Empty;
+    public string 블록Id { get; set; } = string.Empty;
+    public string 표시명 { get; set; } = string.Empty;
+    public string 설명 { get; set; } = string.Empty;
+    public string ApiEndpointKey { get; set; } = string.Empty;
+    public string HttpMethod { get; set; } = "POST";
+    public string 실행대상Id { get; set; } = string.Empty;
+    public string 현재상태 { get; set; } = string.Empty;
+    public bool 실행가능여부 { get; set; }
+    public bool 확인필요여부 { get; set; } = true;
+    public bool 사진필수여부 { get; set; }
+    public string? 비활성사유 { get; set; }
+}
+
+public static class CommunityLedgerNodeActionCodes
+{
+    public const string TransportArrivePickup = "TransportArrivePickup";
+    public const string TransportCompletePickup = "TransportCompletePickup";
+}
+
+public sealed class PlatformCommunityPostLedgerChoiceResponse
+{
+    public string 원장Id { get; set; } = string.Empty;
+    public string 원장템플릿Key { get; set; } = string.Empty;
+    public string 원장템플릿명 { get; set; } = string.Empty;
+    public string 제목 { get; set; } = string.Empty;
+    public string 상태 { get; set; } = string.Empty;
+    public string 현재단계 { get; set; } = string.Empty;
+    public string 업무분류명 { get; set; } = string.Empty;
+    public string WorkflowTag { get; set; } = string.Empty;
+    public bool 내가만든원장 { get; set; }
+    public bool 내접근원장여부 { get; set; }
+    public bool 커뮤니티공유여부 { get; set; }
+    public bool 재사용허용여부 { get; set; }
+    public bool 재공유허용여부 { get; set; }
+    public string 참여역할 { get; set; } = string.Empty;
+    public DateTime 수정시각Utc { get; set; }
 }
 
 public static class PlatformCommunityReportViewerRoles

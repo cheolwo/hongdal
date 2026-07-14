@@ -8,15 +8,22 @@ namespace Hongdal.WebApp.Services;
 public sealed class DiagramCollaborationClientService : IDiagramCollaborationClientService, IAsyncDisposable
 {
     private readonly HttpClient _httpClient;
+    private readonly IHongdalAccessTokenProvider _accessTokenProvider;
     private HubConnection? _connection;
     private string? _roomId;
+    private DiagramRoomJoinRequest? _joinRequest;
 
-    public DiagramCollaborationClientService(HttpClient httpClient)
+    public DiagramCollaborationClientService(
+        HttpClient httpClient,
+        IHongdalAccessTokenProvider accessTokenProvider)
     {
         _httpClient = httpClient;
+        _accessTokenProvider = accessTokenProvider;
     }
 
     public event Func<DiagramChatMessageResponse, Task>? 메시지수신;
+
+    public event Func<DiagramLedgerChangedResponse, Task>? 원장변경수신;
 
     public event Func<string, Task>? 상태변경;
 
@@ -51,7 +58,10 @@ public sealed class DiagramCollaborationClientService : IDiagramCollaborationCli
             var hubUri = new Uri(baseAddress, "hubs/diagram-collaboration");
 
             _connection = new HubConnectionBuilder()
-                .WithUrl(hubUri)
+                .WithUrl(hubUri, options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(_accessTokenProvider.AccessToken);
+                })
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -60,6 +70,7 @@ public sealed class DiagramCollaborationClientService : IDiagramCollaborationCli
             await _connection.StartAsync(cancellationToken);
             await _connection.InvokeAsync("JoinRoom", request, cancellationToken);
             _roomId = request.RoomId.Trim();
+            _joinRequest = request;
             await Publish상태Async("다이어그램 대화방 SignalR 허브에 연결되었습니다.");
             return true;
         }
@@ -139,6 +150,7 @@ public sealed class DiagramCollaborationClientService : IDiagramCollaborationCli
             await _connection.DisposeAsync();
             _connection = null;
             _roomId = null;
+            _joinRequest = null;
             현재사용자Id = null;
             현재사용자표시명 = "나";
         }
@@ -206,6 +218,10 @@ public sealed class DiagramCollaborationClientService : IDiagramCollaborationCli
                 SentAtUtc = action.RequestedAtUtc
             }));
 
+        _connection.On<DiagramLedgerChangedResponse>(
+            DiagramCollaborationClientMethods.ReceiveLedgerChanged,
+            async changed => await Publish원장변경Async(changed));
+
         _connection.Reconnecting += async error =>
         {
             await Publish상태Async(error is null
@@ -215,6 +231,11 @@ public sealed class DiagramCollaborationClientService : IDiagramCollaborationCli
 
         _connection.Reconnected += async _ =>
         {
+            if (_connection is not null && _joinRequest is not null)
+            {
+                await _connection.InvokeAsync("JoinRoom", _joinRequest);
+            }
+
             await Publish상태Async("다이어그램 대화방에 다시 연결되었습니다.");
         };
 
@@ -237,6 +258,20 @@ public sealed class DiagramCollaborationClientService : IDiagramCollaborationCli
         foreach (Func<DiagramChatMessageResponse, Task> callback in handler.GetInvocationList())
         {
             await callback(message);
+        }
+    }
+
+    private async Task Publish원장변경Async(DiagramLedgerChangedResponse changed)
+    {
+        var handler = 원장변경수신;
+        if (handler is null)
+        {
+            return;
+        }
+
+        foreach (Func<DiagramLedgerChangedResponse, Task> callback in handler.GetInvocationList())
+        {
+            await callback(changed);
         }
     }
 

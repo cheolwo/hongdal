@@ -6,6 +6,8 @@ public interface IDiagramCollaborationClientService
 {
     event Func<DiagramChatMessageResponse, Task>? 메시지수신;
 
+    event Func<DiagramLedgerChangedResponse, Task>? 원장변경수신;
+
     event Func<string, Task>? 상태변경;
 
     string 연결상태 { get; }
@@ -33,6 +35,12 @@ public sealed class NoopDiagramCollaborationClientService : IDiagramCollaboratio
     public static NoopDiagramCollaborationClientService Instance { get; } = new();
 
     public event Func<DiagramChatMessageResponse, Task>? 메시지수신
+    {
+        add { }
+        remove { }
+    }
+
+    public event Func<DiagramLedgerChangedResponse, Task>? 원장변경수신
     {
         add { }
         remove { }

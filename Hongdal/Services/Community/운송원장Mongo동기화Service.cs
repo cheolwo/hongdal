@@ -92,9 +92,9 @@ public sealed class 운송원장Mongo동기화Service : I운송원장Mongo동기
         try
         {
             var 원장 = await _원장저장소.원장조회Async(원장Id, cancellationToken);
-            var 투영블록수 = await _db.커뮤니티원장블록투영
+            var 운송실행투영존재 = await _db.운송원장
                 .AsNoTracking()
-                .CountAsync(x => x.커뮤니티원장Id == 원장Id, cancellationToken);
+                .AnyAsync(x => x.의뢰Id == requestId || x.운송번호 == requestId, cancellationToken);
 
             return new 운송원장Mongo동기화상태(
                 원장Id,
@@ -104,7 +104,7 @@ public sealed class 운송원장Mongo동기화Service : I운송원장Mongo동기
                 원장?.대상OsCode,
                 원장?.수정시각Utc,
                 원장?.블록목록.Count ?? 0,
-                투영블록수,
+                운송실행투영존재,
                 원장 is null ? "Mongo 운송 원장 문서가 아직 없습니다." : string.Empty);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
@@ -148,11 +148,11 @@ public sealed record 운송원장Mongo동기화상태(
     string? 대상OsCode,
     DateTime? Mongo원장UpdatedAtUtc,
     int Mongo원장블록수,
-    int Rdb블록투영수,
+    bool Rdb운송실행투영존재,
     string 메시지)
 {
     public static 운송원장Mongo동기화상태 Empty(string 원장Id, string 메시지)
-        => new(원장Id, false, null, null, null, null, 0, 0, 메시지);
+        => new(원장Id, false, null, null, null, null, 0, false, 메시지);
 }
 
 public static class 운송원장Mongo동기화Builder
@@ -166,7 +166,7 @@ public static class 운송원장Mongo동기화Builder
     {
         var requestId = FirstNonEmpty(의뢰?.의뢰Id, 운송실행투영?.의뢰Id, 운송실행투영?.운송번호)
                         ?? throw new InvalidOperationException("운송 Mongo 원장을 만들려면 의뢰Id 또는 운송번호가 필요합니다.");
-        var 원장Id = 원장Id생성(requestId);
+        var 원장Id = FirstNonEmpty(운송실행투영?.커뮤니티원장Id, 원장Id생성(requestId))!;
         var 제목 = BuildTitle(의뢰, 운송실행투영, requestId);
         var 상태 = ResolveLedgerState(의뢰, 운송실행투영);
         var 현재단계 = FirstNonEmpty(운송실행투영?.상태, 의뢰?.배차상태, 의뢰?.상태);
@@ -250,7 +250,7 @@ public static class 운송원장Mongo동기화Builder
                     ("연락처전화번호", 의뢰?.픽업_연락처_전화번호),
                     ("시간창시작", Format(의뢰?.픽업_시간창_시작일시)),
                     ("시간창종료", Format(의뢰?.픽업_시간창_종료일시)),
-                    ("상태변경Api", "POST api/v1/driver/transports/{id}/pickup-arrived, POST api/v1/driver/transports/{id}/pickup-complete"))
+                    ("상태변경Api", "POST api/v1/driver/transports/{id}/arrive-pickup, POST api/v1/driver/transports/{id}/pickup-complete"))
             },
             new()
             {
@@ -349,6 +349,7 @@ public static class 운송원장Mongo동기화Builder
             ("화주운송의뢰Id", requestId),
             ("Rdb화주운송의뢰Pk", Format(의뢰?.Id)),
             ("운송실행투영Id", Format(운송실행투영?.Id)),
+            ("커뮤니티원장Id", 운송실행투영?.커뮤니티원장Id),
             ("운송번호", FirstNonEmpty(운송실행투영?.운송번호, requestId)),
             ("원천유형", 운송실행투영?.원본의뢰유형),
             ("원천Id", 운송실행투영?.원본의뢰Id),

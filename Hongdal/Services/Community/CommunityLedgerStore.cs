@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Hongdal.Contracts.Common.Community;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -28,7 +30,54 @@ public interface I커뮤니티원장저장소
         CancellationToken cancellationToken = default);
 }
 
-public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장소
+public interface I커뮤니티원장투영작업저장소
+{
+    Task<커뮤니티원장투영작업?> 다음작업확보Async(
+        TimeSpan leaseTimeout,
+        CancellationToken cancellationToken = default);
+
+    Task 완료Async(
+        string 원장Id,
+        long revision,
+        string? processingToken,
+        CancellationToken cancellationToken = default);
+
+    Task 실패Async(
+        string 원장Id,
+        long revision,
+        string processingToken,
+        string 오류,
+        int 최대시도횟수,
+        TimeSpan 기본재시도간격,
+        CancellationToken cancellationToken = default);
+}
+
+public sealed record 커뮤니티원장투영작업(
+    커뮤니티원장Dto 원장,
+    string EventId,
+    string 변경유형,
+    string 변경자,
+    커뮤니티원장상태변경요청? 상태변경요청,
+    DateTime 발생시각Utc,
+    string ProcessingToken,
+    int 시도횟수);
+
+public static class 커뮤니티원장투영상태
+{
+    public const string 대기 = "대기";
+    public const string 처리중 = "처리중";
+    public const string 재시도대기 = "재시도대기";
+    public const string 완료 = "완료";
+    public const string 실패 = "실패";
+}
+
+internal static class 커뮤니티원장변경유형값
+{
+    public const string 저장 = "저장";
+    public const string 상태변경 = "상태변경";
+}
+
+public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장소, I커뮤니티원장투영작업저장소
 {
     private const string CollectionName = "community_ledgers";
     private readonly IMongoCollection<커뮤니티원장문서> _collection;
@@ -63,9 +112,14 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
         var existing = await _collection
             .Find(x => x.원장Id == 원장Id)
             .FirstOrDefaultAsync(cancellationToken);
+        EnsureExpectedRevision(request.기대Revision, existing?.Revision ?? 0, 원장Id);
+
+        var revision = (existing?.Revision ?? 0) + 1;
+        var eventId = CreateEventId(원장Id, revision);
 
         var 문서 = new 커뮤니티원장문서
         {
+            Id = existing?.Id ?? ObjectId.GenerateNewId(),
             원장Id = 원장Id,
             커뮤니티Id = request.커뮤니티Id.Trim(),
             원장템플릿Key = request.원장템플릿Key.Trim(),
@@ -79,12 +133,24 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             생성자표시명 = string.IsNullOrWhiteSpace(request.생성자표시명) ? "익명 참여자" : request.생성자표시명.Trim(),
             블록목록 = request.블록목록.Select(ToDocument).ToArray(),
             참여자목록 = request.참여자목록.Select(ToDocument).ToArray(),
+            포함원장목록 = request.포함원장목록 is null
+                ? existing?.포함원장목록 ?? []
+                : request.포함원장목록.Select(ToDocument).ToArray(),
             다이어그램스냅샷 = request.다이어그램스냅샷 is null ? null : ToDocument(request.다이어그램스냅샷),
             외부참조 = NormalizeDictionary(request.외부참조),
             확장속성 = NormalizeDictionary(request.확장속성),
             생성시각Utc = existing?.생성시각Utc ?? now,
             수정시각Utc = now,
-            수정자 = string.IsNullOrWhiteSpace(updatedBy) ? "system" : updatedBy.Trim()
+            수정자 = string.IsNullOrWhiteSpace(updatedBy) ? "system" : updatedBy.Trim(),
+            Revision = revision,
+            투영완료Revision = existing?.투영완료Revision ?? 0,
+            투영상태 = 커뮤니티원장투영상태.대기,
+            투영EventId = eventId,
+            투영변경유형 = 커뮤니티원장변경유형값.저장,
+            투영이전상태 = Clean(existing?.상태),
+            투영변경메모 = existing is null ? "원장 생성" : "원장 저장",
+            투영발생시각Utc = now,
+            투영다음시도시각Utc = now.AddSeconds(5)
         };
 
         문서.상태이력 = existing?.상태이력?.ToList() ?? [];
@@ -92,18 +158,32 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
         {
             문서.상태이력.Add(new 커뮤니티원장상태이력문서
             {
+                EventId = eventId,
                 상태 = 문서.상태,
+                이전상태 = Clean(existing?.상태),
                 메모 = existing is null ? "원장 생성" : "원장 저장 중 상태 변경",
                 변경자 = 문서.수정자,
                 변경시각Utc = now
             });
         }
 
-        await _collection.ReplaceOneAsync(
-            x => x.원장Id == 원장Id,
-            문서,
-            new ReplaceOptions { IsUpsert = true },
-            cancellationToken);
+        try
+        {
+            var result = await _collection.ReplaceOneAsync(
+                BuildRevisionFilter(원장Id, existing?.Revision ?? 0, existing is null),
+                문서,
+                new ReplaceOptions { IsUpsert = existing is null },
+                cancellationToken);
+
+            if (existing is not null && result.MatchedCount == 0)
+            {
+                throw CreateConcurrencyException(원장Id);
+            }
+        }
+        catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+        {
+            throw CreateConcurrencyException(원장Id, ex);
+        }
 
         return ToDto(문서);
     }
@@ -158,10 +238,29 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
 
         var now = DateTime.UtcNow;
         var 변경자 = string.IsNullOrWhiteSpace(updatedBy) ? "system" : updatedBy.Trim();
+        var 원장Id = request.원장Id.Trim();
+        var existing = await _collection
+            .Find(x => x.원장Id == 원장Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (existing is null)
+        {
+            return null;
+        }
+
+        EnsureExpectedRevision(request.기대Revision, existing.Revision, 원장Id);
+        if (!string.IsNullOrWhiteSpace(request.이전상태)
+            && !string.Equals(request.이전상태.Trim(), existing.상태, StringComparison.OrdinalIgnoreCase))
+        {
+            throw CreateConcurrencyException(원장Id);
+        }
+
+        var revision = existing.Revision + 1;
+        var eventId = CreateEventId(원장Id, revision);
         var 상태이력 = new 커뮤니티원장상태이력문서
         {
+            EventId = eventId,
             상태 = request.상태.Trim(),
-            이전상태 = Clean(request.이전상태),
+            이전상태 = Clean(existing.상태),
             현재단계Key = Clean(request.현재단계Key),
             메모 = Clean(request.메모),
             변경자 = 변경자,
@@ -173,10 +272,22 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             .Set(x => x.현재단계Key, Clean(request.현재단계Key))
             .Set(x => x.수정시각Utc, now)
             .Set(x => x.수정자, 변경자)
+            .Set(x => x.Revision, revision)
+            .Set(x => x.투영상태, 커뮤니티원장투영상태.대기)
+            .Set(x => x.투영EventId, eventId)
+            .Set(x => x.투영변경유형, 커뮤니티원장변경유형값.상태변경)
+            .Set(x => x.투영이전상태, Clean(existing.상태))
+            .Set(x => x.투영변경메모, Clean(request.메모))
+            .Set(x => x.투영발생시각Utc, now)
+            .Set(x => x.투영다음시도시각Utc, now.AddSeconds(5))
+            .Set(x => x.투영시도횟수, 0)
+            .Set(x => x.투영처리Token, null)
+            .Set(x => x.투영처리시작시각Utc, null)
+            .Set(x => x.투영마지막오류, null)
             .Push(x => x.상태이력, 상태이력);
 
         var updated = await _collection.FindOneAndUpdateAsync(
-            x => x.원장Id == request.원장Id.Trim(),
+            BuildRevisionFilter(원장Id, existing.Revision, isNew: false),
             update,
             new FindOneAndUpdateOptions<커뮤니티원장문서>
             {
@@ -184,7 +295,143 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             },
             cancellationToken);
 
-        return updated is null ? null : ToDto(updated);
+        if (updated is null)
+        {
+            throw CreateConcurrencyException(원장Id);
+        }
+
+        return ToDto(updated);
+    }
+
+    public async Task<커뮤니티원장투영작업?> 다음작업확보Async(
+        TimeSpan leaseTimeout,
+        CancellationToken cancellationToken = default)
+    {
+        await EnsureIndexesAsync(cancellationToken);
+        var now = DateTime.UtcNow;
+        var leaseExpiredAt = now.Subtract(leaseTimeout <= TimeSpan.Zero ? TimeSpan.FromMinutes(5) : leaseTimeout);
+        var token = Guid.NewGuid().ToString("N");
+        var builder = Builders<커뮤니티원장문서>.Filter;
+        var due = builder.And(
+            builder.In(x => x.투영상태, [커뮤니티원장투영상태.대기, 커뮤니티원장투영상태.재시도대기]),
+            builder.Or(
+                builder.Eq(x => x.투영다음시도시각Utc, null),
+                builder.Lte(x => x.투영다음시도시각Utc, now)));
+        var expired = builder.And(
+            builder.Eq(x => x.투영상태, 커뮤니티원장투영상태.처리중),
+            builder.Or(
+                builder.Eq(x => x.투영처리시작시각Utc, null),
+                builder.Lte(x => x.투영처리시작시각Utc, leaseExpiredAt)));
+
+        var document = await _collection.FindOneAndUpdateAsync(
+            builder.Or(due, expired),
+            Builders<커뮤니티원장문서>.Update
+                .Set(x => x.투영상태, 커뮤니티원장투영상태.처리중)
+                .Set(x => x.투영처리Token, token)
+                .Set(x => x.투영처리시작시각Utc, now)
+                .Set(x => x.투영마지막오류, null)
+                .Inc(x => x.투영시도횟수, 1),
+            new FindOneAndUpdateOptions<커뮤니티원장문서>
+            {
+                Sort = Builders<커뮤니티원장문서>.Sort
+                    .Ascending(x => x.투영다음시도시각Utc)
+                    .Ascending(x => x.수정시각Utc),
+                ReturnDocument = ReturnDocument.After
+            },
+            cancellationToken);
+
+        if (document is null)
+        {
+            return null;
+        }
+
+        var stateRequest = string.Equals(document.투영변경유형, 커뮤니티원장변경유형값.상태변경, StringComparison.Ordinal)
+            ? new 커뮤니티원장상태변경요청
+            {
+                원장Id = document.원장Id,
+                상태 = document.상태,
+                이전상태 = document.투영이전상태,
+                현재단계Key = document.현재단계Key,
+                메모 = document.투영변경메모,
+                기대Revision = document.Revision
+            }
+            : null;
+
+        return new 커뮤니티원장투영작업(
+            ToDto(document),
+            document.투영EventId ?? CreateEventId(document.원장Id, document.Revision),
+            document.투영변경유형 ?? 커뮤니티원장변경유형값.저장,
+            document.수정자,
+            stateRequest,
+            document.투영발생시각Utc ?? document.수정시각Utc,
+            token,
+            document.투영시도횟수);
+    }
+
+    public async Task 완료Async(
+        string 원장Id,
+        long revision,
+        string? processingToken,
+        CancellationToken cancellationToken = default)
+    {
+        var builder = Builders<커뮤니티원장문서>.Filter;
+        var filter = builder.And(
+            builder.Eq(x => x.원장Id, 원장Id),
+            builder.Eq(x => x.Revision, revision));
+        filter &= string.IsNullOrWhiteSpace(processingToken)
+            ? builder.Ne(x => x.투영상태, 커뮤니티원장투영상태.처리중)
+            : builder.Eq(x => x.투영처리Token, processingToken);
+
+        var now = DateTime.UtcNow;
+        await _collection.UpdateOneAsync(
+            filter,
+            Builders<커뮤니티원장문서>.Update
+                .Set(x => x.투영완료Revision, revision)
+                .Set(x => x.투영상태, 커뮤니티원장투영상태.완료)
+                .Set(x => x.투영완료시각Utc, now)
+                .Set(x => x.투영다음시도시각Utc, null)
+                .Set(x => x.투영처리Token, null)
+                .Set(x => x.투영처리시작시각Utc, null)
+                .Set(x => x.투영마지막오류, null),
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task 실패Async(
+        string 원장Id,
+        long revision,
+        string processingToken,
+        string 오류,
+        int 최대시도횟수,
+        TimeSpan 기본재시도간격,
+        CancellationToken cancellationToken = default)
+    {
+        var document = await _collection.Find(x =>
+                x.원장Id == 원장Id
+                && x.Revision == revision
+                && x.투영처리Token == processingToken)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (document is null)
+        {
+            return;
+        }
+
+        var attempts = document.투영시도횟수;
+        var terminal = attempts >= Math.Max(1, 최대시도횟수);
+        var baseSeconds = Math.Max(1, 기본재시도간격.TotalSeconds);
+        var delaySeconds = Math.Min(3600, baseSeconds * Math.Pow(2, Math.Max(0, attempts - 1)));
+        var now = DateTime.UtcNow;
+
+        await _collection.UpdateOneAsync(
+            x => x.원장Id == 원장Id
+                 && x.Revision == revision
+                 && x.투영처리Token == processingToken,
+            Builders<커뮤니티원장문서>.Update
+                .Set(x => x.투영상태, terminal ? 커뮤니티원장투영상태.실패 : 커뮤니티원장투영상태.재시도대기)
+                .Set(x => x.투영다음시도시각Utc, terminal ? null : now.AddSeconds(delaySeconds))
+                .Set(x => x.투영처리Token, null)
+                .Set(x => x.투영처리시작시각Utc, null)
+                .Set(x => x.투영마지막오류, Truncate(오류, 2000)),
+            cancellationToken: cancellationToken);
     }
 
     private FilterDefinition<커뮤니티원장문서> BuildFilter(커뮤니티원장조회조건 query)
@@ -210,6 +457,19 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
         if (!string.IsNullOrWhiteSpace(query.참여자UserId))
         {
             filter &= builder.ElemMatch(x => x.참여자목록, participant => participant.UserId == query.참여자UserId.Trim());
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.접근UserId))
+        {
+            var userId = query.접근UserId.Trim();
+            filter &= builder.Or(
+                builder.Eq(x => x.생성자UserId, userId),
+                builder.ElemMatch(x => x.참여자목록, participant => participant.UserId == userId));
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.포함원장Id))
+        {
+            filter &= builder.ElemMatch(x => x.포함원장목록, child => child.원장Id == query.포함원장Id.Trim());
         }
 
         return filter;
@@ -246,7 +506,23 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
                     Builders<커뮤니티원장문서>.IndexKeys
                         .Ascending("참여자목록.UserId")
                         .Descending(x => x.수정시각Utc),
-                    new CreateIndexOptions { Name = "ix_ledger_participant" })
+                    new CreateIndexOptions { Name = "ix_ledger_participant" }),
+                new CreateIndexModel<커뮤니티원장문서>(
+                    Builders<커뮤니티원장문서>.IndexKeys
+                        .Ascending(x => x.생성자UserId)
+                        .Descending(x => x.수정시각Utc),
+                    new CreateIndexOptions { Name = "ix_ledger_creator" }),
+                new CreateIndexModel<커뮤니티원장문서>(
+                    Builders<커뮤니티원장문서>.IndexKeys
+                        .Ascending("포함원장목록.원장Id")
+                        .Descending(x => x.수정시각Utc),
+                    new CreateIndexOptions { Name = "ix_ledger_contained_ledger" }),
+                new CreateIndexModel<커뮤니티원장문서>(
+                    Builders<커뮤니티원장문서>.IndexKeys
+                        .Ascending(x => x.투영상태)
+                        .Ascending(x => x.투영다음시도시각Utc)
+                        .Ascending(x => x.수정시각Utc),
+                    new CreateIndexOptions { Name = "ix_ledger_projection_queue" })
             };
 
             await _collection.Indexes.CreateManyAsync(indexes, cancellationToken);
@@ -263,6 +539,7 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
         if (string.IsNullOrWhiteSpace(request.커뮤니티Id)) throw new InvalidOperationException("커뮤니티Id is required.");
         if (string.IsNullOrWhiteSpace(request.원장템플릿Key)) throw new InvalidOperationException("원장템플릿Key is required.");
         if (string.IsNullOrWhiteSpace(request.제목)) throw new InvalidOperationException("제목 is required.");
+        주문원장구성정책.저장요청검증(request);
     }
 
     private static 커뮤니티원장블록문서 ToDocument(커뮤니티원장블록Dto dto)
@@ -282,6 +559,16 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             DisplayName = string.IsNullOrWhiteSpace(dto.DisplayName) ? "익명 참여자" : dto.DisplayName.Trim(),
             RoleLabel = string.IsNullOrWhiteSpace(dto.RoleLabel) ? "참여자" : dto.RoleLabel.Trim(),
             ParticipationState = string.IsNullOrWhiteSpace(dto.ParticipationState) ? "참여중" : dto.ParticipationState.Trim()
+        };
+
+    private static 커뮤니티포함원장참조문서 ToDocument(커뮤니티포함원장참조Dto dto)
+        => new()
+        {
+            원장Id = dto.원장Id.Trim(),
+            원장템플릿Key = dto.원장템플릿Key.Trim(),
+            역할 = dto.역할.Trim(),
+            필수여부 = dto.필수여부,
+            표시순서 = dto.표시순서
         };
 
     private static 커뮤니티원장다이어그램문서 ToDocument(DiagramSnapshotDto dto)
@@ -331,10 +618,18 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             생성자표시명 = 문서.생성자표시명,
             블록목록 = 문서.블록목록.Select(ToDto).ToArray(),
             참여자목록 = 문서.참여자목록.Select(ToDto).ToArray(),
+            포함원장목록 = 문서.포함원장목록?.Select(ToDto).OrderBy(x => x.표시순서).ToArray() ?? [],
             다이어그램스냅샷 = 문서.다이어그램스냅샷 is null ? null : ToDto(문서.다이어그램스냅샷, 문서.원장Id),
             외부참조 = 문서.외부참조,
             확장속성 = 문서.확장속성,
             상태이력 = 문서.상태이력.Select(ToDto).ToArray(),
+            Revision = 문서.Revision,
+            투영완료Revision = 문서.투영완료Revision,
+            투영상태 = 문서.Revision <= 문서.투영완료Revision
+                ? 커뮤니티원장투영상태.완료
+                : 문서.투영상태,
+            투영EventId = 문서.투영EventId,
+            투영마지막오류 = 문서.투영마지막오류,
             생성시각Utc = 문서.생성시각Utc,
             수정시각Utc = 문서.수정시각Utc
         };
@@ -358,9 +653,20 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             ParticipationState = 문서.ParticipationState
         };
 
+    private static 커뮤니티포함원장참조Dto ToDto(커뮤니티포함원장참조문서 문서)
+        => new()
+        {
+            원장Id = 문서.원장Id,
+            원장템플릿Key = 문서.원장템플릿Key,
+            역할 = 문서.역할,
+            필수여부 = 문서.필수여부,
+            표시순서 = 문서.표시순서
+        };
+
     private static 커뮤니티원장상태이력Dto ToDto(커뮤니티원장상태이력문서 문서)
         => new()
         {
+            EventId = 문서.EventId,
             상태 = 문서.상태,
             이전상태 = 문서.이전상태,
             현재단계Key = 문서.현재단계Key,
@@ -407,6 +713,52 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             .ToDictionary(pair => pair.Key.Trim(), pair => pair.Value.Trim(), StringComparer.OrdinalIgnoreCase)
            ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    private static FilterDefinition<커뮤니티원장문서> BuildRevisionFilter(
+        string 원장Id,
+        long revision,
+        bool isNew)
+    {
+        var builder = Builders<커뮤니티원장문서>.Filter;
+        if (isNew)
+        {
+            return builder.Eq(x => x.원장Id, 원장Id);
+        }
+
+        var revisionFilter = revision == 0
+            ? builder.Or(
+                builder.Eq(x => x.Revision, 0),
+                builder.Exists(x => x.Revision, false))
+            : builder.Eq(x => x.Revision, revision);
+        return builder.And(builder.Eq(x => x.원장Id, 원장Id), revisionFilter);
+    }
+
+    private static void EnsureExpectedRevision(long? expectedRevision, long actualRevision, string 원장Id)
+    {
+        if (expectedRevision.HasValue && expectedRevision.Value != actualRevision)
+        {
+            throw CreateConcurrencyException(원장Id);
+        }
+    }
+
+    private static InvalidOperationException CreateConcurrencyException(string 원장Id, Exception? inner = null)
+    {
+        var suffix = string.IsNullOrWhiteSpace(원장Id) ? string.Empty : $" 원장Id={원장Id}";
+        return new InvalidOperationException(
+            $"원장의 현재 상태가 다른 요청에서 먼저 변경되었습니다. 최신 원장을 다시 조회한 뒤 재시도해야 합니다.{suffix}",
+            inner);
+    }
+
+    private static string CreateEventId(string 원장Id, long revision)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{원장Id}:{revision}"));
+        return $"ledger-{Convert.ToHexString(bytes).ToLowerInvariant()}";
+    }
+
+    private static string Truncate(string? value, int maxLength)
+        => string.IsNullOrEmpty(value)
+            ? string.Empty
+            : value.Length <= maxLength ? value : value[..maxLength];
+
     private static string? Clean(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }
@@ -417,12 +769,15 @@ public sealed class 커뮤니티원장조회조건
     public string? 원장템플릿Key { get; set; }
     public string? 상태 { get; set; }
     public string? 참여자UserId { get; set; }
+    public string? 접근UserId { get; set; }
+    public string? 포함원장Id { get; set; }
     public int Limit { get; set; } = 50;
 }
 
 public sealed class 커뮤니티원장저장요청
 {
     public string? 원장Id { get; set; }
+    public long? 기대Revision { get; set; }
     public string 커뮤니티Id { get; set; } = "platform";
     public string 원장템플릿Key { get; set; } = CommunityLedgerTemplateKeys.CargoTransport;
     public string 제목 { get; set; } = string.Empty;
@@ -435,6 +790,7 @@ public sealed class 커뮤니티원장저장요청
     public string? 생성자표시명 { get; set; }
     public IReadOnlyList<커뮤니티원장블록Dto> 블록목록 { get; set; } = [];
     public IReadOnlyList<커뮤니티원장참여자Dto> 참여자목록 { get; set; } = [];
+    public IReadOnlyList<커뮤니티포함원장참조Dto>? 포함원장목록 { get; set; }
     public DiagramSnapshotDto? 다이어그램스냅샷 { get; set; }
     public IReadOnlyDictionary<string, string> 외부참조 { get; set; } = new Dictionary<string, string>();
     public IReadOnlyDictionary<string, string> 확장속성 { get; set; } = new Dictionary<string, string>();
@@ -443,6 +799,7 @@ public sealed class 커뮤니티원장저장요청
 public sealed class 커뮤니티원장상태변경요청
 {
     public string 원장Id { get; set; } = string.Empty;
+    public long? 기대Revision { get; set; }
     public string 상태 { get; set; } = 커뮤니티원장상태.진행중;
     public string? 이전상태 { get; set; }
     public string? 현재단계Key { get; set; }
@@ -452,6 +809,11 @@ public sealed class 커뮤니티원장상태변경요청
 public sealed class 커뮤니티원장Dto
 {
     public string 원장Id { get; set; } = string.Empty;
+    public long Revision { get; set; }
+    public long 투영완료Revision { get; set; }
+    public string 투영상태 { get; set; } = 커뮤니티원장투영상태.대기;
+    public string? 투영EventId { get; set; }
+    public string? 투영마지막오류 { get; set; }
     public string 커뮤니티Id { get; set; } = string.Empty;
     public string 원장템플릿Key { get; set; } = string.Empty;
     public string 제목 { get; set; } = string.Empty;
@@ -464,6 +826,7 @@ public sealed class 커뮤니티원장Dto
     public string 생성자표시명 { get; set; } = "익명 참여자";
     public IReadOnlyList<커뮤니티원장블록Dto> 블록목록 { get; set; } = [];
     public IReadOnlyList<커뮤니티원장참여자Dto> 참여자목록 { get; set; } = [];
+    public IReadOnlyList<커뮤니티포함원장참조Dto> 포함원장목록 { get; set; } = [];
     public DiagramSnapshotDto? 다이어그램스냅샷 { get; set; }
     public IReadOnlyDictionary<string, string> 외부참조 { get; set; } = new Dictionary<string, string>();
     public IReadOnlyDictionary<string, string> 확장속성 { get; set; } = new Dictionary<string, string>();
@@ -489,8 +852,18 @@ public sealed class 커뮤니티원장참여자Dto
     public string ParticipationState { get; set; } = "참여중";
 }
 
+public sealed class 커뮤니티포함원장참조Dto
+{
+    public string 원장Id { get; set; } = string.Empty;
+    public string 원장템플릿Key { get; set; } = string.Empty;
+    public string 역할 { get; set; } = string.Empty;
+    public bool 필수여부 { get; set; }
+    public int 표시순서 { get; set; }
+}
+
 public sealed class 커뮤니티원장상태이력Dto
 {
+    public string? EventId { get; set; }
     public string 상태 { get; set; } = string.Empty;
     public string? 이전상태 { get; set; }
     public string? 현재단계Key { get; set; }
@@ -526,10 +899,25 @@ public sealed class 커뮤니티원장문서
     public string 생성자표시명 { get; set; } = "익명 참여자";
     public IReadOnlyList<커뮤니티원장블록문서> 블록목록 { get; set; } = [];
     public IReadOnlyList<커뮤니티원장참여자문서> 참여자목록 { get; set; } = [];
+    public IReadOnlyList<커뮤니티포함원장참조문서> 포함원장목록 { get; set; } = [];
     public 커뮤니티원장다이어그램문서? 다이어그램스냅샷 { get; set; }
     public Dictionary<string, string> 외부참조 { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, string> 확장속성 { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public List<커뮤니티원장상태이력문서> 상태이력 { get; set; } = [];
+    public long Revision { get; set; }
+    public long 투영완료Revision { get; set; }
+    public string 투영상태 { get; set; } = 커뮤니티원장투영상태.대기;
+    public string? 투영EventId { get; set; }
+    public string? 투영변경유형 { get; set; }
+    public string? 투영이전상태 { get; set; }
+    public string? 투영변경메모 { get; set; }
+    public DateTime? 투영발생시각Utc { get; set; }
+    public int 투영시도횟수 { get; set; }
+    public DateTime? 투영다음시도시각Utc { get; set; }
+    public string? 투영처리Token { get; set; }
+    public DateTime? 투영처리시작시각Utc { get; set; }
+    public DateTime? 투영완료시각Utc { get; set; }
+    public string? 투영마지막오류 { get; set; }
     public DateTime 생성시각Utc { get; set; }
     public DateTime 수정시각Utc { get; set; }
     public string 수정자 { get; set; } = "system";
@@ -552,8 +940,18 @@ public sealed class 커뮤니티원장참여자문서
     public string ParticipationState { get; set; } = "참여중";
 }
 
+public sealed class 커뮤니티포함원장참조문서
+{
+    public string 원장Id { get; set; } = string.Empty;
+    public string 원장템플릿Key { get; set; } = string.Empty;
+    public string 역할 { get; set; } = string.Empty;
+    public bool 필수여부 { get; set; }
+    public int 표시순서 { get; set; }
+}
+
 public sealed class 커뮤니티원장상태이력문서
 {
+    public string? EventId { get; set; }
     public string 상태 { get; set; } = string.Empty;
     public string? 이전상태 { get; set; }
     public string? 현재단계Key { get; set; }

@@ -29,6 +29,7 @@ public sealed class 커뮤니티원장업무투영동기화Service : I커뮤니�
 
     public async Task 갱신Async(커뮤니티원장Dto 원장, CancellationToken cancellationToken = default)
     {
+        var failures = new List<Exception>();
         foreach (var handler in _handlers)
         {
             var handlerName = handler.GetType().Name;
@@ -40,6 +41,7 @@ public sealed class 커뮤니티원장업무투영동기화Service : I커뮤니�
             catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
             {
                 _logger.LogError(ex, "커뮤니티 원장 업무 투영 대상 판정에 실패했습니다. Handler={Handler}, 원장Id={원장Id}", handlerName, 원장.원장Id);
+                failures.Add(ex);
                 continue;
             }
 
@@ -55,7 +57,13 @@ public sealed class 커뮤니티원장업무투영동기화Service : I커뮤니�
             catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
             {
                 _logger.LogError(ex, "커뮤니티 원장 업무 투영 동기화에 실패했습니다. Handler={Handler}, 원장Id={원장Id}", handlerName, 원장.원장Id);
+                failures.Add(ex);
             }
+        }
+
+        if (failures.Count > 0)
+        {
+            throw new AggregateException("커뮤니티 원장 업무 투영 중 하나 이상의 처리기가 실패했습니다.", failures);
         }
     }
 }

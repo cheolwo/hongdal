@@ -1,6 +1,7 @@
 using FluentResults;
 using Hongdal.ApiMetadata;
 using Hongdal.Application.Community;
+using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Domain.Community;
 using MediatR;
@@ -126,6 +127,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
     private readonly IGoogleCloudStorageService _storageService;
     private readonly CommunityPostStorageOptions _storageOptions;
     private readonly I커뮤니티게시글음성작업예약Service _음성작업예약Service;
+    private readonly I게시글원장ContextService _원장ContextService;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IPublisher _publisher;
     private readonly ILogger<커뮤니티게시글UseCase> _logger;
 
@@ -134,6 +137,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         IGoogleCloudStorageService storageService,
         IOptions<CommunityPostStorageOptions> storageOptions,
         I커뮤니티게시글음성작업예약Service 음성작업예약Service,
+        I게시글원장ContextService 원장ContextService,
+        ICurrentUserAccessor currentUserAccessor,
         IPublisher publisher,
         ILogger<커뮤니티게시글UseCase> logger)
     {
@@ -141,6 +146,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         _storageService = storageService;
         _storageOptions = storageOptions.Value;
         _음성작업예약Service = 음성작업예약Service;
+        _원장ContextService = 원장ContextService;
+        _currentUserAccessor = currentUserAccessor;
         _publisher = publisher;
         _logger = logger;
     }
@@ -211,6 +218,22 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>(validation);
         }
 
+        커뮤니티원장Dto? 연결원장 = null;
+        if (!string.IsNullOrWhiteSpace(request.커뮤니티원장Id))
+        {
+            var 원장결과 = await _원장ContextService.연결가능원장조회Async(
+                request.커뮤니티원장Id,
+                _currentUserAccessor.UserId,
+                request.WorkflowTag,
+                cancellationToken);
+            if (원장결과.IsFailed)
+            {
+                return Result.Fail<PlatformCommunityPostResponse>(원장결과.Errors);
+            }
+
+            연결원장 = 원장결과.Value;
+        }
+
         var now = DateTime.UtcNow;
         var normalizedCategory = Normalize(request.Category, "자유", 60);
         var isReportBoardPost = request.IsReportBoardPost || IsReportCategory(normalizedCategory);
@@ -224,6 +247,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Title = Normalize(request.Title, string.Empty, 160),
             Body = Normalize(request.Body, string.Empty, 4000),
             SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl),
+            커뮤니티원장Id = 연결원장?.원장Id,
             Nickname = normalizedNickname,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             IsReportBoardPost = isReportBoardPost,
@@ -253,7 +277,10 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
                 entity.Id);
         }
 
-        return Result.Ok(ToResponse(entity));
+        var 원장Context = 연결원장 is null
+            ? null
+            : await _원장ContextService.조회Async(연결원장.원장Id, _currentUserAccessor.UserId, cancellationToken);
+        return Result.Ok(ToResponse(entity, 원장Context));
     }
 
     public async Task<Result<PlatformCommunityPostResponse>> 상세Async(long id, CancellationToken cancellationToken)
@@ -262,9 +289,16 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
 
-        return entity is null
-            ? NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.")
-            : Result.Ok(ToResponse(entity));
+        if (entity is null)
+        {
+            return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
+        }
+
+        var 원장Context = await _원장ContextService.조회Async(
+            entity.커뮤니티원장Id,
+            _currentUserAccessor.UserId,
+            cancellationToken);
+        return Result.Ok(ToResponse(entity, 원장Context));
     }
 
     public async Task<Result<PlatformCommunityPostAttachmentResponse>> 첨부업로드Async(
@@ -366,12 +400,32 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return Forbidden<PlatformCommunityPostResponse>("게시글 비밀번호가 일치하지 않습니다.");
         }
 
+        커뮤니티원장Dto? 연결원장 = null;
+        if (!string.IsNullOrWhiteSpace(request.커뮤니티원장Id))
+        {
+            var 원장결과 = await _원장ContextService.연결가능원장조회Async(
+                request.커뮤니티원장Id,
+                _currentUserAccessor.UserId,
+                request.WorkflowTag,
+                cancellationToken);
+            if (원장결과.IsFailed)
+            {
+                return Result.Fail<PlatformCommunityPostResponse>(원장결과.Errors);
+            }
+
+            연결원장 = 원장결과.Value;
+        }
+
         entity.Category = Normalize(request.Category, "자유", 60);
         entity.WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60);
         entity.RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40);
         entity.Title = Normalize(request.Title, string.Empty, 160);
         entity.Body = Normalize(request.Body, string.Empty, 4000);
         entity.SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl);
+        if (request.커뮤니티원장Id is not null)
+        {
+            entity.커뮤니티원장Id = 연결원장?.원장Id;
+        }
         entity.Nickname = Normalize(request.Nickname, "익명", 40);
         entity.IsReportBoardPost = request.IsReportBoardPost || IsReportCategory(entity.Category);
         entity.ReporterDisplayName = entity.IsReportBoardPost
@@ -383,7 +437,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         entity.UpdatedAtUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(cancellationToken);
-        return Result.Ok(ToResponse(entity));
+        var 원장Context = await _원장ContextService.조회Async(
+            entity.커뮤니티원장Id,
+            _currentUserAccessor.UserId,
+            cancellationToken);
+        return Result.Ok(ToResponse(entity, 원장Context));
     }
 
     public async Task<Result<PlatformCommunityPostResponse>> 운영자고정Async(
@@ -868,7 +926,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             || category.Contains("report", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static PlatformCommunityPostResponse ToResponse(PlatformCommunityPost entity)
+    private static PlatformCommunityPostResponse ToResponse(
+        PlatformCommunityPost entity,
+        PlatformCommunityPostLedgerContextResponse? 원장Context = null)
     {
         var isReportBoardPost = entity.IsReportBoardPost || IsReportCategory(entity.Category);
         var reporterDisplayName = isReportBoardPost ? "신고자" : entity.Nickname;
@@ -884,6 +944,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Title = entity.Title,
             Body = entity.Body,
             SharedLinkUrl = entity.SharedLinkUrl,
+            커뮤니티원장Id = entity.커뮤니티원장Id,
+            원장Context = 원장Context,
             Nickname = isReportBoardPost ? reporterDisplayName : entity.Nickname,
             IsReportBoardPost = isReportBoardPost,
             ReporterDisplayName = reporterDisplayName,

@@ -10,6 +10,7 @@ public sealed class CommunityLedgerTemplateCatalogTests
         var keys = CommunityLedgerTemplateCatalog.All.Select(x => x.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         Assert.Contains(CommunityLedgerTemplateKeys.CargoTransport, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.Order, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.FoodOrder, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.FoodDelivery, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.HongdalMart, keys);
@@ -83,7 +84,9 @@ public sealed class CommunityLedgerTemplateCatalogTests
             Assert.NotEmpty(template.ParticipationPolicy.ExperiencePolicy.ExperienceEvents);
             Assert.Equal(CommunityLedgerPrimaryStoreKinds.MongoDocument, template.PersistencePolicy.PrimaryStoreKind);
             Assert.Equal("community_ledgers", template.PersistencePolicy.PrimaryStoreName);
-            Assert.NotEmpty(template.PersistencePolicy.RelationalProjectionTargets);
+            Assert.DoesNotContain(template.PersistencePolicy.RelationalProjectionTargets, target =>
+                target.TargetName.Contains("블록 관계", StringComparison.OrdinalIgnoreCase)
+                || target.EntityHint.Contains("CommunityLedgerBlockProjection", StringComparison.OrdinalIgnoreCase));
             Assert.False(string.IsNullOrWhiteSpace(template.BestLedgerPatternTitle));
             Assert.False(string.IsNullOrWhiteSpace(template.BestLedgerPatternSummary));
             Assert.NotEmpty(template.CommunityDiscussionPrompts);
@@ -125,7 +128,8 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(mart.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.MartOrderBeforePickingPacking));
 
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Quantity && block.UiSectionHint == "모집 수량");
+        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "개별 주문 원장");
+        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Quantity && block.UiSectionHint == "주문 수량 합계");
         Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Decision && block.UiSectionHint == "수입 결정");
         Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "해외 선적");
         Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "통관 상태");
@@ -140,9 +144,11 @@ public sealed class CommunityLedgerTemplateCatalogTests
     {
         var modules = CommunityLedgerTemplateCatalog.PriorityImplementationModules;
 
-        Assert.Equal(17, modules.Count);
+        Assert.Equal(18, modules.Count);
+        Assert.Equal(Enumerable.Range(1, 18), modules.Select(module => module.Priority));
         Assert.Equal("커뮤니티 대화 원장", modules[0].DisplayName);
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment);
+        Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot);
         Assert.Contains(modules, module => module.DisplayName == "마트 배송 원장");
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand);
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision);
@@ -153,6 +159,17 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(modules, module => module.ModuleCode == CommunityLedgerImplementationModuleCodes.WarehouseInbound);
 
         var relations = CommunityLedgerTemplateCatalog.LedgerRelations;
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.CargoTransport
+            && relation.RelationType == CommunityLedgerRelationTypes.Contains
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany);
+        Assert.Contains(relations, relation =>
+            relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand
+            && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.OrderRoot
+            && relation.RelationType == CommunityLedgerRelationTypes.Contains
+            && relation.Cardinality == CommunityLedgerRelationCardinality.OneToMany
+            && relation.Required);
         Assert.Contains(relations, relation =>
             relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.CommunityConversation
             && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.WishLedgerAssessment
@@ -339,7 +356,7 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(outbound.PersistencePolicy.RelationalProjectionTargets, target => target.LinkFieldHint.Contains("CommunityLedgerId", StringComparison.OrdinalIgnoreCase));
 
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
-        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동구매 수요");
+        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동주문 묶음");
         Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동구매 수입 결정");
         Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 운송 의뢰");
         Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 3PL 입고");
@@ -380,6 +397,8 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.DoesNotContain(CommunityLedgerTemplateKeys.WarehouseOutbound, martPickupRule.RequiredLedgerTemplateKeys);
 
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
+        var individualOrderRule = groupPurchase.CompositionRules.Single(rule =>
+            rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseRequiresIndividualOrders);
         var importDecisionRule = groupPurchase.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseDemandBeforeImportDecision);
         var shipmentRule = groupPurchase.CompositionRules.Single(rule =>
@@ -387,7 +406,10 @@ public sealed class CommunityLedgerTemplateCatalogTests
         var distributionRule = groupPurchase.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution);
 
-        Assert.Contains("모집 수량", importDecisionRule.RequiredUiSectionHints);
+        Assert.Equal("공동주문 묶음 원장", groupPurchase.DisplayName);
+        Assert.Contains(CommunityLedgerTemplateKeys.Order, individualOrderRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("개별 주문 원장", individualOrderRule.RequiredUiSectionHints);
+        Assert.Contains("주문 수량 합계", importDecisionRule.RequiredUiSectionHints);
         Assert.Contains("수입 진행 결정", importDecisionRule.GatedActionHints);
         Assert.Contains("수입 결정", shipmentRule.RequiredUiSectionHints);
         Assert.Contains("통관 상태 동기화", shipmentRule.GatedActionHints);

@@ -99,4 +99,23 @@ public sealed class DiagramCollaborationContractTests
         Assert.Equal("/shipper/inbound/requests?source=diagram-warehouse-proxy", request.TargetRoute);
         Assert.Equal("창고 물류 대행", request.WorkContext!.WorkLabel);
     }
+
+    [Fact]
+    public void Ledger_change_contract_uses_the_same_ledger_room_id()
+    {
+        var roomId = DiagramLedgerRoomIds.Build("ledger-101");
+        var response = new DiagramLedgerChangedResponse
+        {
+            LedgerId = "ledger-101",
+            Revision = 12,
+            State = "진행중",
+            CurrentStep = "상차지도착",
+            NodeId = "pickup",
+            ChangedAtUtc = DateTime.UtcNow
+        };
+
+        Assert.Equal("community:ledger:ledger-101:diagram", roomId);
+        Assert.Equal("pickup", response.NodeId);
+        Assert.Equal("ReceiveDiagramLedgerChanged", DiagramCollaborationClientMethods.ReceiveLedgerChanged);
+    }
 }

@@ -16,13 +16,16 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 {
     private readonly I커뮤니티게시글UseCase _useCase;
     private readonly I커뮤니티게시글음성조회Service _audioService;
+    private readonly I게시글원장ContextService _원장ContextService;
 
     public 커뮤니티게시글Controller(
         I커뮤니티게시글UseCase useCase,
-        I커뮤니티게시글음성조회Service audioService)
+        I커뮤니티게시글음성조회Service audioService,
+        I게시글원장ContextService 원장ContextService)
     {
         _useCase = useCase;
         _audioService = audioService;
+        _원장ContextService = 원장ContextService;
     }
 
     [HttpGet]
@@ -48,6 +51,39 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
         return result.IsSuccess
             ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
             : this.ToActionResult(result);
+    }
+
+    [HttpGet("my-ledgers")]
+    [Authorize]
+    public async Task<IActionResult> ListMyLedgers(
+        [FromQuery] string? workflowTag,
+        CancellationToken cancellationToken)
+        => Ok(await _원장ContextService.연결가능원장목록조회Async(
+            CurrentUserId(),
+            workflowTag,
+            cancellationToken));
+
+    [HttpGet("shared-ledgers")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ListSharedLedgers(
+        [FromQuery] string? workflowTag,
+        CancellationToken cancellationToken)
+        => Ok(await _원장ContextService.공유원장목록조회Async(
+            CurrentUserId(),
+            workflowTag,
+            cancellationToken));
+
+    [HttpGet("ledgers/{ledgerId}/context")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetLedgerContext(
+        string ledgerId,
+        CancellationToken cancellationToken)
+    {
+        var context = await _원장ContextService.조회Async(
+            ledgerId,
+            CurrentUserId(),
+            cancellationToken);
+        return context is null ? NotFound() : Ok(context);
     }
 
     [HttpGet("{id:long}")]

@@ -10,16 +10,24 @@ public sealed class DiagramCollaborationHub : Hub
     public const string HubPath = "/hubs/diagram-collaboration";
 
     private readonly I커뮤니티대화저장소 _대화저장소;
+    private readonly I커뮤니티원장저장소 _원장저장소;
+    private readonly I커뮤니티원장공유Service _원장공유Service;
 
-    public DiagramCollaborationHub(I커뮤니티대화저장소 대화저장소)
+    public DiagramCollaborationHub(
+        I커뮤니티대화저장소 대화저장소,
+        I커뮤니티원장저장소 원장저장소,
+        I커뮤니티원장공유Service 원장공유Service)
     {
         _대화저장소 = 대화저장소;
+        _원장저장소 = 원장저장소;
+        _원장공유Service = 원장공유Service;
     }
 
     public async Task JoinRoom(DiagramRoomJoinRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         var roomId = RequireRoomId(request.RoomId);
+        await EnsureLedgerRoomAccessAsync(request.LedgerId);
         var groupName = BuildRoomGroup(roomId);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
@@ -232,6 +240,28 @@ public sealed class DiagramCollaborationHub : Hub
         => Context.User?.Identity?.Name
            ?? Context.User?.FindFirstValue("name")
            ?? "익명 참여자";
+
+    private async Task EnsureLedgerRoomAccessAsync(string? ledgerId)
+    {
+        if (string.IsNullOrWhiteSpace(ledgerId))
+        {
+            return;
+        }
+
+        var ledger = await _원장저장소.원장조회Async(ledgerId.Trim(), Context.ConnectionAborted);
+        if (ledger is null)
+        {
+            throw new HubException("원장 정보를 찾을 수 없습니다.");
+        }
+
+        var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? Context.UserIdentifier;
+        var access = await _원장공유Service.접근판정Async(ledger, userId, Context.ConnectionAborted);
+        if (!access.직접접근가능 && !access.공개조회가능)
+        {
+            throw new HubException("이 원장 대화방에 접근할 권한이 없습니다.");
+        }
+    }
 
     private static string RequireRoomId(string? roomId)
     {

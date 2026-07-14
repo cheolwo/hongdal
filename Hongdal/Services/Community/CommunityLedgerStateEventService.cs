@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Hongdal.Contracts.Common.Education;
 using Hongdal.Domain.Community;
+using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 
 namespace Hongdal.Services.Community;
@@ -10,12 +11,16 @@ public interface I커뮤니티원장상태이벤트Service
     Task 저장이벤트기록Async(
         커뮤니티원장Dto 원장,
         string updatedBy,
+        string eventId,
+        DateTime occurredAtUtc,
         CancellationToken cancellationToken = default);
 
     Task 상태변경이벤트기록Async(
         커뮤니티원장상태변경요청 request,
         커뮤니티원장Dto 원장,
         string updatedBy,
+        string eventId,
+        DateTime occurredAtUtc,
         CancellationToken cancellationToken = default);
 }
 
@@ -33,6 +38,8 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
     public Task 저장이벤트기록Async(
         커뮤니티원장Dto 원장,
         string updatedBy,
+        string eventId,
+        DateTime occurredAtUtc,
         CancellationToken cancellationToken = default)
         => 기록Async(
             원장,
@@ -42,12 +49,16 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
             현재단계Key: 원장.현재단계Key,
             변경사유: "원장 저장",
             updatedBy,
+            eventId,
+            occurredAtUtc,
             cancellationToken);
 
     public Task 상태변경이벤트기록Async(
         커뮤니티원장상태변경요청 request,
         커뮤니티원장Dto 원장,
         string updatedBy,
+        string eventId,
+        DateTime occurredAtUtc,
         CancellationToken cancellationToken = default)
         => 기록Async(
             원장,
@@ -57,6 +68,8 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
             request.현재단계Key ?? 원장.현재단계Key,
             request.메모,
             updatedBy,
+            eventId,
+            occurredAtUtc,
             cancellationToken);
 
     private async Task 기록Async(
@@ -67,11 +80,25 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
         string? 현재단계Key,
         string? 변경사유,
         string updatedBy,
+        string eventId,
+        DateTime occurredAtUtc,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(원장.원장Id))
         {
             throw new InvalidOperationException("커뮤니티 원장 상태 이벤트에는 원장Id가 필요합니다.");
+        }
+        if (string.IsNullOrWhiteSpace(eventId))
+        {
+            throw new InvalidOperationException("커뮤니티 원장 상태 이벤트에는 EventId가 필요합니다.");
+        }
+
+        var normalizedEventId = eventId.Trim();
+        if (await _db.커뮤니티원장상태이벤트
+                .AsNoTracking()
+                .AnyAsync(x => x.EventId == normalizedEventId, cancellationToken))
+        {
+            return;
         }
 
         var now = DateTime.UtcNow;
@@ -79,7 +106,7 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
 
         _db.커뮤니티원장상태이벤트.Add(new 커뮤니티원장상태이벤트
         {
-            EventId = Guid.NewGuid().ToString("N"),
+            EventId = normalizedEventId,
             커뮤니티원장Id = Clean(원장.원장Id),
             커뮤니티Id = Clean(원장.커뮤니티Id),
             원장템플릿Key = Clean(원장.원장템플릿Key),
@@ -91,7 +118,7 @@ public sealed class 커뮤니티원장상태이벤트Service : I커뮤니티원�
             UpdatedBy = Clean(updatedBy),
             CorrelationId = CleanNullable(원장.외부참조.TryGetValue("CorrelationId", out var correlationId) ? correlationId : null),
             SnapshotJson = JsonSerializer.Serialize(snapshot, JsonOptions),
-            OccurredAtUtc = now,
+            OccurredAtUtc = occurredAtUtc == default ? now : occurredAtUtc,
             CreatedAtUtc = now
         });
 

@@ -71,7 +71,7 @@ public sealed class 이벤트발행커뮤니티원장저장소 : I커뮤니티�
         커뮤니티원장상태변경요청? 상태변경요청,
         CancellationToken cancellationToken)
     {
-        var eventId = Guid.NewGuid().ToString("N");
+        var eventId = 원장.투영EventId ?? Guid.NewGuid().ToString("N");
 
         try
         {
@@ -83,9 +83,10 @@ public sealed class 이벤트발행커뮤니티원장저장소 : I커뮤니티�
                     변경유형,
                     string.IsNullOrWhiteSpace(updatedBy) ? "system" : updatedBy.Trim(),
                     상태변경요청,
-                    DateTime.UtcNow,
+                    원장.수정시각Utc == default ? DateTime.UtcNow : 원장.수정시각Utc,
                     eventId),
                 cancellationToken);
+            await _inner.완료Async(원장.원장Id, 원장.Revision, processingToken: null, cancellationToken);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {

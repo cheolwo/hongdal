@@ -274,6 +274,25 @@ public sealed class DiagramWorkContextDto
     public IReadOnlyDictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 }
 
+public sealed class DiagramLedgerChangedResponse
+{
+    public string LedgerId { get; set; } = string.Empty;
+    public long Revision { get; set; }
+    public string State { get; set; } = string.Empty;
+    public string? CurrentStep { get; set; }
+    public string? NodeId { get; set; }
+    public DateTime ChangedAtUtc { get; set; }
+}
+
+public static class DiagramLedgerRoomIds
+{
+    public static string Build(string ledgerId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(ledgerId);
+        return $"community:ledger:{ledgerId.Trim()}:diagram";
+    }
+}
+
 public static class DiagramCollaborationClientMethods
 {
     public const string RoomJoined = "DiagramRoomJoined";
@@ -287,6 +306,8 @@ public static class DiagramCollaborationClientMethods
     public const string ReceiveSnapshot = "ReceiveDiagramSnapshot";
 
     public const string ReceiveWorkAction = "ReceiveDiagramWorkAction";
+
+    public const string ReceiveLedgerChanged = "ReceiveDiagramLedgerChanged";
 }
 
 public static class DiagramCollaborationMessageKinds

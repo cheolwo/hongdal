@@ -32,6 +32,8 @@ public sealed class 커뮤니티원장상태기록EventHandler : INotificationHa
                     notification.상태변경요청,
                     notification.원장,
                     notification.변경자,
+                    notification.EventId,
+                    notification.발생시각Utc,
                     cancellationToken);
                 return;
             }
@@ -39,6 +41,8 @@ public sealed class 커뮤니티원장상태기록EventHandler : INotificationHa
             await service.저장이벤트기록Async(
                 notification.원장,
                 notification.변경자,
+                notification.EventId,
+                notification.발생시각Utc,
                 cancellationToken);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
@@ -48,6 +52,7 @@ public sealed class 커뮤니티원장상태기록EventHandler : INotificationHa
                 "커뮤니티 원장 변경 상태 기록에 실패했습니다. EventId={EventId}, 원장Id={원장Id}",
                 notification.EventId,
                 notification.원장.원장Id);
+            throw;
         }
     }
 }

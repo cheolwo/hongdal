@@ -85,4 +85,63 @@ public sealed class CommunityLedgerStoreContractTests
         Assert.Equal(커뮤니티원장상태.진행중, request.상태);
         Assert.Equal("pickup", request.현재단계Key);
     }
+
+    [Fact]
+    public void Ledger_write_contract_exposes_optimistic_revision_and_projection_state()
+    {
+        var save = new 커뮤니티원장저장요청
+        {
+            원장Id = "ledger-1",
+            기대Revision = 4,
+            제목 = "운송 원장"
+        };
+        var stateChange = new 커뮤니티원장상태변경요청
+        {
+            원장Id = "ledger-1",
+            기대Revision = 5,
+            상태 = 커뮤니티원장상태.완료
+        };
+        var ledger = new 커뮤니티원장Dto
+        {
+            원장Id = "ledger-1",
+            Revision = 6,
+            투영완료Revision = 5,
+            투영상태 = 커뮤니티원장투영상태.재시도대기,
+            투영EventId = "event-6"
+        };
+
+        Assert.Equal(4, save.기대Revision);
+        Assert.Equal(5, stateChange.기대Revision);
+        Assert.True(ledger.Revision > ledger.투영완료Revision);
+        Assert.Equal(커뮤니티원장투영상태.재시도대기, ledger.투영상태);
+    }
+
+    [Fact]
+    public void Order_ledger_can_reference_independent_fulfillment_ledgers_without_copying_their_state()
+    {
+        var request = new 커뮤니티원장저장요청
+        {
+            원장Id = "order-ledger-1",
+            원장템플릿Key = CommunityLedgerTemplateKeys.Order,
+            제목 = "생활 주문 원장",
+            포함원장목록 =
+            [
+                new()
+                {
+                    원장Id = "transport-ledger-1",
+                    원장템플릿Key = CommunityLedgerTemplateKeys.CargoTransport,
+                    역할 = 주문원장포함역할.운송,
+                    필수여부 = true,
+                    표시순서 = 0
+                }
+            ]
+        };
+
+        var reference = Assert.Single(request.포함원장목록!);
+        Assert.Equal("transport-ledger-1", reference.원장Id);
+        Assert.Equal(주문원장포함역할.운송, reference.역할);
+        Assert.DoesNotContain(
+            typeof(커뮤니티포함원장참조Dto).GetProperties(),
+            property => property.Name.Contains("상태", StringComparison.Ordinal));
+    }
 }
