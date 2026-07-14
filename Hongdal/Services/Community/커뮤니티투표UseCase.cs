@@ -58,6 +58,11 @@ public interface I커뮤니티투표UseCase
     "파일업로드UseCase",
     Condition = "결의문 첨부, 서명 이미지, 증빙 파일이 함께 제출되는 경우",
     Summary = "투표와 결의문 흐름을 파일 업로드 증빙 흐름으로 확장합니다.")]
+[HongdalUseCaseRelation(
+    HongdalUseCaseRelationKind.Extend,
+    "공동구매자동집단화UseCase",
+    Condition = "투표 유형이 GroupPurchaseDemand인 경우",
+    Summary = "커뮤니티의 비구속 수요 투표를 상품과 배송권 기준 공동구매 자동 집단화 흐름으로 전달합니다.")]
 public sealed class 커뮤니티투표UseCase : I커뮤니티투표UseCase
 {
     private readonly ICommunityVoteService _voteService;

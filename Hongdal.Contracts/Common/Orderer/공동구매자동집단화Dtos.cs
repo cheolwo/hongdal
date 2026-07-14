@@ -2,6 +2,9 @@ namespace Hongdal.Contracts.Common.Orderer;
 
 public sealed class 공동구매자동수요등록Command
 {
+    public string 수요출처키 { get; set; } = string.Empty;
+    public long? 커뮤니티게시글Id { get; set; }
+    public string 커뮤니티원장Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
     public string HS코드 { get; set; } = string.Empty;
@@ -17,11 +20,16 @@ public sealed class 공동구매자동수요등록Command
     public string 수요유형 { get; set; } = 공동구매자동수요유형코드.관심표시;
     public string 결제상태 { get; set; } = 공동구매자동결제상태코드.미결제;
     public string 메모 { get; set; } = string.Empty;
+    public int? 목표참여자수 { get; set; }
+    public decimal? 목표수량 { get; set; }
 }
 
 public sealed class 공동구매자동수요응답
 {
     public string 수요Id { get; set; } = string.Empty;
+    public string 수요출처키 { get; set; } = string.Empty;
+    public long? 커뮤니티게시글Id { get; set; }
+    public string 커뮤니티원장Id { get; set; } = string.Empty;
     public string 자동집단Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
@@ -51,6 +59,8 @@ public sealed class 공동구매자동집단응답
     public decimal 총희망수량 { get; set; }
     public string 수량단위 { get; set; } = string.Empty;
     public decimal 예약결제합계 { get; set; }
+    public int? 목표참여자수 { get; set; }
+    public decimal? 목표수량 { get; set; }
     public DateTime 생성시각Utc { get; set; }
     public DateTime 수정시각Utc { get; set; }
     public IReadOnlyList<공동구매자동수요응답> 수요목록 { get; set; } = [];

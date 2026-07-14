@@ -27,6 +27,101 @@ public sealed class PlatformCommunityService
                ?? new PlatformCommunityPostListResponse();
     }
 
+    public async Task<PlatformCommunityPostResponse?> GetPostAsync(
+        long postId,
+        CancellationToken cancellationToken = default)
+        => await _httpClient.GetFromJsonAsync<PlatformCommunityPostResponse>(
+            $"api/v1/community/posts/{postId}",
+            cancellationToken);
+
+    public async Task<IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse>> GetMyLedgersAsync(
+        string? workflowTag = null,
+        CancellationToken cancellationToken = default)
+    {
+        var path = "api/v1/community/posts/my-ledgers";
+        if (!string.IsNullOrWhiteSpace(workflowTag))
+        {
+            path += $"?workflowTag={Uri.EscapeDataString(workflowTag)}";
+        }
+
+        using var response = await _protectedApiClient.GetAsync(path, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse>>(
+                   cancellationToken: cancellationToken)
+               ?? [];
+    }
+
+    public async Task<IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse>> GetSharedLedgersAsync(
+        string? workflowTag = null,
+        CancellationToken cancellationToken = default)
+    {
+        var path = "api/v1/community/posts/shared-ledgers";
+        if (!string.IsNullOrWhiteSpace(workflowTag))
+        {
+            path += $"?workflowTag={Uri.EscapeDataString(workflowTag)}";
+        }
+
+        using var response = await _protectedApiClient.GetAsync(path, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse>>(
+                   cancellationToken: cancellationToken)
+               ?? [];
+    }
+
+    public async Task<PlatformCommunityPostLedgerContextResponse?> GetLedgerContextAsync(
+        string ledgerId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.GetAsync(
+            $"api/v1/community/posts/ledgers/{Uri.EscapeDataString(ledgerId)}/context",
+            cancellationToken);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityPostLedgerContextResponse>(
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<커뮤니티원장공개설정Response?> GetLedgerSharingSettingsAsync(
+        string ledgerId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.GetAsync(
+            $"api/v1/community/ledgers/{Uri.EscapeDataString(ledgerId)}/sharing",
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<커뮤니티원장공개설정Response>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<커뮤니티원장공개설정Response?> UpdateLedgerSharingSettingsAsync(
+        string ledgerId,
+        커뮤니티원장공개설정변경Request request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PutAsProtectedJsonAsync(
+            $"api/v1/community/ledgers/{Uri.EscapeDataString(ledgerId)}/sharing",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<커뮤니티원장공개설정Response>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<커뮤니티원장재사용Response?> ReuseSharedLedgerAsync(
+        string ledgerId,
+        string? newTitle = null,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/ledgers/{Uri.EscapeDataString(ledgerId)}/sharing/reuse",
+            new 커뮤니티원장재사용Request { 새제목 = newTitle },
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<커뮤니티원장재사용Response>(cancellationToken: cancellationToken);
+    }
+
     public async Task<PlatformCommunityBoardListResponse> GetBoardsAsync(
         string appKey,
         string status = PlatformCommunityBoardRequestStatuses.Approved,
@@ -207,6 +302,110 @@ public sealed class PlatformCommunityService
     {
         using var response = await _httpClient.PostAsync($"api/v1/community/posts/attachments/comments/{commentId}/reports", null, cancellationToken);
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<CommunityVoteListResponse> GetGroupPurchaseVotesAsync(
+        string? communityScope = null,
+        CancellationToken cancellationToken = default)
+    {
+        var path = "api/v1/orderer/group-purchase-demand-votes";
+        if (!string.IsNullOrWhiteSpace(communityScope))
+        {
+            path += $"?communityScope={Uri.EscapeDataString(communityScope.Trim())}";
+        }
+
+        using var response = await _protectedApiClient.GetAsync(path, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteListResponse>(cancellationToken: cancellationToken)
+               ?? new CommunityVoteListResponse();
+    }
+
+    public async Task<CommunityVoteResponse?> GetGroupPurchaseVoteAsync(
+        Guid voteId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.GetAsync(
+            $"api/v1/orderer/group-purchase-demand-votes/{voteId}",
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<CommunityVoteResponse?> CreateGroupPurchaseVoteAsync(
+        CommunityVoteCreateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            "api/v1/orderer/group-purchase-demand-votes",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<CommunityVoteResponse?> CastGroupPurchaseVoteAsync(
+        Guid voteId,
+        CommunityVoteCastRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/orderer/group-purchase-demand-votes/{voteId}/votes",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<CommunityVoteResponse?> CloseVoteAsync(
+        Guid voteId,
+        CommunityVoteCloseRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/votes/{voteId}/close",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<CommunityVoteResolutionDocumentResponse?> CreateVoteResolutionAsync(
+        Guid voteId,
+        CommunityVoteResolutionDraftRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/votes/{voteId}/resolution-documents",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResolutionDocumentResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<CommunityVoteResolutionDocumentResponse?> MarkVoteResolutionReadyToSignAsync(
+        Guid voteId,
+        CommunityVoteResolutionReadyToSignRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/votes/{voteId}/resolution-documents/ready-to-sign",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResolutionDocumentResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<CommunityVoteResolutionDocumentResponse?> SignVoteResolutionAsync(
+        Guid voteId,
+        CommunityVoteResolutionSignRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            $"api/v1/community/votes/{voteId}/resolution-documents/signatures",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityVoteResolutionDocumentResponse>(cancellationToken: cancellationToken);
     }
 
     public async Task<PlatformCommunityPostAttachmentResponse?> UploadAttachmentAsync(

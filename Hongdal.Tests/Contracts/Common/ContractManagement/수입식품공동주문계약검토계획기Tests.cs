@@ -123,7 +123,7 @@ public sealed class 수입식품공동주문계약검토계획기Tests
             SignatureBundle = bundle
         };
 
-        var plan = 수입식품공동주문계약검토계획기.계획(draft);
+        var plan = 수입식품공동주문계약검토계획기.계획(draft, now.AddMinutes(1));
 
         Assert.Equal(수입식품공동주문계약상태코드.Signed, plan.제안상태);
         Assert.NotNull(plan.SignaturePlan);

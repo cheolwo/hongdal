@@ -45,6 +45,11 @@ public sealed class 커뮤니티투표Controller : ControllerBase
         [FromBody] CommunityVoteCreateRequest request,
         CancellationToken cancellationToken)
     {
+        if (request.VoteKind == CommunityVoteKindCodes.GroupPurchaseDemand)
+        {
+            return BadRequest("공동구매 수요 투표는 /api/v1/orderer/group-purchase-demand-votes API를 사용해야 합니다.");
+        }
+
         var result = await _useCase.생성Async(request, cancellationToken);
         return result.IsSuccess
             ? CreatedAtAction(nameof(Get), new { voteId = result.Value.Id }, result.Value)
@@ -58,6 +63,12 @@ public sealed class 커뮤니티투표Controller : ControllerBase
         [FromBody] CommunityVoteCastRequest request,
         CancellationToken cancellationToken)
     {
+        var existing = await _useCase.상세Async(voteId, cancellationToken);
+        if (existing.IsSuccess && existing.Value.VoteKind == CommunityVoteKindCodes.GroupPurchaseDemand)
+        {
+            return BadRequest("공동구매 수요 참여는 주문자 공동구매 투표 API를 사용해야 합니다.");
+        }
+
         var result = await _useCase.투표Async(voteId, request, cancellationToken);
         return this.ToActionResult(result);
     }

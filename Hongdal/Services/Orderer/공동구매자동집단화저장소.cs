@@ -49,19 +49,33 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         var 배송권키 = 정규화(command.배송권키, "unknown-scope", 160);
         var 온도코드 = 정규화(command.온도코드, "상온", 40);
         var 물류방식 = 정규화(command.물류방식, "LCL", 40);
+        var 수요출처키 = 정규화(
+            command.수요출처키,
+            $"orderer:{정규화(command.주문자키, "anonymous-orderer", 120)}",
+            200);
         var 자동집단Id = 공동구매자동집단화계획기.자동집단키생성(
             상품키,
             배송권키,
             온도코드,
             물류방식);
 
-        var 기존문서 = await _컬렉션
-            .Find(x => x.자동집단Id == 자동집단Id)
-            .FirstOrDefaultAsync(cancellationToken);
+        var 기존출처문서목록 = await _컬렉션
+            .Find(Builders<공동구매자동집단문서>.Filter.ElemMatch(
+                x => x.수요목록,
+                x => x.수요출처키 == 수요출처키))
+            .ToListAsync(cancellationToken);
+        var 기존문서 = 기존출처문서목록.FirstOrDefault(x => x.자동집단Id == 자동집단Id)
+            ?? await _컬렉션
+                .Find(x => x.자동집단Id == 자동집단Id)
+                .FirstOrDefaultAsync(cancellationToken);
+        var 기존수요 = 기존문서?.수요목록.FirstOrDefault(x => x.수요출처키 == 수요출처키);
 
         var 수요 = new 공동구매자동수요문서
         {
-            수요Id = ObjectId.GenerateNewId().ToString(),
+            수요Id = 기존수요?.수요Id ?? ObjectId.GenerateNewId().ToString(),
+            수요출처키 = 수요출처키,
+            커뮤니티게시글Id = command.커뮤니티게시글Id,
+            커뮤니티원장Id = 정규화(command.커뮤니티원장Id, string.Empty, 200),
             상품키 = 상품키,
             상품명 = 정규화(command.상품명, 상품키, 160),
             배송권키 = 배송권키,
@@ -74,6 +88,8 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             수량단위 = 정규화(command.수량단위, "kg", 20),
             예약결제금액 = command.예약결제금액,
             메모 = 정규화(command.메모, string.Empty, 1000),
+            목표참여자수 = 양수값(command.목표참여자수),
+            목표수량 = 양수값(command.목표수량),
             생성시각Utc = now
         };
 
@@ -92,14 +108,37 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             생성시각Utc = now
         };
 
+        문서.수요목록.RemoveAll(x => x.수요출처키 == 수요출처키);
         문서.수요목록.Add(수요);
         문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
         {
-            이벤트유형 = "DemandRegistered",
-            요약 = $"{수요.주문자표시명} 수요가 {수요.희망수량:N0}{수요.수량단위} 등록되었습니다.",
+            이벤트유형 = 기존수요 is null ? "DemandRegistered" : "DemandUpdated",
+            요약 = $"{수요.주문자표시명} 수요가 {수요.희망수량:N0}{수요.수량단위} {(기존수요 is null ? "등록" : "변경")}되었습니다.",
             발생시각Utc = now
         });
         재계산(문서, now);
+
+        foreach (var 이전문서 in 기존출처문서목록.Where(x => x.자동집단Id != 자동집단Id))
+        {
+            이전문서.수요목록.RemoveAll(x => x.수요출처키 == 수요출처키);
+            if (이전문서.수요목록.Count == 0)
+            {
+                await _컬렉션.DeleteOneAsync(x => x.자동집단Id == 이전문서.자동집단Id, cancellationToken);
+                continue;
+            }
+
+            이전문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
+            {
+                이벤트유형 = "DemandMoved",
+                요약 = "수요 참여자가 다른 상품 또는 수령 범위로 변경했습니다.",
+                발생시각Utc = now
+            });
+            재계산(이전문서, now);
+            await _컬렉션.ReplaceOneAsync(
+                x => x.자동집단Id == 이전문서.자동집단Id,
+                이전문서,
+                cancellationToken: cancellationToken);
+        }
 
         await _컬렉션.ReplaceOneAsync(
             x => x.자동집단Id == 문서.자동집단Id,
@@ -152,12 +191,22 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         문서.총희망수량 = 문서.수요목록.Sum(x => x.희망수량);
         문서.예약결제합계 = 문서.수요목록.Sum(x => Math.Max(0, x.예약결제금액 ?? 0));
         문서.수량단위 = 문서.수요목록.LastOrDefault()?.수량단위 ?? "kg";
+        문서.목표참여자수 = 문서.수요목록
+            .Where(x => x.목표참여자수 is > 0)
+            .Select(x => x.목표참여자수)
+            .Min();
+        문서.목표수량 = 문서.수요목록
+            .Where(x => x.목표수량 is > 0)
+            .Select(x => x.목표수량)
+            .Min();
 
         var 이전상태 = 문서.현재상태;
         문서.현재상태 = 공동구매자동집단화계획기.상태제안(
             문서.수요건수,
             문서.예약결제건수,
-            문서.총희망수량);
+            문서.총희망수량,
+            문서.목표참여자수,
+            문서.목표수량);
         if (이전상태 != 문서.현재상태)
         {
             문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
@@ -216,6 +265,11 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         {
             throw new InvalidOperationException("상품키, 상품명, 배송권키를 입력해야 합니다.");
         }
+
+        if (command.희망수량 <= 0)
+        {
+            throw new InvalidOperationException("희망수량은 0보다 커야 합니다.");
+        }
     }
 
     private static 공동구매자동집단응답 응답으로(공동구매자동집단문서 문서)
@@ -236,6 +290,8 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             총희망수량 = 문서.총희망수량,
             수량단위 = 문서.수량단위,
             예약결제합계 = 문서.예약결제합계,
+            목표참여자수 = 문서.목표참여자수,
+            목표수량 = 문서.목표수량,
             생성시각Utc = 문서.생성시각Utc,
             수정시각Utc = 문서.수정시각Utc,
             수요목록 = 문서.수요목록.OrderByDescending(x => x.생성시각Utc).Select(x => 응답으로(x, 문서.자동집단Id)).ToArray(),
@@ -248,6 +304,9 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         return new 공동구매자동수요응답
         {
             수요Id = 문서.수요Id,
+            수요출처키 = 문서.수요출처키,
+            커뮤니티게시글Id = 문서.커뮤니티게시글Id,
+            커뮤니티원장Id = 문서.커뮤니티원장Id,
             자동집단Id = 자동집단Id,
             상품키 = 문서.상품키,
             상품명 = 문서.상품명,
@@ -294,6 +353,10 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         var 정규화값 = string.IsNullOrWhiteSpace(값) ? 기본값 : 값.Trim();
         return 정규화값.Length <= 최대길이 ? 정규화값 : 정규화값[..최대길이];
     }
+
+    private static int? 양수값(int? 값) => 값 is > 0 ? 값 : null;
+
+    private static decimal? 양수값(decimal? 값) => 값 is > 0 ? 값 : null;
 }
 
 public sealed class 공동구매자동집단문서
@@ -314,6 +377,8 @@ public sealed class 공동구매자동집단문서
     public decimal 총희망수량 { get; set; }
     public string 수량단위 { get; set; } = "kg";
     public decimal 예약결제합계 { get; set; }
+    public int? 목표참여자수 { get; set; }
+    public decimal? 목표수량 { get; set; }
     public List<공동구매자동수요문서> 수요목록 { get; set; } = [];
     public List<공동구매자동집단이벤트문서> 이벤트목록 { get; set; } = [];
     public DateTime 생성시각Utc { get; set; }
@@ -323,6 +388,9 @@ public sealed class 공동구매자동집단문서
 public sealed class 공동구매자동수요문서
 {
     public string 수요Id { get; set; } = string.Empty;
+    public string 수요출처키 { get; set; } = string.Empty;
+    public long? 커뮤니티게시글Id { get; set; }
+    public string 커뮤니티원장Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
     public string 배송권키 { get; set; } = string.Empty;
@@ -335,6 +403,8 @@ public sealed class 공동구매자동수요문서
     public string 수량단위 { get; set; } = "kg";
     public decimal? 예약결제금액 { get; set; }
     public string 메모 { get; set; } = string.Empty;
+    public int? 목표참여자수 { get; set; }
+    public decimal? 목표수량 { get; set; }
     public DateTime 생성시각Utc { get; set; }
 }
 

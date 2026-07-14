@@ -13,7 +13,15 @@ public sealed class CommunityVoteCreateRequest
 
     public string Description { get; set; } = string.Empty;
 
+    public string VoteKind { get; set; } = CommunityVoteKindCodes.General;
+
+    public long? SourcePostId { get; set; }
+
+    public string? CommunityLedgerId { get; set; }
+
     public IReadOnlyList<string> Options { get; set; } = [];
+
+    public IReadOnlyList<CommunityVoteOptionCreateRequest> StructuredOptions { get; set; } = [];
 
     public bool AllowMultipleSelection { get; set; }
 
@@ -24,6 +32,23 @@ public sealed class CommunityVoteCreateRequest
     public DateTime? ClosesAtUtc { get; set; }
 
     public string CreatedByDisplayName { get; set; } = string.Empty;
+
+    public CommunityGroupPurchaseVoteSettingsRequest? GroupPurchase { get; set; }
+}
+
+public sealed class CommunityVoteOptionCreateRequest
+{
+    public string Text { get; set; } = string.Empty;
+
+    public string ProductKey { get; set; } = string.Empty;
+
+    public string HsCode { get; set; } = string.Empty;
+
+    public string TemperatureCode { get; set; } = string.Empty;
+
+    public string LogisticsMode { get; set; } = string.Empty;
+
+    public string QuantityUnit { get; set; } = string.Empty;
 }
 
 public sealed class CommunityVoteCastRequest
@@ -37,6 +62,70 @@ public sealed class CommunityVoteCastRequest
     public string VoterKey { get; set; } = string.Empty;
 
     public IReadOnlyList<string> OptionIds { get; set; } = [];
+
+    public int RequestedQuantity { get; set; } = 1;
+
+    public string ParticipationMethodCode { get; set; } = string.Empty;
+
+    public string? CommunityMembershipReference { get; set; }
+
+    public string? ServiceAreaReference { get; set; }
+
+    public string? PickupPointId { get; set; }
+
+    public bool AllowNearbyPickupPointFallback { get; set; }
+}
+
+public sealed class CommunityGroupPurchaseVoteSettingsRequest
+{
+    public string ParticipationPolicyCode { get; set; } = CommunityVoteParticipationPolicyCodes.Hybrid;
+
+    public string HsCode { get; set; } = string.Empty;
+
+    public string TemperatureCode { get; set; } = "상온";
+
+    public string LogisticsMode { get; set; } = "LCL";
+
+    public string QuantityUnit { get; set; } = "개";
+
+    public string ServiceAreaKey { get; set; } = string.Empty;
+
+    public string ServiceAreaLabel { get; set; } = string.Empty;
+
+    public int? RadiusMeters { get; set; }
+
+    public int MinimumParticipantCount { get; set; } = 1;
+
+    public int MinimumTotalQuantity { get; set; } = 1;
+
+    public IReadOnlyList<CommunityVotePickupPointRequest> PickupPoints { get; set; } = [];
+}
+
+public sealed class CommunityVotePickupPointRequest
+{
+    public string PickupPointId { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public string AddressSummary { get; set; } = string.Empty;
+
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
+
+    public string StorageTypeCode { get; set; } = CommunityVotePickupStorageTypeCodes.Ambient;
+
+    public DateTime? PickupStartsAtUtc { get; set; }
+
+    public DateTime? PickupEndsAtUtc { get; set; }
+
+    public int? CapacityQuantity { get; set; }
+
+    public int? MinimumParticipantCount { get; set; }
+
+    public int? MinimumTotalQuantity { get; set; }
+
+    public decimal PickupFee { get; set; }
 }
 
 public sealed class CommunityVoteCloseRequest
@@ -108,6 +197,12 @@ public sealed class CommunityVoteResponse
 
     public string Description { get; set; } = string.Empty;
 
+    public string VoteKind { get; set; } = CommunityVoteKindCodes.General;
+
+    public long? SourcePostId { get; set; }
+
+    public string? CommunityLedgerId { get; set; }
+
     public string Status { get; set; } = CommunityVoteStatusCodes.Open;
 
     public bool AllowMultipleSelection { get; set; }
@@ -128,6 +223,8 @@ public sealed class CommunityVoteResponse
 
     public IReadOnlyList<CommunityVoteOptionResponse> Options { get; set; } = [];
 
+    public CommunityGroupPurchaseVoteResponse? GroupPurchase { get; set; }
+
     public CommunityVoteResolutionDocumentResponse? ResolutionDocument { get; set; }
 }
 
@@ -137,9 +234,93 @@ public sealed class CommunityVoteOptionResponse
 
     public string Text { get; set; } = string.Empty;
 
+    public string ProductKey { get; set; } = string.Empty;
+
+    public string HsCode { get; set; } = string.Empty;
+
+    public string TemperatureCode { get; set; } = string.Empty;
+
+    public string LogisticsMode { get; set; } = string.Empty;
+
+    public string QuantityUnit { get; set; } = string.Empty;
+
     public int VoteCount { get; set; }
 
+    public int RequestedQuantity { get; set; }
+
     public bool IsWinningOption { get; set; }
+}
+
+public sealed class CommunityGroupPurchaseVoteResponse
+{
+    public string ParticipationPolicyCode { get; set; } = string.Empty;
+
+    public string HsCode { get; set; } = string.Empty;
+
+    public string TemperatureCode { get; set; } = string.Empty;
+
+    public string LogisticsMode { get; set; } = string.Empty;
+
+    public string QuantityUnit { get; set; } = string.Empty;
+
+    public string ServiceAreaKey { get; set; } = string.Empty;
+
+    public string ServiceAreaLabel { get; set; } = string.Empty;
+
+    public int? RadiusMeters { get; set; }
+
+    public int MinimumParticipantCount { get; set; }
+
+    public int MinimumTotalQuantity { get; set; }
+
+    public int TotalRequestedQuantity { get; set; }
+
+    public int UnassignedPickupParticipantCount { get; set; }
+
+    public int UnassignedPickupQuantity { get; set; }
+
+    public int DemandHandoffPendingCount { get; set; }
+
+    public int DemandHandoffFailedCount { get; set; }
+
+    public bool IsMinimumReached { get; set; }
+
+    public IReadOnlyList<CommunityVotePickupPointResponse> PickupPoints { get; set; } = [];
+}
+
+public sealed class CommunityVotePickupPointResponse
+{
+    public string PickupPointId { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public string AddressSummary { get; set; } = string.Empty;
+
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
+
+    public string StorageTypeCode { get; set; } = string.Empty;
+
+    public DateTime? PickupStartsAtUtc { get; set; }
+
+    public DateTime? PickupEndsAtUtc { get; set; }
+
+    public int? CapacityQuantity { get; set; }
+
+    public int? MinimumParticipantCount { get; set; }
+
+    public int? MinimumTotalQuantity { get; set; }
+
+    public decimal PickupFee { get; set; }
+
+    public int ParticipantCount { get; set; }
+
+    public int RequestedQuantity { get; set; }
+
+    public bool IsMinimumReached { get; set; }
+
+    public bool IsCapacityReached { get; set; }
 }
 
 public sealed class CommunityVoteResolutionDocumentResponse
@@ -172,6 +353,42 @@ public static class CommunityVoteStatusCodes
     public const string Closed = "Closed";
 
     public const string ResolutionDrafted = "ResolutionDrafted";
+}
+
+public static class CommunityVoteKindCodes
+{
+    public const string General = "General";
+
+    public const string GroupPurchaseDemand = "GroupPurchaseDemand";
+}
+
+public static class CommunityVoteParticipationPolicyCodes
+{
+    public const string CommunityOnly = "CommunityOnly";
+
+    public const string ServiceAreaOnly = "ServiceAreaOnly";
+
+    public const string PickupPoint = "PickupPoint";
+
+    public const string Hybrid = "Hybrid";
+}
+
+public static class CommunityVoteParticipationMethodCodes
+{
+    public const string CommunityMember = "CommunityMember";
+
+    public const string ServiceArea = "ServiceArea";
+
+    public const string PickupPoint = "PickupPoint";
+}
+
+public static class CommunityVotePickupStorageTypeCodes
+{
+    public const string Ambient = "Ambient";
+
+    public const string Refrigerated = "Refrigerated";
+
+    public const string Frozen = "Frozen";
 }
 
 public static class CommunityVoteResolutionStatusCodes

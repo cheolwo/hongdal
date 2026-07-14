@@ -18,8 +18,21 @@ public static class 공동구매자동집단화계획기
     }
 
     public static string 상태제안(int 수요건수, int 예약결제건수, decimal 총희망수량)
+        => 상태제안(수요건수, 예약결제건수, 총희망수량, null, null);
+
+    public static string 상태제안(
+        int 수요건수,
+        int 예약결제건수,
+        decimal 총희망수량,
+        int? 목표참여자수,
+        decimal? 목표수량)
     {
-        if (예약결제건수 >= 2 || 수요건수 >= 5 || 총희망수량 >= 30)
+        var 참여자목표충족 = !목표참여자수.HasValue || 수요건수 >= 목표참여자수.Value;
+        var 수량목표충족 = !목표수량.HasValue || 총희망수량 >= 목표수량.Value;
+        var 명시목표존재 = 목표참여자수.HasValue || 목표수량.HasValue;
+        var 명시목표충족 = 명시목표존재 && 참여자목표충족 && 수량목표충족;
+
+        if (예약결제건수 >= 2 || 명시목표충족 || !명시목표존재 && (수요건수 >= 5 || 총희망수량 >= 30))
         {
             return 공동구매자동집단상태코드.확정대기;
         }

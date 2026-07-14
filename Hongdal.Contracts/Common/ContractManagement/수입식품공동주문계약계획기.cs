@@ -117,6 +117,11 @@ public sealed record 수입식품공동주문계약검토계획(
 public static class 수입식품공동주문계약검토계획기
 {
     public static 수입식품공동주문계약검토계획 계획(수입식품공동주문계약초안 draft)
+        => 계획(draft, DateTimeOffset.UtcNow);
+
+    public static 수입식품공동주문계약검토계획 계획(
+        수입식품공동주문계약초안 draft,
+        DateTimeOffset 평가시각Utc)
     {
         Validate(draft);
 
@@ -126,7 +131,7 @@ public static class 수입식품공동주문계약검토계획기
         var privacyAndContractReadiness = BuildPrivacyAndContractReadiness(draft, missingItems);
         var signaturePlan = draft.SignatureBundle is null
             ? null
-            : ContractElectronicSignaturePlanner.Plan(draft.SignatureBundle, DateTimeOffset.UtcNow);
+            : ContractElectronicSignaturePlanner.Plan(draft.SignatureBundle, 평가시각Utc);
         var canProceedToReview = isFoodHS코드 &&
             HasRole(draft, 수입식품공동주문계약역할코드.ApplicantOrderer) &&
             HasRole(draft, 수입식품공동주문계약역할코드.PlatformOperator) &&
