@@ -71,12 +71,6 @@ namespace Hongdal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_피킹포장작업", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_피킹포장작업_출고묶음_출고묶음_id",
-                        column: x => x.출고묶음_id,
-                        principalTable: "출고묶음",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 

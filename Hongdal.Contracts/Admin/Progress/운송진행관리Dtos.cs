@@ -46,7 +46,7 @@ public sealed class 운송원장이벤트응답
     public string Mongo원장대상OsCode { get; set; } = string.Empty;
     public DateTime? Mongo원장UpdatedAtUtc { get; set; }
     public int Mongo원장블록수 { get; set; }
-    public int Rdb블록투영수 { get; set; }
+    public bool Rdb운송실행투영존재 { get; set; }
     public string 원장동기화메시지 { get; set; } = string.Empty;
     public DateTime 마지막변경시각 { get; set; }
     public IReadOnlyList<운송원장이벤트항목응답> 이벤트목록 { get; set; } = [];

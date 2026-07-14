@@ -252,6 +252,14 @@ namespace Hongdal.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.AddForeignKey(
+                name: "FK_피킹포장작업_출고묶음_출고묶음_id",
+                table: "피킹포장작업",
+                column: "출고묶음_id",
+                principalTable: "출고묶음",
+                principalColumn: "id",
+                onDelete: ReferentialAction.SetNull);
+
             migrationBuilder.CreateIndex(
                 name: "IX_출고예정_출고묶음_id",
                 table: "출고예정",
@@ -404,6 +412,10 @@ namespace Hongdal.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_피킹포장작업_출고묶음_출고묶음_id",
+                table: "피킹포장작업");
+
             migrationBuilder.DropTable(
                 name: "출고묶음");
 

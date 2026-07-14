@@ -88,7 +88,7 @@ public sealed class 운송원장이벤트조회QueryHandler : IRequestHandler<�
             Mongo원장대상OsCode = 동기화상태.대상OsCode ?? string.Empty,
             Mongo원장UpdatedAtUtc = 동기화상태.Mongo원장UpdatedAtUtc,
             Mongo원장블록수 = 동기화상태.Mongo원장블록수,
-            Rdb블록투영수 = 동기화상태.Rdb블록투영수,
+            Rdb운송실행투영존재 = 동기화상태.Rdb운송실행투영존재,
             원장동기화메시지 = 동기화상태.메시지,
             마지막변경시각 = ResolveLatestChangedAt(shipperRequest, transport, events),
             이벤트목록 = events

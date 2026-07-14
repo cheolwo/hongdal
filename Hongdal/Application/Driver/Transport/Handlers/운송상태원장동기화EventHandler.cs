@@ -16,17 +16,20 @@ public sealed class 운송상태원장동기화EventHandler :
     private readonly HongdalContext _db;
     private readonly I운송원장Mongo동기화Service _원장동기화Service;
     private readonly I음식마트원장Mongo동기화Service _음식마트원장동기화Service;
+    private readonly I원장다이어그램실시간알림Service _실시간알림Service;
     private readonly ILogger<운송상태원장동기화EventHandler> _logger;
 
     public 운송상태원장동기화EventHandler(
         HongdalContext db,
         I운송원장Mongo동기화Service 원장동기화Service,
         I음식마트원장Mongo동기화Service 음식마트원장동기화Service,
+        I원장다이어그램실시간알림Service 실시간알림Service,
         ILogger<운송상태원장동기화EventHandler> logger)
     {
         _db = db;
         _원장동기화Service = 원장동기화Service;
         _음식마트원장동기화Service = 음식마트원장동기화Service;
+        _실시간알림Service = 실시간알림Service;
         _logger = logger;
     }
 
@@ -65,10 +68,18 @@ public sealed class 운송상태원장동기화EventHandler :
                 return;
             }
 
-            await _원장동기화Service.운송실행투영동기화Async(
+            var 원장 = await _원장동기화Service.운송실행투영동기화Async(
                 운송실행투영,
                 string.IsNullOrWhiteSpace(변경자) ? "system" : 변경자,
                 cancellationToken);
+
+            if (원장 is not null)
+            {
+                await _실시간알림Service.변경알림Async(
+                    원장,
+                    Resolve변경블록Id(원장.현재단계Key),
+                    cancellationToken);
+            }
 
             await 관련출고원장동기화Async(
                 운송실행투영,
@@ -141,4 +152,21 @@ public sealed class 운송상태원장동기화EventHandler :
 
     private static string? Clean(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static string? Resolve변경블록Id(string? 현재단계)
+    {
+        var state = Clean(현재단계);
+        if (state?.Contains("상차", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return "pickup";
+        }
+
+        if (state?.Contains("하차", StringComparison.OrdinalIgnoreCase) == true
+            || state?.Contains("인수완료", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return "dropoff";
+        }
+
+        return null;
+    }
 }
