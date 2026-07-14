@@ -1,10 +1,10 @@
-using DriverApp.Models.Auth;
+using Hongdal.Client.Infrastructure.Security;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace DriverApp.Services;
 
-public interface IAuthSession
+public interface IAuthSession : IHongdalAccessTokenProvider
 {
-    string? AccessToken { get; }
     string? RefreshToken { get; }
     string? UserId { get; }
     string? UserName { get; }
@@ -12,6 +12,6 @@ public interface IAuthSession
     bool IsAuthenticated { get; }
     event Action? Changed;
     Task RestoreAsync(CancellationToken cancellationToken = default);
-    Task ApplyAsync(DriverApp.Models.Auth.TokenResponse tokenResponse, CancellationToken cancellationToken = default);
+    Task ApplyAsync(ClientAuthTokenSnapshot snapshot, CancellationToken cancellationToken = default);
     Task ClearAsync(CancellationToken cancellationToken = default);
 }

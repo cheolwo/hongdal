@@ -23,12 +23,11 @@ public static class MauiProgram
 			});
 
 		builder.Services.AddShipperAppServices(builder.Configuration);
-		builder.Services.AddHongdalUiCommonAppServices();
+		builder.Services.AddHongdalUiCommonAppServices<IAuthSession>();
 		builder.Services.AddHongdalDocumentOutputServices();
-		builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7117/") });
-		builder.Services.AddScoped<PlatformCommunityService>();
-		builder.Services.AddScoped<PlatformHomeModeStateService>();
-		builder.Services.AddScoped<PlatformDiagramPaletteStateService>();
+		builder.Services.AddHongdalApiHttpClient(HongdalApiEndpoint.ResolveBaseAddress(
+			builder.Configuration[HongdalApiEndpoint.ConfigurationKey],
+			new Uri(HongdalApiEndpoint.LocalDevelopmentBaseAddress)));
 		builder.Services.AddMudServices();
 		builder.Services.AddMauiBlazorWebView();
 

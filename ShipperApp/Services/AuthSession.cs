@@ -1,4 +1,3 @@
-using Hongdal.Contracts.Common;
 using Hongdal.Client.Infrastructure.Security;
 
 namespace ShipperApp.Services;
@@ -41,16 +40,9 @@ public sealed class AuthSession : IAuthSession
         ApplySnapshot(snapshot!);
     }
 
-    public async Task ApplyAsync(토큰응답 tokenResponse, CancellationToken cancellationToken = default)
+    public async Task ApplyAsync(ClientAuthTokenSnapshot snapshot, CancellationToken cancellationToken = default)
     {
-        var snapshot = new ClientAuthTokenSnapshot(
-            tokenResponse.AccessToken,
-            tokenResponse.AccessTokenExpiresAtUtc,
-            tokenResponse.RefreshToken,
-            tokenResponse.RefreshTokenExpiresAtUtc,
-            tokenResponse.UserId,
-            tokenResponse.UserName,
-            tokenResponse.Roles);
+        ArgumentNullException.ThrowIfNull(snapshot);
 
         ApplySnapshot(snapshot);
         await _tokenStore.SaveAsync(snapshot, cancellationToken);

@@ -99,18 +99,7 @@ public sealed class 음식점주문SignalRClientService(IOptions<RestaurantDeskO
     }
 
     private Uri BuildHubUri()
-    {
-        var baseUrl = string.IsNullOrWhiteSpace(options.Value.ServerBaseUrl)
-            ? "https://localhost:7117/"
-            : options.Value.ServerBaseUrl.Trim();
-
-        if (!baseUrl.EndsWith('/'))
-        {
-            baseUrl += "/";
-        }
-
-        return new Uri(new Uri(baseUrl), "hubs/restaurant-orders");
-    }
+        => new(options.Value.GetServerBaseAddress(), "hubs/restaurant-orders");
 
     private async Task Publish주문수신Async(음식점주문수신알림 notification)
     {

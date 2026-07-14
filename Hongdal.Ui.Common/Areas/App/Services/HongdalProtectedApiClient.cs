@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using Hongdal.Contracts.Common.Privacy;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
@@ -9,14 +10,37 @@ public sealed class HongdalProtectedApiClient
 
     private readonly HttpClient httpClient;
     private readonly HongdalIsmsPClientEncryptionService encryptionService;
+    private readonly IHongdalAccessTokenProvider accessTokenProvider;
     private IsmsPClientEncryptionPublicKeyResponse? cachedPublicKey;
 
     public HongdalProtectedApiClient(
         HttpClient httpClient,
-        HongdalIsmsPClientEncryptionService encryptionService)
+        HongdalIsmsPClientEncryptionService encryptionService,
+        IHongdalAccessTokenProvider accessTokenProvider)
     {
         this.httpClient = httpClient;
         this.encryptionService = encryptionService;
+        this.accessTokenProvider = accessTokenProvider;
+    }
+
+    public async Task<HttpResponseMessage> GetAsync(
+        string requestUri,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestUri);
+        using var message = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        ApplyAuthorization(message);
+        return await httpClient.SendAsync(message, cancellationToken);
+    }
+
+    public async Task<HttpResponseMessage> DeleteAsync(
+        string requestUri,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestUri);
+        using var message = new HttpRequestMessage(HttpMethod.Delete, requestUri);
+        ApplyAuthorization(message);
+        return await httpClient.SendAsync(message, cancellationToken);
     }
 
     public async Task<HttpResponseMessage> PostAsProtectedJsonAsync<TRequest>(
@@ -41,6 +65,22 @@ public sealed class HongdalProtectedApiClient
         CancellationToken cancellationToken = default)
         => await SendAsProtectedJsonAsync(HttpMethod.Put, requestUri, request, cancellationToken);
 
+    public async Task<HttpResponseMessage> PostAsync(
+        string requestUri,
+        HttpContent content,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestUri);
+        ArgumentNullException.ThrowIfNull(content);
+
+        using var message = new HttpRequestMessage(HttpMethod.Post, requestUri)
+        {
+            Content = content
+        };
+        ApplyAuthorization(message);
+        return await httpClient.SendAsync(message, cancellationToken);
+    }
+
     public async Task<TResponse?> PutAsProtectedJsonAsync<TRequest, TResponse>(
         string requestUri,
         TRequest request,
@@ -61,8 +101,18 @@ public sealed class HongdalProtectedApiClient
         ArgumentException.ThrowIfNullOrWhiteSpace(requestUri);
 
         using var message = new HttpRequestMessage(method, requestUri);
+        ApplyAuthorization(message);
         message.Content = await CreateProtectedJsonContentAsync(requestUri, request, cancellationToken);
         return await httpClient.SendAsync(message, cancellationToken);
+    }
+
+    private void ApplyAuthorization(HttpRequestMessage message)
+    {
+        var token = accessTokenProvider.AccessToken?.Trim();
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
     }
 
     public async Task<JsonContent> CreateProtectedJsonContentAsync<TRequest>(

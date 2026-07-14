@@ -1,3 +1,5 @@
+using Hongdal.Ui.Common.Areas.App.Services;
+
 namespace RestaurantDeskApp.Options;
 
 public sealed class RestaurantDeskOptions
@@ -6,5 +8,10 @@ public sealed class RestaurantDeskOptions
 
     public long RestaurantId { get; set; } = 101;
 
-    public string ServerBaseUrl { get; set; } = "https://localhost:7117/";
+    public string ServerBaseUrl { get; set; } = HongdalApiEndpoint.LocalDevelopmentBaseAddress;
+
+    public Uri GetServerBaseAddress()
+        => HongdalApiEndpoint.ResolveBaseAddress(
+            ServerBaseUrl,
+            new Uri(HongdalApiEndpoint.LocalDevelopmentBaseAddress));
 }

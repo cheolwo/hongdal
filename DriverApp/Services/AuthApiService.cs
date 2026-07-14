@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using DriverApp.Models.Auth;
+using Hongdal.Client.Infrastructure.Security;
 using Hongdal.Contracts.Common;
 
 namespace DriverApp.Services;
@@ -42,16 +42,7 @@ public sealed class AuthApiService
             return (false, "서버 로그인 응답을 읽을 수 없습니다.");
         }
 
-        await _authSession.ApplyAsync(new TokenResponse
-        {
-            AccessToken = token.AccessToken,
-            AccessTokenExpiresAtUtc = token.AccessTokenExpiresAtUtc,
-            RefreshToken = token.RefreshToken,
-            RefreshTokenExpiresAtUtc = token.RefreshTokenExpiresAtUtc,
-            UserId = token.UserId,
-            UserName = token.UserName,
-            Roles = token.Roles
-        }, cancellationToken);
+        await _authSession.ApplyAsync(token.ToClientAuthTokenSnapshot(), cancellationToken);
 
         return (true, string.Empty);
     }

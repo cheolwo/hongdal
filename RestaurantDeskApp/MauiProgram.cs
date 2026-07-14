@@ -22,26 +22,19 @@ public static class MauiProgram
         builder.Services.AddSingleton<I음식점주문SignalRClientService, 음식점주문SignalRClientService>();
         builder.Services.AddHongdalUiCommonAppServices();
         builder.Services.AddHongdalDocumentOutputServices();
-        builder.Services.AddHttpClient<I음식주문ApiClient, Hongdal음식주문Client>();
+        builder.Services.AddHttpClient<I음식주문ApiClient, Hongdal음식주문Client>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<IOptions<RestaurantDeskOptions>>().Value;
+            client.BaseAddress = options.GetServerBaseAddress();
+        });
         builder.Services.AddSingleton<음식점전표DraftFactory>();
         builder.Services.AddSingleton<I음식점주문DeskService, 음식점주문DeskService>();
         builder.Services.AddScoped<배차주소ApiService>();
-        builder.Services.AddScoped(sp =>
+        builder.Services.AddHongdalApiHttpClient(sp =>
         {
             var options = sp.GetRequiredService<IOptions<RestaurantDeskOptions>>().Value;
-            var baseUrl = string.IsNullOrWhiteSpace(options.ServerBaseUrl)
-                ? "https://localhost:7117/"
-                : options.ServerBaseUrl.Trim();
-
-            if (!baseUrl.EndsWith('/'))
-            {
-                baseUrl += "/";
-            }
-
-            return new HttpClient { BaseAddress = new Uri(baseUrl) };
+            return options.GetServerBaseAddress();
         });
-        builder.Services.AddScoped<PlatformCommunityService>();
-        builder.Services.AddScoped<PlatformHomeModeStateService>();
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
 

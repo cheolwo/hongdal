@@ -1,24 +1,31 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Hongdal.Client.Infrastructure.Security;
 using Hongdal.Contracts.Common;
 using Microsoft.JSInterop;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.WebApp.Services;
 
-public sealed class WebAuthSessionService
+public sealed class WebAuthSessionService : IHongdalAccessTokenProvider
 {
     private const string StorageKey = "hongdal.web.auth.v1";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _jsRuntime;
+    private readonly IClientSessionGuard _sessionGuard;
 
-    private WebAuthSessionSnapshot? _snapshot;
+    private ClientAuthTokenSnapshot? _snapshot;
 
-    public WebAuthSessionService(HttpClient httpClient, IJSRuntime jsRuntime)
+    public WebAuthSessionService(
+        HttpClient httpClient,
+        IJSRuntime jsRuntime,
+        IClientSessionGuard sessionGuard)
     {
         _httpClient = httpClient;
         _jsRuntime = jsRuntime;
+        _sessionGuard = sessionGuard;
     }
 
     public string? AccessToken => _snapshot?.AccessToken;
@@ -27,7 +34,7 @@ public sealed class WebAuthSessionService
     public IReadOnlyList<string> Roles => _snapshot?.Roles ?? [];
     public string PrimaryRole => WebRoleThemeResolver.ResolvePrimaryRole(Roles);
     public WebRoleTheme CurrentTheme => WebRoleThemeResolver.Resolve(Roles);
-    public bool IsLoggedIn => IsAccessTokenUsable(_snapshot);
+    public bool IsLoggedIn => _sessionGuard.IsAccessTokenUsable(_snapshot, DateTime.UtcNow);
     public event Action? Changed;
 
     public async Task RestoreAsync(CancellationToken cancellationToken = default)
@@ -42,8 +49,8 @@ public sealed class WebAuthSessionService
 
         try
         {
-            _snapshot = JsonSerializer.Deserialize<WebAuthSessionSnapshot>(json, JsonOptions);
-            if (!IsAccessTokenUsable(_snapshot))
+            _snapshot = JsonSerializer.Deserialize<ClientAuthTokenSnapshot>(json, JsonOptions);
+            if (!_sessionGuard.IsAccessTokenUsable(_snapshot, DateTime.UtcNow))
             {
                 _snapshot = null;
             }
@@ -86,16 +93,7 @@ public sealed class WebAuthSessionService
             throw new InvalidOperationException("서버 로그인 응답에서 토큰을 읽을 수 없습니다.");
         }
 
-        _snapshot = new WebAuthSessionSnapshot
-        {
-            AccessToken = token.AccessToken,
-            AccessTokenExpiresAtUtc = token.AccessTokenExpiresAtUtc,
-            RefreshToken = token.RefreshToken,
-            RefreshTokenExpiresAtUtc = token.RefreshTokenExpiresAtUtc,
-            UserId = token.UserId,
-            UserName = token.UserName,
-            Roles = token.Roles
-        };
+        _snapshot = token.ToClientAuthTokenSnapshot();
 
         await SaveSnapshotAsync(cancellationToken);
         NotifyChanged();
@@ -114,24 +112,8 @@ public sealed class WebAuthSessionService
         await _jsRuntime.InvokeVoidAsync("localStorage.setItem", cancellationToken, StorageKey, json);
     }
 
-    private static bool IsAccessTokenUsable(WebAuthSessionSnapshot? snapshot)
-        => snapshot is not null
-           && !string.IsNullOrWhiteSpace(snapshot.AccessToken)
-           && snapshot.AccessTokenExpiresAtUtc > DateTime.UtcNow.AddMinutes(2);
-
     private void NotifyChanged()
     {
         Changed?.Invoke();
     }
-}
-
-public sealed class WebAuthSessionSnapshot
-{
-    public string AccessToken { get; set; } = string.Empty;
-    public DateTime AccessTokenExpiresAtUtc { get; set; }
-    public string RefreshToken { get; set; } = string.Empty;
-    public DateTime RefreshTokenExpiresAtUtc { get; set; }
-    public string UserId { get; set; } = string.Empty;
-    public string UserName { get; set; } = string.Empty;
-    public string[] Roles { get; set; } = [];
 }

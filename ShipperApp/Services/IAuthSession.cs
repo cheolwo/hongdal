@@ -1,16 +1,16 @@
-using Hongdal.Contracts.Common;
+using Hongdal.Client.Infrastructure.Security;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace ShipperApp.Services;
 
-public interface IAuthSession
+public interface IAuthSession : IHongdalAccessTokenProvider
 {
-    string? AccessToken { get; }
     string? RefreshToken { get; }
     string? UserId { get; }
     string? UserName { get; }
     IReadOnlyList<string> Roles { get; }
     bool IsLoggedIn { get; }
     Task RestoreAsync(CancellationToken cancellationToken = default);
-    Task ApplyAsync(토큰응답 tokenResponse, CancellationToken cancellationToken = default);
+    Task ApplyAsync(ClientAuthTokenSnapshot snapshot, CancellationToken cancellationToken = default);
     Task ClearAsync(CancellationToken cancellationToken = default);
 }

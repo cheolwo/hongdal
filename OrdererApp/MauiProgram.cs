@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Hongdal.Ui.Common.Areas.App.Services;
 using MudBlazor.Services;
 using OrdererApp.Services;
@@ -15,11 +16,11 @@ public static class MauiProgram
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddHongdalUiCommonAppServices();
-        builder.Services.AddSingleton(new HttpClient
-        {
-            BaseAddress = new Uri("https://localhost:7117/")
-        });
-        builder.Services.AddScoped<PlatformCommunityService>();
+        builder.Services.AddHongdalApiHttpClient(
+            HongdalApiEndpoint.ResolveBaseAddress(
+                builder.Configuration[HongdalApiEndpoint.ConfigurationKey],
+                new Uri(HongdalApiEndpoint.LocalDevelopmentBaseAddress)),
+            ServiceLifetime.Singleton);
         builder.Services.AddSingleton<IRestaurantSearchPolicyService, HttpRestaurantSearchPolicyService>();
         builder.Services.AddSingleton<IGroupPurchaseShipmentTrackingService, HttpGroupPurchaseShipmentTrackingService>();
 

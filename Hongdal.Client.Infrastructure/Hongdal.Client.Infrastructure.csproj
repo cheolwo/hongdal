@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

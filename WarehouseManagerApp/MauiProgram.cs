@@ -20,10 +20,9 @@ public static class MauiProgram
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
         builder.Services.AddHongdalUiCommonAppServices();
-        builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7117/") });
-        builder.Services.AddScoped<PlatformCommunityService>();
-        builder.Services.AddScoped<PlatformHomeModeStateService>();
-        builder.Services.AddScoped<PlatformDiagramPaletteStateService>();
+        builder.Services.AddHongdalApiHttpClient(HongdalApiEndpoint.ResolveBaseAddress(
+            builder.Configuration[HongdalApiEndpoint.ConfigurationKey],
+            new Uri(HongdalApiEndpoint.LocalDevelopmentBaseAddress)));
         builder.Services.AddSingleton<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();
         builder.Services.AddSingleton<IInboundReceivingWorkflowService, SampleInboundReceivingWorkflowService>();
         builder.Services.AddSingleton<IWarehousePickingBatchWorkspaceService, SampleWarehousePickingBatchWorkspaceService>();

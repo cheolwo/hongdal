@@ -1,14 +1,11 @@
 using System.Net.Http.Json;
 using Hongdal.Contracts.Food;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using RestaurantDeskApp.Options;
 
 namespace RestaurantDeskApp.Services;
 
 public sealed class Hongdal음식주문Client(
     HttpClient httpClient,
-    IOptions<RestaurantDeskOptions> options,
     RestaurantDeskSampleService sampleService,
     ILogger<Hongdal음식주문Client> logger) : I음식주문ApiClient
 {
@@ -17,7 +14,7 @@ public sealed class Hongdal음식주문Client(
         try
         {
             var response = await httpClient.GetFromJsonAsync<음식주문목록응답>(
-                BuildUri("api/v1/food-orders"),
+                "api/v1/food-orders",
                 cancellationToken);
 
             if (response?.Items.Count > 0)
@@ -43,7 +40,7 @@ public sealed class Hongdal음식주문Client(
         try
         {
             return await httpClient.GetFromJsonAsync<음식주문응답>(
-                BuildUri($"api/v1/food-orders/{Uri.EscapeDataString(주문번호.Trim())}"),
+                $"api/v1/food-orders/{Uri.EscapeDataString(주문번호.Trim())}",
                 cancellationToken);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException)
@@ -53,19 +50,5 @@ public sealed class Hongdal음식주문Client(
 
         var orders = await 주문목록조회Async(cancellationToken);
         return orders.FirstOrDefault(x => string.Equals(x.주문번호, 주문번호, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private Uri BuildUri(string path)
-    {
-        var baseUrl = string.IsNullOrWhiteSpace(options.Value.ServerBaseUrl)
-            ? "https://localhost:7117/"
-            : options.Value.ServerBaseUrl.Trim();
-
-        if (!baseUrl.EndsWith('/'))
-        {
-            baseUrl += "/";
-        }
-
-        return new Uri(new Uri(baseUrl), path);
     }
 }

@@ -61,7 +61,6 @@ builder.Services.AddHttpClient<PlatformCommunityService>((sp, client) =>
             ConnectTimeout = useMemory ? TimeSpan.FromMilliseconds(500) : TimeSpan.FromSeconds(10)
         };
     });
-builder.Services.AddScoped<PlatformHomeModeStateService>();
 builder.Services.AddSingleton<백오피스메모리Service>();
 builder.Services.AddSingleton<문서관리메모리Service>();
 builder.Services.AddScoped<차량관리Service>();

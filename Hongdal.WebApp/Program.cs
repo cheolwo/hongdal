@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Hongdal.Client.Infrastructure;
+using Hongdal.Client.Infrastructure.Security;
 using Hongdal.Client.Infrastructure.Transport;
 using Hongdal.Contracts.Driver.Recommendation;
 using Hongdal.WebApp;
@@ -13,20 +14,15 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-var apiBaseAddress = builder.Configuration["HongdalApiBaseAddress"];
-if (string.IsNullOrWhiteSpace(apiBaseAddress))
-{
-    apiBaseAddress = builder.HostEnvironment.BaseAddress;
-}
-
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
+var apiBaseAddress = HongdalApiEndpoint.ResolveBaseAddress(
+    builder.Configuration[HongdalApiEndpoint.ConfigurationKey],
+    new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.AddHongdalApiHttpClient(apiBaseAddress);
 builder.Services.Configure<ClientDataModeOptions>(builder.Configuration.GetSection(ClientDataModeOptions.SectionName));
 builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
-builder.Services.AddHongdalUiCommonAppServices();
+builder.Services.AddHongdalUiCommonAppServices<WebAuthSessionService>();
 builder.Services.AddHongdalDocumentOutputServices();
-builder.Services.AddScoped<PlatformCommunityService>();
-builder.Services.AddScoped<PlatformHomeModeStateService>();
-builder.Services.AddScoped<PlatformDiagramPaletteStateService>();
+builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
 builder.Services.AddScoped<WebAuthSessionService>();
 builder.Services.AddScoped<IDiagramCollaborationClientService, DiagramCollaborationClientService>();
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
