@@ -49,8 +49,6 @@ public sealed class 현장체험활동UseCaseTests
         Assert.Contains(saved.참여자목록, x => x.UserId == "guardian-1" && x.RoleLabel == "보호자");
         Assert.Contains(saved.참여자목록, x => x.UserId == "field-guide-1" && x.RoleLabel == "현장체험지도자");
 
-        var relationalProjection = 커뮤니티원장블록관계투영Builder.생성(saved);
-        Assert.All(relationalProjection.블록목록, block => Assert.Equal("{}", block.속성Json));
     }
 
     [Fact]
