@@ -33,6 +33,33 @@ var mudBlazorStaticAssets = Path.Combine(
     "9.5.0",
     "staticwebassets");
 var commonAppStaticAssets = Path.Combine(repositoryRoot, "Hongdal.Ui.Common", "Areas", "App", "wwwroot");
+var commonAppScopedCss = Path.Combine(
+    repositoryRoot,
+    "Hongdal.Ui.Common",
+    "obj",
+    "Debug",
+    "net10.0",
+    "scopedcss",
+    "projectbundle");
+var commonAppScopedCssFile = Path.Combine(commonAppScopedCss, "Hongdal.Ui.Common.bundle.scp.css");
+var shipperAppCssFile = Path.Combine(appWebRoot, "app.css");
+var communityDecorationStoreCssFile = Path.Combine(
+    repositoryRoot,
+    "ShipperApp",
+    "Components",
+    "Pages",
+    "CommunityDecorationStorePage.razor.css");
+var mudBlazorCssFile = Path.Combine(mudBlazorStaticAssets, "MudBlazor.min.css");
+var shipperAppScopedCssFile = Path.Combine(
+    repositoryRoot,
+    "ShipperApp",
+    "obj",
+    "Debug",
+    "net10.0-windows10.0.19041.0",
+    "win-x64",
+    "scopedcss",
+    "bundle",
+    "ShipperApp.styles.css");
 
 app.UseStatusCodePagesWithReExecute("/not-found");
 if (Directory.Exists(mudBlazorStaticAssets))
@@ -53,6 +80,15 @@ if (Directory.Exists(commonAppStaticAssets))
     });
 }
 
+if (Directory.Exists(commonAppScopedCss))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(commonAppScopedCss),
+        RequestPath = "/_content/Hongdal.Ui.Common"
+    });
+}
+
 if (Directory.Exists(appWebRoot))
 {
     app.UseStaticFiles(new StaticFileOptions
@@ -63,6 +99,13 @@ if (Directory.Exists(appWebRoot))
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.MapStaticAssets();
+app.MapGet("/capture/app.css", () => Results.File(shipperAppCssFile, "text/css"));
+app.MapGet("/capture/mudblazor.css", () => Results.File(mudBlazorCssFile, "text/css"));
+app.MapGet("/capture/common.css", () => Results.File(commonAppScopedCssFile, "text/css"));
+app.MapGet("/capture/shipper.css", () => Results.File(shipperAppScopedCssFile, "text/css"));
+app.MapGet("/capture/community-decoration-store.css", () =>
+    Results.File(communityDecorationStoreCssFile, "text/css"));
 
 app.MapRazorComponents<ShipperApp.App>()
     .AddInteractiveServerRenderMode();

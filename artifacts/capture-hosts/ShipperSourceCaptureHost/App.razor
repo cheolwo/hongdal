@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using ShipperApp.Components
 
 <!DOCTYPE html>
@@ -7,14 +8,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <base href="/" />
-    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
-    <link rel="stylesheet" href="app.css" />
-    <link rel="stylesheet" href="ShipperApp.styles.css" />
+    <link rel="stylesheet" href="capture/mudblazor.css" />
+    <link rel="stylesheet" href="capture/app.css" />
+    <link rel="stylesheet" href="capture/common.css" />
+    <link rel="stylesheet" href="capture/shipper.css" />
+    <link rel="stylesheet" href="capture/community-decoration-store.css" />
     <HeadOutlet />
 </head>
 <body>
     <div class="status-bar-safe-area"></div>
-    <Routes />
+    <Routes @rendermode="InteractiveServer" />
     <script src="_content/Hongdal.Ui.Common/Areas/App/js/hongdal-address.js"></script>
     <script src="_content/Hongdal.Ui.Common/Areas/App/js/hongdal-document-output.js"></script>
     <script src="_framework/blazor.web.js"></script>
