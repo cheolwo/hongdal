@@ -40,4 +40,21 @@ public sealed record DriverWorkOfferDto(
     [property: JsonPropertyName("driverPayout")] decimal DriverPayout,
     [property: JsonPropertyName("distanceKm")] double? DistanceKm,
     [property: JsonPropertyName("recommendationReason")] string RecommendationReason,
-    [property: JsonPropertyName("status")] string Status = DriverWorkOfferStatus.Recommended);
+    [property: JsonPropertyName("status")] string Status = DriverWorkOfferStatus.Recommended,
+    [property: JsonPropertyName("expiresAtUtc")] DateTimeOffset? ExpiresAtUtc = null,
+    [property: JsonPropertyName("orderIds")] IReadOnlyList<string>? OrderIds = null);
+
+public sealed class FoodDeliveryDriverActionResponse
+{
+    [JsonPropertyName("offerId")]
+    public string OfferId { get; set; } = string.Empty;
+
+    [JsonPropertyName("orderIds")]
+    public IReadOnlyList<string> OrderIds { get; set; } = [];
+
+    [JsonPropertyName("status")]
+    public string Status { get; set; } = string.Empty;
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+}

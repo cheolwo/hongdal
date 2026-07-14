@@ -10,6 +10,8 @@ public partial class FDriverNativeMapViewHandler
         {
             [nameof(FDriverNativeMapView.CenterLatitude)] = MapCamera,
             [nameof(FDriverNativeMapView.CenterLongitude)] = MapCamera,
+            [nameof(FDriverNativeMapView.CurrentLocationLatitude)] = MapOptions,
+            [nameof(FDriverNativeMapView.CurrentLocationLongitude)] = MapOptions,
             [nameof(FDriverNativeMapView.Zoom)] = MapCamera,
             [nameof(FDriverNativeMapView.Markers)] = MapMarkers,
             [nameof(FDriverNativeMapView.RouteOverlays)] = MapRouteOverlays,

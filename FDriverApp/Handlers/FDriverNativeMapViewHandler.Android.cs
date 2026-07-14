@@ -172,7 +172,13 @@ public partial class FDriverNativeMapViewHandler : ViewHandler<FDriverNativeMapV
         }
 
         var overlay = _naverMap.LocationOverlay;
-        overlay.Position = new LatLng(VirtualView.CenterLatitude, VirtualView.CenterLongitude);
+        var latitude = VirtualView.CurrentLocationLatitude != 0d
+            ? VirtualView.CurrentLocationLatitude
+            : VirtualView.CenterLatitude;
+        var longitude = VirtualView.CurrentLocationLongitude != 0d
+            ? VirtualView.CurrentLocationLongitude
+            : VirtualView.CenterLongitude;
+        overlay.Position = new LatLng(latitude, longitude);
         overlay.CircleColor = AndroidColor.Argb(40, 25, 118, 210);
         overlay.CircleOutlineColor = AndroidColor.Argb(120, 25, 118, 210);
         overlay.CircleOutlineWidth = 2;

@@ -141,7 +141,8 @@ namespace 홍달.Services.External.Naver
                     TollFare = GetDecimal(summary, "tollFare"),
                     FuelPrice = GetDecimal(summary, "fuelPrice"),
                     DepartureName = GetString(summary, "departureName"),
-                    GoalName = GetString(summary, "goalName")
+                    GoalName = GetString(summary, "goalName"),
+                    Path = GetPath(firstCandidate)
                 };
 
                 return true;
@@ -169,9 +170,39 @@ namespace 홍달.Services.External.Naver
         {
             return element.TryGetProperty(propertyName, out var valueElement) ? valueElement.GetString() : null;
         }
+
+        private static IReadOnlyList<NaverCloudRoutePathPoint> GetPath(JsonElement candidate)
+        {
+            if (!candidate.TryGetProperty("path", out var pathElement)
+                || pathElement.ValueKind != JsonValueKind.Array)
+            {
+                return [];
+            }
+
+            var result = new List<NaverCloudRoutePathPoint>();
+            foreach (var coordinate in pathElement.EnumerateArray())
+            {
+                if (coordinate.ValueKind != JsonValueKind.Array || coordinate.GetArrayLength() < 2)
+                {
+                    continue;
+                }
+
+                var longitudeElement = coordinate[0];
+                var latitudeElement = coordinate[1];
+                if (longitudeElement.TryGetDecimal(out var longitude)
+                    && latitudeElement.TryGetDecimal(out var latitude))
+                {
+                    result.Add(new NaverCloudRoutePathPoint(latitude, longitude));
+                }
+            }
+
+            return result;
+        }
     }
 
     public sealed record NaverCloudRouteWaypoint(decimal Latitude, decimal Longitude);
+
+    public sealed record NaverCloudRoutePathPoint(decimal Latitude, decimal Longitude);
 
     public sealed class NaverCloudDrivingRoute
     {
@@ -182,6 +213,7 @@ namespace 홍달.Services.External.Naver
         public decimal? FuelPrice { get; set; }
         public string? DepartureName { get; set; }
         public string? GoalName { get; set; }
+        public IReadOnlyList<NaverCloudRoutePathPoint> Path { get; set; } = [];
 
         public decimal? DistanceKm => DistanceMeters.HasValue ? DistanceMeters.Value / 1000m : null;
         public TimeSpan? Duration => DurationMilliseconds.HasValue ? TimeSpan.FromMilliseconds((double)DurationMilliseconds.Value) : null;

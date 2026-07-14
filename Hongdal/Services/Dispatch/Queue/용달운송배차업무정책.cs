@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Hongdal;
+using Hongdal.Contracts.Common.Drivers;
 using 홍달.도메인.기사;
 using 홍달.도메인.화물;
 using 홍달.Services.Storage.Local;
@@ -89,6 +90,14 @@ namespace 홍달.Services.Dispatch.Queue
 
             foreach (var osState in candidateStates)
             {
+                if (string.Equals(
+                        osState.AppKey,
+                        기사앱식별자.FoodDeliveryDriverApp,
+                        StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
                 if (!vehicles.TryGetValue(osState.DriverId, out var driver))
                 {
                     continue;

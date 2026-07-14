@@ -8,6 +8,7 @@ public sealed record 위치갱신Command : 홍달CommandBase, IRequest<Result<�
 {
     public 위치갱신Command(
         string driverId,
+        string? appKey,
         decimal? 위도,
         decimal? 경도,
         decimal? 정확도_m,
@@ -16,6 +17,7 @@ public sealed record 위치갱신Command : 홍달CommandBase, IRequest<Result<�
         DateTime? 기록시각)
     {
         기사Id = string.IsNullOrWhiteSpace(driverId) ? string.Empty : driverId;
+        AppKey = string.IsNullOrWhiteSpace(appKey) ? null : appKey.Trim();
         this.위도 = 위도;
         this.경도 = 경도;
         this.정확도_m = 정확도_m;
@@ -27,6 +29,7 @@ public sealed record 위치갱신Command : 홍달CommandBase, IRequest<Result<�
     }
 
     public string 기사Id { get; init; }
+    public string? AppKey { get; init; }
     public decimal? 위도 { get; init; }
     public decimal? 경도 { get; init; }
     public decimal? 정확도_m { get; init; }

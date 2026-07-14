@@ -1,10 +1,15 @@
 using CommunityToolkit.Maui;
 using FDriverApp.Controls;
 using FDriverApp.Handlers;
+using FDriverApp.Pages;
+using Hongdal.Ui.Common.Areas.App.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
 using Syncfusion.Maui.Toolkit.Hosting;
 
 using FDriverApp.Services;
+using Hongdal.Client.Infrastructure.Security;
 
 namespace FDriverApp
 {
@@ -16,6 +21,13 @@ namespace FDriverApp
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("SegoeUI-Semibold.ttf", "SegoeSemibold");
+                    fonts.AddFont("FluentSystemIcons-Regular.ttf", FluentUI.FontFamily);
+                })
                 .ConfigureSyncfusionToolkit()
                 .ConfigureMauiHandlers(handlers =>
                 {
@@ -34,13 +46,6 @@ namespace FDriverApp
     					}
     				});
 #endif
-                })
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                    fonts.AddFont("SegoeUI-Semibold.ttf", "SegoeSemibold");
-                    fonts.AddFont("FluentSystemIcons-Regular.ttf", FluentUI.FontFamily);
                 });
 
 #if DEBUG
@@ -55,9 +60,28 @@ namespace FDriverApp
             builder.Services.AddSingleton<SeedDataService>();
             builder.Services.AddSingleton<ModalErrorHandler>();
             builder.Services.AddSingleton<FDriverAppProfile>();
+            builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
+            builder.Services.AddSingleton<IFDriverAuthSession, FDriverAuthSession>();
+            builder.Services.AddHongdalApiHttpClient(
+                HongdalApiEndpoint.CreateDefaultBaseAddress(),
+                ServiceLifetime.Singleton,
+                TimeSpan.FromSeconds(20));
+            builder.Services.AddSingleton<FDriverAuthApiService>();
+            builder.Services.AddSingleton<IFoodDeliveryDriverApiService, FoodDeliveryDriverApiService>();
+            builder.Services.AddSingleton<IFDriverLocationService, FDriverLocationService>();
+            builder.Services.AddSingleton<IFDriverWorkspaceNavigator, FDriverWorkspaceNavigator>();
             builder.Services.AddSingleton<MainPageModel>();
+            builder.Services.AddTransient<MainPage>();
             builder.Services.AddSingleton<ProjectListPageModel>();
             builder.Services.AddSingleton<ManageMetaPageModel>();
+
+            builder.Services.AddHongdalUiCommonAppServices<IFDriverAuthSession>();
+            builder.Services.AddMudServices();
+            builder.Services.AddMauiBlazorWebView();
+
+#if DEBUG
+            builder.Services.AddBlazorWebViewDeveloperTools();
+#endif
 
             builder.Services.AddTransientWithShellRoute<ProjectDetailPage, ProjectDetailPageModel>("project");
             builder.Services.AddTransientWithShellRoute<TaskDetailPage, TaskDetailPageModel>("task");

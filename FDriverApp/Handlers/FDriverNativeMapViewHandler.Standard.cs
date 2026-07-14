@@ -26,7 +26,7 @@ public partial class FDriverNativeMapViewHandler : ViewHandler<FDriverNativeMapV
             {
                 new TextBlock
                 {
-                    Text = "네이티브 지도는 Android F 드라이버 앱에서 Naver SDK로 렌더링됩니다.",
+                    Text = "네이티브 지도는 Android 음식 배달 앱에서 Naver SDK로 렌더링됩니다.",
                     HorizontalAlignment = NativeHorizontalAlignment.Center,
                     VerticalAlignment = NativeVerticalAlignment.Center,
                     Foreground = new NativeBrush(NativeColors.Black)

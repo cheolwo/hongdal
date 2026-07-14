@@ -19,6 +19,7 @@ public interface I국내화물운송기사상태Service
         DriverLocationSnapshot location,
         long? shiftId = null,
         decimal? 상차접근허용반경Km = null,
+        string? appKey = null,
         CancellationToken cancellationToken = default);
 
     Task<국내화물운송기사상태Snapshot?> 추천기록Async(
@@ -83,6 +84,7 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
         DriverLocationSnapshot location,
         long? shiftId = null,
         decimal? 상차접근허용반경Km = null,
+        string? appKey = null,
         CancellationToken cancellationToken = default)
     {
         var existing = await _store.GetAsync(location.DriverId, cancellationToken);
@@ -112,7 +114,8 @@ public sealed class 국내화물운송기사상태Service : I국내화물운송�
             existing?.StartLocation,
             existing?.ReturnDestination,
             Normalize상차접근허용반경(상차접근허용반경Km) ?? existing?.상차접근허용반경Km,
-            existing?.복귀콜선호);
+            existing?.복귀콜선호,
+            string.IsNullOrWhiteSpace(appKey) ? existing?.AppKey : appKey.Trim());
 
         await _store.UpsertAsync(snapshot, cancellationToken);
         return snapshot;

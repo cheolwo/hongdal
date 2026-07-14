@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Hongdal.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,7 @@ namespace Hongdal.Controllers.Driver.Work01
     [ApiController]
     [Authorize(Roles = 역할명.기사)]
     [Route("api/v1/driver/work")]
-    public sealed class 기사운행Controller : ControllerBase
+    public sealed class 기사운행Controller : DriverControllerBase
     {
         private readonly ISender _sender;
 
@@ -80,6 +79,7 @@ namespace Hongdal.Controllers.Driver.Work01
             var driverId = 현재기사Id();
             var result = await _sender.Send(new 위치갱신Command(
                 driverId,
+                request.AppKey,
                 request.위도,
                 request.경도,
                 request.정확도_m,
@@ -95,10 +95,5 @@ namespace Hongdal.Controllers.Driver.Work01
             return Ok(result.Value);
         }
 
-        private string 현재기사Id()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier)
-                   ?? throw new InvalidOperationException("기사 인증 정보가 없습니다.");
-        }
     }
 }

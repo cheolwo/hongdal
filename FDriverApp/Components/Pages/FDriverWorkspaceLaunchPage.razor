@@ -1,0 +1,33 @@
+@page "/food-delivery/open/{Focus}"
+@inject IFDriverWorkspaceNavigator WorkspaceNavigator
+@inject NavigationManager Navigation
+
+<PageTitle>음식 배달 업무 여는 중</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="pa-6">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-5">
+        <MudStack AlignItems="AlignItems.Center" Spacing="2">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.h6">음식 배달 지도 업무를 여는 중입니다.</MudText>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string Focus { get; set; } = "workspace";
+
+    private bool launched;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || launched)
+        {
+            return;
+        }
+
+        launched = true;
+        await WorkspaceNavigator.OpenAsync(Focus);
+        Navigation.NavigateTo("/", replace: true);
+    }
+}

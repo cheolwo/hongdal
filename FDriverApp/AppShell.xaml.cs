@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using FDriverApp.Pages;
 using Font = Microsoft.Maui.Font;
 
 namespace FDriverApp
@@ -9,6 +10,7 @@ namespace FDriverApp
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute(FDriverWorkspaceNavigator.WorkspaceRoute, typeof(MainPage));
             var currentTheme = Application.Current!.RequestedTheme;
             ThemeSegmentedControl.SelectedIndex = currentTheme == AppTheme.Light ? 0 : 1;
         }

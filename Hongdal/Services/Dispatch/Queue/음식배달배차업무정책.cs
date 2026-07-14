@@ -1,23 +1,97 @@
-namespace 홍달.Services.Dispatch.Queue
+using Hongdal.Contracts.Common.Drivers;
+using Microsoft.Extensions.Options;
+using 홍달.Services.Dispatch.Recommendation;
+using 홍달.Services.Storage.Local;
+using 홍달.도메인.공통;
+using 홍달.도메인.운송;
+
+namespace 홍달.Services.Dispatch.Queue;
+
+public sealed class 음식배달배차업무정책 : I배차업무정책
 {
-    public sealed class 음식배달배차업무정책 : I배차업무정책
+    private static readonly TimeSpan 위치유효시간 = TimeSpan.FromMinutes(10);
+
+    private readonly I국내화물운송기사상태Store _기사상태Store;
+    private readonly IDriverRejectedRequestStore _거절Store;
+    private readonly I배차추천경로Service _경로Service;
+    private readonly 배차큐정책Options _options;
+
+    public 음식배달배차업무정책(
+        I국내화물운송기사상태Store 기사상태Store,
+        IDriverRejectedRequestStore 거절Store,
+        I배차추천경로Service 경로Service,
+        IOptions<배차큐정책Options> options)
     {
-        private readonly ILogger<음식배달배차업무정책> _logger;
+        _기사상태Store = 기사상태Store;
+        _거절Store = 거절Store;
+        _경로Service = 경로Service;
+        _options = options.Value;
+    }
 
-        public 음식배달배차업무정책(ILogger<음식배달배차업무정책> logger)
+    public int 배차업무유형 => 상태값.배차업무유형.음식배달;
+
+    public async Task<배차추천후보?> 다음후보선정Async(
+        운송원장 queue,
+        string? 제외기사Id = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (!queue.픽업_위도.HasValue || !queue.픽업_경도.HasValue)
         {
-            _logger = logger;
+            return null;
         }
 
-        public int 배차업무유형 => 홍달.도메인.공통.상태값.배차업무유형.음식배달;
-
-        public Task<배차추천후보?> 다음후보선정Async(
-            홍달.도메인.운송.운송원장 queue,
-            string? 제외기사Id = null,
-            CancellationToken cancellationToken = default)
+        var pickup = new 배차경로좌표(queue.픽업_위도.Value, queue.픽업_경도.Value);
+        var candidates = await _기사상태Store.위치반경조회Async(
+            pickup.Latitude,
+            pickup.Longitude,
+            Math.Max(1m, _options.기사후보검색반경Km),
+            Math.Max(1, _options.기사후보최대조회수),
+            cancellationToken);
+        if (candidates.Count == 0)
         {
-            _logger.LogDebug("음식배달 배차업무정책은 아직 후보 선정 구현 전입니다. QueueId={QueueId} RequestId={RequestId}", queue.Id, queue.의뢰Id);
-            return Task.FromResult<배차추천후보?>(null);
+            return null;
         }
+
+        var rejectedDriverIds = await _거절Store.GetRejectedDriverIdsAsync(queue.의뢰Id, cancellationToken);
+        var now = DateTime.UtcNow;
+        배차추천후보? best = null;
+        decimal bestDistance = decimal.MaxValue;
+
+        foreach (var candidate in candidates)
+        {
+            if (!string.Equals(candidate.AppKey, 기사앱식별자.FoodDeliveryDriverApp, StringComparison.Ordinal)
+                || !string.Equals(candidate.운행상태, 상태값.기사운행상태.운행중, StringComparison.OrdinalIgnoreCase)
+                || !candidate.Latitude.HasValue
+                || !candidate.Longitude.HasValue
+                || !candidate.위치수신시각Utc.HasValue
+                || now - candidate.위치수신시각Utc.Value > 위치유효시간
+                || rejectedDriverIds.Contains(candidate.DriverId)
+                || (!string.IsNullOrWhiteSpace(제외기사Id)
+                    && string.Equals(candidate.DriverId, 제외기사Id, StringComparison.Ordinal)))
+            {
+                continue;
+            }
+
+            var distance = _경로Service.CalculateDistanceKm(
+                new 배차경로좌표(candidate.Latitude.Value, candidate.Longitude.Value),
+                pickup);
+            if (!distance.HasValue)
+            {
+                continue;
+            }
+
+            var distanceScore = Math.Max(0m, 100m - distance.Value * 12m);
+            var score = distanceScore + candidate.Aging점수;
+            var reason = $"음식점까지 {distance.Value:0.0}km · F드라이버 대기 보정 {candidate.Aging점수:0}";
+            if (best is null
+                || score > best.추천점수
+                || (score == best.추천점수 && distance.Value < bestDistance))
+            {
+                best = new 배차추천후보(candidate.DriverId, score, reason);
+                bestDistance = distance.Value;
+            }
+        }
+
+        return best;
     }
 }

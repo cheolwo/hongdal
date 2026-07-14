@@ -4,19 +4,39 @@ using Hongdal.Contracts.Common.Drivers;
 
 namespace FDriverApp.Pages
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage : ContentPage, IQueryAttributable
     {
+        private string? _entryFocus;
+
         public MainPage(MainPageModel model)
         {
             InitializeComponent();
             BindingContext = model;
         }
 
-        private void OnMapMarkerSelected(object? sender, DriverMapMarkerItem marker)
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is MainPageModel model)
+            {
+                await model.InitializeAsync();
+                model.ApplyEntryFocus(_entryFocus);
+                _entryFocus = null;
+            }
+        }
+
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            _entryFocus = query.TryGetValue(FDriverWorkspaceNavigator.FocusQueryKey, out var value)
+                ? Uri.UnescapeDataString(Convert.ToString(value) ?? string.Empty)
+                : null;
+        }
+
+        private async void OnMapMarkerSelected(object? sender, DriverMapMarkerItem marker)
         {
             if (BindingContext is MainPageModel model)
             {
-                model.SelectTicketById(marker.RequestId);
+                await model.SelectTicketByIdAsync(marker.RequestId);
             }
         }
     }

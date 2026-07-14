@@ -13,7 +13,7 @@ namespace FDriverApp.Services
         /// <param name="ex">Exception.</param>
         public void HandleError(Exception ex)
         {
-            DisplayAlertAsync(ex).FireAndForgetSafeAsync();
+            DisplayAlertAsync(ex).FireAndForgetSafe();
         }
 
         async Task DisplayAlertAsync(Exception ex)

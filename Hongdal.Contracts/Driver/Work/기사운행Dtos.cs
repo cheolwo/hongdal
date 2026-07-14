@@ -40,6 +40,7 @@ public sealed class 기사운행상태응답
 
 public sealed class 기사위치갱신요청
 {
+    public string? AppKey { get; set; }
     public decimal? 위도 { get; set; }
     public decimal? 경도 { get; set; }
     public decimal? 정확도_m { get; set; }

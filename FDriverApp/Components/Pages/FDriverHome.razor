@@ -1,0 +1,81 @@
+@page "/"
+
+<PageTitle>홍달 음식 배달 · 기사 홈</PageTitle>
+
+<PlatformCommunityHome AppName="홍달 음식 배달"
+                       RoleLabel="음식 배달 기사"
+                       AppKey="food-delivery-driver"
+                       ShowRealtimeBest="true"
+                       QuickActions="QuickActions"
+                       Workspaces="FoodDeliveryWorkspaces"
+                       CardinalNavigationOptions="CardinalNavigationOptions">
+    <CommunityModeContent>
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 fdriver-home-intro">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.overline" Color="Color.Warning">사람과 배달 업무가 이어지는 홈</MudText>
+                <MudText Typo="Typo.h6">현장 경험을 나누고, 바로 음식 배달 업무로 이어가세요.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    게시판과 다이어그램은 공통 홈에서 보고, 실제 배차·위치·경로 처리는 지도 업무 화면에서 진행합니다.
+                </MudText>
+            </MudStack>
+        </MudPaper>
+    </CommunityModeContent>
+
+    <WorkModeContent>
+        <MudStack Spacing="3" Class="fdriver-work-home">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">음식 배달 업무</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    진괘는 주문자, 리괘는 음식점, 태괘는 배차, 감괘는 실제 운송·배달 문맥으로 이어집니다.
+                </MudText>
+            </MudStack>
+
+            <MudGrid>
+                @foreach (var action in QuickActions)
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100 fdriver-work-card">
+                            <MudStack Spacing="2" Class="h-100">
+                                <MudIcon Icon="@action.Icon" Color="@action.Color" Size="Size.Large" />
+                                <MudStack Spacing="0" Class="flex-grow-1">
+                                    <MudText Typo="Typo.h6">@action.Title</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
+                                </MudStack>
+                                <MudButton Href="@action.Href"
+                                           Variant="Variant.Filled"
+                                           Color="@action.Color"
+                                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                                    지도 업무 열기
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudStack>
+    </WorkModeContent>
+</PlatformCommunityHome>
+
+@code {
+    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    [
+        new("배차 추천", "현재 위치 기준 추천 배달권을 확인하고 한 건을 수락합니다.", "/food-delivery/open/dispatch", Icons.Material.Filled.AssignmentTurnedIn, Color.Primary),
+        new("묶음 배달", "함께 처리할 수 있는 주문의 동선과 예상 정산을 비교합니다.", "/food-delivery/open/bundle", Icons.Material.Filled.CallMerge, Color.Success),
+        new("위치 · 경로", "현재 위치, 음식점 픽업지와 고객 전달지의 실제 경로를 봅니다.", "/food-delivery/open/route", Icons.Material.Filled.Route, Color.Info),
+        new("정산", "이번 달 배차 건수, 이용료와 예상 배달 수익을 확인합니다.", "/food-delivery/open/settlement", Icons.Material.Filled.ReceiptLong, Color.Warning)
+    ];
+
+    private static readonly IReadOnlyList<HongdalCardinalNavigationOption> CardinalNavigationOptions =
+    [
+        new("li", "리", "☲", "남", "음식점", HongdalCardinalNavigationActionKinds.Route, "/food-delivery/open/restaurant"),
+        new("dui", "태", "☱", "서", "배차", HongdalCardinalNavigationActionKinds.Route, "/food-delivery/open/dispatch"),
+        new("kan", "감", "☵", "북", "운송·배달", HongdalCardinalNavigationActionKinds.Route, "/food-delivery/open/delivery"),
+        new("zhen", "진", "☳", "동", "주문자", HongdalCardinalNavigationActionKinds.Route, "/food-delivery/open/customer")
+    ];
+
+    private static readonly IReadOnlyList<PlatformHomeWorkspaceProfile> FoodDeliveryWorkspaces =
+        PlatformHomeWorkspaceCatalog.DefaultWorkspaces
+            .Where(workspace => workspace.LedgerTemplateKey == CommunityLedgerTemplateKeys.FoodDelivery)
+            .Select(workspace => workspace with { EntryHref = "/food-delivery/open/workspace" })
+            .ToArray();
+}

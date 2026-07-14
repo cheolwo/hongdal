@@ -43,7 +43,7 @@ namespace FDriverApp.PageModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            LoadTaskAsync(query).FireAndForgetSafeAsync(_errorHandler);
+            LoadTaskAsync(query).FireAndForgetSafe(_errorHandler);
         }
 
         private async Task LoadTaskAsync(IDictionary<string, object> query)
@@ -142,7 +142,7 @@ namespace FDriverApp.PageModels
                 Project.Tasks.Add(_task);
 
             if (_task.ProjectID > 0)
-                _taskRepository.SaveItemAsync(_task).FireAndForgetSafeAsync(_errorHandler);
+                _taskRepository.SaveItemAsync(_task).FireAndForgetSafe(_errorHandler);
 
             await Shell.Current.GoToAsync("..?refresh=true");
 

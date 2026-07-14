@@ -87,15 +87,15 @@ namespace FDriverApp.PageModels
             if (query.ContainsKey("id"))
             {
                 int id = Convert.ToInt32(query["id"]);
-                LoadData(id).FireAndForgetSafeAsync(_errorHandler);
+                LoadData(id).FireAndForgetSafe(_errorHandler);
             }
             else if (query.ContainsKey("refresh"))
             {
-                RefreshData().FireAndForgetSafeAsync(_errorHandler);
+                RefreshData().FireAndForgetSafe(_errorHandler);
             }
             else
             {
-                Task.WhenAll(LoadCategories(), LoadTags()).FireAndForgetSafeAsync(_errorHandler);
+                Task.WhenAll(LoadCategories(), LoadTags()).FireAndForgetSafe(_errorHandler);
                 _project = new();
                 _project.Tags = [];
                 _project.Tasks = [];

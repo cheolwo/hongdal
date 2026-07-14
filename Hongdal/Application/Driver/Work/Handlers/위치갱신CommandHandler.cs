@@ -94,6 +94,7 @@ public sealed class 위치갱신CommandHandler : IRequestHandler<위치갱신Com
         var osState = await _국내화물운송기사상태Service.위치갱신Async(
             snapshot,
             상차접근허용반경Km: request.상차접근허용반경Km,
+            appKey: request.AppKey,
             cancellationToken: cancellationToken);
         var 배달권 = 국내화물배달권정책.판정(
             new 배차경로좌표(snapshot.Latitude, snapshot.Longitude),

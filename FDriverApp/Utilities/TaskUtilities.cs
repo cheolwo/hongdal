@@ -2,21 +2,19 @@ using FDriverApp.Services;
 
 namespace FDriverApp.Utilities
 {
-    /// <summary>
-    /// Task Utilities.
-    /// </summary>
     public static class TaskUtilities
     {
-        /// <summary>
-        /// Fire and Forget Safe Async.
-        /// </summary>
-        /// <param name="task">Task to Fire and Forget.</param>
-        /// <param name="handler">Error Handler.</param>
-        public static async void FireAndForgetSafeAsync(this Task task, IErrorHandler? handler = null)
+        public static void FireAndForgetSafe(this Task task, IErrorHandler? handler = null)
+        {
+            ArgumentNullException.ThrowIfNull(task);
+            _ = ObserveAsync(task, handler);
+        }
+
+        private static async Task ObserveAsync(Task task, IErrorHandler? handler)
         {
             try
             {
-                await task;
+                await task.ConfigureAwait(false);
             }
             catch (Exception ex)
             {

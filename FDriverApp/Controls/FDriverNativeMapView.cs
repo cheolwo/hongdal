@@ -16,6 +16,18 @@ public sealed class FDriverNativeMapView : View
         typeof(FDriverNativeMapView),
         126.9780d);
 
+    public static readonly BindableProperty CurrentLocationLatitudeProperty = BindableProperty.Create(
+        nameof(CurrentLocationLatitude),
+        typeof(double),
+        typeof(FDriverNativeMapView),
+        0d);
+
+    public static readonly BindableProperty CurrentLocationLongitudeProperty = BindableProperty.Create(
+        nameof(CurrentLocationLongitude),
+        typeof(double),
+        typeof(FDriverNativeMapView),
+        0d);
+
     public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
         nameof(Zoom),
         typeof(double),
@@ -74,6 +86,18 @@ public sealed class FDriverNativeMapView : View
     {
         get => (double)GetValue(CenterLongitudeProperty);
         set => SetValue(CenterLongitudeProperty, value);
+    }
+
+    public double CurrentLocationLatitude
+    {
+        get => (double)GetValue(CurrentLocationLatitudeProperty);
+        set => SetValue(CurrentLocationLatitudeProperty, value);
+    }
+
+    public double CurrentLocationLongitude
+    {
+        get => (double)GetValue(CurrentLocationLongitudeProperty);
+        set => SetValue(CurrentLocationLongitudeProperty, value);
     }
 
     public double Zoom

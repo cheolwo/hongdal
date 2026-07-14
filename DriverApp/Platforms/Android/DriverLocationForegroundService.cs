@@ -74,6 +74,7 @@ public sealed class DriverLocationForegroundService : Service
         var authSession = DriverAppServiceProvider.Services.GetRequiredService<IAuthSession>();
         await authSession.RestoreAsync(cancellationToken);
         var api = DriverAppServiceProvider.Services.GetRequiredService<IDriverWorkApiService>();
+        var profile = DriverAppServiceProvider.Services.GetRequiredService<DriverAppProfile>();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -87,6 +88,7 @@ public sealed class DriverLocationForegroundService : Service
                 {
                     var response = await api.위치갱신Async(new 기사위치갱신요청
                     {
+                        AppKey = profile.AppKey,
                         위도 = (decimal)location.Latitude,
                         경도 = (decimal)location.Longitude,
                         정확도_m = location.Accuracy.HasValue ? (decimal)location.Accuracy.Value : null,

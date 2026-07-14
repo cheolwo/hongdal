@@ -35,4 +35,5 @@ public sealed record 국내화물운송기사상태Snapshot(
     string? StartLocation,
     string? ReturnDestination,
     decimal? 상차접근허용반경Km = null,
-    string? 복귀콜선호 = null);
+    string? 복귀콜선호 = null,
+    string? AppKey = null);
