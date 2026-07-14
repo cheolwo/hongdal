@@ -8,6 +8,8 @@ Hongdal community is a gathering and coordination layer, not a paywalled social 
 
 플랫폼이 개입하는 유상 화물 배차·주선·운임 수취·정산은 허가·제휴·법률 검토 전 실운영하지 않는다. 코드와 화면은 샘플 데이터, FakePG와 모의 배차를 이용한 기술 검증에 한정할 수 있다. 상세 경계와 공식 근거는 [홍달 1.0 커뮤니티 중심 제품 원칙](CommunityFirstV1Policy.md)을 따른다.
 
+커뮤니티에서 운송 필요가 생기면 사용자가 게시글과 대화로 자발적으로 참여 의사를 밝히고, 당사자끼리 연락 정보 공개에 동의한 뒤 조건을 직접 합의한다. 플랫폼은 특정 기사를 추천·선정·배정하거나 운임과 계약 조건을 제시하지 않으며, 공동 원장은 당사자들이 합의한 뒤 진행 상태를 기록하는 선택적 도구로 사용한다.
+
 ## Development Philosophy
 
 Hongdal is built around the idea of helping people live more `알뜰살뜰`: careful with money, time, movement, labor, trust, and relationships. This is not only a brand phrase for mart workflows. It is the product philosophy behind the community-first platform.
@@ -133,21 +135,22 @@ Priority modules:
 | ---: | --- | --- | --- |
 | 1 | 커뮤니티 대화 원장 | Errand or generic life-request ledger | Community is the intake surface. Loose posts, questions, and recruitment should stay lightweight until they become work. |
 | 2 | 원함-원장 판단 원장 | Errand or generic life-request ledger | A wish should be classified before the platform opens a work ledger. |
-| 3 | 운송의뢰 원장 | Cargo transport ledger | Pickup, dropoff, cargo condition, and settlement condition form the transport request. |
-| 4 | 운송진행 원장 | Cargo transport ledger | Dispatch acceptance, pickup, dropoff, evidence, and receiver confirmation need state history. |
-| 5 | 창고출고 원장 | Warehouse outbound ledger | Outbound items, stock basis, picking, inspection, packing, and handoff need a shared work record. |
-| 6 | 피킹/포장 원장 | Warehouse outbound or HongdalMart delivery ledger | Field work should be trackable independently from the broader order or outbound ledger. |
-| 7 | 마트주문 원장 | HongdalMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
-| 8 | 마트 배송 원장 | HongdalMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
-| 9 | 공동주문 수요 원장 | Group purchase ledger | Participant demand, quantities, and delivery zones should be grouped before import decisions. |
-| 10 | 공동주문 수입 결정 원장 | Group purchase ledger | Import go/no-go, FCL/LCL, price, and quantity decisions need an explicit boundary. |
-| 11 | 공동주문 선적/통관 원장 | Group purchase ledger | Overseas shipment, documents, customs, and release state need their own lifecycle. |
-| 12 | 공동주문 입고/분배 원장 | Group purchase ledger | Domestic 3PL inbound and participant distribution coordinate downstream handoffs. |
-| 13 | 결제/정산 표시 원장 | Cargo transport or related work ledger | Payment marks, counterpart confirmation, holds, and notes should remain participant-centered. |
-| 14 | 신고/분쟁 원장 | Errand or generic life-request ledger | Reports and disputes should not pollute ordinary workflow state, but they must remain linked. |
-| 15 | 음식 주문 원장 | Food delivery ledger | Menu order, restaurant acceptance, cooking, and ready state end before delivery begins. |
-| 16 | 음식 배달 원장 | Food delivery ledger | Each first, split, or retry delivery attempt keeps its own dispatch and proof lifecycle. |
-| 17 | 창고입고 원장 | Warehouse inbound ledger | Dropoff handoff, inspection, exceptions, put-away, and inventory conversion need a destination record. |
+| 3 | 주문 통합 원장 | Order ledger | A single order remains the basic unit and contains its sales, warehouse, delivery, and transport fulfillment ledgers. |
+| 4 | 운송의뢰 원장 | Cargo transport ledger | Pickup, dropoff, cargo condition, and settlement condition form the transport request. |
+| 5 | 운송진행 원장 | Cargo transport ledger | Dispatch acceptance, pickup, dropoff, evidence, and receiver confirmation need state history. |
+| 6 | 창고출고 원장 | Warehouse outbound ledger | Outbound items, stock basis, picking, inspection, packing, and handoff need a shared work record. |
+| 7 | 피킹/포장 원장 | Warehouse outbound or HongdalMart delivery ledger | Field work should be trackable independently from the broader order or outbound ledger. |
+| 8 | 마트주문 원장 | HongdalMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
+| 9 | 마트 배송 원장 | HongdalMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
+| 10 | 공동주문 묶음 원장 | Group purchase ledger | A group order is a collection of independent order ledgers whose quantities and shared conditions are aggregated. |
+| 11 | 공동주문 수입 결정 원장 | Group purchase ledger | Import go/no-go, FCL/LCL, price, and quantity decisions need an explicit boundary. |
+| 12 | 공동주문 선적/통관 원장 | Group purchase ledger | Overseas shipment, documents, customs, and release state need their own lifecycle. |
+| 13 | 공동주문 입고/분배 원장 | Group purchase ledger | Domestic 3PL inbound and participant distribution coordinate downstream handoffs. |
+| 14 | 결제/정산 표시 원장 | Cargo transport or related work ledger | Payment marks, counterpart confirmation, holds, and notes should remain participant-centered. |
+| 15 | 신고/분쟁 원장 | Errand or generic life-request ledger | Reports and disputes should not pollute ordinary workflow state, but they must remain linked. |
+| 16 | 음식 주문 원장 | Food delivery ledger | Menu order, restaurant acceptance, cooking, and ready state end before delivery begins. |
+| 17 | 음식 배달 원장 | Food delivery ledger | Each first, split, or retry delivery attempt keeps its own dispatch and proof lifecycle. |
+| 18 | 창고입고 원장 | Warehouse inbound ledger | Dropoff handoff, inspection, exceptions, put-away, and inventory conversion need a destination record. |
 
 Representative ledger relationships:
 
@@ -307,10 +310,9 @@ The OS handoff remains conceptual and scheduling-oriented. In code, the handoff 
 현재 구현 기준은 다음과 같이 둔다.
 
 - MongoDB `community_ledgers` 컬렉션은 커뮤니티 원장의 원본이다. 블록 목록, 참여자, 다이어그램 스냅샷, 유연 속성은 이 문서에 남긴다.
-- MySQL `community_ledger_block_projections` 테이블은 원장 블록을 조회 가능한 도메인 엔티티 투영으로 보관한다.
-- MySQL `community_ledger_block_relation_projections` 테이블은 블록 간 관계를 보관한다. 관계 값은 `Flow`, `Contains`, `Requires`, `Handoff`, `Reference`를 기본으로 보고, 관계 수는 `1:1`, `1:N`, `N:1`, `N:M`으로 정규화한다.
-- EF `IEntityTypeConfiguration`은 블록과 관계 투영의 테이블명, 인덱스, self-reference 관계를 명시한다. 이 관계는 Mongo 원장 원본을 대체하지 않고, 조회와 규칙 판단을 빠르게 하기 위한 RDB 투영이다.
-- `I커뮤니티원장블록관계투영Service`는 Mongo 원장 DTO를 RDB 투영으로 갱신하는 경계다. `투영갱신커뮤니티원장저장소`는 Mongo 저장 성공 뒤 별도 scope에서 이 서비스를 호출한다. 원본 저장소가 직접 `HongdalContext`를 만지지 않게 해서 원본 저장 책임과 투영 갱신 책임을 분리한다.
+- 원장 블록과 업무적으로 의미 있는 관계는 MongoDB 원장 문서에서 관리한다. 다이어그램 노드·연결선·좌표·선 스타일·레이어·스티커·화면 배치도 MongoDB 책임이다.
+- MySQL에는 범용 원장 블록이나 다이어그램 연결선을 복제하지 않는다. 배차, 운송 실행, 창고 작업, 음식 주문처럼 SQL 트랜잭션·인덱스·권한 조회가 필요한 확정 업무 데이터만 투영한다.
+- 다이어그램의 시각적 연결선으로 RDB 업무 관계나 Cardinality를 추론하지 않는다. 업무 규칙은 원장과 업무별 UseCase가 정의하고, 다이어그램은 그 결과를 표현한다.
 
 For Hongdal 1.0 domestic cargo transport, `transport:{화주운송의뢰Id}` in MongoDB is the transport ledger source. The relational table formerly treated as `운송원장` should be read as `운송실행투영`: a dispatch and driver-progress projection used for queue scans, recommendations, admin lists, event joins, file/POD links, and indexed authorization checks. A shipper request or driver state transition should upsert the Mongo ledger first-class shape, while the RDB projection keeps only stable execution fields and reverse references needed by SQL workflows.
 
