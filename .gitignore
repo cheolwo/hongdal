@@ -19,6 +19,8 @@
 appsettings.Local.json
 appsettings.*.local.json
 *.secret.json
+/Hongdal/App_Data/
+/Hongdal/.local-storage/
 *.secrets.json
 secrets.json
 secrets.*.json
@@ -34,3 +36,17 @@ Thumbs.db
 # Local backup / workspace artifacts
 .git-backup*/
 *.tmp
+
+# Generated verification output (keep screenshots and capture hosts tracked)
+/artifacts/build-check/
+/artifacts/*-bin/
+/artifacts/*-build/
+/artifacts/*-tests/
+/artifacts/*-test-final/
+/artifacts/*-ef-current/
+/artifacts/*-pipeline/
+/artifacts/decompiled-*/
+/artifacts/obj/
+/artifacts/obj-check/
+/artifacts/run-logs/
+/artifacts/tools/
