@@ -1,7 +1,19 @@
 namespace 홍달.Services.Notifications
 {
+    public sealed record FcmPushMessage(
+        string Token,
+        string Title,
+        string Body,
+        IReadOnlyDictionary<string, string> Data,
+        string? ImageUrl = null,
+        bool HighPriority = false);
+
     public interface IFcmPushService
     {
+        Task<bool> SendAsync(
+            FcmPushMessage message,
+            CancellationToken cancellationToken = default);
+
         Task<bool> SendToTokenAsync(
             string token,
             string title,

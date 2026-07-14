@@ -32,8 +32,16 @@ namespace 홍달.Services.Notifications
             string body,
             IReadOnlyDictionary<string, string> data,
             CancellationToken cancellationToken = default)
+            => await SendAsync(
+                new FcmPushMessage(token, title, body, data, null, HighPriority: true),
+                cancellationToken).ConfigureAwait(false);
+
+        public async Task<bool> SendAsync(
+            FcmPushMessage message,
+            CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(token))
+            ArgumentNullException.ThrowIfNull(message);
+            if (string.IsNullOrWhiteSpace(message.Token))
             {
                 return false;
             }
@@ -41,13 +49,13 @@ namespace 홍달.Services.Notifications
             var serviceAccountJsonPath = ResolveServiceAccountJsonPath();
             if (!string.IsNullOrWhiteSpace(serviceAccountJsonPath))
             {
-                return await SendHttpV1Async(token, title, body, data, serviceAccountJsonPath, cancellationToken)
+                return await SendHttpV1Async(message, serviceAccountJsonPath, cancellationToken)
                     .ConfigureAwait(false);
             }
 
             if (!string.IsNullOrWhiteSpace(_options.ServerKey))
             {
-                return await SendLegacyAsync(token, title, body, data, cancellationToken).ConfigureAwait(false);
+                return await SendLegacyAsync(message, cancellationToken).ConfigureAwait(false);
             }
 
             _logger.LogDebug(
@@ -62,10 +70,7 @@ namespace 홍달.Services.Notifications
         }
 
         private async Task<bool> SendHttpV1Async(
-            string token,
-            string title,
-            string body,
-            IReadOnlyDictionary<string, string> data,
+            FcmPushMessage message,
             string serviceAccountJsonPath,
             CancellationToken cancellationToken)
         {
@@ -95,21 +100,44 @@ namespace 홍달.Services.Notifications
             }
 
             var accessToken = await CreateAccessTokenAsync(serviceAccountJsonPath, cancellationToken).ConfigureAwait(false);
+            object? androidNotification = null;
+            object? apns = null;
+            if (!string.IsNullOrWhiteSpace(message.ImageUrl))
+            {
+                androidNotification = new { image = message.ImageUrl };
+                apns = new
+                {
+                    payload = new
+                    {
+                        aps = new Dictionary<string, object>
+                        {
+                            ["mutable-content"] = 1
+                        }
+                    },
+                    fcm_options = new
+                    {
+                        image = message.ImageUrl
+                    }
+                };
+            }
+
             var payload = new
             {
                 message = new
                 {
-                    token,
+                    token = message.Token,
                     notification = new
                     {
-                        title,
-                        body
+                        title = message.Title,
+                        body = message.Body
                     },
-                    data,
+                    data = message.Data,
                     android = new
                     {
-                        priority = "HIGH"
-                    }
+                        priority = message.HighPriority ? "HIGH" : "NORMAL",
+                        notification = androidNotification
+                    },
+                    apns
                 }
             };
 
@@ -126,22 +154,20 @@ namespace 홍달.Services.Notifications
         }
 
         private async Task<bool> SendLegacyAsync(
-            string token,
-            string title,
-            string body,
-            IReadOnlyDictionary<string, string> data,
+            FcmPushMessage message,
             CancellationToken cancellationToken)
         {
             var payload = new
             {
-                to = token,
-                priority = "high",
+                to = message.Token,
+                priority = message.HighPriority ? "high" : "normal",
                 notification = new
                 {
-                    title,
-                    body
+                    title = message.Title,
+                    body = message.Body,
+                    image = message.ImageUrl
                 },
-                data
+                data = message.Data
             };
 
             var json = JsonSerializer.Serialize(payload, JsonOptions);
