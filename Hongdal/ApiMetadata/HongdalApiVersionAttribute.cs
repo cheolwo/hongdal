@@ -100,6 +100,7 @@ public sealed class HongdalUseCaseRelationAttribute : Attribute
 
 public enum HongdalProductVersion
 {
+    V0_0 = 0,
     V1_0 = 100,
     V1_5 = 150,
     V2_0 = 200,
@@ -251,6 +252,7 @@ public static class HongdalProductVersionLabels
     {
         return version switch
         {
+            HongdalProductVersion.V0_0 => "0.0",
             HongdalProductVersion.V1_0 => "1.0",
             HongdalProductVersion.V1_5 => "1.5",
             HongdalProductVersion.V2_0 => "2.0",
@@ -850,19 +852,19 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.GroupPurchaseImport,
             "Orderer",
-            "OrdererApp",
-            "주문자 앱",
-            "수입 공동구매",
-            "/group-purchase",
-            "주문자가 공동주문 상품, 비용, 선적·통관 상태, 분배 조건을 확인합니다."),
+            "ShipperApp",
+            "홍달 앱",
+            "공동수입 상품 선택",
+            "/community/group-import",
+            "주문자가 HS 코드와 통관 주의 태그를 확인하고 공동수입 상품 후보를 선택합니다."),
         new(
             HongdalWorkflow.GroupPurchaseImport,
             "OrdererGroupLeader",
-            "OrdererApp",
-            "주문자 앱",
-            "수입 공동구매",
-            "/group-purchase",
-            "주문자 집단 대표가 공동주문 개설, 운송 방식, 분배 기준을 조정합니다."),
+            "ShipperApp",
+            "홍달 앱",
+            "공동수입 선택안",
+            "/community/group-import",
+            "주문자 집단 대표가 HS 코드 상품 후보, 운송 방식과 공동 선택 조건을 조정합니다."),
         new(
             HongdalWorkflow.GroupPurchaseImport,
             "PlatformOperator",

@@ -2,6 +2,8 @@
 
 Hongdal은 커뮤니티에서 생긴 생활 가까운 일을 **공동 원장과 다이어그램**으로 정리하고, 필요한 업무 화면으로 이어 주는 생활 물류 플랫폼입니다.
 
+제품 릴리즈 순서는 **커뮤니티 기반 0.0 → 국내 화물/용달 1.0 → 이후 실행 모듈**입니다. 0.0은 대화, 참여 동의, 공동 원장, 신고·숙고와 신뢰 기록을 운송 기능 없이도 독립적으로 완성하고, 1.0은 그 위에 올라가는 첫 업무 모듈입니다.
+
 GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세한 정책과 구조는 아래 문서 링크에서 확인합니다.
 
 ## 먼저 보는 화면
@@ -183,7 +185,7 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
 | 문서 | 내용 |
 | --- | --- |
 | [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서와 기술 문서를 보는 순서 |
-| [홍달 1.0 커뮤니티 중심 제품 원칙](docs/Architecture/CommunityFirstV1Policy.md) | 커뮤니티 우선순위와 실운영 배차·주선 경계 |
+| [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md) | 커뮤니티 선행 기반과 실운영 배차·주선 경계 |
 | [커뮤니티 운영 정책](docs/Architecture/CommunityOperatingPolicy.md) | 원함, 원장, 참여자, 경험치, 유틸리티 정책 |
 | [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md) | 원장, 블록, OS, 엔진, API 책임 경계 |
 | [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md) | 사방괘, 다이어그램, 구체 데이터 페이지 |

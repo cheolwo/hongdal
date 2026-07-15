@@ -21,6 +21,7 @@ namespace Hongdal.Tests.ApiMetadata;
 public sealed class HongdalApiVersionAttributeTests
 {
     [Theory]
+    [InlineData(HongdalProductVersion.V0_0, "0.0")]
     [InlineData(HongdalProductVersion.V1_0, "1.0")]
     [InlineData(HongdalProductVersion.V1_5, "1.5")]
     [InlineData(HongdalProductVersion.V2_0, "2.0")]
@@ -193,8 +194,8 @@ public sealed class HongdalApiVersionAttributeTests
             screen.AppCode == "DriverApp" &&
             screen.Route == "/driver/recommendations");
         Assert.Contains(groupPurchaseScreens, screen =>
-            screen.AppCode == "OrdererApp" &&
-            screen.Route == "/group-purchase");
+            screen.AppCode == "ShipperApp" &&
+            screen.Route == "/community/group-import");
     }
 
     [Fact]
@@ -212,7 +213,7 @@ public sealed class HongdalApiVersionAttributeTests
             workflow.WorkflowName == "공동주문 수입" &&
             workflow.FlagKey == VersionFeatureFlagKeys.GroupPurchaseImportWorkflow &&
             workflow.Participants.Any(participant => participant.ActorName == "주문자 집단 대표" && participant.IsPrimary) &&
-            workflow.Screens.Any(screen => screen.AppCode == "OrdererApp" && screen.Route == "/group-purchase") &&
+            workflow.Screens.Any(screen => screen.AppCode == "ShipperApp" && screen.Route == "/community/group-import") &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(공동구매자동집단화UseCase) &&
                 useCase.PrimaryActors.Any(actor => actor.ActorCode == nameof(HongdalActor.Orderer)) &&
                 useCase.Relations.Any(relation =>
@@ -264,6 +265,7 @@ public sealed class HongdalApiVersionAttributeTests
             endpoint.EndpointKey == "커뮤니티게시글Controller.Create" &&
             endpoint.Method == "POST" &&
             endpoint.RoutePattern == "api/v1/community/posts" &&
+            endpoint.ProductVersionName == "0.0" &&
             endpoint.AllowsAnonymous);
     }
 
@@ -366,6 +368,38 @@ public sealed class HongdalApiVersionAttributeTests
             missingCommunityTrack);
 
         Assert.Empty(missingCommunityTrack);
+    }
+
+    [Fact]
+    public void CommunityFoundationApis_AreIntroducedInVersionZero()
+    {
+        var communityFoundationControllers = new[]
+        {
+            typeof(커뮤니티게시글Controller),
+            typeof(커뮤니티게시판Controller),
+            typeof(커뮤니티대화Controller),
+            typeof(커뮤니티투표Controller),
+            typeof(커뮤니티원장공유Controller),
+            typeof(주문원장Controller)
+        };
+
+        var incorrectlyVersioned = communityFoundationControllers
+            .Where(type => type.GetCustomAttribute<HongdalApiVersionAttribute>(inherit: true)?.Version
+                != HongdalProductVersion.V0_0)
+            .Select(type => type.FullName)
+            .Order()
+            .ToArray();
+
+        Assert.Empty(incorrectlyVersioned);
+    }
+
+    [Fact]
+    public void DomesticTransportApis_RemainVersionOne()
+    {
+        var version = typeof(Hongdal.Controllers.Shipper.Request01.화주운송의뢰Controller)
+            .GetCustomAttribute<HongdalApiVersionAttribute>(inherit: true)?.Version;
+
+        Assert.Equal(HongdalProductVersion.V1_0, version);
     }
 
     private static IEnumerable<Type> GetControllerTypes()

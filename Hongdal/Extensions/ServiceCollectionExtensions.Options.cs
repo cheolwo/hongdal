@@ -26,6 +26,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<KieAiOptions>(configuration.GetSection(KieAiOptions.SectionName));
         services.Configure<HIOPSAIOptions>(configuration.GetSection(HIOPSAIOptions.SectionName));
         services.Configure<NaverCloudDirectionsOptions>(configuration.GetSection(NaverCloudDirectionsOptions.SectionName));
+        services.Configure<NaverMapsOptions>(configuration.GetSection(NaverMapsOptions.SectionName));
         services.Configure<OpinetOptions>(configuration.GetSection(OpinetOptions.SectionName));
         services.Configure<NtsBusinessRegistrationOptions>(configuration.GetSection(NtsBusinessRegistrationOptions.SectionName));
         services.Configure<해외제조업소조회Options>(configuration.GetSection(해외제조업소조회Options.SectionName));

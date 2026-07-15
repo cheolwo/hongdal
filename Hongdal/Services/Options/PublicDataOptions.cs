@@ -18,6 +18,8 @@ public sealed class PublicDataOptions
 
     public CustomsTradeStatisticsOptions CustomsTradeStatistics { get; set; } = new();
 
+    public AtFoodPricesOptions AtFoodPrices { get; set; } = new();
+
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
 }
 
@@ -61,6 +63,17 @@ public sealed class CustomsTradeStatisticsOptions
     public string BaseUrl { get; set; } = "https://apis.data.go.kr";
 
     public string HsCountryMonthlyPath { get; set; } = "/1220000/nitemtrade/getNitemtradeList";
+}
+
+public sealed class AtFoodPricesOptions
+{
+    public string ServiceKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://apis.data.go.kr";
+
+    public string DailyPricePath { get; set; } = "/B552845/perDay/price";
+
+    public decimal DefaultSimulationFxRateKrwPerUsd { get; set; } = 1350m;
 }
 
 public sealed class TraditionalMarketOptions

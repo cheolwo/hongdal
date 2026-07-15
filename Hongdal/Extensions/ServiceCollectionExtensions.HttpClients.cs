@@ -12,6 +12,7 @@ using Hongdal.Services.Education;
 using Hongdal.Services.External.Typecast;
 using Hongdal.Services.External.YouTube;
 using Hongdal.Services.External.HongikHakdang;
+using Hongdal.Services.External.Naver;
 
 namespace Hongdal.Extensions;
 
@@ -74,6 +75,12 @@ public static partial class ServiceCollectionExtensions
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<KieAiOptions>>().Value;
             client.BaseAddress = new Uri(options.BaseUrl);
         });
+        services.AddHttpClient<INaverMapsReverseGeocodingService, NaverMapsReverseGeocodingService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<NaverMapsOptions>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
         services.AddHttpClient<IHIOPSAIClient, HIOPSAIClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<HIOPSAIOptions>>().Value;
@@ -114,6 +121,12 @@ public static partial class ServiceCollectionExtensions
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
             client.BaseAddress = new Uri(options.CustomsTradeStatistics.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<IAtDomesticFoodPriceLookupService, AtDomesticFoodPriceLookupService>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.AtFoodPrices.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddScoped<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();
