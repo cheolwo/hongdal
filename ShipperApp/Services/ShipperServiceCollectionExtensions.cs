@@ -28,7 +28,6 @@ using ShipperApp.Services.Samples;
 using ShipperApp.Services.Samples.Commands;
 using ShipperApp.Services.Samples.Events;
 using ShipperApp.Services.Security;
-using ShipperApp.Services.Content;
 using Hongdal.Client.Infrastructure.Notifications;
 using ShipperApp.Services.Warehouse.Fulfillment;
 using ShipperApp.Services.Warehouse.Reconsignment.Commands;
@@ -73,7 +72,6 @@ public static class ShipperServiceCollectionExtensions
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<IAuthSession, AuthSession>();
         services.AddSingleton<IHongdalMobilePushTokenProvider, NullHongdalMobilePushTokenProvider>();
-        services.AddScoped<HongdalCardMobileBootstrapService>();
         services.AddScoped<AuthApiService>();
         services.AddSingleton<I꾸미기보유권LocalStore, Maui꾸미기보유권LocalStore>();
         services.AddScoped<꾸미기보유권동기화Service>();

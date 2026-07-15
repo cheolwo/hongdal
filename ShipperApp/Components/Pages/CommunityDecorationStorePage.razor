@@ -15,10 +15,10 @@
         <div class="decoration-market__hero-copy">
             <span>COMMUNITY MAKER SHOP</span>
             <h1>꾸미기 상점</h1>
-            <p>경전·고전 강의와 이어지는 홈 테마, 괘상과 노드 이미지, 역할별 괘 이동 장면의 전환 애니메이션을 한곳에서 만나보세요.</p>
+            <p>홈 테마, 괘상과 노드 이미지, 역할별 괘 이동 장면의 전환 애니메이션을 한곳에서 만나보세요.</p>
         </div>
         <div class="decoration-market__summary">
-            <span><b>@DecorationState.Products.Count</b>개 상품</span>
+            <span><b>@GeneralClientProducts.Count</b>개 상품</span>
             <span><b>@OwnedProductCount</b>개 보유</span>
         </div>
         <div class="decoration-market__hero-actions">
@@ -181,9 +181,9 @@
         {
             var bySource = activeTab switch
             {
-                CreatorTab => DecorationState.Products.Where(product => !IsPlatformProduct(product) && !product.IsCustom),
-                OwnedTab => DecorationState.Products.Where(DecorationState.IsProductOwned),
-                _ => DecorationState.Products.Where(IsPlatformProduct)
+                CreatorTab => GeneralClientProducts.Where(product => !IsPlatformProduct(product) && !product.IsCustom),
+                OwnedTab => GeneralClientProducts.Where(DecorationState.IsProductOwned),
+                _ => GeneralClientProducts.Where(IsPlatformProduct)
             };
 
             return activeType switch
@@ -197,8 +197,13 @@
         }
     }
 
+    private IReadOnlyList<CommunityDecorationProduct> GeneralClientProducts
+        => DecorationState.Products
+            .Where(HongdalClientContentPolicy.IsVisibleToGeneralClient)
+            .ToArray();
+
     private int OwnedProductCount
-        => DecorationState.Products.Count(DecorationState.IsProductOwned);
+        => GeneralClientProducts.Count(DecorationState.IsProductOwned);
 
     private string CurrentEyebrow => activeType == ScriptureType
         ? "SCRIPTURE & CLASSICS LINK PACKS"
@@ -210,7 +215,7 @@
         };
 
     private string CurrentTitle => activeType == ScriptureType
-        ? "홍익학당 강의 제목과 이어지는 경전·고전 꾸미기"
+        ? "경전과 고전에서 영감을 받은 꾸미기"
         : activeTab switch
         {
             CreatorTab => "디자이너가 만든 완성형 패키지",

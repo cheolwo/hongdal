@@ -54,7 +54,7 @@
                             </span>
                             <span class="hongdal-role-option-copy">
                                 <strong>공통 홈</strong>
-                                <small>역할 없이 반야 · 방편의 두 겹 태극에서 시작</small>
+                                <small>역할 없이 정보와 대화의 공통 홈에서 시작</small>
                             </span>
                             @if (RoleService.IsUnspecified)
                             {
@@ -121,7 +121,7 @@
     {
         HongdalClientRole.WarehouseManager => "창고 관리자 · 통합 창고 운영",
         HongdalClientRole.Shipper => $"화주 · {(ProfileService.IsDomestic ? "국내 운송 운영" : "글로벌 물류 운영")}",
-        _ => "공통 홈 · 반야와 방편"
+        _ => "공통 홈 · 커뮤니티"
     };
 
     private string RolePanelCurrentState => RoleService.HasRole

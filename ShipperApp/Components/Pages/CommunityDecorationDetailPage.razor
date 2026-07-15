@@ -158,10 +158,6 @@ else
                                 <article>
                                     <strong>@playlist.Title</strong>
                                     <div>
-                                        <a class="is-internal" href="@ShipperRoutes.PrajnaLectureFor(playlist.PlaylistId)">
-                                            반야 페이지에서 보기
-                                            <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
-                                        </a>
                                         <a href="@playlist.Url" target="_blank" rel="noopener noreferrer">
                                             YouTube
                                             <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
@@ -294,7 +290,8 @@ else
     protected override void OnParametersSet()
     {
         product = DecorationState.Products.FirstOrDefault(item =>
-            string.Equals(item.Key, ProductKey, StringComparison.OrdinalIgnoreCase));
+            string.Equals(item.Key, ProductKey, StringComparison.OrdinalIgnoreCase)
+            && HongdalClientContentPolicy.IsVisibleToGeneralClient(item));
         selectedAsset = product?.Assets.FirstOrDefault();
     }
 

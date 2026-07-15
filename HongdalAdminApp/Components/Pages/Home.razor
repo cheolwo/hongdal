@@ -1,0 +1,58 @@
+@page "/"
+
+<PageTitle>Hongdal Admin</PageTitle>
+
+<PlatformCommunityHome AppName="Hongdal Admin"
+                       RoleLabel="서버 관리자"
+                       AppKey="admin"
+                       UseCompactHomeSummary="true"
+                       ShowRealtimeBest="false"
+                       ShowPrajnaUpayaNavigator="true"
+                       PrajnaHref="/prajna/hongik-hakdang"
+                       QuickActions="QuickActions">
+    <CommunityModeContent>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            사용자 활동과 콘텐츠를 안전하게 검토하고, 조치 사유와 연락 기록을 남기는 모바일 운영 공간입니다.
+        </MudAlert>
+    </CommunityModeContent>
+    <WorkModeContent>
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                    <MudIcon Icon="@Icons.Material.Filled.ManageAccounts" Color="Color.Warning" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">커뮤니티 운영</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        사용자 ID로 활동 로그와 게시글을 찾고 수정, 숨김, 복구, 연락 조치를 기록합니다.
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                    <MudIcon Icon="@Icons.Material.Filled.AutoStories" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">반야 자료 관리</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        홍익학당 카드와 YouTube 자료를 동기화하고 관리 승인 상태를 확인합니다.
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                    <MudIcon Icon="@Icons.Material.Filled.Policy" Color="Color.Warning" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">공개 범위 원칙</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        공식 협력이 확인되기 전에는 일반 사용자 게시판과 모바일 카드 배포에 연결하지 않습니다.
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </WorkModeContent>
+</PlatformCommunityHome>
+
+@code {
+    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    [
+        new("커뮤니티 운영", "사용자 활동과 게시글을 조회하고 운영 조치를 남깁니다.", "/community-management", Icons.Material.Filled.ManageAccounts, Color.Warning),
+        new("홍익학당 자료", "수집 카드와 재생목록을 내부에서 검토합니다.", "/prajna/hongik-hakdang", Icons.Material.Filled.AutoStories, Color.Primary),
+        new("관리자 로그인", "서버관리자 권한으로 관리 기능을 엽니다.", "/login", Icons.Material.Filled.AdminPanelSettings, Color.Secondary)
+    ];
+}

@@ -40,6 +40,19 @@ public sealed class YouTube채널감시Controller : ControllerBase
         CancellationToken cancellationToken = default)
         => Ok(await _service.영상목록조회Async(channelId, newOnly, take, cancellationToken));
 
+    [HttpGet("playlists")]
+    public async Task<IActionResult> 재생목록조회(
+        [FromQuery] string channelId,
+        CancellationToken cancellationToken = default)
+        => Ok(await _service.재생목록목록조회Async(channelId, cancellationToken));
+
+    [HttpGet("playlists/{playlistId}/videos")]
+    public async Task<IActionResult> 재생목록영상조회(
+        [FromRoute] string playlistId,
+        [FromQuery] int take = 50,
+        CancellationToken cancellationToken = default)
+        => Ok(await _service.재생목록영상목록조회Async(playlistId, take, cancellationToken));
+
     [HttpPut("videos/{videoId}/publication")]
     public async Task<IActionResult> 영상공개설정(
         [FromRoute] string videoId,

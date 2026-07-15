@@ -42,7 +42,7 @@ public sealed class HongdalClientRoleService
     {
         HongdalClientRole.Shipper => "운송 의뢰와 판매·물류 흐름을 연결하는 화주 운영",
         HongdalClientRole.WarehouseManager => "입고부터 판매와 운송까지 이어지는 창고 운영",
-        _ => "반야와 방편의 두 겹 태극에서 시작하는 공통 홈"
+        _ => "정보와 대화에서 시작하는 공통 커뮤니티 홈"
     };
 
     public void SetRole(HongdalClientRole role)

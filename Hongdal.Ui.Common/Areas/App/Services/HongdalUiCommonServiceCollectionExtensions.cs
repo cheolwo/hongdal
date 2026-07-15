@@ -59,9 +59,8 @@ public static class HongdalUiCommonServiceCollectionExtensions
         services.AddScoped<HongdalIsmsPClientEncryptionService>();
         services.TryAddScoped<IHongdalAccessTokenProvider, EmptyHongdalAccessTokenProvider>();
         services.AddScoped<HongdalProtectedApiClient>();
-        services.AddScoped<HongikHakdangCardDeliveryClient>();
         services.AddScoped<CommunityLedgerNodeActionService>();
-        services.AddScoped<YouTube공개콘텐츠Service>();
+        services.AddScoped<YouTube관리콘텐츠Service>();
         services.AddScoped<PlatformCommunityDecorationStateService>();
         services.AddScoped<PlatformCommunityPostDraftStateService>();
         services.AddScoped<IDiagramCollaborationClientService>(_ => NoopDiagramCollaborationClientService.Instance);

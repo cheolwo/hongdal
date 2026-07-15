@@ -9,6 +9,9 @@
     <Project Path="HongdalAdmin/HongdalAdmin.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="HongdalAdminApp/HongdalAdminApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
     <Project Path="OrdererApp/OrdererApp.csproj" />
     <Project Path="RestaurantDeskApp/RestaurantDeskApp.csproj" />
     <Project Path="ShipperApp/ShipperApp.csproj">

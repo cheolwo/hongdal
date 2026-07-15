@@ -978,6 +978,10 @@ namespace Hongdal.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
 
+                    b.Property<bool>("IsAdminEnabled")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_admin_enabled");
+
                     b.Property<DateTime>("LastSeenAtUtc")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("last_seen_at_utc");
@@ -1382,6 +1386,10 @@ namespace Hongdal.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
+
+                    b.Property<bool>("IsAdminEnabled")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_admin_enabled");
 
                     b.Property<DateTime>("LastSeenAtUtc")
                         .HasColumnType("datetime(6)")

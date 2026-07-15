@@ -241,7 +241,8 @@ else
     protected override void OnParametersSet()
     {
         product = DecorationState.Products.FirstOrDefault(item =>
-            string.Equals(item.Key, ProductKey, StringComparison.OrdinalIgnoreCase));
+            string.Equals(item.Key, ProductKey, StringComparison.OrdinalIgnoreCase)
+            && HongdalClientContentPolicy.IsVisibleToGeneralClient(item));
         if (product is not null && DecorationState.IsProductOwned(product) && !product.IsFree)
         {
             paymentCompleted = true;
