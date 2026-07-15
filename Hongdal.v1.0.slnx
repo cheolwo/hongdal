@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/Community Foundation/">
     <Project Path="Hongdal.WebApp/Hongdal.WebApp.csproj" />
-    <Project Path="ShipperApp/ShipperApp.csproj">
+    <Project Path="HongdalApp/HongdalApp.csproj">
       <Deploy Solution="Debug|*" />
     </Project>
   </Folder>

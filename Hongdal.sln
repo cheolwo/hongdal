@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HumanResourcesManagerApp", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDriverApp", "FDriverApp\FDriverApp.csproj", "{4990BC08-7876-4608-8377-70852118AE77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipperApp", "ShipperApp\ShipperApp.csproj", "{D70EF643-3447-4079-A0B0-1B1722525A4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HongdalApp", "HongdalApp\HongdalApp.csproj", "{D70EF643-3447-4079-A0B0-1B1722525A4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hongdal.Client.Infrastructure", "Hongdal.Client.Infrastructure\Hongdal.Client.Infrastructure.csproj", "{D169B00C-A867-4C4C-BFAF-5B9D94002851}"
 EndProject

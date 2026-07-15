@@ -89,7 +89,7 @@ public sealed class DiagramCollaborationContractTests
             {
                 WorkType = "WarehouseProxy",
                 WorkLabel = "창고 물류 대행",
-                AppKey = "ShipperApp",
+                AppKey = "HongdalApp",
                 PrimaryRoute = "/shipper/inbound/requests",
                 PrimaryActionLabel = "신청서 작성"
             }

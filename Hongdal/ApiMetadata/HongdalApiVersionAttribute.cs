@@ -756,7 +756,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.DomesticTransport,
             "Shipper",
-            "ShipperApp",
+            "HongdalApp",
             "화주 앱",
             "운송 의뢰",
             "/shipper/request",
@@ -820,7 +820,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.WarehouseFulfillment,
             "ShipperOrSeller",
-            "ShipperApp",
+            "HongdalApp",
             "화주 앱",
             "창고 재고",
             "/shipper/warehouse/inventory",
@@ -836,7 +836,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.CustomsAndTradeData,
             "ShipperOrSeller",
-            "ShipperApp",
+            "HongdalApp",
             "화주 앱",
             "HS 코드 검토",
             "/shipper/customs/hs-reviews",
@@ -852,7 +852,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.GroupPurchaseImport,
             "Orderer",
-            "ShipperApp",
+            "HongdalApp",
             "홍달 앱",
             "공동수입 상품 선택",
             "/community/group-import",
@@ -860,7 +860,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.GroupPurchaseImport,
             "OrdererGroupLeader",
-            "ShipperApp",
+            "HongdalApp",
             "홍달 앱",
             "공동수입 선택안",
             "/community/group-import",
@@ -876,7 +876,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.SalesChannelFulfillment,
             "Seller",
-            "ShipperApp",
+            "HongdalApp",
             "화주 앱",
             "판매채널 연결",
             "/shipper/sales/channels",
@@ -884,7 +884,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.SalesChannelFulfillment,
             "Seller",
-            "ShipperApp",
+            "HongdalApp",
             "화주 앱",
             "상품 출품",
             "/shipper/sales/listings",
@@ -892,7 +892,7 @@ public static class HongdalWorkflowScreens
         new(
             HongdalWorkflow.SalesChannelFulfillment,
             "Seller",
-            "ShipperApp",
+            "HongdalApp",
             "화주 앱",
             "주문 이행",
             "/shipper/sales/orders",

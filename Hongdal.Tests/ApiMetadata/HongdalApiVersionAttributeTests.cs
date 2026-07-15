@@ -187,14 +187,14 @@ public sealed class HongdalApiVersionAttributeTests
 
         Assert.Contains(domesticScreens, screen =>
             screen.ActorCode == "Shipper" &&
-            screen.AppCode == "ShipperApp" &&
+            screen.AppCode == "HongdalApp" &&
             screen.Route == "/shipper/request");
         Assert.Contains(domesticScreens, screen =>
             screen.ActorCode == "Driver" &&
             screen.AppCode == "DriverApp" &&
             screen.Route == "/driver/recommendations");
         Assert.Contains(groupPurchaseScreens, screen =>
-            screen.AppCode == "ShipperApp" &&
+            screen.AppCode == "HongdalApp" &&
             screen.Route == "/community/group-import");
     }
 
@@ -213,7 +213,7 @@ public sealed class HongdalApiVersionAttributeTests
             workflow.WorkflowName == "공동주문 수입" &&
             workflow.FlagKey == VersionFeatureFlagKeys.GroupPurchaseImportWorkflow &&
             workflow.Participants.Any(participant => participant.ActorName == "주문자 집단 대표" && participant.IsPrimary) &&
-            workflow.Screens.Any(screen => screen.AppCode == "ShipperApp" && screen.Route == "/community/group-import") &&
+            workflow.Screens.Any(screen => screen.AppCode == "HongdalApp" && screen.Route == "/community/group-import") &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(공동구매자동집단화UseCase) &&
                 useCase.PrimaryActors.Any(actor => actor.ActorCode == nameof(HongdalActor.Orderer)) &&
                 useCase.Relations.Any(relation =>

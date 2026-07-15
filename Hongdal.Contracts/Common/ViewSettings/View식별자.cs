@@ -5,7 +5,7 @@ public static class App식별자
     public const string DriverApp = "DriverApp";
     public const string CargoYongdalDriverApp = "CargoYongdalDriverApp";
     public const string FoodDeliveryDriverApp = "FoodDeliveryDriverApp";
-    public const string ShipperApp = "ShipperApp";
+    public const string HongdalApp = "HongdalApp";
     public const string WarehouseManagerApp = "WarehouseManagerApp";
     public const string HongdalAdmin = "HongdalAdmin";
     public const string RestaurantDeskApp = "RestaurantDeskApp";
