@@ -10,7 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableDefaultCssItems>false</EnableDefaultCssItems>
-    <ApplicationTitle>Hongdal Admin</ApplicationTitle>
+    <ApplicationTitle>살뜰 관리자</ApplicationTitle>
     <ApplicationId>com.hongdal.adminapp</ApplicationId>
     <ApplicationDisplayVersion>0.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>

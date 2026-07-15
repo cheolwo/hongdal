@@ -22,7 +22,7 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>홍달 앱</ApplicationTitle>
+        <ApplicationTitle>살뜰</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>com.companyname.hongdalapp</ApplicationId>

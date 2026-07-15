@@ -429,7 +429,7 @@
             "Phone" when !string.IsNullOrWhiteSpace(user.PhoneNumber)
                 => new Uri($"tel:{new string(user.PhoneNumber.Where(character => char.IsDigit(character) || character == '+').ToArray())}"),
             "Email" when !string.IsNullOrWhiteSpace(user.Email)
-                => new Uri($"mailto:{Uri.EscapeDataString(user.Email)}?subject={Uri.EscapeDataString("홍달 커뮤니티 운영 관련 안내")}"),
+                => new Uri($"mailto:{Uri.EscapeDataString(user.Email)}?subject={Uri.EscapeDataString("살뜰 커뮤니티 운영 관련 안내")}"),
             _ => null
         };
 
