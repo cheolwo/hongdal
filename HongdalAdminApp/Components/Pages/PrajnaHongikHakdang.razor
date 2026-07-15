@@ -15,10 +15,15 @@
                 공개 웹 자료의 수집 상태를 관리자가 검토합니다. 현재 공식 협력 자료로 표시하거나 일반 사용자에게 자동 배포하지 않습니다.
             </MudText>
         </MudStack>
-        @if (Session.IsServerAdmin)
-        {
-            <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">서버관리자 전용</MudChip>
-        }
+        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="OpenPrajnaHub">
+                반야 사방괘
+            </MudButton>
+            @if (Session.IsServerAdmin)
+            {
+                <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">서버관리자 전용</MudChip>
+            }
+        </MudStack>
     </div>
 
     @if (!Session.IsServerAdmin)
@@ -30,9 +35,11 @@
     }
     else
     {
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-            카드 수집과 영상 승인 상태는 내부 검토용입니다. `공개` 상태도 일반 커뮤니티 게시 또는 모바일 배포를 의미하지 않습니다.
-        </MudAlert>
+        <section id="policy">
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                카드 수집과 영상 승인 상태는 내부 검토용입니다. `공개` 상태도 일반 커뮤니티 게시 또는 모바일 배포를 의미하지 않습니다.
+            </MudAlert>
+        </section>
 
         <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Sync" Disabled="@isBusy" OnClick="SyncCardsAsync">
@@ -75,6 +82,7 @@
                 </MudItem>
             </MudGrid>
 
+            <section id="cards">
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                 <MudStack Spacing="2">
                     <MudText Typo="Typo.h6">수집 카드 · 관리자 ON/OFF</MudText>
@@ -169,7 +177,9 @@
                     }
                 </MudStack>
             </MudPaper>
+            </section>
 
+            <section id="videos">
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                 <MudStack Spacing="2">
                     <MudText Typo="Typo.h6">YouTube 감시 채널</MudText>
@@ -190,7 +200,9 @@
                     </MudTable>
                 </MudStack>
             </MudPaper>
+            </section>
 
+            <section id="review">
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                 <MudStack Spacing="2">
                     <MudText Typo="Typo.h6">영상 검토</MudText>
@@ -221,6 +233,7 @@
                     </MudTable>
                 </MudStack>
             </MudPaper>
+            </section>
 
             <MudDivider />
             <HongdalPrajnaLectureLibrary ShowCommunityShare="false"
@@ -256,6 +269,8 @@
     }
 
     private void OpenLogin() => Navigation.NavigateTo("/login");
+
+    private void OpenPrajnaHub() => Navigation.NavigateTo("/prajna");
 
     private async Task LoadAsync()
     {
