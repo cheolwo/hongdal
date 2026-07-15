@@ -1,5 +1,6 @@
 ﻿# Hongdal 1.0 Checklist
 
+- [ ] [0.0 집중 로드맵](../v0.0/focus-roadmap.md)의 1.0 재개 조건과 0.0 릴리즈 게이트 통과 확인
 - [ ] [Hongdal 0.0 릴리즈 체크리스트](../v0.0/checklist.md)와 0.0 공통 게이트 통과 확인
 - [ ] `CommunityTrustWorkflow=true` 상태에서 0.0 원장이 1.0 운송 의뢰로 인계되는지 확인
 - [ ] 화주 운송 의뢰 등록 흐름 확인
