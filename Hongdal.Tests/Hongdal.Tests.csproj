@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Hongdal\Hongdal.csproj" />
     <ProjectReference Include="..\Hongdal.Client.Infrastructure\Hongdal.Client.Infrastructure.csproj" />
     <ProjectReference Include="..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+    <ProjectReference Include="..\Hongdal.WebApp\Hongdal.WebApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

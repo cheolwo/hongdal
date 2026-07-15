@@ -28,6 +28,7 @@ builder.Services.AddScoped<IDiagramCollaborationClientService, DiagramCollaborat
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkspaceService>(sp => sp.GetRequiredService<WebShipperWarehouseWorkspaceService>());
 builder.Services.AddScoped<WebShipperSalesWorkspaceService>();
+builder.Services.AddScoped<GlobalTradeWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();
 builder.Services.AddScoped<IInboundReceivingWorkflowService, SampleInboundReceivingWorkflowService>();
 builder.Services.AddScoped<IWarehousePickingBatchWorkspaceService, SampleWarehousePickingBatchWorkspaceService>();
