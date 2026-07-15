@@ -166,7 +166,7 @@ public sealed class InMemoryShipperStore
         {
             Id = 4001,
             채널종류 = CommerceChannelKeys.SmartStore,
-            상점명 = "홍달 셀렉트",
+            상점명 = "살뜰 셀렉트",
             연결상태 = SalesStatusCodes.AccountConnected,
             마지막동기화일시 = DateTime.UtcNow.AddMinutes(-15)
         },
@@ -174,7 +174,7 @@ public sealed class InMemoryShipperStore
         {
             Id = 4002,
             채널종류 = CommerceChannelKeys.Coupang,
-            상점명 = "홍달 로켓제휴",
+            상점명 = "살뜰 로켓제휴",
             연결상태 = SalesStatusCodes.AccountConnected,
             마지막동기화일시 = DateTime.UtcNow.AddHours(-2)
         },

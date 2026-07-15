@@ -25,7 +25,7 @@ public sealed class 샘플화주공통콘텐츠Service : I화주공통콘텐츠S
         return Task.FromResult<홍달위젯콘텐츠Dto?>(new 홍달위젯콘텐츠Dto
         {
             콘텐츠Id = 102,
-            제목 = "홍달 운영 공지",
+            제목 = "살뜰 운영 공지",
             설명 = "공지/정책 업데이트를 확인하세요.",
             이동Url = "https://example.invalid/shipper-notice",
             상태문구 = "앱 공지"

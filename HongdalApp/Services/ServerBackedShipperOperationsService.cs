@@ -260,7 +260,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             },
             연락처 = new ContactDTO
             {
-                이름 = "홍달 앱 담당자",
+                이름 = "살뜰 앱 담당자",
                 전화번호 = "010-0000-0000"
             },
             시간창 = new TimeWindowDTO

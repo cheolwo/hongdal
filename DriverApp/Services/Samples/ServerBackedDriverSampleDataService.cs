@@ -249,7 +249,7 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             복귀지출처 = source.복귀지출처,
             복귀추천사유 = source.복귀추천사유,
             요약설명 = $"{source.화물종류} 운송, {source.픽업지}에서 {source.하차지}까지",
-            상세설명 = "홍달 서버의 기사 추천 API에서 내려온 의뢰입니다.",
+            상세설명 = "살뜰 서비스의 기사 추천 API에서 내려온 의뢰입니다.",
             상태 = source.상태,
             배차상태 = source.배차상태,
             추천시작시각 = source.추천시작시각,
@@ -288,7 +288,7 @@ public sealed class ServerBackedDriverSampleDataService : IDriverSampleDataServi
             source.StartLocation,
             source.ReturnDestination,
             source.IsFuture ? "확정" : "완료",
-            "홍달 서버 예약 API에서 조회됨");
+            "살뜰 서비스 예약 API에서 조회됨");
     }
 
     private static 기사정산샘플요약 ToSettlementSummary(기사정산응답 source)

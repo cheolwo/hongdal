@@ -44,7 +44,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
         _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.Accepted");
         return SaveAccepted(
             request,
-            "홍달 서버에서 배차 수락 처리되었습니다.");
+            "살뜰 서비스에서 배차 수락 처리되었습니다.");
     }
 
     public RecommendationDecisionState Hold(DriverRequestItem request)
@@ -73,7 +73,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             new 기사배차수락취소요청 { 사유 = reason },
             cancellationToken);
         _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.AcceptanceCanceled");
-        var memo = "홍달 서버에서 배차 수락 취소가 접수되었습니다.";
+        var memo = "살뜰 서비스에서 배차 수락 취소가 접수되었습니다.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
             memo = $"{memo} 사유: {reason}";
@@ -97,7 +97,7 @@ public sealed class DriverRecommendationDecisionService : IDriverRecommendationD
             new 기사배차거절요청 { 사유 = reason },
             cancellationToken);
         _ledgerObserver.RequestRefresh(request.의뢰Id, "DriverApp.Rejected");
-        var memo = "홍달 서버에서 배차 거절 처리되었습니다.";
+        var memo = "살뜰 서비스에서 배차 거절 처리되었습니다.";
         if (!string.IsNullOrWhiteSpace(reason))
         {
             memo = $"{memo} 사유: {reason}";
