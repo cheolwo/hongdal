@@ -37,7 +37,7 @@ Thumbs.db
 .git-backup*/
 *.tmp
 
-# Generated verification output (keep screenshots and capture hosts tracked)
+# Generated verification output (keep already-selected screenshots and capture hosts tracked)
 /artifacts/build-check/
 /artifacts/*-bin/
 /artifacts/*-build/
@@ -50,3 +50,16 @@ Thumbs.db
 /artifacts/obj-check/
 /artifacts/run-logs/
 /artifacts/tools/
+
+# Local capture sessions and raw verification output
+# Move representative long-lived images to docs/assets before committing.
+/tmp/
+/.codex-remote-attachments/
+/artifacts/android-render-check/
+/artifacts/page-capture-check/
+/artifacts/screenshots/
+/artifacts/ui-e2e/
+/artifacts/webapp-render-check/
+/artifacts/draw-test.png
+/artifacts/food-ai-review-screen.png
+*.pid

@@ -93,6 +93,273 @@ namespace Hongdal.Migrations
                     b.ToTable("platform_community_board_requests", (string)null);
                 });
 
+            modelBuilder.Entity("Hongdal.Domain.Community.CommunityKeywordNotification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_read");
+
+                    b.Property<string>("MatchedKeywordsJson")
+                        .IsRequired()
+                        .HasMaxLength(4096)
+                        .HasColumnType("varchar(4096)")
+                        .HasColumnName("matched_keywords_json");
+
+                    b.Property<string>("PostAppKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("post_app_key");
+
+                    b.Property<string>("PostAuthorNickname")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("post_author_nickname");
+
+                    b.Property<string>("PostCategory")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)")
+                        .HasColumnName("post_category");
+
+                    b.Property<string>("PostExcerpt")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("post_excerpt");
+
+                    b.Property<long>("PostId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("post_id");
+
+                    b.Property<string>("PostTitle")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)")
+                        .HasColumnName("post_title");
+
+                    b.Property<DateTime?>("ReadAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("read_at_utc");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId", "PostId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_keyword_notification_user_post");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAtUtc")
+                        .HasDatabaseName("IX_community_keyword_notification_inbox");
+
+                    b.ToTable("community_keyword_notifications", (string)null);
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.CommunityKeywordNotificationDelivery", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<long>("InstallationId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("installation_id");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTime?>("NextAttemptAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("next_attempt_at_utc");
+
+                    b.Property<long>("NotificationId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("notification_id");
+
+                    b.Property<string>("ProcessingToken")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("processing_token");
+
+                    b.Property<DateTime?>("SentAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("sent_at_utc");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstallationId")
+                        .HasDatabaseName("IX_community_keyword_delivery_installation");
+
+                    b.HasIndex("NotificationId", "InstallationId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_keyword_delivery_target");
+
+                    b.HasIndex("Status", "NextAttemptAtUtc")
+                        .HasDatabaseName("IX_community_keyword_delivery_due");
+
+                    b.ToTable("community_keyword_notification_deliveries", (string)null);
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.CommunityKeywordSubscription", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AppKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("app_key");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Keyword")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("keyword");
+
+                    b.Property<string>("NormalizedKeyword")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("normalized_keyword");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppKey", "IsActive")
+                        .HasDatabaseName("IX_community_keyword_subscription_match");
+
+                    b.HasIndex("UserId", "AppKey", "NormalizedKeyword")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_keyword_subscription");
+
+                    b.ToTable("community_keyword_subscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostKeywordScan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("completed_at_utc");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTime?>("NextAttemptAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("next_attempt_at_utc");
+
+                    b.Property<long>("PostId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("post_id");
+
+                    b.Property<string>("ProcessingToken")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("processing_token");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_keyword_scan_post");
+
+                    b.HasIndex("Status", "NextAttemptAtUtc")
+                        .HasDatabaseName("IX_community_keyword_scan_due");
+
+                    b.ToTable("platform_community_post_keyword_scans", (string)null);
+                });
+
             modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPost", b =>
                 {
                     b.Property<long>("Id")
@@ -105,6 +372,10 @@ namespace Hongdal.Migrations
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("varchar(80)");
+
+                    b.Property<string>("AuthorUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
 
                     b.Property<string>("Body")
                         .IsRequired()
@@ -185,6 +456,8 @@ namespace Hongdal.Migrations
                         .HasColumnType("varchar(120)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorUserId");
 
                     b.HasIndex("커뮤니티원장Id");
 
@@ -8995,6 +9268,61 @@ namespace Hongdal.Migrations
 
                     b.Navigation("상품목록");
                 });
+            modelBuilder.Entity("Hongdal.Domain.Community.CommunityKeywordNotification", b =>
+                {
+                    b.HasOne("Hongdal.Domain.Community.PlatformCommunityPost", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_notification_post");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.CommunityKeywordNotificationDelivery", b =>
+                {
+                    b.HasOne("Hongdal.Domain.Notifications.HongdalMobilePushInstallation", "Installation")
+                        .WithMany()
+                        .HasForeignKey("InstallationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_delivery_installation");
+
+                    b.HasOne("Hongdal.Domain.Community.CommunityKeywordNotification", "Notification")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("FK_community_keyword_delivery_notification")
+                        .IsRequired();
+
+                    b.Navigation("Installation");
+
+                    b.Navigation("Notification");
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostKeywordScan", b =>
+                {
+                    b.HasOne("Hongdal.Domain.Community.PlatformCommunityPost", "Post")
+                        .WithOne("KeywordNotificationScan")
+                        .HasForeignKey("Hongdal.Domain.Community.PlatformCommunityPostKeywordScan", "PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_scan_post");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.CommunityKeywordNotification", b =>
+                {
+                    b.Navigation("Deliveries");
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPost", b =>
+                {
+                    b.Navigation("KeywordNotificationScan");
+                });
+
 #pragma warning restore 612, 618
         }
     }

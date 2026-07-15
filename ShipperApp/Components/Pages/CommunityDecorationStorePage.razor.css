@@ -125,8 +125,8 @@
 }
 
 .decoration-market__types {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-width: 680px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    max-width: 820px;
     margin-inline: auto;
     background: rgba(var(--mud-palette-primary-rgb), 0.08);
 }
@@ -296,6 +296,25 @@
     color: var(--mud-palette-text-secondary);
     font-size: 0.58rem;
     line-height: 1.4;
+}
+
+.decoration-market-card__scripture {
+    display: flex;
+    min-height: 24px;
+    align-items: center;
+    gap: 5px;
+    color: var(--mud-palette-primary) !important;
+}
+
+.decoration-market-card__scripture b {
+    display: inline-grid;
+    min-width: 29px;
+    height: 20px;
+    padding-inline: 4px;
+    border-radius: 7px;
+    place-items: center;
+    background: rgba(var(--mud-palette-primary-rgb), 0.09);
+    font-size: 0.56rem;
 }
 
 .decoration-market-card__copy > div {

@@ -1,0 +1,220 @@
+@namespace Hongdal.Ui.Common.Areas.App.Components.Community
+@using Hongdal.Contracts.Common.Community
+
+<section class="order-ledger-hierarchy" aria-label="공동주문 포함 원장">
+    <header class="order-ledger-hierarchy__header">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Default"
+                       OnClick="HandleBackAsync"
+                       aria-label="원장 목록으로 돌아가기" />
+        <div>
+            <MudText Typo="Typo.overline" Color="Color.Primary">공동주문 원장</MudText>
+            <MudText Typo="Typo.h5">@(Context?.제목 ?? "포함 원장 보기")</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">공동주문을 구성하는 개별 주문과 후속 업무 원장을 순서대로 확인합니다.</MudText>
+        </div>
+    </header>
+
+    @if (Context is null)
+    {
+        <div class="order-ledger-hierarchy__state">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Warning" Size="Size.Large" />
+            <strong>공동주문 원장 관계를 표시할 수 없습니다.</strong>
+            <span>원장 접근 권한과 서버 연결 상태를 확인해 주세요.</span>
+        </div>
+    }
+    else
+    {
+        var rows = BuildRows(Context);
+        var accessibleCount = rows.Count(row => row.Context is not null);
+        var diagramCount = rows.Count(row => row.Context?.다이어그램 is { Nodes.Count: > 0 });
+
+        <div class="order-ledger-hierarchy__summary" aria-label="공동주문 원장 요약">
+            <div>
+                <span>전체 원장</span>
+                <strong>@rows.Count</strong>
+            </div>
+            <div>
+                <span>확인 가능</span>
+                <strong>@accessibleCount</strong>
+            </div>
+            <div>
+                <span>다이어그램</span>
+                <strong>@diagramCount</strong>
+            </div>
+            <div>
+                <span>공동주문 상태</span>
+                <strong>@Context.상태</strong>
+            </div>
+        </div>
+
+        <div class="order-ledger-hierarchy__heading">
+            <div>
+                <MudIcon Icon="@Icons.Material.Filled.AccountTree" Color="Color.Primary" />
+                <strong>포함 원장 흐름</strong>
+            </div>
+            <span>항목을 누르면 해당 원장의 다이어그램을 엽니다.</span>
+        </div>
+
+        <div class="order-ledger-hierarchy__tree">
+            @foreach (var row in rows)
+            {
+                <button type="button"
+                        class="@BuildRowClass(row)"
+                        style="@($"--ledger-depth:{row.Depth}")"
+                        disabled="@(row.Context is null)"
+                        title="@(row.Context is null ? "이 원장의 공개 또는 참여 권한이 필요합니다." : $"{row.Title} 다이어그램 보기")"
+                        @onclick="@(() => OpenDiagramAsync(row.Context))">
+                    <span class="order-ledger-hierarchy__connector" aria-hidden="true"></span>
+                    <span class="order-ledger-hierarchy__icon">
+                        <MudIcon Icon="@ResolveIcon(row.TemplateKey)" Size="Size.Small" />
+                    </span>
+                    <span class="order-ledger-hierarchy__main">
+                        <span class="order-ledger-hierarchy__title-line">
+                            <strong>@row.Title</strong>
+                            <small>@row.Role</small>
+                            @if (row.Required)
+                            {
+                                <small class="order-ledger-hierarchy__required">필수</small>
+                            }
+                        </span>
+                        <span>@row.TemplateName · @row.State</span>
+                        <small>@BuildDiagramSummary(row)</small>
+                    </span>
+                    <MudIcon Icon="@(row.Context is null ? Icons.Material.Filled.Lock : Icons.Material.Filled.ChevronRight)"
+                             Color="@(row.Context is null ? Color.Default : Color.Primary)" />
+                </button>
+            }
+        </div>
+
+        <footer class="order-ledger-hierarchy__actions">
+            <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="HandleBackAsync">목록으로</MudButton>
+            @if (OnAttach.HasDelegate)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.AttachFile"
+                           OnClick="HandleAttachAsync">
+                    공동주문 원장 첨부
+                </MudButton>
+            }
+        </footer>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public PlatformCommunityPostLedgerContextResponse? Context { get; set; }
+
+    [Parameter]
+    public EventCallback OnBack { get; set; }
+
+    [Parameter]
+    public EventCallback OnAttach { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostLedgerContextResponse> OnOpenDiagram { get; set; }
+
+    private static IReadOnlyList<LedgerRow> BuildRows(PlatformCommunityPostLedgerContextResponse context)
+    {
+        var rows = new List<LedgerRow>
+        {
+            new(
+                context.원장Id,
+                context.원장템플릿Key,
+                context.원장템플릿명,
+                context.제목,
+                context.상태,
+                "공동주문 묶음",
+                Required: true,
+                Depth: 0,
+                context)
+        };
+        AppendChildren(rows, context.포함원장목록, 1);
+        return rows;
+    }
+
+    private static void AppendChildren(
+        ICollection<LedgerRow> rows,
+        IReadOnlyList<PlatformCommunityIncludedLedgerResponse> children,
+        int depth)
+    {
+        foreach (var child in children.OrderBy(item => item.표시순서))
+        {
+            rows.Add(new LedgerRow(
+                child.원장Id,
+                child.원장템플릿Key,
+                child.원장템플릿명,
+                child.원장?.제목 ?? child.원장템플릿명,
+                child.원장?.상태 ?? BuildRestrictedState(child.조회상태),
+                BuildRoleLabel(child.역할),
+                child.필수여부,
+                depth,
+                child.원장));
+            AppendChildren(rows, child.포함원장목록, depth + 1);
+        }
+    }
+
+    private Task HandleBackAsync() => OnBack.InvokeAsync();
+
+    private Task HandleAttachAsync() => OnAttach.InvokeAsync();
+
+    private Task OpenDiagramAsync(PlatformCommunityPostLedgerContextResponse? context)
+        => context is null ? Task.CompletedTask : OnOpenDiagram.InvokeAsync(context);
+
+    private static string BuildRowClass(LedgerRow row)
+    {
+        var state = row.Context is null
+            ? " order-ledger-hierarchy__row--restricted"
+            : string.Equals(row.State, "완료", StringComparison.OrdinalIgnoreCase)
+                ? " order-ledger-hierarchy__row--complete"
+                : " order-ledger-hierarchy__row--active";
+        return $"order-ledger-hierarchy__row{state}";
+    }
+
+    private static string BuildDiagramSummary(LedgerRow row)
+        => row.Context?.다이어그램 is { Nodes.Count: > 0 } diagram
+            ? $"{diagram.Nodes.Count}개 블록 · {diagram.Edges.Count}개 연결"
+            : row.Context is null ? "상세 접근 권한 필요" : "저장된 다이어그램 없음";
+
+    private static string BuildRoleLabel(string role)
+        => role switch
+        {
+            주문원장포함역할.개별주문 => "개별 주문",
+            주문원장포함역할.판매 => "판매",
+            주문원장포함역할.창고입고 => "창고 입고",
+            주문원장포함역할.창고출고 => "창고 출고",
+            주문원장포함역할.배송 => "배송",
+            주문원장포함역할.운송 => "운송",
+            _ => string.IsNullOrWhiteSpace(role) ? "관련 원장" : role
+        };
+
+    private static string BuildRestrictedState(string state)
+        => state switch
+        {
+            "원장누락" => "연결 원장 누락",
+            "순환참조" => "관계 확인 필요",
+            _ => "접근 권한 필요"
+        };
+
+    private static string ResolveIcon(string templateKey)
+        => templateKey switch
+        {
+            CommunityLedgerTemplateKeys.GroupPurchase => Icons.Material.Filled.Hub,
+            CommunityLedgerTemplateKeys.Order or CommunityLedgerTemplateKeys.FoodOrder or CommunityLedgerTemplateKeys.HongdalMart => Icons.Material.Filled.ShoppingCart,
+            CommunityLedgerTemplateKeys.LocalSale => Icons.Material.Filled.Storefront,
+            CommunityLedgerTemplateKeys.WarehouseInbound or CommunityLedgerTemplateKeys.WarehouseOutbound => Icons.Material.Filled.Warehouse,
+            CommunityLedgerTemplateKeys.CargoTransport or CommunityLedgerTemplateKeys.FoodDelivery => Icons.Material.Filled.LocalShipping,
+            _ => Icons.Material.Filled.Description
+        };
+
+    private sealed record LedgerRow(
+        string LedgerId,
+        string TemplateKey,
+        string TemplateName,
+        string Title,
+        string State,
+        string Role,
+        bool Required,
+        int Depth,
+        PlatformCommunityPostLedgerContextResponse? Context);
+}

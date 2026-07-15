@@ -20,6 +20,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.Body).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
         builder.Property(x => x.커뮤니티원장Id).HasMaxLength(120);
+        builder.Property(x => x.AuthorUserId).HasMaxLength(450);
         builder.Property(x => x.Nickname).HasMaxLength(40).IsRequired();
         builder.Property(x => x.ReporterDisplayName).HasMaxLength(40);
         builder.Property(x => x.ReportedDisplayName).HasMaxLength(40);
@@ -30,6 +31,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.HasIndex(x => new { x.WorkflowTag, x.RoleTag, x.IsDeleted, x.CreatedAtUtc });
         builder.HasIndex(x => new { x.IsReportBoardPost, x.IsDeleted, x.CreatedAtUtc });
         builder.HasIndex(x => x.커뮤니티원장Id);
+        builder.HasIndex(x => x.AuthorUserId);
 
         builder.HasMany(x => x.Attachments)
             .WithOne(x => x.Post)

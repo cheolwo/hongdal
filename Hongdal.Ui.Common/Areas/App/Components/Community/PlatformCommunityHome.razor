@@ -26,9 +26,17 @@
             <CommunityLedgerDiagramDetail Context="ledgerDetailContext"
                                           IsLoading="isLedgerDetailLoading"
                                           ErrorMessage="@ledgerDetailErrorMessage"
-                                          OnBack="ReturnToLedgerPicker"
+                                          OnBack="ReturnFromLedgerDetail"
                                           OnAttach="AttachPendingLedgerAndReturn"
+                                          HideAttach="ledgerDetailOpenedFromHierarchy"
                                           OnRefreshRequested="RefreshLedgerDetailAsync" />
+        }
+        else if (isOrderLedgerHierarchyOpen)
+        {
+            <CommunityOrderLedgerHierarchyDetail Context="orderLedgerHierarchyContext"
+                                                 OnBack="ReturnToLedgerPicker"
+                                                 OnAttach="AttachPendingLedgerAndReturn"
+                                                 OnOpenDiagram="OpenHierarchyLedgerDiagram" />
         }
         else if (isLedgerPickerOpen)
         {
@@ -105,7 +113,7 @@
                                 <button type="button"
                                         class="@BuildLedgerPickerItemClass(ledger)"
                                         aria-pressed="@IsPendingLedger(ledger)"
-                                        @onclick="@(() => pendingLedgerId = ledger.원장Id)">
+                                        @onclick="@(() => HandleLedgerPickerItemClickAsync(ledger))">
                                     <span class="platform-ledger-picker-item-icon">
                                         <MudIcon Icon="@Icons.Material.Filled.Description" Color="Color.Primary" />
                                     </span>
@@ -935,6 +943,74 @@
                 </div>
             </div>
         }
+        else if (IsCompactHomeSummaryVisible)
+        {
+            <PlatformCommunityHomeSummary 베스트글목록="@(ShowRealtimeBest ? 실시간베스트글 : [])"
+                                          전체글수="@공통홈전체글수"
+                                          게시판수="@CommunityBoardOptions.Count"
+                                          게시판명목록="@공통홈게시판명목록"
+                                          상점상품수="@DecorationState.Products.Count"
+                                          보유상품수="@공통홈보유상품수"
+                                          현재테마명="@공통홈현재테마명"
+                                          추천상품명목록="@공통홈추천상품명목록"
+                                          데이터로딩중="@isLoading"
+                                          OnBestPostSelected="공통홈베스트글열기Async"
+                                          OnCommunityOpen="공통홈게시판열기Async"
+                                          OnCompose="공통홈글쓰기열기"
+                                          OnStoreOpen="OpenDecorationStore" />
+
+            <div class="@BuildBaguaEntryClass()" style="@BuildBaguaEntryStyle()">
+                <button type="button"
+                        class="platform-community-bagua-toggle"
+                        aria-expanded="@isBaguaNavigatorOpen"
+                        aria-label="@BaguaToggleAriaLabel"
+                        @onpointerdown="BeginBaguaDockDrag"
+                        @onpointermove="HandleBaguaDockDrag"
+                        @onpointerup="EndBaguaDockDrag"
+                        @onpointercancel="CancelBaguaDockDrag"
+                        @onkeydown="HandleBaguaDockKeyDown"
+                        @onkeydown:preventDefault="true">
+                    <span class="platform-community-bagua-toggle-mark">@BaguaToggleSymbol</span>
+                    <span>
+                        <strong>@BaguaToggleTitle</strong>
+                        <small>@BaguaToggleDescription</small>
+                    </span>
+                    <MudIcon Icon="@(isBaguaNavigatorOpen ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" />
+                </button>
+                @if (isBaguaNavigatorOpen)
+                {
+                    @if (ShowPrajnaUpayaNavigator)
+                    {
+                        <HongdalPrajnaUpayaTaegeukNavigator AccentColor="@DecorationState.HomeThemeAccentColor"
+                                                           Theme="@DecorationState.ActiveHomeTheme"
+                                                           UpayaSelected="@PrajnaUpayaUpayaSelectedCallback"
+                                                           PrajnaSelected="@PrajnaUpayaPrajnaSelectedCallback"
+                                                           CommunitySelected="@BaguaTaegeukYangSelectedCallback"
+                                                           StoreSelected="@BaguaTaegeukYinSelectedCallback" />
+                    }
+                    else
+                    {
+                        <HongdalLaterHeavenBaguaNavigator RoleLabel="@RoleLabel"
+                                                           NavigationItems="@EffectiveCardinalNavigationOptions"
+                                                           AccentColor="@DecorationState.BaguaAccentColor"
+                                                           CenterSymbol="@EffectiveBaguaCenterSymbol"
+                                                           CenterTrigramName="@BaguaCenterTrigramName"
+                                                           CenterDestinationLabel="@BaguaCenterDestinationLabel"
+                                                           CenterSelected="@BaguaCenterSelectedCallback"
+                                                           ShowTaegeukCenter="@BaguaCenterShowsTaegeuk"
+                                                           TaegeukYangDestinationLabel="커뮤니티"
+                                                           TaegeukYinDestinationLabel="상점"
+                                                           TaegeukYangSelected="@BaguaTaegeukYangSelectedCallback"
+                                                           TaegeukYinSelected="@BaguaTaegeukYinSelectedCallback"
+                                                           ShowTrigramSymbols="@DecorationState.IsBaguaDecorationEnabled"
+                                                           CenterTransferTrigramKey="zhen"
+                                                           CenterTransferDestinationLabel="공동구매"
+                                                           CenterTransferCompleted="HandleBaguaCenterTransferCompletedAsync"
+                                                           DestinationSelected="HandleBaguaDestinationSelectedAsync" />
+                    }
+                }
+            </div>
+        }
         else
         {
         <MudPaper id="community-home-top" Elevation="0" Class="pa-4 platform-community-hero platform-community-forum-header">
@@ -1627,7 +1703,6 @@
                             </MudPaper>
                             }
                         }
-                    }
                     }
 
                     @if (CommunityModeContent is not null &&
@@ -2815,14 +2890,28 @@
         @if (!IsDiagramMode && !isComposeOpen)
         {
             <nav class="platform-community-mobile-nav" aria-label="커뮤니티 모바일 내비게이션">
-                <button type="button" class="@BuildMobileNavigationClass(!isWorkMode)" @onclick="OpenCommunityMode">
-                    <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
-                    <span>커뮤니티</span>
-                </button>
-                <a href="#community-board-list" class="platform-community-mobile-nav-item">
-                    <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
-                    <span>게시판</span>
-                </a>
+                @if (UseCompactHomeSummary)
+                {
+                    <button type="button" class="@BuildMobileNavigationClass(IsCompactHomeSummaryVisible)" @onclick="OpenCompactHomeSummary">
+                        <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+                        <span>홈</span>
+                    </button>
+                    <button type="button" class="@BuildMobileNavigationClass(!isWorkMode && !IsCompactHomeSummaryVisible)" @onclick="공통홈게시판열기Async">
+                        <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
+                        <span>게시판</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="@BuildMobileNavigationClass(!isWorkMode)" @onclick="OpenCommunityMode">
+                        <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
+                        <span>커뮤니티</span>
+                    </button>
+                    <a href="#community-board-list" class="platform-community-mobile-nav-item">
+                        <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
+                        <span>게시판</span>
+                    </a>
+                }
                 <button type="button" class="platform-community-mobile-nav-item platform-community-mobile-nav-compose" @onclick="OpenCompose">
                     <MudIcon Icon="@Icons.Material.Filled.Add" />
                     <span>글쓰기</span>
@@ -6772,6 +6861,9 @@
     public bool ShowRealtimeBest { get; set; }
 
     [Parameter]
+    public bool UseCompactHomeSummary { get; set; }
+
+    [Parameter]
     public RenderFragment? CommunityModeContent { get; set; }
 
     [Parameter]
@@ -6961,11 +7053,14 @@
     private bool isMyLedgersLoading;
     private bool isLedgerPickerOpen;
     private bool isLedgerDetailOpen;
+    private bool isOrderLedgerHierarchyOpen;
     private bool isLedgerDetailLoading;
+    private bool ledgerDetailOpenedFromHierarchy;
     private bool isLedgerSharingSaving;
     private bool isSharedLedgerReusing;
     private bool isSavingBoardRequest;
     private bool isWorkMode;
+    private bool isCompactHomeSummary;
     private bool isComposeOpen;
     private bool isBaguaNavigatorOpen;
     private bool isBaguaDockDragging;
@@ -6976,6 +7071,7 @@
     private string? ledgerDetailErrorMessage;
     private 커뮤니티원장공개설정Response? ledgerSharingSettings;
     private PlatformCommunityPostLedgerContextResponse? ledgerDetailContext;
+    private PlatformCommunityPostLedgerContextResponse? orderLedgerHierarchyContext;
     private string? 창고대행신청알림문구;
     private string? 원장전송결과메시지;
     private string? 다이어그램대화방알림문구;
@@ -6996,16 +7092,21 @@
 
     private bool IsDiagramMode => DiagramPalette.IsDiagramMode;
 
+    private bool IsCompactHomeSummaryVisible
+        => UseCompactHomeSummary && isCompactHomeSummary && !isWorkMode && !IsDiagramMode;
+
     private string ComposeCardClass => isComposeOpen
         ? "pa-4 platform-community-compose-card platform-community-compose-card--open"
         : "pa-4 platform-community-compose-card";
 
-    private string HomeRootClass => isLedgerPickerOpen || isLedgerDetailOpen
+    private string HomeRootClass => isLedgerPickerOpen || isLedgerDetailOpen || isOrderLedgerHierarchyOpen
         ? "py-4 platform-community-home platform-home--ledger-picker"
         : IsDiagramMode
         ? "py-4 platform-community-home platform-home--diagram"
         : isWorkMode
         ? "py-4 platform-community-home platform-home--work"
+        : IsCompactHomeSummaryVisible
+        ? "py-4 platform-community-home platform-home--summary"
         : "py-4 platform-community-home platform-home--community";
 
     private string CommunityGridClass => IsDiagramMode
@@ -7083,9 +7184,9 @@
 
     private int ForumVisiblePostCount => VisiblePosts.Count + VisibleSeedPosts.Count;
 
-    private IReadOnlyList<실시간베스트글항목> 실시간베스트글
+    private IReadOnlyList<공통홈베스트글요약> 실시간베스트글
         => posts
-            .Select(post => new 실시간베스트글항목(
+            .Select(post => new 공통홈베스트글요약(
                 post.Id,
                 null,
                 post.Title,
@@ -7095,7 +7196,7 @@
                 post.CommentCount,
                 post.IsTrending,
                 post.LastEngagedAtUtc ?? post.CreatedAtUtc))
-            .Concat(SeedPosts.Select(post => new 실시간베스트글항목(
+            .Concat(SeedPosts.Select(post => new 공통홈베스트글요약(
                 null,
                 post.Title,
                 post.Title,
@@ -7109,6 +7210,34 @@
             .ThenByDescending(post => (post.추천수 * 3) + (post.댓글수 * 2))
             .ThenByDescending(post => post.최근활동일시)
             .Take(3)
+            .ToArray();
+
+    private int 공통홈전체글수 => posts.Count + SeedPosts.Count;
+
+    private IReadOnlyList<string> 공통홈게시판명목록
+        => CommunityBoardOptions
+            .Where(board => !string.Equals(board, "전체", StringComparison.OrdinalIgnoreCase))
+            .Take(4)
+            .ToArray();
+
+    private int 공통홈보유상품수
+        => DecorationState.Products.Count(DecorationState.IsProductOwned);
+
+    private string 공통홈현재테마명
+        => DecorationState.Products.FirstOrDefault(product =>
+               string.Equals(
+                   product.PackKey,
+                   DecorationState.ActiveHomeThemePackKey,
+                   StringComparison.OrdinalIgnoreCase))?.Title
+           ?? "홍달 기본 홈";
+
+    private IReadOnlyList<string> 공통홈추천상품명목록
+        => DecorationState.Products
+            .OrderByDescending(DecorationState.IsProductActive)
+            .ThenByDescending(product => !DecorationState.IsProductOwned(product))
+            .Select(product => product.Title)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(2)
             .ToArray();
 
     private string CurrentCommunityBoardTitle
@@ -7255,7 +7384,7 @@
         }
     }
 
-    private void 실시간베스트글열기(실시간베스트글항목 베스트글)
+    private void 실시간베스트글열기(공통홈베스트글요약 베스트글)
     {
         selectedBoardFilter = 베스트글.분류;
         selectedForumListFilter = "전체글";
@@ -7372,7 +7501,10 @@
         isComposeOpen = true;
         isLedgerPickerOpen = true;
         isLedgerDetailOpen = false;
+        isOrderLedgerHierarchyOpen = false;
+        ledgerDetailOpenedFromHierarchy = false;
         ledgerDetailContext = null;
+        orderLedgerHierarchyContext = null;
         ledgerDetailErrorMessage = null;
         nodeDetailPanelNode = null;
         ledgerSharingSettings = null;
@@ -7443,6 +7575,8 @@
         }
 
         isLedgerDetailOpen = true;
+        isOrderLedgerHierarchyOpen = false;
+        ledgerDetailOpenedFromHierarchy = false;
         isLedgerDetailLoading = true;
         ledgerDetailContext = null;
         ledgerDetailErrorMessage = null;
@@ -7453,6 +7587,12 @@
             {
                 ledgerDetailErrorMessage = "이 원장의 공개 범위 또는 참여 권한을 확인해 주세요.";
             }
+            else if (ledgerDetailContext.포함원장목록.Count > 0)
+            {
+                orderLedgerHierarchyContext = ledgerDetailContext;
+                isOrderLedgerHierarchyOpen = true;
+                isLedgerDetailOpen = false;
+            }
         }
         catch (Exception)
         {
@@ -7462,6 +7602,28 @@
         {
             isLedgerDetailLoading = false;
         }
+    }
+
+    private async Task HandleLedgerPickerItemClickAsync(PlatformCommunityPostLedgerChoiceResponse ledger)
+    {
+        pendingLedgerId = ledger.원장Id;
+        if (string.Equals(
+                ledger.원장템플릿Key,
+                CommunityLedgerTemplateKeys.GroupPurchase,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            await OpenPendingLedgerDetailAsync();
+        }
+    }
+
+    private void OpenHierarchyLedgerDiagram(PlatformCommunityPostLedgerContextResponse context)
+    {
+        ledgerDetailContext = context;
+        ledgerDetailErrorMessage = null;
+        isLedgerDetailLoading = false;
+        ledgerDetailOpenedFromHierarchy = true;
+        isOrderLedgerHierarchyOpen = false;
+        isLedgerDetailOpen = true;
     }
 
     private async Task RefreshLedgerDetailAsync()
@@ -7561,17 +7723,38 @@
     private void ReturnToComposeFromLedgerPicker()
     {
         isLedgerDetailOpen = false;
+        isOrderLedgerHierarchyOpen = false;
         isLedgerPickerOpen = false;
         isComposeOpen = true;
         pendingLedgerId = null;
+        ledgerDetailOpenedFromHierarchy = false;
+        orderLedgerHierarchyContext = null;
     }
 
     private void ReturnToLedgerPicker()
     {
         isLedgerDetailOpen = false;
+        isOrderLedgerHierarchyOpen = false;
         isLedgerPickerOpen = true;
         ledgerDetailContext = null;
         ledgerDetailErrorMessage = null;
+        ledgerDetailOpenedFromHierarchy = false;
+        orderLedgerHierarchyContext = null;
+    }
+
+    private void ReturnFromLedgerDetail()
+    {
+        if (ledgerDetailOpenedFromHierarchy && orderLedgerHierarchyContext is not null)
+        {
+            isLedgerDetailOpen = false;
+            isOrderLedgerHierarchyOpen = true;
+            ledgerDetailContext = null;
+            ledgerDetailErrorMessage = null;
+            ledgerDetailOpenedFromHierarchy = false;
+            return;
+        }
+
+        ReturnToLedgerPicker();
     }
 
     private void AttachPendingLedgerAndReturn()
@@ -7587,9 +7770,12 @@
 
         SelectMyLedger(ledger);
         isLedgerDetailOpen = false;
+        isOrderLedgerHierarchyOpen = false;
         isLedgerPickerOpen = false;
         isComposeOpen = true;
         pendingLedgerId = null;
+        ledgerDetailOpenedFromHierarchy = false;
+        orderLedgerHierarchyContext = null;
     }
 
     private void ClearSelectedLedger()
@@ -7713,13 +7899,59 @@
 
     private void OpenCommunityMode()
     {
+        isCompactHomeSummary = false;
         DiagramPalette.SetDiagramMode(false);
         HomeModeState.SetWorkMode(false);
         diagramConnectionMessage = null;
     }
 
+    private void OpenCompactHomeSummary()
+    {
+        isComposeOpen = false;
+        isLedgerDetailOpen = false;
+        isLedgerPickerOpen = false;
+        isOrderLedgerHierarchyOpen = false;
+        isCompactHomeSummary = UseCompactHomeSummary;
+        DiagramPalette.SetDiagramMode(false);
+        HomeModeState.SetWorkMode(false);
+        diagramConnectionMessage = null;
+    }
+
+    private async Task 공통홈게시판열기Async()
+        => await OpenBaguaAnchorAsync(workMode: false, "community-board-list");
+
+    private void 공통홈글쓰기열기()
+    {
+        OpenCommunityMode();
+        OpenCompose();
+    }
+
+    private async Task 공통홈베스트글열기Async(공통홈베스트글요약 베스트글)
+    {
+        OpenCommunityMode();
+        실시간베스트글열기(베스트글);
+        if (베스트글.게시글Id is long 게시글Id)
+        {
+            try
+            {
+                await LoadPostDetailAsync(게시글Id);
+            }
+            catch (HttpRequestException)
+            {
+                statusSeverity = Severity.Warning;
+                statusMessage = "게시글 상세 정보를 불러오지 못했습니다.";
+            }
+        }
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Yield();
+        var currentPage = Navigation.Uri.Split('#', 2)[0];
+        Navigation.NavigateTo($"{currentPage}#community-forum-list", replace: true);
+    }
+
     private void OpenWorkMode()
     {
+        isCompactHomeSummary = false;
         isComposeOpen = false;
         isLedgerDetailOpen = false;
         isLedgerPickerOpen = false;
@@ -11003,6 +11235,7 @@
         Diagram대화방Client.메시지수신 += Handle다이어그램대화방메시지수신Async;
         Diagram대화방Client.상태변경 += Handle다이어그램대화방상태변경Async;
         isWorkMode = HomeModeState.IsWorkMode;
+        isCompactHomeSummary = UseCompactHomeSummary && !isWorkMode && !DiagramPalette.IsDiagramMode;
         HandlePaletteBlockRequested();
         HandleWorkflowPresetRequested();
         _ = LoadCommunityDataInStagesAsync();
@@ -12700,14 +12933,4 @@
         int CommentCount,
         bool HasDiagramPreview);
 
-    private sealed record 실시간베스트글항목(
-        long? 게시글Id,
-        string? 추천글제목,
-        string 제목,
-        string 분류,
-        string 작성자,
-        int 추천수,
-        int 댓글수,
-        bool 실시간인기,
-        DateTime 최근활동일시);
 }

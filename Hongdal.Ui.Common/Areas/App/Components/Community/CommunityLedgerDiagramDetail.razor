@@ -336,7 +336,7 @@
 
         <footer class="ledger-diagram-detail__actions">
             <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="HandleBackAsync">목록으로</MudButton>
-            @if (OnAttach.HasDelegate)
+            @if (OnAttach.HasDelegate && !HideAttach)
             {
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
@@ -387,6 +387,9 @@
 
     [Parameter]
     public EventCallback OnAttach { get; set; }
+
+    [Parameter]
+    public bool HideAttach { get; set; }
 
     [Parameter]
     public EventCallback OnRefreshRequested { get; set; }

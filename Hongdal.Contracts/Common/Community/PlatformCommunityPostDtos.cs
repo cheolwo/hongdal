@@ -160,6 +160,21 @@ public sealed class PlatformCommunityPostLedgerContextResponse
     public IReadOnlyList<PlatformCommunityLedgerBlockResponse> 블록목록 { get; set; } = [];
     public IReadOnlyList<string> 가능한행동목록 { get; set; } = [];
     public IReadOnlyList<PlatformCommunityLedgerNodeActionResponse> 노드행동목록 { get; set; } = [];
+    public IReadOnlyList<PlatformCommunityIncludedLedgerResponse> 포함원장목록 { get; set; } = [];
+}
+
+public sealed class PlatformCommunityIncludedLedgerResponse
+{
+    public string 원장Id { get; set; } = string.Empty;
+    public string 원장템플릿Key { get; set; } = string.Empty;
+    public string 원장템플릿명 { get; set; } = string.Empty;
+    public string 역할 { get; set; } = string.Empty;
+    public bool 필수여부 { get; set; }
+    public int 표시순서 { get; set; }
+    public string 조회상태 { get; set; } = "정상";
+    public bool 접근가능여부 { get; set; }
+    public PlatformCommunityPostLedgerContextResponse? 원장 { get; set; }
+    public IReadOnlyList<PlatformCommunityIncludedLedgerResponse> 포함원장목록 { get; set; } = [];
 }
 
 public sealed class PlatformCommunityLedgerBlockResponse

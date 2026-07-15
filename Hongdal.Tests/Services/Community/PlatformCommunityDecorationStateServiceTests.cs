@@ -134,4 +134,21 @@ public sealed class PlatformCommunityDecorationStateServiceTests
 
         Assert.True(service.IsProductOwned(freeProduct));
     }
+
+    [Fact]
+    public void 경전고전연결팩은_상점의무료홈테마로_등록된다()
+    {
+        var service = new PlatformCommunityDecorationStateService();
+        var scriptureProducts = service.Products
+            .Where(product => product.ScriptureSource is not null)
+            .ToArray();
+
+        Assert.Equal(ScriptureDecorationCatalog.Definitions.Count, scriptureProducts.Length);
+        Assert.All(scriptureProducts, product =>
+        {
+            Assert.True(product.IsHomeTheme);
+            Assert.True(service.IsProductOwned(product));
+            Assert.Equal("Hongdal Lecture Link", product.CreatorName);
+        });
+    }
 }

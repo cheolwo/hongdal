@@ -8,7 +8,7 @@
         <div>
             <span class="prajna-library__eyebrow">般若 · PRAJNA</span>
             <h1 id="prajna-library-title">@ChannelName 강의</h1>
-            <p>지혜를 익히고 삶에서 살펴볼 수 있도록 주제별 강의 재생목록을 모았습니다.</p>
+            <p>먼저 세 편의 강의를 만나고, 아래에서 주제별 재생목록을 차분히 펼쳐보세요.</p>
         </div>
         <a class="prajna-library__channel-link"
            href="@ChannelUrl"
@@ -23,8 +23,8 @@
     {
         <div class="prajna-library__state" aria-live="polite">
             <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
-            <strong>강의 재생목록을 불러오고 있습니다.</strong>
-            <span>홍달 서버가 YouTube의 현재 공개 목록을 확인합니다.</span>
+            <strong>홍익학당 강의를 불러오고 있습니다.</strong>
+            <span>먼저 볼 세 편과 주제별 재생목록을 준비합니다.</span>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -44,207 +44,324 @@
             <label>
                 <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
                 <input type="search"
-                       placeholder="주제나 강의 이름 검색"
+                       placeholder="재생목록 주제 검색"
                        aria-label="홍익학당 재생목록 검색"
                        @bind="searchText"
                        @bind:event="oninput" />
             </label>
         </div>
 
-        <div class="prajna-library__workspace">
-            <aside class="prajna-library__playlists" aria-label="강의 재생목록">
-                @if (FilteredPlaylists.Count == 0)
-                {
-                    <div class="prajna-library__empty">검색 결과가 없습니다.</div>
-                }
-                else
-                {
-                    @foreach (var playlist in FilteredPlaylists)
+        <section class="prajna-library__featured" aria-labelledby="prajna-featured-title">
+            <header class="prajna-library__section-heading">
+                <div>
+                    <span>오늘 먼저 만나는 강의</span>
+                    <h2 id="prajna-featured-title">홍익학당 강의 3편</h2>
+                    @if (featuredPlaylist is not null)
+                    {
+                        <p>@featuredPlaylist.제목 재생목록에서 먼저 세 편을 골랐습니다.</p>
+                    }
+                </div>
+                <span class="prajna-library__section-count">3 VIDEOS</span>
+            </header>
+
+            @if (featuredPlaylist is null || FeaturedVideos.Count == 0)
+            {
+                <div class="prajna-library__state prajna-library__state--compact">
+                    <MudIcon Icon="@Icons.Material.Filled.VideoLibrary" Size="Size.Large" />
+                    <strong>먼저 보여드릴 강의를 찾지 못했습니다.</strong>
+                </div>
+            }
+            else
+            {
+                <div class="prajna-library__featured-grid">
+                    @foreach (var entry in FeaturedVideos.Select((video, index) => (video, index)))
                     {
                         <button type="button"
-                                class="@BuildPlaylistClass(playlist)"
-                                aria-pressed="@IsSelected(playlist)"
-                                @onclick="@(() => SelectPlaylistAsync(playlist))">
-                            <span class="prajna-library__playlist-thumb">
-                                @if (!string.IsNullOrWhiteSpace(playlist.썸네일Url))
+                                class="@BuildFeaturedClass(entry.video)"
+                                aria-pressed="@IsSelected(entry.video)"
+                                @onclick="@(() => OpenVideo(entry.video, featuredPlaylist))">
+                            <span class="prajna-library__featured-thumb">
+                                @if (!string.IsNullOrWhiteSpace(entry.video.썸네일Url))
                                 {
-                                    <img src="@playlist.썸네일Url" alt="" loading="lazy" />
+                                    <img src="@entry.video.썸네일Url" alt="" loading="eager" />
                                 }
-                                else
-                                {
-                                    <MudIcon Icon="@Icons.Material.Filled.AutoStories" Size="Size.Large" />
-                                }
+                                <span class="prajna-library__featured-number">@(entry.index + 1)</span>
+                                <span class="prajna-library__featured-play">
+                                    <MudIcon Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Medium" />
+                                </span>
                             </span>
-                            <span class="prajna-library__playlist-copy">
-                                <strong>@playlist.제목</strong>
-                                <small>@($"영상 {playlist.영상수}개 · {FormatDate(playlist.게시일시Utc)}")</small>
+                            <span class="prajna-library__featured-copy">
+                                <small>@FormatDate(entry.video.게시일시Utc)</small>
+                                <strong>@entry.video.제목</strong>
+                                <span>강의 보기 <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" /></span>
                             </span>
-                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
                         </button>
                     }
-                }
-            </aside>
+                </div>
+            }
+        </section>
 
-            <main class="prajna-library__viewer">
-                @if (selectedPlaylist is null)
-                {
-                    <div class="prajna-library__state">
-                        <MudIcon Icon="@Icons.Material.Filled.PlayCircle" Size="Size.Large" />
-                        <strong>왼쪽에서 강의 재생목록을 선택하세요.</strong>
+        @if (selectedPlaylist is not null && selectedVideo is not null)
+        {
+            <section class="prajna-library__watch" aria-label="선택한 홍익학당 강의">
+                <header class="prajna-library__watch-header">
+                    <div>
+                        <span>지금 보는 강의</span>
+                        <h2>@selectedVideo.제목</h2>
+                        <small>@selectedPlaylist.제목 · @FormatDate(selectedVideo.게시일시Utc)</small>
                     </div>
-                }
-                else
-                {
-                    <header class="prajna-library__playlist-header">
-                        <div>
-                            <span>선택한 재생목록</span>
-                            <h2>@selectedPlaylist.제목</h2>
-                            <p>@PlaylistDescription</p>
-                        </div>
-                        <a href="@selectedPlaylist.재생목록Url" target="_blank" rel="noopener noreferrer">
-                            전체 목록
-                            <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
-                        </a>
-                    </header>
-
-                    @if (isVideosLoading)
-                    {
-                        <div class="prajna-library__state prajna-library__state--compact" aria-live="polite">
-                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
-                            <strong>영상 목록을 불러오는 중입니다.</strong>
-                        </div>
-                    }
-                    else if (!string.IsNullOrWhiteSpace(videoErrorMessage))
-                    {
-                        <div class="prajna-library__state prajna-library__state--error prajna-library__state--compact" role="alert">
-                            <strong>@videoErrorMessage</strong>
-                            <button type="button" @onclick="@(() => SelectPlaylistAsync(selectedPlaylist, true))">다시 시도</button>
-                        </div>
-                    }
-                    else if (selectedVideo is null)
-                    {
-                        <div class="prajna-library__state prajna-library__state--compact">
-                            <MudIcon Icon="@Icons.Material.Filled.VideoLibrary" Size="Size.Large" />
-                            <strong>이 재생목록에는 현재 표시할 영상이 없습니다.</strong>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="prajna-library__player">
-                            <iframe src="@SelectedVideoEmbedUrl"
-                                    title="@($"{selectedVideo.제목} 영상 재생")"
-                                    loading="lazy"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowfullscreen></iframe>
-                        </div>
-                        <div class="prajna-library__now-playing">
-                            <div>
-                                <span>지금 선택한 강의</span>
-                                <h3>@selectedVideo.제목</h3>
-                                <small>@FormatDate(selectedVideo.게시일시Utc)</small>
-                            </div>
-                            <a href="@selectedVideo.시청Url" target="_blank" rel="noopener noreferrer">
-                                YouTube에서 보기
-                                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
+                    <div class="prajna-library__watch-actions">
+                        @if (SelectedScripturePack is { } selectedScripturePack)
+                        {
+                            <a class="prajna-library__decoration-link" href="@DecorationProductHref(selectedScripturePack)">
+                                <span>@selectedScripturePack.Symbol</span>
+                                @selectedScripturePack.ScriptureTitle 꾸미기 팩
+                                <MudIcon Icon="@Icons.Material.Filled.Palette" Size="Size.Small" />
                             </a>
-                        </div>
+                        }
+                        <button type="button" aria-label="강의 닫기" @onclick="CloseVideo">
+                            <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+                        </button>
+                    </div>
+                </header>
 
-                        <section class="prajna-library__community-share" aria-label="강의 글귀 커뮤니티 공유">
-                            <div class="prajna-library__community-share-intro">
-                                <span class="prajna-library__community-share-icon">
-                                    <MudIcon Icon="@Icons.Material.Filled.FormatQuote" Size="Size.Medium" />
+                <div class="prajna-library__player">
+                    <iframe src="@SelectedVideoEmbedUrl"
+                            title="@($"{selectedVideo.제목} 영상 재생")"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                </div>
+
+                <div class="prajna-library__now-playing">
+                    <p>@VideoDescription</p>
+                    <a href="@selectedVideo.시청Url" target="_blank" rel="noopener noreferrer">
+                        YouTube에서 보기
+                        <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
+                    </a>
+                </div>
+
+                <section class="prajna-library__community-share" aria-label="강의 글귀 커뮤니티 공유">
+                    <div class="prajna-library__community-share-intro">
+                        <span class="prajna-library__community-share-icon">
+                            <MudIcon Icon="@Icons.Material.Filled.FormatQuote" Size="Size.Medium" />
+                        </span>
+                        <div>
+                            <strong>마음에 남은 글귀가 있나요?</strong>
+                            <p>강의 출처와 함께 내 커뮤니티 게시판에서 생각을 나눌 수 있습니다.</p>
+                        </div>
+                        <button type="button"
+                                class="prajna-library__community-share-open"
+                                aria-expanded="@isShareComposerOpen"
+                                @onclick="ToggleShareComposer">
+                            @(isShareComposerOpen ? "접기" : "글귀 나누기")
+                        </button>
+                    </div>
+
+                    @if (isShareComposerOpen)
+                    {
+                        <div class="prajna-library__community-share-form">
+                            <label class="prajna-library__community-share-field prajna-library__community-share-field--wide">
+                                <span>마음에 남은 글귀 <b>필수</b></span>
+                                <textarea rows="3"
+                                          maxlength="800"
+                                          placeholder="영상에서 마음에 남은 말을 짧게 적어 주세요."
+                                          @bind="shareQuote"
+                                          @bind:event="oninput"></textarea>
+                            </label>
+                            <label class="prajna-library__community-share-field prajna-library__community-share-field--wide">
+                                <span>나의 생각 <small>선택</small></span>
+                                <textarea rows="3"
+                                          maxlength="1800"
+                                          placeholder="왜 마음에 남았는지, 삶에서 어떻게 살펴보고 싶은지 적어 보세요."
+                                          @bind="shareReflection"
+                                          @bind:event="oninput"></textarea>
+                            </label>
+                            <label class="prajna-library__community-share-field">
+                                <span>영상 위치 <small>선택</small></span>
+                                <input type="text"
+                                       inputmode="numeric"
+                                       maxlength="8"
+                                       placeholder="예: 12:34"
+                                       @bind="shareTimestamp"
+                                       @bind:event="oninput" />
+                            </label>
+                            <div class="prajna-library__community-share-source">
+                                <MudIcon Icon="@Icons.Material.Filled.PlayCircleOutline" Size="Size.Small" />
+                                <span>
+                                    <small>함께 공유되는 강의</small>
+                                    <strong>@selectedVideo.제목</strong>
                                 </span>
-                                <div>
-                                    <strong>마음에 남은 글귀가 있나요?</strong>
-                                    <p>강의 출처와 함께 내 커뮤니티 게시판에서 생각을 나눌 수 있습니다.</p>
-                                </div>
-                                <button type="button"
-                                        class="prajna-library__community-share-open"
-                                        aria-expanded="@isShareComposerOpen"
-                                        @onclick="ToggleShareComposer">
-                                    @(isShareComposerOpen ? "접기" : "글귀 나누기")
-                                </button>
                             </div>
 
-                            @if (isShareComposerOpen)
+                            @if (!string.IsNullOrWhiteSpace(shareValidationMessage))
                             {
-                                <div class="prajna-library__community-share-form">
-                                    <label class="prajna-library__community-share-field prajna-library__community-share-field--wide">
-                                        <span>마음에 남은 글귀 <b>필수</b></span>
-                                        <textarea rows="3"
-                                                  maxlength="800"
-                                                  placeholder="영상에서 마음에 남은 말을 짧게 적어 주세요."
-                                                  @bind="shareQuote"
-                                                  @bind:event="oninput"></textarea>
-                                    </label>
-                                    <label class="prajna-library__community-share-field prajna-library__community-share-field--wide">
-                                        <span>나의 생각 <small>선택</small></span>
-                                        <textarea rows="3"
-                                                  maxlength="1800"
-                                                  placeholder="왜 마음에 남았는지, 삶에서 어떻게 살펴보고 싶은지 적어 보세요."
-                                                  @bind="shareReflection"
-                                                  @bind:event="oninput"></textarea>
-                                    </label>
-                                    <label class="prajna-library__community-share-field">
-                                        <span>영상 위치 <small>선택</small></span>
-                                        <input type="text"
-                                               inputmode="numeric"
-                                               maxlength="8"
-                                               placeholder="예: 12:34"
-                                               @bind="shareTimestamp"
-                                               @bind:event="oninput" />
-                                    </label>
-                                    <div class="prajna-library__community-share-source">
-                                        <MudIcon Icon="@Icons.Material.Filled.PlayCircleOutline" Size="Size.Small" />
-                                        <span>
-                                            <small>함께 공유되는 강의</small>
-                                            <strong>@selectedVideo.제목</strong>
-                                        </span>
-                                    </div>
-
-                                    @if (!string.IsNullOrWhiteSpace(shareValidationMessage))
-                                    {
-                                        <p class="prajna-library__community-share-error" role="alert">@shareValidationMessage</p>
-                                    }
-
-                                    <div class="prajna-library__community-share-actions">
-                                        <span>게시판에서 익명 닉네임과 공개할 내용을 확인한 뒤 등록합니다.</span>
-                                        <button type="button"
-                                                class="prajna-library__community-share-continue"
-                                                @onclick="ContinueToCommunity">
-                                            커뮤니티 글로 이어쓰기
-                                            <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
-                                        </button>
-                                    </div>
-                                </div>
+                                <p class="prajna-library__community-share-error" role="alert">@shareValidationMessage</p>
                             }
-                        </section>
 
-                        <div class="prajna-library__videos" aria-label="재생목록 영상">
-                            @foreach (var video in videos)
-                            {
+                            <div class="prajna-library__community-share-actions">
+                                <span>게시판에서 익명 닉네임과 공개할 내용을 확인한 뒤 등록합니다.</span>
                                 <button type="button"
-                                        class="@BuildVideoClass(video)"
-                                        aria-pressed="@IsSelected(video)"
-                                        @onclick="@(() => SelectVideo(video))">
-                                    <span class="prajna-library__video-thumb">
-                                        @if (!string.IsNullOrWhiteSpace(video.썸네일Url))
-                                        {
-                                            <img src="@video.썸네일Url" alt="" loading="lazy" />
-                                        }
-                                        <MudIcon Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Medium" />
-                                    </span>
-                                    <span>
-                                        <strong>@video.제목</strong>
-                                        <small>@FormatDate(video.게시일시Utc)</small>
-                                    </span>
+                                        class="prajna-library__community-share-continue"
+                                        @onclick="ContinueToCommunity">
+                                    커뮤니티 글로 이어쓰기
+                                    <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
                                 </button>
-                            }
+                            </div>
                         </div>
                     }
-                }
-            </main>
-        </div>
+                </section>
+            </section>
+        }
+
+        <section class="prajna-library__collections" aria-labelledby="prajna-collections-title">
+            <header class="prajna-library__section-heading">
+                <div>
+                    <span>주제별로 이어보기</span>
+                    <h2 id="prajna-collections-title">재생목록별 강의</h2>
+                    <p>관심 있는 묶음을 누르면 그 안의 강의를 한자리에서 볼 수 있습니다.</p>
+                </div>
+                <span class="prajna-library__section-count">@FilteredPlaylists.Count PLAYLISTS</span>
+            </header>
+
+            @if (RequestedPlaylist is { } requestedPlaylist)
+            {
+                var requestedPack = ScriptureDecorationCatalog.FindByPlaylist(
+                    requestedPlaylist.PlaylistId,
+                    requestedPlaylist.제목);
+                <div class="prajna-library__linked-context" role="status">
+                    <span>
+                        <MudIcon Icon="@Icons.Material.Filled.AutoStories" Size="Size.Medium" />
+                    </span>
+                    <div>
+                        <small>꾸미기 팩에서 이어보기</small>
+                        <strong>@requestedPlaylist.제목</strong>
+                        <p>선택한 재생목록을 목록 맨 위에 펼쳐 두었습니다.</p>
+                    </div>
+                    @if (requestedPack is not null)
+                    {
+                        <a href="@DecorationProductHref(requestedPack)">
+                            꾸미기 팩으로 돌아가기
+                            <MudIcon Icon="@Icons.Material.Filled.Palette" Size="Size.Small" />
+                        </a>
+                    }
+                </div>
+            }
+
+            @if (FilteredPlaylists.Count == 0)
+            {
+                <div class="prajna-library__empty">검색 결과가 없습니다.</div>
+            }
+            else
+            {
+                <div class="prajna-library__collection-groups">
+                    @foreach (var playlist in FilteredPlaylists)
+                    {
+                        var scripturePack = ScriptureDecorationCatalog.FindByPlaylist(playlist.PlaylistId, playlist.제목);
+                        <article id="@PlaylistElementId(playlist)" class="@BuildCollectionClass(playlist)">
+                            <button type="button"
+                                    class="prajna-library__collection-header"
+                                    aria-expanded="@IsExpanded(playlist)"
+                                    @onclick="@(() => TogglePlaylistAsync(playlist))">
+                                <span class="prajna-library__collection-thumb">
+                                    @if (!string.IsNullOrWhiteSpace(playlist.썸네일Url))
+                                    {
+                                        <img src="@playlist.썸네일Url" alt="" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.AutoStories" Size="Size.Large" />
+                                    }
+                                </span>
+                                <span class="prajna-library__collection-copy">
+                                    <small>@($"영상 {playlist.영상수}개 · {FormatDate(playlist.게시일시Utc)}")</small>
+                                    <strong>@playlist.제목</strong>
+                                    @if (scripturePack is not null)
+                                    {
+                                        <span class="prajna-library__collection-scripture">
+                                            <b>@scripturePack.Symbol</b>
+                                            @scripturePack.ScriptureTitle 꾸미기 팩 연결됨
+                                        </span>
+                                    }
+                                    <span>@PlaylistDescription(playlist)</span>
+                                </span>
+                                <span class="prajna-library__collection-toggle">
+                                    @(IsExpanded(playlist) ? "접기" : "펼쳐보기")
+                                    <MudIcon Icon="@(IsExpanded(playlist) ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" />
+                                </span>
+                            </button>
+
+                            @if (IsExpanded(playlist))
+                            {
+                                <div class="prajna-library__collection-body">
+                                    @if (IsPlaylistLoading(playlist))
+                                    {
+                                        <div class="prajna-library__state prajna-library__state--compact" aria-live="polite">
+                                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+                                            <strong>재생목록의 강의를 불러오는 중입니다.</strong>
+                                        </div>
+                                    }
+                                    else if (PlaylistError(playlist) is { } playlistError)
+                                    {
+                                        <div class="prajna-library__state prajna-library__state--error prajna-library__state--compact" role="alert">
+                                            <strong>@playlistError</strong>
+                                            <button type="button" @onclick="@(() => ReloadPlaylistAsync(playlist))">다시 시도</button>
+                                        </div>
+                                    }
+                                    else if (PlaylistVideos(playlist).Count == 0)
+                                    {
+                                        <div class="prajna-library__state prajna-library__state--compact">
+                                            <strong>이 재생목록에는 현재 표시할 영상이 없습니다.</strong>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="prajna-library__playlist-videos" aria-label="@($"{playlist.제목} 영상")">
+                                            @foreach (var video in PlaylistVideos(playlist))
+                                            {
+                                                <button type="button"
+                                                        class="@BuildVideoClass(video)"
+                                                        aria-pressed="@IsSelected(video)"
+                                                        @onclick="@(() => OpenVideo(video, playlist))">
+                                                    <span class="prajna-library__video-thumb">
+                                                        @if (!string.IsNullOrWhiteSpace(video.썸네일Url))
+                                                        {
+                                                            <img src="@video.썸네일Url" alt="" loading="lazy" />
+                                                        }
+                                                        <MudIcon Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Medium" />
+                                                    </span>
+                                                    <span>
+                                                        <strong>@video.제목</strong>
+                                                        <small>@FormatDate(video.게시일시Utc)</small>
+                                                    </span>
+                                                </button>
+                                            }
+                                        </div>
+                                        <div class="prajna-library__collection-actions">
+                                            @if (scripturePack is not null)
+                                            {
+                                                <a class="prajna-library__decoration-link" href="@DecorationProductHref(scripturePack)">
+                                                    <span>@scripturePack.Symbol</span>
+                                                    이 강의의 꾸미기 팩 보기
+                                                    <MudIcon Icon="@Icons.Material.Filled.Palette" Size="Size.Small" />
+                                                </a>
+                                            }
+                                            <a class="prajna-library__playlist-link"
+                                               href="@playlist.재생목록Url"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                YouTube에서 전체 재생목록 보기
+                                                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" />
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </article>
+                    }
+                </div>
+            }
+        </section>
     }
 </section>
 
@@ -258,22 +375,29 @@
     [Parameter]
     public string CommunityHref { get; set; } = "/";
 
+    [Parameter]
+    public string DecorationStoreHref { get; set; } = "/community/decorations";
+
+    [Parameter]
+    public string? InitialPlaylistId { get; set; }
+
     private readonly CancellationTokenSource lifetimeCancellation = new();
+    private readonly Dictionary<string, IReadOnlyList<YouTube재생목록영상Dto>> playlistVideoCache = new(StringComparer.Ordinal);
+    private readonly HashSet<string> loadingPlaylistIds = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> playlistErrors = new(StringComparer.Ordinal);
     private IReadOnlyList<YouTube재생목록Dto> playlists = [];
-    private IReadOnlyList<YouTube재생목록영상Dto> videos = [];
+    private YouTube재생목록Dto? featuredPlaylist;
     private YouTube재생목록Dto? selectedPlaylist;
     private YouTube재생목록영상Dto? selectedVideo;
+    private string? expandedPlaylistId;
     private string searchText = string.Empty;
     private string? errorMessage;
-    private string? videoErrorMessage;
     private string shareQuote = string.Empty;
     private string shareReflection = string.Empty;
     private string shareTimestamp = string.Empty;
     private string? shareValidationMessage;
     private bool isLoading = true;
-    private bool isVideosLoading;
     private bool isShareComposerOpen;
-    private int videoLoadVersion;
 
     private string ChannelUrl => $"https://www.youtube.com/channel/{Uri.EscapeDataString(ChannelId)}";
 
@@ -281,17 +405,41 @@
         ? string.Empty
         : $"https://www.youtube-nocookie.com/embed/{Uri.EscapeDataString(selectedVideo.VideoId)}?rel=0";
 
-    private string PlaylistDescription => string.IsNullOrWhiteSpace(selectedPlaylist?.설명)
-        ? "재생목록의 강의를 차례로 살펴보세요."
-        : selectedPlaylist.설명;
+    private string VideoDescription => string.IsNullOrWhiteSpace(selectedVideo?.설명)
+        ? "강의를 들으며 오늘의 삶에서 살펴볼 지점을 찾아보세요."
+        : selectedVideo.설명;
+
+    private ScriptureDecorationDefinition? SelectedScripturePack
+        => selectedPlaylist is null
+            ? null
+            : ScriptureDecorationCatalog.FindByPlaylist(selectedPlaylist.PlaylistId, selectedPlaylist.제목);
+
+    private IReadOnlyList<YouTube재생목록영상Dto> FeaturedVideos
+        => featuredPlaylist is null
+            ? []
+            : PlaylistVideos(featuredPlaylist).Take(3).ToArray();
+
+    private YouTube재생목록Dto? RequestedPlaylist
+        => string.IsNullOrWhiteSpace(InitialPlaylistId)
+            ? null
+            : playlists.FirstOrDefault(playlist =>
+                string.Equals(playlist.PlaylistId, InitialPlaylistId, StringComparison.Ordinal));
 
     private IReadOnlyList<YouTube재생목록Dto> FilteredPlaylists
-        => string.IsNullOrWhiteSpace(searchText)
-            ? playlists
-            : playlists.Where(playlist =>
+    {
+        get
+        {
+            IEnumerable<YouTube재생목록Dto> candidates = string.IsNullOrWhiteSpace(searchText)
+                ? playlists
+                : playlists.Where(playlist =>
                     playlist.제목.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase) ||
-                    playlist.설명.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase))
+                    playlist.설명.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            return candidates
+                .OrderByDescending(IsRequestedPlaylist)
                 .ToArray();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
         => await LoadAsync();
@@ -300,18 +448,29 @@
     {
         isLoading = true;
         errorMessage = null;
+        playlists = [];
+        featuredPlaylist = null;
+        expandedPlaylistId = null;
         selectedPlaylist = null;
         selectedVideo = null;
-        videos = [];
+        playlistVideoCache.Clear();
+        loadingPlaylistIds.Clear();
+        playlistErrors.Clear();
         ResetShareComposer();
 
         try
         {
             playlists = await YouTubeContent.재생목록조회Async(ChannelId, lifetimeCancellation.Token);
-            var firstPlaylist = playlists.FirstOrDefault(x => x.영상수 > 0) ?? playlists.FirstOrDefault();
-            if (firstPlaylist is not null)
+            featuredPlaylist = playlists.FirstOrDefault(item => item.영상수 > 0) ?? playlists.FirstOrDefault();
+            if (featuredPlaylist is not null)
             {
-                await SelectPlaylistAsync(firstPlaylist);
+                await EnsurePlaylistVideosAsync(featuredPlaylist);
+            }
+
+            if (RequestedPlaylist is { } requestedPlaylist)
+            {
+                expandedPlaylistId = requestedPlaylist.PlaylistId;
+                await EnsurePlaylistVideosAsync(requestedPlaylist);
             }
         }
         catch (OperationCanceledException) when (lifetimeCancellation.IsCancellationRequested)
@@ -328,62 +487,69 @@
         }
     }
 
-    private async Task SelectPlaylistAsync(YouTube재생목록Dto playlist, bool forceReload = false)
+    private async Task TogglePlaylistAsync(YouTube재생목록Dto playlist)
     {
-        if (!forceReload && IsSelected(playlist) && videos.Count > 0)
+        if (IsExpanded(playlist))
+        {
+            expandedPlaylistId = null;
+            return;
+        }
+
+        expandedPlaylistId = playlist.PlaylistId;
+        await EnsurePlaylistVideosAsync(playlist);
+    }
+
+    private async Task ReloadPlaylistAsync(YouTube재생목록Dto playlist)
+    {
+        playlistVideoCache.Remove(playlist.PlaylistId);
+        playlistErrors.Remove(playlist.PlaylistId);
+        await EnsurePlaylistVideosAsync(playlist);
+    }
+
+    private async Task EnsurePlaylistVideosAsync(YouTube재생목록Dto playlist)
+    {
+        if (playlistVideoCache.ContainsKey(playlist.PlaylistId) || !loadingPlaylistIds.Add(playlist.PlaylistId))
         {
             return;
         }
 
-        selectedPlaylist = playlist;
-        selectedVideo = null;
-        videos = [];
-        ResetShareComposer();
-        videoErrorMessage = null;
-        isVideosLoading = true;
-        var currentVersion = ++videoLoadVersion;
-
+        playlistErrors.Remove(playlist.PlaylistId);
         try
         {
-            var loadedVideos = await YouTubeContent.재생목록영상조회Async(
+            playlistVideoCache[playlist.PlaylistId] = await YouTubeContent.재생목록영상조회Async(
                 playlist.PlaylistId,
-                50,
+                12,
                 lifetimeCancellation.Token);
-            if (currentVersion != videoLoadVersion)
-            {
-                return;
-            }
-
-            videos = loadedVideos;
-            selectedVideo = videos.FirstOrDefault();
         }
         catch (OperationCanceledException) when (lifetimeCancellation.IsCancellationRequested)
         {
         }
         catch
         {
-            if (currentVersion == videoLoadVersion)
-            {
-                videoErrorMessage = "이 재생목록의 영상을 불러오지 못했습니다.";
-            }
+            playlistErrors[playlist.PlaylistId] = "이 재생목록의 영상을 불러오지 못했습니다.";
         }
         finally
         {
-            if (currentVersion == videoLoadVersion)
-            {
-                isVideosLoading = false;
-            }
+            loadingPlaylistIds.Remove(playlist.PlaylistId);
         }
     }
 
-    private void SelectVideo(YouTube재생목록영상Dto video)
+    private void OpenVideo(YouTube재생목록영상Dto video, YouTube재생목록Dto playlist)
     {
         if (!IsSelected(video))
         {
             ResetShareComposer();
         }
 
+        selectedPlaylist = playlist;
         selectedVideo = video;
+    }
+
+    private void CloseVideo()
+    {
+        selectedPlaylist = null;
+        selectedVideo = null;
+        ResetShareComposer();
     }
 
     private void ToggleShareComposer()
@@ -432,21 +598,54 @@
         shareValidationMessage = null;
     }
 
-    private bool IsSelected(YouTube재생목록Dto playlist)
-        => string.Equals(selectedPlaylist?.PlaylistId, playlist.PlaylistId, StringComparison.Ordinal);
+    private IReadOnlyList<YouTube재생목록영상Dto> PlaylistVideos(YouTube재생목록Dto playlist)
+        => playlistVideoCache.TryGetValue(playlist.PlaylistId, out var videos) ? videos : [];
+
+    private string? PlaylistError(YouTube재생목록Dto playlist)
+        => playlistErrors.GetValueOrDefault(playlist.PlaylistId);
+
+    private bool IsPlaylistLoading(YouTube재생목록Dto playlist)
+        => loadingPlaylistIds.Contains(playlist.PlaylistId);
+
+    private bool IsExpanded(YouTube재생목록Dto playlist)
+        => string.Equals(expandedPlaylistId, playlist.PlaylistId, StringComparison.Ordinal);
+
+    private bool IsRequestedPlaylist(YouTube재생목록Dto playlist)
+        => string.Equals(InitialPlaylistId, playlist.PlaylistId, StringComparison.Ordinal);
 
     private bool IsSelected(YouTube재생목록영상Dto video)
         => string.Equals(selectedVideo?.VideoId, video.VideoId, StringComparison.Ordinal);
 
-    private string BuildPlaylistClass(YouTube재생목록Dto playlist)
-        => IsSelected(playlist)
-            ? "prajna-library__playlist prajna-library__playlist--selected"
-            : "prajna-library__playlist";
+    private string BuildFeaturedClass(YouTube재생목록영상Dto video)
+        => IsSelected(video)
+            ? "prajna-library__featured-card prajna-library__featured-card--selected"
+            : "prajna-library__featured-card";
 
     private string BuildVideoClass(YouTube재생목록영상Dto video)
         => IsSelected(video)
             ? "prajna-library__video prajna-library__video--selected"
             : "prajna-library__video";
+
+    private string BuildCollectionClass(YouTube재생목록Dto playlist)
+    {
+        var className = IsExpanded(playlist)
+            ? "prajna-library__collection prajna-library__collection--expanded"
+            : "prajna-library__collection";
+        return IsRequestedPlaylist(playlist)
+            ? $"{className} prajna-library__collection--linked"
+            : className;
+    }
+
+    private static string PlaylistDescription(YouTube재생목록Dto playlist)
+        => string.IsNullOrWhiteSpace(playlist.설명)
+            ? "재생목록을 펼쳐 강의를 차례로 살펴보세요."
+            : playlist.설명;
+
+    private string DecorationProductHref(ScriptureDecorationDefinition definition)
+        => $"{DecorationStoreHref.TrimEnd('/')}/{Uri.EscapeDataString(definition.ProductKey)}";
+
+    private static string PlaylistElementId(YouTube재생목록Dto playlist)
+        => $"prajna-playlist-{playlist.PlaylistId}";
 
     private static string FormatDate(DateTime value)
         => value.ToLocalTime().ToString("yyyy.MM.dd");

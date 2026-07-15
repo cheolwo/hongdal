@@ -11,6 +11,7 @@ public sealed class PlatformCommunityPost
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
     public string? 커뮤니티원장Id { get; set; }
+    public string? AuthorUserId { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsReportBoardPost { get; set; }
     public string? ReporterDisplayName { get; set; }
@@ -28,4 +29,5 @@ public sealed class PlatformCommunityPost
     public ICollection<PlatformCommunityPostComment> Comments { get; set; } = new List<PlatformCommunityPostComment>();
     public ICollection<PlatformCommunityPostRecommendation> Recommendations { get; set; } = new List<PlatformCommunityPostRecommendation>();
     public PlatformCommunityPostAudio? Audio { get; set; }
+    public PlatformCommunityPostKeywordScan? KeywordNotificationScan { get; set; }
 }

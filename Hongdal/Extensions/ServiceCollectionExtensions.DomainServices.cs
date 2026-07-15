@@ -84,6 +84,12 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IHongikHakdangCardVariantService, HongikHakdangCardVariantService>();
         services.AddScoped<IHongikHakdangCardDeliveryService, HongikHakdangCardDeliveryService>();
         services.AddScoped<IHongdalMobilePushInstallationService, HongdalMobilePushInstallationService>();
+        services.AddSingleton<ICommunityKeywordMatcher, CommunityKeywordMatcher>();
+        services.AddSingleton<ICommunityKeywordNotificationQueue, CommunityKeywordNotificationQueue>();
+        services.AddSingleton<ICommunityKeywordNotificationSignal, CommunityKeywordNotificationSignal>();
+        services.AddScoped<ICommunityKeywordSubscriptionService, CommunityKeywordSubscriptionService>();
+        services.AddScoped<ICommunityKeywordInboxService, CommunityKeywordInboxService>();
+        services.AddScoped<ICommunityKeywordNotificationProcessor, CommunityKeywordNotificationProcessor>();
         services.AddSingleton<I커뮤니티게시글음성본문분할기, 커뮤니티게시글음성본문분할기>();
         services.AddSingleton<I커뮤니티게시글음성작업예약Service, 커뮤니티게시글음성작업예약Service>();
         services.AddSingleton<I커뮤니티게시글음성작업신호, 커뮤니티게시글음성작업신호>();
@@ -91,6 +97,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티게시글음성조회Service, 커뮤니티게시글음성조회Service>();
         services.AddHostedService<교육기관제출Worker>();
         services.AddHostedService<커뮤니티게시글음성Worker>();
+        services.AddHostedService<CommunityKeywordNotificationWorker>();
         services.AddHostedService<커뮤니티원장투영Worker>();
         services.AddHostedService<CommunityGroupPurchaseDemandOutboxWorker>();
         services.AddScoped<I인증UseCase, 인증UseCase>();

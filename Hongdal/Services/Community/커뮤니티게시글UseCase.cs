@@ -127,6 +127,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
     private readonly IGoogleCloudStorageService _storageService;
     private readonly CommunityPostStorageOptions _storageOptions;
     private readonly I커뮤니티게시글음성작업예약Service _음성작업예약Service;
+    private readonly ICommunityKeywordNotificationQueue _keywordNotificationQueue;
     private readonly I게시글원장ContextService _원장ContextService;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IPublisher _publisher;
@@ -137,6 +138,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         IGoogleCloudStorageService storageService,
         IOptions<CommunityPostStorageOptions> storageOptions,
         I커뮤니티게시글음성작업예약Service 음성작업예약Service,
+        ICommunityKeywordNotificationQueue keywordNotificationQueue,
         I게시글원장ContextService 원장ContextService,
         ICurrentUserAccessor currentUserAccessor,
         IPublisher publisher,
@@ -146,6 +148,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         _storageService = storageService;
         _storageOptions = storageOptions.Value;
         _음성작업예약Service = 음성작업예약Service;
+        _keywordNotificationQueue = keywordNotificationQueue;
         _원장ContextService = 원장ContextService;
         _currentUserAccessor = currentUserAccessor;
         _publisher = publisher;
@@ -248,6 +251,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Body = Normalize(request.Body, string.Empty, 4000),
             SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl),
             커뮤니티원장Id = 연결원장?.원장Id,
+            AuthorUserId = NormalizeOptional(_currentUserAccessor.UserId, 450),
             Nickname = normalizedNickname,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             IsReportBoardPost = isReportBoardPost,
@@ -263,6 +267,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 
         _db.PlatformCommunityPosts.Add(entity);
         _음성작업예약Service.예약(entity, now);
+        _keywordNotificationQueue.Enqueue(entity, now);
         await _db.SaveChangesAsync(cancellationToken);
 
         try
@@ -273,7 +278,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         {
             _logger.LogWarning(
                 ex,
-                "게시글 등록 이벤트 발행에 실패했습니다. 음성 작업은 DB 대기열에서 복구됩니다. PostId={PostId}",
+                "게시글 등록 후속 이벤트 발행에 실패했습니다. 음성 및 키워드 작업은 DB 대기열에서 복구됩니다. PostId={PostId}",
                 entity.Id);
         }
 
@@ -872,6 +877,17 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 
         var text = value.Trim();
         return text.Length <= 1000 ? text : text[..1000];
+    }
+
+    private static string? NormalizeOptional(string? value, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var text = value.Trim();
+        return text.Length <= maxLength ? text : text[..maxLength];
     }
 
     private static string? ValidateComment(PlatformCommunityPostCommentCreateRequest request)

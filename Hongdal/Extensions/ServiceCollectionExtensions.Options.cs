@@ -52,6 +52,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<YouTubeOptions>(configuration.GetSection(YouTubeOptions.SectionName));
         services.Configure<HongikHakdangCardOptions>(configuration.GetSection(HongikHakdangCardOptions.SectionName));
         services.Configure<CommunityPostAudioOptions>(configuration.GetSection(CommunityPostAudioOptions.SectionName));
+        services.Configure<CommunityKeywordNotificationOptions>(configuration.GetSection(CommunityKeywordNotificationOptions.SectionName));
         services.Configure<CommunityLedgerProjectionOptions>(configuration.GetSection(CommunityLedgerProjectionOptions.SectionName));
 
         return services;

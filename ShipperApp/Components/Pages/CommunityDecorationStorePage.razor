@@ -15,7 +15,7 @@
         <div class="decoration-market__hero-copy">
             <span>COMMUNITY MAKER SHOP</span>
             <h1>꾸미기 상점</h1>
-            <p>홈 테마, 괘상과 노드 이미지, 역할별 괘 이동 장면에 적용하는 전환 애니메이션을 한곳에서 만나보세요.</p>
+            <p>경전·고전 강의와 이어지는 홈 테마, 괘상과 노드 이미지, 역할별 괘 이동 장면의 전환 애니메이션을 한곳에서 만나보세요.</p>
         </div>
         <div class="decoration-market__summary">
             <span><b>@DecorationState.Products.Count</b>개 상품</span>
@@ -41,6 +41,10 @@
         <button type="button" class="@(activeType == HomeThemeType ? "is-active" : null)" @onclick="@(() => activeType = HomeThemeType)">
             <MudIcon Icon="@Icons.Material.Filled.HomeRepairService" Size="Size.Small" />
             홈 테마
+        </button>
+        <button type="button" class="@(activeType == ScriptureType ? "is-active" : null)" @onclick="@(() => activeType = ScriptureType)">
+            <MudIcon Icon="@Icons.Material.Filled.AutoStories" Size="Size.Small" />
+            경전·고전 팩
         </button>
         <button type="button" class="@(activeType == AssetType ? "is-active" : null)" @onclick="@(() => activeType = AssetType)">
             <MudIcon Icon="@Icons.Material.Filled.Category" Size="Size.Small" />
@@ -125,11 +129,18 @@
                         </div>
                         <div class="decoration-market-card__copy">
                             <span class="decoration-market-card__creator">
-                                @(IsPlatformProduct(product) ? "플랫폼 기본" : product.CreatorName)
+                                @(product.ScriptureSource is not null ? "강의 연결 테마" : IsPlatformProduct(product) ? "플랫폼 기본" : product.CreatorName)
                             </span>
                             <strong>@product.Title</strong>
                             <p>@product.Summary</p>
-                            @if (product.HomeTheme is { } manifest)
+                            @if (product.ScriptureSource is { } scriptureSource)
+                            {
+                                <small class="decoration-market-card__scripture">
+                                    <b>@scriptureSource.Symbol</b>
+                                    @($"{scriptureSource.TraditionLabel} · {scriptureSource.ScriptureTitle} · 재생목록 {scriptureSource.Playlists.Count}개")
+                                </small>
+                            }
+                            else if (product.HomeTheme is { } manifest)
                             {
                                 <small>@($"{manifest.RendererProfile} · {manifest.Slots.Count}개 슬롯 · v{manifest.Version}")</small>
                             }
@@ -157,6 +168,7 @@
     private const string OwnedTab = "owned";
     private const string AllType = "all";
     private const string HomeThemeType = "home-theme";
+    private const string ScriptureType = "scripture";
     private const string AssetType = "asset";
     private const string MotionType = "motion";
 
@@ -177,6 +189,7 @@
             return activeType switch
             {
                 HomeThemeType => bySource.Where(product => product.IsHomeTheme).ToArray(),
+                ScriptureType => bySource.Where(product => product.ScriptureSource is not null).ToArray(),
                 AssetType => bySource.Where(product => !product.IsHomeTheme && !product.IsBaguaMotion).ToArray(),
                 MotionType => bySource.Where(product => product.IsBaguaMotion).ToArray(),
                 _ => bySource.ToArray()
@@ -187,19 +200,23 @@
     private int OwnedProductCount
         => DecorationState.Products.Count(DecorationState.IsProductOwned);
 
-    private string CurrentEyebrow => activeTab switch
-    {
-        CreatorTab => "CREATOR MARKET",
-        OwnedTab => "MY LIBRARY",
-        _ => "HONGDAL ORIGINAL"
-    };
+    private string CurrentEyebrow => activeType == ScriptureType
+        ? "SCRIPTURE & CLASSICS LINK PACKS"
+        : activeTab switch
+        {
+            CreatorTab => "CREATOR MARKET",
+            OwnedTab => "MY LIBRARY",
+            _ => "HONGDAL ORIGINAL"
+        };
 
-    private string CurrentTitle => activeTab switch
-    {
-        CreatorTab => "디자이너가 만든 완성형 패키지",
-        OwnedTab => "내가 사용할 수 있는 꾸미기",
-        _ => "플랫폼에서 제공하는 기본 꾸미기"
-    };
+    private string CurrentTitle => activeType == ScriptureType
+        ? "홍익학당 강의 제목과 이어지는 경전·고전 꾸미기"
+        : activeTab switch
+        {
+            CreatorTab => "디자이너가 만든 완성형 패키지",
+            OwnedTab => "내가 사용할 수 있는 꾸미기",
+            _ => "플랫폼에서 제공하는 기본 꾸미기"
+        };
 
     private void OpenDetail(CommunityDecorationProduct product)
         => Navigation.NavigateTo(ShipperRoutes.CommunityDecorationDetailFor(product.Key));
@@ -214,14 +231,16 @@
         => product.CreatorName.StartsWith("Hongdal", StringComparison.OrdinalIgnoreCase);
 
     private static string ProductTypeLabel(CommunityDecorationProduct product)
-        => product.Target switch
-        {
-            CommunityDecorationTarget.HomeNavigatorTheme => "홈 테마",
-            CommunityDecorationTarget.Bagua => "괘상",
-            CommunityDecorationTarget.DiagramNode => "노드 이미지",
-            CommunityDecorationTarget.BaguaTransitionMotion => "전환 애니메이션",
-            _ => "꾸미기"
-        };
+        => product.ScriptureSource is not null
+            ? "경전·고전 팩"
+            : product.Target switch
+            {
+                CommunityDecorationTarget.HomeNavigatorTheme => "홈 테마",
+                CommunityDecorationTarget.Bagua => "괘상",
+                CommunityDecorationTarget.DiagramNode => "노드 이미지",
+                CommunityDecorationTarget.BaguaTransitionMotion => "전환 애니메이션",
+                _ => "꾸미기"
+            };
 
     private static string ProductAccent(CommunityDecorationProduct product)
         => product.HomeTheme?.AccentColor

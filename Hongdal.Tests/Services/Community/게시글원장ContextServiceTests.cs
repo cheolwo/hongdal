@@ -244,6 +244,80 @@ public sealed class 게시글원장ContextServiceTests
     }
 
     [Fact]
+    public async Task 공동주문_묶음에서_개별주문과_후속원장_다이어그램을_계층으로_조회한다()
+    {
+        var transport = CreateHierarchyLedger(
+            "transport-1",
+            CommunityLedgerTemplateKeys.CargoTransport,
+            "공동주문 국내 운송",
+            "owner-1");
+        var order = CreateHierarchyLedger(
+            "order-1",
+            CommunityLedgerTemplateKeys.Order,
+            "101동 생활용품 주문",
+            "owner-1",
+            new 커뮤니티포함원장참조Dto
+            {
+                원장Id = transport.원장Id,
+                원장템플릿Key = transport.원장템플릿Key,
+                역할 = 주문원장포함역할.운송,
+                필수여부 = true
+            });
+        var group = CreateHierarchyLedger(
+            "group-1",
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            "아파트 생활용품 공동주문",
+            "owner-1",
+            new 커뮤니티포함원장참조Dto
+            {
+                원장Id = order.원장Id,
+                원장템플릿Key = order.원장템플릿Key,
+                역할 = 주문원장포함역할.개별주문,
+                필수여부 = true
+            });
+        var service = CreateHierarchyService(group, order, transport);
+
+        var context = await service.조회Async(group.원장Id, "owner-1", default);
+
+        var orderNode = Assert.Single(context?.포함원장목록 ?? []);
+        Assert.True(orderNode.접근가능여부);
+        Assert.NotNull(orderNode.원장?.다이어그램);
+        var transportNode = Assert.Single(orderNode.포함원장목록);
+        Assert.Equal(주문원장포함역할.운송, transportNode.역할);
+        Assert.NotNull(transportNode.원장?.다이어그램);
+    }
+
+    [Fact]
+    public async Task 공동주문_하위원장에_권한이_없으면_관계만_표시하고_상세를_숨긴다()
+    {
+        var privateOrder = CreateHierarchyLedger(
+            "order-private",
+            CommunityLedgerTemplateKeys.Order,
+            "다른 주문자의 비공개 주문",
+            "another-owner");
+        var group = CreateHierarchyLedger(
+            "group-1",
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            "공개 범위 확인 공동주문",
+            "owner-1",
+            new 커뮤니티포함원장참조Dto
+            {
+                원장Id = privateOrder.원장Id,
+                원장템플릿Key = privateOrder.원장템플릿Key,
+                역할 = 주문원장포함역할.개별주문,
+                필수여부 = true
+            });
+        var service = CreateHierarchyService(group, privateOrder);
+
+        var context = await service.조회Async(group.원장Id, "owner-1", default);
+
+        var restricted = Assert.Single(context?.포함원장목록 ?? []);
+        Assert.False(restricted.접근가능여부);
+        Assert.Equal("접근권한필요", restricted.조회상태);
+        Assert.Null(restricted.원장);
+    }
+
+    [Fact]
     public async Task 공개_원장_재사용은_허용된_항목만_새_비공개_원장으로_복사한다()
     {
         var source = CreateLedger();
@@ -291,6 +365,56 @@ public sealed class 게시글원장ContextServiceTests
             featureFlag);
         return new 게시글원장ContextService(ledgerStore, featureFlag, sharingService);
     }
+
+    private static 게시글원장ContextService CreateHierarchyService(params 커뮤니티원장Dto[] ledgers)
+    {
+        var ledgerStore = new 원장저장소Stub(ledgers);
+        var featureFlag = new 기능설정Stub(true);
+        var root = ledgers[0];
+        var sharingService = new 커뮤니티원장공유Service(
+            ledgerStore,
+            new 원장공유정책저장소Stub(
+                root,
+                커뮤니티원장공개범위.비공개,
+                allowReshare: false,
+                publicItemKeys: []),
+            featureFlag);
+        return new 게시글원장ContextService(ledgerStore, featureFlag, sharingService);
+    }
+
+    private static 커뮤니티원장Dto CreateHierarchyLedger(
+        string ledgerId,
+        string templateKey,
+        string title,
+        string ownerUserId,
+        params 커뮤니티포함원장참조Dto[] children)
+        => new()
+        {
+            원장Id = ledgerId,
+            Revision = 1,
+            원장템플릿Key = templateKey,
+            제목 = title,
+            상태 = 커뮤니티원장상태.진행중,
+            현재단계Key = "진행 중",
+            생성자UserId = ownerUserId,
+            포함원장목록 = children,
+            다이어그램스냅샷 = new DiagramSnapshotDto
+            {
+                DiagramId = $"diagram-{ledgerId}",
+                DiagramName = $"{title} 흐름",
+                LedgerId = ledgerId,
+                LedgerTemplateKey = templateKey,
+                Nodes =
+                [
+                    new DiagramNodeDto
+                    {
+                        NodeId = $"node-{ledgerId}",
+                        Kind = CommunityLedgerBlockTypes.State,
+                        Title = title
+                    }
+                ]
+            }
+        };
 
     private static 커뮤니티원장Dto CreateLedger()
         => new()
@@ -352,17 +476,16 @@ public sealed class 게시글원장ContextServiceTests
 
     private sealed class 원장저장소Stub : I커뮤니티원장저장소
     {
-        private readonly 커뮤니티원장Dto _ledger;
+        private readonly IReadOnlyDictionary<string, 커뮤니티원장Dto> _ledgers;
         public 커뮤니티원장저장요청? LastSaveRequest { get; private set; }
 
-        public 원장저장소Stub(커뮤니티원장Dto ledger)
+        public 원장저장소Stub(params 커뮤니티원장Dto[] ledgers)
         {
-            _ledger = ledger;
+            _ledgers = ledgers.ToDictionary(ledger => ledger.원장Id, StringComparer.OrdinalIgnoreCase);
         }
 
         public Task<커뮤니티원장Dto?> 원장조회Async(string 원장Id, CancellationToken cancellationToken = default)
-            => Task.FromResult<커뮤니티원장Dto?>(
-                string.Equals(원장Id, _ledger.원장Id, StringComparison.OrdinalIgnoreCase) ? _ledger : null);
+            => Task.FromResult(_ledgers.GetValueOrDefault(원장Id));
 
         public Task<커뮤니티원장Dto> 원장저장Async(
             커뮤니티원장저장요청 request,
@@ -386,10 +509,12 @@ public sealed class 게시글원장ContextServiceTests
             커뮤니티원장조회조건 query,
             CancellationToken cancellationToken = default)
         {
-            var hasAccess = string.Equals(query.접근UserId, _ledger.생성자UserId, StringComparison.OrdinalIgnoreCase)
-                            || _ledger.참여자목록.Any(x =>
-                                string.Equals(x.UserId, query.접근UserId, StringComparison.OrdinalIgnoreCase));
-            return Task.FromResult<IReadOnlyList<커뮤니티원장Dto>>(hasAccess ? [_ledger] : []);
+            var accessible = _ledgers.Values
+                .Where(ledger => string.Equals(query.접근UserId, ledger.생성자UserId, StringComparison.OrdinalIgnoreCase)
+                                 || ledger.참여자목록.Any(x =>
+                                     string.Equals(x.UserId, query.접근UserId, StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+            return Task.FromResult<IReadOnlyList<커뮤니티원장Dto>>(accessible);
         }
 
         public Task<커뮤니티원장Dto?> 원장상태변경Async(

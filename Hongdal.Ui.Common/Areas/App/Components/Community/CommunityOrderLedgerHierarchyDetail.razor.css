@@ -1,0 +1,217 @@
+.order-ledger-hierarchy {
+    width: min(100%, 1120px);
+    margin: 0 auto;
+    color: #172033;
+}
+
+.order-ledger-hierarchy__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 4px 0 20px;
+    border-bottom: 1px solid #dce3ec;
+}
+
+.order-ledger-hierarchy__header > div {
+    min-width: 0;
+}
+
+.order-ledger-hierarchy__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-bottom: 1px solid #dce3ec;
+}
+
+.order-ledger-hierarchy__summary > div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    padding: 16px;
+    border-right: 1px solid #dce3ec;
+}
+
+.order-ledger-hierarchy__summary > div:last-child {
+    border-right: 0;
+}
+
+.order-ledger-hierarchy__summary span,
+.order-ledger-hierarchy__main > span,
+.order-ledger-hierarchy__main > small,
+.order-ledger-hierarchy__heading > span {
+    color: #657187;
+    font-size: 0.78rem;
+}
+
+.order-ledger-hierarchy__summary strong {
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+}
+
+.order-ledger-hierarchy__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 4px 10px;
+}
+
+.order-ledger-hierarchy__heading > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.order-ledger-hierarchy__tree {
+    border-top: 1px solid #dce3ec;
+}
+
+.order-ledger-hierarchy__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 24px;
+    align-items: center;
+    gap: 12px;
+    width: calc(100% - min(calc(var(--ledger-depth) * 28px), 112px));
+    min-height: 76px;
+    margin-left: min(calc(var(--ledger-depth) * 28px), 112px);
+    padding: 11px 12px;
+    border: 0;
+    border-bottom: 1px solid #dce3ec;
+    background: #ffffff;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.order-ledger-hierarchy__row:hover:not(:disabled),
+.order-ledger-hierarchy__row:focus-visible:not(:disabled) {
+    background: #f4f8fc;
+    outline: none;
+}
+
+.order-ledger-hierarchy__row:disabled {
+    cursor: default;
+    opacity: 0.72;
+}
+
+.order-ledger-hierarchy__connector {
+    position: absolute;
+    left: -18px;
+    top: 0;
+    width: 18px;
+    height: 50%;
+    border-left: 1px solid #b8c4d3;
+    border-bottom: 1px solid #b8c4d3;
+}
+
+.order-ledger-hierarchy__row:first-child .order-ledger-hierarchy__connector {
+    display: none;
+}
+
+.order-ledger-hierarchy__icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: #e8f1fb;
+    color: #1769aa;
+}
+
+.order-ledger-hierarchy__row--complete .order-ledger-hierarchy__icon {
+    background: #e6f4ec;
+    color: #18794e;
+}
+
+.order-ledger-hierarchy__row--restricted .order-ledger-hierarchy__icon {
+    background: #edf0f4;
+    color: #6c7687;
+}
+
+.order-ledger-hierarchy__main {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.order-ledger-hierarchy__title-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    min-width: 0;
+}
+
+.order-ledger-hierarchy__title-line strong {
+    overflow-wrap: anywhere;
+}
+
+.order-ledger-hierarchy__title-line small {
+    padding: 2px 6px;
+    border: 1px solid #c8d4e2;
+    border-radius: 4px;
+    color: #47566d;
+    font-size: 0.7rem;
+}
+
+.order-ledger-hierarchy__title-line .order-ledger-hierarchy__required {
+    border-color: #f1bf65;
+    color: #875600;
+}
+
+.order-ledger-hierarchy__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 18px 0 4px;
+}
+
+.order-ledger-hierarchy__state {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 56px 16px;
+    color: #657187;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .order-ledger-hierarchy__summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .order-ledger-hierarchy__summary > div:nth-child(2) {
+        border-right: 0;
+    }
+
+    .order-ledger-hierarchy__summary > div:nth-child(-n + 2) {
+        border-bottom: 1px solid #dce3ec;
+    }
+
+    .order-ledger-hierarchy__heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .order-ledger-hierarchy__row {
+        width: calc(100% - min(calc(var(--ledger-depth) * 14px), 42px));
+        margin-left: min(calc(var(--ledger-depth) * 14px), 42px);
+        grid-template-columns: 32px minmax(0, 1fr) 20px;
+        gap: 9px;
+        min-height: 82px;
+        padding: 10px 8px;
+    }
+
+    .order-ledger-hierarchy__connector {
+        left: -9px;
+        width: 9px;
+    }
+
+    .order-ledger-hierarchy__actions {
+        position: sticky;
+        bottom: 0;
+        padding: 12px 0;
+        background: #ffffff;
+    }
+}

@@ -31,6 +31,7 @@ public interface I게시글원장ContextService
 
 public sealed class 게시글원장ContextService : I게시글원장ContextService
 {
+    private const int 최대포함원장깊이 = 4;
     private readonly I커뮤니티원장저장소 _원장저장소;
     private readonly IVersionFeatureFlagService _featureFlagService;
     private readonly I커뮤니티원장공유Service _공유Service;
@@ -160,6 +161,27 @@ public sealed class 게시글원장ContextService : I게시글원장ContextServi
             return null;
         }
 
+        var context = await 원장Context생성Async(원장, 사용자UserId, cancellationToken);
+        if (context is null)
+        {
+            return null;
+        }
+
+        context.포함원장목록 = await 포함원장목록생성Async(
+            원장,
+            사용자UserId,
+            context.상세조회가능여부,
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { 원장.원장Id },
+            깊이: 1,
+            cancellationToken);
+        return context;
+    }
+
+    private async Task<PlatformCommunityPostLedgerContextResponse?> 원장Context생성Async(
+        커뮤니티원장Dto 원장,
+        string? 사용자UserId,
+        CancellationToken cancellationToken)
+    {
         var 접근판정 = await _공유Service.접근판정Async(원장, 사용자UserId, cancellationToken);
         if (!접근판정.직접접근가능 && !접근판정.공개조회가능)
         {
@@ -208,6 +230,99 @@ public sealed class 게시글원장ContextService : I게시글원장ContextServi
                 기능활성화)
         };
     }
+
+    private async Task<IReadOnlyList<PlatformCommunityIncludedLedgerResponse>> 포함원장목록생성Async(
+        커뮤니티원장Dto 상위원장,
+        string? 사용자UserId,
+        bool 상위원장상세조회가능,
+        HashSet<string> 현재경로,
+        int 깊이,
+        CancellationToken cancellationToken)
+    {
+        if (깊이 > 최대포함원장깊이 || 상위원장.포함원장목록.Count == 0)
+        {
+            return [];
+        }
+
+        var result = new List<PlatformCommunityIncludedLedgerResponse>();
+        foreach (var 참조 in 상위원장.포함원장목록.OrderBy(item => item.표시순서))
+        {
+            var template = CommunityLedgerTemplateCatalog.Find(참조.원장템플릿Key);
+            if (현재경로.Contains(참조.원장Id))
+            {
+                if (상위원장상세조회가능)
+                {
+                    result.Add(제한항목(참조, template.DisplayName, "순환참조"));
+                }
+
+                continue;
+            }
+
+            var 하위원장 = await _원장저장소.원장조회Async(참조.원장Id, cancellationToken);
+            if (하위원장 is null)
+            {
+                if (상위원장상세조회가능)
+                {
+                    result.Add(제한항목(참조, template.DisplayName, "원장누락"));
+                }
+
+                continue;
+            }
+
+            var 하위Context = await 원장Context생성Async(하위원장, 사용자UserId, cancellationToken);
+            if (하위Context is null)
+            {
+                if (상위원장상세조회가능)
+                {
+                    result.Add(제한항목(참조, template.DisplayName, "접근권한필요"));
+                }
+
+                continue;
+            }
+
+            현재경로.Add(하위원장.원장Id);
+            var 하위포함원장목록 = await 포함원장목록생성Async(
+                하위원장,
+                사용자UserId,
+                하위Context.상세조회가능여부,
+                현재경로,
+                깊이 + 1,
+                cancellationToken);
+            현재경로.Remove(하위원장.원장Id);
+
+            result.Add(new PlatformCommunityIncludedLedgerResponse
+            {
+                원장Id = 하위원장.원장Id,
+                원장템플릿Key = 하위원장.원장템플릿Key,
+                원장템플릿명 = CommunityLedgerTemplateCatalog.Find(하위원장.원장템플릿Key).DisplayName,
+                역할 = 참조.역할,
+                필수여부 = 참조.필수여부,
+                표시순서 = 참조.표시순서,
+                조회상태 = "정상",
+                접근가능여부 = true,
+                원장 = 하위Context,
+                포함원장목록 = 하위포함원장목록
+            });
+        }
+
+        return result;
+    }
+
+    private static PlatformCommunityIncludedLedgerResponse 제한항목(
+        커뮤니티포함원장참조Dto 참조,
+        string 원장템플릿명,
+        string 조회상태)
+        => new()
+        {
+            원장Id = 참조.원장Id,
+            원장템플릿Key = 참조.원장템플릿Key,
+            원장템플릿명 = 원장템플릿명,
+            역할 = 참조.역할,
+            필수여부 = 참조.필수여부,
+            표시순서 = 참조.표시순서,
+            조회상태 = 조회상태,
+            접근가능여부 = false
+        };
 
     private static IReadOnlyList<PlatformCommunityLedgerBlockResponse> SanitizeBlocks(
         IReadOnlyList<커뮤니티원장블록Dto> blocks,

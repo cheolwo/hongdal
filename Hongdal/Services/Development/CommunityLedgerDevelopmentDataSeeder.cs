@@ -56,11 +56,12 @@ public static class CommunityLedgerDevelopmentDataSeeder
 
         var createdCount = 0;
         var updatedCount = 0;
-        foreach (var request in CreateSamples(
-                     shipperUserId,
-                     driverUserId,
-                     linkedTransport?.Id,
-                     linkedTransport?.상태))
+        var samples = CreateSamples(
+            shipperUserId,
+            driverUserId,
+            linkedTransport?.Id,
+            linkedTransport?.상태);
+        foreach (var request in samples)
         {
             var ledger = await ledgerStore.원장조회Async(request.원장Id!, cancellationToken);
             if (ledger is null)
@@ -97,7 +98,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
             "Community ledger development samples are ready. Created={CreatedCount} Updated={UpdatedCount} Total={TotalCount}",
             createdCount,
             updatedCount,
-            3);
+            samples.Count);
     }
 
     private static IReadOnlyList<커뮤니티원장저장요청> CreateSamples(
@@ -146,6 +147,56 @@ public static class CommunityLedgerDevelopmentDataSeeder
                 ("주소", "서울 양천구 주민센터 앞"), ("시간", "오늘 18:30")),
             Block("handoff", CommunityLedgerBlockTypes.Handoff, "전달", "준비 중",
                 ("다음행동", "꾸러미 수량 확인 후 전달"))
+        };
+
+        var saleBlocks = new[]
+        {
+            Block("sale-item", CommunityLedgerBlockTypes.Item, "공동 판매 상품", "판매 확정",
+                ("상품", "재생 세제 리필 2L"), ("단가", "8,500원")),
+            Block("sale-stock", CommunityLedgerBlockTypes.Inventory, "판매 가능 수량", "재고 확보",
+                ("확보수량", "40개"), ("판매자", "살뜰 생활상점")),
+            Block("sale-settlement", CommunityLedgerBlockTypes.Settlement, "판매 정산", "주문 합계 대기",
+                ("방식", "공동주문 확정 후 결제 표시"))
+        };
+
+        var warehouseBlocks = new[]
+        {
+            Block("outbound-order", CommunityLedgerBlockTypes.Order, "공동주문 출고 지시", "출고 예정",
+                ("상품", "재생 세제 리필 2L"), ("예정수량", "24개")),
+            Block("picking", CommunityLedgerBlockTypes.Inventory, "피킹·포장", "작업 대기",
+                ("피킹단위", "6개입 4상자"), ("포장", "누액 방지 완충")),
+            Block("transport-handoff", CommunityLedgerBlockTypes.Handoff, "운송 인계", "인계 전",
+                ("인계장소", "양천 생활물류 거점"))
+        };
+
+        var orderA상세Blocks = new[]
+        {
+            Block("orderer", CommunityLedgerBlockTypes.Participant, "주문자", "참여 확정",
+                ("표시명", "101동 공동주문 참여자")),
+            Block("order-item", CommunityLedgerBlockTypes.Order, "주문 항목", "주문 확인",
+                ("상품", "재생 세제 리필 2L"), ("수량", "12개")),
+            Block("fulfillment", CommunityLedgerBlockTypes.State, "주문 이행", "상품 준비",
+                ("수령", "아파트 공동 수령"))
+        };
+
+        var orderB상세Blocks = new[]
+        {
+            Block("orderer", CommunityLedgerBlockTypes.Participant, "주문자", "참여 확정",
+                ("표시명", "102동 공동주문 참여자")),
+            Block("order-item", CommunityLedgerBlockTypes.Order, "주문 항목", "주문 확인",
+                ("상품", "재생 세제 리필 2L"), ("수량", "12개")),
+            Block("fulfillment", CommunityLedgerBlockTypes.State, "주문 이행", "상품 준비",
+                ("수령", "아파트 공동 수령"))
+        };
+
+        var groupPurchaseBlocks = new[]
+        {
+            Block("individual-orders", CommunityLedgerBlockTypes.Order, "개별 주문 집계", "2건 연결",
+                ("참여동", "101동, 102동"), ("총수량", "24개")),
+            Block("group-condition", CommunityLedgerBlockTypes.Decision, "공동 조건", "조건 확정",
+                ("최소수량", "20개"), ("공동수령", "양천 생활물류 거점")),
+            Block("group-progress", CommunityLedgerBlockTypes.State, "공동주문 진행", "판매·출고 준비",
+                ("다음행동", "피킹·포장 후 운송 인계"))
         };
 
         List<커뮤니티원장저장요청> samples =
@@ -206,6 +257,84 @@ public static class CommunityLedgerDevelopmentDataSeeder
                 })
                 .ToDictionary(item => item.Key, item => item.Value, StringComparer.OrdinalIgnoreCase);
         }
+
+        samples.AddRange(
+        [
+            CreateRequest(
+                "dev-ledger-group-sale",
+                CommunityLedgerTemplateKeys.LocalSale,
+                "살뜰 생활상점 세제 판매",
+                "공동주문 참여자에게 재생 세제를 공급하고 싶어요.",
+                커뮤니티원장상태.진행중,
+                "재고 확보",
+                CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
+                "창고·커머스 이행 OS",
+                shipperUserId,
+                driverUserId,
+                saleBlocks),
+            CreateRequest(
+                "dev-ledger-group-warehouse-outbound",
+                CommunityLedgerTemplateKeys.WarehouseOutbound,
+                "공동주문 세제 출고",
+                "확정된 공동주문 수량을 피킹하고 포장해 운송 담당자에게 넘기고 싶어요.",
+                커뮤니티원장상태.진행중,
+                "피킹 대기",
+                CommunityLedgerOperatingSystemCodes.WarehouseCommerceFulfillment,
+                "창고·커머스 이행 OS",
+                shipperUserId,
+                driverUserId,
+                warehouseBlocks),
+            CreateRequest(
+                "dev-ledger-group-order-101",
+                CommunityLedgerTemplateKeys.Order,
+                "101동 재생 세제 주문",
+                "101동 참여자 몫의 주문과 판매, 출고, 운송 상태를 한 번에 보고 싶어요.",
+                커뮤니티원장상태.진행중,
+                "상품 준비",
+                CommunityLedgerOperatingSystemCodes.CommunityTrust,
+                "커뮤니티 신뢰 OS",
+                shipperUserId,
+                driverUserId,
+                orderA상세Blocks,
+                [
+                    Included("dev-ledger-group-sale", CommunityLedgerTemplateKeys.LocalSale, 주문원장포함역할.판매, true, 0),
+                    Included("dev-ledger-group-warehouse-outbound", CommunityLedgerTemplateKeys.WarehouseOutbound, 주문원장포함역할.창고출고, true, 1),
+                    Included("dev-ledger-cargo-bookshelf", CommunityLedgerTemplateKeys.CargoTransport, 주문원장포함역할.운송, true, 2)
+                ]),
+            CreateRequest(
+                "dev-ledger-group-order-102",
+                CommunityLedgerTemplateKeys.Order,
+                "102동 재생 세제 주문",
+                "102동 참여자 몫의 주문과 공동 수령 상태를 확인하고 싶어요.",
+                커뮤니티원장상태.진행중,
+                "상품 준비",
+                CommunityLedgerOperatingSystemCodes.CommunityTrust,
+                "커뮤니티 신뢰 OS",
+                shipperUserId,
+                driverUserId,
+                orderB상세Blocks,
+                [
+                    Included("dev-ledger-group-sale", CommunityLedgerTemplateKeys.LocalSale, 주문원장포함역할.판매, true, 0),
+                    Included("dev-ledger-group-warehouse-outbound", CommunityLedgerTemplateKeys.WarehouseOutbound, 주문원장포함역할.창고출고, true, 1),
+                    Included("dev-ledger-cargo-bookshelf", CommunityLedgerTemplateKeys.CargoTransport, 주문원장포함역할.운송, false, 2)
+                ]),
+            CreateRequest(
+                "dev-ledger-group-purchase",
+                CommunityLedgerTemplateKeys.GroupPurchase,
+                "양천 아파트 재생 세제 공동주문",
+                "여러 동의 개별 주문을 묶어 판매, 출고와 운송까지 함께 확인하고 싶어요.",
+                커뮤니티원장상태.진행중,
+                "판매·출고 준비",
+                CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+                "공동주문 수입 OS",
+                shipperUserId,
+                driverUserId,
+                groupPurchaseBlocks,
+                [
+                    Included("dev-ledger-group-order-101", CommunityLedgerTemplateKeys.Order, 주문원장포함역할.개별주문, true, 0),
+                    Included("dev-ledger-group-order-102", CommunityLedgerTemplateKeys.Order, 주문원장포함역할.개별주문, true, 1)
+                ])
+        ]);
 
         return samples;
     }
@@ -282,7 +411,8 @@ public static class CommunityLedgerDevelopmentDataSeeder
         string osName,
         string shipperUserId,
         string driverUserId,
-        IReadOnlyList<커뮤니티원장블록Dto> blocks)
+        IReadOnlyList<커뮤니티원장블록Dto> blocks,
+        IReadOnlyList<커뮤니티포함원장참조Dto>? includedLedgers = null)
         => new()
         {
             원장Id = ledgerId,
@@ -297,6 +427,7 @@ public static class CommunityLedgerDevelopmentDataSeeder
             생성자UserId = shipperUserId,
             생성자표시명 = "살뜰 운영자",
             블록목록 = blocks,
+            포함원장목록 = includedLedgers,
             참여자목록 =
             [
                 new 커뮤니티원장참여자Dto
@@ -320,6 +451,21 @@ public static class CommunityLedgerDevelopmentDataSeeder
                 ["개발샘플"] = "true",
                 ["표시용도"] = "원장 선택 화면 검증"
             }
+        };
+
+    private static 커뮤니티포함원장참조Dto Included(
+        string ledgerId,
+        string templateKey,
+        string role,
+        bool required,
+        int displayOrder)
+        => new()
+        {
+            원장Id = ledgerId,
+            원장템플릿Key = templateKey,
+            역할 = role,
+            필수여부 = required,
+            표시순서 = displayOrder
         };
 
     private static 커뮤니티원장블록Dto Block(

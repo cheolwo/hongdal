@@ -342,6 +342,108 @@
     background: rgba(148, 163, 184, 0.09);
 }
 
+.decoration-detail__scripture-source {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid rgba(var(--mud-palette-primary-rgb), 0.18);
+    border-radius: 17px;
+    background:
+        radial-gradient(circle at 92% 8%, rgba(var(--mud-palette-primary-rgb), 0.12), transparent 35%),
+        var(--mud-palette-surface);
+}
+
+.decoration-detail__scripture-source header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.decoration-detail__scripture-source header > span {
+    display: grid;
+    min-width: 48px;
+    height: 42px;
+    padding-inline: 6px;
+    border-radius: 13px;
+    place-items: center;
+    background: rgba(var(--mud-palette-primary-rgb), 0.1);
+    color: var(--mud-palette-primary);
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.decoration-detail__scripture-source header > div {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.decoration-detail__scripture-source header small {
+    color: var(--mud-palette-primary);
+    font-size: 0.6rem;
+    font-weight: 850;
+}
+
+.decoration-detail__scripture-source header strong {
+    font-size: 0.78rem;
+}
+
+.decoration-detail__scripture-playlists {
+    display: grid;
+    gap: 6px;
+}
+
+.decoration-detail__scripture-playlists article {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(var(--mud-palette-primary-rgb), 0.06);
+}
+
+.decoration-detail__scripture-playlists article > strong {
+    overflow: hidden;
+    font-size: 0.67rem;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.decoration-detail__scripture-playlists article > div {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.decoration-detail__scripture-playlists a {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+    padding: 7px 9px;
+    border: 1px solid rgba(var(--mud-palette-primary-rgb), 0.14);
+    border-radius: 9px;
+    background: var(--mud-palette-surface);
+    color: var(--mud-palette-primary);
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.decoration-detail__scripture-playlists a.is-internal {
+    flex: 1 1 150px;
+    background: var(--mud-palette-primary);
+    color: var(--mud-palette-primary-text);
+}
+
+.decoration-detail__scripture-source > p {
+    margin: 0;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.6rem;
+    line-height: 1.5;
+}
+
 .decoration-detail__price strong {
     font-size: 1.3rem;
 }

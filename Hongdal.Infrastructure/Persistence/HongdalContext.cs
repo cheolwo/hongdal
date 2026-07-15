@@ -149,6 +149,10 @@ namespace 홍달.Data
         public DbSet<PlatformCommunityPostAttachmentComment> PlatformCommunityPostAttachmentComments { get; set; } = null!;
         public DbSet<PlatformCommunityPostComment> PlatformCommunityPostComments { get; set; } = null!;
         public DbSet<PlatformCommunityPostRecommendation> PlatformCommunityPostRecommendations { get; set; } = null!;
+        public DbSet<CommunityKeywordSubscription> CommunityKeywordSubscriptions { get; set; } = null!;
+        public DbSet<PlatformCommunityPostKeywordScan> PlatformCommunityPostKeywordScans { get; set; } = null!;
+        public DbSet<CommunityKeywordNotification> CommunityKeywordNotifications { get; set; } = null!;
+        public DbSet<CommunityKeywordNotificationDelivery> CommunityKeywordNotificationDeliveries { get; set; } = null!;
         public DbSet<PlatformCommunityPostAudio> PlatformCommunityPostAudio { get; set; } = null!;
         public DbSet<PlatformCommunityPostAudioSegment> PlatformCommunityPostAudioSegments { get; set; } = null!;
         public DbSet<PlatformCommunityPostAudioAccessLog> PlatformCommunityPostAudioAccessLogs { get; set; } = null!;

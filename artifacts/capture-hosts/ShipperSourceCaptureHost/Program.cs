@@ -49,6 +49,20 @@ var communityDecorationStoreCssFile = Path.Combine(
     "Components",
     "Pages",
     "CommunityDecorationStorePage.razor.css");
+var communityDecorationDetailCssFile = Path.Combine(
+    repositoryRoot,
+    "ShipperApp",
+    "Components",
+    "Pages",
+    "CommunityDecorationDetailPage.razor.css");
+var prajnaLectureLibraryCssFile = Path.Combine(
+    repositoryRoot,
+    "Hongdal.Ui.Common",
+    "Areas",
+    "App",
+    "Components",
+    "Community",
+    "HongdalPrajnaLectureLibrary.razor.css");
 var mudBlazorCssFile = Path.Combine(mudBlazorStaticAssets, "MudBlazor.min.css");
 var shipperAppScopedCssFile = Path.Combine(
     repositoryRoot,
@@ -106,6 +120,10 @@ app.MapGet("/capture/common.css", () => Results.File(commonAppScopedCssFile, "te
 app.MapGet("/capture/shipper.css", () => Results.File(shipperAppScopedCssFile, "text/css"));
 app.MapGet("/capture/community-decoration-store.css", () =>
     Results.File(communityDecorationStoreCssFile, "text/css"));
+app.MapGet("/capture/community-decoration-detail.css", () =>
+    Results.File(communityDecorationDetailCssFile, "text/css"));
+app.MapGet("/capture/prajna-lecture-library.css", () =>
+    Results.File(prajnaLectureLibraryCssFile, "text/css"));
 
 app.MapRazorComponents<ShipperApp.App>()
     .AddInteractiveServerRenderMode();

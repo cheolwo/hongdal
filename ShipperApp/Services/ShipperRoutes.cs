@@ -46,4 +46,7 @@ public static class ShipperRoutes
 
     public static string CommunityDecorationCheckoutFor(string productKey)
         => $"{CommunityDecorationDetailFor(productKey)}/checkout";
+
+    public static string PrajnaLectureFor(string playlistId)
+        => $"{PrajnaLectures}?playlist={Uri.EscapeDataString(playlistId)}";
 }

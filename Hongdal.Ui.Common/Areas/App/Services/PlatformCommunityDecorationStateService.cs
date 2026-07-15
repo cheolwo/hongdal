@@ -95,7 +95,8 @@ public sealed record CommunityDecorationProduct(
     IReadOnlyList<CommunityDecorationAsset> Assets,
     HomeNavigatorThemeManifest? HomeTheme = null,
     BaguaTransitionMotionManifest? BaguaMotion = null,
-    bool IsCustom = false)
+    bool IsCustom = false,
+    ScriptureDecorationSource? ScriptureSource = null)
 {
     public bool IsFree => PriceAmount <= 0;
 
@@ -738,6 +739,8 @@ public sealed class PlatformCommunityDecorationStateService
                     "빛의 전달자",
                     "발광 서명 궤적"))
         };
+
+        products.AddRange(ScriptureDecorationCatalog.CreateProducts());
 
         foreach (var pack in 노드스티커Catalog.기본팩목록)
         {
