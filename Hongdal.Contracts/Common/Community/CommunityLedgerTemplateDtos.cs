@@ -435,6 +435,7 @@ public static class CommunityLedgerTemplateKeys
     public const string WarehouseInbound = "warehouse-inbound";
     public const string LocalSale = "local-sale";
     public const string GroupPurchase = "group-purchase";
+    public const string GroupImport = "group-import";
     public const string Errand = "errand";
 }
 

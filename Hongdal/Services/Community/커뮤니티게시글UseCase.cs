@@ -299,10 +299,14 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
         }
 
-        var 원장Context = await _원장ContextService.조회Async(
-            entity.커뮤니티원장Id,
-            _currentUserAccessor.UserId,
-            cancellationToken);
+        var 원장Context = CommunityLedgerCompletionPublication.IsSystemPost(entity)
+            ? await _원장ContextService.비식별성립사례조회Async(
+                entity.커뮤니티원장Id,
+                cancellationToken)
+            : await _원장ContextService.조회Async(
+                entity.커뮤니티원장Id,
+                _currentUserAccessor.UserId,
+                cancellationToken);
         return Result.Ok(ToResponse(entity, 원장Context));
     }
 
@@ -398,6 +402,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         if (entity is null)
         {
             return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
+        }
+
+        if (CommunityLedgerCompletionPublication.IsSystemPost(entity))
+        {
+            return Forbidden<PlatformCommunityPostResponse>("원장 성립 시스템 기록은 수정할 수 없습니다.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
@@ -806,6 +815,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return NotFound("게시글을 찾을 수 없습니다.");
         }
 
+        if (CommunityLedgerCompletionPublication.IsSystemPost(entity))
+        {
+            return Forbidden("원장 성립 시스템 기록은 삭제할 수 없습니다.");
+        }
+
         if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
         {
             return Forbidden("게시글 비밀번호가 일치하지 않습니다.");
@@ -947,6 +961,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         PlatformCommunityPostLedgerContextResponse? 원장Context = null)
     {
         var isReportBoardPost = entity.IsReportBoardPost || IsReportCategory(entity.Category);
+        var isLedgerCompletionPost = CommunityLedgerCompletionPublication.IsSystemPost(entity);
         var reporterDisplayName = isReportBoardPost ? "신고자" : entity.Nickname;
         var reportedDisplayName = isReportBoardPost ? "피신고자" : string.Empty;
 
@@ -963,6 +978,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             커뮤니티원장Id = entity.커뮤니티원장Id,
             원장Context = 원장Context,
             Nickname = isReportBoardPost ? reporterDisplayName : entity.Nickname,
+            IsSystemGenerated = isLedgerCompletionPost,
+            SystemPostKind = isLedgerCompletionPost
+                ? PlatformCommunitySystemPostKinds.LedgerCompletion
+                : null,
+            PrivacyNotice = isLedgerCompletionPost
+                ? "원장 종류와 절차 구조만 공개되며 이름, 연락처, 상세 주소, 금액과 원문 증빙은 공개하지 않습니다."
+                : null,
             IsReportBoardPost = isReportBoardPost,
             ReporterDisplayName = reporterDisplayName,
             ReportedDisplayName = reportedDisplayName,

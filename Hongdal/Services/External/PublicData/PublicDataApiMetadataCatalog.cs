@@ -143,6 +143,52 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
                 "통관 상태는 운송 가능성 판단의 참고값이며, 기본 운송 요청을 무조건 차단하는 게이트로 사용하지 않습니다.",
                 "조회 결과 원문과 해석 결과를 분리해 저장합니다."
             ]
+        },
+        new()
+        {
+            Key = "customs-hs-country-import-statistics",
+            Provider = "관세청",
+            DisplayName = "품목별 국가별 수출입실적",
+            Purpose = "HS 코드와 수출국별 수입금액·순중량을 조회해 기간 가중평균 CIF 단가를 계산합니다.",
+            Domain = "Customs",
+            VersionScope = "2.5",
+            ApiType = "REST",
+            DataFormat = "XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15100475/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "strtYymm", "endYymm", "hsSgn", "cntyCd"],
+            MainResponseFields = ["year", "hsCd", "statCd", "impWgt", "impDlr"],
+            UsageNotes =
+            [
+                "수입금액 합계를 순중량 합계로 나눈 가중평균을 사용하고 월별 단가의 단순평균은 사용하지 않습니다.",
+                "CIF 통계단가는 관세·부가세·검역·통관·국내 물류비와 판매마진을 포함한 소비자가격이 아닙니다."
+            ]
+        },
+        new()
+        {
+            Key = "at-daily-wholesale-retail-food-price",
+            Provider = "한국농수산식품유통공사(aT)",
+            DisplayName = "일별 도·소매 가격정보",
+            Purpose = "국내 농축수산물의 최근 중도매·소매가격을 kg 기준으로 정규화해 HS 수입 기준가격과 비교합니다.",
+            Domain = "FoodPrice",
+            VersionScope = "2.5",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15156057/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "cond[exmn_ymd::GTE]", "cond[exmn_ymd::LTE]", "cond[ctgry_cd::EQ]", "cond[item_cd::EQ]"],
+            MainResponseFields = ["exmn_ymd", "se_cd", "item_cd", "vrty_cd", "grd_cd", "exmn_dd_cnvs_prc"],
+            UsageNotes =
+            [
+                "HS 코드와 aT 품목코드는 직접 호환되지 않으므로 검토된 교차 연결표와 매칭 품질을 함께 반환합니다.",
+                "국산 품종을 구분할 수 없는 품목은 국내시장 조사값으로 표시하고 국산 확정 가격으로 표현하지 않습니다."
+            ]
         }
     ];
 

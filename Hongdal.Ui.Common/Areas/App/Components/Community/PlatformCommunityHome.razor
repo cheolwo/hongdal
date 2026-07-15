@@ -959,6 +959,8 @@
                                           OnCompose="공통홈글쓰기열기"
                                           OnStoreOpen="OpenDecorationStore" />
 
+            <CommunityDriverAvailabilityBoard />
+
             <div class="@BuildBaguaEntryClass()" style="@BuildBaguaEntryStyle()">
                 <button type="button"
                         class="platform-community-bagua-toggle"
@@ -1233,13 +1235,17 @@
                                 @foreach (var post in VisiblePosts)
                                 {
                                     <div class="@BuildForumPostRowClass(post)" role="row">
-                                        <span class="platform-community-forum-number" role="cell">@(post.IsOperatorPinned ? "공지" : post.Id.ToString(CultureInfo.InvariantCulture))</span>
+                                        <span class="platform-community-forum-number" role="cell">@(post.IsOperatorPinned ? "공지" : post.IsSystemGenerated ? "성립" : post.Id.ToString(CultureInfo.InvariantCulture))</span>
                                         <span class="platform-community-forum-category" role="cell">@post.Category</span>
                                         <span class="platform-community-forum-subject" role="cell">
                                             <button type="button"
                                                     aria-expanded="@IsForumPostSelected(post)"
                                                     @onclick="@(async () => await ToggleForumPostAsync(post))">
-                                                @if (post.IsOperatorPinned)
+                                                @if (post.IsSystemGenerated)
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.Verified" Size="Size.Small" />
+                                                }
+                                                else if (post.IsOperatorPinned)
                                                 {
                                                     <MudIcon Icon="@Icons.Material.Filled.Campaign" Size="Size.Small" />
                                                 }
@@ -1338,7 +1344,7 @@
                                 <MudStack Spacing="2">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
                                         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                            <MudIcon Icon="@Icons.Material.Filled.Forum" Color="Color.Primary" />
+                                            <MudIcon Icon="@(post.IsSystemGenerated ? Icons.Material.Filled.Verified : Icons.Material.Filled.Forum)" Color="@(post.IsSystemGenerated ? Color.Success : Color.Primary)" />
                                             <MudText Typo="Typo.subtitle1">@post.Title</MudText>
                                         </MudStack>
                                         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
@@ -1349,6 +1355,10 @@
                                             else if (post.IsTrending)
                                             {
                                                 <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">활동 글</MudChip>
+                                            }
+                                            @if (post.IsSystemGenerated)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">자동 성립 기록</MudChip>
                                             }
                                             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@post.Category</MudChip>
                                             <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@post.WorkflowTag</MudChip>
@@ -1362,6 +1372,14 @@
 
                                     <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
 
+                                    @if (post.IsSystemGenerated && !string.IsNullOrWhiteSpace(post.PrivacyNotice))
+                                    {
+                                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Icon="@Icons.Material.Filled.PrivacyTip">
+                                            <strong>비식별 공개본</strong><br />
+                                            @post.PrivacyNotice
+                                        </MudAlert>
+                                    }
+
                                     @if (post.원장Context is { } 원장Context)
                                     {
                                         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
@@ -1369,7 +1387,7 @@
                                                 <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
                                                     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
                                                         <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
-                                                        <strong>현재 원장 · @원장Context.원장템플릿명</strong>
+                                                        <strong>@(post.IsSystemGenerated ? "완료된 공개 절차" : "현재 원장") · @원장Context.원장템플릿명</strong>
                                                     </MudStack>
                                                     <MudStack Row="true" Spacing="1">
                                                         <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@원장Context.상태</MudChip>
@@ -1386,7 +1404,9 @@
                                                 {
                                                     <MudText Typo="Typo.caption">현재 단계 · @원장Context.현재단계</MudText>
                                                 }
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@원장Context.처리체계명 · @원장Context.원장Id</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                    @원장Context.처리체계명 · @(post.IsSystemGenerated ? "개인정보를 제거한 절차 구조" : 원장Context.원장Id)
+                                                </MudText>
                                                 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
                                                     @foreach (var 행동 in 원장Context.가능한행동목록.Take(5))
                                                     {
@@ -1406,6 +1426,16 @@
                                                                    StartIcon="@Icons.Material.Filled.AccountTree"
                                                                    OnClick="@(() => OpenSharedLedgerDiagram(원장Context))">
                                                             다이어그램 같이 보기
+                                                        </MudButton>
+                                                    }
+                                                    @if (post.IsSystemGenerated)
+                                                    {
+                                                        <MudButton Variant="Variant.Filled"
+                                                                   Color="Color.Success"
+                                                                   Size="Size.Small"
+                                                                   StartIcon="@Icons.Material.Filled.AddTask"
+                                                                   OnClick="@(() => StartFromCompletionCase(원장Context))">
+                                                            이 절차로 시작하기
                                                         </MudButton>
                                                     }
                                                     @if (원장Context.재공유허용여부)
@@ -1608,9 +1638,12 @@
                                                     @(post.IsOperatorPinned ? "고정 해제" : "상단 고정")
                                                 </MudButton>
                                             }
-                                            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => BeginEdit(post))">
-                                                수정
-                                            </MudButton>
+                                            @if (!post.IsSystemGenerated)
+                                            {
+                                                <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => BeginEdit(post))">
+                                                    수정
+                                                </MudButton>
+                                            }
                                         </MudStack>
                                     </MudStack>
 
@@ -3721,6 +3754,16 @@
 
     .platform-community-forum-row--notice {
         background: color-mix(in srgb, var(--mud-palette-warning) 7%, var(--platform-home-surface));
+    }
+
+    .platform-community-forum-row--completion {
+        background: color-mix(in srgb, var(--mud-palette-success) 7%, var(--platform-home-surface));
+    }
+
+    .platform-community-forum-row--completion .platform-community-forum-number,
+    .platform-community-forum-row--completion .platform-community-forum-subject strong {
+        color: color-mix(in srgb, var(--mud-palette-success) 78%, var(--mud-palette-text-primary));
+        font-weight: 800;
     }
 
     .platform-community-forum-row--recommended .platform-community-forum-subject strong {
@@ -7411,7 +7454,8 @@
     {
         var selected = IsForumPostSelected(post) ? " platform-community-forum-row--selected" : string.Empty;
         var notice = post.IsOperatorPinned ? " platform-community-forum-row--notice" : string.Empty;
-        return $"platform-community-forum-row{selected}{notice}";
+        var completion = post.IsSystemGenerated ? " platform-community-forum-row--completion" : string.Empty;
+        return $"platform-community-forum-row{selected}{notice}{completion}";
     }
 
     private string BuildForumSeedPostRowClass(CommunitySeedPost post)
@@ -7607,10 +7651,8 @@
     private async Task HandleLedgerPickerItemClickAsync(PlatformCommunityPostLedgerChoiceResponse ledger)
     {
         pendingLedgerId = ledger.원장Id;
-        if (string.Equals(
-                ledger.원장템플릿Key,
-                CommunityLedgerTemplateKeys.GroupPurchase,
-                StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(ledger.원장템플릿Key, CommunityLedgerTemplateKeys.GroupPurchase, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(ledger.원장템플릿Key, CommunityLedgerTemplateKeys.GroupImport, StringComparison.OrdinalIgnoreCase))
         {
             await OpenPendingLedgerDetailAsync();
         }
@@ -10724,6 +10766,11 @@
             return ResolveGroupPurchaseActiveNodeTitle(stateLabel);
         }
 
+        if (templateKey is CommunityLedgerTemplateKeys.GroupImport)
+        {
+            return ResolveGroupImportActiveNodeTitle(stateLabel);
+        }
+
         if (templateKey is CommunityLedgerTemplateKeys.LocalSale)
         {
             return ResolveLocalSaleActiveNodeTitle(stateLabel);
@@ -10880,27 +10927,62 @@
 
     private static string? ResolveGroupPurchaseActiveNodeTitle(string stateLabel)
     {
-        if (ContainsAny(stateLabel, "국내", "인계", "분배", "창고", "입고", "운송", "판매", "정산", "수령", "마감", "SaleOpened"))
+        if (ContainsAny(stateLabel, "정산", "수령", "마감", "완료"))
         {
-            return "국내 인계/마감";
+            return "정산/수령";
         }
 
-        if (ContainsAny(stateLabel, "통관", "HS", "관세", "검역", "보세", "검토"))
+        if (ContainsAny(stateLabel, "분배", "전달", "인계", "배송"))
         {
-            return "통관/검토";
+            return "분배";
         }
 
-        if (ContainsAny(stateLabel, "해외", "구매", "발주", "선적", "인보이스", "패킹", "ImportInProgress"))
+        if (ContainsAny(stateLabel, "거점", "창고", "입고", "보관"))
         {
-            return "해외 구매/선적";
+            return "수령 거점";
         }
 
-        if (ContainsAny(stateLabel, "결정", "확정", "FCL", "LCL", "가격", "수량", "ImportDecision", "Cancelled"))
+        if (ContainsAny(stateLabel, "구매", "결정", "확정", "가격", "수량"))
+        {
+            return "구매 확정";
+        }
+
+        return "수요 모집";
+    }
+
+    private static string? ResolveGroupImportActiveNodeTitle(string stateLabel)
+    {
+        if (ContainsAny(stateLabel, "정산", "수령", "마감", "완료"))
+        {
+            return "정산/수령";
+        }
+
+        if (ContainsAny(stateLabel, "분배", "국내 운송", "세대 배송"))
+        {
+            return "세대 분배";
+        }
+
+        if (ContainsAny(stateLabel, "3PL", "창고", "입고"))
+        {
+            return "3PL 입고";
+        }
+
+        if (ContainsAny(stateLabel, "통관", "반출", "HS", "관세", "검역", "보세", "검토"))
+        {
+            return "통관/반출";
+        }
+
+        if (ContainsAny(stateLabel, "해외", "발주", "선적", "인보이스", "패킹", "ImportInProgress"))
+        {
+            return "해외 선적";
+        }
+
+        if (ContainsAny(stateLabel, "수입", "결정", "확정", "FCL", "LCL", "가격", "수량", "ImportDecision", "Cancelled"))
         {
             return "수입 결정";
         }
 
-        return "수요 모집";
+        return "원천 공동구매";
     }
 
     private static string? ResolveLocalSaleActiveNodeTitle(string stateLabel)
@@ -11416,6 +11498,17 @@
         statusMessage = $"{context.제목} 공개 다이어그램과 대화방을 열었습니다.";
     }
 
+    private void StartFromCompletionCase(PlatformCommunityPostLedgerContextResponse context)
+    {
+        selectedLedgerTemplateKey = context.원장템플릿Key;
+        선택현재원장Id = null;
+        sharedLedgerDiagramSnapshot = null;
+        원장블록흐름도배치초기화();
+        OpenWorkMode();
+        statusSeverity = Severity.Success;
+        statusMessage = $"{context.원장템플릿명} 새 원장 작성 화면을 열었습니다. 공개 사례의 절차를 참고해 필요한 조건만 입력하세요.";
+    }
+
     private static DiagramSnapshotDto NormalizeSharedLedgerDiagramSnapshot(DiagramSnapshotDto diagram)
     {
         var usedTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -11545,6 +11638,7 @@
 
         if (template.Key is CommunityLedgerTemplateKeys.LocalSale
             or CommunityLedgerTemplateKeys.GroupPurchase
+            or CommunityLedgerTemplateKeys.GroupImport
             or CommunityLedgerTemplateKeys.FoodOrder
             or CommunityLedgerTemplateKeys.Errand)
         {

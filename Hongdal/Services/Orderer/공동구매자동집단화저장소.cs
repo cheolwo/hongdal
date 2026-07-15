@@ -15,6 +15,10 @@ public interface I공동구매자동집단화저장소
     Task<IReadOnlyList<공동구매자동집단응답>> 집단목록조회Async(
         공동구매자동집단조회조건 조건,
         CancellationToken cancellationToken = default);
+
+    Task<공동구매자동집단응답?> 집단조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class Mongo공동구매자동집단화저장소 : I공동구매자동집단화저장소
@@ -180,6 +184,20 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             .ToListAsync(cancellationToken);
 
         return items.Select(응답으로).ToArray();
+    }
+
+    public async Task<공동구매자동집단응답?> 집단조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
+        await 인덱스준비Async(cancellationToken);
+
+        var document = await _컬렉션
+            .Find(x => x.자동집단Id == 자동집단Id.Trim())
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return document is null ? null : 응답으로(document);
     }
 
     private static void 재계산(공동구매자동집단문서 문서, DateTime now)

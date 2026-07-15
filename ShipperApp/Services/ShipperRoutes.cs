@@ -30,6 +30,7 @@ public static class ShipperRoutes
     public const string ViewSettings = "/shipper/settings/views";
     public const string ProfileSettings = "/shipper/settings/profile";
     public const string CommunityDecorations = "/community/decorations";
+    public const string CommunityGroupImport = "/community/group-import";
     public const string CommunityDecorationCreate = "/community/decorations/create";
     public const string CommunityDecorationThemeSubmit = "/community/decorations/themes/submit";
     public const string PrajnaLectures = "/learn/prajna";

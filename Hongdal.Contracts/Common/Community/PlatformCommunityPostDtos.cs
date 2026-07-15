@@ -65,6 +65,9 @@ public sealed class PlatformCommunityPostResponse
     public string? 커뮤니티원장Id { get; set; }
     public PlatformCommunityPostLedgerContextResponse? 원장Context { get; set; }
     public string Nickname { get; set; } = string.Empty;
+    public bool IsSystemGenerated { get; set; }
+    public string? SystemPostKind { get; set; }
+    public string? PrivacyNotice { get; set; }
     public bool IsReportBoardPost { get; set; }
     public string ReporterDisplayName { get; set; } = string.Empty;
     public string ReportedDisplayName { get; set; } = string.Empty;
@@ -80,6 +83,11 @@ public sealed class PlatformCommunityPostResponse
     public DateTime UpdatedAtUtc { get; set; }
     public IReadOnlyList<PlatformCommunityPostAttachmentResponse> Attachments { get; set; } = [];
     public IReadOnlyList<PlatformCommunityPostCommentResponse> RecentComments { get; set; } = [];
+}
+
+public static class PlatformCommunitySystemPostKinds
+{
+    public const string LedgerCompletion = "ledger-completion";
 }
 
 public sealed class PlatformCommunityPostCreateRequest
@@ -156,6 +164,13 @@ public sealed class PlatformCommunityPostLedgerContextResponse
     public bool 참여요청필요여부 { get; set; }
     public bool 재사용허용여부 { get; set; }
     public bool 재공유허용여부 { get; set; }
+    public bool 역할범위조회여부 { get; set; }
+    public string 접근역할Code { get; set; } = string.Empty;
+    public string 접근역할명 { get; set; } = string.Empty;
+    public bool 역할권한관리가능여부 { get; set; }
+    public IReadOnlyList<string> 조회가능노드Ids { get; set; } = [];
+    public IReadOnlyList<string> 편집가능노드Ids { get; set; } = [];
+    public bool 운송주선가능여부 { get; set; }
     public DiagramSnapshotDto? 다이어그램 { get; set; }
     public IReadOnlyList<PlatformCommunityLedgerBlockResponse> 블록목록 { get; set; } = [];
     public IReadOnlyList<string> 가능한행동목록 { get; set; } = [];
@@ -183,7 +198,17 @@ public sealed class PlatformCommunityLedgerBlockResponse
     public string 블록유형 { get; set; } = string.Empty;
     public string 제목 { get; set; } = string.Empty;
     public string? 상태 { get; set; }
+    public IReadOnlyList<PlatformCommunityLedgerBlockAssigneeResponse> 담당자목록 { get; set; } = [];
     public IReadOnlyDictionary<string, string> 항목 { get; set; } = new Dictionary<string, string>();
+}
+
+public sealed class PlatformCommunityLedgerBlockAssigneeResponse
+{
+    public string UserId { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string RoleLabel { get; set; } = string.Empty;
+    public string ResponsibilityType { get; set; } = CommunityLedgerBlockResponsibilityTypes.Primary;
+    public string ResponsibilityName { get; set; } = "주담당";
 }
 
 public sealed class PlatformCommunityLedgerNodeActionResponse

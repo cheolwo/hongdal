@@ -18,6 +18,7 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(CommunityLedgerTemplateKeys.WarehouseInbound, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.LocalSale, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.GroupPurchase, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.GroupImport, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.Errand, keys);
     }
 
@@ -130,13 +131,19 @@ public sealed class CommunityLedgerTemplateCatalogTests
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
         Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "개별 주문 원장");
         Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Quantity && block.UiSectionHint == "주문 수량 합계");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Decision && block.UiSectionHint == "수입 결정");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "해외 선적");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "통관 상태");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "국내 반출");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Inventory && block.UiSectionHint == "3PL 입고");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "세대 분배");
-        Assert.Contains(groupPurchase.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution));
+        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Decision && block.UiSectionHint == "구매 확정");
+        Assert.Contains(groupPurchase.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "분배");
+        Assert.DoesNotContain(groupPurchase.LedgerBlocks, block => block.UiSectionHint == "통관 상태");
+
+        var groupImport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupImport);
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Order && block.UiSectionHint == "원천 공동구매 원장");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Decision && block.UiSectionHint == "수입 결정");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "해외 선적");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.State && block.UiSectionHint == "통관 상태");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "국내 반출");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Inventory && block.UiSectionHint == "3PL 입고");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.BlockType == CommunityLedgerBlockTypes.Handoff && block.UiSectionHint == "세대 분배");
+        Assert.Contains(groupImport.LedgerBlocks, block => block.CompositionRuleCodes.Contains(CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution));
     }
 
     [Fact]
@@ -186,8 +193,10 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(relations, relation =>
             relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand
             && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision
-            && relation.RelationType == CommunityLedgerRelationTypes.Flow
-            && relation.Required);
+            && relation.FromLedgerTemplateKey == CommunityLedgerTemplateKeys.GroupPurchase
+            && relation.ToLedgerTemplateKey == CommunityLedgerTemplateKeys.GroupImport
+            && relation.RelationType == CommunityLedgerRelationTypes.Handoff
+            && !relation.Required);
         Assert.Contains(relations, relation =>
             relation.FromModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseShipmentCustoms
             && relation.ToModuleCode == CommunityLedgerImplementationModuleCodes.GroupPurchaseDistribution
@@ -356,10 +365,13 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(outbound.PersistencePolicy.RelationalProjectionTargets, target => target.LinkFieldHint.Contains("CommunityLedgerId", StringComparison.OrdinalIgnoreCase));
 
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
-        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동주문 묶음");
-        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동구매 수입 결정");
-        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 운송 의뢰");
-        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 3PL 입고");
+        Assert.Contains(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동구매 묶음");
+        Assert.DoesNotContain(groupPurchase.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동수입 결정");
+
+        var groupImport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupImport);
+        Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "공동수입 결정");
+        Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 운송 의뢰");
+        Assert.Contains(groupImport.PersistencePolicy.RelationalProjectionTargets, target => target.TargetName == "국내 3PL 입고");
     }
 
     [Fact]
@@ -399,17 +411,20 @@ public sealed class CommunityLedgerTemplateCatalogTests
         var groupPurchase = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupPurchase);
         var individualOrderRule = groupPurchase.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseRequiresIndividualOrders);
-        var importDecisionRule = groupPurchase.CompositionRules.Single(rule =>
+        var groupImport = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.GroupImport);
+        var importDecisionRule = groupImport.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseDemandBeforeImportDecision);
-        var shipmentRule = groupPurchase.CompositionRules.Single(rule =>
+        var shipmentRule = groupImport.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseImportDecisionBeforeShipment);
-        var distributionRule = groupPurchase.CompositionRules.Single(rule =>
+        var distributionRule = groupImport.CompositionRules.Single(rule =>
             rule.Code == CommunityLedgerCompositionRuleCodes.GroupPurchaseCustomsBeforeDomesticDistribution);
 
-        Assert.Equal("공동주문 묶음 원장", groupPurchase.DisplayName);
+        Assert.Equal("공동구매 원장", groupPurchase.DisplayName);
+        Assert.Equal("공동수입 원장", groupImport.DisplayName);
         Assert.Contains(CommunityLedgerTemplateKeys.Order, individualOrderRule.RequiredLedgerTemplateKeys);
         Assert.Contains("개별 주문 원장", individualOrderRule.RequiredUiSectionHints);
-        Assert.Contains("주문 수량 합계", importDecisionRule.RequiredUiSectionHints);
+        Assert.Contains(CommunityLedgerTemplateKeys.GroupPurchase, importDecisionRule.RequiredLedgerTemplateKeys);
+        Assert.Contains("원천 공동구매 원장", importDecisionRule.RequiredUiSectionHints);
         Assert.Contains("수입 진행 결정", importDecisionRule.GatedActionHints);
         Assert.Contains("수입 결정", shipmentRule.RequiredUiSectionHints);
         Assert.Contains("통관 상태 동기화", shipmentRule.GatedActionHints);
@@ -481,7 +496,7 @@ public sealed class CommunityLedgerTemplateCatalogTests
             ActionHints = ["참여 신청", "수량 확정", "수입 진행 결정", "해외 발주/선적 등록", "통관 상태 동기화", "3PL 입고 인계", "세대 분배 시작"]
         });
 
-        Assert.Equal(CommunityLedgerTemplateKeys.GroupPurchase, result.PrimaryCandidate.TemplateKey);
+        Assert.Equal(CommunityLedgerTemplateKeys.GroupImport, result.PrimaryCandidate.TemplateKey);
         Assert.Equal(CommunityLedgerOperatingSystemCodes.GroupPurchaseImport, result.PrimaryCandidate.TargetOperatingSystemCode);
         Assert.Equal(CommunityLedgerFlowRelationCodes.StrongFlowMatch, result.PrimaryCandidate.RelationCode);
         Assert.False(result.RequiresHumanReview);
@@ -492,6 +507,22 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(result.PrimaryCandidate.RelatedProcessingSurfaceHints, surface => surface == "POST 공동구매해외선적추적Controller.통관동기화");
         Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("import-decision", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("customs-state", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void FlowClassifier_SeparatesDomesticGroupPurchaseFromGroupImport()
+    {
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "아파트 생활용품 공동구매",
+            Body = "참여자별 개별 주문과 수량을 모아 공동 가격과 구매처를 확정하고 수령 거점에서 분배합니다.",
+            UiSectionHints = ["개별 주문 원장", "주문 수량 합계", "공동 조건", "투표/결정", "구매 확정", "수령 거점", "분배"],
+            ActionHints = ["개별 주문 연결", "묶음 조건 확정", "구매 확정", "수령 거점 확정", "분배 시작"]
+        });
+
+        Assert.Equal(CommunityLedgerTemplateKeys.GroupPurchase, result.PrimaryCandidate.TemplateKey);
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.CommunityTrust, result.PrimaryCandidate.TargetOperatingSystemCode);
+        Assert.DoesNotContain(CommunityLedgerEngineHints.ImportCustoms, result.PrimaryCandidate.EngineHints);
     }
 
     [Fact]

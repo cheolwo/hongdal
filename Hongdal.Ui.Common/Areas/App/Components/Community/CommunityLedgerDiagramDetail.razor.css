@@ -243,11 +243,18 @@
 }
 
 .ledger-diagram-detail__node > strong,
+.ledger-diagram-detail__node-assignee,
 .ledger-diagram-detail__node-state {
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ledger-diagram-detail__node-assignee,
+.ledger-diagram-detail__mobile-assignee {
+    color: #335f79;
+    font-size: 0.66rem;
 }
 
 .ledger-diagram-detail__node > strong {
@@ -270,6 +277,16 @@
     flex: 0 0 7px;
     border-radius: 50%;
     background: var(--state-accent);
+}
+
+.ledger-diagram-detail__assignees {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e1e6ed;
+    color: #405064;
+    font-size: 0.78rem;
 }
 
 .ledger-diagram-detail__kind--participant {

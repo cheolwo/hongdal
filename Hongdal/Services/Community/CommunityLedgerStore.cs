@@ -131,7 +131,7 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             대상OsName = Clean(request.대상OsName),
             생성자UserId = Clean(request.생성자UserId),
             생성자표시명 = string.IsNullOrWhiteSpace(request.생성자표시명) ? "익명 참여자" : request.생성자표시명.Trim(),
-            블록목록 = request.블록목록.Select(ToDocument).ToArray(),
+            블록목록 = BuildBlockDocuments(request, existing),
             참여자목록 = request.참여자목록.Select(ToDocument).ToArray(),
             포함원장목록 = request.포함원장목록 is null
                 ? existing?.포함원장목록 ?? []
@@ -549,7 +549,43 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             BlockType = dto.BlockType.Trim(),
             Title = dto.Title.Trim(),
             State = Clean(dto.State),
+            담당자목록 = dto.담당자목록
+                .Where(assignee => !string.IsNullOrWhiteSpace(assignee.UserId))
+                .GroupBy(assignee => assignee.UserId.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(group => ToDocument(group.Last()))
+                .ToArray(),
             Data = NormalizeDictionary(dto.Data)
+        };
+
+    private static IReadOnlyList<커뮤니티원장블록문서> BuildBlockDocuments(
+        커뮤니티원장저장요청 request,
+        커뮤니티원장문서? existing)
+    {
+        var existingById = (existing?.블록목록 ?? [])
+            .ToDictionary(block => block.BlockId, StringComparer.OrdinalIgnoreCase);
+        return request.블록목록.Select(block =>
+        {
+            var document = ToDocument(block);
+            if (!request.블록담당자명시적갱신여부
+                && document.담당자목록.Count == 0
+                && existingById.TryGetValue(document.BlockId, out var existingBlock))
+            {
+                document.담당자목록 = existingBlock.담당자목록;
+            }
+
+            return document;
+        }).ToArray();
+    }
+
+    private static 커뮤니티원장블록담당자문서 ToDocument(커뮤니티원장블록담당자Dto dto)
+        => new()
+        {
+            UserId = dto.UserId.Trim(),
+            DisplayName = string.IsNullOrWhiteSpace(dto.DisplayName) ? "익명 참여자" : dto.DisplayName.Trim(),
+            RoleLabel = string.IsNullOrWhiteSpace(dto.RoleLabel) ? "참여자" : dto.RoleLabel.Trim(),
+            ResponsibilityType = CommunityLedgerBlockResponsibilityTypes.IsSupported(dto.ResponsibilityType)
+                ? dto.ResponsibilityType
+                : CommunityLedgerBlockResponsibilityTypes.Primary
         };
 
     private static 커뮤니티원장참여자문서 ToDocument(커뮤니티원장참여자Dto dto)
@@ -641,7 +677,17 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             BlockType = 문서.BlockType,
             Title = 문서.Title,
             State = 문서.State,
+            담당자목록 = 문서.담당자목록.Select(ToDto).ToArray(),
             Data = 문서.Data
+        };
+
+    private static 커뮤니티원장블록담당자Dto ToDto(커뮤니티원장블록담당자문서 문서)
+        => new()
+        {
+            UserId = 문서.UserId,
+            DisplayName = 문서.DisplayName,
+            RoleLabel = 문서.RoleLabel,
+            ResponsibilityType = 문서.ResponsibilityType
         };
 
     private static 커뮤니티원장참여자Dto ToDto(커뮤니티원장참여자문서 문서)
@@ -789,6 +835,7 @@ public sealed class 커뮤니티원장저장요청
     public string? 생성자UserId { get; set; }
     public string? 생성자표시명 { get; set; }
     public IReadOnlyList<커뮤니티원장블록Dto> 블록목록 { get; set; } = [];
+    public bool 블록담당자명시적갱신여부 { get; set; }
     public IReadOnlyList<커뮤니티원장참여자Dto> 참여자목록 { get; set; } = [];
     public IReadOnlyList<커뮤니티포함원장참조Dto>? 포함원장목록 { get; set; }
     public DiagramSnapshotDto? 다이어그램스냅샷 { get; set; }
@@ -841,7 +888,16 @@ public sealed class 커뮤니티원장블록Dto
     public string BlockType { get; set; } = CommunityLedgerBlockTypes.Generic;
     public string Title { get; set; } = string.Empty;
     public string? State { get; set; }
+    public IReadOnlyList<커뮤니티원장블록담당자Dto> 담당자목록 { get; set; } = [];
     public IReadOnlyDictionary<string, string> Data { get; set; } = new Dictionary<string, string>();
+}
+
+public sealed class 커뮤니티원장블록담당자Dto
+{
+    public string UserId { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = "익명 참여자";
+    public string RoleLabel { get; set; } = "참여자";
+    public string ResponsibilityType { get; set; } = CommunityLedgerBlockResponsibilityTypes.Primary;
 }
 
 public sealed class 커뮤니티원장참여자Dto
@@ -929,7 +985,16 @@ public sealed class 커뮤니티원장블록문서
     public string BlockType { get; set; } = CommunityLedgerBlockTypes.Generic;
     public string Title { get; set; } = string.Empty;
     public string? State { get; set; }
+    public IReadOnlyList<커뮤니티원장블록담당자문서> 담당자목록 { get; set; } = [];
     public Dictionary<string, string> Data { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+}
+
+public sealed class 커뮤니티원장블록담당자문서
+{
+    public string UserId { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = "익명 참여자";
+    public string RoleLabel { get; set; } = "참여자";
+    public string ResponsibilityType { get; set; } = CommunityLedgerBlockResponsibilityTypes.Primary;
 }
 
 public sealed class 커뮤니티원장참여자문서
