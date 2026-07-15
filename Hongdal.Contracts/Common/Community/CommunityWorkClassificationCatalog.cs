@@ -18,6 +18,7 @@ public static class CommunityWorkClassificationCatalog
         Classification("warehouse", "창고 입출고", "창고 입출고", "WarehouseFulfillmentWorkflow", CommunityLedgerTemplateKeys.WarehouseInbound, CommunityLedgerTemplateKeys.WarehouseOutbound),
         Classification("group-purchase", "공동구매", "공동구매", "CommunityTrustWorkflow", CommunityLedgerTemplateKeys.Order, CommunityLedgerTemplateKeys.GroupPurchase),
         Classification("group-import", "공동수입", "공동수입", "GroupPurchaseImportWorkflow", CommunityLedgerTemplateKeys.GroupImport),
+        Classification("meat-import-readiness", "육류 수입 준비 정보", "육류 수입 준비", "CommunityTrustWorkflow", CommunityLedgerTemplateKeys.MeatImportReadiness),
         Classification("food-order", "음식 주문", "음식 주문", "FoodDeliveryWorkflow", CommunityLedgerTemplateKeys.FoodOrder),
         Classification("food-delivery", "음식 배달", "음식 배달", "FoodDeliveryWorkflow", CommunityLedgerTemplateKeys.FoodDelivery),
         Classification("hongdal-mart", "알뜰살뜰 마트", "알뜰살뜰 마트", "HongdalMartWorkflow", CommunityLedgerTemplateKeys.HongdalMart),

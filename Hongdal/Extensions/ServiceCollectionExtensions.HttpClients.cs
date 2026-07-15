@@ -123,10 +123,16 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri(options.CustomsTradeStatistics.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
-        services.AddHttpClient<IAtDomesticFoodPriceLookupService, AtDomesticFoodPriceLookupService>((sp, client) =>
+        services.AddHttpClient<세관장확인대상물품공공데이터수집기>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
-            client.BaseAddress = new Uri(options.AtFoodPrices.BaseUrl);
+            client.BaseAddress = new Uri(options.CustomsRequirements.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<관세환율공공데이터수집기>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.CustomsExchangeRate.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddScoped<IDriverRecommendationPushService, FcmDriverRecommendationPushService>();

@@ -1,5 +1,6 @@
 using Hongdal.Contracts.Common.Customs;
 using Hongdal.Contracts.Common.PublicData;
+using Hongdal.Services.AgriculturalFisheries.Information;
 using Microsoft.Extensions.Options;
 using 홍달.Services.External.PublicData;
 using 홍달.Services.Options;
@@ -115,17 +116,21 @@ public sealed class FoodPriceComparisonServiceTests
     private static FoodPriceComparisonService CreateService(
         StubDomesticPriceLookupService domestic,
         StubImportPriceLookupService import)
-        => new(
+    {
+        var options = Options.Create(new PublicDataOptions
+        {
+            AtFoodPrices = new AtFoodPricesOptions
+            {
+                DefaultSimulationFxRateKrwPerUsd = 1_350m
+            }
+        });
+        var informationService = new AgriculturalFisheriesInformationService(
             new FoodPriceCrosswalkCatalog(),
             domestic,
-            import,
-            Options.Create(new PublicDataOptions
-            {
-                AtFoodPrices = new AtFoodPricesOptions
-                {
-                    DefaultSimulationFxRateKrwPerUsd = 1_350m
-                }
-            }));
+            options);
+
+        return new FoodPriceComparisonService(informationService, import, options);
+    }
 
     private static AtDomesticFoodPriceAggregate Aggregate(string code, string label, decimal price)
         => new()

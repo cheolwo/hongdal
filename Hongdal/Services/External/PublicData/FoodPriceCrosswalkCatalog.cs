@@ -4,6 +4,8 @@ namespace 홍달.Services.External.PublicData;
 
 public interface IFoodPriceCrosswalkCatalog
 {
+    IReadOnlyList<FoodPriceCrosswalk> GetAll();
+
     FoodPriceCrosswalk? Find(string? hsCode);
 }
 
@@ -85,6 +87,9 @@ public sealed class FoodPriceCrosswalkCatalog : IFoodPriceCrosswalkCatalog
         Representative("030614", "꽃게", "600", "656", "꽃게", [], DomesticMarket(), "꽃게 냉장·냉동 가격을 함께 집계합니다."),
         Representative("030633", "꽃게", "600", "656", "꽃게", [], DomesticMarket(), "꽃게 냉장·냉동 가격을 함께 집계합니다.")
     ];
+
+    public IReadOnlyList<FoodPriceCrosswalk> GetAll()
+        => Entries;
 
     public FoodPriceCrosswalk? Find(string? hsCode)
     {

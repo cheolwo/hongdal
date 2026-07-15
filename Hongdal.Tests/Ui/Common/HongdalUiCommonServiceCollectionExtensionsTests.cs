@@ -38,6 +38,20 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddHongdalUiCommonAppServices_RegistersAgriculturalFisheriesPublicDataClient()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHongdalUiCommonAppServices();
+
+        var descriptor = Assert.Single(
+            services,
+            candidate => candidate.ServiceType == typeof(I농수산공공데이터Client));
+        Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
+        Assert.Equal(typeof(농수산공공데이터Client), descriptor.ImplementationType);
+    }
+
+    [Fact]
     public void AddHongdalUiCommonAppServices_UsesRegisteredAccessTokenProvider()
     {
         var services = new ServiceCollection();

@@ -38,8 +38,12 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I결제승인완료OutboxService, 결제승인완료OutboxService>();
         services.AddScoped<통관상태동기화Service>();
         services.AddSingleton<IPublicDataApiMetadataCatalog, PublicDataApiMetadataCatalog>();
-        services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
-        services.AddScoped<IFoodPriceComparisonService, FoodPriceComparisonService>();
+        services.AddScoped<IHs공공데이터수집Service, Hs공공데이터수집Service>();
+        services.AddScoped<IHs공공데이터수집기, Hs수입평균단가공공데이터수집기>();
+        services.AddScoped<IHs공공데이터수집기>(sp =>
+            sp.GetRequiredService<세관장확인대상물품공공데이터수집기>());
+        services.AddScoped<IHs공공데이터수집기>(sp =>
+            sp.GetRequiredService<관세환율공공데이터수집기>());
         services.AddSingleton<I주문자집단배송권조회Service, 주문자집단배송권조회Service>();
         services.AddSingleton<I주문자집단자동배정Service, 주문자집단자동배정Service>();
         services.AddSingleton<I공동구매물류워크플로우저장소, Mongo공동구매물류워크플로우저장소>();
@@ -81,6 +85,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I공동수입원장관세사알림Service, 공동수입원장관세사알림Service>();
         services.AddScoped<I공동구매원장관계자알림Service, 공동구매원장관계자알림Service>();
         services.AddScoped<I게시글원장ContextService, 게시글원장ContextService>();
+        services.AddSingleton<ICommunityPostOpportunityAnalyzer, CommunityPostOpportunityAnalyzer>();
+        services.AddScoped<ICommunityPostOpportunityStore, EfCommunityPostOpportunityStore>();
+        services.AddScoped<ICommunityPostOpportunityService, CommunityPostOpportunityService>();
         services.AddScoped<I원장다이어그램실시간알림Service, 원장다이어그램SignalR알림Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();
         services.AddScoped<I원장업무투영동기화Handler, 운송원장업무투영Handler>();

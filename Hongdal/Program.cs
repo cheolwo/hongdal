@@ -176,6 +176,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("운영사용자전용", policy => policy.RequireRole(역할명.화주, 역할명.판매자, 역할명.창고관리자, 역할명.서버관리자));
 });
 
+builder.Services.AddAgriculturalFisheriesInformationModule();
 builder.Services.AddHongdalHttpClients();
 builder.Services.AddHongdalDomainServices();
 if (builder.Environment.IsDevelopment())

@@ -39,4 +39,15 @@ public sealed class CommunityWorkClassificationCatalogTests
         Assert.Equal("CommunityTrustWorkflow", groupPurchase.FeatureFlagKey);
         Assert.Equal("GroupPurchaseImportWorkflow", groupImport.FeatureFlagKey);
     }
+
+    [Fact]
+    public void 육류수입준비정보는_주선업이아닌_커뮤니티신뢰기능으로_분류한다()
+    {
+        var classification = CommunityWorkClassificationCatalog.FindByLedgerTemplate(
+            CommunityLedgerTemplateKeys.MeatImportReadiness);
+
+        Assert.NotNull(classification);
+        Assert.Equal("meat-import-readiness", classification.Code);
+        Assert.Equal("CommunityTrustWorkflow", classification.FeatureFlagKey);
+    }
 }

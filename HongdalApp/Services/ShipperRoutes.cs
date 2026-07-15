@@ -29,6 +29,7 @@ public static class ShipperRoutes
     public const string FclLclPlanner = "/shipper/international/fcl-lcl";
     public const string ViewSettings = "/shipper/settings/views";
     public const string ProfileSettings = "/shipper/settings/profile";
+    public const string PublicDataInformation = "/information/public-data";
     public const string CommunityDecorations = "/community/decorations";
     public const string CommunityGroupImport = "/community/group-import";
     public const string CommunityDecorationCreate = "/community/decorations/create";

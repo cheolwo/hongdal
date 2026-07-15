@@ -19,6 +19,7 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(CommunityLedgerTemplateKeys.LocalSale, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.GroupPurchase, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.GroupImport, keys);
+        Assert.Contains(CommunityLedgerTemplateKeys.MeatImportReadiness, keys);
         Assert.Contains(CommunityLedgerTemplateKeys.Errand, keys);
     }
 
@@ -507,6 +508,22 @@ public sealed class CommunityLedgerTemplateCatalogTests
         Assert.Contains(result.PrimaryCandidate.RelatedProcessingSurfaceHints, surface => surface == "POST 공동구매해외선적추적Controller.통관동기화");
         Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("import-decision", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(result.PrimaryCandidate.RelatedLedgerBlockCodes, blockCode => blockCode.Contains("customs-state", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void 수입준비도는_일반분류기의_자동전환후보가_아닌_커뮤니티선택형템플릿이다()
+    {
+        var template = CommunityLedgerTemplateCatalog.Find(CommunityLedgerTemplateKeys.MeatImportReadiness);
+        var result = CommunityLedgerFlowClassifier.Analyze(new()
+        {
+            Title = "미국산 돼지고기 수입 준비",
+            Body = "해외 작업장, 검역, 통관 절차와 양측 확인을 검토합니다."
+        });
+
+        Assert.True(template.IsCommunityOpportunityTemplate);
+        Assert.Equal(CommunityLedgerOperatingSystemCodes.CommunityTrust, template.TargetOperatingSystemCode);
+        Assert.DoesNotContain(result.Candidates, candidate =>
+            candidate.TemplateKey == CommunityLedgerTemplateKeys.MeatImportReadiness);
     }
 
     [Fact]

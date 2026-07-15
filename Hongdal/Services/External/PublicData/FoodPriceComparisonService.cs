@@ -1,7 +1,9 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Hongdal.Contracts.Common.AgriculturalFisheries;
 using Hongdal.Contracts.Common.Customs;
 using Hongdal.Contracts.Common.PublicData;
+using Hongdal.Services.AgriculturalFisheries.Information;
 using Microsoft.Extensions.Options;
 using 홍달.Services.Options;
 
@@ -11,19 +13,16 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
 {
     private static readonly TimeSpan KoreaOffset = TimeSpan.FromHours(9);
 
-    private readonly IFoodPriceCrosswalkCatalog _crosswalkCatalog;
-    private readonly IAtDomesticFoodPriceLookupService _domesticPriceLookupService;
+    private readonly IAgriculturalFisheriesInformationService _informationService;
     private readonly IHsCountryTradeUnitPriceLookupService _importPriceLookupService;
     private readonly PublicDataOptions _options;
 
     public FoodPriceComparisonService(
-        IFoodPriceCrosswalkCatalog crosswalkCatalog,
-        IAtDomesticFoodPriceLookupService domesticPriceLookupService,
+        IAgriculturalFisheriesInformationService informationService,
         IHsCountryTradeUnitPriceLookupService importPriceLookupService,
         IOptions<PublicDataOptions> options)
     {
-        _crosswalkCatalog = crosswalkCatalog;
-        _domesticPriceLookupService = domesticPriceLookupService;
+        _informationService = informationService;
         _importPriceLookupService = importPriceLookupService;
         _options = options.Value;
     }
@@ -55,8 +54,8 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
             return Invalid(request, hsCode, countryCode, "수입통계 기준월을 yyyyMM 형식으로 확인해 주세요.");
         }
 
-        var crosswalk = _crosswalkCatalog.Find(hsCode);
-        if (crosswalk is null)
+        var item = _informationService.FindItem(hsCode);
+        if (item is null)
         {
             return new FoodPriceComparisonResponse
             {
@@ -74,20 +73,16 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
         }
 
         var lookbackDays = Math.Clamp(request.DomesticLookbackDays <= 0 ? 14 : request.DomesticLookbackDays, 1, 31);
-        var domesticStartDate = referenceDate.AddDays(-(lookbackDays - 1));
         var fxRate = request.FxRateKrwPerUsd is > 0
             ? request.FxRateKrwPerUsd.Value
             : _options.AtFoodPrices.DefaultSimulationFxRateKrwPerUsd;
 
-        var domesticTask = LookupDomesticSafelyAsync(
-            new AtDomesticFoodPriceRequest
+        var domesticTask = _informationService.GetDomesticPriceAsync(
+            new AgriculturalFisheriesDomesticPriceRequest
             {
-                CategoryCode = crosswalk.AtCategoryCode,
-                ItemCode = crosswalk.AtItemCode,
-                StartDate = domesticStartDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture),
-                EndDate = referenceDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture),
-                VarietyCodes = crosswalk.AtVarietyCodes,
-                ExcludedNameTokens = crosswalk.ExcludedNameTokens
+                HsCode = hsCode,
+                ReferenceDate = referenceDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture),
+                LookbackDays = lookbackDays
             },
             cancellationToken);
         var importTask = LookupImportSafelyAsync(
@@ -103,7 +98,14 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
             cancellationToken);
 
         await Task.WhenAll(domesticTask, importTask);
-        var domestic = await domesticTask;
+        var domesticInformation = await domesticTask;
+        var domestic = domesticInformation.Price ?? new AtDomesticFoodPriceLookupResult
+        {
+            Success = false,
+            ErrorMessage = domesticInformation.ErrorMessage ?? "국내가격을 확인하지 못했습니다.",
+            CategoryCode = item.CategoryCode,
+            ItemCode = item.AtItemCode
+        };
         var import = await importTask;
         var importReference = MapImportReference(import, request, fxRate);
         var importComparisonPrice = request.EstimatedImportAdditionalCostKrwPerKg is > 0
@@ -130,42 +132,16 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
             StatusCode = statusCode,
             ErrorMessage = complete ? null : BuildPartialError(domestic, import),
             HsCode = hsCode,
-            ProductName = crosswalk.ProductName,
+            ProductName = item.ProductName,
             CountryCode = countryCode,
-            Match = MapMatch(crosswalk),
+            Match = MapMatch(item),
             ImportPrice = importReference,
             DomesticPrice = domestic,
             PrimaryComparison = primaryComparison,
             Comparisons = comparisons,
-            Summary = BuildSummary(primaryComparison, domestic, import, crosswalk),
-            Notices = BuildNotices(crosswalk, request, fxRate)
+            Summary = BuildSummary(primaryComparison, domestic, import, item),
+            Notices = BuildNotices(item, request, fxRate)
         };
-    }
-
-    private async Task<AtDomesticFoodPriceLookupResult> LookupDomesticSafelyAsync(
-        AtDomesticFoodPriceRequest request,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await _domesticPriceLookupService.LookupAsync(request, cancellationToken);
-        }
-        catch (Exception ex) when (
-            !cancellationToken.IsCancellationRequested
-            && ex is InvalidOperationException or HttpRequestException or TaskCanceledException)
-        {
-            return new AtDomesticFoodPriceLookupResult
-            {
-                Success = false,
-                ErrorMessage = ex is TaskCanceledException
-                    ? "aT 국내가격 조회시간이 초과되었습니다."
-                    : "aT 국내가격을 불러오지 못했습니다.",
-                CategoryCode = request.CategoryCode,
-                ItemCode = request.ItemCode,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate
-            };
-        }
     }
 
     private async Task<HsCountryImportUnitPriceSimulationResult> LookupImportSafelyAsync(
@@ -271,45 +247,45 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
         };
     }
 
-    private static FoodPriceMatchResponse MapMatch(FoodPriceCrosswalk crosswalk)
+    private static FoodPriceMatchResponse MapMatch(AgriculturalFisheriesItemResponse item)
         => new()
         {
-            MatchQualityCode = crosswalk.MatchQualityCode,
-            MatchQualityLabel = crosswalk.MatchQualityLabel,
-            DomesticOriginStatusCode = crosswalk.DomesticOriginStatusCode,
-            DomesticOriginStatusLabel = crosswalk.DomesticOriginStatusLabel,
-            AtCategoryCode = crosswalk.AtCategoryCode,
-            AtItemCode = crosswalk.AtItemCode,
-            AtItemName = crosswalk.AtItemName,
-            Note = crosswalk.Note
+            MatchQualityCode = item.MatchQualityCode,
+            MatchQualityLabel = item.MatchQualityLabel,
+            DomesticOriginStatusCode = item.DomesticOriginStatusCode,
+            DomesticOriginStatusLabel = item.DomesticOriginStatusLabel,
+            AtCategoryCode = item.CategoryCode,
+            AtItemCode = item.AtItemCode,
+            AtItemName = item.AtItemName,
+            Note = item.Note
         };
 
     private static string BuildSummary(
         FoodPriceGapResponse? primaryComparison,
         AtDomesticFoodPriceLookupResult domestic,
         HsCountryImportUnitPriceSimulationResult import,
-        FoodPriceCrosswalk crosswalk)
+        AgriculturalFisheriesItemResponse item)
     {
         if (primaryComparison is not null)
         {
-            return $"{crosswalk.ProductName}: {primaryComparison.PlainLanguageSummary}";
+            return $"{item.ProductName}: {primaryComparison.PlainLanguageSummary}";
         }
 
         if (domestic.Success)
         {
-            return $"{crosswalk.ProductName} 국내가격은 확인했지만 수입 기준가격을 계산하지 못했습니다.";
+            return $"{item.ProductName} 국내가격은 확인했지만 수입 기준가격을 계산하지 못했습니다.";
         }
 
         if (import.Success)
         {
-            return $"{crosswalk.ProductName} 수입 기준가격은 확인했지만 국내가격을 찾지 못했습니다.";
+            return $"{item.ProductName} 수입 기준가격은 확인했지만 국내가격을 찾지 못했습니다.";
         }
 
-        return $"{crosswalk.ProductName} 가격 자료를 현재 불러오지 못했습니다.";
+        return $"{item.ProductName} 가격 자료를 현재 불러오지 못했습니다.";
     }
 
     private static IReadOnlyList<string> BuildNotices(
-        FoodPriceCrosswalk crosswalk,
+        AgriculturalFisheriesItemResponse item,
         FoodPriceComparisonRequest request,
         decimal fxRate)
     {
@@ -329,10 +305,10 @@ public sealed class FoodPriceComparisonService : IFoodPriceComparisonService
             notices.Add($"원화 환산에는 서버의 가정 환율 {fxRate:N0}원/USD를 사용했습니다.");
         }
 
-        notices.Add(crosswalk.DomesticOriginStatusCode == "DomesticVariant"
+        notices.Add(item.DomesticOriginStatusCode == "DomesticVariant"
             ? "aT 품종코드에서 수입산 표본을 제외하고 국산 품종을 선별했습니다."
             : "국내 가격은 aT 국내시장 조사값이며 모든 표본에 국산 원산지가 명시된 것은 아닙니다.");
-        if (crosswalk.MatchQualityCode == "Representative")
+        if (item.MatchQualityCode == "Representative")
         {
             notices.Add("HS 품목과 국내 조사품목의 규격이 달라 대표 품목 가격을 사용했습니다.");
         }

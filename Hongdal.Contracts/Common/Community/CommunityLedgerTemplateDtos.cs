@@ -11,6 +11,7 @@ public sealed class CommunityLedgerTemplateResponse
     public string OperatingSystemRoleCode { get; set; } = CommunityLedgerOperatingSystemRoleCodes.Scheduler;
     public string OperatingSystemRoleSummary { get; set; } = "OS는 원장 상태와 구성 규칙을 기준으로 API/엔진 호출 순서, 큐, 재시도, 후속 원장 생성을 조율합니다.";
     public string Summary { get; set; } = string.Empty;
+    public bool IsCommunityOpportunityTemplate { get; set; }
     public string 원함확인질문 { get; set; } = "무엇을 원하나요?";
     public string 원함확인설명 { get; set; } = "원장은 사용자가 원하는 일을 바로 실행하기 전에, 그 원함을 참여자와 시스템이 함께 이해할 수 있는 업무 모양으로 정리하는 단계입니다.";
     public IReadOnlyList<string> 원함확인질문목록 { get; set; } =
@@ -436,6 +437,7 @@ public static class CommunityLedgerTemplateKeys
     public const string LocalSale = "local-sale";
     public const string GroupPurchase = "group-purchase";
     public const string GroupImport = "group-import";
+    public const string MeatImportReadiness = "meat-import-readiness";
     public const string Errand = "errand";
 }
 
@@ -578,6 +580,7 @@ public static class CommunityLedgerCompositionRuleCodes
     public const string GroupPurchaseDemandBeforeImportDecision = "GroupPurchaseDemandBeforeImportDecision";
     public const string GroupPurchaseImportDecisionBeforeShipment = "GroupPurchaseImportDecisionBeforeShipment";
     public const string GroupPurchaseCustomsBeforeDomesticDistribution = "GroupPurchaseCustomsBeforeDomesticDistribution";
+    public const string CommunityDiscussionBeforeMeatImportReadiness = "CommunityDiscussionBeforeMeatImportReadiness";
     public const string RequestAndParticipantBeforeProgress = "RequestAndParticipantBeforeProgress";
 }
 

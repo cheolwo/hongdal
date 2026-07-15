@@ -20,6 +20,10 @@ public interface I공동수입HS코드조회UseCase
     Task<Result<FoodPriceComparisonResponse>> 식품가격비교Async(
         FoodPriceComparisonRequest request,
         CancellationToken cancellationToken);
+
+    Task<Result<Hs공공데이터묶음응답>> 공공데이터수집Async(
+        Hs공공데이터수집요청 request,
+        CancellationToken cancellationToken);
 }
 
 [HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
@@ -29,13 +33,16 @@ public sealed class 공동수입HS코드조회UseCase : I공동수입HS코드조
 {
     private readonly HongdalContext _db;
     private readonly IFoodPriceComparisonService _foodPriceComparisonService;
+    private readonly IHs공공데이터수집Service _publicDataCollectionService;
 
     public 공동수입HS코드조회UseCase(
         HongdalContext db,
-        IFoodPriceComparisonService foodPriceComparisonService)
+        IFoodPriceComparisonService foodPriceComparisonService,
+        IHs공공데이터수집Service publicDataCollectionService)
     {
         _db = db;
         _foodPriceComparisonService = foodPriceComparisonService;
+        _publicDataCollectionService = publicDataCollectionService;
     }
 
     public async Task<Result<GroupImportHsCodeSearchResponse>> 검색Async(
@@ -100,6 +107,20 @@ public sealed class 공동수입HS코드조회UseCase : I공동수입HS코드조
         CancellationToken cancellationToken)
     {
         var response = await _foodPriceComparisonService.CompareAsync(request, cancellationToken);
+        return Result.Ok(response);
+    }
+
+    public async Task<Result<Hs공공데이터묶음응답>> 공공데이터수집Async(
+        Hs공공데이터수집요청 request,
+        CancellationToken cancellationToken)
+    {
+        var normalizedHsCode = new string((request.HsCode ?? string.Empty).Where(char.IsDigit).ToArray());
+        if (normalizedHsCode.Length is < 4 or > 10)
+        {
+            return Result.Fail<Hs공공데이터묶음응답>("HS 코드는 4~10자리 숫자로 입력해야 합니다.");
+        }
+
+        var response = await _publicDataCollectionService.수집Async(request, cancellationToken);
         return Result.Ok(response);
     }
 

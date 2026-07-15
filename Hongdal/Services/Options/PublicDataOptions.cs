@@ -18,7 +18,13 @@ public sealed class PublicDataOptions
 
     public CustomsTradeStatisticsOptions CustomsTradeStatistics { get; set; } = new();
 
+    public CustomsRequirementsOptions CustomsRequirements { get; set; } = new();
+
+    public CustomsExchangeRateOptions CustomsExchangeRate { get; set; } = new();
+
     public AtFoodPricesOptions AtFoodPrices { get; set; } = new();
+
+    public UsdaNassQuickStatsOptions UsdaNassQuickStats { get; set; } = new();
 
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
 }
@@ -65,6 +71,24 @@ public sealed class CustomsTradeStatisticsOptions
     public string HsCountryMonthlyPath { get; set; } = "/1220000/nitemtrade/getNitemtradeList";
 }
 
+public sealed class CustomsRequirementsOptions
+{
+    public string ServiceKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://apis.data.go.kr";
+
+    public string LookupPath { get; set; } = "/1220000/retrieveCcctLworCd/getRetrieveCcctLworCd";
+}
+
+public sealed class CustomsExchangeRateOptions
+{
+    public string ServiceKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://apis.data.go.kr";
+
+    public string LookupPath { get; set; } = "/1220000/retrieveTrifFxrtInfo/getRetrieveTrifFxrtInfo";
+}
+
 public sealed class AtFoodPricesOptions
 {
     public string ServiceKey { get; set; } = string.Empty;
@@ -74,6 +98,15 @@ public sealed class AtFoodPricesOptions
     public string DailyPricePath { get; set; } = "/B552845/perDay/price";
 
     public decimal DefaultSimulationFxRateKrwPerUsd { get; set; } = 1350m;
+}
+
+public sealed class UsdaNassQuickStatsOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://quickstats.nass.usda.gov";
+
+    public string DataPath { get; set; } = "/api/api_GET/";
 }
 
 public sealed class TraditionalMarketOptions

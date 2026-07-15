@@ -473,6 +473,45 @@ public static class CommunityLedgerTemplateCatalog
         },
         new()
         {
+            Key = CommunityLedgerTemplateKeys.MeatImportReadiness,
+            DisplayName = "육류 수입 준비도 원장",
+            Category = "정보 협업 원장",
+            WorkflowTag = "육류 수입 준비",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            TargetOperatingSystemName = "커뮤니티 신뢰 OS",
+            Summary = "커뮤니티 대화에서 육류 수입 준비가 필요하다고 당사자가 선택했을 때만 열리는 정보 협업 원장입니다. 발주·계약·통관 대행이나 주선은 실행하지 않습니다.",
+            IsCommunityOpportunityTemplate = true,
+            EngineHints = [CommunityLedgerEngineHints.CommunityActivitySignal],
+            UiSectionHints = ["참여자", "제품과 원산지", "준비 단계", "공식 확인 근거", "질문과 이의", "양측 확인", "절차 API 인계"],
+            ActionHints = ["정보 제안 확인", "준비도 원장 시작", "근거 첨부", "질문 남기기", "이의 제기", "양측 확인", "공식 결과 기록"],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.CommunityDiscussionBeforeMeatImportReadiness,
+                    "커뮤니티 대화와 당사자의 명시적 선택이 먼저 필요합니다.",
+                    "게시글에 육류와 국경 간 거래 신호가 함께 있어도 원장을 자동 생성하지 않습니다. 게시글 작성자가 정보 제공 경계를 확인하고 직접 시작한 뒤에만 같은 커뮤니티에 준비도 원장을 연결합니다.",
+                    requiredUiSectionHints: ["참여자", "제품과 원산지"],
+                    gatedActionHints: ["준비도 원장 시작", "절차 API 인계"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("GET", "CommunityPostOpportunitiesController", "Get", "게시글 문맥에 맞는 선택적 정보 협업 제안을 표시 언어에 맞춰 조회합니다.", "ICommunityPostOpportunityService.GetAsync"),
+                ApiEndpoint("POST", "CommunityPostOpportunitiesController", "StartMeatImportReadiness", "작성자가 명시적으로 동의한 경우에만 육류 수입 준비도 원장을 만들고 게시글에 연결합니다.", "ICommunityPostOpportunityService.StartMeatImportReadinessAsync"),
+                ApiEndpoint("GET", "MeatImportReadinessController", "GetDiagram", "정부기관 확인 경계가 표시된 육류 수입 준비 절차도를 조회합니다.", "IMeatImportReadinessService.GetDiagram")
+            ],
+            PersistencePolicy = MongoPolicy(),
+            BestLedgerPatternTitle = "커뮤니티 대화에서 필요할 때만 여는 수입 준비 정보 원장",
+            BestLedgerPatternSummary = "국내·해외 사용자가 같은 게시글과 같은 원장을 사용하고, 국가나 표시 언어로 기능을 나누지 않으며, 당사자의 선택 이후에만 절차·근거·질문·이의를 함께 관리합니다.",
+            CommunityDiscussionPrompts = ["이 대화가 실제 수입 준비 절차 확인을 필요로 하나요?", "한국 측과 해외 측이 각각 확인해야 할 정보는 무엇인가요?", "정부기관의 최신 공식 결과를 어느 단계에서 다시 확인해야 하나요?"],
+            Roles =
+            [
+                Role("한국 측 참여자", "국내 수입 요건과 공식 결과 참조를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence, CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("해외 측 참여자", "제품, 작업장, 수출증명 관련 정보와 근거를 확인합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence, CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("지원 참여자", "필요한 질문과 설명을 남기되 당사자 대신 결정을 확정하지 않습니다.", CommunityLedgerPermissionCodes.AttachEvidence)
+            ]
+        },
+        new()
+        {
             Key = CommunityLedgerTemplateKeys.Errand,
             DisplayName = "생활 요청 원장",
             Category = "생활 원장",

@@ -64,4 +64,29 @@ public sealed class 공동수입HS코드Controller : ControllerBase
 
         return this.ToActionResult(result);
     }
+
+    [HttpGet("{hsCode}/public-data")]
+    public async Task<IActionResult> 공공데이터수집(
+        string hsCode,
+        [FromQuery] string countryCode = "CN",
+        [FromQuery] string? referenceMonth = null,
+        [FromQuery] int lookbackMonths = 3,
+        [FromQuery] string? referenceDate = null,
+        [FromQuery] decimal? expectedFxRateKrwPerUsd = null,
+        [FromQuery] string[]? sourceKeys = null,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _useCase.공공데이터수집Async(new Hs공공데이터수집요청
+        {
+            HsCode = hsCode,
+            CountryCode = countryCode,
+            ReferenceMonth = referenceMonth ?? string.Empty,
+            LookbackMonths = lookbackMonths,
+            ReferenceDate = referenceDate ?? string.Empty,
+            ExpectedFxRateKrwPerUsd = expectedFxRateKrwPerUsd,
+            SourceKeys = sourceKeys ?? []
+        }, cancellationToken);
+
+        return this.ToActionResult(result);
+    }
 }

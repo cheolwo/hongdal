@@ -985,6 +985,8 @@
                     {
                         <HongdalPrajnaUpayaTaegeukNavigator AccentColor="@DecorationState.HomeThemeAccentColor"
                                                            Theme="@DecorationState.ActiveHomeTheme"
+                                                           UpayaLabel="@UpayaLabel"
+                                                           PrajnaLabel="@PrajnaLabel"
                                                            UpayaSelected="@PrajnaUpayaUpayaSelectedCallback"
                                                            PrajnaSelected="@PrajnaUpayaPrajnaSelectedCallback"
                                                            CommunitySelected="@BaguaTaegeukYangSelectedCallback"
@@ -1095,6 +1097,8 @@
                         {
                             <HongdalPrajnaUpayaTaegeukNavigator AccentColor="@DecorationState.HomeThemeAccentColor"
                                                                Theme="@DecorationState.ActiveHomeTheme"
+                                                               UpayaLabel="@UpayaLabel"
+                                                               PrajnaLabel="@PrajnaLabel"
                                                                UpayaSelected="@PrajnaUpayaUpayaSelectedCallback"
                                                                PrajnaSelected="@PrajnaUpayaPrajnaSelectedCallback"
                                                                CommunitySelected="@BaguaTaegeukYangSelectedCallback"
@@ -6871,6 +6875,12 @@
     public bool ShowPrajnaUpayaNavigator { get; set; }
 
     [Parameter]
+    public string UpayaLabel { get; set; } = "방편";
+
+    [Parameter]
+    public string PrajnaLabel { get; set; } = "정보";
+
+    [Parameter]
     public string? UpayaHref { get; set; }
 
     [Parameter]
@@ -8039,8 +8049,8 @@
             : default;
 
     private EventCallback PrajnaUpayaUpayaSelectedCallback
-        => !string.IsNullOrWhiteSpace(UpayaHref)
-            ? EventCallback.Factory.Create(this, () => NavigateFromPrajnaUpaya(UpayaHref))
+        => ShowPrajnaUpayaNavigator
+            ? EventCallback.Factory.Create(this, HandlePrajnaUpayaUpayaSelected)
             : default;
 
     private EventCallback PrajnaUpayaPrajnaSelectedCallback
@@ -8146,12 +8156,24 @@
         Navigation.NavigateTo(href);
     }
 
+    private void HandlePrajnaUpayaUpayaSelected()
+    {
+        if (!string.IsNullOrWhiteSpace(UpayaHref))
+        {
+            NavigateFromPrajnaUpaya(UpayaHref);
+            return;
+        }
+
+        isBaguaNavigatorOpen = false;
+        OpenWorkMode();
+    }
+
     private string BuildBaguaEntryClass() => isBaguaNavigatorOpen
         ? "platform-community-bagua-entry platform-community-bagua-entry--open"
         : "platform-community-bagua-entry platform-community-bagua-entry--closed";
 
     private string BaguaToggleAriaLabel => ShowPrajnaUpayaNavigator
-        ? "반야와 방편의 두 겹 태극을 끌어 펼치거나 접기"
+        ? $"{PrajnaLabel}와 {UpayaLabel}의 두 겹 태극을 끌어 펼치거나 접기"
         : "후천 사방 이동판을 끌어 펼치거나 접기";
 
     private string BaguaToggleSymbol => ShowPrajnaUpayaNavigator
@@ -8159,7 +8181,7 @@
         : DecorationState.BaguaSymbol;
 
     private string BaguaToggleTitle => ShowPrajnaUpayaNavigator
-        ? "반야 · 방편"
+        ? $"{PrajnaLabel} · {UpayaLabel}"
         : "후천 사방 이동";
 
     private string BaguaToggleDescription => ShowPrajnaUpayaNavigator

@@ -169,6 +169,75 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
         },
         new()
         {
+            Key = "customs-confirmation-requirements",
+            Provider = "관세청",
+            DisplayName = "세관장확인대상물품",
+            Purpose = "10자리 HSK 코드로 수입 시 확인해야 할 법령, 승인기관과 구비요건을 조회합니다.",
+            Domain = "Customs",
+            VersionScope = "2.5",
+            ApiType = "REST",
+            DataFormat = "XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15101589/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "hsSgn", "imexTpcd"],
+            MainResponseFields = ["hsSgn", "dcerCfrmLworNm", "reqApreIttNm", "reqCfrmIstmNm", "aplyStrtDt"],
+            UsageNotes =
+            [
+                "조회 결과가 없다는 사실만으로 수입요건이 없거나 통관이 가능하다고 확정하지 않습니다.",
+                "법령·승인기관·구비서류가 반환되면 관세사 또는 해당 승인기관의 확인이 필요한 정보로 표시합니다."
+            ]
+        },
+        new()
+        {
+            Key = "customs-weekly-exchange-rate",
+            Provider = "관세청",
+            DisplayName = "관세환율정보",
+            Purpose = "수입신고 과세가격을 원화로 환산할 때 적용되는 국가·통화별 관세환율을 조회합니다.",
+            Domain = "Customs",
+            VersionScope = "2.5",
+            ApiType = "REST",
+            DataFormat = "XML",
+            BaseUrl = "https://apis.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15101230/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "aplyBgnDt", "weekFxrtTpcd"],
+            MainResponseFields = ["cntySgn", "mtryUtNm", "fxrt", "currSgn", "aplyBgnDt", "imexTp"],
+            UsageNotes =
+            [
+                "일반 환전 시세가 아니라 관세 과세가격 계산에 사용하는 주간 환율입니다.",
+                "요청 국가부호와 일치하는 결과만 HS 공공데이터 묶음에 포함합니다."
+            ]
+        },
+        new()
+        {
+            Key = "customs-hs-code-annual-file",
+            Provider = "관세청",
+            DisplayName = "연례 HS 부호 기준정보",
+            Purpose = "HSK 코드의 한글·영문 품명, 수량·중량 단위와 성질 분류를 내부 HS 기준정보 갱신에 사용합니다.",
+            Domain = "Customs",
+            VersionScope = "2.5",
+            ApiType = "File",
+            DataFormat = "XLSX",
+            BaseUrl = "https://www.data.go.kr",
+            DocumentationUrl = "https://www.data.go.kr/data/15049722/fileData.do",
+            RequiresServiceKey = false,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["catalogYear"],
+            MainResponseFields = ["HSK 코드", "한글품목명", "영문품목명", "수량단위코드", "중량단위코드", "성질통합분류코드"],
+            UsageNotes =
+            [
+                "연간 파일은 실시간 묶음 조회 대상이 아니라 내부 HS 코드 카탈로그 갱신 기준으로 관리합니다.",
+                "연도별 코드 신설·폐지·품명 변경을 검토한 뒤 버전 단위로 반영합니다."
+            ]
+        },
+        new()
+        {
             Key = "at-daily-wholesale-retail-food-price",
             Provider = "한국농수산식품유통공사(aT)",
             DisplayName = "일별 도·소매 가격정보",
