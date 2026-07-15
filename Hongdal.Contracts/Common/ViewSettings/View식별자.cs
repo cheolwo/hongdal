@@ -21,6 +21,7 @@ public static class View식별자
         public const string ExplorationCampaigns = "driver.exploration-campaigns";
         public const string Reservations = "driver.reservations";
         public const string CurrentTransport = "driver.current-transport";
+        public const string CommunityInquiries = "driver.community-inquiries";
         public const string Settlements = "driver.settlements";
         public const string Notifications = "driver.notifications";
         public const string ViewSettings = "driver.view-settings";

@@ -146,6 +146,40 @@
                                     </MudChip>
                                 </MudStack>
 
+                                <DriverCargoLoadProgress CargoItems="@운송.상차대상화물목록"
+                                                         ConfirmedCargoCodes="@loadedCargoCodes" />
+
+                                @if (NextLoadingCargo is not null)
+                                {
+                                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                                        <MudStack Spacing="1">
+                                            <MudText Typo="Typo.subtitle2">
+                                                지금 상차: @NextLoadingCargo.적재순번표시 · @NextLoadingCargo.Label
+                                            </MudText>
+                                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">@NextLoadingCargo.적재순번표시 상차</MudChip>
+                                                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@NextLoadingCargo.차량적재위치</MudChip>
+                                                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@NextLoadingCargo.하차순번표시</MudChip>
+                                            </MudStack>
+                                            <MudText Typo="Typo.body2">@NextLoadingCargo.하차위치 · @NextLoadingCargo.수량중량표시</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@NextLoadingCargo.작업메모</MudText>
+                                            <MudButton Variant="Variant.Text"
+                                                       Color="Color.Warning"
+                                                       Size="Size.Small"
+                                                       StartIcon="@Icons.Material.Filled.TouchApp"
+                                                       OnClick="SelectNextLoadingCargo">
+                                                다음 화물 선택
+                                            </MudButton>
+                                        </MudStack>
+                                    </MudAlert>
+                                }
+                                else
+                                {
+                                    <MudAlert Severity="Severity.Success" Dense="true">권장 상차 순서의 모든 화물을 확인했습니다.</MudAlert>
+                                }
+
                                 <MudGrid>
                                     <MudItem xs="12" sm="8">
                                         <MudTextField @bind-Value="loadingBarcodeInput"
@@ -166,13 +200,13 @@
                                 </MudGrid>
 
                                 <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                    @foreach (var item in 운송.상차대상화물목록)
+                                    @foreach (var item in OrderedLoadingCargo)
                                     {
-                                        <MudButton Variant="Variant.Outlined"
-                                                   Color="Color.Secondary"
+                                        <MudButton Variant="@LoadingCargoButtonVariant(item)"
+                                                   Color="@LoadingCargoButtonColor(item)"
                                                    Size="Size.Small"
                                                    OnClick="@(() => SelectLoadingCargo(item))">
-                                            @item.Barcode
+                                            @item.적재순번표시 · @item.Barcode
                                         </MudButton>
                                     }
                                 </MudStack>
@@ -180,6 +214,14 @@
                                 @if (SelectedLoadingCargo is not null)
                                 {
                                     <MudPaper Elevation="0" Class="pa-3">
+                                        @if (SelectedLoadingCargoOutOfSequence)
+                                        {
+                                            <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-3">
+                                                권장 다음 화물은 @(NextLoadingCargo?.Label)입니다. 현장 사정으로 순서를 바꿀 수는 있지만,
+                                                하차 때 화물이 막히지 않는지 먼저 확인해 주세요.
+                                            </MudAlert>
+                                        }
+
                                         <MudGrid>
                                             <MudItem xs="12" sm="4">
                                                 <MudText Typo="Typo.caption" Color="Color.Secondary">
@@ -214,14 +256,16 @@
                                 }
 
                                 <MudGrid>
-                                    @foreach (var item in 운송.상차대상화물목록)
+                                    @foreach (var item in OrderedLoadingCargo)
                                     {
                                         <MudItem xs="12" sm="6">
                                             <MudPaper Elevation="0" Class="pa-2">
                                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                                     <MudStack Spacing="0">
-                                                        <MudText Typo="Typo.body2">@item.Label</MudText>
+                                                        <MudText Typo="Typo.body2"><strong>@item.적재순번표시 상차</strong> · @item.Label</MudText>
                                                         <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Barcode · @item.수량중량표시</MudText>
+                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.차량적재위치 → @item.하차순번표시 · @item.하차위치</MudText>
+                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.작업메모</MudText>
                                                     </MudStack>
                                                     <MudChip T="string"
                                                              Size="Size.Small"
@@ -420,8 +464,26 @@
            || 운송.상차대상화물목록.Count == 0
            || 운송.상차대상화물목록.All(item => loadedCargoCodes.Contains(item.Code));
 
+    private IReadOnlyList<기사상차대상화물> OrderedLoadingCargo
+        => 운송?.상차대상화물목록
+            .OrderBy(item => item.적재순번)
+            .ThenByDescending(item => item.하차순번)
+            .ThenBy(item => item.Code, StringComparer.Ordinal)
+            .ToArray()
+           ?? [];
+
+    private 기사상차대상화물? NextLoadingCargo
+        => OrderedLoadingCargo.FirstOrDefault(item => !loadedCargoCodes.Contains(item.Code));
+
     private 기사상차대상화물? SelectedLoadingCargo
         => 운송?.상차대상화물목록.FirstOrDefault(item => string.Equals(item.Code, selectedLoadingCargoCode, StringComparison.Ordinal));
+
+    private bool SelectedLoadingCargoOutOfSequence
+        => 운송?.적재순번필요 == true
+           && SelectedLoadingCargo is not null
+           && !IsLoadingCargoConfirmed(SelectedLoadingCargo.Code)
+           && NextLoadingCargo is not null
+           && !string.Equals(SelectedLoadingCargo.Code, NextLoadingCargo.Code, StringComparison.Ordinal);
 
     private bool ReceiptEvidenceRequired
         => 운송?.인수증필요 == true
@@ -545,6 +607,14 @@
         }
 
         SelectLoadingCargo(item);
+        if (운송?.적재순번필요 == true
+            && NextLoadingCargo is not null
+            && !string.Equals(item.Code, NextLoadingCargo.Code, StringComparison.Ordinal))
+        {
+            SetStatus($"권장 다음 화물은 {NextLoadingCargo.Label}입니다. 순서를 바꾸기 전에 적재 위치를 확인해 주세요.", Severity.Warning);
+            return;
+        }
+
         SetStatus($"{item.Label} 상차 정보를 불러왔습니다.", Severity.Info);
     }
 
@@ -552,6 +622,17 @@
     {
         selectedLoadingCargoCode = item.Code;
         loadingBarcodeInput = item.Barcode;
+    }
+
+    private void SelectNextLoadingCargo()
+    {
+        if (NextLoadingCargo is null)
+        {
+            return;
+        }
+
+        SelectLoadingCargo(NextLoadingCargo);
+        SetStatus($"{NextLoadingCargo.Label}을(를) 권장 상차 화물로 선택했습니다.", Severity.Info);
     }
 
     private void ConfirmSelectedLoadingCargo()
@@ -562,8 +643,18 @@
             return;
         }
 
-        loadedCargoCodes.Add(SelectedLoadingCargo.Code);
-        SetStatus($"{SelectedLoadingCargo.Label} 상차 확인을 기록했습니다.", Severity.Success);
+        var selectedCargo = SelectedLoadingCargo;
+        var recommendedCargo = NextLoadingCargo;
+        var outOfSequence = 운송?.적재순번필요 == true
+                            && recommendedCargo is not null
+                            && !string.Equals(selectedCargo.Code, recommendedCargo.Code, StringComparison.Ordinal);
+
+        loadedCargoCodes.Add(selectedCargo.Code);
+        SetStatus(
+            outOfSequence
+                ? $"{selectedCargo.Label}을(를) 권장 순서와 다르게 상차했습니다. 실제 적재 위치를 다시 확인해 주세요."
+                : $"{selectedCargo.Label} 상차 확인을 기록했습니다.",
+            outOfSequence ? Severity.Warning : Severity.Success);
     }
 
     private bool IsLoadingCargoConfirmed(string code)
@@ -573,10 +664,15 @@
     {
         if (IsLoadingCargoConfirmed(item.Code))
         {
-            return "확인";
+            return "상차 완료";
         }
 
-        return 운송?.적재순번필요 == true ? item.적재순번표시 : "동일 규격";
+        if (IsNextLoadingCargo(item))
+        {
+            return "지금 상차";
+        }
+
+        return 운송?.적재순번필요 == true ? $"{item.적재순번표시} 대기" : "수량 확인";
     }
 
     private Color LoadingCargoChipColor(기사상차대상화물 item)
@@ -586,8 +682,29 @@
             return Color.Success;
         }
 
-        return 운송?.적재순번필요 == true ? Color.Warning : Color.Info;
+        if (IsNextLoadingCargo(item))
+        {
+            return Color.Warning;
+        }
+
+        return 운송?.적재순번필요 == true ? Color.Default : Color.Info;
     }
+
+    private bool IsNextLoadingCargo(기사상차대상화물 item)
+        => NextLoadingCargo is not null
+           && string.Equals(item.Code, NextLoadingCargo.Code, StringComparison.Ordinal);
+
+    private Variant LoadingCargoButtonVariant(기사상차대상화물 item)
+        => IsLoadingCargoConfirmed(item.Code) || IsNextLoadingCargo(item)
+            ? Variant.Filled
+            : Variant.Outlined;
+
+    private Color LoadingCargoButtonColor(기사상차대상화물 item)
+        => IsLoadingCargoConfirmed(item.Code)
+            ? Color.Success
+            : IsNextLoadingCargo(item)
+                ? Color.Warning
+                : Color.Secondary;
 
     private async Task RecordPickupIssueAsync()
     {

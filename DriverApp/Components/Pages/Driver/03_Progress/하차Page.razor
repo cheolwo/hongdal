@@ -61,11 +61,36 @@
                                     <MudChip T="string" Size="Size.Small" Color="@DropoffProgressColor" Variant="Variant.Filled">@DropoffProgressLabel</MudChip>
                                 </MudStack>
 
+                                <DriverCargoLoadProgress CargoItems="@운송.상차대상화물목록"
+                                                         ConfirmedCargoCodes="@droppedCargoCodes"
+                                                         IsUnloading="true" />
+
                                 @if (NextDropoffCargo is not null)
                                 {
-                                    <MudAlert Severity="Severity.Info" Dense="true">
-                                        다음 하차: @NextDropoffCargo.하차위치 · @NextDropoffCargo.Label · @NextDropoffCargo.수량중량표시
+                                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                                        <MudStack Spacing="1">
+                                            <MudText Typo="Typo.subtitle2">
+                                                지금 하차: @NextDropoffCargo.하차순번표시 · @NextDropoffCargo.하차위치
+                                            </MudText>
+                                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@NextDropoffCargo.차량적재위치</MudChip>
+                                                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">@NextDropoffCargo.하차순번표시</MudChip>
+                                            </MudStack>
+                                            <MudText Typo="Typo.body2">@NextDropoffCargo.Label · @NextDropoffCargo.수량중량표시 · @NextDropoffCargo.Barcode</MudText>
+                                            <MudButton Variant="Variant.Text"
+                                                       Color="Color.Info"
+                                                       Size="Size.Small"
+                                                       StartIcon="@Icons.Material.Filled.TouchApp"
+                                                       OnClick="SelectNextDropoffCargo">
+                                                다음 화물 선택
+                                            </MudButton>
+                                        </MudStack>
                                     </MudAlert>
+                                }
+                                else
+                                {
+                                    <MudAlert Severity="Severity.Success" Dense="true">권장 하차 순서의 모든 화물을 확인했습니다.</MudAlert>
                                 }
 
                                 <MudGrid>
@@ -90,6 +115,13 @@
                                 @if (SelectedDropoffCargo is not null)
                                 {
                                     <MudPaper Elevation="0" Class="pa-3">
+                                        @if (SelectedDropoffCargoOutOfSequence)
+                                        {
+                                            <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-3">
+                                                권장 다음 화물은 @(NextDropoffCargo?.Label)입니다. 먼저 내리면 다른 화물을 다시 옮겨야 하는지 확인해 주세요.
+                                            </MudAlert>
+                                        }
+
                                         <MudGrid>
                                             <MudItem xs="12" sm="4">
                                                 <MudText Typo="Typo.caption" Color="Color.Secondary">하차 순서</MudText>
@@ -121,9 +153,9 @@
                                             <MudPaper Elevation="0" Class="pa-2">
                                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                                                     <MudStack Spacing="0">
-                                                        <MudText Typo="Typo.body2">@item.하차위치</MudText>
+                                                        <MudText Typo="Typo.body2"><strong>@item.하차순번표시</strong> · @item.하차위치</MudText>
                                                         <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Label · @item.수량중량표시</MudText>
-                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Barcode</MudText>
+                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.차량적재위치 · @item.Barcode</MudText>
                                                     </MudStack>
                                                     <MudChip T="string"
                                                              Size="Size.Small"
@@ -234,7 +266,7 @@
     private IReadOnlyList<기사상차대상화물> OrderedDropoffCargo
         => 운송?.상차대상화물목록
             .OrderBy(item => item.하차순번)
-            .ThenBy(item => item.적재순번)
+            .ThenByDescending(item => item.적재순번)
             .ToArray()
            ?? [];
 
@@ -243,6 +275,13 @@
 
     private 기사상차대상화물? NextDropoffCargo
         => OrderedDropoffCargo.FirstOrDefault(item => !droppedCargoCodes.Contains(item.Code));
+
+    private bool SelectedDropoffCargoOutOfSequence
+        => 운송?.적재순번필요 == true
+           && SelectedDropoffCargo is not null
+           && !IsDropoffCargoConfirmed(SelectedDropoffCargo.Code)
+           && NextDropoffCargo is not null
+           && !string.Equals(SelectedDropoffCargo.Code, NextDropoffCargo.Code, StringComparison.Ordinal);
 
     private bool DropoffCargoCompleted
         => 운송 is null
@@ -310,9 +349,33 @@
             return;
         }
 
+        SelectDropoffCargo(item);
+        if (운송?.적재순번필요 == true
+            && NextDropoffCargo is not null
+            && !string.Equals(item.Code, NextDropoffCargo.Code, StringComparison.Ordinal))
+        {
+            SetStatus($"권장 다음 하차는 {NextDropoffCargo.하차위치}입니다. 순서를 바꾸기 전에 적재 위치를 확인해 주세요.", Severity.Warning);
+            return;
+        }
+
+        SetStatus($"{item.하차위치} 하차 정보를 불러왔습니다.", Severity.Info);
+    }
+
+    private void SelectDropoffCargo(기사상차대상화물 item)
+    {
         selectedDropoffCargoCode = item.Code;
         dropoffBarcodeInput = item.Barcode;
-        SetStatus($"{item.하차위치} 하차 정보를 불러왔습니다.", Severity.Info);
+    }
+
+    private void SelectNextDropoffCargo()
+    {
+        if (NextDropoffCargo is null)
+        {
+            return;
+        }
+
+        SelectDropoffCargo(NextDropoffCargo);
+        SetStatus($"{NextDropoffCargo.하차위치} 화물을 권장 하차 대상으로 선택했습니다.", Severity.Info);
     }
 
     private void ConfirmSelectedDropoffCargo()
@@ -323,8 +386,18 @@
             return;
         }
 
-        droppedCargoCodes.Add(SelectedDropoffCargo.Code);
-        SetStatus($"{SelectedDropoffCargo.하차위치} 하차 확인을 기록했습니다.", Severity.Success);
+        var selectedCargo = SelectedDropoffCargo;
+        var recommendedCargo = NextDropoffCargo;
+        var outOfSequence = 운송?.적재순번필요 == true
+                            && recommendedCargo is not null
+                            && !string.Equals(selectedCargo.Code, recommendedCargo.Code, StringComparison.Ordinal);
+
+        droppedCargoCodes.Add(selectedCargo.Code);
+        SetStatus(
+            outOfSequence
+                ? $"{selectedCargo.하차위치} 화물을 권장 순서와 다르게 하차했습니다. 남은 화물의 적재 상태를 확인해 주세요."
+                : $"{selectedCargo.하차위치} 하차 확인을 기록했습니다.",
+            outOfSequence ? Severity.Warning : Severity.Success);
     }
 
     private bool IsDropoffCargoConfirmed(string code)
@@ -334,10 +407,15 @@
     {
         if (IsDropoffCargoConfirmed(item.Code))
         {
-            return "확인";
+            return "하차 완료";
         }
 
-        return 운송?.적재순번필요 == true ? item.하차순번표시 : "수량 확인";
+        if (IsNextDropoffCargo(item))
+        {
+            return "지금 하차";
+        }
+
+        return 운송?.적재순번필요 == true ? $"{item.하차순번표시} 대기" : "수량 확인";
     }
 
     private Color DropoffCargoChipColor(기사상차대상화물 item)
@@ -347,8 +425,17 @@
             return Color.Success;
         }
 
-        return 운송?.적재순번필요 == true ? Color.Info : Color.Default;
+        if (IsNextDropoffCargo(item))
+        {
+            return Color.Info;
+        }
+
+        return Color.Default;
     }
+
+    private bool IsNextDropoffCargo(기사상차대상화물 item)
+        => NextDropoffCargo is not null
+           && string.Equals(item.Code, NextDropoffCargo.Code, StringComparison.Ordinal);
 
     private async Task RecordDropoffIssueAsync()
     {

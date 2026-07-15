@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Hongdal.Contracts.Driver.Work;
+using Hongdal.Contracts.Common.Community;
 
 namespace DriverApp.Services;
 
@@ -38,6 +39,28 @@ public sealed class DriverWorkApiService : IDriverWorkApiService
         using var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<기사위치갱신응답>(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<CommunityDriverInquiryResponse>> 커뮤니티의뢰목록Async(
+        CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Get, "api/v1/driver/community-inquiries");
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IReadOnlyList<CommunityDriverInquiryResponse>>(cancellationToken)
+               ?? [];
+    }
+
+    public async Task<CommunityDriverInquiryResponse?> 커뮤니티의뢰답변Async(
+        Guid inquiryId,
+        CommunityDriverInquiryDecisionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var httpRequest = CreateRequest(HttpMethod.Post, $"api/v1/driver/community-inquiries/{inquiryId}/decision");
+        httpRequest.Content = JsonContent.Create(request);
+        using var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityDriverInquiryResponse>(cancellationToken);
     }
 
     private HttpRequestMessage CreateRequest(HttpMethod method, string path)
