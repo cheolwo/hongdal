@@ -195,7 +195,15 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
 
 ## 실행과 검증
 
+Visual Studio에서는 현재 집중할 버전에 맞는 솔루션을 엽니다.
+
+- `Hongdal.v0.0.slnx`: 정보 공개형 커뮤니티, 통합 클라이언트, 모바일 관리자, API 서버와 공통 계층
+- `Hongdal.v1.0.slnx`: 0.0 기반에 국내 화물·용달 기사 앱과 배차 운영 화면을 추가한 구성
+- `Hongdal.slnx`: 운송·창고·음식점·인사 등 저장소 전체를 확인하는 구성
+
 ```powershell
+dotnet build Hongdal.v0.0.slnx /p:UseSharedCompilation=false
+dotnet build Hongdal.v1.0.slnx /p:UseSharedCompilation=false
 dotnet build Hongdal.slnx /p:UseSharedCompilation=false
 dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
 ```
