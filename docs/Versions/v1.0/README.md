@@ -40,7 +40,7 @@
 ## 우선 앱/모듈
 
 - `Hongdal.Ui.Common`
-- `ShipperApp`
+- `HongdalApp`
 - `DriverApp`의 운송 기술 검증 화면
 - `HongdalAdmin`
 - `CargoYongdalDispatchEngine`의 모의 배차 경로

@@ -2,12 +2,12 @@
 
 > 구현·캡처 기준: 2026-07-13  
 > 사용자 표시명: **홍달 앱**  
-> 코드 위치: `ShipperApp` 기반 통합 클라이언트  
+> 코드 위치: `HongdalApp` 기반 통합 클라이언트
 > 관련 정책: [커뮤니티 운영 정책](../Architecture/CommunityOperatingPolicy.md), [홈 모드 구조](../Architecture/PlatformHomeMode.md)
 
-홍달 앱의 첫 화면은 `실시간 베스트`, `살뜰 커뮤니티`, `꾸미기 상점`의 핵심 현황만 축약한 공통 홈이다. 게시판 상세, 원장 초안, 다이어그램과 업무 도구는 사용자가 해당 영역으로 들어간 뒤 표시한다. 사용자는 우측 상단 사람 버튼으로 역할을 바꾸고, `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 업무를 찾아간다. `ShipperApp`은 전환 기간의 내부 프로젝트명일 뿐 사용자에게 별도 화주 앱으로 표시하지 않는다. 상세 설계 원칙은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)을 따른다.
+홍달 앱의 첫 화면은 `실시간 베스트`, `살뜰 커뮤니티`, `꾸미기 상점`의 핵심 현황만 축약한 공통 홈이다. 게시판 상세, 원장 초안, 다이어그램과 업무 도구는 사용자가 해당 영역으로 들어간 뒤 표시한다. 사용자는 우측 상단 사람 버튼으로 역할을 바꾸고, `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 업무를 찾아간다. `HongdalApp`은 전환 기간의 내부 프로젝트명일 뿐 사용자에게 별도 화주 앱으로 표시하지 않는다. 상세 설계 원칙은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)을 따른다.
 
-<img src="assets/app-pages/ShipperApp/ShipperApp-P00.png" alt="Hongdal 통합 커뮤니티 홈" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P00.png" alt="Hongdal 통합 커뮤니티 홈" width="360">
 
 ## 화면 책임
 
@@ -126,16 +126,16 @@ flowchart LR
 
 상점은 홈 위에 뜨는 임시 패널이 아니라 독립 페이지다. `전체`, `홈 테마`, `노드·괘상` 상품 종류와 `플랫폼 기본`, `크리에이터`, `내 보유` 출처 탭을 조합해 탐색한다. 홈 테마 카드는 실제 태극 마스크로 합성한 축소판과 `보유 중`, `현재 적용 중` 상태를 표시한다.
 
-<img src="assets/app-pages/ShipperApp/ShipperApp-P10.png" alt="꾸미기 상점" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P10.png" alt="꾸미기 상점" width="360">
 
 상품 상세에서는 사용 위치가 `홈 내비게이터 테마`, `괘상·사방 이동판`, `다이어그램 노드` 중 무엇인지 확인한다. 홈 테마는 펼친 패널·접힌 손잡이·밝고 어두운 배경을 전환하며 실제 결과를 미리 보고, 방편·반야·커뮤니티·상점·간괘·테두리·라벨·손잡이 8개 슬롯을 확인한 뒤 전체 패키지를 한 번에 적용한다.
 
-<img src="assets/app-pages/ShipperApp/ShipperApp-P10-1.png" alt="꾸미기 상품 상세" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P10-1.png" alt="꾸미기 상품 상세" width="360">
 
 FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다. 가상 결제 수단과 약관을 확인하면 현재 앱 실행 동안 구매·보유 상태만 갱신한다. 결제 완료 뒤에는 첫 자산을 자동 적용하지 않으며 사용자가 `구매한 전체 테마 적용` 또는 `상품에서 적용 항목 고르기`를 명시적으로 선택한다.
 
-<img src="assets/app-pages/ShipperApp/ShipperApp-P10-2.png" alt="개발용 FakePG 결제" width="360">
-<img src="assets/app-pages/ShipperApp/ShipperApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료와 적용 선택" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P10-2.png" alt="개발용 FakePG 결제" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료와 적용 선택" width="360">
 
 ## 내 꾸미기 등록 규격
 
@@ -155,7 +155,7 @@ FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다.
 
 디자이너 홈 테마 등록은 `/community/decorations/themes/submit`에서 별도 처리한다. 8개 슬롯마다 필수 대체색과 선택 PNG·WebP·SVG 이미지를 입력하고, 펼친 패널·접힌 손잡이·배경별 미리보기를 확인한다. 저장 결과는 `초안`으로 내 제작함에만 추가되며 현재 홈에 적용된다. 클릭 영역과 커뮤니티·상점 이동 의미는 패키지가 변경하지 못한다.
 
-<img src="assets/app-pages/ShipperApp/ShipperApp-P10-4.png" alt="디자이너 홈 테마 패키지 등록" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P10-4.png" alt="디자이너 홈 테마 패키지 등록" width="360">
 
 ## 현재 상태와 서버 연결 경계
 
@@ -178,15 +178,15 @@ FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다.
 
 | 책임 | 코드 |
 | --- | --- |
-| 역할 라우팅 | `ShipperApp/Components/Pages/UnifiedHome.razor` |
-| 역할 상태 | `ShipperApp/Services/HongdalClientRoleService.cs` |
-| 역할별 메뉴 | `ShipperApp/Services/HongdalClientNavigationCatalog.cs` |
+| 역할 라우팅 | `HongdalApp/Components/Pages/UnifiedHome.razor` |
+| 역할 상태 | `HongdalApp/Services/HongdalClientRoleService.cs` |
+| 역할별 메뉴 | `HongdalApp/Services/HongdalClientNavigationCatalog.cs` |
 | 공통 커뮤니티·다이어그램 | `Hongdal.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor` |
 | 후천 사방 이동판 | `Hongdal.Ui.Common/Areas/App/Components/Community/HongdalLaterHeavenBaguaNavigator.razor` |
 | 반야·방편 홈 테마 렌더러 | `HongdalPrajnaUpayaTaegeukNavigator.razor`, `HongdalHomeNavigatorThemePreview.razor` |
 | 원방각 표시 | `Hongdal.Ui.Common/Areas/App/Components/Community/HongdalWonBangGakMark.razor` |
 | 꾸미기 상태 | `Hongdal.Ui.Common/Areas/App/Services/PlatformCommunityDecorationStateService.cs` |
-| 상점 페이지 | `ShipperApp/Components/Pages/CommunityDecorationStorePage.razor` |
+| 상점 페이지 | `HongdalApp/Components/Pages/CommunityDecorationStorePage.razor` |
 | 상세·결제·제작 | `CommunityDecorationDetailPage.razor`, `CommunityDecorationCheckoutPage.razor`, `CommunityDecorationCreatePage.razor` |
 | 디자이너 테마 등록 | `CommunityDecorationThemeSubmitPage.razor` |
 

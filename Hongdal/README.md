@@ -16,8 +16,8 @@ Hongdal을 만드는 가장 기본적인 이유는 사람들이 조금 더 **알
 
 <img width="487" height="744" alt="DriverApp Home 화면" src="https://github.com/user-attachments/assets/9cecb7cd-bd58-4981-902e-28fdf24d6572" />
 
-# ShipperApp 메뉴
-<img width="809" height="1009" alt="ShipperApp 메뉴" src="https://github.com/user-attachments/assets/094b6cb5-2388-48c4-86e9-bb82b73786dc" />
+# HongdalApp 메뉴
+<img width="809" height="1009" alt="HongdalApp 메뉴" src="https://github.com/user-attachments/assets/094b6cb5-2388-48c4-86e9-bb82b73786dc" />
 
 # WarehouseManager App 화면
 <img width="1106" height="751" alt="창고 App 화면" src="https://github.com/user-attachments/assets/52cccc67-5d58-4405-9c09-a8b79191ece7" />
@@ -60,7 +60,7 @@ Hongdal을 만드는 가장 기본적인 이유는 사람들이 조금 더 **알
 
 | 참여자 | 1.0에서 제공해야 하는 핵심 정보 | 주요 앱/화면 |
 | --- | --- | --- |
-| 화주 | 의뢰 등록, 상차/하차 정보, 화물 정보, 결제/정산 조건, 배차 상태 | `ShipperApp`, 화물운송의뢰 등록, 공개 화물정보 |
+| 화주 | 의뢰 등록, 상차/하차 정보, 화물 정보, 결제/정산 조건, 배차 상태 | `HongdalApp`, 화물운송의뢰 등록, 공개 화물정보 |
 | 용달기사 | 추천 운송, 상차지/하차지, 화물 제원, 결제 방식, 상차/하차 완료 증빙 | `DriverApp`, 추천 목록, 진행 중 운송, 상차/하차 화면 |
 | 수령자 | 하차 예정 정보, 수령/인수 확인, 결제 또는 인수증 관련 정보 | 수령자 정보 DTO, 운송 상세, 하차 완료 흐름 |
 
@@ -81,7 +81,7 @@ flowchart TD
 
 프로젝트는 기능을 한 번에 넓히기보다 버전별로 안정화 대상을 분리합니다. 각 버전은 코드 브랜치, 문서, 앱 노출 범위, DB 마이그레이션을 같은 기준으로 맞춥니다.
 
-형상 관리의 기본 원칙은 **소스 프로젝트는 앱/도메인 기준으로 유지하고, 버전별 관리는 문서/브랜치/태그/마이그레이션/노출 정책으로 분리**하는 것입니다. `DriverApp`, `ShipperApp`, `WarehouseManagerApp`, `Hongdal.Domain` 같은 실행 코드를 `v1.0`, `v1.5` 폴더로 복제하지 않습니다. 대신 버전별 목표와 체크리스트는 [Docs/Versions](../Docs/Versions/README.md)에서 관리합니다.
+형상 관리의 기본 원칙은 **소스 프로젝트는 앱/도메인 기준으로 유지하고, 버전별 관리는 문서/브랜치/태그/마이그레이션/노출 정책으로 분리**하는 것입니다. `DriverApp`, `HongdalApp`, `WarehouseManagerApp`, `Hongdal.Domain` 같은 실행 코드를 `v1.0`, `v1.5` 폴더로 복제하지 않습니다. 대신 버전별 목표와 체크리스트는 [Docs/Versions](../Docs/Versions/README.md)에서 관리합니다.
 
 | 관리 대상 | 기준 |
 | --- | --- |
@@ -97,10 +97,10 @@ flowchart TD
 | 버전 | 목표 | 우선 앱/모듈 | 포함 범위 | 보류 범위 |
 | --- | --- | --- | --- | --- |
 | `0.0` | 커뮤니티와 공동 원장 기반 안정화 | `Hongdal.Ui.Common`, 역할별 앱 홈, `HongdalAdmin` | 대화, 참여 동의, 공동 원장, 다이어그램, 신고·숙고, 완료 사례와 신뢰 기록 | 국내 화물/용달 실행, 실제 결제·정산, 이후 업무 모듈 |
-| `1.0` | 국내 화물/용달 첫 실행 모듈 안정화 | `ShipperApp`, `DriverApp`, `HongdalAdmin`, 운송 서버 | 화주 의뢰, 기사 추천·판단, 상차·하차, 인수와 증빙 검증 | 유상 배차·주선·정산 실운영, 1.5 이후 확장 모듈 |
-| `1.5` | 판매 물류와 창고 기반 출고/재위탁 확장 | `WarehouseManagerApp`, `ShipperApp`, `OrdererApp` | 판매상품 재고, 입고/적재/출고, 주문 출고 알림, 재위탁 운송, 창고 작업자 검증, 판매자 물류 운영 | 알뜰살뜰 마트 도심 즉시배송, 해외/통관 자동화 |
+| `1.0` | 국내 화물/용달 첫 실행 모듈 안정화 | `HongdalApp`, `DriverApp`, `HongdalAdmin`, 운송 서버 | 화주 의뢰, 기사 추천·판단, 상차·하차, 인수와 증빙 검증 | 유상 배차·주선·정산 실운영, 1.5 이후 확장 모듈 |
+| `1.5` | 판매 물류와 창고 기반 출고/재위탁 확장 | `WarehouseManagerApp`, `HongdalApp`, `OrdererApp` | 판매상품 재고, 입고/적재/출고, 주문 출고 알림, 재위탁 운송, 창고 작업자 검증, 판매자 물류 운영 | 알뜰살뜰 마트 도심 즉시배송, 해외/통관 자동화 |
 | `2.0` | 국제 물류/통관/HS 데이터 기반 확장 | `Hongdal.WebApp`, `HongdalAdmin`, HS 코드 DB, 해외/통관 서비스, `CargoYongdalDispatchEngine` | HS 코드 DB, 통관/수입 대행 조회, 관세사 보정 화면, FCL/LCL 판단, 수입 예정 수요 확인, 통관 데이터 공개/결제 정책 | 알뜰살뜰 마트 즉시배송 실운영 |
-| `2.5` | 주문자 집단 기반 공동 주문과 FCL/대량 입고 | `OrdererApp`, `ShipperApp`, `WarehouseManagerApp`, 공동 주문 서비스 | 도로명주소/Kakao 지역 2단계 주문자 집단 구성, 공동주택/생활권 하위 식별, 주문자 공동 주문 모집, 화주 대량 구매 공개, FCL 가능 조건 계산, 집단 대표 입고, 동/수령 지점별 분류/배분 | 알뜰살뜰 마트 즉시배송 실운영, 관리사무소 공식 승인 자동화 |
+| `2.5` | 주문자 집단 기반 공동 주문과 FCL/대량 입고 | `OrdererApp`, `HongdalApp`, `WarehouseManagerApp`, 공동 주문 서비스 | 도로명주소/Kakao 지역 2단계 주문자 집단 구성, 공동주택/생활권 하위 식별, 주문자 공동 주문 모집, 화주 대량 구매 공개, FCL 가능 조건 계산, 집단 대표 입고, 동/수령 지점별 분류/배분 | 알뜰살뜰 마트 즉시배송 실운영, 관리사무소 공식 승인 자동화 |
 | `3.0` | 음식점 일반 음식 배달 운영 | `OrdererApp`, `RestaurantDeskApp`, `FoodDeliveryDispatchEngine`, `FDriverApp` | 음식점 주문, 조리/픽업 상태, 음식 배달 기사 배차, 고객 배송 완료, 묶음 배달 | 알뜰살뜰 마트 도심 즉시배송, 창고형 피킹/포장 배송 |
 | `3.5` | 알뜰살뜰 마트와 도심 즉시배송 운영 | `WarehouseManagerApp`, `OrdererApp`, `FoodDeliveryDispatchEngine`, `FDriverApp` | 알뜰살뜰 마트 주문, 도심 재고 보충, 피킹/포장, 음식 배달 기사 픽업, 묶음 배달, 도심 마트 커뮤니티 운영 | 1.0 핵심 운송 흐름을 흔드는 대규모 구조 변경 |
 
@@ -165,7 +165,7 @@ flowchart TD
 | `Hongdal.BackOffice.Client` | 백오피스 클라이언트 계층 | `net10.0` |
 | `Hongdal.FoodApi` | 음식 도메인 호환 API 영역(메인 `Hongdal` 서버로 이관 중) | `net10.0` |
 | `DriverApp` | 기사 앱 (.NET MAUI Android) | `net10.0-android` |
-| `ShipperApp` | 화주/판매자 앱 (.NET MAUI Android) | `net10.0-android` |
+| `HongdalApp` | 화주/판매자 앱 (.NET MAUI Android) | `net10.0-android` |
 | `WarehouseManagerApp` | 창고 현장 앱 (.NET MAUI Android) | `net10.0-android` |
 | `HumanResourcesManagerApp` | 인력 관리자 앱 (.NET MAUI Windows) | `net10.0-windows10.0.19041.0` |
 
@@ -185,7 +185,7 @@ flowchart TD
 ## 최근 반영 관점
 
 - DriverApp: 지도 중심 홈 + 배차/운행 흐름 집중
-- ShipperApp: 화주/판매자 운영 허브 역할 유지
+- HongdalApp: 화주/판매자 운영 허브 역할 유지
 - WarehouseManagerApp: 입고/출고/포장/스캔 현장 공정 분리
 - HR/권한: 역할 + 근무시간 + 작업장 IP 기준 강화
 - Admin: Command 기능 설정, Event 후속처리, 알림/정산/노출 정책 제어

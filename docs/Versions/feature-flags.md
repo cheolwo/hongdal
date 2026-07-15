@@ -83,7 +83,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
 ## 클라이언트 샘플 데이터 정책
 
-DriverApp과 ShipperApp은 `ClientDataMode` 옵션으로 서버 데이터 호출 실패 시 샘플 데이터를 사용할지 결정합니다.
+DriverApp과 HongdalApp은 `ClientDataMode` 옵션으로 서버 데이터 호출 실패 시 샘플 데이터를 사용할지 결정합니다.
 
 ```json
 {

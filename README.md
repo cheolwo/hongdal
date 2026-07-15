@@ -61,7 +61,7 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
       화물 운송, 창고, 음식, 마트, 공동주문 원장 단위로 노드를 고릅니다.
     </td>
     <td width="50%">
-      <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료" width="100%">
+      <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료" width="100%">
       <br>
       <b>홈 테마 상점과 FakePG</b><br>
       태극 패키지를 구매하고 전체 테마 적용 여부를 직접 선택합니다.
@@ -74,16 +74,16 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
 <table>
   <tr>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10/">
-        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10.png" alt="홈 테마 꾸미기 상점" width="100%">
+      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10/">
+        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10.png" alt="홈 테마 꾸미기 상점" width="100%">
       </a>
       <br>
       <b>1. 홈 테마 탐색</b><br>
       플랫폼 기본, 크리에이터, 내 보유 상품을 화면 단위로 살펴봅니다.
     </td>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-1/">
-        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-1.png" alt="홈 테마 상품 상세" width="100%">
+      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-1/">
+        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-1.png" alt="홈 테마 상품 상세" width="100%">
       </a>
       <br>
       <b>2. 테마 상세와 슬롯 확인</b><br>
@@ -92,16 +92,16 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
   </tr>
   <tr>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-4/">
-        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-4.png" alt="디자이너 홈 테마 등록" width="100%">
+      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-4/">
+        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-4.png" alt="디자이너 홈 테마 등록" width="100%">
       </a>
       <br>
       <b>3. 디자이너 패키지 등록</b><br>
       방편, 반야, 커뮤니티, 상점, 간괘와 테두리를 하나의 패키지로 만듭니다.
     </td>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-2/">
-        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-2.png" alt="홈 테마 FakePG 결제" width="100%">
+      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-2/">
+        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-2.png" alt="홈 테마 FakePG 결제" width="100%">
       </a>
       <br>
       <b>4. 개발용 구매 확인</b><br>
@@ -110,8 +110,8 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
   </tr>
   <tr>
     <td colspan="2" align="center">
-      <a href="docs/ProjectOverview/page-docs/ShipperApp/ShipperApp-P10-2-1/">
-        <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P10-2-1.png" alt="홈 테마 구매 완료와 적용 선택" width="50%">
+      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-2-1/">
+        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="홈 테마 구매 완료와 적용 선택" width="50%">
       </a>
       <br>
       <b>5. 구매 완료와 명시적 적용</b><br>
@@ -143,7 +143,7 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
       <br><b>기사 추천 상세</b>
     </td>
     <td width="33%">
-      <img src="docs/ProjectOverview/assets/app-pages/ShipperApp/ShipperApp-P03.png" alt="화주 의뢰 상세" width="100%">
+      <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P03.png" alt="화주 의뢰 상세" width="100%">
       <br><b>화주 의뢰 상세</b>
     </td>
   </tr>
@@ -175,7 +175,7 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
 
 | 코드 프로젝트 | 먼저 보는 화면 |
 | --- | --- |
-| `ShipperApp` | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점 |
+| `HongdalApp` | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점 |
 | `DriverApp` | 운행 시작, 지도 홈, 추천, 상차/하차 증빙, 정산 |
 | `HongdalAdmin` | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
 | `WarehouseManagerApp` | 창고 작업 보드, 입고, 스캔, 피킹 배치, 마트 피킹/포장 |

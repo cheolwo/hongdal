@@ -6,7 +6,7 @@
 
 | 책임 | 위치 |
 | --- | --- |
-| 역할에 맞는 홈 선택 | `ShipperApp/Components/Pages/UnifiedHome.razor` |
+| 역할에 맞는 홈 선택 | `HongdalApp/Components/Pages/UnifiedHome.razor` |
 | 화주·창고 관리자 업무 콘텐츠 구성 | 각 역할 홈의 `WorkModeContent` |
 | 게시판·글쓰기·원장 다이어그램 UI | `PlatformCommunityHome` |
 | 실제 운송·창고·판매 처리 | 목적별 업무 페이지와 API |

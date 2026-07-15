@@ -10,7 +10,7 @@
 
 | 화주 의뢰 상세 | 기사 지도 홈 |
 | --- | --- |
-| <img src="assets/app-pages/ShipperApp/ShipperApp-P03.png" alt="화주 의뢰 상세 화면" width="260"> | <img src="assets/app-pages/DriverApp/DriverApp-P07.png" alt="기사 지도 홈 화면" width="260"> |
+| <img src="assets/app-pages/HongdalApp/HongdalApp-P03.png" alt="화주 의뢰 상세 화면" width="260"> | <img src="assets/app-pages/DriverApp/DriverApp-P07.png" alt="기사 지도 홈 화면" width="260"> |
 
 | 기사 추천 상세 | 기사 상하차 증빙 |
 | --- | --- |
@@ -22,7 +22,7 @@
 
 ### 새 통합 클라이언트
 
-<img src="assets/app-pages/ShipperApp/ShipperApp-P00.png" alt="역할 기반 통합 커뮤니티 홈" width="360">
+<img src="assets/app-pages/HongdalApp/HongdalApp-P00.png" alt="역할 기반 통합 커뮤니티 홈" width="360">
 
 [통합 커뮤니티 클라이언트와 꾸미기 상점](unified-community-client.md)에서 역할 전환, 모바일 세로 다이어그램, 후천 사방 이동판, 꾸미기 구매·제작 흐름을 확인합니다. 화면을 구성하는 상위 원칙은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)에 둡니다.
 
