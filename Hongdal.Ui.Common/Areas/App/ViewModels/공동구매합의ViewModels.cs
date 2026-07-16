@@ -52,10 +52,10 @@ public sealed partial class 공동구매모집마감ViewModel(
                     ?? throw new InvalidOperationException("공동구매 모집 마감 응답이 비어 있습니다.");
 
                 화면상태.공동구매갱신(updated);
-                화면상태.단계선택(공동구매절차코드.확정안);
+                화면상태.단계진행(공동구매절차코드.거래상대연결);
                 이의검토완료 = false;
             },
-            "수요 모집을 마감했습니다. 이제 확정안 결의문을 만들 수 있습니다.",
+            "수요 모집을 마감했습니다. 이제 거래 상대를 연결하고 공급 조건을 협의할 수 있습니다.",
             cancellationToken);
     }
 }
@@ -141,6 +141,7 @@ public sealed partial class 공동구매결의ViewModel : 공동구매작업View
                 campaign.ResolutionDocument = document;
                 campaign.Status = CommunityVoteStatusCodes.ResolutionDrafted;
                 _화면상태.공동구매갱신(campaign);
+                _화면상태.단계진행(공동구매절차코드.확정안);
             },
             "현재 참여자를 서명 대상으로 포함한 결의문 초안을 만들었습니다.",
             cancellationToken);
@@ -181,7 +182,7 @@ public sealed partial class 공동구매결의ViewModel : 공동구매작업View
 
                 campaign.ResolutionDocument = document;
                 _화면상태.공동구매갱신(campaign);
-                _화면상태.단계선택(공동구매절차코드.전자서명);
+                _화면상태.단계진행(공동구매절차코드.전자서명);
             },
             "검토를 완료하고 전자서명을 받을 수 있는 상태로 전환했습니다.",
             cancellationToken);
@@ -220,6 +221,9 @@ public sealed partial class 공동구매결의ViewModel : 공동구매작업View
             $"참여자: {campaign.TotalVoteCount}명",
             $"총 요청 수량: {campaign.GroupPurchase?.TotalRequestedQuantity ?? 0}{campaign.GroupPurchase?.QuantityUnit}",
             $"수령 범위: {campaign.GroupPurchase?.ServiceAreaLabel}",
+            string.IsNullOrWhiteSpace(campaign.GroupPurchase?.ProposalOriginLegalEffectNotice)
+                ? CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice
+                : campaign.GroupPurchase!.ProposalOriginLegalEffectNotice,
             "접수된 이의와 운영 조건을 검토했으며, 필수 구성원 전자서명 완료 후 구매와 물류 절차를 시작합니다.");
 }
 
@@ -345,8 +349,8 @@ public sealed partial class 공동구매전자서명ViewModel : 공동구매작�
 
                 campaign.ResolutionDocument = document;
                 _화면상태.공동구매갱신(campaign);
-                _화면상태.단계선택(document.Status == CommunityVoteResolutionStatusCodes.Signed
-                    ? 공동구매절차코드.실행
+                _화면상태.단계진행(document.Status == CommunityVoteResolutionStatusCodes.Signed
+                    ? 공동구매절차코드.이행계획
                     : 공동구매절차코드.전자서명);
                 입력초기화();
             },
@@ -388,8 +392,8 @@ public sealed partial class 공동구매전자서명ViewModel : 공동구매작�
 }
 
 /// <summary>
-/// 서버 상태를 사용자에게 보여 줄 여섯 단계로 투영합니다.
-/// 역할 관점이나 UI 선택 상태가 실제 업무 완료 상태를 바꾸지는 않습니다.
+/// 서버 상태와 실제 진행 단계를 사용자에게 보여 줄 업무 절차로 투영합니다.
+/// 화면에서 단계를 선택해도 진행 단계는 바뀌지 않습니다.
 /// </summary>
 public sealed class 공동구매절차상태ViewModel : ObservableObject, IDisposable
 {
@@ -447,32 +451,23 @@ public sealed class 공동구매절차상태ViewModel : ObservableObject, IDispo
             return 공동구매절차단계상태.대기;
         }
 
-        var resolution = campaign.ResolutionDocument;
-        return stageCode switch
+        var target = 공동구매절차카탈로그.찾기(stageCode)
+            ?? throw new ArgumentException(
+                $"알 수 없는 공동구매 절차 코드입니다: {stageCode}",
+                nameof(stageCode));
+        var progress = 공동구매절차카탈로그.찾기(_화면상태.진행단계코드)
+            ?? 공동구매절차카탈로그.전체[0];
+
+        if (stageCode == 공동구매절차코드.제안)
         {
-            공동구매절차코드.제안 => 공동구매절차단계상태.완료,
-            공동구매절차코드.수요모집 => campaign.Status == CommunityVoteStatusCodes.Open
+            return 공동구매절차단계상태.완료;
+        }
+
+        return target.순서 < progress.순서
+            ? 공동구매절차단계상태.완료
+            : target.순서 == progress.순서
                 ? 공동구매절차단계상태.진행중
-                : 공동구매절차단계상태.완료,
-            공동구매절차코드.이의검토 => campaign.Status == CommunityVoteStatusCodes.Open
-                ? 공동구매절차단계상태.진행중
-                : 공동구매절차단계상태.완료,
-            공동구매절차코드.확정안 => resolution is null
-                ? campaign.Status == CommunityVoteStatusCodes.Open
-                    ? 공동구매절차단계상태.대기
-                    : 공동구매절차단계상태.진행중
-                : 공동구매절차단계상태.완료,
-            공동구매절차코드.전자서명 => resolution?.Status == CommunityVoteResolutionStatusCodes.Signed
-                ? 공동구매절차단계상태.완료
-                : resolution?.Status is CommunityVoteResolutionStatusCodes.ReadyToSign
-                    or CommunityVoteResolutionStatusCodes.PartiallySigned
-                    ? 공동구매절차단계상태.진행중
-                    : 공동구매절차단계상태.대기,
-            공동구매절차코드.실행 => resolution?.Status == CommunityVoteResolutionStatusCodes.Signed
-                ? 공동구매절차단계상태.진행중
-                : 공동구매절차단계상태.대기,
-            _ => throw new ArgumentException($"알 수 없는 공동구매 절차 코드입니다: {stageCode}", nameof(stageCode))
-        };
+                : 공동구매절차단계상태.대기;
     }
 
     public void Dispose()

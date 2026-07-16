@@ -176,6 +176,10 @@ public partial class CommunityGroupImportHsSelectionWorkspace
                     .ToArray(),
                 GroupPurchase = new CommunityGroupPurchaseVoteSettingsRequest
                 {
+                    SellerCountryCode = marketCountryCode,
+                    ShipFromCountryCode = marketCountryCode,
+                    DeliveryCountryCode = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                    CustomsClearanceStatusCode = CommunityGroupPurchaseCustomsClearanceStatusCodes.NotCleared,
                     ParticipationPolicyCode = CommunityVoteParticipationPolicyCodes.Hybrid,
                     HsCode = selectedCandidates.Count == 1 ? selectedCandidates[0].HsCode : string.Empty,
                     TemperatureCode = "상온",

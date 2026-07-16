@@ -5,22 +5,50 @@ using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
+public static class 공동구매거래경로필터코드
+{
+    public const string 전체 = "all";
+    public const string 국내공동구매 = "domestic";
+    public const string 공동수입 = "group-import";
+}
+
 /// <summary>
 /// 공동구매 목록과 선택된 공동구매의 상세·의견을 함께 불러옵니다.
 /// </summary>
-public sealed class 공동구매목록ViewModel(
+public sealed partial class 공동구매목록ViewModel(
     I공동구매업무Service service,
     공동구매화면상태ViewModel 화면상태) : 공동구매작업ViewModelBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HS코드조회적용중))]
+    public partial string 조회HS코드 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 거래경로필터 { get; set; } = 공동구매거래경로필터코드.전체;
+
+    public bool HS코드조회적용중 => !string.IsNullOrWhiteSpace(조회HS코드);
+
     public async Task<bool> 목록조회Async(
         string? communityScope = null,
         CancellationToken cancellationToken = default)
-        => await 작업실행Async(
+    {
+        var normalizedHsCode = HS코드정규화(조회HS코드);
+        if (HS코드조회적용중 && normalizedHsCode is null)
+        {
+            return 유효성실패("HS 코드는 구분기호를 제외한 2~10자리 숫자로 입력해 주세요.");
+        }
+
+        return await 작업실행Async(
             async token =>
             {
-                var response = await service.목록조회Async(communityScope, token);
+                var response = await service.목록조회Async(
+                    communityScope,
+                    normalizedHsCode,
+                    token);
                 var campaigns = response.Items
-                    .Where(campaign => !CommunityVoteWorkflowClassifier.IsGroupImport(campaign))
+                    .Where(campaign => normalizedHsCode is null
+                        || HS코드일치(campaign, normalizedHsCode))
+                    .Where(거래경로일치)
                     .OrderByDescending(campaign => campaign.CreatedAtUtc)
                     .ToArray();
                 var previousId = 화면상태.선택된공동구매Id;
@@ -36,9 +64,50 @@ public sealed class 공동구매목록ViewModel(
                     ?? campaigns[0];
                 await LoadSelectionAsync(target.Id, token);
             },
-            "공동구매 목록을 불러왔습니다.",
+            normalizedHsCode is null
+                ? "공동구매 목록을 불러왔습니다."
+                : $"HS 코드 {normalizedHsCode} 공동구매 목록을 불러왔습니다.",
             cancellationToken,
             ex => $"공동구매 목록을 불러오지 못했습니다. 로그인 상태를 확인해 주세요. {ex.Message}");
+    }
+
+    public Task<bool> HS코드별목록조회Async(
+        string hsCode,
+        string? communityScope = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(hsCode))
+        {
+            return Task.FromResult(유효성실패("조회할 HS 코드를 입력해 주세요."));
+        }
+
+        조회HS코드 = hsCode.Trim();
+        return 목록조회Async(communityScope, cancellationToken);
+    }
+
+    public Task<bool> HS코드필터해제후조회Async(
+        string? communityScope = null,
+        CancellationToken cancellationToken = default)
+    {
+        조회HS코드 = string.Empty;
+        return 목록조회Async(communityScope, cancellationToken);
+    }
+
+    public Task<bool> 거래경로별목록조회Async(
+        string routeFilterCode,
+        string? communityScope = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (routeFilterCode is not 공동구매거래경로필터코드.전체
+            and not 공동구매거래경로필터코드.국내공동구매
+            and not 공동구매거래경로필터코드.공동수입)
+        {
+            return Task.FromResult(유효성실패("지원하는 공동구매 거래경로 필터를 선택해 주세요."));
+        }
+
+        거래경로필터 = routeFilterCode;
+        return 목록조회Async(communityScope, cancellationToken);
+    }
 
     public async Task<bool> 선택Async(
         Guid voteId,
@@ -66,16 +135,90 @@ public sealed class 공동구매목록ViewModel(
 
         화면상태.선택적용(campaign, comments);
     }
+
+    private static string? HS코드정규화(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = new string(value.Where(char.IsDigit).ToArray());
+        return normalized.Length is >= 2 and <= 10 ? normalized : null;
+    }
+
+    private static bool HS코드일치(CommunityVoteResponse campaign, string normalizedPrefix)
+        => HS코드접두일치(campaign.GroupPurchase?.HsCode, normalizedPrefix)
+           || campaign.Options.Any(option => HS코드접두일치(option.HsCode, normalizedPrefix));
+
+    private static bool HS코드접두일치(string? value, string normalizedPrefix)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        var normalized = new string(value.Where(char.IsDigit).ToArray());
+        return normalized.StartsWith(normalizedPrefix, StringComparison.Ordinal);
+    }
+
+    private bool 거래경로일치(CommunityVoteResponse campaign)
+        => 거래경로필터 switch
+        {
+            공동구매거래경로필터코드.국내공동구매
+                => !CommunityVoteWorkflowClassifier.IsGroupImport(campaign),
+            공동구매거래경로필터코드.공동수입
+                => CommunityVoteWorkflowClassifier.IsGroupImport(campaign),
+            _ => true
+        };
 }
+
+public sealed record 공동구매제안주체항목(
+    string 코드,
+    string 이름,
+    string 안내);
 
 /// <summary>
 /// 제안 게시글과 수요 투표를 하나의 사용자 작업으로 묶습니다.
 /// 두 번째 API가 실패하면 생성된 게시글 번호를 남겨 운영자가 복구할 수 있습니다.
 /// </summary>
-public sealed partial class 공동구매제안ViewModel(
-    I공동구매업무Service service,
-    공동구매화면상태ViewModel 화면상태) : 공동구매작업ViewModelBase
+public sealed partial class 공동구매제안ViewModel : 공동구매작업ViewModelBase, IDisposable
 {
+    private readonly I공동구매업무Service _service;
+    private readonly 공동구매화면상태ViewModel _화면상태;
+
+    public 공동구매제안ViewModel(
+        I공동구매업무Service service,
+        공동구매화면상태ViewModel 화면상태,
+        공동수입전환준비ViewModel 공동수입전환,
+        공동구매가격의사결정ViewModel 가격의사결정)
+    {
+        _service = service;
+        _화면상태 = 화면상태;
+        this.공동수입전환 = 공동수입전환;
+        this.가격의사결정 = 가격의사결정;
+        this.공동수입전환.PropertyChanged += 하위ViewModel변경;
+        this.가격의사결정.PropertyChanged += 하위ViewModel변경;
+    }
+
+    private static readonly IReadOnlyList<공동구매제안주체항목> 제안주체카탈로그 =
+    [
+        new(
+            CommunityGroupPurchaseProposerRoleCodes.Producer,
+            "생산자",
+            "생산 가능 물량과 출하 조건을 바탕으로 생산자가 먼저 공동구매를 제안합니다."),
+        new(
+            CommunityGroupPurchaseProposerRoleCodes.GroupPurchaseRepresentative,
+            "공동구매 대표",
+            "지역·공동체의 구매 수요와 수령 조건을 바탕으로 공동구매 대표가 제안합니다.")
+    ];
+
+    public 공동수입전환준비ViewModel 공동수입전환 { get; }
+
+    public 공동구매가격의사결정ViewModel 가격의사결정 { get; }
+
+    public 공동구매거래경로판정ViewModel 거래경로 => 공동수입전환.거래경로;
+
     [ObservableProperty]
     public partial string 앱키 { get; set; } = "shipper";
 
@@ -87,6 +230,12 @@ public sealed partial class 공동구매제안ViewModel(
 
     [ObservableProperty]
     public partial string 제안자표시명 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(선택된제안주체명))]
+    [NotifyPropertyChangedFor(nameof(선택된제안주체안내))]
+    public partial string 제안주체코드 { get; set; }
+        = CommunityGroupPurchaseProposerRoleCodes.GroupPurchaseRepresentative;
 
     [ObservableProperty]
     public partial string 게시글비밀번호 { get; set; } = string.Empty;
@@ -140,6 +289,12 @@ public sealed partial class 공동구매제안ViewModel(
 
     public bool 제안글만생성됨 => 생성된게시글 is not null && 생성된공동구매 is null;
     public long? 복구할게시글Id => 제안글만생성됨 ? 생성된게시글?.Id : null;
+    public IReadOnlyList<공동구매제안주체항목> 제안주체목록 => 제안주체카탈로그;
+    public string 선택된제안주체명 => 선택된제안주체?.이름 ?? "제안 주체 미지정";
+    public string 선택된제안주체안내 => 선택된제안주체?.안내 ?? string.Empty;
+
+    private 공동구매제안주체항목? 선택된제안주체
+        => 제안주체카탈로그.FirstOrDefault(item => item.코드 == 제안주체코드);
 
     public async Task<bool> 등록Async(CancellationToken cancellationToken = default)
     {
@@ -155,19 +310,21 @@ public sealed partial class 공동구매제안ViewModel(
         return await 작업실행Async(
             async token =>
             {
-                생성된게시글 = await service.제안글생성Async(제안글요청생성(), token)
+                생성된게시글 = await _service.제안글생성Async(제안글요청생성(), token)
                     ?? throw new InvalidOperationException("제안 글 생성 응답이 비어 있습니다.");
                 OnPropertyChanged(nameof(복구할게시글Id));
 
-                생성된공동구매 = await service.공동구매생성Async(
+                생성된공동구매 = await _service.공동구매생성Async(
                     공동구매요청생성(생성된게시글.Id),
                     token)
                     ?? throw new InvalidOperationException("공동구매 수요 투표 생성 응답이 비어 있습니다.");
 
-                화면상태.새공동구매적용(생성된공동구매);
+                _화면상태.새공동구매적용(생성된공동구매);
                 OnPropertyChanged(nameof(복구할게시글Id));
             },
-            "제안 글과 공동구매 수요 투표를 만들었습니다.",
+            거래경로.공동수입후보
+                ? "제안 글과 공동수입 후보 수요 투표를 만들었습니다. 계약 확정 전 HS 코드와 통관 정보를 확인해 주세요."
+                : "제안 글과 공동구매 수요 투표를 만들었습니다.",
             cancellationToken,
             ex => 생성된게시글 is null
                 ? $"공동구매 제안을 만들지 못했습니다. {ex.Message}"
@@ -176,6 +333,24 @@ public sealed partial class 공동구매제안ViewModel(
 
     private bool 입력검증()
     {
+        if (!CommunityGroupPurchaseProposerRoleCodes.IsSupported(제안주체코드))
+        {
+            return 유효성실패("공동구매 제안 주체를 생산자 또는 공동구매 대표 중에서 선택해 주세요.");
+        }
+
+        if (!거래경로.입력유효)
+        {
+            return 유효성실패(
+                거래경로.입력오류메시지
+                ?? "상품의 출발국가와 최종 배송국가를 확인해 주세요.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(공동수입전환.HS코드)
+            && !공동수입전환.HS코드유효)
+        {
+            return 유효성실패("HS 코드는 구분기호를 제외한 2~10자리 숫자로 입력해 주세요.");
+        }
+
         if (string.IsNullOrWhiteSpace(제목)
             || string.IsNullOrWhiteSpace(상품명)
             || string.IsNullOrWhiteSpace(제안자표시명)
@@ -192,6 +367,13 @@ public sealed partial class 공동구매제안ViewModel(
             return 유효성실패("수량 단위, 최소 참여자·수량과 모집 기간을 올바르게 입력해 주세요.");
         }
 
+        if (가격의사결정.제안가격Krw < 0
+            || 가격의사결정.제안가격Krw > 0
+            && 가격의사결정.가격기준중량Kg <= 0)
+        {
+            return 유효성실패("가격 비교를 사용하려면 제안가격은 0원 이상, 가격 기준 중량은 0kg보다 크게 입력해 주세요.");
+        }
+
         if (string.IsNullOrWhiteSpace(수령소명) != string.IsNullOrWhiteSpace(수령소주소))
         {
             return 유효성실패("공동 수령소를 지정하려면 수령소 이름과 주소를 모두 입력해 주세요.");
@@ -206,7 +388,7 @@ public sealed partial class 공동구매제안ViewModel(
             AppKey = string.IsNullOrWhiteSpace(앱키) ? "platform" : 앱키.Trim(),
             Category = "공동구매",
             WorkflowTag = "공동 구매",
-            RoleTag = "구매 참여자",
+            RoleTag = 선택된제안주체명,
             Title = 제목.Trim(),
             Body = 제안글본문생성(),
             Nickname = 제안자표시명.Trim(),
@@ -231,40 +413,49 @@ public sealed partial class 공동구매제안ViewModel(
                 }
             ];
 
+        var option = new CommunityVoteOptionCreateRequest
+        {
+            Text = 상품명.Trim(),
+            ProductKey = string.IsNullOrWhiteSpace(상품키)
+                ? $"community-product:{postId}"
+                : 상품키.Trim(),
+            QuantityUnit = 수량단위.Trim(),
+            TemperatureCode = 온도코드.Trim(),
+            LogisticsMode = 물류방식.Trim()
+        };
+        var groupPurchase = new CommunityGroupPurchaseVoteSettingsRequest
+        {
+            ProposerRoleCode = 제안주체코드,
+            ParticipationPolicyCode = 참여정책코드,
+            QuantityUnit = 수량단위.Trim(),
+            TargetUnitPriceKrwPerKg = 가격의사결정.제안단가KrwPerKg,
+            ServiceAreaKey = scope,
+            ServiceAreaLabel = scope,
+            RadiusMeters = 반경미터,
+            MinimumParticipantCount = 최소참여자수,
+            MinimumTotalQuantity = 최소총수량,
+            PickupPoints = pickupPoints
+        };
+        공동수입전환.요청에적용(groupPurchase, option);
+        if (string.IsNullOrWhiteSpace(groupPurchase.HsCode)
+            && 가격의사결정.적용HS코드.Length is >= 4 and <= 10)
+        {
+            groupPurchase.HsCode = 가격의사결정.적용HS코드;
+            option.HsCode = 가격의사결정.적용HS코드;
+        }
+
         return new CommunityVoteCreateRequest
         {
             CommunityScope = scope,
             Title = 제목.Trim(),
             Description = 설명.Trim(),
             SourcePostId = postId,
-            StructuredOptions =
-            [
-                new CommunityVoteOptionCreateRequest
-                {
-                    Text = 상품명.Trim(),
-                    ProductKey = string.IsNullOrWhiteSpace(상품키)
-                        ? $"community-product:{postId}"
-                        : 상품키.Trim(),
-                    QuantityUnit = 수량단위.Trim(),
-                    TemperatureCode = 온도코드.Trim(),
-                    LogisticsMode = 물류방식.Trim()
-                }
-            ],
+            StructuredOptions = [option],
             ResolutionDocumentEnabled = true,
             SignatureRequired = true,
             ClosesAtUtc = DateTime.UtcNow.AddDays(모집기간일수),
             CreatedByDisplayName = 제안자표시명.Trim(),
-            GroupPurchase = new CommunityGroupPurchaseVoteSettingsRequest
-            {
-                ParticipationPolicyCode = 참여정책코드,
-                QuantityUnit = 수량단위.Trim(),
-                ServiceAreaKey = scope,
-                ServiceAreaLabel = scope,
-                RadiusMeters = 반경미터,
-                MinimumParticipantCount = 최소참여자수,
-                MinimumTotalQuantity = 최소총수량,
-                PickupPoints = pickupPoints
-            }
+            GroupPurchase = groupPurchase
         };
     }
 
@@ -273,13 +464,36 @@ public sealed partial class 공동구매제안ViewModel(
             Environment.NewLine,
             설명.Trim(),
             string.Empty,
+            $"제안 주체: {선택된제안주체명} ({제안주체코드})",
             $"상품: {상품명.Trim()}",
             $"최소 참여: {최소참여자수}명",
             $"최소 수량: {최소총수량}{수량단위.Trim()}",
+            가격의사결정.제안단가KrwPerKg is > 0
+                ? $"목표 단가: {가격의사결정.제안단가KrwPerKg.Value:N0}원/kg"
+                : "목표 단가: 아직 입력하지 않음",
             $"참여 범위: {(string.IsNullOrWhiteSpace(커뮤니티범위) ? "platform" : 커뮤니티범위.Trim())}",
+            $"거래 경로: {거래경로.판정명} ({거래경로.거래경로코드})",
+            $"판매자 국가: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(거래경로.판매자국가코드)}",
+            $"상품 이동: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(거래경로.상품출발국가코드)} -> {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(거래경로.최종배송국가코드)}",
+            $"국내 통관 상태: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCustomsClearanceStatusCode(거래경로.국내통관상태코드)}",
+            $"계약 합의 정책: {CommunityGroupPurchaseAgreementPolicy.PolicyCode}",
+            CommunityGroupPurchaseAgreementPolicy.ProposalOriginNotice,
+            거래경로.공동수입후보
+                ? CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice
+                : string.Empty,
             string.IsNullOrWhiteSpace(수령소명)
                 ? "공동 수령소: 지정하지 않음"
                 : $"공동 수령소: {수령소명.Trim()} · {수령소주소.Trim()}");
+
+    public void Dispose()
+    {
+        공동수입전환.PropertyChanged -= 하위ViewModel변경;
+        가격의사결정.PropertyChanged -= 하위ViewModel변경;
+        GC.SuppressFinalize(this);
+    }
+
+    private void 하위ViewModel변경(object? sender, PropertyChangedEventArgs e)
+        => OnPropertyChanged(string.Empty);
 }
 
 public sealed partial class 공동구매수요참여ViewModel : 공동구매작업ViewModelBase, IDisposable
@@ -495,6 +709,8 @@ public sealed class 공동구매모집기능ViewModel : 조립ViewModelBase
 
     public 공동구매목록ViewModel 목록 { get; }
     public 공동구매제안ViewModel 제안 { get; }
+    public 공동수입전환준비ViewModel 공동수입전환 => 제안.공동수입전환;
+    public 공동구매가격의사결정ViewModel 가격의사결정 => 제안.가격의사결정;
     public 공동구매수요참여ViewModel 수요참여 { get; }
     public 공동구매이의검토ViewModel 이의검토 { get; }
 

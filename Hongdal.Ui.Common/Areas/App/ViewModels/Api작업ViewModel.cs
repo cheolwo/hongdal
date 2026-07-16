@@ -200,13 +200,19 @@ public sealed partial class Api작업ViewModel<TParameter, TResult> : Observable
 public abstract class 조립ViewModelBase : ObservableObject, IDisposable
 {
     private readonly HashSet<INotifyPropertyChanged> _children = [];
+    private readonly HashSet<IDisposable> _ownedDisposables = [];
 
-    protected T 하위ViewModel등록<T>(T child)
+    protected T 하위ViewModel등록<T>(T child, bool 수명소유 = true)
         where T : class, INotifyPropertyChanged
     {
         if (_children.Add(child))
         {
             child.PropertyChanged += 하위ViewModel변경;
+        }
+
+        if (수명소유 && child is IDisposable disposable)
+        {
+            _ownedDisposables.Add(disposable);
         }
 
         return child;
@@ -217,13 +223,15 @@ public abstract class 조립ViewModelBase : ObservableObject, IDisposable
         foreach (var child in _children)
         {
             child.PropertyChanged -= 하위ViewModel변경;
-            if (child is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+        }
+
+        foreach (var disposable in _ownedDisposables)
+        {
+            disposable.Dispose();
         }
 
         _children.Clear();
+        _ownedDisposables.Clear();
         GC.SuppressFinalize(this);
     }
 

@@ -84,12 +84,20 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(공동구매실행Service)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매가격의사결정Service)
+            && x.ImplementationType == typeof(공동구매가격의사결정Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매화면상태ViewModel)
             && x.ImplementationType == typeof(공동구매화면상태ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매실행상태ViewModel)
             && x.ImplementationType == typeof(공동구매실행상태ViewModel)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매가격의사결정ViewModel)
+            && x.ImplementationType == typeof(공동구매가격의사결정ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매실행기능ViewModel)

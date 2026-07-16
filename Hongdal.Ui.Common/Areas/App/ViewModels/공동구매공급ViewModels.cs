@@ -9,14 +9,17 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
 {
     private readonly I공동구매공급Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
+    private readonly 공동구매거래경로분기ViewModel _분기;
     private Guid? _대상공동구매Id;
 
     public 공동구매생산자연결ViewModel(
         I공동구매공급Service service,
-        공동구매화면상태ViewModel 화면상태)
+        공동구매화면상태ViewModel 화면상태,
+        공동구매거래경로분기ViewModel 분기)
     {
         _service = service;
         _화면상태 = 화면상태;
+        _분기 = 분기;
         _화면상태.PropertyChanged += 화면상태변경;
         공동구매변경동기화();
     }
@@ -47,6 +50,11 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
 
     public async Task<bool> 후보조회Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("생산자 후보 조회는 국내 공동구매 분기에서만 사용할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null)
         {
@@ -110,6 +118,11 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
 
     public async Task<bool> 연락요청저장Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("생산자 연락 요청은 국내 공동구매 분기에서만 저장할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null || 선택된생산자 is null)
         {
@@ -145,6 +158,7 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
                     연락요청초안,
                     token)
                     ?? throw new InvalidOperationException("생산자 연락 요청 초안 응답이 비어 있습니다.");
+                _화면상태.단계도달(공동구매절차코드.공급조건협상);
             },
             "생산자 연락 요청 초안을 저장했습니다.",
             cancellationToken);
@@ -185,14 +199,17 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
 {
     private readonly I공동구매공급Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
+    private readonly 공동구매거래경로분기ViewModel _분기;
     private Guid? _대상공동구매Id;
 
     public 공동구매공급제안ViewModel(
         I공동구매공급Service service,
-        공동구매화면상태ViewModel 화면상태)
+        공동구매화면상태ViewModel 화면상태,
+        공동구매거래경로분기ViewModel 분기)
     {
         _service = service;
         _화면상태 = 화면상태;
+        _분기 = 분기;
         _화면상태.PropertyChanged += 화면상태변경;
         공동구매변경동기화();
     }
@@ -223,6 +240,11 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
 
     public async Task<bool> 대표조회Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("공동구매 대표 후보 조회는 국내 공동구매 분기에서만 사용할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null)
         {
@@ -289,6 +311,11 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
 
     public async Task<bool> 공급제안저장Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 생산자 공급 제안은 국내 공동구매 분기에서만 저장할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null || 선택된대표 is null)
         {
@@ -330,6 +357,7 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
                     공급제안초안,
                     token)
                     ?? throw new InvalidOperationException("생산자 공급 제안 초안 응답이 비어 있습니다.");
+                _화면상태.단계도달(공동구매절차코드.공급조건협상);
             },
             "생산자 공급 제안 초안을 저장했습니다.",
             cancellationToken);
@@ -368,7 +396,8 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
 
 public sealed partial class 공동구매공급적합성ViewModel(
     I공동구매공급Service service,
-    공동구매화면상태ViewModel 화면상태) : 공동구매작업ViewModelBase
+    공동구매화면상태ViewModel 화면상태,
+    공동구매거래경로분기ViewModel 분기) : 공동구매작업ViewModelBase
 {
     [ObservableProperty]
     public partial DomesticGroupPurchaseSupplyCompatibilityPreviewRequest 조건 { get; set; } = new()
@@ -392,6 +421,11 @@ public sealed partial class 공동구매공급적합성ViewModel(
 
     public async Task<bool> 미리보기Async(CancellationToken cancellationToken = default)
     {
+        if (!분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 공급 적합성 판정은 국내 공동구매 분기에서만 사용할 수 있습니다.");
+        }
+
         var campaignId = 화면상태.선택된공동구매Id;
         if (campaignId is null)
         {
@@ -425,14 +459,17 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
 {
     private readonly I공동구매공급Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
+    private readonly 공동구매거래경로분기ViewModel _분기;
     private Guid? _대상공동구매Id;
 
     public 공동구매협상ViewModel(
         I공동구매공급Service service,
-        공동구매화면상태ViewModel 화면상태)
+        공동구매화면상태ViewModel 화면상태,
+        공동구매거래경로분기ViewModel 분기)
     {
         _service = service;
         _화면상태 = 화면상태;
+        _분기 = 분기;
         _화면상태.PropertyChanged += 화면상태변경;
         공동구매변경동기화();
     }
@@ -461,6 +498,11 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
 
     public async Task<bool> 이력조회Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 공급 협상은 국내 공동구매 분기에서만 조회할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null)
         {
@@ -481,6 +523,11 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
 
     public async Task<bool> 이벤트등록Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 공급 협상 기록은 국내 공동구매 분기에서만 등록할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null
             || string.IsNullOrWhiteSpace(이벤트초안.MaskedActorDisplayName)
@@ -508,6 +555,11 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
 
     public async Task<bool> 쟁점등록Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 공급 협상 쟁점은 국내 공동구매 분기에서만 등록할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null
             || string.IsNullOrWhiteSpace(쟁점초안.Title)
@@ -549,6 +601,11 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
 
     public async Task<bool> 숙고의견등록Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 공급 협상 의견은 국내 공동구매 분기에서만 등록할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null || 선택된쟁점Id is null)
         {
@@ -580,6 +637,11 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
 
     public async Task<bool> 쟁점합의Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 공급 협상 합의는 국내 공동구매 분기에서만 등록할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null || 선택된쟁점Id is null)
         {

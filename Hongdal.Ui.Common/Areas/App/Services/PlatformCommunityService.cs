@@ -630,13 +630,14 @@ public sealed class PlatformCommunityService
 
     public async Task<CommunityVoteListResponse> GetGroupPurchaseVotesAsync(
         string? communityScope = null,
+        string? hsCode = null,
         CancellationToken cancellationToken = default)
     {
-        var path = "api/v1/orderer/group-purchase-demand-votes";
-        if (!string.IsNullOrWhiteSpace(communityScope))
-        {
-            path += $"?communityScope={Uri.EscapeDataString(communityScope.Trim())}";
-        }
+        var query = new List<string>();
+        AddQueryValue(query, "communityScope", communityScope);
+        AddQueryValue(query, "hsCode", hsCode);
+        var suffix = query.Count == 0 ? string.Empty : $"?{string.Join("&", query)}";
+        var path = $"api/v1/orderer/group-purchase-demand-votes{suffix}";
 
         using var response = await _protectedApiClient.GetAsync(path, cancellationToken);
         response.EnsureSuccessStatusCode();

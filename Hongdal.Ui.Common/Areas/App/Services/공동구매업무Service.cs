@@ -11,6 +11,7 @@ public interface I공동구매업무Service
 {
     Task<CommunityVoteListResponse> 목록조회Async(
         string? communityScope = null,
+        string? hsCode = null,
         CancellationToken cancellationToken = default);
 
     Task<CommunityVoteResponse?> 상세조회Async(
@@ -68,8 +69,9 @@ public sealed class PlatformCommunity공동구매업무Service(
 {
     public Task<CommunityVoteListResponse> 목록조회Async(
         string? communityScope = null,
+        string? hsCode = null,
         CancellationToken cancellationToken = default)
-        => communityService.GetGroupPurchaseVotesAsync(communityScope, cancellationToken);
+        => communityService.GetGroupPurchaseVotesAsync(communityScope, hsCode, cancellationToken);
 
     public Task<CommunityVoteResponse?> 상세조회Async(
         Guid voteId,

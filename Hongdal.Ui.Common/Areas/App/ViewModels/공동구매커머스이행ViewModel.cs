@@ -39,13 +39,16 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
 
     private readonly I공동구매실행Service _service;
     private readonly 공동구매실행상태ViewModel _실행상태;
+    private readonly 공동구매화면상태ViewModel _화면상태;
 
     public 공동구매커머스이행ViewModel(
         I공동구매실행Service service,
-        공동구매실행상태ViewModel 실행상태)
+        공동구매실행상태ViewModel 실행상태,
+        공동구매화면상태ViewModel 화면상태)
     {
         _service = service;
         _실행상태 = 실행상태;
+        _화면상태 = 화면상태;
         _실행상태.PropertyChanged += 실행상태변경;
         공동구매Id = _실행상태.실행공동구매Id ?? string.Empty;
     }
@@ -120,6 +123,7 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
         공동구매Id = plan.공동구매Id;
         문서관리번호 = plan.문서관리번호;
         _실행상태.커머스이행적용(plan);
+        _화면상태.단계도달(공동구매절차코드.커머스);
         return true;
     }
 
@@ -141,6 +145,7 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
         공동구매Id = selected.공동구매Id;
         문서관리번호 = selected.문서관리번호;
         _실행상태.커머스이행적용(selected);
+        _화면상태.단계도달(공동구매절차코드.커머스);
     }
 
     private void 실행상태변경(object? sender, PropertyChangedEventArgs e)

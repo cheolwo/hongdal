@@ -10,15 +10,15 @@ namespace Hongdal.Tests.Ui.Common;
 public sealed class 공동구매화면ViewModelTests
 {
     [Fact]
-    public async Task 초기화_공동수입을제외하고최신국내공동구매를선택한다()
+    public async Task 초기화_국내공동구매와공동수입을함께조회하고최신공동수입분기를선택한다()
     {
         var service = new Fake공동구매업무Service();
         var oldCampaign = Campaign("이전 국내 공동구매", DateTime.UtcNow.AddDays(-2), sourcePostId: 11);
         var latestCampaign = Campaign("최신 국내 공동구매", DateTime.UtcNow.AddDays(-1), sourcePostId: 22);
-        var importCampaign = Campaign("공동수입", DateTime.UtcNow, hsCode: "0202.30");
+        var importCampaign = Campaign("공동수입", DateTime.UtcNow, sourcePostId: 33, hsCode: "0202.30");
         service.목록응답.Items = [oldCampaign, importCampaign, latestCampaign];
-        service.상세응답[latestCampaign.Id] = latestCampaign;
-        service.의견응답[22] =
+        service.상세응답[importCampaign.Id] = importCampaign;
+        service.의견응답[33] =
         [
             new PlatformCommunityPostCommentResponse
             {
@@ -33,10 +33,68 @@ public sealed class 공동구매화면ViewModelTests
         var succeeded = await fixture.ViewModel.초기화Async();
 
         Assert.True(succeeded);
-        Assert.Equal([latestCampaign.Id, oldCampaign.Id], fixture.ViewModel.상태.공동구매목록.Select(x => x.Id));
-        Assert.Same(latestCampaign, fixture.ViewModel.상태.선택된공동구매);
+        Assert.Equal(
+            [importCampaign.Id, latestCampaign.Id, oldCampaign.Id],
+            fixture.ViewModel.상태.공동구매목록.Select(x => x.Id));
+        Assert.Same(importCampaign, fixture.ViewModel.상태.선택된공동구매);
+        Assert.True(fixture.ViewModel.거래경로분기.공동수입활성);
+        Assert.True(fixture.ViewModel.공동수입.활성);
+        Assert.False(fixture.ViewModel.국내공동구매.활성);
         Assert.Single(fixture.ViewModel.상태.의견목록);
         Assert.Equal(1, fixture.ViewModel.모집.이의검토.전체이의수);
+    }
+
+    [Fact]
+    public async Task 거래경로필터_국내공동구매만조회하고국내분기를활성화한다()
+    {
+        var service = new Fake공동구매업무Service();
+        var oldCampaign = Campaign("이전 국내 공동구매", DateTime.UtcNow.AddDays(-2));
+        var latestCampaign = Campaign("최신 국내 공동구매", DateTime.UtcNow.AddDays(-1));
+        var importCampaign = Campaign("공동수입", DateTime.UtcNow, hsCode: "0202.30");
+        service.목록응답.Items = [oldCampaign, importCampaign, latestCampaign];
+        service.상세응답[latestCampaign.Id] = latestCampaign;
+        using var fixture = CreateFixture(service);
+
+        var succeeded = await fixture.ViewModel.모집.목록.거래경로별목록조회Async(
+            공동구매거래경로필터코드.국내공동구매);
+
+        Assert.True(succeeded);
+        Assert.Equal(
+            [latestCampaign.Id, oldCampaign.Id],
+            fixture.ViewModel.상태.공동구매목록.Select(x => x.Id));
+        Assert.Same(latestCampaign, fixture.ViewModel.상태.선택된공동구매);
+        Assert.True(fixture.ViewModel.국내공동구매.활성);
+        Assert.False(fixture.ViewModel.공동수입.활성);
+    }
+
+    [Fact]
+    public async Task HS코드별초기화_정규화된코드로조회하고해당공동구매를선택한다()
+    {
+        var service = new Fake공동구매업무Service();
+        var matchingCampaign = Campaign(
+            "냉동 소고기 공동구매",
+            DateTime.UtcNow,
+            sourcePostId: 31,
+            hsCode: "0202.30");
+        var otherCampaign = Campaign(
+            "세제 공동구매",
+            DateTime.UtcNow.AddMinutes(-1),
+            hsCode: "3402.50");
+        service.목록응답.Items = [matchingCampaign, otherCampaign];
+        service.상세응답[matchingCampaign.Id] = matchingCampaign;
+
+        using var fixture = CreateFixture(service);
+
+        var succeeded = await fixture.ViewModel.HS코드별초기화Async(
+            "0202.30",
+            "orderer-group:seoul");
+
+        Assert.True(succeeded);
+        Assert.Equal("orderer-group:seoul", service.마지막목록커뮤니티범위);
+        Assert.Equal("020230", service.마지막목록HS코드);
+        Assert.True(fixture.ViewModel.모집.목록.HS코드조회적용중);
+        Assert.Equal(matchingCampaign.Id, Assert.Single(fixture.ViewModel.상태.공동구매목록).Id);
+        Assert.Same(matchingCampaign, fixture.ViewModel.상태.선택된공동구매);
     }
 
     [Fact]
@@ -76,6 +134,9 @@ public sealed class 공동구매화면ViewModelTests
         using var fixture = CreateFixture(service);
         var proposal = fixture.ViewModel.모집.제안;
         FillProposal(proposal);
+        proposal.가격의사결정.조회HS코드 = "0701.90";
+        proposal.가격의사결정.제안가격Krw = 85_000m;
+        proposal.가격의사결정.가격기준중량Kg = 10m;
         proposal.수령소명 = "중앙 관리실";
         proposal.수령소주소 = "서울시 테스트구 1";
 
@@ -88,10 +149,238 @@ public sealed class 공동구매화면ViewModelTests
         Assert.False(proposal.제안글만생성됨);
         Assert.Null(proposal.복구할게시글Id);
         var voteRequest = Assert.IsType<CommunityVoteCreateRequest>(service.마지막공동구매생성요청);
+        Assert.Equal(
+            CommunityGroupPurchaseProposerRoleCodes.GroupPurchaseRepresentative,
+            voteRequest.GroupPurchase?.ProposerRoleCode);
+        Assert.Equal("공동구매 대표", service.마지막제안글요청?.RoleTag);
+        Assert.Contains("목표 단가: 8,500원/kg", service.마지막제안글요청?.Body);
         Assert.Equal("platform", voteRequest.GroupPurchase?.ServiceAreaKey);
+        Assert.Equal("070190", voteRequest.GroupPurchase?.HsCode);
+        Assert.Equal("070190", Assert.Single(voteRequest.StructuredOptions).HsCode);
+        Assert.Equal(8_500m, voteRequest.GroupPurchase?.TargetUnitPriceKrwPerKg);
         Assert.Single(voteRequest.GroupPurchase?.PickupPoints ?? []);
         Assert.True(voteRequest.ResolutionDocumentEnabled);
         Assert.True(voteRequest.SignatureRequired);
+    }
+
+    [Fact]
+    public async Task 생산자제안_역할코드를투표설정과제안글에함께남긴다()
+    {
+        var created = Campaign("못난이 감자 생산자 제안", DateTime.UtcNow, sourcePostId: 88);
+        var service = new Fake공동구매업무Service
+        {
+            생성게시글응답 = new PlatformCommunityPostResponse { Id = 88 },
+            공동구매생성응답 = created
+        };
+        using var fixture = CreateFixture(service);
+        var proposal = fixture.ViewModel.모집.제안;
+        FillProposal(proposal);
+        proposal.제안주체코드 = CommunityGroupPurchaseProposerRoleCodes.Producer;
+
+        var succeeded = await proposal.등록Async();
+
+        Assert.True(succeeded);
+        Assert.Equal("생산자", proposal.선택된제안주체명);
+        Assert.Equal(2, proposal.제안주체목록.Count);
+        Assert.Equal("생산자", service.마지막제안글요청?.RoleTag);
+        Assert.Contains(
+            "제안 주체: 생산자 (Producer)",
+            service.마지막제안글요청?.Body);
+        Assert.Contains(
+            CommunityGroupPurchaseAgreementPolicy.PolicyCode,
+            service.마지막제안글요청?.Body);
+        Assert.Contains("제안의 선후만으로", service.마지막제안글요청?.Body);
+        Assert.Equal(
+            CommunityGroupPurchaseProposerRoleCodes.Producer,
+            service.마지막공동구매생성요청?.GroupPurchase?.ProposerRoleCode);
+    }
+
+    [Fact]
+    public async Task 해외판매자제안_거래경로하위ViewModel이_공동수입후보요청을조립한다()
+    {
+        var created = Campaign("중국 산지 상품 공동수입", DateTime.UtcNow, sourcePostId: 89);
+        var service = new Fake공동구매업무Service
+        {
+            생성게시글응답 = new PlatformCommunityPostResponse { Id = 89 },
+            공동구매생성응답 = created
+        };
+        using var fixture = CreateFixture(service);
+        var proposal = fixture.ViewModel.모집.제안;
+        FillProposal(proposal);
+
+        proposal.거래경로.판매자국가코드 = "cn";
+
+        Assert.Equal("cn", proposal.거래경로.상품출발국가코드);
+        Assert.True(proposal.거래경로.공동수입후보);
+        Assert.False(proposal.공동수입전환.계약확정준비완료);
+        Assert.Same(
+            proposal.공동수입전환,
+            fixture.ViewModel.모집.공동수입전환);
+
+        proposal.공동수입전환.HS코드 = "0202.30";
+        Assert.True(proposal.공동수입전환.계약확정준비완료);
+
+        var succeeded = await proposal.등록Async();
+
+        Assert.True(succeeded);
+        var request = Assert.IsType<CommunityVoteCreateRequest>(
+            service.마지막공동구매생성요청);
+        Assert.Equal("CN", request.GroupPurchase?.SellerCountryCode);
+        Assert.Equal("CN", request.GroupPurchase?.ShipFromCountryCode);
+        Assert.Equal("KR", request.GroupPurchase?.DeliveryCountryCode);
+        Assert.Equal(
+            CommunityGroupPurchaseCustomsClearanceStatusCodes.NotCleared,
+            request.GroupPurchase?.CustomsClearanceStatusCode);
+        Assert.Equal("0202.30", request.GroupPurchase?.HsCode);
+        Assert.Equal("0202.30", Assert.Single(request.StructuredOptions).HsCode);
+        Assert.Contains("거래 경로: 공동수입 후보", service.마지막제안글요청?.Body);
+        Assert.Contains("계약 확정 전", service.마지막제안글요청?.Body);
+    }
+
+    [Fact]
+    public void 해외판매자라도_국내출발통관재고이면_국내공동구매로유지한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        var route = fixture.ViewModel.모집.제안.거래경로;
+        route.판매자국가코드 = "US";
+        route.상품출발국가코드 = "KR";
+        route.국내통관상태코드 = CommunityGroupPurchaseCustomsClearanceStatusCodes.Cleared;
+
+        Assert.Equal(CommunityGroupPurchaseTradeRouteCodes.Domestic, route.거래경로코드);
+        Assert.Equal("국내 공동구매", route.판정명);
+        Assert.False(route.공동수입후보);
+    }
+
+    [Fact]
+    public async Task 공동수입선택_수입분기만활성화하고국내공급API를차단한다()
+    {
+        var campaign = Campaign(
+            "중국 냉동육 공동수입",
+            DateTime.UtcNow,
+            hsCode: "0202.30",
+            status: CommunityVoteStatusCodes.Closed);
+        campaign.GroupPurchase!.SellerCountryCode = "CN";
+        campaign.GroupPurchase.ShipFromCountryCode = "CN";
+        campaign.GroupPurchase.DeliveryCountryCode = "KR";
+        campaign.GroupPurchase.CustomsClearanceStatusCode =
+            CommunityGroupPurchaseCustomsClearanceStatusCodes.NotCleared;
+        campaign.GroupPurchase.TradeRouteCode =
+            CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate;
+        campaign.GroupPurchase.IsGroupImportCandidate = true;
+        campaign.GroupPurchase.HsCode = "0202.30";
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        fixture.ViewModel.상태.선택적용(campaign);
+
+        Assert.True(fixture.ViewModel.공동수입.활성);
+        Assert.False(fixture.ViewModel.국내공동구매.활성);
+        Assert.Equal(공동구매절차코드.거래상대연결, fixture.ViewModel.상태.진행단계코드);
+        Assert.False(await fixture.ViewModel.공급.생산자연결.후보조회Async());
+        Assert.Contains("국내 공동구매 분기", fixture.ViewModel.공급.생산자연결.오류메시지);
+        Assert.True(fixture.ViewModel.공동수입.계약확정준비완료);
+
+        Assert.True(fixture.ViewModel.공동수입.해외판매자연결완료());
+        Assert.Equal(공동구매절차코드.공급조건협상, fixture.ViewModel.상태.진행단계코드);
+        Assert.True(fixture.ViewModel.공동수입.수입조건확정());
+        Assert.Equal(공동구매절차코드.이의검토, fixture.ViewModel.상태.진행단계코드);
+        Assert.True(fixture.ViewModel.공동수입.최종이의검토완료());
+        Assert.Equal(공동구매절차코드.확정안, fixture.ViewModel.상태.진행단계코드);
+    }
+
+    [Fact]
+    public void 절차카탈로그_거래경로분기부터커머스까지업무순서대로배치한다()
+    {
+        Assert.Equal(
+            [
+                공동구매절차코드.제안,
+                공동구매절차코드.거래경로,
+                공동구매절차코드.수요모집,
+                공동구매절차코드.거래상대연결,
+                공동구매절차코드.공급조건협상,
+                공동구매절차코드.이의검토,
+                공동구매절차코드.확정안,
+                공동구매절차코드.전자서명,
+                공동구매절차코드.이행계획,
+                공동구매절차코드.실행,
+                공동구매절차코드.커머스
+            ],
+            공동구매절차카탈로그.전체.Select(stage => stage.코드));
+    }
+
+    [Fact]
+    public async Task 가격의사결정_선택된거래경로와저장된목표단가로분기별자료를조회한다()
+    {
+        var priceService = new Fake공동구매가격의사결정Service
+        {
+            응답 = new 공동구매가격의사결정결과
+            {
+                자료있음 = true,
+                상태코드 = "Complete",
+                기준비교목록 =
+                [
+                    new 공동구매가격기준비교(
+                        "domestic-retail",
+                        "국내 소매 평균가격",
+                        "aT",
+                        12_000m,
+                        9_000m,
+                        3_000m,
+                        0.25m,
+                        공동구매가격판단신호코드.제안가격경쟁력,
+                        "제안가격이 낮음",
+                        "국내 소매가격보다 낮습니다.")
+                ]
+            }
+        };
+        using var fixture = CreateFixture(
+            new Fake공동구매업무Service(),
+            priceService: priceService);
+        var campaign = Campaign("감자 공동구매", DateTime.UtcNow, hsCode: "070190");
+        campaign.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.Domestic;
+        campaign.GroupPurchase.HsCode = "070190";
+        campaign.GroupPurchase.TargetUnitPriceKrwPerKg = 9_000m;
+        fixture.ViewModel.상태.선택적용(campaign);
+
+        Assert.Same(
+            fixture.ViewModel.가격의사결정,
+            fixture.ViewModel.국내공동구매.가격의사결정);
+        Assert.Same(
+            fixture.ViewModel.가격의사결정,
+            fixture.ViewModel.공동수입.가격의사결정);
+        Assert.True(await fixture.ViewModel.가격의사결정.조회Async());
+
+        Assert.Equal(
+            공동구매가격의사결정유형코드.국내공동구매,
+            priceService.마지막요청?.유형코드);
+        Assert.Equal(9_000m, priceService.마지막요청?.제안단가KrwPerKg);
+        Assert.True(fixture.ViewModel.가격의사결정.가격정보최신);
+        Assert.True(fixture.ViewModel.가격의사결정.의사결정근거충분);
+
+        var result = fixture.ViewModel.가격의사결정.결과;
+        fixture.ViewModel.상태.단계선택(공동구매절차코드.공급조건협상);
+        Assert.Same(result, fixture.ViewModel.가격의사결정.결과);
+        Assert.True(fixture.ViewModel.가격의사결정.가격정보최신);
+
+        fixture.ViewModel.가격의사결정.제안가격Krw = 9_500m;
+        Assert.False(fixture.ViewModel.가격의사결정.가격정보최신);
+    }
+
+    [Fact]
+    public void 절차단계선택_화면탭만바꾸고실제진행단계는변경하지않는다()
+    {
+        var campaign = Campaign("감자 공동구매", DateTime.UtcNow);
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        fixture.ViewModel.상태.선택적용(campaign);
+
+        fixture.ViewModel.상태.단계선택(공동구매절차코드.커머스);
+
+        Assert.Equal(공동구매절차코드.커머스, fixture.ViewModel.상태.현재단계코드);
+        Assert.Equal(공동구매절차코드.수요모집, fixture.ViewModel.상태.진행단계코드);
+        Assert.Equal(
+            공동구매절차단계상태.진행중,
+            fixture.ViewModel.합의.절차상태.단계상태(공동구매절차코드.수요모집));
+        Assert.Equal(
+            공동구매절차단계상태.대기,
+            fixture.ViewModel.합의.절차상태.단계상태(공동구매절차코드.커머스));
     }
 
     [Fact]
@@ -137,8 +426,12 @@ public sealed class 공동구매화면ViewModelTests
         viewModel.합의.모집마감.이의검토완료 = true;
         Assert.True(await viewModel.합의.모집마감.마감Async());
         Assert.Equal(CommunityVoteStatusCodes.Closed, viewModel.상태.선택된공동구매?.Status);
-        Assert.Equal(공동구매절차코드.확정안, viewModel.상태.현재단계코드);
+        Assert.Equal(공동구매절차코드.거래상대연결, viewModel.상태.진행단계코드);
+        Assert.Contains("제안의 선후만으로", viewModel.합의.결의.결의문본문);
 
+        viewModel.상태.단계진행(공동구매절차코드.공급조건협상);
+        viewModel.상태.단계진행(공동구매절차코드.이의검토);
+        viewModel.상태.단계진행(공동구매절차코드.확정안);
         Assert.True(await viewModel.합의.결의.결의문작성Async());
         Assert.Same(draftDocument, viewModel.상태.선택된공동구매?.ResolutionDocument);
         Assert.True(await viewModel.합의.결의.서명준비Async());
@@ -151,19 +444,23 @@ public sealed class 공동구매화면ViewModelTests
             "document-hash",
             viewModel.실행.주문원장.서명.참고공동구매결의문Hash);
         Assert.Empty(viewModel.실행.주문원장.서명.서명준비초안.계약문서번호);
+        Assert.Contains("합의한 최종 계약문", viewModel.실행.주문원장.서명.계약문서안내);
 
         Assert.True(viewModel.합의.전자서명.서명자선택("party-1"));
         viewModel.합의.전자서명.결의문동의 = true;
         Assert.True(await viewModel.합의.전자서명.서명제출Async(
             new 공동구매전자서명입력("참여자 1", "data:image/png;base64,test")));
 
-        Assert.Equal(공동구매절차코드.실행, viewModel.상태.현재단계코드);
+        Assert.Equal(공동구매절차코드.이행계획, viewModel.상태.진행단계코드);
         Assert.True(viewModel.합의.절차상태.실행준비완료);
         Assert.Equal(
             공동구매절차단계상태.완료,
             viewModel.합의.절차상태.단계상태(공동구매절차코드.전자서명));
         Assert.Equal(
             공동구매절차단계상태.진행중,
+            viewModel.합의.절차상태.단계상태(공동구매절차코드.이행계획));
+        Assert.Equal(
+            공동구매절차단계상태.대기,
             viewModel.합의.절차상태.단계상태(공동구매절차코드.실행));
         Assert.Equal("party-1", service.마지막전자서명요청?.PartyId);
         Assert.True(viewModel.합의.전자서명.전원서명완료);
@@ -190,7 +487,10 @@ public sealed class 공동구매화면ViewModelTests
     [Fact]
     public async Task 생산자연결_동의된후보를연락요청초안으로변환한다()
     {
-        var campaign = Campaign("양파 공동구매", DateTime.UtcNow);
+        var campaign = Campaign(
+            "양파 공동구매",
+            DateTime.UtcNow,
+            status: CommunityVoteStatusCodes.Closed);
         var supplyService = new Fake공동구매공급Service
         {
             생산자후보응답 = new DomesticProducerCandidateQueryResponse
@@ -212,6 +512,10 @@ public sealed class 공동구매화면ViewModelTests
             {
                 DraftId = Guid.NewGuid(),
                 ProducerCandidateKey = "producer-1"
+            },
+            적합성응답 = new DomesticGroupPurchaseSupplyCompatibilityPreviewResponse
+            {
+                IsMutuallyFeasible = true
             }
         };
         using var fixture = CreateFixture(
@@ -228,6 +532,13 @@ public sealed class 공동구매화면ViewModelTests
         Assert.Equal("producer-1", connection.저장된연락요청?.ProducerCandidateKey);
         Assert.Equal(campaign.Id, supplyService.마지막연락요청?.GroupPurchaseCampaignId);
         Assert.Equal("양파", supplyService.마지막연락요청?.ProductSummary);
+        Assert.True(fixture.ViewModel.국내공동구매.거래상대연결완료());
+        Assert.Equal(공동구매절차코드.공급조건협상, fixture.ViewModel.상태.진행단계코드);
+        Assert.True(await fixture.ViewModel.공급.공급적합성.미리보기Async());
+        Assert.True(fixture.ViewModel.국내공동구매.공급조건확정());
+        Assert.Equal(공동구매절차코드.이의검토, fixture.ViewModel.상태.진행단계코드);
+        Assert.True(fixture.ViewModel.국내공동구매.최종이의검토완료());
+        Assert.Equal(공동구매절차코드.확정안, fixture.ViewModel.상태.진행단계코드);
     }
 
     [Fact]
@@ -395,13 +706,16 @@ public sealed class 공동구매화면ViewModelTests
         Fake공동구매업무Service service,
         Fake공동구매공급Service? supplyService = null,
         Fake공동구매물류Service? logisticsService = null,
-        Fake공동구매실행Service? executionService = null)
+        Fake공동구매실행Service? executionService = null,
+        Fake공동구매가격의사결정Service? priceService = null)
     {
         var services = new ServiceCollection();
         services.AddSingleton<I공동구매업무Service>(service);
         services.AddSingleton<I공동구매공급Service>(supplyService ?? new Fake공동구매공급Service());
         services.AddSingleton<I공동구매물류Service>(logisticsService ?? new Fake공동구매물류Service());
         services.AddSingleton<I공동구매실행Service>(executionService ?? new Fake공동구매실행Service());
+        services.AddSingleton<I공동구매가격의사결정Service>(
+            priceService ?? new Fake공동구매가격의사결정Service());
         services.AddHongdalUiCommonAppServices();
         var provider = services.BuildServiceProvider();
         var scope = provider.CreateScope();
@@ -567,11 +881,18 @@ public sealed class 공동구매화면ViewModelTests
         public PlatformCommunityPostCreateRequest? 마지막제안글요청 { get; private set; }
         public CommunityVoteCreateRequest? 마지막공동구매생성요청 { get; private set; }
         public CommunityVoteResolutionSignRequest? 마지막전자서명요청 { get; private set; }
+        public string? 마지막목록커뮤니티범위 { get; private set; }
+        public string? 마지막목록HS코드 { get; private set; }
 
         public Task<CommunityVoteListResponse> 목록조회Async(
             string? communityScope = null,
+            string? hsCode = null,
             CancellationToken cancellationToken = default)
-            => Task.FromResult(목록응답);
+        {
+            마지막목록커뮤니티범위 = communityScope;
+            마지막목록HS코드 = hsCode;
+            return Task.FromResult(목록응답);
+        }
 
         public Task<CommunityVoteResponse?> 상세조회Async(
             Guid voteId,
@@ -828,5 +1149,19 @@ public sealed class 공동구매화면ViewModelTests
             string documentManagementNumber,
             CancellationToken cancellationToken = default)
             => Task.FromResult(문서커머스응답);
+    }
+
+    private sealed class Fake공동구매가격의사결정Service : I공동구매가격의사결정Service
+    {
+        public 공동구매가격의사결정결과 응답 { get; set; } = new();
+        public 공동구매가격의사결정요청? 마지막요청 { get; private set; }
+
+        public Task<공동구매가격의사결정결과> 조회Async(
+            공동구매가격의사결정요청 request,
+            CancellationToken cancellationToken = default)
+        {
+            마지막요청 = request;
+            return Task.FromResult(응답);
+        }
     }
 }

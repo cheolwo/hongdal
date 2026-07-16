@@ -9,14 +9,17 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
 {
     private readonly I공동구매물류Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
+    private readonly 공동구매거래경로분기ViewModel _분기;
     private Guid? _대상공동구매Id;
 
     public 공동구매이행계획ViewModel(
         I공동구매물류Service service,
-        공동구매화면상태ViewModel 화면상태)
+        공동구매화면상태ViewModel 화면상태,
+        공동구매거래경로분기ViewModel 분기)
     {
         _service = service;
         _화면상태 = 화면상태;
+        _분기 = 분기;
         _화면상태.PropertyChanged += 화면상태변경;
         공동구매변경동기화();
     }
@@ -35,6 +38,11 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
 
     public bool 경로선택(string routeCode)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 이행 경로는 국내 공동구매 분기에서만 선택할 수 있습니다.");
+        }
+
         if (!DomesticGroupPurchaseFulfillmentRouteCodes.All.Contains(routeCode))
         {
             return 유효성실패("지원되는 공동구매 이행 경로를 선택해 주세요.");
@@ -85,6 +93,11 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
 
     public async Task<bool> 서버미리보기Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 이행계획은 국내 공동구매 분기에서만 확인할 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null)
         {
@@ -108,6 +121,11 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
 
     public async Task<bool> 발주초안저장Async(CancellationToken cancellationToken = default)
     {
+        if (!_분기.국내공동구매활성)
+        {
+            return 유효성실패("국내 발주 초안은 국내 공동구매 분기에서만 만들 수 있습니다.");
+        }
+
         var campaignId = _화면상태.선택된공동구매Id;
         if (campaignId is null)
         {
@@ -131,6 +149,7 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
                     token)
                     ?? throw new InvalidOperationException("발주·원장 생성 초안 응답이 비어 있습니다.");
                 계획 = 저장된발주초안.Plan;
+                _화면상태.단계도달(공동구매절차코드.실행);
             },
             "발주 주문 원장과 후속 물류 원장 생성 초안을 저장했습니다.",
             cancellationToken);

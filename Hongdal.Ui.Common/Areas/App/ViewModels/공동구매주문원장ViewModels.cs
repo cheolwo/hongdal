@@ -292,7 +292,8 @@ public sealed partial class 공동구매주문원장서명ViewModel : 공동구�
     public bool 전체서명완료 => 서명상태?.전체서명완료여부 == true;
     public string? 참고공동구매결의문번호 => _대상결의문번호;
     public string? 참고공동구매결의문Hash => _대상결의문Hash;
-    public string 계약문서안내 => "공동구매 결의문은 합의 근거입니다. 서명에는 발주 단계에서 만든 개별 주문계약의 문서번호와 해시를 입력해 주세요.";
+    public string 계약문서안내
+        => $"공동구매 결의문은 합의 근거입니다. 서명에는 발주 단계에서 만든 개별 주문계약의 문서번호와 해시를 입력해 주세요. {CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice}";
 
     public async Task<bool> 상태조회Async(CancellationToken cancellationToken = default)
     {

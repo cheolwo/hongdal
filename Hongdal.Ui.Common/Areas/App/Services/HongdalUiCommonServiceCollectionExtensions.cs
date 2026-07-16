@@ -59,6 +59,7 @@ public static class HongdalUiCommonServiceCollectionExtensions
         services.TryAddScoped<I공동구매공급Service, PlatformCommunity공동구매공급Service>();
         services.TryAddScoped<I공동구매물류Service, PlatformCommunity공동구매물류Service>();
         services.TryAddScoped<I공동구매실행Service, 공동구매실행Service>();
+        services.TryAddScoped<I공동구매가격의사결정Service, 공동구매가격의사결정Service>();
         services.TryAddScoped<PlatformHomeModeStateService>();
         services.TryAddScoped<PlatformDiagramPaletteStateService>();
         services.AddScoped<HongdalIsmsPClientEncryptionService>();
@@ -68,6 +69,10 @@ public static class HongdalUiCommonServiceCollectionExtensions
         services.TryAddTransient<공통Controller기능모음ViewModel>();
         services.TryAddScoped<공동구매화면상태ViewModel>();
         services.TryAddTransient<공동구매목록ViewModel>();
+        services.TryAddScoped<공동구매거래경로판정ViewModel>();
+        services.TryAddScoped<공동수입전환준비ViewModel>();
+        services.TryAddScoped<공동구매거래경로분기ViewModel>();
+        services.TryAddScoped<공동구매가격의사결정ViewModel>();
         services.TryAddTransient<공동구매제안ViewModel>();
         services.TryAddTransient<공동구매수요참여ViewModel>();
         services.TryAddTransient<공동구매이의검토ViewModel>();
@@ -84,6 +89,8 @@ public static class HongdalUiCommonServiceCollectionExtensions
         services.TryAddTransient<공동구매공급기능ViewModel>();
         services.TryAddTransient<공동구매이행계획ViewModel>();
         services.TryAddTransient<공동구매물류기능ViewModel>();
+        services.TryAddTransient<국내공동구매분기ViewModel>();
+        services.TryAddTransient<공동수입분기ViewModel>();
         services.TryAddScoped<공동구매실행상태ViewModel>();
         services.TryAddTransient<공동구매자동집단ViewModel>();
         services.TryAddTransient<공동구매주문원장조회ViewModel>();
