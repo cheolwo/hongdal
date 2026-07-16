@@ -166,5 +166,41 @@ namespace 홍달.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(HongdalContext).Assembly);
 
         }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            배차엔진판단감사불변성검사();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(
+            bool acceptAllChangesOnSuccess,
+            CancellationToken cancellationToken = default)
+        {
+            배차엔진판단감사불변성검사();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void 배차엔진판단감사불변성검사()
+        {
+            var changedAuditEntry = ChangeTracker
+                .Entries<운송이벤트>()
+                .FirstOrDefault(entry =>
+                    entry.State is EntityState.Modified or EntityState.Deleted
+                    && (string.Equals(
+                            entry.Entity.이벤트타입,
+                            운송이벤트유형.배차엔진판단감사,
+                            StringComparison.Ordinal)
+                        || string.Equals(
+                            entry.Property(x => x.이벤트타입).OriginalValue,
+                            운송이벤트유형.배차엔진판단감사,
+                            StringComparison.Ordinal)));
+
+            if (changedAuditEntry is not null)
+            {
+                throw new InvalidOperationException(
+                    $"배차 엔진 판단 감사 이벤트는 추가 후 수정하거나 삭제할 수 없습니다. EventId={changedAuditEntry.Entity.Id}");
+            }
+        }
     }
 }

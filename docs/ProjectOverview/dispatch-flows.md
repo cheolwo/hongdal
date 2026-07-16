@@ -26,16 +26,17 @@ flowchart TD
     H --> I
 ```
 
-현재 코드는 `배차추천후보선정Service`가 `운송원장.배차업무유형`을 보고 `I운송의뢰배차엔진`을 선택합니다. 엔진은 다시 세부 `I배차업무정책`으로 후보 선정 알고리즘을 위임합니다.
+현재 코드는 `배차추천후보선정Service`가 `운송원장.배차업무유형`을 보고 `I운송의뢰배차엔진`을 선택합니다. 엔진은 다시 세부 `I배차업무정책`으로 후보 선정 알고리즘을 위임합니다. 실제 후보 부재와 준비 미완료·입력 오류·구성 오류를 별도 결과로 반환하며, 실제 후보 부재만 공개배차 전환을 허용합니다. 판단 결과와 후속 전환은 기사 식별정보를 제거한 `DispatchEngineDecisionAudit` 운송 이벤트로 원장 상태 변경과 같은 저장 단위에 기록합니다.
 
 ```csharp
 public interface I운송의뢰배차엔진
 {
+    string 논리엔진코드 { get; }
     string 엔진코드 { get; }
     string 표시명 { get; }
     int 배차업무유형 { get; }
 
-    Task<배차추천후보?> 다음후보선정Async(
+    Task<배차추천후보선정결과> 다음후보선정Async(
         운송원장 queue,
         string? 제외기사Id = null,
         CancellationToken cancellationToken = default);

@@ -199,13 +199,7 @@ namespace 홍달.Services.Dispatch.Queue
                 return 대기상태아님(queue);
             }
 
-            queue.배차큐단계 = 상태값.배차큐단계.공개배차;
-            queue.배차노출상태 = 상태값.배차노출상태.공개중;
-            queue.공개전환시각 = DateTime.UtcNow;
-            queue.현재추천대상기사Id = null;
-            queue.추천시작시각 = null;
-            queue.추천만료시각 = null;
-            queue.UpdatedAt = DateTime.UtcNow;
+            공개배차상태적용(queue, DateTime.UtcNow);
 
             await _db.SaveChangesAsync(cancellationToken);
 
