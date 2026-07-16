@@ -1,4 +1,5 @@
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 using Hongdal.Client.Infrastructure;
 using Hongdal.Client.Infrastructure.Security;
 using Hongdal.Client.Infrastructure.Transport;
@@ -32,6 +33,7 @@ using Hongdal.Client.Infrastructure.Notifications;
 using HongdalApp.Services.Warehouse.Fulfillment;
 using HongdalApp.Services.Warehouse.Reconsignment.Commands;
 using HongdalApp.Services.Warehouse.Reconsignment.Events;
+using HongdalApp.ViewModels.Shipper;
 
 namespace HongdalApp.Services;
 
@@ -62,6 +64,11 @@ public static class ShipperServiceCollectionExtensions
 
     private static IServiceCollection AddShipperCoreServices(this IServiceCollection services)
     {
+        services.AddTransient<화주Controller기능모음ViewModel>();
+        services.AddTransient<화주운송의뢰기능ViewModel>();
+        services.AddTransient<화주창고기능ViewModel>();
+        services.AddTransient<화주판매기능ViewModel>();
+        services.AddTransient<화주Api기능모음ViewModel>();
         services.AddSingleton<InMemoryShipperStore>();
         services.AddSingleton<SampleShipperOperationsService>();
         services.AddScoped<FakeShipperPaymentService>();

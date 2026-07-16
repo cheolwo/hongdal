@@ -1,4 +1,5 @@
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 using HongdalAdminApp.Services;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -14,6 +15,8 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<AdminAuthSession>();
         builder.Services.AddHongdalUiCommonAppServices<AdminAuthSession>();
+        builder.Services.AddTransient<관리자Controller기능모음ViewModel>();
+        builder.Services.AddTransient<관리자전체Api기능모음ViewModel>();
         builder.Services.AddHongdalApiHttpClient(HongdalApiEndpoint.ResolveBaseAddress(
             builder.Configuration[HongdalApiEndpoint.ConfigurationKey]));
         builder.Services.AddScoped<AdminAuthService>();

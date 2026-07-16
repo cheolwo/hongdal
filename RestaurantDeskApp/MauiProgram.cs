@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 using MudBlazor.Services;
 using RestaurantDeskApp.Options;
 using RestaurantDeskApp.Services;
+using RestaurantDeskApp.ViewModels;
 
 namespace RestaurantDeskApp;
 
@@ -21,6 +23,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<I주문알림Service, 주문알림Service>();
         builder.Services.AddSingleton<I음식점주문SignalRClientService, 음식점주문SignalRClientService>();
         builder.Services.AddHongdalUiCommonAppServices();
+        builder.Services.AddTransient<음식Controller기능모음ViewModel>();
+        builder.Services.AddTransient<음식점주문기능ViewModel>();
+        builder.Services.AddTransient<음식점Api기능모음ViewModel>();
         builder.Services.AddHongdalDocumentOutputServices();
         builder.Services.AddHttpClient<I음식주문ApiClient, Hongdal음식주문Client>((sp, client) =>
         {

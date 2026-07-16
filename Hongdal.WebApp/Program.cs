@@ -8,6 +8,7 @@ using Hongdal.WebApp;
 using Hongdal.WebApp.Models;
 using Hongdal.WebApp.Services;
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -21,6 +22,7 @@ builder.Services.AddHongdalApiHttpClient(apiBaseAddress);
 builder.Services.Configure<ClientDataModeOptions>(builder.Configuration.GetSection(ClientDataModeOptions.SectionName));
 builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
 builder.Services.AddHongdalUiCommonAppServices<WebAuthSessionService>();
+builder.Services.AddTransient<화주Controller기능모음ViewModel>();
 builder.Services.AddHongdalDocumentOutputServices();
 builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
 builder.Services.AddScoped<WebAuthSessionService>();

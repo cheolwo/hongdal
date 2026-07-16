@@ -1,4 +1,5 @@
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Hongdal.Tests.Ui.Common;
@@ -49,6 +50,55 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             candidate => candidate.ServiceType == typeof(I농수산공공데이터Client));
         Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
         Assert.Equal(typeof(농수산공공데이터Client), descriptor.ImplementationType);
+    }
+
+    [Fact]
+    public void AddHongdalUiCommonAppServices_RegistersMvvmApiCompositionServices()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHongdalUiCommonAppServices();
+
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(IHongdalJsonApiClient)
+            && x.ImplementationType == typeof(HongdalJsonApiClient)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공통Controller기능모음ViewModel)
+            && x.ImplementationType == typeof(공통Controller기능모음ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매업무Service)
+            && x.ImplementationType == typeof(PlatformCommunity공동구매업무Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매공급Service)
+            && x.ImplementationType == typeof(PlatformCommunity공동구매공급Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매물류Service)
+            && x.ImplementationType == typeof(PlatformCommunity공동구매물류Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매실행Service)
+            && x.ImplementationType == typeof(공동구매실행Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매화면상태ViewModel)
+            && x.ImplementationType == typeof(공동구매화면상태ViewModel)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매실행상태ViewModel)
+            && x.ImplementationType == typeof(공동구매실행상태ViewModel)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매실행기능ViewModel)
+            && x.ImplementationType == typeof(공동구매실행기능ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매화면ViewModel)
+            && x.ImplementationType == typeof(공동구매화면ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
     }
 
     [Fact]

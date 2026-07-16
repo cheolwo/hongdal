@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
@@ -54,11 +55,47 @@ public static class HongdalUiCommonServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddScoped<PlatformCommunityService>();
+        services.TryAddScoped<I공동구매업무Service, PlatformCommunity공동구매업무Service>();
+        services.TryAddScoped<I공동구매공급Service, PlatformCommunity공동구매공급Service>();
+        services.TryAddScoped<I공동구매물류Service, PlatformCommunity공동구매물류Service>();
+        services.TryAddScoped<I공동구매실행Service, 공동구매실행Service>();
         services.TryAddScoped<PlatformHomeModeStateService>();
         services.TryAddScoped<PlatformDiagramPaletteStateService>();
         services.AddScoped<HongdalIsmsPClientEncryptionService>();
         services.TryAddScoped<IHongdalAccessTokenProvider, EmptyHongdalAccessTokenProvider>();
         services.AddScoped<HongdalProtectedApiClient>();
+        services.TryAddScoped<IHongdalJsonApiClient, HongdalJsonApiClient>();
+        services.TryAddTransient<공통Controller기능모음ViewModel>();
+        services.TryAddScoped<공동구매화면상태ViewModel>();
+        services.TryAddTransient<공동구매목록ViewModel>();
+        services.TryAddTransient<공동구매제안ViewModel>();
+        services.TryAddTransient<공동구매수요참여ViewModel>();
+        services.TryAddTransient<공동구매이의검토ViewModel>();
+        services.TryAddTransient<공동구매모집기능ViewModel>();
+        services.TryAddTransient<공동구매모집마감ViewModel>();
+        services.TryAddTransient<공동구매결의ViewModel>();
+        services.TryAddTransient<공동구매전자서명ViewModel>();
+        services.TryAddTransient<공동구매절차상태ViewModel>();
+        services.TryAddTransient<공동구매합의기능ViewModel>();
+        services.TryAddTransient<공동구매생산자연결ViewModel>();
+        services.TryAddTransient<공동구매공급제안ViewModel>();
+        services.TryAddTransient<공동구매공급적합성ViewModel>();
+        services.TryAddTransient<공동구매협상ViewModel>();
+        services.TryAddTransient<공동구매공급기능ViewModel>();
+        services.TryAddTransient<공동구매이행계획ViewModel>();
+        services.TryAddTransient<공동구매물류기능ViewModel>();
+        services.TryAddScoped<공동구매실행상태ViewModel>();
+        services.TryAddTransient<공동구매자동집단ViewModel>();
+        services.TryAddTransient<공동구매주문원장조회ViewModel>();
+        services.TryAddTransient<공동구매하위원장ViewModel>();
+        services.TryAddTransient<공동구매주문원장서명ViewModel>();
+        services.TryAddTransient<공동구매주문원장ViewModel>();
+        services.TryAddTransient<공동구매커머스이행ViewModel>();
+        services.TryAddTransient<공동구매실행기능ViewModel>();
+        services.TryAddTransient<공동구매화면ViewModel>();
+        services.TryAddTransient<IBagua업무영역ViewModelFactory, Bagua업무영역ViewModelFactory>();
+        services.TryAddSingleton<IBaguaTargetWorkspaceResolver, DefaultBaguaTargetWorkspaceResolver>();
+        services.TryAddTransient<BaguaRoleTransitionPageViewModel>();
         services.TryAddScoped<I농수산공공데이터Client, 농수산공공데이터Client>();
         services.AddScoped<CommunityLedgerNodeActionService>();
         services.AddScoped<YouTube관리콘텐츠Service>();
