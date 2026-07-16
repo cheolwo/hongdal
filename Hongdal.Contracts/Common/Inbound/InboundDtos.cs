@@ -67,6 +67,27 @@ public sealed class 입고요청목록응답
     public IReadOnlyList<입고요청항목응답> Items { get; set; } = [];
 }
 
+/// <summary>입고 업무 목록의 서버 정렬·검색·페이지 조회 조건입니다. Page는 0부터 시작합니다.</summary>
+public sealed class 입고요청목록조회요청
+{
+    public int Page { get; set; }
+    public int PageSize { get; set; } = 25;
+    public string? Search { get; set; }
+    public string? SortBy { get; set; }
+    public bool SortDescending { get; set; } = true;
+    public long? WarehouseId { get; set; }
+    public string? Status { get; set; }
+    public string? FlowType { get; set; }
+}
+
+public sealed class 입고요청페이지응답
+{
+    public IReadOnlyList<입고요청항목응답> Items { get; set; } = [];
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+}
+
 public sealed class 입고요청저장요청
 {
     public long 창고Id { get; set; }
