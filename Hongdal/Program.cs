@@ -56,6 +56,11 @@ if (!isRunningInContainer)
     builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 }
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>(optional: true);
+}
+
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
