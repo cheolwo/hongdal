@@ -94,10 +94,21 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매실�
             return 유효성실패("자동집단에 연결할 공동구매를 선택해 주세요.");
         }
 
+        if (현재사용자.인증됨)
+        {
+            수요초안.주문자키 = 현재사용자.UserId!;
+            if (string.IsNullOrWhiteSpace(수요초안.주문자표시명))
+            {
+                수요초안.주문자표시명 = 현재사용자.UserName ?? 현재사용자.UserId!;
+            }
+
+            OnPropertyChanged(nameof(수요초안));
+        }
+
         if (string.IsNullOrWhiteSpace(수요초안.주문자키)
             || string.IsNullOrWhiteSpace(수요초안.주문자표시명))
         {
-            return 유효성실패("주문자 식별키와 표시명을 입력해 주세요.");
+            return 유효성실패("로그인 사용자와 주문자 표시명을 확인해 주세요.");
         }
 
         if (string.IsNullOrWhiteSpace(수요초안.상품키)
