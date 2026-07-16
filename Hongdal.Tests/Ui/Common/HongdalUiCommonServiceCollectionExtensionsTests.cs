@@ -2,6 +2,8 @@ using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using System.Text;
+using System.Text.Json;
 
 namespace Hongdal.Tests.Ui.Common;
 
@@ -305,6 +307,63 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddHongdalUiCommonAppServices_현재사용자를세부ViewModel과같은Scope에주입한다()
+    {
+        var tokenProvider = new TestAccessTokenProvider
+        {
+            AccessToken = CreateToken(
+                "warehouse-user-17",
+                "입고 담당자",
+                ["창고관리자", "창고입고담당자"])
+        };
+        var services = new ServiceCollection();
+        services.AddSingleton(tokenProvider);
+        services.AddHongdalUiCommonAppServices<TestAccessTokenProvider>();
+        services.AddHongdalApiHttpClient(new Uri("https://api.hongdal.test/"));
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<IHongdal현재사용자Context>();
+        var warehouseState = scope.ServiceProvider.GetRequiredService<입출고화면상태ViewModel>();
+        var inbound = scope.ServiceProvider.GetRequiredService<입고조회ViewModel>();
+        var sales = scope.ServiceProvider.GetRequiredService<판매채널계정조회ViewModel>();
+        var order = scope.ServiceProvider.GetRequiredService<주문조회ViewModel>();
+
+        Assert.Equal("warehouse-user-17", context.현재사용자.UserId);
+        Assert.Equal("입고 담당자", context.현재사용자.UserName);
+        Assert.True(context.현재사용자.역할보유("창고입고담당자"));
+        Assert.Same(context, warehouseState.현재사용자Context);
+        Assert.Equal("warehouse-user-17", inbound.현재사용자.UserId);
+        Assert.Equal("warehouse-user-17", sales.현재사용자.UserId);
+        Assert.Equal("warehouse-user-17", order.현재사용자.UserId);
+        Assert.True(inbound.사용자확인됨);
+        Assert.True(sales.사용자확인됨);
+        Assert.True(order.사용자확인됨);
+    }
+
+    [Fact]
+    public void 현재사용자Context_사용자식별자가없는Token은익명으로처리한다()
+    {
+        var tokenProvider = new TestAccessTokenProvider
+        {
+            AccessToken = CreateToken(null, "이름만 있는 사용자", ["창고관리자"])
+        };
+        var services = new ServiceCollection();
+        services.AddSingleton(tokenProvider);
+        services.AddHongdalUiCommonAppServices<TestAccessTokenProvider>();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var currentUser = scope.ServiceProvider
+            .GetRequiredService<IHongdal현재사용자Context>()
+            .현재사용자;
+
+        Assert.False(currentUser.인증됨);
+        Assert.Null(currentUser.UserId);
+        Assert.Empty(currentUser.Roles);
+    }
+
+    [Fact]
     public void AddHongdalApiHttpClient_NormalizesAddressAndPreservesOptions()
     {
         var services = new ServiceCollection();
@@ -365,8 +424,28 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
 
     private sealed class TestAccessTokenProvider : IHongdalAccessTokenProvider
     {
-        public string AccessToken => "test-token";
+        public string AccessToken { get; set; } = "test-token";
     }
+
+    private static string CreateToken(
+        string? userId,
+        string userName,
+        IReadOnlyList<string> roles)
+    {
+        var payload = new Dictionary<string, object?>
+        {
+            ["sub"] = userId,
+            ["name"] = userName,
+            ["roles"] = roles
+        };
+        return $"{Base64Url("{\"alg\":\"none\"}")}.{Base64Url(JsonSerializer.Serialize(payload))}.";
+    }
+
+    private static string Base64Url(string value)
+        => Convert.ToBase64String(Encoding.UTF8.GetBytes(value))
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
 
     private sealed class TestJsRuntime : IJSRuntime
     {
