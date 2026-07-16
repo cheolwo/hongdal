@@ -307,7 +307,7 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddHongdalUiCommonAppServices_현재사용자를세부ViewModel과같은Scope에주입한다()
+    public async Task AddHongdalUiCommonAppServices_현재사용자를세부ViewModel과같은Scope에주입한다()
     {
         var tokenProvider = new TestAccessTokenProvider
         {
@@ -318,11 +318,12 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
         };
         var services = new ServiceCollection();
         services.AddSingleton(tokenProvider);
+        services.AddSingleton<IJSRuntime, TestJsRuntime>();
         services.AddHongdalUiCommonAppServices<TestAccessTokenProvider>();
         services.AddHongdalApiHttpClient(new Uri("https://api.hongdal.test/"));
 
-        using var provider = services.BuildServiceProvider();
-        using var scope = provider.CreateScope();
+        await using var provider = services.BuildServiceProvider();
+        await using var scope = provider.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<IHongdal현재사용자Context>();
         var warehouseState = scope.ServiceProvider.GetRequiredService<입출고화면상태ViewModel>();
         var inbound = scope.ServiceProvider.GetRequiredService<입고조회ViewModel>();
