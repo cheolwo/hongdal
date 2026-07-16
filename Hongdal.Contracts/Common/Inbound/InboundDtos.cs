@@ -41,6 +41,9 @@ public sealed class 입고요청항목응답
 {
     public long Id { get; set; }
     public long 창고Id { get; set; }
+    public string? 커뮤니티원장Id { get; set; }
+    public string? 커뮤니티원장템플릿Key { get; set; }
+    public string? 커뮤니티원장상태 { get; set; }
     public string 입고흐름유형 { get; set; } = 입고흐름유형코드.계약기반입고;
     public string 입고생성경로 { get; set; } = string.Empty;
     public bool 계약선행여부 { get; set; } = true;
@@ -93,6 +96,9 @@ public sealed class 입고상품항목응답
     public long Id { get; set; }
     public long 입고요청Id { get; set; }
     public long 창고Id { get; set; }
+    public string? 커뮤니티원장Id { get; set; }
+    public string? 커뮤니티원장템플릿Key { get; set; }
+    public string? 커뮤니티원장상태 { get; set; }
     public string 소유자UserId { get; set; } = string.Empty;
     public string 판매자UserId { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;

@@ -11,6 +11,104 @@ namespace Hongdal.Tests.Ui.Common;
 public sealed class 공동구매창고ViewModelTests
 {
     [Fact]
+    public void 공동구매입출고ViewModel_공통입출고작업을한단계상속한다()
+    {
+        var service = new Fake공동구매창고Service();
+        var state = new 공동구매창고상태ViewModel();
+
+        using var inbound = new 공동구매입고원장ViewModel(service, state);
+        using var outbound = new 공동구매출고원장ViewModel(service, state);
+
+        Assert.IsAssignableFrom<입고ViewModel>(inbound);
+        Assert.IsAssignableFrom<출고ViewModel>(outbound);
+        Assert.NotNull(inbound.원장);
+        Assert.NotNull(outbound.원장);
+        Assert.Equal(6, inbound.세부업무목록.Count);
+        Assert.Equal(3, outbound.세부업무목록.Count);
+        Assert.IsAssignableFrom<I목록조회ViewModel<입고요청항목응답>>(inbound.조회);
+        Assert.IsAssignableFrom<I목록조회ViewModel<재고항목응답>>(outbound.재고조회);
+    }
+
+    [Fact]
+    public async Task 입출고원장목록_입고와출고를나누고선택한원장문맥을공유한다()
+    {
+        var service = new Fake입출고원장조회Service
+        {
+            내원장목록 =
+            [
+                new PlatformCommunityPostLedgerChoiceResponse
+                {
+                    원장Id = "inbound-1",
+                    원장템플릿Key = CommunityLedgerTemplateKeys.WarehouseInbound,
+                    제목 = "서울 입고"
+                }
+            ],
+            공유원장목록 =
+            [
+                new PlatformCommunityPostLedgerChoiceResponse
+                {
+                    원장Id = "outbound-1",
+                    원장템플릿Key = CommunityLedgerTemplateKeys.WarehouseOutbound,
+                    제목 = "부산 출고"
+                }
+            ],
+            원장상세 = new PlatformCommunityPostLedgerContextResponse
+            {
+                원장Id = "inbound-1",
+                원장템플릿Key = CommunityLedgerTemplateKeys.WarehouseInbound,
+                Revision = 3,
+                상태 = "진행중",
+                현재단계 = "검수"
+            }
+        };
+        var state = new 입출고원장상태ViewModel();
+        var list = new 입출고원장목록ViewModel(service, state);
+        using var inbound = new 입고원장ViewModel(state);
+        using var outbound = new 출고원장ViewModel(state);
+
+        Assert.True(await list.목록조회Async());
+        Assert.Equal("inbound-1", Assert.Single(inbound.원장목록).원장Id);
+        Assert.Equal("outbound-1", Assert.Single(outbound.원장목록).원장Id);
+
+        Assert.True(await list.원장선택Async(
+            "inbound-1",
+            CommunityLedgerTemplateKeys.WarehouseInbound));
+
+        Assert.Equal("inbound-1", inbound.원장Id);
+        Assert.Equal(3, inbound.Revision);
+        Assert.Equal("검수", inbound.현재단계);
+        Assert.Null(outbound.원장Id);
+    }
+
+    [Fact]
+    public void 입고ViewModel_선택한입고원장에연결된입고요청만제공한다()
+    {
+        var ledgerState = new 입출고원장상태ViewModel();
+        ledgerState.목록적용(
+        [
+            new PlatformCommunityPostLedgerChoiceResponse
+            {
+                원장Id = "inbound-1",
+                원장템플릿Key = CommunityLedgerTemplateKeys.WarehouseInbound
+            }
+        ],
+        []);
+        var ledger = new 입고원장ViewModel(ledgerState);
+        Assert.True(ledger.원장선택("inbound-1"));
+
+        var warehouseState = new 입출고화면상태ViewModel();
+        warehouseState.입고목록적용(
+        [
+            new 입고요청항목응답 { Id = 1, 커뮤니티원장Id = "inbound-1" },
+            new 입고요청항목응답 { Id = 2, 커뮤니티원장Id = "inbound-2" }
+        ]);
+
+        using var viewModel = new 입고ViewModel(new Fake공동구매창고Service(), warehouseState, ledger);
+
+        Assert.Equal(1, Assert.Single(viewModel.원장연결입고요청목록).Id);
+    }
+
+    [Fact]
     public async Task 초기화_선택창고를기준으로입고원장과출고원장을함께필터링한다()
     {
         var service = new Fake공동구매창고Service
@@ -197,5 +295,25 @@ public sealed class 공동구매창고ViewModelTests
             마지막운송인계요청 = request;
             return Task.FromResult(운송인계응답);
         }
+    }
+
+    private sealed class Fake입출고원장조회Service : I입출고원장조회Service
+    {
+        public IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse> 내원장목록 { get; set; } = [];
+        public IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse> 공유원장목록 { get; set; } = [];
+        public PlatformCommunityPostLedgerContextResponse? 원장상세 { get; set; }
+
+        public Task<IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse>> 내원장목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(내원장목록);
+
+        public Task<IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse>> 공유원장목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(공유원장목록);
+
+        public Task<PlatformCommunityPostLedgerContextResponse?> 원장상세조회Async(
+            string ledgerId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(원장상세);
     }
 }

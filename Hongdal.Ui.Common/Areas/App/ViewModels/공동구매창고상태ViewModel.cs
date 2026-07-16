@@ -3,14 +3,27 @@ using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Shipper.Request;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 /// <summary>
-/// 공동구매 창고 화면의 기준 창고, 입고 요청과 재고 선택을 하위 ViewModel 사이에서 공유합니다.
+/// 입출고 화면의 기준 창고, 입고 요청과 재고 선택을 하위 ViewModel 사이에서 공유합니다.
 /// </summary>
-public sealed class 공동구매창고상태ViewModel : ObservableObject
+public class 입출고화면상태ViewModel : ObservableObject
 {
+    public 입출고화면상태ViewModel()
+    {
+    }
+
+    public 입출고화면상태ViewModel(IHongdal현재사용자Context 현재사용자Context)
+    {
+        this.현재사용자Context = 현재사용자Context;
+    }
+
+    public IHongdal현재사용자Context? 현재사용자Context { get; }
+    public 현재사용자Snapshot 현재사용자
+        => 현재사용자Context?.현재사용자 ?? 현재사용자Snapshot.익명;
     private IReadOnlyList<창고요약응답> _창고목록 = [];
     private 창고요약응답? _선택된창고;
     private IReadOnlyList<창고사용자항목응답> _창고사용자목록 = [];
@@ -253,5 +266,20 @@ public sealed class 공동구매창고상태ViewModel : ObservableObject
         {
             선택된재고 = filteredInventory.FirstOrDefault();
         }
+    }
+}
+
+/// <summary>
+/// 기존 공동구매 화면이 공통 입출고 상태를 그대로 사용할 수 있게 하는 호환 형식입니다.
+/// </summary>
+public sealed class 공동구매창고상태ViewModel : 입출고화면상태ViewModel
+{
+    public 공동구매창고상태ViewModel()
+    {
+    }
+
+    public 공동구매창고상태ViewModel(IHongdal현재사용자Context 현재사용자Context)
+        : base(현재사용자Context)
+    {
     }
 }

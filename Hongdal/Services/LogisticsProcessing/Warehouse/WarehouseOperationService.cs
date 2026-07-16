@@ -31,12 +31,8 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
 
     public async Task<창고목록응답> GetWarehousesAsync(CancellationToken cancellationToken)
     {
-        var userId = _currentUserAccessor.UserId;
-        var query = _db.창고.AsNoTracking().AsQueryable();
-        if (!string.IsNullOrWhiteSpace(userId))
-        {
-            query = query.Where(x => x.소유자UserId == userId || _db.창고사용자.Any(wu => wu.창고Id == x.Id && wu.UserId == userId));
-        }
+        var userId = RequireUserId();
+        var query = 접근가능창고Query(userId).AsNoTracking();
 
         var items = await query
             .OrderBy(x => x.창고명)
@@ -105,6 +101,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
 
     public async Task<창고사용자목록응답> GetWarehouseUsersAsync(long warehouseId, CancellationToken cancellationToken)
     {
+        await 창고접근확인Async(warehouseId, RequireUserId(), cancellationToken);
         var items = await _db.창고사용자.AsNoTracking()
             .Where(x => x.창고Id == warehouseId)
             .OrderByDescending(x => x.IsPrimary)
@@ -125,6 +122,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
 
     public async Task<창고사용자항목응답> AddWarehouseUserAsync(long warehouseId, 창고사용자저장요청 request, CancellationToken cancellationToken)
     {
+        await 창고접근확인Async(warehouseId, RequireUserId(), cancellationToken);
         var entity = new 창고사용자
         {
             창고Id = warehouseId,
@@ -152,13 +150,16 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<입고요청목록응답> GetInboundsAsync(CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var items = await _db.입고요청.AsNoTracking()
-            .Where(x => x.주문자UserId == userId || _db.창고.Any(w => w.Id == x.창고Id && w.소유자UserId == userId))
+        var items = await 접근가능입고Query(userId)
+            .AsNoTracking()
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new 입고요청항목응답
             {
                 Id = x.Id,
                 창고Id = x.창고Id,
+                커뮤니티원장Id = x.커뮤니티원장Id,
+                커뮤니티원장템플릿Key = x.커뮤니티원장템플릿Key,
+                커뮤니티원장상태 = x.커뮤니티원장상태,
                 입고흐름유형 = x.입고흐름유형,
                 입고생성경로 = x.입고생성경로,
                 계약선행여부 = x.계약선행여부,
@@ -184,6 +185,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<입고요청항목응답> CreateInboundAsync(입고요청저장요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
+        await 창고접근확인Async(request.창고Id, userId, cancellationToken);
         var contract = (request.계약정보 ?? 입고계약스냅샷.Default(request.공급처명)).Normalize();
         if (string.IsNullOrWhiteSpace(contract.계약상대방명))
         {
@@ -231,6 +233,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         {
             Id = entity.Id,
             창고Id = entity.창고Id,
+            커뮤니티원장Id = entity.커뮤니티원장Id,
+            커뮤니티원장템플릿Key = entity.커뮤니티원장템플릿Key,
+            커뮤니티원장상태 = entity.커뮤니티원장상태,
             입고흐름유형 = entity.입고흐름유형,
             입고생성경로 = entity.입고생성경로,
             계약선행여부 = entity.계약선행여부,
@@ -253,8 +258,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<입고상품목록응답> CompleteInboundAsync(long inboundId, 입고완료요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var inbound = await _db.입고요청.FirstOrDefaultAsync(x => x.Id == inboundId, cancellationToken)
-            ?? throw new InvalidOperationException("입고요청을 찾을 수 없습니다.");
+        var inbound = await 접근가능입고Query(userId)
+            .FirstOrDefaultAsync(x => x.Id == inboundId, cancellationToken)
+            ?? throw new InvalidOperationException("입고요청을 찾을 수 없거나 접근할 수 없습니다.");
 
         inbound.상태 = 입고상태.입고완료;
         inbound.입고완료일시 = DateTime.UtcNow;
@@ -267,8 +273,11 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             {
                 입고요청Id = inbound.Id,
                 창고Id = inbound.창고Id,
+                커뮤니티원장Id = inbound.커뮤니티원장Id,
+                커뮤니티원장템플릿Key = inbound.커뮤니티원장템플릿Key,
+                커뮤니티원장상태 = inbound.커뮤니티원장상태,
                 소유자UserId = inbound.주문자UserId,
-                판매자UserId = userId,
+                판매자UserId = inbound.판매자UserId,
                 상품명 = item.상품명.Trim(),
                 SKU = item.SKU.Trim(),
                 옵션명 = item.옵션명.Trim(),
@@ -342,6 +351,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
                 Id = item.Id,
                 입고요청Id = item.입고요청Id,
                 창고Id = item.창고Id,
+                커뮤니티원장Id = item.커뮤니티원장Id,
+                커뮤니티원장템플릿Key = item.커뮤니티원장템플릿Key,
+                커뮤니티원장상태 = item.커뮤니티원장상태,
                 소유자UserId = item.소유자UserId,
                 판매자UserId = item.판매자UserId,
                 상품명 = item.상품명,
@@ -362,13 +374,16 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     {
         var userId = RequireUserId();
         var warehouseNames = _db.창고.AsNoTracking();
-        var items = await _db.입고상품.AsNoTracking()
-            .Where(x => x.소유자UserId == userId || x.판매자UserId == userId)
+        var items = await 접근가능재고Query(userId)
+            .AsNoTracking()
             .OrderByDescending(x => x.UpdatedAt)
             .Select(x => new 재고항목응답
             {
                 입고상품Id = x.Id,
                 창고Id = x.창고Id,
+                커뮤니티원장Id = x.커뮤니티원장Id,
+                커뮤니티원장템플릿Key = x.커뮤니티원장템플릿Key,
+                커뮤니티원장상태 = x.커뮤니티원장상태,
                 창고명 = warehouseNames.Where(w => w.Id == x.창고Id).Select(w => w.창고명).FirstOrDefault() ?? string.Empty,
                 소유자UserId = x.소유자UserId,
                 판매자UserId = x.판매자UserId,
@@ -389,8 +404,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<창고작업결과응답> InspectInboundItemAsync(long inboundItemId, 입고검수요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var item = await _db.입고상품.FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
-            ?? throw new InvalidOperationException("입고상품을 찾을 수 없습니다.");
+        var item = await 접근가능재고Query(userId)
+            .FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
+            ?? throw new InvalidOperationException("입고상품을 찾을 수 없거나 접근할 수 없습니다.");
 
         if (request.검수수량 <= 0)
         {
@@ -436,8 +452,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<창고작업결과응답> PutAwayInventoryItemAsync(long inboundItemId, 적재위치배정요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var item = await _db.입고상품.FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
-            ?? throw new InvalidOperationException("입고상품을 찾을 수 없습니다.");
+        var item = await 접근가능재고Query(userId)
+            .FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
+            ?? throw new InvalidOperationException("입고상품을 찾을 수 없거나 접근할 수 없습니다.");
 
         if (string.IsNullOrWhiteSpace(request.보관위치))
         {
@@ -472,8 +489,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<창고작업결과응답> PackInventoryItemAsync(long inboundItemId, 포장작업요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var item = await _db.입고상품.FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
-            ?? throw new InvalidOperationException("입고상품을 찾을 수 없습니다.");
+        var item = await 접근가능재고Query(userId)
+            .FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
+            ?? throw new InvalidOperationException("입고상품을 찾을 수 없거나 접근할 수 없습니다.");
 
         if (request.포장수량 <= 0 || request.포장수량 > item.가용수량 + item.예약수량)
         {
@@ -507,8 +525,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<Hongdal.Contracts.Shipper.Request.화주운송의뢰응답> CreateReconsignmentRequestAsync(재고운송의뢰생성요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var item = await _db.입고상품.FirstOrDefaultAsync(x => x.Id == request.입고상품Id, cancellationToken)
-            ?? throw new InvalidOperationException("입고상품을 찾을 수 없습니다.");
+        var item = await 접근가능재고Query(userId)
+            .FirstOrDefaultAsync(x => x.Id == request.입고상품Id, cancellationToken)
+            ?? throw new InvalidOperationException("입고상품을 찾을 수 없거나 접근할 수 없습니다.");
 
         if (item.가용수량 < request.요청수량 || request.요청수량 <= 0)
         {
@@ -634,7 +653,46 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
 
     private string RequireUserId()
     {
-        return _currentUserAccessor.UserId ?? throw new InvalidOperationException("로그인 사용자를 확인할 수 없습니다.");
+        var userId = _currentUserAccessor.UserId?.Trim();
+        return !string.IsNullOrWhiteSpace(userId)
+            ? userId
+            : throw new InvalidOperationException("로그인 사용자를 확인할 수 없습니다.");
+    }
+
+    private IQueryable<창고> 접근가능창고Query(string userId)
+        => _db.창고.Where(warehouse =>
+            warehouse.소유자UserId == userId
+            || _db.창고사용자.Any(user =>
+                user.창고Id == warehouse.Id && user.UserId == userId));
+
+    private IQueryable<입고요청> 접근가능입고Query(string userId)
+        => _db.입고요청.Where(inbound =>
+            inbound.주문자UserId == userId
+            || _db.창고.Any(warehouse =>
+                warehouse.Id == inbound.창고Id && warehouse.소유자UserId == userId)
+            || _db.창고사용자.Any(user =>
+                user.창고Id == inbound.창고Id && user.UserId == userId));
+
+    private IQueryable<입고상품> 접근가능재고Query(string userId)
+        => _db.입고상품.Where(item =>
+            item.소유자UserId == userId
+            || item.판매자UserId == userId
+            || _db.창고.Any(warehouse =>
+                warehouse.Id == item.창고Id && warehouse.소유자UserId == userId)
+            || _db.창고사용자.Any(user =>
+                user.창고Id == item.창고Id && user.UserId == userId));
+
+    private async Task 창고접근확인Async(
+        long warehouseId,
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        if (!await 접근가능창고Query(userId).AnyAsync(
+                warehouse => warehouse.Id == warehouseId,
+                cancellationToken))
+        {
+            throw new InvalidOperationException("창고를 찾을 수 없거나 접근할 수 없습니다.");
+        }
     }
 
     private static 재고이동 CreateInventoryMovement(입고상품 item, string movementType, int quantity, string userId, string memo, DateTime occurredAt)

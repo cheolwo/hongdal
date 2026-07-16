@@ -6,9 +6,9 @@ using Hongdal.Contracts.Shipper.Request;
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
 /// <summary>
-/// 공동구매 실행 화면에서 창고 기준정보, 입고원장과 출고원장을 다루는 API 경계입니다.
+/// 업무 종류와 무관하게 창고 기준정보와 입출고 작업을 다루는 API 경계입니다.
 /// </summary>
-public interface I공동구매창고Service
+public interface I입출고작업Service
 {
     Task<IReadOnlyList<창고요약응답>> 창고목록조회Async(CancellationToken cancellationToken = default);
 
@@ -58,7 +58,15 @@ public interface I공동구매창고Service
         CancellationToken cancellationToken = default);
 }
 
-public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I공동구매창고Service
+/// <summary>
+/// 기존 공동구매 화면과의 호환성을 위한 이름입니다.
+/// 공동구매 전용 동작은 ViewModel 계층에서 추가하고 API 작업은 공통 계약을 사용합니다.
+/// </summary>
+public interface I공동구매창고Service : I입출고작업Service
+{
+}
+
+public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고작업Service
 {
     private const string BasePath = "api/v1/warehouse-operations";
 
@@ -66,7 +74,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
         CancellationToken cancellationToken = default)
         => (await client.GetAsync<창고목록응답>(
                 $"{BasePath}/warehouses",
-                "공동구매 창고 목록 조회",
+                "창고 목록 조회",
                 cancellationToken: cancellationToken))?.Items
             ?? [];
 
@@ -77,7 +85,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/warehouses",
             request,
-            "공동구매 창고 생성",
+            "창고 생성",
             cancellationToken: cancellationToken);
 
     public async Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(
@@ -85,7 +93,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
         CancellationToken cancellationToken = default)
         => (await client.GetAsync<창고사용자목록응답>(
                 $"{BasePath}/warehouses/{warehouseId}/users",
-                "공동구매 창고 사용자 목록 조회",
+                "창고 사용자 목록 조회",
                 cancellationToken: cancellationToken))?.Items
             ?? [];
 
@@ -97,14 +105,14 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/warehouses/{warehouseId}/users",
             request,
-            "공동구매 창고 사용자 추가",
+            "창고 사용자 추가",
             cancellationToken: cancellationToken);
 
     public async Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(
         CancellationToken cancellationToken = default)
         => (await client.GetAsync<입고요청목록응답>(
                 $"{BasePath}/inbounds",
-                "공동구매 입고원장 목록 조회",
+                "입고 요청 목록 조회",
                 cancellationToken: cancellationToken))?.Items
             ?? [];
 
@@ -115,7 +123,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/inbounds",
             request,
-            "공동구매 입고 요청 생성",
+            "입고 요청 생성",
             cancellationToken: cancellationToken);
 
     public async Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(
@@ -126,7 +134,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
                 HttpMethod.Post,
                 $"{BasePath}/inbounds/{inboundId}/complete",
                 request,
-                "공동구매 입고 완료",
+                "입고 완료",
                 cancellationToken: cancellationToken))?.Items
             ?? [];
 
@@ -134,7 +142,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
         CancellationToken cancellationToken = default)
         => (await client.GetAsync<재고목록응답>(
                 $"{BasePath}/inventory",
-                "공동구매 재고 목록 조회",
+                "재고 목록 조회",
                 cancellationToken: cancellationToken))?.Items
             ?? [];
 
@@ -146,7 +154,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/inventory/{inboundItemId}/inspect",
             request,
-            "공동구매 입고 검수",
+            "입고 검수",
             cancellationToken: cancellationToken);
 
     public Task<창고작업결과응답?> 적재위치배정Async(
@@ -157,7 +165,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/inventory/{inboundItemId}/put-away",
             request,
-            "공동구매 적재 위치 배정",
+            "적재 위치 배정",
             cancellationToken: cancellationToken);
 
     public Task<창고작업결과응답?> 포장작업Async(
@@ -168,7 +176,7 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/inventory/{inboundItemId}/pack",
             request,
-            "공동구매 출고 포장",
+            "출고 포장",
             cancellationToken: cancellationToken);
 
     public Task<화주운송의뢰응답?> 운송인계Async(
@@ -178,6 +186,10 @@ public sealed class 공동구매창고Service(IHongdalJsonApiClient client) : I�
             HttpMethod.Post,
             $"{BasePath}/inventory/reconsignment",
             request,
-            "공동구매 출고 운송 인계",
+            "출고 운송 인계",
             cancellationToken: cancellationToken);
 }
+
+/// <summary>기존 공동구매 화면이 공통 입출고 API 구현을 사용하도록 유지하는 호환 형식입니다.</summary>
+public sealed class 공동구매창고Service(IHongdalJsonApiClient client)
+    : 입출고작업Service(client), I공동구매창고Service;
