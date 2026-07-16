@@ -7,8 +7,11 @@ namespace HongdalApp.ViewModels.Shipper;
 
 public sealed class 화주판매기능ViewModel : 조립ViewModelBase
 {
-    public 화주판매기능ViewModel(IShipperSalesService sales)
+    public 화주판매기능ViewModel(
+        IShipperSalesService sales,
+        판매ViewModel 기본판매)
     {
+        this.기본판매 = 하위ViewModel등록(기본판매);
         지원채널조회 = 하위ViewModel등록(
             new Api작업ViewModel<IReadOnlyList<CommerceChannelDescriptor>>(sales.GetSupportedChannelsAsync));
         계정목록조회 = 하위ViewModel등록(
@@ -25,6 +28,7 @@ public sealed class 화주판매기능ViewModel : 조립ViewModelBase
             new Api작업ViewModel<채널출품저장요청, 채널출품항목응답?>(sales.CreateListingAsync));
     }
 
+    public 판매ViewModel 기본판매 { get; }
     public Api작업ViewModel<IReadOnlyList<CommerceChannelDescriptor>> 지원채널조회 { get; }
     public Api작업ViewModel<판매채널계정목록응답?> 계정목록조회 { get; }
     public Api작업ViewModel<판매채널계정저장요청, 판매채널계정항목응답?> 계정등록 { get; }

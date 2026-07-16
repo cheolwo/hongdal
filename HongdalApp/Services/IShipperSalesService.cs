@@ -1,9 +1,10 @@
 using Hongdal.Contracts.Common.Sales;
+using Hongdal.Ui.Common.Areas.App.Services;
 using HongdalApp.Services.Commerce;
 
 namespace HongdalApp.Services;
 
-public interface IShipperSalesService
+public interface IShipperSalesService : I판매채널계정Service, I상품등록Service, I채널출품Service
 {
     Task<IReadOnlyList<CommerceChannelDescriptor>> GetSupportedChannelsAsync(CancellationToken cancellationToken = default);
 

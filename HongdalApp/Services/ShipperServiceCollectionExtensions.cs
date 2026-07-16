@@ -65,6 +65,9 @@ public static class ShipperServiceCollectionExtensions
     private static IServiceCollection AddShipperCoreServices(this IServiceCollection services)
     {
         services.AddTransient<화주Controller기능모음ViewModel>();
+        services.AddTransient<화주운송의뢰조회ViewModel>();
+        services.AddTransient<화주운송의뢰작성ViewModel>();
+        services.AddTransient<화주운송의뢰일괄ViewModel>();
         services.AddTransient<화주운송의뢰기능ViewModel>();
         services.AddTransient<화주창고기능ViewModel>();
         services.AddTransient<화주판매기능ViewModel>();
@@ -148,6 +151,9 @@ public static class ShipperServiceCollectionExtensions
     {
         services.AddScoped<ShipperSalesService>();
         services.AddScoped<IShipperSalesService>(sp => sp.GetRequiredService<ShipperSalesService>());
+        services.AddScoped<I판매채널계정Service>(sp => sp.GetRequiredService<ShipperSalesService>());
+        services.AddScoped<I상품등록Service>(sp => sp.GetRequiredService<ShipperSalesService>());
+        services.AddScoped<I채널출품Service>(sp => sp.GetRequiredService<ShipperSalesService>());
         services.AddSingleton<ICommerceChannelCatalog, CommerceChannelCatalog>();
         services.AddScoped<ICommerceChannelListingService, CommerceChannelListingService>();
         services.AddScoped<ICommerceOrderFulfillmentService, CommerceOrderFulfillmentService>();

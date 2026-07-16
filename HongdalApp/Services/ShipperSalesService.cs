@@ -64,4 +64,31 @@ public sealed class ShipperSalesService : IShipperSalesService
         cancellationToken.ThrowIfCancellationRequested();
         return await _createListingHandler.HandleAsync(new CreateChannelListingCommand(payload), cancellationToken);
     }
+
+    public async Task<IReadOnlyList<판매채널계정항목응답>> 계정목록조회Async(
+        CancellationToken cancellationToken = default)
+        => (await GetAccountsAsync(cancellationToken))?.Items ?? [];
+
+    public Task<판매채널계정항목응답?> 계정생성Async(
+        판매채널계정저장요청 request,
+        CancellationToken cancellationToken = default)
+        => CreateAccountAsync(request, cancellationToken);
+
+    public async Task<IReadOnlyList<판매상품항목응답>> 상품목록조회Async(
+        CancellationToken cancellationToken = default)
+        => (await GetProductsAsync(cancellationToken))?.Items ?? [];
+
+    public Task<판매상품항목응답?> 상품생성Async(
+        판매상품저장요청 request,
+        CancellationToken cancellationToken = default)
+        => CreateProductAsync(request, cancellationToken);
+
+    public async Task<IReadOnlyList<채널출품항목응답>> 출품목록조회Async(
+        CancellationToken cancellationToken = default)
+        => (await GetListingsAsync(cancellationToken))?.Items ?? [];
+
+    public Task<채널출품항목응답?> 출품생성Async(
+        채널출품저장요청 request,
+        CancellationToken cancellationToken = default)
+        => CreateListingAsync(request, cancellationToken);
 }
