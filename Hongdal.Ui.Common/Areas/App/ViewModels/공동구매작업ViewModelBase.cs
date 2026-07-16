@@ -8,9 +8,11 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 public abstract class 공동구매작업ViewModelBase : ObservableObject
 {
     private Api작업상태 _상태;
+    private Api작업오류? _오류;
     private string? _오류메시지;
     private string? _성공메시지;
     private DateTimeOffset? _마지막완료시각;
+    private CancellationTokenSource? _실행취소;
 
     public Api작업상태 상태
     {
@@ -35,6 +37,12 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
         private set => SetProperty(ref _오류메시지, value);
     }
 
+    public Api작업오류? 오류
+    {
+        get => _오류;
+        private set => SetProperty(ref _오류, value);
+    }
+
     public string? 성공메시지
     {
         get => _성공메시지;
@@ -51,6 +59,7 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
     public bool 성공함 => 상태 == Api작업상태.성공;
     public bool 오류발생 => 상태 == Api작업상태.실패;
     public bool 취소됨 => 상태 == Api작업상태.취소됨;
+    public bool 취소가능 => 처리중 && _실행취소 is not null;
 
     public void 작업상태초기화()
     {
@@ -60,6 +69,7 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
         }
 
         오류메시지 = null;
+        오류 = null;
         성공메시지 = null;
         마지막완료시각 = null;
         상태 = Api작업상태.대기;
@@ -68,6 +78,7 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
     protected bool 유효성실패(string message)
     {
         오류메시지 = message;
+        오류 = new Api작업오류("validation", message);
         성공메시지 = null;
         마지막완료시각 = DateTimeOffset.Now;
         상태 = Api작업상태.실패;
@@ -88,31 +99,49 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
         }
 
         오류메시지 = null;
+        오류 = null;
         성공메시지 = null;
         마지막완료시각 = null;
         상태 = Api작업상태.처리중;
+        _실행취소?.Dispose();
+        using var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _실행취소 = linkedCancellation;
+        OnPropertyChanged(nameof(취소가능));
 
         try
         {
-            await action(cancellationToken);
+            await action(linkedCancellation.Token);
             성공메시지 = successMessage;
             상태 = Api작업상태.성공;
             return true;
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
         {
             상태 = Api작업상태.취소됨;
-            throw;
+            return false;
         }
         catch (Exception ex)
         {
-            오류메시지 = errorMessageFactory?.Invoke(ex) ?? ex.Message;
+            오류 = Api작업오류.변환(ex);
+            오류메시지 = errorMessageFactory?.Invoke(ex) ?? 오류.메시지;
+            if (!string.Equals(오류메시지, 오류.메시지, StringComparison.Ordinal))
+            {
+                오류 = 오류 with { 메시지 = 오류메시지 };
+            }
             상태 = Api작업상태.실패;
             return false;
         }
         finally
         {
+            if (ReferenceEquals(_실행취소, linkedCancellation))
+            {
+                _실행취소 = null;
+            }
+
+            OnPropertyChanged(nameof(취소가능));
             마지막완료시각 = DateTimeOffset.Now;
         }
     }
+
+    public void 작업취소() => _실행취소?.Cancel();
 }
