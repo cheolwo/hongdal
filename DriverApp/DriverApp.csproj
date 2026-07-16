@@ -75,6 +75,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Bogus" />
+		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="Microsoft.Maui.Controls" />
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" />

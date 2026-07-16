@@ -8,6 +8,7 @@ public static class DriverRoutes
     public const string WorkStart = "/driver/work/start";
     public const string CommunityInquiries = "/driver/work/community-inquiries";
     public const string Recommendations = "/driver/recommendations";
+    public const string Reservations = "/driver/reservations";
     public const string CurrentTransport = "/driver/transports/current";
     public const string DeliveryHistory = "/driver/transports/history";
     public const string CurrentMonthSettlement = "/driver/settlements/current-month";
