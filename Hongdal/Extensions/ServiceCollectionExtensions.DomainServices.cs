@@ -48,6 +48,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I주문자집단자동배정Service, 주문자집단자동배정Service>();
         services.AddSingleton<I공동구매물류워크플로우저장소, Mongo공동구매물류워크플로우저장소>();
         services.AddSingleton<I공동구매자동집단화저장소, Mongo공동구매자동집단화저장소>();
+        services.AddScoped<I공동구매수령창고Service, 공동구매수령창고Service>();
+        services.AddScoped<I공동구매개별주문원장Service, 공동구매개별주문원장Service>();
         services.AddSingleton<ICommunityGroupPurchaseDemandHandoff, CommunityVoteOrdererDemandHandoff>();
         services.AddSingleton<ICommunityProducerMemberDirectory, UnconnectedCommunityProducerMemberDirectory>();
         services.AddSingleton<ICommunityGroupPurchaseRepresentativeDirectory, UnconnectedCommunityGroupPurchaseRepresentativeDirectory>();

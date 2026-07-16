@@ -212,5 +212,13 @@ public sealed class DomesticGroupPurchaseVehicleRecommendationServiceTests
                 _group is not null && string.Equals(_group.자동집단Id, 자동집단Id, StringComparison.Ordinal)
                     ? _group
                     : null);
+
+        public Task<공동구매자동집단응답> 개별주문원장연결Async(
+            string 자동집단Id,
+            string 수요Id,
+            string 개별주문원장Id,
+            string 입고예정원장Id,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
     }
 }
