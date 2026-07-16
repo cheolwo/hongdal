@@ -1,5 +1,8 @@
+using System.Globalization;
 using System.Net.Http.Json;
 using Hongdal.Contracts.Common.AgriculturalFisheries;
+using Hongdal.Contracts.Common.Customs;
+using Hongdal.Contracts.Common.PublicData;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
@@ -65,6 +68,54 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
             cancellationToken);
     }
 
+    public Task<FoodPriceComparisonResponse> 식품가격비교Async(
+        FoodPriceComparisonRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.HsCode);
+
+        var hsCode = new string(request.HsCode.Where(char.IsDigit).ToArray());
+        var parameters = new List<string>();
+        AddParameter(parameters, "countryCode", request.CountryCode);
+        AddParameter(parameters, "referenceDate", request.ReferenceDate);
+        parameters.Add($"domesticLookbackDays={Math.Clamp(request.DomesticLookbackDays, 1, 31)}");
+        AddParameter(parameters, "referenceMonth", request.ReferenceMonth);
+        parameters.Add($"importLookbackMonths={Math.Clamp(request.ImportLookbackMonths, 1, 12)}");
+        AddDecimalParameter(parameters, "fxRateKrwPerUsd", request.FxRateKrwPerUsd);
+        AddDecimalParameter(
+            parameters,
+            "estimatedImportAdditionalCostKrwPerKg",
+            request.EstimatedImportAdditionalCostKrwPerKg);
+
+        return GetAsync<FoodPriceComparisonResponse>(
+            $"api/v1/customs/hs-codes/{Uri.EscapeDataString(hsCode)}/food-price-comparison"
+            + $"?{string.Join('&', parameters)}",
+            cancellationToken);
+    }
+
+    public async Task<HsCountryImportUnitPriceSimulationResult> 수입평균단가조회Async(
+        HsCountryMonthlyTradeUnitPriceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        using var response = await httpClient.PostAsJsonAsync(
+            "api/v1/orderer/public-data/customs/hs-country-import-unit-price-simulation",
+            request,
+            cancellationToken);
+        var payload = await response.Content.ReadFromJsonAsync<HsCountryImportUnitPriceSimulationResult>(
+            cancellationToken: cancellationToken);
+        if (payload is null)
+        {
+            throw new HttpRequestException(
+                "수입 평균단가 API 응답을 읽지 못했습니다.",
+                inner: null,
+                response.StatusCode);
+        }
+
+        return payload;
+    }
+
     private async Task<TResponse> GetAsync<TResponse>(
         string path,
         CancellationToken cancellationToken)
@@ -88,6 +139,17 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
         if (!string.IsNullOrWhiteSpace(value))
         {
             parameters.Add($"{name}={Uri.EscapeDataString(value.Trim())}");
+        }
+    }
+
+    private static void AddDecimalParameter(
+        List<string> parameters,
+        string name,
+        decimal? value)
+    {
+        if (value is > 0)
+        {
+            parameters.Add($"{name}={value.Value.ToString(CultureInfo.InvariantCulture)}");
         }
     }
 }

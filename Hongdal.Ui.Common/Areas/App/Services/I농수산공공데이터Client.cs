@@ -1,4 +1,6 @@
 using Hongdal.Contracts.Common.AgriculturalFisheries;
+using Hongdal.Contracts.Common.Customs;
+using Hongdal.Contracts.Common.PublicData;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
@@ -24,5 +26,13 @@ public interface I농수산공공데이터Client
         int yearFrom,
         int yearTo,
         int maxItems = 100,
+        CancellationToken cancellationToken = default);
+
+    Task<FoodPriceComparisonResponse> 식품가격비교Async(
+        FoodPriceComparisonRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<HsCountryImportUnitPriceSimulationResult> 수입평균단가조회Async(
+        HsCountryMonthlyTradeUnitPriceRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text;
 using Hongdal.Contracts.Common.AgriculturalFisheries;
+using Hongdal.Contracts.Common.Customs;
+using Hongdal.Contracts.Common.PublicData;
 using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Tests.Ui.Common;
@@ -89,6 +91,106 @@ public sealed class 농수산공공데이터ClientTests
             "/api/v1/agricultural-fisheries/items/080810/domestic-price",
             requestedUri!.AbsolutePath);
         Assert.Contains("lookbackDays=31", requestedUri.Query, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 식품가격비교는_HS국가환율추가비용을조회조건으로전송한다()
+    {
+        Uri? requestedUri = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "success": true,
+                      "statusCode": "Complete",
+                      "hsCode": "080810",
+                      "countryCode": "US",
+                      "summary": "가격 비교 완료"
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new 농수산공공데이터Client(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.hongdal.test/")
+        });
+
+        var result = await client.식품가격비교Async(new FoodPriceComparisonRequest
+        {
+            HsCode = "0808.10",
+            CountryCode = "US",
+            DomesticLookbackDays = 45,
+            ImportLookbackMonths = 24,
+            FxRateKrwPerUsd = 1_375.5m,
+            EstimatedImportAdditionalCostKrwPerKg = 2_000m
+        });
+
+        Assert.True(result.Success);
+        Assert.NotNull(requestedUri);
+        Assert.Equal(
+            "/api/v1/customs/hs-codes/080810/food-price-comparison",
+            requestedUri!.AbsolutePath);
+        var query = Uri.UnescapeDataString(requestedUri.Query);
+        Assert.Contains("countryCode=US", query, StringComparison.Ordinal);
+        Assert.Contains("domesticLookbackDays=31", query, StringComparison.Ordinal);
+        Assert.Contains("importLookbackMonths=12", query, StringComparison.Ordinal);
+        Assert.Contains("fxRateKrwPerUsd=1375.5", query, StringComparison.Ordinal);
+        Assert.Contains("estimatedImportAdditionalCostKrwPerKg=2000", query, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 수입평균단가조회는_시뮬레이션요청을POST로전송한다()
+    {
+        HttpMethod? requestedMethod = null;
+        Uri? requestedUri = null;
+        string? requestBody = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedMethod = request.Method;
+            requestedUri = request.RequestUri;
+            requestBody = request.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "success": true,
+                      "hsCode": "080810",
+                      "countryCode": "US",
+                      "averageImportUnitValueKrwPerKg": 7000
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new 농수산공공데이터Client(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.hongdal.test/")
+        });
+
+        var result = await client.수입평균단가조회Async(new HsCountryMonthlyTradeUnitPriceRequest
+        {
+            HsCode = "080810",
+            CountryCode = "US",
+            Month = "202606",
+            LookbackMonths = 3,
+            ExpectedSellingUnitPriceKrwPerKg = 12_000m
+        });
+
+        Assert.True(result.Success);
+        Assert.Equal(HttpMethod.Post, requestedMethod);
+        Assert.Equal(
+            "/api/v1/orderer/public-data/customs/hs-country-import-unit-price-simulation",
+            requestedUri?.AbsolutePath);
+        Assert.Contains("\"hsCode\":\"080810\"", requestBody, StringComparison.Ordinal);
+        Assert.Contains("\"expectedSellingUnitPriceKrwPerKg\":12000", requestBody, StringComparison.Ordinal);
     }
 
     private sealed class StubHttpMessageHandler(
