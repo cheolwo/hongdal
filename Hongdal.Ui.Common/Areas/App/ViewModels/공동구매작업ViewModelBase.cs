@@ -1,12 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 /// <summary>
-/// 공동구매 하위 ViewModel에 동일한 실행, 오류, 완료 상태를 제공합니다.
+/// API 기반 업무 ViewModel에 동일한 실행, 오류, 완료 상태를 제공합니다.
 /// </summary>
-public abstract class 공동구매작업ViewModelBase : ObservableObject
+public abstract class 업무작업ViewModelBase : ObservableObject
 {
+    private IHongdal현재사용자Context? _현재사용자Context;
     private Api작업상태 _상태;
     private Api작업오류? _오류;
     private string? _오류메시지;
@@ -60,6 +62,16 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
     public bool 오류발생 => 상태 == Api작업상태.실패;
     public bool 취소됨 => 상태 == Api작업상태.취소됨;
     public bool 취소가능 => 처리중 && _실행취소 is not null;
+    public 현재사용자Snapshot 현재사용자
+        => _현재사용자Context?.현재사용자 ?? 현재사용자Snapshot.익명;
+    public bool 사용자확인됨 => 현재사용자.인증됨;
+
+    protected void 현재사용자Context연결(IHongdal현재사용자Context? context)
+    {
+        _현재사용자Context = context;
+        OnPropertyChanged(nameof(현재사용자));
+        OnPropertyChanged(nameof(사용자확인됨));
+    }
 
     public void 작업상태초기화()
     {
@@ -144,4 +156,12 @@ public abstract class 공동구매작업ViewModelBase : ObservableObject
     }
 
     public void 작업취소() => _실행취소?.Cancel();
+}
+
+/// <summary>
+/// 기존 공동구매 ViewModel의 호환성을 유지하면서 공통 업무 실행 상태를 재사용합니다.
+/// 신규 업무 ViewModel은 <see cref="업무작업ViewModelBase"/>를 직접 상속합니다.
+/// </summary>
+public abstract class 공동구매작업ViewModelBase : 업무작업ViewModelBase
+{
 }
