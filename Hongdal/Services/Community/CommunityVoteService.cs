@@ -9,7 +9,11 @@ public interface ICommunityVoteService
 {
     Task<CommunityVoteResponse> CreateAsync(CommunityVoteCreateRequest request, CancellationToken cancellationToken);
 
-    Task<CommunityVoteListResponse> ListAsync(string? appKey, string? communityScope, CancellationToken cancellationToken);
+    Task<CommunityVoteListResponse> ListAsync(
+        string? appKey,
+        string? communityScope,
+        string? hsCode,
+        CancellationToken cancellationToken);
 
     Task<CommunityVoteResponse?> GetAsync(Guid voteId, CancellationToken cancellationToken);
 
@@ -31,6 +35,39 @@ public interface ICommunityVoteService
         Guid voteId,
         CommunityVoteResolutionReadyToSignRequest request,
         CancellationToken cancellationToken);
+}
+
+internal static class CommunityVoteHsCode
+{
+    public static string? NormalizeOptional(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = new string(value.Where(char.IsDigit).ToArray());
+        if (normalized.Length is < 2 or > 10)
+        {
+            throw new InvalidOperationException("HS 코드는 구분기호를 제외한 2~10자리 숫자로 입력해야 합니다.");
+        }
+
+        return normalized;
+    }
+
+    public static bool MatchesPrefix(string? storedValue, string normalizedPrefix)
+    {
+        if (string.IsNullOrWhiteSpace(storedValue))
+        {
+            return false;
+        }
+
+        var storedCode = new string(storedValue.Where(char.IsDigit).ToArray());
+        return storedCode.StartsWith(normalizedPrefix, StringComparison.Ordinal);
+    }
+
+    public static string PrefixRegex(string normalizedPrefix)
+        => $"^{string.Join("[^0-9]*", normalizedPrefix.Select(character => character.ToString()))}";
 }
 
 public class CommunityVoteService : ICommunityVoteService
@@ -124,9 +161,14 @@ public class CommunityVoteService : ICommunityVoteService
         return ToResponse(vote);
     }
 
-    public async Task<CommunityVoteListResponse> ListAsync(string? appKey, string? communityScope, CancellationToken cancellationToken)
+    public async Task<CommunityVoteListResponse> ListAsync(
+        string? appKey,
+        string? communityScope,
+        string? hsCode,
+        CancellationToken cancellationToken)
     {
-        var items = await _store.ListAsync(appKey, communityScope, cancellationToken);
+        var normalizedHsCode = CommunityVoteHsCode.NormalizeOptional(hsCode);
+        var items = await _store.ListAsync(appKey, communityScope, normalizedHsCode, cancellationToken);
         return new CommunityVoteListResponse
         {
             Items = items.Select(ToResponse).ToArray()
@@ -257,39 +299,45 @@ public class CommunityVoteService : ICommunityVoteService
             throw new InvalidOperationException("서명 필수 결의문은 서명 요청 대상이 필요합니다.");
         }
 
-            var documentText = BuildDocumentText(vote, request);
-            var documentHash = Hash(documentText);
-            var documentNumber = $"COMM-VOTE-{DateTime.UtcNow:yyyyMMdd}-{vote.Id:N}"[..42];
-            var signatureBundle = requiredSigners.Count == 0
-                ? null
-                : ContractElectronicSignaturePlanner.CreateBundle(
-                    documentNumber,
-                    documentHash,
-                    requiredSigners.Select(x => new ContractSignatureRequest(
-                        x.PartyId,
-                        x.RoleCode,
-                        x.SignerDisplayName,
-                        IsRequiredSigner: true,
-                        DateTimeOffset.UtcNow)),
-                    DateTimeOffset.UtcNow);
+        if (!request.LegalReviewRequested && vote.SignatureRequired)
+        {
+            EnsureGroupImportContractReady(vote);
+        }
+
+        var legalEffectNotice = BuildLegalEffectNotice(vote);
+        var documentText = BuildDocumentText(vote, request, legalEffectNotice);
+        var documentHash = Hash(documentText);
+        var documentNumber = $"COMM-VOTE-{DateTime.UtcNow:yyyyMMdd}-{vote.Id:N}"[..42];
+        var signatureBundle = requiredSigners.Count == 0
+            ? null
+            : ContractElectronicSignaturePlanner.CreateBundle(
+                documentNumber,
+                documentHash,
+                requiredSigners.Select(x => new ContractSignatureRequest(
+                    x.PartyId,
+                    x.RoleCode,
+                    x.SignerDisplayName,
+                    IsRequiredSigner: true,
+                    DateTimeOffset.UtcNow)),
+                DateTimeOffset.UtcNow);
 
         vote.Status = CommunityVoteStatusCodes.ResolutionDrafted;
         vote.ResolutionDocument = new CommunityVoteResolutionDocumentRecord
         {
-                Id = Guid.NewGuid(),
-                VoteId = vote.Id,
-                DocumentNumber = documentNumber,
-                DocumentTitle = Normalize(request.DocumentTitle, $"{vote.Title} 결의문"),
-                ResolutionText = Normalize(request.ResolutionText, "투표 결과에 따른 커뮤니티 결의 초안입니다."),
-                DocumentHash = documentHash,
-                Status = request.LegalReviewRequested
-                    ? CommunityVoteResolutionStatusCodes.LegalReviewRequired
-                    : vote.SignatureRequired
-                        ? CommunityVoteResolutionStatusCodes.ReadyToSign
-                        : CommunityVoteResolutionStatusCodes.Draft,
-                LegalEffectNotice = LegalEffectNotice,
-                CreatedAtUtc = DateTime.UtcNow,
-                SignatureBundle = signatureBundle
+            Id = Guid.NewGuid(),
+            VoteId = vote.Id,
+            DocumentNumber = documentNumber,
+            DocumentTitle = Normalize(request.DocumentTitle, $"{vote.Title} 결의문"),
+            ResolutionText = Normalize(request.ResolutionText, "투표 결과에 따른 커뮤니티 결의 초안입니다."),
+            DocumentHash = documentHash,
+            Status = request.LegalReviewRequested
+                ? CommunityVoteResolutionStatusCodes.LegalReviewRequired
+                : vote.SignatureRequired
+                    ? CommunityVoteResolutionStatusCodes.ReadyToSign
+                    : CommunityVoteResolutionStatusCodes.Draft,
+            LegalEffectNotice = legalEffectNotice,
+            CreatedAtUtc = DateTime.UtcNow,
+            SignatureBundle = signatureBundle
         };
 
         await SaveMutationAsync(vote, cancellationToken);
@@ -313,21 +361,23 @@ public class CommunityVoteService : ICommunityVoteService
             throw new InvalidOperationException("법무/운영 검토가 필요한 결의문은 서명 가능 상태로 전환한 뒤 서명해야 합니다.");
         }
 
-            var evidence = new ContractSignatureEvidence(
-                request.PartyId,
-                Normalize(request.SignerDisplayName, "익명 참여자"),
-                Normalize(request.SignatureMethodCode, ContractSignatureMethodCode.PlatformClickSign),
-                document.DocumentHash,
-                Hash(request.ConsentText),
-                Hash(request.SignatureEvidencePayload),
-                DateTimeOffset.UtcNow,
-                request.ClientIpHash);
-            document.SignatureBundle = ContractElectronicSignaturePlanner.AddEvidence(document.SignatureBundle, evidence);
+        EnsureGroupImportContractReady(vote!);
 
-            var plan = ContractElectronicSignaturePlanner.Plan(document.SignatureBundle, DateTimeOffset.UtcNow);
-            document.Status = plan.IsFullySigned
-                ? CommunityVoteResolutionStatusCodes.Signed
-                : CommunityVoteResolutionStatusCodes.PartiallySigned;
+        var evidence = new ContractSignatureEvidence(
+            request.PartyId,
+            Normalize(request.SignerDisplayName, "익명 참여자"),
+            Normalize(request.SignatureMethodCode, ContractSignatureMethodCode.PlatformClickSign),
+            document.DocumentHash,
+            Hash(request.ConsentText),
+            Hash(request.SignatureEvidencePayload),
+            DateTimeOffset.UtcNow,
+            request.ClientIpHash);
+        document.SignatureBundle = ContractElectronicSignaturePlanner.AddEvidence(document.SignatureBundle, evidence);
+
+        var plan = ContractElectronicSignaturePlanner.Plan(document.SignatureBundle, DateTimeOffset.UtcNow);
+        document.Status = plan.IsFullySigned
+            ? CommunityVoteResolutionStatusCodes.Signed
+            : CommunityVoteResolutionStatusCodes.PartiallySigned;
 
         await SaveMutationAsync(vote!, cancellationToken);
         return ToResolutionResponse(document);
@@ -351,10 +401,11 @@ public class CommunityVoteService : ICommunityVoteService
         }
         else
         {
+            EnsureGroupImportContractReady(vote!);
             document.Status = CommunityVoteResolutionStatusCodes.ReadyToSign;
         }
 
-        document.LegalEffectNotice = $"{LegalEffectNotice} 검토자: {Normalize(request.ReviewedByDisplayName, "운영자")}.";
+        document.LegalEffectNotice = $"{BuildLegalEffectNotice(vote!)} 검토자: {Normalize(request.ReviewedByDisplayName, "운영자")}.";
         await SaveMutationAsync(vote!, cancellationToken);
         return ToResolutionResponse(document);
     }
@@ -458,6 +509,42 @@ public class CommunityVoteService : ICommunityVoteService
 
         var settings = request.GroupPurchase
             ?? throw new InvalidOperationException("공동구매 수요 투표 설정이 필요합니다.");
+        var proposerRoleCode = Normalize(
+            settings.ProposerRoleCode,
+            CommunityGroupPurchaseProposerRoleCodes.GroupPurchaseRepresentative);
+        if (!CommunityGroupPurchaseProposerRoleCodes.IsSupported(proposerRoleCode))
+        {
+            throw new InvalidOperationException("공동구매 제안 주체는 생산자 또는 공동구매 대표여야 합니다.");
+        }
+
+        var tradeRouteDecision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
+            new CommunityGroupPurchaseTradeRouteInput(
+                settings.SellerCountryCode,
+                settings.ShipFromCountryCode,
+                settings.DeliveryCountryCode,
+                settings.CustomsClearanceStatusCode));
+        if (tradeRouteDecision.InvalidFieldCodes.Count > 0)
+        {
+            throw new InvalidOperationException(
+                "판매자·상품 출발·배송 국가 코드는 ISO 알파-2 두 자리이고, 통관 상태는 지원하는 코드여야 합니다.");
+        }
+
+        var sellerCountryCode = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(
+            settings.SellerCountryCode);
+        var shipFromCountryCode = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(
+            settings.ShipFromCountryCode);
+        var deliveryCountryCode = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(
+            settings.DeliveryCountryCode);
+        var customsClearanceStatusCode = CommunityGroupPurchaseTradeRoutePolicy
+            .NormalizeCustomsClearanceStatusCode(settings.CustomsClearanceStatusCode);
+        var hasExplicitTradeRouteInput = !string.IsNullOrWhiteSpace(sellerCountryCode)
+            || !string.IsNullOrWhiteSpace(shipFromCountryCode)
+            || !string.IsNullOrWhiteSpace(deliveryCountryCode)
+            || !string.Equals(
+                customsClearanceStatusCode,
+                CommunityGroupPurchaseCustomsClearanceStatusCodes.Unknown,
+                StringComparison.OrdinalIgnoreCase);
+
         var policyCode = Normalize(settings.ParticipationPolicyCode, CommunityVoteParticipationPolicyCodes.Hybrid);
         if (policyCode is not CommunityVoteParticipationPolicyCodes.CommunityOnly
             and not CommunityVoteParticipationPolicyCodes.ServiceAreaOnly
@@ -475,6 +562,11 @@ public class CommunityVoteService : ICommunityVoteService
         if (settings.MinimumTotalQuantity is < 1 or > 1_000_000)
         {
             throw new InvalidOperationException("최소 주문 수량은 1개 이상 1,000,000개 이하여야 합니다.");
+        }
+
+        if (settings.TargetUnitPriceKrwPerKg is <= 0 or > 1_000_000_000m)
+        {
+            throw new InvalidOperationException("공동구매 목표단가는 0원/kg 초과 10억원/kg 이하여야 합니다.");
         }
 
         if (settings.RadiusMeters is < 100 or > 200_000)
@@ -505,11 +597,22 @@ public class CommunityVoteService : ICommunityVoteService
 
         return new CommunityGroupPurchaseVoteSettingsRecord
         {
+            ProposerRoleCode = proposerRoleCode,
+            AgreementPolicyCode = CommunityGroupPurchaseAgreementPolicy.PolicyCode,
+            ProposalOriginLegalEffectNotice = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice,
+            SellerCountryCode = sellerCountryCode,
+            ShipFromCountryCode = shipFromCountryCode,
+            DeliveryCountryCode = deliveryCountryCode,
+            CustomsClearanceStatusCode = customsClearanceStatusCode,
+            TradeRouteCode = hasExplicitTradeRouteInput
+                ? tradeRouteDecision.RouteCode
+                : string.Empty,
             ParticipationPolicyCode = policyCode,
             HsCode = NormalizeOptional(settings.HsCode) ?? string.Empty,
             TemperatureCode = Normalize(settings.TemperatureCode, "상온"),
             LogisticsMode = Normalize(settings.LogisticsMode, "LCL"),
             QuantityUnit = Normalize(settings.QuantityUnit, "개"),
+            TargetUnitPriceKrwPerKg = settings.TargetUnitPriceKrwPerKg,
             ServiceAreaKey = serviceAreaKey ?? string.Empty,
             ServiceAreaLabel = Normalize(settings.ServiceAreaLabel, serviceAreaKey ?? string.Empty),
             RadiusMeters = settings.RadiusMeters,
@@ -735,13 +838,45 @@ public class CommunityVoteService : ICommunityVoteService
 
         var totalRequestedQuantity = vote.Votes.Sum(x => x.RequestedQuantity);
         var unassignedVotes = vote.Votes.Where(x => x.PickupPointId is null).ToArray();
+        var hasExplicitTradeRoute = !string.IsNullOrWhiteSpace(settings.TradeRouteCode);
+        var tradeRouteDecision = hasExplicitTradeRoute
+            ? CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
+                new CommunityGroupPurchaseTradeRouteInput(
+                    settings.SellerCountryCode,
+                    settings.ShipFromCountryCode,
+                    settings.DeliveryCountryCode,
+                    settings.CustomsClearanceStatusCode))
+            : null;
         return new CommunityGroupPurchaseVoteResponse
         {
+            ProposerRoleCode = CommunityGroupPurchaseProposerRoleCodes.IsSupported(settings.ProposerRoleCode)
+                ? settings.ProposerRoleCode
+                : CommunityGroupPurchaseProposerRoleCodes.GroupPurchaseRepresentative,
+            AgreementPolicyCode = string.IsNullOrWhiteSpace(settings.AgreementPolicyCode)
+                ? CommunityGroupPurchaseAgreementPolicy.PolicyCode
+                : settings.AgreementPolicyCode,
+            ProposalOriginLegalEffectNotice = string.IsNullOrWhiteSpace(settings.ProposalOriginLegalEffectNotice)
+                ? CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice
+                : settings.ProposalOriginLegalEffectNotice,
+            SellerCountryCode = settings.SellerCountryCode,
+            ShipFromCountryCode = settings.ShipFromCountryCode,
+            DeliveryCountryCode = settings.DeliveryCountryCode,
+            CustomsClearanceStatusCode = settings.CustomsClearanceStatusCode,
+            TradeRouteCode = tradeRouteDecision?.RouteCode ?? string.Empty,
+            IsGroupImportCandidate = tradeRouteDecision?.IsGroupImportCandidate == true,
+            RequiresTradeRouteReview = tradeRouteDecision?.RequiresManualReview == true,
+            RecommendedLedgerTemplateKey = tradeRouteDecision?.IsGroupImportCandidate == true
+                ? CommunityLedgerTemplateKeys.GroupImport
+                : string.Empty,
+            TradeRouteReasonCodes = tradeRouteDecision?.ReasonCodes ?? [],
+            TradeRouteMissingFieldCodes = tradeRouteDecision?.MissingFieldCodes ?? [],
+            TradeRouteInvalidFieldCodes = tradeRouteDecision?.InvalidFieldCodes ?? [],
             ParticipationPolicyCode = settings.ParticipationPolicyCode,
             HsCode = settings.HsCode,
             TemperatureCode = settings.TemperatureCode,
             LogisticsMode = settings.LogisticsMode,
             QuantityUnit = settings.QuantityUnit,
+            TargetUnitPriceKrwPerKg = settings.TargetUnitPriceKrwPerKg,
             ServiceAreaKey = settings.ServiceAreaKey,
             ServiceAreaLabel = settings.ServiceAreaLabel,
             RadiusMeters = settings.RadiusMeters,
@@ -810,7 +945,10 @@ public class CommunityVoteService : ICommunityVoteService
         };
     }
 
-    private static string BuildDocumentText(CommunityVoteRecord vote, CommunityVoteResolutionDraftRequest request)
+    private static string BuildDocumentText(
+        CommunityVoteRecord vote,
+        CommunityVoteResolutionDraftRequest request,
+        string legalEffectNotice)
     {
         var resultLines = ToResponse(vote).Options
             .OrderByDescending(x => x.VoteCount)
@@ -821,7 +959,59 @@ public class CommunityVoteService : ICommunityVoteService
             vote.Description,
             Normalize(request.ResolutionText, "투표 결과에 따른 커뮤니티 결의 초안입니다."),
             "투표 결과:",
-            string.Join('\n', resultLines));
+            string.Join('\n', resultLines),
+            "법적 효력 고지:",
+            legalEffectNotice);
+    }
+
+    private static string BuildLegalEffectNotice(CommunityVoteRecord vote)
+    {
+        var settings = vote.GroupPurchase;
+        if (settings is null)
+        {
+            return GenericLegalEffectNotice;
+        }
+
+        var proposalOriginNotice = settings.ProposalOriginLegalEffectNotice;
+        var agreementNotice = string.IsNullOrWhiteSpace(proposalOriginNotice)
+            ? $"{GenericLegalEffectNotice} {CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice}"
+            : $"{GenericLegalEffectNotice} {proposalOriginNotice}";
+
+        return CommunityGroupPurchaseTradeRouteCodes.IsGroupImport(settings.TradeRouteCode)
+            ? $"{agreementNotice} {CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice}"
+            : agreementNotice;
+    }
+
+    private static void EnsureGroupImportContractReady(CommunityVoteRecord vote)
+    {
+        var settings = vote.GroupPurchase;
+        if (settings is null
+            || !CommunityGroupPurchaseTradeRouteCodes.IsGroupImport(settings.TradeRouteCode))
+        {
+            return;
+        }
+
+        var tradeRouteDecision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
+            new CommunityGroupPurchaseTradeRouteInput(
+                settings.SellerCountryCode,
+                settings.ShipFromCountryCode,
+                settings.DeliveryCountryCode,
+                settings.CustomsClearanceStatusCode));
+        if (!tradeRouteDecision.IsGroupImportCandidate
+            || tradeRouteDecision.RequiresManualReview)
+        {
+            throw new InvalidOperationException(
+                "공동수입 계약 확정 전에 상품 출발국가, 국내 배송국가와 통관 상태를 다시 확인해 주세요.");
+        }
+
+        var hasValidHsCode = new[] { settings.HsCode }
+            .Concat(vote.Options.Select(option => option.HsCode))
+            .Any(code => CommunityVoteHsCode.NormalizeOptional(code) is not null);
+        if (!hasValidHsCode)
+        {
+            throw new InvalidOperationException(
+                "공동수입 계약을 확정하려면 검토 가능한 HS 코드가 하나 이상 필요합니다.");
+        }
     }
 
     private static string Hash(string value)
@@ -836,7 +1026,7 @@ public class CommunityVoteService : ICommunityVoteService
     private static string? NormalizeOptional(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
-    private const string LegalEffectNotice =
+    private const string GenericLegalEffectNotice =
         "이 문서는 커뮤니티 투표 결과와 전자서명 증적을 정리한 플랫폼 결의문입니다. 실제 법적 효력과 제출 가능 여부는 문서 종류, 당사자 권한, 고지/동의, 상대 기관 기준, 관련 법령 검토가 필요합니다.";
 
     private sealed record GroupPurchaseParticipation(

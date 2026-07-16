@@ -31,9 +31,14 @@ public sealed class 공동구매수요투표Controller : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List(
         [FromQuery] string? communityScope,
+        [FromQuery] string? hsCode,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.목록Async("OrdererApp", communityScope, cancellationToken);
+        var result = await _useCase.목록Async(
+            "OrdererApp",
+            communityScope,
+            hsCode,
+            cancellationToken);
         if (result.IsSuccess)
         {
             result.Value.Items = result.Value.Items

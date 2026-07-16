@@ -88,8 +88,10 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanService
             StatusCode = DomesticGroupPurchaseFulfillmentDraftStatuses.Draft,
             IsDurablyPersisted = false,
             CreatedAtUtc = DateTimeOffset.UtcNow,
+            AgreementPolicyCode = plan.AgreementPolicyCode,
+            ProposalOriginLegalEffectNotice = plan.ProposalOriginLegalEffectNotice,
             Plan = plan,
-            GuidanceMessage = "발주와 원장 생성 계획을 서버 메모리 초안으로 보관했습니다. 확정 단계에서는 주문 원장을 먼저 만든 뒤 계획된 판매·창고·운송 원장을 포함 관계로 연결해야 합니다."
+            GuidanceMessage = $"발주와 원장 생성 계획을 서버 메모리 초안으로 보관했습니다. 확정 단계에서는 주문 원장을 먼저 만든 뒤 계획된 판매·창고·운송 원장을 포함 관계로 연결해야 합니다. {plan.ProposalOriginLegalEffectNotice}"
         };
 
         return await draftStore.SaveAsync(draft, cancellationToken);

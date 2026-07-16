@@ -38,4 +38,33 @@ public sealed class CommunityVoteWorkflowClassifierTests
 
         Assert.False(CommunityVoteWorkflowClassifier.IsGroupImport(campaign));
     }
+
+    [Fact]
+    public void 명시적인_국내거래경로는_HS코드가있어도_공동수입으로분류하지않는다()
+    {
+        var campaign = new CommunityVoteResponse
+        {
+            Options = [new CommunityVoteOptionResponse { HsCode = "0202.30" }],
+            GroupPurchase = new CommunityGroupPurchaseVoteResponse
+            {
+                TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.Domestic
+            }
+        };
+
+        Assert.False(CommunityVoteWorkflowClassifier.IsGroupImport(campaign));
+    }
+
+    [Fact]
+    public void 명시적인_공동수입후보는_HS코드가없어도_공동수입으로분류한다()
+    {
+        var campaign = new CommunityVoteResponse
+        {
+            GroupPurchase = new CommunityGroupPurchaseVoteResponse
+            {
+                TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate
+            }
+        };
+
+        Assert.True(CommunityVoteWorkflowClassifier.IsGroupImport(campaign));
+    }
 }

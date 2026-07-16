@@ -80,6 +80,12 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanBuilderTests
         Assert.Null(await service.GetOrderDraftAsync("representative-2", created.DraftId));
         Assert.Equal(64, created.Plan.PlanFingerprint.Length);
         Assert.Equal("고구마", created.Plan.RequestSnapshot.ProductSummary);
+        Assert.Equal(
+            CommunityGroupPurchaseAgreementPolicy.PolicyCode,
+            created.AgreementPolicyCode);
+        Assert.Equal(created.Plan.AgreementPolicyCode, created.AgreementPolicyCode);
+        Assert.Contains("제안의 선후만으로", created.ProposalOriginLegalEffectNotice);
+        Assert.Contains("생산자와 공동구매 대표가 합의한 최종 계약문", created.GuidanceMessage);
     }
 
     [Fact]
@@ -111,7 +117,10 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanBuilderTests
 
         Assert.NotEqual(direct.PlanFingerprint, thirdParty.PlanFingerprint);
         Assert.Equal(64, direct.PlanFingerprint.Length);
-        Assert.Equal("1.0", direct.PlanVersion);
+        Assert.Equal("1.1", direct.PlanVersion);
+        Assert.Equal(
+            CommunityGroupPurchaseAgreementPolicy.PolicyCode,
+            direct.AgreementPolicyCode);
     }
 
     private static DomesticGroupPurchaseFulfillmentPlanRequest CreateRequest(string routeCode)

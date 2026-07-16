@@ -25,9 +25,10 @@ public sealed class 커뮤니티투표Controller : ControllerBase
     public async Task<IActionResult> List(
         [FromQuery] string? appKey,
         [FromQuery] string? communityScope,
+        [FromQuery] string? hsCode,
         CancellationToken cancellationToken)
     {
-        var result = await _useCase.목록Async(appKey, communityScope, cancellationToken);
+        var result = await _useCase.목록Async(appKey, communityScope, hsCode, cancellationToken);
         return this.ToActionResult(result);
     }
 

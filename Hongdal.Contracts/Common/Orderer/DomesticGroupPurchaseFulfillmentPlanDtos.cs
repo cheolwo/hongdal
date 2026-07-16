@@ -83,8 +83,11 @@ public sealed class DomesticGroupPurchaseFulfillmentLedgerEdge
 
 public sealed class DomesticGroupPurchaseFulfillmentPlanResponse
 {
-    public string PlanVersion { get; set; } = "1.0";
+    public string PlanVersion { get; set; } = "1.1";
     public string PlanFingerprint { get; set; } = string.Empty;
+    public string AgreementPolicyCode { get; set; } = CommunityGroupPurchaseAgreementPolicy.PolicyCode;
+    public string ProposalOriginLegalEffectNotice { get; set; }
+        = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice;
     public Guid GroupPurchaseCampaignId { get; set; }
     public string RouteCode { get; set; } = string.Empty;
     public string RouteLabel { get; set; } = string.Empty;
@@ -106,6 +109,9 @@ public sealed class DomesticGroupPurchaseFulfillmentOrderDraftResponse
     public string StatusCode { get; set; } = DomesticGroupPurchaseFulfillmentDraftStatuses.Draft;
     public bool IsDurablyPersisted { get; set; }
     public DateTimeOffset CreatedAtUtc { get; set; }
+    public string AgreementPolicyCode { get; set; } = CommunityGroupPurchaseAgreementPolicy.PolicyCode;
+    public string ProposalOriginLegalEffectNotice { get; set; }
+        = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice;
     public DomesticGroupPurchaseFulfillmentPlanResponse Plan { get; set; } = new();
     public string GuidanceMessage { get; set; } = string.Empty;
 }
@@ -223,8 +229,10 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         var ready = warnings.Count == 0;
         return new DomesticGroupPurchaseFulfillmentPlanResponse
         {
-            PlanVersion = "1.0",
+            PlanVersion = "1.1",
             PlanFingerprint = CreateFingerprint(request, routeCode),
+            AgreementPolicyCode = CommunityGroupPurchaseAgreementPolicy.PolicyCode,
+            ProposalOriginLegalEffectNotice = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice,
             GroupPurchaseCampaignId = request.GroupPurchaseCampaignId,
             RouteCode = routeCode,
             RouteLabel = GetRouteLabel(routeCode),
@@ -411,6 +419,7 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         var capabilities = request.HubCapabilities ?? new DomesticGroupPurchaseFulfillmentHubCapabilitySnapshot();
         var canonical = string.Join('|',
             request.GroupPurchaseCampaignId.ToString("N"),
+            CommunityGroupPurchaseAgreementPolicy.PolicyCode,
             NormalizeFingerprintPart(routeCode),
             NormalizeFingerprintPart(request.ProducerDisplayName),
             NormalizeFingerprintPart(request.ProductSummary),

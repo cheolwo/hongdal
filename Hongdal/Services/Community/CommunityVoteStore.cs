@@ -2,6 +2,7 @@ using System.Text.Json;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.ContractManagement;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using 홍달.Services.Options;
@@ -15,6 +16,7 @@ internal interface ICommunityVoteStore
     Task<IReadOnlyList<CommunityVoteRecord>> ListAsync(
         string? appKey,
         string? communityScope,
+        string? normalizedHsCode,
         CancellationToken cancellationToken);
 
     Task<CommunityVoteRecord?> GetAsync(Guid voteId, CancellationToken cancellationToken);
@@ -75,6 +77,7 @@ internal sealed class MongoCommunityVoteStore : ICommunityVoteStore
     public async Task<IReadOnlyList<CommunityVoteRecord>> ListAsync(
         string? appKey,
         string? communityScope,
+        string? normalizedHsCode,
         CancellationToken cancellationToken)
     {
         await EnsureIndexesAsync(cancellationToken);
@@ -87,6 +90,15 @@ internal sealed class MongoCommunityVoteStore : ICommunityVoteStore
         if (!string.IsNullOrWhiteSpace(communityScope))
         {
             filter &= Builders<CommunityVoteRecord>.Filter.Eq(x => x.CommunityScope, communityScope.Trim());
+        }
+
+        if (!string.IsNullOrWhiteSpace(normalizedHsCode))
+        {
+            var hsCodeRegex = new BsonRegularExpression(
+                CommunityVoteHsCode.PrefixRegex(normalizedHsCode));
+            filter &= Builders<CommunityVoteRecord>.Filter.Or(
+                Builders<CommunityVoteRecord>.Filter.Regex("GroupPurchase.HsCode", hsCodeRegex),
+                Builders<CommunityVoteRecord>.Filter.Regex("Options.HsCode", hsCodeRegex));
         }
 
         return await _collection
@@ -341,6 +353,10 @@ internal sealed class MongoCommunityVoteStore : ICommunityVoteStore
                     Builders<CommunityVoteRecord>.IndexKeys.Ascending(x => x.SourcePostId),
                     new CreateIndexOptions { Sparse = true }),
                 new CreateIndexModel<CommunityVoteRecord>(
+                    Builders<CommunityVoteRecord>.IndexKeys.Ascending("GroupPurchase.HsCode")),
+                new CreateIndexModel<CommunityVoteRecord>(
+                    Builders<CommunityVoteRecord>.IndexKeys.Ascending("Options.HsCode")),
+                new CreateIndexModel<CommunityVoteRecord>(
                     Builders<CommunityVoteRecord>.IndexKeys
                         .Ascending("DemandHandoffOutbox.Status")
                         .Ascending("DemandHandoffOutbox.NextAttemptAtUtc"))
@@ -374,6 +390,7 @@ internal sealed class InMemoryCommunityVoteStore : ICommunityVoteStore
     public Task<IReadOnlyList<CommunityVoteRecord>> ListAsync(
         string? appKey,
         string? communityScope,
+        string? normalizedHsCode,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -388,6 +405,14 @@ internal sealed class InMemoryCommunityVoteStore : ICommunityVoteStore
             if (!string.IsNullOrWhiteSpace(communityScope))
             {
                 items = items.Where(x => string.Equals(x.CommunityScope, communityScope.Trim(), StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(normalizedHsCode))
+            {
+                items = items.Where(x =>
+                    CommunityVoteHsCode.MatchesPrefix(x.GroupPurchase?.HsCode, normalizedHsCode)
+                    || x.Options.Any(option =>
+                        CommunityVoteHsCode.MatchesPrefix(option.HsCode, normalizedHsCode)));
             }
 
             return Task.FromResult<IReadOnlyList<CommunityVoteRecord>>(
@@ -670,11 +695,22 @@ internal sealed class CommunityVoteCastRecord
 
 internal sealed class CommunityGroupPurchaseVoteSettingsRecord
 {
+    public string ProposerRoleCode { get; set; } = CommunityGroupPurchaseProposerRoleCodes.GroupPurchaseRepresentative;
+    public string AgreementPolicyCode { get; set; } = CommunityGroupPurchaseAgreementPolicy.PolicyCode;
+    public string ProposalOriginLegalEffectNotice { get; set; }
+        = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice;
+    public string SellerCountryCode { get; set; } = string.Empty;
+    public string ShipFromCountryCode { get; set; } = string.Empty;
+    public string DeliveryCountryCode { get; set; } = string.Empty;
+    public string CustomsClearanceStatusCode { get; set; }
+        = CommunityGroupPurchaseCustomsClearanceStatusCodes.Unknown;
+    public string TradeRouteCode { get; set; } = string.Empty;
     public string ParticipationPolicyCode { get; set; } = string.Empty;
     public string HsCode { get; set; } = string.Empty;
     public string TemperatureCode { get; set; } = "상온";
     public string LogisticsMode { get; set; } = "LCL";
     public string QuantityUnit { get; set; } = "개";
+    public decimal? TargetUnitPriceKrwPerKg { get; set; }
     public string ServiceAreaKey { get; set; } = string.Empty;
     public string ServiceAreaLabel { get; set; } = string.Empty;
     public int? RadiusMeters { get; set; }

@@ -10,6 +10,7 @@ public interface I커뮤니티투표UseCase
     Task<Result<CommunityVoteListResponse>> 목록Async(
         string? appKey,
         string? communityScope,
+        string? hsCode,
         CancellationToken cancellationToken);
 
     Task<Result<CommunityVoteResponse>> 상세Async(Guid voteId, CancellationToken cancellationToken);
@@ -75,8 +76,25 @@ public sealed class 커뮤니티투표UseCase : I커뮤니티투표UseCase
     public async Task<Result<CommunityVoteListResponse>> 목록Async(
         string? appKey,
         string? communityScope,
+        string? hsCode,
         CancellationToken cancellationToken)
-        => Result.Ok(await _voteService.ListAsync(appKey, communityScope, cancellationToken));
+    {
+        string? normalizedHsCode;
+        try
+        {
+            normalizedHsCode = CommunityVoteHsCode.NormalizeOptional(hsCode);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest<CommunityVoteListResponse>(ex.Message);
+        }
+
+        return Result.Ok(await _voteService.ListAsync(
+            appKey,
+            communityScope,
+            normalizedHsCode,
+            cancellationToken));
+    }
 
     public async Task<Result<CommunityVoteResponse>> 상세Async(Guid voteId, CancellationToken cancellationToken)
     {
