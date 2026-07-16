@@ -216,7 +216,7 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
         Assert.Contains(services, x =>
             x.ServiceType == typeof(상품등록ViewModel)
             && x.ImplementationType == typeof(상품등록ViewModel)
-            && x.Lifetime == ServiceLifetime.Transient);
+            && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(판매상품조회ViewModel)
             && x.ImplementationType == typeof(판매상품조회ViewModel)
@@ -268,10 +268,25 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             scopedProvider.GetRequiredService<판매상품조회ViewModel>(),
             scopedProvider.GetRequiredService<판매ViewModel>().상품조회);
         Assert.Same(
+            scopedProvider.GetRequiredService<판매상품CrudViewModel>(),
+            scopedProvider.GetRequiredService<판매ViewModel>().상품Crud);
+        Assert.Same(
+            scopedProvider.GetRequiredService<판매상품수정ViewModel>(),
+            scopedProvider.GetRequiredService<판매ViewModel>().상품Crud.수정);
+        Assert.Same(
             scopedProvider.GetRequiredService<주문서명등록ViewModel>(),
             scopedProvider.GetRequiredService<주문ViewModel>().서명등록);
+        Assert.Same(
+            scopedProvider.GetRequiredService<주문하위원장관계CrudViewModel>(),
+            scopedProvider.GetRequiredService<주문ViewModel>().하위원장관계Crud);
+        Assert.Same(
+            scopedProvider.GetRequiredService<주문하위원장수정ViewModel>(),
+            scopedProvider.GetRequiredService<주문ViewModel>().하위원장수정);
 
         var warehouse = scopedProvider.GetRequiredService<입출고화면ViewModel>();
+        Assert.Same(scopedProvider.GetRequiredService<창고CrudViewModel>(), warehouse.창고Crud);
+        Assert.Same(scopedProvider.GetRequiredService<창고사용자CrudViewModel>(), warehouse.창고사용자Crud);
+        Assert.Equal(3, warehouse.Crud업무단위목록.Count);
         Assert.Contains(
             scopedProvider.GetRequiredService<창고목록조회ViewModel>(),
             warehouse.기준정보세부업무목록);
