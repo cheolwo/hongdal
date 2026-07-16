@@ -182,10 +182,16 @@ public sealed class 공동구매주문집계재고배분ViewModelTests
     {
         public Task<IReadOnlyList<창고요약응답>> 창고목록조회Async(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<창고요약응답>>([]);
         public Task<창고요약응답?> 창고생성Async(창고저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<창고요약응답?>(null);
+        public Task<창고요약응답?> 창고수정Async(long warehouseId, 창고저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<창고요약응답?>(null);
+        public Task 창고삭제Async(long warehouseId, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(long warehouseId, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<창고사용자항목응답>>([]);
         public Task<창고사용자항목응답?> 창고사용자추가Async(long warehouseId, 창고사용자저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<창고사용자항목응답?>(null);
+        public Task<창고사용자항목응답?> 창고사용자수정Async(long warehouseId, long warehouseUserId, 창고사용자저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<창고사용자항목응답?>(null);
+        public Task 창고사용자삭제Async(long warehouseId, long warehouseUserId, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<입고요청항목응답>>([]);
         public Task<입고요청항목응답?> 입고요청생성Async(입고요청저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<입고요청항목응답?>(null);
+        public Task<입고요청항목응답?> 입고요청수정Async(long inboundId, 입고요청저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<입고요청항목응답?>(null);
+        public Task 입고요청취소Async(long inboundId, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(long inboundId, 입고완료요청 request, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<입고상품항목응답>>([]);
         public Task<IReadOnlyList<재고항목응답>> 재고목록조회Async(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<재고항목응답>>([]);
         public Task<창고작업결과응답?> 입고검수Async(long inboundItemId, 입고검수요청 request, CancellationToken cancellationToken = default) => Task.FromResult<창고작업결과응답?>(null);

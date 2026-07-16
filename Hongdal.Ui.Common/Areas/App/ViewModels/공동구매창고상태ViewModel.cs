@@ -27,6 +27,7 @@ public class 입출고화면상태ViewModel : ObservableObject
     private IReadOnlyList<창고요약응답> _창고목록 = [];
     private 창고요약응답? _선택된창고;
     private IReadOnlyList<창고사용자항목응답> _창고사용자목록 = [];
+    private 창고사용자항목응답? _선택된창고사용자;
     private IReadOnlyList<입고요청항목응답> _입고요청목록 = [];
     private 입고요청항목응답? _선택된입고요청;
     private IReadOnlyList<입고상품항목응답> _최근입고상품목록 = [];
@@ -53,6 +54,7 @@ public class 입출고화면상태ViewModel : ObservableObject
             }
 
             창고사용자목록 = [];
+            선택된창고사용자 = null;
             OnPropertyChanged(nameof(선택창고입고요청목록));
             OnPropertyChanged(nameof(선택창고재고목록));
         }
@@ -62,6 +64,12 @@ public class 입출고화면상태ViewModel : ObservableObject
     {
         get => _창고사용자목록;
         private set => SetProperty(ref _창고사용자목록, value);
+    }
+
+    public 창고사용자항목응답? 선택된창고사용자
+    {
+        get => _선택된창고사용자;
+        private set => SetProperty(ref _선택된창고사용자, value);
     }
 
     public IReadOnlyList<입고요청항목응답> 입고요청목록
@@ -153,6 +161,16 @@ public class 입출고화면상태ViewModel : ObservableObject
         선택값정합성확인();
     }
 
+    public void 창고삭제적용(long warehouseId)
+    {
+        창고목록 = 창고목록.Where(x => x.Id != warehouseId).ToArray();
+        if (선택된창고?.Id == warehouseId)
+        {
+            선택된창고 = 창고목록.FirstOrDefault(x => x.기본창고여부) ?? 창고목록.FirstOrDefault();
+        }
+        선택값정합성확인();
+    }
+
     public bool 창고선택(long warehouseId)
     {
         var warehouse = 창고목록.FirstOrDefault(x => x.Id == warehouseId);
@@ -170,12 +188,36 @@ public class 입출고화면상태ViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(users);
         창고사용자목록 = users;
+        선택된창고사용자 = users.FirstOrDefault(x => x.Id == 선택된창고사용자?.Id)
+            ?? users.FirstOrDefault();
     }
 
     public void 창고사용자저장적용(창고사용자항목응답 user)
     {
         ArgumentNullException.ThrowIfNull(user);
         창고사용자목록 = 창고사용자목록.Where(x => x.Id != user.Id).Append(user).ToArray();
+        선택된창고사용자 = user;
+    }
+
+    public bool 창고사용자선택(long warehouseUserId)
+    {
+        var user = 창고사용자목록.FirstOrDefault(x => x.Id == warehouseUserId);
+        if (user is null)
+        {
+            return false;
+        }
+
+        선택된창고사용자 = user;
+        return true;
+    }
+
+    public void 창고사용자삭제적용(long warehouseUserId)
+    {
+        창고사용자목록 = 창고사용자목록.Where(x => x.Id != warehouseUserId).ToArray();
+        if (선택된창고사용자?.Id == warehouseUserId)
+        {
+            선택된창고사용자 = 창고사용자목록.FirstOrDefault();
+        }
     }
 
     public void 입고목록적용(IReadOnlyList<입고요청항목응답> inbounds)
@@ -192,6 +234,15 @@ public class 입출고화면상태ViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(inbound);
         입고요청목록 = 입고요청목록.Where(x => x.Id != inbound.Id).Append(inbound).ToArray();
         선택된입고요청 = inbound;
+    }
+
+    public void 입고요청삭제적용(long inboundId)
+    {
+        입고요청목록 = 입고요청목록.Where(x => x.Id != inboundId).ToArray();
+        if (선택된입고요청?.Id == inboundId)
+        {
+            선택된입고요청 = 선택창고입고요청목록.FirstOrDefault();
+        }
     }
 
     public bool 입고요청선택(long inboundId)

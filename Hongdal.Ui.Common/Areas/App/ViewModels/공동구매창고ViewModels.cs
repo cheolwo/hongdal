@@ -30,11 +30,18 @@ public partial class 창고기준정보ViewModel : 업무작업ViewModelBase, ID
     public partial 창고저장요청 창고초안 { get; private set; } = new();
 
     [ObservableProperty]
+    public partial 창고저장요청 창고수정초안 { get; private set; } = new();
+
+    [ObservableProperty]
     public partial 창고사용자저장요청 사용자초안 { get; private set; } = new();
+
+    [ObservableProperty]
+    public partial 창고사용자저장요청 사용자수정초안 { get; private set; } = new();
 
     public IReadOnlyList<창고요약응답> 창고목록 => _창고상태.창고목록;
     public 창고요약응답? 선택된창고 => _창고상태.선택된창고;
     public IReadOnlyList<창고사용자항목응답> 사용자목록 => _창고상태.창고사용자목록;
+    public 창고사용자항목응답? 선택된사용자 => _창고상태.선택된창고사용자;
 
     public Task<bool> 목록조회Async(CancellationToken cancellationToken = default)
         => 작업실행Async(
@@ -69,6 +76,74 @@ public partial class 창고기준정보ViewModel : 업무작업ViewModelBase, ID
                 창고초안 = new 창고저장요청();
             },
             "창고 기준정보를 생성했습니다.",
+            cancellationToken);
+    }
+
+    public bool 창고수정초안적용()
+    {
+        var selected = 선택된창고;
+        if (selected is null)
+        {
+            return 유효성실패("수정할 창고를 먼저 선택해 주세요.");
+        }
+
+        창고수정초안 = new 창고저장요청
+        {
+            창고명 = selected.창고명,
+            소유자유형 = selected.소유자유형,
+            창고유형 = selected.창고유형,
+            물류대행지분류 = selected.물류대행지분류,
+            주소 = selected.주소,
+            담당자명 = selected.담당자명,
+            연락처 = selected.연락처,
+            위도 = selected.위도,
+            경도 = selected.경도,
+            기본창고여부 = selected.기본창고여부
+        };
+        return true;
+    }
+
+    public async Task<bool> 창고수정Async(CancellationToken cancellationToken = default)
+    {
+        var warehouseId = 선택된창고?.Id;
+        if (warehouseId is null)
+        {
+            return 유효성실패("수정할 창고를 먼저 선택해 주세요.");
+        }
+
+        if (string.IsNullOrWhiteSpace(창고수정초안.창고명)
+            || string.IsNullOrWhiteSpace(창고수정초안.주소))
+        {
+            return 유효성실패("창고명과 주소를 입력해 주세요.");
+        }
+
+        return await 작업실행Async(
+            async token =>
+            {
+                var result = await _service.창고수정Async(warehouseId.Value, 창고수정초안, token)
+                    ?? throw new InvalidOperationException("창고 수정 응답이 비어 있습니다.");
+                _창고상태.창고저장적용(result);
+                창고수정초안적용();
+            },
+            "창고 기준정보를 수정했습니다.",
+            cancellationToken);
+    }
+
+    public async Task<bool> 창고삭제Async(CancellationToken cancellationToken = default)
+    {
+        var warehouseId = 선택된창고?.Id;
+        if (warehouseId is null)
+        {
+            return 유효성실패("삭제할 창고를 먼저 선택해 주세요.");
+        }
+
+        return await 작업실행Async(
+            async token =>
+            {
+                await _service.창고삭제Async(warehouseId.Value, token);
+                _창고상태.창고삭제적용(warehouseId.Value);
+            },
+            "창고 기준정보를 삭제했습니다.",
             cancellationToken);
     }
 
@@ -113,10 +188,83 @@ public partial class 창고기준정보ViewModel : 업무작업ViewModelBase, ID
             cancellationToken);
     }
 
+    public bool 사용자선택(long warehouseUserId)
+        => _창고상태.창고사용자선택(warehouseUserId)
+           || 유효성실패("목록에 있는 창고 담당자를 선택해 주세요.");
+
+    public bool 사용자수정초안적용()
+    {
+        var selected = 선택된사용자;
+        if (selected is null)
+        {
+            return 유효성실패("수정할 창고 담당자를 먼저 선택해 주세요.");
+        }
+
+        사용자수정초안 = new 창고사용자저장요청
+        {
+            UserId = selected.UserId,
+            역할명 = selected.역할명,
+            IsPrimary = selected.IsPrimary
+        };
+        return true;
+    }
+
+    public async Task<bool> 사용자수정Async(CancellationToken cancellationToken = default)
+    {
+        var warehouseId = 선택된창고?.Id;
+        var warehouseUserId = 선택된사용자?.Id;
+        if (warehouseId is null || warehouseUserId is null)
+        {
+            return 유효성실패("수정할 창고와 담당자를 먼저 선택해 주세요.");
+        }
+
+        if (string.IsNullOrWhiteSpace(사용자수정초안.UserId)
+            || string.IsNullOrWhiteSpace(사용자수정초안.역할명))
+        {
+            return 유효성실패("담당자 사용자 ID와 역할을 입력해 주세요.");
+        }
+
+        return await 작업실행Async(
+            async token =>
+            {
+                var result = await _service.창고사용자수정Async(
+                        warehouseId.Value,
+                        warehouseUserId.Value,
+                        사용자수정초안,
+                        token)
+                    ?? throw new InvalidOperationException("창고 담당자 수정 응답이 비어 있습니다.");
+                _창고상태.창고사용자저장적용(result);
+                사용자수정초안적용();
+            },
+            "창고 담당자를 수정했습니다.",
+            cancellationToken);
+    }
+
+    public async Task<bool> 사용자삭제Async(CancellationToken cancellationToken = default)
+    {
+        var warehouseId = 선택된창고?.Id;
+        var warehouseUserId = 선택된사용자?.Id;
+        if (warehouseId is null || warehouseUserId is null)
+        {
+            return 유효성실패("삭제할 창고와 담당자를 먼저 선택해 주세요.");
+        }
+
+        return await 작업실행Async(
+            async token =>
+            {
+                await _service.창고사용자삭제Async(warehouseId.Value, warehouseUserId.Value, token);
+                _창고상태.창고사용자삭제적용(warehouseUserId.Value);
+            },
+            "창고 담당자를 삭제했습니다.",
+            cancellationToken);
+    }
+
     public void 입력변경알림()
     {
         OnPropertyChanged(nameof(창고초안));
+        OnPropertyChanged(nameof(창고수정초안));
         OnPropertyChanged(nameof(사용자초안));
+        OnPropertyChanged(nameof(사용자수정초안));
     }
 
     public void Dispose()
@@ -130,6 +278,7 @@ public partial class 창고기준정보ViewModel : 업무작업ViewModelBase, ID
         OnPropertyChanged(nameof(창고목록));
         OnPropertyChanged(nameof(선택된창고));
         OnPropertyChanged(nameof(사용자목록));
+        OnPropertyChanged(nameof(선택된사용자));
     }
 }
 
@@ -152,6 +301,8 @@ public partial class 입고ViewModel : 업무작업ViewModelBase, IDisposable
         입고원장ViewModel? 원장 = null,
         입고조회ViewModel? 조회 = null,
         입고등록ViewModel? 등록 = null,
+        입고수정ViewModel? 수정 = null,
+        입고삭제ViewModel? 삭제 = null,
         입고완료ViewModel? 완료 = null,
         입고재고조회ViewModel? 재고조회 = null,
         입고검수ViewModel? 검수 = null,
@@ -162,18 +313,23 @@ public partial class 입고ViewModel : 업무작업ViewModelBase, IDisposable
         현재사용자Context연결(창고상태.현재사용자Context);
         this.원장 = 원장 ?? new 입고원장ViewModel(new 입출고원장상태ViewModel());
         _세부업무수명소유 = 조회 is null
-                          || 등록 is null
-                          || 완료 is null
+                           || 등록 is null
+                           || 수정 is null
+                           || 삭제 is null
+                           || 완료 is null
                           || 재고조회 is null
                           || 검수 is null
                           || 적재 is null;
         this.조회 = 조회 ?? new 입고조회ViewModel(service, 창고상태, this.원장);
         this.등록 = 등록 ?? new 입고등록ViewModel(service, 창고상태);
+        this.수정 = 수정 ?? new 입고수정ViewModel(service, 창고상태);
+        this.삭제 = 삭제 ?? new 입고삭제ViewModel(service, 창고상태);
+        Crud = new 입고CrudViewModel(this.조회, this.등록, this.수정, this.삭제, 하위수명소유: false);
         this.완료 = 완료 ?? new 입고완료ViewModel(service, 창고상태);
         this.재고조회 = 재고조회 ?? new 입고재고조회ViewModel(service, 창고상태);
         this.검수 = 검수 ?? new 입고검수ViewModel(service, 창고상태);
         this.적재 = 적재 ?? new 입고적재ViewModel(service, 창고상태);
-        세부업무목록 = [this.조회, this.등록, this.완료, this.재고조회, this.검수, this.적재];
+        세부업무목록 = [.. Crud.Crud업무목록, this.완료, this.재고조회, this.검수, this.적재];
         foreach (var child in 세부업무목록)
         {
             child.PropertyChanged += 세부업무변경;
@@ -198,6 +354,9 @@ public partial class 입고ViewModel : 업무작업ViewModelBase, IDisposable
     public 입고원장ViewModel 원장 { get; }
     public 입고조회ViewModel 조회 { get; }
     public 입고등록ViewModel 등록 { get; }
+    public 입고수정ViewModel 수정 { get; }
+    public 입고삭제ViewModel 삭제 { get; }
+    public 입고CrudViewModel Crud { get; }
     public 입고완료ViewModel 완료 { get; }
     public 입고재고조회ViewModel 재고조회 { get; }
     public 입고검수ViewModel 검수 { get; }
@@ -370,11 +529,14 @@ public partial class 입고ViewModel : 업무작업ViewModelBase, IDisposable
         {
             조회.Dispose();
             등록.Dispose();
+            수정.Dispose();
+            삭제.Dispose();
             완료.Dispose();
             재고조회.Dispose();
             검수.Dispose();
             적재.Dispose();
         }
+        Crud.Dispose();
         _창고상태.PropertyChanged -= 창고상태변경;
         원장.PropertyChanged -= 원장상태변경;
         원장.Dispose();
@@ -702,17 +864,15 @@ public sealed class 공동구매출고원장ViewModel : 출고ViewModel
 }
 
 /// <summary>공통 입출고 작업, 커뮤니티 원장 상태와 창고 기준정보를 하나의 화면 단위로 조립합니다.</summary>
-public sealed class 입출고화면ViewModel : 조립ViewModelBase
+public sealed class 입출고화면ViewModel : 조립ViewModelBase, ICrudPageViewModel
 {
     public 입출고화면ViewModel(
         입출고화면상태ViewModel 상태,
         입출고원장상태ViewModel 원장상태,
         입출고원장목록ViewModel 원장목록,
         창고기준정보ViewModel 기준정보,
-        창고목록조회ViewModel 창고목록조회,
-        창고등록ViewModel 창고등록,
-        창고사용자조회ViewModel 창고사용자조회,
-        창고사용자등록ViewModel 창고사용자등록,
+        창고CrudViewModel 창고Crud,
+        창고사용자CrudViewModel 창고사용자Crud,
         입고ViewModel 입고,
         출고ViewModel 출고)
     {
@@ -720,15 +880,12 @@ public sealed class 입출고화면ViewModel : 조립ViewModelBase
         this.원장상태 = 원장상태;
         this.원장목록 = 하위ViewModel등록(원장목록);
         this.기준정보 = 하위ViewModel등록(기준정보, 수명소유: false);
+        this.창고Crud = 하위ViewModel등록(창고Crud);
+        this.창고사용자Crud = 하위ViewModel등록(창고사용자Crud);
         this.입고 = 하위ViewModel등록(입고);
         this.출고 = 하위ViewModel등록(출고);
-        기준정보세부업무목록 =
-        [
-            하위ViewModel등록(창고목록조회, 수명소유: false),
-            하위ViewModel등록(창고등록, 수명소유: false),
-            하위ViewModel등록(창고사용자조회, 수명소유: false),
-            하위ViewModel등록(창고사용자등록, 수명소유: false)
-        ];
+        Crud업무단위목록 = [창고Crud, 창고사용자Crud, 입고.Crud];
+        기준정보세부업무목록 = [.. 창고Crud.Crud업무목록, .. 창고사용자Crud.Crud업무목록];
         세부업무목록 = [.. 기준정보세부업무목록, .. 입고.세부업무목록, .. 출고.세부업무목록];
     }
 
@@ -736,8 +893,11 @@ public sealed class 입출고화면ViewModel : 조립ViewModelBase
     public 입출고원장상태ViewModel 원장상태 { get; }
     public 입출고원장목록ViewModel 원장목록 { get; }
     public 창고기준정보ViewModel 기준정보 { get; }
+    public 창고CrudViewModel 창고Crud { get; }
+    public 창고사용자CrudViewModel 창고사용자Crud { get; }
     public 입고ViewModel 입고 { get; }
     public 출고ViewModel 출고 { get; }
+    public IReadOnlyList<I업무단위CrudViewModel> Crud업무단위목록 { get; }
     public IReadOnlyList<I업무조각ViewModel> 기준정보세부업무목록 { get; }
     public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
     public bool 처리중 => 원장목록.처리중 || 기준정보.처리중 || 입고.처리중 || 출고.처리중;

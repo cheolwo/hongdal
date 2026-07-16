@@ -25,6 +25,38 @@ public sealed class 공동구매창고ServiceTests
     }
 
     [Fact]
+    public async Task 입고서버목록조회는_검색정렬페이지조건을Query경로에전달한다()
+    {
+        var client = new RecordingJsonApiClient
+        {
+            Response = new 입고요청페이지응답 { TotalCount = 31, Page = 2, PageSize = 25 }
+        };
+        var service = new 입출고작업Service(client);
+
+        var result = await service.입고목록조회Async(new 입고요청목록조회요청
+        {
+            Page = 2,
+            PageSize = 25,
+            Search = "공급처 A",
+            SortBy = nameof(입고요청항목응답.예정도착일),
+            SortDescending = false,
+            WarehouseId = 17,
+            Status = "입고예정"
+        });
+
+        Assert.Equal(31, result.TotalCount);
+        Assert.Equal(HttpMethod.Get, client.LastMethod);
+        Assert.Contains("api/v1/warehouse-operations/inbounds/query?", client.LastPath);
+        Assert.Contains("page=2", client.LastPath);
+        Assert.Contains("pageSize=25", client.LastPath);
+        Assert.Contains("search=%EA%B3%B5%EA%B8%89%EC%B2%98%20A", client.LastPath);
+        Assert.Contains("sortBy=%EC%98%88%EC%A0%95%EB%8F%84%EC%B0%A9%EC%9D%BC", client.LastPath);
+        Assert.Contains("sortDescending=false", client.LastPath);
+        Assert.Contains("warehouseId=17", client.LastPath);
+        Assert.Contains("status=%EC%9E%85%EA%B3%A0%EC%98%88%EC%A0%95", client.LastPath);
+    }
+
+    [Fact]
     public async Task 입고완료_입고번호와요청을Controller에전달한다()
     {
         var request = new 입고완료요청
@@ -42,6 +74,29 @@ public sealed class 공동구매창고ServiceTests
         Assert.Equal(HttpMethod.Post, client.LastMethod);
         Assert.Equal("api/v1/warehouse-operations/inbounds/23/complete", client.LastPath);
         Assert.Same(request, client.LastRequest);
+    }
+
+    [Fact]
+    public async Task 입고수정과취소는_같은입고리소스의PutDelete경로를사용한다()
+    {
+        var request = new 입고요청저장요청 { 창고Id = 3, 공급처명 = "생산자" };
+        var client = new RecordingJsonApiClient
+        {
+            Response = new 입고요청항목응답 { Id = 37 }
+        };
+        var service = new 공동구매창고Service(client);
+
+        await service.입고요청수정Async(37, request);
+
+        Assert.Equal(HttpMethod.Put, client.LastMethod);
+        Assert.Equal("api/v1/warehouse-operations/inbounds/37", client.LastPath);
+        Assert.Same(request, client.LastRequest);
+
+        await service.입고요청취소Async(37);
+
+        Assert.Equal(HttpMethod.Delete, client.LastMethod);
+        Assert.Equal("api/v1/warehouse-operations/inbounds/37", client.LastPath);
+        Assert.Null(client.LastRequest);
     }
 
     [Fact]

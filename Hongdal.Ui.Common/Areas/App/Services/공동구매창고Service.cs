@@ -1,3 +1,4 @@
+using System.Globalization;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Warehouse;
@@ -16,6 +17,13 @@ public interface I입출고작업Service
         창고저장요청 request,
         CancellationToken cancellationToken = default);
 
+    Task<창고요약응답?> 창고수정Async(
+        long warehouseId,
+        창고저장요청 request,
+        CancellationToken cancellationToken = default);
+
+    Task 창고삭제Async(long warehouseId, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(
         long warehouseId,
         CancellationToken cancellationToken = default);
@@ -25,11 +33,36 @@ public interface I입출고작업Service
         창고사용자저장요청 request,
         CancellationToken cancellationToken = default);
 
+    Task<창고사용자항목응답?> 창고사용자수정Async(
+        long warehouseId,
+        long warehouseUserId,
+        창고사용자저장요청 request,
+        CancellationToken cancellationToken = default);
+
+    Task 창고사용자삭제Async(
+        long warehouseId,
+        long warehouseUserId,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(CancellationToken cancellationToken = default);
+
+    async Task<입고요청페이지응답> 입고목록조회Async(
+        입고요청목록조회요청 request,
+        CancellationToken cancellationToken = default)
+        => 입고요청목록Query.Apply(
+            await 입고목록조회Async(cancellationToken),
+            request);
 
     Task<입고요청항목응답?> 입고요청생성Async(
         입고요청저장요청 request,
         CancellationToken cancellationToken = default);
+
+    Task<입고요청항목응답?> 입고요청수정Async(
+        long inboundId,
+        입고요청저장요청 request,
+        CancellationToken cancellationToken = default);
+
+    Task 입고요청취소Async(long inboundId, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(
         long inboundId,
@@ -88,6 +121,24 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
             "창고 생성",
             cancellationToken: cancellationToken);
 
+    public Task<창고요약응답?> 창고수정Async(
+        long warehouseId,
+        창고저장요청 request,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync<창고저장요청, 창고요약응답>(
+            HttpMethod.Put,
+            $"{BasePath}/warehouses/{warehouseId}",
+            request,
+            "창고 수정",
+            cancellationToken: cancellationToken);
+
+    public Task 창고삭제Async(long warehouseId, CancellationToken cancellationToken = default)
+        => client.SendAsync(
+            HttpMethod.Delete,
+            $"{BasePath}/warehouses/{warehouseId}",
+            "창고 삭제",
+            cancellationToken);
+
     public async Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(
         long warehouseId,
         CancellationToken cancellationToken = default)
@@ -108,6 +159,28 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
             "창고 사용자 추가",
             cancellationToken: cancellationToken);
 
+    public Task<창고사용자항목응답?> 창고사용자수정Async(
+        long warehouseId,
+        long warehouseUserId,
+        창고사용자저장요청 request,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync<창고사용자저장요청, 창고사용자항목응답>(
+            HttpMethod.Put,
+            $"{BasePath}/warehouses/{warehouseId}/users/{warehouseUserId}",
+            request,
+            "창고 사용자 수정",
+            cancellationToken: cancellationToken);
+
+    public Task 창고사용자삭제Async(
+        long warehouseId,
+        long warehouseUserId,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync(
+            HttpMethod.Delete,
+            $"{BasePath}/warehouses/{warehouseId}/users/{warehouseUserId}",
+            "창고 사용자 삭제",
+            cancellationToken);
+
     public async Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(
         CancellationToken cancellationToken = default)
         => (await client.GetAsync<입고요청목록응답>(
@@ -115,6 +188,19 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
                 "입고 요청 목록 조회",
                 cancellationToken: cancellationToken))?.Items
             ?? [];
+
+    public async Task<입고요청페이지응답> 입고목록조회Async(
+        입고요청목록조회요청 request,
+        CancellationToken cancellationToken = default)
+        => await client.GetAsync<입고요청페이지응답>(
+               BuildInboundQueryPath(request),
+               "입고 요청 서버 목록 조회",
+               cancellationToken: cancellationToken)
+           ?? new 입고요청페이지응답
+           {
+               Page = Math.Max(0, request.Page),
+               PageSize = Math.Clamp(request.PageSize, 1, 200)
+           };
 
     public Task<입고요청항목응답?> 입고요청생성Async(
         입고요청저장요청 request,
@@ -125,6 +211,24 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
             request,
             "입고 요청 생성",
             cancellationToken: cancellationToken);
+
+    public Task<입고요청항목응답?> 입고요청수정Async(
+        long inboundId,
+        입고요청저장요청 request,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync<입고요청저장요청, 입고요청항목응답>(
+            HttpMethod.Put,
+            $"{BasePath}/inbounds/{inboundId}",
+            request,
+            "입고 요청 수정",
+            cancellationToken: cancellationToken);
+
+    public Task 입고요청취소Async(long inboundId, CancellationToken cancellationToken = default)
+        => client.SendAsync(
+            HttpMethod.Delete,
+            $"{BasePath}/inbounds/{inboundId}",
+            "입고 요청 취소",
+            cancellationToken);
 
     public async Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(
         long inboundId,
@@ -188,6 +292,36 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
             request,
             "출고 운송 인계",
             cancellationToken: cancellationToken);
+
+    private static string BuildInboundQueryPath(입고요청목록조회요청 request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var values = new List<string>
+        {
+            $"page={Math.Max(0, request.Page).ToString(CultureInfo.InvariantCulture)}",
+            $"pageSize={Math.Clamp(request.PageSize, 1, 200).ToString(CultureInfo.InvariantCulture)}",
+            $"sortDescending={request.SortDescending.ToString().ToLowerInvariant()}"
+        };
+
+        AddQueryValue(values, "search", request.Search);
+        AddQueryValue(values, "sortBy", request.SortBy);
+        AddQueryValue(values, "status", request.Status);
+        AddQueryValue(values, "flowType", request.FlowType);
+        if (request.WarehouseId is > 0)
+        {
+            values.Add($"warehouseId={request.WarehouseId.Value.ToString(CultureInfo.InvariantCulture)}");
+        }
+
+        return $"{BasePath}/inbounds/query?{string.Join('&', values)}";
+    }
+
+    private static void AddQueryValue(ICollection<string> values, string name, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            values.Add($"{name}={Uri.EscapeDataString(value.Trim())}");
+        }
+    }
 }
 
 /// <summary>기존 공동구매 화면이 공통 입출고 API 구현을 사용하도록 유지하는 호환 형식입니다.</summary>

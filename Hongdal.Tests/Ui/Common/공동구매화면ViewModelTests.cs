@@ -33,8 +33,8 @@ public sealed class 공동구매화면ViewModelTests
         Assert.Equal(10, fixture.ViewModel.공급.세부업무목록.Count);
         Assert.Equal(2, fixture.ViewModel.물류.세부업무목록.Count);
         Assert.Equal(8, fixture.ViewModel.공동수입.세부업무목록.Count);
-        Assert.Equal(19, fixture.ViewModel.실행.세부업무목록.Count);
-        Assert.Equal(48, fixture.ViewModel.절차세부업무목록.Count);
+        Assert.Equal(21, fixture.ViewModel.실행.세부업무목록.Count);
+        Assert.Equal(50, fixture.ViewModel.절차세부업무목록.Count);
         Assert.Equal(
             fixture.ViewModel.절차세부업무목록.Count,
             fixture.ViewModel.절차세부업무목록.Select(item => item.업무코드).Distinct().Count());
@@ -1496,6 +1496,21 @@ public sealed class 공동구매화면ViewModelTests
                 연결상태 = "Connected"
             });
 
+        public Task<판매채널계정항목응답?> 계정수정Async(
+            long accountId,
+            판매채널계정저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<판매채널계정항목응답?>(new 판매채널계정항목응답
+            {
+                Id = accountId,
+                채널종류 = request.채널종류,
+                상점명 = request.상점명,
+                연결상태 = "Connected"
+            });
+
+        public Task 계정삭제Async(long accountId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
         public Task<IReadOnlyList<판매상품항목응답>> 상품목록조회Async(
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<판매상품항목응답>>([]);
@@ -1512,6 +1527,22 @@ public sealed class 공동구매화면ViewModelTests
                 판매가 = request.판매가
             });
 
+        public Task<판매상품항목응답?> 상품수정Async(
+            long productId,
+            판매상품저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<판매상품항목응답?>(new 판매상품항목응답
+            {
+                Id = productId,
+                입고상품Id = request.입고상품Id,
+                대표상품명 = request.대표상품명,
+                판매SKU = request.판매SKU,
+                판매가 = request.판매가
+            });
+
+        public Task 상품삭제Async(long productId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
         public Task<IReadOnlyList<채널출품항목응답>> 출품목록조회Async(
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<채널출품항목응답>>([]);
@@ -1526,6 +1557,21 @@ public sealed class 공동구매화면ViewModelTests
                 판매채널계정Id = request.판매채널계정Id,
                 출품상태 = "Draft"
             });
+
+        public Task<채널출품항목응답?> 출품수정Async(
+            long listingId,
+            채널출품저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<채널출품항목응답?>(new 채널출품항목응답
+            {
+                Id = listingId,
+                판매상품Id = request.판매상품Id,
+                판매채널계정Id = request.판매채널계정Id,
+                출품상태 = "Draft"
+            });
+
+        public Task 출품삭제Async(long listingId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
     }
 
     private sealed class Fake공동구매창고Service : I공동구매창고Service
@@ -1539,6 +1585,15 @@ public sealed class 공동구매화면ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<창고요약응답?>(null);
 
+        public Task<창고요약응답?> 창고수정Async(
+            long warehouseId,
+            창고저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고요약응답?>(null);
+
+        public Task 창고삭제Async(long warehouseId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
         public Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(
             long warehouseId,
             CancellationToken cancellationToken = default)
@@ -1550,6 +1605,19 @@ public sealed class 공동구매화면ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<창고사용자항목응답?>(null);
 
+        public Task<창고사용자항목응답?> 창고사용자수정Async(
+            long warehouseId,
+            long warehouseUserId,
+            창고사용자저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고사용자항목응답?>(null);
+
+        public Task 창고사용자삭제Async(
+            long warehouseId,
+            long warehouseUserId,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
         public Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<입고요청항목응답>>([]);
@@ -1558,6 +1626,15 @@ public sealed class 공동구매화면ViewModelTests
             입고요청저장요청 request,
             CancellationToken cancellationToken = default)
             => Task.FromResult<입고요청항목응답?>(null);
+
+        public Task<입고요청항목응답?> 입고요청수정Async(
+            long inboundId,
+            입고요청저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<입고요청항목응답?>(null);
+
+        public Task 입고요청취소Async(long inboundId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
 
         public Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(
             long inboundId,

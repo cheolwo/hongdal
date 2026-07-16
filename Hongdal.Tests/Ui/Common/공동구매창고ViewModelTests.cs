@@ -23,9 +23,12 @@ public sealed class 공동구매창고ViewModelTests
         Assert.IsAssignableFrom<출고ViewModel>(outbound);
         Assert.NotNull(inbound.원장);
         Assert.NotNull(outbound.원장);
-        Assert.Equal(6, inbound.세부업무목록.Count);
+        Assert.Equal(8, inbound.세부업무목록.Count);
         Assert.Equal(3, outbound.세부업무목록.Count);
         Assert.IsAssignableFrom<I목록조회ViewModel<입고요청항목응답>>(inbound.조회);
+        Assert.IsAssignableFrom<I등록ViewModel<입고요청저장요청>>(inbound.등록);
+        Assert.IsAssignableFrom<I수정ViewModel<입고요청저장요청>>(inbound.수정);
+        Assert.IsAssignableFrom<I삭제ViewModel<long>>(inbound.삭제);
         Assert.IsAssignableFrom<I목록조회ViewModel<재고항목응답>>(outbound.재고조회);
     }
 
@@ -175,6 +178,45 @@ public sealed class 공동구매창고ViewModelTests
     }
 
     [Fact]
+    public async Task 입고Crud_선택한입고를수정하고이력을보존한채취소한다()
+    {
+        var service = new Fake공동구매창고Service
+        {
+            입고수정응답 = new 입고요청항목응답
+            {
+                Id = 37,
+                창고Id = 3,
+                공급처명 = "수정 공급처",
+                상태 = "예정"
+            }
+        };
+        var state = new 공동구매창고상태ViewModel();
+        state.창고목록적용([new 창고요약응답 { Id = 3, 기본창고여부 = true }]);
+        state.입고목록적용(
+        [
+            new 입고요청항목응답
+            {
+                Id = 37,
+                창고Id = 3,
+                공급처명 = "기존 공급처",
+                상태 = "예정"
+            }
+        ]);
+        using var update = new 입고수정ViewModel(service, state);
+        using var delete = new 입고삭제ViewModel(service, state);
+
+        Assert.True(update.선택항목적용());
+        update.초안.공급처명 = "수정 공급처";
+        Assert.True(await update.실행Async());
+        Assert.Equal(37, service.마지막입고수정Id);
+        Assert.Equal("수정 공급처", state.선택된입고요청?.공급처명);
+
+        Assert.True(await delete.실행Async());
+        Assert.Equal(37, service.마지막입고취소Id);
+        Assert.Empty(state.입고요청목록);
+    }
+
+    [Fact]
     public async Task 출고원장_가용재고를포장하고운송원장으로인계한다()
     {
         var service = new Fake공동구매창고Service
@@ -218,10 +260,13 @@ public sealed class 공동구매창고ViewModelTests
         public IReadOnlyList<창고요약응답> 창고목록응답 { get; set; } = [];
         public IReadOnlyList<입고요청항목응답> 입고목록응답 { get; set; } = [];
         public IReadOnlyList<입고상품항목응답> 입고완료응답 { get; set; } = [];
+        public 입고요청항목응답? 입고수정응답 { get; set; }
         public IReadOnlyList<재고항목응답> 재고목록응답 { get; set; } = [];
         public 창고작업결과응답? 포장응답 { get; set; }
         public 화주운송의뢰응답? 운송인계응답 { get; set; }
         public long? 마지막입고완료Id { get; private set; }
+        public long? 마지막입고수정Id { get; private set; }
+        public long? 마지막입고취소Id { get; private set; }
         public long? 마지막포장입고상품Id { get; private set; }
         public 재고운송의뢰생성요청? 마지막운송인계요청 { get; private set; }
 
@@ -234,6 +279,15 @@ public sealed class 공동구매창고ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<창고요약응답?>(null);
 
+        public Task<창고요약응답?> 창고수정Async(
+            long warehouseId,
+            창고저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고요약응답?>(null);
+
+        public Task 창고삭제Async(long warehouseId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
         public Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(
             long warehouseId,
             CancellationToken cancellationToken = default)
@@ -245,6 +299,19 @@ public sealed class 공동구매창고ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<창고사용자항목응답?>(null);
 
+        public Task<창고사용자항목응답?> 창고사용자수정Async(
+            long warehouseId,
+            long warehouseUserId,
+            창고사용자저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고사용자항목응답?>(null);
+
+        public Task 창고사용자삭제Async(
+            long warehouseId,
+            long warehouseUserId,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
         public Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(
             CancellationToken cancellationToken = default)
             => Task.FromResult(입고목록응답);
@@ -253,6 +320,21 @@ public sealed class 공동구매창고ViewModelTests
             입고요청저장요청 request,
             CancellationToken cancellationToken = default)
             => Task.FromResult<입고요청항목응답?>(null);
+
+        public Task<입고요청항목응답?> 입고요청수정Async(
+            long inboundId,
+            입고요청저장요청 request,
+            CancellationToken cancellationToken = default)
+        {
+            마지막입고수정Id = inboundId;
+            return Task.FromResult(입고수정응답);
+        }
+
+        public Task 입고요청취소Async(long inboundId, CancellationToken cancellationToken = default)
+        {
+            마지막입고취소Id = inboundId;
+            return Task.CompletedTask;
+        }
 
         public Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(
             long inboundId,
