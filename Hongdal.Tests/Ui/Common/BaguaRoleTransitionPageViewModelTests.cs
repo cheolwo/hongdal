@@ -276,10 +276,12 @@ public sealed class BaguaRoleTransitionPageViewModelTests
     private static BaguaRoleTransitionPageViewModel CreateViewModel(
         IBaguaTargetWorkspaceResolver? workspaceResolver = null)
     {
-        var domainFactory = new Bagua업무영역ViewModelFactory(new NeverCalledApiClient());
+        var apiClient = new NeverCalledApiClient();
+        var domainFactory = new Bagua업무영역ViewModelFactory(apiClient);
         return new BaguaRoleTransitionPageViewModel(
             domainFactory,
-            workspaceResolver ?? new DefaultBaguaTargetWorkspaceResolver());
+            workspaceResolver ?? new DefaultBaguaTargetWorkspaceResolver(),
+            apiClient);
     }
 
     private sealed class TestWorkspaceResolver : IBaguaTargetWorkspaceResolver

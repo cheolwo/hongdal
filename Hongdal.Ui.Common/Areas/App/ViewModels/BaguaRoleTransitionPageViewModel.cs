@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Ui.Common.Areas.App.Models;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
@@ -267,10 +268,12 @@ public sealed class BaguaRoleTransitionPageViewModel : 조립ViewModelBase
 
     public BaguaRoleTransitionPageViewModel(
         IBagua업무영역ViewModelFactory domainFactory,
-        IBaguaTargetWorkspaceResolver workspaceResolver)
+        IBaguaTargetWorkspaceResolver workspaceResolver,
+        IHongdalJsonApiClient apiClient)
     {
         _workspaceResolver = workspaceResolver;
         서버권한 = 하위ViewModel등록(new Bagua서버권한ViewModel());
+        전환Runtime = 하위ViewModel등록(new Bagua전환RuntimeViewModel(apiClient, 서버권한));
         _domains = domainFactory.CreateAll();
         foreach (var domain in _domains.Values)
         {
@@ -283,6 +286,7 @@ public sealed class BaguaRoleTransitionPageViewModel : 조립ViewModelBase
     public string TargetTrigramKey { get; private set; } = string.Empty;
     public BaguaRoleTransitionPageModel? 페이지 { get; private set; }
     public Bagua서버권한ViewModel 서버권한 { get; }
+    public Bagua전환RuntimeViewModel 전환Runtime { get; }
     public BaguaTransitionDefinition? 전환 { get; private set; }
     public BaguaBusinessAreaDefinition? 출발영역 { get; private set; }
     public BaguaBusinessAreaDefinition? 도착영역 { get; private set; }
@@ -319,6 +323,7 @@ public sealed class BaguaRoleTransitionPageViewModel : 조립ViewModelBase
         역할선택지 = [];
         전환행 = [];
         서버권한.화면초기화(null);
+        전환Runtime.초기화(null);
 
         try
         {
@@ -356,6 +361,7 @@ public sealed class BaguaRoleTransitionPageViewModel : 조립ViewModelBase
                 _domains[page.TargetArea.BusinessCode],
                 전환흐름,
                 현재역할관점);
+            전환Runtime.초기화(업무조립);
             전환행 = BuildMatrix(page.Role.RoleCode);
         }
         catch (KeyNotFoundException)
