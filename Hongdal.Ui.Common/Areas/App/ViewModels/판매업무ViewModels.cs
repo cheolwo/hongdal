@@ -124,6 +124,33 @@ public sealed class 판매업무상태ViewModel : ObservableObject
         선택된출품 = item;
     }
 
+    public void 계정삭제적용(long accountId)
+    {
+        계정목록 = 계정목록.Where(item => item.Id != accountId).ToArray();
+        if (선택된계정?.Id == accountId)
+        {
+            선택된계정 = null;
+        }
+    }
+
+    public void 상품삭제적용(long productId)
+    {
+        상품목록 = 상품목록.Where(item => item.Id != productId).ToArray();
+        if (선택된상품?.Id == productId)
+        {
+            선택된상품 = null;
+        }
+    }
+
+    public void 출품삭제적용(long listingId)
+    {
+        출품목록 = 출품목록.Where(item => item.Id != listingId).ToArray();
+        if (선택된출품?.Id == listingId)
+        {
+            선택된출품 = null;
+        }
+    }
+
     public bool 계정선택(long id)
     {
         var item = 계정목록.FirstOrDefault(value => value.Id == id);
@@ -454,43 +481,48 @@ public sealed class 채널출품ViewModel(
 /// <summary>
 /// 기본 판매 흐름을 조립합니다. 다른 업무 영역은 이 ViewModel을 주입받고 필요한 특화 규칙만 추가합니다.
 /// </summary>
-public sealed class 판매ViewModel : 조립ViewModelBase
+public sealed class 판매ViewModel : 조립ViewModelBase, ICrudPageViewModel
 {
     public 판매ViewModel(
         판매업무상태ViewModel 상태,
         판매채널계정ViewModel 계정,
         상품등록ViewModel 상품등록,
         채널출품ViewModel 출품,
-        판매채널계정조회ViewModel 계정조회,
-        판매채널계정등록ViewModel 계정등록,
-        판매상품조회ViewModel 상품조회,
-        판매상품등록ViewModel 상품등록업무,
-        채널출품조회ViewModel 출품조회,
-        채널출품등록ViewModel 출품등록)
+        판매채널계정CrudViewModel 계정Crud,
+        판매상품CrudViewModel 상품Crud,
+        채널출품CrudViewModel 출품Crud)
     {
         this.상태 = 하위ViewModel등록(상태, 수명소유: false);
         this.계정 = 하위ViewModel등록(계정);
         this.상품등록 = 하위ViewModel등록(상품등록);
         this.출품 = 하위ViewModel등록(출품);
-        this.계정조회 = 하위ViewModel등록(계정조회, 수명소유: false);
-        this.계정등록 = 하위ViewModel등록(계정등록, 수명소유: false);
-        this.상품조회 = 하위ViewModel등록(상품조회, 수명소유: false);
-        this.상품등록업무 = 하위ViewModel등록(상품등록업무, 수명소유: false);
-        this.출품조회 = 하위ViewModel등록(출품조회, 수명소유: false);
-        this.출품등록 = 하위ViewModel등록(출품등록, 수명소유: false);
-        세부업무목록 = [계정조회, 계정등록, 상품조회, 상품등록업무, 출품조회, 출품등록];
+        this.계정Crud = 하위ViewModel등록(계정Crud);
+        this.상품Crud = 하위ViewModel등록(상품Crud);
+        this.출품Crud = 하위ViewModel등록(출품Crud);
+        Crud업무단위목록 = [계정Crud, 상품Crud, 출품Crud];
+        세부업무목록 = [.. 계정Crud.Crud업무목록, .. 상품Crud.Crud업무목록, .. 출품Crud.Crud업무목록];
     }
 
     public 판매업무상태ViewModel 상태 { get; }
     public 판매채널계정ViewModel 계정 { get; }
     public 상품등록ViewModel 상품등록 { get; }
     public 채널출품ViewModel 출품 { get; }
-    public 판매채널계정조회ViewModel 계정조회 { get; }
-    public 판매채널계정등록ViewModel 계정등록 { get; }
-    public 판매상품조회ViewModel 상품조회 { get; }
-    public 판매상품등록ViewModel 상품등록업무 { get; }
-    public 채널출품조회ViewModel 출품조회 { get; }
-    public 채널출품등록ViewModel 출품등록 { get; }
+    public 판매채널계정CrudViewModel 계정Crud { get; }
+    public 판매상품CrudViewModel 상품Crud { get; }
+    public 채널출품CrudViewModel 출품Crud { get; }
+    public IReadOnlyList<I업무단위CrudViewModel> Crud업무단위목록 { get; }
+    public 판매채널계정조회ViewModel 계정조회 => 계정Crud.조회;
+    public 판매채널계정등록ViewModel 계정등록 => 계정Crud.등록;
+    public 판매채널계정수정ViewModel 계정수정 => 계정Crud.수정;
+    public 판매채널계정삭제ViewModel 계정삭제 => 계정Crud.삭제;
+    public 판매상품조회ViewModel 상품조회 => 상품Crud.조회;
+    public 판매상품등록ViewModel 상품등록업무 => 상품Crud.등록;
+    public 판매상품수정ViewModel 상품수정 => 상품Crud.수정;
+    public 판매상품삭제ViewModel 상품삭제 => 상품Crud.삭제;
+    public 채널출품조회ViewModel 출품조회 => 출품Crud.조회;
+    public 채널출품등록ViewModel 출품등록 => 출품Crud.등록;
+    public 채널출품수정ViewModel 출품수정 => 출품Crud.수정;
+    public 채널출품삭제ViewModel 출품삭제 => 출품Crud.삭제;
     public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
     public bool 처리중 => 계정.처리중
                           || 상품등록.처리중
@@ -498,11 +530,7 @@ public sealed class 판매ViewModel : 조립ViewModelBase
                           || 세부업무목록.Any(item => item.처리중);
 
     public void 지원채널설정(IEnumerable<string>? channelTypes)
-    {
-        계정.지원채널설정(channelTypes);
-        계정조회.지원채널설정(channelTypes);
-        계정등록.지원채널설정(channelTypes);
-    }
+        => 계정.지원채널설정(channelTypes);
 
     public async Task<bool> 초기화Async(CancellationToken cancellationToken = default)
         => await 계정조회.조회Async(cancellationToken)

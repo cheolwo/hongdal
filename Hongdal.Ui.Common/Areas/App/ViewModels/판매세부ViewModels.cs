@@ -1,5 +1,4 @@
 using Hongdal.Contracts.Common.Sales;
-using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
@@ -14,270 +13,151 @@ public abstract class 판매업무조각ViewModelBase(
     public 업무조각유형 업무유형 { get; } = 업무유형;
 }
 
-public sealed class 판매채널계정조회ViewModel(
-    I판매채널계정Service service,
-    판매업무상태ViewModel 상태)
-    : 판매업무조각ViewModelBase(
-        상태,
+public sealed class 판매채널계정조회ViewModel(판매채널계정ViewModel 원본)
+    : 위임업무조각ViewModelBase<판매채널계정ViewModel>(
+        원본,
         "sales-channel-account-query",
         "판매채널 계정 조회",
         업무조각유형.목록조회), I목록조회ViewModel<판매채널계정항목응답>
 {
-    private IReadOnlyList<string> _지원채널목록 = [];
-
-    public IReadOnlyList<판매채널계정항목응답> 항목목록
-        => _지원채널목록.Count == 0
-            ? 판매상태.계정목록
-            : 판매상태.계정목록.Where(item => _지원채널목록.Contains(
-                item.채널종류,
-                StringComparer.OrdinalIgnoreCase)).ToArray();
-
-    public 판매채널계정항목응답? 선택된항목 => 판매상태.선택된계정;
+    public IReadOnlyList<판매채널계정항목응답> 항목목록 => 원본.계정목록;
+    public 판매채널계정항목응답? 선택된항목 => 원본.상태공유.선택된계정;
 
     public void 지원채널설정(IEnumerable<string>? channelTypes)
-    {
-        _지원채널목록 = channelTypes?
-            .Where(value => !string.IsNullOrWhiteSpace(value))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray() ?? [];
-        OnPropertyChanged(nameof(항목목록));
-    }
+        => 원본.지원채널설정(channelTypes);
 
     public Task<bool> 조회Async(CancellationToken cancellationToken = default)
-        => 작업실행Async(
-            async token => 판매상태.계정목록적용(await service.계정목록조회Async(token)),
-            "판매채널 계정을 조회했습니다.",
-            cancellationToken);
+        => 원본.목록조회Async(cancellationToken);
 
-    public bool 선택(long accountId)
-        => 판매상태.계정선택(accountId)
-           || 유효성실패("목록에 있는 판매채널 계정을 선택해 주세요.");
+    public bool 선택(long accountId) => 원본.선택(accountId);
 }
 
-public sealed class 판매채널계정등록ViewModel(
-    I판매채널계정Service service,
-    판매업무상태ViewModel 상태)
-    : 판매업무조각ViewModelBase(
-        상태,
+public sealed class 판매채널계정등록ViewModel(판매채널계정ViewModel 원본)
+    : 위임업무조각ViewModelBase<판매채널계정ViewModel>(
+        원본,
         "sales-channel-account-create",
         "판매채널 계정 등록",
-        업무조각유형.등록), I명령ViewModel<판매채널계정저장요청>
+        업무조각유형.등록), I등록ViewModel<판매채널계정저장요청>
 {
-    private IReadOnlyList<string> _지원채널목록 = [];
-    private 판매채널계정저장요청 _초안 = new();
-
-    public 판매채널계정저장요청 초안
-    {
-        get => _초안;
-        private set => SetProperty(ref _초안, value);
-    }
+    public 판매채널계정저장요청 초안 => 원본.초안;
 
     public void 지원채널설정(IEnumerable<string>? channelTypes)
-        => _지원채널목록 = channelTypes?
-            .Where(value => !string.IsNullOrWhiteSpace(value))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray() ?? [];
+        => 원본.지원채널설정(channelTypes);
 
-    public async Task<bool> 실행Async(CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(초안.채널종류) || string.IsNullOrWhiteSpace(초안.상점명))
-        {
-            return 유효성실패("판매채널 종류와 상점명을 입력해 주세요.");
-        }
-
-        if (_지원채널목록.Count > 0
-            && !_지원채널목록.Contains(초안.채널종류, StringComparer.OrdinalIgnoreCase))
-        {
-            return 유효성실패("현재 판매 경로에서 지원하는 채널을 선택해 주세요.");
-        }
-
-        return await 작업실행Async(
-            async token =>
-            {
-                var result = await service.계정생성Async(초안, token)
-                    ?? throw new InvalidOperationException("판매채널 계정 생성 응답이 비어 있습니다.");
-                판매상태.계정저장적용(result);
-                초안 = new 판매채널계정저장요청 { 채널종류 = result.채널종류 };
-            },
-            "판매채널 계정을 등록했습니다.",
-            cancellationToken);
-    }
+    public Task<bool> 실행Async(CancellationToken cancellationToken = default)
+        => 원본.생성Async(cancellationToken);
 
     public void 입력변경알림() => OnPropertyChanged(nameof(초안));
 }
 
-public sealed class 판매상품조회ViewModel(
-    I상품등록Service service,
-    판매업무상태ViewModel 상태)
-    : 판매업무조각ViewModelBase(
-        상태,
+public sealed class 판매상품조회ViewModel(상품등록ViewModel 원본)
+    : 위임업무조각ViewModelBase<상품등록ViewModel>(
+        원본,
         "sales-product-query",
         "판매상품 조회",
-        업무조각유형.목록조회), I목록조회ViewModel<판매상품항목응답>
+        업무조각유형.목록조회),
+        I목록조회ViewModel<판매상품항목응답>,
+        I비동기검색ViewModel<판매상품항목응답>
 {
-    public IReadOnlyList<판매상품항목응답> 항목목록 => 판매상태.상품목록;
-    public 판매상품항목응답? 선택된항목 => 판매상태.선택된상품;
+    private readonly object _검색초기화동기화 = new();
+    private Task<bool>? _검색초기조회;
+
+    public IReadOnlyList<판매상품항목응답> 항목목록 => 원본.상품목록;
+    public 판매상품항목응답? 선택된항목 => 원본.상태공유.선택된상품;
 
     public Task<bool> 조회Async(CancellationToken cancellationToken = default)
-        => 작업실행Async(
-            async token => 판매상태.상품목록적용(await service.상품목록조회Async(token)),
-            "판매상품을 조회했습니다.",
-            cancellationToken);
+        => 원본.목록조회Async(cancellationToken);
 
-    public bool 선택(long productId)
-        => 판매상태.상품선택(productId)
-           || 유효성실패("목록에 있는 판매상품을 선택해 주세요.");
+    public async Task<IReadOnlyList<판매상품항목응답>> 검색Async(
+        string? 검색어,
+        CancellationToken cancellationToken = default)
+    {
+        if (항목목록.Count == 0)
+        {
+            Task<bool> initialLoad;
+            lock (_검색초기화동기화)
+            {
+                _검색초기조회 ??= 조회Async(CancellationToken.None);
+                initialLoad = _검색초기조회;
+            }
+
+            var loaded = await initialLoad.WaitAsync(cancellationToken);
+            if (!loaded)
+            {
+                lock (_검색초기화동기화)
+                {
+                    if (ReferenceEquals(_검색초기조회, initialLoad))
+                    {
+                        _검색초기조회 = null;
+                    }
+                }
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(검색어))
+        {
+            return 항목목록.Take(20).ToArray();
+        }
+
+        var search = 검색어.Trim();
+        return 항목목록
+            .Where(item => item.대표상품명.Contains(search, StringComparison.OrdinalIgnoreCase)
+                           || item.판매SKU.Contains(search, StringComparison.OrdinalIgnoreCase))
+            .Take(20)
+            .ToArray();
+    }
+
+    public bool 선택(long productId) => 원본.선택(productId);
 }
 
-public sealed class 판매상품등록ViewModel(
-    I상품등록Service service,
-    판매업무상태ViewModel 상태)
-    : 판매업무조각ViewModelBase(
-        상태,
+public sealed class 판매상품등록ViewModel(상품등록ViewModel 원본)
+    : 위임업무조각ViewModelBase<상품등록ViewModel>(
+        원본,
         "sales-product-create",
         "판매상품 등록",
-        업무조각유형.등록), I명령ViewModel<판매상품저장요청>
+        업무조각유형.등록), I등록ViewModel<판매상품저장요청>
 {
-    private 판매상품저장요청 _초안 = new();
-
-    public 판매상품저장요청 초안
-    {
-        get => _초안;
-        private set => SetProperty(ref _초안, value);
-    }
+    public 판매상품저장요청 초안 => 원본.초안;
 
     public void 입고상품연결(long inboundProductId, string? productName = null, string? sku = null)
-    {
-        초안.입고상품Id = inboundProductId;
-        if (!string.IsNullOrWhiteSpace(productName))
-        {
-            초안.대표상품명 = productName;
-        }
+        => 원본.입고상품연결(inboundProductId, productName, sku);
 
-        if (string.IsNullOrWhiteSpace(초안.판매SKU) && !string.IsNullOrWhiteSpace(sku))
-        {
-            초안.판매SKU = sku;
-        }
-
-        OnPropertyChanged(nameof(초안));
-    }
-
-    public async Task<bool> 실행Async(CancellationToken cancellationToken = default)
-    {
-        if (초안.입고상품Id <= 0)
-        {
-            return 유효성실패("연결할 입고상품을 선택해 주세요.");
-        }
-
-        if (string.IsNullOrWhiteSpace(초안.대표상품명)
-            || string.IsNullOrWhiteSpace(초안.판매SKU)
-            || 초안.판매가 <= 0)
-        {
-            return 유효성실패("대표상품명, 판매 SKU와 0원보다 큰 판매가를 입력해 주세요.");
-        }
-
-        return await 작업실행Async(
-            async token =>
-            {
-                var result = await service.상품생성Async(초안, token)
-                    ?? throw new InvalidOperationException("판매상품 생성 응답이 비어 있습니다.");
-                판매상태.상품저장적용(result);
-                초안 = new 판매상품저장요청
-                {
-                    입고상품Id = result.입고상품Id,
-                    대표상품명 = result.대표상품명,
-                    판매SKU = result.판매SKU,
-                    판매가 = result.판매가
-                };
-            },
-            "판매상품을 등록했습니다.",
-            cancellationToken);
-    }
+    public Task<bool> 실행Async(CancellationToken cancellationToken = default)
+        => 원본.등록Async(cancellationToken);
 
     public void 입력변경알림() => OnPropertyChanged(nameof(초안));
 }
 
-public sealed class 채널출품조회ViewModel(
-    I채널출품Service service,
-    판매업무상태ViewModel 상태)
-    : 판매업무조각ViewModelBase(
-        상태,
+public sealed class 채널출품조회ViewModel(채널출품ViewModel 원본)
+    : 위임업무조각ViewModelBase<채널출품ViewModel>(
+        원본,
         "sales-listing-query",
         "채널 출품 조회",
         업무조각유형.목록조회), I목록조회ViewModel<채널출품항목응답>
 {
-    public IReadOnlyList<채널출품항목응답> 항목목록 => 판매상태.출품목록;
-    public 채널출품항목응답? 선택된항목 => 판매상태.선택된출품;
+    public IReadOnlyList<채널출품항목응답> 항목목록 => 원본.출품목록;
+    public 채널출품항목응답? 선택된항목 => 원본.상태공유.선택된출품;
 
     public Task<bool> 조회Async(CancellationToken cancellationToken = default)
-        => 작업실행Async(
-            async token => 판매상태.출품목록적용(await service.출품목록조회Async(token)),
-            "채널 출품을 조회했습니다.",
-            cancellationToken);
+        => 원본.목록조회Async(cancellationToken);
 
-    public bool 선택(long listingId)
-        => 판매상태.출품선택(listingId)
-           || 유효성실패("목록에 있는 채널 출품을 선택해 주세요.");
+    public bool 선택(long listingId) => 원본.상태공유.출품선택(listingId);
 }
 
-public sealed class 채널출품등록ViewModel(
-    I채널출품Service service,
-    판매업무상태ViewModel 상태)
-    : 판매업무조각ViewModelBase(
-        상태,
+public sealed class 채널출품등록ViewModel(채널출품ViewModel 원본)
+    : 위임업무조각ViewModelBase<채널출품ViewModel>(
+        원본,
         "sales-listing-create",
         "채널 출품 등록",
-        업무조각유형.등록), I명령ViewModel<채널출품저장요청>
+        업무조각유형.등록), I등록ViewModel<채널출품저장요청>
 {
-    private 채널출품저장요청 _초안 = new();
+    public 채널출품저장요청 초안 => 원본.초안;
 
-    public 채널출품저장요청 초안
-    {
-        get => _초안;
-        private set => SetProperty(ref _초안, value);
-    }
+    public bool 계정선택(long accountId) => 원본.계정선택(accountId);
+    public bool 상품선택(long productId) => 원본.상품선택(productId);
 
-    public bool 계정선택(long accountId)
-    {
-        if (!판매상태.계정선택(accountId))
-        {
-            return 유효성실패("출품할 판매채널 계정을 선택해 주세요.");
-        }
-
-        초안.판매채널계정Id = accountId;
-        OnPropertyChanged(nameof(초안));
-        return true;
-    }
-
-    public bool 상품선택(long productId)
-    {
-        if (!판매상태.상품선택(productId))
-        {
-            return 유효성실패("출품할 판매상품을 선택해 주세요.");
-        }
-
-        초안.판매상품Id = productId;
-        OnPropertyChanged(nameof(초안));
-        return true;
-    }
-
-    public async Task<bool> 실행Async(CancellationToken cancellationToken = default)
-    {
-        if (초안.판매상품Id <= 0 || 초안.판매채널계정Id <= 0)
-        {
-            return 유효성실패("출품할 판매상품과 판매채널 계정을 선택해 주세요.");
-        }
-
-        return await 작업실행Async(
-            async token =>
-            {
-                var result = await service.출품생성Async(초안, token)
-                    ?? throw new InvalidOperationException("채널 출품 응답이 비어 있습니다.");
-                판매상태.출품저장적용(result);
-            },
-            "채널 출품을 등록했습니다.",
-            cancellationToken);
-    }
+    public Task<bool> 실행Async(CancellationToken cancellationToken = default)
+        => 원본.생성Async(cancellationToken);
 
     public void 입력변경알림() => OnPropertyChanged(nameof(초안));
 }

@@ -36,6 +36,7 @@ public sealed class 주문업무상태ViewModel : ObservableObject
     private 주문원장통합공개Dto? _통합결과;
     private 주문원장역할별조회공개Dto? _역할별결과;
     private 주문원장서명상태공개Dto? _서명상태;
+    private 주문원장포함원장참조Dto? _선택된하위원장;
 
     public string? 선택된주문원장Id
     {
@@ -50,7 +51,7 @@ public sealed class 주문업무상태ViewModel : ObservableObject
         {
             if (SetProperty(ref _통합결과, value))
             {
-                OnPropertyChanged(nameof(현재Revision));
+                OnPropertyChanged(nameof(현재원장Revision));
             }
         }
     }
@@ -62,7 +63,7 @@ public sealed class 주문업무상태ViewModel : ObservableObject
         {
             if (SetProperty(ref _역할별결과, value))
             {
-                OnPropertyChanged(nameof(현재Revision));
+                OnPropertyChanged(nameof(현재원장Revision));
             }
         }
     }
@@ -74,15 +75,41 @@ public sealed class 주문업무상태ViewModel : ObservableObject
         {
             if (SetProperty(ref _서명상태, value))
             {
-                OnPropertyChanged(nameof(현재Revision));
+                OnPropertyChanged(nameof(현재서명Revision));
                 OnPropertyChanged(nameof(전체서명완료));
             }
         }
     }
 
-    public long? 현재Revision => 서명상태?.Revision
-        ?? 통합결과?.주문원장.Revision
-        ?? 역할별결과?.주문원장상세?.Revision;
+    public 주문원장포함원장참조Dto? 선택된하위원장
+    {
+        get => _선택된하위원장;
+        private set => SetProperty(ref _선택된하위원장, value);
+    }
+
+    public IReadOnlyList<주문원장포함원장참조Dto> 하위원장목록
+    {
+        get
+        {
+            var integrated = 통합결과?.주문원장;
+            var roleView = 역할별결과?.주문원장상세;
+            if (integrated is null)
+            {
+                return roleView?.포함원장목록 ?? [];
+            }
+
+            return roleView is null || integrated.Revision >= roleView.Revision
+                ? integrated.포함원장목록
+                : roleView.포함원장목록;
+        }
+    }
+
+    public long? 현재원장Revision => new long?[]
+    {
+        통합결과?.주문원장.Revision,
+        역할별결과?.주문원장상세?.Revision
+    }.Max();
+    public long? 현재서명Revision => 서명상태?.Revision;
     public bool 전체서명완료 => 서명상태?.전체서명완료여부 == true;
 
     public void 주문원장선택(string? orderLedgerId)
@@ -97,18 +124,22 @@ public sealed class 주문업무상태ViewModel : ObservableObject
         통합결과 = null;
         역할별결과 = null;
         서명상태 = null;
+        선택된하위원장 = null;
+        OnPropertyChanged(nameof(하위원장목록));
     }
 
     public void 역할별결과적용(주문원장역할별조회공개Dto result)
     {
         ArgumentNullException.ThrowIfNull(result);
         역할별결과 = result;
+        하위원장결과동기화();
     }
 
     public void 통합결과적용(주문원장통합공개Dto result)
     {
         ArgumentNullException.ThrowIfNull(result);
         통합결과 = result;
+        하위원장결과동기화();
         if (result.주문자서명상태 is not null)
         {
             서명상태 = result.주문자서명상태;
@@ -119,6 +150,21 @@ public sealed class 주문업무상태ViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(result);
         서명상태 = result;
+    }
+
+    public void 하위원장선택(주문원장포함원장참조Dto? item)
+        => 선택된하위원장 = item;
+
+    private void 하위원장결과동기화()
+    {
+        OnPropertyChanged(nameof(하위원장목록));
+        if (선택된하위원장 is null)
+        {
+            return;
+        }
+
+        선택된하위원장 = 하위원장목록.FirstOrDefault(x =>
+            string.Equals(x.원장Id, 선택된하위원장.원장Id, StringComparison.OrdinalIgnoreCase));
     }
 }
 
@@ -156,13 +202,14 @@ public abstract class 주문업무ViewModelBase : 업무작업ViewModelBase, IDi
 /// <summary>주문 원장을 주문자 보호형 또는 역할별 범위로 조회하는 기본 업무입니다.</summary>
 public sealed class 주문조회ViewModel(
     I주문원장Service service,
-    주문업무상태ViewModel 상태) : 주문업무ViewModelBase(상태), I업무조각ViewModel
+    주문업무상태ViewModel 상태) : 주문업무ViewModelBase(상태), I상세조회ViewModel<주문원장역할별조회공개Dto>
 {
     private string _보기코드 = 주문원장보기코드.주문자보호;
 
     public string 업무코드 => "order-ledger-query";
     public string 업무명 => "주문 원장 조회";
     public 업무조각유형 업무유형 => 업무조각유형.상세조회;
+    public 주문원장역할별조회공개Dto? 항목 => 주문상태.역할별결과;
 
     public string 보기코드
     {
@@ -242,7 +289,7 @@ public sealed class 주문하위원장ViewModel(
             return 유효성실패("하위 원장의 업무 역할을 선택해 주세요.");
         }
 
-        연결초안.기대Revision ??= 주문상태.현재Revision;
+        연결초안.기대Revision ??= 주문상태.현재원장Revision;
         return await 작업실행Async(
             async token =>
             {
@@ -273,7 +320,7 @@ public sealed class 주문하위원장ViewModel(
                 var result = await service.하위원장분리Async(
                         rootId,
                         childLedgerId,
-                        주문상태.현재Revision,
+                        주문상태.현재원장Revision,
                         token)
                     ?? throw new InvalidOperationException("하위 원장 분리 응답이 비어 있습니다.");
                 주문상태.통합결과적용(result);
@@ -354,7 +401,7 @@ public sealed class 주문서명ViewModel(
             return 유효성실패("계약 문서번호와 문서 해시를 입력해 주세요.");
         }
 
-        서명준비초안.기대Revision ??= 주문상태.현재Revision;
+        서명준비초안.기대Revision ??= 주문상태.현재서명Revision;
         return await 작업실행Async(
             async token =>
             {
@@ -382,7 +429,7 @@ public sealed class 주문서명ViewModel(
             return 유효성실패("문서, 동의문과 서명 증적 해시를 모두 입력해 주세요.");
         }
 
-        서명등록초안.기대Revision ??= 주문상태.현재Revision;
+        서명등록초안.기대Revision ??= 주문상태.현재서명Revision;
         return await 작업실행Async(
             async token =>
             {
@@ -411,15 +458,14 @@ public sealed class 주문서명ViewModel(
 }
 
 /// <summary>기본 주문 업무를 조회·하위 원장·서명 단위로 조립한 재사용 루트입니다.</summary>
-public sealed class 주문ViewModel : 조립ViewModelBase
+public sealed class 주문ViewModel : 조립ViewModelBase, ICrudPageViewModel
 {
     public 주문ViewModel(
         주문업무상태ViewModel 상태,
         주문조회ViewModel 조회,
         주문하위원장ViewModel 하위원장,
         주문서명ViewModel 서명,
-        주문하위원장연결ViewModel 하위원장연결,
-        주문하위원장분리ViewModel 하위원장분리,
+        주문하위원장관계CrudViewModel 하위원장관계Crud,
         주문서명상태조회ViewModel 서명상태조회,
         주문서명준비ViewModel 서명준비,
         주문서명등록ViewModel 서명등록)
@@ -428,20 +474,24 @@ public sealed class 주문ViewModel : 조립ViewModelBase
         this.조회 = 하위ViewModel등록(조회, 수명소유: false);
         this.하위원장 = 하위ViewModel등록(하위원장);
         this.서명 = 하위ViewModel등록(서명);
-        this.하위원장연결 = 하위ViewModel등록(하위원장연결, 수명소유: false);
-        this.하위원장분리 = 하위ViewModel등록(하위원장분리, 수명소유: false);
+        this.하위원장관계Crud = 하위ViewModel등록(하위원장관계Crud);
         this.서명상태조회 = 하위ViewModel등록(서명상태조회, 수명소유: false);
         this.서명준비 = 하위ViewModel등록(서명준비, 수명소유: false);
         this.서명등록 = 하위ViewModel등록(서명등록, 수명소유: false);
-        세부업무목록 = [조회, 하위원장연결, 하위원장분리, 서명상태조회, 서명준비, 서명등록];
+        Crud업무단위목록 = [하위원장관계Crud];
+        세부업무목록 = [조회, .. 하위원장관계Crud.Crud업무목록, 서명상태조회, 서명준비, 서명등록];
     }
 
     public 주문업무상태ViewModel 상태 { get; }
     public 주문조회ViewModel 조회 { get; }
     public 주문하위원장ViewModel 하위원장 { get; }
     public 주문서명ViewModel 서명 { get; }
-    public 주문하위원장연결ViewModel 하위원장연결 { get; }
-    public 주문하위원장분리ViewModel 하위원장분리 { get; }
+    public 주문하위원장관계CrudViewModel 하위원장관계Crud { get; }
+    public IReadOnlyList<I업무단위CrudViewModel> Crud업무단위목록 { get; }
+    public 주문하위원장조회ViewModel 하위원장조회 => 하위원장관계Crud.조회;
+    public 주문하위원장연결ViewModel 하위원장연결 => 하위원장관계Crud.등록;
+    public 주문하위원장수정ViewModel 하위원장수정 => 하위원장관계Crud.수정;
+    public 주문하위원장분리ViewModel 하위원장분리 => 하위원장관계Crud.삭제;
     public 주문서명상태조회ViewModel 서명상태조회 { get; }
     public 주문서명준비ViewModel 서명준비 { get; }
     public 주문서명등록ViewModel 서명등록 { get; }

@@ -42,7 +42,6 @@ public sealed class 국내판매ViewModel : 공동구매판매실행업무ViewMo
         _기본판매 = 기본판매;
         _화면상태 = 화면상태;
         _분기 = 분기;
-        _기본판매.지원채널설정(CommerceChannelOrderSyncScopes.DomesticChannelTypes);
         _기본판매.상태.PropertyChanged += 판매상태변경;
         _화면상태.PropertyChanged += 화면상태변경;
         _분기.PropertyChanged += 분기변경;
@@ -53,7 +52,10 @@ public sealed class 국내판매ViewModel : 공동구매판매실행업무ViewMo
     public override IReadOnlyList<string> 지원채널목록 => CommerceChannelOrderSyncScopes.DomesticChannelTypes;
     public 판매ViewModel 기본판매 => _기본판매;
 
-    public IReadOnlyList<판매채널계정항목응답> 계정목록 => _기본판매.계정.계정목록;
+    public IReadOnlyList<판매채널계정항목응답> 계정목록
+        => _기본판매.상태.계정목록
+            .Where(item => 지원채널목록.Contains(item.채널종류, StringComparer.OrdinalIgnoreCase))
+            .ToArray();
 
     public IReadOnlyList<판매상품항목응답> 상품목록 => _기본판매.상태.상품목록;
 
@@ -383,7 +385,6 @@ public sealed class 해외수출ViewModel : 공동구매판매실행업무ViewMo
         _기본판매 = 기본판매;
         _화면상태 = 화면상태;
         _분기 = 분기;
-        _기본판매.지원채널설정(CommerceChannelOrderSyncScopes.OverseasChannelTypes);
         _기본판매.상태.PropertyChanged += 판매상태변경;
         _화면상태.PropertyChanged += 화면상태변경;
         _분기.PropertyChanged += 분기변경;
@@ -394,7 +395,10 @@ public sealed class 해외수출ViewModel : 공동구매판매실행업무ViewMo
     public override IReadOnlyList<string> 지원채널목록 => CommerceChannelOrderSyncScopes.OverseasChannelTypes;
     public 판매ViewModel 기본판매 => _기본판매;
 
-    public IReadOnlyList<판매채널계정항목응답> 해외계정목록 => _기본판매.계정.계정목록;
+    public IReadOnlyList<판매채널계정항목응답> 해외계정목록
+        => _기본판매.상태.계정목록
+            .Where(item => 지원채널목록.Contains(item.채널종류, StringComparer.OrdinalIgnoreCase))
+            .ToArray();
 
     public IReadOnlyList<판매상품항목응답> 상품목록 => _기본판매.상태.상품목록;
 
