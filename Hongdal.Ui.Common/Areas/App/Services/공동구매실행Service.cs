@@ -4,18 +4,10 @@ using Hongdal.Contracts.Common.Orderer;
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
 /// <summary>
-/// 공동구매 확정 이후 자동집단, 주문원장과 커머스 이행을 연결하는 클라이언트 API 경계입니다.
+/// 공동구매와 무관하게 주문 원장의 조회, 하위 원장 구성과 서명을 제공하는 기본 업무 경계입니다.
 /// </summary>
-public interface I공동구매실행Service
+public interface I주문원장Service
 {
-    Task<IReadOnlyList<공동구매자동집단응답>> 자동집단목록조회Async(
-        공동구매자동집단조회조건 condition,
-        CancellationToken cancellationToken = default);
-
-    Task<공동구매자동집단응답?> 자동수요등록Async(
-        공동구매자동수요등록Command request,
-        CancellationToken cancellationToken = default);
-
     Task<주문원장역할별조회공개Dto?> 주문원장보호조회Async(
         string orderLedgerId,
         CancellationToken cancellationToken = default);
@@ -48,6 +40,20 @@ public interface I공동구매실행Service
     Task<주문원장서명상태공개Dto?> 주문원장서명등록Async(
         string orderLedgerId,
         주문원장서명등록ClientRequest request,
+        CancellationToken cancellationToken = default);
+}
+
+/// <summary>
+/// 공동구매 확정 이후 자동집단, 기본 주문원장 업무와 커머스 이행을 연결하는 API 경계입니다.
+/// </summary>
+public interface I공동구매실행Service : I주문원장Service
+{
+    Task<IReadOnlyList<공동구매자동집단응답>> 자동집단목록조회Async(
+        공동구매자동집단조회조건 condition,
+        CancellationToken cancellationToken = default);
+
+    Task<공동구매자동집단응답?> 자동수요등록Async(
+        공동구매자동수요등록Command request,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<공동구매커머스이행계획공개Dto>> 공동구매별커머스이행조회Async(
