@@ -39,10 +39,12 @@ public sealed partial class 공동구매주문원장조회ViewModel : 공동구�
     public partial string 보기코드 { get; private set; } = 공동구매주문원장보기코드.주문자보호;
 
     public string? 주문원장Id => _실행상태.선택된주문원장Id;
+    public string? 공동구매주문집계원장Id => _실행상태.공동구매주문집계원장Id;
     public string? 원본커뮤니티원장Id => _실행상태.원본커뮤니티원장Id;
     public 주문원장통합공개Dto? 통합결과 => _실행상태.주문원장통합결과;
     public 주문원장역할별조회공개Dto? 역할별결과 => _실행상태.주문원장역할결과;
     public bool 조회가능 => !string.IsNullOrWhiteSpace(주문원장Id);
+    public bool 주문집계연결됨 => !string.IsNullOrWhiteSpace(공동구매주문집계원장Id);
 
     /// <summary>
     /// 현재 공개 API에는 주문 루트 원장 생성 엔드포인트가 없으므로 발주 단계의 생성 결과를 연결해야 합니다.
@@ -106,6 +108,7 @@ public sealed partial class 공동구매주문원장조회ViewModel : 공동구�
     {
         if (!string.IsNullOrEmpty(e.PropertyName)
             && e.PropertyName is not nameof(공동구매실행상태ViewModel.선택된주문원장Id)
+                and not nameof(공동구매실행상태ViewModel.공동구매주문집계원장Id)
                 and not nameof(공동구매실행상태ViewModel.원본커뮤니티원장Id)
                 and not nameof(공동구매실행상태ViewModel.주문원장통합결과)
                 and not nameof(공동구매실행상태ViewModel.주문원장역할결과))
@@ -114,6 +117,8 @@ public sealed partial class 공동구매주문원장조회ViewModel : 공동구�
         }
 
         OnPropertyChanged(nameof(주문원장Id));
+        OnPropertyChanged(nameof(공동구매주문집계원장Id));
+        OnPropertyChanged(nameof(주문집계연결됨));
         OnPropertyChanged(nameof(원본커뮤니티원장Id));
         OnPropertyChanged(nameof(통합결과));
         OnPropertyChanged(nameof(역할별결과));
@@ -129,7 +134,6 @@ public sealed partial class 공동구매하위원장ViewModel : 공동구매작�
 {
     private static readonly IReadOnlyList<string> Roles =
     [
-        주문원장포함역할.개별주문,
         주문원장포함역할.판매,
         주문원장포함역할.창고입고,
         주문원장포함역할.창고출고,
@@ -152,7 +156,7 @@ public sealed partial class 공동구매하위원장ViewModel : 공동구매작�
     [ObservableProperty]
     public partial 주문하위원장연결ClientRequest 연결초안 { get; private set; } = new()
     {
-        역할 = 주문원장포함역할.개별주문,
+        역할 = 주문원장포함역할.판매,
         필수여부 = true
     };
 

@@ -158,7 +158,10 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
                     연락요청초안,
                     token)
                     ?? throw new InvalidOperationException("생산자 연락 요청 초안 응답이 비어 있습니다.");
-                _화면상태.단계도달(공동구매절차코드.공급조건협상);
+                await _화면상태.단계도달Async(
+                    공동구매절차코드.공급조건협상,
+                    "생산자 연락 요청을 저장하고 공급 조건 협상 단계로 진행했습니다.",
+                    token);
             },
             "생산자 연락 요청 초안을 저장했습니다.",
             cancellationToken);
@@ -357,7 +360,10 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
                     공급제안초안,
                     token)
                     ?? throw new InvalidOperationException("생산자 공급 제안 초안 응답이 비어 있습니다.");
-                _화면상태.단계도달(공동구매절차코드.공급조건협상);
+                await _화면상태.단계도달Async(
+                    공동구매절차코드.공급조건협상,
+                    "생산자 공급 제안을 저장하고 공급 조건 협상 단계로 진행했습니다.",
+                    token);
             },
             "생산자 공급 제안 초안을 저장했습니다.",
             cancellationToken);

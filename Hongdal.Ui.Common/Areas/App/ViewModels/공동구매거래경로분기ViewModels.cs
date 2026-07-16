@@ -8,6 +8,7 @@ public static class 공동구매업무분기코드
     public const string 미선택 = "none";
     public const string 국내공동구매 = "domestic-group-purchase";
     public const string 공동수입 = "group-import";
+    public const string 해외수출 = "overseas-export";
     public const string 기타국경간거래 = "other-cross-border";
     public const string 검토필요 = "review-required";
 }
@@ -76,7 +77,9 @@ public sealed class 공동구매거래경로분기ViewModel : ObservableObject, 
                     CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder,
                     StringComparison.OrdinalIgnoreCase))
             {
-                return 공동구매업무분기코드.기타국경간거래;
+                return 해외수출판정
+                    ? 공동구매업무분기코드.해외수출
+                    : 공동구매업무분기코드.기타국경간거래;
             }
 
             return string.Equals(
@@ -94,6 +97,18 @@ public sealed class 공동구매거래경로분기ViewModel : ObservableObject, 
     public bool 공동수입활성
         => 활성분기코드 == 공동구매업무분기코드.공동수입;
 
+    public bool 국내판매활성
+        => string.Equals(
+            현재거래경로코드,
+            CommunityGroupPurchaseTradeRouteCodes.Domestic,
+            StringComparison.OrdinalIgnoreCase);
+
+    public bool 해외수출활성
+        => 활성분기코드 == 공동구매업무분기코드.해외수출;
+
+    public bool 기타국경간거래활성
+        => 활성분기코드 == 공동구매업무분기코드.기타국경간거래;
+
     public bool 검토필요
         => 활성분기코드 is 공동구매업무분기코드.검토필요
             or 공동구매업무분기코드.미선택;
@@ -103,6 +118,7 @@ public sealed class 공동구매거래경로분기ViewModel : ObservableObject, 
         {
             공동구매업무분기코드.국내공동구매 => "국내 공동구매",
             공동구매업무분기코드.공동수입 => "공동수입",
+            공동구매업무분기코드.해외수출 => "해외 수출",
             공동구매업무분기코드.기타국경간거래 => "기타 국경 간 거래",
             공동구매업무분기코드.검토필요 => "거래경로 검토 필요",
             _ => "공동구매 미선택"
@@ -115,10 +131,33 @@ public sealed class 공동구매거래경로분기ViewModel : ObservableObject, 
                 => "국내 생산자·공동구매 대표 연결, 공급 협상과 국내 이행계획을 사용합니다.",
             공동구매업무분기코드.공동수입
                 => "해외 판매자 조건, HS 코드, 통관과 공동수입 원장 준비 흐름을 사용합니다.",
+            공동구매업무분기코드.해외수출
+                => "국내 상품의 해외 출품, 수출 신고, 국제운송과 현지 이행 준비 흐름을 사용합니다.",
             공동구매업무분기코드.기타국경간거래
-                => "한국 반입 공동수입이 아니므로 별도 수출·국경 간 거래 흐름이 필요합니다.",
+                => "한국이 출발지나 도착지가 아닌 거래이므로 별도 국경 간 거래 흐름이 필요합니다.",
             _ => "상품 출발국가, 최종 배송국가와 국내 통관 상태를 확인해 주세요."
         };
+
+    private bool 해외수출판정
+    {
+        get
+        {
+            var settings = _화면상태.선택된공동구매?.GroupPurchase;
+            var shipFrom = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(
+                settings?.ShipFromCountryCode ?? _제안거래경로.상품출발국가코드);
+            var delivery = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(
+                settings?.DeliveryCountryCode ?? _제안거래경로.최종배송국가코드);
+            return string.Equals(
+                       shipFrom,
+                       CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                       StringComparison.OrdinalIgnoreCase)
+                   && !string.IsNullOrWhiteSpace(delivery)
+                   && !string.Equals(
+                       delivery,
+                       CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     public void Dispose()
     {
@@ -166,7 +205,7 @@ public sealed class 국내공동구매분기ViewModel : 조립ViewModelBase
         private set => SetProperty(ref _단계오류메시지, value);
     }
 
-    public bool 거래상대연결완료()
+    public async Task<bool> 거래상대연결완료Async(CancellationToken cancellationToken = default)
     {
         if (_화면상태.선택된공동구매 is null)
         {
@@ -185,11 +224,14 @@ public sealed class 국내공동구매분기ViewModel : 조립ViewModelBase
         }
 
         단계오류메시지 = null;
-        _화면상태.단계도달(공동구매절차코드.공급조건협상);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.공급조건협상,
+            "국내 생산자 또는 공동구매 대표 연결을 완료했습니다.",
+            cancellationToken);
         return true;
     }
 
-    public bool 공급조건확정()
+    public async Task<bool> 공급조건확정Async(CancellationToken cancellationToken = default)
     {
         if (_화면상태.선택된공동구매 is null)
         {
@@ -217,11 +259,14 @@ public sealed class 국내공동구매분기ViewModel : 조립ViewModelBase
         }
 
         단계오류메시지 = null;
-        _화면상태.단계도달(공동구매절차코드.이의검토);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.이의검토,
+            "국내 공동구매 공급 조건 협상을 마치고 최종 이의 검토 단계로 진행했습니다.",
+            cancellationToken);
         return true;
     }
 
-    public bool 최종이의검토완료()
+    public async Task<bool> 최종이의검토완료Async(CancellationToken cancellationToken = default)
     {
         if (_화면상태.선택된공동구매 is null)
         {
@@ -234,7 +279,10 @@ public sealed class 국내공동구매분기ViewModel : 조립ViewModelBase
         }
 
         단계오류메시지 = null;
-        _화면상태.단계도달(공동구매절차코드.확정안);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.확정안,
+            "국내 공동구매 최종 이의 검토를 완료했습니다.",
+            cancellationToken);
         return true;
     }
 
@@ -258,18 +306,26 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
         공동구매거래경로분기ViewModel 분기,
         공동구매화면상태ViewModel 화면상태,
         공동수입전환준비ViewModel 전환준비,
+        공동수입원장물류ViewModel 원장물류,
+        공동수입선적통관ViewModel 선적통관,
         공동구매가격의사결정ViewModel 가격의사결정)
     {
         this.분기 = 하위ViewModel등록(분기, 수명소유: false);
         _화면상태 = 하위ViewModel등록(화면상태, 수명소유: false);
         this.전환준비 = 하위ViewModel등록(전환준비, 수명소유: false);
+        this.원장물류 = 하위ViewModel등록(원장물류);
+        this.선적통관 = 하위ViewModel등록(선적통관);
+        this.선적통관.원장물류연결(this.원장물류);
         this.가격의사결정 = 하위ViewModel등록(가격의사결정, 수명소유: false);
     }
 
     public 공동구매거래경로분기ViewModel 분기 { get; }
     public 공동수입전환준비ViewModel 전환준비 { get; }
+    public 공동수입원장물류ViewModel 원장물류 { get; }
+    public 공동수입선적통관ViewModel 선적통관 { get; }
     public 공동구매가격의사결정ViewModel 가격의사결정 { get; }
     public bool 활성 => 분기.공동수입활성;
+    public bool 처리중 => 원장물류.처리중 || 선적통관.처리중 || 가격의사결정.처리중;
 
     public string 현재HS코드
     {
@@ -348,7 +404,7 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
             _ => CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice
         };
 
-    public bool 해외판매자연결완료()
+    public async Task<bool> 해외판매자연결완료Async(CancellationToken cancellationToken = default)
     {
         if (_화면상태.선택된공동구매 is null)
         {
@@ -361,11 +417,14 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
         }
 
         단계오류메시지 = null;
-        _화면상태.단계도달(공동구매절차코드.공급조건협상);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.공급조건협상,
+            "해외 판매자 연결을 완료하고 공동수입 조건 협상 단계로 진행했습니다.",
+            cancellationToken);
         return true;
     }
 
-    public bool 수입조건확정()
+    public async Task<bool> 수입조건확정Async(CancellationToken cancellationToken = default)
     {
         if (_화면상태.선택된공동구매 is null)
         {
@@ -386,11 +445,14 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
         }
 
         단계오류메시지 = null;
-        _화면상태.단계도달(공동구매절차코드.이의검토);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.이의검토,
+            "공동수입 조건을 확정하고 최종 이의 검토 단계로 진행했습니다.",
+            cancellationToken);
         return true;
     }
 
-    public bool 최종이의검토완료()
+    public async Task<bool> 최종이의검토완료Async(CancellationToken cancellationToken = default)
     {
         if (_화면상태.선택된공동구매 is null)
         {
@@ -403,7 +465,10 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
         }
 
         단계오류메시지 = null;
-        _화면상태.단계도달(공동구매절차코드.확정안);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.확정안,
+            "공동수입 최종 이의 검토를 완료했습니다.",
+            cancellationToken);
         return true;
     }
 

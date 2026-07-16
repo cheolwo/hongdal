@@ -84,6 +84,22 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(공동구매실행Service)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매창고Service)
+            && x.ImplementationType == typeof(공동구매창고Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동구매원장절차Client)
+            && x.ImplementationType == typeof(공동구매원장절차Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동수입원장전환Client)
+            && x.ImplementationType == typeof(공동수입원장전환Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I판매채널Client)
+            && x.ImplementationType == typeof(판매채널Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(I공동구매가격의사결정Service)
             && x.ImplementationType == typeof(공동구매가격의사결정Service)
             && x.Lifetime == ServiceLifetime.Scoped);
@@ -96,12 +112,52 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(공동구매실행상태ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매창고상태ViewModel)
+            && x.ImplementationType == typeof(공동구매창고상태ViewModel)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매가격의사결정ViewModel)
             && x.ImplementationType == typeof(공동구매가격의사결정ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매실행기능ViewModel)
             && x.ImplementationType == typeof(공동구매실행기능ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매주문집계ViewModel)
+            && x.ImplementationType == typeof(공동구매주문집계ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매재고배분ViewModel)
+            && x.ImplementationType == typeof(공동구매재고배분ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매입고원장ViewModel)
+            && x.ImplementationType == typeof(공동구매입고원장ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동수입원장물류ViewModel)
+            && x.ImplementationType == typeof(공동수입원장물류ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I공동수입선적통관Client)
+            && x.ImplementationType == typeof(공동수입선적통관Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동수입선적통관ViewModel)
+            && x.ImplementationType == typeof(공동수입선적통관ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(국내판매ViewModel)
+            && x.ImplementationType == typeof(국내판매ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(해외수출ViewModel)
+            && x.ImplementationType == typeof(해외수출ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(공동구매출고원장ViewModel)
+            && x.ImplementationType == typeof(공동구매출고원장ViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매화면ViewModel)

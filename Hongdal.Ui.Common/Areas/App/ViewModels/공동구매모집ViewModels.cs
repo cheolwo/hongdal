@@ -10,6 +10,7 @@ public static class 공동구매거래경로필터코드
     public const string 전체 = "all";
     public const string 국내공동구매 = "domestic";
     public const string 공동수입 = "group-import";
+    public const string 해외수출 = "overseas-export";
 }
 
 /// <summary>
@@ -100,7 +101,8 @@ public sealed partial class 공동구매목록ViewModel(
     {
         if (routeFilterCode is not 공동구매거래경로필터코드.전체
             and not 공동구매거래경로필터코드.국내공동구매
-            and not 공동구매거래경로필터코드.공동수입)
+            and not 공동구매거래경로필터코드.공동수입
+            and not 공동구매거래경로필터코드.해외수출)
         {
             return Task.FromResult(유효성실패("지원하는 공동구매 거래경로 필터를 선택해 주세요."));
         }
@@ -133,7 +135,7 @@ public sealed partial class 공동구매목록ViewModel(
             ? await service.의견조회Async(postId, cancellationToken)
             : [];
 
-        화면상태.선택적용(campaign, comments);
+        await 화면상태.선택적용Async(campaign, comments, cancellationToken);
     }
 
     private static string? HS코드정규화(string? value)
@@ -166,11 +168,42 @@ public sealed partial class 공동구매목록ViewModel(
         => 거래경로필터 switch
         {
             공동구매거래경로필터코드.국내공동구매
-                => !CommunityVoteWorkflowClassifier.IsGroupImport(campaign),
+                => 국내공동구매인가(campaign),
             공동구매거래경로필터코드.공동수입
                 => CommunityVoteWorkflowClassifier.IsGroupImport(campaign),
+            공동구매거래경로필터코드.해외수출
+                => 해외수출인가(campaign),
             _ => true
         };
+
+    private static bool 국내공동구매인가(CommunityVoteResponse campaign)
+    {
+        var explicitRoute = campaign.GroupPurchase?.TradeRouteCode;
+        return string.IsNullOrWhiteSpace(explicitRoute)
+            ? !CommunityVoteWorkflowClassifier.IsGroupImport(campaign)
+            : string.Equals(
+                explicitRoute,
+                CommunityGroupPurchaseTradeRouteCodes.Domestic,
+                StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool 해외수출인가(CommunityVoteResponse campaign)
+    {
+        var settings = campaign.GroupPurchase;
+        return string.Equals(
+                   settings?.TradeRouteCode,
+                   CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder,
+                   StringComparison.OrdinalIgnoreCase)
+               && string.Equals(
+                   CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(settings?.ShipFromCountryCode),
+                   CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                   StringComparison.OrdinalIgnoreCase)
+               && !string.IsNullOrWhiteSpace(settings?.DeliveryCountryCode)
+               && !string.Equals(
+                   CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(settings.DeliveryCountryCode),
+                   CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                   StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 public sealed record 공동구매제안주체항목(
@@ -319,7 +352,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매작업View
                     token)
                     ?? throw new InvalidOperationException("공동구매 수요 투표 생성 응답이 비어 있습니다.");
 
-                _화면상태.새공동구매적용(생성된공동구매);
+                await _화면상태.새공동구매적용Async(생성된공동구매, token);
                 OnPropertyChanged(nameof(복구할게시글Id));
             },
             거래경로.공동수입후보

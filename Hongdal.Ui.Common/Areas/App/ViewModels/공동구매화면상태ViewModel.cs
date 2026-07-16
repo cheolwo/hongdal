@@ -1,21 +1,22 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 public static class 공동구매절차코드
 {
-    public const string 제안 = "proposal";
-    public const string 거래경로 = "trade-route";
-    public const string 수요모집 = "recruitment";
-    public const string 거래상대연결 = "counterparty";
-    public const string 공급조건협상 = "supply-negotiation";
-    public const string 이의검토 = "objection";
-    public const string 확정안 = "resolution";
-    public const string 전자서명 = "signature";
-    public const string 이행계획 = "fulfillment-plan";
-    public const string 실행 = "execution";
-    public const string 커머스 = "commerce";
+    public const string 제안 = CommunityGroupPurchaseLedgerStageCodes.Proposal;
+    public const string 거래경로 = CommunityGroupPurchaseLedgerStageCodes.TradeRoute;
+    public const string 수요모집 = CommunityGroupPurchaseLedgerStageCodes.Recruitment;
+    public const string 거래상대연결 = CommunityGroupPurchaseLedgerStageCodes.Counterparty;
+    public const string 공급조건협상 = CommunityGroupPurchaseLedgerStageCodes.SupplyNegotiation;
+    public const string 이의검토 = CommunityGroupPurchaseLedgerStageCodes.Objection;
+    public const string 확정안 = CommunityGroupPurchaseLedgerStageCodes.Resolution;
+    public const string 전자서명 = CommunityGroupPurchaseLedgerStageCodes.Signature;
+    public const string 이행계획 = CommunityGroupPurchaseLedgerStageCodes.FulfillmentPlan;
+    public const string 실행 = CommunityGroupPurchaseLedgerStageCodes.Execution;
+    public const string 커머스 = CommunityGroupPurchaseLedgerStageCodes.Commerce;
 }
 
 public enum 공동구매절차단계상태
@@ -73,13 +74,22 @@ public static class 공동구매절차카탈로그
 /// 여러 공동구매 하위 ViewModel이 공유하는 목록, 선택 항목, 의견과 현재 단계입니다.
 /// 페이지마다 별도 복사본을 만들지 않아 사용자 흐름 중 선택 상태가 어긋나는 것을 막습니다.
 /// </summary>
-public sealed class 공동구매화면상태ViewModel : ObservableObject
+public sealed class 공동구매화면상태ViewModel : ObservableObject, IDisposable
 {
+    private readonly I공동구매원장절차Client _원장절차Client;
+    private readonly 업무선택ContextViewModel _선택Context = new();
     private IReadOnlyList<CommunityVoteResponse> _공동구매목록 = [];
     private CommunityVoteResponse? _선택된공동구매;
     private IReadOnlyList<PlatformCommunityPostCommentResponse> _의견목록 = [];
     private string _현재단계코드 = 공동구매절차코드.제안;
     private string _진행단계코드 = 공동구매절차코드.제안;
+    private CommunityGroupPurchaseLedgerProgressResponse? _원장절차;
+    private string? _원장동기화오류;
+
+    public 공동구매화면상태ViewModel(I공동구매원장절차Client 원장절차Client)
+    {
+        _원장절차Client = 원장절차Client;
+    }
 
     public IReadOnlyList<CommunityVoteResponse> 공동구매목록
     {
@@ -114,8 +124,33 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject
         private set => SetProperty(ref _진행단계코드, value);
     }
 
+    public CommunityGroupPurchaseLedgerProgressResponse? 원장절차
+    {
+        get => _원장절차;
+        private set
+        {
+            if (!SetProperty(ref _원장절차, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(원장연결됨));
+            OnPropertyChanged(nameof(공동구매원장Id));
+            OnPropertyChanged(nameof(원장Revision));
+        }
+    }
+
+    public string? 원장동기화오류
+    {
+        get => _원장동기화오류;
+        private set => SetProperty(ref _원장동기화오류, value);
+    }
+
     public Guid? 선택된공동구매Id => 선택된공동구매?.Id;
     public bool 공동구매선택됨 => 선택된공동구매 is not null;
+    public bool 원장연결됨 => 원장절차 is not null && !string.IsNullOrWhiteSpace(원장절차.CommunityLedgerId);
+    public string? 공동구매원장Id => 원장절차?.CommunityLedgerId ?? 선택된공동구매?.CommunityLedgerId;
+    public long? 원장Revision => 원장절차?.Revision;
 
     public void 목록적용(IEnumerable<CommunityVoteResponse> campaigns)
     {
@@ -129,9 +164,12 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(campaign);
 
+        _선택Context.선택(campaign.Id.ToString("D"));
         ReplaceCampaign(campaign);
         선택된공동구매 = campaign;
         의견목록 = comments?.ToArray() ?? [];
+        원장절차 = null;
+        원장동기화오류 = null;
         var inferredStageCode = 진행단계추론(campaign);
         진행단계코드 = inferredStageCode;
         현재단계코드 = inferredStageCode;
@@ -139,12 +177,24 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject
         OnPropertyChanged(nameof(공동구매선택됨));
     }
 
+    public async Task 선택적용Async(
+        CommunityVoteResponse campaign,
+        IEnumerable<PlatformCommunityPostCommentResponse>? comments = null,
+        CancellationToken cancellationToken = default)
+    {
+        선택적용(campaign, comments);
+        await 원장절차복원Async(campaign, cancellationToken);
+    }
+
     public void 선택해제()
     {
+        _선택Context.선택(null);
         선택된공동구매 = null;
         의견목록 = [];
         현재단계코드 = 공동구매절차코드.제안;
         진행단계코드 = 공동구매절차코드.제안;
+        원장절차 = null;
+        원장동기화오류 = null;
         OnPropertyChanged(nameof(선택된공동구매Id));
         OnPropertyChanged(nameof(공동구매선택됨));
     }
@@ -152,17 +202,28 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject
     public void 새공동구매적용(CommunityVoteResponse campaign)
     {
         ArgumentNullException.ThrowIfNull(campaign);
+        _선택Context.선택(campaign.Id.ToString("D"));
         공동구매목록 = 공동구매목록
             .Where(item => item.Id != campaign.Id)
             .Prepend(campaign)
             .ToArray();
         선택된공동구매 = campaign;
         의견목록 = [];
+        원장절차 = null;
+        원장동기화오류 = null;
         var initialStageCode = 진행단계추론(campaign);
         현재단계코드 = initialStageCode;
         진행단계코드 = initialStageCode;
         OnPropertyChanged(nameof(선택된공동구매Id));
         OnPropertyChanged(nameof(공동구매선택됨));
+    }
+
+    public async Task 새공동구매적용Async(
+        CommunityVoteResponse campaign,
+        CancellationToken cancellationToken = default)
+    {
+        새공동구매적용(campaign);
+        await 원장절차복원Async(campaign, cancellationToken);
     }
 
     public void 공동구매갱신(CommunityVoteResponse campaign)
@@ -212,6 +273,27 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject
         현재단계코드 = stageCode;
     }
 
+    public async Task 단계진행Async(
+        string stageCode,
+        string? memo = null,
+        CancellationToken cancellationToken = default)
+    {
+        단계전진검증(stageCode);
+        var campaignId = 선택된공동구매Id
+            ?? throw new InvalidOperationException("원장 절차를 진행할 공동구매가 선택되지 않았습니다.");
+        var progress = await _원장절차Client.진행Async(
+            campaignId,
+            new CommunityGroupPurchaseLedgerProgressRequest
+            {
+                StageCode = stageCode,
+                Memo = memo ?? string.Empty,
+                ExpectedRevision = 원장Revision
+            },
+            cancellationToken)
+            ?? throw new InvalidOperationException("공동구매 원장 절차 진행 응답이 비어 있습니다.");
+        원장절차적용(progress);
+    }
+
     public bool 단계도달(string stageCode)
     {
         var target = 공동구매절차카탈로그.찾기(stageCode)
@@ -227,6 +309,97 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject
         진행단계코드 = stageCode;
         현재단계코드 = stageCode;
         return true;
+    }
+
+    public async Task<bool> 단계도달Async(
+        string stageCode,
+        string? memo = null,
+        CancellationToken cancellationToken = default)
+    {
+        var target = 공동구매절차카탈로그.찾기(stageCode)
+            ?? throw new ArgumentException(
+                $"알 수 없는 공동구매 절차 코드입니다: {stageCode}",
+                nameof(stageCode));
+        var current = 공동구매절차카탈로그.찾기(진행단계코드);
+        if (current is not null && target.순서 <= current.순서)
+        {
+            return false;
+        }
+
+        await 단계진행Async(stageCode, memo, cancellationToken);
+        return true;
+    }
+
+    private async Task 원장절차복원Async(
+        CommunityVoteResponse campaign,
+        CancellationToken cancellationToken)
+    {
+        using var request = _선택Context.요청시작(cancellationToken);
+        try
+        {
+            var progress = await _원장절차Client.조회Async(campaign.Id, request.취소Token);
+            if (!request.현재요청)
+            {
+                return;
+            }
+
+            if (progress is null)
+            {
+                원장동기화오류 = "공동구매 원장을 자동 연결하지 못했습니다.";
+                return;
+            }
+
+            campaign.CommunityLedgerId = progress.CommunityLedgerId;
+            공동구매갱신(campaign);
+            원장절차적용(progress);
+        }
+        catch (OperationCanceledException) when (request.취소Token.IsCancellationRequested)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+        }
+        catch (Exception exception)
+        {
+            if (request.현재요청)
+            {
+                원장동기화오류 = $"공동구매 원장 절차를 복원하지 못했습니다. {exception.Message}";
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _선택Context.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    private void 원장절차적용(CommunityGroupPurchaseLedgerProgressResponse progress)
+    {
+        if (!CommunityGroupPurchaseLedgerStageCodes.IsSupported(progress.CurrentStageCode))
+        {
+            throw new InvalidOperationException($"원장에 알 수 없는 공동구매 절차 단계가 저장돼 있습니다: {progress.CurrentStageCode}");
+        }
+
+        원장절차 = progress;
+        원장동기화오류 = null;
+        진행단계코드 = progress.CurrentStageCode;
+        현재단계코드 = progress.CurrentStageCode;
+    }
+
+    private void 단계전진검증(string stageCode)
+    {
+        var target = 공동구매절차카탈로그.찾기(stageCode)
+            ?? throw new ArgumentException(
+                $"알 수 없는 공동구매 절차 코드입니다: {stageCode}",
+                nameof(stageCode));
+        var current = 공동구매절차카탈로그.찾기(진행단계코드);
+        if (current is not null && target.순서 < current.순서)
+        {
+            throw new InvalidOperationException(
+                $"공동구매 진행 단계는 이전 단계로 되돌릴 수 없습니다: {진행단계코드} -> {stageCode}");
+        }
     }
 
     private static string 진행단계추론(CommunityVoteResponse campaign)

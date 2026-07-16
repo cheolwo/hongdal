@@ -85,7 +85,7 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
             async token =>
             {
                 이행계획목록 = await _service.공동구매별커머스이행조회Async(groupPurchaseId, token);
-                조회결과선택();
+                await 조회결과선택Async(token);
             },
             "공동구매의 커머스 이행 계획을 조회했습니다.",
             cancellationToken);
@@ -103,13 +103,16 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
             async token =>
             {
                 이행계획목록 = await _service.문서번호로커머스이행조회Async(documentNumber, token);
-                조회결과선택();
+                await 조회결과선택Async(token);
             },
             "문서관리번호로 커머스 이행 계획을 조회했습니다.",
             cancellationToken);
     }
 
-    public bool 이행계획선택(string documentManagementNumber, string? deliveryScopeKey = null)
+    public async Task<bool> 이행계획선택Async(
+        string documentManagementNumber,
+        string? deliveryScopeKey = null,
+        CancellationToken cancellationToken = default)
     {
         var plan = 이행계획목록.FirstOrDefault(item =>
             string.Equals(item.문서관리번호, documentManagementNumber, StringComparison.OrdinalIgnoreCase)
@@ -123,7 +126,10 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
         공동구매Id = plan.공동구매Id;
         문서관리번호 = plan.문서관리번호;
         _실행상태.커머스이행적용(plan);
-        _화면상태.단계도달(공동구매절차코드.커머스);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.커머스,
+            "커머스 이행 계획을 선택하고 입고·재고·출품·출고 추적 단계로 진행했습니다.",
+            cancellationToken);
         return true;
     }
 
@@ -133,7 +139,7 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
         GC.SuppressFinalize(this);
     }
 
-    private void 조회결과선택()
+    private async Task 조회결과선택Async(CancellationToken cancellationToken)
     {
         var selected = 이행계획목록.FirstOrDefault();
         if (selected is null)
@@ -145,7 +151,10 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
         공동구매Id = selected.공동구매Id;
         문서관리번호 = selected.문서관리번호;
         _실행상태.커머스이행적용(selected);
-        _화면상태.단계도달(공동구매절차코드.커머스);
+        await _화면상태.단계도달Async(
+            공동구매절차코드.커머스,
+            "커머스 이행 계획을 조회하고 입고·재고·출품·출고 추적 단계로 진행했습니다.",
+            cancellationToken);
     }
 
     private void 실행상태변경(object? sender, PropertyChangedEventArgs e)
@@ -219,19 +228,29 @@ public sealed class 공동구매실행기능ViewModel : 조립ViewModelBase
     public 공동구매실행기능ViewModel(
         공동구매실행상태ViewModel 상태,
         공동구매자동집단ViewModel 자동집단,
+        공동구매재고배분ViewModel 재고배분,
         공동구매주문원장ViewModel 주문원장,
-        공동구매커머스이행ViewModel 커머스이행)
+        공동구매커머스이행ViewModel 커머스이행,
+        공동구매창고기능ViewModel 창고)
     {
         // Scoped 공유 상태의 수명은 DI scope가 관리합니다. 이 transient 조립 객체가 먼저 폐기하지 않습니다.
         this.상태 = 상태;
         this.자동집단 = 하위ViewModel등록(자동집단);
+        this.재고배분 = 하위ViewModel등록(재고배분);
         this.주문원장 = 하위ViewModel등록(주문원장);
         this.커머스이행 = 하위ViewModel등록(커머스이행);
+        this.창고 = 하위ViewModel등록(창고);
+        this.창고.출고원장.재고배분연결(this.재고배분);
     }
 
     public 공동구매실행상태ViewModel 상태 { get; }
     public 공동구매자동집단ViewModel 자동집단 { get; }
+    public 공동구매주문집계ViewModel 주문집계 => 재고배분.주문집계;
+    public 공동구매재고배분ViewModel 재고배분 { get; }
     public 공동구매주문원장ViewModel 주문원장 { get; }
     public 공동구매커머스이행ViewModel 커머스이행 { get; }
-    public bool 처리중 => 자동집단.처리중 || 주문원장.처리중 || 커머스이행.처리중;
+    public 공동구매창고기능ViewModel 창고 { get; }
+    public 공동구매입고원장ViewModel 입고원장 => 창고.입고원장;
+    public 공동구매출고원장ViewModel 출고원장 => 창고.출고원장;
+    public bool 처리중 => 자동집단.처리중 || 주문원장.처리중 || 커머스이행.처리중 || 창고.처리중;
 }

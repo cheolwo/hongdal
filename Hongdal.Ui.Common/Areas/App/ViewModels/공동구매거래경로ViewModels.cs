@@ -36,6 +36,17 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
 
     public bool 공동수입후보 => 판정.IsGroupImportCandidate;
 
+    public bool 해외수출후보
+        => 거래경로코드 == CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder
+           && string.Equals(
+               CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(상품출발국가코드),
+               CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+               StringComparison.OrdinalIgnoreCase)
+           && !string.Equals(
+               CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(최종배송국가코드),
+               CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+               StringComparison.OrdinalIgnoreCase);
+
     public bool 검토필요 => 판정.RequiresManualReview;
 
     public bool 입력유효
@@ -52,6 +63,7 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
         {
             CommunityGroupPurchaseTradeRouteCodes.Domestic => "국내 공동구매",
             CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate => "공동수입 후보",
+            CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder when 해외수출후보 => "해외 수출",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder => "기타 국경 간 거래",
             _ => "거래경로 확인 필요"
         };
@@ -63,6 +75,8 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
                 => CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice,
             CommunityGroupPurchaseTradeRouteCodes.Domestic
                 => "상품이 한국 안에서 이행되거나 이미 국내 통관된 재고이므로 국내 공동구매 흐름을 유지합니다.",
+            CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder when 해외수출후보
+                => "한국에서 출발해 해외로 배송하므로 해외 출품·수출신고·국제운송 흐름으로 전환합니다.",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder
                 => "최종 배송국가가 한국이 아니므로 국내 공동수입이 아닌 별도 국경 간 거래 흐름에서 검토합니다.",
             _ => "상품 출발국가, 최종 배송국가와 국내 통관 상태를 확인하면 거래경로를 판정할 수 있습니다."
@@ -140,6 +154,7 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
         OnPropertyChanged(nameof(판정));
         OnPropertyChanged(nameof(거래경로코드));
         OnPropertyChanged(nameof(공동수입후보));
+        OnPropertyChanged(nameof(해외수출후보));
         OnPropertyChanged(nameof(검토필요));
         OnPropertyChanged(nameof(입력유효));
         OnPropertyChanged(nameof(판정명));

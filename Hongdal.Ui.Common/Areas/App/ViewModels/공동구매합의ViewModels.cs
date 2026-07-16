@@ -52,7 +52,10 @@ public sealed partial class 공동구매모집마감ViewModel(
                     ?? throw new InvalidOperationException("공동구매 모집 마감 응답이 비어 있습니다.");
 
                 화면상태.공동구매갱신(updated);
-                화면상태.단계진행(공동구매절차코드.거래상대연결);
+                await 화면상태.단계진행Async(
+                    공동구매절차코드.거래상대연결,
+                    "수요 모집을 마감하고 거래 상대 연결 단계로 진행했습니다.",
+                    token);
                 이의검토완료 = false;
             },
             "수요 모집을 마감했습니다. 이제 거래 상대를 연결하고 공급 조건을 협의할 수 있습니다.",
@@ -141,7 +144,10 @@ public sealed partial class 공동구매결의ViewModel : 공동구매작업View
                 campaign.ResolutionDocument = document;
                 campaign.Status = CommunityVoteStatusCodes.ResolutionDrafted;
                 _화면상태.공동구매갱신(campaign);
-                _화면상태.단계진행(공동구매절차코드.확정안);
+                await _화면상태.단계진행Async(
+                    공동구매절차코드.확정안,
+                    "공동구매 확정안 결의문을 작성했습니다.",
+                    token);
             },
             "현재 참여자를 서명 대상으로 포함한 결의문 초안을 만들었습니다.",
             cancellationToken);
@@ -182,7 +188,10 @@ public sealed partial class 공동구매결의ViewModel : 공동구매작업View
 
                 campaign.ResolutionDocument = document;
                 _화면상태.공동구매갱신(campaign);
-                _화면상태.단계진행(공동구매절차코드.전자서명);
+                await _화면상태.단계진행Async(
+                    공동구매절차코드.전자서명,
+                    "결의문 검토를 마치고 전자서명 단계로 진행했습니다.",
+                    token);
             },
             "검토를 완료하고 전자서명을 받을 수 있는 상태로 전환했습니다.",
             cancellationToken);
@@ -349,9 +358,14 @@ public sealed partial class 공동구매전자서명ViewModel : 공동구매작�
 
                 campaign.ResolutionDocument = document;
                 _화면상태.공동구매갱신(campaign);
-                _화면상태.단계진행(document.Status == CommunityVoteResolutionStatusCodes.Signed
-                    ? 공동구매절차코드.이행계획
-                    : 공동구매절차코드.전자서명);
+                await _화면상태.단계진행Async(
+                    document.Status == CommunityVoteResolutionStatusCodes.Signed
+                        ? 공동구매절차코드.이행계획
+                        : 공동구매절차코드.전자서명,
+                    document.Status == CommunityVoteResolutionStatusCodes.Signed
+                        ? "필수 전자서명이 완료되어 이행 계획 단계로 진행했습니다."
+                        : "공동구매 결의문에 전자서명 증적을 추가했습니다.",
+                    token);
                 입력초기화();
             },
             "전자서명이 기록됐습니다.",

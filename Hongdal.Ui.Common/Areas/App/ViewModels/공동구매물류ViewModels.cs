@@ -66,6 +66,12 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
                 초안.RequiresStorage = true;
                 초안.RequiresLastMileDelivery = true;
                 break;
+            case DomesticGroupPurchaseFulfillmentRouteCodes.DedicatedWarehouse:
+                초안.HubDisplayName = "공동구매 전용 창고";
+                초안.RequiresSorting = false;
+                초안.RequiresStorage = true;
+                초안.RequiresLastMileDelivery = false;
+                break;
             default:
                 초안.HubDisplayName = string.Empty;
                 초안.HubReferenceKey = string.Empty;
@@ -149,7 +155,10 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
                     token)
                     ?? throw new InvalidOperationException("발주·원장 생성 초안 응답이 비어 있습니다.");
                 계획 = 저장된발주초안.Plan;
-                _화면상태.단계도달(공동구매절차코드.실행);
+                await _화면상태.단계도달Async(
+                    공동구매절차코드.실행,
+                    "발주 주문 원장과 후속 물류 원장 생성 초안을 저장했습니다.",
+                    token);
             },
             "발주 주문 원장과 후속 물류 원장 생성 초안을 저장했습니다.",
             cancellationToken);

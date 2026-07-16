@@ -45,6 +45,8 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매작�
 
     public 공동구매자동집단응답? 선택된자동집단 => _실행상태.선택된자동집단;
     public string? 실행공동구매Id => _실행상태.실행공동구매Id;
+    public string? 공동구매주문집계원장Id => _실행상태.공동구매주문집계원장Id;
+    public string? 내개별주문원장Id => _실행상태.선택된주문원장Id;
     public 창고요약응답? 선택된도착창고 => _창고상태.선택된창고;
     public bool 가상창고사용여부
         => string.Equals(수요초안.도착창고유형, 창고유형코드.가상창고, StringComparison.OrdinalIgnoreCase)
@@ -132,8 +134,20 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매작�
                     .Prepend(group)
                     .ToArray();
                 _실행상태.자동집단적용(group);
+                var registeredDemand = group.수요목록.FirstOrDefault(item =>
+                    string.Equals(item.수요출처키, 수요초안.수요출처키, StringComparison.Ordinal))
+                    ?? group.수요목록.FirstOrDefault(item =>
+                        string.Equals(item.주문자키, 수요초안.주문자키, StringComparison.Ordinal));
+                if (registeredDemand is not null)
+                {
+                    _실행상태.주문집계선택(registeredDemand.공동구매주문집계원장Id);
+                    if (!string.IsNullOrWhiteSpace(registeredDemand.개별주문원장Id))
+                    {
+                        _실행상태.주문원장선택(registeredDemand.개별주문원장Id);
+                    }
+                }
             },
-            "수요를 자동집단에 등록하고 실행 공동구매를 선택했습니다.",
+            "수요를 공동구매에 등록하고 주문집계와 내 개별 주문을 연결했습니다.",
             cancellationToken);
     }
 
@@ -194,10 +208,14 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매작�
     {
         if (string.IsNullOrEmpty(e.PropertyName)
             || e.PropertyName is nameof(공동구매실행상태ViewModel.선택된자동집단)
-                or nameof(공동구매실행상태ViewModel.실행공동구매Id))
+                or nameof(공동구매실행상태ViewModel.실행공동구매Id)
+                or nameof(공동구매실행상태ViewModel.공동구매주문집계원장Id)
+                or nameof(공동구매실행상태ViewModel.선택된주문원장Id))
         {
             OnPropertyChanged(nameof(선택된자동집단));
             OnPropertyChanged(nameof(실행공동구매Id));
+            OnPropertyChanged(nameof(공동구매주문집계원장Id));
+            OnPropertyChanged(nameof(내개별주문원장Id));
         }
     }
 

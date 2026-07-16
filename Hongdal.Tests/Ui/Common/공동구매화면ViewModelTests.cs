@@ -1,6 +1,11 @@
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.ContractManagement;
+using Hongdal.Contracts.Common.Inbound;
+using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Orderer;
+using Hongdal.Contracts.Common.Sales;
+using Hongdal.Contracts.Common.Warehouse;
+using Hongdal.Contracts.Shipper.Request;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +14,127 @@ namespace Hongdal.Tests.Ui.Common;
 
 public sealed class 공동구매화면ViewModelTests
 {
+    [Fact]
+    public void 실행_창고기능을입고원장과출고원장으로조립한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+
+        Assert.Same(fixture.ViewModel.실행.창고.입고원장, fixture.ViewModel.실행.입고원장);
+        Assert.Same(fixture.ViewModel.실행.창고.출고원장, fixture.ViewModel.실행.출고원장);
+    }
+
+    [Fact]
+    public void 국내판매와해외수출_거래방향에따라각각의ViewModel을활성화한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        var domestic = Campaign("국내 감자 판매", DateTime.UtcNow);
+
+        fixture.ViewModel.상태.선택적용(domestic);
+
+        Assert.True(fixture.ViewModel.국내판매.활성);
+        Assert.False(fixture.ViewModel.해외수출.활성);
+        Assert.Equal("국내 감자 판매", fixture.ViewModel.국내판매.상품초안.대표상품명);
+
+        var export = Campaign("한국 배 수출", DateTime.UtcNow, hsCode: "0808.30");
+        export.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder;
+        export.GroupPurchase.SellerCountryCode = "KR";
+        export.GroupPurchase.ShipFromCountryCode = "KR";
+        export.GroupPurchase.DeliveryCountryCode = "US";
+
+        fixture.ViewModel.상태.선택적용(export);
+
+        Assert.False(fixture.ViewModel.국내판매.활성);
+        Assert.True(fixture.ViewModel.해외수출.활성);
+        Assert.Equal(공동구매업무분기코드.해외수출, fixture.ViewModel.거래경로분기.활성분기코드);
+        Assert.Equal("해외 수출", fixture.ViewModel.거래경로분기.활성분기명);
+        Assert.Equal("한국 배 수출", fixture.ViewModel.해외수출.초안.ProductName);
+        Assert.Equal("0808.30", fixture.ViewModel.해외수출.초안.HsCode);
+        Assert.Contains(
+            fixture.ViewModel.해외수출.필수작업안내,
+            item => item.Contains("HS 코드", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task 국내판매_입고재고부터채널출품까지_단계상태로연결한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        var campaign = Campaign("국내 감자 판매", DateTime.UtcNow);
+        fixture.ViewModel.상태.선택적용(campaign);
+        fixture.ViewModel.실행.창고.상태.재고목록적용(
+        [
+            new 재고항목응답
+            {
+                입고상품Id = 71,
+                창고Id = 1,
+                상품명 = "감자 10kg",
+                SKU = "POTATO-10",
+                가용수량 = 10
+            }
+        ]);
+        var sales = fixture.ViewModel.국내판매;
+
+        Assert.True(sales.입고재고선택(71));
+        sales.계정초안.상점명 = "홍달 산지마켓";
+        Assert.True(await sales.계정생성Async());
+        sales.상품초안.판매가 = 25_000;
+        Assert.True(await sales.상품생성Async());
+        Assert.True(await sales.출품생성Async());
+
+        Assert.True(sales.출품완료);
+        Assert.All(sales.진행단계, stage => Assert.Equal(판매실행단계상태.완료, stage.상태));
+        Assert.Contains("준비", sales.다음작업안내);
+    }
+
+    [Fact]
+    public async Task 해외수출_Amazon계정과수출상품을직접생성하고_출품준비단계를관리한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        var campaign = Campaign("한국 배 수출", DateTime.UtcNow, hsCode: "0808.30");
+        campaign.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder;
+        campaign.GroupPurchase.ShipFromCountryCode = "KR";
+        campaign.GroupPurchase.DeliveryCountryCode = "US";
+        fixture.ViewModel.상태.선택적용(campaign);
+        fixture.ViewModel.실행.창고.상태.재고목록적용(
+        [
+            new 재고항목응답
+            {
+                입고상품Id = 81,
+                창고Id = 1,
+                상품명 = "한국 배 5kg",
+                SKU = "PEAR-5",
+                가용수량 = 20
+            }
+        ]);
+        var export = fixture.ViewModel.해외수출;
+
+        Assert.True(export.수출재고선택(81));
+        export.Amazon계정초안.상점명 = "Hongdal Korea";
+        Assert.True(await export.Amazon계정생성Async());
+        export.수출상품초안.판매가 = 45_000;
+        Assert.True(await export.수출상품생성Async());
+
+        export.초안.MarketplaceId = "ATVPDKIKX0DER";
+        export.초안.SellerId = "SELLER-1";
+        export.초안.ProductType = "FRESH_FRUIT";
+        export.초안.ProductTypeDefinitionConfirmed = true;
+        export.초안.ListingPayloadMapped = true;
+        export.초안.ImageAndDescriptionReady = true;
+        export.초안.KoreanLogisticsHistoryRecorded = true;
+        export.초안.ProductJourneyEvidenceReady = true;
+        export.초안.UserReviewUsageConsentConfirmed = true;
+        export.초안.EligibleUserReviewCount = 1;
+        export.초안.DetailPageImageAssetGenerated = true;
+        export.초안.DetailPageImageAssetApproved = true;
+        export.초안.AdvertisingCreativeReady = true;
+        export.입력변경알림();
+
+        Assert.True(export.출품준비완료);
+        Assert.True(await export.Amazon출품생성Async());
+        Assert.Contains(export.진행단계, stage => stage.코드 == "listing" && stage.상태 == 판매실행단계상태.완료);
+        Assert.False(export.수출이행준비완료);
+        Assert.Contains(export.필수작업안내, item => item.Contains("출고 배치", StringComparison.Ordinal));
+    }
+
     [Fact]
     public async Task 초기화_국내공동구매와공동수입을함께조회하고최신공동수입분기를선택한다()
     {
@@ -45,6 +171,77 @@ public sealed class 공동구매화면ViewModelTests
     }
 
     [Fact]
+    public void 공동수입물류_전용창고를선택하면입고보관원장만계획한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+        var campaign = Campaign("태국산 망고 공동수입", DateTime.UtcNow, hsCode: "0804.50");
+        campaign.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate;
+        campaign.GroupPurchase.TotalRequestedQuantity = 1_000;
+        campaign.GroupPurchase.QuantityUnit = "kg";
+        campaign.GroupPurchase.ServiceAreaLabel = "서울 공동 수령지";
+        fixture.ViewModel.상태.선택적용(campaign);
+        var logistics = fixture.ViewModel.공동수입.원장물류;
+
+        Assert.True(logistics.물류경로선택(CommunityGroupImportLogisticsRouteCodes.DedicatedWarehouse));
+        logistics.초안.WarehouseReferenceKey = "dedicated-warehouse:verified";
+        logistics.초안.WarehouseOperatorConsentConfirmed = true;
+        logistics.초안.WarehouseSiteVerified = true;
+        logistics.초안.WarehouseBulkReceivingSupported = true;
+        logistics.초안.WarehouseStorageSupported = true;
+        logistics.입력변경알림();
+
+        Assert.True(logistics.계획?.Ready);
+        Assert.Equal("전용 창고 입고·보관", logistics.계획?.LogisticsRouteLabel);
+        Assert.Contains(logistics.계획!.Nodes, x =>
+            x.LedgerTemplateKey == CommunityLedgerTemplateKeys.WarehouseInbound);
+        Assert.DoesNotContain(logistics.계획.Nodes, x =>
+            x.LedgerTemplateKey == CommunityLedgerTemplateKeys.WarehouseOutbound);
+    }
+
+    [Fact]
+    public async Task 공동수입선적통관_원장생성뒤_선적이벤트와통관상태를차례로실행한다()
+    {
+        var shipmentClient = new Fake공동수입선적통관Client();
+        using var fixture = CreateFixture(
+            new Fake공동구매업무Service(),
+            shipmentCustomsClient: shipmentClient);
+        var campaign = Campaign("태국산 망고 공동수입", DateTime.UtcNow, hsCode: "0804.50");
+        campaign.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate;
+        campaign.GroupPurchase.ShipFromCountryCode = "TH";
+        campaign.GroupPurchase.DeliveryCountryCode = "KR";
+        campaign.GroupPurchase.TotalRequestedQuantity = 1_000;
+        campaign.GroupPurchase.QuantityUnit = "kg";
+        campaign.GroupPurchase.ServiceAreaKey = "seoul-group";
+        campaign.GroupPurchase.ServiceAreaLabel = "서울 공동 수령지";
+        fixture.ViewModel.상태.선택적용(campaign);
+        var import = fixture.ViewModel.공동수입;
+
+        Assert.False(await import.선적통관.관리자선적저장Async());
+        Assert.Contains("공동수입 원장", import.선적통관.오류메시지);
+
+        Assert.True(await import.원장물류.공동수입원장전환Async());
+        Assert.True(import.선적통관.원장준비완료);
+
+        import.선적통관.선적초안.문서관리번호 = "DOC-2026-001";
+        import.선적통관.선적초안.운송문서번호 = "BL-001";
+        Assert.True(await import.선적통관.관리자선적저장Async());
+        Assert.Equal(campaign.Id.ToString("D"), shipmentClient.LastSaveRequest?.공동구매Id);
+        Assert.Equal("seoul-group", shipmentClient.LastSaveRequest?.주문자집단배송권키);
+
+        import.선적통관.이벤트초안.이벤트코드 = 공동구매선적상태코드.운송중;
+        import.선적통관.이벤트초안.표시명 = "국제 운송 중";
+        import.선적통관.이벤트초안.출처주체코드 = "forwarder";
+        Assert.True(await import.선적통관.관리자이벤트추가Async());
+        Assert.Equal(공동구매선적상태코드.운송중, import.선적통관.현재선적?.현재상태코드);
+
+        import.선적통관.통관초안.통관화물관리번호 = "CARGO-001";
+        Assert.True(await import.선적통관.관리자통관동기화Async());
+        Assert.True(import.선적통관.통관결과?.동기화됨);
+        Assert.Equal(공동구매선적상태코드.통관완료, import.선적통관.현재선적?.현재상태코드);
+        Assert.Contains("국내 입고", import.선적통관.다음작업안내);
+    }
+
+    [Fact]
     public async Task 거래경로필터_국내공동구매만조회하고국내분기를활성화한다()
     {
         var service = new Fake공동구매업무Service();
@@ -65,6 +262,28 @@ public sealed class 공동구매화면ViewModelTests
         Assert.Same(latestCampaign, fixture.ViewModel.상태.선택된공동구매);
         Assert.True(fixture.ViewModel.국내공동구매.활성);
         Assert.False(fixture.ViewModel.공동수입.활성);
+    }
+
+    [Fact]
+    public async Task 거래경로필터_한국출발해외도착거래만수출목록으로조회한다()
+    {
+        var service = new Fake공동구매업무Service();
+        var domestic = Campaign("국내 감자 판매", DateTime.UtcNow.AddMinutes(-1));
+        var export = Campaign("한국 배 수출", DateTime.UtcNow, hsCode: "0808.30");
+        export.GroupPurchase!.TradeRouteCode = CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder;
+        export.GroupPurchase.ShipFromCountryCode = "KR";
+        export.GroupPurchase.DeliveryCountryCode = "US";
+        service.목록응답.Items = [domestic, export];
+        service.상세응답[export.Id] = export;
+        using var fixture = CreateFixture(service);
+
+        var succeeded = await fixture.ViewModel.거래경로별초기화Async(
+            공동구매거래경로필터코드.해외수출);
+
+        Assert.True(succeeded);
+        Assert.Equal(export.Id, Assert.Single(fixture.ViewModel.상태.공동구매목록).Id);
+        Assert.True(fixture.ViewModel.해외수출.활성);
+        Assert.False(fixture.ViewModel.국내판매.활성);
     }
 
     [Fact]
@@ -278,11 +497,11 @@ public sealed class 공동구매화면ViewModelTests
         Assert.Contains("국내 공동구매 분기", fixture.ViewModel.공급.생산자연결.오류메시지);
         Assert.True(fixture.ViewModel.공동수입.계약확정준비완료);
 
-        Assert.True(fixture.ViewModel.공동수입.해외판매자연결완료());
+        Assert.True(await fixture.ViewModel.공동수입.해외판매자연결완료Async());
         Assert.Equal(공동구매절차코드.공급조건협상, fixture.ViewModel.상태.진행단계코드);
-        Assert.True(fixture.ViewModel.공동수입.수입조건확정());
+        Assert.True(await fixture.ViewModel.공동수입.수입조건확정Async());
         Assert.Equal(공동구매절차코드.이의검토, fixture.ViewModel.상태.진행단계코드);
-        Assert.True(fixture.ViewModel.공동수입.최종이의검토완료());
+        Assert.True(await fixture.ViewModel.공동수입.최종이의검토완료Async());
         Assert.Equal(공동구매절차코드.확정안, fixture.ViewModel.상태.진행단계코드);
     }
 
@@ -532,12 +751,12 @@ public sealed class 공동구매화면ViewModelTests
         Assert.Equal("producer-1", connection.저장된연락요청?.ProducerCandidateKey);
         Assert.Equal(campaign.Id, supplyService.마지막연락요청?.GroupPurchaseCampaignId);
         Assert.Equal("양파", supplyService.마지막연락요청?.ProductSummary);
-        Assert.True(fixture.ViewModel.국내공동구매.거래상대연결완료());
+        Assert.True(await fixture.ViewModel.국내공동구매.거래상대연결완료Async());
         Assert.Equal(공동구매절차코드.공급조건협상, fixture.ViewModel.상태.진행단계코드);
         Assert.True(await fixture.ViewModel.공급.공급적합성.미리보기Async());
-        Assert.True(fixture.ViewModel.국내공동구매.공급조건확정());
+        Assert.True(await fixture.ViewModel.국내공동구매.공급조건확정Async());
         Assert.Equal(공동구매절차코드.이의검토, fixture.ViewModel.상태.진행단계코드);
-        Assert.True(fixture.ViewModel.국내공동구매.최종이의검토완료());
+        Assert.True(await fixture.ViewModel.국내공동구매.최종이의검토완료Async());
         Assert.Equal(공동구매절차코드.확정안, fixture.ViewModel.상태.진행단계코드);
     }
 
@@ -587,9 +806,21 @@ public sealed class 공동구매화면ViewModelTests
             자동수요응답 = new 공동구매자동집단응답
             {
                 자동집단Id = "auto-potato-seoul",
+                공동구매주문집계원장Id = "aggregation-potato-seoul",
                 상품키 = "potato-10kg",
                 배송권키 = "seoul-east",
-                현재상태 = 공동구매자동집단상태코드.수요수집중
+                현재상태 = 공동구매자동집단상태코드.수요수집중,
+                수요목록 =
+                [
+                    new 공동구매자동수요응답
+                    {
+                        수요Id = "demand-51",
+                        수요출처키 = $"community-vote:{campaign.Id:N}:orderer-51",
+                        주문자키 = "orderer-51",
+                        공동구매주문집계원장Id = "aggregation-potato-seoul",
+                        개별주문원장Id = "individual-order-51"
+                    }
+                ]
             }
         };
         using var fixture = CreateFixture(
@@ -607,6 +838,8 @@ public sealed class 공동구매화면ViewModelTests
         Assert.True(await automaticGroup.수요등록Async());
 
         Assert.Equal("auto-potato-seoul", fixture.ViewModel.실행.상태.실행공동구매Id);
+        Assert.Equal("aggregation-potato-seoul", fixture.ViewModel.실행.상태.공동구매주문집계원장Id);
+        Assert.Equal("individual-order-51", fixture.ViewModel.실행.상태.선택된주문원장Id);
         Assert.Same(executionService.자동수요응답, automaticGroup.선택된자동집단);
         Assert.Equal(
             $"community-vote:{campaign.Id:N}:orderer-51",
@@ -688,6 +921,7 @@ public sealed class 공동구매화면ViewModelTests
         using var fixture = CreateFixture(
             new Fake공동구매업무Service(),
             executionService: executionService);
+        fixture.ViewModel.상태.선택적용(Campaign("커머스 이행 공동구매", DateTime.UtcNow));
         fixture.ViewModel.실행.상태.실행공동구매선택("auto-group-77");
         var commerce = fixture.ViewModel.실행.커머스이행;
 
@@ -707,13 +941,22 @@ public sealed class 공동구매화면ViewModelTests
         Fake공동구매공급Service? supplyService = null,
         Fake공동구매물류Service? logisticsService = null,
         Fake공동구매실행Service? executionService = null,
-        Fake공동구매가격의사결정Service? priceService = null)
+        Fake공동구매가격의사결정Service? priceService = null,
+        Fake공동구매원장절차Client? ledgerProgressClient = null,
+        Fake공동수입선적통관Client? shipmentCustomsClient = null)
     {
         var services = new ServiceCollection();
         services.AddSingleton<I공동구매업무Service>(service);
         services.AddSingleton<I공동구매공급Service>(supplyService ?? new Fake공동구매공급Service());
         services.AddSingleton<I공동구매물류Service>(logisticsService ?? new Fake공동구매물류Service());
         services.AddSingleton<I공동구매실행Service>(executionService ?? new Fake공동구매실행Service());
+        services.AddSingleton<I공동구매창고Service>(new Fake공동구매창고Service());
+        services.AddSingleton<I공동구매원장절차Client>(
+            ledgerProgressClient ?? new Fake공동구매원장절차Client());
+        services.AddSingleton<I공동수입원장전환Client>(new Fake공동수입원장전환Client());
+        services.AddSingleton<I공동수입선적통관Client>(
+            shipmentCustomsClient ?? new Fake공동수입선적통관Client());
+        services.AddSingleton<I판매채널Client>(new Fake판매채널Client());
         services.AddSingleton<I공동구매가격의사결정Service>(
             priceService ?? new Fake공동구매가격의사결정Service());
         services.AddHongdalUiCommonAppServices();
@@ -1065,6 +1308,263 @@ public sealed class 공동구매화면ViewModelTests
             마지막발주요청 = request;
             return Task.FromResult(발주초안응답);
         }
+    }
+
+    private sealed class Fake공동구매원장절차Client : I공동구매원장절차Client
+    {
+        private readonly Dictionary<Guid, CommunityGroupPurchaseLedgerProgressResponse> _progress = [];
+
+        public Task<CommunityGroupPurchaseLedgerProgressResponse?> 조회Async(
+            Guid campaignId,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_progress.TryGetValue(campaignId, out var progress))
+            {
+                progress = Create(campaignId, 공동구매절차코드.수요모집, revision: 1);
+                _progress[campaignId] = progress;
+            }
+
+            return Task.FromResult<CommunityGroupPurchaseLedgerProgressResponse?>(progress);
+        }
+
+        public Task<CommunityGroupPurchaseLedgerProgressResponse?> 진행Async(
+            Guid campaignId,
+            CommunityGroupPurchaseLedgerProgressRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var revision = _progress.TryGetValue(campaignId, out var current)
+                ? current.Revision + 1
+                : 1;
+            var progress = Create(campaignId, request.StageCode, revision);
+            _progress[campaignId] = progress;
+            return Task.FromResult<CommunityGroupPurchaseLedgerProgressResponse?>(progress);
+        }
+
+        private static CommunityGroupPurchaseLedgerProgressResponse Create(
+            Guid campaignId,
+            string stageCode,
+            long revision)
+            => new()
+            {
+                GroupPurchaseCampaignId = campaignId,
+                CommunityLedgerId = $"group-purchase-{campaignId:N}",
+                Revision = revision,
+                LedgerStatus = "진행중",
+                CurrentStageCode = stageCode,
+                AutomaticallyLinked = true
+            };
+    }
+
+    private sealed class Fake공동수입원장전환Client : I공동수입원장전환Client
+    {
+        private readonly Dictionary<Guid, CommunityGroupImportLedgerPlanResponse> _ledgers = [];
+
+        public Task<CommunityGroupImportLedgerPlanResponse?> 조회Async(
+            Guid campaignId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<CommunityGroupImportLedgerPlanResponse?>(_ledgers.GetValueOrDefault(campaignId));
+
+        public Task<CommunityGroupImportLedgerPlanResponse?> 미리보기Async(
+            Guid campaignId,
+            CommunityGroupImportLedgerConversionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            request.GroupPurchaseCampaignId = campaignId;
+            return Task.FromResult<CommunityGroupImportLedgerPlanResponse?>(
+                CommunityGroupImportLedgerPlanBuilder.Preview(request));
+        }
+
+        public Task<CommunityGroupImportLedgerPlanResponse?> 전환Async(
+            Guid campaignId,
+            CommunityGroupImportLedgerConversionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            request.GroupPurchaseCampaignId = campaignId;
+            var response = CommunityGroupImportLedgerPlanBuilder.Preview(request);
+            response.Created = true;
+            response.GroupImportLedgerId = $"group-import-{campaignId:N}";
+            response.Revision = 1;
+            _ledgers[campaignId] = response;
+            return Task.FromResult<CommunityGroupImportLedgerPlanResponse?>(response);
+        }
+    }
+
+    private sealed class Fake공동수입선적통관Client : I공동수입선적통관Client
+    {
+        public 공동구매해외선적추적저장요청? LastSaveRequest { get; private set; }
+        private 공동구매해외선적추적Dto? _shipment;
+
+        public Task<공동구매해외선적공개Dto?> 공개조회Async(
+            string documentManagementNumber,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<공동구매해외선적공개Dto?>(null);
+
+        public Task<IReadOnlyList<공동구매해외선적추적Dto>?> 관리자목록Async(
+            공동구매해외선적추적조회조건 condition,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<공동구매해외선적추적Dto>?>([]);
+
+        public Task<공동구매해외선적추적Dto?> 관리자저장Async(
+            공동구매해외선적추적저장요청 request,
+            CancellationToken cancellationToken = default)
+        {
+            LastSaveRequest = request;
+            _shipment = new 공동구매해외선적추적Dto
+            {
+                추적Id = request.추적Id ?? "shipment-1",
+                공동구매Id = request.공동구매Id,
+                주문자집단배송권키 = request.주문자집단배송권키,
+                주문자집단배송권명 = request.주문자집단배송권명,
+                상품요약 = request.상품요약,
+                문서관리번호 = request.문서관리번호,
+                운송문서유형 = request.운송문서유형,
+                운송문서번호 = request.운송문서번호,
+                운송수단 = request.운송수단,
+                출발국가코드 = request.출발국가코드,
+                현재상태코드 = request.현재상태코드
+            };
+            return Task.FromResult<공동구매해외선적추적Dto?>(_shipment);
+        }
+
+        public Task<공동구매해외선적추적Dto?> 관리자이벤트추가Async(
+            string documentManagementNumber,
+            공동구매해외선적추적이벤트추가요청 request,
+            CancellationToken cancellationToken = default)
+        {
+            _shipment ??= new 공동구매해외선적추적Dto { 문서관리번호 = documentManagementNumber };
+            _shipment.현재상태코드 = request.이벤트코드;
+            _shipment.현재위치요약 = request.위치요약;
+            return Task.FromResult<공동구매해외선적추적Dto?>(_shipment);
+        }
+
+        public Task<공동구매해외선적통관동기화결과?> 관리자통관동기화Async(
+            공동구매해외선적통관동기화요청 request,
+            CancellationToken cancellationToken = default)
+        {
+            _shipment ??= new 공동구매해외선적추적Dto { 문서관리번호 = request.문서관리번호 };
+            _shipment.현재상태코드 = 공동구매선적상태코드.통관완료;
+            return Task.FromResult<공동구매해외선적통관동기화결과?>(new 공동구매해외선적통관동기화결과
+            {
+                동기화됨 = true,
+                메시지 = "통관 완료",
+                통관단계명 = "수입신고수리",
+                선적 = _shipment
+            });
+        }
+    }
+
+    private sealed class Fake판매채널Client : I판매채널Client
+    {
+        public Task<IReadOnlyList<판매채널계정항목응답>> 계정목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<판매채널계정항목응답>>([]);
+
+        public Task<판매채널계정항목응답?> 계정생성Async(
+            판매채널계정저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<판매채널계정항목응답?>(new 판매채널계정항목응답
+            {
+                Id = 1,
+                채널종류 = request.채널종류,
+                상점명 = request.상점명,
+                연결상태 = "Connected"
+            });
+
+        public Task<IReadOnlyList<판매상품항목응답>> 상품목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<판매상품항목응답>>([]);
+
+        public Task<판매상품항목응답?> 상품생성Async(
+            판매상품저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<판매상품항목응답?>(new 판매상품항목응답
+            {
+                Id = 1,
+                입고상품Id = request.입고상품Id,
+                대표상품명 = request.대표상품명,
+                판매SKU = request.판매SKU,
+                판매가 = request.판매가
+            });
+
+        public Task<IReadOnlyList<채널출품항목응답>> 출품목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<채널출품항목응답>>([]);
+
+        public Task<채널출품항목응답?> 출품생성Async(
+            채널출품저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<채널출품항목응답?>(new 채널출품항목응답
+            {
+                Id = 1,
+                판매상품Id = request.판매상품Id,
+                판매채널계정Id = request.판매채널계정Id,
+                출품상태 = "Draft"
+            });
+    }
+
+    private sealed class Fake공동구매창고Service : I공동구매창고Service
+    {
+        public Task<IReadOnlyList<창고요약응답>> 창고목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<창고요약응답>>([]);
+
+        public Task<창고요약응답?> 창고생성Async(
+            창고저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고요약응답?>(null);
+
+        public Task<IReadOnlyList<창고사용자항목응답>> 창고사용자목록조회Async(
+            long warehouseId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<창고사용자항목응답>>([]);
+
+        public Task<창고사용자항목응답?> 창고사용자추가Async(
+            long warehouseId,
+            창고사용자저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고사용자항목응답?>(null);
+
+        public Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<입고요청항목응답>>([]);
+
+        public Task<입고요청항목응답?> 입고요청생성Async(
+            입고요청저장요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<입고요청항목응답?>(null);
+
+        public Task<IReadOnlyList<입고상품항목응답>> 입고완료Async(
+            long inboundId,
+            입고완료요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<입고상품항목응답>>([]);
+
+        public Task<IReadOnlyList<재고항목응답>> 재고목록조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<재고항목응답>>([]);
+
+        public Task<창고작업결과응답?> 입고검수Async(
+            long inboundItemId,
+            입고검수요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고작업결과응답?>(null);
+
+        public Task<창고작업결과응답?> 적재위치배정Async(
+            long inboundItemId,
+            적재위치배정요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고작업결과응답?>(null);
+
+        public Task<창고작업결과응답?> 포장작업Async(
+            long inboundItemId,
+            포장작업요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<창고작업결과응답?>(null);
+
+        public Task<화주운송의뢰응답?> 운송인계Async(
+            재고운송의뢰생성요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<화주운송의뢰응답?>(null);
     }
 
     private sealed class Fake공동구매실행Service : I공동구매실행Service

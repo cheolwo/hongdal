@@ -16,6 +16,7 @@ public sealed class 공동구매실행상태ViewModel : ObservableObject, IDispo
     private string? _원본커뮤니티원장Id;
     private string? _실행공동구매Id;
     private 공동구매자동집단응답? _선택된자동집단;
+    private string? _공동구매주문집계원장Id;
     private string? _선택된주문원장Id;
     private 주문원장통합공개Dto? _주문원장통합결과;
     private 주문원장역할별조회공개Dto? _주문원장역할결과;
@@ -54,6 +55,13 @@ public sealed class 공동구매실행상태ViewModel : ObservableObject, IDispo
         private set => SetProperty(ref _선택된자동집단, value);
     }
 
+    /// <summary>공동구매 화면 내부에서 확정된 개별 주문들을 집계하는 하위 원장 ID입니다.</summary>
+    public string? 공동구매주문집계원장Id
+    {
+        get => _공동구매주문집계원장Id;
+        private set => SetProperty(ref _공동구매주문집계원장Id, Clean(value));
+    }
+
     /// <summary>발주·원장 생성 단계에서 발급된 주문 루트 원장 ID입니다.</summary>
     public string? 선택된주문원장Id
     {
@@ -90,6 +98,7 @@ public sealed class 공동구매실행상태ViewModel : ObservableObject, IDispo
         ArgumentNullException.ThrowIfNull(group);
         선택된자동집단 = group;
         실행공동구매Id = group.자동집단Id;
+        공동구매주문집계원장Id = group.공동구매주문집계원장Id;
         선택된커머스이행 = null;
     }
 
@@ -99,11 +108,15 @@ public sealed class 공동구매실행상태ViewModel : ObservableObject, IDispo
         if (!string.Equals(실행공동구매Id, normalized, StringComparison.Ordinal))
         {
             선택된자동집단 = null;
+            공동구매주문집계원장Id = null;
             선택된커머스이행 = null;
         }
 
         실행공동구매Id = normalized;
     }
+
+    public void 주문집계선택(string? aggregationLedgerId)
+        => 공동구매주문집계원장Id = Clean(aggregationLedgerId);
 
     public void 주문원장선택(string? orderLedgerId)
     {
@@ -182,6 +195,7 @@ public sealed class 공동구매실행상태ViewModel : ObservableObject, IDispo
 
         실행공동구매Id = null;
         선택된자동집단 = null;
+        공동구매주문집계원장Id = null;
         선택된주문원장Id = null;
         주문원장통합결과 = null;
         주문원장역할결과 = null;
