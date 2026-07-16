@@ -10,11 +10,16 @@ using Hongdal.Security;
 using System.Security.Claims;
 using Hongdal.Controllers;
 using Hongdal.ApiMetadata;
+using 홍달.Services.Versioning;
 
 namespace Hongdal.Controllers.Common;
 
-[HongdalApiVersion(HongdalProductVersion.V1_5)]
+[HongdalApiVersion(
+    HongdalProductVersion.V1_5,
+    FeatureKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [HongdalApiWorkflow(HongdalWorkflow.WarehouseFulfillment)]
+[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Warehouse)]
 [ApiController]
 [Authorize(Policy = "운영사용자전용")]
 [Route("api/v1/warehouse-operations")]

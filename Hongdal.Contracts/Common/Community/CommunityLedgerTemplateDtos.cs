@@ -1,3 +1,5 @@
+using Hongdal.Contracts.Common.Versioning;
+
 namespace Hongdal.Contracts.Common.Community;
 
 public sealed class CommunityLedgerTemplateResponse
@@ -564,12 +566,12 @@ public static class CommunityLedgerExperienceEventCodes
 
 public static class CommunityLedgerOperatingSystemCodes
 {
-    public const string CommunityTrust = "CommunityTrustOS";
-    public const string DomesticCargoTransport = "DomesticCargoTransportOS";
-    public const string FoodDelivery = "FoodDeliveryOS";
-    public const string HongdalMartUrbanLogistics = "HongdalMartUrbanLogisticsOS";
-    public const string WarehouseCommerceFulfillment = "WarehouseCommerceFulfillmentOS";
-    public const string GroupPurchaseImport = "GroupPurchaseImportOS";
+    public const string CommunityTrust = OperatingSystemIds.CommunityTrust;
+    public const string DomesticCargoTransport = OperatingSystemIds.DomesticCargoTransport;
+    public const string FoodDelivery = OperatingSystemIds.FoodDelivery;
+    public const string HongdalMartUrbanLogistics = OperatingSystemIds.HongdalMartUrbanLogistics;
+    public const string WarehouseCommerceFulfillment = OperatingSystemIds.WarehouseCommerceFulfillment;
+    public const string GroupPurchaseImport = OperatingSystemIds.GroupPurchaseImport;
 }
 
 public static class CommunityLedgerOperatingSystemRoleCodes
