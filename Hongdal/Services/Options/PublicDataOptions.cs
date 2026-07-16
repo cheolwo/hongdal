@@ -24,6 +24,8 @@ public sealed class PublicDataOptions
 
     public AtFoodPricesOptions AtFoodPrices { get; set; } = new();
 
+    public KamisOptions Kamis { get; set; } = new();
+
     public UsdaNassQuickStatsOptions UsdaNassQuickStats { get; set; } = new();
 
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
@@ -98,6 +100,17 @@ public sealed class AtFoodPricesOptions
     public string DailyPricePath { get; set; } = "/B552845/perDay/price";
 
     public decimal DefaultSimulationFxRateKrwPerUsd { get; set; } = 1350m;
+}
+
+public sealed class KamisOptions
+{
+    public string CertificationKey { get; set; } = string.Empty;
+
+    public string RequesterId { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://www.kamis.or.kr";
+
+    public string DailyCategoryPricePath { get; set; } = "/service/price/xml.do";
 }
 
 public sealed class UsdaNassQuickStatsOptions

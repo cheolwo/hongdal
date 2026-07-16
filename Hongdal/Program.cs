@@ -1,5 +1,6 @@
 using System.Text;
 using System.Data.Common;
+using System.Globalization;
 using Hongdal.Hubs;
 using Hongdal.Application.Behaviors;
 using Hongdal.Application.CommandProcessing;
@@ -40,6 +41,8 @@ using Hongdal.Services.Development;
 using Hongdal.Services.Security;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using Hongdal.Infrastructure.Persistence.AgriculturalFisheries;
+using Hongdal.Services.AgriculturalFisheries.Information;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CustomsWebCorsPolicy = "HongdalWebCustoms";
@@ -188,6 +191,64 @@ builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개�
 
 var app = builder.Build();
 app.Logger.LogInformation("Hongdal execution mode: {ExecutionMode}", executionOptions.Mode);
+
+if (args.Any(argument =>
+        string.Equals(argument, "--collect-usda-nass-prices", StringComparison.OrdinalIgnoreCase)))
+{
+    var yearFromArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year-from=", StringComparison.OrdinalIgnoreCase));
+    var yearFrom = int.TryParse(
+        yearFromArgument?["--year-from=".Length..],
+        out var parsedYearFrom)
+        ? parsedYearFrom
+        : DateTime.UtcNow.Year - 1;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService = scope.ServiceProvider.GetRequiredService<IUsdaNassPriceArchiveService>();
+    var archiveResult = await archiveService.CollectRecentMonthlyPricesAsync(yearFrom);
+    app.Logger.LogInformation(
+        "USDA NASS DB 저장 완료. RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Existing={Existing}, Mappings={Mappings}, LatestSourceLoad={LatestSourceLoad}",
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.ExistingCount,
+        archiveResult.MappingCount,
+        archiveResult.LatestSourceLoadTimeUtc);
+    return;
+}
+
+if (args.Any(argument =>
+        string.Equals(argument, "--collect-kamis-prices", StringComparison.OrdinalIgnoreCase)))
+{
+    var targetDateArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--target-date=", StringComparison.OrdinalIgnoreCase));
+    var defaultTargetDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+    var targetDate = DateOnly.TryParseExact(
+        targetDateArgument?["--target-date=".Length..],
+        "yyyy-MM-dd",
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out var parsedTargetDate)
+        ? parsedTargetDate
+        : defaultTargetDate;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService = scope.ServiceProvider.GetRequiredService<IKamisPriceArchiveService>();
+    var archiveResult = await archiveService.CollectDailyPricesAsync(targetDate);
+    app.Logger.LogInformation(
+        "KAMIS 국내 가격 DB 저장 완료. RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}, LatestSurveyDate={LatestSurveyDate}",
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.UpdatedCount,
+        archiveResult.ExistingCount,
+        archiveResult.LatestSurveyDate);
+    return;
+}
 
 if (app.Environment.IsDevelopment())
 {

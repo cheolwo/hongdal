@@ -28,6 +28,7 @@ public static partial class ServiceCollectionExtensions
                 }));
 
         services.AddTraditionalMarketModule(connectionString);
+        services.AddAgriculturalFisheriesPersistence(connectionString);
 
         var redisConnectionString = configuration.GetSection(RedisOptions.SectionName).GetValue<string>(nameof(RedisOptions.ConnectionString))
                                     ?? Environment.GetEnvironmentVariable("Redis__ConnectionString");

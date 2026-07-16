@@ -29,6 +29,28 @@ public static partial class ServiceCollectionExtensions
             .RemoveAllLoggers();
         services.AddTransient<I미국농수산가격공급자>(serviceProvider =>
             serviceProvider.GetRequiredService<UsdaNassQuickStats가격공급자>());
+        services
+            .AddHttpClient<UsdaNassPriceArchiveService>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.UsdaNassQuickStats.BaseUrl);
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddScoped<IUsdaNassPriceArchiveService>(serviceProvider =>
+            serviceProvider.GetRequiredService<UsdaNassPriceArchiveService>());
+        services
+            .AddHttpClient<KamisPriceArchiveService>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.Kamis.BaseUrl);
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddScoped<IKamisPriceArchiveService>(serviceProvider =>
+            serviceProvider.GetRequiredService<KamisPriceArchiveService>());
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();
         services.AddScoped<I미국농수산가격조회Service, 미국농수산가격조회Service>();
