@@ -8,6 +8,16 @@ Hongdal은 커뮤니티에서 생긴 생활 가까운 일을 **공동 원장과 
 
 GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세한 정책과 구조는 아래 문서 링크에서 확인합니다.
 
+## 바로 체험하기
+
+<p align="center">
+  <a href="https://hongdal-role-preview.cheolwo.chatgpt.site/">
+    <strong>역할별 화면 체험 사이트 열기 →</strong>
+  </a>
+</p>
+
+로그인 없이 주문자·커뮤니티, 해외 공급자, 화주·판매자, 운송 기사, 창고 관리자 화면을 둘러볼 수 있습니다. 공개 체험에서는 주문, 배차, 결제와 데이터 변경이 실행되지 않습니다.
+
 ## 먼저 보는 화면
 
 <table>
@@ -124,6 +134,7 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
 
 | 묶음 | 바로 보기 |
 | --- | --- |
+| 공개 역할별 화면 체험 | [Hongdal 체험 사이트](https://hongdal-role-preview.cheolwo.chatgpt.site/) |
 | 통합 커뮤니티 앱 | [통합 커뮤니티 클라이언트](docs/ProjectOverview/unified-community-client.md) |
 | 커밋별 화면 변화 | [커밋별 시각 변경 기록](docs/Changes/README.md) |
 | 전체 앱 화면 카탈로그 | [코드 프로젝트별 전체 페이지](docs/ProjectOverview/app-page-catalog.md) |

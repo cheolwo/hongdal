@@ -1,75 +1,96 @@
 @page "/"
 
-<WebPageHeader Title="동네 정보와 필요한 일을 함께 찾는 살뜰"
-               Description="게시글과 공개 정보를 먼저 둘러보고, 궁금한 점이나 함께할 일이 생겼을 때 가볍게 참여하세요."
-               Badge="커뮤니티 0.0" />
+<PageTitle>역할별 화면 체험 | 살뜰</PageTitle>
 
-<CommunityFirstStartPanel BrowseHref="/community#community-forum-list"
-                          InformationHref="/information/public-data"
-                          InformationLabel="농수산물 정보 보기"
-                          ParticipationHref="/community#community-compose" />
+<main class="role-experience @SelectedRole.ThemeClass">
+    <header class="role-experience__header">
+        <div>
+            <span>HONGDAL WEB PREVIEW</span>
+            <h1>역할별 화면 체험</h1>
+            <p>현재 구현된 주요 화면을 역할에 따라 바로 열어볼 수 있습니다.</p>
+        </div>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Visibility">
+            @(WebExperienceCatalog.Roles.Count)개 역할
+        </MudChip>
+    </header>
 
-<MudGrid Class="mt-4">
-    <MudItem xs="12" lg="8">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-            <MudStack Spacing="3">
-                <MudStack Spacing="1">
-                    <MudText Typo="Typo.h6">지금 둘러볼 공간</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        자주 사용하는 커뮤니티와 공개 정보만 먼저 모았습니다.
-                    </MudText>
-                </MudStack>
-                <WebPageLinkGrid Items="CommunityLinks" />
-            </MudStack>
-        </MudPaper>
-    </MudItem>
+    <nav class="role-experience__selector" aria-label="체험할 역할 선택">
+        @foreach (var role in WebExperienceCatalog.Roles)
+        {
+            var isSelected = role.Key == SelectedRole.Key;
+            <button type="button"
+                    class="role-experience__role-button @(isSelected ? "is-selected" : null)"
+                    aria-pressed="@isSelected"
+                    @onclick="@(() => SelectRole(role))">
+                <MudIcon Icon="@role.Icon" Size="Size.Small" />
+                <span>@role.Title</span>
+            </button>
+        }
+    </nav>
 
-    <MudItem xs="12" lg="4">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
-            <MudStack Spacing="2">
-                <MudText Typo="Typo.h6">처음이라면 이렇게</MudText>
-                <MudList T="string" Dense="true">
-                    <MudListItem Icon="@Icons.Material.Filled.Visibility">먼저 글과 공개 정보를 읽어봅니다.</MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.ChatBubbleOutline">궁금한 점은 댓글이나 글로 묻습니다.</MudListItem>
-                    <MudListItem Icon="@Icons.Material.Filled.AccountTree">함께할 일이 구체화되면 공동 원장으로 정리합니다.</MudListItem>
-                </MudList>
-                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-                    운송 주선이나 자동 배차 없이, 0.0에서는 정보 공유와 대화에 집중합니다.
-                </MudAlert>
-            </MudStack>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+    <section class="role-experience__workspace" aria-live="polite">
+        <div class="role-experience__preview">
+            <img src="@SelectedRole.ImageUrl"
+                 alt="@SelectedRole.ImageAlt"
+                 loading="eager" />
+            <div class="role-experience__preview-label">
+                <span>@SelectedRole.Eyebrow</span>
+                <strong>@SelectedRole.Title</strong>
+            </div>
+        </div>
 
-<MudExpansionPanels Elevation="0" Class="mt-4">
-    <MudExpansionPanel Text="1.0 업무 도구 미리보기">
-        <MudStack Spacing="2" Class="pa-2">
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                국내 화물·용달 기능은 커뮤니티 0.0이 안정된 뒤 사용하는 다음 단계입니다. 필요한 경우에만 펼쳐서 확인합니다.
-            </MudText>
-            <WebPageLinkGrid Items="FutureWorkflowLinks" />
-        </MudStack>
-    </MudExpansionPanel>
-</MudExpansionPanels>
+        <div class="role-experience__screens">
+            <div class="role-experience__screens-heading">
+                <div>
+                    <span>@SelectedRole.Eyebrow</span>
+                    <h2>@SelectedRole.Title</h2>
+                    <p>@SelectedRole.Description</p>
+                </div>
+                <MudButton Href="@SelectedRole.StartHref"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@SelectedRole.Icon"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">
+                    @SelectedRole.StartLabel
+                </MudButton>
+            </div>
 
-<div class="mt-4">
-    <실시간베스트Section />
-</div>
+            <div class="role-experience__screen-list">
+                @foreach (var screen in SelectedRole.Screens)
+                {
+                    <a class="role-experience__screen-link" href="@screen.Href">
+                        <span class="role-experience__screen-icon">
+                            <MudIcon Icon="@screen.Icon" Size="Size.Small" />
+                        </span>
+                        <span class="role-experience__screen-copy">
+                            <strong>@screen.Title</strong>
+                            <small>@screen.Description</small>
+                        </span>
+                        <span class="role-experience__screen-meta">
+                            <small>@screen.AreaLabel</small>
+                            <em>@screen.Status</em>
+                        </span>
+                        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="role-experience__community">
+        <div class="role-experience__section-title">
+            <span>PUBLIC COMMUNITY</span>
+            <h2>지금 공개된 커뮤니티</h2>
+        </div>
+        <실시간베스트Section />
+    </section>
+</main>
 
 @code {
-    private static readonly IReadOnlyList<WebAppPageLink> CommunityLinks =
-    [
-        new("커뮤니티 글 보기", "새 글과 댓글을 읽고 이웃의 관심사를 확인합니다.", "/community", Icons.Material.Filled.Forum, "먼저 보기"),
-        new("농수산물 공개 정보", "한국과 미국의 공식 농수산물 가격 자료를 출처와 함께 확인합니다.", "/information/public-data", Icons.Material.Filled.Insights, "공개 정보"),
-        new("공동구매 제안", "함께 살 사람과 조건을 댓글로 맞추고 제안을 구체화합니다.", "/community/group-purchase", Icons.Material.Filled.GroupAdd, "함께하기"),
-        new("글로벌 무역 대화", "해외 공급자와 공개적으로 조건을 확인하고 수입 관심을 나눕니다.", GlobalTradeRoutes.CommunityThread(101), Icons.Material.Filled.Language, "대화")
-    ];
+    private WebExperienceRole SelectedRole { get; set; } = WebExperienceCatalog.DefaultRole;
 
-    private static readonly IReadOnlyList<WebAppPageLink> FutureWorkflowLinks =
-    [
-        new("화주·판매자", "운송 의뢰와 판매·입고 업무를 확인합니다.", "/shipper", Icons.Material.Filled.LocalShipping, "1.0"),
-        new("기사", "운행 시작, 추천 배차와 진행 중 운송을 확인합니다.", "/driver/home", Icons.Material.Filled.Route, "1.0"),
-        new("창고·현장", "입고, 스캔, 피킹과 포장 업무를 확인합니다.", "/warehouse", Icons.Material.Filled.Warehouse, "1.0"),
-        new("주문자·공동주문", "공동주문 의사 표시와 주문 내역을 확인합니다.", "/orderer", Icons.Material.Filled.Groups, "1.0")
-    ];
+    private void SelectRole(WebExperienceRole role)
+    {
+        SelectedRole = role;
+    }
 }

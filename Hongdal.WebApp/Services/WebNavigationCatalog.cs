@@ -8,7 +8,7 @@ public static class WebNavigationCatalog
     public const string DiagramRoute = "/diagram";
 
     private static readonly WebNavigationItem Home =
-        new("업무 홈", "/", Icons.Material.Filled.Dashboard, true);
+        new("역할별 화면", "/", Icons.Material.Filled.Dashboard, true);
 
     private static readonly WebNavigationItem Diagram =
         new("업무 다이어그램", DiagramRoute, Icons.Material.Filled.AccountTree);
