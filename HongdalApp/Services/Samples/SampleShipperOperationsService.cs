@@ -68,9 +68,26 @@ public sealed class SampleShipperOperationsService : IShipperOperationsService
         return Task.FromResult(_store.EstimateFare(vehicleType, distanceKm));
     }
 
-    public async Task AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
+    public async Task<ShipperRequestItem> AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         await _addRequestHandler.HandleAsync(new AddShipperRequestCommand(request, "shipper-demo"), cancellationToken);
+        return request;
+    }
+
+    public Task<ShipperRequestItem> UpdateRequestAsync(
+        ShipperRequestItem request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        _store.UpdateRequest(request);
+        return Task.FromResult(request);
+    }
+
+    public Task DeleteRequestAsync(string requestId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        _store.DeleteRequest(requestId);
+        return Task.CompletedTask;
     }
 }

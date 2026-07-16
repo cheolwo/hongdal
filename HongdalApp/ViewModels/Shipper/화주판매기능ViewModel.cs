@@ -13,19 +13,26 @@ public sealed class 화주판매기능ViewModel : 조립ViewModelBase
     {
         this.기본판매 = 하위ViewModel등록(기본판매);
         지원채널조회 = 하위ViewModel등록(
-            new Api작업ViewModel<IReadOnlyList<CommerceChannelDescriptor>>(sales.GetSupportedChannelsAsync));
+            new Api작업ViewModel<IReadOnlyList<CommerceChannelDescriptor>>(sales.GetSupportedChannelsAsync),
+            수명소유: true);
         계정목록조회 = 하위ViewModel등록(
-            new Api작업ViewModel<판매채널계정목록응답?>(sales.GetAccountsAsync));
+            new Api작업ViewModel<판매채널계정목록응답?>(sales.GetAccountsAsync),
+            수명소유: true);
         계정등록 = 하위ViewModel등록(
-            new Api작업ViewModel<판매채널계정저장요청, 판매채널계정항목응답?>(sales.CreateAccountAsync));
+            new Api작업ViewModel<판매채널계정저장요청, 판매채널계정항목응답?>(sales.CreateAccountAsync),
+            수명소유: true);
         상품목록조회 = 하위ViewModel등록(
-            new Api작업ViewModel<판매상품목록응답?>(sales.GetProductsAsync));
+            new Api작업ViewModel<판매상품목록응답?>(sales.GetProductsAsync),
+            수명소유: true);
         상품등록 = 하위ViewModel등록(
-            new Api작업ViewModel<판매상품저장요청, 판매상품항목응답?>(sales.CreateProductAsync));
+            new Api작업ViewModel<판매상품저장요청, 판매상품항목응답?>(sales.CreateProductAsync),
+            수명소유: true);
         출품목록조회 = 하위ViewModel등록(
-            new Api작업ViewModel<채널출품목록응답?>(sales.GetListingsAsync));
+            new Api작업ViewModel<채널출품목록응답?>(sales.GetListingsAsync),
+            수명소유: true);
         출품등록 = 하위ViewModel등록(
-            new Api작업ViewModel<채널출품저장요청, 채널출품항목응답?>(sales.CreateListingAsync));
+            new Api작업ViewModel<채널출품저장요청, 채널출품항목응답?>(sales.CreateListingAsync),
+            수명소유: true);
     }
 
     public 판매ViewModel 기본판매 { get; }

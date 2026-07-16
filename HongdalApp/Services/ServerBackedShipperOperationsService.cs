@@ -124,7 +124,7 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             ?? throw new InvalidOperationException("서버 기준운임 견적 응답이 비어 있습니다.");
     }
 
-    public async Task AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
+    public async Task<ShipperRequestItem> AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
     {
         using var httpRequest = CreateAuthorizedRequest(HttpMethod.Post, "api/v1/shipper/requests");
         httpRequest.Content = JsonContent.Create(ToCreateRequest(request));
@@ -135,10 +135,56 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             throw new InvalidOperationException(await BuildFailureMessageAsync(response, "api/v1/shipper/requests", cancellationToken));
         }
 
-        if (!string.IsNullOrWhiteSpace(request.의뢰Id))
+        var responseItem = await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken)
+            ?? throw new InvalidOperationException("서버 운송의뢰 생성 응답이 비어 있습니다.");
+        var created = ToRequestItem(responseItem);
+        Observe(created, "HongdalApp.RequestCreated");
+        _ledgerObserver.RequestRefresh(created.의뢰Id, "HongdalApp.RequestCreated");
+        return created;
+    }
+
+    public async Task<ShipperRequestItem> UpdateRequestAsync(
+        ShipperRequestItem request,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.의뢰Id))
         {
-            _ledgerObserver.RequestRefresh(request.의뢰Id, "HongdalApp.RequestCreated");
+            throw new InvalidOperationException("수정할 의뢰 ID가 없습니다.");
         }
+
+        var path = $"api/v1/shipper/requests/{Uri.EscapeDataString(request.의뢰Id.Trim())}";
+        using var httpRequest = CreateAuthorizedRequest(HttpMethod.Put, path);
+        httpRequest.Content = JsonContent.Create(ToUpdateRequest(request));
+        using var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, path, cancellationToken));
+        }
+
+        var responseItem = await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken)
+            ?? throw new InvalidOperationException("서버 운송의뢰 수정 응답이 비어 있습니다.");
+        var updated = ToRequestItem(responseItem);
+        Observe(updated, "HongdalApp.RequestUpdated");
+        _ledgerObserver.RequestRefresh(updated.의뢰Id, "HongdalApp.RequestUpdated");
+        return updated;
+    }
+
+    public async Task DeleteRequestAsync(string requestId, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(requestId))
+        {
+            throw new InvalidOperationException("삭제할 의뢰 ID가 없습니다.");
+        }
+
+        var path = $"api/v1/shipper/requests/{Uri.EscapeDataString(requestId.Trim())}";
+        using var request = CreateAuthorizedRequest(HttpMethod.Delete, path);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(await BuildFailureMessageAsync(response, path, cancellationToken));
+        }
+
+        _ledgerObserver.RequestRefresh(requestId, "HongdalApp.RequestDeleted");
     }
 
     private async Task<T?> GetAuthorizedJsonAsync<T>(string path, CancellationToken cancellationToken)
@@ -290,6 +336,26 @@ public sealed class ServerBackedShipperOperationsService : IShipperOperationsSer
             생성일시 = source.생성일시,
             픽업지 = source.픽업지,
             하차지 = source.하차지
+        };
+    }
+
+    private 화주운송의뢰수정요청 ToUpdateRequest(ShipperRequestItem source)
+    {
+        var create = ToCreateRequest(source);
+        return new 화주운송의뢰수정요청
+        {
+            운송방식 = create.운송방식,
+            차량종류 = create.차량종류,
+            결제수단 = create.결제수단,
+            결제예정금액 = create.결제예정금액,
+            정산조건 = create.정산조건,
+            화물 = create.화물,
+            픽업 = create.픽업,
+            하차 = create.하차,
+            요금옵션 = create.요금옵션,
+            결제상태 = source.결제상태,
+            상태 = source.의뢰상태,
+            배차상태 = source.배차상태
         };
     }
 

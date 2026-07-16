@@ -1214,6 +1214,38 @@ public sealed class InMemoryShipperStore
         });
     }
 
+    public void UpdateRequest(ShipperRequestItem request)
+    {
+        var index = _requests.FindIndex(x => string.Equals(x.의뢰Id, request.의뢰Id, StringComparison.OrdinalIgnoreCase));
+        if (index < 0)
+        {
+            throw new InvalidOperationException("수정할 운송의뢰를 찾을 수 없습니다.");
+        }
+
+        _requests[index] = request;
+        var publicIndex = _publicCargo.FindIndex(x => string.Equals(x.의뢰Id, request.의뢰Id, StringComparison.OrdinalIgnoreCase));
+        if (publicIndex >= 0)
+        {
+            var item = _publicCargo[publicIndex];
+            item.화물종류 = request.화물종류;
+            item.운송방식 = request.운송방식;
+            item.차량종류 = request.차량종류;
+            item.의뢰상태 = request.의뢰상태;
+            item.배차상태 = request.배차상태;
+        }
+    }
+
+    public void DeleteRequest(string requestId)
+    {
+        var removed = _requests.RemoveAll(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase));
+        if (removed == 0)
+        {
+            throw new InvalidOperationException("삭제할 운송의뢰를 찾을 수 없습니다.");
+        }
+
+        _publicCargo.RemoveAll(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase));
+    }
+
     public 창고요약응답 CreateWarehouse(창고저장요청 payload, string userId)
     {
         var warehouse = new 창고요약응답
@@ -1403,6 +1435,30 @@ public sealed class InMemoryShipperStore
         return account;
     }
 
+    public 판매채널계정항목응답 UpdateAccount(long accountId, 판매채널계정저장요청 payload)
+    {
+        var account = _accounts.FirstOrDefault(x => x.Id == accountId)
+            ?? throw new KeyNotFoundException("판매채널 계정을 찾을 수 없습니다.");
+
+        account.채널종류 = payload.채널종류;
+        account.상점명 = payload.상점명;
+        account.마지막동기화일시 = DateTime.UtcNow;
+        return account;
+    }
+
+    public void DeleteAccount(long accountId)
+    {
+        var account = _accounts.FirstOrDefault(x => x.Id == accountId)
+            ?? throw new KeyNotFoundException("판매채널 계정을 찾을 수 없습니다.");
+
+        if (_listings.Any(x => x.판매채널계정Id == accountId))
+        {
+            throw new InvalidOperationException("출품에서 사용 중인 판매채널 계정은 삭제할 수 없습니다.");
+        }
+
+        _accounts.Remove(account);
+    }
+
     public 판매상품항목응답 CreateProduct(판매상품저장요청 payload)
     {
         var product = new 판매상품항목응답
@@ -1419,8 +1475,39 @@ public sealed class InMemoryShipperStore
         return product;
     }
 
+    public 판매상품항목응답 UpdateProduct(long productId, 판매상품저장요청 payload)
+    {
+        var product = _products.FirstOrDefault(x => x.Id == productId)
+            ?? throw new KeyNotFoundException("판매상품을 찾을 수 없습니다.");
+
+        product.입고상품Id = payload.입고상품Id;
+        product.대표상품명 = payload.대표상품명;
+        product.판매SKU = payload.판매SKU;
+        product.판매가 = payload.판매가;
+        product.샘플데이터여부 = payload.샘플데이터여부;
+        product.샘플데이터코드 = payload.샘플데이터코드;
+        return product;
+    }
+
+    public void DeleteProduct(long productId)
+    {
+        var product = _products.FirstOrDefault(x => x.Id == productId)
+            ?? throw new KeyNotFoundException("판매상품을 찾을 수 없습니다.");
+
+        if (_listings.Any(x => x.판매상품Id == productId))
+        {
+            throw new InvalidOperationException("출품에서 사용 중인 판매상품은 삭제할 수 없습니다.");
+        }
+
+        _products.Remove(product);
+    }
+
     public 채널출품항목응답 CreateListing(채널출품저장요청 payload)
     {
+        var product = _products.FirstOrDefault(x => x.Id == payload.판매상품Id)
+            ?? throw new KeyNotFoundException("판매상품을 찾을 수 없습니다.");
+        var account = _accounts.FirstOrDefault(x => x.Id == payload.판매채널계정Id)
+            ?? throw new KeyNotFoundException("판매채널 계정을 찾을 수 없습니다.");
         var listing = new 채널출품항목응답
         {
             Id = _listingSequence++,
@@ -1432,7 +1519,54 @@ public sealed class InMemoryShipperStore
         };
 
         _listings.Add(listing);
+        product.상태 = SalesStatusCodes.ProductActive;
+        account.마지막동기화일시 = DateTime.UtcNow;
         return listing;
+    }
+
+    public 채널출품항목응답 UpdateListing(long listingId, 채널출품저장요청 payload)
+    {
+        var listing = _listings.FirstOrDefault(x => x.Id == listingId)
+            ?? throw new KeyNotFoundException("채널 출품을 찾을 수 없습니다.");
+        var previousProductId = listing.판매상품Id;
+        var product = _products.FirstOrDefault(x => x.Id == payload.판매상품Id)
+            ?? throw new KeyNotFoundException("판매상품을 찾을 수 없습니다.");
+        var account = _accounts.FirstOrDefault(x => x.Id == payload.판매채널계정Id)
+            ?? throw new KeyNotFoundException("판매채널 계정을 찾을 수 없습니다.");
+
+        listing.판매상품Id = payload.판매상품Id;
+        listing.판매채널계정Id = payload.판매채널계정Id;
+        listing.동기화상태 = SalesStatusCodes.SyncNormal;
+        listing.에러메시지 = string.Empty;
+        product.상태 = SalesStatusCodes.ProductActive;
+        account.마지막동기화일시 = DateTime.UtcNow;
+        if (previousProductId != product.Id
+            && _listings.All(x => x.Id == listingId || x.판매상품Id != previousProductId))
+        {
+            var previousProduct = _products.FirstOrDefault(x => x.Id == previousProductId);
+            if (previousProduct is not null)
+            {
+                previousProduct.상태 = SalesStatusCodes.ProductReady;
+            }
+        }
+        return listing;
+    }
+
+    public void DeleteListing(long listingId)
+    {
+        var listing = _listings.FirstOrDefault(x => x.Id == listingId)
+            ?? throw new KeyNotFoundException("채널 출품을 찾을 수 없습니다.");
+
+        _listings.Remove(listing);
+
+        if (_listings.All(x => x.판매상품Id != listing.판매상품Id))
+        {
+            var product = _products.FirstOrDefault(x => x.Id == listing.판매상품Id);
+            if (product is not null)
+            {
+                product.상태 = SalesStatusCodes.ProductReady;
+            }
+        }
     }
 
     public void UpdateListingSync(long listingId, string syncStatus, string message)

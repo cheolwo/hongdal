@@ -24,5 +24,9 @@ public interface IShipperOperationsService
 
     Task<decimal> EstimateFareAsync(string vehicleType, decimal distanceKm, CancellationToken cancellationToken = default);
 
-    Task AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default);
+    Task<ShipperRequestItem> AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default);
+
+    Task<ShipperRequestItem> UpdateRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default);
+
+    Task DeleteRequestAsync(string requestId, CancellationToken cancellationToken = default);
 }

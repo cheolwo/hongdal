@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Hongdal.Contracts.Common.Inbound;
@@ -26,6 +27,11 @@ public sealed class ShipperWarehouseService : IShipperWarehouseWorkflowService
 
     public Task<입고요청목록응답?> GetInboundsAsync(CancellationToken cancellationToken = default)
         => GetAuthorizedJsonAsync<입고요청목록응답>("api/v1/warehouse-operations/inbounds", cancellationToken);
+
+    public Task<입고요청페이지응답?> QueryInboundsAsync(
+        입고요청목록조회요청 request,
+        CancellationToken cancellationToken = default)
+        => GetAuthorizedJsonAsync<입고요청페이지응답>(BuildInboundQueryPath(request), cancellationToken);
 
     public Task<입고요청항목응답?> CreateInboundAsync(입고요청저장요청 payload, CancellationToken cancellationToken = default)
         => PostAuthorizedJsonAsync<입고요청저장요청, 입고요청항목응답>("api/v1/warehouse-operations/inbounds", payload, cancellationToken);
@@ -75,6 +81,34 @@ public sealed class ShipperWarehouseService : IShipperWarehouseWorkflowService
         var request = new HttpRequestMessage(method, path);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
         return request;
+    }
+
+    private static string BuildInboundQueryPath(입고요청목록조회요청 request)
+    {
+        var values = new List<string>
+        {
+            $"page={Math.Max(0, request.Page).ToString(CultureInfo.InvariantCulture)}",
+            $"pageSize={Math.Clamp(request.PageSize, 1, 200).ToString(CultureInfo.InvariantCulture)}",
+            $"sortDescending={request.SortDescending.ToString().ToLowerInvariant()}"
+        };
+        AddQueryValue(values, "search", request.Search);
+        AddQueryValue(values, "sortBy", request.SortBy);
+        AddQueryValue(values, "status", request.Status);
+        AddQueryValue(values, "flowType", request.FlowType);
+        if (request.WarehouseId is > 0)
+        {
+            values.Add($"warehouseId={request.WarehouseId.Value.ToString(CultureInfo.InvariantCulture)}");
+        }
+
+        return $"api/v1/warehouse-operations/inbounds/query?{string.Join('&', values)}";
+    }
+
+    private static void AddQueryValue(ICollection<string> values, string name, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            values.Add($"{name}={Uri.EscapeDataString(value.Trim())}");
+        }
     }
 
     private static async Task<string> BuildFailureMessageAsync(HttpResponseMessage response, string path, CancellationToken cancellationToken)

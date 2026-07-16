@@ -73,16 +73,30 @@ public sealed class SmokeAwareShipperOperationsService : IShipperOperationsServi
             token => _sample.EstimateFareAsync(vehicleType, distanceKm, token),
             cancellationToken);
 
-    public Task AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
+    public Task<ShipperRequestItem> AddRequestAsync(ShipperRequestItem request, CancellationToken cancellationToken = default)
+        => WithSampleFallbackAsync(
+            token => _server.AddRequestAsync(request, token),
+            token => _sample.AddRequestAsync(request, token),
+            cancellationToken);
+
+    public Task<ShipperRequestItem> UpdateRequestAsync(
+        ShipperRequestItem request,
+        CancellationToken cancellationToken = default)
+        => WithSampleFallbackAsync(
+            token => _server.UpdateRequestAsync(request, token),
+            token => _sample.UpdateRequestAsync(request, token),
+            cancellationToken);
+
+    public Task DeleteRequestAsync(string requestId, CancellationToken cancellationToken = default)
         => WithSampleFallbackAsync(
             async token =>
             {
-                await _server.AddRequestAsync(request, token);
+                await _server.DeleteRequestAsync(requestId, token);
                 return true;
             },
             async token =>
             {
-                await _sample.AddRequestAsync(request, token);
+                await _sample.DeleteRequestAsync(requestId, token);
                 return true;
             },
             cancellationToken);

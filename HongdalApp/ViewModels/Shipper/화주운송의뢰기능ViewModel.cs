@@ -20,13 +20,17 @@ public sealed class 화주운송의뢰조회ViewModel : 화주운송의뢰업무
         : base("shipper-request-query", "운송의뢰 조회")
     {
         의뢰목록조회 = 하위ViewModel등록(
-            new Api작업ViewModel<IReadOnlyList<ShipperRequestItem>>(operations.GetRequestsAsync));
+            new Api작업ViewModel<IReadOnlyList<ShipperRequestItem>>(operations.GetRequestsAsync),
+            수명소유: true);
         의뢰상세조회 = 하위ViewModel등록(
-            new Api작업ViewModel<string, ShipperRequestItem?>(operations.GetRequestAsync));
+            new Api작업ViewModel<string, ShipperRequestItem?>(operations.GetRequestAsync),
+            수명소유: true);
         공개화물조회 = 하위ViewModel등록(
-            new Api작업ViewModel<IReadOnlyList<공개화물요약응답>>(operations.GetPublicCargoAsync));
+            new Api작업ViewModel<IReadOnlyList<공개화물요약응답>>(operations.GetPublicCargoAsync),
+            수명소유: true);
         차량종류조회 = 하위ViewModel등록(
-            new Api작업ViewModel<IReadOnlyList<string>>(operations.GetVehicleTypesAsync));
+            new Api작업ViewModel<IReadOnlyList<string>>(operations.GetVehicleTypesAsync),
+            수명소유: true);
     }
 
     public Api작업ViewModel<IReadOnlyList<ShipperRequestItem>> 의뢰목록조회 { get; }
@@ -46,13 +50,14 @@ public sealed class 화주운송의뢰작성ViewModel : 화주운송의뢰업무
                 (condition, cancellationToken) => operations.EstimateFareAsync(
                     condition.차량종류,
                     condition.거리Km,
-                    cancellationToken)));
+                    cancellationToken)),
+            수명소유: true);
         의뢰등록 = 하위ViewModel등록(
             new Api작업ViewModel<ShipperRequestItem, Api작업완료>(async (request, cancellationToken) =>
             {
                 await operations.AddRequestAsync(request, cancellationToken);
                 return Api작업완료.값;
-            }));
+            }), 수명소유: true);
     }
 
     public Api작업ViewModel<화주운임예상조건, decimal> 운임예상 { get; }
@@ -70,10 +75,12 @@ public sealed class 화주운송의뢰일괄ViewModel : 화주운송의뢰업무
                 (condition, cancellationToken) => bulkRequests.미리보기Async(
                     condition.스트림,
                     condition.파일명,
-                    cancellationToken)));
+                    cancellationToken)),
+            수명소유: true);
         일괄등록 = 하위ViewModel등록(
             new Api작업ViewModel<화주운송의뢰일괄확정등록요청, 화주운송의뢰일괄등록결과응답?>(
-                bulkRequests.등록Async));
+                bulkRequests.등록Async),
+            수명소유: true);
     }
 
     public Api작업ViewModel<화주일괄파일조건, 화주운송의뢰일괄미리보기응답?> 일괄미리보기 { get; }
@@ -81,21 +88,29 @@ public sealed class 화주운송의뢰일괄ViewModel : 화주운송의뢰업무
 }
 
 /// <summary>화주 운송의뢰를 조회·작성·일괄등록 업무로 조립합니다.</summary>
-public sealed class 화주운송의뢰기능ViewModel : 조립ViewModelBase
+public sealed class 화주운송의뢰기능ViewModel : 조립ViewModelBase, ICrudPageViewModel
 {
     public 화주운송의뢰기능ViewModel(
+        화주운송의뢰상태ViewModel 상태,
+        화주운송의뢰CrudViewModel crud,
         화주운송의뢰조회ViewModel 조회,
         화주운송의뢰작성ViewModel 작성,
         화주운송의뢰일괄ViewModel 일괄)
     {
+        this.상태 = 하위ViewModel등록(상태, 수명소유: false);
+        Crud = 하위ViewModel등록(crud);
         this.조회 = 하위ViewModel등록(조회);
         this.작성 = 하위ViewModel등록(작성);
         this.일괄 = 하위ViewModel등록(일괄);
+        Crud업무단위목록 = [Crud];
     }
 
+    public 화주운송의뢰상태ViewModel 상태 { get; }
+    public 화주운송의뢰CrudViewModel Crud { get; }
     public 화주운송의뢰조회ViewModel 조회 { get; }
     public 화주운송의뢰작성ViewModel 작성 { get; }
     public 화주운송의뢰일괄ViewModel 일괄 { get; }
+    public IReadOnlyList<I업무단위CrudViewModel> Crud업무단위목록 { get; }
 
     public Api작업ViewModel<IReadOnlyList<ShipperRequestItem>> 의뢰목록조회 => 조회.의뢰목록조회;
     public Api작업ViewModel<string, ShipperRequestItem?> 의뢰상세조회 => 조회.의뢰상세조회;
