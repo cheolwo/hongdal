@@ -13,6 +13,7 @@
     <Compile Include="..\..\..\HongdalApp\Models\**\*.cs" LinkBase="Models" />
     <Compile Include="..\..\..\HongdalApp\Options\**\*.cs" LinkBase="Options" />
     <Compile Include="..\..\..\HongdalApp\Services\**\*.cs" LinkBase="Services" />
+    <Compile Include="..\..\..\HongdalApp\ViewModels\**\*.cs" LinkBase="ViewModels" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +25,7 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="Bogus" />
-    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="MudBlazor" />
   </ItemGroup>
 </Project>

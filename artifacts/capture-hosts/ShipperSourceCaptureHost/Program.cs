@@ -32,6 +32,17 @@ var mudBlazorStaticAssets = Path.Combine(
     "mudblazor",
     "9.5.0",
     "staticwebassets");
+var aspNetCoreInternalAssetsRoot = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+    ".nuget",
+    "packages",
+    "microsoft.aspnetcore.app.internal.assets");
+var blazorFrameworkAssets = Directory.Exists(aspNetCoreInternalAssetsRoot)
+    ? Directory.GetDirectories(aspNetCoreInternalAssetsRoot)
+        .OrderByDescending(path => path, StringComparer.OrdinalIgnoreCase)
+        .Select(path => Path.Combine(path, "_framework"))
+        .FirstOrDefault(Directory.Exists)
+    : null;
 var commonAppStaticAssets = Path.Combine(repositoryRoot, "Hongdal.Ui.Common", "Areas", "App", "wwwroot");
 var commonAppScopedCss = Path.Combine(
     repositoryRoot,
@@ -85,6 +96,15 @@ if (Directory.Exists(mudBlazorStaticAssets))
     });
 }
 
+if (blazorFrameworkAssets is not null)
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(blazorFrameworkAssets),
+        RequestPath = "/_framework"
+    });
+}
+
 if (Directory.Exists(commonAppStaticAssets))
 {
     app.UseStaticFiles(new StaticFileOptions
@@ -113,7 +133,6 @@ if (Directory.Exists(appWebRoot))
 
 app.UseStaticFiles();
 app.UseAntiforgery();
-app.MapStaticAssets();
 app.MapGet("/capture/app.css", () => Results.File(hongdalAppCssFile, "text/css"));
 app.MapGet("/capture/mudblazor.css", () => Results.File(mudBlazorCssFile, "text/css"));
 app.MapGet("/capture/common.css", () => Results.File(commonAppScopedCssFile, "text/css"));
