@@ -23,6 +23,10 @@ public static class MauiProgram
         builder.Services.AddMudServices();
         builder.Services.AddHongdalUiCommonAppServices();
         builder.Services.AddTransient<창고Controller기능모음ViewModel>();
+        builder.Services.AddTransient<창고기준정보업무ViewModel>();
+        builder.Services.AddTransient<창고입고업무ViewModel>();
+        builder.Services.AddTransient<창고재고출고업무ViewModel>();
+        builder.Services.AddTransient<창고운송연계업무ViewModel>();
         builder.Services.AddTransient<창고작업기능ViewModel>();
         builder.Services.AddTransient<창고Api기능모음ViewModel>();
         builder.Services.AddHongdalApiHttpClient(HongdalApiEndpoint.ResolveBaseAddress(

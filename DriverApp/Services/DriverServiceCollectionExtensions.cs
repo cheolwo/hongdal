@@ -79,6 +79,10 @@ public static class DriverServiceCollectionExtensions
         services.AddTransient<기사탐색캠페인기능ViewModel>();
         services.AddTransient<기사배차액션기능ViewModel>();
         services.AddTransient<기사예약기능ViewModel>();
+        services.AddTransient<기사운송조회ViewModel>();
+        services.AddTransient<기사상차업무ViewModel>();
+        services.AddTransient<기사하차업무ViewModel>();
+        services.AddTransient<기사운송예외업무ViewModel>();
         services.AddTransient<기사운송기능ViewModel>();
         services.AddTransient<기사설정기능ViewModel>();
         services.AddTransient<기사정산기능ViewModel>();

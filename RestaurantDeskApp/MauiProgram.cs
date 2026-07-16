@@ -24,6 +24,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<I음식점주문SignalRClientService, 음식점주문SignalRClientService>();
         builder.Services.AddHongdalUiCommonAppServices();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
+        builder.Services.AddTransient<음식점주문조회ViewModel>();
+        builder.Services.AddTransient<음식점주문접수ViewModel>();
+        builder.Services.AddTransient<음식점주문이행ViewModel>();
         builder.Services.AddTransient<음식점주문기능ViewModel>();
         builder.Services.AddTransient<음식점Api기능모음ViewModel>();
         builder.Services.AddHongdalDocumentOutputServices();

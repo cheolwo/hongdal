@@ -80,6 +80,10 @@ namespace FDriverApp
             builder.Services.AddHongdalUiCommonAppServices<IFDriverAuthSession>();
             builder.Services.AddTransient<음식배달기사Controller기능모음ViewModel>();
             builder.Services.AddTransient<기사Controller기능모음ViewModel>();
+            builder.Services.AddTransient<음식배달기사운행ViewModel>();
+            builder.Services.AddTransient<음식배달수락ViewModel>();
+            builder.Services.AddTransient<음식배달이행ViewModel>();
+            builder.Services.AddTransient<음식배달경로ViewModel>();
             builder.Services.AddTransient<음식배달기사업무기능ViewModel>();
             builder.Services.AddTransient<음식배달기사Api기능모음ViewModel>();
             builder.Services.AddMudServices();
