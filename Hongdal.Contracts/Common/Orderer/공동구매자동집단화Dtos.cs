@@ -49,6 +49,7 @@ public sealed class 공동구매자동수요응답
     public string 도착창고명 { get; set; } = string.Empty;
     public string 수령지주소참조키 { get; set; } = string.Empty;
     public string 입고의미상태 { get; set; } = 공동구매개별주문입고상태코드.미지정;
+    public string 공동구매주문집계원장Id { get; set; } = string.Empty;
     public string 개별주문원장Id { get; set; } = string.Empty;
     public string 입고예정원장Id { get; set; } = string.Empty;
     public string 수요유형 { get; set; } = string.Empty;
@@ -62,6 +63,7 @@ public sealed class 공동구매자동수요응답
 public sealed class 공동구매자동집단응답
 {
     public string 자동집단Id { get; set; } = string.Empty;
+    public string 공동구매주문집계원장Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
     public string HS코드 { get; set; } = string.Empty;

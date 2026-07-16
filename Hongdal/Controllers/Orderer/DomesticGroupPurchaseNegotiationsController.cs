@@ -23,36 +23,44 @@ public sealed class DomesticGroupPurchaseNegotiationsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetTimeline(Guid campaignId)
-        => Ok(service.GetTimeline(campaignId));
+    public async Task<IActionResult> GetTimeline(Guid campaignId, CancellationToken cancellationToken)
+        => Ok(await service.GetTimelineAsync(campaignId, cancellationToken));
 
     [HttpPost("events")]
-    public IActionResult AppendEvent(Guid campaignId, [FromBody] DomesticGroupPurchaseNegotiationEventRequest request)
-        => Execute(() => service.AppendEvent(campaignId, CurrentUserId(), request));
+    public Task<IActionResult> AppendEvent(
+        Guid campaignId,
+        [FromBody] DomesticGroupPurchaseNegotiationEventRequest request,
+        CancellationToken cancellationToken)
+        => ExecuteAsync(() => service.AppendEventAsync(campaignId, CurrentUserId(), request, cancellationToken));
 
     [HttpPost("issues")]
-    public IActionResult OpenIssue(Guid campaignId, [FromBody] DomesticGroupPurchaseNegotiationIssueRequest request)
-        => Execute(() => service.OpenIssue(campaignId, CurrentUserId(), request));
+    public Task<IActionResult> OpenIssue(
+        Guid campaignId,
+        [FromBody] DomesticGroupPurchaseNegotiationIssueRequest request,
+        CancellationToken cancellationToken)
+        => ExecuteAsync(() => service.OpenIssueAsync(campaignId, CurrentUserId(), request, cancellationToken));
 
     [HttpPost("issues/{issueId:guid}/positions")]
-    public IActionResult AddPosition(
+    public Task<IActionResult> AddPosition(
         Guid campaignId,
         Guid issueId,
-        [FromBody] DomesticGroupPurchaseDeliberationPositionRequest request)
-        => Execute(() => service.AddPosition(campaignId, issueId, CurrentUserId(), request));
+        [FromBody] DomesticGroupPurchaseDeliberationPositionRequest request,
+        CancellationToken cancellationToken)
+        => ExecuteAsync(() => service.AddPositionAsync(campaignId, issueId, CurrentUserId(), request, cancellationToken));
 
     [HttpPost("issues/{issueId:guid}/resolution")]
-    public IActionResult ResolveIssue(
+    public Task<IActionResult> ResolveIssue(
         Guid campaignId,
         Guid issueId,
-        [FromBody] DomesticGroupPurchaseNegotiationResolutionRequest request)
-        => Execute(() => service.ResolveIssue(campaignId, issueId, CurrentUserId(), request));
+        [FromBody] DomesticGroupPurchaseNegotiationResolutionRequest request,
+        CancellationToken cancellationToken)
+        => ExecuteAsync(() => service.ResolveIssueAsync(campaignId, issueId, CurrentUserId(), request, cancellationToken));
 
-    private IActionResult Execute<T>(Func<T> action)
+    private async Task<IActionResult> ExecuteAsync<T>(Func<Task<T>> action)
     {
         try
         {
-            return Ok(action());
+            return Ok(await action());
         }
         catch (KeyNotFoundException ex)
         {

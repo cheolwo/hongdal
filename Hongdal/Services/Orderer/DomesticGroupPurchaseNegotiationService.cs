@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Orderer;
+using Hongdal.Services.Community;
 
 namespace Hongdal.Services.Orderer;
 
@@ -17,6 +19,7 @@ public sealed class SystemDomesticGroupPurchaseNegotiationClock : IDomesticGroup
 public sealed class DomesticGroupPurchaseNegotiationCampaignState
 {
     public object SyncRoot { get; } = new();
+    public long Revision { get; set; }
     public List<DomesticGroupPurchaseNegotiationEventResponse> Events { get; } = [];
     public List<DomesticGroupPurchaseNegotiationIssueState> Issues { get; } = [];
 }
@@ -35,27 +38,48 @@ public sealed class DomesticGroupPurchaseNegotiationPositionState
 
 public interface IDomesticGroupPurchaseNegotiationStore
 {
-    DomesticGroupPurchaseNegotiationCampaignState GetOrCreate(Guid campaignId);
+    Task<DomesticGroupPurchaseNegotiationCampaignState> GetOrCreateAsync(
+        Guid campaignId,
+        CancellationToken cancellationToken = default);
+
+    Task SaveAsync(
+        Guid campaignId,
+        DomesticGroupPurchaseNegotiationCampaignState state,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class InMemoryDomesticGroupPurchaseNegotiationStore : IDomesticGroupPurchaseNegotiationStore
 {
     private readonly ConcurrentDictionary<Guid, DomesticGroupPurchaseNegotiationCampaignState> campaigns = new();
 
-    public DomesticGroupPurchaseNegotiationCampaignState GetOrCreate(Guid campaignId)
+    public Task<DomesticGroupPurchaseNegotiationCampaignState> GetOrCreateAsync(
+        Guid campaignId,
+        CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfEqual(campaignId, Guid.Empty);
-        return campaigns.GetOrAdd(campaignId, static _ => new DomesticGroupPurchaseNegotiationCampaignState());
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(campaigns.GetOrAdd(
+            campaignId,
+            static _ => new DomesticGroupPurchaseNegotiationCampaignState()));
+    }
+
+    public Task SaveAsync(
+        Guid campaignId,
+        DomesticGroupPurchaseNegotiationCampaignState state,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
     }
 }
 
 public interface IDomesticGroupPurchaseNegotiationService
 {
-    DomesticGroupPurchaseNegotiationTimelineResponse GetTimeline(Guid campaignId);
-    DomesticGroupPurchaseNegotiationEventResponse AppendEvent(Guid campaignId, string userId, DomesticGroupPurchaseNegotiationEventRequest request);
-    DomesticGroupPurchaseNegotiationIssueResponse OpenIssue(Guid campaignId, string userId, DomesticGroupPurchaseNegotiationIssueRequest request);
-    DomesticGroupPurchaseNegotiationIssueResponse AddPosition(Guid campaignId, Guid issueId, string userId, DomesticGroupPurchaseDeliberationPositionRequest request);
-    DomesticGroupPurchaseNegotiationIssueResponse ResolveIssue(Guid campaignId, Guid issueId, string userId, DomesticGroupPurchaseNegotiationResolutionRequest request);
+    Task<DomesticGroupPurchaseNegotiationTimelineResponse> GetTimelineAsync(Guid campaignId, CancellationToken cancellationToken = default);
+    Task<DomesticGroupPurchaseNegotiationEventResponse> AppendEventAsync(Guid campaignId, string userId, DomesticGroupPurchaseNegotiationEventRequest request, CancellationToken cancellationToken = default);
+    Task<DomesticGroupPurchaseNegotiationIssueResponse> OpenIssueAsync(Guid campaignId, string userId, DomesticGroupPurchaseNegotiationIssueRequest request, CancellationToken cancellationToken = default);
+    Task<DomesticGroupPurchaseNegotiationIssueResponse> AddPositionAsync(Guid campaignId, Guid issueId, string userId, DomesticGroupPurchaseDeliberationPositionRequest request, CancellationToken cancellationToken = default);
+    Task<DomesticGroupPurchaseNegotiationIssueResponse> ResolveIssueAsync(Guid campaignId, Guid issueId, string userId, DomesticGroupPurchaseNegotiationResolutionRequest request, CancellationToken cancellationToken = default);
 }
 
 public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticGroupPurchaseNegotiationService
@@ -81,28 +105,44 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
 
     private readonly IDomesticGroupPurchaseNegotiationStore store;
     private readonly IDomesticGroupPurchaseNegotiationClock clock;
+    private readonly I커뮤니티원장저장소? ledgerStore;
+    private readonly I공동구매원장절차Service? ledgerWorkflow;
 
     public DomesticGroupPurchaseNegotiationService(
         IDomesticGroupPurchaseNegotiationStore store,
         IDomesticGroupPurchaseNegotiationClock clock)
+        : this(store, clock, null, null)
+    {
+    }
+
+    public DomesticGroupPurchaseNegotiationService(
+        IDomesticGroupPurchaseNegotiationStore store,
+        IDomesticGroupPurchaseNegotiationClock clock,
+        I커뮤니티원장저장소? ledgerStore,
+        I공동구매원장절차Service? ledgerWorkflow)
     {
         this.store = store;
         this.clock = clock;
+        this.ledgerStore = ledgerStore;
+        this.ledgerWorkflow = ledgerWorkflow;
     }
 
-    public DomesticGroupPurchaseNegotiationTimelineResponse GetTimeline(Guid campaignId)
+    public async Task<DomesticGroupPurchaseNegotiationTimelineResponse> GetTimelineAsync(
+        Guid campaignId,
+        CancellationToken cancellationToken = default)
     {
-        var state = store.GetOrCreate(campaignId);
+        var state = await store.GetOrCreateAsync(campaignId, cancellationToken);
         lock (state.SyncRoot)
         {
             return BuildTimeline(campaignId, state);
         }
     }
 
-    public DomesticGroupPurchaseNegotiationEventResponse AppendEvent(
+    public async Task<DomesticGroupPurchaseNegotiationEventResponse> AppendEventAsync(
         Guid campaignId,
         string userId,
-        DomesticGroupPurchaseNegotiationEventRequest request)
+        DomesticGroupPurchaseNegotiationEventRequest request,
+        CancellationToken cancellationToken = default)
     {
         ValidateUser(userId);
         ArgumentNullException.ThrowIfNull(request);
@@ -116,19 +156,21 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
             request.MaskedActorDisplayName,
             request.ActorRoleLabel,
             request.PublicSummary);
-        var state = store.GetOrCreate(campaignId);
+        var state = await store.GetOrCreateAsync(campaignId, cancellationToken);
         lock (state.SyncRoot)
         {
             state.Events.Add(created);
         }
 
+        await 변경저장및원장반영Async(campaignId, state, userId, cancellationToken);
         return CopyEvent(created);
     }
 
-    public DomesticGroupPurchaseNegotiationIssueResponse OpenIssue(
+    public async Task<DomesticGroupPurchaseNegotiationIssueResponse> OpenIssueAsync(
         Guid campaignId,
         string userId,
-        DomesticGroupPurchaseNegotiationIssueRequest request)
+        DomesticGroupPurchaseNegotiationIssueRequest request,
+        CancellationToken cancellationToken = default)
     {
         ValidateUser(userId);
         ArgumentNullException.ThrowIfNull(request);
@@ -149,7 +191,8 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
             DeliberationClosesAtUtc = now.AddHours(request.DeliberationHours)
         };
 
-        var state = store.GetOrCreate(campaignId);
+        var state = await store.GetOrCreateAsync(campaignId, cancellationToken);
+        DomesticGroupPurchaseNegotiationIssueResponse result;
         lock (state.SyncRoot)
         {
             state.Issues.Add(new DomesticGroupPurchaseNegotiationIssueState { PublicIssue = issue });
@@ -159,15 +202,19 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
                 issue.ReporterRoleLabel,
                 $"{issue.Title}: {issue.PublicSummary}",
                 issue.IssueId));
-            return BuildIssue(state.Issues[^1]);
+            result = BuildIssue(state.Issues[^1]);
         }
+
+        await 변경저장및원장반영Async(campaignId, state, userId, cancellationToken);
+        return result;
     }
 
-    public DomesticGroupPurchaseNegotiationIssueResponse AddPosition(
+    public async Task<DomesticGroupPurchaseNegotiationIssueResponse> AddPositionAsync(
         Guid campaignId,
         Guid issueId,
         string userId,
-        DomesticGroupPurchaseDeliberationPositionRequest request)
+        DomesticGroupPurchaseDeliberationPositionRequest request,
+        CancellationToken cancellationToken = default)
     {
         ValidateUser(userId);
         ArgumentNullException.ThrowIfNull(request);
@@ -176,7 +223,8 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
             throw new ArgumentException("의견은 지지, 우려, 대안 중 하나여야 합니다.", nameof(request));
         }
 
-        var state = store.GetOrCreate(campaignId);
+        var state = await store.GetOrCreateAsync(campaignId, cancellationToken);
+        DomesticGroupPurchaseNegotiationIssueResponse result;
         lock (state.SyncRoot)
         {
             var issueState = FindIssue(state, issueId);
@@ -205,19 +253,24 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
                 position.ParticipantRoleLabel,
                 position.PublicRationale,
                 issueId));
-            return BuildIssue(issueState);
+            result = BuildIssue(issueState);
         }
+
+        await 변경저장및원장반영Async(campaignId, state, userId, cancellationToken);
+        return result;
     }
 
-    public DomesticGroupPurchaseNegotiationIssueResponse ResolveIssue(
+    public async Task<DomesticGroupPurchaseNegotiationIssueResponse> ResolveIssueAsync(
         Guid campaignId,
         Guid issueId,
         string userId,
-        DomesticGroupPurchaseNegotiationResolutionRequest request)
+        DomesticGroupPurchaseNegotiationResolutionRequest request,
+        CancellationToken cancellationToken = default)
     {
         ValidateUser(userId);
         ArgumentNullException.ThrowIfNull(request);
-        var state = store.GetOrCreate(campaignId);
+        var state = await store.GetOrCreateAsync(campaignId, cancellationToken);
+        DomesticGroupPurchaseNegotiationIssueResponse result;
         lock (state.SyncRoot)
         {
             var issueState = FindIssue(state, issueId);
@@ -257,7 +310,95 @@ public sealed partial class DomesticGroupPurchaseNegotiationService : IDomesticG
                 issue.Resolution.ResolverRoleLabel,
                 $"{issue.Resolution.ResolutionSummary} 결정 근거: {issue.Resolution.DecisionRationale}",
                 issueId));
-            return BuildIssue(issueState);
+            result = BuildIssue(issueState);
+        }
+
+        await 변경저장및원장반영Async(campaignId, state, userId, cancellationToken);
+        return result;
+    }
+
+    private async Task 변경저장및원장반영Async(
+        Guid campaignId,
+        DomesticGroupPurchaseNegotiationCampaignState state,
+        string updatedBy,
+        CancellationToken cancellationToken)
+    {
+        await store.SaveAsync(campaignId, state, cancellationToken);
+        if (ledgerStore is null || ledgerWorkflow is null)
+        {
+            return;
+        }
+
+        var progress = await ledgerWorkflow.조회Async(campaignId, cancellationToken)
+            ?? throw new InvalidOperationException("협상 이력을 연결할 공동구매 원장을 찾을 수 없습니다.");
+        var ledger = await ledgerStore.원장조회Async(progress.CommunityLedgerId, cancellationToken)
+            ?? throw new InvalidOperationException("협상 이력을 연결할 공동구매 원장 상세를 찾을 수 없습니다.");
+        DomesticGroupPurchaseNegotiationTimelineResponse timeline;
+        lock (state.SyncRoot)
+        {
+            timeline = BuildTimeline(campaignId, state);
+        }
+
+        var block = new 커뮤니티원장블록Dto
+        {
+            BlockId = $"supply-negotiation-{campaignId:N}",
+            BlockType = CommunityLedgerBlockTypes.Generic,
+            Title = "공개 공급 협상·쟁점 합의",
+            State = timeline.Issues.Any(x => x.StatusCode == DomesticGroupPurchaseNegotiationIssueStatusCodes.Deliberating)
+                ? "deliberating"
+                : "recorded",
+            Data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["EventCount"] = timeline.Events.Count.ToString(),
+                ["IssueCount"] = timeline.Issues.Count.ToString(),
+                ["OpenIssueCount"] = timeline.Issues.Count(x => x.StatusCode == DomesticGroupPurchaseNegotiationIssueStatusCodes.Deliberating).ToString(),
+                ["ResolvedIssueCount"] = timeline.Issues.Count(x => x.StatusCode == DomesticGroupPurchaseNegotiationIssueStatusCodes.Resolved).ToString(),
+                ["LatestEventId"] = timeline.Events.LastOrDefault()?.EventId.ToString("D") ?? string.Empty,
+                ["NegotiationResourceKey"] = campaignId.ToString("D")
+            }
+        };
+        await ledgerStore.원장저장Async(
+            new 커뮤니티원장저장요청
+            {
+                원장Id = ledger.원장Id,
+                기대Revision = ledger.Revision,
+                커뮤니티Id = ledger.커뮤니티Id,
+                원장템플릿Key = ledger.원장템플릿Key,
+                제목 = ledger.제목,
+                원함 = ledger.원함,
+                상태 = ledger.상태,
+                현재단계Key = ledger.현재단계Key,
+                대상OsCode = ledger.대상OsCode,
+                대상OsName = ledger.대상OsName,
+                생성자UserId = ledger.생성자UserId,
+                생성자표시명 = ledger.생성자표시명,
+                블록목록 = ledger.블록목록
+                    .Where(x => !string.Equals(x.BlockId, block.BlockId, StringComparison.OrdinalIgnoreCase))
+                    .Append(block)
+                    .ToArray(),
+                참여자목록 = ledger.참여자목록,
+                포함원장목록 = ledger.포함원장목록,
+                다이어그램스냅샷 = ledger.다이어그램스냅샷,
+                외부참조 = ledger.외부참조,
+                확장속성 = ledger.확장속성
+            },
+            updatedBy,
+            cancellationToken);
+
+        var latestProgress = await ledgerWorkflow.조회Async(campaignId, cancellationToken) ?? progress;
+        if (CommunityGroupPurchaseLedgerStageCodes.OrderOf(CommunityGroupPurchaseLedgerStageCodes.SupplyNegotiation)
+            > CommunityGroupPurchaseLedgerStageCodes.OrderOf(latestProgress.CurrentStageCode))
+        {
+            await ledgerWorkflow.진행Async(
+                campaignId,
+                new CommunityGroupPurchaseLedgerProgressRequest
+                {
+                    StageCode = CommunityGroupPurchaseLedgerStageCodes.SupplyNegotiation,
+                    Memo = "공개 공급 협상 또는 쟁점 숙고 기록을 공동구매 원장에 반영했습니다.",
+                    ExpectedRevision = latestProgress.Revision
+                },
+                updatedBy,
+                cancellationToken);
         }
     }
 

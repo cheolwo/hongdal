@@ -371,25 +371,19 @@ public static class CommunityLedgerTemplateCatalog
             WorkflowTag = "공동구매",
             TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
             TargetOperatingSystemName = "커뮤니티 신뢰 OS",
-            Summary = "여러 사람이 만든 독립된 주문 원장을 공동 조건으로 묶어 수량과 금액을 합산하고, 국내 구매 확정부터 수령 거점과 참여자 분배까지 관리하는 집합 원장입니다.",
-            EngineHints = [CommunityLedgerEngineHints.Grouping, CommunityLedgerEngineHints.OutboundBatch, CommunityLedgerEngineHints.TransportDispatch],
-            UiSectionHints = ["개별 주문 원장", "주문 수량 합계", "공동 조건", "투표/결정", "구매 확정", "발주 주문 원장", "이행 거점 옵션", "포함 원장 다이어그램", "수령 거점", "분배", "정산 표시", "수령 확인"],
-            ActionHints = ["개별 주문 연결", "묶음 조건 확정", "구매 확정", "이행 경로 선택", "발주·원장 생성 초안", "수령 거점 확정", "분배 시작", "수령 확인"],
+            Summary = "공동구매의 모집, 제안, 가격 근거, 거래경로와 합의를 관리하고, 확정된 수요는 내부 주문집계로 인계하는 사용자 중심 원장입니다.",
+            EngineHints = [CommunityLedgerEngineHints.Grouping],
+            UiSectionHints = ["모집", "제안 주체", "공동 조건", "가격 근거", "투표/결정", "거래경로", "합의", "주문 집계", "개별 주문 원장", "주문 수량 합계", "수령 거점", "분배"],
+            ActionHints = ["수요 모집", "공동 조건 조정", "가격 근거 확인", "거래경로 확정", "합의 확정", "주문집계 생성", "개별 주문 연결", "구매 확정", "수령 거점 확정", "분배 시작"],
             CompositionRules =
             [
                 Rule(
-                    CommunityLedgerCompositionRuleCodes.GroupPurchaseRequiresIndividualOrders,
-                    "공동구매는 개별 주문 원장이 먼저 필요합니다.",
-                    "참여 의사나 수량을 공동구매 원장에 직접 적재하지 않고, 각 참여자의 주문 원장을 연결한 뒤 주문들의 수량과 조건을 집계합니다.",
-                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.Order],
-                    requiredUiSectionHints: ["개별 주문 원장", "주문 수량 합계"],
-                    gatedActionHints: ["묶음 조건 확정", "구매 확정"]),
-                Rule(
-                    CommunityLedgerCompositionRuleCodes.RecruitmentBeforePurchaseDistribution,
-                    "개별 주문 집계와 공동 조건 확정이 먼저 필요합니다.",
-                    "구매 확정, 수령 거점과 분배 화면은 연결된 개별 주문의 합계와 공동 조건이 확정된 뒤에 구성되어야 합니다.",
-                    requiredUiSectionHints: ["개별 주문 원장", "주문 수량 합계", "투표/결정"],
-                    gatedActionHints: ["묶음 조건 확정", "구매 확정", "분배 시작"])
+                    CommunityLedgerCompositionRuleCodes.GroupPurchaseAgreementBeforeGroupOrder,
+                    "주문집계 생성 전에 공동구매 합의가 필요합니다.",
+                    "모집과 가격·거래경로·공급 조건을 합의한 뒤 결제 또는 확정된 개별 주문을 내부 주문집계로 묶습니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.GroupOrder],
+                    requiredUiSectionHints: ["공동 조건", "투표/결정", "거래경로", "합의"],
+                    gatedActionHints: ["주문집계 생성"])
             ],
             ProcessingSurfaces =
             [
@@ -399,17 +393,58 @@ public static class CommunityLedgerTemplateCatalog
             ],
             PersistencePolicy = MongoPolicy(
                 Projection("공동구매 수요", "GroupPurchaseDemand / 공동구매자동수요", "CommunityLedgerId", "참여자의 상품, 수량과 공동 조건을 수요로 투영합니다."),
-                Projection("공동구매 묶음", "GroupPurchaseGroup / 공동구매묶음", "CommunityLedgerId", "연결된 개별 주문 원장의 상품, 수량과 조건을 집계해 공동구매 묶음으로 투영합니다.")),
-            BestLedgerPatternTitle = "개별 주문의 독립성을 유지하는 공동구매 원장",
-            BestLedgerPatternSummary = "각 참여자의 주문 원장을 그대로 보존하면서 상품과 수량 조건이 맞는 주문만 묶고, 발주 주문 원장을 중심으로 선택한 거점 경로에 필요한 판매·입고·출고·운송 원장만 포함합니다.",
-            CommunityDiscussionPrompts = ["어떤 조건의 주문들을 같은 공동구매로 볼까요?", "개별 주문 변경은 구매 확정 전 언제까지 반영할까요?", "전통시장·3PL·집합지 직송 중 어떤 이행 경로가 맞을까요?", "수령 거점과 참여자별 분배 방식은 어떻게 정할까요?"],
+                Projection("주문집계 인계", "GroupOrder / 공동구매주문집계", "CommunityLedgerId + AutomaticGroupId", "합의된 조건으로 확정된 개별 주문 집합을 공동구매 내부 주문집계에 투영합니다.")),
+            BestLedgerPatternTitle = "합의와 실행을 분리하는 공동구매 원장",
+            BestLedgerPatternSummary = "공동구매 화면에는 모집부터 이행까지 하나의 흐름으로 보이되, 결제·확정된 개별 주문의 집계는 내부 주문집계에 맡깁니다.",
+            CommunityDiscussionPrompts = ["어떤 조건으로 공동구매 주문을 확정할까요?", "개별 주문 확정 기준은 무엇인가요?", "국내 구매와 공동수입 중 어떤 경로가 맞을까요?"],
             Roles =
             [
-                Role("묶음 구성자", "조건이 맞는 개별 주문 원장을 공동구매 원장에 연결합니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ChangeState),
-                Role("주문자", "자신의 개별 주문 원장에서 수량과 수령 조건을 관리합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
-                Role("구매 담당자", "공동 조건과 구매 확정 근거를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
-                Role("분배 담당자", "수령 거점과 참여자별 분배 상태를 남깁니다.", CommunityLedgerPermissionCodes.ChangeState),
-                Role("정산 확인자", "각자 입금 표시와 확인 메모를 정리합니다.", CommunityLedgerPermissionCodes.MarkPayment, CommunityLedgerPermissionCodes.CloseLedger)
+                Role("제안자", "공동구매 조건과 제안 근거를 남깁니다.", CommunityLedgerPermissionCodes.InviteParticipant, CommunityLedgerPermissionCodes.ChangeState),
+                Role("참여자", "수요와 이의, 합의 의사를 남깁니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("공동구매 대표", "합의된 조건을 내부 주문집계로 인계합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("확인자", "합의와 주문집계 인계 상태를 확인합니다.", CommunityLedgerPermissionCodes.CloseLedger),
+                Role("정산 확인자", "개별 주문 합계와 공동구매 정산 표시를 확인합니다.", CommunityLedgerPermissionCodes.MarkPayment, CommunityLedgerPermissionCodes.CloseLedger)
+            ]
+        },
+        new()
+        {
+            Key = CommunityLedgerTemplateKeys.GroupOrder,
+            DisplayName = "공동구매 주문집계 원장",
+            Category = "통합 원장",
+            WorkflowTag = "공동구매 주문집계·이행",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            TargetOperatingSystemName = "커뮤니티 신뢰 OS",
+            IsInternalAggregationTemplate = true,
+            Summary = "공동구매 내부에서 동일 조건으로 확정된 개별 주문들을 묶고 수량, 금액과 참여자 수를 개별 주문의 합으로 계산하는 하위 집계 원장입니다.",
+            EngineHints = [CommunityLedgerEngineHints.Grouping, CommunityLedgerEngineHints.OutboundBatch, CommunityLedgerEngineHints.TransportDispatch],
+            UiSectionHints = ["원천 공동구매", "개별 주문 원장", "확정 주문 수", "주문 수량 합계", "예약결제 합계", "수령 창고 분포", "공동 물류", "분배"],
+            ActionHints = ["개별 주문 연결", "집계 갱신", "공급 발주", "공동 입고", "참여자별 분배"],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.GroupOrderRequiresIndividualOrders,
+                    "공동구매 주문집계는 확정된 개별 주문의 집합입니다.",
+                    "주문집계의 참여자 수, 수량과 금액은 연결된 유효 개별 주문에서 계산하며 독립 값으로 입력하지 않습니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.Order],
+                    requiredUiSectionHints: ["개별 주문 원장", "확정 주문 수", "주문 수량 합계"],
+                    gatedActionHints: ["공급 발주", "공동 입고", "참여자별 분배"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("POST", "공동구매자동집단화Controller", "수요등록", "예약결제된 개별 주문을 공동구매 주문집계에 연결하고 합계를 갱신합니다.", "I공동구매자동집단화UseCase.수요등록Async"),
+                ApiEndpoint("GET", "주문원장Controller", "통합조회", "주문집계와 연결된 개별 주문들의 이행·서명 상태를 계산합니다.", "I주문원장통합UseCase.조회Async")
+            ],
+            PersistencePolicy = MongoPolicy(
+                Projection("공동구매 주문집계", "CommunityLedger / GroupOrder", "SourceGroupPurchaseLedgerId + AutomaticGroupId", "개별 주문 연결이 바뀔 때 확정 주문 수, 수량과 금액을 다시 계산합니다.")),
+            BestLedgerPatternTitle = "개별 주문에서 계산되는 공동구매 주문집계",
+            BestLedgerPatternSummary = "개인의 계약·결제·수령 조건은 개별 주문에 유지하고 주문집계에는 합계와 공동 물류 관계만 둡니다.",
+            CommunityDiscussionPrompts = ["현재 확정된 개별 주문은 몇 건인가요?", "공동 발주 수량은 얼마인가요?", "어떤 수령 창고 기준으로 분배해야 하나요?"],
+            Roles =
+            [
+                Role("공동구매 주문 담당자", "개별 주문 집합과 공동 발주를 관리합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.AttachEvidence),
+                Role("개별 주문자", "자신의 주문·결제·수령 조건을 관리합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion),
+                Role("물류 담당자", "공동 입고와 참여자별 분배를 관리합니다.", CommunityLedgerPermissionCodes.ChangeState),
+                Role("정산 확인자", "개별 주문 합계와 공동 정산을 확인합니다.", CommunityLedgerPermissionCodes.MarkPayment, CommunityLedgerPermissionCodes.CloseLedger)
             ]
         },
         new()
@@ -647,13 +682,13 @@ public static class CommunityLedgerTemplateCatalog
         Module(
             10,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
-            "공동구매 수요/묶음 원장",
+            "공동구매 모집·합의 원장",
             CommunityLedgerTemplateKeys.GroupPurchase,
             CommunityLedgerOperatingSystemCodes.CommunityTrust,
             "커뮤니티 신뢰 OS",
-            "여러 개별 주문 원장을 상품, 수량, 공동 조건과 수령권 기준으로 묶는 국내 공동구매 집합 원장입니다.",
-            ["개별 주문 원장", "공동구매 묶음", "주문 수량 합계"],
-            ["개별 주문 원장", "주문 수량 합계", "투표/결정"]),
+            "공동구매의 모집, 가격 근거, 거래경로와 합의를 관리하고 확정 수요를 내부 주문집계로 인계하는 원장입니다.",
+            ["공동구매 모집", "가격 근거", "거래경로", "합의"],
+            ["모집", "공동 조건", "투표/결정", "합의"]),
         Module(
             11,
             CommunityLedgerImplementationModuleCodes.GroupPurchaseImportDecision,
@@ -733,7 +768,17 @@ public static class CommunityLedgerTemplateCatalog
             "창고·커머스 이행 OS",
             "입고 예정 품목과 운송 하차 인계 내용을 받아 검수, 이상 처리, 보관과 재고 전환을 추적하는 원장입니다.",
             ["창고 입고", "운송 하차 인계", "입고 검수"],
-            ["입고 예정", "운송 하차", "검수", "보관 위치", "이상 기록"])
+            ["입고 예정", "운송 하차", "검수", "보관 위치", "이상 기록"]),
+        Module(
+            19,
+            CommunityLedgerImplementationModuleCodes.GroupOrderAggregation,
+            "공동구매 주문집계 원장",
+            CommunityLedgerTemplateKeys.GroupOrder,
+            CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            "커뮤니티 신뢰 OS",
+            "확정된 개별 주문들을 연결하고 주문 수, 수량과 예약결제 금액을 개별 주문의 합으로 계산하는 원장입니다.",
+            ["공동구매 주문집계", "개별 주문 원장", "공동 물류"],
+            ["확정 주문 수", "주문 수량 합계", "예약결제 합계", "수령 창고 분포"])
     ];
 
     private static readonly IReadOnlyList<CommunityLedgerRelationResponse> PriorityLedgerRelations =
@@ -817,17 +862,27 @@ public static class CommunityLedgerTemplateCatalog
             CommunityLedgerRelationCardinality.OneToMany,
             required: false,
             "커뮤니티 대화에서 여러 사람의 유사 주문 의사가 확인될 때",
-            "각 참여자의 주문 원장을 먼저 만든 뒤 조건이 맞는 주문들을 공동주문 묶음 원장으로 연결합니다."),
+            "유사한 수요를 모집하고 가격·거래경로·공급 조건을 합의할 공동구매 원장으로 연결합니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.GroupPurchaseDemand,
-            CommunityLedgerImplementationModuleCodes.OrderRoot,
+            CommunityLedgerImplementationModuleCodes.GroupOrderAggregation,
             CommunityLedgerTemplateKeys.GroupPurchase,
+            CommunityLedgerTemplateKeys.GroupOrder,
+            CommunityLedgerRelationTypes.Contains,
+            CommunityLedgerRelationCardinality.OneToMany,
+            required: true,
+            "공동구매 조건에 동의하고 예약결제한 개별 주문이 하나 이상 생길 때",
+            "사용자에게는 하나의 공동구매로 보이되 확정된 주문 집합은 내부 주문집계로 분리합니다."),
+        LedgerRelation(
+            CommunityLedgerImplementationModuleCodes.GroupOrderAggregation,
+            CommunityLedgerImplementationModuleCodes.OrderRoot,
+            CommunityLedgerTemplateKeys.GroupOrder,
             CommunityLedgerTemplateKeys.Order,
             CommunityLedgerRelationTypes.Contains,
             CommunityLedgerRelationCardinality.OneToMany,
             required: true,
             "상품과 공동 조건이 맞는 개별 주문이 하나 이상 만들어질 때",
-            "공동주문 묶음 원장은 여러 개별 주문 원장을 포함하며, 개별 주문이 공동주문의 기본 단위입니다."),
+            "공동구매 주문집계는 여러 개별 주문 원장을 포함하며, 수량과 금액은 개별 주문에서 계산합니다."),
         LedgerRelation(
             CommunityLedgerImplementationModuleCodes.FoodOrder,
             CommunityLedgerImplementationModuleCodes.FoodDelivery,

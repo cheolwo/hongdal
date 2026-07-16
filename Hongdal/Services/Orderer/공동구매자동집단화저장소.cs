@@ -23,6 +23,7 @@ public interface I공동구매자동집단화저장소
     Task<공동구매자동집단응답> 개별주문원장연결Async(
         string 자동집단Id,
         string 수요Id,
+        string 공동구매주문집계원장Id,
         string 개별주문원장Id,
         string 입고예정원장Id,
         CancellationToken cancellationToken = default);
@@ -100,6 +101,7 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             입고의미상태 = 주문확정수요인가(command)
                 ? 공동구매개별주문입고상태코드.입고예정
                 : 기존수요?.입고의미상태 ?? 공동구매개별주문입고상태코드.미지정,
+            공동구매주문집계원장Id = 기존수요?.공동구매주문집계원장Id ?? string.Empty,
             개별주문원장Id = 기존수요?.개별주문원장Id ?? string.Empty,
             입고예정원장Id = 기존수요?.입고예정원장Id ?? string.Empty,
             수요유형 = 수요유형정규화(command.수요유형),
@@ -219,12 +221,14 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
     public async Task<공동구매자동집단응답> 개별주문원장연결Async(
         string 자동집단Id,
         string 수요Id,
+        string 공동구매주문집계원장Id,
         string 개별주문원장Id,
         string 입고예정원장Id,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
         ArgumentException.ThrowIfNullOrWhiteSpace(수요Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(공동구매주문집계원장Id);
         ArgumentException.ThrowIfNullOrWhiteSpace(개별주문원장Id);
         ArgumentException.ThrowIfNullOrWhiteSpace(입고예정원장Id);
         await 인덱스준비Async(cancellationToken);
@@ -235,6 +239,8 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         var 수요 = 문서.수요목록.FirstOrDefault(x => x.수요Id == 수요Id.Trim())
             ?? throw new InvalidOperationException("개별 주문 원장을 연결할 주문자 수요를 찾을 수 없습니다.");
 
+        문서.공동구매주문집계원장Id = 공동구매주문집계원장Id.Trim();
+        수요.공동구매주문집계원장Id = 공동구매주문집계원장Id.Trim();
         수요.개별주문원장Id = 개별주문원장Id.Trim();
         수요.입고예정원장Id = 입고예정원장Id.Trim();
         수요.입고의미상태 = 공동구매개별주문입고상태코드.입고예정;
@@ -242,7 +248,7 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
         {
             이벤트유형 = "IndividualOrderInboundPlanned",
-            요약 = $"{수요.주문자표시명} 개별 주문과 도착 창고 입고 예정 원장을 연결했습니다.",
+            요약 = $"{수요.주문자표시명} 개별 주문을 공동구매 주문집계와 도착 창고 입고 예정 원장에 연결했습니다.",
             발생시각Utc = now
         });
         문서.수정시각Utc = now;
@@ -367,6 +373,7 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         return new 공동구매자동집단응답
         {
             자동집단Id = 문서.자동집단Id,
+            공동구매주문집계원장Id = 문서.공동구매주문집계원장Id,
             상품키 = 문서.상품키,
             상품명 = 문서.상품명,
             HS코드 = 문서.HS코드,
@@ -409,6 +416,7 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             도착창고명 = 문서.도착창고명,
             수령지주소참조키 = 문서.수령지주소참조키,
             입고의미상태 = 문서.입고의미상태,
+            공동구매주문집계원장Id = 문서.공동구매주문집계원장Id,
             개별주문원장Id = 문서.개별주문원장Id,
             입고예정원장Id = 문서.입고예정원장Id,
             수요유형 = 문서.수요유형,
@@ -468,6 +476,7 @@ public sealed class 공동구매자동집단문서
     [BsonId]
     public ObjectId Id { get; set; }
     public string 자동집단Id { get; set; } = string.Empty;
+    public string 공동구매주문집계원장Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
     public string HS코드 { get; set; } = string.Empty;
@@ -506,6 +515,7 @@ public sealed class 공동구매자동수요문서
     public string 도착창고명 { get; set; } = string.Empty;
     public string 수령지주소참조키 { get; set; } = string.Empty;
     public string 입고의미상태 { get; set; } = 공동구매개별주문입고상태코드.미지정;
+    public string 공동구매주문집계원장Id { get; set; } = string.Empty;
     public string 개별주문원장Id { get; set; } = string.Empty;
     public string 입고예정원장Id { get; set; } = string.Empty;
     public string 수요유형 { get; set; } = 공동구매자동수요유형코드.관심표시;

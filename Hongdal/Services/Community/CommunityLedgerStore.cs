@@ -161,6 +161,7 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
                 EventId = eventId,
                 상태 = 문서.상태,
                 이전상태 = Clean(existing?.상태),
+                현재단계Key = Clean(문서.현재단계Key),
                 메모 = existing is null ? "원장 생성" : "원장 저장 중 상태 변경",
                 변경자 = 문서.수정자,
                 변경시각Utc = now
@@ -603,6 +604,9 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             원장Id = dto.원장Id.Trim(),
             원장템플릿Key = dto.원장템플릿Key.Trim(),
             역할 = dto.역할.Trim(),
+            관계유형 = string.IsNullOrWhiteSpace(dto.관계유형)
+                ? CommunityLedgerRelationTypes.Contains
+                : dto.관계유형.Trim(),
             필수여부 = dto.필수여부,
             표시순서 = dto.표시순서
         };
@@ -705,6 +709,9 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
             원장Id = 문서.원장Id,
             원장템플릿Key = 문서.원장템플릿Key,
             역할 = 문서.역할,
+            관계유형 = string.IsNullOrWhiteSpace(문서.관계유형)
+                ? CommunityLedgerRelationTypes.Contains
+                : 문서.관계유형,
             필수여부 = 문서.필수여부,
             표시순서 = 문서.표시순서
         };
@@ -913,6 +920,7 @@ public sealed class 커뮤니티포함원장참조Dto
     public string 원장Id { get; set; } = string.Empty;
     public string 원장템플릿Key { get; set; } = string.Empty;
     public string 역할 { get; set; } = string.Empty;
+    public string 관계유형 { get; set; } = CommunityLedgerRelationTypes.Contains;
     public bool 필수여부 { get; set; }
     public int 표시순서 { get; set; }
 }
@@ -1010,6 +1018,7 @@ public sealed class 커뮤니티포함원장참조문서
     public string 원장Id { get; set; } = string.Empty;
     public string 원장템플릿Key { get; set; } = string.Empty;
     public string 역할 { get; set; } = string.Empty;
+    public string 관계유형 { get; set; } = CommunityLedgerRelationTypes.Contains;
     public bool 필수여부 { get; set; }
     public int 표시순서 { get; set; }
 }

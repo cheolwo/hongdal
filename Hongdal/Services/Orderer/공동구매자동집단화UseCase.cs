@@ -81,7 +81,8 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
                     throw new InvalidOperationException("등록한 주문자 수요를 자동집단에서 찾을 수 없습니다.");
                 }
 
-                if (string.IsNullOrWhiteSpace(demand.개별주문원장Id)
+                if (string.IsNullOrWhiteSpace(demand.공동구매주문집계원장Id)
+                    || string.IsNullOrWhiteSpace(demand.개별주문원장Id)
                     || string.IsNullOrWhiteSpace(demand.입고예정원장Id))
                 {
                     var ledgers = await _개별주문원장Service.생성및연결Async(
@@ -91,6 +92,7 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
                     group = await _저장소.개별주문원장연결Async(
                         group.자동집단Id,
                         demand.수요Id,
+                        ledgers.공동구매주문집계원장Id,
                         ledgers.개별주문원장Id,
                         ledgers.입고예정원장Id,
                         cancellationToken);

@@ -99,11 +99,15 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IWorkRelationshipSnapshotService, WorkRelationshipSnapshotService>();
         services.AddScoped<ICommunityActivitySignalService, CommunityActivitySignalService>();
         services.AddSingleton<ICommunityVoteStore, MongoCommunityVoteStore>();
+        services.AddSingleton<I공동구매원장캠페인Store, CommunityVote공동구매원장캠페인Store>();
+        services.AddScoped<I공동구매원장절차Service, 공동구매원장절차Service>();
+        services.AddScoped<I공동수입원장전환Service, 공동수입원장전환Service>();
         services.AddScoped<ICommunityGroupPurchaseDemandOutboxProcessor, CommunityGroupPurchaseDemandOutboxProcessor>();
         services.AddScoped<ICommunityVoteService>(serviceProvider =>
             new CommunityVoteService(
                 serviceProvider.GetRequiredService<ICommunityVoteStore>(),
-                serviceProvider.GetRequiredService<ICommunityGroupPurchaseDemandOutboxProcessor>()));
+                serviceProvider.GetRequiredService<ICommunityGroupPurchaseDemandOutboxProcessor>(),
+                serviceProvider.GetRequiredService<I공동구매원장절차Service>()));
         services.AddScoped<ISalesChannelOrderSyncService, SalesChannelOrderSyncService>();
         services.AddSingleton<ISalesChannelOrderFeedClient, EmptySalesChannelOrderFeedClient>();
         services.AddScoped<IHrRoleAssignmentStore, EfCoreHrRoleAssignmentStore>();

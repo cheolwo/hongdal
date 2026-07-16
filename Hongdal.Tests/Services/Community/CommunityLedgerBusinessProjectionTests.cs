@@ -179,7 +179,7 @@ public sealed class CommunityLedgerBusinessProjectionTests
             ]
         };
 
-        var snapshot = 창고원장업무투영Snapshot.생성(ledger);
+        var snapshot = 입출고원장업무투영Snapshot.생성(ledger);
 
         Assert.NotNull(snapshot);
         Assert.Equal(310, snapshot!.출고예정Id);
@@ -205,7 +205,7 @@ public sealed class CommunityLedgerBusinessProjectionTests
             }
         };
 
-        var snapshot = 창고원장업무투영Snapshot.생성(ledger);
+        var snapshot = 입출고원장업무투영Snapshot.생성(ledger);
 
         Assert.NotNull(snapshot);
         Assert.Equal(21, snapshot!.입고요청Id);
@@ -228,7 +228,7 @@ public sealed class CommunityLedgerBusinessProjectionTests
             }
         };
 
-        var snapshot = 창고원장업무투영Snapshot.생성(ledger);
+        var snapshot = 입출고원장업무투영Snapshot.생성(ledger);
 
         Assert.NotNull(snapshot);
         Assert.Equal("ORDER-9", snapshot!.주문참조번호);

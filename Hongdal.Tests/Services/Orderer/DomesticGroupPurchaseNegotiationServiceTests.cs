@@ -6,12 +6,12 @@ namespace Hongdal.Tests.Services.Orderer;
 public sealed class DomesticGroupPurchaseNegotiationServiceTests
 {
     [Fact]
-    public void AppendEvent_PublishesMaskedProcessWithoutInternalUserOrContactDetails()
+    public async Task AppendEvent_PublishesMaskedProcessWithoutInternalUserOrContactDetails()
     {
         var service = CreateService();
         var campaignId = Guid.NewGuid();
 
-        service.AppendEvent(
+        await service.AppendEventAsync(
             campaignId,
             "internal-user-197",
             new DomesticGroupPurchaseNegotiationEventRequest
@@ -22,7 +22,7 @@ public sealed class DomesticGroupPurchaseNegotiationServiceTests
                 PublicSummary = "500kg 중 420kg은 금요일, 80kg은 토요일 분할 출하를 제안합니다."
             });
 
-        var timeline = service.GetTimeline(campaignId);
+        var timeline = await service.GetTimelineAsync(campaignId);
 
         Assert.True(timeline.CommunityVisible);
         Assert.False(timeline.ContactDetailsDisclosed);
@@ -35,11 +35,11 @@ public sealed class DomesticGroupPurchaseNegotiationServiceTests
     [Theory]
     [InlineData("연락은 producer@example.com 으로 주세요")]
     [InlineData("연락처는 010-1234-5678 입니다")]
-    public void AppendEvent_RejectsContactDetailsInPublicText(string publicSummary)
+    public async Task AppendEvent_RejectsContactDetailsInPublicText(string publicSummary)
     {
         var service = CreateService();
 
-        var error = Assert.Throws<ArgumentException>(() => service.AppendEvent(
+        var error = await Assert.ThrowsAsync<ArgumentException>(() => service.AppendEventAsync(
             Guid.NewGuid(),
             "user-1",
             new DomesticGroupPurchaseNegotiationEventRequest
@@ -53,11 +53,11 @@ public sealed class DomesticGroupPurchaseNegotiationServiceTests
     }
 
     [Fact]
-    public void OpenIssue_RejectsDeliberationOutsideOneTo168Hours()
+    public async Task OpenIssue_RejectsDeliberationOutsideOneTo168Hours()
     {
         var service = CreateService();
 
-        var error = Assert.Throws<ArgumentOutOfRangeException>(() => service.OpenIssue(
+        var error = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => service.OpenIssueAsync(
             Guid.NewGuid(),
             "user-1",
             NewIssueRequest(deliberationHours: 169)));
@@ -66,16 +66,16 @@ public sealed class DomesticGroupPurchaseNegotiationServiceTests
     }
 
     [Fact]
-    public void ResolveIssue_BeforeDeliberationClose_IsRejected()
+    public async Task ResolveIssue_BeforeDeliberationClose_IsRejected()
     {
         var clock = new FakeNegotiationClock(new DateTimeOffset(2026, 7, 15, 0, 0, 0, TimeSpan.Zero));
         var service = CreateService(clock);
         var campaignId = Guid.NewGuid();
-        var issue = service.OpenIssue(campaignId, "user-1", NewIssueRequest());
-        service.AddPosition(campaignId, issue.IssueId, "user-1", NewPositionRequest("대표 박○○"));
-        service.AddPosition(campaignId, issue.IssueId, "user-2", NewPositionRequest("생산자 김○○"));
+        var issue = await service.OpenIssueAsync(campaignId, "user-1", NewIssueRequest());
+        await service.AddPositionAsync(campaignId, issue.IssueId, "user-1", NewPositionRequest("대표 박○○"));
+        await service.AddPositionAsync(campaignId, issue.IssueId, "user-2", NewPositionRequest("생산자 김○○"));
 
-        var error = Assert.Throws<InvalidOperationException>(() => service.ResolveIssue(
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => service.ResolveIssueAsync(
             campaignId,
             issue.IssueId,
             "user-1",
@@ -85,32 +85,32 @@ public sealed class DomesticGroupPurchaseNegotiationServiceTests
     }
 
     [Fact]
-    public void ResolveIssue_RequiresTwoDistinctParticipants_AndResolverParticipation()
+    public async Task ResolveIssue_RequiresTwoDistinctParticipants_AndResolverParticipation()
     {
         var clock = new FakeNegotiationClock(new DateTimeOffset(2026, 7, 15, 0, 0, 0, TimeSpan.Zero));
         var service = CreateService(clock);
         var campaignId = Guid.NewGuid();
-        var issue = service.OpenIssue(campaignId, "reporter", NewIssueRequest(deliberationHours: 1));
-        service.AddPosition(campaignId, issue.IssueId, "user-1", NewPositionRequest("대표 박○○"));
-        service.AddPosition(campaignId, issue.IssueId, "user-1", NewPositionRequest("대표 박○○", "대안을 보완합니다."));
+        var issue = await service.OpenIssueAsync(campaignId, "reporter", NewIssueRequest(deliberationHours: 1));
+        await service.AddPositionAsync(campaignId, issue.IssueId, "user-1", NewPositionRequest("대표 박○○"));
+        await service.AddPositionAsync(campaignId, issue.IssueId, "user-1", NewPositionRequest("대표 박○○", "대안을 보완합니다."));
         clock.Advance(TimeSpan.FromHours(2));
 
-        var participantError = Assert.Throws<InvalidOperationException>(() => service.ResolveIssue(
+        var participantError = await Assert.ThrowsAsync<InvalidOperationException>(() => service.ResolveIssueAsync(
             campaignId,
             issue.IssueId,
             "user-1",
             NewResolutionRequest()));
         Assert.Contains("서로 다른 구성원 2명", participantError.Message);
 
-        service.AddPosition(campaignId, issue.IssueId, "user-2", NewPositionRequest("생산자 김○○"));
-        var resolverError = Assert.Throws<InvalidOperationException>(() => service.ResolveIssue(
+        await service.AddPositionAsync(campaignId, issue.IssueId, "user-2", NewPositionRequest("생산자 김○○"));
+        var resolverError = await Assert.ThrowsAsync<InvalidOperationException>(() => service.ResolveIssueAsync(
             campaignId,
             issue.IssueId,
             "observer-3",
             NewResolutionRequest()));
         Assert.Contains("의견을 남긴 구성원", resolverError.Message);
 
-        var resolved = service.ResolveIssue(
+        var resolved = await service.ResolveIssueAsync(
             campaignId,
             issue.IssueId,
             "user-1",
@@ -120,7 +120,7 @@ public sealed class DomesticGroupPurchaseNegotiationServiceTests
         Assert.NotNull(resolved.Resolution);
         Assert.False(resolved.ContactDetailsDisclosed);
         Assert.Contains(
-            service.GetTimeline(campaignId).Events,
+            (await service.GetTimelineAsync(campaignId)).Events,
             item => item.EventTypeCode == DomesticGroupPurchaseNegotiationEventTypeCodes.Resolution);
     }
 

@@ -63,6 +63,25 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanBuilderTests
     }
 
     [Fact]
+    public void Preview_DedicatedWarehouseStorageOnly_AddsInboundWithoutOutbound()
+    {
+        var request = CreateRequest(DomesticGroupPurchaseFulfillmentRouteCodes.DedicatedWarehouse);
+        request.HubReferenceKey = "dedicated-warehouse:sample";
+        request.HubDisplayName = "공동구매 전용 창고";
+        request.RequiresStorage = true;
+        request.RequiresSorting = false;
+        request.RequiresLastMileDelivery = false;
+        SetVerifiedHubCapabilities(request, supportsStorage: true);
+
+        var result = DomesticGroupPurchaseFulfillmentPlanBuilder.Preview(request);
+
+        Assert.True(result.OrderPlacementReady);
+        Assert.Contains(result.LedgerNodes, x => x.NodeId == "dedicated-warehouse-inbound");
+        Assert.DoesNotContain(result.LedgerNodes, x => x.NodeId == "dedicated-warehouse-outbound");
+        Assert.DoesNotContain(result.LedgerNodes, x => x.NodeId == "transport-from-dedicated-warehouse");
+    }
+
+    [Fact]
     public async Task CreateOrderDraftAsync_DoesNotPlaceOrderOrPersistLedgers_AndLimitsReadToOwner()
     {
         var service = new DomesticGroupPurchaseFulfillmentPlanService(

@@ -9,12 +9,14 @@ public static class DomesticGroupPurchaseFulfillmentRouteCodes
 {
     public const string TraditionalMarketHub = "traditional-market-hub";
     public const string ThirdPartyLogistics = "third-party-logistics";
+    public const string DedicatedWarehouse = "dedicated-warehouse";
     public const string DirectCollectionPoint = "direct-collection-point";
 
     public static IReadOnlySet<string> All { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         TraditionalMarketHub,
         ThirdPartyLogistics,
+        DedicatedWarehouse,
         DirectCollectionPoint
     };
 }
@@ -63,6 +65,7 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanRequest
 public sealed class DomesticGroupPurchaseFulfillmentLedgerNode
 {
     public string NodeId { get; set; } = string.Empty;
+    public string LedgerId { get; set; } = string.Empty;
     public string LedgerTemplateKey { get; set; } = string.Empty;
     public string IncludedLedgerRole { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
@@ -92,6 +95,7 @@ public sealed class DomesticGroupPurchaseFulfillmentPlanResponse
     public string RouteCode { get; set; } = string.Empty;
     public string RouteLabel { get; set; } = string.Empty;
     public string OrderLedgerNodeId { get; set; } = "order-root";
+    public string OrderLedgerId { get; set; } = string.Empty;
     public bool OrderPlacementReady { get; set; }
     public bool LedgersPersisted { get; set; }
     public bool OrderPlaced { get; set; }
@@ -197,6 +201,33 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
                 if (request.RequiresLastMileDelivery)
                 {
                     AddTransport(nodes, "transport-to-destination", "3PL → 공동 수령지 운송", 5);
+                }
+                break;
+
+            case DomesticGroupPurchaseFulfillmentRouteCodes.DedicatedWarehouse:
+                AddTransport(nodes, "transport-to-dedicated-warehouse", "생산지 → 전용 창고 운송", 2);
+                nodes.Add(Node(
+                    "dedicated-warehouse-inbound",
+                    CommunityLedgerTemplateKeys.WarehouseInbound,
+                    주문원장포함역할.창고입고,
+                    "전용 창고 입고·검수 원장",
+                    ResolveHubLabel(request, "전용 창고"),
+                    "전용 보관 장소 입고, 수량 검수와 재고 인계",
+                    3));
+                if (request.RequiresSorting || request.RequiresLastMileDelivery)
+                {
+                    nodes.Add(Node(
+                        "dedicated-warehouse-outbound",
+                        CommunityLedgerTemplateKeys.WarehouseOutbound,
+                        주문원장포함역할.창고출고,
+                        "전용 창고 출고 원장",
+                        ResolveHubLabel(request, "전용 창고"),
+                        request.RequiresSorting ? "참여자·수령지 단위 분류와 출고" : "공동 수령 단위 출고",
+                        4));
+                }
+                if (request.RequiresLastMileDelivery)
+                {
+                    AddTransport(nodes, "transport-from-dedicated-warehouse", "전용 창고 → 최종 도착지 운송", 5);
                 }
                 break;
 
@@ -459,6 +490,7 @@ public static class DomesticGroupPurchaseFulfillmentPlanBuilder
         {
             DomesticGroupPurchaseFulfillmentRouteCodes.TraditionalMarketHub => "전통시장 공동물류 거점",
             DomesticGroupPurchaseFulfillmentRouteCodes.ThirdPartyLogistics => "3PL 입출고 거점",
+            DomesticGroupPurchaseFulfillmentRouteCodes.DedicatedWarehouse => "전용 창고 입고·보관",
             _ => "공동 수령·집합지 직송"
         };
 

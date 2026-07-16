@@ -216,6 +216,7 @@ public sealed class DomesticGroupPurchaseVehicleRecommendationServiceTests
         public Task<공동구매자동집단응답> 개별주문원장연결Async(
             string 자동집단Id,
             string 수요Id,
+            string 공동구매주문집계원장Id,
             string 개별주문원장Id,
             string 입고예정원장Id,
             CancellationToken cancellationToken = default)

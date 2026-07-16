@@ -41,6 +41,7 @@ public sealed class 공동구매자동집단화UseCaseTests
         Assert.Equal(창고유형코드.가상창고, demand.도착창고유형);
         Assert.Equal("warehouse:101:receiving-address", demand.수령지주소참조키);
         Assert.Equal(공동구매개별주문입고상태코드.입고예정, demand.입고의미상태);
+        Assert.Equal("group-order-ledger-1", demand.공동구매주문집계원장Id);
         Assert.Equal("individual-order-ledger-1", demand.개별주문원장Id);
         Assert.Equal("inbound-planned-ledger-1", demand.입고예정원장Id);
     }
@@ -102,6 +103,7 @@ public sealed class 공동구매자동집단화UseCaseTests
         {
             Called = true;
             return Task.FromResult(new 공동구매개별주문원장연결결과(
+                "group-order-ledger-1",
                 "individual-order-ledger-1",
                 "inbound-planned-ledger-1"));
         }
@@ -160,11 +162,14 @@ public sealed class 공동구매자동집단화UseCaseTests
         public Task<공동구매자동집단응답> 개별주문원장연결Async(
             string 자동집단Id,
             string 수요Id,
+            string 공동구매주문집계원장Id,
             string 개별주문원장Id,
             string 입고예정원장Id,
             CancellationToken cancellationToken = default)
         {
             var demand = _group!.수요목록.Single(x => x.수요Id == 수요Id);
+            _group.공동구매주문집계원장Id = 공동구매주문집계원장Id;
+            demand.공동구매주문집계원장Id = 공동구매주문집계원장Id;
             demand.개별주문원장Id = 개별주문원장Id;
             demand.입고예정원장Id = 입고예정원장Id;
             demand.입고의미상태 = 공동구매개별주문입고상태코드.입고예정;

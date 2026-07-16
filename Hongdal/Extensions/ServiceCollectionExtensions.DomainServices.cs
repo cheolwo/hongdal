@@ -53,14 +53,14 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<ICommunityGroupPurchaseDemandHandoff, CommunityVoteOrdererDemandHandoff>();
         services.AddSingleton<ICommunityProducerMemberDirectory, UnconnectedCommunityProducerMemberDirectory>();
         services.AddSingleton<ICommunityGroupPurchaseRepresentativeDirectory, UnconnectedCommunityGroupPurchaseRepresentativeDirectory>();
-        services.AddSingleton<IDomesticProducerContactRequestDraftStore, InMemoryDomesticProducerContactRequestDraftStore>();
-        services.AddSingleton<IDomesticProducerSupplyOfferDraftStore, InMemoryDomesticProducerSupplyOfferDraftStore>();
+        services.AddSingleton<IDomesticProducerContactRequestDraftStore, MongoDomesticProducerContactRequestDraftStore>();
+        services.AddSingleton<IDomesticProducerSupplyOfferDraftStore, MongoDomesticProducerSupplyOfferDraftStore>();
         services.AddScoped<IDomesticGroupPurchaseProducerConnectionService, DomesticGroupPurchaseProducerConnectionService>();
-        services.AddSingleton<IDomesticGroupPurchaseFulfillmentOrderDraftStore, InMemoryDomesticGroupPurchaseFulfillmentOrderDraftStore>();
+        services.AddSingleton<IDomesticGroupPurchaseFulfillmentOrderDraftStore, MongoDomesticGroupPurchaseFulfillmentOrderDraftStore>();
         services.AddScoped<IDomesticGroupPurchaseFulfillmentPlanService, DomesticGroupPurchaseFulfillmentPlanService>();
         services.AddScoped<IDomesticGroupPurchaseVehicleRecommendationService, DomesticGroupPurchaseVehicleRecommendationService>();
         services.AddSingleton<IDomesticGroupPurchaseNegotiationClock, SystemDomesticGroupPurchaseNegotiationClock>();
-        services.AddSingleton<IDomesticGroupPurchaseNegotiationStore, InMemoryDomesticGroupPurchaseNegotiationStore>();
+        services.AddSingleton<IDomesticGroupPurchaseNegotiationStore, MongoDomesticGroupPurchaseNegotiationStore>();
         services.AddScoped<IDomesticGroupPurchaseNegotiationService, DomesticGroupPurchaseNegotiationService>();
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
@@ -93,7 +93,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I원장다이어그램실시간알림Service, 원장다이어그램SignalR알림Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();
         services.AddScoped<I원장업무투영동기화Handler, 운송원장업무투영Handler>();
-        services.AddScoped<I원장업무투영동기화Handler, 창고원장업무투영Handler>();
+        services.AddScoped<I원장업무투영동기화Handler, 입출고원장업무투영Handler>();
         services.AddScoped<I원장업무투영동기화Handler, 음식주문원장업무투영Handler>();
         services.AddScoped<I운송원장Mongo동기화Service, 운송원장Mongo동기화Service>();
         services.AddScoped<I음식마트원장Mongo동기화Service, 음식마트원장Mongo동기화Service>();

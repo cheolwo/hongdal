@@ -22,10 +22,14 @@ namespace Hongdal.Controllers.Orderer;
 public sealed class 공동구매수요투표Controller : ControllerBase
 {
     private readonly I커뮤니티투표UseCase _useCase;
+    private readonly I공동구매원장절차Service _ledgerWorkflow;
 
-    public 공동구매수요투표Controller(I커뮤니티투표UseCase useCase)
+    public 공동구매수요투표Controller(
+        I커뮤니티투표UseCase useCase,
+        I공동구매원장절차Service ledgerWorkflow)
     {
         _useCase = useCase;
+        _ledgerWorkflow = ledgerWorkflow;
     }
 
     [HttpGet]
@@ -59,6 +63,38 @@ public sealed class 공동구매수요투표Controller : ControllerBase
         }
 
         return this.ToActionResult(result);
+    }
+
+    [HttpGet("{voteId:guid}/ledger-progress")]
+    public async Task<IActionResult> GetLedgerProgress(
+        Guid voteId,
+        CancellationToken cancellationToken)
+    {
+        var progress = await _ledgerWorkflow.조회Async(voteId, cancellationToken);
+        return progress is null ? NotFound() : Ok(progress);
+    }
+
+    [HttpPost("{voteId:guid}/ledger-progress")]
+    public async Task<IActionResult> AdvanceLedgerProgress(
+        Guid voteId,
+        [FromBody] CommunityGroupPurchaseLedgerProgressRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var progress = await _ledgerWorkflow.진행Async(
+                voteId,
+                request,
+                User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? User.Identity?.Name
+                ?? "group-purchase-user",
+                cancellationToken);
+            return progress is null ? NotFound() : Ok(progress);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
     }
 
     [HttpPost]

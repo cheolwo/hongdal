@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Orderer;
+using Hongdal.Services.Community;
 
 namespace Hongdal.Services.Orderer;
 
@@ -162,17 +164,38 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
     private readonly ICommunityGroupPurchaseRepresentativeDirectory representativeDirectory;
     private readonly IDomesticProducerContactRequestDraftStore draftStore;
     private readonly IDomesticProducerSupplyOfferDraftStore supplyOfferDraftStore;
+    private readonly I커뮤니티원장저장소? ledgerStore;
+    private readonly I공동구매원장절차Service? ledgerWorkflow;
 
     public DomesticGroupPurchaseProducerConnectionService(
         ICommunityProducerMemberDirectory producerDirectory,
         ICommunityGroupPurchaseRepresentativeDirectory representativeDirectory,
         IDomesticProducerContactRequestDraftStore draftStore,
         IDomesticProducerSupplyOfferDraftStore supplyOfferDraftStore)
+        : this(
+            producerDirectory,
+            representativeDirectory,
+            draftStore,
+            supplyOfferDraftStore,
+            null,
+            null)
+    {
+    }
+
+    public DomesticGroupPurchaseProducerConnectionService(
+        ICommunityProducerMemberDirectory producerDirectory,
+        ICommunityGroupPurchaseRepresentativeDirectory representativeDirectory,
+        IDomesticProducerContactRequestDraftStore draftStore,
+        IDomesticProducerSupplyOfferDraftStore supplyOfferDraftStore,
+        I커뮤니티원장저장소? ledgerStore,
+        I공동구매원장절차Service? ledgerWorkflow)
     {
         this.producerDirectory = producerDirectory;
         this.representativeDirectory = representativeDirectory;
         this.draftStore = draftStore;
         this.supplyOfferDraftStore = supplyOfferDraftStore;
+        this.ledgerStore = ledgerStore;
+        this.ledgerWorkflow = ledgerWorkflow;
     }
 
     public async Task<DomesticProducerCandidateQueryResponse> SearchCandidatesAsync(
@@ -256,7 +279,35 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
             GuidanceMessage = "연락 요청 초안만 서버 메모리에 보관했습니다. 실제 발송과 연락처 공개는 상대 수락 및 영구 저장소 연동 후 활성화됩니다."
         };
 
-        return await draftStore.SaveAsync(draft, cancellationToken);
+        var saved = await draftStore.SaveAsync(draft, cancellationToken);
+        await 공동구매원장블록기록Async(
+            saved.GroupPurchaseCampaignId,
+            new 커뮤니티원장블록Dto
+            {
+                BlockId = $"producer-contact-{saved.DraftId:N}",
+                BlockType = CommunityLedgerBlockTypes.Generic,
+                Title = "생산자 연락 요청 초안",
+                State = saved.StatusCode,
+                Data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["DraftId"] = saved.DraftId.ToString("D"),
+                    ["RequestedByUserId"] = saved.RequestedByUserId,
+                    ["ProducerCandidateKey"] = saved.ProducerCandidateKey,
+                    ["ProductSummary"] = saved.ProductSummary,
+                    ["RequestedQuantity"] = saved.RequestedQuantity.ToString(),
+                    ["MaximumAbsorptionQuantity"] = saved.MaximumAbsorptionQuantity.ToString(),
+                    ["QuantityUnit"] = saved.QuantityUnit,
+                    ["PackagingFormCode"] = saved.RequiredPackagingFormCode,
+                    ["PackagingUnitSummary"] = saved.PackagingUnitSummary,
+                    ["QualityGradeSummary"] = saved.QualityGradeSummary,
+                    ["Message"] = saved.Message
+                }
+            },
+            CommunityGroupPurchaseLedgerStageCodes.Counterparty,
+            "생산자 연락 요청 초안을 공동구매 원장에 기록했습니다.",
+            saved.RequestedByUserId,
+            cancellationToken);
+        return saved;
     }
 
     public async Task<DomesticProducerContactRequestDraftResponse?> GetDraftAsync(
@@ -377,7 +428,38 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
             GuidanceMessage = "생산자 공급 제안 초안만 서버 메모리에 보관했습니다. 대표가 수락하기 전에는 연락처가 공개되지 않으며 실제 거래도 확정되지 않습니다."
         };
 
-        return await supplyOfferDraftStore.SaveAsync(draft, cancellationToken);
+        var saved = await supplyOfferDraftStore.SaveAsync(draft, cancellationToken);
+        await 공동구매원장블록기록Async(
+            saved.GroupPurchaseCampaignId,
+            new 커뮤니티원장블록Dto
+            {
+                BlockId = $"producer-supply-offer-{saved.DraftId:N}",
+                BlockType = CommunityLedgerBlockTypes.Generic,
+                Title = "생산자 공급 제안 초안",
+                State = saved.StatusCode,
+                Data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["DraftId"] = saved.DraftId.ToString("D"),
+                    ["OfferedByUserId"] = saved.OfferedByUserId,
+                    ["RepresentativeCandidateKey"] = saved.RepresentativeCandidateKey,
+                    ["ProductSummary"] = saved.ProductSummary,
+                    ["AvailableQuantity"] = saved.AvailableQuantity.ToString(),
+                    ["MinimumTakeQuantity"] = saved.MinimumTakeQuantity.ToString(),
+                    ["QuantityUnit"] = saved.QuantityUnit,
+                    ["PackagingFormCodes"] = string.Join(",", saved.SupportedPackagingFormCodes),
+                    ["ExpectedPriceSummary"] = saved.ExpectedPriceSummary,
+                    ["SupplyDeadlineSummary"] = saved.SupplyDeadlineSummary,
+                    ["OfferReasonCode"] = saved.OfferReasonCode,
+                    ["QualityDisclosure"] = saved.QualityDisclosure,
+                    ["FoodSafetyConfirmed"] = saved.FoodSafetyConfirmed.ToString(),
+                    ["Message"] = saved.Message
+                }
+            },
+            CommunityGroupPurchaseLedgerStageCodes.SupplyNegotiation,
+            "생산자 공급 제안 초안을 공동구매 원장에 기록했습니다.",
+            saved.OfferedByUserId,
+            cancellationToken);
+        return saved;
     }
 
     public async Task<DomesticProducerSupplyOfferDraftResponse?> GetSupplyOfferDraftAsync(
@@ -457,6 +539,80 @@ public sealed class DomesticGroupPurchaseProducerConnectionService : IDomesticGr
                 ? "포장 규격과 양측 물량 조건이 맞아 세부 협의를 시작할 수 있습니다."
                 : "아직 맞지 않는 포장 또는 물량 조건이 있어 조정이 필요합니다."
         };
+    }
+
+    private async Task 공동구매원장블록기록Async(
+        Guid campaignId,
+        커뮤니티원장블록Dto block,
+        string stageCode,
+        string stageMemo,
+        string updatedBy,
+        CancellationToken cancellationToken)
+    {
+        if (ledgerStore is null || ledgerWorkflow is null)
+        {
+            return;
+        }
+
+        var progress = await ledgerWorkflow.조회Async(campaignId, cancellationToken)
+            ?? throw new InvalidOperationException("생산자 연결 기록을 저장할 공동구매 원장을 찾을 수 없습니다.");
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            var ledger = await ledgerStore.원장조회Async(progress.CommunityLedgerId, cancellationToken)
+                ?? throw new InvalidOperationException("생산자 연결 기록을 저장할 공동구매 원장 상세를 찾을 수 없습니다.");
+            var blocks = ledger.블록목록
+                .Where(x => !string.Equals(x.BlockId, block.BlockId, StringComparison.OrdinalIgnoreCase))
+                .Append(block)
+                .ToArray();
+            try
+            {
+                await ledgerStore.원장저장Async(
+                    new 커뮤니티원장저장요청
+                    {
+                        원장Id = ledger.원장Id,
+                        기대Revision = ledger.Revision,
+                        커뮤니티Id = ledger.커뮤니티Id,
+                        원장템플릿Key = ledger.원장템플릿Key,
+                        제목 = ledger.제목,
+                        원함 = ledger.원함,
+                        상태 = ledger.상태,
+                        현재단계Key = ledger.현재단계Key,
+                        대상OsCode = ledger.대상OsCode,
+                        대상OsName = ledger.대상OsName,
+                        생성자UserId = ledger.생성자UserId,
+                        생성자표시명 = ledger.생성자표시명,
+                        블록목록 = blocks,
+                        참여자목록 = ledger.참여자목록,
+                        포함원장목록 = ledger.포함원장목록,
+                        다이어그램스냅샷 = ledger.다이어그램스냅샷,
+                        외부참조 = ledger.외부참조,
+                        확장속성 = ledger.확장속성
+                    },
+                    updatedBy,
+                    cancellationToken);
+                break;
+            }
+            catch (InvalidOperationException) when (attempt == 0)
+            {
+                // 동시에 다른 원장 블록이 추가된 경우 최신 Revision으로 한 번 병합 재시도합니다.
+            }
+        }
+
+        var latestProgress = await ledgerWorkflow.조회Async(campaignId, cancellationToken) ?? progress;
+        if (CommunityGroupPurchaseLedgerStageCodes.OrderOf(stageCode)
+            > CommunityGroupPurchaseLedgerStageCodes.OrderOf(latestProgress.CurrentStageCode))
+        {
+            await ledgerWorkflow.진행Async(
+                campaignId,
+                new CommunityGroupPurchaseLedgerProgressRequest
+                {
+                    StageCode = stageCode,
+                    Memo = stageMemo,
+                    ExpectedRevision = latestProgress.Revision
+                },
+                updatedBy,
+                cancellationToken);
+        }
     }
 
     private static void ValidateOfferReason(string reasonCode)

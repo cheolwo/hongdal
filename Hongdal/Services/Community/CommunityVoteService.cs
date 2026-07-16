@@ -74,13 +74,16 @@ public class CommunityVoteService : ICommunityVoteService
 {
     private readonly ICommunityVoteStore _store;
     private readonly ICommunityGroupPurchaseDemandOutboxProcessor _demandOutboxProcessor;
+    private readonly I공동구매원장절차Service _ledgerWorkflow;
 
     internal CommunityVoteService(
         ICommunityVoteStore store,
-        ICommunityGroupPurchaseDemandOutboxProcessor demandOutboxProcessor)
+        ICommunityGroupPurchaseDemandOutboxProcessor demandOutboxProcessor,
+        I공동구매원장절차Service? ledgerWorkflow = null)
     {
         _store = store;
         _demandOutboxProcessor = demandOutboxProcessor;
+        _ledgerWorkflow = ledgerWorkflow ?? 빈공동구매원장절차Service.Instance;
     }
 
     public async Task<CommunityVoteResponse> CreateAsync(CommunityVoteCreateRequest request, CancellationToken cancellationToken)
@@ -137,16 +140,18 @@ public class CommunityVoteService : ICommunityVoteService
 
         var groupPurchase = CreateGroupPurchaseSettings(request, voteKind);
 
+        var voteId = Guid.NewGuid();
         var vote = new CommunityVoteRecord
         {
-            Id = Guid.NewGuid(),
+            Id = voteId,
             AppKey = Normalize(request.AppKey, "platform"),
             CommunityScope = Normalize(request.CommunityScope, "platform"),
             Title = request.Title.Trim(),
             Description = request.Description?.Trim() ?? string.Empty,
             VoteKind = voteKind,
             SourcePostId = request.SourcePostId,
-            CommunityLedgerId = NormalizeOptional(request.CommunityLedgerId),
+            CommunityLedgerId = NormalizeOptional(request.CommunityLedgerId)
+                ?? (groupPurchase is null ? null : 공동구매원장절차Service.원장Id생성(voteId)),
             AllowMultipleSelection = request.AllowMultipleSelection,
             ResolutionDocumentEnabled = request.ResolutionDocumentEnabled,
             SignatureRequired = request.SignatureRequired,
@@ -158,6 +163,10 @@ public class CommunityVoteService : ICommunityVoteService
         };
 
         await _store.AddAsync(vote, cancellationToken);
+        if (groupPurchase is not null)
+        {
+            await _ledgerWorkflow.조회Async(vote.Id, cancellationToken);
+        }
         return ToResponse(vote);
     }
 
@@ -254,6 +263,15 @@ public class CommunityVoteService : ICommunityVoteService
         vote.ClosedAtUtc = DateTime.UtcNow;
         vote.ClosedByDisplayName = Normalize(request.ClosedByDisplayName, "운영자");
         await SaveMutationAsync(vote, cancellationToken);
+        await _ledgerWorkflow.진행Async(
+            vote.Id,
+            new CommunityGroupPurchaseLedgerProgressRequest
+            {
+                StageCode = CommunityGroupPurchaseLedgerStageCodes.Counterparty,
+                Memo = "수요 모집을 마감하고 거래 상대 연결 단계로 진행했습니다."
+            },
+            vote.ClosedByDisplayName,
+            cancellationToken);
         return ToResponse(vote);
     }
 
@@ -341,6 +359,15 @@ public class CommunityVoteService : ICommunityVoteService
         };
 
         await SaveMutationAsync(vote, cancellationToken);
+        await _ledgerWorkflow.진행Async(
+            vote.Id,
+            new CommunityGroupPurchaseLedgerProgressRequest
+            {
+                StageCode = CommunityGroupPurchaseLedgerStageCodes.Resolution,
+                Memo = "공동구매 확정안 결의문을 작성했습니다."
+            },
+            vote.CreatedByDisplayName,
+            cancellationToken);
         return ToResolutionResponse(vote.ResolutionDocument);
     }
 
@@ -380,6 +407,19 @@ public class CommunityVoteService : ICommunityVoteService
             : CommunityVoteResolutionStatusCodes.PartiallySigned;
 
         await SaveMutationAsync(vote!, cancellationToken);
+        await _ledgerWorkflow.진행Async(
+            vote!.Id,
+            new CommunityGroupPurchaseLedgerProgressRequest
+            {
+                StageCode = document.Status == CommunityVoteResolutionStatusCodes.Signed
+                    ? CommunityGroupPurchaseLedgerStageCodes.FulfillmentPlan
+                    : CommunityGroupPurchaseLedgerStageCodes.Signature,
+                Memo = document.Status == CommunityVoteResolutionStatusCodes.Signed
+                    ? "필수 전자서명이 완료되어 이행 계획 단계로 진행했습니다."
+                    : "공동구매 결의문에 전자서명 증적을 추가했습니다."
+            },
+            request.SignerDisplayName,
+            cancellationToken);
         return ToResolutionResponse(document);
     }
 
@@ -407,6 +447,19 @@ public class CommunityVoteService : ICommunityVoteService
 
         document.LegalEffectNotice = $"{BuildLegalEffectNotice(vote!)} 검토자: {Normalize(request.ReviewedByDisplayName, "운영자")}.";
         await SaveMutationAsync(vote!, cancellationToken);
+        await _ledgerWorkflow.진행Async(
+            vote!.Id,
+            new CommunityGroupPurchaseLedgerProgressRequest
+            {
+                StageCode = document.SignatureBundle is null
+                    ? CommunityGroupPurchaseLedgerStageCodes.Resolution
+                    : CommunityGroupPurchaseLedgerStageCodes.Signature,
+                Memo = document.SignatureBundle is null
+                    ? "결의문 검토 결과를 원장에 기록했습니다."
+                    : "결의문 검토를 마치고 전자서명 단계로 진행했습니다."
+            },
+            request.ReviewedByDisplayName,
+            cancellationToken);
         return ToResolutionResponse(document);
     }
 
