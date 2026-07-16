@@ -27,6 +27,7 @@ public abstract class 업무작업ViewModelBase : ObservableObject
             }
 
             OnPropertyChanged(nameof(처리중));
+            OnPropertyChanged(nameof(실행가능));
             OnPropertyChanged(nameof(성공함));
             OnPropertyChanged(nameof(오류발생));
             OnPropertyChanged(nameof(취소됨));
@@ -58,6 +59,8 @@ public abstract class 업무작업ViewModelBase : ObservableObject
     }
 
     public bool 처리중 => 상태 == Api작업상태.처리중;
+    /// <summary>중복 제출을 막기 위해 현재 작업이 끝난 경우에만 새 조회·명령을 허용합니다.</summary>
+    public bool 실행가능 => !처리중;
     public bool 성공함 => 상태 == Api작업상태.성공;
     public bool 오류발생 => 상태 == Api작업상태.실패;
     public bool 취소됨 => 상태 == Api작업상태.취소됨;

@@ -272,12 +272,14 @@ public sealed class BaguaRoleTransitionPageViewModel : 조립ViewModelBase
         IHongdalJsonApiClient apiClient)
     {
         _workspaceResolver = workspaceResolver;
-        서버권한 = 하위ViewModel등록(new Bagua서버권한ViewModel());
-        전환Runtime = 하위ViewModel등록(new Bagua전환RuntimeViewModel(apiClient, 서버권한));
+        서버권한 = 하위ViewModel등록(new Bagua서버권한ViewModel(), 수명소유: true);
+        전환Runtime = 하위ViewModel등록(
+            new Bagua전환RuntimeViewModel(apiClient, 서버권한),
+            수명소유: true);
         _domains = domainFactory.CreateAll();
         foreach (var domain in _domains.Values)
         {
-            하위ViewModel등록(domain);
+            하위ViewModel등록(domain, 수명소유: true);
         }
     }
 

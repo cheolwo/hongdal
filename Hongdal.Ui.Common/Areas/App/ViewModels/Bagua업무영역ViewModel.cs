@@ -9,6 +9,12 @@ public enum BaguaApi요청형식
     MultipartForm
 }
 
+public enum BaguaCqrs요청유형
+{
+    조회,
+    명령
+}
+
 /// <summary>
 /// Bagua 업무 영역에서 사용하는 Controller 액션 한 개를 설명합니다.
 /// 경로 매개변수는 실제 원장·업무가 선택된 뒤 채웁니다.
@@ -23,6 +29,36 @@ public sealed record BaguaApi기능정의(
 {
     public bool 경로값필요 => RelativePath.Contains('{');
     public bool JsonClient호출가능 => 요청형식 == BaguaApi요청형식.Json;
+    public BaguaCqrs요청유형 Cqrs요청유형
+        => Method.Equals(HttpMethod.Get) ? BaguaCqrs요청유형.조회 : BaguaCqrs요청유형.명령;
+    public 업무조각유형 업무유형 => 분류();
+    public bool 명령다이얼로그사용가능
+        => Cqrs요청유형 == BaguaCqrs요청유형.명령 && JsonClient호출가능;
+    public 명령다이얼로그정책? 다이얼로그정책
+        => 명령다이얼로그사용가능 ? 명령다이얼로그정책.기본(표시명, 업무유형) : null;
+
+    private 업무조각유형 분류()
+    {
+        if (Method.Equals(HttpMethod.Get))
+        {
+            return 경로값필요 ? 업무조각유형.상세조회 : 업무조각유형.목록조회;
+        }
+
+        if (Method.Equals(HttpMethod.Delete))
+        {
+            return 업무조각유형.삭제;
+        }
+
+        if (Method.Equals(HttpMethod.Put) || Method.Equals(HttpMethod.Patch))
+        {
+            return 업무조각유형.수정;
+        }
+
+        return Key.StartsWith("create-", StringComparison.OrdinalIgnoreCase)
+               || Key.StartsWith("add-", StringComparison.OrdinalIgnoreCase)
+            ? 업무조각유형.등록
+            : 업무조각유형.처리;
+    }
 }
 
 public sealed record Bagua업무영역정의(
@@ -62,11 +98,17 @@ public static class Bagua업무영역카탈로그
             [
                 Api("common.sales-channels", "accounts", HttpMethod.Get, "accounts", "판매 채널 계정 조회"),
                 Api("common.sales-channels", "create-account", HttpMethod.Post, "accounts", "판매 채널 계정 등록"),
+                Api("common.sales-channels", "update-account", HttpMethod.Put, "accounts/{accountId}", "판매 채널 계정 수정"),
+                Api("common.sales-channels", "delete-account", HttpMethod.Delete, "accounts/{accountId}", "판매 채널 계정 삭제"),
                 Api("common.sales-channels", "products", HttpMethod.Get, "products", "판매 상품 조회"),
                 Api("common.sales-channels", "create-product", HttpMethod.Post, "products", "판매 상품 등록"),
+                Api("common.sales-channels", "update-product", HttpMethod.Put, "products/{productId}", "판매 상품 수정"),
+                Api("common.sales-channels", "delete-product", HttpMethod.Delete, "products/{productId}", "판매 상품 삭제"),
                 Api("common.sales-channels", "seed-products", HttpMethod.Post, "products/seed-samples", "샘플 상품 생성"),
                 Api("common.sales-channels", "listings", HttpMethod.Get, "listings", "출품 조회"),
-                Api("common.sales-channels", "create-listing", HttpMethod.Post, "listings", "출품 등록")
+                Api("common.sales-channels", "create-listing", HttpMethod.Post, "listings", "출품 등록"),
+                Api("common.sales-channels", "update-listing", HttpMethod.Put, "listings/{listingId}", "출품 수정"),
+                Api("common.sales-channels", "delete-listing", HttpMethod.Delete, "listings/{listingId}", "출품 삭제")
             ]),
         new(
             BaguaBusinessCodes.Warehouse,
@@ -74,10 +116,16 @@ public static class Bagua업무영역카탈로그
             [
                 Api("common.warehouse-operations", "warehouses", HttpMethod.Get, "warehouses", "창고 조회"),
                 Api("common.warehouse-operations", "create-warehouse", HttpMethod.Post, "warehouses", "창고 생성"),
+                Api("common.warehouse-operations", "update-warehouse", HttpMethod.Put, "warehouses/{warehouseId}", "창고 수정"),
+                Api("common.warehouse-operations", "delete-warehouse", HttpMethod.Delete, "warehouses/{warehouseId}", "창고 삭제"),
                 Api("common.warehouse-operations", "warehouse-users", HttpMethod.Get, "warehouses/{warehouseId}/users", "창고 사용자 조회"),
                 Api("common.warehouse-operations", "add-warehouse-user", HttpMethod.Post, "warehouses/{warehouseId}/users", "창고 사용자 추가"),
+                Api("common.warehouse-operations", "update-warehouse-user", HttpMethod.Put, "warehouses/{warehouseId}/users/{warehouseUserId}", "창고 사용자 수정"),
+                Api("common.warehouse-operations", "delete-warehouse-user", HttpMethod.Delete, "warehouses/{warehouseId}/users/{warehouseUserId}", "창고 사용자 삭제"),
                 Api("common.warehouse-operations", "inbounds", HttpMethod.Get, "inbounds", "입고 요청 조회"),
                 Api("common.warehouse-operations", "create-inbound", HttpMethod.Post, "inbounds", "입고 요청 생성"),
+                Api("common.warehouse-operations", "update-inbound", HttpMethod.Put, "inbounds/{inboundId}", "입고 요청 수정"),
+                Api("common.warehouse-operations", "delete-inbound", HttpMethod.Delete, "inbounds/{inboundId}", "입고 요청 취소"),
                 Api("common.warehouse-operations", "complete-inbound", HttpMethod.Post, "inbounds/{inboundId}/complete", "입고 완료"),
                 Api("common.warehouse-operations", "inventory", HttpMethod.Get, "inventory", "재고 조회"),
                 Api("common.warehouse-operations", "inspect", HttpMethod.Post, "inventory/{inboundItemId}/inspect", "입고 검수"),
@@ -152,7 +200,9 @@ public sealed class Bagua업무영역ViewModel : 조립ViewModelBase
         정의 = definition;
         _controllers = definition.ControllerKeys
             .Select(key => controllerDefinitions.TryGetValue(key, out var controller)
-                ? 하위ViewModel등록(new Controller기능ViewModel(client, controller))
+                ? 하위ViewModel등록(
+                    new Controller기능ViewModel(client, controller),
+                    수명소유: true)
                 : throw new KeyNotFoundException($"Bagua 업무 영역에 필요한 Controller가 없습니다: {key}"))
             .ToDictionary(controller => controller.Key, StringComparer.OrdinalIgnoreCase);
     }

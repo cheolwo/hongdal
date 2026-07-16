@@ -1,6 +1,9 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Hongdal.Ui.Common.Areas.App.Components;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Microsoft.AspNetCore.Components;
 
 namespace Hongdal.Tests.Ui.Common;
 
@@ -81,6 +84,47 @@ public sealed class 업무실행ViewModel기반Tests
         Assert.False(form.저장가능);
     }
 
+    [Fact]
+    public void 명령ViewModel은_표현라이브러리와무관한_다이얼로그정책을제공한다()
+    {
+        I명령ViewModel<object> command = new TestCommand();
+
+        Assert.True(command.실행가능);
+        Assert.Equal("테스트 삭제", command.다이얼로그정책.제목);
+        Assert.Equal("삭제", command.다이얼로그정책.확인버튼문구);
+        Assert.True(command.다이얼로그정책.파괴적명령);
+        Assert.True(command.다이얼로그정책.성공시닫기);
+    }
+
+    [Fact]
+    public void 조립ViewModel은_DI하위수명을소유하지않고_직접생성하위만폐기한다()
+    {
+        var injected = new TestDisposableViewModel();
+        var owned = new TestDisposableViewModel();
+        var parent = new TestCompositeViewModel(injected, owned);
+        var changeCount = 0;
+        parent.PropertyChanged += (_, _) => changeCount++;
+
+        Assert.Same(injected, parent.Injected);
+        Assert.Same(owned, parent.Owned);
+        injected.RaisePropertyChanged();
+        Assert.Equal(1, changeCount);
+
+        parent.Dispose();
+        injected.RaisePropertyChanged();
+
+        Assert.False(injected.Disposed);
+        Assert.True(owned.Disposed);
+        Assert.Equal(1, changeCount);
+    }
+
+    [Fact]
+    public void MvvmComponent는_컴포넌트단위ServiceScope를소유한다()
+    {
+        Assert.True(typeof(OwningComponentBase<TestDisposableViewModel>)
+            .IsAssignableFrom(typeof(TestMvvmComponent)));
+    }
+
     public sealed class TestForm : 업무입력ViewModelBase
     {
         private string _이름 = string.Empty;
@@ -91,5 +135,43 @@ public sealed class 업무실행ViewModel기반Tests
             get => _이름;
             set => 입력값설정(ref _이름, value);
         }
+    }
+
+    private sealed class TestCommand()
+        : 업무조각ViewModelBase("test-delete", "테스트 삭제", 업무조각유형.삭제), I명령ViewModel<object>
+    {
+        public object 초안 { get; } = new();
+
+        public Task<bool> 실행Async(CancellationToken cancellationToken = default)
+            => Task.FromResult(true);
+    }
+
+    private sealed class TestCompositeViewModel : 조립ViewModelBase
+    {
+        public TestCompositeViewModel(
+            TestDisposableViewModel injected,
+            TestDisposableViewModel owned)
+        {
+            Injected = 하위ViewModel등록(injected);
+            Owned = 하위ViewModel등록(owned, 수명소유: true);
+        }
+
+        public TestDisposableViewModel Injected { get; }
+        public TestDisposableViewModel Owned { get; }
+    }
+
+    private sealed class TestDisposableViewModel : INotifyPropertyChanged, IDisposable
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public bool Disposed { get; private set; }
+
+        public void RaisePropertyChanged()
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Disposed)));
+
+        public void Dispose() => Disposed = true;
+    }
+
+    private sealed class TestMvvmComponent : MvvmComponentBase<TestDisposableViewModel>
+    {
     }
 }

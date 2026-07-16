@@ -258,7 +258,7 @@ public abstract class 조립ViewModelBase : ObservableObject, IDisposable
     private readonly HashSet<INotifyPropertyChanged> _children = [];
     private readonly HashSet<IDisposable> _ownedDisposables = [];
 
-    protected T 하위ViewModel등록<T>(T child, bool 수명소유 = true)
+    protected T 하위ViewModel등록<T>(T child, bool 수명소유 = false)
         where T : class, INotifyPropertyChanged
     {
         if (_children.Add(child))

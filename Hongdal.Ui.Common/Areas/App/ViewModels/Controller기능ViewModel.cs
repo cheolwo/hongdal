@@ -43,7 +43,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                 경로(상대경로),
                 작업명 ?? $"{표시명} 조회",
                 notFound허용,
-                cancellationToken)));
+                cancellationToken)), 수명소유: true);
 
     public Api작업ViewModel<ControllerApi경로요청, TResult?> 경로조회<TResult>(
         string? 작업명 = null,
@@ -53,7 +53,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                 경로(request.상대경로, request.경로값),
                 작업명 ?? $"{표시명} 조회",
                 notFound허용,
-                cancellationToken)));
+                cancellationToken)), 수명소유: true);
 
     public Api작업ViewModel<TRequest, TResult?> 명령<TRequest, TResult>(
         HttpMethod method,
@@ -65,7 +65,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                 경로(상대경로),
                 request,
                 작업명 ?? $"{표시명} 명령",
-                cancellationToken: cancellationToken)));
+                cancellationToken: cancellationToken)), 수명소유: true);
 
     public Api작업ViewModel<ControllerApi요청<TRequest>, TResult?> 경로명령<TRequest, TResult>(
         HttpMethod method,
@@ -76,7 +76,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                 경로(request.상대경로, request.경로값),
                 request.요청,
                 작업명 ?? $"{표시명} 명령",
-                cancellationToken: cancellationToken)));
+                cancellationToken: cancellationToken)), 수명소유: true);
 
     public Api작업ViewModel<TRequest, Api작업완료> 명령<TRequest>(
         HttpMethod method,
@@ -92,7 +92,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                     작업명 ?? $"{표시명} 명령",
                     cancellationToken);
                 return Api작업완료.값;
-            }));
+            }), 수명소유: true);
 
     public Api작업ViewModel<ControllerApi경로요청, TResult?> 경로명령<TResult>(
         HttpMethod method,
@@ -102,7 +102,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                 method,
                 경로(request.상대경로, request.경로값),
                 작업명 ?? $"{표시명} 명령",
-                cancellationToken: cancellationToken)));
+                cancellationToken: cancellationToken)), 수명소유: true);
 
     public Api작업ViewModel<ControllerApi경로요청, Api작업완료> 경로명령(
         HttpMethod method,
@@ -116,7 +116,7 @@ public sealed class Controller기능ViewModel : 조립ViewModelBase
                     작업명 ?? $"{표시명} 명령",
                     cancellationToken);
                 return Api작업완료.값;
-            }));
+            }), 수명소유: true);
 
     public string 경로(
         string? 상대경로 = null,
@@ -162,7 +162,9 @@ public abstract class Controller기능모음ViewModel : 조립ViewModelBase
         IEnumerable<Controller기능정의> definitions)
     {
         _controllers = definitions
-            .Select(definition => 하위ViewModel등록(new Controller기능ViewModel(client, definition)))
+            .Select(definition => 하위ViewModel등록(
+                new Controller기능ViewModel(client, definition),
+                수명소유: true))
             .ToDictionary(controller => controller.Key, StringComparer.OrdinalIgnoreCase);
     }
 

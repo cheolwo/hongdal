@@ -77,7 +77,7 @@ public sealed class BaguaRoleTransitionPageViewModelTests
 
         Assert.Equal(5, definitions.Count);
         Assert.Equal(5, definitions.Select(definition => definition.BusinessCode).Distinct().Count());
-        Assert.Equal(55, definitions.Sum(definition => definition.Api기능.Count));
+        Assert.Equal(67, definitions.Sum(definition => definition.Api기능.Count));
         Assert.Equal(
             2,
             definitions.SelectMany(definition => definition.Api기능)

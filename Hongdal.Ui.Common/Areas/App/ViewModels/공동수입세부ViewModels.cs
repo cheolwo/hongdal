@@ -84,7 +84,7 @@ public sealed class 공동수입선적등록ViewModel(공동수입선적통관Vi
         원본,
         "group-import-shipment-save",
         "공동수입 선적 등록",
-        업무조각유형.등록), I명령ViewModel<공동수입선적초안ViewModel>
+        업무조각유형.등록), I등록ViewModel<공동수입선적초안ViewModel>
 {
     public 공동수입선적초안ViewModel 초안 => 원본.선적초안;
     public 공동구매해외선적추적Dto? 결과 => 원본.현재선적;
@@ -97,7 +97,7 @@ public sealed class 공동수입선적이벤트등록ViewModel(공동수입선�
         원본,
         "group-import-shipment-event-create",
         "공동수입 선적 이벤트 등록",
-        업무조각유형.등록), I명령ViewModel<공동수입선적이벤트초안ViewModel>
+        업무조각유형.등록), I등록ViewModel<공동수입선적이벤트초안ViewModel>
 {
     public 공동수입선적이벤트초안ViewModel 초안 => 원본.이벤트초안;
     public 공동구매해외선적추적Dto? 결과 => 원본.현재선적;

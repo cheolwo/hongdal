@@ -46,7 +46,7 @@ public sealed class 공동구매제안등록조각ViewModel(공동구매제안Vi
         원본,
         "group-purchase-proposal-create",
         "공동구매 제안 등록",
-        업무조각유형.등록), I명령ViewModel<공동구매제안ViewModel>
+        업무조각유형.등록), I등록ViewModel<공동구매제안ViewModel>
 {
     public 공동구매제안ViewModel 초안 => 원본;
     public CommunityVoteResponse? 결과 => 원본.생성된공동구매;
@@ -59,7 +59,7 @@ public sealed class 공동구매수요참여등록ViewModel(공동구매수요�
         원본,
         "group-purchase-demand-participation-create",
         "공동구매 수요 참여",
-        업무조각유형.등록), I명령ViewModel<공동구매수요참여ViewModel>
+        업무조각유형.등록), I등록ViewModel<공동구매수요참여ViewModel>
 {
     public 공동구매수요참여ViewModel 초안 => 원본;
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -71,7 +71,7 @@ public sealed class 공동구매이의등록ViewModel(공동구매이의검토Vi
         원본,
         "group-purchase-objection-create",
         "공동구매 이의 등록",
-        업무조각유형.등록), I명령ViewModel<공동구매이의검토ViewModel>
+        업무조각유형.등록), I등록ViewModel<공동구매이의검토ViewModel>
 {
     public 공동구매이의검토ViewModel 초안 => 원본;
     public IReadOnlyList<PlatformCommunityPostCommentResponse> 이의목록 => 원본.전체이의;
@@ -96,7 +96,7 @@ public sealed class 공동구매결의문등록ViewModel(공동구매결의ViewM
         원본,
         "group-purchase-resolution-create",
         "공동구매 결의문 등록",
-        업무조각유형.등록), I명령ViewModel<공동구매결의ViewModel>
+        업무조각유형.등록), I등록ViewModel<공동구매결의ViewModel>
 {
     public 공동구매결의ViewModel 초안 => 원본;
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -127,7 +127,7 @@ public sealed class 공동구매전자서명등록ViewModel(공동구매전자�
         원본,
         "group-purchase-resolution-signature-create",
         "공동구매 전자서명 등록",
-        업무조각유형.등록), I명령ViewModel<공동구매전자서명초안>
+        업무조각유형.등록), I등록ViewModel<공동구매전자서명초안>
 {
     public 공동구매전자서명초안 초안 { get; } = new();
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -163,7 +163,7 @@ public sealed class 공동구매발주초안등록ViewModel(공동구매이행�
         원본,
         "group-purchase-order-draft-create",
         "공동구매 발주 초안 등록",
-        업무조각유형.등록), I명령ViewModel<DomesticGroupPurchaseFulfillmentPlanRequest>
+        업무조각유형.등록), I등록ViewModel<DomesticGroupPurchaseFulfillmentPlanRequest>
 {
     public DomesticGroupPurchaseFulfillmentPlanRequest 초안 => 원본.초안;
     public DomesticGroupPurchaseFulfillmentOrderDraftResponse? 결과 => 원본.저장된발주초안;

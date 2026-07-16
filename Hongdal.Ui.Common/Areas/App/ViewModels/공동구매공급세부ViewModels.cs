@@ -21,7 +21,7 @@ public sealed class 공동구매생산자연락요청ViewModel(공동구매생�
         원본,
         "group-purchase-producer-contact-create",
         "생산자 연락 요청",
-        업무조각유형.등록), I명령ViewModel<DomesticProducerContactRequestDraftRequest>
+        업무조각유형.등록), I등록ViewModel<DomesticProducerContactRequestDraftRequest>
 {
     public DomesticProducerContactRequestDraftRequest 초안 => 원본.연락요청초안;
     public DomesticProducerContactRequestDraftResponse? 결과 => 원본.저장된연락요청;
@@ -50,7 +50,7 @@ public sealed class 공동구매공급제안등록ViewModel(공동구매공급�
         원본,
         "group-purchase-supply-offer-create",
         "공동구매 공급 제안 등록",
-        업무조각유형.등록), I명령ViewModel<DomesticProducerSupplyOfferDraftRequest>
+        업무조각유형.등록), I등록ViewModel<DomesticProducerSupplyOfferDraftRequest>
 {
     public DomesticProducerSupplyOfferDraftRequest 초안 => 원본.공급제안초안;
     public DomesticProducerSupplyOfferDraftResponse? 결과 => 원본.저장된공급제안;
@@ -94,7 +94,7 @@ public sealed class 공동구매협상이벤트등록ViewModel(공동구매협�
         원본,
         "group-purchase-negotiation-event-create",
         "공동구매 협상 이벤트 등록",
-        업무조각유형.등록), I명령ViewModel<DomesticGroupPurchaseNegotiationEventRequest>
+        업무조각유형.등록), I등록ViewModel<DomesticGroupPurchaseNegotiationEventRequest>
 {
     public DomesticGroupPurchaseNegotiationEventRequest 초안 => 원본.이벤트초안;
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -108,7 +108,7 @@ public sealed class 공동구매협상쟁점등록ViewModel(공동구매협상Vi
         원본,
         "group-purchase-negotiation-issue-create",
         "공동구매 협상 쟁점 등록",
-        업무조각유형.등록), I명령ViewModel<DomesticGroupPurchaseNegotiationIssueRequest>
+        업무조각유형.등록), I등록ViewModel<DomesticGroupPurchaseNegotiationIssueRequest>
 {
     public DomesticGroupPurchaseNegotiationIssueRequest 초안 => 원본.쟁점초안;
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -122,7 +122,7 @@ public sealed class 공동구매숙고의견등록ViewModel(공동구매협상Vi
         원본,
         "group-purchase-deliberation-position-create",
         "공동구매 숙고 의견 등록",
-        업무조각유형.등록), I명령ViewModel<DomesticGroupPurchaseDeliberationPositionRequest>
+        업무조각유형.등록), I등록ViewModel<DomesticGroupPurchaseDeliberationPositionRequest>
 {
     public DomesticGroupPurchaseDeliberationPositionRequest 초안 => 원본.숙고의견초안;
     public Guid? 선택된쟁점Id => 원본.선택된쟁점Id;

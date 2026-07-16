@@ -47,7 +47,34 @@ public sealed partial class 세부ViewModelApi호환성Tests
             features.Select(feature => $"{feature.ControllerKey}:{feature.Key}")
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Count());
-        Assert.Equal(32, features.Length);
+        Assert.Equal(44, features.Length);
+    }
+
+    [Fact]
+    public void Api기능은_Cqrs와_다이얼로그정책을_Http메서드에맞게제공한다()
+    {
+        var sales = Bagua업무영역카탈로그.Find(BaguaBusinessCodes.Sales);
+        var transport = Bagua업무영역카탈로그.Find(BaguaBusinessCodes.Transport);
+
+        var query = sales.Api기능.Single(feature => feature.Key == "accounts");
+        var create = sales.Api기능.Single(feature => feature.Key == "create-account");
+        var update = transport.Api기능.Single(feature => feature.Key == "update-request");
+        var delete = transport.Api기능.Single(feature => feature.Key == "delete-request");
+        var multipart = transport.Api기능.Single(feature => feature.Key == "bulk-confirm");
+
+        Assert.Equal(BaguaCqrs요청유형.조회, query.Cqrs요청유형);
+        Assert.False(query.명령다이얼로그사용가능);
+        Assert.Null(query.다이얼로그정책);
+
+        Assert.Equal(업무조각유형.등록, create.업무유형);
+        Assert.Equal("등록", create.다이얼로그정책!.확인버튼문구);
+        Assert.Equal(업무조각유형.수정, update.업무유형);
+        Assert.Equal("저장", update.다이얼로그정책!.확인버튼문구);
+        Assert.Equal(업무조각유형.삭제, delete.업무유형);
+        Assert.True(delete.다이얼로그정책!.파괴적명령);
+
+        Assert.Equal(BaguaCqrs요청유형.명령, multipart.Cqrs요청유형);
+        Assert.False(multipart.명령다이얼로그사용가능);
     }
 
     private static IReadOnlySet<ControllerRoute> ControllerRoutes(Type controllerType)

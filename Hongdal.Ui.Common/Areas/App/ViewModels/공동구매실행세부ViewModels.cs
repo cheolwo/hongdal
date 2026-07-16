@@ -24,7 +24,7 @@ public sealed class 공동구매자동수요등록ViewModel(공동구매자동�
         원본,
         "group-purchase-automatic-demand-create",
         "공동구매 자동수요 등록",
-        업무조각유형.등록), I명령ViewModel<공동구매자동수요등록Command>
+        업무조각유형.등록), I등록ViewModel<공동구매자동수요등록Command>
 {
     public 공동구매자동수요등록Command 초안 => 원본.수요초안;
     public 공동구매자동집단응답? 결과 => 원본.선택된자동집단;
@@ -54,7 +54,7 @@ public sealed class 공동구매주문하위원장연결ViewModel(공동구매�
         원본,
         "group-purchase-order-child-ledger-connect",
         "공동구매 주문 하위원장 연결",
-        업무조각유형.등록), I명령ViewModel<주문하위원장연결ClientRequest>
+        업무조각유형.등록), I등록ViewModel<주문하위원장연결ClientRequest>
 {
     public 주문하위원장연결ClientRequest 초안 => 원본.연결초안;
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -73,7 +73,7 @@ public sealed class 공동구매주문하위원장분리ViewModel(공동구매�
         원본,
         "group-purchase-order-child-ledger-disconnect",
         "공동구매 주문 하위원장 분리",
-        업무조각유형.삭제), I명령ViewModel<공동구매주문하위원장분리초안>
+        업무조각유형.삭제), I삭제ViewModel<공동구매주문하위원장분리초안>
 {
     public 공동구매주문하위원장분리초안 초안 { get; } = new();
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)
@@ -113,7 +113,7 @@ public sealed class 공동구매주문서명등록ViewModel(공동구매주문�
         원본,
         "group-purchase-order-signature-create",
         "공동구매 주문 서명 등록",
-        업무조각유형.등록), I명령ViewModel<주문원장서명등록ClientRequest>
+        업무조각유형.등록), I등록ViewModel<주문원장서명등록ClientRequest>
 {
     public 주문원장서명등록ClientRequest 초안 => 원본.서명등록초안;
     public Task<bool> 실행Async(CancellationToken cancellationToken = default)

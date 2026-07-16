@@ -110,15 +110,17 @@ public sealed class Bagua전환RuntimeViewModel : 조립ViewModelBase
     {
         _client = client;
         _서버권한 = 서버권한;
-        초안 = 하위ViewModel등록(new Bagua전환초안ViewModel());
-        _원본선택Context = 하위ViewModel등록(new 업무선택ContextViewModel());
+        초안 = 하위ViewModel등록(new Bagua전환초안ViewModel(), 수명소유: true);
+        _원본선택Context = 하위ViewModel등록(new 업무선택ContextViewModel(), 수명소유: true);
         기능메타데이터조회 = 하위ViewModel등록(new Api작업ViewModel<VersionFeatureFlagsResponse?>(
             cancellationToken => _client.GetAsync<VersionFeatureFlagsResponse>(
                 VersionFeatureFlagsPath,
                 "버전 기능 메타데이터 조회",
                 allowNotFound: false,
-                cancellationToken)));
-        실행작업 = 하위ViewModel등록(new Api작업ViewModel<BaguaApi실행요청, string?>(실행CoreAsync));
+                cancellationToken)), 수명소유: true);
+        실행작업 = 하위ViewModel등록(
+            new Api작업ViewModel<BaguaApi실행요청, string?>(실행CoreAsync),
+            수명소유: true);
     }
 
     public Bagua전환초안ViewModel 초안 { get; }
