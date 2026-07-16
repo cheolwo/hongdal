@@ -5,7 +5,7 @@ using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
-public sealed partial class 공동구매생산자연결ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매생산자연결ViewModel : 공동구매공급업무ViewModelBase, IDisposable
 {
     private readonly I공동구매공급Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -16,6 +16,7 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
         I공동구매공급Service service,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -198,7 +199,7 @@ public sealed partial class 공동구매생산자연결ViewModel : 공동구매�
     }
 }
 
-public sealed partial class 공동구매공급제안ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매공급제안ViewModel : 공동구매공급업무ViewModelBase, IDisposable
 {
     private readonly I공동구매공급Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -209,6 +210,7 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
         I공동구매공급Service service,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -403,7 +405,7 @@ public sealed partial class 공동구매공급제안ViewModel : 공동구매작�
 public sealed partial class 공동구매공급적합성ViewModel(
     I공동구매공급Service service,
     공동구매화면상태ViewModel 화면상태,
-    공동구매거래경로분기ViewModel 분기) : 공동구매작업ViewModelBase
+    공동구매거래경로분기ViewModel 분기) : 공동구매공급업무ViewModelBase(화면상태)
 {
     [ObservableProperty]
     public partial DomesticGroupPurchaseSupplyCompatibilityPreviewRequest 조건 { get; set; } = new()
@@ -461,7 +463,7 @@ public sealed partial class 공동구매공급적합성ViewModel(
     }
 }
 
-public sealed partial class 공동구매협상ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매협상ViewModel : 공동구매공급업무ViewModelBase, IDisposable
 {
     private readonly I공동구매공급Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -472,6 +474,7 @@ public sealed partial class 공동구매협상ViewModel : 공동구매작업View
         I공동구매공급Service service,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -741,18 +744,42 @@ public sealed class 공동구매공급기능ViewModel : 조립ViewModelBase
         공동구매생산자연결ViewModel 생산자연결,
         공동구매공급제안ViewModel 공급제안,
         공동구매공급적합성ViewModel 공급적합성,
-        공동구매협상ViewModel 협상)
+        공동구매협상ViewModel 협상,
+        공동구매생산자후보조회ViewModel 생산자후보조회,
+        공동구매생산자연락요청ViewModel 생산자연락요청,
+        공동구매대표후보조회ViewModel 대표후보조회,
+        공동구매공급제안등록ViewModel 공급제안등록,
+        공동구매공급적합성미리보기ViewModel 공급적합성미리보기,
+        공동구매협상이력조회ViewModel 협상이력조회,
+        공동구매협상이벤트등록ViewModel 협상이벤트등록,
+        공동구매협상쟁점등록ViewModel 협상쟁점등록,
+        공동구매숙고의견등록ViewModel 숙고의견등록,
+        공동구매협상쟁점합의ViewModel 협상쟁점합의)
     {
-        this.생산자연결 = 하위ViewModel등록(생산자연결);
-        this.공급제안 = 하위ViewModel등록(공급제안);
-        this.공급적합성 = 하위ViewModel등록(공급적합성);
-        this.협상 = 하위ViewModel등록(협상);
+        this.생산자연결 = 하위ViewModel등록(생산자연결, 수명소유: false);
+        this.공급제안 = 하위ViewModel등록(공급제안, 수명소유: false);
+        this.공급적합성 = 하위ViewModel등록(공급적합성, 수명소유: false);
+        this.협상 = 하위ViewModel등록(협상, 수명소유: false);
+        세부업무목록 =
+        [
+            하위ViewModel등록(생산자후보조회, 수명소유: false),
+            하위ViewModel등록(생산자연락요청, 수명소유: false),
+            하위ViewModel등록(대표후보조회, 수명소유: false),
+            하위ViewModel등록(공급제안등록, 수명소유: false),
+            하위ViewModel등록(공급적합성미리보기, 수명소유: false),
+            하위ViewModel등록(협상이력조회, 수명소유: false),
+            하위ViewModel등록(협상이벤트등록, 수명소유: false),
+            하위ViewModel등록(협상쟁점등록, 수명소유: false),
+            하위ViewModel등록(숙고의견등록, 수명소유: false),
+            하위ViewModel등록(협상쟁점합의, 수명소유: false)
+        ];
     }
 
     public 공동구매생산자연결ViewModel 생산자연결 { get; }
     public 공동구매공급제안ViewModel 공급제안 { get; }
     public 공동구매공급적합성ViewModel 공급적합성 { get; }
     public 공동구매협상ViewModel 협상 { get; }
+    public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
 
     public bool 처리중
         => 생산자연결.처리중 || 공급제안.처리중 || 공급적합성.처리중 || 협상.처리중;

@@ -22,49 +22,50 @@ public sealed record 판매실행단계ViewModel(
 /// 국내 판매채널 계정, 판매상품과 출품을 한 화면 흐름으로 관리합니다.
 /// 공동구매에서 확보한 상품을 실제 국내 판매로 넘기는 하위 ViewModel입니다.
 /// </summary>
-public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed class 국내판매ViewModel : 공동구매판매실행업무ViewModelBase, IDisposable
 {
     private readonly I판매채널Client _client;
+    private readonly 판매ViewModel _기본판매;
     private readonly 공동구매화면상태ViewModel _화면상태;
     private readonly 공동구매거래경로분기ViewModel _분기;
     private 공동구매실행기능ViewModel? _실행;
     private Guid? _대상공동구매Id;
-    private IReadOnlyList<판매채널계정항목응답> _계정목록 = [];
-    private IReadOnlyList<판매상품항목응답> _상품목록 = [];
-    private IReadOnlyList<채널출품항목응답> _출품목록 = [];
 
     public 국내판매ViewModel(
         I판매채널Client client,
+        판매ViewModel 기본판매,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기)
+        : base(화면상태, CommunityGroupPurchaseTradeRouteCodes.Domestic)
     {
         _client = client;
+        _기본판매 = 기본판매;
         _화면상태 = 화면상태;
         _분기 = 분기;
+        _기본판매.지원채널설정(CommerceChannelOrderSyncScopes.DomesticChannelTypes);
+        _기본판매.상태.PropertyChanged += 판매상태변경;
         _화면상태.PropertyChanged += 화면상태변경;
         _분기.PropertyChanged += 분기변경;
         공동구매변경동기화();
     }
 
-    public bool 활성 => _분기.국내판매활성;
-    public IReadOnlyList<string> 지원채널목록 => CommerceChannelOrderSyncScopes.DomesticChannelTypes;
+    public override bool 활성 => _분기.국내판매활성;
+    public override IReadOnlyList<string> 지원채널목록 => CommerceChannelOrderSyncScopes.DomesticChannelTypes;
+    public 판매ViewModel 기본판매 => _기본판매;
 
-    public IReadOnlyList<판매채널계정항목응답> 계정목록
-    {
-        get => _계정목록;
-        private set => SetProperty(ref _계정목록, value);
-    }
+    public IReadOnlyList<판매채널계정항목응답> 계정목록 => _기본판매.계정.계정목록;
 
-    public IReadOnlyList<판매상품항목응답> 상품목록
-    {
-        get => _상품목록;
-        private set => SetProperty(ref _상품목록, value);
-    }
+    public IReadOnlyList<판매상품항목응답> 상품목록 => _기본판매.상태.상품목록;
 
     public IReadOnlyList<채널출품항목응답> 출품목록
     {
-        get => _출품목록;
-        private set => SetProperty(ref _출품목록, value);
+        get
+        {
+            var accountIds = 계정목록.Select(account => account.Id).ToHashSet();
+            return _기본판매.상태.출품목록
+                .Where(listing => accountIds.Contains(listing.판매채널계정Id))
+                .ToArray();
+        }
     }
 
     public 판매채널계정저장요청 계정초안 { get; private set; } = 새국내계정초안();
@@ -173,16 +174,9 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
             async token =>
             {
                 var accounts = await _client.계정목록조회Async(token);
-                계정목록 = accounts
-                    .Where(account => CommerceChannelOrderSyncScopes.DomesticChannelTypes.Contains(
-                        account.채널종류,
-                        StringComparer.OrdinalIgnoreCase))
-                    .ToArray();
-                상품목록 = await _client.상품목록조회Async(token);
-                var accountIds = 계정목록.Select(account => account.Id).ToHashSet();
-                출품목록 = (await _client.출품목록조회Async(token))
-                    .Where(listing => accountIds.Contains(listing.판매채널계정Id))
-                    .ToArray();
+                var products = await _client.상품목록조회Async(token);
+                var listings = await _client.출품목록조회Async(token);
+                _기본판매.상태.목록적용(accounts, products, listings);
             },
             "국내 판매채널, 상품과 출품 상태를 조회했습니다.",
             cancellationToken);
@@ -210,7 +204,7 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
             {
                 var created = await _client.계정생성Async(계정초안, token)
                     ?? throw new InvalidOperationException("판매채널 계정 생성 응답이 비어 있습니다.");
-                계정목록 = 계정목록.Append(created).ToArray();
+                _기본판매.상태.계정저장적용(created);
                 출품초안.판매채널계정Id = created.Id;
                 계정초안 = 새국내계정초안();
                 OnPropertyChanged(string.Empty);
@@ -242,7 +236,7 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
             {
                 var created = await _client.상품생성Async(상품초안, token)
                     ?? throw new InvalidOperationException("판매상품 생성 응답이 비어 있습니다.");
-                상품목록 = 상품목록.Append(created).ToArray();
+                _기본판매.상태.상품저장적용(created);
                 출품초안.판매상품Id = created.Id;
                 상품초안 = new 판매상품저장요청
                 {
@@ -274,7 +268,7 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
             {
                 var created = await _client.출품생성Async(출품초안, token)
                     ?? throw new InvalidOperationException("국내 판매채널 출품 응답이 비어 있습니다.");
-                출품목록 = 출품목록.Append(created).ToArray();
+                _기본판매.상태.출품저장적용(created);
                 OnPropertyChanged(string.Empty);
             },
             "국내 판매채널 출품을 생성했습니다.",
@@ -290,6 +284,7 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
 
         _화면상태.PropertyChanged -= 화면상태변경;
         _분기.PropertyChanged -= 분기변경;
+        _기본판매.상태.PropertyChanged -= 판매상태변경;
         GC.SuppressFinalize(this);
     }
 
@@ -301,6 +296,16 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
 
     private void 실행변경(object? sender, PropertyChangedEventArgs e)
         => OnPropertyChanged(string.Empty);
+
+    private void 판매상태변경(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(계정목록));
+        OnPropertyChanged(nameof(상품목록));
+        OnPropertyChanged(nameof(출품목록));
+        OnPropertyChanged(nameof(출품완료));
+        OnPropertyChanged(nameof(진행단계));
+        OnPropertyChanged(nameof(다음작업안내));
+    }
 
     private void 공동구매변경동기화()
     {
@@ -354,16 +359,14 @@ public sealed class 국내판매ViewModel : 공동구매작업ViewModelBase, IDi
 /// 국내 출발·해외 도착 거래에서 판매상품, 해외 채널 출품,
 /// 수출신고와 국제물류 준비 상태를 함께 관리합니다.
 /// </summary>
-public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed class 해외수출ViewModel : 공동구매판매실행업무ViewModelBase, IDisposable
 {
     private readonly I판매채널Client _client;
+    private readonly 판매ViewModel _기본판매;
     private readonly 공동구매화면상태ViewModel _화면상태;
     private readonly 공동구매거래경로분기ViewModel _분기;
     private 공동구매실행기능ViewModel? _실행;
     private Guid? _대상공동구매Id;
-    private IReadOnlyList<판매채널계정항목응답> _해외계정목록 = [];
-    private IReadOnlyList<판매상품항목응답> _상품목록 = [];
-    private IReadOnlyList<채널출품항목응답> _출품목록 = [];
     private AmazonExportReadinessDraftRequest _초안 = new();
     private AmazonExportReadinessResult _계획 = new();
     private 판매채널계정저장요청 _Amazon계정초안 = 새Amazon계정초안();
@@ -371,36 +374,39 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
 
     public 해외수출ViewModel(
         I판매채널Client client,
+        판매ViewModel 기본판매,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기)
+        : base(화면상태, CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder)
     {
         _client = client;
+        _기본판매 = 기본판매;
         _화면상태 = 화면상태;
         _분기 = 분기;
+        _기본판매.지원채널설정(CommerceChannelOrderSyncScopes.OverseasChannelTypes);
+        _기본판매.상태.PropertyChanged += 판매상태변경;
         _화면상태.PropertyChanged += 화면상태변경;
         _분기.PropertyChanged += 분기변경;
         공동구매변경동기화();
     }
 
-    public bool 활성 => _분기.해외수출활성;
-    public IReadOnlyList<string> 지원채널목록 => CommerceChannelOrderSyncScopes.OverseasChannelTypes;
+    public override bool 활성 => _분기.해외수출활성;
+    public override IReadOnlyList<string> 지원채널목록 => CommerceChannelOrderSyncScopes.OverseasChannelTypes;
+    public 판매ViewModel 기본판매 => _기본판매;
 
-    public IReadOnlyList<판매채널계정항목응답> 해외계정목록
-    {
-        get => _해외계정목록;
-        private set => SetProperty(ref _해외계정목록, value);
-    }
+    public IReadOnlyList<판매채널계정항목응답> 해외계정목록 => _기본판매.계정.계정목록;
 
-    public IReadOnlyList<판매상품항목응답> 상품목록
-    {
-        get => _상품목록;
-        private set => SetProperty(ref _상품목록, value);
-    }
+    public IReadOnlyList<판매상품항목응답> 상품목록 => _기본판매.상태.상품목록;
 
     public IReadOnlyList<채널출품항목응답> 출품목록
     {
-        get => _출품목록;
-        private set => SetProperty(ref _출품목록, value);
+        get
+        {
+            var accountIds = 해외계정목록.Select(account => account.Id).ToHashSet();
+            return _기본판매.상태.출품목록
+                .Where(listing => accountIds.Contains(listing.판매채널계정Id))
+                .ToArray();
+        }
     }
 
     public AmazonExportReadinessDraftRequest 초안
@@ -516,16 +522,9 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
             async token =>
             {
                 var accounts = await _client.계정목록조회Async(token);
-                해외계정목록 = accounts
-                    .Where(account => CommerceChannelOrderSyncScopes.OverseasChannelTypes.Contains(
-                        account.채널종류,
-                        StringComparer.OrdinalIgnoreCase))
-                    .ToArray();
-                상품목록 = await _client.상품목록조회Async(token);
-                var accountIds = 해외계정목록.Select(account => account.Id).ToHashSet();
-                출품목록 = (await _client.출품목록조회Async(token))
-                    .Where(listing => accountIds.Contains(listing.판매채널계정Id))
-                    .ToArray();
+                var products = await _client.상품목록조회Async(token);
+                var listings = await _client.출품목록조회Async(token);
+                _기본판매.상태.목록적용(accounts, products, listings);
             },
             "해외 판매채널, 수출상품과 출품 상태를 조회했습니다.",
             cancellationToken);
@@ -578,7 +577,7 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
             {
                 var created = await _client.계정생성Async(Amazon계정초안, token)
                     ?? throw new InvalidOperationException("Amazon 판매채널 계정 생성 응답이 비어 있습니다.");
-                해외계정목록 = 해외계정목록.Append(created).ToArray();
+                _기본판매.상태.계정저장적용(created);
                 초안.SalesChannelAccountId = created.Id;
                 초안.AmazonSellerAccountConnected = true;
                 Amazon계정초안 = 새Amazon계정초안();
@@ -607,7 +606,7 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
             {
                 var created = await _client.상품생성Async(수출상품초안, token)
                     ?? throw new InvalidOperationException("수출 판매상품 생성 응답이 비어 있습니다.");
-                상품목록 = 상품목록.Append(created).ToArray();
+                _기본판매.상태.상품저장적용(created);
                 초안.SalesProductId = created.Id;
                 초안.SalesSku = created.판매SKU;
                 초안.ProductName = created.대표상품명;
@@ -675,7 +674,7 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
                     },
                     token)
                     ?? throw new InvalidOperationException("해외 판매채널 출품 응답이 비어 있습니다.");
-                출품목록 = 출품목록.Append(created).ToArray();
+                _기본판매.상태.출품저장적용(created);
             },
             "Amazon 수출 출품을 생성했습니다.",
             cancellationToken);
@@ -690,6 +689,7 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
 
         _화면상태.PropertyChanged -= 화면상태변경;
         _분기.PropertyChanged -= 분기변경;
+        _기본판매.상태.PropertyChanged -= 판매상태변경;
         GC.SuppressFinalize(this);
     }
 
@@ -701,6 +701,15 @@ public sealed class 해외수출ViewModel : 공동구매작업ViewModelBase, IDi
 
     private void 실행변경(object? sender, PropertyChangedEventArgs e)
         => OnPropertyChanged(string.Empty);
+
+    private void 판매상태변경(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(해외계정목록));
+        OnPropertyChanged(nameof(상품목록));
+        OnPropertyChanged(nameof(출품목록));
+        OnPropertyChanged(nameof(진행단계));
+        OnPropertyChanged(nameof(다음작업안내));
+    }
 
     private void 공동구매변경동기화()
     {

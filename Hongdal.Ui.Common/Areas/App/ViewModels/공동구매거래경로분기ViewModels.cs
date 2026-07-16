@@ -17,7 +17,7 @@ public static class 공동구매업무분기코드
 /// 선택된 공동구매가 있으면 서버가 확정한 거래경로를 사용하고,
 /// 제안 작성 중이면 제안 하위 ViewModel의 실시간 판정을 사용합니다.
 /// </summary>
-public sealed class 공동구매거래경로분기ViewModel : ObservableObject, IDisposable
+public sealed class 공동구매거래경로분기ViewModel : 공동구매의사결정업무ViewModelBase, IDisposable
 {
     private readonly 공동구매화면상태ViewModel _화면상태;
     private readonly 공동구매거래경로판정ViewModel _제안거래경로;
@@ -25,6 +25,7 @@ public sealed class 공동구매거래경로분기ViewModel : ObservableObject, 
     public 공동구매거래경로분기ViewModel(
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로판정ViewModel 제안거래경로)
+        : base(화면상태)
     {
         _화면상태 = 화면상태;
         _제안거래경로 = 제안거래경로;
@@ -308,15 +309,34 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
         공동수입전환준비ViewModel 전환준비,
         공동수입원장물류ViewModel 원장물류,
         공동수입선적통관ViewModel 선적통관,
-        공동구매가격의사결정ViewModel 가격의사결정)
+        공동구매가격의사결정ViewModel 가격의사결정,
+        공동수입원장조회ViewModel 원장조회,
+        공동수입원장미리보기ViewModel 원장미리보기,
+        공동수입원장전환ViewModel 원장전환,
+        공동수입선적공개조회ViewModel 선적공개조회,
+        공동수입선적관리목록조회ViewModel 선적관리목록조회,
+        공동수입선적등록ViewModel 선적등록,
+        공동수입선적이벤트등록ViewModel 선적이벤트등록,
+        공동수입통관동기화ViewModel 통관동기화)
     {
         this.분기 = 하위ViewModel등록(분기, 수명소유: false);
         _화면상태 = 하위ViewModel등록(화면상태, 수명소유: false);
         this.전환준비 = 하위ViewModel등록(전환준비, 수명소유: false);
-        this.원장물류 = 하위ViewModel등록(원장물류);
-        this.선적통관 = 하위ViewModel등록(선적통관);
+        this.원장물류 = 하위ViewModel등록(원장물류, 수명소유: false);
+        this.선적통관 = 하위ViewModel등록(선적통관, 수명소유: false);
         this.선적통관.원장물류연결(this.원장물류);
         this.가격의사결정 = 하위ViewModel등록(가격의사결정, 수명소유: false);
+        세부업무목록 =
+        [
+            하위ViewModel등록(원장조회, 수명소유: false),
+            하위ViewModel등록(원장미리보기, 수명소유: false),
+            하위ViewModel등록(원장전환, 수명소유: false),
+            하위ViewModel등록(선적공개조회, 수명소유: false),
+            하위ViewModel등록(선적관리목록조회, 수명소유: false),
+            하위ViewModel등록(선적등록, 수명소유: false),
+            하위ViewModel등록(선적이벤트등록, 수명소유: false),
+            하위ViewModel등록(통관동기화, 수명소유: false)
+        ];
     }
 
     public 공동구매거래경로분기ViewModel 분기 { get; }
@@ -324,6 +344,7 @@ public sealed class 공동수입분기ViewModel : 조립ViewModelBase
     public 공동수입원장물류ViewModel 원장물류 { get; }
     public 공동수입선적통관ViewModel 선적통관 { get; }
     public 공동구매가격의사결정ViewModel 가격의사결정 { get; }
+    public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
     public bool 활성 => 분기.공동수입활성;
     public bool 처리중 => 원장물류.처리중 || 선적통관.처리중 || 가격의사결정.처리중;
 

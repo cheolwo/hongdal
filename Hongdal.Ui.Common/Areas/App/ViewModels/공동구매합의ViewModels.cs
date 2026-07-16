@@ -8,7 +8,7 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 public sealed partial class 공동구매모집마감ViewModel(
     I공동구매업무Service service,
-    공동구매화면상태ViewModel 화면상태) : 공동구매작업ViewModelBase
+    공동구매화면상태ViewModel 화면상태) : 공동구매합의업무ViewModelBase(화면상태)
 {
     [ObservableProperty]
     public partial string 운영자표시명 { get; set; } = "공동구매 운영자";
@@ -63,7 +63,7 @@ public sealed partial class 공동구매모집마감ViewModel(
     }
 }
 
-public sealed partial class 공동구매결의ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매결의ViewModel : 공동구매합의업무ViewModelBase, IDisposable
 {
     private readonly I공동구매업무Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -72,6 +72,7 @@ public sealed partial class 공동구매결의ViewModel : 공동구매작업View
     public 공동구매결의ViewModel(
         I공동구매업무Service service,
         공동구매화면상태ViewModel 화면상태)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -241,7 +242,7 @@ public sealed record 공동구매전자서명입력(
     string 서명증빙Payload,
     string? 접속IpHash = null);
 
-public sealed partial class 공동구매전자서명ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매전자서명ViewModel : 공동구매합의업무ViewModelBase, IDisposable
 {
     private readonly I공동구매업무Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -250,6 +251,7 @@ public sealed partial class 공동구매전자서명ViewModel : 공동구매작�
     public 공동구매전자서명ViewModel(
         I공동구매업무Service service,
         공동구매화면상태ViewModel 화면상태)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -500,18 +502,30 @@ public sealed class 공동구매합의기능ViewModel : 조립ViewModelBase
         공동구매모집마감ViewModel 모집마감,
         공동구매결의ViewModel 결의,
         공동구매전자서명ViewModel 전자서명,
-        공동구매절차상태ViewModel 절차상태)
+        공동구매절차상태ViewModel 절차상태,
+        공동구매모집마감처리ViewModel 모집마감처리,
+        공동구매결의문등록ViewModel 결의문등록,
+        공동구매결의서명준비ViewModel 결의서명준비,
+        공동구매전자서명등록ViewModel 전자서명등록)
     {
-        this.모집마감 = 하위ViewModel등록(모집마감);
-        this.결의 = 하위ViewModel등록(결의);
-        this.전자서명 = 하위ViewModel등록(전자서명);
+        this.모집마감 = 하위ViewModel등록(모집마감, 수명소유: false);
+        this.결의 = 하위ViewModel등록(결의, 수명소유: false);
+        this.전자서명 = 하위ViewModel등록(전자서명, 수명소유: false);
         this.절차상태 = 하위ViewModel등록(절차상태);
+        세부업무목록 =
+        [
+            하위ViewModel등록(모집마감처리, 수명소유: false),
+            하위ViewModel등록(결의문등록, 수명소유: false),
+            하위ViewModel등록(결의서명준비, 수명소유: false),
+            하위ViewModel등록(전자서명등록, 수명소유: false)
+        ];
     }
 
     public 공동구매모집마감ViewModel 모집마감 { get; }
     public 공동구매결의ViewModel 결의 { get; }
     public 공동구매전자서명ViewModel 전자서명 { get; }
     public 공동구매절차상태ViewModel 절차상태 { get; }
+    public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
 
     public bool 처리중 => 모집마감.처리중 || 결의.처리중 || 전자서명.처리중;
 }

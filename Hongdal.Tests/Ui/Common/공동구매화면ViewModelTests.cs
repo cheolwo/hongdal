@@ -15,6 +15,32 @@ namespace Hongdal.Tests.Ui.Common;
 public sealed class 공동구매화면ViewModelTests
 {
     [Fact]
+    public void 루트화면_하위ViewModel을기본업무영역별로제공한다()
+    {
+        using var fixture = CreateFixture(new Fake공동구매업무Service());
+
+        Assert.Equal(21, fixture.ViewModel.업무목록.Count);
+        Assert.Contains(fixture.ViewModel.모집.제안, fixture.ViewModel.업무영역조회(공동구매업무영역코드.모집));
+        Assert.Contains(fixture.ViewModel.합의.결의, fixture.ViewModel.업무영역조회(공동구매업무영역코드.합의));
+        Assert.Contains(fixture.ViewModel.공급.협상, fixture.ViewModel.업무영역조회(공동구매업무영역코드.공급));
+        Assert.Contains(fixture.ViewModel.물류.이행계획, fixture.ViewModel.업무영역조회(공동구매업무영역코드.물류));
+        Assert.Contains(fixture.ViewModel.실행.커머스이행, fixture.ViewModel.업무영역조회(공동구매업무영역코드.실행));
+        Assert.Contains(fixture.ViewModel.국내판매, fixture.ViewModel.업무영역조회(공동구매업무영역코드.실행));
+        Assert.Contains(fixture.ViewModel.해외수출, fixture.ViewModel.업무영역조회(공동구매업무영역코드.실행));
+
+        Assert.Equal(5, fixture.ViewModel.모집.세부업무목록.Count);
+        Assert.Equal(4, fixture.ViewModel.합의.세부업무목록.Count);
+        Assert.Equal(10, fixture.ViewModel.공급.세부업무목록.Count);
+        Assert.Equal(2, fixture.ViewModel.물류.세부업무목록.Count);
+        Assert.Equal(8, fixture.ViewModel.공동수입.세부업무목록.Count);
+        Assert.Equal(19, fixture.ViewModel.실행.세부업무목록.Count);
+        Assert.Equal(48, fixture.ViewModel.절차세부업무목록.Count);
+        Assert.Equal(
+            fixture.ViewModel.절차세부업무목록.Count,
+            fixture.ViewModel.절차세부업무목록.Select(item => item.업무코드).Distinct().Count());
+    }
+
+    [Fact]
     public void 실행_창고기능을입고원장과출고원장으로조립한다()
     {
         using var fixture = CreateFixture(new Fake공동구매업무Service());

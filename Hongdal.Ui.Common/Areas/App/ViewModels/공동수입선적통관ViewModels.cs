@@ -316,6 +316,7 @@ public sealed class 공동수입선적통관ViewModel : 공동구매작업ViewMo
         _client = client;
         _화면상태 = 화면상태;
         _분기 = 분기;
+        현재사용자Context연결(화면상태.현재사용자Context);
         선적초안 = new 공동수입선적초안ViewModel();
         이벤트초안 = new 공동수입선적이벤트초안ViewModel();
         통관초안 = new 공동수입통관동기화초안ViewModel();

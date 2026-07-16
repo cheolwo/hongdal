@@ -10,7 +10,7 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 /// <summary>
 /// 공동구매 수요를 상품·배송권 기준 자동집단으로 묶는 API를 담당합니다.
 /// </summary>
-public sealed partial class 공동구매자동집단ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매자동집단ViewModel : 공동구매실행업무ViewModelBase, IDisposable
 {
     private readonly I공동구매실행Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -23,6 +23,7 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매작�
         공동구매화면상태ViewModel 화면상태,
         공동구매실행상태ViewModel 실행상태,
         공동구매창고상태ViewModel 창고상태)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;

@@ -18,7 +18,7 @@ public static class 공동구매거래경로필터코드
 /// </summary>
 public sealed partial class 공동구매목록ViewModel(
     I공동구매업무Service service,
-    공동구매화면상태ViewModel 화면상태) : 공동구매작업ViewModelBase
+    공동구매화면상태ViewModel 화면상태) : 공동구매모집업무ViewModelBase(화면상태)
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HS코드조회적용중))]
@@ -215,7 +215,7 @@ public sealed record 공동구매제안주체항목(
 /// 제안 게시글과 수요 투표를 하나의 사용자 작업으로 묶습니다.
 /// 두 번째 API가 실패하면 생성된 게시글 번호를 남겨 운영자가 복구할 수 있습니다.
 /// </summary>
-public sealed partial class 공동구매제안ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매제안ViewModel : 공동구매모집업무ViewModelBase, IDisposable
 {
     private readonly I공동구매업무Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -225,6 +225,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매작업View
         공동구매화면상태ViewModel 화면상태,
         공동수입전환준비ViewModel 공동수입전환,
         공동구매가격의사결정ViewModel 가격의사결정)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -529,7 +530,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매작업View
         => OnPropertyChanged(string.Empty);
 }
 
-public sealed partial class 공동구매수요참여ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매수요참여ViewModel : 공동구매모집업무ViewModelBase, IDisposable
 {
     private readonly I공동구매업무Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -538,6 +539,7 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매작�
     public 공동구매수요참여ViewModel(
         I공동구매업무Service service,
         공동구매화면상태ViewModel 화면상태)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -634,7 +636,7 @@ public sealed partial class 공동구매수요참여ViewModel : 공동구매작�
     }
 }
 
-public sealed partial class 공동구매이의검토ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매이의검토ViewModel : 공동구매모집업무ViewModelBase, IDisposable
 {
     private readonly I공동구매업무Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -642,6 +644,7 @@ public sealed partial class 공동구매이의검토ViewModel : 공동구매작�
     public 공동구매이의검토ViewModel(
         I공동구매업무Service service,
         공동구매화면상태ViewModel 화면상태)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -732,12 +735,25 @@ public sealed class 공동구매모집기능ViewModel : 조립ViewModelBase
         공동구매목록ViewModel 목록,
         공동구매제안ViewModel 제안,
         공동구매수요참여ViewModel 수요참여,
-        공동구매이의검토ViewModel 이의검토)
+        공동구매이의검토ViewModel 이의검토,
+        공동구매목록조회조각ViewModel 목록조회,
+        공동구매상세조회ViewModel 상세조회,
+        공동구매제안등록조각ViewModel 제안등록,
+        공동구매수요참여등록ViewModel 수요참여등록,
+        공동구매이의등록ViewModel 이의등록)
     {
-        this.목록 = 하위ViewModel등록(목록);
-        this.제안 = 하위ViewModel등록(제안);
-        this.수요참여 = 하위ViewModel등록(수요참여);
-        this.이의검토 = 하위ViewModel등록(이의검토);
+        this.목록 = 하위ViewModel등록(목록, 수명소유: false);
+        this.제안 = 하위ViewModel등록(제안, 수명소유: false);
+        this.수요참여 = 하위ViewModel등록(수요참여, 수명소유: false);
+        this.이의검토 = 하위ViewModel등록(이의검토, 수명소유: false);
+        세부업무목록 =
+        [
+            하위ViewModel등록(목록조회, 수명소유: false),
+            하위ViewModel등록(상세조회, 수명소유: false),
+            하위ViewModel등록(제안등록, 수명소유: false),
+            하위ViewModel등록(수요참여등록, 수명소유: false),
+            하위ViewModel등록(이의등록, 수명소유: false)
+        ];
     }
 
     public 공동구매목록ViewModel 목록 { get; }
@@ -746,6 +762,7 @@ public sealed class 공동구매모집기능ViewModel : 조립ViewModelBase
     public 공동구매가격의사결정ViewModel 가격의사결정 => 제안.가격의사결정;
     public 공동구매수요참여ViewModel 수요참여 { get; }
     public 공동구매이의검토ViewModel 이의검토 { get; }
+    public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
 
     public bool 처리중 => 목록.처리중 || 제안.처리중 || 수요참여.처리중 || 이의검토.처리중;
 }

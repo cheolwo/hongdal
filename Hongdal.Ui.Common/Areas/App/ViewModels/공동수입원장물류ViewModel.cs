@@ -31,6 +31,7 @@ public sealed class 공동수입원장물류ViewModel : 공동구매작업ViewMo
         _client = client;
         _화면상태 = 화면상태;
         _분기 = 분기;
+        현재사용자Context연결(화면상태.현재사용자Context);
         _화면상태.PropertyChanged += 화면상태변경;
         _분기.PropertyChanged += 분기변경;
         공동구매변경동기화();

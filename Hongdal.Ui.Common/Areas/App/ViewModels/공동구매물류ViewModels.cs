@@ -5,7 +5,7 @@ using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
-public sealed partial class 공동구매이행계획ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매이행계획ViewModel : 공동구매물류업무ViewModelBase, IDisposable
 {
     private readonly I공동구매물류Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -16,6 +16,7 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
         I공동구매물류Service service,
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -225,11 +226,20 @@ public sealed partial class 공동구매이행계획ViewModel : 공동구매작�
 
 public sealed class 공동구매물류기능ViewModel : 조립ViewModelBase
 {
-    public 공동구매물류기능ViewModel(공동구매이행계획ViewModel 이행계획)
+    public 공동구매물류기능ViewModel(
+        공동구매이행계획ViewModel 이행계획,
+        공동구매이행계획미리보기ViewModel 이행계획미리보기,
+        공동구매발주초안등록ViewModel 발주초안등록)
     {
-        this.이행계획 = 하위ViewModel등록(이행계획);
+        this.이행계획 = 하위ViewModel등록(이행계획, 수명소유: false);
+        세부업무목록 =
+        [
+            하위ViewModel등록(이행계획미리보기, 수명소유: false),
+            하위ViewModel등록(발주초안등록, 수명소유: false)
+        ];
     }
 
     public 공동구매이행계획ViewModel 이행계획 { get; }
+    public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
     public bool 처리중 => 이행계획.처리중;
 }

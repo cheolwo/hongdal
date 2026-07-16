@@ -29,6 +29,48 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
         this.실행 = 하위ViewModel등록(실행);
         this.국내판매.실행연결(this.실행);
         this.해외수출.실행연결(this.실행);
+
+        업무목록 =
+        [
+            this.거래경로분기,
+            this.가격의사결정,
+            this.모집.목록,
+            this.모집.제안,
+            this.모집.수요참여,
+            this.모집.이의검토,
+            this.합의.모집마감,
+            this.합의.결의,
+            this.합의.전자서명,
+            this.공급.생산자연결,
+            this.공급.공급제안,
+            this.공급.공급적합성,
+            this.공급.협상,
+            this.물류.이행계획,
+            this.실행.자동집단,
+            this.실행.주문원장.조회,
+            this.실행.주문원장.하위원장,
+            this.실행.주문원장.서명,
+            this.실행.커머스이행,
+            this.국내판매,
+            this.해외수출
+        ];
+        업무영역별목록 = 업무목록
+            .GroupBy(x => x.업무영역코드, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                x => x.Key,
+                x => (IReadOnlyList<공동구매원장업무ViewModelBase>)x.ToArray(),
+                StringComparer.OrdinalIgnoreCase);
+        절차세부업무영역별목록 = new Dictionary<string, IReadOnlyList<I업무조각ViewModel>>(
+            StringComparer.OrdinalIgnoreCase)
+        {
+            [공동구매업무영역코드.모집] = this.모집.세부업무목록,
+            [공동구매업무영역코드.합의] = this.합의.세부업무목록,
+            [공동구매업무영역코드.공급] = this.공급.세부업무목록,
+            [공동구매업무영역코드.물류] = this.물류.세부업무목록,
+            ["group-import"] = this.공동수입.세부업무목록,
+            [공동구매업무영역코드.실행] = this.실행.세부업무목록
+        };
+        절차세부업무목록 = 절차세부업무영역별목록.Values.SelectMany(items => items).ToArray();
     }
 
     public 공동구매화면상태ViewModel 상태 { get; }
@@ -43,6 +85,13 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
     public 공동구매공급기능ViewModel 공급 => 국내공동구매.공급;
     public 공동구매물류기능ViewModel 물류 => 국내공동구매.물류;
     public 공동구매실행기능ViewModel 실행 { get; }
+    public IReadOnlyList<공동구매원장업무ViewModelBase> 업무목록 { get; }
+    public IReadOnlyDictionary<string, IReadOnlyList<공동구매원장업무ViewModelBase>> 업무영역별목록 { get; }
+    public IReadOnlyList<I업무조각ViewModel> 절차세부업무목록 { get; }
+    public IReadOnlyDictionary<string, IReadOnlyList<I업무조각ViewModel>> 절차세부업무영역별목록 { get; }
+
+    public IReadOnlyList<공동구매원장업무ViewModelBase> 업무영역조회(string areaCode)
+        => 업무영역별목록.TryGetValue(areaCode, out var viewModels) ? viewModels : [];
 
     public bool 처리중
         => 모집.처리중

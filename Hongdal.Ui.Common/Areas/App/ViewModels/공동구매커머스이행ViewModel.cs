@@ -24,7 +24,7 @@ public sealed record 공동구매커머스단계표시(
 /// 주문자에게 공개된 커머스 이행 계획을 조회하고 입고·출품·출고 진행도를 해석합니다.
 /// 계획 변경 API는 관리자용이므로 이 ViewModel은 의도적으로 조회 전용입니다.
 /// </summary>
-public sealed partial class 공동구매커머스이행ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매커머스이행ViewModel : 공동구매실행업무ViewModelBase, IDisposable
 {
     private static readonly IReadOnlyList<(string Code, string Title, string Description)> StageCatalog =
     [
@@ -45,6 +45,7 @@ public sealed partial class 공동구매커머스이행ViewModel : 공동구매�
         I공동구매실행Service service,
         공동구매실행상태ViewModel 실행상태,
         공동구매화면상태ViewModel 화면상태)
+        : base(화면상태)
     {
         _service = service;
         _실행상태 = 실행상태;
@@ -231,16 +232,41 @@ public sealed class 공동구매실행기능ViewModel : 조립ViewModelBase
         공동구매재고배분ViewModel 재고배분,
         공동구매주문원장ViewModel 주문원장,
         공동구매커머스이행ViewModel 커머스이행,
-        공동구매창고기능ViewModel 창고)
+        공동구매창고기능ViewModel 창고,
+        공동구매자동집단조회ViewModel 자동집단조회,
+        공동구매자동수요등록ViewModel 자동수요등록,
+        공동구매주문원장상세조회ViewModel 주문원장상세조회,
+        공동구매주문하위원장연결ViewModel 주문하위원장연결,
+        공동구매주문하위원장분리ViewModel 주문하위원장분리,
+        공동구매주문서명상태조회ViewModel 주문서명상태조회,
+        공동구매주문서명준비ViewModel 주문서명준비,
+        공동구매주문서명등록ViewModel 주문서명등록,
+        공동구매커머스이행조회ViewModel 커머스이행조회,
+        공동구매커머스문서조회ViewModel 커머스문서조회)
     {
         // Scoped 공유 상태의 수명은 DI scope가 관리합니다. 이 transient 조립 객체가 먼저 폐기하지 않습니다.
         this.상태 = 상태;
-        this.자동집단 = 하위ViewModel등록(자동집단);
+        this.자동집단 = 하위ViewModel등록(자동집단, 수명소유: false);
         this.재고배분 = 하위ViewModel등록(재고배분);
         this.주문원장 = 하위ViewModel등록(주문원장);
-        this.커머스이행 = 하위ViewModel등록(커머스이행);
+        this.커머스이행 = 하위ViewModel등록(커머스이행, 수명소유: false);
         this.창고 = 하위ViewModel등록(창고);
         this.창고.출고원장.재고배분연결(this.재고배분);
+        세부업무목록 =
+        [
+            하위ViewModel등록(자동집단조회, 수명소유: false),
+            하위ViewModel등록(자동수요등록, 수명소유: false),
+            하위ViewModel등록(주문원장상세조회, 수명소유: false),
+            하위ViewModel등록(주문하위원장연결, 수명소유: false),
+            하위ViewModel등록(주문하위원장분리, 수명소유: false),
+            하위ViewModel등록(주문서명상태조회, 수명소유: false),
+            하위ViewModel등록(주문서명준비, 수명소유: false),
+            하위ViewModel등록(주문서명등록, 수명소유: false),
+            하위ViewModel등록(커머스이행조회, 수명소유: false),
+            하위ViewModel등록(커머스문서조회, 수명소유: false),
+            .. this.창고.입고원장.세부업무목록,
+            .. this.창고.출고원장.세부업무목록
+        ];
     }
 
     public 공동구매실행상태ViewModel 상태 { get; }
@@ -252,5 +278,6 @@ public sealed class 공동구매실행기능ViewModel : 조립ViewModelBase
     public 공동구매창고기능ViewModel 창고 { get; }
     public 공동구매입고원장ViewModel 입고원장 => 창고.입고원장;
     public 공동구매출고원장ViewModel 출고원장 => 창고.출고원장;
+    public IReadOnlyList<I업무조각ViewModel> 세부업무목록 { get; }
     public bool 처리중 => 자동집단.처리중 || 주문원장.처리중 || 커머스이행.처리중 || 창고.처리중;
 }

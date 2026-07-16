@@ -8,7 +8,7 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 /// 공동구매 제안가격을 국내 도·소매가 및 수입 평균단가와 비교하고,
 /// 해외 공공가격은 원문 단위의 별도 참고자료로 유지합니다.
 /// </summary>
-public sealed partial class 공동구매가격의사결정ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매가격의사결정ViewModel : 공동구매의사결정업무ViewModelBase, IDisposable
 {
     private readonly I공동구매가격의사결정Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
@@ -22,6 +22,7 @@ public sealed partial class 공동구매가격의사결정ViewModel : 공동구�
         공동구매화면상태ViewModel 화면상태,
         공동구매거래경로분기ViewModel 분기,
         공동수입전환준비ViewModel 공동수입전환)
+        : base(화면상태)
     {
         _service = service;
         _화면상태 = 화면상태;

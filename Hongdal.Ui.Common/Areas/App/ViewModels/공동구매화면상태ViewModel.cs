@@ -86,10 +86,17 @@ public sealed class 공동구매화면상태ViewModel : ObservableObject, IDispo
     private CommunityGroupPurchaseLedgerProgressResponse? _원장절차;
     private string? _원장동기화오류;
 
-    public 공동구매화면상태ViewModel(I공동구매원장절차Client 원장절차Client)
+    public 공동구매화면상태ViewModel(
+        I공동구매원장절차Client 원장절차Client,
+        IHongdal현재사용자Context? 현재사용자Context = null)
     {
         _원장절차Client = 원장절차Client;
+        this.현재사용자Context = 현재사용자Context;
     }
+
+    public IHongdal현재사용자Context? 현재사용자Context { get; }
+    public 현재사용자Snapshot 현재사용자
+        => 현재사용자Context?.현재사용자 ?? 현재사용자Snapshot.익명;
 
     public IReadOnlyList<CommunityVoteResponse> 공동구매목록
     {

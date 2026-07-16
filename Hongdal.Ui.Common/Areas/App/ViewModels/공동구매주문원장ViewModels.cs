@@ -8,27 +8,28 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 public static class 공동구매주문원장보기코드
 {
-    public const string 주문자보호 = "protected-orderer";
-    public const string 주문자 = "orderer";
-    public const string 판매자 = "seller";
-    public const string 창고담당자 = "warehouse";
-    public const string 운송담당자 = "transport";
+    public const string 주문자보호 = 주문원장보기코드.주문자보호;
+    public const string 주문자 = 주문원장보기코드.주문자;
+    public const string 판매자 = 주문원장보기코드.판매자;
+    public const string 창고담당자 = 주문원장보기코드.창고담당자;
+    public const string 운송담당자 = 주문원장보기코드.운송담당자;
 
-    public static IReadOnlyList<string> 전체 { get; } =
-        [주문자보호, 주문자, 판매자, 창고담당자, 운송담당자];
+    public static IReadOnlyList<string> 전체 => 주문원장보기코드.전체;
 }
 
 /// <summary>
 /// 주문 루트 원장의 주문자 보호형 보기와 역할별 공개 보기를 전환합니다.
 /// </summary>
-public sealed partial class 공동구매주문원장조회ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매주문원장조회ViewModel : 공동구매주문원장실행업무ViewModelBase, IDisposable
 {
-    private readonly I공동구매실행Service _service;
+    private readonly I주문원장Service _service;
     private readonly 공동구매실행상태ViewModel _실행상태;
 
     public 공동구매주문원장조회ViewModel(
-        I공동구매실행Service service,
-        공동구매실행상태ViewModel 실행상태)
+        I주문원장Service service,
+        공동구매실행상태ViewModel 실행상태,
+        공동구매화면상태ViewModel 화면상태)
+        : base(화면상태, 실행상태)
     {
         _service = service;
         _실행상태 = 실행상태;
@@ -130,7 +131,7 @@ public sealed partial class 공동구매주문원장조회ViewModel : 공동구�
 /// <summary>
 /// 판매, 입출고, 배송, 운송 등의 하위 원장을 주문 루트 원장에 연결하거나 분리합니다.
 /// </summary>
-public sealed partial class 공동구매하위원장ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매하위원장ViewModel : 공동구매주문원장실행업무ViewModelBase, IDisposable
 {
     private static readonly IReadOnlyList<string> Roles =
     [
@@ -141,12 +142,14 @@ public sealed partial class 공동구매하위원장ViewModel : 공동구매작�
         주문원장포함역할.운송
     ];
 
-    private readonly I공동구매실행Service _service;
+    private readonly I주문원장Service _service;
     private readonly 공동구매실행상태ViewModel _실행상태;
 
     public 공동구매하위원장ViewModel(
-        I공동구매실행Service service,
-        공동구매실행상태ViewModel 실행상태)
+        I주문원장Service service,
+        공동구매실행상태ViewModel 실행상태,
+        공동구매화면상태ViewModel 화면상태)
+        : base(화면상태, 실행상태)
     {
         _service = service;
         _실행상태 = 실행상태;
@@ -263,9 +266,9 @@ public sealed partial class 공동구매하위원장ViewModel : 공동구매작�
 /// <summary>
 /// 주문 원장의 계약 문서 준비, 서명 제출과 서명 완료 상태를 담당합니다.
 /// </summary>
-public sealed partial class 공동구매주문원장서명ViewModel : 공동구매작업ViewModelBase, IDisposable
+public sealed partial class 공동구매주문원장서명ViewModel : 공동구매주문원장실행업무ViewModelBase, IDisposable
 {
-    private readonly I공동구매실행Service _service;
+    private readonly I주문원장Service _service;
     private readonly 공동구매화면상태ViewModel _화면상태;
     private readonly 공동구매실행상태ViewModel _실행상태;
     private Guid? _대상공동구매Id;
@@ -273,9 +276,10 @@ public sealed partial class 공동구매주문원장서명ViewModel : 공동구�
     private string? _대상결의문Hash;
 
     public 공동구매주문원장서명ViewModel(
-        I공동구매실행Service service,
+        I주문원장Service service,
         공동구매화면상태ViewModel 화면상태,
         공동구매실행상태ViewModel 실행상태)
+        : base(화면상태, 실행상태)
     {
         _service = service;
         _화면상태 = 화면상태;
@@ -460,17 +464,26 @@ public sealed partial class 공동구매주문원장서명ViewModel : 공동구�
 public sealed class 공동구매주문원장ViewModel : 조립ViewModelBase
 {
     public 공동구매주문원장ViewModel(
+        주문ViewModel 기본주문,
         공동구매주문원장조회ViewModel 조회,
         공동구매하위원장ViewModel 하위원장,
         공동구매주문원장서명ViewModel 서명)
     {
-        this.조회 = 하위ViewModel등록(조회);
-        this.하위원장 = 하위ViewModel등록(하위원장);
-        this.서명 = 하위ViewModel등록(서명);
+        this.기본주문 = 하위ViewModel등록(기본주문);
+        this.조회 = 하위ViewModel등록(조회, 수명소유: false);
+        this.하위원장 = 하위ViewModel등록(하위원장, 수명소유: false);
+        this.서명 = 하위ViewModel등록(서명, 수명소유: false);
     }
 
+    public 주문ViewModel 기본주문 { get; }
     public 공동구매주문원장조회ViewModel 조회 { get; }
     public 공동구매하위원장ViewModel 하위원장 { get; }
     public 공동구매주문원장서명ViewModel 서명 { get; }
-    public bool 처리중 => 조회.처리중 || 하위원장.처리중 || 서명.처리중;
+    public bool 처리중 => 기본주문.처리중 || 조회.처리중 || 하위원장.처리중 || 서명.처리중;
+
+    public void 주문원장선택(string? orderLedgerId)
+    {
+        기본주문.조회.주문원장선택(orderLedgerId);
+        조회.주문원장선택(orderLedgerId);
+    }
 }
