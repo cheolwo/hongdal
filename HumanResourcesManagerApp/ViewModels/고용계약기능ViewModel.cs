@@ -4,11 +4,12 @@ using Hongdal.Ui.Common.Areas.App.ViewModels;
 
 namespace HumanResourcesManagerApp.ViewModels;
 
-public sealed class 고용계약기능ViewModel : 조립ViewModelBase
+public sealed class 고용계약기능ViewModel : 인사업무ViewModelBase
 {
     private const string BasePath = "api/v1/admin/hr-employment-contracts";
 
     public 고용계약기능ViewModel(IHongdalJsonApiClient api)
+        : base("employment-contract", "고용계약", "계약 초안·서명과 급여 스케줄을 관리합니다.")
     {
         목록조회 = 하위ViewModel등록(new Api작업ViewModel<고용계약조회조건, HrEmploymentContractListResponse?>(
             (condition, cancellationToken) => api.GetAsync<HrEmploymentContractListResponse>(

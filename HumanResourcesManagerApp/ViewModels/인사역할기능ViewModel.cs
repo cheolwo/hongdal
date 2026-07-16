@@ -4,11 +4,12 @@ using Hongdal.Ui.Common.Areas.App.ViewModels;
 
 namespace HumanResourcesManagerApp.ViewModels;
 
-public sealed class 인사역할기능ViewModel : 조립ViewModelBase
+public sealed class 인사역할기능ViewModel : 인사업무ViewModelBase
 {
     private const string BasePath = "api/v1/admin/hr-roles";
 
     public 인사역할기능ViewModel(IHongdalJsonApiClient api)
+        : base("hr-role", "인사 역할", "사용자의 인사 역할과 적용 범위를 관리합니다.")
     {
         목록조회 = 하위ViewModel등록(new Api작업ViewModel<인사역할조회조건, HrRoleAssignmentListResponse?>(
             (condition, cancellationToken) => api.GetAsync<HrRoleAssignmentListResponse>(

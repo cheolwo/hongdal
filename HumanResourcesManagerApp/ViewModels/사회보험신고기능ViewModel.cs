@@ -4,11 +4,12 @@ using Hongdal.Ui.Common.Areas.App.ViewModels;
 
 namespace HumanResourcesManagerApp.ViewModels;
 
-public sealed class 사회보험신고기능ViewModel : 조립ViewModelBase
+public sealed class 사회보험신고기능ViewModel : 인사업무ViewModelBase
 {
     private const string BasePath = "api/v1/admin/hr-social-insurance-filings";
 
     public 사회보험신고기능ViewModel(IHongdalJsonApiClient api)
+        : base("social-insurance", "사회보험 신고", "가입 요건 평가와 신고 계획·상태를 관리합니다.")
     {
         목록조회 = 하위ViewModel등록(new Api작업ViewModel<사회보험신고조회조건, SocialInsuranceFilingPlanListResponse?>(
             (condition, cancellationToken) => api.GetAsync<SocialInsuranceFilingPlanListResponse>(
