@@ -80,14 +80,18 @@ public sealed class 공동구매수요투표Controller : ControllerBase
         [FromBody] CommunityGroupPurchaseLedgerProgressRequest request,
         CancellationToken cancellationToken)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
         try
         {
             var progress = await _ledgerWorkflow.진행Async(
                 voteId,
                 request,
-                User.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? User.Identity?.Name
-                ?? "group-purchase-user",
+                userId,
                 cancellationToken);
             return progress is null ? NotFound() : Ok(progress);
         }

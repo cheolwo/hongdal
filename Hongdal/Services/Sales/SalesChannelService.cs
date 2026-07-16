@@ -234,7 +234,10 @@ public sealed class SalesChannelService : ISalesChannelService
 
     private string RequireUserId()
     {
-        return _currentUserAccessor.UserId ?? throw new InvalidOperationException("로그인 사용자를 확인할 수 없습니다.");
+        var userId = _currentUserAccessor.UserId?.Trim();
+        return !string.IsNullOrWhiteSpace(userId)
+            ? userId
+            : throw new InvalidOperationException("로그인 사용자를 확인할 수 없습니다.");
     }
 
     private bool IsServerAdmin()
