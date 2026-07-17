@@ -24,6 +24,7 @@
 | `1ecfdec8` | 주 Context 모델 격리 회귀 테스트 | 화면 없음 | 전용 Entity 제외 단위 테스트 |
 | `02e28fdc` | Docker Compose 농수산물 배치 cron 외부 설정 | 화면 없음 | Compose 환경변수와 예시 값 확인 |
 | `a67cc0b3` | Preview Site 커뮤니티 판매글 작성·조회·문의 체험 | 간접 | 정적 빌드와 세 개 공개 경로 산출물 확인 |
+| `refactor: modularize Apify actor integration` | 공통 Apify Gateway와 Amazon Adapter 책임 분리 | 화면 없음 | Apify 관련 단위 테스트 8개와 서버 빌드 |
 
 ## 확인 사항
 

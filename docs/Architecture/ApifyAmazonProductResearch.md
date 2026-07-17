@@ -4,18 +4,23 @@
 
 Amazon 상품 상세페이지에서 확인되는 공개 정보를 Hongdal의 확정 상품·주문으로 바로 등록하지 않고, 커뮤니티와 공동구매 운영자가 검수할 수 있는 외부 참고자료로 수용한다.
 
-이 통합은 `junglee/amazon-crawler` Actor의 상품 상세 응답을 사용한다. Actor 응답의 가격·재고·평점·리뷰 수는 Amazon 마켓플레이스, 배송 지역과 조회 시각에 따라 달라질 수 있으므로 사실 원본이 아니라 **관측 스냅샷**으로 다룬다.
+이 통합은 공통 `ApifyActorGateway` 위에서 `junglee/amazon-crawler` Actor의 상품 상세 응답을 사용한다. Actor 응답의 가격·재고·평점·리뷰 수는 Amazon 마켓플레이스, 배송 지역과 조회 시각에 따라 달라질 수 있으므로 사실 원본이 아니라 **관측 스냅샷**으로 다룬다.
 
 ```mermaid
 flowchart LR
-    A["운영자가 Amazon 상품 URL 입력"] --> B["Apify Actor 1건 조회"]
-    B --> C["ASIN·가격·재고·이미지·속성 정규화"]
-    C --> D["Pending 외부 참고자료"]
-    D --> E{"운영자 검수"}
-    E -->|채택| F["커뮤니티 글·공동 원장 외부참조"]
-    E -->|보류/반려| G["비공개 유지"]
-    F --> H["사용자 직접 비교·선택·의향 표시"]
+    A["운영자가 Amazon 상품 URL 입력"] --> B["Amazon Adapter"]
+    B --> C["공통 Apify Gateway"]
+    C --> D["허용 Actor·비용 상한·실행 제한 검증"]
+    D --> E["Apify Actor 1건 조회"]
+    E --> F["ASIN·가격·재고·이미지·속성 정규화"]
+    F --> G["Pending 외부 참고자료"]
+    G --> H{"운영자 검수"}
+    H -->|채택| I["커뮤니티 글·공동 원장 외부참조"]
+    H -->|보류/반려| J["비공개 유지"]
+    I --> K["사용자 직접 비교·선택·의향 표시"]
 ```
+
+공통 Gateway는 인증 header, 표준 Actor 실행 경로, timeout, memory, dataset 역직렬화와 오류 처리를 담당한다. 업무별 Adapter는 Actor ID, 입력 schema와 응답 정규화만 담당한다. 새 Actor를 추가할 때는 `AllowedActorIds`에 명시하고 업무별 비용 상한을 전역 상한 이하로 둔다.
 
 ## Hongdal 제품 경계
 
@@ -45,18 +50,27 @@ Content-Type: application/json
 
 ## 설정
 
-기본값은 비활성이다. 토큰은 tracked 설정에 넣지 않고 `Hongdal/appsettings.Local.json`, .NET user secrets 또는 환경 변수 `ApifyAmazon__ApiToken`에 둔다.
+기본값은 비활성이다. 토큰은 tracked 설정에 넣지 않고 `Hongdal/appsettings.Local.json`, .NET user secrets 또는 환경 변수 `Apify__ApiToken`에 둔다. 공통 연결 설정과 Amazon Adapter 설정을 분리한다.
 
 ```json
 {
-  "ApifyAmazon": {
+  "Apify": {
     "Enabled": true,
     "ApiToken": "",
     "BaseUrl": "https://api.apify.com/v2/",
-    "ActorId": "junglee~amazon-crawler",
     "TimeoutSeconds": 150,
+    "MaxTotalChargeUsd": 2.0,
+    "AllowedActorIds": [
+      "junglee~amazon-crawler"
+    ]
+  },
+  "ApifyAmazon": {
+    "Enabled": true,
+    "ActorId": "junglee~amazon-crawler",
     "ActorTimeoutSeconds": 120,
     "MemoryMegabytes": 1024,
+    "MaxDatasetItems": 1,
+    "MaxTotalChargeUsd": 1.0,
     "MaxFeatureCount": 8,
     "MaxAttributeCount": 30,
     "MaxImageCount": 8
@@ -64,7 +78,7 @@ Content-Type: application/json
 }
 ```
 
-실제 호출에서는 토큰을 query string에 넣지 않고 `Authorization: Bearer` header로 전송한다. 대량 검색, 반복 배치와 seller/offer 추가 수집은 비용과 정책 검토 전에는 활성화하지 않는다.
+기존 `ApifyAmazon:Enabled`, `ApiToken`, `BaseUrl`, `TimeoutSeconds` 설정은 이전 배포와의 호환을 위해 공통 설정의 fallback으로 계속 읽는다. 신규 설정은 `Apify` section을 사용한다. 실제 호출에서는 토큰을 query string에 넣지 않고 `Authorization: Bearer` header로 전송한다. 대량 검색, 반복 배치와 seller/offer 추가 수집은 비용과 정책 검토 전에는 활성화하지 않는다.
 
 ## 2026-07-17 최소 호출 검증
 

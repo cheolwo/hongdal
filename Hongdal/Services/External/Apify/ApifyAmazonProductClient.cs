@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using 홍달.Services.Options;
@@ -43,14 +41,14 @@ public sealed record ApifyAmazon상품상세응답(
 
 public sealed class ApifyAmazonProductClient : IApifyAmazonProductClient
 {
-    private readonly HttpClient _httpClient;
+    private readonly IApifyActorGateway _gateway;
     private readonly ApifyAmazonOptions _options;
 
     public ApifyAmazonProductClient(
-        HttpClient httpClient,
+        IApifyActorGateway gateway,
         IOptions<ApifyAmazonOptions> options)
     {
-        _httpClient = httpClient;
+        _gateway = gateway;
         _options = options.Value;
     }
 
@@ -60,11 +58,7 @@ public sealed class ApifyAmazonProductClient : IApifyAmazonProductClient
     {
         EnsureConfigured();
 
-        using var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            BuildRunPath());
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiToken);
-        request.Content = JsonContent.Create(new
+        var input = JsonSerializer.SerializeToElement(new
         {
             categoryOrProductUrls = new[] { new { url = 상품Url.AbsoluteUri } },
             maxItemsPerStartUrl = 1,
@@ -77,29 +71,21 @@ public sealed class ApifyAmazonProductClient : IApifyAmazonProductClient
             scrapeProductDetails = true,
             locationDeliverableRoutes = new[] { "PRODUCT" }
         });
-
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
+        var result = await _gateway.RunSyncGetDatasetItemsAsync(
+            new ApifyActorSyncRequest(
+                _options.ActorId,
+                input,
+                _options.ActorTimeoutSeconds,
+                _options.MemoryMegabytes,
+                Math.Clamp(_options.MaxDatasetItems, 1, 10),
+                _options.MaxTotalChargeUsd),
             cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await ReadSafeErrorAsync(response, cancellationToken);
-            throw new HttpRequestException(
-                $"Apify Amazon 상품 조회에 실패했습니다. HTTP {(int)response.StatusCode}: {message}",
-                null,
-                response.StatusCode);
-        }
-
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-        if (document.RootElement.ValueKind != JsonValueKind.Array
-            || document.RootElement.GetArrayLength() == 0)
+        if (result.Items.Count == 0)
         {
             return null;
         }
 
-        var item = document.RootElement[0];
+        var item = result.Items[0];
         var asin = GetString(item, "asin");
         var title = GetString(item, "title");
         if (string.IsNullOrWhiteSpace(asin) || string.IsNullOrWhiteSpace(title))
@@ -128,32 +114,11 @@ public sealed class ApifyAmazonProductClient : IApifyAmazonProductClient
             GetAttributes(item));
     }
 
-    private string BuildRunPath()
-    {
-        var actorId = _options.ActorId.Trim();
-        if (!System.Text.RegularExpressions.Regex.IsMatch(
-                actorId,
-                "^[A-Za-z0-9_.-]+~[A-Za-z0-9_.-]+$",
-                System.Text.RegularExpressions.RegexOptions.CultureInvariant))
-        {
-            throw new InvalidOperationException("ApifyAmazon:ActorId 형식이 올바르지 않습니다.");
-        }
-
-        var timeout = Math.Clamp(_options.ActorTimeoutSeconds, 30, 300);
-        var memory = Math.Clamp(_options.MemoryMegabytes, 128, 4096);
-        return $"acts/{actorId}/run-sync-get-dataset-items?timeout={timeout}&memory={memory}";
-    }
-
     private void EnsureConfigured()
     {
         if (!_options.Enabled)
         {
             throw new InvalidOperationException("Apify Amazon 상품 참고자료 조회가 비활성화되어 있습니다.");
-        }
-
-        if (string.IsNullOrWhiteSpace(_options.ApiToken))
-        {
-            throw new InvalidOperationException("ApifyAmazon:ApiToken 비밀 설정이 필요합니다.");
         }
     }
 
@@ -349,17 +314,4 @@ public sealed class ApifyAmazonProductClient : IApifyAmazonProductClient
         return normalized?.Length == 2 ? normalized : null;
     }
 
-    private static async Task<string> ReadSafeErrorAsync(
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
-    {
-        var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(body))
-        {
-            return response.ReasonPhrase ?? "응답 본문 없음";
-        }
-
-        var singleLine = body.Replace('\r', ' ').Replace('\n', ' ').Trim();
-        return singleLine.Length <= 800 ? singleLine : singleLine[..800];
-    }
 }

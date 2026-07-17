@@ -21,6 +21,10 @@ public sealed class ApifyAmazonOptions
 
     public int MemoryMegabytes { get; set; } = 1024;
 
+    public int MaxDatasetItems { get; set; } = 1;
+
+    public decimal MaxTotalChargeUsd { get; set; } = 1m;
+
     public int MaxFeatureCount { get; set; } = 8;
 
     public int MaxAttributeCount { get; set; } = 30;

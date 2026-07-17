@@ -71,9 +71,11 @@ public sealed class ApifyAmazonProductClientTests
         Assert.Equal("Bearer", capturedRequest.Headers.Authorization?.Scheme);
         Assert.Equal("test-token", capturedRequest.Headers.Authorization?.Parameter);
         Assert.Contains(
-            "acts/junglee~amazon-crawler/run-sync-get-dataset-items",
+            "actors/junglee~amazon-crawler/run-sync-get-dataset-items",
             capturedRequest.RequestUri!.AbsoluteUri,
             StringComparison.Ordinal);
+        Assert.Contains("maxItems=1", capturedRequest.RequestUri.Query, StringComparison.Ordinal);
+        Assert.Contains("maxTotalChargeUsd=1", capturedRequest.RequestUri.Query, StringComparison.Ordinal);
 
         using var body = JsonDocument.Parse(capturedBody!);
         Assert.Equal(1, body.RootElement.GetProperty("maxItemsPerStartUrl").GetInt32());
@@ -126,10 +128,15 @@ public sealed class ApifyAmazonProductClientTests
         {
             BaseAddress = new Uri("https://api.apify.com/v2/")
         };
-        return new ApifyAmazonProductClient(httpClient, Options.Create(new ApifyAmazonOptions
+        var gateway = new ApifyActorGateway(httpClient, Options.Create(new ApifyOptions
         {
             Enabled = true,
-            ApiToken = "test-token"
+            ApiToken = "test-token",
+            AllowedActorIds = ["junglee~amazon-crawler"]
+        }));
+        return new ApifyAmazonProductClient(gateway, Options.Create(new ApifyAmazonOptions
+        {
+            Enabled = true
         }));
     }
 
