@@ -38,6 +38,8 @@ Thumbs.db
 *.tmp
 
 # Generated verification output (keep already-selected screenshots and capture hosts tracked)
+**/.artifacts/
+**/.codex-build/
 /artifacts/build-check/
 /artifacts/*-bin/
 /artifacts/*-build/
