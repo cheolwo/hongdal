@@ -41,6 +41,7 @@ public sealed class CommunityPrajnaPostSourceTests
         await using var context = CreateContext();
         var card = AddCard(context, approved: true, "먼저 게시할 카드");
         AddVideo(context, "hidden-video", YouTube채널영상.숨김상태, "숨김 영상");
+        AddVideo(context, "blocked-channel-video", YouTube채널영상.공개상태, "채널 미승인 영상", "other-channel", false);
         AddVideo(context, "approved-video", YouTube채널영상.공개상태, "승인 영상");
         await context.SaveChangesAsync();
         context.PlatformCommunityPosts.Add(SystemPost(
@@ -113,20 +114,22 @@ public sealed class CommunityPrajnaPostSourceTests
         HongdalContext context,
         string videoId,
         string publicationState,
-        string title)
+        string title,
+        string channelId = HongikChannelId,
+        bool prajnaAllowed = true)
     {
         var channel = context.YouTube감시채널.Local
-            .FirstOrDefault(existing => existing.ChannelId == HongikChannelId);
+            .FirstOrDefault(existing => existing.ChannelId == channelId);
         if (channel is null)
         {
             channel = new YouTube감시채널
             {
-                ChannelId = HongikChannelId,
-                채널명 = "홍익학당",
-                UploadsPlaylistId = "uploads",
+                ChannelId = channelId,
+                채널명 = channelId == HongikChannelId ? "홍익학당" : "다른 성찰 채널",
+                UploadsPlaylistId = $"uploads-{channelId}",
                 활성화여부 = true,
                 지식성찰채널여부 = true,
-                반야게시허용여부 = true,
+                반야게시허용여부 = prajnaAllowed,
                 지식성찰분류 = YouTube지식성찰주제코드.철학,
                 관점표시 = "홍익·양심 공부"
             };
@@ -136,7 +139,7 @@ public sealed class CommunityPrajnaPostSourceTests
         channel.영상.Add(new YouTube채널영상
         {
             감시채널 = channel,
-            ChannelId = HongikChannelId,
+            ChannelId = channelId,
             VideoId = videoId,
             제목 = title,
             설명 = "짧은 영상 소개",
