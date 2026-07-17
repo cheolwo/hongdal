@@ -1390,7 +1390,16 @@
                                         </MudStack>
                                     </MudStack>
 
-                                     <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
+                                     @if (post.SalesOffer is not null)
+                                     {
+                                         <PlatformCommunitySalesOfferPanel Post="@post"
+                                                                           InquiryRequested="@(async (string message) => await BeginSalesInquiryAsync(post, message))" />
+                                     }
+
+                                     @if (!string.IsNullOrWhiteSpace(post.Body))
+                                     {
+                                         <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
+                                     }
 
                                      @if (post.IsCommunityMomentumPromoted
                                           && !string.IsNullOrWhiteSpace(post.CommunityMomentumMessage))
@@ -13639,6 +13648,18 @@
 
     private async Task SaveCommentAsync(PlatformCommunityPostResponse post)
         => await ApplyCommandResultAsync(await Engagement.SaveCommentAsync(post.Id));
+
+    private Task BeginSalesInquiryAsync(PlatformCommunityPostResponse post, string message)
+    {
+        var commentForm = GetCommentForm(post.Id);
+        commentForm.Body = message;
+        if (!IsPostCommentsExpanded(post.Id))
+        {
+            TogglePostComments(post.Id);
+        }
+
+        return Task.CompletedTask;
+    }
 
     private async Task DeleteCommentAsync(PlatformCommunityPostResponse post, PlatformCommunityPostCommentResponse comment)
         => await ApplyCommandResultAsync(
