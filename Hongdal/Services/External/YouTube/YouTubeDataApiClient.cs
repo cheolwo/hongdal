@@ -7,6 +7,13 @@ namespace Hongdal.Services.External.YouTube;
 
 public interface IYouTubeDataApiClient
 {
+    Task<IReadOnlyList<YouTube채널검색응답>> 채널검색Async(
+        string 검색어,
+        int maxResults,
+        string? regionCode,
+        string? relevanceLanguage,
+        CancellationToken cancellationToken);
+
     Task<YouTube채널응답?> 채널조회Async(string channelId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<YouTube재생목록응답>> 재생목록목록조회Async(
@@ -28,6 +35,13 @@ public sealed record YouTube채널응답(
     string ChannelId,
     string 채널명,
     string UploadsPlaylistId,
+    string? 썸네일Url);
+
+public sealed record YouTube채널검색응답(
+    string ChannelId,
+    string 채널명,
+    string 설명,
+    DateTime 게시일시Utc,
     string? 썸네일Url);
 
 public sealed record YouTube영상응답(
@@ -56,6 +70,58 @@ public sealed class YouTubeDataApiClient : IYouTubeDataApiClient
     {
         _httpClient = httpClient;
         _options = options.Value;
+    }
+
+    public async Task<IReadOnlyList<YouTube채널검색응답>> 채널검색Async(
+        string 검색어,
+        int maxResults,
+        string? regionCode,
+        string? relevanceLanguage,
+        CancellationToken cancellationToken)
+    {
+        EnsureConfigured();
+        ArgumentException.ThrowIfNullOrWhiteSpace(검색어);
+
+        var query = 검색어.Trim();
+        if (query.Length > 200)
+        {
+            throw new ArgumentOutOfRangeException(nameof(검색어), "YouTube 검색어는 200자 이하여야 합니다.");
+        }
+
+        var safeMaxResults = Math.Clamp(maxResults, 1, 25);
+        var path = $"search?part=snippet&type=channel&topicId={Encode("/m/02wbm")}&order=relevance&q={Encode(query)}&maxResults={safeMaxResults}&key={Encode(_options.ApiKey)}";
+        if (!string.IsNullOrWhiteSpace(regionCode))
+        {
+            var normalizedRegion = NormalizeRegionCode(regionCode);
+            path += $"&regionCode={Encode(normalizedRegion)}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(relevanceLanguage))
+        {
+            var normalizedLanguage = relevanceLanguage.Trim();
+            if (normalizedLanguage.Length > 10)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(relevanceLanguage),
+                    "YouTube 관련 언어 코드는 10자 이하여야 합니다.");
+            }
+
+            path += $"&relevanceLanguage={Encode(normalizedLanguage)}";
+        }
+
+        using var response = await _httpClient.GetAsync(path, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+        var body = await response.Content.ReadFromJsonAsync<YouTube목록응답<YouTube채널검색항목>>(
+            cancellationToken);
+
+        return (body?.Items ?? [])
+            .Select(ToChannelSearchResult)
+            .Where(item => item is not null)
+            .Cast<YouTube채널검색응답>()
+            .GroupBy(item => item.ChannelId, StringComparer.Ordinal)
+            .Select(group => group.First())
+            .Take(safeMaxResults)
+            .ToArray();
     }
 
     public async Task<YouTube채널응답?> 채널조회Async(
@@ -212,6 +278,22 @@ public sealed class YouTubeDataApiClient : IYouTubeDataApiClient
             SelectThumbnail(item.Snippet?.Thumbnails));
     }
 
+    private static YouTube채널검색응답? ToChannelSearchResult(YouTube채널검색항목 item)
+    {
+        var channelId = item.Id?.ChannelId;
+        if (string.IsNullOrWhiteSpace(channelId))
+        {
+            return null;
+        }
+
+        return new YouTube채널검색응답(
+            channelId,
+            item.Snippet?.Title?.Trim() ?? channelId,
+            item.Snippet?.Description?.Trim() ?? string.Empty,
+            item.Snippet?.PublishedAt?.ToUniversalTime() ?? DateTime.UnixEpoch,
+            SelectThumbnail(item.Snippet?.Thumbnails));
+    }
+
     private static YouTube재생목록응답? ToPlaylist(YouTube재생목록정보항목 item)
     {
         var channelId = item.Snippet?.ChannelId;
@@ -241,6 +323,17 @@ public sealed class YouTubeDataApiClient : IYouTubeDataApiClient
            ?? thumbnails?.Default?.Url;
 
     private static string Encode(string value) => Uri.EscapeDataString(value);
+
+    private static string NormalizeRegionCode(string regionCode)
+    {
+        var normalized = regionCode.Trim().ToUpperInvariant();
+        if (normalized.Length != 2 || normalized.Any(character => character is < 'A' or > 'Z'))
+        {
+            throw new ArgumentException("YouTube 지역 코드는 ISO 3166-1 alpha-2 형식이어야 합니다.", nameof(regionCode));
+        }
+
+        return normalized;
+    }
 
     private static string? NextPageToken(string? nextPageToken, HashSet<string> seenTokens)
         => !string.IsNullOrWhiteSpace(nextPageToken) && seenTokens.Add(nextPageToken)
@@ -276,6 +369,19 @@ public sealed class YouTubeDataApiClient : IYouTubeDataApiClient
         [property: JsonPropertyName("id")] string Id,
         [property: JsonPropertyName("snippet")] YouTube채널Snippet? Snippet,
         [property: JsonPropertyName("contentDetails")] YouTube채널ContentDetails? ContentDetails);
+
+    private sealed record YouTube채널검색항목(
+        [property: JsonPropertyName("id")] YouTube채널검색Id? Id,
+        [property: JsonPropertyName("snippet")] YouTube검색Snippet? Snippet);
+
+    private sealed record YouTube채널검색Id(
+        [property: JsonPropertyName("channelId")] string? ChannelId);
+
+    private sealed record YouTube검색Snippet(
+        [property: JsonPropertyName("publishedAt")] DateTime? PublishedAt,
+        [property: JsonPropertyName("title")] string? Title,
+        [property: JsonPropertyName("description")] string? Description,
+        [property: JsonPropertyName("thumbnails")] YouTube썸네일목록? Thumbnails);
 
     private sealed record YouTube채널Snippet(
         [property: JsonPropertyName("title")] string? Title,

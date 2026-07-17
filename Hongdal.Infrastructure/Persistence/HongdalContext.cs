@@ -106,6 +106,7 @@ namespace 홍달.Data
         public DbSet<Typecast음성용도> Typecast음성용도 { get; set; } = null!;
         public DbSet<YouTube감시채널> YouTube감시채널 { get; set; } = null!;
         public DbSet<YouTube채널영상> YouTube채널영상 { get; set; } = null!;
+        public DbSet<YouTube영상상품후보> YouTube영상상품후보 { get; set; } = null!;
         public DbSet<HongikHakdangCardCollection> HongikHakdangCardCollections { get; set; } = null!;
         public DbSet<HongikHakdangCard> HongikHakdangCards { get; set; } = null!;
         public DbSet<HongikHakdangCardCollectionItem> HongikHakdangCardCollectionItems { get; set; } = null!;
