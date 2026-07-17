@@ -71,6 +71,15 @@ namespace Hongdal.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("varchar(40)");
 
+                    b.Property<string>("RequestedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
+
+                    b.Property<string>("ReviewedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -89,6 +98,9 @@ namespace Hongdal.Migrations
                     b.HasIndex("AppKey", "BoardKey", "IsDeleted");
 
                     b.HasIndex("AppKey", "Status", "IsDeleted", "UpdatedAtUtc");
+
+                    b.HasIndex("RequestedByUserId", "Status", "IsDeleted", "CreatedAtUtc")
+                        .HasDatabaseName("IX_community_board_requests_requester_status");
 
                     b.ToTable("platform_community_board_requests", (string)null);
                 });

@@ -87,6 +87,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I버전워크플로우UseCase, 버전워크플로우UseCase>();
         services.AddScoped<IISMSP전송보호UseCase, ISMSP전송보호UseCase>();
         services.AddScoped<I커뮤니티게시판UseCase, 커뮤니티게시판UseCase>();
+        services.AddScoped<ICommunityBoardWritePolicy, CommunityBoardWritePolicy>();
         services.AddScoped<I커뮤니티게시글UseCase, 커뮤니티게시글UseCase>();
         services.AddScoped<I커뮤니티투표UseCase, 커뮤니티투표UseCase>();
         services.AddScoped<I커뮤니티활동신호UseCase, 커뮤니티활동신호UseCase>();

@@ -311,8 +311,22 @@ public sealed class PlatformCommunityService
         string status = PlatformCommunityBoardRequestStatuses.Approved,
         CancellationToken cancellationToken = default)
     {
-        var path = $"api/v1/community/boards?appKey={Uri.EscapeDataString(appKey)}&status={Uri.EscapeDataString(status)}";
-        return await _httpClient.GetFromJsonAsync<PlatformCommunityBoardListResponse>(path, cancellationToken)
+        var isPublicList = string.Equals(
+            status,
+            PlatformCommunityBoardRequestStatuses.Approved,
+            StringComparison.OrdinalIgnoreCase);
+        var path = isPublicList
+            ? $"api/v1/community/boards?appKey={Uri.EscapeDataString(appKey)}"
+            : $"api/v1/community/boards/requests?appKey={Uri.EscapeDataString(appKey)}&status={Uri.EscapeDataString(status)}";
+        if (isPublicList)
+        {
+            return await _httpClient.GetFromJsonAsync<PlatformCommunityBoardListResponse>(path, cancellationToken)
+                   ?? new PlatformCommunityBoardListResponse();
+        }
+
+        using var response = await _protectedApiClient.GetAsync(path, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityBoardListResponse>(cancellationToken: cancellationToken)
                ?? new PlatformCommunityBoardListResponse();
     }
 

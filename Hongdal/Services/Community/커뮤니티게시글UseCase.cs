@@ -138,6 +138,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
     private readonly I커뮤니티게시글음성작업예약Service _음성작업예약Service;
     private readonly ICommunityKeywordNotificationQueue _keywordNotificationQueue;
     private readonly I게시글원장ContextService _원장ContextService;
+    private readonly ICommunityBoardWritePolicy _boardWritePolicy;
     private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly IPublisher _publisher;
     private readonly ILogger<커뮤니티게시글UseCase> _logger;
@@ -149,6 +150,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         I커뮤니티게시글음성작업예약Service 음성작업예약Service,
         ICommunityKeywordNotificationQueue keywordNotificationQueue,
         I게시글원장ContextService 원장ContextService,
+        ICommunityBoardWritePolicy boardWritePolicy,
         ICurrentUserAccessor currentUserAccessor,
         IPublisher publisher,
         ILogger<커뮤니티게시글UseCase> logger)
@@ -159,6 +161,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         _음성작업예약Service = 음성작업예약Service;
         _keywordNotificationQueue = keywordNotificationQueue;
         _원장ContextService = 원장ContextService;
+        _boardWritePolicy = boardWritePolicy;
         _currentUserAccessor = currentUserAccessor;
         _publisher = publisher;
         _logger = logger;
@@ -282,7 +285,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
                             && board.Status == PlatformCommunityBoardRequestStatuses.Approved);
         if (normalizedAppKey is not null)
         {
-            customBoardsQuery = customBoardsQuery.Where(board => board.AppKey == normalizedAppKey);
+            customBoardsQuery = customBoardsQuery.Where(board =>
+                board.AppKey == normalizedAppKey || board.AppKey == "platform");
         }
 
         var customBoards = await customBoardsQuery
@@ -362,7 +366,17 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         }
 
         var now = DateTime.UtcNow;
+        var normalizedAppKey = Normalize(request.AppKey, "platform", 80);
         var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
+        if (!await _boardWritePolicy.CanWriteAsync(
+                normalizedAppKey,
+                normalizedCategory,
+                cancellationToken))
+        {
+            return BadRequest<PlatformCommunityPostResponse>(
+                "기본 게시판 또는 운영자가 승인한 사용자 게시판에만 글을 작성할 수 있습니다.");
+        }
+
         var isReportBoardPost = request.SalesOffer is null
                                 && (request.IsReportBoardPost || IsReportCategory(normalizedCategory));
         var normalizedNickname = Normalize(request.Nickname, "익명", 40);
@@ -370,7 +384,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         var normalizedBody = Normalize(request.Body, string.Empty, 4000);
         var entity = new PlatformCommunityPost
         {
-            AppKey = Normalize(request.AppKey, "platform", 80),
+            AppKey = normalizedAppKey,
             Category = normalizedCategory,
             WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60),
             RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40),
@@ -587,7 +601,17 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             연결원장 = 원장결과.Value;
         }
 
-        entity.Category = ResolvePostCategory(request.Category, request.SalesOffer);
+        var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
+        if (!await _boardWritePolicy.CanWriteAsync(
+                entity.AppKey,
+                normalizedCategory,
+                cancellationToken))
+        {
+            return BadRequest<PlatformCommunityPostResponse>(
+                "기본 게시판 또는 운영자가 승인한 사용자 게시판으로만 글을 이동할 수 있습니다.");
+        }
+
+        entity.Category = normalizedCategory;
         var isReportBoardPost = request.SalesOffer is null
                                 && (request.IsReportBoardPost || IsReportCategory(entity.Category));
         entity.WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60);

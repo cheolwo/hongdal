@@ -79,6 +79,10 @@ These functions are treated as community infrastructure:
 
 The goal is to let people gather first. A community that charges too early loses the social density that makes the platform useful.
 
+## User-Created Boards
+
+고정 목적별 게시판에 없는 주제는 로그인 사용자가 개설을 신청할 수 있다. 신청 즉시 공개하지 않고 서버 관리자가 승인한 뒤 `구성원 게시판`으로 노출한다. 공개 목록은 승인된 게시판만 포함하며 승인 대기·반려 사유와 운영 메모는 관리자 검토 정보로 보호한다. 게시글 저장 시에도 승인 상태를 다시 검사해 임의 카테고리 문자열로 승인 절차를 우회하지 못하게 한다. 신청 계정, 검토 관리자, 대기 신청 제한과 후속 운영권 경계는 [사용자 개설 커뮤니티 게시판](UserCreatedCommunityBoards.md)을 따른다.
+
 ## Community Ledger Skeleton
 
 Community conversations can become lightweight ledgers when participants decide to handle a real-life task together. A ledger draft is not a platform-guaranteed contract. It is a shared board where participants can name roles, record state, attach optional evidence, and mark payment or completion confirmations for each other.
