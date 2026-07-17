@@ -182,6 +182,10 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(입고조회ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고예정조회ViewModel)
+            && x.ImplementationType == typeof(입고예정조회ViewModel)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(출고포장ViewModel)
             && x.ImplementationType == typeof(출고포장ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);

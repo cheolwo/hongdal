@@ -80,6 +80,7 @@
                                     @입고흐름유형코드.GetDescription(inboundFlowType)
                                 </MudAlert>
                             </MudItem>
+                            <MudItem xs="12" md="6"><MudTextField Label="공급처 코드" @bind-Value="supplierCode" Variant="Variant.Outlined" /></MudItem>
                             <MudItem xs="12" md="6"><MudTextField Label="공급처명" @bind-Value="supplierName" Variant="Variant.Outlined" /></MudItem>
                             <MudItem xs="12" md="6"><MudTextField Label="원주문 참조번호" @bind-Value="orderReference" Variant="Variant.Outlined" /></MudItem>
                             <MudItem xs="12" md="6"><MudDatePicker Label="예정 도착일" @bind-Date="expectedArrivalDate" Variant="Variant.Outlined" /></MudItem>
@@ -114,8 +115,8 @@
                                        SelectedItemChanged="SelectInboundAsync"
                                        RowsPerPage="25"
                                        MinimumWidth="1280"
-                                       SkeletonColumns="7"
-                                       SearchPlaceholder="공급처, 참조번호, 계약번호 검색"
+                                       SkeletonColumns="9"
+                                       SearchPlaceholder="공급처 코드·명칭, 상품, SKU, 참조번호 검색"
                                        EmptyText="등록된 입고 요청이 없습니다.">
                     <ToolBarContent>
                         <MudText Typo="Typo.h6">입고 요청 목록</MudText>
@@ -137,7 +138,17 @@
                                 }
                             </CellTemplate>
                         </TemplateColumn>
+                        <PropertyColumn T="입고요청항목응답" TProperty="string" Property="item => item.공급처코드" Title="공급처 코드" />
                         <PropertyColumn T="입고요청항목응답" TProperty="string" Property="item => item.공급처명" Title="공급처" />
+                        <TemplateColumn T="입고요청항목응답" Title="예정 품목" Sortable="false">
+                            <CellTemplate>
+                                <MudText Typo="Typo.body2">@(string.IsNullOrWhiteSpace(context.Item.예정상품명) ? "-" : context.Item.예정상품명)</MudText>
+                                @if (!string.IsNullOrWhiteSpace(context.Item.예정SKU))
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Item.예정SKU · @context.Item.예정수량</MudText>
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
                         <PropertyColumn T="입고요청항목응답" TProperty="string" Property="item => item.원주문참조번호" Title="참조번호" />
                         <TemplateColumn T="입고요청항목응답" Title="계약" Sortable="false">
                             <CellTemplate>
@@ -244,6 +255,7 @@
 
     private long? selectedWarehouseId;
     private string inboundFlowType = 입고흐름유형코드.계약기반입고;
+    private string supplierCode = string.Empty;
     private string supplierName = string.Empty;
     private string orderReference = string.Empty;
     private DateTime? expectedArrivalDate = DateTime.Today;
@@ -449,6 +461,7 @@
                 입고생성경로 = BuildInboundSourceLabel(inboundFlowType),
                 계약선행여부 = 입고흐름유형코드.RequiresExistingContract(inboundFlowType),
                 자동생성여부 = 입고흐름유형코드.IsOrderGenerated(inboundFlowType),
+                공급처코드 = supplierCode,
                 공급처명 = supplierName,
                 원주문참조번호 = orderReference,
                 예정도착일 = expectedArrivalDate,
@@ -466,7 +479,7 @@
                 }.Normalize()
             });
 
-            supplierName = orderReference = inboundMemo = string.Empty;
+            supplierCode = supplierName = orderReference = inboundMemo = string.Empty;
             inboundFlowType = 입고흐름유형코드.계약기반입고;
             contractNo = contractCounterpartyName = contractSettlementType = string.Empty;
             contractType = 입고계약유형코드.보관대행;

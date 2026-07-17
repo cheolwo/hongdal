@@ -158,6 +158,72 @@ public sealed class 입고조회ViewModel : 입출고업무조각ViewModelBase,
     }
 }
 
+/// <summary>창고 유형과 무관하게 입고 예정 상태만 서버 페이징으로 조회하는 화면 조각입니다.</summary>
+public sealed class 입고예정조회ViewModel : 업무조각ViewModelBase,
+    I서버목록조회ViewModel<입고요청항목응답>
+{
+    private readonly 입고조회ViewModel _입고조회;
+    private 목록조회결과<입고요청항목응답> _결과 = 목록조회결과<입고요청항목응답>.비어있음;
+    private 목록조회요청? _최근요청;
+
+    public 입고예정조회ViewModel(입고조회ViewModel 입고조회)
+        : base("expected-inbound-query", "입고 예정 조회", 업무조각유형.목록조회)
+    {
+        _입고조회 = 입고조회;
+    }
+
+    public 목록조회결과<입고요청항목응답> 결과
+    {
+        get => _결과;
+        private set => SetProperty(ref _결과, value);
+    }
+
+    public 목록조회요청? 최근요청
+    {
+        get => _최근요청;
+        private set => SetProperty(ref _최근요청, value);
+    }
+
+    public bool 선택(long inboundId)
+        => _입고조회.선택(inboundId);
+
+    public Task<bool> 조회Async(
+        목록조회요청 요청,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(요청);
+        var normalized = 요청.정규화();
+        var expectedRequest = normalized with
+        {
+            필터조건 = normalized.필터조건
+                .Where(filter => !string.Equals(
+                    filter.필드,
+                    nameof(입고요청항목응답.상태),
+                    StringComparison.OrdinalIgnoreCase))
+                .Append(new 목록필터조건(
+                    nameof(입고요청항목응답.상태),
+                    "Equal",
+                    입고상태코드.예정))
+                .ToArray()
+        };
+        최근요청 = expectedRequest;
+
+        return 작업실행Async(
+            async token =>
+            {
+                if (!await _입고조회.조회Async(expectedRequest, token))
+                {
+                    throw new InvalidOperationException(
+                        _입고조회.오류메시지 ?? "입고 예정 목록을 조회하지 못했습니다.");
+                }
+
+                결과 = _입고조회.결과;
+            },
+            "입고 예정 목록을 조회했습니다.",
+            cancellationToken);
+    }
+}
+
 /// <summary>입고 요청 한 건을 등록하는 폼용 화면 조각입니다.</summary>
 public sealed class 입고등록ViewModel : 입출고업무조각ViewModelBase, I등록ViewModel<입고요청저장요청>
 {
@@ -239,6 +305,7 @@ public sealed class 입고수정ViewModel : 입출고업무조각ViewModelBase, 
             판매자UserId = selected.판매자UserId,
             출고예정Id = selected.출고예정Id,
             운송의뢰Id = selected.운송의뢰Id,
+            공급처코드 = selected.공급처코드,
             공급처명 = selected.공급처명,
             원주문참조번호 = selected.원주문참조번호,
             예정도착일 = selected.예정도착일,

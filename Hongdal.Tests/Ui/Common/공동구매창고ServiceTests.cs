@@ -2,6 +2,7 @@ using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Shipper.Request;
 using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 
 namespace Hongdal.Tests.Ui.Common;
 
@@ -54,6 +55,43 @@ public sealed class 공동구매창고ServiceTests
         Assert.Contains("sortDescending=false", client.LastPath);
         Assert.Contains("warehouseId=17", client.LastPath);
         Assert.Contains("status=%EC%9E%85%EA%B3%A0%EC%98%88%EC%A0%95", client.LastPath);
+    }
+
+    [Fact]
+    public async Task 입고예정조회ViewModel은_상태조건을입고예정으로고정한다()
+    {
+        var client = new RecordingJsonApiClient
+        {
+            Response = new 입고요청페이지응답
+            {
+                Items = [new 입고요청항목응답 { Id = 7, 상태 = 입고상태코드.예정 }],
+                TotalCount = 1
+            }
+        };
+        var state = new 입출고화면상태ViewModel();
+        state.창고목록적용([new() { Id = 17, 기본창고여부 = true }]);
+        using var ledger = new 입고원장ViewModel(new 입출고원장상태ViewModel());
+        using var query = new 입고조회ViewModel(new 입출고작업Service(client), state, ledger);
+        var expectedQuery = new 입고예정조회ViewModel(query);
+
+        var succeeded = await expectedQuery.조회Async(new 목록조회요청
+        {
+            검색어 = "SUP-01",
+            필터조건 =
+            [
+                new 목록필터조건(
+                    nameof(입고요청항목응답.상태),
+                    "Equal",
+                    입고상태코드.완료)
+            ]
+        });
+
+        Assert.True(succeeded);
+        Assert.Equal(1, expectedQuery.결과.전체건수);
+        Assert.Contains("search=SUP-01", client.LastPath);
+        Assert.Contains("warehouseId=17", client.LastPath);
+        Assert.Contains("status=%EC%9E%85%EA%B3%A0%EC%98%88%EC%A0%95", client.LastPath);
+        Assert.DoesNotContain("status=%EC%9E%85%EA%B3%A0%EC%99%84%EB%A3%8C", client.LastPath);
     }
 
     [Fact]

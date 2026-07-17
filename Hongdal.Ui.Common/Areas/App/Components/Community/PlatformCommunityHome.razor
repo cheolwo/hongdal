@@ -708,6 +708,12 @@
                                     <MudText Typo="Typo.subtitle2">신청 입력</MudText>
                                     <MudGrid Class="platform-diagram-warehouse-request-form">
                                         <MudItem xs="12" sm="6">
+                                            <MudTextField Label="공급처 코드"
+                                                          @bind-Value="warehouseProxySupplierCode"
+                                                          Variant="Variant.Outlined"
+                                                          Margin="Margin.Dense" />
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6">
                                             <MudTextField Label="공급처명"
                                                           @bind-Value="warehouseProxySupplierName"
                                                           Variant="Variant.Outlined"
@@ -7084,6 +7090,7 @@
     private bool diagramHandleDragMoved;
     private bool suppressNextDiagramHandleClick;
     private string newConnectionLabel = "다음 단계";
+    private string warehouseProxySupplierCode = string.Empty;
     private string warehouseProxySupplierName = string.Empty;
     private string warehouseProxyOrderReference = string.Empty;
     private DateTime? warehouseProxyExpectedArrivalDate = DateTime.Today.AddDays(1);
@@ -9551,6 +9558,7 @@
                 입고생성경로 = $"다이어그램 창고 블록/{node.Title}",
                 계약선행여부 = true,
                 자동생성여부 = false,
+                공급처코드 = warehouseProxySupplierCode.Trim(),
                 공급처명 = warehouseProxySupplierName.Trim(),
                 원주문참조번호 = warehouseProxyOrderReference.Trim(),
                 예정도착일 = warehouseProxyExpectedArrivalDate,
@@ -9589,6 +9597,7 @@
 
     private void 창고대행신청양식미리채우기(다이어그램창고대행후보 candidate)
     {
+        warehouseProxySupplierCode = "DIAGRAM-SUPPLIER";
         warehouseProxySupplierName = "다이어그램 물류 대행 신청";
         warehouseProxyOrderReference = $"DIAGRAM-{DateTime.Today:yyyyMMdd}";
         warehouseProxyExpectedArrivalDate = DateTime.Today.AddDays(1);
@@ -9604,6 +9613,7 @@
     private void 창고대행신청양식초기화()
     {
         창고대행신청제출중 = false;
+        warehouseProxySupplierCode = string.Empty;
         warehouseProxySupplierName = string.Empty;
         warehouseProxyOrderReference = string.Empty;
         warehouseProxyExpectedArrivalDate = DateTime.Today.AddDays(1);

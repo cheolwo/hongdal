@@ -90,4 +90,44 @@ public sealed class 목록검색ViewModelTests
         Assert.Equal(1, result.Page);
         Assert.Equal(1, result.PageSize);
     }
+
+    [Fact]
+    public void 입고목록Query는_공급처코드와예정품목을검색한다()
+    {
+        입고요청항목응답[] source =
+        [
+            new()
+            {
+                Id = 11,
+                공급처코드 = "SUP-SEOUL-01",
+                공급처명 = "서울 식자재",
+                예정상품명 = "유기농 감자",
+                예정SKU = "POTATO-10KG",
+                상태 = 입고상태코드.예정
+            },
+            new()
+            {
+                Id = 22,
+                공급처코드 = "SUP-BUSAN-02",
+                공급처명 = "부산 수산",
+                예정상품명 = "고등어",
+                예정SKU = "FISH-001",
+                상태 = 입고상태코드.예정
+            }
+        ];
+
+        var bySupplierCode = 입고요청목록Query.Apply(source, new 입고요청목록조회요청
+        {
+            Search = "SEOUL-01",
+            Status = 입고상태코드.예정
+        });
+        var byProduct = 입고요청목록Query.Apply(source, new 입고요청목록조회요청
+        {
+            Search = "POTATO-10KG",
+            Status = 입고상태코드.예정
+        });
+
+        Assert.Equal(11, Assert.Single(bySupplierCode.Items).Id);
+        Assert.Equal(11, Assert.Single(byProduct.Items).Id);
+    }
 }

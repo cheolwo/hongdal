@@ -6469,6 +6469,12 @@ namespace Hongdal.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("공급처명");
 
+                    b.Property<string>("공급처코드")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("공급처코드");
+
                     b.Property<decimal>("보관료일단가")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("보관료일단가");

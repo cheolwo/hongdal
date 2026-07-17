@@ -32,6 +32,7 @@ internal static class WarehouseUiModule
         services.TryAddScoped<창고사용자삭제ViewModel>();
         services.TryAddScoped<창고사용자CrudViewModel>();
         services.TryAddScoped<입고조회ViewModel>();
+        services.TryAddScoped<입고예정조회ViewModel>();
         services.TryAddScoped<입고등록ViewModel>();
         services.TryAddScoped<입고수정ViewModel>();
         services.TryAddScoped<입고삭제ViewModel>();

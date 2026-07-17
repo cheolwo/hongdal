@@ -68,7 +68,10 @@ public static class 입고요청목록Query
             var search = request.Search.Trim();
             query = query.Where(item =>
                 item.Id.ToString().Contains(search, StringComparison.OrdinalIgnoreCase)
+                || item.공급처코드.Contains(search, StringComparison.OrdinalIgnoreCase)
                 || item.공급처명.Contains(search, StringComparison.OrdinalIgnoreCase)
+                || item.예정상품명.Contains(search, StringComparison.OrdinalIgnoreCase)
+                || item.예정SKU.Contains(search, StringComparison.OrdinalIgnoreCase)
                 || item.원주문참조번호.Contains(search, StringComparison.OrdinalIgnoreCase)
                 || item.주문참조번호.Contains(search, StringComparison.OrdinalIgnoreCase)
                 || item.계약정보.계약번호.Contains(search, StringComparison.OrdinalIgnoreCase));
@@ -80,6 +83,8 @@ public static class 입고요청목록Query
             (nameof(입고요청항목응답.Id), true) => query.OrderByDescending(item => item.Id),
             (nameof(입고요청항목응답.창고Id), false) => query.OrderBy(item => item.창고Id).ThenBy(item => item.Id),
             (nameof(입고요청항목응답.창고Id), true) => query.OrderByDescending(item => item.창고Id).ThenByDescending(item => item.Id),
+            (nameof(입고요청항목응답.공급처코드), false) => query.OrderBy(item => item.공급처코드).ThenBy(item => item.Id),
+            (nameof(입고요청항목응답.공급처코드), true) => query.OrderByDescending(item => item.공급처코드).ThenByDescending(item => item.Id),
             (nameof(입고요청항목응답.공급처명), false) => query.OrderBy(item => item.공급처명).ThenBy(item => item.Id),
             (nameof(입고요청항목응답.공급처명), true) => query.OrderByDescending(item => item.공급처명).ThenByDescending(item => item.Id),
             (nameof(입고요청항목응답.원주문참조번호), false) => query.OrderBy(item => item.원주문참조번호).ThenBy(item => item.Id),

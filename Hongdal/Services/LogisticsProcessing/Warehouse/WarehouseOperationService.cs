@@ -226,35 +226,17 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
     public async Task<입고요청목록응답> GetInboundsAsync(CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var items = await 접근가능입고Query(userId)
+        var entities = await 접근가능입고Query(userId)
             .AsNoTracking()
             .Where(x => x.상태 != 입고상태.취소)
             .OrderByDescending(x => x.CreatedAt)
-            .Select(x => new 입고요청항목응답
-            {
-                Id = x.Id,
-                창고Id = x.창고Id,
-                커뮤니티원장Id = x.커뮤니티원장Id,
-                커뮤니티원장템플릿Key = x.커뮤니티원장템플릿Key,
-                커뮤니티원장상태 = x.커뮤니티원장상태,
-                입고흐름유형 = x.입고흐름유형,
-                입고생성경로 = x.입고생성경로,
-                계약선행여부 = x.계약선행여부,
-                자동생성여부 = x.자동생성여부,
-                주문Id = x.주문Id,
-                주문참조번호 = x.주문참조번호,
-                주문자UserId = x.주문자UserId,
-                판매자UserId = x.판매자UserId,
-                출고예정Id = x.출고예정Id,
-                운송의뢰Id = x.운송의뢰Id,
-                공급처명 = x.공급처명,
-                원주문참조번호 = x.원주문참조번호,
-                상태 = x.상태,
-                예정도착일 = x.예정도착일,
-                입고완료일시 = x.입고완료일시,
-                계약정보 = CreateContractSnapshot(x)
-            })
             .ToArrayAsync(cancellationToken);
+        var expectedOutbounds = await LoadExpectedOutboundsAsync(entities, cancellationToken);
+        var items = entities
+            .Select(entity => ToInboundResponse(
+                entity,
+                expectedOutbounds.GetValueOrDefault(entity.Id)))
+            .ToArray();
 
         return new 입고요청목록응답 { Items = items };
     }
@@ -294,10 +276,14 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             var idMatched = long.TryParse(search, out var inboundId);
             query = query.Where(x =>
                 (idMatched && x.Id == inboundId)
+                || x.공급처코드.Contains(search)
                 || x.공급처명.Contains(search)
                 || x.원주문참조번호.Contains(search)
                 || x.주문참조번호.Contains(search)
-                || x.계약번호.Contains(search));
+                || x.계약번호.Contains(search)
+                || _db.출고예정.Any(outbound =>
+                    outbound.입고요청Id == x.Id
+                    && (outbound.상품명.Contains(search) || outbound.SKU.Contains(search))));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -310,6 +296,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             nameof(입고요청항목응답.창고Id) => descending
                 ? query.OrderByDescending(x => x.창고Id).ThenByDescending(x => x.Id)
                 : query.OrderBy(x => x.창고Id).ThenBy(x => x.Id),
+            nameof(입고요청항목응답.공급처코드) => descending
+                ? query.OrderByDescending(x => x.공급처코드).ThenByDescending(x => x.Id)
+                : query.OrderBy(x => x.공급처코드).ThenBy(x => x.Id),
             nameof(입고요청항목응답.공급처명) => descending
                 ? query.OrderByDescending(x => x.공급처명).ThenByDescending(x => x.Id)
                 : query.OrderBy(x => x.공급처명).ThenBy(x => x.Id),
@@ -330,10 +319,15 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             .Skip(skip)
             .Take(pageSize)
             .ToArrayAsync(cancellationToken);
+        var expectedOutbounds = await LoadExpectedOutboundsAsync(entities, cancellationToken);
 
         return new 입고요청페이지응답
         {
-            Items = entities.Select(ToInboundResponse).ToArray(),
+            Items = entities
+                .Select(entity => ToInboundResponse(
+                    entity,
+                    expectedOutbounds.GetValueOrDefault(entity.Id)))
+                .ToArray(),
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize
@@ -365,6 +359,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             판매자UserId = request.판매자UserId.Trim(),
             출고예정Id = request.출고예정Id,
             운송의뢰Id = string.IsNullOrWhiteSpace(request.운송의뢰Id) ? null : request.운송의뢰Id.Trim(),
+            공급처코드 = request.공급처코드.Trim(),
             공급처명 = request.공급처명.Trim(),
             원주문참조번호 = request.원주문참조번호.Trim(),
             예정도착일 = request.예정도착일,
@@ -404,6 +399,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             판매자UserId = entity.판매자UserId,
             출고예정Id = entity.출고예정Id,
             운송의뢰Id = entity.운송의뢰Id,
+            공급처코드 = entity.공급처코드,
             공급처명 = entity.공급처명,
             원주문참조번호 = entity.원주문참조번호,
             상태 = entity.상태,
@@ -446,6 +442,7 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         entity.판매자UserId = request.판매자UserId.Trim();
         entity.출고예정Id = request.출고예정Id;
         entity.운송의뢰Id = string.IsNullOrWhiteSpace(request.운송의뢰Id) ? null : request.운송의뢰Id.Trim();
+        entity.공급처코드 = request.공급처코드.Trim();
         entity.공급처명 = request.공급처명.Trim();
         entity.원주문참조번호 = request.원주문참조번호.Trim();
         entity.예정도착일 = request.예정도착일;
@@ -906,7 +903,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             IsPrimary = entity.IsPrimary
         };
 
-    private static 입고요청항목응답 ToInboundResponse(입고요청 entity)
+    private static 입고요청항목응답 ToInboundResponse(
+        입고요청 entity,
+        출고예정? expectedOutbound = null)
         => new()
         {
             Id = entity.Id,
@@ -924,13 +923,39 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             판매자UserId = entity.판매자UserId,
             출고예정Id = entity.출고예정Id,
             운송의뢰Id = entity.운송의뢰Id,
+            공급처코드 = entity.공급처코드,
             공급처명 = entity.공급처명,
+            예정상품명 = expectedOutbound?.상품명 ?? string.Empty,
+            예정SKU = expectedOutbound?.SKU ?? string.Empty,
+            예정수량 = expectedOutbound?.수량,
             원주문참조번호 = entity.원주문참조번호,
             상태 = entity.상태,
             예정도착일 = entity.예정도착일,
             입고완료일시 = entity.입고완료일시,
             계약정보 = CreateContractSnapshot(entity)
         };
+
+    private async Task<IReadOnlyDictionary<long, 출고예정>> LoadExpectedOutboundsAsync(
+        IReadOnlyCollection<입고요청> inbounds,
+        CancellationToken cancellationToken)
+    {
+        var inboundIds = inbounds.Select(entity => entity.Id).Distinct().ToArray();
+        if (inboundIds.Length == 0)
+        {
+            return new Dictionary<long, 출고예정>();
+        }
+
+        var outbounds = await _db.출고예정
+            .AsNoTracking()
+            .Where(outbound => outbound.입고요청Id.HasValue
+                               && inboundIds.Contains(outbound.입고요청Id.Value))
+            .OrderBy(outbound => outbound.Id)
+            .ToArrayAsync(cancellationToken);
+
+        return outbounds
+            .GroupBy(outbound => outbound.입고요청Id!.Value)
+            .ToDictionary(group => group.Key, group => group.First());
+    }
 
     private string RequireUserId()
     {

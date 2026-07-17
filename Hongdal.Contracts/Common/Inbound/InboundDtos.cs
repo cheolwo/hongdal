@@ -37,6 +37,14 @@ public static class 입고흐름유형코드
         => Normalize(value) == 주문자동입고예정;
 }
 
+public static class 입고상태코드
+{
+    public const string 예정 = "입고예정";
+    public const string 운송중 = "운송중";
+    public const string 완료 = "입고완료";
+    public const string 취소 = "입고취소";
+}
+
 public sealed class 입고요청항목응답
 {
     public long Id { get; set; }
@@ -54,7 +62,11 @@ public sealed class 입고요청항목응답
     public string 판매자UserId { get; set; } = string.Empty;
     public long? 출고예정Id { get; set; }
     public string? 운송의뢰Id { get; set; }
+    public string 공급처코드 { get; set; } = string.Empty;
     public string 공급처명 { get; set; } = string.Empty;
+    public string 예정상품명 { get; set; } = string.Empty;
+    public string 예정SKU { get; set; } = string.Empty;
+    public int? 예정수량 { get; set; }
     public string 원주문참조번호 { get; set; } = string.Empty;
     public string 상태 { get; set; } = string.Empty;
     public DateTime? 예정도착일 { get; set; }
@@ -100,6 +112,7 @@ public sealed class 입고요청저장요청
     public string 판매자UserId { get; set; } = string.Empty;
     public long? 출고예정Id { get; set; }
     public string? 운송의뢰Id { get; set; }
+    public string 공급처코드 { get; set; } = string.Empty;
     public string 공급처명 { get; set; } = string.Empty;
     public string 원주문참조번호 { get; set; } = string.Empty;
     public DateTime? 예정도착일 { get; set; }
