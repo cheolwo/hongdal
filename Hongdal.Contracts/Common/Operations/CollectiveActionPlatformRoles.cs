@@ -7,6 +7,12 @@ public static class PlatformOperatingRoleCodes
 
 public static class RegulatedExecutionResponsibilityCodes
 {
+    public const string ParticipatingExecutionActor =
+        "ParticipatingExecutionActor";
+
+    public const string ParticipatingTransportProvider =
+        "ParticipatingTransportProvider";
+
     public const string ParticipatingQualifiedServiceProvider =
         "ParticipatingQualifiedServiceProvider";
 }

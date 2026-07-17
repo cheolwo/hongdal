@@ -49,6 +49,11 @@ public sealed class OperatingMarketFreightRuntimePolicyResponse
 
     public bool QualifiedProviderParticipationRequestAvailable { get; init; } = true;
 
+    public bool PlatformCanConfirmDispatch { get; init; }
+
+    public IReadOnlyList<string> SupportedDispatchConfirmationDecisionSourceCodes { get; init; } =
+        DispatchConfirmationDecisionSourceCodes.ConfirmationCapable;
+
     public bool TransportationArrangementAvailable { get; init; }
 
     public string RegulatedExecutionResponsibilityCode { get; init; } =

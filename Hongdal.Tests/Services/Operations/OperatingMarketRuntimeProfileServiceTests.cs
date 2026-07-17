@@ -25,6 +25,10 @@ public sealed class OperatingMarketRuntimeProfileServiceTests
         Assert.True(response.DisplayLanguageSelectionIsIndependent);
         Assert.Contains(DisplayLanguageCodes.Korean, response.SupportedDisplayLanguageCodes);
         Assert.Contains(DisplayLanguageCodes.English, response.SupportedDisplayLanguageCodes);
+        Assert.False(response.FreightPolicy.PlatformCanConfirmDispatch);
+        Assert.Contains(
+            DispatchConfirmationDecisionSourceCodes.ParticipatingDriverSelfAcceptance,
+            response.FreightPolicy.SupportedDispatchConfirmationDecisionSourceCodes);
         Assert.False(response.FreightPolicy.TransportationArrangementAvailable);
     }
 
@@ -67,6 +71,10 @@ public sealed class OperatingMarketRuntimeProfileServiceTests
             response.PlatformOperatingRoleCode);
         Assert.True(response.FreightPolicy.CommunityIntentCoordinationAvailable);
         Assert.True(response.FreightPolicy.QualifiedProviderParticipationRequestAvailable);
+        Assert.False(response.FreightPolicy.PlatformCanConfirmDispatch);
+        Assert.Contains(
+            DispatchConfirmationDecisionSourceCodes.QualifiedServiceProviderConfirmation,
+            response.FreightPolicy.SupportedDispatchConfirmationDecisionSourceCodes);
         Assert.True(response.FreightPolicy.TransportationArrangementAvailable);
         Assert.Equal(
             FreightServiceProviderVerificationStatusCodes.Verified,

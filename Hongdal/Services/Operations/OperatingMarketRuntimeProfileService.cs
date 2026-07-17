@@ -66,6 +66,9 @@ public sealed class OperatingMarketRuntimeProfileService
                 ComplianceEnforcementModeCode = freightDecision.ComplianceEnforcementModeCode,
                 CommunityIntentCoordinationAvailable = true,
                 QualifiedProviderParticipationRequestAvailable = true,
+                PlatformCanConfirmDispatch = false,
+                SupportedDispatchConfirmationDecisionSourceCodes =
+                    DispatchConfirmationDecisionSourceCodes.ConfirmationCapable,
                 TransportationArrangementAvailable =
                     freightDecision.CanProceed &&
                     string.Equals(
