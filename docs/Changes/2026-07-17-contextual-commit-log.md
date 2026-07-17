@@ -23,6 +23,7 @@
 | `1a6e8f2c` | 판매 제안 null 입력 검증과 초안 테스트 | 화면 없음 | 판매 제안 ViewModel 단위 테스트 |
 | `1ecfdec8` | 주 Context 모델 격리 회귀 테스트 | 화면 없음 | 전용 Entity 제외 단위 테스트 |
 | `02e28fdc` | Docker Compose 농수산물 배치 cron 외부 설정 | 화면 없음 | Compose 환경변수와 예시 값 확인 |
+| `a67cc0b3` | Preview Site 커뮤니티 판매글 작성·조회·문의 체험 | 간접 | 정적 빌드와 세 개 공개 경로 산출물 확인 |
 
 ## 확인 사항
 
