@@ -91,6 +91,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityExperienceAwardService, CommunityExperienceAwardService>();
         services.AddScoped<ICommunityExperienceEventRecorder, CommunityExperienceEventRecorder>();
         services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();
+        services.AddScoped<IWarehousePerspectiveReadService, WarehousePerspectiveReadService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
         services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
         services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();

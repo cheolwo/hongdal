@@ -53,6 +53,18 @@ public interface I입출고작업Service
             await 입고목록조회Async(cancellationToken),
             request);
 
+    Task<입고요청페이지응답> 입고예정관점목록조회Async(
+        string perspectiveCode,
+        string? communityLedgerId,
+        입고요청목록조회요청 request,
+        CancellationToken cancellationToken = default);
+
+    Task<출고예정페이지응답> 출고예정관점목록조회Async(
+        string perspectiveCode,
+        string? communityLedgerId,
+        출고예정목록조회요청 request,
+        CancellationToken cancellationToken = default);
+
     Task<입고요청항목응답?> 입고요청생성Async(
         입고요청저장요청 request,
         CancellationToken cancellationToken = default);
@@ -102,6 +114,7 @@ public interface I공동구매창고Service : I입출고작업Service
 public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고작업Service
 {
     private const string BasePath = "api/v1/warehouse-operations";
+    private const string PerspectiveBasePath = "api/v1/warehouse-perspectives";
 
     public async Task<IReadOnlyList<창고요약응답>> 창고목록조회Async(
         CancellationToken cancellationToken = default)
@@ -202,6 +215,64 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
                PageSize = Math.Clamp(request.PageSize, 1, 200)
            };
 
+    public async Task<입고요청페이지응답> 입고예정관점목록조회Async(
+        string perspectiveCode,
+        string? communityLedgerId,
+        입고요청목록조회요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        var queryPath = perspectiveCode switch
+        {
+            창고업무관점코드.주문자 => $"{PerspectiveBasePath}/inbounds/expected/orderer",
+            창고업무관점코드.판매자 => $"{PerspectiveBasePath}/inbounds/expected/seller",
+            창고업무관점코드.창고관리자 => $"{BasePath}/inbounds/query",
+            창고업무관점코드.운송담당자 => $"{PerspectiveBasePath}/inbounds/expected/transport",
+            창고업무관점코드.공동원장 when !string.IsNullOrWhiteSpace(communityLedgerId)
+                => $"{PerspectiveBasePath}/inbounds/expected/community-ledgers/{Uri.EscapeDataString(communityLedgerId.Trim())}",
+            창고업무관점코드.공동원장 => throw new ArgumentException("공동 원장 ID가 필요합니다.", nameof(communityLedgerId)),
+            _ => throw new ArgumentOutOfRangeException(nameof(perspectiveCode), perspectiveCode, "지원하지 않는 입고 예정 관점입니다.")
+        };
+
+        return await client.GetAsync<입고요청페이지응답>(
+                   BuildInboundQueryPath(request, queryPath),
+                   "역할별 입고 예정 목록 조회",
+                   cancellationToken: cancellationToken)
+               ?? new 입고요청페이지응답
+               {
+                   Page = Math.Max(0, request.Page),
+                   PageSize = Math.Clamp(request.PageSize, 1, 200)
+               };
+    }
+
+    public async Task<출고예정페이지응답> 출고예정관점목록조회Async(
+        string perspectiveCode,
+        string? communityLedgerId,
+        출고예정목록조회요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        var queryPath = perspectiveCode switch
+        {
+            창고업무관점코드.주문자 => $"{PerspectiveBasePath}/outbounds/expected/orderer",
+            창고업무관점코드.판매자 => $"{PerspectiveBasePath}/outbounds/expected/seller",
+            창고업무관점코드.창고관리자 => $"{PerspectiveBasePath}/outbounds/expected/warehouse",
+            창고업무관점코드.운송담당자 => $"{PerspectiveBasePath}/outbounds/expected/transport",
+            창고업무관점코드.공동원장 when !string.IsNullOrWhiteSpace(communityLedgerId)
+                => $"{PerspectiveBasePath}/outbounds/expected/community-ledgers/{Uri.EscapeDataString(communityLedgerId.Trim())}",
+            창고업무관점코드.공동원장 => throw new ArgumentException("공동 원장 ID가 필요합니다.", nameof(communityLedgerId)),
+            _ => throw new ArgumentOutOfRangeException(nameof(perspectiveCode), perspectiveCode, "지원하지 않는 출고 예정 관점입니다.")
+        };
+
+        return await client.GetAsync<출고예정페이지응답>(
+                   BuildOutboundQueryPath(request, queryPath),
+                   "역할별 출고 예정 목록 조회",
+                   cancellationToken: cancellationToken)
+               ?? new 출고예정페이지응답
+               {
+                   Page = Math.Max(0, request.Page),
+                   PageSize = Math.Clamp(request.PageSize, 1, 200)
+               };
+    }
+
     public Task<입고요청항목응답?> 입고요청생성Async(
         입고요청저장요청 request,
         CancellationToken cancellationToken = default)
@@ -293,7 +364,9 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
             "출고 운송 인계",
             cancellationToken: cancellationToken);
 
-    private static string BuildInboundQueryPath(입고요청목록조회요청 request)
+    private static string BuildInboundQueryPath(
+        입고요청목록조회요청 request,
+        string? queryPath = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         var values = new List<string>
@@ -312,7 +385,29 @@ public class 입출고작업Service(IHongdalJsonApiClient client) : I입출고�
             values.Add($"warehouseId={request.WarehouseId.Value.ToString(CultureInfo.InvariantCulture)}");
         }
 
-        return $"{BasePath}/inbounds/query?{string.Join('&', values)}";
+        return $"{queryPath ?? $"{BasePath}/inbounds/query"}?{string.Join('&', values)}";
+    }
+
+    private static string BuildOutboundQueryPath(
+        출고예정목록조회요청 request,
+        string queryPath)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var values = new List<string>
+        {
+            $"page={Math.Max(0, request.Page).ToString(CultureInfo.InvariantCulture)}",
+            $"pageSize={Math.Clamp(request.PageSize, 1, 200).ToString(CultureInfo.InvariantCulture)}",
+            $"sortDescending={request.SortDescending.ToString().ToLowerInvariant()}"
+        };
+
+        AddQueryValue(values, "search", request.Search);
+        AddQueryValue(values, "sortBy", request.SortBy);
+        if (request.WarehouseId is > 0)
+        {
+            values.Add($"warehouseId={request.WarehouseId.Value.ToString(CultureInfo.InvariantCulture)}");
+        }
+
+        return $"{queryPath}?{string.Join('&', values)}";
     }
 
     private static void AddQueryValue(ICollection<string> values, string name, string? value)
