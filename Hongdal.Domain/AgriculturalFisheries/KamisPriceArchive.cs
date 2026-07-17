@@ -67,6 +67,8 @@ public sealed class KamisPriceObservation
 
     public DateOnly SurveyDate { get; set; }
 
+    public string FrequencyCode { get; set; } = "Daily";
+
     public string ItemName { get; set; } = string.Empty;
 
     public string ItemCode { get; set; } = string.Empty;

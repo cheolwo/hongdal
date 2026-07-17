@@ -143,6 +143,10 @@ internal sealed class KamisPriceObservationConfiguration
         builder.Property(x => x.CountryName).HasMaxLength(30).IsRequired();
         builder.Property(x => x.RequestedDate).HasColumnType("date");
         builder.Property(x => x.SurveyDate).HasColumnType("date");
+        builder.Property(x => x.FrequencyCode)
+            .HasMaxLength(20)
+            .HasDefaultValue("Daily")
+            .IsRequired();
         builder.Property(x => x.ItemName).HasMaxLength(100).IsRequired();
         builder.Property(x => x.ItemCode).HasMaxLength(20).IsRequired();
         builder.Property(x => x.KindName).HasMaxLength(150).IsRequired();
@@ -176,6 +180,7 @@ internal sealed class KamisPriceObservationConfiguration
         builder.HasIndex(x => new
         {
             x.SurveyDate,
+            x.FrequencyCode,
             x.ProductClassCode,
             x.CategoryCode,
             x.ItemCode
