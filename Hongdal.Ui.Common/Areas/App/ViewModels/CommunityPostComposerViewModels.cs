@@ -629,6 +629,19 @@ public sealed class CommunityPostListPageViewModel(
         OnPropertyChanged(nameof(VisibleItems));
     }
 
+    public async Task<PlatformCommunityPostResponse?> RefreshItemAsync(
+        long postId,
+        CancellationToken cancellationToken = default)
+    {
+        var detail = await communityService.GetPostAsync(postId, cancellationToken);
+        if (detail is not null)
+        {
+            Replace(detail);
+        }
+
+        return detail;
+    }
+
     protected override async Task 불러오기Async(
         bool 새로고침,
         CancellationToken cancellationToken)
@@ -676,14 +689,29 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
 {
     public PlatformCommunityHomePageViewModel(
         CommunityPostComposerViewModel composer,
-        CommunityPostListPageViewModel postList)
+        CommunityPostListPageViewModel postList,
+        PlatformCommunityHomeShellViewModel shell,
+        PlatformCommunityBoardWorkspaceViewModel boards,
+        PlatformCommunityPostEngagementViewModel engagement,
+        PlatformCommunityLedgerPickerViewModel ledgerPicker,
+        YouTubeFoodCommunityDiscoveryViewModel foodDiscovery)
     {
-        Composer = 하위ViewModel등록(composer);
-        PostList = 하위ViewModel등록(postList);
+        Composer = 하위ViewModel등록(composer, 수명소유: true);
+        PostList = 하위ViewModel등록(postList, 수명소유: true);
+        Shell = 하위ViewModel등록(shell, 수명소유: true);
+        Boards = 하위ViewModel등록(boards, 수명소유: true);
+        Engagement = 하위ViewModel등록(engagement, 수명소유: true);
+        LedgerPicker = 하위ViewModel등록(ledgerPicker, 수명소유: true);
+        FoodDiscovery = 하위ViewModel등록(foodDiscovery, 수명소유: true);
     }
 
     public CommunityPostComposerViewModel Composer { get; }
     public CommunityPostListPageViewModel PostList { get; }
+    public PlatformCommunityHomeShellViewModel Shell { get; }
+    public PlatformCommunityBoardWorkspaceViewModel Boards { get; }
+    public PlatformCommunityPostEngagementViewModel Engagement { get; }
+    public PlatformCommunityLedgerPickerViewModel LedgerPicker { get; }
+    public YouTubeFoodCommunityDiscoveryViewModel FoodDiscovery { get; }
 
     public void Configure(string appKey, string defaultRoleTag)
     {
@@ -695,10 +723,10 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         bool 새로고침,
         CancellationToken cancellationToken)
     {
-        var loaded = 새로고침
+        var postsLoaded = 새로고침
             ? await PostList.새로고침Async(cancellationToken)
             : await PostList.초기화Async(cancellationToken);
-        if (!loaded)
+        if (!postsLoaded)
         {
             throw new InvalidOperationException(
                 PostList.오류메시지 ?? "커뮤니티 게시글 목록을 불러오지 못했습니다.");

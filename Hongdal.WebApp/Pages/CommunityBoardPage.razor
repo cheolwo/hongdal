@@ -1,0 +1,18 @@
+@page "/community/boards"
+
+<PageTitle>@($"{SelectedBoard} 게시판")</PageTitle>
+
+<PlatformCommunityHome AppName="살뜰"
+                       RoleLabel="웹 사용자"
+                       AppKey="shipper"
+                       ListOnly="true"
+                       InitialBoard="@SelectedBoard" />
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "board")]
+    public string? BoardName { get; set; }
+
+    private string SelectedBoard
+        => string.IsNullOrWhiteSpace(BoardName) ? "전체" : BoardName.Trim();
+}

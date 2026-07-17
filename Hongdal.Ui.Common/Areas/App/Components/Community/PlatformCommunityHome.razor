@@ -22,7 +22,115 @@
 
 <MudContainer MaxWidth="MaxWidth.False" Class="@HomeRootClass">
     <MudStack Spacing="3">
-        @if (isLedgerDetailOpen)
+        @if (BoardIndexOnly)
+        {
+            <section class="platform-community-board-index" aria-labelledby="community-board-index-title">
+                <header class="platform-community-board-index__header">
+                    <div>
+                        <span>COMMUNITY BOARDS</span>
+                        <h1 id="community-board-index-title">살뜰 생활 게시판</h1>
+                        <p>관심 있는 게시판을 고르면 그곳의 글 목록으로 이동합니다.</p>
+                    </div>
+                    <label class="platform-community-board-index__search">
+                        <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
+                        <input type="search"
+                               aria-label="게시판 검색"
+                               placeholder="게시판 이름이나 주제 검색"
+                               value="@boardIndexSearchText"
+                               @oninput="HandleBoardIndexSearchInput" />
+                    </label>
+                </header>
+
+                <a class="platform-community-board-index__all" href="/community/boards?board=%EC%A0%84%EC%B2%B4">
+                    <span class="platform-community-board-index__icon">
+                        <MudIcon Icon="@Icons.Material.Filled.DynamicFeed" />
+                    </span>
+                    <span>
+                        <strong>전체 글</strong>
+                        <small>모든 게시판에서 올라온 글을 한 번에 봅니다.</small>
+                    </span>
+                    <b>@GetCommunityBoardPostCount("전체")</b>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                </a>
+
+                @if (VisibleBoardIndexOptions.Count == 0)
+                {
+                    <div class="platform-community-board-index__empty">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" />
+                        <span>검색 조건에 맞는 게시판이 없습니다.</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="platform-community-board-index__list">
+                        @foreach (var board in VisibleBoardIndexOptions)
+                        {
+                            <a class="platform-community-board-index__item"
+                               href="@BuildCommunityBoardHref(board)">
+                                <span class="platform-community-board-index__icon">
+                                    <MudIcon Icon="@ResolveCommunityBoardIcon(board)" />
+                                </span>
+                                <span>
+                                    <strong>@board</strong>
+                                    <small>@ResolveCommunityBoardDescription(board)</small>
+                                </span>
+                                <b>@GetCommunityBoardPostCount(board)</b>
+                                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                            </a>
+                        }
+                    </div>
+                }
+            </section>
+        }
+        else if (ListOnly)
+        {
+            <section class="platform-community-post-index" aria-label="커뮤니티 글 목록">
+                <header class="platform-community-post-index__header">
+                    <a href="/community">
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+                        전체 게시판
+                    </a>
+                    <strong>@selectedBoardFilter</strong>
+                </header>
+                <nav class="platform-community-post-index__boards" aria-label="게시판 선택">
+                    @foreach (var board in CommunityBoardOptions)
+                    {
+                        <a class="@BuildPostIndexBoardClass(board)"
+                           href="@BuildCommunityBoardHref(board)"
+                           aria-current="@(string.Equals(selectedBoardFilter, board, StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                            <span>@board</span>
+                            <b>@GetCommunityBoardPostCount(board)</b>
+                        </a>
+                    }
+                </nav>
+
+                @if (isLoading)
+                {
+                    <div class="platform-community-post-index__loading" aria-live="polite">
+                        <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                        <span>커뮤니티 글을 불러오는 중입니다.</span>
+                    </div>
+                }
+                else
+                {
+                    <PlatformCommunityPostList BoardName="@selectedBoardFilter"
+                                               FilterOptions="@ForumListFilterOptions"
+                                               SelectedFilter="@selectedForumListFilter"
+                                               SelectedFilterChanged="SelectForumListFilter"
+                                               ViewMode="@communityPostViewMode"
+                                               ViewModeChanged="SelectCommunityPostViewMode"
+                                               ComposeRequested="OpenCommunityComposePage"
+                                               Posts="@VisiblePosts"
+                                               SeedPosts="@VisibleSeedPosts"
+                                               VisiblePostCount="@ForumVisiblePostCount"
+                                               PostSelected="OpenCommunityPostPage"
+                                               SeedPostSelected="OpenCommunitySeedPostPage"
+                                               SearchText="@communityPostSearchText"
+                                               SearchTextChanged="HandleCommunityPostSearchChanged" />
+                }
+            </section>
+        }
+        else if (isLedgerDetailOpen)
         {
             <CommunityLedgerDiagramDetail Context="ledgerDetailContext"
                                           IsLoading="isLedgerDetailLoading"
@@ -1198,6 +1306,7 @@
                     }
                 </div>
             </section>
+
         }
 
         <MudGrid Class="@CommunityGridClass">
@@ -1607,11 +1716,11 @@
                                         {
                                             <div class="platform-community-lecture-share-card">
                                                 <span class="platform-community-lecture-share-icon">
-                                                    <MudIcon Icon="@Icons.Material.Filled.FormatQuote" Size="Size.Medium" />
+                                                    <MudIcon Icon="@(IsFoodYouTubeSharedPost(post) ? Icons.Material.Filled.Restaurant : Icons.Material.Filled.PlayCircle)" Size="Size.Medium" />
                                                 </span>
                                                 <span class="platform-community-lecture-share-copy">
-                                                    <small>영상과 함께 나눈 글귀</small>
-                                                    <strong>@ResolveSharedLectureTitle(post.Title)</strong>
+                                                    <small>@ResolveSharedVideoEyebrow(post)</small>
+                                                    <strong>@ResolveSharedVideoTitle(post.Title)</strong>
                                                 </span>
                                                 <MudButton Href="@post.SharedLinkUrl"
                                                            Target="_blank"
@@ -1620,7 +1729,7 @@
                                                            Color="Color.Info"
                                                            Size="Size.Small"
                                                            StartIcon="@Icons.Material.Filled.PlayCircleOutline">
-                                                    해당 위치에서 보기
+                                                    YouTube에서 보기
                                                 </MudButton>
                                             </div>
                                         }
@@ -2891,7 +3000,7 @@
         </MudPaper>
         }
 
-        @if (!IsDiagramMode && !isComposeOpen)
+        @if (!BoardIndexOnly && !ListOnly && !IsDiagramMode && !isComposeOpen)
         {
             <nav class="platform-community-mobile-nav" aria-label="커뮤니티 모바일 내비게이션">
                 @if (UseCompactHomeSummary)
@@ -3133,11 +3242,255 @@
                 </MudStack>
             </aside>
         }
-
     </MudStack>
 </MudContainer>
 
 <style>
+    .platform-community-board-index {
+        display: grid;
+        width: min(100%, 1080px);
+        margin: 0 auto;
+        gap: 14px;
+    }
+
+    .platform-community-board-index__header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--mud-palette-text-primary);
+    }
+
+    .platform-community-board-index__header > div {
+        display: grid;
+        min-width: 0;
+        gap: 3px;
+    }
+
+    .platform-community-board-index__header span {
+        color: var(--mud-palette-primary);
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    .platform-community-board-index__header h1,
+    .platform-community-board-index__header p {
+        margin: 0;
+    }
+
+    .platform-community-board-index__header h1 {
+        font-size: 1.55rem;
+        line-height: 1.3;
+    }
+
+    .platform-community-board-index__header p {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.86rem;
+    }
+
+    .platform-community-board-index__search {
+        display: flex;
+        width: min(100%, 320px);
+        min-height: 38px;
+        align-items: center;
+        gap: 7px;
+        padding: 0 10px;
+        border: 1px solid var(--mud-palette-lines-default);
+        background: var(--mud-palette-surface);
+    }
+
+    .platform-community-board-index__search input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--mud-palette-text-primary);
+        font: inherit;
+    }
+
+    .platform-community-board-index__all,
+    .platform-community-board-index__item {
+        display: grid;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid var(--mud-palette-lines-default);
+        border-radius: 4px;
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+        grid-template-columns: 36px minmax(0, 1fr) auto 20px;
+        text-decoration: none;
+    }
+
+    .platform-community-board-index__all {
+        min-height: 64px;
+        padding: 10px 12px;
+        border-color: var(--mud-palette-primary);
+    }
+
+    .platform-community-board-index__list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .platform-community-board-index__item {
+        min-height: 70px;
+        padding: 10px 12px;
+    }
+
+    .platform-community-board-index__item:hover,
+    .platform-community-board-index__item:focus-visible,
+    .platform-community-board-index__all:hover,
+    .platform-community-board-index__all:focus-visible {
+        border-color: var(--mud-palette-primary);
+        background: var(--mud-palette-background-gray);
+    }
+
+    .platform-community-board-index__icon {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 4px;
+        background: var(--mud-palette-background-gray);
+        color: var(--mud-palette-primary);
+    }
+
+    .platform-community-board-index__all > span:nth-child(2),
+    .platform-community-board-index__item > span:nth-child(2) {
+        display: grid;
+        min-width: 0;
+        gap: 2px;
+    }
+
+    .platform-community-board-index__all strong,
+    .platform-community-board-index__item strong {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-board-index__all small,
+    .platform-community-board-index__item small {
+        overflow: hidden;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.76rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-board-index__all b,
+    .platform-community-board-index__item b {
+        color: var(--mud-palette-primary);
+        font-size: 0.82rem;
+    }
+
+    .platform-community-board-index__empty {
+        display: flex;
+        min-height: 160px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .platform-community-post-index {
+        display: grid;
+        width: min(100%, 1180px);
+        margin: 0 auto;
+        gap: 12px;
+    }
+
+    .platform-community-post-index__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--mud-palette-text-primary);
+    }
+
+    .platform-community-post-index__header a {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--mud-palette-text-secondary);
+        text-decoration: none;
+    }
+
+    .platform-community-post-index__header strong {
+        overflow: hidden;
+        font-size: 1.05rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-post-index__boards {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 2px 0 6px;
+        scrollbar-width: thin;
+    }
+
+    .platform-community-post-index__board {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        min-height: 34px;
+        gap: 7px;
+        padding: 6px 10px;
+        border: 1px solid var(--mud-palette-lines-default);
+        border-radius: 4px;
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+        cursor: pointer;
+        font: inherit;
+        text-decoration: none;
+    }
+
+    .platform-community-post-index__board b {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    .platform-community-post-index__board--selected {
+        border-color: var(--mud-palette-primary);
+        background: var(--mud-palette-primary);
+        color: var(--mud-palette-primary-text);
+    }
+
+    .platform-community-post-index__board--selected b {
+        color: inherit;
+    }
+
+    .platform-community-post-index__loading {
+        display: flex;
+        align-items: center;
+        min-height: 160px;
+        justify-content: center;
+        gap: 10px;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    @@media (max-width: 700px) {
+        .platform-community-board-index__header {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .platform-community-board-index__search {
+            width: 100%;
+        }
+
+        .platform-community-board-index__list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
     .platform-community-home {
         --platform-home-accent: #2563eb;
         --platform-home-accent-rgb: 37, 99, 235;
@@ -7682,6 +8035,18 @@
 
 @code {
     [Parameter]
+    public bool BoardIndexOnly { get; set; }
+
+    [Parameter]
+    public bool ListOnly { get; set; }
+
+    [Parameter]
+    public string? InitialBoard { get; set; }
+
+    [Parameter]
+    public bool StartInComposeMode { get; set; }
+
+    [Parameter]
     public string AppName { get; set; } = "Hongdal";
 
     [Parameter]
@@ -7759,17 +8124,25 @@
     [Parameter]
     public long? QueryPostId { get; set; }
 
-    private readonly List<PlatformCommunityPostLedgerChoiceResponse> myLedgers = [];
-    private readonly List<PlatformCommunityBoardResponse> approvedBoards = [];
-    private readonly List<PlatformCommunityBoardResponse> pendingBoardRequests = [];
-    private readonly PlatformCommunityBoardForm boardForm = new();
-    private readonly Dictionary<long, PlatformCommunityCommentForm> commentForms = [];
-    private readonly Dictionary<long, PlatformCommunityCommentForm> attachmentCommentForms = [];
-    private readonly Dictionary<long, CommunityPostOpportunityListResponse> postOpportunities = [];
-    private readonly Dictionary<long, HashSet<string>> selectedParticipationOptionIds = [];
-    private readonly HashSet<long> pendingPostParticipationIds = [];
-    private readonly Dictionary<long, string> boardReviewMemo = [];
-    private readonly HashSet<long> expandedCommentPostIds = [];
+    [Parameter]
+    public string? QuerySeedPostTitle { get; set; }
+
+    [Parameter]
+    public string? QueryBoardName { get; set; }
+
+    private string boardIndexSearchText = string.Empty;
+
+    private PlatformCommunityHomeShellViewModel Shell => ViewModel.Shell;
+    private PlatformCommunityBoardWorkspaceViewModel Boards => ViewModel.Boards;
+    private PlatformCommunityPostEngagementViewModel Engagement => ViewModel.Engagement;
+    private PlatformCommunityLedgerPickerViewModel LedgerPicker => ViewModel.LedgerPicker;
+    private List<PlatformCommunityPostLedgerChoiceResponse> myLedgers => LedgerPicker.Items;
+    private List<PlatformCommunityBoardResponse> approvedBoards => Boards.ApprovedBoards;
+    private List<PlatformCommunityBoardResponse> pendingBoardRequests => Boards.PendingBoardRequests;
+    private PlatformCommunityBoardForm boardForm => Boards.Form;
+    private Dictionary<long, CommunityPostOpportunityListResponse> postOpportunities => Engagement.Opportunities;
+    private HashSet<long> pendingPostParticipationIds => Engagement.PendingPostParticipationIds;
+    private Dictionary<long, string> boardReviewMemo => Boards.ReviewMemos;
     private readonly Dictionary<string, string> 원장블록입력값 = [];
     private readonly Dictionary<string, string> diagramFormValues = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> 원장Api경로변수값 = [];
@@ -7879,9 +8252,9 @@
             })
     ];
 
-    private readonly string recommendationSessionKey = Guid.NewGuid().ToString("N");
     private readonly string 다이어그램대화방로컬사용자Id = $"local-{Guid.NewGuid():N}";
     private CommunityPostComposerViewModel Composer => ViewModel.Composer;
+    private YouTubeFoodCommunityDiscoveryViewModel FoodDiscovery => ViewModel.FoodDiscovery;
     private IReadOnlyList<PlatformCommunityPostResponse> posts => ViewModel.PostList.Items;
     private List<IBrowserFile> selectedFiles => Composer.SelectedFiles;
     private CommunityPostComposerDraftViewModel form => Composer.Draft;
@@ -7913,15 +8286,31 @@
         get => ViewModel.PostList.SearchText;
         set => ViewModel.PostList.SearchText = value;
     }
-    private string ledgerPickerSearchText = string.Empty;
-    private string ledgerPickerScope = "전체";
-    private string? pendingLedgerId;
+    private string ledgerPickerSearchText
+    {
+        get => LedgerPicker.SearchText;
+        set => LedgerPicker.SearchText = value;
+    }
+    private string ledgerPickerScope
+    {
+        get => LedgerPicker.Scope;
+        set => LedgerPicker.Scope = value;
+    }
+    private string? pendingLedgerId
+    {
+        get => LedgerPicker.PendingLedgerId;
+        set => LedgerPicker.PendingLedgerId = value;
+    }
     private long? selectedForumPostId
     {
         get => ViewModel.PostList.SelectedPostId;
         set => ViewModel.PostList.SelectedPostId = value;
     }
-    private string? selectedForumSeedPostTitle;
+    private string? selectedForumSeedPostTitle
+    {
+        get => Engagement.SelectedSeedPostTitle;
+        set => Engagement.SelectedSeedPostTitle = value;
+    }
     private string? 선택현재원장Id;
     private string? 선택원장블록노드제목;
     private string? connectionStartNodeTitle;
@@ -7960,36 +8349,116 @@
         get => Composer.EditingPostId;
         set => Composer.EditingPostId = value;
     }
-    private bool isLoading = true;
-    private bool isBoardLoading;
+    private bool isLoading
+    {
+        get => Shell.IsLoading;
+        set => Shell.IsLoading = value;
+    }
+    private bool isBoardLoading
+    {
+        get => Boards.IsLoading;
+        set => Boards.IsLoading = value;
+    }
     private bool isApiEndpointMetadataLoading;
-    private bool isMyLedgersLoading;
-    private bool isLedgerPickerOpen;
-    private bool isLedgerDetailOpen;
-    private bool isOrderLedgerHierarchyOpen;
-    private bool isLedgerDetailLoading;
-    private bool ledgerDetailOpenedFromHierarchy;
-    private bool isLedgerSharingSaving;
-    private bool isSharedLedgerReusing;
-    private bool isSavingBoardRequest;
-    private bool isWorkMode;
-    private bool isCompactHomeSummary;
+    private bool isMyLedgersLoading
+    {
+        get => LedgerPicker.IsLoading;
+        set => LedgerPicker.IsLoading = value;
+    }
+    private bool isLedgerPickerOpen
+    {
+        get => LedgerPicker.IsPickerOpen;
+        set => LedgerPicker.IsPickerOpen = value;
+    }
+    private bool isLedgerDetailOpen
+    {
+        get => LedgerPicker.IsDetailOpen;
+        set => LedgerPicker.IsDetailOpen = value;
+    }
+    private bool isOrderLedgerHierarchyOpen
+    {
+        get => LedgerPicker.IsHierarchyOpen;
+        set => LedgerPicker.IsHierarchyOpen = value;
+    }
+    private bool isLedgerDetailLoading
+    {
+        get => LedgerPicker.IsDetailLoading;
+        set => LedgerPicker.IsDetailLoading = value;
+    }
+    private bool ledgerDetailOpenedFromHierarchy
+    {
+        get => LedgerPicker.DetailOpenedFromHierarchy;
+        set => LedgerPicker.DetailOpenedFromHierarchy = value;
+    }
+    private bool isLedgerSharingSaving
+    {
+        get => LedgerPicker.IsSharingSaving;
+        set => LedgerPicker.IsSharingSaving = value;
+    }
+    private bool isSharedLedgerReusing
+    {
+        get => LedgerPicker.IsSharedLedgerReusing;
+        set => LedgerPicker.IsSharedLedgerReusing = value;
+    }
+    private bool isSavingBoardRequest
+    {
+        get => Boards.IsSavingRequest;
+        set => Boards.IsSavingRequest = value;
+    }
+    private bool isWorkMode
+    {
+        get => Shell.IsWorkMode;
+        set => Shell.IsWorkMode = value;
+    }
+    private bool isCompactHomeSummary
+    {
+        get => Shell.IsCompactHomeSummary;
+        set => Shell.IsCompactHomeSummary = value;
+    }
     private bool isComposeOpen
     {
         get => Composer.IsOpen;
         set => Composer.IsOpen = value;
     }
 
-    private bool isBaguaNavigatorOpen;
+    private bool isBaguaNavigatorOpen
+    {
+        get => Shell.IsBaguaNavigatorOpen;
+        set => Shell.IsBaguaNavigatorOpen = value;
+    }
     private bool isBaguaDockDragging;
     private bool hasBaguaDockDragMoved;
     private double baguaDockDragStartX;
-    private string? statusMessage;
-    private string? myLedgerLoadMessage;
-    private string? ledgerDetailErrorMessage;
-    private 커뮤니티원장공개설정Response? ledgerSharingSettings;
-    private PlatformCommunityPostLedgerContextResponse? ledgerDetailContext;
-    private PlatformCommunityPostLedgerContextResponse? orderLedgerHierarchyContext;
+    private string? statusMessage
+    {
+        get => Shell.StatusMessage;
+        set => Shell.StatusMessage = value;
+    }
+    private string? myLedgerLoadMessage
+    {
+        get => LedgerPicker.LoadMessage;
+        set => LedgerPicker.LoadMessage = value;
+    }
+    private string? ledgerDetailErrorMessage
+    {
+        get => LedgerPicker.DetailErrorMessage;
+        set => LedgerPicker.DetailErrorMessage = value;
+    }
+    private 커뮤니티원장공개설정Response? ledgerSharingSettings
+    {
+        get => LedgerPicker.SharingSettings;
+        set => LedgerPicker.SharingSettings = value;
+    }
+    private PlatformCommunityPostLedgerContextResponse? ledgerDetailContext
+    {
+        get => LedgerPicker.DetailContext;
+        set => LedgerPicker.DetailContext = value;
+    }
+    private PlatformCommunityPostLedgerContextResponse? orderLedgerHierarchyContext
+    {
+        get => LedgerPicker.HierarchyContext;
+        set => LedgerPicker.HierarchyContext = value;
+    }
     private string? 창고대행신청알림문구;
     private string? 원장전송결과메시지;
     private string? 다이어그램대화방알림문구;
@@ -7998,7 +8467,23 @@
     private bool 다이어그램대화방입장중;
     private bool 다이어그램대화방이력로딩중;
     private bool 다이어그램대화방FeedScroll필요;
-    private Severity statusSeverity = Severity.Info;
+    private Severity statusSeverity
+    {
+        get => Shell.StatusKind switch
+        {
+            CommunityComposerMessageKind.Success => Severity.Success,
+            CommunityComposerMessageKind.Warning => Severity.Warning,
+            CommunityComposerMessageKind.Error => Severity.Error,
+            _ => Severity.Info
+        };
+        set => Shell.StatusKind = value switch
+        {
+            Severity.Success => CommunityComposerMessageKind.Success,
+            Severity.Warning => CommunityComposerMessageKind.Warning,
+            Severity.Error => CommunityComposerMessageKind.Error,
+            _ => CommunityComposerMessageKind.Info
+        };
+    }
     private Severity diagramConnectionSeverity = Severity.Info;
     private Severity 창고대행신청알림수준 = Severity.Info;
     private Severity 원장전송결과Severity = Severity.Info;
@@ -8074,6 +8559,16 @@
         => new[] { "전체" }
             .Concat(BoardCategoryOptions)
             .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyList<string> VisibleBoardIndexOptions
+        => CommunityBoardOptions
+            .Where(board => !string.Equals(board, "전체", StringComparison.OrdinalIgnoreCase))
+            .Where(board => string.IsNullOrWhiteSpace(boardIndexSearchText)
+                || board.Contains(boardIndexSearchText.Trim(), StringComparison.OrdinalIgnoreCase)
+                || ResolveCommunityBoardDescription(board).Contains(
+                    boardIndexSearchText.Trim(),
+                    StringComparison.OrdinalIgnoreCase))
             .ToArray();
 
     private IReadOnlyList<PlatformCommunityPostResponse> VisiblePosts
@@ -8213,6 +8708,30 @@
         }
     }
 
+    private string BuildPostIndexBoardClass(string board)
+        => string.Equals(selectedBoardFilter, board, StringComparison.OrdinalIgnoreCase)
+            ? "platform-community-post-index__board platform-community-post-index__board--selected"
+            : "platform-community-post-index__board";
+
+    private static string BuildCommunityBoardHref(string board)
+        => $"/community/boards?board={Uri.EscapeDataString(board)}";
+
+    private void HandleBoardIndexSearchInput(ChangeEventArgs args)
+        => boardIndexSearchText = args.Value?.ToString() ?? string.Empty;
+
+    private void OpenCommunityPostPage(PlatformCommunityPostResponse post)
+        => Navigation.NavigateTo($"/community/posts/{post.Id}");
+
+    private void OpenCommunitySeedPostPage(CommunitySeedPost post)
+        => Navigation.NavigateTo(
+            $"/community/workspace?seed={Uri.EscapeDataString(post.Title)}");
+
+    private void OpenCommunityComposePage()
+        => Navigation.NavigateTo(
+            string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
+                ? "/community/write"
+                : $"/community/write?board={Uri.EscapeDataString(selectedBoardFilter)}");
+
     private bool MatchesForumListFilter(CommunitySeedPost post)
         => selectedForumListFilter switch
         {
@@ -8291,12 +8810,10 @@
         => string.Equals(selectedForumSeedPostTitle, post.Title, StringComparison.Ordinal);
 
     private bool IsPostParticipationPending(long postId)
-        => pendingPostParticipationIds.Contains(postId);
+        => Engagement.IsParticipationPending(postId);
 
     private bool IsParticipationRoleSelected(long postId, string optionId)
-        => !string.IsNullOrWhiteSpace(optionId)
-           && selectedParticipationOptionIds.TryGetValue(postId, out var selected)
-           && selected.Contains(optionId);
+        => Engagement.IsParticipationRoleSelected(postId, optionId);
 
     private string BuildParticipationRoleClass(long postId, string optionId)
         => IsParticipationRoleSelected(postId, optionId)
@@ -8304,112 +8821,14 @@
             : "platform-community-participation-role";
 
     private async Task StartPostParticipationAsync(PlatformCommunityPostResponse post)
-    {
-        if (!pendingPostParticipationIds.Add(post.Id))
-        {
-            return;
-        }
-
-        try
-        {
-            await CommunityService.StartPostParticipationAsync(
-                post.Id,
-                new StartCommunityPostParticipationRequest
-                {
-                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
-                    ConfirmExplicitStart = true,
-                    ConfirmNonBindingParticipation = true
-                });
-            await RefreshPostOpportunitiesAsync(post.Id);
-            statusSeverity = Severity.Success;
-            statusMessage = "게시글에서 비구속적 관심 모집을 시작했습니다.";
-        }
-        catch (HttpRequestException exception) when (
-            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
-            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "관심 모집을 시작하려면 먼저 로그인해 주세요.";
-        }
-        catch (Exception exception)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"관심 모집을 시작하지 못했습니다: {exception.Message}";
-        }
-        finally
-        {
-            pendingPostParticipationIds.Remove(post.Id);
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.StartParticipationAsync(post.Id));
 
     private async Task ToggleParticipationRoleAsync(
         PlatformCommunityPostResponse post,
         CommunityPostParticipationRoleOptionResponse role)
-    {
-        if (string.IsNullOrWhiteSpace(role.OptionId)
-            || !postOpportunities.TryGetValue(post.Id, out var opportunity)
-            || opportunity.Participation.InterestVoteId is not Guid voteId
-            || !pendingPostParticipationIds.Add(post.Id))
-        {
-            return;
-        }
-
-        var selected = GetParticipationOptionSelection(post.Id);
-        var wasSelected = selected.Contains(role.OptionId);
-        if (wasSelected && selected.Count == 1)
-        {
-            pendingPostParticipationIds.Remove(post.Id);
-            statusSeverity = Severity.Info;
-            statusMessage = "관심 역할은 하나 이상 남겨야 합니다.";
-            return;
-        }
-
-        if (wasSelected)
-        {
-            selected.Remove(role.OptionId);
-        }
-        else
-        {
-            selected.Add(role.OptionId);
-        }
-
-        try
-        {
-            var displayName = commentForms.TryGetValue(post.Id, out var commentForm)
-                              && !string.IsNullOrWhiteSpace(commentForm.Nickname)
-                ? commentForm.Nickname.Trim()
-                : "관심 참여자";
-            await CommunityService.CastCommunityVoteAsync(
-                voteId,
-                new CommunityVoteCastRequest
-                {
-                    VoterKey = $"community-interest:{recommendationSessionKey}",
-                    VoterDisplayName = displayName,
-                    OptionIds = selected.ToArray()
-                });
-            await RefreshPostOpportunitiesAsync(post.Id);
-            statusSeverity = Severity.Success;
-            statusMessage = "가능한 참여 역할을 반영했습니다.";
-        }
-        catch (Exception exception)
-        {
-            if (wasSelected)
-            {
-                selected.Add(role.OptionId);
-            }
-            else
-            {
-                selected.Remove(role.OptionId);
-            }
-
-            statusSeverity = Severity.Error;
-            statusMessage = $"관심 역할을 반영하지 못했습니다: {exception.Message}";
-        }
-        finally
-        {
-            pendingPostParticipationIds.Remove(post.Id);
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.ToggleParticipationRoleAsync(post.Id, role));
 
     private async Task PromotePostParticipationAsync(
         PlatformCommunityPostResponse post,
@@ -8448,27 +8867,8 @@
 
         try
         {
-            var result = await CommunityService.PromotePostParticipationAsync(
-                post.Id,
-                request);
-            await LoadPostsAsync();
-            await RefreshPostOpportunitiesAsync(post.Id);
-            statusSeverity = Severity.Success;
-            statusMessage = result?.ReusedExistingProvisionalLedger == true
-                ? "이미 만들어진 가원장을 다시 확인했습니다."
-                : "모인 관심을 비구속적 가원장으로 기록하고 참여자 알림을 요청했습니다.";
-        }
-        catch (HttpRequestException exception) when (
-            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
-            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "로그인한 게시글 작성자만 가원장을 만들 수 있습니다.";
-        }
-        catch (Exception exception)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"가원장을 만들지 못했습니다: {exception.Message}";
+            await ApplyCommandResultAsync(
+                await Engagement.PromoteParticipationAsync(post.Id, request));
         }
         finally
         {
@@ -8502,35 +8902,11 @@
 
         try
         {
-            var result = await CommunityService.JoinPostProfessionalRoleAsync(
-                post.Id,
-                new JoinCommunityPostProfessionalRequest
-                {
-                    ProvisionalLedgerId = opportunity.Participation.ProvisionalLedgerId,
-                    ProfessionalRoleCode = roleCode,
-                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
-                    ConfirmProfessionalCapacity = true,
-                    ConfirmVoluntaryNonBindingParticipation = true,
-                    ConfirmParticipantNotification = true
-                });
-            await LoadPostsAsync();
-            await RefreshPostOpportunitiesAsync(post.Id);
-            statusSeverity = Severity.Success;
-            statusMessage = result?.ReusedExistingParticipation == true
-                ? "이미 참여 중인 역할을 다시 확인했습니다."
-                : "거래 참여팀 역할 참여를 기록하고 기존 참여자 알림을 요청했습니다.";
-        }
-        catch (HttpRequestException exception) when (
-            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
-            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "현재 계정의 플랫폼 프로필에서 이 역할을 확인할 수 없습니다.";
-        }
-        catch (Exception exception)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"역할 참여를 기록하지 못했습니다: {exception.Message}";
+            await ApplyCommandResultAsync(
+                await Engagement.JoinProfessionalRoleAsync(
+                    post.Id,
+                    opportunity.Participation.ProvisionalLedgerId,
+                    roleCode));
         }
         finally
         {
@@ -8564,35 +8940,11 @@
 
         try
         {
-            var result = await CommunityService.JoinPostPartyRoleAsync(
-                post.Id,
-                new JoinCommunityPostPartyRoleRequest
-                {
-                    ProvisionalLedgerId = opportunity.Participation.ProvisionalLedgerId,
-                    PartyRoleCode = roleCode,
-                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
-                    ConfirmRoleCapacity = true,
-                    ConfirmVoluntaryNonBindingParticipation = true,
-                    ConfirmParticipantNotification = true
-                });
-            await LoadPostsAsync();
-            await RefreshPostOpportunitiesAsync(post.Id);
-            statusSeverity = Severity.Success;
-            statusMessage = result?.ReusedExistingParticipation == true
-                ? "이미 수락한 거래 역할을 다시 확인했습니다."
-                : "비구속적 거래 역할 수락을 기록하고 기존 참여자 알림을 요청했습니다.";
-        }
-        catch (HttpRequestException exception) when (
-            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
-            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "거래 역할을 수락하려면 로그인해야 합니다.";
-        }
-        catch (Exception exception)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"거래 역할 수락을 기록하지 못했습니다: {exception.Message}";
+            await ApplyCommandResultAsync(
+                await Engagement.JoinPartyRoleAsync(
+                    post.Id,
+                    opportunity.Participation.ProvisionalLedgerId,
+                    roleCode));
         }
         finally
         {
@@ -8656,28 +9008,8 @@
             _ => Icons.Material.Outlined.RadioButtonUnchecked
         };
 
-    private HashSet<string> GetParticipationOptionSelection(long postId)
-    {
-        if (!selectedParticipationOptionIds.TryGetValue(postId, out var selected))
-        {
-            selected = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            selectedParticipationOptionIds[postId] = selected;
-        }
-
-        return selected;
-    }
-
     private async Task RefreshPostOpportunitiesAsync(long postId)
-    {
-        var result = await CommunityService.GetPostOpportunitiesAsync(postId);
-        if (result is null)
-        {
-            postOpportunities.Remove(postId);
-            return;
-        }
-
-        postOpportunities[postId] = result;
-    }
+        => await Engagement.RefreshOpportunityAsync(postId);
 
     private void HandleCommunityPostSearchChanged(string value)
     {
@@ -8727,15 +9059,10 @@
         return label.Length > 24 ? label[..24] + "…" : label;
     }
 
-    private bool IsPostCommentsExpanded(long postId) => expandedCommentPostIds.Contains(postId);
+    private bool IsPostCommentsExpanded(long postId) => Engagement.IsCommentsExpanded(postId);
 
     private void TogglePostComments(long postId)
-    {
-        if (!expandedCommentPostIds.Add(postId))
-        {
-            expandedCommentPostIds.Remove(postId);
-        }
-    }
+        => Engagement.ToggleComments(postId);
 
     private static string BuildMobileNavigationClass(bool active)
         => active
@@ -8761,110 +9088,16 @@
     {
         OpenCommunityMode();
         isComposeOpen = true;
-        isLedgerPickerOpen = true;
-        isLedgerDetailOpen = false;
-        isOrderLedgerHierarchyOpen = false;
-        ledgerDetailOpenedFromHierarchy = false;
-        ledgerDetailContext = null;
-        orderLedgerHierarchyContext = null;
-        ledgerDetailErrorMessage = null;
+        LedgerPicker.Open(form.커뮤니티원장Id);
         nodeDetailPanelNode = null;
-        ledgerSharingSettings = null;
-        ledgerPickerSearchText = string.Empty;
-        ledgerPickerScope = "전체";
-        pendingLedgerId = form.커뮤니티원장Id;
         await LoadMyLedgersAsync();
     }
 
     private async Task LoadMyLedgersAsync()
-    {
-        isMyLedgersLoading = true;
-        myLedgerLoadMessage = null;
-        myLedgers.Clear();
-        var loginRequired = false;
-        var sharedLoadFailed = false;
-        try
-        {
-            var ledgers = await CommunityService.GetMyLedgersAsync();
-            myLedgers.AddRange(ledgers);
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-        {
-            loginRequired = true;
-        }
-        catch (Exception)
-        {
-            loginRequired = true;
-        }
-
-        try
-        {
-            var sharedLedgers = await CommunityService.GetSharedLedgersAsync();
-            foreach (var ledger in sharedLedgers)
-            {
-                if (!myLedgers.Any(x => string.Equals(x.원장Id, ledger.원장Id, StringComparison.OrdinalIgnoreCase)))
-                {
-                    myLedgers.Add(ledger);
-                }
-            }
-        }
-        catch (Exception)
-        {
-            sharedLoadFailed = true;
-        }
-
-        if (myLedgers.Count == 0)
-        {
-            myLedgerLoadMessage = sharedLoadFailed
-                ? "원장 목록을 불러오지 못했습니다. 서버 연결 상태를 확인해 주세요."
-                : loginRequired
-                    ? "로그인하면 내 원장을 함께 볼 수 있습니다. 현재 재공유가 허용된 공개 원장은 없습니다."
-                    : "내 원장과 재공유가 허용된 공개 원장이 아직 없습니다.";
-        }
-
-        isMyLedgersLoading = false;
-    }
+        => await LedgerPicker.LoadAsync();
 
     private async Task OpenPendingLedgerDetailAsync()
-    {
-        var ledger = myLedgers.FirstOrDefault(item =>
-            string.Equals(item.원장Id, pendingLedgerId, StringComparison.OrdinalIgnoreCase));
-        if (ledger is null)
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "내부 데이터를 확인할 원장을 먼저 선택해 주세요.";
-            return;
-        }
-
-        isLedgerDetailOpen = true;
-        isOrderLedgerHierarchyOpen = false;
-        ledgerDetailOpenedFromHierarchy = false;
-        isLedgerDetailLoading = true;
-        ledgerDetailContext = null;
-        ledgerDetailErrorMessage = null;
-        try
-        {
-            ledgerDetailContext = await CommunityService.GetLedgerContextAsync(ledger.원장Id);
-            if (ledgerDetailContext is null)
-            {
-                ledgerDetailErrorMessage = "이 원장의 공개 범위 또는 참여 권한을 확인해 주세요.";
-            }
-            else if (ledgerDetailContext.포함원장목록.Count > 0)
-            {
-                orderLedgerHierarchyContext = ledgerDetailContext;
-                isOrderLedgerHierarchyOpen = true;
-                isLedgerDetailOpen = false;
-            }
-        }
-        catch (Exception)
-        {
-            ledgerDetailErrorMessage = "원장 내부 데이터를 불러오지 못했습니다. 서버 연결 상태를 확인해 주세요.";
-        }
-        finally
-        {
-            isLedgerDetailLoading = false;
-        }
-    }
+        => ApplyCommandResult(await LedgerPicker.OpenPendingDetailAsync());
 
     private async Task HandleLedgerPickerItemClickAsync(PlatformCommunityPostLedgerChoiceResponse ledger)
     {
@@ -8877,37 +9110,10 @@
     }
 
     private void OpenHierarchyLedgerDiagram(PlatformCommunityPostLedgerContextResponse context)
-    {
-        ledgerDetailContext = context;
-        ledgerDetailErrorMessage = null;
-        isLedgerDetailLoading = false;
-        ledgerDetailOpenedFromHierarchy = true;
-        isOrderLedgerHierarchyOpen = false;
-        isLedgerDetailOpen = true;
-    }
+        => LedgerPicker.OpenHierarchyLedgerDiagram(context);
 
     private async Task RefreshLedgerDetailAsync()
-    {
-        var ledgerId = ledgerDetailContext?.원장Id ?? pendingLedgerId;
-        if (string.IsNullOrWhiteSpace(ledgerId))
-        {
-            return;
-        }
-
-        try
-        {
-            var refreshed = await CommunityService.GetLedgerContextAsync(ledgerId);
-            if (refreshed is not null)
-            {
-                ledgerDetailContext = refreshed;
-                ledgerDetailErrorMessage = null;
-            }
-        }
-        catch (Exception)
-        {
-            ledgerDetailErrorMessage = "원장 최신 상태를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
-        }
-    }
+        => await LedgerPicker.RefreshDetailAsync();
 
     private void SelectMyLedger(PlatformCommunityPostLedgerChoiceResponse ledger)
     {
@@ -8934,35 +9140,10 @@
     }
 
     private IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse> FilteredLedgerPickerChoices
-        => myLedgers
-            .Where(MatchesLedgerPickerScope)
-            .Where(MatchesLedgerPickerSearch)
-            .OrderByDescending(ledger => ledger.내접근원장여부)
-            .ThenByDescending(ledger => ledger.수정시각Utc)
-            .ToArray();
-
-    private bool MatchesLedgerPickerScope(PlatformCommunityPostLedgerChoiceResponse ledger)
-        => ledgerPickerScope switch
-        {
-            "내 원장" => ledger.내접근원장여부,
-            "공개 원장" => !ledger.내접근원장여부,
-            _ => true
-        };
-
-    private bool MatchesLedgerPickerSearch(PlatformCommunityPostLedgerChoiceResponse ledger)
-    {
-        var searchText = ledgerPickerSearchText.Trim();
-        return searchText.Length == 0
-            || ContainsCommunitySearchText(ledger.제목, searchText)
-            || ContainsCommunitySearchText(ledger.원장템플릿명, searchText)
-            || ContainsCommunitySearchText(ledger.상태, searchText)
-            || ContainsCommunitySearchText(ledger.WorkflowTag, searchText)
-            || ContainsCommunitySearchText(ledger.참여역할, searchText)
-            || ContainsCommunitySearchText(ledger.원장Id, searchText);
-    }
+        => LedgerPicker.FilteredItems;
 
     private bool IsPendingLedger(PlatformCommunityPostLedgerChoiceResponse ledger)
-        => string.Equals(ledger.원장Id, pendingLedgerId, StringComparison.OrdinalIgnoreCase);
+        => LedgerPicker.IsPending(ledger);
 
     private string BuildLedgerPickerItemClass(PlatformCommunityPostLedgerChoiceResponse ledger)
         => IsPendingLedger(ledger)
@@ -8975,47 +9156,19 @@
             : "platform-ledger-picker-segment";
 
     private void ResetLedgerPickerFilters()
-    {
-        ledgerPickerSearchText = string.Empty;
-        ledgerPickerScope = "전체";
-    }
+        => LedgerPicker.ResetFilters();
 
     private void ReturnToComposeFromLedgerPicker()
     {
-        isLedgerDetailOpen = false;
-        isOrderLedgerHierarchyOpen = false;
-        isLedgerPickerOpen = false;
+        LedgerPicker.ReturnToCompose();
         isComposeOpen = true;
-        pendingLedgerId = null;
-        ledgerDetailOpenedFromHierarchy = false;
-        orderLedgerHierarchyContext = null;
     }
 
     private void ReturnToLedgerPicker()
-    {
-        isLedgerDetailOpen = false;
-        isOrderLedgerHierarchyOpen = false;
-        isLedgerPickerOpen = true;
-        ledgerDetailContext = null;
-        ledgerDetailErrorMessage = null;
-        ledgerDetailOpenedFromHierarchy = false;
-        orderLedgerHierarchyContext = null;
-    }
+        => LedgerPicker.ReturnToPicker();
 
     private void ReturnFromLedgerDetail()
-    {
-        if (ledgerDetailOpenedFromHierarchy && orderLedgerHierarchyContext is not null)
-        {
-            isLedgerDetailOpen = false;
-            isOrderLedgerHierarchyOpen = true;
-            ledgerDetailContext = null;
-            ledgerDetailErrorMessage = null;
-            ledgerDetailOpenedFromHierarchy = false;
-            return;
-        }
-
-        ReturnToLedgerPicker();
-    }
+        => LedgerPicker.ReturnFromDetail();
 
     private void AttachPendingLedgerAndReturn()
     {
@@ -9048,62 +9201,11 @@
     }
 
     private async Task OpenLedgerSharingSettingsAsync()
-    {
-        var selected = myLedgers.FirstOrDefault(x =>
-            string.Equals(x.원장Id, form.커뮤니티원장Id, StringComparison.OrdinalIgnoreCase));
-        if (selected?.내가만든원장 != true)
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "원장 생성자만 공개 설정을 변경할 수 있습니다.";
-            return;
-        }
-
-        try
-        {
-            ledgerSharingSettings = await CommunityService.GetLedgerSharingSettingsAsync(selected.원장Id);
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"원장 공개 설정을 불러오지 못했습니다: {ex.Message}";
-        }
-    }
+        => ApplyCommandResult(
+            await LedgerPicker.LoadSharingSettingsAsync(form.커뮤니티원장Id));
 
     private async Task SaveLedgerSharingSettingsAsync()
-    {
-        if (ledgerSharingSettings is null) return;
-        isLedgerSharingSaving = true;
-        try
-        {
-            ledgerSharingSettings = await CommunityService.UpdateLedgerSharingSettingsAsync(
-                ledgerSharingSettings.원장Id,
-                new 커뮤니티원장공개설정변경Request
-                {
-                    공개범위 = ledgerSharingSettings.공개범위,
-                    재사용허용여부 = ledgerSharingSettings.재사용허용여부,
-                    재공유허용여부 = ledgerSharingSettings.재공유허용여부,
-                    기대Revision = ledgerSharingSettings.Revision,
-                    공개항목Key목록 = ledgerSharingSettings.항목목록
-                        .Where(x => x.공개여부)
-                        .Select(x => x.항목Key)
-                        .ToArray()
-                });
-            statusSeverity = Severity.Success;
-            statusMessage = ledgerSharingSettings?.공개범위 == 커뮤니티원장공개범위.비공개
-                ? "원장을 비공개로 전환했습니다."
-                : "선택한 항목만 공개되도록 원장 공유 설정을 저장했습니다.";
-            await LoadMyLedgersAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"원장 공개 설정 저장에 실패했습니다: {ex.Message}";
-        }
-        finally
-        {
-            isLedgerSharingSaving = false;
-        }
-    }
+        => ApplyCommandResult(await LedgerPicker.SaveSharingSettingsAsync());
 
     private void CloseLedgerSharingSettings()
     {
@@ -9112,40 +9214,23 @@
 
     private async Task ReuseSharedLedgerAsync(PlatformCommunityPostLedgerContextResponse context)
     {
-        if (isSharedLedgerReusing) return;
-        isSharedLedgerReusing = true;
-        try
+        var result = await LedgerPicker.ReuseSharedLedgerAsync(context.원장Id);
+        ApplyCommandResult(result.Command);
+        if (result.ReusedLedger is not { } reused)
         {
-            var reused = await CommunityService.ReuseSharedLedgerAsync(context.원장Id);
-            if (reused is null)
-            {
-                statusSeverity = Severity.Error;
-                statusMessage = "원장 사본을 만들지 못했습니다.";
-                return;
-            }
+            return;
+        }
 
-            OpenCompose();
-            form.커뮤니티원장Id = reused.원장Id;
-            form.WorkflowTag = CommunityWorkClassificationCatalog.FindByLedgerTemplate(reused.원장템플릿Key)?.WorkflowTag
-                               ?? form.WorkflowTag;
-            if (string.IsNullOrWhiteSpace(form.Title))
-            {
-                form.Title = $"[{CommunityLedgerTemplateCatalog.Find(reused.원장템플릿Key).DisplayName}] {reused.제목}";
-            }
-            await LoadMyLedgersAsync();
-            isLedgerPickerOpen = false;
-            statusSeverity = Severity.Success;
-            statusMessage = $"'{reused.제목}'을 내 비공개 원장으로 가져와 글에 첨부했습니다.";
-        }
-        catch (Exception ex)
+        OpenCompose();
+        form.커뮤니티원장Id = reused.원장Id;
+        form.WorkflowTag = CommunityWorkClassificationCatalog.FindByLedgerTemplate(reused.원장템플릿Key)?.WorkflowTag
+                           ?? form.WorkflowTag;
+        if (string.IsNullOrWhiteSpace(form.Title))
         {
-            statusSeverity = Severity.Error;
-            statusMessage = $"원장을 가져오지 못했습니다: {ex.Message}";
+            form.Title = $"[{CommunityLedgerTemplateCatalog.Find(reused.원장템플릿Key).DisplayName}] {reused.제목}";
         }
-        finally
-        {
-            isSharedLedgerReusing = false;
-        }
+
+        isLedgerPickerOpen = false;
     }
 
     private void CloseCompose()
@@ -9855,13 +9940,59 @@
     protected override void OnParametersSet()
     {
         ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
-        ApplyCommunityQueryParameters();
-        ApplyPendingCommunityPostDraft();
+        ApplyRequestedBoardSelection();
+        if (!BoardIndexOnly && !ListOnly)
+        {
+            ApplyCommunityQueryParameters();
+            ApplySeedPostRouteSelection();
+            if (!ApplyPendingCommunityPostDraft() && StartInComposeMode)
+            {
+                OpenCompose();
+            }
+        }
+    }
+
+    private void ApplyRequestedBoardSelection()
+    {
+        var requestedBoard = string.IsNullOrWhiteSpace(QueryBoardName)
+            ? InitialBoard
+            : QueryBoardName;
+        if (string.IsNullOrWhiteSpace(requestedBoard))
+        {
+            return;
+        }
+
+        selectedBoardFilter = requestedBoard.Trim();
+        selectedForumPostId = null;
+        selectedForumSeedPostTitle = null;
+        if (!string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase))
+        {
+            form.Category = selectedBoardFilter;
+        }
+    }
+
+    private void ApplySeedPostRouteSelection()
+    {
+        if (string.IsNullOrWhiteSpace(QuerySeedPostTitle))
+        {
+            return;
+        }
+
+        var requestedSeedPost = SeedPosts.FirstOrDefault(post =>
+            string.Equals(post.Title, QuerySeedPostTitle, StringComparison.Ordinal));
+        if (requestedSeedPost is null)
+        {
+            return;
+        }
+
+        selectedBoardFilter = requestedSeedPost.Category;
+        selectedForumPostId = null;
+        selectedForumSeedPostTitle = requestedSeedPost.Title;
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && ApplyCommunityQueryParameters())
+        if (firstRender && !BoardIndexOnly && !ListOnly && ApplyCommunityQueryParameters())
         {
             StateHasChanged();
         }
@@ -9869,7 +10000,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !BoardIndexOnly && !ListOnly)
         {
             await LoadLocalComposerDraftAsync();
         }
@@ -12586,6 +12717,11 @@
 
             await InvokeAsync(StateHasChanged);
 
+            if (BoardIndexOnly || ListOnly)
+            {
+                return;
+            }
+
             await LoadApiEndpointMetadataAsync();
             if (!isDisposed)
             {
@@ -13433,44 +13569,15 @@
     }
 
     private async Task LoadBoardsAsync()
-    {
-        isBoardLoading = true;
-        try
-        {
-            var approved = await CommunityService.GetBoardsAsync(AppKey, PlatformCommunityBoardRequestStatuses.Approved);
-            approvedBoards.Clear();
-            approvedBoards.AddRange(approved.Items);
-
-            if (CanManageCommunityPosts)
-            {
-                var pending = await CommunityService.GetBoardsAsync(AppKey, PlatformCommunityBoardRequestStatuses.Pending);
-                pendingBoardRequests.Clear();
-                pendingBoardRequests.AddRange(pending.Items);
-                foreach (var board in pendingBoardRequests)
-                {
-                    boardReviewMemo.TryAdd(board.Id, string.Empty);
-                }
-            }
-        }
-        catch
-        {
-            // Board requests are an enhancement; post loading should still work if this API is unavailable.
-        }
-        finally
-        {
-            isBoardLoading = false;
-        }
-    }
+        => await Boards.LoadAsync(AppKey, CanManageCommunityPosts);
 
     private async Task LoadPostDetailAsync(long postId)
     {
-        var detail = await CommunityService.GetPostAsync(postId);
+        var detail = await ViewModel.PostList.RefreshItemAsync(postId);
         if (detail is null)
         {
             return;
         }
-
-        ViewModel.PostList.Replace(detail);
 
         try
         {
@@ -13484,78 +13591,35 @@
 
     private async Task SaveBoardRequestAsync()
     {
-        statusMessage = null;
-        if (string.IsNullOrWhiteSpace(boardForm.Title) ||
-            string.IsNullOrWhiteSpace(boardForm.RequestedBy) ||
-            string.IsNullOrWhiteSpace(boardForm.RequestReason))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "게시판 이름, 신청자, 개설 이유를 입력하세요.";
-            return;
-        }
-
-        isSavingBoardRequest = true;
-        try
-        {
-            await CommunityService.CreateBoardRequestAsync(new PlatformCommunityBoardCreateRequest
-            {
-                AppKey = AppKey,
-                Title = boardForm.Title,
-                Description = boardForm.Description,
-                RequestedBy = boardForm.RequestedBy,
-                RequestReason = boardForm.RequestReason
-            });
-
-            boardForm.Title = string.Empty;
-            boardForm.Description = string.Empty;
-            boardForm.RequestReason = string.Empty;
-            await LoadBoardsAsync();
-
-            statusSeverity = Severity.Success;
-            statusMessage = "게시판 개설 신청을 접수했습니다. 운영자 승인 후 게시판 목록에 표시됩니다.";
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"게시판 개설 신청에 실패했습니다: {ex.Message}";
-        }
-        finally
-        {
-            isSavingBoardRequest = false;
-        }
+        Shell.ClearStatus();
+        ApplyCommandResult(await Boards.SubmitRequestAsync(AppKey, CanManageCommunityPosts));
     }
 
     private async Task ReviewBoardAsync(PlatformCommunityBoardResponse board, bool approve)
-    {
-        try
-        {
-            var memo = boardReviewMemo.TryGetValue(board.Id, out var value) ? value : string.Empty;
-            if (approve)
-            {
-                await CommunityService.ApproveBoardAsync(board.Id, memo);
-                statusMessage = $"'{board.Title}' 게시판을 승인했습니다.";
-            }
-            else
-            {
-                await CommunityService.RejectBoardAsync(board.Id, memo);
-                statusMessage = $"'{board.Title}' 게시판 신청을 반려했습니다.";
-            }
-
-            statusSeverity = Severity.Success;
-            await LoadBoardsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"게시판 검토 처리에 실패했습니다: {ex.Message}";
-        }
-    }
+        => ApplyCommandResult(await Boards.ReviewAsync(AppKey, board, approve));
 
     private void SelectBoard(string title)
     {
         form.Category = title;
         statusSeverity = Severity.Info;
         statusMessage = $"'{title}' 게시판으로 글 분류를 선택했습니다.";
+    }
+
+    private void ApplyCommandResult(PlatformCommunityCommandResult result)
+    {
+        if (!string.IsNullOrWhiteSpace(result.Message))
+        {
+            Shell.SetStatus(result.Message, result.MessageKind);
+        }
+    }
+
+    private async Task ApplyCommandResultAsync(PlatformCommunityCommandResult result)
+    {
+        ApplyCommandResult(result);
+        if (result.RefreshPosts)
+        {
+            await LoadPostsAsync();
+        }
     }
 
     private async Task HandleComposerSavedAsync(CommunityPostComposerSaveResult result)
@@ -13567,192 +13631,41 @@
 
 
     private async Task RecommendPostAsync(PlatformCommunityPostResponse post)
-    {
-        try
-        {
-            await CommunityService.RecommendAsync(post.Id, recommendationSessionKey);
-            await LoadPostsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"추천 처리에 실패했습니다: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(await Engagement.RecommendAsync(post.Id));
 
     private async Task ToggleOperatorPinAsync(PlatformCommunityPostResponse post)
-    {
-        try
-        {
-            await CommunityService.SetOperatorPinAsync(post.Id, !post.IsOperatorPinned);
-            await LoadPostsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"상단 고정 처리에 실패했습니다: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.SetOperatorPinAsync(post.Id, !post.IsOperatorPinned));
 
     private async Task SaveCommentAsync(PlatformCommunityPostResponse post)
-    {
-        var commentForm = GetCommentForm(post.Id);
-        if (string.IsNullOrWhiteSpace(commentForm.Nickname) ||
-            string.IsNullOrWhiteSpace(commentForm.Password) ||
-            string.IsNullOrWhiteSpace(commentForm.Body))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "댓글 닉네임, 비밀번호, 내용을 입력하세요.";
-            return;
-        }
-
-        try
-        {
-            await CommunityService.CreateCommentAsync(post.Id, new PlatformCommunityPostCommentCreateRequest
-            {
-                Nickname = commentForm.Nickname,
-                Password = commentForm.Password,
-                Body = commentForm.Body
-            });
-
-            commentForms.Remove(post.Id);
-            await LoadPostsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"댓글 등록에 실패했습니다: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(await Engagement.SaveCommentAsync(post.Id));
 
     private async Task DeleteCommentAsync(PlatformCommunityPostResponse post, PlatformCommunityPostCommentResponse comment)
-    {
-        var commentForm = GetCommentForm(post.Id);
-        if (string.IsNullOrWhiteSpace(commentForm.Password))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "Enter the comment password before deleting.";
-            return;
-        }
-
-        try
-        {
-            await CommunityService.DeleteCommentAsync(post.Id, comment.Id, commentForm.Password);
-            await LoadPostsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"Comment delete failed: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.DeleteCommentAsync(post.Id, comment.Id));
 
     private async Task ReportCommentAsync(PlatformCommunityPostCommentResponse comment)
-    {
-        try
-        {
-            await CommunityService.ReportCommentAsync(comment.Id);
-            statusSeverity = Severity.Info;
-            statusMessage = "Comment report received.";
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"Comment report failed: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(await Engagement.ReportCommentAsync(comment.Id));
 
     private PlatformCommunityCommentForm GetCommentForm(long postId)
-    {
-        if (!commentForms.TryGetValue(postId, out var commentForm))
-        {
-            commentForm = new PlatformCommunityCommentForm();
-            commentForms[postId] = commentForm;
-        }
-
-        return commentForm;
-    }
+        => Engagement.GetCommentForm(postId);
 
     private async Task SaveAttachmentCommentAsync(PlatformCommunityPostAttachmentResponse attachment)
-    {
-        var commentForm = GetAttachmentCommentForm(attachment.Id);
-        if (string.IsNullOrWhiteSpace(commentForm.Nickname) ||
-            string.IsNullOrWhiteSpace(commentForm.Password) ||
-            string.IsNullOrWhiteSpace(commentForm.Body))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "Image comment nickname, password, and body are required.";
-            return;
-        }
-
-        try
-        {
-            await CommunityService.CreateAttachmentCommentAsync(attachment.Id, new PlatformCommunityPostAttachmentCommentCreateRequest
-            {
-                Nickname = commentForm.Nickname,
-                Password = commentForm.Password,
-                Body = commentForm.Body
-            });
-
-            attachmentCommentForms.Remove(attachment.Id);
-            await LoadPostsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"Image comment failed: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.SaveAttachmentCommentAsync(attachment.Id));
 
     private async Task DeleteAttachmentCommentAsync(
         PlatformCommunityPostAttachmentResponse attachment,
         PlatformCommunityPostAttachmentCommentResponse comment)
-    {
-        var commentForm = GetAttachmentCommentForm(attachment.Id);
-        if (string.IsNullOrWhiteSpace(commentForm.Password))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "Enter the image comment password before deleting.";
-            return;
-        }
-
-        try
-        {
-            await CommunityService.DeleteAttachmentCommentAsync(attachment.Id, comment.Id, commentForm.Password);
-            await LoadPostsAsync();
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"Image comment delete failed: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.DeleteAttachmentCommentAsync(attachment.Id, comment.Id));
 
     private async Task ReportAttachmentCommentAsync(PlatformCommunityPostAttachmentCommentResponse comment)
-    {
-        try
-        {
-            await CommunityService.ReportAttachmentCommentAsync(comment.Id);
-            statusSeverity = Severity.Info;
-            statusMessage = "Image comment report received.";
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"Image comment report failed: {ex.Message}";
-        }
-    }
+        => await ApplyCommandResultAsync(
+            await Engagement.ReportAttachmentCommentAsync(comment.Id));
 
     private PlatformCommunityCommentForm GetAttachmentCommentForm(long attachmentId)
-    {
-        if (!attachmentCommentForms.TryGetValue(attachmentId, out var commentForm))
-        {
-            commentForm = new PlatformCommunityCommentForm();
-            attachmentCommentForms[attachmentId] = commentForm;
-        }
-
-        return commentForm;
-    }
+        => Engagement.GetAttachmentCommentForm(attachmentId);
 
     private void BeginEdit(PlatformCommunityPostResponse post)
     {
@@ -13789,8 +13702,21 @@
             : "전체";
         OpenCompose();
         statusSeverity = Severity.Info;
-        statusMessage = $"{draft.SourceLabel}에서 가져온 글귀 초안입니다. 공개할 내용을 확인한 뒤 등록하세요.";
+        statusMessage = draft.SourceKind switch
+        {
+            PlatformCommunityPostDraftSourceKinds.YouTubeFood
+                => $"{draft.SourceLabel}의 음식 영상 공유 초안입니다. 나눌 내용을 확인한 뒤 등록하세요.",
+            PlatformCommunityPostDraftSourceKinds.PrajnaLecture
+                => $"{draft.SourceLabel}에서 가져온 글귀 초안입니다. 공개할 내용을 확인한 뒤 등록하세요.",
+            _ => $"{draft.SourceLabel}에서 가져온 공유 초안입니다. 공개할 내용을 확인하세요."
+        };
         return true;
+    }
+
+    private void HandleYouTubeFoodShareRequested(PlatformCommunityPostDraft draft)
+    {
+        CommunityPostDrafts.Prepare(draft);
+        ApplyPendingCommunityPostDraft();
     }
 
     private static bool IsYouTubeSharedLink(string? url)
@@ -13808,12 +13734,27 @@
                || host.EndsWith(".youtube-nocookie.com", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string ResolveSharedLectureTitle(string title)
+    private static bool IsFoodYouTubeSharedPost(PlatformCommunityPostResponse post)
+        => post.Title.StartsWith("[음식 발견]", StringComparison.OrdinalIgnoreCase);
+
+    private static string ResolveSharedVideoEyebrow(PlatformCommunityPostResponse post)
+        => IsFoodYouTubeSharedPost(post)
+            ? "영상에서 발견한 음식"
+            : post.Title.StartsWith("[반야 나눔]", StringComparison.OrdinalIgnoreCase)
+                ? "영상과 함께 나눈 글귀"
+                : "커뮤니티에 공유한 영상";
+
+    private static string ResolveSharedVideoTitle(string title)
     {
-        const string prefix = "[반야 나눔] ";
-        return title.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-            ? title[prefix.Length..]
-            : title;
+        foreach (var prefix in new[] { "[반야 나눔] ", "[음식 발견] " })
+        {
+            if (title.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return title[prefix.Length..];
+            }
+        }
+
+        return title;
     }
 
     private void ResetForm()
@@ -14124,21 +14065,6 @@
         "실행이 필요한 내용은 역할별 업무 화면으로 연결",
         "게시글은 닉네임과 비밀번호로 수정 권한을 보호"
     ];
-
-    private sealed class PlatformCommunityBoardForm
-    {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string RequestedBy { get; set; } = string.Empty;
-        public string RequestReason { get; set; } = string.Empty;
-    }
-
-    private sealed class PlatformCommunityCommentForm
-    {
-        public string Nickname { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Body { get; set; } = string.Empty;
-    }
 
     private enum WorkCommunityDraftKind
     {

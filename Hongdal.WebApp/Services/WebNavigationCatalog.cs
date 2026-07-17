@@ -75,6 +75,9 @@ public static class WebNavigationCatalog
     public static IReadOnlyList<WebNavigationItem> CommunityItems { get; } =
     [
         new("커뮤니티 홈", "/community", Icons.Material.Filled.Forum, true),
+        new("음식 영상 발견", "/community/discover/food", Icons.Material.Filled.SmartDisplay),
+        new("함께 하는 일", "/community/actions", Icons.Material.Filled.Groups),
+        new("커뮤니티 작업실", "/community/workspace", Icons.Material.Filled.AccountTree),
         new("글로벌 무역 대화", GlobalTradeRoutes.CommunityThread(101), Icons.Material.Filled.Translate),
         new("공동구매 운영", "/community/group-purchase", Icons.Material.Filled.GroupAdd),
         new("공동수입 운영", "/community/group-import", Icons.Material.Filled.Public)

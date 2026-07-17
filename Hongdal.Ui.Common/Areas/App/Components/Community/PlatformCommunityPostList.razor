@@ -82,6 +82,10 @@
                             {
                                 <MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" />
                             }
+                            else if (IsFoodVideoPost(post))
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.SmartDisplay" Size="Size.Small" />
+                            }
                             <strong>@post.Title</strong>
                             @if (post.IsCommunityMomentumPromoted)
                             {
@@ -169,6 +173,10 @@
                         else if (post.IsTrending)
                         {
                             <MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" />
+                        }
+                        else if (IsFoodVideoPost(post))
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.SmartDisplay" Size="Size.Small" />
                         }
                         <strong>@post.Title</strong>
                         @if (post.IsCommunityMomentumPromoted)
@@ -378,6 +386,23 @@
     private static bool IsReportPost(PlatformCommunityPostResponse post)
         => post.IsReportBoardPost
            || ContainsReportKeyword(post.Category);
+
+    private static bool IsFoodVideoPost(PlatformCommunityPostResponse post)
+        => post.Title.StartsWith("[음식 발견]", StringComparison.OrdinalIgnoreCase)
+           && IsYouTubeUrl(post.SharedLinkUrl);
+
+    private static bool IsYouTubeUrl(string? value)
+    {
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        var host = uri.Host.TrimStart('.');
+        return host.Equals("youtu.be", StringComparison.OrdinalIgnoreCase)
+               || host.Equals("youtube.com", StringComparison.OrdinalIgnoreCase)
+               || host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static bool ContainsReportKeyword(string? category)
         => !string.IsNullOrWhiteSpace(category)

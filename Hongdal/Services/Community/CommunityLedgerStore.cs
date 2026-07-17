@@ -449,6 +449,18 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
         {
             filter &= builder.Eq(x => x.원장템플릿Key, query.원장템플릿Key.Trim());
         }
+        else if (query.원장템플릿Keys.Count > 0)
+        {
+            var templateKeys = query.원장템플릿Keys
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            if (templateKeys.Length > 0)
+            {
+                filter &= builder.In(x => x.원장템플릿Key, templateKeys);
+            }
+        }
 
         if (!string.IsNullOrWhiteSpace(query.상태))
         {
@@ -471,6 +483,18 @@ public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장
         if (!string.IsNullOrWhiteSpace(query.포함원장Id))
         {
             filter &= builder.ElemMatch(x => x.포함원장목록, child => child.원장Id == query.포함원장Id.Trim());
+        }
+        else if (query.포함원장Ids.Count > 0)
+        {
+            var childIds = query.포함원장Ids
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            if (childIds.Length > 0)
+            {
+                filter &= builder.In<string>("포함원장목록.원장Id", childIds);
+            }
         }
 
         return filter;
@@ -820,10 +844,12 @@ public sealed class 커뮤니티원장조회조건
 {
     public string? 커뮤니티Id { get; set; }
     public string? 원장템플릿Key { get; set; }
+    public IReadOnlyList<string> 원장템플릿Keys { get; set; } = [];
     public string? 상태 { get; set; }
     public string? 참여자UserId { get; set; }
     public string? 접근UserId { get; set; }
     public string? 포함원장Id { get; set; }
+    public IReadOnlyList<string> 포함원장Ids { get; set; } = [];
     public int Limit { get; set; } = 50;
 }
 

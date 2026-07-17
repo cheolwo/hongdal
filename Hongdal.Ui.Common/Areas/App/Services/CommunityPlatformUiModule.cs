@@ -11,10 +11,25 @@ internal static class CommunityPlatformUiModule
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddScoped<PlatformCommunityService>();
+        services.TryAddScoped<YouTubeFoodCommunityDiscoveryService>();
         services.TryAddScoped<ICommunityPostComposerDraftStore, BrowserCommunityPostComposerDraftStore>();
         services.TryAddTransient<CommunityPostComposerViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();
+        services.TryAddTransient<PlatformCommunityHomeShellViewModel>();
+        services.TryAddTransient<PlatformCommunityBoardWorkspaceViewModel>();
+        services.TryAddTransient<PlatformCommunityPostEngagementViewModel>();
+        services.TryAddTransient<PlatformCommunityLedgerPickerViewModel>();
+        services.TryAddTransient<YouTubeFoodCommunityDiscoveryViewModel>();
         services.TryAddTransient<PlatformCommunityHomePageViewModel>();
+        services.TryAddTransient<ICommunityCollectiveActionSource, PlatformCommunityCollectiveActionSource>();
+        services.TryAddTransient<CommunityActionJourneyNavigationViewModel>();
+        services.TryAddTransient<CommunityActionCollectionViewModel>();
+        services.TryAddTransient<CommunityActionConditionsViewModel>();
+        services.TryAddTransient<CommunityActionPartyViewModel>();
+        services.TryAddTransient<CommunityActionReadinessViewModel>();
+        services.TryAddTransient<CommunityActionExecutionViewModel>();
+        services.TryAddTransient<CommunityActionOutcomeViewModel>();
+        services.TryAddTransient<CommunityCollectiveActionPageViewModel>();
         services.TryAddScoped<PlatformHomeModeStateService>();
         services.TryAddScoped<PlatformDiagramPaletteStateService>();
         services.TryAddTransient<IBagua업무영역ViewModelFactory, Bagua업무영역ViewModelFactory>();

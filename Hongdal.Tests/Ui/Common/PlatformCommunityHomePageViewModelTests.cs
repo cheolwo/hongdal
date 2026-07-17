@@ -1,0 +1,197 @@
+using System.Net;
+using System.Net.Http.Json;
+using Hongdal.Contracts.Common.Content;
+using Hongdal.Contracts.Common.Community;
+using Hongdal.Ui.Common.Areas.App.Services;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
+
+namespace Hongdal.Tests.Ui.Common;
+
+public sealed class PlatformCommunityHomePageViewModelTests
+{
+    [Fact]
+    public void 홈PageViewModel은_기능별하위ViewModel을조립한다()
+    {
+        var service = CreateService();
+        var composer = new CommunityPostComposerViewModel(service, new EmptyDraftStore());
+        var postList = new CommunityPostListPageViewModel(service);
+        var shell = new PlatformCommunityHomeShellViewModel();
+        var boards = new PlatformCommunityBoardWorkspaceViewModel(service);
+        var engagement = new PlatformCommunityPostEngagementViewModel(service);
+        var ledgerPicker = new PlatformCommunityLedgerPickerViewModel(service);
+        var foodDiscovery = new YouTubeFoodCommunityDiscoveryViewModel(
+            new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!));
+        using var page = new PlatformCommunityHomePageViewModel(
+            composer,
+            postList,
+            shell,
+            boards,
+            engagement,
+            ledgerPicker,
+            foodDiscovery);
+
+        Assert.Same(composer, page.Composer);
+        Assert.Same(postList, page.PostList);
+        Assert.Same(shell, page.Shell);
+        Assert.Same(boards, page.Boards);
+        Assert.Same(engagement, page.Engagement);
+        Assert.Same(ledgerPicker, page.LedgerPicker);
+        Assert.Same(foodDiscovery, page.FoodDiscovery);
+    }
+
+    [Fact]
+    public void 게시글상호작용ViewModel은_게시글별입력과펼침상태를분리한다()
+    {
+        var viewModel = new PlatformCommunityPostEngagementViewModel(CreateService());
+
+        var first = viewModel.GetCommentForm(10);
+        var same = viewModel.GetCommentForm(10);
+        var other = viewModel.GetCommentForm(20);
+        viewModel.ToggleComments(10);
+
+        Assert.Same(first, same);
+        Assert.NotSame(first, other);
+        Assert.True(viewModel.IsCommentsExpanded(10));
+        Assert.False(viewModel.IsCommentsExpanded(20));
+    }
+
+    [Fact]
+    public void 원장선택ViewModel은_범위와검색어를함께적용한다()
+    {
+        var viewModel = new PlatformCommunityLedgerPickerViewModel(CreateService());
+        viewModel.ReplaceItems(
+        [
+            new PlatformCommunityPostLedgerChoiceResponse
+            {
+                원장Id = "mine-1",
+                제목 = "공동수입 준비",
+                원장템플릿명 = "공동수입",
+                내접근원장여부 = true,
+                수정시각Utc = new DateTime(2026, 7, 17, 1, 0, 0, DateTimeKind.Utc)
+            },
+            new PlatformCommunityPostLedgerChoiceResponse
+            {
+                원장Id = "shared-1",
+                제목 = "동네 공동구매",
+                원장템플릿명 = "공동구매",
+                내접근원장여부 = false,
+                수정시각Utc = new DateTime(2026, 7, 17, 2, 0, 0, DateTimeKind.Utc)
+            }
+        ]);
+
+        viewModel.Scope = "공개 원장";
+        viewModel.SearchText = "공동구매";
+
+        var item = Assert.Single(viewModel.FilteredItems);
+        Assert.Equal("shared-1", item.원장Id);
+    }
+
+    [Fact]
+    public void 게시판신청Draft는_필수값과제출후초기화를관리한다()
+    {
+        var form = new PlatformCommunityBoardForm
+        {
+            Title = "해외 생활",
+            RequestedBy = "작성자",
+            RequestReason = "국가별 생활 정보를 나누기 위해",
+            Description = "설명"
+        };
+
+        Assert.True(form.IsValid);
+
+        form.ResetAfterSubmit();
+
+        Assert.False(form.IsValid);
+        Assert.Equal("작성자", form.RequestedBy);
+        Assert.Empty(form.Title);
+        Assert.Empty(form.Description);
+        Assert.Empty(form.RequestReason);
+    }
+
+    [Fact]
+    public async Task 음식영상발견ViewModel은_국가와후보유형을함께필터한다()
+    {
+        IReadOnlyList<YouTube음식커뮤니티공유후보Dto> candidates =
+        [
+            CreateFoodCandidate(1, "고추장", "KR", YouTube상품후보유형코드.식재료),
+            CreateFoodCandidate(2, "메이플 쿠키", "CA", YouTube상품후보유형코드.포장상품),
+            CreateFoodCandidate(3, "집된장", "KR", YouTube상품후보유형코드.포장상품)
+        ];
+        var httpClient = new HttpClient(
+            new JsonResponseHandler<IReadOnlyList<YouTube음식커뮤니티공유후보Dto>>(candidates))
+        {
+            BaseAddress = new Uri("https://hongdal.test/")
+        };
+        var viewModel = new YouTubeFoodCommunityDiscoveryViewModel(
+            new YouTubeFoodCommunityDiscoveryService(httpClient, new EmptyAccessTokenProvider()));
+
+        await viewModel.LoadAsync(forceRefresh: false);
+        viewModel.SelectCountry("KR");
+        viewModel.SelectCandidateType(YouTube상품후보유형코드.포장상품);
+
+        var item = Assert.Single(viewModel.VisibleItems);
+        Assert.Equal("집된장", item.상품명);
+        Assert.Null(viewModel.ErrorMessage);
+    }
+
+    private static PlatformCommunityService CreateService()
+        => new(new HttpClient(), null!);
+
+    private static YouTube음식커뮤니티공유후보Dto CreateFoodCandidate(
+        long id,
+        string productName,
+        string countryCode,
+        string candidateType)
+        => new(
+            id,
+            productName,
+            null,
+            countryCode,
+            candidateType,
+            null,
+            "영상 내 소개",
+            $"video-{id}",
+            $"{productName} 만드는 법",
+            new DateTime(2026, 7, 17, 0, 0, 0, DateTimeKind.Utc).AddMinutes(id),
+            null,
+            $"https://www.youtube.com/watch?v=video-{id}",
+            $"channel-{id}",
+            $"채널 {id}",
+            countryCode);
+
+    private sealed class JsonResponseHandler<T>(T responseValue) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+            => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = JsonContent.Create(responseValue),
+                RequestMessage = request
+            });
+    }
+
+    private sealed class EmptyAccessTokenProvider : IHongdalAccessTokenProvider
+    {
+        public string? AccessToken => null;
+    }
+
+    private sealed class EmptyDraftStore : ICommunityPostComposerDraftStore
+    {
+        public Task<CommunityPostComposerSnapshot?> LoadAsync(
+            string appKey,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<CommunityPostComposerSnapshot?>(null);
+
+        public Task SaveAsync(
+            string appKey,
+            CommunityPostComposerSnapshot snapshot,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
+        public Task ClearAsync(
+            string appKey,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+    }
+}
