@@ -125,7 +125,11 @@ public sealed class CommunityPrajnaPostSourceTests
                 ChannelId = HongikChannelId,
                 채널명 = "홍익학당",
                 UploadsPlaylistId = "uploads",
-                활성화여부 = true
+                활성화여부 = true,
+                지식성찰채널여부 = true,
+                반야게시허용여부 = true,
+                지식성찰분류 = YouTube지식성찰주제코드.철학,
+                관점표시 = "홍익·양심 공부"
             };
             context.Add(channel);
         }
@@ -162,12 +166,7 @@ public sealed class CommunityPrajnaPostSourceTests
         };
 
     private static CommunityPrajnaPostSource CreateSource(HongdalContext context)
-        => new(
-            context,
-            Options.Create(new CommunityEditorialBatchOptions
-            {
-                PrajnaYouTubeChannelId = HongikChannelId
-            }));
+        => new(context);
 
     private static HongdalContext CreateContext()
     {

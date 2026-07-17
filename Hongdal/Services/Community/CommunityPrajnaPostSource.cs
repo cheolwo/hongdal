@@ -2,28 +2,22 @@ using System.Globalization;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Domain.Content;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using 홍달.Data;
-using 홍달.Services.Options;
 
 namespace Hongdal.Services.Community;
 
 /// <summary>
-/// 관리자가 공개 승인한 홍익학당 카드와 영상을 반야 게시판 초안으로 한 건씩 구성합니다.
+/// 관리자가 공개 승인한 카드와 지식·성찰 채널 영상을 반야 게시판 초안으로 한 건씩 구성합니다.
 /// 원본 수집 상태와 커뮤니티 공개 승인은 서로 다른 경계로 유지합니다.
 /// </summary>
 public sealed class CommunityPrajnaPostSource : ICommunityAutomatedPostSource
 {
     private const int CandidatePageSize = 100;
     private readonly HongdalContext _db;
-    private readonly CommunityEditorialBatchOptions _options;
 
-    public CommunityPrajnaPostSource(
-        HongdalContext db,
-        IOptions<CommunityEditorialBatchOptions> options)
+    public CommunityPrajnaPostSource(HongdalContext db)
     {
         _db = db;
-        _options = options.Value;
     }
 
     public string SourceKey => CommunityAutomatedPostSourceKeys.Prajna;
@@ -107,17 +101,14 @@ public sealed class CommunityPrajnaPostSource : ICommunityAutomatedPostSource
         IReadOnlySet<string> publishedKeys,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(_options.PrajnaYouTubeChannelId))
-        {
-            return null;
-        }
-
         var query = _db.YouTube채널영상
             .AsNoTracking()
-            .Where(video => video.ChannelId == _options.PrajnaYouTubeChannelId
-                            && video.공유상태 == YouTube채널영상.공개상태
+            .Include(video => video.감시채널)
+            .Where(video => video.공유상태 == YouTube채널영상.공개상태
                             && video.감시채널 != null
-                            && video.감시채널.활성화여부)
+                            && video.감시채널.활성화여부
+                            && video.감시채널.지식성찰채널여부
+                            && video.감시채널.반야게시허용여부)
             .OrderBy(video => video.게시일시Utc)
             .ThenBy(video => video.Id);
         for (var skip = 0; ; skip += CandidatePageSize)
@@ -177,6 +168,8 @@ public sealed class CommunityPrajnaPostSource : ICommunityAutomatedPostSource
     {
         var title = TextOrFallback(video.제목, video.VideoId);
         var description = LimitText(video.설명, 420);
+        var channelName = TextOrFallback(video.감시채널?.채널명, "원 채널");
+        var perspective = TextOrFallback(video.감시채널?.관점표시, "지식·성찰");
         var localPublishedAt = TimeZoneInfo.ConvertTimeFromUtc(
             DateTime.SpecifyKind(video.게시일시Utc, DateTimeKind.Utc),
             timeZone);
@@ -193,15 +186,16 @@ public sealed class CommunityPrajnaPostSource : ICommunityAutomatedPostSource
 
         body.Add($"영상 게시일: {localPublishedAt:yyyy-MM-dd} ({timeZone.Id})");
         body.Add($"선별 기준일: {publicationDate:yyyy-MM-dd}");
-        body.Add("출처: 홍익학당 YouTube 공개 영상");
-        body.Add("홍익학당은 현재 홍달의 협력기관이 아닙니다. 이 글은 제휴나 공식 추천을 뜻하지 않으며 영상 내용과 권리는 원 출처에 있습니다.");
+        body.Add($"출처: {channelName} YouTube 공개 영상");
+        body.Add($"관점: {perspective}");
+        body.Add($"{channelName}은(는) 현재 홍달의 협력기관으로 표시되지 않습니다. 이 글은 제휴·교리의 우열·공식 추천을 뜻하지 않으며 영상 내용과 권리는 원 출처에 있습니다.");
 
         return new CommunityAutomatedPostDraft(
             CommunityAutomatedPostSourceKeys.PrajnaVideo,
             video.VideoId,
             CommunityBoardCatalog.Prajna.DisplayName,
             "배움·성찰",
-            "관리자 선별 콘텐츠",
+            LimitText($"관리자 선별 · {perspective}", 40),
             LimitText($"[반야 영상] {title}", 180),
             string.Join(Environment.NewLine, body),
             "홍달 반야지기",

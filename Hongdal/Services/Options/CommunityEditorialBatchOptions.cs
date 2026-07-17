@@ -28,5 +28,4 @@ public sealed class CommunityEditorialBatchOptions
 
     public string PrajnaPublicationCronExpression { get; set; } = "0 15 9 * * ?";
 
-    public string PrajnaYouTubeChannelId { get; set; } = "UCI8HW08rOSlvweOjJ9Gp2Ng";
 }
