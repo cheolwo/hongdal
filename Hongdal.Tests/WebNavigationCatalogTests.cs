@@ -39,6 +39,28 @@ public sealed class WebNavigationCatalogTests
         Assert.DoesNotContain(items, item => item.Href == WebNavigationCatalog.DiagramRoute);
     }
 
+    [Fact]
+    public void CommunityItems_ExposePersonalExplorationInsteadOfBusinessFeatures()
+    {
+        var items = WebNavigationCatalog.CommunityItems;
+
+        Assert.Equal(
+        [
+            "/community/me",
+            "/community/me/posts",
+            "/community/me/actions",
+            "/community/me/ledgers",
+            "/community/me/notifications",
+            "/community/decorations",
+            "/community/me/settings"
+        ],
+            items.Select(item => item.Href));
+        Assert.DoesNotContain(items, item => item.Href is "/community/workspace"
+            or "/community/actions"
+            or "/community/group-purchase"
+            or "/community/group-import");
+    }
+
     [Theory]
     [InlineData("community")]
     [InlineData("community/group-purchase")]

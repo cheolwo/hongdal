@@ -26,6 +26,7 @@ builder.Services.AddTransient<화주Controller기능모음ViewModel>();
 builder.Services.AddHongdalDocumentOutputServices();
 builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
 builder.Services.AddScoped<WebAuthSessionService>();
+builder.Services.AddScoped<CommunityPersonalPreferenceService>();
 builder.Services.AddScoped<IDiagramCollaborationClientService, DiagramCollaborationClientService>();
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkspaceService>(sp => sp.GetRequiredService<WebShipperWarehouseWorkspaceService>());

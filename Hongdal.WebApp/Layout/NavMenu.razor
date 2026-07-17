@@ -1,14 +1,15 @@
 @implements IDisposable
 @inject NavigationManager Navigation
 @inject WebAuthSessionService AuthSession
+@inject CommunityPersonalPreferenceService PersonalPreferences
 
 <div class="web-navigation-shell">
     <div class="web-navigation-main">
         <MudStack Spacing="0" Class="px-4 pt-3 pb-2">
             <MudText Typo="Typo.overline" Color="Color.Secondary">
-                @(IsCommunityMode ? "살뜰 커뮤니티" : "살뜰 업무")
+                @(IsCommunityMode ? "내 커뮤니티" : "살뜰 업무")
             </MudText>
-            <MudText Typo="Typo.subtitle2">@AuthSession.CurrentTheme.RoleLabel</MudText>
+            <MudText Typo="Typo.subtitle2">@NavigationIdentityLabel</MudText>
         </MudStack>
 
         <MudNavMenu Class="platform-navigation-menu">
@@ -24,24 +25,48 @@
     </div>
 
     <MudPaper Square="true" Elevation="0" Class="web-navigation-mode-switch pa-2">
-        <MudStack Row="true" Spacing="1">
-            <MudButton Variant="@BusinessModeVariant"
-                       Color="Color.Primary"
-                       Size="Size.Small"
-                       FullWidth="true"
-                       StartIcon="@Icons.Material.Filled.Work"
-                       OnClick="OpenBusinessMode">
-                업무
-            </MudButton>
-            <MudButton Variant="@CommunityModeVariant"
-                       Color="Color.Secondary"
-                       Size="Size.Small"
-                       FullWidth="true"
-                       StartIcon="@Icons.Material.Filled.Forum"
-                       OnClick="OpenCommunityMode">
-                커뮤니티
-            </MudButton>
-        </MudStack>
+        @if (IsCommunityMode)
+        {
+            <MudStack Row="true" Spacing="1">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           Size="Size.Small"
+                           FullWidth="true"
+                           StartIcon="@Icons.Material.Filled.Forum"
+                           OnClick="OpenCommunityMode">
+                    게시판
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           FullWidth="true"
+                           StartIcon="@Icons.Material.Filled.Edit"
+                           OnClick="OpenCommunityCompose">
+                    글쓰기
+                </MudButton>
+            </MudStack>
+        }
+        else
+        {
+            <MudStack Row="true" Spacing="1">
+                <MudButton Variant="@BusinessModeVariant"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           FullWidth="true"
+                           StartIcon="@Icons.Material.Filled.Work"
+                           OnClick="OpenBusinessMode">
+                    업무
+                </MudButton>
+                <MudButton Variant="@CommunityModeVariant"
+                           Color="Color.Secondary"
+                           Size="Size.Small"
+                           FullWidth="true"
+                           StartIcon="@Icons.Material.Filled.Forum"
+                           OnClick="OpenCommunityMode">
+                    커뮤니티
+                </MudButton>
+            </MudStack>
+        }
     </MudPaper>
 </div>
 
@@ -79,8 +104,21 @@
 
     private IReadOnlyList<WebNavigationItem> CurrentItems
         => IsCommunityMode
-            ? WebNavigationCatalog.CommunityItems
+            ? PersonalPreferences.Current.UseCompactPersonalMenu
+                ? WebNavigationCatalog.CommunityItems
+                    .Where(item => item.Href is "/community/me"
+                        or "/community/me/posts"
+                        or "/community/me/actions"
+                        or "/community/decorations"
+                        or "/community/me/settings")
+                    .ToArray()
+                : WebNavigationCatalog.CommunityItems
             : WebNavigationCatalog.GetBusinessItems(AuthSession.CurrentTheme.ThemeCode);
+
+    private string NavigationIdentityLabel
+        => IsCommunityMode
+            ? AuthSession.UserName ?? AuthSession.CurrentTheme.RoleLabel
+            : AuthSession.CurrentTheme.RoleLabel;
 
     private Variant BusinessModeVariant => IsCommunityMode ? Variant.Outlined : Variant.Filled;
 
@@ -89,7 +127,19 @@
     protected override void OnInitialized()
     {
         AuthSession.Changed += HandleStateChanged;
+        PersonalPreferences.Changed += HandleStateChanged;
         Navigation.LocationChanged += HandleLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await PersonalPreferences.LoadAsync(AuthSession.UserId);
+        await InvokeAsync(StateHasChanged);
     }
 
     private void OpenBusinessMode()
@@ -97,6 +147,9 @@
 
     private void OpenCommunityMode()
         => Navigation.NavigateTo("/community");
+
+    private void OpenCommunityCompose()
+        => Navigation.NavigateTo("/community/write");
 
     private void HandleStateChanged()
         => _ = InvokeAsync(StateHasChanged);
@@ -107,6 +160,7 @@
     public void Dispose()
     {
         AuthSession.Changed -= HandleStateChanged;
+        PersonalPreferences.Changed -= HandleStateChanged;
         Navigation.LocationChanged -= HandleLocationChanged;
     }
 }
