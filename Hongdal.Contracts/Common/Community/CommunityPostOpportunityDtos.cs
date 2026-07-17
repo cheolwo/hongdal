@@ -1,4 +1,5 @@
 using Hongdal.Contracts.Common.AgriculturalFisheries;
+using Hongdal.Contracts.Common.Localization;
 
 namespace Hongdal.Contracts.Common.Community;
 
@@ -75,13 +76,11 @@ public static class CommunityExperienceScopeCodes
 
 public static class CommunityDisplayLanguageCodes
 {
-    public const string Korean = "ko-KR";
-    public const string English = "en-US";
+    public const string Korean = DisplayLanguageCodes.Korean;
+    public const string English = DisplayLanguageCodes.English;
 
-    public static IReadOnlyList<string> Supported { get; } = [Korean, English];
+    public static IReadOnlyList<string> Supported => DisplayLanguageCodes.Supported;
 
     public static string Normalize(string? value)
-        => value?.Trim().StartsWith("en", StringComparison.OrdinalIgnoreCase) == true
-            ? English
-            : Korean;
+        => DisplayLanguageCodes.Normalize(value);
 }

@@ -1,3 +1,5 @@
+using Hongdal.Contracts.Common.Localization;
+
 namespace HongdalApp.Services.Localization;
 
 public sealed class ShipperLocalizationService
@@ -234,6 +236,9 @@ public sealed class ShipperLocalizationService
     }
 
     public string Language { get; private set; }
+    public string DisplayLanguageCode => Language == "en"
+        ? DisplayLanguageCodes.English
+        : DisplayLanguageCodes.Korean;
 
     public void SetLanguage(string language)
     {
@@ -245,6 +250,17 @@ public sealed class ShipperLocalizationService
         Language = language;
         Preferences.Default.Set(PreferredLanguageKey, language);
         Changed?.Invoke();
+    }
+
+    public bool TrySetDisplayLanguageCode(string? displayLanguageCode)
+    {
+        if (!DisplayLanguageCodes.TryNormalize(displayLanguageCode, out var normalizedCode))
+        {
+            return false;
+        }
+
+        SetLanguage(DisplayLanguageCodes.ToNeutralCode(normalizedCode));
+        return true;
     }
 
     public bool IsLanguage(string language)

@@ -55,6 +55,12 @@ public static class OperatingWeightUnitCodes
     public const string Pound = "lb";
 }
 
+public static class OperatingTimeZoneIds
+{
+    public const string Korea = "Asia/Seoul";
+    public const string CoordinatedUniversal = "UTC";
+}
+
 public static class OperatingAddressFormatCodes
 {
     public const string KoreaRoadName = "KoreaRoadName";
@@ -83,14 +89,18 @@ public sealed record OperatingMarketProfile(
     string MarketCode,
     string CountryCode,
     string CurrencyCode,
-    string CultureName,
+    string FormattingCultureName,
     string DistanceUnitCode,
     string WeightUnitCode,
     string AddressFormatCode,
     string AddressProviderCode,
     string MapProviderCode,
     string FreightArrangementModeCode,
-    IReadOnlyList<string> PreferredCommerceChannelCodes);
+    IReadOnlyList<string> PreferredCommerceChannelCodes)
+{
+    // Retained for callers compiled against the first operating-market contract.
+    public string CultureName => FormattingCultureName;
+}
 
 public static class OperatingMarketProfileCatalog
 {
