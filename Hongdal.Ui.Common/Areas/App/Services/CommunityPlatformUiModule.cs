@@ -12,6 +12,7 @@ internal static class CommunityPlatformUiModule
 
         services.TryAddScoped<PlatformCommunityService>();
         services.TryAddScoped<YouTubeFoodCommunityDiscoveryService>();
+        services.TryAddScoped<ICommunityDynamicDiscoveryClient, CommunityDynamicDiscoveryClient>();
         services.TryAddScoped<ICommunityPostComposerDraftStore, BrowserCommunityPostComposerDraftStore>();
         services.TryAddTransient<CommunityPostComposerViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();
@@ -21,6 +22,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<PlatformCommunityPostEngagementViewModel>();
         services.TryAddTransient<PlatformCommunityLedgerPickerViewModel>();
         services.TryAddTransient<YouTubeFoodCommunityDiscoveryViewModel>();
+        services.TryAddTransient<CommunityDynamicDiscoveryViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramChatViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramCanvasViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();
