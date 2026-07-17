@@ -158,16 +158,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I음식점주문실시간알림Service, 음식점주문SignalR알림Service>();
 
         services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
-        services.AddSingleton<IDriverLocationStore, DriverLocationStore>();
-        services.AddSingleton<IDriverWorkQueueStore, RedisDriverWorkQueueStore>();
-        services.AddSingleton<I국내화물운송기사상태Store, Redis국내화물운송기사상태Store>();
         services.AddScoped<I국내화물운송기사상태Service, 국내화물운송기사상태Service>();
-        services.AddSingleton<IDriverRejectedRequestStore, RedisDriverRejectedRequestStore>();
-        services.AddSingleton<IDriverPushTokenStore, RedisDriverPushTokenStore>();
-        services.AddSingleton<I사용자PushTokenStore, Redis사용자PushTokenStore>();
-        services.AddSingleton<IDriverRecommendationPushStateStore, RedisDriverRecommendationPushStateStore>();
-        services.AddSingleton<IDriverCallScopeStore, RedisDriverCallScopeStore>();
-        services.AddSingleton<IDriverNotificationSettingsStore, RedisDriverNotificationSettingsStore>();
         services.AddSingleton<ICommandFileStoragePathResolver, CommandFileStoragePathResolver>();
         services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();
         services.AddSingleton<IDispatchAcceptanceLogStore, DispatchAcceptanceLogStore>();

@@ -5,12 +5,13 @@ services:
       dockerfile: Hongdal/Dockerfile
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "${HONGDAL_BIND_ADDRESS:-127.0.0.1}:8080:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: "${HONGDAL_ASPNETCORE_ENVIRONMENT:-Development}"
       ASPNETCORE_URLS: http://+:8080
       DOTNET_RUNNING_IN_CONTAINER: "true"
       ConnectionStrings__DefaultConnection: "${HONGDAL_DB_CONNECTION_STRING:-server=mysql;port=3306;database=hongdal_dev;user=hongdal;password=YOUR_LOCAL_PASSWORD;}"
+      TransientState__Provider: "${HONGDAL_TRANSIENT_STATE_PROVIDER:-Memory}"
       Redis__ConnectionString: "${HONGDAL_REDIS_CONNECTION_STRING:-redis:6379}"
       MongoDb__ConnectionString: "${HONGDAL_MONGO_CONNECTION_STRING:-mongodb://hongdal:YOUR_LOCAL_PASSWORD@mongo:27017/?authSource=admin}"
       MongoDb__Database: hongdal_dev
@@ -40,6 +41,7 @@ services:
       GoogleGeocodingApiKey: "${HONGDAL_GOOGLE_GEOCODING_API_KEY:-development-only-google-geocoding-key}"
       NaverCloudDirections__ApiKeyId: "${HONGDAL_NAVER_CLOUD_DIRECTIONS_API_KEY_ID:-development-only-naver-key-id}"
       NaverCloudDirections__ApiKey: "${HONGDAL_NAVER_CLOUD_DIRECTIONS_API_KEY:-development-only-naver-key}"
+      HongdalLogging__FilePath: "logs/hongdal-.log"
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/health/ready"]
       interval: 30s
@@ -49,16 +51,19 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      redis:
-        condition: service_healthy
       mongo:
         condition: service_healthy
+    volumes:
+      - app_data:/app/App_Data
+      - app_uploads:/app/uploads
+      - app_community:/app/community
+      - app_logs:/app/logs
 
   mysql:
     image: mysql:8.4
     restart: unless-stopped
     ports:
-      - "13306:3306"
+      - "127.0.0.1:13306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "${HONGDAL_MYSQL_ROOT_PASSWORD:-YOUR_LOCAL_ROOT_PASSWORD}"
       MYSQL_DATABASE: hongdal_dev
@@ -79,9 +84,10 @@ services:
 
   redis:
     image: redis:7.4-alpine
+    profiles: ["redis"]
     restart: unless-stopped
     ports:
-      - "16379:6379"
+      - "127.0.0.1:16379:6379"
     command: ["redis-server", "--appendonly", "yes"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -95,7 +101,7 @@ services:
     image: mongo:8.0
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: hongdal
       MONGO_INITDB_ROOT_PASSWORD: "${HONGDAL_MONGO_ROOT_PASSWORD:-YOUR_LOCAL_PASSWORD}"
@@ -109,6 +115,10 @@ services:
       - mongo_data:/data/db
 
 volumes:
+  app_data:
+  app_uploads:
+  app_community:
+  app_logs:
   mysql_data:
   redis_data:
   mongo_data:

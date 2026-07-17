@@ -14,18 +14,23 @@ namespace Hongdal.Infrastructure.HealthChecks;
 public sealed class PersistenceReadinessHealthCheck : IHealthCheck
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IConnectionMultiplexer _redis;
+    private readonly IConnectionMultiplexer? _redis;
+    private readonly TransientStateProvider _transientStateProvider;
     private readonly IMongoClient _mongo;
     private readonly MongoDbOptions _mongoOptions;
 
     public PersistenceReadinessHealthCheck(
         IServiceScopeFactory scopeFactory,
-        IConnectionMultiplexer redis,
+        IServiceProvider serviceProvider,
         IMongoClient mongo,
-        IOptions<MongoDbOptions> mongoOptions)
+        IOptions<MongoDbOptions> mongoOptions,
+        IOptions<TransientStateOptions> transientStateOptions)
     {
         _scopeFactory = scopeFactory;
-        _redis = redis;
+        _transientStateProvider = transientStateOptions.Value.Provider;
+        _redis = _transientStateProvider == TransientStateProvider.Redis
+            ? serviceProvider.GetRequiredService<IConnectionMultiplexer>()
+            : null;
         _mongo = mongo;
         _mongoOptions = mongoOptions.Value;
     }
@@ -63,15 +68,19 @@ public sealed class PersistenceReadinessHealthCheck : IHealthCheck
                 cancellationToken);
         }
 
-        try
+        data["transientStateProvider"] = _transientStateProvider.ToString();
+        if (_redis is not null)
         {
-            var latency = await _redis.GetDatabase().PingAsync().WaitAsync(cancellationToken);
-            data["redisLatencyMs"] = Math.Round(latency.TotalMilliseconds, 2);
-        }
-        catch (Exception exception)
-        {
-            failures.Add("redis");
-            CaptureException(exception);
+            try
+            {
+                var latency = await _redis.GetDatabase().PingAsync().WaitAsync(cancellationToken);
+                data["redisLatencyMs"] = Math.Round(latency.TotalMilliseconds, 2);
+            }
+            catch (Exception exception)
+            {
+                failures.Add("redis");
+                CaptureException(exception);
+            }
         }
 
         try
@@ -94,7 +103,9 @@ public sealed class PersistenceReadinessHealthCheck : IHealthCheck
         }
 
         return failures.Count == 0
-            ? HealthCheckResult.Healthy("MySQL, Redis and MongoDB are ready.", data)
+            ? HealthCheckResult.Healthy(
+                $"MySQL, MongoDB and {_transientStateProvider} transient state are ready.",
+                data)
             : HealthCheckResult.Unhealthy(
                 $"Persistence dependencies are not ready: {string.Join(", ", failures)}.",
                 firstException,

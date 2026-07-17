@@ -37,7 +37,11 @@ RUN dotnet publish "./Hongdal.csproj" \
 # 이 스테이지는 프로덕션에서 사용되거나 VS에서 일반 모드로 실행할 때 사용됩니다(디버그 구성을 사용하지 않는 경우 기본값).
 FROM base AS final
 WORKDIR /app
+USER root
+RUN mkdir -p /app/App_Data /app/uploads /app/community /app/logs \
+    && chown -R $APP_UID:$APP_UID /app/App_Data /app/uploads /app/community /app/logs
 COPY --from=publish --chown=$APP_UID:$APP_UID /app/publish .
+USER $APP_UID
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl --fail --silent --show-error http://127.0.0.1:8080/health/ready || exit 1
 ENTRYPOINT ["dotnet", "Hongdal.dll"]

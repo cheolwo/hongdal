@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
-using StackExchange.Redis;
-using Hongdal.Services.Security;
 using 홍달.Services.Options;
 
 namespace Hongdal.Extensions;
@@ -29,19 +27,7 @@ public static partial class ServiceCollectionExtensions
 
         services.AddTraditionalMarketModule(connectionString);
         services.AddAgriculturalFisheriesPersistence(connectionString);
-
-        var redisConnectionString = configuration.GetSection(RedisOptions.SectionName).GetValue<string>(nameof(RedisOptions.ConnectionString))
-                                    ?? Environment.GetEnvironmentVariable("Redis__ConnectionString");
-        if (string.IsNullOrWhiteSpace(redisConnectionString))
-        {
-            throw new InvalidOperationException("Redis:ConnectionString configuration is required.");
-        }
-
-        var redisConfiguration = ConfigurationOptions.Parse(redisConnectionString);
-        redisConfiguration.AbortOnConnectFail = false;
-        redisConfiguration.ClientName ??= "Hongdal";
-        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
-        services.AddSingleton<IIsmsPTransportKeyStatusStore, RedisIsmsPTransportKeyStatusStore>();
+        services.AddHongdalTransientState(configuration);
 
         var mongoOptions = configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();
         var mongoConnectionString = string.IsNullOrWhiteSpace(mongoOptions.ConnectionString)

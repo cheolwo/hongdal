@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using StackExchange.Redis;
 using Serilog;
 using Hongdal.Application.Driver.Transport;
 using Hongdal.Extensions;

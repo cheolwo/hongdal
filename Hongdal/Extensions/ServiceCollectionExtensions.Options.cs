@@ -33,6 +33,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<수입식품제품조회Options>(configuration.GetSection(수입식품제품조회Options.SectionName));
         services.Configure<기사이용료정책Options>(configuration.GetSection(기사이용료정책Options.SectionName));
         services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
+        services.Configure<TransientStateOptions>(configuration.GetSection(TransientStateOptions.SectionName));
         services.Configure<MongoDbOptions>(configuration.GetSection(MongoDbOptions.SectionName));
         services.Configure<DatabaseInitializationOptions>(configuration.GetSection(DatabaseInitializationOptions.SectionName));
         services.Configure<PushNotificationsOptions>(configuration.GetSection(PushNotificationsOptions.SectionName));
