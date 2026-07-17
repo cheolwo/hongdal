@@ -55,6 +55,20 @@ public sealed class YouTube채널감시Controller : ControllerBase
         CancellationToken cancellationToken)
         => Ok(await _service.음식채널프로필설정Async(channelId, 요청, cancellationToken));
 
+    [HttpPut("channels/{channelId}/knowledge-reflection-profile")]
+    public async Task<IActionResult> 지식성찰채널프로필설정(
+        [FromRoute] string channelId,
+        [FromBody] YouTube지식성찰채널프로필설정요청Dto 요청,
+        CancellationToken cancellationToken)
+        => Ok(await _service.지식성찰채널프로필설정Async(channelId, 요청, cancellationToken));
+
+    [HttpPut("channels/{channelId}/prajna-publication")]
+    public async Task<IActionResult> 반야게시채널설정(
+        [FromRoute] string channelId,
+        [FromBody] YouTube반야게시채널설정요청Dto 요청,
+        CancellationToken cancellationToken)
+        => Ok(await _service.반야게시채널설정Async(channelId, 요청.허용여부, cancellationToken));
+
     [HttpGet("videos")]
     public async Task<IActionResult> 영상목록조회(
         [FromQuery] string? channelId,

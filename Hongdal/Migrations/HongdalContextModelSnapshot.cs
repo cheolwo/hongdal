@@ -1096,6 +1096,10 @@ namespace Hongdal.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_admin_enabled");
 
+                    b.Property<bool>("IsCommunityPublicationApproved")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_community_publication_approved");
+
                     b.Property<DateTime>("LastSeenAtUtc")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("last_seen_at_utc");
@@ -1147,6 +1151,9 @@ namespace Hongdal.Migrations
 
                     b.HasIndex("IsActive", "LastSeenAtUtc")
                         .HasDatabaseName("IX_hh_cards_active_last_seen");
+
+                    b.HasIndex("IsCommunityPublicationApproved", "IsActive", "IsAdminEnabled")
+                        .HasDatabaseName("IX_hh_cards_community_publication");
 
                     b.ToTable("hongik_hakdang_cards", (string)null);
                 });

@@ -95,15 +95,18 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityAutomatedPostSource, CommunityKamisPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityReflectionSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityActivityDigestSource>();
+        services.AddScoped<ICommunityAutomatedPostSource, CommunityPrajnaPostSource>();
         services.AddScoped<I공동수입원장관세사알림Service, 공동수입원장관세사알림Service>();
         services.AddScoped<I공동구매원장관계자알림Service, 공동구매원장관계자알림Service>();
         services.AddScoped<I게시글원장ContextService, 게시글원장ContextService>();
         services.AddScoped<ICommunityPostTranslationService, CommunityPostTranslationService>();
         services.AddSingleton<ICommunityPostOpportunityAnalyzer, CommunityPostOpportunityAnalyzer>();
+        services.AddSingleton<ICommunityDynamicTopicClassifier, CommunityDynamicTopicClassifier>();
         services.AddScoped<ICommunityPostOpportunityStore, EfCommunityPostOpportunityStore>();
         services.AddScoped<ICommunityProfessionalEligibilityService, CommunityProfessionalEligibilityService>();
         services.AddScoped<ICommunityPostProfessionalParticipationService, CommunityPostProfessionalParticipationService>();
         services.AddScoped<ICommunityActionJourneyService, CommunityActionJourneyService>();
+        services.AddScoped<ICommunityDynamicDiscoveryService, CommunityDynamicDiscoveryService>();
         services.AddScoped<ICommunityPostOpportunityService, CommunityPostOpportunityService>();
         services.AddScoped<I원장다이어그램실시간알림Service, 원장다이어그램SignalR알림Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();

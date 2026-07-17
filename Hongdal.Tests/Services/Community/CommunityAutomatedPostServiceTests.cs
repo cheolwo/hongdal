@@ -61,6 +61,24 @@ public sealed class CommunityAutomatedPostServiceTests
             CommunityAutomatedPostPublication.GetSystemPostKind(post));
     }
 
+    [Theory]
+    [InlineData(CommunityAutomatedPostSourceKeys.PrajnaCard)]
+    [InlineData(CommunityAutomatedPostSourceKeys.PrajnaVideo)]
+    public void PrajnaSource_ResolvesAdminSelectedSystemKind(string sourceKey)
+    {
+        var post = new PlatformCommunityPost
+        {
+            AuthorUserId = CommunityAutomatedPostPublication.BuildSystemAuthorKey(sourceKey, "item-1")
+        };
+
+        Assert.Equal(
+            PlatformCommunitySystemPostKinds.PrajnaContent,
+            CommunityAutomatedPostPublication.GetSystemPostKind(post));
+        Assert.Contains(
+            "제휴를 뜻하지 않습니다",
+            CommunityAutomatedPostPublication.GetPrivacyNotice(PlatformCommunitySystemPostKinds.PrajnaContent));
+    }
+
     [Fact]
     public void KamisBody_IncludesSourceDateUnitAndComparisonBoundary()
     {

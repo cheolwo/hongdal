@@ -123,6 +123,75 @@ public sealed class PublicDataApiMetadataCatalog : IPublicDataApiMetadataCatalog
         },
         new()
         {
+            Key = "mfds-imported-food-product-db",
+            Provider = "식품의약품안전처",
+            DisplayName = "수입식품 제품DB 정보",
+            Purpose = "영상·게시글·수입 검토에서 발견된 제품명을 식약처 수입식품 관리번호와 공식 품목 후보로 연결합니다.",
+            Domain = "ImportedFood",
+            VersionScope = "2.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/1471000/IprtFoodPrdtDBService02",
+            DocumentationUrl = "https://www.data.go.kr/data/15073949/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows", "type", "DCLR_PRDT_DIVS_NM", "MNFT_NATN_NM", "PRDT_NM", "PRDLST_NM"],
+            MainResponseFields = ["IPRT_FOOD_MNG_NO", "PRDT_NM", "PRDLST_CD", "PRDLST_NM", "MNFT_NATN_CD", "MNFT_NATN_NM"],
+            UsageNotes =
+            [
+                "수입식품 관리번호를 공식 제품 후보의 기준 식별자로 보관합니다.",
+                "식약처 품목코드는 관세청 HSK 코드가 아니므로 자동 변환하거나 같은 코드로 취급하지 않습니다."
+            ]
+        },
+        new()
+        {
+            Key = "mfds-imported-food-overseas-manufacturer",
+            Provider = "식품의약품안전처",
+            DisplayName = "수입식품 해외제조업소 정보",
+            Purpose = "해외제조업소의 공식 코드, 소재 국가, 업종, 안전관리 인증과 취소·중단 상태를 확인합니다.",
+            Domain = "ImportedFood",
+            VersionScope = "2.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/1471000/IprtFoodOvseaMnftBsshInfoService02",
+            DocumentationUrl = "https://www.data.go.kr/data/15073967/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows", "type", "OCTR_MNFT_BSSH_NM", "FOOD_SE_NM", "NATN_NM"],
+            MainResponseFields = ["OCTR_MNFT_BSSH_CD", "OCTR_MNFT_BSSH_NM", "OCTR_MNFT_BSSH_ADDR", "NATN_NM", "FOOD_SAFE_MNG_SYS_CERT_YN", "RTRCN_SUSP_NM", "IPRT_SUSP_NO"],
+            UsageNotes =
+            [
+                "제조업소명보다 식약처 해외제조업소 코드를 우선 식별자로 사용합니다.",
+                "인증·취소·수입중단 상태는 바뀔 수 있으므로 조회시각을 기록하고 실제 수입 전에 다시 확인합니다."
+            ]
+        },
+        new()
+        {
+            Key = "mfds-imported-food-korean-label",
+            Provider = "식품의약품안전처",
+            DisplayName = "수입식품 제품별 한글표시사항",
+            Purpose = "수입제품의 한글·영문명, 수입업체, 해외제조업소, 원재료와 변환된 한글표시사항을 조회합니다.",
+            Domain = "ImportedFood",
+            VersionScope = "2.0",
+            ApiType = "REST",
+            DataFormat = "JSON/XML",
+            BaseUrl = "https://apis.data.go.kr/1471000/IprtFoodPrdtKoreanLabelingItem",
+            DocumentationUrl = "https://www.data.go.kr/data/15110214/openapi.do",
+            RequiresServiceKey = true,
+            ContainsResidentialData = false,
+            ContainsPersonalData = false,
+            MainParameters = ["serviceKey", "pageNo", "numOfRows", "type", "prductKoreanNm", "prductNm", "ovsmnfstNm", "itmNm", "mnfNtncdNm", "irdntNm", "procsDtmStart", "procsDtmEnd"],
+            MainResponseFields = ["PRDUCT_KOREAN_NM", "PRDUCT_NM", "BSN_OFC_NAME", "OVSMNFST_NM", "ITM_NM", "MNF_NTNCD_NM", "KORLABEL", "IRDNT_NM", "PROCS_DTM"],
+            UsageNotes =
+            [
+                "이 데이터에는 수입식품 관리번호와 해외제조업소 코드가 없으므로 이름·국가·품목 기반 연결은 확정값이 아니라 후보로 보관합니다.",
+                "원재료 텍스트는 제품 표시 정보이며 원료 사용 가능 여부 판정을 대신하지 않습니다. 별도 원료정보 API와 규격정보 확인이 필요합니다."
+            ]
+        },
+        new()
+        {
             Key = "customs-cargo-tracking",
             Provider = "관세청/공공데이터포털",
             DisplayName = "화물 통관 진행 정보 조회",

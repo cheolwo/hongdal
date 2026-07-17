@@ -23,4 +23,10 @@ public sealed class CommunityEditorialBatchOptions
     public bool ActivityDigestEnabled { get; set; } = true;
 
     public string ActivityDigestCronExpression { get; set; } = "0 30 8 * * ?";
+
+    public bool PrajnaPublicationEnabled { get; set; }
+
+    public string PrajnaPublicationCronExpression { get; set; } = "0 15 9 * * ?";
+
+    public string PrajnaYouTubeChannelId { get; set; } = "UCI8HW08rOSlvweOjJ9Gp2Ng";
 }

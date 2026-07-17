@@ -40,6 +40,18 @@ public static class YouTube채널수집국가코드
 
 public sealed record YouTube영상공개설정요청Dto(bool 공개여부);
 
+public sealed record YouTube반야게시채널설정요청Dto(bool 허용여부);
+
+public sealed record YouTube지식성찰채널프로필설정요청Dto(
+    bool 지식성찰채널여부,
+    string? Handle,
+    string 국가코드,
+    string 기본언어코드,
+    IReadOnlyList<string> 주제코드목록,
+    string 관점표시,
+    string? 공식출처Url,
+    DateTime? 자료확인일시Utc);
+
 public sealed record YouTube감시채널Dto(
     string ChannelId,
     string 채널명,
@@ -58,7 +70,13 @@ public sealed record YouTube감시채널Dto(
     int 수입발견점수,
     string? 조사근거Url,
     string? 조사메모,
-    DateTime? 조사확인일시Utc);
+    DateTime? 조사확인일시Utc,
+    bool 지식성찰채널여부,
+    IReadOnlyList<string> 지식성찰분류목록,
+    string 관점표시,
+    string? 공식출처Url,
+    DateTime? 자료확인일시Utc,
+    bool 반야게시허용여부);
 
 public sealed record YouTube채널영상Dto(
     string VideoId,

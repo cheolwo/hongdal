@@ -238,5 +238,19 @@ public static partial class ServiceCollectionExtensions
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionDoNothing()));
         }
+
+        if (options.PrajnaPublicationEnabled)
+        {
+            var jobKey = new JobKey("CommunityPrajnaPublication");
+            quartz.AddJob<CommunityPrajnaPublicationJob>(job => job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("CommunityPrajnaPublication-trigger")
+                .WithCronSchedule(
+                    options.PrajnaPublicationCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
     }
 }

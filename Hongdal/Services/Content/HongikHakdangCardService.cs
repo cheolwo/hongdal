@@ -24,6 +24,11 @@ public interface IHongikHakdangCardService
         bool enabled,
         CancellationToken cancellationToken);
 
+    Task<HongikHakdangCardCommunityPublicationUpdateResponse?> SetCardCommunityPublicationApprovedAsync(
+        long cardId,
+        bool approved,
+        CancellationToken cancellationToken);
+
     Task<HongikHakdangCardImageContentResult?> GetCardImageAsync(
         long cardId,
         CancellationToken cancellationToken);
@@ -269,6 +274,28 @@ public sealed class HongikHakdangCardService : IHongikHakdangCardService
             enabled ? "카드를 관리자 검토 대상으로 켰습니다." : "카드를 관리자 검토 대상에서 껐습니다.");
     }
 
+    public async Task<HongikHakdangCardCommunityPublicationUpdateResponse?> SetCardCommunityPublicationApprovedAsync(
+        long cardId,
+        bool approved,
+        CancellationToken cancellationToken)
+    {
+        var card = await _repository.FindCardTrackedAsync(cardId, cancellationToken);
+        if (card is null)
+        {
+            return null;
+        }
+
+        card.IsCommunityPublicationApproved = approved;
+        card.UpdatedAtUtc = DateTime.UtcNow;
+        await _repository.SaveAsync(cancellationToken);
+        return new HongikHakdangCardCommunityPublicationUpdateResponse(
+            card.Id,
+            approved,
+            approved
+                ? "카드를 반야 게시 후보로 승인했습니다. 배치가 활성화되면 순서대로 게시합니다."
+                : "카드의 반야 게시 승인을 해제했습니다.");
+    }
+
     public async Task<HongikHakdangCardImageContentResult?> GetCardImageAsync(
         long cardId,
         CancellationToken cancellationToken)
@@ -362,7 +389,8 @@ public sealed class HongikHakdangCardService : IHongikHakdangCardService
                     x.Card.IsActive,
                     x.Card.LastSeenAtUtc,
                     x.SortOrder,
-                    x.Card.IsAdminEnabled))
+                    x.Card.IsAdminEnabled,
+                    x.Card.IsCommunityPublicationApproved))
                 .ToArray(),
             collection.IsAdminEnabled);
 

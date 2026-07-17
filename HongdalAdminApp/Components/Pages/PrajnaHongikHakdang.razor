@@ -12,7 +12,7 @@
             <MudText Typo="Typo.overline" Color="Color.Primary">般若 · INTERNAL REVIEW</MudText>
             <MudText Typo="Typo.h4">홍익학당 자료 관리</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                공개 웹 자료의 수집 상태를 관리자가 검토합니다. 현재 공식 협력 자료로 표시하거나 일반 사용자에게 자동 배포하지 않습니다.
+                공개 웹 자료를 검토하고 반야 게시판에 순차 게시할 항목을 승인합니다. 홍익학당과의 공식 제휴를 의미하지 않습니다.
             </MudText>
         </MudStack>
         <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
@@ -37,7 +37,7 @@
     {
         <section id="policy">
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                카드 수집과 영상 승인 상태는 내부 검토용입니다. `공개` 상태도 일반 커뮤니티 게시 또는 모바일 배포를 의미하지 않습니다.
+                카드의 `반야 게시 승인`과 영상의 `공개` 상태가 게시 후보를 정합니다. 전체 반야 배치 설정이 켜진 경우에만 승인 항목을 한 번에 하나씩 게시하며, 모바일 카드 배포는 별도 기능입니다.
             </MudAlert>
         </section>
 
@@ -85,7 +85,7 @@
             <section id="cards">
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                 <MudStack Spacing="2">
-                    <MudText Typo="Typo.h6">수집 카드 · 관리자 ON/OFF</MudText>
+                    <MudText Typo="Typo.h6">수집 카드 · 검토 및 반야 게시 승인</MudText>
                     <MudText Typo="Typo.body2" Color="Color.Secondary">
                         원본 사이트에서 감지된 상태와 별개로, 관리자가 검토에 사용할 묶음과 카드를 켜거나 끌 수 있습니다. 설정은 다음 동기화 후에도 유지됩니다.
                     </MudText>
@@ -147,6 +147,9 @@
                                                                     <MudChip T="string" Size="Size.Small" Color="@(card.IsAdminEnabled ? Color.Success : Color.Warning)" Variant="Variant.Filled">
                                                                         관리자 @(card.IsAdminEnabled ? "ON" : "OFF")
                                                                     </MudChip>
+                                                                    <MudChip T="string" Size="Size.Small" Color="@(card.IsCommunityPublicationApproved ? Color.Primary : Color.Default)" Variant="Variant.Outlined">
+                                                                        반야 게시 @(card.IsCommunityPublicationApproved ? "승인" : "미승인")
+                                                                    </MudChip>
                                                                 </MudStack>
                                                                 <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
                                                                     <MudButton Size="Size.Small"
@@ -162,6 +165,13 @@
                                                                                Disabled="@isBusy"
                                                                                OnClick="@(() => ToggleCardAsync(card))">
                                                                         @(card.IsAdminEnabled ? "끄기" : "켜기")
+                                                                    </MudButton>
+                                                                    <MudButton Size="Size.Small"
+                                                                               Variant="Variant.Filled"
+                                                                               Color="@(card.IsCommunityPublicationApproved ? Color.Warning : Color.Primary)"
+                                                                               Disabled="@isBusy"
+                                                                               OnClick="@(() => ToggleCardCommunityPublicationAsync(card))">
+                                                                        @(card.IsCommunityPublicationApproved ? "게시 승인 해제" : "반야 게시 승인")
                                                                     </MudButton>
                                                                 </MudStack>
                                                             </MudStack>
@@ -205,7 +215,7 @@
             <section id="review">
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                 <MudStack Spacing="2">
-                    <MudText Typo="Typo.h6">영상 검토</MudText>
+                    <MudText Typo="Typo.h6">영상 검토 · 반야 게시 승인</MudText>
                     <MudTable Items="snapshot.Videos" Dense="true" Hover="true" Breakpoint="Breakpoint.Md">
                         <HeaderContent>
                             <MudTh>영상</MudTh>
@@ -226,7 +236,7 @@
                                            Color="@(IsApproved(video) ? Color.Secondary : Color.Primary)"
                                            Disabled="@isBusy"
                                            OnClick="@(() => TogglePublicationAsync(video))">
-                                    @(IsApproved(video) ? "승인 해제" : "내부 승인")
+                                    @(IsApproved(video) ? "게시 승인 해제" : "반야 게시 승인")
                                 </MudButton>
                             </MudTd>
                         </RowTemplate>
@@ -327,6 +337,15 @@
             return result.Message;
         });
 
+    private Task ToggleCardCommunityPublicationAsync(HongikHakdangCardDto card)
+        => RunActionAsync(async () =>
+        {
+            var result = await AdminService.SetCardCommunityPublicationAsync(
+                card.Id,
+                !card.IsCommunityPublicationApproved);
+            return result.Message;
+        });
+
     private async Task LoadCardPreviewAsync(HongikHakdangCardDto card)
     {
         if (isBusy)
@@ -375,7 +394,9 @@
         {
             var approve = !IsApproved(video);
             await AdminService.SetVideoPublicationAsync(video.VideoId, approve);
-            return approve ? "내부 검토 대상으로 승인했습니다." : "승인을 해제했습니다.";
+            return approve
+                ? "영상을 반야 게시 후보로 승인했습니다. 배치가 활성화되면 순서대로 게시합니다."
+                : "영상의 반야 게시 승인을 해제했습니다.";
         });
     }
 

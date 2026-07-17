@@ -23,7 +23,8 @@ namespace 홍달.Services.External.Mfds
 
             if (string.IsNullOrWhiteSpace(_옵션.ServiceKey))
             {
-                throw new InvalidOperationException("수입식품제품조회:ServiceKey 설정이 필요합니다.");
+                throw new InvalidOperationException(
+                    "수입식품제품조회:ServiceKey 또는 PublicData:DataGoKrServiceKey 설정이 필요합니다.");
             }
         }
 
@@ -44,12 +45,7 @@ namespace 홍달.Services.External.Mfds
                 ["DCLR_PRDT_DIVS_NM"] = 요청.신고제품구분명,
                 ["MNFT_NATN_NM"] = 요청.제조국가명,
                 ["PRDT_NM"] = 요청.제품명,
-                ["PRDLST_NM"] = 요청.품목명,
-                ["DCLR_PRDT_DIVS_CD"] = 요청.신고제품구분코드,
-                ["MNFT_NATN_CD"] = 요청.제조국가코드,
-                ["PRDLST_CD"] = 요청.품목코드,
-                ["MEAT_PRDLST_NM"] = 요청.육류품목명,
-                ["MEAT_PRDLST_CD"] = 요청.육류품목코드
+                ["PRDLST_NM"] = 요청.품목명
             });
 
             using var 응답 = await _httpClient.GetAsync(요청주소, 취소토큰);
@@ -231,9 +227,17 @@ namespace 홍달.Services.External.Mfds
                 }
 
                 var 내부항목 = 속성찾기(값, "item");
-                if (내부항목.HasValue && 내부항목.Value.ValueKind == JsonValueKind.Array)
+                if (내부항목.HasValue)
                 {
-                    목록.AddRange(내부항목.Value.EnumerateArray());
+                    if (내부항목.Value.ValueKind == JsonValueKind.Array)
+                    {
+                        목록.AddRange(내부항목.Value.EnumerateArray());
+                    }
+                    else if (내부항목.Value.ValueKind == JsonValueKind.Object)
+                    {
+                        목록.Add(내부항목.Value);
+                    }
+
                     return 목록;
                 }
             }
@@ -299,16 +303,10 @@ namespace 홍달.Services.External.Mfds
         public int 한페이지결과수 { get; set; } = 10;
         public string 데이터형식 { get; set; } = "xml";
 
-        public string? 신고제품구분코드 { get; set; }
         public string? 신고제품구분명 { get; set; }
-        public string? 제조국가코드 { get; set; }
         public string? 제조국가명 { get; set; }
         public string? 제품명 { get; set; }
-        public string? 육류품목코드 { get; set; }
-        public string? 육류품목명 { get; set; }
-        public string? 품목코드 { get; set; }
         public string? 품목명 { get; set; }
-        public string? 수입식품관리번호 { get; set; }
     }
 
     public sealed class 수입식품제품조회응답DTO

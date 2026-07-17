@@ -11,6 +11,8 @@ public sealed class CommunityPostOpportunityListResponse
     public CommunityPostParticipationEntryResponse Participation { get; set; } = new();
     public CommunityActionJourneyResponse Journey { get; set; } = new();
     public IReadOnlyList<CommunityPostOpportunityResponse> Items { get; set; } = [];
+    public IReadOnlyList<CommunityDynamicTopicResponse> DynamicTopics { get; set; } = [];
+    public CommunityPostContextDiscoveryResponse ContextDiscovery { get; set; } = new();
 }
 
 public sealed class CommunitySharedExperiencePolicyResponse

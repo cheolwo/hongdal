@@ -56,6 +56,19 @@ public sealed class HongikHakdangCardController : ControllerBase
         return result is null ? NotFound() : Ok(result);
     }
 
+    [HttpPut("{cardId:long}/community-publication")]
+    public async Task<IActionResult> SetCardCommunityPublication(
+        long cardId,
+        [FromBody] Hongdal.Contracts.Common.Content.HongikHakdangCardCommunityPublicationUpdateRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _service.SetCardCommunityPublicationApprovedAsync(
+            cardId,
+            request.Approved,
+            cancellationToken);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     [HttpGet("{cardId:long}/image")]
     public async Task<IActionResult> GetCardImage(long cardId, CancellationToken cancellationToken)
     {

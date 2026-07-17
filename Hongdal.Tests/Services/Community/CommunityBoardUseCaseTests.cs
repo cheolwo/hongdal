@@ -114,7 +114,7 @@ public sealed class CommunityBoardUseCaseTests
     }
 
     [Fact]
-    public async Task 게시글작성정책은_기본또는승인게시판만허용한다()
+    public async Task 게시글작성정책은_사용자작성가능기본게시판또는승인게시판만허용한다()
     {
         await using var context = CreateContext();
         context.PlatformCommunityBoardRequests.AddRange(
@@ -130,6 +130,18 @@ public sealed class CommunityBoardUseCaseTests
         Assert.True(await policy.CanWriteAsync(
             "platform",
             "승인 게시판",
+            CancellationToken.None));
+        Assert.False(await policy.CanWriteAsync(
+            "platform",
+            CommunityBoardCatalog.Prajna.DisplayName,
+            CancellationToken.None));
+        Assert.False(await policy.CanWriteAsync(
+            "platform",
+            CommunityBoardCatalog.NoticeGuide.DisplayName,
+            CancellationToken.None));
+        Assert.True(await policy.CanWriteAsync(
+            "platform",
+            CommunityBoardCatalog.SafetyReport.DisplayName,
             CancellationToken.None));
         Assert.False(await policy.CanWriteAsync(
             "platform",

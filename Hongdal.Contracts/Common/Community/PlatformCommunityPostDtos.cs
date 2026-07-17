@@ -101,6 +101,7 @@ public static class PlatformCommunitySystemPostKinds
     public const string KamisPriceBrief = "kamis-price-brief";
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
+    public const string PrajnaContent = "prajna-content";
     public const string AutomatedEditorial = "automated-editorial";
 }
 

@@ -34,6 +34,19 @@ public sealed class CommunityEditorialBatchRunnerTests
         Assert.Equal(0, publisher.CallCount);
     }
 
+    [Fact]
+    public async Task PrajnaRun_PublishesOnlyTheSingleDraftReturnedByTheSource()
+    {
+        var source = new RecordingSource(CommunityAutomatedPostSourceKeys.Prajna, hasDraft: true);
+        var publisher = new RecordingPublisher();
+        var runner = CreateRunner(source, publisher);
+
+        await runner.RunPrajnaPublicationAsync(CancellationToken.None);
+
+        Assert.Equal(1, publisher.CallCount);
+        Assert.Equal(CommunityAutomatedPostSourceKeys.Prajna, publisher.Draft?.SourceKey);
+    }
+
     private static CommunityEditorialBatchRunner CreateRunner(
         ICommunityAutomatedPostSource targetSource,
         RecordingPublisher publisher)

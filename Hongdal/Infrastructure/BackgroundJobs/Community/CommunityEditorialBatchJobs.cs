@@ -37,6 +37,9 @@ public sealed class CommunityEditorialBatchRunner
     public Task RunActivityDigestAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.ActivityDigest, cancellationToken);
 
+    public Task RunPrajnaPublicationAsync(CancellationToken cancellationToken)
+        => RunSourceAsync(CommunityAutomatedPostSourceKeys.Prajna, cancellationToken);
+
     private async Task RunSourceAsync(string sourceKey, CancellationToken cancellationToken)
     {
         if (!_sources.TryGetValue(sourceKey, out var source))
@@ -144,6 +147,32 @@ public sealed class CommunityActivityDigestJob : IJob
         => CommunityEditorialJobExecution.RunAsync(
             "CommunityActivityDigest",
             _runner.RunActivityDigestAsync,
+            context,
+            _options,
+            _logger);
+}
+
+[DisallowConcurrentExecution]
+public sealed class CommunityPrajnaPublicationJob : IJob
+{
+    private readonly CommunityEditorialBatchRunner _runner;
+    private readonly CommunityEditorialBatchOptions _options;
+    private readonly ILogger<CommunityPrajnaPublicationJob> _logger;
+
+    public CommunityPrajnaPublicationJob(
+        CommunityEditorialBatchRunner runner,
+        IOptions<CommunityEditorialBatchOptions> options,
+        ILogger<CommunityPrajnaPublicationJob> logger)
+    {
+        _runner = runner;
+        _options = options.Value;
+        _logger = logger;
+    }
+
+    public Task Execute(IJobExecutionContext context)
+        => CommunityEditorialJobExecution.RunAsync(
+            "CommunityPrajnaPublication",
+            _runner.RunPrajnaPublicationAsync,
             context,
             _options,
             _logger);

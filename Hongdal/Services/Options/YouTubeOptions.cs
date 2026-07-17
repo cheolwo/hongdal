@@ -23,6 +23,12 @@ public sealed class YouTubeOptions
     public bool SeedFoodResearchCatalog { get; set; }
 
     /// <summary>
+    /// 지식·성찰 대표 채널 카탈로그를 감시 채널 DB에 추가합니다.
+    /// 기본값은 false이며, 시드 여부와 반야 게시 승인은 서로 독립적입니다.
+    /// </summary>
+    public bool SeedKnowledgeReflectionCatalog { get; set; }
+
+    /// <summary>
     /// 백그라운드 동기화를 국가별 실행 단위로 나눕니다. 비어 있으면 전체 채널을 한 번에 처리합니다.
     /// </summary>
     public List<string> CountryCollectionCodes { get; set; } = [];

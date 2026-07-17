@@ -62,6 +62,8 @@ public sealed class HongikHakdangCard
 
     public bool IsAdminEnabled { get; set; } = true;
 
+    public bool IsCommunityPublicationApproved { get; set; }
+
     public DateTime LastSeenAtUtc { get; set; }
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

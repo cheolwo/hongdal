@@ -23,7 +23,8 @@ namespace 홍달.Services.External.Mfds
 
             if (string.IsNullOrWhiteSpace(_옵션.ServiceKey))
             {
-                throw new InvalidOperationException("해외제조업소조회:ServiceKey 설정이 필요합니다.");
+                throw new InvalidOperationException(
+                    "해외제조업소조회:ServiceKey 또는 PublicData:DataGoKrServiceKey 설정이 필요합니다.");
             }
         }
 
@@ -264,9 +265,17 @@ namespace 홍달.Services.External.Mfds
                 }
 
                 var 내부항목 = 속성찾기(값, "item");
-                if (내부항목.HasValue && 내부항목.Value.ValueKind == JsonValueKind.Array)
+                if (내부항목.HasValue)
                 {
-                    목록.AddRange(내부항목.Value.EnumerateArray());
+                    if (내부항목.Value.ValueKind == JsonValueKind.Array)
+                    {
+                        목록.AddRange(내부항목.Value.EnumerateArray());
+                    }
+                    else if (내부항목.Value.ValueKind == JsonValueKind.Object)
+                    {
+                        목록.Add(내부항목.Value);
+                    }
+
                     return 목록;
                 }
             }

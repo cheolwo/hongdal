@@ -29,6 +29,9 @@ public static class CommunityBoardKeys
     public const string FreeLife = "free-life";
     public const string QuestionHelp = "question-help";
     public const string InformationPrices = "information-prices";
+    public const string Food = "food";
+    public const string Cargo = "cargo";
+    public const string Prajna = "prajna";
     public const string Participation = "participation";
     public const string SalesSupply = "sales-supply";
     public const string LedgerProgress = "ledger-progress";
@@ -92,6 +95,37 @@ public static class CommunityBoardCatalog
         isUserCreatable: true,
         isPublic: true,
         "정보 협업");
+
+    public static CommunityBoardDefinition Food { get; } = Board(
+        CommunityBoardKeys.Food,
+        "음식",
+        "음식 이야기와 조리·식재료 정보, 위치 동의 시 반경 7km 음식점 후보를 함께 보는 공간",
+        CommunityBoardGroupCodes.PeopleAndInformation,
+        "사람과 정보",
+        isUserCreatable: true,
+        isPublic: true,
+        "맛집",
+        "음식 정보");
+
+    public static CommunityBoardDefinition Cargo { get; } = Board(
+        CommunityBoardKeys.Cargo,
+        "화물",
+        "화물 정보와 운송 조건을 나누고 자격 역할·공개 화물 후보를 비구속적으로 살펴보는 공간",
+        CommunityBoardGroupCodes.CollectiveWork,
+        "함께하는 일",
+        isUserCreatable: true,
+        isPublic: true,
+        "화물 운송",
+        "운송 정보");
+
+    public static CommunityBoardDefinition Prajna { get; } = Board(
+        CommunityBoardKeys.Prajna,
+        "반야",
+        "관리자가 선별한 배움·철학·홍익학당 카드와 영상",
+        CommunityBoardGroupCodes.PeopleAndInformation,
+        "사람과 정보",
+        isUserCreatable: false,
+        isPublic: true);
 
     public static CommunityBoardDefinition Participation { get; } = Board(
         CommunityBoardKeys.Participation,
@@ -164,6 +198,9 @@ public static class CommunityBoardCatalog
         FreeLife,
         QuestionHelp,
         InformationPrices,
+        Food,
+        Cargo,
+        Prajna,
         Participation,
         SalesSupply,
         LedgerProgress,

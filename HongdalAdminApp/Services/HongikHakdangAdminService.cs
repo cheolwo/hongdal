@@ -64,6 +64,15 @@ public sealed class HongikHakdangAdminService
             new HongikHakdangCardActivationUpdateRequest(enabled),
             cancellationToken);
 
+    public Task<HongikHakdangCardCommunityPublicationUpdateResponse> SetCardCommunityPublicationAsync(
+        long cardId,
+        bool approved,
+        CancellationToken cancellationToken = default)
+        => PutAsync<HongikHakdangCardCommunityPublicationUpdateRequest, HongikHakdangCardCommunityPublicationUpdateResponse>(
+            $"{CardBasePath}/{cardId}/community-publication",
+            new HongikHakdangCardCommunityPublicationUpdateRequest(approved),
+            cancellationToken);
+
     public async Task<string?> GetCardImageDataUrlAsync(
         long cardId,
         CancellationToken cancellationToken = default)

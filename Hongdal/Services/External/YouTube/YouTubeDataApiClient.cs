@@ -16,6 +16,8 @@ public interface IYouTubeDataApiClient
 
     Task<YouTube채널응답?> 채널조회Async(string channelId, CancellationToken cancellationToken);
 
+    Task<YouTube채널응답?> 채널Handle조회Async(string handle, CancellationToken cancellationToken);
+
     Task<IReadOnlyList<YouTube재생목록응답>> 재생목록목록조회Async(
         string channelId,
         CancellationToken cancellationToken);
@@ -135,20 +137,25 @@ public sealed class YouTubeDataApiClient : IYouTubeDataApiClient
         using var response = await _httpClient.GetAsync(path, cancellationToken);
         await EnsureSuccessAsync(response, cancellationToken);
 
-        var body = await response.Content.ReadFromJsonAsync<YouTube목록응답<YouTube채널항목>>(
-            cancellationToken);
-        var item = body?.Items?.FirstOrDefault();
-        var uploadsPlaylistId = item?.ContentDetails?.RelatedPlaylists?.Uploads;
-        if (item is null || string.IsNullOrWhiteSpace(item.Id) || string.IsNullOrWhiteSpace(uploadsPlaylistId))
+        return await ReadChannelAsync(response, cancellationToken);
+    }
+
+    public async Task<YouTube채널응답?> 채널Handle조회Async(
+        string handle,
+        CancellationToken cancellationToken)
+    {
+        EnsureConfigured();
+        ArgumentException.ThrowIfNullOrWhiteSpace(handle);
+        var normalizedHandle = handle.Trim().TrimStart('@');
+        if (normalizedHandle.Length is 0 or > 100)
         {
-            return null;
+            throw new ArgumentOutOfRangeException(nameof(handle), "YouTube handle은 100자 이하여야 합니다.");
         }
 
-        return new YouTube채널응답(
-            item.Id,
-            item.Snippet?.Title?.Trim() ?? item.Id,
-            uploadsPlaylistId,
-            SelectThumbnail(item.Snippet?.Thumbnails));
+        var path = $"channels?part=snippet,contentDetails&forHandle={Encode(normalizedHandle)}&key={Encode(_options.ApiKey)}";
+        using var response = await _httpClient.GetAsync(path, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+        return await ReadChannelAsync(response, cancellationToken);
     }
 
     public async Task<IReadOnlyList<YouTube영상응답>> 업로드목록조회Async(
@@ -321,6 +328,26 @@ public sealed class YouTubeDataApiClient : IYouTubeDataApiClient
            ?? thumbnails?.High?.Url
            ?? thumbnails?.Medium?.Url
            ?? thumbnails?.Default?.Url;
+
+    private static async Task<YouTube채널응답?> ReadChannelAsync(
+        HttpResponseMessage response,
+        CancellationToken cancellationToken)
+    {
+        var body = await response.Content.ReadFromJsonAsync<YouTube목록응답<YouTube채널항목>>(
+            cancellationToken);
+        var item = body?.Items?.FirstOrDefault();
+        var uploadsPlaylistId = item?.ContentDetails?.RelatedPlaylists?.Uploads;
+        if (item is null || string.IsNullOrWhiteSpace(item.Id) || string.IsNullOrWhiteSpace(uploadsPlaylistId))
+        {
+            return null;
+        }
+
+        return new YouTube채널응답(
+            item.Id,
+            item.Snippet?.Title?.Trim() ?? item.Id,
+            uploadsPlaylistId,
+            SelectThumbnail(item.Snippet?.Thumbnails));
+    }
 
     private static string Encode(string value) => Uri.EscapeDataString(value);
 

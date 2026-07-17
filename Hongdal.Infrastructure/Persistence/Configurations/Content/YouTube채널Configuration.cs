@@ -25,6 +25,12 @@ public sealed class YouTube감시채널Configuration : IEntityTypeConfiguration<
         builder.Property(x => x.조사근거Url).HasColumnName("research_source_url").HasMaxLength(1000);
         builder.Property(x => x.조사메모).HasColumnName("research_note").HasMaxLength(1000);
         builder.Property(x => x.조사확인일시Utc).HasColumnName("research_verified_at_utc");
+        builder.Property(x => x.지식성찰채널여부).HasColumnName("is_knowledge_reflection_channel");
+        builder.Property(x => x.지식성찰분류).HasColumnName("knowledge_reflection_category_codes").HasMaxLength(300).IsRequired();
+        builder.Property(x => x.관점표시).HasColumnName("perspective_label").HasMaxLength(200).IsRequired();
+        builder.Property(x => x.공식출처Url).HasColumnName("official_source_url").HasMaxLength(1000);
+        builder.Property(x => x.자료확인일시Utc).HasColumnName("source_verified_at_utc");
+        builder.Property(x => x.반야게시허용여부).HasColumnName("is_prajna_publication_allowed");
         builder.Property(x => x.활성화여부).HasColumnName("is_active");
         builder.Property(x => x.초기동기화완료여부).HasColumnName("initial_sync_completed");
         builder.Property(x => x.마지막동기화일시Utc).HasColumnName("last_synced_at_utc");
@@ -37,6 +43,8 @@ public sealed class YouTube감시채널Configuration : IEntityTypeConfiguration<
         builder.HasIndex(x => new { x.국가코드, x.활성화여부, x.마지막동기화일시Utc })
             .HasDatabaseName("IX_youtube_watched_channels_country_active_sync");
         builder.HasIndex(x => new { x.음식채널여부, x.구매발견점수, x.수입발견점수 });
+        builder.HasIndex(x => new { x.지식성찰채널여부, x.반야게시허용여부, x.활성화여부 })
+            .HasDatabaseName("IX_youtube_watched_channels_knowledge_prajna_active");
         builder.HasIndex(x => new { x.활성화여부, x.마지막동기화일시Utc });
     }
 }

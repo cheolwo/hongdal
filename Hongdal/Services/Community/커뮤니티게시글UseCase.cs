@@ -374,7 +374,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
                 cancellationToken))
         {
             return BadRequest<PlatformCommunityPostResponse>(
-                "기본 게시판 또는 운영자가 승인한 사용자 게시판에만 글을 작성할 수 있습니다.");
+                "사용자 작성이 허용된 기본 게시판 또는 운영자가 승인한 사용자 게시판에만 글을 작성할 수 있습니다.");
         }
 
         var isReportBoardPost = request.SalesOffer is null
@@ -608,7 +608,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
                 cancellationToken))
         {
             return BadRequest<PlatformCommunityPostResponse>(
-                "기본 게시판 또는 운영자가 승인한 사용자 게시판으로만 글을 이동할 수 있습니다.");
+                "사용자 작성이 허용된 기본 게시판 또는 운영자가 승인한 사용자 게시판으로만 글을 이동할 수 있습니다.");
         }
 
         entity.Category = normalizedCategory;

@@ -18,6 +18,9 @@ public static class CommunityAutomatedPostSourceKeys
     public const string KamisPriceBrief = "kamis-price-brief";
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
+    public const string Prajna = "prajna";
+    public const string PrajnaCard = "prajna-card";
+    public const string PrajnaVideo = "prajna-video";
 }
 
 public sealed record CommunityAutomatedPostDraft(
@@ -85,6 +88,8 @@ public static class CommunityAutomatedPostPublication
             CommunityAutomatedPostSourceKeys.KamisPriceBrief => PlatformCommunitySystemPostKinds.KamisPriceBrief,
             CommunityAutomatedPostSourceKeys.Reflection => PlatformCommunitySystemPostKinds.Reflection,
             CommunityAutomatedPostSourceKeys.ActivityDigest => PlatformCommunitySystemPostKinds.ActivityDigest,
+            CommunityAutomatedPostSourceKeys.PrajnaCard or CommunityAutomatedPostSourceKeys.PrajnaVideo =>
+                PlatformCommunitySystemPostKinds.PrajnaContent,
             _ => PlatformCommunitySystemPostKinds.AutomatedEditorial
         };
     }
@@ -100,6 +105,8 @@ public static class CommunityAutomatedPostPublication
                 "홍달 운영 원칙을 바탕으로 자동 편집한 성찰문이며 특정 사상가의 실제 인용문이 아닙니다.",
             PlatformCommunitySystemPostKinds.ActivityDigest =>
                 "완료 상태로 기록된 비식별 원장의 건수만 자동 집계했으며 참여자, 금액, 주소와 거래 세부정보를 포함하지 않습니다.",
+            PlatformCommunitySystemPostKinds.PrajnaContent =>
+                "관리자가 선별한 외부 공개 자료의 제목과 짧은 소개만 게시합니다. 원 출처를 확인해야 하며 홍달과 해당 기관의 제휴를 뜻하지 않습니다.",
             PlatformCommunitySystemPostKinds.AutomatedEditorial =>
                 "출처와 기준 시각을 표시해 자동 작성한 홍달 시스템 정보 글입니다.",
             _ => null

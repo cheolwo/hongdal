@@ -25,9 +25,11 @@ public sealed class CommunityBoardWritePolicy(HongdalContext db) : ICommunityBoa
             return false;
         }
 
-        if (CommunityBoardCatalog.Find(normalizedCategory) is not null)
+        var catalogBoard = CommunityBoardCatalog.Find(normalizedCategory);
+        if (catalogBoard is not null)
         {
-            return true;
+            return (catalogBoard.IsPublic && catalogBoard.IsUserCreatable)
+                   || catalogBoard.Key == CommunityBoardKeys.SafetyReport;
         }
 
         var normalizedAppKey = string.IsNullOrWhiteSpace(appKey)

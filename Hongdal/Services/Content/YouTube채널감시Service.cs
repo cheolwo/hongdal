@@ -24,6 +24,16 @@ public interface IYouTube채널감시Service
         YouTube음식채널프로필설정요청Dto 요청,
         CancellationToken cancellationToken);
 
+    Task<YouTube감시채널Dto> 지식성찰채널프로필설정Async(
+        string channelId,
+        YouTube지식성찰채널프로필설정요청Dto 요청,
+        CancellationToken cancellationToken);
+
+    Task<YouTube감시채널Dto> 반야게시채널설정Async(
+        string channelId,
+        bool 허용여부,
+        CancellationToken cancellationToken);
+
     Task<IReadOnlyList<YouTube감시채널Dto>> 채널목록조회Async(CancellationToken cancellationToken);
 
     Task<IReadOnlyList<YouTube감시채널Dto>> 채널목록조회Async(
@@ -153,6 +163,52 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         채널.조사확인일시Utc = 요청.조사확인일시Utc?.ToUniversalTime() ?? DateTime.UtcNow;
         채널.수정일시Utc = DateTime.UtcNow;
 
+        await _저장소.저장Async(cancellationToken);
+        return ToChannelDto(채널);
+    }
+
+    public async Task<YouTube감시채널Dto> 지식성찰채널프로필설정Async(
+        string channelId,
+        YouTube지식성찰채널프로필설정요청Dto 요청,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(요청);
+        var 채널 = await _저장소.추적조회Async(NormalizeId(channelId), cancellationToken)
+            ?? throw new InvalidOperationException("지식·성찰 프로필을 설정할 YouTube 채널을 찾지 못했습니다.");
+        var topics = 지식성찰분류정규화(요청.주제코드목록);
+
+        채널.지식성찰채널여부 = 요청.지식성찰채널여부;
+        채널.Handle = NormalizeOptional(요청.Handle, 100);
+        채널.국가코드 = NormalizeCountryCode(요청.국가코드);
+        채널.기본언어코드 = NormalizeRequired(요청.기본언어코드, "ko", 10);
+        채널.지식성찰분류 = string.Join(',', topics);
+        채널.관점표시 = NormalizeRequired(요청.관점표시, "지식·성찰", 200);
+        채널.공식출처Url = NormalizeHttpsUrl(요청.공식출처Url, nameof(요청.공식출처Url));
+        채널.자료확인일시Utc = 요청.자료확인일시Utc?.ToUniversalTime() ?? DateTime.UtcNow;
+        if (!채널.지식성찰채널여부)
+        {
+            채널.반야게시허용여부 = false;
+        }
+
+        채널.수정일시Utc = DateTime.UtcNow;
+        await _저장소.저장Async(cancellationToken);
+        return ToChannelDto(채널);
+    }
+
+    public async Task<YouTube감시채널Dto> 반야게시채널설정Async(
+        string channelId,
+        bool 허용여부,
+        CancellationToken cancellationToken)
+    {
+        var 채널 = await _저장소.추적조회Async(NormalizeId(channelId), cancellationToken)
+            ?? throw new InvalidOperationException("반야 게시 여부를 설정할 YouTube 채널을 찾지 못했습니다.");
+        if (허용여부 && !채널.지식성찰채널여부)
+        {
+            throw new InvalidOperationException("지식·성찰 채널 프로필을 먼저 확인한 뒤 반야 게시를 허용할 수 있습니다.");
+        }
+
+        채널.반야게시허용여부 = 허용여부;
+        채널.수정일시Utc = DateTime.UtcNow;
         await _저장소.저장Async(cancellationToken);
         return ToChannelDto(채널);
     }
@@ -357,6 +413,11 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         string? 국가코드,
         CancellationToken cancellationToken)
     {
+        if (_options.SeedKnowledgeReflectionCatalog)
+        {
+            await 지식성찰Catalog확보Async(국가코드, cancellationToken);
+        }
+
         var 설정목록 = new List<(string ChannelId, string? DisplayName, string CountryCode)>();
         설정목록.AddRange((_options.DefaultChannels ?? [])
             .Where(item => !string.IsNullOrWhiteSpace(item.ChannelId))
@@ -430,6 +491,52 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         }
     }
 
+    private async Task 지식성찰Catalog확보Async(
+        string? 국가코드,
+        CancellationToken cancellationToken)
+    {
+        var items = YouTube지식성찰채널Catalog.항목
+            .Where(item => 국가코드 is null || item.국가코드 == 국가코드)
+            .ToArray();
+        var changed = false;
+        foreach (var item in items)
+        {
+            YouTube채널응답? remote = null;
+            var channelId = item.ChannelId;
+            if (string.IsNullOrWhiteSpace(channelId))
+            {
+                if (string.IsNullOrWhiteSpace(item.Handle))
+                {
+                    continue;
+                }
+
+                remote = await _client.채널Handle조회Async(item.Handle, cancellationToken)
+                    ?? throw new InvalidOperationException($"YouTube handle을 채널로 해석하지 못했습니다: {item.Handle}");
+                channelId = remote.ChannelId;
+            }
+
+            var 채널 = await _저장소.추적조회Async(NormalizeId(channelId), cancellationToken);
+            if (채널 is null)
+            {
+                remote ??= await _client.채널조회Async(channelId, cancellationToken)
+                    ?? throw new InvalidOperationException($"YouTube 채널을 찾지 못했습니다: {channelId}");
+                채널 = 원격채널생성(remote, item.표시이름);
+                _저장소.채널추가(채널);
+                changed = true;
+            }
+
+            if (지식성찰Catalog프로필적용(채널, item))
+            {
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            await _저장소.저장Async(cancellationToken);
+        }
+    }
+
     private async Task<YouTube감시채널> 원격채널생성Async(
         string channelId,
         string? 표시이름,
@@ -438,6 +545,13 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         var remote = await _client.채널조회Async(channelId, cancellationToken)
             ?? throw new InvalidOperationException("YouTube 채널을 찾지 못했거나 업로드 목록을 확인할 수 없습니다.");
 
+        return 원격채널생성(remote, 표시이름);
+    }
+
+    private static YouTube감시채널 원격채널생성(
+        YouTube채널응답 remote,
+        string? 표시이름)
+    {
         var now = DateTime.UtcNow;
         return new YouTube감시채널
         {
@@ -505,7 +619,13 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
             channel.수입발견점수,
             channel.조사근거Url,
             channel.조사메모,
-            channel.조사확인일시Utc);
+            channel.조사확인일시Utc,
+            channel.지식성찰채널여부,
+            분류목록(channel.지식성찰분류),
+            channel.관점표시,
+            channel.공식출처Url,
+            channel.자료확인일시Utc,
+            channel.반야게시허용여부);
 
     private static YouTube채널영상Dto ToVideoDto(YouTube채널영상 video)
         => new(
@@ -577,6 +697,36 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         return true;
     }
 
+    private static bool 지식성찰Catalog프로필적용(
+        YouTube감시채널 채널,
+        YouTube지식성찰채널Catalog항목 item)
+    {
+        var categories = string.Join(',', 지식성찰분류정규화(item.주제코드목록));
+        var changed = !채널.지식성찰채널여부
+                      || !string.Equals(채널.Handle, item.Handle, StringComparison.OrdinalIgnoreCase)
+                      || !string.Equals(채널.국가코드, item.국가코드, StringComparison.Ordinal)
+                      || !string.Equals(채널.기본언어코드, item.기본언어코드, StringComparison.Ordinal)
+                      || !string.Equals(채널.지식성찰분류, categories, StringComparison.Ordinal)
+                      || !string.Equals(채널.관점표시, item.관점표시, StringComparison.Ordinal)
+                      || !string.Equals(채널.공식출처Url, item.공식출처Url, StringComparison.Ordinal)
+                      || 채널.자료확인일시Utc != item.자료확인일시Utc;
+        if (!changed)
+        {
+            return false;
+        }
+
+        채널.지식성찰채널여부 = true;
+        채널.Handle = item.Handle;
+        채널.국가코드 = YouTube채널수집국가코드.정규화(item.국가코드);
+        채널.기본언어코드 = item.기본언어코드;
+        채널.지식성찰분류 = categories;
+        채널.관점표시 = item.관점표시;
+        채널.공식출처Url = item.공식출처Url;
+        채널.자료확인일시Utc = item.자료확인일시Utc;
+        채널.수정일시Utc = DateTime.UtcNow;
+        return true;
+    }
+
     private static IReadOnlyList<string> 음식분류정규화(IEnumerable<string>? categories)
     {
         var normalized = (categories ?? [])
@@ -588,6 +738,22 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         if (unknown is not null)
         {
             throw new ArgumentException($"지원하지 않는 YouTube 음식 채널 분류입니다: {unknown}");
+        }
+
+        return normalized;
+    }
+
+    private static IReadOnlyList<string> 지식성찰분류정규화(IEnumerable<string>? categories)
+    {
+        var normalized = (categories ?? [])
+            .Where(item => !string.IsNullOrWhiteSpace(item))
+            .Select(item => item.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var unknown = normalized.FirstOrDefault(item => !YouTube지식성찰주제코드.전체.Contains(item));
+        if (unknown is not null)
+        {
+            throw new ArgumentException($"지원하지 않는 YouTube 지식·성찰 채널 분류입니다: {unknown}");
         }
 
         return normalized;

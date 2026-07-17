@@ -45,4 +45,20 @@ public sealed class YouTube관리ControllerTests
             "videos/{videoId}/publication",
             action.GetCustomAttribute<HttpPutAttribute>()?.Template);
     }
+
+    [Fact]
+    public void 카드반야게시승인은_별도관리자쓰기API다()
+    {
+        var authorize = typeof(HongikHakdangCardController).GetCustomAttribute<AuthorizeAttribute>();
+        var action = typeof(HongikHakdangCardController)
+            .GetMethod(
+                nameof(HongikHakdangCardController.SetCardCommunityPublication),
+                BindingFlags.Instance | BindingFlags.Public);
+
+        Assert.Equal("서버관리자전용", authorize?.Policy);
+        Assert.NotNull(action);
+        Assert.Equal(
+            "{cardId:long}/community-publication",
+            action.GetCustomAttribute<HttpPutAttribute>()?.Template);
+    }
 }

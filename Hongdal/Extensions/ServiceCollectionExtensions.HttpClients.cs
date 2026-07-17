@@ -21,6 +21,11 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHongdalHttpClients(this IServiceCollection services)
     {
+        services.AddHttpClient<ICommunityNearbyRestaurantDirectory, HttpCommunityNearbyRestaurantDirectory>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CommunityContextDiscoveryOptions>>().Value;
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(3, options.TimeoutSeconds));
+        });
         services.AddHttpClient<I교육기관제출전송Service, 교육기관제출전송Service>();
         services.AddHttpClient<ICommunityTextTranslationProvider, AzureCommunityTextTranslationProvider>((sp, client) =>
         {
@@ -66,11 +71,19 @@ public static partial class ServiceCollectionExtensions
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<해외제조업소조회Options>>().Value;
             client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddHttpClient<I수입식품제품조회Service, 수입식품제품조회Service>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<수입식품제품조회Options>>().Value;
             client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
+        services.AddHttpClient<I수입식품한글표시사항조회Service, 수입식품한글표시사항조회Service>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<수입식품한글표시사항조회Options>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
         services.AddHttpClient<ITossPaymentsService, TossPaymentsService>((sp, client) =>
         {

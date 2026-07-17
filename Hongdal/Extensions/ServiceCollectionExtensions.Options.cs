@@ -31,6 +31,30 @@ public static partial class ServiceCollectionExtensions
         services.Configure<NtsBusinessRegistrationOptions>(configuration.GetSection(NtsBusinessRegistrationOptions.SectionName));
         services.Configure<해외제조업소조회Options>(configuration.GetSection(해외제조업소조회Options.SectionName));
         services.Configure<수입식품제품조회Options>(configuration.GetSection(수입식품제품조회Options.SectionName));
+        services.Configure<수입식품한글표시사항조회Options>(configuration.GetSection(수입식품한글표시사항조회Options.SectionName));
+        var 공공데이터기본서비스키 = configuration[$"{PublicDataOptions.SectionName}:DataGoKrServiceKey"]
+            ?? configuration[$"{PublicDataOptions.SectionName}:ServiceKey"];
+        services.PostConfigure<해외제조업소조회Options>(options =>
+        {
+            if (string.IsNullOrWhiteSpace(options.ServiceKey))
+            {
+                options.ServiceKey = 공공데이터기본서비스키 ?? string.Empty;
+            }
+        });
+        services.PostConfigure<수입식품제품조회Options>(options =>
+        {
+            if (string.IsNullOrWhiteSpace(options.ServiceKey))
+            {
+                options.ServiceKey = 공공데이터기본서비스키 ?? string.Empty;
+            }
+        });
+        services.PostConfigure<수입식품한글표시사항조회Options>(options =>
+        {
+            if (string.IsNullOrWhiteSpace(options.ServiceKey))
+            {
+                options.ServiceKey = 공공데이터기본서비스키 ?? string.Empty;
+            }
+        });
         services.Configure<기사이용료정책Options>(configuration.GetSection(기사이용료정책Options.SectionName));
         services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
         services.Configure<TransientStateOptions>(configuration.GetSection(TransientStateOptions.SectionName));
@@ -46,6 +70,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<PublicDataOptions>(configuration.GetSection(PublicDataOptions.SectionName));
         services.Configure<AgriculturalFisheriesBatchOptions>(configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName));
         services.Configure<CommunityEditorialBatchOptions>(configuration.GetSection(CommunityEditorialBatchOptions.SectionName));
+        services.Configure<CommunityContextDiscoveryOptions>(configuration.GetSection(CommunityContextDiscoveryOptions.SectionName));
         services.Configure<VersionFeatureFlagsOptions>(configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
         services.Configure<HongdalExecutionOptions>(configuration.GetSection(HongdalExecutionOptions.SectionName));
         services.Configure<RoleAdvertisingOptions>(configuration.GetSection(RoleAdvertisingOptions.SectionName));

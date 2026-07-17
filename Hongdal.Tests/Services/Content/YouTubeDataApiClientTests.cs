@@ -91,6 +91,39 @@ public sealed class YouTubeDataApiClientTests
     }
 
     [Fact]
+    public async Task 채널Handle조회Async_공식Handle을채널ID와업로드목록으로해석한다()
+    {
+        Uri? requestUri = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestUri = request.RequestUri;
+            return JsonResponse(
+                """
+                {
+                  "items": [
+                    {
+                      "id": "UC_TED",
+                      "snippet": { "title": "TED" },
+                      "contentDetails": {
+                        "relatedPlaylists": { "uploads": "UU_TED" }
+                      }
+                    }
+                  ]
+                }
+                """);
+        });
+        var sut = CreateClient(handler);
+
+        var result = await sut.채널Handle조회Async("@TED", CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.Equal("UC_TED", result.ChannelId);
+        Assert.Equal("UU_TED", result.UploadsPlaylistId);
+        Assert.Contains("forHandle=TED", requestUri!.Query);
+        Assert.DoesNotContain("%40", requestUri.Query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task 업로드목록조회Async_영상정보를_게시일역순으로반환한다()
     {
         var handler = new StubHttpMessageHandler(_ => JsonResponse(

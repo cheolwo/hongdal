@@ -14,6 +14,11 @@ public interface ICommunityPostOpportunityService
         string? displayLanguageCode,
         CancellationToken cancellationToken = default);
 
+    Task<CommunityPostContextDiscoveryResponse?> GetContextDiscoveryAsync(
+        long postId,
+        CommunityPostContextDiscoveryRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<StartCommunityPostParticipationResponse> StartParticipationAsync(
         long postId,
         StartCommunityPostParticipationRequest request,
@@ -97,7 +102,9 @@ public sealed record CommunityPostOpportunitySource(
     string? LinkedLedgerId,
     bool IsReportBoardPost = false,
     string? SalesOfferJson = null,
-    DateTime CreatedAtUtc = default);
+    DateTime CreatedAtUtc = default,
+    string? Category = null,
+    string? WorkflowTag = null);
 
 public enum CommunityPostLedgerLinkResult
 {
@@ -158,7 +165,9 @@ public sealed class EfCommunityPostOpportunityStore : ICommunityPostOpportunityS
                 post.커뮤니티원장Id,
                 post.IsReportBoardPost,
                 post.SalesOfferJson,
-                post.CreatedAtUtc))
+                post.CreatedAtUtc,
+                post.Category,
+                post.WorkflowTag))
             .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<CommunityPostLedgerLinkResult> LinkLedgerAsync(
@@ -249,6 +258,7 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
     private readonly ICommunityProfessionalEligibilityService? _professionalEligibilityService;
     private readonly ICommunityPostProfessionalParticipationService? _professionalParticipationService;
     private readonly ICommunityActionJourneyService? _journeyService;
+    private readonly ICommunityDynamicDiscoveryService? _dynamicDiscoveryService;
 
     public CommunityPostOpportunityService(
         ICommunityPostOpportunityStore postStore,
@@ -258,7 +268,8 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
         I커뮤니티원장저장소? ledgerStore = null,
         ICommunityProfessionalEligibilityService? professionalEligibilityService = null,
         ICommunityPostProfessionalParticipationService? professionalParticipationService = null,
-        ICommunityActionJourneyService? journeyService = null)
+        ICommunityActionJourneyService? journeyService = null,
+        ICommunityDynamicDiscoveryService? dynamicDiscoveryService = null)
     {
         _postStore = postStore;
         _analyzer = analyzer;
@@ -268,6 +279,7 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
         _professionalEligibilityService = professionalEligibilityService;
         _professionalParticipationService = professionalParticipationService;
         _journeyService = journeyService;
+        _dynamicDiscoveryService = dynamicDiscoveryService;
     }
 
     public async Task<CommunityPostOpportunityListResponse?> GetAsync(
@@ -312,6 +324,9 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
                 provisionalLedger,
                 language,
                 cancellationToken);
+        var contextDiscovery = _dynamicDiscoveryService is null
+            ? new CommunityPostContextDiscoveryResponse { PostId = postId }
+            : await _dynamicDiscoveryService.DiscoverAsync(source, null, cancellationToken);
 
         return new CommunityPostOpportunityListResponse
         {
@@ -320,8 +335,27 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
             ExperiencePolicy = new CommunitySharedExperiencePolicyResponse(),
             Participation = participation,
             Journey = journey,
-            Items = items
+            Items = items,
+            DynamicTopics = contextDiscovery.DynamicTopics,
+            ContextDiscovery = contextDiscovery
         };
+    }
+
+    public async Task<CommunityPostContextDiscoveryResponse?> GetContextDiscoveryAsync(
+        long postId,
+        CommunityPostContextDiscoveryRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var source = await _postStore.GetAsync(postId, cancellationToken);
+        if (source is null)
+        {
+            return null;
+        }
+
+        return _dynamicDiscoveryService is null
+            ? new CommunityPostContextDiscoveryResponse { PostId = postId }
+            : await _dynamicDiscoveryService.DiscoverAsync(source, request, cancellationToken);
     }
 
     public async Task<StartCommunityPostParticipationResponse> StartParticipationAsync(

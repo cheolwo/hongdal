@@ -35,6 +35,29 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
             : Ok(result);
     }
 
+    [HttpPost("context-discovery")]
+    [AllowAnonymous]
+    public async Task<ActionResult<CommunityPostContextDiscoveryResponse>> GetContextDiscovery(
+        long postId,
+        [FromBody] CommunityPostContextDiscoveryRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _service.GetContextDiscoveryAsync(postId, request, cancellationToken);
+            return result is null
+                ? NotFoundProblem("커뮤니티 게시글을 찾을 수 없습니다.")
+                : Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "주변 정보 조회 요청이 올바르지 않습니다.",
+                detail: ex.Message);
+        }
+    }
+
     [HttpPost("meat-import-readiness/start")]
     [Authorize]
     public async Task<ActionResult<StartCommunityMeatImportReadinessResponse>> StartMeatImportReadiness(
