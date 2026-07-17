@@ -39,6 +39,7 @@ public sealed class CommunityLedgerCompletionPostServiceTests
         Assert.DoesNotContain("상세 증빙 메모", publicPayload, StringComparison.Ordinal);
         Assert.Contains("화물 운송 원장", draft.Title, StringComparison.Ordinal);
         Assert.Contains("비식별", draft.Body, StringComparison.Ordinal);
+        Assert.Equal(CommunityBoardCatalog.CompletionReview.DisplayName, draft.Category);
     }
 
     [Fact]

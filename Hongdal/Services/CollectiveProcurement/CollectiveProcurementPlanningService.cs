@@ -56,6 +56,11 @@ public interface ICollectiveProcurementPlanningStore
         Guid planId,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<CollectiveProcurementPlanState>> ListBySourceAsync(
+        string sourceTypeCode,
+        string sourceReferenceId,
+        CancellationToken cancellationToken = default);
+
     Task CreateAsync(
         CollectiveProcurementPlanState state,
         CancellationToken cancellationToken = default);
@@ -85,6 +90,34 @@ public sealed class InMemoryCollectiveProcurementPlanningStore : ICollectiveProc
         {
             return Task.FromResult<CollectiveProcurementPlanState?>(Clone(entry.State));
         }
+    }
+
+    public Task<IReadOnlyList<CollectiveProcurementPlanState>> ListBySourceAsync(
+        string sourceTypeCode,
+        string sourceReferenceId,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var sourceType = sourceTypeCode?.Trim() ?? string.Empty;
+        var sourceReference = sourceReferenceId?.Trim() ?? string.Empty;
+        if (sourceType.Length == 0 || sourceReference.Length == 0)
+        {
+            return Task.FromResult<IReadOnlyList<CollectiveProcurementPlanState>>([]);
+        }
+
+        var matches = plans.Values
+            .Select(entry =>
+            {
+                lock (entry.SyncRoot)
+                {
+                    return Clone(entry.State);
+                }
+            })
+            .Where(state => string.Equals(state.SourceTypeCode, sourceType, StringComparison.OrdinalIgnoreCase)
+                            && string.Equals(state.SourceReferenceId, sourceReference, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(state => state.UpdatedAtUtc)
+            .ToArray();
+        return Task.FromResult<IReadOnlyList<CollectiveProcurementPlanState>>(matches);
     }
 
     public Task CreateAsync(

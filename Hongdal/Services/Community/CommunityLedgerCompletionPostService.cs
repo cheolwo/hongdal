@@ -40,7 +40,7 @@ public sealed record CommunityLedgerCompletionPostDraft(
 public static class CommunityLedgerCompletionPublication
 {
     public const string SystemAuthorKey = "system:ledger-completion";
-    public const string Category = "성립 사례";
+    public static string Category => CommunityBoardCatalog.CompletionReview.DisplayName;
 
     public static bool IsCompleted(커뮤니티원장Dto ledger)
         => string.Equals(ledger.상태, 커뮤니티원장상태.완료, StringComparison.OrdinalIgnoreCase);

@@ -36,11 +36,32 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     public async Task<IActionResult> List(
         [FromQuery] string? appKey,
         [FromQuery] string? category,
+        [FromQuery] string? boardKey,
+        [FromQuery] string? workflowTag,
+        [FromQuery] string? roleTag,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
-        var result = await _useCase.목록Async(appKey, category, page, pageSize, cancellationToken);
+        var result = await _useCase.목록Async(
+            appKey,
+            category,
+            boardKey,
+            workflowTag,
+            roleTag,
+            page,
+            pageSize,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("board-summaries")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ListBoardSummaries(
+        [FromQuery] string? appKey,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.게시판요약목록Async(appKey, cancellationToken);
         return this.ToActionResult(result);
     }
 

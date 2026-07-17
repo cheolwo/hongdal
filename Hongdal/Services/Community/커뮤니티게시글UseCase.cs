@@ -20,8 +20,15 @@ public interface I커뮤니티게시글UseCase
     Task<Result<PlatformCommunityPostListResponse>> 목록Async(
         string? appKey,
         string? category,
+        string? boardKey,
+        string? workflowTag,
+        string? roleTag,
         int page,
         int pageSize,
+        CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<CommunityBoardSummaryResponse>>> 게시판요약목록Async(
+        string? appKey,
         CancellationToken cancellationToken);
 
     Task<Result<PlatformCommunityPostResponse>> 생성Async(
@@ -160,6 +167,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
     public async Task<Result<PlatformCommunityPostListResponse>> 목록Async(
         string? appKey,
         string? category,
+        string? boardKey,
+        string? workflowTag,
+        string? roleTag,
         int page,
         int pageSize,
         CancellationToken cancellationToken)
@@ -167,9 +177,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 50);
 
+        var protectedCategoryNames = CommunityBoardCatalog
+            .CategoryNamesFor(CommunityBoardKeys.SafetyReport);
         var query = _db.PlatformCommunityPosts
             .AsNoTracking()
-            .Where(x => !x.IsDeleted);
+            .Where(x => !x.IsDeleted
+                        && !x.IsReportBoardPost
+                        && !protectedCategoryNames.Contains(x.Category));
 
         if (!string.IsNullOrWhiteSpace(appKey))
         {
@@ -177,10 +191,30 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             query = query.Where(x => x.AppKey == normalizedAppKey || x.AppKey == "platform");
         }
 
-        if (!string.IsNullOrWhiteSpace(category))
+        if (!string.IsNullOrWhiteSpace(boardKey))
         {
-            var normalizedCategory = Normalize(category, "자유", 60);
-            query = query.Where(x => x.Category == normalizedCategory);
+            var boardCategoryNames = await ResolveBoardCategoryNamesAsync(
+                appKey,
+                boardKey,
+                cancellationToken);
+            query = query.Where(x => boardCategoryNames.Contains(x.Category));
+        }
+        else if (!string.IsNullOrWhiteSpace(category))
+        {
+            var categoryNames = CommunityBoardCatalog.CategoryNamesFor(category);
+            query = query.Where(x => categoryNames.Contains(x.Category));
+        }
+
+        if (!string.IsNullOrWhiteSpace(workflowTag))
+        {
+            var normalizedWorkflowTag = Normalize(workflowTag, string.Empty, 60);
+            query = query.Where(x => x.WorkflowTag == normalizedWorkflowTag);
+        }
+
+        if (!string.IsNullOrWhiteSpace(roleTag))
+        {
+            var normalizedRoleTag = Normalize(roleTag, string.Empty, 40);
+            query = query.Where(x => x.RoleTag == normalizedRoleTag);
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -208,6 +242,77 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Page = page,
             PageSize = pageSize
         });
+    }
+
+    public async Task<Result<IReadOnlyList<CommunityBoardSummaryResponse>>> 게시판요약목록Async(
+        string? appKey,
+        CancellationToken cancellationToken)
+    {
+        var protectedCategoryNames = CommunityBoardCatalog
+            .CategoryNamesFor(CommunityBoardKeys.SafetyReport);
+        var query = _db.PlatformCommunityPosts
+            .AsNoTracking()
+            .Where(post => !post.IsDeleted
+                           && !post.IsReportBoardPost
+                           && !protectedCategoryNames.Contains(post.Category));
+
+        var normalizedAppKey = string.IsNullOrWhiteSpace(appKey)
+            ? null
+            : Normalize(appKey, "platform", 80);
+        if (normalizedAppKey is not null)
+        {
+            query = query.Where(post => post.AppKey == normalizedAppKey || post.AppKey == "platform");
+        }
+
+        var categoryCounts = await query
+            .GroupBy(post => post.Category)
+            .Select(group => new CommunityBoardCategoryCount(
+                group.Key,
+                group.Count(),
+                group.Max(post => post.CreatedAtUtc)))
+            .ToListAsync(cancellationToken);
+
+        var summaries = CommunityBoardCatalog.PublicBoards
+            .Select(board => BuildBoardSummary(board, categoryCounts))
+            .ToList();
+
+        var customBoardsQuery = _db.PlatformCommunityBoardRequests
+            .AsNoTracking()
+            .Where(board => !board.IsDeleted
+                            && board.Status == PlatformCommunityBoardRequestStatuses.Approved);
+        if (normalizedAppKey is not null)
+        {
+            customBoardsQuery = customBoardsQuery.Where(board => board.AppKey == normalizedAppKey);
+        }
+
+        var customBoards = await customBoardsQuery
+            .OrderBy(board => board.Title)
+            .ToListAsync(cancellationToken);
+        foreach (var board in customBoards)
+        {
+            if (CommunityBoardCatalog.Find(board.BoardKey) is not null
+                || CommunityBoardCatalog.Find(board.Title) is not null)
+            {
+                continue;
+            }
+
+            var count = categoryCounts.FirstOrDefault(item =>
+                string.Equals(item.Category, board.Title, StringComparison.OrdinalIgnoreCase));
+            summaries.Add(new CommunityBoardSummaryResponse
+            {
+                BoardKey = board.BoardKey,
+                DisplayName = board.Title,
+                Description = board.Description,
+                GroupCode = CommunityBoardGroupCodes.PeopleAndInformation,
+                GroupDisplayName = "구성원 게시판",
+                IsUserCreatable = true,
+                IsCustom = true,
+                PostCount = count?.Count ?? 0,
+                LatestPostAtUtc = count?.LatestPostAtUtc
+            });
+        }
+
+        return Result.Ok<IReadOnlyList<CommunityBoardSummaryResponse>>(summaries);
     }
 
     public async Task<Result<PlatformCommunityPostResponse>> 생성Async(
@@ -257,12 +362,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         }
 
         var now = DateTime.UtcNow;
-        var normalizedCategory = Normalize(request.Category, "자유", 60);
-        var isReportBoardPost = request.IsReportBoardPost || IsReportCategory(normalizedCategory);
-        if (isReportBoardPost && request.SalesOffer is not null)
-        {
-            return BadRequest<PlatformCommunityPostResponse>("신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.");
-        }
+        var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
+        var isReportBoardPost = request.SalesOffer is null
+                                && (request.IsReportBoardPost || IsReportCategory(normalizedCategory));
         var normalizedNickname = Normalize(request.Nickname, "익명", 40);
         var normalizedTitle = Normalize(request.Title, string.Empty, 160);
         var normalizedBody = Normalize(request.Body, string.Empty, 4000);
@@ -336,14 +438,17 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return NotFound<PlatformCommunityPostResponse>("게시글을 찾을 수 없습니다.");
         }
 
-        var 원장Context = CommunityLedgerCompletionPublication.IsSystemPost(entity)
-            ? await _원장ContextService.비식별성립사례조회Async(
-                entity.커뮤니티원장Id,
-                cancellationToken)
-            : await _원장ContextService.조회Async(
-                entity.커뮤니티원장Id,
-                _currentUserAccessor.UserId,
-                cancellationToken);
+        var isProtectedReport = entity.IsReportBoardPost || IsReportCategory(entity.Category);
+        var 원장Context = isProtectedReport
+            ? null
+            : CommunityLedgerCompletionPublication.IsSystemPost(entity)
+                ? await _원장ContextService.비식별성립사례조회Async(
+                    entity.커뮤니티원장Id,
+                    cancellationToken)
+                : await _원장ContextService.조회Async(
+                    entity.커뮤니티원장Id,
+                    _currentUserAccessor.UserId,
+                    cancellationToken);
         return Result.Ok(ToResponse(entity, 원장Context));
     }
 
@@ -482,12 +587,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             연결원장 = 원장결과.Value;
         }
 
-        entity.Category = Normalize(request.Category, "자유", 60);
-        var isReportBoardPost = request.IsReportBoardPost || IsReportCategory(entity.Category);
-        if (isReportBoardPost && request.SalesOffer is not null)
-        {
-            return BadRequest<PlatformCommunityPostResponse>("신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.");
-        }
+        entity.Category = ResolvePostCategory(request.Category, request.SalesOffer);
+        var isReportBoardPost = request.SalesOffer is null
+                                && (request.IsReportBoardPost || IsReportCategory(entity.Category));
         entity.WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60);
         entity.RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40);
         entity.Title = Normalize(request.Title, string.Empty, 160);
@@ -1157,6 +1259,69 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             || category.Contains("report", StringComparison.OrdinalIgnoreCase);
     }
 
+    private static string ResolvePostCategory(
+        string? requestedCategory,
+        PlatformCommunityPostSalesOfferRequest? salesOffer)
+        => Normalize(
+            PlatformCommunityPostCategoryPolicy.Resolve(requestedCategory, salesOffer is not null),
+            PlatformCommunityPostCategories.General,
+            60);
+
+    private async Task<IReadOnlyList<string>> ResolveBoardCategoryNamesAsync(
+        string? appKey,
+        string boardKey,
+        CancellationToken cancellationToken)
+    {
+        var catalogBoard = CommunityBoardCatalog.Find(boardKey);
+        if (catalogBoard is not null)
+        {
+            return CommunityBoardCatalog.CategoryNamesFor(catalogBoard.Key);
+        }
+
+        var normalizedBoardKey = Normalize(boardKey, string.Empty, 80);
+        var normalizedAppKey = string.IsNullOrWhiteSpace(appKey)
+            ? null
+            : Normalize(appKey, "platform", 80);
+        var query = _db.PlatformCommunityBoardRequests
+            .AsNoTracking()
+            .Where(board => !board.IsDeleted
+                            && board.Status == PlatformCommunityBoardRequestStatuses.Approved
+                            && board.BoardKey == normalizedBoardKey);
+        if (normalizedAppKey is not null)
+        {
+            query = query.Where(board => board.AppKey == normalizedAppKey);
+        }
+
+        var customBoardTitle = await query
+            .Select(board => board.Title)
+            .FirstOrDefaultAsync(cancellationToken);
+        return string.IsNullOrWhiteSpace(customBoardTitle)
+            ? [normalizedBoardKey]
+            : [customBoardTitle];
+    }
+
+    private static CommunityBoardSummaryResponse BuildBoardSummary(
+        CommunityBoardDefinition board,
+        IReadOnlyList<CommunityBoardCategoryCount> categoryCounts)
+    {
+        var matchingCounts = categoryCounts
+            .Where(item => CommunityBoardCatalog.MatchesCategory(board.Key, item.Category))
+            .ToArray();
+        return new CommunityBoardSummaryResponse
+        {
+            BoardKey = board.Key,
+            DisplayName = board.DisplayName,
+            Description = board.Description,
+            GroupCode = board.GroupCode,
+            GroupDisplayName = board.GroupDisplayName,
+            IsUserCreatable = board.IsUserCreatable,
+            PostCount = matchingCounts.Sum(item => item.Count),
+            LatestPostAtUtc = matchingCounts
+                .Select(item => (DateTime?)item.LatestPostAtUtc)
+                .Max()
+        };
+    }
+
     private static PlatformCommunityPostResponse ToResponse(
         PlatformCommunityPost entity,
         PlatformCommunityPostLedgerContextResponse? 원장Context = null)
@@ -1171,18 +1336,22 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Id = entity.Id,
             AppKey = entity.AppKey,
             Category = entity.Category,
-            WorkflowTag = entity.WorkflowTag,
-            RoleTag = entity.RoleTag,
-            Title = entity.Title,
-            Body = entity.Body,
-            OriginalLanguageCode = CommunityPostLanguageResolver.Resolve(
-                entity.OriginalLanguageCode,
-                entity.Title,
-                entity.Body),
-            SharedLinkUrl = entity.SharedLinkUrl,
-            SalesOffer = DeserializeSalesOffer(entity.SalesOfferJson),
-            커뮤니티원장Id = entity.커뮤니티원장Id,
-            원장Context = 원장Context,
+            WorkflowTag = isReportBoardPost ? "안전센터" : entity.WorkflowTag,
+            RoleTag = isReportBoardPost ? "보호 기록" : entity.RoleTag,
+            Title = isReportBoardPost ? "보호된 신고·분쟁 기록" : entity.Title,
+            Body = isReportBoardPost
+                ? "신고 원문과 첨부·댓글은 공개 게시판에서 제공하지 않습니다."
+                : entity.Body,
+            OriginalLanguageCode = isReportBoardPost
+                ? CommunityDisplayLanguageCodes.Korean
+                : CommunityPostLanguageResolver.Resolve(
+                    entity.OriginalLanguageCode,
+                    entity.Title,
+                    entity.Body),
+            SharedLinkUrl = isReportBoardPost ? null : entity.SharedLinkUrl,
+            SalesOffer = isReportBoardPost ? null : DeserializeSalesOffer(entity.SalesOfferJson),
+            커뮤니티원장Id = isReportBoardPost ? null : entity.커뮤니티원장Id,
+            원장Context = isReportBoardPost ? null : 원장Context,
             Nickname = isReportBoardPost ? reporterDisplayName : entity.Nickname,
             IsAuthorDisplayCountryPublic = !isReportBoardPost && entity.IsAuthorDisplayCountryPublic,
             AuthorDisplayCountryCode = !isReportBoardPost && entity.IsAuthorDisplayCountryPublic
@@ -1195,9 +1364,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             SystemPostKind = isLedgerCompletionPost
                 ? PlatformCommunitySystemPostKinds.LedgerCompletion
                 : null,
-            PrivacyNotice = isLedgerCompletionPost
-                ? "원장 종류와 절차 구조만 공개되며 이름, 연락처, 상세 주소, 금액과 원문 증빙은 공개하지 않습니다."
-                : null,
+            PrivacyNotice = isReportBoardPost
+                ? "신고·분쟁 기록은 공개 목록에서 제외되며 원문과 첨부·댓글을 공개하지 않습니다."
+                : isLedgerCompletionPost
+                    ? "원장 종류와 절차 구조만 공개되며 이름, 연락처, 상세 주소, 금액과 원문 증빙은 공개하지 않습니다."
+                    : null,
             IsReportBoardPost = isReportBoardPost,
             ReporterDisplayName = reporterDisplayName,
             ReportedDisplayName = reportedDisplayName,
@@ -1218,22 +1389,28 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             CommunityMomentumUpdatedAtUtc = !isReportBoardPost && entity.IsCommunityMomentumPromoted
                 ? entity.CommunityMomentumUpdatedAtUtc
                 : null,
-            RecommendationCount = entity.RecommendationCount,
-            CommentCount = entity.CommentCount,
-            LastEngagedAtUtc = entity.LastEngagedAtUtc,
-            IsTrending = !entity.IsOperatorPinned && (entity.RecommendationCount >= 3 || entity.CommentCount >= 3),
+            RecommendationCount = isReportBoardPost ? 0 : entity.RecommendationCount,
+            CommentCount = isReportBoardPost ? 0 : entity.CommentCount,
+            LastEngagedAtUtc = isReportBoardPost ? null : entity.LastEngagedAtUtc,
+            IsTrending = !isReportBoardPost
+                         && !entity.IsOperatorPinned
+                         && (entity.RecommendationCount >= 3 || entity.CommentCount >= 3),
             CreatedAtUtc = entity.CreatedAtUtc,
             UpdatedAtUtc = entity.UpdatedAtUtc,
-            Attachments = entity.Attachments
-                .OrderBy(x => x.UploadedAtUtc)
-                .Select(ToAttachmentResponse)
-                .ToArray(),
-            RecentComments = entity.Comments
-                .Where(x => !x.IsDeleted && !x.IsOperatorHidden)
-                .OrderByDescending(x => x.CreatedAtUtc)
-                .Take(3)
-                .Select(ToCommentResponse)
-                .ToArray()
+            Attachments = isReportBoardPost
+                ? []
+                : entity.Attachments
+                    .OrderBy(x => x.UploadedAtUtc)
+                    .Select(ToAttachmentResponse)
+                    .ToArray(),
+            RecentComments = isReportBoardPost
+                ? []
+                : entity.Comments
+                    .Where(x => !x.IsDeleted && !x.IsOperatorHidden)
+                    .OrderByDescending(x => x.CreatedAtUtc)
+                    .Take(3)
+                    .Select(ToCommentResponse)
+                    .ToArray()
         };
     }
 
@@ -1293,4 +1470,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 
     private static Result Forbidden(string message)
         => Result.Fail(new Error(message).WithMetadata("StatusCode", StatusCodes.Status403Forbidden));
+
+    private sealed record CommunityBoardCategoryCount(
+        string Category,
+        int Count,
+        DateTime LatestPostAtUtc);
 }

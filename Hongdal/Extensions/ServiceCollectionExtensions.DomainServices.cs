@@ -99,6 +99,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityPostOpportunityStore, EfCommunityPostOpportunityStore>();
         services.AddScoped<ICommunityProfessionalEligibilityService, CommunityProfessionalEligibilityService>();
         services.AddScoped<ICommunityPostProfessionalParticipationService, CommunityPostProfessionalParticipationService>();
+        services.AddScoped<ICommunityActionJourneyService, CommunityActionJourneyService>();
         services.AddScoped<ICommunityPostOpportunityService, CommunityPostOpportunityService>();
         services.AddScoped<I원장다이어그램실시간알림Service, 원장다이어그램SignalR알림Service>();
         services.AddScoped<I커뮤니티원장업무투영동기화Service, 커뮤니티원장업무투영동기화Service>();

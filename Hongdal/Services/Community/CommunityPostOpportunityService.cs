@@ -95,7 +95,9 @@ public sealed record CommunityPostOpportunitySource(
     string Body,
     string? AuthorUserId,
     string? LinkedLedgerId,
-    bool IsReportBoardPost = false);
+    bool IsReportBoardPost = false,
+    string? SalesOfferJson = null,
+    DateTime CreatedAtUtc = default);
 
 public enum CommunityPostLedgerLinkResult
 {
@@ -154,7 +156,9 @@ public sealed class EfCommunityPostOpportunityStore : ICommunityPostOpportunityS
                 post.Body,
                 post.AuthorUserId,
                 post.커뮤니티원장Id,
-                post.IsReportBoardPost))
+                post.IsReportBoardPost,
+                post.SalesOfferJson,
+                post.CreatedAtUtc))
             .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<CommunityPostLedgerLinkResult> LinkLedgerAsync(
@@ -244,6 +248,7 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
     private readonly I커뮤니티원장저장소? _ledgerStore;
     private readonly ICommunityProfessionalEligibilityService? _professionalEligibilityService;
     private readonly ICommunityPostProfessionalParticipationService? _professionalParticipationService;
+    private readonly ICommunityActionJourneyService? _journeyService;
 
     public CommunityPostOpportunityService(
         ICommunityPostOpportunityStore postStore,
@@ -252,7 +257,8 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
         ICommunityVoteService? voteService = null,
         I커뮤니티원장저장소? ledgerStore = null,
         ICommunityProfessionalEligibilityService? professionalEligibilityService = null,
-        ICommunityPostProfessionalParticipationService? professionalParticipationService = null)
+        ICommunityPostProfessionalParticipationService? professionalParticipationService = null,
+        ICommunityActionJourneyService? journeyService = null)
     {
         _postStore = postStore;
         _analyzer = analyzer;
@@ -261,6 +267,7 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
         _ledgerStore = ledgerStore;
         _professionalEligibilityService = professionalEligibilityService;
         _professionalParticipationService = professionalParticipationService;
+        _journeyService = journeyService;
     }
 
     public async Task<CommunityPostOpportunityListResponse?> GetAsync(
@@ -288,12 +295,31 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
             provisionalLedger = await _ledgerStore.원장조회Async(source.LinkedLedgerId, cancellationToken);
         }
 
+        var participation = BuildParticipationEntry(source, language, participationVote, provisionalLedger);
+        var journey = _journeyService is null
+            ? CommunityActionJourneyProjection.Build(
+                source,
+                participation,
+                participationVote,
+                provisionalLedger,
+                [],
+                null,
+                language)
+            : await _journeyService.BuildAsync(
+                source,
+                participation,
+                participationVote,
+                provisionalLedger,
+                language,
+                cancellationToken);
+
         return new CommunityPostOpportunityListResponse
         {
             PostId = source.PostId,
             DisplayLanguageCode = language,
             ExperiencePolicy = new CommunitySharedExperiencePolicyResponse(),
-            Participation = BuildParticipationEntry(source, language, participationVote, provisionalLedger),
+            Participation = participation,
+            Journey = journey,
             Items = items
         };
     }

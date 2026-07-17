@@ -43,6 +43,27 @@ public sealed class MongoCollectiveProcurementPlanningStore : ICollectiveProcure
         return document is null ? null : Deserialize(document.PayloadJson);
     }
 
+    public async Task<IReadOnlyList<CollectiveProcurementPlanState>> ListBySourceAsync(
+        string sourceTypeCode,
+        string sourceReferenceId,
+        CancellationToken cancellationToken = default)
+    {
+        var sourceType = sourceTypeCode?.Trim() ?? string.Empty;
+        var sourceReference = sourceReferenceId?.Trim() ?? string.Empty;
+        if (sourceType.Length == 0 || sourceReference.Length == 0)
+        {
+            return [];
+        }
+
+        await EnsureIndexesAsync(cancellationToken);
+        var documents = await collection
+            .Find(item => item.SourceTypeCode == sourceType && item.SourceReferenceId == sourceReference)
+            .SortByDescending(item => item.UpdatedAtUtc)
+            .Limit(20)
+            .ToListAsync(cancellationToken);
+        return documents.Select(document => Deserialize(document.PayloadJson)).ToArray();
+    }
+
     public async Task CreateAsync(
         CollectiveProcurementPlanState state,
         CancellationToken cancellationToken = default)
@@ -100,7 +121,8 @@ public sealed class MongoCollectiveProcurementPlanningStore : ICollectiveProcure
                 return;
             }
 
-            await collection.Indexes.CreateOneAsync(
+            var indexes = new[]
+            {
                 new CreateIndexModel<CollectiveProcurementPlanDocument>(
                     Builders<CollectiveProcurementPlanDocument>.IndexKeys.Ascending(item => item.PlanId),
                     new CreateIndexOptions
@@ -108,6 +130,15 @@ public sealed class MongoCollectiveProcurementPlanningStore : ICollectiveProcure
                         Unique = true,
                         Name = "ux_collective_procurement_plan"
                     }),
+                new CreateIndexModel<CollectiveProcurementPlanDocument>(
+                    Builders<CollectiveProcurementPlanDocument>.IndexKeys
+                        .Ascending(item => item.SourceTypeCode)
+                        .Ascending(item => item.SourceReferenceId)
+                        .Descending(item => item.UpdatedAtUtc),
+                    new CreateIndexOptions { Name = "ix_collective_procurement_source" })
+            };
+            await collection.Indexes.CreateManyAsync(
+                indexes,
                 cancellationToken: cancellationToken);
             indexesReady = true;
         }

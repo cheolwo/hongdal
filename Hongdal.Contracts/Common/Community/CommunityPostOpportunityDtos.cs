@@ -9,6 +9,7 @@ public sealed class CommunityPostOpportunityListResponse
     public string DisplayLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
     public CommunitySharedExperiencePolicyResponse ExperiencePolicy { get; set; } = new();
     public CommunityPostParticipationEntryResponse Participation { get; set; } = new();
+    public CommunityActionJourneyResponse Journey { get; set; } = new();
     public IReadOnlyList<CommunityPostOpportunityResponse> Items { get; set; } = [];
 }
 

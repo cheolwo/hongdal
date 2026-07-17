@@ -100,10 +100,26 @@ public static class PlatformCommunitySystemPostKinds
     public const string LedgerCompletion = "ledger-completion";
 }
 
+public static class PlatformCommunityPostCategories
+{
+    public const string General = "자유·생활";
+    public const string Sales = "판매·공급";
+    public const string ReportDispute = "신고/분쟁";
+}
+
+public static class PlatformCommunityPostCategoryPolicy
+{
+    public static string Resolve(string? requestedCategory, bool hasSalesOffer)
+        => CommunityBoardCatalog.ResolveCanonicalCategory(
+            hasSalesOffer
+                ? PlatformCommunityPostCategories.Sales
+                : requestedCategory);
+}
+
 public sealed class PlatformCommunityPostCreateRequest
 {
     public string AppKey { get; set; } = "platform";
-    public string Category { get; set; } = "자유";
+    public string Category { get; set; } = PlatformCommunityPostCategories.General;
     public string WorkflowTag { get; set; } = "국내 화물 운송";
     public string RoleTag { get; set; } = "플랫폼 구성원";
     public string Title { get; set; } = string.Empty;
@@ -163,7 +179,7 @@ public sealed class PlatformCommunityPostAudioSegmentResponse
 
 public sealed class PlatformCommunityPostUpdateRequest
 {
-    public string Category { get; set; } = "자유";
+    public string Category { get; set; } = PlatformCommunityPostCategories.General;
     public string WorkflowTag { get; set; } = "국내 화물 운송";
     public string RoleTag { get; set; } = "플랫폼 구성원";
     public string Title { get; set; } = string.Empty;
