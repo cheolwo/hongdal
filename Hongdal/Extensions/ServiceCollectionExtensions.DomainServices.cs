@@ -15,6 +15,7 @@ using 홍달.Services.Options;
 using 홍달.Services.Sales;
 using 홍달.Services.Versioning;
 using Hongdal.Services.Auth;
+using Hongdal.Services.CollectiveProcurement;
 using Hongdal.Services.Community;
 using Hongdal.Services.Content;
 using Hongdal.Services.Food;
@@ -62,6 +63,10 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IDomesticGroupPurchaseNegotiationClock, SystemDomesticGroupPurchaseNegotiationClock>();
         services.AddSingleton<IDomesticGroupPurchaseNegotiationStore, MongoDomesticGroupPurchaseNegotiationStore>();
         services.AddScoped<IDomesticGroupPurchaseNegotiationService, DomesticGroupPurchaseNegotiationService>();
+        services.AddSingleton<ICollectiveProcurementPlanningClock, SystemCollectiveProcurementPlanningClock>();
+        services.AddSingleton<ICollectiveProcurementEconomicsEngine, CollectiveProcurementEconomicsEngine>();
+        services.AddSingleton<ICollectiveProcurementPlanningStore, MongoCollectiveProcurementPlanningStore>();
+        services.AddScoped<ICollectiveProcurementPlanningService, CollectiveProcurementPlanningService>();
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
