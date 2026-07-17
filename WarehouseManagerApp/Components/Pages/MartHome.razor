@@ -1,5 +1,7 @@
 ﻿@page "/mart"
 
+@inject 창고작업세션상태ViewModel WarehouseSession
+
 <PageTitle>알뜰살뜰 마트</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
@@ -26,7 +28,10 @@
                         <MudIcon Icon="@Icons.Material.Filled.MoveToInbox" Color="Color.Warning" Size="Size.Large" />
                         <MudText Typo="Typo.h6">도심 입고</MudText>
                         <MudText Typo="Typo.body2" Color="Color.Secondary">납품, 반품, 거점 이동 물량을 창고 재고로 확인합니다.</MudText>
-                        <MudButton Href="@WarehouseManagerRoutes.MartInboundWorkStart" Variant="Variant.Filled" Color="Color.Warning">시작</MudButton>
+                        <MudStack Row="true" Spacing="1">
+                            <MudButton Href="@WarehouseManagerRoutes.ExpectedInbounds" Variant="Variant.Outlined" Color="Color.Warning">입고 예정</MudButton>
+                            <MudButton Href="@WarehouseManagerRoutes.MartInboundWorkStart" Variant="Variant.Filled" Color="Color.Warning">시작</MudButton>
+                        </MudStack>
                     </MudStack>
                 </MudPaper>
             </MudItem>
@@ -80,3 +85,16 @@
         </MudPaper>
     </MudStack>
 </MudContainer>
+
+@code {
+    protected override void OnInitialized()
+        => EnsureMartProfile();
+
+    private void EnsureMartProfile()
+    {
+        if (!string.Equals(WarehouseSession.운영ProfileCode, 창고운영ProfileCodes.마트도심, StringComparison.OrdinalIgnoreCase))
+        {
+            WarehouseSession.운영Profile설정(창고운영ProfileCodes.마트도심);
+        }
+    }
+}

@@ -1,5 +1,6 @@
 @page "/work/picking-batch"
 @inject IWarehousePickingBatchWorkspaceService PickingService
+@inject 창고작업세션상태ViewModel WarehouseSession
 
 <PageTitle>피킹 배치</PageTitle>
 
@@ -222,6 +223,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnsureGeneralProfile();
         warehouseOptions = await PickingService.GetWarehouseOptionsAsync();
         var first = warehouseOptions.FirstOrDefault();
         if (first is not null)
@@ -232,6 +234,14 @@
         }
 
         await LoadAssignedTasksAsync();
+    }
+
+    private void EnsureGeneralProfile()
+    {
+        if (!string.Equals(WarehouseSession.운영ProfileCode, 창고운영ProfileCodes.일반입출고, StringComparison.OrdinalIgnoreCase))
+        {
+            WarehouseSession.운영Profile설정(창고운영ProfileCodes.일반입출고);
+        }
     }
 
     private async Task OnWarehouseChanged(long warehouseId)

@@ -1,6 +1,7 @@
 @page "/work/inbound/products"
 @inject NavigationManager Navigation
 @inject IInboundReceivingWorkflowService ReceivingWorkflow
+@inject 창고작업세션상태ViewModel WarehouseSession
 
 <PageTitle>입고 상품 확인</PageTitle>
 
@@ -47,6 +48,12 @@
                                Disabled="@string.IsNullOrWhiteSpace(productBarcode)"
                                OnClick="StartUnplannedInbound">
                         현장 입고 등록
+                    </MudButton>
+                    <MudButton Href="@WarehouseManagerRoutes.ExpectedInbounds"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.EventAvailable">
+                        업체별 입고 예정
                     </MudButton>
                 </MudStack>
             </MudStack>
@@ -303,7 +310,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnsureGeneralProfile();
         expectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
+    }
+
+    private void EnsureGeneralProfile()
+    {
+        if (!string.Equals(WarehouseSession.운영ProfileCode, 창고운영ProfileCodes.일반입출고, StringComparison.OrdinalIgnoreCase))
+        {
+            WarehouseSession.운영Profile설정(창고운영ProfileCodes.일반입출고);
+        }
     }
 
     private Task OnBarcodeChanged(string value)

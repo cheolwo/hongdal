@@ -1,5 +1,7 @@
 @page "/mart/picking"
 
+@inject 마트피킹포장PageViewModel PageModel
+
 <PageTitle>알뜰살뜰 마트 피킹/포장</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
@@ -22,3 +24,13 @@
         <HongdalMartPickingPackingWorkflow WorkBoardUrl="@WarehouseManagerRoutes.MartWorkBoard" />
     </MudStack>
 </MudContainer>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!string.Equals(PageModel.세션.운영ProfileCode, 창고운영ProfileCodes.마트도심, StringComparison.OrdinalIgnoreCase))
+        {
+            PageModel.세션.운영Profile설정(창고운영ProfileCodes.마트도심);
+        }
+    }
+}

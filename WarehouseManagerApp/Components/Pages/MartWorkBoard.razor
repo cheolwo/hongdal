@@ -1,5 +1,7 @@
 ﻿@page "/mart/work-board"
 
+@inject 마트주문처리PageViewModel PageModel
+
 <PageTitle>알뜰살뜰 마트 작업 보드</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
@@ -92,6 +94,14 @@
 </MudContainer>
 
 @code {
+    protected override void OnInitialized()
+    {
+        if (!string.Equals(PageModel.세션.운영ProfileCode, 창고운영ProfileCodes.마트도심, StringComparison.OrdinalIgnoreCase))
+        {
+            PageModel.세션.운영Profile설정(창고운영ProfileCodes.마트도심);
+        }
+    }
+
     private static readonly IReadOnlyList<BoardSummary> Summaries =
     [
         new("오늘 주문", "128", "마감 전 42건", Color.Primary),
