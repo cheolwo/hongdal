@@ -87,25 +87,6 @@ public partial class PlatformCommunityHome
         statusMessage = $"'{ledger.제목}' 원장을 글에 첨부했습니다.";
     }
 
-    private IReadOnlyList<PlatformCommunityPostLedgerChoiceResponse> FilteredLedgerPickerChoices
-        => LedgerPicker.FilteredItems;
-
-    private bool IsPendingLedger(PlatformCommunityPostLedgerChoiceResponse ledger)
-        => LedgerPicker.IsPending(ledger);
-
-    private string BuildLedgerPickerItemClass(PlatformCommunityPostLedgerChoiceResponse ledger)
-        => IsPendingLedger(ledger)
-            ? "platform-ledger-picker-item platform-ledger-picker-item--selected"
-            : "platform-ledger-picker-item";
-
-    private string BuildLedgerPickerScopeClass(string scope)
-        => string.Equals(ledgerPickerScope, scope, StringComparison.Ordinal)
-            ? "platform-ledger-picker-segment platform-ledger-picker-segment--active"
-            : "platform-ledger-picker-segment";
-
-    private void ResetLedgerPickerFilters()
-        => LedgerPicker.ResetFilters();
-
     private void ReturnToComposeFromLedgerPicker()
     {
         LedgerPicker.ReturnToCompose();

@@ -283,17 +283,4 @@ public partial class PlatformCommunityHome
             : 선택원장블록흐름도.Nodes.FirstOrDefault(node =>
                 string.Equals(node.Title, 선택원장블록노드제목, StringComparison.OrdinalIgnoreCase));
 
-    private 다이어그램창고대행후보? 선택창고대행후보
-        => string.IsNullOrWhiteSpace(선택창고대행후보키)
-            ? null
-            : 창고대행후보목록.FirstOrDefault(candidate =>
-                string.Equals(candidate.Key, 선택창고대행후보키, StringComparison.OrdinalIgnoreCase));
-
-    private bool 창고대행입고신청가능한가
-        => !창고대행신청제출중 &&
-            선택창고대행후보?.WarehouseId is not null &&
-            Services.GetService<IWarehouseWorkspaceService>() is not null &&
-            !string.IsNullOrWhiteSpace(warehouseProxySupplierName) &&
-            !string.IsNullOrWhiteSpace(warehouseProxyOrderReference);
-
 }

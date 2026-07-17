@@ -4,6 +4,7 @@ using Hongdal.Contracts.Common.Content;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hongdal.Tests.Ui.Common;
 
@@ -22,6 +23,8 @@ public sealed class PlatformCommunityHomePageViewModelTests
         var foodDiscovery = new YouTubeFoodCommunityDiscoveryViewModel(
             new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!));
         var diagramWorkspace = new PlatformCommunityDiagramWorkspaceViewModel();
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var warehouseProxy = new PlatformCommunityWarehouseProxyViewModel(services);
         using var page = new PlatformCommunityHomePageViewModel(
             composer,
             postList,
@@ -30,7 +33,8 @@ public sealed class PlatformCommunityHomePageViewModelTests
             engagement,
             ledgerPicker,
             foodDiscovery,
-            diagramWorkspace);
+            diagramWorkspace,
+            warehouseProxy);
 
         Assert.Same(composer, page.Composer);
         Assert.Same(postList, page.PostList);
@@ -40,6 +44,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
         Assert.Same(ledgerPicker, page.LedgerPicker);
         Assert.Same(foodDiscovery, page.FoodDiscovery);
         Assert.Same(diagramWorkspace, page.DiagramWorkspace);
+        Assert.Same(warehouseProxy, page.WarehouseProxy);
         Assert.Same(engagement.Journeys, page.ActionJourneys);
     }
 

@@ -17,27 +17,6 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
-    private bool IsPostParticipationPending(long postId)
-        => Engagement.IsParticipationPending(postId);
-
-    private bool IsParticipationRoleSelected(long postId, string optionId)
-        => Engagement.IsParticipationRoleSelected(postId, optionId);
-
-    private string BuildParticipationRoleClass(long postId, string optionId)
-        => IsParticipationRoleSelected(postId, optionId)
-            ? "platform-community-participation-role platform-community-participation-role--selected"
-            : "platform-community-participation-role";
-
-    private async Task StartPostParticipationAsync(PlatformCommunityPostResponse post)
-        => await ApplyCommandResultAsync(
-            await Engagement.StartParticipationAsync(post.Id));
-
-    private async Task ToggleParticipationRoleAsync(
-        PlatformCommunityPostResponse post,
-        CommunityPostParticipationRoleOptionResponse role)
-        => await ApplyCommandResultAsync(
-            await Engagement.ToggleParticipationRoleAsync(post.Id, role));
-
     private async Task PromotePostParticipationAsync(
         PlatformCommunityPostResponse post,
         string intentTypeCode)
@@ -168,54 +147,6 @@ public partial class PlatformCommunityHome
             _ => "공동구매 가원장"
         };
 
-    private static string TradeDirectionLabel(string code)
-        => code switch
-        {
-            CommunityTradeDirectionCodes.Import => "수입 검토",
-            CommunityTradeDirectionCodes.Export => "수출 검토",
-            _ => "국내 거래 검토"
-        };
-
-    private static string CommunityMomentumLabel(string? code)
-        => code switch
-        {
-            CommunityPostMomentumCodes.ReadyForRealLedgerReview => "전환 검토 준비",
-            CommunityPostMomentumCodes.PartyForming => "참여팀 구성중",
-            _ => "역할 참여 모집"
-        };
-
-    private static string CountryCodeLabel(string? code)
-        => string.IsNullOrWhiteSpace(code) ? "미정" : code.Trim().ToUpperInvariant();
-
-    private static string TransportModeLabel(string code)
-        => code switch
-        {
-            CommunityTransportModeCodes.Ocean => "해상",
-            CommunityTransportModeCodes.Air => "항공",
-            CommunityTransportModeCodes.Road => "도로",
-            CommunityTransportModeCodes.Rail => "철도",
-            CommunityTransportModeCodes.Multimodal => "복합운송",
-            _ => code
-        };
-
-    private static string BuildPartySlotClass(CommunityPostPartyRoleSlotResponse slot)
-        => slot.StateCode switch
-        {
-            CommunityPartyRoleSlotStateCodes.RoleAccepted =>
-                "platform-community-party-slot platform-community-party-slot--confirmed",
-            CommunityPartyRoleSlotStateCodes.InterestExpressed =>
-                "platform-community-party-slot platform-community-party-slot--interest",
-            _ => "platform-community-party-slot"
-        };
-
-    private static string PartySlotIcon(CommunityPostPartyRoleSlotResponse slot)
-        => slot.StateCode switch
-        {
-            CommunityPartyRoleSlotStateCodes.RoleAccepted => Icons.Material.Filled.CheckCircle,
-            CommunityPartyRoleSlotStateCodes.InterestExpressed => Icons.Material.Filled.Schedule,
-            _ => Icons.Material.Outlined.RadioButtonUnchecked
-        };
-
     private async Task RefreshPostOpportunitiesAsync(long postId)
         => await Engagement.RefreshOpportunityAsync(postId);
 
@@ -224,47 +155,6 @@ public partial class PlatformCommunityHome
         communityPostSearchText = value ?? string.Empty;
         selectedForumPostId = null;
         selectedForumSeedPostTitle = null;
-    }
-
-    private static bool IsDiagramBoardPost(string? category, string? body)
-    {
-        return (!string.IsNullOrWhiteSpace(category) &&
-                category.Contains("다이어그램", StringComparison.OrdinalIgnoreCase))
-            || (!string.IsNullOrWhiteSpace(body) &&
-                (body.Contains("->", StringComparison.Ordinal) ||
-                 body.Contains("-->", StringComparison.Ordinal) ||
-                 body.Contains("```mermaid", StringComparison.OrdinalIgnoreCase)));
-    }
-
-    private static IReadOnlyList<string> BuildCommunityDiagramPreviewNodes(string? body, string fallbackLabel)
-    {
-        var nodes = (body ?? string.Empty)
-            .Replace("-->", "->", StringComparison.Ordinal)
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Where(line => line.Contains("->", StringComparison.Ordinal))
-            .SelectMany(line => line.Split("->", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-            .Select(NormalizeCommunityDiagramNodeLabel)
-            .Where(label => !string.IsNullOrWhiteSpace(label))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Take(4)
-            .ToArray();
-
-        return nodes.Length > 1
-            ? nodes
-            : new[] { fallbackLabel, "사람 확인", "업무 처리", "상태 공유" };
-    }
-
-    private static string NormalizeCommunityDiagramNodeLabel(string value)
-    {
-        var label = value.Trim().Trim('-', '>', '`', '*', '#', ' ', ';');
-        var openBracket = label.IndexOf('[');
-        var closeBracket = label.LastIndexOf(']');
-        if (openBracket >= 0 && closeBracket > openBracket)
-        {
-            label = label[(openBracket + 1)..closeBracket];
-        }
-
-        return label.Length > 24 ? label[..24] + "…" : label;
     }
 
     private bool IsPostCommentsExpanded(long postId) => Engagement.IsCommentsExpanded(postId);

@@ -4,15 +4,13 @@ using MudBlazor;
 
 namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
-public partial class PlatformCommunityHome
-{
-    private sealed record 도형상세동작(
+public sealed record 도형상세동작(
         string Url,
         string Description,
         string Icon,
         Color Color);
 
-    private sealed record 도형레이어배지(
+public sealed record 도형레이어배지(
         string LayerKey,
         string Label,
         string Description,
@@ -21,7 +19,7 @@ public partial class PlatformCommunityHome
         int ConflictPriority,
         string CssClass);
 
-    private sealed record 도형레이어신호(
+public sealed record 도형레이어신호(
         string LayerKey,
         int DisplayOrder,
         int ConflictPriority,
@@ -29,13 +27,13 @@ public partial class PlatformCommunityHome
         도형레이어배지 Badge,
         bool ShouldEmphasizeNode);
 
-    private sealed record 도형입력항목(
+public sealed record 도형입력항목(
         string Label,
         string InputType,
         string Description,
         bool IsRequired);
 
-    private sealed record 노드입력준비도(
+public sealed record 노드입력준비도(
         int Percent,
         int CompletedCount,
         int TrackedCount,
@@ -56,14 +54,14 @@ public partial class PlatformCommunityHome
         };
     }
 
-    private enum 원장블록처리상태
+public enum 원장블록처리상태
     {
         대기,
         진행중,
         완료
     }
 
-    private sealed record 현재원장컨텍스트(
+public sealed record 현재원장컨텍스트(
         string Id,
         string Title,
         string TemplateKey,
@@ -77,7 +75,7 @@ public partial class PlatformCommunityHome
         public IReadOnlyList<현재원장컨텍스트연결선> DiagramEdges { get; init; } = [];
     }
 
-    private sealed record 현재원장컨텍스트연결선(
+public sealed record 현재원장컨텍스트연결선(
         string FromTitle,
         string ToTitle,
         string Label,
@@ -85,11 +83,11 @@ public partial class PlatformCommunityHome
         DiagramConnectionHandleKind ToHandle = DiagramConnectionHandleKind.Left,
         DiagramEdgeStyleKind Style = DiagramEdgeStyleKind.Curve);
 
-    private sealed record 원장블록흐름도(
+public sealed record 원장블록흐름도(
         IReadOnlyList<원장블록노드> Nodes,
         IReadOnlyList<string> Rules);
 
-    private sealed record 원장블록노드(
+public sealed record 원장블록노드(
         string Title,
         string GroupLabel,
         string Description,
@@ -100,23 +98,11 @@ public partial class PlatformCommunityHome
         DiagramNodeConnectionRole ConnectionRole = DiagramNodeConnectionRole.Standard,
         string? FormKind = null);
 
-    private sealed record 다이어그램창고대행후보(
-        string Key,
-        long? WarehouseId,
-        string Name,
-        string ScopeLabel,
-        string ProxyTypeCode,
-        string ProxyTypeLabel,
-        string Address,
-        string Description,
-        bool IsWorkspaceWarehouse);
+public sealed record DiagramPoint(double X, double Y);
 
-    private sealed record DiagramPoint(double X, double Y);
+public sealed record DiagramHandleHit(string NodeTitle, string Handle);
 
-    private sealed record DiagramHandleHit(string NodeTitle, string Handle);
-
-    private sealed record DiagramEdgeGeometry(
-        string Path,
-        double LabelX,
-        double LabelY);
-}
+public sealed record DiagramEdgeGeometry(
+    string Path,
+    double LabelX,
+    double LabelY);

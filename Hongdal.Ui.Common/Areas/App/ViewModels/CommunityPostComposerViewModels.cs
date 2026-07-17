@@ -879,7 +879,8 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         PlatformCommunityPostEngagementViewModel engagement,
         PlatformCommunityLedgerPickerViewModel ledgerPicker,
         YouTubeFoodCommunityDiscoveryViewModel foodDiscovery,
-        PlatformCommunityDiagramWorkspaceViewModel diagramWorkspace)
+        PlatformCommunityDiagramWorkspaceViewModel diagramWorkspace,
+        PlatformCommunityWarehouseProxyViewModel warehouseProxy)
     {
         Composer = 하위ViewModel등록(composer, 수명소유: true);
         PostList = 하위ViewModel등록(postList, 수명소유: true);
@@ -889,6 +890,7 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         LedgerPicker = 하위ViewModel등록(ledgerPicker, 수명소유: true);
         FoodDiscovery = 하위ViewModel등록(foodDiscovery, 수명소유: true);
         DiagramWorkspace = 하위ViewModel등록(diagramWorkspace, 수명소유: true);
+        WarehouseProxy = 하위ViewModel등록(warehouseProxy, 수명소유: true);
     }
 
     public CommunityPostComposerViewModel Composer { get; }
@@ -899,6 +901,7 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
     public PlatformCommunityLedgerPickerViewModel LedgerPicker { get; }
     public YouTubeFoodCommunityDiscoveryViewModel FoodDiscovery { get; }
     public PlatformCommunityDiagramWorkspaceViewModel DiagramWorkspace { get; }
+    public PlatformCommunityWarehouseProxyViewModel WarehouseProxy { get; }
     public CommunityPostJourneyCollectionViewModel ActionJourneys => Engagement.Journeys;
 
     public void Configure(string appKey, string defaultRoleTag)

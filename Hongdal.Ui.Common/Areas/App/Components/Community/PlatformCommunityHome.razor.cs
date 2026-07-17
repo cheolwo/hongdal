@@ -120,6 +120,7 @@ public partial class PlatformCommunityHome
     private PlatformCommunityPostEngagementViewModel Engagement => ViewModel.Engagement;
     private PlatformCommunityLedgerPickerViewModel LedgerPicker => ViewModel.LedgerPicker;
     private PlatformCommunityDiagramWorkspaceViewModel DiagramWorkspace => ViewModel.DiagramWorkspace;
+    private PlatformCommunityWarehouseProxyViewModel WarehouseProxy => ViewModel.WarehouseProxy;
     private PlatformCommunityDiagramChatViewModel DiagramChat => DiagramWorkspace.Chat;
     private PlatformCommunityDiagramCanvasViewModel DiagramCanvas => DiagramWorkspace.Canvas;
     private List<PlatformCommunityPostLedgerChoiceResponse> myLedgers => LedgerPicker.Items;
@@ -137,7 +138,6 @@ public partial class PlatformCommunityHome
     private readonly List<원장블록노드> 팔레트원장블록노드목록 = [];
     private List<string> diagramNodeOrder => DiagramCanvas.NodeOrder;
     private List<원장블록연결선> customDiagramEdges => DiagramCanvas.CustomEdges;
-    private readonly List<다이어그램창고대행후보> 창고대행후보목록 = [];
     private Dictionary<string, string> diagramEdgeLabels => DiagramCanvas.EdgeLabels;
     private Dictionary<string, DiagramEdgeStyleKind> diagramEdgeStyles => DiagramCanvas.EdgeStyles;
     private static readonly IReadOnlyList<DiagramConnectionHandleKind> DiagramConnectionHandles =
@@ -146,12 +146,6 @@ public partial class PlatformCommunityHome
         DiagramConnectionHandleKind.Right,
         DiagramConnectionHandleKind.Bottom,
         DiagramConnectionHandleKind.Left
-    ];
-    private static readonly IReadOnlyList<DiagramEdgeStyleKind> DiagramEdgeStyleOptions =
-    [
-        DiagramEdgeStyleKind.Curve,
-        DiagramEdgeStyleKind.Straight,
-        DiagramEdgeStyleKind.Elbow
     ];
     private const string DiagramLayerStructure = "structure";
     private const string DiagramLayerProcedure = "procedure";
@@ -170,13 +164,6 @@ public partial class PlatformCommunityHome
         new(DiagramLayerEvidence, "증빙", "필수 확인, 사진, 수령, 정산 근거입니다.", 50, 50, Icons.Material.Filled.FactCheck, Color.Warning, true),
         new(DiagramLayerRisk, "리스크", "신고, 분쟁, 오류, 보류처럼 다른 표시를 덮어야 하는 신호입니다.", 60, 60, Icons.Material.Filled.HelpOutline, Color.Error, true),
         new(DiagramLayerApi, "API", "노드에서 호출 가능한 처리 표면과 기존 API 경로입니다.", 70, 35, Icons.Material.Filled.OpenInNew, Color.Info, true)
-    ];
-    private static readonly IReadOnlyList<string> 창고대행입고계약유형목록 =
-    [
-        입고계약유형코드.보관대행,
-        입고계약유형코드.위탁판매,
-        입고계약유형코드.마켓풀필먼트,
-        입고계약유형코드.수입통관풀필먼트
     ];
     private static readonly IReadOnlyList<현재원장컨텍스트> 현재원장스냅샷목록 =
     [
@@ -242,8 +229,6 @@ public partial class PlatformCommunityHome
     private IReadOnlyList<PlatformCommunityPostResponse> posts => ViewModel.PostList.Items;
     private List<IBrowserFile> selectedFiles => Composer.SelectedFiles;
     private CommunityPostComposerDraftViewModel form => Composer.Draft;
-    private ElementReference diagramCanvasElement;
-    private IJSObjectReference? diagramJsModule;
     private string selectedLedgerTemplateKey
     {
         get => DiagramWorkspace.SelectedLedgerTemplateKey;
@@ -271,16 +256,6 @@ public partial class PlatformCommunityHome
     {
         get => ViewModel.PostList.SearchText;
         set => ViewModel.PostList.SearchText = value;
-    }
-    private string ledgerPickerSearchText
-    {
-        get => LedgerPicker.SearchText;
-        set => LedgerPicker.SearchText = value;
-    }
-    private string ledgerPickerScope
-    {
-        get => LedgerPicker.Scope;
-        set => LedgerPicker.Scope = value;
     }
     private string? pendingLedgerId
     {
@@ -318,16 +293,12 @@ public partial class PlatformCommunityHome
         get => DiagramCanvas.SelectedEdgeId;
         set => DiagramCanvas.SelectedEdgeId = value;
     }
-    private string? 선택창고대행후보키;
     private 원장블록노드? nodeDetailPanelNode;
-    private 원장블록노드? 창고대행신청노드;
     private bool isDiagramEdgeOptionDockCollapsed
     {
         get => DiagramCanvas.IsEdgeOptionDockCollapsed;
         set => DiagramCanvas.IsEdgeOptionDockCollapsed = value;
     }
-    private bool 창고대행후보목록로딩중;
-    private bool 창고대행신청제출중;
     private DiagramHandleDrag? activeDiagramHandleDrag
     {
         get => DiagramCanvas.ActiveHandleDrag;
@@ -354,17 +325,6 @@ public partial class PlatformCommunityHome
         get => DiagramCanvas.NewConnectionLabel;
         set => DiagramCanvas.NewConnectionLabel = value;
     }
-    private string warehouseProxySupplierCode = string.Empty;
-    private string warehouseProxySupplierName = string.Empty;
-    private string warehouseProxyOrderReference = string.Empty;
-    private DateTime? warehouseProxyExpectedArrivalDate = DateTime.Today.AddDays(1);
-    private string warehouseProxyContractNo = string.Empty;
-    private string 창고대행계약유형 = 입고계약유형코드.보관대행;
-    private string warehouseProxyContractCounterpartyName = string.Empty;
-    private string warehouseProxyContractSettlementType = "보관료/작업비 협의";
-    private decimal warehouseProxyContractCommissionRate;
-    private decimal warehouseProxyContractDailyStorageFee;
-    private string 창고대행메모 = string.Empty;
     private string 원함입력 = string.Empty;
     private string 원함조건입력 = string.Empty;
     private CommunityLedgerFlowAnalysisResponse? 원함분석결과;
@@ -450,9 +410,6 @@ public partial class PlatformCommunityHome
         get => Shell.IsBaguaNavigatorOpen;
         set => Shell.IsBaguaNavigatorOpen = value;
     }
-    private bool isBaguaDockDragging;
-    private bool hasBaguaDockDragMoved;
-    private double baguaDockDragStartX;
     private string? statusMessage
     {
         get => Shell.StatusMessage;
@@ -483,7 +440,6 @@ public partial class PlatformCommunityHome
         get => LedgerPicker.HierarchyContext;
         set => LedgerPicker.HierarchyContext = value;
     }
-    private string? 창고대행신청알림문구;
     private string? 원장전송결과메시지;
     private Severity statusSeverity
     {
@@ -519,11 +475,9 @@ public partial class PlatformCommunityHome
             _ => CommunityComposerMessageKind.Info
         };
     }
-    private Severity 창고대행신청알림수준 = Severity.Info;
     private Severity 원장전송결과Severity = Severity.Info;
     private bool isDisposed;
     private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체글", "추천글", "공지"];
-    private static readonly IReadOnlyList<string> LedgerPickerScopes = ["전체", "내 원장", "공개 원장"];
 
     private bool IsDiagramMode => DiagramPalette.IsDiagramMode;
 
@@ -545,40 +499,6 @@ public partial class PlatformCommunityHome
         : isWorkMode
         ? "platform-community-main-grid platform-home-section-hidden"
         : "platform-community-main-grid";
-
-    private string BuildDiagramEdgeDockClass(원장블록연결선? selectedDiagramEdge)
-    {
-        var state = isDiagramEdgeOptionDockCollapsed
-            ? " platform-ledger-edge-options-dock--collapsed"
-            : " platform-ledger-edge-options-dock--expanded";
-        var empty = selectedDiagramEdge is null
-            ? " platform-ledger-edge-options-dock--empty"
-            : string.Empty;
-        return $"platform-ledger-edge-options-dock{state}{empty}";
-    }
-
-    private string BuildDiagramEdgeDockToggleClass()
-        => isDiagramEdgeOptionDockCollapsed
-            ? "platform-ledger-edge-dock-toggle platform-ledger-edge-dock-toggle--collapsed"
-            : "platform-ledger-edge-dock-toggle platform-ledger-edge-dock-toggle--expanded";
-
-    private string BuildDiagramEdgeDockToggleIcon()
-        => isDiagramEdgeOptionDockCollapsed
-            ? Icons.Material.Filled.ChevronLeft
-            : Icons.Material.Filled.ChevronRight;
-
-    private string BuildDiagramEdgeDockToggleLabel()
-        => isDiagramEdgeOptionDockCollapsed ? "선 옵션 열기" : "선 옵션 접기";
-
-    private void ToggleDiagramEdgeOptionDock()
-    {
-        isDiagramEdgeOptionDockCollapsed = !isDiagramEdgeOptionDockCollapsed;
-    }
-
-    private void CollapseDiagramEdgeOptionDock()
-    {
-        isDiagramEdgeOptionDockCollapsed = true;
-    }
 
     private string WorkPanelClass => isWorkMode && !IsDiagramMode
         ? "pa-4 platform-work-panel"

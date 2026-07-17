@@ -102,54 +102,26 @@ public partial class PlatformCommunityHome
         return true;
     }
 
-    private async Task BeginDiagramHandleDragAsync(
-        원장블록노드 node,
-        DiagramConnectionHandleKind handle,
-        MouseEventArgs eventArgs)
+    private void BeginDiagramHandlePointerDrag(PlatformCommunityDiagramHandlePointerStart request)
     {
-        if (eventArgs.Button != 0)
+        if (request.Button != 0)
         {
             return;
         }
 
         if (activeDiagramHandleDrag is not null)
         {
-            CompleteDiagramHandleDrag(node, handle);
+            CompleteDiagramHandleDrag(request.Node, request.Handle);
             return;
         }
 
-        if (!CanStartDiagramConnection(node, handle))
+        if (!CanStartDiagramConnection(request.Node, request.Handle))
         {
             return;
         }
 
-        StartDiagramHandleDrag(node, handle);
-        await UpdateDiagramDragPointerAsync(eventArgs.ClientX, eventArgs.ClientY);
-    }
-
-    private async Task BeginDiagramHandlePointerDragAsync(
-        원장블록노드 node,
-        DiagramConnectionHandleKind handle,
-        PointerEventArgs eventArgs)
-    {
-        if (eventArgs.Button != 0)
-        {
-            return;
-        }
-
-        if (activeDiagramHandleDrag is not null)
-        {
-            CompleteDiagramHandleDrag(node, handle);
-            return;
-        }
-
-        if (!CanStartDiagramConnection(node, handle))
-        {
-            return;
-        }
-
-        StartDiagramHandleDrag(node, handle);
-        await UpdateDiagramDragPointerAsync(eventArgs.ClientX, eventArgs.ClientY);
+        StartDiagramHandleDrag(request.Node, request.Handle);
+        diagramDragPointer = request.Point;
     }
 
     private void StartDiagramHandleDrag(원장블록노드 node, DiagramConnectionHandleKind handle)
@@ -165,6 +137,12 @@ public partial class PlatformCommunityHome
             BuildDefaultEdgeLabel(node, null),
             BuildDiagramConnectionGuidance(node));
     }
+
+    private void CompleteDiagramHandlePointerUp(PlatformCommunityDiagramDesktopHandle handle)
+        => CompleteDiagramHandleDrag(handle.Node, handle.Handle);
+
+    private void HandleDiagramDesktopHandleClick(PlatformCommunityDiagramDesktopHandle handle)
+        => HandleDiagramHandleClick(handle.Node, handle.Handle);
 
     private void HandleDiagramHandleClick(원장블록노드 node, DiagramConnectionHandleKind handle)
     {
@@ -187,7 +165,7 @@ public partial class PlatformCommunityHome
         CompleteDiagramHandleDrag(node, handle);
     }
 
-    private async Task HandleDiagramCanvasMouseMoveAsync(MouseEventArgs eventArgs)
+    private void HandleDiagramDragPointerChanged(DiagramDragPoint point)
     {
         if (activeDiagramHandleDrag is null)
         {
@@ -195,47 +173,17 @@ public partial class PlatformCommunityHome
         }
 
         diagramHandleDragMoved = true;
-        await UpdateDiagramDragPointerAsync(eventArgs.ClientX, eventArgs.ClientY);
+        diagramDragPointer = point;
     }
 
-    private async Task HandleDiagramCanvasPointerMoveAsync(PointerEventArgs eventArgs)
+    private void CompleteDiagramHandleDrop(DiagramHandleHit? hit)
     {
         if (activeDiagramHandleDrag is null)
         {
             return;
         }
 
-        diagramHandleDragMoved = true;
-        await UpdateDiagramDragPointerAsync(eventArgs.ClientX, eventArgs.ClientY);
-    }
-
-    private async Task HandleDiagramCanvasMouseUpAsync(MouseEventArgs eventArgs)
-    {
-        await CompleteDiagramHandleDragFromClientPointAsync(eventArgs.ClientX, eventArgs.ClientY);
-    }
-
-    private async Task HandleDiagramCanvasPointerUpAsync(PointerEventArgs eventArgs)
-    {
-        await CompleteDiagramHandleDragFromClientPointAsync(eventArgs.ClientX, eventArgs.ClientY);
-    }
-
-    private async Task CompleteDiagramHandleDragFromClientPointAsync(double clientX, double clientY)
-    {
-        if (activeDiagramHandleDrag is null)
-        {
-            return;
-        }
-
-        var module = await GetDiagramJsModuleAsync();
-        var hit = module is null
-            ? null
-            : await module.InvokeAsync<DiagramHandleHit?>(
-                "findConnectionHandle",
-                clientX,
-                clientY);
-
-        if (hit is null ||
-            !TryParseDiagramHandle(hit.Handle, out var targetHandle))
+        if (hit is null || !TryParseDiagramHandle(hit.Handle, out var targetHandle))
         {
             if (diagramHandleDragMoved)
             {
@@ -255,40 +203,6 @@ public partial class PlatformCommunityHome
 
         CompleteDiagramHandleDrag(targetNode, targetHandle);
     }
-
-    private async Task UpdateDiagramDragPointerAsync(double clientX, double clientY)
-    {
-        var module = await GetDiagramJsModuleAsync();
-        if (module is null)
-        {
-            return;
-        }
-
-        diagramDragPointer = await module.InvokeAsync<DiagramDragPoint>(
-            "toDiagramPoint",
-            diagramCanvasElement,
-            clientX,
-            clientY);
-    }
-
-    private async ValueTask<IJSObjectReference?> GetDiagramJsModuleAsync()
-    {
-        if (diagramJsModule is not null)
-        {
-            return diagramJsModule;
-        }
-
-        try
-        {
-            diagramJsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/platformDiagram.js");
-            return diagramJsModule;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
     private void CompleteDiagramHandleDrag(원장블록노드 node, DiagramConnectionHandleKind targetHandle)
     {
         if (activeDiagramHandleDrag is null)

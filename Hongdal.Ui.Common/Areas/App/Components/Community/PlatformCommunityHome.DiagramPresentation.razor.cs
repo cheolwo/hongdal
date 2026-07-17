@@ -55,6 +55,124 @@ public partial class PlatformCommunityHome
         return $"platform-ledger-mobile-connector{selected}{empty}";
     }
 
+    private IReadOnlyList<PlatformCommunityDiagramMobileStep> BuildMobileDiagramSteps(
+        IReadOnlyList<원장블록노드> nodes,
+        IReadOnlyList<원장블록연결선> edges)
+    {
+        var steps = new List<PlatformCommunityDiagramMobileStep>(nodes.Count);
+        for (var index = 0; index < nodes.Count; index++)
+        {
+            var node = nodes[index];
+            var state = 원장블록처리상태해결(index, nodes);
+            var readiness = 노드입력준비도해결(node, state);
+            var sticker = 원장블록노드스티커해결(node);
+            var nextNode = index < nodes.Count - 1 ? nodes[index + 1] : null;
+            var primaryEdge = nextNode is null
+                ? null
+                : edges.FirstOrDefault(edge =>
+                    string.Equals(edge.FromTitle, node.Title, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(edge.ToTitle, nextNode.Title, StringComparison.OrdinalIgnoreCase));
+            var extraEdges = edges
+                .Where(edge =>
+                    string.Equals(edge.FromTitle, node.Title, StringComparison.OrdinalIgnoreCase)
+                    && (nextNode is null || !string.Equals(edge.ToTitle, nextNode.Title, StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+
+            steps.Add(new(
+                index + 1,
+                node,
+                BuildMobileDiagramNodeClass(node, index, nodes),
+                BuildNodeReadinessStyle(readiness),
+                흐름노드역할라벨해결(node),
+                BuildNodeProcessingStateLabel(state),
+                원장블록노드아이콘해결(node),
+                sticker?.이미지Url,
+                sticker?.대체Text ?? node.Title,
+                readiness,
+                도형레이어배지목록생성(node, index, nodes),
+                원장블록노드선택됨(node),
+                CanStartDiagramConnection(node),
+                primaryEdge,
+                BuildMobileDiagramConnectorClass(primaryEdge),
+                extraEdges));
+        }
+
+        return steps;
+    }
+
+    private PlatformCommunityDiagramDesktopCanvasPresentation BuildDesktopDiagramPresentation(
+        IReadOnlyList<원장블록노드> nodes,
+        IReadOnlyList<원장블록연결선> edges,
+        double minimumHeight)
+    {
+        var presentedEdges = edges
+            .Select(edge => new
+            {
+                Edge = edge,
+                Geometry = BuildDiagramEdgeGeometry(edge, nodes, minimumHeight)
+            })
+            .Where(item => item.Geometry is not null)
+            .Select(item => new PlatformCommunityDiagramDesktopEdge(
+                item.Edge,
+                item.Geometry!,
+                BuildDiagramEdgePathClass(item.Edge),
+                BuildDiagramEdgeLabelClass(item.Edge),
+                BuildDiagramEdgeLabelStyle(item.Geometry!)))
+            .ToArray();
+        var presentedNodes = new List<PlatformCommunityDiagramDesktopNode>(nodes.Count);
+        var presentedHandles = new List<PlatformCommunityDiagramDesktopHandle>();
+
+        for (var index = 0; index < nodes.Count; index++)
+        {
+            var node = nodes[index];
+            var inputFields = 도형입력항목해결(node);
+            var sticker = 원장블록노드스티커해결(node);
+            var readiness = 노드입력준비도해결(node, 원장블록처리상태해결(index, nodes));
+            var nodeStyle = $"{원장블록노드스타일생성(index, nodes, minimumHeight)} "
+                + $"{BuildDiagramNodeStackStyle(node, nodes)} "
+                + BuildNodeReadinessStyle(readiness);
+
+            presentedNodes.Add(new(
+                node,
+                원장블록노드클래스생성(node, index, nodes),
+                nodeStyle,
+                IsDiagramLayerVisible(DiagramLayerRole) ? 흐름노드역할라벨해결(node) : null,
+                원장블록노드아이콘해결(node),
+                sticker?.이미지Url,
+                sticker?.대체Text ?? node.Title,
+                sticker?.표시명 ?? node.Title,
+                도형입력요약제목생성(inputFields),
+                readiness,
+                도형레이어배지목록생성(node, index, nodes),
+                원장블록노드선택됨(node)));
+
+            foreach (var handle in ResolveDiagramConnectionHandles(node))
+            {
+                presentedHandles.Add(new(
+                    node,
+                    handle,
+                    BuildDiagramHandleClass(handle),
+                    $"{BuildDiagramHandleStyle(index, handle, nodes, minimumHeight)} {BuildDiagramHandleStackStyle(node, nodes)}",
+                    BuildDiagramHandleKey(handle),
+                    BuildDiagramHandleLabel(handle)));
+            }
+        }
+
+        var previewPath = activeDiagramHandleDrag is not null && diagramDragPointer is not null
+            ? BuildDiagramPreviewEdgeGeometry(activeDiagramHandleDrag, nodes, diagramDragPointer, minimumHeight)?.Path
+            : null;
+
+        return new(
+            BuildDiagramCanvasClass("platform-ledger-flow-diagram platform-ledger-flow-diagram--canvas platform-ledger-flow-diagram--stage-canvas platform-ledger-desktop-canvas"),
+            BuildDiagramCanvasStyle(nodes, minimumHeight),
+            BuildDiagramViewBox(nodes, minimumHeight),
+            presentedEdges,
+            presentedNodes,
+            presentedHandles,
+            previewPath,
+            activeDiagramHandleDrag);
+    }
+
     private 원장블록처리상태 원장블록처리상태해결(
         int nodeIndex,
         IReadOnlyList<원장블록노드> nodes)

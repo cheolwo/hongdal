@@ -3,6 +3,7 @@ using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Versioning;
 using Hongdal.Contracts.Common.Warehouse;
+using Hongdal.Ui.Common.Areas.App;
 using Hongdal.Ui.Common.Areas.App.Models;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
@@ -42,7 +43,7 @@ public partial class PlatformCommunityHome
     {
         원장블록노드선택(node);
         OpenNodeDetailPanel(node);
-        창고대행신청패널닫기();
+        WarehouseProxy.Close();
         await Task.CompletedTask;
     }
 
@@ -77,10 +78,10 @@ public partial class PlatformCommunityHome
         }
 
         CloseNodeDetailPanel();
-        창고대행신청노드 = node;
-        창고대행신청알림문구 = null;
-        창고대행신청알림수준 = Severity.Info;
-        await 창고대행후보목록불러오기Async();
+        await WarehouseProxy.OpenAsync(new(
+            node.Title,
+            node.GroupLabel,
+            node.Description));
     }
 
     private void NavigateToNodeDetailPage()
@@ -93,7 +94,7 @@ public partial class PlatformCommunityHome
 
         var action = BuildNodeDetailAction(node);
         CloseNodeDetailPanel();
-        창고대행신청패널닫기();
+        WarehouseProxy.Close();
 
         if (action.Url.StartsWith("/community", StringComparison.OrdinalIgnoreCase))
         {
@@ -106,6 +107,56 @@ public partial class PlatformCommunityHome
 
         DiagramPalette.SetDiagramMode(false);
         Navigation.NavigateTo(action.Url);
+    }
+
+    private void NavigateToWarehouseProxyWorkspace(string targetUrl)
+    {
+        HomeModeState.SetWorkMode(true);
+        DiagramPalette.SetDiagramMode(false);
+        Navigation.NavigateTo(targetUrl);
+    }
+
+    private PlatformCommunityDiagramNodeDetailPresentation BuildNodeDetailPresentation(원장블록노드 node)
+    {
+        var state = ResolveNodeDetailProcessingState(node);
+        var readiness = 노드입력준비도해결(node, state);
+        var currentLedger = 선택현재원장;
+        return new(
+            node,
+            BuildNodeProcessingStateLabel(state),
+            BuildNodeProcessingStateColor(state),
+            BuildNodeKindLabel(node.Kind),
+            IsDiagramMode ? BuildDiagramNodeStackLabel(node) : null,
+            node.Kind.Equals("form", StringComparison.OrdinalIgnoreCase)
+                ? ResolveDiagramFormKindLabel(node.FormKind)
+                : null,
+            readiness,
+            readiness.Percent >= 100
+                ? "platform-diagram-node-readiness-card platform-diagram-node-readiness-card--complete"
+                : "platform-diagram-node-readiness-card",
+            BuildNodeReadinessStyle(readiness),
+            ResolveNodeDetailContextValues(node),
+            도형입력항목해결(node),
+            currentLedger is null ? null : $"{currentLedger.Title} · {currentLedger.StateLabel}",
+            BuildNodeDetailAction(node),
+            IsDiagramMode,
+            CanBringSelectedDiagramNodeToFront(),
+            CanSendSelectedDiagramNodeToBack(),
+            창고대행신청노드인가(node));
+    }
+
+    private string ResolveNodeDetailFormValue(도형입력항목 field)
+        => nodeDetailPanelNode is null ? string.Empty : GetDiagramFormValue(nodeDetailPanelNode, field);
+
+    private void HandleNodeDetailLedgerBlockValueChanged(PlatformCommunityLedgerBlockValueChange change)
+        => Set원장블록입력값(change.BlockCode, change.Value);
+
+    private void HandleNodeDetailFormValueChanged(PlatformCommunityDiagramFormValueChange change)
+    {
+        if (nodeDetailPanelNode is not null)
+        {
+            SetDiagramFormValue(nodeDetailPanelNode, change.Field, change.Value);
+        }
     }
 
     private 도형상세동작 BuildNodeDetailAction(원장블록노드 node)
@@ -122,7 +173,7 @@ public partial class PlatformCommunityHome
         };
 
         return new(
-            BuildUrlWithQuery(basePath, values),
+            PlatformCommunityNavigationQuery.Build(basePath, values),
             BuildNodeDetailActionDescription(node, basePath),
             ResolveNodeDetailActionIcon(basePath),
             ResolveNodeDetailActionColor(basePath));

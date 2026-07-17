@@ -64,7 +64,7 @@
             @foreach (var post in Posts)
             {
                 <div class="@BuildPostRowClass(post)" role="row">
-                    <span class="platform-community-forum-number" role="cell">@(post.IsOperatorPinned ? "공지" : post.IsSystemGenerated ? "성립" : post.Id.ToString(CultureInfo.InvariantCulture))</span>
+                    <span class="platform-community-forum-number" role="cell">@(post.IsOperatorPinned ? "공지" : post.IsSystemGenerated ? CommunitySystemPostDisplay.ShortLabel(post.SystemPostKind) : post.Id.ToString(CultureInfo.InvariantCulture))</span>
                     <span class="platform-community-forum-category" role="cell">@post.Category</span>
                     <span class="platform-community-forum-subject" role="cell">
                         <button type="button"

@@ -17,14 +17,6 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
-    private string BuildCommunityBoardClass(string board)
-    {
-        var selected = string.Equals(selectedBoardFilter, board, StringComparison.OrdinalIgnoreCase)
-            ? " platform-community-board-card--selected"
-            : string.Empty;
-        return $"platform-community-board-card{selected}";
-    }
-
     private static string ResolveCommunityBoardIcon(string board)
         => board switch
         {

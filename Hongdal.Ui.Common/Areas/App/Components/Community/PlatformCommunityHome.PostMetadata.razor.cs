@@ -181,37 +181,6 @@ public partial class PlatformCommunityHome
         return IsReportPost(post) ? "익명 신고자" : post.Nickname;
     }
 
-    private static bool HasPublicAuthorCountry(PlatformCommunityPostResponse post)
-        => post.IsAuthorDisplayCountryPublic
-           && !string.IsNullOrWhiteSpace(post.AuthorDisplayCountryCode)
-           && !string.IsNullOrWhiteSpace(post.AuthorDisplayCountryName)
-           && !IsReportPost(post);
-
-    private static string FormatPostCountryInline(PlatformCommunityPostResponse post)
-        => HasPublicAuthorCountry(post)
-            ? $" · 활동 국가 {post.AuthorDisplayCountryCode} {post.AuthorDisplayCountryName}"
-            : string.Empty;
-
-    private static string DisplayCommentNickname(PlatformCommunityPostResponse post, string nickname)
-    {
-        return IsReportPost(post) ? "익명 참여자" : nickname;
-    }
-
-    private static string ReportReporterLabel(PlatformCommunityPostResponse post)
-    {
-        return post.IsReportSubjectMasked ? "익명 신고자" : Fallback(post.ReporterDisplayName, "신고자");
-    }
-
-    private static string ReportReportedLabel(PlatformCommunityPostResponse post)
-    {
-        return post.IsReportSubjectMasked ? "익명 피신고자" : Fallback(post.ReportedDisplayName, "피신고자");
-    }
-
-    private static string Fallback(string? value, string fallback)
-    {
-        return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
-    }
-
     private static bool ContainsReportKeyword(string? category)
     {
         if (string.IsNullOrWhiteSpace(category))

@@ -196,17 +196,6 @@ public partial class PlatformCommunityHome
             _ => "curve"
         };
 
-    private static string BuildDiagramEdgeStyleLabel(DiagramEdgeStyleKind style)
-        => style switch
-        {
-            DiagramEdgeStyleKind.Straight => "직선",
-            DiagramEdgeStyleKind.Elbow => "꺾은선",
-            _ => "곡선"
-        };
-
-    private static string BuildDiagramEdgeStylePreviewClass(DiagramEdgeStyleKind style)
-        => $"platform-ledger-edge-style-preview platform-ledger-edge-style-preview--{BuildDiagramEdgeStyleKey(style)}";
-
     private static string BuildDiagramHandleClass(DiagramConnectionHandleKind handle)
     {
         var role = IsDiagramOutputHandle(handle)

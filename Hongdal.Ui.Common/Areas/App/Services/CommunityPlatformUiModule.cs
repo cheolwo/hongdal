@@ -24,6 +24,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<PlatformCommunityDiagramChatViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramCanvasViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();
+        services.TryAddTransient<PlatformCommunityWarehouseProxyViewModel>();
         services.TryAddTransient<PlatformCommunityHomePageViewModel>();
         services.TryAddTransient<ICommunityCollectiveActionSource, PlatformCommunityCollectiveActionSource>();
         services.TryAddTransient<CommunityActionJourneyNavigationViewModel>();

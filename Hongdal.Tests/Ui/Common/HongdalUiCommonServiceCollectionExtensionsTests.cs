@@ -114,6 +114,10 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(PlatformCommunityDiagramWorkspaceViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityWarehouseProxyViewModel)
+            && x.ImplementationType == typeof(PlatformCommunityWarehouseProxyViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(YouTubeFoodCommunityDiscoveryService)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>

@@ -118,16 +118,6 @@ public partial class PlatformCommunityHome
     }
 
 
-    private async Task RecommendPostAsync(PlatformCommunityPostResponse post)
-        => await ApplyCommandResultAsync(await Engagement.RecommendAsync(post.Id));
-
-    private async Task ToggleOperatorPinAsync(PlatformCommunityPostResponse post)
-        => await ApplyCommandResultAsync(
-            await Engagement.SetOperatorPinAsync(post.Id, !post.IsOperatorPinned));
-
-    private async Task SaveCommentAsync(PlatformCommunityPostResponse post)
-        => await ApplyCommandResultAsync(await Engagement.SaveCommentAsync(post.Id));
-
     private Task BeginSalesInquiryAsync(PlatformCommunityPostResponse post, string message)
     {
         var commentForm = GetCommentForm(post.Id);
@@ -140,32 +130,8 @@ public partial class PlatformCommunityHome
         return Task.CompletedTask;
     }
 
-    private async Task DeleteCommentAsync(PlatformCommunityPostResponse post, PlatformCommunityPostCommentResponse comment)
-        => await ApplyCommandResultAsync(
-            await Engagement.DeleteCommentAsync(post.Id, comment.Id));
-
-    private async Task ReportCommentAsync(PlatformCommunityPostCommentResponse comment)
-        => await ApplyCommandResultAsync(await Engagement.ReportCommentAsync(comment.Id));
-
     private PlatformCommunityCommentForm GetCommentForm(long postId)
         => Engagement.GetCommentForm(postId);
-
-    private async Task SaveAttachmentCommentAsync(PlatformCommunityPostAttachmentResponse attachment)
-        => await ApplyCommandResultAsync(
-            await Engagement.SaveAttachmentCommentAsync(attachment.Id));
-
-    private async Task DeleteAttachmentCommentAsync(
-        PlatformCommunityPostAttachmentResponse attachment,
-        PlatformCommunityPostAttachmentCommentResponse comment)
-        => await ApplyCommandResultAsync(
-            await Engagement.DeleteAttachmentCommentAsync(attachment.Id, comment.Id));
-
-    private async Task ReportAttachmentCommentAsync(PlatformCommunityPostAttachmentCommentResponse comment)
-        => await ApplyCommandResultAsync(
-            await Engagement.ReportAttachmentCommentAsync(comment.Id));
-
-    private PlatformCommunityCommentForm GetAttachmentCommentForm(long attachmentId)
-        => Engagement.GetAttachmentCommentForm(attachmentId);
 
     private void BeginEdit(PlatformCommunityPostResponse post)
     {
@@ -217,44 +183,6 @@ public partial class PlatformCommunityHome
     {
         CommunityPostDrafts.Prepare(draft);
         ApplyPendingCommunityPostDraft();
-    }
-
-    private static bool IsYouTubeSharedLink(string? url)
-    {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-        {
-            return false;
-        }
-
-        var host = uri.Host.TrimStart('.');
-        return host.Equals("youtu.be", StringComparison.OrdinalIgnoreCase)
-               || host.Equals("youtube.com", StringComparison.OrdinalIgnoreCase)
-               || host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase)
-               || host.Equals("youtube-nocookie.com", StringComparison.OrdinalIgnoreCase)
-               || host.EndsWith(".youtube-nocookie.com", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static bool IsFoodYouTubeSharedPost(PlatformCommunityPostResponse post)
-        => post.Title.StartsWith("[음식 발견]", StringComparison.OrdinalIgnoreCase);
-
-    private static string ResolveSharedVideoEyebrow(PlatformCommunityPostResponse post)
-        => IsFoodYouTubeSharedPost(post)
-            ? "영상에서 발견한 음식"
-            : post.Title.StartsWith("[반야 나눔]", StringComparison.OrdinalIgnoreCase)
-                ? "영상과 함께 나눈 글귀"
-                : "커뮤니티에 공유한 영상";
-
-    private static string ResolveSharedVideoTitle(string title)
-    {
-        foreach (var prefix in new[] { "[반야 나눔] ", "[음식 발견] " })
-        {
-            if (title.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            {
-                return title[prefix.Length..];
-            }
-        }
-
-        return title;
     }
 
     private void ResetForm()
