@@ -1,4 +1,5 @@
 using Quartz;
+using Hongdal.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 using Hongdal.Infrastructure.BackgroundJobs.Content;
 using Hongdal.Infrastructure.BackgroundJobs.SalesOrders;
 using Hongdal.Services.LogisticsProcessing.SalesOrders;
@@ -18,8 +19,10 @@ public static partial class ServiceCollectionExtensions
         SalesChannelOrderSyncOptions salesOrderSyncOptions,
         YouTubeOptions youTubeOptions,
         HongikHakdangCardOptions hongikHakdangCardOptions,
+        AgriculturalFisheriesBatchOptions agriculturalFisheriesBatchOptions,
         HongdalExecutionOptions executionOptions)
     {
+        services.AddScoped<AgriculturalFisheriesBatchRunner>();
         services.AddQuartz(q =>
         {
             if (executionOptions.Mode == HongdalExecutionMode.Operational)
@@ -120,9 +123,63 @@ public static partial class ServiceCollectionExtensions
                             .RepeatForever()));
                 }
             }
+
+            if (agriculturalFisheriesBatchOptions.Enabled)
+            {
+                AddAgriculturalFisheriesBatchJobs(q, agriculturalFisheriesBatchOptions);
+            }
         });
 
         services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
         return services;
+    }
+
+    private static void AddAgriculturalFisheriesBatchJobs(
+        IServiceCollectionQuartzConfigurator quartz,
+        AgriculturalFisheriesBatchOptions options)
+    {
+        var timeZone = AgriculturalFisheriesBatchSchedule.ResolveTimeZone(options.TimeZoneId);
+
+        if (options.KamisDailyEnabled)
+        {
+            var jobKey = new JobKey("KamisDailyPriceCollection");
+            quartz.AddJob<KamisDailyPriceCollectionJob>(job => job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("KamisDailyPriceCollection-trigger")
+                .WithCronSchedule(
+                    options.KamisDailyCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
+        if (options.KamisMonthlyEnabled)
+        {
+            var jobKey = new JobKey("KamisMonthlyPriceCollection");
+            quartz.AddJob<KamisMonthlyPriceCollectionJob>(job => job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("KamisMonthlyPriceCollection-trigger")
+                .WithCronSchedule(
+                    options.KamisMonthlyCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
+        if (options.UsdaMonthlyEnabled)
+        {
+            var jobKey = new JobKey("UsdaMonthlyPriceCollection");
+            quartz.AddJob<UsdaMonthlyPriceCollectionJob>(job => job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("UsdaMonthlyPriceCollection-trigger")
+                .WithCronSchedule(
+                    options.UsdaMonthlyCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
     }
 }
