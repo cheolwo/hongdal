@@ -10,6 +10,7 @@ const roles = [
     startPath: "/community",
     screens: [
       { path: "/community", title: "생활 게시판", description: "동네 글과 댓글, 연결된 업무 원장을 함께 봅니다.", tag: "바로 보기" },
+      { path: "/community/write", title: "판매글 작성", description: "사진, 상품명, 수량, 가격과 결제 협의 방법을 게시글에 붙입니다.", tag: "모바일 체험" },
       { path: "/community/group-purchase", title: "공동구매 제안", description: "참여자와 수량, 가격, 공급 조건을 맞춥니다.", tag: "흐름 체험" },
       { path: "/community/group-import", title: "공동수입 검토", description: "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", tag: "흐름 체험" },
       { path: "/information/public-data", title: "농수산물 공개 정보", description: "공식 가격 자료와 출처를 비교해 봅니다.", tag: "바로 보기" }
@@ -503,6 +504,9 @@ function bindScreenInteractions(role) {
 function render() {
   const path = normalizePath(window.location.pathname);
   if (path === "/") renderHome();
+  else if (path === "/community") window.communitySalesPreview.renderBoard();
+  else if (path === "/community/write") window.communitySalesPreview.renderComposer();
+  else if (path === "/community/posts/101") window.communitySalesPreview.renderPost();
   else if (path === "/shipper/sales/pages/new") renderSalesPageComposer();
   else if (screenByPath.has(path)) renderScreen(screenByPath.get(path));
   else renderUnknown(path);
