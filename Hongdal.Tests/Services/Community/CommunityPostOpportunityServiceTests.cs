@@ -68,6 +68,380 @@ public sealed class CommunityPostOpportunityServiceTests
     }
 
     [Fact]
+    public async Task 평범한_게시글도_가벼운_참여진입을_제공한다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var service = CreateService(store);
+
+        var result = await service.GetAsync(72, "ko-KR");
+
+        Assert.NotNull(result);
+        Assert.Empty(result.Items);
+        Assert.Equal(CommunityPostParticipationStateCodes.Available, result.Participation.StateCode);
+        Assert.True(result.Participation.CanStart);
+        Assert.False(result.Participation.CanJoin);
+        Assert.False(result.Participation.AutoStartsWorkflow);
+        Assert.True(result.Participation.NonBinding);
+        Assert.True(result.Participation.RequiresExplicitPromotionToPlanning);
+        Assert.Equal(CommunityPostParticipationRoleCodes.All.Count, result.Participation.RoleOptions.Count);
+    }
+
+    [Fact]
+    public async Task 신고게시글은_거래참여와_가원장흐름에서_분리한다()
+    {
+        var source = CreateOrdinaryPost() with { IsReportBoardPost = true };
+        var store = new InMemoryPostStore(source);
+        var service = CreateService(store, voteService: new InMemoryCommunityVoteService());
+
+        var result = await service.GetAsync(source.PostId, "ko-KR");
+
+        Assert.NotNull(result);
+        Assert.Equal(CommunityPostParticipationStateCodes.Closed, result.Participation.StateCode);
+        Assert.False(result.Participation.CanStart);
+        Assert.Empty(result.Participation.RoleOptions);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.StartParticipationAsync(
+            source.PostId,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람"));
+    }
+
+    [Fact]
+    public async Task 독자가_명시적으로_시작하면_비구속적_역할관심투표만_만든다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var ledgerStore = new InMemoryLedgerStore();
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, ledgerStore, voteService);
+        var request = CreateParticipationStartRequest();
+
+        var started = await service.StartParticipationAsync(
+            72,
+            request,
+            "reader-1",
+            "읽던 사람");
+        var retried = await service.StartParticipationAsync(
+            72,
+            request,
+            "reader-2",
+            "다른 독자");
+        var votes = await voteService.ListBySourcePostAsync(72, CancellationToken.None);
+
+        Assert.False(started.ReusedExistingInterestVote);
+        Assert.True(retried.ReusedExistingInterestVote);
+        Assert.Equal(started.InterestVote.Id, retried.InterestVote.Id);
+        Assert.Equal(CommunityVoteKindCodes.CollectiveActionInterest, started.InterestVote.VoteKind);
+        Assert.Equal(72, started.InterestVote.SourcePostId);
+        Assert.Null(started.InterestVote.CommunityLedgerId);
+        Assert.True(started.InterestVote.AllowMultipleSelection);
+        Assert.False(started.InterestVote.ResolutionDocumentEnabled);
+        Assert.False(started.InterestVote.SignatureRequired);
+        Assert.Equal(CommunityPostParticipationStateCodes.Gathering, started.Participation.StateCode);
+        Assert.All(started.Participation.RoleOptions, option => Assert.False(string.IsNullOrWhiteSpace(option.OptionId)));
+        Assert.Single(votes.Items);
+        Assert.Null(store.Current.LinkedLedgerId);
+        Assert.Equal(0, ledgerStore.Count);
+    }
+
+    [Fact]
+    public async Task 참여관심모집은_두가지_명시적확인이_필요하다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, voteService: voteService);
+        var request = CreateParticipationStartRequest();
+        request.ConfirmNonBindingParticipation = false;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.StartParticipationAsync(
+            72,
+            request,
+            "reader-1",
+            "읽던 사람"));
+
+        var votes = await voteService.ListBySourcePostAsync(72, CancellationToken.None);
+        Assert.Empty(votes.Items);
+    }
+
+    [Fact]
+    public async Task 한사람이_여러_가능역할을_표시해도_참여자수는_한명으로_집계한다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, voteService: voteService);
+        var started = await service.StartParticipationAsync(
+            72,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람");
+        var selected = started.InterestVote.Options
+            .Where(option => option.ProductKey is "community-role:Carrier" or "community-role:FollowOnly")
+            .Select(option => option.OptionId)
+            .ToArray();
+
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                VoterKey = "reader-1",
+                VoterDisplayName = "읽던 사람",
+                OptionIds = selected
+            },
+            CancellationToken.None);
+        var result = await service.GetAsync(72, "ko-KR");
+
+        Assert.Equal(2, selected.Length);
+        Assert.Equal(1, result!.Participation.ParticipantCount);
+        Assert.Equal(1, result.Participation.RoleOptions.Single(x => x.RoleCode == CommunityPostParticipationRoleCodes.Carrier).InterestCount);
+        Assert.Equal(1, result.Participation.RoleOptions.Single(x => x.RoleCode == CommunityPostParticipationRoleCodes.FollowOnly).InterestCount);
+        Assert.Null(store.Current.LinkedLedgerId);
+    }
+
+    [Fact]
+    public async Task 두사람이_모이기전에는_가원장을_만들수없다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var ledgerStore = new InMemoryLedgerStore();
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, ledgerStore, voteService);
+        var started = await service.StartParticipationAsync(
+            72,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람");
+        var buyerOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:Buyer");
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "reader-1",
+                VoterKey = "session-1",
+                VoterDisplayName = "읽던 사람",
+                OptionIds = [buyerOption.OptionId]
+            },
+            CancellationToken.None);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PromoteParticipationAsync(
+            72,
+            CreatePromotionRequest(started.InterestVote.Id),
+            "author-2",
+            "작성자"));
+
+        Assert.Contains("2명 이상", exception.Message, StringComparison.Ordinal);
+        Assert.Null(store.Current.LinkedLedgerId);
+        Assert.Equal(0, ledgerStore.Count);
+    }
+
+    [Fact]
+    public async Task 작성자가_두사람의_관심을_비구속적_가원장으로_승격하고_재시도해도_한번만저장한다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var ledgerStore = new InMemoryLedgerStore();
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, ledgerStore, voteService);
+        var started = await service.StartParticipationAsync(
+            72,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람");
+        var buyerOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:Buyer");
+        var warehouseOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:WarehouseOperator");
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "reader-1",
+                VoterKey = "session-1",
+                VoterDisplayName = "구매 관심자",
+                OptionIds = [buyerOption.OptionId]
+            },
+            CancellationToken.None);
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "warehouse-1",
+                VoterKey = "session-2",
+                VoterDisplayName = "창고 담당자",
+                OptionIds = [warehouseOption.OptionId]
+            },
+            CancellationToken.None);
+
+        var request = CreatePromotionRequest(started.InterestVote.Id);
+        var promoted = await service.PromoteParticipationAsync(72, request, "author-2", "작성자");
+        var retried = await service.PromoteParticipationAsync(72, request, "author-2", "작성자");
+        var ledger = ledgerStore.Get(promoted.ProvisionalLedger.LedgerId);
+        var vote = await voteService.GetAsync(started.InterestVote.Id, CancellationToken.None);
+
+        Assert.False(promoted.ReusedExistingProvisionalLedger);
+        Assert.True(retried.ReusedExistingProvisionalLedger);
+        Assert.Equal(1, ledgerStore.Count);
+        Assert.NotNull(ledger);
+        Assert.Equal(1, ledger!.Revision);
+        Assert.Equal(커뮤니티원장상태.초안, ledger.상태);
+        Assert.Equal(CommunityLedgerTemplateKeys.GroupPurchase, ledger.원장템플릿Key);
+        Assert.Equal(
+            CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
+            ledger.확장속성[CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey]);
+        Assert.Equal("NonBinding", ledger.확장속성[CommunityPostProvisionalLedgerPolicy.BindingEffectAttributeKey]);
+        Assert.Contains(ledger.참여자목록, participant => participant.UserId == "reader-1");
+        Assert.Contains(ledger.참여자목록, participant => participant.UserId == "warehouse-1");
+        Assert.Equal(CommunityVoteStatusCodes.Closed, vote!.Status);
+        Assert.Equal(ledger.원장Id, vote.CommunityLedgerId);
+        Assert.Equal(CommunityPostParticipationStateCodes.ProvisionalLedgerCreated, promoted.Participation.StateCode);
+        Assert.False(promoted.Participation.CanJoin);
+        Assert.Equal(CommunityTradeDirectionCodes.Import, promoted.TradeDirectionCode);
+        Assert.Equal("US", promoted.OriginCountryCode);
+        Assert.Equal("KR", promoted.DestinationCountryCode);
+        Assert.Equal([CommunityTransportModeCodes.Ocean], promoted.TransportModeCodes);
+        Assert.True(promoted.Participation.PartyFormation.IsAvailable);
+        Assert.True(promoted.Participation.PartyFormation.NonBinding);
+        Assert.True(promoted.Participation.PartyFormation.PlatformDoesNotAssignWork);
+        Assert.True(promoted.Participation.PartyFormation.PlatformDoesNotCreateContracts);
+        Assert.Contains(promoted.Participation.PartyFormation.RoleSlots, slot =>
+            slot.RoleCode == CommunityPostPartyRoleCodes.Importer && slot.IsRequired);
+        Assert.Contains(promoted.Participation.PartyFormation.RoleSlots, slot =>
+            slot.RoleCode == CommunityPostPartyRoleCodes.Exporter && slot.IsRequired);
+        Assert.Contains(promoted.Participation.PartyFormation.RoleSlots, slot =>
+            slot.RoleCode == CommunityPostPartyRoleCodes.ImportCustomsBroker
+            && slot.IsRecommended
+            && slot.VerificationRequirementCode == CommunityPartyRoleVerificationRequirementCodes.JurisdictionLicenseOrRegistration);
+        Assert.Contains(promoted.Participation.PartyFormation.RoleSlots, slot =>
+            slot.RoleCode == CommunityPostPartyRoleCodes.OceanCarrier
+            && slot.IsRequired
+            && slot.VerificationRequirementCode == CommunityPartyRoleVerificationRequirementCodes.CarrierOperatingAuthority);
+        Assert.Contains(promoted.Participation.PartyFormation.RoleSlots, slot =>
+            slot.RoleCode == CommunityPostPartyRoleCodes.OceanFreightForwarder && slot.IsRecommended);
+        Assert.Equal(0, promoted.Participation.PartyFormation.RepresentedRequiredRoleSlotCount);
+        Assert.False(promoted.Participation.PartyFormation.IsReadyForRealLedgerReview);
+    }
+
+    [Fact]
+    public async Task 관심표시와_역할수락을_분리하고_필수당사자와_운송사가_수락해야_실원장검토가가능하다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var ledgerStore = new InMemoryLedgerStore();
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(store, ledgerStore, voteService);
+        var started = await service.StartParticipationAsync(
+            72,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람");
+        var buyerOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:Buyer");
+        var warehouseOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:WarehouseOperator");
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "buyer-interest-1",
+                VoterKey = "session-buyer",
+                VoterDisplayName = "구매 관심자",
+                OptionIds = [buyerOption.OptionId]
+            },
+            CancellationToken.None);
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "warehouse-interest-1",
+                VoterKey = "session-warehouse",
+                VoterDisplayName = "창고 관심자",
+                OptionIds = [warehouseOption.OptionId]
+            },
+            CancellationToken.None);
+        var promoted = await service.PromoteParticipationAsync(
+            72,
+            CreatePromotionRequest(started.InterestVote.Id),
+            "author-2",
+            "작성자");
+        var participationService = new CommunityPostProfessionalParticipationService(
+            store,
+            ledgerStore,
+            new InMemoryProfessionalEligibilityService(CommunityPostPartyRoleCodes.OceanCarrier));
+
+        JoinCommunityPostPartyRoleResponse? partyResult = null;
+        foreach (var role in new[]
+                 {
+                     CommunityPostPartyRoleCodes.Buyer,
+                     CommunityPostPartyRoleCodes.Seller,
+                     CommunityPostPartyRoleCodes.Importer,
+                     CommunityPostPartyRoleCodes.Exporter
+                 })
+        {
+            partyResult = await participationService.JoinPartyRoleAsync(
+                72,
+                new JoinCommunityPostPartyRoleRequest
+                {
+                    ProvisionalLedgerId = promoted.ProvisionalLedger.LedgerId,
+                    PartyRoleCode = role,
+                    ConfirmRoleCapacity = true,
+                    ConfirmVoluntaryNonBindingParticipation = true,
+                    ConfirmParticipantNotification = true
+                },
+                $"party-{role}",
+                $"{role} 참여자");
+        }
+
+        Assert.NotNull(partyResult);
+        Assert.Equal(4, partyResult.Participation.PartyFormation.RepresentedRequiredRoleSlotCount);
+        Assert.False(partyResult.Participation.PartyFormation.IsReadyForRealLedgerReview);
+
+        var carrierResult = await participationService.JoinAsync(
+            72,
+            new JoinCommunityPostProfessionalRequest
+            {
+                ProvisionalLedgerId = promoted.ProvisionalLedger.LedgerId,
+                ProfessionalRoleCode = CommunityPostPartyRoleCodes.OceanCarrier,
+                ConfirmProfessionalCapacity = true,
+                ConfirmVoluntaryNonBindingParticipation = true,
+                ConfirmParticipantNotification = true
+            },
+            "ocean-carrier-1",
+            "해상 운송사");
+        var retriedBuyer = await participationService.JoinPartyRoleAsync(
+            72,
+            new JoinCommunityPostPartyRoleRequest
+            {
+                ProvisionalLedgerId = promoted.ProvisionalLedger.LedgerId,
+                PartyRoleCode = CommunityPostPartyRoleCodes.Buyer,
+                ConfirmRoleCapacity = true,
+                ConfirmVoluntaryNonBindingParticipation = true,
+                ConfirmParticipantNotification = true
+            },
+            $"party-{CommunityPostPartyRoleCodes.Buyer}",
+            "Buyer 참여자");
+
+        Assert.True(carrierResult.Participation.PartyFormation.IsReadyForRealLedgerReview);
+        Assert.Equal(5, carrierResult.Participation.PartyFormation.RepresentedRequiredRoleSlotCount);
+        Assert.Contains("명시적으로 역할을 수락", carrierResult.Participation.PartyFormation.ReadinessMessage, StringComparison.Ordinal);
+        Assert.True(retriedBuyer.ReusedExistingParticipation);
+        Assert.True(retriedBuyer.Participation.PartyFormation.IsReadyForRealLedgerReview);
+        Assert.Contains(carrierResult.Participation.PartyFormation.RoleSlots, slot =>
+            slot.RoleCode == CommunityPostPartyRoleCodes.OceanCarrier
+            && slot.ConfirmedParticipantCount == 1
+            && slot.ExternalCredentialVerificationRequired
+            && !slot.ExternalCredentialVerified);
+    }
+
+    [Fact]
+    public async Task 게시글작성자가아니면_모인관심을_가원장으로_승격할수없다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var service = CreateService(store, voteService: new InMemoryCommunityVoteService());
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.PromoteParticipationAsync(
+            72,
+            CreatePromotionRequest(Guid.NewGuid()),
+            "reader-1",
+            "읽던 사람"));
+    }
+
+    [Fact]
     public async Task 해외작성자도_명시적으로_확인하면_같은게시글과_원장을_시작한다()
     {
         var store = new InMemoryPostStore(CreateImportPost(authorUserId: "exporter-1"));
@@ -127,15 +501,29 @@ public sealed class CommunityPostOpportunityServiceTests
             .GetCustomAttributes(typeof(AllowAnonymousAttribute), inherit: true).SingleOrDefault());
         Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.StartMeatImportReadiness))!
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.StartParticipation))!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.PromoteParticipation))!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.JoinProfessional))!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
+        Assert.NotNull(controller.GetMethod(nameof(CommunityPostOpportunitiesController.JoinPartyRole))!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
     }
 
     private static CommunityPostOpportunityService CreateService(
         InMemoryPostStore postStore,
-        InMemoryLedgerStore? ledgerStore = null)
-        => new(
+        InMemoryLedgerStore? ledgerStore = null,
+        ICommunityVoteService? voteService = null)
+    {
+        var effectiveLedgerStore = ledgerStore ?? new InMemoryLedgerStore();
+        return new CommunityPostOpportunityService(
             postStore,
             new CommunityPostOpportunityAnalyzer(),
-            new MeatImportReadinessService(ledgerStore ?? new InMemoryLedgerStore()));
+            new MeatImportReadinessService(effectiveLedgerStore),
+            voteService,
+            effectiveLedgerStore);
+    }
 
     private static CommunityPostOpportunitySource CreateImportPost(string authorUserId = "author-1")
         => new(
@@ -145,6 +533,37 @@ public sealed class CommunityPostOpportunityServiceTests
             "해외 작업장과 한국 수입업자가 검역·통관 준비 정보를 함께 확인하고 싶습니다.",
             authorUserId,
             null);
+
+    private static CommunityPostOpportunitySource CreateOrdinaryPost()
+        => new(
+            72,
+            "platform",
+            "아파트 장터에서 같이 나눌 사람 있나요",
+            "일단 편하게 의견부터 나눠봅니다.",
+            "author-2",
+            null);
+
+    private static StartCommunityPostParticipationRequest CreateParticipationStartRequest()
+        => new()
+        {
+            DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+            ConfirmExplicitStart = true,
+            ConfirmNonBindingParticipation = true
+        };
+
+    private static PromoteCommunityPostParticipationRequest CreatePromotionRequest(Guid voteId)
+        => new()
+        {
+            InterestVoteId = voteId,
+            CollectiveIntentTypeCode = CommunityCollectiveIntentTypeCodes.GroupImportCandidate,
+            TradeDirectionCode = CommunityTradeDirectionCodes.Import,
+            OriginCountryCode = "US",
+            DestinationCountryCode = "KR",
+            TransportModeCodes = [CommunityTransportModeCodes.Ocean],
+            ConfirmProvisionalLedger = true,
+            ConfirmNonBindingEvidence = true,
+            ConfirmParticipantNotifications = true
+        };
 
     private static StartCommunityMeatImportReadinessRequest CreateStartRequest(string initiatorSideCode)
         => new()
@@ -213,6 +632,19 @@ public sealed class CommunityPostOpportunityServiceTests
             Current = Current with { LinkedLedgerId = ledgerId };
             return Task.FromResult(CommunityPostLedgerLinkResult.Linked);
         }
+
+        public Task<CommunityPostMomentumUpdateResult> SetMomentumPromotionAsync(
+            long postId,
+            string ledgerId,
+            string momentumCode,
+            string momentumMessage,
+            int roleParticipantCount,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(
+                postId == Current.PostId
+                && string.Equals(Current.LinkedLedgerId, ledgerId, StringComparison.OrdinalIgnoreCase)
+                    ? CommunityPostMomentumUpdateResult.Updated
+                    : CommunityPostMomentumUpdateResult.ConflictingLedger);
     }
 
     private sealed class InMemoryLedgerStore : I커뮤니티원장저장소
@@ -220,6 +652,8 @@ public sealed class CommunityPostOpportunityServiceTests
         private readonly Dictionary<string, 커뮤니티원장Dto> _items = new(StringComparer.OrdinalIgnoreCase);
 
         public int Count => _items.Count;
+
+        public 커뮤니티원장Dto? Get(string ledgerId) => _items.GetValueOrDefault(ledgerId);
 
         public Task<커뮤니티원장Dto> 원장저장Async(
             커뮤니티원장저장요청 request,
@@ -274,5 +708,14 @@ public sealed class CommunityPostOpportunityServiceTests
             string updatedBy,
             CancellationToken cancellationToken = default)
             => Task.FromResult<커뮤니티원장Dto?>(null);
+    }
+
+    private sealed class InMemoryProfessionalEligibilityService(params string[] roleCodes)
+        : ICommunityProfessionalEligibilityService
+    {
+        public Task<IReadOnlyList<string>> GetVerifiedRoleCodesAsync(
+            string userId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<string>>(roleCodes);
     }
 }

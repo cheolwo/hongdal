@@ -1,5 +1,6 @@
 using Hongdal.Contracts.Common.ContractManagement;
 using Hongdal.Contracts.Common.Privacy;
+using System.Text.Json.Serialization;
 
 namespace Hongdal.Contracts.Common.Community;
 
@@ -61,6 +62,9 @@ public sealed class CommunityVoteCastRequest
 
     public string VoterKey { get; set; } = string.Empty;
 
+    [JsonIgnore]
+    public string? AuthenticatedUserId { get; set; }
+
     public IReadOnlyList<string> OptionIds { get; set; } = [];
 
     public int RequestedQuantity { get; set; } = 1;
@@ -74,6 +78,27 @@ public sealed class CommunityVoteCastRequest
     public string? PickupPointId { get; set; }
 
     public bool AllowNearbyPickupPointFallback { get; set; }
+}
+
+public sealed class CommunityInterestVotePromotionSnapshot
+{
+    public Guid VoteId { get; set; }
+    public long SourcePostId { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public string? CommunityLedgerId { get; set; }
+    public int ParticipantCount { get; set; }
+    public string EvidenceSnapshotHash { get; set; } = string.Empty;
+    public IReadOnlyList<CommunityInterestVoteParticipantSnapshot> Participants { get; set; } = [];
+    public IReadOnlyDictionary<string, int> RoleCounts { get; set; }
+        = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+}
+
+public sealed class CommunityInterestVoteParticipantSnapshot
+{
+    public string ParticipantReference { get; set; } = string.Empty;
+    public string? UserId { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
+    public IReadOnlyList<string> RoleCodes { get; set; } = [];
 }
 
 public sealed class CommunityGroupPurchaseVoteSettingsRequest
@@ -407,6 +432,8 @@ public static class CommunityVoteStatusCodes
 public static class CommunityVoteKindCodes
 {
     public const string General = "General";
+
+    public const string CollectiveActionInterest = "CollectiveActionInterest";
 
     public const string GroupPurchaseDemand = "GroupPurchaseDemand";
 }

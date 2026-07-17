@@ -15,7 +15,24 @@ public interface ICommunityVoteService
         string? hsCode,
         CancellationToken cancellationToken);
 
+    Task<CommunityVoteListResponse> ListBySourcePostAsync(
+        long sourcePostId,
+        CancellationToken cancellationToken);
+
     Task<CommunityVoteResponse?> GetAsync(Guid voteId, CancellationToken cancellationToken);
+
+    Task<CommunityInterestVotePromotionSnapshot?> GetInterestPromotionSnapshotAsync(
+        Guid voteId,
+        long sourcePostId,
+        CancellationToken cancellationToken);
+
+    Task<CommunityInterestVotePromotionSnapshot?> AttachProvisionalLedgerAsync(
+        Guid voteId,
+        long sourcePostId,
+        string communityLedgerId,
+        int minimumParticipantCount,
+        string promotedByDisplayName,
+        CancellationToken cancellationToken);
 
     Task<CommunityVoteResponse?> CastVoteAsync(Guid voteId, CommunityVoteCastRequest request, CancellationToken cancellationToken);
 
@@ -128,9 +145,31 @@ public class CommunityVoteService : ICommunityVoteService
         }
 
         var voteKind = Normalize(request.VoteKind, CommunityVoteKindCodes.General);
-        if (voteKind is not CommunityVoteKindCodes.General and not CommunityVoteKindCodes.GroupPurchaseDemand)
+        if (voteKind is not CommunityVoteKindCodes.General
+            and not CommunityVoteKindCodes.CollectiveActionInterest
+            and not CommunityVoteKindCodes.GroupPurchaseDemand)
         {
             throw new InvalidOperationException("지원하지 않는 투표 유형입니다.");
+        }
+
+        if (voteKind == CommunityVoteKindCodes.CollectiveActionInterest)
+        {
+            if (request.SourcePostId is null or <= 0)
+            {
+                throw new InvalidOperationException("참여 관심 투표는 원본 커뮤니티 게시글이 필요합니다.");
+            }
+
+            if (!request.AllowMultipleSelection)
+            {
+                throw new InvalidOperationException("참여 관심 투표는 여러 역할을 함께 선택할 수 있어야 합니다.");
+            }
+
+            if (request.ResolutionDocumentEnabled
+                || request.SignatureRequired
+                || !string.IsNullOrWhiteSpace(request.CommunityLedgerId))
+            {
+                throw new InvalidOperationException("참여 관심 투표에서는 원장, 결의문 또는 서명을 시작할 수 없습니다.");
+            }
         }
 
         if (request.ClosesAtUtc is not null && request.ClosesAtUtc <= DateTime.UtcNow)
@@ -190,6 +229,91 @@ public class CommunityVoteService : ICommunityVoteService
         return vote is null ? null : ToResponse(vote);
     }
 
+    public async Task<CommunityInterestVotePromotionSnapshot?> GetInterestPromotionSnapshotAsync(
+        Guid voteId,
+        long sourcePostId,
+        CancellationToken cancellationToken)
+    {
+        var vote = await _store.GetAsync(voteId, cancellationToken);
+        if (vote is null)
+        {
+            return null;
+        }
+
+        EnsureInterestVoteSource(vote, sourcePostId);
+        return ToPromotionSnapshot(vote);
+    }
+
+    public async Task<CommunityInterestVotePromotionSnapshot?> AttachProvisionalLedgerAsync(
+        Guid voteId,
+        long sourcePostId,
+        string communityLedgerId,
+        int minimumParticipantCount,
+        string promotedByDisplayName,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(communityLedgerId);
+        if (minimumParticipantCount < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(minimumParticipantCount));
+        }
+
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            var vote = await _store.GetAsync(voteId, cancellationToken);
+            if (vote is null)
+            {
+                return null;
+            }
+
+            EnsureInterestVoteSource(vote, sourcePostId);
+            if (vote.Votes.Count < minimumParticipantCount)
+            {
+                throw new InvalidOperationException(
+                    $"가원장은 서로 다른 관심 참여자 {minimumParticipantCount}명 이상이 모인 뒤 만들 수 있습니다.");
+            }
+
+            var normalizedLedgerId = communityLedgerId.Trim();
+            if (!string.IsNullOrWhiteSpace(vote.CommunityLedgerId))
+            {
+                if (!string.Equals(vote.CommunityLedgerId, normalizedLedgerId, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("이 관심 모집은 이미 다른 가원장에 연결되어 있습니다.");
+                }
+
+                return ToPromotionSnapshot(vote);
+            }
+
+            vote.CommunityLedgerId = normalizedLedgerId;
+            vote.Status = CommunityVoteStatusCodes.Closed;
+            vote.ClosedAtUtc ??= DateTime.UtcNow;
+            vote.ClosedByDisplayName = Normalize(promotedByDisplayName, "게시글 작성자");
+            var expectedRevision = vote.Revision++;
+            if (await _store.ReplaceAsync(vote, expectedRevision, cancellationToken))
+            {
+                return ToPromotionSnapshot(vote);
+            }
+        }
+
+        throw new InvalidOperationException("다른 참여자가 관심 모집을 먼저 변경했습니다. 최신 상태를 확인한 뒤 다시 시도해 주세요.");
+    }
+
+    public async Task<CommunityVoteListResponse> ListBySourcePostAsync(
+        long sourcePostId,
+        CancellationToken cancellationToken)
+    {
+        if (sourcePostId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(sourcePostId));
+        }
+
+        var items = await _store.ListBySourcePostAsync(sourcePostId, cancellationToken);
+        return new CommunityVoteListResponse
+        {
+            Items = items.Select(ToResponse).ToArray()
+        };
+    }
+
     public async Task<CommunityVoteResponse?> CastVoteAsync(Guid voteId, CommunityVoteCastRequest request, CancellationToken cancellationToken)
     {
         var vote = await _store.GetAsync(voteId, cancellationToken);
@@ -220,12 +344,17 @@ public class CommunityVoteService : ICommunityVoteService
                 throw new InvalidOperationException("존재하지 않는 투표 항목이 포함되어 있습니다.");
             }
 
-        var voterHash = Hash(Normalize(request.VoterKey, request.VoterDisplayName));
+        var authenticatedUserId = NormalizeOptional(request.AuthenticatedUserId);
+        var voterIdentity = authenticatedUserId is null
+            ? Normalize(request.VoterKey, request.VoterDisplayName)
+            : $"authenticated-user:{authenticatedUserId}";
+        var voterHash = Hash(voterIdentity);
         var groupPurchaseParticipation = ValidateGroupPurchaseParticipation(vote, request, voterHash);
         vote.Votes.RemoveAll(x => string.Equals(x.VoterHash, voterHash, StringComparison.Ordinal));
         vote.Votes.Add(new CommunityVoteCastRecord
         {
             VoterHash = voterHash,
+            VoterUserId = authenticatedUserId,
             VoterDisplayName = Normalize(request.VoterDisplayName, "익명 참여자"),
             OptionIds = selectedOptionIds,
             RequestedQuantity = groupPurchaseParticipation.RequestedQuantity,
@@ -263,15 +392,18 @@ public class CommunityVoteService : ICommunityVoteService
         vote.ClosedAtUtc = DateTime.UtcNow;
         vote.ClosedByDisplayName = Normalize(request.ClosedByDisplayName, "운영자");
         await SaveMutationAsync(vote, cancellationToken);
-        await _ledgerWorkflow.진행Async(
-            vote.Id,
-            new CommunityGroupPurchaseLedgerProgressRequest
-            {
-                StageCode = CommunityGroupPurchaseLedgerStageCodes.Counterparty,
-                Memo = "수요 모집을 마감하고 거래 상대 연결 단계로 진행했습니다."
-            },
-            vote.ClosedByDisplayName,
-            cancellationToken);
+        if (vote.GroupPurchase is not null)
+        {
+            await _ledgerWorkflow.진행Async(
+                vote.Id,
+                new CommunityGroupPurchaseLedgerProgressRequest
+                {
+                    StageCode = CommunityGroupPurchaseLedgerStageCodes.Counterparty,
+                    Memo = "수요 모집을 마감하고 거래 상대 연결 단계로 진행했습니다."
+                },
+                vote.ClosedByDisplayName,
+                cancellationToken);
+        }
         return ToResponse(vote);
     }
 
@@ -541,15 +673,90 @@ public class CommunityVoteService : ICommunityVoteService
         };
     }
 
+    private static void EnsureInterestVoteSource(CommunityVoteRecord vote, long sourcePostId)
+    {
+        if (sourcePostId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(sourcePostId));
+        }
+
+        if (!string.Equals(
+                vote.VoteKind,
+                CommunityVoteKindCodes.CollectiveActionInterest,
+                StringComparison.OrdinalIgnoreCase)
+            || vote.SourcePostId != sourcePostId)
+        {
+            throw new InvalidOperationException("게시글의 참여 관심 모집과 일치하는 투표가 아닙니다.");
+        }
+    }
+
+    private static CommunityInterestVotePromotionSnapshot ToPromotionSnapshot(CommunityVoteRecord vote)
+    {
+        var roleByOptionId = vote.Options.ToDictionary(
+            option => option.OptionId,
+            option => ParseParticipationRoleCode(option.ProductKey),
+            StringComparer.OrdinalIgnoreCase);
+        var participants = vote.Votes
+            .OrderBy(cast => cast.VotedAtUtc)
+            .Select(cast => new CommunityInterestVoteParticipantSnapshot
+            {
+                ParticipantReference = cast.VoterHash,
+                UserId = NormalizeOptional(cast.VoterUserId),
+                DisplayName = Normalize(cast.VoterDisplayName, "익명 참여자"),
+                RoleCodes = cast.OptionIds
+                    .Select(optionId => roleByOptionId.GetValueOrDefault(optionId))
+                    .Where(roleCode => !string.IsNullOrWhiteSpace(roleCode))
+                    .Select(roleCode => roleCode!)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Order(StringComparer.OrdinalIgnoreCase)
+                    .ToArray()
+            })
+            .ToArray();
+        var roleCounts = participants
+            .SelectMany(participant => participant.RoleCodes)
+            .GroupBy(roleCode => roleCode, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.Count(), StringComparer.OrdinalIgnoreCase);
+        var evidenceLines = participants
+            .OrderBy(participant => participant.ParticipantReference, StringComparer.Ordinal)
+            .Select(participant => $"{participant.ParticipantReference}:{string.Join(',', participant.RoleCodes)}")
+            .Prepend(vote.Id.ToString("D"));
+
+        return new CommunityInterestVotePromotionSnapshot
+        {
+            VoteId = vote.Id,
+            SourcePostId = vote.SourcePostId!.Value,
+            Status = vote.Status,
+            CommunityLedgerId = vote.CommunityLedgerId,
+            ParticipantCount = participants.Length,
+            EvidenceSnapshotHash = Hash(string.Join('\n', evidenceLines)),
+            Participants = participants,
+            RoleCounts = roleCounts
+        };
+    }
+
+    private static string? ParseParticipationRoleCode(string? productKey)
+    {
+        const string prefix = "community-role:";
+        if (string.IsNullOrWhiteSpace(productKey)
+            || !productKey.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        var roleCode = productKey[prefix.Length..].Trim();
+        return CommunityPostParticipationRoleCodes.All.FirstOrDefault(candidate =>
+            string.Equals(candidate, roleCode, StringComparison.OrdinalIgnoreCase));
+    }
+
     private static CommunityGroupPurchaseVoteSettingsRecord? CreateGroupPurchaseSettings(
         CommunityVoteCreateRequest request,
         string voteKind)
     {
-        if (voteKind == CommunityVoteKindCodes.General)
+        if (voteKind != CommunityVoteKindCodes.GroupPurchaseDemand)
         {
             if (request.GroupPurchase is not null)
             {
-                throw new InvalidOperationException("일반 투표에는 공동구매 설정을 지정할 수 없습니다.");
+                throw new InvalidOperationException("공동구매 수요 투표가 아닌 경우 공동구매 설정을 지정할 수 없습니다.");
             }
 
             return null;

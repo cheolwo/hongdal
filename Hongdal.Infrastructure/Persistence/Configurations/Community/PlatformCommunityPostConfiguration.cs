@@ -22,8 +22,12 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.커뮤니티원장Id).HasMaxLength(120);
         builder.Property(x => x.AuthorUserId).HasMaxLength(450);
         builder.Property(x => x.Nickname).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.AuthorDisplayCountryCode).HasMaxLength(2);
+        builder.Property(x => x.AuthorDisplayCountryName).HasMaxLength(80);
         builder.Property(x => x.ReporterDisplayName).HasMaxLength(40);
         builder.Property(x => x.ReportedDisplayName).HasMaxLength(40);
+        builder.Property(x => x.CommunityMomentumCode).HasMaxLength(40);
+        builder.Property(x => x.CommunityMomentumMessage).HasMaxLength(240);
         builder.Property(x => x.PasswordHash).HasMaxLength(200).IsRequired();
 
         builder.HasIndex(x => new { x.AppKey, x.IsDeleted, x.IsOperatorPinned, x.OperatorPinnedAtUtc, x.RecommendationCount, x.LastEngagedAtUtc, x.CreatedAtUtc });

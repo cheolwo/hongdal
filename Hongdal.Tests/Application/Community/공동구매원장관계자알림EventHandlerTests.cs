@@ -12,7 +12,7 @@ namespace Hongdal.Tests.Application.Community;
 public sealed class 공동구매원장관계자알림EventHandlerTests
 {
     [Fact]
-    public async Task 생성이후_공동구매원장_저장과_상태변경만_관계자알림을_적재한다()
+    public async Task 일반초안생성은_알리지않고_가원장생성과_후속변경만_관계자알림을_적재한다()
     {
         var service = new RecordingNotificationService();
         using var services = new ServiceCollection()
@@ -23,12 +23,17 @@ public sealed class 공동구매원장관계자알림EventHandlerTests
             NullLogger<공동구매원장관계자알림EventHandler>.Instance);
 
         await handler.Handle(CreateEvent(CommunityLedgerTemplateKeys.GroupPurchase, revision: 1, "저장"), default);
+        await handler.Handle(CreateEvent(
+            CommunityLedgerTemplateKeys.GroupPurchase,
+            revision: 1,
+            "저장",
+            provisional: true), default);
         await handler.Handle(CreateEvent(CommunityLedgerTemplateKeys.GroupPurchase, revision: 2, "저장"), default);
         await handler.Handle(CreateEvent(CommunityLedgerTemplateKeys.GroupPurchase, revision: 3, "상태변경"), default);
         await handler.Handle(CreateEvent(CommunityLedgerTemplateKeys.GroupImport, revision: 2, "저장"), default);
 
-        Assert.Equal(2, service.Events.Count);
-        Assert.Equal(["저장", "상태변경"], service.Events.Select(item => item.ChangeType));
+        Assert.Equal(3, service.Events.Count);
+        Assert.Equal(["저장", "저장", "상태변경"], service.Events.Select(item => item.ChangeType));
     }
 
     [Fact]
@@ -74,6 +79,62 @@ public sealed class 공동구매원장관계자알림EventHandlerTests
     }
 
     [Fact]
+    public void 가원장생성알림은_실행확정이아님을_명시한다()
+    {
+        var ledger = CreateLedger(CommunityLedgerTemplateKeys.GroupPurchase, revision: 1, provisional: true);
+
+        var json = 공동구매원장관계자알림Policy.BuildPayload(ledger, "member-1", "저장");
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        Assert.Contains("가원장", root.GetProperty("title").GetString(), StringComparison.Ordinal);
+        Assert.Contains("비구속적", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+        Assert.Contains("운송 주선은 확정되지 않았습니다", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void 역할참여알림은_역할과_외부면허확인경계를_명시한다()
+    {
+        var ledger = CreateLedger(CommunityLedgerTemplateKeys.GroupPurchase, revision: 2);
+        ledger.확장속성 = new Dictionary<string, string>
+        {
+            [CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinRevisionAttributeKey] = "2",
+            [CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinedDisplayNameAttributeKey] = "해상 물류 담당자",
+            [CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinedRoleCodeAttributeKey] =
+                CommunityPostPartyRoleCodes.OceanFreightForwarder
+        };
+
+        var json = 공동구매원장관계자알림Policy.BuildPayload(ledger, "member-1", "저장");
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        Assert.Contains("새 역할", root.GetProperty("title").GetString(), StringComparison.Ordinal);
+        Assert.Contains("해상 운송 주선업자", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+        Assert.Contains("외부 면허·등록 확인", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void 거래당사자역할수락알림은_계약과_최종책임이아님을_명시한다()
+    {
+        var ledger = CreateLedger(CommunityLedgerTemplateKeys.GroupPurchase, revision: 3);
+        ledger.확장속성 = new Dictionary<string, string>
+        {
+            [CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinRevisionAttributeKey] = "3",
+            [CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinedDisplayNameAttributeKey] = "구매 검토자",
+            [CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinedRoleCodeAttributeKey] =
+                CommunityPostPartyRoleCodes.Buyer
+        };
+
+        var json = 공동구매원장관계자알림Policy.BuildPayload(ledger, "member-1", "저장");
+        using var document = JsonDocument.Parse(json);
+        var body = document.RootElement.GetProperty("body").GetString();
+
+        Assert.Contains("구매자 역할을 비구속적으로 수락", body, StringComparison.Ordinal);
+        Assert.Contains("주문·계약·결제", body, StringComparison.Ordinal);
+        Assert.Contains("별도 합의 전까지 확정되지 않습니다", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void 동일이벤트는_항상_같은_중복방지키를_만든다()
     {
         var first = 공동구매원장관계자알림Policy.BuildTraceId("event-1", "fallback-1");
@@ -83,16 +144,20 @@ public sealed class 공동구매원장관계자알림EventHandlerTests
         Assert.Equal(64, first.Length);
     }
 
-    private static 커뮤니티원장변경됨Event CreateEvent(string templateKey, long revision, string changeType)
+    private static 커뮤니티원장변경됨Event CreateEvent(
+        string templateKey,
+        long revision,
+        string changeType,
+        bool provisional = false)
         => new(
-            CreateLedger(templateKey, revision),
+            CreateLedger(templateKey, revision, provisional),
             changeType,
             "actor",
             null,
             new DateTime(2026, 7, 15, 1, 2, 3, DateTimeKind.Utc),
             $"event-{revision}-{changeType}");
 
-    private static 커뮤니티원장Dto CreateLedger(string templateKey, long revision)
+    private static 커뮤니티원장Dto CreateLedger(string templateKey, long revision, bool provisional = false)
         => new()
         {
             원장Id = "group-purchase-ledger-1",
@@ -102,7 +167,14 @@ public sealed class 공동구매원장관계자알림EventHandlerTests
             제목 = "감자 공동구매",
             상태 = 커뮤니티원장상태.초안,
             생성자UserId = "owner",
-            참여자목록 = [Participant("member-1"), Participant("actor")]
+            참여자목록 = [Participant("member-1"), Participant("actor")],
+            확장속성 = provisional
+                ? new Dictionary<string, string>
+                {
+                    [CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey] = CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
+                    [CommunityPostProvisionalLedgerPolicy.ParticipantNotificationsAttributeKey] = bool.TrueString
+                }
+                : new Dictionary<string, string>()
         };
 
     private static 커뮤니티원장참여자Dto Participant(string? userId)

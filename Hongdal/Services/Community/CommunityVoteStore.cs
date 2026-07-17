@@ -19,6 +19,10 @@ internal interface ICommunityVoteStore
         string? normalizedHsCode,
         CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<CommunityVoteRecord>> ListBySourcePostAsync(
+        long sourcePostId,
+        CancellationToken cancellationToken);
+
     Task<CommunityVoteRecord?> GetAsync(Guid voteId, CancellationToken cancellationToken);
 
     Task<bool> ReplaceAsync(
@@ -105,6 +109,18 @@ internal sealed class MongoCommunityVoteStore : ICommunityVoteStore
             .Find(filter)
             .SortByDescending(x => x.CreatedAtUtc)
             .Limit(200)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<CommunityVoteRecord>> ListBySourcePostAsync(
+        long sourcePostId,
+        CancellationToken cancellationToken)
+    {
+        await EnsureIndexesAsync(cancellationToken);
+        return await _collection
+            .Find(x => x.SourcePostId == sourcePostId)
+            .SortByDescending(x => x.CreatedAtUtc)
+            .Limit(50)
             .ToListAsync(cancellationToken);
     }
 
@@ -420,6 +436,22 @@ internal sealed class InMemoryCommunityVoteStore : ICommunityVoteStore
         }
     }
 
+    public Task<IReadOnlyList<CommunityVoteRecord>> ListBySourcePostAsync(
+        long sourcePostId,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        lock (_gate)
+        {
+            return Task.FromResult<IReadOnlyList<CommunityVoteRecord>>(
+                _votes.Values
+                    .Where(x => x.SourcePostId == sourcePostId)
+                    .OrderByDescending(x => x.CreatedAtUtc)
+                    .Select(Clone)
+                    .ToArray());
+        }
+    }
+
     public Task<CommunityVoteRecord?> GetAsync(Guid voteId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -684,6 +716,7 @@ internal sealed class CommunityVoteOptionRecord
 internal sealed class CommunityVoteCastRecord
 {
     public string VoterHash { get; set; } = string.Empty;
+    public string? VoterUserId { get; set; }
     public string VoterDisplayName { get; set; } = string.Empty;
     public IReadOnlyList<string> OptionIds { get; set; } = [];
     public int RequestedQuantity { get; set; }

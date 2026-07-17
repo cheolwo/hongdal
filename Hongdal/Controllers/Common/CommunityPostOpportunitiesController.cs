@@ -86,6 +86,175 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
         }
     }
 
+    [HttpPost("participation/start")]
+    [Authorize]
+    public async Task<ActionResult<StartCommunityPostParticipationResponse>> StartParticipation(
+        long postId,
+        [FromBody] StartCommunityPostParticipationRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _service.StartParticipationAsync(
+                postId,
+                request,
+                CurrentUserId(),
+                CurrentDisplayName(),
+                cancellationToken);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFoundProblem(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "참여 관심 모집을 시작하려면 로그인이 필요합니다.",
+                detail: ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "참여 관심 모집 요청이 올바르지 않습니다.",
+                detail: ex.Message);
+        }
+    }
+
+    [HttpPost("participation/provisional-ledger")]
+    [Authorize]
+    public async Task<ActionResult<PromoteCommunityPostParticipationResponse>> PromoteParticipation(
+        long postId,
+        [FromBody] PromoteCommunityPostParticipationRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _service.PromoteParticipationAsync(
+                postId,
+                request,
+                CurrentUserId(),
+                CurrentDisplayName(),
+                cancellationToken);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFoundProblem(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "가원장을 만들 권한이 없습니다.",
+                detail: ex.Message);
+        }
+        catch (CommunityPostOpportunityConflictException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "게시글 원장 연결이 충돌했습니다.",
+                detail: ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "가원장 생성 요청이 올바르지 않습니다.",
+                detail: ex.Message);
+        }
+    }
+
+    [HttpPost("participation/professionals")]
+    [Authorize]
+    public async Task<ActionResult<JoinCommunityPostProfessionalResponse>> JoinProfessional(
+        long postId,
+        [FromBody] JoinCommunityPostProfessionalRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _service.JoinProfessionalAsync(
+                postId,
+                request,
+                CurrentUserId(),
+                CurrentDisplayName(),
+                cancellationToken);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFoundProblem(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "전문 역할 참여 자격을 확인할 수 없습니다.",
+                detail: ex.Message);
+        }
+        catch (CommunityPostOpportunityConflictException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "게시글과 가원장 연결이 충돌했습니다.",
+                detail: ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "전문가 참여 요청이 올바르지 않습니다.",
+                detail: ex.Message);
+        }
+    }
+
+    [HttpPost("participation/party-roles")]
+    [Authorize]
+    public async Task<ActionResult<JoinCommunityPostPartyRoleResponse>> JoinPartyRole(
+        long postId,
+        [FromBody] JoinCommunityPostPartyRoleRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _service.JoinPartyRoleAsync(
+                postId,
+                request,
+                CurrentUserId(),
+                CurrentDisplayName(),
+                cancellationToken);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFoundProblem(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "거래 당사자 역할을 수락하려면 로그인이 필요합니다.",
+                detail: ex.Message);
+        }
+        catch (CommunityPostOpportunityConflictException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "게시글과 가원장 연결이 충돌했습니다.",
+                detail: ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "거래 당사자 역할 참여 요청이 올바르지 않습니다.",
+                detail: ex.Message);
+        }
+    }
+
     private string CurrentUserId()
         => User.FindFirstValue(ClaimTypes.NameIdentifier)
            ?? User.FindFirstValue("sub")

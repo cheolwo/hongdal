@@ -102,7 +102,26 @@ public static class 공동구매원장관계자알림Policy
                CommunityLedgerTemplateKeys.GroupPurchase,
                StringComparison.OrdinalIgnoreCase)
            && (string.Equals(변경유형, "상태변경", StringComparison.Ordinal)
-               || string.Equals(변경유형, "저장", StringComparison.Ordinal) && 원장.Revision > 1);
+               || string.Equals(변경유형, "저장", StringComparison.Ordinal)
+               && (원장.Revision > 1 || IsNotifiableProvisionalLedger(원장)));
+
+    public static bool IsNotifiableProvisionalLedger(커뮤니티원장Dto 원장)
+    {
+        ArgumentNullException.ThrowIfNull(원장);
+        return 원장.Revision == 1
+               && 원장.확장속성.TryGetValue(
+                   CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey,
+                   out var maturityCode)
+               && string.Equals(
+                   maturityCode,
+                   CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
+                   StringComparison.OrdinalIgnoreCase)
+               && 원장.확장속성.TryGetValue(
+                   CommunityPostProvisionalLedgerPolicy.ParticipantNotificationsAttributeKey,
+                   out var notificationsRequested)
+               && bool.TryParse(notificationsRequested, out var requested)
+               && requested;
+    }
 
     public static IReadOnlyList<string> ResolveRecipientUserIds(
         커뮤니티원장Dto 원장,
@@ -135,9 +154,22 @@ public static class 공동구매원장관계자알림Policy
         var stateSummary = string.IsNullOrWhiteSpace(원장.현재단계Key)
             ? 원장.상태
             : $"{원장.상태} · {원장.현재단계Key.Trim()}";
-        var body = string.Equals(변경유형, "상태변경", StringComparison.Ordinal)
-            ? $"{title}의 진행 상태가 {stateSummary}(으)로 변경되었습니다."
-            : $"{title}의 조건 또는 참여 내용이 변경되었습니다.";
+        var provisionalCreated = string.Equals(변경유형, "저장", StringComparison.Ordinal)
+                                 && IsNotifiableProvisionalLedger(원장);
+        var roleParticipantJoined = TryReadRoleParticipation(
+            원장,
+            out var joinedDisplayName,
+            out var joinedRoleLabel,
+            out var specialistRoleJoined);
+        var body = provisionalCreated
+            ? $"{title}에 관심이 모여 비구속적 가원장이 만들어졌습니다. 아직 주문·계약·배차·운송 주선은 확정되지 않았습니다."
+            : roleParticipantJoined
+                ? specialistRoleJoined
+                    ? $"{joinedDisplayName}님이 {joinedRoleLabel} 역할로 거래 참여팀에 합류했습니다. 플랫폼 역할 확인은 외부 면허·등록 확인이나 업무 수임을 대신하지 않습니다."
+                    : $"{joinedDisplayName}님이 {joinedRoleLabel} 역할을 비구속적으로 수락했습니다. 주문·계약·결제 또는 최종 거래 책임은 별도 합의 전까지 확정되지 않습니다."
+            : string.Equals(변경유형, "상태변경", StringComparison.Ordinal)
+                ? $"{title}의 진행 상태가 {stateSummary}(으)로 변경되었습니다."
+                : $"{title}의 조건 또는 참여 내용이 변경되었습니다.";
 
         return JsonSerializer.Serialize(new
         {
@@ -148,11 +180,45 @@ public static class 공동구매원장관계자알림Policy
             changeType = 변경유형,
             currentState = 원장.상태,
             currentStep = 원장.현재단계Key ?? string.Empty,
-            title = "공동구매 원장이 변경되었습니다",
+            title = provisionalCreated
+                ? "관심이 모여 가원장이 만들어졌습니다"
+                : roleParticipantJoined
+                    ? "거래 참여팀에 새 역할이 합류했습니다"
+                    : "공동구매 원장이 변경되었습니다",
             body,
             deepLink = $"/community/group-purchase?ledgerId={Uri.EscapeDataString(ledgerId)}",
             channels = new[] { "Push" }
         });
+    }
+
+    private static bool TryReadRoleParticipation(
+        커뮤니티원장Dto ledger,
+        out string displayName,
+        out string roleLabel,
+        out bool specialistRole)
+    {
+        displayName = "새 참여자";
+        roleLabel = "업무 참여";
+        specialistRole = false;
+        if (!ledger.확장속성.TryGetValue(
+                CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinRevisionAttributeKey,
+                out var revisionValue)
+            || !long.TryParse(revisionValue, out var joinRevision)
+            || joinRevision != ledger.Revision
+            || !ledger.확장속성.TryGetValue(
+                CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinedRoleCodeAttributeKey,
+                out var roleCode)
+            || !CommunityPostPartyRoleCodes.IsSupported(roleCode))
+        {
+            return false;
+        }
+
+        displayName = ledger.확장속성.GetValueOrDefault(
+            CommunityPostProvisionalLedgerPolicy.LastPartyRoleJoinedDisplayNameAttributeKey,
+            displayName);
+        roleLabel = CommunityPostProfessionalParticipationProjection.RoleLabel(roleCode, false);
+        specialistRole = CommunityPostPartyRoleCodes.IsSpecialist(roleCode);
+        return true;
     }
 
     public static string BuildTraceId(string? eventId, string fallback)

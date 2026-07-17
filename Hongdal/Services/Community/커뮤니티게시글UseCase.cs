@@ -188,6 +188,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             .Include(x => x.Comments.Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden))
             .OrderByDescending(x => x.IsOperatorPinned)
             .ThenByDescending(x => x.OperatorPinnedAtUtc)
+            .ThenByDescending(x => x.IsCommunityMomentumPromoted)
+            .ThenByDescending(x => x.CommunityMomentumUpdatedAtUtc)
             .ThenByDescending(x => x.RecommendationCount)
             .ThenByDescending(x => x.LastEngagedAtUtc)
             .ThenByDescending(x => x.CreatedAtUtc)
@@ -219,6 +221,15 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         if (validation is not null)
         {
             return BadRequest<PlatformCommunityPostResponse>(validation);
+        }
+
+        var countryValidation = ValidateAuthorDisplayCountry(
+            request.IsAuthorDisplayCountryPublic,
+            request.AuthorDisplayCountryCode,
+            request.AuthorDisplayCountryName);
+        if (countryValidation is not null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>(countryValidation);
         }
 
         커뮤니티원장Dto? 연결원장 = null;
@@ -253,6 +264,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             커뮤니티원장Id = 연결원장?.원장Id,
             AuthorUserId = NormalizeOptional(_currentUserAccessor.UserId, 450),
             Nickname = normalizedNickname,
+            IsAuthorDisplayCountryPublic = !isReportBoardPost && request.IsAuthorDisplayCountryPublic,
+            AuthorDisplayCountryCode = !isReportBoardPost && request.IsAuthorDisplayCountryPublic
+                ? NormalizeCountryCode(request.AuthorDisplayCountryCode)
+                : null,
+            AuthorDisplayCountryName = !isReportBoardPost && request.IsAuthorDisplayCountryPublic
+                ? Normalize(request.AuthorDisplayCountryName, string.Empty, 80)
+                : null,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             IsReportBoardPost = isReportBoardPost,
             ReporterDisplayName = isReportBoardPost
@@ -397,6 +415,15 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>(validation);
         }
 
+        var countryValidation = ValidateAuthorDisplayCountry(
+            request.IsAuthorDisplayCountryPublic,
+            request.AuthorDisplayCountryCode,
+            request.AuthorDisplayCountryName);
+        if (countryValidation is not null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>(countryValidation);
+        }
+
         var entity = await _db.PlatformCommunityPosts
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
@@ -442,6 +469,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         }
         entity.Nickname = Normalize(request.Nickname, "익명", 40);
         entity.IsReportBoardPost = request.IsReportBoardPost || IsReportCategory(entity.Category);
+        entity.IsAuthorDisplayCountryPublic = !entity.IsReportBoardPost && request.IsAuthorDisplayCountryPublic;
+        entity.AuthorDisplayCountryCode = entity.IsAuthorDisplayCountryPublic
+            ? NormalizeCountryCode(request.AuthorDisplayCountryCode)
+            : null;
+        entity.AuthorDisplayCountryName = entity.IsAuthorDisplayCountryPublic
+            ? Normalize(request.AuthorDisplayCountryName, string.Empty, 80)
+            : null;
         entity.ReporterDisplayName = entity.IsReportBoardPost
             ? Normalize(request.ReporterDisplayName, entity.Nickname, 40)
             : null;
@@ -944,6 +978,33 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         return null;
     }
 
+    private static string? ValidateAuthorDisplayCountry(
+        bool isPublic,
+        string? countryCode,
+        string? countryName)
+    {
+        if (!isPublic)
+        {
+            return null;
+        }
+
+        var code = countryCode?.Trim() ?? string.Empty;
+        if (code.Length != 2 || code.Any(character => !char.IsAsciiLetter(character)))
+        {
+            return "활동 국가 코드는 ISO 알파-2 영문 두 자리로 입력해야 합니다.";
+        }
+
+        if (string.IsNullOrWhiteSpace(countryName) || countryName.Trim().Length > 80)
+        {
+            return "공개할 활동 국가 이름은 1자 이상 80자 이하로 입력해야 합니다.";
+        }
+
+        return null;
+    }
+
+    private static string NormalizeCountryCode(string? value)
+        => (value ?? string.Empty).Trim().ToUpperInvariant();
+
     private static bool IsReportCategory(string? category)
     {
         if (string.IsNullOrWhiteSpace(category))
@@ -978,6 +1039,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             커뮤니티원장Id = entity.커뮤니티원장Id,
             원장Context = 원장Context,
             Nickname = isReportBoardPost ? reporterDisplayName : entity.Nickname,
+            IsAuthorDisplayCountryPublic = !isReportBoardPost && entity.IsAuthorDisplayCountryPublic,
+            AuthorDisplayCountryCode = !isReportBoardPost && entity.IsAuthorDisplayCountryPublic
+                ? entity.AuthorDisplayCountryCode
+                : null,
+            AuthorDisplayCountryName = !isReportBoardPost && entity.IsAuthorDisplayCountryPublic
+                ? entity.AuthorDisplayCountryName
+                : null,
             IsSystemGenerated = isLedgerCompletionPost,
             SystemPostKind = isLedgerCompletionPost
                 ? PlatformCommunitySystemPostKinds.LedgerCompletion
@@ -992,6 +1060,19 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             IsReportSubjectMasked = isReportBoardPost,
             IsOperatorPinned = entity.IsOperatorPinned,
             OperatorPinnedAtUtc = entity.OperatorPinnedAtUtc,
+            IsCommunityMomentumPromoted = !isReportBoardPost && entity.IsCommunityMomentumPromoted,
+            CommunityMomentumCode = !isReportBoardPost && entity.IsCommunityMomentumPromoted
+                ? entity.CommunityMomentumCode
+                : null,
+            CommunityMomentumMessage = !isReportBoardPost && entity.IsCommunityMomentumPromoted
+                ? entity.CommunityMomentumMessage
+                : null,
+            CommunityMomentumRoleParticipantCount = !isReportBoardPost && entity.IsCommunityMomentumPromoted
+                ? entity.CommunityMomentumRoleParticipantCount
+                : 0,
+            CommunityMomentumUpdatedAtUtc = !isReportBoardPost && entity.IsCommunityMomentumPromoted
+                ? entity.CommunityMomentumUpdatedAtUtc
+                : null,
             RecommendationCount = entity.RecommendationCount,
             CommentCount = entity.CommentCount,
             LastEngagedAtUtc = entity.LastEngagedAtUtc,

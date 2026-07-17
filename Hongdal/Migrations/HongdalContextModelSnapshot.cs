@@ -377,6 +377,14 @@ namespace Hongdal.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("varchar(450)");
 
+                    b.Property<string>("AuthorDisplayCountryCode")
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)");
+
+                    b.Property<string>("AuthorDisplayCountryName")
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -390,10 +398,30 @@ namespace Hongdal.Migrations
                     b.Property<int>("CommentCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("CommunityMomentumCode")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("CommunityMomentumMessage")
+                        .HasMaxLength(240)
+                        .HasColumnType("varchar(240)");
+
+                    b.Property<int>("CommunityMomentumRoleParticipantCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CommunityMomentumUpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsAuthorDisplayCountryPublic")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsCommunityMomentumPromoted")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsOperatorPinned")

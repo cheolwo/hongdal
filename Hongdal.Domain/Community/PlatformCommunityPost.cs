@@ -13,12 +13,20 @@ public sealed class PlatformCommunityPost
     public string? 커뮤니티원장Id { get; set; }
     public string? AuthorUserId { get; set; }
     public string Nickname { get; set; } = string.Empty;
+    public bool IsAuthorDisplayCountryPublic { get; set; }
+    public string? AuthorDisplayCountryCode { get; set; }
+    public string? AuthorDisplayCountryName { get; set; }
     public bool IsReportBoardPost { get; set; }
     public string? ReporterDisplayName { get; set; }
     public string? ReportedDisplayName { get; set; }
     public string PasswordHash { get; set; } = string.Empty;
     public bool IsOperatorPinned { get; set; }
     public DateTime? OperatorPinnedAtUtc { get; set; }
+    public bool IsCommunityMomentumPromoted { get; set; }
+    public string? CommunityMomentumCode { get; set; }
+    public string? CommunityMomentumMessage { get; set; }
+    public int CommunityMomentumRoleParticipantCount { get; set; }
+    public DateTime? CommunityMomentumUpdatedAtUtc { get; set; }
     public int RecommendationCount { get; set; }
     public int CommentCount { get; set; }
     public DateTime? LastEngagedAtUtc { get; set; }
