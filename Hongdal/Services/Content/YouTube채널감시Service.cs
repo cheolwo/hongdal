@@ -476,6 +476,13 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
                 추가됨 = true;
             }
 
+            // 관리자가 비활성화한 기존 채널은 기본 설정이나 카탈로그 동기화가
+            // 메타데이터까지 암묵적으로 되살리거나 변경하지 않도록 그대로 둔다.
+            if (!채널.활성화여부)
+            {
+                continue;
+            }
+
             if (string.IsNullOrWhiteSpace(채널.국가코드))
             {
                 채널.국가코드 = 기본채널.CountryCode;
