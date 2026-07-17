@@ -72,6 +72,11 @@
     max-width: 14rem;
 }
 
+.platform-community-compose-board-tab:disabled {
+    cursor: not-allowed;
+    opacity: 0.42;
+}
+
 @media (max-width: 640px) {
     .community-sales-compose__fields {
         grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 0.65fr);

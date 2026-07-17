@@ -21,7 +21,7 @@ public sealed record CommunityPostComposerSnapshot
     public bool IsAuthorDisplayCountryPublic { get; init; }
     public string AuthorDisplayCountryCode { get; init; } = string.Empty;
     public string AuthorDisplayCountryName { get; init; } = string.Empty;
-    public string Category { get; init; } = "자유";
+    public string Category { get; init; } = PlatformCommunityPostCategories.General;
     public string WorkflowTag { get; init; } = "커뮤니티 신뢰";
     public string RoleTag { get; init; } = "플랫폼 구성원";
     public string Title { get; init; } = string.Empty;
@@ -68,7 +68,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     private string _authorDisplayCountryCode = string.Empty;
     private string _authorDisplayCountryName = string.Empty;
     private string _password = string.Empty;
-    private string _category = "자유";
+    private string _category = PlatformCommunityPostCategories.General;
     private string _workflowTag = "커뮤니티 신뢰";
     private string _roleTag = "플랫폼 구성원";
     private string _title = string.Empty;
@@ -96,13 +96,32 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     public string AuthorDisplayCountryCode { get => _authorDisplayCountryCode; set => SetProperty(ref _authorDisplayCountryCode, value); }
     public string AuthorDisplayCountryName { get => _authorDisplayCountryName; set => SetProperty(ref _authorDisplayCountryName, value); }
     public string Password { get => _password; set => SetProperty(ref _password, value); }
-    public string Category { get => _category; set => SetProperty(ref _category, value); }
+    public string Category
+    {
+        get => _category;
+        set => SetProperty(
+            ref _category,
+            _isSalesPost ? PlatformCommunityPostCategories.Sales : value);
+    }
     public string WorkflowTag { get => _workflowTag; set => SetProperty(ref _workflowTag, value); }
     public string RoleTag { get => _roleTag; set => SetProperty(ref _roleTag, value); }
     public string Title { get => _title; set => SetProperty(ref _title, value); }
     public string Body { get => _body; set => SetProperty(ref _body, value); }
     public string SharedLinkUrl { get => _sharedLinkUrl; set => SetProperty(ref _sharedLinkUrl, value); }
-    public bool IsSalesPost { get => _isSalesPost; set => SetProperty(ref _isSalesPost, value); }
+    public bool IsSalesPost
+    {
+        get => _isSalesPost;
+        set
+        {
+            if (!SetProperty(ref _isSalesPost, value) || !value)
+            {
+                return;
+            }
+
+            Category = PlatformCommunityPostCategories.Sales;
+            IsReportBoardPost = false;
+        }
+    }
     public string SalesProductTitle { get => _salesProductTitle; set => SetProperty(ref _salesProductTitle, value); }
     public decimal SalesAvailableQuantity { get => _salesAvailableQuantity; set => SetProperty(ref _salesAvailableQuantity, value); }
     public string SalesQuantityUnit { get => _salesQuantityUnit; set => SetProperty(ref _salesQuantityUnit, value); }
@@ -115,7 +134,11 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     public bool AllowsGroupPurchase { get => _allowsGroupPurchase; set => SetProperty(ref _allowsGroupPurchase, value); }
     public string SalesStatus { get => _salesStatus; set => SetProperty(ref _salesStatus, value); }
     public string 커뮤니티원장Id { get => _커뮤니티원장Id; set => SetProperty(ref _커뮤니티원장Id, value); }
-    public bool IsReportBoardPost { get => _isReportBoardPost; set => SetProperty(ref _isReportBoardPost, value); }
+    public bool IsReportBoardPost
+    {
+        get => _isReportBoardPost;
+        set => SetProperty(ref _isReportBoardPost, IsSalesPost ? false : value);
+    }
     public string ReporterDisplayName { get => _reporterDisplayName; set => SetProperty(ref _reporterDisplayName, value); }
     public string ReportedDisplayName { get => _reportedDisplayName; set => SetProperty(ref _reportedDisplayName, value); }
 
@@ -161,10 +184,6 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
                 return "협의 가능한 결제 방법을 하나 이상 선택하세요.";
             }
 
-            if (IsReportBoardPost)
-            {
-                return "신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.";
-            }
         }
 
         if (IsAuthorDisplayCountryPublic
@@ -184,13 +203,13 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         AuthorDisplayCountryCode = string.Empty;
         AuthorDisplayCountryName = string.Empty;
         Password = string.Empty;
-        Category = "자유";
+        IsSalesPost = false;
+        Category = PlatformCommunityPostCategories.General;
         WorkflowTag = "커뮤니티 신뢰";
         RoleTag = defaultRoleTag;
         Title = string.Empty;
         Body = string.Empty;
         SharedLinkUrl = string.Empty;
-        IsSalesPost = false;
         SalesProductTitle = string.Empty;
         SalesAvailableQuantity = 1;
         SalesQuantityUnit = "개";
@@ -215,6 +234,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         AuthorDisplayCountryCode = post.AuthorDisplayCountryCode ?? string.Empty;
         AuthorDisplayCountryName = post.AuthorDisplayCountryName ?? string.Empty;
         Password = string.Empty;
+        IsSalesPost = false;
         Category = post.Category;
         WorkflowTag = post.WorkflowTag;
         RoleTag = post.RoleTag;
@@ -236,6 +256,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         AuthorDisplayCountryCode = snapshot.AuthorDisplayCountryCode;
         AuthorDisplayCountryName = snapshot.AuthorDisplayCountryName;
         Password = string.Empty;
+        IsSalesPost = false;
         Category = snapshot.Category;
         WorkflowTag = snapshot.WorkflowTag;
         RoleTag = snapshot.RoleTag;
@@ -268,7 +289,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             IsAuthorDisplayCountryPublic = IsAuthorDisplayCountryPublic,
             AuthorDisplayCountryCode = AuthorDisplayCountryCode,
             AuthorDisplayCountryName = AuthorDisplayCountryName,
-            Category = Category,
+            Category = PlatformCommunityPostCategoryPolicy.Resolve(Category, IsSalesPost),
             WorkflowTag = WorkflowTag,
             RoleTag = RoleTag,
             Title = Title,
@@ -287,7 +308,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             AllowsGroupPurchase = AllowsGroupPurchase,
             SalesStatus = SalesStatus,
             커뮤니티원장Id = 커뮤니티원장Id,
-            IsReportBoardPost = IsReportBoardPost,
+            IsReportBoardPost = !IsSalesPost && IsReportBoardPost,
             ReporterDisplayName = ReporterDisplayName,
             ReportedDisplayName = ReportedDisplayName
         };
@@ -296,7 +317,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         => new()
         {
             AppKey = appKey,
-            Category = Category,
+            Category = PlatformCommunityPostCategoryPolicy.Resolve(Category, IsSalesPost),
             WorkflowTag = WorkflowTag,
             RoleTag = RoleTag,
             Title = Title,
@@ -308,7 +329,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             IsAuthorDisplayCountryPublic = IsAuthorDisplayCountryPublic,
             AuthorDisplayCountryCode = AuthorDisplayCountryCode,
             AuthorDisplayCountryName = AuthorDisplayCountryName,
-            IsReportBoardPost = IsReportBoardPost,
+            IsReportBoardPost = !IsSalesPost && IsReportBoardPost,
             ReporterDisplayName = ReporterDisplayName,
             ReportedDisplayName = ReportedDisplayName,
             Password = Password
@@ -317,7 +338,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     public PlatformCommunityPostUpdateRequest CreateUpdateRequest()
         => new()
         {
-            Category = Category,
+            Category = PlatformCommunityPostCategoryPolicy.Resolve(Category, IsSalesPost),
             WorkflowTag = WorkflowTag,
             RoleTag = RoleTag,
             Title = Title,
@@ -329,7 +350,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             IsAuthorDisplayCountryPublic = IsAuthorDisplayCountryPublic,
             AuthorDisplayCountryCode = AuthorDisplayCountryCode,
             AuthorDisplayCountryName = AuthorDisplayCountryName,
-            IsReportBoardPost = IsReportBoardPost,
+            IsReportBoardPost = !IsSalesPost && IsReportBoardPost,
             ReporterDisplayName = ReporterDisplayName,
             ReportedDisplayName = ReportedDisplayName,
             Password = Password
@@ -489,6 +510,16 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
 
     public void SelectCategory(string category)
     {
+        if (Draft.IsSalesPost
+            && !string.Equals(category, PlatformCommunityPostCategories.Sales, StringComparison.OrdinalIgnoreCase))
+        {
+            Draft.Category = PlatformCommunityPostCategories.Sales;
+            SetStatus(
+                "판매 정보가 붙은 글은 판매 게시판에 자동으로 등록됩니다.",
+                CommunityComposerMessageKind.Info);
+            return;
+        }
+
         Draft.Category = category;
         ClearStatus();
     }
@@ -700,7 +731,8 @@ public sealed class CommunityPostListPageViewModel(
     public IReadOnlyList<PlatformCommunityPostResponse> VisibleItems
         => _items
             .Where(post => string.Equals(SelectedBoard, "전체", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(post.Category, SelectedBoard, StringComparison.OrdinalIgnoreCase))
+                ? !CommunityBoardCatalog.IsProtectedCategory(post.Category)
+                : CommunityBoardCatalog.MatchesCategory(SelectedBoard, post.Category))
             .Where(MatchesListFilter)
             .Where(MatchesSearch)
             .OrderByDescending(post => post.IsOperatorPinned)
@@ -846,7 +878,8 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         PlatformCommunityBoardWorkspaceViewModel boards,
         PlatformCommunityPostEngagementViewModel engagement,
         PlatformCommunityLedgerPickerViewModel ledgerPicker,
-        YouTubeFoodCommunityDiscoveryViewModel foodDiscovery)
+        YouTubeFoodCommunityDiscoveryViewModel foodDiscovery,
+        PlatformCommunityDiagramWorkspaceViewModel diagramWorkspace)
     {
         Composer = 하위ViewModel등록(composer, 수명소유: true);
         PostList = 하위ViewModel등록(postList, 수명소유: true);
@@ -855,6 +888,7 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         Engagement = 하위ViewModel등록(engagement, 수명소유: true);
         LedgerPicker = 하위ViewModel등록(ledgerPicker, 수명소유: true);
         FoodDiscovery = 하위ViewModel등록(foodDiscovery, 수명소유: true);
+        DiagramWorkspace = 하위ViewModel등록(diagramWorkspace, 수명소유: true);
     }
 
     public CommunityPostComposerViewModel Composer { get; }
@@ -864,6 +898,8 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
     public PlatformCommunityPostEngagementViewModel Engagement { get; }
     public PlatformCommunityLedgerPickerViewModel LedgerPicker { get; }
     public YouTubeFoodCommunityDiscoveryViewModel FoodDiscovery { get; }
+    public PlatformCommunityDiagramWorkspaceViewModel DiagramWorkspace { get; }
+    public CommunityPostJourneyCollectionViewModel ActionJourneys => Engagement.Journeys;
 
     public void Configure(string appKey, string defaultRoleTag)
     {

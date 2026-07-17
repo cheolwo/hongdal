@@ -21,6 +21,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
         var ledgerPicker = new PlatformCommunityLedgerPickerViewModel(service);
         var foodDiscovery = new YouTubeFoodCommunityDiscoveryViewModel(
             new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!));
+        var diagramWorkspace = new PlatformCommunityDiagramWorkspaceViewModel();
         using var page = new PlatformCommunityHomePageViewModel(
             composer,
             postList,
@@ -28,7 +29,8 @@ public sealed class PlatformCommunityHomePageViewModelTests
             boards,
             engagement,
             ledgerPicker,
-            foodDiscovery);
+            foodDiscovery,
+            diagramWorkspace);
 
         Assert.Same(composer, page.Composer);
         Assert.Same(postList, page.PostList);
@@ -37,6 +39,73 @@ public sealed class PlatformCommunityHomePageViewModelTests
         Assert.Same(engagement, page.Engagement);
         Assert.Same(ledgerPicker, page.LedgerPicker);
         Assert.Same(foodDiscovery, page.FoodDiscovery);
+        Assert.Same(diagramWorkspace, page.DiagramWorkspace);
+        Assert.Same(engagement.Journeys, page.ActionJourneys);
+    }
+
+    [Fact]
+    public void 다이어그램Workspace는_운송흐름을_커뮤니티초안으로전환한다()
+    {
+        var viewModel = new PlatformCommunityDiagramWorkspaceViewModel();
+
+        var draft = viewModel.CreateCommunityDraft(
+        [
+            new("상차 요청", "운송", "출발지에서 화물을 싣습니다.", "delivery"),
+            new("운송", "운송", "도착지까지 이동합니다.", "delivery"),
+            new("하차 확인", "운송", "수령 증빙을 확인합니다.", "delivery")
+        ],
+        [
+            new("상차 요청", "운송", "배차 후 출발"),
+            new("운송", "하차 확인", "도착 후 인계")
+        ],
+        ["일반", "운송 실무", "생활 원장", "신고/분쟁"],
+        "홍달",
+        "화주");
+
+        Assert.Equal(CommunityLedgerTemplateKeys.CargoTransport, draft.LedgerTemplateKey);
+        Assert.Equal("운송 실무", draft.Category);
+        Assert.Contains("상차 요청 -> 운송", draft.Body);
+        Assert.Contains("기본 원장 초안", draft.Body);
+        Assert.False(draft.IsReportBoardPost);
+        Assert.Equal(draft.LedgerTemplateKey, viewModel.SelectedLedgerTemplateKey);
+    }
+
+    [Fact]
+    public void 다이어그램Workspace는_분쟁신호를_신고초안으로보호한다()
+    {
+        var viewModel = new PlatformCommunityDiagramWorkspaceViewModel();
+
+        var draft = viewModel.CreateCommunityDraft(
+        [
+            new("분쟁 신고", "검토", "거래 분쟁을 확인합니다.", "review")
+        ],
+        [],
+        ["일반", "생활 원장", "신고/분쟁"],
+        "홍달",
+        "참여자");
+
+        Assert.Equal("신고/분쟁", draft.Category);
+        Assert.True(draft.IsReportBoardPost);
+        Assert.Empty(draft.WorkflowTag);
+        Assert.Empty(draft.RoleTag);
+    }
+
+    [Fact]
+    public void 다이어그램Workspace는_국제업무초안의_맥락을구성한다()
+    {
+        var viewModel = new PlatformCommunityDiagramWorkspaceViewModel();
+
+        var draft = viewModel.CreateWorkDraft(
+            WorkCommunityDraftKind.InternationalCoordination,
+            "수입 업무 앱",
+            "관세사",
+            "통관 담당");
+
+        Assert.Equal("국제 소통", draft.Category);
+        Assert.Equal("통관·무역 데이터", draft.WorkflowTag);
+        Assert.Equal("통관 담당", draft.RoleTag);
+        Assert.Contains("관련 국가/지역", draft.Body);
+        Assert.Contains("관세사", draft.Title);
     }
 
     [Fact]

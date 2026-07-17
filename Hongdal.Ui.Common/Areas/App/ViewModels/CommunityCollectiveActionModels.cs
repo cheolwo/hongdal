@@ -168,27 +168,75 @@ public interface ICommunityCollectiveActionSource
     Task<IReadOnlyList<CommunityVoteResponse>> LoadAsync(CancellationToken cancellationToken = default);
 }
 
+public sealed record CommunityCollectiveActionSourceItem(
+    CommunityVoteResponse Campaign,
+    CommunityActionJourneyResponse? Journey);
+
+public interface ICommunityCollectiveActionSnapshotSource
+{
+    Task<IReadOnlyList<CommunityCollectiveActionSourceItem>> LoadSnapshotsAsync(
+        CancellationToken cancellationToken = default);
+}
+
 public sealed class PlatformCommunityCollectiveActionSource(
-    PlatformCommunityService communityService) : ICommunityCollectiveActionSource
+    PlatformCommunityService communityService) :
+    ICommunityCollectiveActionSource,
+    ICommunityCollectiveActionSnapshotSource
 {
     public async Task<IReadOnlyList<CommunityVoteResponse>> LoadAsync(
         CancellationToken cancellationToken = default)
         => (await communityService.GetGroupPurchaseVotesAsync(cancellationToken: cancellationToken)).Items;
+
+    public async Task<IReadOnlyList<CommunityCollectiveActionSourceItem>> LoadSnapshotsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var campaigns = await LoadAsync(cancellationToken);
+        var items = await Task.WhenAll(campaigns.Select(async campaign =>
+        {
+            if (campaign.SourcePostId is not long postId)
+            {
+                return new CommunityCollectiveActionSourceItem(campaign, null);
+            }
+
+            try
+            {
+                var opportunity = await communityService.GetPostOpportunitiesAsync(postId, cancellationToken: cancellationToken);
+                return new CommunityCollectiveActionSourceItem(campaign, opportunity?.Journey);
+            }
+            catch (HttpRequestException)
+            {
+                return new CommunityCollectiveActionSourceItem(campaign, null);
+            }
+        }));
+        return items;
+    }
 }
 
 public static class CommunityCollectiveActionSnapshotFactory
 {
-    public static CommunityCollectiveActionSnapshot FromCampaign(CommunityVoteResponse campaign)
+    public static CommunityCollectiveActionSnapshot FromCampaign(
+        CommunityVoteResponse campaign,
+        CommunityActionJourneyResponse? journey = null)
     {
         ArgumentNullException.ThrowIfNull(campaign);
         var groupPurchase = campaign.GroupPurchase;
-        var totalQuantity = groupPurchase?.TotalRequestedQuantity ?? campaign.Options.Sum(option => option.RequestedQuantity);
-        var minimumQuantity = groupPurchase?.MinimumTotalQuantity ?? 1;
+        decimal totalQuantity = groupPurchase?.TotalRequestedQuantity ?? campaign.Options.Sum(option => option.RequestedQuantity);
+        decimal minimumQuantity = groupPurchase?.MinimumTotalQuantity ?? 1;
+        if (journey?.Economics is { HasPlan: true } economics)
+        {
+            totalQuantity = economics.CurrentCommittedQuantity > 0
+                ? economics.CurrentCommittedQuantity
+                : totalQuantity;
+            minimumQuantity = economics.MinimumOrderQuantity > 0
+                ? economics.MinimumOrderQuantity
+                : minimumQuantity;
+        }
+
         var isSigned = string.Equals(
             campaign.ResolutionDocument?.Status,
             CommunityVoteResolutionStatusCodes.Signed,
             StringComparison.OrdinalIgnoreCase);
-        var currentPageKey = ResolveCurrentPageKey(campaign, isSigned);
+        var currentPageKey = ResolveCurrentPageKey(campaign, isSigned, journey);
         var productLabel = string.Join(", ", campaign.Options
             .Select(option => option.Text)
             .Where(value => !string.IsNullOrWhiteSpace(value))
@@ -196,6 +244,11 @@ public static class CommunityCollectiveActionSnapshotFactory
         if (string.IsNullOrWhiteSpace(productLabel))
         {
             productLabel = "상품 조건 확인 중";
+        }
+
+        if (!string.IsNullOrWhiteSpace(journey?.Sales.ProductTitle))
+        {
+            productLabel = journey.Sales.ProductTitle;
         }
 
         var isImport = groupPurchase?.IsGroupImportCandidate == true;
@@ -214,13 +267,15 @@ public static class CommunityCollectiveActionSnapshotFactory
             Summary = campaign.Description,
             CommunityScope = campaign.CommunityScope,
             CurrentPageKey = currentPageKey,
-            StatusLabel = ResolveStatusLabel(currentPageKey),
+            StatusLabel = string.IsNullOrWhiteSpace(journey?.CurrentStageLabel)
+                ? ResolveStatusLabel(currentPageKey)
+                : journey.CurrentStageLabel,
             ProductLabel = productLabel,
             SourceCountryCode = groupPurchase?.ShipFromCountryCode ?? string.Empty,
             DestinationCountryCode = groupPurchase?.DeliveryCountryCode ?? string.Empty,
-            ParticipantCount = campaign.TotalVoteCount,
+            ParticipantCount = Math.Max(campaign.TotalVoteCount, journey?.ParticipantCount ?? 0),
             CurrentCommittedQuantity = totalQuantity,
-            CurrentPotentialQuantity = totalQuantity,
+            CurrentPotentialQuantity = journey?.Economics.RecommendedQuantity ?? totalQuantity,
             MinimumOrderQuantity = minimumQuantity,
             QuantityUnit = string.IsNullOrWhiteSpace(groupPurchase?.QuantityUnit)
                 ? "개"
@@ -228,12 +283,15 @@ public static class CommunityCollectiveActionSnapshotFactory
             AdditionalParticipationClosesAt = campaign.Status == CommunityVoteStatusCodes.Open
                 ? ToOffset(campaign.ClosesAtUtc)
                 : null,
-            Conditions = BuildConditions(campaign, productLabel, minimumReached, routeReady),
-            RoleSlots = BuildRoleSlots(campaign, isImport),
-            ReadinessChecks = BuildReadinessChecks(campaign, minimumReached, routeReady, isSigned),
+            EstimatedCurrentUnitCost = journey?.Economics.EstimatedUnitLandedCost,
+            Conditions = BuildConditions(campaign, productLabel, minimumReached, routeReady, journey),
+            RoleSlots = journey?.RoleSlots.Count > 0
+                ? BuildRoleSlots(journey)
+                : BuildRoleSlots(campaign, isImport),
+            ReadinessChecks = BuildReadinessChecks(campaign, minimumReached, routeReady, isSigned, journey),
             CapacityEvidence = BuildCapacityEvidence(isImport, pickupCapacity),
-            Timeline = BuildTimeline(campaign, isSigned),
-            Outcomes = isSigned
+            Timeline = BuildTimeline(campaign, isSigned, journey),
+            Outcomes = isSigned || currentPageKey == CommunityCollectiveActionPageKeys.Completed
                 ?
                 [
                     new("모인 사람", $"{campaign.TotalVoteCount}명", "현재 결의문 기준 참여 인원"),
@@ -244,8 +302,27 @@ public static class CommunityCollectiveActionSnapshotFactory
         };
     }
 
-    private static string ResolveCurrentPageKey(CommunityVoteResponse campaign, bool isSigned)
+    private static string ResolveCurrentPageKey(
+        CommunityVoteResponse campaign,
+        bool isSigned,
+        CommunityActionJourneyResponse? journey)
     {
+        var projectedPage = journey?.CurrentStageCode switch
+        {
+            CommunityActionJourneyStageCodes.Conditions => CommunityCollectiveActionPageKeys.Conditions,
+            CommunityActionJourneyStageCodes.Party => CommunityCollectiveActionPageKeys.Party,
+            CommunityActionJourneyStageCodes.Readiness => CommunityCollectiveActionPageKeys.Readiness,
+            CommunityActionJourneyStageCodes.InProgress => CommunityCollectiveActionPageKeys.InProgress,
+            CommunityActionJourneyStageCodes.Completed => CommunityCollectiveActionPageKeys.Completed,
+            CommunityActionJourneyStageCodes.ProvisionalLedger => CommunityCollectiveActionPageKeys.Conditions,
+            CommunityActionJourneyStageCodes.Gathering => CommunityCollectiveActionPageKeys.Gathering,
+            _ => null
+        };
+        if (projectedPage is not null)
+        {
+            return projectedPage;
+        }
+
         if (isSigned)
         {
             return CommunityCollectiveActionPageKeys.InProgress;
@@ -280,13 +357,14 @@ public static class CommunityCollectiveActionSnapshotFactory
         CommunityVoteResponse campaign,
         string productLabel,
         bool minimumReached,
-        bool routeReady)
+        bool routeReady,
+        CommunityActionJourneyResponse? journey)
     {
         var groupPurchase = campaign.GroupPurchase;
         var serviceArea = string.IsNullOrWhiteSpace(groupPurchase?.ServiceAreaLabel)
             ? campaign.CommunityScope
             : groupPurchase.ServiceAreaLabel;
-        return
+        List<CommunityActionConditionSnapshot> conditions =
         [
             new("product", "함께 살 것", productLabel, "확인 중", campaign.Options.Count > 0),
             new(
@@ -309,7 +387,56 @@ public static class CommunityCollectiveActionSnapshotFactory
                 campaign.ResolutionDocument is null ? "초안 전" : "문서 있음",
                 campaign.ResolutionDocument is not null)
         ];
+
+        if (journey?.Sales is { HasSalesOffer: true } sales)
+        {
+            conditions.Insert(1, new CommunityActionConditionSnapshot(
+                "supplier",
+                "공급 제안",
+                $"{sales.AvailableQuantity:N0}{sales.QuantityUnit} · {sales.UnitPrice:N0} {sales.CurrencyCode}",
+                sales.AllowsGroupPurchase ? "공동구매 협의 가능" : "개별 판매",
+                true));
+        }
+
+        if (journey?.Economics is { HasPlan: true } economics)
+        {
+            var quantity = economics.RecommendedQuantity ?? economics.MinimumViableQuantity;
+            conditions.Add(new CommunityActionConditionSnapshot(
+                "economics",
+                "가격·경제성",
+                quantity.HasValue
+                    ? $"검토 수량 {quantity:N0}{economics.QuantityUnit}"
+                    : "집계 계산 리비전 있음",
+                economics.ExecutionReady ? "참여자 확인 완료" : "함께 검토 중",
+                economics.CurrentQuantityEconomicallyViable));
+        }
+
+        return conditions;
     }
+
+    private static IReadOnlyList<CommunityActionRoleSlotSnapshot> BuildRoleSlots(
+        CommunityActionJourneyResponse journey)
+        => journey.RoleSlots.Select(slot => new CommunityActionRoleSlotSnapshot(
+            CategoryLabel(slot.CategoryCode),
+            slot.RoleCode,
+            slot.Label,
+            slot.Summary,
+            slot.IsRequired,
+            slot.ConfirmedParticipantCount > 0 ? $"{slot.ConfirmedParticipantCount}명 수락" : null,
+            slot.ConfirmedParticipantCount > 0
+                ? "역할 수락 기록"
+                : slot.ExternalCredentialVerificationRequired ? "관할 자격 확인 필요" : "참여 요청",
+            slot.ConfirmedParticipantCount > 0)).ToArray();
+
+    private static string CategoryLabel(string categoryCode)
+        => categoryCode switch
+        {
+            CommunityPartyRoleCategoryCodes.CommercialParty => "거래 당사자",
+            CommunityPartyRoleCategoryCodes.CustomsAndDocumentation => "통관·문서",
+            CommunityPartyRoleCategoryCodes.TransportationIntermediary => "운송 중개·주선",
+            CommunityPartyRoleCategoryCodes.Carrier => "실제 운송",
+            _ => "현장 이행"
+        };
 
     private static IReadOnlyList<CommunityActionRoleSlotSnapshot> BuildRoleSlots(
         CommunityVoteResponse campaign,
@@ -346,12 +473,21 @@ public static class CommunityCollectiveActionSnapshotFactory
         CommunityVoteResponse campaign,
         bool minimumReached,
         bool routeReady,
-        bool isSigned)
+        bool isSigned,
+        CommunityActionJourneyResponse? journey)
         =>
         [
             new("demand", "최소 수요", minimumReached ? "필요한 수량과 인원이 모였습니다." : "최소 수량 또는 인원이 더 필요합니다.", minimumReached, true),
             new("route", "거래 경로", routeReady ? "출발·도착과 거래 방향을 확인했습니다." : "거래 경로 필수값을 확인해야 합니다.", routeReady, true),
-            new("roles", "필수 역할 수락", "관심 표시는 역할 수락이나 자격 확인을 대신하지 않습니다.", false, true),
+            new(
+                "roles",
+                "필수 역할 수락",
+                journey?.RequiredRoleCount > 0
+                    ? $"{journey.FilledRequiredRoleCount}/{journey.RequiredRoleCount}개 필수 역할이 확인됐습니다."
+                    : "관심 표시는 역할 수락이나 자격 확인을 대신하지 않습니다.",
+                journey?.RequiredRoleCount > 0
+                && journey.FilledRequiredRoleCount >= journey.RequiredRoleCount,
+                true),
             new("resolution", "결의문", campaign.ResolutionDocument is null ? "조건 조율 후 결의문을 작성합니다." : campaign.ResolutionDocument.DocumentTitle, campaign.ResolutionDocument is not null, true),
             new("signature", "현재 리비전 동의", isSigned ? "현재 결의문 서명이 완료됐습니다." : "주요 조건이 확정되면 당사자 동의를 받습니다.", isSigned, true),
             new("capacity", "이행 여력", "공급·창고·운송·서류 담당자가 각자 가능한 범위를 확인합니다.", false, true)
@@ -378,8 +514,20 @@ public static class CommunityCollectiveActionSnapshotFactory
 
     private static IReadOnlyList<CommunityActionTimelineItemSnapshot> BuildTimeline(
         CommunityVoteResponse campaign,
-        bool isSigned)
+        bool isSigned,
+        CommunityActionJourneyResponse? journey)
     {
+        if (journey?.Timeline.Count > 0)
+        {
+            return journey.Timeline
+                .Select(item => new CommunityActionTimelineItemSnapshot(
+                    item.OccurredAtUtc,
+                    item.Title,
+                    item.Detail,
+                    item.IsCompleted))
+                .ToArray();
+        }
+
         var items = new List<CommunityActionTimelineItemSnapshot>
         {
             new(ToOffset(campaign.CreatedAtUtc) ?? DateTimeOffset.UtcNow, "제안이 열렸어요", campaign.CreatedByDisplayName, true)

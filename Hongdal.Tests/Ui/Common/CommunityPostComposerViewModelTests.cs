@@ -111,6 +111,29 @@ public sealed class CommunityPostComposerViewModelTests
         Assert.Contains(PlatformCommunitySalesPaymentMethodCodes.DirectCash, salesOffer.AcceptedPaymentMethods);
         Assert.Contains(PlatformCommunitySalesPaymentMethodCodes.TossPayments, salesOffer.AcceptedPaymentMethods);
         Assert.True(salesOffer.AllowsGroupPurchase);
+        Assert.Equal(PlatformCommunityPostCategories.Sales, request.Category);
+        Assert.False(request.IsReportBoardPost);
+    }
+
+    [Fact]
+    public void 판매정보를_붙이면_판매게시판으로_자동분류되고_다른분류로_바뀌지않는다()
+    {
+        var draft = new CommunityPostComposerDraftViewModel
+        {
+            Category = PlatformCommunityPostCategories.ReportDispute,
+            IsReportBoardPost = true
+        };
+
+        draft.IsSalesPost = true;
+        draft.Category = PlatformCommunityPostCategories.General;
+        draft.IsReportBoardPost = true;
+
+        Assert.Equal(PlatformCommunityPostCategories.Sales, draft.Category);
+        Assert.False(draft.IsReportBoardPost);
+
+        var updateRequest = draft.CreateUpdateRequest();
+        Assert.Equal(PlatformCommunityPostCategories.Sales, updateRequest.Category);
+        Assert.False(updateRequest.IsReportBoardPost);
     }
 
     [Fact]

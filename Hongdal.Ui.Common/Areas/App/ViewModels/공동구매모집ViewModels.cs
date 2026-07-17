@@ -420,7 +420,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
         => new()
         {
             AppKey = string.IsNullOrWhiteSpace(앱키) ? "platform" : 앱키.Trim(),
-            Category = "공동구매",
+            Category = CommunityBoardCatalog.Participation.DisplayName,
             WorkflowTag = "공동 구매",
             RoleTag = 선택된제안주체명,
             Title = 제목.Trim(),

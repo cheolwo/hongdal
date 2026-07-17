@@ -248,7 +248,8 @@ public sealed class PlatformCommunityCommentForm : ObservableObject
 /// 게시글 댓글, 관심 역할과 가원장 참여 상태를 게시글별로 관리합니다.
 /// </summary>
 public sealed class PlatformCommunityPostEngagementViewModel(
-    PlatformCommunityService communityService) : ObservableObject
+    PlatformCommunityService communityService,
+    CommunityPostJourneyCollectionViewModel? journeys = null) : ObservableObject
 {
     private string? _selectedSeedPostTitle;
 
@@ -256,6 +257,7 @@ public sealed class PlatformCommunityPostEngagementViewModel(
     public Dictionary<long, PlatformCommunityCommentForm> CommentForms { get; } = [];
     public Dictionary<long, PlatformCommunityCommentForm> AttachmentCommentForms { get; } = [];
     public Dictionary<long, CommunityPostOpportunityListResponse> Opportunities { get; } = [];
+    public CommunityPostJourneyCollectionViewModel Journeys { get; } = journeys ?? new();
     public Dictionary<long, HashSet<string>> SelectedParticipationOptionIds { get; } = [];
     public HashSet<long> PendingPostParticipationIds { get; } = [];
     public HashSet<long> ExpandedCommentPostIds { get; } = [];
@@ -314,6 +316,8 @@ public sealed class PlatformCommunityPostEngagementViewModel(
         {
             Opportunities[postId] = opportunity;
         }
+
+        Journeys.Set(postId, opportunity?.Journey);
 
         OnPropertyChanged(nameof(Opportunities));
     }

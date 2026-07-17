@@ -30,10 +30,10 @@
       '    <div><strong>생활 게시판</strong><small>판매 · 나눔 · 동네 이야기</small></div>',
       '    <button type="button" aria-label="게시판 검색">⌕</button>',
       '  </header>',
-      '  <nav class="sales-board__tabs" aria-label="게시판 분류"><button class="is-active">전체</button><button>생활</button><button>판매</button><button>공동구매</button></nav>',
+      '  <nav class="sales-board__tabs" aria-label="게시판 분류"><button class="is-active" data-board-filter="all">전체</button><button data-board-filter="생활">생활</button><button data-board-filter="판매">판매</button><button data-board-filter="공동구매">공동구매</button></nav>',
       '  <div class="sales-board__notice"><span>안내</span><p>상품 정보는 대화를 돕는 요약입니다. 주문·결제 조건은 당사자가 확인해 주세요.</p></div>',
       '  <div class="sales-board__feed">',
-      '    <a class="sales-board-card sales-board-card--product" href="/community/posts/101" data-route>',
+      '    <a class="sales-board-card sales-board-card--product" href="/community/posts/101" data-board-category="판매" data-route>',
       '      <div class="sales-board-card__thumb"><span>🍑</span><small>썸네일</small></div>',
       '      <div class="sales-board-card__copy">',
       '        <div class="sales-board-card__meta"><span>판매 중</span><small>방금 · ' + escapeHtml(salesPost.seller) + '</small></div>',
@@ -43,13 +43,23 @@
       '        <p>결제 협의 ' + salesPost.methods.length + '가지 · 댓글로 구매 문의</p>',
       '      </div>',
       '    </a>',
-      '    <article class="sales-board-card sales-board-card--text"><div><span>생활 질문</span><small>12분 · 동네사람</small></div><h2>이번 주말 나눔장터 장소가 정해졌나요?</h2><p>댓글 5 · 추천 3</p></article>',
-      '    <article class="sales-board-card sales-board-card--text"><div><span>공동구매</span><small>1시간 · 장바구니</small></div><h2>친환경 세제 12개 묶음 같이 주문하실 분</h2><p>댓글 8 · 관심 11</p></article>',
+      '    <article class="sales-board-card sales-board-card--text" data-board-category="생활"><div><span>생활 질문</span><small>12분 · 동네사람</small></div><h2>이번 주말 나눔장터 장소가 정해졌나요?</h2><p>댓글 5 · 추천 3</p></article>',
+      '    <article class="sales-board-card sales-board-card--text" data-board-category="공동구매"><div><span>공동구매</span><small>1시간 · 장바구니</small></div><h2>친환경 세제 12개 묶음 같이 주문하실 분</h2><p>댓글 8 · 관심 11</p></article>',
       '  </div>',
       '  <a class="sales-board__write" href="/community/write" data-route><span>＋</span> 글쓰기</a>',
       '  <nav class="sales-mobile-nav" aria-label="모바일 메뉴"><a class="is-active" href="/community" data-route><span>⌂</span>게시판</a><button><span>◎</span>원장</button><button><span>♙</span>내 활동</button></nav>',
       '</section>'
     ].join("");
+
+    document.querySelectorAll("[data-board-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const selected = button.dataset.boardFilter;
+        document.querySelectorAll("[data-board-filter]").forEach((item) => item.classList.toggle("is-active", item === button));
+        document.querySelectorAll("[data-board-category]").forEach((card) => {
+          card.hidden = selected !== "all" && card.dataset.boardCategory !== selected;
+        });
+      });
+    });
   }
 
   function renderComposer() {
@@ -65,6 +75,7 @@
       '    <label class="sales-write__plain">게시글 제목<input name="boardTitle" value="' + escapeHtml(salesPost.boardTitle) + '" maxlength="160" required></label>',
       '    <label class="sales-write__plain">내용<textarea name="body" rows="5">' + escapeHtml(salesPost.body) + '</textarea></label>',
       '    <section class="sales-write__product">',
+      '      <div class="sales-write__destination"><span>게시 위치</span><strong>판매 게시판</strong><small>판매 정보가 있어 자동으로 분류됩니다.</small></div>',
       '      <header><div><span>판매 정보</span><strong>상품 요약을 게시글에 붙입니다</strong></div><span class="sales-write__on">사용 중</span></header>',
       '      <label>상품명<input name="productTitle" value="' + escapeHtml(salesPost.productTitle) + '" required></label>',
       '      <div class="sales-write__numbers">',
@@ -121,7 +132,7 @@
       salesPost.allowsGroup = data.get("allowsGroup") === "on";
       salesPost.thumbnailName = document.querySelector("#thumbnail-name")?.textContent || salesPost.thumbnailName;
       salesPost.detailName = document.querySelector("#detail-name")?.textContent || salesPost.detailName;
-      showToast("판매 정보를 붙인 커뮤니티 글을 등록했습니다.");
+      showToast("판매 게시판에 글을 등록했습니다.");
       navigate("/community/posts/101");
     });
   }

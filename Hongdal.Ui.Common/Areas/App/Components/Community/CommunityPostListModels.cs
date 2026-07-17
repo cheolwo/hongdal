@@ -13,3 +13,11 @@ public sealed record CommunitySeedPost(
     int RecommendationCount,
     int CommentCount,
     bool HasDiagramPreview);
+
+public sealed record CommunityBoardNavigationItem(
+    string Name,
+    string Description,
+    string Icon,
+    int PostCount,
+    string Href,
+    bool IsSelected = false);

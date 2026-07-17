@@ -55,7 +55,9 @@
                 {
                     <button type="button"
                             class="@BuildCategoryClass(category)"
+                            disabled="@IsCategoryLocked(category)"
                             aria-pressed="@string.Equals(ViewModel.Draft.Category, category, StringComparison.OrdinalIgnoreCase)"
+                            aria-disabled="@IsCategoryLocked(category)"
                             @onclick="@(() => ViewModel.SelectCategory(category))">
                         @category
                     </button>
@@ -100,7 +102,9 @@
                         aria-pressed="@ViewModel.Draft.IsSalesPost"
                         @onclick="ToggleSalesPost">
                     <span><MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" /> 판매 정보 붙이기</span>
-                    <small>게시글과 댓글 안에서 상품을 소개하고 거래 조건을 이야기합니다.</small>
+                    <small>@(ViewModel.Draft.IsSalesPost
+                        ? "판매 게시판에 자동 분류됩니다. 댓글에서 거래 조건을 이야기해 주세요."
+                        : "상품 정보를 붙이면 판매 게시판으로 자동 분류됩니다.")</small>
                 </button>
 
                 @if (ViewModel.Draft.IsSalesPost)
@@ -469,6 +473,10 @@
         => string.Equals(ViewModel.Draft.Category, category, StringComparison.OrdinalIgnoreCase)
             ? "platform-community-compose-board-tab platform-community-compose-board-tab--active"
             : "platform-community-compose-board-tab";
+
+    private bool IsCategoryLocked(string category)
+        => ViewModel.Draft.IsSalesPost
+           && !string.Equals(category, PlatformCommunityPostCategories.Sales, StringComparison.OrdinalIgnoreCase);
 
     private async Task SaveAsync()
     {

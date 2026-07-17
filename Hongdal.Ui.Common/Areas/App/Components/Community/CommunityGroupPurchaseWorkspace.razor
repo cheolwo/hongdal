@@ -468,7 +468,7 @@
             post = await CommunityService.CreatePostAsync(new PlatformCommunityPostCreateRequest
             {
                 AppKey = "shipper",
-                Category = "공동구매",
+                Category = CommunityBoardCatalog.Participation.DisplayName,
                 WorkflowTag = "공동 구매",
                 RoleTag = "구매 참여자",
                 Title = draft.Title.Trim(),

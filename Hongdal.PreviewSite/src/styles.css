@@ -1527,6 +1527,37 @@ a:focus-visible {
 .sales-post__comment-form { display: grid; gap: 8px; }
 @media (max-width: 620px) { .sales-board-card--product { grid-template-columns: 94px 1fr; } .sales-write__numbers { grid-template-columns: 1fr 1fr; } .sales-write__numbers label:last-child { grid-column: 1 / -1; } .sales-post__offer { grid-template-columns: 1fr; } .sales-post__hero { min-height: 190px; } }
 
+.sales-write__destination {
+  align-items: center;
+  background: #eaf8f0;
+  border: 1px solid #bfe2cf;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 6px 9px;
+  padding: 10px 12px;
+}
+
+.sales-write__destination span {
+  color: #547364;
+  font-size: .72rem;
+}
+
+.sales-write__destination strong {
+  color: #176c48;
+  font-size: .82rem;
+}
+
+.sales-write__destination small {
+  color: #547364;
+  font-size: .7rem;
+  text-align: right;
+}
+
+.sales-board-card[hidden] {
+  display: none;
+}
+
 /* Community sales post preview */
 .sales-board,
 .sales-write,

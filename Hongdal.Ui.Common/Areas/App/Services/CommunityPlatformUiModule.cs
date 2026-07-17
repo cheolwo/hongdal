@@ -17,9 +17,13 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<CommunityPostListPageViewModel>();
         services.TryAddTransient<PlatformCommunityHomeShellViewModel>();
         services.TryAddTransient<PlatformCommunityBoardWorkspaceViewModel>();
+        services.TryAddTransient<CommunityPostJourneyCollectionViewModel>();
         services.TryAddTransient<PlatformCommunityPostEngagementViewModel>();
         services.TryAddTransient<PlatformCommunityLedgerPickerViewModel>();
         services.TryAddTransient<YouTubeFoodCommunityDiscoveryViewModel>();
+        services.TryAddTransient<PlatformCommunityDiagramChatViewModel>();
+        services.TryAddTransient<PlatformCommunityDiagramCanvasViewModel>();
+        services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();
         services.TryAddTransient<PlatformCommunityHomePageViewModel>();
         services.TryAddTransient<ICommunityCollectiveActionSource, PlatformCommunityCollectiveActionSource>();
         services.TryAddTransient<CommunityActionJourneyNavigationViewModel>();

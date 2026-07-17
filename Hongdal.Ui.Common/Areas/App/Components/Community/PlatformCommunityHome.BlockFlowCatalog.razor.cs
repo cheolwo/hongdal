@@ -1,4 +1,5 @@
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Ui.Common.Areas.App.ViewModels;
 using MudBlazor;
 
 namespace Hongdal.Ui.Common.Areas.App.Components.Community;

@@ -35,9 +35,18 @@ public sealed class CommunityPostListPageViewModelTests
                     IsOperatorPinned = true,
                     RecommendationCount = 9,
                     CreatedAtUtc = new DateTime(2026, 7, 17, 1, 0, 0, DateTimeKind.Utc)
+                },
+                new PlatformCommunityPostResponse
+                {
+                    Id = 3,
+                    Category = "신고/분쟁",
+                    Title = "공개되면 안 되는 신고 기록",
+                    Body = "보호할 내용",
+                    Nickname = "신고자",
+                    CreatedAtUtc = new DateTime(2026, 7, 18, 1, 0, 0, DateTimeKind.Utc)
                 }
             ],
-            TotalCount = 2
+            TotalCount = 3
         };
         using var httpClient = new HttpClient(new JsonResponseHandler(response))
         {
@@ -50,8 +59,11 @@ public sealed class CommunityPostListPageViewModelTests
         Assert.True(await viewModel.초기화Async());
         Assert.Equal([2L, 1L], viewModel.VisibleItems.Select(item => item.Id));
 
-        viewModel.SelectedBoard = "업무 질문";
+        viewModel.SelectedBoard = CommunityBoardCatalog.QuestionHelp.DisplayName;
         Assert.Equal(2, Assert.Single(viewModel.VisibleItems).Id);
+
+        viewModel.SelectedBoard = CommunityBoardCatalog.LedgerProgress.DisplayName;
+        Assert.Equal(1, Assert.Single(viewModel.VisibleItems).Id);
 
         viewModel.SelectedBoard = "전체";
         viewModel.SelectedListFilter = "추천글";

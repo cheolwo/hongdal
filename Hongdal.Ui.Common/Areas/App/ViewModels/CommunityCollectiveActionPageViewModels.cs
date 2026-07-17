@@ -491,20 +491,43 @@ public sealed class CommunityCollectiveActionPageViewModel : PageViewModelBase
         IReadOnlyList<CommunityCollectiveActionSnapshot> snapshots;
         try
         {
-            var campaigns = await _source.LoadAsync(cancellationToken);
-            if (campaigns.Count == 0)
+            if (_source is ICommunityCollectiveActionSnapshotSource snapshotSource)
             {
-                snapshots = CommunityCollectiveActionPreviewCatalog.Create();
-                DataMode = CommunityCollectiveActionDataMode.Preview;
-                DataNotice = "진행 중인 공동구매가 없어 둘러보기 예시를 표시합니다.";
+                var sourceItems = await snapshotSource.LoadSnapshotsAsync(cancellationToken);
+                if (sourceItems.Count == 0)
+                {
+                    snapshots = CommunityCollectiveActionPreviewCatalog.Create();
+                    DataMode = CommunityCollectiveActionDataMode.Preview;
+                    DataNotice = "진행 중인 공동구매가 없어 둘러보기 예시를 표시합니다.";
+                }
+                else
+                {
+                    snapshots = sourceItems
+                        .Select(item => CommunityCollectiveActionSnapshotFactory.FromCampaign(
+                            item.Campaign,
+                            item.Journey))
+                        .ToArray();
+                    DataMode = CommunityCollectiveActionDataMode.Live;
+                    DataNotice = null;
+                }
             }
             else
             {
-                snapshots = campaigns
-                    .Select(CommunityCollectiveActionSnapshotFactory.FromCampaign)
-                    .ToArray();
-                DataMode = CommunityCollectiveActionDataMode.Live;
-                DataNotice = null;
+                var campaigns = await _source.LoadAsync(cancellationToken);
+                if (campaigns.Count == 0)
+                {
+                    snapshots = CommunityCollectiveActionPreviewCatalog.Create();
+                    DataMode = CommunityCollectiveActionDataMode.Preview;
+                    DataNotice = "진행 중인 공동구매가 없어 둘러보기 예시를 표시합니다.";
+                }
+                else
+                {
+                    snapshots = campaigns
+                        .Select(campaign => CommunityCollectiveActionSnapshotFactory.FromCampaign(campaign))
+                        .ToArray();
+                    DataMode = CommunityCollectiveActionDataMode.Live;
+                    DataNotice = null;
+                }
             }
         }
         catch (HttpRequestException)
