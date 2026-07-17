@@ -9,6 +9,7 @@ using 홍달.Services.Options;
 using 홍달.Services.Payments;
 using Hongdal.Services.Food;
 using Hongdal.Services.Education;
+using Hongdal.Services.Community;
 using Hongdal.Services.External.Typecast;
 using Hongdal.Services.External.YouTube;
 using Hongdal.Services.External.HongikHakdang;
@@ -21,6 +22,12 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddHongdalHttpClients(this IServiceCollection services)
     {
         services.AddHttpClient<I교육기관제출전송Service, 교육기관제출전송Service>();
+        services.AddHttpClient<ICommunityTextTranslationProvider, AzureCommunityTextTranslationProvider>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CommunityPostTranslationOptions>>().Value;
+            client.BaseAddress = new Uri($"{options.Endpoint.TrimEnd('/')}/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
         services.AddHttpClient<ITypecastClient, TypecastClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<TypecastOptions>>().Value;

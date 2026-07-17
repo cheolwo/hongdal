@@ -41,6 +41,9 @@ services:
       GoogleGeocodingApiKey: "${HONGDAL_GOOGLE_GEOCODING_API_KEY:-development-only-google-geocoding-key}"
       NaverCloudDirections__ApiKeyId: "${HONGDAL_NAVER_CLOUD_DIRECTIONS_API_KEY_ID:-development-only-naver-key-id}"
       NaverCloudDirections__ApiKey: "${HONGDAL_NAVER_CLOUD_DIRECTIONS_API_KEY:-development-only-naver-key}"
+      CommunityPostTranslation__Enabled: "${HONGDAL_COMMUNITY_TRANSLATION_ENABLED:-false}"
+      CommunityPostTranslation__ApiKey: "${HONGDAL_AZURE_TRANSLATOR_KEY:-}"
+      CommunityPostTranslation__Region: "${HONGDAL_AZURE_TRANSLATOR_REGION:-koreacentral}"
       HongdalLogging__FilePath: "logs/hongdal-.log"
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/health/ready"]

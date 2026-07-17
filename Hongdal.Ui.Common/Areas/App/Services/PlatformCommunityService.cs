@@ -37,6 +37,20 @@ public sealed class PlatformCommunityService
             $"api/v1/community/posts/{postId}",
             cancellationToken);
 
+    public async Task<PlatformCommunityPostTranslationResponse?> TranslatePostAsync(
+        long postId,
+        string targetLanguageCode,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _httpClient.PostAsync(
+            $"api/v1/community/posts/{postId}/translations/{Uri.EscapeDataString(targetLanguageCode)}",
+            content: null,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityPostTranslationResponse>(
+            cancellationToken: cancellationToken);
+    }
+
     public async Task<CommunityPostOpportunityListResponse?> GetPostOpportunitiesAsync(
         long postId,
         string displayLanguageCode = CommunityDisplayLanguageCodes.Korean,

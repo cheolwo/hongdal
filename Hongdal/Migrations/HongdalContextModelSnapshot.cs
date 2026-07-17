@@ -441,6 +441,10 @@ namespace Hongdal.Migrations
                     b.Property<DateTime?>("OperatorPinnedAtUtc")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("OriginalLanguageCode")
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -875,6 +879,73 @@ namespace Hongdal.Migrations
                         .IsUnique();
 
                     b.ToTable("platform_community_post_recommendations", (string)null);
+                });
+
+            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostTranslation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsHumanReviewed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("PostId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("ProviderModelVersion")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("SourceContentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.Property<string>("SourceLanguageCode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<string>("TargetLanguageCode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<string>("TranslatedBody")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TranslatedTitle")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId", "CreatedAtUtc")
+                        .HasDatabaseName("IX_community_post_translation_post_created");
+
+                    b.HasIndex("PostId", "TargetLanguageCode", "SourceContentHash")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_post_translation_content");
+
+                    b.ToTable("platform_community_post_translations", (string)null);
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Community.커뮤니티원장상태이벤트", b =>
@@ -9096,6 +9167,17 @@ namespace Hongdal.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostTranslation", b =>
+                {
+                    b.HasOne("Hongdal.Domain.Community.PlatformCommunityPost", "Post")
+                        .WithMany("Translations")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("Hongdal.Domain.Content.YouTube채널영상", b =>
                 {
                     b.HasOne("Hongdal.Domain.Content.YouTube감시채널", "감시채널")
@@ -9419,6 +9501,8 @@ namespace Hongdal.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Recommendations");
+
+                    b.Navigation("Translations");
                 });
 
             modelBuilder.Entity("Hongdal.Domain.Community.PlatformCommunityPostAttachment", b =>

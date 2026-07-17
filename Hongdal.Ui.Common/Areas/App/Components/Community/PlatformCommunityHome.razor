@@ -1396,10 +1396,9 @@
                                                                            InquiryRequested="@(async (string message) => await BeginSalesInquiryAsync(post, message))" />
                                      }
 
-                                     @if (!string.IsNullOrWhiteSpace(post.Body))
-                                     {
-                                         <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
-                                     }
+                                     <CommunityPostTranslationContent @key="post.Id"
+                                                                      Post="@post"
+                                                                      IsReportPost="@isReportPost" />
 
                                      @if (post.IsCommunityMomentumPromoted
                                           && !string.IsNullOrWhiteSpace(post.CommunityMomentumMessage))

@@ -61,6 +61,7 @@ public sealed class PlatformCommunityPostResponse
     public string RoleTag { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public string OriginalLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
     public string? SharedLinkUrl { get; set; }
     public PlatformCommunityPostSalesOfferResponse? SalesOffer { get; set; }
     public string? 커뮤니티원장Id { get; set; }
@@ -107,6 +108,7 @@ public sealed class PlatformCommunityPostCreateRequest
     public string RoleTag { get; set; } = "플랫폼 구성원";
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
     public PlatformCommunityPostSalesOfferRequest? SalesOffer { get; set; }
     public string? 커뮤니티원장Id { get; set; }
@@ -134,6 +136,22 @@ public sealed class PlatformCommunityPostAudioResponse
     public IReadOnlyList<PlatformCommunityPostAudioSegmentResponse> Segments { get; set; } = [];
 }
 
+public sealed class PlatformCommunityPostTranslationResponse
+{
+    public long PostId { get; set; }
+    public string SourceLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
+    public string TargetLanguageCode { get; set; } = CommunityDisplayLanguageCodes.English;
+    public string OriginalTitle { get; set; } = string.Empty;
+    public string OriginalBody { get; set; } = string.Empty;
+    public string TranslatedTitle { get; set; } = string.Empty;
+    public string TranslatedBody { get; set; } = string.Empty;
+    public string Provider { get; set; } = string.Empty;
+    public bool IsMachineTranslated { get; set; }
+    public bool IsCached { get; set; }
+    public bool IsHumanReviewed { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+}
+
 public sealed class PlatformCommunityPostAudioSegmentResponse
 {
     public int Sequence { get; set; }
@@ -150,6 +168,7 @@ public sealed class PlatformCommunityPostUpdateRequest
     public string RoleTag { get; set; } = "플랫폼 구성원";
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
     public PlatformCommunityPostSalesOfferRequest? SalesOffer { get; set; }
     public string? 커뮤니티원장Id { get; set; }

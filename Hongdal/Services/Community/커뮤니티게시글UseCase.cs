@@ -264,14 +264,20 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>("신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.");
         }
         var normalizedNickname = Normalize(request.Nickname, "익명", 40);
+        var normalizedTitle = Normalize(request.Title, string.Empty, 160);
+        var normalizedBody = Normalize(request.Body, string.Empty, 4000);
         var entity = new PlatformCommunityPost
         {
             AppKey = Normalize(request.AppKey, "platform", 80),
             Category = normalizedCategory,
             WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60),
             RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40),
-            Title = Normalize(request.Title, string.Empty, 160),
-            Body = Normalize(request.Body, string.Empty, 4000),
+            Title = normalizedTitle,
+            Body = normalizedBody,
+            OriginalLanguageCode = CommunityPostLanguageResolver.Resolve(
+                request.OriginalLanguageCode,
+                normalizedTitle,
+                normalizedBody),
             SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl),
             SalesOfferJson = SerializeSalesOffer(request.SalesOffer),
             커뮤니티원장Id = 연결원장?.원장Id,
@@ -486,6 +492,10 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         entity.RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40);
         entity.Title = Normalize(request.Title, string.Empty, 160);
         entity.Body = Normalize(request.Body, string.Empty, 4000);
+        entity.OriginalLanguageCode = CommunityPostLanguageResolver.Resolve(
+            request.OriginalLanguageCode,
+            entity.Title,
+            entity.Body);
         entity.SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl);
         entity.SalesOfferJson = SerializeSalesOffer(request.SalesOffer);
         if (request.커뮤니티원장Id is not null)
@@ -1165,6 +1175,10 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             RoleTag = entity.RoleTag,
             Title = entity.Title,
             Body = entity.Body,
+            OriginalLanguageCode = CommunityPostLanguageResolver.Resolve(
+                entity.OriginalLanguageCode,
+                entity.Title,
+                entity.Body),
             SharedLinkUrl = entity.SharedLinkUrl,
             SalesOffer = DeserializeSalesOffer(entity.SalesOfferJson),
             커뮤니티원장Id = entity.커뮤니티원장Id,

@@ -9,6 +9,7 @@ public sealed class PlatformCommunityPost
     public string RoleTag { get; set; } = "플랫폼 구성원";
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
     public string? SalesOfferJson { get; set; }
     public string? 커뮤니티원장Id { get; set; }
@@ -37,6 +38,7 @@ public sealed class PlatformCommunityPost
     public ICollection<PlatformCommunityPostAttachment> Attachments { get; set; } = new List<PlatformCommunityPostAttachment>();
     public ICollection<PlatformCommunityPostComment> Comments { get; set; } = new List<PlatformCommunityPostComment>();
     public ICollection<PlatformCommunityPostRecommendation> Recommendations { get; set; } = new List<PlatformCommunityPostRecommendation>();
+    public ICollection<PlatformCommunityPostTranslation> Translations { get; set; } = new List<PlatformCommunityPostTranslation>();
     public PlatformCommunityPostAudio? Audio { get; set; }
     public PlatformCommunityPostKeywordScan? KeywordNotificationScan { get; set; }
 }

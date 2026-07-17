@@ -16,15 +16,18 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 {
     private readonly I커뮤니티게시글UseCase _useCase;
     private readonly I커뮤니티게시글음성조회Service _audioService;
+    private readonly ICommunityPostTranslationService _translationService;
     private readonly I게시글원장ContextService _원장ContextService;
 
     public 커뮤니티게시글Controller(
         I커뮤니티게시글UseCase useCase,
         I커뮤니티게시글음성조회Service audioService,
+        ICommunityPostTranslationService translationService,
         I게시글원장ContextService 원장ContextService)
     {
         _useCase = useCase;
         _audioService = audioService;
+        _translationService = translationService;
         _원장ContextService = 원장ContextService;
     }
 
@@ -91,6 +94,20 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     public async Task<IActionResult> Get(long id, CancellationToken cancellationToken)
     {
         var result = await _useCase.상세Async(id, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("{id:long}/translations/{targetLanguageCode}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Translate(
+        long id,
+        string targetLanguageCode,
+        CancellationToken cancellationToken)
+    {
+        var result = await _translationService.GetOrCreateAsync(
+            id,
+            targetLanguageCode,
+            cancellationToken);
         return this.ToActionResult(result);
     }
 

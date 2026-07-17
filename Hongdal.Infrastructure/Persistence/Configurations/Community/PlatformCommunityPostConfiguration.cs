@@ -18,6 +18,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.RoleTag).HasMaxLength(40).IsRequired();
         builder.Property(x => x.Title).HasMaxLength(160).IsRequired();
         builder.Property(x => x.Body).HasMaxLength(4000).IsRequired();
+        builder.Property(x => x.OriginalLanguageCode).HasMaxLength(16);
         builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
         builder.Property(x => x.SalesOfferJson).HasColumnType("longtext");
         builder.Property(x => x.커뮤니티원장Id).HasMaxLength(120);
@@ -49,6 +50,11 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.Recommendations)
+            .WithOne(x => x.Post)
+            .HasForeignKey(x => x.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Translations)
             .WithOne(x => x.Post)
             .HasForeignKey(x => x.PostId)
             .OnDelete(DeleteBehavior.Cascade);
