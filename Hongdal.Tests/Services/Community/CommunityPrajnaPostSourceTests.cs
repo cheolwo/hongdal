@@ -1,12 +1,11 @@
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Content;
 using Hongdal.Domain.Community;
 using Hongdal.Domain.Content;
 using Hongdal.Services.Community;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using 홍달.Data;
 using 홍달.Infrastructure.Security;
-using 홍달.Services.Options;
 
 namespace Hongdal.Tests.Services.Community;
 

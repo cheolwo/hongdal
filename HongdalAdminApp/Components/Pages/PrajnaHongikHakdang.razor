@@ -4,15 +4,15 @@
 @inject HongikHakdangAdminService AdminService
 @inject NavigationManager Navigation
 
-<PageTitle>반야 · 홍익학당 자료 관리</PageTitle>
+<PageTitle>반야 · 지식·성찰 자료 관리</PageTitle>
 
 <MudStack Spacing="3">
     <div class="admin-page-header">
         <MudStack Spacing="1">
             <MudText Typo="Typo.overline" Color="Color.Primary">般若 · INTERNAL REVIEW</MudText>
-            <MudText Typo="Typo.h4">홍익학당 자료 관리</MudText>
+            <MudText Typo="Typo.h4">지식·성찰 자료 관리</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                공개 웹 자료를 검토하고 반야 게시판에 순차 게시할 항목을 승인합니다. 홍익학당과의 공식 제휴를 의미하지 않습니다.
+                홍익학당을 포함한 여러 자기계발·철학·종교 교육 채널의 공개 자료를 같은 기준으로 검토합니다. 채널 수집과 반야 게시는 별도로 승인하며 제휴나 관점의 우열을 의미하지 않습니다.
             </MudText>
         </MudStack>
         <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
@@ -37,7 +37,7 @@
     {
         <section id="policy">
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                카드의 `반야 게시 승인`과 영상의 `공개` 상태가 게시 후보를 정합니다. 전체 반야 배치 설정이 켜진 경우에만 승인 항목을 한 번에 하나씩 게시하며, 모바일 카드 배포는 별도 기능입니다.
+                카드는 `반야 게시 승인`, 영상은 `채널 반야 허용`과 영상별 `공개`가 모두 필요합니다. 전체 반야 배치 설정이 켜진 경우에만 승인 항목을 한 번에 하나씩 게시하며, 모바일 카드 배포는 별도 기능입니다.
             </MudAlert>
         </section>
 
@@ -196,16 +196,31 @@
                     <MudTable Items="snapshot.Channels" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
                         <HeaderContent>
                             <MudTh>채널</MudTh>
+                            <MudTh>관점·분류</MudTh>
                             <MudTh>상태</MudTh>
                             <MudTh>마지막 동기화</MudTh>
+                            <MudTh>반야 게시</MudTh>
                         </HeaderContent>
                         <RowTemplate Context="channel">
                             <MudTd DataLabel="채널">
                                 <MudText Typo="Typo.body2">@channel.채널명</MudText>
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">@channel.ChannelId</MudText>
                             </MudTd>
+                            <MudTd DataLabel="관점·분류">
+                                <MudText Typo="Typo.body2">@(string.IsNullOrWhiteSpace(channel.관점표시) ? "미분류" : channel.관점표시)</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@string.Join(" · ", channel.지식성찰분류목록)</MudText>
+                            </MudTd>
                             <MudTd DataLabel="상태">@(channel.활성화여부 ? "활성" : "중지")</MudTd>
                             <MudTd DataLabel="마지막 동기화">@FormatDate(channel.마지막동기화일시Utc)</MudTd>
+                            <MudTd DataLabel="반야 게시">
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Outlined"
+                                           Color="@(channel.반야게시허용여부 ? Color.Warning : Color.Primary)"
+                                           Disabled="@(isBusy || (!channel.지식성찰채널여부 && !channel.반야게시허용여부))"
+                                           OnClick="@(() => ToggleChannelPrajnaPublicationAsync(channel))">
+                                    @(channel.반야게시허용여부 ? "채널 승인 해제" : channel.지식성찰채널여부 ? "채널 반야 허용" : "프로필 확인 필요")
+                                </MudButton>
+                            </MudTd>
                         </RowTemplate>
                     </MudTable>
                 </MudStack>
@@ -234,9 +249,9 @@
                                 <MudButton Size="Size.Small"
                                            Variant="Variant.Text"
                                            Color="@(IsApproved(video) ? Color.Secondary : Color.Primary)"
-                                           Disabled="@isBusy"
+                                           Disabled="@(isBusy || !IsChannelPrajnaAllowed(video))"
                                            OnClick="@(() => TogglePublicationAsync(video))">
-                                    @(IsApproved(video) ? "게시 승인 해제" : "반야 게시 승인")
+                                    @(IsChannelPrajnaAllowed(video) ? (IsApproved(video) ? "게시 승인 해제" : "반야 게시 승인") : "채널 승인 필요")
                                 </MudButton>
                             </MudTd>
                         </RowTemplate>
@@ -399,6 +414,21 @@
                 : "영상의 반야 게시 승인을 해제했습니다.";
         });
     }
+
+    private Task ToggleChannelPrajnaPublicationAsync(YouTube감시채널Dto channel)
+        => RunActionAsync(async () =>
+        {
+            var allow = !channel.반야게시허용여부;
+            await AdminService.SetChannelPrajnaPublicationAsync(channel.ChannelId, allow);
+            return allow
+                ? $"{channel.채널명} 채널을 반야 영상 후보 출처로 허용했습니다. 영상별 공개 승인은 별도로 유지됩니다."
+                : $"{channel.채널명} 채널의 반야 게시 허용을 해제했습니다.";
+        });
+
+    private bool IsChannelPrajnaAllowed(YouTube채널영상Dto video)
+        => snapshot?.Channels.Any(channel =>
+               channel.반야게시허용여부
+               && string.Equals(channel.ChannelId, video.ChannelId, StringComparison.Ordinal)) == true;
 
     private async Task RunActionAsync(Func<Task<string>> action)
     {

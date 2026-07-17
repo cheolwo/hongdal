@@ -135,6 +135,11 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
         {
             조사프로필적용(채널, 조사);
         }
+        var 지식성찰항목 = YouTube지식성찰채널Catalog.찾기(channelId);
+        if (지식성찰항목 is not null)
+        {
+            지식성찰Catalog프로필적용(채널, 지식성찰항목);
+        }
 
         _저장소.채널추가(채널);
         await _저장소.저장Async(cancellationToken);
@@ -480,6 +485,12 @@ public sealed class YouTube채널감시Service : IYouTube채널감시Service
 
             var 조사 = YouTube음식채널조사Catalog.찾기(channelId);
             if (조사 is not null && 조사프로필적용(채널, 조사))
+            {
+                추가됨 = true;
+            }
+
+            var 지식성찰항목 = YouTube지식성찰채널Catalog.찾기(channelId);
+            if (지식성찰항목 is not null && 지식성찰Catalog프로필적용(채널, 지식성찰항목))
             {
                 추가됨 = true;
             }

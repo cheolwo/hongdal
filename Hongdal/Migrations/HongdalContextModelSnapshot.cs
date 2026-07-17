@@ -1712,6 +1712,35 @@ namespace Hongdal.Migrations
                         .HasColumnType("varchar(1000)")
                         .HasColumnName("research_source_url");
 
+                    b.Property<string>("공식출처Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("official_source_url");
+
+                    b.Property<string>("관점표시")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("perspective_label");
+
+                    b.Property<DateTime?>("자료확인일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("source_verified_at_utc");
+
+                    b.Property<bool>("지식성찰채널여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_knowledge_reflection_channel");
+
+                    b.Property<string>("지식성찰분류")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("knowledge_reflection_category_codes");
+
+                    b.Property<bool>("반야게시허용여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_prajna_publication_allowed");
+
                     b.Property<string>("조사메모")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)")
@@ -1744,6 +1773,9 @@ namespace Hongdal.Migrations
                         .HasDatabaseName("IX_youtube_watched_channels_country_active_sync");
 
                     b.HasIndex("음식채널여부", "구매발견점수", "수입발견점수");
+
+                    b.HasIndex("지식성찰채널여부", "반야게시허용여부", "활성화여부")
+                        .HasDatabaseName("IX_youtube_watched_channels_knowledge_prajna_active");
 
                     b.HasIndex("활성화여부", "마지막동기화일시Utc");
 

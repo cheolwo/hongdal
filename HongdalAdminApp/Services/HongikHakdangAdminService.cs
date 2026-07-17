@@ -106,6 +106,15 @@ public sealed class HongikHakdangAdminService
         response.EnsureSuccessStatusCode();
     }
 
+    public Task<YouTube감시채널Dto> SetChannelPrajnaPublicationAsync(
+        string channelId,
+        bool allowed,
+        CancellationToken cancellationToken = default)
+        => PutAsync<YouTube반야게시채널설정요청Dto, YouTube감시채널Dto>(
+            $"{YouTubeBasePath}/channels/{Uri.EscapeDataString(channelId)}/prajna-publication",
+            new YouTube반야게시채널설정요청Dto(allowed),
+            cancellationToken);
+
     private async Task<T> GetAsync<T>(string path, CancellationToken cancellationToken)
     {
         using var request = CreateRequest(HttpMethod.Get, path);

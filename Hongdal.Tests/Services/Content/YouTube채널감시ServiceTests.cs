@@ -71,6 +71,39 @@ public sealed class YouTube채널감시ServiceTests
     }
 
     [Fact]
+    public async Task 지식성찰카탈로그는_명시적으로켰을때만_Handle을해석해모듈화한다()
+    {
+        var store = new FakeStore();
+        var client = new FakeClient();
+        var sut = new YouTube채널감시Service(
+            client,
+            store,
+            Options.Create(new YouTubeOptions
+            {
+                Enabled = true,
+                ApiKey = "test-key",
+                SeedKnowledgeReflectionCatalog = true,
+                MaxResultsPerChannel = 20
+            }));
+
+        var result = await sut.동기화Async(null, CancellationToken.None);
+
+        Assert.True(result.실행됨);
+        Assert.Equal(YouTube지식성찰채널Catalog.항목.Count, store.Channels.Count);
+        Assert.Equal(
+            YouTube지식성찰채널Catalog.항목.Count(item => !string.IsNullOrWhiteSpace(item.Handle)),
+            client.HandleCalls);
+        Assert.All(store.Channels, channel =>
+        {
+            Assert.True(channel.지식성찰채널여부);
+            Assert.NotEmpty(channel.지식성찰분류);
+            Assert.NotEmpty(channel.관점표시);
+            Assert.NotNull(channel.공식출처Url);
+            Assert.False(channel.반야게시허용여부);
+        });
+    }
+
+    [Fact]
     public async Task 최초동기화_기존영상을_기준선으로저장한다()
     {
         var channel = CreateChannel();
@@ -240,6 +273,37 @@ public sealed class YouTube채널감시ServiceTests
     }
 
     [Fact]
+    public async Task 반야채널허용은_지식성찰프로필확인후에만_별도로설정한다()
+    {
+        var channel = CreateChannel();
+        var store = new FakeStore(channel);
+        var sut = CreateService(new FakeClient(), store);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.반야게시채널설정Async(
+            channel.ChannelId,
+            true,
+            CancellationToken.None));
+        await sut.지식성찰채널프로필설정Async(
+            channel.ChannelId,
+            new YouTube지식성찰채널프로필설정요청Dto(
+                true,
+                "@hongdal",
+                "KR",
+                "ko",
+                [YouTube지식성찰주제코드.철학],
+                "철학 대화",
+                "https://www.youtube.com/@hongdal",
+                DateTime.UtcNow),
+            CancellationToken.None);
+
+        var allowed = await sut.반야게시채널설정Async(channel.ChannelId, true, CancellationToken.None);
+
+        Assert.True(allowed.지식성찰채널여부);
+        Assert.True(allowed.반야게시허용여부);
+        Assert.Equal([YouTube지식성찰주제코드.철학], allowed.지식성찰분류목록);
+    }
+
+    [Fact]
     public async Task 공개영상조회는_관리자가공개한영상만반환한다()
     {
         var channel = CreateChannel();
@@ -331,6 +395,8 @@ public sealed class YouTube채널감시ServiceTests
 
         public int ChannelCalls { get; private set; }
 
+        public int HandleCalls { get; private set; }
+
         public string? LastPlaylistChannelId { get; private set; }
 
         public Task<IReadOnlyList<YouTube채널검색응답>> 채널검색Async(
@@ -348,6 +414,17 @@ public sealed class YouTube채널감시ServiceTests
             ChannelCalls++;
             return Task.FromResult<YouTube채널응답?>(
                 new(channelId, "홍달 채널", $"UU{channelId[2..]}", null));
+        }
+
+        public Task<YouTube채널응답?> 채널Handle조회Async(
+            string handle,
+            CancellationToken cancellationToken)
+        {
+            HandleCalls++;
+            var normalized = handle.Trim().TrimStart('@').Replace("-", string.Empty, StringComparison.Ordinal);
+            var channelId = $"UC_{normalized}";
+            return Task.FromResult<YouTube채널응답?>(
+                new(channelId, handle.TrimStart('@'), $"UU_{normalized}", null));
         }
 
         public Task<IReadOnlyList<YouTube영상응답>> 업로드목록조회Async(
