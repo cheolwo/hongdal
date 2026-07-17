@@ -257,6 +257,7 @@ public abstract class 조립ViewModelBase : ObservableObject, IDisposable
 {
     private readonly HashSet<INotifyPropertyChanged> _children = [];
     private readonly HashSet<IDisposable> _ownedDisposables = [];
+    private bool _disposed;
 
     protected T 하위ViewModel등록<T>(T child, bool 수명소유 = false)
         where T : class, INotifyPropertyChanged
@@ -276,6 +277,18 @@ public abstract class 조립ViewModelBase : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing || _disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
         foreach (var child in _children)
         {
             child.PropertyChanged -= 하위ViewModel변경;
@@ -288,7 +301,6 @@ public abstract class 조립ViewModelBase : ObservableObject, IDisposable
 
         _children.Clear();
         _ownedDisposables.Clear();
-        GC.SuppressFinalize(this);
     }
 
     private void 하위ViewModel변경(object? sender, PropertyChangedEventArgs e)

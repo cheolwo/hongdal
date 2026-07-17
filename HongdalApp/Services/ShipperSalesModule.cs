@@ -26,7 +26,7 @@ internal static class ShipperSalesModule
         services.AddScoped<I판매채널계정Service>(provider => provider.GetRequiredService<ShipperSalesService>());
         services.AddScoped<I상품등록Service>(provider => provider.GetRequiredService<ShipperSalesService>());
         services.AddScoped<I채널출품Service>(provider => provider.GetRequiredService<ShipperSalesService>());
-        services.AddScoped<화주판매채널계정PageViewModel>();
+        services.AddTransient<화주판매채널계정PageViewModel>();
         services.AddSingleton<ICommerceChannelCatalog, CommerceChannelCatalog>();
         services.AddScoped<ICommerceChannelListingService, CommerceChannelListingService>();
         services.AddScoped<ICommerceOrderFulfillmentService, CommerceOrderFulfillmentService>();

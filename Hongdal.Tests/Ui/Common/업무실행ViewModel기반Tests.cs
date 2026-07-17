@@ -4,6 +4,7 @@ using Hongdal.Ui.Common.Areas.App.Components;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hongdal.Tests.Ui.Common;
 
@@ -119,10 +120,24 @@ public sealed class 업무실행ViewModel기반Tests
     }
 
     [Fact]
-    public void MvvmComponent는_컴포넌트단위ServiceScope를소유한다()
+    public void MvvmComponent는_현재Scope상태를공유하고_PageViewModel수명만관리한다()
     {
-        Assert.True(typeof(OwningComponentBase<TestDisposableViewModel>)
+        var viewModel = new TestDisposableViewModel();
+        using var services = new ServiceCollection()
+            .AddTransient(_ => viewModel)
+            .BuildServiceProvider();
+        var component = new TestMvvmComponent();
+
+        component.Initialize(services);
+
+        Assert.Equal(1, viewModel.SubscriberCount);
+        Assert.False(typeof(OwningComponentBase<TestDisposableViewModel>)
             .IsAssignableFrom(typeof(TestMvvmComponent)));
+
+        component.Dispose();
+
+        Assert.Equal(0, viewModel.SubscriberCount);
+        Assert.True(viewModel.Disposed);
     }
 
     public sealed class TestForm : 업무입력ViewModelBase
@@ -162,16 +177,37 @@ public sealed class 업무실행ViewModel기반Tests
 
     private sealed class TestDisposableViewModel : INotifyPropertyChanged, IDisposable
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        private PropertyChangedEventHandler? _propertyChanged;
+
         public bool Disposed { get; private set; }
+        public int SubscriberCount { get; private set; }
+
+        public event PropertyChangedEventHandler? PropertyChanged
+        {
+            add
+            {
+                _propertyChanged += value;
+                SubscriberCount++;
+            }
+            remove
+            {
+                _propertyChanged -= value;
+                SubscriberCount--;
+            }
+        }
 
         public void RaisePropertyChanged()
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Disposed)));
+            => _propertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Disposed)));
 
         public void Dispose() => Disposed = true;
     }
 
     private sealed class TestMvvmComponent : MvvmComponentBase<TestDisposableViewModel>
     {
+        public void Initialize(IServiceProvider services)
+        {
+            Services = services;
+            OnInitialized();
+        }
     }
 }
