@@ -22,6 +22,7 @@
 | `ca4744ae` | 전용 공공데이터 DbContext와 주 Context 모델 분리 | 화면 없음 | 모델 격리 테스트와 전체 회귀 테스트 |
 | `1a6e8f2c` | 판매 제안 null 입력 검증과 초안 테스트 | 화면 없음 | 판매 제안 ViewModel 단위 테스트 |
 | `1ecfdec8` | 주 Context 모델 격리 회귀 테스트 | 화면 없음 | 전용 Entity 제외 단위 테스트 |
+| `02e28fdc` | Docker Compose 농수산물 배치 cron 외부 설정 | 화면 없음 | Compose 환경변수와 예시 값 확인 |
 
 ## 확인 사항
 
