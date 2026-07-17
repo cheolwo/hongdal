@@ -20,6 +20,11 @@ public sealed class CommunityDynamicTopicFeedsController : ControllerBase
         _service = service;
     }
 
+    [HttpGet]
+    [AllowAnonymous]
+    public ActionResult<CommunityDynamicTopicCatalogResponse> GetCatalog()
+        => Ok(_service.GetCatalog());
+
     [HttpGet("{topicKey}")]
     [AllowAnonymous]
     public async Task<ActionResult<CommunityDynamicTopicFeedResponse>> Get(

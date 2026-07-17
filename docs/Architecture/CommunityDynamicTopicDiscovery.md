@@ -1,30 +1,60 @@
-# 음식·화물 게시판과 글 기반 동적 주제 탐색
+# 업무 주제별 동적 게시판과 문맥 탐색
 
 ## 목적
 
-`음식`과 `화물`은 사용자가 직접 선택해 글을 쓰는 고정 공개 게시판이다. 동시에 다른 게시판에 작성된 글도 제목·본문·업무 태그에 음식 또는 화물 신호가 있으면 원문을 옮기지 않고 동적 주제 피드에서 함께 찾을 수 있다. 동적 주제는 게시판 Entity를 글마다 새로 만드는 기능이 아니라 게시글의 읽기 전용 투영이다.
+동적 게시판은 사용자가 글을 쓸 때마다 실제 게시판 Entity를 새로 만드는 기능이 아니다. 공개 게시글의 제목·본문·게시판·업무 태그를 읽고, 원문 게시판을 옮기지 않은 채 업무 주제별로 모아 보여 주는 읽기 전용 투영이다.
+
+주제 목록은 화면 ViewModel을 최소 기능 단위로 조립하는 구조와 같은 4×2 계층을 사용한다.
+
+```text
+동적 게시판 주제
+├─ 창고
+│  ├─ 입고
+│  └─ 출고
+├─ 주문
+│  ├─ 개별주문
+│  └─ 공동주문
+├─ 판매
+│  ├─ 음식
+│  └─ 화물
+└─ 운송
+   ├─ 상차
+   └─ 하차
+```
+
+한 게시글은 여러 세부 주제에 동시에 속할 수 있다. 예를 들어 `공동주문 냉장 화물 상차` 글은 `주문/공동주문`, `판매/화물`, `운송/상차` 피드에 함께 나타날 수 있다.
 
 ```mermaid
 flowchart LR
-    A["사용자 게시글"] --> B["동적 주제 분류"]
-    B --> C["음식 이야기 모아보기"]
-    B --> D["화물 이야기 모아보기"]
-    C --> E{"위치 일시 사용 동의"}
-    E -->|동의·좌표 있음| F["Hongdal.FoodApi 반경 7km 후보"]
-    E -->|없음| G["게시글만 표시"]
-    D --> H["플랫폼 주선 역할 후보"]
-    D --> I["운송 OS 공개배차 화물 요약"]
-    H --> J["당사자 별도 자격·면허 확인"]
-    I --> J
+    A["사용자 게시글"] --> B["업무·세부 주제 분류"]
+    B --> C["창고: 입고·출고"]
+    B --> D["주문: 개별·공동"]
+    B --> E["판매: 음식·화물"]
+    B --> F["운송: 상차·하차"]
+    E --> G{"음식 + 위치 일시 사용 동의"}
+    G -->|동의·좌표 있음| H["Hongdal.FoodApi 반경 7km 후보"]
+    E --> I["운송 OS 공개배차 화물 요약"]
+    F --> I
+    I --> J["당사자 별도 자격·면허·계약 확인"]
 ```
 
-## API
+## API와 ViewModel 조립
 
 | Method | Path | 책임 |
 | --- | --- | --- |
-| `GET` | `/api/v1/community/dynamic-topic-feeds/food` | 원 게시판을 바꾸지 않고 음식 신호가 있는 공개 글을 모아 조회 |
-| `GET` | `/api/v1/community/dynamic-topic-feeds/cargo` | 원 게시판을 바꾸지 않고 화물 신호가 있는 공개 글을 모아 조회 |
-| `POST` | `/api/v1/community/posts/{postId}/opportunities/context-discovery` | 위치 동의와 좌표를 request body로 받아 주변 음식점 또는 화물 문맥 후보 조회 |
+| `GET` | `/api/v1/community/dynamic-topic-feeds` | 4개 업무 영역과 8개 세부 주제 목록 조회 |
+| `GET` | `/api/v1/community/dynamic-topic-feeds/{topicKey}` | 선택한 세부 주제의 공개 글 조회 |
+| `POST` | `/api/v1/community/posts/{postId}/opportunities/context-discovery` | 게시글의 복수 주제와 음식·화물 문맥 후보 조회 |
+
+canonical `topicKey`는 `warehouse-inbound`, `warehouse-outbound`, `order-individual`, `order-group`, `sales-food`, `sales-cargo`, `transport-loading`, `transport-unloading`이다. 기존 `/food`, `/cargo` 요청은 호환을 위해 각각 `sales-food`, `sales-cargo`로 정규화한다.
+
+공용 UI는 역할을 다음처럼 나눈다.
+
+- `CommunityDynamicTopicDirectoryViewModel`: 업무 영역과 세부 주제 목록만 담당
+- `CommunityDynamicTopicFeedViewModel`: 선택한 세부 주제 한 개의 목록·페이지 상태 담당
+- `CommunityDynamicDiscoveryViewModel`: 게시글 한 건의 위치 동의 및 음식·화물 문맥 후보 담당
+
+따라서 Razor Class Library는 디렉터리, 목록, 게시글 문맥 패널을 각각 주입해 테이블·카드·모바일 목록 등 다른 표현으로 조립할 수 있다.
 
 신고·분쟁 글은 동적 주제 피드와 후보 조회에서 제외한다. 위치는 response에도 그대로 되돌려 주지 않고 DB, 게시글, 원장에 저장하지 않는다. 반경은 서버에서 최대 7km로 제한한다.
 
@@ -38,7 +68,7 @@ flowchart LR
 
 ## 화물 후보와 OS 경계
 
-화물 후보는 새 배차 엔진을 만들지 않는다. 기존 국내 화물 운송 OS가 RDB 실행 투영에 기록한 `공개배차 + 공개중 + 미확정` 상태만 읽고, 화물 종류·중량·차량과 시·군·구 수준 지역을 비식별 요약한다.
+화물 및 상·하차 후보는 새 배차 엔진을 만들지 않는다. 기존 국내 화물 운송 OS가 RDB 실행 투영에 기록한 `공개배차 + 공개중 + 미확정` 상태만 읽고, 화물 종류·중량·차량과 시·군·구 수준 지역을 비식별 요약한다.
 
 주선업자 후보는 플랫폼 역할 프로필이 활성화된 사용자를 보여 주는 1차 신호다. 이는 관할 면허·등록 확인을 대신하지 않는다. 플랫폼은 후보를 나란히 보여 줄 뿐 다음 행동을 하지 않는다.
 

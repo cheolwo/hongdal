@@ -7,6 +7,9 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 public interface ICommunityDynamicDiscoveryClient
 {
+    Task<CommunityDynamicTopicCatalogResponse> GetTopicCatalogAsync(
+        CancellationToken cancellationToken = default);
+
     Task<CommunityPostContextDiscoveryResponse> DiscoverAsync(
         long postId,
         CommunityPostContextDiscoveryRequest request,
@@ -22,6 +25,13 @@ public interface ICommunityDynamicDiscoveryClient
 public sealed class CommunityDynamicDiscoveryClient(HttpClient httpClient)
     : ICommunityDynamicDiscoveryClient
 {
+    public async Task<CommunityDynamicTopicCatalogResponse> GetTopicCatalogAsync(
+        CancellationToken cancellationToken = default)
+        => await httpClient.GetFromJsonAsync<CommunityDynamicTopicCatalogResponse>(
+               "api/v1/community/dynamic-topic-feeds",
+               cancellationToken)
+           ?? throw new InvalidOperationException("동적 게시판 주제 목록 응답이 비어 있습니다.");
+
     public async Task<CommunityPostContextDiscoveryResponse> DiscoverAsync(
         long postId,
         CommunityPostContextDiscoveryRequest request,
@@ -52,6 +62,123 @@ public sealed class CommunityDynamicDiscoveryClient(HttpClient httpClient)
 
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<CommunityDynamicTopicFeedResponse>(cancellationToken);
+    }
+}
+
+public sealed class CommunityDynamicTopicDirectoryViewModel(ICommunityDynamicDiscoveryClient client)
+    : ObservableObject
+{
+    private CommunityDynamicTopicCatalogResponse? _catalog;
+    private bool _isLoading;
+    private string? _errorMessage;
+
+    public CommunityDynamicTopicCatalogResponse? Catalog
+    {
+        get => _catalog;
+        private set => SetProperty(ref _catalog, value);
+    }
+
+    public IReadOnlyList<CommunityDynamicTopicDomainResponse> Domains => Catalog?.Domains ?? [];
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set => SetProperty(ref _isLoading, value);
+    }
+
+    public string? ErrorMessage
+    {
+        get => _errorMessage;
+        private set => SetProperty(ref _errorMessage, value);
+    }
+
+    public async Task LoadAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsLoading)
+        {
+            return;
+        }
+
+        IsLoading = true;
+        ErrorMessage = null;
+        try
+        {
+            Catalog = await client.GetTopicCatalogAsync(cancellationToken);
+            OnPropertyChanged(nameof(Domains));
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}
+
+public sealed class CommunityDynamicTopicFeedViewModel(ICommunityDynamicDiscoveryClient client)
+    : ObservableObject
+{
+    private CommunityDynamicTopicFeedResponse? _feed;
+    private bool _isLoading;
+    private string? _errorMessage;
+
+    public CommunityDynamicTopicFeedResponse? Feed
+    {
+        get => _feed;
+        private set => SetProperty(ref _feed, value);
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set => SetProperty(ref _isLoading, value);
+    }
+
+    public string? ErrorMessage
+    {
+        get => _errorMessage;
+        private set => SetProperty(ref _errorMessage, value);
+    }
+
+    public async Task LoadAsync(
+        string topicKey,
+        int page = 1,
+        int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        if (IsLoading)
+        {
+            return;
+        }
+
+        IsLoading = true;
+        ErrorMessage = null;
+        try
+        {
+            Feed = await client.GetFeedAsync(topicKey, page, pageSize, cancellationToken);
+            if (Feed is null)
+            {
+                ErrorMessage = "지원하지 않는 동적 주제입니다.";
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 }
 
@@ -137,6 +264,10 @@ public sealed class CommunityDynamicDiscoveryViewModel(ICommunityDynamicDiscover
         try
         {
             await action();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

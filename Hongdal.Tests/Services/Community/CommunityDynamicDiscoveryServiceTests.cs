@@ -18,6 +18,42 @@ namespace Hongdal.Tests.Services.Community;
 public sealed class CommunityDynamicDiscoveryServiceTests
 {
     [Fact]
+    public void 동적주제카탈로그는_네업무영역마다_두세부주제를제공한다()
+    {
+        using var db = CreateContext();
+        var service = CreateService(db, new FakeRestaurantDirectory([]));
+
+        var catalog = service.GetCatalog();
+
+        Assert.Equal(4, catalog.Domains.Count);
+        Assert.All(catalog.Domains, domain => Assert.Equal(2, domain.Topics.Count));
+        Assert.Collection(
+            catalog.Domains,
+            domain => Assert.Equal(["입고", "출고"], domain.Topics.Select(topic => topic.DisplayName)),
+            domain => Assert.Equal(["개별주문", "공동주문"], domain.Topics.Select(topic => topic.DisplayName)),
+            domain => Assert.Equal(["음식", "화물"], domain.Topics.Select(topic => topic.DisplayName)),
+            domain => Assert.Equal(["상차", "하차"], domain.Topics.Select(topic => topic.DisplayName)));
+    }
+
+    [Fact]
+    public void 한글업무신호는_창고주문판매운송의_세부주제로분류된다()
+    {
+        var classifier = new CommunityDynamicTopicClassifier();
+
+        var matches = classifier.Classify(
+            "공동주문 음식 화물 입고와 출고",
+            "개별 주문을 합친 뒤 상차하고 하차하여 인수합니다.");
+
+        Assert.Equal(8, matches.Select(match => match.TopicKey).Distinct().Count());
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.WarehouseInbound);
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.WarehouseOutbound);
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.IndividualOrder);
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.GroupOrder);
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.TransportLoading);
+        Assert.Contains(matches, match => match.TopicKey == CommunityDynamicTopicCodes.TransportUnloading);
+    }
+
+    [Fact]
     public void 한게시글에서_음식과화물_동적주제를_함께찾을수있다()
     {
         var classifier = new CommunityDynamicTopicClassifier();
@@ -135,6 +171,22 @@ public sealed class CommunityDynamicDiscoveryServiceTests
         Assert.Equal(1, item.PostId);
         Assert.Equal("자유·생활", item.Category);
         Assert.Equal(1, feed.TotalCount);
+    }
+
+    [Fact]
+    public async Task 기존_food경로는_판매음식주제로정규화한다()
+    {
+        await using var db = CreateContext();
+        db.PlatformCommunityPosts.Add(Post(1, "자유·생활", "동네 식당", "음식을 나눕니다"));
+        await db.SaveChangesAsync();
+        var service = CreateService(db, new FakeRestaurantDirectory([]));
+
+        var feed = await service.GetFeedAsync(CommunityDynamicTopicCodes.LegacyFood, 1, 20);
+
+        Assert.NotNull(feed);
+        Assert.Equal(CommunityDynamicTopicDomainCodes.Sales, feed.DomainKey);
+        Assert.Equal(CommunityDynamicTopicCodes.Food, feed.TopicKey);
+        Assert.Single(feed.Items);
     }
 
     private static CommunityDynamicDiscoveryService CreateService(

@@ -23,6 +23,8 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<PlatformCommunityLedgerPickerViewModel>();
         services.TryAddTransient<YouTubeFoodCommunityDiscoveryViewModel>();
         services.TryAddTransient<CommunityDynamicDiscoveryViewModel>();
+        services.TryAddTransient<CommunityDynamicTopicDirectoryViewModel>();
+        services.TryAddTransient<CommunityDynamicTopicFeedViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramChatViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramCanvasViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();

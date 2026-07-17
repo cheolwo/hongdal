@@ -10,6 +10,8 @@ using 홍달.도메인.공통;
 namespace Hongdal.Services.Community;
 
 public sealed record CommunityDynamicTopicMatch(
+    string DomainKey,
+    string DomainDisplayName,
     string TopicKey,
     string DisplayName,
     string Summary,
@@ -26,16 +28,24 @@ public interface ICommunityDynamicTopicClassifier
 
 public sealed class CommunityDynamicTopicClassifier : ICommunityDynamicTopicClassifier
 {
-    private static readonly string[] FoodSignals =
+    private static readonly IReadOnlyList<(string TopicKey, string[] Signals)> Rules =
     [
-        "음식", "음식점", "식당", "맛집", "메뉴", "요리", "반찬", "식재료", "배달음식",
-        "food", "restaurant", "menu", "recipe"
-    ];
-
-    private static readonly string[] CargoSignals =
-    [
-        "화물", "운송", "용달", "트럭", "상차", "하차", "주선", "배차", "포워더",
-        "cargo", "freight", "truck", "forwarder"
+        (CommunityDynamicTopicCodes.WarehouseInbound,
+            ["입고", "입고예정", "입고 예정", "입고원장", "입고 원장", "검수입고", "inbound", "receiving"]),
+        (CommunityDynamicTopicCodes.WarehouseOutbound,
+            ["출고", "출고예정", "출고 예정", "출고원장", "출고 원장", "피킹", "포장출고", "outbound", "warehouse shipping"]),
+        (CommunityDynamicTopicCodes.IndividualOrder,
+            ["개별주문", "개별 주문", "개인주문", "개인 주문", "단독주문", "individual order"]),
+        (CommunityDynamicTopicCodes.GroupOrder,
+            ["공동주문", "공동 주문", "공동구매", "공동 구매", "group order", "group purchase"]),
+        (CommunityDynamicTopicCodes.Food,
+            ["음식", "음식점", "식당", "맛집", "메뉴", "요리", "반찬", "식재료", "배달음식", "food", "restaurant", "recipe"]),
+        (CommunityDynamicTopicCodes.Cargo,
+            ["화물", "용달", "트럭", "포워더", "cargo", "freight", "truck", "forwarder"]),
+        (CommunityDynamicTopicCodes.TransportLoading,
+            ["상차", "상차예정", "상차 예정", "픽업", "집하", "loading", "pickup"]),
+        (CommunityDynamicTopicCodes.TransportUnloading,
+            ["하차", "하차예정", "하차 예정", "도착지 인수", "인수확인", "unloading", "dropoff"])
     ];
 
     public IReadOnlyList<CommunityDynamicTopicMatch> Classify(
@@ -46,28 +56,17 @@ public sealed class CommunityDynamicTopicClassifier : ICommunityDynamicTopicClas
     {
         var text = $"{title}\n{body}\n{category}\n{workflowTag}";
         var matches = new List<CommunityDynamicTopicMatch>();
-        AddIfMatched(
-            matches,
-            CommunityDynamicTopicCodes.Food,
-            "음식 이야기 모아보기",
-            "게시글의 음식 신호를 따라 관련 대화와 위치 동의 기반 주변 음식점 정보를 함께 봅니다.",
-            FoodSignals,
-            text);
-        AddIfMatched(
-            matches,
-            CommunityDynamicTopicCodes.Cargo,
-            "화물 이야기 모아보기",
-            "게시글의 화물 신호를 따라 자격 역할 후보와 공개배차 상태의 화물 정보를 함께 봅니다.",
-            CargoSignals,
-            text);
+        foreach (var rule in Rules)
+        {
+            AddIfMatched(matches, CommunityDynamicTopicCatalog.Find(rule.TopicKey)!, rule.Signals, text);
+        }
+
         return matches;
     }
 
     private static void AddIfMatched(
         ICollection<CommunityDynamicTopicMatch> target,
-        string topicKey,
-        string displayName,
-        string summary,
+        CommunityDynamicTopicDefinition definition,
         IEnumerable<string> signals,
         string text)
     {
@@ -77,13 +76,21 @@ public sealed class CommunityDynamicTopicClassifier : ICommunityDynamicTopicClas
             .ToArray();
         if (matched.Length > 0)
         {
-            target.Add(new(topicKey, displayName, summary, matched));
+            target.Add(new(
+                definition.DomainKey,
+                definition.DomainDisplayName,
+                definition.TopicKey,
+                definition.DisplayName,
+                definition.Summary,
+                matched));
         }
     }
 }
 
 public interface ICommunityDynamicDiscoveryService
 {
+    CommunityDynamicTopicCatalogResponse GetCatalog();
+
     Task<CommunityPostContextDiscoveryResponse> DiscoverAsync(
         CommunityPostOpportunitySource source,
         CommunityPostContextDiscoveryRequest? request,
@@ -114,6 +121,24 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
         _restaurantDirectory = restaurantDirectory;
         _options = options.Value;
     }
+
+    public CommunityDynamicTopicCatalogResponse GetCatalog()
+        => new()
+        {
+            GenerationPolicy =
+                "사용자 게시글을 창고·주문·판매·운송 업무와 세부 주제로 읽기 전용 분류하며 원문 게시판은 변경하지 않습니다.",
+            Domains = CommunityDynamicTopicCatalog.All
+                .GroupBy(definition => new { definition.DomainKey, definition.DomainDisplayName })
+                .Select(group => new CommunityDynamicTopicDomainResponse
+                {
+                    DomainKey = group.Key.DomainKey,
+                    DisplayName = group.Key.DomainDisplayName,
+                    Topics = group.OrderBy(definition => definition.SortOrder)
+                        .Select(definition => BuildTopicResponse(definition, []))
+                        .ToArray()
+                })
+                .ToArray()
+        };
 
     public async Task<CommunityPostContextDiscoveryResponse> DiscoverAsync(
         CommunityPostOpportunitySource source,
@@ -169,10 +194,13 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
                 .ToArray();
         }
 
-        var providers = topicKeys.Contains(CommunityDynamicTopicCodes.Cargo)
+        var freightContext = topicKeys.Contains(CommunityDynamicTopicCodes.Cargo)
+                             || topicKeys.Contains(CommunityDynamicTopicCodes.TransportLoading)
+                             || topicKeys.Contains(CommunityDynamicTopicCodes.TransportUnloading);
+        var providers = freightContext
             ? await FindFreightProviderCandidatesAsync(cancellationToken)
             : [];
-        var publicFreight = topicKeys.Contains(CommunityDynamicTopicCodes.Cargo)
+        var publicFreight = freightContext
             ? await FindPublicFreightCandidatesAsync(cancellationToken)
             : [];
 
@@ -212,13 +240,13 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        if (!CommunityDynamicTopicCodes.IsSupported(topicKey))
+        var definition = CommunityDynamicTopicCatalog.Find(topicKey);
+        if (definition is null)
         {
             return null;
         }
 
-        var normalizedTopicKey = CommunityDynamicTopicCodes.All.First(code =>
-            string.Equals(code, topicKey.Trim(), StringComparison.OrdinalIgnoreCase));
+        var normalizedTopicKey = definition.TopicKey;
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 50);
         var protectedCategories = CommunityBoardCatalog.CategoryNamesFor(CommunityBoardKeys.SafetyReport);
@@ -230,6 +258,50 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
 
         query = normalizedTopicKey switch
         {
+            CommunityDynamicTopicCodes.WarehouseInbound => query.Where(post =>
+                post.Title.Contains("입고")
+                || post.Body.Contains("입고")
+                || post.WorkflowTag.Contains("입고")
+                || post.Title.Contains("inbound")
+                || post.Body.Contains("inbound")
+                || post.Title.Contains("receiving")
+                || post.Body.Contains("receiving")),
+            CommunityDynamicTopicCodes.WarehouseOutbound => query.Where(post =>
+                post.Title.Contains("출고")
+                || post.Body.Contains("출고")
+                || post.WorkflowTag.Contains("출고")
+                || post.Title.Contains("피킹")
+                || post.Body.Contains("피킹")
+                || post.Title.Contains("outbound")
+                || post.Body.Contains("outbound")
+                || post.Title.Contains("warehouse shipping")
+                || post.Body.Contains("warehouse shipping")),
+            CommunityDynamicTopicCodes.IndividualOrder => query.Where(post =>
+                post.Title.Contains("개별주문")
+                || post.Body.Contains("개별주문")
+                || post.Title.Contains("개별 주문")
+                || post.Body.Contains("개별 주문")
+                || post.Title.Contains("개인 주문")
+                || post.Body.Contains("개인 주문")
+                || post.Title.Contains("개인주문")
+                || post.Body.Contains("개인주문")
+                || post.Title.Contains("단독주문")
+                || post.Body.Contains("단독주문")
+                || post.Title.Contains("individual order")
+                || post.Body.Contains("individual order")),
+            CommunityDynamicTopicCodes.GroupOrder => query.Where(post =>
+                post.Title.Contains("공동주문")
+                || post.Body.Contains("공동주문")
+                || post.Title.Contains("공동 주문")
+                || post.Body.Contains("공동 주문")
+                || post.Title.Contains("공동구매")
+                || post.Body.Contains("공동구매")
+                || post.Title.Contains("공동 구매")
+                || post.Body.Contains("공동 구매")
+                || post.Title.Contains("group order")
+                || post.Body.Contains("group order")
+                || post.Title.Contains("group purchase")
+                || post.Body.Contains("group purchase")),
             CommunityDynamicTopicCodes.Food => query.Where(post =>
                 post.Category == CommunityBoardCatalog.Food.DisplayName
                 || post.Category == "맛집"
@@ -240,20 +312,54 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
                 || post.Title.Contains("맛집")
                 || post.Body.Contains("맛집")
                 || post.Title.Contains("요리")
-                || post.Body.Contains("요리")),
+                || post.Body.Contains("요리")
+                || post.Title.Contains("메뉴")
+                || post.Body.Contains("메뉴")
+                || post.Title.Contains("식재료")
+                || post.Body.Contains("식재료")
+                || post.Title.Contains("food")
+                || post.Body.Contains("food")
+                || post.Title.Contains("restaurant")
+                || post.Body.Contains("restaurant")),
             CommunityDynamicTopicCodes.Cargo => query.Where(post =>
                 post.Category == CommunityBoardCatalog.Cargo.DisplayName
                 || post.Category == "화물 운송"
                 || post.Title.Contains("화물")
                 || post.Body.Contains("화물")
-                || post.Title.Contains("운송")
-                || post.Body.Contains("운송")
                 || post.Title.Contains("용달")
                 || post.Body.Contains("용달")
-                || post.Title.Contains("상차")
+                || post.Title.Contains("cargo")
+                || post.Body.Contains("cargo")
+                || post.Title.Contains("freight")
+                || post.Body.Contains("freight")
+                || post.Title.Contains("truck")
+                || post.Body.Contains("truck")
+                || post.Title.Contains("forwarder")
+                || post.Body.Contains("forwarder")),
+            CommunityDynamicTopicCodes.TransportLoading => query.Where(post =>
+                post.Title.Contains("상차")
                 || post.Body.Contains("상차")
-                || post.Title.Contains("하차")
-                || post.Body.Contains("하차")),
+                || post.WorkflowTag.Contains("상차")
+                || post.Title.Contains("픽업")
+                || post.Body.Contains("픽업")
+                || post.Title.Contains("집하")
+                || post.Body.Contains("집하")
+                || post.Title.Contains("loading")
+                || post.Body.Contains("loading")
+                || post.Title.Contains("pickup")
+                || post.Body.Contains("pickup")),
+            CommunityDynamicTopicCodes.TransportUnloading => query.Where(post =>
+                post.Title.Contains("하차")
+                || post.Body.Contains("하차")
+                || post.WorkflowTag.Contains("하차")
+                || post.Title.Contains("인수확인")
+                || post.Body.Contains("인수확인")
+                || post.Title.Contains("도착지 인수")
+                || post.Body.Contains("도착지 인수")
+                || post.Title.Contains("unloading")
+                || post.Body.Contains("unloading")
+                || post.Title.Contains("dropoff")
+                || post.Body.Contains("dropoff")),
             _ => query
         };
 
@@ -276,13 +382,12 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
             })
             .ToListAsync(cancellationToken);
 
-        var topicDisplayName = normalizedTopicKey == CommunityDynamicTopicCodes.Food
-            ? "음식 이야기 모아보기"
-            : "화물 이야기 모아보기";
         return new CommunityDynamicTopicFeedResponse
         {
+            DomainKey = definition.DomainKey,
+            DomainDisplayName = definition.DomainDisplayName,
             TopicKey = normalizedTopicKey,
-            DisplayName = topicDisplayName,
+            DisplayName = definition.DisplayName,
             GenerationPolicy = "사용자 게시글의 제목·본문·게시판·업무 태그 신호를 읽기 전용으로 분류해 구성하며 원문 게시판을 변경하지 않습니다.",
             TotalCount = totalCount,
             Page = page,
@@ -380,12 +485,28 @@ public sealed class CommunityDynamicDiscoveryService : ICommunityDynamicDiscover
         IReadOnlyList<CommunityDynamicTopicMatch> matches)
         => matches.Select(match => new CommunityDynamicTopicResponse
         {
+            DomainKey = match.DomainKey,
+            DomainDisplayName = match.DomainDisplayName,
             TopicKey = match.TopicKey,
             DisplayName = match.DisplayName,
             Summary = match.Summary,
             FeedEndpoint = $"/api/v1/community/dynamic-topic-feeds/{match.TopicKey}",
             MatchedSignals = match.MatchedSignals
         }).ToArray();
+
+    private static CommunityDynamicTopicResponse BuildTopicResponse(
+        CommunityDynamicTopicDefinition definition,
+        IReadOnlyList<string> matchedSignals)
+        => new()
+        {
+            DomainKey = definition.DomainKey,
+            DomainDisplayName = definition.DomainDisplayName,
+            TopicKey = definition.TopicKey,
+            DisplayName = definition.DisplayName,
+            Summary = definition.Summary,
+            FeedEndpoint = $"/api/v1/community/dynamic-topic-feeds/{definition.TopicKey}",
+            MatchedSignals = matchedSignals
+        };
 
     private static void ValidateCoordinates(decimal latitude, decimal longitude)
     {
