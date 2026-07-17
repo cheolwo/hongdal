@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 using System.Text.Json;
 using 홍달.Data;
 using 홍달.Services.External.Google;
@@ -311,6 +312,10 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
                 GroupDisplayName = "구성원 게시판",
                 IsUserCreatable = true,
                 IsCustom = true,
+                PostingAccessCode = CommunityBoardPostingAccessCodes.Authenticated,
+                PostingAccessDisplayName = CommunityBoardPostingAccessCodes.DisplayName(
+                    CommunityBoardPostingAccessCodes.Authenticated),
+                AllowsAnonymousPosting = false,
                 PostCount = count?.Count ?? 0,
                 LatestPostAtUtc = count?.LatestPostAtUtc
             });
@@ -328,13 +333,15 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>("request body is required");
         }
 
+        var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
         var validation = ValidatePost(
             request.Nickname,
             request.Password,
             request.Title,
             request.Body,
             request.SharedLinkUrl,
-            request.SalesOffer);
+            request.SalesOffer,
+            RequiresSuppliedNickname(normalizedCategory));
         if (validation is not null)
         {
             return BadRequest<PlatformCommunityPostResponse>(validation);
@@ -367,19 +374,18 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 
         var now = DateTime.UtcNow;
         var normalizedAppKey = Normalize(request.AppKey, "platform", 80);
-        var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
         if (!await _boardWritePolicy.CanWriteAsync(
                 normalizedAppKey,
                 normalizedCategory,
+                _currentUserAccessor.UserId,
                 cancellationToken))
         {
-            return BadRequest<PlatformCommunityPostResponse>(
-                "사용자 작성이 허용된 기본 게시판 또는 운영자가 승인한 사용자 게시판에만 글을 작성할 수 있습니다.");
+            return WriteRejected<PlatformCommunityPostResponse>(normalizedCategory);
         }
 
         var isReportBoardPost = request.SalesOffer is null
                                 && (request.IsReportBoardPost || IsReportCategory(normalizedCategory));
-        var normalizedNickname = Normalize(request.Nickname, "익명", 40);
+        var normalizedNickname = ResolvePostingNickname(normalizedCategory, request.Nickname);
         var normalizedTitle = Normalize(request.Title, string.Empty, 160);
         var normalizedBody = Normalize(request.Body, string.Empty, 4000);
         var entity = new PlatformCommunityPost
@@ -547,13 +553,15 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>("request body is required");
         }
 
+        var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
         var validation = ValidatePost(
             request.Nickname,
             request.Password,
             request.Title,
             request.Body,
             request.SharedLinkUrl,
-            request.SalesOffer);
+            request.SalesOffer,
+            RequiresSuppliedNickname(normalizedCategory));
         if (validation is not null)
         {
             return BadRequest<PlatformCommunityPostResponse>(validation);
@@ -601,14 +609,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             연결원장 = 원장결과.Value;
         }
 
-        var normalizedCategory = ResolvePostCategory(request.Category, request.SalesOffer);
         if (!await _boardWritePolicy.CanWriteAsync(
                 entity.AppKey,
                 normalizedCategory,
+                _currentUserAccessor.UserId,
                 cancellationToken))
         {
-            return BadRequest<PlatformCommunityPostResponse>(
-                "사용자 작성이 허용된 기본 게시판 또는 운영자가 승인한 사용자 게시판으로만 글을 이동할 수 있습니다.");
+            return WriteRejected<PlatformCommunityPostResponse>(normalizedCategory);
         }
 
         entity.Category = normalizedCategory;
@@ -628,7 +635,10 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         {
             entity.커뮤니티원장Id = 연결원장?.원장Id;
         }
-        entity.Nickname = Normalize(request.Nickname, "익명", 40);
+        entity.Nickname = ResolvePostingNickname(
+            normalizedCategory,
+            request.Nickname,
+            entity.Nickname);
         entity.IsReportBoardPost = isReportBoardPost;
         entity.IsAuthorDisplayCountryPublic = !entity.IsReportBoardPost && request.IsAuthorDisplayCountryPublic;
         entity.AuthorDisplayCountryCode = entity.IsAuthorDisplayCountryPublic
@@ -743,12 +753,6 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostCommentResponse>("request body is required");
         }
 
-        var validation = ValidateComment(request);
-        if (validation is not null)
-        {
-            return BadRequest<PlatformCommunityPostCommentResponse>(validation);
-        }
-
         var entity = await _db.PlatformCommunityPosts
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
@@ -756,11 +760,17 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return NotFound<PlatformCommunityPostCommentResponse>("게시글을 찾을 수 없습니다.");
         }
 
+        var validation = ValidateComment(request, RequiresSuppliedNickname(entity.Category));
+        if (validation is not null)
+        {
+            return BadRequest<PlatformCommunityPostCommentResponse>(validation);
+        }
+
         var now = DateTime.UtcNow;
         var comment = new PlatformCommunityPostComment
         {
             PostId = id,
-            Nickname = Normalize(request.Nickname, "익명", 40),
+            Nickname = ResolvePostingNickname(entity.Category, request.Nickname),
             Body = Normalize(request.Body, string.Empty, 1000),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             CreatedAtUtc = now,
@@ -883,12 +893,6 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostAttachmentCommentResponse>("request body is required");
         }
 
-        var validation = ValidateAttachmentComment(request);
-        if (validation is not null)
-        {
-            return BadRequest<PlatformCommunityPostAttachmentCommentResponse>(validation);
-        }
-
         var attachment = await _db.PlatformCommunityPostAttachments
             .Include(x => x.Post)
             .FirstOrDefaultAsync(x => x.Id == attachmentId && x.Post != null && !x.Post.IsDeleted, cancellationToken);
@@ -897,11 +901,19 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return NotFound<PlatformCommunityPostAttachmentCommentResponse>("첨부 이미지를 찾을 수 없습니다.");
         }
 
+        var validation = ValidateAttachmentComment(
+            request,
+            RequiresSuppliedNickname(attachment.Post!.Category));
+        if (validation is not null)
+        {
+            return BadRequest<PlatformCommunityPostAttachmentCommentResponse>(validation);
+        }
+
         var now = DateTime.UtcNow;
         var comment = new PlatformCommunityPostAttachmentComment
         {
             AttachmentId = attachmentId,
-            Nickname = Normalize(request.Nickname, "Anonymous", 40),
+            Nickname = ResolvePostingNickname(attachment.Post!.Category, request.Nickname),
             Body = Normalize(request.Body, string.Empty, 1000),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim()),
             CreatedAtUtc = now,
@@ -1039,9 +1051,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         string title,
         string body,
         string? sharedLinkUrl,
-        PlatformCommunityPostSalesOfferRequest? salesOffer)
+        PlatformCommunityPostSalesOfferRequest? salesOffer,
+        bool requiresSuppliedNickname)
     {
-        if (string.IsNullOrWhiteSpace(nickname) || nickname.Trim().Length > 40)
+        if ((requiresSuppliedNickname && string.IsNullOrWhiteSpace(nickname))
+            || (!string.IsNullOrWhiteSpace(nickname) && nickname.Trim().Length > 40))
         {
             return "닉네임은 1자 이상 40자 이하로 입력해야 합니다.";
         }
@@ -1182,6 +1196,32 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         return text.Length <= maxLength ? text : text[..maxLength];
     }
 
+    private string ResolvePostingNickname(
+        string category,
+        string? requestedNickname,
+        string? existingNickname = null)
+    {
+        if (!string.IsNullOrWhiteSpace(_currentUserAccessor.UserId)
+            || CommunityBoardCatalog.Find(category)?.AllowsAnonymousPosting != true)
+        {
+            return Normalize(requestedNickname, "익명", 40);
+        }
+
+        var baseName = CommunityAnonymousNicknameCatalog.ResolveBaseName(category);
+        if (!string.IsNullOrWhiteSpace(existingNickname)
+            && existingNickname.StartsWith(baseName, StringComparison.Ordinal))
+        {
+            return Normalize(existingNickname, baseName, 40);
+        }
+
+        var discriminator = Convert.ToHexString(RandomNumberGenerator.GetBytes(2));
+        return CommunityAnonymousNicknameCatalog.Create(category, discriminator);
+    }
+
+    private bool RequiresSuppliedNickname(string category)
+        => !string.IsNullOrWhiteSpace(_currentUserAccessor.UserId)
+           || CommunityBoardCatalog.Find(category)?.AllowsAnonymousPosting != true;
+
     private static string? NormalizeOptionalUrl(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -1204,9 +1244,12 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         return text.Length <= maxLength ? text : text[..maxLength];
     }
 
-    private static string? ValidateComment(PlatformCommunityPostCommentCreateRequest request)
+    private static string? ValidateComment(
+        PlatformCommunityPostCommentCreateRequest request,
+        bool requiresSuppliedNickname)
     {
-        if (string.IsNullOrWhiteSpace(request.Nickname) || request.Nickname.Trim().Length > 40)
+        if ((requiresSuppliedNickname && string.IsNullOrWhiteSpace(request.Nickname))
+            || (!string.IsNullOrWhiteSpace(request.Nickname) && request.Nickname.Trim().Length > 40))
         {
             return "닉네임은 1자 이상 40자 이하로 입력해야 합니다.";
         }
@@ -1224,9 +1267,12 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         return null;
     }
 
-    private static string? ValidateAttachmentComment(PlatformCommunityPostAttachmentCommentCreateRequest request)
+    private static string? ValidateAttachmentComment(
+        PlatformCommunityPostAttachmentCommentCreateRequest request,
+        bool requiresSuppliedNickname)
     {
-        if (string.IsNullOrWhiteSpace(request.Nickname) || request.Nickname.Trim().Length > 40)
+        if ((requiresSuppliedNickname && string.IsNullOrWhiteSpace(request.Nickname))
+            || (!string.IsNullOrWhiteSpace(request.Nickname) && request.Nickname.Trim().Length > 40))
         {
             return "닉네임은 1자 이상 40자 이하로 입력해야 합니다.";
         }
@@ -1339,6 +1385,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             GroupCode = board.GroupCode,
             GroupDisplayName = board.GroupDisplayName,
             IsUserCreatable = board.IsUserCreatable,
+            PostingAccessCode = board.PostingAccessCode,
+            PostingAccessDisplayName = board.PostingAccessDisplayName,
+            AllowsAnonymousPosting = board.AllowsAnonymousPosting,
             PostCount = matchingCounts.Sum(item => item.Count),
             LatestPostAtUtc = matchingCounts
                 .Select(item => (DateTime?)item.LatestPostAtUtc)
@@ -1491,6 +1540,21 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 
     private static Result Forbidden(string message)
         => Result.Fail(new Error(message).WithMetadata("StatusCode", StatusCodes.Status403Forbidden));
+
+    private Result<T> WriteRejected<T>(string category)
+    {
+        var board = CommunityBoardCatalog.Find(category);
+        var loginRequired = board?.RequiresAuthenticatedPosting == true || board is null;
+        if (loginRequired && string.IsNullOrWhiteSpace(_currentUserAccessor.UserId))
+        {
+            return Result.Fail<T>(new Error(
+                    "이 게시판은 로그인한 사용자만 글을 작성할 수 있습니다. 공개 화면에는 실명 대신 닉네임이 표시됩니다.")
+                .WithMetadata("StatusCode", StatusCodes.Status401Unauthorized));
+        }
+
+        return BadRequest<T>(
+            "사용자 작성이 허용된 기본 게시판 또는 운영자가 승인한 사용자 게시판에만 글을 작성할 수 있습니다.");
+    }
 
     private sealed record CommunityBoardCategoryCount(
         string Category,

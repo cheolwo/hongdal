@@ -9,6 +9,7 @@ public interface ICommunityBoardWritePolicy
     Task<bool> CanWriteAsync(
         string? appKey,
         string? category,
+        string? userId,
         CancellationToken cancellationToken = default);
 }
 
@@ -17,6 +18,7 @@ public sealed class CommunityBoardWritePolicy(HongdalContext db) : ICommunityBoa
     public async Task<bool> CanWriteAsync(
         string? appKey,
         string? category,
+        string? userId,
         CancellationToken cancellationToken = default)
     {
         var normalizedCategory = category?.Trim();
@@ -28,8 +30,21 @@ public sealed class CommunityBoardWritePolicy(HongdalContext db) : ICommunityBoa
         var catalogBoard = CommunityBoardCatalog.Find(normalizedCategory);
         if (catalogBoard is not null)
         {
-            return (catalogBoard.IsPublic && catalogBoard.IsUserCreatable)
-                   || catalogBoard.Key == CommunityBoardKeys.SafetyReport;
+            var userPostingEnabled = (catalogBoard.IsPublic && catalogBoard.IsUserCreatable)
+                                     || catalogBoard.Key == CommunityBoardKeys.SafetyReport;
+            if (!userPostingEnabled)
+            {
+                return false;
+            }
+
+            return catalogBoard.AllowsAnonymousPosting
+                   || (catalogBoard.RequiresAuthenticatedPosting
+                       && !string.IsNullOrWhiteSpace(userId));
+        }
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return false;
         }
 
         var normalizedAppKey = string.IsNullOrWhiteSpace(appKey)

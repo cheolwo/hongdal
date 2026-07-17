@@ -8,7 +8,18 @@ public sealed record CommunityBoardDefinition(
     string GroupDisplayName,
     bool IsUserCreatable,
     bool IsPublic,
-    IReadOnlyList<string> LegacyCategoryNames);
+    string PostingAccessCode,
+    IReadOnlyList<string> LegacyCategoryNames)
+{
+    public bool AllowsAnonymousPosting
+        => PostingAccessCode == CommunityBoardPostingAccessCodes.Anonymous;
+
+    public bool RequiresAuthenticatedPosting
+        => PostingAccessCode == CommunityBoardPostingAccessCodes.Authenticated;
+
+    public string PostingAccessDisplayName
+        => CommunityBoardPostingAccessCodes.DisplayName(PostingAccessCode);
+}
 
 public sealed class CommunityBoardSummaryResponse
 {
@@ -19,6 +30,10 @@ public sealed class CommunityBoardSummaryResponse
     public string GroupDisplayName { get; set; } = string.Empty;
     public bool IsUserCreatable { get; set; }
     public bool IsCustom { get; set; }
+    public string PostingAccessCode { get; set; } = CommunityBoardPostingAccessCodes.Authenticated;
+    public string PostingAccessDisplayName { get; set; } = CommunityBoardPostingAccessCodes.DisplayName(
+        CommunityBoardPostingAccessCodes.Authenticated);
+    public bool AllowsAnonymousPosting { get; set; }
     public int PostCount { get; set; }
     public DateTime? LatestPostAtUtc { get; set; }
 }
@@ -48,6 +63,61 @@ public static class CommunityBoardGroupCodes
     public const string Safety = "safety";
 }
 
+public static class CommunityBoardPostingAccessCodes
+{
+    public const string Anonymous = "anonymous";
+    public const string Authenticated = "authenticated";
+    public const string OperatorOnly = "operator-only";
+    public const string Mixed = "mixed";
+
+    public static string DisplayName(string? code)
+        => code switch
+        {
+            Anonymous => "비로그인 작성 가능",
+            Authenticated => "로그인 후 작성",
+            OperatorOnly => "운영자 작성",
+            Mixed => "게시판별 작성 조건",
+            _ => "로그인 후 작성"
+        };
+}
+
+public static class CommunityAnonymousNicknameCatalog
+{
+    public static string ResolveBaseName(string? category)
+        => CommunityBoardCatalog.Find(category)?.Key switch
+        {
+            CommunityBoardKeys.FreeLife => "지나가는 이웃",
+            CommunityBoardKeys.QuestionHelp => "궁금한 이웃",
+            CommunityBoardKeys.InformationPrices => "시세 살피는 이웃",
+            CommunityBoardKeys.Food => "골목 미식가",
+            CommunityBoardKeys.SafetyReport => "익명 신고자",
+            _ => "익명 이웃"
+        };
+
+    public static string Create(string? category, string? discriminator)
+    {
+        var baseName = ResolveBaseName(category);
+        if (CommunityBoardCatalog.Find(category)?.Key == CommunityBoardKeys.SafetyReport)
+        {
+            return baseName;
+        }
+
+        var suffix = new string((discriminator ?? string.Empty)
+            .Where(char.IsAsciiLetterOrDigit)
+            .Take(4)
+            .Select(char.ToUpperInvariant)
+            .ToArray());
+        return string.IsNullOrWhiteSpace(suffix)
+            ? baseName
+            : $"{baseName}-{suffix}";
+    }
+
+    public static string Preview(string? category)
+        => CommunityBoardCatalog.Find(category)?.Key == CommunityBoardKeys.SafetyReport
+            ? ResolveBaseName(category)
+            : $"{ResolveBaseName(category)}-****";
+}
+
 /// <summary>
 /// 게시판은 글의 목적을 나타내고, 공동구매·창고·운송 같은 업무 영역은 WorkflowTag로 분리합니다.
 /// 기존 Category 값은 별칭으로 유지해 데이터 이관 없이 새 게시판에서 함께 조회합니다.
@@ -62,6 +132,7 @@ public static class CommunityBoardCatalog
         "서비스 운영",
         isUserCreatable: false,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly,
         "공지",
         "이용안내");
 
@@ -73,6 +144,7 @@ public static class CommunityBoardCatalog
         "사람과 정보",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "자유");
 
     public static CommunityBoardDefinition QuestionHelp { get; } = Board(
@@ -83,6 +155,7 @@ public static class CommunityBoardCatalog
         "사람과 정보",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "업무 질문",
         "운송 실무");
 
@@ -94,6 +167,7 @@ public static class CommunityBoardCatalog
         "사람과 정보",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "정보 협업");
 
     public static CommunityBoardDefinition Food { get; } = Board(
@@ -104,6 +178,7 @@ public static class CommunityBoardCatalog
         "사람과 정보",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "맛집",
         "음식 정보");
 
@@ -115,6 +190,7 @@ public static class CommunityBoardCatalog
         "함께하는 일",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Authenticated,
         "화물 운송",
         "운송 정보");
 
@@ -125,7 +201,8 @@ public static class CommunityBoardCatalog
         CommunityBoardGroupCodes.PeopleAndInformation,
         "사람과 정보",
         isUserCreatable: false,
-        isPublic: true);
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly);
 
     public static CommunityBoardDefinition Participation { get; } = Board(
         CommunityBoardKeys.Participation,
@@ -135,6 +212,7 @@ public static class CommunityBoardCatalog
         "함께하는 일",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Authenticated,
         "공동구매",
         "모집");
 
@@ -146,6 +224,7 @@ public static class CommunityBoardCatalog
         "함께하는 일",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Authenticated,
         "판매");
 
     public static CommunityBoardDefinition LedgerProgress { get; } = Board(
@@ -156,6 +235,7 @@ public static class CommunityBoardCatalog
         "함께하는 일",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Authenticated,
         "생활 원장",
         "업무 기록",
         "시스템 다이어그램");
@@ -168,6 +248,7 @@ public static class CommunityBoardCatalog
         "함께하는 일",
         isUserCreatable: true,
         isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Authenticated,
         "성립 사례",
         "완료 사례",
         "후기");
@@ -179,7 +260,8 @@ public static class CommunityBoardCatalog
         CommunityBoardGroupCodes.ServiceOperation,
         "서비스 운영",
         isUserCreatable: true,
-        isPublic: true);
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Authenticated);
 
     public static CommunityBoardDefinition SafetyReport { get; } = Board(
         CommunityBoardKeys.SafetyReport,
@@ -189,6 +271,7 @@ public static class CommunityBoardCatalog
         "안전센터",
         isUserCreatable: false,
         isPublic: false,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
         "신고/분쟁",
         "신고",
         "분쟁");
@@ -273,6 +356,7 @@ public static class CommunityBoardCatalog
         string groupDisplayName,
         bool isUserCreatable,
         bool isPublic,
+        string postingAccessCode,
         params string[] legacyCategoryNames)
         => new(
             key,
@@ -282,6 +366,7 @@ public static class CommunityBoardCatalog
             groupDisplayName,
             isUserCreatable,
             isPublic,
+            postingAccessCode,
             legacyCategoryNames
                 .Where(value => !string.IsNullOrWhiteSpace(value))
                 .Select(value => value.Trim())

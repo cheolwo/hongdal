@@ -32,6 +32,41 @@ public sealed class CommunityBoardCatalogTests
             CommunityBoardCatalog.Find(CommunityBoardKeys.Prajna));
     }
 
+    [Fact]
+    public void 게시판마다_비로그인작성_로그인작성_운영자작성조건을구분한다()
+    {
+        Assert.Equal(
+            CommunityBoardPostingAccessCodes.Anonymous,
+            CommunityBoardCatalog.FreeLife.PostingAccessCode);
+        Assert.True(CommunityBoardCatalog.Food.AllowsAnonymousPosting);
+        Assert.True(CommunityBoardCatalog.SafetyReport.AllowsAnonymousPosting);
+
+        Assert.Equal(
+            CommunityBoardPostingAccessCodes.Authenticated,
+            CommunityBoardCatalog.Cargo.PostingAccessCode);
+        Assert.True(CommunityBoardCatalog.Participation.RequiresAuthenticatedPosting);
+        Assert.True(CommunityBoardCatalog.SalesSupply.RequiresAuthenticatedPosting);
+        Assert.True(CommunityBoardCatalog.LedgerProgress.RequiresAuthenticatedPosting);
+
+        Assert.Equal(
+            CommunityBoardPostingAccessCodes.OperatorOnly,
+            CommunityBoardCatalog.NoticeGuide.PostingAccessCode);
+        Assert.Equal(
+            CommunityBoardPostingAccessCodes.OperatorOnly,
+            CommunityBoardCatalog.Prajna.PostingAccessCode);
+    }
+
+    [Theory]
+    [InlineData(CommunityBoardKeys.FreeLife, "지나가는 이웃-A1B2")]
+    [InlineData(CommunityBoardKeys.QuestionHelp, "궁금한 이웃-A1B2")]
+    [InlineData(CommunityBoardKeys.InformationPrices, "시세 살피는 이웃-A1B2")]
+    [InlineData(CommunityBoardKeys.Food, "골목 미식가-A1B2")]
+    [InlineData(CommunityBoardKeys.SafetyReport, "익명 신고자")]
+    public void 익명닉네임은_게시판특색을반영한다(string boardKey, string expected)
+    {
+        Assert.Equal(expected, CommunityAnonymousNicknameCatalog.Create(boardKey, "a1-b2-c3"));
+    }
+
     [Theory]
     [InlineData("업무 질문", CommunityBoardKeys.QuestionHelp)]
     [InlineData("운송 실무", CommunityBoardKeys.QuestionHelp)]

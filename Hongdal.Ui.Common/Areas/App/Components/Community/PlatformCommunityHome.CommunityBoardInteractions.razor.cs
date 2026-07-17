@@ -80,7 +80,14 @@ public partial class PlatformCommunityHome
             ResolveCommunityBoardIcon(board),
             GetCommunityBoardPostCount(board),
             BuildCommunityBoardHref(board),
-            string.Equals(selectedBoardFilter, board, StringComparison.OrdinalIgnoreCase));
+            string.Equals(selectedBoardFilter, board, StringComparison.OrdinalIgnoreCase),
+            ResolvePostingAccessCode(board));
+
+    private static string ResolvePostingAccessCode(string board)
+        => string.Equals(board, "전체", StringComparison.OrdinalIgnoreCase)
+            ? CommunityBoardPostingAccessCodes.Mixed
+            : CommunityBoardCatalog.Find(board)?.PostingAccessCode
+              ?? CommunityBoardPostingAccessCodes.Authenticated;
 
     private void SelectBoardFilter(string board)
     {

@@ -1,4 +1,5 @@
 @using Hongdal.Ui.Common.Areas.App.ViewModels
+@inject Hongdal.Ui.Common.Areas.App.Services.IHongdalAccessTokenProvider AccessTokenProvider
 @inherits ViewModelParameterComponentBase<CommunityPostComposerViewModel>
 @namespace Hongdal.Ui.Common.Areas.App.Components.Community
 
@@ -63,6 +64,13 @@
                     </button>
                 }
             </nav>
+            <MudAlert Severity="@SelectedPostingAccessSeverity"
+                      Dense="true"
+                      Variant="Variant.Text"
+                      aria-live="polite">
+                <strong>@SelectedPostingAccessLabel</strong>
+                <span> — @SelectedPostingAccessNotice</span>
+            </MudAlert>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(VisibleStatusMessage))
@@ -286,12 +294,25 @@
                 </header>
 
                 <div class="platform-community-compose-settings-grid platform-community-compose-settings-grid--identity">
-                    <MudTextField T="string"
-                                  Label="닉네임"
-                                  @bind-Value="ViewModel.Draft.Nickname"
-                                  MaxLength="40"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense" />
+                    @if (UsesAutomaticAnonymousNickname)
+                    {
+                        <MudTextField T="string"
+                                      Label="자동 익명 닉네임"
+                                      Value="@AutomaticAnonymousNicknameDisplay"
+                                      ReadOnly="true"
+                                      HelperText="실제 등록할 때 별표가 짧은 무작위 표식으로 바뀝니다."
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    }
+                    else
+                    {
+                        <MudTextField T="string"
+                                      Label="닉네임"
+                                      @bind-Value="ViewModel.Draft.Nickname"
+                                      MaxLength="40"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    }
                     <MudTextField T="string"
                                   Label="글 비밀번호"
                                   @bind-Value="ViewModel.Draft.Password"
@@ -469,6 +490,45 @@
                 _ => Severity.Info
             };
 
+    private CommunityBoardDefinition? SelectedBoardDefinition
+        => CommunityBoardCatalog.Find(ViewModel.Draft.Category);
+
+    private string SelectedPostingAccessCode
+        => SelectedBoardDefinition?.PostingAccessCode
+           ?? CommunityBoardPostingAccessCodes.Authenticated;
+
+    private string SelectedPostingAccessLabel
+        => CommunityBoardPostingAccessCodes.DisplayName(SelectedPostingAccessCode);
+
+    private bool UsesAutomaticAnonymousNickname
+        => SelectedPostingAccessCode == CommunityBoardPostingAccessCodes.Anonymous
+           && string.IsNullOrWhiteSpace(AccessTokenProvider.AccessToken);
+
+    private string AutomaticAnonymousNicknameDisplay
+        => ViewModel.EditingPostId is not null && !string.IsNullOrWhiteSpace(ViewModel.Draft.Nickname)
+            ? ViewModel.Draft.Nickname
+            : CommunityAnonymousNicknameCatalog.Preview(ViewModel.Draft.Category);
+
+    private Severity SelectedPostingAccessSeverity
+        => SelectedPostingAccessCode switch
+        {
+            CommunityBoardPostingAccessCodes.Anonymous => Severity.Success,
+            CommunityBoardPostingAccessCodes.OperatorOnly => Severity.Warning,
+            _ => Severity.Info
+        };
+
+    private string SelectedPostingAccessNotice
+        => SelectedPostingAccessCode switch
+        {
+            CommunityBoardPostingAccessCodes.Anonymous =>
+                UsesAutomaticAnonymousNickname
+                    ? $"비로그인 작성자는 {CommunityAnonymousNicknameCatalog.Preview(ViewModel.Draft.Category)} 형태의 이름을 자동으로 받습니다."
+                    : "로그인한 작성자는 계정의 공개 닉네임을 사용합니다.",
+            CommunityBoardPostingAccessCodes.OperatorOnly =>
+                "일반 사용자가 직접 작성할 수 없는 운영 게시판입니다.",
+            _ => "계정 확인이 필요하지만 공개 화면에는 실명 대신 닉네임이 표시됩니다."
+        };
+
     private string BuildCategoryClass(string category)
         => string.Equals(ViewModel.Draft.Category, category, StringComparison.OrdinalIgnoreCase)
             ? "platform-community-compose-board-tab platform-community-compose-board-tab--active"
@@ -480,6 +540,11 @@
 
     private async Task SaveAsync()
     {
+        if (UsesAutomaticAnonymousNickname)
+        {
+            ViewModel.Draft.Nickname = AutomaticAnonymousNicknameDisplay;
+        }
+
         var result = await ViewModel.SaveAsync();
         if (result.Succeeded)
         {

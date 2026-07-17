@@ -21,7 +21,21 @@ public sealed record CommunityBoardNavigationItem(
     string Icon,
     int PostCount,
     string Href,
-    bool IsSelected = false);
+    bool IsSelected = false,
+    string PostingAccessCode = CommunityBoardPostingAccessCodes.Mixed)
+{
+    public string PostingAccessLabel
+        => CommunityBoardPostingAccessCodes.DisplayName(PostingAccessCode);
+
+    public Color PostingAccessColor
+        => PostingAccessCode switch
+        {
+            CommunityBoardPostingAccessCodes.Anonymous => Color.Success,
+            CommunityBoardPostingAccessCodes.Authenticated => Color.Info,
+            CommunityBoardPostingAccessCodes.OperatorOnly => Color.Warning,
+            _ => Color.Default
+        };
+}
 
 public static class CommunitySystemPostDisplay
 {

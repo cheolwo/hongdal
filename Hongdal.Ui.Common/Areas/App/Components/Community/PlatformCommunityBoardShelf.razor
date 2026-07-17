@@ -20,6 +20,12 @@
                 <span class="platform-community-board-copy">
                     <strong>@item.Name</strong>
                     <small>@item.Description</small>
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Variant="Variant.Text"
+                             Color="@item.PostingAccessColor">
+                        @item.PostingAccessLabel
+                    </MudChip>
                 </span>
                 <span class="platform-community-board-count">@item.PostCount</span>
             </button>

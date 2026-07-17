@@ -48,6 +48,12 @@
                     <span>
                         <strong>@board.Name</strong>
                         <small>@board.Description</small>
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Variant="Variant.Text"
+                                 Color="@board.PostingAccessColor">
+                            @board.PostingAccessLabel
+                        </MudChip>
                     </span>
                     <b>@board.PostCount</b>
                     <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />

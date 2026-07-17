@@ -654,6 +654,13 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
             SetStatus(message, CommunityComposerMessageKind.Success);
             return new(true, wasEditing, saved, message);
         }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            const string loginRequiredMessage =
+                "선택한 게시판은 로그인한 사용자만 글을 작성할 수 있습니다. 로그인 후 다시 등록해 주세요.";
+            SetStatus(loginRequiredMessage, CommunityComposerMessageKind.Warning);
+            return new(false, wasEditing, null, loginRequiredMessage);
+        }
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
         {
             const string forbiddenMessage = "비밀번호가 맞지 않아 수정할 수 없습니다.";

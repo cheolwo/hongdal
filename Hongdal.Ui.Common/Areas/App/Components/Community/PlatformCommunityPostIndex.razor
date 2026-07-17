@@ -17,6 +17,7 @@
                href="@board.Href"
                aria-current="@(board.IsSelected ? "page" : null)">
                 <span>@board.Name</span>
+                <small>@board.PostingAccessLabel</small>
                 <b>@board.PostCount</b>
             </a>
         }

@@ -114,7 +114,7 @@ public sealed class CommunityBoardUseCaseTests
     }
 
     [Fact]
-    public async Task 게시글작성정책은_사용자작성가능기본게시판또는승인게시판만허용한다()
+    public async Task 게시글작성정책은_게시판별익명로그인운영자조건을적용한다()
     {
         await using var context = CreateContext();
         context.PlatformCommunityBoardRequests.AddRange(
@@ -126,30 +126,52 @@ public sealed class CommunityBoardUseCaseTests
         Assert.True(await policy.CanWriteAsync(
             "platform",
             CommunityBoardCatalog.InformationPrices.DisplayName,
+            null,
+            CancellationToken.None));
+        Assert.False(await policy.CanWriteAsync(
+            "platform",
+            CommunityBoardCatalog.Cargo.DisplayName,
+            null,
+            CancellationToken.None));
+        Assert.True(await policy.CanWriteAsync(
+            "platform",
+            CommunityBoardCatalog.Cargo.DisplayName,
+            "cargo-writer",
+            CancellationToken.None));
+        Assert.False(await policy.CanWriteAsync(
+            "platform",
+            "승인 게시판",
+            null,
             CancellationToken.None));
         Assert.True(await policy.CanWriteAsync(
             "platform",
             "승인 게시판",
+            "custom-board-writer",
             CancellationToken.None));
         Assert.False(await policy.CanWriteAsync(
             "platform",
             CommunityBoardCatalog.Prajna.DisplayName,
+            "member-1",
             CancellationToken.None));
         Assert.False(await policy.CanWriteAsync(
             "platform",
             CommunityBoardCatalog.NoticeGuide.DisplayName,
+            "member-1",
             CancellationToken.None));
         Assert.True(await policy.CanWriteAsync(
             "platform",
             CommunityBoardCatalog.SafetyReport.DisplayName,
+            null,
             CancellationToken.None));
         Assert.False(await policy.CanWriteAsync(
             "platform",
             "대기 게시판",
+            "member-1",
             CancellationToken.None));
         Assert.False(await policy.CanWriteAsync(
             "platform",
             "신청하지 않은 게시판",
+            "member-1",
             CancellationToken.None));
     }
 
