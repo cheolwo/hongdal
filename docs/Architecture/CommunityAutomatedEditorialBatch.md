@@ -32,7 +32,7 @@ KAMIS 가격 글은 관측 항목 일부를 표시하며 전체 시장 평균이
 
 성찰문은 특정 인물의 말처럼 보이게 출처를 꾸미지 않는다. 현재 카탈로그는 홍달의 공개·합의·기록 원칙을 바탕으로 직접 작성한 짧은 문장과 실천 질문만 포함한다. 외부 명언을 추가하려면 원문 출처와 번역·이용 권리를 확인한 별도 Source로 구현한다.
 
-반야 자료는 카드 수집 상태나 내부 검토 ON/OFF만으로 게시하지 않는다. 카드는 `반야 게시 승인`, 영상은 기존 `공개` 상태가 필요하며, 전체 `PrajnaPublicationEnabled` 설정도 별도로 켜야 한다. 배치는 승인된 카드와 영상을 번갈아 보면서 실행당 미게시 항목 한 건만 올린다. 게시글에는 짧은 소개와 원 출처 링크만 담고 저장 이미지를 커뮤니티 첨부물로 복제하지 않는다. 자세한 경계는 [반야 게시판과 관리자 선별 발행](PrajnaCommunityPublication.md)을 따른다.
+반야 자료는 카드 수집 상태나 내부 검토 ON/OFF만으로 게시하지 않는다. 카드는 `반야 게시 승인`, 영상은 지식·성찰 채널 확인 + 채널 반야 허용 + 개별 영상 `공개`가 필요하며, 전체 `PrajnaPublicationEnabled` 설정도 별도로 켜야 한다. 배치는 승인된 카드와 영상을 번갈아 보면서 실행당 미게시 항목 한 건만 올린다. 게시글에는 짧은 소개와 원 출처 링크만 담고 저장 이미지를 커뮤니티 첨부물로 복제하지 않는다. 자세한 경계는 [반야 게시판과 관리자 선별 발행](PrajnaCommunityPublication.md)을 따른다.
 
 ## 중복·실패 경계
 
@@ -61,8 +61,7 @@ KAMIS 가격 글은 관측 항목 일부를 표시하며 전체 시장 평균이
     "ActivityDigestEnabled": true,
     "ActivityDigestCronExpression": "0 30 8 * * ?",
     "PrajnaPublicationEnabled": false,
-    "PrajnaPublicationCronExpression": "0 15 9 * * ?",
-    "PrajnaYouTubeChannelId": "UCI8HW08rOSlvweOjJ9Gp2Ng"
+    "PrajnaPublicationCronExpression": "0 15 9 * * ?"
   }
 }
 ```

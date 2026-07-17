@@ -2,9 +2,9 @@
 
 ## 목적
 
-`반야`는 배움·철학 자료를 나누는 고정 공개 게시판이다. 일반 사용자가 글쓰기 요청의 분류값을 직접 바꾸어 게시할 수 없는 관리자 선별 공간이다. 현재 첫 원천은 서버에 이미 수집되는 홍익학당 카드와 YouTube 영상이다. 수집된 외부 자료를 자동으로 모두 노출하지 않고, 서버관리자가 개별 항목을 선별한 뒤 정해진 배치가 미게시 항목을 한 건씩 올린다.
+`반야`는 배움·철학 자료를 나누는 고정 공개 게시판이다. 일반 사용자가 글쓰기 요청의 분류값을 직접 바꾸어 게시할 수 없는 관리자 선별 공간이다. 카드 원천은 홍익학당으로 시작하고, 영상은 홍익학당을 포함한 자기계발·철학·종교 교육 채널을 공통 `지식·성찰 채널` 모델로 관리한다. 수집된 외부 자료를 자동으로 모두 노출하지 않고, 서버관리자가 채널과 개별 항목을 각각 선별한 뒤 정해진 배치가 미게시 항목을 한 건씩 올린다.
 
-홍익학당은 현재 홍달의 협력기관이 아니다. 게시글은 제휴·공식 추천으로 표현하지 않고 원 출처, 기준일과 비제휴 안내를 포함한다.
+수집 카탈로그는 인기 순위나 관점·교리의 우열을 뜻하지 않는다. 게시글은 제휴·공식 추천으로 표현하지 않고 원 출처, 관점 표시, 기준일과 비제휴 안내를 포함한다.
 
 ## 승인과 발행 흐름
 
@@ -13,9 +13,10 @@ flowchart LR
     A["카드 페이지·YouTube 업로드 동기화"] --> B["관리자 전용 반야 자료 화면"]
     B --> C{"개별 게시 승인"}
     C -->|카드| D["반야 게시 승인 = true"]
-    C -->|영상| E["공유 상태 = 공개"]
+    C -->|영상 채널| E["지식·성찰 프로필 + 채널 반야 허용"]
+    E --> L["개별 영상 공유 상태 = 공개"]
     D --> F{"반야 발행 배치 활성"}
-    E --> F
+    L --> F
     F -->|꺼짐| G["승인 상태만 보관"]
     F -->|켜짐| H["카드·영상을 번갈아 한 건 선택"]
     H --> I{"원천 항목을 이미 게시했는가"}
@@ -31,6 +32,8 @@ flowchart LR
 | 카드 `IsAdminEnabled` | 내부 검토·활용 대상 ON | 필요 |
 | 카드 `IsCommunityPublicationApproved` | 관리자가 반야 게시를 명시 승인 | 필요, 기본값 `false` |
 | 영상 `공유상태 = 공개` | 관리자가 개별 영상 링크 게시를 승인 | 필요 |
+| 채널 `지식성찰채널여부` | 채널의 주제·관점·공식 출처를 공통 모델로 확인 | 영상에 필요 |
+| 채널 `반야게시허용여부` | 관리자가 해당 채널을 반야 원천으로 별도 승인 | 영상에 필요, 기본값 `false` |
 | `CommunityEditorialBatch:Enabled` | 커뮤니티 편집 배치 전체 스위치 | 필요 |
 | `PrajnaPublicationEnabled` | 반야 발행 전용 스위치 | 필요, 기본값 `false` |
 
@@ -48,7 +51,7 @@ flowchart LR
 
 - 카드: 제목, 최대 420자의 짧은 소개, 선별 기준일, 원 출처 링크
 - 영상: 제목, 최대 420자의 짧은 소개, 영상 게시일, 선별 기준일, YouTube 원본 링크
-- 공통: 관리자가 선별했다는 표시와 홍익학당 비제휴 안내
+- 공통: 관리자가 선별했다는 표시, 채널 관점과 비제휴·비추천 안내
 - 제외: 사용자 개인정보, 관리자 메모, 저장된 원본·파생 이미지 파일, 영상 파일, 자막 전문
 
 원자료 이미지는 관리자 검수와 별도 모바일 카드 기능에만 사용한다. 반야 게시글은 외부 원본 링크를 공유하므로 원 출처의 최신 내용과 이용 조건을 사용자가 직접 확인할 수 있어야 한다.
@@ -60,6 +63,8 @@ flowchart LR
 | `GET` | `/api/v1/admin/content/hongik-hakdang/cards?includeInactive=true` | 카드 묶음과 카드의 감지·검토·게시 승인 상태 조회 |
 | `PUT` | `/api/v1/admin/content/hongik-hakdang/cards/{cardId}/community-publication` | 개별 카드 반야 게시 승인·해제 |
 | `GET` | `/api/v1/admin/content/youtube/playlists` | 재생목록을 보며 선별 후보 탐색 |
+| `PUT` | `/api/v1/admin/content/youtube/channels/{channelId}/knowledge-reflection-profile` | 채널 주제·관점·공식 출처 설정 |
+| `PUT` | `/api/v1/admin/content/youtube/channels/{channelId}/prajna-publication` | 채널 단위 반야 게시 허용·해제 |
 | `PUT` | `/api/v1/admin/content/youtube/videos/{videoId}/publication` | 개별 영상 공개 승인·해제 |
 
 모든 쓰기 API는 `서버관리자전용` 정책을 사용한다. 발행 배치는 외부 YouTube API를 직접 호출하지 않고 이미 동기화된 DB 상태만 읽는다.
@@ -71,10 +76,11 @@ flowchart LR
   "CommunityEditorialBatch": {
     "Enabled": true,
     "PrajnaPublicationEnabled": true,
-    "PrajnaPublicationCronExpression": "0 15 9 * * ?",
-    "PrajnaYouTubeChannelId": "UCI8HW08rOSlvweOjJ9Gp2Ng"
+    "PrajnaPublicationCronExpression": "0 15 9 * * ?"
   }
 }
 ```
 
 저장소의 기본값은 전체 배치와 반야 발행 모두 `false`다. 운영자는 출처 표시, 게시 빈도와 관리자 승인 목록을 검토한 뒤 환경별 설정에서 명시적으로 활성화한다.
+
+`YouTube:SeedKnowledgeReflectionCatalog`도 기본값은 `false`다. 켜면 공식 handle을 `channels.list(forHandle=...)`로 채널 ID에 해석해 대표 후보를 추가하지만, 어떤 채널도 반야 게시 허용으로 자동 전환하지 않는다.
