@@ -33,4 +33,34 @@ public sealed class KamisPriceArchiveServiceTests
     {
         Assert.Null(KamisPriceArchiveService.ParsePrice(source));
     }
+
+    [Theory]
+    [InlineData("2025", "07/17", "2025-07-17")]
+    [InlineData("2026", "1/02", "2026-01-02")]
+    public void 기간가격의_연도와_월일을_조사일로변환한다(
+        string year,
+        string monthDay,
+        string expected)
+    {
+        var result = KamisPriceArchiveService.ParsePeriodSurveyDate(year, monthDay);
+
+        Assert.Equal(DateOnly.Parse(expected), result);
+    }
+
+    [Fact]
+    public void 기간조회는_직전_1년_범위를허용한다()
+    {
+        KamisPriceArchiveService.ValidatePeriod(
+            new DateOnly(2025, 7, 17),
+            new DateOnly(2026, 7, 16));
+    }
+
+    [Fact]
+    public void 기간조회가_1년을넘으면_거부한다()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            KamisPriceArchiveService.ValidatePeriod(
+                new DateOnly(2025, 7, 17),
+                new DateOnly(2026, 7, 17)));
+    }
 }

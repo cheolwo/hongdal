@@ -23,6 +23,11 @@ public interface IKamisPriceArchiveService
     Task<KamisPriceArchiveResult> CollectDailyPricesAsync(
         DateOnly requestedDate,
         CancellationToken cancellationToken = default);
+
+    Task<KamisPriceArchiveResult> CollectPeriodPricesAsync(
+        DateOnly startDate,
+        DateOnly endDate,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
@@ -30,6 +35,22 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
     private const string SourceUrl = "https://www.kamis.or.kr/service/price/xml.do";
     private const string NationwideCode = "ALL";
     private const string NationwideName = "전국";
+    private const string ConvertedKilogramUnit = "1kg";
+    private const int PeriodQueryBatchSize = 12;
+    private const int PeriodQueryConcurrency = 2;
+
+    private sealed record PeriodProductQuery(
+        string Action,
+        string ProductClassCode,
+        string ProductClassName,
+        string CategoryCode,
+        string CategoryName,
+        string ItemCode,
+        string ItemName,
+        string KindCode,
+        string KindName,
+        string RankCode,
+        string RankName);
 
     private static readonly IReadOnlyDictionary<string, string> ProductClasses =
         new Dictionary<string, string>(StringComparer.Ordinal)
@@ -75,13 +96,7 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
             throw new ArgumentOutOfRangeException(nameof(requestedDate));
         }
 
-        var kamis = _options.Kamis;
-        if (string.IsNullOrWhiteSpace(kamis.CertificationKey)
-            || string.IsNullOrWhiteSpace(kamis.RequesterId))
-        {
-            throw new InvalidOperationException(
-                "KAMIS 인증값이 설정되지 않았습니다. PublicData:Kamis 설정을 확인해 주세요.");
-        }
+        EnsureKamisConfigured();
 
         var run = new KamisPriceCollectionRun
         {
@@ -187,6 +202,420 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         }
     }
 
+    public async Task<KamisPriceArchiveResult> CollectPeriodPricesAsync(
+        DateOnly startDate,
+        DateOnly endDate,
+        CancellationToken cancellationToken = default)
+    {
+        ValidatePeriod(startDate, endDate);
+        EnsureKamisConfigured();
+
+        var run = new KamisPriceCollectionRun
+        {
+            RequestedDate = endDate,
+            QuerySummary =
+                $"KAMIS 전국 기간 가격 / 도매·소매 / 품목·품종·등급별 / {startDate:yyyy-MM-dd}~{endDate:yyyy-MM-dd} / kg 환산",
+            SourceUrl = SourceUrl,
+            StartedAtUtc = DateTime.UtcNow
+        };
+        _db.KamisCollectionRuns.Add(run);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        var fetchedCount = 0;
+        var insertedCount = 0;
+        var updatedCount = 0;
+        var existingCount = 0;
+        DateOnly? latestSurveyDate = null;
+
+        try
+        {
+            var queries = await FetchPeriodProductQueriesAsync(cancellationToken);
+            using var concurrency = new SemaphoreSlim(PeriodQueryConcurrency);
+            var completedQueryCount = 0;
+
+            foreach (var batch in queries.Chunk(PeriodQueryBatchSize))
+            {
+                var tasks = batch.Select(async query =>
+                {
+                    await concurrency.WaitAsync(cancellationToken);
+                    try
+                    {
+                        return await FetchPeriodPricesAsync(
+                            query,
+                            startDate,
+                            endDate,
+                            DateTime.UtcNow,
+                            cancellationToken);
+                    }
+                    finally
+                    {
+                        concurrency.Release();
+                    }
+                });
+
+                var batchResults = await Task.WhenAll(tasks);
+                var deduplicated = batchResults
+                    .SelectMany(result => result)
+                    .GroupBy(item => item.RecordKey, StringComparer.Ordinal)
+                    .Select(group => group.Last())
+                    .ToArray();
+                var batchCounts = await UpsertPeriodBatchAsync(
+                    run.Id,
+                    deduplicated,
+                    cancellationToken);
+
+                fetchedCount += deduplicated.Length;
+                insertedCount += batchCounts.Inserted;
+                updatedCount += batchCounts.Updated;
+                existingCount += batchCounts.Existing;
+                var batchLatestDate = deduplicated
+                    .Select(item => item.SurveyDate)
+                    .Cast<DateOnly?>()
+                    .DefaultIfEmpty()
+                    .Max();
+                if (batchLatestDate is not null
+                    && (latestSurveyDate is null || batchLatestDate > latestSurveyDate))
+                {
+                    latestSurveyDate = batchLatestDate;
+                }
+
+                completedQueryCount += batch.Length;
+                _logger.LogInformation(
+                    "KAMIS 기간 가격 수집 진행. RunId={RunId}, Queries={Completed}/{Total}, Fetched={Fetched}, Inserted={Inserted}",
+                    run.Id,
+                    completedQueryCount,
+                    queries.Count,
+                    fetchedCount,
+                    insertedCount);
+            }
+
+            _db.ChangeTracker.Clear();
+            var completedRun = await _db.KamisCollectionRuns
+                .SingleAsync(item => item.Id == run.Id, cancellationToken);
+            completedRun.StatusCode = KamisArchiveStatusCodes.Completed;
+            completedRun.CompletedAtUtc = DateTime.UtcNow;
+            completedRun.LatestSurveyDate = latestSurveyDate;
+            completedRun.FetchedCount = fetchedCount;
+            completedRun.InsertedCount = insertedCount;
+            completedRun.UpdatedCount = updatedCount;
+            completedRun.ExistingCount = existingCount;
+            await _db.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation(
+                "KAMIS 국내 농수산물 1년 가격 수집 완료. RunId={RunId}, Queries={Queries}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}",
+                run.Id,
+                queries.Count,
+                fetchedCount,
+                insertedCount,
+                updatedCount,
+                existingCount);
+
+            return new KamisPriceArchiveResult(
+                run.Id,
+                fetchedCount,
+                insertedCount,
+                updatedCount,
+                existingCount,
+                latestSurveyDate);
+        }
+        catch (Exception ex)
+        {
+            _db.ChangeTracker.Clear();
+            var failedRun = await _db.KamisCollectionRuns
+                .SingleAsync(item => item.Id == run.Id, CancellationToken.None);
+            failedRun.StatusCode = KamisArchiveStatusCodes.Failed;
+            failedRun.CompletedAtUtc = DateTime.UtcNow;
+            failedRun.LatestSurveyDate = latestSurveyDate;
+            failedRun.FetchedCount = fetchedCount;
+            failedRun.InsertedCount = insertedCount;
+            failedRun.UpdatedCount = updatedCount;
+            failedRun.ExistingCount = existingCount;
+            failedRun.ErrorMessage = ex.Message.Length <= 2000 ? ex.Message : ex.Message[..2000];
+            await _db.SaveChangesAsync(CancellationToken.None);
+            throw;
+        }
+    }
+
+    private async Task<IReadOnlyList<PeriodProductQuery>> FetchPeriodProductQueriesAsync(
+        CancellationToken cancellationToken)
+    {
+        var kamis = _options.Kamis;
+        var requestPath = QueryHelpers.AddQueryString(
+            kamis.DailyCategoryPricePath.TrimStart('/'),
+            new Dictionary<string, string?>
+            {
+                ["action"] = "productInfo",
+                ["p_returntype"] = "json"
+            });
+
+        using var document = await GetKamisJsonDocumentAsync(requestPath, cancellationToken);
+        var root = document.RootElement;
+        var resultCode = ReadString(root, "error_code");
+        if (!string.Equals(resultCode, "000", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException($"KAMIS 품목 목록 요청이 거부되었습니다. 코드={resultCode}");
+        }
+
+        if (!TryGetProperty(root, "info", out var info)
+            || info.ValueKind != JsonValueKind.Array)
+        {
+            throw new InvalidOperationException("KAMIS 품목 목록 응답의 info 항목이 올바르지 않습니다.");
+        }
+
+        var queries = new List<PeriodProductQuery>();
+        foreach (var product in info.EnumerateArray())
+        {
+            AddPeriodProductQueries(
+                queries,
+                product,
+                "periodWholesaleProductList",
+                "02",
+                ProductClasses["02"],
+                "whole_productrankcode");
+            AddPeriodProductQueries(
+                queries,
+                product,
+                "periodRetailProductList",
+                "01",
+                ProductClasses["01"],
+                "retail_productrankcode");
+        }
+
+        return queries
+            .DistinctBy(query => string.Join(
+                '\u001f',
+                query.Action,
+                query.CategoryCode,
+                query.ItemCode,
+                query.KindCode,
+                query.RankCode))
+            .ToArray();
+    }
+
+    private static void AddPeriodProductQueries(
+        ICollection<PeriodProductQuery> target,
+        JsonElement product,
+        string action,
+        string productClassCode,
+        string productClassName,
+        string rankPropertyName)
+    {
+        var categoryCode = ReadString(product, "itemcategorycode");
+        var itemCode = ReadString(product, "itemcode");
+        var kindCode = ReadString(product, "kindcode");
+        var rankCodes = ReadString(product, rankPropertyName)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (categoryCode.Length == 0
+            || itemCode.Length == 0
+            || kindCode.Length == 0
+            || rankCodes.Length == 0)
+        {
+            return;
+        }
+
+        var categoryName = ReadString(product, "itemcategoryname");
+        var itemName = ReadString(product, "itemname");
+        var kindName = ReadString(product, "kindname");
+        foreach (var rankCode in rankCodes)
+        {
+            target.Add(new PeriodProductQuery(
+                action,
+                productClassCode,
+                productClassName,
+                categoryCode,
+                categoryName,
+                itemCode,
+                itemName,
+                kindCode,
+                kindName,
+                rankCode,
+                GetRankName(rankCode)));
+        }
+    }
+
+    private async Task<IReadOnlyList<KamisPriceObservation>> FetchPeriodPricesAsync(
+        PeriodProductQuery query,
+        DateOnly startDate,
+        DateOnly endDate,
+        DateTime collectedAtUtc,
+        CancellationToken cancellationToken)
+    {
+        var kamis = _options.Kamis;
+        var requestPath = QueryHelpers.AddQueryString(
+            kamis.DailyCategoryPricePath.TrimStart('/'),
+            new Dictionary<string, string?>
+            {
+                ["action"] = query.Action,
+                ["p_startday"] = startDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                ["p_endday"] = endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                ["p_product_cls_code"] = query.ProductClassCode,
+                ["p_item_category_code"] = query.CategoryCode,
+                ["p_item_code"] = query.ItemCode,
+                ["p_kind_code"] = query.KindCode,
+                ["p_product_rank_code"] = query.RankCode,
+                ["p_county_code"] = string.Empty,
+                ["p_convert_kg_yn"] = "Y",
+                ["p_cert_key"] = kamis.CertificationKey,
+                ["p_cert_id"] = kamis.RequesterId,
+                ["p_returntype"] = "json"
+            });
+
+        using var document = await GetKamisJsonDocumentAsync(requestPath, cancellationToken);
+        var data = ReadDataObject(document.RootElement, query.ProductClassCode, query.CategoryCode);
+        var resultCode = ReadString(data, "error_code");
+        if (!string.Equals(resultCode, "000", StringComparison.Ordinal))
+        {
+            if (string.Equals(resultCode, "001", StringComparison.Ordinal))
+            {
+                return [];
+            }
+
+            throw new InvalidOperationException(
+                $"KAMIS 기간 가격 요청이 거부되었습니다. 가격구분={query.ProductClassCode}, 부류={query.CategoryCode}, 품목={query.ItemCode}, 코드={resultCode}");
+        }
+
+        if (!TryGetProperty(data, "item", out var items))
+        {
+            return [];
+        }
+
+        var sourceItems = items.ValueKind switch
+        {
+            JsonValueKind.Array => items.EnumerateArray().ToArray(),
+            JsonValueKind.Object => [items],
+            _ => []
+        };
+        var resolvedItemName = sourceItems
+            .Select(item => ReadString(item, "itemname"))
+            .FirstOrDefault(value => value.Length > 0) ?? query.ItemName;
+        var resolvedKindName = sourceItems
+            .Select(item => ReadString(item, "kindname"))
+            .FirstOrDefault(value => value.Length > 0) ?? query.KindName;
+
+        return sourceItems
+            .Where(item => string.Equals(
+                ReadString(item, "countyname"),
+                "평균",
+                StringComparison.Ordinal))
+            .Select(item => MapPeriodObservation(
+                item,
+                query,
+                resolvedItemName,
+                resolvedKindName,
+                endDate,
+                collectedAtUtc))
+            .Where(item => item is not null)
+            .Select(item => item!)
+            .ToArray();
+    }
+
+    private async Task<(int Inserted, int Updated, int Existing)> UpsertPeriodBatchAsync(
+        long collectionRunId,
+        IReadOnlyCollection<KamisPriceObservation> incoming,
+        CancellationToken cancellationToken)
+    {
+        if (incoming.Count == 0)
+        {
+            return (0, 0, 0);
+        }
+
+        var recordKeys = incoming
+            .Select(item => item.RecordKey)
+            .ToHashSet(StringComparer.Ordinal);
+        var existing = await _db.KamisPriceObservations
+            .Where(item => recordKeys.Contains(item.RecordKey))
+            .ToDictionaryAsync(item => item.RecordKey, StringComparer.Ordinal, cancellationToken);
+        var updatedCount = 0;
+        var seenAtUtc = DateTime.UtcNow;
+
+        foreach (var item in incoming)
+        {
+            if (existing.TryGetValue(item.RecordKey, out var stored))
+            {
+                if (HasPeriodMaterialChanges(stored, item))
+                {
+                    CopyPeriodMutableValues(stored, item);
+                    stored.UpdatedAtUtc = seenAtUtc;
+                    updatedCount++;
+                }
+
+                stored.LastSeenAtUtc = seenAtUtc;
+                continue;
+            }
+
+            item.FirstCollectionRunId = collectionRunId;
+            _db.KamisPriceObservations.Add(item);
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+        _db.ChangeTracker.Clear();
+        return (incoming.Count - existing.Count, updatedCount, existing.Count);
+    }
+
+    private async Task<JsonDocument> GetKamisJsonDocumentAsync(
+        string requestPath,
+        CancellationToken cancellationToken)
+    {
+        const int maxAttempts = 3;
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                using var response = await _httpClient.GetAsync(
+                    requestPath,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                    return await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+                }
+
+                var isTransient = (int)response.StatusCode == 408
+                                  || (int)response.StatusCode == 429
+                                  || (int)response.StatusCode >= 500;
+                if (!isTransient || attempt == maxAttempts)
+                {
+                    throw new InvalidOperationException(
+                        $"KAMIS HTTP 요청이 실패했습니다. 상태 코드={(int)response.StatusCode}");
+                }
+
+                _logger.LogWarning(
+                    "KAMIS HTTP 요청을 재시도합니다. Attempt={Attempt}/{MaxAttempts}, StatusCode={StatusCode}",
+                    attempt,
+                    maxAttempts,
+                    (int)response.StatusCode);
+            }
+            catch (HttpRequestException) when (attempt < maxAttempts)
+            {
+                _logger.LogWarning(
+                    "KAMIS 네트워크 요청을 재시도합니다. Attempt={Attempt}/{MaxAttempts}",
+                    attempt,
+                    maxAttempts);
+            }
+            catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested
+                                                && attempt < maxAttempts)
+            {
+                _logger.LogWarning(
+                    "KAMIS 시간 초과 요청을 재시도합니다. Attempt={Attempt}/{MaxAttempts}",
+                    attempt,
+                    maxAttempts);
+            }
+            catch (HttpRequestException)
+            {
+                throw new InvalidOperationException("KAMIS 네트워크 요청에 실패했습니다.");
+            }
+            catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                throw new InvalidOperationException("KAMIS 요청 제한 시간을 초과했습니다.");
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, attempt - 1)), cancellationToken);
+        }
+
+        throw new InvalidOperationException("KAMIS 요청 재시도 횟수를 초과했습니다.");
+    }
+
     private async Task<IReadOnlyList<KamisPriceObservation>> FetchCategoryAsync(
         DateOnly requestedDate,
         string productClassCode,
@@ -212,14 +641,7 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
                 ["p_returntype"] = "json"
             });
 
-        using var response = await _httpClient.GetAsync(
-            requestPath,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+        using var document = await GetKamisJsonDocumentAsync(requestPath, cancellationToken);
         var data = ReadDataObject(document.RootElement, productClassCode, categoryCode);
         var resultCode = ReadString(data, "error_code");
         if (!string.Equals(resultCode, "000", StringComparison.Ordinal))
@@ -313,7 +735,7 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
         var kindCode = ReadString(source, "kind_code", "kindcode");
         var rankName = ReadString(source, "rank");
         var rankCode = ReadString(source, "rank_code", "rankcode");
-        var unit = ReadString(source, "unit");
+        var unit = ConvertedKilogramUnit;
         var priceRaw = ReadString(source, "dpr1");
         var surveyDate = ParseSurveyDate(ReadString(source, "day1"), requestedDate);
         var identity = string.Join(
@@ -367,6 +789,123 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
             UpdatedAtUtc = collectedAtUtc
         };
     }
+
+    private static KamisPriceObservation? MapPeriodObservation(
+        JsonElement source,
+        PeriodProductQuery query,
+        string itemName,
+        string kindName,
+        DateOnly requestedDate,
+        DateTime collectedAtUtc)
+    {
+        var surveyDate = ParsePeriodSurveyDate(
+            ReadString(source, "yyyy"),
+            ReadString(source, "regday"));
+        if (surveyDate is null)
+        {
+            return null;
+        }
+
+        var priceRaw = ReadString(source, "price");
+        var identity = string.Join(
+            '\u001f',
+            query.ProductClassCode,
+            query.CategoryCode,
+            NationwideCode,
+            surveyDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            query.ItemCode,
+            query.KindCode,
+            query.RankCode,
+            ConvertedKilogramUnit);
+
+        return new KamisPriceObservation
+        {
+            RecordKey = UsdaNassPriceArchiveService.Sha256(identity),
+            ProductClassCode = query.ProductClassCode,
+            ProductClassName = query.ProductClassName,
+            CategoryCode = query.CategoryCode,
+            CategoryName = query.CategoryName,
+            CountryCode = NationwideCode,
+            CountryName = NationwideName,
+            RequestedDate = requestedDate,
+            SurveyDate = surveyDate.Value,
+            ItemName = itemName,
+            ItemCode = query.ItemCode,
+            KindName = kindName,
+            KindCode = query.KindCode,
+            RankName = query.RankName,
+            RankCode = query.RankCode,
+            Unit = ConvertedKilogramUnit,
+            PriceRaw = priceRaw,
+            PriceKrw = ParsePrice(priceRaw),
+            IsPriceMissing = ParsePrice(priceRaw) is null,
+            SourceUrl = SourceUrl,
+            RawJson = source.GetRawText(),
+            FirstCollectedAtUtc = collectedAtUtc,
+            LastSeenAtUtc = collectedAtUtc,
+            UpdatedAtUtc = collectedAtUtc
+        };
+    }
+
+    internal static DateOnly? ParsePeriodSurveyDate(string year, string monthDay)
+    {
+        var parts = monthDay.Trim().Split('/', StringSplitOptions.TrimEntries);
+        if (parts.Length != 2
+            || !int.TryParse(year.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out var parsedYear)
+            || !int.TryParse(parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out var parsedMonth)
+            || !int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out var parsedDay))
+        {
+            return null;
+        }
+
+        try
+        {
+            return new DateOnly(parsedYear, parsedMonth, parsedDay);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return null;
+        }
+    }
+
+    internal static void ValidatePeriod(DateOnly startDate, DateOnly endDate)
+    {
+        if (startDate.Year is < 1990 or > 2100)
+        {
+            throw new ArgumentOutOfRangeException(nameof(startDate));
+        }
+
+        if (endDate < startDate)
+        {
+            throw new ArgumentException("종료일은 시작일보다 빠를 수 없습니다.", nameof(endDate));
+        }
+
+        if (endDate >= startDate.AddYears(1))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(endDate),
+                "KAMIS 기간 조회는 시작일을 포함해 최대 1년 미만 범위로 요청해야 합니다.");
+        }
+    }
+
+    private void EnsureKamisConfigured()
+    {
+        var kamis = _options.Kamis;
+        if (string.IsNullOrWhiteSpace(kamis.CertificationKey)
+            || string.IsNullOrWhiteSpace(kamis.RequesterId))
+        {
+            throw new InvalidOperationException(
+                "KAMIS 인증값이 설정되지 않았습니다. PublicData:Kamis 설정을 확인해 주세요.");
+        }
+    }
+
+    private static string GetRankName(string rankCode)
+        => rankCode switch
+        {
+            "04" => "상품",
+            "05" => "중품",
+            _ => $"등급 {rankCode}"
+        };
 
     internal static DateOnly ParseSurveyDate(string value, DateOnly requestedDate)
     {
@@ -447,6 +986,33 @@ public sealed partial class KamisPriceArchiveService : IKamisPriceArchiveService
 
         value = default;
         return false;
+    }
+
+    private static bool HasPeriodMaterialChanges(
+        KamisPriceObservation stored,
+        KamisPriceObservation incoming)
+        => stored.ItemName != incoming.ItemName
+           || stored.KindName != incoming.KindName
+           || stored.RankName != incoming.RankName
+           || stored.Unit != incoming.Unit
+           || stored.PriceRaw != incoming.PriceRaw
+           || stored.PriceKrw != incoming.PriceKrw
+           || stored.IsPriceMissing != incoming.IsPriceMissing
+           || stored.RawJson != incoming.RawJson;
+
+    private static void CopyPeriodMutableValues(
+        KamisPriceObservation stored,
+        KamisPriceObservation incoming)
+    {
+        stored.RequestedDate = incoming.RequestedDate;
+        stored.ItemName = incoming.ItemName;
+        stored.KindName = incoming.KindName;
+        stored.RankName = incoming.RankName;
+        stored.Unit = incoming.Unit;
+        stored.PriceRaw = incoming.PriceRaw;
+        stored.PriceKrw = incoming.PriceKrw;
+        stored.IsPriceMissing = incoming.IsPriceMissing;
+        stored.RawJson = incoming.RawJson;
     }
 
     private static bool HasMaterialChanges(

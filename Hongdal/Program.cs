@@ -255,6 +255,50 @@ if (args.Any(argument =>
     return;
 }
 
+if (args.Any(argument =>
+        string.Equals(argument, "--collect-kamis-price-history", StringComparison.OrdinalIgnoreCase)))
+{
+    var endDateArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--end-date=", StringComparison.OrdinalIgnoreCase));
+    var defaultEndDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+    var endDate = DateOnly.TryParseExact(
+        endDateArgument?["--end-date=".Length..],
+        "yyyy-MM-dd",
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out var parsedEndDate)
+        ? parsedEndDate
+        : defaultEndDate;
+    var startDateArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--start-date=", StringComparison.OrdinalIgnoreCase));
+    var defaultStartDate = endDate.AddYears(-1).AddDays(1);
+    var startDate = DateOnly.TryParseExact(
+        startDateArgument?["--start-date=".Length..],
+        "yyyy-MM-dd",
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None,
+        out var parsedStartDate)
+        ? parsedStartDate
+        : defaultStartDate;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService = scope.ServiceProvider.GetRequiredService<IKamisPriceArchiveService>();
+    var archiveResult = await archiveService.CollectPeriodPricesAsync(startDate, endDate);
+    app.Logger.LogInformation(
+        "KAMIS 국내 1년 가격 DB 저장 완료. Range={StartDate}~{EndDate}, RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}, LatestSurveyDate={LatestSurveyDate}",
+        startDate,
+        endDate,
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.UpdatedCount,
+        archiveResult.ExistingCount,
+        archiveResult.LatestSurveyDate);
+    return;
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

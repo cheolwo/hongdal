@@ -1,3 +1,4 @@
+using System.Net;
 using Hongdal.Services.AgriculturalFisheries.Information;
 using Hongdal.Services.AgriculturalFisheries.ImportReadiness;
 using Microsoft.Extensions.Options;
@@ -46,7 +47,10 @@ public static partial class ServiceCollectionExtensions
                 {
                     var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
                     client.BaseAddress = new Uri(options.Kamis.BaseUrl);
-                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                    client.DefaultRequestVersion = HttpVersion.Version11;
+                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Hongdal-KAMIS-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(90, options.TimeoutSeconds));
                 })
             .RemoveAllLoggers();
         services.AddScoped<IKamisPriceArchiveService>(serviceProvider =>
