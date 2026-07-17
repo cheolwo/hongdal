@@ -94,12 +94,98 @@
                           Class="platform-community-compose-body-field"
                           aria-label="게시글 내용" />
 
+            <section class="community-sales-compose" aria-label="판매 정보">
+                <button type="button"
+                        class="community-sales-compose__toggle @(ViewModel.Draft.IsSalesPost ? "is-active" : string.Empty)"
+                        aria-pressed="@ViewModel.Draft.IsSalesPost"
+                        @onclick="ToggleSalesPost">
+                    <span><MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" /> 판매 정보 붙이기</span>
+                    <small>게시글과 댓글 안에서 상품을 소개하고 거래 조건을 이야기합니다.</small>
+                </button>
+
+                @if (ViewModel.Draft.IsSalesPost)
+                {
+                    <div class="community-sales-compose__fields">
+                        <MudTextField T="string"
+                                      Label="상품명"
+                                      Placeholder="예: 햇복숭아 3kg 한 상자"
+                                      @bind-Value="ViewModel.Draft.SalesProductTitle"
+                                      Immediate="true"
+                                      MaxLength="160"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Class="community-sales-compose__product" />
+                        <MudNumericField T="decimal"
+                                         Label="판매 가능 수량"
+                                         @bind-Value="ViewModel.Draft.SalesAvailableQuantity"
+                                         Min="@((decimal)0.01)"
+                                         Max="@((decimal)1000000)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+                        <MudTextField T="string"
+                                      Label="수량 단위"
+                                      Placeholder="개, 상자, kg"
+                                      @bind-Value="ViewModel.Draft.SalesQuantityUnit"
+                                      MaxLength="20"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                        <MudNumericField T="decimal"
+                                         Label="개당 가격"
+                                         @bind-Value="ViewModel.Draft.SalesUnitPrice"
+                                         Min="@((decimal)0.01)"
+                                         Max="@((decimal)1000000000)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+                        <MudTextField T="string"
+                                      Label="통화"
+                                      Placeholder="KRW"
+                                      @bind-Value="ViewModel.Draft.SalesCurrencyCode"
+                                      MaxLength="3"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </div>
+
+                    <div class="community-sales-compose__payments" role="group" aria-label="협의 가능한 결제 방법">
+                        <strong>협의 가능한 결제</strong>
+                        <div>
+                            <MudCheckBox T="bool" @bind-Value="ViewModel.Draft.AcceptsTossPayments" Label="토스결제" Dense="true" />
+                            <MudCheckBox T="bool" @bind-Value="ViewModel.Draft.AcceptsNaverPay" Label="네이버페이" Dense="true" />
+                            <MudCheckBox T="bool" @bind-Value="ViewModel.Draft.AcceptsPayPal" Label="PayPal" Dense="true" />
+                            <MudCheckBox T="bool" @bind-Value="ViewModel.Draft.AcceptsDirectCash" Label="당사자 간 현금" Dense="true" />
+                        </div>
+                        <MudCheckBox T="bool"
+                                     @bind-Value="ViewModel.Draft.AllowsGroupPurchase"
+                                     Label="주문자들이 수량을 모아 공동구매를 제안할 수 있음"
+                                     Dense="true" />
+                        <small>결제 수단은 가능 여부를 표시하는 정보입니다. 실제 결제·현금 전달은 댓글에서 조건을 합의한 뒤 별도로 진행합니다.</small>
+                    </div>
+
+                    @if (ViewModel.EditingPostId is not null)
+                    {
+                        <MudSelect T="string"
+                                   Label="판매 상태"
+                                   @bind-Value="ViewModel.Draft.SalesStatus"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Class="community-sales-compose__status">
+                            <MudSelectItem Value="@PlatformCommunitySalesOfferStatuses.Open">판매 중</MudSelectItem>
+                            <MudSelectItem Value="@PlatformCommunitySalesOfferStatuses.SoldOut">품절</MudSelectItem>
+                            <MudSelectItem Value="@PlatformCommunitySalesOfferStatuses.Closed">판매 종료</MudSelectItem>
+                        </MudSelect>
+                    }
+                }
+            </section>
+
             @if (ViewModel.SelectedFiles.Count > 0)
             {
                 <div class="platform-community-compose-file-list" aria-label="선택한 사진">
-                    @foreach (var file in ViewModel.SelectedFiles.Take(4))
+                    @for (var index = 0; index < Math.Min(ViewModel.SelectedFiles.Count, 4); index++)
                     {
-                        <span><MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" /> @file.Name</span>
+                        var file = ViewModel.SelectedFiles[index];
+                        <span>
+                            <b>@(ViewModel.Draft.IsSalesPost ? index == 0 ? "썸네일" : "상세" : "사진")</b>
+                            <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" /> @file.Name
+                        </span>
                     }
                     @if (ViewModel.SelectedFiles.Count > 4)
                     {
@@ -123,6 +209,12 @@
                                    Color="Color.Default"
                                    OnClick="ViewModel.OpenSettings"
                                    aria-label="공유 링크 추가" />
+                </MudTooltip>
+                <MudTooltip Text="판매 정보 붙이기">
+                    <MudIconButton Icon="@Icons.Material.Filled.Storefront"
+                                   Color="@(ViewModel.Draft.IsSalesPost ? Color.Primary : Color.Default)"
+                                   OnClick="ToggleSalesPost"
+                                   aria-label="판매 정보 붙이기" />
                 </MudTooltip>
                 <MudTooltip Text="원장 첨부">
                     <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
@@ -157,6 +249,13 @@
             @if (!string.IsNullOrWhiteSpace(ViewModel.Draft.커뮤니티원장Id))
             {
                 <span class="platform-community-compose-context--ledger"><MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" /> 원장 연결</span>
+            }
+            @if (ViewModel.Draft.IsSalesPost)
+            {
+                <span class="platform-community-compose-context--sales">
+                    <MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" />
+                    판매글 · @ViewModel.Draft.SalesAvailableQuantity@ViewModel.Draft.SalesQuantityUnit
+                </span>
             }
             @if (ViewModel.Draft.IsReportBoardPost)
             {
@@ -397,4 +496,17 @@
 
     private void HandleFilesSelected(InputFileChangeEventArgs args)
         => ViewModel.SetFiles(args.GetMultipleFiles(5));
+
+    private void ToggleSalesPost()
+    {
+        ViewModel.Draft.IsSalesPost = !ViewModel.Draft.IsSalesPost;
+        if (ViewModel.Draft.IsSalesPost
+            && string.IsNullOrWhiteSpace(ViewModel.Draft.SalesProductTitle)
+            && !string.IsNullOrWhiteSpace(ViewModel.Draft.Title))
+        {
+            ViewModel.Draft.SalesProductTitle = ViewModel.Draft.Title;
+        }
+
+        ViewModel.ClearStatus();
+    }
 }

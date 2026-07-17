@@ -27,6 +27,18 @@ public sealed record CommunityPostComposerSnapshot
     public string Title { get; init; } = string.Empty;
     public string Body { get; init; } = string.Empty;
     public string SharedLinkUrl { get; init; } = string.Empty;
+    public bool IsSalesPost { get; init; }
+    public string SalesProductTitle { get; init; } = string.Empty;
+    public decimal SalesAvailableQuantity { get; init; } = 1;
+    public string SalesQuantityUnit { get; init; } = "개";
+    public decimal SalesUnitPrice { get; init; }
+    public string SalesCurrencyCode { get; init; } = "KRW";
+    public bool AcceptsTossPayments { get; init; }
+    public bool AcceptsNaverPay { get; init; }
+    public bool AcceptsPayPal { get; init; }
+    public bool AcceptsDirectCash { get; init; } = true;
+    public bool AllowsGroupPurchase { get; init; } = true;
+    public string SalesStatus { get; init; } = PlatformCommunitySalesOfferStatuses.Open;
     public string 커뮤니티원장Id { get; init; } = string.Empty;
     public bool IsReportBoardPost { get; init; }
     public string ReporterDisplayName { get; init; } = string.Empty;
@@ -62,6 +74,18 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     private string _title = string.Empty;
     private string _body = string.Empty;
     private string _sharedLinkUrl = string.Empty;
+    private bool _isSalesPost;
+    private string _salesProductTitle = string.Empty;
+    private decimal _salesAvailableQuantity = 1;
+    private string _salesQuantityUnit = "개";
+    private decimal _salesUnitPrice;
+    private string _salesCurrencyCode = "KRW";
+    private bool _acceptsTossPayments;
+    private bool _acceptsNaverPay;
+    private bool _acceptsPayPal;
+    private bool _acceptsDirectCash = true;
+    private bool _allowsGroupPurchase = true;
+    private string _salesStatus = PlatformCommunitySalesOfferStatuses.Open;
     private string _커뮤니티원장Id = string.Empty;
     private bool _isReportBoardPost;
     private string _reporterDisplayName = string.Empty;
@@ -78,6 +102,18 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     public string Title { get => _title; set => SetProperty(ref _title, value); }
     public string Body { get => _body; set => SetProperty(ref _body, value); }
     public string SharedLinkUrl { get => _sharedLinkUrl; set => SetProperty(ref _sharedLinkUrl, value); }
+    public bool IsSalesPost { get => _isSalesPost; set => SetProperty(ref _isSalesPost, value); }
+    public string SalesProductTitle { get => _salesProductTitle; set => SetProperty(ref _salesProductTitle, value); }
+    public decimal SalesAvailableQuantity { get => _salesAvailableQuantity; set => SetProperty(ref _salesAvailableQuantity, value); }
+    public string SalesQuantityUnit { get => _salesQuantityUnit; set => SetProperty(ref _salesQuantityUnit, value); }
+    public decimal SalesUnitPrice { get => _salesUnitPrice; set => SetProperty(ref _salesUnitPrice, value); }
+    public string SalesCurrencyCode { get => _salesCurrencyCode; set => SetProperty(ref _salesCurrencyCode, value); }
+    public bool AcceptsTossPayments { get => _acceptsTossPayments; set => SetProperty(ref _acceptsTossPayments, value); }
+    public bool AcceptsNaverPay { get => _acceptsNaverPay; set => SetProperty(ref _acceptsNaverPay, value); }
+    public bool AcceptsPayPal { get => _acceptsPayPal; set => SetProperty(ref _acceptsPayPal, value); }
+    public bool AcceptsDirectCash { get => _acceptsDirectCash; set => SetProperty(ref _acceptsDirectCash, value); }
+    public bool AllowsGroupPurchase { get => _allowsGroupPurchase; set => SetProperty(ref _allowsGroupPurchase, value); }
+    public string SalesStatus { get => _salesStatus; set => SetProperty(ref _salesStatus, value); }
     public string 커뮤니티원장Id { get => _커뮤니티원장Id; set => SetProperty(ref _커뮤니티원장Id, value); }
     public bool IsReportBoardPost { get => _isReportBoardPost; set => SetProperty(ref _isReportBoardPost, value); }
     public string ReporterDisplayName { get => _reporterDisplayName; set => SetProperty(ref _reporterDisplayName, value); }
@@ -87,6 +123,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         => !string.IsNullOrWhiteSpace(Title)
            || !string.IsNullOrWhiteSpace(Body)
            || !string.IsNullOrWhiteSpace(SharedLinkUrl)
+           || IsSalesPost
            || !string.IsNullOrWhiteSpace(커뮤니티원장Id);
 
     public string? Validate()
@@ -97,9 +134,37 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             || string.IsNullOrWhiteSpace(WorkflowTag)
             || string.IsNullOrWhiteSpace(RoleTag)
             || string.IsNullOrWhiteSpace(Title)
-            || (string.IsNullOrWhiteSpace(Body) && string.IsNullOrWhiteSpace(SharedLinkUrl)))
+            || (string.IsNullOrWhiteSpace(Body) && string.IsNullOrWhiteSpace(SharedLinkUrl) && !IsSalesPost))
         {
-            return "닉네임, 비밀번호, 게시판/분류, 워크플로우 태그, 역할 태그, 제목, 본문 또는 링크를 입력하세요.";
+            return "닉네임, 비밀번호, 게시판/분류, 워크플로우 태그, 역할 태그, 제목과 본문·링크·판매 정보 중 하나를 입력하세요.";
+        }
+
+        if (IsSalesPost)
+        {
+            if (string.IsNullOrWhiteSpace(SalesProductTitle))
+            {
+                return "판매할 상품명을 입력하세요.";
+            }
+
+            if (SalesAvailableQuantity <= 0 || string.IsNullOrWhiteSpace(SalesQuantityUnit))
+            {
+                return "판매 가능 수량과 단위를 확인하세요.";
+            }
+
+            if (SalesUnitPrice <= 0)
+            {
+                return "상품 가격을 입력하세요.";
+            }
+
+            if (!AcceptsTossPayments && !AcceptsNaverPay && !AcceptsPayPal && !AcceptsDirectCash)
+            {
+                return "협의 가능한 결제 방법을 하나 이상 선택하세요.";
+            }
+
+            if (IsReportBoardPost)
+            {
+                return "신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.";
+            }
         }
 
         if (IsAuthorDisplayCountryPublic
@@ -125,6 +190,18 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         Title = string.Empty;
         Body = string.Empty;
         SharedLinkUrl = string.Empty;
+        IsSalesPost = false;
+        SalesProductTitle = string.Empty;
+        SalesAvailableQuantity = 1;
+        SalesQuantityUnit = "개";
+        SalesUnitPrice = 0;
+        SalesCurrencyCode = "KRW";
+        AcceptsTossPayments = false;
+        AcceptsNaverPay = false;
+        AcceptsPayPal = false;
+        AcceptsDirectCash = true;
+        AllowsGroupPurchase = true;
+        SalesStatus = PlatformCommunitySalesOfferStatuses.Open;
         커뮤니티원장Id = string.Empty;
         IsReportBoardPost = false;
         ReporterDisplayName = string.Empty;
@@ -144,6 +221,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         Title = post.Title;
         Body = post.Body;
         SharedLinkUrl = post.SharedLinkUrl ?? string.Empty;
+        Apply(post.SalesOffer);
         커뮤니티원장Id = post.커뮤니티원장Id ?? string.Empty;
         IsReportBoardPost = string.Equals(post.Category, "신고/분쟁", StringComparison.OrdinalIgnoreCase)
                             || post.IsReportBoardPost;
@@ -164,6 +242,18 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         Title = snapshot.Title;
         Body = snapshot.Body;
         SharedLinkUrl = snapshot.SharedLinkUrl;
+        IsSalesPost = snapshot.IsSalesPost;
+        SalesProductTitle = snapshot.SalesProductTitle;
+        SalesAvailableQuantity = snapshot.SalesAvailableQuantity;
+        SalesQuantityUnit = snapshot.SalesQuantityUnit;
+        SalesUnitPrice = snapshot.SalesUnitPrice;
+        SalesCurrencyCode = snapshot.SalesCurrencyCode;
+        AcceptsTossPayments = snapshot.AcceptsTossPayments;
+        AcceptsNaverPay = snapshot.AcceptsNaverPay;
+        AcceptsPayPal = snapshot.AcceptsPayPal;
+        AcceptsDirectCash = snapshot.AcceptsDirectCash;
+        AllowsGroupPurchase = snapshot.AllowsGroupPurchase;
+        SalesStatus = snapshot.SalesStatus;
         커뮤니티원장Id = snapshot.커뮤니티원장Id;
         IsReportBoardPost = snapshot.IsReportBoardPost;
         ReporterDisplayName = snapshot.ReporterDisplayName;
@@ -184,6 +274,18 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             Title = Title,
             Body = Body,
             SharedLinkUrl = SharedLinkUrl,
+            IsSalesPost = IsSalesPost,
+            SalesProductTitle = SalesProductTitle,
+            SalesAvailableQuantity = SalesAvailableQuantity,
+            SalesQuantityUnit = SalesQuantityUnit,
+            SalesUnitPrice = SalesUnitPrice,
+            SalesCurrencyCode = SalesCurrencyCode,
+            AcceptsTossPayments = AcceptsTossPayments,
+            AcceptsNaverPay = AcceptsNaverPay,
+            AcceptsPayPal = AcceptsPayPal,
+            AcceptsDirectCash = AcceptsDirectCash,
+            AllowsGroupPurchase = AllowsGroupPurchase,
+            SalesStatus = SalesStatus,
             커뮤니티원장Id = 커뮤니티원장Id,
             IsReportBoardPost = IsReportBoardPost,
             ReporterDisplayName = ReporterDisplayName,
@@ -200,6 +302,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             Title = Title,
             Body = Body,
             SharedLinkUrl = SharedLinkUrl,
+            SalesOffer = CreateSalesOfferRequest(),
             커뮤니티원장Id = 커뮤니티원장Id,
             Nickname = Nickname,
             IsAuthorDisplayCountryPublic = IsAuthorDisplayCountryPublic,
@@ -220,6 +323,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             Title = Title,
             Body = Body,
             SharedLinkUrl = SharedLinkUrl,
+            SalesOffer = CreateSalesOfferRequest(),
             커뮤니티원장Id = 커뮤니티원장Id,
             Nickname = Nickname,
             IsAuthorDisplayCountryPublic = IsAuthorDisplayCountryPublic,
@@ -230,6 +334,54 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             ReportedDisplayName = ReportedDisplayName,
             Password = Password
         };
+
+    private void Apply(PlatformCommunityPostSalesOfferResponse? salesOffer)
+    {
+        IsSalesPost = salesOffer is not null;
+        SalesProductTitle = salesOffer?.ProductTitle ?? string.Empty;
+        SalesAvailableQuantity = salesOffer?.AvailableQuantity ?? 1;
+        SalesQuantityUnit = salesOffer?.QuantityUnit ?? "개";
+        SalesUnitPrice = salesOffer?.UnitPrice ?? 0;
+        SalesCurrencyCode = salesOffer?.CurrencyCode ?? "KRW";
+        AcceptsTossPayments = AcceptsPaymentMethod(salesOffer, PlatformCommunitySalesPaymentMethodCodes.TossPayments);
+        AcceptsNaverPay = AcceptsPaymentMethod(salesOffer, PlatformCommunitySalesPaymentMethodCodes.NaverPay);
+        AcceptsPayPal = AcceptsPaymentMethod(salesOffer, PlatformCommunitySalesPaymentMethodCodes.PayPal);
+        AcceptsDirectCash = salesOffer is null
+            || AcceptsPaymentMethod(salesOffer, PlatformCommunitySalesPaymentMethodCodes.DirectCash);
+        AllowsGroupPurchase = salesOffer?.AllowsGroupPurchase ?? true;
+        SalesStatus = salesOffer?.Status ?? PlatformCommunitySalesOfferStatuses.Open;
+    }
+
+    private PlatformCommunityPostSalesOfferRequest? CreateSalesOfferRequest()
+    {
+        if (!IsSalesPost)
+        {
+            return null;
+        }
+
+        var paymentMethods = new List<string>();
+        if (AcceptsTossPayments) paymentMethods.Add(PlatformCommunitySalesPaymentMethodCodes.TossPayments);
+        if (AcceptsNaverPay) paymentMethods.Add(PlatformCommunitySalesPaymentMethodCodes.NaverPay);
+        if (AcceptsPayPal) paymentMethods.Add(PlatformCommunitySalesPaymentMethodCodes.PayPal);
+        if (AcceptsDirectCash) paymentMethods.Add(PlatformCommunitySalesPaymentMethodCodes.DirectCash);
+
+        return new PlatformCommunityPostSalesOfferRequest
+        {
+            ProductTitle = SalesProductTitle,
+            AvailableQuantity = SalesAvailableQuantity,
+            QuantityUnit = SalesQuantityUnit,
+            UnitPrice = SalesUnitPrice,
+            CurrencyCode = SalesCurrencyCode,
+            AcceptedPaymentMethods = paymentMethods,
+            AllowsGroupPurchase = AllowsGroupPurchase,
+            Status = SalesStatus
+        };
+    }
+
+    private static bool AcceptsPaymentMethod(
+        PlatformCommunityPostSalesOfferResponse? salesOffer,
+        string paymentMethod)
+        => salesOffer?.AcceptedPaymentMethods.Contains(paymentMethod, StringComparer.OrdinalIgnoreCase) == true;
 }
 
 public sealed record CommunityPostComposerSaveResult(
