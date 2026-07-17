@@ -58,6 +58,7 @@ Thumbs.db
 /tmp/
 /.codex-remote-attachments/
 /artifacts/android-render-check/
+/artifacts/apify-amazon/
 /artifacts/page-capture-check/
 /artifacts/screenshots/
 /artifacts/ui-e2e/

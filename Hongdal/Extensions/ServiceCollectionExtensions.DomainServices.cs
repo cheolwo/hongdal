@@ -33,6 +33,7 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddHongdalDomainServices(this IServiceCollection services)
     {
         services.AddSingleton<IHongdalExecutionModePolicy, HongdalExecutionModePolicy>();
+        services.AddRoleAdvertisingIntegration();
         services.AddScoped<I결제Provider, Toss결제Provider>();
         services.AddScoped<I공통결제Service, 공통결제Service>();
         services.AddScoped<I콘텐츠혜택계산Service, 콘텐츠혜택계산Service>();
@@ -70,6 +71,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();
+        services.AddSingleton<I판매페이지초안저장소, Mongo판매페이지초안저장소>();
         services.AddSingleton<Mongo커뮤니티원장저장소>();
         services.AddSingleton<I커뮤니티원장투영작업저장소>(sp => sp.GetRequiredService<Mongo커뮤니티원장저장소>());
         services.AddSingleton<I커뮤니티원장저장소, 이벤트발행커뮤니티원장저장소>();
@@ -112,6 +114,10 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ITypecast음성카탈로그Service, Typecast음성카탈로그Service>();
         services.AddScoped<IYouTube채널감시저장소, EfYouTube채널감시저장소>();
         services.AddScoped<IYouTube채널감시Service, YouTube채널감시Service>();
+        services.AddScoped<IYouTube음식상품발견저장소, EfYouTube음식상품발견저장소>();
+        services.AddScoped<IYouTube음식상품발견Service, YouTube음식상품발견Service>();
+        services.AddScoped<IYouTube영상재료인지Engine, YouTube영상재료인지Engine>();
+        services.AddScoped<IYouTube영상재료자동인지Service, YouTube영상재료자동인지Service>();
         services.AddSingleton<IHongikHakdangCardPageParser, HongikHakdangCardPageParser>();
         services.AddSingleton<IHongikHakdangCardImageStore, HongikHakdangCardImageStore>();
         services.AddSingleton<IHongikHakdangCardVariantRenderer, HongikHakdangCardVariantRenderer>();

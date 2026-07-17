@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
+ENV ASPNETCORE_HTTP_PORTS=8080
 
 
 # 이 스테이지는 서비스 프로젝트를 빌드하는 데 사용됩니다.
@@ -30,5 +30,5 @@ RUN dotnet publish "./Hongdal.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p
 # 이 스테이지는 프로덕션에서 사용되거나 VS에서 일반 모드로 실행할 때 사용됩니다(디버그 구성을 사용하지 않는 경우 기본값).
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=publish --chown=$APP_UID:$APP_UID /app/publish .
 ENTRYPOINT ["dotnet", "Hongdal.dll"]

@@ -8,6 +8,7 @@ using Hongdal.Controllers;
 using Hongdal.Security;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -42,6 +43,7 @@ using Hongdal.Services.Security;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Hongdal.Infrastructure.Persistence.AgriculturalFisheries;
+using Hongdal.Infrastructure.Persistence.TraditionalMarkets;
 using Hongdal.Services.AgriculturalFisheries.Information;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,11 +70,23 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .ReadFrom.Services(services)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "Hongdal.LogisticsApi")
-        .WriteTo.Console()
-        .WriteTo.File(
-            path: "logs/hongdal-.log",
+        .WriteTo.Console();
+
+    var fileLogPath = context.Configuration["HongdalLogging:FilePath"];
+    if (string.IsNullOrWhiteSpace(fileLogPath)
+        && context.HostingEnvironment.IsDevelopment()
+        && !isRunningInContainer)
+    {
+        fileLogPath = "logs/hongdal-.log";
+    }
+
+    if (!string.IsNullOrWhiteSpace(fileLogPath))
+    {
+        configuration.WriteTo.File(
+            path: fileLogPath,
             rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 14);
+    }
 });
 
 builder.Services.AddHongdalPresentation();
@@ -118,9 +132,14 @@ var dispatchQueueJobOptions = builder.Configuration.GetSection(배차큐배치�
 var salesOrderSyncOptions = builder.Configuration.GetSection(SalesChannelOrderSyncOptions.SectionName).Get<SalesChannelOrderSyncOptions>() ?? new SalesChannelOrderSyncOptions();
 var youTubeOptions = builder.Configuration.GetSection(YouTubeOptions.SectionName).Get<YouTubeOptions>() ?? new YouTubeOptions();
 var hongikHakdangCardOptions = builder.Configuration.GetSection(HongikHakdangCardOptions.SectionName).Get<HongikHakdangCardOptions>() ?? new HongikHakdangCardOptions();
+var agriculturalFisheriesBatchOptions = builder.Configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName).Get<AgriculturalFisheriesBatchOptions>() ?? new AgriculturalFisheriesBatchOptions();
+var databaseInitializationOptions = builder.Configuration.GetSection(DatabaseInitializationOptions.SectionName).Get<DatabaseInitializationOptions>() ?? new DatabaseInitializationOptions();
+var initializeDatabaseOnly = args.Any(argument =>
+    string.Equals(argument, "--initialize-database", StringComparison.OrdinalIgnoreCase));
 
-builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions, youTubeOptions, hongikHakdangCardOptions, executionOptions);
+builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions, youTubeOptions, hongikHakdangCardOptions, agriculturalFisheriesBatchOptions, executionOptions);
 builder.Services.AddHongdalPersistence(builder.Configuration);
+builder.Services.AddHongdalHealthChecks();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
@@ -186,6 +205,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddAgriculturalFisheriesInformationModule();
 builder.Services.AddHongdalHttpClients();
+builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
 builder.Services.AddHongdalDomainServices();
 if (builder.Environment.IsDevelopment())
 {
@@ -315,10 +335,32 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-using (var scope = app.Services.CreateScope())
+if (databaseInitializationOptions.RunAtStartup || initializeDatabaseOnly)
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<HongdalContext>();
-    await InitializeDatabaseAsync(db, scope.ServiceProvider, app.Environment, app.Logger);
+    await InitializeDatabaseAsync(
+        db,
+        scope.ServiceProvider,
+        app.Environment,
+        app.Logger,
+        databaseInitializationOptions.FailOnError || initializeDatabaseOnly);
+}
+else
+{
+    app.Logger.LogInformation(
+        "Database initialization at startup is disabled. Run the application once with --initialize-database during deployment.");
+}
+
+if (initializeDatabaseOnly)
+{
+    app.Logger.LogInformation("Database initialization command completed.");
+    return;
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
 }
 
 if (!isRunningInContainer)
@@ -414,11 +456,26 @@ app.MapControllers();
 app.MapHub<DispatchRecommendationHub>("/hubs/dispatch-recommendations");
 app.MapHub<RestaurantOrderHub>("/hubs/restaurant-orders");
 app.MapHub<DiagramCollaborationHub>(DiagramCollaborationHub.HubPath);
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("live")
+}).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready")
+}).AllowAnonymous();
 
 app.Run();
 
-static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider services, IWebHostEnvironment environment, Microsoft.Extensions.Logging.ILogger logger)
+static async Task InitializeDatabaseAsync(
+    HongdalContext db,
+    IServiceProvider services,
+    IWebHostEnvironment environment,
+    Microsoft.Extensions.Logging.ILogger logger,
+    bool failOnError)
 {
+    var traditionalMarketDb = services.GetRequiredService<TraditionalMarketDbContext>();
+    var agriculturalFisheriesDb = services.GetRequiredService<AgriculturalFisheriesDbContext>();
     var migrationDelays = new[]
     {
         TimeSpan.FromSeconds(2),
@@ -433,6 +490,8 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
         try
         {
             await db.Database.MigrateAsync();
+            await traditionalMarketDb.Database.MigrateAsync();
+            await agriculturalFisheriesDb.Database.MigrateAsync();
             break;
         }
         catch (Exception ex) when (attempt < migrationDelays.Length)
@@ -443,6 +502,13 @@ static async Task InitializeDatabaseAsync(HongdalContext db, IServiceProvider se
         }
         catch (Exception ex)
         {
+            if (failOnError)
+            {
+                throw new InvalidOperationException(
+                    $"MySQL migration failed after {attempt + 1} attempts.",
+                    ex);
+            }
+
             logger.LogWarning(ex, "MySQL migration failed after {Attempt} attempts. Application will continue without applying migrations at startup.", attempt + 1);
             return;
         }

@@ -34,6 +34,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<기사이용료정책Options>(configuration.GetSection(기사이용료정책Options.SectionName));
         services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
         services.Configure<MongoDbOptions>(configuration.GetSection(MongoDbOptions.SectionName));
+        services.Configure<DatabaseInitializationOptions>(configuration.GetSection(DatabaseInitializationOptions.SectionName));
         services.Configure<PushNotificationsOptions>(configuration.GetSection(PushNotificationsOptions.SectionName));
         services.Configure<KakaoAlimTalkOptions>(configuration.GetSection(KakaoAlimTalkOptions.SectionName));
         services.Configure<KakaoLocalOptions>(configuration.GetSection(KakaoLocalOptions.SectionName));
@@ -42,8 +43,10 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CommandFileStorageOptions>(configuration.GetSection(CommandFileStorageOptions.SectionName));
         services.Configure<CustomsOptions>(configuration.GetSection(CustomsOptions.SectionName));
         services.Configure<PublicDataOptions>(configuration.GetSection(PublicDataOptions.SectionName));
+        services.Configure<AgriculturalFisheriesBatchOptions>(configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName));
         services.Configure<VersionFeatureFlagsOptions>(configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
         services.Configure<HongdalExecutionOptions>(configuration.GetSection(HongdalExecutionOptions.SectionName));
+        services.Configure<RoleAdvertisingOptions>(configuration.GetSection(RoleAdvertisingOptions.SectionName));
         services.Configure<SalesChannelOrderSyncOptions>(configuration.GetSection(SalesChannelOrderSyncOptions.SectionName));
         services.Configure<배차큐정책Options>(configuration.GetSection("DispatchQueue"));
         services.Configure<국내화물배차AI정책Options>(configuration.GetSection(국내화물배차AI정책Options.SectionName));

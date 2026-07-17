@@ -28,6 +28,7 @@ using 홍달.Services.Audit;
 using 홍달.Services.Sales;
 using 홍달.Services.ViewSettings;
 using Hongdal.Services.LogisticsProcessing.Warehouse;
+using Hongdal.Services.LogisticsProcessing.VehicleLoading;
 using Hongdal.Application.Driver.Transport;
 
 namespace Hongdal.Extensions;
@@ -61,6 +62,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I사용자행위로그Service, 사용자행위로그Service>();
         services.AddScoped<ISalesChannelService, SalesChannelService>();
         services.AddScoped<I판매채널UseCase, 판매채널UseCase>();
+        services.AddScoped<I판매페이지Service, 판매페이지Service>();
+        services.AddScoped<I판매페이지UseCase, 판매페이지UseCase>();
         services.AddScoped<IView가시성Service, View가시성Service>();
         services.AddScoped<IView설정UseCase, View설정UseCase>();
         services.AddScoped<I관리자View정책UseCase, 관리자View정책UseCase>();
@@ -92,6 +95,10 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityExperienceEventRecorder, CommunityExperienceEventRecorder>();
         services.AddScoped<IWarehouseOperationService, WarehouseOperationService>();
         services.AddScoped<IWarehousePerspectiveReadService, WarehousePerspectiveReadService>();
+        services.AddScoped<ILoadingPerspectiveReadService, LoadingPerspectiveReadService>();
+        services.AddScoped<IUnloadingPerspectiveReadService, UnloadingPerspectiveReadService>();
+        services.AddScoped<IIndividualOrderPerspectiveReadService, IndividualOrderPerspectiveReadService>();
+        services.AddScoped<IGroupOrderPerspectiveReadService, GroupOrderPerspectiveReadService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
         services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
         services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();

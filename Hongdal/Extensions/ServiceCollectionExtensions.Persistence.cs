@@ -37,7 +37,10 @@ public static partial class ServiceCollectionExtensions
             throw new InvalidOperationException("Redis:ConnectionString configuration is required.");
         }
 
-        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
+        var redisConfiguration = ConfigurationOptions.Parse(redisConnectionString);
+        redisConfiguration.AbortOnConnectFail = false;
+        redisConfiguration.ClientName ??= "Hongdal";
+        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
         services.AddSingleton<IIsmsPTransportKeyStatusStore, RedisIsmsPTransportKeyStatusStore>();
 
         var mongoOptions = configuration.GetSection(MongoDbOptions.SectionName).Get<MongoDbOptions>() ?? new MongoDbOptions();
@@ -49,7 +52,14 @@ public static partial class ServiceCollectionExtensions
             throw new InvalidOperationException("MongoDb:ConnectionString configuration is required.");
         }
 
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnectionString));
+        if (string.IsNullOrWhiteSpace(mongoOptions.Database))
+        {
+            throw new InvalidOperationException("MongoDb:Database configuration is required.");
+        }
+
+        var mongoSettings = MongoClientSettings.FromConnectionString(mongoConnectionString);
+        mongoSettings.ApplicationName ??= "Hongdal";
+        services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoSettings));
 
         return services;
     }

@@ -1,6 +1,8 @@
 **/.classpath
 **/.dockerignore
 **/.env
+**/appsettings.Local.json
+**/appsettings.*.Local.json
 **/.git
 **/.gitignore
 **/.project
@@ -19,6 +21,13 @@
 **/node_modules
 **/npm-debug.log
 **/obj
+**/logs
+**/App_Data
+**/artifacts
+**/*.pfx
+**/*.p12
+**/*.pem
+**/*service-account*.json
 **/secrets.dev.yaml
 **/values.dev.yaml
 LICENSE

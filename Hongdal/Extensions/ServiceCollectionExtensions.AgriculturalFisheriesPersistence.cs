@@ -19,8 +19,6 @@ public static partial class ServiceCollectionExtensions
                     mysqlOptions.MigrationsHistoryTable("__EFMigrationsHistory_AgriculturalFisheries");
                     mysqlOptions.EnableRetryOnFailure();
                 }));
-        services.AddHostedService<AgriculturalFisheriesDatabaseInitializer>();
-
         return services;
     }
 }
