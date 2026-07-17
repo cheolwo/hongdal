@@ -974,7 +974,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return "통화 코드는 KRW, USD처럼 ISO 영문 세 자리로 입력해야 합니다.";
         }
 
-        var paymentMethods = salesOffer.AcceptedPaymentMethods
+        var paymentMethods = (salesOffer.AcceptedPaymentMethods ?? [])
             .Where(method => !string.IsNullOrWhiteSpace(method))
             .Select(method => method.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -989,7 +989,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return "지원하지 않는 결제 방법이 포함되어 있습니다.";
         }
 
-        if (!PlatformCommunitySalesOfferStatuses.All.Contains(salesOffer.Status, StringComparer.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(salesOffer.Status)
+            || !PlatformCommunitySalesOfferStatuses.All.Contains(salesOffer.Status, StringComparer.OrdinalIgnoreCase))
         {
             return "판매 상태가 올바르지 않습니다.";
         }
@@ -1011,7 +1012,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             QuantityUnit = Normalize(source.QuantityUnit, "개", 20),
             UnitPrice = source.UnitPrice,
             CurrencyCode = source.CurrencyCode.Trim().ToUpperInvariant(),
-            AcceptedPaymentMethods = source.AcceptedPaymentMethods
+            AcceptedPaymentMethods = (source.AcceptedPaymentMethods ?? [])
                 .Where(method => !string.IsNullOrWhiteSpace(method))
                 .Select(method => method.Trim())
                 .Distinct(StringComparer.OrdinalIgnoreCase)

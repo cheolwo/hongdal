@@ -80,6 +80,61 @@ public sealed class CommunityPostComposerViewModelTests
         Assert.Equal(string.Empty, composer.Draft.Password);
     }
 
+    [Fact]
+    public void 판매글은_본문없이도_상품수량가격결제정보로_요청을만든다()
+    {
+        var draft = new CommunityPostComposerDraftViewModel
+        {
+            Nickname = "햇살농원",
+            Password = "secret",
+            Category = "자유",
+            WorkflowTag = "커뮤니티 신뢰",
+            RoleTag = "생산자",
+            Title = "오늘 수확한 복숭아를 판매합니다",
+            IsSalesPost = true,
+            SalesProductTitle = "햇복숭아 3kg 한 상자",
+            SalesAvailableQuantity = 24,
+            SalesQuantityUnit = "상자",
+            SalesUnitPrice = 29_000,
+            SalesCurrencyCode = "KRW",
+            AcceptsDirectCash = true,
+            AcceptsTossPayments = true,
+            AllowsGroupPurchase = true
+        };
+
+        Assert.Null(draft.Validate());
+
+        var request = draft.CreateRequest("shipper");
+        var salesOffer = Assert.IsType<PlatformCommunityPostSalesOfferRequest>(request.SalesOffer);
+        Assert.Equal("햇복숭아 3kg 한 상자", salesOffer.ProductTitle);
+        Assert.Equal(24, salesOffer.AvailableQuantity);
+        Assert.Contains(PlatformCommunitySalesPaymentMethodCodes.DirectCash, salesOffer.AcceptedPaymentMethods);
+        Assert.Contains(PlatformCommunitySalesPaymentMethodCodes.TossPayments, salesOffer.AcceptedPaymentMethods);
+        Assert.True(salesOffer.AllowsGroupPurchase);
+    }
+
+    [Fact]
+    public void 판매글은_결제방법이없으면_검증에실패한다()
+    {
+        var draft = new CommunityPostComposerDraftViewModel
+        {
+            Nickname = "판매자",
+            Password = "secret",
+            Category = "자유",
+            WorkflowTag = "커뮤니티 신뢰",
+            RoleTag = "판매자",
+            Title = "판매글",
+            IsSalesPost = true,
+            SalesProductTitle = "상품",
+            SalesAvailableQuantity = 1,
+            SalesQuantityUnit = "개",
+            SalesUnitPrice = 10_000,
+            AcceptsDirectCash = false
+        };
+
+        Assert.Contains("결제 방법", draft.Validate());
+    }
+
     private static CommunityPostComposerViewModel CreateComposer(
         ICommunityPostComposerDraftStore store)
     {
