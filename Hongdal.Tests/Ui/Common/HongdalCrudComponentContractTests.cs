@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Hongdal.Ui.Common.Areas.App.Components;
 using Hongdal.Ui.Common.Areas.App.Components.Crud;
+using Hongdal.Ui.Common.Areas.App.Components.Community;
 using Hongdal.Ui.Common.Areas.App.Components.Sales;
 using Microsoft.AspNetCore.Components;
 
@@ -24,7 +25,9 @@ public sealed class HongdalCrudComponentContractTests
             typeof(HongdalDeleteDialog<>),
             typeof(HongdalSalesChannelAccountEditor),
             typeof(HongdalSalesChannelAccountDialog),
-            typeof(HongdalSalesChannelAccountWorkspace)
+            typeof(HongdalSalesChannelAccountWorkspace),
+            typeof(PlatformCommunityPostComposer),
+            typeof(PlatformCommunityPostList)
         ];
 
         Assert.All(componentTypes, type =>

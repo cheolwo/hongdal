@@ -11,6 +11,10 @@ internal static class CommunityPlatformUiModule
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddScoped<PlatformCommunityService>();
+        services.TryAddScoped<ICommunityPostComposerDraftStore, BrowserCommunityPostComposerDraftStore>();
+        services.TryAddTransient<CommunityPostComposerViewModel>();
+        services.TryAddTransient<CommunityPostListPageViewModel>();
+        services.TryAddTransient<PlatformCommunityHomePageViewModel>();
         services.TryAddScoped<PlatformHomeModeStateService>();
         services.TryAddScoped<PlatformDiagramPaletteStateService>();
         services.TryAddTransient<IBagua업무영역ViewModelFactory, Bagua업무영역ViewModelFactory>();

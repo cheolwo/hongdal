@@ -1,10 +1,11 @@
 @namespace Hongdal.Ui.Common.Areas.App.Components.Community
-@implements IDisposable
+@inherits MvvmComponentBase<PlatformCommunityHomePageViewModel>
 @using System.Globalization
 @using Hongdal.Contracts.Common.Community
 @using Hongdal.Contracts.Common.Inbound
 @using Hongdal.Contracts.Common.Versioning
 @using Hongdal.Contracts.Common.Warehouse
+@using Hongdal.Ui.Common.Areas.App.ViewModels
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.Extensions.DependencyInjection
@@ -15,9 +16,9 @@
 @inject PlatformDiagramPaletteStateService DiagramPalette
 @inject PlatformCommunityDecorationStateService DecorationState
 @inject PlatformCommunityPostDraftStateService CommunityPostDrafts
-@inject IServiceProvider Services
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.False" Class="@HomeRootClass">
     <MudStack Spacing="3">
@@ -1204,132 +1205,22 @@
                 <MudStack Spacing="2">
                     @if (!isLoading)
                     {
-                        <section id="community-forum-list" class="platform-community-forum" aria-label="@($"{CurrentCommunityBoardTitle} 글 목록")">
-                            <header class="platform-community-forum-toolbar">
-                                <div class="platform-community-forum-toolbar-title">
-                                    <span>@selectedBoardFilter</span>
-                                    <strong>글 목록</strong>
-                                    <small>@($"{ForumVisiblePostCount:N0}개 글")</small>
-                                </div>
-                                <div class="platform-community-forum-view-tabs" role="group" aria-label="글 목록 필터">
-                                    @foreach (var filter in ForumListFilterOptions)
-                                    {
-                                        <button type="button"
-                                                class="@BuildForumListFilterClass(filter)"
-                                                aria-pressed="@string.Equals(selectedForumListFilter, filter, StringComparison.OrdinalIgnoreCase)"
-                                                @onclick="@(() => SelectForumListFilter(filter))">
-                                            @filter
-                                        </button>
-                                    }
-                                </div>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           Size="Size.Small"
-                                           StartIcon="@Icons.Material.Filled.Edit"
-                                           OnClick="OpenCompose">
-                                    글쓰기
-                                </MudButton>
-                            </header>
-
-                            <div class="platform-community-forum-table" role="table" aria-label="커뮤니티 글 목록">
-                                <div class="platform-community-forum-row platform-community-forum-row--head" role="row">
-                                    <span role="columnheader">번호</span>
-                                    <span role="columnheader">분류</span>
-                                    <span role="columnheader">제목</span>
-                                    <span role="columnheader">글쓴이</span>
-                                    <span role="columnheader">작성일</span>
-                                    <span role="columnheader">추천</span>
-                                    <span role="columnheader">댓글</span>
-                                </div>
-
-                                @foreach (var post in VisiblePosts)
-                                {
-                                    <div class="@BuildForumPostRowClass(post)" role="row">
-                                        <span class="platform-community-forum-number" role="cell">@(post.IsOperatorPinned ? "공지" : post.IsSystemGenerated ? "성립" : post.Id.ToString(CultureInfo.InvariantCulture))</span>
-                                        <span class="platform-community-forum-category" role="cell">@post.Category</span>
-                                        <span class="platform-community-forum-subject" role="cell">
-                                            <button type="button"
-                                                    aria-expanded="@IsForumPostSelected(post)"
-                                                    @onclick="@(async () => await ToggleForumPostAsync(post))">
-                                                @if (post.IsSystemGenerated)
-                                                {
-                                                    <MudIcon Icon="@Icons.Material.Filled.Verified" Size="Size.Small" />
-                                                }
-                                                else if (post.IsOperatorPinned)
-                                                {
-                                                    <MudIcon Icon="@Icons.Material.Filled.Campaign" Size="Size.Small" />
-                                                }
-                                                else if (post.IsTrending)
-                                                {
-                                                    <MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" />
-                                                }
-                                                <strong>@post.Title</strong>
-                                                @if (post.CommentCount > 0)
-                                                {
-                                                    <b>[@post.CommentCount]</b>
-                                                }
-                                            </button>
-                                            <small>@post.WorkflowTag · @post.RoleTag · @DisplayPostNickname(post)</small>
-                                        </span>
-                                        <span class="platform-community-forum-author" role="cell">@DisplayPostNickname(post)</span>
-                                        <time role="cell" datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@FormatForumDate(post.CreatedAtUtc)</time>
-                                        <span class="platform-community-forum-count" role="cell">@post.RecommendationCount</span>
-                                        <span class="platform-community-forum-count" role="cell">@post.CommentCount</span>
-                                    </div>
-                                }
-
-                                @foreach (var post in VisibleSeedPosts)
-                                {
-                                    <div class="@BuildForumSeedPostRowClass(post)" role="row">
-                                        <span class="platform-community-forum-number platform-community-forum-number--recommended" role="cell">추천</span>
-                                        <span class="platform-community-forum-category" role="cell">@post.Category</span>
-                                        <span class="platform-community-forum-subject" role="cell">
-                                            <button type="button"
-                                                    aria-expanded="@IsForumSeedPostSelected(post)"
-                                                    @onclick="@(() => ToggleForumSeedPost(post))">
-                                                <MudIcon Icon="@post.Icon" Size="Size.Small" />
-                                                <strong>@post.Title</strong>
-                                                @if (post.CommentCount > 0)
-                                                {
-                                                    <b>[@post.CommentCount]</b>
-                                                }
-                                            </button>
-                                            <small>홍달 추천 · @post.Category · @post.Author</small>
-                                        </span>
-                                        <span class="platform-community-forum-author" role="cell">@post.Author</span>
-                                        <span role="cell">@post.Meta</span>
-                                        <span class="platform-community-forum-count" role="cell">@post.RecommendationCount</span>
-                                        <span class="platform-community-forum-count" role="cell">@post.CommentCount</span>
-                                    </div>
-                                }
-
-                                @if (ForumVisiblePostCount == 0)
-                                {
-                                    <div class="platform-community-forum-empty" role="row">
-                                        <MudIcon Icon="@Icons.Material.Filled.Inbox" />
-                                        <span>조건에 맞는 글이 없습니다.</span>
-                                    </div>
-                                }
-                            </div>
-
-                            <footer class="platform-community-forum-footer">
-                                <label>
-                                    <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
-                                    <input type="search"
-                                           aria-label="게시글 검색"
-                                           placeholder="제목, 내용, 작성자 검색"
-                                           @bind="communityPostSearchText"
-                                           @bind:event="oninput" />
-                                    @if (!string.IsNullOrWhiteSpace(communityPostSearchText))
-                                    {
-                                        <button type="button" title="검색어 지우기" aria-label="검색어 지우기" @onclick="ClearCommunityPostSearch">
-                                            <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
-                                        </button>
-                                    }
-                                </label>
-                                <span>게시글 제목을 누르면 본문과 업무 흐름을 확인할 수 있습니다.</span>
-                            </footer>
-                        </section>
+                        <PlatformCommunityPostList BoardName="@selectedBoardFilter"
+                                                   FilterOptions="@ForumListFilterOptions"
+                                                   SelectedFilter="@selectedForumListFilter"
+                                                   SelectedFilterChanged="SelectForumListFilter"
+                                                   ViewMode="@communityPostViewMode"
+                                                   ViewModeChanged="SelectCommunityPostViewMode"
+                                                   ComposeRequested="OpenCompose"
+                                                   Posts="@VisiblePosts"
+                                                   SeedPosts="@VisibleSeedPosts"
+                                                   VisiblePostCount="@ForumVisiblePostCount"
+                                                   SelectedPostId="@selectedForumPostId"
+                                                   SelectedSeedPostTitle="@selectedForumSeedPostTitle"
+                                                   PostSelected="ToggleForumPostAsync"
+                                                   SeedPostSelected="ToggleForumSeedPost"
+                                                   SearchText="@communityPostSearchText"
+                                                   SearchTextChanged="HandleCommunityPostSearchChanged" />
                     }
 
                     @if (isLoading)
@@ -1366,10 +1257,20 @@
                                             {
                                                 <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">활동 글</MudChip>
                                             }
-                                            @if (post.IsSystemGenerated)
-                                            {
-                                                <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">자동 성립 기록</MudChip>
-                                            }
+                                             @if (post.IsSystemGenerated)
+                                             {
+                                                 <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">자동 성립 기록</MudChip>
+                                             }
+                                             @if (post.IsCommunityMomentumPromoted)
+                                             {
+                                                 <MudChip T="string"
+                                                          Size="Size.Small"
+                                                          Color="Color.Warning"
+                                                          Variant="Variant.Outlined"
+                                                          Icon="@Icons.Material.Filled.Hub">
+                                                     @CommunityMomentumLabel(post.CommunityMomentumCode)
+                                                 </MudChip>
+                                             }
                                             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@post.Category</MudChip>
                                             <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@post.WorkflowTag</MudChip>
                                             <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@post.RoleTag</MudChip>
@@ -1380,7 +1281,190 @@
                                         </MudStack>
                                     </MudStack>
 
-                                    <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
+                                     <MudText Typo="Typo.body2" Class="platform-community-post-body">@post.Body</MudText>
+
+                                     @if (post.IsCommunityMomentumPromoted
+                                          && !string.IsNullOrWhiteSpace(post.CommunityMomentumMessage))
+                                     {
+                                         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Icon="@Icons.Material.Filled.Hub">
+                                             @post.CommunityMomentumMessage
+                                         </MudAlert>
+                                     }
+
+                                     @if (postOpportunities.TryGetValue(post.Id, out var postOpportunity))
+                                    {
+                                        var participation = postOpportunity.Participation;
+                                        <section class="platform-community-participation" aria-label="게시글 참여 관심 모집">
+                                            <header>
+                                                <div>
+                                                    <MudIcon Icon="@Icons.Material.Filled.Groups" Size="Size.Small" />
+                                                    <strong>@participation.Title</strong>
+                                                </div>
+                                                @if (participation.ParticipantCount > 0)
+                                                {
+                                                    <span>@($"{participation.ParticipantCount:N0}명 관심")</span>
+                                                }
+                                            </header>
+                                            <p>@participation.Summary</p>
+
+                                            @if (participation.CanJoin && participation.InterestVoteId.HasValue)
+                                            {
+                                                <div class="platform-community-participation-roles" role="group" aria-label="가능한 참여 역할">
+                                                    @foreach (var role in participation.RoleOptions)
+                                                    {
+                                                        <button type="button"
+                                                                class="@BuildParticipationRoleClass(post.Id, role.OptionId)"
+                                                                title="@role.Summary"
+                                                                aria-pressed="@IsParticipationRoleSelected(post.Id, role.OptionId)"
+                                                                disabled="@(IsPostParticipationPending(post.Id) || string.IsNullOrWhiteSpace(role.OptionId))"
+                                                                @onclick="@(async () => await ToggleParticipationRoleAsync(post, role))">
+                                                            <span>@role.Label</span>
+                                                            @if (role.InterestCount > 0)
+                                                            {
+                                                                <b>@role.InterestCount</b>
+                                                            }
+                                                        </button>
+                                                    }
+                                                </div>
+                                            }
+                                            else if (participation.CanStart)
+                                            {
+                                                <MudButton Variant="Variant.Outlined"
+                                                           Color="Color.Primary"
+                                                           Size="Size.Small"
+                                                           StartIcon="@Icons.Material.Filled.GroupAdd"
+                                                           Disabled="@IsPostParticipationPending(post.Id)"
+                                                           OnClick="@(async () => await StartPostParticipationAsync(post))">
+                                                    비구속적 관심 모으기
+                                                </MudButton>
+                                            }
+                                            else if (participation.StateCode != CommunityPostParticipationStateCodes.ProvisionalLedgerCreated)
+                                            {
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">이 게시글의 관심 모집은 마감되었습니다.</MudText>
+                                            }
+
+                                            @if (participation.CanPromoteToProvisionalLedger && participation.InterestVoteId.HasValue)
+                                            {
+                                                <div class="platform-community-provisional-actions">
+                                                    <MudButton Variant="Variant.Filled"
+                                                               Color="Color.Primary"
+                                                               Size="Size.Small"
+                                                               StartIcon="@Icons.Material.Filled.Description"
+                                                               Disabled="@IsPostParticipationPending(post.Id)"
+                                                               OnClick="@(async () => await PromotePostParticipationAsync(post, CommunityCollectiveIntentTypeCodes.GroupPurchase))">
+                                                        공동구매 가원장
+                                                    </MudButton>
+                                                    <MudButton Variant="Variant.Outlined"
+                                                               Color="Color.Info"
+                                                               Size="Size.Small"
+                                                               StartIcon="@Icons.Material.Filled.Public"
+                                                               Disabled="@IsPostParticipationPending(post.Id)"
+                                                               OnClick="@(async () => await PromotePostParticipationAsync(post, CommunityCollectiveIntentTypeCodes.GroupImportCandidate))">
+                                                        공동수입 검토 가원장
+                                                    </MudButton>
+                                                    <MudButton Variant="Variant.Outlined"
+                                                               Color="Color.Secondary"
+                                                               Size="Size.Small"
+                                                               StartIcon="@Icons.Material.Filled.Public"
+                                                               Disabled="@IsPostParticipationPending(post.Id)"
+                                                               OnClick="@(async () => await PromotePostParticipationAsync(post, CommunityCollectiveIntentTypeCodes.GroupExportCandidate))">
+                                                        공동수출 검토 가원장
+                                                    </MudButton>
+                                                </div>
+                                            }
+                                            else if (participation.StateCode == CommunityPostParticipationStateCodes.ProvisionalLedgerCreated)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Description">
+                                                    비구속적 가원장 생성됨
+                                                </MudChip>
+                                            }
+
+                                            @if (participation.PartyFormation.IsAvailable)
+                                            {
+                                                var formation = participation.PartyFormation;
+                                                <section class="platform-community-party-formation" aria-label="거래 참여팀 역할 구성">
+                                                    <header>
+                                                        <div>
+                                                            <MudIcon Icon="@Icons.Material.Filled.Hub" Size="Size.Small" />
+                                                            <strong>거래 참여팀</strong>
+                                                        </div>
+                                                        <span>@($"필수 역할 {formation.RepresentedRequiredRoleSlotCount}/{formation.RequiredRoleSlotCount}")</span>
+                                                    </header>
+                                                    <div class="platform-community-party-route">
+                                                        <span>@TradeDirectionLabel(formation.TradeDirectionCode)</span>
+                                                        @if (!string.IsNullOrWhiteSpace(formation.OriginCountryCode)
+                                                             || !string.IsNullOrWhiteSpace(formation.DestinationCountryCode))
+                                                        {
+                                                            <span>@($"{CountryCodeLabel(formation.OriginCountryCode)} → {CountryCodeLabel(formation.DestinationCountryCode)}")</span>
+                                                        }
+                                                        @if (formation.TransportModeCodes.Count > 0)
+                                                        {
+                                                            <span>@string.Join(" · ", formation.TransportModeCodes.Select(TransportModeLabel))</span>
+                                                        }
+                                                    </div>
+                                                    <div class="platform-community-party-slots">
+                                                        @foreach (var slot in formation.RoleSlots)
+                                                        {
+                                                            var opening = participation.ProfessionalParticipation.RoleOpenings.FirstOrDefault(candidate =>
+                                                                string.Equals(candidate.RoleCode, slot.RoleCode, StringComparison.OrdinalIgnoreCase));
+                                                            <div class="@BuildPartySlotClass(slot)">
+                                                                <MudIcon Icon="@PartySlotIcon(slot)" Size="Size.Small" />
+                                                                <div>
+                                                                    <strong>@slot.Label</strong>
+                                                                    <small>@slot.Summary</small>
+                                                                </div>
+                                                                <div class="platform-community-party-slot-meta">
+                                                                    <span>@(slot.IsRequired ? "필수" : slot.IsRecommended ? "권장" : "선택")</span>
+                                                                    @if (slot.ConfirmedParticipantCount > 0)
+                                                                    {
+                                                                        <b>@($"확인 {slot.ConfirmedParticipantCount}")</b>
+                                                                    }
+                                                                    else if (slot.InterestCount > 0)
+                                                                    {
+                                                                        <b>@($"관심 {slot.InterestCount}")</b>
+                                                                    }
+                                                                    @if (slot.ExternalCredentialVerificationRequired && !slot.ExternalCredentialVerified)
+                                                                    {
+                                                                        <MudTooltip Text="관할기관 면허·등록 또는 운송 권한을 별도로 확인해야 합니다.">
+                                                                            <MudIcon Icon="@Icons.Material.Filled.GppMaybe"
+                                                                                     Size="Size.Small"
+                                                                                     Color="Color.Warning"
+                                                                                     aria-label="외부 자격 확인 필요" />
+                                                                        </MudTooltip>
+                                                                    }
+                                                                    @if (CommunityPostPartyRoleCodes.IsCommercialParty(slot.RoleCode))
+                                                                    {
+                                                                        <MudTooltip Text="가원장 검토 단계에서 당사자 역할을 명시적으로 수락합니다. 주문·계약·결제 또는 법적 책임은 확정되지 않습니다.">
+                                                                            <MudIconButton Icon="@Icons.Material.Filled.HowToReg"
+                                                                                           Size="Size.Small"
+                                                                                           Color="Color.Primary"
+                                                                                           Disabled="@IsPostParticipationPending(post.Id)"
+                                                                                           aria-label="@($"{slot.Label} 역할을 비구속적으로 수락")"
+                                                                                           OnClick="@(async () => await JoinPostPartyRoleAsync(post, slot.RoleCode))" />
+                                                                        </MudTooltip>
+                                                                    }
+                                                                    else if (opening is not null)
+                                                                    {
+                                                                        <MudTooltip Text="플랫폼 프로필에서 역할이 확인된 계정만 참여할 수 있으며 외부 면허·등록은 별도 확인 대상입니다.">
+                                                                            <MudIconButton Icon="@Icons.Material.Filled.PersonAdd"
+                                                                                           Size="Size.Small"
+                                                                                           Color="Color.Primary"
+                                                                                           Disabled="@IsPostParticipationPending(post.Id)"
+                                                                                           aria-label="@($"{slot.Label} 역할로 자발적 참여")"
+                                                                                           OnClick="@(async () => await JoinPostProfessionalRoleAsync(post, slot.RoleCode))" />
+                                                                        </MudTooltip>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                    <p class="platform-community-party-readiness">@formation.ReadinessMessage</p>
+                                                </section>
+                                            }
+
+                                            <small>관심만 표시하며 주문·계약·배차·운송 주선은 시작되지 않습니다.</small>
+                                        </section>
+                                    }
 
                                     @if (post.IsSystemGenerated && !string.IsNullOrWhiteSpace(post.PrivacyNotice))
                                     {
@@ -1631,6 +1715,12 @@
                                                                               Category="@post.Category"
                                                                               IsMasked="@IsReportPost(post)"
                                                                               Compact="true" />
+                                            @if (HasPublicAuthorCountry(post))
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Public">
+                                                    활동 국가 @post.AuthorDisplayCountryCode · @post.AuthorDisplayCountryName
+                                                </MudChip>
+                                            }
                                             <MudText Typo="Typo.caption">추천 @post.RecommendationCount</MudText>
                                             <MudText Typo="Typo.caption">댓글 @post.CommentCount</MudText>
                                             <MudText Typo="Typo.caption">· @FormatDate(post.CreatedAtUtc)</MudText>
@@ -2525,228 +2615,99 @@
                         </MudStack>
                     </MudPaper>
 
-                    <MudPaper id="community-compose"
-                              Elevation="0"
-                              Outlined="true"
-                              Class="@ComposeCardClass"
-                              role="dialog"
-                              aria-label="커뮤니티 글쓰기">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="platform-community-compose-header">
-                                <MudStack Spacing="0">
-                                    <MudText Typo="Typo.overline" Color="Color.Primary">COMMUNITY</MudText>
-                                    <MudText Typo="Typo.h6">@(editingPostId is null ? "새 글 쓰기" : "글 수정")</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">질문이나 경험을 편하게 적어 주세요. 세부 태그는 나중에 펼쳐서 정할 수 있습니다.</MudText>
-                                </MudStack>
-                                <MudIconButton Icon="@Icons.Material.Filled.Close"
-                                               Color="Color.Default"
-                                               OnClick="CloseCompose"
-                                               Class="platform-community-compose-close"
-                                               aria-label="글쓰기 닫기" />
-                            </MudStack>
-
-                            <section class="platform-community-compose-ledger-shortcut" aria-label="원장 바로가기">
-                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
-                                    <MudStack Spacing="0">
-                                        <MudText Typo="Typo.subtitle2">원장 바로가기</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">내 원장 또는 생성자가 재공유를 허용한 공개 원장을 글에 첨부합니다.</MudText>
-                                    </MudStack>
-                                    <MudButton Variant="Variant.Text"
-                                               Color="Color.Primary"
-                                               Size="Size.Small"
-                                               StartIcon="@Icons.Material.Filled.FolderOpen"
-                                               Disabled="@isMyLedgersLoading"
-                                               OnClick="OpenLedgerPickerAsync">
-                                        원장 목록에서 선택
-                                    </MudButton>
-                                </MudStack>
-
-                                @if (!string.IsNullOrWhiteSpace(form.커뮤니티원장Id))
-                                {
-                                    var selectedMyLedger = myLedgers.FirstOrDefault(x =>
-                                        string.Equals(x.원장Id, form.커뮤니티원장Id, StringComparison.OrdinalIgnoreCase));
-                                    <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
-                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
-                                            <span>
-                                                <strong>@(selectedMyLedger?.제목 ?? "선택한 원장")</strong>
-                                                <small class="platform-community-ledger-choice-meta">@form.커뮤니티원장Id</small>
-                                            </span>
-                                            <MudStack Row="true" Spacing="1">
-                                                @if (selectedMyLedger?.내가만든원장 == true)
-                                                {
-                                                    <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" OnClick="OpenLedgerSharingSettingsAsync">공개 설정</MudButton>
-                                                }
-                                                <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small" OnClick="ClearSelectedLedger">첨부 해제</MudButton>
-                                            </MudStack>
-                                        </MudStack>
-                                    </MudAlert>
-                                }
-
-                                @if (ledgerSharingSettings is not null)
-                                {
-                                    <div class="platform-community-ledger-sharing-settings">
-                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                            <MudText Typo="Typo.subtitle2">원장 공개 설정</MudText>
-                                            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="CloseLedgerSharingSettings" aria-label="공개 설정 닫기" />
-                                        </MudStack>
-                                        <MudSelect T="string" Label="원장 공개 범위" @bind-Value="ledgerSharingSettings.공개범위" Variant="Variant.Outlined">
-                                            <MudSelectItem Value="@커뮤니티원장공개범위.비공개">비공개</MudSelectItem>
-                                            <MudSelectItem Value="@커뮤니티원장공개범위.커뮤니티">홍달 커뮤니티 공개</MudSelectItem>
-                                            <MudSelectItem Value="@커뮤니티원장공개범위.전체공개">링크 전체 공개</MudSelectItem>
-                                        </MudSelect>
-                                        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
-                                            <MudSwitch T="bool" Label="다른 사용자 재사용 허용" @bind-Value="ledgerSharingSettings.재사용허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
-                                            <MudSwitch T="bool" Label="게시글 재공유 허용" @bind-Value="ledgerSharingSettings.재공유허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
-                                        </MudStack>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">공개할 항목만 선택하세요. 선택하지 않은 값은 다른 사용자에게 전달되지 않습니다.</MudText>
-                                        <div class="platform-community-ledger-sharing-item-list">
-                                            @foreach (var item in ledgerSharingSettings.항목목록)
-                                            {
-                                                <MudCheckBox T="bool"
-                                                             @bind-Value="item.공개여부"
-                                                             Label="@item.표시명"
-                                                             Color="Color.Primary"
-                                                             Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
-                                            }
+                    <PlatformCommunityPostComposer ViewModel="@Composer"
+                                                       BoardCategories="@BoardCategoryOptions"
+                                                       RoleTags="@RoleTagOptions"
+                                                       SelectedWorkClassification="@SelectedWorkClassification"
+                                                       SelectedWorkFeatureEnabled="@SelectedWorkFeatureEnabled"
+                                                       LedgerPickerLoading="@isMyLedgersLoading"
+                                                       ExternalStatusMessage="@statusMessage"
+                                                       ExternalStatusSeverity="@statusSeverity"
+                                                       LedgerPickerRequested="OpenLedgerPickerAsync"
+                                                       Closed="CloseCompose"
+                                                       CancelEditRequested="CancelEdit"
+                                                       Saved="HandleComposerSavedAsync">
+                        <LedgerSettings>
+                                    <section class="platform-community-compose-ledger-shortcut" aria-label="원장 연결">
+                                        <div class="platform-community-compose-setting-heading">
+                                            <div>
+                                                <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
+                                                <strong>원장 연결</strong>
+                                            </div>
+                                            <MudButton Variant="Variant.Text"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       Disabled="@isMyLedgersLoading"
+                                                       OnClick="OpenLedgerPickerAsync">
+                                                원장 선택
+                                            </MudButton>
                                         </div>
-                                        <MudButton Variant="Variant.Filled"
-                                                   Color="Color.Primary"
-                                                   StartIcon="@Icons.Material.Filled.Save"
-                                                   Disabled="@isLedgerSharingSaving"
-                                                   OnClick="SaveLedgerSharingSettingsAsync">
-                                            공개 설정 저장
-                                        </MudButton>
-                                    </div>
-                                }
-                            </section>
 
-                            <section class="platform-community-compose-section platform-community-compose-section--main" aria-label="글 내용">
-                                <MudTextField T="string"
-                                              Label="제목"
-                                              Placeholder="어떤 이야기를 나누고 싶나요?"
-                                              @bind-Value="form.Title"
-                                              MaxLength="160"
-                                              Counter="160"
-                                              Variant="Variant.Outlined" />
-                                <MudTextField T="string"
-                                              Label="본문"
-                                              Placeholder="상황과 궁금한 점, 함께 확인할 내용을 적어 주세요."
-                                              @bind-Value="form.Body"
-                                              Lines="8"
-                                              MaxLength="4000"
-                                              Counter="4000"
-                                              Variant="Variant.Outlined"
-                                              HelperText="업무 흐름은 '요청 → 검토 → 처리 → 공유'처럼 적으면 읽기 쉽습니다." />
-                            </section>
-
-                            <section class="platform-community-compose-section" aria-label="게시판과 작성자">
-                                <MudText Typo="Typo.subtitle2">게시판과 작성자</MudText>
-                                <MudSelect T="string" Label="게시판" @bind-Value="form.Category" Variant="Variant.Outlined">
-                                @foreach (var category in BoardCategoryOptions)
-                                {
-                                    <MudSelectItem Value="@category">@category</MudSelectItem>
-                                }
-                                </MudSelect>
-                                <MudTextField T="string" Label="닉네임" @bind-Value="form.Nickname" MaxLength="40" Variant="Variant.Outlined" />
-                                <MudTextField T="string"
-                                              Label="글 비밀번호"
-                                              @bind-Value="form.Password"
-                                              InputType="InputType.Password"
-                                              Variant="Variant.Outlined"
-                                              HelperText="로그인 없이도 나중에 이 글을 수정할 수 있도록 사용합니다." />
-                            </section>
-
-                            <MudExpansionPanels Elevation="0" Class="platform-community-compose-options">
-                                <MudExpansionPanel Text="태그·신고·첨부 설정">
-                                    <MudStack Spacing="2" Class="pt-2">
-                                        <MudSelect T="string" Label="업무 분류" @bind-Value="form.WorkflowTag" Variant="Variant.Outlined">
-                                            @foreach (var 업무분류 in CommunityWorkClassificationCatalog.All)
-                                            {
-                                                <MudSelectItem Value="@업무분류.WorkflowTag">@업무분류.DisplayName</MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                        @if (SelectedWorkClassification is { } 선택업무분류)
+                                        @if (!string.IsNullOrWhiteSpace(form.커뮤니티원장Id))
                                         {
-                                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
-                                                <MudChip T="string"
-                                                         Size="Size.Small"
-                                                         Color="@(SelectedWorkFeatureEnabled ? Color.Success : Color.Warning)"
-                                                         Variant="Variant.Outlined">
-                                                    @(SelectedWorkFeatureEnabled ? "원장 연결 가능" : "대화만 가능")
-                                                </MudChip>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                                    @(선택업무분류.LedgerTemplateKeys.Count == 0
-                                                        ? "원장 연결 없는 대화 분류"
-                                                        : string.Join(" · ", 선택업무분류.LedgerTemplateKeys.Select(key => CommunityLedgerTemplateCatalog.Find(key).DisplayName)))
-                                                </MudText>
-                                            </MudStack>
+                                            var selectedMyLedger = myLedgers.FirstOrDefault(x =>
+                                                string.Equals(x.원장Id, form.커뮤니티원장Id, StringComparison.OrdinalIgnoreCase));
+                                            <div class="platform-community-compose-selected-ledger">
+                                                <span>
+                                                    <strong>@(selectedMyLedger?.제목 ?? "선택한 원장")</strong>
+                                                    <small>@form.커뮤니티원장Id</small>
+                                                </span>
+                                                <div>
+                                                    @if (selectedMyLedger?.내가만든원장 == true)
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.Filled.Public"
+                                                                       Size="Size.Small"
+                                                                       Color="Color.Primary"
+                                                                       OnClick="OpenLedgerSharingSettingsAsync"
+                                                                       aria-label="원장 공개 설정" />
+                                                    }
+                                                    <MudIconButton Icon="@Icons.Material.Filled.LinkOff"
+                                                                   Size="Size.Small"
+                                                                   Color="Color.Error"
+                                                                   OnClick="ClearSelectedLedger"
+                                                                   aria-label="원장 첨부 해제" />
+                                                </div>
+                                            </div>
                                         }
-                                        <MudSelect T="string" Label="역할 태그" @bind-Value="form.RoleTag" Variant="Variant.Outlined">
-                                            @foreach (var roleTag in RoleTagOptions)
-                                            {
-                                                <MudSelectItem Value="@roleTag">@roleTag</MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                        <MudCheckBox T="bool" @bind-Value="form.IsReportBoardPost" Label="신고/분쟁 게시글로 작성" Color="Color.Error" />
-                                        @if (form.IsReportBoardPost)
-                                        {
-                                            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
-                                                다른 사용자에게는 신고한 사람과 신고받는 사람이 익명으로 표시됩니다.
-                                            </MudAlert>
-                                            <MudTextField T="string" Label="신고한 사람 표시명" @bind-Value="form.ReporterDisplayName" MaxLength="40" HelperText="비워두면 닉네임을 기준으로 저장합니다." />
-                                            <MudTextField T="string" Label="신고받는 사람 표시명" @bind-Value="form.ReportedDisplayName" MaxLength="40" />
-                                        }
-                                        <MudTextField T="string" Label="공유 링크 또는 영상 링크" @bind-Value="form.SharedLinkUrl" MaxLength="1000" Variant="Variant.Outlined" />
-                                        <MudTextField T="string"
-                                                      Label="연결할 주 원장 ID"
-                                                      @bind-Value="form.커뮤니티원장Id"
-                                                      MaxLength="120"
-                                                      Variant="Variant.Outlined"
-                                                      Disabled="@(!SelectedWorkFeatureEnabled)"
-                                                      HelperText="본인이 참여 중이거나 생성자가 재공유를 허용한 원장을 연결할 수 있습니다." />
-                                        <label class="platform-community-file-picker">
-                                            <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" Color="Color.Primary" />
-                                            <span>
-                                                <strong>@(selectedFiles.Count > 0 ? $"사진 {selectedFiles.Count}개 선택됨" : "사진 첨부")</strong>
-                                                <small>JPG, PNG, WEBP, GIF · 파일당 최대 5MB</small>
-                                            </span>
-                                            <InputFile OnChange="HandleFilesSelected"
-                                                       multiple
-                                                       accept="image/jpeg,image/png,image/webp,image/gif"
-                                                       class="platform-community-file-input" />
-                                        </label>
-                                    </MudStack>
-                                </MudExpansionPanel>
-                            </MudExpansionPanels>
 
-                            @if (!string.IsNullOrWhiteSpace(statusMessage))
-                            {
-                                <MudAlert Severity="@statusSeverity" Dense="true">@statusMessage</MudAlert>
-                            }
-                            <MudStack Row="true" Spacing="1" Class="platform-community-compose-actions">
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           Disabled="@isSaving"
-                                           OnClick="SavePostAsync"
-                                           StartIcon="@Icons.Material.Filled.Send"
-                                           Class="platform-community-compose-primary">
-                                    @(isSaving ? "저장 중..." : editingPostId is null ? "글 등록하기" : "수정 저장")
-                                </MudButton>
-                                @if (editingPostId is not null)
-                                {
-                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@isSaving" OnClick="CancelEdit">
-                                        수정 취소
-                                    </MudButton>
-                                }
-                                else
-                                {
-                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@isSaving" OnClick="CloseCompose">
-                                        닫기
-                                    </MudButton>
-                                }
-                            </MudStack>
-                        </MudStack>
-                    </MudPaper>
+                                        @if (ledgerSharingSettings is not null)
+                                        {
+                                            <div class="platform-community-ledger-sharing-settings">
+                                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                                    <MudText Typo="Typo.subtitle2">원장 공개 설정</MudText>
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="CloseLedgerSharingSettings" aria-label="공개 설정 닫기" />
+                                                </MudStack>
+                                                <MudSelect T="string" Label="원장 공개 범위" @bind-Value="ledgerSharingSettings.공개범위" Variant="Variant.Outlined" Margin="Margin.Dense">
+                                                    <MudSelectItem Value="@커뮤니티원장공개범위.비공개">비공개</MudSelectItem>
+                                                    <MudSelectItem Value="@커뮤니티원장공개범위.커뮤니티">홍달 커뮤니티 공개</MudSelectItem>
+                                                    <MudSelectItem Value="@커뮤니티원장공개범위.전체공개">링크 전체 공개</MudSelectItem>
+                                                </MudSelect>
+                                                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                                                    <MudSwitch T="bool" Label="재사용 허용" @bind-Value="ledgerSharingSettings.재사용허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
+                                                    <MudSwitch T="bool" Label="재공유 허용" @bind-Value="ledgerSharingSettings.재공유허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
+                                                </MudStack>
+                                                <div class="platform-community-ledger-sharing-item-list">
+                                                    @foreach (var item in ledgerSharingSettings.항목목록)
+                                                    {
+                                                        <MudCheckBox T="bool"
+                                                                     @bind-Value="item.공개여부"
+                                                                     Label="@item.표시명"
+                                                                     Color="Color.Primary"
+                                                                     Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
+                                                    }
+                                                </div>
+                                                <MudButton Variant="Variant.Filled"
+                                                           Color="Color.Primary"
+                                                           StartIcon="@Icons.Material.Filled.Save"
+                                                           Disabled="@isLedgerSharingSaving"
+                                                           OnClick="SaveLedgerSharingSettingsAsync">
+                                                    공개 설정 저장
+                                                </MudButton>
+                                            </div>
+                                        }
+                                    </section>
+                        </LedgerSettings>
+                    </PlatformCommunityPostComposer>
 
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                         <MudStack Spacing="2">
@@ -3663,7 +3624,7 @@
 
     .platform-community-forum-toolbar {
         display: grid;
-        grid-template-columns: minmax(180px, 1fr) auto auto;
+        grid-template-columns: minmax(180px, 1fr) auto auto auto;
         align-items: end;
         gap: 12px;
         min-height: 58px;
@@ -3728,6 +3689,44 @@
         outline: none;
     }
 
+    .platform-community-forum-display-switch {
+        display: inline-flex;
+        align-items: center;
+        align-self: center;
+    }
+
+    .platform-community-forum-display-button {
+        display: grid;
+        width: 34px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid var(--platform-home-border);
+        background: var(--platform-home-surface);
+        color: var(--mud-palette-text-secondary);
+        cursor: pointer;
+        place-items: center;
+    }
+
+    .platform-community-forum-display-button:first-child {
+        border-radius: 4px 0 0 4px;
+    }
+
+    .platform-community-forum-display-button:last-child {
+        margin-left: -1px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .platform-community-forum-display-button:hover,
+    .platform-community-forum-display-button:focus-visible,
+    .platform-community-forum-display-button--selected {
+        position: relative;
+        z-index: 1;
+        border-color: var(--platform-home-accent);
+        background: rgba(var(--platform-home-accent-rgb), 0.09);
+        color: var(--platform-home-accent);
+        outline: none;
+    }
+
     .platform-community-forum-table {
         display: grid;
         min-width: 0;
@@ -3760,6 +3759,10 @@
     .platform-community-forum-row:not(.platform-community-forum-row--head):hover,
     .platform-community-forum-row--selected {
         background: rgba(var(--platform-home-accent-rgb), 0.045);
+    }
+
+    .platform-community-forum-row--momentum {
+        background: color-mix(in srgb, var(--mud-palette-warning) 5%, var(--platform-home-surface));
     }
 
     .platform-community-forum-row--notice {
@@ -3802,6 +3805,44 @@
         font-weight: 700;
     }
 
+    .platform-community-forum-author,
+    .platform-community-forum-card-author {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .platform-community-forum-card-author {
+        justify-content: flex-start;
+    }
+
+    .platform-community-country {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        min-width: 0;
+        padding: 1px 4px;
+        border: 1px solid var(--platform-home-border);
+        border-radius: 3px;
+        background: var(--platform-home-surface-soft);
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.62rem;
+        font-weight: 500;
+    }
+
+    .platform-community-country > b {
+        flex: 0 0 auto;
+        color: var(--platform-home-accent);
+        font-size: 0.62rem;
+    }
+
+    .platform-community-country > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .platform-community-forum-subject {
         display: grid;
         gap: 2px;
@@ -3830,6 +3871,8 @@
 
     .platform-community-forum-subject strong {
         overflow: hidden;
+        flex: 1 1 auto;
+        min-width: 0;
         font-size: 0.82rem;
         font-weight: 650;
         text-overflow: ellipsis;
@@ -3858,6 +3901,393 @@
         min-height: 112px;
         color: var(--mud-palette-text-secondary);
         font-size: 0.8rem;
+    }
+
+    .platform-community-forum-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 10px;
+        padding: 12px;
+        background: var(--platform-home-surface-soft);
+    }
+
+    .platform-community-forum-card {
+        display: grid;
+        grid-template-rows: auto auto minmax(42px, 1fr) auto;
+        gap: 8px;
+        min-width: 0;
+        min-height: 178px;
+        padding: 12px;
+        border: 1px solid var(--platform-home-border);
+        border-radius: 4px;
+        background: var(--platform-home-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .platform-community-forum-card:hover,
+    .platform-community-forum-card--selected {
+        border-color: var(--platform-home-accent);
+        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.07);
+    }
+
+    .platform-community-forum-card--momentum {
+        border-color: color-mix(in srgb, var(--mud-palette-warning) 55%, var(--platform-home-border));
+    }
+
+    .platform-community-forum-card--notice {
+        background: color-mix(in srgb, var(--mud-palette-warning) 5%, var(--platform-home-surface));
+    }
+
+    .platform-community-forum-card--completion,
+    .platform-community-forum-card--recommended {
+        background: color-mix(in srgb, var(--mud-palette-success) 5%, var(--platform-home-surface));
+    }
+
+    .platform-community-forum-card > header,
+    .platform-community-forum-card > footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.68rem;
+    }
+
+    .platform-community-forum-card > header {
+        justify-content: space-between;
+    }
+
+    .platform-community-forum-card > header > span:first-child {
+        color: var(--platform-home-accent);
+        font-weight: 800;
+    }
+
+    .platform-community-forum-card-title {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .platform-community-forum-card-title:hover,
+    .platform-community-forum-card-title:focus-visible {
+        color: var(--platform-home-accent);
+        outline: none;
+    }
+
+    .platform-community-forum-card-title strong {
+        display: -webkit-box;
+        overflow: hidden;
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: 0.9rem;
+        line-height: 1.35;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .platform-community-momentum-label {
+        flex: 0 0 auto;
+        padding: 2px 5px;
+        border: 1px solid var(--mud-palette-warning);
+        border-radius: 3px;
+        color: var(--mud-palette-warning-darken);
+        font-size: 0.62rem;
+        font-style: normal;
+        font-weight: 800;
+        line-height: 1.25;
+        white-space: nowrap;
+    }
+
+    .platform-community-forum-card > p {
+        display: -webkit-box;
+        overflow: hidden;
+        margin: 0;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        white-space: pre-line;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .platform-community-forum-card > footer {
+        flex-wrap: wrap;
+        padding-top: 8px;
+        border-top: 1px solid var(--platform-home-border);
+    }
+
+    .platform-community-forum-card-author {
+        overflow: hidden;
+        max-width: 34%;
+        color: var(--mud-palette-text-primary);
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-forum-card-tags {
+        overflow: hidden;
+        flex: 1 1 100px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-forum-card-metrics {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    .platform-community-forum-card-empty {
+        grid-column: 1 / -1;
+    }
+
+    .platform-community-participation {
+        display: grid;
+        gap: 9px;
+        padding: 12px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.22);
+        border-radius: 4px;
+        background: rgba(var(--platform-home-accent-rgb), 0.035);
+    }
+
+    .platform-community-participation > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .platform-community-participation > header > div {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+        color: var(--platform-home-accent);
+    }
+
+    .platform-community-participation > header strong {
+        overflow: hidden;
+        font-size: 0.86rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-participation > header > span,
+    .platform-community-participation > small {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.68rem;
+    }
+
+    .platform-community-participation > header > span {
+        flex: 0 0 auto;
+        font-weight: 700;
+    }
+
+    .platform-community-participation > p {
+        margin: 0;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.75rem;
+        line-height: 1.45;
+    }
+
+    .platform-community-participation-roles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .platform-community-participation-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 31px;
+        max-width: 100%;
+        padding: 4px 9px;
+        border: 1px solid var(--platform-home-border);
+        border-radius: 4px;
+        background: var(--platform-home-surface);
+        color: var(--mud-palette-text-primary);
+        font: inherit;
+        font-size: 0.72rem;
+        cursor: pointer;
+    }
+
+    .platform-community-participation-role > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-participation-role > b {
+        color: var(--platform-home-accent);
+        font-size: 0.66rem;
+    }
+
+    .platform-community-participation-role:hover,
+    .platform-community-participation-role:focus-visible,
+    .platform-community-participation-role--selected {
+        border-color: var(--platform-home-accent);
+        background: rgba(var(--platform-home-accent-rgb), 0.1);
+        color: var(--platform-home-accent);
+        outline: none;
+    }
+
+    .platform-community-participation-role:disabled {
+        cursor: default;
+        opacity: 0.6;
+    }
+
+    .platform-community-provisional-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .platform-community-party-formation {
+        display: grid;
+        gap: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--platform-home-border);
+    }
+
+    .platform-community-party-formation > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .platform-community-party-formation > header > div {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--mud-palette-text-primary);
+        font-size: 0.78rem;
+    }
+
+    .platform-community-party-formation > header > span {
+        color: var(--platform-home-accent);
+        font-size: 0.69rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .platform-community-party-route {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .platform-community-party-route > span {
+        padding: 3px 7px;
+        border: 1px solid var(--platform-home-border);
+        border-radius: 3px;
+        background: var(--platform-home-surface);
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.67rem;
+        font-weight: 700;
+    }
+
+    .platform-community-party-slots {
+        border-block: 1px solid var(--platform-home-border);
+    }
+
+    .platform-community-party-slot {
+        display: grid;
+        grid-template-columns: 20px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 7px 2px;
+    }
+
+    .platform-community-party-slot + .platform-community-party-slot {
+        border-top: 1px solid var(--platform-home-border);
+    }
+
+    .platform-community-party-slot > svg {
+        color: var(--mud-palette-text-disabled);
+    }
+
+    .platform-community-party-slot--interest > svg {
+        color: var(--mud-palette-warning);
+    }
+
+    .platform-community-party-slot--confirmed > svg {
+        color: var(--mud-palette-success);
+    }
+
+    .platform-community-party-slot > div:nth-child(2) {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .platform-community-party-slot strong {
+        font-size: 0.72rem;
+        line-height: 1.35;
+    }
+
+    .platform-community-party-slot small {
+        display: -webkit-box;
+        overflow: hidden;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.65rem;
+        line-height: 1.35;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .platform-community-party-slot-meta {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        min-width: 96px;
+    }
+
+    .platform-community-party-slot-meta > span,
+    .platform-community-party-slot-meta > b {
+        font-size: 0.64rem;
+        white-space: nowrap;
+    }
+
+    .platform-community-party-slot-meta > span {
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .platform-community-party-slot-meta > b {
+        color: var(--platform-home-accent);
+    }
+
+    .platform-community-party-readiness {
+        margin: 0;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.68rem;
+        line-height: 1.45;
+    }
+
+    @@media (max-width: 600px) {
+        .platform-community-party-slot {
+            grid-template-columns: 20px minmax(0, 1fr);
+        }
+
+        .platform-community-party-slot-meta {
+            grid-column: 2;
+            justify-content: flex-start;
+            min-width: 0;
+        }
     }
 
     .platform-community-forum-footer {
@@ -3987,32 +4417,404 @@
     }
 
     .platform-community-compose-card {
-        scroll-margin-top: 16px;
-        border-color: rgba(var(--platform-home-accent-rgb), 0.35) !important;
-        border-radius: 18px;
-        box-shadow: 0 12px 30px rgba(var(--platform-home-accent-rgb), 0.09);
+        display: none;
     }
 
-    .platform-community-compose-header {
+    .platform-community-compose-card.platform-community-compose-card--open {
+        position: fixed;
+        z-index: 1600;
+        inset: 0;
+        display: block;
+        width: 100vw;
+        height: 100dvh;
+        padding: 0 !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+        border: 0 !important;
+        border-radius: 0;
+        background: #eef1f4;
+        box-shadow: none;
+        overscroll-behavior: contain;
+    }
+
+    .platform-community-compose-shell {
+        display: flex;
+        flex-direction: column;
+        width: min(100%, 920px);
+        min-height: 100dvh;
+        margin: 0 auto;
+        background: var(--mud-palette-surface);
+        box-shadow: 0 0 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .platform-community-compose-top {
+        position: sticky;
+        z-index: 5;
+        top: 0;
+        background: var(--mud-palette-surface);
+    }
+
+    .platform-community-compose-appbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 64px;
+        padding: 8px 14px;
+        border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+        background: #3949a3;
+        color: #ffffff;
+    }
+
+    .platform-community-compose-appbar-leading,
+    .platform-community-compose-appbar-actions {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+    }
+
+    .platform-community-compose-appbar-leading {
+        flex: 1 1 auto;
+        gap: 8px;
+    }
+
+    .platform-community-compose-appbar-actions {
+        flex: 0 0 auto;
+        gap: 8px;
+    }
+
+    .platform-community-compose-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: #12a9c7;
+        color: #ffffff;
+    }
+
+    .platform-community-compose-appbar-title {
+        display: grid;
+        min-width: 0;
+        line-height: 1.2;
+    }
+
+    .platform-community-compose-appbar-title strong,
+    .platform-community-compose-appbar-title small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-compose-appbar-title strong {
+        font-size: 0.94rem;
+    }
+
+    .platform-community-compose-appbar-title small {
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 0.7rem;
+    }
+
+    .platform-community-compose-appbar .mud-icon-button,
+    .platform-community-compose-appbar .mud-button-root {
+        color: #ffffff;
+    }
+
+    .platform-community-compose-draft-action,
+    .platform-community-compose-publish-action {
+        min-width: 62px;
+        min-height: 38px;
+        border-radius: 4px;
+    }
+
+    .platform-community-compose-draft-action {
+        border-color: rgba(255, 255, 255, 0.62) !important;
+    }
+
+    .platform-community-compose-publish-action {
+        border: 1px solid #ffffff;
+        background: #ffffff !important;
+        color: #29347f !important;
+    }
+
+    .platform-community-compose-board-tabs {
+        display: flex;
+        align-items: stretch;
+        min-height: 48px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-bottom: 1px solid rgba(100, 116, 139, 0.24);
+        background: var(--mud-palette-surface);
+        scrollbar-width: none;
+    }
+
+    .platform-community-compose-board-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .platform-community-compose-board-tab {
+        flex: 0 0 auto;
+        min-width: 82px;
+        min-height: 48px;
+        padding: 0 14px;
+        border: 0;
+        border-bottom: 3px solid transparent;
+        background: transparent;
+        color: var(--mud-palette-text-secondary);
+        font: inherit;
+        font-size: 0.84rem;
+        cursor: pointer;
+    }
+
+    .platform-community-compose-board-tab:hover {
+        background: rgba(57, 73, 163, 0.06);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .platform-community-compose-board-tab--active {
+        border-bottom-color: #3949a3;
+        color: #29347f;
+        font-weight: 800;
+    }
+
+    .platform-community-compose-status {
+        margin: 8px 14px 0;
+    }
+
+    .platform-community-compose-editor {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        min-height: clamp(420px, 64dvh, 720px);
+        background: var(--mud-palette-surface);
+    }
+
+    .platform-community-compose-title-field {
+        flex: 0 0 auto;
+        padding: 10px 16px 4px;
+        border-bottom: 1px solid rgba(100, 116, 139, 0.28);
+    }
+
+    .platform-community-compose-title-field .mud-input,
+    .platform-community-compose-title-field input {
+        font-size: 1.06rem;
+        font-weight: 700;
+    }
+
+    .platform-community-compose-body-field {
+        flex: 1 1 auto;
+        padding: 12px 16px 0;
+    }
+
+    .platform-community-compose-body-field .mud-input-control,
+    .platform-community-compose-body-field .mud-input,
+    .platform-community-compose-body-field textarea {
+        min-height: 100%;
+    }
+
+    .platform-community-compose-body-field textarea {
+        line-height: 1.72;
+    }
+
+    .platform-community-compose-title-field .mud-input-underline::before,
+    .platform-community-compose-title-field .mud-input-underline::after,
+    .platform-community-compose-body-field .mud-input-underline::before,
+    .platform-community-compose-body-field .mud-input-underline::after {
+        border-bottom: 0 !important;
+    }
+
+    .platform-community-compose-file-list {
+        display: flex;
+        gap: 6px;
+        padding: 8px 14px;
+        overflow-x: auto;
+        border-top: 1px solid rgba(100, 116, 139, 0.14);
+    }
+
+    .platform-community-compose-file-list > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex: 0 0 auto;
+        max-width: 220px;
+        padding: 5px 8px;
+        border: 1px solid rgba(2, 132, 199, 0.24);
+        border-radius: 4px;
+        background: rgba(14, 165, 233, 0.06);
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.72rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-compose-tools {
+        position: sticky;
+        z-index: 3;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        min-height: 58px;
+        padding: 4px 12px;
+        border-top: 1px solid rgba(100, 116, 139, 0.24);
+        background: #f7f8fa;
+    }
+
+    .platform-community-compose-tool-button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        overflow: hidden;
+        border-radius: 50%;
+        color: var(--mud-palette-text-secondary);
+        cursor: pointer;
+    }
+
+    .platform-community-compose-tool-button:hover {
+        background: rgba(57, 73, 163, 0.08);
+        color: #3949a3;
+    }
+
+    .platform-community-compose-character-count {
+        flex: 1 1 auto;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.7rem;
+        text-align: right;
+    }
+
+    .platform-community-compose-context {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 46px;
+        padding: 8px 14px;
+        overflow-x: auto;
+        border-top: 1px solid rgba(100, 116, 139, 0.16);
+        background: var(--mud-palette-surface);
+    }
+
+    .platform-community-compose-context > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex: 0 0 auto;
+        padding: 4px 7px;
+        border: 1px solid rgba(100, 116, 139, 0.22);
+        border-radius: 4px;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.7rem;
+    }
+
+    .platform-community-compose-context > small {
+        flex: 1 0 auto;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.68rem;
+        text-align: right;
+    }
+
+    .platform-community-compose-context--ledger {
+        border-color: rgba(22, 163, 74, 0.28) !important;
+        color: #15803d !important;
+    }
+
+    .platform-community-compose-context--report {
+        border-color: rgba(220, 38, 38, 0.28) !important;
+        color: #b91c1c !important;
+    }
+
+    .platform-community-compose-settings {
+        position: fixed;
+        z-index: 8;
+        bottom: 0;
+        left: 50%;
+        display: grid;
+        gap: 14px;
+        width: min(100%, 920px);
+        max-height: min(78dvh, 720px);
+        padding: 18px;
+        overflow-y: auto;
+        border-top: 6px solid #eef1f4;
+        background: var(--mud-palette-surface);
+        box-shadow: 0 -16px 44px rgba(15, 23, 42, 0.18);
+        transform: translateX(-50%);
+    }
+
+    .platform-community-compose-settings > header,
+    .platform-community-compose-setting-heading,
+    .platform-community-compose-selected-ledger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 12px;
     }
 
-    .platform-community-compose-close {
-        display: none;
-        flex: 0 0 auto;
+    .platform-community-compose-settings > header > div,
+    .platform-community-compose-setting-heading > div {
+        display: flex;
+        align-items: center;
+        gap: 7px;
     }
 
-    .platform-community-compose-section {
+    .platform-community-compose-settings-grid {
         display: grid;
-        gap: 14px;
-        padding: 16px;
-        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.14);
-        border-radius: 16px;
-        background: color-mix(in srgb, var(--mud-palette-surface) 97%, var(--platform-home-accent) 3%);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
 
-    .platform-community-compose-section--main {
-        border-color: rgba(var(--platform-home-accent-rgb), 0.24);
+    .platform-community-compose-feature-state {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.78rem;
+    }
+
+    .platform-community-compose-feature-state small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-compose-setting-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+    }
+
+    .platform-community-compose-selected-ledger {
+        padding: 10px 12px;
+        border: 1px solid rgba(22, 163, 74, 0.28);
+        border-radius: 6px;
+        background: rgba(22, 163, 74, 0.05);
+    }
+
+    .platform-community-compose-selected-ledger > span {
+        display: grid;
+        min-width: 0;
+    }
+
+    .platform-community-compose-selected-ledger strong,
+    .platform-community-compose-selected-ledger small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-compose-selected-ledger small {
+        color: var(--mud-palette-text-secondary);
+        font-size: 0.68rem;
+    }
+
+    .platform-community-country-fields > .mud-input-control {
+        min-width: 0;
+        flex: 1 1 180px;
     }
 
     .platform-home--ledger-picker {
@@ -4285,10 +5087,11 @@
 
     .platform-community-compose-ledger-shortcut {
         display: grid;
-        gap: 12px;
-        padding: 12px 0;
-        border-top: 1px solid rgba(var(--platform-home-accent-rgb), 0.16);
-        border-bottom: 1px solid rgba(var(--platform-home-accent-rgb), 0.16);
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid rgba(var(--platform-home-accent-rgb), 0.18);
+        border-radius: 6px;
+        background: rgba(var(--platform-home-accent-rgb), 0.03);
     }
 
     .platform-community-ledger-choice-list {
@@ -6576,6 +7379,10 @@
             flex: 1 1 auto;
         }
 
+        .platform-community-forum-display-switch {
+            flex: 0 0 auto;
+        }
+
         .platform-community-forum-view-tab {
             flex: 1 1 auto;
             padding: 0 8px;
@@ -6589,7 +7396,9 @@
         .platform-community-forum-row--head,
         .platform-community-forum-category,
         .platform-community-forum-author,
-        .platform-community-forum-count {
+        .platform-community-forum-count,
+        .platform-community-forum-row > time,
+        .platform-community-forum-row > span:nth-child(5) {
             display: none;
         }
 
@@ -6602,10 +7411,17 @@
             grid-column: 2;
         }
 
-        .platform-community-forum-row > time,
-        .platform-community-forum-row > span:nth-child(5) {
+        .platform-community-forum-count--comments {
+            display: block;
             grid-column: 3;
+            color: var(--mud-palette-error);
+            font-weight: 800;
             text-align: center;
+        }
+
+        .platform-community-forum-card-grid {
+            grid-template-columns: minmax(0, 1fr);
+            padding: 8px;
         }
 
         .platform-community-forum-footer {
@@ -6681,66 +7497,51 @@
             margin-top: 4px;
         }
 
-        .platform-community-compose-card {
-            scroll-margin-top: 10px;
-            border-radius: 18px;
-        }
-
-        .platform-community-compose-card:not(.platform-community-compose-card--open) {
-            display: none;
-        }
-
         .platform-community-compose-card.platform-community-compose-card--open {
-            position: fixed;
-            z-index: 1600;
-            inset: 0;
-            display: block;
-            width: 100vw;
-            height: 100dvh;
-            padding: max(14px, env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom)) !important;
-            overflow-x: hidden;
-            overflow-y: auto;
-            border: 0 !important;
-            border-radius: 0;
-            background: var(--mud-palette-background);
+            padding: 0 !important;
+            background: var(--mud-palette-surface);
+        }
+
+        .platform-community-compose-shell {
+            width: 100%;
             box-shadow: none;
-            overscroll-behavior: contain;
         }
 
-        .platform-community-compose-card--open .platform-community-compose-header {
-            position: sticky;
-            z-index: 2;
-            top: calc(-1 * max(14px, env(safe-area-inset-top)));
-            margin: calc(-1 * max(14px, env(safe-area-inset-top))) -14px 2px;
-            padding: max(14px, env(safe-area-inset-top)) 14px 12px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-            background: color-mix(in srgb, var(--mud-palette-background) 96%, transparent);
-            backdrop-filter: blur(14px);
+        .platform-community-compose-appbar {
+            min-height: calc(60px + env(safe-area-inset-top));
+            padding: max(8px, env(safe-area-inset-top)) 8px 8px;
         }
 
-        .platform-community-compose-card--open .platform-community-compose-close {
-            display: inline-flex;
+        .platform-community-compose-appbar-actions {
+            gap: 5px;
         }
 
-        .platform-community-compose-card--open .platform-community-compose-section {
+        .platform-community-compose-draft-action,
+        .platform-community-compose-publish-action {
+            min-width: 56px;
+            padding-inline: 10px;
+        }
+
+        .platform-community-compose-board-tab {
+            min-width: 74px;
+            padding-inline: 11px;
+        }
+
+        .platform-community-compose-editor {
+            min-height: calc(100dvh - 158px - env(safe-area-inset-top));
+        }
+
+        .platform-community-compose-tools {
+            padding-bottom: max(4px, env(safe-area-inset-bottom));
+        }
+
+        .platform-community-compose-settings {
+            grid-template-columns: minmax(0, 1fr);
             padding: 14px;
         }
 
-        .platform-community-compose-card--open .platform-community-compose-actions {
-            position: sticky;
-            z-index: 2;
-            bottom: calc(-1 * (18px + env(safe-area-inset-bottom)));
-            margin: 0 -14px calc(-1 * (18px + env(safe-area-inset-bottom)));
-            padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
-            border-top: 1px solid rgba(148, 163, 184, 0.2);
-            background: color-mix(in srgb, var(--mud-palette-background) 96%, transparent);
-            box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08);
-            backdrop-filter: blur(14px);
-        }
-
-        .platform-community-compose-card--open .platform-community-compose-primary {
-            flex: 1 1 auto;
-            min-height: 46px;
+        .platform-community-compose-settings-grid {
+            grid-template-columns: minmax(0, 1fr);
         }
 
         .platform-community-mobile-nav {
@@ -6856,6 +7657,27 @@
         }
     }
 
+    @@media (max-width: 420px) {
+        .platform-community-compose-appbar-title {
+            display: none;
+        }
+
+        .platform-community-compose-appbar-leading {
+            gap: 2px;
+        }
+
+        .platform-community-compose-mark {
+            width: 32px;
+            height: 32px;
+        }
+
+        .platform-community-compose-draft-action,
+        .platform-community-compose-publish-action {
+            min-width: 52px;
+            padding-inline: 8px;
+        }
+    }
+
 </style>
 
 @code {
@@ -6937,15 +7759,15 @@
     [Parameter]
     public long? QueryPostId { get; set; }
 
-    private readonly List<PlatformCommunityPostResponse> posts = [];
     private readonly List<PlatformCommunityPostLedgerChoiceResponse> myLedgers = [];
     private readonly List<PlatformCommunityBoardResponse> approvedBoards = [];
     private readonly List<PlatformCommunityBoardResponse> pendingBoardRequests = [];
-    private readonly List<IBrowserFile> selectedFiles = [];
-    private readonly PlatformCommunityPostForm form = new();
     private readonly PlatformCommunityBoardForm boardForm = new();
     private readonly Dictionary<long, PlatformCommunityCommentForm> commentForms = [];
     private readonly Dictionary<long, PlatformCommunityCommentForm> attachmentCommentForms = [];
+    private readonly Dictionary<long, CommunityPostOpportunityListResponse> postOpportunities = [];
+    private readonly Dictionary<long, HashSet<string>> selectedParticipationOptionIds = [];
+    private readonly HashSet<long> pendingPostParticipationIds = [];
     private readonly Dictionary<long, string> boardReviewMemo = [];
     private readonly HashSet<long> expandedCommentPostIds = [];
     private readonly Dictionary<string, string> 원장블록입력값 = [];
@@ -7059,18 +7881,46 @@
 
     private readonly string recommendationSessionKey = Guid.NewGuid().ToString("N");
     private readonly string 다이어그램대화방로컬사용자Id = $"local-{Guid.NewGuid():N}";
+    private CommunityPostComposerViewModel Composer => ViewModel.Composer;
+    private IReadOnlyList<PlatformCommunityPostResponse> posts => ViewModel.PostList.Items;
+    private List<IBrowserFile> selectedFiles => Composer.SelectedFiles;
+    private CommunityPostComposerDraftViewModel form => Composer.Draft;
     private ElementReference diagramCanvasElement;
     private ElementReference 다이어그램대화방FeedElement;
     private IJSObjectReference? diagramJsModule;
     private IDiagramCollaborationClientService? 다이어그램대화방Client;
     private string selectedLedgerTemplateKey = CommunityLedgerTemplateKeys.CargoTransport;
-    private string selectedBoardFilter = "전체";
-    private string selectedForumListFilter = "전체글";
-    private string communityPostSearchText = string.Empty;
+    private string selectedBoardFilter
+    {
+        get => ViewModel.PostList.SelectedBoard;
+        set => ViewModel.PostList.SelectedBoard = value;
+    }
+
+    private string selectedForumListFilter
+    {
+        get => ViewModel.PostList.SelectedListFilter;
+        set => ViewModel.PostList.SelectedListFilter = value;
+    }
+
+    private CommunityPostViewMode communityPostViewMode
+    {
+        get => ViewModel.PostList.ViewMode;
+        set => ViewModel.PostList.ViewMode = value;
+    }
+
+    private string communityPostSearchText
+    {
+        get => ViewModel.PostList.SearchText;
+        set => ViewModel.PostList.SearchText = value;
+    }
     private string ledgerPickerSearchText = string.Empty;
     private string ledgerPickerScope = "전체";
     private string? pendingLedgerId;
-    private long? selectedForumPostId;
+    private long? selectedForumPostId
+    {
+        get => ViewModel.PostList.SelectedPostId;
+        set => ViewModel.PostList.SelectedPostId = value;
+    }
     private string? selectedForumSeedPostTitle;
     private string? 선택현재원장Id;
     private string? 선택원장블록노드제목;
@@ -7105,11 +7955,14 @@
     private string 원함입력 = string.Empty;
     private string 원함조건입력 = string.Empty;
     private CommunityLedgerFlowAnalysisResponse? 원함분석결과;
-    private long? editingPostId;
+    private long? editingPostId
+    {
+        get => Composer.EditingPostId;
+        set => Composer.EditingPostId = value;
+    }
     private bool isLoading = true;
     private bool isBoardLoading;
     private bool isApiEndpointMetadataLoading;
-    private bool isSaving;
     private bool isMyLedgersLoading;
     private bool isLedgerPickerOpen;
     private bool isLedgerDetailOpen;
@@ -7121,7 +7974,12 @@
     private bool isSavingBoardRequest;
     private bool isWorkMode;
     private bool isCompactHomeSummary;
-    private bool isComposeOpen;
+    private bool isComposeOpen
+    {
+        get => Composer.IsOpen;
+        set => Composer.IsOpen = value;
+    }
+
     private bool isBaguaNavigatorOpen;
     private bool isBaguaDockDragging;
     private bool hasBaguaDockDragMoved;
@@ -7145,7 +8003,6 @@
     private Severity 창고대행신청알림수준 = Severity.Info;
     private Severity 원장전송결과Severity = Severity.Info;
     private bool isDisposed;
-    private const long MaxUploadFileBytes = 5 * 1024 * 1024;
     private const string DiagramCollaborationHubPath = "/hubs/diagram-collaboration";
     private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체글", "추천글", "공지"];
     private static readonly IReadOnlyList<string> LedgerPickerScopes = ["전체", "내 원장", "공개 원장"];
@@ -7154,10 +8011,6 @@
 
     private bool IsCompactHomeSummaryVisible
         => UseCompactHomeSummary && isCompactHomeSummary && !isWorkMode && !IsDiagramMode;
-
-    private string ComposeCardClass => isComposeOpen
-        ? "pa-4 platform-community-compose-card platform-community-compose-card--open"
-        : "pa-4 platform-community-compose-card";
 
     private string HomeRootClass => isLedgerPickerOpen || isLedgerDetailOpen || isOrderLedgerHierarchyOpen
         ? "py-4 platform-community-home platform-home--ledger-picker"
@@ -7224,15 +8077,7 @@
             .ToArray();
 
     private IReadOnlyList<PlatformCommunityPostResponse> VisiblePosts
-        => posts
-            .Where(post => string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(post.Category, selectedBoardFilter, StringComparison.OrdinalIgnoreCase))
-            .Where(MatchesForumListFilter)
-            .Where(MatchesCommunityPostSearch)
-            .OrderByDescending(post => post.IsOperatorPinned)
-            .ThenByDescending(post => post.IsTrending)
-            .ThenByDescending(post => post.LastEngagedAtUtc ?? post.CreatedAtUtc)
-            .ToArray();
+        => ViewModel.PostList.VisibleItems;
 
     private IReadOnlyList<CommunitySeedPost> VisibleSeedPosts
         => SeedPosts
@@ -7368,14 +8213,6 @@
         }
     }
 
-    private bool MatchesForumListFilter(PlatformCommunityPostResponse post)
-        => selectedForumListFilter switch
-        {
-            "공지" => post.IsOperatorPinned,
-            "추천글" => post.IsTrending || post.RecommendationCount >= 5,
-            _ => true
-        };
-
     private bool MatchesForumListFilter(CommunitySeedPost post)
         => selectedForumListFilter switch
         {
@@ -7383,18 +8220,6 @@
             "추천글" => post.RecommendationCount >= 5,
             _ => true
         };
-
-    private bool MatchesCommunityPostSearch(PlatformCommunityPostResponse post)
-    {
-        var searchText = communityPostSearchText.Trim();
-        return searchText.Length == 0
-            || ContainsCommunitySearchText(post.Title, searchText)
-            || ContainsCommunitySearchText(post.Body, searchText)
-            || ContainsCommunitySearchText(post.Nickname, searchText)
-            || ContainsCommunitySearchText(post.Category, searchText)
-            || ContainsCommunitySearchText(post.WorkflowTag, searchText)
-            || ContainsCommunitySearchText(post.RoleTag, searchText);
-    }
 
     private bool MatchesCommunityPostSearch(CommunitySeedPost post)
     {
@@ -7417,10 +8242,8 @@
         selectedForumSeedPostTitle = null;
     }
 
-    private string BuildForumListFilterClass(string filter)
-        => string.Equals(selectedForumListFilter, filter, StringComparison.OrdinalIgnoreCase)
-            ? "platform-community-forum-view-tab platform-community-forum-view-tab--selected"
-            : "platform-community-forum-view-tab";
+    private void SelectCommunityPostViewMode(CommunityPostViewMode viewMode)
+        => communityPostViewMode = viewMode;
 
     private async Task ToggleForumPostAsync(PlatformCommunityPostResponse post)
     {
@@ -7467,23 +8290,398 @@
     private bool IsForumSeedPostSelected(CommunitySeedPost post)
         => string.Equals(selectedForumSeedPostTitle, post.Title, StringComparison.Ordinal);
 
-    private string BuildForumPostRowClass(PlatformCommunityPostResponse post)
+    private bool IsPostParticipationPending(long postId)
+        => pendingPostParticipationIds.Contains(postId);
+
+    private bool IsParticipationRoleSelected(long postId, string optionId)
+        => !string.IsNullOrWhiteSpace(optionId)
+           && selectedParticipationOptionIds.TryGetValue(postId, out var selected)
+           && selected.Contains(optionId);
+
+    private string BuildParticipationRoleClass(long postId, string optionId)
+        => IsParticipationRoleSelected(postId, optionId)
+            ? "platform-community-participation-role platform-community-participation-role--selected"
+            : "platform-community-participation-role";
+
+    private async Task StartPostParticipationAsync(PlatformCommunityPostResponse post)
     {
-        var selected = IsForumPostSelected(post) ? " platform-community-forum-row--selected" : string.Empty;
-        var notice = post.IsOperatorPinned ? " platform-community-forum-row--notice" : string.Empty;
-        var completion = post.IsSystemGenerated ? " platform-community-forum-row--completion" : string.Empty;
-        return $"platform-community-forum-row{selected}{notice}{completion}";
+        if (!pendingPostParticipationIds.Add(post.Id))
+        {
+            return;
+        }
+
+        try
+        {
+            await CommunityService.StartPostParticipationAsync(
+                post.Id,
+                new StartCommunityPostParticipationRequest
+                {
+                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+                    ConfirmExplicitStart = true,
+                    ConfirmNonBindingParticipation = true
+                });
+            await RefreshPostOpportunitiesAsync(post.Id);
+            statusSeverity = Severity.Success;
+            statusMessage = "게시글에서 비구속적 관심 모집을 시작했습니다.";
+        }
+        catch (HttpRequestException exception) when (
+            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
+            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "관심 모집을 시작하려면 먼저 로그인해 주세요.";
+        }
+        catch (Exception exception)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"관심 모집을 시작하지 못했습니다: {exception.Message}";
+        }
+        finally
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+        }
     }
 
-    private string BuildForumSeedPostRowClass(CommunitySeedPost post)
+    private async Task ToggleParticipationRoleAsync(
+        PlatformCommunityPostResponse post,
+        CommunityPostParticipationRoleOptionResponse role)
     {
-        var selected = IsForumSeedPostSelected(post) ? " platform-community-forum-row--selected" : string.Empty;
-        return $"platform-community-forum-row platform-community-forum-row--recommended{selected}";
+        if (string.IsNullOrWhiteSpace(role.OptionId)
+            || !postOpportunities.TryGetValue(post.Id, out var opportunity)
+            || opportunity.Participation.InterestVoteId is not Guid voteId
+            || !pendingPostParticipationIds.Add(post.Id))
+        {
+            return;
+        }
+
+        var selected = GetParticipationOptionSelection(post.Id);
+        var wasSelected = selected.Contains(role.OptionId);
+        if (wasSelected && selected.Count == 1)
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+            statusSeverity = Severity.Info;
+            statusMessage = "관심 역할은 하나 이상 남겨야 합니다.";
+            return;
+        }
+
+        if (wasSelected)
+        {
+            selected.Remove(role.OptionId);
+        }
+        else
+        {
+            selected.Add(role.OptionId);
+        }
+
+        try
+        {
+            var displayName = commentForms.TryGetValue(post.Id, out var commentForm)
+                              && !string.IsNullOrWhiteSpace(commentForm.Nickname)
+                ? commentForm.Nickname.Trim()
+                : "관심 참여자";
+            await CommunityService.CastCommunityVoteAsync(
+                voteId,
+                new CommunityVoteCastRequest
+                {
+                    VoterKey = $"community-interest:{recommendationSessionKey}",
+                    VoterDisplayName = displayName,
+                    OptionIds = selected.ToArray()
+                });
+            await RefreshPostOpportunitiesAsync(post.Id);
+            statusSeverity = Severity.Success;
+            statusMessage = "가능한 참여 역할을 반영했습니다.";
+        }
+        catch (Exception exception)
+        {
+            if (wasSelected)
+            {
+                selected.Add(role.OptionId);
+            }
+            else
+            {
+                selected.Remove(role.OptionId);
+            }
+
+            statusSeverity = Severity.Error;
+            statusMessage = $"관심 역할을 반영하지 못했습니다: {exception.Message}";
+        }
+        finally
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+        }
     }
 
-    private void ClearCommunityPostSearch()
+    private async Task PromotePostParticipationAsync(
+        PlatformCommunityPostResponse post,
+        string intentTypeCode)
     {
-        communityPostSearchText = string.Empty;
+        if (!postOpportunities.TryGetValue(post.Id, out var opportunity)
+            || opportunity.Participation.InterestVoteId is not Guid voteId
+            || !pendingPostParticipationIds.Add(post.Id))
+        {
+            return;
+        }
+
+        var parameters = new DialogParameters
+        {
+            [nameof(CommunityProvisionalLedgerDialog.InterestVoteId)] = voteId,
+            [nameof(CommunityProvisionalLedgerDialog.IntentTypeCode)] = intentTypeCode
+        };
+        var dialog = await DialogService.ShowAsync<CommunityProvisionalLedgerDialog>(
+            ProvisionalLedgerDialogTitle(intentTypeCode),
+            parameters,
+            new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true,
+                CloseButton = true,
+                CloseOnEscapeKey = true
+            });
+        var dialogResult = await dialog.Result;
+        if (dialogResult is null
+            || dialogResult.Canceled
+            || dialogResult.Data is not PromoteCommunityPostParticipationRequest request)
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+            return;
+        }
+
+        try
+        {
+            var result = await CommunityService.PromotePostParticipationAsync(
+                post.Id,
+                request);
+            await LoadPostsAsync();
+            await RefreshPostOpportunitiesAsync(post.Id);
+            statusSeverity = Severity.Success;
+            statusMessage = result?.ReusedExistingProvisionalLedger == true
+                ? "이미 만들어진 가원장을 다시 확인했습니다."
+                : "모인 관심을 비구속적 가원장으로 기록하고 참여자 알림을 요청했습니다.";
+        }
+        catch (HttpRequestException exception) when (
+            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
+            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "로그인한 게시글 작성자만 가원장을 만들 수 있습니다.";
+        }
+        catch (Exception exception)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"가원장을 만들지 못했습니다: {exception.Message}";
+        }
+        finally
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+        }
+    }
+
+    private async Task JoinPostProfessionalRoleAsync(
+        PlatformCommunityPostResponse post,
+        string roleCode)
+    {
+        if (!postOpportunities.TryGetValue(post.Id, out var opportunity)
+            || string.IsNullOrWhiteSpace(opportunity.Participation.ProvisionalLedgerId)
+            || !pendingPostParticipationIds.Add(post.Id))
+        {
+            return;
+        }
+
+        var opening = opportunity.Participation.ProfessionalParticipation.RoleOpenings.FirstOrDefault(candidate =>
+            string.Equals(candidate.RoleCode, roleCode, StringComparison.OrdinalIgnoreCase));
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            opening?.Label ?? "거래 참여팀 역할",
+            "이 참여는 가원장 검토 단계의 자발적·비구속 참여입니다. 플랫폼 프로필 확인은 관할기관 면허·등록 확인이나 계약·수임을 대신하지 않습니다.",
+            yesText: "역할로 참여",
+            cancelText: "취소");
+        if (confirmed is not true)
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+            return;
+        }
+
+        try
+        {
+            var result = await CommunityService.JoinPostProfessionalRoleAsync(
+                post.Id,
+                new JoinCommunityPostProfessionalRequest
+                {
+                    ProvisionalLedgerId = opportunity.Participation.ProvisionalLedgerId,
+                    ProfessionalRoleCode = roleCode,
+                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+                    ConfirmProfessionalCapacity = true,
+                    ConfirmVoluntaryNonBindingParticipation = true,
+                    ConfirmParticipantNotification = true
+                });
+            await LoadPostsAsync();
+            await RefreshPostOpportunitiesAsync(post.Id);
+            statusSeverity = Severity.Success;
+            statusMessage = result?.ReusedExistingParticipation == true
+                ? "이미 참여 중인 역할을 다시 확인했습니다."
+                : "거래 참여팀 역할 참여를 기록하고 기존 참여자 알림을 요청했습니다.";
+        }
+        catch (HttpRequestException exception) when (
+            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
+            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "현재 계정의 플랫폼 프로필에서 이 역할을 확인할 수 없습니다.";
+        }
+        catch (Exception exception)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"역할 참여를 기록하지 못했습니다: {exception.Message}";
+        }
+        finally
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+        }
+    }
+
+    private async Task JoinPostPartyRoleAsync(
+        PlatformCommunityPostResponse post,
+        string roleCode)
+    {
+        if (!postOpportunities.TryGetValue(post.Id, out var opportunity)
+            || string.IsNullOrWhiteSpace(opportunity.Participation.ProvisionalLedgerId)
+            || !pendingPostParticipationIds.Add(post.Id))
+        {
+            return;
+        }
+
+        var slot = opportunity.Participation.PartyFormation.RoleSlots.FirstOrDefault(candidate =>
+            string.Equals(candidate.RoleCode, roleCode, StringComparison.OrdinalIgnoreCase));
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            slot?.Label ?? "거래 당사자 역할",
+            "이 수락은 가원장의 비구속적 검토 참여를 기록합니다. 주문·계약·결제, 수출입 책임 또는 최종 업무 배정은 별도 합의 전까지 확정되지 않습니다.",
+            yesText: "역할 수락",
+            cancelText: "취소");
+        if (confirmed is not true)
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+            return;
+        }
+
+        try
+        {
+            var result = await CommunityService.JoinPostPartyRoleAsync(
+                post.Id,
+                new JoinCommunityPostPartyRoleRequest
+                {
+                    ProvisionalLedgerId = opportunity.Participation.ProvisionalLedgerId,
+                    PartyRoleCode = roleCode,
+                    DisplayLanguageCode = CommunityDisplayLanguageCodes.Korean,
+                    ConfirmRoleCapacity = true,
+                    ConfirmVoluntaryNonBindingParticipation = true,
+                    ConfirmParticipantNotification = true
+                });
+            await LoadPostsAsync();
+            await RefreshPostOpportunitiesAsync(post.Id);
+            statusSeverity = Severity.Success;
+            statusMessage = result?.ReusedExistingParticipation == true
+                ? "이미 수락한 거래 역할을 다시 확인했습니다."
+                : "비구속적 거래 역할 수락을 기록하고 기존 참여자 알림을 요청했습니다.";
+        }
+        catch (HttpRequestException exception) when (
+            exception.StatusCode == System.Net.HttpStatusCode.Unauthorized
+            || exception.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "거래 역할을 수락하려면 로그인해야 합니다.";
+        }
+        catch (Exception exception)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = $"거래 역할 수락을 기록하지 못했습니다: {exception.Message}";
+        }
+        finally
+        {
+            pendingPostParticipationIds.Remove(post.Id);
+        }
+    }
+
+    private static string ProvisionalLedgerDialogTitle(string intentTypeCode)
+        => intentTypeCode switch
+        {
+            CommunityCollectiveIntentTypeCodes.GroupImportCandidate => "공동수입 검토 가원장",
+            CommunityCollectiveIntentTypeCodes.GroupExportCandidate => "공동수출 검토 가원장",
+            _ => "공동구매 가원장"
+        };
+
+    private static string TradeDirectionLabel(string code)
+        => code switch
+        {
+            CommunityTradeDirectionCodes.Import => "수입 검토",
+            CommunityTradeDirectionCodes.Export => "수출 검토",
+            _ => "국내 거래 검토"
+        };
+
+    private static string CommunityMomentumLabel(string? code)
+        => code switch
+        {
+            CommunityPostMomentumCodes.ReadyForRealLedgerReview => "전환 검토 준비",
+            CommunityPostMomentumCodes.PartyForming => "참여팀 구성중",
+            _ => "역할 참여 모집"
+        };
+
+    private static string CountryCodeLabel(string? code)
+        => string.IsNullOrWhiteSpace(code) ? "미정" : code.Trim().ToUpperInvariant();
+
+    private static string TransportModeLabel(string code)
+        => code switch
+        {
+            CommunityTransportModeCodes.Ocean => "해상",
+            CommunityTransportModeCodes.Air => "항공",
+            CommunityTransportModeCodes.Road => "도로",
+            CommunityTransportModeCodes.Rail => "철도",
+            CommunityTransportModeCodes.Multimodal => "복합운송",
+            _ => code
+        };
+
+    private static string BuildPartySlotClass(CommunityPostPartyRoleSlotResponse slot)
+        => slot.StateCode switch
+        {
+            CommunityPartyRoleSlotStateCodes.RoleAccepted =>
+                "platform-community-party-slot platform-community-party-slot--confirmed",
+            CommunityPartyRoleSlotStateCodes.InterestExpressed =>
+                "platform-community-party-slot platform-community-party-slot--interest",
+            _ => "platform-community-party-slot"
+        };
+
+    private static string PartySlotIcon(CommunityPostPartyRoleSlotResponse slot)
+        => slot.StateCode switch
+        {
+            CommunityPartyRoleSlotStateCodes.RoleAccepted => Icons.Material.Filled.CheckCircle,
+            CommunityPartyRoleSlotStateCodes.InterestExpressed => Icons.Material.Filled.Schedule,
+            _ => Icons.Material.Outlined.RadioButtonUnchecked
+        };
+
+    private HashSet<string> GetParticipationOptionSelection(long postId)
+    {
+        if (!selectedParticipationOptionIds.TryGetValue(postId, out var selected))
+        {
+            selected = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            selectedParticipationOptionIds[postId] = selected;
+        }
+
+        return selected;
+    }
+
+    private async Task RefreshPostOpportunitiesAsync(long postId)
+    {
+        var result = await CommunityService.GetPostOpportunitiesAsync(postId);
+        if (result is null)
+        {
+            postOpportunities.Remove(postId);
+            return;
+        }
+
+        postOpportunities[postId] = result;
+    }
+
+    private void HandleCommunityPostSearchChanged(string value)
+    {
+        communityPostSearchText = value ?? string.Empty;
         selectedForumPostId = null;
         selectedForumSeedPostTitle = null;
     }
@@ -7547,8 +8745,11 @@
     private void OpenCompose()
     {
         OpenCommunityMode();
-        isComposeOpen = true;
+        Composer.Open();
     }
+
+    private Task LoadLocalComposerDraftAsync()
+        => Composer.LoadLocalDraftAsync();
 
     private async Task OpenMyLedgerComposeAsync()
     {
@@ -8653,6 +9854,7 @@
 
     protected override void OnParametersSet()
     {
+        ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
         ApplyCommunityQueryParameters();
         ApplyPendingCommunityPostDraft();
     }
@@ -8667,6 +9869,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            await LoadLocalComposerDraftAsync();
+        }
+
         if (!다이어그램대화방FeedScroll필요)
         {
             return;
@@ -11341,6 +12548,7 @@
 
     protected override Task OnInitializedAsync()
     {
+        ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
         HomeModeState.Changed += HandleModeChanged;
         DiagramPalette.Changed += HandleDiagramPaletteChanged;
         DecorationState.Changed += HandleDecorationStateChanged;
@@ -12164,20 +13372,25 @@
         원장블록흐름도배치초기화();
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        isDisposed = true;
-        HomeModeState.Changed -= HandleModeChanged;
-        DiagramPalette.Changed -= HandleDiagramPaletteChanged;
-        DecorationState.Changed -= HandleDecorationStateChanged;
-        DiagramPalette.BlockRequested -= HandlePaletteBlockRequested;
-        DiagramPalette.WorkflowPresetRequested -= HandleWorkflowPresetRequested;
-        if (다이어그램대화방Client is not null)
+        if (disposing)
         {
-            다이어그램대화방Client.메시지수신 -= Handle다이어그램대화방메시지수신Async;
-            다이어그램대화방Client.상태변경 -= Handle다이어그램대화방상태변경Async;
-            _ = 다이어그램대화방Client.연결해제Async();
+            isDisposed = true;
+            HomeModeState.Changed -= HandleModeChanged;
+            DiagramPalette.Changed -= HandleDiagramPaletteChanged;
+            DecorationState.Changed -= HandleDecorationStateChanged;
+            DiagramPalette.BlockRequested -= HandlePaletteBlockRequested;
+            DiagramPalette.WorkflowPresetRequested -= HandleWorkflowPresetRequested;
+            if (다이어그램대화방Client is not null)
+            {
+                다이어그램대화방Client.메시지수신 -= Handle다이어그램대화방메시지수신Async;
+                다이어그램대화방Client.상태변경 -= Handle다이어그램대화방상태변경Async;
+                _ = 다이어그램대화방Client.연결해제Async();
+            }
         }
+
+        base.Dispose(disposing);
     }
 
     private async Task LoadPostsAsync()
@@ -12185,9 +13398,12 @@
         isLoading = true;
         try
         {
-            var result = await CommunityService.GetPostsAsync(AppKey);
-            posts.Clear();
-            posts.AddRange(result.Items);
+            ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
+            if (!await ViewModel.새로고침Async())
+            {
+                throw new InvalidOperationException(
+                    ViewModel.오류메시지 ?? "커뮤니티 게시글을 불러오지 못했습니다.");
+            }
 
             if (QueryPostId is long requestedPostId)
             {
@@ -12254,10 +13470,15 @@
             return;
         }
 
-        var index = posts.FindIndex(item => item.Id == postId);
-        if (index >= 0)
+        ViewModel.PostList.Replace(detail);
+
+        try
         {
-            posts[index] = detail;
+            await RefreshPostOpportunitiesAsync(postId);
+        }
+        catch (HttpRequestException)
+        {
+            postOpportunities.Remove(postId);
         }
     }
 
@@ -12337,96 +13558,13 @@
         statusMessage = $"'{title}' 게시판으로 글 분류를 선택했습니다.";
     }
 
-    private async Task SavePostAsync()
+    private async Task HandleComposerSavedAsync(CommunityPostComposerSaveResult result)
     {
-        statusMessage = null;
-        if (string.IsNullOrWhiteSpace(form.Nickname) ||
-            string.IsNullOrWhiteSpace(form.Password) ||
-            string.IsNullOrWhiteSpace(form.Category) ||
-            string.IsNullOrWhiteSpace(form.WorkflowTag) ||
-            string.IsNullOrWhiteSpace(form.RoleTag) ||
-            string.IsNullOrWhiteSpace(form.Title) ||
-            (string.IsNullOrWhiteSpace(form.Body) && string.IsNullOrWhiteSpace(form.SharedLinkUrl)))
-        {
-            statusSeverity = Severity.Warning;
-            statusMessage = "닉네임, 비밀번호, 게시판/분류, 워크플로우 태그, 역할 태그, 제목, 본문 또는 링크를 입력하세요.";
-            return;
-        }
-
-        isSaving = true;
-        try
-        {
-            var wasEditing = editingPostId is not null;
-            PlatformCommunityPostResponse? saved;
-
-            if (editingPostId is long postId)
-            {
-                saved = await CommunityService.UpdatePostAsync(postId, new PlatformCommunityPostUpdateRequest
-                {
-                    Category = form.Category,
-                    WorkflowTag = form.WorkflowTag,
-                    RoleTag = form.RoleTag,
-                    Title = form.Title,
-                    Body = form.Body,
-                    SharedLinkUrl = form.SharedLinkUrl,
-                    커뮤니티원장Id = form.커뮤니티원장Id,
-                    Nickname = form.Nickname,
-                    IsReportBoardPost = form.IsReportBoardPost,
-                    ReporterDisplayName = form.ReporterDisplayName,
-                    ReportedDisplayName = form.ReportedDisplayName,
-                    Password = form.Password
-                });
-            }
-            else
-            {
-                saved = await CommunityService.CreatePostAsync(new PlatformCommunityPostCreateRequest
-                {
-                    AppKey = AppKey,
-                    Category = form.Category,
-                    WorkflowTag = form.WorkflowTag,
-                    RoleTag = form.RoleTag,
-                    Title = form.Title,
-                    Body = form.Body,
-                    SharedLinkUrl = form.SharedLinkUrl,
-                    커뮤니티원장Id = form.커뮤니티원장Id,
-                    Nickname = form.Nickname,
-                    IsReportBoardPost = form.IsReportBoardPost,
-                    ReporterDisplayName = form.ReporterDisplayName,
-                    ReportedDisplayName = form.ReportedDisplayName,
-                    Password = form.Password
-                });
-            }
-
-            if (saved is not null)
-            {
-                foreach (var file in selectedFiles)
-                {
-                    await CommunityService.UploadAttachmentAsync(saved.Id, form.Password, file, MaxUploadFileBytes);
-                }
-
-                ResetForm();
-                await LoadPostsAsync();
-                isComposeOpen = false;
-            }
-
-            statusSeverity = Severity.Success;
-            statusMessage = wasEditing ? "글을 수정했습니다." : "글을 등록했습니다.";
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = "비밀번호가 맞지 않아 수정할 수 없습니다.";
-        }
-        catch (Exception ex)
-        {
-            statusSeverity = Severity.Error;
-            statusMessage = $"저장에 실패했습니다: {ex.Message}";
-        }
-        finally
-        {
-            isSaving = false;
-        }
+        statusSeverity = Severity.Success;
+        statusMessage = result.Message;
+        await LoadPostsAsync();
     }
+
 
     private async Task RecommendPostAsync(PlatformCommunityPostResponse post)
     {
@@ -12618,23 +13756,10 @@
 
     private void BeginEdit(PlatformCommunityPostResponse post)
     {
-        editingPostId = post.Id;
-        selectedFiles.Clear();
-        form.Nickname = post.Nickname;
-        form.Password = string.Empty;
-        form.Category = post.Category;
-        form.WorkflowTag = post.WorkflowTag;
-        form.RoleTag = post.RoleTag;
-        form.Title = post.Title;
-        form.Body = post.Body;
-        form.SharedLinkUrl = post.SharedLinkUrl ?? string.Empty;
-        form.커뮤니티원장Id = post.커뮤니티원장Id ?? string.Empty;
-        form.IsReportBoardPost = IsReportPost(post);
-        form.ReporterDisplayName = post.ReporterDisplayName;
-        form.ReportedDisplayName = post.ReportedDisplayName;
+        Composer.BeginEdit(post);
         statusMessage = "작성할 때 입력한 비밀번호를 넣고 수정 저장을 누르세요.";
         statusSeverity = Severity.Info;
-        OpenCompose();
+        OpenCommunityMode();
     }
 
     private void CancelEdit()
@@ -12693,23 +13818,10 @@
 
     private void ResetForm()
     {
-        editingPostId = null;
-        selectedFiles.Clear();
+        Composer.Reset();
         isLedgerDetailOpen = false;
         isLedgerPickerOpen = false;
         pendingLedgerId = null;
-        form.Nickname = string.Empty;
-        form.Password = string.Empty;
-        form.Category = "자유";
-        form.WorkflowTag = "커뮤니티 신뢰";
-        form.RoleTag = ResolveRoleTag(RoleLabel);
-        form.Title = string.Empty;
-        form.Body = string.Empty;
-        form.SharedLinkUrl = string.Empty;
-        form.커뮤니티원장Id = string.Empty;
-        form.IsReportBoardPost = false;
-        form.ReporterDisplayName = string.Empty;
-        form.ReportedDisplayName = string.Empty;
     }
 
     private IReadOnlyList<string> BoardCategoryOptions
@@ -12854,12 +13966,6 @@
         };
     }
 
-    private void HandleFilesSelected(InputFileChangeEventArgs args)
-    {
-        selectedFiles.Clear();
-        selectedFiles.AddRange(args.GetMultipleFiles(5));
-    }
-
     private static string FormatDate(DateTime createdAtUtc)
     {
         return createdAtUtc.ToLocalTime().ToString("yyyy.MM.dd HH:mm");
@@ -12889,6 +13995,17 @@
     {
         return IsReportPost(post) ? "익명 신고자" : post.Nickname;
     }
+
+    private static bool HasPublicAuthorCountry(PlatformCommunityPostResponse post)
+        => post.IsAuthorDisplayCountryPublic
+           && !string.IsNullOrWhiteSpace(post.AuthorDisplayCountryCode)
+           && !string.IsNullOrWhiteSpace(post.AuthorDisplayCountryName)
+           && !IsReportPost(post);
+
+    private static string FormatPostCountryInline(PlatformCommunityPostResponse post)
+        => HasPublicAuthorCountry(post)
+            ? $" · 활동 국가 {post.AuthorDisplayCountryCode} {post.AuthorDisplayCountryName}"
+            : string.Empty;
 
     private static string DisplayCommentNickname(PlatformCommunityPostResponse post, string nickname)
     {
@@ -13008,22 +14125,6 @@
         "게시글은 닉네임과 비밀번호로 수정 권한을 보호"
     ];
 
-    private sealed class PlatformCommunityPostForm
-    {
-        public string Nickname { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Category { get; set; } = "자유";
-        public string WorkflowTag { get; set; } = "커뮤니티 신뢰";
-        public string RoleTag { get; set; } = "플랫폼 구성원";
-        public string Title { get; set; } = string.Empty;
-        public string Body { get; set; } = string.Empty;
-        public string SharedLinkUrl { get; set; } = string.Empty;
-        public string 커뮤니티원장Id { get; set; } = string.Empty;
-        public bool IsReportBoardPost { get; set; }
-        public string ReporterDisplayName { get; set; } = string.Empty;
-        public string ReportedDisplayName { get; set; } = string.Empty;
-    }
-
     private sealed class PlatformCommunityBoardForm
     {
         public string Title { get; set; } = string.Empty;
@@ -13046,17 +14147,5 @@
         Suggestion,
         InternationalCoordination
     }
-
-    private sealed record CommunitySeedPost(
-        string Title,
-        string Body,
-        string Category,
-        string Meta,
-        string Icon,
-        Color Color,
-        string Author,
-        int RecommendationCount,
-        int CommentCount,
-        bool HasDiagramPreview);
 
 }

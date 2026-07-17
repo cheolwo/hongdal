@@ -90,6 +90,14 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             x.ServiceType == typeof(I주문원장Service)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(ICommunityPostComposerDraftStore)
+            && x.ImplementationType == typeof(BrowserCommunityPostComposerDraftStore)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityHomePageViewModel)
+            && x.ImplementationType == typeof(PlatformCommunityHomePageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(I공동구매창고Service)
             && x.ImplementationType == typeof(공동구매창고Service)
             && x.Lifetime == ServiceLifetime.Scoped);

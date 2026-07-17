@@ -1,0 +1,400 @@
+@using Hongdal.Ui.Common.Areas.App.ViewModels
+@inherits ViewModelParameterComponentBase<CommunityPostComposerViewModel>
+@namespace Hongdal.Ui.Common.Areas.App.Components.Community
+
+<MudPaper id="community-compose"
+          Elevation="0"
+          Outlined="true"
+          Class="@ComposeCardClass"
+          role="dialog"
+          aria-label="커뮤니티 글쓰기">
+    <div class="platform-community-compose-shell">
+        <div class="platform-community-compose-top">
+            <header class="platform-community-compose-appbar">
+                <div class="platform-community-compose-appbar-leading">
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                                   Color="Color.Inherit"
+                                   OnClick="CloseAsync"
+                                   aria-label="글쓰기 닫기" />
+                    <span class="platform-community-compose-mark" aria-hidden="true">
+                        <MudIcon Icon="@Icons.Material.Filled.Forum" Size="Size.Small" />
+                    </span>
+                    <span class="platform-community-compose-appbar-title">
+                        <strong>@(ViewModel.EditingPostId is null ? "글쓰기" : "글 수정")</strong>
+                        <small>@ViewModel.Draft.Category</small>
+                    </span>
+                </div>
+                <div class="platform-community-compose-appbar-actions">
+                    <MudTooltip Text="게시 설정">
+                        <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz"
+                                       Color="Color.Inherit"
+                                       OnClick="ViewModel.ToggleSettings"
+                                       aria-label="게시 설정 열기" />
+                    </MudTooltip>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Inherit"
+                               Size="Size.Small"
+                               Disabled="@ViewModel.IsSaving"
+                               OnClick="SaveDraftAsync"
+                               Class="platform-community-compose-draft-action">
+                        임시
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               Disabled="@ViewModel.IsSaving"
+                               OnClick="SaveAsync"
+                               Class="platform-community-compose-publish-action">
+                        @(ViewModel.IsSaving ? "저장 중" : ViewModel.EditingPostId is null ? "등록" : "수정")
+                    </MudButton>
+                </div>
+            </header>
+
+            <nav class="platform-community-compose-board-tabs" aria-label="게시판 선택">
+                @foreach (var category in BoardCategories)
+                {
+                    <button type="button"
+                            class="@BuildCategoryClass(category)"
+                            aria-pressed="@string.Equals(ViewModel.Draft.Category, category, StringComparison.OrdinalIgnoreCase)"
+                            @onclick="@(() => ViewModel.SelectCategory(category))">
+                        @category
+                    </button>
+                }
+            </nav>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(VisibleStatusMessage))
+        {
+            <MudAlert Severity="@VisibleStatusSeverity"
+                      Dense="true"
+                      Variant="Variant.Text"
+                      Class="platform-community-compose-status">
+                @VisibleStatusMessage
+            </MudAlert>
+        }
+
+        <main class="platform-community-compose-editor" aria-label="글 내용">
+            <MudTextField T="string"
+                          Placeholder="제목"
+                          @bind-Value="ViewModel.Draft.Title"
+                          Immediate="true"
+                          MaxLength="160"
+                          Variant="Variant.Text"
+                          Margin="Margin.Dense"
+                          Class="platform-community-compose-title-field"
+                          aria-label="게시글 제목" />
+            <MudTextField T="string"
+                          Placeholder="내용"
+                          @bind-Value="ViewModel.Draft.Body"
+                          Immediate="true"
+                          Lines="12"
+                          MaxLength="4000"
+                          Variant="Variant.Text"
+                          Margin="Margin.Dense"
+                          Class="platform-community-compose-body-field"
+                          aria-label="게시글 내용" />
+
+            @if (ViewModel.SelectedFiles.Count > 0)
+            {
+                <div class="platform-community-compose-file-list" aria-label="선택한 사진">
+                    @foreach (var file in ViewModel.SelectedFiles.Take(4))
+                    {
+                        <span><MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" /> @file.Name</span>
+                    }
+                    @if (ViewModel.SelectedFiles.Count > 4)
+                    {
+                        <span>@($"외 {ViewModel.SelectedFiles.Count - 4}개")</span>
+                    }
+                </div>
+            }
+
+            <div class="platform-community-compose-tools" aria-label="글 첨부 도구">
+                <MudTooltip Text="사진 첨부">
+                    <label class="platform-community-compose-tool-button" aria-label="사진 첨부">
+                        <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" />
+                        <InputFile OnChange="HandleFilesSelected"
+                                   multiple
+                                   accept="image/jpeg,image/png,image/webp,image/gif"
+                                   class="platform-community-file-input" />
+                    </label>
+                </MudTooltip>
+                <MudTooltip Text="링크 추가">
+                    <MudIconButton Icon="@Icons.Material.Filled.Link"
+                                   Color="Color.Default"
+                                   OnClick="ViewModel.OpenSettings"
+                                   aria-label="공유 링크 추가" />
+                </MudTooltip>
+                <MudTooltip Text="원장 첨부">
+                    <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
+                                   Color="Color.Default"
+                                   Disabled="@LedgerPickerLoading"
+                                   OnClick="LedgerPickerRequested"
+                                   aria-label="원장 첨부" />
+                </MudTooltip>
+                <MudTooltip Text="활동 국가와 역할 설정">
+                    <MudIconButton Icon="@Icons.Material.Filled.Public"
+                                   Color="Color.Default"
+                                   OnClick="ViewModel.OpenSettings"
+                                   aria-label="활동 국가와 역할 설정" />
+                </MudTooltip>
+                <MudTooltip Text="게시 설정">
+                    <MudIconButton Icon="@Icons.Material.Filled.Tune"
+                                   Color="Color.Default"
+                                   OnClick="ViewModel.ToggleSettings"
+                                   aria-label="게시 설정" />
+                </MudTooltip>
+                <span class="platform-community-compose-character-count">@($"{ViewModel.Draft.Body.Length:N0}/4,000")</span>
+            </div>
+        </main>
+
+        <div class="platform-community-compose-context" aria-label="현재 게시 설정">
+            <span>@ViewModel.Draft.WorkflowTag</span>
+            <span>@ViewModel.Draft.RoleTag</span>
+            @if (ViewModel.Draft.IsAuthorDisplayCountryPublic && !string.IsNullOrWhiteSpace(ViewModel.Draft.AuthorDisplayCountryCode))
+            {
+                <span>@ViewModel.Draft.AuthorDisplayCountryCode.ToUpperInvariant()</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(ViewModel.Draft.커뮤니티원장Id))
+            {
+                <span class="platform-community-compose-context--ledger"><MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" /> 원장 연결</span>
+            }
+            @if (ViewModel.Draft.IsReportBoardPost)
+            {
+                <span class="platform-community-compose-context--report">신고·분쟁</span>
+            }
+            @if (ViewModel.LocalDraftSavedAtUtc is DateTime savedAtUtc)
+            {
+                <small>@($"임시저장 {savedAtUtc.ToLocalTime():HH:mm}")</small>
+            }
+        </div>
+
+        @if (ViewModel.IsSettingsOpen)
+        {
+            <section class="platform-community-compose-settings" aria-label="게시 설정">
+                <header>
+                    <div>
+                        <MudIcon Icon="@Icons.Material.Filled.Tune" Size="Size.Small" />
+                        <strong>게시 설정</strong>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                   Size="Size.Small"
+                                   OnClick="ViewModel.ToggleSettings"
+                                   aria-label="게시 설정 닫기" />
+                </header>
+
+                <div class="platform-community-compose-settings-grid platform-community-compose-settings-grid--identity">
+                    <MudTextField T="string"
+                                  Label="닉네임"
+                                  @bind-Value="ViewModel.Draft.Nickname"
+                                  MaxLength="40"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                    <MudTextField T="string"
+                                  Label="글 비밀번호"
+                                  @bind-Value="ViewModel.Draft.Password"
+                                  InputType="InputType.Password"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
+                </div>
+
+                <div class="platform-community-compose-settings-grid">
+                    <MudSelect T="string"
+                               Label="업무 분류"
+                               @bind-Value="ViewModel.Draft.WorkflowTag"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        @foreach (var classification in CommunityWorkClassificationCatalog.All)
+                        {
+                            <MudSelectItem Value="@classification.WorkflowTag">@classification.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudSelect T="string"
+                               Label="역할 태그"
+                               @bind-Value="ViewModel.Draft.RoleTag"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        @foreach (var roleTag in RoleTags)
+                        {
+                            <MudSelectItem Value="@roleTag">@roleTag</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+
+                @if (SelectedWorkClassification is { } classification)
+                {
+                    <div class="platform-community-compose-feature-state">
+                        <MudIcon Icon="@(SelectedWorkFeatureEnabled ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.ChatBubbleOutline)"
+                                 Color="@(SelectedWorkFeatureEnabled ? Color.Success : Color.Default)"
+                                 Size="Size.Small" />
+                        <span>@(SelectedWorkFeatureEnabled ? "원장 연결 가능" : "대화 게시글")</span>
+                        <small>@(classification.LedgerTemplateKeys.Count == 0
+                            ? "연결 원장 없음"
+                            : string.Join(" · ", classification.LedgerTemplateKeys.Select(key => CommunityLedgerTemplateCatalog.Find(key).DisplayName)))</small>
+                    </div>
+                }
+
+                <MudTextField T="string"
+                              Label="공유 링크 또는 영상 링크"
+                              @bind-Value="ViewModel.Draft.SharedLinkUrl"
+                              MaxLength="1000"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Link" />
+
+                <div class="platform-community-compose-setting-row">
+                    <MudCheckBox T="bool"
+                                 @bind-Value="ViewModel.Draft.IsAuthorDisplayCountryPublic"
+                                 Label="활동 국가 공개"
+                                 Color="Color.Primary" />
+                    <MudCheckBox T="bool"
+                                 @bind-Value="ViewModel.Draft.IsReportBoardPost"
+                                 Label="신고·분쟁 게시글"
+                                 Color="Color.Error" />
+                </div>
+
+                @if (ViewModel.Draft.IsAuthorDisplayCountryPublic)
+                {
+                    <div class="platform-community-compose-settings-grid platform-community-country-fields">
+                        <MudTextField T="string"
+                                      Label="국가 코드"
+                                      Placeholder="KR"
+                                      @bind-Value="ViewModel.Draft.AuthorDisplayCountryCode"
+                                      MaxLength="2"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                        <MudTextField T="string"
+                                      Label="활동 국가"
+                                      Placeholder="대한민국"
+                                      @bind-Value="ViewModel.Draft.AuthorDisplayCountryName"
+                                      MaxLength="80"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </div>
+                }
+
+                @if (ViewModel.Draft.IsReportBoardPost)
+                {
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Text">
+                        신고 관계자는 공개 화면에서 익명으로 표시됩니다.
+                    </MudAlert>
+                    <div class="platform-community-compose-settings-grid">
+                        <MudTextField T="string"
+                                      Label="신고한 사람 표시명"
+                                      @bind-Value="ViewModel.Draft.ReporterDisplayName"
+                                      MaxLength="40"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                        <MudTextField T="string"
+                                      Label="신고받는 사람 표시명"
+                                      @bind-Value="ViewModel.Draft.ReportedDisplayName"
+                                      MaxLength="40"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </div>
+                }
+
+                @LedgerSettings
+
+                @if (ViewModel.EditingPostId is not null)
+                {
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Error"
+                               Disabled="@ViewModel.IsSaving"
+                               OnClick="CancelEditAsync"
+                               StartIcon="@Icons.Material.Filled.Close">
+                        수정 취소
+                    </MudButton>
+                }
+            </section>
+        }
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<string> BoardCategories { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyList<string> RoleTags { get; set; } = [];
+
+    [Parameter]
+    public CommunityWorkClassificationResponse? SelectedWorkClassification { get; set; }
+
+    [Parameter]
+    public bool SelectedWorkFeatureEnabled { get; set; }
+
+    [Parameter]
+    public bool LedgerPickerLoading { get; set; }
+
+    [Parameter]
+    public string? ExternalStatusMessage { get; set; }
+
+    [Parameter]
+    public Severity ExternalStatusSeverity { get; set; } = Severity.Info;
+
+    [Parameter]
+    public RenderFragment? LedgerSettings { get; set; }
+
+    [Parameter]
+    public EventCallback LedgerPickerRequested { get; set; }
+
+    [Parameter]
+    public EventCallback Closed { get; set; }
+
+    [Parameter]
+    public EventCallback CancelEditRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<CommunityPostComposerSaveResult> Saved { get; set; }
+
+    private string ComposeCardClass => ViewModel.IsOpen
+        ? "pa-4 platform-community-compose-card platform-community-compose-card--open"
+        : "pa-4 platform-community-compose-card";
+
+    private string? VisibleStatusMessage
+        => ViewModel.StatusMessage ?? ExternalStatusMessage;
+
+    private Severity VisibleStatusSeverity
+        => ViewModel.StatusMessage is null
+            ? ExternalStatusSeverity
+            : ViewModel.StatusKind switch
+            {
+                CommunityComposerMessageKind.Success => Severity.Success,
+                CommunityComposerMessageKind.Warning => Severity.Warning,
+                CommunityComposerMessageKind.Error => Severity.Error,
+                _ => Severity.Info
+            };
+
+    private string BuildCategoryClass(string category)
+        => string.Equals(ViewModel.Draft.Category, category, StringComparison.OrdinalIgnoreCase)
+            ? "platform-community-compose-board-tab platform-community-compose-board-tab--active"
+            : "platform-community-compose-board-tab";
+
+    private async Task SaveAsync()
+    {
+        var result = await ViewModel.SaveAsync();
+        if (result.Succeeded)
+        {
+            await Saved.InvokeAsync(result);
+        }
+    }
+
+    private Task SaveDraftAsync()
+        => ViewModel.SaveLocalDraftAsync();
+
+    private async Task CloseAsync()
+    {
+        ViewModel.Close();
+        await Closed.InvokeAsync();
+    }
+
+    private async Task CancelEditAsync()
+    {
+        ViewModel.CancelEdit();
+        await CancelEditRequested.InvokeAsync();
+    }
+
+    private void HandleFilesSelected(InputFileChangeEventArgs args)
+        => ViewModel.SetFiles(args.GetMultipleFiles(5));
+}
