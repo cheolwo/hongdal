@@ -349,7 +349,7 @@ public sealed class 커뮤니티운영Controller : ControllerBase
             Title = post.Title,
             Body = post.Body,
             Nickname = post.Nickname,
-            IsSystemGenerated = CommunityLedgerCompletionPublication.IsSystemPost(post),
+            IsSystemGenerated = CommunityAutomatedPostPublication.GetSystemPostKind(post) is not null,
             IsDeleted = post.IsDeleted,
             CreatedAtUtc = post.CreatedAtUtc,
             UpdatedAtUtc = post.UpdatedAtUtc,

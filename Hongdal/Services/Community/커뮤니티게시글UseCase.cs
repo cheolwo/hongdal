@@ -1327,7 +1327,8 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         PlatformCommunityPostLedgerContextResponse? 원장Context = null)
     {
         var isReportBoardPost = entity.IsReportBoardPost || IsReportCategory(entity.Category);
-        var isLedgerCompletionPost = CommunityLedgerCompletionPublication.IsSystemPost(entity);
+        var systemPostKind = CommunityAutomatedPostPublication.GetSystemPostKind(entity);
+        var isSystemGenerated = systemPostKind is not null;
         var reporterDisplayName = isReportBoardPost ? "신고자" : entity.Nickname;
         var reportedDisplayName = isReportBoardPost ? "피신고자" : string.Empty;
 
@@ -1360,15 +1361,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             AuthorDisplayCountryName = !isReportBoardPost && entity.IsAuthorDisplayCountryPublic
                 ? entity.AuthorDisplayCountryName
                 : null,
-            IsSystemGenerated = isLedgerCompletionPost,
-            SystemPostKind = isLedgerCompletionPost
-                ? PlatformCommunitySystemPostKinds.LedgerCompletion
-                : null,
+            IsSystemGenerated = isSystemGenerated,
+            SystemPostKind = systemPostKind,
             PrivacyNotice = isReportBoardPost
                 ? "신고·분쟁 기록은 공개 목록에서 제외되며 원문과 첨부·댓글을 공개하지 않습니다."
-                : isLedgerCompletionPost
-                    ? "원장 종류와 절차 구조만 공개되며 이름, 연락처, 상세 주소, 금액과 원문 증빙은 공개하지 않습니다."
-                    : null,
+                : CommunityAutomatedPostPublication.GetPrivacyNotice(systemPostKind),
             IsReportBoardPost = isReportBoardPost,
             ReporterDisplayName = reporterDisplayName,
             ReportedDisplayName = reportedDisplayName,

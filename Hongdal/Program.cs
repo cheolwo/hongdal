@@ -132,11 +132,12 @@ var salesOrderSyncOptions = builder.Configuration.GetSection(SalesChannelOrderSy
 var youTubeOptions = builder.Configuration.GetSection(YouTubeOptions.SectionName).Get<YouTubeOptions>() ?? new YouTubeOptions();
 var hongikHakdangCardOptions = builder.Configuration.GetSection(HongikHakdangCardOptions.SectionName).Get<HongikHakdangCardOptions>() ?? new HongikHakdangCardOptions();
 var agriculturalFisheriesBatchOptions = builder.Configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName).Get<AgriculturalFisheriesBatchOptions>() ?? new AgriculturalFisheriesBatchOptions();
+var communityEditorialBatchOptions = builder.Configuration.GetSection(CommunityEditorialBatchOptions.SectionName).Get<CommunityEditorialBatchOptions>() ?? new CommunityEditorialBatchOptions();
 var databaseInitializationOptions = builder.Configuration.GetSection(DatabaseInitializationOptions.SectionName).Get<DatabaseInitializationOptions>() ?? new DatabaseInitializationOptions();
 var initializeDatabaseOnly = args.Any(argument =>
     string.Equals(argument, "--initialize-database", StringComparison.OrdinalIgnoreCase));
 
-builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions, youTubeOptions, hongikHakdangCardOptions, agriculturalFisheriesBatchOptions, executionOptions);
+builder.Services.AddHongdalBackgroundJobs(dispatchQueueJobOptions, salesOrderSyncOptions, youTubeOptions, hongikHakdangCardOptions, agriculturalFisheriesBatchOptions, communityEditorialBatchOptions, executionOptions);
 builder.Services.AddHongdalPersistence(builder.Configuration);
 builder.Services.AddHongdalHealthChecks();
 

@@ -354,6 +354,10 @@ This creates a loop: the community starts a ledger, the right OS schedules the n
 - 자동 글은 일반 사용자가 수정하거나 삭제할 수 없고 운영자는 고정할 수 있다. 댓글과 추천은 사례에 대한 숙고와 개선 제안을 위해 허용한다.
 - `이 절차로 시작하기`는 원본 원장을 복사하지 않고 같은 원장 템플릿의 빈 작성 흐름만 연다.
 
+### 출처 기반 자동 정보 글
+
+게시판에 주기적으로 제공하는 자동 글은 일반 사용자의 활동처럼 위장하지 않고 `시스템 작성` 표시, 원천, 기준 시각과 해석 주의를 함께 제공한다. KAMIS 가격은 조사일·품목·등급·단위가 있는 관측값만 사용하고, 플랫폼 활동은 비식별 완료 원장 게시 기록의 건수만 집계한다. 원시 업무 로그, 참여자, 연락처, 상세 주소, 금액, 증빙과 신고·분쟁 원문은 자동 글의 입력으로 사용하지 않는다. 같은 원천과 기준일은 한 번만 발행하며 원천 자료가 없으면 빈 글을 만들지 않는다. 세부 구조와 일정은 [커뮤니티 자동 정보 발행 배치](CommunityAutomatedEditorialBatch.md)를 따른다.
+
 ## Unified Community Home
 
 The common community home is the first unified app shell. Client-specific apps may still provide their own work-mode content, but their entry points should be progressively exposed through the shared home rather than only through app-local navigation.

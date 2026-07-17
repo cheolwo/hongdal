@@ -98,6 +98,10 @@ public sealed class PlatformCommunityPostResponse
 public static class PlatformCommunitySystemPostKinds
 {
     public const string LedgerCompletion = "ledger-completion";
+    public const string KamisPriceBrief = "kamis-price-brief";
+    public const string Reflection = "reflection";
+    public const string ActivityDigest = "activity-digest";
+    public const string AutomatedEditorial = "automated-editorial";
 }
 
 public static class PlatformCommunityPostCategories

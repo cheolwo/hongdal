@@ -45,6 +45,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CustomsOptions>(configuration.GetSection(CustomsOptions.SectionName));
         services.Configure<PublicDataOptions>(configuration.GetSection(PublicDataOptions.SectionName));
         services.Configure<AgriculturalFisheriesBatchOptions>(configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName));
+        services.Configure<CommunityEditorialBatchOptions>(configuration.GetSection(CommunityEditorialBatchOptions.SectionName));
         services.Configure<VersionFeatureFlagsOptions>(configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
         services.Configure<HongdalExecutionOptions>(configuration.GetSection(HongdalExecutionOptions.SectionName));
         services.Configure<RoleAdvertisingOptions>(configuration.GetSection(RoleAdvertisingOptions.SectionName));
