@@ -12,21 +12,21 @@
     align-items: center;
     gap: 1.2rem;
     padding: 1.25rem;
-    border: 1px solid rgba(83, 99, 82, .16);
-    border-radius: 1.1rem;
-    background: linear-gradient(135deg, #fbfcf8, #eef4ea);
+    border: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
+    border-radius: 6px;
+    background: var(--community-reading-surface, #fff);
 }
 
 .community-board-page__header > a {
     display: flex;
     align-items: center;
     gap: .3rem;
-    color: #50604f;
+    color: var(--community-reading-muted, #50604f);
     text-decoration: none;
 }
 
 .community-board-page__header span {
-    color: #60745e;
+    color: var(--community-reading-accent, #60745e);
     font-size: .7rem;
     font-weight: 800;
     letter-spacing: .12em;
@@ -38,7 +38,7 @@
 
 .community-board-page__header p {
     margin: 0;
-    color: #657066;
+    color: var(--community-reading-muted, #657066);
 }
 
 .community-board-page__navigation {
@@ -54,26 +54,26 @@
     gap: .45rem;
     flex: 0 0 auto;
     padding: .55rem .8rem;
-    border: 1px solid rgba(83, 99, 82, .16);
-    border-radius: 999px;
-    background: #fff;
-    color: #4e5a4e;
+    border: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
+    border-radius: 4px;
+    background: var(--community-reading-surface, #fff);
+    color: var(--community-reading-text, #4e5a4e);
     text-decoration: none;
 }
 
 .community-board-page__board-link b {
     font-size: .72rem;
-    color: #718071;
+    color: var(--community-reading-muted, #718071);
 }
 
 .community-board-page__board-link--active {
-    border-color: #506f4e;
-    background: #506f4e;
-    color: #fff;
+    border-color: var(--community-reading-accent, #506f4e);
+    background: var(--community-reading-accent, #506f4e);
+    color: var(--community-reading-on-accent, #fff);
 }
 
 .community-board-page__board-link--active b {
-    color: rgba(255, 255, 255, .75);
+    color: color-mix(in srgb, var(--community-reading-on-accent, #fff) 75%, transparent);
 }
 
 .community-board-page__filters {
@@ -84,7 +84,7 @@
 }
 
 .community-board-page__filters > span {
-    color: #667168;
+    color: var(--community-reading-muted, #667168);
     font-size: .82rem;
     font-weight: 700;
 }
@@ -95,7 +95,7 @@
     justify-content: center;
     gap: .75rem;
     min-height: 260px;
-    color: #637064;
+    color: var(--community-reading-muted, #637064);
 }
 
 .community-board-page__pagination {

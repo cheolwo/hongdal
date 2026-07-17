@@ -318,6 +318,19 @@ public sealed class PlatformCommunityDecorationStateService
         return product.Assets.FirstOrDefault() is { } firstAsset && Apply(firstAsset);
     }
 
+    public bool ApplyHomeThemePack(string? packKey)
+    {
+        if (string.IsNullOrWhiteSpace(packKey))
+        {
+            return false;
+        }
+
+        var product = products.FirstOrDefault(candidate =>
+            candidate.IsHomeTheme &&
+            string.Equals(candidate.PackKey, packKey.Trim(), StringComparison.OrdinalIgnoreCase));
+        return product is not null && ApplyProduct(product);
+    }
+
     public void RestoreDefaultHomeTheme()
     {
         ActiveHomeThemePackKey = DefaultHomeThemePackKey;

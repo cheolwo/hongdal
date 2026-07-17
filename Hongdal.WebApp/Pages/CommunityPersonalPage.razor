@@ -6,6 +6,7 @@
 @inject WebAuthSessionService AuthSession
 @inject CommunityPersonalPreferenceService Preferences
 @inject PlatformCommunityDecorationStateService DecorationState
+@inject ICommunityDecorationSelectionStore DecorationSelectionStore
 @inject PlatformCommunityService CommunityService
 
 <PageTitle>@CurrentSectionTitle · 살뜰 커뮤니티</PageTitle>
@@ -191,7 +192,7 @@
             </div>
 
             <div class="community-personal-decoration-toggles">
-                <MudSwitch T="bool" Value="@DecorationState.IsHomeThemeEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.HomeNavigatorTheme, value))" Color="Color.Primary" Label="홈 테마" />
+                <MudSwitch T="bool" Value="@DecorationState.IsHomeThemeEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.HomeNavigatorTheme, value))" Color="Color.Primary" Label="홈 · 게시판 테마" />
                 <MudSwitch T="bool" Value="@DecorationState.IsBaguaDecorationEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.Bagua, value))" Color="Color.Primary" Label="사방 이동판" />
                 <MudSwitch T="bool" Value="@DecorationState.IsNodeDecorationEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.DiagramNode, value))" Color="Color.Primary" Label="다이어그램 도형" />
                 <MudSwitch T="bool" Value="@DecorationState.IsBaguaMotionEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.BaguaTransitionMotion, value))" Color="Color.Primary" Label="이동 효과" />
@@ -208,6 +209,10 @@
                             <span>@ResolveDecorationTargetLabel(product.Target)</span>
                             <h3>@product.Title</h3>
                             <p>@product.Summary</p>
+                            @if (product.IsHomeTheme)
+                            {
+                                <small>홈 · 게시판 · 글 목록 · 글 본문</small>
+                            }
                             <small>@product.CreatorName</small>
                         </div>
                         <div class="community-decoration-product-action">
@@ -344,6 +349,7 @@
         }
 
         await Preferences.LoadAsync(AuthSession.UserId);
+        await RestoreDecorationSelectionAsync();
         await LoadPersonalDataAsync();
         await InvokeAsync(StateHasChanged);
     }
@@ -385,18 +391,29 @@
             .Split('?', '#')[0]
             .StartsWith("community/decorations", StringComparison.OrdinalIgnoreCase);
 
-    private void SetDecorationTarget(CommunityDecorationTarget target, bool enabled)
-        => DecorationState.SetTargetEnabled(target, enabled);
+    private async Task SetDecorationTarget(CommunityDecorationTarget target, bool enabled)
+    {
+        DecorationState.SetTargetEnabled(target, enabled);
+        if (target == CommunityDecorationTarget.HomeNavigatorTheme)
+        {
+            await SaveDecorationSelectionAsync();
+        }
+    }
 
-    private void OwnDecoration(CommunityDecorationProduct product)
+    private async Task OwnDecoration(CommunityDecorationProduct product)
     {
         DecorationState.Purchase(product);
         DecorationState.ApplyProduct(product);
+        if (!await SaveDecorationSelectionAsync())
+        {
+            return;
+        }
+
         StatusSeverity = Severity.Success;
         StatusMessage = $"{product.Title} 꾸미기를 현재 브라우저에서 사용할 수 있게 했습니다.";
     }
 
-    private void ApplyDecoration(CommunityDecorationProduct product)
+    private async Task ApplyDecoration(CommunityDecorationProduct product)
     {
         if (!DecorationState.ApplyProduct(product))
         {
@@ -405,8 +422,44 @@
             return;
         }
 
+        if (!await SaveDecorationSelectionAsync())
+        {
+            return;
+        }
+
         StatusSeverity = Severity.Success;
         StatusMessage = $"{product.Title} 꾸미기를 적용했습니다.";
+    }
+
+    private async Task RestoreDecorationSelectionAsync()
+    {
+        var selection = await DecorationSelectionStore.LoadAsync();
+        if (selection is null)
+        {
+            return;
+        }
+
+        DecorationState.ApplyHomeThemePack(selection.ActiveHomeThemePackKey);
+        DecorationState.SetTargetEnabled(
+            CommunityDecorationTarget.HomeNavigatorTheme,
+            selection.IsHomeThemeEnabled);
+    }
+
+    private async Task<bool> SaveDecorationSelectionAsync()
+    {
+        try
+        {
+            await DecorationSelectionStore.SaveAsync(new(
+                DecorationState.ActiveHomeThemePackKey,
+                DecorationState.IsHomeThemeEnabled));
+            return true;
+        }
+        catch (JSException)
+        {
+            StatusSeverity = Severity.Warning;
+            StatusMessage = "브라우저 저장소를 사용할 수 없어 꾸미기 선택을 이번 화면에서만 적용했습니다.";
+            return false;
+        }
     }
 
     private async Task SavePreferencesAsync()
@@ -445,7 +498,7 @@
     private static string ResolveDecorationTargetLabel(CommunityDecorationTarget target)
         => target switch
         {
-            CommunityDecorationTarget.HomeNavigatorTheme => "홈 테마",
+            CommunityDecorationTarget.HomeNavigatorTheme => "홈 · 게시판 테마",
             CommunityDecorationTarget.Bagua => "사방 이동판",
             CommunityDecorationTarget.DiagramNode => "다이어그램 도형",
             CommunityDecorationTarget.BaguaTransitionMotion => "이동 효과",

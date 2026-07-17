@@ -24,29 +24,33 @@
     <MudStack Spacing="3">
         @if (BoardIndexOnly)
         {
-            <PlatformCommunityBoardIndex AllBoard="@AllBoardNavigationItem"
-                                         Boards="@VisibleBoardIndexItems"
-                                         SearchText="@boardIndexSearchText"
-                                         SearchTextChanged="HandleBoardIndexSearchChanged" />
+            <PlatformCommunityReadingThemeFrame>
+                <PlatformCommunityBoardIndex AllBoard="@AllBoardNavigationItem"
+                                             Boards="@VisibleBoardIndexItems"
+                                             SearchText="@boardIndexSearchText"
+                                             SearchTextChanged="HandleBoardIndexSearchChanged" />
+            </PlatformCommunityReadingThemeFrame>
         }
         else if (ListOnly)
         {
-            <PlatformCommunityPostIndex SelectedBoard="@selectedBoardFilter"
-                                        Boards="@PostIndexBoardItems"
-                                        IsLoading="@isLoading"
-                                        FilterOptions="@ForumListFilterOptions"
-                                        SelectedFilter="@selectedForumListFilter"
-                                        SelectedFilterChanged="SelectForumListFilter"
-                                        ViewMode="@communityPostViewMode"
-                                        ViewModeChanged="SelectCommunityPostViewMode"
-                                        ComposeRequested="OpenCommunityComposePage"
-                                        Posts="@VisiblePosts"
-                                        SeedPosts="@VisibleSeedPosts"
-                                        VisiblePostCount="@ForumVisiblePostCount"
-                                        PostSelected="OpenCommunityPostPage"
-                                        SeedPostSelected="OpenCommunitySeedPostPage"
-                                        SearchText="@communityPostSearchText"
-                                        SearchTextChanged="HandleCommunityPostSearchChanged" />
+            <PlatformCommunityReadingThemeFrame>
+                <PlatformCommunityPostIndex SelectedBoard="@selectedBoardFilter"
+                                            Boards="@PostIndexBoardItems"
+                                            IsLoading="@isLoading"
+                                            FilterOptions="@ForumListFilterOptions"
+                                            SelectedFilter="@selectedForumListFilter"
+                                            SelectedFilterChanged="SelectForumListFilter"
+                                            ViewMode="@communityPostViewMode"
+                                            ViewModeChanged="SelectCommunityPostViewMode"
+                                            ComposeRequested="OpenCommunityComposePage"
+                                            Posts="@VisiblePosts"
+                                            SeedPosts="@VisibleSeedPosts"
+                                            VisiblePostCount="@ForumVisiblePostCount"
+                                            PostSelected="OpenCommunityPostPage"
+                                            SeedPostSelected="OpenCommunitySeedPostPage"
+                                            SearchText="@communityPostSearchText"
+                                            SearchTextChanged="HandleCommunityPostSearchChanged" />
+            </PlatformCommunityReadingThemeFrame>
         }
         else if (isLedgerDetailOpen)
         {
@@ -326,19 +330,21 @@
                         {
                             @if (IsForumPostSelected(post))
                             {
-                                <PlatformCommunityPostDetail Post="@post"
-                                                             ViewModel="@Engagement"
-                                                             CanManagePosts="@CanManageCommunityPosts"
-                                                             IsSharedLedgerReusing="@isSharedLedgerReusing"
-                                                             SalesInquiryRequested="@((string message) => BeginSalesInquiryAsync(post, message))"
-                                                             CommandCompleted="ApplyCommandResultAsync"
-                                                             PromoteRequested="@((string intentTypeCode) => PromotePostParticipationAsync(post, intentTypeCode))"
-                                                             JoinPartyRoleRequested="@((string roleCode) => JoinPostPartyRoleAsync(post, roleCode))"
-                                                             JoinProfessionalRoleRequested="@((string roleCode) => JoinPostProfessionalRoleAsync(post, roleCode))"
-                                                             DiagramRequested="OpenSharedLedgerDiagram"
-                                                             StartFromCompletionRequested="StartFromCompletionCase"
-                                                             ReuseRequested="ReuseSharedLedgerAsync"
-                                                             EditRequested="BeginEdit" />
+                                <PlatformCommunityReadingThemeFrame Compact="true">
+                                    <PlatformCommunityPostDetail Post="@post"
+                                                                 ViewModel="@Engagement"
+                                                                 CanManagePosts="@CanManageCommunityPosts"
+                                                                 IsSharedLedgerReusing="@isSharedLedgerReusing"
+                                                                 SalesInquiryRequested="@((string message) => BeginSalesInquiryAsync(post, message))"
+                                                                 CommandCompleted="ApplyCommandResultAsync"
+                                                                 PromoteRequested="@((string intentTypeCode) => PromotePostParticipationAsync(post, intentTypeCode))"
+                                                                 JoinPartyRoleRequested="@((string roleCode) => JoinPostPartyRoleAsync(post, roleCode))"
+                                                                 JoinProfessionalRoleRequested="@((string roleCode) => JoinPostProfessionalRoleAsync(post, roleCode))"
+                                                                 DiagramRequested="OpenSharedLedgerDiagram"
+                                                                 StartFromCompletionRequested="StartFromCompletionCase"
+                                                                 ReuseRequested="ReuseSharedLedgerAsync"
+                                                                 EditRequested="BeginEdit" />
+                                </PlatformCommunityReadingThemeFrame>
                             }
                         }
                     }
@@ -357,7 +363,9 @@
                         {
                             @if (IsForumSeedPostSelected(post))
                             {
-                                <PlatformCommunitySeedPostDetail Post="@post" />
+                                <PlatformCommunityReadingThemeFrame Compact="true">
+                                    <PlatformCommunitySeedPostDetail Post="@post" />
+                                </PlatformCommunityReadingThemeFrame>
                             }
                         }
                     }

@@ -1,3 +1,106 @@
+    .platform-community-reading-theme {
+        --community-reading-background: #f8fafc;
+        --community-reading-surface: #ffffff;
+        --community-reading-accent: #2563eb;
+        --community-reading-accent-rgb: 37, 99, 235;
+        --community-reading-text: #171717;
+        --community-reading-muted: #64748b;
+        --community-reading-border: #dbe3ed;
+        --community-reading-on-accent: #ffffff;
+        display: grid;
+        width: 100%;
+        gap: 12px;
+        padding: clamp(12px, 2vw, 20px);
+        border-top: 3px solid var(--community-reading-accent);
+        border-bottom: 1px solid var(--community-reading-border);
+        background: var(--community-reading-background);
+        color: var(--community-reading-text);
+        transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+    }
+
+    .platform-community-reading-theme__toolbar {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 9px;
+        width: min(100%, 1180px);
+        margin: 0 auto;
+        padding-bottom: 9px;
+        border-bottom: 1px solid var(--community-reading-border);
+    }
+
+    .platform-community-reading-theme__symbol {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        overflow: hidden;
+        place-items: center;
+        border: 1px solid var(--community-reading-accent);
+        border-radius: 4px;
+        background: var(--community-reading-surface);
+        color: var(--community-reading-accent);
+        font-size: 0.74rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .platform-community-reading-theme__name {
+        display: grid;
+        min-width: 0;
+        gap: 1px;
+    }
+
+    .platform-community-reading-theme__name small {
+        color: var(--community-reading-muted);
+        font-size: 0.65rem;
+    }
+
+    .platform-community-reading-theme__name strong {
+        overflow: hidden;
+        color: var(--community-reading-text);
+        font-size: 0.82rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-community-reading-theme__store {
+        display: inline-flex;
+        min-height: 34px;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 9px;
+        border: 1px solid var(--community-reading-accent);
+        border-radius: 4px;
+        background: var(--community-reading-surface);
+        color: var(--community-reading-accent);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .platform-community-reading-theme__store:hover,
+    .platform-community-reading-theme__store:focus-visible {
+        background: color-mix(in srgb, var(--community-reading-accent) 9%, var(--community-reading-surface));
+        outline: 2px solid color-mix(in srgb, var(--community-reading-accent) 45%, transparent);
+        outline-offset: 2px;
+    }
+
+    .platform-community-reading-theme__content {
+        min-width: 0;
+    }
+
+    .platform-community-reading-theme--compact {
+        gap: 8px;
+        padding: 10px;
+        border: 1px solid var(--community-reading-border);
+        border-top: 3px solid var(--community-reading-accent);
+        background: var(--community-reading-background);
+    }
+
+    .platform-community-reading-theme--compact .platform-community-reading-theme__toolbar {
+        padding-bottom: 7px;
+    }
+
     .platform-community-board-index {
         display: grid;
         width: min(100%, 1080px);
@@ -10,7 +113,7 @@
         justify-content: space-between;
         gap: 18px;
         padding-bottom: 14px;
-        border-bottom: 2px solid var(--mud-palette-text-primary);
+        border-bottom: 2px solid var(--community-reading-text, var(--mud-palette-text-primary));
     }
 
     .platform-community-board-index__header > div {
@@ -20,7 +123,7 @@
     }
 
     .platform-community-board-index__header span {
-        color: var(--mud-palette-primary);
+        color: var(--community-reading-accent, var(--mud-palette-primary));
         font-size: 0.7rem;
         font-weight: 700;
     }
@@ -36,7 +139,7 @@
     }
 
     .platform-community-board-index__header p {
-        color: var(--mud-palette-text-secondary);
+        color: var(--community-reading-muted, var(--mud-palette-text-secondary));
         font-size: 0.86rem;
     }
 
@@ -47,8 +150,8 @@
         align-items: center;
         gap: 7px;
         padding: 0 10px;
-        border: 1px solid var(--mud-palette-lines-default);
-        background: var(--mud-palette-surface);
+        border: 1px solid var(--community-reading-border, var(--mud-palette-lines-default));
+        background: var(--community-reading-surface, var(--mud-palette-surface));
     }
 
     .platform-community-board-index__search input {
@@ -57,7 +160,7 @@
         border: 0;
         outline: 0;
         background: transparent;
-        color: var(--mud-palette-text-primary);
+        color: var(--community-reading-text, var(--mud-palette-text-primary));
         font: inherit;
     }
 
@@ -66,10 +169,10 @@
         display: grid;
         align-items: center;
         gap: 10px;
-        border: 1px solid var(--mud-palette-lines-default);
+        border: 1px solid var(--community-reading-border, var(--mud-palette-lines-default));
         border-radius: 4px;
-        background: var(--mud-palette-surface);
-        color: var(--mud-palette-text-primary);
+        background: var(--community-reading-surface, var(--mud-palette-surface));
+        color: var(--community-reading-text, var(--mud-palette-text-primary));
         grid-template-columns: 36px minmax(0, 1fr) auto 20px;
         text-decoration: none;
     }
@@ -77,7 +180,7 @@
     .platform-community-board-index__all {
         min-height: 64px;
         padding: 10px 12px;
-        border-color: var(--mud-palette-primary);
+        border-color: var(--community-reading-accent, var(--mud-palette-primary));
     }
 
     .platform-community-board-index__list {
@@ -95,8 +198,8 @@
     .platform-community-board-index__item:focus-visible,
     .platform-community-board-index__all:hover,
     .platform-community-board-index__all:focus-visible {
-        border-color: var(--mud-palette-primary);
-        background: var(--mud-palette-background-gray);
+        border-color: var(--community-reading-accent, var(--mud-palette-primary));
+        background: color-mix(in srgb, var(--community-reading-accent, var(--mud-palette-primary)) 7%, var(--community-reading-surface, var(--mud-palette-surface)));
     }
 
     .platform-community-board-index__icon {
@@ -105,8 +208,8 @@
         height: 34px;
         place-items: center;
         border-radius: 4px;
-        background: var(--mud-palette-background-gray);
-        color: var(--mud-palette-primary);
+        background: color-mix(in srgb, var(--community-reading-accent, var(--mud-palette-primary)) 8%, var(--community-reading-surface, var(--mud-palette-surface)));
+        color: var(--community-reading-accent, var(--mud-palette-primary));
     }
 
     .platform-community-board-index__all > span:nth-child(2),
@@ -126,7 +229,7 @@
     .platform-community-board-index__all small,
     .platform-community-board-index__item small {
         overflow: hidden;
-        color: var(--mud-palette-text-secondary);
+        color: var(--community-reading-muted, var(--mud-palette-text-secondary));
         font-size: 0.76rem;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -134,7 +237,7 @@
 
     .platform-community-board-index__all b,
     .platform-community-board-index__item b {
-        color: var(--mud-palette-primary);
+        color: var(--community-reading-accent, var(--mud-palette-primary));
         font-size: 0.82rem;
     }
 
@@ -144,7 +247,7 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        color: var(--mud-palette-text-secondary);
+        color: var(--community-reading-muted, var(--mud-palette-text-secondary));
     }
 
     .platform-community-post-index {
@@ -160,14 +263,14 @@
         justify-content: space-between;
         gap: 12px;
         padding-bottom: 10px;
-        border-bottom: 2px solid var(--mud-palette-text-primary);
+        border-bottom: 2px solid var(--community-reading-text, var(--mud-palette-text-primary));
     }
 
     .platform-community-post-index__header a {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        color: var(--mud-palette-text-secondary);
+        color: var(--community-reading-muted, var(--mud-palette-text-secondary));
         text-decoration: none;
     }
 
@@ -193,25 +296,25 @@
         min-height: 34px;
         gap: 7px;
         padding: 6px 10px;
-        border: 1px solid var(--mud-palette-lines-default);
+        border: 1px solid var(--community-reading-border, var(--mud-palette-lines-default));
         border-radius: 4px;
-        background: var(--mud-palette-surface);
-        color: var(--mud-palette-text-primary);
+        background: var(--community-reading-surface, var(--mud-palette-surface));
+        color: var(--community-reading-text, var(--mud-palette-text-primary));
         cursor: pointer;
         font: inherit;
         text-decoration: none;
     }
 
     .platform-community-post-index__board b {
-        color: var(--mud-palette-text-secondary);
+        color: var(--community-reading-muted, var(--mud-palette-text-secondary));
         font-size: 0.72rem;
         font-weight: 600;
     }
 
     .platform-community-post-index__board--selected {
-        border-color: var(--mud-palette-primary);
-        background: var(--mud-palette-primary);
-        color: var(--mud-palette-primary-text);
+        border-color: var(--community-reading-accent, var(--mud-palette-primary));
+        background: var(--community-reading-accent, var(--mud-palette-primary));
+        color: var(--community-reading-on-accent, var(--mud-palette-primary-text));
     }
 
     .platform-community-post-index__board--selected b {
@@ -224,10 +327,29 @@
         min-height: 160px;
         justify-content: center;
         gap: 10px;
-        color: var(--mud-palette-text-secondary);
+        color: var(--community-reading-muted, var(--mud-palette-text-secondary));
     }
 
     @media (max-width: 700px) {
+        .platform-community-reading-theme {
+            gap: 10px;
+            padding: 10px 8px 12px;
+        }
+
+        .platform-community-reading-theme__store span {
+            display: none;
+        }
+
+        .platform-community-reading-theme__store {
+            width: 34px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        .platform-community-reading-theme--compact {
+            padding: 8px;
+        }
+
         .platform-community-board-index__header {
             align-items: stretch;
             flex-direction: column;
