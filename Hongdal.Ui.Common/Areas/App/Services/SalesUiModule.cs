@@ -11,6 +11,7 @@ internal static class SalesUiModule
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddScoped<I판매채널Client, 판매채널Client>();
+        services.TryAddScoped<I판매페이지Client, 판매페이지Client>();
         services.TryAddScoped<I판매채널계정Service>(provider =>
             provider.GetRequiredService<I판매채널Client>());
         services.TryAddScoped<I상품등록Service>(provider =>
@@ -18,6 +19,7 @@ internal static class SalesUiModule
         services.TryAddScoped<I채널출품Service>(provider =>
             provider.GetRequiredService<I판매채널Client>());
         services.TryAddScoped<판매업무상태ViewModel>();
+        services.TryAddScoped<판매페이지작성ViewModel>();
         services.TryAddScoped<판매채널계정ViewModel>();
         services.TryAddScoped<상품등록ViewModel>();
         services.TryAddScoped<채널출품ViewModel>();

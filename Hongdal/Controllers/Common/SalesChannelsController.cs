@@ -16,11 +16,40 @@ namespace Hongdal.Controllers.Common;
 public sealed class SalesChannelsController : ControllerBase
 {
     private readonly I판매채널UseCase _useCase;
+    private readonly I판매페이지UseCase _salesPageUseCase;
 
-    public SalesChannelsController(I판매채널UseCase useCase)
+    public SalesChannelsController(
+        I판매채널UseCase useCase,
+        I판매페이지UseCase salesPageUseCase)
     {
         _useCase = useCase;
+        _salesPageUseCase = salesPageUseCase;
     }
+
+    [HttpGet("product-pages/drafts")]
+    [HongdalApiVersion(HongdalProductVersion.V0_0)]
+    public async Task<IActionResult> 판매페이지초안목록(CancellationToken cancellationToken)
+        => this.ToActionResult(await _salesPageUseCase.초안목록Async(요청Context생성(), cancellationToken));
+
+    [HttpGet("product-pages/drafts/{pageId}")]
+    [HongdalApiVersion(HongdalProductVersion.V0_0)]
+    public async Task<IActionResult> 판매페이지초안조회(string pageId, CancellationToken cancellationToken)
+        => this.ToActionResult(await _salesPageUseCase.초안조회Async(pageId, 요청Context생성(), cancellationToken));
+
+    [HttpPost("product-pages/drafts")]
+    [HongdalApiVersion(HongdalProductVersion.V0_0)]
+    public async Task<IActionResult> 판매페이지초안생성(
+        [FromBody] 판매페이지초안생성요청 request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await _salesPageUseCase.초안생성Async(request, 요청Context생성(), cancellationToken));
+
+    [HttpPut("product-pages/drafts/{pageId}")]
+    [HongdalApiVersion(HongdalProductVersion.V0_0)]
+    public async Task<IActionResult> 판매페이지초안수정(
+        string pageId,
+        [FromBody] 판매페이지초안수정요청 request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await _salesPageUseCase.초안수정Async(pageId, request, 요청Context생성(), cancellationToken));
 
     [HttpGet("accounts")]
     public async Task<IActionResult> 계정목록(CancellationToken cancellationToken)
