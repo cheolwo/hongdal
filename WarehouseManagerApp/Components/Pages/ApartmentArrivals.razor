@@ -1,10 +1,10 @@
 @page "/warehouse/apartment/arrivals"
-@inject 공동주택반입예정PageViewModel PageModel
+@inherits MvvmComponentBase<공동주택반입예정PageViewModel>
 @inject NavigationManager Navigation
 
 <PageTitle>공동주택 반입 예정</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="공동주택 반입 예정"
                     Description="단지 물류 거점에 도착할 화물과 예정 시간을 확인합니다."
                     Icon="@Icons.Material.Filled.Schedule"
@@ -13,7 +13,7 @@
         <MudStack Row="true" Spacing="1">
             <MudButton Variant="Variant.Text"
                        StartIcon="@Icons.Material.Filled.Refresh"
-                       Disabled="@PageModel.처리중"
+                       Disabled="@ViewModel.처리중"
                        OnClick="ReloadAsync">
                 새로고침
             </MudButton>
@@ -26,15 +26,15 @@
         </MudStack>
     </Actions>
     <ChildContent>
-        @if (!string.IsNullOrWhiteSpace(PageModel.입고예정조회.오류메시지))
+        @if (!string.IsNullOrWhiteSpace(ViewModel.입고예정조회.오류메시지))
         {
-            <MudAlert Severity="Severity.Error">@PageModel.입고예정조회.오류메시지</MudAlert>
+            <MudAlert Severity="Severity.Error">@ViewModel.입고예정조회.오류메시지</MudAlert>
         }
 
         <MudPaper Class="pa-4" Elevation="0" Outlined="true">
-            <HongdalOperationState ViewModel="@PageModel.입고예정조회" />
+            <HongdalOperationState ViewModel="@ViewModel.입고예정조회" />
             <WarehouseExpectedInboundGrid @ref="_grid"
-                                          ViewModel="@PageModel.입고예정조회"
+                                          ViewModel="@ViewModel.입고예정조회"
                                           Color="Color.Secondary"
                                           SelectLabel="입고 확인"
                                           OnSelect="OpenInbound" />
@@ -45,21 +45,25 @@
 @code {
     private WarehouseExpectedInboundGrid? _grid;
 
-    protected override void OnInitialized() => EnsureProfile();
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        EnsureProfile();
+    }
 
     private Task ReloadAsync() => _grid?.ReloadAsync() ?? Task.CompletedTask;
 
     private void OpenInbound(입고요청항목응답 item)
     {
-        PageModel.입고예정조회.선택(item.Id);
+        ViewModel.입고예정조회.선택(item.Id);
         Navigation.NavigateTo(WarehouseManagerRoutes.ApartmentInbound);
     }
 
     private void EnsureProfile()
     {
-        if (!string.Equals(PageModel.세션.운영ProfileCode, 창고운영ProfileCodes.공동주택물류, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(ViewModel.세션.운영ProfileCode, 창고운영ProfileCodes.공동주택물류, StringComparison.OrdinalIgnoreCase))
         {
-            PageModel.세션.운영Profile설정(창고운영ProfileCodes.공동주택물류);
+            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.공동주택물류);
         }
     }
 }

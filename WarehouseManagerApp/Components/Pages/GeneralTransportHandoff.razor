@@ -1,9 +1,9 @@
 @page "/warehouse/general/transport-handoff"
-@inject 일반운송인계PageViewModel PageModel
+@inherits MvvmComponentBase<일반운송인계PageViewModel>
 
 <PageTitle>일반 운송 인계</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="일반 운송 인계"
                     Description="출고 재고를 선택하고 국내 운송 업무로 인계합니다."
                     Icon="@Icons.Material.Filled.LocalShipping"
@@ -16,13 +16,13 @@
         </MudButton>
     </Actions>
     <ChildContent>
-        @if (!string.IsNullOrWhiteSpace(PageModel.재고조회.오류메시지))
+        @if (!string.IsNullOrWhiteSpace(ViewModel.재고조회.오류메시지))
         {
-            <MudAlert Severity="Severity.Error">@PageModel.재고조회.오류메시지</MudAlert>
+            <MudAlert Severity="Severity.Error">@ViewModel.재고조회.오류메시지</MudAlert>
         }
 
-        <WarehouseTransportHandoffPanel Inventory="@PageModel.재고조회"
-                                        Handoff="@PageModel.운송인계"
+        <WarehouseTransportHandoffPanel Inventory="@ViewModel.재고조회"
+                                        Handoff="@ViewModel.운송인계"
                                         OnCompleted="ReloadAsync" />
     </ChildContent>
 </WarehousePageShell>
@@ -31,19 +31,19 @@
     protected override async Task OnInitializedAsync()
     {
         EnsureProfile();
-        await PageModel.초기화Async();
+        await ViewModel.초기화Async();
     }
 
-    private Task ReloadAsync() => PageModel.초기화Async();
+    private Task ReloadAsync() => ViewModel.초기화Async();
 
     private void EnsureProfile()
     {
         if (!string.Equals(
-                PageModel.세션.운영ProfileCode,
+                ViewModel.세션.운영ProfileCode,
                 창고운영ProfileCodes.일반입출고,
                 StringComparison.OrdinalIgnoreCase))
         {
-            PageModel.세션.운영Profile설정(창고운영ProfileCodes.일반입출고);
+            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.일반입출고);
         }
     }
 }

@@ -1,9 +1,9 @@
 @page "/warehouse/inbounds/expected"
-@inject 창고입고예정조회PageViewModel PageModel
+@inherits MvvmComponentBase<창고입고예정조회PageViewModel>
 
 <PageTitle>입고 예정 조회</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="입고 예정 조회"
                     Description="현재 창고에 도착할 업체별 품목과 예정 시간을 확인합니다."
                     Icon="@Icons.Material.Filled.EventAvailable"
@@ -13,11 +13,11 @@
             <MudTooltip Text="새로고침">
                 <MudIconButton Icon="@Icons.Material.Filled.Refresh"
                                Color="Color.Default"
-                               Disabled="@PageModel.처리중"
+                               Disabled="@ViewModel.처리중"
                                OnClick="ReloadAsync"
                                aria-label="새로고침" />
             </MudTooltip>
-            <MudButton Href="@PageModel.입고작업경로"
+            <MudButton Href="@ViewModel.입고작업경로"
                        Variant="Variant.Filled"
                        Color="Color.Primary"
                        EndIcon="@Icons.Material.Filled.ChevronRight">
@@ -26,9 +26,9 @@
         </MudStack>
     </Actions>
     <ChildContent>
-        @if (!string.IsNullOrWhiteSpace(PageModel.창고조회.오류메시지))
+        @if (!string.IsNullOrWhiteSpace(ViewModel.창고조회.오류메시지))
         {
-            <MudAlert Severity="Severity.Error">@PageModel.창고조회.오류메시지</MudAlert>
+            <MudAlert Severity="Severity.Error">@ViewModel.창고조회.오류메시지</MudAlert>
         }
 
         <MudPaper Class="pa-4" Elevation="0" Outlined="true">
@@ -38,8 +38,8 @@
                        ValueChanged="WarehouseChangedAsync"
                        Variant="Variant.Outlined"
                        Dense="true"
-                       Disabled="@PageModel.창고조회.처리중">
-                @foreach (var warehouse in PageModel.창고조회.항목목록)
+                       Disabled="@ViewModel.창고조회.처리중">
+                @foreach (var warehouse in ViewModel.창고조회.항목목록)
                 {
                     <MudSelectItem T="long?" Value="@((long?)warehouse.Id)">
                         @warehouse.창고명 · @warehouse.주소
@@ -51,9 +51,9 @@
         @if (_initialized && _warehouseId.HasValue)
         {
             <MudPaper Class="pa-4" Elevation="0" Outlined="true">
-                <HongdalOperationState ViewModel="@PageModel.입고예정조회" />
+                <HongdalOperationState ViewModel="@ViewModel.입고예정조회" />
                 <WarehouseExpectedInboundGrid @ref="_grid"
-                                              ViewModel="@PageModel.입고예정조회" />
+                                              ViewModel="@ViewModel.입고예정조회" />
             </MudPaper>
         }
         else if (_initialized)
@@ -72,8 +72,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _initialized = await PageModel.초기화Async();
-        _warehouseId = PageModel.세션.선택된창고?.Id;
+        _initialized = await ViewModel.초기화Async();
+        _warehouseId = ViewModel.세션.선택된창고?.Id;
     }
 
     private Task ReloadAsync()
@@ -82,7 +82,7 @@
     private async Task WarehouseChangedAsync(long? warehouseId)
     {
         _warehouseId = warehouseId;
-        if (!warehouseId.HasValue || !PageModel.창고선택(warehouseId.Value))
+        if (!warehouseId.HasValue || !ViewModel.창고선택(warehouseId.Value))
         {
             return;
         }

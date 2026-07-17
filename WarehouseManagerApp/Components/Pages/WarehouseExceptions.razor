@@ -1,9 +1,9 @@
 @page "/warehouse/exceptions"
-@inject 창고예외처리PageViewModel PageModel
+@inherits MvvmComponentBase<창고예외처리PageViewModel>
 
 <PageTitle>창고 예외 처리</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="창고 예외 처리"
                     Description="수량 차이, 스캔 실패와 인계 보류 작업을 한곳에서 확인합니다."
                     Icon="@Icons.Material.Filled.Warning"

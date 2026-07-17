@@ -1,7 +1,6 @@
 @page "/work/inbound/products"
+@inherits MvvmComponentBase<일반입고작업PageViewModel>
 @inject NavigationManager Navigation
-@inject IInboundReceivingWorkflowService ReceivingWorkflow
-@inject 창고작업세션상태ViewModel WarehouseSession
 
 <PageTitle>입고 상품 확인</PageTitle>
 
@@ -311,14 +310,14 @@
     protected override async Task OnInitializedAsync()
     {
         EnsureGeneralProfile();
-        expectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
+        expectedProducts = await ViewModel.입고Workflow.GetExpectedProductsAsync();
     }
 
     private void EnsureGeneralProfile()
     {
-        if (!string.Equals(WarehouseSession.운영ProfileCode, 창고운영ProfileCodes.일반입출고, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(ViewModel.세션.운영ProfileCode, 창고운영ProfileCodes.일반입출고, StringComparison.OrdinalIgnoreCase))
         {
-            WarehouseSession.운영Profile설정(창고운영ProfileCodes.일반입출고);
+            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.일반입출고);
         }
     }
 
@@ -342,7 +341,7 @@
 
     private async Task LookupAsync()
     {
-        selectedProduct = await ReceivingWorkflow.FindExpectedProductAsync(productBarcode);
+        selectedProduct = await ViewModel.입고Workflow.FindExpectedProductAsync(productBarcode);
         isInboundConfirmed = false;
 
         if (selectedProduct is null)
@@ -373,7 +372,7 @@
 
         try
         {
-            var result = await ReceivingWorkflow.ConfirmReceivedAsync(new InboundReceivingConfirmationRequest(
+            var result = await ViewModel.입고Workflow.ConfirmReceivedAsync(new InboundReceivingConfirmationRequest(
                 selectedProduct.Barcode,
                 inboundBundleBarcode,
                 receivedQuantity));
@@ -410,7 +409,7 @@
     {
         try
         {
-            var result = await ReceivingWorkflow.RegisterUnplannedInboundAsync(new UnplannedInboundRegistrationRequest(
+            var result = await ViewModel.입고Workflow.RegisterUnplannedInboundAsync(new UnplannedInboundRegistrationRequest(
                 unplannedProductBarcode,
                 unplannedInboundBundleBarcode,
                 unplannedProductName,
@@ -420,7 +419,7 @@
                 unplannedContractLinkStatus,
                 unplannedExceptionReason));
 
-            expectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
+            expectedProducts = await ViewModel.입고Workflow.GetExpectedProductsAsync();
             selectedProduct = result.Product;
             productBarcode = result.Product.Barcode;
             inboundBundleBarcode = result.InboundBundleBarcode;

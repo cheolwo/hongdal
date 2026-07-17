@@ -220,10 +220,20 @@ public sealed class 창고작업시작PageViewModel : 창고PageViewModelBase
     public async Task<bool> 작업자확인Async(
         string phoneLastEightDigits,
         CancellationToken cancellationToken = default)
+        => (await 작업자확인결과Async(phoneLastEightDigits, cancellationToken)).IsAllowed;
+
+    public async Task<WarehouseWorkOperatorVerificationResult> 작업자확인결과Async(
+        string phoneLastEightDigits,
+        CancellationToken cancellationToken = default)
     {
         if (확인중)
         {
-            return false;
+            return 확인결과
+                   ?? new WarehouseWorkOperatorVerificationResult(
+                       false,
+                       string.Empty,
+                       string.Empty,
+                       "작업자 확인이 이미 진행 중입니다.");
         }
 
         확인중 = true;
@@ -238,7 +248,7 @@ public sealed class 창고작업시작PageViewModel : 창고PageViewModelBase
                 세션.작업시작(ProcessCode, 확인결과);
             }
 
-            return 확인결과.IsAllowed;
+            return 확인결과;
         }
         finally
         {
@@ -286,7 +296,16 @@ public sealed class 창고작업대스캔PageViewModel : 창고PageViewModelBase
             return false;
         }
 
-        세션.작업대확인(작업대Barcode);
+        try
+        {
+            세션.작업대확인(작업대Barcode);
+        }
+        catch (InvalidOperationException ex)
+        {
+            안내메시지 = ex.Message;
+            return false;
+        }
+
         안내메시지 = $"작업대 {세션.현재작업대Barcode} 확인이 완료되었습니다.";
         return true;
     }

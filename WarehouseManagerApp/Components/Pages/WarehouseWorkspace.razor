@@ -1,10 +1,10 @@
 @page "/warehouse"
-@inject 창고홈PageViewModel PageModel
+@inherits MvvmComponentBase<창고홈PageViewModel>
 @inject NavigationManager Navigation
 
 <PageTitle>창고 운영 홈</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="창고 운영 홈"
                     Description="창고 유형을 선택하고 해당 업무 흐름으로 진입합니다."
                     Icon="@Icons.Material.Filled.Warehouse"
@@ -18,9 +18,9 @@
         </MudButton>
     </Actions>
     <ChildContent>
-        @if (!string.IsNullOrWhiteSpace(PageModel.창고조회.오류메시지))
+        @if (!string.IsNullOrWhiteSpace(ViewModel.창고조회.오류메시지))
         {
-            <MudAlert Severity="Severity.Error">@PageModel.창고조회.오류메시지</MudAlert>
+            <MudAlert Severity="Severity.Error">@ViewModel.창고조회.오류메시지</MudAlert>
         }
 
         <MudPaper Class="pa-4" Elevation="0" Outlined="true">
@@ -32,7 +32,7 @@
                                Dense="true"
                                Clearable="true"
                                @bind-Value="_selectedWarehouseId">
-                        @foreach (var warehouse in PageModel.창고조회.항목목록)
+                        @foreach (var warehouse in ViewModel.창고조회.항목목록)
                         {
                             <MudSelectItem T="long?" Value="@((long?)warehouse.Id)">
                                 @warehouse.창고명 · @warehouse.주소
@@ -44,7 +44,7 @@
                     <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="1">
                         <MudButton Variant="Variant.Text"
                                    StartIcon="@Icons.Material.Filled.Refresh"
-                                   Disabled="@PageModel.처리중"
+                                   Disabled="@ViewModel.처리중"
                                    OnClick="ReloadAsync">
                             새로고침
                         </MudButton>
@@ -61,7 +61,7 @@
                         <MudStack Spacing="2">
                             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                                 <MudIcon Icon="@ProfileIcon(profile.코드)" Color="@ProfileColor(profile.코드)" Size="Size.Large" />
-                                @if (string.Equals(PageModel.세션.운영ProfileCode, profile.코드, StringComparison.OrdinalIgnoreCase))
+                                @if (string.Equals(ViewModel.세션.운영ProfileCode, profile.코드, StringComparison.OrdinalIgnoreCase))
                                 {
                                     <MudChip T="string" Size="Size.Small" Color="@ProfileColor(profile.코드)">현재 유형</MudChip>
                                 }
@@ -83,7 +83,7 @@
         <MudStack Spacing="2">
             <MudText Typo="Typo.h6">현재 유형의 작업 순서</MudText>
             <MudGrid>
-                @foreach (var page in PageModel.연결된페이지목록.Where(page => page.페이지코드 != 창고PageCodes.홈))
+                @foreach (var page in ViewModel.연결된페이지목록.Where(page => page.페이지코드 != 창고PageCodes.홈))
                 {
                     <MudItem xs="12" sm="6" lg="4">
                         <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
@@ -112,25 +112,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await PageModel.초기화Async();
-        _selectedWarehouseId = PageModel.세션.선택된창고?.Id;
+        await ViewModel.초기화Async();
+        _selectedWarehouseId = ViewModel.세션.선택된창고?.Id;
     }
 
     private async Task ReloadAsync()
     {
-        await PageModel.초기화Async();
-        _selectedWarehouseId = PageModel.세션.선택된창고?.Id;
+        await ViewModel.초기화Async();
+        _selectedWarehouseId = ViewModel.세션.선택된창고?.Id;
     }
 
     private void OpenProfile(string profileCode)
     {
         if (_selectedWarehouseId is { } warehouseId)
         {
-            PageModel.세션.창고선택(warehouseId, profileCode);
+            ViewModel.세션.창고선택(warehouseId, profileCode);
         }
         else
         {
-            PageModel.세션.운영Profile설정(profileCode);
+            ViewModel.세션.운영Profile설정(profileCode);
         }
 
         Navigation.NavigateTo(ProfileStartRoute(profileCode));

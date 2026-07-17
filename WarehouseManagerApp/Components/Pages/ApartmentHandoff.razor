@@ -1,9 +1,9 @@
 @page "/warehouse/apartment/handoff"
-@inject 공동주택수령인계PageViewModel PageModel
+@inherits MvvmComponentBase<공동주택수령인계PageViewModel>
 
 <PageTitle>공동주택 입주민 수령 인계</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="공동주택 입주민 수령 인계"
                     Description="입고 완료된 세대별 주문을 수령 확인 대상으로 조회합니다."
                     Icon="@Icons.Material.Filled.VerifiedUser"
@@ -64,7 +64,7 @@
 
 @code {
     private IReadOnlyList<공동주문개별주문항목ViewModel> ReadyOrders
-        => PageModel.주문집계.개별주문목록
+        => ViewModel.주문집계.개별주문목록
             .Where(order => string.Equals(
                 order.입고의미상태,
                 공동구매개별주문입고상태코드.입고완료,
@@ -73,9 +73,10 @@
 
     protected override void OnInitialized()
     {
-        if (!string.Equals(PageModel.세션.운영ProfileCode, 창고운영ProfileCodes.공동주택물류, StringComparison.OrdinalIgnoreCase))
+        base.OnInitialized();
+        if (!string.Equals(ViewModel.세션.운영ProfileCode, 창고운영ProfileCodes.공동주택물류, StringComparison.OrdinalIgnoreCase))
         {
-            PageModel.세션.운영Profile설정(창고운영ProfileCodes.공동주택물류);
+            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.공동주택물류);
         }
     }
 }

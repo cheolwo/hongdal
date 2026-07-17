@@ -1,9 +1,9 @@
 @page "/warehouse/import/arrival"
-@inject 수입화물반입PageViewModel PageModel
+@inherits MvvmComponentBase<수입화물반입PageViewModel>
 
 <PageTitle>수입 화물 반입</PageTitle>
 
-<WarehousePageShell Model="@PageModel"
+<WarehousePageShell Model="@ViewModel"
                     Title="수입 화물 반입"
                     Description="선적·도착 예정과 보세 창고 반입 대상을 확인합니다."
                     Icon="@Icons.Material.Filled.MoveToInbox"
@@ -12,7 +12,7 @@
         <MudStack Row="true" Spacing="1">
             <MudButton Variant="Variant.Text"
                        StartIcon="@Icons.Material.Filled.Refresh"
-                       Disabled="@PageModel.처리중"
+                       Disabled="@ViewModel.처리중"
                        OnClick="ReloadAsync">
                 새로고침
             </MudButton>
@@ -25,20 +25,20 @@
         </MudStack>
     </Actions>
     <ChildContent>
-        @if (!string.IsNullOrWhiteSpace(PageModel.입고예정조회.오류메시지))
+        @if (!string.IsNullOrWhiteSpace(ViewModel.입고예정조회.오류메시지))
         {
-            <MudAlert Severity="Severity.Error">@PageModel.입고예정조회.오류메시지</MudAlert>
+            <MudAlert Severity="Severity.Error">@ViewModel.입고예정조회.오류메시지</MudAlert>
         }
 
         <MudPaper Class="pa-4" Elevation="0" Outlined="true">
-            <HongdalOperationState ViewModel="@PageModel.입고예정조회" />
+            <HongdalOperationState ViewModel="@ViewModel.입고예정조회" />
             <WarehouseExpectedInboundGrid @ref="_grid"
-                                          ViewModel="@PageModel.입고예정조회"
+                                          ViewModel="@ViewModel.입고예정조회"
                                           Color="Color.Info" />
         </MudPaper>
 
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-            @PageModel.원장물류.선택한경로안내
+            @ViewModel.원장물류.선택한경로안내
         </MudAlert>
     </ChildContent>
 </WarehousePageShell>
@@ -46,15 +46,19 @@
 @code {
     private WarehouseExpectedInboundGrid? _grid;
 
-    protected override void OnInitialized() => EnsureProfile();
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        EnsureProfile();
+    }
 
     private Task ReloadAsync() => _grid?.ReloadAsync() ?? Task.CompletedTask;
 
     private void EnsureProfile()
     {
-        if (!string.Equals(PageModel.세션.운영ProfileCode, 창고운영ProfileCodes.보세수입, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(ViewModel.세션.운영ProfileCode, 창고운영ProfileCodes.보세수입, StringComparison.OrdinalIgnoreCase))
         {
-            PageModel.세션.운영Profile설정(창고운영ProfileCodes.보세수입);
+            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.보세수입);
         }
     }
 }

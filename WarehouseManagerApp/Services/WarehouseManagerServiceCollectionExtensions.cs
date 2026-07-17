@@ -39,6 +39,7 @@ public static class WarehouseManagerServiceCollectionExtensions
         services.AddTransient<창고예외처리PageViewModel>();
         services.AddTransient<창고작업이력PageViewModel>();
         services.AddTransient<창고설정PageViewModel>();
+        services.AddTransient<창고피킹배치PageViewModel>();
 
         services.AddTransient<일반입고작업PageViewModel>();
         services.AddTransient<일반재고현황PageViewModel>();
