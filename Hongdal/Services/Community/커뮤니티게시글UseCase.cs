@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 using 홍달.Data;
 using 홍달.Services.External.Google;
 using 홍달.Services.Options;
@@ -123,6 +124,7 @@ public sealed record 커뮤니티게시글첨부업로드Command(
     Summary = "게시글의 역할 태그와 활동 신호를 업무 인연 스냅샷 조회로 확장합니다.")]
 public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly HongdalContext _db;
     private readonly IGoogleCloudStorageService _storageService;
     private readonly CommunityPostStorageOptions _storageOptions;
@@ -217,7 +219,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>("request body is required");
         }
 
-        var validation = ValidatePost(request.Nickname, request.Password, request.Title, request.Body, request.SharedLinkUrl);
+        var validation = ValidatePost(
+            request.Nickname,
+            request.Password,
+            request.Title,
+            request.Body,
+            request.SharedLinkUrl,
+            request.SalesOffer);
         if (validation is not null)
         {
             return BadRequest<PlatformCommunityPostResponse>(validation);
@@ -251,6 +259,10 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         var now = DateTime.UtcNow;
         var normalizedCategory = Normalize(request.Category, "자유", 60);
         var isReportBoardPost = request.IsReportBoardPost || IsReportCategory(normalizedCategory);
+        if (isReportBoardPost && request.SalesOffer is not null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>("신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.");
+        }
         var normalizedNickname = Normalize(request.Nickname, "익명", 40);
         var entity = new PlatformCommunityPost
         {
@@ -261,6 +273,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Title = Normalize(request.Title, string.Empty, 160),
             Body = Normalize(request.Body, string.Empty, 4000),
             SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl),
+            SalesOfferJson = SerializeSalesOffer(request.SalesOffer),
             커뮤니티원장Id = 연결원장?.원장Id,
             AuthorUserId = NormalizeOptional(_currentUserAccessor.UserId, 450),
             Nickname = normalizedNickname,
@@ -409,7 +422,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return BadRequest<PlatformCommunityPostResponse>("request body is required");
         }
 
-        var validation = ValidatePost(request.Nickname, request.Password, request.Title, request.Body, request.SharedLinkUrl);
+        var validation = ValidatePost(
+            request.Nickname,
+            request.Password,
+            request.Title,
+            request.Body,
+            request.SharedLinkUrl,
+            request.SalesOffer);
         if (validation is not null)
         {
             return BadRequest<PlatformCommunityPostResponse>(validation);
@@ -458,17 +477,23 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         }
 
         entity.Category = Normalize(request.Category, "자유", 60);
+        var isReportBoardPost = request.IsReportBoardPost || IsReportCategory(entity.Category);
+        if (isReportBoardPost && request.SalesOffer is not null)
+        {
+            return BadRequest<PlatformCommunityPostResponse>("신고·분쟁 게시글에는 판매 정보를 함께 등록할 수 없습니다.");
+        }
         entity.WorkflowTag = Normalize(request.WorkflowTag, "국내 화물 운송", 60);
         entity.RoleTag = Normalize(request.RoleTag, "플랫폼 구성원", 40);
         entity.Title = Normalize(request.Title, string.Empty, 160);
         entity.Body = Normalize(request.Body, string.Empty, 4000);
         entity.SharedLinkUrl = NormalizeOptionalUrl(request.SharedLinkUrl);
+        entity.SalesOfferJson = SerializeSalesOffer(request.SalesOffer);
         if (request.커뮤니티원장Id is not null)
         {
             entity.커뮤니티원장Id = 연결원장?.원장Id;
         }
         entity.Nickname = Normalize(request.Nickname, "익명", 40);
-        entity.IsReportBoardPost = request.IsReportBoardPost || IsReportCategory(entity.Category);
+        entity.IsReportBoardPost = isReportBoardPost;
         entity.IsAuthorDisplayCountryPublic = !entity.IsReportBoardPost && request.IsAuthorDisplayCountryPublic;
         entity.AuthorDisplayCountryCode = entity.IsAuthorDisplayCountryPublic
             ? NormalizeCountryCode(request.AuthorDisplayCountryCode)
@@ -872,7 +897,13 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
                 .ThenInclude(x => x.Comments)
             .Include(x => x.Comments.Where(comment => !comment.IsDeleted && !comment.IsOperatorHidden));
 
-    private static string? ValidatePost(string nickname, string password, string title, string body, string? sharedLinkUrl)
+    private static string? ValidatePost(
+        string nickname,
+        string password,
+        string title,
+        string body,
+        string? sharedLinkUrl,
+        PlatformCommunityPostSalesOfferRequest? salesOffer)
     {
         if (string.IsNullOrWhiteSpace(nickname) || nickname.Trim().Length > 40)
         {
@@ -889,9 +920,9 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return "제목은 1자 이상 160자 이하로 입력해야 합니다.";
         }
 
-        if (string.IsNullOrWhiteSpace(body) && string.IsNullOrWhiteSpace(sharedLinkUrl))
+        if (string.IsNullOrWhiteSpace(body) && string.IsNullOrWhiteSpace(sharedLinkUrl) && salesOffer is null)
         {
-            return "본문 또는 공유 링크 중 하나는 입력해야 합니다.";
+            return "본문, 공유 링크 또는 판매 정보 중 하나는 입력해야 합니다.";
         }
 
         if (!string.IsNullOrWhiteSpace(body) && body.Trim().Length > 4000)
@@ -907,7 +938,105 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             return "공유 링크는 http 또는 https URL로 입력해야 합니다.";
         }
 
+        return ValidateSalesOffer(salesOffer);
+    }
+
+    private static string? ValidateSalesOffer(PlatformCommunityPostSalesOfferRequest? salesOffer)
+    {
+        if (salesOffer is null)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(salesOffer.ProductTitle) || salesOffer.ProductTitle.Trim().Length > 160)
+        {
+            return "판매 상품명은 1자 이상 160자 이하로 입력해야 합니다.";
+        }
+
+        if (salesOffer.AvailableQuantity <= 0 || salesOffer.AvailableQuantity > 1_000_000)
+        {
+            return "판매 가능 수량은 0보다 크고 1,000,000 이하여야 합니다.";
+        }
+
+        if (string.IsNullOrWhiteSpace(salesOffer.QuantityUnit) || salesOffer.QuantityUnit.Trim().Length > 20)
+        {
+            return "수량 단위는 1자 이상 20자 이하로 입력해야 합니다.";
+        }
+
+        if (salesOffer.UnitPrice <= 0 || salesOffer.UnitPrice > 1_000_000_000)
+        {
+            return "판매 가격은 0보다 크고 1,000,000,000 이하여야 합니다.";
+        }
+
+        var currencyCode = salesOffer.CurrencyCode?.Trim() ?? string.Empty;
+        if (currencyCode.Length != 3 || currencyCode.Any(character => !char.IsAsciiLetter(character)))
+        {
+            return "통화 코드는 KRW, USD처럼 ISO 영문 세 자리로 입력해야 합니다.";
+        }
+
+        var paymentMethods = salesOffer.AcceptedPaymentMethods
+            .Where(method => !string.IsNullOrWhiteSpace(method))
+            .Select(method => method.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        if (paymentMethods.Length == 0)
+        {
+            return "협의 가능한 결제 방법을 하나 이상 선택해야 합니다.";
+        }
+
+        if (paymentMethods.Any(method => !PlatformCommunitySalesPaymentMethodCodes.All.Contains(method, StringComparer.OrdinalIgnoreCase)))
+        {
+            return "지원하지 않는 결제 방법이 포함되어 있습니다.";
+        }
+
+        if (!PlatformCommunitySalesOfferStatuses.All.Contains(salesOffer.Status, StringComparer.OrdinalIgnoreCase))
+        {
+            return "판매 상태가 올바르지 않습니다.";
+        }
+
         return null;
+    }
+
+    private static string? SerializeSalesOffer(PlatformCommunityPostSalesOfferRequest? source)
+    {
+        if (source is null)
+        {
+            return null;
+        }
+
+        var normalized = new PlatformCommunityPostSalesOfferResponse
+        {
+            ProductTitle = Normalize(source.ProductTitle, string.Empty, 160),
+            AvailableQuantity = source.AvailableQuantity,
+            QuantityUnit = Normalize(source.QuantityUnit, "개", 20),
+            UnitPrice = source.UnitPrice,
+            CurrencyCode = source.CurrencyCode.Trim().ToUpperInvariant(),
+            AcceptedPaymentMethods = source.AcceptedPaymentMethods
+                .Where(method => !string.IsNullOrWhiteSpace(method))
+                .Select(method => method.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray(),
+            AllowsGroupPurchase = source.AllowsGroupPurchase,
+            Status = source.Status.Trim().ToLowerInvariant()
+        };
+        return JsonSerializer.Serialize(normalized, JsonOptions);
+    }
+
+    private static PlatformCommunityPostSalesOfferResponse? DeserializeSalesOffer(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<PlatformCommunityPostSalesOfferResponse>(json, JsonOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
     private static string Normalize(string? value, string fallback, int maxLength)
@@ -1036,6 +1165,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             Title = entity.Title,
             Body = entity.Body,
             SharedLinkUrl = entity.SharedLinkUrl,
+            SalesOffer = DeserializeSalesOffer(entity.SalesOfferJson),
             커뮤니티원장Id = entity.커뮤니티원장Id,
             원장Context = 원장Context,
             Nickname = isReportBoardPost ? reporterDisplayName : entity.Nickname,

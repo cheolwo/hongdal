@@ -462,6 +462,9 @@ namespace Hongdal.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("varchar(40)");
 
+                    b.Property<string>("SalesOfferJson")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("SharedLinkUrl")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");

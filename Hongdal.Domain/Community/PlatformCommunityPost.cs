@@ -10,6 +10,7 @@ public sealed class PlatformCommunityPost
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public string? SalesOfferJson { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public string? AuthorUserId { get; set; }
     public string Nickname { get; set; } = string.Empty;

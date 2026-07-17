@@ -62,6 +62,7 @@ public sealed class PlatformCommunityPostResponse
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public PlatformCommunityPostSalesOfferResponse? SalesOffer { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public PlatformCommunityPostLedgerContextResponse? 원장Context { get; set; }
     public string Nickname { get; set; } = string.Empty;
@@ -107,6 +108,7 @@ public sealed class PlatformCommunityPostCreateRequest
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public PlatformCommunityPostSalesOfferRequest? SalesOffer { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsAuthorDisplayCountryPublic { get; set; }
@@ -149,6 +151,7 @@ public sealed class PlatformCommunityPostUpdateRequest
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public string? SharedLinkUrl { get; set; }
+    public PlatformCommunityPostSalesOfferRequest? SalesOffer { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsAuthorDisplayCountryPublic { get; set; }
@@ -158,6 +161,51 @@ public sealed class PlatformCommunityPostUpdateRequest
     public string? ReporterDisplayName { get; set; }
     public string? ReportedDisplayName { get; set; }
     public string Password { get; set; } = string.Empty;
+}
+
+public sealed class PlatformCommunityPostSalesOfferRequest
+{
+    public string ProductTitle { get; set; } = string.Empty;
+    public decimal AvailableQuantity { get; set; } = 1;
+    public string QuantityUnit { get; set; } = "개";
+    public decimal UnitPrice { get; set; }
+    public string CurrencyCode { get; set; } = "KRW";
+    public IReadOnlyList<string> AcceptedPaymentMethods { get; set; } =
+        [PlatformCommunitySalesPaymentMethodCodes.DirectCash];
+    public bool AllowsGroupPurchase { get; set; } = true;
+    public string Status { get; set; } = PlatformCommunitySalesOfferStatuses.Open;
+}
+
+public sealed class PlatformCommunityPostSalesOfferResponse
+{
+    public string ProductTitle { get; set; } = string.Empty;
+    public decimal AvailableQuantity { get; set; }
+    public string QuantityUnit { get; set; } = string.Empty;
+    public decimal UnitPrice { get; set; }
+    public string CurrencyCode { get; set; } = string.Empty;
+    public IReadOnlyList<string> AcceptedPaymentMethods { get; set; } = [];
+    public bool AllowsGroupPurchase { get; set; }
+    public string Status { get; set; } = PlatformCommunitySalesOfferStatuses.Open;
+}
+
+public static class PlatformCommunitySalesOfferStatuses
+{
+    public const string Open = "open";
+    public const string SoldOut = "sold-out";
+    public const string Closed = "closed";
+
+    public static IReadOnlyList<string> All { get; } = [Open, SoldOut, Closed];
+}
+
+public static class PlatformCommunitySalesPaymentMethodCodes
+{
+    public const string TossPayments = "platform.toss-payments";
+    public const string NaverPay = "platform.naver-pay";
+    public const string PayPal = "platform.paypal";
+    public const string DirectCash = "direct.cash";
+
+    public static IReadOnlyList<string> All { get; } =
+        [TossPayments, NaverPay, PayPal, DirectCash];
 }
 
 public sealed class PlatformCommunityPostLedgerContextResponse

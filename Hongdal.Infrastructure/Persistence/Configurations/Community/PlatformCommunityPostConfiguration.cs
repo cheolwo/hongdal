@@ -19,6 +19,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.Title).HasMaxLength(160).IsRequired();
         builder.Property(x => x.Body).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
+        builder.Property(x => x.SalesOfferJson).HasColumnType("longtext");
         builder.Property(x => x.커뮤니티원장Id).HasMaxLength(120);
         builder.Property(x => x.AuthorUserId).HasMaxLength(450);
         builder.Property(x => x.Nickname).HasMaxLength(40).IsRequired();
