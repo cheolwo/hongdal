@@ -29,6 +29,7 @@ public static class DriverServiceCollectionExtensions
         }
 
         services.AddSingleton<DriverAppProfile>();
+        services.AddSingleton<DriverOperatingProfileService>();
         services.AddSingleton<IClientSecureTokenStore, MauiSecureTokenStore>();
         services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
         services.AddSingleton<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();

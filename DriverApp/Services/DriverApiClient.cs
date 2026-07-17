@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Contracts.Common.Operations;
 
 namespace DriverApp.Services;
 
@@ -59,11 +60,16 @@ public sealed class DriverApiClient : IDriverApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthSession _authSession;
+    private readonly DriverOperatingProfileService _operatingProfileService;
 
-    public DriverApiClient(HttpClient httpClient, IAuthSession authSession)
+    public DriverApiClient(
+        HttpClient httpClient,
+        IAuthSession authSession,
+        DriverOperatingProfileService operatingProfileService)
     {
         _httpClient = httpClient;
         _authSession = authSession;
+        _operatingProfileService = operatingProfileService;
     }
 
     public Task<TResponse?> GetAsync<TResponse>(
@@ -200,6 +206,13 @@ public sealed class DriverApiClient : IDriverApiClient
         if (!string.IsNullOrWhiteSpace(_authSession.AccessToken))
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authSession.AccessToken);
+        }
+
+        if (!request.Headers.Contains(OperatingMarketContextKeys.HeaderName))
+        {
+            request.Headers.TryAddWithoutValidation(
+                OperatingMarketContextKeys.HeaderName,
+                _operatingProfileService.Current.MarketCode);
         }
 
         try
