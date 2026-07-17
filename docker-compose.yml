@@ -25,7 +25,7 @@ services:
       IsmsPProtectedData__TransportKeyId: "${HONGDAL_ISMSP_TRANSPORT_KEY_ID:-hongdal-local-transport-v1}"
       IsmsPProtectedData__TransportPublicKeyPem: "${HONGDAL_ISMSP_TRANSPORT_PUBLIC_KEY_PEM:-}"
       IsmsPProtectedData__TransportPrivateKeyPem: "${HONGDAL_ISMSP_TRANSPORT_PRIVATE_KEY_PEM:-}"
-      IsmsPProtectedData__FailWhenKeyMissing: "true"
+      IsmsPProtectedData__FailWhenKeyMissing: "${HONGDAL_ISMSP_FAIL_WHEN_KEY_MISSING:-false}"
       AgriculturalFisheriesBatch__Enabled: "${HONGDAL_AGRICULTURAL_FISHERIES_BATCH_ENABLED:-false}"
       AgriculturalFisheriesBatch__KamisDailyEnabled: "${HONGDAL_KAMIS_DAILY_BATCH_ENABLED:-true}"
       AgriculturalFisheriesBatch__KamisDailyCronExpression: "${HONGDAL_KAMIS_DAILY_CRON_EXPRESSION:-0 30 6 * * ?}"
