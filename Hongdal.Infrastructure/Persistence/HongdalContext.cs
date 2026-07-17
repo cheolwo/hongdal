@@ -164,7 +164,17 @@ namespace 홍달.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyPersonalDataProtection(_personalDataProtector);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(HongdalContext).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(
+                typeof(HongdalContext).Assembly,
+                configurationType =>
+                    !string.Equals(
+                        configurationType.Namespace,
+                        "Hongdal.Infrastructure.Persistence.AgriculturalFisheries",
+                        StringComparison.Ordinal)
+                    && !string.Equals(
+                        configurationType.Namespace,
+                        "Hongdal.Infrastructure.Persistence.TraditionalMarkets",
+                        StringComparison.Ordinal));
 
         }
 
