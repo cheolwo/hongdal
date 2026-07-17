@@ -203,6 +203,7 @@ GitHub 첫 화면은 설명보다 화면을 먼저 보여줍니다. 더 자세�
 | [커뮤니티 운영 정책](docs/Architecture/CommunityOperatingPolicy.md) | 원함, 원장, 참여자, 경험치, 유틸리티 정책 |
 | [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md) | 원장, 블록, OS, 엔진, API 책임 경계 |
 | [통합 클라이언트 3단계 내비게이션](docs/Architecture/ThreeStageClientNavigation.md) | 사방괘, 다이어그램, 구체 데이터 페이지 |
+| [YouTube 음식 상품 발견·공동구매 전산화](docs/ProjectOverview/youtube-food-commerce-discovery.md) | 음식 채널 조사, 상품 후보 검수, 구매·공동구매·수입검토 의향 연결 |
 
 ## 실행과 검증
 
