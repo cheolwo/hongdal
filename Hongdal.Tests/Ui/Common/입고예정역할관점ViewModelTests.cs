@@ -107,6 +107,20 @@ public sealed class 입고예정역할관점ViewModelTests
     }
 
     [Fact]
+    public async Task 공동원장관점은_선택한원장Id를정규화해전용Api를호출한다()
+    {
+        using var fixture = new Fixture(
+            [입고(1, 주문자: "user-1", 판매자: "seller-1", 원장Id: "ledger 11")],
+            new 현재사용자Snapshot("user-1", "공동 원장 참여자", []));
+
+        var succeeded = await fixture.협동조합운영자.원장별조회Async("  ledger 11  ");
+
+        Assert.True(succeeded);
+        Assert.Equal(1, fixture.Client.CallCount);
+        Assert.Contains("warehouse-perspectives/inbounds/expected/community-ledgers/ledger%2011?", fixture.Client.LastPath);
+    }
+
+    [Fact]
     public async Task PageViewModel은_역할관점을선택하고지원되는관점에서만서버조회한다()
     {
         using var fixture = new Fixture(

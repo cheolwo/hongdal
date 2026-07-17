@@ -12,6 +12,8 @@ internal static class WarehouseUiModule
 
         services.TryAddScoped<I공동구매창고Service, 공동구매창고Service>();
         services.TryAddScoped<I입출고작업Service, 입출고작업Service>();
+        services.TryAddScoped<I상차관점Service, 상차관점Service>();
+        services.TryAddScoped<I하차관점Service, 하차관점Service>();
         services.TryAddScoped<I입출고원장조회Service, PlatformCommunity입출고원장조회Service>();
         services.TryAddScoped<공동구매창고상태ViewModel>();
         services.TryAddScoped<입출고화면상태ViewModel>(provider =>
@@ -46,6 +48,20 @@ internal static class WarehouseUiModule
         services.TryAddScoped<운송담당자출고예정ViewModel>();
         services.TryAddScoped<협동조합운영자출고예정ViewModel>();
         services.TryAddScoped<출고예정PageViewModel>();
+        services.TryAddScoped<상차업무상태ViewModel>();
+        services.TryAddScoped<주문자상차ViewModel>();
+        services.TryAddScoped<판매자상차ViewModel>();
+        services.TryAddScoped<창고관리자상차ViewModel>();
+        services.TryAddScoped<운송담당자상차ViewModel>();
+        services.TryAddScoped<협동조합운영자상차ViewModel>();
+        services.TryAddScoped<상차PageViewModel>();
+        services.TryAddScoped<하차업무상태ViewModel>();
+        services.TryAddScoped<주문자하차ViewModel>();
+        services.TryAddScoped<판매자하차ViewModel>();
+        services.TryAddScoped<창고관리자하차ViewModel>();
+        services.TryAddScoped<운송담당자하차ViewModel>();
+        services.TryAddScoped<협동조합운영자하차ViewModel>();
+        services.TryAddScoped<하차PageViewModel>();
         services.TryAddScoped<입고등록ViewModel>();
         services.TryAddScoped<입고수정ViewModel>();
         services.TryAddScoped<입고삭제ViewModel>();

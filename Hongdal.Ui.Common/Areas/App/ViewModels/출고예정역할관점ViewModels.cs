@@ -455,6 +455,32 @@ public sealed class 협동조합운영자출고예정ViewModel(
     IHongdal현재사용자Context context)
     : 출고예정역할관점ViewModelBase(출고예정역할관점카탈로그.협동조합운영자, 공통조회, service, context)
 {
+    public Task<bool> 원장별조회Async(
+        string ledgerId,
+        목록조회요청? request = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(ledgerId))
+        {
+            return Task.FromResult(유효성실패("조회할 공동 원장을 선택해 주세요."));
+        }
+
+        var source = (request ?? new 목록조회요청()).정규화();
+        return 조회Async(source with
+        {
+            필터조건 = source.필터조건
+                .Where(filter => !string.Equals(
+                    filter.필드,
+                    nameof(출고예정항목응답.커뮤니티원장Id),
+                    StringComparison.OrdinalIgnoreCase))
+                .Append(new 목록필터조건(
+                    nameof(출고예정항목응답.커뮤니티원장Id),
+                    "Equal",
+                    ledgerId.Trim()))
+                .ToArray()
+        }, cancellationToken);
+    }
+
     protected override bool 포함(출고예정항목응답 item, 현재사용자Snapshot user)
         => !string.IsNullOrWhiteSpace(item.커뮤니티원장Id);
 

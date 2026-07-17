@@ -579,6 +579,7 @@ public partial class 출고ViewModel : 업무작업ViewModelBase, IDisposable
         I입출고작업Service service,
         입출고화면상태ViewModel 창고상태,
         출고원장ViewModel? 원장 = null,
+        출고예정조회ViewModel? 출고예정조회 = null,
         출고재고조회ViewModel? 재고조회 = null,
         출고포장ViewModel? 포장 = null,
         출고운송인계ViewModel? 운송인계 = null)
@@ -588,10 +589,11 @@ public partial class 출고ViewModel : 업무작업ViewModelBase, IDisposable
         현재사용자Context연결(창고상태.현재사용자Context);
         this.원장 = 원장 ?? new 출고원장ViewModel(new 입출고원장상태ViewModel());
         _세부업무수명소유 = 재고조회 is null || 포장 is null || 운송인계 is null;
+        this.출고예정조회 = 출고예정조회 ?? new 출고예정조회ViewModel(service, 창고상태);
         this.재고조회 = 재고조회 ?? new 출고재고조회ViewModel(service, 창고상태);
         this.포장 = 포장 ?? new 출고포장ViewModel(service, 창고상태);
         this.운송인계 = 운송인계 ?? new 출고운송인계ViewModel(service, 창고상태);
-        세부업무목록 = [this.재고조회, this.포장, this.운송인계];
+        세부업무목록 = [this.출고예정조회, this.재고조회, this.포장, this.운송인계];
         foreach (var child in 세부업무목록)
         {
             child.PropertyChanged += 세부업무변경;
@@ -607,6 +609,7 @@ public partial class 출고ViewModel : 업무작업ViewModelBase, IDisposable
 
     public string 주문원장역할코드 => 주문원장포함역할.창고출고;
     public 출고원장ViewModel 원장 { get; }
+    public 출고예정조회ViewModel 출고예정조회 { get; }
     public 출고재고조회ViewModel 재고조회 { get; }
     public 출고포장ViewModel 포장 { get; }
     public 출고운송인계ViewModel 운송인계 { get; }
@@ -617,11 +620,15 @@ public partial class 출고ViewModel : 업무작업ViewModelBase, IDisposable
     public 창고작업결과응답? 최근포장결과 => 창고상태.최근출고작업결과;
     public 화주운송의뢰응답? 최근운송의뢰 => 창고상태.최근운송의뢰;
 
-    /// <summary>현재 공개 Controller에는 별도의 출고 목록·완료 엔드포인트가 아직 없습니다.</summary>
-    public bool 출고목록Api지원됨 => false;
+    public bool 출고목록Api지원됨 => true;
     public bool 출고완료Api지원됨 => false;
     public string 현재지원범위
-        => "재고 조회 → 포장 → 운송 인계까지 처리합니다. 출고예정 목록과 출고완료 확정은 전용 API가 추가된 뒤 연결합니다.";
+        => "역할별 출고예정 조회 → 재고 조회 → 포장 → 운송 인계까지 처리합니다. 출고완료 확정 명령은 전용 API가 추가된 뒤 연결합니다.";
+
+    public Task<bool> 출고예정목록조회Async(
+        목록조회요청 request,
+        CancellationToken cancellationToken = default)
+        => 출고예정조회.조회Async(request, cancellationToken);
 
     public Task<bool> 재고목록조회Async(CancellationToken cancellationToken = default)
         => 작업실행Async(
@@ -776,7 +783,7 @@ public sealed class 공동구매출고원장ViewModel : 출고ViewModel
     }
 
     public new string 현재지원범위
-        => "공동주문별 서버 재고 배분 결과를 공통 출고 작업에 연결합니다. 출고예정 목록과 출고완료 확정은 전용 API가 추가된 뒤 연결합니다.";
+        => "공동 원장별 출고예정 조회와 공동주문별 서버 재고 배분 결과를 공통 출고 작업에 연결합니다. 출고완료 확정 명령은 전용 API가 추가된 뒤 연결합니다.";
 
     public void 재고배분연결(공동구매재고배분ViewModel 재고배분)
     {

@@ -98,6 +98,34 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(PlatformCommunityHomePageViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityHomeShellViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityBoardWorkspaceViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityPostEngagementViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityLedgerPickerViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(YouTubeFoodCommunityDiscoveryService)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(YouTubeFoodCommunityDiscoveryViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(ICommunityCollectiveActionSource)
+            && x.ImplementationType == typeof(PlatformCommunityCollectiveActionSource)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(CommunityActionExecutionViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(CommunityCollectiveActionPageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(I공동구매창고Service)
             && x.ImplementationType == typeof(공동구매창고Service)
             && x.Lifetime == ServiceLifetime.Scoped);

@@ -490,6 +490,32 @@ public sealed class 협동조합운영자입고예정ViewModel(
         service,
         현재사용자Context)
 {
+    public Task<bool> 원장별조회Async(
+        string ledgerId,
+        목록조회요청? request = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(ledgerId))
+        {
+            return Task.FromResult(유효성실패("조회할 공동 원장을 선택해 주세요."));
+        }
+
+        var source = (request ?? new 목록조회요청()).정규화();
+        return 조회Async(source with
+        {
+            필터조건 = source.필터조건
+                .Where(filter => !string.Equals(
+                    filter.필드,
+                    nameof(입고요청항목응답.커뮤니티원장Id),
+                    StringComparison.OrdinalIgnoreCase))
+                .Append(new 목록필터조건(
+                    nameof(입고요청항목응답.커뮤니티원장Id),
+                    "Equal",
+                    ledgerId.Trim()))
+                .ToArray()
+        }, cancellationToken);
+    }
+
     protected override bool 포함(입고요청항목응답 item, 현재사용자Snapshot 현재사용자)
         => !string.IsNullOrWhiteSpace(item.커뮤니티원장Id);
 

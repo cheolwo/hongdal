@@ -49,9 +49,10 @@ public sealed class WarehousePerspectiveReadService(
         }
 
         var normalizedPerspective = perspectiveCode?.Trim();
+        var normalizedLedgerId = string.IsNullOrWhiteSpace(communityLedgerId) ? null : communityLedgerId.Trim();
         if (string.Equals(normalizedPerspective, 창고업무관점코드.공동원장, StringComparison.OrdinalIgnoreCase))
         {
-            var ledgerAccess = await CheckLedgerAccessAsync(communityLedgerId, userId, cancellationToken);
+            var ledgerAccess = await CheckLedgerAccessAsync(normalizedLedgerId, userId, cancellationToken);
             if (ledgerAccess.IsFailed)
             {
                 return Result.Fail<입고요청페이지응답>(ledgerAccess.Errors);
@@ -61,7 +62,7 @@ public sealed class WarehousePerspectiveReadService(
         var query = db.입고요청
             .AsNoTracking()
             .Where(item => item.상태 == 입고상태코드.예정);
-        query = ApplyInboundPerspective(query, normalizedPerspective, communityLedgerId, userId);
+        query = ApplyInboundPerspective(query, normalizedPerspective, normalizedLedgerId, userId);
         if (query is null)
         {
             return Failure<입고요청페이지응답>("지원하지 않는 입고 예정 관점입니다.", StatusCodes.Status400BadRequest);
@@ -103,9 +104,10 @@ public sealed class WarehousePerspectiveReadService(
         }
 
         var normalizedPerspective = perspectiveCode?.Trim();
+        var normalizedLedgerId = string.IsNullOrWhiteSpace(communityLedgerId) ? null : communityLedgerId.Trim();
         if (string.Equals(normalizedPerspective, 창고업무관점코드.공동원장, StringComparison.OrdinalIgnoreCase))
         {
-            var ledgerAccess = await CheckLedgerAccessAsync(communityLedgerId, userId, cancellationToken);
+            var ledgerAccess = await CheckLedgerAccessAsync(normalizedLedgerId, userId, cancellationToken);
             if (ledgerAccess.IsFailed)
             {
                 return Result.Fail<출고예정페이지응답>(ledgerAccess.Errors);
@@ -115,7 +117,7 @@ public sealed class WarehousePerspectiveReadService(
         var query = db.출고예정
             .AsNoTracking()
             .Where(item => item.상태 == 출고상태코드.예정);
-        query = ApplyOutboundPerspective(query, normalizedPerspective, communityLedgerId, userId);
+        query = ApplyOutboundPerspective(query, normalizedPerspective, normalizedLedgerId, userId);
         if (query is null)
         {
             return Failure<출고예정페이지응답>("지원하지 않는 출고 예정 관점입니다.", StatusCodes.Status400BadRequest);

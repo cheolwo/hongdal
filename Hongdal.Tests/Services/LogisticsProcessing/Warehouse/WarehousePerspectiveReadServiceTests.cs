@@ -80,7 +80,7 @@ public sealed class WarehousePerspectiveReadServiceTests
 
         var result = await allowed.QueryExpectedInboundsAsync(
             창고업무관점코드.공동원장,
-            "ledger-1",
+            "  ledger-1  ",
             new 입고요청목록조회요청(),
             default);
         var forbidden = await denied.QueryExpectedInboundsAsync(

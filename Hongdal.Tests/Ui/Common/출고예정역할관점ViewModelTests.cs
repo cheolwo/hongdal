@@ -46,16 +46,7 @@ public sealed class 출고예정역할관점ViewModelTests
         Assert.Contains("outbounds/expected/warehouse?", fixture.Client.LastPath);
         Assert.True(await fixture.운송담당자.조회Async(new 목록조회요청()));
         Assert.Contains("outbounds/expected/transport?", fixture.Client.LastPath);
-        Assert.True(await fixture.협동조합운영자.조회Async(new 목록조회요청
-        {
-            필터조건 =
-            [
-                new 목록필터조건(
-                    nameof(출고예정항목응답.커뮤니티원장Id),
-                    "Equal",
-                    "ledger 11")
-            ]
-        }));
+        Assert.True(await fixture.협동조합운영자.원장별조회Async("  ledger 11  "));
         Assert.Contains("outbounds/expected/community-ledgers/ledger%2011?", fixture.Client.LastPath);
 
         var projected = fixture.Page.역할관점목록

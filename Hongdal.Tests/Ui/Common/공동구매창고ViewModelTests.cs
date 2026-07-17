@@ -24,11 +24,12 @@ public sealed class 공동구매창고ViewModelTests
         Assert.NotNull(inbound.원장);
         Assert.NotNull(outbound.원장);
         Assert.Equal(8, inbound.세부업무목록.Count);
-        Assert.Equal(3, outbound.세부업무목록.Count);
+        Assert.Equal(4, outbound.세부업무목록.Count);
         Assert.IsAssignableFrom<I목록조회ViewModel<입고요청항목응답>>(inbound.조회);
         Assert.IsAssignableFrom<I등록ViewModel<입고요청저장요청>>(inbound.등록);
         Assert.IsAssignableFrom<I수정ViewModel<입고요청저장요청>>(inbound.수정);
         Assert.IsAssignableFrom<I삭제ViewModel<long>>(inbound.삭제);
+        Assert.IsAssignableFrom<I서버목록조회ViewModel<출고예정항목응답>>(outbound.출고예정조회);
         Assert.IsAssignableFrom<I목록조회ViewModel<재고항목응답>>(outbound.재고조회);
     }
 
@@ -242,7 +243,7 @@ public sealed class 공동구매창고ViewModelTests
         Assert.Equal(51, service.마지막포장입고상품Id);
         Assert.Equal(51, service.마지막운송인계요청?.입고상품Id);
         Assert.Equal("transport-51", viewModel.최근운송의뢰?.의뢰Id);
-        Assert.False(viewModel.출고목록Api지원됨);
+        Assert.True(viewModel.출고목록Api지원됨);
         Assert.False(viewModel.출고완료Api지원됨);
     }
 

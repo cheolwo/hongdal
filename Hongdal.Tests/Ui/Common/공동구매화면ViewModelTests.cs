@@ -33,8 +33,8 @@ public sealed class 공동구매화면ViewModelTests
         Assert.Equal(10, fixture.ViewModel.공급.세부업무목록.Count);
         Assert.Equal(2, fixture.ViewModel.물류.세부업무목록.Count);
         Assert.Equal(8, fixture.ViewModel.공동수입.세부업무목록.Count);
-        Assert.Equal(21, fixture.ViewModel.실행.세부업무목록.Count);
-        Assert.Equal(50, fixture.ViewModel.절차세부업무목록.Count);
+        Assert.Equal(22, fixture.ViewModel.실행.세부업무목록.Count);
+        Assert.Equal(51, fixture.ViewModel.절차세부업무목록.Count);
         Assert.Equal(
             fixture.ViewModel.절차세부업무목록.Count,
             fixture.ViewModel.절차세부업무목록.Select(item => item.업무코드).Distinct().Count());
