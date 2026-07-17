@@ -43,6 +43,7 @@ const roles = [
     screens: [
       { path: "/shipper/request", title: "운송 의뢰", description: "화물, 상하차지, 차량과 결제 조건을 입력합니다.", tag: "절차 체험" },
       { path: "/shipper/inbound/dashboard", title: "입고 대시보드", description: "입고 예정과 완료, 보관 재고를 한눈에 봅니다.", tag: "화면 체험" },
+      { path: "/shipper/sales/pages/new", title: "판매 페이지 만들기", description: "판매자 유형과 주문 방식을 정하고 상품 상세 자료로 초안을 만듭니다.", tag: "모바일 체험" },
       { path: "/shipper/sales/channels", title: "판매채널", description: "판매채널 계정과 연결 상태를 관리합니다.", tag: "화면 체험" },
       { path: "/shipper/international/fcl-lcl", title: "통관·FCL/LCL", description: "수입량과 비용을 비교하고 운송 방식을 검토합니다.", tag: "화면 체험" }
     ]
@@ -308,6 +309,155 @@ function renderUnknown(path) {
     </section>`;
 }
 
+function renderSalesPageComposer() {
+  document.title = "판매 페이지 만들기 | Hongdal 체험";
+  app.innerHTML = `
+    <section class="sales-composer-page">
+      <nav class="breadcrumbs" aria-label="현재 위치">
+        <a href="/" data-route>체험 홈</a>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-select-role="shipper">화주·판매자</button>
+        <span aria-hidden="true">/</span>
+        <strong>판매 페이지 만들기</strong>
+      </nav>
+
+      <header class="sales-composer-hero">
+        <div>
+          <span class="eyebrow">HONGDAL SELLER PAGE</span>
+          <h1>내 상품을 소개하고<br>주문 방법을 열어보세요</h1>
+          <p>농가, 일반 판매자, 제조자, 수출업자 모두 사용할 수 있습니다. 공동주문은 판매 페이지의 종류가 아니라 구매자가 선택할 수 있는 주문 방식입니다.</p>
+        </div>
+        <span class="draft-pill">초안 · 실제 판매 미연결</span>
+      </header>
+
+      <div class="sales-composer-layout">
+        <section class="seller-editor" aria-label="판매 페이지 입력">
+          <div class="editor-section">
+            <div class="section-heading"><span>01</span><div><h2>판매자와 상품</h2><p>누가 어떤 상품을 판매하는지 알려주세요.</p></div></div>
+            <div class="seller-type-picker" role="group" aria-label="판매자 유형">
+              <button type="button" class="is-selected" data-seller-type="일반 판매자">일반 판매자</button>
+              <button type="button" data-seller-type="농가·생산자">농가·생산자</button>
+              <button type="button" data-seller-type="수출업자">수출업자</button>
+              <button type="button" data-seller-type="제조자">제조자</button>
+            </div>
+            <label class="field-label">판매자 표시명<input id="seller-name" value="햇살마켓" placeholder="예: 햇살농원"></label>
+            <label class="field-label">상품명<input id="product-name" value="매콤한 크림 볶음면 5개 묶음" placeholder="상품 이름"></label>
+            <label class="field-label">한 줄 소개<textarea id="product-tagline" rows="2">부드러운 크림과 매콤함을 함께 즐기는 간편한 한 끼</textarea></label>
+          </div>
+
+          <div class="editor-section editor-section--source">
+            <div class="section-heading"><span>02</span><div><h2>외부 상세는 선택 사항</h2><p>직접 작성해도 되고, Amazon 상세 자료를 참고해 시작할 수도 있습니다.</p></div></div>
+            <label class="field-label">Amazon 상품 상세 URL
+              <div class="url-field"><input id="amazon-url" type="url" value="https://www.amazon.com/dp/B0CLWNBWVT"><button type="button" data-import-amazon>참고자료 불러오기</button></div>
+            </label>
+            <div class="source-result" id="source-result" aria-live="polite">
+              <span class="source-result__icon" aria-hidden="true">A</span>
+              <div><strong>외부 자료 호출 전</strong><small>불러온 가격과 재고는 Hongdal 판매 조건으로 자동 확정되지 않습니다.</small></div>
+              <span class="source-result__status">선택</span>
+            </div>
+          </div>
+
+          <div class="editor-section">
+            <div class="section-heading"><span>03</span><div><h2>주문 방식</h2><p>판매자가 받을 수 있는 주문 방식을 선택합니다.</p></div></div>
+            <div class="order-choice-grid">
+              <label class="order-choice"><input type="checkbox" data-order-mode="individual" checked><span><strong>개별주문</strong><small>한 사람도 바로 주문할 수 있어요</small></span></label>
+              <label class="order-choice"><input type="checkbox" data-order-mode="group" checked><span><strong>공동주문</strong><small>주문자 집단이 수량을 모아 제안해요</small></span></label>
+            </div>
+            <div class="price-row">
+              <label class="field-label">Hongdal 판매가<input id="sales-price" inputmode="numeric" value="24,900"></label>
+              <label class="field-label">공동주문 최소 수량<input id="group-minimum" inputmode="numeric" value="10"></label>
+            </div>
+          </div>
+
+          <button class="create-draft-button" type="button" data-create-sales-draft>판매 페이지 초안 만들기 <span aria-hidden="true">→</span></button>
+          <p class="safe-copy">초안 생성만 체험하며 실제 상품, 재고, 주문과 결제는 만들지 않습니다.</p>
+        </section>
+
+        <aside class="phone-preview" aria-label="모바일 판매 페이지 미리보기">
+          <div class="phone-preview__bar"><span>모바일 미리보기</span><strong id="preview-state">작성 중</strong></div>
+          <article class="seller-product-page">
+            <div class="seller-product-page__media">
+              <div class="product-photo-placeholder"><span aria-hidden="true">＋</span><strong>대표 상품 사진</strong><small>판매자가 직접 등록</small></div>
+              <span class="seller-kind" id="preview-seller-type">일반 판매자</span>
+            </div>
+            <div class="seller-product-page__content">
+              <div class="seller-profile"><span id="seller-initial">햇</span><div><small>판매자</small><strong id="preview-seller-name">햇살마켓</strong></div><button type="button" aria-label="판매자 정보 보기">정보</button></div>
+              <div><h2 id="preview-product-name">매콤한 크림 볶음면 5개 묶음</h2><p id="preview-tagline">부드러운 크림과 매콤함을 함께 즐기는 간편한 한 끼</p></div>
+              <strong class="preview-price" id="preview-price">24,900원</strong>
+              <div class="purchase-facts"><span><small>주문 방식</small><strong id="preview-order-mode">개별 · 공동</strong></span><span><small>최소 주문</small><strong>1개</strong></span></div>
+              <div class="group-purchase-box" id="group-order-box"><span aria-hidden="true">함께</span><div><strong>주문자 집단도 제안할 수 있어요</strong><small><b id="preview-group-minimum">10개</b>부터 수량을 모아 판매자에게 주문을 제안합니다.</small></div></div>
+              <div class="source-snapshot" id="preview-source"><strong>외부 상세 참고 전</strong><small>외부 가격·재고는 별도 참고 영역에 표시됩니다.</small></div>
+              <button class="preview-order-button" type="button" disabled>주문 방법 선택</button>
+              <small class="preview-safety">판매상품과 재고가 연결된 뒤 공개할 수 있습니다.</small>
+            </div>
+          </article>
+        </aside>
+      </div>
+    </section>`;
+
+  bindSalesPageComposerInteractions();
+}
+
+function bindSalesPageComposerInteractions() {
+  document.querySelector("[data-select-role]")?.addEventListener("click", () => {
+    selectedRoleKey = "shipper";
+    navigate("/");
+  });
+
+  document.querySelectorAll("[data-seller-type]").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll("[data-seller-type]").forEach((item) => item.classList.toggle("is-selected", item === button));
+      document.querySelector("#preview-seller-type").textContent = button.dataset.sellerType;
+    });
+  });
+
+  const mirrorText = (inputSelector, targetSelector, fallback) => {
+    document.querySelector(inputSelector)?.addEventListener("input", (event) => {
+      const value = event.currentTarget.value.trim() || fallback;
+      document.querySelector(targetSelector).textContent = value;
+      if (inputSelector === "#seller-name") document.querySelector("#seller-initial").textContent = value.slice(0, 1);
+    });
+  };
+  mirrorText("#seller-name", "#preview-seller-name", "판매자 이름");
+  mirrorText("#product-name", "#preview-product-name", "판매할 상품 이름");
+  mirrorText("#product-tagline", "#preview-tagline", "상품의 특징과 판매자 이야기를 적어주세요.");
+
+  document.querySelector("#sales-price")?.addEventListener("input", (event) => {
+    document.querySelector("#preview-price").textContent = `${event.currentTarget.value.trim() || "가격 협의"}${event.currentTarget.value.trim() ? "원" : ""}`;
+  });
+  document.querySelector("#group-minimum")?.addEventListener("input", (event) => {
+    document.querySelector("#preview-group-minimum").textContent = `${event.currentTarget.value.trim() || "2"}개`;
+  });
+
+  const updateOrderModes = () => {
+    const individual = document.querySelector('[data-order-mode="individual"]').checked;
+    const group = document.querySelector('[data-order-mode="group"]').checked;
+    document.querySelector("#preview-order-mode").textContent = individual && group ? "개별 · 공동" : individual ? "개별주문" : group ? "공동주문" : "선택 필요";
+    document.querySelector("#group-order-box").hidden = !group;
+  };
+  document.querySelectorAll("[data-order-mode]").forEach((input) => input.addEventListener("change", updateOrderModes));
+
+  document.querySelector("[data-import-amazon]")?.addEventListener("click", (event) => {
+    event.currentTarget.disabled = true;
+    event.currentTarget.textContent = "자료 확인 완료";
+    document.querySelector("#source-result").innerHTML = `
+      <span class="source-result__icon" aria-hidden="true">A</span>
+      <div><strong>Amazon 상세 1건 참고됨</strong><small>ASIN B0CLWNBWVT · 평점 4.3 (22) · 관측 가격 없음 · 현재 구매 불가</small></div>
+      <span class="source-result__status is-complete">분리 저장</span>`;
+    document.querySelector("#preview-source").innerHTML = `<strong>외부 상세 참고 · Amazon</strong><span>ASIN B0CLWNBWVT · 평점 4.3</span><small>관측 가격 없음 · 재고 없음. Hongdal 판매가와 재고로 자동 적용하지 않았습니다.</small>`;
+    document.querySelector("#product-name").value = "Samyang Buldak Ramen Carbonara Bundle";
+    document.querySelector("#preview-product-name").textContent = "Samyang Buldak Ramen Carbonara Bundle";
+    showToast("외부 상품 상세를 참고자료로만 불러왔습니다.");
+  });
+
+  document.querySelector("[data-create-sales-draft]")?.addEventListener("click", () => {
+    document.querySelector("#preview-state").textContent = "초안 저장됨";
+    dialogCopy.textContent = "판매 페이지 초안을 만들었습니다. 실제 주문을 받으려면 판매자 소유의 입고상품 기반 판매상품을 연결하고 공개 검수를 거쳐야 합니다.";
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+  });
+}
+
 function bindHomeInteractions() {
   document.querySelectorAll("[data-role-key]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -353,6 +503,7 @@ function bindScreenInteractions(role) {
 function render() {
   const path = normalizePath(window.location.pathname);
   if (path === "/") renderHome();
+  else if (path === "/shipper/sales/pages/new") renderSalesPageComposer();
   else if (screenByPath.has(path)) renderScreen(screenByPath.get(path));
   else renderUnknown(path);
   bindRouteLinks();
@@ -393,4 +544,3 @@ function showToast(message) {
 document.querySelector("[data-close-dialog]")?.addEventListener("click", () => dialog.close());
 window.addEventListener("popstate", render);
 render();
-

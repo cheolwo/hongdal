@@ -39,6 +39,7 @@ $publicRoutes = @(
     "community/global-trade/101",
     "shipper/request",
     "shipper/inbound/dashboard",
+    "shipper/sales/pages/new",
     "shipper/sales/channels",
     "shipper/international/fcl-lcl",
     "driver/home",
