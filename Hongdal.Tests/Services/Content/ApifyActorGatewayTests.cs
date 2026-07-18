@@ -85,7 +85,7 @@ public sealed class ApifyActorGatewayTests
         var sut = CreateGateway(handler, ["junglee~amazon-crawler"]);
 
         var result = await sut.RunSyncGetDatasetItemsAsync(
-            CreateRequest("junglee~amazon-crawler"),
+            CreateRequest("junglee~amazon-crawler") with { MaxItems = 2 },
             CancellationToken.None);
 
         Assert.Equal(2, result.Items.Count);
