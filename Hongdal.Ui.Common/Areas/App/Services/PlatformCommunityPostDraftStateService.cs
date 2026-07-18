@@ -200,13 +200,16 @@ public static class YouTubeFoodCommunityShareDraftFactory
 
         bodyLines.Add(string.Empty);
         bodyLines.Add("어떻게 먹거나 구할 수 있는지, 같이 알아볼 사람과 이야기해 보고 싶습니다.");
+        bodyLines.Add("관심 있는 분은 게시글의 함께하기에서 구매자·공급자·운송·통관·창고 역할 중 가능한 것을 표시해 주세요.");
+        bodyLines.Add("관심이 모이면 공동구매 또는 공동수입 검토를 위한 비구속적 가원장으로 조건을 함께 살펴봅니다.");
+        bodyLines.Add("참여 표시는 주문·계약·결제·배차·운송 주선을 확정하지 않습니다.");
         bodyLines.Add(string.Empty);
         bodyLines.Add("---");
         bodyLines.Add("이 글은 영상 정보 공유이며 구매·수입·계약 제안이 아닙니다.");
 
         return new PlatformCommunityPostDraft(
             "자유",
-            "커뮤니티 신뢰",
+            "공동구매",
             title,
             string.Join(Environment.NewLine, bodyLines),
             BuildTimestampUrl(sourceUri, candidate.영상구간초),

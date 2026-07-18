@@ -85,9 +85,11 @@ public sealed class PlatformCommunityPostDraftStateServiceTests
 
         Assert.Equal(PlatformCommunityPostDraftSourceKinds.YouTubeFood, draft.SourceKind);
         Assert.Equal("자유", draft.Category);
-        Assert.Equal("커뮤니티 신뢰", draft.WorkflowTag);
+        Assert.Equal("공동구매", draft.WorkflowTag);
         Assert.StartsWith("[음식 발견] 흡직 파프리카", draft.Title, StringComparison.Ordinal);
         Assert.Contains("채널: Farm Table · HU", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("게시글의 함께하기", draft.Body, StringComparison.Ordinal);
+        Assert.Contains("비구속적 가원장", draft.Body, StringComparison.Ordinal);
         Assert.Contains("구매·수입·계약 제안이 아닙니다", draft.Body, StringComparison.Ordinal);
         Assert.Equal("https://www.youtube.com/watch?v=food-1&t=95s", draft.SharedLinkUrl);
     }
