@@ -35,6 +35,8 @@
 | 관세청 품목별 국가별 수출입실적 | HS 코드·국가별 CIF 통계단가 비교 | 실제 매입가, 국내 도착원가, 운송 견적이나 소비자가격이 아님 |
 | 미국 농무부 농업통계청(USDA NASS) Quick Stats | 미국 농작물·축산물·양식 수산물의 가격·판매 집계 통계 | 미국 공식 품목명·단위·조사 프로그램을 유지하며 국내 aT 가격과 동일한 시장 단계로 간주하지 않음 |
 
+미국 농어업경영체 정보는 전국 단일 공개 명부로 취급하지 않는다. 개별 농장·양식장·어업 자료의 비공개 경계와 인증·검사·자발적 등재·지역 허가 목적별 공개 원천은 [미국 농어업경영체 정보 공개 원천](UnitedStatesAgriculturalFisheriesOperatorInformation.md)에 구분해 전산화한다.
+
 인증키가 없을 때도 모듈 개요와 지원 품목은 조회할 수 있다. 개요 응답은 각 원천의 `Ready` 또는 `NeedsServiceKey` 상태를 표시하며 인증키 값 자체는 노출하지 않는다.
 
 ## 공개 API
@@ -45,6 +47,7 @@
 | 지원 품목 검색 | `GET /api/v1/agricultural-fisheries/items` | 없음 |
 | HS 품목의 국내가격 조회 | `GET /api/v1/agricultural-fisheries/items/{hsCode}/domestic-price` | 없음 |
 | 미국 농수산물 가격·판매 통계 조회 | `GET /api/v1/agricultural-fisheries/us-prices` | 없음 |
+| 미국 농어업경영체 정보 원천 조회 | `GET /api/v1/agricultural-fisheries/us-operator-information-sources` | 없음 |
 | 한국 육류 수입 준비 절차도 조회 | `GET /api/v1/agricultural-fisheries/import-readiness/diagram` | 없음 |
 
 국내가격 조회는 지원하지 않는 HS 코드에 `MappingRequired`, 잘못된 요청에 `InvalidRequest`, 외부 자료를 얻지 못한 경우 `DataUnavailable`을 반환한다. 연결되지 않은 품목을 임의의 유사 품목으로 자동 대체하지 않는다.
@@ -145,11 +148,12 @@ GET /api/v1/agricultural-fisheries/us-prices
 
 ## 다음 데이터 축적 순서
 
-1. NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결을 검증한다.
-2. 축산물 등급·도매가격과 aT 조사 가격의 역할을 구분한다.
-3. 소비자 체감가격과 온라인 가격은 조사 기준 및 수집 허용 범위를 먼저 정한다.
-4. 지역·시장·품질·등급·포장단위별 누락률, 갱신 지연과 매칭 정확도를 시계열로 기록한다.
-5. 정보 이용자와 현장 종사자의 질문·오류 제보를 품목 연결표 개선 근거로 축적한다.
+1. USDA Local Food API와 FSIS CSV를 개인정보 최소화 규칙과 함께 검증한다.
+2. NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결을 검증한다.
+3. 축산물 등급·도매가격과 aT 조사 가격의 역할을 구분한다.
+4. 소비자 체감가격과 온라인 가격은 조사 기준 및 수집 허용 범위를 먼저 정한다.
+5. 지역·시장·품질·등급·포장단위별 누락률, 갱신 지연과 매칭 정확도를 시계열로 기록한다.
+6. 정보 이용자와 현장 종사자의 질문·오류 제보를 품목 연결표 개선 근거로 축적한다.
 
 ## 주선업 단계로 넘어가기 위한 조건
 
