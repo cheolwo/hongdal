@@ -482,7 +482,7 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
             ? []
             : await _professionalEligibilityService.GetVerifiedRoleCodesAsync(actor, cancellationToken);
         var plannedSpecialistRoles = CommunityPostPartyRoleCodes
-            .ForPlan(tradeDirectionCode, transportModeCodes)
+            .ForPlan(tradeDirectionCode, transportModeCodes, destinationCountryCode)
             .Where(CommunityPostPartyRoleCodes.IsSpecialist)
             .ToArray();
         authorProfessionalRoles = authorProfessionalRoles
@@ -987,7 +987,10 @@ public sealed class CommunityPostOpportunityService : ICommunityPostOpportunityS
 
         var roleCountsJson = JsonSerializer.Serialize(snapshot.RoleCounts);
         var requiredProfessionalRoles = CommunityPostPartyRoleCodes
-            .ForPlan(tradeDirectionCode, transportModeCodes)
+            .ForPlan(
+                tradeDirectionCode,
+                transportModeCodes,
+                destinationCountryCode)
             .Where(CommunityPostPartyRoleCodes.IsSpecialist)
             .ToArray();
         var professionalAssignmentsJson = CommunityPostProfessionalParticipationProjection.SerializeAssignments(

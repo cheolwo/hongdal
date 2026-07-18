@@ -429,6 +429,151 @@ public sealed class CommunityPostOpportunityServiceTests
     }
 
     [Fact]
+    public async Task 미국공동수입은_보세시설부터참여자주소배송까지_역할슬롯과원장참여를연결한다()
+    {
+        var store = new InMemoryPostStore(CreateOrdinaryPost());
+        var ledgerStore = new InMemoryLedgerStore();
+        var voteService = new InMemoryCommunityVoteService();
+        var service = CreateService(
+            store,
+            ledgerStore,
+            voteService,
+            new InMemoryProfessionalEligibilityService(
+                CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator));
+        var started = await service.StartParticipationAsync(
+            72,
+            CreateParticipationStartRequest(),
+            "buyer-interest",
+            "구매 관심자");
+        var buyerOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:Buyer");
+        var warehouseOption = started.InterestVote.Options.Single(option =>
+            option.ProductKey == "community-role:WarehouseOperator");
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "buyer-interest",
+                VoterKey = "session-us-buyer",
+                VoterDisplayName = "미국 공동구매 관심자",
+                OptionIds = [buyerOption.OptionId]
+            },
+            CancellationToken.None);
+        await voteService.CastVoteAsync(
+            started.InterestVote.Id,
+            new CommunityVoteCastRequest
+            {
+                AuthenticatedUserId = "warehouse-interest",
+                VoterKey = "session-us-warehouse",
+                VoterDisplayName = "물류 관심자",
+                OptionIds = [warehouseOption.OptionId]
+            },
+            CancellationToken.None);
+
+        var promotionRequest = CreatePromotionRequest(started.InterestVote.Id);
+        promotionRequest.OriginCountryCode = "KR";
+        promotionRequest.DestinationCountryCode = "US";
+        var promoted = await service.PromoteParticipationAsync(
+            72,
+            promotionRequest,
+            "author-2",
+            "작성자");
+
+        var expectedRoleDirectories = new Dictionary<string, string>
+        {
+            [CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator] =
+                "stageCode=CustomsControlledStorage",
+            [CommunityPostPartyRoleCodes.InBondCarrier] =
+                "stageCode=InBondTransportation",
+            [CommunityPostPartyRoleCodes.DomesticFulfillmentOperator] =
+                "stageCode=FulfillmentWarehouseInbound",
+            [CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider] =
+                "stageCode=ParticipantAddressFinalMileDelivery"
+        };
+        foreach (var expected in expectedRoleDirectories)
+        {
+            var slot = promoted.Participation.PartyFormation.RoleSlots.Single(item =>
+                item.RoleCode == expected.Key);
+            Assert.True(slot.IsRecommended);
+            Assert.False(slot.IsRequired);
+            Assert.True(slot.ExternalCredentialVerificationRequired);
+            Assert.False(slot.ExternalCredentialVerified);
+            Assert.True(slot.CandidateDirectoryIsResearchOnly);
+            Assert.Contains(expected.Value, slot.CandidateDirectoryEndpoint, StringComparison.Ordinal);
+
+            var opening = promoted.Participation.ProfessionalParticipation.RoleOpenings.Single(
+                item => item.RoleCode == expected.Key);
+            Assert.Equal(slot.CandidateDirectoryEndpoint, opening.CandidateDirectoryEndpoint);
+            Assert.True(opening.RequiresSeparateAuthorityAndContractVerification);
+        }
+
+        Assert.DoesNotContain(
+            promoted.Participation.PartyFormation.RoleSlots,
+            slot => slot.RoleCode == CommunityPostPartyRoleCodes.WarehouseOperator);
+        Assert.Contains(
+            promoted.Participation.PartyFormation.RoleSlots,
+            slot => slot.RoleCode == CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator
+                    && slot.ConfirmedParticipantCount == 1
+                    && slot.StateCode == CommunityPartyRoleSlotStateCodes.RoleAccepted);
+
+        var participationService = new CommunityPostProfessionalParticipationService(
+            store,
+            ledgerStore,
+            new InMemoryProfessionalEligibilityService(
+                expectedRoleDirectories.Keys.ToArray()));
+        JoinCommunityPostProfessionalResponse? joined = null;
+        var participantIndex = 0;
+        foreach (var roleCode in expectedRoleDirectories.Keys.Where(roleCode => !string.Equals(
+                     roleCode,
+                     CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator,
+                     StringComparison.OrdinalIgnoreCase)))
+        {
+            participantIndex++;
+            joined = await participationService.JoinAsync(
+                72,
+                new JoinCommunityPostProfessionalRequest
+                {
+                    ProvisionalLedgerId = promoted.ProvisionalLedger.LedgerId,
+                    ProfessionalRoleCode = roleCode,
+                    ConfirmProfessionalCapacity = true,
+                    ConfirmVoluntaryNonBindingParticipation = true,
+                    ConfirmParticipantNotification = true
+                },
+                $"us-logistics-{participantIndex}",
+                $"미국 물류 참여자 {participantIndex}");
+        }
+
+        Assert.NotNull(joined);
+        var ledger = ledgerStore.Get(promoted.ProvisionalLedger.LedgerId);
+        Assert.NotNull(ledger);
+        Assert.All(
+            expectedRoleDirectories.Keys,
+            roleCode => Assert.Contains(
+                joined!.Participation.PartyFormation.RoleSlots,
+                slot => slot.RoleCode == roleCode
+                        && slot.ConfirmedParticipantCount == 1
+                        && slot.StateCode == CommunityPartyRoleSlotStateCodes.RoleAccepted));
+        Assert.Equal(
+            3,
+            ledger!.참여자목록.Count(participant =>
+                participant.ParticipationState == "가원장 역할 참여"));
+        Assert.Contains(
+            ledger.참여자목록,
+            participant => participant.UserId == "author-2"
+                           && participant.ParticipationState == "가원장 발의·역할 참여"
+                           && participant.RoleLabel.Contains(
+                               "보세창고·FTZ 운영자",
+                               StringComparison.Ordinal));
+        Assert.All(
+            ledger.참여자목록.Where(participant =>
+                participant.ParticipationState == "가원장 역할 참여"),
+            participant => Assert.Contains(
+                "플랫폼 역할 확인",
+                participant.RoleLabel,
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task 게시글작성자가아니면_모인관심을_가원장으로_승격할수없다()
     {
         var store = new InMemoryPostStore(CreateOrdinaryPost());
@@ -514,7 +659,8 @@ public sealed class CommunityPostOpportunityServiceTests
     private static CommunityPostOpportunityService CreateService(
         InMemoryPostStore postStore,
         InMemoryLedgerStore? ledgerStore = null,
-        ICommunityVoteService? voteService = null)
+        ICommunityVoteService? voteService = null,
+        ICommunityProfessionalEligibilityService? professionalEligibilityService = null)
     {
         var effectiveLedgerStore = ledgerStore ?? new InMemoryLedgerStore();
         return new CommunityPostOpportunityService(
@@ -522,7 +668,8 @@ public sealed class CommunityPostOpportunityServiceTests
             new CommunityPostOpportunityAnalyzer(),
             new MeatImportReadinessService(effectiveLedgerStore),
             voteService,
-            effectiveLedgerStore);
+            effectiveLedgerStore,
+            professionalEligibilityService);
     }
 
     private static CommunityPostOpportunitySource CreateImportPost(string authorUserId = "author-1")

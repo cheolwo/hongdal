@@ -19,6 +19,10 @@ public sealed class KoreaOperatingMarketServiceModule : IOperatingMarketServiceM
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddScoped<IOperatingMarketAddressLookupAdapter, KoreaRoadAddressLookupAdapter>();
+        services.AddScoped<IThirdPartyLogisticsProviderDirectoryService,
+            UnavailableThirdPartyLogisticsProviderDirectoryService>();
+        services.AddScoped<IThirdPartyLogisticsProviderOutreachPreparationService,
+            UnavailableThirdPartyLogisticsProviderOutreachPreparationService>();
         services.AddScoped<IOperatingMarketFreightWorkflowPolicy>(serviceProvider =>
             new KoreaOperatingMarketFreightWorkflowPolicy(
                 serviceProvider.GetRequiredService<
@@ -59,6 +63,10 @@ public sealed class UnitedStatesOperatingMarketServiceModule : IOperatingMarketS
             UnitedStatesDeliveryScopePlanner>();
         services.AddScoped<IUnitedStatesDeliveryScopeService,
             UnitedStatesDeliveryScopeService>();
+        services.AddSingleton<IThirdPartyLogisticsProviderDirectoryService,
+            UnitedStatesThirdPartyLogisticsProviderDirectoryService>();
+        services.AddSingleton<IThirdPartyLogisticsProviderOutreachPreparationService,
+            UnitedStatesThirdPartyLogisticsProviderOutreachPreparationService>();
 
         services.AddScoped<IOperatingMarketAddressLookupAdapter,
             UnitedStatesAddressLookupAdapter>();

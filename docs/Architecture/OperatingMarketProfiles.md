@@ -187,6 +187,22 @@ USPS Addresses API는 배송용 주소 표준화와 ZIP+4 확인 단계에만 �
 4. 배송 또는 label 생성 직전처럼 우편 검증이 실제로 필요한 시점에만 호출한다.
 5. USPS 장애가 발생해도 Census 결과를 배송 검증 성공으로 승격하지 않는다.
 
+## 미국 3PL 후보 디렉터리
+
+미국 배포에는 공동구매·공동수입 참여자가 필요한 물류 역량을 직접 비교하고 상담할 수 있도록 읽기 전용 3PL 후보 디렉터리를 둔다. 조사 후보는 실제 계약 창고와 분리하고 모두 `NoPlatformRelationship`, `RegulatoryStatusNotVerified`, `CanBeSelectedForOperations=false`로 시작한다.
+
+```http
+GET /api/v1/operations/third-party-logistics/providers
+GET /api/v1/operations/third-party-logistics/providers/collective-purchase
+GET /api/v1/operations/third-party-logistics/providers/bonded-to-door
+```
+
+첫 API는 범용 23개 업체를 역량과 업무 구간으로 찾고, 두 번째 API는 그중 공동구매 흐름을 공식 자료로 확인한 12개 업체를 국제 반입·항만·대량 입고·공동 보관·소분·참여자 배송·반품 단계와 상품 취급 조건으로 찾는다. 세 번째 API는 보세창고·FTZ부터 통관, 미국 내 물류창고 입고, 참여자별 parcel 출고까지의 역할 후보 10개를 storage model·단계·시설 소재 주로 찾는다. 추천 점수나 자동 선정을 제공하지 않는다. 서비스 광고 근거와 공개 최소조건은 회사 공식 URL·검토일·재확인 상태로 남기고, 운송 주선·해상 OTI·보세창고·통관 등은 실제 수행 법인과 시설을 정부 자료에서 별도로 확인한 뒤 계약 참여자로 승격한다. 조사 대상, API 계약, 공식 근거와 갱신 절차는 [미국 3PL 후보 디렉터리](UnitedStatesThirdPartyLogisticsProviderDirectory.md)에 정리한다.
+
+도착국이 미국인 공동수입 가원장은 디렉터리 단계와 같은 보세시설 운영, in-bond 운송, 미국 내 풀필먼트, 참여자 주소 배송 역할 슬롯을 연다. 조사 업체는 자동으로 슬롯을 채우지 않는다. 업체 담당자가 플랫폼 계정 역할 확인과 비구속 참여를 명시적으로 수락해야 원장 참여자로 기록되며, 외부 자격과 실제 계약은 계속 미확인 상태로 남긴다.
+
+미국 배포의 관리자는 `POST /api/v1/admin/operations/third-party-logistics/outreach/preview`에서 보세-주소 후보 10개에 대한 영문 문의 초안을 준비할 수 있다. 공개 일반 이메일을 공식 회사 페이지에서 확인한 업체만 이메일 draft로 분류하고 나머지는 회사가 지정한 문의 양식용 본문으로 분류한다. 발신자 신원, 실제 우편 주소, 회신·수신거부 주소, suppression 확인과 업체별 수동 승인이 모두 없으면 차단하며 자동 발송은 제공하지 않는다. 한국 배포에서는 해당 준비 service도 사용할 수 없다.
+
 ## 서버 컨텍스트와 클라이언트 인터페이스
 
 운영 시장은 요청 claim이나 header가 아니라 서버 배포 설정으로 고정한다. `IOperatingMarketContextAccessor`는 시장과 배포 시간대를 반환한다.
@@ -262,6 +278,8 @@ GET /api/v1/operations/market-profile
 - 시장별 주소 어댑터와 단위 변환
 - 미국 Census 주소 범위 매칭, benchmark·정밀도·좌표 계약과 US 배포 전용 등록
 - Census State·County·Place·ZCTA 지리 투영과 미국 공동구매 배달권 계획기
+- 공식 회사 근거를 포함한 미국 3PL 범용 23개 후보, 공동구매 역할 12개와 보세시설-참여자 주소 역할 10개 프로필의 읽기 전용 중립 필터 API
+- 보세-주소 후보 10개의 공식 문의 채널과 관리자 전용 영문 초안 준비 API. 자동 발송 없이 발신자·수신거부·업체별 승인 요건을 강제
 - 배포 시간대와 공개 런타임 프로필 API
 - 운송 의뢰 생성을 `QualifiedProviderParticipationRequest`로 분류한 촉진 업무 경계
 - 전문 사업자 참여 역할, 검증 상태, 만료, 요구사항별 증거 모델

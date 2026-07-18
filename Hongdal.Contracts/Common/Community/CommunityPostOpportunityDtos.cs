@@ -228,6 +228,9 @@ public sealed class CommunityPostProfessionalRoleOpeningResponse
     public bool ExternalCredentialVerified { get; set; }
     public int PlatformConfirmedParticipantCount { get; set; }
     public bool HasPlatformConfirmedParticipant => PlatformConfirmedParticipantCount > 0;
+    public string CandidateDirectoryEndpoint { get; set; } = string.Empty;
+    public bool CandidateDirectoryIsResearchOnly { get; set; }
+    public bool RequiresSeparateAuthorityAndContractVerification { get; set; }
 }
 
 public sealed class CommunityPostPartyFormationResponse
@@ -265,6 +268,9 @@ public sealed class CommunityPostPartyRoleSlotResponse
     public int ConfirmedParticipantCount { get; set; }
     public string StateCode { get; set; } = CommunityPartyRoleSlotStateCodes.Open;
     public bool IsRepresented => ConfirmedParticipantCount > 0;
+    public string CandidateDirectoryEndpoint { get; set; } = string.Empty;
+    public bool CandidateDirectoryIsResearchOnly { get; set; }
+    public bool RequiresSeparateAuthorityAndContractVerification { get; set; }
 }
 
 public static class CommunityPostOpportunityCodes
@@ -366,6 +372,13 @@ public static class CommunityPostPartyRoleCodes
     public const string RoadCarrier = "RoadCarrier";
     public const string RailCarrier = "RailCarrier";
     public const string WarehouseOperator = "WarehouseOperator";
+    public const string CustomsControlledFacilityOperator =
+        "CustomsControlledFacilityOperator";
+    public const string InBondCarrier = "InBondCarrier";
+    public const string DomesticFulfillmentOperator =
+        "DomesticFulfillmentOperator";
+    public const string ParticipantAddressDeliveryProvider =
+        "ParticipantAddressDeliveryProvider";
 
     public static IReadOnlyList<string> All { get; } =
     [
@@ -383,7 +396,11 @@ public static class CommunityPostPartyRoleCodes
         AirCarrier,
         RoadCarrier,
         RailCarrier,
-        WarehouseOperator
+        WarehouseOperator,
+        CustomsControlledFacilityOperator,
+        InBondCarrier,
+        DomesticFulfillmentOperator,
+        ParticipantAddressDeliveryProvider
     ];
 
     public static IReadOnlyList<string> SpecialistRoles { get; } =
@@ -398,7 +415,11 @@ public static class CommunityPostPartyRoleCodes
         AirCarrier,
         RoadCarrier,
         RailCarrier,
-        WarehouseOperator
+        WarehouseOperator,
+        CustomsControlledFacilityOperator,
+        InBondCarrier,
+        DomesticFulfillmentOperator,
+        ParticipantAddressDeliveryProvider
     ];
 
     public static IReadOnlyList<string> CommercialPartyRoles { get; } =
@@ -423,25 +444,49 @@ public static class CommunityPostPartyRoleCodes
 
     public static IReadOnlyList<string> ForPlan(
         string? tradeDirectionCode,
-        IEnumerable<string>? transportModeCodes)
+        IEnumerable<string>? transportModeCodes,
+        string? destinationCountryCode = null)
     {
         var roles = new List<string>
         {
             Buyer,
-            Seller,
-            WarehouseOperator
+            Seller
         };
-        if (string.Equals(tradeDirectionCode, CommunityTradeDirectionCodes.Import, StringComparison.OrdinalIgnoreCase))
+        var isImport = string.Equals(
+            tradeDirectionCode,
+            CommunityTradeDirectionCodes.Import,
+            StringComparison.OrdinalIgnoreCase);
+        var isUnitedStatesDestination = string.Equals(
+            destinationCountryCode?.Trim(),
+            "US",
+            StringComparison.OrdinalIgnoreCase);
+        if (isImport)
         {
             roles.Add(Importer);
             roles.Add(Exporter);
             roles.Add(ImportCustomsBroker);
+            if (isUnitedStatesDestination)
+            {
+                roles.Add(CustomsControlledFacilityOperator);
+                roles.Add(InBondCarrier);
+                roles.Add(DomesticFulfillmentOperator);
+                roles.Add(ParticipantAddressDeliveryProvider);
+            }
+            else
+            {
+                roles.Add(WarehouseOperator);
+            }
         }
         else if (string.Equals(tradeDirectionCode, CommunityTradeDirectionCodes.Export, StringComparison.OrdinalIgnoreCase))
         {
             roles.Add(Importer);
             roles.Add(Exporter);
             roles.Add(ExportCustomsBroker);
+            roles.Add(WarehouseOperator);
+        }
+        else
+        {
+            roles.Add(WarehouseOperator);
         }
 
         foreach (var mode in CommunityTransportModeCodes.NormalizeMany(transportModeCodes))
@@ -488,6 +533,12 @@ public static class CommunityPartyRoleVerificationRequirementCodes
     public const string PlatformProfile = "PlatformProfile";
     public const string JurisdictionLicenseOrRegistration = "JurisdictionLicenseOrRegistration";
     public const string CarrierOperatingAuthority = "CarrierOperatingAuthority";
+    public const string CustomsFacilityAuthorization =
+        "CustomsFacilityAuthorization";
+    public const string BondedCarrierOperatingAuthority =
+        "BondedCarrierOperatingAuthority";
+    public const string FacilityCapabilityAndContract =
+        "FacilityCapabilityAndContract";
 }
 
 public static class CommunityPartyRoleSlotStateCodes

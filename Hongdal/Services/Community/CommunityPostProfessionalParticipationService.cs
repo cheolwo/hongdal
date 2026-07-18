@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Operations;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
 using 홍달.도메인.사용자;
@@ -24,6 +25,14 @@ public sealed class CommunityProfessionalEligibilityService : ICommunityProfessi
     private static readonly string[] AirCarrierIdentityRoles = ["항공운송사", "AirCarrier"];
     private static readonly string[] RailCarrierIdentityRoles = ["철도운송사", "RailCarrier"];
     private static readonly string[] WarehouseIdentityRoles = [역할명.창고관리자, "WarehouseOperator"];
+    private static readonly string[] CustomsControlledFacilityIdentityRoles =
+        [역할명.보세창고운영자, 역할명.FTZ운영자, "CustomsBondedWarehouseOperator", "ForeignTradeZoneOperator", "CustomsControlledFacilityOperator"];
+    private static readonly string[] InBondCarrierIdentityRoles =
+        [역할명.보세운송사, "InBondCarrier"];
+    private static readonly string[] FulfillmentIdentityRoles =
+        [역할명.창고관리자, 역할명.풀필먼트운영자, "WarehouseOperator", "FulfillmentOperator", "ThirdPartyLogisticsProvider"];
+    private static readonly string[] ParticipantAddressDeliveryIdentityRoles =
+        [역할명.배달기사, 역할명.택배운송사, "ParcelCarrier", "LastMileCarrier"];
 
     private readonly HongdalContext _db;
 
@@ -87,6 +96,29 @@ public sealed class CommunityProfessionalEligibilityService : ICommunityProfessi
             || HasAnyRole(identityRoles, WarehouseIdentityRoles))
         {
             verifiedRoles.Add(CommunityPostPartyRoleCodes.WarehouseOperator);
+        }
+
+        if (HasAnyRole(identityRoles, CustomsControlledFacilityIdentityRoles))
+        {
+            verifiedRoles.Add(
+                CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator);
+        }
+
+        if (HasAnyRole(identityRoles, InBondCarrierIdentityRoles))
+        {
+            verifiedRoles.Add(CommunityPostPartyRoleCodes.InBondCarrier);
+        }
+
+        if (participantRoles.Contains(홍달역할유형.창고관리자)
+            || HasAnyRole(identityRoles, FulfillmentIdentityRoles))
+        {
+            verifiedRoles.Add(CommunityPostPartyRoleCodes.DomesticFulfillmentOperator);
+        }
+
+        if (HasAnyRole(identityRoles, ParticipantAddressDeliveryIdentityRoles))
+        {
+            verifiedRoles.Add(
+                CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider);
         }
 
         if (HasAnyRole(identityRoles, RoadFreightBrokerIdentityRoles))
@@ -276,7 +308,9 @@ public sealed class CommunityPostProfessionalParticipationService : ICommunityPo
             CommunityPostProfessionalParticipationProjection.EnsureProvisionalLedger(ledger);
             var availableRoles = CommunityPostPartyRoleCodes.ForPlan(
                 CommunityPostProfessionalParticipationProjection.ReadTradeDirectionCode(ledger),
-                CommunityPostProfessionalParticipationProjection.ReadTransportModeCodes(ledger));
+                CommunityPostProfessionalParticipationProjection.ReadTransportModeCodes(ledger),
+                ledger.확장속성.GetValueOrDefault(
+                    CommunityPostProvisionalLedgerPolicy.DestinationCountryAttributeKey));
             if (!availableRoles.Contains(roleCode, StringComparer.OrdinalIgnoreCase))
             {
                 throw new InvalidOperationException("이 가원장의 거래 방향과 운송수단에서 모집 중인 역할이 아닙니다.");
@@ -655,6 +689,14 @@ internal static class CommunityPostProfessionalParticipationProjection
 
     public static IReadOnlyList<string> ResolveRequiredRoles(커뮤니티원장Dto ledger)
     {
+        var plannedRoles = CommunityPostPartyRoleCodes
+            .ForPlan(
+                ReadTradeDirectionCode(ledger),
+                ReadTransportModeCodes(ledger),
+                ledger.확장속성.GetValueOrDefault(
+                    CommunityPostProvisionalLedgerPolicy.DestinationCountryAttributeKey))
+            .Where(CommunityPostPartyRoleCodes.IsSpecialist)
+            .ToArray();
         if (ledger.확장속성.TryGetValue(
                 CommunityPostProvisionalLedgerPolicy.RequiredProfessionalRolesAttributeKey,
                 out var serialized))
@@ -670,6 +712,7 @@ internal static class CommunityPostProfessionalParticipationProjection
                             candidate,
                             role,
                             StringComparison.OrdinalIgnoreCase)))
+                        .Concat(plannedRoles)
                         .Distinct(StringComparer.OrdinalIgnoreCase)
                         .ToArray();
                 }
@@ -680,14 +723,7 @@ internal static class CommunityPostProfessionalParticipationProjection
             }
         }
 
-        ledger.확장속성.TryGetValue(
-            CommunityPostProvisionalLedgerPolicy.TradeDirectionAttributeKey,
-            out var tradeDirectionCode);
-        var transportModeCodes = ReadTransportModeCodes(ledger);
-        return CommunityPostPartyRoleCodes
-            .ForPlan(tradeDirectionCode, transportModeCodes)
-            .Where(CommunityPostPartyRoleCodes.IsSpecialist)
-            .ToArray();
+        return plannedRoles;
     }
 
     public static string ReadTradeDirectionCode(커뮤니티원장Dto ledger)
@@ -863,7 +899,11 @@ internal static class CommunityPostProfessionalParticipationProjection
                 PlatformConfirmedParticipantCount = professionalAssignments.Count(assignment => string.Equals(
                     assignment.RoleCode,
                     roleCode,
-                    StringComparison.OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase)),
+                CandidateDirectoryEndpoint = CandidateDirectoryEndpoint(roleCode),
+                CandidateDirectoryIsResearchOnly = !string.IsNullOrWhiteSpace(
+                    CandidateDirectoryEndpoint(roleCode)),
+                RequiresSeparateAuthorityAndContractVerification = true
             }).ToArray()
         };
     }
@@ -920,7 +960,10 @@ internal static class CommunityPostProfessionalParticipationProjection
             CommunityPostProvisionalLedgerPolicy.DestinationCountryAttributeKey,
             string.Empty);
         var interestCounts = ReadInterestRoleCounts(ledger);
-        var definitions = BuildPartyRoleDefinitions(tradeDirectionCode, transportModeCodes);
+        var definitions = BuildPartyRoleDefinitions(
+            tradeDirectionCode,
+            transportModeCodes,
+            destinationCountryCode);
         var slots = definitions.Select(definition =>
         {
             var interestCount = ResolveInterestCount(
@@ -949,7 +992,13 @@ internal static class CommunityPostProfessionalParticipationProjection
                     ? CommunityPartyRoleSlotStateCodes.RoleAccepted
                     : interestCount > 0
                         ? CommunityPartyRoleSlotStateCodes.InterestExpressed
-                        : CommunityPartyRoleSlotStateCodes.Open
+                        : CommunityPartyRoleSlotStateCodes.Open,
+                CandidateDirectoryEndpoint = CandidateDirectoryEndpoint(
+                    definition.RoleCode),
+                CandidateDirectoryIsResearchOnly = !string.IsNullOrWhiteSpace(
+                    CandidateDirectoryEndpoint(definition.RoleCode)),
+                RequiresSeparateAuthorityAndContractVerification =
+                    RequiresExternalCredential(definition.RoleCode)
             };
         }).ToArray();
         var requiredSlots = slots.Where(slot => slot.IsRequired).ToArray();
@@ -1017,6 +1066,20 @@ internal static class CommunityPostProfessionalParticipationProjection
             (CommunityPostPartyRoleCodes.RailCarrier, false) => "철도 운송사",
             (CommunityPostPartyRoleCodes.WarehouseOperator, true) => "Warehouse operator",
             (CommunityPostPartyRoleCodes.WarehouseOperator, false) => "창고 운영자",
+            (CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator, true) =>
+                "Customs-controlled facility operator",
+            (CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator, false) =>
+                "보세창고·FTZ 운영자",
+            (CommunityPostPartyRoleCodes.InBondCarrier, true) => "In-bond carrier",
+            (CommunityPostPartyRoleCodes.InBondCarrier, false) => "통관 전 보세운송사",
+            (CommunityPostPartyRoleCodes.DomesticFulfillmentOperator, true) =>
+                "Domestic fulfillment operator",
+            (CommunityPostPartyRoleCodes.DomesticFulfillmentOperator, false) =>
+                "미국 내 풀필먼트 운영자",
+            (CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider, true) =>
+                "Participant-address delivery provider",
+            (CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider, false) =>
+                "참여자 주소 배송 사업자",
             _ => roleCode
         };
 
@@ -1053,6 +1116,22 @@ internal static class CommunityPostProfessionalParticipationProjection
             (CommunityPostPartyRoleCodes.RailCarrier, false) => "예약 수락 전 철도 운송 가능 용량과 조건을 검토합니다.",
             (CommunityPostPartyRoleCodes.WarehouseOperator, true) => "Review receiving, storage, and outbound feasibility without accepting a service order.",
             (CommunityPostPartyRoleCodes.WarehouseOperator, false) => "서비스 주문 수락 전 입고·보관·출고 가능 조건을 검토합니다.",
+            (CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator, true) =>
+                "Review bonded warehouse or FTZ storage without confirming current facility authorization, availability, or a service contract.",
+            (CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator, false) =>
+                "현재 시설 승인·가용 공간·계약을 확정하지 않은 상태에서 보세창고 또는 FTZ 보관 가능성을 검토합니다.",
+            (CommunityPostPartyRoleCodes.InBondCarrier, true) =>
+                "Review pre-release in-bond movement subject to ACE filing, carrier bond, route, and a separate carriage contract.",
+            (CommunityPostPartyRoleCodes.InBondCarrier, false) =>
+                "ACE 신고·carrier bond·이동 경로와 별도 운송계약 확인을 전제로 통관 전 보세운송 가능성을 검토합니다.",
+            (CommunityPostPartyRoleCodes.DomesticFulfillmentOperator, true) =>
+                "Review released-cargo receiving, break-pack, kitting, storage, and parcel tender without accepting a fulfillment order.",
+            (CommunityPostPartyRoleCodes.DomesticFulfillmentOperator, false) =>
+                "서비스 주문 수락 전 반출 완료 화물의 입고·소분·kitting·보관·parcel 인계 가능성을 검토합니다.",
+            (CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider, true) =>
+                "Review delivery from fulfillment to participant addresses without accepting shipments or confirming coverage.",
+            (CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider, false) =>
+                "배송 접수나 권역을 확정하지 않은 상태에서 풀필먼트 창고부터 참여자 주소까지의 배송 가능성을 검토합니다.",
             _ => string.Empty
         };
 
@@ -1076,19 +1155,38 @@ internal static class CommunityPostProfessionalParticipationProjection
                 or CommunityPostPartyRoleCodes.RoadCarrier
                 or CommunityPostPartyRoleCodes.RailCarrier
                 => CommunityPartyRoleVerificationRequirementCodes.CarrierOperatingAuthority,
+            CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator
+                => CommunityPartyRoleVerificationRequirementCodes
+                    .CustomsFacilityAuthorization,
+            CommunityPostPartyRoleCodes.InBondCarrier
+                => CommunityPartyRoleVerificationRequirementCodes
+                    .BondedCarrierOperatingAuthority,
+            CommunityPostPartyRoleCodes.DomesticFulfillmentOperator
+                => CommunityPartyRoleVerificationRequirementCodes
+                    .FacilityCapabilityAndContract,
+            CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider
+                => CommunityPartyRoleVerificationRequirementCodes
+                    .CarrierOperatingAuthority,
             _ => CommunityPartyRoleVerificationRequirementCodes.PlatformProfile
         };
 
     private static bool RequiresExternalCredential(string roleCode)
         => VerificationRequirementCode(roleCode) is
             CommunityPartyRoleVerificationRequirementCodes.JurisdictionLicenseOrRegistration
-            or CommunityPartyRoleVerificationRequirementCodes.CarrierOperatingAuthority;
+            or CommunityPartyRoleVerificationRequirementCodes.CarrierOperatingAuthority
+            or CommunityPartyRoleVerificationRequirementCodes.CustomsFacilityAuthorization
+            or CommunityPartyRoleVerificationRequirementCodes.BondedCarrierOperatingAuthority
+            or CommunityPartyRoleVerificationRequirementCodes.FacilityCapabilityAndContract;
 
     private static IReadOnlyList<PartyRoleDefinition> BuildPartyRoleDefinitions(
         string tradeDirectionCode,
-        IReadOnlyList<string> transportModeCodes)
+        IReadOnlyList<string> transportModeCodes,
+        string destinationCountryCode)
     {
-        var roles = CommunityPostPartyRoleCodes.ForPlan(tradeDirectionCode, transportModeCodes);
+        var roles = CommunityPostPartyRoleCodes.ForPlan(
+            tradeDirectionCode,
+            transportModeCodes,
+            destinationCountryCode);
         return roles
             .Select(roleCode => new PartyRoleDefinition(
                 roleCode,
@@ -1121,6 +1219,8 @@ internal static class CommunityPostProfessionalParticipationProjection
                 or CommunityPostPartyRoleCodes.AirCarrier
                 or CommunityPostPartyRoleCodes.RoadCarrier
                 or CommunityPostPartyRoleCodes.RailCarrier
+                or CommunityPostPartyRoleCodes.InBondCarrier
+                or CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider
                 => CommunityPartyRoleCategoryCodes.Carrier,
             _ => CommunityPartyRoleCategoryCodes.Fulfillment
         };
@@ -1144,7 +1244,11 @@ internal static class CommunityPostProfessionalParticipationProjection
             or CommunityPostPartyRoleCodes.OceanFreightForwarder
             or CommunityPostPartyRoleCodes.AirFreightForwarder
             or CommunityPostPartyRoleCodes.RoadFreightBroker
-            or CommunityPostPartyRoleCodes.WarehouseOperator;
+            or CommunityPostPartyRoleCodes.WarehouseOperator
+            or CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator
+            or CommunityPostPartyRoleCodes.InBondCarrier
+            or CommunityPostPartyRoleCodes.DomesticFulfillmentOperator
+            or CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider;
 
     private static string? TransportModeCode(string roleCode)
         => roleCode switch
@@ -1154,6 +1258,8 @@ internal static class CommunityPostProfessionalParticipationProjection
             CommunityPostPartyRoleCodes.AirFreightForwarder or CommunityPostPartyRoleCodes.AirCarrier
                 => CommunityTransportModeCodes.Air,
             CommunityPostPartyRoleCodes.RoadFreightBroker or CommunityPostPartyRoleCodes.RoadCarrier
+                => CommunityTransportModeCodes.Road,
+            CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider
                 => CommunityTransportModeCodes.Road,
             CommunityPostPartyRoleCodes.RailCarrier => CommunityTransportModeCodes.Rail,
             CommunityPostPartyRoleCodes.MultimodalCoordinator => CommunityTransportModeCodes.Multimodal,
@@ -1182,11 +1288,38 @@ internal static class CommunityPostProfessionalParticipationProjection
                 or CommunityPostPartyRoleCodes.RailCarrier
                 => transportModeCodes.Count == 1 ? CommunityPostParticipationRoleCodes.Carrier : string.Empty,
             CommunityPostPartyRoleCodes.WarehouseOperator => CommunityPostParticipationRoleCodes.WarehouseOperator,
+            CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator
+                or CommunityPostPartyRoleCodes.DomesticFulfillmentOperator
+                => CommunityPostParticipationRoleCodes.WarehouseOperator,
+            CommunityPostPartyRoleCodes.InBondCarrier
+                or CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider
+                => CommunityPostParticipationRoleCodes.Carrier,
             _ => string.Empty
         };
         return string.IsNullOrWhiteSpace(sourceRoleCode)
             ? 0
             : Math.Max(0, interestCounts.GetValueOrDefault(sourceRoleCode));
+    }
+
+    private static string CandidateDirectoryEndpoint(string roleCode)
+    {
+        var stageCode = roleCode switch
+        {
+            CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator
+                => BondedToDoorLogisticsStageCodes.CustomsControlledStorage,
+            CommunityPostPartyRoleCodes.InBondCarrier
+                => BondedToDoorLogisticsStageCodes.InBondTransportation,
+            CommunityPostPartyRoleCodes.DomesticFulfillmentOperator
+                => BondedToDoorLogisticsStageCodes.FulfillmentWarehouseInbound,
+            CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider
+                => BondedToDoorLogisticsStageCodes
+                    .ParticipantAddressFinalMileDelivery,
+            _ => string.Empty
+        };
+
+        return string.IsNullOrWhiteSpace(stageCode)
+            ? string.Empty
+            : $"/api/v1/operations/third-party-logistics/providers/bonded-to-door?stageCode={stageCode}";
     }
 
     private static bool TradeRouteNeedsConfirmation(

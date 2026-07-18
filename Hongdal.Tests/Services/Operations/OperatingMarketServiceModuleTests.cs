@@ -31,6 +31,9 @@ public sealed class OperatingMarketServiceModuleTests
         Assert.DoesNotContain(
             services,
             descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopeService));
+        AssertDirectoryService<UnavailableThirdPartyLogisticsProviderDirectoryService>(services);
+        AssertOutreachService<
+            UnavailableThirdPartyLogisticsProviderOutreachPreparationService>(services);
     }
 
     [Fact]
@@ -55,6 +58,9 @@ public sealed class OperatingMarketServiceModuleTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopeService));
+        AssertDirectoryService<UnitedStatesThirdPartyLogisticsProviderDirectoryService>(services);
+        AssertOutreachService<
+            UnitedStatesThirdPartyLogisticsProviderOutreachPreparationService>(services);
     }
 
     [Fact]
@@ -193,6 +199,33 @@ public sealed class OperatingMarketServiceModuleTests
             descriptor => descriptor.ServiceType == typeof(IOperatingMarketDeployment));
         return Assert.IsType<OperatingMarketDeployment>(
             deploymentDescriptor.ImplementationInstance);
+    }
+
+    private static void AssertDirectoryService<TService>(IServiceCollection services)
+    {
+        Assert.Single(
+            services,
+            descriptor => descriptor.ServiceType ==
+                          typeof(IThirdPartyLogisticsProviderDirectoryService));
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        Assert.IsType<TService>(scope.ServiceProvider
+            .GetRequiredService<IThirdPartyLogisticsProviderDirectoryService>());
+    }
+
+    private static void AssertOutreachService<TService>(IServiceCollection services)
+    {
+        Assert.Single(
+            services,
+            descriptor => descriptor.ServiceType ==
+                          typeof(IThirdPartyLogisticsProviderOutreachPreparationService));
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        Assert.IsType<TService>(scope.ServiceProvider
+            .GetRequiredService<
+                IThirdPartyLogisticsProviderOutreachPreparationService>());
     }
 
     private static void AssertMarketModule<TModule, TAddressAdapter, TFreightPolicy>(
