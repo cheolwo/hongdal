@@ -1,3 +1,4 @@
+using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Localization;
 using Hongdal.Domain.Community;
 using Hongdal.Services.Community;
@@ -100,6 +101,40 @@ public sealed class CommunityPostTranslationServiceTests
         Assert.Equal(403, result.Errors[0].Metadata["StatusCode"]);
     }
 
+    [Fact]
+    public async Task GetOrCreateAsync_ExcludesEvidenceChartBlockFromExternalTranslation()
+    {
+        await using var context = CreateContext();
+        var post = CreatePost();
+        post.Body = string.Join(
+            Environment.NewLine,
+            "공동구매 수치를 함께 확인합니다.",
+            string.Empty,
+            CommunityEvidenceChartTextCodec.Encode(new CommunityEvidenceChartBlock
+            {
+                ChartTypeCode = CommunityEvidenceChartTypeCodes.Bar,
+                Title = "역할별 순편익",
+                Claim = "각 역할의 편익과 부담을 비교합니다.",
+                SeriesLabel = "순편익",
+                Unit = "KRW",
+                SourceLabel = "작성 중인 검토",
+                ReferenceDate = "2026-07-19",
+                Interpretation = "입력된 역할의 순편익이 모두 양수입니다.",
+                Limitation = "작성자 추정값이며 실제 조건을 다시 확인해야 합니다.",
+                Points = [new("구매자", 10_000m), new("공급자", 12_000m)]
+            }));
+        context.PlatformCommunityPosts.Add(post);
+        await context.SaveChangesAsync();
+        var provider = new RecordingTranslationProvider();
+        var service = CreateService(context, provider);
+
+        var result = await service.GetOrCreateAsync(post.Id, DisplayLanguageCodes.English, default);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("공동구매 수치를 함께 확인합니다.", provider.LastBody);
+        Assert.DoesNotContain(CommunityEvidenceChartTextCodec.StartMarker, provider.LastBody, StringComparison.Ordinal);
+    }
+
     private static CommunityPostTranslationService CreateService(
         HongdalContext context,
         ICommunityTextTranslationProvider provider)
@@ -139,6 +174,7 @@ public sealed class CommunityPostTranslationServiceTests
     {
         public bool IsAvailable => true;
         public int CallCount { get; private set; }
+        public string LastBody { get; private set; } = string.Empty;
 
         public Task<CommunityTextTranslationResult> TranslateAsync(
             string title,
@@ -148,6 +184,7 @@ public sealed class CommunityPostTranslationServiceTests
             CancellationToken cancellationToken)
         {
             CallCount++;
+            LastBody = body;
             return Task.FromResult(new CommunityTextTranslationResult(
                 "Translated title",
                 "Translated body",

@@ -4,6 +4,9 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 internal static class PlatformCommunityPostPresentation
 {
+    public static string ResolveVisibleBody(string? body)
+        => CommunityEvidenceChartTextCodec.StripBlocks(body);
+
     public static bool IsDiagramPost(string? category, string? body)
         => (!string.IsNullOrWhiteSpace(category)
             && category.Contains("다이어그램", StringComparison.OrdinalIgnoreCase))

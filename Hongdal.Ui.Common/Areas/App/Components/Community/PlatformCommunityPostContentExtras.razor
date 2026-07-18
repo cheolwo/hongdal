@@ -1,5 +1,10 @@
 @namespace Hongdal.Ui.Common.Areas.App.Components.Community
 
+@foreach (var evidenceChart in CommunityEvidenceChartTextCodec.DecodeAll(Post.Body))
+{
+    <CommunityEvidenceChartDisplay Model="@evidenceChart" />
+}
+
 @if (PlatformCommunityPostPresentation.IsDiagramPost(Post.Category, Post.Body))
 {
     var diagramNodes = PlatformCommunityPostPresentation.BuildDiagramPreviewNodes(Post.Body, Post.WorkflowTag);

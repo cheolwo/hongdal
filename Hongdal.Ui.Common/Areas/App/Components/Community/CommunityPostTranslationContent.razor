@@ -55,17 +55,17 @@
         {
             <MudText Typo="Typo.subtitle2">@translation.TranslatedTitle</MudText>
         }
-        @if (!string.IsNullOrWhiteSpace(translation.TranslatedBody))
+        @if (!string.IsNullOrWhiteSpace(VisibleTranslatedBody))
         {
-            <MudText Typo="Typo.body2" Class="platform-community-post-body">@translation.TranslatedBody</MudText>
+            <MudText Typo="Typo.body2" Class="platform-community-post-body">@VisibleTranslatedBody</MudText>
         }
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
             AI가 만든 참고용 번역입니다. 가격·수량·통화·HS Code 및 거래 조건은 원문을 함께 확인해 주세요.
         </MudAlert>
     }
-    else if (!string.IsNullOrWhiteSpace(Post.Body))
+    else if (!string.IsNullOrWhiteSpace(VisibleOriginalBody))
     {
-        <MudText Typo="Typo.body2" Class="platform-community-post-body">@Post.Body</MudText>
+        <MudText Typo="Typo.body2" Class="platform-community-post-body">@VisibleOriginalBody</MudText>
     }
 </MudStack>
 
@@ -83,6 +83,12 @@
     private Severity messageSeverity = Severity.Info;
 
     private bool IsTranslationVisible => translation is not null && !showOriginal;
+
+    private string VisibleOriginalBody
+        => PlatformCommunityPostPresentation.ResolveVisibleBody(Post.Body);
+
+    private string VisibleTranslatedBody
+        => PlatformCommunityPostPresentation.ResolveVisibleBody(translation?.TranslatedBody);
 
     private string TargetLanguageCode
         => CommunityDisplayLanguageCodes.Normalize(Post.OriginalLanguageCode) == CommunityDisplayLanguageCodes.English

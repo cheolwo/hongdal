@@ -76,10 +76,11 @@ public sealed class CommunityPostTranslationService : ICommunityPostTranslationS
                 StatusCodes.Status403Forbidden);
         }
 
+        var translatableBody = CommunityEvidenceChartTextCodec.StripBlocks(post.Body);
         var sourceLanguage = CommunityPostLanguageResolver.Resolve(
             post.OriginalLanguageCode,
             post.Title,
-            post.Body);
+            translatableBody);
         if (string.Equals(sourceLanguage, targetLanguage, StringComparison.OrdinalIgnoreCase))
         {
             return Result.Ok(ToOriginalResponse(post, sourceLanguage));
@@ -110,7 +111,7 @@ public sealed class CommunityPostTranslationService : ICommunityPostTranslationS
             {
                 translated = await _provider.TranslateAsync(
                     post.Title,
-                    post.Body,
+                    translatableBody,
                     sourceLanguage,
                     targetLanguage,
                     cancellationToken);
