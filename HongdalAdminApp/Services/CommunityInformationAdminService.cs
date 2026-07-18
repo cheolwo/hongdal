@@ -1,0 +1,76 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using Hongdal.Contracts.Common.Content;
+using Hongdal.Ui.Common.Areas.App.Services;
+
+namespace HongdalAdminApp.Services;
+
+public sealed class CommunityInformationAdminService : ICommunityInformationReviewClient
+{
+    private const string BasePath = "api/v1/admin/content/information";
+    private readonly HttpClient _httpClient;
+    private readonly AdminAuthSession _session;
+
+    public CommunityInformationAdminService(
+        HttpClient httpClient,
+        AdminAuthSession session)
+    {
+        _httpClient = httpClient;
+        _session = session;
+    }
+
+    public async Task<IReadOnlyList<CommunityInformationSourceDto>> GetSourcesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Get, $"{BasePath}/sources");
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IReadOnlyList<CommunityInformationSourceDto>>(
+                   cancellationToken: cancellationToken)
+               ?? [];
+    }
+
+    public async Task<CommunityInformationCollectionResponse> GetCandidatesAsync(
+        CommunityInformationCollectionQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        using var request = CreateRequest(HttpMethod.Get, BuildCandidatePath(query));
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityInformationCollectionResponse>(
+                   cancellationToken: cancellationToken)
+               ?? new CommunityInformationCollectionResponse(DateTime.UtcNow, [], [], []);
+    }
+
+    internal static string BuildCandidatePath(CommunityInformationCollectionQuery query)
+    {
+        var parameters = new List<string>();
+        Add(parameters, "sourceKey", query.SourceKey);
+        Add(parameters, "countryCode", query.CountryCode);
+        Add(parameters, "reviewState", query.ReviewState);
+        Add(parameters, "searchText", query.SearchText);
+        parameters.Add($"take={Math.Clamp(query.Take, 1, 100)}");
+        return $"{BasePath}/candidates?{string.Join("&", parameters)}";
+    }
+
+    private HttpRequestMessage CreateRequest(HttpMethod method, string path)
+    {
+        if (!_session.IsServerAdmin || string.IsNullOrWhiteSpace(_session.AccessToken))
+        {
+            throw new UnauthorizedAccessException("서버관리자 로그인이 필요합니다.");
+        }
+
+        var request = new HttpRequestMessage(method, path);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _session.AccessToken);
+        return request;
+    }
+
+    private static void Add(ICollection<string> parameters, string key, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            parameters.Add($"{key}={Uri.EscapeDataString(value.Trim())}");
+        }
+    }
+}

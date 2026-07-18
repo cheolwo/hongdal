@@ -57,6 +57,7 @@
 | `HongdalApp` | 30 | 화주, 창고 관리자, 판매자, 물류 의뢰자 | 통합 커뮤니티, 역할 전환, 운송 의뢰, 창고/입고, 꾸미기 상점 |
 | `DriverApp` | 23 | 기사 | 운행 시작, 추천, 수락/거절, 상차/하차, 정산, 알림 |
 | `HongdalAdmin` | 42 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
+| `HongdalAdminApp` | 6 | 커뮤니티 운영자 | 공통 홈, 커뮤니티 운영, 출처 자료 검토·글쓰기, 반야 선별 운영 |
 | `WarehouseManagerApp` | 13 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 알뜰살뜰 마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
@@ -181,6 +182,17 @@
 | `HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `HongdalAdmin/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P90.png" alt="HongdalAdmin-P90" width="160"> |
 | `HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `HongdalAdmin/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P91.png" alt="HongdalAdmin-P91" width="160"> |
 | `HongdalAdmin-P99 - 미발견 페이지` | `/not-found` | `HongdalAdmin/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P99.png" alt="HongdalAdmin-P99" width="160"> |
+
+## HongdalAdminApp
+
+| 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `HongdalAdminApp-P00 - 커뮤니티 운영 홈` | `/` | `HongdalAdminApp/Components/Pages/Home.razor` | 시스템 | 공통 커뮤니티 현황과 운영 진입 | - | 코드 확인 |
+| `HongdalAdminApp-P01 - 관리자 로그인` | `/login` | `HongdalAdminApp/Components/Pages/Login.razor` | 시스템 | 서버관리자 인증 | - | 코드 확인 |
+| `HongdalAdminApp-P02 - 커뮤니티 운영` | `/community-management` | `HongdalAdminApp/Components/Pages/CommunityManagement.razor` | 운영 | 커뮤니티 운영 상태와 관리 작업 | - | 코드 확인 |
+| `HongdalAdminApp-P03 - 자료 검토·글쓰기` | `/information-review` | `HongdalAdminApp/Components/Pages/CommunityInformationReview.razor` | 운영 | 수집 자료의 출처·기준 검토와 커뮤니티 글 초안 작성 | `HongdalAdminApp-P01` | 로그인 경계 확인<br><img src="../assets/changes/2026-07-18-admin-information-review/admin-information-review-mobile.png" alt="HongdalAdminApp 자료 검토 모바일 화면" width="160"> |
+| `HongdalAdminApp-P04 - 반야 운영 허브` | `/prajna` | `HongdalAdminApp/Components/Pages/PrajnaHub.razor` | 운영 | 지식·성찰 자료 선별 운영 | `HongdalAdminApp-P01` | 코드 확인 |
+| `HongdalAdminApp-P04-1 - 홍익학당 선별 운영` | `/prajna/hongik-hakdang` | `HongdalAdminApp/Components/Pages/PrajnaHongikHakdang.razor` | 운영 | 홍익학당 공개 자료 검토와 발행 | `HongdalAdminApp-P04` | 코드 확인 |
 
 ## WarehouseManagerApp
 

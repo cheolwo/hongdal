@@ -123,6 +123,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ITypecast음성카탈로그Service, Typecast음성카탈로그Service>();
         services.AddScoped<IYouTube채널감시저장소, EfYouTube채널감시저장소>();
         services.AddScoped<IYouTube채널감시Service, YouTube채널감시Service>();
+        services.AddScoped<ICommunityInformationCandidateSource, CommunityYouTubeInformationCandidateSource>();
+        services.AddScoped<ICommunityInformationCandidateSource, CommunityKamisInformationCandidateSource>();
+        services.AddScoped<ICommunityInformationCollectionService, CommunityInformationCollectionService>();
         services.AddScoped<IYouTube음식상품발견저장소, EfYouTube음식상품발견저장소>();
         services.AddScoped<IYouTube음식상품발견Service, YouTube음식상품발견Service>();
         services.AddScoped<IYouTube영상재료인지Engine, YouTube영상재료인지Engine>();

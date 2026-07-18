@@ -1,0 +1,82 @@
+namespace Hongdal.Contracts.Common.Content;
+
+public static class CommunityInformationSourceKeys
+{
+    public const string YouTubeChannelVideos = "youtube-channel-videos";
+    public const string KamisPriceObservations = "kamis-price-observations";
+}
+
+public static class CommunityInformationSourceTypes
+{
+    public const string Video = "Video";
+    public const string PublicData = "PublicData";
+}
+
+public static class CommunityInformationCollectionModes
+{
+    public const string ScheduledArchive = "ScheduledArchive";
+}
+
+public static class CommunityInformationReviewStates
+{
+    public const string Baseline = "Baseline";
+    public const string PendingReview = "PendingReview";
+    public const string Approved = "Approved";
+    public const string Excluded = "Excluded";
+    public const string OfficialObservation = "OfficialObservation";
+}
+
+public sealed record CommunityInformationSourceDto(
+    string SourceKey,
+    string SourceType,
+    string Provider,
+    string DisplayName,
+    string CollectionMode,
+    string UpdateCycle,
+    string PublicationPolicy,
+    string DocumentationUrl,
+    bool RequiresEditorialReview);
+
+public sealed record CommunityInformationCandidateDto(
+    string CandidateKey,
+    string SourceKey,
+    string SourceType,
+    string Provider,
+    string Title,
+    string Summary,
+    string OriginalUrl,
+    string? ThumbnailUrl,
+    DateTime? PublishedAtUtc,
+    DateOnly? ReferenceDate,
+    DateTime CollectedAtUtc,
+    string CountryCode,
+    string LanguageCode,
+    string? CurrencyCode,
+    string? Unit,
+    string ReviewState,
+    IReadOnlyList<string> TopicTags,
+    string SourceNotice,
+    string Limitations);
+
+public sealed class CommunityInformationCollectionQuery
+{
+    public string? SourceKey { get; init; }
+
+    public string? CountryCode { get; init; }
+
+    public string? ReviewState { get; init; }
+
+    public string? SearchText { get; init; }
+
+    public int Take { get; init; } = 50;
+}
+
+public sealed record CommunityInformationSourceFailureDto(
+    string SourceKey,
+    string Message);
+
+public sealed record CommunityInformationCollectionResponse(
+    DateTime GeneratedAtUtc,
+    IReadOnlyList<CommunityInformationSourceDto> Sources,
+    IReadOnlyList<CommunityInformationCandidateDto> Items,
+    IReadOnlyList<CommunityInformationSourceFailureDto> Failures);
