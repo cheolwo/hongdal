@@ -108,6 +108,14 @@ flowchart LR
       태극 패키지를 구매하고 전체 테마 적용 여부를 직접 선택합니다.
     </td>
   </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/assets/changes/2026-07-19-community-authoring-evidence/evidence-chart-desktop.png" alt="공동행동 근거 그래프를 확인하는 글쓰기 화면" width="100%">
+      <br>
+      <b>근거를 붙여 설득하는 글쓰기</b><br>
+      예상 단가와 참여 규모를 그래프로 비교하고, 출처·기준·한계를 확인한 뒤 공동행동 제안을 글에 넣습니다.
+    </td>
+  </tr>
 </table>
 
 ## 홈 테마 상점 화면 흐름
