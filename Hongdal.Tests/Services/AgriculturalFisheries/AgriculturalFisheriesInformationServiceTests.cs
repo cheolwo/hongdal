@@ -40,6 +40,11 @@ public sealed class AgriculturalFisheriesInformationServiceTests
         Assert.Contains(result.Capabilities, capability =>
             capability.Code == "MeatImportReadinessCollaboration" && capability.AvailableNow);
         Assert.Contains(result.Capabilities, capability =>
+            capability.Code == "UnitedStatesOperatorInformationSources"
+            && capability.AvailableNow
+            && capability.Endpoint ==
+                "GET /api/v1/agricultural-fisheries/us-operator-information-sources");
+        Assert.Contains(result.Capabilities, capability =>
             capability.Code == "FreightBrokerage" && !capability.AvailableNow);
         Assert.NotEmpty(result.BrokerageReadinessRequirements);
     }

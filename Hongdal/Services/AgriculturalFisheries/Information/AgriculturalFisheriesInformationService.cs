@@ -127,6 +127,14 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
                 },
                 new AgriculturalFisheriesCapabilityResponse
                 {
+                    Code = "UnitedStatesOperatorInformationSources",
+                    Label = "미국 농어업경영체 정보 원천",
+                    Description = "개별 기록의 비공개 경계와 인증·검사·자발적 등재·지역 허가 목적별 공개 명부를 구분해 제공합니다.",
+                    AvailableNow = true,
+                    Endpoint = "GET /api/v1/agricultural-fisheries/us-operator-information-sources"
+                },
+                new AgriculturalFisheriesCapabilityResponse
+                {
                     Code = "FreightBrokerage",
                     Label = "화물 주선·중개",
                     Description = "업계 이해와 운영 요건이 충분히 축적된 뒤 별도 모듈로 검토합니다.",
@@ -135,6 +143,7 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
             ],
             NextDataPriorities =
             [
+                "미국 농어업경영체 공개 원천 중 CSV·API 제공 명부를 개인정보 최소화 규칙과 함께 순차 연동",
                 "미국 NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결 검증",
                 "축산물 등급·도매 유통가격과 aT 가격의 역할 구분",
                 "소비자 체감가격·온라인 가격의 조사 기준과 수집 허용 범위 정리",

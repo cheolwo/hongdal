@@ -14,13 +14,16 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
 {
     private readonly IAgriculturalFisheriesInformationService _informationService;
     private readonly I미국농수산가격조회Service _usPriceService;
+    private readonly I미국농어업경영체정보원천Service _usOperatorSourceService;
 
     public AgriculturalFisheriesInformationController(
         IAgriculturalFisheriesInformationService informationService,
-        I미국농수산가격조회Service usPriceService)
+        I미국농수산가격조회Service usPriceService,
+        I미국농어업경영체정보원천Service usOperatorSourceService)
     {
         _informationService = informationService;
         _usPriceService = usPriceService;
+        _usOperatorSourceService = usOperatorSourceService;
     }
 
     [HttpGet]
@@ -107,4 +110,25 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
             _ => Ok(response)
         };
     }
+
+    [HttpGet("us-operator-information-sources")]
+    public ActionResult<미국농어업경영체정보원천조회응답> GetUsOperatorInformationSources(
+        [FromQuery] string? q = null,
+        [FromQuery] string? sectorCode = null,
+        [FromQuery] string? recordTypeCode = null,
+        [FromQuery] string? publicAccessCode = null,
+        [FromQuery] string? integrationStatusCode = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
+        => Ok(_usOperatorSourceService.Search(
+            new 미국농어업경영체정보원천조회요청
+            {
+                SearchText = q,
+                SectorCode = sectorCode,
+                RecordTypeCode = recordTypeCode,
+                PublicAccessCode = publicAccessCode,
+                IntegrationStatusCode = integrationStatusCode,
+                Page = page,
+                PageSize = pageSize
+            }));
 }

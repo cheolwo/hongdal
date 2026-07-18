@@ -57,6 +57,8 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();
         services.AddScoped<I미국농수산가격조회Service, 미국농수산가격조회Service>();
+        services.AddSingleton<I미국농어업경영체정보원천Service,
+            미국농어업경영체정보원천Service>();
         services.AddScoped<IMeatImportReadinessService, MeatImportReadinessService>();
         services.AddScoped<IFoodPriceComparisonService, FoodPriceComparisonService>();
 
