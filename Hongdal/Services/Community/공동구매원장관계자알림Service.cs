@@ -96,9 +96,6 @@ public sealed class 공동구매원장관계자알림Service : I공동구매원�
 
 public static class 공동구매원장관계자알림Policy
 {
-    private const string SourceCommunityPostIdKey = "SourceCommunityPostId";
-    private const string SourcePostIdKey = "SourcePostId";
-
     public static bool ShouldQueue(string 변경유형, 커뮤니티원장Dto 원장)
         => string.Equals(
                원장.원장템플릿Key,
@@ -144,25 +141,6 @@ public static class 공동구매원장관계자알림Policy
             .ToArray();
     }
 
-    private static IReadOnlyList<CommunityPostPartyRoleSlotResponse> ResolveInitialOpenRoleSlots(
-        커뮤니티원장Dto 원장)
-    {
-        ArgumentNullException.ThrowIfNull(원장);
-        if (!IsNotifiableProvisionalLedger(원장))
-        {
-            return [];
-        }
-
-        return CommunityPostProfessionalParticipationProjection
-            .BuildPartyFormationResponse(원장, CommunityDisplayLanguageCodes.Korean)
-            .RoleSlots
-            .Where(slot => slot.ConfirmedParticipantCount == 0)
-            .OrderByDescending(slot => slot.IsRequired)
-            .ThenByDescending(slot => slot.InterestCount)
-            .ThenBy(slot => slot.Label, StringComparer.Ordinal)
-            .ToArray();
-    }
-
     public static string BuildPayload(
         커뮤니티원장Dto 원장,
         string targetUserId,
@@ -178,13 +156,11 @@ public static class 공동구매원장관계자알림Policy
             : $"{원장.상태} · {원장.현재단계Key.Trim()}";
         var provisionalCreated = string.Equals(변경유형, "저장", StringComparison.Ordinal)
                                  && IsNotifiableProvisionalLedger(원장);
-        IReadOnlyList<CommunityPostPartyRoleSlotResponse> openRoleSlots = provisionalCreated
-            ? ResolveInitialOpenRoleSlots(원장)
-            : [];
-        var roleInterestInvitation = openRoleSlots.Count > 0;
-        var openRoleSummary = roleInterestInvitation
-            ? BuildOpenRoleSummary(openRoleSlots)
-            : string.Empty;
+        var roleInvitation = 공동구매원장빈역할알림Policy.Resolve(
+            원장,
+            provisionalCreated,
+            BuildLedgerDeepLink(ledgerId));
+        var roleInterestInvitation = roleInvitation.Enabled;
         var roleParticipantJoined = TryReadRoleParticipation(
             원장,
             out var joinedDisplayName,
@@ -192,7 +168,7 @@ public static class 공동구매원장관계자알림Policy
             out var specialistRoleJoined);
         var body = provisionalCreated
             ? roleInterestInvitation
-                ? $"{title}에 관심이 모여 비구속적 가원장이 만들어졌습니다. 현재 비어 있는 역할은 {openRoleSummary}입니다. 기존 참여자는 게시글에서 맡을 수 있는 역할을 확인하고 비구속적 참여 의향을 표시할 수 있습니다. 이 알림만으로 역할이 배정되거나 확정되지는 않습니다. 아직 주문·계약·배차·운송 주선은 확정되지 않았습니다."
+                ? roleInvitation.BuildBody(title)
                 : $"{title}에 관심이 모여 비구속적 가원장이 만들어졌습니다. 아직 주문·계약·배차·운송 주선은 확정되지 않았습니다."
             : roleParticipantJoined
                 ? specialistRoleJoined
@@ -219,12 +195,10 @@ public static class 공동구매원장관계자알림Policy
                     ? "거래 참여팀에 새 역할이 합류했습니다"
                     : "공동구매 원장이 변경되었습니다",
             body,
-            deepLink = roleInterestInvitation
-                ? BuildRoleParticipationDeepLink(원장, ledgerId)
-                : BuildLedgerDeepLink(ledgerId),
+            deepLink = roleInvitation.DeepLink,
             roleInterestInvitation,
-            openRoleSlotCount = openRoleSlots.Count,
-            openRoleSlots = openRoleSlots.Select(slot => new
+            openRoleSlotCount = roleInvitation.OpenRoleSlots.Count,
+            openRoleSlots = roleInvitation.OpenRoleSlots.Select(slot => new
             {
                 roleCode = slot.RoleCode,
                 label = slot.Label,
@@ -237,48 +211,6 @@ public static class 공동구매원장관계자알림Policy
             platformDoesNotAssignWork = true,
             channels = new[] { "Push" }
         });
-    }
-
-    private static string BuildOpenRoleSummary(
-        IReadOnlyList<CommunityPostPartyRoleSlotResponse> openRoleSlots)
-    {
-        const int visibleRoleCount = 3;
-        var labels = openRoleSlots
-            .Take(visibleRoleCount)
-            .Select(slot => slot.Label)
-            .ToArray();
-        var remainingCount = openRoleSlots.Count - labels.Length;
-        return remainingCount > 0
-            ? $"{string.Join(", ", labels)} 외 {remainingCount}개"
-            : string.Join(", ", labels);
-    }
-
-    private static string BuildRoleParticipationDeepLink(커뮤니티원장Dto 원장, string ledgerId)
-    {
-        if (원장.외부참조.TryGetValue(SourceCommunityPostIdKey, out var externalSourcePostId)
-            && TryBuildCommunityPostDeepLink(externalSourcePostId, out var externalDeepLink))
-        {
-            return externalDeepLink;
-        }
-
-        var blockSourcePostId = 원장.블록목록
-            .Select(block => block.Data.GetValueOrDefault(SourcePostIdKey))
-            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
-        return TryBuildCommunityPostDeepLink(blockSourcePostId, out var blockDeepLink)
-            ? blockDeepLink
-            : BuildLedgerDeepLink(ledgerId);
-    }
-
-    private static bool TryBuildCommunityPostDeepLink(string? value, out string deepLink)
-    {
-        if (long.TryParse(value, out var postId) && postId > 0)
-        {
-            deepLink = $"/community/posts/{postId}";
-            return true;
-        }
-
-        deepLink = string.Empty;
-        return false;
     }
 
     private static string BuildLedgerDeepLink(string ledgerId)
