@@ -1,0 +1,10 @@
+namespace Hongdal.Ui.Common.Areas.App.ViewModels;
+
+public enum CommunityAuthoringTool
+{
+    CollectedSources,
+    YouTubeSocialResearch,
+    Diagram,
+    MutualBenefit,
+    EvidenceChart
+}
