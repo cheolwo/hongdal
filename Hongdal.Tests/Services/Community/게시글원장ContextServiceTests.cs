@@ -353,6 +353,7 @@ public sealed class 게시글원장ContextServiceTests
         var node = Assert.Single(Assert.IsType<DiagramSnapshotDto>(saved.다이어그램스냅샷).Nodes);
         Assert.Null(node.Description);
         Assert.Empty(node.Data);
+        Assert.Empty(node.OrganizationReferences);
         Assert.Equal(source.원장Id, saved.외부참조["재사용출처원장Id"]);
     }
 
@@ -555,6 +556,17 @@ public sealed class 게시글원장ContextServiceTests
                         Kind = "transport",
                         Title = "상차",
                         Description = "비공개 연락처가 들어 있는 설명",
+                        OrganizationReferences =
+                        [
+                            new DiagramOrganizationReferenceDto
+                            {
+                                ReferenceId = "private-provider-reference",
+                                OrganizationKey = "private-provider",
+                                DisplayName = "비공개 물류 후보",
+                                RoleLabel = "운송 후보",
+                                CountryCode = "KR"
+                            }
+                        ],
                         Data = new Dictionary<string, string> { ["phone"] = "010-0000-0000" }
                     }
                 ]

@@ -136,6 +136,10 @@
                                             <MudIcon Icon="@ResolveNodeIcon(nodeLayout.Node)" Size="Size.Small" />
                                         </span>
                                         @ResolveNodeTypeLabel(nodeLayout.Node)
+                                        @if (nodeLayout.Node.OrganizationReferences?.Count > 0)
+                                        {
+                                            <span class="ledger-diagram-detail__node-organization-count">@($"업체 {nodeLayout.Node.OrganizationReferences.Count}")</span>
+                                        }
                                     </span>
                                     <strong>@nodeLayout.Node.Title</strong>
                                     @if (!string.IsNullOrWhiteSpace(BuildAssigneeSummary(nodeLayout.Node.NodeId)))
@@ -163,6 +167,10 @@
                                     <span class="ledger-diagram-detail__mobile-type">
                                         <MudIcon Icon="@ResolveNodeIcon(node)" Size="Size.Small" />
                                         @ResolveNodeTypeLabel(node)
+                                        @if (node.OrganizationReferences?.Count > 0)
+                                        {
+                                            <span class="ledger-diagram-detail__node-organization-count">@($"업체 {node.OrganizationReferences.Count}")</span>
+                                        }
                                     </span>
                                     <strong>@node.Title</strong>
                                     @if (!string.IsNullOrWhiteSpace(BuildAssigneeSummary(node.NodeId)))
@@ -259,6 +267,49 @@
                                                                      BlockId="@SelectedNode.NodeId"
                                                                      Saved="RequestRefreshAsync" />
                             }
+                        }
+
+                        @if (SelectedNode.OrganizationReferences is { Count: > 0 } organizationReferences)
+                        {
+                            <section class="ledger-diagram-detail__organizations" aria-label="연결 업체 후보">
+                                <div class="ledger-diagram-detail__organizations-heading">
+                                    <strong>연결 업체·기관</strong>
+                                    <span>@($"{organizationReferences.Count:N0}곳")</span>
+                                </div>
+                                @foreach (var organization in organizationReferences)
+                                {
+                                    var websiteUrl = ResolveExternalHttpUrl(organization.OfficialWebsiteUrl);
+                                    var sourceUrl = ResolveExternalHttpUrl(organization.SourceReferenceUrl);
+                                    <article>
+                                        <div>
+                                            <strong>@organization.DisplayName</strong>
+                                            <span>@organization.RoleLabel · @organization.CountryCode</span>
+                                        </div>
+                                        <MudChipSet T="string" ReadOnly="true">
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">
+                                                @ResolveOrganizationRelationshipLabel(organization)
+                                            </MudChip>
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">
+                                                @ResolveOrganizationVerificationLabel(organization)
+                                            </MudChip>
+                                        </MudChipSet>
+                                        @if (websiteUrl is not null || sourceUrl is not null)
+                                        {
+                                            <div class="ledger-diagram-detail__organization-links">
+                                                @if (websiteUrl is not null)
+                                                {
+                                                    <a href="@websiteUrl" target="_blank" rel="noopener noreferrer">공식 사이트</a>
+                                                }
+                                                @if (sourceUrl is not null && !string.Equals(sourceUrl, websiteUrl, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <a href="@sourceUrl" target="_blank" rel="noopener noreferrer">조사 출처</a>
+                                                }
+                                            </div>
+                                        }
+                                    </article>
+                                }
+                                <small>연결 정보는 조사 후보이며 선정·계약·면허 확인을 대신하지 않습니다.</small>
+                            </section>
                         }
 
                         @if (SelectedBlock is { 항목.Count: > 0 } block)
@@ -493,6 +544,29 @@
             : context.상세조회가능여부
                 ? "참여자 상세"
                 : "공개 항목";
+
+    private static string ResolveOrganizationRelationshipLabel(
+        DiagramOrganizationReferenceDto organization)
+        => organization.IsPlatformPartner
+            ? "플랫폼 제휴"
+            : "플랫폼 제휴 없음";
+
+    private static string ResolveOrganizationVerificationLabel(
+        DiagramOrganizationReferenceDto organization)
+        => organization.CanBeSelectedForOperations
+            ? "업무 선택 가능"
+            : string.Equals(
+                organization.CompanySourceVerificationStatusCode,
+                DiagramOrganizationVerificationStatusCodes.PublicSourceReviewed,
+                StringComparison.OrdinalIgnoreCase)
+                ? "공개 출처 확인"
+                : "별도 검증 필요";
+
+    private static string? ResolveExternalHttpUrl(string? value)
+        => Uri.TryCreate(value, UriKind.Absolute, out var uri)
+           && uri.Scheme is "http" or "https"
+            ? uri.AbsoluteUri
+            : null;
 
     protected override void OnInitialized()
     {
