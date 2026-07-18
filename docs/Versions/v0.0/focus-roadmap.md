@@ -8,6 +8,8 @@
 
 > 사용자가 필요한 일과 가능한 일을 공개하고, 직접 상대를 찾아 선택하며, 상호 동의로 연락하고, 합의한 진행 과정을 공동 원장으로 기록하는 커뮤니티를 완성합니다.
 
+이 목표는 [이웃에서 시작하는 공동행동 개발 철학](../../Architecture/NeighborCenteredDevelopmentPhilosophy.md)에 따라, 가까운 필요를 자발적으로 돌보고 자신이 감당할 약속에서 시작한 신뢰를 더 넓은 공동체로 확장하는 순서로 구현합니다.
+
 ```mermaid
 flowchart LR
     A["필요한 일·가능한 일 게시"] --> B["사용자 직접 검색·선택"]
@@ -167,7 +169,8 @@ HongdalMartV35=false
 2. 사용자의 직접 게시·검색·선택·연락 동의 흐름을 완성하는가?
 3. 국내 공동구매 대표 시나리오를 실제 영속 데이터로 연결하는가?
 4. 개인정보, 신뢰 또는 운영 안전성을 높이는가?
-5. 위 네 가지가 아니면 현재 백로그로 보냅니다.
+5. 이익과 효율뿐 아니라 참여자의 노동, 위험, 철회 가능성과 영향을 함께 드러내는가?
+6. 위 다섯 가지가 아니면 현재 백로그로 보냅니다.
 
 작업 묶음은 가능한 한 다음 크기로 유지합니다.
 
@@ -185,4 +188,5 @@ HongdalMartV35=false
 - [0.0 마이그레이션 기록](./migration-notes.md)
 - [릴리즈 게이트](../release-gates.md)
 - [기능 플래그 정책](../feature-flags.md)
+- [이웃에서 시작하는 공동행동 개발 철학](../../Architecture/NeighborCenteredDevelopmentPhilosophy.md)
 - [커뮤니티 0.0 기반 제품 원칙](../../Architecture/CommunityFoundationV0Policy.md)

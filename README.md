@@ -4,6 +4,8 @@ Hongdal은 평범한 게시글에서 시작해 사람들이 마음을 모으고,
 
 플랫폼의 역할은 거래 당사자나 화물 운송 주선자가 되는 것이 아닙니다. 필요한 사람·정보·진행 상태를 알아보기 쉽게 드러내고, 당사자들이 직접 합의한 과정을 공동 원장과 다이어그램으로 기록하도록 돕는 촉매이자 도구를 지향합니다.
 
+개발 철학은 가까운 이웃의 필요를 먼저 알아보고, 자신이 감당할 약속에서 시작한 신뢰를 더 넓은 공동체로 확장하는 것입니다. 예수의 이웃 사랑과 『대학』의 수신·제가·치국에서 이 실천 방향을 참고하되, 특정 종교나 문화에 참여를 한정하지 않습니다. 자세한 판단 기준은 [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md)에 정리합니다.
+
 제품 릴리즈 순서는 **커뮤니티 기반 0.0 → 국내 화물/용달 1.0 → 이후 실행 모듈**입니다. 0.0은 대화, 참여 동의, 공동 원장, 신고·숙고와 신뢰 기록을 운송 기능 없이도 독립적으로 완성하고, 1.0은 그 위에 올라가는 첫 업무 모듈입니다.
 
 현재는 정보 공개형 커뮤니티 `0.0`만 개발 집중 대상으로 봅니다. 구체적인 작업 순서와 보류 경계는 [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 기준으로 판단합니다.
@@ -232,6 +234,7 @@ flowchart LR
 | [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서와 기술 문서를 보는 순서 |
 | [Hongdal 0.0](docs/Versions/v0.0/README.md) | 글쓰기부터 가원장·역할 참여·완료 사례까지의 현재 제품 범위 |
 | [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md) | 정보 공개형 커뮤니티의 현재 우선순위와 후속 기능 보류 경계 |
+| [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md) | 이웃 사랑과 수신·제가·치국을 제품·코드 판단으로 옮기는 기준 |
 | [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md) | 커뮤니티 선행 기반과 실운영 배차·주선 경계 |
 | [커뮤니티 운영 정책](docs/Architecture/CommunityOperatingPolicy.md) | 원함, 원장, 참여자, 경험치, 유틸리티 정책 |
 | [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md) | 원장, 블록, OS, 엔진, API 책임 경계 |
