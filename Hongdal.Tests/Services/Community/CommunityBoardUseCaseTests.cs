@@ -128,6 +128,11 @@ public sealed class CommunityBoardUseCaseTests
             CommunityBoardCatalog.InformationPrices.DisplayName,
             null,
             CancellationToken.None));
+        Assert.True(await policy.CanWriteAsync(
+            "platform",
+            CommunityBoardCatalog.Vow.DisplayName,
+            null,
+            CancellationToken.None));
         Assert.False(await policy.CanWriteAsync(
             "platform",
             CommunityBoardCatalog.Cargo.DisplayName,

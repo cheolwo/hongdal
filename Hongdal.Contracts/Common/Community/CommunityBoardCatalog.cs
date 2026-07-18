@@ -41,6 +41,7 @@ public sealed class CommunityBoardSummaryResponse
 public static class CommunityBoardKeys
 {
     public const string NoticeGuide = "notice-guide";
+    public const string Vow = "vow";
     public const string FreeLife = "free-life";
     public const string QuestionHelp = "question-help";
     public const string InformationPrices = "information-prices";
@@ -86,6 +87,7 @@ public static class CommunityAnonymousNicknameCatalog
     public static string ResolveBaseName(string? category)
         => CommunityBoardCatalog.Find(category)?.Key switch
         {
+            CommunityBoardKeys.Vow => "서원 적는 이웃",
             CommunityBoardKeys.FreeLife => "지나가는 이웃",
             CommunityBoardKeys.QuestionHelp => "궁금한 이웃",
             CommunityBoardKeys.InformationPrices => "시세 살피는 이웃",
@@ -135,6 +137,17 @@ public static class CommunityBoardCatalog
         postingAccessCode: CommunityBoardPostingAccessCodes.OperatorOnly,
         "공지",
         "이용안내");
+
+    public static CommunityBoardDefinition Vow { get; } = Board(
+        CommunityBoardKeys.Vow,
+        "서원",
+        "이루고 싶은 일과 함께 알아차릴 사람·업체를 가볍게 적고 마음을 모으는 공간",
+        CommunityBoardGroupCodes.PeopleAndInformation,
+        "사람과 정보",
+        isUserCreatable: true,
+        isPublic: true,
+        postingAccessCode: CommunityBoardPostingAccessCodes.Anonymous,
+        "발원");
 
     public static CommunityBoardDefinition FreeLife { get; } = Board(
         CommunityBoardKeys.FreeLife,
@@ -278,6 +291,7 @@ public static class CommunityBoardCatalog
 
     public static IReadOnlyList<CommunityBoardDefinition> All { get; } =
     [
+        Vow,
         FreeLife,
         QuestionHelp,
         InformationPrices,

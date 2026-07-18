@@ -7,6 +7,7 @@ public sealed class CommunityBoardCatalogTests
     [Fact]
     public void 공개게시판은_글목적별로구성하고_신고분쟁은제외한다()
     {
+        Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Vow);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.InformationPrices);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.Participation);
         Assert.Contains(CommunityBoardCatalog.PublicBoards, board => board.Key == CommunityBoardKeys.CompletionReview);
@@ -38,6 +39,7 @@ public sealed class CommunityBoardCatalogTests
         Assert.Equal(
             CommunityBoardPostingAccessCodes.Anonymous,
             CommunityBoardCatalog.FreeLife.PostingAccessCode);
+        Assert.True(CommunityBoardCatalog.Vow.AllowsAnonymousPosting);
         Assert.True(CommunityBoardCatalog.Food.AllowsAnonymousPosting);
         Assert.True(CommunityBoardCatalog.SafetyReport.AllowsAnonymousPosting);
 
@@ -57,6 +59,7 @@ public sealed class CommunityBoardCatalogTests
     }
 
     [Theory]
+    [InlineData(CommunityBoardKeys.Vow, "서원 적는 이웃-A1B2")]
     [InlineData(CommunityBoardKeys.FreeLife, "지나가는 이웃-A1B2")]
     [InlineData(CommunityBoardKeys.QuestionHelp, "궁금한 이웃-A1B2")]
     [InlineData(CommunityBoardKeys.InformationPrices, "시세 살피는 이웃-A1B2")]
@@ -68,6 +71,7 @@ public sealed class CommunityBoardCatalogTests
     }
 
     [Theory]
+    [InlineData("발원", CommunityBoardKeys.Vow)]
     [InlineData("업무 질문", CommunityBoardKeys.QuestionHelp)]
     [InlineData("운송 실무", CommunityBoardKeys.QuestionHelp)]
     [InlineData("공동구매", CommunityBoardKeys.Participation)]
