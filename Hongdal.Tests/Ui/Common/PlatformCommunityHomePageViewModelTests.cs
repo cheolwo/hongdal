@@ -23,6 +23,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
         var foodDiscovery = new YouTubeFoodCommunityDiscoveryViewModel(
             new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!));
         var diagramWorkspace = new PlatformCommunityDiagramWorkspaceViewModel();
+        var evidenceChart = new CommunityAuthoringEvidenceChartViewModel();
         using var services = new ServiceCollection().BuildServiceProvider();
         var warehouseProxy = new PlatformCommunityWarehouseProxyViewModel(services);
         using var page = new PlatformCommunityHomePageViewModel(
@@ -34,6 +35,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
             ledgerPicker,
             foodDiscovery,
             diagramWorkspace,
+            evidenceChart,
             warehouseProxy);
 
         Assert.Same(composer, page.Composer);
@@ -44,8 +46,62 @@ public sealed class PlatformCommunityHomePageViewModelTests
         Assert.Same(ledgerPicker, page.LedgerPicker);
         Assert.Same(foodDiscovery, page.FoodDiscovery);
         Assert.Same(diagramWorkspace, page.DiagramWorkspace);
+        Assert.Same(evidenceChart, page.EvidenceChart);
         Assert.Same(warehouseProxy, page.WarehouseProxy);
         Assert.Same(engagement.Journeys, page.ActionJourneys);
+    }
+
+    [Fact]
+    public void 홈PageViewModel은_글쓰기근거그래프를_초안에적용하고다시불러온다()
+    {
+        var service = CreateService();
+        using var services = new ServiceCollection().BuildServiceProvider();
+        using var page = new PlatformCommunityHomePageViewModel(
+            new CommunityPostComposerViewModel(service, new EmptyDraftStore()),
+            new CommunityPostListPageViewModel(service),
+            new PlatformCommunityHomeShellViewModel(),
+            new PlatformCommunityBoardWorkspaceViewModel(service),
+            new PlatformCommunityPostEngagementViewModel(service),
+            new PlatformCommunityLedgerPickerViewModel(service),
+            new YouTubeFoodCommunityDiscoveryViewModel(
+                new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!)),
+            new PlatformCommunityDiagramWorkspaceViewModel(),
+            new CommunityAuthoringEvidenceChartViewModel(),
+            new PlatformCommunityWarehouseProxyViewModel(services));
+
+        page.Composer.Draft.Title = "함께 주문하면 배송비를 줄일 수 있을까";
+        page.OpenEvidenceChartTool();
+        var evidence = page.EvidenceChart;
+        evidence.Title = "주문 수량별 1인 배송비";
+        evidence.Claim = "주문 수량이 늘면 1인당 배송비가 낮아질 가능성이 있습니다.";
+        evidence.SeriesLabel = "1인당 배송비";
+        evidence.Unit = "USD/person";
+        evidence.SourceLabel = "작성자 시뮬레이션";
+        evidence.ReferenceDate = "2026-07-19";
+        evidence.Interpretation = "20명이 함께 주문하는 가정에서 1인당 배송비가 낮게 계산됩니다.";
+        evidence.Limitation = "관세, 지역별 최종 배송비와 실제 견적은 포함하지 않은 비교입니다.";
+        evidence.Points[0].Label = "개별 주문";
+        evidence.Points[0].Value = 18m;
+        evidence.Points[1].Label = "20명 공동 주문";
+        evidence.Points[1].Value = 7m;
+
+        Assert.True(evidence.Evaluate());
+        Assert.True(page.ApplyEvidenceChartToDraft());
+        Assert.False(page.IsEvidenceChartToolOpen);
+        Assert.Single(CommunityEvidenceChartTextCodec.DecodeAll(page.Composer.Draft.Body));
+
+        page.OpenEvidenceChartTool();
+
+        Assert.True(page.IsEvidenceChartToolOpen);
+        Assert.Equal("주문 수량별 1인 배송비", page.EvidenceChart.Title);
+        Assert.Equal(7m, page.EvidenceChart.Points[1].Value);
+
+        page.EvidenceChart.Points[1].Value = 6m;
+        Assert.True(page.EvidenceChart.Evaluate());
+        Assert.True(page.ApplyEvidenceChartToDraft());
+        var updated = Assert.Single(
+            CommunityEvidenceChartTextCodec.DecodeAll(page.Composer.Draft.Body));
+        Assert.Equal(6m, updated.Points[1].Value);
     }
 
     [Fact]

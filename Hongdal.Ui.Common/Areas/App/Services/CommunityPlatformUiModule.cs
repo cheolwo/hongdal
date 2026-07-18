@@ -11,11 +11,13 @@ internal static class CommunityPlatformUiModule
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddScoped<PlatformCommunityService>();
+        services.TryAddScoped<IDiagramOrganizationDirectoryClient, DiagramOrganizationDirectoryClient>();
         services.TryAddScoped<YouTubeFoodCommunityDiscoveryService>();
         services.TryAddScoped<ICommunityDynamicDiscoveryClient, CommunityDynamicDiscoveryClient>();
         services.TryAddScoped<ICommunityPostComposerDraftStore, BrowserCommunityPostComposerDraftStore>();
         services.TryAddScoped<ICommunityDecorationSelectionStore, BrowserCommunityDecorationSelectionStore>();
         services.TryAddTransient<CommunityPostComposerViewModel>();
+        services.TryAddTransient<CommunityScheduledPostListViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();
         services.TryAddTransient<PlatformCommunityHomeShellViewModel>();
         services.TryAddTransient<PlatformCommunityBoardWorkspaceViewModel>();
@@ -26,6 +28,11 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<CommunityDynamicDiscoveryViewModel>();
         services.TryAddTransient<CommunityDynamicTopicDirectoryViewModel>();
         services.TryAddTransient<CommunityDynamicTopicFeedViewModel>();
+        services.TryAddTransient<CommunityAuthoringDiagramViewModel>();
+        services.TryAddTransient<CommunityAuthoringMutualBenefitViewModel>();
+        services.TryAddTransient<CommunityAuthoringEvidenceChartViewModel>();
+        services.TryAddTransient<CommunityOperatorWritingPersonaViewModel>();
+        services.TryAddTransient<CommunityVowVersionViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramChatViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramCanvasViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();

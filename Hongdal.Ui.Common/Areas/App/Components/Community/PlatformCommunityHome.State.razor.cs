@@ -68,6 +68,7 @@ private string boardIndexSearchText = string.Empty;
         new(DiagramLayerApi, "API", "노드에서 호출 가능한 처리 표면과 기존 API 경로입니다.", 70, 35, Icons.Material.Filled.OpenInNew, Color.Info, true)
     ];
     private CommunityPostComposerViewModel Composer => ViewModel.Composer;
+    private CommunityAuthoringEvidenceChartViewModel EvidenceChart => ViewModel.EvidenceChart;
     private YouTubeFoodCommunityDiscoveryViewModel FoodDiscovery => ViewModel.FoodDiscovery;
     private IReadOnlyList<PlatformCommunityPostResponse> posts => ViewModel.PostList.Items;
     private List<IBrowserFile> selectedFiles => Composer.SelectedFiles;
@@ -245,7 +246,14 @@ private string boardIndexSearchText = string.Empty;
     private bool isComposeOpen
     {
         get => Composer.IsOpen;
-        set => Composer.IsOpen = value;
+        set
+        {
+            Composer.IsOpen = value;
+            if (!value)
+            {
+                ViewModel.CloseEvidenceChartTool();
+            }
+        }
     }
 
     private bool isBaguaNavigatorOpen

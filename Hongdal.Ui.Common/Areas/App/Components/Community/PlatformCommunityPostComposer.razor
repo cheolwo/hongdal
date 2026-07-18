@@ -46,7 +46,7 @@
                                Disabled="@ViewModel.IsSaving"
                                OnClick="SaveAsync"
                                Class="platform-community-compose-publish-action">
-                        @(ViewModel.IsSaving ? "저장 중" : ViewModel.EditingPostId is null ? "등록" : "수정")
+                        @PublishActionText
                     </MudButton>
                 </div>
             </header>
@@ -235,6 +235,42 @@
                                    OnClick="LedgerPickerRequested"
                                    aria-label="원장 첨부" />
                 </MudTooltip>
+                @if (ResearchToolsRequested.HasDelegate)
+                {
+                    <MudTooltip Text="자료 찾기">
+                        <MudIconButton Icon="@Icons.Material.Filled.TravelExplore"
+                                       Color="Color.Default"
+                                       OnClick="ResearchToolsRequested"
+                                       aria-label="자료 찾기" />
+                    </MudTooltip>
+                }
+                @if (DiagramToolsRequested.HasDelegate)
+                {
+                    <MudTooltip Text="다이어그램 작성">
+                        <MudIconButton Icon="@Icons.Material.Filled.Hub"
+                                       Color="Color.Default"
+                                       OnClick="DiagramToolsRequested"
+                                       aria-label="다이어그램 작성" />
+                    </MudTooltip>
+                }
+                @if (EvidenceToolsRequested.HasDelegate)
+                {
+                    <MudTooltip Text="근거 그래프 작성">
+                        <MudIconButton Icon="@Icons.Material.Filled.InsertChart"
+                                       Color="Color.Default"
+                                       OnClick="EvidenceToolsRequested"
+                                       aria-label="근거 그래프 작성" />
+                    </MudTooltip>
+                }
+                @if (MutualBenefitToolsRequested.HasDelegate)
+                {
+                    <MudTooltip Text="상호 이익 검토">
+                        <MudIconButton Icon="@Icons.Material.Filled.Handshake"
+                                       Color="Color.Default"
+                                       OnClick="MutualBenefitToolsRequested"
+                                       aria-label="상호 이익 검토" />
+                    </MudTooltip>
+                }
                 <MudTooltip Text="활동 국가와 역할 설정">
                     <MudIconButton Icon="@Icons.Material.Filled.Public"
                                    Color="Color.Default"
@@ -273,11 +309,25 @@
             {
                 <span class="platform-community-compose-context--report">신고·분쟁</span>
             }
+            @if (ViewModel.IsScheduledPublication && ViewModel.ScheduledPublishAtUtc is DateTime scheduledAtUtc)
+            {
+                <span class="platform-community-compose-context--schedule">
+                    <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" />
+                    @scheduledAtUtc.ToLocalTime().ToString("MM-dd HH:mm") 예약
+                </span>
+            }
             @if (ViewModel.LocalDraftSavedAtUtc is DateTime savedAtUtc)
             {
                 <small>@($"임시저장 {savedAtUtc.ToLocalTime():HH:mm}")</small>
             }
         </div>
+
+        @if (AuthoringToolVisible && AuthoringTool is not null)
+        {
+            <aside class="platform-community-compose-authoring-tool" aria-label="글쓰기 보조 도구">
+                @AuthoringTool
+            </aside>
+        }
 
         @if (ViewModel.IsSettingsOpen)
         {
@@ -320,6 +370,35 @@
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense" />
                 </div>
+
+                @if (ViewModel.AllowScheduledPublication && ViewModel.EditingPostId is null)
+                {
+                    <div class="platform-community-compose-schedule">
+                        <MudSwitch T="bool"
+                                   @bind-Value="ViewModel.IsScheduledPublication"
+                                   Color="Color.Primary"
+                                   Label="예약 발행" />
+                        @if (ViewModel.IsScheduledPublication)
+                        {
+                            <div class="platform-community-compose-schedule-fields">
+                                <MudDatePicker Label="발행 날짜"
+                                               @bind-Date="ViewModel.ScheduledPublishDateLocal"
+                                               MinDate="@DateTime.Today"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense" />
+                                <MudTimePicker Label="발행 시간"
+                                               @bind-Time="ViewModel.ScheduledPublishTimeLocal"
+                                               AmPm="false"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense" />
+                            </div>
+                            <small>
+                                <MudIcon Icon="@Icons.Material.Filled.Public" Size="Size.Small" />
+                                @ViewModel.LocalTimeZoneDisplayName 기준입니다. 저장 후 서버가 해당 시각에 공개합니다.
+                            </small>
+                        }
+                    </div>
+                }
 
                 <div class="platform-community-compose-settings-grid">
                     <MudSelect T="string"
@@ -461,7 +540,25 @@
     public RenderFragment? LedgerSettings { get; set; }
 
     [Parameter]
+    public RenderFragment? AuthoringTool { get; set; }
+
+    [Parameter]
+    public bool AuthoringToolVisible { get; set; }
+
+    [Parameter]
     public EventCallback LedgerPickerRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ResearchToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback DiagramToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback EvidenceToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback MutualBenefitToolsRequested { get; set; }
 
     [Parameter]
     public EventCallback Closed { get; set; }
@@ -475,6 +572,15 @@
     private string ComposeCardClass => ViewModel.IsOpen
         ? "pa-4 platform-community-compose-card platform-community-compose-card--open"
         : "pa-4 platform-community-compose-card";
+
+    private string PublishActionText
+        => ViewModel.IsSaving
+            ? "저장 중"
+            : ViewModel.EditingPostId is not null
+                ? "수정"
+                : ViewModel.IsScheduledPublication
+                    ? "예약"
+                    : "등록";
 
     private string? VisibleStatusMessage
         => ViewModel.StatusMessage ?? ExternalStatusMessage;

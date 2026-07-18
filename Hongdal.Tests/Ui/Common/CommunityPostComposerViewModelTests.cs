@@ -81,6 +81,26 @@ public sealed class CommunityPostComposerViewModelTests
     }
 
     [Fact]
+    public void 운영자글쓰기는_로컬날짜와시간으로_예약발행시각을준비한다()
+    {
+        using var composer = CreateComposer(new InMemoryDraftStore());
+        composer.Configure("platform", "운영자 정보 공유", allowScheduledPublication: true);
+
+        composer.IsScheduledPublication = true;
+
+        Assert.True(composer.AllowScheduledPublication);
+        Assert.NotNull(composer.ScheduledPublishDateLocal);
+        Assert.NotNull(composer.ScheduledPublishTimeLocal);
+        Assert.True(composer.ScheduledPublishAtUtc > DateTime.UtcNow.AddMinutes(1));
+
+        composer.Reset();
+
+        Assert.False(composer.IsScheduledPublication);
+        Assert.Null(composer.ScheduledPublishDateLocal);
+        Assert.Null(composer.ScheduledPublishTimeLocal);
+    }
+
+    [Fact]
     public void 판매글은_본문없이도_상품수량가격결제정보로_요청을만든다()
     {
         var draft = new CommunityPostComposerDraftViewModel

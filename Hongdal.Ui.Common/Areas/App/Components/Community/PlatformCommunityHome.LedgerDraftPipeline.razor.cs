@@ -142,6 +142,7 @@ public partial class PlatformCommunityHome
                 X = node.X,
                 Y = node.Y,
                 RelatedRoute = node.RelatedRoute,
+                OrganizationReferences = node.OrganizationReferences,
                 Data = node.Data
             });
         }

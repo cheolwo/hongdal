@@ -114,6 +114,7 @@ public partial class PlatformCommunityHome
     {
         statusSeverity = Severity.Success;
         statusMessage = result.Message;
+        ViewModel.ResetEvidenceChartTool();
         await LoadPostsAsync();
     }
 
@@ -188,6 +189,7 @@ public partial class PlatformCommunityHome
     private void ResetForm()
     {
         Composer.Reset();
+        ViewModel.ResetEvidenceChartTool();
         isLedgerDetailOpen = false;
         isLedgerPickerOpen = false;
         pendingLedgerId = null;

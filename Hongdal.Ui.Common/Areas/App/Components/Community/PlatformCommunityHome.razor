@@ -563,6 +563,8 @@
                                                        ExternalStatusMessage="@statusMessage"
                                                        ExternalStatusSeverity="@statusSeverity"
                                                        LedgerPickerRequested="OpenLedgerPickerAsync"
+                                                       EvidenceToolsRequested="OpenEvidenceChartTool"
+                                                       AuthoringToolVisible="@ViewModel.IsEvidenceChartToolOpen"
                                                        Closed="CloseCompose"
                                                        CancelEditRequested="CancelEdit"
                                                        Saved="HandleComposerSavedAsync">
@@ -578,6 +580,14 @@
                                                                       CloseSharingSettingsRequested="CloseLedgerSharingSettings"
                                                                       SaveSharingSettingsRequested="SaveLedgerSharingSettingsAsync" />
                         </LedgerSettings>
+                        <AuthoringTool>
+                            @if (ViewModel.IsEvidenceChartToolOpen)
+                            {
+                                <CommunityAuthoringEvidenceChartTool ViewModel="@EvidenceChart"
+                                                                      CloseRequested="CloseEvidenceChartTool"
+                                                                      ApplyToDraftRequested="ApplyEvidenceChartToDraft" />
+                            }
+                        </AuthoringTool>
                     </PlatformCommunityPostComposer>
 
                     <PlatformCommunitySupportPanels QuickActions="@QuickActions"
