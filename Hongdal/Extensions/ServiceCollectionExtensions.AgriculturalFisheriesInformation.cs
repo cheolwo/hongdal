@@ -31,6 +31,17 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient<I미국농수산가격공급자>(serviceProvider =>
             serviceProvider.GetRequiredService<UsdaNassQuickStats가격공급자>());
         services
+            .AddHttpClient<AbsConsumerPriceIndex식품가격공급자>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.AbsConsumerPriceIndex.BaseUrl);
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<I호주농수산식품가격공급자>(serviceProvider =>
+            serviceProvider.GetRequiredService<AbsConsumerPriceIndex식품가격공급자>());
+        services
             .AddHttpClient<UsdaNassPriceArchiveService>(
                 (serviceProvider, client) =>
                 {
@@ -57,6 +68,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();
         services.AddScoped<I미국농수산가격조회Service, 미국농수산가격조회Service>();
+        services.AddScoped<I호주농수산식품가격조회Service, 호주농수산식품가격조회Service>();
         services.AddSingleton<I미국농어업경영체정보원천Service,
             미국농어업경영체정보원천Service>();
         services.AddScoped<IMeatImportReadinessService, MeatImportReadinessService>();

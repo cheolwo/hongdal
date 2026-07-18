@@ -28,6 +28,7 @@ public sealed class AgriculturalFisheriesInformationServiceTests
         Assert.False(result.AllowsTransactionExecution);
         Assert.False(result.IsBrokerageEnabled);
         Assert.Contains("US", result.SupportedMarketCodes);
+        Assert.Contains("AU", result.SupportedMarketCodes);
         Assert.Contains("주선", result.BrokerageBoundaryNote, StringComparison.Ordinal);
         Assert.Contains(result.DataSources, source =>
             source.Key == "at-daily-wholesale-retail-food-price"
@@ -37,6 +38,14 @@ public sealed class AgriculturalFisheriesInformationServiceTests
             source.Key == 미국농수산가격출처Keys.UsdaNassQuickStats
             && source.IsConfigured
             && source.StatusCode == "Ready");
+        Assert.Contains(result.DataSources, source =>
+            source.Key == 호주농수산식품가격출처Keys.AbsConsumerPriceIndex
+            && source.IsConfigured
+            && source.StatusCode == "IntegratedApi");
+        Assert.Contains(result.DataSources, source =>
+            source.Key == 호주농수산식품가격출처Keys.AbaresFisheriesAquacultureStatistics
+            && !source.IsConfigured
+            && source.StatusCode == "DownloadAvailable");
         Assert.Contains(result.Capabilities, capability =>
             capability.Code == "MeatImportReadinessCollaboration" && capability.AvailableNow);
         Assert.Contains(result.Capabilities, capability =>
@@ -44,6 +53,11 @@ public sealed class AgriculturalFisheriesInformationServiceTests
             && capability.AvailableNow
             && capability.Endpoint ==
                 "GET /api/v1/agricultural-fisheries/us-operator-information-sources");
+        Assert.Contains(result.Capabilities, capability =>
+            capability.Code == "AustraliaFoodPriceIndexes"
+            && capability.AvailableNow
+            && capability.Endpoint ==
+                "GET /api/v1/agricultural-fisheries/au-food-price-indexes");
         Assert.Contains(result.Capabilities, capability =>
             capability.Code == "FreightBrokerage" && !capability.AvailableNow);
         Assert.NotEmpty(result.BrokerageReadinessRequirements);

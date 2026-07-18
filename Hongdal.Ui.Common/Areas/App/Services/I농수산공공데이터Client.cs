@@ -28,6 +28,13 @@ public interface I농수산공공데이터Client
         int maxItems = 100,
         CancellationToken cancellationToken = default);
 
+    Task<호주농수산식품가격Catalog응답> 호주가격원천Catalog조회Async(
+        CancellationToken cancellationToken = default);
+
+    Task<호주농수산식품가격조회응답> 호주식품가격지수조회Async(
+        호주농수산식품가격조회요청 request,
+        CancellationToken cancellationToken = default);
+
     Task<FoodPriceComparisonResponse> 식품가격비교Async(
         FoodPriceComparisonRequest request,
         CancellationToken cancellationToken = default);

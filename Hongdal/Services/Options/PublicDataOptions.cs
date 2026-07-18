@@ -28,6 +28,8 @@ public sealed class PublicDataOptions
 
     public UsdaNassQuickStatsOptions UsdaNassQuickStats { get; set; } = new();
 
+    public AbsConsumerPriceIndexOptions AbsConsumerPriceIndex { get; set; } = new();
+
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
 }
 
@@ -120,6 +122,13 @@ public sealed class UsdaNassQuickStatsOptions
     public string BaseUrl { get; set; } = "https://quickstats.nass.usda.gov";
 
     public string DataPath { get; set; } = "/api/api_GET/";
+}
+
+public sealed class AbsConsumerPriceIndexOptions
+{
+    public string BaseUrl { get; set; } = "https://data.api.abs.gov.au";
+
+    public string DataPath { get; set; } = "/rest/data/CPI";
 }
 
 public sealed class TraditionalMarketOptions

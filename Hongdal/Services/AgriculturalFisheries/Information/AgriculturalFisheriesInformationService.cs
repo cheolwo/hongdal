@@ -44,10 +44,11 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
         var atConfigured = dataGoKrConfigured || !string.IsNullOrWhiteSpace(_options.AtFoodPrices.ServiceKey);
         var customsConfigured = dataGoKrConfigured || !string.IsNullOrWhiteSpace(_options.CustomsTradeStatistics.ServiceKey);
         var nassConfigured = !string.IsNullOrWhiteSpace(_options.UsdaNassQuickStats.ApiKey);
+        var australiaCatalog = 호주농수산식품가격Catalog.Build();
 
         return new AgriculturalFisheriesInformationOverviewResponse
         {
-            SupportedMarketCodes = ["KR", "US"],
+            SupportedMarketCodes = ["KR", "US", "AU"],
             Positioning = "공공데이터를 읽고 비교하고 수입 준비 절차의 확인 기록을 함께 관리하는 정보 기반입니다. 주문·계약·배차를 만들지 않습니다.",
             AllowsReadinessRecordWrites = true,
             AllowsTransactionExecution = false,
@@ -81,7 +82,8 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
                     "품목·조사 프로그램별 상이",
                     nassConfigured,
                     "https://quickstats.nass.usda.gov/api",
-                    "미국 공식 품목명과 조사 단위를 유지하며 국내 aT 가격과 직접 같은 값으로 보지 않습니다.")
+                    "미국 공식 품목명과 조사 단위를 유지하며 국내 aT 가격과 직접 같은 값으로 보지 않습니다."),
+                .. australiaCatalog.Sources.Select(AustraliaSource)
             ],
             Capabilities =
             [
@@ -135,6 +137,22 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
                 },
                 new AgriculturalFisheriesCapabilityResponse
                 {
+                    Code = "AustraliaFoodPriceIndexes",
+                    Label = "호주 식품 가격지수",
+                    Description = "ABS의 8개 주도시 가중평균과 도시별 월별 식품·육류·수산물·유제품·과일·채소 소비자 가격지수를 조회합니다.",
+                    AvailableNow = true,
+                    Endpoint = "GET /api/v1/agricultural-fisheries/au-food-price-indexes"
+                },
+                new AgriculturalFisheriesCapabilityResponse
+                {
+                    Code = "AustraliaFoodPriceSourceCatalog",
+                    Label = "호주 농수산물 가격 원천 카탈로그",
+                    Description = "ABS 자동 조회와 ABARES 농축산·원예·수산물 파일·참고 원천의 수집 경계를 구분합니다.",
+                    AvailableNow = true,
+                    Endpoint = "GET /api/v1/agricultural-fisheries/au-food-price-indexes/catalog"
+                },
+                new AgriculturalFisheriesCapabilityResponse
+                {
                     Code = "FreightBrokerage",
                     Label = "화물 주선·중개",
                     Description = "업계 이해와 운영 요건이 충분히 축적된 뒤 별도 모듈로 검토합니다.",
@@ -143,6 +161,8 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
             ],
             NextDataPriorities =
             [
+                "ABARES 수산·양식 통계 XLSX를 원본 해시·회계연도·어종·단위와 함께 적재하는 연간 수집기 구현",
+                "ABARES 주간 농축산·원예 가격의 민간 원자료 이용조건과 안정적인 기계 판독 계약 확인",
                 "미국 농어업경영체 공개 원천 중 CSV·API 제공 명부를 개인정보 최소화 규칙과 함께 순차 연동",
                 "미국 NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결 검증",
                 "축산물 등급·도매 유통가격과 aT 가격의 역할 구분",
@@ -159,6 +179,27 @@ public sealed class AgriculturalFisheriesInformationService : IAgriculturalFishe
             ]
         };
     }
+
+    private static AgriculturalFisheriesDataSourceResponse AustraliaSource(
+        호주농수산식품가격원천응답 source)
+        => new()
+        {
+            Key = source.Key,
+            Provider = source.Provider,
+            DisplayName = source.DisplayName,
+            Coverage = source.Coverage,
+            UpdateCycle = source.UpdateCycle,
+            StatusCode = source.IntegrationStatusCode,
+            StatusLabel = source.IntegrationStatusCode switch
+            {
+                "IntegratedApi" => "자동 조회 가능",
+                "DownloadAvailable" => "공식 파일 수집 준비",
+                _ => "참고 원천 확인됨"
+            },
+            IsConfigured = source.AutomatedQueryAvailable,
+            DocumentationUrl = source.DocumentationUrl,
+            UsageNote = source.UsageNote
+        };
 
     public AgriculturalFisheriesItemSearchResponse SearchItems(
         string? query,

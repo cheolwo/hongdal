@@ -14,15 +14,18 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
 {
     private readonly IAgriculturalFisheriesInformationService _informationService;
     private readonly I미국농수산가격조회Service _usPriceService;
+    private readonly I호주농수산식품가격조회Service _australiaFoodPriceService;
     private readonly I미국농어업경영체정보원천Service _usOperatorSourceService;
 
     public AgriculturalFisheriesInformationController(
         IAgriculturalFisheriesInformationService informationService,
         I미국농수산가격조회Service usPriceService,
+        I호주농수산식품가격조회Service australiaFoodPriceService,
         I미국농어업경영체정보원천Service usOperatorSourceService)
     {
         _informationService = informationService;
         _usPriceService = usPriceService;
+        _australiaFoodPriceService = australiaFoodPriceService;
         _usOperatorSourceService = usOperatorSourceService;
     }
 
@@ -106,6 +109,44 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
             미국농수산가격조회상태Codes.설정안됨 =>
                 StatusCode(StatusCodes.Status503ServiceUnavailable, response),
             미국농수산가격조회상태Codes.자료조회불가 =>
+                StatusCode(StatusCodes.Status503ServiceUnavailable, response),
+            _ => Ok(response)
+        };
+    }
+
+    [HttpGet("au-food-price-indexes/catalog")]
+    public ActionResult<호주농수산식품가격Catalog응답> GetAustraliaFoodPriceCatalog()
+        => Ok(_australiaFoodPriceService.GetCatalog());
+
+    [HttpGet("au-food-price-indexes")]
+    public async Task<ActionResult<호주농수산식품가격조회응답>> GetAustraliaFoodPriceIndexes(
+        [FromQuery] string sourceKey = 호주농수산식품가격출처Keys.AbsConsumerPriceIndex,
+        [FromQuery] string indexCode = 호주식품가격지수Codes.FoodAndNonAlcoholicBeverages,
+        [FromQuery] string measureCode = 호주식품가격지수측정Codes.IndexNumber,
+        [FromQuery] string regionCode = 호주식품가격지수지역Codes.Australia,
+        [FromQuery] string? startPeriod = null,
+        [FromQuery] string? endPeriod = null,
+        [FromQuery] int maxItems = 60,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _australiaFoodPriceService.조회Async(
+            new 호주농수산식품가격조회요청
+            {
+                SourceKey = sourceKey,
+                IndexCode = indexCode,
+                MeasureCode = measureCode,
+                RegionCode = regionCode,
+                StartPeriod = startPeriod ?? string.Empty,
+                EndPeriod = endPeriod ?? string.Empty,
+                MaxItems = maxItems
+            },
+            cancellationToken);
+
+        return response.StatusCode switch
+        {
+            호주농수산식품가격조회상태Codes.잘못된요청 => BadRequest(response),
+            호주농수산식품가격조회상태Codes.지원하지않는출처 => BadRequest(response),
+            호주농수산식품가격조회상태Codes.자료조회불가 =>
                 StatusCode(StatusCodes.Status503ServiceUnavailable, response),
             _ => Ok(response)
         };

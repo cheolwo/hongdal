@@ -94,6 +94,57 @@ public sealed class 농수산공공데이터ClientTests
     }
 
     [Fact]
+    public async Task 호주식품가격지수조회는_허용차원과기간을전송한다()
+    {
+        Uri? requestedUri = null;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "success": true,
+                      "statusCode": "Complete",
+                      "sourceKey": "abs-cpi-food-price-index",
+                      "summary": "ABS 식품 가격지수 2건을 제공합니다."
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new 농수산공공데이터Client(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.hongdal.test/")
+        });
+
+        var result = await client.호주식품가격지수조회Async(new 호주농수산식품가격조회요청
+        {
+            IndexCode = 호주식품가격지수Codes.FishAndOtherSeafood,
+            MeasureCode = 호주식품가격지수측정Codes.PreviousYearPercentageChange,
+            RegionCode = 호주식품가격지수지역Codes.Melbourne,
+            StartPeriod = "2025-01",
+            EndPeriod = "2026-05",
+            MaxItems = 500
+        });
+
+        Assert.True(result.Success);
+        Assert.NotNull(requestedUri);
+        Assert.Equal(
+            "/api/v1/agricultural-fisheries/au-food-price-indexes",
+            requestedUri!.AbsolutePath);
+        var query = Uri.UnescapeDataString(requestedUri.Query);
+        Assert.Contains("indexCode=40015", query, StringComparison.Ordinal);
+        Assert.Contains("measureCode=3", query, StringComparison.Ordinal);
+        Assert.Contains("regionCode=2", query, StringComparison.Ordinal);
+        Assert.Contains("startPeriod=2025-01", query, StringComparison.Ordinal);
+        Assert.Contains("endPeriod=2026-05", query, StringComparison.Ordinal);
+        Assert.Contains("maxItems=120", query, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task 식품가격비교는_HS국가환율추가비용을조회조건으로전송한다()
     {
         Uri? requestedUri = null;

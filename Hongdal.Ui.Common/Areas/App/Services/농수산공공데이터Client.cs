@@ -68,6 +68,31 @@ public sealed class 농수산공공데이터Client(HttpClient httpClient) : I농
             cancellationToken);
     }
 
+    public Task<호주농수산식품가격Catalog응답> 호주가격원천Catalog조회Async(
+        CancellationToken cancellationToken = default)
+        => GetAsync<호주농수산식품가격Catalog응답>(
+            $"{BasePath}/au-food-price-indexes/catalog",
+            cancellationToken);
+
+    public Task<호주농수산식품가격조회응답> 호주식품가격지수조회Async(
+        호주농수산식품가격조회요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var parameters = new List<string>();
+        AddParameter(parameters, "sourceKey", request.SourceKey);
+        AddParameter(parameters, "indexCode", request.IndexCode);
+        AddParameter(parameters, "measureCode", request.MeasureCode);
+        AddParameter(parameters, "regionCode", request.RegionCode);
+        AddParameter(parameters, "startPeriod", request.StartPeriod);
+        AddParameter(parameters, "endPeriod", request.EndPeriod);
+        parameters.Add($"maxItems={Math.Clamp(request.MaxItems, 1, 120)}");
+
+        return GetAsync<호주농수산식품가격조회응답>(
+            $"{BasePath}/au-food-price-indexes?{string.Join('&', parameters)}",
+            cancellationToken);
+    }
+
     public Task<FoodPriceComparisonResponse> 식품가격비교Async(
         FoodPriceComparisonRequest request,
         CancellationToken cancellationToken = default)

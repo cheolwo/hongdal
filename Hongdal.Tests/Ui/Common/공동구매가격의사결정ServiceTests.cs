@@ -224,6 +224,15 @@ public sealed class 공동구매가격의사결정ServiceTests
             return Task.FromResult(미국가격응답);
         }
 
+        public Task<호주농수산식품가격Catalog응답> 호주가격원천Catalog조회Async(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new 호주농수산식품가격Catalog응답());
+
+        public Task<호주농수산식품가격조회응답> 호주식품가격지수조회Async(
+            호주농수산식품가격조회요청 request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new 호주농수산식품가격조회응답());
+
         public Task<FoodPriceComparisonResponse> 식품가격비교Async(
             FoodPriceComparisonRequest request,
             CancellationToken cancellationToken = default)

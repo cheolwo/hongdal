@@ -34,6 +34,8 @@
 | 한국농수산식품유통공사(aT) 일별 도·소매 가격정보 | 농축수산물 국내 중도매·소매 가격 | 품질·등급·산지·포장 차이가 있으며 모든 국내시장 표본이 국산 확정값은 아님 |
 | 관세청 품목별 국가별 수출입실적 | HS 코드·국가별 CIF 통계단가 비교 | 실제 매입가, 국내 도착원가, 운송 견적이나 소비자가격이 아님 |
 | 미국 농무부 농업통계청(USDA NASS) Quick Stats | 미국 농작물·축산물·양식 수산물의 가격·판매 집계 통계 | 미국 공식 품목명·단위·조사 프로그램을 유지하며 국내 aT 가격과 동일한 시장 단계로 간주하지 않음 |
+| 호주 통계청(ABS) Consumer Price Index | 8개 주도시 가중평균과 각 주도시의 월별 식품 소비자 가격지수 | 실제 A$/kg 단가가 아니며 도시 간 절대 가격 수준 비교에 사용하지 않음 |
+| 호주 ABARES 농축산·원예·수산 통계 | 주간 가격 참고 화면, 연간 수산·양식 통계표와 농장 조사 파일 | 원천별 자동수집·파일다운로드·민간 자료 이용조건을 분리하며 같은 가격으로 합치지 않음 |
 
 미국 농어업경영체 정보는 전국 단일 공개 명부로 취급하지 않는다. 개별 농장·양식장·어업 자료의 비공개 경계와 인증·검사·자발적 등재·지역 허가 목적별 공개 원천은 [미국 농어업경영체 정보 공개 원천](UnitedStatesAgriculturalFisheriesOperatorInformation.md)에 구분해 전산화한다.
 
@@ -48,6 +50,8 @@
 | HS 품목의 국내가격 조회 | `GET /api/v1/agricultural-fisheries/items/{hsCode}/domestic-price` | 없음 |
 | 미국 농수산물 가격·판매 통계 조회 | `GET /api/v1/agricultural-fisheries/us-prices` | 없음 |
 | 미국 농어업경영체 정보 원천 조회 | `GET /api/v1/agricultural-fisheries/us-operator-information-sources` | 없음 |
+| 호주 농수산물 가격 원천·허용 코드 조회 | `GET /api/v1/agricultural-fisheries/au-food-price-indexes/catalog` | 없음 |
+| 호주 ABS 식품 가격지수 조회 | `GET /api/v1/agricultural-fisheries/au-food-price-indexes` | 없음 |
 | 한국 육류 수입 준비 절차도 조회 | `GET /api/v1/agricultural-fisheries/import-readiness/diagram` | 없음 |
 
 국내가격 조회는 지원하지 않는 HS 코드에 `MappingRequired`, 잘못된 요청에 `InvalidRequest`, 외부 자료를 얻지 못한 경우 `DataUnavailable`을 반환한다. 연결되지 않은 품목을 임의의 유사 품목으로 자동 대체하지 않는다.
@@ -77,6 +81,46 @@ GET /api/v1/agricultural-fisheries/us-prices
 키는 추적되지 않는 `appsettings.Local.json` 또는 user secrets의 `PublicData:UsdaNassQuickStats:ApiKey`에 둔다. 키가 없으면 서버 시작은 정상적으로 완료되고 조회 API만 `NotConfigured`와 HTTP 503을 반환한다. 키 자체나 외부 오류 본문은 공개 응답과 로그에 남기지 않는다.
 
 상용 수산물 양륙 가격의 후속 원천으로 [NOAA Fisheries 상업 어업 자료](https://www.fisheries.noaa.gov/topic/resources-fishing/commercial-fishing)를 검토한다. 현재는 안정적인 공식 REST 계약을 확인하지 않은 상태이므로 화면 조회 도구를 스크래핑하지 않고, 공급자 인터페이스만 확장 가능하게 유지한다.
+
+## 호주 농수산물·식품 가격 원천
+
+2026-07-18 기준으로 호주 원천은 데이터의 시장 단계와 자동수집 가능성을 다음과 같이 분리한다.
+
+| 출처 키 | 원천 | 현재 상태 | 저장·해석 경계 |
+|---|---|---|---|
+| `abs-cpi-food-price-index` | [ABS Data API](https://www.abs.gov.au/statistics/application-programming-interfaces-apis/data-api-user-guide) `CPI` 데이터흐름 | `IntegratedApi` | 월별 소비자 가격지수를 읽기 전용 조회하며 단가로 환산하지 않음 |
+| `abares-weekly-australian-agricultural-prices` | [ABARES Australian agricultural prices](https://www.agriculture.gov.au/abares/data/weekly-commodity-price-update/australian-agricultural-prices) | `ReferenceOnly` | 곡물·가축 등의 주간 가격 화면은 민간·산업 원자료 이용조건 확인 전 자동수집하지 않음 |
+| `abares-weekly-australian-horticulture-prices` | [ABARES Australian horticulture prices](https://www.agriculture.gov.au/abares/data/weekly-commodity-price-update/australian-horticulture-prices) | `ReferenceOnly` | 멜버른 도매시장 가격 움직임 지표이며 품목 단가로 저장하거나 화면을 스크래핑하지 않음 |
+| `abares-fisheries-aquaculture-statistics` | [Australian fisheries and aquaculture statistics](https://www.agriculture.gov.au/abares/research-topics/fisheries/fisheries-and-aquaculture-statistics) | `DownloadAvailable` | 연간 XLSX의 생산량·생산가치·무역·소비를 원 단위와 회계연도 그대로 적재할 수 있도록 준비 |
+| `abares-farm-data-portal` | [ABARES Farm Data Portal](https://www.agriculture.gov.au/abares/data/farm-data-portal) | `DownloadAvailable` | 국가·주·지역별 농장 조사 CSV를 개별 농가 가격이나 실시간 공급 제안으로 해석하지 않음 |
+
+ABS Data API는 인증키 없이 접근할 수 있지만 Beta 서비스다. 현재 어댑터는 SDMX JSON을 구조화해
+`MEASURE.INDEX.TSEST.REGION.FREQ` 순서의 데이터 키를 만들고, 원계열(`TSEST=10`)과 월별
+빈도(`FREQ=M`)만 허용한다. 한 요청은 최대 120개월이며 정상 결과는 6시간, 자료 없음은 30분
+캐시한다. 지원 품목과 지역 코드는 catalog API에서 조회한다.
+
+```http
+GET /api/v1/agricultural-fisheries/au-food-price-indexes
+    ?indexCode=40015
+    &measureCode=1
+    &regionCode=50
+    &startPeriod=2025-01
+    &endPeriod=2026-05
+```
+
+- `40015`는 `Fish and other seafood`, `40009`는 `Beef and veal`, `114121`은 `Fruit`,
+  `114122`는 `Vegetables`다.
+- `measureCode=1`은 기준시점 대비 지수, `2`는 전월 대비 변동률, `3`은 전년 동월 대비
+  변동률이다.
+- `regionCode=50`은 8개 주도시 가중평균이며 `1`부터 `8`은 시드니·멜버른 등 주도시다. 주도시 지수는
+  각 도시 안에서 시간에 따른 변화를 보여 주며 도시 사이의 절대 소매가격 차이를 뜻하지 않는다.
+- 응답은 `IsActualUnitPrice=false`를 유지하고 ABS 출처, 원 기준시점, 수집 시각과
+  `Based on Australian Bureau of Statistics data` 귀속 문구를 포함한다.
+
+ABS 웹 자료와 ABARES 출판물은 원칙적으로 CC BY 4.0 귀속 조건을 따르지만 로고·문장·민간
+제공자료 등 예외가 있다. 특히 ABARES 주간 가격의 [data attribution](https://www.agriculture.gov.au/abares/products/weekly_update/data-attribution)에
+명시된 제3자 원천은 해당 제공자의 조건을 별도로 확인한다. 자동 적재를 시작할 때에는 원본 URL,
+기준일, 파일 해시, 라이선스 문구와 변환 여부를 수집 실행에 함께 저장한다.
 
 ## 육류 수입 준비도 협업 작업공간
 
@@ -148,12 +192,14 @@ GET /api/v1/agricultural-fisheries/us-prices
 
 ## 다음 데이터 축적 순서
 
-1. USDA Local Food API와 FSIS CSV를 개인정보 최소화 규칙과 함께 검증한다.
-2. NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결을 검증한다.
-3. 축산물 등급·도매가격과 aT 조사 가격의 역할을 구분한다.
-4. 소비자 체감가격과 온라인 가격은 조사 기준 및 수집 허용 범위를 먼저 정한다.
-5. 지역·시장·품질·등급·포장단위별 누락률, 갱신 지연과 매칭 정확도를 시계열로 기록한다.
-6. 정보 이용자와 현장 종사자의 질문·오류 제보를 품목 연결표 개선 근거로 축적한다.
+1. ABARES 수산·양식 연간 XLSX를 원본 해시·회계연도·어종·단위와 함께 적재한다.
+2. ABARES 주간 농축산·원예 가격의 민간 원자료 이용조건과 안정적인 기계 판독 계약을 확인한다.
+3. USDA Local Food API와 FSIS CSV를 개인정보 최소화 규칙과 함께 검증한다.
+4. NOAA 수산물 양륙·생산 자료의 안정적인 공식 제공 방식과 NASS 품목 코드 연결을 검증한다.
+5. 축산물 등급·도매가격과 aT 조사 가격의 역할을 구분한다.
+6. 소비자 체감가격과 온라인 가격은 조사 기준 및 수집 허용 범위를 먼저 정한다.
+7. 지역·시장·품질·등급·포장단위별 누락률, 갱신 지연과 매칭 정확도를 시계열로 기록한다.
+8. 정보 이용자와 현장 종사자의 질문·오류 제보를 품목 연결표 개선 근거로 축적한다.
 
 ## 주선업 단계로 넘어가기 위한 조건
 
