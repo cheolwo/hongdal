@@ -159,6 +159,21 @@
                     </dl>
                 </section>
 
+                @if (ViewModel.Delivery.IsApplicable)
+                {
+                    <CommunityUnitedStatesCollectiveImportJourney Model="@ViewModel.Delivery.Snapshot" />
+                }
+
+                @if (ViewModel.TraditionalMarketImportedMeat.IsApplicable)
+                {
+                    <CommunityTraditionalMarketImportedMeatJourney Model="@ViewModel.TraditionalMarketImportedMeat.Snapshot" />
+                }
+
+                @if (ViewModel.MarketDay.IsApplicable)
+                {
+                    <CommunityMarketDayJourney Model="@ViewModel.MarketDay.Snapshot" />
+                }
+
                 @if (ViewModel.CurrentPage.Key == CommunityCollectiveActionPageKeys.Gathering)
                 {
                     <section class="collective-action-section">

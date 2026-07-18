@@ -73,4 +73,41 @@ public sealed class CommunityGroupPurchaseTradeRoutePolicyTests
             CommunityGroupPurchaseTradeRouteFieldCodes.CustomsClearanceStatusCode,
             decision.MissingFieldCodes);
     }
+
+    [Fact]
+    public void 미국운영에서_한국출발_미국배송_미통관이면_공동수입후보로판정한다()
+    {
+        var decision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
+            new CommunityGroupPurchaseTradeRouteInput(
+                "KR",
+                "KR",
+                "US",
+                CommunityGroupPurchaseCustomsClearanceStatusCodes.NotCleared,
+                CommunityGroupPurchaseTradeRoutePolicy.UnitedStatesCountryCode));
+
+        Assert.Equal(
+            CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate,
+            decision.RouteCode);
+        Assert.True(decision.IsGroupImportCandidate);
+        Assert.Contains(
+            CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToOperatingMarket,
+            decision.ReasonCodes);
+        Assert.DoesNotContain(
+            CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToKorea,
+            decision.ReasonCodes);
+    }
+
+    [Fact]
+    public void 한국운영에서_한국출발_미국배송은_다른국경간거래로유지한다()
+    {
+        var decision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
+            new CommunityGroupPurchaseTradeRouteInput(
+                "KR",
+                "KR",
+                "US",
+                CommunityGroupPurchaseCustomsClearanceStatusCodes.NotCleared));
+
+        Assert.Equal(CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder, decision.RouteCode);
+        Assert.False(decision.IsGroupImportCandidate);
+    }
 }

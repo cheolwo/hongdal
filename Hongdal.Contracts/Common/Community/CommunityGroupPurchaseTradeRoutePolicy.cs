@@ -8,7 +8,8 @@ public sealed record CommunityGroupPurchaseTradeRouteInput(
     string? SellerCountryCode,
     string? ShipFromCountryCode,
     string? DeliveryCountryCode,
-    string? CustomsClearanceStatusCode);
+    string? CustomsClearanceStatusCode,
+    string? OperatingMarketCountryCode = null);
 
 public sealed record CommunityGroupPurchaseTradeRouteDecision(
     string RouteCode,
@@ -30,8 +31,10 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
 {
     public const string KoreaCountryCode = "KR";
 
+    public const string UnitedStatesCountryCode = "US";
+
     public const string GroupImportCandidateNotice =
-        "공동수입 후보 판정은 제안 단계의 물류 경로 분류입니다. 계약 확정 전 상품 출발국가, 국내 통관 여부와 HS 코드를 다시 확인하고, 확정된 경우에만 원천 공동구매와 연결된 별도 공동수입 원장으로 인계합니다.";
+        "공동수입 후보 판정은 제안 단계의 물류 경로 분류입니다. 계약 확정 전 상품 출발국가, 운영 국가의 통관 여부와 HS 코드를 다시 확인하고, 확정된 경우에만 원천 공동구매와 연결된 별도 공동수입 원장으로 인계합니다.";
 
     public static CommunityGroupPurchaseTradeRouteDecision Evaluate(
         CommunityGroupPurchaseTradeRouteInput input)
@@ -41,6 +44,8 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
         var sellerCountryCode = NormalizeCountryCode(input.SellerCountryCode);
         var shipFromCountryCode = NormalizeCountryCode(input.ShipFromCountryCode);
         var deliveryCountryCode = NormalizeCountryCode(input.DeliveryCountryCode);
+        var operatingMarketCountryCode = NormalizeOperatingMarketCountryCode(
+            input.OperatingMarketCountryCode);
         var customsClearanceStatusCode = NormalizeCustomsClearanceStatusCode(
             input.CustomsClearanceStatusCode);
 
@@ -93,10 +98,13 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
         if (!string.IsNullOrWhiteSpace(sellerCountryCode)
             && !string.Equals(
                 sellerCountryCode,
-                KoreaCountryCode,
+                operatingMarketCountryCode,
                 StringComparison.OrdinalIgnoreCase))
         {
-            reasons.Add(CommunityGroupPurchaseTradeRouteReasonCodes.SellerOutsideKorea);
+            reasons.Add(OperatingMarketReasonCode(
+                operatingMarketCountryCode,
+                CommunityGroupPurchaseTradeRouteReasonCodes.SellerOutsideKorea,
+                CommunityGroupPurchaseTradeRouteReasonCodes.SellerOutsideOperatingMarket));
         }
 
         if (string.Equals(
@@ -108,7 +116,7 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
             return new CommunityGroupPurchaseTradeRouteDecision(
                 string.Equals(
                     deliveryCountryCode,
-                    KoreaCountryCode,
+                    operatingMarketCountryCode,
                     StringComparison.OrdinalIgnoreCase)
                     ? CommunityGroupPurchaseTradeRouteCodes.Domestic
                     : CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder,
@@ -119,10 +127,13 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
 
         if (!string.Equals(
                 deliveryCountryCode,
-                KoreaCountryCode,
+                operatingMarketCountryCode,
                 StringComparison.OrdinalIgnoreCase))
         {
-            reasons.Add(CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryOutsideKorea);
+            reasons.Add(OperatingMarketReasonCode(
+                operatingMarketCountryCode,
+                CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryOutsideKorea,
+                CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryOutsideOperatingMarket));
             return new CommunityGroupPurchaseTradeRouteDecision(
                 CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder,
                 reasons,
@@ -130,8 +141,14 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
                 invalidFields);
         }
 
-        reasons.Add(CommunityGroupPurchaseTradeRouteReasonCodes.GoodsShipFromOutsideKorea);
-        reasons.Add(CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToKorea);
+        reasons.Add(OperatingMarketReasonCode(
+            operatingMarketCountryCode,
+            CommunityGroupPurchaseTradeRouteReasonCodes.GoodsShipFromOutsideKorea,
+            CommunityGroupPurchaseTradeRouteReasonCodes.GoodsShipFromOutsideOperatingMarket));
+        reasons.Add(OperatingMarketReasonCode(
+            operatingMarketCountryCode,
+            CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToKorea,
+            CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToOperatingMarket));
 
         if (string.Equals(
                 customsClearanceStatusCode,
@@ -168,6 +185,12 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
         => string.IsNullOrWhiteSpace(value)
             ? string.Empty
             : value.Trim().ToUpperInvariant();
+
+    public static string NormalizeOperatingMarketCountryCode(string? value)
+    {
+        var normalized = NormalizeCountryCode(value);
+        return IsValidCountryCode(normalized) ? normalized : KoreaCountryCode;
+    }
 
     public static bool IsValidCountryCode(string? value)
     {
@@ -230,6 +253,17 @@ public static class CommunityGroupPurchaseTradeRoutePolicy
             reasons,
             missingFields,
             invalidFields);
+
+    private static string OperatingMarketReasonCode(
+        string operatingMarketCountryCode,
+        string koreaReasonCode,
+        string genericReasonCode)
+        => string.Equals(
+            operatingMarketCountryCode,
+            KoreaCountryCode,
+            StringComparison.OrdinalIgnoreCase)
+            ? koreaReasonCode
+            : genericReasonCode;
 }
 
 public static class CommunityGroupPurchaseTradeRouteCodes
@@ -298,4 +332,13 @@ public static class CommunityGroupPurchaseTradeRouteReasonCodes
     public const string IncompleteTradeRouteInput = "IncompleteTradeRouteInput";
 
     public const string InvalidTradeRouteInput = "InvalidTradeRouteInput";
+
+    public const string SellerOutsideOperatingMarket = "SellerOutsideOperatingMarket";
+
+    public const string GoodsShipFromOutsideOperatingMarket =
+        "GoodsShipFromOutsideOperatingMarket";
+
+    public const string DeliveryToOperatingMarket = "DeliveryToOperatingMarket";
+
+    public const string DeliveryOutsideOperatingMarket = "DeliveryOutsideOperatingMarket";
 }

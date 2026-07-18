@@ -92,15 +92,19 @@ public class CommunityVoteService : ICommunityVoteService
     private readonly ICommunityVoteStore _store;
     private readonly ICommunityGroupPurchaseDemandOutboxProcessor _demandOutboxProcessor;
     private readonly I공동구매원장절차Service _ledgerWorkflow;
+    private readonly string _operatingMarketCountryCode;
 
     internal CommunityVoteService(
         ICommunityVoteStore store,
         ICommunityGroupPurchaseDemandOutboxProcessor demandOutboxProcessor,
-        I공동구매원장절차Service? ledgerWorkflow = null)
+        I공동구매원장절차Service? ledgerWorkflow = null,
+        string? operatingMarketCountryCode = null)
     {
         _store = store;
         _demandOutboxProcessor = demandOutboxProcessor;
         _ledgerWorkflow = ledgerWorkflow ?? 빈공동구매원장절차Service.Instance;
+        _operatingMarketCountryCode = CommunityGroupPurchaseTradeRoutePolicy
+            .NormalizeOperatingMarketCountryCode(operatingMarketCountryCode);
     }
 
     public async Task<CommunityVoteResponse> CreateAsync(CommunityVoteCreateRequest request, CancellationToken cancellationToken)
@@ -177,7 +181,10 @@ public class CommunityVoteService : ICommunityVoteService
             throw new InvalidOperationException("투표 마감 시각은 현재보다 이후여야 합니다.");
         }
 
-        var groupPurchase = CreateGroupPurchaseSettings(request, voteKind);
+        var groupPurchase = CreateGroupPurchaseSettings(
+            request,
+            voteKind,
+            _operatingMarketCountryCode);
 
         var voteId = Guid.NewGuid();
         var vote = new CommunityVoteRecord
@@ -750,7 +757,8 @@ public class CommunityVoteService : ICommunityVoteService
 
     private static CommunityGroupPurchaseVoteSettingsRecord? CreateGroupPurchaseSettings(
         CommunityVoteCreateRequest request,
-        string voteKind)
+        string voteKind,
+        string operatingMarketCountryCode)
     {
         if (voteKind != CommunityVoteKindCodes.GroupPurchaseDemand)
         {
@@ -782,7 +790,8 @@ public class CommunityVoteService : ICommunityVoteService
                 settings.SellerCountryCode,
                 settings.ShipFromCountryCode,
                 settings.DeliveryCountryCode,
-                settings.CustomsClearanceStatusCode));
+                settings.CustomsClearanceStatusCode,
+                operatingMarketCountryCode));
         if (tradeRouteDecision.InvalidFieldCodes.Count > 0)
         {
             throw new InvalidOperationException(
@@ -860,6 +869,7 @@ public class CommunityVoteService : ICommunityVoteService
             ProposerRoleCode = proposerRoleCode,
             AgreementPolicyCode = CommunityGroupPurchaseAgreementPolicy.PolicyCode,
             ProposalOriginLegalEffectNotice = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice,
+            OperatingMarketCountryCode = operatingMarketCountryCode,
             SellerCountryCode = sellerCountryCode,
             ShipFromCountryCode = shipFromCountryCode,
             DeliveryCountryCode = deliveryCountryCode,
@@ -1105,7 +1115,8 @@ public class CommunityVoteService : ICommunityVoteService
                     settings.SellerCountryCode,
                     settings.ShipFromCountryCode,
                     settings.DeliveryCountryCode,
-                    settings.CustomsClearanceStatusCode))
+                    settings.CustomsClearanceStatusCode,
+                    settings.OperatingMarketCountryCode))
             : null;
         return new CommunityGroupPurchaseVoteResponse
         {
@@ -1118,6 +1129,8 @@ public class CommunityVoteService : ICommunityVoteService
             ProposalOriginLegalEffectNotice = string.IsNullOrWhiteSpace(settings.ProposalOriginLegalEffectNotice)
                 ? CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice
                 : settings.ProposalOriginLegalEffectNotice,
+            OperatingMarketCountryCode = CommunityGroupPurchaseTradeRoutePolicy
+                .NormalizeOperatingMarketCountryCode(settings.OperatingMarketCountryCode),
             SellerCountryCode = settings.SellerCountryCode,
             ShipFromCountryCode = settings.ShipFromCountryCode,
             DeliveryCountryCode = settings.DeliveryCountryCode,
@@ -1256,7 +1269,8 @@ public class CommunityVoteService : ICommunityVoteService
                 settings.SellerCountryCode,
                 settings.ShipFromCountryCode,
                 settings.DeliveryCountryCode,
-                settings.CustomsClearanceStatusCode));
+                settings.CustomsClearanceStatusCode,
+                settings.OperatingMarketCountryCode));
         if (!tradeRouteDecision.IsGroupImportCandidate
             || tradeRouteDecision.RequiresManualReview)
         {
@@ -1297,29 +1311,38 @@ public class CommunityVoteService : ICommunityVoteService
 
 public sealed class InMemoryCommunityVoteService : CommunityVoteService
 {
-    public InMemoryCommunityVoteService(ICommunityGroupPurchaseDemandHandoff? groupPurchaseDemandHandoff = null)
+    public InMemoryCommunityVoteService(
+        ICommunityGroupPurchaseDemandHandoff? groupPurchaseDemandHandoff = null,
+        string? operatingMarketCountryCode = null)
         : this(
             new InMemoryCommunityVoteStore(),
-            groupPurchaseDemandHandoff ?? new NoOpCommunityGroupPurchaseDemandHandoff())
+            groupPurchaseDemandHandoff ?? new NoOpCommunityGroupPurchaseDemandHandoff(),
+            operatingMarketCountryCode)
     {
     }
 
     private InMemoryCommunityVoteService(
         InMemoryCommunityVoteStore store,
-        ICommunityGroupPurchaseDemandHandoff handoff)
+        ICommunityGroupPurchaseDemandHandoff handoff,
+        string? operatingMarketCountryCode)
         : this(
             store,
             new CommunityGroupPurchaseDemandOutboxProcessor(
                 store,
                 handoff,
-                retryBaseDelay: TimeSpan.Zero))
+                retryBaseDelay: TimeSpan.Zero),
+            operatingMarketCountryCode)
     {
     }
 
     private InMemoryCommunityVoteService(
         InMemoryCommunityVoteStore store,
-        ICommunityGroupPurchaseDemandOutboxProcessor processor)
-        : base(store, processor)
+        ICommunityGroupPurchaseDemandOutboxProcessor processor,
+        string? operatingMarketCountryCode)
+        : base(
+            store,
+            processor,
+            operatingMarketCountryCode: operatingMarketCountryCode)
     {
         DemandOutboxProcessor = processor;
     }

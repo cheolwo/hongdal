@@ -732,6 +732,8 @@ internal sealed class CommunityGroupPurchaseVoteSettingsRecord
     public string AgreementPolicyCode { get; set; } = CommunityGroupPurchaseAgreementPolicy.PolicyCode;
     public string ProposalOriginLegalEffectNotice { get; set; }
         = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice;
+    public string OperatingMarketCountryCode { get; set; }
+        = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode;
     public string SellerCountryCode { get; set; } = string.Empty;
     public string ShipFromCountryCode { get; set; } = string.Empty;
     public string DeliveryCountryCode { get; set; } = string.Empty;

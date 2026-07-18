@@ -103,10 +103,13 @@ public sealed class 공동구매화면ViewModel : 조립ViewModelBase
            || 가격의사결정.처리중
            || 실행.처리중;
 
-    public Task<bool> 초기화Async(
+    public async Task<bool> 초기화Async(
         string? communityScope = null,
         CancellationToken cancellationToken = default)
-        => 모집.목록.목록조회Async(communityScope, cancellationToken);
+    {
+        await 모집.제안.거래경로.운영시장초기화Async(cancellationToken);
+        return await 모집.목록.목록조회Async(communityScope, cancellationToken);
+    }
 
     public Task<bool> HS코드별초기화Async(
         string hsCode,

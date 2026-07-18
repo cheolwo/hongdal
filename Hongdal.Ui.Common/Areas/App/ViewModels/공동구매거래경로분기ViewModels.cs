@@ -129,14 +129,14 @@ public sealed class 공동구매거래경로분기ViewModel : 공동구매의사
         => 활성분기코드 switch
         {
             공동구매업무분기코드.국내공동구매
-                => "국내 생산자·공동구매 대표 연결, 공급 협상과 국내 이행계획을 사용합니다.",
+                => "운영 국가 안의 생산자·공동구매 대표 연결, 공급 협상과 이행계획을 사용합니다.",
             공동구매업무분기코드.공동수입
                 => "해외 판매자 조건, HS 코드, 통관과 공동수입 원장 준비 흐름을 사용합니다.",
             공동구매업무분기코드.해외수출
-                => "국내 상품의 해외 출품, 수출 신고, 국제운송과 현지 이행 준비 흐름을 사용합니다.",
+                => "운영 국가 상품의 해외 출품, 수출 신고, 국제운송과 현지 이행 준비 흐름을 사용합니다.",
             공동구매업무분기코드.기타국경간거래
-                => "한국이 출발지나 도착지가 아닌 거래이므로 별도 국경 간 거래 흐름이 필요합니다.",
-            _ => "상품 출발국가, 최종 배송국가와 국내 통관 상태를 확인해 주세요."
+                => "운영 국가가 출발지나 도착지가 아닌 거래이므로 별도 국경 간 거래 흐름이 필요합니다.",
+            _ => "상품 출발국가, 최종 배송국가와 도착국 통관 상태를 확인해 주세요."
         };
 
     private bool 해외수출판정
@@ -148,14 +148,17 @@ public sealed class 공동구매거래경로분기ViewModel : 공동구매의사
                 settings?.ShipFromCountryCode ?? _제안거래경로.상품출발국가코드);
             var delivery = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(
                 settings?.DeliveryCountryCode ?? _제안거래경로.최종배송국가코드);
+            var operatingMarket = CommunityGroupPurchaseTradeRoutePolicy
+                .NormalizeOperatingMarketCountryCode(
+                    settings?.OperatingMarketCountryCode ?? _제안거래경로.운영국가코드);
             return string.Equals(
                        shipFrom,
-                       CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                       operatingMarket,
                        StringComparison.OrdinalIgnoreCase)
                    && !string.IsNullOrWhiteSpace(delivery)
                    && !string.Equals(
                        delivery,
-                       CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                       operatingMarket,
                        StringComparison.OrdinalIgnoreCase);
         }
     }

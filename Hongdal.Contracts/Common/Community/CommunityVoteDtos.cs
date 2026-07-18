@@ -302,6 +302,9 @@ public sealed class CommunityGroupPurchaseVoteResponse
     public string ProposalOriginLegalEffectNotice { get; set; }
         = CommunityGroupPurchaseAgreementPolicy.FullLegalEffectNotice;
 
+    public string OperatingMarketCountryCode { get; set; }
+        = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode;
+
     public string SellerCountryCode { get; set; } = string.Empty;
 
     public string ShipFromCountryCode { get; set; } = string.Empty;

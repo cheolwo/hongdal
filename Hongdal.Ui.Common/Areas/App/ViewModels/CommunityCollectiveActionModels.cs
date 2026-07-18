@@ -165,6 +165,9 @@ public sealed class CommunityCollectiveActionSnapshot
     public IReadOnlyList<CommunityCapacityEvidenceSnapshot> CapacityEvidence { get; init; } = [];
     public IReadOnlyList<CommunityActionTimelineItemSnapshot> Timeline { get; init; } = [];
     public IReadOnlyList<CommunityActionOutcomeSnapshot> Outcomes { get; init; } = [];
+    public CommunityCollectiveImportDeliverySnapshot Delivery { get; init; } = new();
+    public CommunityTraditionalMarketImportedMeatFulfillmentSnapshot TraditionalMarketImportedMeatFulfillment { get; init; } = new();
+    public CommunityMarketDaySnapshot MarketDay { get; init; } = new();
 }
 
 public interface ICommunityCollectiveActionSource
@@ -263,6 +266,24 @@ public static class CommunityCollectiveActionSnapshotFactory
         var pickupCapacity = groupPurchase?.PickupPoints
             .Where(point => point.CapacityQuantity.HasValue)
             .Sum(point => point.CapacityQuantity!.Value);
+        var isUnitedStatesImport = isImport
+                                   && string.Equals(
+                                       CommunityGroupPurchaseTradeRoutePolicy
+                                           .NormalizeOperatingMarketCountryCode(
+                                               groupPurchase?.OperatingMarketCountryCode),
+                                       CommunityGroupPurchaseTradeRoutePolicy
+                                           .UnitedStatesCountryCode,
+                                       StringComparison.OrdinalIgnoreCase)
+                                   && string.Equals(
+                                       groupPurchase?.DeliveryCountryCode,
+                                       CommunityGroupPurchaseTradeRoutePolicy
+                                           .UnitedStatesCountryCode,
+                                       StringComparison.OrdinalIgnoreCase);
+        var isKoreaImportedMeat = CommunityTraditionalMarketImportedMeatScenarioFactory
+            .IsApplicable(groupPurchase);
+        var roleSlots = journey?.RoleSlots.Count > 0
+            ? BuildRoleSlots(journey)
+            : BuildRoleSlots(campaign, isImport, isUnitedStatesImport, isKoreaImportedMeat);
 
         return new CommunityCollectiveActionSnapshot
         {
@@ -290,9 +311,7 @@ public static class CommunityCollectiveActionSnapshotFactory
                 : null,
             EstimatedCurrentUnitCost = journey?.Economics.EstimatedUnitLandedCost,
             Conditions = BuildConditions(campaign, productLabel, minimumReached, routeReady, journey),
-            RoleSlots = journey?.RoleSlots.Count > 0
-                ? BuildRoleSlots(journey)
-                : BuildRoleSlots(campaign, isImport),
+            RoleSlots = roleSlots,
             ReadinessChecks = BuildReadinessChecks(campaign, minimumReached, routeReady, isSigned, journey),
             CapacityEvidence = BuildCapacityEvidence(isImport, pickupCapacity),
             Timeline = BuildTimeline(campaign, isSigned, journey),
@@ -303,7 +322,19 @@ public static class CommunityCollectiveActionSnapshotFactory
                     new("함께 정한 수량", $"{totalQuantity:N0}{groupPurchase?.QuantityUnit ?? "개"}", "서명된 수요 기준"),
                     new("다음 기록", "이행 중", "실제 출고·수령 결과는 업무 원장에서 이어집니다.")
                 ]
-                : []
+                : [],
+            Delivery = CommunityUnitedStatesCollectiveImportScenarioFactory.Build(
+                campaign,
+                journey,
+                roleSlots),
+            TraditionalMarketImportedMeatFulfillment =
+                CommunityTraditionalMarketImportedMeatScenarioFactory.Build(campaign),
+            MarketDay = CommunityMarketDayScenarioFactory.Build(
+                campaign,
+                productLabel,
+                totalQuantity,
+                journey?.Economics.RecommendedQuantity ?? totalQuantity,
+                groupPurchase?.QuantityUnit ?? "개")
         };
     }
 
@@ -445,7 +476,9 @@ public static class CommunityCollectiveActionSnapshotFactory
 
     private static IReadOnlyList<CommunityActionRoleSlotSnapshot> BuildRoleSlots(
         CommunityVoteResponse campaign,
-        bool isImport)
+        bool isImport,
+        bool isUnitedStatesImport,
+        bool isKoreaImportedMeat)
     {
         var proposerLabel = string.IsNullOrWhiteSpace(campaign.CreatedByDisplayName)
             ? "제안자 확인 필요"
@@ -468,6 +501,103 @@ public static class CommunityCollectiveActionSnapshotFactory
                 new("통관·문서", "import-customs", "수입 통관 전문가", "도착국 신고와 통관 서류를 별도 수임으로 검토합니다.", false, null, "전문가 요청", false),
                 new("통관·문서", "export-customs", "수출 통관 전문가", "출발국 수출 신고와 서류를 별도 수임으로 검토합니다.", false, null, "전문가 요청", false),
                 new("운송 중개·주선", "forwarder", "허가·등록된 운송 주선업자", "운송 경로와 제공자 조건을 자신의 권한 안에서 제안합니다.", false, null, "전문가 요청", false)
+            ]);
+        }
+
+        if (isUnitedStatesImport)
+        {
+            slots.RemoveAll(slot => slot.RoleCode is "warehouse" or "carrier");
+            slots.AddRange(
+            [
+                new(
+                    "현장 이행",
+                    CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator,
+                    "보세창고·FTZ 운영자",
+                    "현재 시설 승인, FIRMS 정보, 공간과 계약을 별도로 확인합니다.",
+                    false,
+                    null,
+                    "업체 후보 확인",
+                    false),
+                new(
+                    "실제 운송",
+                    CommunityPostPartyRoleCodes.InBondCarrier,
+                    "통관 전 보세운송사",
+                    "ACE in-bond 신고, carrier bond와 운송계약을 확인합니다.",
+                    false,
+                    null,
+                    "업체 후보 확인",
+                    false),
+                new(
+                    "현장 이행",
+                    CommunityPostPartyRoleCodes.DomesticFulfillmentOperator,
+                    "미국 내 풀필먼트 운영자",
+                    "반출 화물의 입고·소분·보관·피킹·parcel 인계를 검토합니다.",
+                    false,
+                    null,
+                    "업체 후보 확인",
+                    false),
+                new(
+                    "실제 운송",
+                    CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider,
+                    "참여자 주소 배송 사업자",
+                    "동의된 주소와 서비스 권역 안에서 최종 배송 가능성을 검토합니다.",
+                    false,
+                    null,
+                    "업체 후보 확인",
+                    false)
+            ]);
+        }
+
+        if (isKoreaImportedMeat)
+        {
+            slots.RemoveAll(slot => slot.RoleCode is "warehouse" or "carrier");
+            slots.AddRange(
+            [
+                new(
+                    "현장 이행",
+                    CommunityTraditionalMarketImportedMeatRoleCodes.TraditionalMarketHubOperator,
+                    "전통시장 육류 입고 거점",
+                    "통관 반출된 수입육의 lot, 온도, 이력번호와 작업장 인계를 확인합니다.",
+                    true,
+                    null,
+                    "거점·냉장시설 확인",
+                    false),
+                new(
+                    "현장 이행",
+                    CommunityTraditionalMarketImportedMeatRoleCodes.LicensedMeatProcessor,
+                    "전통시장 정육·육가공 사업자",
+                    "실제 인허가 범위 안에서 발골·정형·절단·소분과 포장을 제안합니다.",
+                    true,
+                    null,
+                    "인허가·처리량 확인",
+                    false),
+                new(
+                    "거래 당사자",
+                    CommunityTraditionalMarketImportedMeatRoleCodes.MeatSeller,
+                    "식육 판매 책임 사업자",
+                    "참여자별 판매 중량, 표시, 이력번호와 소비기한을 확인합니다.",
+                    true,
+                    null,
+                    "판매 범위 확인",
+                    false),
+                new(
+                    "실제 운송",
+                    CommunityTraditionalMarketImportedMeatRoleCodes.DomesticColdCarrier,
+                    "국내 냉장·냉동 운송 사업자",
+                    "통관 반출지부터 시장 작업장까지 보관조건과 온도 인계를 확인합니다.",
+                    false,
+                    null,
+                    "운반 영업·차량 확인",
+                    false),
+                new(
+                    "실제 운송",
+                    CommunityTraditionalMarketImportedMeatRoleCodes.NeighborhoodColdDeliveryProvider,
+                    "동네 냉장배송 사업자",
+                    "참여자 주소 동의 후 생활권 안의 냉장배송과 수령 확인을 맡습니다.",
+                    false,
+                    null,
+                    "배송 범위·계약 확인",
+                    false)
             ]);
         }
 
@@ -569,6 +699,9 @@ public static class CommunityCollectiveActionPreviewCatalog
         return
         [
             CreateInProgress(now),
+            CreateUnitedStatesBuyerImport(now),
+            CreateTraditionalMarketImportedMeat(now),
+            CreateFreshProduceMarketDay(now),
             CreateGathering(now),
             CreateReadiness(now),
             CreateCompleted(now)
@@ -645,6 +778,270 @@ public static class CommunityCollectiveActionPreviewCatalog
                 new("확정 수량", "42박스", "임시 참여 2박스 별도"),
                 new("남은 여력", "8박스", "모든 필수 담당자 확인 기준")
             ]
+        };
+
+    private static CommunityCollectiveActionSnapshot CreateUnitedStatesBuyerImport(
+        DateTimeOffset now)
+    {
+        IReadOnlyList<CommunityActionRoleSlotSnapshot> roles =
+        [
+            new("거래 당사자", CommunityPostPartyRoleCodes.Buyer, "미국 구매 참여자", "수량과 배송 조건을 직접 확인합니다.", true, "26명", "관심·수량 확인", true),
+            new("거래 당사자", CommunityPostPartyRoleCodes.Seller, "중국 제조사·수출자", "공급과 출하 전 개별포장·라벨 조건을 제안합니다.", true, "중국 제조공장", "전처리 견적 검토", true),
+            new("거래 당사자", CommunityPostPartyRoleCodes.Importer, "미국 수입 책임 당사자", "수입 계약과 신고 책임 범위를 직접 수락합니다.", true, "참여자 확인 중", "역할 수락 필요", false),
+            new("통관·문서", CommunityPostPartyRoleCodes.ImportCustomsBroker, "미국 수입 통관 전문가", "통관 서류와 관할 요구사항을 별도 수임으로 검토합니다.", false, null, "전문가 요청", false),
+            new("현장 이행", CommunityPostPartyRoleCodes.CustomsControlledFacilityOperator, "보세창고·FTZ 운영자", "시설 승인과 공간, 인계 조건을 별도 계약으로 확인합니다.", false, "후보 문의 준비", "권한·계약 확인", false),
+            new("실제 운송", CommunityPostPartyRoleCodes.InBondCarrier, "통관 전 보세운송사", "ACE in-bond 이동 권한과 경로를 확인합니다.", false, null, "업체 후보 확인", false),
+            new("현장 이행", CommunityPostPartyRoleCodes.DomesticFulfillmentOperator, "미국 내 풀필먼트 운영자", "반출 화물의 입고·소분·피킹·parcel 인계를 맡습니다.", false, "후보 문의 준비", "시설·계약 확인", false),
+            new("실제 운송", CommunityPostPartyRoleCodes.ParticipantAddressDeliveryProvider, "참여자 주소 배송 사업자", "동의된 주소와 서비스 권역 안에서 배송합니다.", false, null, "서비스 권역 확인", false)
+        ];
+        var campaign = new CommunityVoteResponse
+        {
+            TotalVoteCount = 26,
+            GroupPurchase = new CommunityGroupPurchaseVoteResponse
+            {
+                OperatingMarketCountryCode = CommunityGroupPurchaseTradeRoutePolicy
+                    .UnitedStatesCountryCode,
+                ShipFromCountryCode = "CN",
+                DeliveryCountryCode = "US",
+                IsGroupImportCandidate = true,
+                MinimumParticipantCount = 20,
+                MinimumTotalQuantity = 72,
+                TotalRequestedQuantity = 84,
+                IsMinimumReached = true,
+                ServiceAreaKey = "us-place:3651000",
+                ServiceAreaLabel = "New York city"
+            }
+        };
+        var journey = new CommunityActionJourneyResponse
+        {
+            ProvisionalLedgerId = "preview-us-import-provisional-ledger"
+        };
+
+        return new CommunityCollectiveActionSnapshot
+        {
+            Id = Guid.Parse("55555555-5555-4555-8555-555555555555"),
+            Title = "뉴욕 생활모임 중국 공장 생활용품 공동수입",
+            Summary = "미국 구매자들이 수량을 모으고 중국 공장에서 개별포장·문서·카톤 작업을 먼저 해 미국 후처리 비용을 줄일 수 있는지 견적을 비교합니다.",
+            CommunityScope = "New York city · Census place 배달권",
+            CurrentPageKey = CommunityCollectiveActionPageKeys.Party,
+            StatusLabel = "수입·물류 역할 구성 중",
+            ProductLabel = "중국 공장 생산 스테인리스 밀폐용기 세트",
+            SourceCountryCode = "CN",
+            DestinationCountryCode = "US",
+            ParticipantCount = 26,
+            CurrentCommittedQuantity = 84,
+            CurrentPotentialQuantity = 92,
+            MinimumOrderQuantity = 72,
+            QuantityUnit = "상자",
+            AdditionalParticipationClosesAt = now.AddDays(4),
+            EstimatedCurrentUnitCost = 48.60m,
+            IsPreview = true,
+            IsMine = true,
+            Conditions =
+            [
+                new("product", "함께 살 것", "중국 공장 생산 스테인리스 밀폐용기 6종", "상품 조건 확인", true),
+                new("quantity", "필요한 양", "84/72상자", "기준 도달", true),
+                new("scope", "모집 배달권", "New York city · us-place:3651000", "Census 범위", true),
+                new("delivery", "수령 방식", "미국 풀필먼트 입고 후 참여자 주소 배송", "개별 주소 비공개", true),
+                new("origin-preparation", "출발 전 전처리", "개별포장·영문 원산지 라벨·송장 원천자료", "공장·미국 3PL 견적 비교 전", false),
+                new("economics", "예상 도착원가", "48.60 USD/상자 · 추정", "견적 전", false)
+            ],
+            RoleSlots = roles,
+            ReadinessChecks =
+            [
+                new("demand", "최소 수요", "20명·72상자 기준을 넘었습니다.", true, true),
+                new("route", "거래 경로", "중국 공장 출발·미국 반입·참여자 주소 배송을 확인했습니다.", true, true),
+                new("origin-preparation", "출발 전 전처리", "공장 전처리비, 추가 국제운임과 미국 후처리 회피비용을 비교해야 합니다.", false, true),
+                new("scope", "모집 배달권", "Census place 범위로만 공개하며 개별 주소는 수집하지 않습니다.", true, true),
+                new("roles", "필수 역할 수락", "수입자와 물류 역할 담당자의 직접 수락이 더 필요합니다.", false, true),
+                new("contracts", "권한·계약", "시설 승인, 통관, 운송과 풀필먼트 계약은 플랫폼 밖에서 별도 확인합니다.", false, true)
+            ],
+            CapacityEvidence =
+            [
+                new("supply", "공급 가능량", "중국 제조사·수출자", CommunityCapacityEvidenceStatus.Pending, 120, "공급 견적 재확인 필요"),
+                new("origin-preparation", "출발 전 포장·문서 처리량", "중국 제조공장", CommunityCapacityEvidenceStatus.Pending, null, "개별포장·라벨·QC 견적 전"),
+                new("bonded", "보세 인계 가능량", "보세시설·보세운송사", CommunityCapacityEvidenceStatus.Pending, null, "시설·권한 확인 전"),
+                new("fulfillment", "풀필먼트 처리량", "미국 내 풀필먼트 운영자", CommunityCapacityEvidenceStatus.Pending, null, "계약·SLA 확인 전"),
+                new("parcel", "참여자 주소 배송", "parcel·last-mile 사업자", CommunityCapacityEvidenceStatus.Pending, null, "서비스 권역 확인 전")
+            ],
+            Timeline =
+            [
+                new(now.AddDays(-9), "미국 구매자들이 이야기를 시작했어요", "개별 주소 대신 New York city 배달권에서 관심을 모았습니다.", true),
+                new(now.AddDays(-5), "최소 수량을 넘었어요", "26명이 84상자의 참여 의향을 기록했습니다.", true),
+                new(now.AddDays(-3), "비구속 가원장을 만들었어요", "주문·계약 확정 전 공동 조건과 역할 슬롯을 기록했습니다.", true),
+                new(now.AddDays(-1), "공장 전처리 견적 비교를 열었어요", "공장 전처리와 미국 3PL 후처리 비용을 같은 조건으로 확인합니다.", true)
+            ],
+            Delivery = CommunityUnitedStatesCollectiveImportScenarioFactory.Build(
+                campaign,
+                journey,
+                roles)
+        };
+    }
+
+    private static CommunityCollectiveActionSnapshot CreateTraditionalMarketImportedMeat(
+        DateTimeOffset now)
+    {
+        IReadOnlyList<CommunityActionRoleSlotSnapshot> roles =
+        [
+            new("거래 당사자", CommunityPostPartyRoleCodes.Buyer, "한국 구매 참여자", "희망 부위, 중량과 냉장 수령 조건을 확인합니다.", true, "34명", "수량 확인", true),
+            new("거래 당사자", CommunityPostPartyRoleCodes.Seller, "호주 승인 작업장·수출자", "도축·1차 처리, 제품 lot와 수출 증명을 준비합니다.", true, "호주 공급자 예시", "공급 조건 확인", true),
+            new("거래 당사자", CommunityPostPartyRoleCodes.Importer, "한국 수입 책임 당사자", "검역·수입검사·세관 신고와 국내 반출 근거를 확인합니다.", true, "수입 책임 참여자", "역할 수락", true),
+            new("통관·문서", CommunityPostPartyRoleCodes.ImportCustomsBroker, "수입 통관 전문가", "품목분류와 신고 서류를 별도 수임 범위에서 검토합니다.", false, "수임 예시", "공식 결과 연결", true),
+            new("현장 이행", CommunityTraditionalMarketImportedMeatRoleCodes.TraditionalMarketHubOperator, "전통시장 육류 입고 거점", "통관 반출된 lot와 온도·이력번호를 확인하고 작업장에 인계합니다.", true, "서울 지역 전통시장 후보", "현장·냉장시설 확인", false),
+            new("현장 이행", CommunityTraditionalMarketImportedMeatRoleCodes.LicensedMeatProcessor, "전통시장 정육·육가공 사업자", "인허가 범위 안에서 필요한 발골·정형·절단·소분을 맡습니다.", true, "시장 상인 참여 요청", "인허가·처리량 확인", false),
+            new("거래 당사자", CommunityTraditionalMarketImportedMeatRoleCodes.MeatSeller, "식육 판매 책임 사업자", "판매 중량, 표시, 이력번호와 소비기한을 확인합니다.", true, null, "판매 범위 확인", false),
+            new("실제 운송", CommunityTraditionalMarketImportedMeatRoleCodes.DomesticColdCarrier, "국내 냉장·냉동 운송 사업자", "반출지에서 전통시장까지 냉동 상태와 인계 기록을 유지합니다.", false, null, "차량·계약 확인", false),
+            new("실제 운송", CommunityTraditionalMarketImportedMeatRoleCodes.NeighborhoodColdDeliveryProvider, "동네 냉장배송 사업자", "참여자 주소 동의 후 생활권 안에서 냉장배송합니다.", false, "지역 배송 참여 요청", "배송권·계약 확인", false)
+        ];
+        var campaign = new CommunityVoteResponse
+        {
+            TotalVoteCount = 34,
+            GroupPurchase = new CommunityGroupPurchaseVoteResponse
+            {
+                OperatingMarketCountryCode = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                SellerCountryCode = "AU",
+                ShipFromCountryCode = "AU",
+                DeliveryCountryCode = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+                IsGroupImportCandidate = true,
+                CustomsClearanceStatusCode = CommunityGroupPurchaseCustomsClearanceStatusCodes.Cleared,
+                HsCode = "020230",
+                TemperatureCode = "냉동",
+                MinimumParticipantCount = 24,
+                MinimumTotalQuantity = 300,
+                TotalRequestedQuantity = 420,
+                IsMinimumReached = true,
+                ServiceAreaKey = "traditional-market:sample-seoul",
+                ServiceAreaLabel = "서울 지역 전통시장 생활권"
+            }
+        };
+
+        return new CommunityCollectiveActionSnapshot
+        {
+            Id = Guid.Parse("66666666-6666-4666-8666-666666666666"),
+            Title = "호주산 소고기 공동수입 · 전통시장 정육 배분",
+            Summary = "해외 승인 작업장에서 도축·수출검역된 냉동육을 한국에서 검역·통관한 뒤, 지역 전통시장 정육 사업자가 부위별로 작업하고 동네 냉장배송 사업자가 참여자에게 전달하는 예시입니다.",
+            CommunityScope = "서울 전통시장 생활권 · 한국/호주",
+            CurrentPageKey = CommunityCollectiveActionPageKeys.Party,
+            StatusLabel = "지역 가공·배송 역할 구성 중",
+            ProductLabel = "호주산 냉동 뼈 없는 소고기 · HS 020230",
+            SourceCountryCode = "AU",
+            DestinationCountryCode = "KR",
+            ParticipantCount = 34,
+            CurrentCommittedQuantity = 420,
+            CurrentPotentialQuantity = 470,
+            MinimumOrderQuantity = 300,
+            QuantityUnit = "kg",
+            AdditionalParticipationClosesAt = now.AddDays(5),
+            IsPreview = true,
+            IsMine = true,
+            Conditions =
+            [
+                new("product", "함께 살 것", "호주산 냉동 뼈 없는 소고기 420kg", "제품 lot 확인", true),
+                new("import-release", "국내 반출", "검역·수입검사·세관 수리 참조가 있는 물량", "둘러보기 예시", true),
+                new("processing", "지역 2차 가공", "필요한 발골·정형·부위별 소분·소비자 포장", "작업장 인허가 확인 전", false),
+                new("traceability", "표시·이력", "원산지·보관조건·축산물이력번호 연결", "작업 lot 설계 중", false),
+                new("delivery", "수령 방식", "전통시장 출고 후 참여자 주소 냉장배송", "주소 동의 후", false),
+                new("local-value", "지역 사업자 대가", "정육가공비와 동네 냉장배송비를 별도 견적으로 반영", "견적 전", false)
+            ],
+            RoleSlots = roles,
+            ReadinessChecks =
+            [
+                new("demand", "최소 수요", "24명·300kg 기준을 넘었습니다.", true, true),
+                new("import-release", "수입 반출 근거", "예시상 공식 결과 참조가 연결돼 있습니다.", true, true),
+                new("market", "전통시장 작업장", "시장 공공정보와 실제 식육 영업 인허가를 별도로 확인해야 합니다.", false, true),
+                new("processing", "가공 범위", "포장육 생산·재절단 판매·즉석가공 중 실제 작업 범위를 정해야 합니다.", false, true),
+                new("cold-chain", "냉장·냉동 이행", "입고부터 가공·포장·배송까지 처리량과 온도 기록이 필요합니다.", false, true),
+                new("contracts", "직접 수락·계약", "플랫폼이 상인이나 배송자를 자동 선정하지 않습니다.", false, true)
+            ],
+            CapacityEvidence =
+            [
+                new("supply", "통관 반출 물량", "한국 수입 책임 당사자", CommunityCapacityEvidenceStatus.Confirmed, 500, "예시 공식 참조 · 실제 재확인 필요"),
+                new("market-inbound", "시장 냉동 입고량", "전통시장 거점 운영자", CommunityCapacityEvidenceStatus.Pending, null, "냉동시설·일일 처리량 확인 전"),
+                new("processing", "정육가공 가능량", "허가·신고된 식육 작업 사업자", CommunityCapacityEvidenceStatus.Pending, null, "부위 규격·수율·인허가 확인 전"),
+                new("packing", "참여자 포장 가능량", "식육 판매 책임 사업자", CommunityCapacityEvidenceStatus.Pending, null, "포장·표시·이력 설계 전"),
+                new("local-delivery", "동네 냉장배송 가능량", "지역 배송 사업자", CommunityCapacityEvidenceStatus.Pending, null, "생활권·차량·계약 확인 전")
+            ],
+            Timeline =
+            [
+                new(now.AddDays(-12), "호주산 소고기 이야기가 시작됐어요", "필요한 부위와 가구별 중량을 게시글에서 모았습니다.", true),
+                new(now.AddDays(-7), "최소 수량을 넘었어요", "34명이 420kg의 비구속 참여 의향을 기록했습니다.", true),
+                new(now.AddDays(-3), "국내 반출 이후 흐름을 나눴어요", "수입 절차와 전통시장 2차 가공을 서로 다른 책임 단계로 분리했습니다.", true),
+                new(now.AddDays(-1), "시장 상인과 배송 역할을 열었어요", "가공비와 지역 배송비를 정당한 서비스 대가로 견적받습니다.", true)
+            ],
+            TraditionalMarketImportedMeatFulfillment =
+                CommunityTraditionalMarketImportedMeatScenarioFactory.Build(campaign),
+            MarketDay = CommunityMarketDayScenarioFactory.Build(
+                campaign,
+                "호주산 냉동 뼈 없는 소고기 · HS 020230",
+                420,
+                470,
+                "kg")
+        };
+    }
+
+    private static CommunityCollectiveActionSnapshot CreateFreshProduceMarketDay(
+        DateTimeOffset now)
+        => new()
+        {
+            Id = Guid.Parse("77777777-7777-4777-8777-777777777777"),
+            Title = "성남 제철 채소·과일 공동구매 장날",
+            Summary = "공동구매 예약 물량을 먼저 보호하고, 상인회와 청과·채소 상인이 확정한 여유 물량을 장날 현장에 진열해 이웃도 구경하고 구매하는 시범 운영입니다.",
+            CommunityScope = "경기 성남 · 전통시장 생활권",
+            CurrentPageKey = CommunityCollectiveActionPageKeys.InProgress,
+            StatusLabel = "공동장날 입고 준비 중",
+            ProductLabel = "제철 토마토·사과 꾸러미",
+            SourceCountryCode = "KR",
+            DestinationCountryCode = "KR",
+            ParticipantCount = 48,
+            CurrentCommittedQuantity = 80,
+            CurrentPotentialQuantity = 96,
+            MinimumOrderQuantity = 60,
+            QuantityUnit = "상자",
+            AdditionalParticipationClosesAt = now.AddDays(3),
+            IsPreview = true,
+            IsMine = true,
+            Conditions =
+            [
+                new("association", "상인회 공동사업", "시범 장날 일정·공용공간·차량 동선 합의", "예시 합의", true),
+                new("reservation", "예약 물량", "공동구매 참여자 80상자 별도 표식·보관", "현장판매와 분리", true),
+                new("walk-in", "현장판매 물량", "확정 12상자·추가 후보 4상자", "확정 물량만 공개", true),
+                new("produce-handling", "청과·채소 작업", "검수·선별·등급·단순 손질·소분", "참여 상인 수락", true),
+                new("origin", "표시", "품목·생산지·중량·판매 상인 표시", "입고 때 재확인", false),
+                new("closeout", "잔량 처리", "할인·기부·반품 중 판매 상인이 합의한 기준", "마감 기록 예정", false)
+            ],
+            RoleSlots =
+            [
+                new("거래 당사자", CommunityPostPartyRoleCodes.Buyer, "공동구매 참여 주민", "예약 수량과 장날 수령시간을 확인합니다.", true, "48명", "예약 80상자", true),
+                new("현장 이행", CommunityMarketDayRoleCodes.MarketAssociationCoordinator, "전통시장 상인회·시장관리자", "공동장날 일정, 공용공간과 참여 상점 모집을 조정합니다.", true, "시범운영 합의 예시", "공동사업 범위", true),
+                new("현장 이행", CommunityMarketDayRoleCodes.FreshProduceMerchant, "청과·채소 상인", "입고 농산물을 검수하고 선별·등급·원산지와 판매 조건을 확인합니다.", true, "참여 상점 2곳", "취급 품목·처리량", true),
+                new("현장 이행", CommunityMarketDayRoleCodes.ProduceSortingPackingOperator, "농산물 선별·소분 담당", "예약과 현장판매 물량을 나누어 상자별로 표시합니다.", true, "시장 작업조 1팀", "작업 범위·위생", true),
+                new("거래 당사자", CommunityMarketDayRoleCodes.MarketDaySeller, "장날 현장 판매 상인", "확정 여유 물량을 진열하고 표시 가격과 판매 결과를 기록합니다.", true, "참여 상점 2곳", "수량·표시·마감", true),
+                new("실제 운송", CommunityMarketDayRoleCodes.LocalDeliveryProvider, "생활권 배송 참여자", "배송 신청 물량만 시장에서 인수해 전달합니다.", false, null, "서비스 권역·계약", false)
+            ],
+            ReadinessChecks =
+            [
+                new("association", "상인회 협의", "시범 장날 공동사업 범위를 합의했습니다.", true, true),
+                new("merchants", "참여 상점 수락", "청과·채소 상인과 현장 판매 상인이 직접 수락했습니다.", true, true),
+                new("inventory", "예약·현장판매 재고 분리", "80상자와 12상자를 별도 표식으로 관리합니다.", true, true),
+                new("arrival", "입고 품질·원산지", "장날 아침 실제 물량을 확인해야 합니다.", false, true),
+                new("marketing", "지역 공개", "일정과 확정 현장판매 물량만 게시판과 시장 현장판에 공개합니다.", true, false)
+            ],
+            CapacityEvidence =
+            [
+                new("supply", "산지 출하 가능량", "생산자·공급자", CommunityCapacityEvidenceStatus.Confirmed, 100, "출하 확인 예시"),
+                new("reserved", "공동구매 예약 물량", "참여 주민", CommunityCapacityEvidenceStatus.Confirmed, 80, "예약 원장", false),
+                new("walk-in", "현장판매 확정 물량", "참여 판매 상인", CommunityCapacityEvidenceStatus.Confirmed, 12, "별도 판매 재고", false),
+                new("sorting", "선별·소분 처리량", "청과·채소 상인", CommunityCapacityEvidenceStatus.Confirmed, 100, "장날 오전 처리량 예시"),
+                new("delivery", "생활권 배송 물량", "지역 배송 참여자", CommunityCapacityEvidenceStatus.Pending, null, "배송 신청 마감 뒤 확인", false)
+            ],
+            Timeline =
+            [
+                new(now.AddDays(-14), "제철 농산물 이야기가 시작됐어요", "게시글에서 원하는 꾸러미와 수령 방식을 모았습니다.", true),
+                new(now.AddDays(-9), "공동구매 기준을 넘었어요", "48명이 80상자를 예약했습니다.", true),
+                new(now.AddDays(-5), "상인회와 시범 장날을 합의했어요", "공용공간, 입고 동선과 참여 상점 모집 범위를 정했습니다.", true),
+                new(now.AddDays(-2), "현장판매 물량을 따로 확정했어요", "예약 물량을 건드리지 않는 12상자만 이웃에게 공개합니다.", true)
+            ],
+            MarketDay = CommunityMarketDayScenarioFactory.CreateFreshProducePilotPreview(now)
         };
 
     private static CommunityCollectiveActionSnapshot CreateGathering(DateTimeOffset now)

@@ -3,6 +3,7 @@ using Hongdal.Contracts.Common.ContractManagement;
 using Hongdal.Contracts.Common.Inbound;
 using Hongdal.Contracts.Common.Inventory;
 using Hongdal.Contracts.Common.Orderer;
+using Hongdal.Contracts.Common.Operations;
 using Hongdal.Contracts.Common.Sales;
 using Hongdal.Contracts.Common.Warehouse;
 using Hongdal.Contracts.Shipper.Request;
@@ -497,6 +498,29 @@ public sealed class 공동구매화면ViewModelTests
     }
 
     [Fact]
+    public async Task 미국운영시장_기본국가를적용하고_한국출발미국배송을공동수입으로판정한다()
+    {
+        using var fixture = CreateFixture(
+            new Fake공동구매업무Service(),
+            operatingMarketProfileClient: new FakeOperatingMarketProfileClient("US"));
+
+        Assert.True(await fixture.ViewModel.초기화Async());
+
+        var route = fixture.ViewModel.모집.제안.거래경로;
+        Assert.Equal("US", route.운영국가코드);
+        Assert.Equal("US", route.판매자국가코드);
+        Assert.Equal("US", route.상품출발국가코드);
+        Assert.Equal("US", route.최종배송국가코드);
+        Assert.Equal("미국 내 공동구매", route.판정명);
+
+        route.판매자국가코드 = "KR";
+
+        Assert.Equal("KR", route.상품출발국가코드);
+        Assert.True(route.공동수입후보);
+        Assert.Equal("공동수입 후보", route.판정명);
+    }
+
+    [Fact]
     public async Task 공동수입선택_수입분기만활성화하고국내공급API를차단한다()
     {
         var campaign = Campaign(
@@ -969,7 +993,8 @@ public sealed class 공동구매화면ViewModelTests
         Fake공동구매실행Service? executionService = null,
         Fake공동구매가격의사결정Service? priceService = null,
         Fake공동구매원장절차Client? ledgerProgressClient = null,
-        Fake공동수입선적통관Client? shipmentCustomsClient = null)
+        Fake공동수입선적통관Client? shipmentCustomsClient = null,
+        IOperatingMarketProfileClient? operatingMarketProfileClient = null)
     {
         var services = new ServiceCollection();
         services.AddSingleton<I공동구매업무Service>(service);
@@ -985,6 +1010,8 @@ public sealed class 공동구매화면ViewModelTests
         services.AddSingleton<I판매채널Client>(new Fake판매채널Client());
         services.AddSingleton<I공동구매가격의사결정Service>(
             priceService ?? new Fake공동구매가격의사결정Service());
+        services.AddSingleton<IOperatingMarketProfileClient>(
+            operatingMarketProfileClient ?? new FakeOperatingMarketProfileClient("KR"));
         services.AddHongdalUiCommonAppServices();
         var provider = services.BuildServiceProvider();
         var scope = provider.CreateScope();
@@ -1131,6 +1158,18 @@ public sealed class 공동구매화면ViewModelTests
             scope.Dispose();
             provider.Dispose();
         }
+    }
+
+    private sealed class FakeOperatingMarketProfileClient(string countryCode)
+        : IOperatingMarketProfileClient
+    {
+        public Task<OperatingMarketRuntimeProfileResponse?> GetCurrentAsync(
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<OperatingMarketRuntimeProfileResponse?>(new()
+            {
+                MarketCode = countryCode,
+                CountryCode = countryCode
+            });
     }
 
     private sealed class Fake공동구매업무Service : I공동구매업무Service

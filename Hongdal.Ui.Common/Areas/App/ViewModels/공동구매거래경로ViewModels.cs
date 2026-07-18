@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
@@ -8,6 +9,18 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 /// </summary>
 public sealed partial class 공동구매거래경로판정ViewModel : ObservableObject
 {
+    private readonly IOperatingMarketProfileClient? _operatingMarketProfileClient;
+
+    public 공동구매거래경로판정ViewModel(
+        IOperatingMarketProfileClient? operatingMarketProfileClient = null)
+    {
+        _operatingMarketProfileClient = operatingMarketProfileClient;
+    }
+
+    [ObservableProperty]
+    public partial string 운영국가코드 { get; set; }
+        = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode;
+
     [ObservableProperty]
     public partial string 판매자국가코드 { get; set; }
         = CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode;
@@ -30,7 +43,8 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
                 판매자국가코드,
                 상품출발국가코드,
                 최종배송국가코드,
-                국내통관상태코드));
+                국내통관상태코드,
+                운영국가코드));
 
     public string 거래경로코드 => 판정.RouteCode;
 
@@ -40,12 +54,24 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
         => 거래경로코드 == CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder
            && string.Equals(
                CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(상품출발국가코드),
-               CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+               정규화운영국가코드,
                StringComparison.OrdinalIgnoreCase)
            && !string.Equals(
                CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(최종배송국가코드),
-               CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
+               정규화운영국가코드,
                StringComparison.OrdinalIgnoreCase);
+
+    public string 정규화운영국가코드
+        => CommunityGroupPurchaseTradeRoutePolicy.NormalizeOperatingMarketCountryCode(
+            운영국가코드);
+
+    public string 운영국가표시명
+        => 정규화운영국가코드 switch
+        {
+            CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode => "한국",
+            CommunityGroupPurchaseTradeRoutePolicy.UnitedStatesCountryCode => "미국",
+            _ => 정규화운영국가코드
+        };
 
     public bool 검토필요 => 판정.RequiresManualReview;
 
@@ -61,7 +87,10 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
     public string 판정명
         => 거래경로코드 switch
         {
-            CommunityGroupPurchaseTradeRouteCodes.Domestic => "국내 공동구매",
+            CommunityGroupPurchaseTradeRouteCodes.Domestic
+                => 정규화운영국가코드 == CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode
+                    ? "국내 공동구매"
+                    : $"{운영국가표시명} 내 공동구매",
             CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate => "공동수입 후보",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder when 해외수출후보 => "해외 수출",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder => "기타 국경 간 거래",
@@ -74,12 +103,12 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
             CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate
                 => CommunityGroupPurchaseTradeRoutePolicy.GroupImportCandidateNotice,
             CommunityGroupPurchaseTradeRouteCodes.Domestic
-                => "상품이 한국 안에서 이행되거나 이미 국내 통관된 재고이므로 국내 공동구매 흐름을 유지합니다.",
+                => $"상품이 {운영국가표시명} 안에서 이행되거나 이미 통관된 재고이므로 운영 국가 내 공동구매 흐름을 유지합니다.",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder when 해외수출후보
-                => "한국에서 출발해 해외로 배송하므로 해외 출품·수출신고·국제운송 흐름으로 전환합니다.",
+                => $"{운영국가표시명}에서 출발해 다른 국가로 배송하므로 수출·국제운송 검토 흐름으로 전환합니다.",
             CommunityGroupPurchaseTradeRouteCodes.OtherCrossBorder
-                => "최종 배송국가가 한국이 아니므로 국내 공동수입이 아닌 별도 국경 간 거래 흐름에서 검토합니다.",
-            _ => "상품 출발국가, 최종 배송국가와 국내 통관 상태를 확인하면 거래경로를 판정할 수 있습니다."
+                => $"최종 배송국가가 {운영국가표시명}이 아니므로 운영 국가 반입이 아닌 별도 국경 간 거래 흐름에서 검토합니다.",
+            _ => "상품 출발국가, 최종 배송국가와 도착국 통관 상태를 확인하면 거래경로를 판정할 수 있습니다."
         };
 
     public IReadOnlyList<string> 판정근거
@@ -106,6 +135,64 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
             return requiredMissing.Length > 0
                 ? $"{string.Join(", ", requiredMissing)}를 입력해 주세요."
                 : null;
+        }
+    }
+
+    public async Task<bool> 운영시장초기화Async(
+        CancellationToken cancellationToken = default)
+    {
+        if (_operatingMarketProfileClient is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var profile = await _operatingMarketProfileClient.GetCurrentAsync(cancellationToken);
+            if (profile is null)
+            {
+                return false;
+            }
+
+            운영시장적용(
+                string.IsNullOrWhiteSpace(profile.CountryCode)
+                    ? profile.MarketCode
+                    : profile.CountryCode);
+            return true;
+        }
+        catch (HttpRequestException)
+        {
+            return false;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+    }
+
+    public void 운영시장적용(string? countryCode)
+    {
+        var previousMarketCode = 정규화운영국가코드;
+        var nextMarketCode = CommunityGroupPurchaseTradeRoutePolicy
+            .NormalizeOperatingMarketCountryCode(countryCode);
+        var resetSeller = 기본국가값(판매자국가코드, previousMarketCode);
+        var resetOrigin = 기본국가값(상품출발국가코드, previousMarketCode);
+        var resetDestination = 기본국가값(최종배송국가코드, previousMarketCode);
+
+        운영국가코드 = nextMarketCode;
+        if (resetSeller)
+        {
+            판매자국가코드 = nextMarketCode;
+        }
+
+        if (resetOrigin)
+        {
+            상품출발국가코드 = nextMarketCode;
+        }
+
+        if (resetDestination)
+        {
+            최종배송국가코드 = nextMarketCode;
         }
     }
 
@@ -149,12 +236,17 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
     partial void On국내통관상태코드Changed(string value)
         => 판정속성변경알림();
 
+    partial void On운영국가코드Changed(string value)
+        => 판정속성변경알림();
+
     private void 판정속성변경알림()
     {
         OnPropertyChanged(nameof(판정));
         OnPropertyChanged(nameof(거래경로코드));
         OnPropertyChanged(nameof(공동수입후보));
         OnPropertyChanged(nameof(해외수출후보));
+        OnPropertyChanged(nameof(정규화운영국가코드));
+        OnPropertyChanged(nameof(운영국가표시명));
         OnPropertyChanged(nameof(검토필요));
         OnPropertyChanged(nameof(입력유효));
         OnPropertyChanged(nameof(판정명));
@@ -171,7 +263,7 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
             CommunityGroupPurchaseTradeRouteFieldCodes.SellerCountryCode => "판매자 국가",
             CommunityGroupPurchaseTradeRouteFieldCodes.ShipFromCountryCode => "상품 출발국가",
             CommunityGroupPurchaseTradeRouteFieldCodes.DeliveryCountryCode => "최종 배송국가",
-            CommunityGroupPurchaseTradeRouteFieldCodes.CustomsClearanceStatusCode => "국내 통관 상태",
+            CommunityGroupPurchaseTradeRouteFieldCodes.CustomsClearanceStatusCode => "도착국 통관 상태",
             CommunityGroupPurchaseTradeRouteFieldCodes.HsCode => "HS 코드",
             _ => fieldCode
         };
@@ -184,12 +276,23 @@ public sealed partial class 공동구매거래경로판정ViewModel : Observable
             CommunityGroupPurchaseTradeRouteReasonCodes.GoodsShipFromOutsideKorea => "상품이 해외에서 출발함",
             CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToKorea => "최종 배송국가가 한국임",
             CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryOutsideKorea => "최종 배송국가가 한국이 아님",
+            CommunityGroupPurchaseTradeRouteReasonCodes.SellerOutsideOperatingMarket => "판매자가 운영 국가 밖에 있음",
+            CommunityGroupPurchaseTradeRouteReasonCodes.GoodsShipFromOutsideOperatingMarket => "상품이 운영 국가 밖에서 출발함",
+            CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryToOperatingMarket => "최종 배송지가 운영 국가임",
+            CommunityGroupPurchaseTradeRouteReasonCodes.DeliveryOutsideOperatingMarket => "최종 배송지가 운영 국가 밖임",
             CommunityGroupPurchaseTradeRouteReasonCodes.AlreadyCustomsCleared => "상품이 이미 국내 통관됨",
             CommunityGroupPurchaseTradeRouteReasonCodes.CustomsClearanceRequired => "국내 반입 통관이 필요함",
             CommunityGroupPurchaseTradeRouteReasonCodes.CustomsClearanceStatusRequired => "국내 통관 상태 확인이 필요함",
             CommunityGroupPurchaseTradeRouteReasonCodes.InvalidTradeRouteInput => "거래경로 입력 코드가 올바르지 않음",
             _ => "거래경로 필수정보가 부족함"
         };
+
+    private static bool 기본국가값(string? countryCode, string marketCode)
+    {
+        var normalized = CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(countryCode);
+        return string.IsNullOrWhiteSpace(normalized)
+               || string.Equals(normalized, marketCode, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 /// <summary>

@@ -20,6 +20,7 @@ using Hongdal.Application.Orderer;
 using Hongdal.Application.Settlement;
 using Hongdal.Application.Versioning;
 using Hongdal.Application.Security;
+using Hongdal.Application.Operations;
 using Hongdal.Services.HumanResources;
 using Hongdal.Services.Community;
 using Hongdal.Services.LogisticsProcessing.SalesOrders;
@@ -116,7 +117,9 @@ public static partial class ServiceCollectionExtensions
             new CommunityVoteService(
                 serviceProvider.GetRequiredService<ICommunityVoteStore>(),
                 serviceProvider.GetRequiredService<ICommunityGroupPurchaseDemandOutboxProcessor>(),
-                serviceProvider.GetRequiredService<I공동구매원장절차Service>()));
+                serviceProvider.GetRequiredService<I공동구매원장절차Service>(),
+                serviceProvider.GetRequiredService<IOperatingMarketContextAccessor>()
+                    .Current.Profile.CountryCode));
         services.AddScoped<ISalesChannelOrderSyncService, SalesChannelOrderSyncService>();
         services.AddSingleton<ISalesChannelOrderFeedClient, EmptySalesChannelOrderFeedClient>();
         services.AddScoped<IHrRoleAssignmentStore, EfCoreHrRoleAssignmentStore>();

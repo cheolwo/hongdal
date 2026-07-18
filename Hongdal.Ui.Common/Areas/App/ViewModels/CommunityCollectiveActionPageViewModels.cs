@@ -140,6 +140,83 @@ public sealed class CommunityActionPartyViewModel : ObservableObject
     }
 }
 
+public sealed class CommunityActionDeliveryViewModel : ObservableObject
+{
+    private CommunityCollectiveImportDeliverySnapshot _snapshot = new();
+
+    public CommunityCollectiveImportDeliverySnapshot Snapshot
+    {
+        get => _snapshot;
+        private set => SetProperty(ref _snapshot, value);
+    }
+
+    public bool IsApplicable => Snapshot.IsApplicable;
+    public string RecruitmentScopeLabel => Snapshot.RecruitmentScopeLabel;
+    public string RecruitmentScopeKey => Snapshot.RecruitmentScopeKey;
+    public bool RecruitmentScopeVerified => Snapshot.RecruitmentScopeVerified;
+    public int CompletedStageCount => Snapshot.CompletedStageCount;
+    public int TotalStageCount => Snapshot.Stages.Count;
+    public CommunityCollectiveImportDeliveryStageSnapshot? CurrentStage
+        => Snapshot.CurrentStage;
+    public IReadOnlyList<CommunityCollectiveImportDeliveryStageSnapshot> Stages
+        => Snapshot.Stages;
+
+    public void Apply(CommunityCollectiveActionSnapshot snapshot)
+    {
+        Snapshot = snapshot.Delivery;
+        OnPropertyChanged(nameof(IsApplicable));
+        OnPropertyChanged(nameof(RecruitmentScopeLabel));
+        OnPropertyChanged(nameof(RecruitmentScopeKey));
+        OnPropertyChanged(nameof(RecruitmentScopeVerified));
+        OnPropertyChanged(nameof(CompletedStageCount));
+        OnPropertyChanged(nameof(TotalStageCount));
+        OnPropertyChanged(nameof(CurrentStage));
+        OnPropertyChanged(nameof(Stages));
+    }
+}
+
+public sealed class CommunityActionTraditionalMarketImportedMeatViewModel : ObservableObject
+{
+    private CommunityTraditionalMarketImportedMeatFulfillmentSnapshot _snapshot = new();
+
+    public CommunityTraditionalMarketImportedMeatFulfillmentSnapshot Snapshot
+    {
+        get => _snapshot;
+        private set => SetProperty(ref _snapshot, value);
+    }
+
+    public bool IsApplicable => Snapshot.IsApplicable;
+
+    public void Apply(CommunityCollectiveActionSnapshot snapshot)
+    {
+        Snapshot = snapshot.TraditionalMarketImportedMeatFulfillment;
+        OnPropertyChanged(nameof(IsApplicable));
+    }
+}
+
+public sealed class CommunityActionMarketDayViewModel : ObservableObject
+{
+    private CommunityMarketDaySnapshot _snapshot = new();
+
+    public CommunityMarketDaySnapshot Snapshot
+    {
+        get => _snapshot;
+        private set => SetProperty(ref _snapshot, value);
+    }
+
+    public bool IsApplicable => Snapshot.IsApplicable;
+    public bool CanAdvertiseWalkInSale => Snapshot.CanAdvertiseWalkInSale;
+    public CommunityMarketDayStageSnapshot? CurrentStage => Snapshot.CurrentStage;
+
+    public void Apply(CommunityCollectiveActionSnapshot snapshot)
+    {
+        Snapshot = snapshot.MarketDay;
+        OnPropertyChanged(nameof(IsApplicable));
+        OnPropertyChanged(nameof(CanAdvertiseWalkInSale));
+        OnPropertyChanged(nameof(CurrentStage));
+    }
+}
+
 public sealed class CommunityActionReadinessViewModel : ObservableObject
 {
     private IReadOnlyList<CommunityActionReadinessCheckSnapshot> _checks = [];
@@ -411,6 +488,9 @@ public sealed class CommunityCollectiveActionPageViewModel : PageViewModelBase
         CommunityActionCollectionViewModel actions,
         CommunityActionConditionsViewModel conditions,
         CommunityActionPartyViewModel party,
+        CommunityActionDeliveryViewModel delivery,
+        CommunityActionTraditionalMarketImportedMeatViewModel traditionalMarketImportedMeat,
+        CommunityActionMarketDayViewModel marketDay,
         CommunityActionReadinessViewModel readiness,
         CommunityActionExecutionViewModel execution,
         CommunityActionOutcomeViewModel outcome)
@@ -420,6 +500,9 @@ public sealed class CommunityCollectiveActionPageViewModel : PageViewModelBase
         Actions = 하위ViewModel등록(actions);
         Conditions = 하위ViewModel등록(conditions);
         Party = 하위ViewModel등록(party);
+        Delivery = 하위ViewModel등록(delivery);
+        TraditionalMarketImportedMeat = 하위ViewModel등록(traditionalMarketImportedMeat);
+        MarketDay = 하위ViewModel등록(marketDay);
         Readiness = 하위ViewModel등록(readiness);
         Execution = 하위ViewModel등록(execution);
         Outcome = 하위ViewModel등록(outcome);
@@ -429,6 +512,9 @@ public sealed class CommunityCollectiveActionPageViewModel : PageViewModelBase
     public CommunityActionCollectionViewModel Actions { get; }
     public CommunityActionConditionsViewModel Conditions { get; }
     public CommunityActionPartyViewModel Party { get; }
+    public CommunityActionDeliveryViewModel Delivery { get; }
+    public CommunityActionTraditionalMarketImportedMeatViewModel TraditionalMarketImportedMeat { get; }
+    public CommunityActionMarketDayViewModel MarketDay { get; }
     public CommunityActionReadinessViewModel Readiness { get; }
     public CommunityActionExecutionViewModel Execution { get; }
     public CommunityActionOutcomeViewModel Outcome { get; }
@@ -571,6 +657,9 @@ public sealed class CommunityCollectiveActionPageViewModel : PageViewModelBase
 
         Conditions.Apply(selected);
         Party.Apply(selected);
+        Delivery.Apply(selected);
+        TraditionalMarketImportedMeat.Apply(selected);
+        MarketDay.Apply(selected);
         Readiness.Apply(selected);
         Execution.Apply(selected);
         Outcome.Apply(selected);

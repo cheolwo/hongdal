@@ -16,6 +16,20 @@ public static class CollectiveProcurementCostModelCodes
     };
 }
 
+public static class CollectiveProcurementCostCategoryCodes
+{
+    public const string Goods = "goods";
+    public const string OriginPreparation = "origin-preparation";
+    public const string OriginPackagingAndLabeling = "origin-packaging-labeling";
+    public const string InternationalFreight = "international-freight";
+    public const string DestinationHandling = "destination-handling";
+    public const string ReworkRisk = "rework-risk";
+    public const string DomesticValueAddedProcessing = "domestic-value-added-processing";
+    public const string PackagingLabelingAndTraceability = "packaging-labeling-traceability";
+    public const string LocalColdChainDelivery = "local-cold-chain-delivery";
+    public const string ProcessingYieldLoss = "processing-yield-loss";
+}
+
 public static class CollectiveProcurementBenefitKindCodes
 {
     public const string BuyerSavings = "buyer-savings";

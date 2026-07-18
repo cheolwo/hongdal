@@ -509,7 +509,7 @@ public sealed partial class 공동구매제안ViewModel : 공동구매모집업�
             $"거래 경로: {거래경로.판정명} ({거래경로.거래경로코드})",
             $"판매자 국가: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(거래경로.판매자국가코드)}",
             $"상품 이동: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(거래경로.상품출발국가코드)} -> {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCountryCode(거래경로.최종배송국가코드)}",
-            $"국내 통관 상태: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCustomsClearanceStatusCode(거래경로.국내통관상태코드)}",
+            $"도착국 통관 상태: {CommunityGroupPurchaseTradeRoutePolicy.NormalizeCustomsClearanceStatusCode(거래경로.국내통관상태코드)}",
             $"계약 합의 정책: {CommunityGroupPurchaseAgreementPolicy.PolicyCode}",
             CommunityGroupPurchaseAgreementPolicy.ProposalOriginNotice,
             거래경로.공동수입후보

@@ -152,6 +152,8 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                     ["SellerCountryCode"] = campaign.SellerCountryCode ?? string.Empty,
                     ["ShipFromCountryCode"] = campaign.ShipFromCountryCode ?? string.Empty,
                     ["DeliveryCountryCode"] = campaign.DeliveryCountryCode ?? string.Empty,
+                    ["OperatingMarketCountryCode"] = campaign.OperatingMarketCountryCode
+                                                       ?? CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
                     ["LogisticsRouteCode"] = plan.LogisticsRouteCode,
                     ["WarehouseReferenceKey"] = request.WarehouseReferenceKey.Trim()
                 },
@@ -183,7 +185,7 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
     {
         if (!CommunityGroupPurchaseTradeRouteCodes.IsGroupImport(campaign.TradeRouteCode))
         {
-            throw new InvalidOperationException("해외 출발·국내 반입으로 판정된 공동구매만 공동수입 원장으로 전환할 수 있습니다.");
+            throw new InvalidOperationException("해외 출발·운영 국가 반입으로 판정된 공동구매만 공동수입 원장으로 전환할 수 있습니다.");
         }
 
         var decision = CommunityGroupPurchaseTradeRoutePolicy.Evaluate(
@@ -191,10 +193,11 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                 campaign.SellerCountryCode,
                 campaign.ShipFromCountryCode,
                 campaign.DeliveryCountryCode,
-                campaign.CustomsClearanceStatusCode));
+                campaign.CustomsClearanceStatusCode,
+                campaign.OperatingMarketCountryCode));
         if (!decision.IsGroupImportCandidate || decision.RequiresManualReview)
         {
-            throw new InvalidOperationException("상품 출발국가, 국내 배송국가와 통관 상태를 확정해야 합니다.");
+            throw new InvalidOperationException("상품 출발국가, 운영 국가 배송지와 통관 상태를 확정해야 합니다.");
         }
 
         var normalizedHsCode = new string((campaign.HsCode ?? string.Empty).Where(char.IsDigit).ToArray());
@@ -256,6 +259,8 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                 ["GroupPurchaseCampaignId"] = campaign.CampaignId.ToString("D"),
                 ["SourceGroupPurchaseLedgerId"] = sourceLedger.원장Id,
                 ["HsCode"] = campaign.HsCode ?? string.Empty,
+                ["OperatingMarketCountryCode"] = campaign.OperatingMarketCountryCode
+                                                   ?? CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
                 ["PlanNodeId"] = node.NodeId
             }
         };
@@ -279,6 +284,8 @@ public sealed class 공동수입원장전환Service : I공동수입원장전환S
                 ["SellerCountryCode"] = campaign.SellerCountryCode ?? string.Empty,
                 ["ShipFromCountryCode"] = campaign.ShipFromCountryCode ?? string.Empty,
                 ["DeliveryCountryCode"] = campaign.DeliveryCountryCode ?? string.Empty,
+                ["OperatingMarketCountryCode"] = campaign.OperatingMarketCountryCode
+                                                   ?? CommunityGroupPurchaseTradeRoutePolicy.KoreaCountryCode,
                 ["CustomsClearanceStatusCode"] = campaign.CustomsClearanceStatusCode ?? string.Empty
             }),
             Block("overseas-contract", "해외 공급 계약·발주", "planned", new()

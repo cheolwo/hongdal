@@ -131,6 +131,15 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             x.ServiceType == typeof(CommunityActionExecutionViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(CommunityActionDeliveryViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(CommunityActionTraditionalMarketImportedMeatViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(CommunityActionMarketDayViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(CommunityCollectiveActionPageViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
@@ -169,6 +178,10 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
         Assert.Contains(services, x =>
             x.ServiceType == typeof(I공동구매가격의사결정Service)
             && x.ImplementationType == typeof(공동구매가격의사결정Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(IOperatingMarketProfileClient)
+            && x.ImplementationType == typeof(OperatingMarketProfileClient)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(공동구매화면상태ViewModel)

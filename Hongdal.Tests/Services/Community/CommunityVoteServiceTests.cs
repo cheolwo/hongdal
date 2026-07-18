@@ -162,6 +162,36 @@ public sealed class CommunityVoteServiceTests
     }
 
     [Fact]
+    public async Task GroupPurchaseProposal_KoreaShipmentToUnitedStates_RoundTripsAsUsGroupImportCandidate()
+    {
+        var service = new InMemoryCommunityVoteService(
+            operatingMarketCountryCode: CommunityGroupPurchaseTradeRoutePolicy
+                .UnitedStatesCountryCode);
+        var request = CreateGroupPurchaseVoteRequest();
+        request.GroupPurchase!.SellerCountryCode = "KR";
+        request.GroupPurchase.ShipFromCountryCode = "KR";
+        request.GroupPurchase.DeliveryCountryCode = "US";
+        request.GroupPurchase.CustomsClearanceStatusCode =
+            CommunityGroupPurchaseCustomsClearanceStatusCodes.NotCleared;
+        request.GroupPurchase.ServiceAreaKey = "us-place:3651000";
+        request.GroupPurchase.ServiceAreaLabel = "New York city";
+
+        var created = await service.CreateAsync(request, CancellationToken.None);
+        var reloaded = await service.GetAsync(created.Id, CancellationToken.None);
+
+        Assert.Equal(
+            CommunityGroupPurchaseTradeRoutePolicy.UnitedStatesCountryCode,
+            reloaded?.GroupPurchase?.OperatingMarketCountryCode);
+        Assert.Equal(
+            CommunityGroupPurchaseTradeRouteCodes.InboundGroupImportCandidate,
+            reloaded?.GroupPurchase?.TradeRouteCode);
+        Assert.True(reloaded?.GroupPurchase?.IsGroupImportCandidate);
+        Assert.Equal(
+            CommunityLedgerTemplateKeys.GroupImport,
+            reloaded?.GroupPurchase?.RecommendedLedgerTemplateKey);
+    }
+
+    [Fact]
     public async Task GroupPurchaseProposal_WithoutTradeRouteInputs_KeepsLegacyHsClassification()
     {
         var service = new InMemoryCommunityVoteService();

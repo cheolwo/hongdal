@@ -33,7 +33,8 @@ public sealed record 공동구매원장캠페인Snapshot(
     string? DeliveryCountryCode = null,
     string? CustomsClearanceStatusCode = null,
     decimal TotalRequestedQuantity = 0,
-    string? QuantityUnit = null);
+    string? QuantityUnit = null,
+    string? OperatingMarketCountryCode = null);
 
 public interface I공동구매원장캠페인Store
 {
@@ -76,7 +77,8 @@ internal sealed class CommunityVote공동구매원장캠페인Store(ICommunityVo
                 vote.GroupPurchase?.DeliveryCountryCode,
                 vote.GroupPurchase?.CustomsClearanceStatusCode,
                 vote.Votes.Sum(x => x.RequestedQuantity),
-                vote.GroupPurchase?.QuantityUnit);
+                vote.GroupPurchase?.QuantityUnit,
+                vote.GroupPurchase?.OperatingMarketCountryCode);
     }
 
     public async Task 원장연결Async(

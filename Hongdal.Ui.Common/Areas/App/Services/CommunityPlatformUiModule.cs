@@ -36,6 +36,9 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<CommunityActionCollectionViewModel>();
         services.TryAddTransient<CommunityActionConditionsViewModel>();
         services.TryAddTransient<CommunityActionPartyViewModel>();
+        services.TryAddTransient<CommunityActionDeliveryViewModel>();
+        services.TryAddTransient<CommunityActionTraditionalMarketImportedMeatViewModel>();
+        services.TryAddTransient<CommunityActionMarketDayViewModel>();
         services.TryAddTransient<CommunityActionReadinessViewModel>();
         services.TryAddTransient<CommunityActionExecutionViewModel>();
         services.TryAddTransient<CommunityActionOutcomeViewModel>();

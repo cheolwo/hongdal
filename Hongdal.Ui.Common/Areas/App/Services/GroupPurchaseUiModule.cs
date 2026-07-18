@@ -18,6 +18,7 @@ internal static class GroupPurchaseUiModule
         services.TryAddScoped<I공동수입원장전환Client, 공동수입원장전환Client>();
         services.TryAddScoped<I공동수입선적통관Client, 공동수입선적통관Client>();
         services.TryAddScoped<I공동구매가격의사결정Service, 공동구매가격의사결정Service>();
+        services.TryAddScoped<IOperatingMarketProfileClient, OperatingMarketProfileClient>();
         services.TryAddScoped<공동구매화면상태ViewModel>();
         services.TryAddScoped<공동구매목록ViewModel>();
         services.TryAddScoped<공동구매거래경로판정ViewModel>();
