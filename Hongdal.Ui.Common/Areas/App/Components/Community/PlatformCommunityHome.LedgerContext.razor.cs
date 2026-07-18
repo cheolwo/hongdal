@@ -13,15 +13,6 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
-    private string 현재원장스냅샷클래스생성(현재원장컨텍스트 ledger)
-    {
-        var selected = string.Equals(ledger.Id, 선택현재원장Id, StringComparison.OrdinalIgnoreCase)
-            ? " platform-current-ledger-card--selected"
-            : string.Empty;
-
-        return $"platform-current-ledger-card{selected}";
-    }
-
     private void 현재원장컨텍스트불러오기(string ledgerId)
     {
         var snapshot = 현재원장스냅샷목록.FirstOrDefault(ledger =>

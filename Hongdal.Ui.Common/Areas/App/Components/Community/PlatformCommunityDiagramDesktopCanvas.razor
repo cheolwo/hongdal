@@ -105,26 +105,39 @@
                     }
                 </span>
             }
+            @if (ShowSelectionHint)
+            {
+                <MudChip T="string"
+                         Size="Size.Small"
+                         Variant="@(node.IsSelected ? Variant.Filled : Variant.Outlined)"
+                         Color="@(node.IsSelected ? Color.Success : Color.Secondary)"
+                         Class="platform-ledger-flow-node-select-hint">
+                    @(node.IsSelected ? "선택됨" : "선택")
+                </MudChip>
+            }
         </div>
     }
 
-    @foreach (var handle in Presentation.Handles)
+    @if (ShowHandles)
     {
-        <button type="button"
-                class="@handle.CssClass"
-                style="@handle.Style"
-                title="@($"{handle.Node.Title} {handle.Label} 연결점")"
-                aria-label="@($"{handle.Node.Title} {handle.Label} 연결점")"
-                data-node-title="@handle.Node.Title"
-                data-handle="@handle.HandleKey"
-                draggable="false"
-                @onpointerdown="@((PointerEventArgs eventArgs) => HandlePointerDownAsync(handle, eventArgs))"
-                @onpointerdown:stopPropagation="true"
-                @onpointerup="@(() => HandlePointerUpRequested.InvokeAsync(handle))"
-                @onpointerup:stopPropagation="true"
-                @onclick="@(() => HandleClicked.InvokeAsync(handle))"
-                @onclick:stopPropagation="true"
-                @ondragstart:preventDefault="true"></button>
+        @foreach (var handle in Presentation.Handles)
+        {
+            <button type="button"
+                    class="@handle.CssClass"
+                    style="@handle.Style"
+                    title="@($"{handle.Node.Title} {handle.Label} 연결점")"
+                    aria-label="@($"{handle.Node.Title} {handle.Label} 연결점")"
+                    data-node-title="@handle.Node.Title"
+                    data-handle="@handle.HandleKey"
+                    draggable="false"
+                    @onpointerdown="@((PointerEventArgs eventArgs) => HandlePointerDownAsync(handle, eventArgs))"
+                    @onpointerdown:stopPropagation="true"
+                    @onpointerup="@(() => HandlePointerUpRequested.InvokeAsync(handle))"
+                    @onpointerup:stopPropagation="true"
+                    @onclick="@(() => HandleClicked.InvokeAsync(handle))"
+                    @onclick:stopPropagation="true"
+                    @ondragstart:preventDefault="true"></button>
+        }
     }
 </div>
 
@@ -143,6 +156,8 @@
     [Parameter] public EventCallback<PlatformCommunityDiagramHandlePointerStart> HandlePointerStartRequested { get; set; }
     [Parameter] public EventCallback<DiagramDragPoint> DragPointerChanged { get; set; }
     [Parameter] public EventCallback<DiagramHandleHit?> HandleDropRequested { get; set; }
+    [Parameter] public bool ShowHandles { get; set; } = true;
+    [Parameter] public bool ShowSelectionHint { get; set; }
 
     private async Task HandlePointerDownAsync(
         PlatformCommunityDiagramDesktopHandle handle,

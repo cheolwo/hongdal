@@ -17,6 +17,22 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
+    protected override Task OnInitializedAsync()
+    {
+        ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
+        HomeModeState.Changed += HandleModeChanged;
+        DiagramPalette.Changed += HandleDiagramPaletteChanged;
+        DecorationState.Changed += HandleDecorationStateChanged;
+        DiagramPalette.BlockRequested += HandlePaletteBlockRequested;
+        DiagramPalette.WorkflowPresetRequested += HandleWorkflowPresetRequested;
+        isWorkMode = HomeModeState.IsWorkMode;
+        isCompactHomeSummary = UseCompactHomeSummary && !isWorkMode && !DiagramPalette.IsDiagramMode;
+        HandlePaletteBlockRequested();
+        HandleWorkflowPresetRequested();
+        _ = LoadCommunityDataInStagesAsync();
+        return Task.CompletedTask;
+    }
+
     protected override void OnParametersSet()
     {
         ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));

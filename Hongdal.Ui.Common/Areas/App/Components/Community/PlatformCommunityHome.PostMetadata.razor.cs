@@ -145,12 +145,6 @@ public partial class PlatformCommunityHome
                ?? resolvedRole;
     }
 
-    private static IReadOnlyList<string> ResolveLedgerTemplateNames(IReadOnlyList<string> keys)
-        => keys
-            .Select(key => CommunityLedgerTemplateCatalog.Find(key).DisplayName)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
     private static string FormatDate(DateTime createdAtUtc)
     {
         return createdAtUtc.ToLocalTime().ToString("yyyy.MM.dd HH:mm");

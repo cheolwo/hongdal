@@ -386,189 +386,34 @@
 
             <MudItem xs="12" Class="platform-community-secondary-flow">
                 <MudStack Spacing="2">
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.subtitle1">개설된 게시판</MudText>
-                            @if (isBoardLoading && approvedBoards.Count == 0)
-                            {
-                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">게시판 목록을 불러오는 중입니다.</MudText>
-                                </MudStack>
-                            }
-                            else if (approvedBoards.Count == 0)
-                            {
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">아직 승인된 추가 게시판이 없습니다.</MudText>
-                            }
-                            else
-                            {
-                                <MudStack Spacing="1">
-                                    @foreach (var board in approvedBoards)
-                                    {
-                                        <MudButton Variant="Variant.Outlined"
-                                                   Color="Color.Primary"
-                                                   Size="Size.Small"
-                                                   StartIcon="@Icons.Material.Filled.Forum"
-                                                   OnClick="@(() => SelectBoard(board.Title))">
-                                            <MudStack Spacing="0" AlignItems="AlignItems.Start">
-                                                <MudText Typo="Typo.body2">@board.Title</MudText>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@board.Description</MudText>
-                                            </MudStack>
-                                        </MudButton>
-                                    }
-                                </MudStack>
-                            }
-                        </MudStack>
-                    </MudPaper>
+                    <PlatformCommunityBoardManagementPanel IsLoading="@isBoardLoading"
+                                                           IsSaving="@isSavingBoardRequest"
+                                                           CanManage="@CanManageCommunityPosts"
+                                                           ApprovedBoards="@approvedBoards"
+                                                           PendingBoards="@pendingBoardRequests"
+                                                           Form="@boardForm"
+                                                           ReviewMemos="@boardReviewMemo"
+                                                           BoardSelected="SelectBoard"
+                                                           SaveRequested="SaveBoardRequestAsync"
+                                                           ApproveRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, true))"
+                                                           RejectRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, false))" />
 
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.subtitle1">게시판 개설 신청</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                사용자가 필요한 게시판을 신청하면, 운영자가 승인한 뒤 모든 사용자에게 보입니다.
-                            </MudText>
-                            <MudTextField T="string" Label="게시판 이름" @bind-Value="boardForm.Title" MaxLength="60" />
-                            <MudTextField T="string" Label="신청자" @bind-Value="boardForm.RequestedBy" MaxLength="40" />
-                            <MudTextField T="string" Label="게시판 설명" @bind-Value="boardForm.Description" MaxLength="500" />
-                            <MudTextField T="string" Label="개설 이유" @bind-Value="boardForm.RequestReason" Lines="3" MaxLength="1000" />
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       Disabled="@isSavingBoardRequest"
-                                       StartIcon="@Icons.Material.Filled.AddCircleOutline"
-                                       OnClick="SaveBoardRequestAsync">
-                                개설 신청
-                            </MudButton>
-                        </MudStack>
-                    </MudPaper>
-
-                    @if (CanManageCommunityPosts)
-                    {
-                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                            <MudStack Spacing="2">
-                                <MudText Typo="Typo.subtitle1">게시판 승인 대기</MudText>
-                                @if (isBoardLoading && pendingBoardRequests.Count == 0)
-                                {
-                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                        <MudProgressCircular Indeterminate="true" Size="Size.Small" />
-                                        <MudText Typo="Typo.body2" Color="Color.Secondary">승인 대기 목록을 확인하는 중입니다.</MudText>
-                                    </MudStack>
-                                }
-                                else if (pendingBoardRequests.Count == 0)
-                                {
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">승인 대기 중인 게시판 신청이 없습니다.</MudText>
-                                }
-                                else
-                                {
-                                    @foreach (var board in pendingBoardRequests)
-                                    {
-                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
-                                            <MudStack Spacing="1">
-                                                <MudText Typo="Typo.subtitle2">@board.Title</MudText>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">신청자: @board.RequestedBy · @FormatDate(board.CreatedAtUtc)</MudText>
-                                                <MudText Typo="Typo.body2">@board.RequestReason</MudText>
-                                                <MudTextField T="string" Label="운영 메모" @bind-Value="boardReviewMemo[board.Id]" MaxLength="1000" Margin="Margin.Dense" />
-                                                <MudStack Row="true" Spacing="1">
-                                                    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="@(() => ReviewBoardAsync(board, true))">
-                                                        승인
-                                                    </MudButton>
-                                                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="@(() => ReviewBoardAsync(board, false))">
-                                                        반려
-                                                    </MudButton>
-                                                </MudStack>
-                                            </MudStack>
-                                        </MudPaper>
-                                    }
-                                }
-                            </MudStack>
-                        </MudPaper>
-                    }
-
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudStack Spacing="0">
-                                <MudText Typo="Typo.subtitle1">통합 업무 허브</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                    커뮤니티에서 시작한 일을 원장 유형과 처리 체계 기준으로 정리합니다.
-                                </MudText>
-                            </MudStack>
-                            <MudGrid>
-                                @foreach (var workspace in UnifiedWorkspaces)
-                                {
-                                    <MudItem xs="12" sm="6">
-                                        <div class="platform-unified-workspace">
-                                            <MudStack Spacing="1">
-                                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                                    <MudIcon Icon="@workspace.Icon" Color="@workspace.Color" />
-                                                    <MudChip T="string" Size="Size.Small" Color="@workspace.Color" Variant="Variant.Outlined">@원장처리체계표시명(workspace.OperatingSystemName)</MudChip>
-                                                </MudStack>
-                                                <MudText Typo="Typo.subtitle2">@workspace.Title</MudText>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@workspace.Description</MudText>
-                                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                                    <MudButton Variant="Variant.Outlined"
-                                                               Size="Size.Small"
-                                                               Color="@workspace.Color"
-                                                               StartIcon="@Icons.Material.Filled.Assignment"
-                                                               OnClick="@(() => PrepareLedgerCommunityDraft(workspace.LedgerTemplateKey))">
-                                                        원장 초안
-                                                    </MudButton>
-                                                    @if (!string.IsNullOrWhiteSpace(workspace.EntryHref))
-                                                    {
-                                                        <MudButton Href="@workspace.EntryHref"
-                                                                   Variant="Variant.Text"
-                                                                   Size="Size.Small"
-                                                                   Color="@workspace.Color"
-                                                                   EndIcon="@Icons.Material.Filled.ChevronRight">
-                                                            열기
-                                                        </MudButton>
-                                                    }
-                                                </MudStack>
-                                            </MudStack>
-                                        </div>
-                                    </MudItem>
-                                }
-                            </MudGrid>
-                        </MudStack>
-                    </MudPaper>
+                    <PlatformCommunityWorkspaceHub Workspaces="@UnifiedWorkspaces"
+                                                   LedgerDraftRequested="@((string templateKey) => PrepareLedgerCommunityDraft(templateKey))" />
 
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-ledger-draft-paper">
                         <MudStack Spacing="2">
                             <MudText Typo="Typo.subtitle1">생활 원장 초안</MudText>
-                            <MudStack Spacing="2" Class="platform-wish-intake">
-                                <MudStack Spacing="0">
-                                    <MudText Typo="Typo.subtitle2">원함 먼저 묻기</MudText>
-                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                        바로 원장을 쓰기 전에 사용자가 원하는 일과 조건을 적으면, 홍달이 어떤 원장으로 정리할 수 있는지 대략 안내합니다.
-                                    </MudText>
-                                </MudStack>
-                                <MudTextField T="string"
-                                              Label="무엇을 원하나요?"
-                                              Placeholder="예: 동네에서 같이 장을 보고 포장한 뒤 가까운 기사님에게 전달하고 싶어요."
-                                              @bind-Value="원함입력"
-                                              Lines="3"
-                                              Immediate="true"
-                                              Variant="Variant.Outlined" />
-                                <MudTextField T="string"
-                                              Label="참여자, 장소, 시간, 조건"
-                                              Placeholder="예: 주문자, 피킹할 사람, 포장 완료 시간, 전달 장소, 결제 표시나 사진 증빙이 필요한지"
-                                              @bind-Value="원함조건입력"
-                                              Lines="2"
-                                              Immediate="true"
-                                              Variant="Variant.Outlined" />
-                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center">
-                                    <MudButton Variant="Variant.Filled"
-                                               Color="Color.Primary"
-                                               StartIcon="@Icons.Material.Filled.Psychology"
-                                               Disabled="@(!원함입력됨)"
-                                               OnClick="원함분석하기">
-                                        홍달이 도울 수 있는 범위 보기
-                                    </MudButton>
-                                    @if (원함분석결과 is not null)
-                                    {
-                                        <MudChip T="string" Size="Size.Small" Color="@원장화판정Color" Variant="Variant.Filled">@원장화판정</MudChip>
-                                        <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@원함추천템플릿.DisplayName</MudChip>
-                                    }
-                                </MudStack>
-                            </MudStack>
+                            <PlatformCommunityWishIntakePanel Wish="@원함입력"
+                                                              WishChanged="@((string value) => 원함입력 = value)"
+                                                              Conditions="@원함조건입력"
+                                                              ConditionsChanged="@((string value) => 원함조건입력 = value)"
+                                                              CanAnalyze="@원함입력됨"
+                                                              HasAnalysis="@(원함분석결과 is not null)"
+                                                              DecisionLabel="@원장화판정"
+                                                              DecisionColor="@원장화판정Color"
+                                                              RecommendedTemplateName="@원함추천템플릿.DisplayName"
+                                                              AnalyzeRequested="원함분석하기" />
                             @{
                                 var contextTemplate = SelectedLedgerTemplate;
                                 var contextDiagram = 선택원장블록흐름도;
@@ -579,115 +424,23 @@
                                 var 선택컨텍스트원장 = 선택현재원장;
                                 var activeWorkflowModeLabel = ResolveDiagramWorkflowModeLabel(DiagramPalette.WorkflowModeKey);
                             }
-                            <div id="community-current-ledger" class="platform-ledger-context-panel" aria-label="현재 원장 컨텍스트">
-                                <div class="platform-current-ledger-picker">
-                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
-                                        <MudStack Spacing="0">
-                                            <MudText Typo="Typo.subtitle2">내 원장 불러오기</MudText>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">기존 원장을 선택하면 원함, 원장 유형, 블록 입력, 다이어그램 연결이 현재 컨텍스트로 로드됩니다.</MudText>
-                                        </MudStack>
-                                        @if (선택컨텍스트원장 is not null)
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">@선택컨텍스트원장.StateLabel</MudChip>
-                                        }
-                                    </MudStack>
-                                    <div class="platform-current-ledger-list">
-                                        @foreach (var ledger in 현재원장스냅샷목록)
-                                        {
-                                            <button type="button"
-                                                    class="@현재원장스냅샷클래스생성(ledger)"
-                                                    title="@ledger.Summary"
-                                                    @onclick="@(() => 현재원장컨텍스트불러오기(ledger.Id))">
-                                                <span class="platform-current-ledger-title">@ledger.Title</span>
-                                                <span class="platform-current-ledger-meta">@($"{CommunityLedgerTemplateCatalog.Find(ledger.TemplateKey).DisplayName} · {ledger.StateLabel}")</span>
-                                                <span class="platform-current-ledger-meta">@ledger.LastUpdatedLabel</span>
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
-                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="2">
-                                    <MudStack Spacing="0">
-                                        <MudText Typo="Typo.subtitle2">현재 원장 컨텍스트</MudText>
-                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@현재원장컨텍스트요약생성(contextTemplate)</MudText>
-                                    </MudStack>
-                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                        @if (선택컨텍스트원장 is not null)
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">@선택컨텍스트원장.Title</MudChip>
-                                        }
-                                        <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">@activeWorkflowModeLabel</MudChip>
-                                        <MudChip T="string" Size="Size.Small" Color="@원장화판정Color" Variant="Variant.Filled">@원장화판정</MudChip>
-                                        <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@원장처리체계표시명(contextTemplate.TargetOperatingSystemName)</MudChip>
-                                    </MudStack>
-                                </MudStack>
-
-                                <div class="platform-ledger-context-grid">
-                                    <div class="platform-ledger-context-cell">
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">원함</MudText>
-                                        <MudText Typo="Typo.subtitle2">@현재원장원함제목생성(contextTemplate)</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@현재원장원함상세생성(contextTemplate)</MudText>
-                                    </div>
-                                    <div class="platform-ledger-context-cell">
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">추천 원장</MudText>
-                                        <MudText Typo="Typo.subtitle2">@contextTemplate.DisplayName</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@contextTemplate.Summary</MudText>
-                                    </div>
-                                    <div class="platform-ledger-context-cell">
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">다이어그램</MudText>
-                                        <MudText Typo="Typo.subtitle2">@($"{컨텍스트흐름노드목록.Count}개 블록 · {컨텍스트다이어그램연결선목록.Count}개 연결")</MudText>
-                                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="mt-1">
-                                            @foreach (var gap in 컨텍스트보완항목목록)
-                                            {
-                                                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@gap</MudChip>
-                                            }
-                                        </MudStack>
-                                    </div>
-                                    <div class="platform-ledger-context-cell">
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">관련 메뉴</MudText>
-                                        @if (컨텍스트업무공간 is not null)
-                                        {
-                                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                                <MudIcon Icon="@컨텍스트업무공간.Icon" Color="@컨텍스트업무공간.Color" Size="Size.Small" />
-                                                <MudText Typo="Typo.subtitle2">@컨텍스트업무공간.Title</MudText>
-                                            </MudStack>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">@컨텍스트업무공간.Description</MudText>
-                                        }
-                                        else
-                                        {
-                                            <MudText Typo="Typo.subtitle2">커뮤니티 원장</MudText>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">관련 업무 메뉴를 원장 정보로 더 연결할 수 있습니다.</MudText>
-                                        }
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@($"{contextTemplate.ProcessingSurfaces.Count}개 API/업무 후보")</MudText>
-                                    </div>
-                                </div>
-
-                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                    <MudButton Variant="Variant.Filled"
-                                               Color="Color.Secondary"
-                                               Size="Size.Small"
-                                               StartIcon="@Icons.Material.Filled.AccountTree"
-                                               OnClick="현재원장다이어그램열기">
-                                        다이어그램으로 보기
-                                    </MudButton>
-                                    <MudButton Variant="Variant.Outlined"
-                                               Color="Color.Primary"
-                                               Size="Size.Small"
-                                               StartIcon="@Icons.Material.Filled.Edit"
-                                               OnClick="PrepareLedgerCommunityDraft">
-                                        커뮤니티 초안
-                                    </MudButton>
-                                    @if (컨텍스트업무공간 is not null && !string.IsNullOrWhiteSpace(컨텍스트업무공간.EntryHref))
-                                    {
-                                        <MudButton Href="@컨텍스트업무공간.EntryHref"
-                                                   Variant="Variant.Text"
-                                                   Color="@컨텍스트업무공간.Color"
-                                                   Size="Size.Small"
-                                                   EndIcon="@Icons.Material.Filled.ChevronRight">
-                                            관련 업무 열기
-                                        </MudButton>
-                                    }
-                                </MudStack>
-                            </div>
+                            <PlatformCommunityCurrentLedgerPanel Ledgers="@현재원장스냅샷목록"
+                                                                 SelectedLedger="@선택컨텍스트원장"
+                                                                 Template="@contextTemplate"
+                                                                 ContextSummary="@현재원장컨텍스트요약생성(contextTemplate)"
+                                                                 WorkflowModeLabel="@activeWorkflowModeLabel"
+                                                                 DecisionLabel="@원장화판정"
+                                                                 DecisionColor="@원장화판정Color"
+                                                                 OperatingSystemLabel="@원장처리체계표시명(contextTemplate.TargetOperatingSystemName)"
+                                                                 WishTitle="@현재원장원함제목생성(contextTemplate)"
+                                                                 WishDetails="@현재원장원함상세생성(contextTemplate)"
+                                                                 NodeCount="@컨텍스트흐름노드목록.Count"
+                                                                 EdgeCount="@컨텍스트다이어그램연결선목록.Count"
+                                                                 ImprovementItems="@컨텍스트보완항목목록"
+                                                                 Workspace="@컨텍스트업무공간"
+                                                                 LedgerSelected="현재원장컨텍스트불러오기"
+                                                                 OpenDiagramRequested="현재원장다이어그램열기"
+                                                                 CommunityDraftRequested="@(() => PrepareLedgerCommunityDraft())" />
                             <MudDivider />
                             <MudSelect T="string" Label="원장 유형" @bind-Value="selectedLedgerTemplateKey" Variant="Variant.Outlined">
                                 @foreach (var template in LedgerTemplates)
@@ -708,6 +461,11 @@
                                 var diagramEdges = BuildDiagramEdges(flowNodes);
                                 var selectedDiagramEdge = diagramEdges.FirstOrDefault(edge =>
                                     string.Equals(edge.Id, selectedDiagramEdgeId, StringComparison.OrdinalIgnoreCase));
+                                var inlineDiagramPresentation = BuildDesktopDiagramPresentation(
+                                    flowNodes,
+                                    diagramEdges,
+                                    DefaultDiagramCanvasMinHeight,
+                                    useStageCanvasStyle: false);
                             }
                             <div class="platform-ledger-diagram-workbench">
                                 <PlatformCommunityDiagramToolbar Canvas="@DiagramCanvas"
@@ -726,116 +484,12 @@
                                                                          OnStartConnection="StartDiagramEdgeFromSelectedNode"
                                                                          OnReset="원장블록흐름도배치초기화"
                                                                          OnCancelConnection="CancelDiagramEdgeCreation" />
-                                <div class="@BuildDiagramCanvasClass("platform-ledger-flow-diagram platform-ledger-flow-diagram--canvas")" style="@BuildDiagramCanvasStyle(flowNodes)">
-                                    <svg class="platform-ledger-edge-layer"
-                                         viewBox="@BuildDiagramViewBox(flowNodes)"
-                                         preserveAspectRatio="none"
-                                         aria-hidden="true">
-                                        <defs>
-                                            <marker id="platform-ledger-edge-arrow"
-                                                    viewBox="0 0 10 10"
-                                                    refX="8"
-                                                    refY="5"
-                                                    markerWidth="7"
-                                                    markerHeight="7"
-                                                    orient="auto-start-reverse">
-                                                <path d="M 0 0 L 10 5 L 0 10 z" />
-                                            </marker>
-                                        </defs>
-                                        @foreach (var edge in diagramEdges)
-                                        {
-                                            var geometry = BuildDiagramEdgeGeometry(edge, flowNodes);
-                                            if (geometry is not null)
-                                            {
-                                                <path class="platform-ledger-edge-hit-area"
-                                                      d="@geometry.Path"
-                                                      @onclick="@(() => SelectDiagramEdge(edge))"
-                                                      @onclick:stopPropagation="true" />
-                                                <path class="@BuildDiagramEdgePathClass(edge)"
-                                                      d="@geometry.Path"
-                                                      marker-end="url(#platform-ledger-edge-arrow)"
-                                                      @onclick="@(() => SelectDiagramEdge(edge))"
-                                                      @onclick:stopPropagation="true" />
-                                            }
-                                        }
-                                    </svg>
-                                    @foreach (var edge in diagramEdges)
-                                    {
-                                        var geometry = BuildDiagramEdgeGeometry(edge, flowNodes);
-                                        if (geometry is not null)
-                                        {
-                                            <button type="button"
-                                                    class="@BuildDiagramEdgeLabelClass(edge)"
-                                                    style="@BuildDiagramEdgeLabelStyle(geometry)"
-                                                    title="@edge.Label"
-                                                    @onclick="@(() => SelectDiagramEdge(edge))">
-                                                @edge.Label
-                                            </button>
-                                        }
-                                    }
-                                    @for (var i = 0; i < flowNodes.Count; i++)
-                                    {
-                                        var node = flowNodes[i];
-                                        var nodeLayerBadges = 도형레이어배지목록생성(node, i, flowNodes);
-                                        var nodeInputFormFields = 도형입력항목해결(node);
-                                        var nodeSticker = 원장블록노드스티커해결(node);
-                                        var nodeReadiness = 노드입력준비도해결(node, 원장블록처리상태해결(i, flowNodes));
-                                        var nodePositionStyle = 원장블록노드스타일생성(i, flowNodes);
-                                        <button type="button"
-                                                class="@원장블록노드클래스생성(node, i, flowNodes)"
-                                                style="@($"{nodePositionStyle} {BuildDiagramNodeStackStyle(node, flowNodes)} {BuildNodeReadinessStyle(nodeReadiness)}")"
-                                                aria-pressed="@원장블록노드선택됨(node)"
-                                                title="@node.Description"
-                                                @onclick="@(() => 원장블록노드클릭처리(node))"
-                                                @oncontextmenu="@((MouseEventArgs _) => 원장블록노드컨텍스트메뉴처리Async(node))"
-                                                @oncontextmenu:preventDefault="true">
-                                            @if (IsDiagramLayerVisible(DiagramLayerRole))
-                                            {
-                                                <span class="platform-ledger-flow-node-role">@흐름노드역할라벨해결(node)</span>
-                                            }
-                                            <span class="@(nodeSticker is null ? "platform-ledger-flow-node-icon" : "platform-ledger-flow-node-icon platform-ledger-flow-node-icon--sticker")">
-                                                @if (nodeSticker is not null)
-                                                {
-                                                    <img class="platform-ledger-flow-node-sticker"
-                                                         src="@nodeSticker.이미지Url"
-                                                         alt="@nodeSticker.대체Text"
-                                                         title="@nodeSticker.표시명" />
-                                                }
-                                                else
-                                                {
-                                                    <MudIcon Icon="@원장블록노드아이콘해결(node)" Color="@node.Color" />
-                                                }
-                                            </span>
-                                            <span class="platform-ledger-flow-node-title">@node.Title</span>
-                                            <span class="platform-ledger-flow-node-form-summary"
-                                                  title="@도형입력요약제목생성(nodeInputFormFields)">
-                                                @($"{nodeReadiness.Percent}% · {nodeReadiness.CountLabel}")
-                                            </span>
-                                            <span class="platform-ledger-flow-node-readiness" aria-label="@($"입력 준비도 {nodeReadiness.Percent}%")">
-                                                <i></i>
-                                            </span>
-                                            @if (nodeLayerBadges.Count > 0)
-                                            {
-                                                <span class="platform-ledger-flow-node-layer-stack" aria-label="노드 레이어 신호">
-                                                    @foreach (var badge in nodeLayerBadges)
-                                                    {
-                                                        <span class="@badge.CssClass" title="@badge.Description">
-                                                            <MudIcon Icon="@badge.Icon" Size="Size.Small" />
-                                                            <span>@badge.Label</span>
-                                                        </span>
-                                                    }
-                                                </span>
-                                            }
-                                            <MudChip T="string"
-                                                     Size="Size.Small"
-                                                     Variant="@(원장블록노드선택됨(node) ? Variant.Filled : Variant.Outlined)"
-                                                     Color="@(원장블록노드선택됨(node) ? Color.Success : Color.Secondary)"
-                                                     Class="platform-ledger-flow-node-select-hint">
-                                                @(원장블록노드선택됨(node) ? "선택됨" : "선택")
-                                            </MudChip>
-                                        </button>
-                                    }
-                                </div>
+                                <PlatformCommunityDiagramDesktopCanvas Presentation="@inlineDiagramPresentation"
+                                                                        ShowHandles="false"
+                                                                        ShowSelectionHint="true"
+                                                                        EdgeSelected="SelectDiagramEdge"
+                                                                        NodeSelected="원장블록노드클릭처리"
+                                                                        NodeContextRequested="원장블록노드컨텍스트메뉴처리Async" />
                                 @if (selectedDiagramEdge is not null)
                                 {
                                     <div class="platform-ledger-edge-editor">
@@ -882,187 +536,15 @@
                                     </div>
                                 }
                             </div>
-                            @if (SelectedLedgerTemplate.LedgerBlocks.Count > 0)
-                            {
-                                <MudStack Spacing="1">
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">동적 원장 블록 입력</MudText>
-                                    <MudGrid Spacing="2">
-                                        @foreach (var block in SelectedLedgerTemplate.LedgerBlocks)
-                                        {
-                                            <MudItem xs="12" md="6">
-                                                <div class="platform-ledger-block-input">
-                                                    <MudStack Spacing="1">
-                                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
-                                                            <MudText Typo="Typo.body2">@block.DisplayName</MudText>
-                                                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                                                @if (block.RequiredForAiJudgment)
-                                                                {
-                                                                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">AI 판단 필요</MudChip>
-                                                                }
-                                                                @if (block.OpensApiHandoff)
-                                                                {
-                                                                    <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">API handoff</MudChip>
-                                                                }
-                                                            </MudStack>
-                                                        </MudStack>
-                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@block.Purpose</MudText>
-                                                        <MudTextField T="string"
-                                                                      Label="@($"{block.DisplayName} 내용")"
-                                                                      Value="@Get원장블록입력값(block.Code)"
-                                                                      ValueChanged="@((string value) => Set원장블록입력값(block.Code, value))"
-                                                                      Lines="2"
-                                                                      Immediate="true"
-                                                                      Variant="Variant.Outlined" />
-                                                    </MudStack>
-                                                </div>
-                                            </MudItem>
-                                        }
-                                    </MudGrid>
-                                </MudStack>
-                            }
-                            @if (SelectedLedgerTemplate.ProcessingSurfaces.Count > 0)
-                            {
-                                <MudStack Spacing="1">
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">API 경로 메타데이터 후보</MudText>
-                                    @if (SelectedApiRouteParameterNames.Count > 0)
-                                    {
-                                        <MudGrid Spacing="2">
-                                            @foreach (var parameterName in SelectedApiRouteParameterNames)
-                                            {
-                                                <MudItem xs="12" sm="6">
-                                                    <MudTextField T="string"
-                                                                  Label="@($"{parameterName} 경로 값")"
-                                                                  Value="@Get원장Api경로변수값(parameterName)"
-                                                                  ValueChanged="@((string value) => Set원장Api경로변수값(parameterName, value))"
-                                                                  Immediate="true"
-                                                                  Variant="Variant.Outlined" />
-                                                </MudItem>
-                                            }
-                                        </MudGrid>
-                                    }
-                                    @foreach (var surface in SelectedLedgerTemplate.ProcessingSurfaces)
-                                    {
-                                        <div class="platform-ledger-api-send">
-                                            <MudStack Spacing="1">
-                                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
-                                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
-                                                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">@ResolveSurfaceMethod(surface)</MudChip>
-                                                        <MudChip T="string" Size="Size.Small" Color="@ResolveSurfaceStatusColor(surface)" Variant="Variant.Outlined">
-                                                            @ResolveSurfaceStatusLabel(surface)
-                                                        </MudChip>
-                                                        <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@surface.HandoffMode</MudChip>
-                                                    </MudStack>
-                                                    <MudButton Variant="Variant.Outlined"
-                                                               Color="Color.Primary"
-                                                               Size="Size.Small"
-                                                               StartIcon="@Icons.Material.Filled.Route"
-                                                               Disabled="@(HasUnresolvedApiMetadata(surface) || HasMissingApiRouteParameters(surface))"
-                                                               OnClick="@(() => 원장Api경로준비(surface))">
-                                                        이 경로로 준비
-                                                    </MudButton>
-                                                </MudStack>
-                                                <MudText Typo="Typo.caption" Class="platform-ledger-api-route">@BuildResolvedApiRoute(surface)</MudText>
-                                                @if (surface.IsExistingSurface && !string.IsNullOrWhiteSpace(surface.ApiEndpointKey))
-                                                {
-                                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@surface.ApiEndpointKey</MudText>
-                                                }
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@surface.Purpose</MudText>
-                                                @if (HasUnresolvedApiMetadata(surface))
-                                                {
-                                                    <MudText Typo="Typo.caption" Color="Color.Warning">기존 API 메타데이터를 아직 불러오지 못했습니다.</MudText>
-                                                }
-                                                @if (HasMissingApiRouteParameters(surface))
-                                                {
-                                                    <MudText Typo="Typo.caption" Color="Color.Warning">경로 변수 값을 먼저 입력해야 전송할 수 있습니다.</MudText>
-                                                }
-                                            </MudStack>
-                                        </div>
-                                    }
-                                    @if (!string.IsNullOrWhiteSpace(원장전송결과메시지))
-                                    {
-                                        <MudAlert Severity="@원장전송결과Severity" Dense="true" Variant="Variant.Outlined">
-                                            @원장전송결과메시지
-                                        </MudAlert>
-                                    }
-                                </MudStack>
-                            }
-                            @if (SelectedLedgerTemplate.CompositionRules.Count > 0)
-                            {
-                                <MudStack Spacing="1">
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">원장 구성 규칙</MudText>
-                                    @foreach (var rule in SelectedLedgerTemplate.CompositionRules)
-                                    {
-                                        <div class="platform-ledger-rule">
-                                            <MudStack Spacing="1">
-                                                <MudText Typo="Typo.body2">@rule.Title</MudText>
-                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@rule.Description</MudText>
-                                                @if (rule.RequiredLedgerTemplateKeys.Count > 0)
-                                                {
-                                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">선행 원장</MudText>
-                                                        @foreach (var prerequisite in ResolveLedgerTemplateNames(rule.RequiredLedgerTemplateKeys))
-                                                        {
-                                                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@prerequisite</MudChip>
-                                                        }
-                                                    </MudStack>
-                                                }
-                                                @if (rule.RequiredUiSectionHints.Count > 0)
-                                                {
-                                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">먼저 필요한 UI</MudText>
-                                                        @foreach (var section in rule.RequiredUiSectionHints)
-                                                        {
-                                                            <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@section</MudChip>
-                                                        }
-                                                    </MudStack>
-                                                }
-                                                @if (rule.GatedActionHints.Count > 0)
-                                                {
-                                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                                        <MudText Typo="Typo.caption" Color="Color.Secondary">이후 행동</MudText>
-                                                        @foreach (var action in rule.GatedActionHints)
-                                                        {
-                                                            <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">@action</MudChip>
-                                                        }
-                                                    </MudStack>
-                                                }
-                                            </MudStack>
-                                        </div>
-                                    }
-                                </MudStack>
-                            }
-                            <MudStack Spacing="1">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">저장/반영 방식</MudText>
-                                <div class="platform-ledger-rule">
-                                    <MudStack Spacing="1">
-                                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
-                                                @SelectedLedgerTemplate.PersistencePolicy.PrimaryStoreKind
-                                            </MudChip>
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
-                                                @SelectedLedgerTemplate.PersistencePolicy.PrimaryStoreName
-                                            </MudChip>
-                                        </MudStack>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@SelectedLedgerTemplate.PersistencePolicy.RelationalProjectionPolicy</MudText>
-                                        @if (SelectedLedgerTemplate.PersistencePolicy.RelationalProjectionTargets.Count > 0)
-                                        {
-                                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                                @foreach (var target in SelectedLedgerTemplate.PersistencePolicy.RelationalProjectionTargets)
-                                                {
-                                                    <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@target.TargetName</MudChip>
-                                                }
-                                            </MudStack>
-                                        }
-                                    </MudStack>
-                                </div>
-                            </MudStack>
-                            <MudStack Spacing="1">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">커뮤니티 소통 질문</MudText>
-                                @foreach (var prompt in SelectedLedgerTemplate.CommunityDiscussionPrompts.Take(2))
-                                {
-                                    <MudText Typo="Typo.caption">· @prompt</MudText>
-                                }
-                            </MudStack>
+                            <PlatformCommunityLedgerMetadataEditor Template="@SelectedLedgerTemplate"
+                                                                    Workspace="@DiagramWorkspace"
+                                                                    ApiRouteParameterNames="@SelectedApiRouteParameterNames"
+                                                                    ApiSurfaces="@BuildLedgerApiSurfacePresentations()"
+                                                                    ResultMessage="@원장전송결과메시지"
+                                                                    ResultSeverity="@원장전송결과Severity"
+                                                                    ValuesChanged="ClearLedgerMetadataResult"
+                                                                    ApiRoutePrepareRequested="원장Api경로준비" />
+                            <PlatformCommunityLedgerTemplateGuidance Template="@SelectedLedgerTemplate" />
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Success"
                                        StartIcon="@Icons.Material.Filled.Assignment"
@@ -1085,303 +567,46 @@
                                                        CancelEditRequested="CancelEdit"
                                                        Saved="HandleComposerSavedAsync">
                         <LedgerSettings>
-                                    <section class="platform-community-compose-ledger-shortcut" aria-label="원장 연결">
-                                        <div class="platform-community-compose-setting-heading">
-                                            <div>
-                                                <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
-                                                <strong>원장 연결</strong>
-                                            </div>
-                                            <MudButton Variant="Variant.Text"
-                                                       Color="Color.Primary"
-                                                       Size="Size.Small"
-                                                       Disabled="@isMyLedgersLoading"
-                                                       OnClick="OpenLedgerPickerAsync">
-                                                원장 선택
-                                            </MudButton>
-                                        </div>
-
-                                        @if (!string.IsNullOrWhiteSpace(form.커뮤니티원장Id))
-                                        {
-                                            var selectedMyLedger = myLedgers.FirstOrDefault(x =>
-                                                string.Equals(x.원장Id, form.커뮤니티원장Id, StringComparison.OrdinalIgnoreCase));
-                                            <div class="platform-community-compose-selected-ledger">
-                                                <span>
-                                                    <strong>@(selectedMyLedger?.제목 ?? "선택한 원장")</strong>
-                                                    <small>@form.커뮤니티원장Id</small>
-                                                </span>
-                                                <div>
-                                                    @if (selectedMyLedger?.내가만든원장 == true)
-                                                    {
-                                                        <MudIconButton Icon="@Icons.Material.Filled.Public"
-                                                                       Size="Size.Small"
-                                                                       Color="Color.Primary"
-                                                                       OnClick="OpenLedgerSharingSettingsAsync"
-                                                                       aria-label="원장 공개 설정" />
-                                                    }
-                                                    <MudIconButton Icon="@Icons.Material.Filled.LinkOff"
-                                                                   Size="Size.Small"
-                                                                   Color="Color.Error"
-                                                                   OnClick="ClearSelectedLedger"
-                                                                   aria-label="원장 첨부 해제" />
-                                                </div>
-                                            </div>
-                                        }
-
-                                        @if (ledgerSharingSettings is not null)
-                                        {
-                                            <div class="platform-community-ledger-sharing-settings">
-                                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                                    <MudText Typo="Typo.subtitle2">원장 공개 설정</MudText>
-                                                    <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="CloseLedgerSharingSettings" aria-label="공개 설정 닫기" />
-                                                </MudStack>
-                                                <MudSelect T="string" Label="원장 공개 범위" @bind-Value="ledgerSharingSettings.공개범위" Variant="Variant.Outlined" Margin="Margin.Dense">
-                                                    <MudSelectItem Value="@커뮤니티원장공개범위.비공개">비공개</MudSelectItem>
-                                                    <MudSelectItem Value="@커뮤니티원장공개범위.커뮤니티">홍달 커뮤니티 공개</MudSelectItem>
-                                                    <MudSelectItem Value="@커뮤니티원장공개범위.전체공개">링크 전체 공개</MudSelectItem>
-                                                </MudSelect>
-                                                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
-                                                    <MudSwitch T="bool" Label="재사용 허용" @bind-Value="ledgerSharingSettings.재사용허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
-                                                    <MudSwitch T="bool" Label="재공유 허용" @bind-Value="ledgerSharingSettings.재공유허용여부" Color="Color.Primary" Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
-                                                </MudStack>
-                                                <div class="platform-community-ledger-sharing-item-list">
-                                                    @foreach (var item in ledgerSharingSettings.항목목록)
-                                                    {
-                                                        <MudCheckBox T="bool"
-                                                                     @bind-Value="item.공개여부"
-                                                                     Label="@item.표시명"
-                                                                     Color="Color.Primary"
-                                                                     Disabled="@(ledgerSharingSettings.공개범위 == 커뮤니티원장공개범위.비공개)" />
-                                                    }
-                                                </div>
-                                                <MudButton Variant="Variant.Filled"
-                                                           Color="Color.Primary"
-                                                           StartIcon="@Icons.Material.Filled.Save"
-                                                           Disabled="@isLedgerSharingSaving"
-                                                           OnClick="SaveLedgerSharingSettingsAsync">
-                                                    공개 설정 저장
-                                                </MudButton>
-                                            </div>
-                                        }
-                                    </section>
+                            <PlatformCommunityLedgerComposerSettings SelectedLedgerId="@form.커뮤니티원장Id"
+                                                                      Ledgers="@myLedgers"
+                                                                      SharingSettings="@ledgerSharingSettings"
+                                                                      IsPickerLoading="@isMyLedgersLoading"
+                                                                      IsSharingSettingsSaving="@isLedgerSharingSaving"
+                                                                      PickerRequested="OpenLedgerPickerAsync"
+                                                                      SharingSettingsRequested="OpenLedgerSharingSettingsAsync"
+                                                                      ClearRequested="ClearSelectedLedger"
+                                                                      CloseSharingSettingsRequested="CloseLedgerSharingSettings"
+                                                                      SaveSharingSettingsRequested="SaveLedgerSharingSettingsAsync" />
                         </LedgerSettings>
                     </PlatformCommunityPostComposer>
 
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.subtitle1">업무 바로가기</MudText>
-                            @foreach (var action in QuickActions)
-                            {
-                                <MudButton Href="@action.Href"
-                                           Variant="Variant.Outlined"
-                                           Color="@action.Color"
-                                           StartIcon="@action.Icon"
-                                           EndIcon="@Icons.Material.Filled.ChevronRight"
-                                           Class="platform-community-action">
-                                    <MudStack Spacing="0" AlignItems="AlignItems.Start">
-                                        <MudText Typo="Typo.body2">@action.Title</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@action.Description</MudText>
-                                    </MudStack>
-                                </MudButton>
-                            }
-                        </MudStack>
-                    </MudPaper>
-
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.subtitle1">운영 흐름</MudText>
-                            @foreach (var item in OperatingNotes)
-                            {
-                                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="1">
-                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
-                                    <MudText Typo="Typo.body2">@item</MudText>
-                                </MudStack>
-                            }
-                        </MudStack>
-                    </MudPaper>
+                    <PlatformCommunitySupportPanels QuickActions="@QuickActions"
+                                                    OperatingNotes="@OperatingNotes" />
                 </MudStack>
             </MudItem>
         </MudGrid>
 
-        <MudPaper id="community-work-panel" Elevation="0" Outlined="true" Class="@WorkPanelClass">
-            <MudStack Spacing="3">
-                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h5">업무 모드</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">
-                            커뮤니티 흐름은 잠시 접고, 지금 처리할 업무 화면으로 바로 진입합니다.
-                        </MudText>
-                    </MudStack>
-                    <MudChip T="string" Color="@CurrentModeColor" Variant="Variant.Outlined">@RoleLabel</MudChip>
-                </MudStack>
-
-                <MudPaper Elevation="0" Outlined="true" Class="pa-3 platform-work-community-draft">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="2">
-                        <MudStack Spacing="0">
-                            <MudText Typo="Typo.subtitle2">업무에서 커뮤니티 글쓰기</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                업무 중 궁금한 점이나 처리한 일을 바로 커뮤니티 글 초안으로 옮깁니다.
-                            </MudText>
-                        </MudStack>
-                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                            <MudButton Variant="Variant.Outlined"
-                                       Color="Color.Primary"
-                                       Size="Size.Small"
-                                       StartIcon="@Icons.Material.Filled.HelpOutline"
-                                       OnClick="@(() => PrepareWorkCommunity초안(WorkCommunityDraftKind.Question))">
-                                궁금한 점
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined"
-                                       Color="Color.Success"
-                                       Size="Size.Small"
-                                       StartIcon="@Icons.Material.Filled.TaskAlt"
-                                       OnClick="@(() => PrepareWorkCommunity초안(WorkCommunityDraftKind.WorkDone))">
-                                처리한 일
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined"
-                                       Color="Color.Warning"
-                                       Size="Size.Small"
-                                       StartIcon="@Icons.Material.Filled.Lightbulb"
-                                       OnClick="@(() => PrepareWorkCommunity초안(WorkCommunityDraftKind.Suggestion))">
-                                개선 제안
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined"
-                                       Color="Color.Info"
-                                       Size="Size.Small"
-                                       StartIcon="@Icons.Material.Filled.Public"
-                                       OnClick="@(() => PrepareWorkCommunity초안(WorkCommunityDraftKind.InternationalCoordination))">
-                                국제 소통
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined"
-                                       Color="Color.Success"
-                                       Size="Size.Small"
-                                       StartIcon="@Icons.Material.Filled.Assignment"
-                                       OnClick="PrepareLedgerCommunityDraft">
-                                원장 초안
-                            </MudButton>
-                        </MudStack>
-                    </MudStack>
-                </MudPaper>
-
-                <MudStack Spacing="2">
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.subtitle1">통합 업무 흐름</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">
-                            앱별 화면을 따로 외우지 않아도, 같은 원장 템플릿에서 업무 초안과 실행 화면으로 이어집니다.
-                        </MudText>
-                    </MudStack>
-                    <MudGrid>
-                        @foreach (var workspace in UnifiedWorkspaces)
-                        {
-                            <MudItem xs="12" sm="6" lg="3">
-                                <div class="platform-unified-workspace platform-unified-workspace--compact">
-                                    <MudStack Spacing="1">
-                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                            <MudIcon Icon="@workspace.Icon" Color="@workspace.Color" />
-                                            <MudChip T="string" Size="Size.Small" Color="@workspace.Color" Variant="Variant.Outlined">@workspace.Title</MudChip>
-                                        </MudStack>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@원장처리체계표시명(workspace.OperatingSystemName)</MudText>
-                                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                            <MudButton Variant="Variant.Outlined"
-                                                       Size="Size.Small"
-                                                       Color="@workspace.Color"
-                                                       StartIcon="@Icons.Material.Filled.Assignment"
-                                                       OnClick="@(() => PrepareLedgerCommunityDraft(workspace.LedgerTemplateKey))">
-                                                초안
-                                            </MudButton>
-                                            @if (!string.IsNullOrWhiteSpace(workspace.EntryHref))
-                                            {
-                                                <MudButton Href="@workspace.EntryHref"
-                                                           Variant="Variant.Text"
-                                                           Size="Size.Small"
-                                                           Color="@workspace.Color"
-                                                           EndIcon="@Icons.Material.Filled.ChevronRight">
-                                                    열기
-                                                </MudButton>
-                                            }
-                                        </MudStack>
-                                    </MudStack>
-                                </div>
-                            </MudItem>
-                        }
-                    </MudGrid>
-                </MudStack>
-
-                @if (WorkModeContent is not null)
-                {
-                    @WorkModeContent
-                }
-                else if (QuickActions.Count == 0)
-                {
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                        이 앱에는 아직 업무 바로가기가 등록되어 있지 않습니다.
-                    </MudAlert>
-                }
-                else
-                {
-                    <MudGrid>
-                        @foreach (var action in QuickActions)
-                        {
-                            <MudItem xs="12" sm="6" lg="4">
-                                <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100 platform-work-action-card">
-                                    <MudStack Spacing="2">
-                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                                            <MudIcon Icon="@action.Icon" Color="@action.Color" Size="Size.Large" />
-                                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="@action.Color" />
-                                        </MudStack>
-                                        <MudStack Spacing="0">
-                                            <MudText Typo="Typo.subtitle1" Class="fw-bold">@action.Title</MudText>
-                                            <MudText Typo="Typo.body2" Color="Color.Secondary">@action.Description</MudText>
-                                        </MudStack>
-                                        <MudButton Href="@action.Href"
-                                                   Variant="Variant.Filled"
-                                                   Color="@action.Color"
-                                                   StartIcon="@action.Icon">
-                                            열기
-                                        </MudButton>
-                                    </MudStack>
-                                </MudPaper>
-                            </MudItem>
-                        }
-                    </MudGrid>
-                }
-            </MudStack>
-        </MudPaper>
+        <PlatformCommunityWorkPanel CssClass="@WorkPanelClass"
+                                    ModeColor="@CurrentModeColor"
+                                    RoleLabel="@RoleLabel"
+                                    Workspaces="@UnifiedWorkspaces"
+                                    QuickActions="@QuickActions"
+                                    Content="@WorkModeContent"
+                                    DraftRequested="PrepareWorkCommunity초안"
+                                    LedgerDraftRequested="@(() => PrepareLedgerCommunityDraft())"
+                                    WorkspaceLedgerDraftRequested="@((string templateKey) => PrepareLedgerCommunityDraft(templateKey))" />
         }
 
         @if (!BoardIndexOnly && !ListOnly && !IsDiagramMode && !isComposeOpen)
         {
-            <nav class="platform-community-mobile-nav" aria-label="커뮤니티 모바일 내비게이션">
-                @if (UseCompactHomeSummary)
-                {
-                    <button type="button" class="@BuildMobileNavigationClass(IsCompactHomeSummaryVisible)" @onclick="OpenCompactHomeSummary">
-                        <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
-                        <span>홈</span>
-                    </button>
-                    <button type="button" class="@BuildMobileNavigationClass(!isWorkMode && !IsCompactHomeSummaryVisible)" @onclick="공통홈게시판열기Async">
-                        <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
-                        <span>게시판</span>
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="@BuildMobileNavigationClass(!isWorkMode)" @onclick="OpenCommunityMode">
-                        <MudIcon Icon="@Icons.Material.Filled.Home" Size="Size.Small" />
-                        <span>커뮤니티</span>
-                    </button>
-                    <a href="#community-board-list" class="platform-community-mobile-nav-item">
-                        <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
-                        <span>게시판</span>
-                    </a>
-                }
-                <button type="button" class="platform-community-mobile-nav-item platform-community-mobile-nav-compose" @onclick="OpenCompose">
-                    <MudIcon Icon="@Icons.Material.Filled.Add" />
-                    <span>글쓰기</span>
-                </button>
-                <button type="button" class="@BuildMobileNavigationClass(isWorkMode)" @onclick="OpenWorkMode">
-                    <MudIcon Icon="@Icons.Material.Filled.Work" Size="Size.Small" />
-                    <span>업무</span>
-                </button>
-            </nav>
+            <PlatformCommunityMobileNavigation UseCompactHomeSummary="@UseCompactHomeSummary"
+                                               IsCompactHomeSummaryVisible="@IsCompactHomeSummaryVisible"
+                                               IsWorkMode="@isWorkMode"
+                                               HomeRequested="OpenCompactHomeSummary"
+                                               BoardRequested="공통홈게시판열기Async"
+                                               CommunityRequested="OpenCommunityMode"
+                                               ComposeRequested="OpenCompose"
+                                               WorkRequested="OpenWorkMode" />
         }
 
         @if (nodeDetailPanelNode is not null)
