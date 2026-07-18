@@ -93,6 +93,53 @@ public sealed class 공동구매원장관계자알림EventHandlerTests
     }
 
     [Fact]
+    public void 가원장생성알림은_빈역할슬롯과_참여의향경계를_한번안내한다()
+    {
+        var ledger = CreateLedger(CommunityLedgerTemplateKeys.GroupPurchase, revision: 1, provisional: true);
+        ledger.외부참조 = new Dictionary<string, string>
+        {
+            ["SourceCommunityPostId"] = "42"
+        };
+
+        var json = 공동구매원장관계자알림Policy.BuildPayload(ledger, "member-1", "저장");
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        Assert.True(root.GetProperty("roleInterestInvitation").GetBoolean());
+        Assert.True(root.GetProperty("openRoleSlotCount").GetInt32() > 0);
+        Assert.Contains(
+            root.GetProperty("openRoleSlots").EnumerateArray(),
+            slot => slot.GetProperty("roleCode").GetString() == CommunityPostPartyRoleCodes.Buyer);
+        Assert.Contains("비어 있는 역할", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+        Assert.Contains("비구속적 참여 의향", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+        Assert.Contains("배정되거나 확정되지는 않", root.GetProperty("body").GetString(), StringComparison.Ordinal);
+        Assert.Equal("/community/posts/42", root.GetProperty("deepLink").GetString());
+        Assert.True(root.GetProperty("requiresExplicitRoleAcceptance").GetBoolean());
+        Assert.True(root.GetProperty("platformDoesNotAssignWork").GetBoolean());
+    }
+
+    [Fact]
+    public void 후속원장변경알림은_같은빈역할초대를_반복하지않는다()
+    {
+        var ledger = CreateLedger(CommunityLedgerTemplateKeys.GroupPurchase, revision: 2, provisional: true);
+        ledger.외부참조 = new Dictionary<string, string>
+        {
+            ["SourceCommunityPostId"] = "42"
+        };
+
+        var json = 공동구매원장관계자알림Policy.BuildPayload(ledger, "member-1", "저장");
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        Assert.False(root.GetProperty("roleInterestInvitation").GetBoolean());
+        Assert.Equal(0, root.GetProperty("openRoleSlotCount").GetInt32());
+        Assert.Empty(root.GetProperty("openRoleSlots").EnumerateArray());
+        Assert.Equal(
+            "/community/group-purchase?ledgerId=group-purchase-ledger-1",
+            root.GetProperty("deepLink").GetString());
+    }
+
+    [Fact]
     public void 역할참여알림은_역할과_외부면허확인경계를_명시한다()
     {
         var ledger = CreateLedger(CommunityLedgerTemplateKeys.GroupPurchase, revision: 2);
@@ -172,6 +219,7 @@ public sealed class 공동구매원장관계자알림EventHandlerTests
                 ? new Dictionary<string, string>
                 {
                     [CommunityPostProvisionalLedgerPolicy.LedgerMaturityAttributeKey] = CommunityPostProvisionalLedgerPolicy.LedgerMaturityCode,
+                    [CommunityPostProvisionalLedgerPolicy.BindingEffectAttributeKey] = CommunityPostProvisionalLedgerPolicy.NonBindingEffectCode,
                     [CommunityPostProvisionalLedgerPolicy.ParticipantNotificationsAttributeKey] = bool.TrueString
                 }
                 : new Dictionary<string, string>()
