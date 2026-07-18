@@ -4,17 +4,24 @@ public static class CommunityInformationSourceKeys
 {
     public const string YouTubeChannelVideos = "youtube-channel-videos";
     public const string KamisPriceObservations = "kamis-price-observations";
+    public const string RedditPublicPosts = "reddit-public-posts";
+    public const string RedditRssPublicPosts = "reddit-rss-public-posts";
+    public const string XPublicPosts = "x-public-posts";
+    public const string InstagramPublicPosts = "instagram-public-posts";
+    public const string FacebookPublicPosts = "facebook-public-posts";
 }
 
 public static class CommunityInformationSourceTypes
 {
     public const string Video = "Video";
     public const string PublicData = "PublicData";
+    public const string SocialMedia = "SocialMedia";
 }
 
 public static class CommunityInformationCollectionModes
 {
     public const string ScheduledArchive = "ScheduledArchive";
+    public const string OnDemandExternalResearch = "OnDemandExternalResearch";
 }
 
 public static class CommunityInformationReviewStates

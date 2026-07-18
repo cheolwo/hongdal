@@ -10,6 +10,13 @@ public static partial class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        if (services.Any(descriptor =>
+                descriptor.ServiceType == typeof(ApifyPlatformRegistrationMarker)))
+        {
+            return services;
+        }
+
+        services.AddSingleton<ApifyPlatformRegistrationMarker>();
         services.Configure<ApifyOptions>(configuration.GetSection(ApifyOptions.SectionName));
         services.AddHttpClient<IApifyActorGateway, ApifyActorGateway>((sp, client) =>
         {
@@ -18,5 +25,9 @@ public static partial class ServiceCollectionExtensions
             client.Timeout = TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 30, 300));
         });
         return services;
+    }
+
+    private sealed class ApifyPlatformRegistrationMarker
+    {
     }
 }

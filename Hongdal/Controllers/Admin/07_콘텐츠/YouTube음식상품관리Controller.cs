@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Content;
 using Hongdal.Services.Content;
+using Hongdal.Services.External.YouTube;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +16,16 @@ public sealed class YouTube음식상품관리Controller : ControllerBase
 {
     private readonly IYouTube음식상품발견Service _service;
     private readonly IYouTube영상재료자동인지Service _ingredientRecognitionService;
+    private readonly IYouTubeTranscriptSource _transcriptSource;
 
     public YouTube음식상품관리Controller(
         IYouTube음식상품발견Service service,
-        IYouTube영상재료자동인지Service ingredientRecognitionService)
+        IYouTube영상재료자동인지Service ingredientRecognitionService,
+        IYouTubeTranscriptSource transcriptSource)
     {
         _service = service;
         _ingredientRecognitionService = ingredientRecognitionService;
+        _transcriptSource = transcriptSource;
     }
 
     [HttpGet("product-candidates")]
@@ -38,6 +42,20 @@ public sealed class YouTube음식상품관리Controller : ControllerBase
     {
         var created = await _service.상품후보등록Async(요청, cancellationToken);
         return CreatedAtAction(nameof(상품후보목록), new { created.후보Id }, created);
+    }
+
+    [HttpPost("videos/{videoId}/transcript")]
+    public async Task<IActionResult> 영상자막조회(
+        [FromRoute] string videoId,
+        [FromQuery] string? targetLanguage,
+        CancellationToken cancellationToken)
+    {
+        var result = await _transcriptSource.GetAsync(
+            new YouTubeTranscriptRequest(videoId, targetLanguage),
+            cancellationToken);
+        return result is null
+            ? NotFound("공개 자막을 찾지 못했습니다.")
+            : Ok(result);
     }
 
     [HttpPost("videos/{videoId}/ingredient-recognition")]
