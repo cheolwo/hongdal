@@ -15,7 +15,7 @@
         <div class="decoration-market__hero-copy">
             <span>COMMUNITY MAKER SHOP</span>
             <h1>꾸미기 상점</h1>
-            <p>홈 테마, 괘상과 노드 이미지, 역할별 괘 이동 장면의 전환 애니메이션을 한곳에서 만나보세요.</p>
+            <p>개인 홈 테마부터 시장별 이야기와 표식을 담은 전통시장 팩, 괘상·노드·전환 장면까지 한곳에서 만나보세요.</p>
         </div>
         <div class="decoration-market__summary">
             <span><b>@GeneralClientProducts.Count</b>개 상품</span>
@@ -45,6 +45,10 @@
         <button type="button" class="@(activeType == ScriptureType ? "is-active" : null)" @onclick="@(() => activeType = ScriptureType)">
             <MudIcon Icon="@Icons.Material.Filled.AutoStories" Size="Size.Small" />
             경전·고전 팩
+        </button>
+        <button type="button" class="@(activeType == MarketThemeType ? "is-active" : null)" @onclick="@(() => activeType = MarketThemeType)">
+            <MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" />
+            전통시장 팩
         </button>
         <button type="button" class="@(activeType == AssetType ? "is-active" : null)" @onclick="@(() => activeType = AssetType)">
             <MudIcon Icon="@Icons.Material.Filled.Category" Size="Size.Small" />
@@ -99,6 +103,10 @@
                             {
                                 <HongdalHomeNavigatorThemePreview Theme="@theme" Title="@product.Title" Compact="true" />
                             }
+                            else if (product.TraditionalMarketTheme is { } marketTheme)
+                            {
+                                <TraditionalMarketThemePreview Theme="marketTheme" Title="@product.Title" Compact="true" />
+                            }
                             else if (product.BaguaMotion is { } motion)
                             {
                                 <BaguaMotionPackPreview Manifest="@motion" Title="@product.Title" Compact="true" />
@@ -129,7 +137,11 @@
                         </div>
                         <div class="decoration-market-card__copy">
                             <span class="decoration-market-card__creator">
-                                @(product.ScriptureSource is not null ? "강의 연결 테마" : IsPlatformProduct(product) ? "플랫폼 기본" : product.CreatorName)
+                                @(product.ScriptureSource is not null
+                                    ? "강의 연결 테마"
+                                    : product.IsTraditionalMarketTheme
+                                        ? product.CreatorName
+                                        : IsPlatformProduct(product) ? "플랫폼 기본" : product.CreatorName)
                             </span>
                             <strong>@product.Title</strong>
                             <p>@product.Summary</p>
@@ -143,6 +155,10 @@
                             else if (product.HomeTheme is { } manifest)
                             {
                                 <small>@($"{manifest.RendererProfile} · {manifest.Slots.Count}개 슬롯 · v{manifest.Version}")</small>
+                            }
+                            else if (product.TraditionalMarketTheme is { } marketManifest)
+                            {
+                                <small>@($"{marketManifest.MarketName} · {marketManifest.Slots.Count}개 표식 · 상인회 {marketManifest.AssociationApprovalStatus}")</small>
                             }
                             else if (product.BaguaMotion is { } motion)
                             {
@@ -169,6 +185,7 @@
     private const string AllType = "all";
     private const string HomeThemeType = "home-theme";
     private const string ScriptureType = "scripture";
+    private const string MarketThemeType = "market-theme";
     private const string AssetType = "asset";
     private const string MotionType = "motion";
 
@@ -183,14 +200,15 @@
             {
                 CreatorTab => GeneralClientProducts.Where(product => !IsPlatformProduct(product) && !product.IsCustom),
                 OwnedTab => GeneralClientProducts.Where(DecorationState.IsProductOwned),
-                _ => GeneralClientProducts.Where(IsPlatformProduct)
+                _ => GeneralClientProducts.Where(IsPlatformCuratedProduct)
             };
 
             return activeType switch
             {
                 HomeThemeType => bySource.Where(product => product.IsHomeTheme).ToArray(),
                 ScriptureType => bySource.Where(product => product.ScriptureSource is not null).ToArray(),
-                AssetType => bySource.Where(product => !product.IsHomeTheme && !product.IsBaguaMotion).ToArray(),
+                MarketThemeType => bySource.Where(product => product.IsTraditionalMarketTheme).ToArray(),
+                AssetType => bySource.Where(product => !product.IsHomeTheme && !product.IsTraditionalMarketTheme && !product.IsBaguaMotion).ToArray(),
                 MotionType => bySource.Where(product => product.IsBaguaMotion).ToArray(),
                 _ => bySource.ToArray()
             };
@@ -205,23 +223,29 @@
     private int OwnedProductCount
         => GeneralClientProducts.Count(DecorationState.IsProductOwned);
 
-    private string CurrentEyebrow => activeType == ScriptureType
-        ? "SCRIPTURE & CLASSICS LINK PACKS"
-        : activeTab switch
+    private string CurrentEyebrow => activeType switch
+    {
+        ScriptureType => "SCRIPTURE & CLASSICS LINK PACKS",
+        MarketThemeType => "LOCAL MARKET DESIGN PACKS",
+        _ => activeTab switch
         {
             CreatorTab => "CREATOR MARKET",
             OwnedTab => "MY LIBRARY",
             _ => "HONGDAL ORIGINAL"
-        };
+        }
+    };
 
-    private string CurrentTitle => activeType == ScriptureType
-        ? "경전과 고전에서 영감을 받은 꾸미기"
-        : activeTab switch
+    private string CurrentTitle => activeType switch
+    {
+        ScriptureType => "경전과 고전에서 영감을 받은 꾸미기",
+        MarketThemeType => "시장과 디자이너가 함께 만든 지역별 표식",
+        _ => activeTab switch
         {
             CreatorTab => "디자이너가 만든 완성형 패키지",
             OwnedTab => "내가 사용할 수 있는 꾸미기",
             _ => "플랫폼에서 제공하는 기본 꾸미기"
-        };
+        }
+    };
 
     private void OpenDetail(CommunityDecorationProduct product)
         => Navigation.NavigateTo(ShipperRoutes.CommunityDecorationDetailFor(product.Key));
@@ -235,12 +259,17 @@
     private static bool IsPlatformProduct(CommunityDecorationProduct product)
         => product.CreatorName.StartsWith("Hongdal", StringComparison.OrdinalIgnoreCase);
 
+    private static bool IsPlatformCuratedProduct(CommunityDecorationProduct product)
+        => IsPlatformProduct(product)
+           || product.TraditionalMarketTheme?.IsOfficiallyApplicable == true;
+
     private static string ProductTypeLabel(CommunityDecorationProduct product)
         => product.ScriptureSource is not null
             ? "경전·고전 팩"
             : product.Target switch
             {
                 CommunityDecorationTarget.HomeNavigatorTheme => "홈 테마",
+                CommunityDecorationTarget.TraditionalMarketTheme => "전통시장 팩",
                 CommunityDecorationTarget.Bagua => "괘상",
                 CommunityDecorationTarget.DiagramNode => "노드 이미지",
                 CommunityDecorationTarget.BaguaTransitionMotion => "전환 애니메이션",
@@ -249,6 +278,7 @@
 
     private static string ProductAccent(CommunityDecorationProduct product)
         => product.HomeTheme?.AccentColor
+           ?? product.TraditionalMarketTheme?.AccentColor
            ?? product.BaguaMotion?.AccentColor
            ?? product.Assets.FirstOrDefault()?.AccentColor
            ?? "#2563eb";

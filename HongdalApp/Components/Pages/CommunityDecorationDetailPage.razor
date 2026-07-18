@@ -64,6 +64,31 @@ else
                         }
                     </div>
                 }
+                else if (product.TraditionalMarketTheme is { } marketTheme)
+                {
+                    <div class="decoration-detail__theme-stage">
+                        <TraditionalMarketThemePreview Theme="marketTheme" Title="@product.Title" />
+                        <small>시장 머리말·게시판·장날·상품·수령·성사 이야기 표식을 같은 시장 범위에 적용합니다.</small>
+                    </div>
+                    <div class="decoration-detail__slots">
+                        @foreach (var slot in marketTheme.Slots)
+                        {
+                            <article>
+                                <span style="@($"--slot-color: {slot.Color};")">
+                                    @if (slot.HasImage)
+                                    {
+                                        <img src="@slot.ImageUrl" alt="@slot.AltText" />
+                                    }
+                                </span>
+                                <div>
+                                    <strong>@slot.Title</strong>
+                                    <small>@(slot.HasImage ? "이미지 + 대체색" : slot.Color)</small>
+                                </div>
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" />
+                            </article>
+                        }
+                    </div>
+                }
                 else if (product.BaguaMotion is { } motion)
                 {
                     <div class="decoration-detail__motion-stage">
@@ -127,6 +152,11 @@ else
                     {
                         <span>@manifest.ReviewStatus</span>
                     }
+                    else if (product.TraditionalMarketTheme is { } marketManifest)
+                    {
+                        <span>플랫폼 @marketManifest.ReviewStatus</span>
+                        <span>상인회 @marketManifest.AssociationApprovalStatus</span>
+                    }
                     else if (product.BaguaMotion is { } motionManifest)
                     {
                         <span>@motionManifest.ReviewStatus</span>
@@ -184,6 +214,17 @@ else
                         <div><dt>사용권</dt><dd>@metadata.LicenseLabel</dd></div>
                     </dl>
                 }
+                else if (product.TraditionalMarketTheme is { } marketMetadata)
+                {
+                    <dl class="decoration-detail__metadata">
+                        <div><dt>대상 시장</dt><dd>@marketMetadata.MarketName</dd></div>
+                        <div><dt>시장 범위</dt><dd>@marketMetadata.MarketScopeKey</dd></div>
+                        <div><dt>포함 표식</dt><dd>@(marketMetadata.Slots.Count)개</dd></div>
+                        <div><dt>사용권</dt><dd>@marketMetadata.LicenseLabel</dd></div>
+                        <div><dt>디자이너 보상</dt><dd>@marketMetadata.DesignerCompensationPolicyLabel</dd></div>
+                        <div><dt>안전 정보</dt><dd>@(marketMetadata.PreservesCriticalInformation ? "가격·원산지·수령 정보 유지" : "공식 적용 불가")</dd></div>
+                    </dl>
+                }
                 else if (product.BaguaMotion is { } motionMetadata)
                 {
                     <dl class="decoration-detail__metadata">
@@ -217,12 +258,14 @@ else
                                Size="Size.Large"
                                FullWidth="true"
                                StartIcon="@Icons.Material.Filled.CheckCircle"
-                               Disabled="@((product.IsHomeTheme || product.IsBaguaMotion) ? DecorationState.IsProductActive(product) : selectedAsset is null)"
+                               Disabled="@((product.IsHomeTheme || product.IsTraditionalMarketTheme || product.IsBaguaMotion) ? DecorationState.IsProductActive(product) : selectedAsset is null)"
                                OnClick="ApplySelectedAsync">
                         @(DecorationState.IsProductActive(product)
                             ? "현재 사용 중"
                             : product.IsHomeTheme
                                 ? "전체 홈 테마 적용"
+                                : product.IsTraditionalMarketTheme
+                                    ? "이 시장에 꾸미기 팩 적용"
                                 : product.IsBaguaMotion
                                     ? "이 애니메이션 슬롯에 적용"
                                     : "선택한 꾸미기 적용")
@@ -234,6 +277,8 @@ else
                                OnClick="DisableDecorationAsync">
                         @(product.IsHomeTheme
                             ? "살뜰 기본 테마로 복원"
+                            : product.IsTraditionalMarketTheme
+                                ? "전통시장 팩 표시 안 함"
                             : product.IsBaguaMotion
                                 ? "기본 전환 애니메이션으로 복원"
                                 : "이 꾸미기 종류 표시 안 함")
@@ -313,19 +358,23 @@ else
             return Task.CompletedTask;
         }
 
-        var applied = product.IsHomeTheme || product.IsBaguaMotion
+        var applied = product.IsHomeTheme || product.IsTraditionalMarketTheme || product.IsBaguaMotion
             ? DecorationState.ApplyProduct(product)
             : selectedAsset is not null && DecorationState.Apply(selectedAsset);
         if (!applied)
         {
             statusSeverity = Severity.Warning;
-            statusMessage = "이 꾸미기를 적용하려면 먼저 구매가 필요합니다.";
+            statusMessage = product.IsTraditionalMarketTheme && DecorationState.IsProductOwned(product)
+                ? "전통시장 팩은 플랫폼 검수와 해당 상인회 승인을 모두 받은 뒤 공식 화면에 적용할 수 있습니다."
+                : "이 꾸미기를 적용하려면 먼저 구매가 필요합니다.";
             return Task.CompletedTask;
         }
 
         statusSeverity = Severity.Success;
         statusMessage = product.IsHomeTheme
             ? $"{product.Title}의 8개 영역을 홈에 한 번에 적용했습니다."
+            : product.IsTraditionalMarketTheme
+                ? $"{product.Title}을(를) {product.TraditionalMarketTheme!.MarketName} 화면에 적용했습니다."
             : product.IsBaguaMotion
                 ? $"{product.Title}을(를) {MotionScopeLabel(product.BaguaMotion!)}에 적용했습니다."
                 : $"{selectedAsset!.Title}을(를) 적용했습니다. 홈과 다이어그램에서 바로 확인할 수 있습니다.";
@@ -343,6 +392,11 @@ else
         {
             DecorationState.RestoreDefaultHomeTheme();
             statusMessage = "살뜰 반야·방편 기본 테마로 복원했습니다.";
+        }
+        else if (product.IsTraditionalMarketTheme)
+        {
+            DecorationState.SetTargetEnabled(CommunityDecorationTarget.TraditionalMarketTheme, false);
+            statusMessage = "전통시장 꾸미기 팩 표시를 끄고 정보 중심 기본 화면으로 전환했습니다.";
         }
         else if (product.IsBaguaMotion)
         {
@@ -367,6 +421,7 @@ else
             : item.Target switch
             {
                 CommunityDecorationTarget.HomeNavigatorTheme => "홈 내비게이터 테마",
+                CommunityDecorationTarget.TraditionalMarketTheme => "전통시장 꾸미기 팩",
                 CommunityDecorationTarget.Bagua => "괘상",
                 CommunityDecorationTarget.DiagramNode => "다이어그램 노드",
                 CommunityDecorationTarget.BaguaTransitionMotion => "괘 전환 애니메이션",
@@ -376,6 +431,8 @@ else
     private static string IncludedDescription(CommunityDecorationProduct item)
         => item.HomeTheme is { } theme
             ? $"{theme.Slots.Count}개 영역 · {string.Join(", ", theme.Slots.Select(slot => slot.Title))}"
+            : item.TraditionalMarketTheme is { } marketTheme
+                ? $"{marketTheme.Slots.Count}개 시장 표식 · {string.Join(", ", marketTheme.Slots.Select(slot => slot.Title))}"
             : item.BaguaMotion is { } motion
                 ? $"애니메이션 작품 1개 · {motion.CharacterLabel} · {motion.TrailLabel}"
                 : $"{item.Assets.Count}개 항목 · {string.Join(", ", item.Assets.Select(asset => asset.Title))}";
@@ -384,6 +441,9 @@ else
         => item.Target switch
         {
             CommunityDecorationTarget.HomeNavigatorTheme => "공통 홈의 펼친 반야·방편 태극과 접힌 오른쪽 하단 손잡이",
+            CommunityDecorationTarget.TraditionalMarketTheme => item.TraditionalMarketTheme is { } marketTheme
+                ? $"{marketTheme.MarketName}의 게시판, 장날, 상품, 수령, 성사 이야기 화면"
+                : "승인된 전통시장 화면",
             CommunityDecorationTarget.Bagua => "홈의 사방 이동판과 벽면 반원 손잡이",
             CommunityDecorationTarget.DiagramNode => "모바일 세로 다이어그램과 데스크톱 다이어그램 노드",
             CommunityDecorationTarget.BaguaTransitionMotion => item.BaguaMotion is { } motion
@@ -395,6 +455,8 @@ else
     private static string RightsDescription(CommunityDecorationProduct item)
         => item.ScriptureSource is not null
             ? "살뜰의 색상 테마만 적용합니다. 연결된 강의와 경전 원문의 권리는 각 원저작자와 제공자에게 있으며 이 팩은 공식 제휴 상품이 아닙니다."
+            : item.TraditionalMarketTheme is { } marketTheme
+                ? $"플랫폼 검수 {marketTheme.ReviewStatus}, 상인회 승인 {marketTheme.AssociationApprovalStatus} 상태입니다. 가격·원산지·수령시간 같은 거래 정보는 꾸미기와 무관하게 유지합니다."
             : "앱의 이동 동작은 유지하고 패키지의 승인된 시각 자산만 적용합니다. 초안은 내 보유함에서만 확인할 수 있습니다.";
 
     private static string MotionScopeLabel(BaguaTransitionMotionManifest motion)

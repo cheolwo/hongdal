@@ -93,6 +93,12 @@
     background: rgba(148, 163, 184, 0.12);
 }
 
+.theme-submit__kind {
+    width: fit-content;
+    max-width: 100%;
+    margin: 18px 0 0;
+}
+
 .theme-submit__preview-toolbar button {
     appearance: none;
     min-height: 38px;

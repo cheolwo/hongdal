@@ -20,6 +20,30 @@ public sealed class CommunityDecorationSelectionStoreTests
         Assert.Equal(expected, restored);
     }
 
+    [Fact]
+    public async Task 시장별꾸미기팩선택을_브라우저저장소에서복원한다()
+    {
+        var jsRuntime = new MemoryJsRuntime();
+        var store = new BrowserCommunityDecorationSelectionStore(jsRuntime);
+        var expected = new CommunityDecorationSelectionSnapshot(
+            "home-theme-hongdal-default-v1",
+            true,
+            new Dictionary<string, string>
+            {
+                ["traditional-market:sample-seongnam"] = "market-theme-seongnam-harvest-v1"
+            },
+            true);
+
+        await store.SaveAsync(expected);
+        var restored = await store.LoadAsync();
+
+        Assert.NotNull(restored);
+        Assert.True(restored.IsTraditionalMarketThemeEnabled);
+        Assert.Equal(
+            "market-theme-seongnam-harvest-v1",
+            restored.ActiveTraditionalMarketThemePackByScope?["traditional-market:sample-seongnam"]);
+    }
+
     private sealed class MemoryJsRuntime : IJSRuntime
     {
         private readonly Dictionary<string, string> storage = [];

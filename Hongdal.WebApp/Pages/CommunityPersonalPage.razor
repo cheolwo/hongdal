@@ -193,6 +193,7 @@
 
             <div class="community-personal-decoration-toggles">
                 <MudSwitch T="bool" Value="@DecorationState.IsHomeThemeEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.HomeNavigatorTheme, value))" Color="Color.Primary" Label="홈 · 게시판 테마" />
+                <MudSwitch T="bool" Value="@DecorationState.IsTraditionalMarketThemeEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.TraditionalMarketTheme, value))" Color="Color.Primary" Label="전통시장 꾸미기 팩" />
                 <MudSwitch T="bool" Value="@DecorationState.IsBaguaDecorationEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.Bagua, value))" Color="Color.Primary" Label="사방 이동판" />
                 <MudSwitch T="bool" Value="@DecorationState.IsNodeDecorationEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.DiagramNode, value))" Color="Color.Primary" Label="다이어그램 도형" />
                 <MudSwitch T="bool" Value="@DecorationState.IsBaguaMotionEnabled" ValueChanged="@((bool value) => SetDecorationTarget(CommunityDecorationTarget.BaguaTransitionMotion, value))" Color="Color.Primary" Label="이동 효과" />
@@ -201,10 +202,19 @@
             <div class="community-decoration-products">
                 @foreach (var product in VisibleDecorationProducts)
                 {
-                    <article class="@(DecorationState.IsProductActive(product) ? "community-decoration-product community-decoration-product--active" : "community-decoration-product")">
-                        <div class="community-decoration-product-preview" style="@($"--decoration-accent: {ResolveProductAccent(product)}")">
-                            <span>@ResolveProductSymbol(product)</span>
-                        </div>
+                    <article class="@BuildDecorationProductClass(product)">
+                        @if (product.TraditionalMarketTheme is { } marketTheme)
+                        {
+                            <div class="community-decoration-product-market-preview">
+                                <TraditionalMarketThemePreview Theme="marketTheme" Title="@product.Title" Compact="true" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="community-decoration-product-preview" style="@($"--decoration-accent: {ResolveProductAccent(product)}")">
+                                <span>@ResolveProductSymbol(product)</span>
+                            </div>
+                        }
                         <div class="community-decoration-product-copy">
                             <span>@ResolveDecorationTargetLabel(product.Target)</span>
                             <h3>@product.Title</h3>
@@ -212,6 +222,11 @@
                             @if (product.IsHomeTheme)
                             {
                                 <small>홈 · 게시판 · 글 목록 · 글 본문</small>
+                            }
+                            else if (product.TraditionalMarketTheme is { } traditionalMarketTheme)
+                            {
+                                <small>@traditionalMarketTheme.MarketName · 상인회 @traditionalMarketTheme.AssociationApprovalStatus</small>
+                                <small>@traditionalMarketTheme.DesignerCompensationPolicyLabel</small>
                             }
                             <small>@product.CreatorName</small>
                         </div>
@@ -394,7 +409,8 @@
     private async Task SetDecorationTarget(CommunityDecorationTarget target, bool enabled)
     {
         DecorationState.SetTargetEnabled(target, enabled);
-        if (target == CommunityDecorationTarget.HomeNavigatorTheme)
+        if (target is CommunityDecorationTarget.HomeNavigatorTheme
+            or CommunityDecorationTarget.TraditionalMarketTheme)
         {
             await SaveDecorationSelectionAsync();
         }
@@ -443,6 +459,15 @@
         DecorationState.SetTargetEnabled(
             CommunityDecorationTarget.HomeNavigatorTheme,
             selection.IsHomeThemeEnabled);
+        foreach (var (marketScopeKey, packKey) in selection.ActiveTraditionalMarketThemePackByScope
+                     ?? new Dictionary<string, string>())
+        {
+            DecorationState.ApplyTraditionalMarketThemePack(marketScopeKey, packKey);
+        }
+
+        DecorationState.SetTargetEnabled(
+            CommunityDecorationTarget.TraditionalMarketTheme,
+            selection.IsTraditionalMarketThemeEnabled);
     }
 
     private async Task<bool> SaveDecorationSelectionAsync()
@@ -451,7 +476,9 @@
         {
             await DecorationSelectionStore.SaveAsync(new(
                 DecorationState.ActiveHomeThemePackKey,
-                DecorationState.IsHomeThemeEnabled));
+                DecorationState.IsHomeThemeEnabled,
+                new Dictionary<string, string>(DecorationState.ActiveTraditionalMarketThemePackByScope),
+                DecorationState.IsTraditionalMarketThemeEnabled));
             return true;
         }
         catch (JSException)
@@ -499,6 +526,7 @@
         => target switch
         {
             CommunityDecorationTarget.HomeNavigatorTheme => "홈 · 게시판 테마",
+            CommunityDecorationTarget.TraditionalMarketTheme => "전통시장 꾸미기 팩",
             CommunityDecorationTarget.Bagua => "사방 이동판",
             CommunityDecorationTarget.DiagramNode => "다이어그램 도형",
             CommunityDecorationTarget.BaguaTransitionMotion => "이동 효과",
@@ -508,14 +536,32 @@
     private static string ResolveProductSymbol(CommunityDecorationProduct product)
         => product.Assets.FirstOrDefault()?.PreviewSymbol
            ?? product.HomeTheme?.ClosedHandle.Title
+           ?? product.TraditionalMarketTheme?.MarketDayBanner.Title
            ?? product.BaguaMotion?.PreviewSymbol
            ?? "◇";
 
     private static string ResolveProductAccent(CommunityDecorationProduct product)
         => product.Assets.FirstOrDefault()?.AccentColor
            ?? product.HomeTheme?.AccentColor
+           ?? product.TraditionalMarketTheme?.AccentColor
            ?? product.BaguaMotion?.AccentColor
            ?? "#147d64";
+
+    private string BuildDecorationProductClass(CommunityDecorationProduct product)
+    {
+        var classes = new List<string> { "community-decoration-product" };
+        if (product.IsTraditionalMarketTheme)
+        {
+            classes.Add("community-decoration-product--market");
+        }
+
+        if (DecorationState.IsProductActive(product))
+        {
+            classes.Add("community-decoration-product--active");
+        }
+
+        return string.Join(' ', classes);
+    }
 
     private static string FormatDate(DateTime value)
         => value.ToLocalTime().ToString("yyyy.MM.dd HH:mm");

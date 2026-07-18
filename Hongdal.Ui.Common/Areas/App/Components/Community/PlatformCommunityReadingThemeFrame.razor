@@ -67,6 +67,15 @@
         DecorationState.SetTargetEnabled(
             CommunityDecorationTarget.HomeNavigatorTheme,
             selection.IsHomeThemeEnabled);
+        foreach (var (marketScopeKey, packKey) in selection.ActiveTraditionalMarketThemePackByScope
+                     ?? new Dictionary<string, string>())
+        {
+            DecorationState.ApplyTraditionalMarketThemePack(marketScopeKey, packKey);
+        }
+
+        DecorationState.SetTargetEnabled(
+            CommunityDecorationTarget.TraditionalMarketTheme,
+            selection.IsTraditionalMarketThemeEnabled);
     }
 
     private void HandleDecorationChanged()

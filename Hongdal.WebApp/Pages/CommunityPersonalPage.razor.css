@@ -298,6 +298,14 @@
     overflow: hidden;
 }
 
+.community-decoration-product--market {
+    grid-template-columns: minmax(210px, 0.9fr) minmax(0, 1.1fr) auto;
+}
+
+.community-decoration-product-market-preview {
+    min-width: 0;
+}
+
 .community-decoration-product-copy {
     min-width: 0;
 }
@@ -354,6 +362,14 @@
 
     .community-decoration-product {
         grid-template-columns: 62px minmax(0, 1fr);
+    }
+
+    .community-decoration-product--market {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .community-decoration-product--market .community-decoration-product-action {
+        grid-column: 1;
     }
 
     .community-decoration-product-preview {

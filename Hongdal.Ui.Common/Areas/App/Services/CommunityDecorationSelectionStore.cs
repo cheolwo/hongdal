@@ -5,7 +5,9 @@ namespace Hongdal.Ui.Common.Areas.App.Services;
 
 public sealed record CommunityDecorationSelectionSnapshot(
     string ActiveHomeThemePackKey,
-    bool IsHomeThemeEnabled);
+    bool IsHomeThemeEnabled,
+    IReadOnlyDictionary<string, string>? ActiveTraditionalMarketThemePackByScope = null,
+    bool IsTraditionalMarketThemeEnabled = true);
 
 public interface ICommunityDecorationSelectionStore
 {

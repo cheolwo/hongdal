@@ -36,6 +36,12 @@ else if (paymentCompleted)
                 <HongdalHomeNavigatorThemePreview Theme="@completedTheme" Title="@product.Title" Compact="true" />
             </div>
         }
+        else if (product.TraditionalMarketTheme is { } completedMarketTheme)
+        {
+            <div class="decoration-checkout__complete-preview">
+                <TraditionalMarketThemePreview Theme="completedMarketTheme" Title="@product.Title" Compact="true" />
+            </div>
+        }
         else if (product.BaguaMotion is { } completedMotion)
         {
             <div class="decoration-checkout__complete-preview">
@@ -52,7 +58,7 @@ else if (paymentCompleted)
             <div><dt>승인 금액</dt><dd>@FormatPrice(product)</dd></div>
             <div><dt>결제 환경</dt><dd>Development · FakePG</dd></div>
         </dl>
-        @if (product.IsHomeTheme || product.IsBaguaMotion)
+        @if (product.IsHomeTheme || product.IsTraditionalMarketTheme || product.IsBaguaMotion)
         {
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
@@ -64,6 +70,8 @@ else if (paymentCompleted)
                     ? "현재 적용 중"
                     : product.IsBaguaMotion
                         ? "구매한 애니메이션 적용"
+                        : product.IsTraditionalMarketTheme
+                            ? "구매한 시장 팩 적용"
                         : "구매한 전체 테마 적용")
             </MudButton>
         }
@@ -123,6 +131,12 @@ else
                         <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 방편·반야·커뮤니티·상점·간괘·테두리·라벨·손잡이 8개 슬롯이 하나의 패키지로 제공됩니다.</p>
                         <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 구매 후 명시적으로 적용할 때 전체 슬롯이 한 번에 변경됩니다.</p>
                     }
+                    else if (product.TraditionalMarketTheme is { } marketTheme)
+                    {
+                        <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> @marketTheme.MarketName 범위의 시장 머리말·게시판·장날·상품·수령·성사 이야기 표식이 함께 제공됩니다.</p>
+                        <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 플랫폼 검수와 상인회 승인이 모두 유지되는 동안만 공식 시장 화면에 적용됩니다.</p>
+                        <p><MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" /> 가격·수량·원산지·수령 시간과 같은 거래 정보는 팩이 변경하지 않습니다.</p>
+                    }
                     else if (product.BaguaMotion is { } motion)
                     {
                         <p><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" /> 역할별 괘 이동 장면 125개 중 @(motion.CoveredPerspectiveSlotCount)개 슬롯에 적용되는 작품입니다.</p>
@@ -159,6 +173,17 @@ else
                             <strong>@product.Title</strong>
                             <small>@product.CreatorName</small>
                             <small>@($"전체 테마 {theme.Slots.Count}개 슬롯 · v{theme.Version}")</small>
+                        </div>
+                    </div>
+                }
+                else if (product.TraditionalMarketTheme is { } marketTheme)
+                {
+                    <div class="decoration-checkout__theme-product">
+                        <TraditionalMarketThemePreview Theme="marketTheme" Title="@product.Title" Compact="true" />
+                        <div>
+                            <strong>@product.Title</strong>
+                            <small>@product.CreatorName</small>
+                            <small>@($"{marketTheme.MarketName} · {marketTheme.Slots.Count}개 표식 · v{marketTheme.Version}")</small>
                         </div>
                     </div>
                 }
@@ -293,6 +318,8 @@ else
         {
             applyMessage = product.IsBaguaMotion
                 ? $"{product.Title}을(를) 지정된 괘 전환 슬롯에 적용했습니다."
+                : product.IsTraditionalMarketTheme
+                    ? $"{product.Title}을(를) {product.TraditionalMarketTheme!.MarketName}에 적용했습니다."
                 : $"{product.Title}의 전체 영역을 홈에 적용했습니다.";
         }
 
