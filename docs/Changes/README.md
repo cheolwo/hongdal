@@ -18,7 +18,6 @@
 | 2026-07-18 | [미국 구매자 공동수입 배송 여정](2026-07-18-us-buyer-collective-import.md) | 미국 구매자 수요·가원장·역할 구성부터 중국 공장 출발 전 전처리, 보세·통관·풀필먼트·참여자 주소 배송까지 11단계를 별도 계약 경계와 함께 표시 |
 | 2026-07-18 | [미국 3PL 업체 문의 준비](../Architecture/UnitedStatesThirdPartyLogisticsProviderDirectory.md#업체-문의-초안-준비) | 화면 없음 — 보세-주소 후보 10개의 공식 문의 채널과 영문 초안을 관리자 전용 API로 준비하고, 발신자·실제 주소·수신거부·업체별 승인 없이는 차단하며 자동 발송은 비활성 |
 | 2026-07-18 | [미국 3PL 후보 디렉터리](../Architecture/UnitedStatesThirdPartyLogisticsProviderDirectory.md) | 화면 없음 — 범용 23개 업체와 보세-주소 역할 후보를 전산화하고, 미국 공동수입 가원장에 보세시설·in-bond·풀필먼트·참여자 주소 배송 슬롯 및 기존 역할 참여 API를 연결 |
-| 2026-07-18 | [이웃에서 시작하는 공동행동 개발 철학](../Architecture/NeighborCenteredDevelopmentPhilosophy.md) | 화면 없음 — 이웃 사랑과 수신·제가·치국의 실천 접점을 자발적 참여·책임·공정한 공동 기록의 개발 기준으로 정리 |
 | 2026-07-18 | [관리자 자료 검토와 커뮤니티 글쓰기](2026-07-18-admin-information-review.md) | YouTube·KAMIS 수집 후보를 출처 기준과 함께 검토하고 기존 커뮤니티 글쓰기 초안으로 넘기는 Admin 앱 작업공간 |
 | 2026-07-18 | [게시판별 익명 작성과 특색 닉네임](2026-07-18-community-anonymous-posting.md) | 게시판마다 비로그인·로그인·운영자 작성 조건을 표시하고 방문자에게 게시판 특색형 익명 닉네임 자동 발급 |
 | 2026-07-18 | [커뮤니티 읽기 테마 패키지](2026-07-18-community-reading-theme.md) | 홈 테마 패키지를 게시판 홈·글 목록·글 본문에 일괄 적용하고 브라우저 재접속 시 선택 복원 |
