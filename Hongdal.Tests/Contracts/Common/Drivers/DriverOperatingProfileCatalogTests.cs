@@ -27,7 +27,9 @@ public sealed class DriverOperatingProfileCatalogTests
         Assert.Equal(OperatingMapProviderCodes.GoogleMaps, profile.MapProviderCode);
         Assert.Equal(DriverRoutingProviderCodes.GoogleRoutes, profile.RoutingProviderCode);
         Assert.Equal(DriverPlaceProviderCodes.GooglePlaces, profile.PlaceProviderCode);
-        Assert.Equal(OperatingAddressProviderCodes.GoogleAddressValidation, profile.AddressProviderCode);
+        Assert.Equal(
+            OperatingAddressProviderCodes.UnitedStatesCensusGeocoder,
+            profile.AddressProviderCode);
     }
 
     [Theory]

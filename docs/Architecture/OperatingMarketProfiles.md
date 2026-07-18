@@ -50,7 +50,7 @@
 | 통화 | KRW | USD |
 | 거리 / 중량 | km / kg | mi / lb |
 | 배포 기본 시간대 | Asia/Seoul | UTC, 배포 설정으로 지역 시간대 지정 |
-| 주소 기본값 | 행안부 도로명주소 | Google Address Validation |
+| 주소 기본값 | 행안부 도로명주소 | Census 주소 범위 매칭, 배송 검증 별도 |
 | 지도 기본값 | Naver Maps | Google Maps |
 | 판매채널 기본값 | SmartStore, Coupang, 11st | Amazon, eBay, Shopify, Walmart, Etsy, TikTok Shop |
 | 화물 주선 기본값 | 국내 운송 업무 | 권한을 확인한 브로커 파트너 흐름 |
@@ -79,10 +79,113 @@
 
 | 공통 인터페이스 | 한국 모듈 | 미국 모듈 |
 | --- | --- | --- |
-| `IOperatingMarketAddressLookupAdapter` | 행안부 도로명주소 | Google Address Validation 연결 자리 |
+| `IOperatingMarketAddressLookupAdapter` | 행안부 도로명주소 | U.S. Census Geocoder |
 | `IOperatingMarketFreightWorkflowPolicy` | 국내 전문 사업자 허가 점검 메타데이터 | 참여 브로커의 권한 강제 검증 |
 
 주소 조회는 `IOperatingMarketAddressLookupService`를 공통 진입점으로 사용한다. 한 서버에는 해당 배포 시장의 주소 어댑터만 존재한다. 다른 시장의 주소 요청은 제공자 우회 없이 `MarketNotAvailableInDeployment`로 거절한다.
+
+## 미국 주소 정보 경계
+
+미국 주소는 하나의 API가 모든 의미를 확정하는 값으로 다루지 않는다. 특정 문화권을 단정해 기능을 강제하지 않고, 참여자가 원할 때 가까운 지역의 공동구매를 찾고 함께 의사를 모을 수 있도록 다음 책임을 분리한다.
+
+| 계층 | 용도 | 현재 제공자 | 판정 의미 |
+| --- | --- | --- | --- |
+| 주소 입력 | street, city, state, ZIP, 보조 단위 입력 | 공통 계약 | 사용자가 입력한 값 |
+| 위치 매칭 | 좌표와 city/state/ZIP 후보 확인 | U.S. Census Geocoder | MAF/TIGER 도로 주소 범위에 매칭됨 |
+| 우편 표준화 | ZIP+4, 표준 약어, 배송용 주소 확인 | USPS 후속 연결 | USPS 우편 표준에 맞춘 결과 |
+| 커뮤니티 지역 | 가까운 공동구매 탐색과 집계 | 별도 비식별 투영 | 공개 가능한 지역 범위 |
+
+USPS Publication 28은 배달 주소 줄과 city/state/ZIP 줄을 구분하고, 공동주택에는 `APT`, `STE`, `UNIT` 같은 secondary unit designator를 사용한다. PO Box, rural route, 군 우편과 Puerto Rico 주소도 별도 형식을 가진다. 특히 Puerto Rico의 `URB` urbanization은 주소의 중요한 구성 요소이므로 일반 미국 주소 문자열에서 임의로 버리지 않는다.
+
+ZIP Code는 행정구역 폴리곤이 아니라 USPS가 우편 처리와 배송 경로에 부여하는 코드다. Census의 ZCTA는 ZIP Code 분포를 통계·지도 분석용 면으로 일반화한 별도 지리 제품이며 모든 유효 ZIP Code가 ZCTA로 표현되는 것도 아니다. 따라서 ZIP Code를 시·군 경계처럼 사용하거나 ZIP과 ZCTA를 같은 식별자로 저장하지 않는다.
+
+### 현재 구현
+
+미국 배포의 `UnitedStatesAddressLookupAdapter`는 `UnitedStatesCensusAddressGeocoder`를 사용한다.
+
+```text
+GET https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress
+  ?address={사용자가 입력한 주소}
+  &benchmark=Public_AR_Current
+  &vintage=Current_Current
+  &layers=2,28,30,80,82
+  &format=json
+```
+
+- API key 없이 공식 단건 Geocoder를 호출한다.
+- 반환 주소, city, state, ZIP, 위도·경도와 TIGER line ID를 공통 주소 후보로 변환한다.
+- Census State, County, Incorporated Place, Census Designated Place, ZCTA를 `GEOID` 기반 지리 영역으로 함께 반환한다.
+- `Public_AR_Current` benchmark와 `Current_Current` geography vintage처럼 응답이 실제로 밝힌 데이터 기준을 함께 보존한다.
+- 좌표는 주소 범위에서 계산된 값이므로 `MatchPrecisionCode=AddressRange`로 표시한다.
+- 매칭 결과가 없어도 제공자 오류가 아닌 정상 빈 결과로 처리한다.
+- 요청 실패 메시지에는 사용자가 입력한 주소를 되풀이하지 않는다.
+
+Census 매칭 성공은 우편 배송 가능 확인이나 건물 출입구의 rooftop 좌표를 뜻하지 않는다. 현재 oneline endpoint는 Puerto Rico의 urbanization/municipio가 포함된 주소를 완전하게 지원하지 않으므로 해당 형식은 향후 `addressPR` 구조화 요청으로 분기한다.
+
+미국 서버 설정은 다음과 같다.
+
+```json
+{
+  "UnitedStatesAddress": {
+    "CensusGeocoder": {
+      "Enabled": true,
+      "BaseUrl": "https://geocoding.geo.census.gov",
+      "GeographiesOneLineAddressPath": "/geocoder/geographies/onelineaddress",
+      "Benchmark": "Public_AR_Current",
+      "Vintage": "Current_Current",
+      "Layers": "2,28,30,80,82",
+      "TimeoutSeconds": 15,
+      "MaxAddressLength": 500
+    },
+    "DeliveryScopes": {
+      "StateMinimumParticipantsForPublicDisplay": 1,
+      "CountyMinimumParticipantsForPublicDisplay": 3,
+      "PlaceMinimumParticipantsForPublicDisplay": 5,
+      "ZctaMinimumParticipantsForPublicDisplay": 10
+    }
+  }
+}
+```
+
+### 미국 공동구매 배달권 분할
+
+`UnitedStatesDeliveryScopePlanner`는 주소 후보에 포함된 Census 지리를 모집 표시뿐 아니라 물류 효율화를 위한 수요 묶음 후보로 분리한다. 가까운 수요를 같은 키로 집계하면 공동 수입·공동 구매의 총량을 계산하고, 집결 창고를 고르고, 출고 배치와 차량 적재를 묶어 배송 횟수와 마지막 배송의 정차 수를 줄일 수 있다.
+
+`IUnitedStatesDeliveryScopeService.ResolveAsync`는 전체 주소 조회와 배달권 계획을 한 경로로 연결한다. 주소가 매칭되지 않거나 State 지리가 없으면 임의의 ZIP·문자열 키를 만들지 않고 실패 결과를 반환한다.
+
+| 범위 | 키 기준 | 모집·물류 목적 | 기본 선택 |
+| --- | --- | --- | --- |
+| State | State GEOID | 넓은 글 탐색, 지역 간 수요 발견, 수입·간선 물량 집계 | 다른 지리가 없을 때만 |
+| County / county-equivalent | County GEOID | 비도시·저밀도 수요의 공동 집결과 배송 경로 묶음 | Place가 없을 때 |
+| Incorporated Place / CDP | Place GEOID | 도시 생활권 수요 집계, 집결 거점과 출고 배치 후보 구성 | 주소에 Place가 있으면 우선 |
+| ZCTA | ZCTA GEOID | 참여자가 충분한 구간의 마지막 배송 정차·경로 묶음 | 기본 선택 아님 |
+| 실제 운행권 | 주행시간, 제공자 service area, 차량·품목 조건 | 배송 실행 가능성 판단 | Census 지리와 별도 |
+
+배달권 키는 `us-state:{GEOID}`, `us-county:{GEOID}`, `us-place:{GEOID}`, `us-zcta:{GEOID}` 형식을 사용하고 생성 당시 benchmark와 geography vintage를 계획 결과에 함께 남긴다. 주소의 우편 ZIP과 해당 좌표의 ZCTA가 다를 수 있으므로 `PostalCode`를 ZCTA 키로 복사하지 않는다. Place는 여러 County에 걸칠 수 있고 ZCTA도 행정구역에 완전히 종속되지 않으므로 억지로 `State > County > Place > ZCTA` 단일 트리로 만들지 않고 겹치는 지리 후보로 보존한다.
+
+각 후보에는 `RegionalInboundConsolidation`, `RuralRouteConsolidation`, `UrbanHubConsolidation`, `LastMileStopConsolidation` 중 하나의 물류 역할을 기록한다. `RecommendedScopeKey`는 커뮤니티 모집의 초기 추천을, `RecommendedDemandConsolidationScopeKey`는 물류 수요 집계의 초기 추천을 나타낸다. 현재는 둘 다 Place 우선, Place가 없으면 County를 사용하지만 별도 계약으로 유지해 실제 밀도와 운영 데이터가 쌓인 뒤 서로 다른 권역을 선택할 수 있게 한다. 계획의 `ConsolidateDemandThenValidateFulfillment` 정책은 지리적으로 수요를 먼저 묶은 다음 창고·출고·운행 조건을 검증한다는 순서를 뜻한다.
+
+모든 지리 후보의 `RequiresLogisticsFeasibilityValidation`과 `RequiresOperationalRouteValidation`은 `true`다. 즉 같은 Place나 County 안에 있다는 사실은 수요를 묶어 볼 근거일 뿐, 합배송이 더 저렴하거나 창고·배송 제공자가 실제로 갈 수 있다는 뜻은 아니다. 실행 단계에서는 총 수량·중량·부피, SKU와 온도대 호환성, 재고 창고, 공통 배송 시간창, 차량 적재율, 도로 주행시간, 배송 제공자 관할과 예상 비용을 다시 계산한다.
+
+공개 최소 인원의 기본값은 State 1명, County 3명, Place 5명, ZCTA 10명이다. 이는 법정 기준이나 물류 효율 달성 기준이 아니라 초기 개인정보 보호를 위한 조정 가능한 제품 정책이다. 기준 미달 수요도 내부 집계에는 포함할 수 있지만 지역명과 참여 규모를 공개하지 않는다. 반대로 공개 인원을 충족해도 적재율·배송 시간창·비용 절감 조건을 충족하지 못하면 실행 배치로 확정하지 않는다.
+
+### 개인정보와 공동구매 지역
+
+- 상세 street, apartment/suite/unit, 정확한 좌표는 배송과 상호 동의가 필요한 사적 정보로 유지한다.
+- 게시글과 모집 화면에는 원본 주소나 좌표를 직접 투영하지 않는다.
+- 초기 공개 지역은 Place를 우선하고, Place가 없는 지역은 County를 사용한다. ZCTA는 설정된 최소 참여 인원을 충족한 경우에만 세분화한다.
+- ZIP 단위라도 참여자가 적어 개인 주거지를 추정할 수 있으면 더 넓은 지역으로 올려 표시한다.
+- 공동구매 지역은 사용자의 명시적 참여 선택을 나타낼 뿐, 주소가 같거나 가깝다는 이유만으로 자동 가입·알림·거래 상대 추천을 하지 않는다.
+
+### USPS 후속 연결 조건
+
+USPS Addresses API는 배송용 주소 표준화와 ZIP+4 확인 단계에만 연결한다. 2026-07-18 확인 기준으로 USPS는 Addresses API 3.3.1 접근을 2026-08-01로 연기했고, 계속 사용하려는 고객에게 별도 license agreement를 요구하고 있다. 개발자 포털은 Address API의 요금 계층 전환도 안내하고 있으므로 다음 준비 전에는 Hongdal의 기본 주소 제공자로 고정하지 않는다.
+
+1. USPS Business Account와 OAuth client credentials를 배포 비밀로 관리한다.
+2. 주소 API license, 허용 용도, 보존·재배포 제한과 실제 요금을 검토한다.
+3. Census `AddressRange` 매칭과 USPS `PostalStandardized` 결과를 서로 다른 상태로 저장한다.
+4. 배송 또는 label 생성 직전처럼 우편 검증이 실제로 필요한 시점에만 호출한다.
+5. USPS 장애가 발생해도 Census 결과를 배송 검증 성공으로 승격하지 않는다.
 
 ## 서버 컨텍스트와 클라이언트 인터페이스
 
@@ -136,13 +239,17 @@ GET /api/v1/operations/market-profile
 
 ## 공식 근거
 
-2026-07-17 확인 기준이다. 법령과 행정 요구는 변경될 수 있으므로 운영 전 다시 확인해야 한다.
+2026-07-18 확인 기준이다. 법령과 행정 요구, 외부 API 조건은 변경될 수 있으므로 운영 전 다시 확인해야 한다.
 
 - 한국: [화물자동차 운수사업법 제24조, 국가법령정보센터](https://www.law.go.kr/LSW/lsInfoP.do?chrClsCd=010202&lsId=&lsiSeq=286393&urlMode=lsInfoP)
 - 미국: [FMCSA Broker Registration](https://www.fmcsa.dot.gov/registration/broker-registration)
 - 미국: [FMCSA의 motor carrier, broker, freight forwarder 정의](https://www.fmcsa.dot.gov/faq/what-are-definitions-motor-carrier-broker-and-freight-forwarder-authorities)
 - 미국: [FMCSA Broker and Freight Forwarder Financial Responsibility](https://www.fmcsa.dot.gov/registration/broker-and-freight-forwarder-financial-responsibility-rule-overview-and-compliance)
 - 미국: [FMCSA Form BOC-3](https://www.fmcsa.dot.gov/registration/form-boc-3-designation-agents-service-process)
+- 미국 주소 표준: [USPS Publication 28](https://pe.usps.com/text/pub28/welcome.htm)
+- 미국 주소 API: [USPS Addresses API](https://developers.usps.com/addressesv3), [USPS API 이용 조건](https://developers.usps.com/terms-and-conditions)
+- 미국 위치 매칭: [Census Geocoding Services API](https://geocoding.geo.census.gov/geocoder/Geocoding_Services_API.html)
+- ZIP과 통계 지리: [Census ZIP Code Tabulation Areas](https://www.census.gov/programs-surveys/geography/guidance/geo-areas/zctas.html)
 
 이 문서와 정책 코드는 법률 자문이나 자동 면허 판정이 아니다. 실제 서비스 출시 전 해당 관할의 변호사 또는 규제 전문가와 계약·운영 구조를 검토해야 한다.
 
@@ -153,10 +260,12 @@ GET /api/v1/operations/market-profile
 - `KR` / `US` 공통 운영 프로필과 배포별 단일 서비스 모듈
 - 표시 언어와 운영 시장의 독립 계약
 - 시장별 주소 어댑터와 단위 변환
+- 미국 Census 주소 범위 매칭, benchmark·정밀도·좌표 계약과 US 배포 전용 등록
+- Census State·County·Place·ZCTA 지리 투영과 미국 공동구매 배달권 계획기
 - 배포 시간대와 공개 런타임 프로필 API
 - 운송 의뢰 생성을 `QualifiedProviderParticipationRequest`로 분류한 촉진 업무 경계
 - 전문 사업자 참여 역할, 검증 상태, 만료, 요구사항별 증거 모델
 - 플랫폼 후보 정보와 기사 본인 수락·전문 사업자 결정을 구분하는 배차 확정 경계
 - 커뮤니티 원장에서 RDB 기사 확정·운송 실행 상태로의 역투영 차단
 
-아직 남은 범위는 Google Address Validation 실제 연결, 전문 사업자 권한을 공식 데이터에서 주기적으로 재검증하는 저장소, 전문 사업자가 확정하는 별도 명령에서 `RegulatedTransportationArrangement`를 강제하는 연결, 한국 집행 모드 강화, 국가별 결제·정산 제공자 분리다. 기존 Naver, Toss, 국내 공공데이터처럼 한국 중심 서비스는 해당 업무를 리팩터링할 때 시장 모듈 경계 안으로 단계적으로 이동한다.
+아직 남은 주소 범위는 구조화된 미국 주소 입력, Puerto Rico `addressPR`, USPS 배송 표준화, 실제 창고·배송 제공자 service area와 주행시간 검증 연결이다. 공개 최소 인원은 실제 이용 밀도와 개인정보 검토 결과에 따라 조정해야 한다. 그 밖에는 전문 사업자 권한을 공식 데이터에서 주기적으로 재검증하는 저장소, 전문 사업자가 확정하는 별도 명령에서 `RegulatedTransportationArrangement`를 강제하는 연결, 한국 집행 모드 강화, 국가별 결제·정산 제공자 분리가 남아 있다. 기존 Naver, Toss, 국내 공공데이터처럼 한국 중심 서비스는 해당 업무를 리팩터링할 때 시장 모듈 경계 안으로 단계적으로 이동한다.

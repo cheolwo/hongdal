@@ -65,7 +65,7 @@ public static partial class ServiceCollectionExtensions
             OperatingMarketAddressLookupService>();
         services.AddScoped<IOperatingMarketRuntimeProfileService,
             OperatingMarketRuntimeProfileService>();
-        module.AddServices(services);
+        module.AddServices(services, configuration);
 
         return services;
     }

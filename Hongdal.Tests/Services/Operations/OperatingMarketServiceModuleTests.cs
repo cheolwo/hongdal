@@ -22,6 +22,15 @@ public sealed class OperatingMarketServiceModuleTests
 
         var deployment = GetDeployment(services);
         Assert.Equal(OperatingTimeZoneIds.Korea, deployment.TimeZoneId);
+        Assert.DoesNotContain(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUnitedStatesAddressGeocoder));
+        Assert.DoesNotContain(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopePlanner));
+        Assert.DoesNotContain(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopeService));
     }
 
     [Fact]
@@ -37,6 +46,15 @@ public sealed class OperatingMarketServiceModuleTests
 
         var deployment = GetDeployment(services);
         Assert.Equal(OperatingTimeZoneIds.CoordinatedUniversal, deployment.TimeZoneId);
+        Assert.Contains(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUnitedStatesAddressGeocoder));
+        Assert.Contains(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopePlanner));
+        Assert.Contains(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopeService));
     }
 
     [Fact]
