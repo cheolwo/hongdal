@@ -207,6 +207,9 @@ public sealed class CommunityActionMarketDayViewModel : ObservableObject
     public bool IsApplicable => Snapshot.IsApplicable;
     public bool CanAdvertiseWalkInSale => Snapshot.CanAdvertiseWalkInSale;
     public CommunityMarketDayStageSnapshot? CurrentStage => Snapshot.CurrentStage;
+    public CommunityDomesticMarketSupplySnapshot DomesticSupply => Snapshot.DomesticSupply;
+    public CommunityMarketIngredientSupplySnapshot MarketIngredientSupply
+        => DomesticSupply.MarketIngredientSupply;
 
     public void Apply(CommunityCollectiveActionSnapshot snapshot)
     {
@@ -214,6 +217,8 @@ public sealed class CommunityActionMarketDayViewModel : ObservableObject
         OnPropertyChanged(nameof(IsApplicable));
         OnPropertyChanged(nameof(CanAdvertiseWalkInSale));
         OnPropertyChanged(nameof(CurrentStage));
+        OnPropertyChanged(nameof(DomesticSupply));
+        OnPropertyChanged(nameof(MarketIngredientSupply));
     }
 }
 

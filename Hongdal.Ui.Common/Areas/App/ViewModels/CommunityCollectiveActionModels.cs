@@ -984,8 +984,8 @@ public static class CommunityCollectiveActionPreviewCatalog
         => new()
         {
             Id = Guid.Parse("77777777-7777-4777-8777-777777777777"),
-            Title = "성남 제철 채소·과일 공동구매 장날",
-            Summary = "공동구매 예약 물량을 먼저 보호하고, 상인회와 청과·채소 상인이 확정한 여유 물량을 장날 현장에 진열해 이웃도 구경하고 구매하는 시범 운영입니다.",
+            Title = "성남 국내 제철 채소·과일 공동구매 장날",
+            Summary = "국내 생산자 공동 출하 물량을 전통시장으로 곧장 입고해 가정 예약분과 시장 조리 가게 식재료를 나누어 배분합니다. 별도 확정된 여유 물량만 장날 현장에 진열하는 시범 운영입니다.",
             CommunityScope = "경기 성남 · 전통시장 생활권",
             CurrentPageKey = CommunityCollectiveActionPageKeys.InProgress,
             StatusLabel = "공동장날 입고 준비 중",
@@ -1002,6 +1002,9 @@ public static class CommunityCollectiveActionPreviewCatalog
             IsMine = true,
             Conditions =
             [
+                new("domestic-source", "국내 산지 공동 출하", "경기 광주·충북 충주 생산자 출하 lot와 100상자 공급 조건", "생산자 직접 수락", true),
+                new("direct-route", "전통시장 직입고", "산지 선별·포장 뒤 성남 생활권 전통시장 입고 슬롯으로 직송", "운송·입고 수락", true),
+                new("food-business-supply", "시장 조리 가게 공급", "가정 예약 68상자·조리 가게 예약 12상자·현장판매 확정 12상자 분리", "가게 2곳 직접 수락", true),
                 new("association", "상인회 공동사업", "시범 장날 일정·공용공간·차량 동선 합의", "예시 합의", true),
                 new("reservation", "예약 물량", "공동구매 참여자 80상자 별도 표식·보관", "현장판매와 분리", true),
                 new("walk-in", "현장판매 물량", "확정 12상자·추가 후보 4상자", "확정 물량만 공개", true),
@@ -1012,14 +1015,21 @@ public static class CommunityCollectiveActionPreviewCatalog
             RoleSlots =
             [
                 new("거래 당사자", CommunityPostPartyRoleCodes.Buyer, "공동구매 참여 주민", "예약 수량과 장날 수령시간을 확인합니다.", true, "48명", "예약 80상자", true),
+                new("거래 당사자", CommunityDomesticMarketSupplyRoleCodes.ProducerOrCooperative, "국내 농가·생산자단체", "생산지, 수확일, 출하 가능량, 가격과 인계 조건을 직접 수락합니다.", true, "경기 광주·충북 충주 생산자 예시", "출하 lot·조건 수락", true),
+                new("산지 이행", CommunityDomesticMarketSupplyRoleCodes.OriginSortingPackingOperator, "산지 농산물 선별·포장 주체", "시장 검수와 주문별 배분에 맞게 선별·포장하고 상차 기록을 남깁니다.", true, "산지 작업조 예시", "선별·포장 범위", true),
+                new("실제 운송", CommunityDomesticMarketSupplyRoleCodes.OriginToMarketCarrier, "국내 산지 직송 운송 주체", "확정 출하 lot를 시장 입고 시간에 맞춰 운송하고 인계합니다.", true, "국내 운송 참여 예시", "차량·적재·인계", true),
                 new("현장 이행", CommunityMarketDayRoleCodes.MarketAssociationCoordinator, "전통시장 상인회·시장관리자", "공동장날 일정, 공용공간과 참여 상점 모집을 조정합니다.", true, "시범운영 합의 예시", "공동사업 범위", true),
                 new("현장 이행", CommunityMarketDayRoleCodes.FreshProduceMerchant, "청과·채소 상인", "입고 농산물을 검수하고 선별·등급·원산지와 판매 조건을 확인합니다.", true, "참여 상점 2곳", "취급 품목·처리량", true),
                 new("현장 이행", CommunityMarketDayRoleCodes.ProduceSortingPackingOperator, "농산물 선별·소분 담당", "예약과 현장판매 물량을 나누어 상자별로 표시합니다.", true, "시장 작업조 1팀", "작업 범위·위생", true),
+                new("거래 당사자", CommunityMarketIngredientSupplyRoleCodes.MarketFoodBusinessIngredientBuyer, "시장 조리·식음료 가게", "가정 예약분과 분리된 식재료 수량·가격·보관·사용 조건을 직접 수락합니다.", false, "시장 조리 가게 2곳 예시", "영업 범위·보관·가게별 lot", true),
                 new("거래 당사자", CommunityMarketDayRoleCodes.MarketDaySeller, "장날 현장 판매 상인", "확정 여유 물량을 진열하고 표시 가격과 판매 결과를 기록합니다.", true, "참여 상점 2곳", "수량·표시·마감", true),
                 new("실제 운송", CommunityMarketDayRoleCodes.LocalDeliveryProvider, "생활권 배송 참여자", "배송 신청 물량만 시장에서 인수해 전달합니다.", false, null, "서비스 권역·계약", false)
             ],
             ReadinessChecks =
             [
+                new("source", "국내 산지 공급 조건", "생산자 공동 출하량, 가격, 생산지와 출하 lot를 확인했습니다.", true, true),
+                new("direct-transport", "산지에서 시장까지 직송", "운송 주체와 시장 입고 슬롯이 같은 배치에 연결됐습니다.", true, true),
+                new("food-business-supply", "조리 가게 식재료 공급", "가정 예약분을 잠근 뒤 가게 2곳이 12상자의 공급 조건과 영업 범위를 직접 확인했습니다.", true, true),
                 new("association", "상인회 협의", "시범 장날 공동사업 범위를 합의했습니다.", true, true),
                 new("merchants", "참여 상점 수락", "청과·채소 상인과 현장 판매 상인이 직접 수락했습니다.", true, true),
                 new("inventory", "예약·현장판매 재고 분리", "80상자와 12상자를 별도 표식으로 관리합니다.", true, true),
@@ -1029,7 +1039,8 @@ public static class CommunityCollectiveActionPreviewCatalog
             CapacityEvidence =
             [
                 new("supply", "산지 출하 가능량", "생산자·공급자", CommunityCapacityEvidenceStatus.Confirmed, 100, "출하 확인 예시"),
-                new("reserved", "공동구매 예약 물량", "참여 주민", CommunityCapacityEvidenceStatus.Confirmed, 80, "예약 원장", false),
+                new("reserved", "공동구매 예약 물량", "가정·가게 공동구매 참여자", CommunityCapacityEvidenceStatus.Confirmed, 80, "가정 68상자·가게 12상자 예약 원장", false),
+                new("food-business", "조리 가게 식재료 배정", "시장 조리·식음료 가게", CommunityCapacityEvidenceStatus.Confirmed, 12, "80상자 예약 안의 가게 공급분", false),
                 new("walk-in", "현장판매 확정 물량", "참여 판매 상인", CommunityCapacityEvidenceStatus.Confirmed, 12, "별도 판매 재고", false),
                 new("sorting", "선별·소분 처리량", "청과·채소 상인", CommunityCapacityEvidenceStatus.Confirmed, 100, "장날 오전 처리량 예시"),
                 new("delivery", "생활권 배송 물량", "지역 배송 참여자", CommunityCapacityEvidenceStatus.Pending, null, "배송 신청 마감 뒤 확인", false)
@@ -1038,6 +1049,8 @@ public static class CommunityCollectiveActionPreviewCatalog
             [
                 new(now.AddDays(-14), "제철 농산물 이야기가 시작됐어요", "게시글에서 원하는 꾸러미와 수령 방식을 모았습니다.", true),
                 new(now.AddDays(-9), "공동구매 기준을 넘었어요", "48명이 80상자를 예약했습니다.", true),
+                new(now.AddDays(-7), "국내 산지 공동 출하를 수락했어요", "생산자와 산지 작업 주체가 출하 lot·가격·포장 단위를 확인했습니다.", true),
+                new(now.AddDays(-6), "시장 조리 가게도 식재료 공급에 참여했어요", "가정 예약 68상자를 먼저 잠그고 가게 2곳의 12상자를 별도 배정했습니다.", true),
                 new(now.AddDays(-5), "상인회와 시범 장날을 합의했어요", "공용공간, 입고 동선과 참여 상점 모집 범위를 정했습니다.", true),
                 new(now.AddDays(-2), "현장판매 물량을 따로 확정했어요", "예약 물량을 건드리지 않는 12상자만 이웃에게 공개합니다.", true)
             ],

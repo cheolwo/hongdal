@@ -29,6 +29,8 @@
             </div>
         </div>
 
+        <CommunityDomesticMarketSupplyJourney Model="@Model.DomesticSupply" />
+
         @if (MarketTheme is { } marketTheme && MarketThemeProduct is { } marketThemeProduct)
         {
             <section class="community-market-day__theme" aria-labelledby="community-market-day-theme-title">

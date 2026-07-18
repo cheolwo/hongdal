@@ -361,6 +361,7 @@ public sealed class CommunityCollectiveActionPageViewModelTests
         {
             GroupPurchase = new CommunityGroupPurchaseVoteResponse
             {
+                ShipFromCountryCode = "KR",
                 DeliveryCountryCode = "KR",
                 ServiceAreaKey = "traditional-market:sample",
                 ServiceAreaLabel = "성남 전통시장 생활권",
@@ -398,9 +399,115 @@ public sealed class CommunityCollectiveActionPageViewModelTests
             role => role.RoleCode == CommunityMarketDayRoleCodes.MarketVisualDesigner
                     && !role.Required
                     && !role.Accepted);
+        Assert.Contains(
+            snapshot.MerchantRoles,
+            role => role.RoleCode == CommunityMarketDayRoleCodes.MarketFoodBusinessIngredientBuyer
+                    && !role.Required
+                    && !role.Accepted);
+        Assert.True(snapshot.DomesticSupply.IsApplicable);
+        Assert.False(snapshot.DomesticSupply.RequiresCustomsClearance);
+        Assert.False(snapshot.DomesticSupply.CanDispatchDirectlyToMarket);
+        Assert.Equal(10, snapshot.DomesticSupply.Stages.Count);
+        Assert.Contains(
+            snapshot.DomesticSupply.Roles,
+            role => role.RoleCode == CommunityDomesticMarketSupplyRoleCodes.ProducerOrCooperative
+                    && !role.Accepted);
+        Assert.Equal(
+            "국내 생산자·산지 공급 주체 직접 수락",
+            snapshot.DomesticSupply.CurrentStage?.Label);
+        Assert.True(snapshot.DomesticSupply.MarketIngredientSupply.IsApplicable);
+        Assert.Equal(80m, snapshot.DomesticSupply.MarketIngredientSupply.HouseholdReservedQuantity);
+        Assert.Equal(16m, snapshot.DomesticSupply.MarketIngredientSupply.PotentialBusinessSupplyQuantity);
+        Assert.Empty(snapshot.DomesticSupply.MarketIngredientSupply.Businesses);
+        Assert.False(snapshot.DomesticSupply.MarketIngredientSupply.CanConfirmBusinessSupply);
+        Assert.False(snapshot.DomesticSupply.MarketIngredientSupply.PlatformAutomaticallyAssignsBusinesses);
+        Assert.Equal(
+            "시장 조리 가게 식재료 수요 등록",
+            snapshot.DomesticSupply.MarketIngredientSupply.CurrentStage?.Label);
         Assert.Equal(
             "상인회·시장관리자 공동사업 합의",
             snapshot.CurrentStage?.Label);
+    }
+
+    [Fact]
+    public void 국내수산물공동구매는_콜드체인역할과시장직입고여정으로조립된다()
+    {
+        var campaign = new CommunityVoteResponse
+        {
+            GroupPurchase = new CommunityGroupPurchaseVoteResponse
+            {
+                ShipFromCountryCode = "KR",
+                DeliveryCountryCode = "KR",
+                ServiceAreaKey = "traditional-market:busan",
+                ServiceAreaLabel = "부산 전통시장 생활권",
+                HsCode = "0302.89",
+                TemperatureCode = "chilled",
+                QuantityUnit = "상자"
+            }
+        };
+
+        var snapshot = CommunityMarketDayScenarioFactory.Build(
+            campaign,
+            "남해안 제철 생선 꾸러미",
+            reservedQuantity: 45,
+            potentialQuantity: 54,
+            quantityUnit: "상자");
+
+        Assert.Equal(
+            CommunityMarketDayProductHandlingProfileCodes.FisheriesProducts,
+            snapshot.ProductHandlingProfileCode);
+        Assert.Contains(
+            snapshot.MerchantRoles,
+            role => role.RoleCode == CommunityMarketDayRoleCodes.FisheriesMerchant);
+        Assert.True(snapshot.DomesticSupply.IsApplicable);
+        Assert.Equal(
+            CommunityDomesticMarketSupplyProductCategoryCodes.FisheriesProducts,
+            snapshot.DomesticSupply.ProductCategoryCode);
+        Assert.True(snapshot.DomesticSupply.RequiresColdChain);
+        Assert.False(snapshot.DomesticSupply.RequiresCustomsClearance);
+        Assert.False(snapshot.DomesticSupply.PlatformAutomaticallySelectsSuppliers);
+        Assert.False(snapshot.DomesticSupply.PlatformAutomaticallyAssignsCarriers);
+        Assert.Contains(
+            snapshot.DomesticSupply.Roles,
+            role => role.RoleCode == CommunityDomesticMarketSupplyRoleCodes.OriginToMarketCarrier
+                    && role.Label.Contains("냉장·냉동", StringComparison.Ordinal));
+        Assert.Contains(
+            snapshot.DomesticSupply.Stages,
+            stage => stage.Code == CommunityDomesticMarketSupplyStageCodes.MarketReceiving
+                     && stage.EvidenceLabel.Contains("선도·온도", StringComparison.Ordinal));
+        Assert.True(snapshot.DomesticSupply.MarketIngredientSupply.IsApplicable);
+        Assert.True(snapshot.DomesticSupply.MarketIngredientSupply.RequiresStorageConditionConfirmation);
+        Assert.Contains(
+            snapshot.MerchantRoles,
+            role => role.RoleCode == CommunityMarketDayRoleCodes.MarketFoodBusinessIngredientBuyer
+                    && role.VerificationLabel.Contains("보관", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void 해외산농산물에는_국내산지직입고여정을적용하지않는다()
+    {
+        var campaign = new CommunityVoteResponse
+        {
+            GroupPurchase = new CommunityGroupPurchaseVoteResponse
+            {
+                ShipFromCountryCode = "CN",
+                DeliveryCountryCode = "KR",
+                ServiceAreaKey = "traditional-market:sample",
+                HsCode = "0702.00",
+                QuantityUnit = "상자"
+            }
+        };
+
+        var snapshot = CommunityMarketDayScenarioFactory.Build(
+            campaign,
+            "수입 토마토",
+            reservedQuantity: 20,
+            potentialQuantity: 24,
+            quantityUnit: "상자");
+
+        Assert.True(snapshot.IsApplicable);
+        Assert.False(snapshot.DomesticSupply.IsApplicable);
+        Assert.False(snapshot.DomesticSupply.MarketIngredientSupply.IsApplicable);
     }
 
     [Fact]
@@ -419,6 +526,35 @@ public sealed class CommunityCollectiveActionPageViewModelTests
         Assert.True(preview.MarketDay.ReservedInventoryProtected);
         Assert.True(preview.MarketDay.WalkInInventorySeparated);
         Assert.Equal("traditional-market:sample-seongnam", preview.MarketDay.MarketScopeKey);
+        Assert.True(preview.MarketDay.DomesticSupply.IsApplicable);
+        Assert.True(preview.MarketDay.DomesticSupply.CanDispatchDirectlyToMarket);
+        Assert.True(preview.MarketDay.DomesticSupply.ReservedAllocationProtected);
+        Assert.False(preview.MarketDay.DomesticSupply.RequiresCustomsClearance);
+        Assert.Equal(10, preview.MarketDay.DomesticSupply.Stages.Count);
+        Assert.Equal(
+            "산지 선별·포장·상차",
+            preview.MarketDay.DomesticSupply.CurrentStage?.Label);
+        var ingredientSupply = preview.MarketDay.DomesticSupply.MarketIngredientSupply;
+        Assert.True(ingredientSupply.IsApplicable);
+        Assert.True(ingredientSupply.HouseholdReservationProtected);
+        Assert.True(ingredientSupply.CanConfirmBusinessSupply);
+        Assert.False(ingredientSupply.PlatformAutomaticallyAssignsBusinesses);
+        Assert.Equal(68m, ingredientSupply.HouseholdReservedQuantity);
+        Assert.Equal(12m, ingredientSupply.ConfirmedBusinessSupplyQuantity);
+        Assert.Equal(80m, ingredientSupply.HouseholdReservedQuantity + ingredientSupply.ConfirmedBusinessSupplyQuantity);
+        Assert.Equal(2, ingredientSupply.Businesses.Count);
+        Assert.All(
+            ingredientSupply.Businesses,
+            business =>
+            {
+                Assert.True(business.DirectlyAccepted);
+                Assert.True(business.BusinessScopeVerified);
+                Assert.True(business.StorageConditionConfirmed);
+                Assert.StartsWith("market-food-business:", business.BusinessReferenceKey, StringComparison.Ordinal);
+            });
+        Assert.Equal(
+            "시장 입고 시 가게 공급 lot 분리",
+            ingredientSupply.CurrentStage?.Label);
         Assert.Contains(
             preview.MarketDay.MerchantRoles,
             role => role.RoleCode == CommunityMarketDayRoleCodes.FreshProduceMerchant
@@ -443,6 +579,10 @@ public sealed class CommunityCollectiveActionPageViewModelTests
         Assert.Equal(preview.Id, page.SelectedAction?.Id);
         Assert.True(page.MarketDay.IsApplicable);
         Assert.True(page.MarketDay.CanAdvertiseWalkInSale);
+        Assert.True(page.MarketDay.DomesticSupply.IsApplicable);
+        Assert.True(page.MarketDay.DomesticSupply.CanDispatchDirectlyToMarket);
+        Assert.True(page.MarketDay.MarketIngredientSupply.IsApplicable);
+        Assert.True(page.MarketDay.MarketIngredientSupply.CanConfirmBusinessSupply);
         Assert.Equal(
             "장날 입고·검수·상점별 인계",
             page.MarketDay.CurrentStage?.Label);

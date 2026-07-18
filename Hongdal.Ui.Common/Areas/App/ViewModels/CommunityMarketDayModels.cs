@@ -5,6 +5,7 @@ namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 public static class CommunityMarketDayProductHandlingProfileCodes
 {
     public const string FreshProduce = "fresh-produce";
+    public const string FisheriesProducts = "fisheries-products";
     public const string Meat = "meat";
     public const string GeneralGoods = "general-goods";
 }
@@ -14,6 +15,9 @@ public static class CommunityMarketDayRoleCodes
     public const string MarketAssociationCoordinator = "market-association-coordinator";
     public const string FreshProduceMerchant = "fresh-produce-merchant";
     public const string ProduceSortingPackingOperator = "produce-sorting-packing-operator";
+    public const string FisheriesMerchant = "fisheries-merchant";
+    public const string MarketFoodBusinessIngredientBuyer =
+        CommunityMarketIngredientSupplyRoleCodes.MarketFoodBusinessIngredientBuyer;
     public const string LicensedMeatProcessor = "licensed-meat-processor";
     public const string ProductMerchant = "market-day-product-merchant";
     public const string MarketDaySeller = "market-day-seller";
@@ -83,6 +87,7 @@ public sealed class CommunityMarketDaySnapshot
     public string PublicAudienceLabel { get; init; } = string.Empty;
     public string ReservationProtectionLabel { get; init; } = string.Empty;
     public string UnsoldInventoryPolicyLabel { get; init; } = string.Empty;
+    public CommunityDomesticMarketSupplySnapshot DomesticSupply { get; init; } = new();
     public IReadOnlyList<CommunityMarketDayMerchantRoleSnapshot> MerchantRoles { get; init; } = [];
     public IReadOnlyList<CommunityMarketDayStageSnapshot> Stages { get; init; } = [];
 
@@ -151,6 +156,15 @@ public static class CommunityMarketDayScenarioFactory
             PublicAudienceLabel = "생활권 게시판 공개 범위 협의 전",
             ReservationProtectionLabel = "공동구매 예약 물량은 현장판매 물량과 분리",
             UnsoldInventoryPolicyLabel = "판매 주체와 반품·기부·다음 배치 처리 방식을 별도 합의",
+            DomesticSupply = CommunityDomesticMarketSupplyScenarioFactory.Build(
+                campaign,
+                productLabel,
+                string.IsNullOrWhiteSpace(groupPurchase.ServiceAreaLabel)
+                    ? "전통시장 생활권"
+                    : groupPurchase.ServiceAreaLabel.Trim(),
+                reservedQuantity,
+                potentialQuantity,
+                quantityUnit),
             MerchantRoles = BuildMerchantRoles(profileCode, associationAccepted: false, merchantsAccepted: false),
             Stages = BuildStages(CommunityMarketDayState.AssociationReview)
         };
@@ -186,8 +200,9 @@ public static class CommunityMarketDayScenarioFactory
             PlatformAutomaticallyAssignsMerchants = false,
             AnnouncementPolicyLabel = "일정 확정 뒤 지역 게시판·시장 현장판·구독 알림에 공개",
             PublicAudienceLabel = "공동구매 미참여 주민도 확정 현장판매 물량 안에서 구매",
-            ReservationProtectionLabel = "예약 80상자는 별도 표식·보관하고 현장판매 12상자와 섞지 않음",
+            ReservationProtectionLabel = "예약 80상자는 가정 68상자·조리 가게 12상자로 표식하고 현장판매 12상자와 섞지 않음",
             UnsoldInventoryPolicyLabel = "현장판매 잔량은 판매 상인이 합의한 할인·기부·반품 기준으로 마감",
+            DomesticSupply = CommunityDomesticMarketSupplyScenarioFactory.CreateFreshProducePilotPreview(arrival),
             MerchantRoles = BuildMerchantRoles(
                 CommunityMarketDayProductHandlingProfileCodes.FreshProduce,
                 associationAccepted: true,
@@ -229,6 +244,16 @@ public static class CommunityMarketDayScenarioFactory
                 merchantsAccepted,
                 "작업 범위·시설·위생 조건"));
         }
+        else if (profileCode == CommunityMarketDayProductHandlingProfileCodes.FisheriesProducts)
+        {
+            roles.Add(new(
+                CommunityMarketDayRoleCodes.FisheriesMerchant,
+                "수산물 판매·처리 사업자",
+                "선도·보관온도·원산지와 직접 맡을 손질·소분·판매 범위를 수락합니다.",
+                true,
+                merchantsAccepted,
+                "수산물 취급 범위·시설·온도·원산지 표시"));
+        }
         else if (profileCode == CommunityMarketDayProductHandlingProfileCodes.Meat)
         {
             roles.Add(new(
@@ -248,6 +273,18 @@ public static class CommunityMarketDayScenarioFactory
                 true,
                 merchantsAccepted,
                 "품목별 영업 범위·처리량"));
+        }
+
+        if (profileCode is CommunityMarketDayProductHandlingProfileCodes.FreshProduce
+            or CommunityMarketDayProductHandlingProfileCodes.FisheriesProducts)
+        {
+            roles.Add(new(
+                CommunityMarketDayRoleCodes.MarketFoodBusinessIngredientBuyer,
+                "시장 조리·식음료 가게",
+                "가정 예약분을 침해하지 않는 식재료 물량의 규격·수량·가격·보관·조리 사용 조건을 직접 수락합니다.",
+                false,
+                merchantsAccepted,
+                "가게 참조키·영업 범위·조리시설·보관 조건"));
         }
 
         roles.Add(new(
@@ -303,6 +340,11 @@ public static class CommunityMarketDayScenarioFactory
     private static string ResolveProfileCode(string? hsCode)
     {
         var normalizedHsCode = string.Concat((hsCode ?? string.Empty).Where(char.IsDigit));
+        if (normalizedHsCode.StartsWith("03", StringComparison.Ordinal))
+        {
+            return CommunityMarketDayProductHandlingProfileCodes.FisheriesProducts;
+        }
+
         if (normalizedHsCode.StartsWith("02", StringComparison.Ordinal))
         {
             return CommunityMarketDayProductHandlingProfileCodes.Meat;
@@ -321,6 +363,7 @@ public static class CommunityMarketDayScenarioFactory
         => profileCode switch
         {
             CommunityMarketDayProductHandlingProfileCodes.FreshProduce => "청과·채소 선별·소분·현장판매",
+            CommunityMarketDayProductHandlingProfileCodes.FisheriesProducts => "수산물 온도·선도·원산지 확인·현장판매",
             CommunityMarketDayProductHandlingProfileCodes.Meat => "허가된 식육 2차 가공·현장판매",
             _ => "품목별 검수·분류·소분·현장판매"
         };
