@@ -1,16 +1,18 @@
-@using Hongdal.Contracts.Common.AgriculturalFisheries
-@inject I농수산공공데이터Client DataClient
+@inherits MvvmComponentBase<농수산가격비교PageViewModel>
+@using Hongdal.Ui.Common.Areas.App.Models
+@using Hongdal.Ui.Common.Areas.App.ViewModels
 
 <section class="public-data-workspace">
     <header class="public-data-workspace__header">
         <div>
-            <span>공공데이터 정보</span>
-            <h1>농수산물 가격</h1>
-            <p>한국 aT와 미국 USDA NASS의 조사값을 출처와 단위 그대로 확인합니다.</p>
+            <span>공식 공공데이터</span>
+            <h1>한국·미국·호주 농수산물 가격</h1>
+            <p>각 국가의 조사값을 통화·단위·유통단계와 함께 비교합니다.</p>
         </div>
         <div class="public-data-workspace__market-status" aria-label="지원 시장">
             <span>KR</span>
             <span>US</span>
+            <span>AU</span>
         </div>
     </header>
 
@@ -21,96 +23,134 @@
                                                AccentColor="#0f766e"
                                                CenterSymbol="ⓘ"
                                                CenterTrigramName="정보"
-                                               CenterDestinationLabel="한·미 비교"
+                                               CenterDestinationLabel="3개국 비교"
                                                ShowTaegeukCenter="false"
-                                               CenterSelected="ShowComparisonAsync"
-                                               DestinationSelected="SelectInformationSectionAsync" />
+                                               CenterSelected="ViewModel.ShowComparisonAsync"
+                                               DestinationSelected="ViewModel.SelectSectionAsync" />
         </aside>
 
         <main class="public-data-workspace__content">
             <header class="public-data-workspace__section-header">
                 <div>
-                    <span>@CurrentSectionEyebrow</span>
-                    <h2>@CurrentSectionTitle</h2>
+                    <span>@ViewModel.CurrentSectionEyebrow</span>
+                    <h2>@ViewModel.CurrentSectionTitle</h2>
                 </div>
-                @if (isLoading)
+                @if (ViewModel.IsLoading)
                 {
                     <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Info" />
                 }
             </header>
 
-            @if (!string.IsNullOrWhiteSpace(initializationMessage))
+            @if (!string.IsNullOrWhiteSpace(ViewModel.InitializationMessage))
             {
-                <MudAlert Severity="Severity.Info" Dense="true">@initializationMessage</MudAlert>
+                <MudAlert Severity="Severity.Info" Dense="true">@ViewModel.InitializationMessage</MudAlert>
             }
 
-            @switch (activeSection)
+            @switch (ViewModel.ActiveSection)
             {
-                case DomesticSection:
-                    <section class="public-data-workspace__query-section">
-                        @DomesticQueryControls("국내 가격 조회", LoadDomesticAsync)
+                case 농수산가격비교Section.국내:
+                    <section class="public-data-workspace__query-section public-data-workspace__query-section--domestic">
+                        <label class="public-data-workspace__field">
+                            <span>국내 품목</span>
+                            <select @bind="ViewModel.국내.선택HsCode">
+                                @foreach (var item in ViewModel.국내.품목)
+                                {
+                                    <option value="@item.HsPrefix">@item.CategoryLabel · @item.ProductName</option>
+                                }
+                            </select>
+                        </label>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Search"
+                                   Disabled="ViewModel.IsLoading"
+                                   OnClick="@(() => ViewModel.LoadDomesticAsync())">
+                            한국 가격 조회
+                        </MudButton>
                     </section>
-                    <국내농수산가격Result Response="@domesticPrice" ErrorMessage="@domesticError" />
+                    <국내농수산가격Result Response="@ViewModel.국내.응답"
+                                          ErrorMessage="@ViewModel.국내.오류메시지" />
                     break;
 
-                case UnitedStatesSection:
+                case 농수산가격비교Section.미국:
                     <section class="public-data-workspace__query-section">
-                        @UnitedStatesQueryControls("미국 가격 조회", LoadUnitedStatesAsync)
+                        <label class="public-data-workspace__field">
+                            <span>미국 공식 품목명</span>
+                            <input list="usda-commodity-examples"
+                                   @bind="ViewModel.미국.품목명"
+                                   autocomplete="off" />
+                        </label>
+                        <datalist id="usda-commodity-examples">
+                            @foreach (var commodity in 미국농수산가격조회ViewModel.품목예시)
+                            {
+                                <option value="@commodity"></option>
+                            }
+                        </datalist>
+                        <label class="public-data-workspace__field public-data-workspace__field--small">
+                            <span>조사</span>
+                            <select @bind="ViewModel.미국.조사Program">
+                                <option value="SURVEY">SURVEY</option>
+                                <option value="CENSUS">CENSUS</option>
+                            </select>
+                        </label>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Search"
+                                   Disabled="ViewModel.IsLoading"
+                                   OnClick="@(() => ViewModel.LoadUnitedStatesAsync())">
+                            미국 가격 조회
+                        </MudButton>
                     </section>
-                    <미국농수산가격Result Response="@unitedStatesPrice" ErrorMessage="@unitedStatesError" />
+                    <미국농수산가격Result Response="@ViewModel.미국.응답"
+                                          ErrorMessage="@ViewModel.미국.오류메시지" />
                     break;
 
-                case SourcesSection:
-                    <section class="public-data-workspace__sources" aria-label="농수산물 공공데이터 출처">
-                        @foreach (var source in VisibleSources)
-                        {
-                            <article>
-                                <div class="public-data-workspace__source-mark" aria-hidden="true">
-                                    <MudIcon Icon="@ResolveSourceIcon(source.Key)" Size="Size.Medium" />
-                                </div>
-                                <div>
-                                    <span>@source.Provider</span>
-                                    <strong>@source.DisplayName</strong>
-                                    <p>@source.Coverage</p>
-                                    <small>@source.UsageNote</small>
-                                </div>
-                                <span class="@BuildSourceStatusClass(source)">@source.StatusLabel</span>
-                            </article>
-                        }
+                case 농수산가격비교Section.호주:
+                    <section class="public-data-workspace__query-section public-data-workspace__query-section--australia">
+                        <label class="public-data-workspace__field">
+                            <span>호주 식품 분류</span>
+                            <select @bind="ViewModel.호주.선택IndexCode">
+                                @foreach (var index in ViewModel.호주.Catalog.Indexes)
+                                {
+                                    <option value="@index.Code">@index.Label</option>
+                                }
+                            </select>
+                        </label>
+                        <label class="public-data-workspace__field">
+                            <span>측정 기준</span>
+                            <select @bind="ViewModel.호주.선택MeasureCode">
+                                @foreach (var measure in ViewModel.호주.Catalog.Measures)
+                                {
+                                    <option value="@measure.Code">@measure.Label</option>
+                                }
+                            </select>
+                        </label>
+                        <label class="public-data-workspace__field">
+                            <span>지역</span>
+                            <select @bind="ViewModel.호주.선택RegionCode">
+                                @foreach (var region in ViewModel.호주.Catalog.Regions)
+                                {
+                                    <option value="@region.Code">@region.Label</option>
+                                }
+                            </select>
+                        </label>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Info"
+                                   StartIcon="@Icons.Material.Filled.Search"
+                                   Disabled="ViewModel.IsLoading"
+                                   OnClick="@(() => ViewModel.LoadAustraliaAsync())">
+                            호주 지수 조회
+                        </MudButton>
                     </section>
+                    <호주농수산가격Result Response="@ViewModel.호주.응답"
+                                          ErrorMessage="@ViewModel.호주.오류메시지" />
+                    break;
+
+                case 농수산가격비교Section.출처:
+                    <농수산가격SourceList Sources="ViewModel.VisibleSources" />
                     break;
 
                 default:
-                    <section class="public-data-workspace__query-section public-data-workspace__query-section--compare">
-                        @DomesticQueryControls("", null)
-                        @UnitedStatesQueryControls("", null)
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Info"
-                                   StartIcon="@Icons.Material.Filled.CompareArrows"
-                                   Disabled="isLoading"
-                                   OnClick="LoadComparisonAsync">
-                            나란히 조회
-                        </MudButton>
-                    </section>
-                    <div class="public-data-workspace__comparison">
-                        <section>
-                            <header>
-                                <span>한국</span>
-                                <strong>@SelectedDomesticItemName</strong>
-                            </header>
-                            <국내농수산가격Result Response="@domesticPrice" ErrorMessage="@domesticError" />
-                        </section>
-                        <section>
-                            <header>
-                                <span>미국</span>
-                                <strong>@NormalizedUnitedStatesCommodity</strong>
-                            </header>
-                            <미국농수산가격Result Response="@unitedStatesPrice" ErrorMessage="@unitedStatesError" />
-                        </section>
-                    </div>
-                    <p class="public-data-workspace__comparison-note">
-                        두 자료는 통화, 단위, 품질과 유통 단계가 다르므로 동일 가격으로 환산하지 않습니다.
-                    </p>
+                    <농수산가격ComparisonWorkspace ViewModel="ViewModel" />
                     break;
             }
         </main>
@@ -118,317 +158,16 @@
 </section>
 
 @code {
-    private const string DomesticSection = "domestic";
-    private const string UnitedStatesSection = "united-states";
-    private const string SourcesSection = "sources";
-    private const string ComparisonSection = "comparison";
-
     private static readonly IReadOnlyList<HongdalCardinalNavigationOption> InformationNavigationItems =
     [
         new("li", "리", "☲", "남", "한국 aT", "information") { BusinessLabel = "국내가격" },
         new("dui", "태", "☱", "서", "USDA NASS", "information") { BusinessLabel = "미국가격" },
-        new("kan", "감", "☵", "북", "공식 원천", "information") { BusinessLabel = "데이터출처" },
-        new("zhen", "진", "☳", "동", "한국·미국", "information") { BusinessLabel = "가격비교" }
+        new("kan", "감", "☵", "북", "호주 ABS", "information") { BusinessLabel = "호주지수" },
+        new("zhen", "진", "☳", "동", "공식 원천", "information") { BusinessLabel = "데이터출처" }
     ];
-
-    private static readonly IReadOnlyList<AgriculturalFisheriesItemResponse> FallbackDomesticItems =
-    [
-        DomesticItem("1006", "쌀", "식량작물"),
-        DomesticItem("0701", "감자", "식량작물"),
-        DomesticItem("081010", "딸기", "채소류"),
-        DomesticItem("080810", "사과", "과일류"),
-        DomesticItem("0201", "쇠고기", "축산물"),
-        DomesticItem("030354", "고등어", "수산물"),
-        DomesticItem("030711", "굴", "수산물")
-    ];
-
-    private static readonly IReadOnlyList<string> UnitedStatesCommodityExamples =
-        ["APPLES", "POTATOES", "STRAWBERRIES", "CATFISH", "TROUT"];
-
-    private static readonly IReadOnlyList<AgriculturalFisheriesDataSourceResponse> FallbackSources =
-    [
-        new()
-        {
-            Key = "at-daily-wholesale-retail-food-price",
-            Provider = "한국농수산식품유통공사(aT)",
-            DisplayName = "국내 도·소매 가격정보",
-            Coverage = "한국 농축수산물 중도매·소매 조사 가격",
-            StatusCode = "Unknown",
-            StatusLabel = "서버 확인 전",
-            UsageNote = "품질·등급·산지·포장 차이를 함께 확인합니다."
-        },
-        new()
-        {
-            Key = 미국농수산가격출처Keys.UsdaNassQuickStats,
-            Provider = "미국 농무부 농업통계청(USDA NASS)",
-            DisplayName = "Quick Stats 가격·판매 통계",
-            Coverage = "미국 농작물·축산물·양식 수산물 집계 통계",
-            StatusCode = "Unknown",
-            StatusLabel = "서버 확인 전",
-            UsageNote = "미국 공식 품목명과 원문 단위를 유지합니다."
-        }
-    ];
-
-    private IReadOnlyList<AgriculturalFisheriesItemResponse> domesticItems = FallbackDomesticItems;
-    private AgriculturalFisheriesInformationOverviewResponse? overview;
-    private AgriculturalFisheriesDomesticPriceResponse? domesticPrice;
-    private 미국농수산가격조회응답? unitedStatesPrice;
-    private string activeSection = ComparisonSection;
-    private string selectedHsCode = "080810";
-    private string unitedStatesCommodity = "APPLES";
-    private string unitedStatesProgram = "SURVEY";
-    private int yearFrom = DateTime.UtcNow.Year - 3;
-    private int yearTo = DateTime.UtcNow.Year;
-    private bool isLoading;
-    private string? initializationMessage;
-    private string? domesticError;
-    private string? unitedStatesError;
-
-    private string CurrentSectionEyebrow => activeSection switch
-    {
-        DomesticSection => "KR · aT",
-        UnitedStatesSection => "US · USDA NASS",
-        SourcesSection => "SOURCE",
-        _ => "COMPARE"
-    };
-
-    private string CurrentSectionTitle => activeSection switch
-    {
-        DomesticSection => "한국 농수산물 가격",
-        UnitedStatesSection => "미국 농수산물 가격",
-        SourcesSection => "공식 데이터 출처",
-        _ => "한국·미국 가격 비교"
-    };
-
-    private string SelectedDomesticItemName
-        => domesticItems.FirstOrDefault(item => item.HsPrefix == selectedHsCode)?.ProductName
-            ?? selectedHsCode;
-
-    private string NormalizedUnitedStatesCommodity
-        => string.IsNullOrWhiteSpace(unitedStatesCommodity)
-            ? "품목 미선택"
-            : unitedStatesCommodity.Trim().ToUpperInvariant();
-
-    private IReadOnlyList<AgriculturalFisheriesDataSourceResponse> VisibleSources
-        => overview?.DataSources.Count > 0 ? overview.DataSources : FallbackSources;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var overviewTask = DataClient.개요조회Async();
-            var itemsTask = DataClient.국내품목조회Async();
-            await Task.WhenAll(overviewTask, itemsTask);
-            overview = await overviewTask;
-            var catalog = await itemsTask;
-            domesticItems = catalog.Items
-                .Concat(FallbackDomesticItems)
-                .GroupBy(item => item.HsPrefix, StringComparer.Ordinal)
-                .Select(group => group.First())
-                .OrderBy(item => item.CategoryCode, StringComparer.Ordinal)
-                .ThenBy(item => item.ProductName, StringComparer.Ordinal)
-                .ToArray();
-        }
-        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
-        {
-            initializationMessage = "공공데이터 서버 연결 전에는 품목 선택 화면만 표시됩니다.";
-        }
+        await ViewModel.초기화Async();
     }
-
-    private RenderFragment DomesticQueryControls(string buttonLabel, Func<Task>? onClick) => builder =>
-    {
-        var sequence = 0;
-        builder.OpenElement(sequence++, "label");
-        builder.AddAttribute(sequence++, "class", "public-data-workspace__field");
-        builder.OpenElement(sequence++, "span");
-        builder.AddContent(sequence++, "국내 품목");
-        builder.CloseElement();
-        builder.OpenElement(sequence++, "select");
-        builder.AddAttribute(sequence++, "value", selectedHsCode);
-        builder.AddAttribute(sequence++, "onchange", EventCallback.Factory.CreateBinder<string>(
-            this,
-            value => selectedHsCode = value,
-            selectedHsCode));
-        foreach (var item in domesticItems)
-        {
-            builder.OpenElement(sequence++, "option");
-            builder.AddAttribute(sequence++, "value", item.HsPrefix);
-            builder.AddContent(sequence++, $"{item.CategoryLabel} · {item.ProductName}");
-            builder.CloseElement();
-        }
-        builder.CloseElement();
-        builder.CloseElement();
-
-        if (onClick is not null)
-        {
-            builder.OpenComponent<MudButton>(sequence++);
-            builder.AddAttribute(sequence++, nameof(MudButton.Variant), Variant.Filled);
-            builder.AddAttribute(sequence++, nameof(MudButton.Color), Color.Success);
-            builder.AddAttribute(sequence++, nameof(MudButton.StartIcon), Icons.Material.Filled.Search);
-            builder.AddAttribute(sequence++, nameof(MudButton.Disabled), isLoading);
-            builder.AddAttribute(sequence++, nameof(MudButton.OnClick), EventCallback.Factory.Create(this, onClick));
-            builder.AddAttribute(sequence++, nameof(MudButton.ChildContent), (RenderFragment)(contentBuilder =>
-                contentBuilder.AddContent(0, buttonLabel)));
-            builder.CloseComponent();
-        }
-    };
-
-    private RenderFragment UnitedStatesQueryControls(string buttonLabel, Func<Task>? onClick) => builder =>
-    {
-        var sequence = 0;
-        builder.OpenElement(sequence++, "label");
-        builder.AddAttribute(sequence++, "class", "public-data-workspace__field");
-        builder.OpenElement(sequence++, "span");
-        builder.AddContent(sequence++, "미국 공식 품목명");
-        builder.CloseElement();
-        builder.OpenElement(sequence++, "input");
-        builder.AddAttribute(sequence++, "list", "usda-commodity-examples");
-        builder.AddAttribute(sequence++, "value", unitedStatesCommodity);
-        builder.AddAttribute(sequence++, "onchange", EventCallback.Factory.CreateBinder<string>(
-            this,
-            value => unitedStatesCommodity = value,
-            unitedStatesCommodity));
-        builder.AddAttribute(sequence++, "autocomplete", "off");
-        builder.CloseElement();
-        builder.CloseElement();
-
-        builder.OpenElement(sequence++, "datalist");
-        builder.AddAttribute(sequence++, "id", "usda-commodity-examples");
-        foreach (var commodity in UnitedStatesCommodityExamples)
-        {
-            builder.OpenElement(sequence++, "option");
-            builder.AddAttribute(sequence++, "value", commodity);
-            builder.CloseElement();
-        }
-        builder.CloseElement();
-
-        builder.OpenElement(sequence++, "label");
-        builder.AddAttribute(sequence++, "class", "public-data-workspace__field public-data-workspace__field--small");
-        builder.OpenElement(sequence++, "span");
-        builder.AddContent(sequence++, "조사");
-        builder.CloseElement();
-        builder.OpenElement(sequence++, "select");
-        builder.AddAttribute(sequence++, "value", unitedStatesProgram);
-        builder.AddAttribute(sequence++, "onchange", EventCallback.Factory.CreateBinder<string>(
-            this,
-            value => unitedStatesProgram = value,
-            unitedStatesProgram));
-        builder.AddMarkupContent(sequence++, "<option value=\"SURVEY\">SURVEY</option><option value=\"CENSUS\">CENSUS</option>");
-        builder.CloseElement();
-        builder.CloseElement();
-
-        if (onClick is not null)
-        {
-            builder.OpenComponent<MudButton>(sequence++);
-            builder.AddAttribute(sequence++, nameof(MudButton.Variant), Variant.Filled);
-            builder.AddAttribute(sequence++, nameof(MudButton.Color), Color.Error);
-            builder.AddAttribute(sequence++, nameof(MudButton.StartIcon), Icons.Material.Filled.Search);
-            builder.AddAttribute(sequence++, nameof(MudButton.Disabled), isLoading);
-            builder.AddAttribute(sequence++, nameof(MudButton.OnClick), EventCallback.Factory.Create(this, onClick));
-            builder.AddAttribute(sequence++, nameof(MudButton.ChildContent), (RenderFragment)(contentBuilder =>
-                contentBuilder.AddContent(0, buttonLabel)));
-            builder.CloseComponent();
-        }
-    };
-
-    private Task SelectInformationSectionAsync(HongdalCardinalNavigationOption option)
-    {
-        activeSection = option.TrigramKey switch
-        {
-            "li" => DomesticSection,
-            "dui" => UnitedStatesSection,
-            "kan" => SourcesSection,
-            _ => ComparisonSection
-        };
-        return Task.CompletedTask;
-    }
-
-    private Task ShowComparisonAsync()
-    {
-        activeSection = ComparisonSection;
-        return Task.CompletedTask;
-    }
-
-    private async Task LoadDomesticAsync()
-    {
-        isLoading = true;
-        await LoadDomesticCoreAsync();
-        isLoading = false;
-    }
-
-    private async Task LoadUnitedStatesAsync()
-    {
-        isLoading = true;
-        await LoadUnitedStatesCoreAsync();
-        isLoading = false;
-    }
-
-    private async Task LoadComparisonAsync()
-    {
-        isLoading = true;
-        await Task.WhenAll(LoadDomesticCoreAsync(), LoadUnitedStatesCoreAsync());
-        isLoading = false;
-    }
-
-    private async Task LoadDomesticCoreAsync()
-    {
-        domesticError = null;
-        try
-        {
-            domesticPrice = await DataClient.국내가격조회Async(selectedHsCode);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
-        {
-            domesticPrice = null;
-            domesticError = "국내 가격 API에 연결하지 못했습니다.";
-        }
-    }
-
-    private async Task LoadUnitedStatesCoreAsync()
-    {
-        unitedStatesError = null;
-        if (string.IsNullOrWhiteSpace(unitedStatesCommodity))
-        {
-            unitedStatesPrice = null;
-            unitedStatesError = "미국 공식 품목명을 입력해 주세요.";
-            return;
-        }
-
-        try
-        {
-            unitedStatesPrice = await DataClient.미국가격조회Async(
-                NormalizedUnitedStatesCommodity,
-                unitedStatesProgram,
-                yearFrom,
-                yearTo);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
-        {
-            unitedStatesPrice = null;
-            unitedStatesError = "미국 가격 API에 연결하지 못했습니다.";
-        }
-    }
-
-    private static AgriculturalFisheriesItemResponse DomesticItem(
-        string hsPrefix,
-        string productName,
-        string categoryLabel)
-        => new()
-        {
-            HsPrefix = hsPrefix,
-            ProductName = productName,
-            CategoryLabel = categoryLabel
-        };
-
-    private static string ResolveSourceIcon(string sourceKey)
-        => sourceKey == 미국농수산가격출처Keys.UsdaNassQuickStats
-            ? Icons.Material.Filled.Public
-            : sourceKey.Contains("customs", StringComparison.OrdinalIgnoreCase)
-                ? Icons.Material.Filled.FactCheck
-                : Icons.Material.Filled.Agriculture;
-
-    private static string BuildSourceStatusClass(AgriculturalFisheriesDataSourceResponse source)
-        => source.IsConfigured
-            ? "public-data-workspace__source-status public-data-workspace__source-status--ready"
-            : "public-data-workspace__source-status";
 }

@@ -22,7 +22,7 @@ public static class WebExperienceCatalog
                 new("살뜰 게시판", "동네 글과 댓글, 연결된 업무 원장을 함께 봅니다.", "/community", Icons.Material.Filled.Forum, "커뮤니티", "바로 보기"),
                 new("공동구매 제안", "참여자와 수량, 가격, 공급 조건을 맞춥니다.", "/community/group-purchase", Icons.Material.Filled.GroupAdd, "공동구매", "흐름 체험"),
                 new("공동수입 검토", "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", "/community/group-import", Icons.Material.Filled.Public, "공동수입", "흐름 체험"),
-                new("농수산물 공개 정보", "한국과 미국의 공식 가격 자료를 출처와 함께 봅니다.", "/information/public-data", Icons.Material.Filled.Insights, "공개 정보", "바로 보기")
+                new("3개국 농수산물 가격", "한국·미국·호주의 공식 가격 자료를 단위와 조사 단계별로 비교합니다.", "/information/public-data", Icons.Material.Filled.Insights, "공개 정보", "바로 보기")
             ]),
         new(
             "global-supplier",

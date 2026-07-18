@@ -49,6 +49,10 @@ internal static class CommunityPlatformUiModule
         services.TryAddSingleton<IBaguaTargetWorkspaceResolver, DefaultBaguaTargetWorkspaceResolver>();
         services.TryAddTransient<BaguaRoleTransitionPageViewModel>();
         services.TryAddScoped<I농수산공공데이터Client, 농수산공공데이터Client>();
+        services.TryAddTransient<국내농수산가격조회ViewModel>();
+        services.TryAddTransient<미국농수산가격조회ViewModel>();
+        services.TryAddTransient<호주농수산가격조회ViewModel>();
+        services.TryAddTransient<농수산가격비교PageViewModel>();
         services.TryAddScoped<CommunityLedgerNodeActionService>();
         services.TryAddScoped<YouTube관리콘텐츠Service>();
         services.TryAddScoped<PlatformCommunityDecorationStateService>();
