@@ -96,7 +96,7 @@ Google Cloud 프로젝트에서 YouTube Data API v3를 활성화하고, 운영 �
 
 음식 상품 후보 검수와 구매 의향 연결은 [YouTube 음식 상품 발견·공동구매 전산화](../ProjectOverview/youtube-food-commerce-discovery.md)에 정리한다.
 
-Apify 자막 공급자와 LLM을 이용해 식재료·HS 코드 후보를 만드는 방안은 비용과 이용 조건이 정리될 때까지 구현하지 않고 [보류 메모](../ProjectOverview/youtube-food-commerce-discovery.md#보류-메모-apify-자막-기반-식재료hs-코드-후보화)로만 유지한다.
+Apify 자막 공급자는 [Apify YouTube 자막 Adapter](ApifyYouTubeTranscriptResearch.md)로 분리되어 있으며 기본 비활성이다. 비용·권리·내용 검수 후 관리자 단건 조회 결과만 기존 재료 인지 입력에 사용할 수 있다.
 
 YouTube는 PubSubHubbub 기반 푸시 알림을 지원한다. 공개 콜백 서버가 준비되면 업로드·제목·설명 변경 알림에서 `VideoId`와 `ChannelId`를 읽고, 현재 동기화 서비스를 호출하는 입력 어댑터를 추가한다. 웹훅은 알림 신호만 담당하고 최종 메타데이터와 중복 판정은 기존 API 클라이언트와 저장소가 계속 책임진다.
 

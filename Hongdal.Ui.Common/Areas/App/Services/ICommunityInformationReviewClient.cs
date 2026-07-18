@@ -10,4 +10,29 @@ public interface ICommunityInformationReviewClient
     Task<CommunityInformationCollectionResponse> GetCandidatesAsync(
         CommunityInformationCollectionQuery query,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSourcesAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<YouTubeSocialContextResearchResponse> ResearchYouTubeSocialContextAsync(
+        YouTubeSocialContextResearchRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<YouTubeSocialContextWorkspaceDto?> GetYouTubeSocialContextWorkspaceByVideoAsync(
+        string videoId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<YouTubeSocialContextWorkspaceSummaryDto>> GetYouTubeSocialContextWorkspacesAsync(
+        int take = 50,
+        CancellationToken cancellationToken = default);
+
+    Task<YouTubeSocialContextWorkspaceDto> SaveYouTubeSocialContextWorkspaceDraftAsync(
+        string workspaceId,
+        YouTubeSocialContextWorkspaceDraftUpdateRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<YouTubeSocialContextWorkspaceDto> LinkYouTubeSocialContextPublicationAsync(
+        string workspaceId,
+        YouTubeSocialContextPublicationLinkRequest request,
+        CancellationToken cancellationToken = default);
 }

@@ -105,17 +105,17 @@ flowchart LR
 
 2026-07-17 운영 결정으로 자막 취득 비용과 이용 조건이 별도로 승인될 때까지 이 기능을 활성화하거나 실영상에 실행하지 않는다.
 
-## 보류 메모: Apify 자막 기반 식재료·HS 코드 후보화
+## Apify 자막 기반 식재료·HS 코드 후보화
 
-> 상태: 향후 검토 아이디어다. 현재 Apify 연동, 자막 수집, LLM 분석과 과금은 모두 실행하지 않는다.
+> 상태: `ApifyYouTubeTranscript` Adapter를 구현했지만 기본 비활성이다. 관리자 단건 자막 조회와 기존 재료 인지 입력 연결만 제공한다.
 
-자막 확보 비용과 콘텐츠 이용 조건이 정리되는 시점에는 Apify의 자막 추출 Actor를 외부 공급자로 검토할 수 있다. Apify는 Actor에 JSON 입력을 보내 실행하고 완료 후 기본 데이터셋 결과를 가져오는 API를 제공한다. 후보 예시로 [커뮤니티가 유지하는 YouTube Transcript Scraper Actor](https://apify.com/supreme_coder/youtube-transcript-scraper)가 있으나, 특정 Actor를 현재 공급자로 확정하지 않는다. 실제 도입 전에는 [Apify Actor API 실행·결과 조회 방식](https://docs.apify.com/academy/api/run-actor-and-retrieve-data-via-api), Actor 작성자, 버전, 입력·출력 스키마, 이용 조건, 장애 이력과 당시 가격을 다시 검증한다.
+현재 Adapter는 [pintostudio/youtube-transcript-scraper Actor](https://apify.com/pintostudio/youtube-transcript-scraper)를 사용한다. Actor에 `videoUrl`과 `targetLanguage`를 보내고, 서버는 timestamp 세그먼트와 길이 제한된 전사를 반환한다. 모듈 경계와 설정은 [Apify YouTube 자막 Adapter](../Architecture/ApifyYouTubeTranscriptResearch.md)에 정리한다.
 
 향후 처리 흐름은 다음 순서로 제한한다.
 
-1. 운영자가 분석할 `VideoId`를 선택하고 자막 취득·분석 가능 여부를 확인한다.
-2. 서버가 비밀 저장소의 Apify 토큰과 설정된 Actor ID로 단건 또는 소량 작업을 실행한다.
-3. 영상 ID, 자막 언어, 타임스탬프 구간과 Actor 실행 ID·버전을 수신한다.
+1. 운영자가 분석할 `VideoId`와 자막 언어를 선택하고 자막 취득·분석 가능 여부를 확인한다.
+2. 서버가 `POST /api/v1/admin/content/youtube-food/videos/{videoId}/transcript`로 비밀 저장소의 Apify 토큰과 설정된 Actor ID를 사용해 단건 작업을 실행한다.
+3. 서버가 영상 ID, 자막 언어, 타임스탬프 구간과 정규화된 전사를 반환한다.
 4. LLM이 자막에 명시된 식품·식재료, 가공 상태, 포장·용도 표현을 근거 구간과 함께 구조화한다.
 5. 내부 품목분류 자료를 조회해 `HS 코드 후보`, 후보 근거, 신뢰도와 추가 확인이 필요한 정보를 만든다.
 6. 운영자 또는 관세 전문가가 상품의 성분함량표·제조공정·용도·포장 상태를 확인한 뒤 후보를 승인하거나 수정한다.

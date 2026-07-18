@@ -206,6 +206,10 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAgriculturalFisheriesInformationModule();
 builder.Services.AddHongdalHttpClients();
 builder.Services.AddApifyAmazonProductResearch(builder.Configuration);
+builder.Services.AddApifySocialMediaResearch(builder.Configuration);
+builder.Services.AddApifyYouTubeTranscriptResearch(builder.Configuration);
+builder.Services.AddFreeSocialMediaResearch(builder.Configuration);
+builder.Services.AddYouTubeSocialContextWorkspace(builder.Configuration);
 builder.Services.AddHongdalDomainServices();
 if (builder.Environment.IsDevelopment())
 {
