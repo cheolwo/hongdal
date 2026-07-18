@@ -9,9 +9,9 @@
 <div class="collective-action-workspace">
     <header class="collective-action-header">
         <div class="collective-action-header__copy">
-            <a class="collective-action-back" href="/community">
+            <a class="collective-action-back" href="@BuildBackRoute()">
                 <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
-                커뮤니티
+                @BuildBackLabel()
             </a>
             <div class="collective-action-heading-row">
                 <div>
@@ -530,6 +530,12 @@
 
     private void PrepareNextBatchWaitlist()
         => ViewModel.Execution.PrepareNextBatchWaitlist();
+
+    private string BuildBackRoute()
+        => CommunityCollectiveActionRoutes.BuildSourcePost(ViewModel.SelectedAction?.SourcePostId);
+
+    private string BuildBackLabel()
+        => ViewModel.SelectedAction?.SourcePostId is > 0 ? "원문 게시글" : "커뮤니티";
 
     private string BuildStageClass(CommunityCollectiveActionPageDefinition stage)
     {

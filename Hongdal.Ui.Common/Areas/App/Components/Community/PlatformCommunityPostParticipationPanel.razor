@@ -4,8 +4,14 @@
 @if (ViewModel.Opportunities.TryGetValue(Post.Id, out var opportunity))
 {
     var participation = opportunity.Participation;
-    <CommunityActionJourneySummary Journey="@opportunity.Journey" />
-    <section class="platform-community-participation" aria-label="게시글 참여 관심 모집">
+    var flow = CommunityPostActionFlowViewModel.Create(opportunity);
+    <CommunityPostActionFlowSummary Flow="@flow"
+                                    IsBusy="@ViewModel.IsParticipationPending(Post.Id)"
+                                    DetailsExpanded="@_detailsExpanded"
+                                    PrimaryActionRequested="HandlePrimaryActionAsync"
+                                    DetailsRequested="ToggleDetails" />
+    <MudCollapse Expanded="@_detailsExpanded">
+    <section class="platform-community-participation" aria-label="게시글 참여 관심 모집 세부 정보">
         <header>
             <div>
                 <MudIcon Icon="@Icons.Material.Filled.Groups" Size="Size.Small" />
@@ -175,6 +181,7 @@
 
         <small>관심만 표시하며 주문·계약·배차·운송 주선은 시작되지 않습니다.</small>
     </section>
+    </MudCollapse>
 }
 
 @code {
@@ -196,19 +203,52 @@
     [Parameter]
     public EventCallback<string> JoinProfessionalRoleRequested { get; set; }
 
+    private bool _detailsExpanded;
+
     private string BuildParticipationRoleClass(string optionId)
         => ViewModel.IsParticipationRoleSelected(Post.Id, optionId)
             ? "platform-community-participation-role platform-community-participation-role--selected"
             : "platform-community-participation-role";
 
     private async Task StartParticipationAsync()
-        => await CompleteAsync(await ViewModel.StartParticipationAsync(Post.Id));
+    {
+        var result = await ViewModel.StartParticipationAsync(Post.Id);
+        if (result.Succeeded)
+        {
+            _detailsExpanded = true;
+        }
+
+        await CompleteAsync(result);
+    }
 
     private async Task ToggleParticipationRoleAsync(CommunityPostParticipationRoleOptionResponse role)
         => await CompleteAsync(await ViewModel.ToggleParticipationRoleAsync(Post.Id, role));
 
     private async Task CompleteAsync(PlatformCommunityCommandResult result)
         => await CommandCompleted.InvokeAsync(result);
+
+    private async Task HandlePrimaryActionAsync()
+    {
+        if (!ViewModel.Opportunities.TryGetValue(Post.Id, out var opportunity))
+        {
+            return;
+        }
+
+        var flow = CommunityPostActionFlowViewModel.Create(opportunity);
+        if (flow.PrimaryActionKind == CommunityPostPrimaryActionKind.StartGathering)
+        {
+            await StartParticipationAsync();
+            return;
+        }
+
+        if (flow.PrimaryActionKind == CommunityPostPrimaryActionKind.ShowParticipationDetails)
+        {
+            _detailsExpanded = true;
+        }
+    }
+
+    private void ToggleDetails()
+        => _detailsExpanded = !_detailsExpanded;
 
     private static string TradeDirectionLabel(string code)
         => code switch

@@ -16,6 +16,8 @@ public sealed class CommunityCollectiveActionPageViewModelTests
         Assert.Equal(
             $"/community/actions/in-progress?campaignId={campaignId:D}",
             CommunityCollectiveActionRoutes.Build(CommunityCollectiveActionPageKeys.InProgress, campaignId));
+        Assert.Equal("/community/posts/31", CommunityCollectiveActionRoutes.BuildSourcePost(31));
+        Assert.Equal("/community", CommunityCollectiveActionRoutes.BuildSourcePost(null));
     }
 
     [Fact]
@@ -83,6 +85,7 @@ public sealed class CommunityCollectiveActionPageViewModelTests
         var campaign = new CommunityVoteResponse
         {
             Id = Guid.NewGuid(),
+            SourcePostId = 902,
             Title = "동네 쌀 공동구매",
             Description = "필요한 가구가 함께 수량을 모읍니다.",
             CommunityScope = "서울",
@@ -114,6 +117,7 @@ public sealed class CommunityCollectiveActionPageViewModelTests
 
         Assert.False(page.IsPreview);
         Assert.Equal(campaign.Id, page.SelectedAction?.Id);
+        Assert.Equal(902, page.SelectedAction?.SourcePostId);
         Assert.Equal("동네 쌀 공동구매", page.SelectedAction?.Title);
         Assert.Equal(8m, page.Execution.CurrentCommittedQuantity);
     }

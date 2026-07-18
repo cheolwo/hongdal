@@ -74,6 +74,9 @@ public static class CommunityCollectiveActionRoutes
         var path = $"{Root}/{CommunityCollectiveActionPageKeys.Normalize(pageKey)}";
         return actionId.HasValue ? $"{path}?campaignId={actionId.Value:D}" : path;
     }
+
+    public static string BuildSourcePost(long? postId)
+        => postId is > 0 ? $"/community/posts/{postId.Value}" : "/community";
 }
 
 public enum CommunityCollectiveActionDataMode
@@ -137,6 +140,7 @@ public sealed record CommunityActionOutcomeSnapshot(
 public sealed class CommunityCollectiveActionSnapshot
 {
     public Guid Id { get; init; }
+    public long? SourcePostId { get; init; }
     public string Title { get; init; } = string.Empty;
     public string Summary { get; init; } = string.Empty;
     public string CommunityScope { get; init; } = string.Empty;
@@ -263,6 +267,7 @@ public static class CommunityCollectiveActionSnapshotFactory
         return new CommunityCollectiveActionSnapshot
         {
             Id = campaign.Id,
+            SourcePostId = campaign.SourcePostId,
             Title = campaign.Title,
             Summary = campaign.Description,
             CommunityScope = campaign.CommunityScope,

@@ -1,5 +1,6 @@
 @namespace Hongdal.Ui.Common.Areas.App.Components.Community
 @using Hongdal.Contracts.Common.Community
+@using Hongdal.Ui.Common.Areas.App.ViewModels
 
 @if (Journey is { IsAvailable: true, HasStarted: true })
 {
@@ -62,7 +63,10 @@
     [Parameter, EditorRequired]
     public CommunityActionJourneyResponse Journey { get; set; } = new();
 
-    private string ActionRoute => $"/community/actions/{MapPageKey(Journey.CurrentStageCode)}";
+    private string ActionRoute
+        => CommunityCollectiveActionRoutes.Build(
+            MapPageKey(Journey.CurrentStageCode),
+            Journey.InterestVoteId);
 
     private string BuildStageClass(string stageCode)
     {
