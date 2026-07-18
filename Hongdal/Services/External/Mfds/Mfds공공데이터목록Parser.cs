@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -7,38 +6,6 @@ namespace 홍달.Services.External.Mfds;
 
 internal static class Mfds공공데이터목록Parser
 {
-    public static string 데이터형식정리(string? 값, string 기본값)
-    {
-        var 후보 = string.IsNullOrWhiteSpace(값) ? 기본값 : 값;
-        return string.Equals(후보?.Trim(), "json", StringComparison.OrdinalIgnoreCase)
-            ? "json"
-            : "xml";
-    }
-
-    public static string 요청주소생성(
-        string 경로,
-        IReadOnlyDictionary<string, string?> 매개변수목록)
-    {
-        var 빌더 = new StringBuilder(경로.TrimStart('/'));
-        var 첫매개변수인지여부 = true;
-
-        foreach (var 항목 in 매개변수목록)
-        {
-            if (string.IsNullOrWhiteSpace(항목.Value))
-            {
-                continue;
-            }
-
-            빌더.Append(첫매개변수인지여부 ? '?' : '&');
-            빌더.Append(항목.Key);
-            빌더.Append('=');
-            빌더.Append(Uri.EscapeDataString(항목.Value));
-            첫매개변수인지여부 = false;
-        }
-
-        return 빌더.ToString();
-    }
-
     public static Mfds공공데이터목록결과<T> 파싱<T>(
         string 본문텍스트,
         string 데이터형식,
@@ -150,6 +117,11 @@ internal static class Mfds공공데이터목록Parser
         var 값 = 항목영역.Value;
         if (값.ValueKind == JsonValueKind.Object)
         {
+            if (!값.EnumerateObject().Any())
+            {
+                return [];
+            }
+
             var 내부항목 = 속성찾기(값, "item");
             if (내부항목.HasValue)
             {

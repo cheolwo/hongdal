@@ -55,6 +55,46 @@ public sealed class 수입식품제품조회ServiceTests
         Assert.DoesNotContain("MEAT_PRDLST_CD", 요청문자열);
     }
 
+    [Fact]
+    public async Task 조회Async_Json빈항목객체를결과항목으로만들지않는다()
+    {
+        var handler = new StubHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "response": {
+                        "header": { "resultCode": "00", "resultMsg": "NORMAL SERVICE" },
+                        "body": {
+                          "numOfRows": 10,
+                          "pageNo": 1,
+                          "totalCount": 0,
+                          "items": {}
+                        }
+                      }
+                    }
+                    """,
+                    Encoding.UTF8,
+                    "application/json")
+            });
+        var options = new 수입식품제품조회Options
+        {
+            ServiceKey = "test-key"
+        };
+        var service = new 수입식품제품조회Service(
+            new HttpClient(handler) { BaseAddress = new Uri($"{options.BaseUrl}/") },
+            Options.Create(options));
+
+        var 결과 = await service.조회Async(new 수입식품제품조회요청DTO
+        {
+            데이터형식 = "JSON"
+        });
+
+        Assert.NotNull(결과.본문?.아이템);
+        Assert.Empty(결과.본문.아이템.항목);
+    }
+
     private sealed class StubHttpMessageHandler(
         Func<HttpRequestMessage, HttpResponseMessage> responseFactory) : HttpMessageHandler
     {

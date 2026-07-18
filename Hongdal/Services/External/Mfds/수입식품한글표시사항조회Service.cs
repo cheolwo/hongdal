@@ -3,13 +3,6 @@ using Microsoft.Extensions.Options;
 
 namespace 홍달.Services.External.Mfds;
 
-public interface I수입식품한글표시사항조회Service
-{
-    Task<수입식품한글표시사항조회응답DTO> 조회Async(
-        수입식품한글표시사항조회요청DTO 요청,
-        CancellationToken 취소토큰 = default);
-}
-
 public sealed class 수입식품한글표시사항조회Service : I수입식품한글표시사항조회Service
 {
     private readonly HttpClient _httpClient;
@@ -37,8 +30,8 @@ public sealed class 수입식품한글표시사항조회Service : I수입식품�
 
         var 페이지번호 = Math.Max(1, 요청.페이지번호);
         var 한페이지결과수 = Math.Clamp(요청.한페이지결과수, 1, 100);
-        var 데이터형식 = Mfds공공데이터목록Parser.데이터형식정리(요청.데이터형식, _옵션.DefaultType);
-        var 요청주소 = Mfds공공데이터목록Parser.요청주소생성(
+        var 데이터형식 = Mfds공공데이터요청Builder.데이터형식정리(요청.데이터형식, _옵션.DefaultType);
+        var 요청주소 = Mfds공공데이터요청Builder.요청주소생성(
             _옵션.Path,
             new Dictionary<string, string?>
             {
@@ -68,26 +61,7 @@ public sealed class 수입식품한글표시사항조회Service : I수입식품�
         응답.EnsureSuccessStatusCode();
 
         var 본문텍스트 = await 응답.Content.ReadAsStringAsync(취소토큰);
-        var 파싱결과 = Mfds공공데이터목록Parser.파싱(
-            본문텍스트,
-            데이터형식,
-            항목 => new 수입식품한글표시사항조회항목DTO
-            {
-                제품구분 = 항목.문자열("DCL_PRDUCT_SE_CD_NM"),
-                수입업체명 = 항목.문자열("BSN_OFC_NAME"),
-                한글제품명 = 항목.문자열("PRDUCT_KOREAN_NM"),
-                영문제품명 = 항목.문자열("PRDUCT_NM"),
-                유통기한 = 항목.문자열("EXPIRDE_DTM"),
-                처리일자 = 항목.문자열("PROCS_DTM"),
-                해외제조업소명 = 항목.문자열("OVSMNFST_NM"),
-                품목명 = 항목.문자열("ITM_NM"),
-                수출국명 = 항목.문자열("XPORT_NTNCD_NM"),
-                제조국명 = 항목.문자열("MNF_NTNCD_NM"),
-                한글표시사항 = 항목.문자열("KORLABEL"),
-                원재료명 = 항목.문자열("IRDNT_NM"),
-                유통기한시작일자 = 항목.문자열("EXPIRDE_BEGIN_DTM"),
-                유통기한종료일자 = 항목.문자열("EXPIRDE_END_DTM")
-            });
+        var 파싱결과 = Mfds공공데이터목록Parser.파싱(본문텍스트, 데이터형식, 항목변환);
 
         return new 수입식품한글표시사항조회응답DTO
         {
@@ -99,91 +73,23 @@ public sealed class 수입식품한글표시사항조회Service : I수입식품�
             항목목록 = 파싱결과.항목목록
         };
     }
-}
 
-public sealed class 수입식품한글표시사항조회요청DTO
-{
-    public int 페이지번호 { get; set; } = 1;
-
-    public int 한페이지결과수 { get; set; } = 10;
-
-    public string 데이터형식 { get; set; } = "xml";
-
-    public string? 제품구분 { get; set; }
-
-    public string? 수입업체명 { get; set; }
-
-    public string? 한글제품명 { get; set; }
-
-    public string? 영문제품명 { get; set; }
-
-    public string? 해외제조업소명 { get; set; }
-
-    public string? 품목명 { get; set; }
-
-    public string? 수출국명 { get; set; }
-
-    public string? 제조국명 { get; set; }
-
-    public string? 한글표시사항검색어 { get; set; }
-
-    public string? 원재료명 { get; set; }
-
-    public string? 유통기한시작일자검색시작 { get; set; }
-
-    public string? 유통기한시작일자검색종료 { get; set; }
-
-    public string? 유통기한종료일자검색시작 { get; set; }
-
-    public string? 유통기한종료일자검색종료 { get; set; }
-
-    public string? 처리일자검색시작 { get; set; }
-
-    public string? 처리일자검색종료 { get; set; }
-}
-
-public sealed class 수입식품한글표시사항조회응답DTO
-{
-    public string? 결과코드 { get; set; }
-
-    public string? 결과메시지 { get; set; }
-
-    public int 페이지번호 { get; set; }
-
-    public int 한페이지결과수 { get; set; }
-
-    public int 전체결과수 { get; set; }
-
-    public IReadOnlyList<수입식품한글표시사항조회항목DTO> 항목목록 { get; set; } = [];
-}
-
-public sealed class 수입식품한글표시사항조회항목DTO
-{
-    public string? 제품구분 { get; set; }
-
-    public string? 수입업체명 { get; set; }
-
-    public string? 한글제품명 { get; set; }
-
-    public string? 영문제품명 { get; set; }
-
-    public string? 유통기한 { get; set; }
-
-    public string? 처리일자 { get; set; }
-
-    public string? 해외제조업소명 { get; set; }
-
-    public string? 품목명 { get; set; }
-
-    public string? 수출국명 { get; set; }
-
-    public string? 제조국명 { get; set; }
-
-    public string? 한글표시사항 { get; set; }
-
-    public string? 원재료명 { get; set; }
-
-    public string? 유통기한시작일자 { get; set; }
-
-    public string? 유통기한종료일자 { get; set; }
+    private static 수입식품한글표시사항조회항목DTO 항목변환(Mfds공공데이터항목 항목)
+        => new()
+        {
+            제품구분 = 항목.문자열("DCL_PRDUCT_SE_CD_NM"),
+            수입업체명 = 항목.문자열("BSN_OFC_NAME"),
+            한글제품명 = 항목.문자열("PRDUCT_KOREAN_NM"),
+            영문제품명 = 항목.문자열("PRDUCT_NM"),
+            유통기한 = 항목.문자열("EXPIRDE_DTM"),
+            처리일자 = 항목.문자열("PROCS_DTM"),
+            해외제조업소명 = 항목.문자열("OVSMNFST_NM"),
+            품목명 = 항목.문자열("ITM_NM"),
+            수출국명 = 항목.문자열("XPORT_NTNCD_NM"),
+            제조국명 = 항목.문자열("MNF_NTNCD_NM"),
+            한글표시사항 = 항목.문자열("KORLABEL"),
+            원재료명 = 항목.문자열("IRDNT_NM"),
+            유통기한시작일자 = 항목.문자열("EXPIRDE_BEGIN_DTM"),
+            유통기한종료일자 = 항목.문자열("EXPIRDE_END_DTM")
+        };
 }
