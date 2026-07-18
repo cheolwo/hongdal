@@ -650,6 +650,48 @@ public sealed class PlatformCommunityService
         return await response.Content.ReadFromJsonAsync<PlatformCommunityPostResponse>(cancellationToken: cancellationToken);
     }
 
+    public async Task<PlatformCommunityPostResponse?> SchedulePostAsync(
+        PlatformCommunityPostScheduleCreateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.PostAsProtectedJsonAsync(
+            "api/v1/admin/community-post-schedules",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityPostResponse>(
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<PlatformCommunityPostResponse>> GetScheduledPostsAsync(
+        string? status = null,
+        int take = 50,
+        CancellationToken cancellationToken = default)
+    {
+        var query = string.IsNullOrWhiteSpace(status)
+            ? $"?take={Math.Clamp(take, 1, 100)}"
+            : $"?status={Uri.EscapeDataString(status.Trim())}&take={Math.Clamp(take, 1, 100)}";
+        using var response = await _protectedApiClient.GetAsync(
+            $"api/v1/admin/community-post-schedules{query}",
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IReadOnlyList<PlatformCommunityPostResponse>>(
+                   cancellationToken: cancellationToken)
+               ?? [];
+    }
+
+    public async Task<PlatformCommunityPostResponse?> CancelScheduledPostAsync(
+        long postId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.DeleteAsync(
+            $"api/v1/admin/community-post-schedules/{postId}",
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityPostResponse>(
+            cancellationToken: cancellationToken);
+    }
+
     public async Task<PlatformCommunityPostResponse?> UpdatePostAsync(
         long postId,
         PlatformCommunityPostUpdateRequest request,

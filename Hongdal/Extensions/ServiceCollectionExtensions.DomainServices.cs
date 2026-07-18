@@ -153,7 +153,9 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I커뮤니티게시글음성작업신호, 커뮤니티게시글음성작업신호>();
         services.AddScoped<I커뮤니티게시글음성작업Processor, 커뮤니티게시글음성작업Processor>();
         services.AddScoped<I커뮤니티게시글음성조회Service, 커뮤니티게시글음성조회Service>();
+        services.AddScoped<ICommunityScheduledPostPublicationProcessor, CommunityScheduledPostPublicationProcessor>();
         services.AddHostedService<교육기관제출Worker>();
+        services.AddHostedService<CommunityScheduledPostPublicationWorker>();
         services.AddHostedService<커뮤니티게시글음성Worker>();
         services.AddHostedService<CommunityKeywordNotificationWorker>();
         services.AddHostedService<커뮤니티원장투영Worker>();

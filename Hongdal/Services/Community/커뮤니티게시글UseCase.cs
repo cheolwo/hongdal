@@ -36,6 +36,19 @@ public interface I커뮤니티게시글UseCase
         PlatformCommunityPostCreateRequest? request,
         CancellationToken cancellationToken);
 
+    Task<Result<PlatformCommunityPostResponse>> 예약Async(
+        PlatformCommunityPostScheduleCreateRequest? request,
+        CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<PlatformCommunityPostResponse>>> 예약목록Async(
+        string? status,
+        int take,
+        CancellationToken cancellationToken);
+
+    Task<Result<PlatformCommunityPostResponse>> 예약취소Async(
+        long id,
+        CancellationToken cancellationToken);
+
     Task<Result<PlatformCommunityPostResponse>> 상세Async(long id, CancellationToken cancellationToken);
 
     Task<Result<PlatformCommunityPostAttachmentResponse>> 첨부업로드Async(
@@ -232,7 +245,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             .ThenByDescending(x => x.CommunityMomentumUpdatedAtUtc)
             .ThenByDescending(x => x.RecommendationCount)
             .ThenByDescending(x => x.LastEngagedAtUtc)
-            .ThenByDescending(x => x.CreatedAtUtc)
+            .ThenByDescending(x => x.PublishedAtUtc ?? x.CreatedAtUtc)
             .ThenByDescending(x => x.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -273,7 +286,7 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             .Select(group => new CommunityBoardCategoryCount(
                 group.Key,
                 group.Count(),
-                group.Max(post => post.CreatedAtUtc)))
+                group.Max(post => post.PublishedAtUtc ?? post.CreatedAtUtc)))
             .ToListAsync(cancellationToken);
 
         var summaries = CommunityBoardCatalog.PublicBoards
@@ -324,8 +337,35 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         return Result.Ok<IReadOnlyList<CommunityBoardSummaryResponse>>(summaries);
     }
 
-    public async Task<Result<PlatformCommunityPostResponse>> 생성Async(
+    public Task<Result<PlatformCommunityPostResponse>> 생성Async(
         PlatformCommunityPostCreateRequest? request,
+        CancellationToken cancellationToken)
+        => 저장Async(request, null, cancellationToken);
+
+    public Task<Result<PlatformCommunityPostResponse>> 예약Async(
+        PlatformCommunityPostScheduleCreateRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request is null)
+        {
+            return Task.FromResult(BadRequest<PlatformCommunityPostResponse>("request body is required"));
+        }
+
+        var scheduledPublishAtUtc = EnsureUtc(request.ScheduledPublishAtUtc);
+        var now = DateTime.UtcNow;
+        if (scheduledPublishAtUtc < now.Add(PlatformCommunityPostSchedulePolicy.MinimumLeadTime)
+            || scheduledPublishAtUtc > now.Add(PlatformCommunityPostSchedulePolicy.MaximumLeadTime))
+        {
+            return Task.FromResult(BadRequest<PlatformCommunityPostResponse>(
+                "예약 발행 시각은 현재부터 1분 이후, 365일 이내여야 합니다."));
+        }
+
+        return 저장Async(request.Post, scheduledPublishAtUtc, cancellationToken);
+    }
+
+    private async Task<Result<PlatformCommunityPostResponse>> 저장Async(
+        PlatformCommunityPostCreateRequest? request,
+        DateTime? scheduledPublishAtUtc,
         CancellationToken cancellationToken)
     {
         if (request is null)
@@ -420,31 +460,109 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             ReportedDisplayName = isReportBoardPost
                 ? Normalize(request.ReportedDisplayName, string.Empty, 40)
                 : null,
+            PublicationStatusCode = scheduledPublishAtUtc.HasValue
+                ? PlatformCommunityPostPublicationStatusCodes.Scheduled
+                : PlatformCommunityPostPublicationStatusCodes.Published,
+            ScheduledPublishAtUtc = scheduledPublishAtUtc,
+            PublishedAtUtc = scheduledPublishAtUtc.HasValue ? null : now,
+            PublicationNextAttemptAtUtc = scheduledPublishAtUtc,
             CreatedAtUtc = now,
             UpdatedAtUtc = now
         };
 
         _db.PlatformCommunityPosts.Add(entity);
-        _음성작업예약Service.예약(entity, now);
-        _keywordNotificationQueue.Enqueue(entity, now);
+        if (!scheduledPublishAtUtc.HasValue)
+        {
+            _음성작업예약Service.예약(entity, now);
+            _keywordNotificationQueue.Enqueue(entity, now);
+        }
+
         await _db.SaveChangesAsync(cancellationToken);
 
-        try
+        if (!scheduledPublishAtUtc.HasValue)
         {
-            await _publisher.Publish(new 커뮤니티게시글등록됨Event(entity.Id), cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(
-                ex,
-                "게시글 등록 후속 이벤트 발행에 실패했습니다. 음성 및 키워드 작업은 DB 대기열에서 복구됩니다. PostId={PostId}",
-                entity.Id);
+            try
+            {
+                await _publisher.Publish(new 커뮤니티게시글등록됨Event(entity.Id), cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "게시글 등록 후속 이벤트 발행에 실패했습니다. 음성 및 키워드 작업은 DB 대기열에서 복구됩니다. PostId={PostId}",
+                    entity.Id);
+            }
         }
 
         var 원장Context = 연결원장 is null
             ? null
             : await _원장ContextService.조회Async(연결원장.원장Id, _currentUserAccessor.UserId, cancellationToken);
         return Result.Ok(ToResponse(entity, 원장Context));
+    }
+
+    public async Task<Result<IReadOnlyList<PlatformCommunityPostResponse>>> 예약목록Async(
+        string? status,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        var normalizedStatus = string.IsNullOrWhiteSpace(status) ? null : status.Trim().ToLowerInvariant();
+        if (normalizedStatus is not null
+            && !PlatformCommunityPostPublicationStatuses.IsSupported(normalizedStatus))
+        {
+            return BadRequest<IReadOnlyList<PlatformCommunityPostResponse>>("지원하지 않는 예약 발행 상태입니다.");
+        }
+
+        var query = _db.PlatformCommunityPosts
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(post => !post.IsDeleted);
+        query = normalizedStatus is null
+            ? query.Where(post => post.PublicationStatusCode != PlatformCommunityPostPublicationStatusCodes.Published)
+            : query.Where(post => post.PublicationStatusCode == normalizedStatus);
+        var items = await query
+            .OrderBy(post => post.ScheduledPublishAtUtc ?? DateTime.MaxValue)
+            .ThenByDescending(post => post.CreatedAtUtc)
+            .Take(Math.Clamp(take, 1, 100))
+            .ToListAsync(cancellationToken);
+        return Result.Ok<IReadOnlyList<PlatformCommunityPostResponse>>(
+            items.Select(post => ToResponse(post)).ToArray());
+    }
+
+    public async Task<Result<PlatformCommunityPostResponse>> 예약취소Async(
+        long id,
+        CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+        var cancelled = await _db.PlatformCommunityPosts
+            .IgnoreQueryFilters()
+            .Where(post => post.Id == id
+                           && !post.IsDeleted
+                           && post.PublicationStatusCode == PlatformCommunityPostPublicationStatusCodes.Scheduled)
+            .ExecuteUpdateAsync(
+                setters => setters
+                    .SetProperty(
+                        post => post.PublicationStatusCode,
+                        PlatformCommunityPostPublicationStatusCodes.Cancelled)
+                    .SetProperty(post => post.PublicationNextAttemptAtUtc, (DateTime?)null)
+                    .SetProperty(post => post.PublicationClaimedAtUtc, (DateTime?)null)
+                    .SetProperty(post => post.UpdatedAtUtc, now),
+                cancellationToken);
+        if (cancelled == 0)
+        {
+            var exists = await _db.PlatformCommunityPosts
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .AnyAsync(post => post.Id == id && !post.IsDeleted, cancellationToken);
+            return exists
+                ? BadRequest<PlatformCommunityPostResponse>("발행 대기 중인 예약 게시글만 취소할 수 있습니다.")
+                : NotFound<PlatformCommunityPostResponse>("예약 게시글을 찾을 수 없습니다.");
+        }
+
+        var post = await _db.PlatformCommunityPosts
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .SingleAsync(item => item.Id == id, cancellationToken);
+        return Result.Ok(ToResponse(post));
     }
 
     public async Task<Result<PlatformCommunityPostResponse>> 상세Async(long id, CancellationToken cancellationToken)
@@ -488,12 +606,18 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         }
 
         var entity = await _db.PlatformCommunityPosts
+            .IgnoreQueryFilters()
             .Include(x => x.Attachments)
                 .ThenInclude(x => x.Comments)
             .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
         if (entity is null)
         {
             return NotFound<PlatformCommunityPostAttachmentResponse>("게시글을 찾을 수 없습니다.");
+        }
+        if (entity.PublicationStatusCode is PlatformCommunityPostPublicationStatusCodes.Cancelled
+            or PlatformCommunityPostPublicationStatusCodes.Failed)
+        {
+            return BadRequest<PlatformCommunityPostAttachmentResponse>("취소되거나 실패한 예약 게시글에는 첨부할 수 없습니다.");
         }
 
         if (!BCrypt.Net.BCrypt.Verify(command.Password.Trim(), entity.PasswordHash))
@@ -1233,6 +1357,14 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
         return text.Length <= 1000 ? text : text[..1000];
     }
 
+    private static DateTime EnsureUtc(DateTime value)
+        => value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+        };
+
     private static string? NormalizeOptional(string? value, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -1465,6 +1597,11 @@ public sealed class 커뮤니티게시글UseCase : I커뮤니티게시글UseCase
             IsTrending = !isReportBoardPost
                          && !entity.IsOperatorPinned
                          && (entity.RecommendationCount >= 3 || entity.CommentCount >= 3),
+            PublicationStatusCode = entity.PublicationStatusCode,
+            ScheduledPublishAtUtc = entity.ScheduledPublishAtUtc,
+            PublishedAtUtc = entity.PublishedAtUtc,
+            PublicationAttemptCount = entity.PublicationAttemptCount,
+            PublicationLastError = entity.PublicationLastError,
             CreatedAtUtc = entity.CreatedAtUtc,
             UpdatedAtUtc = entity.UpdatedAtUtc,
             Attachments = isReportBoardPost

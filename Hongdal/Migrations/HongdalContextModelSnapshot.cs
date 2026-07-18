@@ -462,6 +462,29 @@ namespace Hongdal.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
+                    b.Property<int>("PublicationAttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PublicationClaimedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PublicationLastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTime?>("PublicationNextAttemptAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PublicationStatusCode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasDefaultValue("published");
+
+                    b.Property<DateTime?>("PublishedAtUtc")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("RecommendationCount")
                         .HasColumnType("int");
 
@@ -484,6 +507,9 @@ namespace Hongdal.Migrations
                     b.Property<string>("SharedLinkUrl")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTime?>("ScheduledPublishAtUtc")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -511,6 +537,9 @@ namespace Hongdal.Migrations
                     b.HasIndex("Category", "IsDeleted", "CreatedAtUtc");
 
                     b.HasIndex("IsReportBoardPost", "IsDeleted", "CreatedAtUtc");
+
+                    b.HasIndex("PublicationStatusCode", "PublicationNextAttemptAtUtc", "PublicationClaimedAtUtc")
+                        .HasDatabaseName("IX_platform_community_posts_publication_due");
 
                     b.HasIndex("WorkflowTag", "RoleTag", "IsDeleted", "CreatedAtUtc");
 

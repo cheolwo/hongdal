@@ -22,6 +22,13 @@ public sealed class PlatformCommunityPost
     public string? ReporterDisplayName { get; set; }
     public string? ReportedDisplayName { get; set; }
     public string PasswordHash { get; set; } = string.Empty;
+    public string PublicationStatusCode { get; set; } = PlatformCommunityPostPublicationStatusCodes.Published;
+    public DateTime? ScheduledPublishAtUtc { get; set; }
+    public DateTime? PublishedAtUtc { get; set; } = DateTime.UtcNow;
+    public DateTime? PublicationNextAttemptAtUtc { get; set; }
+    public DateTime? PublicationClaimedAtUtc { get; set; }
+    public int PublicationAttemptCount { get; set; }
+    public string? PublicationLastError { get; set; }
     public bool IsOperatorPinned { get; set; }
     public DateTime? OperatorPinnedAtUtc { get; set; }
     public bool IsCommunityMomentumPromoted { get; set; }
@@ -41,4 +48,13 @@ public sealed class PlatformCommunityPost
     public ICollection<PlatformCommunityPostTranslation> Translations { get; set; } = new List<PlatformCommunityPostTranslation>();
     public PlatformCommunityPostAudio? Audio { get; set; }
     public PlatformCommunityPostKeywordScan? KeywordNotificationScan { get; set; }
+}
+
+public static class PlatformCommunityPostPublicationStatusCodes
+{
+    public const string Scheduled = "scheduled";
+    public const string Publishing = "publishing";
+    public const string Published = "published";
+    public const string Cancelled = "cancelled";
+    public const string Failed = "failed";
 }

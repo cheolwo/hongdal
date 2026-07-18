@@ -89,10 +89,33 @@ public sealed class PlatformCommunityPostResponse
     public int CommentCount { get; set; }
     public DateTime? LastEngagedAtUtc { get; set; }
     public bool IsTrending { get; set; }
+    public string PublicationStatusCode { get; set; } = PlatformCommunityPostPublicationStatuses.Published;
+    public DateTime? ScheduledPublishAtUtc { get; set; }
+    public DateTime? PublishedAtUtc { get; set; }
+    public int PublicationAttemptCount { get; set; }
+    public string? PublicationLastError { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime UpdatedAtUtc { get; set; }
     public IReadOnlyList<PlatformCommunityPostAttachmentResponse> Attachments { get; set; } = [];
     public IReadOnlyList<PlatformCommunityPostCommentResponse> RecentComments { get; set; } = [];
+}
+
+public static class PlatformCommunityPostPublicationStatuses
+{
+    public const string Scheduled = "scheduled";
+    public const string Publishing = "publishing";
+    public const string Published = "published";
+    public const string Cancelled = "cancelled";
+    public const string Failed = "failed";
+
+    public static bool IsSupported(string? value)
+        => value is Scheduled or Publishing or Published or Cancelled or Failed;
+}
+
+public static class PlatformCommunityPostSchedulePolicy
+{
+    public static readonly TimeSpan MinimumLeadTime = TimeSpan.FromMinutes(1);
+    public static readonly TimeSpan MaximumLeadTime = TimeSpan.FromDays(365);
 }
 
 public static class PlatformCommunitySystemPostKinds
@@ -107,6 +130,7 @@ public static class PlatformCommunitySystemPostKinds
 
 public static class PlatformCommunityPostCategories
 {
+    public const string Vow = "서원";
     public const string General = "자유·생활";
     public const string Sales = "판매·공급";
     public const string ReportDispute = "신고/분쟁";
@@ -141,6 +165,13 @@ public sealed class PlatformCommunityPostCreateRequest
     public string? ReporterDisplayName { get; set; }
     public string? ReportedDisplayName { get; set; }
     public string Password { get; set; } = string.Empty;
+}
+
+public sealed class PlatformCommunityPostScheduleCreateRequest
+{
+    public PlatformCommunityPostCreateRequest Post { get; set; } = new();
+
+    public DateTime ScheduledPublishAtUtc { get; set; }
 }
 
 public sealed class PlatformCommunityPostAudioResponse
