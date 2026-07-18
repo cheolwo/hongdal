@@ -42,7 +42,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IUsdaNassPriceArchiveService>(serviceProvider =>
             serviceProvider.GetRequiredService<UsdaNassPriceArchiveService>());
         services
-            .AddHttpClient<KamisPriceArchiveService>(
+            .AddHttpClient<IKamisJsonClient, KamisJsonClient>(
                 (serviceProvider, client) =>
                 {
                     var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
@@ -53,8 +53,7 @@ public static partial class ServiceCollectionExtensions
                     client.Timeout = TimeSpan.FromSeconds(Math.Max(90, options.TimeoutSeconds));
                 })
             .RemoveAllLoggers();
-        services.AddScoped<IKamisPriceArchiveService>(serviceProvider =>
-            serviceProvider.GetRequiredService<KamisPriceArchiveService>());
+        services.AddScoped<IKamisPriceArchiveService, KamisPriceArchiveService>();
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();
         services.AddScoped<I미국농수산가격조회Service, 미국농수산가격조회Service>();

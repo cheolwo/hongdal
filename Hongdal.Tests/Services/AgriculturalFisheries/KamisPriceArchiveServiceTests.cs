@@ -13,7 +13,7 @@ public sealed class KamisPriceArchiveServiceTests
         string requested,
         string expected)
     {
-        var result = KamisPriceArchiveService.ParseSurveyDate(source, DateOnly.Parse(requested));
+        var result = KamisPriceValueParser.ParseSurveyDate(source, DateOnly.Parse(requested));
 
         Assert.Equal(DateOnly.Parse(expected), result);
     }
@@ -23,7 +23,7 @@ public sealed class KamisPriceArchiveServiceTests
     [InlineData(" 1,234.5 ", 1234.5)]
     public void 쉼표가있는_가격을_숫자로변환한다(string source, decimal expected)
     {
-        Assert.Equal(expected, KamisPriceArchiveService.ParsePrice(source));
+        Assert.Equal(expected, KamisPriceValueParser.ParsePrice(source));
     }
 
     [Theory]
@@ -31,7 +31,7 @@ public sealed class KamisPriceArchiveServiceTests
     [InlineData("")]
     public void 미제공가격은_null로변환한다(string source)
     {
-        Assert.Null(KamisPriceArchiveService.ParsePrice(source));
+        Assert.Null(KamisPriceValueParser.ParsePrice(source));
     }
 
     [Theory]
@@ -42,7 +42,7 @@ public sealed class KamisPriceArchiveServiceTests
         string monthDay,
         string expected)
     {
-        var result = KamisPriceArchiveService.ParsePeriodSurveyDate(year, monthDay);
+        var result = KamisPriceValueParser.ParsePeriodSurveyDate(year, monthDay);
 
         Assert.Equal(DateOnly.Parse(expected), result);
     }
@@ -50,7 +50,7 @@ public sealed class KamisPriceArchiveServiceTests
     [Fact]
     public void 기간조회는_직전_1년_범위를허용한다()
     {
-        KamisPriceArchiveService.ValidatePeriod(
+        KamisPriceRequestRules.ValidatePeriod(
             new DateOnly(2025, 7, 17),
             new DateOnly(2026, 7, 16));
     }
@@ -59,7 +59,7 @@ public sealed class KamisPriceArchiveServiceTests
     public void 기간조회가_1년을넘으면_거부한다()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            KamisPriceArchiveService.ValidatePeriod(
+            KamisPriceRequestRules.ValidatePeriod(
                 new DateOnly(2025, 7, 17),
                 new DateOnly(2026, 7, 17)));
     }
