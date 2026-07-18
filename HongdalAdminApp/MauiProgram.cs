@@ -1,5 +1,6 @@
 using Hongdal.Ui.Common.Areas.App.Services;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Hongdal.Ui.Common.Areas.BackOffice.ViewModels;
 using HongdalAdminApp.Services;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -24,6 +25,10 @@ public static class MauiProgram
         builder.Services.AddScoped<HongikHakdangAdminService>();
         builder.Services.AddScoped<ICommunityInformationReviewClient, CommunityInformationAdminService>();
         builder.Services.AddTransient<CommunityInformationReviewPageViewModel>();
+        builder.Services.AddSingleton<IAdminPageCatalogClient, AdminPageCatalogSampleService>();
+        builder.Services.AddTransient<AdminPageCatalogListViewModel>();
+        builder.Services.AddTransient<AdminPageCatalogDetailViewModel>();
+        builder.Services.AddTransient<AdminPageCatalogPageViewModel>();
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
 
