@@ -224,6 +224,13 @@ flowchart LR
 - 운송, 창고, 통관, 음식, 마트, 공동주문은 이 커뮤니티 여정 위에 결합되는 실행 도구입니다.
 - 플랫폼은 특정 거래 상대나 기사를 선정·배정하지 않으며, 실제 유상 화물 배차·주선·운임 수취·정산은 허가·제휴·법률 검토 전 운영 기능으로 켜지지 않습니다.
 
+### 화물 운송 주선업 진입비용 메모
+
+> 2026년 7월 19일 기준 사업성 검토용 메모입니다. 실제 계약 전에는 관할 기관과 전문가를 통해 자격·거래가격·보증 조건을 다시 확인해야 합니다.
+
+- **한국:** 기존 화물자동차 운송주선사업 허가권을 **개인 간 양도·양수할 때의 거래비용을 약 6천만 원**으로 봅니다. 이는 법정 허가 수수료나 고정가격이 아니라 거래 당사자와 허가권 상태에 따라 달라지는 시장 거래가격입니다. [현행 공급기준](https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000232974&chrClsCd=010201)은 신규 허가를 원칙적으로 금지하고 있으며, 양수인은 [시행규칙상 허가기준](https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260603&lsiSeq=286659&urlMode=lsInfoP)도 별도로 충족해야 합니다.
+- **미국:** FMCSA의 화물 broker 또는 freight forwarder 권한을 유지하려면 **USD 75,000** 규모의 재정보증이 필요합니다. 이는 면허 수수료가 아니라 BMC-84 보증채권 또는 BMC-85 신탁기금의 보증 한도이며, [신청 수수료 USD 300과 BOC-3 제출은 별도](https://www.fmcsa.dot.gov/registration/broker-registration)입니다. 2026년 1월 16일부터는 가용 재정보증이 USD 75,000 아래로 내려간 뒤 7일 안에 복구되지 않으면 [운영 권한이 정지될 수 있습니다](https://www.fmcsa.dot.gov/registration/broker-and-freight-forwarder-financial-responsibility-rule-overview-and-compliance).
+
 ## 코드 프로젝트별 화면 묶음
 
 | 코드 프로젝트 | 먼저 보는 화면 |
