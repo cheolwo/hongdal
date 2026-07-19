@@ -26,19 +26,21 @@ public sealed partial class CommunityInformationReviewPageViewModel
     {
         if (!Composer.Draft.HasContent)
         {
+            var templateDraft = VowJourneyTemplate.BuildDraft(VowVersion.Selected);
             MutualBenefit.Reset();
             EvidenceChart.Reset();
             Composer.Draft.Nickname = ResolveWritingNickname(defaultNickname);
             Composer.Draft.Category = CommunityBoardCatalog.Vow.DisplayName;
             Composer.Draft.WorkflowTag = VowVersion.Selected.WorkflowTag;
             Composer.Draft.RoleTag = "운영자 서원 기록";
-            Composer.Draft.Title = VowVersion.BuildTitle();
-            Composer.Draft.Body = VowVersion.BuildBody();
+            Composer.Draft.Title = templateDraft.Title;
+            Composer.Draft.Body = templateDraft.Body;
         }
 
         Composer.Open();
         Composer.OpenSettings();
-        StatusMessage = $"{VowVersion.Selected.DisplayName} 서원과 함께 알아차리고 싶은 사람·업체부터 적어 보세요.";
+        ActiveTool = CommunityAuthoringTool.VowJourneyTemplate;
+        StatusMessage = $"{VowVersion.Selected.DisplayName} · {VowJourneyTemplate.Selected.DisplayName} 서원 초안을 열었습니다.";
     }
 
     public void SelectVowVersion(string code)
@@ -47,6 +49,43 @@ public sealed partial class CommunityInformationReviewPageViewModel
         StatusMessage = Composer.Draft.HasContent
             ? $"{VowVersion.Selected.DisplayName}을(를) 다음 서원 초안의 목표로 선택했습니다. 현재 작성 중인 글은 바꾸지 않습니다."
             : $"{VowVersion.Selected.DisplayName}을(를) 서원 목표 버전으로 선택했습니다.";
+    }
+
+    public void SelectVowJourneyTemplate(string key)
+    {
+        VowJourneyTemplate.SelectedKey = key;
+        ActiveTool = CommunityAuthoringTool.VowJourneyTemplate;
+        StatusMessage = Composer.Draft.HasContent
+            ? $"{VowJourneyTemplate.Selected.DisplayName} 틀을 선택했습니다. 현재 글은 유지되며 명시적으로 추가할 때만 본문 뒤에 붙습니다."
+            : $"{VowJourneyTemplate.Selected.DisplayName} 틀을 다음 서원 초안에 적용합니다.";
+    }
+
+    public bool ApplyVowJourneyTemplate(string defaultNickname)
+    {
+        if (!Composer.Draft.HasContent)
+        {
+            OpenVowDraft(defaultNickname);
+            return true;
+        }
+
+        var template = VowJourneyTemplate.Selected;
+        var templateDraft = VowJourneyTemplate.BuildDraft(VowVersion.Selected);
+        if (!AppendBodySection(
+                $"서원 여정 틀 · {template.DisplayName}",
+                templateDraft.Body,
+                allowTruncate: false))
+        {
+            return false;
+        }
+
+        EnsureComposerIdentity(defaultNickname);
+        Composer.Open();
+        ActiveTool = CommunityAuthoringTool.VowJourneyTemplate;
+        Composer.SetStatus(
+            $"{template.DisplayName} 틀을 현재 본문 뒤에 추가했습니다.",
+            CommunityComposerMessageKind.Success);
+        StatusMessage = $"기존 내용을 유지하고 {template.DisplayName} 틀을 본문에 추가했습니다.";
+        return true;
     }
 
     public void SelectWritingPersona(string key)
@@ -111,6 +150,7 @@ public sealed partial class CommunityInformationReviewPageViewModel
         Composer.Reset();
         MutualBenefit.Reset();
         EvidenceChart.Reset();
+        AiDraft.ResetResult();
         StatusMessage = "현재 화면의 초안을 비웠습니다.";
     }
 
@@ -364,6 +404,136 @@ public sealed partial class CommunityInformationReviewPageViewModel
         StatusMessage = "주장과 수치, 출처, 기준일과 한계를 한 묶음으로 확인합니다.";
     }
 
+    public void OpenPeriodStatisticsTool()
+    {
+        PeriodStatistics.PrepareFilters(SelectedSourceKey, CountryCode, SearchText);
+        ActiveTool = CommunityAuthoringTool.PeriodStatistics;
+        StatusMessage = "달력에서 고른 기간 안의 수집 자료를 구간별 통계로 확인합니다.";
+    }
+
+    public void OpenAiDraftTool()
+    {
+        AiDraft.PrepareFilters(
+            SelectedSourceKey,
+            CountryCode,
+            SearchText,
+            Composer.Draft.Title);
+        ActiveTool = CommunityAuthoringTool.AiDraft;
+        StatusMessage = "허용한 자료 조회 도구와 현재 편집 문맥으로 검토용 글 초안을 만듭니다.";
+    }
+
+    public async Task<bool> GenerateAiDraftAsync(CancellationToken cancellationToken = default)
+    {
+        YouTubeSocialContextResearchRequest? socialResearchRequest = null;
+        if (AiDraft.IncludeYouTubeSocialResearch)
+        {
+            try
+            {
+                socialResearchRequest = SocialResearch.CreateResearchRequest();
+            }
+            catch (ArgumentException exception)
+            {
+                AiDraft.SetInputError(exception.Message);
+                StatusMessage = exception.Message;
+                return false;
+            }
+        }
+
+        var generated = await AiDraft.GenerateAsync(
+            BuildAiDraftContextSections(),
+            socialResearchRequest,
+            cancellationToken);
+        StatusMessage = AiDraft.StatusMessage;
+        return generated;
+    }
+
+    public bool ApplyAiDraftToComposer(string defaultNickname)
+    {
+        var generatedDraft = AiDraft.Result?.Draft;
+        if (!AiDraft.CanApply || generatedDraft is null)
+        {
+            StatusMessage = "먼저 검토 가능한 LLM 글 초안을 만들어 주세요.";
+            return false;
+        }
+
+        var hadContent = Composer.Draft.HasContent;
+        EnsureComposerIdentity(defaultNickname);
+        if (!hadContent)
+        {
+            MutualBenefit.Reset();
+            EvidenceChart.Reset();
+            Composer.Draft.Category = generatedDraft.Category;
+            Composer.Draft.WorkflowTag = generatedDraft.WorkflowTag;
+            Composer.Draft.RoleTag = generatedDraft.RoleTag;
+            Composer.Draft.Title = Limit(generatedDraft.Title, 160);
+            Composer.Draft.Body = Limit(generatedDraft.Body, 4000);
+            Composer.Draft.SharedLinkUrl = generatedDraft.SharedLinkUrl ?? string.Empty;
+        }
+        else if (!AppendBodySection("LLM 보조 초안", generatedDraft.Body, allowTruncate: false))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(Composer.Draft.SharedLinkUrl))
+        {
+            Composer.Draft.SharedLinkUrl = generatedDraft.SharedLinkUrl ?? string.Empty;
+        }
+
+        Composer.Open();
+        Composer.OpenSettings();
+        Composer.SetStatus(
+            hadContent
+                ? "LLM 보조 초안을 현재 본문 뒤에 추가했습니다. 근거와 표현을 다시 확인해 주세요."
+                : "LLM 보조 초안을 글쓰기로 옮겼습니다. 게시 전에 근거와 표현을 다시 확인해 주세요.",
+            CommunityComposerMessageKind.Success);
+        StatusMessage = "LLM 결과를 검토 가능한 글 초안에 반영했습니다. 자동 게시되지는 않습니다.";
+        return true;
+    }
+
+    public int ImportAiDiagramSteps()
+    {
+        var suggestedSteps = AiDraft.Result?.Draft?.SuggestedDiagramSteps ?? [];
+        var importedCount = 0;
+        foreach (var step in suggestedSteps.Take(8))
+        {
+            if (Diagram.Steps.Any(existing => string.Equals(
+                    existing.Title.Trim(),
+                    step.Trim(),
+                    StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            Diagram.NewStepTitle = step;
+            Diagram.NewStepDescription = "LLM 초안에서 제안된 검토 단계입니다. 실제 업무 전환 전에 담당자와 조건을 확인합니다.";
+            if (Diagram.AddStep())
+            {
+                importedCount++;
+            }
+        }
+
+        ActiveTool = CommunityAuthoringTool.Diagram;
+        StatusMessage = importedCount > 0
+            ? $"LLM 제안 단계 {importedCount:N0}개를 편집용 다이어그램에 추가했습니다."
+            : "다이어그램에 새로 추가할 LLM 제안 단계가 없습니다.";
+        return importedCount;
+    }
+
+    public bool ImportPeriodStatisticsToEvidenceChart()
+    {
+        var block = PeriodStatistics.CreateEvidenceBlock();
+        if (block is null)
+        {
+            StatusMessage = "기간 통계를 먼저 만들고 값이 있는 구간을 두 개 이상 확인해 주세요.";
+            return false;
+        }
+
+        var imported = EvidenceChart.ImportPeriodStatistics(block);
+        ActiveTool = CommunityAuthoringTool.EvidenceChart;
+        StatusMessage = EvidenceChart.StatusMessage;
+        return imported;
+    }
+
     public bool ImportMutualBenefitToEvidenceChart()
     {
         var imported = EvidenceChart.ImportMutualBenefit(MutualBenefit);
@@ -410,6 +580,8 @@ public sealed partial class CommunityInformationReviewPageViewModel
         PendingDraftCandidate = null;
         MutualBenefit.Reset();
         EvidenceChart.Reset();
+        PeriodStatistics.Reset();
+        AiDraft.ResetResult();
         StatusMessage = result.WasScheduled && result.ScheduledPublishAtUtc is DateTime scheduledAtUtc
             ? $"커뮤니티 글 #{result.Post.Id:N0}을 {scheduledAtUtc.ToLocalTime():yyyy-MM-dd HH:mm} 발행으로 예약했습니다."
             : $"커뮤니티 글 #{result.Post.Id:N0}을 등록했습니다.";
@@ -538,6 +710,77 @@ public sealed partial class CommunityInformationReviewPageViewModel
             Diagram.CreateImportJourneyUpdate(),
             cancellationToken);
 
+    private IReadOnlyList<CommunityAuthoringAiContextSectionDto> BuildAiDraftContextSections()
+    {
+        var sections = new List<CommunityAuthoringAiContextSectionDto>();
+        if (Composer.Draft.HasContent)
+        {
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "current-draft",
+                "현재 작성 중인 글",
+                $"제목: {Composer.Draft.Title}{Environment.NewLine}본문:{Environment.NewLine}{Composer.Draft.Body}"));
+        }
+
+        if (Diagram.Steps.Count > 0)
+        {
+            var diagramLines = Diagram.Steps.Select((step, index) =>
+                    $"{index + 1}. {step.Title}: {step.Description}")
+                .Concat(Diagram.OrganizationCandidates.Select(candidate =>
+                    $"업체 후보: {candidate.OrganizationName} · 역할 {candidate.RoleLabel} · 국가 {candidate.CountryCode}"));
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "diagram",
+                "현재 다이어그램과 업체 후보",
+                string.Join(Environment.NewLine, diagramLines)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(MutualBenefit.SharedPurpose) || MutualBenefit.Roles.Count > 0)
+        {
+            var roleLines = MutualBenefit.Roles.Select(role =>
+                $"- {role.RoleLabel} · 편익: {role.ExpectedBenefit} · 부담: {role.ContributionOrBurden} · 조건: {role.RiskOrCondition}");
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "mutual-benefit",
+                "상호 이익 사전 검토",
+                $"공동 목적: {MutualBenefit.SharedPurpose}{Environment.NewLine}{string.Join(Environment.NewLine, roleLines)}"));
+        }
+
+        if (PeriodStatistics.HasResult)
+        {
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "period-statistics",
+                "기간 통계",
+                string.Join(
+                    Environment.NewLine,
+                    PeriodStatistics.Buckets.Select(bucket =>
+                        $"- {bucket.Label}: 자료 {bucket.RecordCount:N0}건, 수치 {bucket.NumericValueCount:N0}건, 값 {(bucket.Value.HasValue ? bucket.Value.Value.ToString("N2") : "없음")}"))));
+        }
+
+        if (SocialResearch.Result is { } socialResult)
+        {
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "youtube-social-workspace",
+                "현재 YouTube·SNS 조사 작업공간",
+                $"영상: {socialResult.Video.Title}{Environment.NewLine}영상 주소: {socialResult.Video.OriginalUrl}{Environment.NewLine}조사 초안:{Environment.NewLine}{socialResult.Draft.Body}"));
+        }
+
+        if (EvidenceChart.HasPreview)
+        {
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "evidence-chart",
+                "현재 근거 그래프",
+                $"제목: {EvidenceChart.Title}{Environment.NewLine}주장: {EvidenceChart.Claim}{Environment.NewLine}출처: {EvidenceChart.SourceLabel} {EvidenceChart.SourceUrl}{Environment.NewLine}한계: {EvidenceChart.Limitation}"));
+        }
+
+        if (sections.Count == 0)
+        {
+            sections.Add(new CommunityAuthoringAiContextSectionDto(
+                "vow-direction",
+                "서원 방향",
+                $"목표 버전: {VowVersion.Selected.DisplayName}{Environment.NewLine}여정 틀: {VowJourneyTemplate.Selected.DisplayName}"));
+        }
+
+        return sections.Take(6).ToArray();
+    }
+
     private bool AppendBodySection(
         string heading,
         string content,
@@ -576,6 +819,7 @@ public sealed partial class CommunityInformationReviewPageViewModel
         => candidate.SourceKey switch
         {
             CommunityInformationSourceKeys.KamisPriceObservations => "농수산물 가격 정보",
+            CommunityInformationSourceKeys.FishCooperativeGeneralStatistics => "수산업협동조합 통계 정보",
             CommunityInformationSourceKeys.YouTubeChannelVideos => "외부 공개 자료 공유",
             _ => "출처 기반 정보 공유"
         };

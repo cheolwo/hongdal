@@ -32,6 +32,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<CommunityAuthoringMutualBenefitViewModel>();
         services.TryAddTransient<CommunityAuthoringEvidenceChartViewModel>();
         services.TryAddTransient<CommunityAuthoringPeriodStatisticsViewModel>();
+        services.TryAddTransient<CommunityAuthoringAiDraftViewModel>();
         services.TryAddTransient<CommunityOperatorWritingPersonaViewModel>();
         services.TryAddTransient<CommunityVowVersionViewModel>();
         services.TryAddTransient<CommunityVowJourneyTemplateViewModel>();

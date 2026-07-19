@@ -1,3 +1,4 @@
+@page "/"
 @page "/information-review"
 @inherits MvvmComponentBase<CommunityInformationReviewPageViewModel>
 @using Hongdal.Contracts.Common.Community
@@ -129,6 +130,7 @@
                                                    ResearchToolsRequested="OpenCollectedSourceTool"
                                                    DiagramToolsRequested="OpenDiagramTool"
                                                    EvidenceToolsRequested="OpenEvidenceChartTool"
+                                                   PeriodStatisticsToolsRequested="OpenPeriodStatisticsTool"
                                                    MutualBenefitToolsRequested="OpenMutualBenefitTool"
                                                    Saved="HandleComposerSaved" />
                 }
@@ -238,6 +240,23 @@
                                                               ImportMutualBenefitRequested="ImportMutualBenefitToEvidenceChart"
                                                               ApplyToDraftRequested="ApplyEvidenceChartToDraft" />
                     </MudTabPanel>
+                    <MudTabPanel Text="기간 통계" Icon="@Icons.Material.Filled.DateRange">
+                        <CommunityAuthoringPeriodStatisticsTool ViewModel="@ViewModel.PeriodStatistics"
+                                                                ImportToEvidenceChartRequested="ImportPeriodStatisticsToEvidenceChart" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="서원 틀" Icon="@Icons.Material.Filled.AutoStories">
+                        <CommunityVowJourneyTemplateTool ViewModel="@ViewModel.VowJourneyTemplate"
+                                                         Version="@ViewModel.VowVersion.Selected"
+                                                         HasDraftContent="@ViewModel.Composer.Draft.HasContent"
+                                                         TemplateChanged="ChangeVowJourneyTemplate"
+                                                         ApplyRequested="ApplyVowJourneyTemplate" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="LLM 초안" Icon="@Icons.Material.Filled.AutoAwesome">
+                        <CommunityAuthoringAiDraftTool ViewModel="@ViewModel.AiDraft"
+                                                       GenerateRequested="GenerateAiDraftAsync"
+                                                       ApplyRequested="ApplyAiDraftToComposer"
+                                                       ImportDiagramRequested="ImportAiDiagramSteps" />
+                    </MudTabPanel>
                 </MudTabs>
             </aside>
         </section>
@@ -261,9 +280,19 @@
     private int ActiveToolIndex
     {
         get => (int)ViewModel.ActiveTool;
-        set => ViewModel.ActiveTool = Enum.IsDefined(typeof(CommunityAuthoringTool), value)
-            ? (CommunityAuthoringTool)value
-            : CommunityAuthoringTool.CollectedSources;
+        set
+        {
+            var nextTool = Enum.IsDefined(typeof(CommunityAuthoringTool), value)
+                ? (CommunityAuthoringTool)value
+                : CommunityAuthoringTool.CollectedSources;
+            if (nextTool == CommunityAuthoringTool.AiDraft)
+            {
+                ViewModel.OpenAiDraftTool();
+                return;
+            }
+
+            ViewModel.ActiveTool = nextTool;
+        }
     }
 
     private Severity ScheduledPostsStatusSeverity
@@ -292,6 +321,9 @@
     private void ChangeVowVersion(string code)
         => ViewModel.SelectVowVersion(code);
 
+    private void ChangeVowJourneyTemplate(string key)
+        => ViewModel.SelectVowJourneyTemplate(key);
+
     private void ChangeWritingPersona(string key)
         => ViewModel.SelectWritingPersona(key);
 
@@ -306,6 +338,9 @@
 
     private void OpenEvidenceChartTool()
         => ViewModel.OpenEvidenceChartTool();
+
+    private void OpenPeriodStatisticsTool()
+        => ViewModel.OpenPeriodStatisticsTool();
 
     private async Task ApplySocialResearchToDraftAsync()
         => await ViewModel.ApplySocialResearchToDraftAsync(Session.UserName);
@@ -330,6 +365,21 @@
 
     private void ApplyEvidenceChartToDraft()
         => ViewModel.ApplyEvidenceChartToDraft(Session.UserName);
+
+    private void ImportPeriodStatisticsToEvidenceChart()
+        => ViewModel.ImportPeriodStatisticsToEvidenceChart();
+
+    private void ApplyVowJourneyTemplate()
+        => ViewModel.ApplyVowJourneyTemplate(Session.UserName);
+
+    private Task GenerateAiDraftAsync()
+        => ViewModel.GenerateAiDraftAsync();
+
+    private void ApplyAiDraftToComposer()
+        => ViewModel.ApplyAiDraftToComposer(Session.UserName);
+
+    private void ImportAiDiagramSteps()
+        => ViewModel.ImportAiDiagramSteps();
 
     private async Task HandleComposerSaved(CommunityPostComposerSaveResult result)
         => await ViewModel.HandleComposerSavedAsync(result);

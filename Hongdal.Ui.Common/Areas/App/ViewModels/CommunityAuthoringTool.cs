@@ -8,5 +8,6 @@ public enum CommunityAuthoringTool
     MutualBenefit,
     EvidenceChart,
     PeriodStatistics,
-    VowJourneyTemplate
+    VowJourneyTemplate,
+    AiDraft
 }

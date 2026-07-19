@@ -43,6 +43,20 @@ public sealed class CommunityInformationAdminService : ICommunityInformationRevi
                ?? new CommunityInformationCollectionResponse(DateTime.UtcNow, [], [], []);
     }
 
+    public async Task<CommunityAuthoringAiDraftResponse> GenerateAiDraftAsync(
+        CommunityAuthoringAiDraftRequest draftRequest,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(draftRequest);
+        using var request = CreateRequest(HttpMethod.Post, $"{BasePath}/authoring/ai-drafts");
+        request.Content = JsonContent.Create(draftRequest);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityAuthoringAiDraftResponse>(
+                   cancellationToken: cancellationToken)
+               ?? throw new InvalidOperationException("LLM 글 초안 응답이 비어 있습니다.");
+    }
+
     public async Task<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSourcesAsync(
         CancellationToken cancellationToken = default)
     {
@@ -140,6 +154,8 @@ public sealed class CommunityInformationAdminService : ICommunityInformationRevi
         Add(parameters, "countryCode", query.CountryCode);
         Add(parameters, "reviewState", query.ReviewState);
         Add(parameters, "searchText", query.SearchText);
+        Add(parameters, "startDate", query.StartDate?.ToString("yyyy-MM-dd"));
+        Add(parameters, "endDate", query.EndDate?.ToString("yyyy-MM-dd"));
         parameters.Add($"take={Math.Clamp(query.Take, 1, 100)}");
         return $"{BasePath}/candidates?{string.Join("&", parameters)}";
     }

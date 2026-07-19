@@ -86,6 +86,49 @@ public sealed class CommunityInformationReviewPageViewModelTests
     }
 
     [Fact]
+    public async Task LlmDraft_DoesNotChangeComposerUntilOperatorAppliesIt()
+    {
+        var aiResponse = new CommunityAuthoringAiDraftResponse(
+            true,
+            CommunityAuthoringAiDraftStatusCodes.ReadyForReview,
+            "검토용 초안을 만들었습니다.",
+            new CommunityAuthoringAiPostDraftDto(
+                "[서원] 지역 사과를 함께 살펴봅니다",
+                "공개 가격 자료와 아직 확인할 조건을 함께 적습니다.\n\n확인한 출처\n- https://example.com/price",
+                CommunityBoardCatalog.Vow.DisplayName,
+                "공동구매 사전 검토",
+                "운영자 서원 기록",
+                "https://example.com/price",
+                ["https://example.com/price"],
+                ["수요 확인"],
+                ["최소 수량은 얼마인가요?"]),
+            [],
+            [],
+            true,
+            false,
+            "fake-model",
+            0.01m,
+            0.02m,
+            20m);
+        var client = new RecordingClient([], [], aiDraftResponse: aiResponse);
+        using var viewModel = CreateViewModel(client);
+        viewModel.AiDraft.Objective = "사과 공동구매를 근거와 함께 검토한다.";
+
+        var generated = await viewModel.GenerateAiDraftAsync();
+
+        Assert.True(generated);
+        Assert.False(viewModel.Composer.Draft.HasContent);
+        Assert.NotNull(client.LastAiDraftRequest);
+
+        var applied = viewModel.ApplyAiDraftToComposer("관리자");
+
+        Assert.True(applied);
+        Assert.True(viewModel.Composer.IsOpen);
+        Assert.Equal("[서원] 지역 사과를 함께 살펴봅니다", viewModel.Composer.Draft.Title);
+        Assert.Contains("확인한 출처", viewModel.Composer.Draft.Body);
+    }
+
+    [Fact]
     public void Diagram_AppliesTemplateFlowToEmptyDraft()
     {
         using var viewModel = CreateViewModel(new RecordingClient([], []));
@@ -215,6 +258,115 @@ public sealed class CommunityInformationReviewPageViewModelTests
     }
 
     [Fact]
+    public async Task PeriodStatistics_AggregatesSelectedCalendarRangeAndImportsEvidenceChart()
+    {
+        var source = Source(CommunityInformationSourceKeys.KamisPriceObservations);
+        var client = new RecordingClient(
+            [source],
+            [
+                KamisCandidate(new DateOnly(2026, 7, 1), 20_000m),
+                KamisCandidate(new DateOnly(2026, 7, 5), 25_000m),
+                KamisCandidate(new DateOnly(2026, 7, 12), 30_000m),
+                KamisCandidate(new DateOnly(2026, 6, 30), 99_000m)
+            ]);
+        using var viewModel = CreateViewModel(client);
+        viewModel.PeriodStatistics.SetAvailableSources([source]);
+        viewModel.PeriodStatistics.SetDateRange(
+            new DateTime(2026, 7, 1),
+            new DateTime(2026, 7, 12));
+        viewModel.PeriodStatistics.SourceKey = CommunityInformationSourceKeys.KamisPriceObservations;
+        viewModel.PeriodStatistics.MetricCode = CommunityPeriodStatisticsMetricCodes.NumericAverage;
+
+        var generated = await viewModel.PeriodStatistics.GenerateAsync();
+        var imported = viewModel.ImportPeriodStatisticsToEvidenceChart();
+
+        Assert.True(generated);
+        Assert.True(imported);
+        Assert.Equal(new DateOnly(2026, 7, 1), client.LastQuery?.StartDate);
+        Assert.Equal(new DateOnly(2026, 7, 12), client.LastQuery?.EndDate);
+        Assert.Equal(3, viewModel.PeriodStatistics.RecordCount);
+        Assert.Equal(3, viewModel.PeriodStatistics.NumericValueCount);
+        Assert.Equal(25_000m, viewModel.PeriodStatistics.Statistics?.Average);
+        Assert.Equal(CommunityAuthoringTool.EvidenceChart, viewModel.ActiveTool);
+        Assert.Equal("KRW/10개", viewModel.EvidenceChart.Unit);
+        Assert.Equal("2026-07-01 ~ 2026-07-12", viewModel.EvidenceChart.ReferenceDate);
+        Assert.Equal(3, viewModel.EvidenceChart.Preview?.Points.Count);
+    }
+
+    [Fact]
+    public async Task PeriodStatistics_DoesNotAverageDifferentPriceSeries()
+    {
+        var source = Source(CommunityInformationSourceKeys.KamisPriceObservations);
+        var client = new RecordingClient(
+            [source],
+            [
+                KamisCandidate(new DateOnly(2026, 7, 1), 20_000m, "retail|apple|fuji|premium|10ea"),
+                KamisCandidate(new DateOnly(2026, 7, 2), 22_000m, "retail|apple|fuji|premium|10ea"),
+                KamisCandidate(new DateOnly(2026, 7, 1), 12_000m, "wholesale|apple|fuji|premium|10ea"),
+                KamisCandidate(new DateOnly(2026, 7, 2), 14_000m, "wholesale|apple|fuji|premium|10ea")
+            ]);
+        using var viewModel = CreateViewModel(client);
+        viewModel.PeriodStatistics.SetAvailableSources([source]);
+        viewModel.PeriodStatistics.SetDateRange(
+            new DateTime(2026, 7, 1),
+            new DateTime(2026, 7, 2));
+        viewModel.PeriodStatistics.SourceKey = CommunityInformationSourceKeys.KamisPriceObservations;
+        viewModel.PeriodStatistics.MetricCode = CommunityPeriodStatisticsMetricCodes.NumericAverage;
+
+        var generated = await viewModel.PeriodStatistics.GenerateAsync();
+
+        Assert.False(generated);
+        Assert.Null(viewModel.PeriodStatistics.Preview);
+        Assert.Equal(2, viewModel.PeriodStatistics.AvailableSeries.Count);
+        Assert.Contains("수치 계열", viewModel.PeriodStatistics.StatusMessage, StringComparison.Ordinal);
+
+        viewModel.PeriodStatistics.MetricSeriesSelectionKey =
+            viewModel.PeriodStatistics.AvailableSeries[0].SelectionKey;
+        var selectedSeriesGenerated = await viewModel.PeriodStatistics.GenerateAsync();
+
+        Assert.True(selectedSeriesGenerated);
+        Assert.Equal(2, viewModel.PeriodStatistics.RecordCount);
+        Assert.Equal(2, viewModel.PeriodStatistics.NumericValueCount);
+        Assert.True(viewModel.PeriodStatistics.Statistics?.Average is 13_000m or 21_000m);
+        Assert.Equal(2, viewModel.PeriodStatistics.Preview?.Points.Count);
+    }
+
+    [Fact]
+    public async Task PeriodStatistics_FishCooperativeMonthlyRangeBuildsEmployeeCountGraph()
+    {
+        var source = Source(CommunityInformationSourceKeys.FishCooperativeGeneralStatistics);
+        var client = new RecordingClient(
+            [source],
+            [
+                FishCooperativeCandidate(new DateOnly(2026, 5, 1), 105m),
+                FishCooperativeCandidate(new DateOnly(2026, 6, 1), 106m),
+                FishCooperativeCandidate(new DateOnly(2026, 7, 1), 107m)
+            ]);
+        using var viewModel = CreateViewModel(client);
+        viewModel.PeriodStatistics.SetAvailableSources([source]);
+        viewModel.PeriodStatistics.SetDateRange(
+            new DateTime(2026, 5, 15),
+            new DateTime(2026, 7, 10));
+        viewModel.PeriodStatistics.SelectSource(
+            CommunityInformationSourceKeys.FishCooperativeGeneralStatistics);
+
+        var generated = await viewModel.PeriodStatistics.GenerateAsync();
+        var imported = viewModel.ImportPeriodStatisticsToEvidenceChart();
+
+        Assert.True(generated);
+        Assert.True(imported);
+        Assert.Equal("KR", viewModel.PeriodStatistics.CountryCode);
+        Assert.Equal(
+            CommunityPeriodStatisticsMetricCodes.NumericAverage,
+            viewModel.PeriodStatistics.MetricCode);
+        Assert.Equal(3, viewModel.PeriodStatistics.Buckets.Count);
+        Assert.Equal(106m, viewModel.PeriodStatistics.Statistics?.Average);
+        Assert.Equal("명", viewModel.EvidenceChart.Unit);
+        Assert.Equal("기간별 총임직원 평균", viewModel.EvidenceChart.Title);
+        Assert.Equal(3, viewModel.EvidenceChart.Preview?.Points.Count);
+    }
+
+    [Fact]
     public async Task Diagram_CanAttachDirectoryProviderToSelectedNodeWithoutContactEmail()
     {
         var provider = new ThirdPartyLogisticsProviderDirectoryItem
@@ -307,8 +459,10 @@ public sealed class CommunityInformationReviewPageViewModelTests
         Assert.NotEqual(firstNickname, viewModel.Composer.Draft.Nickname);
         Assert.Equal(CommunityBoardCatalog.Vow.DisplayName, viewModel.Composer.Draft.Category);
         Assert.StartsWith("[서원]", viewModel.Composer.Draft.Title, StringComparison.Ordinal);
-        Assert.Contains("함께 알아차리고 싶은 사람·업체", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
-        Assert.Contains("주문·계약·결제·배차", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("함께할 사람과 업체", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("다이어그램과 원장 연결", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("주문·계약·결제·배차·보관·정산", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Equal(CommunityAuthoringTool.VowJourneyTemplate, viewModel.ActiveTool);
     }
 
     [Fact]
@@ -337,6 +491,79 @@ public sealed class CommunityInformationReviewPageViewModelTests
         Assert.Equal(
             CommunityVowVersionCatalog.All.Count,
             CommunityVowVersionCatalog.All.Select(version => version.WorkflowTag).Distinct().Count());
+    }
+
+    [Fact]
+    public void VowJourneyTemplate_SourceDraftSeparatesFactsFromInterpretation()
+    {
+        using var viewModel = CreateViewModel(new RecordingClient([], []));
+        viewModel.SelectVowVersion("2.0");
+        viewModel.SelectVowJourneyTemplate(CommunityVowJourneyTemplateCatalog.SourceKey);
+
+        viewModel.OpenVowDraft("관리자");
+
+        Assert.StartsWith("[서원][홍달 2.0] 이 자료에서 시작한 여정", viewModel.Composer.Draft.Title, StringComparison.Ordinal);
+        Assert.Contains("자료에서 확인한 사실", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("사실과 구분한 나의 해석", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("가격·통계 근거", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("가원장에 남길 참여 의사와 질문", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Equal("홍달 2.0 · 국제 물류·통관", viewModel.Composer.Draft.WorkflowTag);
+        Assert.Equal(CommunityBoardCatalog.Vow.DisplayName, viewModel.Composer.Draft.Category);
+    }
+
+    [Fact]
+    public void VowJourneyTemplate_AppendsWithoutReplacingExistingDraft()
+    {
+        using var viewModel = CreateViewModel(new RecordingClient([], []));
+        viewModel.OpenBlankDraft("관리자");
+        viewModel.Composer.Draft.Title = "이미 작성 중인 제목";
+        viewModel.Composer.Draft.Body = "이미 정리한 내용";
+        viewModel.SelectVowJourneyTemplate(CommunityVowJourneyTemplateCatalog.PartnersKey);
+
+        var applied = viewModel.ApplyVowJourneyTemplate("관리자");
+
+        Assert.True(applied);
+        Assert.Equal("이미 작성 중인 제목", viewModel.Composer.Draft.Title);
+        Assert.StartsWith("이미 정리한 내용", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("서원 여정 틀 · 함께할 사람 찾기", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("아직 비어 있는 역할", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("플랫폼이 대신 결정하거나 중개하지 않을 범위", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void VowJourneyTemplateCatalog_ProvidesDistinctWritingStartingPoints()
+    {
+        Assert.Equal(
+            [
+                CommunityVowJourneyTemplateCatalog.JourneyKey,
+                CommunityVowJourneyTemplateCatalog.SourceKey,
+                CommunityVowJourneyTemplateCatalog.PartnersKey
+            ],
+            CommunityVowJourneyTemplateCatalog.All.Select(template => template.Key));
+        Assert.All(
+            CommunityVowJourneyTemplateCatalog.All,
+            template => Assert.Contains("운영 경계", template.SectionNames));
+    }
+
+    [Fact]
+    public void VowJourneyTemplate_AllVersionCombinationsFitComposerLimitsAndKeepBoundary()
+    {
+        var viewModel = new CommunityVowJourneyTemplateViewModel();
+
+        foreach (var template in CommunityVowJourneyTemplateCatalog.All)
+        {
+            viewModel.SelectedKey = template.Key;
+            foreach (var version in CommunityVowVersionCatalog.All)
+            {
+                var draft = viewModel.BuildDraft(version);
+
+                Assert.InRange(draft.Title.Length, 1, 160);
+                Assert.InRange(draft.Body.Length, 1, 4000);
+                Assert.Contains(version.Focus, draft.Body, StringComparison.Ordinal);
+                Assert.Contains(version.OperationalBoundary, draft.Body, StringComparison.Ordinal);
+                Assert.Contains("비구속적 서원", draft.Body, StringComparison.Ordinal);
+            }
+        }
     }
 
     [Fact]
@@ -409,8 +636,11 @@ public sealed class CommunityInformationReviewPageViewModelTests
             diagram,
             new CommunityAuthoringMutualBenefitViewModel(),
             new CommunityAuthoringEvidenceChartViewModel(),
+            new CommunityAuthoringPeriodStatisticsViewModel(client),
+            new CommunityAuthoringAiDraftViewModel(client),
             new CommunityOperatorWritingPersonaViewModel(),
-            new CommunityVowVersionViewModel());
+            new CommunityVowVersionViewModel(),
+            new CommunityVowJourneyTemplateViewModel());
     }
 
     private static CommunityInformationSourceDto Source(string sourceKey)
@@ -425,18 +655,21 @@ public sealed class CommunityInformationReviewPageViewModelTests
             "https://example.com/docs",
             true);
 
-    private static CommunityInformationCandidateDto KamisCandidate()
+    private static CommunityInformationCandidateDto KamisCandidate(
+        DateOnly? referenceDate = null,
+        decimal numericValue = 25_000m,
+        string metricSeriesKey = "retail|apple|fuji|premium|10ea")
         => new(
-            "kamis:apple",
+            $"kamis:apple:{referenceDate?.ToString("yyyyMMdd") ?? "default"}",
             CommunityInformationSourceKeys.KamisPriceObservations,
             CommunityInformationSourceTypes.PublicData,
             "KAMIS 농산물 유통정보",
             "사과 (후지 · 상품)",
-            "소매 · 과일류 · 25,000원/10개",
+            $"소매 · 과일류 · {numericValue:N0}원/10개",
             "https://www.kamis.or.kr/service/price/xml.do",
             null,
             null,
-            new DateOnly(2026, 7, 17),
+            referenceDate ?? new DateOnly(2026, 7, 17),
             new DateTime(2026, 7, 18, 1, 0, 0, DateTimeKind.Utc),
             "KR",
             "ko",
@@ -445,7 +678,41 @@ public sealed class CommunityInformationReviewPageViewModelTests
             CommunityInformationReviewStates.OfficialObservation,
             ["농수산물", "과일류"],
             "KAMIS Open API에서 수집한 관측값입니다.",
-            "전체 시장 평균이나 판매 권고가 아닙니다.");
+            "전체 시장 평균이나 판매 권고가 아닙니다.",
+            numericValue,
+            "가격",
+            metricSeriesKey);
+
+    private static CommunityInformationCandidateDto FishCooperativeCandidate(
+        DateOnly referenceMonth,
+        decimal employeeCount)
+        => new(
+            $"fish-coop:{referenceMonth:yyyyMM}:001:TOTAL",
+            CommunityInformationSourceKeys.FishCooperativeGeneralStatistics,
+            CommunityInformationSourceTypes.PublicData,
+            "금융위원회 금융통계",
+            "통영수산업협동조합 · 총임직원",
+            $"{referenceMonth:yyyy년 M월} · {employeeCount:N0}명",
+            "https://www.data.go.kr/data/15061340/openapi.do",
+            null,
+            null,
+            referenceMonth,
+            new DateTime(2026, 7, 19, 1, 0, 0, DateTimeKind.Utc),
+            "KR",
+            "ko",
+            null,
+            "명",
+            CommunityInformationReviewStates.OfficialObservation,
+            ["수산업협동조합", "수협", "총임직원"],
+            "금융위원회 금융통계 수산업협동조합 일반현황 관측값입니다.",
+            "같은 조합과 같은 임직원 구분만 시계열로 비교해야 합니다.",
+            employeeCount,
+            "총임직원",
+            "fish-coop|001|TOTAL|employee-count",
+            new DateOnly(
+                referenceMonth.Year,
+                referenceMonth.Month,
+                DateTime.DaysInMonth(referenceMonth.Year, referenceMonth.Month)));
 
     private static CommunityInformationCandidateDto VideoCandidate()
         => new(
@@ -601,9 +868,11 @@ public sealed class CommunityInformationReviewPageViewModelTests
         IReadOnlyList<CommunityInformationCandidateDto> candidates,
         IReadOnlyList<SocialMediaResearchSourceDto>? socialSources = null,
         YouTubeSocialContextResearchResponse? socialResearchResponse = null,
-        YouTubeSocialContextWorkspaceDto? socialWorkspace = null) : ICommunityInformationReviewClient
+        YouTubeSocialContextWorkspaceDto? socialWorkspace = null,
+        CommunityAuthoringAiDraftResponse? aiDraftResponse = null) : ICommunityInformationReviewClient
     {
         public CommunityInformationCollectionQuery? LastQuery { get; private set; }
+        public CommunityAuthoringAiDraftRequest? LastAiDraftRequest { get; private set; }
         public YouTubeSocialContextResearchRequest? LastResearchRequest { get; private set; }
         public YouTubeSocialContextWorkspaceDraftUpdateRequest? LastWorkspaceDraftRequest { get; private set; }
 
@@ -621,6 +890,28 @@ public sealed class CommunityInformationReviewPageViewModelTests
                 sources,
                 candidates,
                 []));
+        }
+
+        public Task<CommunityAuthoringAiDraftResponse> GenerateAiDraftAsync(
+            CommunityAuthoringAiDraftRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            LastAiDraftRequest = request;
+            return Task.FromResult(
+                aiDraftResponse
+                ?? new CommunityAuthoringAiDraftResponse(
+                    false,
+                    CommunityAuthoringAiDraftStatusCodes.LlmBlocked,
+                    "테스트에서 LLM을 호출하지 않습니다.",
+                    null,
+                    [],
+                    [],
+                    true,
+                    false,
+                    null,
+                    0m,
+                    0m,
+                    0m));
         }
 
         public Task<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSourcesAsync(

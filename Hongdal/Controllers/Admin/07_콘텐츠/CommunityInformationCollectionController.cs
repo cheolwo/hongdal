@@ -15,13 +15,16 @@ public sealed class CommunityInformationCollectionController : ControllerBase
 {
     private readonly ICommunityInformationCollectionService _service;
     private readonly IYouTubeSocialContextWorkspaceService _socialContextWorkspaceService;
+    private readonly ICommunityAuthoringAiDraftService _aiDraftService;
 
     public CommunityInformationCollectionController(
         ICommunityInformationCollectionService service,
-        IYouTubeSocialContextWorkspaceService socialContextWorkspaceService)
+        IYouTubeSocialContextWorkspaceService socialContextWorkspaceService,
+        ICommunityAuthoringAiDraftService aiDraftService)
     {
         _service = service;
         _socialContextWorkspaceService = socialContextWorkspaceService;
+        _aiDraftService = aiDraftService;
     }
 
     [HttpGet("sources")]
@@ -33,6 +36,21 @@ public sealed class CommunityInformationCollectionController : ControllerBase
         [FromQuery] CommunityInformationCollectionQuery query,
         CancellationToken cancellationToken)
         => Ok(await _service.ReadAsync(query, cancellationToken));
+
+    [HttpPost("authoring/ai-drafts")]
+    public async Task<ActionResult<CommunityAuthoringAiDraftResponse>> GenerateAiDraft(
+        [FromBody] CommunityAuthoringAiDraftRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await _aiDraftService.GenerateAsync(request, cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateProblem(400, exception.Message));
+        }
+    }
 
     [HttpGet("social-media/sources")]
     public ActionResult<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSources()
@@ -139,7 +157,12 @@ public sealed class CommunityInformationCollectionController : ControllerBase
         => new()
         {
             Status = status,
-            Title = status == 409 ? "작업공간 변경 충돌" : "작업공간을 찾을 수 없음",
+            Title = status switch
+            {
+                400 => "글쓰기 요청을 확인해 주세요",
+                409 => "작업공간 변경 충돌",
+                _ => "작업공간을 찾을 수 없음"
+            },
             Detail = detail
         };
 }

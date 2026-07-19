@@ -244,11 +244,10 @@ public sealed class CommunityAuthoringSocialResearchViewModel(
         Workspace = null;
         ApplyWorkspaceMetadata(string.Empty, 0, string.Empty);
 
-        string videoId;
+        YouTubeSocialContextResearchRequest researchRequest;
         try
         {
-            videoId = ExtractYouTubeVideoId(VideoReference);
-            ValidateSelectedSources();
+            researchRequest = CreateResearchRequest();
         }
         catch (ArgumentException exception)
         {
@@ -259,24 +258,8 @@ public sealed class CommunityAuthoringSocialResearchViewModel(
         IsLoading = true;
         try
         {
-            var selectedSources = Sources.Where(source => source.IsSelected).ToArray();
             Result = await client.ResearchYouTubeSocialContextAsync(
-                new YouTubeSocialContextResearchRequest
-                {
-                    VideoId = videoId,
-                    SourceKeys = selectedSources.Select(source => source.Source.SourceKey).ToArray(),
-                    SearchTerms = SplitValues(SearchTermsText),
-                    AdjacentTopics = SplitValues(AdjacentTopicsText),
-                    SourceTargets = selectedSources
-                        .Where(source => source.StartUrls.Count > 0)
-                        .Select(source => new SocialMediaResearchTargetDto(
-                            source.Source.SourceKey,
-                            source.StartUrls))
-                        .ToArray(),
-                    TakePerSource = TakePerSource,
-                    CountryCode = NormalizeOptional(CountryCode),
-                    LanguageCode = NormalizeOptional(LanguageCode)
-                },
+                researchRequest,
                 cancellationToken);
             ApplyWorkspaceMetadata(
                 Result.WorkspaceId,
@@ -512,6 +495,29 @@ public sealed class CommunityAuthoringSocialResearchViewModel(
             YouTubeImportOutreachReadinessCodes.ContactReviewRequired => "연락처 검토 필요",
             _ => "업체 후보 수집 중"
         };
+
+    public YouTubeSocialContextResearchRequest CreateResearchRequest()
+    {
+        var videoId = ExtractYouTubeVideoId(VideoReference);
+        ValidateSelectedSources();
+        var selectedSources = Sources.Where(source => source.IsSelected).ToArray();
+        return new YouTubeSocialContextResearchRequest
+        {
+            VideoId = videoId,
+            SourceKeys = selectedSources.Select(source => source.Source.SourceKey).ToArray(),
+            SearchTerms = SplitValues(SearchTermsText),
+            AdjacentTopics = SplitValues(AdjacentTopicsText),
+            SourceTargets = selectedSources
+                .Where(source => source.StartUrls.Count > 0)
+                .Select(source => new SocialMediaResearchTargetDto(
+                    source.Source.SourceKey,
+                    source.StartUrls))
+                .ToArray(),
+            TakePerSource = TakePerSource,
+            CountryCode = NormalizeOptional(CountryCode),
+            LanguageCode = NormalizeOptional(LanguageCode)
+        };
+    }
 
     private async Task RefreshSavedWorkspacesAsync(CancellationToken cancellationToken)
     {

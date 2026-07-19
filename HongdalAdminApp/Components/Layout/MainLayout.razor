@@ -8,7 +8,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
         <MudStack Spacing="0" Class="ml-2">
             <MudText Typo="Typo.subtitle1">살뜰 관리자</MudText>
-            <MudText Typo="Typo.caption">커뮤니티 운영·내부 자료 관리</MudText>
+            <MudText Typo="Typo.caption">글쓰기·자료 검토·발행 관리</MudText>
         </MudStack>
         <MudSpacer />
         @if (Session.IsServerAdmin)
@@ -19,11 +19,14 @@
 
     <MudDrawer @bind-Open="drawerOpen" Variant="DrawerVariant.Responsive" Elevation="1" ClipMode="DrawerClipMode.Always">
         <MudNavMenu Class="pa-3">
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">공통 홈</MudNavLink>
-            <MudNavLink Href="/page-catalog" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.WebAsset">페이지 운영</MudNavLink>
-            <MudNavLink Href="/community-management" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">커뮤니티 운영</MudNavLink>
-            <MudNavLink Href="/information-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FactCheck">자료 검토·글쓰기</MudNavLink>
-            <MudNavLink Href="/prajna" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoStories">반야 운영 허브</MudNavLink>
+            <MudNavLink Href="/information-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EditNote">글쓰기 작업대</MudNavLink>
+            <MudNavLink Href="/prajna" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoStories">외부 콘텐츠 검토</MudNavLink>
+            <MudDivider Class="my-3" />
+            <MudNavGroup Title="보조 관리" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+                <MudNavLink Href="/overview" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">관리 개요</MudNavLink>
+                <MudNavLink Href="/community-management" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">커뮤니티 운영</MudNavLink>
+                <MudNavLink Href="/page-catalog" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.WebAsset">페이지 운영</MudNavLink>
+            </MudNavGroup>
             <MudDivider Class="my-3" />
             @if (Session.IsServerAdmin)
             {

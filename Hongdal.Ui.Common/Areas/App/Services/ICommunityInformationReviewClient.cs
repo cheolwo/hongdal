@@ -11,6 +11,10 @@ public interface ICommunityInformationReviewClient
         CommunityInformationCollectionQuery query,
         CancellationToken cancellationToken = default);
 
+    Task<CommunityAuthoringAiDraftResponse> GenerateAiDraftAsync(
+        CommunityAuthoringAiDraftRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSourcesAsync(
         CancellationToken cancellationToken = default);
 

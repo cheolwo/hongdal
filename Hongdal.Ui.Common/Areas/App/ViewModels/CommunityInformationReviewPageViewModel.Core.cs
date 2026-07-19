@@ -30,8 +30,11 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
         CommunityAuthoringDiagramViewModel diagram,
         CommunityAuthoringMutualBenefitViewModel mutualBenefit,
         CommunityAuthoringEvidenceChartViewModel evidenceChart,
+        CommunityAuthoringPeriodStatisticsViewModel periodStatistics,
+        CommunityAuthoringAiDraftViewModel aiDraft,
         CommunityOperatorWritingPersonaViewModel writingPersona,
-        CommunityVowVersionViewModel vowVersion)
+        CommunityVowVersionViewModel vowVersion,
+        CommunityVowJourneyTemplateViewModel vowJourneyTemplate)
     {
         _client = client;
         Composer = 하위ViewModel등록(composer, 수명소유: true);
@@ -40,8 +43,11 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
         Diagram = 하위ViewModel등록(diagram, 수명소유: true);
         MutualBenefit = 하위ViewModel등록(mutualBenefit, 수명소유: true);
         EvidenceChart = 하위ViewModel등록(evidenceChart, 수명소유: true);
+        PeriodStatistics = 하위ViewModel등록(periodStatistics, 수명소유: true);
+        AiDraft = 하위ViewModel등록(aiDraft, 수명소유: true);
         WritingPersona = 하위ViewModel등록(writingPersona, 수명소유: true);
         VowVersion = 하위ViewModel등록(vowVersion, 수명소유: true);
+        VowJourneyTemplate = 하위ViewModel등록(vowJourneyTemplate, 수명소유: true);
         Composer.Configure("platform", "운영자 정보 공유", allowScheduledPublication: true);
     }
 
@@ -51,8 +57,11 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
     public CommunityAuthoringDiagramViewModel Diagram { get; }
     public CommunityAuthoringMutualBenefitViewModel MutualBenefit { get; }
     public CommunityAuthoringEvidenceChartViewModel EvidenceChart { get; }
+    public CommunityAuthoringPeriodStatisticsViewModel PeriodStatistics { get; }
+    public CommunityAuthoringAiDraftViewModel AiDraft { get; }
     public CommunityOperatorWritingPersonaViewModel WritingPersona { get; }
     public CommunityVowVersionViewModel VowVersion { get; }
+    public CommunityVowJourneyTemplateViewModel VowJourneyTemplate { get; }
 
     public IReadOnlyList<CommunityInformationSourceDto> Sources
     {
@@ -185,6 +194,8 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
                 },
                 cancellationToken);
             Sources = response.Sources.Count > 0 ? response.Sources : Sources;
+            PeriodStatistics.SetAvailableSources(Sources);
+            AiDraft.SetAvailableSources(Sources);
             Candidates = response.Items;
             Failures = response.Failures;
             if (SelectedCandidate is not null)
