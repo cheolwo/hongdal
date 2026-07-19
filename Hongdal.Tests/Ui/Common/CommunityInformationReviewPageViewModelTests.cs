@@ -619,6 +619,128 @@ public sealed class CommunityInformationReviewPageViewModelTests
             Assert.Single(viewModel.SocialResearch.Sources).StartUrls.Single());
     }
 
+    [Fact]
+    public async Task HandleComposerSavedAsync_AttachesSelectedGeneratedImagesInContextOrder()
+    {
+        var plan = new CommunityAuthoringImagePromptPlanResponse(
+            "지역 식재료 공동구매",
+            2,
+            [
+                new CommunityAuthoringImagePromptSegmentDto(
+                    "context-01",
+                    1,
+                    "수요 확인",
+                    "이웃이 원하는 품목과 수량을 확인합니다.",
+                    "첫 번째 문맥 이미지 프롬프트입니다.",
+                    CommunityAuthoringImageAspectRatios.Landscape,
+                    true),
+                new CommunityAuthoringImagePromptSegmentDto(
+                    "context-02",
+                    2,
+                    "공급 조건",
+                    "공급자와 가격 및 물류 조건을 비교합니다.",
+                    "두 번째 문맥 이미지 프롬프트입니다.",
+                    CommunityAuthoringImageAspectRatios.Square,
+                    true)
+            ],
+            "test-v1",
+            "테스트 계획");
+        var firstImage = CompletedImage(
+            "image-job-41",
+            plan.Segments[0].Prompt,
+            plan.Segments[0].AspectRatio);
+        var secondImage = CompletedImage(
+            "image-job-42",
+            plan.Segments[1].Prompt,
+            plan.Segments[1].AspectRatio);
+        var client = new RecordingClient(
+            [],
+            [],
+            authoringImagePromptPlan: plan,
+            authoringImageResponses: [firstImage, secondImage]);
+        using var viewModel = CreateViewModel(client);
+
+        Assert.True(await viewModel.ImageGenerator.PlanAsync(plan.ArticleTitle, "두 개 문맥 본문"));
+        Assert.True(await viewModel.ImageGenerator.GenerateSelectedAsync());
+        Assert.All(viewModel.ImageGenerator.Items, item => Assert.True(viewModel.ImageGenerator.TogglePostSelection(item)));
+
+        await viewModel.HandleComposerSavedAsync(
+            new CommunityPostComposerSaveResult(
+                true,
+                false,
+                new PlatformCommunityPostResponse { Id = 42 },
+                "게시글을 등록했습니다.")
+            {
+                SubmissionPassword = "draft-password"
+            });
+
+        Assert.Equal(2, client.AuthoringImageRequests.Count);
+        Assert.Equal(plan.Segments[0].Prompt, client.AuthoringImageRequests[0].Prompt);
+        Assert.Equal(plan.Segments[1].Prompt, client.AuthoringImageRequests[1].Prompt);
+        Assert.Collection(
+            client.ImageAttachments,
+            attachment =>
+            {
+                Assert.Equal("image-job-41", attachment.JobCode);
+                Assert.Equal(42, attachment.PostId);
+                Assert.Equal("draft-password", attachment.Password);
+            },
+            attachment => Assert.Equal("image-job-42", attachment.JobCode));
+        Assert.False(viewModel.ImageGenerator.HasSelectedImage);
+        Assert.Contains("문맥 순서대로 게시글 사진에 첨부했습니다", viewModel.StatusMessage, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ImageGenerator_PreservesEditedPlanUntilExplicitlyCleared()
+    {
+        var plan = new CommunityAuthoringImagePromptPlanResponse(
+            "새 글 제목",
+            1,
+            [
+                new CommunityAuthoringImagePromptSegmentDto(
+                    "context-01",
+                    1,
+                    "도입",
+                    "새 글 본문",
+                    "자동으로 만든 이미지 프롬프트입니다.",
+                    CommunityAuthoringImageAspectRatios.Landscape,
+                    true)
+            ],
+            "test-v1",
+            "테스트 계획");
+        var client = new RecordingClient([], [], authoringImagePromptPlan: plan);
+        var viewModel = new CommunityAuthoringImageGeneratorViewModel(client);
+
+        Assert.True(await viewModel.PlanAsync("새 글 제목", "새 글 본문"));
+        viewModel.Items[0].Prompt = "직접 다듬은 이미지 프롬프트입니다.";
+
+        viewModel.PrepareFromDraft("바뀐 글 제목", "바뀐 글 본문");
+        Assert.Equal("직접 다듬은 이미지 프롬프트입니다.", viewModel.Items[0].Prompt);
+        Assert.Equal(CommunityComposerMessageKind.Warning, viewModel.StatusKind);
+
+        viewModel.PrepareFromDraft("바뀐 글 제목", "바뀐 글 본문", overwrite: true);
+        Assert.Empty(viewModel.Items);
+    }
+
+    private static CommunityAuthoringImageTaskResponse CompletedImage(
+        string jobCode,
+        string prompt,
+        string aspectRatio)
+        => new(
+            jobCode,
+            CommunityAuthoringImageTaskStatusCodes.Completed,
+            "이미지 생성을 완료했습니다.",
+            prompt,
+            aspectRatio,
+            "gpt-image-2-text-to-image",
+            $"https://cdn.example.com/{jobCode}.png",
+            true,
+            true,
+            100,
+            new DateTime(2026, 7, 19, 1, 0, 0, DateTimeKind.Utc),
+            new DateTime(2026, 7, 19, 1, 1, 0, DateTimeKind.Utc),
+            "AI 생성 이미지");
+
     private static CommunityInformationReviewPageViewModel CreateViewModel(
         ICommunityInformationReviewClient client)
     {
@@ -638,6 +760,7 @@ public sealed class CommunityInformationReviewPageViewModelTests
             new CommunityAuthoringEvidenceChartViewModel(),
             new CommunityAuthoringPeriodStatisticsViewModel(client),
             new CommunityAuthoringAiDraftViewModel(client),
+            new CommunityAuthoringImageGeneratorViewModel(client),
             new CommunityOperatorWritingPersonaViewModel(),
             new CommunityVowVersionViewModel(),
             new CommunityVowJourneyTemplateViewModel());
@@ -869,12 +992,22 @@ public sealed class CommunityInformationReviewPageViewModelTests
         IReadOnlyList<SocialMediaResearchSourceDto>? socialSources = null,
         YouTubeSocialContextResearchResponse? socialResearchResponse = null,
         YouTubeSocialContextWorkspaceDto? socialWorkspace = null,
-        CommunityAuthoringAiDraftResponse? aiDraftResponse = null) : ICommunityInformationReviewClient
+        CommunityAuthoringAiDraftResponse? aiDraftResponse = null,
+        CommunityAuthoringImageTaskResponse? authoringImageResponse = null,
+        CommunityAuthoringImagePromptPlanResponse? authoringImagePromptPlan = null,
+        IReadOnlyList<CommunityAuthoringImageTaskResponse>? authoringImageResponses = null) : ICommunityInformationReviewClient
     {
+        private readonly Queue<CommunityAuthoringImageTaskResponse> _authoringImageResponses = new(
+            authoringImageResponses
+            ?? (authoringImageResponse is null ? [] : [authoringImageResponse]));
+
         public CommunityInformationCollectionQuery? LastQuery { get; private set; }
         public CommunityAuthoringAiDraftRequest? LastAiDraftRequest { get; private set; }
         public YouTubeSocialContextResearchRequest? LastResearchRequest { get; private set; }
         public YouTubeSocialContextWorkspaceDraftUpdateRequest? LastWorkspaceDraftRequest { get; private set; }
+        public CommunityAuthoringImagePromptPlanRequest? LastImagePromptPlanRequest { get; private set; }
+        public List<CommunityAuthoringImageGenerateRequest> AuthoringImageRequests { get; } = [];
+        public List<(string JobCode, long PostId, string Password)> ImageAttachments { get; } = [];
 
         public Task<IReadOnlyList<CommunityInformationSourceDto>> GetSourcesAsync(
             CancellationToken cancellationToken = default)
@@ -912,6 +1045,69 @@ public sealed class CommunityInformationReviewPageViewModelTests
                     0m,
                     0m,
                     0m));
+        }
+
+        public Task<CommunityAuthoringImageTaskResponse> GenerateAuthoringImageAsync(
+            CommunityAuthoringImageGenerateRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            AuthoringImageRequests.Add(request);
+            return Task.FromResult(_authoringImageResponses.Count > 0
+                ? _authoringImageResponses.Dequeue()
+                : new CommunityAuthoringImageTaskResponse(
+                "test-image-job",
+                CommunityAuthoringImageTaskStatusCodes.Queued,
+                "대기 중",
+                request.Prompt,
+                request.AspectRatio,
+                "gpt-image-2-text-to-image",
+                null,
+                false,
+                false,
+                null,
+                DateTime.UtcNow,
+                null,
+                "AI 생성 이미지"));
+        }
+
+        public Task<CommunityAuthoringImagePromptPlanResponse> PlanAuthoringImagePromptsAsync(
+            CommunityAuthoringImagePromptPlanRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            LastImagePromptPlanRequest = request;
+            return Task.FromResult(
+                authoringImagePromptPlan
+                ?? new CommunityAuthoringImagePromptPlanResponse(
+                    string.IsNullOrWhiteSpace(request.Title) ? "테스트 글" : request.Title,
+                    1,
+                    [
+                        new CommunityAuthoringImagePromptSegmentDto(
+                            "context-01",
+                            1,
+                            "도입",
+                            request.Body,
+                            $"{request.Title} {request.Body}".Trim(),
+                            request.AspectRatio,
+                            true)
+                    ],
+                    "test-v1",
+                    "테스트 문맥 계획"));
+        }
+
+        public Task<CommunityAuthoringImageTaskResponse?> GetAuthoringImageAsync(
+            string jobCode,
+            bool refreshProvider = true,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(authoringImageResponse);
+
+        public Task<PlatformCommunityPostAttachmentResponse> AttachAuthoringImageAsync(
+            string jobCode,
+            long postId,
+            string password,
+            CancellationToken cancellationToken = default)
+        {
+            ImageAttachments.Add((jobCode, postId, password));
+            return Task.FromResult(new PlatformCommunityPostAttachmentResponse());
         }
 
         public Task<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSourcesAsync(

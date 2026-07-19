@@ -151,6 +151,7 @@ public sealed partial class CommunityInformationReviewPageViewModel
         MutualBenefit.Reset();
         EvidenceChart.Reset();
         AiDraft.ResetResult();
+        ImageGenerator.Reset();
         StatusMessage = "현재 화면의 초안을 비웠습니다.";
     }
 
@@ -411,6 +412,13 @@ public sealed partial class CommunityInformationReviewPageViewModel
         StatusMessage = "달력에서 고른 기간 안의 수집 자료를 구간별 통계로 확인합니다.";
     }
 
+    public void OpenImageGeneratorTool()
+    {
+        ImageGenerator.PrepareFromDraft(Composer.Draft.Title, Composer.Draft.Body);
+        ActiveTool = CommunityAuthoringTool.ImageGenerator;
+        StatusMessage = "현재 글을 연속된 문맥으로 나눈 뒤 Kie.ai 이미지 프롬프트를 검토합니다.";
+    }
+
     public void OpenAiDraftTool()
     {
         AiDraft.PrepareFilters(
@@ -597,10 +605,25 @@ public sealed partial class CommunityInformationReviewPageViewModel
             await ScheduledPosts.RefreshAsync(cancellationToken);
         }
 
-        if (!result.Succeeded
-            || result.Post is null
-            || result.SubmittedDraft is null
-            || !SocialResearch.HasWorkspace)
+        if (!result.Succeeded || result.Post is null)
+        {
+            return;
+        }
+
+        string? imageAttachmentMessage = null;
+        if (ImageGenerator.HasSelectedImage)
+        {
+            var attached = await ImageGenerator.AttachSelectedAsync(
+                result.Post.Id,
+                result.SubmissionPassword,
+                cancellationToken);
+            imageAttachmentMessage = attached
+                ? "선택한 생성 이미지도 문맥 순서대로 게시글 사진에 첨부했습니다."
+                : "일부 생성 이미지 첨부는 재시도가 필요합니다.";
+            StatusMessage = $"{StatusMessage} {imageAttachmentMessage}";
+        }
+
+        if (result.SubmittedDraft is null || !SocialResearch.HasWorkspace)
         {
             return;
         }
@@ -611,6 +634,11 @@ public sealed partial class CommunityInformationReviewPageViewModel
         if (!draftSaved)
         {
             StatusMessage = $"커뮤니티 글 #{result.Post.Id:N0}은 등록됐지만 YouTube 작업공간 초안은 재저장해야 합니다.";
+            if (!string.IsNullOrWhiteSpace(imageAttachmentMessage))
+            {
+                StatusMessage = $"{StatusMessage} {imageAttachmentMessage}";
+            }
+
             return;
         }
 
@@ -624,6 +652,10 @@ public sealed partial class CommunityInformationReviewPageViewModel
             : result.WasScheduled
                 ? $"예약 글 #{result.Post.Id:N0}은 저장됐지만 YouTube 작업공간 연결은 재시도가 필요합니다."
                 : $"커뮤니티 글 #{result.Post.Id:N0}은 등록됐지만 YouTube 작업공간 연결은 재시도가 필요합니다.";
+        if (!string.IsNullOrWhiteSpace(imageAttachmentMessage))
+        {
+            StatusMessage = $"{StatusMessage} {imageAttachmentMessage}";
+        }
     }
 
     public static string BuildDraftBody(CommunityInformationCandidateDto candidate)

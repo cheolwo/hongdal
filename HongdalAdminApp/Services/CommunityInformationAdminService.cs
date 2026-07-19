@@ -1,10 +1,20 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Content;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace HongdalAdminApp.Services;
 
+[HongdalCodeMetadata(
+    HongdalCodeFeatureKeys.CommunityAuthoringImage,
+    HongdalCodeLayer.ClientAdapter,
+    "관리자 App의 이미지 전용 client port를 Hongdal 관리자 HTTP API에 연결",
+    ContractType = typeof(ICommunityAuthoringImageClient),
+    FlowOrder = 21,
+    Effects = HongdalCodeEffect.NetworkCall | HongdalCodeEffect.MayIncurExternalCost,
+    Boundary = "관리자 인증 토큰만 서버에 전달하고 Kie.ai 자격 증명은 다루지 않습니다.")]
 public sealed class CommunityInformationAdminService : ICommunityInformationReviewClient
 {
     private const string BasePath = "api/v1/admin/content/information";
@@ -55,6 +65,75 @@ public sealed class CommunityInformationAdminService : ICommunityInformationRevi
         return await response.Content.ReadFromJsonAsync<CommunityAuthoringAiDraftResponse>(
                    cancellationToken: cancellationToken)
                ?? throw new InvalidOperationException("LLM 글 초안 응답이 비어 있습니다.");
+    }
+
+    public async Task<CommunityAuthoringImagePromptPlanResponse> PlanAuthoringImagePromptsAsync(
+        CommunityAuthoringImagePromptPlanRequest planRequest,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(planRequest);
+        using var request = CreateRequest(HttpMethod.Post, $"{BasePath}/authoring/images/prompt-plan");
+        request.Content = JsonContent.Create(planRequest);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CommunityAuthoringImagePromptPlanResponse>(
+                   cancellationToken: cancellationToken)
+               ?? throw new InvalidOperationException("이미지 문맥 계획 응답이 비어 있습니다.");
+    }
+
+    public async Task<CommunityAuthoringImageTaskResponse> GenerateAuthoringImageAsync(
+        CommunityAuthoringImageGenerateRequest imageRequest,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(imageRequest);
+        using var request = CreateRequest(HttpMethod.Post, $"{BasePath}/authoring/images");
+        request.Content = JsonContent.Create(imageRequest);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<CommunityAuthoringImageTaskResponse>(
+                         cancellationToken: cancellationToken)
+                     ?? throw new InvalidOperationException("이미지 생성 응답이 비어 있습니다.");
+        return ResolveImageUrl(result);
+    }
+
+    public async Task<CommunityAuthoringImageTaskResponse?> GetAuthoringImageAsync(
+        string jobCode,
+        bool refreshProvider = true,
+        CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(
+            HttpMethod.Get,
+            $"{BasePath}/authoring/images/{Uri.EscapeDataString(jobCode)}?refreshProvider={refreshProvider.ToString().ToLowerInvariant()}");
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<CommunityAuthoringImageTaskResponse>(
+            cancellationToken: cancellationToken);
+        return result is null ? null : ResolveImageUrl(result);
+    }
+
+    public async Task<PlatformCommunityPostAttachmentResponse> AttachAuthoringImageAsync(
+        string jobCode,
+        long postId,
+        string password,
+        CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(
+            HttpMethod.Post,
+            $"{BasePath}/authoring/images/{Uri.EscapeDataString(jobCode)}/post-attachments/{postId}");
+        request.Content = JsonContent.Create(new CommunityAuthoringGeneratedImageAttachRequest
+        {
+            Password = password
+        });
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlatformCommunityPostAttachmentResponse>(
+                   cancellationToken: cancellationToken)
+               ?? throw new InvalidOperationException("생성 이미지 첨부 응답이 비어 있습니다.");
     }
 
     public async Task<IReadOnlyList<SocialMediaResearchSourceDto>> GetSocialMediaSourcesAsync(
@@ -170,6 +249,21 @@ public sealed class CommunityInformationAdminService : ICommunityInformationRevi
         var request = new HttpRequestMessage(method, path);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _session.AccessToken);
         return request;
+    }
+
+    private CommunityAuthoringImageTaskResponse ResolveImageUrl(CommunityAuthoringImageTaskResponse response)
+    {
+        if (string.IsNullOrWhiteSpace(response.ImageUrl)
+            || Uri.TryCreate(response.ImageUrl, UriKind.Absolute, out _)
+            || _httpClient.BaseAddress is null)
+        {
+            return response;
+        }
+
+        return response with
+        {
+            ImageUrl = new Uri(_httpClient.BaseAddress, response.ImageUrl).ToString()
+        };
     }
 
     private static void Add(ICollection<string> parameters, string key, string? value)

@@ -1,13 +1,24 @@
 using System.Security.Claims;
 using Hongdal.ApiMetadata;
+using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Content;
+using Hongdal.Contracts.Common.Metadata;
+using Hongdal.Services.Community;
 using Hongdal.Services.Content;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hongdal.Controllers.Admin.Content07;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Authoring,
+    HongdalModuleKind.Api,
+    "운영자 자료 수집·SNS 조사·AI 초안 작업공간 HTTP 경계",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "서버관리자만 사용하며 외부 자료와 AI 초안은 검토 전 자동 게시하지 않습니다.")]
 [HongdalApiVersion(HongdalProductVersion.V0_0)]
+[HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
+[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/admin/content/information")]
 [Authorize(Policy = "서버관리자전용")]

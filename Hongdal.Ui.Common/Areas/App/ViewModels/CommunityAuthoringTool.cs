@@ -9,5 +9,6 @@ public enum CommunityAuthoringTool
     EvidenceChart,
     PeriodStatistics,
     VowJourneyTemplate,
+    ImageGenerator,
     AiDraft
 }

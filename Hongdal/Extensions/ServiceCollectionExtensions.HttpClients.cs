@@ -93,7 +93,8 @@ public static partial class ServiceCollectionExtensions
         services.AddHttpClient<IKieAiImageGenerationClient, KieAiImageGenerationClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<KieAiOptions>>().Value;
-            client.BaseAddress = new Uri(options.BaseUrl);
+            client.BaseAddress = new Uri($"{options.BaseUrl.TrimEnd('/')}/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(10, options.TimeoutSeconds));
         });
         services.AddHttpClient<INaverMapsReverseGeocodingService, NaverMapsReverseGeocodingService>((sp, client) =>
         {

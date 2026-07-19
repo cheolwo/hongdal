@@ -64,6 +64,10 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 | `GET` | `/api/v1/admin/content/information/sources` | 현재 공통 후보를 제공하는 원천과 게시 정책 조회 |
 | `GET` | `/api/v1/admin/content/information/candidates` | 원천·국가·검수상태·검색어별 최근 후보 조회 |
 | `POST` | `/api/v1/admin/content/information/authoring/ai-drafts` | 허용된 자료 Adapter와 현재 글쓰기 문맥으로 검토 전용 LLM 초안 생성 |
+| `POST` | `/api/v1/admin/content/information/authoring/images/prompt-plan` | 현재 글을 연속 문맥으로 나누고 문맥별 Kie.ai 프롬프트 계획 생성. 외부 이미지 API는 호출하지 않음 |
+| `POST` | `/api/v1/admin/content/information/authoring/images` | Kie.ai GPT Image 글쓰기 이미지 작업 등록 |
+| `GET` | `/api/v1/admin/content/information/authoring/images/{jobCode}` | 이미지 생성 상태 조회와 결과 보관 상태 갱신 |
+| `POST` | `/api/v1/admin/content/information/authoring/images/{jobCode}/post-attachments/{postId}` | 운영자가 선택한 완료 이미지를 저장된 게시글 사진으로 첨부 |
 | `GET` | `/api/v1/admin/content/information/social-media/sources` | SNS Adapter별 활성화·검색·URL 조사 지원 여부 조회 |
 | `POST` | `/api/v1/admin/content/information/youtube-social-context/workspaces/research` | YouTube 영상을 루트로 SNS 자료와 글쓰기 초안을 MongoDB에 저장 |
 | `GET` | `/api/v1/admin/content/information/youtube-social-context/workspaces/by-video/{videoId}` | 영상별 최신 SNS 하위 자료와 편집 초안 복원 |
@@ -117,15 +121,17 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 - `YouTube·SNS`: 저장된 YouTube 영상을 루트로 선택한 공개 SNS 원천을 조사하고, SNS별 하위 자료·원문 링크·수집 한계·편집 초안을 Mongo 작업공간에 저장한다. 최근 작업 목록에서는 다이어그램 단계 수, 업체 후보 수와 연락 준비 상태를 함께 확인한다.
 - `다이어그램`: 공동수입 원장 여정을 기본으로 불러오고, 직접 단계를 추가·정렬하거나 단계별 업체·기관 후보와 공개 연락처 근거를 연결해 글 초안으로 전환한다.
 - `LLM 근거 초안`: 운영자가 선택한 수집 자료와 필요할 때만 다시 조회한 YouTube·SNS 자료, 현재 초안·다이어그램·상호 이익·통계 문맥을 서버 allowlist 안에서 조립해 검토용 초안을 만든다. 생성만으로 현재 글을 덮어쓰지 않으며 적용과 다이어그램 단계 가져오기는 각각 별도 명령이다. 세부 경계는 [커뮤니티 글쓰기 LLM 근거 초안](CommunityAuthoringAI.md)에 둔다.
+- `이미지`: 현재 글의 소제목과 문단을 최대 5개 연속 문맥으로 묶어 각각의 프롬프트를 먼저 검토한다. 선택한 문맥마다 명시적으로 Kie.ai GPT Image 작업을 한 건씩 등록하고, 운영자가 선택한 완료 이미지만 글 저장 성공 뒤 문맥 순서대로 기존 사진 첨부 경계에 연결한다. 세부 계약은 [커뮤니티 글쓰기 이미지 생성](CommunityAuthoringImageGeneration.md)에 둔다.
 
 1. 서버관리자가 원천, 국가, 검토 상태와 검색어로 후보를 조회한다.
 2. 후보의 제공기관, 기준일, 수집 시각, 국가·언어, 원문, 출처 설명과 해석 한계를 확인한다.
 3. `새 초안`은 출처와 기준을 포함한 제목·본문·공유 링크를 기존 커뮤니티 글쓰기 초안으로 옮기고, `본문에 추가`는 작성 중인 내용을 유지한 채 자료를 이어 붙인다.
 4. 작성 중인 초안이 있으면 자동으로 덮어쓰지 않고 기존 초안 유지 또는 교체를 운영자가 선택한다.
 5. 필요하면 허용된 자료 Adapter와 현재 글쓰기 문맥으로 LLM 검토 초안을 만들고, 출처·비용·확인 질문을 검토한 뒤 명시적으로 현재 글에 적용한다.
-6. YouTube·SNS 조사 결과와 공동수입 다이어그램을 같은 초안에 반영하고, 각 단계에 해외 공급자·통관·운송·창고 등 업체 후보를 연결한다.
-7. 글 초안, 여정 단계·연결과 업체 후보를 같은 영상별 Mongo 작업공간 revision에 저장한다.
-8. 운영자가 문맥과 의견을 직접 보완한 뒤 즉시 등록하거나 예약 발행하고, 저장된 RDB 게시글 ID를 Mongo 작업공간에 연결한다.
+6. 필요하면 현재 초안을 연속 문맥으로 나누고 문맥별 프롬프트를 수정한 뒤, 선택 문맥만 명시적으로 생성해 게시글 사진으로 고른다.
+7. YouTube·SNS 조사 결과와 공동수입 다이어그램을 같은 초안에 반영하고, 각 단계에 해외 공급자·통관·운송·창고 등 업체 후보를 연결한다.
+8. 글 초안, 여정 단계·연결과 업체 후보를 같은 영상별 Mongo 작업공간 revision에 저장한다.
+9. 운영자가 문맥과 의견을 직접 보완한 뒤 즉시 등록하거나 예약 발행하고, 선택 이미지 첨부와 저장된 RDB 게시글 ID의 Mongo 작업공간 연결을 각각 수행한다.
 
 자료를 조회하거나 초안·다이어그램을 만드는 행위만으로 게시글, 가원장, 공동행동 또는 관계자 알림을 생성하지 않는다. 현재 화면은 후보의 검토 상태도 변경하지 않는다. 검토 결정 저장과 감사 기록은 별도 Command/API가 마련된 뒤 연결한다.
 

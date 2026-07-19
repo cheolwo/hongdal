@@ -216,6 +216,15 @@
                                    class="platform-community-file-input" />
                     </label>
                 </MudTooltip>
+                @if (ImageGeneratorToolsRequested.HasDelegate)
+                {
+                    <MudTooltip Text="AI 이미지 생성">
+                        <MudIconButton Icon="@Icons.Material.Filled.AutoFixHigh"
+                                       Color="Color.Default"
+                                       OnClick="ImageGeneratorToolsRequested"
+                                       aria-label="AI 이미지 생성" />
+                    </MudTooltip>
+                }
                 <MudTooltip Text="링크 추가">
                     <MudIconButton Icon="@Icons.Material.Filled.Link"
                                    Color="Color.Default"
@@ -571,6 +580,9 @@
 
     [Parameter]
     public EventCallback MutualBenefitToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ImageGeneratorToolsRequested { get; set; }
 
     [Parameter]
     public EventCallback Closed { get; set; }

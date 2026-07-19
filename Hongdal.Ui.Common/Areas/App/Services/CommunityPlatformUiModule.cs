@@ -1,9 +1,16 @@
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ui,
+    HongdalModuleKind.ClientComposition,
+    "커뮤니티 홈·게시판·글쓰기·다이어그램 ViewModel과 browser state adapter를 조립",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.IndependentExecution,
+    Boundary = "후속 업무 proxy의 DI 등록은 운영 노출을 뜻하지 않으며 메뉴와 API는 버전 기능 플래그를 따라야 합니다.")]
 internal static class CommunityPlatformUiModule
 {
     internal static IServiceCollection AddCommunityPlatformUiModule(this IServiceCollection services)
@@ -33,6 +40,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<CommunityAuthoringEvidenceChartViewModel>();
         services.TryAddTransient<CommunityAuthoringPeriodStatisticsViewModel>();
         services.TryAddTransient<CommunityAuthoringAiDraftViewModel>();
+        services.TryAddTransient<CommunityAuthoringImageGeneratorViewModel>();
         services.TryAddTransient<CommunityOperatorWritingPersonaViewModel>();
         services.TryAddTransient<CommunityVowVersionViewModel>();
         services.TryAddTransient<CommunityVowJourneyTemplateViewModel>();

@@ -132,6 +132,7 @@
                                                    EvidenceToolsRequested="OpenEvidenceChartTool"
                                                    PeriodStatisticsToolsRequested="OpenPeriodStatisticsTool"
                                                    MutualBenefitToolsRequested="OpenMutualBenefitTool"
+                                                   ImageGeneratorToolsRequested="OpenImageGeneratorTool"
                                                    Saved="HandleComposerSaved" />
                 }
 
@@ -251,6 +252,11 @@
                                                          TemplateChanged="ChangeVowJourneyTemplate"
                                                          ApplyRequested="ApplyVowJourneyTemplate" />
                     </MudTabPanel>
+                    <MudTabPanel Text="이미지" Icon="@Icons.Material.Filled.AutoFixHigh">
+                        <CommunityAuthoringImageGeneratorTool ViewModel="@ViewModel.ImageGenerator"
+                                                               DraftTitle="@ViewModel.Composer.Draft.Title"
+                                                               DraftBody="@ViewModel.Composer.Draft.Body" />
+                    </MudTabPanel>
                     <MudTabPanel Text="LLM 초안" Icon="@Icons.Material.Filled.AutoAwesome">
                         <CommunityAuthoringAiDraftTool ViewModel="@ViewModel.AiDraft"
                                                        GenerateRequested="GenerateAiDraftAsync"
@@ -288,6 +294,12 @@
             if (nextTool == CommunityAuthoringTool.AiDraft)
             {
                 ViewModel.OpenAiDraftTool();
+                return;
+            }
+
+            if (nextTool == CommunityAuthoringTool.ImageGenerator)
+            {
+                ViewModel.OpenImageGeneratorTool();
                 return;
             }
 
@@ -341,6 +353,9 @@
 
     private void OpenPeriodStatisticsTool()
         => ViewModel.OpenPeriodStatisticsTool();
+
+    private void OpenImageGeneratorTool()
+        => ViewModel.OpenImageGeneratorTool();
 
     private async Task ApplySocialResearchToDraftAsync()
         => await ViewModel.ApplySocialResearchToDraftAsync(Session.UserName);

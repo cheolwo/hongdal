@@ -132,6 +132,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityAuthoringAiEvidenceTool, CommunityInformationAuthoringAiEvidenceTool>();
         services.AddScoped<ICommunityAuthoringAiEvidenceTool, YouTubeSocialContextAuthoringAiEvidenceTool>();
         services.AddScoped<ICommunityAuthoringAiDraftService, CommunityAuthoringAiDraftService>();
+        services.AddSingleton<ICommunityAuthoringImagePromptPlanner, CommunityAuthoringImagePromptPlanner>();
+        services.AddScoped<ICommunityAuthoringImageService, CommunityAuthoringImageService>();
         services.AddScoped<IYouTube음식상품발견저장소, EfYouTube음식상품발견저장소>();
         services.AddScoped<IYouTube음식상품발견Service, YouTube음식상품발견Service>();
         services.AddScoped<IYouTube영상재료인지Engine, YouTube영상재료인지Engine>();
@@ -202,6 +204,7 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I이미지프롬프트생성기, 음식상품썸네일프롬프트생성기>();
         services.AddSingleton<I이미지프롬프트생성기, 주문후기사진프롬프트생성기>();
         services.AddSingleton<I이미지프롬프트생성기, 상품상세페이지이미지프롬프트생성기>();
+        services.AddSingleton<I이미지프롬프트생성기, 커뮤니티글쓰기이미지프롬프트생성기>();
         services.AddScoped<I샘플이미지대상Resolver, 판매상품샘플이미지대상Resolver>();
         services.AddScoped<I샘플이미지대상Resolver, 상품상세이미지생성작업대상Resolver>();
         services.AddScoped<I샘플이미지생성Service, 샘플이미지생성Service>();

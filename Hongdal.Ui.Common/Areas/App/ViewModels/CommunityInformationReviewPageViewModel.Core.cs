@@ -1,9 +1,16 @@
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Content;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Authoring,
+    HongdalModuleKind.ClientFeature,
+    "운영자가 공개 자료를 검토하고 글·다이어그램·근거·이미지·예약 발행 도구를 조립해 사용하는 페이지 상태",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "수집 자료와 AI 산출물은 사람이 출처·권리·사실성을 검토한 뒤 게시하며 원장이나 거래를 자동 확정하지 않습니다.")]
 public sealed partial class CommunityInformationReviewPageViewModel : 조립ViewModelBase
 {
     private readonly ICommunityInformationReviewClient _client;
@@ -32,6 +39,7 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
         CommunityAuthoringEvidenceChartViewModel evidenceChart,
         CommunityAuthoringPeriodStatisticsViewModel periodStatistics,
         CommunityAuthoringAiDraftViewModel aiDraft,
+        CommunityAuthoringImageGeneratorViewModel imageGenerator,
         CommunityOperatorWritingPersonaViewModel writingPersona,
         CommunityVowVersionViewModel vowVersion,
         CommunityVowJourneyTemplateViewModel vowJourneyTemplate)
@@ -45,6 +53,7 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
         EvidenceChart = 하위ViewModel등록(evidenceChart, 수명소유: true);
         PeriodStatistics = 하위ViewModel등록(periodStatistics, 수명소유: true);
         AiDraft = 하위ViewModel등록(aiDraft, 수명소유: true);
+        ImageGenerator = 하위ViewModel등록(imageGenerator, 수명소유: true);
         WritingPersona = 하위ViewModel등록(writingPersona, 수명소유: true);
         VowVersion = 하위ViewModel등록(vowVersion, 수명소유: true);
         VowJourneyTemplate = 하위ViewModel등록(vowJourneyTemplate, 수명소유: true);
@@ -59,6 +68,7 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
     public CommunityAuthoringEvidenceChartViewModel EvidenceChart { get; }
     public CommunityAuthoringPeriodStatisticsViewModel PeriodStatistics { get; }
     public CommunityAuthoringAiDraftViewModel AiDraft { get; }
+    public CommunityAuthoringImageGeneratorViewModel ImageGenerator { get; }
     public CommunityOperatorWritingPersonaViewModel WritingPersona { get; }
     public CommunityVowVersionViewModel VowVersion { get; }
     public CommunityVowJourneyTemplateViewModel VowJourneyTemplate { get; }

@@ -1,6 +1,7 @@
 using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -13,10 +14,17 @@ public sealed record CommunityPostComposerSaveResult(
     string Message)
 {
     public CommunityPostComposerSnapshot? SubmittedDraft { get; init; }
+    public string? SubmissionPassword { get; init; }
     public bool WasScheduled { get; init; }
     public DateTime? ScheduledPublishAtUtc { get; init; }
 }
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ui,
+    HongdalModuleKind.ClientFeature,
+    "커뮤니티 게시글 등록·수정·예약·첨부와 browser 초안 상태를 조율",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "글쓰기는 참여 의사를 공개하는 시작점이며 계약·배차·정산을 자동 확정하지 않습니다.")]
 public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
 {
     private const long MaxUploadFileBytes = 5 * 1024 * 1024;
@@ -308,6 +316,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
         var scheduledPublishAtUtc = !wasEditing && IsScheduledPublication
             ? ScheduledPublishAtUtc
             : null;
+        var submissionPassword = Draft.Password.Trim();
         var submittedDraft = Draft.CreateSnapshot(DateTime.UtcNow);
         try
         {
@@ -357,6 +366,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
             return new(true, wasEditing, saved, message)
             {
                 SubmittedDraft = submittedDraft,
+                SubmissionPassword = submissionPassword,
                 WasScheduled = scheduledPublishAtUtc.HasValue,
                 ScheduledPublishAtUtc = scheduledPublishAtUtc
             };

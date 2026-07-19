@@ -23,7 +23,11 @@ public static class MauiProgram
         builder.Services.AddScoped<AdminAuthService>();
         builder.Services.AddScoped<CommunityManagementAdminService>();
         builder.Services.AddScoped<HongikHakdangAdminService>();
-        builder.Services.AddScoped<ICommunityInformationReviewClient, CommunityInformationAdminService>();
+        builder.Services.AddScoped<CommunityInformationAdminService>();
+        builder.Services.AddScoped<ICommunityInformationReviewClient>(services =>
+            services.GetRequiredService<CommunityInformationAdminService>());
+        builder.Services.AddScoped<ICommunityAuthoringImageClient>(services =>
+            services.GetRequiredService<CommunityInformationAdminService>());
         builder.Services.AddTransient<CommunityAuthoringSocialResearchViewModel>();
         builder.Services.AddTransient<CommunityInformationReviewPageViewModel>();
         builder.Services.AddSingleton<IAdminPageCatalogClient, AdminPageCatalogSampleService>();

@@ -1,8 +1,9 @@
+using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Content;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
-public interface ICommunityInformationReviewClient
+public interface ICommunityInformationReviewClient : ICommunityAuthoringImageClient
 {
     Task<IReadOnlyList<CommunityInformationSourceDto>> GetSourcesAsync(
         CancellationToken cancellationToken = default);
