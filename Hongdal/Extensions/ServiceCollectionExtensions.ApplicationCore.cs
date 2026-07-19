@@ -89,7 +89,16 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IISMSP전송보호UseCase, ISMSP전송보호UseCase>();
         services.AddScoped<I커뮤니티게시판UseCase, 커뮤니티게시판UseCase>();
         services.AddScoped<ICommunityBoardWritePolicy, CommunityBoardWritePolicy>();
-        services.AddScoped<I커뮤니티게시글UseCase, 커뮤니티게시글UseCase>();
+        services.AddScoped<커뮤니티게시글생성Service>();
+        services.AddScoped<커뮤니티게시글UseCase>();
+        services.AddScoped<I커뮤니티게시글UseCase>(provider =>
+            provider.GetRequiredService<커뮤니티게시글UseCase>());
+        services.AddScoped<I커뮤니티게시글조회UseCase, 커뮤니티게시글조회UseCase>();
+        services.AddScoped<I커뮤니티게시글발행UseCase, 커뮤니티게시글발행UseCase>();
+        services.AddScoped<I커뮤니티게시글예약발행UseCase, 커뮤니티게시글예약발행UseCase>();
+        services.AddScoped<I커뮤니티게시글첨부UseCase, 커뮤니티게시글첨부UseCase>();
+        services.AddScoped<I커뮤니티게시글참여UseCase, 커뮤니티게시글참여UseCase>();
+        services.AddScoped<I커뮤니티게시글운영UseCase, 커뮤니티게시글운영UseCase>();
         services.AddScoped<I커뮤니티투표UseCase, 커뮤니티투표UseCase>();
         services.AddScoped<I커뮤니티활동신호UseCase, 커뮤니티활동신호UseCase>();
         services.AddScoped<I노드스티커상점UseCase, 노드스티커상점UseCase>();

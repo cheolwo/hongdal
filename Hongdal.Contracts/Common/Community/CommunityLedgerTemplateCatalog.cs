@@ -345,7 +345,7 @@ public static class CommunityLedgerTemplateCatalog
             ],
             ProcessingSurfaces =
             [
-                ApiEndpoint("POST", "커뮤니티게시글Controller", "Create", "거래 대화와 원장 기록을 커뮤니티에 남깁니다.", "I커뮤니티게시글UseCase"),
+                ApiEndpoint("POST", "커뮤니티게시글Controller", "Create", "거래 대화와 원장 기록을 커뮤니티에 남깁니다.", "I커뮤니티게시글발행UseCase"),
                 ApiEndpoint("GET", "상품여정Controller", "스캔코드기반상품여정조회", "상품 또는 물건 여정 정보를 조회합니다.", "상품여정Controller")
             ],
             PersistencePolicy = MongoPolicy(
@@ -530,8 +530,8 @@ public static class CommunityLedgerTemplateCatalog
             ],
             ProcessingSurfaces =
             [
-                ApiEndpoint("GET", "CommunityPostOpportunitiesController", "Get", "게시글 문맥에 맞는 선택적 정보 협업 제안을 표시 언어에 맞춰 조회합니다.", "ICommunityPostOpportunityService.GetAsync"),
-                ApiEndpoint("POST", "CommunityPostOpportunitiesController", "StartMeatImportReadiness", "작성자가 명시적으로 동의한 경우에만 육류 수입 준비도 원장을 만들고 게시글에 연결합니다.", "ICommunityPostOpportunityService.StartMeatImportReadinessAsync"),
+                ApiEndpoint("GET", "CommunityPostOpportunitiesController", "Get", "게시글 문맥에 맞는 선택적 정보 협업 제안을 표시 언어에 맞춰 조회합니다.", "ICommunityPostOpportunityQueryUseCase.GetAsync"),
+                ApiEndpoint("POST", "CommunityPostOpportunitiesController", "StartMeatImportReadiness", "작성자가 명시적으로 동의한 경우에만 육류 수입 준비도 원장을 만들고 게시글에 연결합니다.", "ICommunityPostMeatImportReadinessUseCase.StartAsync"),
                 ApiEndpoint("GET", "MeatImportReadinessController", "GetDiagram", "정부기관 확인 경계가 표시된 육류 수입 준비 절차도를 조회합니다.", "IMeatImportReadinessService.GetDiagram")
             ],
             PersistencePolicy = MongoPolicy(),
@@ -568,7 +568,7 @@ public static class CommunityLedgerTemplateCatalog
             ],
             ProcessingSurfaces =
             [
-                ApiEndpoint("POST", "커뮤니티게시글Controller", "Create", "비정형 요청과 진행 기록을 커뮤니티 원장으로 남깁니다.", "I커뮤니티게시글UseCase")
+                ApiEndpoint("POST", "커뮤니티게시글Controller", "Create", "비정형 요청과 진행 기록을 커뮤니티 원장으로 남깁니다.", "I커뮤니티게시글발행UseCase")
             ],
             PersistencePolicy = MongoPolicy(
                 Projection("커뮤니티 게시글", "PlatformCommunityPost", "CommunityLedgerId", "비정형 원장의 공개 대화와 진행 요약만 RDB 커뮤니티 글로 투영합니다."),

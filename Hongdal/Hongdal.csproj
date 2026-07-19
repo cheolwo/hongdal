@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hongdal.Community\Hongdal.Community.csproj" />
     <ProjectReference Include="..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
     <ProjectReference Include="..\Hongdal.Domain\Hongdal.Domain.csproj" />
     <ProjectReference Include="..\Hongdal.Infrastructure\Hongdal.Infrastructure.csproj" />

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Hongdal.ApiMetadata;
+using Hongdal.Community;
 using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Controllers.Admin.Content07;
 using Hongdal.Controllers.Common;
@@ -21,13 +22,38 @@ public sealed class HongdalCommunityV0ModuleMetadataTests
         Assert.Equal(HongdalCommunityV0ModuleKeys.All.Count, moduleKeys.Count);
         Assert.All(HongdalCommunityV0ModuleKeys.All, moduleKey => Assert.Contains(moduleKey, moduleKeys));
         Assert.Contains(modules, module => module.ComponentName.EndsWith("CommunityPlatformUiModule", StringComparison.Ordinal));
+        Assert.Contains(modules, module => module.ComponentName.EndsWith("CommunityWritingUiModule", StringComparison.Ordinal));
         Assert.Contains(modules, module => module.Component == typeof(PlatformCommunityHomePageViewModel));
         Assert.Contains(modules, module => module.Component == typeof(CommunityPostComposerViewModel));
         Assert.Contains(modules, module => module.Component == typeof(커뮤니티게시글UseCase));
         Assert.Contains(modules, module => module.Component == typeof(커뮤니티투표UseCase));
         Assert.Contains(modules, module => module.Component == typeof(Mongo커뮤니티원장저장소));
+        Assert.Contains(modules, module => module.Component == typeof(Mongo커뮤니티원장투영작업저장소));
         Assert.Contains(modules, module => module.Component == typeof(CommunityBoardWritePolicy));
         Assert.Contains(modules, module => module.Component == typeof(CommunityInformationCollectionController));
+        Assert.Contains(modules, module => module.Component == typeof(CommunityContentApplicationModule));
+        Assert.Contains(modules, module => module.Component == typeof(CommunityParticipationApplicationModule));
+        Assert.Contains(modules, module => module.Component == typeof(CommunityLedgerApplicationModule));
+    }
+
+    [Fact]
+    public void CommunityApplicationModule_DependsOnlyOnSharedContracts()
+    {
+        var moduleAssembly = typeof(CommunityContentApplicationModule).Assembly;
+        var references = moduleAssembly
+            .GetReferencedAssemblies()
+            .Select(reference => reference.Name)
+            .Where(name => name is not null)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Assert.Contains("Hongdal.Contracts", references);
+        Assert.DoesNotContain("Hongdal", references);
+        Assert.DoesNotContain("Hongdal.Ui.Common", references);
+        Assert.DoesNotContain("Microsoft.EntityFrameworkCore", references);
+        Assert.DoesNotContain("MongoDB.Driver", references);
+        Assert.Equal(moduleAssembly, typeof(CommunityDriverAvailabilityService).Assembly);
+        Assert.Equal(moduleAssembly, typeof(커뮤니티원장Dto).Assembly);
+        Assert.Equal(moduleAssembly, typeof(주문원장구성정책).Assembly);
     }
 
     [Fact]
@@ -70,5 +96,6 @@ public sealed class HongdalCommunityV0ModuleMetadataTests
         => HongdalModuleMetadataReader.ReadVersion(
             HongdalProductVersionCodes.V0_0,
             typeof(PlatformCommunityHomePageViewModel).Assembly,
-            typeof(커뮤니티게시글UseCase).Assembly);
+            typeof(커뮤니티게시글UseCase).Assembly,
+            typeof(CommunityContentApplicationModule).Assembly);
 }

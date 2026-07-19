@@ -14,15 +14,18 @@ namespace Hongdal.Services.Community;
 public sealed class 이벤트발행커뮤니티원장저장소 : I커뮤니티원장저장소
 {
     private readonly Mongo커뮤니티원장저장소 _inner;
+    private readonly I커뮤니티원장투영작업저장소 _projectionWorkStore;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<이벤트발행커뮤니티원장저장소> _logger;
 
     public 이벤트발행커뮤니티원장저장소(
         Mongo커뮤니티원장저장소 inner,
+        I커뮤니티원장투영작업저장소 projectionWorkStore,
         IServiceScopeFactory scopeFactory,
         ILogger<이벤트발행커뮤니티원장저장소> logger)
     {
         _inner = inner;
+        _projectionWorkStore = projectionWorkStore;
         _scopeFactory = scopeFactory;
         _logger = logger;
     }
@@ -93,7 +96,11 @@ public sealed class 이벤트발행커뮤니티원장저장소 : I커뮤니티�
                     원장.수정시각Utc == default ? DateTime.UtcNow : 원장.수정시각Utc,
                     eventId),
                 cancellationToken);
-            await _inner.완료Async(원장.원장Id, 원장.Revision, processingToken: null, cancellationToken);
+            await _projectionWorkStore.완료Async(
+                원장.원장Id,
+                원장.Revision,
+                processingToken: null,
+                cancellationToken);
         }
         catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {

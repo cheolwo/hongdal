@@ -39,16 +39,16 @@ public sealed class CommunityAuthoringImagesController : ControllerBase
 {
     private readonly ICommunityAuthoringImagePromptPlanner _promptPlanner;
     private readonly ICommunityAuthoringImageService _imageService;
-    private readonly I커뮤니티게시글UseCase _communityPostUseCase;
+    private readonly I커뮤니티게시글첨부UseCase _communityPostAttachmentUseCase;
 
     public CommunityAuthoringImagesController(
         ICommunityAuthoringImagePromptPlanner promptPlanner,
         ICommunityAuthoringImageService imageService,
-        I커뮤니티게시글UseCase communityPostUseCase)
+        I커뮤니티게시글첨부UseCase communityPostAttachmentUseCase)
     {
         _promptPlanner = promptPlanner;
         _imageService = imageService;
-        _communityPostUseCase = communityPostUseCase;
+        _communityPostAttachmentUseCase = communityPostAttachmentUseCase;
     }
 
     [HttpPost("prompt-plan")]
@@ -108,7 +108,7 @@ public sealed class CommunityAuthoringImagesController : ControllerBase
         {
             var file = await _imageService.OpenCompletedImageAsync(jobCode, cancellationToken);
             await using var stream = new MemoryStream(file.Content, writable: false);
-            var result = await _communityPostUseCase.첨부업로드Async(
+            var result = await _communityPostAttachmentUseCase.첨부업로드Async(
                 postId,
                 new 커뮤니티게시글첨부업로드Command(
                     request.Password,

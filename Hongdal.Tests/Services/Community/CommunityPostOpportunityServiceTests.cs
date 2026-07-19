@@ -1,9 +1,11 @@
 using Hongdal.Contracts.Common.AgriculturalFisheries;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Controllers.Common;
+using Hongdal.Extensions;
 using Hongdal.Services.AgriculturalFisheries.ImportReadiness;
 using Hongdal.Services.Community;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hongdal.Tests.Services.Community;
 
@@ -656,6 +658,44 @@ public sealed class CommunityPostOpportunityServiceTests
             .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).SingleOrDefault());
     }
 
+    [Fact]
+    public void 컨트롤러는_기능별_좁은_UseCase에_의존한다()
+    {
+        var parameterTypes = typeof(CommunityPostOpportunitiesController)
+            .GetConstructors()
+            .Single()
+            .GetParameters()
+            .Select(parameter => parameter.ParameterType)
+            .ToArray();
+
+        Assert.DoesNotContain(typeof(ICommunityPostOpportunityService), parameterTypes);
+        Assert.Contains(typeof(ICommunityPostOpportunityQueryUseCase), parameterTypes);
+        Assert.Contains(typeof(ICommunityPostParticipationUseCase), parameterTypes);
+        Assert.Contains(typeof(ICommunityPostProfessionalParticipationService), parameterTypes);
+        Assert.Contains(typeof(ICommunityPostMeatImportReadinessUseCase), parameterTypes);
+    }
+
+    [Fact]
+    public void 기능별_UseCase가_DI에_등록된다()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHongdalDomainServices();
+
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostOpportunityQueryUseCase)
+            && descriptor.ImplementationType == typeof(CommunityPostOpportunityQueryUseCase));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostParticipationUseCase)
+            && descriptor.ImplementationType == typeof(CommunityPostParticipationUseCase));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostMeatImportReadinessUseCase)
+            && descriptor.ImplementationType == typeof(CommunityPostMeatImportReadinessUseCase));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostOpportunityService)
+            && descriptor.ImplementationType == typeof(CommunityPostOpportunityService));
+    }
+
     private static CommunityPostOpportunityService CreateService(
         InMemoryPostStore postStore,
         InMemoryLedgerStore? ledgerStore = null,
@@ -663,13 +703,35 @@ public sealed class CommunityPostOpportunityServiceTests
         ICommunityProfessionalEligibilityService? professionalEligibilityService = null)
     {
         var effectiveLedgerStore = ledgerStore ?? new InMemoryLedgerStore();
-        return new CommunityPostOpportunityService(
+        var effectiveVoteService = voteService ?? new InMemoryCommunityVoteService();
+        var effectiveEligibilityService = professionalEligibilityService
+                                          ?? new InMemoryProfessionalEligibilityService();
+        var analyzer = new CommunityPostOpportunityAnalyzer();
+        var queryUseCase = new CommunityPostOpportunityQueryUseCase(
             postStore,
-            new CommunityPostOpportunityAnalyzer(),
-            new MeatImportReadinessService(effectiveLedgerStore),
-            voteService,
+            analyzer,
+            effectiveVoteService,
             effectiveLedgerStore,
-            professionalEligibilityService);
+            new ProjectionOnlyCommunityActionJourneyService(),
+            new EmptyCommunityDynamicDiscoveryService());
+        var readinessUseCase = new CommunityPostMeatImportReadinessUseCase(
+            postStore,
+            analyzer,
+            new MeatImportReadinessService(effectiveLedgerStore));
+        var professionalParticipationService = new CommunityPostProfessionalParticipationService(
+            postStore,
+            effectiveLedgerStore,
+            effectiveEligibilityService);
+        var participationUseCase = new CommunityPostParticipationUseCase(
+            postStore,
+            effectiveVoteService,
+            effectiveLedgerStore,
+            effectiveEligibilityService);
+        return new CommunityPostOpportunityService(
+            queryUseCase,
+            participationUseCase,
+            professionalParticipationService,
+            readinessUseCase);
     }
 
     private static CommunityPostOpportunitySource CreateImportPost(string authorUserId = "author-1")
@@ -864,5 +926,42 @@ public sealed class CommunityPostOpportunityServiceTests
             string userId,
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<string>>(roleCodes);
+    }
+
+    private sealed class ProjectionOnlyCommunityActionJourneyService : ICommunityActionJourneyService
+    {
+        public Task<CommunityActionJourneyResponse> BuildAsync(
+            CommunityPostOpportunitySource source,
+            CommunityPostParticipationEntryResponse participation,
+            CommunityVoteResponse? interestVote,
+            커뮤니티원장Dto? rootLedger,
+            string displayLanguageCode,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(CommunityActionJourneyProjection.Build(
+                source,
+                participation,
+                interestVote,
+                rootLedger,
+                [],
+                null,
+                displayLanguageCode));
+    }
+
+    private sealed class EmptyCommunityDynamicDiscoveryService : ICommunityDynamicDiscoveryService
+    {
+        public CommunityDynamicTopicCatalogResponse GetCatalog() => new();
+
+        public Task<CommunityPostContextDiscoveryResponse> DiscoverAsync(
+            CommunityPostOpportunitySource source,
+            CommunityPostContextDiscoveryRequest? request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new CommunityPostContextDiscoveryResponse { PostId = source.PostId });
+
+        public Task<CommunityDynamicTopicFeedResponse?> GetFeedAsync(
+            string topicKey,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<CommunityDynamicTopicFeedResponse?>(null);
     }
 }

@@ -12,9 +12,9 @@ namespace Hongdal.Controllers.Admin.Content07;
 [Authorize(Policy = "서버관리자전용")]
 public sealed class CommunityPostScheduleController : ControllerBase
 {
-    private readonly I커뮤니티게시글UseCase _useCase;
+    private readonly I커뮤니티게시글예약발행UseCase _useCase;
 
-    public CommunityPostScheduleController(I커뮤니티게시글UseCase useCase)
+    public CommunityPostScheduleController(I커뮤니티게시글예약발행UseCase useCase)
     {
         _useCase = useCase;
     }

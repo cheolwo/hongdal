@@ -15,11 +15,21 @@ namespace Hongdal.Controllers.Common;
 [Route("api/v1/community/posts/{postId:long}/opportunities")]
 public sealed class CommunityPostOpportunitiesController : ControllerBase
 {
-    private readonly ICommunityPostOpportunityService _service;
+    private readonly ICommunityPostOpportunityQueryUseCase _queryUseCase;
+    private readonly ICommunityPostParticipationUseCase _participationUseCase;
+    private readonly ICommunityPostProfessionalParticipationService _professionalParticipationService;
+    private readonly ICommunityPostMeatImportReadinessUseCase _meatImportReadinessUseCase;
 
-    public CommunityPostOpportunitiesController(ICommunityPostOpportunityService service)
+    public CommunityPostOpportunitiesController(
+        ICommunityPostOpportunityQueryUseCase queryUseCase,
+        ICommunityPostParticipationUseCase participationUseCase,
+        ICommunityPostProfessionalParticipationService professionalParticipationService,
+        ICommunityPostMeatImportReadinessUseCase meatImportReadinessUseCase)
     {
-        _service = service;
+        _queryUseCase = queryUseCase;
+        _participationUseCase = participationUseCase;
+        _professionalParticipationService = professionalParticipationService;
+        _meatImportReadinessUseCase = meatImportReadinessUseCase;
     }
 
     [HttpGet]
@@ -29,7 +39,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
         [FromQuery] string? displayLanguage,
         CancellationToken cancellationToken)
     {
-        var result = await _service.GetAsync(postId, displayLanguage, cancellationToken);
+        var result = await _queryUseCase.GetAsync(postId, displayLanguage, cancellationToken);
         return result is null
             ? NotFoundProblem("커뮤니티 게시글을 찾을 수 없습니다.")
             : Ok(result);
@@ -44,7 +54,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
     {
         try
         {
-            var result = await _service.GetContextDiscoveryAsync(postId, request, cancellationToken);
+            var result = await _queryUseCase.GetContextDiscoveryAsync(postId, request, cancellationToken);
             return result is null
                 ? NotFoundProblem("커뮤니티 게시글을 찾을 수 없습니다.")
                 : Ok(result);
@@ -67,7 +77,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
     {
         try
         {
-            var result = await _service.StartMeatImportReadinessAsync(
+            var result = await _meatImportReadinessUseCase.StartAsync(
                 postId,
                 request,
                 CurrentUserId(),
@@ -118,7 +128,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
     {
         try
         {
-            var result = await _service.StartParticipationAsync(
+            var result = await _participationUseCase.StartParticipationAsync(
                 postId,
                 request,
                 CurrentUserId(),
@@ -155,7 +165,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
     {
         try
         {
-            var result = await _service.PromoteParticipationAsync(
+            var result = await _participationUseCase.PromoteParticipationAsync(
                 postId,
                 request,
                 CurrentUserId(),
@@ -199,7 +209,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
     {
         try
         {
-            var result = await _service.JoinProfessionalAsync(
+            var result = await _professionalParticipationService.JoinAsync(
                 postId,
                 request,
                 CurrentUserId(),
@@ -243,7 +253,7 @@ public sealed class CommunityPostOpportunitiesController : ControllerBase
     {
         try
         {
-            var result = await _service.JoinPartyRoleAsync(
+            var result = await _professionalParticipationService.JoinPartyRoleAsync(
                 postId,
                 request,
                 CurrentUserId(),

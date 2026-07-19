@@ -17,6 +17,9 @@
       <Deploy Solution="Debug|*" />
     </Project>
   </Folder>
+  <Folder Name="/Server Modules/">
+    <Project Path="Hongdal.Community/Hongdal.Community.csproj" />
+  </Folder>
   <Folder Name="/Server/">
     <Project Path="Hongdal/Hongdal.csproj" />
   </Folder>
