@@ -1,0 +1,59 @@
+@using Ssalddel.Ui.Common.Areas.App.Models
+@using Ssalddel.Ui.Common.Areas.App.Services
+
+<MudStack Spacing="1">
+    <MudTextField T="string"
+                  Label="@Label"
+                  Value="@_displayValue"
+                  ValueChanged="OnInputChangedAsync"
+                  Immediate="true"
+                  Variant="Variant.Outlined"
+                  Placeholder="000-00-00000"
+                  HelperText="@HelperText"
+                  Error="@(_showValidation && !IsValid)"
+                  ErrorText="사업자등록번호 형식 또는 체크섬이 유효하지 않습니다." />
+</MudStack>
+
+@code {
+    [Parameter]
+    public 사업자등록번호입력값Dto Value { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<사업자등록번호입력값Dto> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "사업자등록번호";
+
+    [Parameter]
+    public bool ShowValidationMessage { get; set; } = true;
+
+    private string _displayValue = string.Empty;
+
+    private bool _showValidation;
+
+    private bool IsValid => Value.형식유효 && Value.체크섬유효;
+
+    private string? HelperText => ShowValidationMessage
+        ? (IsValid ? "유효한 사업자등록번호 형식입니다." : "숫자 10자리 사업자등록번호를 입력하세요.")
+        : null;
+
+    protected override void OnParametersSet()
+    {
+        _displayValue = string.IsNullOrWhiteSpace(Value.표시값)
+            ? 사업자등록번호검증기.표시형식(Value.원본값)
+            : Value.표시값;
+    }
+
+    private async Task OnInputChangedAsync(string? input)
+    {
+        _showValidation = true;
+        Value.원본값 = input ?? string.Empty;
+        Value.숫자값 = 사업자등록번호검증기.숫자만추출(input);
+        Value.표시값 = 사업자등록번호검증기.표시형식(Value.숫자값);
+        Value.형식유효 = 사업자등록번호검증기.형식유효(Value.숫자값);
+        Value.체크섬유효 = 사업자등록번호검증기.체크섬유효(Value.숫자값);
+
+        _displayValue = Value.표시값;
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

@@ -3,7 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Util;
-using Hongdal.Contracts.Driver.Work;
+using Ssalddel.Contracts.Driver.Work;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Devices.Sensors;
 
@@ -12,13 +12,13 @@ using Microsoft.Maui.Devices.Sensors;
 namespace DriverApp.Services;
 
 [Service(
-    Name = "kr.hongdal.driver.DriverLocationForegroundService",
+    Name = "kr.ssalddel.driver.DriverLocationForegroundService",
     Exported = false,
     ForegroundServiceType = ForegroundService.TypeLocation)]
 public sealed class DriverLocationForegroundService : Service
 {
-    public const string ActionStart = "kr.hongdal.driver.action.START_LOCATION_STREAM";
-    public const string ActionStop = "kr.hongdal.driver.action.STOP_LOCATION_STREAM";
+    public const string ActionStart = "kr.ssalddel.driver.action.START_LOCATION_STREAM";
+    public const string ActionStop = "kr.ssalddel.driver.action.STOP_LOCATION_STREAM";
     public const string ExtraIntervalSeconds = "intervalSeconds";
     public const string ExtraPickupApproachRadiusKm = "pickupApproachRadiusKm";
     public const string ExtraDrivingStatus = "drivingStatus";

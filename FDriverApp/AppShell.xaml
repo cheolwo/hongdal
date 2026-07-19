@@ -11,7 +11,7 @@
     <ShellContent
         Title="홈"
         Icon="{StaticResource IconDashboard}"
-        ContentTemplate="{DataTemplate pages:HongdalHomePage}"
+        ContentTemplate="{DataTemplate pages:SsalddelHomePage}"
         Route="home" />
 
     <Shell.FlyoutFooter>

@@ -8,7 +8,7 @@
 
 따라서 보안 관련 구현은 현재 수준을 기준선으로 두고, 인증 또는 외부 검증이 필요한 시점에 ISMS-P 운영 관리 계획과 증적 문서를 별도 프로젝트 작업으로 보강합니다.
 
-이 문서는 Hongdal의 개인정보 및 계약 데이터 처리 기능을 ISMS-P 관점에서 점검하기 위한 내부 준비도 문서입니다. 실제 ISMS-P 인증 적합 판정은 인증기관/심사기관의 심사, 운영 증적, 보완 조치 결과를 통해 확인되어야 하므로 이 문서는 인증 취득을 보장하지 않습니다.
+이 문서는 Ssalddel의 개인정보 및 계약 데이터 처리 기능을 ISMS-P 관점에서 점검하기 위한 내부 준비도 문서입니다. 실제 ISMS-P 인증 적합 판정은 인증기관/심사기관의 심사, 운영 증적, 보완 조치 결과를 통해 확인되어야 하므로 이 문서는 인증 취득을 보장하지 않습니다.
 
 ## 공식 기준 요약
 
@@ -40,7 +40,7 @@
 
 ## 추가된 공통 코드
 
-`Hongdal.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`는 개인정보 또는 계약 데이터를 다루는 기능을 다음 기준으로 점검합니다.
+`Ssalddel.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`는 개인정보 또는 계약 데이터를 다루는 기능을 다음 기준으로 점검합니다.
 
 | 영역 | 점검 항목 |
 | --- | --- |
@@ -48,7 +48,7 @@
 | 보호대책 | 역할 기반 접근권한, 마스킹/암호화, 감사 로그, 외부자/위탁 검토, 사고 대응 담당, 개발 보안 검토, 백업/복구 |
 | 개인정보 처리단계 | 처리 목적과 법적 근거, 최소 수집, 보유/파기 기준, 고지/동의 |
 
-`Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`는 필드 단위 보호 기준을 관리합니다. 기능 단위로 `HasMaskingOrEncryption=true`를 두는 것만으로는 어떤 필드를 어떻게 보호해야 하는지 흐려지기 때문에, 연락처, 상세주소, 계좌번호, 위치 좌표, 상차/하차 사진, 계약 문서, 통관 참조 정보 같은 필드를 카탈로그로 분리합니다.
+`Ssalddel.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`는 필드 단위 보호 기준을 관리합니다. 기능 단위로 `HasMaskingOrEncryption=true`를 두는 것만으로는 어떤 필드를 어떻게 보호해야 하는지 흐려지기 때문에, 연락처, 상세주소, 계좌번호, 위치 좌표, 상차/하차 사진, 계약 문서, 통관 참조 정보 같은 필드를 카탈로그로 분리합니다.
 
 | 필드 예시 | 기본 보호 조치 |
 | --- | --- |
@@ -82,7 +82,7 @@ public string AccountNumber { get; set; } = string.Empty;
 
 ## 전자서명 UI 원칙
 
-계약 서명 패드는 `Hongdal.Ui.Common`의 `HongdalSignatureGate`와 `HongdalSignaturePad`를 사용합니다. 서명 패드는 모든 화면에 상시 노출하지 않고, 업무 단계가 서명을 요구할 때만 렌더링합니다.
+계약 서명 패드는 `Ssalddel.Ui.Common`의 `SsalddelSignatureGate`와 `SsalddelSignaturePad`를 사용합니다. 서명 패드는 모든 화면에 상시 노출하지 않고, 업무 단계가 서명을 요구할 때만 렌더링합니다.
 
 예시는 다음과 같습니다.
 
@@ -100,7 +100,7 @@ ISMS-P 보호 속성이 붙은 값은 다음 흐름을 기본으로 둡니다.
 ```mermaid
 sequenceDiagram
     participant Client as Client App
-    participant Server as Hongdal API
+    participant Server as Ssalddel API
     participant Store as DB/Storage
 
     Client->>Server: 공개키 요청
@@ -121,10 +121,10 @@ sequenceDiagram
 
 | 단계 | 구현 위치 | 기준 |
 | --- | --- | --- |
-| 클라이언트 암호화 | `Hongdal.Ui.Common/Areas/App/wwwroot/js/hongdal-isms-p-transport.js` | `RSA-OAEP-256+A256GCM` |
-| 클라이언트 공통 보호 전송 | `Hongdal.Ui.Common/Areas/App/Services/HongdalProtectedApiClient.cs` | DTO 보호 계획을 확인하고 필요한 경우 암호화 envelope로 전송 |
-| 클라이언트 래퍼 | `Hongdal.Ui.Common/Areas/App/Services/HongdalIsmsPClientEncryptionService.cs` | 공개키 응답을 받아 암호화 봉투 생성 |
-| 서버 envelope 미들웨어 | `Hongdal/Middleware/IsmsPEncryptedTransportMiddleware.cs` | 암호화 envelope 요청 본문을 모델 바인딩 전에 원래 JSON으로 복호화 |
+| 클라이언트 암호화 | `Ssalddel.Ui.Common/Areas/App/wwwroot/js/ssalddel-isms-p-transport.js` | `RSA-OAEP-256+A256GCM` |
+| 클라이언트 공통 보호 전송 | `Ssalddel.Ui.Common/Areas/App/Services/SsalddelProtectedApiClient.cs` | DTO 보호 계획을 확인하고 필요한 경우 암호화 envelope로 전송 |
+| 클라이언트 래퍼 | `Ssalddel.Ui.Common/Areas/App/Services/SsalddelIsmsPClientEncryptionService.cs` | 공개키 응답을 받아 암호화 봉투 생성 |
+| 서버 envelope 미들웨어 | `Ssalddel/Middleware/IsmsPEncryptedTransportMiddleware.cs` | 암호화 envelope 요청 본문을 모델 바인딩 전에 원래 JSON으로 복호화 |
 | 서버 복호화 | `RsaOaepAesGcmClientTransportProtectionService` | 서버 개인키로 AES 키 복호화 후 payload 해석 |
 | 저장 전 보호 | `IsmsPProtectedDataStorePreparationService` | `IsmsPProtectedDataAttribute`와 필드 카탈로그 기반 처리 |
 | 저장 암호화 | `AesGcmIsmsPProtectedDataCryptoService` | `AES-256-GCM` |

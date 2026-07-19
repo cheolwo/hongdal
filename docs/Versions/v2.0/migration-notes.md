@@ -1,4 +1,4 @@
-# Hongdal 2.0 Migration Notes
+# Ssalddel 2.0 Migration Notes
 
 2.0에서는 HS 코드, 통관, 관세사 보정, 데이터 공개/결제 관련 변경을 기록합니다.
 

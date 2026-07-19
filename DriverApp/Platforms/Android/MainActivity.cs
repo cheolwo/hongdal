@@ -60,7 +60,7 @@ public class MainActivity : MauiAppCompatActivity
                 return;
             }
 
-            _ = HongdalFirebaseMessagingService.RegisterTokenAsync(token);
+            _ = SsalddelFirebaseMessagingService.RegisterTokenAsync(token);
         }
     }
 }

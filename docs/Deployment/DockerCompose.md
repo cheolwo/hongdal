@@ -10,14 +10,14 @@
 
 실행 상태 저장소는 다음 두 가지다.
 
-- `HONGDAL_TRANSIENT_STATE_PROVIDER=Redis`: 단일 VM 운영 권장값이다. `redis` Compose 프로필을 함께 실행한다. AOF 볼륨을 사용하므로 컨테이너 재생성 뒤에도 상태를 복구할 수 있다.
-- `HONGDAL_TRANSIENT_STATE_PROVIDER=Memory`: Redis 없이 개발할 때 사용한다. 애플리케이션 재시작 시 기사 위치, 대기열, 추천 상태와 Push Token 등 임시 상태가 사라진다.
+- `SSALDDEL_TRANSIENT_STATE_PROVIDER=Redis`: 단일 VM 운영 권장값이다. `redis` Compose 프로필을 함께 실행한다. AOF 볼륨을 사용하므로 컨테이너 재생성 뒤에도 상태를 복구할 수 있다.
+- `SSALDDEL_TRANSIENT_STATE_PROVIDER=Memory`: Redis 없이 개발할 때 사용한다. 애플리케이션 재시작 시 기사 위치, 대기열, 추천 상태와 Push Token 등 임시 상태가 사라진다.
 
-로컬 개발 기동은 ISMS-P 키가 없어도 상태 확인과 일반 API를 점검할 수 있도록 `HONGDAL_ISMSP_FAIL_WHEN_KEY_MISSING=false`가 기본이다. 운영 배포에서는 반드시 이 값을 `true`로 설정하고 AES-256-GCM 키와 전송 키를 비밀 저장소에서 주입한다.
+로컬 개발 기동은 ISMS-P 키가 없어도 상태 확인과 일반 API를 점검할 수 있도록 `SSALDDEL_ISMSP_FAIL_WHEN_KEY_MISSING=false`가 기본이다. 운영 배포에서는 반드시 이 값을 `true`로 설정하고 AES-256-GCM 키와 전송 키를 비밀 저장소에서 주입한다.
 
 기존 MySQL·MongoDB 볼륨을 이미 만든 경우에는 최초 생성 때 사용한 비밀번호를 계속 사용해야 한다. `.env`의 비밀번호와 연결 문자열의 비밀번호가 기존 볼륨과 다르면 컨테이너 환경변수만 바꿔도 DB 계정 비밀번호는 바뀌지 않는다.
 
-게시글 번역은 기본적으로 꺼져 있다. Azure Translator 리소스를 준비한 뒤 `HONGDAL_AZURE_TRANSLATOR_KEY`, `HONGDAL_AZURE_TRANSLATOR_REGION`을 비밀 저장소에서 주입하고 `HONGDAL_COMMUNITY_TRANSLATION_ENABLED=true`로 바꾼다. 원문은 MySQL 게시글에 그대로 유지되고 `ko-KR`·`en-US` 번역은 상세 화면에서 처음 요청될 때 생성되어 `platform_community_post_translations`에 캐시된다. 글이 수정되면 원문 해시가 달라져 기존 번역은 재사용되지 않으며, 신고·분쟁 글은 기본 정책상 외부 번역 대상에서 제외된다.
+게시글 번역은 기본적으로 꺼져 있다. Azure Translator 리소스를 준비한 뒤 `SSALDDEL_AZURE_TRANSLATOR_KEY`, `SSALDDEL_AZURE_TRANSLATOR_REGION`을 비밀 저장소에서 주입하고 `SSALDDEL_COMMUNITY_TRANSLATION_ENABLED=true`로 바꾼다. 원문은 MySQL 게시글에 그대로 유지되고 `ko-KR`·`en-US` 번역은 상세 화면에서 처음 요청될 때 생성되어 `platform_community_post_translations`에 캐시된다. 글이 수정되면 원문 해시가 달라져 기존 번역은 재사용되지 않으며, 신고·분쟁 글은 기본 정책상 외부 번역 대상에서 제외된다.
 
 ## 2. 이미지 빌드
 
@@ -28,7 +28,7 @@ docker compose --progress plain build app
 Dockerfile은 복원 레이어를 캐시한 뒤 `dotnet publish` 한 번으로 컴파일한다. 완료 후 이미지 ID와 생성 시각을 확인한다.
 
 ```powershell
-docker image inspect hongdal-app --format 'Id={{.Id}} Created={{.Created}}'
+docker image inspect ssalddel-app --format 'Id={{.Id}} Created={{.Created}}'
 ```
 
 ## 3. 데이터베이스 초기화
@@ -57,7 +57,7 @@ curl.exe --fail http://localhost:8080/health/ready
 
 - `/health/live`: ASP.NET Core 프로세스가 요청을 처리할 수 있는지 확인한다.
 - `/health/ready`: 기본·전통시장·농수산 MySQL DbContext의 연결과 미적용 마이그레이션, MongoDB, 선택한 실행 상태 저장소를 확인한다. Provider가 `Memory`이면 Redis 검사를 생략한다.
-- 농수산물 배치는 `HONGDAL_AGRICULTURAL_FISHERIES_BATCH_ENABLED=true`일 때만 등록된다.
+- 농수산물 배치는 `SSALDDEL_AGRICULTURAL_FISHERIES_BATCH_ENABLED=true`일 때만 등록된다.
 
 `docker compose ps`의 app 상태가 `healthy`가 아니면 다음 순서로 확인한다.
 

@@ -2,18 +2,18 @@
 
 [첨부 문서 README](../README.md) / [코드 프로젝트별 전체 페이지 카탈로그](../app-page-catalog.md)
 
-이 폴더는 홍달 프로젝트의 각 화면을 독립 README로 설명합니다. 큰 카탈로그는 전체 위치를 찾기 위한 색인이고, 여기의 각 화면 문서는 실제 화면 캡처와 상세 설명을 함께 둡니다.
+이 폴더는 살뜰 프로젝트의 각 화면을 독립 README로 설명합니다. 큰 카탈로그는 전체 위치를 찾기 위한 색인이고, 여기의 각 화면 문서는 실제 화면 캡처와 상세 설명을 함께 둡니다.
 
 ## 코드 프로젝트별 색인
 
 | 코드 프로젝트 | 화면 수 | 필수 화면 수 | 인증 필요 캡처 수 |
 | --- | ---: | ---: | ---: |
 | [DriverApp](DriverApp/) | 23 | 10 | 0 |
-| [HongdalAdmin](HongdalAdmin/) | 42 | 18 | 0 |
+| [SsalddelAdmin](SsalddelAdmin/) | 42 | 18 | 0 |
 | [HumanResourcesManagerApp](HumanResourcesManagerApp/) | 1 | 0 | 0 |
 | [OrdererApp](OrdererApp/) | 8 | 0 | 0 |
 | [RestaurantDeskApp](RestaurantDeskApp/) | 5 | 0 | 0 |
-| [HongdalApp](HongdalApp/) | 30 | 5 | 0 |
+| [SsalddelApp](SsalddelApp/) | 30 | 5 | 0 |
 | [WarehouseManagerApp](WarehouseManagerApp/) | 13 | 0 | 0 |
 
 ## 문서 형식
@@ -35,6 +35,6 @@
 
 - 새 @page 라우트가 생기면 app-page-catalog.md 와 이 폴더의 화면 README를 함께 갱신합니다.
 - 캡처는 기존 assets/app-pages/{앱명}/{페이지ID}.png 를 참조합니다.
-- 1.0 필수 화면은 hongdal-v1-required-pages.md 와도 맞춰 둡니다.
+- 1.0 필수 화면은 ssalddel-v1-required-pages.md 와도 맞춰 둡니다.
 - 새로 만들거나 수정하는 화면 README에는 가능한 경우 진입 사방괘, 출발 다이어그램·노드 행동, 필요한 식별자, 뒤로 갈 때 복원할 문맥을 기록합니다.
 - 프로젝트명은 코드 위치를 나타냅니다. 사용자 화면 관계는 [통합 클라이언트 3단계 내비게이션](../../Architecture/ThreeStageClientNavigation.md)을 우선합니다.

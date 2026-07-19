@@ -1,6 +1,6 @@
 # Admin Community And Utility Fee Settings
 
-This document fixes the admin-side requirement for Hongdal's community and utility fee model.
+This document fixes the admin-side requirement for Ssalddel's community and utility fee model.
 
 ## Operating Split
 

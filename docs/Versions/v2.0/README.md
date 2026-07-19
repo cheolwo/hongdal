@@ -1,4 +1,4 @@
-﻿# Hongdal 2.0
+﻿# Ssalddel 2.0
 
 ## 목표
 
@@ -22,8 +22,8 @@
 
 ## 우선 앱/모듈
 
-- `Hongdal.WebApp`
-- `HongdalAdmin`
+- `Ssalddel.WebApp`
+- `SsalddelAdmin`
 - HS 코드 DB
 - 해외/통관 서비스
 - `CargoYongdalDispatchEngine`

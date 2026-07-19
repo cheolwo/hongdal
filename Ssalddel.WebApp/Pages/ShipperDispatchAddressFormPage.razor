@@ -1,0 +1,40 @@
+@page "/dispatch/address-form"
+
+<SsalddelDispatchAddressFormPanel
+    Title="상차/하차 주소 입력"
+    Subtitle="공통 주소 컴포넌트와 사업자등록번호 입력 컴포넌트를 WebApp에서 검증합니다."
+    PickupAddress="@PickupAddress"
+    PickupAddressChanged="value => PickupAddress = value"
+    DropoffAddress="@DropoffAddress"
+    DropoffAddressChanged="value => DropoffAddress = value"
+    BusinessNumber="@BusinessNumber"
+    BusinessNumberChanged="value => BusinessNumber = value"
+    Message="@Message"
+    MessageSeverity="@MessageSeverity"
+    OnSave="SaveAsync"
+    OnReset="ResetAsync" />
+
+@code {
+    private 주소입력값Dto PickupAddress = new();
+    private 주소입력값Dto DropoffAddress = new();
+    private 사업자등록번호입력값Dto BusinessNumber = new();
+    private string? Message;
+    private Severity MessageSeverity = Severity.Info;
+
+    private Task SaveAsync()
+    {
+        MessageSeverity = Severity.Success;
+        Message = "주소 입력 샘플을 저장했습니다.";
+        return Task.CompletedTask;
+    }
+
+    private Task ResetAsync()
+    {
+        PickupAddress = new();
+        DropoffAddress = new();
+        BusinessNumber = new();
+        MessageSeverity = Severity.Info;
+        Message = "주소 입력값을 초기화했습니다.";
+        return Task.CompletedTask;
+    }
+}

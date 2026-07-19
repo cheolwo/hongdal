@@ -1,5 +1,5 @@
 @page "/driver/home"
-@using Hongdal.Contracts.Common.Drivers
+@using Ssalddel.Contracts.Common.Drivers
 @inject IAuthSession AuthSession
 @inject IDriverSampleDataService SampleDataService
 @inject DriverAppProfile DriverProfile
@@ -126,7 +126,7 @@
     {
         return profile.WorkType switch
         {
-            Hongdal.Contracts.Common.Drivers.기사업무유형코드.화물운송 => Color.Secondary,
+            Ssalddel.Contracts.Common.Drivers.기사업무유형코드.화물운송 => Color.Secondary,
             _ => Color.Primary
         };
     }

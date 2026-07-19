@@ -1,4 +1,4 @@
-﻿# Hongdal 2.5
+﻿# Ssalddel 2.5
 
 ## 목표
 
@@ -23,7 +23,7 @@
 | 마일스톤 지급 | 주문자 선결제 부담을 줄이기 위해 상차, 하차, 분배 확인 기준으로 지급 시기를 분리 |
 | 해외 선적/통관 추적 | BL/AWB, 문서관리번호, UNI-PASS 통관 상태를 공동주문 원장으로 연결 |
 | 국내 물류대행 입고 | 공동수입 물품을 국내 물류대행사 또는 3PL에 입고하고, 입고상품/재고 로트/판매상품으로 연결 |
-| 플랫폼 위임 국내 운송 | 보세구역 반출 가능 이후 플랫폼이 화주 운송 의뢰 주체가 되고, 주문자 집단은 비용 귀속/정산 단위로 관리. 기본 목적지는 홍달 1.0 용달 기사 배차를 통한 아파트 단지 세대배송이며, 3PL 창고나 주문자 집단 대표 수령지는 선택 경로로 둔다. 냉장/냉동 화물은 차량과 3PL 설비 적합성을 확인한다. 주문자 결제수단은 카드/현금성 이체 등으로 나뉠 수 있으며 플랫폼이 운송비를 모아 보관한 뒤 하차/증빙 확인 후 기사 정산계좌로 지연 지급 |
+| 플랫폼 위임 국내 운송 | 보세구역 반출 가능 이후 플랫폼이 화주 운송 의뢰 주체가 되고, 주문자 집단은 비용 귀속/정산 단위로 관리. 기본 목적지는 살뜰 1.0 용달 기사 배차를 통한 아파트 단지 세대배송이며, 3PL 창고나 주문자 집단 대표 수령지는 선택 경로로 둔다. 냉장/냉동 화물은 차량과 3PL 설비 적합성을 확인한다. 주문자 결제수단은 카드/현금성 이체 등으로 나뉠 수 있으며 플랫폼이 운송비를 모아 보관한 뒤 하차/증빙 확인 후 기사 정산계좌로 지연 지급 |
 | 판매채널 출품과 출고 배치 | 스마트스토어/쿠팡 등 판매채널 주문을 창고 재고와 출고 배치 엔진으로 연결 |
 | Amazon 수출 준비 골격 | 국내 입고상품/판매상품을 Amazon 출품과 수출 이행으로 연결하기 전 수입 참여자 자격, 국내 물류 이력, 후기 사용 동의, 이미지형 상세페이지/광고 소재, seller 계정, marketplace, productType, HS 수출 검토, 관세사 수임/비용, 서류, 재고 예약, 출고 배치, 국제배송, 반품/정산 정책을 확인 |
 | 주문자 집단 운영 주체 | 비사업자 모임, 개인사업자, 법인, 협동조합, 관리사무소 위임, 플랫폼 위임을 구분 |
@@ -51,7 +51,7 @@
 ## 우선 앱/모듈
 
 - `OrdererApp`
-- `HongdalApp`
+- `SsalddelApp`
 - `WarehouseManagerApp`
 - `CargoYongdalDispatchEngine`
 - 주문자 집단 식별 서비스
@@ -108,25 +108,25 @@
 
 ### 프로젝트 모듈 위치
 
-- 계약 DTO: `Hongdal.Contracts/Common/PublicData/PublicDataApiMetadataDtos.cs`
-- 조회 DTO: `Hongdal.Contracts/Common/PublicData/PublicDataLookupDtos.cs`
-- 서버 카탈로그: `Hongdal/Services/External/PublicData/PublicDataApiMetadataCatalog.cs`
-- 주소 조회 서비스: `Hongdal/Services/External/PublicData/RoadAddressLookupService.cs`
-- 공동주택 조회 서비스: `Hongdal/Services/External/PublicData/ApartmentComplexLookupService.cs`
-- 주문자 집단 범위 후보 서비스: `Hongdal/Services/External/PublicData/주문자집단배송권조회Service.cs`
-- 먹거리 공동주문 플래너: `Hongdal.Contracts/Common/Orderer/냉장냉동먹거리공동구매계획기.cs`
-- 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/공동구매결제단계계획기.cs`
-- 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/수입식품공동주문계약계획기.cs`
-- 플랫폼 위임 국내 운송 플래너: `Hongdal.Contracts/Common/Orderer/공동구매플랫폼국내운송계획기.cs`
-- 개인정보/계약 ISMS-P 준비도 플래너: `Hongdal.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
-- 개인정보 필드 보호 카탈로그: `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
+- 계약 DTO: `Ssalddel.Contracts/Common/PublicData/PublicDataApiMetadataDtos.cs`
+- 조회 DTO: `Ssalddel.Contracts/Common/PublicData/PublicDataLookupDtos.cs`
+- 서버 카탈로그: `Ssalddel/Services/External/PublicData/PublicDataApiMetadataCatalog.cs`
+- 주소 조회 서비스: `Ssalddel/Services/External/PublicData/RoadAddressLookupService.cs`
+- 공동주택 조회 서비스: `Ssalddel/Services/External/PublicData/ApartmentComplexLookupService.cs`
+- 주문자 집단 범위 후보 서비스: `Ssalddel/Services/External/PublicData/주문자집단배송권조회Service.cs`
+- 먹거리 공동주문 플래너: `Ssalddel.Contracts/Common/Orderer/냉장냉동먹거리공동구매계획기.cs`
+- 마일스톤 지급 플래너: `Ssalddel.Contracts/Common/Orderer/공동구매결제단계계획기.cs`
+- 수입 식품 공동 주문 계약서 플래너: `Ssalddel.Contracts/Common/ContractManagement/수입식품공동주문계약계획기.cs`
+- 플랫폼 위임 국내 운송 플래너: `Ssalddel.Contracts/Common/Orderer/공동구매플랫폼국내운송계획기.cs`
+- 개인정보/계약 ISMS-P 준비도 플래너: `Ssalddel.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
+- 개인정보 필드 보호 카탈로그: `Ssalddel.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
 - 주문자 공동구매 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`
 - 먹거리 공동주문 정책 문서: `docs/Architecture/FoodFocusedGroupPurchase.md`
 - 주문자 집단 공동주문/커머스 흐름 문서: `docs/ProjectOverview/orderer-group-commerce-flows.md`
 - 출고 배치 엔진 상세 문서: `docs/Architecture/OutboundBatchEngine.md`
 - 4대보험 신고 준비 흐름 문서: `docs/Architecture/SocialInsuranceFiling.md`
-- 4대보험 신고 준비 DTO/API: `Hongdal.Contracts/Common/Hr/SocialInsuranceFilingDtos.cs`, `Hongdal/Services/HumanResources/SocialInsuranceFilingService.cs`, `POST /api/v1/admin/hr-social-insurance-filings/assess`
-- Amazon 수출 준비 플래너: `Hongdal.Contracts/Common/Sales/AmazonExportReadinessPlanner.cs`
+- 4대보험 신고 준비 DTO/API: `Ssalddel.Contracts/Common/Hr/SocialInsuranceFilingDtos.cs`, `Ssalddel/Services/HumanResources/SocialInsuranceFilingService.cs`, `POST /api/v1/admin/hr-social-insurance-filings/assess`
+- Amazon 수출 준비 플래너: `Ssalddel.Contracts/Common/Sales/AmazonExportReadinessPlanner.cs`
 - Amazon 수출 준비 문서: `docs/Architecture/AmazonExportReadiness.md`
 - 메타데이터 조회 API: `GET /api/v1/public-data/apis`
 - 실제 데이터 조회 API:

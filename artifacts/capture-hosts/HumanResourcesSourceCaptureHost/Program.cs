@@ -1,4 +1,4 @@
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.Services;
 using Microsoft.Extensions.FileProviders;
 using MudBlazor.Services;
 
@@ -8,7 +8,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
-builder.Services.AddHongdalUiCommonAppServices();
+builder.Services.AddSsalddelUiCommonAppServices();
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7117/") });
 builder.Services.AddScoped<PlatformCommunityService>();
 builder.Services.AddScoped<PlatformHomeModeStateService>();

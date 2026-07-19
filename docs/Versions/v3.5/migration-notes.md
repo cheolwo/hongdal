@@ -1,4 +1,4 @@
-﻿# Hongdal 3.5 Migration Notes
+﻿# Ssalddel 3.5 Migration Notes
 
 3.5에서는 알뜰살뜰 마트 주문, 도심 재고, 피킹/포장, 알뜰살뜰 마트 즉시배송 배차 관련 변경을 기록합니다.
 
@@ -6,7 +6,7 @@
 
 - 알뜰살뜰 마트 상품/재고 테이블 변경
 - 피킹/포장 상태 변경
-- `HongdalMartPackedOrder` 생성 조건
+- `SsalddelMartPackedOrder` 생성 조건
 - 알뜰살뜰 마트 음식 배달 배차 대기 데이터
 - 묶음 배달 판단 데이터
 

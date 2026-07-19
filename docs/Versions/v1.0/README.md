@@ -1,4 +1,4 @@
-﻿# Hongdal 1.0
+﻿# Ssalddel 1.0
 
 ## 목표
 
@@ -39,17 +39,17 @@
 
 ## 우선 앱/모듈
 
-- `Hongdal.Ui.Common`
-- `HongdalApp`
+- `Ssalddel.Ui.Common`
+- `SsalddelApp`
 - `DriverApp`의 운송 기술 검증 화면
-- `HongdalAdmin`
+- `SsalddelAdmin`
 - `CargoYongdalDispatchEngine`의 모의 배차 경로
-- `Hongdal.Contracts`
-- `Hongdal.Domain`
+- `Ssalddel.Contracts`
+- `Ssalddel.Domain`
 
 ## 필수 화면 기준
 
-1.0의 첫 필수 화면은 화주 의뢰, 기사 추천·판단, 진행 중 운송, 상차·하차, 인수와 관리자 진행 확인입니다. 통합 커뮤니티 홈, 게시판, 글쓰기, 공동 원장과 다이어그램은 0.0 필수 화면으로 분리합니다. 상세 운송 화면은 [홍달 1.0 필수 페이지 기준](../../ProjectOverview/hongdal-v1-required-pages.md)을 따릅니다.
+1.0의 첫 필수 화면은 화주 의뢰, 기사 추천·판단, 진행 중 운송, 상차·하차, 인수와 관리자 진행 확인입니다. 통합 커뮤니티 홈, 게시판, 글쓰기, 공동 원장과 다이어그램은 0.0 필수 화면으로 분리합니다. 상세 운송 화면은 [살뜰 1.0 필수 페이지 기준](../../ProjectOverview/ssalddel-v1-required-pages.md)을 따릅니다.
 
 ## 안정화 기준
 
@@ -180,7 +180,7 @@ flowchart TD
 | `CustomsHsV20` | `false` | 통관/HS 데이터는 2.0 범위 |
 | `OrdererGroupOrderV25` | `false` | 주문자 집단 공동 주문은 2.5 범위 |
 | `FoodDeliveryV30` | `false` | 음식점 일반 음식 배달은 3.0 범위 |
-| `HongdalMartV35` | `false` | 알뜰살뜰 마트 도심 즉시배송은 3.5 범위 |
+| `SsalddelMartV35` | `false` | 알뜰살뜰 마트 도심 즉시배송은 3.5 범위 |
 
 ## 기능 설정 운영 기준
 

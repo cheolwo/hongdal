@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Hongdal.Client.Infrastructure.Security;
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Client.Infrastructure.Security;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace FDriverApp.Services;
 
-public interface IFDriverAuthSession : IHongdalAccessTokenProvider
+public interface IFDriverAuthSession : ISsalddelAccessTokenProvider
 {
     string? UserId { get; }
     string? UserName { get; }
@@ -16,7 +16,7 @@ public interface IFDriverAuthSession : IHongdalAccessTokenProvider
 
 public sealed class FDriverAuthSession : IFDriverAuthSession
 {
-    private const string StorageKey = "hongdal.fdriver.authToken.v1";
+    private const string StorageKey = "ssalddel.fdriver.authToken.v1";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly IClientSessionGuard _sessionGuard;
     private bool _restored;

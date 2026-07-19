@@ -1,11 +1,11 @@
-using Hongdal.Contracts.Driver.Notification;
+using Ssalddel.Contracts.Driver.Notification;
 using Microsoft.Maui.Storage;
 
 namespace DriverApp.Services;
 
 public sealed class 기사푸시토큰등록Service : I기사푸시토큰등록Service
 {
-    private const string 저장키 = "hongdal.driver.fcmToken.v1";
+    private const string 저장키 = "ssalddel.driver.fcmToken.v1";
 
     private readonly IDriverNotificationApiService _notificationApi;
     private readonly IAuthSession _authSession;

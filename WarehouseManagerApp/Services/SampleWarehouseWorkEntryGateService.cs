@@ -1,5 +1,5 @@
-using Hongdal.Contracts.Common.Hr;
-using Hongdal.Ui.Common.Areas.App.Models;
+using Ssalddel.Contracts.Common.Hr;
+using Ssalddel.Ui.Common.Areas.App.Models;
 
 namespace WarehouseManagerApp.Services;
 

@@ -3,7 +3,7 @@ using DriverApp.Services.CommonContents;
 using DriverApp.Services;
 using DriverApp.Services.Samples;
 using DriverApp.Handlers;
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 
@@ -27,11 +27,11 @@ public static class MauiProgram
 			});
 
 		builder.Services.AddDriverAppServices(builder.Configuration);
-		builder.Services.AddHongdalUiCommonAppServices<IAuthSession>();
-		builder.Services.AddHongdalApiHttpClient(
-			HongdalApiEndpoint.CreateDefaultBaseAddress(),
+		builder.Services.AddSsalddelUiCommonAppServices<IAuthSession>();
+		builder.Services.AddSsalddelApiHttpClient(
+			SsalddelApiEndpoint.CreateDefaultBaseAddress(),
 			ServiceLifetime.Singleton);
-		builder.Services.AddHongdalDocumentOutputServices();
+		builder.Services.AddSsalddelDocumentOutputServices();
 		builder.Services.AddTransient<NativeDriverHomePage>();
 		builder.Services.AddMudServices();
 		builder.Services.AddMauiBlazorWebView();

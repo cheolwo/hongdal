@@ -30,14 +30,14 @@
 
 ![모바일 커뮤니티 글쓰기와 게시 설정](../assets/changes/2026-07-19-community-authoring-reliability/mobile.png)
 
-캡처는 실제 `Hongdal.WebApp`의 공통 `PlatformCommunityPostComposer`를 렌더링한 결과다. 예시 제목과 본문만 사용했으며 실제 사용자 정보, 주소, 연락처, 결제 정보 또는 증빙 파일은 포함하지 않았다.
+캡처는 실제 `Ssalddel.WebApp`의 공통 `PlatformCommunityPostComposer`를 렌더링한 결과다. 예시 제목과 본문만 사용했으며 실제 사용자 정보, 주소, 연락처, 결제 정보 또는 증빙 파일은 포함하지 않았다.
 
 ## 검증
 
 - 글쓰기·관리자 작성·공통 DI 대상 테스트 60개 통과
-- `Hongdal.WebApp` Release 빌드 경고 0개·오류 0개
-- `HongdalAdminApp` Windows Release 빌드 경고 0개·오류 0개
-- `HongdalAdminApp` Android Release 빌드 경고 0개·오류 0개
+- `Ssalddel.WebApp` Release 빌드 경고 0개·오류 0개
+- `SsalddelAdminApp` Windows Release 빌드 경고 0개·오류 0개
+- `SsalddelAdminApp` Android Release 빌드 경고 0개·오류 0개
 - 실제 WebApp에서 입력 자동저장, 짧은 비밀번호의 등록 전 차단, 닫기·새로고침 복구, 비밀번호 미복원, 초안 비우기 확인 및 삭제를 검증
 - 기본 데스크톱과 390px 모바일 viewport에서 헤더 버튼, 설정 입력, 원장 연결이 겹치거나 잘리지 않는지 확인
 - 최종 검증 포트에서 신규 browser 오류 없음 확인

@@ -1,0 +1,26 @@
+@typeparam TDraft
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Crud
+
+<SsalddelCommandDialog TDraft="TDraft" ViewModel="@ViewModel">
+    <Content>
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+            @if (string.IsNullOrWhiteSpace(TargetLabel))
+            {
+                <span>선택한 대상을 삭제합니다.</span>
+            }
+            else
+            {
+                <span><strong>@TargetLabel</strong> 항목을 삭제합니다.</span>
+            }
+        </MudAlert>
+    </Content>
+</SsalddelCommandDialog>
+
+@code {
+    [Parameter, EditorRequired]
+    public I명령ViewModel<TDraft> ViewModel { get; set; } = default!;
+
+    [Parameter]
+    public string? TargetLabel { get; set; }
+}

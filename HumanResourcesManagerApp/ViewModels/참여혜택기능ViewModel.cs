@@ -1,6 +1,6 @@
-using Hongdal.Contracts.Common.Hr;
-using Hongdal.Ui.Common.Areas.App.Services;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Contracts.Common.Hr;
+using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace HumanResourcesManagerApp.ViewModels;
 
@@ -8,7 +8,7 @@ public sealed class 참여혜택기능ViewModel : 인사업무ViewModelBase
 {
     private const string BasePath = "api/v1/admin/hr-participation-benefits";
 
-    public 참여혜택기능ViewModel(IHongdalJsonApiClient api)
+    public 참여혜택기능ViewModel(ISsalddelJsonApiClient api)
         : base("participation-benefit", "참여 혜택", "참여에서 발생한 혜택을 조회하고 전환합니다.")
     {
         목록조회 = 하위ViewModel등록(new Api작업ViewModel<참여혜택조회조건, HrParticipationBenefitRecordListResponse?>(

@@ -1,4 +1,4 @@
-using Hongdal.Contracts.CommonContents;
+using Ssalddel.Contracts.CommonContents;
 
 #pragma warning disable CS8602
 
@@ -9,21 +9,21 @@ public sealed class 샘플공통콘텐츠Service : I공통콘텐츠Service
     private long _nextSessionId = 1;
     private readonly Dictionary<long, int> _sessionProgress = new();
 
-    public Task<홍달위젯콘텐츠Dto?> 위젯콘텐츠조회Async(string 위치, CancellationToken cancellationToken = default)
+    public Task<살뜰위젯콘텐츠Dto?> 위젯콘텐츠조회Async(string 위치, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var dto = new 홍달위젯콘텐츠Dto
+        var dto = new 살뜰위젯콘텐츠Dto
         {
             콘텐츠Id = 1,
             제목 = 위치.Equals("lock", StringComparison.OrdinalIgnoreCase) ? "살뜰 잠금화면 콘텐츠" : "살뜰 홈 위젯 콘텐츠",
             설명 = "살뜰 공통콘텐츠 샘플 카드",
             이미지Url = null,
-            이동Url = "https://example.invalid/hongdal-common-content",
+            이동Url = "https://example.invalid/ssalddel-common-content",
             상태문구 = "살뜰과 연결됨"
         };
 
-        return Task.FromResult<홍달위젯콘텐츠Dto?>(dto);
+        return Task.FromResult<살뜰위젯콘텐츠Dto?>(dto);
     }
 
     public Task<long?> 시청시작Async(long 콘텐츠Id, int 영상전체초, CancellationToken cancellationToken = default)
@@ -66,12 +66,12 @@ public sealed class 샘플공통콘텐츠Service : I공통콘텐츠Service
         return Task.FromResult<콘텐츠시청완료Result?>(result);
     }
 
-    public Task<홍달위젯콘텐츠Dto?> 위젯콘텐츠동기화Async(string 위치, CancellationToken cancellationToken = default)
+    public Task<살뜰위젯콘텐츠Dto?> 위젯콘텐츠동기화Async(string 위치, CancellationToken cancellationToken = default)
     {
         return 위젯콘텐츠동기화내부Async(위치, cancellationToken);
     }
 
-    private async Task<홍달위젯콘텐츠Dto?> 위젯콘텐츠동기화내부Async(string 위치, CancellationToken cancellationToken)
+    private async Task<살뜰위젯콘텐츠Dto?> 위젯콘텐츠동기화내부Async(string 위치, CancellationToken cancellationToken)
     {
         var content = await 위젯콘텐츠조회Async(위치, cancellationToken);
         if (content is null)
@@ -81,7 +81,7 @@ public sealed class 샘플공통콘텐츠Service : I공통콘텐츠Service
 
 #if ANDROID
         var context = global::Android.App.Application.Context;
-        var 저장소 = context.GetSharedPreferences("hongdal_widget", global::Android.Content.FileCreationMode.Private);
+        var 저장소 = context.GetSharedPreferences("ssalddel_widget", global::Android.Content.FileCreationMode.Private);
         저장소.Edit()!
             .PutString("title", content.제목)
             .PutString("status", content.상태문구)
@@ -91,12 +91,12 @@ public sealed class 샘플공통콘텐츠Service : I공통콘텐츠Service
         var manager = global::Android.Appwidget.AppWidgetManager.GetInstance(context);
         var component = new global::Android.Content.ComponentName(
             context,
-            Java.Lang.Class.FromType(typeof(global::DriverApp.홍달위젯Provider)));
+            Java.Lang.Class.FromType(typeof(global::DriverApp.살뜰위젯Provider)));
         var ids = manager.GetAppWidgetIds(component);
 
         if (ids.Length > 0)
         {
-            var intent = new global::Android.Content.Intent(context, typeof(global::DriverApp.홍달위젯Provider));
+            var intent = new global::Android.Content.Intent(context, typeof(global::DriverApp.살뜰위젯Provider));
             intent.SetAction(global::Android.Appwidget.AppWidgetManager.ActionAppwidgetUpdate);
             intent.PutExtra(global::Android.Appwidget.AppWidgetManager.ExtraAppwidgetIds, ids);
             context.SendBroadcast(intent);

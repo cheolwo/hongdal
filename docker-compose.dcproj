@@ -3,7 +3,7 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>{A6B4E1CF-0B2D-4B1A-8D5A-2D2D8F1B9B1F}</ProjectGuid>
-    <DockerComposeProjectName>hongdal</DockerComposeProjectName>
+    <DockerComposeProjectName>ssalddel</DockerComposeProjectName>
   </PropertyGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -19,33 +19,33 @@
     <None Include="Docs\ViewControllerMapping\DriverApp\기사화면_상세매핑.md" />
     <None Include="Docs\ViewControllerMapping\README.md" />
     <None Include="Docs\ViewControllerMapping\Server\README.md" />
-    <None Include="Docs\ViewControllerMapping\HongdalApp\README.md" />
-    <None Include="Docs\ViewControllerMapping\HongdalApp\화주화면_상세매핑.md" />
-    <None Include="Hongdal.Domain\Hongdal.Domain.csproj" />
-    <None Include="Hongdal.FoodApi\appsettings.Development.json" />
-    <None Include="Hongdal.FoodApi\appsettings.json" />
-    <None Include="Hongdal.FoodApi\Controllers\Admin\음식점리뷰관리Controller.cs" />
-    <None Include="Hongdal.FoodApi\Controllers\Common\음식점Controller.cs" />
-    <None Include="Hongdal.FoodApi\Controllers\Common\음식주문Controller.cs" />
-    <None Include="Hongdal.FoodApi\Hongdal.FoodApi.csproj" />
-    <None Include="Hongdal.FoodApi\Hongdal.FoodApi.http" />
-    <None Include="Hongdal.FoodApi\Program.cs" />
-    <None Include="Hongdal.FoodApi\Properties\launchSettings.json" />
-    <None Include="Hongdal.FoodApi\Services\음식샘플Store.cs" />
-    <None Include="Hongdal.Infrastructure\DependencyInjection\InfrastructureServiceCollectionExtensions.cs" />
-    <None Include="Hongdal.Infrastructure\Hongdal.Infrastructure.csproj" />
-    <None Include="Hongdal.Infrastructure\Security\DataProtectionPersonalDataProtector.cs" />
-    <None Include="Hongdal.Infrastructure\Security\IPersonalDataProtector.cs" />
-    <None Include="Hongdal.sln" />
-    <None Include="Hongdal.Tests\CommandProcessing\Command후처리규칙Tests.cs" />
-    <None Include="HongdalRestaurantDesktop\App.axaml" />
-    <None Include="HongdalRestaurantDesktop\App.axaml.cs" />
-    <None Include="HongdalRestaurantDesktop\app.manifest" />
-    <None Include="HongdalRestaurantDesktop\HongdalRestaurantDesktop.csproj" />
-    <None Include="HongdalRestaurantDesktop\Program.cs" />
-    <None Include="HongdalRestaurantDesktop\ViewModels\MainWindowViewModel.cs" />
-    <None Include="HongdalRestaurantDesktop\Views\MainWindow.axaml" />
-    <None Include="HongdalRestaurantDesktop\Views\MainWindow.axaml.cs" />
+    <None Include="Docs\ViewControllerMapping\SsalddelApp\README.md" />
+    <None Include="Docs\ViewControllerMapping\SsalddelApp\화주화면_상세매핑.md" />
+    <None Include="Ssalddel.Domain\Ssalddel.Domain.csproj" />
+    <None Include="Ssalddel.FoodApi\appsettings.Development.json" />
+    <None Include="Ssalddel.FoodApi\appsettings.json" />
+    <None Include="Ssalddel.FoodApi\Controllers\Admin\음식점리뷰관리Controller.cs" />
+    <None Include="Ssalddel.FoodApi\Controllers\Common\음식점Controller.cs" />
+    <None Include="Ssalddel.FoodApi\Controllers\Common\음식주문Controller.cs" />
+    <None Include="Ssalddel.FoodApi\Ssalddel.FoodApi.csproj" />
+    <None Include="Ssalddel.FoodApi\Ssalddel.FoodApi.http" />
+    <None Include="Ssalddel.FoodApi\Program.cs" />
+    <None Include="Ssalddel.FoodApi\Properties\launchSettings.json" />
+    <None Include="Ssalddel.FoodApi\Services\음식샘플Store.cs" />
+    <None Include="Ssalddel.Infrastructure\DependencyInjection\InfrastructureServiceCollectionExtensions.cs" />
+    <None Include="Ssalddel.Infrastructure\Ssalddel.Infrastructure.csproj" />
+    <None Include="Ssalddel.Infrastructure\Security\DataProtectionPersonalDataProtector.cs" />
+    <None Include="Ssalddel.Infrastructure\Security\IPersonalDataProtector.cs" />
+    <None Include="Ssalddel.sln" />
+    <None Include="Ssalddel.Tests\CommandProcessing\Command후처리규칙Tests.cs" />
+    <None Include="SsalddelRestaurantDesktop\App.axaml" />
+    <None Include="SsalddelRestaurantDesktop\App.axaml.cs" />
+    <None Include="SsalddelRestaurantDesktop\app.manifest" />
+    <None Include="SsalddelRestaurantDesktop\SsalddelRestaurantDesktop.csproj" />
+    <None Include="SsalddelRestaurantDesktop\Program.cs" />
+    <None Include="SsalddelRestaurantDesktop\ViewModels\MainWindowViewModel.cs" />
+    <None Include="SsalddelRestaurantDesktop\Views\MainWindow.axaml" />
+    <None Include="SsalddelRestaurantDesktop\Views\MainWindow.axaml.cs" />
     <None Include="README.md" />
     <None Include="RestaurantDeskApp\App.xaml" />
     <None Include="RestaurantDeskApp\App.xaml.cs" />

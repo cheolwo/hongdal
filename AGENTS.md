@@ -1,6 +1,6 @@
-# Hongdal 공통 작업 지침
+# Ssalddel 공통 작업 지침
 
-이 파일은 Hongdal 저장소에서 작업하는 모든 AI 도구와 스레드가 함께 따르는 단일 공통 지침이다. 세부 제품·설계 문서를 복제하지 않고, 작업 판단의 우선순위와 변경 원칙을 정한다.
+이 파일은 Ssalddel 저장소에서 작업하는 모든 AI 도구와 스레드가 함께 따르는 단일 공통 지침이다. 세부 제품·설계 문서를 복제하지 않고, 작업 판단의 우선순위와 변경 원칙을 정한다.
 
 ## 적용 범위와 우선순위
 
@@ -20,17 +20,17 @@
 
 ## 현재 제품 기준
 
-- Hongdal의 중심은 **정보 공개형 커뮤니티**다. 대화와 모집이 공동 원장·다이어그램으로 이어지고, 운송·창고·음식·마트·공동주문은 그 위에 붙는 업무 도구다.
+- Ssalddel의 중심은 **정보 공개형 커뮤니티**다. 대화와 모집이 공동 원장·다이어그램으로 이어지고, 운송·창고·음식·마트·공동주문은 그 위에 붙는 업무 도구다.
 - 기본 개발 집중 범위는 `0.0`이다. `1.0` 이후 코드는 미래 자산으로 보존하되, 명시적인 요청 없이 운영 노출이나 실제 외부 효과를 켜지 않는다.
 - 유상 화물 추천·자동 배차·계약 중개·운임 수취·보관·정산은 허가·제휴·법률·운영 준비 전 기본 비활성이다. 개발 검증은 샘플 데이터, FakePG, 모의 흐름을 사용한다.
-- 실행 효과는 `HongdalExecution:Mode`의 `Simulation`과 `Operational` 경계로 통제한다. 화면이나 API마다 별도 실행 모드를 임의로 만들지 않는다.
+- 실행 효과는 `SsalddelExecution:Mode`의 `Simulation`과 `Operational` 경계로 통제한다. 화면이나 API마다 별도 실행 모드를 임의로 만들지 않는다.
 - 사용자가 특정 버전이나 업무 모듈을 명시하면 그 범위에서 작업하되, 현재 운영 경계와 기능 플래그를 유지한다.
 
 제품 경계는 [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md), 세부 우선순위는 [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 따른다.
 
 ## 개발 철학
 
-- Hongdal은 가까운 사람의 필요를 알아보고, 사용자가 책임질 수 있는 약속부터 함께 실천하며, 그 신뢰를 더 넓은 공동체로 확장하도록 돕는다. 세부 기준은 [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md)을 따른다.
+- Ssalddel은 가까운 사람의 필요를 알아보고, 사용자가 책임질 수 있는 약속부터 함께 실천하며, 그 신뢰를 더 넓은 공동체로 확장하도록 돕는다. 세부 기준은 [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md)을 따른다.
 - 예수의 이웃 사랑과 『대학』의 수신·제가·치국은 같은 실천 원리로 본다. 자신을 바로 세우고 가까운 이웃을 사랑하며, 그 돌봄과 책임을 더 넓은 공동체로 확장한다.
 
 ## 공동행동 원칙
@@ -50,9 +50,9 @@
 - 원장 변경은 Event/Outbox를 통해 필요한 RDB 투영을 갱신하고, RDB 업무 변경은 관련 원장을 다시 구성한다. 재처리 가능하고 멱등해야 하며 양방향 이벤트의 순환 발행을 막는다.
 - 하나의 EventHandler는 하나의 후속 관심사만 맡는다. 원본 상태와 반드시 같이 성공해야 하는 처리는 같은 트랜잭션에 두고, 알림·투영·감사·추천 큐처럼 재시도 가능한 후속 처리는 분리한다.
 - 새 Controller나 DTO를 먼저 늘리지 않는다. 기존 route, UseCase, metadata, contract, shared component를 재사용할 수 있는지 확인한다.
-- 여러 앱이 함께 쓰는 DTO·상수·계약은 `Hongdal.Contracts`, 공통 UI와 workflow는 `Hongdal.Ui.Common`에 둔다. platform 기능만 adapter로 분리한다.
-- 여러 프로젝트를 통과하는 기능을 추적할 때는 먼저 `HongdalCodeMetadataAttribute`와 `HongdalCodeFeatureKeys`를 검색한다. 특성이 있는 기능은 `FlowOrder`, `Layer`, `Effects`, `Boundary`, `ContractType` 순으로 읽고, 실제 코드와 다르면 특성을 함께 고친다. 세부 규약은 [코드 탐색 메타데이터](docs/Architecture/HongdalCodeMetadata.md)를 따른다.
-- 커뮤니티 0.0 범위 작업은 `[HongdalCommunityV0Module]`을 먼저 검색해 UI·콘텐츠·참여·원장·안전·운영자 글쓰기 모듈과 `0.0-A~E` 단계를 확인한다. 새 대표 진입점을 추가하거나 책임을 옮기면 모듈 특성과 카탈로그 테스트도 갱신한다.
+- 여러 앱이 함께 쓰는 DTO·상수·계약은 `Ssalddel.Contracts`, 공통 UI와 workflow는 `Ssalddel.Ui.Common`에 둔다. platform 기능만 adapter로 분리한다.
+- 여러 프로젝트를 통과하는 기능을 추적할 때는 먼저 `SsalddelCodeMetadataAttribute`와 `SsalddelCodeFeatureKeys`를 검색한다. 특성이 있는 기능은 `FlowOrder`, `Layer`, `Effects`, `Boundary`, `ContractType` 순으로 읽고, 실제 코드와 다르면 특성을 함께 고친다. 세부 규약은 [코드 탐색 메타데이터](docs/Architecture/SsalddelCodeMetadata.md)를 따른다.
+- 커뮤니티 0.0 범위 작업은 `[SsalddelCommunityV0Module]`을 먼저 검색해 UI·콘텐츠·참여·원장·안전·운영자 글쓰기 모듈과 `0.0-A~E` 단계를 확인한다. 새 대표 진입점을 추가하거나 책임을 옮기면 모듈 특성과 카탈로그 테스트도 갱신한다.
 - 기술 용어(`API`, `DTO`, `Command`, `Event`, `Handler`, `UseCase`, `Outbox`, `Service`)는 영어로 쓰고 업무 도메인 용어는 한국어로 쓴다. 요청 DTO는 `...요청`, 응답 DTO는 `...응답` 형태를 우선한다.
 - Controller와 service 폴더는 역할과 업무 흐름이 드러나게 정리하되, 단순 정리를 위해 저장소 전체 namespace를 한꺼번에 바꾸지 않는다.
 - 개인정보 암호화·복호화는 domain property의 getter/setter가 아니라 persistence와 infrastructure 경계에서 처리한다.
@@ -74,7 +74,7 @@
 
 ## 클라이언트와 UI
 
-- 새 공용 사용자 흐름은 우선 `HongdalApp`과 `Hongdal.Ui.Common`에 통합한다. 기존 전문 앱은 명시적인 통합 작업이 아니면 삭제하거나 기능을 축소하지 않는다.
+- 새 공용 사용자 흐름은 우선 `SsalddelApp`과 `Ssalddel.Ui.Common`에 통합한다. 기존 전문 앱은 명시적인 통합 작업이 아니면 삭제하거나 기능을 축소하지 않는다.
 - 공통 셸은 커뮤니티, 업무, 다이어그램, 정보 흐름을 같은 문맥에서 연결한다. 내비게이션은 기본적으로 `사방괘 -> 다이어그램 -> 구체 데이터 페이지` 구조를 따른다.
 - MAUI Blazor 화면은 View, ViewModel, navigation 책임을 나누고 기존 MVVM CommunityToolkit 패턴을 따른다. 모바일 목록은 넓은 다중 열 table보다 빠르게 훑을 수 있는 compact card와 detail 전환을 우선한다.
 - 기존 화면을 수정할 때 사용자가 요청하지 않은 메뉴·상점·업무 진입·샘플 기능을 없애지 않는다.

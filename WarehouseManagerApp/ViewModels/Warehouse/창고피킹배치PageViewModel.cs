@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.Warehouse;
+using Ssalddel.Contracts.Common.Warehouse;
 using WarehouseManagerApp.Services;
 
 namespace WarehouseManagerApp.ViewModels.Warehouse;

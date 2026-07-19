@@ -2,8 +2,8 @@ using CommunityToolkit.Maui;
 using FDriverApp.Controls;
 using FDriverApp.Handlers;
 using FDriverApp.Pages;
-using Hongdal.Ui.Common.Areas.App.Services;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -11,7 +11,7 @@ using Syncfusion.Maui.Toolkit.Hosting;
 
 using FDriverApp.Services;
 using FDriverApp.ViewModels;
-using Hongdal.Client.Infrastructure.Security;
+using Ssalddel.Client.Infrastructure.Security;
 
 namespace FDriverApp
 {
@@ -64,8 +64,8 @@ namespace FDriverApp
             builder.Services.AddSingleton<FDriverAppProfile>();
             builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
             builder.Services.AddSingleton<IFDriverAuthSession, FDriverAuthSession>();
-            builder.Services.AddHongdalApiHttpClient(
-                HongdalApiEndpoint.CreateDefaultBaseAddress(),
+            builder.Services.AddSsalddelApiHttpClient(
+                SsalddelApiEndpoint.CreateDefaultBaseAddress(),
                 ServiceLifetime.Singleton,
                 TimeSpan.FromSeconds(20));
             builder.Services.AddSingleton<FDriverAuthApiService>();
@@ -77,7 +77,7 @@ namespace FDriverApp
             builder.Services.AddSingleton<ProjectListPageModel>();
             builder.Services.AddSingleton<ManageMetaPageModel>();
 
-            builder.Services.AddHongdalUiCommonAppServices<IFDriverAuthSession>();
+            builder.Services.AddSsalddelUiCommonAppServices<IFDriverAuthSession>();
             builder.Services.AddTransient<음식배달기사Controller기능모음ViewModel>();
             builder.Services.AddTransient<기사Controller기능모음ViewModel>();
             builder.Services.AddTransient<음식배달기사운행ViewModel>();

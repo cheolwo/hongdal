@@ -1,0 +1,138 @@
+@page "/shipper/warehouse/work/{ProcessCode}"
+@inject IWarehouseWorkEntryGateService EntryGateService
+@inject NavigationManager Navigation
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-6">
+    <MudStack Spacing="3">
+        <MudPaper Class="pa-4" Elevation="1">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h4">@PageTitleText</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@PageDescription</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <SsalddelWarehouseWorkEntryGate Title="@GateTitle"
+                                       Description="@GateDescription"
+                                       ProcessLabel="@ProcessLabel"
+                                       ChipColor="@ProcessColor"
+                                       PanelClass="pa-4"
+                                       IsBusy="@isBusy"
+                                       VerificationHandler="VerifyAsync"
+                                       Verified="OnVerifiedAsync" />
+
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.subtitle2">샘플 작업자 번호</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    입고 12345678 · 출고 23456789 · 포장 34567890 · 마켓 45678901 · 해외 56789012 · 국내배송 67890123 · 관리자 99998888
+                </MudText>
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string ProcessCode { get; set; } = WarehouseWorkProcessCodes.Inbound;
+
+    private bool isBusy;
+
+    private WarehouseWorkStartDefinition Definition => ResolveDefinition(ProcessCode);
+
+    private string NormalizedProcess => Definition.ProcessCode;
+
+    private string PageTitleText => Definition.Title;
+
+    private string PageDescription => Definition.Description;
+
+    private string GateTitle => $"{ProcessLabel} 작업자 확인";
+
+    private string GateDescription => "휴대폰 번호 뒤 8자리로 작업자를 찾고, 공정 역할이 맞으면 다음 화면으로 이동합니다.";
+
+    private string ProcessLabel => Definition.Label;
+
+    private Color ProcessColor => Definition.Color;
+
+    private string NextRoute => Definition.NextRoute;
+
+    private async Task<WarehouseWorkOperatorVerificationResult> VerifyAsync(string phoneSuffix)
+    {
+        isBusy = true;
+        try
+        {
+            return await EntryGateService.VerifyAsync(NormalizedProcess, phoneSuffix);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private async Task OnVerifiedAsync(WarehouseWorkOperatorVerificationResult result)
+    {
+        await Task.Delay(450);
+        Navigation.NavigateTo(NextRoute);
+    }
+
+    private static WarehouseWorkStartDefinition ResolveDefinition(string? processCode)
+    {
+        return Definitions.FirstOrDefault(x => string.Equals(x.ProcessCode, processCode, StringComparison.OrdinalIgnoreCase))
+            ?? Definitions[0];
+    }
+
+    private static readonly IReadOnlyList<WarehouseWorkStartDefinition> Definitions =
+    [
+        new(
+            WarehouseWorkProcessCodes.Inbound,
+            "입고 작업 시작",
+            "입고 검수와 적재 작업을 시작하기 전에 작업자와 입고 역할을 확인합니다.",
+            "입고",
+            Color.Warning,
+            ShipperRoutes.InboundRequests),
+        new(
+            WarehouseWorkProcessCodes.Outbound,
+            "출고 작업 시작",
+            "출고 피킹 작업을 시작하기 전에 작업자와 출고 역할을 확인합니다.",
+            "출고",
+            Color.Primary,
+            ShipperRoutes.OrderFulfillment),
+        new(
+            WarehouseWorkProcessCodes.Packing,
+            "포장 작업 시작",
+            "포장 작업을 시작하기 전에 작업자와 포장 역할을 확인합니다.",
+            "포장",
+            Color.Success,
+            ShipperRoutes.OrderFulfillment),
+        new(
+            WarehouseWorkProcessCodes.MarketFulfillment,
+            "마켓 출고 작업 시작",
+            "이커머스 주문 출고, 피킹, 포장 흐름을 시작하기 전에 마켓 출고 역할을 확인합니다.",
+            "마켓 출고",
+            Color.Info,
+            ShipperRoutes.OrderFulfillment),
+        new(
+            WarehouseWorkProcessCodes.InternationalForwarding,
+            "해외 배송대행 작업 시작",
+            "해외 배송대행 입고, 검수, 통관 연결 업무를 시작하기 전에 담당 역할을 확인합니다.",
+            "해외 배송대행",
+            Color.Secondary,
+            ShipperRoutes.InboundDashboard),
+        new(
+            WarehouseWorkProcessCodes.DeliveryAgency,
+            "국내 배송대행 작업 시작",
+            "국내 배송대행 접수와 운송 연결 업무를 시작하기 전에 담당 역할을 확인합니다.",
+            "국내 배송대행",
+            Color.Tertiary,
+            ShipperRoutes.ReconsignmentOrders)
+    ];
+
+    private sealed record WarehouseWorkStartDefinition(
+        string ProcessCode,
+        string Title,
+        string Description,
+        string Label,
+        Color Color,
+        string NextRoute);
+}

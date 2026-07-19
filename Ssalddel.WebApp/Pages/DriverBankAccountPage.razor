@@ -1,0 +1,76 @@
+@page "/driver/account/bank"
+@using Ssalddel.Contracts.Driver.Profile
+@using Ssalddel.Contracts.Driver.Settlement
+@inject 기사내정보Service 내정보Service
+@inject 기사정산Service 정산Service
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="계좌 정보"
+               Description="정산금을 받을 계좌와 이번 달 정산 상태를 확인합니다."
+               Badge="정산 계좌" />
+
+@if (!string.IsNullOrWhiteSpace(StatusMessage))
+{
+    <MudAlert Severity="@StatusSeverity" Variant="Variant.Outlined" Class="mb-3">@StatusMessage</MudAlert>
+}
+
+<MudGrid>
+    <MudItem xs="12" lg="8">
+        <SsalddelBankAccountPanel Account="@Account"
+                                 PanelClass="pa-4"
+                                 IdentityVerified="@IdentityVerified"
+                                 IdentityVerifiedChanged="@(value => IdentityVerified = value)"
+                                 StatusColor="@AccountStatusColor">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/driver/settlements/current-month">정산 정보</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/driver/me">내 정보 메뉴</MudButton>
+        </SsalddelBankAccountPanel>
+    </MudItem>
+    <MudItem xs="12" lg="4">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">정산 요약</MudText>
+                <MudText Typo="Typo.body2">배차 @((Settlement?.DispatchCount ?? 0).ToString("N0"))건</MudText>
+                <MudText Typo="Typo.body2">이용료 @((Settlement?.UsageFee ?? 0m).ToString("N0"))원</MudText>
+                <MudText Typo="Typo.body2">월 상한 @((Settlement?.MonthlyFeeCap ?? 0m).ToString("N0"))원</MudText>
+                <MudAlert Severity="@(Settlement?.IsPaid == true ? Severity.Success : Severity.Warning)" Dense="true" Variant="Variant.Outlined">
+                    @(Settlement?.IsPaid == true ? "이번 달 정산 확인 완료" : "이번 달 정산 확인 필요")
+                </MudAlert>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private 용달기사등록응답? Profile { get; set; }
+    private 기사정산응답? Settlement { get; set; }
+    private bool IdentityVerified { get; set; }
+    private string? StatusMessage { get; set; }
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+
+    private SsalddelBankAccountSummary Account => new(
+        "정산 계좌",
+        Display(Profile?.기사명, "기사님"),
+        "000-00-000000",
+        Profile is null ? "서버 조회 필요" : "확인 필요",
+        Settlement?.DispatchCount ?? 0,
+        Settlement?.UsageFee ?? 0m);
+
+    private Color AccountStatusColor => Profile is null ? Color.Warning : Color.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Profile = await 내정보Service.내프로필조회Async();
+            Settlement = await 정산Service.현재월조회Async();
+        }
+        catch (Exception ex)
+        {
+            StatusSeverity = Severity.Info;
+            StatusMessage = $"계좌/정산 정보를 아직 불러오지 못했습니다. {ex.Message}";
+        }
+    }
+
+    private static string Display(params string?[] values)
+        => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+}

@@ -1,0 +1,19 @@
+.ssalddel-server-grid-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+}
+
+.ssalddel-server-grid-scroll ::deep .mud-table-cell {
+    word-break: keep-all;
+}
+
+.ssalddel-server-grid-scroll ::deep th.mud-table-cell {
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .ssalddel-server-grid-content {
+        min-width: 0 !important;
+    }
+}

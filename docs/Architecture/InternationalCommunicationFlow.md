@@ -1,6 +1,6 @@
 # International Communication Flow
 
-Hongdal should help logistics participants communicate across countries, languages, customs rules, and warehouse locations. The goal is not only overseas processing, but reducing misunderstanding when Korean and non-Korean participants work through the same platform.
+Ssalddel should help logistics participants communicate across countries, languages, customs rules, and warehouse locations. The goal is not only overseas processing, but reducing misunderstanding when Korean and non-Korean participants work through the same platform.
 
 ## Scope
 

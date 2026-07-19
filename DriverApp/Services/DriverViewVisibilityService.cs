@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.ViewSettings;
+using Ssalddel.Contracts.Common.ViewSettings;
 
 namespace DriverApp.Services;
 

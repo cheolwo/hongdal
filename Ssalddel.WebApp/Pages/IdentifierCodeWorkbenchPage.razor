@@ -1,0 +1,118 @@
+@page "/tools/identifier-codes"
+
+<WebPageHeader Eyebrow="Common Tool"
+               Title="번호 QR/바코드 생성"
+               Description="주문번호, 원장번호, 출고예정번호를 공통 payload로 만들고 QR 또는 Code128로 출력합니다."
+               Badge="ZXing.Net SVG" />
+
+<MudGrid>
+    <MudItem xs="12" lg="4">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6">번호 입력</MudText>
+                <MudSelect T="string" Label="번호 유형" Value="@IdentifierKind" ValueChanged="OnKindChanged" Variant="Variant.Outlined">
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.Order">주문 번호</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.Ledger">원장 번호</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.OutboundPlan">출고예정 번호</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.TransportRequest">운송 의뢰 번호</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.InboundRequest">입고요청 번호</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.Product">상품 바코드</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.StorageLocation">적재 위치</MudSelectItem>
+                    <MudSelectItem T="string" Value="@SsalddelIdentifierKindCode.Bundle">묶음 바코드</MudSelectItem>
+                </MudSelect>
+
+                <MudTextField T="string"
+                              Label="번호"
+                              @bind-Value="IdentifierValue"
+                              Immediate="true"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" />
+
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    @foreach (var sample in Samples)
+                    {
+                        <MudButton Size="Size.Small"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   OnClick="@(() => UseSample(sample.Kind))">
+                            @sample.Label
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" lg="8">
+        @if (CurrentPayload is { } payload)
+        {
+            <MudStack Spacing="3">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2">스캔 payload</MudText>
+                        <MudText Typo="Typo.body2" Style="font-family: Consolas, 'Courier New', monospace; overflow-wrap: anywhere">
+                            @payload.RawCode
+                        </MudText>
+                    </MudStack>
+                </MudPaper>
+
+                <MudGrid>
+                    <MudItem xs="12" md="5">
+                        <SsalddelIdentifierCodePanel Payload="@payload"
+                                                    Format="@SsalddelMachineReadableCodeFormatCode.QrCode"
+                                                    Width="260"
+                                                    Height="260"
+                                                    Title="QR 코드" />
+                    </MudItem>
+                    <MudItem xs="12" md="7">
+                        <SsalddelIdentifierCodePanel Payload="@payload"
+                                                    Format="@SsalddelMachineReadableCodeFormatCode.Code128"
+                                                    Width="560"
+                                                    Height="160"
+                                                    Margin="1"
+                                                    Title="Code128 바코드" />
+                    </MudItem>
+                </MudGrid>
+            </MudStack>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Warning">번호를 입력하면 QR과 바코드를 생성합니다.</MudAlert>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    private static readonly IReadOnlyList<IdentifierSample> Samples =
+    [
+        new("주문", SsalddelIdentifierKindCode.Order, "ORD-20260710-0001"),
+        new("원장", SsalddelIdentifierKindCode.Ledger, "LED-20260710-0007"),
+        new("출고", SsalddelIdentifierKindCode.OutboundPlan, "OUT-20260710-0012"),
+        new("입고", SsalddelIdentifierKindCode.InboundRequest, "INB-20260710-0104"),
+        new("적재", SsalddelIdentifierKindCode.StorageLocation, "A-01-02")
+    ];
+
+    private string IdentifierKind = SsalddelIdentifierKindCode.Order;
+    private string IdentifierValue = "ORD-20260710-0001";
+
+    private SsalddelIdentifierCodePayload? CurrentPayload => string.IsNullOrWhiteSpace(IdentifierValue)
+        ? null
+        : SsalddelIdentifierCodePayloads.Create(IdentifierKind, IdentifierValue);
+
+    private Task OnKindChanged(string value)
+    {
+        IdentifierKind = value;
+        IdentifierValue = Samples.FirstOrDefault(x => x.Kind == value)?.Value ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private void UseSample(string kind)
+    {
+        var sample = Samples.First(x => x.Kind == kind);
+        IdentifierKind = sample.Kind;
+        IdentifierValue = sample.Value;
+    }
+
+    private sealed record IdentifierSample(string Label, string Kind, string Value);
+}

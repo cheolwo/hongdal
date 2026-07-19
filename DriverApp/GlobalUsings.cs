@@ -1,1 +1,1 @@
-global using Hongdal.Ui.Common.Areas.App.ViewModels;
+global using Ssalddel.Ui.Common.Areas.App.ViewModels;

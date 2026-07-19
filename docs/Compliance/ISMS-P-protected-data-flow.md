@@ -1,6 +1,6 @@
 # ISMS-P Protected Data Flow
 
-이 문서는 Hongdal에서 개인정보와 계약 보호 정보가 클라이언트, 서버, DB, 응답 화면을 오갈 때 적용할 기본 흐름을 정리한다. 이 문서는 인증 적합 선언이 아니라 내부 설계 기준이다. 실제 ISMS-P 인증 적합성은 운영 범위, 관리체계 증적, 심사기관 확인으로 판단해야 한다.
+이 문서는 Ssalddel에서 개인정보와 계약 보호 정보가 클라이언트, 서버, DB, 응답 화면을 오갈 때 적용할 기본 흐름을 정리한다. 이 문서는 인증 적합 선언이 아니라 내부 설계 기준이다. 실제 ISMS-P 인증 적합성은 운영 범위, 관리체계 증적, 심사기관 확인으로 판단해야 한다.
 
 공식 기준 참고:
 
@@ -26,7 +26,7 @@
 ```mermaid
 sequenceDiagram
     participant Client as Client App
-    participant Server as Hongdal API
+    participant Server as Ssalddel API
     participant Store as DB or File Storage
 
     Client->>Server: transport public key request
@@ -46,11 +46,11 @@ sequenceDiagram
 
 | 책임 | 코드 |
 | --- | --- |
-| 필드 분류와 보호 방식 | `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs` |
+| 필드 분류와 보호 방식 | `Ssalddel.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs` |
 | DTO 속성 표시 | `IsmsPProtectedDataAttribute` |
-| 클라이언트 전송 암호화 판단 | `HongdalIsmsPClientEncryptionService.RequiresEncryptedTransport<T>()` |
-| 클라이언트 공통 보호 전송 | `HongdalProtectedApiClient` |
-| 클라이언트 envelope 생성 | `hongdal-isms-p-transport.js`, `HongdalIsmsPClientEncryptionService` |
+| 클라이언트 전송 암호화 판단 | `SsalddelIsmsPClientEncryptionService.RequiresEncryptedTransport<T>()` |
+| 클라이언트 공통 보호 전송 | `SsalddelProtectedApiClient` |
+| 클라이언트 envelope 생성 | `ssalddel-isms-p-transport.js`, `SsalddelIsmsPClientEncryptionService` |
 | 서버 envelope 자동 복호화 | `IsmsPEncryptedTransportMiddleware` |
 | 서버 transport 복호화 | `RsaOaepAesGcmClientTransportProtectionService` |
 | transport 키 활성 메타데이터 | `RedisIsmsPTransportKeyStatusStore` |

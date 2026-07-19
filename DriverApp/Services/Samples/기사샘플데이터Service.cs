@@ -2,7 +2,7 @@ using Bogus;
 using DriverApp.Models.Driver;
 using DriverApp.Models.Driver.Samples;
 using DriverApp.Services.Geo;
-using Hongdal.Contracts.Common.VehicleLoading;
+using Ssalddel.Contracts.Common.VehicleLoading;
 using System.Globalization;
 
 namespace DriverApp.Services.Samples;

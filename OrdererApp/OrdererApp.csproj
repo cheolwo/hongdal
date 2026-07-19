@@ -10,7 +10,7 @@
     <Nullable>enable</Nullable>
     <EnableDefaultCssItems>false</EnableDefaultCssItems>
     <ApplicationTitle>살뜰 주문</ApplicationTitle>
-    <ApplicationId>com.hongdal.ordererapp</ApplicationId>
+    <ApplicationId>com.ssalddel.ordererapp</ApplicationId>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
     <WindowsPackageType>None</WindowsPackageType>
@@ -19,8 +19,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
-    <ProjectReference Include="..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+    <ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+    <ProjectReference Include="..\Ssalddel.Ui.Common\Ssalddel.Ui.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

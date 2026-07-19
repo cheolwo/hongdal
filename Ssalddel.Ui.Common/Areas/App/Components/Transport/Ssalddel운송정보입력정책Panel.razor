@@ -1,0 +1,17 @@
+@using Ssalddel.Ui.Common.Areas.App.Models
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="@Dense">
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.subtitle2">@운송정보입력정책.Get안내문구(화물적재형태)</MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">권장 운송 방식: @운송정보입력정책.Get권장운송방식(화물적재형태)</MudText>
+        @foreach (var 요구사항 in 운송정보입력정책.Get요구사항(화물적재형태))
+        {
+            <MudText Typo="Typo.caption">- @요구사항.제목: @요구사항.설명</MudText>
+        }
+    </MudStack>
+</MudAlert>
+
+@code {
+    [Parameter] public string? 화물적재형태 { get; set; }
+    [Parameter] public bool Dense { get; set; } = true;
+}

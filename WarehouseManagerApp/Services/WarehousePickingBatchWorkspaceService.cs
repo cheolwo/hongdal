@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.Warehouse;
+using Ssalddel.Contracts.Common.Warehouse;
 
 namespace WarehouseManagerApp.Services;
 
@@ -20,7 +20,7 @@ public sealed record WarehousePickingWarehouseOption(
     string WarehouseName,
     피킹포장처리방식 Mode,
     bool IsBarcodeRequired,
-    bool IsHongdalMartUrbanWarehouse,
+    bool IsSsalddelMartUrbanWarehouse,
     string OperationMemo);
 
 public sealed class WarehousePickingTaskItem

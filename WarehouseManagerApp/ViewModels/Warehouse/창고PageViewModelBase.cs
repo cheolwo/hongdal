@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace WarehouseManagerApp.ViewModels.Warehouse;
 

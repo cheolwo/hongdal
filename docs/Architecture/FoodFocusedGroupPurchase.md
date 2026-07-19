@@ -85,7 +85,7 @@ flowchart TD
 
 초안 상태에서는 필수 조항이 빠졌는지 먼저 확인하고, 운영자가 검토한 뒤 서명 가능한 상태로 넘깁니다. 특히 공급자/화주 당사자, 비구속 수요 확인 고지, 마일스톤 지급 조항, 분배 확인 기준은 빠지면 안 됩니다.
 
-전자서명은 모든 화면에 상시 노출하지 않습니다. 창고 앱은 입고 계약처럼 서명이 필요한 계약 단계에서, 화주/차주 흐름은 거래 양식상 서명이 필요한 경우에, 기사 앱은 상차 인수나 하차 인수 확인이 필요한 경우에만 서명 패드를 노출합니다. UI 공통단에서는 `HongdalSignatureGate`가 `HongdalSignatureRequirement.IsRequired=true`일 때만 `HongdalSignaturePad`를 렌더링합니다.
+전자서명은 모든 화면에 상시 노출하지 않습니다. 창고 앱은 입고 계약처럼 서명이 필요한 계약 단계에서, 화주/차주 흐름은 거래 양식상 서명이 필요한 경우에, 기사 앱은 상차 인수나 하차 인수 확인이 필요한 경우에만 서명 패드를 노출합니다. UI 공통단에서는 `SsalddelSignatureGate`가 `SsalddelSignatureRequirement.IsRequired=true`일 때만 `SsalddelSignaturePad`를 렌더링합니다.
 
 ## 개인정보/계약 보호 기준
 
@@ -108,18 +108,18 @@ DTO 속성에는 `IsmsPProtectedDataAttribute`를 붙여 어떤 값이 ISMS-P �
 
 ## 코드 골격
 
-- 공통 플래너: `Hongdal.Contracts/Common/Orderer/냉장냉동먹거리공동구매계획기.cs`
-- 마일스톤 지급 플래너: `Hongdal.Contracts/Common/Orderer/공동구매결제단계계획기.cs`
-- 수입 식품 공동 주문 계약서 플래너: `Hongdal.Contracts/Common/ContractManagement/수입식품공동주문계약계획기.cs`
-- 계약 전자서명 플래너: `Hongdal.Contracts/Common/ContractManagement/ContractElectronicSignature.cs`
-- 개인정보/계약 ISMS-P 준비도 플래너: `Hongdal.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
-- ISMS-P 보호 어트리뷰트: `Hongdal.Contracts/Common/Privacy/IsmsPProtectedDataAttribute.cs`
-- 개인정보 필드 보호 카탈로그: `Hongdal.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
-- 공통 서명 입력 UI: `Hongdal.Ui.Common/Areas/App/Components/Contracts/HongdalSignatureGate.razor`, `HongdalSignaturePad.razor`
+- 공통 플래너: `Ssalddel.Contracts/Common/Orderer/냉장냉동먹거리공동구매계획기.cs`
+- 마일스톤 지급 플래너: `Ssalddel.Contracts/Common/Orderer/공동구매결제단계계획기.cs`
+- 수입 식품 공동 주문 계약서 플래너: `Ssalddel.Contracts/Common/ContractManagement/수입식품공동주문계약계획기.cs`
+- 계약 전자서명 플래너: `Ssalddel.Contracts/Common/ContractManagement/ContractElectronicSignature.cs`
+- 개인정보/계약 ISMS-P 준비도 플래너: `Ssalddel.Contracts/Common/Privacy/IsmsPComplianceReadiness.cs`
+- ISMS-P 보호 어트리뷰트: `Ssalddel.Contracts/Common/Privacy/IsmsPProtectedDataAttribute.cs`
+- 개인정보 필드 보호 카탈로그: `Ssalddel.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
+- 공통 서명 입력 UI: `Ssalddel.Ui.Common/Areas/App/Components/Contracts/SsalddelSignatureGate.razor`, `SsalddelSignaturePad.razor`
 - 주문자 앱 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`
-- HS 식품 분류 기준: `Hongdal.Domain/HS코드s/HS코드BusinessCategoryClassifier.cs`
-- 수입식품 조회 모듈: `Hongdal/Services/External/Mfds/*`
-- 주문자 집단 범위 후보: `Hongdal/Services/External/PublicData/주문자집단배송권조회Service.cs`
+- HS 식품 분류 기준: `Ssalddel.Domain/HS코드s/HS코드BusinessCategoryClassifier.cs`
+- 수입식품 조회 모듈: `Ssalddel/Services/External/Mfds/*`
+- 주문자 집단 범위 후보: `Ssalddel/Services/External/PublicData/주문자집단배송권조회Service.cs`
 
 `냉장냉동먹거리공동구매계획기`는 DB 없이 캠페인 초안을 판정한다.
 

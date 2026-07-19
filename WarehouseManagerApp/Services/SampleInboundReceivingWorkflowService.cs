@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.WarehouseScanning;
+using Ssalddel.Contracts.Common.WarehouseScanning;
 
 namespace WarehouseManagerApp.Services;
 

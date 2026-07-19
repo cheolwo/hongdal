@@ -30,6 +30,6 @@
 - 가격 비교 Page ViewModel 집중 테스트 4개 통과
 - 공공데이터 개요 실패 시 fallback 출처 유지 확인
 - 미국 조회 실패 시 한국·호주 결과 유지 확인
-- `Hongdal.Ui.Common`, `Hongdal.WebApp`, `HongdalApp` Windows 빌드 통과, 경고 0개·오류 0개
+- `Ssalddel.Ui.Common`, `Ssalddel.WebApp`, `SsalddelApp` Windows 빌드 통과, 경고 0개·오류 0개
 - 데스크톱 `1280 x 720`과 모바일 `390 x 844`에서 조회 버튼, 비교 기준, 국가별 결과 카드와 가로 넘침 없음 확인
 - API 연결 실패 시 Blazor 오류 화면 없이 국가별 안내 상태 표시 확인

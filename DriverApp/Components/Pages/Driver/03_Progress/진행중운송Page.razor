@@ -106,42 +106,42 @@
                         </MudStack>
                     </MudPaper>
 
-                    <HongdalSensitiveDisclosureList Title="운행 상세"
+                    <SsalddelSensitiveDisclosureList Title="운행 상세"
                                                     Summary="@현재운송.현재단계"
                                                     RelatedParties='@($"기사님 · 화주 · 하차지 담당자 / 의뢰 {현재운송.의뢰Id}")'
                                                     Icon="@Icons.Material.Filled.LocalShipping"
                                                     Color="Color.Primary"
                                                     PrivacyHint="운행 중 필요한 정보만 펼쳐 확인합니다.">
                         <MudExpansionPanel Text="화물 정보">
-                            <HongdalSensitiveInfoRow Label="화물 종류" Value="@현재운송.화물종류" />
-                            <HongdalSensitiveInfoRow Label="상차 유형" Value="@현재운송.수입화물유형표시" />
-                            <HongdalSensitiveInfoRow Label="BL/반출 문서" Value="@DocumentNumberLabel" />
-                            <HongdalSensitiveInfoRow Label="컨테이너" Value="@ContainerNumberLabel" />
-                            <HongdalSensitiveInfoRow Label="의뢰 번호" Value="@현재운송.의뢰Id" />
-                            <HongdalSensitiveInfoRow Label="작업 메모" Value="@현재운송.상차주의사항" />
+                            <SsalddelSensitiveInfoRow Label="화물 종류" Value="@현재운송.화물종류" />
+                            <SsalddelSensitiveInfoRow Label="상차 유형" Value="@현재운송.수입화물유형표시" />
+                            <SsalddelSensitiveInfoRow Label="BL/반출 문서" Value="@DocumentNumberLabel" />
+                            <SsalddelSensitiveInfoRow Label="컨테이너" Value="@ContainerNumberLabel" />
+                            <SsalddelSensitiveInfoRow Label="의뢰 번호" Value="@현재운송.의뢰Id" />
+                            <SsalddelSensitiveInfoRow Label="작업 메모" Value="@현재운송.상차주의사항" />
                         </MudExpansionPanel>
 
                         <MudExpansionPanel Text="운송 정보">
-                            <HongdalSensitiveInfoRow Label="상차지" Value="@현재운송.픽업지" />
-                            <HongdalSensitiveInfoRow Label="하차지" Value="@현재운송.하차지" />
-                            <HongdalSensitiveInfoRow Label="현재 단계" Value="@현재운송.현재단계" />
-                            <HongdalSensitiveInfoRow Label="예정 시각" Value='@현재운송.예정시각.ToString("HH:mm")' />
-                            <HongdalSensitiveInfoRow Label="운송 거리" Value='@($"{현재운송.운송거리Km:0.0}km")' />
+                            <SsalddelSensitiveInfoRow Label="상차지" Value="@현재운송.픽업지" />
+                            <SsalddelSensitiveInfoRow Label="하차지" Value="@현재운송.하차지" />
+                            <SsalddelSensitiveInfoRow Label="현재 단계" Value="@현재운송.현재단계" />
+                            <SsalddelSensitiveInfoRow Label="예정 시각" Value='@현재운송.예정시각.ToString("HH:mm")' />
+                            <SsalddelSensitiveInfoRow Label="운송 거리" Value='@($"{현재운송.운송거리Km:0.0}km")' />
                         </MudExpansionPanel>
 
                         <MudExpansionPanel Text="결제 정보">
-                            <HongdalSensitiveInfoRow Label="예상 수익" Value='@($"{현재운송.예상수익:0}원")' />
-                            <HongdalSensitiveInfoRow Label="정산 기준" Value="하차 완료 후 정산 확인" />
-                            <HongdalSensitiveInfoRow Label="인수증" Value="하차 현장에서 필요 여부 확인" />
+                            <SsalddelSensitiveInfoRow Label="예상 수익" Value='@($"{현재운송.예상수익:0}원")' />
+                            <SsalddelSensitiveInfoRow Label="정산 기준" Value="하차 완료 후 정산 확인" />
+                            <SsalddelSensitiveInfoRow Label="인수증" Value="하차 현장에서 필요 여부 확인" />
                         </MudExpansionPanel>
 
                         <MudExpansionPanel Text="전달받는자 정보">
-                            <HongdalSensitiveInfoRow Label="전달 위치" Value="@현재운송.하차지" />
-                            <HongdalSensitiveInfoRow Label="담당자" Value="하차지 담당자" />
-                            <HongdalSensitiveInfoRow Label="연락처" Value="상세 API 연결 시 표시" />
-                            <HongdalSensitiveInfoRow Label="전달 요청" Value="도착 전 연락 후 하차 완료 사진을 남깁니다." />
+                            <SsalddelSensitiveInfoRow Label="전달 위치" Value="@현재운송.하차지" />
+                            <SsalddelSensitiveInfoRow Label="담당자" Value="하차지 담당자" />
+                            <SsalddelSensitiveInfoRow Label="연락처" Value="상세 API 연결 시 표시" />
+                            <SsalddelSensitiveInfoRow Label="전달 요청" Value="도착 전 연락 후 하차 완료 사진을 남깁니다." />
                         </MudExpansionPanel>
-                    </HongdalSensitiveDisclosureList>
+                    </SsalddelSensitiveDisclosureList>
                 </MudStack>
             </MudPaper>
         }

@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Food;
+using Ssalddel.Contracts.Food;
 using RestaurantDeskApp.Models.Restaurant;
 
 namespace RestaurantDeskApp.Services;

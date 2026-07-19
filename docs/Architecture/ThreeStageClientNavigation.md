@@ -4,7 +4,7 @@
 > 기준일: 2026-07-13  
 > 관련 문서: [Platform Home Mode](PlatformHomeMode.md), [통합 커뮤니티 클라이언트](../ProjectOverview/unified-community-client.md)
 
-Hongdal 클라이언트의 페이지는 역할별 앱 목록을 먼저 보여주는 방식에서 벗어나 다음 세 단계로 연결한다.
+Ssalddel 클라이언트의 페이지는 역할별 앱 목록을 먼저 보여주는 방식에서 벗어나 다음 세 단계로 연결한다.
 
 ```mermaid
 flowchart LR
@@ -256,7 +256,7 @@ DiagramNodeAction
 2. 2단계 다이어그램 종류와 노드 관계
 3. 각 노드 행동에서 열리는 3단계 데이터 페이지
 
-`HongdalApp`, `WarehouseManagerApp`, `DriverApp` 같은 프로젝트별 카탈로그는 코드 위치와 라우트를 찾는 물리 색인으로 유지한다. 프로젝트가 다르다는 이유만으로 사용자에게 별도 앱처럼 설명하지 않는다.
+`SsalddelApp`, `WarehouseManagerApp`, `DriverApp` 같은 프로젝트별 카탈로그는 코드 위치와 라우트를 찾는 물리 색인으로 유지한다. 프로젝트가 다르다는 이유만으로 사용자에게 별도 앱처럼 설명하지 않는다.
 
 새 화면 README에는 가능한 경우 다음을 기록한다.
 

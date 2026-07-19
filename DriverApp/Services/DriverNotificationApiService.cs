@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Driver.Notification;
+using Ssalddel.Contracts.Driver.Notification;
 
 namespace DriverApp.Services;
 

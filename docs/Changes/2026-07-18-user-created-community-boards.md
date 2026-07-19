@@ -17,7 +17,7 @@
 
 ## 검증
 
-- `dotnet build Hongdal/Hongdal.csproj --no-restore`
+- `dotnet build Ssalddel/Ssalddel.csproj --no-restore`
 - 사용자 게시판·Controller 권한·게시판 카탈로그 관련 테스트 15개 통과
 - EF Core 모델 스냅샷 정합성 확인: `No changes have been made to the model since the last migration.`
 - 전체 테스트 1,297개 중 1,296개 통과, 기존 Apify 배열 응답 테스트 1개 실패

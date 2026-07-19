@@ -6,7 +6,7 @@ using Com.Naver.Maps.Map;
 using Com.Naver.Maps.Map.Overlay;
 using Com.Naver.Maps.Map.Util;
 using FDriverApp.Controls;
-using Hongdal.Contracts.Common.Drivers;
+using Ssalddel.Contracts.Common.Drivers;
 using Microsoft.Maui.Handlers;
 using AndroidColor = Android.Graphics.Color;
 

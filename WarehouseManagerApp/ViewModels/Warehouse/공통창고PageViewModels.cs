@@ -1,6 +1,6 @@
-using Hongdal.Contracts.Common.WarehouseScanning;
-using Hongdal.Ui.Common.Areas.App.Models;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Contracts.Common.WarehouseScanning;
+using Ssalddel.Ui.Common.Areas.App.Models;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using WarehouseManagerApp.Services;
 
 namespace WarehouseManagerApp.ViewModels.Warehouse;

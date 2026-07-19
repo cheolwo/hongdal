@@ -32,7 +32,7 @@
 ## 검증
 
 - 음식점 식재료 공급 요청 Page ViewModel 집중 테스트 10개 통과
-- `Hongdal.Tests` 전체 테스트 1,417개 통과
+- `Ssalddel.Tests` 전체 테스트 1,417개 통과
 - `RestaurantDeskApp` Windows 빌드 통과, 경고 0개·오류 0개
 - 실제 MAUI Blazor 앱에서 국내·수입 경로 전환, 후보 직접 선택, 목표 단가 반영과 Simulation 초안 저장 확인
 - 데스크톱 `1426 x 746`과 모바일 `391 x 1032`에서 입력·경로 버튼·가격 카드의 가로 넘침 없음

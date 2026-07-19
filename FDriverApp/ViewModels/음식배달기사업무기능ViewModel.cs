@@ -1,8 +1,8 @@
 using FDriverApp.Services;
-using Hongdal.Contracts.Common.Drivers;
-using Hongdal.Contracts.Driver.Food;
-using Hongdal.Contracts.Driver.Work;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Contracts.Common.Drivers;
+using Ssalddel.Contracts.Driver.Food;
+using Ssalddel.Contracts.Driver.Work;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace FDriverApp.ViewModels;
 

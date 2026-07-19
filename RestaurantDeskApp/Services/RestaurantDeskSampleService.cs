@@ -1,7 +1,7 @@
-using Hongdal.Contracts.Admin.Restaurants;
-using Hongdal.Contracts.Common.Participants;
-using Hongdal.Contracts.Food;
-using Hongdal.Contracts.Restaurants;
+using Ssalddel.Contracts.Admin.Restaurants;
+using Ssalddel.Contracts.Common.Participants;
+using Ssalddel.Contracts.Food;
+using Ssalddel.Contracts.Restaurants;
 using RestaurantDeskApp.Models.Restaurant;
 
 namespace RestaurantDeskApp.Services;

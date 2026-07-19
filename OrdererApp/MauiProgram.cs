@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Hongdal.Ui.Common.Areas.App.Services;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using MudBlazor.Services;
 using OrdererApp.Services;
 using OrdererApp.ViewModels;
@@ -17,16 +17,16 @@ public static class MauiProgram
 
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
-        builder.Services.AddHongdalUiCommonAppServices();
+        builder.Services.AddSsalddelUiCommonAppServices();
         builder.Services.AddTransient<주문자Controller기능모음ViewModel>();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
         builder.Services.AddTransient<주문자공동구매기능ViewModel>();
         builder.Services.AddTransient<주문자음식점탐색기능ViewModel>();
         builder.Services.AddTransient<주문자Api기능모음ViewModel>();
-        builder.Services.AddHongdalApiHttpClient(
-            HongdalApiEndpoint.ResolveBaseAddress(
-                builder.Configuration[HongdalApiEndpoint.ConfigurationKey],
-                new Uri(HongdalApiEndpoint.LocalDevelopmentBaseAddress)),
+        builder.Services.AddSsalddelApiHttpClient(
+            SsalddelApiEndpoint.ResolveBaseAddress(
+                builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
+                new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)),
             ServiceLifetime.Singleton);
         builder.Services.AddSingleton<IRestaurantSearchPolicyService, HttpRestaurantSearchPolicyService>();
         builder.Services.AddSingleton<IGroupPurchaseShipmentTrackingService, HttpGroupPurchaseShipmentTrackingService>();

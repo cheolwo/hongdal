@@ -22,7 +22,7 @@
                                 <MudChip T="string" Color="@item.Color">@item.Status</MudChip>
                             </MudStack>
 
-                            <HongdalSensitiveDisclosureList Title="검수 관계와 상세"
+                            <SsalddelSensitiveDisclosureList Title="검수 관계와 상세"
                                                             Summary="@item.Description"
                                                             RelatedParties="@item.RelatedParties"
                                                             PrivacyHint="검수 결과에 따라 누가 후속 확인 대상인지 먼저 확인합니다."
@@ -30,16 +30,16 @@
                                                             Color="@item.Color"
                                                             Compact="true">
                                 <MudExpansionPanel Text="검수 정보" Icon="@Icons.Material.Filled.Inventory2">
-                                    <HongdalSensitiveInfoRow Label="상품명" Value="@item.Name" />
-                                    <HongdalSensitiveInfoRow Label="검수 항목" Value="@item.CheckPoint" />
-                                    <HongdalSensitiveInfoRow Label="상태" Value="@item.Status" />
+                                    <SsalddelSensitiveInfoRow Label="상품명" Value="@item.Name" />
+                                    <SsalddelSensitiveInfoRow Label="검수 항목" Value="@item.CheckPoint" />
+                                    <SsalddelSensitiveInfoRow Label="상태" Value="@item.Status" />
                                 </MudExpansionPanel>
                                 <MudExpansionPanel Text="후속 확인" Icon="@Icons.Material.Filled.Group">
-                                    <HongdalSensitiveInfoRow Label="직접 관련 대상" Value="@item.RelatedParties" />
-                                    <HongdalSensitiveInfoRow Label="문의 경로" Value="@item.ContactContext" />
-                                    <HongdalSensitiveInfoRow Label="관계 기록" Value="검수 완료 후 입고 담당자와 공급사/화주 간 업무 연결 기록 후보가 됩니다." />
+                                    <SsalddelSensitiveInfoRow Label="직접 관련 대상" Value="@item.RelatedParties" />
+                                    <SsalddelSensitiveInfoRow Label="문의 경로" Value="@item.ContactContext" />
+                                    <SsalddelSensitiveInfoRow Label="관계 기록" Value="검수 완료 후 입고 담당자와 공급사/화주 간 업무 연결 기록 후보가 됩니다." />
                                 </MudExpansionPanel>
-                            </HongdalSensitiveDisclosureList>
+                            </SsalddelSensitiveDisclosureList>
 
                             <MudButton Variant="Variant.Filled" Color="@item.Color" StartIcon="@Icons.Material.Filled.FactCheck">
                                 검수 진행

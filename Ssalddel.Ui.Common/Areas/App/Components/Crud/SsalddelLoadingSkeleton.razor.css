@@ -1,0 +1,23 @@
+.ssalddel-loading-skeleton {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    padding: 16px;
+}
+
+.ssalddel-loading-skeleton__row {
+    display: grid;
+    grid-template-columns: repeat(var(--ssalddel-skeleton-columns), minmax(0, 1fr));
+    gap: 16px;
+    min-height: 24px;
+}
+
+@media (max-width: 600px) {
+    .ssalddel-loading-skeleton__row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ssalddel-loading-skeleton__row > :not(:first-child) {
+        display: none;
+    }
+}

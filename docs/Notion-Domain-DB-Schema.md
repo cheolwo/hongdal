@@ -1,6 +1,6 @@
-# Hongdal Domain 기반 Notion DB 스키마 문서
+# Ssalddel Domain 기반 Notion DB 스키마 문서
 
-이 문서는 `Hongdal/Domain` 엔티티를 기준으로 Notion Database를 동일 구조로 수동 생성할 때 바로 복붙해서 쓸 수 있게 정리한 문서입니다.
+이 문서는 `Ssalddel/Domain` 엔티티를 기준으로 Notion Database를 동일 구조로 수동 생성할 때 바로 복붙해서 쓸 수 있게 정리한 문서입니다.
 
 ## 1) 공통 생성 규칙
 
@@ -316,5 +316,5 @@
 
 ## 5) 참고 소스
 
-- `Hongdal/Domain/**/*.cs`
-- `Hongdal/Domain/공통/상태값.cs`
+- `Ssalddel/Domain/**/*.cs`
+- `Ssalddel/Domain/공통/상태값.cs`

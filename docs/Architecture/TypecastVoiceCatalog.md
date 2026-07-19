@@ -2,7 +2,7 @@
 
 ## 목적
 
-Typecast 외부 API 계약을 홍달의 업무 코드와 분리하고, 음성 캐릭터와 지원 모델 정보를 MySQL 카탈로그로 동기화한다. 화면과 다른 업무 모듈은 Typecast 응답을 직접 사용하지 않고 홍달 계약 DTO를 조회한다.
+Typecast 외부 API 계약을 살뜰의 업무 코드와 분리하고, 음성 캐릭터와 지원 모델 정보를 MySQL 카탈로그로 동기화한다. 화면과 다른 업무 모듈은 Typecast 응답을 직접 사용하지 않고 살뜰 계약 DTO를 조회한다.
 
 ## 모듈 경계
 
@@ -21,7 +21,7 @@ Typecast 외부 API 계약을 홍달의 업무 코드와 분리하고, 음성 �
 
 ## 운영 설정
 
-API 키는 추적되는 설정 파일에 넣지 않는다. `Hongdal/appsettings.Local.json` 또는 환경 변수에 다음 값을 설정한다.
+API 키는 추적되는 설정 파일에 넣지 않는다. `Ssalddel/appsettings.Local.json` 또는 환경 변수에 다음 값을 설정한다.
 
 ```json
 {

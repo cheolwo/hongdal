@@ -3,7 +3,7 @@
 @inject RestaurantDeskSampleService SampleService
 @inject I음식점주문DeskService OrderDeskService
 @inject I음식점주문SignalRClientService RestaurantRealtimeService
-@inject IHongdalDocumentOutputService DocumentOutputService
+@inject ISsalddelDocumentOutputService DocumentOutputService
 @inject IOptions<RestaurantDeskOptions> DeskOptions
 @inject IJSRuntime JS
 
@@ -91,7 +91,7 @@
                             </MudTimelineItem>
                             <MudTimelineItem Color="Color.Primary" Icon="@Icons.Material.Filled.CheckCircle">
                                 <MudText Typo="Typo.subtitle2">음식점 수락</MudText>
-                                <MudText Typo="Typo.body2">수락 시점에 Hongdal 서버에서 주문 상세를 다시 조회합니다.</MudText>
+                                <MudText Typo="Typo.body2">수락 시점에 Ssalddel 서버에서 주문 상세를 다시 조회합니다.</MudText>
                             </MudTimelineItem>
                             <MudTimelineItem Color="Color.Success" Icon="@Icons.Material.Filled.Print">
                                 <MudText Typo="Typo.subtitle2">전표 출력</MudText>
@@ -207,7 +207,7 @@
             }
 
             var output = DocumentOutputService.CreateOutboundExpectedItems(result.전표Draft);
-            await JS.InvokeVoidAsync("hongdalDocumentOutput.printHtml", output.Title, output.Html);
+            await JS.InvokeVoidAsync("ssalddelDocumentOutput.printHtml", output.Title, output.Html);
             await OrderDeskService.전표출력완료Async(orderNo);
 
             messageSeverity = Severity.Success;

@@ -26,7 +26,7 @@
 		<ApplicationTitle>살뜰 배달</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>kr.hongdal.fdriver</ApplicationId>
+		<ApplicationId>kr.ssalddel.fdriver</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -47,9 +47,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
-		<ProjectReference Include="..\Hongdal.Client.Infrastructure\Hongdal.Client.Infrastructure.csproj" />
-		<ProjectReference Include="..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+		<ProjectReference Include="..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+		<ProjectReference Include="..\Ssalddel.Client.Infrastructure\Ssalddel.Client.Infrastructure.csproj" />
+		<ProjectReference Include="..\Ssalddel.Ui.Common\Ssalddel.Ui.Common.csproj" />
 
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#17171a" />

@@ -1,0 +1,172 @@
+@using System.Globalization
+@using Ssalddel.Ui.Common.Areas.App.Services
+
+<div class="@BuildClass()"
+     style="@BuildStyle()"
+     role="img"
+     aria-label="@($"{Title}, 진괘 주문에서 감괘 운송으로 이동하는 애니메이션 미리보기")">
+    <span class="bagua-motion-pack-preview__node bagua-motion-pack-preview__node--source">
+        <b>☳</b><small>주문</small>
+    </span>
+    <span class="bagua-motion-pack-preview__trail" aria-hidden="true"></span>
+    <span class="bagua-motion-pack-preview__actor" aria-hidden="true">@Manifest.PreviewSymbol</span>
+    <span class="bagua-motion-pack-preview__node bagua-motion-pack-preview__node--target">
+        <b>☵</b><small>운송</small>
+    </span>
+    @if (!Compact)
+    {
+        <span class="bagua-motion-pack-preview__profile">@Manifest.CharacterLabel · @Manifest.TrailLabel</span>
+    }
+</div>
+
+<style>
+    .bagua-motion-pack-preview {
+        position: relative;
+        width: 100%;
+        min-height: 150px;
+        overflow: hidden;
+        border-radius: 18px;
+        background:
+            radial-gradient(circle at 50% 48%, rgba(255, 255, 255, .92), transparent 28%),
+            linear-gradient(145deg, color-mix(in srgb, var(--pack-motion-accent) 12%, #f8fafc), #eef3f8);
+    }
+
+    .bagua-motion-pack-preview--compact { min-height: 118px; }
+
+    .bagua-motion-pack-preview__node {
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+        display: grid;
+        place-items: center;
+        width: 58px;
+        height: 58px;
+        transform: translateY(-50%);
+        border: 2px solid rgba(255, 255, 255, .92);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .9);
+        color: #1e293b;
+        box-shadow: 0 8px 20px rgba(30, 41, 59, .13);
+    }
+
+    .bagua-motion-pack-preview__node--source { left: 7%; }
+    .bagua-motion-pack-preview__node--target { right: 7%; border-color: var(--pack-motion-accent); }
+    .bagua-motion-pack-preview__node b { font-size: 24px; line-height: 1; }
+    .bagua-motion-pack-preview__node small { color: #64748b; font-size: 9px; font-weight: 800; }
+
+    .bagua-motion-pack-preview__trail {
+        position: absolute;
+        top: 50%;
+        right: 20%;
+        left: 20%;
+        height: 3px;
+        transform: translateY(-50%);
+        background: repeating-linear-gradient(90deg, var(--pack-motion-accent) 0 11px, transparent 11px 21px);
+        opacity: .42;
+        animation: bagua-motion-pack-trail .8s linear infinite;
+    }
+
+    .bagua-motion-pack-preview__actor {
+        position: absolute;
+        z-index: 3;
+        top: 50%;
+        left: 18%;
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        transform: translate(-50%, -50%);
+        border: 2px solid var(--pack-motion-accent);
+        border-radius: 50%;
+        background: #fff;
+        font-size: 24px;
+        filter: drop-shadow(0 7px 6px rgba(15, 23, 42, .16));
+        animation: bagua-motion-pack-journey var(--pack-motion-duration) ease-in-out infinite;
+    }
+
+    .bagua-motion-pack-preview--courier-sprint-v1 .bagua-motion-pack-preview__actor {
+        border-radius: 12px;
+        animation-timing-function: cubic-bezier(.25, .05, .2, 1);
+    }
+
+    .bagua-motion-pack-preview--courier-sprint-v1 .bagua-motion-pack-preview__trail {
+        height: 5px;
+        box-shadow: 0 7px 0 color-mix(in srgb, var(--pack-motion-accent) 35%, transparent);
+    }
+
+    .bagua-motion-pack-preview--light-trail-v1 .bagua-motion-pack-preview__actor {
+        box-shadow: 0 0 25px color-mix(in srgb, var(--pack-motion-accent) 58%, transparent);
+    }
+
+    .bagua-motion-pack-preview--light-trail-v1 .bagua-motion-pack-preview__trail {
+        height: 4px;
+        filter: drop-shadow(0 0 7px var(--pack-motion-accent));
+    }
+
+    .bagua-motion-pack-preview__profile {
+        position: absolute;
+        right: 12px;
+        bottom: 9px;
+        left: 12px;
+        overflow: hidden;
+        color: #52657d;
+        font-size: 10px;
+        font-weight: 800;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @@keyframes bagua-motion-pack-journey {
+        0%, 12% { left: 18%; transform: translate(-50%, -50%) scale(.92); }
+        72%, 100% { left: 82%; transform: translate(-50%, -58%) scale(1); }
+    }
+
+    @@keyframes bagua-motion-pack-trail { to { background-position-x: 21px; } }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .bagua-motion-pack-preview__trail { animation: none; }
+        .bagua-motion-pack-preview__actor { left: 82%; animation: none; }
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired]
+    public BaguaTransitionMotionManifest Manifest { get; set; } = default!;
+
+    [Parameter]
+    public string Title { get; set; } = "괘 전환 애니메이션";
+
+    [Parameter]
+    public bool Compact { get; set; }
+
+    private string BuildClass()
+    {
+        var classes = new List<string>
+        {
+            "bagua-motion-pack-preview",
+            $"bagua-motion-pack-preview--{NormalizeProfile(Manifest.RendererProfile)}"
+        };
+        if (Compact)
+        {
+            classes.Add("bagua-motion-pack-preview--compact");
+        }
+
+        return string.Join(' ', classes);
+    }
+
+    private string BuildStyle()
+    {
+        var duration = Math.Clamp(4.2 * Manifest.DurationScale, 2.4, 8.0);
+        return FormattableString.Invariant(
+            $"--pack-motion-accent: {Manifest.AccentColor}; --pack-motion-duration: {duration:0.##}s;");
+    }
+
+    private static string NormalizeProfile(string rendererProfile)
+        => rendererProfile switch
+        {
+            "courier-sprint-v1" => "courier-sprint-v1",
+            "light-trail-v1" => "light-trail-v1",
+            _ => "runner-v1"
+        };
+}

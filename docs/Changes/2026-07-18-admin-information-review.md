@@ -8,7 +8,7 @@
 
 ## 적용 범위
 
-- `HongdalAdminApp` 내비게이션에 `자료 검토·글쓰기`를 추가했다.
+- `SsalddelAdminApp` 내비게이션에 `자료 검토·글쓰기`를 추가했다.
 - 원천, 국가, 검토 상태와 검색어로 최근 후보를 조회한다.
 - 선택한 후보의 제공기관, 기준일, 원문, 출처 설명과 해석 한계를 함께 확인한다.
 - 기존 `CommunityPostComposerViewModel`을 하위 ViewModel로 조립해 공통 임시 저장·검증·게시 흐름을 재사용한다.
@@ -25,7 +25,7 @@
 
 ## 검증
 
-- `HongdalAdminApp` Windows 빌드 경고·오류 없음
+- `SsalddelAdminApp` Windows 빌드 경고·오류 없음
 - 정보 후보 수집·관리자 자료 검토 Page ViewModel 집중 테스트 7개 통과
 - 자동 편집·YouTube 감시·KAMIS 인접 회귀를 포함한 관련 테스트 46개 통과
 - Admin 앱에서 `/information-review` 이동, 로그인 버튼의 `/login` 이동과 좁은 창 레이아웃 확인

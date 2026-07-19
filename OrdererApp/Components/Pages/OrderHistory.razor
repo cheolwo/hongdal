@@ -25,31 +25,31 @@
                                 <MudChip T="string" Size="Size.Small" Color="@order.Color">@order.Status</MudChip>
                             </MudStack>
 
-                            <HongdalSensitiveDisclosureList Title="주문 상세"
+                            <SsalddelSensitiveDisclosureList Title="주문 상세"
                                                             Summary="@order.Type"
                                                             RelatedParties="@order.RelatedParties"
                                                             Icon="@Icons.Material.Filled.ReceiptLong"
                                                             Color="@order.Color"
                                                             PrivacyHint="결제, 배송, 상대 정보는 필요할 때만 펼쳐 확인합니다.">
                                 <MudExpansionPanel Text="주문 정보" Expanded="true">
-                                    <HongdalSensitiveInfoRow Label="주문 유형" Value="@order.Type" />
-                                    <HongdalSensitiveInfoRow Label="주문 내용" Value="@order.Title" />
-                                    <HongdalSensitiveInfoRow Label="진행 상태" Value="@order.Status" />
+                                    <SsalddelSensitiveInfoRow Label="주문 유형" Value="@order.Type" />
+                                    <SsalddelSensitiveInfoRow Label="주문 내용" Value="@order.Title" />
+                                    <SsalddelSensitiveInfoRow Label="진행 상태" Value="@order.Status" />
                                 </MudExpansionPanel>
                                 <MudExpansionPanel Text="배송 정보">
-                                    <HongdalSensitiveInfoRow Label="예정" Value="@order.Eta" />
-                                    <HongdalSensitiveInfoRow Label="수령 방식" Value="@order.DeliveryMethod" />
-                                    <HongdalSensitiveInfoRow Label="수령 위치" Value="@order.DeliveryArea" />
+                                    <SsalddelSensitiveInfoRow Label="예정" Value="@order.Eta" />
+                                    <SsalddelSensitiveInfoRow Label="수령 방식" Value="@order.DeliveryMethod" />
+                                    <SsalddelSensitiveInfoRow Label="수령 위치" Value="@order.DeliveryArea" />
                                 </MudExpansionPanel>
                                 <MudExpansionPanel Text="결제 정보">
-                                    <HongdalSensitiveInfoRow Label="결제 상태" Value="@order.PaymentStatus" />
-                                    <HongdalSensitiveInfoRow Label="결제 수단" Value="@order.PaymentMethod" />
+                                    <SsalddelSensitiveInfoRow Label="결제 상태" Value="@order.PaymentStatus" />
+                                    <SsalddelSensitiveInfoRow Label="결제 수단" Value="@order.PaymentMethod" />
                                 </MudExpansionPanel>
                                 <MudExpansionPanel Text="상대 정보">
-                                    <HongdalSensitiveInfoRow Label="처리 주체" Value="@order.Counterparty" />
-                                    <HongdalSensitiveInfoRow Label="노출 범위" Value="필요 시에만 상세 확인" />
+                                    <SsalddelSensitiveInfoRow Label="처리 주체" Value="@order.Counterparty" />
+                                    <SsalddelSensitiveInfoRow Label="노출 범위" Value="필요 시에만 상세 확인" />
                                 </MudExpansionPanel>
-                            </HongdalSensitiveDisclosureList>
+                            </SsalddelSensitiveDisclosureList>
                         </MudStack>
                     </MudPaper>
                 </MudItem>

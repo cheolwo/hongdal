@@ -48,7 +48,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 
 - 안정 후보 키와 원천 키
 - 제공기관, 제목, 짧은 설명과 원본 URL
-- 원 게시 시각, 자료 기준일과 홍달 수집 시각
+- 원 게시 시각, 자료 기준일과 살뜰 수집 시각
 - 월·분기 자료의 기준기간 종료일
 - 수집 국가, 언어, 통화와 단위
 - 숫자 관측값, 지표 이름, 안정 수치 계열 키와 사람이 읽을 수 있는 계열 이름
@@ -81,7 +81,7 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 
 ## 초기 운영자의 자료 검토와 글쓰기
 
-초기에는 운영자가 직접 커뮤니티 글을 채워야 하므로 `HongdalAdminApp`의 `/information-review`를 커뮤니티 글쓰기 작업대로 둔다. 이 화면은 별도 게시 도구를 새로 만들지 않고 공통 `CommunityPostComposerViewModel`과 `PlatformCommunityPostComposer`를 조립하며, 글 초안을 유지한 상태에서 자료 수집·기간 통계·YouTube·SNS·다이어그램 보조 도구를 오갈 수 있다.
+초기에는 운영자가 직접 커뮤니티 글을 채워야 하므로 `SsalddelAdminApp`의 `/information-review`를 커뮤니티 글쓰기 작업대로 둔다. 이 화면은 별도 게시 도구를 새로 만들지 않고 공통 `CommunityPostComposerViewModel`과 `PlatformCommunityPostComposer`를 조립하며, 글 초안을 유지한 상태에서 자료 수집·기간 통계·YouTube·SNS·다이어그램 보조 도구를 오갈 수 있다.
 
 새 글은 게시글 `Category`를 기본적으로 `서원`으로 두고, `한 문장 서원 → 문제와 기회 → 함께할 사람과 업체 → 여정 → 다이어그램·가원장 → 근거 → 상호 이익 → 미정 조건 → 다음 행동 → 운영 경계`의 비구속적 초안으로 시작한다. 운영자는 관점을 바꿔 쓸 수 있지만, 다른 일반 사용자로 보이지 않도록 모든 필명에 `· 운영자`를 표시한다. 필명은 닉네임 표시만 바꾸며 등록 주체, 권한, 감사 경계를 바꾸지 않는다.
 

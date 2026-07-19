@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Driver.Settings;
+using Ssalddel.Contracts.Driver.Settings;
 
 namespace DriverApp.Services;
 

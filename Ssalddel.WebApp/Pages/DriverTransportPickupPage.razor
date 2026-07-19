@@ -1,0 +1,436 @@
+@page "/driver/transports/{TransportId:long}/pickup"
+@using Ssalddel.Contracts.Driver.Transport
+@inject 기사운송증빙Service 증빙Service
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="상차 처리"
+               Description="상차지 도착, 상차 사진 업로드, 인수증 확인, 상차 완료를 한 화면에서 처리합니다."
+               Badge="상차 전용" />
+
+<MudGrid>
+    <MudItem xs="12" lg="4">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudText Typo="Typo.h6">운송 정보</MudText>
+                        <MudChip T="string" Color="@ResolveTransportStateColor(CurrentTransport?.상태)" Size="Size.Small">
+                            @Display(CurrentTransport?.상태, "조회 전")
+                        </MudChip>
+                    </MudStack>
+
+                    @if (CurrentTransport is null)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">운송 ID @TransportId 정보를 조회합니다.</MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.subtitle2">@CurrentTransport.운송번호</MudText>
+                        <MudText Typo="Typo.body2">@Display(CurrentTransport.출발지, "-") → @Display(CurrentTransport.도착지, "-")</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">운임 @DisplayMoney(CurrentTransport.운임) · @Display(CurrentTransport.결제방식, "현장 확인")</MudText>
+                        @if (CurrentTransport.인수증필요)
+                        {
+                            <MudChip T="string" Color="Color.Warning" Size="Size.Small" Variant="Variant.Filled">
+                                @(CurrentTransport.인수증서명필수 ? "인수증 서명 필수" : "인수증 필요")
+                            </MudChip>
+                        }
+                    }
+
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Sync"
+                                   OnClick="LoadTransportAsync">
+                            새로고침
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Place"
+                                   OnClick="ArrivePickupAsync">
+                            상차지 도착
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            @if (!string.IsNullOrWhiteSpace(StatusMessage))
+            {
+                <MudAlert Severity="@StatusSeverity" Variant="Variant.Outlined">@StatusMessage</MudAlert>
+            }
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">이동</MudText>
+                    <MudButton Href="@DropoffHref" Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Flag">
+                        하차 처리로
+                    </MudButton>
+                    <MudButton Href="/driver/transports/current" Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.LocalShipping">
+                        진행 중 운송으로
+                    </MudButton>
+                    <MudButton Href="@UnifiedProofHref" Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.PhotoCamera">
+                        통합 증빙 화면
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" lg="8">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="3">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.h6">상차 완료 사진</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            사진 업로드 응답의 ObjectName이 확인된 뒤에만 상차 완료 처리를 전송합니다.
+                        </MudText>
+                    </MudStack>
+
+                    <InputFile OnChange="OnPickupPhotoSelectedAsync" accept="image/*" />
+
+                    @if (!string.IsNullOrWhiteSpace(PickupPreviewUrl))
+                    {
+                        <img src="@PickupPreviewUrl" alt="상차 증빙 미리보기" class="driver-proof-preview" />
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @PickupFileName</MudText>
+                    }
+
+                    @if (PickupUpload is not null)
+                    {
+                        <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+                            업로드 완료: @PickupUpload.ObjectName
+                        </MudAlert>
+                    }
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">인수증/서명</MudText>
+                            <MudSelect T="string" @bind-Value="ReceiptEvidenceMethod" Label="인수증 증빙 방식" Variant="Variant.Outlined">
+                                <MudSelectItem T="string" Value="@("사진")">사진</MudSelectItem>
+                                <MudSelectItem T="string" Value="@("전자서명")">전자서명</MudSelectItem>
+                                <MudSelectItem T="string" Value="@("서명생략")">서명생략</MudSelectItem>
+                            </MudSelect>
+                            <MudTextField @bind-Value="RecipientName" Label="인수자명" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="RecipientOrganization" Label="인수자 소속" Variant="Variant.Outlined" />
+                        </MudStack>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">확인 항목</MudText>
+                            <MudTextField @bind-Value="RecipientSignature" Label="인수자 서명값" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="DriverSignature" Label="기사 서명값" Variant="Variant.Outlined" />
+                            <MudCheckBox T="bool" @bind-Value="ReceiptConfirmed" Label="인수증 확인 완료" Color="Color.Primary" />
+                            <MudCheckBox T="bool" @bind-Value="SignatureOmitted" Label="서명 생략 확인" Color="Color.Warning" />
+                            <MudTextField @bind-Value="SignatureOmissionReason"
+                                          Label="서명 생략 사유"
+                                          Variant="Variant.Outlined"
+                                          Disabled="@(!SignatureOmitted)" />
+                        </MudStack>
+                    </MudItem>
+                </MudGrid>
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           Class="mt-3"
+                           Disabled="@(PickupUpload is null || IsBusy)"
+                           StartIcon="@Icons.Material.Filled.CheckCircle"
+                           OnClick="CompletePickupProofAsync">
+                    상차 완료 처리
+                </MudButton>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h6">상차 예외 신고</MudText>
+                    <MudGrid>
+                        <MudItem xs="12" md="6">
+                            <MudSelect T="string" Label="예외 사유" @bind-Value="IssueCode" Variant="Variant.Outlined">
+                                @foreach (var reason in PickupIssueReasons)
+                                {
+                                    <MudSelectItem T="string" Value="@reason.Code">@reason.Label</MudSelectItem>
+                                }
+                            </MudSelect>
+                            <MudTextField T="string" Label="현장 메모" @bind-Value="IssueMemo" Lines="4" Variant="Variant.Outlined" Class="mt-3" />
+                            <MudCheckBox T="bool" @bind-Value="RequireAdminReview" Label="관리자 확인 요청" Color="Color.Warning" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <InputFile OnChange="OnIssuePhotoSelectedAsync" accept="image/*" />
+                            @if (!string.IsNullOrWhiteSpace(IssuePreviewUrl))
+                            {
+                                <img src="@IssuePreviewUrl" alt="상차 예외 증빙 미리보기" class="driver-proof-preview mt-3" />
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @IssueFileName</MudText>
+                            }
+                            @if (IssueUpload is not null)
+                            {
+                                <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined" Class="mt-3">
+                                    예외 증빙 업로드 완료: @IssueUpload.ObjectName
+                                </MudAlert>
+                            }
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Warning"
+                               Disabled="@IsBusy"
+                               StartIcon="@Icons.Material.Filled.ReportProblem"
+                               OnClick="ReportIssueAsync">
+                        상차 예외 기록
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private const long MaxImageBytes = 5 * 1024 * 1024;
+
+    [Parameter] public long TransportId { get; set; }
+
+    private static readonly IReadOnlyList<운송예외사유Option> PickupIssueReasons =
+    [
+        new("상차물건없음", "상차지에 물건이 없음", "상차"),
+        new("수량불일치", "수량이 다름", "상차"),
+        new("상차담당자부재", "상차 담당자 부재", "상차"),
+        new("화물훼손", "화물 훼손", "상차"),
+        new("사진재촬영필요", "사진 재촬영 필요", "상차")
+    ];
+
+    private 기사운송요약응답? CurrentTransport { get; set; }
+    private 기사운송상태변경응답? LastState { get; set; }
+    private bool IsBusy { get; set; }
+    private string? StatusMessage { get; set; }
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+    private string? PickupPreviewUrl { get; set; }
+    private string? PickupFileName { get; set; }
+    private 기사운송사진업로드결과? PickupUpload { get; set; }
+    private string ReceiptEvidenceMethod { get; set; } = "사진";
+    private string? RecipientName { get; set; }
+    private string? RecipientOrganization { get; set; }
+    private string? RecipientSignature { get; set; }
+    private string? DriverSignature { get; set; }
+    private bool ReceiptConfirmed { get; set; }
+    private bool SignatureOmitted { get; set; }
+    private string? SignatureOmissionReason { get; set; }
+    private string IssueCode { get; set; } = PickupIssueReasons[0].Code;
+    private string? IssueMemo { get; set; }
+    private bool RequireAdminReview { get; set; } = true;
+    private string? IssuePreviewUrl { get; set; }
+    private string? IssueFileName { get; set; }
+    private 기사운송사진업로드결과? IssueUpload { get; set; }
+
+    private string DropoffHref => $"/driver/transports/{TransportId}/dropoff";
+    private string UnifiedProofHref => $"/driver/transport/proof?transportId={TransportId}";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TryLoadTransportAsync();
+    }
+
+    private async Task TryLoadTransportAsync()
+    {
+        try
+        {
+            await LoadTransportCoreAsync();
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"운송 정보를 아직 불러오지 못했습니다. {ex.Message}", Severity.Info);
+        }
+    }
+
+    private async Task LoadTransportAsync()
+    {
+        await RunAsync("운송 정보를 조회했습니다.", LoadTransportCoreAsync);
+    }
+
+    private async Task LoadTransportCoreAsync()
+    {
+        CurrentTransport = await 증빙Service.상세조회Async(TransportId);
+    }
+
+    private async Task ArrivePickupAsync()
+    {
+        await RunAsync("상차지 도착 상태를 서버에 반영했습니다.", async () =>
+        {
+            LastState = await 증빙Service.상차지도착Async(TransportId);
+            await RefreshDetailQuietlyAsync();
+        });
+    }
+
+    private async Task OnPickupPhotoSelectedAsync(InputFileChangeEventArgs e)
+    {
+        await SelectAndUploadAsync(e.File, 운송증빙단계.상차, result =>
+        {
+            PickupPreviewUrl = result.PreviewUrl;
+            PickupFileName = result.FileName;
+            PickupUpload = result.Upload;
+        });
+    }
+
+    private async Task OnIssuePhotoSelectedAsync(InputFileChangeEventArgs e)
+    {
+        await SelectAndUploadAsync(e.File, 운송증빙단계.예외, result =>
+        {
+            IssuePreviewUrl = result.PreviewUrl;
+            IssueFileName = result.FileName;
+            IssueUpload = result.Upload;
+        });
+    }
+
+    private async Task CompletePickupProofAsync()
+    {
+        if (PickupUpload is null)
+        {
+            SetStatus("상차 사진 업로드가 완료되어야 상차 완료 처리를 할 수 있습니다.", Severity.Warning);
+            return;
+        }
+
+        await RunAsync("상차 완료 상태를 서버에 반영했습니다.", async () =>
+        {
+            LastState = await 증빙Service.상차완료Async(TransportId, PickupUpload, BuildReceiptInput());
+            await RefreshDetailQuietlyAsync();
+        });
+    }
+
+    private async Task ReportIssueAsync()
+    {
+        var option = PickupIssueReasons.FirstOrDefault(x => x.Code == IssueCode) ?? PickupIssueReasons[0];
+        await RunAsync("상차 예외 사유를 서버에 기록했습니다.", async () =>
+        {
+            LastState = await 증빙Service.예외신고Async(
+                TransportId,
+                new 기사운송문제신고요청
+                {
+                    단계 = option.Stage,
+                    예외코드 = option.Code,
+                    사유 = option.Label,
+                    메모 = IssueMemo,
+                    증빙ObjectName = IssueUpload?.ObjectName,
+                    증빙Url = IssueUpload?.Url,
+                    관리자확인요청 = RequireAdminReview
+                });
+            await RefreshDetailQuietlyAsync();
+        });
+    }
+
+    private async Task SelectAndUploadAsync(
+        IBrowserFile file,
+        운송증빙단계 stage,
+        Action<운송증빙선택결과> apply)
+    {
+        await RunAsync($"{DisplayStage(stage)} 사진을 업로드했습니다.", async () =>
+        {
+            var (preview, fileName, contentType, bytes) = await ReadImageAsync(file);
+            var upload = await 증빙Service.사진업로드Async(TransportId, stage, fileName, contentType, bytes);
+            apply(new 운송증빙선택결과(preview, fileName, upload));
+        });
+    }
+
+    private async Task RefreshDetailQuietlyAsync()
+    {
+        try
+        {
+            CurrentTransport = await 증빙Service.상세조회Async(TransportId);
+        }
+        catch
+        {
+            // 상태 전환 자체는 성공했을 수 있으므로 후속 상세 조회 실패는 화면 상태 메시지를 덮지 않는다.
+        }
+    }
+
+    private 기사상차인수증입력 BuildReceiptInput()
+        => new()
+        {
+            인수증증빙방식 = ReceiptEvidenceMethod,
+            인수자명 = RecipientName,
+            인수자소속 = RecipientOrganization,
+            인수자서명 = RecipientSignature,
+            기사서명 = DriverSignature,
+            인수증확인완료 = ReceiptConfirmed,
+            인수증서명생략확인 = SignatureOmitted,
+            인수증서명생략사유 = SignatureOmitted ? SignatureOmissionReason : null
+        };
+
+    private async Task RunAsync(string successMessage, Func<Task> action)
+    {
+        IsBusy = true;
+        SetStatus("서버 요청을 처리하는 중입니다.", Severity.Info);
+
+        try
+        {
+            await action();
+            SetStatus(successMessage, Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private static async Task<(string PreviewUrl, string FileName, string ContentType, byte[] Bytes)> ReadImageAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(MaxImageBytes);
+        using var memory = new MemoryStream();
+        await stream.CopyToAsync(memory);
+        var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "image/png" : file.ContentType;
+        var bytes = memory.ToArray();
+        return ($"data:{contentType};base64,{Convert.ToBase64String(bytes)}", file.Name, contentType, bytes);
+    }
+
+    private void SetStatus(string message, Severity severity)
+    {
+        StatusMessage = message;
+        StatusSeverity = severity;
+    }
+
+    private static Color ResolveTransportStateColor(string? status)
+    {
+        if (ContainsAny(status, "완료", "인수"))
+        {
+            return Color.Success;
+        }
+
+        if (ContainsAny(status, "예외", "실패", "문제"))
+        {
+            return Color.Error;
+        }
+
+        if (ContainsAny(status, "도착", "상차", "하차"))
+        {
+            return Color.Info;
+        }
+
+        return Color.Default;
+    }
+
+    private static bool ContainsAny(string? value, params string[] tokens)
+        => !string.IsNullOrWhiteSpace(value)
+           && tokens.Any(token => value.Contains(token, StringComparison.OrdinalIgnoreCase));
+
+    private static string Display(params string?[] values)
+        => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+
+    private static string DisplayMoney(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}원" : "금액 미정";
+
+    private static string DisplayStage(운송증빙단계 stage)
+        => stage switch
+        {
+            운송증빙단계.상차 => "상차",
+            운송증빙단계.하차 => "하차",
+            _ => "예외"
+        };
+
+    private sealed record 운송예외사유Option(string Code, string Label, string Stage);
+    private sealed record 운송증빙선택결과(string PreviewUrl, string FileName, 기사운송사진업로드결과 Upload);
+}

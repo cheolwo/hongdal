@@ -1,8 +1,8 @@
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.Services;
 using Microsoft.Extensions.FileProviders;
 using MudBlazor.Services;
-using HongdalApp.Services;
-using HongdalApp.Services.Samples;
+using SsalddelApp.Services;
+using SsalddelApp.Services.Samples;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +10,10 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
-builder.Services.AddHongdalAppServices(builder.Configuration);
+builder.Services.AddSsalddelAppServices(builder.Configuration);
 builder.Services.AddScoped<IShipperOperationsService, SampleShipperOperationsService>();
-builder.Services.AddHongdalUiCommonAppServices();
-builder.Services.AddHongdalDocumentOutputServices();
+builder.Services.AddSsalddelUiCommonAppServices();
+builder.Services.AddSsalddelDocumentOutputServices();
 builder.Services.AddScoped(_ => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7117/"),
@@ -24,7 +24,7 @@ builder.Services.AddScoped<PlatformHomeModeStateService>();
 
 var app = builder.Build();
 var repositoryRoot = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "..", ".."));
-var appWebRoot = Path.Combine(repositoryRoot, "HongdalApp", "wwwroot");
+var appWebRoot = Path.Combine(repositoryRoot, "SsalddelApp", "wwwroot");
 var mudBlazorStaticAssets = Path.Combine(
     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
     ".nuget",
@@ -43,48 +43,48 @@ var blazorFrameworkAssets = Directory.Exists(aspNetCoreInternalAssetsRoot)
         .Select(path => Path.Combine(path, "_framework"))
         .FirstOrDefault(Directory.Exists)
     : null;
-var commonAppStaticAssets = Path.Combine(repositoryRoot, "Hongdal.Ui.Common", "Areas", "App", "wwwroot");
+var commonAppStaticAssets = Path.Combine(repositoryRoot, "Ssalddel.Ui.Common", "Areas", "App", "wwwroot");
 var commonAppScopedCss = Path.Combine(
     repositoryRoot,
-    "Hongdal.Ui.Common",
+    "Ssalddel.Ui.Common",
     "obj",
     "Debug",
     "net10.0",
     "scopedcss",
     "projectbundle");
-var commonAppScopedCssFile = Path.Combine(commonAppScopedCss, "Hongdal.Ui.Common.bundle.scp.css");
-var hongdalAppCssFile = Path.Combine(appWebRoot, "app.css");
+var commonAppScopedCssFile = Path.Combine(commonAppScopedCss, "Ssalddel.Ui.Common.bundle.scp.css");
+var ssalddelAppCssFile = Path.Combine(appWebRoot, "app.css");
 var communityDecorationStoreCssFile = Path.Combine(
     repositoryRoot,
-    "HongdalApp",
+    "SsalddelApp",
     "Components",
     "Pages",
     "CommunityDecorationStorePage.razor.css");
 var communityDecorationDetailCssFile = Path.Combine(
     repositoryRoot,
-    "HongdalApp",
+    "SsalddelApp",
     "Components",
     "Pages",
     "CommunityDecorationDetailPage.razor.css");
 var prajnaLectureLibraryCssFile = Path.Combine(
     repositoryRoot,
-    "Hongdal.Ui.Common",
+    "Ssalddel.Ui.Common",
     "Areas",
     "App",
     "Components",
     "Community",
-    "HongdalPrajnaLectureLibrary.razor.css");
+    "SsalddelPrajnaLectureLibrary.razor.css");
 var mudBlazorCssFile = Path.Combine(mudBlazorStaticAssets, "MudBlazor.min.css");
-var hongdalAppScopedCssFile = Path.Combine(
+var ssalddelAppScopedCssFile = Path.Combine(
     repositoryRoot,
-    "HongdalApp",
+    "SsalddelApp",
     "obj",
     "Debug",
     "net10.0-windows10.0.19041.0",
     "win-x64",
     "scopedcss",
     "bundle",
-    "HongdalApp.styles.css");
+    "SsalddelApp.styles.css");
 
 app.UseStatusCodePagesWithReExecute("/not-found");
 if (Directory.Exists(mudBlazorStaticAssets))
@@ -110,7 +110,7 @@ if (Directory.Exists(commonAppStaticAssets))
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(commonAppStaticAssets),
-        RequestPath = "/_content/Hongdal.Ui.Common/Areas/App"
+        RequestPath = "/_content/Ssalddel.Ui.Common/Areas/App"
     });
 }
 
@@ -119,7 +119,7 @@ if (Directory.Exists(commonAppScopedCss))
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(commonAppScopedCss),
-        RequestPath = "/_content/Hongdal.Ui.Common"
+        RequestPath = "/_content/Ssalddel.Ui.Common"
     });
 }
 
@@ -133,10 +133,10 @@ if (Directory.Exists(appWebRoot))
 
 app.UseStaticFiles();
 app.UseAntiforgery();
-app.MapGet("/capture/app.css", () => Results.File(hongdalAppCssFile, "text/css"));
+app.MapGet("/capture/app.css", () => Results.File(ssalddelAppCssFile, "text/css"));
 app.MapGet("/capture/mudblazor.css", () => Results.File(mudBlazorCssFile, "text/css"));
 app.MapGet("/capture/common.css", () => Results.File(commonAppScopedCssFile, "text/css"));
-app.MapGet("/capture/shipper.css", () => Results.File(hongdalAppScopedCssFile, "text/css"));
+app.MapGet("/capture/shipper.css", () => Results.File(ssalddelAppScopedCssFile, "text/css"));
 app.MapGet("/capture/community-decoration-store.css", () =>
     Results.File(communityDecorationStoreCssFile, "text/css"));
 app.MapGet("/capture/community-decoration-detail.css", () =>
@@ -144,7 +144,7 @@ app.MapGet("/capture/community-decoration-detail.css", () =>
 app.MapGet("/capture/prajna-lecture-library.css", () =>
     Results.File(prajnaLectureLibraryCssFile, "text/css"));
 
-app.MapRazorComponents<HongdalApp.App>()
+app.MapRazorComponents<SsalddelApp.App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();

@@ -2,7 +2,7 @@
 
 > 기록일: 2026-07-17
 >
-> 대상: `Hongdal.WebApp`, `Hongdal.Ui.Common`, 커뮤니티 조회 API와 공통 계약
+> 대상: `Ssalddel.WebApp`, `Ssalddel.Ui.Common`, 커뮤니티 조회 API와 공통 계약
 
 ## 변경 요약
 
@@ -29,9 +29,9 @@
 
 ## 검증
 
-- `dotnet test Hongdal.Tests/Hongdal.Tests.csproj --no-restore --filter "FullyQualifiedName~CommunityBoardCatalogTests|FullyQualifiedName~CommunityPostListPageViewModelTests|FullyQualifiedName~CommunityLedgerCompletionPostServiceTests|FullyQualifiedName~CommunityPostComposerViewModelTests"`
+- `dotnet test Ssalddel.Tests/Ssalddel.Tests.csproj --no-restore --filter "FullyQualifiedName~CommunityBoardCatalogTests|FullyQualifiedName~CommunityPostListPageViewModelTests|FullyQualifiedName~CommunityLedgerCompletionPostServiceTests|FullyQualifiedName~CommunityPostComposerViewModelTests"`
   - 19개 통과
-- `Hongdal.Contracts`, `Hongdal.Ui.Common`, `Hongdal`, `Hongdal.WebApp` 빌드 확인
+- `Ssalddel.Contracts`, `Ssalddel.Ui.Common`, `Ssalddel`, `Ssalddel.WebApp` 빌드 확인
 - 로컬 WebApp을 데스크톱 `1440px`, 모바일 `390px` 폭에서 렌더링하고 게시판 9개와 안전센터 문구를 확인
 
 API 서버를 연결하지 않은 시각 검증에서는 게시글 수 조회 실패 상태와 기본 게시판 구성을 함께 확인했다. 운영 연결 시에는 동일 화면이 `board-summaries` 응답의 공개 글 수를 표시한다.

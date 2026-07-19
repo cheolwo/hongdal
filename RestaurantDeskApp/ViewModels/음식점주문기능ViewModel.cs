@@ -1,5 +1,5 @@
-using Hongdal.Contracts.Food;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Contracts.Food;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using RestaurantDeskApp.Models.Restaurant;
 using RestaurantDeskApp.Services;
 

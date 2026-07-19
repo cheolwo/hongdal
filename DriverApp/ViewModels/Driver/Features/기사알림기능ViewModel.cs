@@ -1,5 +1,5 @@
 using DriverApp.Services;
-using Hongdal.Contracts.Driver.Notification;
+using Ssalddel.Contracts.Driver.Notification;
 
 namespace DriverApp.ViewModels.Driver.Features;
 

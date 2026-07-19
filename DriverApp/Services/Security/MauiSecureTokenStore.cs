@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Hongdal.Client.Infrastructure.Security;
+using Ssalddel.Client.Infrastructure.Security;
 
 namespace DriverApp.Services.Security;
 
 public sealed class MauiSecureTokenStore : IClientSecureTokenStore
 {
-    private const string StorageKey = "hongdal.driver.authToken.v1";
+    private const string StorageKey = "ssalddel.driver.authToken.v1";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     public async Task<ClientAuthTokenSnapshot?> LoadAsync(CancellationToken cancellationToken = default)

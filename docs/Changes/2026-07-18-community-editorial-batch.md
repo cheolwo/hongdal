@@ -16,7 +16,7 @@
 
 ## 검증
 
-- `dotnet build Hongdal/Hongdal.csproj --no-restore`
+- `dotnet build Ssalddel/Ssalddel.csproj --no-restore`
 - 자동 게시·배치 실행기·기존 원장 완료 게시 관련 테스트 10개 통과
 - 전체 테스트 1,287개 중 1,286개 통과, 기존 Apify 배열 응답 테스트 1개 실패
 

@@ -47,7 +47,7 @@
 ## API 경로와 코드 연결
 
 - 화면 소스: [WarehouseManagerApp/Components/Pages/WorkStart.razor](../../../../../WarehouseManagerApp/Components/Pages/WorkStart.razor)
-- 클라이언트 서비스/계약: [HongdalApp/Services/IWarehouseWorkEntryGateService.cs](../../../../../HongdalApp/Services/IWarehouseWorkEntryGateService.cs), [HongdalApp/Services/SampleWarehouseWorkEntryGateService.cs](../../../../../HongdalApp/Services/SampleWarehouseWorkEntryGateService.cs), [WarehouseManagerApp/Services/IWarehouseWorkEntryGateService.cs](../../../../../WarehouseManagerApp/Services/IWarehouseWorkEntryGateService.cs), [WarehouseManagerApp/Services/SampleWarehouseWorkEntryGateService.cs](../../../../../WarehouseManagerApp/Services/SampleWarehouseWorkEntryGateService.cs)
+- 클라이언트 서비스/계약: [SsalddelApp/Services/IWarehouseWorkEntryGateService.cs](../../../../../SsalddelApp/Services/IWarehouseWorkEntryGateService.cs), [SsalddelApp/Services/SampleWarehouseWorkEntryGateService.cs](../../../../../SsalddelApp/Services/SampleWarehouseWorkEntryGateService.cs), [WarehouseManagerApp/Services/IWarehouseWorkEntryGateService.cs](../../../../../WarehouseManagerApp/Services/IWarehouseWorkEntryGateService.cs), [WarehouseManagerApp/Services/SampleWarehouseWorkEntryGateService.cs](../../../../../WarehouseManagerApp/Services/SampleWarehouseWorkEntryGateService.cs)
 
 현재 문서와 소스에서 직접 연결된 `api/v1/...` 경로를 찾지 못했습니다. 이 화면은 정적 안내, 라우팅, 메뉴 진입, 오류 표시, 또는 다른 화면으로 넘기는 책임이 중심일 수 있습니다.
 
@@ -66,5 +66,5 @@
 ## 보완 메모
 
 - 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 hongdal-v1-required-pages.md에도 반영합니다.
+- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
 - 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.

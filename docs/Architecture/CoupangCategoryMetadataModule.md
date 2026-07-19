@@ -2,7 +2,7 @@
 
 ## 목적
 
-홍달은 쿠팡 판매자 Open API 키가 없는 단계에서도 쿠팡 카테고리 연동을 준비할 수 있어야 한다.
+살뜰은 쿠팡 판매자 Open API 키가 없는 단계에서도 쿠팡 카테고리 연동을 준비할 수 있어야 한다.
 따라서 실제 API 호출보다 먼저 공식 문서의 경로, 요청 본문, 응답 형식을 공유 계약 DTO로 정리한다.
 
 이 모듈은 쿠팡 파트너스 수익화 링크와 직접 결합하지 않는다. 파트너스 링크는 운영비 후원 링크 카탈로그에서 다루고, 이 문서는 판매자 상품 등록에 필요한 쿠팡 카테고리 메타데이터 준비 범위만 다룬다.
@@ -20,7 +20,7 @@
 
 ## DTO 경계
 
-DTO는 `Hongdal.Contracts.Common.Sales` 안에 둔다.
+DTO는 `Ssalddel.Contracts.Common.Sales` 안에 둔다.
 
 - `CoupangCategoryApiContractCatalog`: 엔드포인트 키, HTTP 메서드, 경로, 요청/응답 계약명, 공식 문서 URL
 - `CoupangDisplayCategoryTreeResponse`: 쿠팡 노출 카테고리 트리 응답
@@ -30,7 +30,7 @@ DTO는 `Hongdal.Contracts.Common.Sales` 안에 둔다.
 - `CoupangCategoryPredictionRequest`: 상품명, 상세설명, 브랜드, 속성, 판매자 SKU
 - `CoupangCategoryPredictionResponse`: 추천 결과 타입, 추천 카테고리 코드, 추천 카테고리명
 
-쿠팡 문서 예시에는 `displayCategoryCode`와 `displayItemCategoryCode`가 함께 나타난다. 홍달 DTO는 둘을 모두 보관하고, 내부 사용 시 `EffectiveDisplayCategoryCode`로 하나의 카테고리 코드처럼 다룬다.
+쿠팡 문서 예시에는 `displayCategoryCode`와 `displayItemCategoryCode`가 함께 나타난다. 살뜰 DTO는 둘을 모두 보관하고, 내부 사용 시 `EffectiveDisplayCategoryCode`로 하나의 카테고리 코드처럼 다룬다.
 
 ## 키 없는 단계에서 가능한 일
 

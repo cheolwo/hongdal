@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
-using Hongdal.Client.Infrastructure.Security;
-using Hongdal.Contracts.Common;
+using Ssalddel.Client.Infrastructure.Security;
+using Ssalddel.Contracts.Common;
 
 namespace DriverApp.Services;
 

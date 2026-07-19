@@ -12,20 +12,20 @@
             </MudStack>
         </MudPaper>
 
-        <HongdalBankAccountPanel Account="@Account"
+        <SsalddelBankAccountPanel Account="@Account"
                                  PanelClass="driver-recommendation-card pa-4"
                                  IdentityVerified="@_identityVerified"
                                  IdentityVerifiedChanged="@(value => _identityVerified = value)">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@DriverRoutes.CurrentMonthSettlement">정산 정보</MudButton>
             <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="@DriverRoutes.Menu">사용자 메뉴로</MudButton>
-        </HongdalBankAccountPanel>
+        </SsalddelBankAccountPanel>
     </MudStack>
 </MudContainer>
 
 @code {
     private bool _identityVerified;
 
-    private HongdalBankAccountSummary Account => new(
+    private SsalddelBankAccountSummary Account => new(
         "국민은행",
         "홍길동 기사님",
         "123-45-678901",

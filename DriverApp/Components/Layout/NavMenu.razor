@@ -28,7 +28,7 @@
 </MudStack>
 
 @code {
-    private IReadOnlyList<Hongdal.Contracts.Common.ViewSettings.View가시성항목응답> 지원메뉴항목 => ViewVisibilityService.VisibleItems
+    private IReadOnlyList<Ssalddel.Contracts.Common.ViewSettings.View가시성항목응답> 지원메뉴항목 => ViewVisibilityService.VisibleItems
             .Where(x => !string.Equals(x.Route, DriverRoutes.Home, StringComparison.OrdinalIgnoreCase)
                  && !string.Equals(x.Route, "/driver/menu", StringComparison.OrdinalIgnoreCase))
         .ToArray();

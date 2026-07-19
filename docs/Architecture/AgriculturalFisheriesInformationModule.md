@@ -14,7 +14,7 @@
 
 ## 모듈 경계
 
-`Hongdal.Services.AgriculturalFisheries.Information`이 정보 활용 규칙을 담당한다.
+`Ssalddel.Services.AgriculturalFisheries.Information`이 정보 활용 규칙을 담당한다.
 
 - `FoodPriceCrosswalkCatalog`: HS 코드와 aT 조사품목 사이의 검토된 연결표
 - `AtDomesticFoodPriceLookupService`: aT 일별 가격 API 어댑터
@@ -165,7 +165,7 @@ ABS 웹 자료와 ABARES 출판물은 원칙적으로 CC BY 4.0 귀속 조건을
 - 상태 변경 이력과 낙관적 동시성 `Revision`
 - 한국 측과 해외 측의 선적 전 공동 확인
 
-정부기관 확인이 필요한 노드는 참여자의 `ParticipantChecked`만으로 완료되지 않는다. 공식 결과의 참조번호 또는 증빙 메타데이터를 남긴 `OfficialResultRecorded`가 필요하다. 이 값 역시 참여자가 결과를 기록했다는 뜻이며 홍달이 승인이나 진위를 보증하는 것은 아니다.
+정부기관 확인이 필요한 노드는 참여자의 `ParticipantChecked`만으로 완료되지 않는다. 공식 결과의 참조번호 또는 증빙 메타데이터를 남긴 `OfficialResultRecorded`가 필요하다. 이 값 역시 참여자가 결과를 기록했다는 뜻이며 살뜰이 승인이나 진위를 보증하는 것은 아니다.
 
 선적 전 공동 확인은 한국 측과 해외 측의 확인이 모두 있어야 완료된다. 선행 단계에 미해결 차단 이의가 있으면 확인할 수 없고, 이미 확인한 뒤 선행 상태·증빙·이의가 바뀌면 기존 확인을 자동으로 지운다.
 
@@ -186,7 +186,7 @@ ABS 웹 자료와 ABARES 출판물은 원칙적으로 CC BY 4.0 귀속 조건을
 | 차단 이의 해결 기록 | `POST /api/v1/agricultural-fisheries/import-readiness/cases/{caseId}/steps/{stepCode}/discussions/{discussionId}/resolve` |
 | 양측 확인 | `POST /api/v1/agricultural-fisheries/import-readiness/cases/{caseId}/steps/{stepCode}/acknowledgements` |
 
-각 응답은 기존 다이어그램 공동작업 SignalR 방에서 사용할 `CollaborationRoomId`를 함께 제공한다. 해외 상대방의 홍달 사용자 ID를 아직 모르면 `PendingAccountLink` 참여자로 생성되며, 실제 계정 초대·연결 UI와 별도 초대 토큰 흐름은 후속 범위다.
+각 응답은 기존 다이어그램 공동작업 SignalR 방에서 사용할 `CollaborationRoomId`를 함께 제공한다. 해외 상대방의 살뜰 사용자 ID를 아직 모르면 `PendingAccountLink` 참여자로 생성되며, 실제 계정 초대·연결 UI와 별도 초대 토큰 흐름은 후속 범위다.
 
 국가·품목 수입 가능성, 해외 작업장 상태와 검역증명서 서식은 고정된 허용값으로 저장하지 않는다. 농림축산검역본부, 식품의약품안전처 수입식품정보마루, 국가법령정보센터와 관세청의 공식 원문 링크를 제공하고 `LiveRecheckRequired=true`로 선적 직전 재확인을 요구한다.
 

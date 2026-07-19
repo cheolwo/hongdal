@@ -1,4 +1,4 @@
-# Hongdal 3.0 Food Delivery Pricing and Settlement Notes
+# Ssalddel 3.0 Food Delivery Pricing and Settlement Notes
 
 작성일: 2026-07-10
 
@@ -171,8 +171,8 @@
 
 ## 참고
 
-- [Hongdal 3.0 README](./README.md)
-- [Hongdal 3.0 Scope](./scope.md)
+- [Ssalddel 3.0 README](./README.md)
+- [Ssalddel 3.0 Scope](./scope.md)
 - [국세청 퀵서비스배달 용역제공자 신고 안내](https://www.nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2286&nttSn=1347988)
 - [삼일PwC 플랫폼 사업자 부가가치세 이슈](https://www.pwc.com/kr/ko/insights/industry-focus/industry-tax-04.html)
 - [KCI 부가가치세법상 매출에누리 및 판매장려금의 구분](https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002063440)

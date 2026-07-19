@@ -1,7 +1,7 @@
 using DriverApp.Models.Driver.Samples;
 using DriverApp.Models.Driver;
 using DriverApp.Services;
-using Hongdal.Contracts.Common.Drivers;
+using Ssalddel.Contracts.Common.Drivers;
 using System.Globalization;
 
 namespace DriverApp;
@@ -104,10 +104,10 @@ public partial class NativeDriverHomePage : ContentPage
     }
 
     private void OnKoreaDriverClicked(object? sender, EventArgs e)
-        => _operatingProfileService.SetMarket(Hongdal.Contracts.Common.Operations.OperatingMarketCodes.Korea);
+        => _operatingProfileService.SetMarket(Ssalddel.Contracts.Common.Operations.OperatingMarketCodes.Korea);
 
     private void OnUnitedStatesDriverClicked(object? sender, EventArgs e)
-        => _operatingProfileService.SetMarket(Hongdal.Contracts.Common.Operations.OperatingMarketCodes.UnitedStates);
+        => _operatingProfileService.SetMarket(Ssalddel.Contracts.Common.Operations.OperatingMarketCodes.UnitedStates);
 
     private void OnOperatingProfileChanged()
         => MainThread.BeginInvokeOnMainThread(ApplyOperatingProfile);

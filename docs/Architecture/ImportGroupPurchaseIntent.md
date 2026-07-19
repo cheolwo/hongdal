@@ -17,7 +17,7 @@
 
 ## 현재 UI
 
-- App: 통합 `홍달 앱` (`HongdalApp`, `Hongdal.WebApp` 공유 컴포넌트)
+- App: 통합 `살뜰 앱` (`SsalddelApp`, `Ssalddel.WebApp` 공유 컴포넌트)
 - Route: `/community/group-import`
 - Entry point: 공통 홈의 업무 모드에서 `공동수입` 선택
 - 활성 HS 코드 카탈로그는 `GET /api/v1/customs/hs-codes`로 조회한다.
@@ -126,7 +126,7 @@ flowchart LR
 
 ## 연결 지점
 
-- `HongdalApp` FCL/LCL 판단 화면에서 수요 확인 캠페인을 생성한다.
+- `SsalddelApp` FCL/LCL 판단 화면에서 수요 확인 캠페인을 생성한다.
 - `PlatformCommunityHome`은 캠페인형 게시글을 노출할 수 있다.
 - `OrdererApp`은 주문자가 의향을 남기는 전용 화면을 제공한다.
 - HS 코드/관세사 검토는 캠페인의 통관 신뢰도를 보완한다.

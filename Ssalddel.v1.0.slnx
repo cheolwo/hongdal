@@ -1,0 +1,37 @@
+<Solution>
+  <Folder Name="/Community Foundation/">
+    <Project Path="Ssalddel.WebApp/Ssalddel.WebApp.csproj" />
+    <Project Path="SsalddelApp/SsalddelApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
+  </Folder>
+  <Folder Name="/Cargo Apps/">
+    <Project Path="DriverApp/DriverApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
+    <Project Path="DriverApp.NaverMaps.Android/DriverApp.NaverMaps.Android.csproj" />
+  </Folder>
+  <Folder Name="/Operations/">
+    <Project Path="SsalddelAdmin/SsalddelAdmin.csproj" />
+    <Project Path="SsalddelAdminApp/SsalddelAdminApp.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
+  </Folder>
+  <Folder Name="/Server Modules/">
+    <Project Path="Ssalddel.Community/Ssalddel.Community.csproj" />
+  </Folder>
+  <Folder Name="/Server/">
+    <Project Path="Ssalddel/Ssalddel.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="Ssalddel.BackOffice.Client/Ssalddel.BackOffice.Client.csproj" />
+    <Project Path="Ssalddel.Client.Infrastructure/Ssalddel.Client.Infrastructure.csproj" />
+    <Project Path="Ssalddel.Contracts/Ssalddel.Contracts.csproj" />
+    <Project Path="Ssalddel.Domain/Ssalddel.Domain.csproj" />
+    <Project Path="Ssalddel.Infrastructure/Ssalddel.Infrastructure.csproj" />
+    <Project Path="Ssalddel.Ui.Common/Ssalddel.Ui.Common.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Ssalddel.Tests/Ssalddel.Tests.csproj" />
+  </Folder>
+</Solution>

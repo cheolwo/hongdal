@@ -1,4 +1,4 @@
-﻿# Hongdal 1.5
+﻿# Ssalddel 1.5
 
 ## 목표
 
@@ -34,15 +34,15 @@
 
 | 구성 | 역할 | 코드 위치 |
 | --- | --- | --- |
-| 출고 배치 요청 DTO | 주문 참조번호, 판매자, 주문자, 하차 주소, 상품 라인을 전달 | `Hongdal.Contracts/Common/Warehouse/OutboundBatchDtos.cs` |
-| `IOutboundBatchEngine` | 출고 계획을 만드는 인터페이스 | `Hongdal/Services/LogisticsProcessing/Warehouse/IOutboundBatchEngine.cs` |
-| `OutboundBatchEngine` | 입고상품 재고, 창고 배송권, 거리/운송비 점수를 보고 출고 배분 계산 | `Hongdal/Services/LogisticsProcessing/Warehouse/OutboundBatchEngine.cs` |
-| 피킹 배치 DTO | 출고 라인, 적재대/보관 위치, 피킹/포장 처리 방식, 작업자 후보를 전달 | `Hongdal.Contracts/Common/Warehouse/PickingBatchDtos.cs` |
-| `I피킹배치Engine` | 출고 배치 결과를 현장 피킹/포장 작업으로 나누는 인터페이스 | `Hongdal/Services/LogisticsProcessing/Warehouse/I피킹배치Engine.cs` |
-| `피킹배치Engine` | 피킹 작업자와 포장 작업자를 통합 또는 분리 방식으로 배정 | `Hongdal/Services/LogisticsProcessing/Warehouse/피킹배치Engine.cs` |
-| `WarehouseServiceAreaPolicy` | 주문자 주소가 창고 기본 배송권에 들어가는지 판단 | `Hongdal/Services/LogisticsProcessing/Warehouse/WarehouseServiceAreaPolicy.cs` |
-| `WarehouseDistanceCostEstimator` | 창고와 주문자 주소 사이의 거리/운송비를 추정 | `Hongdal/Services/LogisticsProcessing/Warehouse/WarehouseDistanceCostEstimator.cs` |
-| 판매채널 주문 동기화 | 채널 주문을 판매상품/입고상품과 매핑하고 출고 배치 엔진을 호출 | `Hongdal/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncService.cs` |
+| 출고 배치 요청 DTO | 주문 참조번호, 판매자, 주문자, 하차 주소, 상품 라인을 전달 | `Ssalddel.Contracts/Common/Warehouse/OutboundBatchDtos.cs` |
+| `IOutboundBatchEngine` | 출고 계획을 만드는 인터페이스 | `Ssalddel/Services/LogisticsProcessing/Warehouse/IOutboundBatchEngine.cs` |
+| `OutboundBatchEngine` | 입고상품 재고, 창고 배송권, 거리/운송비 점수를 보고 출고 배분 계산 | `Ssalddel/Services/LogisticsProcessing/Warehouse/OutboundBatchEngine.cs` |
+| 피킹 배치 DTO | 출고 라인, 적재대/보관 위치, 피킹/포장 처리 방식, 작업자 후보를 전달 | `Ssalddel.Contracts/Common/Warehouse/PickingBatchDtos.cs` |
+| `I피킹배치Engine` | 출고 배치 결과를 현장 피킹/포장 작업으로 나누는 인터페이스 | `Ssalddel/Services/LogisticsProcessing/Warehouse/I피킹배치Engine.cs` |
+| `피킹배치Engine` | 피킹 작업자와 포장 작업자를 통합 또는 분리 방식으로 배정 | `Ssalddel/Services/LogisticsProcessing/Warehouse/피킹배치Engine.cs` |
+| `WarehouseServiceAreaPolicy` | 주문자 주소가 창고 기본 배송권에 들어가는지 판단 | `Ssalddel/Services/LogisticsProcessing/Warehouse/WarehouseServiceAreaPolicy.cs` |
+| `WarehouseDistanceCostEstimator` | 창고와 주문자 주소 사이의 거리/운송비를 추정 | `Ssalddel/Services/LogisticsProcessing/Warehouse/WarehouseDistanceCostEstimator.cs` |
+| 판매채널 주문 동기화 | 채널 주문을 판매상품/입고상품과 매핑하고 출고 배치 엔진을 호출 | `Ssalddel/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncService.cs` |
 
 ### 처리 흐름
 
@@ -112,10 +112,10 @@ flowchart TD
 ## 우선 대상 모듈
 
 - `WarehouseManagerApp`
-- `HongdalApp`
+- `SsalddelApp`
 - `OrdererApp`
-- `Hongdal.Domain`
-- `Hongdal.Infrastructure`
+- `Ssalddel.Domain`
+- `Ssalddel.Infrastructure`
 
 ## 안정화 기준
 

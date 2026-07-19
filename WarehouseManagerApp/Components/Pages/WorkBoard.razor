@@ -28,7 +28,7 @@
                                 <MudChip T="string" Color="@item.Color" Variant="Variant.Outlined">@item.Status</MudChip>
                             </MudStack>
 
-                            <HongdalSensitiveDisclosureList Title="업무 관계와 상세"
+                            <SsalddelSensitiveDisclosureList Title="업무 관계와 상세"
                                                             Summary="@item.Description"
                                                             RelatedParties="@item.RelatedParties"
                                                             PrivacyHint="업무에 필요한 대상만 먼저 확인하고, 세부 정보는 펼쳐서 확인합니다."
@@ -36,20 +36,20 @@
                                                             Color="@item.Color"
                                                             Compact="true">
                                 <MudExpansionPanel Text="업무 정보" Icon="@Icons.Material.Filled.Assignment">
-                                    <HongdalSensitiveInfoRow Label="업무 번호" Value="@item.WorkNo" />
-                                    <HongdalSensitiveInfoRow Label="처리 단계" Value="@item.Stage" />
-                                    <HongdalSensitiveInfoRow Label="상태" Value="@item.Status" />
+                                    <SsalddelSensitiveInfoRow Label="업무 번호" Value="@item.WorkNo" />
+                                    <SsalddelSensitiveInfoRow Label="처리 단계" Value="@item.Stage" />
+                                    <SsalddelSensitiveInfoRow Label="상태" Value="@item.Status" />
                                 </MudExpansionPanel>
                                 <MudExpansionPanel Text="연결 대상" Icon="@Icons.Material.Filled.Group">
-                                    <HongdalSensitiveInfoRow Label="직접 관련 대상" Value="@item.RelatedParties" />
-                                    <HongdalSensitiveInfoRow Label="다음 연락 가능성" Value="@item.ContactContext" />
-                                    <HongdalSensitiveInfoRow Label="관계 기록" Value="업무 완료 시 관계 스냅샷 후보로 남깁니다." />
+                                    <SsalddelSensitiveInfoRow Label="직접 관련 대상" Value="@item.RelatedParties" />
+                                    <SsalddelSensitiveInfoRow Label="다음 연락 가능성" Value="@item.ContactContext" />
+                                    <SsalddelSensitiveInfoRow Label="관계 기록" Value="업무 완료 시 관계 스냅샷 후보로 남깁니다." />
                                 </MudExpansionPanel>
                                 <MudExpansionPanel Text="주의 사항" Icon="@Icons.Material.Filled.Info">
-                                    <HongdalSensitiveInfoRow Label="작업 메모" Value="@item.Note" />
-                                    <HongdalSensitiveInfoRow Label="노출 기준" Value="연락처와 상세 주소는 실제 업무 진입 후 필요한 범위에서만 표시합니다." />
+                                    <SsalddelSensitiveInfoRow Label="작업 메모" Value="@item.Note" />
+                                    <SsalddelSensitiveInfoRow Label="노출 기준" Value="연락처와 상세 주소는 실제 업무 진입 후 필요한 범위에서만 표시합니다." />
                                 </MudExpansionPanel>
-                            </HongdalSensitiveDisclosureList>
+                            </SsalddelSensitiveDisclosureList>
 
                             <MudButton Variant="Variant.Text" Color="@item.Color" EndIcon="@Icons.Material.Filled.ChevronRight">처리</MudButton>
                         </MudStack>

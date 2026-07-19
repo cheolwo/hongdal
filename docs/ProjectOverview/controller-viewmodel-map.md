@@ -18,12 +18,12 @@ Razor 페이지가 `HttpClient`, URL, 로딩·오류 상태를 직접 다루지 
 - `Api작업ViewModel<TParameter, TResult>`: 요청값이 있는 API의 동일한 상태 관리
 - `조립ViewModelBase`: 하위 ViewModel 변경을 상위 PageViewModel에 전달
 - `MvvmComponentBase<TViewModel>`: Razor Component에 ViewModel을 주입하고 `PropertyChanged` 때 다시 렌더링
-- `IHongdalJsonApiClient`: 인증 헤더, 오류 변환, JSON 직렬화의 공통 경계
-- `HongdalProtectedApiClient`: ISMS-P 보호 속성이 있는 요청의 보호 직렬화
+- `ISsalddelJsonApiClient`: 인증 헤더, 오류 변환, JSON 직렬화의 공통 경계
+- `SsalddelProtectedApiClient`: ISMS-P 보호 속성이 있는 요청의 보호 직렬화
 
 ## Controller 경로 대응 현황
 
-`Hongdal`과 `Hongdal.FoodApi`의 Controller 클래스 기본 `[Route]`를 `Controller기능카탈로그`와 대조했다.
+`Ssalddel`과 `Ssalddel.FoodApi`의 Controller 클래스 기본 `[Route]`를 `Controller기능카탈로그`와 대조했다.
 
 | 영역 | 카탈로그 | 기본 경로 수 |
 |---|---|---:|
@@ -124,7 +124,7 @@ Razor 페이지가 `HttpClient`, URL, 로딩·오류 상태를 직접 다루지 
 페이지는 공통 기반 클래스를 상속하면 ViewModel 주입과 변경 알림 렌더링을 함께 얻는다.
 
 ```razor
-@using Hongdal.Ui.Common.Areas.App.Components
+@using Ssalddel.Ui.Common.Areas.App.Components
 @inherits MvvmComponentBase<주문자Api기능모음ViewModel>
 
 @if (ViewModel.공동구매.해외선적조회.처리중)
@@ -167,6 +167,6 @@ await 작업.실행Async(new ControllerApi경로요청(
 
 ## 인증 연결
 
-공통 API 클라이언트는 앱이 등록한 `IHongdalAccessTokenProvider`의 토큰을 사용한다. 기사, 음식 배달 기사, 화주, 관리자, 관리자 앱, WebAssembly 앱은 기존 인증 세션과 연결돼 있다.
+공통 API 클라이언트는 앱이 등록한 `ISsalddelAccessTokenProvider`의 토큰을 사용한다. 기사, 음식 배달 기사, 화주, 관리자, 관리자 앱, WebAssembly 앱은 기존 인증 세션과 연결돼 있다.
 
-창고·인사 앱은 아직 자체 로그인 세션이 없으므로 현재 빈 토큰 공급자를 사용한다. 해당 서버 Controller는 인증이 필요하므로 실제 호출을 열기 전에 각 앱 로그인 세션이 `IHongdalAccessTokenProvider`를 구현하고 `AddHongdalUiCommonAppServices<TSession>()`로 등록되어야 한다.
+창고·인사 앱은 아직 자체 로그인 세션이 없으므로 현재 빈 토큰 공급자를 사용한다. 해당 서버 Controller는 인증이 필요하므로 실제 호출을 열기 전에 각 앱 로그인 세션이 `ISsalddelAccessTokenProvider`를 구현하고 `AddSsalddelUiCommonAppServices<TSession>()`로 등록되어야 한다.

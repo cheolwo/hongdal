@@ -20,8 +20,8 @@
 
 ## 검증
 
-- `dotnet build Hongdal.Contracts/Hongdal.Contracts.csproj --no-restore` 경고·오류 없음
-- `dotnet build Hongdal/Hongdal.csproj --no-restore -p:BuildProjectReferences=false` 경고·오류 없음
+- `dotnet build Ssalddel.Contracts/Ssalddel.Contracts.csproj --no-restore` 경고·오류 없음
+- `dotnet build Ssalddel/Ssalddel.csproj --no-restore -p:BuildProjectReferences=false` 경고·오류 없음
 - 관련 게시판 계약·정책 테스트 22개 통과
-- 깨끗한 검증 worktree에서 `dotnet build Hongdal.WebApp/Hongdal.WebApp.csproj` 경고·오류 없음
+- 깨끗한 검증 worktree에서 `dotnet build Ssalddel.WebApp/Ssalddel.WebApp.csproj` 경고·오류 없음
 - 방문자 상태의 `/community/boards`에서 게시판별 작성 조건과 글쓰기의 자동 익명 닉네임 안내를 확인

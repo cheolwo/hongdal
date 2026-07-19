@@ -1,12 +1,12 @@
 # Platform Community Home
 
-`PlatformCommunityHome`은 Hongdal 클라이언트에서 커뮤니티, 업무 진입, 원장 다이어그램을 조합하는 공통 화면 컴포넌트다. 제품 화면과 사용자 흐름은 [통합 커뮤니티 클라이언트와 꾸미기 상점](ProjectOverview/unified-community-client.md)에서 캡처와 함께 본다.
+`PlatformCommunityHome`은 Ssalddel 클라이언트에서 커뮤니티, 업무 진입, 원장 다이어그램을 조합하는 공통 화면 컴포넌트다. 제품 화면과 사용자 흐름은 [통합 커뮤니티 클라이언트와 꾸미기 상점](ProjectOverview/unified-community-client.md)에서 캡처와 함께 본다.
 
 ## 책임 경계
 
 | 책임 | 위치 |
 | --- | --- |
-| 역할에 맞는 홈 선택 | `HongdalApp/Components/Pages/UnifiedHome.razor` |
+| 역할에 맞는 홈 선택 | `SsalddelApp/Components/Pages/UnifiedHome.razor` |
 | 화주·창고 관리자 업무 콘텐츠 구성 | 각 역할 홈의 `WorkModeContent` |
 | 게시판·글쓰기·원장 다이어그램 UI | `PlatformCommunityHome` |
 | 실제 운송·창고·판매 처리 | 목적별 업무 페이지와 API |

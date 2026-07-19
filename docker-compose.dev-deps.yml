@@ -5,22 +5,22 @@ services:
     ports:
       - "13306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: hongdal_dev_root_password
-      MYSQL_DATABASE: hongdal_dev
-      MYSQL_USER: hongdal
-      MYSQL_PASSWORD: hongdal_dev_password
+      MYSQL_ROOT_PASSWORD: ssalddel_dev_root_password
+      MYSQL_DATABASE: ssalddel_dev
+      MYSQL_USER: ssalddel
+      MYSQL_PASSWORD: ssalddel_dev_password
       TZ: Asia/Seoul
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-phongdal_dev_root_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pssalddel_dev_root_password"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
     volumes:
-      - hongdal_dev_mysql_data:/var/lib/mysql
+      - ssalddel_dev_mysql_data:/var/lib/mysql
 
   redis:
     image: redis:7.4-alpine
@@ -35,7 +35,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - hongdal_dev_redis_data:/data
+      - ssalddel_dev_redis_data:/data
 
   mongo:
     image: mongo:8.0
@@ -43,9 +43,9 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: hongdal
-      MONGO_INITDB_ROOT_PASSWORD: hongdal_dev_password
-      MONGO_INITDB_DATABASE: hongdal_dev
+      MONGO_INITDB_ROOT_USERNAME: ssalddel
+      MONGO_INITDB_ROOT_PASSWORD: ssalddel_dev_password
+      MONGO_INITDB_DATABASE: ssalddel_dev
     healthcheck:
       test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' | grep 1"]
       interval: 10s
@@ -53,9 +53,9 @@ services:
       retries: 10
       start_period: 10s
     volumes:
-      - hongdal_dev_mongo_data:/data/db
+      - ssalddel_dev_mongo_data:/data/db
 
 volumes:
-  hongdal_dev_mysql_data:
-  hongdal_dev_redis_data:
-  hongdal_dev_mongo_data:
+  ssalddel_dev_mysql_data:
+  ssalddel_dev_redis_data:
+  ssalddel_dev_mongo_data:

@@ -1,0 +1,134 @@
+<MudStack Spacing="1">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <MudText Typo="Typo.subtitle2">@Label</MudText>
+    }
+
+    <div class="ssalddel-payment-method-grid">
+        @foreach (var option in PaymentMethodOptions)
+        {
+            <MudButton Variant="@GetButtonVariant(option)"
+                       Color="@GetButtonColor(option)"
+                       StartIcon="@GetPaymentIcon(option)"
+                       Disabled="@Disabled"
+                       Class="ssalddel-payment-method-button"
+                       OnClick="@(() => SelectAsync(option))">
+                <span class="ssalddel-payment-method-button__text">
+                    <span>@option</span>
+                    <small>@GetPaymentDescription(option)</small>
+                </span>
+            </MudButton>
+        }
+    </div>
+</MudStack>
+
+<style>
+    .ssalddel-payment-method-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .ssalddel-payment-method-button {
+        min-height: 64px;
+        justify-content: flex-start;
+        text-align: left;
+        border-radius: 8px;
+    }
+
+    .ssalddel-payment-method-button__text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        line-height: 1.2;
+    }
+
+    .ssalddel-payment-method-button__text small {
+        font-size: 0.72rem;
+        opacity: 0.78;
+        white-space: normal;
+    }
+</style>
+
+@code {
+    [Parameter] public string Value { get; set; } = "카드";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public IReadOnlyList<string> 결제수단목록 { get; set; } = [];
+    [Parameter] public string Label { get; set; } = "결제 수단";
+    [Parameter] public bool Disabled { get; set; }
+
+    private IReadOnlyList<string> PaymentMethodOptions =>
+        결제수단목록.Count == 0
+            ? ["인수증", "카드", "가상계좌", "계좌이체", "현금성 정산"]
+            : 결제수단목록;
+
+    private async Task SelectAsync(string option)
+    {
+        Value = option;
+        await ValueChanged.InvokeAsync(option);
+    }
+
+    private Variant GetButtonVariant(string option) =>
+        IsSelected(option) ? Variant.Filled : Variant.Outlined;
+
+    private Color GetButtonColor(string option) =>
+        IsSelected(option) ? Color.Primary : Color.Default;
+
+    private bool IsSelected(string option) =>
+        string.Equals(Value, option, StringComparison.OrdinalIgnoreCase);
+
+    private static string GetPaymentIcon(string option)
+    {
+        if (ContainsAny(option, "카드", "Card"))
+        {
+            return Icons.Material.Filled.CreditCard;
+        }
+
+        if (ContainsAny(option, "가상계좌", "계좌이체", "이체", "계좌", "Transfer", "Virtual"))
+        {
+            return Icons.Material.Filled.AccountBalance;
+        }
+
+        if (ContainsAny(option, "인수증", "영수증", "Receipt"))
+        {
+            return Icons.Material.Filled.ReceiptLong;
+        }
+
+        return Icons.Material.Filled.Payments;
+    }
+
+    private static string GetPaymentDescription(string option)
+    {
+        if (ContainsAny(option, "인수증"))
+        {
+            return "증빙 확인 후 정산";
+        }
+
+        if (ContainsAny(option, "카드"))
+        {
+            return "즉시 카드 결제";
+        }
+
+        if (ContainsAny(option, "가상계좌"))
+        {
+            return "입금 계좌 발급";
+        }
+
+        if (ContainsAny(option, "계좌이체", "이체"))
+        {
+            return "직접 이체 확인";
+        }
+
+        if (ContainsAny(option, "현금", "정산", "후불", "월정산"))
+        {
+            return "정산 조건 확인";
+        }
+
+        return "결제 조건 확인";
+    }
+
+    private static bool ContainsAny(string value, params string[] patterns)
+    {
+        return patterns.Any(pattern => value.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+    }
+}

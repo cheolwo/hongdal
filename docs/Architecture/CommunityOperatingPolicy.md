@@ -1,10 +1,10 @@
 # Community Operating Policy
 
-Hongdal community is a gathering and coordination layer, not a paywalled social network. The platform should keep ordinary communication free so people can meet, ask, share, report, and coordinate without feeling forced into payment.
+Ssalddel community is a gathering and coordination layer, not a paywalled social network. The platform should keep ordinary communication free so people can meet, ask, share, report, and coordinate without feeling forced into payment.
 
-## 홍달 0.0 제품 기반
+## 살뜰 0.0 제품 기반
 
-홍달 0.0은 커뮤니티를 독립적인 제품 기반으로 먼저 구성한다. 사용자는 대화와 모집에서 공동 원장과 다이어그램을 만들고, 참여자가 직접 합의한 업무의 상태와 선택적 증빙을 기록한다. 국내 화물/용달 1.0과 이후의 운송·창고·주문 기능은 이 흐름을 처리하는 업무 도구이며, 커뮤니티를 단순 보조 레이어로 낮추지 않는다.
+살뜰 0.0은 커뮤니티를 독립적인 제품 기반으로 먼저 구성한다. 사용자는 대화와 모집에서 공동 원장과 다이어그램을 만들고, 참여자가 직접 합의한 업무의 상태와 선택적 증빙을 기록한다. 국내 화물/용달 1.0과 이후의 운송·창고·주문 기능은 이 흐름을 처리하는 업무 도구이며, 커뮤니티를 단순 보조 레이어로 낮추지 않는다.
 
 플랫폼이 개입하는 유상 화물 배차·주선·운임 수취·정산은 허가·제휴·법률 검토 전 실운영하지 않는다. 코드와 화면은 샘플 데이터, FakePG와 모의 배차를 이용한 기술 검증에 한정할 수 있다. 상세 경계와 공식 근거는 [커뮤니티 0.0 기반 제품 원칙](CommunityFoundationV0Policy.md)을 따른다.
 
@@ -12,37 +12,37 @@ Hongdal community is a gathering and coordination layer, not a paywalled social 
 
 ## Development Philosophy
 
-Hongdal is built around the idea of helping people live more `알뜰살뜰`: careful with money, time, movement, labor, trust, and relationships. This is not only a brand phrase for mart workflows. It is the product philosophy behind the community-first platform.
+Ssalddel is built around the idea of helping people live more `알뜰살뜰`: careful with money, time, movement, labor, trust, and relationships. This is not only a brand phrase for mart workflows. It is the product philosophy behind the community-first platform.
 
 The platform should therefore be judged by whether it reduces real-life friction: fewer wasted trips, fewer unclear promises, fewer repeated explanations, less anxiety around handoff and settlement, and more voluntary cooperation between people who already share a neighborhood, task, or need. Revenue features may exist later, but they should not override the basic aim of helping people gather, coordinate, record, and complete ordinary work with less waste.
 
 ## 원장보다 먼저 원함 확인
 
-Before a user creates a ledger, the UI should ask what the user wants and show what Hongdal can and cannot do for that wish. The Korean word `원장` can be treated productively as starting from `원함` or `願`: a wish, request, or desired outcome that has not yet become executable work.
+Before a user creates a ledger, the UI should ask what the user wants and show what Ssalddel can and cannot do for that wish. The Korean word `원장` can be treated productively as starting from `원함` or `願`: a wish, request, or desired outcome that has not yet become executable work.
 
 This pre-ledger step should show:
 
 - what the user wants to solve or make happen;
 - who should participate, confirm, or help;
 - where, when, and under what conditions the work should happen;
-- how Hongdal can turn the wish into ledger blocks, composition rules, OS scheduling, engine judgment, and API handoff candidates;
+- how Ssalddel can turn the wish into ledger blocks, composition rules, OS scheduling, engine judgment, and API handoff candidates;
 - what the user and counterpart still need to enter, confirm, prove, or dispute themselves.
 
-This keeps expectations honest. Hongdal can structure, guide, schedule, recommend, and record. It should not imply that every wish can be automatically fulfilled, legally guaranteed, paid, or verified by the platform.
+This keeps expectations honest. Ssalddel can structure, guide, schedule, recommend, and record. It should not imply that every wish can be automatically fulfilled, legally guaranteed, paid, or verified by the platform.
 
 ## 원함-원장 판단 보고서
 
-원함 확인의 결과는 단순 안내 문구로 끝나지 않고, 원함을 원장으로 바꿀 수 있는지 판단하는 보고서 형태로 남기는 것이 바람직하다. 이 보고서는 사용자의 바람을 넓게 듣되, 홍달이 더 좋게 만들 수 있는 범위를 좁고 책임 있게 정리한다.
+원함 확인의 결과는 단순 안내 문구로 끝나지 않고, 원함을 원장으로 바꿀 수 있는지 판단하는 보고서 형태로 남기는 것이 바람직하다. 이 보고서는 사용자의 바람을 넓게 듣되, 살뜰이 더 좋게 만들 수 있는 범위를 좁고 책임 있게 정리한다.
 
 보고서는 다음 순서로 정리한다.
 
 | 항목 | 정리할 내용 | 판단 기준 |
 | --- | --- | --- |
 | 사용자의 원함 | 사용자가 바라는 일, 해결하고 싶은 생활 문제, 함께 처리하고 싶은 일 | 원함이 너무 추상적이면 커뮤니티 대화로 먼저 남긴다 |
-| 홍달이 다룰 수 있는 범위 | 참여자, 장소, 시간, 물건/업무, 상태, 증빙, 정산 표시, 확인 책임으로 정리 가능한 부분 | 적어도 하나 이상의 원장 블록으로 구조화할 수 있어야 한다 |
-| 원장화 판정 | 바로 원장 생성, 추가 정보 필요, 커뮤니티 대화 유지, 홍달 처리 범위 밖으로 분류 | 플랫폼 보증이나 자동 실행 약속으로 오해될 요청은 원장화를 보류한다 |
+| 살뜰이 다룰 수 있는 범위 | 참여자, 장소, 시간, 물건/업무, 상태, 증빙, 정산 표시, 확인 책임으로 정리 가능한 부분 | 적어도 하나 이상의 원장 블록으로 구조화할 수 있어야 한다 |
+| 원장화 판정 | 바로 원장 생성, 추가 정보 필요, 커뮤니티 대화 유지, 살뜰 처리 범위 밖으로 분류 | 플랫폼 보증이나 자동 실행 약속으로 오해될 요청은 원장화를 보류한다 |
 | 필요한 원장 구성 | 참여자, 장소, 물건, 재고, 상태, 증빙, 정산, 인계 같은 원장 블록 | 다음 행동을 열기 전에 필요한 최소 블록을 표시한다 |
-| 홍달이 도울 일 | 다음 행동 안내, 상태 변경, 알림, 추천, 보류 판단, 증빙 첨부, 정산 표시 | 시스템이 구조화, 기록, 스케줄링, 추천, handoff로 도울 수 있는 일만 적는다 |
+| 살뜰이 도울 일 | 다음 행동 안내, 상태 변경, 알림, 추천, 보류 판단, 증빙 첨부, 정산 표시 | 시스템이 구조화, 기록, 스케줄링, 추천, handoff로 도울 수 있는 일만 적는다 |
 | 사용자가 직접 해야 할 일 | 실제 약속, 상대방 확인, 현장 확인, 결제 사실, 분쟁 대응, 신고 보완 | 플랫폼이 자동 보증하지 않는 책임을 분리해 적는다 |
 | OS/엔진/API 연결 | 어떤 하위 OS가 흐름을 잡고, 어떤 엔진이 판단을 돕고, 어떤 API가 상태를 바꾸는지 | 실제 실행은 OS가 아니라 API, UseCase, 메시지, application service가 맡는다 |
 
@@ -51,7 +51,7 @@ This keeps expectations honest. Hongdal can structure, guide, schedule, recommen
 - `원장 생성 가능`: 원함이 원장 블록으로 충분히 구조화되어 다음 행동을 열 수 있다.
 - `추가 정보 필요`: 참여자, 장소, 시간, 물건, 상태, 증빙, 정산 표시 중 핵심 정보가 부족하다.
 - `커뮤니티 대화 유지`: 아직 실행할 업무보다 의견, 모집, 질문, 제안에 가깝다.
-- `홍달 처리 범위 밖`: 홍달이 구조화하거나 기록할 수는 있어도 보증, 법적 판단, 강제 이행, 자동 결제 확정처럼 플랫폼 책임으로 처리하면 안 되는 요청이다.
+- `살뜰 처리 범위 밖`: 살뜰이 구조화하거나 기록할 수는 있어도 보증, 법적 판단, 강제 이행, 자동 결제 확정처럼 플랫폼 책임으로 처리하면 안 되는 요청이다.
 
 이 보고서는 나중에 화면과 AI 판단의 공통 입력이 된다. 화면은 보고서를 읽어 어떤 섹션을 먼저 보여줄지 정하고, AI 판단 보조는 보고서의 원장 블록과 판정 사유를 근거로 추천, 보류, 추가 질문을 만든다.
 
@@ -98,7 +98,7 @@ Initial ledger-to-OS routing:
 | Cargo transport ledger | Domestic cargo transport OS | Transport request dispatch engine |
 | Food order ledger | Food delivery OS | Food delivery dispatch engine |
 | Food delivery ledger | Food delivery OS | Food delivery dispatch engine, transport request dispatch engine |
-| HongdalMart delivery ledger | HongdalMart urban logistics OS | Picking batch engine, food delivery dispatch engine, transport request dispatch engine |
+| SsalddelMart delivery ledger | SsalddelMart urban logistics OS | Picking batch engine, food delivery dispatch engine, transport request dispatch engine |
 | Warehouse outbound ledger | Warehouse-commerce fulfillment OS | Outbound batch engine, picking batch engine, transport request dispatch engine |
 | Warehouse inbound ledger | Warehouse-commerce fulfillment OS | Community activity signal engine first, then warehouse workflow policy |
 | Local sale ledger | Warehouse-commerce fulfillment OS | Outbound batch engine, transport request dispatch engine |
@@ -122,7 +122,7 @@ Supported starter ledger templates:
 - Cargo transport ledger: requester, carrier, pickup confirmer, receiver, settlement confirmer
 - Food order ledger: orderer, seller, cook, handoff person, receiver
 - Food delivery ledger: delivery requester, pickup handler, deliverer, receiver confirmer, settlement confirmer
-- HongdalMart delivery ledger: orderer, mart picker, packer, deliverer, receiver confirmer
+- SsalddelMart delivery ledger: orderer, mart picker, packer, deliverer, receiver confirmer
 - Warehouse outbound ledger: outbound requester, picker, inspector, packer, carrier
 - Warehouse inbound ledger: inbound requester, supplier, inbound inspector, storage handler, close confirmer
 - Local sale ledger: seller, buyer, handoff person, confirmer, settlement confirmer
@@ -143,9 +143,9 @@ Priority modules:
 | 4 | 운송의뢰 원장 | Cargo transport ledger | Pickup, dropoff, cargo condition, and settlement condition form the transport request. |
 | 5 | 운송진행 원장 | Cargo transport ledger | Dispatch acceptance, pickup, dropoff, evidence, and receiver confirmation need state history. |
 | 6 | 창고출고 원장 | Warehouse outbound ledger | Outbound items, stock basis, picking, inspection, packing, and handoff need a shared work record. |
-| 7 | 피킹/포장 원장 | Warehouse outbound or HongdalMart delivery ledger | Field work should be trackable independently from the broader order or outbound ledger. |
-| 8 | 마트주문 원장 | HongdalMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
-| 9 | 마트 배송 원장 | HongdalMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
+| 7 | 피킹/포장 원장 | Warehouse outbound or SsalddelMart delivery ledger | Field work should be trackable independently from the broader order or outbound ledger. |
+| 8 | 마트주문 원장 | SsalddelMart delivery ledger | Mart item demand and urban stock should be separated from generic warehouse outbound work. |
+| 9 | 마트 배송 원장 | SsalddelMart delivery ledger | Delivery is the movement work after packing. `즉시배송` is a delivery-type attribute, not the ledger name. |
 | 10 | 공동구매 수요/묶음 원장 | Group purchase ledger | Independent order ledgers are aggregated for domestic purchase confirmation, pickup-point receipt, and participant distribution. |
 | 11 | 공동수입 결정 원장 | Group import ledger | A confirmed group-purchase ledger is linked as the source before import go/no-go, FCL/LCL, price, and quantity are decided. |
 | 12 | 공동수입 선적/통관 원장 | Group import ledger | Overseas shipment, documents, customs, and release state stay outside the domestic group-purchase ledger. |
@@ -183,7 +183,7 @@ The template roles are defaults only. Participants should be able to rename, add
 
 Community participation should be anonymous or pseudonymous by default. The public display name for posts, comments, ledgers, reports, votes, and activity signals should be a nickname, handle, role label, or anonymous participant label rather than a required real name. Identity verification can exist as an optional trust signal when a user wants it or when a specific regulated workflow later requires stronger checks, but it must stay separate from the public display name and should not force real-name community activity.
 
-HongdalMart should be separated from the general warehouse outbound workflow at the ledger boundary. A warehouse outbound ledger is for sales-channel or ordinary warehouse work where picking, inspection, packing, and transport handoff can happen as a broader fulfillment process. A HongdalMart ledger is for short-cycle urban inventory work where a mart order, nearby stock, pick-pack completion, driver pickup, and customer delivery are coordinated as one instant-delivery flow. It can reuse warehouse events and dispatch engines, but it should route through the HongdalMart urban logistics OS rather than being treated as a `warehouse-outbound` ledger.
+SsalddelMart should be separated from the general warehouse outbound workflow at the ledger boundary. A warehouse outbound ledger is for sales-channel or ordinary warehouse work where picking, inspection, packing, and transport handoff can happen as a broader fulfillment process. A SsalddelMart ledger is for short-cycle urban inventory work where a mart order, nearby stock, pick-pack completion, driver pickup, and customer delivery are coordinated as one instant-delivery flow. It can reuse warehouse events and dispatch engines, but it should route through the SsalddelMart urban logistics OS rather than being treated as a `warehouse-outbound` ledger.
 
 ## AI-Assisted Ledger Flow Classification
 
@@ -200,7 +200,7 @@ The classifier response should include:
 - related composition rule codes and processing surface hints;
 - a human-review flag when top candidates are too close or the shape is too weak.
 
-This keeps AI in the interpretation layer. The AI may say that a draft looks like a HongdalMart delivery flow with an immediate-delivery attribute, a warehouse outbound flow, a cargo transport flow, or only a loose community request. It should not directly create relational work records, award experience, or call operational APIs until the ledger is confirmed and handed to the proper OS/API boundary.
+This keeps AI in the interpretation layer. The AI may say that a draft looks like a SsalddelMart delivery flow with an immediate-delivery attribute, a warehouse outbound flow, a cargo transport flow, or only a loose community request. It should not directly create relational work records, award experience, or call operational APIs until the ledger is confirmed and handed to the proper OS/API boundary.
 
 The system should reason about action hints such as state change, evidence attachment, payment marking, completion confirmation, participant invitation, and ledger closing separately from the visible role name. These action hints can guide UI layout and audit messages, but they should not prevent ordinary participation merely because the user picked a different role label.
 
@@ -214,7 +214,7 @@ Experience should come from helpful community and ledger actions, such as writin
 
 API handlers should not update user levels directly. A business API should complete its own work first, publish a domain/application event, and let a community experience handler translate that event into an experience award. Any API whose purpose is to move a work item from one state to another should be treated as an experience-event candidate because the user has usually advanced a physical or operational situation, not merely read data.
 
-For Hongdal 1.0 domestic transport, the first concrete mappings are:
+For Ssalddel 1.0 domestic transport, the first concrete mappings are:
 
 | Source event | Experience event | Base experience | Processing boundary |
 | --- | --- | ---: | --- |
@@ -227,7 +227,7 @@ For Hongdal 1.0 domestic transport, the first concrete mappings are:
 | `창고입고완료됨Event` from `POST api/v1/warehouse-operations/inbounds/{inboundId}/complete` | `WarehouseInboundCompleted` | 20 | `창고작업경험치EventHandler` records inbound completion after inventory items are created. |
 | `창고입고검수완료됨Event` from `POST api/v1/warehouse-operations/inventory/{inboundItemId}/inspect` | `WarehouseInboundInspected` | 12 | `창고작업경험치EventHandler` records inspection completion after available and defect quantities are updated. |
 | `창고적재위치배정됨Event` from `POST api/v1/warehouse-operations/inventory/{inboundItemId}/put-away` | `WarehousePutAwayCompleted` | 8 | `창고작업경험치EventHandler` records put-away location assignment. |
-| `창고피킹완료됨Event` from planned `POST api/v1/warehouse-operations/picking-tasks/{taskKey}/complete` | `WarehousePickingCompleted` | 12 | `창고작업경험치EventHandler` records picking completion. HongdalMart may reuse the event, but the ledger remains routed to the HongdalMart urban logistics OS. |
+| `창고피킹완료됨Event` from planned `POST api/v1/warehouse-operations/picking-tasks/{taskKey}/complete` | `WarehousePickingCompleted` | 12 | `창고작업경험치EventHandler` records picking completion. SsalddelMart may reuse the event, but the ledger remains routed to the SsalddelMart urban logistics OS. |
 | `창고포장완료됨Event` from `POST api/v1/warehouse-operations/inventory/{inboundItemId}/pack` | `WarehouseInventoryPacked` | 14 | `창고작업경험치EventHandler` records packing completion after inventory is prepared for outbound work. |
 | `창고재위탁운송생성됨Event` from `POST api/v1/warehouse-operations/inventory/reconsignment` | `WarehouseReconsignmentCreated` | 18 | `창고작업경험치EventHandler` records the handoff from warehouse inventory to transport request. |
 
@@ -281,15 +281,15 @@ Initial composition rules:
 | --- | --- | --- |
 | Transport request before pickup/dropoff | A cargo transport ledger needs participants, pickup place, dropoff place, and cargo conditions before pickup or dropoff actions are shown. | Pickup arrival, pickup confirmation, dropoff completion, receiver confirmation |
 | Food order before delivery | A food delivery ledger should be generated from a food order ledger or a pickup request that already has pickup place, destination, and receiver conditions. | Pickup arrival, pickup completion, delivery completion, receiver confirmation |
-| Mart order before picking/packing | A HongdalMart ledger needs a mart order, urban stock, and participants before picking or packing actions are shown. | Stock check, picking, packing completion |
-| Mart packed before delivery pickup | A HongdalMart delivery pickup can be recommended early, but actual driver handoff and customer delivery actions open after packing is complete. | Pickup readiness, driver handoff, delivery completion |
+| Mart order before picking/packing | A SsalddelMart ledger needs a mart order, urban stock, and participants before picking or packing actions are shown. | Stock check, picking, packing completion |
+| Mart packed before delivery pickup | A SsalddelMart delivery pickup can be recommended early, but actual driver handoff and customer delivery actions open after packing is complete. | Pickup readiness, driver handoff, delivery completion |
 | Inbound or stock before outbound | A warehouse outbound ledger needs an inbound ledger, stock record, or operator-approved stock basis before picking starts. | Picking, inspection request, outbound progress |
 | Outbound before handoff transport | A transport handoff from warehouse work opens only after picking, inspection, and packing are settled. | Transport handoff, later cargo transport request |
 | Sale item before reservation settlement | A local sale ledger needs the item and counterpart before reservation, payment mark, or delivery handoff actions are useful. | Reservation, payment mark, handoff schedule, delivery completion |
 | Recruitment before purchase distribution | A group purchase ledger needs participants and quantity decisions before purchase, distribution, and settlement surfaces are opened. | Purchase progress, distribution, payment mark |
 | Request and participant before progress | Generic requests, inbound work, and food orders need at least a request shape and participants before progress states are meaningful. | Start progress, completion confirmation, hold/dispute state |
 
-These rules are not meant to make the community rigid. They are the guardrails that let Hongdal render dynamic pages from a ledger without showing impossible actions. If a user creates a loose community post first, the post can remain loose. Once the post becomes a ledger, the composition rules decide what must be filled before the OS or engine receives it.
+These rules are not meant to make the community rigid. They are the guardrails that let Ssalddel render dynamic pages from a ledger without showing impossible actions. If a user creates a loose community post first, the post can remain loose. Once the post becomes a ledger, the composition rules decide what must be filled before the OS or engine receives it.
 
 ## Mongo Ledger Source And Relational Projection
 
@@ -324,7 +324,7 @@ The OS handoff remains conceptual and scheduling-oriented. In code, the handoff 
 - MySQL에는 범용 원장 블록이나 다이어그램 연결선을 복제하지 않는다. 배차, 운송 실행, 창고 작업, 음식 주문처럼 SQL 트랜잭션·인덱스·권한 조회가 필요한 확정 업무 데이터만 투영한다.
 - 다이어그램의 시각적 연결선으로 RDB 업무 관계나 Cardinality를 추론하지 않는다. 업무 규칙은 원장과 업무별 UseCase가 정의하고, 다이어그램은 그 결과를 표현한다.
 
-For Hongdal 1.0 domestic cargo transport, `transport:{화주운송의뢰Id}` in MongoDB is the transport ledger source. The relational table formerly treated as `운송원장` should be read as `운송실행투영`: a dispatch and driver-progress projection used for queue scans, recommendations, admin lists, event joins, file/POD links, and indexed authorization checks. A shipper request or driver state transition should upsert the Mongo ledger first-class shape, while the RDB projection keeps only stable execution fields and reverse references needed by SQL workflows.
+For Ssalddel 1.0 domestic cargo transport, `transport:{화주운송의뢰Id}` in MongoDB is the transport ledger source. The relational table formerly treated as `운송원장` should be read as `운송실행투영`: a dispatch and driver-progress projection used for queue scans, recommendations, admin lists, event joins, file/POD links, and indexed authorization checks. A shipper request or driver state transition should upsert the Mongo ledger first-class shape, while the RDB projection keeps only stable execution fields and reverse references needed by SQL workflows.
 
 ## Best Ledger Pattern Sharing
 
@@ -345,7 +345,7 @@ A best ledger pattern should not expose:
 - exact cargo, order, or transaction details unless the participants deliberately make them public;
 - claims that the platform verified payment, identity, legal effect, or performance unless the relevant OS and provider integration actually did so.
 
-This creates a loop: the community starts a ledger, the right OS schedules the next work steps, APIs and use cases execute them, and the useful shape of that ledger can return to the community as a reusable work pattern. Over time, Hongdal can rank or recommend these patterns by completion rate, low dispute rate, clarity of roles, and participant feedback.
+This creates a loop: the community starts a ledger, the right OS schedules the next work steps, APIs and use cases execute them, and the useful shape of that ledger can return to the community as a reusable work pattern. Over time, Ssalddel can rank or recommend these patterns by completion rate, low dispute rate, clarity of roles, and participant feedback.
 
 ### 완료 원장 자동 성립 사례
 
@@ -373,7 +373,7 @@ The shared home uses a workspace catalog to map:
 - the target OS that should schedule and orchestrate the ledger when it becomes concrete work;
 - the current route that can open the existing static screen while the dynamic UI engine is still being built.
 
-This lets Hongdal move from many predetermined client apps toward one community-centered workspace. A user can start from a conversation, choose a ledger shape, fill a draft, and then continue into the current work screen. Over time, app-specific home panels should become dynamic ledger sections rendered from the ledger template and OS metadata, not separate hard-coded product surfaces.
+This lets Ssalddel move from many predetermined client apps toward one community-centered workspace. A user can start from a conversation, choose a ledger shape, fill a draft, and then continue into the current work screen. Over time, app-specific home panels should become dynamic ledger sections rendered from the ledger template and OS metadata, not separate hard-coded product surfaces.
 
 ## Activity Signal Policy
 

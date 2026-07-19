@@ -1,0 +1,241 @@
+@inject ISsalddelDocumentOutputService DocumentOutputService
+@inject IJSRuntime JS
+
+<MudPaper Class="@PanelClass" Elevation="@Elevation" Outlined="@Outlined">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">@Output.Title</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    @EffectiveDraft.DocumentNo · @EffectiveDraft.WarehouseName · @EffectiveDraft.Lines.Count.ToString("N0")개 품목
+                </MudText>
+            </MudStack>
+            <MudChip T="string" Color="@KindColor" Variant="Variant.Filled">@KindText</MudChip>
+        </MudStack>
+
+        @if (ShowLayoutControls)
+        {
+            <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="4" md="3">
+                        <MudSelect T="string" Label="용지" Value="@PaperSize" ValueChanged="OnPaperSizeChanged" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPaperSizeCode.Thermal80">주문전표 80mm</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPaperSizeCode.Thermal58">소형전표 58mm</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPaperSizeCode.A4">A4 문서</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPaperSizeCode.A5">A5 문서</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPaperSizeCode.A6">A6 문서</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="4" md="3">
+                        <MudSelect T="string" Label="밀도" @bind-Value="Density" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@SsalddelDocumentDensityCode.Comfortable">보통</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentDensityCode.Compact">압축</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentDensityCode.Dense">고밀도</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="4" md="3">
+                        <MudSelect T="string" Label="형식" @bind-Value="PrintStyle" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@IsThermalPaper">
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPrintStyleCode.ReceiptSlip">전표형</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentPrintStyleCode.Sheet">문서형</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="4" md="3">
+                        <MudSelect T="string" Label="방향" @bind-Value="Orientation" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="@IsThermalPaper">
+                            <MudSelectItem T="string" Value="@SsalddelDocumentOrientationCode.Portrait">세로</MudSelectItem>
+                            <MudSelectItem T="string" Value="@SsalddelDocumentOrientationCode.Landscape">가로</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudStack Spacing="0">
+                            <MudSwitch T="bool" Label="문서 QR" @bind-Value="IncludeDocumentQrCode" Color="Color.Primary" />
+                            <MudSwitch T="bool" Label="품목 바코드" @bind-Value="IncludeLineBarcodes" Color="Color.Primary" />
+                        </MudStack>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }
+
+        <MudTable T="SsalddelExpectedItemDocumentLine" Items="@EffectiveDraft.Lines" Dense="true" Hover="true" Elevation="0">
+            <HeaderContent>
+                <MudTh>품목</MudTh>
+                <MudTh>수량</MudTh>
+                <MudTh>바코드</MudTh>
+                <MudTh>위치</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="품목">
+                    <MudText Typo="Typo.body2">@context.ProductName</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Sku</MudText>
+                </MudTd>
+                <MudTd DataLabel="수량">@context.Quantity.ToString("N0") @context.Unit</MudTd>
+                <MudTd DataLabel="바코드">
+                    <MudText Typo="Typo.caption" Style="font-family: Consolas, 'Courier New', monospace; overflow-wrap: anywhere">
+                        @ResolveBarcodeText(context)
+                    </MudText>
+                </MudTd>
+                <MudTd DataLabel="위치">@context.LocationCode</MudTd>
+            </RowTemplate>
+        </MudTable>
+
+        @if (!string.IsNullOrWhiteSpace(_statusMessage))
+        {
+            <MudAlert Severity="@_statusSeverity" Dense="true">@_statusMessage</MudAlert>
+        }
+
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Print" OnClick="PrintAsync">
+                인쇄
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Download" OnClick="DownloadHtmlAsync">
+                HTML 저장
+            </MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Article" OnClick="TogglePreview">
+                텍스트 미리보기
+            </MudButton>
+        </MudStack>
+
+        @if (_showPreview)
+        {
+            <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.body2" Style="white-space: pre-wrap">@Output.PlainText</MudText>
+            </MudPaper>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    private bool _showPreview;
+    private string? _statusMessage;
+    private Severity _statusSeverity = Severity.Info;
+    private SsalddelExpectedItemDocumentDraft? _loadedDraft;
+    private string PaperSize = SsalddelDocumentPaperSizeCode.A4;
+    private string Density = SsalddelDocumentDensityCode.Compact;
+    private string Orientation = SsalddelDocumentOrientationCode.Portrait;
+    private string PrintStyle = SsalddelDocumentPrintStyleCode.Sheet;
+    private bool IncludeDocumentQrCode = true;
+    private bool IncludeLineBarcodes = true;
+
+    [Parameter, EditorRequired]
+    public SsalddelExpectedItemDocumentDraft Draft { get; set; } = default!;
+
+    [Parameter]
+    public bool ShowLayoutControls { get; set; } = true;
+
+    [Parameter]
+    public string PanelClass { get; set; } = "pa-4";
+
+    [Parameter]
+    public int Elevation { get; set; }
+
+    [Parameter]
+    public bool Outlined { get; set; } = true;
+
+    private bool IsOutbound => string.Equals(
+        EffectiveDraft.DocumentKind,
+        SsalddelExpectedItemDocumentKindCode.OutboundExpectedItems,
+        StringComparison.OrdinalIgnoreCase);
+
+    private bool IsThermalPaper => string.Equals(PaperSize, SsalddelDocumentPaperSizeCode.Thermal80, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(PaperSize, SsalddelDocumentPaperSizeCode.Thermal58, StringComparison.OrdinalIgnoreCase);
+
+    private string KindText => IsOutbound ? "출고예정" : "입고예정";
+
+    private Color KindColor => IsOutbound ? Color.Primary : Color.Info;
+
+    private SsalddelExpectedItemDocumentDraft EffectiveDraft => new()
+    {
+        DocumentNo = Draft.DocumentNo,
+        DocumentKind = Draft.DocumentKind,
+        Title = Draft.Title,
+        Status = Draft.Status,
+        WarehouseName = Draft.WarehouseName,
+        OwnerName = Draft.OwnerName,
+        CounterpartyName = Draft.CounterpartyName,
+        OrderNo = Draft.OrderNo,
+        LedgerNo = Draft.LedgerNo,
+        ExpectedDateText = Draft.ExpectedDateText,
+        WorkMemo = Draft.WorkMemo,
+        CreatedAt = Draft.CreatedAt,
+        DocumentBarcodePayload = Draft.DocumentBarcodePayload,
+        Lines = Draft.Lines,
+        PrintLayout = new SsalddelDocumentPrintLayoutOptions
+        {
+            PaperSize = PaperSize,
+            Density = Density,
+            Orientation = IsThermalPaper ? SsalddelDocumentOrientationCode.Portrait : Orientation,
+            PrintStyle = IsThermalPaper ? SsalddelDocumentPrintStyleCode.ReceiptSlip : PrintStyle,
+            IncludeDocumentQrCode = IncludeDocumentQrCode,
+            IncludeLineBarcodes = IncludeLineBarcodes
+        }
+    };
+
+    private SsalddelDocumentOutput Output => IsOutbound
+        ? DocumentOutputService.CreateOutboundExpectedItems(EffectiveDraft)
+        : DocumentOutputService.CreateInboundExpectedItems(EffectiveDraft);
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_loadedDraft, Draft))
+        {
+            return;
+        }
+
+        _loadedDraft = Draft;
+        PaperSize = Draft.PrintLayout.PaperSize;
+        Density = Draft.PrintLayout.Density;
+        Orientation = Draft.PrintLayout.Orientation;
+        PrintStyle = IsThermalPaper ? SsalddelDocumentPrintStyleCode.ReceiptSlip : Draft.PrintLayout.PrintStyle;
+        IncludeDocumentQrCode = Draft.PrintLayout.IncludeDocumentQrCode;
+        IncludeLineBarcodes = Draft.PrintLayout.IncludeLineBarcodes;
+    }
+
+    private Task OnPaperSizeChanged(string value)
+    {
+        PaperSize = value;
+        if (IsThermalPaper)
+        {
+            PrintStyle = SsalddelDocumentPrintStyleCode.ReceiptSlip;
+            Orientation = SsalddelDocumentOrientationCode.Portrait;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task PrintAsync()
+    {
+        var output = Output;
+        await JS.InvokeVoidAsync("ssalddelDocumentOutput.printHtml", output.Title, output.Html);
+        _statusSeverity = Severity.Success;
+        _statusMessage = "바코드가 포함된 인쇄용 문서를 열었습니다.";
+    }
+
+    private async Task DownloadHtmlAsync()
+    {
+        var output = Output;
+        await JS.InvokeVoidAsync("ssalddelDocumentOutput.downloadHtml", output.FileName, output.Html);
+        _statusSeverity = Severity.Success;
+        _statusMessage = "바코드가 포함된 HTML 문서를 생성했습니다.";
+    }
+
+    private void TogglePreview()
+    {
+        _showPreview = !_showPreview;
+        _statusSeverity = Severity.Info;
+        _statusMessage = _showPreview ? "문서에 포함될 핵심 텍스트와 바코드 값을 표시합니다." : null;
+    }
+
+    private static string ResolveBarcodeText(SsalddelExpectedItemDocumentLine line)
+    {
+        if (line.BarcodePayload is not null)
+        {
+            return line.BarcodePayload.RawCode;
+        }
+
+        if (!string.IsNullOrWhiteSpace(line.ProductBarcode))
+        {
+            return line.ProductBarcode;
+        }
+
+        return line.BundleBarcode;
+    }
+}

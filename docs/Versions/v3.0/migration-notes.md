@@ -1,4 +1,4 @@
-﻿# Hongdal 3.0 Migration Notes
+﻿# Ssalddel 3.0 Migration Notes
 
 3.0에서는 음식점 주문, 조리/픽업 상태, 음식 배달 배차 관련 변경을 기록합니다.
 

@@ -4,7 +4,7 @@
 
 - 확인일: 2026-07-03
 - 기준: 공식 개발자 문서 또는 공식 개발자 포털
-- 목적: 홍달 화주 앱의 `판매상품 -> 채널출품` 구조에 붙일 해외 판매채널 후보를 정리한다.
+- 목적: 살뜰 화주 앱의 `판매상품 -> 채널출품` 구조에 붙일 해외 판매채널 후보를 정리한다.
 
 ## 1차 구현 후보
 
@@ -13,7 +13,7 @@
 - 공식 문서: Shopify Admin GraphQL API
 - 상품 모델: Product, Product Variant, Media, Inventory 관련 객체
 - 인증/권한: Shopify app OAuth와 Admin API access scope
-- 홍달 적합도: 높음
+- 살뜰 적합도: 높음
 - 이유: 독립몰 계정 단위라 `판매채널계정` 모델과 잘 맞고, API 문서와 버전 관리가 안정적이다.
 
 ### Amazon
@@ -21,7 +21,7 @@
 - 공식 문서: Amazon Selling Partner API
 - 핵심 API: Listings Items API, Product Type Definitions API
 - 인증/권한: SP-API app authorization, Login with Amazon, AWS SigV4
-- 홍달 적합도: 높지만 난도 높음
+- 살뜰 적합도: 높지만 난도 높음
 - 이유: 글로벌 확장성은 가장 크지만 marketplaceId, sellerId, productType별 JSON Schema, 리전 처리까지 필요하다.
 
 ### eBay
@@ -29,7 +29,7 @@
 - 공식 문서: eBay Sell Inventory API
 - 출품 흐름: inventory item 생성, offer 생성, offer publish
 - 인증/권한: OAuth 2.0
-- 홍달 적합도: 높음
+- 살뜰 적합도: 높음
 - 이유: `판매상품 -> 채널출품` 모델을 `inventoryItem -> offer -> publish` 흐름에 대응하기 쉽다.
 
 ## 후속 후보

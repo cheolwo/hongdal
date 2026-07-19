@@ -1,0 +1,69 @@
+@page "/warehouse/work/{ProcessCode}"
+@page "/work/{ProcessCode}"
+@inject IWarehouseWorkEntryGateService EntryGateService
+@inject NavigationManager Navigation
+
+<WebPageHeader Eyebrow="Warehouse Web"
+               Title="@Definition.Title"
+               Description="@Definition.Description"
+               Badge="@Definition.Label" />
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="px-0">
+    <MudStack Spacing="3">
+        <SsalddelWarehouseWorkEntryGate Title="@($"{Definition.Label} 작업자 확인")"
+                                       Description="휴대폰 번호 뒤 8자리로 작업자를 확인합니다. 입고와 포장은 작업자 확인 후 작업대 바코드를 추가로 확인합니다."
+                                       ProcessLabel="@Definition.Label"
+                                       ChipColor="@Definition.Color"
+                                       PanelClass="pa-4"
+                                       IsBusy="@IsBusy"
+                                       VerificationHandler="VerifyAsync"
+                                       Verified="OnVerifiedAsync" />
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            샘플: 입고 12345678, 출고 23456789, 포장 34567890, 마켓 45678901, 해외 56789012, 국내배송 67890123, 관리자 99998888
+        </MudAlert>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string ProcessCode { get; set; } = WarehouseWorkProcessCodes.Inbound;
+
+    private bool IsBusy;
+    private WorkDefinition Definition => ResolveDefinition(ProcessCode);
+
+    private async Task<WarehouseWorkOperatorVerificationResult> VerifyAsync(string phoneSuffix)
+    {
+        IsBusy = true;
+        try
+        {
+            return await EntryGateService.VerifyAsync(Definition.ProcessCode, phoneSuffix);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task OnVerifiedAsync(WarehouseWorkOperatorVerificationResult result)
+    {
+        await Task.Delay(300);
+        Navigation.NavigateTo(Definition.NextRoute);
+    }
+
+    private static WorkDefinition ResolveDefinition(string? processCode)
+        => Definitions.FirstOrDefault(x => string.Equals(x.ProcessCode, processCode, StringComparison.OrdinalIgnoreCase))
+           ?? Definitions[0];
+
+    private static readonly IReadOnlyList<WorkDefinition> Definitions =
+    [
+        new(WarehouseWorkProcessCodes.Inbound, "입고 작업 시작", "입고 검수와 적재 전환 전에 작업자를 확인한 뒤 입고 작업대 바코드를 확인합니다.", "입고", Color.Warning, WarehouseManagerRoutes.WorkbenchScan(WarehouseWorkProcessCodes.Inbound)),
+        new(WarehouseWorkProcessCodes.Outbound, "출고 작업 시작", "출고 피킹 전에 작업자를 확인합니다.", "출고", Color.Primary, WarehouseManagerRoutes.WorkBoard),
+        new(WarehouseWorkProcessCodes.Packing, "포장 작업 시작", "포장 업무 전에 작업자를 확인한 뒤 포장 작업대 바코드를 확인합니다.", "포장", Color.Success, WarehouseManagerRoutes.WorkbenchScan(WarehouseWorkProcessCodes.Packing)),
+        new(WarehouseWorkProcessCodes.MarketFulfillment, "마켓 출고 시작", "이커머스 주문 출고 담당자를 확인합니다.", "마켓 출고", Color.Info, WarehouseManagerRoutes.WorkBoard),
+        new(WarehouseWorkProcessCodes.InternationalForwarding, "해외 배송대행 시작", "해외 배송대행 입고/통관 연결 담당자를 확인합니다.", "해외 배송대행", Color.Secondary, WarehouseManagerRoutes.WorkBoard),
+        new(WarehouseWorkProcessCodes.DeliveryAgency, "국내 배송대행 시작", "국내 배송대행 접수/운송 연결 담당자를 확인합니다.", "국내 배송대행", Color.Tertiary, WarehouseManagerRoutes.WorkBoard)
+    ];
+
+    private sealed record WorkDefinition(string ProcessCode, string Title, string Description, string Label, Color Color, string NextRoute);
+}

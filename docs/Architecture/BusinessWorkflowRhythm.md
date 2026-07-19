@@ -1,4 +1,4 @@
-# Hongdal 업무 흐름 리듬
+# Ssalddel 업무 흐름 리듬
 
 이 문서는 지금까지 구현된 주요 흐름을 `Command -> 상태 변경 -> Event/후속처리 -> Query/View` 리듬으로 정리한다. 목적은 코드가 단순 기능 목록이 아니라, 어떤 업무가 어떤 순서로 흘러가는지 드러나게 하는 것이다.
 
@@ -18,15 +18,15 @@ flowchart LR
 
 | 단계 | 책임 | 대표 코드 |
 | --- | --- | --- |
-| Command/API | 사용자의 실행 의도 수신 | `Hongdal.Controllers`, `HongdalApp.Services.Commerce.Orders.Commands` |
+| Command/API | 사용자의 실행 의도 수신 | `Ssalddel.Controllers`, `SsalddelApp.Services.Commerce.Orders.Commands` |
 | Handler/Service | 검증, 권한, 핵심 상태 전이 | `WarehouseOperationService`, `ProcessCommerceOrderCommandHandler` |
-| Domain/Store | 저장되는 업무 상태 | `Hongdal.Domain`, `InMemoryShipperStore` |
+| Domain/Store | 저장되는 업무 상태 | `Ssalddel.Domain`, `InMemoryShipperStore` |
 | Event/Outbox | 후속 처리 대기 또는 발생 사실 기록 | `CommerceOrderProcessedEvent`, `배차추천알림Outbox` |
-| Query/View | 지금 처리해야 할 일 표시 | `Hongdal.Ui.Common`, `HongdalApp.Components`, `DriverApp` |
+| Query/View | 지금 처리해야 할 일 표시 | `Ssalddel.Ui.Common`, `SsalddelApp.Components`, `DriverApp` |
 
 ## 운영 레인
 
-`레인(lane)`은 Hongdal에서 업무 책임을 나누기 위한 상위 분류입니다. 화면 이름이나 앱 이름이 아니라, 같은 기능 안에서도 서로 다른 질문을 담당하는 처리 축입니다. 예를 들어 “입고”라는 하나의 업무도 계약 조건을 확인하는 흐름, 작업자가 권한을 갖는지 확인하는 흐름, 실제 재고 상태를 바꾸는 흐름이 섞여 있습니다. 이 흐름들을 한 파일이나 한 서비스에 모두 넣지 않기 위해 레인이라는 단어를 씁니다.
+`레인(lane)`은 Ssalddel에서 업무 책임을 나누기 위한 상위 분류입니다. 화면 이름이나 앱 이름이 아니라, 같은 기능 안에서도 서로 다른 질문을 담당하는 처리 축입니다. 예를 들어 “입고”라는 하나의 업무도 계약 조건을 확인하는 흐름, 작업자가 권한을 갖는지 확인하는 흐름, 실제 재고 상태를 바꾸는 흐름이 섞여 있습니다. 이 흐름들을 한 파일이나 한 서비스에 모두 넣지 않기 위해 레인이라는 단어를 씁니다.
 
 짧게 말하면 레인은 “누가/무엇을 책임지는가”를 기준으로 나눈 업무 구역입니다.
 
@@ -62,13 +62,13 @@ flowchart TD
 
 | 레인 | 폴더 | 네임스페이스 |
 | --- | --- | --- |
-| 인사 영역 | `Hongdal/Application/HumanResources` | `Hongdal.Application.HumanResources` |
-| 인사 영역 | `Hongdal/Services/HumanResources` | `Hongdal.Services.HumanResources` |
-| 인사 영역 | `Hongdal/Controllers/Admin/HumanResources` | `Hongdal.Controllers.Admin.HumanResources` |
-| 계약 영역 | `Hongdal/Application/ContractManagement` | `Hongdal.Application.ContractManagement` |
-| 계약 영역 | `Hongdal/Services/ContractManagement` | `Hongdal.Services.ContractManagement` |
-| 물류 처리 영역 | `Hongdal/Application/LogisticsProcessing` | `Hongdal.Application.LogisticsProcessing` |
-| 물류 처리 영역 | `Hongdal/Services/LogisticsProcessing` | `Hongdal.Services.LogisticsProcessing` |
+| 인사 영역 | `Ssalddel/Application/HumanResources` | `Ssalddel.Application.HumanResources` |
+| 인사 영역 | `Ssalddel/Services/HumanResources` | `Ssalddel.Services.HumanResources` |
+| 인사 영역 | `Ssalddel/Controllers/Admin/HumanResources` | `Ssalddel.Controllers.Admin.HumanResources` |
+| 계약 영역 | `Ssalddel/Application/ContractManagement` | `Ssalddel.Application.ContractManagement` |
+| 계약 영역 | `Ssalddel/Services/ContractManagement` | `Ssalddel.Services.ContractManagement` |
+| 물류 처리 영역 | `Ssalddel/Application/LogisticsProcessing` | `Ssalddel.Application.LogisticsProcessing` |
+| 물류 처리 영역 | `Ssalddel/Services/LogisticsProcessing` | `Ssalddel.Services.LogisticsProcessing` |
 
 참여자는 이름만 저장하지 않고 성격을 함께 가진다.
 
@@ -108,11 +108,11 @@ flowchart TD
 
 대표 파일:
 
-- `Hongdal.Contracts/Common/Inbound/InboundContractDtos.cs`
-- `Hongdal.Domain/창고/입고요청.cs`
-- `Hongdal.Domain/창고/입고상품.cs`
-- `Hongdal/Services/Warehouse/WarehouseOperationService.cs`
-- `Hongdal.Ui.Common/Areas/App/Components/WarehouseOperations/HongdalInboundRequestManager.razor`
+- `Ssalddel.Contracts/Common/Inbound/InboundContractDtos.cs`
+- `Ssalddel.Domain/창고/입고요청.cs`
+- `Ssalddel.Domain/창고/입고상품.cs`
+- `Ssalddel/Services/Warehouse/WarehouseOperationService.cs`
+- `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/SsalddelInboundRequestManager.razor`
 
 ## 2. 마켓 주문, 피킹, 포장 흐름
 
@@ -157,12 +157,12 @@ flowchart TD
 
 대표 파일:
 
-- `HongdalApp/Services/Commerce/Orders/Commands/ProcessCommerceOrderCommandHandler.cs`
+- `SsalddelApp/Services/Commerce/Orders/Commands/ProcessCommerceOrderCommandHandler.cs`
 - `docs/Architecture/OutboundBatchEngine.md`
-- `HongdalApp/Services/Warehouse/Fulfillment/WarehousePickingPlanner.cs`
-- `HongdalApp/Services/Warehouse/Fulfillment/WarehouseOrderPickingTask.cs`
-- `HongdalApp/Services/Warehouse/Fulfillment/WarehousePackingTask.cs`
-- `HongdalApp/Components/Pages/OrderFulfillment.razor`
+- `SsalddelApp/Services/Warehouse/Fulfillment/WarehousePickingPlanner.cs`
+- `SsalddelApp/Services/Warehouse/Fulfillment/WarehouseOrderPickingTask.cs`
+- `SsalddelApp/Services/Warehouse/Fulfillment/WarehousePackingTask.cs`
+- `SsalddelApp/Components/Pages/OrderFulfillment.razor`
 
 ## 2-1. 판매채널 주문 동기화 흐름
 
@@ -190,11 +190,11 @@ flowchart TD
 
 대표 파일:
 
-- `Hongdal/Infrastructure/BackgroundJobs/SalesOrders/DomesticSalesChannelOrderSyncJob.cs`
-- `Hongdal/Infrastructure/BackgroundJobs/SalesOrders/OverseasSalesChannelOrderSyncJob.cs`
-- `Hongdal/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncService.cs`
-- `Hongdal/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderFeedModels.cs`
-- `Hongdal/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncOptions.cs`
+- `Ssalddel/Infrastructure/BackgroundJobs/SalesOrders/DomesticSalesChannelOrderSyncJob.cs`
+- `Ssalddel/Infrastructure/BackgroundJobs/SalesOrders/OverseasSalesChannelOrderSyncJob.cs`
+- `Ssalddel/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncService.cs`
+- `Ssalddel/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderFeedModels.cs`
+- `Ssalddel/Services/LogisticsProcessing/SalesOrders/SalesChannelOrderSyncOptions.cs`
 
 ## 3. 기사 배차와 운행 시작 흐름
 
@@ -235,15 +235,15 @@ flowchart TD
 
 대표 파일:
 
-- `Hongdal.Domain/배차/배차대기.cs`
-- `Hongdal/Application/Admin/Inbound/Handlers/배차대기생성CommandHandler.cs`
+- `Ssalddel.Domain/배차/배차대기.cs`
+- `Ssalddel/Application/Admin/Inbound/Handlers/배차대기생성CommandHandler.cs`
 - `docs/DispatchQueue/배차큐_진행현황_2026-07-02.md`
 - `DriverApp/Pages/NativeDriverHomePage.cs`
 - `DriverApp/Views/DriverNativeMapView.cs`
 
 ## 4. 음식 주문 배차 흐름
 
-음식 주문은 FoodApi에서 주문 상태를 관리하고, 배달이 필요한 시점에 Hongdal의 공통 배차 큐로 넘긴다.
+음식 주문은 FoodApi에서 주문 상태를 관리하고, 배달이 필요한 시점에 Ssalddel의 공통 배차 큐로 넘긴다.
 
 레인: `비즈니스 실행 영역`
 
@@ -257,7 +257,7 @@ flowchart TD
     A["음식 주문 생성"] --> B["음식점 주문 확인"]
     B --> C["조리/픽업 준비"]
     C --> D["FoodApi dispatch-wait 호출"]
-    D --> E["Hongdal 배차대기 생성"]
+    D --> E["Ssalddel 배차대기 생성"]
     E --> F["배차업무유형=음식배달"]
     F --> G["배달기사 후보 선정"]
     G --> H["기사 앱 추천/지도 표시"]
@@ -271,9 +271,9 @@ flowchart TD
 
 대표 파일:
 
-- `Hongdal.FoodApi`
+- `Ssalddel.FoodApi`
 - `docs/DispatchQueue/배차큐_진행현황_2026-07-02.md`
-- `Hongdal.Domain/배차/배차대기.cs`
+- `Ssalddel.Domain/배차/배차대기.cs`
 
 ## 5. 통관, HS 검토, 행정 알림 흐름
 
@@ -301,9 +301,9 @@ flowchart TD
 
 대표 파일:
 
-- `HongdalApp/Services/Customs`
-- `Hongdal.Domain/통관`
-- `Hongdal/Application/Warehouse/Handlers/국제거래통관절차생성EventHandler.cs`
+- `SsalddelApp/Services/Customs`
+- `Ssalddel.Domain/통관`
+- `Ssalddel/Application/Warehouse/Handlers/국제거래통관절차생성EventHandler.cs`
 
 ## 6. HR/권한 흐름
 
@@ -322,9 +322,9 @@ flowchart TD
 
 대표 파일:
 
-- `Hongdal.Contracts/Common/Hr/HrRoleDtos.cs`
-- `Hongdal.Services.ViewSettings.View카탈로그`
-- `Hongdal.Domain/설정/사용자Command기능설정.cs`
+- `Ssalddel.Contracts/Common/Hr/HrRoleDtos.cs`
+- `Ssalddel.Services.ViewSettings.View카탈로그`
+- `Ssalddel.Domain/설정/사용자Command기능설정.cs`
 
 ## 문서 유지 규칙
 

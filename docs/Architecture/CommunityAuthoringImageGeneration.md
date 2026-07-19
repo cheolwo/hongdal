@@ -62,7 +62,7 @@ flowchart LR
 | `CommunityAuthoringImagePromptItemViewModel` | 문맥별 프롬프트·비율·생성 상태·오류·첨부 선택 관리 |
 | 공통 Razor 도구 | 문맥 선택, 프롬프트 편집, 종횡비, 대기·실패·완료, 미리보기와 첨부 선택 표시 |
 
-각 타입에는 `community-authoring-image` 기능 키의 `HongdalCodeMetadataAttribute`를 붙인다. `HongdalCodeMetadataReader`로 계약부터 Kie.ai adapter까지 `FlowOrder` 순서로 조회할 수 있으며, 세부 규약은 [코드 탐색 메타데이터](HongdalCodeMetadata.md)를 따른다.
+각 타입에는 `community-authoring-image` 기능 키의 `SsalddelCodeMetadataAttribute`를 붙인다. `SsalddelCodeMetadataReader`로 계약부터 Kie.ai adapter까지 `FlowOrder` 순서로 조회할 수 있으며, 세부 규약은 [코드 탐색 메타데이터](SsalddelCodeMetadata.md)를 따른다.
 
 지원 비율은 `auto`, `1:1`, `3:2`, `2:3`으로 제한한다. 프롬프트는 10자 이상 4,000자 이하이며, 초안에서 문맥과 프롬프트를 계획하는 행위는 외부 API를 호출하지 않는다. 선택한 문맥마다 `생성`을 실행할 때만 별도의 Kie.ai 작업과 비용이 발생할 수 있다.
 

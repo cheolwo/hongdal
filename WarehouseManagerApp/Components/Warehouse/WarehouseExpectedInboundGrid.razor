@@ -1,4 +1,4 @@
-<HongdalServerDataGrid @ref="_grid"
+<SsalddelServerDataGrid @ref="_grid"
                        TItem="입고요청항목응답"
                        ViewModel="@ViewModel"
                        RowsPerPage="25"
@@ -60,10 +60,10 @@
             </TemplateColumn>
         }
     </Columns>
-</HongdalServerDataGrid>
+</SsalddelServerDataGrid>
 
 @code {
-    private HongdalServerDataGrid<입고요청항목응답>? _grid;
+    private SsalddelServerDataGrid<입고요청항목응답>? _grid;
 
     [Parameter, EditorRequired]
     public 입고예정조회ViewModel ViewModel { get; set; } = default!;

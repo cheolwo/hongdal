@@ -4,7 +4,7 @@ This document defines the first skeleton for exporting domestic products through
 
 ## Purpose
 
-The group-purchase flow currently emphasizes import: overseas purchase, shipment tracking, customs release, bonded-area pickup, and domestic distribution. Hongdal also needs a balanced export path where domestic inventory can be listed on Amazon and fulfilled to overseas buyers.
+The group-purchase flow currently emphasizes import: overseas purchase, shipment tracking, customs release, bonded-area pickup, and domestic distribution. Ssalddel also needs a balanced export path where domestic inventory can be listed on Amazon and fulfilled to overseas buyers.
 
 The first implementation does not call Amazon SP-API directly. It separates readiness gates so the platform can confirm listing, market story, customs, and fulfillment data before connecting real external APIs.
 
@@ -70,9 +70,9 @@ Amazon Seller Central states that FBA does not fulfill fresh produce, chilled fo
 
 ## Implementation
 
-- Planner: `Hongdal.Contracts/Common/Sales/AmazonExportReadinessPlanner.cs`
-- Tests: `Hongdal.Tests/Contracts/Common/Sales/AmazonExportReadinessPlannerTests.cs`
-- Payload draft builder: `HongdalApp/Services/Commerce/Amazon/AmazonSpApiProductPayloadBuilder.cs`
+- Planner: `Ssalddel.Contracts/Common/Sales/AmazonExportReadinessPlanner.cs`
+- Tests: `Ssalddel.Tests/Contracts/Common/Sales/AmazonExportReadinessPlannerTests.cs`
+- Payload draft builder: `SsalddelApp/Services/Commerce/Amazon/AmazonSpApiProductPayloadBuilder.cs`
 
 The planner returns two separate readiness flags:
 

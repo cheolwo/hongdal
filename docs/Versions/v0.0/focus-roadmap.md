@@ -1,4 +1,4 @@
-# Hongdal 0.0 집중 로드맵
+# Ssalddel 0.0 집중 로드맵
 
 이 문서는 현재 개발 순서를 정하는 단일 기준입니다. 면허 취득 경로와 운송 주선 운영 주체가 구체화될 때까지 **정보 공개형 커뮤니티 0.0만 현재 릴리즈 범위로 봅니다.**
 
@@ -23,9 +23,9 @@ flowchart LR
 
 ## 0.0 운영 경계
 
-홍달은 정보를 게시·검색·기록할 도구를 제공하지만 거래 상대를 선택하거나 운송을 성사시키지 않습니다.
+살뜰은 정보를 게시·검색·기록할 도구를 제공하지만 거래 상대를 선택하거나 운송을 성사시키지 않습니다.
 
-| 홍달이 제공 | 사용자가 직접 수행 |
+| 살뜰이 제공 | 사용자가 직접 수행 |
 | --- | --- |
 | 게시글, 검색과 중립적 필터 | 상대방 탐색과 선택 |
 | 관심 표시와 연락 요청 전달 | 연락처 공개 동의 |
@@ -54,7 +54,7 @@ WarehouseV15=false
 CustomsHsV20=false
 OrdererGroupOrderV25=false
 FoodDeliveryV30=false
-HongdalMartV35=false
+SsalddelMartV35=false
 ```
 
 운송·창고·통관·음식·마트 앱이나 데이터가 없어도 0.0이 독립적으로 실행되고 검증되어야 합니다.
@@ -71,7 +71,7 @@ HongdalMartV35=false
 
 ## 코드 모듈 메타데이터
 
-커뮤니티 0.0의 대표 진입점에는 `[HongdalCommunityV0Module]`을 붙인다. 이 특성은 `ProductVersion=0.0`, `CommunityTrustWorkflow`, 기본 활성 상태와 로드맵 단계를 함께 기록한다. 특성 자체가 기능을 활성화하지 않으며 실제 노출은 기능 플래그, 권한 검사와 `HongdalExecution:Mode`를 따른다.
+커뮤니티 0.0의 대표 진입점에는 `[SsalddelCommunityV0Module]`을 붙인다. 이 특성은 `ProductVersion=0.0`, `CommunityTrustWorkflow`, 기본 활성 상태와 로드맵 단계를 함께 기록한다. 특성 자체가 기능을 활성화하지 않으며 실제 노출은 기능 플래그, 권한 검사와 `SsalddelExecution:Mode`를 따른다.
 
 | ModuleKey | 주 단계 | 관리 범위 |
 | --- | --- | --- |
@@ -85,7 +85,7 @@ HongdalMartV35=false
 다음 검색으로 0.0 모듈의 API, UseCase, 저장소, ViewModel과 운영 경계를 한 번에 찾을 수 있다.
 
 ```powershell
-rg -n "HongdalCommunityV0Module\(" Hongdal Hongdal.Ui.Common
+rg -n "SsalddelCommunityV0Module\(" Ssalddel Ssalddel.Ui.Common
 ```
 
 ## 0.0-A. 독립 실행
@@ -111,7 +111,7 @@ rg -n "HongdalCommunityV0Module\(" Hongdal Hongdal.Ui.Common
 
 ## 0.0-C. 국내 공동구매 대표 파일럿
 
-국내 공동구매는 0.0에서 사람과 사람의 직접 협의를 검증하는 첫 대표 시나리오입니다. 홍달이 생산자나 대표자를 추천하지 않고, 사용자가 게시글과 검색 결과를 보고 직접 선택합니다.
+국내 공동구매는 0.0에서 사람과 사람의 직접 협의를 검증하는 첫 대표 시나리오입니다. 살뜰이 생산자나 대표자를 추천하지 않고, 사용자가 게시글과 검색 결과를 보고 직접 선택합니다.
 
 먼저 영속화할 데이터는 다음과 같습니다.
 
@@ -137,7 +137,7 @@ rg -n "HongdalCommunityV0Module\(" Hongdal Hongdal.Ui.Common
 7. 완료되면 개인정보를 줄인 사례 글과 다이어그램을 중복 없이 게시합니다.
 8. 사례 글에서 같은 절차의 새 모집 또는 원장을 시작합니다.
 
-기사 운행 가능 상태와 개별 문의는 이 흐름 이후의 제한 파일럿입니다. 기사도 단순히 가능한 지역·시간을 게시하고 사용자가 직접 선택하며, 홍달은 운송 요청을 추천하거나 배정하지 않습니다.
+기사 운행 가능 상태와 개별 문의는 이 흐름 이후의 제한 파일럿입니다. 기사도 단순히 가능한 지역·시간을 게시하고 사용자가 직접 선택하며, 살뜰은 운송 요청을 추천하거나 배정하지 않습니다.
 
 ## 0.0-E. 개인정보와 운영 안정화
 

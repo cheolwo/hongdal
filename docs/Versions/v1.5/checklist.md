@@ -1,4 +1,4 @@
-﻿# Hongdal 1.5 Checklist
+﻿# Ssalddel 1.5 Checklist
 
 - [ ] 입고 업무 시작 화면 확인
 - [ ] 휴대폰 뒤 8자리 작업자 확인 흐름 확인
@@ -19,5 +19,5 @@
 - [ ] 외부 주문자에게 불필요한 입고 알림이 가지 않는지 확인
 - [ ] 창고 출고 연계 운송이 화물/용달 배차와 연결되는지 확인
 - [ ] 내부 테스트 또는 1.5 릴리즈에서 `WarehouseV15=true` 확인
-- [ ] `CustomsHsV20`, `OrdererGroupOrderV25`, `FoodDeliveryV30`, `HongdalMartV35` 기본 비활성 확인
+- [ ] `CustomsHsV20`, `OrdererGroupOrderV25`, `FoodDeliveryV30`, `SsalddelMartV35` 기본 비활성 확인
 - [ ] [공통 릴리즈 게이트](../release-gates.md) 통과 확인

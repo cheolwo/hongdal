@@ -23,7 +23,7 @@
 | `CustomsHsV20` | `2.0` | `false` | HS 코드, 통관, 관세사 보정 |
 | `OrdererGroupOrderV25` | `2.5` | `false` | 주문자 집단 공동 주문, 해외 선적/통관 조회, 국내 물류대행 입고, 판매채널 출품, 집단 내 분류/배분, 입주민 우선 고용 |
 | `FoodDeliveryV30` | `3.0` | `false` | 음식점 일반 음식 배달, 조리/픽업, 고객 배송 |
-| `HongdalMartV35` | `3.5` | `false` | 알뜰살뜰 마트, 도심 즉시배송, 피킹/포장 후 음식 배달 기사 픽업 |
+| `SsalddelMartV35` | `3.5` | `false` | 알뜰살뜰 마트, 도심 즉시배송, 피킹/포장 후 음식 배달 기사 픽업 |
 
 ## 설정 예시
 
@@ -36,7 +36,7 @@
     "CustomsHsV20": false,
     "OrdererGroupOrderV25": false,
     "FoodDeliveryV30": false,
-    "HongdalMartV35": false
+    "SsalddelMartV35": false
   }
 }
 ```
@@ -51,12 +51,12 @@
 
 ## API 제품 버전 메타데이터
 
-모든 서버 컨트롤러는 `HongdalApiVersionAttribute`로 제품 로드맵 버전을 기록합니다. 이 버전은 `/api/v1/...`의 HTTP 계약 버전과 다르며, 홍달 기능 로드맵의 `0.0`, `1.0`, `1.5`, `2.0`, `2.5`, `3.0`, `3.5`를 뜻합니다.
+모든 서버 컨트롤러는 `SsalddelApiVersionAttribute`로 제품 로드맵 버전을 기록합니다. 이 버전은 `/api/v1/...`의 HTTP 계약 버전과 다르며, 살뜰 기능 로드맵의 `0.0`, `1.0`, `1.5`, `2.0`, `2.5`, `3.0`, `3.5`를 뜻합니다.
 
-버전 값은 문자열을 직접 쓰지 않고 `HongdalProductVersion` enum으로 관리합니다. 사람이 읽는 `1.0`, `2.5` 같은 라벨은 `HongdalProductVersionLabels`에서만 변환합니다.
+버전 값은 문자열을 직접 쓰지 않고 `SsalddelProductVersion` enum으로 관리합니다. 사람이 읽는 `1.0`, `2.5` 같은 라벨은 `SsalddelProductVersionLabels`에서만 변환합니다.
 
 ```csharp
-[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.OrdererGroupOrderV25)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.OrdererGroupOrderV25)]
 [RequireVersionFeature(VersionFeatureFlagKeys.OrdererGroupOrderV25)]
 public sealed class 공동구매해외선적추적Controller : ControllerBase
 {
@@ -65,15 +65,15 @@ public sealed class 공동구매해외선적추적Controller : ControllerBase
 
 한 컨트롤러 안에 여러 제품 버전 API가 섞이는 경우에는 컨트롤러에 기본 버전을 붙이고 action에 더 구체적인 버전을 붙입니다. 예를 들어 주소 검색은 1.0 기반 조회로 남기고, 공동주택/주문자 집단 조회 action은 2.5로 표시합니다.
 
-테스트는 모든 컨트롤러에 제품 버전 메타데이터가 있는지, `RequireVersionFeatureAttribute`로 막는 API가 같은 feature key를 `HongdalApiVersionAttribute`에도 기록하는지 확인합니다.
+테스트는 모든 컨트롤러에 제품 버전 메타데이터가 있는지, `RequireVersionFeatureAttribute`로 막는 API가 같은 feature key를 `SsalddelApiVersionAttribute`에도 기록하는지 확인합니다.
 
 ## API 성장 트랙 메타데이터
 
-제품 버전은 특정 API가 어느 릴리즈 범위에서 안정화되는지를 나타냅니다. 반면 커뮤니티처럼 여러 버전에 걸쳐 계속 자라야 하는 기능은 `HongdalApiGrowthTrackAttribute`로 별도 성장 트랙을 기록합니다.
+제품 버전은 특정 API가 어느 릴리즈 범위에서 안정화되는지를 나타냅니다. 반면 커뮤니티처럼 여러 버전에 걸쳐 계속 자라야 하는 기능은 `SsalddelApiGrowthTrackAttribute`로 별도 성장 트랙을 기록합니다.
 
 ```csharp
-[HongdalApiVersion(HongdalProductVersion.V0_0)]
-[HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
+[SsalddelApiVersion(SsalddelProductVersion.V0_0)]
+[SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
 public sealed class 커뮤니티게시글Controller : ControllerBase
 {
 }
@@ -83,7 +83,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
 ## 클라이언트 샘플 데이터 정책
 
-DriverApp과 HongdalApp은 `ClientDataMode` 옵션으로 서버 데이터 호출 실패 시 샘플 데이터를 사용할지 결정합니다.
+DriverApp과 SsalddelApp은 `ClientDataMode` 옵션으로 서버 데이터 호출 실패 시 샘플 데이터를 사용할지 결정합니다.
 
 ```json
 {
@@ -121,6 +121,6 @@ DriverApp과 HongdalApp은 `ClientDataMode` 옵션으로 서버 데이터 호출
 3. `1.5` 창고 기능을 내부 테스트할 때 `WarehouseV15=true`로 바꾸되, 운영 사용자 View 가시성은 제한합니다.
 4. `2.5` 주문자 집단 공동 주문, 해외 선적/통관 조회, 물류대행 입고, 판매채널 출품, 집단 내 고용 흐름은 API/DB가 먼저 들어와도 `OrdererGroupOrderV25=false`이면 기본 화면에 노출하지 않습니다.
 5. `3.0` 음식점 일반 배달은 `FoodDeliveryV30=true`가 되기 전까지 음식 배달 기사 배차 흐름에 실운영 주문을 흘려보내지 않습니다.
-6. `3.5` 알뜰살뜰 마트는 `HongdalMartV35=true`가 되기 전까지 도심 즉시배송 주문을 피킹/포장/배차 실운영 흐름에 흘려보내지 않습니다.
+6. `3.5` 알뜰살뜰 마트는 `SsalddelMartV35=true`가 되기 전까지 도심 즉시배송 주문을 피킹/포장/배차 실운영 흐름에 흘려보내지 않습니다.
 
 기존 `ApartmentGroupOrderV25` 설정 키는 공동주택 중심 명칭이므로 새 문서와 운영 화면에서는 사용하지 않습니다. 다만 기존 로컬 설정 호환을 위해 서버는 해당 키가 `true`인 경우에도 `OrdererGroupOrderV25`가 켜진 것으로 해석합니다.

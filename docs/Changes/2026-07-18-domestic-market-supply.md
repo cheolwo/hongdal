@@ -43,7 +43,7 @@
 ## 검증
 
 - 공동행동 Page ViewModel 집중 테스트 16개와 전체 테스트 1,407개 통과
-- 별도 artifacts 경로에서 WebApp과 HongdalApp Windows 빌드 통과, 경고 0개·오류 0개
+- 별도 artifacts 경로에서 WebApp과 SsalddelApp Windows 빌드 통과, 경고 0개·오류 0개
 - 데스크톱 viewport `1440 x 1000`(저장 PNG `1430 x 993`): 가정 예약 68상자 보호, 가게 공급 12상자, 가게 2곳의 직접 수락과 6단계 공급 절차 표시
 - 모바일 viewport `390 x 844`(저장 PNG `380 x 822`): 배분 지표와 가게별 수락 정보의 단일 열 전환 확인
 - 두 viewport 모두 시장 조리 가게 식재료 공급 영역의 가로 넘침 요소 없음

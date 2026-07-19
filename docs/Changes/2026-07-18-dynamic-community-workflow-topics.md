@@ -25,8 +25,8 @@
 ## 검증
 
 - 관련 커뮤니티·YouTube 회귀 테스트 45개 통과
-- `dotnet build Hongdal/Hongdal.csproj --no-restore`
-- `dotnet build HongdalApp/HongdalApp.csproj --no-restore -f net10.0-windows10.0.19041.0`
-- `dotnet build HongdalAdminApp/HongdalAdminApp.csproj --no-restore -f net10.0-windows10.0.19041.0`
-- `dotnet build Hongdal.FoodApi/Hongdal.FoodApi.csproj --no-restore`
+- `dotnet build Ssalddel/Ssalddel.csproj --no-restore`
+- `dotnet build SsalddelApp/SsalddelApp.csproj --no-restore -f net10.0-windows10.0.19041.0`
+- `dotnet build SsalddelAdminApp/SsalddelAdminApp.csproj --no-restore -f net10.0-windows10.0.19041.0`
+- `dotnet build Ssalddel.FoodApi/Ssalddel.FoodApi.csproj --no-restore`
 - 전체 테스트 1,332개 중 1,331개 통과. 기존 `ApifyActorGatewayTests` 배열 응답 테스트 1건은 이번 변경과 무관한 알려진 잔여 항목이다.

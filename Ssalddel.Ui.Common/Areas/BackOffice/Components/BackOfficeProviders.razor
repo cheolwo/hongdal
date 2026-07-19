@@ -1,0 +1,10 @@
+@using Ssalddel.Ui.Common.Areas.BackOffice.Theme
+
+<MudThemeProvider Theme="@_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    private readonly MudTheme _theme = BackOfficeTheme.Create();
+}

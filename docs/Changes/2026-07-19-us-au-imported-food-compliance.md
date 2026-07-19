@@ -19,6 +19,6 @@
 
 ## 검증
 
-- `Hongdal.Contracts` build
+- `Ssalddel.Contracts` build
 - `ImportedFoodComplianceCatalogTests`
 - 공식 출처 URL과 requirement-reference 연결 검사

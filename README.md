@@ -1,6 +1,6 @@
-# Hongdal
+# 살뜰 (Ssalddel)
 
-Hongdal은 평범한 게시글에서 시작해 사람들이 마음을 모으고, 필요한 역할과 조건을 함께 채우며, 실제 공동행동까지 이어 갈 수 있게 돕는 **커뮤니티 기반 생활 협업 플랫폼**입니다.
+살뜰은 평범한 게시글에서 시작해 사람들이 마음을 모으고, 필요한 역할과 조건을 함께 채우며, 실제 공동행동까지 이어 갈 수 있게 돕는 **커뮤니티 기반 생활 협업 플랫폼**입니다.
 
 플랫폼의 역할은 거래 당사자나 화물 운송 주선자가 되는 것이 아닙니다. 필요한 사람·정보·진행 상태를 알아보기 쉽게 드러내고, 당사자들이 직접 합의한 과정을 공동 원장과 다이어그램으로 기록하도록 돕는 촉매이자 도구를 지향합니다.
 
@@ -30,7 +30,7 @@ flowchart LR
 ## 바로 체험하기
 
 <p align="center">
-  <a href="https://hongdal-role-preview.cheolwo.chatgpt.site/">
+  <a href="https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/">
     <strong>역할별 화면 체험 사이트 열기 →</strong>
   </a>
 </p>
@@ -42,13 +42,13 @@ flowchart LR
 <table>
   <tr>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/unified-community-home.png" alt="통합 커뮤니티 홈" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/unified-community-home.png" alt="통합 커뮤니티 홈" width="100%">
       <br>
       <b>통합 커뮤니티 홈</b><br>
       커뮤니티, 게시판, 업무 진입을 한 앱에서 시작합니다.
     </td>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/role-switch-panel.png" alt="역할 전환 패널" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/role-switch-panel.png" alt="역할 전환 패널" width="100%">
       <br>
       <b>역할 전환</b><br>
       화주, 기사, 창고 관리자 같은 업무 관점을 바꿉니다.
@@ -56,13 +56,13 @@ flowchart LR
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/community-board-desktop.png" alt="홍달 생활 게시판" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/community-board-desktop.png" alt="살뜰 생활 게시판" width="100%">
       <br>
-      <b>홍달 생활 게시판</b><br>
+      <b>살뜰 생활 게시판</b><br>
       추천, 분류, 댓글 수가 보이는 게시판형 글 목록입니다.
     </td>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/community-board-mobile.png" alt="모바일 홍달 생활 게시판" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/community-board-mobile.png" alt="모바일 살뜰 생활 게시판" width="100%">
       <br>
       <b>모바일 생활 게시판</b><br>
       작은 화면에서도 게시판 탭과 글 목록을 먼저 훑습니다.
@@ -70,13 +70,13 @@ flowchart LR
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/mobile-ledger-diagram.png" alt="모바일 원장 다이어그램" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/mobile-ledger-diagram.png" alt="모바일 원장 다이어그램" width="100%">
       <br>
       <b>모바일 원장 다이어그램</b><br>
       운송 의뢰, 상차, 하차, 정산 흐름을 세로로 확인합니다.
     </td>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/bagua-navigation-taegeuk-open.png" alt="태극 중심 후천 사방 이동판" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/bagua-navigation-taegeuk-open.png" alt="태극 중심 후천 사방 이동판" width="100%">
       <br>
       <b>태극 사방괘 업무 이동</b><br>
       오른쪽 하단 패널을 열어 업무 방향과 중심 행동을 고릅니다.
@@ -98,13 +98,13 @@ flowchart LR
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/assets/changes/2026-07-13-hongdal-visual-summary/ledger-centered-diagram-palette.png" alt="원장 중심 다이어그램 팔레트" width="100%">
+      <img src="docs/assets/changes/2026-07-13-ssalddel-visual-summary/ledger-centered-diagram-palette.png" alt="원장 중심 다이어그램 팔레트" width="100%">
       <br>
       <b>원장 중심 웹 팔레트</b><br>
       화물 운송, 창고, 음식, 마트, 공동주문 원장 단위로 노드를 고릅니다.
     </td>
     <td width="50%">
-      <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료" width="100%">
+      <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료" width="100%">
       <br>
       <b>홈 테마 상점과 FakePG</b><br>
       태극 패키지를 구매하고 전체 테마 적용 여부를 직접 선택합니다.
@@ -125,16 +125,16 @@ flowchart LR
 <table>
   <tr>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10/">
-        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10.png" alt="홈 테마 꾸미기 상점" width="100%">
+      <a href="docs/ProjectOverview/page-docs/SsalddelApp/SsalddelApp-P10/">
+        <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P10.png" alt="홈 테마 꾸미기 상점" width="100%">
       </a>
       <br>
       <b>1. 홈 테마 탐색</b><br>
       플랫폼 기본, 크리에이터, 내 보유 상품을 화면 단위로 살펴봅니다.
     </td>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-1/">
-        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-1.png" alt="홈 테마 상품 상세" width="100%">
+      <a href="docs/ProjectOverview/page-docs/SsalddelApp/SsalddelApp-P10-1/">
+        <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P10-1.png" alt="홈 테마 상품 상세" width="100%">
       </a>
       <br>
       <b>2. 테마 상세와 슬롯 확인</b><br>
@@ -143,16 +143,16 @@ flowchart LR
   </tr>
   <tr>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-4/">
-        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-4.png" alt="디자이너 홈 테마 등록" width="100%">
+      <a href="docs/ProjectOverview/page-docs/SsalddelApp/SsalddelApp-P10-4/">
+        <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P10-4.png" alt="디자이너 홈 테마 등록" width="100%">
       </a>
       <br>
       <b>3. 디자이너 패키지 등록</b><br>
       방편, 반야, 커뮤니티, 상점, 간괘와 테두리를 하나의 패키지로 만듭니다.
     </td>
     <td width="50%">
-      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-2/">
-        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-2.png" alt="홈 테마 FakePG 결제" width="100%">
+      <a href="docs/ProjectOverview/page-docs/SsalddelApp/SsalddelApp-P10-2/">
+        <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P10-2.png" alt="홈 테마 FakePG 결제" width="100%">
       </a>
       <br>
       <b>4. 개발용 구매 확인</b><br>
@@ -161,8 +161,8 @@ flowchart LR
   </tr>
   <tr>
     <td colspan="2" align="center">
-      <a href="docs/ProjectOverview/page-docs/HongdalApp/HongdalApp-P10-2-1/">
-        <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="홈 테마 구매 완료와 적용 선택" width="50%">
+      <a href="docs/ProjectOverview/page-docs/SsalddelApp/SsalddelApp-P10-2-1/">
+        <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P10-2-1.png" alt="홈 테마 구매 완료와 적용 선택" width="50%">
       </a>
       <br>
       <b>5. 구매 완료와 명시적 적용</b><br>
@@ -175,12 +175,12 @@ flowchart LR
 
 | 묶음 | 바로 보기 |
 | --- | --- |
-| 공개 역할별 화면 체험 | [Hongdal 체험 사이트](https://hongdal-role-preview.cheolwo.chatgpt.site/) |
+| 공개 역할별 화면 체험 | [살뜰 체험 사이트](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/) |
 | 통합 커뮤니티 앱 | [통합 커뮤니티 클라이언트](docs/ProjectOverview/unified-community-client.md) |
 | 커밋별 화면 변화 | [커밋별 시각 변경 기록](docs/Changes/README.md) |
 | 전체 앱 화면 카탈로그 | [코드 프로젝트별 전체 페이지](docs/ProjectOverview/app-page-catalog.md) |
-| 홍달 1.0 필수 화면 | [필수 페이지 기준](docs/ProjectOverview/hongdal-v1-required-pages.md) |
-| 실제 렌더링 검증 | [렌더링/캡처 검증 요약](docs/ProjectOverview/hongdal-v1-render-capture-summary.md) |
+| 살뜰 1.0 필수 화면 | [필수 페이지 기준](docs/ProjectOverview/ssalddel-v1-required-pages.md) |
+| 실제 렌더링 검증 | [렌더링/캡처 검증 요약](docs/ProjectOverview/ssalddel-v1-render-capture-summary.md) |
 
 ## 대표 업무 화면
 
@@ -195,7 +195,7 @@ flowchart LR
       <br><b>기사 추천 상세</b>
     </td>
     <td width="33%">
-      <img src="docs/ProjectOverview/assets/app-pages/HongdalApp/HongdalApp-P03.png" alt="화주 의뢰 상세" width="100%">
+      <img src="docs/ProjectOverview/assets/app-pages/SsalddelApp/SsalddelApp-P03.png" alt="화주 의뢰 상세" width="100%">
       <br><b>화주 의뢰 상세</b>
     </td>
   </tr>
@@ -209,7 +209,7 @@ flowchart LR
       <br><b>하차 증빙</b>
     </td>
     <td width="33%">
-      <img src="docs/ProjectOverview/assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="관리자 운송 원장" width="100%">
+      <img src="docs/ProjectOverview/assets/app-pages/SsalddelAdmin/SsalddelAdmin-P22.png" alt="관리자 운송 원장" width="100%">
       <br><b>관리자 운송 원장</b>
     </td>
   </tr>
@@ -235,9 +235,9 @@ flowchart LR
 
 | 코드 프로젝트 | 먼저 보는 화면 |
 | --- | --- |
-| `HongdalApp` | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점 |
+| `SsalddelApp` | 통합 커뮤니티 홈, 역할 전환, 운송 업무, 꾸미기 상점 |
 | `DriverApp` | 운행 시작, 지도 홈, 추천, 상차/하차 증빙, 정산 |
-| `HongdalAdmin` | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
+| `SsalddelAdmin` | 배차 대기, 운송 원장, 문서/POD, 결제/정산, 운영 점검 |
 | `WarehouseManagerApp` | 창고 작업 보드, 입고, 스캔, 피킹 배치, 마트 피킹/포장 |
 | `OrdererApp` | 주문자 홈, 공동구매, 음식/마트 주문, 주문 이력 |
 | `RestaurantDeskApp` | 음식점 주문 접수와 매장 운영 화면 |
@@ -247,7 +247,7 @@ flowchart LR
 | 문서 | 내용 |
 | --- | --- |
 | [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md) | 화면 문서와 기술 문서를 보는 순서 |
-| [Hongdal 0.0](docs/Versions/v0.0/README.md) | 글쓰기부터 가원장·역할 참여·완료 사례까지의 현재 제품 범위 |
+| [Ssalddel 0.0](docs/Versions/v0.0/README.md) | 글쓰기부터 가원장·역할 참여·완료 사례까지의 현재 제품 범위 |
 | [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md) | 정보 공개형 커뮤니티의 현재 우선순위와 후속 기능 보류 경계 |
 | [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md) | 이웃 사랑과 수신·제가·치국을 제품·코드 판단으로 옮기는 기준 |
 | [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md) | 커뮤니티 선행 기반과 실운영 배차·주선 경계 |
@@ -261,13 +261,13 @@ flowchart LR
 
 Visual Studio에서는 현재 집중할 버전에 맞는 솔루션을 엽니다.
 
-- `Hongdal.v0.0.slnx`: 정보 공개형 커뮤니티, 통합 클라이언트, 모바일 관리자, API 서버와 공통 계층
-- `Hongdal.v1.0.slnx`: 0.0 기반에 국내 화물·용달 기사 앱과 배차 운영 화면을 추가한 구성
-- `Hongdal.slnx`: 운송·창고·음식점·인사 등 저장소 전체를 확인하는 구성
+- `Ssalddel.v0.0.slnx`: 정보 공개형 커뮤니티, 통합 클라이언트, 모바일 관리자, API 서버와 공통 계층
+- `Ssalddel.v1.0.slnx`: 0.0 기반에 국내 화물·용달 기사 앱과 배차 운영 화면을 추가한 구성
+- `Ssalddel.slnx`: 운송·창고·음식점·인사 등 저장소 전체를 확인하는 구성
 
 ```powershell
-dotnet build Hongdal.v0.0.slnx /p:UseSharedCompilation=false
-dotnet build Hongdal.v1.0.slnx /p:UseSharedCompilation=false
-dotnet build Hongdal.slnx /p:UseSharedCompilation=false
-dotnet test Hongdal.Tests\Hongdal.Tests.csproj /p:UseSharedCompilation=false
+dotnet build Ssalddel.v0.0.slnx /p:UseSharedCompilation=false
+dotnet build Ssalddel.v1.0.slnx /p:UseSharedCompilation=false
+dotnet build Ssalddel.slnx /p:UseSharedCompilation=false
+dotnet test Ssalddel.Tests\Ssalddel.Tests.csproj /p:UseSharedCompilation=false
 ```

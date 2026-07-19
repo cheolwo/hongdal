@@ -2,7 +2,7 @@
 
 ## 목적
 
-홍달의 한국 운영과 미국 운영은 앱이나 원장을 복제하지 않고, 공통 업무 흐름에 배포별 운영 정책을 적용하는 방식으로 분리한다.
+살뜰의 한국 운영과 미국 운영은 앱이나 원장을 복제하지 않고, 공통 업무 흐름에 배포별 운영 정책을 적용하는 방식으로 분리한다.
 
 다음 네 축은 서로 독립적으로 유지한다.
 
@@ -15,7 +15,7 @@
 
 ## 플랫폼 운영자의 역할
 
-홍달의 기본 역할 코드는 `CollectiveActionFacilitator`다. 운영자는 운송 주선업자가 되는 것을 제품의 전제로 삼지 않고, 사람들이 수요·의사·정보를 모아 공동구매, 공동수입, 수출입 준비를 시작할 수 있게 돕는다.
+살뜰의 기본 역할 코드는 `CollectiveActionFacilitator`다. 운영자는 운송 주선업자가 되는 것을 제품의 전제로 삼지 않고, 사람들이 수요·의사·정보를 모아 공동구매, 공동수입, 수출입 준비를 시작할 수 있게 돕는다.
 
 업무는 다음 세 단계로 구분한다.
 
@@ -35,7 +35,7 @@
 
 화면과 계약에서도 다음 경계를 유지한다.
 
-- 홍달은 특정 운송사를 자기 명의로 확정하거나 운송계약의 당사자인 것처럼 표시하지 않는다.
+- 살뜰은 특정 운송사를 자기 명의로 확정하거나 운송계약의 당사자인 것처럼 표시하지 않는다.
 - 전문 사업자의 제안, 자격 상태, 계약 주체, 수수료와 대금 수령 주체를 분리해 표시한다.
 - 원장에는 공동 의사 형성 기록과 전문 사업자의 규제 업무 실행 기록을 별도 블록으로 남긴다.
 - 커뮤니티 원장은 배차 후보와 진행 정보를 보여주지만 기사 확정과 운송 실행 상태를 RDB로 역전파하지 않는다. 참여자 실행 경로에서 확정된 결과가 RDB에 기록된 뒤 원장으로 동기화된다.
@@ -43,7 +43,7 @@
 
 ## 공통 프로필
 
-공통 기준은 `Hongdal.Contracts/Common/Operations/OperatingMarketProfiles.cs`에 둔다.
+공통 기준은 `Ssalddel.Contracts/Common/Operations/OperatingMarketProfiles.cs`에 둔다.
 
 | 항목 | 한국 `KR` | 미국 `US` |
 | --- | --- | --- |
@@ -55,7 +55,7 @@
 | 판매채널 기본값 | SmartStore, Coupang, 11st | Amazon, eBay, Shopify, Walmart, Etsy, TikTok Shop |
 | 화물 주선 기본값 | 국내 운송 업무 | 권한을 확인한 브로커 파트너 흐름 |
 
-표시 언어 코드는 `Hongdal.Contracts/Common/Localization/DisplayLanguageCodes.cs`에 별도로 둔다. 시장 프로필의 `FormattingCultureName`은 금액과 날짜의 기본 형식일 뿐 사용자가 선택한 표시 언어가 아니다.
+표시 언어 코드는 `Ssalddel.Contracts/Common/Localization/DisplayLanguageCodes.cs`에 별도로 둔다. 시장 프로필의 `FormattingCultureName`은 금액과 날짜의 기본 형식일 뿐 사용자가 선택한 표시 언어가 아니다.
 
 ## 적용 규칙
 
@@ -179,7 +179,7 @@ Census 매칭 성공은 우편 배송 가능 확인이나 건물 출입구의 ro
 
 ### USPS 후속 연결 조건
 
-USPS Addresses API는 배송용 주소 표준화와 ZIP+4 확인 단계에만 연결한다. 2026-07-18 확인 기준으로 USPS는 Addresses API 3.3.1 접근을 2026-08-01로 연기했고, 계속 사용하려는 고객에게 별도 license agreement를 요구하고 있다. 개발자 포털은 Address API의 요금 계층 전환도 안내하고 있으므로 다음 준비 전에는 Hongdal의 기본 주소 제공자로 고정하지 않는다.
+USPS Addresses API는 배송용 주소 표준화와 ZIP+4 확인 단계에만 연결한다. 2026-07-18 확인 기준으로 USPS는 Addresses API 3.3.1 접근을 2026-08-01로 연기했고, 계속 사용하려는 고객에게 별도 license agreement를 요구하고 있다. 개발자 포털은 Address API의 요금 계층 전환도 안내하고 있으므로 다음 준비 전에는 Ssalddel의 기본 주소 제공자로 고정하지 않는다.
 
 1. USPS Business Account와 OAuth client credentials를 배포 비밀로 관리한다.
 2. 주소 API license, 허용 용도, 보존·재배포 제한과 실제 요금을 검토한다.

@@ -1,25 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>HongdalApp</RootNamespace>
+    <RootNamespace>SsalddelApp</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableDefaultCssItems>false</EnableDefaultCssItems>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\..\HongdalApp\Components\**\*.razor" LinkBase="Components" />
-    <Content Include="..\..\..\HongdalApp\wwwroot\**\*" LinkBase="wwwroot" CopyToOutputDirectory="PreserveNewest" />
-    <Compile Include="..\..\..\HongdalApp\Models\**\*.cs" LinkBase="Models" />
-    <Compile Include="..\..\..\HongdalApp\Options\**\*.cs" LinkBase="Options" />
-    <Compile Include="..\..\..\HongdalApp\Services\**\*.cs" LinkBase="Services" />
-    <Compile Include="..\..\..\HongdalApp\ViewModels\**\*.cs" LinkBase="ViewModels" />
+    <Content Include="..\..\..\SsalddelApp\Components\**\*.razor" LinkBase="Components" />
+    <Content Include="..\..\..\SsalddelApp\wwwroot\**\*" LinkBase="wwwroot" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Include="..\..\..\SsalddelApp\Models\**\*.cs" LinkBase="Models" />
+    <Compile Include="..\..\..\SsalddelApp\Options\**\*.cs" LinkBase="Options" />
+    <Compile Include="..\..\..\SsalddelApp\Services\**\*.cs" LinkBase="Services" />
+    <Compile Include="..\..\..\SsalddelApp\ViewModels\**\*.cs" LinkBase="ViewModels" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Hongdal.Contracts\Hongdal.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Hongdal.Client.Infrastructure\Hongdal.Client.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\Hongdal.Ui.Common\Hongdal.Ui.Common.csproj" />
+    <ProjectReference Include="..\..\..\Ssalddel.Contracts\Ssalddel.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Ssalddel.Client.Infrastructure\Ssalddel.Client.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Ssalddel.Ui.Common\Ssalddel.Ui.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,13 +1,13 @@
 # 통합 커뮤니티 클라이언트와 꾸미기 상점
 
 > 구현·캡처 기준: 2026-07-13  
-> 사용자 표시명: **홍달 앱**  
-> 코드 위치: `HongdalApp` 기반 통합 클라이언트
+> 사용자 표시명: **살뜰 앱**<br>
+> 코드 위치: `SsalddelApp` 기반 통합 클라이언트
 > 관련 정책: [커뮤니티 운영 정책](../Architecture/CommunityOperatingPolicy.md), [홈 모드 구조](../Architecture/PlatformHomeMode.md)
 
-홍달 앱의 첫 화면은 `실시간 베스트`, `살뜰 커뮤니티`, `꾸미기 상점`의 핵심 현황만 축약한 공통 홈이다. 게시판 상세, 원장 초안, 다이어그램과 업무 도구는 사용자가 해당 영역으로 들어간 뒤 표시한다. 사용자는 우측 상단 사람 버튼으로 역할을 바꾸고, `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 업무를 찾아간다. `HongdalApp`은 전환 기간의 내부 프로젝트명일 뿐 사용자에게 별도 화주 앱으로 표시하지 않는다. 상세 설계 원칙은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)을 따른다.
+살뜰 앱의 첫 화면은 `실시간 베스트`, `살뜰 커뮤니티`, `꾸미기 상점`의 핵심 현황만 축약한 공통 홈이다. 게시판 상세, 원장 초안, 다이어그램과 업무 도구는 사용자가 해당 영역으로 들어간 뒤 표시한다. 사용자는 우측 상단 사람 버튼으로 역할을 바꾸고, `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 업무를 찾아간다. `SsalddelApp`은 전환 기간의 내부 프로젝트명일 뿐 사용자에게 별도 화주 앱으로 표시하지 않는다. 상세 설계 원칙은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)을 따른다.
 
-<img src="assets/app-pages/HongdalApp/HongdalApp-P00.png" alt="Hongdal 통합 커뮤니티 홈" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P00.png" alt="Ssalddel 통합 커뮤니티 홈" width="360">
 
 ## 화면 책임
 
@@ -55,7 +55,7 @@ flowchart LR
 
 ## 역할 전환과 내비게이션
 
-우측 상단의 사람 모양 원형 버튼은 기존 상단 메뉴를 바꾸지 않고 역할 선택 패널만 연다. 상태는 `역할 미설정`, `화주`, `창고 관리자`이며, 선택값은 `Preferences`의 `hongdal.client.active_role`에 저장된다. 저장값이 없는 새 사용자는 역할 미설정 상태로 시작하고, `공통 홈`을 선택하면 다시 역할을 비울 수 있다.
+우측 상단의 사람 모양 원형 버튼은 기존 상단 메뉴를 바꾸지 않고 역할 선택 패널만 연다. 상태는 `역할 미설정`, `화주`, `창고 관리자`이며, 선택값은 `Preferences`의 `ssalddel.client.active_role`에 저장된다. 저장값이 없는 새 사용자는 역할 미설정 상태로 시작하고, `공통 홈`을 선택하면 다시 역할을 비울 수 있다.
 
 <img src="assets/unified-community-client/role-switch.png" alt="우측 상단 역할 전환 패널" width="360">
 
@@ -116,7 +116,7 @@ flowchart LR
 | 아래 | 북·감괘 `☵` | 운송 | 출고·기사·차량·인도 관계 |
 | 왼쪽 | 동·진괘 `☳` | 입고 | 공급처·입고·검수·보관 관계 |
 
-공통 사방괘의 가운데에는 산을 뜻하는 간괘 `☶`를 둔다. 펼친 이동판은 외곽 사방괘 원과 내부 간괘 원의 두 동심원이다. 내부 원은 태극 문양처럼 위쪽 빨간 양효 영역과 아래쪽 파란 음효 영역으로 나누고, 빨간 영역은 커뮤니티 글 목록, 파란 영역은 꾸미기 상점을 연다. 이 중심 디자인은 특정 역할 설정이 아니라 `PlatformCommunityHome`과 `HongdalLaterHeavenBaguaNavigator`의 공통 기본값이다. 역할별 차이는 외곽 사방괘의 목적지에만 적용한다. 모바일에서는 오른쪽 아래 벽면에 정확한 반원 손잡이만 보이도록 접고, 하단 업무 버튼과 겹치지 않도록 안전 영역 위에 고정한다.
+공통 사방괘의 가운데에는 산을 뜻하는 간괘 `☶`를 둔다. 펼친 이동판은 외곽 사방괘 원과 내부 간괘 원의 두 동심원이다. 내부 원은 태극 문양처럼 위쪽 빨간 양효 영역과 아래쪽 파란 음효 영역으로 나누고, 빨간 영역은 커뮤니티 글 목록, 파란 영역은 꾸미기 상점을 연다. 이 중심 디자인은 특정 역할 설정이 아니라 `PlatformCommunityHome`과 `SsalddelLaterHeavenBaguaNavigator`의 공통 기본값이다. 역할별 차이는 외곽 사방괘의 목적지에만 적용한다. 모바일에서는 오른쪽 아래 벽면에 정확한 반원 손잡이만 보이도록 접고, 하단 업무 버튼과 겹치지 않도록 안전 영역 위에 고정한다.
 
 <img src="assets/unified-community-client/bagua-closed.png" alt="오른쪽 벽면의 닫힌 반원 손잡이" width="260">
 <img src="assets/unified-community-client/bagua-taegeuk-open.png" alt="펼쳐진 태극 중심 후천 사방 이동판" width="260">
@@ -128,16 +128,16 @@ flowchart LR
 
 상점은 홈 위에 뜨는 임시 패널이 아니라 독립 페이지다. `전체`, `홈 테마`, `노드·괘상` 상품 종류와 `플랫폼 기본`, `크리에이터`, `내 보유` 출처 탭을 조합해 탐색한다. 홈 테마 카드는 실제 태극 마스크로 합성한 축소판과 `보유 중`, `현재 적용 중` 상태를 표시한다.
 
-<img src="assets/app-pages/HongdalApp/HongdalApp-P10.png" alt="꾸미기 상점" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P10.png" alt="꾸미기 상점" width="360">
 
 상품 상세에서는 사용 위치가 `홈 내비게이터 테마`, `괘상·사방 이동판`, `다이어그램 노드` 중 무엇인지 확인한다. 홈 테마는 펼친 패널·접힌 손잡이·밝고 어두운 배경을 전환하며 실제 결과를 미리 보고, 방편·반야·커뮤니티·상점·간괘·테두리·라벨·손잡이 8개 슬롯을 확인한 뒤 전체 패키지를 한 번에 적용한다.
 
-<img src="assets/app-pages/HongdalApp/HongdalApp-P10-1.png" alt="꾸미기 상품 상세" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-1.png" alt="꾸미기 상품 상세" width="360">
 
 FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다. 가상 결제 수단과 약관을 확인하면 현재 앱 실행 동안 구매·보유 상태만 갱신한다. 결제 완료 뒤에는 첫 자산을 자동 적용하지 않으며 사용자가 `구매한 전체 테마 적용` 또는 `상품에서 적용 항목 고르기`를 명시적으로 선택한다.
 
-<img src="assets/app-pages/HongdalApp/HongdalApp-P10-2.png" alt="개발용 FakePG 결제" width="360">
-<img src="assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료와 적용 선택" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-2.png" alt="개발용 FakePG 결제" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-2-1.png" alt="홈 테마 FakePG 구매 완료와 적용 선택" width="360">
 
 ## 내 꾸미기 등록 규격
 
@@ -157,7 +157,7 @@ FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다.
 
 디자이너 홈 테마 등록은 `/community/decorations/themes/submit`에서 별도 처리한다. 8개 슬롯마다 필수 대체색과 선택 PNG·WebP·SVG 이미지를 입력하고, 펼친 패널·접힌 손잡이·배경별 미리보기를 확인한다. 저장 결과는 `초안`으로 내 제작함에만 추가되며 현재 홈에 적용된다. 클릭 영역과 커뮤니티·상점 이동 의미는 패키지가 변경하지 못한다.
 
-<img src="assets/app-pages/HongdalApp/HongdalApp-P10-4.png" alt="디자이너 홈 테마 패키지 등록" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-4.png" alt="디자이너 홈 테마 패키지 등록" width="360">
 
 ## 현재 상태와 서버 연결 경계
 
@@ -180,15 +180,15 @@ FakePG는 실제 카드 승인이나 창작자 정산을 수행하지 않는다.
 
 | 책임 | 코드 |
 | --- | --- |
-| 역할 라우팅 | `HongdalApp/Components/Pages/UnifiedHome.razor` |
-| 역할 상태 | `HongdalApp/Services/HongdalClientRoleService.cs` |
-| 역할별 메뉴 | `HongdalApp/Services/HongdalClientNavigationCatalog.cs` |
-| 공통 커뮤니티·다이어그램 | `Hongdal.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor` |
-| 후천 사방 이동판 | `Hongdal.Ui.Common/Areas/App/Components/Community/HongdalLaterHeavenBaguaNavigator.razor` |
-| 반야·방편 홈 테마 렌더러 | `HongdalPrajnaUpayaTaegeukNavigator.razor`, `HongdalHomeNavigatorThemePreview.razor` |
-| 원방각 표시 | `Hongdal.Ui.Common/Areas/App/Components/Community/HongdalWonBangGakMark.razor` |
-| 꾸미기 상태 | `Hongdal.Ui.Common/Areas/App/Services/PlatformCommunityDecorationStateService.cs` |
-| 상점 페이지 | `HongdalApp/Components/Pages/CommunityDecorationStorePage.razor` |
+| 역할 라우팅 | `SsalddelApp/Components/Pages/UnifiedHome.razor` |
+| 역할 상태 | `SsalddelApp/Services/SsalddelClientRoleService.cs` |
+| 역할별 메뉴 | `SsalddelApp/Services/SsalddelClientNavigationCatalog.cs` |
+| 공통 커뮤니티·다이어그램 | `Ssalddel.Ui.Common/Areas/App/Components/Community/PlatformCommunityHome.razor` |
+| 후천 사방 이동판 | `Ssalddel.Ui.Common/Areas/App/Components/Community/SsalddelLaterHeavenBaguaNavigator.razor` |
+| 반야·방편 홈 테마 렌더러 | `SsalddelPrajnaUpayaTaegeukNavigator.razor`, `SsalddelHomeNavigatorThemePreview.razor` |
+| 원방각 표시 | `Ssalddel.Ui.Common/Areas/App/Components/Community/SsalddelWonBangGakMark.razor` |
+| 꾸미기 상태 | `Ssalddel.Ui.Common/Areas/App/Services/PlatformCommunityDecorationStateService.cs` |
+| 상점 페이지 | `SsalddelApp/Components/Pages/CommunityDecorationStorePage.razor` |
 | 상세·결제·제작 | `CommunityDecorationDetailPage.razor`, `CommunityDecorationCheckoutPage.razor`, `CommunityDecorationCreatePage.razor` |
 | 디자이너 테마 등록 | `CommunityDecorationThemeSubmitPage.razor` |
 

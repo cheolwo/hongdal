@@ -1,6 +1,6 @@
 ﻿# 워크플로우 API 정책
 
-홍달 API는 버전별 기능 묶음에서 업무 처리 절차별 워크플로우 묶음으로 이동합니다.
+살뜰 API는 버전별 기능 묶음에서 업무 처리 절차별 워크플로우 묶음으로 이동합니다.
 
 `0.0`, `1.0`, `1.5`, `2.5`, `3.5` 같은 제품 버전은 기능이 처음 정리된 시점을 기록합니다. 실제 API 노출, 메뉴 노출, 권한, 운영 가능 여부는 워크플로우 기준으로 관리합니다.
 
@@ -9,7 +9,7 @@
 | 개념 | 의미 |
 | --- | --- |
 | 제품 버전 | API나 기능이 처음 들어온 로드맵 단계. 커뮤니티 기반은 0.0, 첫 실행 모듈인 국내 화물/용달은 1.0부터 시작 |
-| HIOPS | Hongdal Integrated Operations & Policy System. 여러 참여자의 입장과 책임을 조율하기 위해 하위 OS, 워크플로우, 엔진을 조합하는 최상위 운영 체제 |
+| HIOPS | Ssalddel Integrated Operations & Policy System. 여러 참여자의 입장과 책임을 조율하기 위해 하위 OS, 워크플로우, 엔진을 조합하는 최상위 운영 체제 |
 | 하위 OS | HIOPS 안에서 특정 운영 목적을 맡는 실행 단위. 예: 국내 화물 운송 OS, 공동주문 수입 OS, 창고·커머스 이행 OS |
 | 워크플로우 | 하나의 업무 절차를 완성하기 위해 묶이는 API 집합 |
 | 액터 | 유스케이스를 직접 실행하거나 보조로 참여하는 사용자·운영 주체 |
@@ -44,7 +44,7 @@ OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업�
 | 커뮤니티 신뢰 | `CommunityTrust` | `CommunityTrustWorkflow` | 커뮤니티 글, 댓글, 후기, 활동 신호, 투표, 관계 기록 |
 | 참여 인력 관리 | `HrParticipation` | `HrParticipationWorkflow` | 역할, 근로계약, 4대보험 신고 준비, 참여 보상 |
 | 음식 배달 | `FoodDelivery` | `FoodDeliveryWorkflow` | 음식점 주문, 조리 상태, 픽업, 고객 전달 |
-| 알뜰살뜰 마트 | `HongdalMart` | `HongdalMartWorkflow` | 마트 주문, 도심 재고, 피킹, 포장, 기사 인계 |
+| 알뜰살뜰 마트 | `SsalddelMart` | `SsalddelMartWorkflow` | 마트 주문, 도심 재고, 피킹, 포장, 기사 인계 |
 
 ## 사용자와 책임 경계
 
@@ -98,11 +98,11 @@ OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업�
 
 ## 메타데이터 규칙
 
-컨트롤러와 action은 `HongdalApiVersionAttribute`를 유지합니다. 이 값은 도입 시점을 기록합니다. 워크플로우에 속한 API는 `HongdalApiWorkflowAttribute`도 함께 붙입니다.
+컨트롤러와 action은 `SsalddelApiVersionAttribute`를 유지합니다. 이 값은 도입 시점을 기록합니다. 워크플로우에 속한 API는 `SsalddelApiWorkflowAttribute`도 함께 붙입니다.
 
 ```csharp
-[HongdalApiVersion(HongdalProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
-[HongdalApiWorkflow(HongdalWorkflow.GroupPurchaseImport)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
 public sealed class 공동구매해외선적추적Controller : ControllerBase
 {
@@ -115,13 +115,13 @@ public sealed class 공동구매해외선적추적Controller : ControllerBase
 - 업무 절차: `공동주문 수입`
 - 운영 스위치: `GroupPurchaseImportWorkflow`
 
-유스케이스는 `HongdalUseCaseActorAttribute`로 주 액터와 보조 액터를 기록합니다. 이 값은 권한을 강제하는 장치라기보다, 설계 문서와 코드에서 “누가 이 업무를 주로 쓰는가”를 드러내는 메타데이터입니다. 실제 권한 검사는 기존 `Authorize`, 정책, HR 역할 검사와 함께 둡니다.
+유스케이스는 `SsalddelUseCaseActorAttribute`로 주 액터와 보조 액터를 기록합니다. 이 값은 권한을 강제하는 장치라기보다, 설계 문서와 코드에서 “누가 이 업무를 주로 쓰는가”를 드러내는 메타데이터입니다. 실제 권한 검사는 기존 `Authorize`, 정책, HR 역할 검사와 함께 둡니다.
 
 ```csharp
-[HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
-[HongdalUseCase("기사 배차 추천 조회", Summary = "기사에게 일반 화물, 공동주문 운송, 공개 배차, 전국콜 후보를 추천하고 상세를 조회합니다.")]
-[HongdalUseCaseActor(HongdalActor.Driver)]
-[HongdalUseCaseActor(HongdalActor.PlatformOperator, HongdalUseCaseActorRole.Supporting)]
+[SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
+[SsalddelUseCase("기사 배차 추천 조회", Summary = "기사에게 일반 화물, 공동주문 운송, 공개 배차, 전국콜 후보를 추천하고 상세를 조회합니다.")]
+[SsalddelUseCaseActor(SsalddelActor.Driver)]
+[SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 public sealed class 기사배차추천UseCase : I기사배차추천UseCase
 {
 }
@@ -142,8 +142,8 @@ public sealed class 기사배차추천UseCase : I기사배차추천UseCase
 | `Extend` | 확장 | 기본 유스케이스는 독립적으로 성립하지만 특정 조건에서 추가되는 기능 | `화주운송의뢰UseCase` → `문서관리UseCase` |
 
 ```csharp
-[HongdalUseCaseRelation(
-    HongdalUseCaseRelationKind.Extend,
+[SsalddelUseCaseRelation(
+    SsalddelUseCaseRelationKind.Extend,
     "문서관리UseCase",
     Condition = "인수증 거래, 전자서명, POD 증빙이 필요한 경우",
     Summary = "운송 의뢰의 상차·하차 증빙을 문서 관리 흐름으로 확장합니다.")]
@@ -158,7 +158,7 @@ public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
 
 컨트롤러는 유스케이스를 주입받아 HTTP 요청을 넘기는 역할만 맡습니다. 컨트롤러에 업무 판단을 쌓지 않고, 유스케이스 이름이 다이어그램의 노드와 대응되도록 둡니다.
 
-홍달의 Controller API는 단순한 HTTP CRUD 목록이 아니라, OS가 열어 둔 업무 기능을 호출하는 입구로 본다. 실제 코드 호출은 `Controller -> UseCase/Command` 방향이지만, 운영 의미는 `해당 OS의 특정 기능을 호출한다`에 가깝다.
+살뜰의 Controller API는 단순한 HTTP CRUD 목록이 아니라, OS가 열어 둔 업무 기능을 호출하는 입구로 본다. 실제 코드 호출은 `Controller -> UseCase/Command` 방향이지만, 운영 의미는 `해당 OS의 특정 기능을 호출한다`에 가깝다.
 
 예를 들어 `POST api/v1/driver/transports/{id}/pickup-complete`는 HTTP로는 기사 앱에서 호출하는 Controller action이고, 코드로는 운송 진행 UseCase나 Command가 상태를 바꾸는 실행 단위다. HIOPS 관점에서는 국내 화물 운송 OS가 `상차 완료` 기능을 해당 시점에 열어 두었고, 그 기능 호출이 이 API/UseCase로 이어지는 것이다.
 
@@ -199,11 +199,11 @@ public sealed class 기사배차추천Controller : ControllerBase
 새 유스케이스를 추가할 때는 attribute, 인터페이스, 구현체, DI 등록을 한 묶음으로 본다.
 
 ```csharp
-[HongdalApiWorkflow(HongdalWorkflow.DomesticTransport)]
-[HongdalUseCase("파일 POD 관리", Summary = "하차 완료 사진과 배송 완료 증빙 파일 상태를 관리합니다.")]
-[HongdalUseCaseActor(HongdalActor.PlatformOperator)]
-[HongdalUseCaseRelation(
-    HongdalUseCaseRelationKind.Include,
+[SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
+[SsalddelUseCase("파일 POD 관리", Summary = "하차 완료 사진과 배송 완료 증빙 파일 상태를 관리합니다.")]
+[SsalddelUseCaseActor(SsalddelActor.PlatformOperator)]
+[SsalddelUseCaseRelation(
+    SsalddelUseCaseRelationKind.Include,
     "파일업로드UseCase",
     Condition = "POD 파일을 저장하거나 상태를 확인할 때",
     Summary = "POD 관리는 업로드된 파일을 전제로 합니다.")]
@@ -230,7 +230,7 @@ services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
 | 커뮤니티 신뢰 | `커뮤니티게시판UseCase`, `커뮤니티게시글UseCase`, `커뮤니티투표UseCase`, `커뮤니티활동신호UseCase`, `인연스냅샷조회UseCase` |
 | 참여 인력 관리 | `HR참여운영UseCase`, `사회보험신고UseCase`, `플랫폼수익환급UseCase` |
 
-이 목록은 `HongdalApiWorkflowAttribute`와 `HongdalUseCaseAttribute`가 붙은 유스케이스 클래스를 서버가 읽어 구성합니다. 새 유스케이스를 추가할 때는 워크플로우, 표시 이름, 주 액터, 보조 액터를 함께 붙이는 것을 기본 규칙으로 둡니다.
+이 목록은 `SsalddelApiWorkflowAttribute`와 `SsalddelUseCaseAttribute`가 붙은 유스케이스 클래스를 서버가 읽어 구성합니다. 새 유스케이스를 추가할 때는 워크플로우, 표시 이름, 주 액터, 보조 액터를 함께 붙이는 것을 기본 규칙으로 둡니다.
 
 컨트롤러는 HTTP 라우팅, 인증 정책, 파일 스트림 열기처럼 웹 계층에 가까운 일만 담당합니다. 게시글 작성, 댓글 작성, 추천 중복 방지, 신고 수 증가, 운영자 숨김 같은 업무 처리는 유스케이스에 둡니다.
 
@@ -266,7 +266,7 @@ services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
 | `CustomsHsV20` | `CustomsAndTradeDataWorkflow` | 통관·무역 데이터 |
 | `OrdererGroupOrderV25`, `ApartmentGroupOrderV25` | `GroupPurchaseImportWorkflow` | 공동주문 수입 |
 | `FoodDeliveryV30` | `FoodDeliveryWorkflow` | 음식 배달 |
-| `HongdalMartV35` | `HongdalMartWorkflow` | 알뜰살뜰 마트 |
+| `SsalddelMartV35` | `SsalddelMartWorkflow` | 알뜰살뜰 마트 |
 
 ## 워크플로우 관계
 

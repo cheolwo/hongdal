@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.Services;
 using MudBlazor.Services;
 using WarehouseManagerApp.Services;
 
@@ -19,11 +19,11 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
-        builder.Services.AddHongdalUiCommonAppServices();
+        builder.Services.AddSsalddelUiCommonAppServices();
         builder.Services.AddWarehouseManagerApplication();
-        builder.Services.AddHongdalApiHttpClient(HongdalApiEndpoint.ResolveBaseAddress(
-            builder.Configuration[HongdalApiEndpoint.ConfigurationKey],
-            new Uri(HongdalApiEndpoint.LocalDevelopmentBaseAddress)));
+        builder.Services.AddSsalddelApiHttpClient(SsalddelApiEndpoint.ResolveBaseAddress(
+            builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
+            new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)));
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

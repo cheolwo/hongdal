@@ -2,7 +2,7 @@
 
 ## 목적
 
-홍달 광고는 플랫폼 전체를 모호하게 알리는 캠페인이 아니라, 같은 지역과 품목에서 필요한 역할을 함께 모으는 양면시장 획득 흐름으로 관리한다.
+살뜰 광고는 플랫폼 전체를 모호하게 알리는 캠페인이 아니라, 같은 지역과 품목에서 필요한 역할을 함께 모으는 양면시장 획득 흐름으로 관리한다.
 
 첫 범위는 커뮤니티 0.0에 직접 필요한 다음 역할이다.
 
@@ -17,7 +17,7 @@
 
 ```mermaid
 flowchart LR
-    A["홍달 역할 Profile"] --> B["RoleAdvertisingCampaignPlanner"]
+    A["살뜰 역할 Profile"] --> B["RoleAdvertisingCampaignPlanner"]
     B --> C["Meta Adapter"]
     B --> D["Google Ads Adapter"]
     B --> E["LinkedIn Adapter"]
@@ -32,10 +32,10 @@ flowchart LR
 - 역할 Profile은 landing page의 목적, 성공 지표, 기본 키워드·산업·직무 힌트를 정의한다.
 - Planner는 역할과 0.0 경계, 전환 동의 안내, 채용성 광고 정책 검토 여부를 검증한다.
 - Adapter는 공통 입력을 각 광고 API의 캠페인 구조와 타기팅 개념으로 변환한다.
-- 외부 캠페인 생성·수정은 현재 구현하지 않는다. `HongdalExecution:Mode=Simulation`과 `RoleAdvertising:Enabled=false`가 기본이다.
+- 외부 캠페인 생성·수정은 현재 구현하지 않는다. `SsalddelExecution:Mode=Simulation`과 `RoleAdvertising:Enabled=false`가 기본이다.
 - 내부 사용자 이메일·전화번호·정확한 위치·광고 식별자를 Adapter 입력으로 받지 않는다.
 
-내부 `탐색캠페인`은 홍달 사용자 사이의 공개 탐색 흐름이다. 이 문서의 외부 광고 캠페인과 저장소, 상태, 식별자를 공유하지 않는다.
+내부 `탐색캠페인`은 살뜰 사용자 사이의 공개 탐색 흐름이다. 이 문서의 외부 광고 캠페인과 저장소, 상태, 식별자를 공유하지 않는다.
 
 ## 플랫폼 조사 결과
 
@@ -73,7 +73,7 @@ flowchart LR
 
 ## 개인정보와 광고 정책
 
-1. 역할은 홍달 내부 개인 Profile을 외부로 내보내는 값이 아니라 광고 문안·키워드·산업 힌트를 만드는 Persona다.
+1. 역할은 살뜰 내부 개인 Profile을 외부로 내보내는 값이 아니라 광고 문안·키워드·산업 힌트를 만드는 Persona다.
 2. Google Customer Match처럼 이메일·전화번호를 사용하는 기능은 이번 범위에서 제외한다. 향후 도입하려면 광고 목적 동의, 철회, 보존 기간, 삭제, 계정 자격과 각 플랫폼 정책을 별도 구현한다.
 3. 전환 측정을 켜는 초안은 광고·분석 데이터 처리 안내 URL이 없으면 차단한다.
 4. 기사 모집처럼 채용 또는 일자리로 해석될 수 있는 광고는 플랫폼 특별 광고 정책 검토 참조가 없으면 차단한다.
@@ -82,12 +82,12 @@ flowchart LR
 
 ## 코드 위치
 
-- 공통 계약: `Hongdal.Contracts/Common/Advertising/RoleAdvertisingContracts.cs`
-- 역할 Profile: `Hongdal/Services/Advertising/RoleAdvertisingAudienceCatalog.cs`
-- 플랫폼 Adapter: `Hongdal/Services/Advertising/RoleAdvertisingPlatformAdapters.cs`
-- 검증·계획: `Hongdal/Services/Advertising/RoleAdvertisingCampaignPlanner.cs`
-- 설정: `Hongdal/Services/Options/RoleAdvertisingOptions.cs`
-- DI: `Hongdal/Extensions/ServiceCollectionExtensions.Advertising.cs`
+- 공통 계약: `Ssalddel.Contracts/Common/Advertising/RoleAdvertisingContracts.cs`
+- 역할 Profile: `Ssalddel/Services/Advertising/RoleAdvertisingAudienceCatalog.cs`
+- 플랫폼 Adapter: `Ssalddel/Services/Advertising/RoleAdvertisingPlatformAdapters.cs`
+- 검증·계획: `Ssalddel/Services/Advertising/RoleAdvertisingCampaignPlanner.cs`
+- 설정: `Ssalddel/Services/Options/RoleAdvertisingOptions.cs`
+- DI: `Ssalddel/Extensions/ServiceCollectionExtensions.Advertising.cs`
 
 ## 다음 세로 구현 순서
 

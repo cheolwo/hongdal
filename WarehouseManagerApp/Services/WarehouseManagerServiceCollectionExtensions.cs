@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using WarehouseManagerApp.ViewModels;
 using WarehouseManagerApp.ViewModels.Warehouse;
 

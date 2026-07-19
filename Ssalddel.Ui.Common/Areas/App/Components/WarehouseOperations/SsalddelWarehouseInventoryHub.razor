@@ -1,0 +1,164 @@
+@using Ssalddel.Contracts.Common.Inventory
+@using Ssalddel.Ui.Common.Areas.App.Services
+@inject IWarehouseWorkspaceService WarehouseService
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">@Title</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Description</MudText>
+            </MudStack>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadAsync">새로고침</MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <MudAlert Severity="@messageSeverity">@message</MudAlert>
+        }
+
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.subtitle2">재고 건수</MudText>
+                    <MudText Typo="Typo.h4">@inventory.Count</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.subtitle2">즉시 출고 가능 수량</MudText>
+                    <MudText Typo="Typo.h4">@inventory.Sum(x => x.가용수량)</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.subtitle2">@AuxiliaryMetricLabel</MudText>
+                    <MudText Typo="Typo.h4">@AuxiliaryMetricValue</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Class="mb-3">보관 재고 목록</MudText>
+
+                @if (isLoading)
+                {
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                }
+                else if (inventory.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info">입고완료된 재고가 없습니다.</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="inventory.OrderByDescending(x => x.입고상품Id)" Dense="true" Hover="true">
+                        <HeaderContent>
+                            <MudTh>상품명</MudTh>
+                            <MudTh>SKU</MudTh>
+                            <MudTh>창고</MudTh>
+                            <MudTh>가용수량</MudTh>
+                            <MudTh>예약수량</MudTh>
+                            <MudTh>상태</MudTh>
+                            <MudTh>보관위치</MudTh>
+                            @if (ShowReconsignmentAction || ShowSaleAction)
+                            {
+                                <MudTh>액션</MudTh>
+                            }
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="상품명">@context.상품명</MudTd>
+                            <MudTd DataLabel="SKU">@context.SKU</MudTd>
+                            <MudTd DataLabel="창고">@context.창고명</MudTd>
+                            <MudTd DataLabel="가용수량">@context.가용수량</MudTd>
+                            <MudTd DataLabel="예약수량">@context.예약수량</MudTd>
+                            <MudTd DataLabel="상태">@context.상태</MudTd>
+                            <MudTd DataLabel="보관위치">@context.보관위치</MudTd>
+                            @if (ShowReconsignmentAction || ShowSaleAction)
+                            {
+                                <MudTd DataLabel="액션">
+                                    <MudStack Row="true" Spacing="1">
+                                        @if (ShowReconsignmentAction)
+                                        {
+                                            <MudButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@(IsBusy || context.가용수량 <= 0)" OnClick="() => RequestReconsignmentAsync(context)">
+                                                @ReconsignmentActionLabel
+                                            </MudButton>
+                                        }
+                                        @if (ShowSaleAction)
+                                        {
+                                            <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" Disabled="@(IsBusy || context.가용수량 <= 0)" OnClick="() => RequestSaleAsync(context)">
+                                                @SaleActionLabel
+                                            </MudButton>
+                                        }
+                                    </MudStack>
+                                </MudTd>
+                            }
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter] public string Title { get; set; } = "재고 허브";
+    [Parameter] public string Description { get; set; } = "입고상품의 수량, 위치, 상태를 확인하고 다음 업무를 결정합니다.";
+    [Parameter] public string AuxiliaryMetricLabel { get; set; } = "후속 업무";
+    [Parameter] public string AuxiliaryMetricValue { get; set; } = "-";
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public bool ShowReconsignmentAction { get; set; } = true;
+    [Parameter] public bool ShowSaleAction { get; set; } = true;
+    [Parameter] public string ReconsignmentActionLabel { get; set; } = "재위탁 운송";
+    [Parameter] public string SaleActionLabel { get; set; } = "판매 등록";
+    [Parameter] public EventCallback<재고항목응답> OnReconsignmentRequested { get; set; }
+    [Parameter] public EventCallback<재고항목응답> OnSaleRequested { get; set; }
+
+    private readonly List<재고항목응답> inventory = [];
+    private bool isLoading;
+    private string? message;
+    private Severity messageSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadAsync();
+    }
+
+    public async Task ReloadAsync()
+    {
+        isLoading = true;
+
+        try
+        {
+            inventory.Clear();
+            inventory.AddRange((await WarehouseService.GetInventoryAsync())?.Items ?? []);
+            messageSeverity = Severity.Info;
+            message = $"재고 {inventory.Count}건을 불러왔습니다.";
+        }
+        catch (Exception ex)
+        {
+            messageSeverity = Severity.Error;
+            message = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task RequestReconsignmentAsync(재고항목응답 item)
+    {
+        if (OnReconsignmentRequested.HasDelegate)
+        {
+            await OnReconsignmentRequested.InvokeAsync(item);
+        }
+    }
+
+    private async Task RequestSaleAsync(재고항목응답 item)
+    {
+        if (OnSaleRequested.HasDelegate)
+        {
+            await OnSaleRequested.InvokeAsync(item);
+        }
+    }
+}

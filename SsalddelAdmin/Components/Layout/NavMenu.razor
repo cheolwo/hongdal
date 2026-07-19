@@ -1,0 +1,98 @@
+@using SsalddelAdmin.Services
+@using Ssalddel.Ui.Common.Areas.App.Services
+@implements IDisposable
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject 관리자인증Service 관리자인증Service
+@inject ViewPolicyService ViewPolicyService
+@inject NavigationManager NavigationManager
+
+<MudNavMenu Class="pa-3">
+    <MudStack Spacing="0" Class="px-2 pb-3">
+        <MudText Typo="Typo.subtitle1">살뜰 관리자</MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">서비스 운영</MudText>
+    </MudStack>
+    <MudDivider Class="mb-3" />
+
+    @if (!ViewPolicyService.IsLoaded)
+    {
+        <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mx-2 my-2" />
+    }
+    else
+    {
+        @foreach (var item in AdminV1NavigationPolicy.MenuItems.Where(x => IsVisible(x.Route)))
+        {
+            <MudNavLink Href="@AdminV1NavigationPolicy.ToHref(item.Route)"
+                        Match="@(item.Exact ? NavLinkMatch.All : NavLinkMatch.Prefix)"
+                        Icon="@ResolveIcon(item.IconKey)">
+                @item.Label
+            </MudNavLink>
+        }
+    }
+
+    <MudDivider Class="my-3" />
+
+    @if (!관리자인증세션Service.로그인됨)
+    {
+        <MudNavLink Href="login" Icon="@Icons.Material.Filled.Login">관리자 로그인</MudNavLink>
+    }
+    else
+    {
+        <MudStack Spacing="1" Class="px-2">
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@관리자인증세션Service.UserName</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Logout" OnClick="로그아웃">로그아웃</MudButton>
+        </MudStack>
+    }
+</MudNavMenu>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        ViewPolicyService.Changed += HandleChanged;
+        await ViewPolicyService.EnsureLoadedAsync();
+    }
+
+    private void HandleChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private bool IsVisible(string route)
+        => ViewPolicyService.GetBlockingItem(route) is null;
+
+    private static string ResolveIcon(string iconKey) => iconKey switch
+    {
+        "home" => Icons.Material.Filled.Home,
+        "settings" => Icons.Material.Filled.Settings,
+        "add_box" => Icons.Material.Filled.AddBox,
+        "view_list" => Icons.Material.Filled.ViewList,
+        "inbox" => Icons.Material.Filled.Inbox,
+        "dashboard" => Icons.Material.Filled.Dashboard,
+        "inventory_2" => Icons.Material.Filled.Inventory2,
+        "warehouse" => Icons.Material.Filled.Warehouse,
+        "local_shipping" => Icons.Material.Filled.LocalShipping,
+        "qr_code_scanner" => Icons.Material.Filled.QrCodeScanner,
+        "person" => Icons.Material.Filled.Person,
+        "storefront" => Icons.Material.Filled.Storefront,
+        "sell" => Icons.Material.Filled.Sell,
+        "outbox" => Icons.Material.Filled.Outbox,
+        "public" => Icons.Material.Filled.Public,
+        "fact_check" => Icons.Material.Filled.FactCheck,
+        "calculate" => Icons.Material.Filled.Calculate,
+        "route" => Icons.Material.Filled.Route,
+        "payments" => Icons.Material.Filled.Payments,
+        "account_balance" => Icons.Material.Filled.AccountBalance,
+        "description" => Icons.Material.Filled.Description,
+        _ => Icons.Material.Filled.ChevronRight
+    };
+
+    private void 로그아웃()
+    {
+        관리자인증Service.로그아웃();
+        NavigationManager.NavigateTo("/login", forceLoad: false);
+    }
+
+    public void Dispose()
+    {
+        ViewPolicyService.Changed -= HandleChanged;
+    }
+}

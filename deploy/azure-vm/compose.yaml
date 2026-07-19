@@ -1,0 +1,121 @@
+name: ssalddel-preview
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${SSALDDEL_MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: ssalddel
+      MYSQL_USER: ssalddel
+      MYSQL_PASSWORD: "${SSALDDEL_MYSQL_PASSWORD}"
+      TZ: Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=192M
+      - --max-connections=50
+      - --performance-schema=OFF
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    mem_limit: 560m
+
+  mongo:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ssalddel
+      MONGO_INITDB_ROOT_PASSWORD: "${SSALDDEL_MONGO_PASSWORD}"
+      MONGO_INITDB_DATABASE: ssalddel
+      TZ: Asia/Seoul
+    command: ["mongod", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --username \"$${MONGO_INITDB_ROOT_USERNAME}\" --password \"$${MONGO_INITDB_ROOT_PASSWORD}\" --authenticationDatabase admin --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"]
+      interval: 10s
+      timeout: 8s
+      retries: 20
+      start_period: 30s
+    mem_limit: 560m
+
+  app:
+    image: ssalddel-server:azure-preview
+    pull_policy: never
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      AllowedHosts: "${SSALDDEL_SITE_HOST}"
+      ConnectionStrings__DefaultConnection: "server=mysql;port=3306;database=ssalddel;user=ssalddel;password=${SSALDDEL_MYSQL_PASSWORD};SslMode=None;AllowPublicKeyRetrieval=True;"
+      MongoDb__ConnectionString: "mongodb://ssalddel:${SSALDDEL_MONGO_PASSWORD}@mongo:27017/?authSource=admin"
+      MongoDb__Database: ssalddel
+      TransientState__Provider: Memory
+      DatabaseInitialization__RunAtStartup: "false"
+      DatabaseInitialization__FailOnError: "true"
+      Jwt__Issuer: Ssalddel.AzurePreview
+      Jwt__Audience: Ssalddel.WebApp.AzurePreview
+      Jwt__SecretKey: "${SSALDDEL_JWT_SECRET_KEY}"
+      IsmsPProtectedData__FailWhenKeyMissing: "false"
+      SsalddelExecution__Mode: Simulation
+      CustomsBrokerCors__AllowedOrigins__0: "https://${SSALDDEL_SITE_HOST}"
+      AgriculturalFisheriesBatch__Enabled: "false"
+      CommunityEditorialBatch__Enabled: "false"
+      CommunityPostTranslation__Enabled: "false"
+      SalesChannelOrderSync__Enabled: "false"
+      WorkRelationshipSnapshots__Enabled: "false"
+      YouTube__Enabled: "false"
+      HongikHakdangCards__Enabled: "false"
+      CommunityPostStorage__Folder: /app/community/posts
+    volumes:
+      - app_data:/app/App_Data
+      - app_uploads:/app/uploads
+      - app_community:/app/community
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--header", "Host: ${SSALDDEL_SITE_HOST}", "http://127.0.0.1:8080/health/ready"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
+    mem_limit: 760m
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      SSALDDEL_SITE_HOST: "${SSALDDEL_SITE_HOST}"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./web:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    mem_limit: 128m
+
+volumes:
+  mysql_data:
+  mongo_data:
+  app_data:
+  app_uploads:
+  app_community:
+  caddy_data:
+  caddy_config:

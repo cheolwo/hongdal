@@ -23,38 +23,38 @@ body {
     min-height: 100vh;
 }
 
-.hongdal-appbar {
+.ssalddel-appbar {
     background: #172033 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     color: #fff !important;
 }
 
-.hongdal-appbar-title {
+.ssalddel-appbar-title {
     min-width: 0;
 }
 
-.hongdal-appbar-subtitle {
+.ssalddel-appbar-subtitle {
     color: rgba(255, 255, 255, 0.7) !important;
     line-height: 1.15;
 }
 
-.hongdal-main-content {
+.ssalddel-main-content {
     height: calc(100vh - 48px);
     overflow: auto;
     padding: 16px;
     background: #f6f8fb;
 }
 
-.hongdal-role-switcher {
+.ssalddel-role-switcher {
     position: relative;
 }
 
-.hongdal-role-trigger,
-.hongdal-role-panel button {
+.ssalddel-role-trigger,
+.ssalddel-role-panel button {
     font: inherit;
 }
 
-.hongdal-role-trigger {
+.ssalddel-role-trigger {
     display: grid;
     width: 38px;
     height: 38px;
@@ -66,7 +66,7 @@ body {
     color: white;
 }
 
-.hongdal-role-panel-dismiss {
+.ssalddel-role-panel-dismiss {
     position: fixed;
     z-index: 1350;
     inset: 0;
@@ -74,7 +74,7 @@ body {
     background: rgba(15, 23, 42, 0.36);
 }
 
-.hongdal-role-panel {
+.ssalddel-role-panel {
     position: fixed;
     z-index: 1360;
     top: 58px;
@@ -88,36 +88,36 @@ body {
     box-shadow: 0 20px 56px rgba(15, 23, 42, 0.24);
 }
 
-.hongdal-role-panel-handle {
+.ssalddel-role-panel-handle {
     display: none;
 }
 
-.hongdal-role-panel header,
-.hongdal-role-option {
+.ssalddel-role-panel header,
+.ssalddel-role-option {
     display: flex;
     gap: 12px;
     align-items: center;
 }
 
-.hongdal-role-panel header {
+.ssalddel-role-panel header {
     justify-content: space-between;
     margin-bottom: 12px;
 }
 
-.hongdal-role-panel header > div,
-.hongdal-role-option > span:nth-child(2) {
+.ssalddel-role-panel header > div,
+.ssalddel-role-option > span:nth-child(2) {
     display: grid;
     gap: 2px;
 }
 
-.hongdal-role-panel header span,
-.hongdal-role-panel header small,
-.hongdal-role-option small {
+.ssalddel-role-panel header span,
+.ssalddel-role-panel header small,
+.ssalddel-role-option small {
     color: #64748b;
     font-size: 0.76rem;
 }
 
-.hongdal-role-panel header > button {
+.ssalddel-role-panel header > button {
     display: grid;
     width: 34px;
     height: 34px;
@@ -127,7 +127,7 @@ body {
     background: #f1f5f9;
 }
 
-.hongdal-role-option {
+.ssalddel-role-option {
     width: 100%;
     padding: 12px;
     border: 1px solid #bfdbfe;
@@ -138,11 +138,11 @@ body {
     text-align: left;
 }
 
-.hongdal-role-option > span:nth-child(2) {
+.ssalddel-role-option > span:nth-child(2) {
     flex: 1;
 }
 
-.hongdal-role-option-icon {
+.ssalddel-role-option-icon {
     display: grid;
     width: 38px;
     height: 38px;
@@ -182,11 +182,11 @@ body {
 }
 
 @media (max-width: 600px) {
-    .hongdal-main-content {
+    .ssalddel-main-content {
         padding: 8px 6px 104px;
     }
 
-    .hongdal-role-panel {
+    .ssalddel-role-panel {
         top: auto;
         right: 8px;
         bottom: 8px;
@@ -195,7 +195,7 @@ body {
         border-radius: 24px;
     }
 
-    .hongdal-role-panel-handle {
+    .ssalddel-role-panel-handle {
         display: block;
         width: 42px;
         height: 4px;
@@ -212,7 +212,7 @@ body {
         background: #172033;
     }
 
-    .hongdal-main-content {
+    .ssalddel-main-content {
         padding-bottom: max(104px, env(safe-area-inset-bottom));
     }
 }

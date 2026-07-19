@@ -51,7 +51,7 @@
         @if (_initialized && _warehouseId.HasValue)
         {
             <MudPaper Class="pa-4" Elevation="0" Outlined="true">
-                <HongdalOperationState ViewModel="@ViewModel.입고예정조회" />
+                <SsalddelOperationState ViewModel="@ViewModel.입고예정조회" />
                 <WarehouseExpectedInboundGrid @ref="_grid"
                                               ViewModel="@ViewModel.입고예정조회" />
             </MudPaper>

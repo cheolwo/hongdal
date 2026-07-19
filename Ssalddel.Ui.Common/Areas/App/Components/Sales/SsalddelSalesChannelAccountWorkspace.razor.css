@@ -1,0 +1,19 @@
+.ssalddel-account-workspace {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+}
+
+.ssalddel-account-workspace__cards {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .ssalddel-account-workspace__table {
+        display: none;
+    }
+
+    .ssalddel-account-workspace__cards {
+        display: block;
+    }
+}

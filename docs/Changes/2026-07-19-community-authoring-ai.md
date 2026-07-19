@@ -40,7 +40,7 @@
 ## 검증
 
 - `CommunityAuthoringAiDraftServiceTests`와 `CommunityInformationReviewPageViewModelTests` 28개 통과
-- `Hongdal` server build 경고 0개·오류 0개
-- `HongdalAdminApp` `net10.0-windows10.0.19041.0` build 경고 0개·오류 0개
+- `Ssalddel` server build 경고 0개·오류 0개
+- `SsalddelAdminApp` `net10.0-windows10.0.19041.0` build 경고 0개·오류 0개
 - 실제 공통 Razor 컴포넌트의 데스크톱·모바일 반응형 렌더링 확인
 - `git diff --check` 통과

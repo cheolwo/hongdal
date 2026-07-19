@@ -4,7 +4,7 @@ This document defines how group purchase imports connect to the 1.0 domestic car
 
 ## Principle
 
-An orderer group is often an informal group without a business registration number or legal shipper status. Hongdal should not require that group to become the direct shipper for the bonded-area domestic transport step.
+An orderer group is often an informal group without a business registration number or legal shipper status. Ssalddel should not require that group to become the direct shipper for the bonded-area domestic transport step.
 
 The default operating model is:
 
@@ -37,7 +37,7 @@ The platform may create this draft before customs release is complete. In that c
 
 ## Destination Options
 
-The default destination decision is apartment direct distribution through a Hongdal 1.0 cargo-yongdal driver. The default driver scope is unit-door delivery, because it keeps the group-purchase delivery promise simple for orderers. 3PL inbound or representative dropoff remains available as an option when the orderer group deliberately chooses storage, later sales-channel fulfillment, or internal distribution.
+The default destination decision is apartment direct distribution through a Ssalddel 1.0 cargo-yongdal driver. The default driver scope is unit-door delivery, because it keeps the group-purchase delivery promise simple for orderers. 3PL inbound or representative dropoff remains available as an option when the orderer group deliberately chooses storage, later sales-channel fulfillment, or internal distribution.
 
 After the orderer group confirms a delivery method, the platform treats the transport decision as locked by default. A later request to switch from driver home delivery to 3PL, or from 3PL to direct distribution, is not applied silently; it produces `ConfirmTransportDecisionRevision` so the platform can re-check cost, labor scope, privacy handling, and participant agreement.
 
@@ -184,6 +184,6 @@ Next schema candidate: if the platform starts persisting unit-delivery count and
 
 ## Implementation
 
-- Planner: `Hongdal.Contracts/Common/Orderer/공동구매플랫폼국내운송계획기.cs`
+- Planner: `Ssalddel.Contracts/Common/Orderer/공동구매플랫폼국내운송계획기.cs`
 - Admin API: `POST /api/v1/admin/orderer/group-purchase-commerce-fulfillment-plans/{planId}/platform-domestic-transport-draft`
-- Tests: `Hongdal.Tests/Contracts/Common/Orderer/공동구매플랫폼국내운송계획기Tests.cs`
+- Tests: `Ssalddel.Tests/Contracts/Common/Orderer/공동구매플랫폼국내운송계획기Tests.cs`

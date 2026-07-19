@@ -13,7 +13,7 @@
 | 필드 | 초기 값 | 의미 |
 | --- | --- | --- |
 | `DirectoryStatusCode` | `ResearchCandidate` | 공개 자료를 확인한 조사 후보 |
-| `PlatformRelationshipStatusCode` | `NoPlatformRelationship` | 홍달과 제휴·계약 관계 없음 |
+| `PlatformRelationshipStatusCode` | `NoPlatformRelationship` | 살뜰과 제휴·계약 관계 없음 |
 | `RegulatoryVerificationStatusCode` | `RegulatoryStatusNotVerified` | 역할별 면허·권한을 아직 확인하지 않음 |
 | `IsPlatformPartner` | `false` | 플랫폼 참여 사업자가 아님 |
 | `CanBeSelectedForOperations` | `false` | 원장·입고·출고·운송 실행에 바로 선택할 수 없음 |
@@ -72,7 +72,7 @@
 
 ## 공동구매 우선 후보 12개
 
-아래 공개 조건은 2026-07-18 확인값이며 계약 전에 반드시 다시 확인한다. `공개 최소조건`은 최종 견적이나 홍달의 추천 점수가 아니다.
+아래 공개 조건은 2026-07-18 확인값이며 계약 전에 반드시 다시 확인한다. `공개 최소조건`은 최종 견적이나 살뜰의 추천 점수가 아니다.
 
 | 업체 | 적합성을 확인할 공동구매 구간 | 공개 최소조건·주요 제한 |
 | --- | --- | --- |
@@ -202,7 +202,7 @@ POST /api/v1/admin/operations/third-party-logistics/outreach/preview
 초안에는 다음 내용을 명시한다.
 
 - 아직 실제 화물·booking·tender·배차가 없는 탐색 문의임을 밝힌다.
-- 홍달이 화물 브로커로 배차·운송계약·운임 수취를 수행하지 않는 경계를 밝힌다.
+- 살뜰이 화물 브로커로 배차·운송계약·운임 수취를 수행하지 않는 경계를 밝힌다.
 - 공개 자료에서 본 역량은 미검증 상태이며 정확한 법인, 시설, FIRMS, FTZ activation, carrier authority와 계약을 다시 묻는다.
 - 업체 담당자가 원할 경우 플랫폼 계정 확인 뒤 비구속 가원장 역할 슬롯에서 검토에 참여할 수 있지만, 슬롯 참여 자체는 계약이나 지급 의무를 만들지 않는다고 알린다.
 - 품목, 출발·도착지, 예상 물량, 일정, 시설·fulfillment·API/EDI 조건을 업체가 판단할 수 있을 정도로 제공한다.

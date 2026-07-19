@@ -1,0 +1,364 @@
+@page "/warehouse/work/inbound/products"
+@page "/work/inbound/products"
+@inject NavigationManager Navigation
+@inject IInboundReceivingWorkflowService ReceivingWorkflow
+
+<WebPageHeader Eyebrow="Warehouse Web"
+               Title="입고 상품 확인"
+               Description="상품 바코드를 입력하면 입고 예정 상품을 조회하고, 입고 묶음 바코드와 함께 확인합니다."
+               Badge="입고 상품" />
+
+<MudStack Spacing="3">
+    <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+        <MudStack Spacing="3">
+            <MudTextField T="string"
+                          Label="상품 바코드"
+                          Value="@ProductBarcodeInput"
+                          ValueChanged="OnBarcodeChanged"
+                          Variant="Variant.Outlined"
+                          Immediate="true"
+                          AutoFocus="true"
+                          Placeholder="SKU:MILK-001"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                          OnKeyDown="OnKeyDownAsync" />
+
+            <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Disabled="@string.IsNullOrWhiteSpace(ProductBarcodeInput)" OnClick="LookupAsync">
+                    입고 예정 조회
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Backspace" OnClick="Clear">
+                    다시 입력
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Warning" StartIcon="@Icons.Material.Filled.AddBusiness" Disabled="@string.IsNullOrWhiteSpace(ProductBarcodeInput)" OnClick="StartUnplannedInbound">
+                    현장 입고 등록
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <MudAlert Severity="@MessageSeverity">@Message</MudAlert>
+    }
+
+    @if (ShowUnplannedInboundForm)
+    {
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">현장 입고 등록</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">계약 또는 입고 예정이 아직 연결되지 않은 상품을 임시 입고로 등록합니다.</MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">예외 입고</MudChip>
+                </MudStack>
+
+                <MudAlert Severity="Severity.Info" Dense="true">
+                    현장 입고는 업무를 멈추지 않기 위한 임시 상태입니다. 검수 단계에서 계약 연결, 정산 조건, 보관 책임을 보완해야 합니다.
+                </MudAlert>
+
+                <MudGrid>
+                    <MudItem xs="12" md="6"><MudTextField T="string" Label="상품 바코드" @bind-Value="UnplannedProductBarcode" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" /></MudItem>
+                    <MudItem xs="12" md="6"><MudTextField T="string" Label="입고 묶음 바코드" @bind-Value="UnplannedInboundBundleBarcode" Variant="Variant.Outlined" Placeholder="BND:IN-001" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" /></MudItem>
+                    <MudItem xs="12" md="6"><MudTextField T="string" Label="상품명" @bind-Value="UnplannedProductName" Variant="Variant.Outlined" Placeholder="예: 냉장 샌드위치 박스" /></MudItem>
+                    <MudItem xs="12" md="6"><MudTextField T="string" Label="공급사 또는 반입자" @bind-Value="UnplannedSupplier" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" md="3"><MudNumericField T="int" Label="입고 수량" @bind-Value="UnplannedReceivedQuantity" Min="1" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudSelect T="string" Label="보관 조건" @bind-Value="UnplannedStorageType" Variant="Variant.Outlined">
+                            @foreach (var option in StorageTypeOptions)
+                            {
+                                <MudSelectItem T="string" Value="@option">@option</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string" Label="계약 연결 상태" @bind-Value="UnplannedContractLinkStatus" Variant="Variant.Outlined">
+                            @foreach (var option in ContractLinkOptions)
+                            {
+                                <MudSelectItem T="string" Value="@option">@option</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12"><MudTextField T="string" Label="현장 입고 사유" @bind-Value="UnplannedExceptionReason" Variant="Variant.Outlined" Lines="3" /></MudItem>
+                </MudGrid>
+
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Inventory" OnClick="RegisterUnplannedInboundAsync">임시 입고로 편입</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" StartIcon="@Icons.Material.Filled.Close" OnClick="CancelUnplannedInbound">취소</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    }
+
+    @if (SelectedProduct is not null)
+    {
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">@SelectedProduct.Name</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@SelectedProduct.InboundRequestNo / @SelectedProduct.Supplier</MudText>
+                    </MudStack>
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        @if (SelectedProduct.IsUnplannedInbound)
+                        {
+                            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">현장 입고</MudChip>
+                        }
+                        <MudChip T="string" Color="@QuantityColor" Variant="Variant.Filled">@QuantityStatus</MudChip>
+                    </MudStack>
+                </MudStack>
+
+                <SsalddelSensitiveDisclosureList Title="입고 관계와 상세"
+                                                Summary="@($"{SelectedProduct.Name} / 예정 {SelectedProduct.ExpectedQuantity}개")"
+                                                RelatedParties="@BuildInboundRelatedParties(SelectedProduct)"
+                                                PrivacyHint="입고 담당자가 후속 확인이 필요한 상대를 먼저 인지하도록 구성합니다."
+                                                Icon="@Icons.Material.Filled.MoveToInbox"
+                                                Color="@QuantityColor">
+                    <MudExpansionPanel Text="입고 정보" Icon="@Icons.Material.Filled.Inventory2">
+                        <SsalddelSensitiveInfoRow Label="입고 번호" Value="@SelectedProduct.InboundRequestNo" />
+                        <SsalddelSensitiveInfoRow Label="상품 바코드" Value="@SelectedProduct.Barcode" />
+                        <SsalddelSensitiveInfoRow Label="상품명" Value="@SelectedProduct.Name" />
+                        <SsalddelSensitiveInfoRow Label="공급사" Value="@SelectedProduct.Supplier" />
+                        <SsalddelSensitiveInfoRow Label="계약 연결 상태" Value="@SelectedProduct.ContractLinkStatus" />
+                    </MudExpansionPanel>
+                    <MudExpansionPanel Text="수량과 보관" Icon="@Icons.Material.Filled.FactCheck">
+                        <SsalddelSensitiveInfoRow Label="예정 수량" Value="@SelectedProduct.ExpectedQuantity.ToString()" />
+                        <SsalddelSensitiveInfoRow Label="실제 입고 수량" Value="@ReceivedQuantity.ToString()" />
+                        <SsalddelSensitiveInfoRow Label="입고 묶음 바코드" Value="@InboundBundleBarcode" />
+                        <SsalddelSensitiveInfoRow Label="보관 조건" Value="@SelectedProduct.StorageType" />
+                        <SsalddelSensitiveInfoRow Label="수량 상태" Value="@QuantityStatus" />
+                    </MudExpansionPanel>
+                    <MudExpansionPanel Text="후속 연결" Icon="@Icons.Material.Filled.ConnectWithoutContact">
+                        <SsalddelSensitiveInfoRow Label="다음 공정" Value="입고 확인 후 검수 작업으로 이동" />
+                        <SsalddelSensitiveInfoRow Label="문의 가능 대상" Value="@BuildInboundContactContext(SelectedProduct)" />
+                        <SsalddelSensitiveInfoRow Label="관계 기록" Value="입고 확인 완료 시 공급사, 화주, 검수 담당자와의 업무 관계 스냅샷 후보가 됩니다." />
+                        @if (!string.IsNullOrWhiteSpace(SelectedProduct.ExceptionReason))
+                        {
+                            <SsalddelSensitiveInfoRow Label="예외 사유" Value="@SelectedProduct.ExceptionReason" />
+                        }
+                    </MudExpansionPanel>
+                </SsalddelSensitiveDisclosureList>
+
+                <MudNumericField T="int" Label="실제 입고 수량" @bind-Value="ReceivedQuantity" Min="0" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="입고 묶음 바코드" @bind-Value="InboundBundleBarcode" Variant="Variant.Outlined" Placeholder="BND:IN-001" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" />
+
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Inventory" OnClick="ConfirmInboundAsync">입고 확인 상태로 변경</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FactCheck" Disabled="@(!IsInboundConfirmed)" Href="@WarehouseManagerRoutes.InboundInspection">검수 작업으로 이동</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    }
+
+    <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+        <MudText Typo="Typo.subtitle1">샘플 상품 바코드</MudText>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="mt-2">
+            @foreach (var item in ExpectedProducts)
+            {
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default" OnClick="@(() => SelectSampleAsync(item.Barcode))">
+                    @item.Barcode
+                </MudButton>
+            }
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private IReadOnlyList<InboundExpectedProductDto> ExpectedProducts = [];
+    private string ProductBarcodeInput = string.Empty;
+    private string? Message;
+    private Severity MessageSeverity = Severity.Info;
+    private InboundExpectedProductDto? SelectedProduct;
+    private int ReceivedQuantity;
+    private bool IsInboundConfirmed;
+    private bool ShowUnplannedInboundForm;
+    private string InboundBundleBarcode = string.Empty;
+    private string UnplannedProductBarcode = string.Empty;
+    private string UnplannedInboundBundleBarcode = string.Empty;
+    private string UnplannedProductName = string.Empty;
+    private string UnplannedSupplier = string.Empty;
+    private int UnplannedReceivedQuantity = 1;
+    private string UnplannedStorageType = "상온";
+    private string UnplannedContractLinkStatus = "계약 미연결";
+    private string UnplannedExceptionReason = string.Empty;
+
+    private static readonly IReadOnlyList<string> StorageTypeOptions = ["상온", "냉장", "냉동", "위험물", "미지정"];
+    private static readonly IReadOnlyList<string> ContractLinkOptions = ["계약 미연결", "계약 확인 중", "구두 합의 선반입", "반품/회수 입고", "기존 계약 사후 연결 예정"];
+
+    private Color QuantityColor => SelectedProduct is null
+        ? Color.Default
+        : ReceivedQuantity == SelectedProduct.ExpectedQuantity ? Color.Success : Color.Warning;
+
+    private string QuantityStatus => SelectedProduct is null
+        ? "대기"
+        : ReceivedQuantity == SelectedProduct.ExpectedQuantity ? "수량 일치" : "수량 차이";
+
+    protected override async Task OnInitializedAsync()
+    {
+        ExpectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
+    }
+
+    private Task OnBarcodeChanged(string value)
+    {
+        ProductBarcodeInput = (value ?? string.Empty).Trim();
+        Message = null;
+        IsInboundConfirmed = false;
+        InboundBundleBarcode = string.Empty;
+        ShowUnplannedInboundForm = false;
+        return Task.CompletedTask;
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "NumpadEnter")
+        {
+            await LookupAsync();
+        }
+    }
+
+    private async Task LookupAsync()
+    {
+        SelectedProduct = await ReceivingWorkflow.FindExpectedProductAsync(ProductBarcodeInput);
+        IsInboundConfirmed = false;
+
+        if (SelectedProduct is null)
+        {
+            ReceivedQuantity = 0;
+            PrefillUnplannedInbound();
+            ShowUnplannedInboundForm = true;
+            MessageSeverity = Severity.Warning;
+            Message = "입고 예정 상품에서 찾지 못했습니다. 현장 입고로 임시 등록하거나 바코드를 다시 확인해 주세요.";
+            return;
+        }
+
+        ShowUnplannedInboundForm = false;
+        ReceivedQuantity = SelectedProduct.ExpectedQuantity;
+        InboundBundleBarcode = BuildDefaultBundleBarcode(SelectedProduct.InboundRequestNo);
+        MessageSeverity = Severity.Success;
+        Message = $"{SelectedProduct.Name} 입고 예정 정보를 불러왔습니다.";
+    }
+
+    private async Task ConfirmInboundAsync()
+    {
+        if (SelectedProduct is null)
+        {
+            MessageSeverity = Severity.Warning;
+            Message = "먼저 상품 바코드로 입고 예정 상품을 조회해 주세요.";
+            return;
+        }
+
+        try
+        {
+            var result = await ReceivingWorkflow.ConfirmReceivedAsync(new InboundReceivingConfirmationRequest(
+                SelectedProduct.Barcode,
+                InboundBundleBarcode,
+                ReceivedQuantity));
+
+            IsInboundConfirmed = true;
+            InboundBundleBarcode = result.InboundBundleBarcode;
+            MessageSeverity = result.QuantityMatched ? Severity.Success : Severity.Warning;
+            Message = result.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            MessageSeverity = Severity.Error;
+            Message = ex.Message;
+        }
+    }
+
+    private async Task SelectSampleAsync(string barcode)
+    {
+        ProductBarcodeInput = barcode;
+        await LookupAsync();
+    }
+
+    private void StartUnplannedInbound()
+    {
+        SelectedProduct = null;
+        IsInboundConfirmed = false;
+        PrefillUnplannedInbound();
+        ShowUnplannedInboundForm = true;
+        MessageSeverity = Severity.Info;
+        Message = "현장 입고 정보를 입력한 뒤 임시 입고로 편입할 수 있습니다.";
+    }
+
+    private async Task RegisterUnplannedInboundAsync()
+    {
+        try
+        {
+            var result = await ReceivingWorkflow.RegisterUnplannedInboundAsync(new UnplannedInboundRegistrationRequest(
+                UnplannedProductBarcode,
+                UnplannedInboundBundleBarcode,
+                UnplannedProductName,
+                UnplannedSupplier,
+                UnplannedReceivedQuantity,
+                UnplannedStorageType,
+                UnplannedContractLinkStatus,
+                UnplannedExceptionReason));
+
+            ExpectedProducts = await ReceivingWorkflow.GetExpectedProductsAsync();
+            SelectedProduct = result.Product;
+            ProductBarcodeInput = result.Product.Barcode;
+            InboundBundleBarcode = result.InboundBundleBarcode;
+            ReceivedQuantity = result.ReceivedQuantity;
+            IsInboundConfirmed = true;
+            ShowUnplannedInboundForm = false;
+            MessageSeverity = Severity.Warning;
+            Message = result.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            MessageSeverity = Severity.Error;
+            Message = ex.Message;
+        }
+    }
+
+    private void CancelUnplannedInbound()
+    {
+        ShowUnplannedInboundForm = false;
+        Message = null;
+    }
+
+    private void Clear()
+    {
+        ProductBarcodeInput = string.Empty;
+        SelectedProduct = null;
+        ReceivedQuantity = 0;
+        InboundBundleBarcode = string.Empty;
+        IsInboundConfirmed = false;
+        ShowUnplannedInboundForm = false;
+        Message = null;
+    }
+
+    private void PrefillUnplannedInbound()
+    {
+        UnplannedProductBarcode = ProductBarcodeInput;
+        UnplannedInboundBundleBarcode = BuildDefaultBundleBarcode("UNPLANNED");
+        UnplannedProductName = string.Empty;
+        UnplannedSupplier = string.Empty;
+        UnplannedReceivedQuantity = Math.Max(1, ReceivedQuantity);
+        UnplannedStorageType = "상온";
+        UnplannedContractLinkStatus = "계약 미연결";
+        UnplannedExceptionReason = "입고 예정 또는 계약 연결 전 현장 반입";
+    }
+
+    private static string BuildInboundRelatedParties(InboundExpectedProductDto product)
+        => product.IsUnplannedInbound
+            ? $"입고 담당자 · 반입자 {product.Supplier} · 계약 확인 담당자 · 검수 담당자"
+            : $"입고 담당자 · 공급사 {product.Supplier} · 화주 재고 담당자 · 검수 담당자";
+
+    private static string BuildInboundContactContext(InboundExpectedProductDto product)
+        => product.IsUnplannedInbound
+            ? $"{product.Supplier}, 계약 확인 담당자, 검수 담당자"
+            : $"{product.Supplier}, 화주 재고 담당자, 검수 담당자";
+
+    private static string BuildDefaultBundleBarcode(string seed)
+    {
+        var value = new string((seed ?? string.Empty)
+            .Where(char.IsLetterOrDigit)
+            .TakeLast(8)
+            .ToArray());
+        return $"BND:{(string.IsNullOrWhiteSpace(value) ? "INBOUND" : value)}";
+    }
+}

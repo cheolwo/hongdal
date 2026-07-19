@@ -66,8 +66,8 @@
 
 ## 검증
 
-- `Hongdal.Tests` 전체 1,494개 통과
-- `HongdalAdminApp` `net10.0-windows10.0.19041.0` 빌드 경고 0개·오류 0개
+- `Ssalddel.Tests` 전체 1,494개 통과
+- `SsalddelAdminApp` `net10.0-windows10.0.19041.0` 빌드 경고 0개·오류 0개
 - 달력 팝업 열기, 통계 재조회, 수치 계열 선택, 수산업협동조합 월별 표·선 그래프와 데스크톱·모바일 반응형 렌더링 확인
 - 모바일 390px에서 가로 넘침 없음과 브라우저 경고·오류 없음 확인
 - `git diff --check` 확인

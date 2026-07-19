@@ -1,0 +1,70 @@
+@page "/warehouse/mart/work/{ProcessCode}"
+@page "/mart/work/{ProcessCode}"
+@inject IWarehouseWorkEntryGateService EntryGateService
+@inject NavigationManager Navigation
+
+<WebPageHeader Eyebrow="Warehouse Web"
+               Title="@Definition.Title"
+               Description="@Definition.Description"
+               Badge="@Definition.Label" />
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="px-0">
+    <MudStack Spacing="3">
+        <SsalddelWarehouseWorkEntryGate Title="@($"{Definition.Label} 작업자 확인")"
+                                       Description="휴대폰 번호 뒤 8자리로 작업자를 확인하고, 알뜰살뜰 마트 창고 공정 역할이 맞으면 업무 화면으로 이동합니다."
+                                       ProcessLabel="@Definition.Label"
+                                       ChipColor="@Definition.Color"
+                                       PanelClass="pa-4"
+                                       IsBusy="@IsBusy"
+                                       VerificationHandler="VerifyAsync"
+                                       Verified="OnVerifiedAsync" />
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            샘플: 도심입고 77771111, 보충 77772222, 피킹/포장 77773333, 배달픽업 77774444, 관리자 99998888
+        </MudAlert>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string ProcessCode { get; set; } = WarehouseWorkProcessCodes.MartInbound;
+
+    private bool IsBusy;
+    private MartWorkDefinition Definition => ResolveDefinition(ProcessCode);
+
+    private async Task<WarehouseWorkOperatorVerificationResult> VerifyAsync(string phoneSuffix)
+    {
+        IsBusy = true;
+        try
+        {
+            return await EntryGateService.VerifyAsync(Definition.ProcessCode, phoneSuffix);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task OnVerifiedAsync(WarehouseWorkOperatorVerificationResult result)
+    {
+        await Task.Delay(300);
+        var route = string.Equals(Definition.ProcessCode, WarehouseWorkProcessCodes.MartPicking, StringComparison.OrdinalIgnoreCase)
+            ? WarehouseManagerRoutes.MartPickingPacking
+            : WarehouseManagerRoutes.MartWorkBoard;
+        Navigation.NavigateTo(route);
+    }
+
+    private static MartWorkDefinition ResolveDefinition(string? processCode)
+        => Definitions.FirstOrDefault(x => string.Equals(x.ProcessCode, processCode, StringComparison.OrdinalIgnoreCase))
+           ?? Definitions[0];
+
+    private static readonly IReadOnlyList<MartWorkDefinition> Definitions =
+    [
+        new(WarehouseWorkProcessCodes.MartInbound, "도심 입고 시작", "거점으로 들어온 납품, 반품, 이동 물량을 창고 재고로 확인합니다.", "도심 입고", Color.Warning),
+        new(WarehouseWorkProcessCodes.MartReplenishment, "진열/피킹존 보충 시작", "음식점의 재료 준비와 비슷하지만, 창고 재고를 주문 처리 가능 위치로 옮기는 공정입니다.", "보충", Color.Info),
+        new(WarehouseWorkProcessCodes.MartPicking, "주문 피킹/포장 시작", "고객 주문별로 상품을 피킹하고 포장 완료 상태까지 처리합니다.", "피킹/포장", Color.Primary),
+        new(WarehouseWorkProcessCodes.MartDeliveryPickup, "배달 기사 픽업 시작", "포장 완료된 주문을 음식 배달 기사에게 넘기고 고객 배송 흐름으로 연결합니다.", "배달 픽업", Color.Success)
+    ];
+
+    private sealed record MartWorkDefinition(string ProcessCode, string Title, string Description, string Label, Color Color);
+}

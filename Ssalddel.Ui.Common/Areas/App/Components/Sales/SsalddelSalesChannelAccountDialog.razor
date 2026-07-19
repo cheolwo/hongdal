@@ -1,0 +1,23 @@
+@using Ssalddel.Contracts.Common.Sales
+@using Ssalddel.Ui.Common.Areas.App.Components.Crud
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Sales
+
+<SsalddelCommandDialog TDraft="판매채널계정저장요청" ViewModel="@ViewModel">
+    <EditorContent Context="draft">
+        <SsalddelSalesChannelAccountEditor Model="@draft"
+                                          ChannelOptions="@ChannelOptions"
+                                          ChannelLocked="@ChannelLocked" />
+    </EditorContent>
+</SsalddelCommandDialog>
+
+@code {
+    [Parameter, EditorRequired]
+    public I명령ViewModel<판매채널계정저장요청> ViewModel { get; set; } = default!;
+
+    [Parameter]
+    public IReadOnlyList<업무선택항목<string>> ChannelOptions { get; set; } = [];
+
+    [Parameter]
+    public bool ChannelLocked { get; set; }
+}

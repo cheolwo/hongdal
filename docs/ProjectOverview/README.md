@@ -18,7 +18,7 @@
 
 | 화주 의뢰 상세 | 기사 지도 홈 |
 | --- | --- |
-| <img src="assets/app-pages/HongdalApp/HongdalApp-P03.png" alt="화주 의뢰 상세 화면" width="260"> | <img src="assets/app-pages/DriverApp/DriverApp-P07.png" alt="기사 지도 홈 화면" width="260"> |
+| <img src="assets/app-pages/SsalddelApp/SsalddelApp-P03.png" alt="화주 의뢰 상세 화면" width="260"> | <img src="assets/app-pages/DriverApp/DriverApp-P07.png" alt="기사 지도 홈 화면" width="260"> |
 
 | 기사 추천 상세 | 기사 상하차 증빙 |
 | --- | --- |
@@ -26,27 +26,27 @@
 
 | 관리자 운송 원장 | 창고 피킹 배치 |
 | --- | --- |
-| <img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="관리자 운송 원장 화면" width="300"> | <img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P04.png" alt="창고 피킹 배치 화면" width="260"> |
+| <img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P22.png" alt="관리자 운송 원장 화면" width="300"> | <img src="assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P04.png" alt="창고 피킹 배치 화면" width="260"> |
 
 ### 새 통합 클라이언트
 
-<img src="assets/app-pages/HongdalApp/HongdalApp-P00.png" alt="역할 기반 통합 커뮤니티 홈" width="360">
+<img src="assets/app-pages/SsalddelApp/SsalddelApp-P00.png" alt="역할 기반 통합 커뮤니티 홈" width="360">
 
-[통합 커뮤니티 클라이언트와 꾸미기 상점](unified-community-client.md)에서 게시판, 글쓰기, 역할 참여, 모바일 세로 다이어그램, 후천 사방 이동판과 꾸미기 흐름을 확인합니다. 화면을 구성하는 상위 원칙은 [Hongdal 0.0](../Versions/v0.0/README.md)과 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)에 둡니다.
+[통합 커뮤니티 클라이언트와 꾸미기 상점](unified-community-client.md)에서 게시판, 글쓰기, 역할 참여, 모바일 세로 다이어그램, 후천 사방 이동판과 꾸미기 흐름을 확인합니다. 화면을 구성하는 상위 원칙은 [Ssalddel 0.0](../Versions/v0.0/README.md)과 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)에 둡니다.
 
 ## 먼저 볼 화면 문서
 
 | 번호 | 문서 | 내용 |
 | --- | --- | --- |
-| 0.0 | [Hongdal 0.0](../Versions/v0.0/README.md) | 글쓰기 → 가원장 → 역할 슬롯 → 실원장으로 이어지는 현재 제품 범위 |
+| 0.0 | [Ssalddel 0.0](../Versions/v0.0/README.md) | 글쓰기 → 가원장 → 역할 슬롯 → 실원장으로 이어지는 현재 제품 범위 |
 | 00 | [첨부 문서 목차](00-첨부문서목차.md) | 화면 문서부터 기술 문서까지 읽는 순서 |
 | 01 | [page-docs/README.md](page-docs/README.md) | 각 화면별 독립 README와 인라인 캡처, 상세 설명 |
 | 02 | [unified-community-client.md](unified-community-client.md) | 통합 홈, 역할, 모바일 다이어그램, 사방 이동, 꾸미기 상점 |
 | 03 | [ThreeStageClientNavigation.md](../Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지의 사용자 화면 구조 |
 | 04 | [app-page-catalog.md](app-page-catalog.md) | 코드 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
-| 05 | [hongdal-v1-required-pages.md](hongdal-v1-required-pages.md) | 홍달 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
-| 06 | [hongdal-v1-page-validation-walkthrough.md](hongdal-v1-page-validation-walkthrough.md) | 1.0 필수 페이지를 하나씩 검증하는 순례 순서와 확인 항목 |
-| 07 | [hongdal-v1-render-capture-summary.md](hongdal-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
+| 05 | [ssalddel-v1-required-pages.md](ssalddel-v1-required-pages.md) | 살뜰 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
+| 06 | [ssalddel-v1-page-validation-walkthrough.md](ssalddel-v1-page-validation-walkthrough.md) | 1.0 필수 페이지를 하나씩 검증하는 순례 순서와 확인 항목 |
+| 07 | [ssalddel-v1-render-capture-summary.md](ssalddel-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
 | 08 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 코드 프로젝트의 화면이 하나의 업무 흐름을 완성하는 관계를 설명 |
 | 09 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 노드 행동, 모드 전환이 다음 행동으로 이어지는 흐름 |
 

@@ -1,4 +1,4 @@
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace HumanResourcesManagerApp.ViewModels;
 

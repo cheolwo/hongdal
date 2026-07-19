@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Food;
+using Ssalddel.Contracts.Food;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 using RestaurantDeskApp.Options;

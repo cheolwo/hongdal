@@ -1,0 +1,72 @@
+@page "/login"
+@inject WebAuthSessionService AuthSession
+
+<WebPageHeader Eyebrow="Web Login"
+               Title="웹 로그인"
+               Description="서버 인증 API로 토큰을 받아 WebApp API 호출에 사용합니다."
+               Badge="공통 로그인 패널" />
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="12" md="7" lg="5">
+        <Ssalddel공통로그인Panel 제목="살뜰 로그인"
+                              설명="화주, 기사, 창고 관리자, 주문자 웹 화면을 같은 로그인 패턴으로 확인합니다."
+                              초기아이디="web-user@ssalddel.local"
+                              상태메시지="@StatusMessage"
+                              상태Severity="@StatusSeverity"
+                              개발힌트목록="Hints"
+                              OnPasswordLogin="HandlePasswordLoginAsync"
+                              OnSocialLogin="HandleSocialLoginAsync">
+            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                로그인에 성공하면 브라우저 localStorage에 웹앱용 토큰을 보관하고, 대표 역할에 맞춰 웹앱 레이아웃 색상이 바뀝니다.
+            </MudAlert>
+        </Ssalddel공통로그인Panel>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private static readonly IReadOnlyList<string> Hints = ["화주", "기사", "창고관리자", "주문자", "흥여회"];
+    private string? StatusMessage { get; set; }
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await AuthSession.RestoreAsync();
+        if (AuthSession.IsLoggedIn)
+        {
+            StatusSeverity = Severity.Success;
+            StatusMessage = $"{AuthSession.UserName ?? AuthSession.UserId} 계정의 서버 인증 토큰을 복구했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandlePasswordLoginAsync(공통로그인요청 request)
+    {
+        try
+        {
+            StatusSeverity = Severity.Info;
+            StatusMessage = "서버 인증 API로 로그인하는 중입니다.";
+
+            await AuthSession.LoginAsync(request.UserNameOrEmail, request.Password);
+
+            StatusSeverity = Severity.Success;
+            StatusMessage = $"{AuthSession.UserName ?? request.UserNameOrEmail} 계정으로 서버 인증을 완료했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
+        }
+        catch (Exception ex)
+        {
+            StatusSeverity = Severity.Error;
+            StatusMessage = ex.Message;
+        }
+    }
+
+    private Task HandleSocialLoginAsync(공통소셜로그인요청 request)
+    {
+        StatusSeverity = Severity.Info;
+        StatusMessage = $"{request.ProviderDisplayName} OAuth 연결은 서버 인증 API 연결 단계에서 활성화됩니다.";
+        return Task.CompletedTask;
+    }
+}

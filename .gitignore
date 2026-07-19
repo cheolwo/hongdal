@@ -16,11 +16,13 @@
 **/logs/
 
 # Local secrets / overrides
+.env
+**/.env
 appsettings.Local.json
 appsettings.*.local.json
 *.secret.json
-/Hongdal/App_Data/
-/Hongdal/.local-storage/
+/Ssalddel/App_Data/
+/Ssalddel/.local-storage/
 *.secrets.json
 secrets.json
 secrets.*.json
@@ -41,6 +43,7 @@ Thumbs.db
 **/.artifacts/
 **/.codex-build/
 /artifacts/build-check/
+/artifacts/build/
 /artifacts/*-bin/
 /artifacts/*-build/
 /artifacts/*-tests/

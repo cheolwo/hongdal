@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
-using Hongdal.Contracts.Food;
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Contracts.Food;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace RestaurantDeskApp.Services;
 
-public sealed class 배차주소ApiService(HongdalProtectedApiClient protectedApiClient)
+public sealed class 배차주소ApiService(SsalddelProtectedApiClient protectedApiClient)
 {
     public async Task<배차주소저장결과> 저장Async(배차주소저장요청 request, CancellationToken cancellationToken = default)
     {

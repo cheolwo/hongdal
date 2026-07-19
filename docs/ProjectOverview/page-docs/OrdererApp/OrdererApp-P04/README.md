@@ -51,7 +51,7 @@
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 워크플로우 문서 | - | `api/v1/orderer/restaurant-search-policy` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/orderer/restaurant-search-policy` [Hongdal/Controllers/Orderer/RestaurantSearchPolicyPublicController.cs](../../../../../Hongdal/Controllers/Orderer/RestaurantSearchPolicyPublicController.cs) |
+| 워크플로우 문서 | - | `api/v1/orderer/restaurant-search-policy` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/orderer/restaurant-search-policy` [Ssalddel/Controllers/Orderer/RestaurantSearchPolicyPublicController.cs](../../../../../Ssalddel/Controllers/Orderer/RestaurantSearchPolicyPublicController.cs) |
 
 검증할 때는 이 화면이 직접 메모리 데이터만 보는지, 위 API 응답을 받아 상태를 표시하는지, 실패했을 때 사용자가 다음 행동을 알 수 있는지 확인합니다.
 
@@ -68,5 +68,5 @@
 ## 보완 메모
 
 - 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 hongdal-v1-required-pages.md에도 반영합니다.
+- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
 - 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.

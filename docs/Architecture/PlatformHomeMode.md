@@ -1,12 +1,12 @@
 # Platform Home Mode
 
-Hongdal 클라이언트는 앱을 역할별로 복제하지 않고 하나의 셸에서 역할과 커뮤니티 문맥을 공유한다. 업무 탐색은 [3단계 내비게이션](ThreeStageClientNavigation.md)에 따라 `사방괘 → 다이어그램 → 구체 데이터 페이지`로 이어진다. 실제 화면과 캡처는 [통합 커뮤니티 클라이언트와 꾸미기 상점](../ProjectOverview/unified-community-client.md)에서 본다.
+Ssalddel 클라이언트는 앱을 역할별로 복제하지 않고 하나의 셸에서 역할과 커뮤니티 문맥을 공유한다. 업무 탐색은 [3단계 내비게이션](ThreeStageClientNavigation.md)에 따라 `사방괘 → 다이어그램 → 구체 데이터 페이지`로 이어진다. 실제 화면과 캡처는 [통합 커뮤니티 클라이언트와 꾸미기 상점](../ProjectOverview/unified-community-client.md)에서 본다.
 
 ## 구조
 
 ```mermaid
 flowchart TD
-    A["/ · UnifiedHome"] --> B{"HongdalClientRoleService"}
+    A["/ · UnifiedHome"] --> B{"SsalddelClientRoleService"}
     B -->|역할 미설정| N["RoleNeutralHome"]
     B -->|화주| C["Home · /shipper"]
     B -->|창고 관리자| D["WarehouseManagerRoleHome"]
@@ -24,9 +24,9 @@ flowchart TD
 ## 책임
 
 - `UnifiedHome`: 현재 역할을 읽고 해당 역할 홈만 선택한다.
-- `HongdalClientRoleService`: 역할과 `Preferences` 저장, 변경 이벤트를 담당한다.
+- `SsalddelClientRoleService`: 역할과 `Preferences` 저장, 변경 이벤트를 담당한다.
 - `MainLayout`: 우측 상단 역할 패널을 열고 역할 변경 후 `/`로 이동한다.
-- `HongdalClientNavigationCatalog`: 역할별 좌측 메뉴를 제공한다.
+- `SsalddelClientNavigationCatalog`: 역할별 좌측 메뉴를 제공한다.
 - `PlatformCommunityHome`: 공통 홈 요약과 세 모드의 공통 UI·모드 상태를 조정한다.
 - `PlatformCommunityHomeSummary`: 첫 화면에서 실시간 베스트, 커뮤니티 현황, 꾸미기 상점 현황만 축약해 보여준다.
 - 역할 홈: `CommunityModeContent`, `WorkModeContent`, `QuickActions`, 사방 이동 항목을 주입한다.
@@ -71,9 +71,9 @@ flowchart TD
 
 역할 미설정 상태에서는 바깥 사방괘를 표시하지 않는다. 대신 바깥쪽 빨간 `방편`·파란 `반야` 태극과 안쪽 `커뮤니티`·`상점` 간괘 태극을 겹친 두 겹 태극을 표시한다. 외곽의 방편은 위·왼쪽·오른쪽을 넓게 감싸고, 반야는 아래 중앙의 곡선 영역만 차지한다. 안쪽은 먹색 `#171717` 커뮤니티와 목재 갈색 `#8B5E3C` 상점, 상아색 테두리로 구성해 물 위에 뜬 배의 인상을 만든다. 역할을 선택하면 안쪽 태극은 유지하고 바깥쪽만 역할별 사방괘로 바뀐다.
 
-파란 `반야` 영역의 홍익학당 원자료 관리 화면은 일반 홍달 앱에서 제외한다. 현재 홍익학당은 협력업체가 아니므로 `HongdalAdminApp`의 공통 홈에서만 `/prajna/hongik-hakdang` 관리 화면으로 이동한다. 재생목록, 영상, 수집 카드와 파생 이미지는 서버관리자 전용 API로 조회·동기화한다. 일반 사용자는 원자료 관리 기능을 볼 수 없고, 관리자가 개별 자료를 명시적으로 승인하고 별도 배치를 켠 경우에만 출처와 비제휴 안내를 포함한 링크 글이 `반야` 게시판에 한 건씩 올라온다. 모바일 카드 배포는 계속 별도 기능이다.
+파란 `반야` 영역의 홍익학당 원자료 관리 화면은 일반 살뜰 앱에서 제외한다. 현재 홍익학당은 협력업체가 아니므로 `SsalddelAdminApp`의 공통 홈에서만 `/prajna/hongik-hakdang` 관리 화면으로 이동한다. 재생목록, 영상, 수집 카드와 파생 이미지는 서버관리자 전용 API로 조회·동기화한다. 일반 사용자는 원자료 관리 기능을 볼 수 없고, 관리자가 개별 자료를 명시적으로 승인하고 별도 배치를 켠 경우에만 출처와 비제휴 안내를 포함한 링크 글이 `반야` 게시판에 한 건씩 올라온다. 모바일 카드 배포는 계속 별도 기능이다.
 
-`HongdalAdminApp`은 Android와 Windows를 지원하는 MAUI Blazor Hybrid 운영 앱이다. `/community-management`에서는 정확한 사용자 ID를 기준으로 계정 연락처, 역할, API 활동 로그, 작성 게시글과 댓글을 한 화면에서 확인한다. 게시글 수정과 게시글·댓글 숨김/복구는 조치 사유를 필수로 받고, 연락 앱을 열기 전에도 연락 수단과 메모를 관리자 감사 로그에 남긴다. 원장 성립 시스템 게시글은 운영자가 수정하거나 숨길 수 없다.
+`SsalddelAdminApp`은 Android와 Windows를 지원하는 MAUI Blazor Hybrid 운영 앱이다. `/community-management`에서는 정확한 사용자 ID를 기준으로 계정 연락처, 역할, API 활동 로그, 작성 게시글과 댓글을 한 화면에서 확인한다. 게시글 수정과 게시글·댓글 숨김/복구는 조치 사유를 필수로 받고, 연락 앱을 열기 전에도 연락 수단과 메모를 관리자 감사 로그에 남긴다. 원장 성립 시스템 게시글은 운영자가 수정하거나 숨길 수 없다.
 
 홍익학당 카드의 `원본 감지 상태`와 `관리자 ON/OFF`는 분리한다. 관리자가 끈 카드와 카드 묶음은 다음 수집 동기화 뒤에도 꺼진 상태를 유지하며, 관리자 전용 화면에서만 저장 이미지 미리보기와 상태 변경을 수행한다.
 

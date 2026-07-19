@@ -25,9 +25,9 @@
 
 ## 검증
 
-- `dotnet test Hongdal.Tests/Hongdal.Tests.csproj --filter "FullyQualifiedName~CommunityReadingThemePresentationTests|FullyQualifiedName~CommunityDecorationSelectionStoreTests|FullyQualifiedName~PlatformCommunityDecorationStateServiceTests" --no-restore`
+- `dotnet test Ssalddel.Tests/Ssalddel.Tests.csproj --filter "FullyQualifiedName~CommunityReadingThemePresentationTests|FullyQualifiedName~CommunityDecorationSelectionStoreTests|FullyQualifiedName~PlatformCommunityDecorationStateServiceTests" --no-restore`
 - 관련 테스트 11개 통과
-- `dotnet build Hongdal.WebApp/Hongdal.WebApp.csproj --no-restore` 경고·오류 없음
+- `dotnet build Ssalddel.WebApp/Ssalddel.WebApp.csproj --no-restore` 경고·오류 없음
 - `/community`, `/community/boards`, 샘플 글 본문에서 브라우저 console error와 가로 overflow 없음 확인
 - 상점에서 `논어 배움의 뜰` 적용 후 직접 재접속해 패키지명 `논어 배움의 뜰`, 기호 `仁`, 강조색 `#35614D` 복원 확인
 - 로컬 검증에서는 커뮤니티 API를 함께 실행하지 않아 게시판 수가 fallback 또는 loading 상태로 표시됐다.

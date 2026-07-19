@@ -1,6 +1,6 @@
 ﻿# 코드 프로젝트별 전체 페이지 카탈로그
 
-이 문서는 홍달 저장소 안의 클라이언트 프로젝트에 선언된 `@page` 라우트를 코드 위치별로 모은 전체 페이지 카탈로그다. 사용자에게 별도 앱을 강제하는 내비게이션 목록이 아니라, 통합 클라이언트 화면의 구현 파일을 찾기 위한 물리 색인이다. 사용자 화면은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)의 `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 이해한다.
+이 문서는 살뜰 저장소 안의 클라이언트 프로젝트에 선언된 `@page` 라우트를 코드 위치별로 모은 전체 페이지 카탈로그다. 사용자에게 별도 앱을 강제하는 내비게이션 목록이 아니라, 통합 클라이언트 화면의 구현 파일을 찾기 위한 물리 색인이다. 사용자 화면은 [통합 클라이언트 3단계 내비게이션](../Architecture/ThreeStageClientNavigation.md)의 `사방괘 → 다이어그램 → 구체 데이터 페이지` 순서로 이해한다.
 
 ## 문서 기준
 
@@ -21,8 +21,8 @@
 
 | 단계 | 화면 형태 | 현재 구현 위치 | 문서에서 확인할 것 |
 | --- | --- | --- | --- |
-| 공통 셸 | 역할 선택, 커뮤니티, 하단 내비게이션 | `HongdalApp`의 `/`, `/shipper`, `MainLayout` | 역할이 바뀔 때 세 단계의 메뉴와 문맥이 함께 바뀌는가 |
-| 1단계 | 후천 사방 이동판 | `PlatformCommunityHome` 내부의 `HongdalLaterHeavenBaguaNavigator` | 역할별 네 방향과 관련 다이어그램 진입 |
+| 공통 셸 | 역할 선택, 커뮤니티, 하단 내비게이션 | `SsalddelApp`의 `/`, `/shipper`, `MainLayout` | 역할이 바뀔 때 세 단계의 메뉴와 문맥이 함께 바뀌는가 |
+| 1단계 | 후천 사방 이동판 | `PlatformCommunityHome` 내부의 `SsalddelLaterHeavenBaguaNavigator` | 역할별 네 방향과 관련 다이어그램 진입 |
 | 2단계 | 원장 관계·흐름 다이어그램 | `PlatformCommunityHome` 다이어그램 모드 | 단일·연결·복합 원장 경계, 노드 요약, 상태, 진행도, 행동 메뉴 |
 | 3단계 | 목록·상세·작업 페이지 | 아래 `@page` 카탈로그 | 한 페이지가 한 가지 조회·입력·처리 책임을 갖는가 |
 
@@ -54,10 +54,10 @@
 
 | 코드 프로젝트 | 페이지 수 | 주 사용자 | 현재 포함 화면 |
 | --- | ---: | --- | --- |
-| `HongdalApp` | 30 | 화주, 창고 관리자, 판매자, 물류 의뢰자 | 통합 커뮤니티, 역할 전환, 운송 의뢰, 창고/입고, 꾸미기 상점 |
+| `SsalddelApp` | 30 | 화주, 창고 관리자, 판매자, 물류 의뢰자 | 통합 커뮤니티, 역할 전환, 운송 의뢰, 창고/입고, 꾸미기 상점 |
 | `DriverApp` | 23 | 기사 | 운행 시작, 추천, 수락/거절, 상차/하차, 정산, 알림 |
-| `HongdalAdmin` | 42 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
-| `HongdalAdminApp` | 6 | 커뮤니티 운영자 | 공통 홈, 커뮤니티 운영, 출처 자료 검토·글쓰기, 반야 선별 운영 |
+| `SsalddelAdmin` | 42 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
+| `SsalddelAdminApp` | 6 | 커뮤니티 운영자 | 공통 홈, 커뮤니티 운영, 출처 자료 검토·글쓰기, 반야 선별 운영 |
 | `WarehouseManagerApp` | 13 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 알뜰살뜰 마트 창고 |
 | `OrdererApp` | 8 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
@@ -71,42 +71,42 @@
 | 인증 필요 | 0 | 관리자 보호 라우트도 개발용 인증 세션과 문서용 메모리 데이터로 운영 화면까지 캡처한 상태 |
 | 캡처 대기 | 4 | 운송 업무, 내 꾸미기 만들기, Admin Fake PG/정산, 마트 피킹/포장 전용 캡처 필요 |
 
-## HongdalApp
+## SsalddelApp
 
 | 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `HongdalApp-P00 - 역할 기반 통합 커뮤니티 홈` | `/` | `HongdalApp/Components/Pages/UnifiedHome.razor` | 필수 | 현재 역할에 맞는 화주 또는 창고 관리자 홈 선택 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P00.png" alt="HongdalApp-P00" width="160"> |
-| `HongdalApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입` | `/shipper` | `HongdalApp/Components/Pages/Home.razor` | 필수 | 커뮤니티와 화주 업무 요약, 목적별 업무 진입 | `HongdalApp-P01` | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P01.png" alt="HongdalApp-P01" width="160"> |
-| `HongdalApp-P01-1 - 화주 프로필과 운영 프로필 설정` | `/shipper/settings/profile` | `HongdalApp/Components/Pages/ShipperProfileSettings.razor` | 보조 | 화주 프로필과 운영 프로필 설정 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P01-1.png" alt="HongdalApp-P01-1" width="160"> |
-| `HongdalApp-P01-2 - 화주 앱 메뉴/화면 노출 설정` | `/shipper/settings/views` | `HongdalApp/Components/Pages/ShipperViewSettings.razor` | 보조 | 화주 앱 메뉴/화면 노출 설정 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P01-2.png" alt="HongdalApp-P01-2" width="160"> |
-| `HongdalApp-P01-3 - 공개 화물 또는 공개 의뢰 확인` | `/shipper/public-cargo` | `HongdalApp/Components/Pages/PublicCargo.razor` | 확장 | 공개 화물 또는 공개 의뢰 확인 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P01-3.png" alt="HongdalApp-P01-3" width="160"> |
-| `HongdalApp-P01-4 - 탐색/제안성 업무 수신함` | `/shipper/exploration/inbox` | `HongdalApp/Components/Pages/ExplorationInbox.razor` | 확장 | 탐색/제안성 업무 수신함 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P01-4.png" alt="HongdalApp-P01-4" width="160"> |
-| `HongdalApp-P02 - 운송 의뢰 작성` | `/shipper/request` | `HongdalApp/Components/Pages/ShipperRequestWizard.razor` | 필수 | 운송 의뢰 작성 | `HongdalApp-P02` | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P02.png" alt="HongdalApp-P02" width="160"> |
-| `HongdalApp-P02-1 - 운송 의뢰 대량 등록` | `/shipper/request/bulk` | `HongdalApp/Components/Pages/ShipperBulkImport.razor` | 보조 | 운송 의뢰 대량 등록 | `HongdalApp-P02-1` | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P02-1.png" alt="HongdalApp-P02-1" width="160"> |
-| `HongdalApp-P02-2 - 배차 주소 입력/검증 폼` | `/dispatch/address-form` | `HongdalApp/Components/Pages/DispatchAddressForm.razor` | 보조 | 배차 주소 입력/검증 폼 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P02-2.png" alt="HongdalApp-P02-2" width="160"> |
-| `HongdalApp-P03 - 의뢰 상세, 결제/배차/상차/하차/정산 타임라인` | `/shipper/request/{RequestId}` | `HongdalApp/Components/Pages/ShipperRequestDetail.razor` | 필수 | 의뢰 상세, 결제/배차/상차/하차/정산 타임라인 | `HongdalApp-P03` | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P03.png" alt="HongdalApp-P03" width="160"> |
-| `HongdalApp-P04 - 화주 입고 업무 대시보드` | `/shipper/inbound/dashboard` | `HongdalApp/Components/Pages/InboundDashboard.razor` | 확장 | 화주 입고 업무 대시보드 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P04.png" alt="HongdalApp-P04" width="160"> |
-| `HongdalApp-P04-1 - 입고 요청 목록과 처리` | `/shipper/inbound/requests` | `HongdalApp/Components/Pages/InboundRequests.razor` | 확장 | 입고 요청 목록과 처리 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P04-1.png" alt="HongdalApp-P04-1" width="160"> |
-| `HongdalApp-P05 - 화주 관점 창고 업무 허브` | `/shipper/warehouse/workspace` | `HongdalApp/Components/Pages/WarehouseWorkspace.razor` | 확장 | 화주 관점 창고 업무 허브 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P05.png" alt="HongdalApp-P05" width="160"> |
-| `HongdalApp-P05-1 - 창고 재고 조회` | `/shipper/warehouse/inventory` | `HongdalApp/Components/Pages/WarehouseInventory.razor` | 확장 | 창고 재고 조회 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P05-1.png" alt="HongdalApp-P05-1" width="160"> |
-| `HongdalApp-P05-2 - 창고 스캔 작업` | `/shipper/warehouse/scan` | `HongdalApp/Components/Pages/WarehouseScanStation.razor` | 확장 | 창고 스캔 작업 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P05-2.png" alt="HongdalApp-P05-2" width="160"> |
-| `HongdalApp-P05-3 - 창고 프로세스별 작업 시작` | `/shipper/warehouse/work/{ProcessCode}` | `HongdalApp/Components/Pages/WarehouseWorkStart.razor` | 확장 | 창고 프로세스별 작업 시작 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P05-3.png" alt="HongdalApp-P05-3" width="160"> |
-| `HongdalApp-P06 - 판매채널 연결/관리` | `/shipper/sales/channels` | `HongdalApp/Components/Pages/SalesChannels.razor` | 확장 | 판매채널 연결/관리 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P06.png" alt="HongdalApp-P06" width="160"> |
-| `HongdalApp-P06-1 - 상품 등록/리스팅` | `/shipper/sales/listings` | `HongdalApp/Components/Pages/ProductListings.razor` | 확장 | 상품 등록/리스팅 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P06-1.png" alt="HongdalApp-P06-1" width="160"> |
-| `HongdalApp-P06-2 - 판매 주문 이행/출고 연결` | `/shipper/sales/orders` | `HongdalApp/Components/Pages/OrderFulfillment.razor` | 확장 | 판매 주문 이행/출고 연결 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P06-2.png" alt="HongdalApp-P06-2" width="160"> |
-| `HongdalApp-P07 - FCL/LCL 해외 물류 계획` | `/shipper/international/fcl-lcl` | `HongdalApp/Components/Pages/FclLclPlanner.razor` | 확장 | FCL/LCL 해외 물류 계획 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P07.png" alt="HongdalApp-P07" width="160"> |
-| `HongdalApp-P07-1 - HS 코드/통관 검토` | `/shipper/customs/hs-reviews` | `HongdalApp/Components/Pages/CustomsHsReviews.razor` | 확장 | HS 코드/통관 검토 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P07-1.png" alt="HongdalApp-P07-1" width="160"> |
-| `HongdalApp-P08 - 재위탁/재운송 주문` | `/shipper/reconsignment/orders` | `HongdalApp/Components/Pages/ReconsignmentOrders.razor` | 확장 | 재위탁/재운송 주문 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P08.png" alt="HongdalApp-P08" width="160"> |
-| `HongdalApp-P09 - 운송 업무 워크스페이스` | `/shipper/transport` | `HongdalApp/Components/Pages/TransportWorkspace.razor` | 필수 | 의뢰별 결제·배차·운송 진행 상태와 다음 행동 처리 | - | 캡처 대기 |
-| `HongdalApp-P10 - 꾸미기 상점` | `/community/decorations` | `HongdalApp/Components/Pages/CommunityDecorationStorePage.razor` | 확장 | 홈 테마·노드·괘상 상품 탐색 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P10.png" alt="HongdalApp-P10" width="160"> |
-| `HongdalApp-P10-1 - 꾸미기 상품 상세` | `/community/decorations/{ProductKey}` | `HongdalApp/Components/Pages/CommunityDecorationDetailPage.razor` | 확장 | 전체 테마 미리보기, 구매·적용 판단 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P10-1.png" alt="HongdalApp-P10-1" width="160"> |
-| `HongdalApp-P10-2 - 꾸미기 FakePG 결제` | `/community/decorations/{ProductKey}/checkout` | `HongdalApp/Components/Pages/CommunityDecorationCheckoutPage.razor` | 개발·확장 | 실제 청구 없는 개발용 구매 승인 흐름 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P10-2.png" alt="HongdalApp-P10-2" width="160"> |
-| `HongdalApp-P10-2-1 - 홈 테마 구매 완료와 적용 선택` | `/community/decorations/{ProductKey}/checkout` | `HongdalApp/Components/Pages/CommunityDecorationCheckoutPage.razor` | 개발·확장 | 구매 완료 확인과 명시적 전체 적용 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P10-2-1.png" alt="HongdalApp-P10-2-1" width="160"> |
-| `HongdalApp-P10-3 - 내 꾸미기 만들기` | `/community/decorations/create` | `HongdalApp/Components/Pages/CommunityDecorationCreatePage.razor` | 확장 | 개인 괘상·다이어그램 노드 이미지 제작 | - | 캡처 대기 |
-| `HongdalApp-P10-4 - 디자이너 홈 테마 패키지 등록` | `/community/decorations/themes/submit` | `HongdalApp/Components/Pages/CommunityDecorationThemeSubmitPage.razor` | 확장·제작 | 8개 시각 슬롯 패키지 제작과 미리보기 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P10-4.png" alt="HongdalApp-P10-4" width="160"> |
-| `HongdalApp-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `HongdalApp/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P90.png" alt="HongdalApp-P90" width="160"> |
-| `HongdalApp-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `HongdalApp/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P91.png" alt="HongdalApp-P91" width="160"> |
-| `HongdalApp-P99 - 미발견 페이지` | `/not-found` | `HongdalApp/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/HongdalApp/HongdalApp-P99.png" alt="HongdalApp-P99" width="160"> |
+| `SsalddelApp-P00 - 역할 기반 통합 커뮤니티 홈` | `/` | `SsalddelApp/Components/Pages/UnifiedHome.razor` | 필수 | 현재 역할에 맞는 화주 또는 창고 관리자 홈 선택 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P00.png" alt="SsalddelApp-P00" width="160"> |
+| `SsalddelApp-P01 - 화주 업무 홈, 운송 의뢰/상태/창고/판매 업무 진입` | `/shipper` | `SsalddelApp/Components/Pages/Home.razor` | 필수 | 커뮤니티와 화주 업무 요약, 목적별 업무 진입 | `SsalddelApp-P01` | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P01.png" alt="SsalddelApp-P01" width="160"> |
+| `SsalddelApp-P01-1 - 화주 프로필과 운영 프로필 설정` | `/shipper/settings/profile` | `SsalddelApp/Components/Pages/ShipperProfileSettings.razor` | 보조 | 화주 프로필과 운영 프로필 설정 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P01-1.png" alt="SsalddelApp-P01-1" width="160"> |
+| `SsalddelApp-P01-2 - 화주 앱 메뉴/화면 노출 설정` | `/shipper/settings/views` | `SsalddelApp/Components/Pages/ShipperViewSettings.razor` | 보조 | 화주 앱 메뉴/화면 노출 설정 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P01-2.png" alt="SsalddelApp-P01-2" width="160"> |
+| `SsalddelApp-P01-3 - 공개 화물 또는 공개 의뢰 확인` | `/shipper/public-cargo` | `SsalddelApp/Components/Pages/PublicCargo.razor` | 확장 | 공개 화물 또는 공개 의뢰 확인 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P01-3.png" alt="SsalddelApp-P01-3" width="160"> |
+| `SsalddelApp-P01-4 - 탐색/제안성 업무 수신함` | `/shipper/exploration/inbox` | `SsalddelApp/Components/Pages/ExplorationInbox.razor` | 확장 | 탐색/제안성 업무 수신함 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P01-4.png" alt="SsalddelApp-P01-4" width="160"> |
+| `SsalddelApp-P02 - 운송 의뢰 작성` | `/shipper/request` | `SsalddelApp/Components/Pages/ShipperRequestWizard.razor` | 필수 | 운송 의뢰 작성 | `SsalddelApp-P02` | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P02.png" alt="SsalddelApp-P02" width="160"> |
+| `SsalddelApp-P02-1 - 운송 의뢰 대량 등록` | `/shipper/request/bulk` | `SsalddelApp/Components/Pages/ShipperBulkImport.razor` | 보조 | 운송 의뢰 대량 등록 | `SsalddelApp-P02-1` | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P02-1.png" alt="SsalddelApp-P02-1" width="160"> |
+| `SsalddelApp-P02-2 - 배차 주소 입력/검증 폼` | `/dispatch/address-form` | `SsalddelApp/Components/Pages/DispatchAddressForm.razor` | 보조 | 배차 주소 입력/검증 폼 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P02-2.png" alt="SsalddelApp-P02-2" width="160"> |
+| `SsalddelApp-P03 - 의뢰 상세, 결제/배차/상차/하차/정산 타임라인` | `/shipper/request/{RequestId}` | `SsalddelApp/Components/Pages/ShipperRequestDetail.razor` | 필수 | 의뢰 상세, 결제/배차/상차/하차/정산 타임라인 | `SsalddelApp-P03` | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P03.png" alt="SsalddelApp-P03" width="160"> |
+| `SsalddelApp-P04 - 화주 입고 업무 대시보드` | `/shipper/inbound/dashboard` | `SsalddelApp/Components/Pages/InboundDashboard.razor` | 확장 | 화주 입고 업무 대시보드 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P04.png" alt="SsalddelApp-P04" width="160"> |
+| `SsalddelApp-P04-1 - 입고 요청 목록과 처리` | `/shipper/inbound/requests` | `SsalddelApp/Components/Pages/InboundRequests.razor` | 확장 | 입고 요청 목록과 처리 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P04-1.png" alt="SsalddelApp-P04-1" width="160"> |
+| `SsalddelApp-P05 - 화주 관점 창고 업무 허브` | `/shipper/warehouse/workspace` | `SsalddelApp/Components/Pages/WarehouseWorkspace.razor` | 확장 | 화주 관점 창고 업무 허브 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P05.png" alt="SsalddelApp-P05" width="160"> |
+| `SsalddelApp-P05-1 - 창고 재고 조회` | `/shipper/warehouse/inventory` | `SsalddelApp/Components/Pages/WarehouseInventory.razor` | 확장 | 창고 재고 조회 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P05-1.png" alt="SsalddelApp-P05-1" width="160"> |
+| `SsalddelApp-P05-2 - 창고 스캔 작업` | `/shipper/warehouse/scan` | `SsalddelApp/Components/Pages/WarehouseScanStation.razor` | 확장 | 창고 스캔 작업 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P05-2.png" alt="SsalddelApp-P05-2" width="160"> |
+| `SsalddelApp-P05-3 - 창고 프로세스별 작업 시작` | `/shipper/warehouse/work/{ProcessCode}` | `SsalddelApp/Components/Pages/WarehouseWorkStart.razor` | 확장 | 창고 프로세스별 작업 시작 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P05-3.png" alt="SsalddelApp-P05-3" width="160"> |
+| `SsalddelApp-P06 - 판매채널 연결/관리` | `/shipper/sales/channels` | `SsalddelApp/Components/Pages/SalesChannels.razor` | 확장 | 판매채널 연결/관리 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P06.png" alt="SsalddelApp-P06" width="160"> |
+| `SsalddelApp-P06-1 - 상품 등록/리스팅` | `/shipper/sales/listings` | `SsalddelApp/Components/Pages/ProductListings.razor` | 확장 | 상품 등록/리스팅 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P06-1.png" alt="SsalddelApp-P06-1" width="160"> |
+| `SsalddelApp-P06-2 - 판매 주문 이행/출고 연결` | `/shipper/sales/orders` | `SsalddelApp/Components/Pages/OrderFulfillment.razor` | 확장 | 판매 주문 이행/출고 연결 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P06-2.png" alt="SsalddelApp-P06-2" width="160"> |
+| `SsalddelApp-P07 - FCL/LCL 해외 물류 계획` | `/shipper/international/fcl-lcl` | `SsalddelApp/Components/Pages/FclLclPlanner.razor` | 확장 | FCL/LCL 해외 물류 계획 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P07.png" alt="SsalddelApp-P07" width="160"> |
+| `SsalddelApp-P07-1 - HS 코드/통관 검토` | `/shipper/customs/hs-reviews` | `SsalddelApp/Components/Pages/CustomsHsReviews.razor` | 확장 | HS 코드/통관 검토 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P07-1.png" alt="SsalddelApp-P07-1" width="160"> |
+| `SsalddelApp-P08 - 재위탁/재운송 주문` | `/shipper/reconsignment/orders` | `SsalddelApp/Components/Pages/ReconsignmentOrders.razor` | 확장 | 재위탁/재운송 주문 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P08.png" alt="SsalddelApp-P08" width="160"> |
+| `SsalddelApp-P09 - 운송 업무 워크스페이스` | `/shipper/transport` | `SsalddelApp/Components/Pages/TransportWorkspace.razor` | 필수 | 의뢰별 결제·배차·운송 진행 상태와 다음 행동 처리 | - | 캡처 대기 |
+| `SsalddelApp-P10 - 꾸미기 상점` | `/community/decorations` | `SsalddelApp/Components/Pages/CommunityDecorationStorePage.razor` | 확장 | 홈 테마·노드·괘상 상품 탐색 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P10.png" alt="SsalddelApp-P10" width="160"> |
+| `SsalddelApp-P10-1 - 꾸미기 상품 상세` | `/community/decorations/{ProductKey}` | `SsalddelApp/Components/Pages/CommunityDecorationDetailPage.razor` | 확장 | 전체 테마 미리보기, 구매·적용 판단 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-1.png" alt="SsalddelApp-P10-1" width="160"> |
+| `SsalddelApp-P10-2 - 꾸미기 FakePG 결제` | `/community/decorations/{ProductKey}/checkout` | `SsalddelApp/Components/Pages/CommunityDecorationCheckoutPage.razor` | 개발·확장 | 실제 청구 없는 개발용 구매 승인 흐름 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-2.png" alt="SsalddelApp-P10-2" width="160"> |
+| `SsalddelApp-P10-2-1 - 홈 테마 구매 완료와 적용 선택` | `/community/decorations/{ProductKey}/checkout` | `SsalddelApp/Components/Pages/CommunityDecorationCheckoutPage.razor` | 개발·확장 | 구매 완료 확인과 명시적 전체 적용 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-2-1.png" alt="SsalddelApp-P10-2-1" width="160"> |
+| `SsalddelApp-P10-3 - 내 꾸미기 만들기` | `/community/decorations/create` | `SsalddelApp/Components/Pages/CommunityDecorationCreatePage.razor` | 확장 | 개인 괘상·다이어그램 노드 이미지 제작 | - | 캡처 대기 |
+| `SsalddelApp-P10-4 - 디자이너 홈 테마 패키지 등록` | `/community/decorations/themes/submit` | `SsalddelApp/Components/Pages/CommunityDecorationThemeSubmitPage.razor` | 확장·제작 | 8개 시각 슬롯 패키지 제작과 미리보기 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P10-4.png" alt="SsalddelApp-P10-4" width="160"> |
+| `SsalddelApp-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `SsalddelApp/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P90.png" alt="SsalddelApp-P90" width="160"> |
+| `SsalddelApp-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `SsalddelApp/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P91.png" alt="SsalddelApp-P91" width="160"> |
+| `SsalddelApp-P99 - 미발견 페이지` | `/not-found` | `SsalddelApp/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P99.png" alt="SsalddelApp-P99" width="160"> |
 
 ## DriverApp
 
@@ -136,63 +136,63 @@
 | `DriverApp-P15-1 - 알림 수신 설정` | `/driver/notifications/settings` | `DriverApp/Components/Pages/Driver/04_Settings/알림설정Page.razor` | 보조 | 알림 수신 설정 | `DriverApp-P15-1` | 완료<br><img src="assets/app-pages/DriverApp/DriverApp-P15-1.png" alt="DriverApp-P15-1" width="160"> |
 | `DriverApp-P15-2 - 푸시 토큰/권한 설정` | `/driver/notifications/push` | `DriverApp/Components/Pages/Driver/06_Notification/푸시설정Page.razor` | 보조 | 푸시 토큰/권한 설정 | `DriverApp-P15-2` | 완료<br><img src="assets/app-pages/DriverApp/DriverApp-P15-2.png" alt="DriverApp-P15-2" width="160"> |
 
-## HongdalAdmin
+## SsalddelAdmin
 
 | 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `HongdalAdmin-P00 - 관리자 홈` | `/` | `HongdalAdmin/Components/Pages/Home.razor` | 시스템 | 관리자 홈 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P00.png" alt="HongdalAdmin-P00" width="160"> |
-| `HongdalAdmin-P00-1 - 관리자 로그인` | `/login` | `HongdalAdmin/Components/Pages/AdminLogin.razor` | 시스템 | 관리자 로그인 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P00-1.png" alt="HongdalAdmin-P00-1" width="160"> |
-| `HongdalAdmin-P00-2 - 오류 화면` | `/Error` | `HongdalAdmin/Components/Pages/Error.razor` | 시스템 | 오류 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P00-2.png" alt="HongdalAdmin-P00-2" width="160"> |
-| `HongdalAdmin-P16 - 운영 대시보드` | `/dashboard` | `HongdalAdmin/Components/Pages/Dashboard.razor` | 필수 | 운영 대시보드 | `HongdalAdmin-P16` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P16.png" alt="HongdalAdmin-P16" width="160"> |
-| `HongdalAdmin-P17 - 의뢰 목록` | `/requests` | `HongdalAdmin/Components/Pages/Requests.razor` | 필수 | 의뢰 목록 | `HongdalAdmin-P17` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P17.png" alt="HongdalAdmin-P17" width="160"> |
-| `HongdalAdmin-P18 - 의뢰 상세` | `/requests/{RequestId}` | `HongdalAdmin/Components/Pages/RequestDetail.razor` | 필수 | 의뢰 상세 | `HongdalAdmin-P18` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P18.png" alt="HongdalAdmin-P18" width="160"> |
-| `HongdalAdmin-P19 - 배차대기/추천 잠금 상태` | `/dispatch/wait` | `HongdalAdmin/Components/Pages/DispatchWait.razor` | 필수 | 배차대기/추천 잠금 상태 | `HongdalAdmin-P19` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P19.png" alt="HongdalAdmin-P19" width="160"> |
-| `HongdalAdmin-P20 - 운행 중 기사 현황` | `/drivers/operating` | `HongdalAdmin/Components/Pages/DriverOperatingView.razor` | 필수 | 운행 중 기사 현황 | `HongdalAdmin-P20` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P20.png" alt="HongdalAdmin-P20" width="160"> |
-| `HongdalAdmin-P21 - 운송 목록` | `/transports` | `HongdalAdmin/Components/Pages/Transports.razor` | 필수 | 운송 목록 | `HongdalAdmin-P21` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P21.png" alt="HongdalAdmin-P21" width="160"> |
-| `HongdalAdmin-P22 - 운송 상세 원장` | `/transports/{RequestId}` | `HongdalAdmin/Components/Pages/TransportWorkflowDetail.razor` | 필수 | 운송 상세 원장 | `HongdalAdmin-P22` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22.png" alt="HongdalAdmin-P22" width="160"> |
-| `HongdalAdmin-P22-1 - 운송 이벤트 감사` | `/transports/{RequestId}/events` | `HongdalAdmin/Components/Pages/TransportWorkflowEvents.razor` | 필수 | 운송 이벤트 감사 | `HongdalAdmin-P22-1` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22-1.png" alt="HongdalAdmin-P22-1" width="160"> |
-| `HongdalAdmin-P22-2 - 운송 증빙/POD` | `/transports/{RequestId}/proofs` | `HongdalAdmin/Components/Pages/TransportWorkflowProofs.razor` | 필수 | 운송 증빙/POD | `HongdalAdmin-P22-2` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22-2.png" alt="HongdalAdmin-P22-2" width="160"> |
-| `HongdalAdmin-P22-3 - 운송 정산 상세` | `/transports/{RequestId}/settlement` | `HongdalAdmin/Components/Pages/TransportWorkflowSettlement.razor` | 필수 | 운송 정산 상세 | `HongdalAdmin-P22-3` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P22-3.png" alt="HongdalAdmin-P22-3" width="160"> |
-| `HongdalAdmin-P23 - 관리자 활동 로그` | `/activity-logs` | `HongdalAdmin/Components/Pages/ActivityLogs.razor` | 운영 | 관리자 활동 로그 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P23.png" alt="HongdalAdmin-P23" width="160"> |
-| `HongdalAdmin-P24 - 화면/기능 노출 정책` | `/view-policies` | `HongdalAdmin/Components/Pages/ViewPolicies.razor` | 운영 | 화면/기능 노출 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P24.png" alt="HongdalAdmin-P24" width="160"> |
-| `HongdalAdmin-P25 - 공통 콘텐츠 관리` | `/common-contents` | `HongdalAdmin/Components/Pages/CommonContents.razor` | 운영 | 공통 콘텐츠 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P25.png" alt="HongdalAdmin-P25" width="160"> |
-| `HongdalAdmin-P26 - 결제 목록` | `/payments` | `HongdalAdmin/Components/Pages/Payments.razor` | 필수 | 결제 목록 | `HongdalAdmin-P26` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P26.png" alt="HongdalAdmin-P26" width="160"> |
-| `HongdalAdmin-P26-1 - 정산 목록` | `/settlements` | `HongdalAdmin/Components/Pages/Settlements.razor` | 필수 | 정산 목록 | `HongdalAdmin-P26-1` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P26-1.png" alt="HongdalAdmin-P26-1" width="160"> |
-| `HongdalAdmin-P27 - 문서 목록` | `/documents` | `HongdalAdmin/Components/Pages/Documents.razor` | 필수 | 문서 목록 | `HongdalAdmin-P27` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27.png" alt="HongdalAdmin-P27" width="160"> |
-| `HongdalAdmin-P27-1 - 문서 업로드` | `/documents/upload` | `HongdalAdmin/Components/Pages/DocumentUpload.razor` | 필수 | 문서 업로드 | `HongdalAdmin-P27-1` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-1.png" alt="HongdalAdmin-P27-1" width="160"> |
-| `HongdalAdmin-P27-2 - 문서 정책 목록` | `/documents/policies` | `HongdalAdmin/Components/Pages/DocumentPolicies.razor` | 필수 | 문서 정책 목록 | `HongdalAdmin-P27-2` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-2.png" alt="HongdalAdmin-P27-2" width="160"> |
-| `HongdalAdmin-P27-3 - 문서 정책 상세` | `/documents/policies/{DocumentCode}` | `HongdalAdmin/Components/Pages/DocumentPolicyDetail.razor` | 필수 | 문서 정책 상세 | `HongdalAdmin-P27-3` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-3.png" alt="HongdalAdmin-P27-3" width="160"> |
-| `HongdalAdmin-P27-4 - 문서 조회 로그` | `/documents/logs` | `HongdalAdmin/Components/Pages/DocumentLogs.razor` | 필수 | 문서 조회 로그 | `HongdalAdmin-P27-4` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-4.png" alt="HongdalAdmin-P27-4" width="160"> |
-| `HongdalAdmin-P27-5 - 파일/POD 관리` | `/files/pod` | `HongdalAdmin/Components/Pages/FilesPod.razor` | 필수 | 파일/POD 관리 | `HongdalAdmin-P27-5` | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P27-5.png" alt="HongdalAdmin-P27-5" width="160"> |
-| `HongdalAdmin-P28 - 공개 화물/화물 운영 화면` | `/cargo` | `HongdalAdmin/Components/Pages/PublicCargo.razor` | 운영 | 공개 화물/화물 운영 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P28.png" alt="HongdalAdmin-P28" width="160"> |
-| `HongdalAdmin-P29 - HS 코드/통관 운영` | `/customs/hs-codes` | `HongdalAdmin/Components/Pages/HsCodeOperations.razor` | 운영 | HS 코드/통관 운영 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P29.png" alt="HongdalAdmin-P29" width="160"> |
-| `HongdalAdmin-P30 - 음식 주문/배달 운영` | `/food/operations` | `HongdalAdmin/Components/Pages/FoodOperations.razor` | 운영 | 음식 주문/배달 운영 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P30.png" alt="HongdalAdmin-P30" width="160"> |
-| `HongdalAdmin-P30-1 - 음식점 검색 정책` | `/restaurant-search-policy` | `HongdalAdmin/Components/Pages/RestaurantSearchPolicySettings.razor` | 운영 | 음식점 검색 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P30-1.png" alt="HongdalAdmin-P30-1" width="160"> |
-| `HongdalAdmin-P31 - 탐색 캠페인 운영` | `/exploration/campaigns` | `HongdalAdmin/Components/Pages/ExplorationCampaigns.razor` | 운영 | 탐색 캠페인 운영 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P31.png" alt="HongdalAdmin-P31" width="160"> |
-| `HongdalAdmin-P32 - 기사 목록/관리` | `/drivers` | `HongdalAdmin/Components/Pages/Drivers.razor` | 운영 | 기사 목록/관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P32.png" alt="HongdalAdmin-P32" width="160"> |
-| `HongdalAdmin-P32-1 - 차량 관리` | `/vehicle-management` | `HongdalAdmin/Components/Pages/VehicleManagement.razor` | 운영 | 차량 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P32-1.png" alt="HongdalAdmin-P32-1" width="160"> |
-| `HongdalAdmin-P33 - 파트너 관리` | `/partners` | `HongdalAdmin/Components/Pages/Partners.razor` | 운영 | 파트너 관리 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P33.png" alt="HongdalAdmin-P33" width="160"> |
-| `HongdalAdmin-P34 - 수익/요율 정책` | `/revenue-policies` | `HongdalAdmin/Components/Pages/RevenuePolicies.razor` | 운영 | 수익/요율 정책 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P34.png" alt="HongdalAdmin-P34" width="160"> |
-| `HongdalAdmin-P35 - 보조 기능 설정` | `/auxiliary-feature-settings` | `HongdalAdmin/Components/Pages/AuxiliaryFeatureSettings.razor` | 운영 | 보조 기능 설정 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P35.png" alt="HongdalAdmin-P35" width="160"> |
-| `HongdalAdmin-P36 - 연락처 통합 검색` | `/contact-search` | `HongdalAdmin/Components/Pages/ContactSearch.razor` | 운영 | 전화번호 뒤 8자리 기준 인물/역할 통합 조회 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P36.png" alt="HongdalAdmin-P36" width="160"> |
-| `HongdalAdmin-P37 - 국내화물 AI 배차 검토` | `/dispatch/ai-review` | `HongdalAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor` | 운영 | 국내화물 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P37.png" alt="HongdalAdmin-P37" width="160"> |
-| `HongdalAdmin-P38 - 음식배달 AI 배차 검토` | `/dispatch/food-ai-review` | `HongdalAdmin/Components/Pages/FoodDeliveryDispatchAIReview.razor` | 운영 | 음식배달 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P38.png" alt="HongdalAdmin-P38" width="160"> |
-| `HongdalAdmin-P39 - 배차 AI 판단 사례` | `/dispatch-ai-judgment-cases` | `HongdalAdmin/Components/Pages/DispatchAIJudgmentCases.razor` | 운영 | 배차 AI 판단 사례 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P39.png" alt="HongdalAdmin-P39" width="160"> |
-| `HongdalAdmin-P40 - 개발용 Fake PG/정산 콘솔` | `/development/fake-payment-settlement` | `HongdalAdmin/Components/Pages/FakePaymentSettlementConsole.razor` | 개발 | 결제 보증·상하차·정산·보류·환불 상태 전이 시뮬레이션 | - | 캡처 대기 |
-| `HongdalAdmin-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `HongdalAdmin/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P90.png" alt="HongdalAdmin-P90" width="160"> |
-| `HongdalAdmin-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `HongdalAdmin/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P91.png" alt="HongdalAdmin-P91" width="160"> |
-| `HongdalAdmin-P99 - 미발견 페이지` | `/not-found` | `HongdalAdmin/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/HongdalAdmin/HongdalAdmin-P99.png" alt="HongdalAdmin-P99" width="160"> |
+| `SsalddelAdmin-P00 - 관리자 홈` | `/` | `SsalddelAdmin/Components/Pages/Home.razor` | 시스템 | 관리자 홈 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P00.png" alt="SsalddelAdmin-P00" width="160"> |
+| `SsalddelAdmin-P00-1 - 관리자 로그인` | `/login` | `SsalddelAdmin/Components/Pages/AdminLogin.razor` | 시스템 | 관리자 로그인 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P00-1.png" alt="SsalddelAdmin-P00-1" width="160"> |
+| `SsalddelAdmin-P00-2 - 오류 화면` | `/Error` | `SsalddelAdmin/Components/Pages/Error.razor` | 시스템 | 오류 화면 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P00-2.png" alt="SsalddelAdmin-P00-2" width="160"> |
+| `SsalddelAdmin-P16 - 운영 대시보드` | `/dashboard` | `SsalddelAdmin/Components/Pages/Dashboard.razor` | 필수 | 운영 대시보드 | `SsalddelAdmin-P16` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P16.png" alt="SsalddelAdmin-P16" width="160"> |
+| `SsalddelAdmin-P17 - 의뢰 목록` | `/requests` | `SsalddelAdmin/Components/Pages/Requests.razor` | 필수 | 의뢰 목록 | `SsalddelAdmin-P17` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P17.png" alt="SsalddelAdmin-P17" width="160"> |
+| `SsalddelAdmin-P18 - 의뢰 상세` | `/requests/{RequestId}` | `SsalddelAdmin/Components/Pages/RequestDetail.razor` | 필수 | 의뢰 상세 | `SsalddelAdmin-P18` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P18.png" alt="SsalddelAdmin-P18" width="160"> |
+| `SsalddelAdmin-P19 - 배차대기/추천 잠금 상태` | `/dispatch/wait` | `SsalddelAdmin/Components/Pages/DispatchWait.razor` | 필수 | 배차대기/추천 잠금 상태 | `SsalddelAdmin-P19` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P19.png" alt="SsalddelAdmin-P19" width="160"> |
+| `SsalddelAdmin-P20 - 운행 중 기사 현황` | `/drivers/operating` | `SsalddelAdmin/Components/Pages/DriverOperatingView.razor` | 필수 | 운행 중 기사 현황 | `SsalddelAdmin-P20` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P20.png" alt="SsalddelAdmin-P20" width="160"> |
+| `SsalddelAdmin-P21 - 운송 목록` | `/transports` | `SsalddelAdmin/Components/Pages/Transports.razor` | 필수 | 운송 목록 | `SsalddelAdmin-P21` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P21.png" alt="SsalddelAdmin-P21" width="160"> |
+| `SsalddelAdmin-P22 - 운송 상세 원장` | `/transports/{RequestId}` | `SsalddelAdmin/Components/Pages/TransportWorkflowDetail.razor` | 필수 | 운송 상세 원장 | `SsalddelAdmin-P22` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P22.png" alt="SsalddelAdmin-P22" width="160"> |
+| `SsalddelAdmin-P22-1 - 운송 이벤트 감사` | `/transports/{RequestId}/events` | `SsalddelAdmin/Components/Pages/TransportWorkflowEvents.razor` | 필수 | 운송 이벤트 감사 | `SsalddelAdmin-P22-1` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P22-1.png" alt="SsalddelAdmin-P22-1" width="160"> |
+| `SsalddelAdmin-P22-2 - 운송 증빙/POD` | `/transports/{RequestId}/proofs` | `SsalddelAdmin/Components/Pages/TransportWorkflowProofs.razor` | 필수 | 운송 증빙/POD | `SsalddelAdmin-P22-2` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P22-2.png" alt="SsalddelAdmin-P22-2" width="160"> |
+| `SsalddelAdmin-P22-3 - 운송 정산 상세` | `/transports/{RequestId}/settlement` | `SsalddelAdmin/Components/Pages/TransportWorkflowSettlement.razor` | 필수 | 운송 정산 상세 | `SsalddelAdmin-P22-3` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P22-3.png" alt="SsalddelAdmin-P22-3" width="160"> |
+| `SsalddelAdmin-P23 - 관리자 활동 로그` | `/activity-logs` | `SsalddelAdmin/Components/Pages/ActivityLogs.razor` | 운영 | 관리자 활동 로그 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P23.png" alt="SsalddelAdmin-P23" width="160"> |
+| `SsalddelAdmin-P24 - 화면/기능 노출 정책` | `/view-policies` | `SsalddelAdmin/Components/Pages/ViewPolicies.razor` | 운영 | 화면/기능 노출 정책 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P24.png" alt="SsalddelAdmin-P24" width="160"> |
+| `SsalddelAdmin-P25 - 공통 콘텐츠 관리` | `/common-contents` | `SsalddelAdmin/Components/Pages/CommonContents.razor` | 운영 | 공통 콘텐츠 관리 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P25.png" alt="SsalddelAdmin-P25" width="160"> |
+| `SsalddelAdmin-P26 - 결제 목록` | `/payments` | `SsalddelAdmin/Components/Pages/Payments.razor` | 필수 | 결제 목록 | `SsalddelAdmin-P26` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P26.png" alt="SsalddelAdmin-P26" width="160"> |
+| `SsalddelAdmin-P26-1 - 정산 목록` | `/settlements` | `SsalddelAdmin/Components/Pages/Settlements.razor` | 필수 | 정산 목록 | `SsalddelAdmin-P26-1` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P26-1.png" alt="SsalddelAdmin-P26-1" width="160"> |
+| `SsalddelAdmin-P27 - 문서 목록` | `/documents` | `SsalddelAdmin/Components/Pages/Documents.razor` | 필수 | 문서 목록 | `SsalddelAdmin-P27` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P27.png" alt="SsalddelAdmin-P27" width="160"> |
+| `SsalddelAdmin-P27-1 - 문서 업로드` | `/documents/upload` | `SsalddelAdmin/Components/Pages/DocumentUpload.razor` | 필수 | 문서 업로드 | `SsalddelAdmin-P27-1` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P27-1.png" alt="SsalddelAdmin-P27-1" width="160"> |
+| `SsalddelAdmin-P27-2 - 문서 정책 목록` | `/documents/policies` | `SsalddelAdmin/Components/Pages/DocumentPolicies.razor` | 필수 | 문서 정책 목록 | `SsalddelAdmin-P27-2` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P27-2.png" alt="SsalddelAdmin-P27-2" width="160"> |
+| `SsalddelAdmin-P27-3 - 문서 정책 상세` | `/documents/policies/{DocumentCode}` | `SsalddelAdmin/Components/Pages/DocumentPolicyDetail.razor` | 필수 | 문서 정책 상세 | `SsalddelAdmin-P27-3` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P27-3.png" alt="SsalddelAdmin-P27-3" width="160"> |
+| `SsalddelAdmin-P27-4 - 문서 조회 로그` | `/documents/logs` | `SsalddelAdmin/Components/Pages/DocumentLogs.razor` | 필수 | 문서 조회 로그 | `SsalddelAdmin-P27-4` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P27-4.png" alt="SsalddelAdmin-P27-4" width="160"> |
+| `SsalddelAdmin-P27-5 - 파일/POD 관리` | `/files/pod` | `SsalddelAdmin/Components/Pages/FilesPod.razor` | 필수 | 파일/POD 관리 | `SsalddelAdmin-P27-5` | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P27-5.png" alt="SsalddelAdmin-P27-5" width="160"> |
+| `SsalddelAdmin-P28 - 공개 화물/화물 운영 화면` | `/cargo` | `SsalddelAdmin/Components/Pages/PublicCargo.razor` | 운영 | 공개 화물/화물 운영 화면 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P28.png" alt="SsalddelAdmin-P28" width="160"> |
+| `SsalddelAdmin-P29 - HS 코드/통관 운영` | `/customs/hs-codes` | `SsalddelAdmin/Components/Pages/HsCodeOperations.razor` | 운영 | HS 코드/통관 운영 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P29.png" alt="SsalddelAdmin-P29" width="160"> |
+| `SsalddelAdmin-P30 - 음식 주문/배달 운영` | `/food/operations` | `SsalddelAdmin/Components/Pages/FoodOperations.razor` | 운영 | 음식 주문/배달 운영 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P30.png" alt="SsalddelAdmin-P30" width="160"> |
+| `SsalddelAdmin-P30-1 - 음식점 검색 정책` | `/restaurant-search-policy` | `SsalddelAdmin/Components/Pages/RestaurantSearchPolicySettings.razor` | 운영 | 음식점 검색 정책 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P30-1.png" alt="SsalddelAdmin-P30-1" width="160"> |
+| `SsalddelAdmin-P31 - 탐색 캠페인 운영` | `/exploration/campaigns` | `SsalddelAdmin/Components/Pages/ExplorationCampaigns.razor` | 운영 | 탐색 캠페인 운영 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P31.png" alt="SsalddelAdmin-P31" width="160"> |
+| `SsalddelAdmin-P32 - 기사 목록/관리` | `/drivers` | `SsalddelAdmin/Components/Pages/Drivers.razor` | 운영 | 기사 목록/관리 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P32.png" alt="SsalddelAdmin-P32" width="160"> |
+| `SsalddelAdmin-P32-1 - 차량 관리` | `/vehicle-management` | `SsalddelAdmin/Components/Pages/VehicleManagement.razor` | 운영 | 차량 관리 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P32-1.png" alt="SsalddelAdmin-P32-1" width="160"> |
+| `SsalddelAdmin-P33 - 파트너 관리` | `/partners` | `SsalddelAdmin/Components/Pages/Partners.razor` | 운영 | 파트너 관리 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P33.png" alt="SsalddelAdmin-P33" width="160"> |
+| `SsalddelAdmin-P34 - 수익/요율 정책` | `/revenue-policies` | `SsalddelAdmin/Components/Pages/RevenuePolicies.razor` | 운영 | 수익/요율 정책 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P34.png" alt="SsalddelAdmin-P34" width="160"> |
+| `SsalddelAdmin-P35 - 보조 기능 설정` | `/auxiliary-feature-settings` | `SsalddelAdmin/Components/Pages/AuxiliaryFeatureSettings.razor` | 운영 | 보조 기능 설정 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P35.png" alt="SsalddelAdmin-P35" width="160"> |
+| `SsalddelAdmin-P36 - 연락처 통합 검색` | `/contact-search` | `SsalddelAdmin/Components/Pages/ContactSearch.razor` | 운영 | 전화번호 뒤 8자리 기준 인물/역할 통합 조회 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P36.png" alt="SsalddelAdmin-P36" width="160"> |
+| `SsalddelAdmin-P37 - 국내화물 AI 배차 검토` | `/dispatch/ai-review` | `SsalddelAdmin/Components/Pages/DomesticCargoDispatchAIReview.razor` | 운영 | 국내화물 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P37.png" alt="SsalddelAdmin-P37" width="160"> |
+| `SsalddelAdmin-P38 - 음식배달 AI 배차 검토` | `/dispatch/food-ai-review` | `SsalddelAdmin/Components/Pages/FoodDeliveryDispatchAIReview.razor` | 운영 | 음식배달 AI 배차 검토 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P38.png" alt="SsalddelAdmin-P38" width="160"> |
+| `SsalddelAdmin-P39 - 배차 AI 판단 사례` | `/dispatch-ai-judgment-cases` | `SsalddelAdmin/Components/Pages/DispatchAIJudgmentCases.razor` | 운영 | 배차 AI 판단 사례 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P39.png" alt="SsalddelAdmin-P39" width="160"> |
+| `SsalddelAdmin-P40 - 개발용 Fake PG/정산 콘솔` | `/development/fake-payment-settlement` | `SsalddelAdmin/Components/Pages/FakePaymentSettlementConsole.razor` | 개발 | 결제 보증·상하차·정산·보류·환불 상태 전이 시뮬레이션 | - | 캡처 대기 |
+| `SsalddelAdmin-P90 - 템플릿/샘플성 날씨 화면` | `/weather` | `SsalddelAdmin/Components/Pages/Weather.razor` | 시스템 | 템플릿/샘플성 날씨 화면 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P90.png" alt="SsalddelAdmin-P90" width="160"> |
+| `SsalddelAdmin-P91 - 템플릿/샘플성 카운터 화면` | `/counter` | `SsalddelAdmin/Components/Pages/Counter.razor` | 시스템 | 템플릿/샘플성 카운터 화면 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P91.png" alt="SsalddelAdmin-P91" width="160"> |
+| `SsalddelAdmin-P99 - 미발견 페이지` | `/not-found` | `SsalddelAdmin/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/SsalddelAdmin/SsalddelAdmin-P99.png" alt="SsalddelAdmin-P99" width="160"> |
 
-## HongdalAdminApp
+## SsalddelAdminApp
 
 | 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `HongdalAdminApp-P00 - 커뮤니티 운영 홈` | `/` | `HongdalAdminApp/Components/Pages/Home.razor` | 시스템 | 공통 커뮤니티 현황과 운영 진입 | - | 코드 확인 |
-| `HongdalAdminApp-P01 - 관리자 로그인` | `/login` | `HongdalAdminApp/Components/Pages/Login.razor` | 시스템 | 서버관리자 인증 | - | 코드 확인 |
-| `HongdalAdminApp-P02 - 커뮤니티 운영` | `/community-management` | `HongdalAdminApp/Components/Pages/CommunityManagement.razor` | 운영 | 커뮤니티 운영 상태와 관리 작업 | - | 코드 확인 |
-| `HongdalAdminApp-P03 - 자료 검토·글쓰기` | `/information-review` | `HongdalAdminApp/Components/Pages/CommunityInformationReview.razor` | 운영 | 수집 자료의 출처·기준 검토와 커뮤니티 글 초안 작성 | `HongdalAdminApp-P01` | 로그인 경계 확인<br><img src="../assets/changes/2026-07-18-admin-information-review/admin-information-review-mobile.png" alt="HongdalAdminApp 자료 검토 모바일 화면" width="160"> |
-| `HongdalAdminApp-P04 - 반야 운영 허브` | `/prajna` | `HongdalAdminApp/Components/Pages/PrajnaHub.razor` | 운영 | 지식·성찰 자료 선별 운영 | `HongdalAdminApp-P01` | 코드 확인 |
-| `HongdalAdminApp-P04-1 - 홍익학당 선별 운영` | `/prajna/hongik-hakdang` | `HongdalAdminApp/Components/Pages/PrajnaHongikHakdang.razor` | 운영 | 홍익학당 공개 자료 검토와 발행 | `HongdalAdminApp-P04` | 코드 확인 |
+| `SsalddelAdminApp-P00 - 커뮤니티 운영 홈` | `/` | `SsalddelAdminApp/Components/Pages/Home.razor` | 시스템 | 공통 커뮤니티 현황과 운영 진입 | - | 코드 확인 |
+| `SsalddelAdminApp-P01 - 관리자 로그인` | `/login` | `SsalddelAdminApp/Components/Pages/Login.razor` | 시스템 | 서버관리자 인증 | - | 코드 확인 |
+| `SsalddelAdminApp-P02 - 커뮤니티 운영` | `/community-management` | `SsalddelAdminApp/Components/Pages/CommunityManagement.razor` | 운영 | 커뮤니티 운영 상태와 관리 작업 | - | 코드 확인 |
+| `SsalddelAdminApp-P03 - 자료 검토·글쓰기` | `/information-review` | `SsalddelAdminApp/Components/Pages/CommunityInformationReview.razor` | 운영 | 수집 자료의 출처·기준 검토와 커뮤니티 글 초안 작성 | `SsalddelAdminApp-P01` | 로그인 경계 확인<br><img src="../assets/changes/2026-07-18-admin-information-review/admin-information-review-mobile.png" alt="SsalddelAdminApp 자료 검토 모바일 화면" width="160"> |
+| `SsalddelAdminApp-P04 - 반야 운영 허브` | `/prajna` | `SsalddelAdminApp/Components/Pages/PrajnaHub.razor` | 운영 | 지식·성찰 자료 선별 운영 | `SsalddelAdminApp-P01` | 코드 확인 |
+| `SsalddelAdminApp-P04-1 - 홍익학당 선별 운영` | `/prajna/hongik-hakdang` | `SsalddelAdminApp/Components/Pages/PrajnaHongikHakdang.razor` | 운영 | 홍익학당 공개 자료 검토와 발행 | `SsalddelAdminApp-P04` | 코드 확인 |
 
 ## WarehouseManagerApp
 
@@ -246,7 +246,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 필수 페이지와 전체 페이지의 관계 | 필수 페이지는 1.0 운송 루프를 닫는 최소 화면이고, 이 문서는 코드 프로젝트 전체 화면을 찾기 위한 색인이다. |
-| 라우트 충돌 후보 | `HongdalApp`과 `RestaurantDeskApp` 모두 `/dispatch/address-form`을 가진다. 앱이 다르므로 런타임 충돌은 아니지만 문서에서 책임을 구분해야 한다. |
+| 라우트 충돌 후보 | `SsalddelApp`과 `RestaurantDeskApp` 모두 `/dispatch/address-form`을 가진다. 앱이 다르므로 런타임 충돌은 아니지만 문서에서 책임을 구분해야 한다. |
 | 템플릿성 화면 | `Counter`, `Weather`는 시스템/샘플 화면으로 분류했다. 출시 전 제거 또는 숨김 여부를 따로 판단한다. |
 | 미발견 페이지 | `NotFound`는 사용자 업무 화면이 아니지만 앱 운영에 필요한 라우트로 남긴다. |
 | 다음 문서화 단계 | 각 페이지별 상세 README는 `page-docs/{앱명}/{페이지ID}/README.md`에 두고, 캡처는 `assets/app-pages/{앱명}/` 아래 추가한다. |

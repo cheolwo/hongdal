@@ -4,10 +4,10 @@ using DriverApp.Services.Security;
 using DriverApp.ViewModels.Driver.Features;
 using DriverApp.ViewModels.Driver.Home;
 using DriverApp.ViewModels.Driver.Transport;
-using Hongdal.Client.Infrastructure;
-using Hongdal.Client.Infrastructure.Security;
-using Hongdal.Client.Infrastructure.Transport;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Client.Infrastructure;
+using Ssalddel.Client.Infrastructure.Security;
+using Ssalddel.Client.Infrastructure.Transport;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

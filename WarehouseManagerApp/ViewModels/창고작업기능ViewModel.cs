@@ -1,9 +1,9 @@
-using Hongdal.Contracts.Common.Inbound;
-using Hongdal.Contracts.Common.Inventory;
-using Hongdal.Contracts.Common.Warehouse;
-using Hongdal.Contracts.Shipper.Request;
-using Hongdal.Ui.Common.Areas.App.Services;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Contracts.Common.Inbound;
+using Ssalddel.Contracts.Common.Inventory;
+using Ssalddel.Contracts.Common.Warehouse;
+using Ssalddel.Contracts.Shipper.Request;
+using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace WarehouseManagerApp.ViewModels;
 
@@ -20,7 +20,7 @@ public abstract class 창고업무단위ViewModelBase(
 /// <summary>창고와 작업 사용자를 관리하는 기준정보 업무입니다.</summary>
 public sealed class 창고기준정보업무ViewModel : 창고업무단위ViewModelBase
 {
-    public 창고기준정보업무ViewModel(IHongdalJsonApiClient api)
+    public 창고기준정보업무ViewModel(ISsalddelJsonApiClient api)
         : base("warehouse-master", "창고 기준정보")
     {
         창고목록조회 = 하위ViewModel등록(new Api작업ViewModel<창고목록응답?>(
@@ -49,7 +49,7 @@ public sealed class 창고기준정보업무ViewModel : 창고업무단위ViewMo
 /// <summary>입고 요청의 조회·생성·완료를 담당하는 입고 업무입니다.</summary>
 public sealed class 창고입고업무ViewModel : 창고업무단위ViewModelBase
 {
-    public 창고입고업무ViewModel(IHongdalJsonApiClient api)
+    public 창고입고업무ViewModel(ISsalddelJsonApiClient api)
         : base("warehouse-inbound", "입고")
     {
         입고목록조회 = 하위ViewModel등록(new Api작업ViewModel<입고요청목록응답?>(
@@ -74,7 +74,7 @@ public sealed class 창고입고업무ViewModel : 창고업무단위ViewModelBas
 /// <summary>재고 조회·검수·적재·포장을 담당하는 재고 및 출고 준비 업무입니다.</summary>
 public sealed class 창고재고출고업무ViewModel : 창고업무단위ViewModelBase
 {
-    public 창고재고출고업무ViewModel(IHongdalJsonApiClient api)
+    public 창고재고출고업무ViewModel(ISsalddelJsonApiClient api)
         : base("warehouse-inventory-outbound", "재고·출고 준비")
     {
         재고목록조회 = 하위ViewModel등록(new Api작업ViewModel<재고목록응답?>(
@@ -111,7 +111,7 @@ public sealed class 창고재고출고업무ViewModel : 창고업무단위ViewMo
 /// <summary>출고 재고를 운송 업무로 인계하는 연계 업무입니다.</summary>
 public sealed class 창고운송연계업무ViewModel : 창고업무단위ViewModelBase
 {
-    public 창고운송연계업무ViewModel(IHongdalJsonApiClient api)
+    public 창고운송연계업무ViewModel(ISsalddelJsonApiClient api)
         : base("warehouse-transport-handoff", "운송 인계")
     {
         재위탁운송생성 = 하위ViewModel등록(new Api작업ViewModel<재고운송의뢰생성요청, 화주운송의뢰응답?>(

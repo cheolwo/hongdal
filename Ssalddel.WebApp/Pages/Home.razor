@@ -1,0 +1,96 @@
+@page "/"
+
+<PageTitle>역할별 화면 체험 | 살뜰</PageTitle>
+
+<main class="role-experience @SelectedRole.ThemeClass">
+    <header class="role-experience__header">
+        <div>
+            <span>SSALDDEL WEB PREVIEW</span>
+            <h1>역할별 화면 체험</h1>
+            <p>현재 구현된 주요 화면을 역할에 따라 바로 열어볼 수 있습니다.</p>
+        </div>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Visibility">
+            @(WebExperienceCatalog.Roles.Count)개 역할
+        </MudChip>
+    </header>
+
+    <nav class="role-experience__selector" aria-label="체험할 역할 선택">
+        @foreach (var role in WebExperienceCatalog.Roles)
+        {
+            var isSelected = role.Key == SelectedRole.Key;
+            <button type="button"
+                    class="role-experience__role-button @(isSelected ? "is-selected" : null)"
+                    aria-pressed="@isSelected"
+                    @onclick="@(() => SelectRole(role))">
+                <MudIcon Icon="@role.Icon" Size="Size.Small" />
+                <span>@role.Title</span>
+            </button>
+        }
+    </nav>
+
+    <section class="role-experience__workspace" aria-live="polite">
+        <div class="role-experience__preview">
+            <img src="@SelectedRole.ImageUrl"
+                 alt="@SelectedRole.ImageAlt"
+                 loading="eager" />
+            <div class="role-experience__preview-label">
+                <span>@SelectedRole.Eyebrow</span>
+                <strong>@SelectedRole.Title</strong>
+            </div>
+        </div>
+
+        <div class="role-experience__screens">
+            <div class="role-experience__screens-heading">
+                <div>
+                    <span>@SelectedRole.Eyebrow</span>
+                    <h2>@SelectedRole.Title</h2>
+                    <p>@SelectedRole.Description</p>
+                </div>
+                <MudButton Href="@SelectedRole.StartHref"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@SelectedRole.Icon"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">
+                    @SelectedRole.StartLabel
+                </MudButton>
+            </div>
+
+            <div class="role-experience__screen-list">
+                @foreach (var screen in SelectedRole.Screens)
+                {
+                    <a class="role-experience__screen-link" href="@screen.Href">
+                        <span class="role-experience__screen-icon">
+                            <MudIcon Icon="@screen.Icon" Size="Size.Small" />
+                        </span>
+                        <span class="role-experience__screen-copy">
+                            <strong>@screen.Title</strong>
+                            <small>@screen.Description</small>
+                        </span>
+                        <span class="role-experience__screen-meta">
+                            <small>@screen.AreaLabel</small>
+                            <em>@screen.Status</em>
+                        </span>
+                        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="role-experience__community">
+        <div class="role-experience__section-title">
+            <span>PUBLIC COMMUNITY</span>
+            <h2>지금 공개된 커뮤니티</h2>
+        </div>
+        <실시간베스트Section />
+    </section>
+</main>
+
+@code {
+    private WebExperienceRole SelectedRole { get; set; } = WebExperienceCatalog.DefaultRole;
+
+    private void SelectRole(WebExperienceRole role)
+    {
+        SelectedRole = role;
+    }
+}

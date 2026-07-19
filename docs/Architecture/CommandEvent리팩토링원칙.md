@@ -1,7 +1,7 @@
 # Command/Event 리팩토링 원칙
 
 ## 목적
-지금 여기 Hongdal 서버에서 우리는 핵심 업무 상태 변경과 사후처리를 분리해서, Handler 비대화를 줄이고 유지보수 속도를 높인다.
+지금 여기 Ssalddel 서버에서 우리는 핵심 업무 상태 변경과 사후처리를 분리해서, Handler 비대화를 줄이고 유지보수 속도를 높인다.
 
 ## 기본 원칙
 1. CommandHandler는 사용자의 명령을 검증하고 핵심 도메인 상태를 변경한다.
@@ -26,7 +26,7 @@
 - 혜택 자격 발급
 
 ## EventHandler 일관 정리 규칙
-- 위치: 이벤트가 발생한 업무 흐름의 Application 하위 `Handlers` 폴더에 둔다. 예를 들어 창고 포장 완료 후 배차대기 생성은 `Hongdal/Application/Warehouse/Handlers`에 둔다.
+- 위치: 이벤트가 발생한 업무 흐름의 Application 하위 `Handlers` 폴더에 둔다. 예를 들어 창고 포장 완료 후 배차대기 생성은 `Ssalddel/Application/Warehouse/Handlers`에 둔다.
 - 이름: `{업무사건}{후속처리}EventHandler` 형식을 쓴다. 예: `알뜰살뜰마트포장완료배차대기EventHandler`, `운송완료입금요청EventHandler`.
 - 책임: 하나의 EventHandler는 하나의 후속 관심사만 담당한다. 알림, 경험치, 배차대기 생성, Mongo 원장 동기화가 모두 필요하면 서로 다른 핸들러 또는 명확한 내부 서비스로 나눈다.
 - 트랜잭션 경계: 원본 상태 변경이 반드시 같이 성공해야 하는 처리는 CommandHandler 또는 동일 트랜잭션에 남긴다. 실패해도 재시도 가능한 후속 투영, 알림, 감사 로그, 추천 큐 갱신은 EventHandler로 둔다.
@@ -39,7 +39,7 @@
 - 실패해도 재시도로 복구 가능한 처리: EventHandler로 분리한다.
 
 ## 결제-배차 경계 예외
-Hongdal 정책상 `결제완료된 의뢰만 배차대기에 진입`이 핵심 규칙이므로, 결제 승인과 배차대기 생성은 핵심 트랜잭션 경계로 유지한다.
+Ssalddel 정책상 `결제완료된 의뢰만 배차대기에 진입`이 핵심 규칙이므로, 결제 승인과 배차대기 생성은 핵심 트랜잭션 경계로 유지한다.
 
 반면 아래는 EventHandler로 분리한다.
 - 결제완료 알림

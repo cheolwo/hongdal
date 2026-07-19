@@ -47,12 +47,12 @@
 ## API 경로와 코드 연결
 
 - 화면 소스: [RestaurantDeskApp/Components/Pages/DispatchAddressForm.razor](../../../../../RestaurantDeskApp/Components/Pages/DispatchAddressForm.razor)
-- 클라이언트 서비스/계약: [RestaurantDeskApp/Services/배차주소ApiService.cs](../../../../../RestaurantDeskApp/Services/배차주소ApiService.cs), [HongdalApp/Services/배차주소ApiService.cs](../../../../../HongdalApp/Services/배차주소ApiService.cs)
+- 클라이언트 서비스/계약: [RestaurantDeskApp/Services/배차주소ApiService.cs](../../../../../RestaurantDeskApp/Services/배차주소ApiService.cs), [SsalddelApp/Services/배차주소ApiService.cs](../../../../../SsalddelApp/Services/배차주소ApiService.cs)
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
-| 클라이언트 서비스 | - | `api/v1/food-orders/dispatch/address-form` | [RestaurantDeskApp/Services/배차주소ApiService.cs](../../../../../RestaurantDeskApp/Services/배차주소ApiService.cs) | `POST api/v1/food-orders/dispatch/address-form` [Hongdal.FoodApi/Controllers/Common/배차주소Controller.cs](../../../../../Hongdal.FoodApi/Controllers/Common/배차주소Controller.cs)<br>`GET api/v1/food-orders` [Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs)<br>`POST api/v1/food-orders` [Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs) |
-| 클라이언트 서비스 | - | `api/v1/food-orders/dispatch/address-form` | [HongdalApp/Services/배차주소ApiService.cs](../../../../../HongdalApp/Services/배차주소ApiService.cs) | `POST api/v1/food-orders/dispatch/address-form` [Hongdal.FoodApi/Controllers/Common/배차주소Controller.cs](../../../../../Hongdal.FoodApi/Controllers/Common/배차주소Controller.cs)<br>`GET api/v1/food-orders` [Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs)<br>`POST api/v1/food-orders` [Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Hongdal.FoodApi/Controllers/Common/음식주문Controller.cs) |
+| 클라이언트 서비스 | - | `api/v1/food-orders/dispatch/address-form` | [RestaurantDeskApp/Services/배차주소ApiService.cs](../../../../../RestaurantDeskApp/Services/배차주소ApiService.cs) | `POST api/v1/food-orders/dispatch/address-form` [Ssalddel.FoodApi/Controllers/Common/배차주소Controller.cs](../../../../../Ssalddel.FoodApi/Controllers/Common/배차주소Controller.cs)<br>`GET api/v1/food-orders` [Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs)<br>`POST api/v1/food-orders` [Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs) |
+| 클라이언트 서비스 | - | `api/v1/food-orders/dispatch/address-form` | [SsalddelApp/Services/배차주소ApiService.cs](../../../../../SsalddelApp/Services/배차주소ApiService.cs) | `POST api/v1/food-orders/dispatch/address-form` [Ssalddel.FoodApi/Controllers/Common/배차주소Controller.cs](../../../../../Ssalddel.FoodApi/Controllers/Common/배차주소Controller.cs)<br>`GET api/v1/food-orders` [Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs)<br>`POST api/v1/food-orders` [Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs](../../../../../Ssalddel.FoodApi/Controllers/Common/음식주문Controller.cs) |
 
 검증할 때는 이 화면이 직접 메모리 데이터만 보는지, 위 API 응답을 받아 상태를 표시하는지, 실패했을 때 사용자가 다음 행동을 알 수 있는지 확인합니다.
 
@@ -69,5 +69,5 @@
 ## 보완 메모
 
 - 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 hongdal-v1-required-pages.md에도 반영합니다.
+- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
 - 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.

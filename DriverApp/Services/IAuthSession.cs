@@ -1,9 +1,9 @@
-using Hongdal.Client.Infrastructure.Security;
-using Hongdal.Ui.Common.Areas.App.Services;
+using Ssalddel.Client.Infrastructure.Security;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace DriverApp.Services;
 
-public interface IAuthSession : IHongdalAccessTokenProvider
+public interface IAuthSession : ISsalddelAccessTokenProvider
 {
     string? RefreshToken { get; }
     string? UserId { get; }

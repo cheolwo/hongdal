@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.Exploration;
+using Ssalddel.Contracts.Common.Exploration;
 
 namespace DriverApp.Services;
 

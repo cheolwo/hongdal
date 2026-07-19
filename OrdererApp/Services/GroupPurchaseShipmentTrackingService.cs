@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using Hongdal.Contracts.Common.Orderer;
-using Hongdal.Contracts.Common.PublicData;
+using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Common.PublicData;
 
 namespace OrdererApp.Services;
 

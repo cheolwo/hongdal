@@ -1,4 +1,4 @@
-﻿# Hongdal 2.5 Migration Notes
+﻿# Ssalddel 2.5 Migration Notes
 
 2.5에서는 주문자 집단 식별, 공동주택 하위 식별, 공동 주문 모집, 주문자 구매 의사, FCL/대량 입고, 집단 내 분류/배분 관련 데이터 변경을 기록합니다.
 

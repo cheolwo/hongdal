@@ -188,36 +188,36 @@
                         </MudStack>
                     </MudStack>
 
-                    <HongdalSensitiveDisclosureList Title="입고 관계와 상세"
+                    <SsalddelSensitiveDisclosureList Title="입고 관계와 상세"
                                                     Summary="@($"{selectedProduct.Name} / 예정 {selectedProduct.ExpectedQuantity}개")"
                                                     RelatedParties="@BuildInboundRelatedParties(selectedProduct)"
                                                     PrivacyHint="입고 담당자가 후속 확인이 필요한 상대를 먼저 인지하도록 구성합니다."
                                                     Icon="@Icons.Material.Filled.MoveToInbox"
                                                     Color="@QuantityColor">
                         <MudExpansionPanel Text="입고 정보" Icon="@Icons.Material.Filled.Inventory2">
-                            <HongdalSensitiveInfoRow Label="입고 번호" Value="@selectedProduct.InboundRequestNo" />
-                            <HongdalSensitiveInfoRow Label="상품 바코드" Value="@selectedProduct.Barcode" />
-                            <HongdalSensitiveInfoRow Label="상품명" Value="@selectedProduct.Name" />
-                            <HongdalSensitiveInfoRow Label="공급사" Value="@selectedProduct.Supplier" />
-                            <HongdalSensitiveInfoRow Label="계약 연결 상태" Value="@selectedProduct.ContractLinkStatus" />
+                            <SsalddelSensitiveInfoRow Label="입고 번호" Value="@selectedProduct.InboundRequestNo" />
+                            <SsalddelSensitiveInfoRow Label="상품 바코드" Value="@selectedProduct.Barcode" />
+                            <SsalddelSensitiveInfoRow Label="상품명" Value="@selectedProduct.Name" />
+                            <SsalddelSensitiveInfoRow Label="공급사" Value="@selectedProduct.Supplier" />
+                            <SsalddelSensitiveInfoRow Label="계약 연결 상태" Value="@selectedProduct.ContractLinkStatus" />
                         </MudExpansionPanel>
                         <MudExpansionPanel Text="수량과 보관" Icon="@Icons.Material.Filled.FactCheck">
-                            <HongdalSensitiveInfoRow Label="예정 수량" Value="@selectedProduct.ExpectedQuantity.ToString()" />
-                            <HongdalSensitiveInfoRow Label="실제 입고 수량" Value="@receivedQuantity.ToString()" />
-                            <HongdalSensitiveInfoRow Label="입고 묶음 바코드" Value="@inboundBundleBarcode" />
-                            <HongdalSensitiveInfoRow Label="보관 조건" Value="@selectedProduct.StorageType" />
-                            <HongdalSensitiveInfoRow Label="수량 상태" Value="@QuantityStatus" />
+                            <SsalddelSensitiveInfoRow Label="예정 수량" Value="@selectedProduct.ExpectedQuantity.ToString()" />
+                            <SsalddelSensitiveInfoRow Label="실제 입고 수량" Value="@receivedQuantity.ToString()" />
+                            <SsalddelSensitiveInfoRow Label="입고 묶음 바코드" Value="@inboundBundleBarcode" />
+                            <SsalddelSensitiveInfoRow Label="보관 조건" Value="@selectedProduct.StorageType" />
+                            <SsalddelSensitiveInfoRow Label="수량 상태" Value="@QuantityStatus" />
                         </MudExpansionPanel>
                         <MudExpansionPanel Text="후속 연결" Icon="@Icons.Material.Filled.ConnectWithoutContact">
-                            <HongdalSensitiveInfoRow Label="다음 공정" Value="입고 확인 후 검수 작업으로 이동" />
-                            <HongdalSensitiveInfoRow Label="문의 가능 대상" Value="@BuildInboundContactContext(selectedProduct)" />
-                            <HongdalSensitiveInfoRow Label="관계 기록" Value="입고 확인 완료 시 공급사, 화주, 검수 담당자와의 업무 관계 스냅샷 후보가 됩니다." />
+                            <SsalddelSensitiveInfoRow Label="다음 공정" Value="입고 확인 후 검수 작업으로 이동" />
+                            <SsalddelSensitiveInfoRow Label="문의 가능 대상" Value="@BuildInboundContactContext(selectedProduct)" />
+                            <SsalddelSensitiveInfoRow Label="관계 기록" Value="입고 확인 완료 시 공급사, 화주, 검수 담당자와의 업무 관계 스냅샷 후보가 됩니다." />
                             @if (!string.IsNullOrWhiteSpace(selectedProduct.ExceptionReason))
                             {
-                                <HongdalSensitiveInfoRow Label="예외 사유" Value="@selectedProduct.ExceptionReason" />
+                                <SsalddelSensitiveInfoRow Label="예외 사유" Value="@selectedProduct.ExceptionReason" />
                             }
                         </MudExpansionPanel>
-                    </HongdalSensitiveDisclosureList>
+                    </SsalddelSensitiveDisclosureList>
 
                     <MudNumericField T="int"
                                      Label="실제 입고 수량"

@@ -1,6 +1,6 @@
-# Hongdal Azure App Service 배포 준비
+# Ssalddel Azure App Service 배포 준비
 
-이 문서는 `Hongdal` API를 Azure App Service의 Linux 사용자 지정 컨테이너로 운영할 때의 기준이다. 데이터 계층은 Azure Database for MySQL Flexible Server, Azure Managed Redis, MongoDB 호환 관리형 서비스(Azure Cosmos DB for MongoDB 또는 MongoDB Atlas)를 전제로 한다.
+이 문서는 `Ssalddel` API를 Azure App Service의 Linux 사용자 지정 컨테이너로 운영할 때의 기준이다. 데이터 계층은 Azure Database for MySQL Flexible Server, Azure Managed Redis, MongoDB 호환 관리형 서비스(Azure Cosmos DB for MongoDB 또는 MongoDB Atlas)를 전제로 한다.
 
 ## 현재 코드에 반영된 안전장치
 
@@ -27,7 +27,7 @@
 | `Jwt__SecretKey` | JWT 서명 키 | Key Vault 참조 권장 |
 | `DatabaseInitialization__RunAtStartup` | 앱 시작 시 마이그레이션 | 운영에서는 반드시 `false` |
 | `DatabaseInitialization__FailOnError` | 마이그레이션 실패 처리 | `true` |
-| `HongdalLogging__FilePath` | 선택적 파일 로그 | 필요할 때만 `/home/LogFiles/hongdal-.log` |
+| `SsalddelLogging__FilePath` | 선택적 파일 로그 | 필요할 때만 `/home/LogFiles/ssalddel-.log` |
 
 프로젝트에서 사용하는 `IsmsPProtectedData`, OAuth, 결제, 공공데이터 및 외부 API 키도 모두 같은 방식으로 Key Vault에 보관한다. Key Vault 참조 문법과 관리 ID 권한 설정은 [App Service Key Vault references](https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references)를 따른다.
 
@@ -58,7 +58,7 @@ Azure의 TLS 요구사항과 연결 예시는 [Connect with TLS/SSL](https://lea
 ## 배포 순서
 
 1. 같은 커밋에서 컨테이너 이미지를 한 번 빌드하여 Azure Container Registry에 올린다.
-2. 운영 비밀값과 네트워크에 접근할 수 있는 일회성 배포 작업에서 같은 이미지를 `dotnet Hongdal.dll --initialize-database`로 실행한다.
+2. 운영 비밀값과 네트워크에 접근할 수 있는 일회성 배포 작업에서 같은 이미지를 `dotnet Ssalddel.dll --initialize-database`로 실행한다.
 3. 작업이 성공하지 않으면 배포를 중단한다. 이 명령은 기본, 전통시장, 농수산 DbContext 마이그레이션을 모두 적용하고 오류 시 실패 코드로 종료한다.
 4. App Service 슬롯에 이미지를 배포하고 `/health/live`, `/health/ready`가 모두 `200`인지 확인한다.
 5. 준비 상태가 확인된 뒤 슬롯을 교환하거나 트래픽을 전환한다.

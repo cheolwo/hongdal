@@ -1,12 +1,12 @@
-using Hongdal.Contracts.Common.Documents;
-using Hongdal.Contracts.Common.Identifiers;
-using Hongdal.Contracts.Food;
+using Ssalddel.Contracts.Common.Documents;
+using Ssalddel.Contracts.Common.Identifiers;
+using Ssalddel.Contracts.Food;
 
 namespace RestaurantDeskApp.Services;
 
 public sealed class 음식점전표DraftFactory
 {
-    public HongdalExpectedItemDocumentDraft Create주문전표Draft(음식주문응답 order)
+    public SsalddelExpectedItemDocumentDraft Create주문전표Draft(음식주문응답 order)
     {
         ArgumentNullException.ThrowIfNull(order);
         ArgumentException.ThrowIfNullOrWhiteSpace(order.주문번호);
@@ -14,10 +14,10 @@ public sealed class 음식점전표DraftFactory
         var createdAt = ToLocalOffset(order.CreatedAt);
         var ledgerNo = $"FOOD-LEDGER-{order.음식점Id}-{createdAt:yyyyMMdd}";
 
-        return new HongdalExpectedItemDocumentDraft
+        return new SsalddelExpectedItemDocumentDraft
         {
             DocumentNo = order.주문번호,
-            DocumentKind = HongdalExpectedItemDocumentKindCode.OutboundExpectedItems,
+            DocumentKind = SsalddelExpectedItemDocumentKindCode.OutboundExpectedItems,
             Title = $"주문 전표 {order.주문번호}",
             Status = "주문수락",
             WarehouseName = $"음식점 {order.음식점Id}",
@@ -28,28 +28,28 @@ public sealed class 음식점전표DraftFactory
             ExpectedDateText = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm"),
             WorkMemo = BuildMemo(order),
             CreatedAt = DateTimeOffset.Now,
-            PrintLayout = new HongdalDocumentPrintLayoutOptions
+            PrintLayout = new SsalddelDocumentPrintLayoutOptions
             {
-                PaperSize = HongdalDocumentPaperSizeCode.Thermal80,
-                Density = HongdalDocumentDensityCode.Dense,
-                Orientation = HongdalDocumentOrientationCode.Portrait,
-                PrintStyle = HongdalDocumentPrintStyleCode.ReceiptSlip,
+                PaperSize = SsalddelDocumentPaperSizeCode.Thermal80,
+                Density = SsalddelDocumentDensityCode.Dense,
+                Orientation = SsalddelDocumentOrientationCode.Portrait,
+                PrintStyle = SsalddelDocumentPrintStyleCode.ReceiptSlip,
                 IncludeDocumentQrCode = false,
                 IncludeLineBarcodes = true
             },
-            DocumentBarcodePayload = HongdalIdentifierCodePayloads.Create(
-                HongdalIdentifierKindCode.Order,
+            DocumentBarcodePayload = SsalddelIdentifierCodePayloads.Create(
+                SsalddelIdentifierKindCode.Order,
                 order.주문번호),
             Lines = order.상품목록.Select((item, index) => CreateLine(order, item, index + 1)).ToArray()
         };
     }
 
-    private static HongdalExpectedItemDocumentLine CreateLine(음식주문응답 order, 음식주문상품Dto item, int lineNumber)
+    private static SsalddelExpectedItemDocumentLine CreateLine(음식주문응답 order, 음식주문상품Dto item, int lineNumber)
     {
         var productBarcode = $"MENU-{order.음식점Id}-{lineNumber:00}";
         var bundleBarcode = $"BND-{order.주문번호}-{lineNumber:00}";
 
-        return new HongdalExpectedItemDocumentLine
+        return new SsalddelExpectedItemDocumentLine
         {
             LineNo = lineNumber.ToString("00"),
             Sku = productBarcode,
@@ -62,8 +62,8 @@ public sealed class 음식점전표DraftFactory
             StorageCondition = "즉시조리",
             RelatedOrderNo = order.주문번호,
             Note = $"{item.단가:N0}원",
-            BarcodePayload = HongdalIdentifierCodePayloads.Create(
-                HongdalIdentifierKindCode.Product,
+            BarcodePayload = SsalddelIdentifierCodePayloads.Create(
+                SsalddelIdentifierKindCode.Product,
                 productBarcode,
                 item.상품명)
         };

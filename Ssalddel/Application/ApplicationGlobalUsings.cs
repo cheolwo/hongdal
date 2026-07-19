@@ -1,0 +1,14 @@
+global using MediatR;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Logging;
+global using 살뜰.Data;
+global using 살뜰.도메인.공통;
+global using 살뜰.도메인.기사;
+global using 살뜰.도메인.운송;
+global using 살뜰.도메인.화주;
+global using 살뜰.Services.Dispatch.Recommendation;
+global using 살뜰.Services.Dispatch.Request;
+global using 살뜰.Services.Storage.Local;
+global using Ssalddel.Contracts.Driver.Recommendation;
+global using Ssalddel.Contracts.Driver.Work;

@@ -1,0 +1,240 @@
+@page "/activity-logs"
+@rendermode InteractiveServer
+@using Ssalddel.Contracts.Admin.Audit
+@inject ActivityLogService ActivityLogService
+@inject 관리자인증세션Service 관리자인증세션Service
+@inject NavigationManager NavigationManager
+
+<PageTitle>사용자 행위 로그</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Spacing="0">
+        <MudText Typo="Typo.h4">사용자 행위 로그</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">앱, 사용자, TraceId 기준으로 서버 행위 기록을 확인합니다.</MudText>
+    </MudStack>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudGrid Spacing="2">
+            <MudItem xs="12" md="3">
+                <MudSelect T="string" Label="앱" Variant="Variant.Outlined" Dense="true" @bind-Value="search.AppKey">
+                    <MudSelectItem T="string" Value="@EmptyValue">전체</MudSelectItem>
+                    <MudSelectItem T="string" Value="@("SsalddelAdmin")">SsalddelAdmin</MudSelectItem>
+                    <MudSelectItem T="string" Value="@("DriverApp")">DriverApp</MudSelectItem>
+                    <MudSelectItem T="string" Value="@("SsalddelApp")">SsalddelApp</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="사용자 Id" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="search.UserId" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="이메일" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="search.Email" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="전화 끝 4자리" Variant="Variant.Outlined" Margin="Margin.Dense" MaxLength="4" @bind-Value="search.PhoneLast4" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="행위 유형" Placeholder="Read, Update, Command" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="search.ActionType" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="행위명" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="search.ActionName" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudTextField Label="TraceId" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="search.TraceId" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudSelect T="string" Label="성공 여부" Variant="Variant.Outlined" Dense="true" @bind-Value="selectedIsSuccess">
+                    <MudSelectItem T="string" Value="@EmptyValue">전체</MudSelectItem>
+                    <MudSelectItem T="string" Value="@("true")">성공</MudSelectItem>
+                    <MudSelectItem T="string" Value="@("false")">실패</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Row="true" Spacing="1" Class="mt-3" Style="flex-wrap: wrap;">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Disabled="@isLoading" OnClick="LoadAsync">조회</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="Reset">초기화</MudButton>
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+    }
+
+    @if (isLoading)
+    {
+        <MudAlert Severity="Severity.Info">행위 로그를 불러오는 중입니다...</MudAlert>
+    }
+    else
+    {
+        <MudGrid Spacing="3">
+            <MudItem xs="12" lg="8">
+                <MudPaper Elevation="1" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="flex-wrap: wrap;">
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">총 @result.TotalCount 건</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">페이지 @result.Page / 크기 @result.PageSize</MudText>
+                        </MudStack>
+
+                        <MudTable Items="@result.Items" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>시각</MudTh>
+                                <MudTh>앱</MudTh>
+                                <MudTh>사용자</MudTh>
+                                <MudTh>행위</MudTh>
+                                <MudTh>결과</MudTh>
+                                <MudTh>TraceId</MudTh>
+                                <MudTh></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="시각">@context.OccurredAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
+                                <MudTd DataLabel="앱">@context.AppKey</MudTd>
+                                <MudTd DataLabel="사용자">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.body2">@context.UserName</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.UserId</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.EmailMasked / @context.PhoneLast4</MudText>
+                                    </MudStack>
+                                </MudTd>
+                                <MudTd DataLabel="행위">
+                                    <MudStack Spacing="0">
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Filled">@context.ActionType</MudChip>
+                                        <MudText Typo="Typo.body2">@context.ActionName</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Route</MudText>
+                                    </MudStack>
+                                </MudTd>
+                                <MudTd DataLabel="결과">
+                                    <MudChip T="string" Size="Size.Small" Color="@(context.IsSuccess ? Color.Success : Color.Error)" Variant="Variant.Filled">
+                                        @(context.IsSuccess ? "성공" : "실패")
+                                    </MudChip>
+                                </MudTd>
+                                <MudTd DataLabel="TraceId">
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" OnClick="@(() => LoadTraceAsync(context.TraceId))">@context.TraceId</MudButton>
+                                </MudTd>
+                                <MudTd>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="@(() => LoadDetailAsync(context.Id))">상세</MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" lg="4">
+                <MudStack Spacing="3">
+                    <MudPaper Elevation="1" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">상세</MudText>
+                            @if (selectedDetail is null)
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">상세 버튼을 눌러 선택한 로그를 확인할 수 있습니다.</MudText>
+                            }
+                            else
+                            {
+                                <AdminInfoField Label="앱" Value="@selectedDetail.AppKey" />
+                                <AdminInfoField Label="사용자" Value="@($"{selectedDetail.UserName} ({selectedDetail.UserId})")" />
+                                <AdminInfoField Label="이메일" Value="@selectedDetail.EmailMasked" />
+                                <AdminInfoField Label="전화" Value="@selectedDetail.PhoneLast4" />
+                                <AdminInfoField Label="행위" Value="@($"{selectedDetail.ActionType} / {selectedDetail.ActionName}")" />
+                                <AdminInfoField Label="결과" Value="@(selectedDetail.IsSuccess ? "성공" : "실패")" />
+                                <AdminInfoField Label="오류" Value="@($"{selectedDetail.ErrorCode} {selectedDetail.ErrorMessage}")" />
+                                <AdminInfoField Label="TraceId" Value="@selectedDetail.TraceId" />
+                                <AdminInfoField Label="IP" Value="@selectedDetail.ClientIp" />
+                                <AdminInfoField Label="UA" Value="@selectedDetail.UserAgent" />
+                                <MudTextField T="string" Label="Metadata" Value="@selectedDetail.MetadataJson" Variant="Variant.Outlined" Lines="10" ReadOnly="true" />
+                            }
+                        </MudStack>
+                    </MudPaper>
+
+                    <MudPaper Elevation="1" Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.h6">Trace 묶음</MudText>
+                            @if (traceGroup is null || traceGroup.Items.Count == 0)
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">TraceId를 선택하면 같은 요청의 행위를 확인할 수 있습니다.</MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@traceGroup.TraceId</MudText>
+                                @foreach (var item in traceGroup.Items)
+                                {
+                                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                        <MudText Typo="Typo.body2">@item.OccurredAtUtc.ToLocalTime().ToString("HH:mm:ss") · @item.ActionType · @item.ActionName</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.AppKey / @(item.IsSuccess ? "성공" : "실패")</MudText>
+                                    </MudPaper>
+                                }
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudStack>
+            </MudItem>
+        </MudGrid>
+    }
+</MudStack>
+
+@code {
+    private const string EmptyValue = "";
+
+    private readonly 사용자행위로그검색요청 search = new();
+    private 사용자행위로그목록응답 result = new();
+    private 사용자행위로그상세응답? selectedDetail;
+    private Trace행위로그묶음응답? traceGroup;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string selectedIsSuccess = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!관리자인증세션Service.서버관리자인가)
+        {
+            NavigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString("/activity-logs")}");
+            return;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        search.IsSuccess = string.IsNullOrWhiteSpace(selectedIsSuccess) ? null : bool.Parse(selectedIsSuccess);
+
+        try
+        {
+            result = await ActivityLogService.SearchAsync(search);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"행위 로그 조회 실패: {ex.Message}";
+            result = new 사용자행위로그목록응답();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadDetailAsync(long id)
+    {
+        selectedDetail = await ActivityLogService.GetDetailAsync(id);
+    }
+
+    private async Task LoadTraceAsync(string traceId)
+    {
+        traceGroup = await ActivityLogService.GetTraceAsync(traceId);
+    }
+
+    private void Reset()
+    {
+        search.AppKey = null;
+        search.UserId = null;
+        search.Email = null;
+        search.PhoneLast4 = null;
+        search.ActionType = null;
+        search.ActionName = null;
+        search.TraceId = null;
+        search.IsSuccess = null;
+        selectedIsSuccess = string.Empty;
+    }
+}

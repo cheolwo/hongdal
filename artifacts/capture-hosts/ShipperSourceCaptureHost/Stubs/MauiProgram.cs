@@ -1,4 +1,4 @@
-namespace HongdalApp;
+namespace SsalddelApp;
 
 public static class MauiProgram
 {

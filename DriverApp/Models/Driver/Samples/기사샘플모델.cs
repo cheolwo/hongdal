@@ -1,4 +1,4 @@
-using Hongdal.Contracts.Common.VehicleLoading;
+using Ssalddel.Contracts.Common.VehicleLoading;
 
 namespace DriverApp.Models.Driver.Samples;
 

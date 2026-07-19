@@ -20,7 +20,7 @@
             <MudAlert Severity="@_statusSeverity">@_statusMessage</MudAlert>
         }
 
-        <Hongdal공통로그인Panel 제목="기사 로그인"
+        <Ssalddel공통로그인Panel 제목="기사 로그인"
                          설명="기사 앱은 카카오, 구글, 네이버 로그인 버튼을 같은 위치에 두고, 실제 OAuth 연결은 서버 설정이 준비된 뒤 활성화합니다."
                          초기아이디="@_loginId"
                          현재사용자표시="@CurrentUserLabel"
@@ -47,7 +47,7 @@
                     로그아웃
                 </MudButton>
             }
-        </Hongdal공통로그인Panel>
+        </Ssalddel공통로그인Panel>
     </MudStack>
 </MudContainer>
 
@@ -59,7 +59,7 @@
     private Severity _statusSeverity = Severity.Info;
     private static readonly IReadOnlyList<string> DriverLoginHints =
     [
-        "개발용 기사: driver1@hongdal.local",
+        "개발용 기사: driver1@ssalddel.local",
         "비밀번호: Driver123!"
     ];
 
@@ -95,7 +95,7 @@
         catch
         {
             _statusSeverity = Severity.Error;
-            _statusMessage = "Hongdal 서버에 연결하지 못했습니다. 서버 실행 상태와 HTTPS 포트를 확인해 주세요.";
+            _statusMessage = "Ssalddel 서버에 연결하지 못했습니다. 서버 실행 상태와 HTTPS 포트를 확인해 주세요.";
             return;
         }
         finally

@@ -1,4 +1,4 @@
-# Hongdal 1.5 Migration Notes
+# Ssalddel 1.5 Migration Notes
 
 1.5에서는 창고, 재고, 입고 예정, 출고 예정, 작업자 검증 관련 데이터 변경을 기록합니다.
 

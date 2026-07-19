@@ -1,10 +1,10 @@
 ﻿# 워크플로우 앱 화면 지도
 
-이 문서는 홍달의 워크플로우가 실제 앱 화면에서 어떻게 성립되는지 정리한다. 중심은 홍달 1.0 국내 화물/용달 운송이다. 다른 워크플로우는 독립적으로 펼쳐 놓기보다, 어떤 상태에서 국내 운송으로 합류하고 기사님 화면에 어떤 의뢰로 보이는지를 기준으로 읽는다.
+이 문서는 살뜰의 워크플로우가 실제 앱 화면에서 어떻게 성립되는지 정리한다. 중심은 살뜰 1.0 국내 화물/용달 운송이다. 다른 워크플로우는 독립적으로 펼쳐 놓기보다, 어떤 상태에서 국내 운송으로 합류하고 기사님 화면에 어떤 의뢰로 보이는지를 기준으로 읽는다.
 
 기본 정책은 [workflow-api-policy.md](workflow-api-policy.md)를 따른다. 이 문서는 그 정책을 화면, 앱, 부족한 페이지 후보 관점으로 풀어쓴다.
 
-홍달 1.0을 실제로 닫기 위한 필수 화면 체크리스트는 [홍달 1.0 필수 페이지 기준](hongdal-v1-required-pages.md)에 둔다. 이 문서는 여러 워크플로우가 앱 화면 사이에서 어떻게 이어지는지를 설명하고, 필수 페이지 기준 문서는 그중 1.0 국내 화물/용달 운송을 완성하는 화면 단위를 고정한다.
+살뜰 1.0을 실제로 닫기 위한 필수 화면 체크리스트는 [살뜰 1.0 필수 페이지 기준](ssalddel-v1-required-pages.md)에 둔다. 이 문서는 여러 워크플로우가 앱 화면 사이에서 어떻게 이어지는지를 설명하고, 필수 페이지 기준 문서는 그중 1.0 국내 화물/용달 운송을 완성하는 화면 단위를 고정한다.
 
 ## 읽는 방법
 
@@ -18,19 +18,19 @@
 
 ## 문서의 중심축
 
-가장 먼저 닫아야 할 화면 흐름은 `HongdalApp` 운송 의뢰, `HongdalAdmin` 배차 대기, `DriverApp` 추천/수락/상차/하차, `HongdalAdmin` 운송·증빙·정산 관리다.
+가장 먼저 닫아야 할 화면 흐름은 `SsalddelApp` 운송 의뢰, `SsalddelAdmin` 배차 대기, `DriverApp` 추천/수락/상차/하차, `SsalddelAdmin` 운송·증빙·정산 관리다.
 
 ```mermaid
 flowchart TD
-    Request["HongdalApp<br/>/shipper/request<br/>운송 의뢰"]
-    Wait["HongdalAdmin<br/>/dispatch/wait<br/>배차 대기"]
+    Request["SsalddelApp<br/>/shipper/request<br/>운송 의뢰"]
+    Wait["SsalddelAdmin<br/>/dispatch/wait<br/>배차 대기"]
     Reco["DriverApp<br/>/driver/recommendations<br/>추천 목록"]
     Detail["DriverApp<br/>/driver/recommendations/{의뢰Id}<br/>추천 상세"]
     Decision["DriverApp<br/>/driver/recommendations/{의뢰Id}/decision<br/>수락·보류·거절"]
     Current["DriverApp<br/>/driver/transports/current<br/>진행 중 운송"]
     Pickup["DriverApp<br/>/driver/transports/{운송Id}/pickup<br/>상차·인수증·서명"]
     Dropoff["DriverApp<br/>/driver/transports/{운송Id}/dropoff<br/>하차·완료 증빙"]
-    Admin["HongdalAdmin<br/>/transports, /documents, /settlements<br/>운송·증빙·정산"]
+    Admin["SsalddelAdmin<br/>/transports, /documents, /settlements<br/>운송·증빙·정산"]
 
     Request --> Wait --> Reco --> Detail --> Decision --> Current --> Pickup --> Dropoff --> Admin
     Admin --> Request
@@ -43,22 +43,22 @@ flowchart TD
 | 앱 | 주 사용자 | 현재 역할 |
 | --- | --- | --- |
 | `OrdererApp` | 주문자, 주문자 집단 대표 | 음식/마트 주문, 화물 주문, 수입 공동구매, 주문 내역, 커뮤니티 진입 |
-| `HongdalApp` | 화주, 판매자, 물류 의뢰자 | 운송 의뢰, 대량 의뢰, 창고 재고, 판매채널, HS 코드 검토, 국제 운송 계획 |
+| `SsalddelApp` | 화주, 판매자, 물류 의뢰자 | 운송 의뢰, 대량 의뢰, 창고 재고, 판매채널, HS 코드 검토, 국제 운송 계획 |
 | `DriverApp` | 용달 기사, 배달 기사 | 운행 시작, 추천 의뢰 확인, 배차 수락/거절, 상차/하차 증빙, 정산 |
 | `WarehouseManagerApp` | 창고 관리자, 현장 작업자 | 입고, 검수, 스캔, 피킹, 포장, 출고, 알뜰살뜰 마트 작업 |
-| `HongdalAdmin` | 플랫폼 운영자 | 배차 대기, 운송 진행, 기사/화주 관리, 문서, 정산, HS 코드, HR, 운영 정책 |
-| `Hongdal.WebApp` | 관세사, 화주, 판매자 | 통관·무역 데이터 검토와 보정의 사용자 접점 |
+| `SsalddelAdmin` | 플랫폼 운영자 | 배차 대기, 운송 진행, 기사/화주 관리, 문서, 정산, HS 코드, HR, 운영 정책 |
+| `Ssalddel.WebApp` | 관세사, 화주, 판매자 | 통관·무역 데이터 검토와 보정의 사용자 접점 |
 
 ## 1.0 중심 연결 그림
 
 ```mermaid
 flowchart LR
-    Core["홍달 1.0 국내 화물/용달 운송<br/>기사 추천 → 수락 → 상차 → 하차 → 증빙 → 정산"]
-    Shipper["HongdalApp<br/>일반 화주 운송 의뢰"]
+    Core["살뜰 1.0 국내 화물/용달 운송<br/>기사 추천 → 수락 → 상차 → 하차 → 증빙 → 정산"]
+    Shipper["SsalddelApp<br/>일반 화주 운송 의뢰"]
     Group["OrdererApp<br/>공동주문 수입"]
-    Customs["Hongdal.WebApp / HongdalAdmin<br/>통관·HS 판단"]
+    Customs["Ssalddel.WebApp / SsalddelAdmin<br/>통관·HS 판단"]
     Warehouse["WarehouseManagerApp<br/>창고 입출고"]
-    Sales["HongdalApp<br/>판매채널 출고"]
+    Sales["SsalddelApp<br/>판매채널 출고"]
     Food["OrdererApp<br/>음식 주문"]
     Mart["OrdererApp / WarehouseManagerApp<br/>알뜰살뜰 마트"]
     Community["커뮤니티 신뢰<br/>후기·활동 신호"]
@@ -84,15 +84,15 @@ flowchart LR
 
 | 우선순위 | 상태 변경 | 조작 화면 | 반영 화면 | 의미 |
 | --- | --- | --- | --- | --- |
-| 1 | 운송 의뢰 등록 | `HongdalApp` `/shipper/request` | `HongdalAdmin` `/dispatch/wait`, `DriverApp` `/driver/recommendations` | 화주의 입력이 배차 대기와 기사 추천으로 전파된다. |
-| 1 | 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `HongdalApp` 운송 의뢰 상세, `HongdalAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
-| 1 | 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `HongdalAdmin` `/documents`, `HongdalApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
-| 1 | 현장 예외 신고 | `DriverApp` `/driver/transports/{운송Id}/pickup`, `/driver/transports/{운송Id}/dropoff`, `/driver/transports/current` | `HongdalAdmin` `/transports`, `HongdalApp` 운송 의뢰 상세 후보 | 상차물건없음, 수량불일치, 담당자부재, 하차지부재, 증빙업로드실패 같은 상황이 단계와 예외코드로 남고 다음 행동 안내가 내려간다. |
-| 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `HongdalAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
-| 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `HongdalApp` `/shipper/warehouse/inventory`, `HongdalApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
-| 2 | 판매채널 주문 출고 배치 | `HongdalApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
-| 3 | 통관 상태 보정 | `Hongdal.WebApp` `/shipper/customs/hs-reviews` 또는 `HongdalAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `HongdalApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
-| 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `HongdalAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
+| 1 | 운송 의뢰 등록 | `SsalddelApp` `/shipper/request` | `SsalddelAdmin` `/dispatch/wait`, `DriverApp` `/driver/recommendations` | 화주의 입력이 배차 대기와 기사 추천으로 전파된다. |
+| 1 | 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `SsalddelApp` 운송 의뢰 상세, `SsalddelAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
+| 1 | 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `SsalddelAdmin` `/documents`, `SsalddelApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
+| 1 | 현장 예외 신고 | `DriverApp` `/driver/transports/{운송Id}/pickup`, `/driver/transports/{운송Id}/dropoff`, `/driver/transports/current` | `SsalddelAdmin` `/transports`, `SsalddelApp` 운송 의뢰 상세 후보 | 상차물건없음, 수량불일치, 담당자부재, 하차지부재, 증빙업로드실패 같은 상황이 단계와 예외코드로 남고 다음 행동 안내가 내려간다. |
+| 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `SsalddelAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
+| 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `SsalddelApp` `/shipper/warehouse/inventory`, `SsalddelApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
+| 2 | 판매채널 주문 출고 배치 | `SsalddelApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
+| 3 | 통관 상태 보정 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `SsalddelApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
+| 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `SsalddelAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
 
 ### 국내 운송 상태 전파
 
@@ -102,12 +102,12 @@ flowchart LR
 
 ```mermaid
 sequenceDiagram
-    participant Shipper as HongdalApp /shipper/request
-    participant Server as Hongdal 운송 원장
-    participant AdminWait as HongdalAdmin /dispatch/wait
+    participant Shipper as SsalddelApp /shipper/request
+    participant Server as Ssalddel 운송 원장
+    participant AdminWait as SsalddelAdmin /dispatch/wait
     participant DriverReco as DriverApp /driver/recommendations
     participant DriverRun as DriverApp /driver/transports/current
-    participant AdminTrans as HongdalAdmin /transports
+    participant AdminTrans as SsalddelAdmin /transports
 
     Shipper->>Server: 운송 의뢰 등록
     Server->>AdminWait: 상태=배차대기 목록 반영
@@ -130,9 +130,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Orderer as OrdererApp /group-purchase
-    participant Ledger as Hongdal 공동주문 원장
-    participant Admin as HongdalAdmin 공동주문 운영 화면 후보
-    participant Broker as Hongdal.WebApp 통관 검토
+    participant Ledger as Ssalddel 공동주문 원장
+    participant Admin as SsalddelAdmin 공동주문 운영 화면 후보
+    participant Broker as Ssalddel.WebApp 통관 검토
     participant Driver as DriverApp 추천/진행 화면
     participant Warehouse as WarehouseManagerApp /work-board
 
@@ -157,14 +157,14 @@ sequenceDiagram
 
 ### 공동주문 수입 통관완료 후 기사 추천으로 이어지는 흐름
 
-공동주문 수입이 국내 보세구역에 들어온 뒤에는 새 운송 워크플로우를 따로 만들기보다, 홍달 1.0 국내 화물/용달 운송 흐름으로 합류한다. 이때 주문자 집단이 법적 화주가 아닐 수 있으므로 운송 의뢰 주체는 플랫폼으로 두고, 비용 부담과 정산 범위는 주문자 집단으로 남긴다.
+공동주문 수입이 국내 보세구역에 들어온 뒤에는 새 운송 워크플로우를 따로 만들기보다, 살뜰 1.0 국내 화물/용달 운송 흐름으로 합류한다. 이때 주문자 집단이 법적 화주가 아닐 수 있으므로 운송 의뢰 주체는 플랫폼으로 두고, 비용 부담과 정산 범위는 주문자 집단으로 남긴다.
 
 ```mermaid
 sequenceDiagram
     participant Orderer as OrdererApp /group-purchase
     participant ImportLedger as 공동주문 수입 원장
-    participant Admin as HongdalAdmin 공동주문 운영
-    participant Dispatch as 홍달 1.0 배차대기
+    participant Admin as SsalddelAdmin 공동주문 운영
+    participant Dispatch as 살뜰 1.0 배차대기
     participant DriverList as DriverApp 추천목록
     participant DriverDetail as DriverApp 추천상세
 
@@ -194,11 +194,11 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Seller as HongdalApp /shipper/sales/orders
-    participant Server as Hongdal 판매·출고 원장
+    participant Seller as SsalddelApp /shipper/sales/orders
+    participant Server as Ssalddel 판매·출고 원장
     participant Warehouse as WarehouseManagerApp /work-board
     participant Driver as DriverApp /driver/recommendations
-    participant Admin as HongdalAdmin /transports
+    participant Admin as SsalddelAdmin /transports
 
     Seller->>Server: 판매채널 주문 동기화
     Server->>Seller: 주문 상태=출고대기
@@ -215,19 +215,19 @@ sequenceDiagram
 
 ## 국내 화물 운송
 
-국내 화물 운송은 홍달 1.0에서 시작한 핵심 실행 워크플로우다. 공동주문 수입, 창고 입출고, 판매채널 출고, 음식 배달, 알뜰살뜰 마트도 실제 상차와 하차가 필요하면 이 흐름으로 합류한다.
+국내 화물 운송은 살뜰 1.0에서 시작한 핵심 실행 워크플로우다. 공동주문 수입, 창고 입출고, 판매채널 출고, 음식 배달, 알뜰살뜰 마트도 실제 상차와 하차가 필요하면 이 흐름으로 합류한다.
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
-| 화주 | `HongdalApp` `/shipper/request`, `/shipper/request/bulk`, `/shipper/public-cargo` | `api/v1/shipper/requests` |
+| 화주 | `SsalddelApp` `/shipper/request`, `/shipper/request/bulk`, `/shipper/public-cargo` | `api/v1/shipper/requests` |
 | 기사 | `DriverApp` `/driver/work/start`, `/driver/recommendations`, `/driver/recommendations/{의뢰Id}`, `/driver/recommendations/{의뢰Id}/decision` | `api/v1/driver/recommendations`, `api/v1/driver/dispatch-actions` |
 | 기사 | `DriverApp` `/driver/transports/current`, `/driver/transports/{운송Id}/pickup`, `/driver/transports/{운송Id}/dropoff` | `api/v1/driver/transports`, `api/v1/files` |
-| 플랫폼 운영자 | `HongdalAdmin` `/dispatch/wait`, `/transports`, `/drivers/operating`, `/documents`, `/settlements` | `api/v1/admin/transports`, `api/v1/transport-events`, `api/v1/admin/documents` |
+| 플랫폼 운영자 | `SsalddelAdmin` `/dispatch/wait`, `/transports`, `/drivers/operating`, `/documents`, `/settlements` | `api/v1/admin/transports`, `api/v1/transport-events`, `api/v1/admin/documents` |
 
 ```mermaid
 sequenceDiagram
-    participant Shipper as HongdalApp 화주 화면
-    participant Admin as Hongdal 서버/관리자
+    participant Shipper as SsalddelApp 화주 화면
+    participant Admin as Ssalddel 서버/관리자
     participant Driver as DriverApp 기사 화면
 
     Shipper->>Admin: 운송 의뢰 등록
@@ -244,11 +244,11 @@ sequenceDiagram
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 운송 의뢰 상세/분쟁 상세 | `HongdalApp` | 화주가 비용, 증빙, 정산 예정, 분쟁 상태를 한 화면에서 확인해야 한다. |
-| 운송 완료 후 입금 요청 화면 | `HongdalApp` | 운송완료후정산 건에서 토스페이먼츠 가상계좌 결제대기 건, 입금 기한, 1/3/7일 알림 상태를 확인해야 한다. |
+| 운송 의뢰 상세/분쟁 상세 | `SsalddelApp` | 화주가 비용, 증빙, 정산 예정, 분쟁 상태를 한 화면에서 확인해야 한다. |
+| 운송 완료 후 입금 요청 화면 | `SsalddelApp` | 운송완료후정산 건에서 토스페이먼츠 가상계좌 결제대기 건, 입금 기한, 1/3/7일 알림 상태를 확인해야 한다. |
 | 업무 유형이 강조된 추천 상세 | `DriverApp` | 일반 화물, 공동주문 세대 배송, 음식, 마트 인계를 기사에게 명확히 구분해 보여야 한다. |
 | 수령자 확인 화면 | `OrdererApp` 또는 별도 공개 화면 | 하차 완료 후 수령자가 확인, 이의 제기, 사진 확인을 할 수 있어야 한다. |
-| 운송 워크플로우 운영 보드 | `HongdalAdmin` | 모든 운송 건을 워크플로우 단계 기준으로 모아 보고 예외를 처리해야 한다. |
+| 운송 워크플로우 운영 보드 | `SsalddelAdmin` | 모든 운송 건을 워크플로우 단계 기준으로 모아 보고 예외를 처리해야 한다. |
 
 ## 공동주문 수입
 
@@ -258,9 +258,9 @@ sequenceDiagram
 | --- | --- | --- |
 | 주문자, 주문자 집단 대표 | `OrdererApp` `/group-purchase` | `api/v1/orderer/group-purchase-logistics-workflows`, `api/v1/orderer/group-purchase-overseas-shipments` |
 | 주문자 | `OrdererApp` `/orders` | 공동주문 상태와 개인 주문 확인 |
-| 플랫폼 운영자 | `HongdalAdmin` `/dashboard`, `/documents`, `/activity-logs` | `api/v1/admin/orderer/group-purchase-*`, `api/v1/admin/documents` |
-| 관세사 | `Hongdal.WebApp` `/shipper/customs/hs-reviews` 또는 `HongdalAdmin` `/customs/hs-codes` | `api/v1/customs`, `api/v1/admin/hs-codes` |
-| 화주·판매자 | `HongdalApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 검토, FCL/LCL 계획 |
+| 플랫폼 운영자 | `SsalddelAdmin` `/dashboard`, `/documents`, `/activity-logs` | `api/v1/admin/orderer/group-purchase-*`, `api/v1/admin/documents` |
+| 관세사 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | `api/v1/customs`, `api/v1/admin/hs-codes` |
+| 화주·판매자 | `SsalddelApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 검토, FCL/LCL 계획 |
 | 기사 | `DriverApp` 국내 화물 운송 화면 | 국내 보세구역 반출 이후 운송 |
 | 창고 관리자 | `WarehouseManagerApp` `/work/inbound`, `/work-board` | 3PL 입고 또는 판매채널 출고 준비 |
 
@@ -285,8 +285,8 @@ flowchart TD
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
 | 공동주문 투표/결정 화면 | `OrdererApp` | 운송 방식, 세대 배송 범위, 3PL 입고 여부, 비용 부담 방식을 집단이 합의해야 한다. |
-| 공동주문 수입 원장 콘솔 | `HongdalAdmin` | BL/AWB, 문서관리번호, 통관 상태, 보세구역, 국내 운송 인계를 운영자가 한 곳에서 봐야 한다. |
-| 해외 판매자/배송대행지 업로드 화면 | 별도 파트너 화면 또는 `HongdalApp` 확장 | 라벨, 상품 정보 스티커, 포장 단위, 선적 증빙을 외부 참여자가 입력할 접점이 필요하다. |
+| 공동주문 수입 원장 콘솔 | `SsalddelAdmin` | BL/AWB, 문서관리번호, 통관 상태, 보세구역, 국내 운송 인계를 운영자가 한 곳에서 봐야 한다. |
+| 해외 판매자/배송대행지 업로드 화면 | 별도 파트너 화면 또는 `SsalddelApp` 확장 | 라벨, 상품 정보 스티커, 포장 단위, 선적 증빙을 외부 참여자가 입력할 접점이 필요하다. |
 | 기사 세대 배송 상세 | `DriverApp` | 송장 필수 배송과 품목 스티커만 필요한 배송을 구분하고, 동/호수 분배 책임을 표시해야 한다. |
 | 공동주문 수령/분배 체크리스트 | `OrdererApp` | 주문자 집단이 세대별 수령, 미수령, 파손, 추가 비용을 확인해야 한다. |
 
@@ -298,8 +298,8 @@ flowchart TD
 | --- | --- | --- |
 | 창고 관리자 | `WarehouseManagerApp` `/work/inbound`, `/work/outbound`, `/work/packing`, `/scan`, `/work-board` | `api/v1/warehouse-operations` |
 | 창고 관리자 | `WarehouseManagerApp` `/work/inbound/products`, `/work/inbound/inspection`, `/work/{ProcessCode}/workbench` | 입고 검수, 작업대 스캔 |
-| 화주·판매자 | `HongdalApp` `/shipper/warehouse/workspace`, `/shipper/warehouse/inventory`, `/shipper/warehouse/scan` | 재고, 입고 상태 확인 |
-| 화주·판매자 | `HongdalApp` `/shipper/warehouse/work/inbound`, `/shipper/warehouse/work/outbound`, `/shipper/warehouse/work/packing` | 창고 작업 진입 |
+| 화주·판매자 | `SsalddelApp` `/shipper/warehouse/workspace`, `/shipper/warehouse/inventory`, `/shipper/warehouse/scan` | 재고, 입고 상태 확인 |
+| 화주·판매자 | `SsalddelApp` `/shipper/warehouse/work/inbound`, `/shipper/warehouse/work/outbound`, `/shipper/warehouse/work/packing` | 창고 작업 진입 |
 
 ```mermaid
 flowchart LR
@@ -317,7 +317,7 @@ flowchart LR
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
 | 공동수입 입고 로트 상세 | `WarehouseManagerApp` | BL/AWB, 통관 단위, 세대 배송 단위, 냉장/냉동 조건을 창고 입고 단위와 연결해야 한다. |
-| 출고 배치 상세 | `WarehouseManagerApp` 또는 `HongdalApp` | 출고 배치 엔진이 어떤 창고와 재고를 선택했는지 사람이 검토할 수 있어야 한다. |
+| 출고 배치 상세 | `WarehouseManagerApp` 또는 `SsalddelApp` | 출고 배치 엔진이 어떤 창고와 재고를 선택했는지 사람이 검토할 수 있어야 한다. |
 | 보관 조건 적합성 확인 | `WarehouseManagerApp` | 냉장, 냉동, 상온, 유통기한 조건에 맞는 창고만 선택되도록 보여야 한다. |
 
 ## 판매채널 출고
@@ -326,9 +326,9 @@ flowchart LR
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
-| 판매자 | `HongdalApp` `/shipper/sales/channels` | `api/v1/sales-channels` |
-| 판매자 | `HongdalApp` `/shipper/sales/listings` | 상품 출품 후보와 채널 상품 연결 |
-| 판매자 | `HongdalApp` `/shipper/sales/orders` | 판매채널 주문과 창고 출고 연결 |
+| 판매자 | `SsalddelApp` `/shipper/sales/channels` | `api/v1/sales-channels` |
+| 판매자 | `SsalddelApp` `/shipper/sales/listings` | 상품 출품 후보와 채널 상품 연결 |
+| 판매자 | `SsalddelApp` `/shipper/sales/orders` | 판매채널 주문과 창고 출고 연결 |
 | 창고 관리자 | `WarehouseManagerApp` `/work-board`, `/work/outbound`, `/work/packing` | 출고, 피킹, 포장 |
 | 기사 | `DriverApp` 국내 화물 운송 화면 | 출고 후 국내 배송 |
 
@@ -336,9 +336,9 @@ flowchart LR
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 채널 주문 상세 | `HongdalApp` | 주문별 재고 배분, 출고 배치, 배송 인계를 추적해야 한다. |
-| 상품 상세 이미지 생성/검수 화면 | `HongdalApp` 또는 `HongdalAdmin` | 물류 이력과 후기를 판매 상세 이미지로 활용하려면 검수 접점이 필요하다. |
-| 수출 채널 준비 화면 | `HongdalApp` | 아마존 등 해외 채널로 보낼 때 수출 통관, 관세사 검토, 금지 품목 판단을 연결해야 한다. |
+| 채널 주문 상세 | `SsalddelApp` | 주문별 재고 배분, 출고 배치, 배송 인계를 추적해야 한다. |
+| 상품 상세 이미지 생성/검수 화면 | `SsalddelApp` 또는 `SsalddelAdmin` | 물류 이력과 후기를 판매 상세 이미지로 활용하려면 검수 접점이 필요하다. |
+| 수출 채널 준비 화면 | `SsalddelApp` | 아마존 등 해외 채널로 보낼 때 수출 통관, 관세사 검토, 금지 품목 판단을 연결해야 한다. |
 
 ## 통관·무역 데이터
 
@@ -346,9 +346,9 @@ flowchart LR
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
-| 화주·판매자 | `HongdalApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 코드 검토, FCL/LCL 판단 |
-| 관세사 | `Hongdal.WebApp` `/shipper/customs/hs-reviews` 또는 `HongdalAdmin` `/customs/hs-codes` | 관세사 검토와 보정 |
-| 플랫폼 운영자 | `HongdalAdmin` `/customs/hs-codes` | HS 코드 운영 |
+| 화주·판매자 | `SsalddelApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 코드 검토, FCL/LCL 판단 |
+| 관세사 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | 관세사 검토와 보정 |
+| 플랫폼 운영자 | `SsalddelAdmin` `/customs/hs-codes` | HS 코드 운영 |
 | 주문자 | `OrdererApp` `/group-purchase` | 공동수입 상태와 예상 단가 확인 |
 
 보완 후보:
@@ -356,8 +356,8 @@ flowchart LR
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
 | BL/AWB 조회 상세 | `OrdererApp` 또는 공개 조회 화면 | 주문자가 자신의 공동수입 화물이 어디 있는지 문서관리번호로 확인해야 한다. |
-| 항구/공항/세관/보세구역 코드 브라우저 | `HongdalAdmin` | 공공 데이터를 정규화해 통관 응답값과 연결해야 한다. |
-| 관세사 작업 보드 | `Hongdal.WebApp` 또는 `HongdalAdmin` | HS 코드 보정, 수입 가능성 검토, 보류 사유를 관세사 업무 단위로 처리해야 한다. |
+| 항구/공항/세관/보세구역 코드 브라우저 | `SsalddelAdmin` | 공공 데이터를 정규화해 통관 응답값과 연결해야 한다. |
+| 관세사 작업 보드 | `Ssalddel.WebApp` 또는 `SsalddelAdmin` | HS 코드 보정, 수입 가능성 검토, 보류 사유를 관세사 업무 단위로 처리해야 한다. |
 
 ## 커뮤니티 신뢰
 
@@ -367,13 +367,13 @@ flowchart LR
 | --- | --- | --- |
 | 커뮤니티 참여자 | 각 앱 홈의 커뮤니티 모드 | `api/v1/community/posts`, `api/v1/community/activity-signals` |
 | 주문자 집단 | `OrdererApp` `/group-purchase`, 홈 커뮤니티 | `api/v1/community/votes` |
-| 플랫폼 운영자 | `HongdalAdmin` `/common-contents`, `/activity-logs` | 콘텐츠와 활동 로그 관리 |
+| 플랫폼 운영자 | `SsalddelAdmin` `/common-contents`, `/activity-logs` | 콘텐츠와 활동 로그 관리 |
 
 보완 후보:
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 워크플로우 활동 신호 뷰어 | 각 앱 또는 `HongdalAdmin` | 어떤 업무 행동이 커뮤니티에 공개 가능한지 확인해야 한다. |
+| 워크플로우 활동 신호 뷰어 | 각 앱 또는 `SsalddelAdmin` | 어떤 업무 행동이 커뮤니티에 공개 가능한지 확인해야 한다. |
 | 투표와 전자문서 화면 | `OrdererApp` | 집단 결정, 참여자 서명, 제출 가능한 문서 생성을 연결해야 한다. |
 | 공개 범위 설정 | 각 앱 | 개인정보와 영업정보를 보호하면서 신뢰 신호만 공개해야 한다. |
 
@@ -383,17 +383,17 @@ flowchart LR
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
-| 플랫폼 운영자 | `HongdalAdmin` `/dashboard` | `api/v1/admin/hr-roles`, `api/v1/admin/hr-employment-contracts` |
-| 플랫폼 운영자 | `HongdalAdmin` `/dashboard` | `api/v1/admin/hr-participation-benefits`, `api/v1/admin/hr-social-insurance-filings` |
+| 플랫폼 운영자 | `SsalddelAdmin` `/dashboard` | `api/v1/admin/hr-roles`, `api/v1/admin/hr-employment-contracts` |
+| 플랫폼 운영자 | `SsalddelAdmin` `/dashboard` | `api/v1/admin/hr-participation-benefits`, `api/v1/admin/hr-social-insurance-filings` |
 | 주문자 집단 | `OrdererApp` `/group-purchase` | 주문자 집단 운영 주체와 참여 가능 역할 확인 |
 
 보완 후보:
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| HR 운영 콘솔 | `HongdalAdmin` | 역할, 계약, 보상, 4대보험 신고 준비 상태를 분리해서 관리해야 한다. |
+| HR 운영 콘솔 | `SsalddelAdmin` | 역할, 계약, 보상, 4대보험 신고 준비 상태를 분리해서 관리해야 한다. |
 | 입주민 참여 신청 화면 | `OrdererApp` | 같은 단지 주민이 분류, 배분, 관리 보조 업무에 지원할 접점이 필요하다. |
-| 계약/신고 준비 체크리스트 | `HongdalAdmin` | API만 있으면 운영자가 누락 상태를 파악하기 어렵다. |
+| 계약/신고 준비 체크리스트 | `SsalddelAdmin` | API만 있으면 운영자가 누락 상태를 파악하기 어렵다. |
 
 ## 음식 배달
 
@@ -403,13 +403,13 @@ flowchart LR
 | --- | --- | --- |
 | 주문자 | `OrdererApp` `/food`, `/food/restaurants` | `api/v1/orderer/restaurant-search-policy` |
 | 기사 | `DriverApp` `/driver/recommendations`, `/driver/transports/current` | 기사 추천, 픽업/전달 |
-| 플랫폼 운영자 | `HongdalAdmin` `/restaurant-search-policy`, `/food/operations` | 음식점 검색 정책과 운영 상태 |
+| 플랫폼 운영자 | `SsalddelAdmin` `/restaurant-search-policy`, `/food/operations` | 음식점 검색 정책과 운영 상태 |
 
 보완 후보:
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 음식점 주문 관리 화면 | 별도 음식점 앱 또는 `HongdalAdmin` | 조리 상태, 픽업 준비, 품절 처리를 음식점이 입력해야 한다. |
+| 음식점 주문 관리 화면 | 별도 음식점 앱 또는 `SsalddelAdmin` | 조리 상태, 픽업 준비, 품절 처리를 음식점이 입력해야 한다. |
 | 음식 픽업 전용 상세 | `DriverApp` | 일반 화물 상차/하차와 다른 조리 완료, 픽업, 고객 전달 상태가 필요하다. |
 
 ## 알뜰살뜰 마트
@@ -426,17 +426,17 @@ flowchart LR
 
 | 화면 후보 | 앱 | 이유 |
 | --- | --- | --- |
-| 마트 상품/재고 운영 화면 | `HongdalAdmin` 또는 `WarehouseManagerApp` | 판매 가능 재고, 품절, 가격, 보충 정책을 운영해야 한다. |
+| 마트 상품/재고 운영 화면 | `SsalddelAdmin` 또는 `WarehouseManagerApp` | 판매 가능 재고, 품절, 가격, 보충 정책을 운영해야 한다. |
 | 마트 주문 상세 | `OrdererApp` | 피킹, 포장, 기사 인계, 배송 완료 상태를 주문자가 봐야 한다. |
-| 반품/취소 처리 화면 | `OrdererApp` 또는 `HongdalAdmin` | 신선식품과 일반상품의 취소 가능 시점을 다르게 관리해야 한다. |
+| 반품/취소 처리 화면 | `OrdererApp` 또는 `SsalddelAdmin` | 신선식품과 일반상품의 취소 가능 시점을 다르게 관리해야 한다. |
 
 ## 화면 보완 우선순위
 
 | 순위 | 보완 항목 | 이유 |
 | --- | --- | --- |
-| 1 | `DriverApp` 추천 상세의 업무 유형 강화 | 홍달 1.0의 첫 판단 화면이다. 일반 화물, 공동주문 세대 배송, 음식, 마트 배송은 기사 책임 범위가 다르다. |
+| 1 | `DriverApp` 추천 상세의 업무 유형 강화 | 살뜰 1.0의 첫 판단 화면이다. 일반 화물, 공동주문 세대 배송, 음식, 마트 배송은 기사 책임 범위가 다르다. |
 | 2 | `DriverApp` 상차·하차 증빙 화면 강화 | 기사님 운행 흐름에서 실제 법적·정산 증빙이 닫히는 지점이다. 인수증, 사진, 서명, 생략 사유가 안정적으로 남아야 한다. |
-| 3 | `HongdalAdmin` 국내 운송 운영 보드 | 배차 대기, 진행 중, 상차 완료, 하차 완료, 정산 후보를 1.0 중심 상태로 먼저 볼 수 있어야 한다. |
+| 3 | `SsalddelAdmin` 국내 운송 운영 보드 | 배차 대기, 진행 중, 상차 완료, 하차 완료, 정산 후보를 1.0 중심 상태로 먼저 볼 수 있어야 한다. |
 | 4 | 공동주문 수입 원장 콘솔 | BL/AWB, 통관, 보세구역, 국내 운송, 3PL 입고가 하나의 원장으로 이어져야 한다. |
 | 5 | 공동주문 투표/결정/전자문서 화면 | 주문자 집단의 합의와 책임 경계를 기록해야 이후 분쟁을 줄일 수 있다. |
 | 6 | 창고 입고 로트와 출고 배치 상세 | 공동수입, 냉장/냉동, 판매채널 출고를 창고 작업자가 이해할 수 있어야 한다. |

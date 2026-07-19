@@ -1,7 +1,7 @@
-﻿# Hongdal 1.0 Checklist
+﻿# Ssalddel 1.0 Checklist
 
 - [ ] [0.0 집중 로드맵](../v0.0/focus-roadmap.md)의 1.0 재개 조건과 0.0 릴리즈 게이트 통과 확인
-- [ ] [Hongdal 0.0 릴리즈 체크리스트](../v0.0/checklist.md)와 0.0 공통 게이트 통과 확인
+- [ ] [Ssalddel 0.0 릴리즈 체크리스트](../v0.0/checklist.md)와 0.0 공통 게이트 통과 확인
 - [ ] `CommunityTrustWorkflow=true` 상태에서 0.0 원장이 1.0 운송 의뢰로 인계되는지 확인
 - [ ] 화주 운송 의뢰 등록 흐름 확인
 - [ ] 화물/용달 기사 추천 후보 생성 확인
@@ -31,5 +31,5 @@
 - [ ] 1.0 범위 밖 기능의 기본 노출이 꺼져 있는지 확인
 - [ ] Admin/User 기능 설정 화면에서 0.0 기반, 1.0 실행 모듈과 1.5 이후 확장 기능이 버전 그룹으로 구분되는지 확인
 - [ ] `CargoYongdalV1=true` 확인
-- [ ] `WarehouseV15`, `CustomsHsV20`, `OrdererGroupOrderV25`, `FoodDeliveryV30`, `HongdalMartV35` 기본 비활성 확인
+- [ ] `WarehouseV15`, `CustomsHsV20`, `OrdererGroupOrderV25`, `FoodDeliveryV30`, `SsalddelMartV35` 기본 비활성 확인
 - [ ] [공통 릴리즈 게이트](../release-gates.md) 통과 확인

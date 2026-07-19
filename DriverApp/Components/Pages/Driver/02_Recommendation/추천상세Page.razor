@@ -87,7 +87,7 @@
                 </MudStack>
             </MudPaper>
 
-            <HongdalDocumentOutputPanel Draft="@CreateWaybillDraft(의뢰)"
+            <SsalddelDocumentOutputPanel Draft="@CreateWaybillDraft(의뢰)"
                                         Title="운송장 출력"
                                         Subtitle="추천 의뢰 정보를 인쇄 가능한 운송장으로 변환합니다."
                                         PanelClass="driver-recommendation-card pa-4" />
@@ -177,12 +177,12 @@
 
     private DriverWarningBadgeState WarningState => DriverWarningBadgeStateFactory.Create(의뢰);
 
-    private static HongdalWaybillDocumentDraft CreateWaybillDraft(DriverRequestItem item)
+    private static SsalddelWaybillDocumentDraft CreateWaybillDraft(DriverRequestItem item)
     {
         var fare = item.예상수익 ?? 0m;
         var cost = item.예상총비용 ?? 0m;
 
-        return new HongdalWaybillDocumentDraft(
+        return new SsalddelWaybillDocumentDraft(
             item.의뢰Id,
             item.화물종류,
             item.운송조건표시,

@@ -1,6 +1,6 @@
-using Hongdal.Contracts.Common.Orderer;
-using Hongdal.Contracts.Common.PublicData;
-using Hongdal.Ui.Common.Areas.App.ViewModels;
+using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Common.PublicData;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using OrdererApp.Services;
 
 namespace OrdererApp.ViewModels;

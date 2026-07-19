@@ -47,12 +47,12 @@ public interface I운송의뢰배차엔진
 
 화물 배달 건은 "누가 주문했는가"보다 "어떤 운송 맥락에서 출고 또는 반출되는가"를 먼저 봅니다.
 1.0 문맥에서는 화주 운송 의뢰와 주문자 화물/공산품 운송을 창고 출고 연계 운송의 대표 유입으로 본다. 판매자인 화주의 출고는 동시에 주문자의 입고 예정 이벤트가 될 수 있으므로, 배차 판단에는 출고 준비 상태와 주문자 인수 조건을 같이 올립니다.
-따라서 HongdalApp 화면에는 `화주 운송 의뢰`로 보이더라도 서버 내부에서는 `출고예정운송대상`으로 정규화합니다. 판매채널 주문으로 생긴 `출고예정`, 창고에서 바로 나가는 출고 물량, 화주가 맡긴 물건은 모두 같은 배차 파이프라인에서 "운송 가능한 출고 예정 상품"으로 다룹니다.
+따라서 SsalddelApp 화면에는 `화주 운송 의뢰`로 보이더라도 서버 내부에서는 `출고예정운송대상`으로 정규화합니다. 판매채널 주문으로 생긴 `출고예정`, 창고에서 바로 나가는 출고 물량, 화주가 맡긴 물건은 모두 같은 배차 파이프라인에서 "운송 가능한 출고 예정 상품"으로 다룹니다.
 FCL/LCL은 독립된 최상위 유입이라기보다 수입/통관 연계 운송 안에서 컨테이너/혼적 단위를 판단하는 하위 개념으로 둡니다.
 
 | 흐름 | 원본의뢰유형 | 배차 시작 조건 | 배차 시 우선 확인 |
 | --- | --- | --- | --- |
-| 창고 출고 연계 운송 - 화주 출고 | `CargoTransport`, `WarehouseOutboundCargo`, `SalesChannelOutboundCargo`, `HongdalMartOutboundCargo` | 결제/승인 조건과 출고 예정 또는 출고 준비 상태 확인 | 판매자/화주 출고지, 주문자 입고지, 화물 제원, 운임, 결제/정산 조건 |
+| 창고 출고 연계 운송 - 화주 출고 | `CargoTransport`, `WarehouseOutboundCargo`, `SalesChannelOutboundCargo`, `SsalddelMartOutboundCargo` | 결제/승인 조건과 출고 예정 또는 출고 준비 상태 확인 | 판매자/화주 출고지, 주문자 입고지, 화물 제원, 운임, 결제/정산 조건 |
 | 창고 출고 연계 운송 - 주문자 화물/공산품 | `WarehouseOutboundCargo`, `OrdererCargoOrder` | 주문 확정, 출고 예정, 주문자 인수 조건 확인 | 주문자 연락 가능 여부, 상품 크기, 파손 주의, 픽업/하차 주소 |
 | 수입/통관 연계 FCL | `ImportCargoTransport`, `GroupPurchaseCargoTransport`, `FclCargoTransport` | 통관 또는 반출 가능 상태와 컨테이너/독차 조건 확정 | 통관 상태, 컨테이너/차량 제원, 팔레트 수, 중량, 상하차 장비 |
 | 수입/통관 연계 LCL | `ImportCargoTransport`, `GroupPurchaseCargoTransport`, `LclCargoTransport` | 통관 또는 반출 가능 상태와 혼적 가능 조건 확인 | HS 코드 위험 태그, 온도/파손 민감도, 하차 순서, 경유 가능 시간 |
@@ -108,8 +108,8 @@ OutboundBatchPlanRequest planRequest = 화주운송의뢰출고예정정규화.T
 | 흐름 | 원본의뢰유형 | 배차 시작 조건 |
 | --- | --- | --- |
 | 음식점 즉시 배달 | `RestaurantFoodOrder`, `FoodOrder` | 결제 승인과 조리 접수 후 바로 배차 가능 |
-| 알뜰살뜰 마트 준비 중 사전 배차 | `HongdalMartOrder`, `MartFoodOrder` | 재고 확인, 피킹/포장 진행 중에도 포장 완료 예상시각 기준으로 서버 사전 배차 가능 |
-| 알뜰살뜰 마트 포장 완료 픽업 | `HongdalMartPackedOrder` | 포장 완료 후 배달기사 실제 픽업 가능 |
+| 알뜰살뜰 마트 준비 중 사전 배차 | `SsalddelMartOrder`, `MartFoodOrder` | 재고 확인, 피킹/포장 진행 중에도 포장 완료 예상시각 기준으로 서버 사전 배차 가능 |
+| 알뜰살뜰 마트 포장 완료 픽업 | `SsalddelMartPackedOrder` | 포장 완료 후 배달기사 실제 픽업 가능 |
 
 ```mermaid
 flowchart TD

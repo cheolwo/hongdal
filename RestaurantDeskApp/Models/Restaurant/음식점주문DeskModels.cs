@@ -1,5 +1,5 @@
-using Hongdal.Contracts.Common.Documents;
-using Hongdal.Contracts.Food;
+using Ssalddel.Contracts.Common.Documents;
+using Ssalddel.Contracts.Food;
 
 namespace RestaurantDeskApp.Models.Restaurant;
 
@@ -72,5 +72,5 @@ public sealed class 음식점주문수락결과
 
     public 음식주문응답? 상세주문 { get; init; }
 
-    public HongdalExpectedItemDocumentDraft? 전표Draft { get; init; }
+    public SsalddelExpectedItemDocumentDraft? 전표Draft { get; init; }
 }

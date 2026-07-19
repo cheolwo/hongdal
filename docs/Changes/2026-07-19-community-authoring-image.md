@@ -35,7 +35,7 @@
 ## 검증
 
 - `CommunityAuthoringImagePromptPlannerTests`, `KieAiImageGenerationClientTests`, `CommunityInformationReviewPageViewModelTests` 대상 테스트 37개 통과
-- `Hongdal`, `Hongdal.Ui.Common`, `HongdalAdminApp` Windows·Android 대상 build 경고 0개·오류 0개
+- `Ssalddel`, `Ssalddel.Ui.Common`, `SsalddelAdminApp` Windows·Android 대상 build 경고 0개·오류 0개
 - 실제 공통 Razor 컴포넌트를 참조한 검증 host build 경고 0개·오류 0개
 - 데스크톱·모바일 PNG는 브라우저 webview 연결 시간 초과로 확보하지 못했으며 실제 Admin route 시각 검증은 남아 있음
 - `git diff --check` 통과

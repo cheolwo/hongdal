@@ -1,4 +1,4 @@
-# Hongdal 1.0 Migration Notes
+# Ssalddel 1.0 Migration Notes
 
 1.0에서는 국내 화물/용달 운송 안정화에 필요한 최소 데이터 구조를 우선합니다.
 

@@ -1,4 +1,4 @@
-using Hongdal.Ui.Common.Areas.App.Models;
+using Ssalddel.Ui.Common.Areas.App.Models;
 
 namespace WarehouseManagerApp.Services;
 

@@ -1,0 +1,673 @@
+@page "/driver/recommendations"
+@implements IAsyncDisposable
+@using Ssalddel.Contracts.Driver.Recommendation
+@inject I기사추천수신Service 추천Service
+@inject WebAuthSessionService AuthSession
+@inject NavigationManager Navigation
+
+<WebPageHeader Eyebrow="Driver Web"
+               Title="추천 배차 수신"
+               Description="기사 지도 화면에서 신규 배차 추천이 들어왔을 때 배너, 제한 시간, 수락/거절 흐름을 검증합니다."
+               Badge="SignalR + API" />
+
+<MudGrid>
+    <MudItem xs="12" lg="4">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudText Typo="Typo.h6">추천 수신 준비</MudText>
+                        <MudChip T="string" Color="@ResolveConnectionColor()" Size="Size.Small">@추천Service.연결상태</MudChip>
+                    </MudStack>
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                        실제 수신은 기사 계정 로그인 후 SignalR 허브에 연결해야 합니다. API 키나 FCM 없이도 모의 추천으로 같은 화면을 검증할 수 있습니다.
+                    </MudAlert>
+                    <MudSelect T="기사추천조회범위"
+                               @bind-Value="조회범위"
+                               Label="추천 조회 범위"
+                               Variant="Variant.Outlined">
+                        <MudSelectItem T="기사추천조회범위" Value="@기사추천조회범위.전체">전체 추천</MudSelectItem>
+                        <MudSelectItem T="기사추천조회범위" Value="@기사추천조회범위.운행중">운행 중 추천</MudSelectItem>
+                        <MudSelectItem T="기사추천조회범위" Value="@기사추천조회범위.비운행중">비운행 중 추천</MudSelectItem>
+                        <MudSelectItem T="기사추천조회범위" Value="@기사추천조회범위.전국콜">전국콜</MudSelectItem>
+                    </MudSelect>
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Hub"
+                                   OnClick="ConnectSignalRAsync">
+                            SignalR 연결
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Info"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Sync"
+                                   OnClick="LoadRecommendationsAsync">
+                            서버 추천 조회
+                        </MudButton>
+                    </MudStack>
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.LocalShipping"
+                                   OnClick="SendDrivingStatusAsync">
+                            운행중 전송
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.MyLocation"
+                                   OnClick="SendSampleLocationAsync">
+                            샘플 위치 전송
+                        </MudButton>
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Warning"
+                                   Disabled="@IsBusy"
+                                   StartIcon="@Icons.Material.Filled.Bolt"
+                                   OnClick="ReceiveMockRecommendationAsync">
+                            모의 추천
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">수신 상태</MudText>
+                    @if (string.IsNullOrWhiteSpace(StatusMessage))
+                    {
+                        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                            추천이 들어오면 지도 화면 위 배너로 표시됩니다.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="@StatusSeverity" Dense="true" Variant="Variant.Outlined">
+                            @StatusMessage
+                        </MudAlert>
+                    }
+
+                    <MudTextField @bind-Value="RejectReason"
+                                  Label="거절/만료 사유"
+                                  Variant="Variant.Outlined"
+                                  Lines="2" />
+
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">최근 추천 목록</MudText>
+                        @if (Recommendations.Count == 0)
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">아직 수신된 추천이 없습니다.</MudText>
+                        }
+                        else
+                        {
+                            @foreach (var item in Recommendations.Take(5))
+                            {
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudStack Spacing="1">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                            <MudText Typo="Typo.subtitle2">@DisplayCargo(item)</MudText>
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Info">@DisplayMoney(item.예상수익)</MudChip>
+                                        </MudStack>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@item.픽업지 → @item.하차지</MudText>
+                                        <MudButton Size="Size.Small"
+                                                   Variant="Variant.Text"
+                                                   Color="Color.Primary"
+                                                   OnClick="() => SelectRecommendationAsync(item)">
+                                            이 추천 보기
+                                        </MudButton>
+                                    </MudStack>
+                                </MudPaper>
+                            }
+                        }
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="12" lg="8">
+        <MudStack Spacing="3">
+            <MudPaper Elevation="0" Outlined="true" Class="driver-recommendation-shell">
+                <div class="driver-recommendation-map">
+                    <div class="driver-route-line driver-route-line-primary"></div>
+                    <div class="driver-route-line driver-route-line-secondary"></div>
+                    <div class="driver-map-pin driver-map-pin-current">현위치</div>
+                    <div class="driver-map-pin driver-map-pin-current-destination">현재 목적지</div>
+                    <div class="driver-current-route-label">현재 운행 경로</div>
+                </div>
+
+                @if (ActiveRecommendation is null)
+                {
+                    <div class="driver-empty-map-panel">
+                        <MudIcon Icon="@Icons.Material.Filled.NotificationsNone" Size="Size.Large" Color="Color.Secondary" />
+                        <MudText Typo="Typo.h6">대기 중</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            서버 추천 조회나 SignalR 수신이 발생하면 이 지도 위에 신규 추천 배너가 표시됩니다.
+                        </MudText>
+                    </div>
+                }
+                else
+                {
+                    <MudPaper Elevation="8" Class="driver-recommendation-top-strip px-3 py-2">
+                        <MudStack Spacing="1">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Filled.NotificationsActive" Color="Color.Primary" />
+                                    <MudText Typo="Typo.subtitle2">신규 배차 추천</MudText>
+                                </MudStack>
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@DisplayMoney(ActiveRecommendation.예상수익)</MudText>
+                                    <MudChip T="string" Color="@ResolveCountdownColor()" Size="Size.Small" Variant="Variant.Filled">
+                                        @(IsExpired ? "만료" : $"{RemainingSeconds:N0}초")
+                                    </MudChip>
+                                </MudStack>
+                            </MudStack>
+                            <MudProgressLinear Value="@ProgressPercent" Color="@ResolveCountdownColor()" Rounded="true" />
+                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd" Class="driver-recommendation-actions">
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           Disabled="@IsBusy"
+                                           StartIcon="@Icons.Material.Filled.Article"
+                                           OnClick="OpenDetailAsync">
+                                    상세
+                                </MudButton>
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           Disabled="@IsBusy"
+                                           StartIcon="@Icons.Material.Filled.Map"
+                                           OnClick="NavigateToRecommendationMapPage">
+                                    지도
+                                </MudButton>
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Success"
+                                           Disabled="@(IsBusy || IsExpired)"
+                                           StartIcon="@Icons.Material.Filled.CheckCircle"
+                                           OnClick="AcceptAsync">
+                                    수락
+                                </MudButton>
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Secondary"
+                                           Disabled="@IsBusy"
+                                           StartIcon="@Icons.Material.Filled.Cancel"
+                                           OnClick="RejectAsync">
+                                    거절
+                                </MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudPaper>
+
+            @if (ActiveRecommendation is not null && DetailOpen)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="3">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">추천 상세</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    경로, 수익, 경고만 먼저 확인하고 수락 여부를 판단합니다.
+                                </MudText>
+                            </MudStack>
+                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                @foreach (var badge in ActiveRecommendation.배지)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@badge</MudChip>
+                                }
+                            </MudStack>
+                        </MudStack>
+
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudText Typo="Typo.subtitle2">운송 정보</MudText>
+                                    <MudText Typo="Typo.body2">의뢰 ID: @ActiveRecommendation.의뢰Id</MudText>
+                                    <MudText Typo="Typo.body2">유형: @ActiveRecommendation.운송의뢰유형표시</MudText>
+                                    <MudText Typo="Typo.body2">운송 거리: @DisplayDistance(ActiveRecommendation.운송거리Km)</MudText>
+                                    <MudText Typo="Typo.body2">일정 삽입: @(ActiveRecommendation.일정삽입가능여부 ? "가능" : "미확인")</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                    <MudText Typo="Typo.subtitle2">비용/수익</MudText>
+                                    <MudText Typo="Typo.body2">예상 비용: @DisplayMoney(ActiveRecommendation.예상총비용)</MudText>
+                                    <MudText Typo="Typo.body2">예상 수익: @DisplayMoney(ActiveRecommendation.예상수익)</MudText>
+                                    <MudText Typo="Typo.body2">분당 추가 수익: @DisplayMoney(ActiveRecommendation.분당추가수익)</MudText>
+                                    <MudText Typo="Typo.body2">기존 지연: @DisplayMinutes(ActiveRecommendation.기존배송지연분)</MudText>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+
+                        @if (!string.IsNullOrWhiteSpace(ActiveRecommendation.추천사유))
+                        {
+                            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                                @ActiveRecommendation.추천사유
+                            </MudAlert>
+                        }
+
+                        @foreach (var warning in ActiveRecommendation.경고.Concat(ActiveRecommendation.차량경고).Concat(ActiveRecommendation.차량부적합사유))
+                        {
+                            <MudAlert Severity="Severity.Warning" Dense="true" Variant="Variant.Outlined">@warning</MudAlert>
+                        }
+
+                        @if (Detail is not null)
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                                <MudText Typo="Typo.subtitle2">서버 상세 응답</MudText>
+                                <MudGrid>
+                                    <MudItem xs="12" md="4">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">결제 상태</MudText>
+                                        <MudText Typo="Typo.body2">@Display(Detail.결제상태)</MudText>
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">정산 상태</MudText>
+                                        <MudText Typo="Typo.body2">@Display(Detail.정산상태)</MudText>
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">차량 적합</MudText>
+                                        <MudText Typo="Typo.body2">@(Detail.차량적합여부 ? "적합" : "확인 필요")</MudText>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudPaper>
+                        }
+
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd">
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       Disabled="@IsBusy"
+                                       StartIcon="@Icons.Material.Filled.Map"
+                                       OnClick="NavigateToRecommendationMapPage">
+                                지도 상세로
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       Disabled="@(IsBusy || IsExpired)"
+                                       StartIcon="@Icons.Material.Filled.CheckCircle"
+                                       OnClick="AcceptAsync">
+                                수락하고 운송 시작
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Disabled="@IsBusy"
+                                       StartIcon="@Icons.Material.Filled.Cancel"
+                                       OnClick="RejectAsync">
+                                거절
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            }
+
+            @if (AcceptedRecommendation is not null)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                    @AcceptedRecommendation.의뢰Id 추천을 수락했습니다. 지도에는 상차지와 하차지 기준 경로가 표시될 준비 상태입니다.
+                </MudAlert>
+            }
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private const int DefaultResponseSeconds = 60;
+
+    private 기사추천조회범위 조회범위 { get; set; } = 기사추천조회범위.전체;
+    private List<기사추천수신항목> Recommendations { get; } = [];
+    private 기사추천수신항목? ActiveRecommendation { get; set; }
+    private 기사추천수신항목? AcceptedRecommendation { get; set; }
+    private 기사운송의뢰상세응답? Detail { get; set; }
+    private bool DetailOpen { get; set; }
+    private bool IsBusy { get; set; }
+    private bool IsExpired { get; set; }
+    private int RemainingSeconds { get; set; }
+    private int ResponseSeconds { get; set; } = DefaultResponseSeconds;
+    private string ActiveRecommendationSource { get; set; } = string.Empty;
+    private string RejectReason { get; set; } = "기사 직접 거절";
+    private string StatusMessage { get; set; } = string.Empty;
+    private Severity StatusSeverity { get; set; } = Severity.Info;
+    private CancellationTokenSource? CountdownCts { get; set; }
+    private DateTimeOffset? DeadlineUtc { get; set; }
+
+    private double ProgressPercent
+        => ResponseSeconds <= 0
+            ? 100
+            : Math.Clamp((double)(ResponseSeconds - RemainingSeconds) / ResponseSeconds * 100, 0, 100);
+
+    protected override async Task OnInitializedAsync()
+    {
+        추천Service.추천수신 += OnRecommendationReceivedAsync;
+        추천Service.상태변경 += OnConnectionStatusChangedAsync;
+        await AuthSession.RestoreAsync();
+    }
+
+    private async Task ConnectSignalRAsync()
+    {
+        await RunAsync("SignalR 연결을 요청했습니다.", async () => await 추천Service.연결Async());
+    }
+
+    private async Task SendDrivingStatusAsync()
+    {
+        await RunAsync("운행중 상태를 서버로 전송했습니다.", async () => await 추천Service.운행중상태전송Async());
+    }
+
+    private async Task SendSampleLocationAsync()
+    {
+        await RunAsync("샘플 위치를 서버로 전송했습니다.", async () => await 추천Service.위치전송Async(37.526m, 126.875m, 10));
+    }
+
+    private async Task LoadRecommendationsAsync()
+    {
+        await RunAsync("서버 추천 목록을 조회했습니다.", async () =>
+        {
+            var items = await 추천Service.추천조회Async(조회범위);
+            await ReceiveRecommendationsAsync(items, "서버 추천 조회");
+        });
+    }
+
+    private async Task ReceiveMockRecommendationAsync()
+    {
+        await ReceiveRecommendationsAsync(추천Service.모의추천목록(), "모의 추천");
+        SetStatus("모의 추천을 수신했습니다. 60초 안에 수락 또는 거절을 눌러 흐름을 확인하세요.", Severity.Info);
+    }
+
+    private async Task OpenDetailAsync()
+    {
+        if (ActiveRecommendation is null)
+        {
+            return;
+        }
+
+        DetailOpen = true;
+        Detail = null;
+
+        await RunAsync("추천 상세를 조회했습니다.", async () =>
+        {
+            Detail = await 추천Service.상세조회Async(ActiveRecommendation.의뢰Id);
+        });
+    }
+
+    private async Task AcceptAsync()
+    {
+        if (ActiveRecommendation is null)
+        {
+            return;
+        }
+
+        var target = ActiveRecommendation;
+        await RunAsync("추천을 수락했습니다. 서버가 배차 확정과 화주 알림 사후처리를 진행합니다.", async () =>
+        {
+            var requestId = target.의뢰Id;
+            await 추천Service.수락Async(requestId);
+            AcceptedRecommendation = target;
+            ClearActiveRecommendation();
+            추천Service.선택추천해제(requestId);
+            Navigation.NavigateTo(CurrentTransportHref(requestId));
+        });
+    }
+
+    private async Task RejectAsync()
+    {
+        if (ActiveRecommendation is null)
+        {
+            return;
+        }
+
+        var target = ActiveRecommendation;
+        await RunAsync(IsExpired ? "만료된 추천에 대한 거절 전송을 완료했습니다." : "추천을 거절했습니다.", async () =>
+        {
+            await 추천Service.거절Async(target.의뢰Id, RejectReason);
+            ClearActiveRecommendation();
+            추천Service.선택추천해제(target.의뢰Id);
+        });
+    }
+
+    private async Task OnRecommendationReceivedAsync(IReadOnlyList<기사추천수신항목> items)
+    {
+        await InvokeAsync(async () =>
+        {
+            await ReceiveRecommendationsAsync(items, "SignalR 수신");
+            StateHasChanged();
+        });
+    }
+
+    private async Task OnConnectionStatusChangedAsync(string message)
+    {
+        await InvokeAsync(() =>
+        {
+            SetStatus(message, Severity.Info);
+            StateHasChanged();
+        });
+    }
+
+    private async Task ReceiveRecommendationsAsync(IReadOnlyList<기사추천수신항목> items, string source)
+    {
+        Recommendations.Clear();
+        Recommendations.AddRange(items.OrderByDescending(x => x.추천점수 ?? 0));
+
+        if (Recommendations.Count == 0)
+        {
+            ClearActiveRecommendation();
+            SetStatus("현재 표시할 추천이 없습니다.", Severity.Info);
+            return;
+        }
+
+        await SetActiveRecommendationAsync(Recommendations[0], source);
+    }
+
+    private Task SelectRecommendationAsync(기사추천수신항목 item)
+        => SetActiveRecommendationAsync(item, "목록 선택");
+
+    private void NavigateToRecommendationMapPage()
+    {
+        if (ActiveRecommendation is null)
+        {
+            return;
+        }
+
+        추천Service.선택추천설정(ActiveRecommendation, ActiveRecommendationSource, DeadlineUtc, ResponseSeconds);
+        Navigation.NavigateTo($"/driver/recommendations/{Uri.EscapeDataString(ActiveRecommendation.의뢰Id)}");
+    }
+
+    private Task SetActiveRecommendationAsync(기사추천수신항목 item, string source)
+    {
+        ActiveRecommendation = item;
+        ActiveRecommendationSource = source;
+        AcceptedRecommendation = null;
+        Detail = null;
+        DetailOpen = false;
+        IsExpired = false;
+        RejectReason = "기사 직접 거절";
+        StartCountdown(item);
+        추천Service.선택추천설정(item, source, DeadlineUtc, ResponseSeconds);
+        SetStatus($"{item.의뢰Id} 추천이 도착했습니다. 제한 시간 안에 수락 또는 거절을 선택하세요.", Severity.Info);
+        return Task.CompletedTask;
+    }
+
+    private void StartCountdown(기사추천수신항목 item)
+    {
+        CountdownCts?.Cancel();
+        CountdownCts?.Dispose();
+        CountdownCts = new CancellationTokenSource();
+
+        var now = DateTimeOffset.UtcNow;
+        var deadline = item.추천만료시각.HasValue
+            ? ToUtcOffset(item.추천만료시각.Value)
+            : now.AddSeconds(DefaultResponseSeconds);
+
+        if (deadline <= now)
+        {
+            deadline = now.AddSeconds(DefaultResponseSeconds);
+        }
+
+        DeadlineUtc = deadline;
+        ResponseSeconds = Math.Max(1, (int)Math.Ceiling((deadline - now).TotalSeconds));
+        UpdateRemaining();
+        _ = RunCountdownAsync(CountdownCts.Token);
+    }
+
+    private async Task RunCountdownAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested && ActiveRecommendation is not null)
+        {
+            UpdateRemaining();
+            await InvokeAsync(StateHasChanged);
+
+            if (RemainingSeconds <= 0)
+            {
+                await InvokeAsync(HandleExpiredAsync);
+                return;
+            }
+
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+    }
+
+    private async Task HandleExpiredAsync()
+    {
+        if (ActiveRecommendation is null || IsExpired || IsBusy)
+        {
+            return;
+        }
+
+        IsExpired = true;
+        RejectReason = "추천 응답 시간 만료";
+        var target = ActiveRecommendation;
+
+        try
+        {
+            IsBusy = true;
+            await 추천Service.거절Async(target.의뢰Id, RejectReason);
+            ClearActiveRecommendation();
+            SetStatus("응답 제한 시간이 지나 자동 거절을 서버에 전송했습니다.", Severity.Warning);
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"응답 제한 시간이 지났지만 자동 거절 전송에 실패했습니다. 거절 재시도를 눌러 주세요. {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void UpdateRemaining()
+    {
+        if (DeadlineUtc is null)
+        {
+            RemainingSeconds = 0;
+            return;
+        }
+
+        RemainingSeconds = Math.Max(0, (int)Math.Ceiling((DeadlineUtc.Value - DateTimeOffset.UtcNow).TotalSeconds));
+    }
+
+    private void ClearActiveRecommendation()
+    {
+        CountdownCts?.Cancel();
+        CountdownCts?.Dispose();
+        CountdownCts = null;
+        ActiveRecommendation = null;
+        Detail = null;
+        DetailOpen = false;
+        DeadlineUtc = null;
+        RemainingSeconds = 0;
+        IsExpired = false;
+    }
+
+    private async Task RunAsync(string successMessage, Func<Task> action)
+    {
+        IsBusy = true;
+        SetStatus("서버 요청을 처리하는 중입니다.", Severity.Info);
+
+        try
+        {
+            await action();
+            if (!string.IsNullOrWhiteSpace(successMessage))
+            {
+                SetStatus(successMessage, Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void SetStatus(string message, Severity severity)
+    {
+        StatusMessage = message;
+        StatusSeverity = severity;
+    }
+
+    private Color ResolveConnectionColor()
+        => 추천Service.연결상태 == "Connected" ? Color.Success : Color.Default;
+
+    private Color ResolveCountdownColor()
+    {
+        if (IsExpired)
+        {
+            return Color.Error;
+        }
+
+        return RemainingSeconds <= 10 ? Color.Warning : Color.Success;
+    }
+
+    private static DateTimeOffset ToUtcOffset(DateTime value)
+        => value.Kind switch
+        {
+            DateTimeKind.Utc => new DateTimeOffset(value),
+            DateTimeKind.Local => new DateTimeOffset(value.ToUniversalTime()),
+            _ => new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc))
+        };
+
+    private static string DisplayCargo(기사추천수신항목 item)
+    {
+        var type = string.IsNullOrWhiteSpace(item.운송의뢰유형표시) ? "일반 화물" : item.운송의뢰유형표시;
+        var cargo = string.IsNullOrWhiteSpace(item.화물종류) ? "화물" : item.화물종류;
+        return $"{cargo} · {type}";
+    }
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "미확인" : value;
+
+    private static string DisplayMoney(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}원" : "금액 미정";
+
+    private static string DisplayDistance(decimal? value)
+        => value.HasValue ? $"{value.Value:N1}km" : "거리 미정";
+
+    private static string DisplayMinutes(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}분" : "시간 미정";
+
+    private static string DisplayScore(decimal? value)
+        => value.HasValue ? $"{value.Value:N1}" : "미정";
+
+    private static string CurrentTransportHref(string requestId)
+        => $"/driver/transports/current?acceptedRequestId={Uri.EscapeDataString(requestId)}";
+
+    public async ValueTask DisposeAsync()
+    {
+        추천Service.추천수신 -= OnRecommendationReceivedAsync;
+        추천Service.상태변경 -= OnConnectionStatusChangedAsync;
+        CountdownCts?.Cancel();
+        CountdownCts?.Dispose();
+        await 추천Service.연결해제Async();
+    }
+}

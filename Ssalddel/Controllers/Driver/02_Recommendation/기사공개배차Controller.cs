@@ -1,0 +1,32 @@
+using Ssalddel.Controllers;
+using Ssalddel.Application.Driver.Recommendation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using 살뜰.도메인.공통;
+using Ssalddel.ApiMetadata;
+
+namespace Ssalddel.Controllers.Driver.Recommendation02
+{
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+    [ApiController]
+    [Authorize(Roles = 역할명.기사)]
+    [Route("api/v1/driver/public-dispatches")]
+    public sealed class 기사공개배차Controller : DriverControllerBase
+    {
+        private readonly I기사배차추천UseCase _useCase;
+
+        public 기사공개배차Controller(I기사배차추천UseCase useCase)
+        {
+            _useCase = useCase;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> 조회()
+        {
+            var driverId = 현재기사Id();
+            var items = await _useCase.공개배차조회Async(driverId);
+            return Ok(items);
+        }
+
+    }
+}
