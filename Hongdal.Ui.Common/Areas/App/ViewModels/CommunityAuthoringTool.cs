@@ -6,5 +6,7 @@ public enum CommunityAuthoringTool
     YouTubeSocialResearch,
     Diagram,
     MutualBenefit,
-    EvidenceChart
+    EvidenceChart,
+    PeriodStatistics,
+    VowJourneyTemplate
 }

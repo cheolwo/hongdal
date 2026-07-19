@@ -262,6 +262,15 @@
                                        aria-label="근거 그래프 작성" />
                     </MudTooltip>
                 }
+                @if (PeriodStatisticsToolsRequested.HasDelegate)
+                {
+                    <MudTooltip Text="기간 통계">
+                        <MudIconButton Icon="@Icons.Material.Filled.DateRange"
+                                       Color="Color.Default"
+                                       OnClick="PeriodStatisticsToolsRequested"
+                                       aria-label="기간 통계" />
+                    </MudTooltip>
+                }
                 @if (MutualBenefitToolsRequested.HasDelegate)
                 {
                     <MudTooltip Text="상호 이익 검토">
@@ -556,6 +565,9 @@
 
     [Parameter]
     public EventCallback EvidenceToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback PeriodStatisticsToolsRequested { get; set; }
 
     [Parameter]
     public EventCallback MutualBenefitToolsRequested { get; set; }

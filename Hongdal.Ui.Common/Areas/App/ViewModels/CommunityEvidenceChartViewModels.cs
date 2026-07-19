@@ -353,6 +353,26 @@ public sealed class CommunityAuthoringEvidenceChartViewModel : ObservableObject
         return evaluated;
     }
 
+    public bool ImportPeriodStatistics(CommunityEvidenceChartBlock block)
+    {
+        ArgumentNullException.ThrowIfNull(block);
+        var validation = CommunityEvidenceChartPolicy.Validate(block);
+        if (!validation.IsValid)
+        {
+            ValidationErrors = validation.Errors;
+            SetStatus(
+                "기간 통계를 근거 그래프로 가져오지 못했습니다. 기간과 자료 단위를 다시 확인해 주세요.",
+                CommunityComposerMessageKind.Warning);
+            return false;
+        }
+
+        Load(block);
+        SetStatus(
+            "기간 통계를 근거 그래프로 가져왔습니다. 해석과 자료의 한계를 확인한 뒤 글에 넣어 주세요.",
+            CommunityComposerMessageKind.Success);
+        return true;
+    }
+
     public bool Evaluate()
     {
         var rowErrors = new List<string>();
