@@ -50,6 +50,10 @@ public sealed class CommunityYouTubeInformationCandidateSource : ICommunityInfor
                                     query.ReviewState.Trim(),
                                     StringComparison.OrdinalIgnoreCase))
             .Where(candidate => MatchesSearch(candidate, query.SearchText))
+            .Where(candidate => !query.StartDate.HasValue
+                                || candidate.ReferenceDate >= query.StartDate.Value)
+            .Where(candidate => !query.EndDate.HasValue
+                                || candidate.ReferenceDate <= query.EndDate.Value)
             .Take(Math.Clamp(query.Take, 1, 100))
             .ToArray();
     }

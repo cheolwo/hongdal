@@ -31,6 +31,8 @@ public sealed class PublicDataOptions
     public AbsConsumerPriceIndexOptions AbsConsumerPriceIndex { get; set; } = new();
 
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
+
+    public FishCooperativeStatisticsOptions FishCooperativeStatistics { get; set; } = new();
 }
 
 public sealed class RoadAddressOptions
@@ -142,6 +144,20 @@ public sealed class TraditionalMarketOptions
     public string DatasetKey { get; set; } = "semas-traditional-market-status";
 
     public string SourceReferenceDate { get; set; } = "2025-07-22";
+
+    public int PageSize { get; set; } = 1000;
+}
+
+public sealed class FishCooperativeStatisticsOptions
+{
+    public string ServiceKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://apis.data.go.kr";
+
+    public string GeneralStatisticsPath { get; set; }
+        = "/1160100/service/GetFishCoopInfoService/getFishCoopGeneInfo";
+
+    public string GeneralStatisticsTitle { get; set; } = "수협_일반현황_임직원현황";
 
     public int PageSize { get; set; } = 1000;
 }

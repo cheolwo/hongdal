@@ -62,7 +62,12 @@ public sealed class CommunityInformationCollectionService : ICommunityInformatio
         ArgumentNullException.ThrowIfNull(query);
 
         var selectedSources = string.IsNullOrWhiteSpace(query.SourceKey)
-            ? _sources.Values.ToArray()
+            ? _sources.Values
+                .Where(source => !string.Equals(
+                    source.Source.CollectionMode,
+                    CommunityInformationCollectionModes.OnDemandPublicDataQuery,
+                    StringComparison.Ordinal))
+                .ToArray()
             : _sources.TryGetValue(query.SourceKey.Trim(), out var selected)
                 ? [selected]
                 : [];
@@ -87,7 +92,7 @@ public sealed class CommunityInformationCollectionService : ICommunityInformatio
                     source.Source.SourceKey);
                 failures.Add(new CommunityInformationSourceFailureDto(
                     source.Source.SourceKey,
-                    "수집 보관 자료를 조회하지 못했습니다."));
+                    "자료 원천을 조회하지 못했습니다."));
             }
         }
 
@@ -96,6 +101,7 @@ public sealed class CommunityInformationCollectionService : ICommunityInformatio
             .Where(candidate => MatchesCountry(candidate, query.CountryCode))
             .Where(candidate => MatchesReviewState(candidate, query.ReviewState))
             .Where(candidate => MatchesSearchText(candidate, query.SearchText))
+            .Where(candidate => MatchesDateRange(candidate, query.StartDate, query.EndDate))
             .GroupBy(candidate => candidate.CandidateKey, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .OrderByDescending(GetSortTime)
@@ -140,6 +146,26 @@ public sealed class CommunityInformationCollectionService : ICommunityInformatio
                || candidate.Provider.Contains(term, StringComparison.OrdinalIgnoreCase)
                || candidate.TopicTags.Any(tag => tag.Contains(term, StringComparison.OrdinalIgnoreCase));
     }
+
+    private static bool MatchesDateRange(
+        CommunityInformationCandidateDto candidate,
+        DateOnly? startDate,
+        DateOnly? endDate)
+    {
+        var candidateStartDate = GetCandidateDate(candidate);
+        var candidateEndDate = candidate.ReferencePeriodEndDate.HasValue
+                               && candidate.ReferencePeriodEndDate.Value >= candidateStartDate
+            ? candidate.ReferencePeriodEndDate.Value
+            : candidateStartDate;
+        return (!startDate.HasValue || candidateEndDate >= startDate.Value)
+               && (!endDate.HasValue || candidateStartDate <= endDate.Value);
+    }
+
+    private static DateOnly GetCandidateDate(CommunityInformationCandidateDto candidate)
+        => candidate.ReferenceDate
+           ?? (candidate.PublishedAtUtc.HasValue
+               ? DateOnly.FromDateTime(candidate.PublishedAtUtc.Value)
+               : DateOnly.FromDateTime(candidate.CollectedAtUtc));
 
     private static DateTime GetSortTime(CommunityInformationCandidateDto candidate)
     {

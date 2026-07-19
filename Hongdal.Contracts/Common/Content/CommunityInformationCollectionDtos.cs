@@ -4,6 +4,9 @@ public static class CommunityInformationSourceKeys
 {
     public const string YouTubeChannelVideos = "youtube-channel-videos";
     public const string KamisPriceObservations = "kamis-price-observations";
+    public const string UsdaNassPriceObservations = "usda-nass-price-observations";
+    public const string AbsFoodPriceIndex = "abs-cpi-food-price-index";
+    public const string FishCooperativeGeneralStatistics = "fish-cooperative-general-statistics";
     public const string RedditPublicPosts = "reddit-public-posts";
     public const string RedditRssPublicPosts = "reddit-rss-public-posts";
     public const string XPublicPosts = "x-public-posts";
@@ -22,6 +25,7 @@ public static class CommunityInformationCollectionModes
 {
     public const string ScheduledArchive = "ScheduledArchive";
     public const string OnDemandExternalResearch = "OnDemandExternalResearch";
+    public const string OnDemandPublicDataQuery = "OnDemandPublicDataQuery";
 }
 
 public static class CommunityInformationReviewStates
@@ -63,7 +67,12 @@ public sealed record CommunityInformationCandidateDto(
     string ReviewState,
     IReadOnlyList<string> TopicTags,
     string SourceNotice,
-    string Limitations);
+    string Limitations,
+    decimal? NumericValue = null,
+    string? MetricLabel = null,
+    string? MetricSeriesKey = null,
+    DateOnly? ReferencePeriodEndDate = null,
+    string? MetricSeriesLabel = null);
 
 public sealed class CommunityInformationCollectionQuery
 {
@@ -74,6 +83,10 @@ public sealed class CommunityInformationCollectionQuery
     public string? ReviewState { get; init; }
 
     public string? SearchText { get; init; }
+
+    public DateOnly? StartDate { get; init; }
+
+    public DateOnly? EndDate { get; init; }
 
     public int Take { get; init; } = 50;
 }

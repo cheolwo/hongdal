@@ -20,9 +20,9 @@ public sealed class CommunityKamisInformationCandidateSource : ICommunityInforma
         CommunityInformationSourceKeys.KamisPriceObservations,
         CommunityInformationSourceTypes.PublicData,
         "KAMIS 농산물 유통정보",
-        "농수산물 가격 관측값",
+        "농수산물 일별·월평균 가격 관측값",
         CommunityInformationCollectionModes.ScheduledArchive,
-        "일별 수집, KAMIS 제공일 기준",
+        "일별 수집과 월 1회 최근 월평균 보완",
         "공식 관측값이어도 품목·품종·등급·단위를 확인한 편집 결과만 커뮤니티 정보 글로 게시합니다.",
         DocumentationUrl,
         true);
@@ -40,9 +40,25 @@ public sealed class CommunityKamisInformationCandidateSource : ICommunityInforma
 
         var observations = _db.KamisPriceObservations
             .AsNoTracking()
-            .Where(observation => observation.FrequencyCode == "Daily"
+            .Where(observation => (observation.FrequencyCode == "Daily"
+                                   || observation.FrequencyCode == "Monthly")
                                   && !observation.IsPriceMissing
                                   && observation.PriceKrw.HasValue);
+        if (query.StartDate.HasValue)
+        {
+            var firstMonthDate = new DateOnly(query.StartDate.Value.Year, query.StartDate.Value.Month, 1);
+            observations = observations.Where(observation => observation.SurveyDate >= firstMonthDate);
+        }
+
+        if (query.EndDate.HasValue)
+        {
+            var finalMonthDate = new DateOnly(
+                query.EndDate.Value.Year,
+                query.EndDate.Value.Month,
+                DateTime.DaysInMonth(query.EndDate.Value.Year, query.EndDate.Value.Month));
+            observations = observations.Where(observation => observation.SurveyDate <= finalMonthDate);
+        }
+
         var searchText = query.SearchText?.Trim();
         if (!string.IsNullOrWhiteSpace(searchText))
         {
@@ -66,12 +82,18 @@ public sealed class CommunityKamisInformationCandidateSource : ICommunityInforma
         return rows
             .GroupBy(observation => observation.RecordKey, StringComparer.Ordinal)
             .Select(group => ToCandidate(group.First()))
+            .Where(candidate => OverlapsRange(candidate, query.StartDate, query.EndDate))
             .Take(Math.Clamp(query.Take, 1, 100))
             .ToArray();
     }
 
     private static CommunityInformationCandidateDto ToCandidate(KamisPriceObservation observation)
     {
+        var isMonthly = string.Equals(observation.FrequencyCode, "Monthly", StringComparison.OrdinalIgnoreCase);
+        var referenceDate = isMonthly
+            ? new DateOnly(observation.SurveyDate.Year, observation.SurveyDate.Month, 1)
+            : observation.SurveyDate;
+        var referenceEndDate = isMonthly ? observation.SurveyDate : (DateOnly?)null;
         var specification = string.Join(
             " · ",
             new[] { observation.KindName, observation.RankName }
@@ -92,11 +114,14 @@ public sealed class CommunityKamisInformationCandidateSource : ICommunityInforma
             CommunityInformationSourceTypes.PublicData,
             "KAMIS 농산물 유통정보",
             $"{observation.ItemName}{(specification.Length == 0 ? string.Empty : $" ({specification})")}",
-            string.Join(" · ", summaryParts.Where(value => !string.IsNullOrWhiteSpace(value))),
+            string.Join(
+                " · ",
+                (isMonthly ? new[] { "월평균" }.Concat(summaryParts) : summaryParts)
+                .Where(value => !string.IsNullOrWhiteSpace(value))),
             sourceUrl,
             null,
             null,
-            observation.SurveyDate,
+            referenceDate,
             DateTime.SpecifyKind(observation.LastSeenAtUtc, DateTimeKind.Utc),
             "KR",
             "ko",
@@ -108,7 +133,49 @@ public sealed class CommunityKamisInformationCandidateSource : ICommunityInforma
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray(),
             "KAMIS Open API에서 수집해 보관한 공식 가격 관측값입니다.",
-            "전체 시장 평균이나 판매 권고가 아닙니다. 조사일, 품종, 등급, 단위와 조사처가 다른 값은 같은 가격처럼 직접 비교할 수 없습니다.");
+            "전체 시장 평균이나 판매 권고가 아닙니다. 조사일, 품종, 등급, 단위와 조사처가 다른 값은 같은 가격처럼 직접 비교할 수 없습니다.",
+            observation.PriceKrw,
+            isMonthly ? "월평균 가격" : "가격",
+            BuildMetricSeriesKey(observation),
+            referenceEndDate,
+            BuildMetricSeriesLabel(observation));
+    }
+
+    private static string BuildMetricSeriesKey(KamisPriceObservation observation)
+        => string.Join(
+            '|',
+            observation.ProductClassCode,
+            observation.CategoryCode,
+            observation.ItemCode,
+            observation.KindCode,
+            observation.RankCode,
+            observation.Unit.Trim().ToUpperInvariant(),
+            observation.FrequencyCode.Trim().ToUpperInvariant());
+
+    private static string BuildMetricSeriesLabel(KamisPriceObservation observation)
+        => string.Join(
+            " · ",
+            new[]
+            {
+                observation.ProductClassName,
+                observation.ItemName,
+                observation.KindName,
+                observation.RankName,
+                observation.Unit,
+                string.Equals(observation.FrequencyCode, "Monthly", StringComparison.OrdinalIgnoreCase)
+                    ? "월평균"
+                    : "일별"
+            }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private static bool OverlapsRange(
+        CommunityInformationCandidateDto candidate,
+        DateOnly? startDate,
+        DateOnly? endDate)
+    {
+        var candidateStart = candidate.ReferenceDate!.Value;
+        var candidateEnd = candidate.ReferencePeriodEndDate ?? candidateStart;
+        return (!startDate.HasValue || candidateEnd >= startDate.Value)
+               && (!endDate.HasValue || candidateStart <= endDate.Value);
     }
 
     private static bool MatchesKoreanSource(string? countryCode)

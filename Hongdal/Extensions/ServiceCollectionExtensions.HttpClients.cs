@@ -143,6 +143,12 @@ public static partial class ServiceCollectionExtensions
             client.BaseAddress = new Uri(options.CustomsTradeStatistics.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
         });
+        services.AddHttpClient<IFishCooperativeStatisticsClient, FishCooperativeStatisticsClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
+            client.BaseAddress = new Uri(options.FishCooperativeStatistics.BaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(5, options.TimeoutSeconds));
+        });
         services.AddHttpClient<세관장확인대상물품공공데이터수집기>((sp, client) =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PublicDataOptions>>().Value;
