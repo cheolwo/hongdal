@@ -32,14 +32,27 @@
                                        OnClick="ViewModel.ToggleSettings"
                                        aria-label="게시 설정 열기" />
                     </MudTooltip>
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Inherit"
-                               Size="Size.Small"
-                               Disabled="@ViewModel.IsSaving"
-                               OnClick="SaveDraftAsync"
-                               Class="platform-community-compose-draft-action">
-                        임시
-                    </MudButton>
+                    @if (ViewModel.EditingPostId is null
+                         && (ViewModel.Draft.HasContent
+                             || ViewModel.LocalDraftSavedAtUtc.HasValue
+                             || ViewModel.SelectedFiles.Count > 0))
+                    {
+                        <MudTooltip Text="초안 비우기">
+                            <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+                                           Color="Color.Inherit"
+                                           Disabled="@ViewModel.IsSaving"
+                                           OnClick="ShowDiscardDraftConfirmation"
+                                           aria-label="초안 비우기" />
+                        </MudTooltip>
+                    }
+                    <MudTooltip Text="임시 저장">
+                        <MudIconButton Icon="@Icons.Material.Filled.Save"
+                                       Color="Color.Inherit"
+                                       Disabled="@ViewModel.IsSaving"
+                                       OnClick="SaveDraftAsync"
+                                       Class="platform-community-compose-draft-action"
+                                       aria-label="임시 저장" />
+                    </MudTooltip>
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Primary"
                                Size="Size.Small"
@@ -83,10 +96,36 @@
             </MudAlert>
         }
 
+        @if (_isDiscardDraftConfirmationVisible)
+        {
+            <MudAlert Severity="Severity.Warning"
+                      Dense="true"
+                      Variant="Variant.Outlined"
+                      Class="platform-community-compose-discard-confirmation">
+                <div class="platform-community-compose-discard-confirmation__content">
+                    <span>현재 작성 내용과 이 browser에 저장된 임시 초안을 모두 비웁니다.</span>
+                    <span class="platform-community-compose-discard-confirmation__actions">
+                        <MudButton Variant="Variant.Text"
+                                   Size="Size.Small"
+                                   OnClick="CancelDiscardDraft">
+                            계속 작성
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   OnClick="ConfirmDiscardDraftAsync">
+                            비우기
+                        </MudButton>
+                    </span>
+                </div>
+            </MudAlert>
+        }
+
         <main class="platform-community-compose-editor" aria-label="글 내용">
             <MudTextField T="string"
                           Placeholder="제목"
                           @bind-Value="ViewModel.Draft.Title"
+                          OnBlur="SaveDraftSilentlyAsync"
                           Immediate="true"
                           MaxLength="160"
                           Variant="Variant.Text"
@@ -96,6 +135,7 @@
             <MudTextField T="string"
                           Placeholder="내용"
                           @bind-Value="ViewModel.Draft.Body"
+                          OnBlur="SaveDraftSilentlyAsync"
                           Immediate="true"
                           Lines="12"
                           MaxLength="4000"
@@ -197,12 +237,22 @@
                         <span>
                             <b>@(ViewModel.Draft.IsSalesPost ? index == 0 ? "썸네일" : "상세" : "사진")</b>
                             <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" /> @file.Name
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Size="Size.Small"
+                                           OnClick="@(() => ViewModel.RemoveFile(file))"
+                                           aria-label="@($"{file.Name} 첨부 제외")" />
                         </span>
                     }
                     @if (ViewModel.SelectedFiles.Count > 4)
                     {
                         <span>@($"외 {ViewModel.SelectedFiles.Count - 4}개")</span>
                     }
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Error"
+                               Size="Size.Small"
+                               OnClick="ViewModel.ClearFiles">
+                        모두 빼기
+                    </MudButton>
                 </div>
             }
 
@@ -237,13 +287,16 @@
                                    OnClick="ToggleSalesPost"
                                    aria-label="판매 정보 붙이기" />
                 </MudTooltip>
-                <MudTooltip Text="원장 첨부">
-                    <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
-                                   Color="Color.Default"
-                                   Disabled="@LedgerPickerLoading"
-                                   OnClick="LedgerPickerRequested"
-                                   aria-label="원장 첨부" />
-                </MudTooltip>
+                @if (LedgerPickerRequested.HasDelegate)
+                {
+                    <MudTooltip Text="원장 첨부">
+                        <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
+                                       Color="Color.Default"
+                                       Disabled="@LedgerPickerLoading"
+                                       OnClick="LedgerPickerRequested"
+                                       aria-label="원장 첨부" />
+                    </MudTooltip>
+                }
                 @if (ResearchToolsRequested.HasDelegate)
                 {
                     <MudTooltip Text="자료 찾기">
@@ -385,6 +438,8 @@
                                   Label="글 비밀번호"
                                   @bind-Value="ViewModel.Draft.Password"
                                   InputType="InputType.Password"
+                                  MaxLength="100"
+                                  HelperText="수정과 사진 첨부에 다시 사용하므로 4자 이상 입력하세요."
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense" />
                 </div>
@@ -593,6 +648,8 @@
     [Parameter]
     public EventCallback<CommunityPostComposerSaveResult> Saved { get; set; }
 
+    private bool _isDiscardDraftConfirmationVisible;
+
     private string ComposeCardClass => ViewModel.IsOpen
         ? "pa-4 platform-community-compose-card platform-community-compose-card--open"
         : "pa-4 platform-community-compose-card";
@@ -685,20 +742,40 @@
     private Task SaveDraftAsync()
         => ViewModel.SaveLocalDraftAsync();
 
+    private Task SaveDraftSilentlyAsync(FocusEventArgs _)
+        => ViewModel.SaveLocalDraftSilentlyAsync();
+
+    private void ShowDiscardDraftConfirmation()
+        => _isDiscardDraftConfirmationVisible = true;
+
+    private void CancelDiscardDraft()
+        => _isDiscardDraftConfirmationVisible = false;
+
+    private async Task ConfirmDiscardDraftAsync()
+    {
+        _isDiscardDraftConfirmationVisible = false;
+        if (await ViewModel.DiscardDraftAsync())
+        {
+            ViewModel.SetStatus("초안을 비웠습니다.", CommunityComposerMessageKind.Success);
+        }
+    }
+
     private async Task CloseAsync()
     {
+        _isDiscardDraftConfirmationVisible = false;
+        await ViewModel.SaveLocalDraftSilentlyAsync();
         ViewModel.Close();
         await Closed.InvokeAsync();
     }
 
     private async Task CancelEditAsync()
     {
-        ViewModel.CancelEdit();
+        await ViewModel.CancelEditAsync();
         await CancelEditRequested.InvokeAsync();
     }
 
     private void HandleFilesSelected(InputFileChangeEventArgs args)
-        => ViewModel.SetFiles(args.GetMultipleFiles(5));
+        => ViewModel.SetFiles(args.GetMultipleFiles(int.MaxValue));
 
     private void ToggleSalesPost()
     {

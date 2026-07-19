@@ -4,7 +4,7 @@ using Hongdal.Ui.Common.Areas.App.Services;
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
 public sealed class CommunityScheduledPostListViewModel(
-    PlatformCommunityService communityService) : 조립ViewModelBase
+    ICommunityPostClient communityService) : 조립ViewModelBase
 {
     private IReadOnlyList<PlatformCommunityPostResponse> _items = [];
     private bool _isLoading;

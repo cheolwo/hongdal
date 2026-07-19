@@ -15,13 +15,18 @@ namespace Hongdal.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
-private string boardIndexSearchText = string.Empty;
+    private string boardIndexSearchText
+    {
+        get => Boards.IndexSearchText;
+        set => Boards.IndexSearchText = value;
+    }
 
     private PlatformCommunityHomeShellViewModel Shell => ViewModel.Shell;
     private PlatformCommunityBoardWorkspaceViewModel Boards => ViewModel.Boards;
     private PlatformCommunityPostEngagementViewModel Engagement => ViewModel.Engagement;
     private PlatformCommunityLedgerPickerViewModel LedgerPicker => ViewModel.LedgerPicker;
     private PlatformCommunityDiagramWorkspaceViewModel DiagramWorkspace => ViewModel.DiagramWorkspace;
+    private PlatformCommunityWishFlowViewModel WishFlow => ViewModel.WishFlow;
     private PlatformCommunityWarehouseProxyViewModel WarehouseProxy => ViewModel.WarehouseProxy;
     private PlatformCommunityDiagramChatViewModel DiagramChat => DiagramWorkspace.Chat;
     private PlatformCommunityDiagramCanvasViewModel DiagramCanvas => DiagramWorkspace.Canvas;
@@ -35,8 +40,8 @@ private string boardIndexSearchText = string.Empty;
     private Dictionary<string, string> 원장블록입력값 => DiagramWorkspace.LedgerBlockValues;
     private Dictionary<string, string> diagramFormValues => DiagramWorkspace.FormValues;
     private Dictionary<string, string> 원장Api경로변수값 => DiagramWorkspace.ApiPathParameterValues;
-    private readonly Dictionary<string, WorkflowApiEndpointDto> apiEndpointMetadata = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, bool> featureFlagStates = new(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, WorkflowApiEndpointDto> apiEndpointMetadata => DiagramWorkspace.ApiEndpointMetadata;
+    private Dictionary<string, bool> featureFlagStates => DiagramWorkspace.FeatureFlagStates;
     private readonly List<원장블록노드> 팔레트원장블록노드목록 = [];
     private List<string> diagramNodeOrder => DiagramCanvas.NodeOrder;
     private List<원장블록연결선> customDiagramEdges => DiagramCanvas.CustomEdges;
@@ -116,7 +121,11 @@ private string boardIndexSearchText = string.Empty;
         get => Engagement.SelectedSeedPostTitle;
         set => Engagement.SelectedSeedPostTitle = value;
     }
-    private string? 선택현재원장Id;
+    private string? 선택현재원장Id
+    {
+        get => DiagramWorkspace.SelectedCurrentLedgerId;
+        set => DiagramWorkspace.SelectedCurrentLedgerId = value;
+    }
     private string? 선택원장블록노드제목
     {
         get => DiagramCanvas.SelectedNodeTitle;
@@ -153,7 +162,11 @@ private string boardIndexSearchText = string.Empty;
         get => DiagramCanvas.DragPointer;
         set => DiagramCanvas.DragPointer = value;
     }
-    private DiagramSnapshotDto? sharedLedgerDiagramSnapshot;
+    private DiagramSnapshotDto? sharedLedgerDiagramSnapshot
+    {
+        get => DiagramWorkspace.SharedLedgerDiagramSnapshot;
+        set => DiagramWorkspace.SharedLedgerDiagramSnapshot = value;
+    }
     private bool diagramHandleDragMoved
     {
         get => DiagramCanvas.HandleDragMoved;
@@ -169,9 +182,21 @@ private string boardIndexSearchText = string.Empty;
         get => DiagramCanvas.NewConnectionLabel;
         set => DiagramCanvas.NewConnectionLabel = value;
     }
-    private string 원함입력 = string.Empty;
-    private string 원함조건입력 = string.Empty;
-    private CommunityLedgerFlowAnalysisResponse? 원함분석결과;
+    private string 원함입력
+    {
+        get => WishFlow.Wish;
+        set => WishFlow.Wish = value;
+    }
+    private string 원함조건입력
+    {
+        get => WishFlow.Condition;
+        set => WishFlow.Condition = value;
+    }
+    private CommunityLedgerFlowAnalysisResponse? 원함분석결과
+    {
+        get => WishFlow.Analysis;
+        set => WishFlow.Analysis = value;
+    }
     private long? editingPostId
     {
         get => Composer.EditingPostId;
@@ -187,7 +212,11 @@ private string boardIndexSearchText = string.Empty;
         get => Boards.IsLoading;
         set => Boards.IsLoading = value;
     }
-    private bool isApiEndpointMetadataLoading;
+    private bool isApiEndpointMetadataLoading
+    {
+        get => DiagramWorkspace.IsApiEndpointMetadataLoading;
+        set => DiagramWorkspace.IsApiEndpointMetadataLoading = value;
+    }
     private bool isMyLedgersLoading
     {
         get => LedgerPicker.IsLoading;
@@ -291,7 +320,11 @@ private string boardIndexSearchText = string.Empty;
         get => LedgerPicker.HierarchyContext;
         set => LedgerPicker.HierarchyContext = value;
     }
-    private string? 원장전송결과메시지;
+    private string? 원장전송결과메시지
+    {
+        get => DiagramWorkspace.LedgerSubmissionMessage;
+        set => DiagramWorkspace.LedgerSubmissionMessage = value;
+    }
     private Severity statusSeverity
     {
         get => Shell.StatusKind switch
@@ -326,6 +359,22 @@ private string boardIndexSearchText = string.Empty;
             _ => CommunityComposerMessageKind.Info
         };
     }
-    private Severity 원장전송결과Severity = Severity.Info;
+    private Severity 원장전송결과Severity
+    {
+        get => DiagramWorkspace.LedgerSubmissionMessageKind switch
+        {
+            CommunityComposerMessageKind.Success => Severity.Success,
+            CommunityComposerMessageKind.Warning => Severity.Warning,
+            CommunityComposerMessageKind.Error => Severity.Error,
+            _ => Severity.Info
+        };
+        set => DiagramWorkspace.LedgerSubmissionMessageKind = value switch
+        {
+            Severity.Success => CommunityComposerMessageKind.Success,
+            Severity.Warning => CommunityComposerMessageKind.Warning,
+            Severity.Error => CommunityComposerMessageKind.Error,
+            _ => CommunityComposerMessageKind.Info
+        };
+    }
     private bool isDisposed;
 }

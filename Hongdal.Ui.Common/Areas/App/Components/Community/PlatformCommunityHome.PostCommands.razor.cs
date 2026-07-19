@@ -112,7 +112,13 @@ public partial class PlatformCommunityHome
 
     private async Task HandleComposerSavedAsync(CommunityPostComposerSaveResult result)
     {
-        statusSeverity = Severity.Success;
+        statusSeverity = result.MessageKind switch
+        {
+            CommunityComposerMessageKind.Warning => Severity.Warning,
+            CommunityComposerMessageKind.Error => Severity.Error,
+            CommunityComposerMessageKind.Info => Severity.Info,
+            _ => Severity.Success
+        };
         statusMessage = result.Message;
         ViewModel.ResetEvidenceChartTool();
         await LoadPostsAsync();

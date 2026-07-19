@@ -138,15 +138,30 @@ public sealed partial class CommunityAuthoringImageGeneratorViewModel
     public async Task<bool> AttachSelectedAsync(
         long postId,
         string? password,
+        int maxAttachmentCount = CommunityAuthoringImageLimits.MaximumPlannedImages,
         CancellationToken cancellationToken = default)
     {
-        var targets = Items
+        var selectedTargets = Items
             .Where(item => item.IsSelectedForPost && item.Task is { IsSuccess: true })
             .OrderBy(item => item.Sequence)
             .ToArray();
-        if (targets.Length == 0)
+        if (selectedTargets.Length == 0)
         {
             return true;
+        }
+
+        var availableCount = Math.Clamp(
+            maxAttachmentCount,
+            0,
+            CommunityAuthoringImageLimits.MaximumPlannedImages);
+        var targets = selectedTargets.Take(availableCount).ToArray();
+        var skipped = selectedTargets.Length - targets.Length;
+        if (targets.Length == 0)
+        {
+            SetStatus(
+                $"게시글당 사진은 최대 {CommunityAuthoringImageLimits.MaximumPlannedImages}개입니다. 이미 선택한 사진 때문에 생성 이미지 {skipped}개는 첨부하지 않았습니다.",
+                CommunityComposerMessageKind.Warning);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(password))
@@ -185,11 +200,13 @@ public sealed partial class CommunityAuthoringImageGeneratorViewModel
             }
 
             SetStatus(
-                failed == 0
+                failed == 0 && skipped == 0
                     ? $"생성 이미지 {attached}개를 문맥 순서대로 게시글 사진에 첨부했습니다."
-                    : $"게시글은 저장됐지만 이미지 {attached}개만 첨부됐고 {failed}개는 재시도가 필요합니다.",
-                failed == 0 ? CommunityComposerMessageKind.Success : CommunityComposerMessageKind.Warning);
-            return failed == 0;
+                    : $"게시글은 저장됐지만 생성 이미지 {attached}개만 첨부됐고 실패 {failed}개, 첨부 제한으로 보류 {skipped}개가 남았습니다.",
+                failed == 0 && skipped == 0
+                    ? CommunityComposerMessageKind.Success
+                    : CommunityComposerMessageKind.Warning);
+            return failed == 0 && skipped == 0;
         }
         finally
         {

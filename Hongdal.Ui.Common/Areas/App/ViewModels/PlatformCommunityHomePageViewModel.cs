@@ -26,6 +26,7 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         PlatformCommunityLedgerPickerViewModel ledgerPicker,
         YouTubeFoodCommunityDiscoveryViewModel foodDiscovery,
         PlatformCommunityDiagramWorkspaceViewModel diagramWorkspace,
+        PlatformCommunityWishFlowViewModel wishFlow,
         CommunityAuthoringEvidenceChartViewModel evidenceChart,
         PlatformCommunityWarehouseProxyViewModel warehouseProxy)
     {
@@ -37,6 +38,7 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
         LedgerPicker = 하위ViewModel등록(ledgerPicker, 수명소유: true);
         FoodDiscovery = 하위ViewModel등록(foodDiscovery, 수명소유: true);
         DiagramWorkspace = 하위ViewModel등록(diagramWorkspace, 수명소유: true);
+        WishFlow = 하위ViewModel등록(wishFlow);
         EvidenceChart = 하위ViewModel등록(evidenceChart, 수명소유: true);
         WarehouseProxy = 하위ViewModel등록(warehouseProxy, 수명소유: true);
     }
@@ -49,6 +51,7 @@ public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
     public PlatformCommunityLedgerPickerViewModel LedgerPicker { get; }
     public YouTubeFoodCommunityDiscoveryViewModel FoodDiscovery { get; }
     public PlatformCommunityDiagramWorkspaceViewModel DiagramWorkspace { get; }
+    public PlatformCommunityWishFlowViewModel WishFlow { get; }
     public CommunityAuthoringEvidenceChartViewModel EvidenceChart { get; }
     public PlatformCommunityWarehouseProxyViewModel WarehouseProxy { get; }
     public CommunityPostJourneyCollectionViewModel ActionJourneys => Engagement.Journeys;

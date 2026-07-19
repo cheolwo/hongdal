@@ -23,6 +23,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
         var foodDiscovery = new YouTubeFoodCommunityDiscoveryViewModel(
             new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!));
         var diagramWorkspace = new PlatformCommunityDiagramWorkspaceViewModel();
+        var wishFlow = new PlatformCommunityWishFlowViewModel();
         var evidenceChart = new CommunityAuthoringEvidenceChartViewModel();
         using var services = new ServiceCollection().BuildServiceProvider();
         var warehouseProxy = new PlatformCommunityWarehouseProxyViewModel(services);
@@ -35,6 +36,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
             ledgerPicker,
             foodDiscovery,
             diagramWorkspace,
+            wishFlow,
             evidenceChart,
             warehouseProxy);
 
@@ -46,6 +48,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
         Assert.Same(ledgerPicker, page.LedgerPicker);
         Assert.Same(foodDiscovery, page.FoodDiscovery);
         Assert.Same(diagramWorkspace, page.DiagramWorkspace);
+        Assert.Same(wishFlow, page.WishFlow);
         Assert.Same(evidenceChart, page.EvidenceChart);
         Assert.Same(warehouseProxy, page.WarehouseProxy);
         Assert.Same(engagement.Journeys, page.ActionJourneys);
@@ -66,6 +69,7 @@ public sealed class PlatformCommunityHomePageViewModelTests
             new YouTubeFoodCommunityDiscoveryViewModel(
                 new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!)),
             new PlatformCommunityDiagramWorkspaceViewModel(),
+            new PlatformCommunityWishFlowViewModel(),
             new CommunityAuthoringEvidenceChartViewModel(),
             new PlatformCommunityWarehouseProxyViewModel(services));
 

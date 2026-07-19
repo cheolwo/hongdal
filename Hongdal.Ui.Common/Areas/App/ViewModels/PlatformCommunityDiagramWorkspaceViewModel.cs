@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Versioning;
 using Hongdal.Ui.Common.Areas.App.Services;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
@@ -37,6 +38,11 @@ public sealed record CommunityComposerDraftTransition(
 public sealed class PlatformCommunityDiagramWorkspaceViewModel : 조립ViewModelBase
 {
     private string _selectedLedgerTemplateKey = CommunityLedgerTemplateKeys.CargoTransport;
+    private string? _selectedCurrentLedgerId;
+    private DiagramSnapshotDto? _sharedLedgerDiagramSnapshot;
+    private bool _isApiEndpointMetadataLoading;
+    private string? _ledgerSubmissionMessage;
+    private CommunityComposerMessageKind _ledgerSubmissionMessageKind = CommunityComposerMessageKind.Info;
 
     public PlatformCommunityDiagramWorkspaceViewModel()
         : this(
@@ -72,6 +78,40 @@ public sealed class PlatformCommunityDiagramWorkspaceViewModel : 조립ViewModel
     public Dictionary<string, string> FormValues { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public Dictionary<string, string> ApiPathParameterValues { get; } = [];
+
+    public Dictionary<string, WorkflowApiEndpointDto> ApiEndpointMetadata { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public Dictionary<string, bool> FeatureFlagStates { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public string? SelectedCurrentLedgerId
+    {
+        get => _selectedCurrentLedgerId;
+        set => SetProperty(ref _selectedCurrentLedgerId, value);
+    }
+
+    public DiagramSnapshotDto? SharedLedgerDiagramSnapshot
+    {
+        get => _sharedLedgerDiagramSnapshot;
+        set => SetProperty(ref _sharedLedgerDiagramSnapshot, value);
+    }
+
+    public bool IsApiEndpointMetadataLoading
+    {
+        get => _isApiEndpointMetadataLoading;
+        set => SetProperty(ref _isApiEndpointMetadataLoading, value);
+    }
+
+    public string? LedgerSubmissionMessage
+    {
+        get => _ledgerSubmissionMessage;
+        set => SetProperty(ref _ledgerSubmissionMessage, value);
+    }
+
+    public CommunityComposerMessageKind LedgerSubmissionMessageKind
+    {
+        get => _ledgerSubmissionMessageKind;
+        set => SetProperty(ref _ledgerSubmissionMessageKind, value);
+    }
 
     public CommunityComposerDraftTransition CreateDiagramShareDraft(
         string? currentWorkflowTag,

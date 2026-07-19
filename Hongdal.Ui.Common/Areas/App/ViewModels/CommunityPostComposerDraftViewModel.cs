@@ -17,6 +17,10 @@ public enum CommunityComposerMessageKind
 public sealed record CommunityPostComposerSnapshot
 {
     public DateTime SavedAtUtc { get; init; }
+    public long? EditingPostId { get; init; }
+    public bool IsScheduledPublication { get; init; }
+    public DateTime? ScheduledPublishDateLocal { get; init; }
+    public TimeSpan? ScheduledPublishTimeLocal { get; init; }
     public string Nickname { get; init; } = string.Empty;
     public bool IsAuthorDisplayCountryPublic { get; init; }
     public string AuthorDisplayCountryCode { get; init; } = string.Empty;
@@ -152,31 +156,69 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     public string? Validate()
     {
         if (string.IsNullOrWhiteSpace(Nickname)
-            || string.IsNullOrWhiteSpace(Password)
             || string.IsNullOrWhiteSpace(Category)
             || string.IsNullOrWhiteSpace(WorkflowTag)
             || string.IsNullOrWhiteSpace(RoleTag)
             || string.IsNullOrWhiteSpace(Title)
             || (string.IsNullOrWhiteSpace(Body) && string.IsNullOrWhiteSpace(SharedLinkUrl) && !IsSalesPost))
         {
-            return "닉네임, 비밀번호, 게시판/분류, 워크플로우 태그, 역할 태그, 제목과 본문·링크·판매 정보 중 하나를 입력하세요.";
+            return "닉네임, 게시판/분류, 워크플로우 태그, 역할 태그, 제목과 본문·링크·판매 정보 중 하나를 입력하세요.";
+        }
+
+        if (Nickname.Trim().Length > 40)
+        {
+            return "닉네임은 1자 이상 40자 이하로 입력하세요.";
+        }
+
+        if (string.IsNullOrWhiteSpace(Password)
+            || Password.Trim().Length is < 4 or > 100)
+        {
+            return "글 비밀번호는 4자 이상 100자 이하로 입력하세요.";
+        }
+
+        if (Title.Trim().Length > 160)
+        {
+            return "제목은 1자 이상 160자 이하로 입력하세요.";
+        }
+
+        if (Body.Trim().Length > 4000)
+        {
+            return "본문은 4,000자 이하로 입력하세요.";
+        }
+
+        if (!string.IsNullOrWhiteSpace(SharedLinkUrl)
+            && (SharedLinkUrl.Trim().Length > 1000
+                || !Uri.TryCreate(SharedLinkUrl.Trim(), UriKind.Absolute, out var sharedUri)
+                || (sharedUri.Scheme != Uri.UriSchemeHttp
+                    && sharedUri.Scheme != Uri.UriSchemeHttps)))
+        {
+            return "공유 링크는 http 또는 https 주소로 입력하세요.";
         }
 
         if (IsSalesPost)
         {
-            if (string.IsNullOrWhiteSpace(SalesProductTitle))
+            if (string.IsNullOrWhiteSpace(SalesProductTitle)
+                || SalesProductTitle.Trim().Length > 160)
             {
-                return "판매할 상품명을 입력하세요.";
+                return "판매할 상품명은 1자 이상 160자 이하로 입력하세요.";
             }
 
-            if (SalesAvailableQuantity <= 0 || string.IsNullOrWhiteSpace(SalesQuantityUnit))
+            if (SalesAvailableQuantity is <= 0 or > 1_000_000
+                || string.IsNullOrWhiteSpace(SalesQuantityUnit)
+                || SalesQuantityUnit.Trim().Length > 20)
             {
-                return "판매 가능 수량과 단위를 확인하세요.";
+                return "판매 가능 수량은 1,000,000 이하이고 단위는 20자 이하여야 합니다.";
             }
 
-            if (SalesUnitPrice <= 0)
+            if (SalesUnitPrice is <= 0 or > 1_000_000_000)
             {
-                return "상품 가격을 입력하세요.";
+                return "상품 가격은 0보다 크고 1,000,000,000 이하여야 합니다.";
+            }
+
+            var currencyCode = SalesCurrencyCode?.Trim() ?? string.Empty;
+            if (currencyCode.Length != 3 || currencyCode.Any(character => !char.IsAsciiLetter(character)))
+            {
+                return "통화 코드는 KRW, USD처럼 영문 세 자리로 입력하세요.";
             }
 
             if (!AcceptsTossPayments && !AcceptsNaverPay && !AcceptsPayPal && !AcceptsDirectCash)
@@ -188,9 +230,11 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
 
         if (IsAuthorDisplayCountryPublic
             && (AuthorDisplayCountryCode.Trim().Length != 2
-                || string.IsNullOrWhiteSpace(AuthorDisplayCountryName)))
+                || AuthorDisplayCountryCode.Any(character => !char.IsAsciiLetter(character))
+                || string.IsNullOrWhiteSpace(AuthorDisplayCountryName)
+                || AuthorDisplayCountryName.Trim().Length > 80))
         {
-            return "활동 국가를 공개하려면 ISO 알파-2 국가 코드와 국가 이름을 입력하세요.";
+            return "활동 국가를 공개하려면 ISO 알파-2 영문 국가 코드와 80자 이하의 국가 이름을 입력하세요.";
         }
 
         return null;

@@ -33,6 +33,7 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
         ICommunityInformationReviewClient client,
         CommunityPostComposerViewModel composer,
         CommunityScheduledPostListViewModel scheduledPosts,
+        PlatformCommunityLedgerPickerViewModel ledgerPicker,
         CommunityAuthoringSocialResearchViewModel socialResearch,
         CommunityAuthoringDiagramViewModel diagram,
         CommunityAuthoringMutualBenefitViewModel mutualBenefit,
@@ -47,6 +48,7 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
         _client = client;
         Composer = 하위ViewModel등록(composer, 수명소유: true);
         ScheduledPosts = 하위ViewModel등록(scheduledPosts, 수명소유: true);
+        LedgerPicker = 하위ViewModel등록(ledgerPicker);
         SocialResearch = 하위ViewModel등록(socialResearch, 수명소유: true);
         Diagram = 하위ViewModel등록(diagram, 수명소유: true);
         MutualBenefit = 하위ViewModel등록(mutualBenefit, 수명소유: true);
@@ -62,6 +64,7 @@ public sealed partial class CommunityInformationReviewPageViewModel : 조립View
 
     public CommunityPostComposerViewModel Composer { get; }
     public CommunityScheduledPostListViewModel ScheduledPosts { get; }
+    public PlatformCommunityLedgerPickerViewModel LedgerPicker { get; }
     public CommunityAuthoringSocialResearchViewModel SocialResearch { get; }
     public CommunityAuthoringDiagramViewModel Diagram { get; }
     public CommunityAuthoringMutualBenefitViewModel MutualBenefit { get; }

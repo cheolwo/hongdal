@@ -20,7 +20,7 @@ public enum CommunityPostViewMode
     ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
     Boundary = "특정 거래 상대의 적합성이나 성사 가능성으로 게시글을 추천·순위화하지 않습니다.")]
 public sealed class CommunityPostListPageViewModel(
-    PlatformCommunityService communityService) : PageViewModelBase
+    ICommunityPostClient communityService) : PageViewModelBase
 {
     private string _appKey = string.Empty;
     private readonly List<PlatformCommunityPostResponse> _items = [];

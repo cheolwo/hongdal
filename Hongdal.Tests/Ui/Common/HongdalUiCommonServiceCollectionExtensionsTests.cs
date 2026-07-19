@@ -9,6 +9,82 @@ namespace Hongdal.Tests.Ui.Common;
 
 public sealed class HongdalUiCommonServiceCollectionExtensionsTests
 {
+    [Fact]
+    public void AddHongdalCommunityWritingServices_RegistersOnlyReusableWritingBoundary()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHongdalCommunityWritingServices();
+
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostClient)
+            && descriptor.ImplementationType == typeof(CommunityPlatformClient)
+            && descriptor.Lifetime == ServiceLifetime.Scoped);
+        Assert.All(
+            new[]
+            {
+                typeof(PlatformCommunityService),
+                typeof(ICommunityParticipationClient),
+                typeof(ICommunityLedgerClient),
+                typeof(ICommunityProcurementClient),
+                typeof(ICommunityVoteClient)
+            },
+            contractType => Assert.DoesNotContain(services, descriptor =>
+                descriptor.ServiceType == contractType));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostComposerDraftStore)
+            && descriptor.ImplementationType == typeof(BrowserCommunityPostComposerDraftStore)
+            && descriptor.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(CommunityPostComposerViewModel)
+            && descriptor.ImplementationType == typeof(CommunityPostComposerViewModel)
+            && descriptor.Lifetime == ServiceLifetime.Transient);
+        Assert.DoesNotContain(services, descriptor =>
+            descriptor.ServiceType == typeof(CommunityAuthoringAiDraftViewModel));
+        Assert.DoesNotContain(services, descriptor =>
+            descriptor.ServiceType == typeof(CommunityCollectiveActionPageViewModel));
+    }
+
+    [Fact]
+    public void AddHongdalUiCommonAppServices_RegistersFullCommunityClientBoundary()
+    {
+        var services = new ServiceCollection();
+
+        services.AddHongdalUiCommonAppServices();
+
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(ICommunityPostClient)
+            && descriptor.ImplementationType == typeof(CommunityPlatformClient)
+            && descriptor.Lifetime == ServiceLifetime.Scoped);
+        Assert.All(
+            new[]
+            {
+                typeof(ICommunityParticipationClient),
+                typeof(ICommunityLedgerClient),
+                typeof(ICommunityProcurementClient),
+                typeof(ICommunityVoteClient)
+            },
+            contractType => Assert.Contains(services, descriptor =>
+                descriptor.ServiceType == contractType
+                && descriptor.ImplementationFactory is not null
+                && descriptor.Lifetime == ServiceLifetime.Scoped));
+    }
+
+    [Fact]
+    public void AddHongdalCommunityWritingServices_UsesHostAccessTokenProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddScoped<TestAccessTokenProvider>();
+
+        services.AddHongdalCommunityWritingServices<TestAccessTokenProvider>();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        Assert.Same(
+            scope.ServiceProvider.GetRequiredService<TestAccessTokenProvider>(),
+            scope.ServiceProvider.GetRequiredService<IHongdalAccessTokenProvider>());
+    }
+
     [Theory]
     [InlineData(typeof(PlatformCommunityService))]
     [InlineData(typeof(PlatformHomeModeStateService))]
@@ -39,6 +115,20 @@ public sealed class HongdalUiCommonServiceCollectionExtensionsTests
             services,
             candidate => candidate.ServiceType == typeof(PlatformHomeModeStateService));
         Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
+    }
+
+    [Theory]
+    [InlineData(typeof(CommunityAuthoringPeriodStatisticsViewModel))]
+    [InlineData(typeof(CommunityAuthoringAiDraftViewModel))]
+    [InlineData(typeof(CommunityAuthoringImageGeneratorViewModel))]
+    public void AddHongdalUiCommonAppServices_DoesNotRegisterAdminAuthoringToolsWithoutClients(
+        Type serviceType)
+    {
+        var services = new ServiceCollection();
+
+        services.AddHongdalUiCommonAppServices();
+
+        Assert.DoesNotContain(services, candidate => candidate.ServiceType == serviceType);
     }
 
     [Fact]

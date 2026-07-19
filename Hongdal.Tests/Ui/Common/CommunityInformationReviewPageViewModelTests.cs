@@ -49,7 +49,7 @@ public sealed class CommunityInformationReviewPageViewModelTests
     }
 
     [Fact]
-    public void ExistingDraft_IsNotReplacedUntilOperatorConfirms()
+    public async Task ExistingDraft_IsNotReplacedUntilOperatorConfirms()
     {
         using var viewModel = CreateViewModel(new RecordingClient([], []));
         viewModel.Composer.Draft.Title = "작성 중인 글";
@@ -61,7 +61,7 @@ public sealed class CommunityInformationReviewPageViewModelTests
         Assert.True(viewModel.HasDraftConflict);
         Assert.Equal("작성 중인 글", viewModel.Composer.Draft.Title);
 
-        viewModel.ReplaceDraft("관리자");
+        await viewModel.ReplaceDraftAsync("관리자");
 
         Assert.False(viewModel.HasDraftConflict);
         Assert.Equal(CommunityBoardCatalog.Vow.DisplayName, viewModel.Composer.Draft.Category);
@@ -83,6 +83,31 @@ public sealed class CommunityInformationReviewPageViewModelTests
         Assert.StartsWith("먼저 적어 둔 생각입니다.", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
         Assert.Contains("참고 자료 · 사과 (후지 · 상품)", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
         Assert.Contains("https://www.kamis.or.kr/service/price/xml.do", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SelectedLedger_IsAttachedToAdminDraftAndReturnsToComposer()
+    {
+        using var viewModel = CreateViewModel(new RecordingClient([], []));
+        var ledger = new PlatformCommunityPostLedgerChoiceResponse
+        {
+            원장Id = "ledger-group-import-17",
+            원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
+            원장템플릿명 = "공동수입 원장",
+            제목 = "호주 식재료 공동수입 검토",
+            WorkflowTag = "공동수입"
+        };
+        viewModel.LedgerPicker.ReplaceItems([ledger]);
+        viewModel.LedgerPicker.Open(null);
+        viewModel.SelectLedger(ledger);
+
+        var attached = viewModel.AttachSelectedLedger();
+
+        Assert.True(attached);
+        Assert.Equal(ledger.원장Id, viewModel.Composer.Draft.커뮤니티원장Id);
+        Assert.Contains(ledger.제목, viewModel.Composer.Draft.Title, StringComparison.Ordinal);
+        Assert.True(viewModel.Composer.IsOpen);
+        Assert.False(viewModel.LedgerPicker.IsPickerOpen);
     }
 
     [Fact]
@@ -754,6 +779,7 @@ public sealed class CommunityInformationReviewPageViewModelTests
             client,
             composer,
             new CommunityScheduledPostListViewModel(communityService),
+            new PlatformCommunityLedgerPickerViewModel(communityService),
             socialResearch,
             diagram,
             new CommunityAuthoringMutualBenefitViewModel(),

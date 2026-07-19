@@ -29,6 +29,9 @@ public static class MauiProgram
         builder.Services.AddScoped<ICommunityAuthoringImageClient>(services =>
             services.GetRequiredService<CommunityInformationAdminService>());
         builder.Services.AddTransient<CommunityAuthoringSocialResearchViewModel>();
+        builder.Services.AddTransient<CommunityAuthoringPeriodStatisticsViewModel>();
+        builder.Services.AddTransient<CommunityAuthoringAiDraftViewModel>();
+        builder.Services.AddTransient<CommunityAuthoringImageGeneratorViewModel>();
         builder.Services.AddTransient<CommunityInformationReviewPageViewModel>();
         builder.Services.AddSingleton<IAdminPageCatalogClient, AdminPageCatalogSampleService>();
         builder.Services.AddTransient<AdminPageCatalogListViewModel>();

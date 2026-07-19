@@ -17,6 +17,10 @@ public sealed record CommunityPostComposerSaveResult(
     public string? SubmissionPassword { get; init; }
     public bool WasScheduled { get; init; }
     public DateTime? ScheduledPublishAtUtc { get; init; }
+    public CommunityComposerMessageKind MessageKind { get; init; } = CommunityComposerMessageKind.Success;
+    public int AttachmentUploadAttemptedCount { get; init; }
+    public int AttachmentUploadSucceededCount { get; init; }
+    public IReadOnlyList<string> AttachmentUploadFailedFileNames { get; init; } = [];
 }
 
 [HongdalCommunityV0Module(
@@ -28,8 +32,18 @@ public sealed record CommunityPostComposerSaveResult(
 public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
 {
     private const long MaxUploadFileBytes = 5 * 1024 * 1024;
-    private readonly PlatformCommunityService _communityService;
+    private const int MaxUploadFileCount = 5;
+    private static readonly HashSet<string> AllowedUploadContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif"
+    };
+    private readonly ICommunityPostClient _communityService;
     private readonly ICommunityPostComposerDraftStore _draftStore;
+    private readonly SemaphoreSlim _draftStoreGate = new(1, 1);
+    private long _draftGeneration;
     private string _appKey = string.Empty;
     private string _defaultRoleTag = "플랫폼 구성원";
     private string? _loadedDraftAppKey;
@@ -47,7 +61,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
     private TimeSpan? _scheduledPublishTimeLocal;
 
     public CommunityPostComposerViewModel(
-        PlatformCommunityService communityService,
+        ICommunityPostClient communityService,
         ICommunityPostComposerDraftStore draftStore)
     {
         _communityService = communityService;
@@ -208,9 +222,48 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
 
     public void SetFiles(IEnumerable<IBrowserFile> files)
     {
+        ArgumentNullException.ThrowIfNull(files);
+        var candidates = files.ToArray();
+        var accepted = candidates
+            .Where(file => file.Size <= MaxUploadFileBytes
+                           && AllowedUploadContentTypes.Contains(file.ContentType))
+            .Take(MaxUploadFileCount)
+            .ToArray();
         SelectedFiles.Clear();
-        SelectedFiles.AddRange(files.Take(5));
+        SelectedFiles.AddRange(accepted);
         OnPropertyChanged(nameof(SelectedFiles));
+
+        var rejectedCount = candidates.Length - accepted.Length;
+        if (rejectedCount > 0)
+        {
+            SetStatus(
+                $"사진 {accepted.Length}개를 선택했습니다. {rejectedCount}개는 5개 제한, 5MB 크기 또는 지원 형식(JPG·PNG·WebP·GIF)을 확인해 주세요.",
+                CommunityComposerMessageKind.Warning);
+        }
+    }
+
+    public void RemoveFile(IBrowserFile file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
+        if (!SelectedFiles.Remove(file))
+        {
+            return;
+        }
+
+        OnPropertyChanged(nameof(SelectedFiles));
+        SetStatus("선택한 사진을 첨부 목록에서 뺐습니다.", CommunityComposerMessageKind.Info);
+    }
+
+    public void ClearFiles()
+    {
+        if (SelectedFiles.Count == 0)
+        {
+            return;
+        }
+
+        SelectedFiles.Clear();
+        OnPropertyChanged(nameof(SelectedFiles));
+        SetStatus("첨부할 사진을 모두 비웠습니다.", CommunityComposerMessageKind.Info);
     }
 
     public void BeginEdit(PlatformCommunityPostResponse post)
@@ -227,10 +280,42 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
         IsSettingsOpen = true;
     }
 
-    public void CancelEdit()
+    public async Task CancelEditAsync(CancellationToken cancellationToken = default)
+    {
+        await DiscardDraftAsync(cancellationToken);
+        IsOpen = false;
+    }
+
+    public async Task<bool> DiscardDraftAsync(CancellationToken cancellationToken = default)
     {
         Reset();
-        IsOpen = false;
+        _localDraft = null;
+        LocalDraftSavedAtUtc = null;
+        Interlocked.Increment(ref _draftGeneration);
+        try
+        {
+            EnsureConfigured();
+            await _draftStoreGate.WaitAsync(cancellationToken);
+            try
+            {
+                await _draftStore.ClearAsync(_appKey, cancellationToken);
+                _localDraft = null;
+                LocalDraftSavedAtUtc = null;
+            }
+            finally
+            {
+                _draftStoreGate.Release();
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            SetStatus(
+                "현재 화면의 초안은 비웠지만 browser 임시 저장을 제거하지 못했습니다.",
+                CommunityComposerMessageKind.Warning);
+            return false;
+        }
     }
 
     public void Reset()
@@ -255,34 +340,71 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
     public void ClearStatus()
         => StatusMessage = null;
 
-    public async Task SaveLocalDraftAsync(CancellationToken cancellationToken = default)
+    public Task SaveLocalDraftAsync(CancellationToken cancellationToken = default)
+        => SaveLocalDraftCoreAsync(announce: true, cancellationToken);
+
+    public Task SaveLocalDraftSilentlyAsync(CancellationToken cancellationToken = default)
+        => SaveLocalDraftCoreAsync(announce: false, cancellationToken);
+
+    private async Task SaveLocalDraftCoreAsync(
+        bool announce,
+        CancellationToken cancellationToken)
     {
         EnsureConfigured();
         if (!Draft.HasContent)
         {
-            SetStatus(
-                "임시 저장할 제목, 내용, 링크 또는 원장 연결이 없습니다.",
-                CommunityComposerMessageKind.Warning);
+            if (announce)
+            {
+                SetStatus(
+                    "임시 저장할 제목, 내용, 링크 또는 원장 연결이 없습니다.",
+                    CommunityComposerMessageKind.Warning);
+            }
+
             return;
         }
 
-        var snapshot = Draft.CreateSnapshot(DateTime.UtcNow);
+        var snapshot = CreateSnapshot(DateTime.UtcNow);
+        var generation = Volatile.Read(ref _draftGeneration);
         try
         {
-            await _draftStore.SaveAsync(_appKey, snapshot, cancellationToken);
+            await _draftStoreGate.WaitAsync(cancellationToken);
+            try
+            {
+                if (generation != Volatile.Read(ref _draftGeneration))
+                {
+                    return;
+                }
+
+                await _draftStore.SaveAsync(_appKey, snapshot, cancellationToken);
+                if (generation != Volatile.Read(ref _draftGeneration))
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                _draftStoreGate.Release();
+            }
+
             _localDraft = snapshot;
             LocalDraftSavedAtUtc = snapshot.SavedAtUtc;
-            SetStatus(
-                SelectedFiles.Count == 0
-                    ? "이 브라우저에 임시 저장했습니다. 글 비밀번호는 저장하지 않습니다."
-                    : "이 브라우저에 임시 저장했습니다. 글 비밀번호와 첨부 사진은 저장하지 않습니다.",
-                CommunityComposerMessageKind.Success);
+            if (announce)
+            {
+                SetStatus(
+                    SelectedFiles.Count == 0
+                        ? "이 브라우저에 임시 저장했습니다. 글 비밀번호는 저장하지 않습니다."
+                        : "이 브라우저에 임시 저장했습니다. 글 비밀번호와 첨부 사진은 저장하지 않습니다.",
+                    CommunityComposerMessageKind.Success);
+            }
         }
         catch (Exception)
         {
-            SetStatus(
-                "브라우저 임시 저장을 사용할 수 없습니다. 현재 화면의 내용은 닫기 전까지 유지됩니다.",
-                CommunityComposerMessageKind.Warning);
+            if (announce)
+            {
+                SetStatus(
+                    "브라우저 임시 저장을 사용할 수 없습니다. 현재 화면의 내용은 닫기 전까지 유지됩니다.",
+                    CommunityComposerMessageKind.Warning);
+            }
         }
     }
 
@@ -317,7 +439,7 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
             ? ScheduledPublishAtUtc
             : null;
         var submissionPassword = Draft.Password.Trim();
-        var submittedDraft = Draft.CreateSnapshot(DateTime.UtcNow);
+        var submittedDraft = CreateSnapshot(DateTime.UtcNow);
         try
         {
             var saved = EditingPostId is long postId
@@ -344,32 +466,68 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
                 return new(false, wasEditing, null, emptyResponseMessage);
             }
 
-            foreach (var file in SelectedFiles)
+            var selectedFiles = SelectedFiles.ToArray();
+            var uploadedFileCount = 0;
+            var failedFileNames = new List<string>();
+            for (var fileIndex = 0; fileIndex < selectedFiles.Length; fileIndex++)
             {
-                await _communityService.UploadAttachmentAsync(
-                    saved.Id,
-                    Draft.Password,
-                    file,
-                    MaxUploadFileBytes,
-                    cancellationToken);
+                var file = selectedFiles[fileIndex];
+                try
+                {
+                    await _communityService.UploadAttachmentAsync(
+                        saved.Id,
+                        Draft.Password,
+                        file,
+                        MaxUploadFileBytes,
+                        cancellationToken);
+                    uploadedFileCount++;
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    failedFileNames.AddRange(selectedFiles
+                        .Skip(fileIndex)
+                        .Select(pending => pending.Name));
+                    break;
+                }
+                catch (Exception)
+                {
+                    failedFileNames.Add(file.Name);
+                }
             }
 
-            await ClearLocalDraftAsync(cancellationToken);
+            await ClearLocalDraftAsync(CancellationToken.None);
             Reset();
             IsOpen = false;
-            var message = wasEditing
+            var persistenceMessage = wasEditing
                 ? "글을 수정했습니다."
                 : scheduledPublishAtUtc is DateTime scheduledAtUtc
                     ? $"{scheduledAtUtc.ToLocalTime():yyyy-MM-dd HH:mm}에 발행하도록 예약했습니다."
                     : "글을 등록했습니다.";
-            SetStatus(message, CommunityComposerMessageKind.Success);
+            var messageKind = failedFileNames.Count == 0
+                ? CommunityComposerMessageKind.Success
+                : CommunityComposerMessageKind.Warning;
+            var message = failedFileNames.Count == 0
+                ? persistenceMessage
+                : $"{persistenceMessage} 다만 사진 {failedFileNames.Count}개를 첨부하지 못했습니다. 글 상세에서 저장 여부를 확인한 뒤 수정으로 다시 첨부해 주세요: {string.Join(", ", failedFileNames.Distinct(StringComparer.OrdinalIgnoreCase))}";
+            SetStatus(message, messageKind);
             return new(true, wasEditing, saved, message)
             {
                 SubmittedDraft = submittedDraft,
                 SubmissionPassword = submissionPassword,
                 WasScheduled = scheduledPublishAtUtc.HasValue,
-                ScheduledPublishAtUtc = scheduledPublishAtUtc
+                ScheduledPublishAtUtc = scheduledPublishAtUtc,
+                MessageKind = messageKind,
+                AttachmentUploadAttemptedCount = selectedFiles.Length,
+                AttachmentUploadSucceededCount = uploadedFileCount,
+                AttachmentUploadFailedFileNames = failedFileNames
             };
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            const string canceledMessage =
+                "저장 요청이 취소되었습니다. 다시 등록하기 전에 글 목록에서 이미 저장됐는지 확인해 주세요.";
+            SetStatus(canceledMessage, CommunityComposerMessageKind.Warning);
+            return new(false, wasEditing, null, canceledMessage);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
         {
@@ -403,20 +561,46 @@ public sealed class CommunityPostComposerViewModel : 조립ViewModelBase
             return false;
         }
 
+        EditingPostId = _localDraft.EditingPostId;
         Draft.Apply(_localDraft);
+        ScheduledPublishDateLocal = _localDraft.ScheduledPublishDateLocal;
+        ScheduledPublishTimeLocal = _localDraft.ScheduledPublishTimeLocal;
+        IsScheduledPublication = _localDraft.IsScheduledPublication;
         SetStatus(
-            "이 브라우저에 임시 저장한 글을 불러왔습니다.",
+            EditingPostId.HasValue
+                ? "이 브라우저에 임시 저장한 수정 내용을 불러왔습니다. 글 비밀번호를 다시 입력해 주세요."
+                : "이 브라우저에 임시 저장한 글을 불러왔습니다.",
             CommunityComposerMessageKind.Info);
         return true;
     }
+
+    private CommunityPostComposerSnapshot CreateSnapshot(DateTime savedAtUtc)
+        => Draft.CreateSnapshot(savedAtUtc) with
+        {
+            EditingPostId = EditingPostId,
+            IsScheduledPublication = IsScheduledPublication,
+            ScheduledPublishDateLocal = ScheduledPublishDateLocal,
+            ScheduledPublishTimeLocal = ScheduledPublishTimeLocal
+        };
 
     private async Task ClearLocalDraftAsync(CancellationToken cancellationToken)
     {
         _localDraft = null;
         LocalDraftSavedAtUtc = null;
+        Interlocked.Increment(ref _draftGeneration);
         try
         {
-            await _draftStore.ClearAsync(_appKey, cancellationToken);
+            await _draftStoreGate.WaitAsync(cancellationToken);
+            try
+            {
+                await _draftStore.ClearAsync(_appKey, cancellationToken);
+                _localDraft = null;
+                LocalDraftSavedAtUtc = null;
+            }
+            finally
+            {
+                _draftStoreGate.Release();
+            }
         }
         catch (Exception)
         {

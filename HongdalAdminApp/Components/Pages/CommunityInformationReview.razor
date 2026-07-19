@@ -72,12 +72,15 @@
                         <MudText Typo="Typo.overline" Color="Color.Primary">POST DRAFT</MudText>
                         <MudText Typo="Typo.h6">글 초안</MudText>
                     </div>
-                    @if (ViewModel.Composer.IsOpen)
+                    @if (ViewModel.Composer.IsOpen
+                         && !ViewModel.LedgerPicker.IsPickerOpen
+                         && !ViewModel.LedgerPicker.IsDetailOpen
+                         && !ViewModel.LedgerPicker.IsHierarchyOpen)
                     {
                         <MudButton Variant="Variant.Text"
                                    Color="Color.Error"
                                    StartIcon="@Icons.Material.Filled.DeleteOutline"
-                                   OnClick="ViewModel.ClearDraft">
+                                   OnClick="ClearDraftAsync">
                             비우기
                         </MudButton>
                     }
@@ -109,7 +112,31 @@
                     </MudText>
                 </div>
 
-                @if (!ViewModel.Composer.IsOpen)
+                @if (ViewModel.LedgerPicker.IsDetailOpen)
+                {
+                    <CommunityLedgerDiagramDetail Context="@ViewModel.LedgerPicker.DetailContext"
+                                                  IsLoading="@ViewModel.LedgerPicker.IsDetailLoading"
+                                                  ErrorMessage="@ViewModel.LedgerPicker.DetailErrorMessage"
+                                                  OnBack="@(() => ViewModel.LedgerPicker.ReturnFromDetail())"
+                                                  OnAttach="AttachSelectedLedger"
+                                                  OnRefreshRequested="RefreshSelectedLedgerAsync" />
+                }
+                else if (ViewModel.LedgerPicker.IsHierarchyOpen)
+                {
+                    <CommunityOrderLedgerHierarchyDetail Context="@ViewModel.LedgerPicker.HierarchyContext"
+                                                         OnBack="ViewModel.LedgerPicker.ReturnToPicker"
+                                                         OnAttach="AttachSelectedLedger"
+                                                         OnOpenDiagram="ViewModel.LedgerPicker.OpenHierarchyLedgerDiagram" />
+                }
+                else if (ViewModel.LedgerPicker.IsPickerOpen)
+                {
+                    <PlatformCommunityLedgerPickerPage ViewModel="@ViewModel.LedgerPicker"
+                                                       BackRequested="ViewModel.LedgerPicker.ReturnToCompose"
+                                                       LedgerSelected="ViewModel.SelectLedger"
+                                                       DetailRequested="OpenSelectedLedgerDetailAsync"
+                                                       AttachRequested="AttachSelectedLedger" />
+                }
+                else if (!ViewModel.Composer.IsOpen)
                 {
                     <div class="information-authoring-empty">
                         <MudIcon Icon="@Icons.Material.Filled.EditNote" Color="Color.Primary" Size="Size.Large" />
@@ -133,7 +160,33 @@
                                                    PeriodStatisticsToolsRequested="OpenPeriodStatisticsTool"
                                                    MutualBenefitToolsRequested="OpenMutualBenefitTool"
                                                    ImageGeneratorToolsRequested="OpenImageGeneratorTool"
-                                                   Saved="HandleComposerSaved" />
+                                                   LedgerPickerLoading="@ViewModel.LedgerPicker.IsLoading"
+                                                   LedgerPickerRequested="OpenLedgerPickerAsync"
+                                                   Saved="HandleComposerSaved">
+                        <LedgerSettings>
+                            @if (!string.IsNullOrWhiteSpace(ViewModel.Composer.Draft.커뮤니티원장Id))
+                            {
+                                var attachedLedger = ViewModel.LedgerPicker.Items.FirstOrDefault(item =>
+                                    string.Equals(
+                                        item.원장Id,
+                                        ViewModel.Composer.Draft.커뮤니티원장Id,
+                                        StringComparison.OrdinalIgnoreCase));
+                                <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                        <span>
+                                            <strong>연결 원장</strong>
+                                            @(attachedLedger?.제목 ?? ViewModel.Composer.Draft.커뮤니티원장Id)
+                                        </span>
+                                        <MudIconButton Icon="@Icons.Material.Filled.LinkOff"
+                                                       Color="Color.Error"
+                                                       Size="Size.Small"
+                                                       OnClick="ViewModel.ClearAttachedLedger"
+                                                       aria-label="원장 첨부 해제" />
+                                    </MudStack>
+                                </MudAlert>
+                            }
+                        </LedgerSettings>
+                    </PlatformCommunityPostComposer>
                 }
 
                 <section class="information-scheduled-posts" aria-label="예약 발행 관리">
@@ -330,6 +383,18 @@
     private void OpenVowDraft()
         => ViewModel.OpenVowDraft(Session.UserName);
 
+    private Task ClearDraftAsync()
+        => ViewModel.ClearDraftAsync();
+
+    private Task OpenLedgerPickerAsync()
+        => ViewModel.OpenLedgerPickerAsync();
+
+    private void AttachSelectedLedger()
+        => ViewModel.AttachSelectedLedger();
+
+    private Task RefreshSelectedLedgerAsync()
+        => ViewModel.LedgerPicker.RefreshDetailAsync();
+
     private void ChangeVowVersion(string code)
         => ViewModel.SelectVowVersion(code);
 
@@ -395,6 +460,9 @@
 
     private void ImportAiDiagramSteps()
         => ViewModel.ImportAiDiagramSteps();
+
+    private async Task OpenSelectedLedgerDetailAsync()
+        => await ViewModel.LedgerPicker.OpenPendingDetailAsync();
 
     private async Task HandleComposerSaved(CommunityPostComposerSaveResult result)
         => await ViewModel.HandleComposerSavedAsync(result);

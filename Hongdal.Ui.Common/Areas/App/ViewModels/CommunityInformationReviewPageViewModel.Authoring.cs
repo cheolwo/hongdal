@@ -121,14 +121,18 @@ public sealed partial class CommunityInformationReviewPageViewModel
         return true;
     }
 
-    public void ReplaceDraft(string defaultNickname)
+    public async Task ReplaceDraftAsync(
+        string defaultNickname,
+        CancellationToken cancellationToken = default)
     {
         if (PendingDraftCandidate is null)
         {
             return;
         }
 
+        await Composer.DiscardDraftAsync(cancellationToken);
         ApplyCandidateToComposer(PendingDraftCandidate, defaultNickname);
+        await Composer.SaveLocalDraftSilentlyAsync(cancellationToken);
     }
 
     public void ContinueExistingDraft(string defaultNickname)
@@ -144,15 +148,75 @@ public sealed partial class CommunityInformationReviewPageViewModel
         StatusMessage = null;
     }
 
-    public void ClearDraft()
+    public async Task ClearDraftAsync(CancellationToken cancellationToken = default)
     {
         PendingDraftCandidate = null;
-        Composer.Reset();
+        var discarded = await Composer.DiscardDraftAsync(cancellationToken);
         MutualBenefit.Reset();
         EvidenceChart.Reset();
         AiDraft.ResetResult();
         ImageGenerator.Reset();
-        StatusMessage = "현재 화면의 초안을 비웠습니다.";
+        StatusMessage = discarded
+            ? "현재 화면과 browser 임시 저장의 초안을 비웠습니다."
+            : "현재 화면은 비웠지만 browser 임시 저장 제거는 다시 확인해야 합니다.";
+    }
+
+    public async Task OpenLedgerPickerAsync(CancellationToken cancellationToken = default)
+    {
+        LedgerPicker.Open(Composer.Draft.커뮤니티원장Id);
+        await LedgerPicker.LoadAsync(cancellationToken);
+        StatusMessage = LedgerPicker.Items.Count == 0
+            ? LedgerPicker.LoadMessage
+            : "글에 연결할 내 원장 또는 공개 원장을 선택해 주세요.";
+    }
+
+    public void SelectLedger(PlatformCommunityPostLedgerChoiceResponse ledger)
+    {
+        ArgumentNullException.ThrowIfNull(ledger);
+        LedgerPicker.PendingLedgerId = ledger.원장Id;
+        StatusMessage = $"'{ledger.제목}' 원장을 선택했습니다. 내용을 확인하거나 글에 첨부할 수 있습니다.";
+    }
+
+    public bool AttachSelectedLedger()
+    {
+        var ledger = LedgerPicker.Items.FirstOrDefault(LedgerPicker.IsPending);
+        if (ledger is null)
+        {
+            StatusMessage = "글에 첨부할 원장을 먼저 선택해 주세요.";
+            return false;
+        }
+
+        Composer.Draft.커뮤니티원장Id = ledger.원장Id;
+        Composer.Draft.WorkflowTag = CommunityWorkClassificationCatalog
+            .FindByLedgerTemplate(ledger.원장템플릿Key)?.WorkflowTag
+            ?? Composer.Draft.WorkflowTag;
+        if (string.IsNullOrWhiteSpace(Composer.Draft.Title))
+        {
+            Composer.Draft.Title = Limit($"[{ledger.원장템플릿명}] {ledger.제목}", 160);
+        }
+
+        if (string.IsNullOrWhiteSpace(Composer.Draft.Body))
+        {
+            Composer.Draft.Body = Limit(
+                $"{ledger.제목} 원장의 진행 상황과 함께 확인할 내용을 기록합니다.{Environment.NewLine}{Environment.NewLine}확인하고 싶은 내용: ",
+                4000);
+        }
+
+        LedgerPicker.ReturnToCompose();
+        Composer.Open();
+        Composer.SetStatus(
+            $"'{ledger.제목}' 원장을 글에 첨부했습니다.",
+            CommunityComposerMessageKind.Success);
+        StatusMessage = $"'{ledger.제목}' 원장을 글 초안에 연결했습니다.";
+        return true;
+    }
+
+    public void ClearAttachedLedger()
+    {
+        Composer.Draft.커뮤니티원장Id = string.Empty;
+        LedgerPicker.PendingLedgerId = null;
+        Composer.SetStatus("글에서 원장 첨부를 해제했습니다.", CommunityComposerMessageKind.Info);
+        StatusMessage = "글에서 원장 첨부를 해제했습니다.";
     }
 
     public bool AppendCandidateToDraft(
@@ -590,9 +654,12 @@ public sealed partial class CommunityInformationReviewPageViewModel
         EvidenceChart.Reset();
         PeriodStatistics.Reset();
         AiDraft.ResetResult();
-        StatusMessage = result.WasScheduled && result.ScheduledPublishAtUtc is DateTime scheduledAtUtc
+        var savedMessage = result.WasScheduled && result.ScheduledPublishAtUtc is DateTime scheduledAtUtc
             ? $"커뮤니티 글 #{result.Post.Id:N0}을 {scheduledAtUtc.ToLocalTime():yyyy-MM-dd HH:mm} 발행으로 예약했습니다."
             : $"커뮤니티 글 #{result.Post.Id:N0}을 등록했습니다.";
+        StatusMessage = result.MessageKind == CommunityComposerMessageKind.Warning
+            ? $"{savedMessage} {result.Message}"
+            : savedMessage;
     }
 
     public async Task HandleComposerSavedAsync(
@@ -616,10 +683,12 @@ public sealed partial class CommunityInformationReviewPageViewModel
             var attached = await ImageGenerator.AttachSelectedAsync(
                 result.Post.Id,
                 result.SubmissionPassword,
+                Math.Max(0, 5 - result.AttachmentUploadAttemptedCount),
                 cancellationToken);
-            imageAttachmentMessage = attached
-                ? "선택한 생성 이미지도 문맥 순서대로 게시글 사진에 첨부했습니다."
-                : "일부 생성 이미지 첨부는 재시도가 필요합니다.";
+            imageAttachmentMessage = ImageGenerator.StatusMessage
+                                     ?? (attached
+                                         ? "선택한 생성 이미지도 문맥 순서대로 게시글 사진에 첨부했습니다."
+                                         : "일부 생성 이미지 첨부는 재시도가 필요합니다.");
             StatusMessage = $"{StatusMessage} {imageAttachmentMessage}";
         }
 

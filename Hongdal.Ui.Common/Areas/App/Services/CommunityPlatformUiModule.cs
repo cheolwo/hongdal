@@ -17,13 +17,20 @@ internal static class CommunityPlatformUiModule
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.AddCommunityWritingUiModule();
         services.TryAddScoped<PlatformCommunityService>();
+        services.TryAddScoped<ICommunityParticipationClient>(provider =>
+            provider.GetRequiredService<PlatformCommunityService>());
+        services.TryAddScoped<ICommunityLedgerClient>(provider =>
+            provider.GetRequiredService<PlatformCommunityService>());
+        services.TryAddScoped<ICommunityProcurementClient>(provider =>
+            provider.GetRequiredService<PlatformCommunityService>());
+        services.TryAddScoped<ICommunityVoteClient>(provider =>
+            provider.GetRequiredService<PlatformCommunityService>());
         services.TryAddScoped<IDiagramOrganizationDirectoryClient, DiagramOrganizationDirectoryClient>();
         services.TryAddScoped<YouTubeFoodCommunityDiscoveryService>();
         services.TryAddScoped<ICommunityDynamicDiscoveryClient, CommunityDynamicDiscoveryClient>();
-        services.TryAddScoped<ICommunityPostComposerDraftStore, BrowserCommunityPostComposerDraftStore>();
         services.TryAddScoped<ICommunityDecorationSelectionStore, BrowserCommunityDecorationSelectionStore>();
-        services.TryAddTransient<CommunityPostComposerViewModel>();
         services.TryAddTransient<CommunityScheduledPostListViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();
         services.TryAddTransient<PlatformCommunityHomeShellViewModel>();
@@ -38,15 +45,13 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<CommunityAuthoringDiagramViewModel>();
         services.TryAddTransient<CommunityAuthoringMutualBenefitViewModel>();
         services.TryAddTransient<CommunityAuthoringEvidenceChartViewModel>();
-        services.TryAddTransient<CommunityAuthoringPeriodStatisticsViewModel>();
-        services.TryAddTransient<CommunityAuthoringAiDraftViewModel>();
-        services.TryAddTransient<CommunityAuthoringImageGeneratorViewModel>();
         services.TryAddTransient<CommunityOperatorWritingPersonaViewModel>();
         services.TryAddTransient<CommunityVowVersionViewModel>();
         services.TryAddTransient<CommunityVowJourneyTemplateViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramChatViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramCanvasViewModel>();
         services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();
+        services.TryAddTransient<PlatformCommunityWishFlowViewModel>();
         services.TryAddTransient<PlatformCommunityWarehouseProxyViewModel>();
         services.TryAddTransient<PlatformCommunityHomePageViewModel>();
         services.TryAddTransient<ICommunityCollectiveActionSource, PlatformCommunityCollectiveActionSource>();

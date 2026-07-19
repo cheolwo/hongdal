@@ -5,6 +5,27 @@ namespace Hongdal.Ui.Common.Areas.App.Services;
 
 public static class HongdalUiCommonServiceCollectionExtensions
 {
+    public static IServiceCollection AddHongdalCommunityWritingServices(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.AddHongdalUiCoreModule();
+        services.AddCommunityWritingUiModule();
+        return services;
+    }
+
+    public static IServiceCollection AddHongdalCommunityWritingServices<TAccessTokenProvider>(
+        this IServiceCollection services)
+        where TAccessTokenProvider : class, IHongdalAccessTokenProvider
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddScoped<IHongdalAccessTokenProvider>(provider =>
+            provider.GetRequiredService<TAccessTokenProvider>());
+
+        return services.AddHongdalCommunityWritingServices();
+    }
+
     public static IServiceCollection AddHongdalUiCommonAppServices(this IServiceCollection services)
         => AddHongdalUiCommonModules(services);
 

@@ -1749,16 +1749,18 @@
 
     .platform-community-compose-draft-action,
     .platform-community-compose-publish-action {
-        min-width: 62px;
         min-height: 38px;
         border-radius: 4px;
     }
 
     .platform-community-compose-draft-action {
+        width: 38px;
+        min-width: 38px;
         border-color: rgba(255, 255, 255, 0.62) !important;
     }
 
     .platform-community-compose-publish-action {
+        min-width: 62px;
         border: 1px solid #ffffff;
         background: #ffffff !important;
         color: #29347f !important;
@@ -1806,6 +1808,26 @@
 
     .platform-community-compose-status {
         margin: 8px 14px 0;
+    }
+
+    .platform-community-compose-discard-confirmation {
+        margin: 8px 14px 0;
+    }
+
+    .platform-community-compose-discard-confirmation__content {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px 16px;
+        width: 100%;
+    }
+
+    .platform-community-compose-discard-confirmation__actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
     }
 
     .platform-community-compose-editor {
@@ -4742,7 +4764,12 @@
             gap: 5px;
         }
 
-        .platform-community-compose-draft-action,
+        .platform-community-compose-draft-action {
+            width: 38px;
+            min-width: 38px;
+            padding-inline: 0;
+        }
+
         .platform-community-compose-publish-action {
             min-width: 56px;
             padding-inline: 10px;
@@ -4897,7 +4924,12 @@
             height: 32px;
         }
 
-        .platform-community-compose-draft-action,
+        .platform-community-compose-draft-action {
+            width: 36px;
+            min-width: 36px;
+            padding-inline: 0;
+        }
+
         .platform-community-compose-publish-action {
             min-width: 52px;
             padding-inline: 8px;
