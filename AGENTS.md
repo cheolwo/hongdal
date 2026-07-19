@@ -28,6 +28,11 @@
 
 제품 경계는 [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md), 세부 우선순위는 [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 따른다.
 
+## 개발 철학
+
+- Hongdal은 가까운 사람의 필요를 알아보고, 사용자가 책임질 수 있는 약속부터 함께 실천하며, 그 신뢰를 더 넓은 공동체로 확장하도록 돕는다. 세부 기준은 [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md)을 따른다.
+- 예수의 이웃 사랑과 『대학』의 수신·제가·치국은 같은 실천 원리로 본다. 자신을 바로 세우고 가까운 이웃을 사랑하며, 그 돌봄과 책임을 더 넓은 공동체로 확장한다.
+
 ## 공동행동 원칙
 
 - 종교, 국적, 언어, 가족 형태와 경제력은 가입, 노출, 신뢰 점수, 검색 순위나 역할 자격의 대리 지표로 사용하지 않는다.
@@ -99,8 +104,9 @@
 
 1. [README](README.md)
 2. [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)
-3. [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md)
-4. [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md)
-5. [Command/Event 리팩토링 원칙](docs/Architecture/CommandEvent리팩토링원칙.md)
-6. [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md)
-7. [커밋별 시각 변경 기록](docs/Changes/README.md)
+3. [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md)
+4. [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md)
+5. [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md)
+6. [Command/Event 리팩토링 원칙](docs/Architecture/CommandEvent리팩토링원칙.md)
+7. [첨부 문서 목차](docs/ProjectOverview/00-첨부문서목차.md)
+8. [커밋별 시각 변경 기록](docs/Changes/README.md)
