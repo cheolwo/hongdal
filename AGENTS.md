@@ -46,6 +46,8 @@
 - 하나의 EventHandler는 하나의 후속 관심사만 맡는다. 원본 상태와 반드시 같이 성공해야 하는 처리는 같은 트랜잭션에 두고, 알림·투영·감사·추천 큐처럼 재시도 가능한 후속 처리는 분리한다.
 - 새 Controller나 DTO를 먼저 늘리지 않는다. 기존 route, UseCase, metadata, contract, shared component를 재사용할 수 있는지 확인한다.
 - 여러 앱이 함께 쓰는 DTO·상수·계약은 `Hongdal.Contracts`, 공통 UI와 workflow는 `Hongdal.Ui.Common`에 둔다. platform 기능만 adapter로 분리한다.
+- 여러 프로젝트를 통과하는 기능을 추적할 때는 먼저 `HongdalCodeMetadataAttribute`와 `HongdalCodeFeatureKeys`를 검색한다. 특성이 있는 기능은 `FlowOrder`, `Layer`, `Effects`, `Boundary`, `ContractType` 순으로 읽고, 실제 코드와 다르면 특성을 함께 고친다. 세부 규약은 [코드 탐색 메타데이터](docs/Architecture/HongdalCodeMetadata.md)를 따른다.
+- 커뮤니티 0.0 범위 작업은 `[HongdalCommunityV0Module]`을 먼저 검색해 UI·콘텐츠·참여·원장·안전·운영자 글쓰기 모듈과 `0.0-A~E` 단계를 확인한다. 새 대표 진입점을 추가하거나 책임을 옮기면 모듈 특성과 카탈로그 테스트도 갱신한다.
 - 기술 용어(`API`, `DTO`, `Command`, `Event`, `Handler`, `UseCase`, `Outbox`, `Service`)는 영어로 쓰고 업무 도메인 용어는 한국어로 쓴다. 요청 DTO는 `...요청`, 응답 DTO는 `...응답` 형태를 우선한다.
 - Controller와 service 폴더는 역할과 업무 흐름이 드러나게 정리하되, 단순 정리를 위해 저장소 전체 namespace를 한꺼번에 바꾸지 않는다.
 - 개인정보 암호화·복호화는 domain property의 getter/setter가 아니라 persistence와 infrastructure 경계에서 처리한다.

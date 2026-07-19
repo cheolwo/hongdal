@@ -1,5 +1,6 @@
 using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,12 @@ using System.Security.Claims;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Content,
+    HongdalModuleKind.Api,
+    "게시글·댓글·첨부·음성·번역·원장 문맥 HTTP 경계",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "익명 공개 조회와 인증된 쓰기·신고·관리 명령의 권한을 action별로 구분합니다.")]
 [HongdalApiVersion(HongdalProductVersion.V0_0)]
 [HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
 [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]

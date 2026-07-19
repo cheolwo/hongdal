@@ -67,6 +67,25 @@ HongdalMartV35=false
 | 4 | `0.0-D` 원장 폐쇄 루프 | 합의부터 숙고·완료 사례까지 연결 | 한 사용자 여정이 중복 없이 끝까지 이어짐 |
 | 5 | `0.0-E` 개인정보·안전·운영 | 동의·신고·차단·속도 제한·복구 | 운영 체크리스트와 기기 검증을 통과함 |
 
+## 코드 모듈 메타데이터
+
+커뮤니티 0.0의 대표 진입점에는 `[HongdalCommunityV0Module]`을 붙인다. 이 특성은 `ProductVersion=0.0`, `CommunityTrustWorkflow`, 기본 활성 상태와 로드맵 단계를 함께 기록한다. 특성 자체가 기능을 활성화하지 않으며 실제 노출은 기능 플래그, 권한 검사와 `HongdalExecution:Mode`를 따른다.
+
+| ModuleKey | 주 단계 | 관리 범위 |
+| --- | --- | --- |
+| `community-v0-ui` | `0.0-A`, `0.0-B` | 커뮤니티 UI 조립, 홈, 게시판별 글 목록과 글쓰기 |
+| `community-v0-content` | `0.0-B` | 게시판, 게시글, 댓글, 첨부, 신고와 예약 발행 |
+| `community-v0-participation` | `0.0-C`, `0.0-D` | 비구속 투표, 참여 의사, 결의문과 원장·다이어그램 대화 |
+| `community-v0-ledger` | `0.0-D` | Mongo 공동 원장, 변경 Event와 개인정보를 줄인 완료 사례 환류 |
+| `community-v0-safety` | `0.0-E` | 서버 쓰기 정책, 명시적 키워드 구독과 재시도 가능한 알림 |
+| `community-v0-authoring` | `0.0-B` | 운영자 자료 검토, AI 보조 글·다이어그램·이미지와 예약 발행 |
+
+다음 검색으로 0.0 모듈의 API, UseCase, 저장소, ViewModel과 운영 경계를 한 번에 찾을 수 있다.
+
+```powershell
+rg -n "HongdalCommunityV0Module\(" Hongdal Hongdal.Ui.Common
+```
+
 ## 0.0-A. 독립 실행
 
 - 커뮤니티 홈, 게시글, 댓글, 모집, 투표, 대화와 공동 원장 API를 확인합니다.

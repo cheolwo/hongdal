@@ -1,5 +1,6 @@
 using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Services.Community;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Participation,
+    HongdalModuleKind.Api,
+    "커뮤니티 투표·참여·결의문 HTTP 경계",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.DomesticGroupPurchasePilot,
+    Boundary = "투표 결과를 주문·계약·자동 배정으로 해석하지 않고 후속 기능은 별도 기능 플래그로 제한합니다.")]
 [HongdalApiVersion(HongdalProductVersion.V0_0)]
 [HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
 [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]

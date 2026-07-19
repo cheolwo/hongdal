@@ -1,5 +1,6 @@
 using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Services.Community;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,14 @@ using System.Security.Claims;
 
 namespace Hongdal.Controllers.Common;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Content,
+    HongdalModuleKind.Api,
+    "공개 게시판 조회와 인증된 개설 신청·운영 검토 HTTP 경계",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "공개 조회와 관리자 검토 endpoint의 인증 경계를 분리합니다.")]
 [HongdalApiVersion(HongdalProductVersion.V0_0)]
+[HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
 [HongdalApiGrowthTrack(HongdalApiGrowthTrack.Community)]
 [ApiController]
 [Route("api/v1/community/boards")]

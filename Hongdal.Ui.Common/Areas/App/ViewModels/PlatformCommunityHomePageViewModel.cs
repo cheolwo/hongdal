@@ -1,11 +1,18 @@
 using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Hongdal.Ui.Common.Areas.App.ViewModels;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ui,
+    HongdalModuleKind.ClientFeature,
+    "커뮤니티 홈에서 게시판·글 목록·작성·참여·원장·다이어그램 하위 ViewModel을 조립",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.IndependentExecution,
+    Boundary = "기본 진입은 게시판과 글이며 후속 업무 도구는 사용자 행동과 기능 플래그 뒤에서만 엽니다.")]
 public sealed class PlatformCommunityHomePageViewModel : PageViewModelBase
 {
     private bool _isEvidenceChartToolOpen;

@@ -3,6 +3,7 @@ using Hongdal.ApiMetadata;
 using Hongdal.Application.Community;
 using Hongdal.Application.CommandProcessing;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Domain.Community;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -129,6 +130,12 @@ public sealed record 커뮤니티게시글첨부업로드Command(
     string ContentType,
     long Length);
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Content,
+    HongdalModuleKind.Application,
+    "게시글·댓글·첨부·추천·신고·예약 발행의 권한과 영속 상태를 처리",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "게시글은 정보와 참여 의사를 기록하며 특정 상대 추천, 계약 대리, 배차 확정 또는 대금 정산을 수행하지 않습니다.")]
 [HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
 [HongdalUseCase("커뮤니티 게시글 운영", Summary = "참여자가 워크플로우/역할 태그가 붙은 게시글, 첨부, 댓글, 추천, 신고를 처리합니다.")]
 [HongdalUseCaseActor(HongdalActor.CommunityMember)]

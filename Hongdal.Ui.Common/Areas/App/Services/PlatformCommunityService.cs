@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using Hongdal.Contracts.Common.Community;
 using Hongdal.Contracts.Common.Customs;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Contracts.Common.Orderer;
 using Hongdal.Contracts.Common.PublicData;
 using Hongdal.Contracts.Common.Versioning;
@@ -8,6 +9,12 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Hongdal.Ui.Common.Areas.App.Services;
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ui,
+    HongdalModuleKind.ClientFeature,
+    "공통 UI의 게시판·게시글·댓글·참여·원장 HTTP 요청을 서버 API에 연결",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.IndependentExecution,
+    Boundary = "후속 버전 API client가 함께 있어도 0.0 화면은 CommunityTrustWorkflow와 사용자 직접 선택 경계를 따릅니다.")]
 public sealed class PlatformCommunityService
 {
     private readonly HttpClient _httpClient;

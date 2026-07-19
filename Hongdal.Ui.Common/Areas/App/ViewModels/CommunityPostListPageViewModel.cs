@@ -1,6 +1,7 @@
 using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Ui.Common.Areas.App.Services;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -12,6 +13,12 @@ public enum CommunityPostViewMode
     Cards
 }
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ui,
+    HongdalModuleKind.ClientFeature,
+    "선택한 게시판의 글을 목록·카드 형식으로 검색하고 상세 선택 상태를 관리",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "특정 거래 상대의 적합성이나 성사 가능성으로 게시글을 추천·순위화하지 않습니다.")]
 public sealed class CommunityPostListPageViewModel(
     PlatformCommunityService communityService) : PageViewModelBase
 {

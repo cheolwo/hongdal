@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Hongdal.Application.Community;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Domain.Community;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -268,6 +269,12 @@ public static class CommunityLedgerCompletionPublication
     }
 }
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ledger,
+    HongdalModuleKind.Application,
+    "완료 원장을 개인정보를 줄인 커뮤니티 완료 사례 글로 한 번만 환류",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.ClosedLoop,
+    Boundary = "완료 사례에는 상세 주소·연락처·계좌·비공개 증빙을 복제하지 않으며 동일 원장의 중복 발행을 막습니다.")]
 public sealed class CommunityLedgerCompletionPostService : ICommunityLedgerCompletionPostService
 {
     private readonly ICommunityLedgerCompletionPostStore _store;

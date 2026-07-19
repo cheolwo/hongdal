@@ -1,6 +1,7 @@
 using FluentResults;
 using Hongdal.ApiMetadata;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Hongdal.Domain.Community;
 using Microsoft.EntityFrameworkCore;
 using 홍달.Data;
@@ -34,6 +35,12 @@ public interface I커뮤니티게시판UseCase
         CancellationToken cancellationToken);
 }
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Content,
+    HongdalModuleKind.Application,
+    "게시판 목록과 참여자 개설 신청·운영자 승인·반려 상태를 영속 처리",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.Persistence,
+    Boundary = "게시판 승인은 공개 대화 공간을 여는 운영 행위이며 거래 상대나 계약을 승인하는 행위가 아닙니다.")]
 [HongdalApiWorkflow(HongdalWorkflow.CommunityTrust)]
 [HongdalUseCase("커뮤니티 게시판 개설", Summary = "커뮤니티 참여자가 게시판 개설을 신청하고 운영자가 승인 또는 반려합니다.")]
 [HongdalUseCaseActor(HongdalActor.CommunityMember)]

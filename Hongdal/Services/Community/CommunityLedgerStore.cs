@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Hongdal.Contracts.Common.Community;
+using Hongdal.Contracts.Common.Metadata;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -77,6 +78,12 @@ internal static class 커뮤니티원장변경유형값
     public const string 상태변경 = "상태변경";
 }
 
+[HongdalCommunityV0Module(
+    HongdalCommunityV0ModuleKeys.Ledger,
+    HongdalModuleKind.Persistence,
+    "MongoDB community_ledgers 원본과 재시도 가능한 원장 투영 작업을 저장",
+    ReleaseStage = HongdalCommunityV0ReleaseStages.ClosedLoop,
+    Boundary = "원장은 참여자가 직접 합의한 진행 상태를 기록하며 플랫폼 계약 성립이나 자동 업무 실행의 근거가 아닙니다.")]
 public sealed class Mongo커뮤니티원장저장소 : I커뮤니티원장저장소, I커뮤니티원장투영작업저장소
 {
     private const string CollectionName = "community_ledgers";
