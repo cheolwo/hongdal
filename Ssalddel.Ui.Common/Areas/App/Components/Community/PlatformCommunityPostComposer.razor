@@ -430,6 +430,7 @@
                         <MudTextField T="string"
                                       Label="닉네임"
                                       @bind-Value="ViewModel.Draft.Nickname"
+                                      Immediate="true"
                                       MaxLength="40"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense" />
@@ -438,6 +439,7 @@
                                   Label="글 비밀번호"
                                   @bind-Value="ViewModel.Draft.Password"
                                   InputType="InputType.Password"
+                                  Immediate="true"
                                   MaxLength="100"
                                   HelperText="수정과 사진 첨부에 다시 사용하므로 4자 이상 입력하세요."
                                   Variant="Variant.Outlined"

@@ -49,10 +49,10 @@
                     }
                     else
                     {
-                        <MudTextField T="string" Placeholder="Nickname" @bind-Value="attachmentCommentForm.Nickname" MaxLength="40" Margin="Margin.Dense" />
+                        <MudTextField T="string" Placeholder="Nickname" @bind-Value="attachmentCommentForm.Nickname" Immediate="true" MaxLength="40" Margin="Margin.Dense" />
                     }
-                    <MudTextField T="string" Placeholder="Password" @bind-Value="attachmentCommentForm.Password" InputType="InputType.Password" MaxLength="100" Margin="Margin.Dense" />
-                    <MudTextField T="string" Placeholder="Image comment" @bind-Value="attachmentCommentForm.Body" MaxLength="1000" Margin="Margin.Dense" />
+                    <MudTextField T="string" Placeholder="Password" @bind-Value="attachmentCommentForm.Password" InputType="InputType.Password" Immediate="true" MaxLength="100" Margin="Margin.Dense" />
+                    <MudTextField T="string" Placeholder="Image comment" @bind-Value="attachmentCommentForm.Body" Immediate="true" MaxLength="1000" Margin="Margin.Dense" />
                     <MudButton Variant="Variant.Outlined"
                                Size="Size.Small"
                                Color="Color.Primary"
@@ -158,10 +158,10 @@
         }
         else
         {
-            <MudTextField T="string" Placeholder="닉네임" @bind-Value="commentForm.Nickname" MaxLength="40" Margin="Margin.Dense" />
+            <MudTextField T="string" Placeholder="닉네임" @bind-Value="commentForm.Nickname" Immediate="true" MaxLength="40" Margin="Margin.Dense" />
         }
-        <MudTextField T="string" Placeholder="비밀번호" @bind-Value="commentForm.Password" InputType="InputType.Password" MaxLength="100" Margin="Margin.Dense" />
-        <MudTextField T="string" Placeholder="댓글" @bind-Value="commentForm.Body" MaxLength="1000" Margin="Margin.Dense" />
+        <MudTextField T="string" Placeholder="비밀번호" @bind-Value="commentForm.Password" InputType="InputType.Password" Immediate="true" MaxLength="100" Margin="Margin.Dense" />
+        <MudTextField T="string" Placeholder="댓글" @bind-Value="commentForm.Body" Immediate="true" MaxLength="1000" Margin="Margin.Dense" />
         <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" OnClick="SaveCommentAsync">
             댓글 등록
         </MudButton>

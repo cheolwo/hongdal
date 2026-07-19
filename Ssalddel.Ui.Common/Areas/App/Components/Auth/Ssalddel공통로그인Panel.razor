@@ -19,12 +19,14 @@
         {
             <MudTextField @bind-Value="_userNameOrEmail"
                           Label="@아이디Label"
+                          Immediate="true"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           FullWidth="true" />
             <MudTextField @bind-Value="_password"
                           Label="@비밀번호Label"
                           InputType="InputType.Password"
+                          Immediate="true"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           FullWidth="true" />
