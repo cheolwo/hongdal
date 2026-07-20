@@ -24,6 +24,9 @@ public partial class PlatformCommunityHome
     public bool ListOnly { get; set; }
 
     [Parameter]
+    public bool UseDedicatedCommunityRoutes { get; set; }
+
+    [Parameter]
     public string? InitialBoard { get; set; }
 
     [Parameter]

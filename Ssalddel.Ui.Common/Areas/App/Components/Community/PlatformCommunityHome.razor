@@ -227,7 +227,7 @@
                         <MudButton Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    StartIcon="@Icons.Material.Filled.Edit"
-                                   OnClick="OpenCompose">
+                                   OnClick="HandleCommunityComposeRequested">
                             글쓰기
                         </MudButton>
                         <MudButton Variant="Variant.Outlined"
@@ -289,7 +289,7 @@
         @if (!isWorkMode)
         {
             <PlatformCommunityBoardShelf Items="@PostIndexBoardItems"
-                                         ItemSelected="SelectBoardFilter" />
+                                         ItemSelected="HandleCommunityBoardSelected" />
         }
 
         <MudGrid Class="@CommunityGridClass">
@@ -303,7 +303,7 @@
                                                    SelectedFilterChanged="SelectForumListFilter"
                                                    ViewMode="@communityPostViewMode"
                                                    ViewModeChanged="SelectCommunityPostViewMode"
-                                                   ComposeRequested="OpenCompose"
+                                                   ComposeRequested="HandleCommunityComposeRequested"
                                                    Posts="@VisiblePosts"
                                                    SeedPosts="@VisibleSeedPosts"
                                                    VisiblePostCount="@ForumVisiblePostCount"
@@ -616,7 +616,7 @@
                                                HomeRequested="OpenCompactHomeSummary"
                                                BoardRequested="공통홈게시판열기Async"
                                                CommunityRequested="OpenCommunityMode"
-                                               ComposeRequested="OpenCompose"
+                                               ComposeRequested="HandleCommunityComposeRequested"
                                                WorkRequested="OpenWorkMode" />
         }
 

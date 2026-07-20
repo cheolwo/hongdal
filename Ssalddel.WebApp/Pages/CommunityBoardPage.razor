@@ -62,25 +62,26 @@
             <span>글 목록을 불러오는 중입니다.</span>
         </div>
     }
-    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
-    {
-        <section class="community-board-page__error" aria-live="assertive">
-            <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
-            <div>
-                <strong>글 목록을 열지 못했습니다.</strong>
-                <span>@ErrorMessage</span>
-            </div>
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Refresh"
-                       Disabled="@IsLoading"
-                       OnClick="LoadBoardAsync">
-                다시 불러오기
-            </MudButton>
-        </section>
-    }
     else
     {
+        @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <section class="community-board-page__error" aria-live="polite">
+                <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
+                <div>
+                    <strong>새 글을 불러오지 못했습니다.</strong>
+                    <span>@ErrorMessage 기존 게시판 구조는 계속 사용할 수 있습니다.</span>
+                </div>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@IsLoading"
+                           OnClick="LoadBoardAsync">
+                    다시 불러오기
+                </MudButton>
+            </section>
+        }
+
         <PlatformCommunityPostList BoardName="@CurrentBoardName"
                                    FilterOptions="@ListFilters"
                                    SelectedFilter="@SelectedFilter"

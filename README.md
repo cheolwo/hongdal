@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="docs/ProjectOverview/page-docs/">
-    <img src="docs/assets/changes/2026-07-17-community-board-taxonomy/community-board-directory-desktop.png" alt="살뜰 커뮤니티 게시판" width="900">
+    <img src="docs/assets/changes/2026-07-20-community-forum-restoration/community-board-desktop.png" alt="살뜰 커뮤니티 게시판 글 목록" width="900">
   </a>
 </p>
 

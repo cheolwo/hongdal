@@ -100,6 +100,28 @@ public partial class PlatformCommunityHome
         }
     }
 
+    private void HandleCommunityBoardSelected(string board)
+    {
+        if (UseDedicatedCommunityRoutes)
+        {
+            Navigation.NavigateTo(BuildCommunityBoardHref(board));
+            return;
+        }
+
+        SelectBoardFilter(board);
+    }
+
+    private void HandleCommunityComposeRequested()
+    {
+        if (UseDedicatedCommunityRoutes)
+        {
+            OpenCommunityComposePage();
+            return;
+        }
+
+        OpenCompose();
+    }
+
     private static string BuildCommunityBoardHref(string board)
         => $"/community/boards?board={Uri.EscapeDataString(board)}";
 

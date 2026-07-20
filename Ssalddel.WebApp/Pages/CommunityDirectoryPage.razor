@@ -1,0 +1,207 @@
+@page "/community/categories"
+@inject PlatformCommunityService CommunityService
+
+<PageTitle>살뜰 생활 게시판</PageTitle>
+
+<PlatformCommunityReadingThemeFrame>
+<main class="community-directory">
+    <header class="community-directory__hero">
+        <div>
+            <span>COMMUNITY BOARDS</span>
+            <h1>살뜰 생활 게시판</h1>
+            <p>사람과 정보를 만나고, 함께할 일을 모아 공동 원장과 완료 사례까지 이어갑니다.</p>
+        </div>
+        <label class="community-directory__search">
+            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
+            <input type="search"
+                   aria-label="게시판 검색"
+                   placeholder="게시판 이름이나 주제 검색"
+                   value="@SearchText"
+                   @oninput="HandleSearchInput" />
+        </label>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <MudAlert Severity="Severity.Warning" Dense="true">
+            <div class="community-directory__recoverable-error">
+                <span>@StatusMessage</span>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Warning"
+                           Size="Size.Small"
+                           Disabled="@IsLoading"
+                           OnClick="LoadBoardSummariesAsync">
+                    다시 불러오기
+                </MudButton>
+            </div>
+        </MudAlert>
+    }
+
+    <a class="community-directory__all" href="/community/boards">
+        <span class="community-directory__icon"><MudIcon Icon="@Icons.Material.Filled.DynamicFeed" /></span>
+        <span><strong>전체 글</strong><small>공개 게시판의 글을 한 번에 봅니다.</small></span>
+        <b>@TotalPostCount.ToString("N0")</b>
+        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+    </a>
+
+    @if (IsLoading)
+    {
+        <div class="community-directory__state" aria-live="polite">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <span>게시판을 불러오는 중입니다.</span>
+        </div>
+    }
+    else if (VisibleGroups.Count == 0)
+    {
+        <div class="community-directory__state">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <span>검색 조건에 맞는 게시판이 없습니다.</span>
+        </div>
+    }
+    else
+    {
+        @foreach (var group in VisibleGroups)
+        {
+            <section class="community-directory__group" aria-labelledby="@($"board-group-{group.Key}")">
+                <header>
+                    <span>@GroupEyebrow(group.Key)</span>
+                    <h2 id="@($"board-group-{group.Key}")">@group.First().GroupDisplayName</h2>
+                </header>
+                <div class="community-directory__list">
+                    @foreach (var board in group)
+                    {
+                        <a class="community-directory__board"
+                           href="@BoardHref(board.BoardKey)">
+                            <span class="community-directory__icon">
+                                <MudIcon Icon="@ResolveBoardIcon(board.BoardKey)" />
+                            </span>
+                            <span>
+                                <strong>@board.DisplayName</strong>
+                                <small>@board.Description</small>
+                            </span>
+                            <b>@board.PostCount.ToString("N0")</b>
+                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+    }
+
+    <aside class="community-directory__safety" aria-label="안전센터">
+        <span class="community-directory__icon"><MudIcon Icon="@Icons.Material.Filled.HealthAndSafety" /></span>
+        <span>
+            <strong>신고·분쟁은 안전센터에서 보호합니다.</strong>
+            <small>신고 원문과 첨부·댓글은 일반 게시판 목록에 공개하지 않습니다.</small>
+        </span>
+        <MudButton Href="/community/safety"
+                   Variant="Variant.Outlined"
+                   Color="Color.Error"
+                   EndIcon="@Icons.Material.Filled.ChevronRight">
+            안전센터
+        </MudButton>
+    </aside>
+</main>
+</PlatformCommunityReadingThemeFrame>
+
+@code {
+    private IReadOnlyList<CommunityBoardSummaryResponse> BoardSummaries { get; set; } = [];
+    private string SearchText { get; set; } = string.Empty;
+    private string? StatusMessage { get; set; }
+    private bool IsLoading { get; set; } = true;
+
+    private int TotalPostCount => BoardSummaries.Sum(board => board.PostCount);
+
+    private IReadOnlyList<IGrouping<string, CommunityBoardSummaryResponse>> VisibleGroups
+        => BoardSummaries
+            .Where(MatchesSearch)
+            .GroupBy(board => board.GroupCode)
+            .ToArray();
+
+    protected override Task OnInitializedAsync()
+        => LoadBoardSummariesAsync();
+
+    private async Task LoadBoardSummariesAsync()
+    {
+        IsLoading = true;
+        StatusMessage = null;
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            var serverBoards = await CommunityService.GetBoardSummariesAsync("shipper", timeout.Token);
+            BoardSummaries = MergeWithCoreBoards(serverBoards);
+        }
+        catch (Exception)
+        {
+            BoardSummaries = MergeWithCoreBoards([]);
+            StatusMessage = "게시글 수를 불러오지 못했습니다. 기본 게시판을 먼저 표시합니다.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private static IReadOnlyList<CommunityBoardSummaryResponse> MergeWithCoreBoards(
+        IReadOnlyList<CommunityBoardSummaryResponse> serverBoards)
+    {
+        var byKey = serverBoards
+            .Where(board => !string.IsNullOrWhiteSpace(board.BoardKey))
+            .GroupBy(board => board.BoardKey, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+        var merged = CommunityBoardCatalog.PublicBoards
+            .Select(board => byKey.TryGetValue(board.Key, out var serverBoard)
+                ? serverBoard
+                : new CommunityBoardSummaryResponse
+                {
+                    BoardKey = board.Key,
+                    DisplayName = board.DisplayName,
+                    Description = board.Description,
+                    GroupCode = board.GroupCode,
+                    GroupDisplayName = board.GroupDisplayName,
+                    IsUserCreatable = board.IsUserCreatable
+                })
+            .ToList();
+        merged.AddRange(serverBoards.Where(board => board.IsCustom));
+        return merged;
+    }
+
+    private bool MatchesSearch(CommunityBoardSummaryResponse board)
+    {
+        var search = SearchText.Trim();
+        return search.Length == 0
+               || board.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
+               || board.Description.Contains(search, StringComparison.OrdinalIgnoreCase)
+               || board.GroupDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void HandleSearchInput(ChangeEventArgs args)
+        => SearchText = args.Value?.ToString() ?? string.Empty;
+
+    private static string BoardHref(string boardKey)
+        => $"/community/boards?boardKey={Uri.EscapeDataString(boardKey)}";
+
+    private static string GroupEyebrow(string groupCode)
+        => groupCode switch
+        {
+            CommunityBoardGroupCodes.CollectiveWork => "COLLECTIVE WORK",
+            CommunityBoardGroupCodes.ServiceOperation => "SERVICE OPERATION",
+            _ => "PEOPLE & INFORMATION"
+        };
+
+    private static string ResolveBoardIcon(string boardKey)
+        => boardKey switch
+        {
+            CommunityBoardKeys.NoticeGuide => Icons.Material.Filled.Campaign,
+            CommunityBoardKeys.Vow => Icons.Material.Filled.FavoriteBorder,
+            CommunityBoardKeys.FreeLife => Icons.Material.Filled.Forum,
+            CommunityBoardKeys.QuestionHelp => Icons.Material.Filled.HelpOutline,
+            CommunityBoardKeys.InformationPrices => Icons.Material.Filled.QueryStats,
+            CommunityBoardKeys.Participation => Icons.Material.Filled.Groups,
+            CommunityBoardKeys.SalesSupply => Icons.Material.Filled.Storefront,
+            CommunityBoardKeys.LedgerProgress => Icons.Material.Filled.AccountTree,
+            CommunityBoardKeys.CompletionReview => Icons.Material.Filled.Verified,
+            CommunityBoardKeys.ProductFeedback => Icons.Material.Filled.Lightbulb,
+            _ => Icons.Material.Filled.Topic
+        };
+}
