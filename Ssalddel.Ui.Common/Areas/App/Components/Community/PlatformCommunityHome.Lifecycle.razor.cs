@@ -146,13 +146,28 @@ public partial class PlatformCommunityHome
         {
             await InvokeAsync(StateHasChanged);
 
-            await LoadPostsAsync();
-            if (isDisposed)
+            if (PostDetailOnly && QueryPostId is null && !string.IsNullOrWhiteSpace(QuerySeedPostTitle))
             {
+                isLoading = false;
+                await InvokeAsync(StateHasChanged);
                 return;
             }
 
-            await InvokeAsync(StateHasChanged);
+            if (!WorkspaceOnly)
+            {
+                await LoadPostsAsync();
+                if (isDisposed)
+                {
+                    return;
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+
+            if (PostDetailOnly)
+            {
+                return;
+            }
 
             await LoadBoardsAsync();
             if (isDisposed)
@@ -162,7 +177,7 @@ public partial class PlatformCommunityHome
 
             await InvokeAsync(StateHasChanged);
 
-            if (BoardIndexOnly || ListOnly)
+            if (BoardIndexOnly || ListOnly || CommunityFeedOnly || PostDetailOnly)
             {
                 return;
             }

@@ -49,6 +49,12 @@ public partial class PlatformCommunityHome
 
     private void 현재원장다이어그램열기()
     {
+        if (UseDedicatedCommunityRoutes && CommunityFeedOnly)
+        {
+            Navigation.NavigateTo("/community/workspace?diagram=true");
+            return;
+        }
+
         원장블록흐름도배치초기화();
         HomeModeState.SetWorkMode(false);
         DiagramPalette.SetDiagramMode(true);

@@ -129,11 +129,12 @@ public partial class PlatformCommunityHome
         => boardIndexSearchText = value;
 
     private void OpenCommunityPostPage(PlatformCommunityPostResponse post)
-        => Navigation.NavigateTo($"/community/posts/{post.Id}");
+        => Navigation.NavigateTo(
+            $"/community/posts/{post.Id}?board={Uri.EscapeDataString(post.Category)}");
 
     private void OpenCommunitySeedPostPage(CommunitySeedPost post)
         => Navigation.NavigateTo(
-            $"/community/workspace?seed={Uri.EscapeDataString(post.Title)}");
+            $"/community/posts/recommended?seed={Uri.EscapeDataString(post.Title)}&board={Uri.EscapeDataString(post.Category)}");
 
     private void OpenCommunityComposePage()
         => Navigation.NavigateTo(
@@ -175,6 +176,12 @@ public partial class PlatformCommunityHome
 
     private async Task ToggleForumPostAsync(PlatformCommunityPostResponse post)
     {
+        if (UseDedicatedCommunityRoutes)
+        {
+            OpenCommunityPostPage(post);
+            return;
+        }
+
         if (selectedForumPostId == post.Id)
         {
             selectedForumPostId = null;
@@ -197,6 +204,22 @@ public partial class PlatformCommunityHome
 
     private void 실시간베스트글열기(공통홈베스트글요약 베스트글)
     {
+        if (UseDedicatedCommunityRoutes)
+        {
+            if (베스트글.게시글Id is long postId)
+            {
+                Navigation.NavigateTo(
+                    $"/community/posts/{postId}?board={Uri.EscapeDataString(베스트글.분류)}");
+            }
+            else if (!string.IsNullOrWhiteSpace(베스트글.추천글제목))
+            {
+                Navigation.NavigateTo(
+                    $"/community/posts/recommended?seed={Uri.EscapeDataString(베스트글.추천글제목)}&board={Uri.EscapeDataString(베스트글.분류)}");
+            }
+
+            return;
+        }
+
         selectedBoardFilter = 베스트글.분류;
         selectedForumListFilter = "전체글";
         communityPostSearchText = string.Empty;
@@ -206,6 +229,12 @@ public partial class PlatformCommunityHome
 
     private void ToggleForumSeedPost(CommunitySeedPost post)
     {
+        if (UseDedicatedCommunityRoutes)
+        {
+            OpenCommunitySeedPostPage(post);
+            return;
+        }
+
         selectedForumSeedPostTitle = string.Equals(selectedForumSeedPostTitle, post.Title, StringComparison.Ordinal)
             ? null
             : post.Title;

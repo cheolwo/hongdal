@@ -114,7 +114,12 @@
                     </span>
                     <time role="cell" datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@FormatForumDate(post.CreatedAtUtc)</time>
                     <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
-                    <span class="platform-community-forum-count platform-community-forum-count--comments" role="cell">@post.CommentCount</span>
+                    <span class="platform-community-forum-count platform-community-forum-count--comments"
+                          role="cell"
+                          aria-label="@($"댓글 {post.CommentCount}개")">
+                        <span class="platform-community-forum-count-label" aria-hidden="true">댓글</span>
+                        @post.CommentCount
+                    </span>
                 </div>
             }
 
@@ -139,7 +144,12 @@
                     <span class="platform-community-forum-author" role="cell">@post.Author</span>
                     <span role="cell">@post.Meta</span>
                     <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
-                    <span class="platform-community-forum-count platform-community-forum-count--comments" role="cell">@post.CommentCount</span>
+                    <span class="platform-community-forum-count platform-community-forum-count--comments"
+                          role="cell"
+                          aria-label="@($"댓글 {post.CommentCount}개")">
+                        <span class="platform-community-forum-count-label" aria-hidden="true">댓글</span>
+                        @post.CommentCount
+                    </span>
                 </div>
             }
 

@@ -25,6 +25,17 @@ public partial class PlatformCommunityHome
         diagramConnectionMessage = null;
     }
 
+    private void OpenPublicCommunity()
+    {
+        if (UseDedicatedCommunityRoutes && WorkspaceOnly)
+        {
+            Navigation.NavigateTo("/community");
+            return;
+        }
+
+        OpenCommunityMode();
+    }
+
     private void OpenCompactHomeSummary()
     {
         isComposeOpen = false;
@@ -38,7 +49,15 @@ public partial class PlatformCommunityHome
     }
 
     private async Task 공통홈게시판열기Async()
-        => await OpenBaguaAnchorAsync(workMode: false, "community-board-list");
+    {
+        if (UseDedicatedCommunityRoutes && WorkspaceOnly)
+        {
+            Navigation.NavigateTo("/community");
+            return;
+        }
+
+        await OpenBaguaAnchorAsync(workMode: false, "community-board-list");
+    }
 
     private void 공통홈글쓰기열기()
     {
@@ -71,6 +90,12 @@ public partial class PlatformCommunityHome
 
     private void OpenWorkMode()
     {
+        if (UseDedicatedCommunityRoutes)
+        {
+            Navigation.NavigateTo("/community/workspace");
+            return;
+        }
+
         isCompactHomeSummary = false;
         isComposeOpen = false;
         isLedgerDetailOpen = false;

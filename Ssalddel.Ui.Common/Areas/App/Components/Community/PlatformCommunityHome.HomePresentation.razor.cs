@@ -13,7 +13,13 @@ private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체�
     private bool IsCompactHomeSummaryVisible
         => UseCompactHomeSummary && isCompactHomeSummary && !isWorkMode && !IsDiagramMode;
 
-    private string HomeRootClass => isLedgerPickerOpen || isLedgerDetailOpen || isOrderLedgerHierarchyOpen
+    private string HomeRootClass => WorkspaceOnly
+        ? "py-2 platform-community-home platform-home--workspace"
+        : CommunityFeedOnly
+        ? UseClassicForumLayout
+            ? "py-2 platform-community-home platform-home--community platform-home--classic-forum"
+            : "py-4 platform-community-home platform-home--community"
+        : isLedgerPickerOpen || isLedgerDetailOpen || isOrderLedgerHierarchyOpen
         ? "py-4 platform-community-home platform-home--ledger-picker"
         : IsDiagramMode
         ? "py-4 platform-community-home platform-home--diagram"
@@ -23,7 +29,11 @@ private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체�
         ? "py-4 platform-community-home platform-home--summary"
         : "py-4 platform-community-home platform-home--community";
 
-    private string CommunityGridClass => IsDiagramMode
+    private string CommunityGridClass => WorkspaceOnly
+        ? "platform-community-main-grid platform-community-main-grid--workspace"
+        : CommunityFeedOnly
+        ? "platform-community-main-grid"
+        : IsDiagramMode
         ? "platform-community-main-grid platform-community-main-grid--diagram"
         : isWorkMode
         ? "platform-community-main-grid platform-home-section-hidden"
@@ -33,9 +43,21 @@ private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체�
         ? "pa-4 platform-work-panel"
         : "pa-4 platform-work-panel platform-home-section-hidden";
 
-    private string CurrentModeLabel => IsDiagramMode ? "다이어그램 모드" : isWorkMode ? "업무 모드" : "커뮤니티 모드";
+    private string CurrentModeLabel => CommunityFeedOnly
+        ? "커뮤니티 모드"
+        : IsDiagramMode
+        ? "다이어그램 모드"
+        : isWorkMode
+        ? "업무 모드"
+        : "커뮤니티 모드";
 
-    private Color CurrentModeColor => IsDiagramMode ? Color.Secondary : isWorkMode ? Color.Success : Color.Primary;
+    private Color CurrentModeColor => CommunityFeedOnly
+        ? Color.Primary
+        : IsDiagramMode
+        ? Color.Secondary
+        : isWorkMode
+        ? Color.Success
+        : Color.Primary;
 
     private IReadOnlyList<string> CommunityBoardOptions
         => new[] { "전체" }

@@ -414,6 +414,9 @@
 
     .platform-ledger-diagram-workbench--stage {
         width: min(1120px, 100%);
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
         box-shadow: 0 18px 42px rgba(var(--platform-home-accent-rgb), 0.12);
     }
 
@@ -1018,6 +1021,10 @@
         text-align: center;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .platform-community-forum-count-label {
+        display: none;
     }
 
     .platform-community-forum-number--recommended,
@@ -2488,6 +2495,55 @@
 
     .platform-community-secondary-flow > .mud-stack {
         width: 100%;
+    }
+
+    .platform-community-workspace-section {
+        min-width: 0;
+        scroll-margin-top: 1rem;
+    }
+
+    .platform-community-workspace-section > .mud-paper + .mud-paper {
+        margin-top: 16px;
+    }
+
+    .platform-community-route-detail {
+        display: grid;
+        gap: 16px;
+        width: min(960px, calc(100% - 24px));
+        margin: 0 auto;
+        padding-block: 4px 24px;
+    }
+
+    .platform-community-route-detail__empty {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .platform-community-main-grid--workspace .platform-community-secondary-flow {
+        max-width: 1180px;
+        margin-inline: auto;
+    }
+
+    .platform-community-main-grid--workspace #community-workspace-hub {
+        order: 1;
+    }
+
+    .platform-community-main-grid--workspace #community-ledger-draft {
+        order: 2;
+    }
+
+    .platform-community-main-grid--workspace #community-board-management {
+        order: 3;
+    }
+
+    .platform-community-main-grid--workspace #community-workspace-support {
+        order: 4;
+    }
+
+    .platform-community-main-grid--workspace .platform-community-compose-card {
+        order: 5;
     }
 
     .platform-community-meta {
@@ -4613,22 +4669,27 @@
         }
 
         .platform-community-forum-toolbar {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
             align-items: center;
-            flex-wrap: wrap;
             gap: 8px;
         }
 
         .platform-community-forum-toolbar-title {
-            flex: 1 0 100%;
+            grid-column: 1 / -1;
         }
 
         .platform-community-forum-view-tabs {
-            flex: 1 1 auto;
+            grid-column: 1 / -1;
         }
 
         .platform-community-forum-display-switch {
-            flex: 0 0 auto;
+            grid-column: 1;
+        }
+
+        .platform-community-forum-toolbar > .mud-button-root {
+            grid-column: 2;
+            justify-self: end;
         }
 
         .platform-community-forum-view-tab {
@@ -4660,11 +4721,19 @@
         }
 
         .platform-community-forum-count--comments {
-            display: block;
+            display: grid;
             grid-column: 3;
+            gap: 1px;
             color: var(--mud-palette-error);
             font-weight: 800;
             text-align: center;
+        }
+
+        .platform-community-forum-count-label {
+            display: inline;
+            color: var(--mud-palette-text-secondary);
+            font-size: 0.62rem;
+            font-weight: 600;
         }
 
         .platform-community-forum-card-grid {
@@ -4683,6 +4752,21 @@
 
         .platform-community-forum-footer > span {
             line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .platform-community-route-detail {
+            width: calc(100% - 12px);
+        }
+
+        .platform-community-route-detail__empty {
+            grid-template-columns: 1fr;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .platform-community-route-detail__empty .mud-button-root {
+            width: 100%;
         }
 
         .platform-community-main-grid {
@@ -4933,5 +5017,458 @@
         .platform-community-compose-publish-action {
             min-width: 52px;
             padding-inline: 8px;
+        }
+    }
+
+    /* 살뜰 0.0 기본 공개 화면: 밀도 높은 전통 게시판 */
+    .platform-home--classic-forum {
+        --platform-home-accent: #2457a6;
+        --platform-home-accent-rgb: 36, 87, 166;
+        --platform-home-border: #c7d2e3;
+        --platform-home-surface: #ffffff;
+        --platform-home-surface-soft: #f1f4f8;
+        background: #f5f7fa;
+    }
+
+    .platform-home--classic-forum > .mud-stack {
+        gap: 8px !important;
+    }
+
+    .platform-home--classic-forum .platform-community-hero {
+        padding: 12px 14px !important;
+        border-color: var(--platform-home-border) !important;
+        border-top: 3px solid var(--platform-home-accent) !important;
+        border-radius: 2px;
+        box-shadow: none;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-heading {
+        align-items: center;
+        gap: 12px;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-title {
+        gap: 9px;
+    }
+
+    .platform-home--classic-forum .platform-community-hero-title {
+        font-size: 1.32rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+    .platform-home--classic-forum .platform-community-hero-copy {
+        max-width: 760px;
+        overflow: hidden;
+        font-size: 0.76rem;
+        line-height: 1.45;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-status {
+        gap: 8px;
+        font-size: 0.7rem;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-status .mud-chip {
+        display: none;
+    }
+
+    .platform-community-classic-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px;
+        padding-top: 8px;
+        border-top: 1px solid var(--platform-home-border);
+    }
+
+    .platform-home--classic-forum .platform-community-classic-actions .mud-button-root {
+        min-height: 30px;
+        border-radius: 2px;
+        font-size: 0.72rem;
+    }
+
+    .platform-home--classic-forum .mud-button-filled-primary {
+        background: var(--platform-home-accent);
+        color: #fff;
+    }
+
+    .platform-home--classic-forum .platform-community-board-shelf {
+        gap: 4px;
+        padding: 2px 0 0;
+    }
+
+    .platform-home--classic-forum .platform-community-section-heading {
+        align-items: center;
+        min-height: 26px;
+        padding: 0 2px;
+        font-size: 0.7rem;
+    }
+
+    .platform-home--classic-forum .platform-community-section-heading > div {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 7px;
+    }
+
+    .platform-home--classic-forum .platform-community-section-heading > div > span {
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+    }
+
+    .platform-home--classic-forum .platform-community-section-heading strong {
+        font-size: 0.88rem;
+    }
+
+    .platform-home--classic-forum .platform-community-board-scroll {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0;
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid var(--platform-home-border);
+        border-top: 2px solid var(--platform-home-accent);
+        background: var(--platform-home-surface);
+    }
+
+    .platform-home--classic-forum .platform-community-board-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        width: 100%;
+        min-height: 36px;
+        gap: 5px;
+        padding: 5px 9px;
+        border: 0;
+        border-right: 1px solid var(--platform-home-border);
+        border-bottom: 1px solid var(--platform-home-border);
+        border-radius: 0;
+        background: #fff;
+    }
+
+    .platform-home--classic-forum .platform-community-board-card:hover,
+    .platform-home--classic-forum .platform-community-board-card:focus-visible {
+        background: #eef3fb;
+        box-shadow: inset 0 0 0 1px var(--platform-home-accent);
+    }
+
+    .platform-home--classic-forum .platform-community-board-card--selected {
+        background: #e6eefb;
+        color: #174788;
+        box-shadow: inset 3px 0 0 var(--platform-home-accent);
+    }
+
+    .platform-home--classic-forum .platform-community-board-icon,
+    .platform-home--classic-forum .platform-community-board-copy small,
+    .platform-home--classic-forum .platform-community-board-copy .mud-chip {
+        display: none;
+    }
+
+    .platform-home--classic-forum .platform-community-board-copy {
+        display: block;
+    }
+
+    .platform-home--classic-forum .platform-community-board-copy strong {
+        font-size: 0.74rem;
+        font-weight: 650;
+    }
+
+    .platform-home--classic-forum .platform-community-board-count {
+        min-width: 20px;
+        height: 19px;
+        padding-inline: 4px;
+        border-radius: 2px;
+        background: #edf1f6;
+        font-size: 0.62rem;
+    }
+
+    .platform-home--classic-forum .platform-community-main-grid {
+        margin: -3px;
+    }
+
+    .platform-home--classic-forum .platform-community-main-grid > .mud-grid-item {
+        padding: 3px;
+    }
+
+    .platform-home--classic-forum .platform-community-forum {
+        border-color: var(--platform-home-border);
+        border-top-color: var(--platform-home-accent);
+        border-radius: 2px;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-toolbar {
+        grid-template-columns: minmax(180px, 1fr) auto auto auto;
+        gap: 6px;
+        min-height: 48px;
+        padding: 7px 9px;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-toolbar-title > strong {
+        font-size: 0.92rem;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-view-tab,
+    .platform-home--classic-forum .platform-community-forum-display-button {
+        min-height: 29px;
+        height: 29px;
+        border-radius: 0;
+        font-size: 0.7rem;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-display-button {
+        width: 30px;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-toolbar > .mud-button-root {
+        min-height: 29px;
+        border-radius: 2px;
+        font-size: 0.7rem;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-row {
+        grid-template-columns: 54px 104px minmax(220px, 1fr) 112px 72px 50px 50px;
+        min-height: 40px;
+        font-size: 0.71rem;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-row > * {
+        padding: 5px 7px;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-row--head {
+        min-height: 31px;
+        background: #edf1f6;
+        font-size: 0.66rem;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-subject strong {
+        font-size: 0.77rem;
+        font-weight: 600;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-subject small {
+        display: none;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-footer {
+        padding: 7px 9px;
+        background: #f1f4f8;
+    }
+
+    .platform-home--classic-forum .platform-community-forum-footer > label {
+        min-height: 30px;
+        border-radius: 2px;
+    }
+
+    @media (max-width: 720px) {
+        .platform-home--classic-forum.platform-community-home:not(.platform-home--diagram) {
+            margin: 0 -12px;
+            padding: 4px 6px calc(96px + env(safe-area-inset-bottom)) !important;
+            background: #f5f7fa;
+        }
+
+        .platform-home--classic-forum > .mud-stack {
+            gap: 6px !important;
+        }
+
+        .platform-home--classic-forum .platform-community-hero {
+            padding: 9px 10px !important;
+            border-right: 0 !important;
+            border-left: 0 !important;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-heading {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-title > :first-child {
+            display: none;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-title {
+            gap: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-title > div:last-child > span {
+            font-size: 0.58rem;
+        }
+
+        .platform-home--classic-forum .platform-community-hero-title {
+            font-size: 1.18rem;
+            line-height: 1.15;
+        }
+
+        .platform-home--classic-forum .platform-community-hero-copy {
+            max-width: 62vw;
+            font-size: 0.68rem;
+            line-height: 1.35;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-status {
+            justify-content: flex-end;
+            gap: 5px;
+            font-size: 0.64rem;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-status > span:nth-child(2) {
+            display: none;
+        }
+
+        .platform-community-classic-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 2px;
+            padding-top: 6px;
+        }
+
+        .platform-home--classic-forum .platform-community-classic-actions .mud-button-root {
+            min-width: 0;
+            min-height: 28px;
+            padding-inline: 6px;
+            font-size: 0.66rem;
+        }
+
+        .platform-home--classic-forum .platform-community-board-shelf {
+            padding-top: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-section-heading {
+            min-height: 22px;
+            padding-inline: 5px;
+        }
+
+        .platform-home--classic-forum .platform-community-section-heading > div > span {
+            display: none;
+        }
+
+        .platform-home--classic-forum .platform-community-section-heading strong {
+            font-size: 0.8rem;
+        }
+
+        .platform-home--classic-forum .platform-community-board-scroll {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            margin: 0;
+            padding: 0;
+            border-right: 0;
+            border-left: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-board-card {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 78px;
+            min-height: 34px;
+            padding: 5px 9px;
+            border-bottom: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-board-card--selected {
+            box-shadow: inset 0 -3px 0 var(--platform-home-accent);
+        }
+
+        .platform-home--classic-forum .platform-community-main-grid {
+            margin: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-main-grid > .mud-grid-item {
+            padding: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-forum {
+            border-right: 0;
+            border-left: 0;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-toolbar {
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-rows: auto auto;
+            gap: 5px;
+            min-height: 0;
+            padding: 6px 8px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-toolbar-title {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-toolbar-title > strong {
+            font-size: 0.84rem;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-toolbar-title > small {
+            font-size: 0.62rem;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-toolbar > .mud-button-root {
+            grid-column: 2;
+            grid-row: 1;
+            justify-self: end;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-view-tabs {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-display-switch {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-view-tab {
+            min-height: 27px;
+            padding-inline: 8px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-display-button {
+            width: 28px;
+            height: 27px;
+            min-height: 27px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-row {
+            grid-template-columns: 36px minmax(0, 1fr) 42px;
+            min-height: 47px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-row > * {
+            padding: 4px 5px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-subject {
+            gap: 1px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-subject strong {
+            font-size: 0.76rem;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-subject small {
+            display: block;
+            font-size: 0.61rem;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-count--comments {
+            gap: 0;
+            font-size: 0.7rem;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-count-label {
+            display: none;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-footer {
+            gap: 5px;
+            padding: 6px 8px;
+        }
+
+        .platform-home--classic-forum .platform-community-forum-footer > span {
+            display: none;
         }
     }

@@ -1,19 +1,29 @@
 .community-directory {
+    --community-reading-accent: #2457a6;
+    --community-reading-on-accent: #fff;
     display: grid;
-    gap: 1.5rem;
-    width: min(1120px, calc(100% - 2rem));
+    grid-template-columns: minmax(0, 1fr);
+    gap: .6rem;
+    min-width: 0;
+    width: min(1180px, calc(100% - 2rem));
     margin: 0 auto;
-    padding: 2rem 0 5rem;
+    padding: 1rem 0 5rem;
+}
+
+.community-directory > * {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .community-directory__hero {
     display: flex;
-    align-items: end;
+    align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
-    padding: 1.8rem;
+    gap: 1rem;
+    padding: .85rem 1rem;
     border: 1px solid var(--community-reading-border, rgba(83, 99, 82, .18));
-    border-radius: 6px;
+    border-top: 3px solid var(--community-reading-accent, #2457a6);
+    border-radius: 2px;
     background: var(--community-reading-surface, #fff);
 }
 
@@ -27,20 +37,28 @@
 
 .community-directory__hero h1,
 .community-directory__group h2 {
-    margin: .25rem 0;
+    margin: .15rem 0;
+}
+
+.community-directory__hero h1 {
+    font-size: 1.4rem;
+    line-height: 1.2;
 }
 
 .community-directory__hero p {
     margin: 0;
     color: var(--community-reading-muted, #5e685d);
+    line-height: 1.45;
+    word-break: keep-all;
 }
 
 .community-directory__search {
     display: flex;
     align-items: center;
     gap: .55rem;
-    min-width: min(320px, 100%);
-    padding: .75rem 1rem;
+    min-width: min(300px, 100%);
+    min-height: 34px;
+    padding: .4rem .7rem;
     border: 1px solid var(--community-reading-border, rgba(83, 99, 82, .2));
     border-radius: 4px;
     background: var(--community-reading-surface, #fff);
@@ -66,8 +84,9 @@
 }
 
 .community-directory__all {
-    padding: 1rem 1.2rem;
-    border-radius: 4px;
+    min-height: 44px;
+    padding: .5rem .75rem;
+    border-radius: 2px;
     background: var(--community-reading-accent, #273229);
     color: var(--community-reading-on-accent, #fff);
 }
@@ -77,6 +96,7 @@
 .community-directory__safety > span:nth-child(2) {
     display: grid;
     gap: .18rem;
+    min-width: 0;
 }
 
 .community-directory__all small {
@@ -85,41 +105,64 @@
 
 .community-directory__group {
     display: grid;
-    gap: .75rem;
+    gap: .3rem;
+}
+
+.community-directory__group > header {
+    display: flex;
+    align-items: baseline;
+    gap: .65rem;
+    min-height: 28px;
+    padding-inline: .2rem;
+}
+
+.community-directory__group h2 {
+    font-size: .92rem;
 }
 
 .community-directory__list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: .75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
+    border-left: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
 }
 
 .community-directory__board {
-    min-height: 96px;
-    padding: 1rem;
-    border: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
-    border-radius: 4px;
+    min-height: 54px;
+    gap: .65rem;
+    padding: .5rem .65rem;
+    border: 0;
+    border-right: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
+    border-bottom: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
+    border-radius: 0;
     background: var(--community-reading-surface, #fff);
     transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
 }
 
 .community-directory__board:hover {
-    transform: translateY(-2px);
+    transform: none;
     border-color: var(--community-reading-accent, rgba(69, 101, 66, .42));
-    box-shadow: 0 8px 20px rgba(var(--community-reading-accent-rgb, 37, 99, 235), .09);
+    background: color-mix(in srgb, var(--community-reading-accent, #2457a6) 7%, #fff);
+    box-shadow: inset 0 0 0 1px var(--community-reading-accent, #2457a6);
 }
 
 .community-directory__board small,
 .community-directory__safety small {
+    overflow: hidden;
     color: var(--community-reading-muted, #687269);
+    font-size: .68rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .community-directory__icon {
     display: grid;
     place-items: center;
-    width: 2.6rem;
-    height: 2.6rem;
-    border-radius: 4px;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 2px;
     background: color-mix(in srgb, var(--community-reading-accent, #4e704a) 11%, var(--community-reading-surface, #fff));
     color: var(--community-reading-accent, #4e704a);
 }
@@ -142,7 +185,8 @@
 }
 
 .community-directory__safety {
-    padding: 1.15rem;
+    min-height: 54px;
+    padding: .6rem .75rem;
     border: 1px solid rgba(174, 66, 57, .22);
     border-radius: 4px;
     background: rgba(255, 247, 245, .9);
@@ -155,14 +199,33 @@
 
 @media (max-width: 720px) {
     .community-directory {
-        width: min(100% - 1rem, 1120px);
-        padding-top: .75rem;
+        width: 100%;
+        gap: .45rem;
+        padding: .25rem 0 5rem;
     }
 
     .community-directory__hero {
         align-items: stretch;
         flex-direction: column;
-        padding: 1.2rem;
+        gap: .65rem;
+        padding: .7rem .75rem;
+        border-right: 0;
+        border-left: 0;
+    }
+
+    .community-directory__hero span {
+        display: none;
+    }
+
+    .community-directory__hero h1 {
+        font-size: 1.18rem;
+    }
+
+    .community-directory__hero p {
+        overflow: hidden;
+        font-size: .72rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .community-directory__search {
@@ -171,6 +234,27 @@
 
     .community-directory__list {
         grid-template-columns: 1fr;
+        border-right: 0;
+        border-left: 0;
+    }
+
+    .community-directory__group > header {
+        min-height: 24px;
+        padding-inline: .65rem;
+    }
+
+    .community-directory__group header span {
+        display: none;
+    }
+
+    .community-directory__group h2 {
+        font-size: .82rem;
+    }
+
+    .community-directory__all,
+    .community-directory__safety {
+        border-radius: 0;
+        padding-inline: .65rem;
     }
 
     .community-directory__safety {

@@ -27,6 +27,18 @@ public partial class PlatformCommunityHome
     public bool UseDedicatedCommunityRoutes { get; set; }
 
     [Parameter]
+    public bool CommunityFeedOnly { get; set; }
+
+    [Parameter]
+    public bool UseClassicForumLayout { get; set; }
+
+    [Parameter]
+    public bool WorkspaceOnly { get; set; }
+
+    [Parameter]
+    public bool PostDetailOnly { get; set; }
+
+    [Parameter]
     public string? InitialBoard { get; set; }
 
     [Parameter]

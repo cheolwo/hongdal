@@ -52,6 +52,57 @@
                                             SearchTextChanged="HandleCommunityPostSearchChanged" />
             </PlatformCommunityReadingThemeFrame>
         }
+        else if (PostDetailOnly)
+        {
+            var routePost = posts.FirstOrDefault(post => post.Id == selectedForumPostId);
+            var routeSeedPost = SeedPosts.FirstOrDefault(post => IsForumSeedPostSelected(post));
+
+            <PlatformCommunityReadingThemeFrame>
+                <section class="platform-community-route-detail" aria-live="polite">
+                    @if (isLoading)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">게시글을 불러오는 중입니다.</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                    else if (routePost is not null)
+                    {
+                        <PlatformCommunityPostDetail Post="@routePost"
+                                                     ViewModel="@Engagement"
+                                                     CanManagePosts="@CanManageCommunityPosts"
+                                                     CargoRequestDraftHrefBase="@CargoRequestDraftHrefBase"
+                                                     IsSharedLedgerReusing="@isSharedLedgerReusing"
+                                                     SalesInquiryRequested="@((string message) => BeginSalesInquiryAsync(routePost, message))"
+                                                     CommandCompleted="ApplyCommandResultAsync"
+                                                     PromoteRequested="@((string intentTypeCode) => PromotePostParticipationAsync(routePost, intentTypeCode))"
+                                                     JoinPartyRoleRequested="@((string roleCode) => JoinPostPartyRoleAsync(routePost, roleCode))"
+                                                     JoinProfessionalRoleRequested="@((string roleCode) => JoinPostProfessionalRoleAsync(routePost, roleCode))"
+                                                     DiagramRequested="OpenSharedLedgerDiagram"
+                                                     StartFromCompletionRequested="StartFromCompletionCase"
+                                                     ReuseRequested="ReuseSharedLedgerAsync"
+                                                     EditRequested="BeginEdit" />
+                    }
+                    else if (routeSeedPost is not null)
+                    {
+                        <PlatformCommunitySeedPostDetail Post="@routeSeedPost" />
+                    }
+                    else
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-community-route-detail__empty">
+                            <MudIcon Icon="@Icons.Material.Filled.Article" Color="Color.Secondary" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">게시글을 찾을 수 없습니다.</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">삭제되었거나 공개 범위가 변경된 글일 수 있습니다.</MudText>
+                            </div>
+                            <MudButton Href="/community/boards" Variant="Variant.Outlined" Color="Color.Primary">글 목록으로</MudButton>
+                        </MudPaper>
+                    }
+                </section>
+            </PlatformCommunityReadingThemeFrame>
+        }
         else if (isLedgerDetailOpen)
         {
             <CommunityLedgerDiagramDetail Context="ledgerDetailContext"
@@ -201,11 +252,13 @@
         }
         else
         {
+        @if (!WorkspaceOnly)
+        {
         <MudPaper id="community-home-top" Elevation="0" Class="pa-4 platform-community-hero platform-community-forum-header">
             <MudStack Spacing="2">
                 <div class="platform-community-forum-heading">
                     <div class="platform-community-forum-title">
-                        <SsalddelWonBangGakMark Size="48" />
+                        <SsalddelWonBangGakMark Size="@(UseClassicForumLayout ? 34 : 48)" />
                         <div>
                             <span>@AppName · 살뜰 커뮤니티</span>
                             <MudText Typo="Typo.h4" Class="platform-community-hero-title">@CurrentCommunityBoardTitle</MudText>
@@ -221,7 +274,31 @@
                     </div>
                 </div>
 
-                @if (!isWorkMode)
+                @if (UseClassicForumLayout)
+                {
+                    <nav class="platform-community-classic-actions" aria-label="게시판 바로가기">
+                        <MudButton Href="/community/categories"
+                                   Variant="Variant.Text"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.List">
+                            게시판 전체보기
+                        </MudButton>
+                        <MudButton Href="/community/workspace"
+                                   Variant="Variant.Text"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.AccountTree">
+                            업무·원장
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Edit"
+                                   OnClick="HandleCommunityComposeRequested">
+                            글쓰기
+                        </MudButton>
+                    </nav>
+                }
+                else if (CommunityFeedOnly || !isWorkMode)
                 {
                     <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="platform-community-hero-actions">
                         <MudButton Variant="Variant.Filled"
@@ -257,42 +334,48 @@
                     </MudStack>
                 }
 
-                <PlatformCommunityBaguaDock DecorationState="@DecorationState"
-                                             @bind-IsOpen="isBaguaNavigatorOpen"
-                                             ShowPrajnaUpayaNavigator="@ShowPrajnaUpayaNavigator"
-                                             UpayaLabel="@UpayaLabel"
-                                             PrajnaLabel="@PrajnaLabel"
-                                             RoleLabel="@RoleLabel"
-                                             NavigationItems="@EffectiveCardinalNavigationOptions"
-                                             CenterSymbol="@EffectiveBaguaCenterSymbol"
-                                             CenterTrigramName="@BaguaCenterTrigramName"
-                                             CenterDestinationLabel="@BaguaCenterDestinationLabel"
-                                             ShowTaegeukCenter="@BaguaCenterShowsTaegeuk"
-                                             UpayaSelected="@PrajnaUpayaUpayaSelectedCallback"
-                                             PrajnaSelected="@PrajnaUpayaPrajnaSelectedCallback"
-                                             CommunitySelected="@BaguaTaegeukYangSelectedCallback"
-                                             StoreSelected="@BaguaTaegeukYinSelectedCallback"
-                                             CenterSelected="@BaguaCenterSelectedCallback"
-                                             TaegeukYangSelected="@BaguaTaegeukYangSelectedCallback"
-                                             TaegeukYinSelected="@BaguaTaegeukYinSelectedCallback"
-                                             CenterTransferCompleted="HandleBaguaCenterTransferCompletedAsync"
-                                             DestinationSelected="HandleBaguaDestinationSelectedAsync" />
+                @if (!UseClassicForumLayout)
+                {
+                    <PlatformCommunityBaguaDock DecorationState="@DecorationState"
+                                                 @bind-IsOpen="isBaguaNavigatorOpen"
+                                                 ShowPrajnaUpayaNavigator="@ShowPrajnaUpayaNavigator"
+                                                 UpayaLabel="@UpayaLabel"
+                                                 PrajnaLabel="@PrajnaLabel"
+                                                 RoleLabel="@RoleLabel"
+                                                 NavigationItems="@EffectiveCardinalNavigationOptions"
+                                                 CenterSymbol="@EffectiveBaguaCenterSymbol"
+                                                 CenterTrigramName="@BaguaCenterTrigramName"
+                                                 CenterDestinationLabel="@BaguaCenterDestinationLabel"
+                                                 ShowTaegeukCenter="@BaguaCenterShowsTaegeuk"
+                                                 UpayaSelected="@PrajnaUpayaUpayaSelectedCallback"
+                                                 PrajnaSelected="@PrajnaUpayaPrajnaSelectedCallback"
+                                                 CommunitySelected="@BaguaTaegeukYangSelectedCallback"
+                                                 StoreSelected="@BaguaTaegeukYinSelectedCallback"
+                                                 CenterSelected="@BaguaCenterSelectedCallback"
+                                                 TaegeukYangSelected="@BaguaTaegeukYangSelectedCallback"
+                                                 TaegeukYinSelected="@BaguaTaegeukYinSelectedCallback"
+                                                 CenterTransferCompleted="HandleBaguaCenterTransferCompletedAsync"
+                                                 DestinationSelected="HandleBaguaDestinationSelectedAsync" />
+                }
             </MudStack>
         </MudPaper>
+        }
 
-        @if (!isWorkMode && ShowRealtimeBest)
+        @if (!WorkspaceOnly && (CommunityFeedOnly || !isWorkMode) && ShowRealtimeBest)
         {
             <PlatformCommunityRealtimeBest Items="@실시간베스트글"
                                            ItemSelected="실시간베스트글열기" />
         }
 
-        @if (!isWorkMode)
+        @if (!WorkspaceOnly && (CommunityFeedOnly || !isWorkMode))
         {
             <PlatformCommunityBoardShelf Items="@PostIndexBoardItems"
                                          ItemSelected="HandleCommunityBoardSelected" />
         }
 
         <MudGrid Class="@CommunityGridClass">
+            @if (!WorkspaceOnly)
+            {
             <MudItem xs="12">
                 <MudStack Spacing="2">
                     @if (!isLoading)
@@ -384,25 +467,32 @@
                     }
                 </MudStack>
             </MudItem>
+            }
 
+            @if (!CommunityFeedOnly)
+            {
             <MudItem xs="12" Class="platform-community-secondary-flow">
                 <MudStack Spacing="2">
-                    <PlatformCommunityBoardManagementPanel IsLoading="@isBoardLoading"
-                                                           IsSaving="@isSavingBoardRequest"
-                                                           CanManage="@CanManageCommunityPosts"
-                                                           ApprovedBoards="@approvedBoards"
-                                                           PendingBoards="@pendingBoardRequests"
-                                                           Form="@boardForm"
-                                                           ReviewMemos="@boardReviewMemo"
-                                                           BoardSelected="SelectBoard"
-                                                           SaveRequested="SaveBoardRequestAsync"
-                                                           ApproveRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, true))"
-                                                           RejectRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, false))" />
+                    <section id="community-board-management" class="platform-community-workspace-section">
+                        <PlatformCommunityBoardManagementPanel IsLoading="@isBoardLoading"
+                                                               IsSaving="@isSavingBoardRequest"
+                                                               CanManage="@CanManageCommunityPosts"
+                                                               ApprovedBoards="@approvedBoards"
+                                                               PendingBoards="@pendingBoardRequests"
+                                                               Form="@boardForm"
+                                                               ReviewMemos="@boardReviewMemo"
+                                                               BoardSelected="SelectBoard"
+                                                               SaveRequested="SaveBoardRequestAsync"
+                                                               ApproveRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, true))"
+                                                               RejectRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, false))" />
+                    </section>
 
-                    <PlatformCommunityWorkspaceHub Workspaces="@UnifiedWorkspaces"
-                                                   LedgerDraftRequested="@((string templateKey) => PrepareLedgerCommunityDraft(templateKey))" />
+                    <section id="community-workspace-hub" class="platform-community-workspace-section">
+                        <PlatformCommunityWorkspaceHub Workspaces="@UnifiedWorkspaces"
+                                                       LedgerDraftRequested="@((string templateKey) => PrepareLedgerCommunityDraft(templateKey))" />
+                    </section>
 
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-ledger-draft-paper">
+                    <MudPaper id="community-ledger-draft" Elevation="0" Outlined="true" Class="pa-4 platform-ledger-draft-paper platform-community-workspace-section">
                         <MudStack Spacing="2">
                             <MudText Typo="Typo.subtitle1">생활 원장 초안</MudText>
                             <PlatformCommunityWishIntakePanel Wish="@원함입력"
@@ -591,12 +681,17 @@
                         </AuthoringTool>
                     </PlatformCommunityPostComposer>
 
-                    <PlatformCommunitySupportPanels QuickActions="@QuickActions"
-                                                    OperatingNotes="@OperatingNotes" />
+                    <section id="community-workspace-support" class="platform-community-workspace-section">
+                        <PlatformCommunitySupportPanels QuickActions="@QuickActions"
+                                                        OperatingNotes="@OperatingNotes" />
+                    </section>
                 </MudStack>
             </MudItem>
+            }
         </MudGrid>
 
+        @if (!CommunityFeedOnly && !WorkspaceOnly)
+        {
         <PlatformCommunityWorkPanel CssClass="@WorkPanelClass"
                                     ModeColor="@CurrentModeColor"
                                     RoleLabel="@RoleLabel"
@@ -607,15 +702,16 @@
                                     LedgerDraftRequested="@(() => PrepareLedgerCommunityDraft())"
                                     WorkspaceLedgerDraftRequested="@((string templateKey) => PrepareLedgerCommunityDraft(templateKey))" />
         }
+        }
 
         @if (!BoardIndexOnly && !ListOnly && !IsDiagramMode && !isComposeOpen)
         {
             <PlatformCommunityMobileNavigation UseCompactHomeSummary="@UseCompactHomeSummary"
                                                IsCompactHomeSummaryVisible="@IsCompactHomeSummaryVisible"
-                                               IsWorkMode="@isWorkMode"
+                                               IsWorkMode="@(WorkspaceOnly || (!CommunityFeedOnly && isWorkMode))"
                                                HomeRequested="OpenCompactHomeSummary"
                                                BoardRequested="공통홈게시판열기Async"
-                                               CommunityRequested="OpenCommunityMode"
+                                               CommunityRequested="OpenPublicCommunity"
                                                ComposeRequested="HandleCommunityComposeRequested"
                                                WorkRequested="OpenWorkMode" />
         }

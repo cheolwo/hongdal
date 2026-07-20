@@ -28,6 +28,12 @@ public partial class PlatformCommunityHome
 
     private async Task OpenMyLedgerComposeAsync()
     {
+        if (UseDedicatedCommunityRoutes && CommunityFeedOnly)
+        {
+            Navigation.NavigateTo("/community/workspace");
+            return;
+        }
+
         OpenCompose();
         await OpenLedgerPickerAsync();
     }
