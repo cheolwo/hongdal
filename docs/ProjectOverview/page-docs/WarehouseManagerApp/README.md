@@ -11,9 +11,15 @@
 | [WarehouseManagerApp-P02-1 - 프로세스별 창고 작업 시작](WarehouseManagerApp-P02-1/) | /work/{ProcessCode} | 확장 | 프로세스별 창고 작업 시작 | 완료 |
 | [WarehouseManagerApp-P02-2 - 작업대 스캔](WarehouseManagerApp-P02-2/) | /work/{ProcessCode}/workbench | 확장 | 작업대 스캔 | 완료 |
 | [WarehouseManagerApp-P02-3 - 범용 스캔 스테이션](WarehouseManagerApp-P02-3/) | /scan | 확장 | 범용 스캔 스테이션 | 완료 |
-| [WarehouseManagerApp-P03 - 입고 검수](WarehouseManagerApp-P03/) | /work/inbound/inspection | 확장 | 입고 검수 | 완료 |
-| [WarehouseManagerApp-P03-1 - 입고 상품 스캔](WarehouseManagerApp-P03-1/) | /work/inbound/products | 확장 | 입고 상품 스캔 | 완료 |
-| [WarehouseManagerApp-P04 - 피킹 배치 작업](WarehouseManagerApp-P04/) | /work/picking-batch | 확장 | 피킹 배치 작업 | 완료 |
+| [WarehouseManagerApp-P03 - 입고 검수](WarehouseManagerApp-P03/) | /work/inbound/inspection | 확장 | 서버 검수대상 조회·수량 검수·같은 ID 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P03-1 - 입고상품 수령](WarehouseManagerApp-P03-1/) | /work/inbound/products | 확장 | 정확한 입고예정 조회와 현장 반입 요청 | 완료 |
+| [WarehouseManagerApp-P03-2 - 일반 재고 현황](WarehouseManagerApp-P03-2/) | /warehouse/general/inventory | 확장 | 창고 범위 최소 재고 목록·서버 집계·정확한 상세 | 실제 캡처 |
+| [WarehouseManagerApp-P03-3 - 적재 작업](WarehouseManagerApp-P03-3/) | /work/inbound/put-away | 확장 | 검수 완료 재고의 위치 확정과 같은 ID 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P04 - 피킹 작업](WarehouseManagerApp-P04/) | /work/picking-batch | 확장 | 서버 피킹 목록·정확한 상세·시작/완료·같은 Key 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P04-1 - 포장 작업](WarehouseManagerApp-P04-1/) | /work/outbound/packing | 확장 | 적재 완료 재고의 전체 가용수량 포장·같은 ID 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P04-2 - 출고 인계 준비](WarehouseManagerApp-P04-2/) | /warehouse/general/transport-handoff | 확장 | 포장 완료 재고의 출고예정 원장 준비·같은 ID 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P04-3 - 출고예정 운송 전 검토](WarehouseManagerApp-P04-3/) | /warehouse/general/outbound-plan-review | 확장 | 준비된 출고예정의 포장·수량·출발 창고 근거와 운송 전 입력 필요 항목 확인 | 실제 캡처 |
+| [WarehouseManagerApp-P04-4 - 운송의뢰 로컬 초안](WarehouseManagerApp-P04-4/) | /warehouse/general/transport-request-draft | 확장 | 정확한 출고예정의 하차지·희망 일정·차량 조건 로컬 검토 | 실제 캡처 |
 | [WarehouseManagerApp-P05 - 알뜰살뜰 마트 창고 홈](WarehouseManagerApp-P05/) | /mart | 확장 | 알뜰살뜰 마트 창고 홈 | 완료 |
 | [WarehouseManagerApp-P05-1 - 알뜰살뜰 마트 작업 보드](WarehouseManagerApp-P05-1/) | /mart/work-board | 확장 | 알뜰살뜰 마트 작업 보드 | 완료 |
 | [WarehouseManagerApp-P05-2 - 알뜰살뜰 마트 프로세스별 작업 시작](WarehouseManagerApp-P05-2/) | /mart/work/{ProcessCode} | 확장 | 알뜰살뜰 마트 프로세스별 작업 시작 | 완료 |

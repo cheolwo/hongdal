@@ -4,67 +4,67 @@
 
 ## 화면 캡처
 
-<img src="../../../assets/app-pages/WarehouseManagerApp/WarehouseManagerApp-P03.png" alt="WarehouseManagerApp-P03 화면 캡처" width="720">
+![입고 검수 실제 화면](../../../../assets/changes/2026-07-20-inbound-inspection/desktop.png)
 
 ## 기본 정보
 
 | 항목 | 내용 |
 | --- | --- |
-| 앱 | WarehouseManagerApp |
+| 앱 | WarehouseManagerApp, 통합 WebApp |
 | 페이지 ID / 제목 | WarehouseManagerApp-P03 - 입고 검수 |
-| 라우트 | /work/inbound/inspection |
-| 소스 파일 | [WarehouseManagerApp/Components/Pages/InboundInspection.razor](../../../../../WarehouseManagerApp/Components/Pages/InboundInspection.razor) |
-| 분류 | 확장 |
-| 1.0 필수 연결 | 직접 연결 없음 |
-| 캡처 상태 | 완료 |
+| 라우트 | `/work/inbound/inspection`, `/warehouse/work/inbound/inspection` |
+| host 소스 | `WarehouseManagerApp/Components/Pages/InboundInspection.razor`, `Ssalddel.WebApp/Pages/WarehouseInboundInspectionPage.razor` |
+| 공용 화면 | `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/SsalddelInboundInspectionWorkspace.razor` |
+| 단계 / 실행 경계 | `Beta / Simulation` |
+| 캡처 상태 | 실제 WebApp 데스크톱 검증 완료 |
 
-## 왜 필요한가
+## 단일 책임 경계
 
-이 화면은 입고 검수을 담당하므로, 1.0 이후의 해외 물류, 창고, 주문자 집단, 판매채널 확장을 화면 단위로 검증하기 위해 필요합니다.
+이 페이지는 접근 가능한 창고의 `보관중` 입고상품을 조회하고, 실제 검수 수량과 불량 수량을 한 번 기록한 뒤 같은 입고상품 ID를 다시 확인하는 일만 담당한다.
 
-## 사용자와 참여자
+- `입고검수대상목록ViewModel`: 검색어·검수 상태·서버 페이징 목록만 담당한다.
+- `입고검수대상상세ViewModel`: 사용자가 명시적으로 선택한 `inboundItemId` 한 건의 상세만 조회한다. 첫 항목을 자동 선택하거나 없는 ID를 다른 항목으로 대체하지 않는다.
+- `입고검수작성ViewModel`: 수량, 네 가지 현장 확인, 메모와 저장 명령만 담당한다.
+- `입고검수PageViewModel`: 목록·상세·작성 순서를 조정하고 저장 성공 뒤 같은 ID 상세와 목록을 서버에서 다시 조회한다.
+- 공용 workspace는 상태를 렌더링하고 사용자 event를 ViewModel에 전달한다.
+- 각 host는 인증, capability와 URL query 동기화만 맡는다.
 
-주 사용자: 창고 관리자, 창고 작업자 / 보조 참여자: 화주, 기사, 관리자
+적재 위치 확정, 출고, 운송 인계, 계약, 보관 책임, 결제와 정산은 이 페이지 책임이 아니다.
 
-이 화면은 창고/출고/피킹 확장 워크플로우 안에서 입고 검수 책임을 갖습니다. 화면 하나가 너무 많은 결정을 떠안지 않도록, 이 문서에서는 이 화면의 주 책임과 다른 화면으로 넘겨야 할 책임을 구분해 관리합니다.
+## API와 권한
 
-## 화면에서 다루는 일
+- `GET /api/v1/warehouse-operations/inventory/inspection-targets`
+- `GET /api/v1/warehouse-operations/inventory/{inboundItemId}/inspection-target`
+- `POST /api/v1/warehouse-operations/inventory/{inboundItemId}/inspect`
 
-- 주 책임: 입고 검수
-- 사용자가 확인해야 하는 것: 이 화면에서 상태, 입력값, 다음 행동이 명확히 보이는지 확인합니다.
-- 사용자가 조작해야 하는 것: 버튼, 입력, 선택, 업로드, 조회 같은 조작이 이 화면의 책임 안에 머무는지 확인합니다.
-- 화면 밖으로 넘길 일: 다른 앱이나 관리자 화면에서 처리해야 하는 상태 변경은 이 화면에 과하게 넣지 않습니다.
+모든 경로는 로그인과 `WarehouseManager` 또는 `WarehouseInboundOperator` 역할을 요구한다. 서버는 창고 소유자 또는 해당 창고에 배정된 사용자만 조회·검수할 수 있게 제한하고, 상품 소유권만으로는 접근을 허용하지 않는다. 범위 밖 ID와 없는 ID는 같은 404로 처리한다.
+
+목록 계약은 상품명, SKU, 창고명, 수량, 상태와 기준 시각만 반환한다. 상세 계약도 사용자 ID, 주소, 연락처, 계좌, 결제 식별자와 증빙 원본을 포함하지 않는다.
+
+## 상태 전이 규칙
+
+- 검수 대상은 현재 상태가 `보관중`인 입고상품이다.
+- 실제 검수 수량과 불량 수량은 각각 0~100,000 범위이며 불량 수량은 실제 수량을 넘을 수 없다.
+- 메모는 최대 400자다.
+- 네 가지 현장 확인을 모두 완료하기 전에는 클라이언트 저장이 비활성이다.
+- 최초 성공은 수량·불량 수량과 검수 이력을 기록하고 상태를 `검수완료`로 전이한다.
+- 완료 후 같은 수량으로 재시도하면 새 이력·감사·event를 만들지 않고 기존 결과를 반환한다.
+- 완료 후 다른 수량으로 재시도하면 서버가 충돌로 거부한다.
+
+## 화면 상태
+
+기능 비활성, 로그인 필요, 역할 거부, 로딩, 원장 없음, 검색 결과 없음, 선택 전, 상세 없음, API 오류, 저장 중과 재시도를 구분한다. `Simulation` 안내는 검수 완료가 적재·출고·운송·계약·결제·정산을 자동 실행하지 않는다는 경계를 함께 표시한다.
 
 ## 다른 화면과의 관계
 
-- 이전 화면: [WarehouseManagerApp-P02-3 - 범용 스캔 스테이션](../WarehouseManagerApp-P02-3/)
-- 다음 화면: [WarehouseManagerApp-P03-1 - 입고 상품 스캔](../WarehouseManagerApp-P03-1/)
-- 상위 화면: 없음
-- 하위 화면: [WarehouseManagerApp-P03-1 - 입고 상품 스캔](../WarehouseManagerApp-P03-1/)
+- 앞 단계: [WarehouseManagerApp-P03-1 - 입고상품 수령](../WarehouseManagerApp-P03-1/)
+- 현재 단계: 입고상품 실제 수량·불량 수량 검수
+- 다음 후보: [WarehouseManagerApp-P04 - 피킹 배치 작업](../WarehouseManagerApp-P04/)
 
-상호작용 관점에서는 다음 흐름을 우선 봅니다. 창고 작업자가 입력한 입고, 스캔, 피킹 결과는 화주 재고/출고 상태와 기사 운송 의뢰 흐름으로 연결됩니다.
+입고상품 수령 페이지가 `입고예정` 요청을 만들고 별도 입고 완료 흐름이 `보관중` 재고를 만든 뒤, 이 페이지가 그 재고만 검수한다. 검수 결과가 이후 작업의 입력이 될 수는 있지만 이 화면이 후속 작업을 자동 시작하지 않는다.
 
-## API 경로와 코드 연결
+## 검증 범위
 
-- 화면 소스: [WarehouseManagerApp/Components/Pages/InboundInspection.razor](../../../../../WarehouseManagerApp/Components/Pages/InboundInspection.razor)
-- 클라이언트 서비스/계약: 화면 파일에서 직접 확인하거나 정적/라우팅 화면으로 본다.
-
-현재 문서와 소스에서 직접 연결된 `api/v1/...` 경로를 찾지 못했습니다. 이 화면은 정적 안내, 라우팅, 메뉴 진입, 오류 표시, 또는 다른 화면으로 넘기는 책임이 중심일 수 있습니다.
-
-검증할 때는 이 화면이 직접 메모리 데이터만 보는지, 위 API 응답을 받아 상태를 표시하는지, 실패했을 때 사용자가 다음 행동을 알 수 있는지 확인합니다.
-
-## 보안과 개인정보 점검
-
-개인정보와 업무 상태가 섞이는 화면인지 확인하고, 화면 권한과 로그 정책을 함께 점검합니다.
-
-## 캡처와 문서 상태
-
-현재 캡처는 문서용 캡처 호스트 또는 기존 캡처 파일 기준으로 확인한 화면입니다.
-
-이미지 파일을 다시 생성하면 이 README는 같은 경로의 이미지를 참조하므로 자동으로 최신 캡처를 보여줍니다.
-
-## 보완 메모
-
-- 화면 설명이 실제 구현과 달라지면 이 문서와 app-page-catalog.md를 함께 갱신합니다.
-- 화면이 1.0 필수 워크플로우에 포함되면 ssalddel-v1-required-pages.md에도 반영합니다.
-- 렌더링이 깨지거나 내용이 잘리면 캡처 스크립트와 실제 화면 레이아웃을 같이 확인합니다.
+- 실제 WebApp에서 개발 계정 로그인, 서버 목록 2건, 정확한 `inboundItemId=2` 상세, 네 가지 확인 전후 저장 버튼 상태와 console 경고·오류 0건을 확인했다.
+- 브라우저 검증에서는 개발 DB에 임시 검수 이력을 남기지 않기 위해 저장 직전까지만 진행했다.
+- 서버 상태 전이, 권한, 자연 멱등 재시도, 완료 후 다른 수량 거부와 저장 뒤 같은 ID 재조회는 자동화 테스트로 검증한다.
