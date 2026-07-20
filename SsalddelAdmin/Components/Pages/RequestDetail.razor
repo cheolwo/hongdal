@@ -1,46 +1,109 @@
 @page "/requests/{RequestId}"
 @using Ssalddel.Client.Infrastructure.Transport
+@using Ssalddel.Contracts.Admin.Transport
+@using Ssalddel.Ui.Common.Areas.App.Services
+@using Ssalddel.Ui.Common.Areas.BackOffice.ViewModels
 @inject I백오피스Service DataService
+@inject 관리자인증세션Service AdminSession
+@inject ICommunityProcurementClient WorkflowMetadata
 @inject ITransportRequestLedgerObserver LedgerObserver
+@inject IConfiguration Configuration
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<PageTitle>의뢰 상세</PageTitle>
+<PageTitle>04-1. 운송 의뢰 상세</PageTitle>
 
 <MudStack Spacing="3">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
         <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">04-1. 의뢰 상세</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">화주 의뢰 원장의 결제, 배차, 정산 값을 확인합니다.</MudText>
+            <MudText Typo="Typo.h4">04-1. 운송 의뢰 상세</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">의뢰 원장의 결제·배차·정산 상태를 같은 ID로 확인합니다.</MudText>
         </MudStack>
         <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="@(() => NavigationManager.NavigateTo("/requests"))">의뢰 목록</MudButton>
-            <MudButton Href="@WorkflowDetailHref" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Route">1.0 관제 개요</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@isLoading" OnClick="LoadAsync">새로고침</MudButton>
+            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                @(isMemoryMode ? "개발 샘플" : "Simulation 운영 조회")
+            </MudChip>
+            <MudButton Href="/requests" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowBack">
+                의뢰 목록
+            </MudButton>
+            <MudButton Href="@WorkflowDetailHref" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Route">
+                관제 화면
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@(isLoading || isSaving)" OnClick="LoadAsync">
+                새로고침
+            </MudButton>
         </MudStack>
     </MudStack>
 
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+        상세 주소와 정밀 좌표는 서버관리자가 업무상 필요할 때 직접 펼쳐서 확인합니다. 취소·환불은 외부 PG 호출 없이 Simulation 원장 상태만 기록합니다.
+    </MudAlert>
+
     @if (!string.IsNullOrWhiteSpace(message))
     {
-        <MudAlert Severity="@MessageSeverity">@message</MudAlert>
+        <MudAlert Severity="@messageSeverity" Variant="Variant.Outlined">@message</MudAlert>
     }
 
     @if (isLoading)
     {
-        <MudAlert Severity="Severity.Info">의뢰 상세를 불러오는 중입니다...</MudAlert>
+        <MudStack Spacing="1">
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">운송 의뢰 상세를 불러오는 중입니다.</MudText>
+        </MudStack>
     }
-    else if (request is null)
+    else if (requiresLogin)
     {
-        <MudAlert Severity="Severity.Warning">의뢰 @RequestId 정보를 찾지 못했습니다.</MudAlert>
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">서버관리자 로그인이 필요합니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">상세 위치와 상태 전이가 포함된 화면이므로 서버관리자 계정만 접근할 수 있습니다.</MudText>
+                <MudButton Href="@LoginHref" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login">
+                    운영자 로그인
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+    else if (isTransportWorkflowEnabled == false)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">국내 운송 워크플로우가 비활성입니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">현재 환경에서는 의뢰 상세 조회와 취소·환불 상태 기록을 실행하지 않습니다.</MudText>
+                <MudButton OnClick="RetryLoadAsync" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh">
+                    서버 상태 다시 확인
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@errorMessage</MudAlert>
+                <MudButton OnClick="RetryLoadAsync" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh">
+                    다시 조회
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+    else if (isNotFound || request is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">의뢰를 찾을 수 없습니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">의뢰 ID를 확인하거나 목록에서 다시 선택해 주세요.</MudText>
+                <MudButton Href="/requests" Variant="Variant.Outlined" Color="Color.Primary">의뢰 목록으로</MudButton>
+            </MudStack>
+        </MudPaper>
     }
     else
     {
         <MudPaper Elevation="1" Class="pa-4">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Spacing="2" Style="flex-wrap: wrap;">
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰ID</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰 ID</MudText>
                     <MudText Typo="Typo.h4">@request.의뢰Id</MudText>
-                    <MudText Typo="Typo.body1">@request.픽업지 → @request.하차지</MudText>
+                    <MudText Typo="Typo.body1">@RouteArea</MudText>
                 </MudStack>
                 <MudChip T="string" Color="@ReviewColor(request)" Variant="Variant.Filled">@ReviewLabel(request)</MudChip>
             </MudStack>
@@ -53,11 +116,11 @@
                         <MudText Typo="Typo.h6">의뢰 상태</MudText>
                         <MudGrid Spacing="2">
                             <MudItem xs="12" md="6"><AdminInfoField Label="의뢰 상태" Value="@request.의뢰상태" /></MudItem>
-                            <MudItem xs="12" md="6"><AdminInfoField Label="운송 방식" Value="@request.운송방식" /></MudItem>
                             <MudItem xs="12" md="6"><AdminInfoField Label="배차 상태" Value="@request.배차상태" /></MudItem>
-                            <MudItem xs="12" md="6"><AdminInfoField Label="증빙 방식" Value="@request.증빙방식" /></MudItem>
-                            <MudItem xs="12" md="6"><AdminInfoField Label="생성 시각" Value="@request.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="운송 방식" Value="@request.운송방식" /></MudItem>
                             <MudItem xs="12" md="6"><AdminInfoField Label="화물" Value="@request.요약?.화물종류" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="생성 시각" Value="@request.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")" /></MudItem>
+                            <MudItem xs="12" md="6"><AdminInfoField Label="증빙 방식" Value="@request.증빙방식" /></MudItem>
                         </MudGrid>
                     </MudStack>
                 </MudPaper>
@@ -66,7 +129,7 @@
             <MudItem xs="12" lg="6">
                 <MudPaper Elevation="1" Class="pa-4" Style="height: 100%;">
                     <MudStack Spacing="2">
-                        <MudText Typo="Typo.h6">결제/정산</MudText>
+                        <MudText Typo="Typo.h6">결제·정산</MudText>
                         <MudGrid Spacing="2">
                             <MudItem xs="12" md="6"><AdminInfoField Label="결제 상태" Value="@request.결제상태" /></MudItem>
                             <MudItem xs="12" md="6"><AdminInfoField Label="결제 수단" Value="@request.결제수단" /></MudItem>
@@ -82,42 +145,183 @@
 
         <MudPaper Elevation="1" Class="pa-4">
             <MudStack Spacing="2">
-                <MudText Typo="Typo.h6">상차/하차</MudText>
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Style="flex-wrap: wrap;">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">상차·하차 위치</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">기본 화면에서는 권역만 표시합니다.</MudText>
+                    </MudStack>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="@(showSensitiveLocation ? Color.Warning : Color.Primary)"
+                               StartIcon="@(showSensitiveLocation ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                               OnClick="ToggleSensitiveLocation">
+                        @(showSensitiveLocation ? "상세 위치 숨기기" : "업무상 상세 위치 확인")
+                    </MudButton>
+                </MudStack>
+
                 <MudGrid Spacing="2">
-                    <MudItem xs="12" lg="6"><AdminInfoField Label="상차지" Value="@BuildAddress(request.픽업지, request.픽업상세지)" /></MudItem>
-                    <MudItem xs="12" lg="6"><AdminInfoField Label="하차지" Value="@BuildAddress(request.하차지, request.하차상세지)" /></MudItem>
-                    <MudItem xs="12" md="6"><AdminInfoField Label="상차 좌표" Value="@BuildPoint(request.픽업위도, request.픽업경도)" /></MudItem>
-                    <MudItem xs="12" md="6"><AdminInfoField Label="하차 좌표" Value="@BuildPoint(request.하차위도, request.하차경도)" /></MudItem>
+                    <MudItem xs="12" md="6"><AdminInfoField Label="상차 권역" Value="@PickupArea" /></MudItem>
+                    <MudItem xs="12" md="6"><AdminInfoField Label="하차 권역" Value="@DropoffArea" /></MudItem>
                 </MudGrid>
+
+                @if (showSensitiveLocation)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                        상세 주소와 정밀 좌표는 운송 운영 목적 범위에서만 사용하고 별도로 복사·공유하지 마세요.
+                    </MudAlert>
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" lg="6"><AdminInfoField Label="상차 상세 주소" Value="@BuildAddress(request.픽업지, request.픽업상세지)" /></MudItem>
+                        <MudItem xs="12" lg="6"><AdminInfoField Label="하차 상세 주소" Value="@BuildAddress(request.하차지, request.하차상세지)" /></MudItem>
+                        <MudItem xs="12" md="6"><AdminInfoField Label="상차 좌표" Value="@BuildPoint(request.픽업위도, request.픽업경도)" /></MudItem>
+                        <MudItem xs="12" md="6"><AdminInfoField Label="하차 좌표" Value="@BuildPoint(request.하차위도, request.하차경도)" /></MudItem>
+                    </MudGrid>
+                }
             </MudStack>
         </MudPaper>
 
         <MudPaper Elevation="1" Class="pa-4">
             <MudStack Spacing="2">
-                <MudText Typo="Typo.h6">취소/환불</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">취소 또는 환불이 필요한 의뢰만 처리합니다.</MudText>
-                <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" Disabled="@isSaving" OnClick="CancelAsync">취소/환불 처리</MudButton>
+                <MudText Typo="Typo.h6">취소·환불 상태 기록</MudText>
+
+                @if (!CancellationDecision.처리가능)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@CancellationDecision.안내문구</MudAlert>
+                }
+                else if (!showCancellationConfirmation)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                        @CancellationDecision.안내문구 처리 직전에 서버가 현재 상태를 다시 검증합니다.
+                    </MudAlert>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Error"
+                               StartIcon="@Icons.Material.Filled.Warning"
+                               Disabled="@isSaving"
+                               OnClick="OpenCancellationConfirmation">
+                        @CancellationDecision.처리명 검토
+                    </MudButton>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                        이 작업은 의뢰·결제·정산·배차 상태를 함께 종료 상태로 바꿉니다. 계속하려면 사유와 의뢰 ID를 입력하세요.
+                    </MudAlert>
+                    <MudTextField Label="처리 사유"
+                                  Placeholder="운영 판단 근거를 300자 이내로 입력"
+                                  Variant="Variant.Outlined"
+                                  Lines="3"
+                                  Immediate="true"
+                                  Disabled="@isSaving"
+                                  @bind-Value="cancellationReason" />
+                    <MudTextField Label="확인용 의뢰 ID"
+                                  HelperText="현재 의뢰 ID를 그대로 입력하세요."
+                                  Variant="Variant.Outlined"
+                                  Immediate="true"
+                                  Disabled="@isSaving"
+                                  @bind-Value="confirmationRequestId" />
+
+                    @if (ConfirmationStarted && ConfirmationError is not null)
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Error">@ConfirmationError</MudText>
+                    }
+
+                    <MudStack Row="true" Spacing="1" Style="flex-wrap: wrap;">
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@isSaving" OnClick="CloseCancellationConfirmation">
+                            돌아가기
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   Disabled="@(!CanSubmitCancellation)"
+                                   OnClick="CancelAsync">
+                            @(isSaving ? "처리 중" : CancellationDecision.처리명)
+                        </MudButton>
+                    </MudStack>
+                }
             </MudStack>
         </MudPaper>
     }
 </MudStack>
 
 @code {
+    private const string DomesticTransportFeatureKey = "DomesticTransportWorkflow";
+
     [Parameter]
     public string RequestId { get; set; } = string.Empty;
 
-    private bool isLoading = true;
+    private bool isLoading;
     private bool isSaving;
-    private bool isError;
+    private bool requiresLogin;
+    private bool isMemoryMode;
+    private bool isNotFound;
+    private bool? isTransportWorkflowEnabled;
+    private bool showSensitiveLocation;
+    private bool showCancellationConfirmation;
+    private string? loadedRequestId;
+    private string? errorMessage;
     private string? message;
+    private string? cancellationReason;
+    private string? confirmationRequestId;
+    private Severity messageSeverity = Severity.Info;
     private 화주운송의뢰응답? request;
-    private Severity MessageSeverity => isError ? Severity.Error : Severity.Success;
     private CancellationTokenSource? pollingCts;
 
+    private string LoginHref => $"/login?returnUrl={Uri.EscapeDataString($"/requests/{RequestId}")}";
     private string WorkflowDetailHref => $"/transports/{Uri.EscapeDataString(RequestId)}";
+    private string PickupArea => 관리자운송의뢰목록정책.권역표시(request?.픽업지 ?? request?.요약?.픽업지);
+    private string DropoffArea => 관리자운송의뢰목록정책.권역표시(request?.하차지 ?? request?.요약?.하차지);
+    private string RouteArea => $"{PickupArea} → {DropoffArea}";
+
+    private 관리자운송의뢰취소환불판단 CancellationDecision
+        => request is null
+            ? new(false, false, "처리 불가", "의뢰를 먼저 조회해 주세요.")
+            : 관리자운송의뢰취소환불정책.평가(
+                request.의뢰상태,
+                request.결제상태,
+                request.정산상태,
+                request.배차상태);
+
+    private string? ConfirmationError
+        => 관리자운송의뢰취소환불정책.명시적확인오류(
+            request?.의뢰Id,
+            confirmationRequestId,
+            cancellationReason);
+
+    private bool ConfirmationStarted
+        => !string.IsNullOrWhiteSpace(confirmationRequestId)
+           || !string.IsNullOrWhiteSpace(cancellationReason);
+
+    private bool CanSubmitCancellation
+        => !isSaving
+           && CancellationDecision.처리가능
+           && ConfirmationError is null;
 
     protected override async Task OnParametersSetAsync()
     {
+        isMemoryMode = Configuration.GetValue("AdminData:UseMemory", false);
+
+        if (!string.Equals(loadedRequestId, RequestId, StringComparison.OrdinalIgnoreCase))
+        {
+            loadedRequestId = RequestId;
+            showSensitiveLocation = false;
+            CloseCancellationConfirmation();
+            request = null;
+            isNotFound = false;
+        }
+
+        if (!AdminSession.서버관리자인가)
+        {
+            requiresLogin = true;
+            isLoading = false;
+            NavigationManager.NavigateTo(LoginHref);
+            return;
+        }
+
+        requiresLogin = false;
+        if (!await EnsureTransportWorkflowEnabledAsync())
+        {
+            isLoading = false;
+            return;
+        }
+
         EnsureObserverStarted();
         await LoadAsync();
     }
@@ -126,14 +330,22 @@
 
     private async Task LoadAsync(bool showMessage)
     {
+        if (isLoading || isSaving || isTransportWorkflowEnabled != true)
+        {
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(RequestId))
         {
             request = null;
-            isLoading = false;
+            isNotFound = true;
             return;
         }
 
         isLoading = true;
+        isNotFound = false;
+        errorMessage = null;
+        var previousRequest = request;
         if (showMessage)
         {
             message = null;
@@ -142,16 +354,25 @@
         try
         {
             request = await DataService.의뢰상세조회Async(RequestId);
-            isError = false;
+            isNotFound = request is null;
         }
         catch (Exception ex)
         {
-            if (showMessage)
+            request = showMessage ? null : previousRequest;
+            requiresLogin = IsAuthenticationFailure(ex);
+            if (ex is HttpRequestException { StatusCode: System.Net.HttpStatusCode.NotFound })
             {
-                isError = true;
-                message = $"의뢰 상세 조회 실패: {ex.Message}";
+                request = null;
+                isNotFound = true;
             }
-            request = null;
+            else if (IsFeatureDisabledFailure(ex))
+            {
+                isTransportWorkflowEnabled = false;
+            }
+            else if (!requiresLogin && showMessage)
+            {
+                errorMessage = ResolveLoadFailureMessage(ex);
+            }
         }
         finally
         {
@@ -159,26 +380,97 @@
         }
     }
 
+    private async Task<bool> EnsureTransportWorkflowEnabledAsync()
+    {
+        if (isMemoryMode)
+        {
+            isTransportWorkflowEnabled = true;
+            return true;
+        }
+
+        if (isTransportWorkflowEnabled.HasValue)
+        {
+            return isTransportWorkflowEnabled.Value;
+        }
+
+        try
+        {
+            var metadata = await WorkflowMetadata.GetVersionWorkflowMetadataAsync();
+            isTransportWorkflowEnabled = metadata.Flags.TryGetValue(
+                DomesticTransportFeatureKey,
+                out var enabled)
+                && enabled;
+            return isTransportWorkflowEnabled.Value;
+        }
+        catch (Exception)
+        {
+            isTransportWorkflowEnabled = null;
+            errorMessage = "국내 운송 의뢰 상세 조회 가능 여부를 확인하지 못했습니다. 잠시 뒤 다시 시도해 주세요.";
+            return false;
+        }
+    }
+
+    private async Task RetryLoadAsync()
+    {
+        isTransportWorkflowEnabled = null;
+        errorMessage = null;
+        if (await EnsureTransportWorkflowEnabledAsync())
+        {
+            await LoadAsync();
+        }
+    }
+
+    private void ToggleSensitiveLocation()
+        => showSensitiveLocation = !showSensitiveLocation;
+
+    private void OpenCancellationConfirmation()
+    {
+        showCancellationConfirmation = true;
+        cancellationReason = null;
+        confirmationRequestId = null;
+        message = null;
+    }
+
+    private void CloseCancellationConfirmation()
+    {
+        showCancellationConfirmation = false;
+        cancellationReason = null;
+        confirmationRequestId = null;
+    }
+
     private async Task CancelAsync()
     {
-        if (request is null)
+        if (request is null || !CanSubmitCancellation)
         {
             return;
         }
 
+        var actionName = CancellationDecision.처리명;
+        var requestId = request.의뢰Id;
         isSaving = true;
         message = null;
+        errorMessage = null;
 
         try
         {
-            request = await DataService.의뢰취소환불처리Async(request.의뢰Id);
-            isError = false;
-            message = "취소/환불 처리했습니다.";
+            await DataService.의뢰취소환불처리Async(
+                requestId,
+                confirmationRequestId!,
+                cancellationReason!);
+
+            CloseCancellationConfirmation();
+            isSaving = false;
+            await LoadAsync(showMessage: false);
+            messageSeverity = Severity.Success;
+            message = $"{actionName}을 완료했습니다. 최신 원장 상태를 다시 조회했습니다.";
         }
         catch (Exception ex)
         {
-            isError = true;
-            message = $"취소/환불 처리 실패: {ex.Message}";
+            requiresLogin = IsAuthenticationFailure(ex);
+            messageSeverity = Severity.Error;
+            message = requiresLogin
+                ? "로그인 상태가 만료되었습니다. 다시 로그인해 주세요."
+                : "처리하지 못했습니다. 현재 상태가 바뀌었거나 확인 정보가 올바르지 않을 수 있으니 새로고침 후 다시 확인해 주세요.";
         }
         finally
         {
@@ -206,7 +498,11 @@
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                if (string.IsNullOrWhiteSpace(RequestId) || isLoading || isSaving)
+                if (string.IsNullOrWhiteSpace(RequestId)
+                    || isLoading
+                    || isSaving
+                    || requiresLogin
+                    || isTransportWorkflowEnabled != true)
                 {
                     continue;
                 }
@@ -237,9 +533,9 @@
         });
     }
 
-    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest request)
+    private void OnLedgerRefreshRequested(TransportRequestLedgerRefreshRequest refreshRequest)
     {
-        if (!IsCurrentRequest(request.RequestId))
+        if (!IsCurrentRequest(refreshRequest.RequestId))
         {
             return;
         }
@@ -294,19 +590,31 @@
 
     private static string BuildAddress(string? address, string? detail)
     {
-        if (string.IsNullOrWhiteSpace(detail))
-        {
-            return 관리자화면Ui.표시값(address);
-        }
-
-        return $"{관리자화면Ui.표시값(address)} {detail}";
+        var primary = 관리자화면Ui.표시값(address);
+        return string.IsNullOrWhiteSpace(detail)
+            ? primary
+            : $"{primary} {detail.Trim()}";
     }
 
     private static string BuildPoint(decimal? latitude, decimal? longitude)
         => latitude is null || longitude is null ? "-" : $"{latitude:F6}, {longitude:F6}";
 
     private static bool IsMatch(string? value, params string[] candidates)
-    {
-        return candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
-    }
+        => candidates.Any(candidate => string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsAuthenticationFailure(Exception exception)
+        => exception is HttpRequestException
+           {
+               StatusCode: System.Net.HttpStatusCode.Unauthorized
+                   or System.Net.HttpStatusCode.Forbidden
+           }
+           || exception.Message.Contains("로그인이 필요", StringComparison.Ordinal);
+
+    private static bool IsFeatureDisabledFailure(Exception exception)
+        => exception.Message.Contains("FeatureDisabled", StringComparison.OrdinalIgnoreCase);
+
+    private static string ResolveLoadFailureMessage(Exception exception)
+        => exception is HttpRequestException { StatusCode: System.Net.HttpStatusCode.NotFound }
+            ? "운송 의뢰 상세 API를 찾을 수 없습니다. 현재 배포 버전과 기능 상태를 확인해 주세요."
+            : "운송 의뢰 상세를 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.";
 }

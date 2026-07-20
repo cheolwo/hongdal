@@ -19,8 +19,8 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
-        builder.Services.AddSsalddelUiCommonAppServices();
         builder.Services.AddWarehouseManagerApplication();
+        builder.Services.AddSsalddelUiCommonAppServices<WarehouseAccessTokenProvider>();
         builder.Services.AddSsalddelApiHttpClient(SsalddelApiEndpoint.ResolveBaseAddress(
             builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
             new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)));

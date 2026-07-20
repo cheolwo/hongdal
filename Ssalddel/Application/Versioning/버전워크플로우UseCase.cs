@@ -34,8 +34,39 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
             Workflows = BuildWorkflowStates(flags),
             WorkflowRelations = SsalddelWorkflowRelations.GetAll().Select(ToDto).ToArray(),
             OperatingSystems = SsalddelOperatingSystems.GetAll().Select(item => ToDto(item, flags)).ToArray(),
-            ApiEndpoints = BuildApiEndpoints(flags)
+            ApiEndpoints = BuildApiEndpoints(flags),
+            PageCapabilities = BuildPageCapabilities(flags)
         };
+    }
+
+    private static IReadOnlyList<PageCapabilityDto> BuildPageCapabilities(
+        IReadOnlyDictionary<string, bool> flags)
+    {
+        return SsalddelPageCapabilityCatalog.GetAll()
+            .Select(capability => new PageCapabilityDto
+            {
+                PageKey = capability.PageKey,
+                AppCode = capability.AppCode,
+                RoutePattern = capability.RoutePattern,
+                MatchKindCode = capability.MatchKind.ToString(),
+                StageCode = capability.Stage.ToString(),
+                StageName = PageCapabilityLabels.StageName(capability.Stage),
+                BoundaryCode = capability.Boundary.ToString(),
+                BoundaryName = PageCapabilityLabels.BoundaryName(capability.Boundary),
+                RequiresAuthentication = capability.RequiresAuthentication,
+                HasExternalEffects = capability.HasExternalEffects,
+                IntroducedVersion = capability.IntroducedVersion,
+                FeatureKeys = capability.FeatureKeys,
+                IsFeatureEnabled = capability.FeatureKeys.Count == 0
+                    || capability.FeatureKeys.Any(featureKey =>
+                        flags.TryGetValue(featureKey, out var enabled) && enabled),
+                WorkflowCodes = capability.WorkflowCodes,
+                Notice = capability.Notice
+            })
+            .OrderBy(capability => capability.AppCode, StringComparer.Ordinal)
+            .ThenBy(capability => capability.RoutePattern, StringComparer.Ordinal)
+            .ThenBy(capability => capability.PageKey, StringComparer.Ordinal)
+            .ToArray();
     }
 
     private static IReadOnlyList<WorkflowFlagStateDto> BuildWorkflowStates(IReadOnlyDictionary<string, bool> flags)

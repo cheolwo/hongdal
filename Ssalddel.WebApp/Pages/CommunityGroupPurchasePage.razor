@@ -1,5 +1,25 @@
 @page "/community/group-purchase"
+@inject NavigationManager Navigation
 
 <PageTitle>공동구매 운영 공간</PageTitle>
 
-<CommunityGroupPurchaseWorkspace />
+<CommunityGroupPurchaseWorkspace CampaignId="@CampaignId"
+                                 CampaignSelected="HandleCampaignSelected" />
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "campaignId")]
+    public Guid? CampaignId { get; set; }
+
+    private void HandleCampaignSelected(Guid campaignId)
+    {
+        if (CampaignId == campaignId)
+        {
+            return;
+        }
+
+        Navigation.NavigateTo(
+            $"/community/group-purchase?campaignId={campaignId:D}",
+            replace: true);
+    }
+}

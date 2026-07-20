@@ -1,117 +1,30 @@
 @page "/shipper/sales/channels"
-@inject WebShipperSalesWorkspaceService SalesService
+@inject NavigationManager Navigation
+
+<PageTitle>판매채널 연결 준비</PageTitle>
 
 <WebPageHeader Eyebrow="Shipper Web"
-               Title="판매채널 연결"
-               Description="스마트스토어, 쿠팡 등 판매채널 계정을 연결해 입고상품 판매 흐름을 준비합니다."
-               Badge="판매" />
+               Title="판매채널 연결 준비"
+               Description="내 판매채널 계정 원장을 조회하고 외부 자격증명 없이 연결 준비 기록을 남깁니다."
+               Badge="내부 원장 베타" />
 
-@if (!string.IsNullOrWhiteSpace(Message))
-{
-    <MudAlert Severity="@MessageSeverity" Class="mb-4">@Message</MudAlert>
-}
-
-<MudGrid>
-    <MudItem xs="12" lg="5">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudStack Spacing="3">
-                <MudText Typo="Typo.h6">채널 계정 등록</MudText>
-                <MudSelect T="string" Label="채널종류" @bind-Value="ChannelType" Variant="Variant.Outlined">
-                    @foreach (var channel in SalesService.SupportedChannels)
-                    {
-                        <MudSelectItem T="string" Value="@channel.Key">@channel.Name</MudSelectItem>
-                    }
-                </MudSelect>
-                <MudTextField Label="상점명" @bind-Value="StoreName" Variant="Variant.Outlined" />
-                <MudTextField Label="인증 메모" @bind-Value="AuthMemo" Variant="Variant.Outlined" />
-                <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="IsBusy" OnClick="CreateAccountAsync">채널 계정 등록</MudButton>
-            </MudStack>
-        </MudPaper>
-    </MudItem>
-
-    <MudItem xs="12" lg="7">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudStack Spacing="2">
-                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                    <MudText Typo="Typo.h6">연결된 판매채널 계정</MudText>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="LoadAsync">새로고침</MudButton>
-                </MudStack>
-
-                <MudTable Items="Accounts.OrderByDescending(x => x.Id)" Dense="true" Hover="true">
-                    <HeaderContent>
-                        <MudTh>ID</MudTh>
-                        <MudTh>채널종류</MudTh>
-                        <MudTh>상점명</MudTh>
-                        <MudTh>연결상태</MudTh>
-                        <MudTh>마지막 동기화</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="ID">@context.Id</MudTd>
-                        <MudTd DataLabel="채널종류">@context.채널종류</MudTd>
-                        <MudTd DataLabel="상점명">@context.상점명</MudTd>
-                        <MudTd DataLabel="연결상태">@context.연결상태</MudTd>
-                        <MudTd DataLabel="마지막 동기화">@context.마지막동기화일시?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </MudStack>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+<ShipperSalesChannelWorkspace AccountId="@AccountId"
+                              AccountSelected="HandleAccountSelected" />
 
 @code {
-    private readonly List<판매채널계정항목응답> Accounts = [];
-    private bool IsBusy;
-    private string? Message;
-    private Severity MessageSeverity = Severity.Info;
-    private string ChannelType = CommerceChannelKeys.SmartStore;
-    private string StoreName = "신규 살뜰 스토어";
-    private string AuthMemo = "웹앱 샘플 인증";
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "accountId")]
+    public long? AccountId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private void HandleAccountSelected(long accountId)
     {
-        await LoadAsync();
-    }
-
-    private async Task LoadAsync()
-    {
-        var response = await SalesService.GetAccountsAsync();
-        Accounts.Clear();
-        Accounts.AddRange(response.Items);
-        MessageSeverity = Severity.Info;
-        Message = $"판매채널 계정 {Accounts.Count}건을 불러왔습니다.";
-    }
-
-    private async Task CreateAccountAsync()
-    {
-        if (IsBusy)
+        if (AccountId == accountId)
         {
             return;
         }
 
-        IsBusy = true;
-        try
-        {
-            var created = await SalesService.CreateAccountAsync(new 판매채널계정저장요청
-            {
-                채널종류 = ChannelType,
-                상점명 = StoreName,
-                인증메모 = AuthMemo
-            });
-
-            MessageSeverity = Severity.Success;
-            Message = $"판매채널 계정 {created.상점명}을 등록했습니다.";
-            StoreName = string.Empty;
-            AuthMemo = string.Empty;
-            await LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            MessageSeverity = Severity.Error;
-            Message = ex.Message;
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        Navigation.NavigateTo(
+            $"/shipper/sales/channels?accountId={accountId}",
+            replace: true);
     }
 }

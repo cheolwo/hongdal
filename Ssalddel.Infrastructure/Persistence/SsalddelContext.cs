@@ -77,6 +77,7 @@ namespace 살뜰.Data
         public DbSet<살뜰참여자> 살뜰참여자 { get; set; } = null!;
         public DbSet<살뜰참여자역할> 살뜰참여자역할 { get; set; } = null!;
         public DbSet<HrRoleAssignmentRecord> HrRoleAssignments { get; set; } = null!;
+        public DbSet<HrRoleApplicationRecord> HrRoleApplications { get; set; } = null!;
         public DbSet<HrEmploymentContractRecord> HrEmploymentContracts { get; set; } = null!;
         public DbSet<HrPayrollScheduleRecord> HrPayrollSchedules { get; set; } = null!;
         public DbSet<WorkRelationshipSnapshotRecord> WorkRelationshipSnapshots { get; set; } = null!;
@@ -136,6 +137,8 @@ namespace 살뜰.Data
         public DbSet<음식주문> 음식주문 { get; set; } = null!;
         public DbSet<음식주문상품> 음식주문상품 { get; set; } = null!;
         public DbSet<음식주문상태이력> 음식주문상태이력 { get; set; } = null!;
+        public DbSet<마트공개상품> 마트공개상품 { get; set; } = null!;
+        public DbSet<마트주문요청> 마트주문요청 { get; set; } = null!;
         public DbSet<마트주문> 마트주문 { get; set; } = null!;
         public DbSet<마트주문상품> 마트주문상품 { get; set; } = null!;
 

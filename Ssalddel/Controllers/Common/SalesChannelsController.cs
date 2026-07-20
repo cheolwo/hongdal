@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Filters;
+using 살뜰.Services.Versioning;
 
 namespace Ssalddel.Controllers.Common;
 
@@ -17,13 +19,16 @@ public sealed class SalesChannelsController : ControllerBase
 {
     private readonly I판매채널UseCase _useCase;
     private readonly I판매페이지UseCase _salesPageUseCase;
+    private readonly I판매채널주문조회UseCase _orderReadUseCase;
 
     public SalesChannelsController(
         I판매채널UseCase useCase,
-        I판매페이지UseCase salesPageUseCase)
+        I판매페이지UseCase salesPageUseCase,
+        I판매채널주문조회UseCase orderReadUseCase)
     {
         _useCase = useCase;
         _salesPageUseCase = salesPageUseCase;
+        _orderReadUseCase = orderReadUseCase;
     }
 
     [HttpGet("product-pages/drafts")]
@@ -52,13 +57,35 @@ public sealed class SalesChannelsController : ControllerBase
         => this.ToActionResult(await _salesPageUseCase.초안수정Async(pageId, request, 요청Context생성(), cancellationToken));
 
     [HttpGet("accounts")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
     public async Task<IActionResult> 계정목록(CancellationToken cancellationToken)
     {
         var result = await _useCase.계정목록Async(cancellationToken);
         return this.ToActionResult(result);
     }
 
+    [HttpGet("accounts/{accountId:long}")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    public async Task<IActionResult> 계정상세(long accountId, CancellationToken cancellationToken)
+    {
+        var result = await _useCase.계정상세Async(accountId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpPost("accounts")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
     public async Task<IActionResult> 계정생성([FromBody] 판매채널계정저장요청 request, CancellationToken cancellationToken)
     {
         var result = await _useCase.계정생성Async(request, 요청Context생성(), cancellationToken);
@@ -66,6 +93,11 @@ public sealed class SalesChannelsController : ControllerBase
     }
 
     [HttpPut("accounts/{accountId:long}")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
     public async Task<IActionResult> 계정수정(long accountId, [FromBody] 판매채널계정저장요청 request, CancellationToken cancellationToken)
     {
         var result = await _useCase.계정수정Async(accountId, request, 요청Context생성(), cancellationToken);
@@ -73,11 +105,38 @@ public sealed class SalesChannelsController : ControllerBase
     }
 
     [HttpDelete("accounts/{accountId:long}")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
     public async Task<IActionResult> 계정삭제(long accountId, CancellationToken cancellationToken)
     {
         var result = await _useCase.계정삭제Async(accountId, 요청Context생성(), cancellationToken);
         return this.ToNoContentActionResult(result);
     }
+
+    [HttpGet("orders")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    public async Task<IActionResult> 주문출고후보목록(
+        [FromQuery] 판매채널주문목록조회요청 request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await _orderReadUseCase.목록Async(request, cancellationToken));
+
+    [HttpGet("orders/{orderId:long}")]
+    [SsalddelApiVersion(
+        SsalddelProductVersion.V2_5,
+        FeatureKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow,
+        WorkflowKey = VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow)]
+    public async Task<IActionResult> 주문출고후보상세(
+        long orderId,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await _orderReadUseCase.상세Async(orderId, cancellationToken));
 
     [HttpGet("products")]
     public async Task<IActionResult> 상품목록(CancellationToken cancellationToken)

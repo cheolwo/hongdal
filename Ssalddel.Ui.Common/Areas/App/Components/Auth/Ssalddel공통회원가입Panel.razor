@@ -1,0 +1,152 @@
+@using Ssalddel.Contracts.Common
+@using Ssalddel.Ui.Common.Areas.App.Models.Auth
+
+<MudPaper Class="@Class" Elevation="@Elevation" Style="@Style">
+    <MudStack Spacing="2">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h6">@제목</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">@설명</MudText>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(DisplayStatusMessage))
+        {
+            <MudAlert Severity="@DisplayStatusSeverity" Dense="true">@DisplayStatusMessage</MudAlert>
+        }
+
+        <MudTextField @bind-Value="_userName"
+                      Label="아이디"
+                      Immediate="true"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      MaxLength="40"
+                      FullWidth="true" />
+        <MudTextField @bind-Value="_email"
+                      Label="이메일"
+                      InputType="InputType.Email"
+                      Immediate="true"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      MaxLength="256"
+                      FullWidth="true" />
+        <MudTextField @bind-Value="_password"
+                      Label="비밀번호"
+                      InputType="InputType.Password"
+                      Immediate="true"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      FullWidth="true" />
+        <MudTextField @bind-Value="_passwordConfirmation"
+                      Label="비밀번호 확인"
+                      InputType="InputType.Password"
+                      Immediate="true"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      FullWidth="true" />
+
+        <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+            <MudStack Spacing="1">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Icons.Material.Filled.PrivacyTip" Color="Color.Primary" />
+                    <MudText Typo="Typo.subtitle2">개인정보 수집·이용 안내 (필수)</MudText>
+                </MudStack>
+                <MudText Typo="Typo.body2"><strong>수집·이용 목적</strong> · @커뮤니티회원가입개인정보동의문.수집이용목적</MudText>
+                <MudText Typo="Typo.body2"><strong>수집 항목</strong> · @커뮤니티회원가입개인정보동의문.수집항목</MudText>
+                <MudText Typo="Typo.body2"><strong>보유·이용 기간</strong> · @커뮤니티회원가입개인정보동의문.보유이용기간</MudText>
+                <MudText Typo="Typo.body2"><strong>동의 거부</strong> · @커뮤니티회원가입개인정보동의문.동의거부안내</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">동의문 버전: @커뮤니티회원가입개인정보동의문.현재버전</MudText>
+            </MudStack>
+        </MudPaper>
+
+        <MudCheckBox T="bool"
+                     @bind-Value="_privacyConsentAccepted"
+                     Color="Color.Primary"
+                     Label="위 안내를 확인했으며 개인정보 수집·이용에 동의합니다. (필수)" />
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   FullWidth="true"
+                   Disabled="@IsBusy"
+                   OnClick="RegisterAsync">
+            @(IsBusy ? "가입 중..." : "회원가입")
+        </MudButton>
+
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Secondary"
+                   FullWidth="true"
+                   Href="@익명이용Href"
+                   StartIcon="@Icons.Material.Filled.Forum">
+            가입 없이 익명 게시판 이용
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public string 제목 { get; set; } = "선택 회원가입";
+    [Parameter] public string 설명 { get; set; } = "로그인 전용 기능이 필요할 때만 계정을 만드세요.";
+    [Parameter] public string 익명이용Href { get; set; } = "/community";
+    [Parameter] public string? 상태메시지 { get; set; }
+    [Parameter] public Severity 상태Severity { get; set; } = Severity.Info;
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public int Elevation { get; set; } = 2;
+    [Parameter] public string Class { get; set; } = "pa-4";
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public EventCallback<공통커뮤니티회원가입요청> OnRegister { get; set; }
+
+    private string _userName = string.Empty;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _passwordConfirmation = string.Empty;
+    private bool _privacyConsentAccepted;
+    private string? _localStatusMessage;
+    private Severity _localStatusSeverity = Severity.Info;
+
+    private string? DisplayStatusMessage => !string.IsNullOrWhiteSpace(_localStatusMessage)
+        ? _localStatusMessage
+        : 상태메시지;
+
+    private Severity DisplayStatusSeverity => !string.IsNullOrWhiteSpace(_localStatusMessage)
+        ? _localStatusSeverity
+        : 상태Severity;
+
+    private async Task RegisterAsync()
+    {
+        _localStatusMessage = null;
+
+        if (string.IsNullOrWhiteSpace(_userName)
+            || string.IsNullOrWhiteSpace(_email)
+            || string.IsNullOrWhiteSpace(_password)
+            || string.IsNullOrWhiteSpace(_passwordConfirmation))
+        {
+            ShowWarning("아이디, 이메일, 비밀번호와 비밀번호 확인을 모두 입력해 주세요.");
+            return;
+        }
+
+        if (!string.Equals(_password, _passwordConfirmation, StringComparison.Ordinal))
+        {
+            ShowWarning("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            return;
+        }
+
+        if (!_privacyConsentAccepted)
+        {
+            ShowWarning("개인정보 수집·이용 안내를 확인하고 동의해 주세요. 동의하지 않아도 익명 허용 게시판은 이용할 수 있습니다.");
+            return;
+        }
+
+        if (OnRegister.HasDelegate)
+        {
+            await OnRegister.InvokeAsync(new 공통커뮤니티회원가입요청(
+                _userName.Trim(),
+                _email.Trim(),
+                _password,
+                _privacyConsentAccepted,
+                커뮤니티회원가입개인정보동의문.현재버전));
+        }
+    }
+
+    private void ShowWarning(string message)
+    {
+        _localStatusSeverity = Severity.Warning;
+        _localStatusMessage = message;
+    }
+}

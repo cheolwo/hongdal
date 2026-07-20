@@ -135,6 +135,16 @@ public sealed class WarehouseOperationsController : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpGet("inbounds/{inboundId:long}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInboundOperator)]
+    public async Task<IActionResult> 입고상세(long inboundId, CancellationToken cancellationToken)
+    {
+        var result = await _useCase.입고상세Async(inboundId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpPost("inbounds")]
     [RequireHrRole(
         HrDetailedRoleCodes.WarehouseManager,

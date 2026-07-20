@@ -1,13 +1,72 @@
 @page "/shipper/request"
 @inject 운송의뢰작성ViewModel 작성상태
 @inject 운송의뢰자동저장Service 자동저장Service
+@inject 커뮤니티화물글초안가져오기Service 화물글가져오기Service
 @inject 화주운송의뢰등록Service 의뢰등록Service
 @inject WebAuthSessionService AuthSession
+@inject ICommunityPostClient CommunityPosts
+@inject ICommunityProcurementClient WorkflowMetadata
+@inject NavigationManager Navigation
 
 <WebPageHeader Eyebrow="Shipper Web"
                Title="운송 의뢰 작성"
                Description="웹 기본 화면에서는 화물, 운송, 절차/결제 정보를 한 화면에서 입력합니다."
                Badge="한 화면 입력" />
+
+@if (SourcePostId.HasValue && SourcePostId.Value > 0)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4 mb-4">
+        <MudStack Spacing="2">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.overline" Color="Color.Primary">커뮤니티에서 이어서 작성</MudText>
+                    <MudText Typo="Typo.h6">화물 글을 운송 의뢰 초안으로 가져오기</MudText>
+                </MudStack>
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                    배차·계약 전 초안
+                </MudChip>
+            </MudStack>
+
+            @if (IsSourcePostLoading)
+            {
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                    <MudText Typo="Typo.body2">화물 글을 불러오는 중입니다.</MudText>
+                </MudStack>
+            }
+            else if (!string.IsNullOrWhiteSpace(SourcePostError))
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@SourcePostError</MudAlert>
+            }
+            else if (SourcePost is not null)
+            {
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle1">@SourcePost.Title</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@BuildSourcePostPreview(SourcePost.Body)</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        가져오기를 눌러야 입력값이 바뀝니다. 제목은 비어 있는 화물 종류에만 채우고 본문은 화물 설명에 덧붙입니다.
+                        주소·연락처·수량·운임은 글에서 자동 추출하지 않습니다.
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                    <MudButton OnClick="ApplySourcePostAsync"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@(IsSourcePostApplying || SourcePostApplied)"
+                               StartIcon="@Icons.Material.Filled.PostAdd">
+                        @(SourcePostApplied ? "초안에 반영됨" : "초안에 반영")
+                    </MudButton>
+                    <MudButton Href="@($"/community/posts/{SourcePost.Id}")"
+                               Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.OpenInNew">
+                        원문 보기
+                    </MudButton>
+                </MudStack>
+            }
+        </MudStack>
+    </MudPaper>
+}
 
 <MudGrid @onfocusout="AutoSaveDraftAsync">
     <MudItem xs="12" xl="8">
@@ -30,7 +89,7 @@
 
                     <MudGrid>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.화물종류" Label="화물 종류" Variant="Variant.Outlined" Required="true" />
+                            <MudTextField @bind-Value="작성상태.화물종류" Label="화물 종류" Variant="Variant.Outlined" Required="true" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudSelect @bind-Value="작성상태.화물적재형태" Label="화물 적재 형태" Variant="Variant.Outlined">
@@ -52,16 +111,17 @@
                                           Label="화물 설명"
                                           Lines="3"
                                           Variant="Variant.Outlined"
+                                          Immediate="true"
                                           Placeholder="예: 삼겹살 3kg 단위 묶음, 파손 주의 상품 등" />
                         </MudItem>
                         <MudItem xs="12" md="4">
-                            <MudNumericField T="int?" @bind-Value="작성상태.화물수량" Label="수량" Variant="Variant.Outlined" />
+                            <MudNumericField T="int?" @bind-Value="작성상태.화물수량" Label="수량" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="4">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.화물중량Kg" Label="중량 kg" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.화물중량Kg" Label="중량 kg" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="4">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.화물부피Cbm" Label="부피 cbm" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.화물부피Cbm" Label="부피 cbm" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                     </MudGrid>
                 </MudStack>
@@ -78,28 +138,28 @@
 
                     <MudGrid>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.상차도로명주소" Label="상차 도로명 주소" Variant="Variant.Outlined" Required="true" />
+                            <MudTextField @bind-Value="작성상태.상차도로명주소" Label="상차 도로명 주소" Variant="Variant.Outlined" Required="true" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.상차상세주소" Label="상차 상세 주소" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.상차상세주소" Label="상차 상세 주소" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.상차연락처이름" Label="상차 담당자" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.상차연락처이름" Label="상차 담당자" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.상차연락처전화번호" Label="상차 담당자 연락처" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.상차연락처전화번호" Label="상차 담당자 연락처" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.하차도로명주소" Label="하차 도로명 주소" Variant="Variant.Outlined" Required="true" />
+                            <MudTextField @bind-Value="작성상태.하차도로명주소" Label="하차 도로명 주소" Variant="Variant.Outlined" Required="true" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.하차상세주소" Label="하차 상세 주소" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.하차상세주소" Label="하차 상세 주소" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.하차연락처이름" Label="하차 담당자" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.하차연락처이름" Label="하차 담당자" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.하차연락처전화번호" Label="하차 담당자 연락처" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.하차연락처전화번호" Label="하차 담당자 연락처" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudSelect @bind-Value="작성상태.운송방식" Label="운송 방식" Variant="Variant.Outlined">
@@ -116,7 +176,7 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudTextField @bind-Value="작성상태.요청사항" Label="요청 사항" Lines="3" Variant="Variant.Outlined" HelperText="@작성상태.요청사항입력힌트" />
+                            <MudTextField @bind-Value="작성상태.요청사항" Label="요청 사항" Lines="3" Variant="Variant.Outlined" HelperText="@작성상태.요청사항입력힌트" Immediate="true" />
                         </MudItem>
                     </MudGrid>
 
@@ -151,7 +211,7 @@
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.예상거리Km" Label="예상 거리 km" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.예상거리Km" Label="예상 거리 km" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12">
                             <Ssalddel결제수단선택Buttons @bind-Value="작성상태.결제수단" />
@@ -160,57 +220,92 @@
                             <운송의뢰결제후속절차Panel ViewModel="작성상태" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudNumericField T="int?" @bind-Value="작성상태.결제예정금액" Label="결제 예정 금액" Variant="Variant.Outlined" />
+                            <MudNumericField T="int?" @bind-Value="작성상태.결제예정금액" Label="결제 예정 금액" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.기준운임" Label="기준 운임" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.기준운임" Label="기준 운임" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudNumericField T="int?" @bind-Value="작성상태.기사지급예정운임" Label="기사 지급 예정 운임" Variant="Variant.Outlined" />
+                            <MudNumericField T="int?" @bind-Value="작성상태.기사지급예정운임" Label="기사 지급 예정 운임" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="4">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.대기료" Label="대기료" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.대기료" Label="대기료" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="4">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.수작업비" Label="수작업비" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.수작업비" Label="수작업비" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="4">
-                            <MudNumericField T="decimal?" @bind-Value="작성상태.할증" Label="할증" Variant="Variant.Outlined" />
+                            <MudNumericField T="decimal?" @bind-Value="작성상태.할증" Label="할증" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudNumericField T="int" @bind-Value="작성상태.알선단계" Label="알선 단계" Variant="Variant.Outlined" />
+                            <MudNumericField T="int" @bind-Value="작성상태.알선단계" Label="알선 단계" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField @bind-Value="작성상태.알선소Id" Label="알선소 ID" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.알선소Id" Label="알선소 ID" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                         <MudItem xs="12">
                             <MudCheckBox T="bool" @bind-Value="작성상태.재알선금지" Label="재알선 금지" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12">
-                            <MudTextField @bind-Value="작성상태.절차메모" Label="절차 메모" Lines="3" Variant="Variant.Outlined" />
+                            <MudTextField @bind-Value="작성상태.절차메모" Label="절차 메모" Lines="3" Variant="Variant.Outlined" Immediate="true" />
                         </MudItem>
                     </MudGrid>
                 </MudStack>
             </MudPaper>
 
             <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h6">웹 의뢰 저장/등록</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">
-                            초안은 브라우저에 자동 보관하고, 서버 등록은 인증 토큰으로 실제 API를 호출합니다.
-                        </MudText>
-                    </MudStack>
-                    <MudStack Row="true" Spacing="1">
-                        <MudButton OnClick="ResetDraft" Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@IsSubmitting" StartIcon="@Icons.Material.Filled.RestartAlt">
-                            초기화
-                        </MudButton>
-                        <MudButton OnClick="SaveDraft" Variant="Variant.Outlined" Color="Color.Primary" Disabled="@IsSubmitting" StartIcon="@Icons.Material.Filled.Save">
-                            초안 저장
-                        </MudButton>
-                        <MudButton OnClick="SubmitRequest" Variant="Variant.Filled" Color="Color.Primary" Disabled="@IsSubmitting" StartIcon="@Icons.Material.Filled.CloudUpload">
-                            서버에 의뢰 등록
-                        </MudButton>
+                <MudStack Spacing="2">
+                    @if (IsTransportRegistrationEnabled != true)
+                    {
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap" Spacing="1">
+                                <MudText Typo="Typo.body2">
+                                    @(IsTransportRegistrationEnabled is null
+                                        ? "서버 등록 가능 여부를 확인하고 있습니다. 초안은 계속 작성할 수 있습니다."
+                                        : string.IsNullOrWhiteSpace(RegistrationAvailabilityError)
+                                            ? "현재 환경에서는 국내 화물 운송의 서버 등록이 비활성화되어 있습니다. 초안 작성·저장은 가능하며 배차나 계약은 시작되지 않습니다."
+                                            : RegistrationAvailabilityError)
+                                </MudText>
+                                @if (!string.IsNullOrWhiteSpace(RegistrationAvailabilityError))
+                                {
+                                    <MudButton OnClick="LoadTransportRegistrationAvailabilityAsync"
+                                               Variant="Variant.Text"
+                                               Color="Color.Warning"
+                                               Size="Size.Small"
+                                               Disabled="@IsRegistrationAvailabilityLoading">
+                                        다시 확인
+                                    </MudButton>
+                                }
+                            </MudStack>
+                        </MudAlert>
+                    }
+
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">웹 의뢰 저장/등록</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                초안은 브라우저에 자동 보관하고, 서버 등록은 인증 토큰으로 실제 API를 호출합니다.
+                            </MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1">
+                            <MudButton OnClick="ResetDraft" Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@IsSubmitting" StartIcon="@Icons.Material.Filled.RestartAlt">
+                                초기화
+                            </MudButton>
+                            <MudButton OnClick="SaveDraft" Variant="Variant.Outlined" Color="Color.Primary" Disabled="@IsSubmitting" StartIcon="@Icons.Material.Filled.Save">
+                                초안 저장
+                            </MudButton>
+                            <MudButton OnClick="SubmitRequest"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Disabled="@(IsSubmitting || IsTransportRegistrationEnabled != true)"
+                                       StartIcon="@Icons.Material.Filled.CloudUpload">
+                                @(IsTransportRegistrationEnabled is null
+                                    ? "서버 상태 확인 중"
+                                    : IsTransportRegistrationEnabled == false
+                                        ? "서버 등록 비활성"
+                                        : "서버에 의뢰 등록")
+                            </MudButton>
+                        </MudStack>
                     </MudStack>
                 </MudStack>
             </MudPaper>
@@ -266,6 +361,12 @@
 </MudGrid>
 
 @code {
+    private const string DomesticTransportFeatureKey = "DomesticTransportWorkflow";
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "sourcePostId")]
+    public long? SourcePostId { get; set; }
+
     private static readonly IReadOnlyList<string> VehicleTypes =
     [
         "오토바이 퀵",
@@ -284,6 +385,14 @@
     private string? CreatedRequestId { get; set; }
     private bool IsSubmitting { get; set; }
     private bool AutoSaveReady { get; set; }
+    private PlatformCommunityPostResponse? SourcePost { get; set; }
+    private string? SourcePostError { get; set; }
+    private bool IsSourcePostLoading { get; set; }
+    private bool IsSourcePostApplying { get; set; }
+    private bool SourcePostApplied { get; set; }
+    private bool? IsTransportRegistrationEnabled { get; set; }
+    private bool IsRegistrationAvailabilityLoading { get; set; }
+    private string? RegistrationAvailabilityError { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -302,7 +411,107 @@
         }
 
         AutoSaveReady = true;
+        await LoadTransportRegistrationAvailabilityAsync();
+        if (SourcePostId.HasValue && SourcePostId.Value > 0)
+        {
+            await LoadSourcePostAsync(SourcePostId.Value);
+        }
+
         StateHasChanged();
+    }
+
+    private async Task LoadTransportRegistrationAvailabilityAsync()
+    {
+        if (IsRegistrationAvailabilityLoading)
+        {
+            return;
+        }
+
+        IsRegistrationAvailabilityLoading = true;
+        RegistrationAvailabilityError = null;
+        try
+        {
+            var metadata = await WorkflowMetadata.GetVersionWorkflowMetadataAsync();
+            IsTransportRegistrationEnabled = metadata.Flags.TryGetValue(
+                DomesticTransportFeatureKey,
+                out var enabled)
+                && enabled;
+        }
+        catch (Exception)
+        {
+            IsTransportRegistrationEnabled = false;
+            RegistrationAvailabilityError = "서버 등록 가능 여부를 확인하지 못해 등록을 안전하게 보류했습니다. 초안은 계속 저장할 수 있습니다.";
+        }
+        finally
+        {
+            IsRegistrationAvailabilityLoading = false;
+        }
+    }
+
+    private async Task LoadSourcePostAsync(long postId)
+    {
+        IsSourcePostLoading = true;
+        SourcePost = null;
+        SourcePostError = null;
+
+        try
+        {
+            var post = await CommunityPosts.GetPostAsync(postId);
+            if (post is null)
+            {
+                SourcePostError = "가져올 커뮤니티 글을 찾을 수 없습니다.";
+                return;
+            }
+
+            if (!화물글가져오기Service.가져올수있음(post))
+            {
+                SourcePostError = "화물 게시판 글만 운송 의뢰 초안으로 가져올 수 있습니다.";
+                return;
+            }
+
+            SourcePost = post;
+            SourcePostApplied = 화물글가져오기Service.이미반영됨(작성상태, post.Id);
+        }
+        catch (Exception ex)
+        {
+            SourcePostError = $"화물 글을 불러오지 못했습니다: {ex.Message}";
+        }
+        finally
+        {
+            IsSourcePostLoading = false;
+        }
+    }
+
+    private async Task ApplySourcePostAsync()
+    {
+        if (SourcePost is null || IsSourcePostApplying)
+        {
+            return;
+        }
+
+        IsSourcePostApplying = true;
+        try
+        {
+            var result = 화물글가져오기Service.가져오기(작성상태, SourcePost);
+            LastDraft = 작성상태.ToDraft();
+            await 자동저장Service.SaveAsync(LastDraft);
+            CreatedRequestId = null;
+            SourcePostApplied = true;
+            StatusSeverity = result.변경됨 ? Severity.Success : Severity.Info;
+            StatusMessage = result.변경됨
+                ? "화물 글의 제목과 본문을 초안에 반영했습니다. 주소·연락처·수량·운임을 확인해 주세요."
+                : "이 화물 글은 이미 현재 초안에 반영되어 있습니다.";
+            AutoSaveMessage = $"가져온 초안을 저장했습니다. 저장 시각: {DateTime.Now:HH:mm:ss}";
+        }
+        catch (Exception ex)
+        {
+            StatusSeverity = Severity.Error;
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            IsSourcePostApplying = false;
+        }
     }
 
     private async Task SaveDraft()
@@ -319,6 +528,13 @@
     private async Task SubmitRequest()
     {
         await SaveDraft();
+        if (IsTransportRegistrationEnabled != true)
+        {
+            StatusSeverity = Severity.Warning;
+            StatusMessage = "현재 환경에서는 국내 화물 운송 서버 등록이 비활성화되어 있습니다. 초안은 브라우저에 저장했습니다.";
+            return;
+        }
+
         if (!작성상태.서버등록가능)
         {
             StatusSeverity = Severity.Warning;
@@ -335,8 +551,10 @@
             var created = await 의뢰등록Service.등록Async(작성상태);
             CreatedRequestId = created.의뢰Id;
             await 자동저장Service.ClearAsync();
+            LastDraft = null;
             StatusSeverity = Severity.Success;
             StatusMessage = $"서버 운송 의뢰를 등록했습니다. 의뢰 ID: {created.의뢰Id}";
+            Navigation.NavigateTo(ShipperRoutes.CreatedRequestDetailFor(created.의뢰Id));
         }
         catch (Exception ex)
         {
@@ -366,9 +584,23 @@
         작성상태.Reset();
         LastDraft = null;
         CreatedRequestId = null;
+        SourcePostApplied = false;
         await 자동저장Service.ClearAsync();
         StatusSeverity = Severity.Info;
         StatusMessage = "운송 의뢰 입력값을 초기화했습니다.";
         AutoSaveMessage = string.Empty;
+    }
+
+    private static string BuildSourcePostPreview(string? body)
+    {
+        const int maximumLength = 240;
+        var normalized = string.Join(
+            " ",
+            (body ?? string.Empty).Split(
+                ['\r', '\n'],
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        return normalized.Length <= maximumLength
+            ? normalized
+            : $"{normalized[..maximumLength].TrimEnd()}…";
     }
 }

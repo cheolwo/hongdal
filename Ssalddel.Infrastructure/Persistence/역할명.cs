@@ -2,6 +2,7 @@ namespace 살뜰.Data
 {
     public static class 역할명
     {
+        public const string 커뮤니티회원 = "커뮤니티회원";
         public const string 기사 = "기사";
         public const string 배달기사 = "배달기사";
         public const string 용달기사 = "용달기사";

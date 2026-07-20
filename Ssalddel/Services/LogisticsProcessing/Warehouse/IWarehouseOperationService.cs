@@ -17,6 +17,7 @@ public interface IWarehouseOperationService
     Task DeleteWarehouseUserAsync(long warehouseId, long warehouseUserId, CancellationToken cancellationToken);
     Task<입고요청목록응답> GetInboundsAsync(CancellationToken cancellationToken);
     Task<입고요청페이지응답> QueryInboundsAsync(입고요청목록조회요청 request, CancellationToken cancellationToken);
+    Task<입고요청항목응답?> GetInboundAsync(long inboundId, CancellationToken cancellationToken);
     Task<입고요청항목응답> CreateInboundAsync(입고요청저장요청 request, CancellationToken cancellationToken);
     Task<입고요청항목응답> UpdateInboundAsync(long inboundId, 입고요청저장요청 request, CancellationToken cancellationToken);
     Task CancelInboundAsync(long inboundId, CancellationToken cancellationToken);

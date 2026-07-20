@@ -10,7 +10,7 @@ public sealed class 음식주문페이지ViewModelTests
     public async Task 인증ViewModel은_익명복원뒤로그인사용자세션을반영한다()
     {
         var service = new FakeAuthenticationService();
-        var viewModel = new 주문자음식주문인증ViewModel(service);
+        var viewModel = new 주문자앱인증ViewModel(service);
 
         Assert.True(await viewModel.복원Async());
         Assert.True(viewModel.초기화됨);

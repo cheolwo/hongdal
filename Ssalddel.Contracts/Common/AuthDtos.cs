@@ -62,6 +62,37 @@ public sealed class 토큰응답
     public string[] Roles { get; set; } = Array.Empty<string>();
 }
 
+public static class 커뮤니티회원가입개인정보동의문
+{
+    public const string 현재버전 = "community-signup-privacy-2026-07-20";
+    public const string 수집이용목적 = "회원 계정 생성, 로그인, 계정 보안과 필수 서비스 안내";
+    public const string 수집항목 = "아이디, 이메일, 비밀번호(원문을 저장하지 않고 단방향 해시로 처리)";
+    public const string 보유이용기간 = "회원 탈퇴 시까지. 단, 관계 법령에 따른 보존 의무가 있으면 해당 기간 동안 보관";
+    public const string 동의거부안내 = "동의를 거부할 수 있으며, 거부하면 회원 계정은 만들 수 없습니다. 자유·생활 등 익명 쓰기를 허용한 게시판은 회원가입 없이 이용할 수 있습니다.";
+
+    public static bool 유효한동의(bool accepted, string? version)
+        => accepted
+            && string.Equals(version?.Trim(), 현재버전, StringComparison.Ordinal);
+}
+
+public sealed class 커뮤니티회원가입요청
+{
+    public string UserName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public bool PrivacyConsentAccepted { get; set; }
+    public string PrivacyConsentVersion { get; set; } = string.Empty;
+}
+
+public sealed class 커뮤니티회원가입응답
+{
+    public string UserId { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PrivacyConsentVersion { get; set; } = string.Empty;
+    public DateTime PrivacyConsentedAtUtc { get; set; }
+}
+
 public sealed class 주문자회원가입요청
 {
     public string UserName { get; set; } = string.Empty;

@@ -9,6 +9,17 @@ namespace Ssalddel.Tests.Controllers;
 
 public sealed class GroupPurchaseDemandVoteControllerTests
 {
+    [Theory]
+    [InlineData(nameof(커뮤니티투표Controller.List))]
+    [InlineData(nameof(커뮤니티투표Controller.Get))]
+    public void GenericCommunityVoteReadEndpoints_AllowAnonymous(string methodName)
+    {
+        var method = typeof(커뮤니티투표Controller).GetMethod(methodName);
+
+        Assert.NotNull(method);
+        Assert.NotNull(method.GetCustomAttribute<AllowAnonymousAttribute>());
+    }
+
     [Fact]
     public void OrdererGroupPurchaseDemandVoteController_RequiresAuthentication()
     {

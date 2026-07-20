@@ -7,6 +7,7 @@ using Ssalddel.Contracts.Shipper.Request;
 using Ssalddel.Application.Warehouse.Events;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using 살뜰.Services.Audit;
 
 namespace Ssalddel.Application.Warehouse;
@@ -23,6 +24,7 @@ public interface I창고작업UseCase
     Task<Result> 창고사용자삭제Async(long warehouseId, long warehouseUserId, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result<입고요청목록응답>> 입고목록Async(CancellationToken cancellationToken);
     Task<Result<입고요청페이지응답>> 입고목록조회Async(입고요청목록조회요청 request, CancellationToken cancellationToken);
+    Task<Result<입고요청항목응답>> 입고상세Async(long inboundId, CancellationToken cancellationToken);
     Task<Result<입고요청항목응답>> 입고생성Async(입고요청저장요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result<입고요청항목응답>> 입고수정Async(long inboundId, 입고요청저장요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result> 입고취소Async(long inboundId, 창고작업요청Context context, CancellationToken cancellationToken);
@@ -140,6 +142,18 @@ public sealed class 창고작업UseCase : I창고작업UseCase
         입고요청목록조회요청 request,
         CancellationToken cancellationToken)
         => await _warehouseOperationService.QueryInboundsAsync(request, cancellationToken);
+
+    public async Task<Result<입고요청항목응답>> 입고상세Async(
+        long inboundId,
+        CancellationToken cancellationToken)
+    {
+        var item = await _warehouseOperationService.GetInboundAsync(inboundId, cancellationToken);
+        return item is not null
+            ? Result.Ok(item)
+            : Result.Fail<입고요청항목응답>(
+                new Error("입고요청을 찾을 수 없거나 조회 범위에 없습니다.")
+                    .WithMetadata("StatusCode", StatusCodes.Status404NotFound));
+    }
 
     public async Task<Result<입고요청항목응답>> 입고생성Async(입고요청저장요청 request, 창고작업요청Context context, CancellationToken cancellationToken)
     {

@@ -1,0 +1,395 @@
+@inherits MvvmComponentBase<화주HS코드검토PageViewModel>
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="hs-review-workspace" aria-label="화주 HS 코드 검토 자료">
+    @if (Access.처리중 && Access.화면상태 == 화주HS코드검토접근상태.확인전)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="hs-review-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">통관·무역 데이터 기능 상태를 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (Access.화면상태 == 화주HS코드검토접근상태.오류)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="hs-review-access-alert">
+            <MudText Typo="Typo.subtitle2">HS 코드 검토 화면을 준비하지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@Access.오류메시지</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="RetryAccessAsync" Class="mt-3">
+                다시 확인
+            </MudButton>
+        </MudAlert>
+    }
+    else if (Access.기능비활성)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="hs-review-access-alert">
+            <MudText Typo="Typo.subtitle2">통관·무역 데이터 기능이 현재 비활성입니다.</MudText>
+            <MudText Typo="Typo.body2">
+                운영 환경에서 <code>CustomsAndTradeDataWorkflow</code>를 활성화하기 전에는 HS 코드 원장을 조회하지 않습니다.
+            </MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/shipper" Class="mt-2">화주 홈으로</MudButton>
+        </MudAlert>
+    }
+    else if (Access.로그인필요)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="hs-review-access-alert">
+            <MudText Typo="Typo.subtitle2">HS 코드 검토 자료는 화주·판매자 로그인이 필요합니다.</MudText>
+            <MudText Typo="Typo.body2">로그인하지 않아도 커뮤니티의 공개 글은 계속 이용할 수 있습니다.</MudText>
+            <MudStack Row="true" Spacing="1" Class="mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" Href="/login">
+                    로그인
+                </MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Default" Href="/community">공개 커뮤니티 보기</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (Access.사용가능)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="hs-review-boundary">
+            HS 코드 후보, 원장 출처와 공개 자료를 비교하는 읽기 전용 화면입니다. 품목분류·세율·신고는 관세사와 세관의 최종 판단을 확인해야 합니다.
+        </MudAlert>
+
+        <div class="hs-review-layout">
+            <MudPaper Elevation="0" Outlined="true" Class="hs-review-panel hs-review-list-panel">
+                <div class="hs-review-heading">
+                    <div>
+                        <MudText Typo="Typo.overline">ACTIVE HS CATALOG</MudText>
+                        <MudText Typo="Typo.h6">검토할 HS 코드 찾기</MudText>
+                        <MudText Typo="Typo.body2">코드·품명·설명으로 검색하고 원장의 분류 단위를 확인하세요.</MudText>
+                    </div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                                   Color="Color.Primary"
+                                   Disabled="@List.처리중"
+                                   OnClick="ReloadListAsync"
+                                   aria-label="HS 코드 목록 새로고침" />
+                </div>
+
+                <div class="hs-review-search">
+                    <MudTextField T="string"
+                                  @bind-Value="List.검색어"
+                                  Label="HS 코드 또는 품명"
+                                  Placeholder="예: 9401.69, 의자"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                    <MudSelect T="int?"
+                               @bind-Value="List.업무분류"
+                               Label="업무 분류"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        <MudSelectItem T="int?" Value="@((int?)10)">식품 관련</MudSelectItem>
+                        <MudSelectItem T="int?" Value="@((int?)20)">일반 화물</MudSelectItem>
+                        <MudSelectItem T="int?" Value="@((int?)30)">복합 화물</MudSelectItem>
+                        <MudSelectItem T="int?" Value="@((int?)0)">미분류</MudSelectItem>
+                    </MudSelect>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@List.처리중"
+                               OnClick="SearchAsync">
+                        조회
+                    </MudButton>
+                </div>
+
+                @if (List.처리중)
+                {
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mt-3" />
+                }
+                else if (List.오류발생)
+                {
+                    <div class="hs-review-state hs-review-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" />
+                        <MudText Typo="Typo.subtitle2">목록을 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@ListErrorMessage</MudText>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadListAsync">다시 시도</MudButton>
+                    </div>
+                }
+                else if (List.비어있음)
+                {
+                    <div class="hs-review-state hs-review-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">조건에 맞는 활성 HS 코드가 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">검색어를 줄이거나 업무 분류를 지운 뒤 다시 조회해 주세요.</MudText>
+                    </div>
+                }
+                else if (List.초기화됨)
+                {
+                    <MudText Typo="Typo.caption" Class="hs-review-count">@($"전체 {List.전체건수:N0}건 · {List.현재페이지}/{List.총페이지수}페이지")</MudText>
+                    <MudTable T="화주HS코드검토항목응답"
+                              Items="@List.검토목록"
+                              Dense="true"
+                              Hover="true"
+                              Breakpoint="Breakpoint.Sm"
+                              Class="hs-review-table">
+                        <HeaderContent>
+                            <MudTh>HS 코드·품명</MudTh>
+                            <MudTh>분류</MudTh>
+                            <MudTh>주의</MudTh>
+                            <MudTh>공개 근거</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="HS 코드·품명">
+                                <strong>@context.Code</strong>
+                                <span class="hs-review-cell-subtitle">@PrimaryName(context)</span>
+                            </MudTd>
+                            <MudTd DataLabel="분류">
+                                <span>@context.BusinessCategoryLabel</span>
+                                <span class="hs-review-cell-subtitle">@context.LevelLabel</span>
+                            </MudTd>
+                            <MudTd DataLabel="주의">
+                                <MudChip T="string" Size="Size.Small" Color="@RiskColor(context.RiskLevelCode)" Variant="Variant.Outlined">
+                                    @context.RiskLevelLabel
+                                </MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="공개 근거">
+                                <span>@($"공식 {context.OfficialCaseCount} · 대행 {context.CustomsAgencyExperienceCount + context.ImportAgencyExperienceCount}")</span>
+                                <span class="hs-review-cell-subtitle">@SourceShortLabel(context.Source)</span>
+                            </MudTd>
+                            <MudTd>
+                                <MudButton Size="Size.Small"
+                                           Variant="@(Detail.요청ReviewId == context.ReviewId ? Variant.Filled : Variant.Outlined)"
+                                           Color="Color.Primary"
+                                           OnClick="@(() => SelectReviewAsync(context.ReviewId))">
+                                    상세
+                                </MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+
+                    @if (List.총페이지수 > 1)
+                    {
+                        <div class="hs-review-pagination">
+                            <MudPagination Count="@List.총페이지수"
+                                           Selected="@List.현재페이지"
+                                           SelectedChanged="ChangePageAsync"
+                                           Disabled="@List.처리중"
+                                           ShowFirstButton="true"
+                                           ShowLastButton="true" />
+                        </div>
+                    }
+                }
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="hs-review-panel hs-review-detail-panel">
+                @if (Detail.처리중)
+                {
+                    <div class="hs-review-state hs-review-state--detail">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.body1">선택한 HS 코드의 공개 근거를 불러오고 있습니다.</MudText>
+                    </div>
+                }
+                else if (Detail.오류발생)
+                {
+                    <div class="hs-review-state hs-review-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" />
+                        <MudText Typo="Typo.h6">상세 자료를 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@DetailErrorMessage</MudText>
+                        @if (Detail.요청ReviewId is long retryId)
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectReviewAsync(retryId, false))">
+                                다시 시도
+                            </MudButton>
+                        }
+                    </div>
+                }
+                else if (Detail.찾을수없음)
+                {
+                    <div class="hs-review-state hs-review-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">활성 검토 항목을 찾을 수 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">주소의 reviewId를 확인하거나 왼쪽 목록에서 다른 항목을 선택해 주세요.</MudText>
+                    </div>
+                }
+                else if (Detail.상세 is null)
+                {
+                    <div class="hs-review-state hs-review-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.FactCheck" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.h6">HS 코드를 선택해 근거를 비교하세요.</MudText>
+                        <MudText Typo="Typo.body2">목록 선택 전에는 임의의 샘플이나 첫 항목을 대신 표시하지 않습니다.</MudText>
+                    </div>
+                }
+                else
+                {
+                    var review = Detail.상세;
+                    var item = review.Item;
+
+                    <div class="hs-review-detail-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">@item.BusinessCategoryLabel · @item.LevelLabel</MudText>
+                            <MudText Typo="Typo.h5">@item.Code</MudText>
+                            <MudText Typo="Typo.subtitle1">@PrimaryName(item)</MudText>
+                        </div>
+                        <MudChip T="string" Color="@RiskColor(item.RiskLevelCode)" Variant="Variant.Filled">
+                            @item.RiskLevelLabel
+                        </MudChip>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                    {
+                        <MudText Typo="Typo.body2" Class="hs-review-description">@item.Description</MudText>
+                    }
+
+                    <div class="hs-review-metrics">
+                        <div><strong>@item.OfficialCaseCount</strong><span>공식 공개 사례</span></div>
+                        <div><strong>@item.CustomsAgencyExperienceCount</strong><span>공개 통관 경험</span></div>
+                        <div><strong>@item.ImportAgencyExperienceCount</strong><span>공개 수입 경험</span></div>
+                        <div><strong>@item.Source.CodeDigits</strong><span>분류 기준 자릿수</span></div>
+                    </div>
+
+                    <section class="hs-review-section hs-review-source">
+                        <div class="hs-review-section-title">
+                            <MudIcon Icon="@Icons.Material.Filled.Source" Color="Color.Primary" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">원장 출처와 기준 시각</MudText>
+                                <MudText Typo="Typo.caption">서로 다른 국가·개정판의 수치를 같은 분류처럼 단정하지 않습니다.</MudText>
+                            </div>
+                        </div>
+                        <dl class="hs-review-source-grid">
+                            <div><dt>표준·국가</dt><dd>@SourceStandardLabel(item.Source)</dd></div>
+                            <div><dt>개정판</dt><dd>@ValueOrDash(item.Source.Revision)</dd></div>
+                            <div><dt>적용 기준일</dt><dd>@DateLabel(item.Source.EffectiveFrom)</dd></div>
+                            <div><dt>원장 반영 시각</dt><dd>@DateTimeLabel(item.Source.ImportedAtUtc)</dd></div>
+                        </dl>
+                        @if (!string.IsNullOrWhiteSpace(item.Source.SourceName))
+                        {
+                            <MudText Typo="Typo.body2">
+                                출처: @item.Source.SourceName
+                                @if (!string.IsNullOrWhiteSpace(item.Source.SourceUrl))
+                                {
+                                    <a class="hs-review-source-link" href="@item.Source.SourceUrl" target="_blank" rel="noopener noreferrer">원문 열기</a>
+                                }
+                            </MudText>
+                        }
+                    </section>
+
+                    <section class="hs-review-section">
+                        <div class="hs-review-section-title">
+                            <MudIcon Icon="@Icons.Material.Filled.WarningAmber" Color="Color.Warning" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">통관 주의 항목</MudText>
+                                <MudText Typo="Typo.caption">원장에 활성 상태로 남은 태그만 표시합니다.</MudText>
+                            </div>
+                        </div>
+                        @if (review.RiskTags.Count == 0)
+                        {
+                            <MudText Typo="Typo.body2">등록된 활성 주의 태그가 없습니다. 기본 서류와 상품 사양은 별도로 확인해 주세요.</MudText>
+                        }
+                        else
+                        {
+                            <ul class="hs-review-evidence-list">
+                                @foreach (var tag in review.RiskTags)
+                                {
+                                    <li>
+                                        <strong>@tag.Label</strong>
+                                        <span>@ValueOrDash(tag.Reason)</span>
+                                        <small>@tag.SourceLabel</small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </section>
+
+                    <section class="hs-review-section">
+                        <div class="hs-review-section-title">
+                            <MudIcon Icon="@Icons.Material.Filled.Gavel" Color="Color.Info" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">공식 공개 분류사례</MudText>
+                                <MudText Typo="Typo.caption">공개 공식 사례로 표시된 최근 자료를 최대 20건 보여 줍니다.</MudText>
+                            </div>
+                        </div>
+                        @if (review.OfficialCases.Count == 0)
+                        {
+                            <MudText Typo="Typo.body2">연결된 공개 공식 분류사례가 없습니다.</MudText>
+                        }
+                        else
+                        {
+                            <div class="hs-review-card-list">
+                                @foreach (var officialCase in review.OfficialCases)
+                                {
+                                    <article class="hs-review-evidence-card">
+                                        <div>
+                                            <MudText Typo="Typo.subtitle2">@ValueOrDash(officialCase.ProductName)</MudText>
+                                            <MudText Typo="Typo.caption">@($"{ValueOrDash(officialCase.IssuingAuthority)} · {DateLabel(officialCase.DecidedAt)}")</MudText>
+                                        </div>
+                                        <MudText Typo="Typo.body2">@ValueOrDash(officialCase.GoodsDescription)</MudText>
+                                        @if (!string.IsNullOrWhiteSpace(officialCase.DecisionReason))
+                                        {
+                                            <MudText Typo="Typo.body2"><strong>판단 근거</strong> @officialCase.DecisionReason</MudText>
+                                        }
+                                        <MudText Typo="Typo.caption">
+                                            @($"{ValueOrDash(officialCase.CountryCode)} · {ValueOrDash(officialCase.SourceType)} · {ValueOrDash(officialCase.SourceReferenceNo)}")
+                                            @if (!string.IsNullOrWhiteSpace(officialCase.SourceUrl))
+                                            {
+                                                <a class="hs-review-source-link" href="@officialCase.SourceUrl" target="_blank" rel="noopener noreferrer">원문</a>
+                                            }
+                                        </MudText>
+                                    </article>
+                                }
+                            </div>
+                        }
+                    </section>
+
+                    <section class="hs-review-section">
+                        <div class="hs-review-section-title">
+                            <MudIcon Icon="@Icons.Material.Filled.Handshake" Color="Color.Success" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">공개 동의된 대행 경험</MudText>
+                                <MudText Typo="Typo.caption">제공자가 공개에 동의했고 유료 상세가 아닌 경험만 표시합니다.</MudText>
+                            </div>
+                        </div>
+                        @if (review.AgencyExperiences.Count == 0)
+                        {
+                            <MudText Typo="Typo.body2">공개 가능한 통관·수입 대행 경험이 없습니다.</MudText>
+                        }
+                        else
+                        {
+                            <div class="hs-review-card-list">
+                                @foreach (var experience in review.AgencyExperiences)
+                                {
+                                    <article class="hs-review-evidence-card">
+                                        <div class="hs-review-card-title">
+                                            <MudChip T="string" Size="Size.Small" Color="@AgencyColor(experience.AgencyTypeLabel)" Variant="Variant.Outlined">
+                                                @experience.AgencyTypeLabel
+                                            </MudChip>
+                                            <MudText Typo="Typo.caption">@($"{ValueOrDash(experience.CountryRoute)} · {ValueOrDash(experience.CaseStatus)} · {DateLabel(experience.CompletedAtUtc)}")</MudText>
+                                        </div>
+                                        <MudText Typo="Typo.body2">@ValueOrDash(experience.Summary)</MudText>
+                                        @if (!string.IsNullOrWhiteSpace(experience.DisclosurePolicy))
+                                        {
+                                            <MudText Typo="Typo.caption">공개 기준: @experience.DisclosurePolicy</MudText>
+                                        }
+                                    </article>
+                                }
+                            </div>
+                        }
+
+                        @if (review.RequiredDocuments.Count > 0)
+                        {
+                            <MudText Typo="Typo.subtitle2" Class="mt-4 mb-2">공개 경험에서 확인된 준비 서류</MudText>
+                            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                                @foreach (var document in review.RequiredDocuments)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">@document</MudChip>
+                                }
+                            </MudStack>
+                        }
+                    </section>
+
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="hs-review-decision-boundary">
+                        @review.DecisionBoundary
+                    </MudAlert>
+
+                    <div class="hs-review-next-action">
+                        <div>
+                            <MudText Typo="Typo.subtitle2">실제 상품 조건을 정리했나요?</MudText>
+                            <MudText Typo="Typo.body2">운송 의뢰는 별도 Simulation 흐름에서 작성하며 이 화면이 자동 배차·계약·통관 신고를 만들지는 않습니다.</MudText>
+                        </div>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/shipper/request">운송 의뢰 작성으로</MudButton>
+                    </div>
+                }
+            </MudPaper>
+        </div>
+    }
+</section>

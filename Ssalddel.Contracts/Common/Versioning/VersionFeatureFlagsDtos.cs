@@ -11,6 +11,8 @@ public sealed class VersionFeatureFlagsResponse
     public IReadOnlyList<OperatingSystemDto> OperatingSystems { get; init; } = [];
 
     public IReadOnlyList<WorkflowApiEndpointDto> ApiEndpoints { get; init; } = [];
+
+    public IReadOnlyList<PageCapabilityDto> PageCapabilities { get; init; } = [];
 }
 
 public sealed class WorkflowFlagStateDto

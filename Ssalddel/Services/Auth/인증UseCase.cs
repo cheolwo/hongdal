@@ -2,6 +2,7 @@ using System.Security.Claims;
 using FluentResults;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.ViewSettings;
 using Ssalddel.Security;
@@ -17,6 +18,7 @@ namespace Ssalddel.Services.Auth;
 public interface I인증UseCase
 {
     Task<Result<토큰응답>> 로그인Async(로그인요청? request, 인증요청Context context);
+    Task<Result<커뮤니티회원가입응답>> 커뮤니티회원가입Async(커뮤니티회원가입요청? request);
     Task<Result<기사회원가입응답>> 기사회원가입Async(기사회원가입요청? request);
     Task<Result<주문자회원가입응답>> 주문자회원가입Async(주문자회원가입요청? request);
     Task<Result<IReadOnlyList<가입인연후보항목응답>>> 가입온보딩인연후보조회Async(가입인연후보조회요청? request, CancellationToken cancellationToken);
@@ -83,6 +85,72 @@ public sealed class 인증UseCase : I인증UseCase
         var response = await 토큰발급Async(user);
         await 로그인로그기록Async(userNameOrEmail, user, true, string.Empty, string.Empty, context);
         return response;
+    }
+
+    [SsalddelCommunityV0Module(
+        SsalddelCommunityV0ModuleKeys.Safety,
+        SsalddelModuleKind.Application,
+        "선택 회원가입의 최소 개인정보 동의를 검증하고 동의 버전과 시각을 계정에 기록",
+        ReleaseStage = SsalddelCommunityV0ReleaseStages.SafetyAndOperations,
+        Boundary = "회원가입을 거부해도 익명 허용 게시판 이용은 유지하며, 계정 생성에 필요한 최소 정보만 저장")]
+    public async Task<Result<커뮤니티회원가입응답>> 커뮤니티회원가입Async(커뮤니티회원가입요청? request)
+    {
+        if (request == null) return Result.Fail<커뮤니티회원가입응답>("request body is required");
+        if (string.IsNullOrWhiteSpace(request.UserName)) return Result.Fail<커뮤니티회원가입응답>("아이디를 입력해 주세요.");
+        if (string.IsNullOrWhiteSpace(request.Email)) return Result.Fail<커뮤니티회원가입응답>("이메일을 입력해 주세요.");
+        if (string.IsNullOrWhiteSpace(request.Password)) return Result.Fail<커뮤니티회원가입응답>("비밀번호를 입력해 주세요.");
+        if (!커뮤니티회원가입개인정보동의문.유효한동의(
+                request.PrivacyConsentAccepted,
+                request.PrivacyConsentVersion))
+        {
+            return Result.Fail<커뮤니티회원가입응답>("현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요.");
+        }
+
+        var userName = request.UserName.Trim();
+        var email = request.Email.Trim();
+        if (!System.Net.Mail.MailAddress.TryCreate(email, out var parsedEmail)
+            || !string.Equals(parsedEmail.Address, email, StringComparison.OrdinalIgnoreCase))
+        {
+            return Result.Fail<커뮤니티회원가입응답>("올바른 이메일 주소를 입력해 주세요.");
+        }
+
+        var duplicate = await 중복사용자검증Async(userName, email);
+        if (duplicate.IsFailed)
+        {
+            return Result.Fail<커뮤니티회원가입응답>(duplicate.Errors);
+        }
+
+        var consentedAtUtc = DateTime.UtcNow;
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            Email = email,
+            EmailConfirmed = false,
+            PrivacyConsentVersion = 커뮤니티회원가입개인정보동의문.현재버전,
+            PrivacyConsentedAtUtc = consentedAtUtc
+        };
+
+        var createResult = await _userManager.CreateAsync(user, request.Password);
+        if (!createResult.Succeeded)
+        {
+            return Result.Fail<커뮤니티회원가입응답>(["회원가입에 실패했습니다.", .. createResult.Errors.Select(x => x.Description)]);
+        }
+
+        var roleResult = await _userManager.AddToRoleAsync(user, 역할명.커뮤니티회원);
+        if (!roleResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+            return Result.Fail<커뮤니티회원가입응답>(["커뮤니티 회원 역할 부여에 실패했습니다.", .. roleResult.Errors.Select(x => x.Description)]);
+        }
+
+        return new 커뮤니티회원가입응답
+        {
+            UserId = user.Id,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            PrivacyConsentVersion = user.PrivacyConsentVersion,
+            PrivacyConsentedAtUtc = consentedAtUtc
+        };
     }
 
     public async Task<Result<기사회원가입응답>> 기사회원가입Async(기사회원가입요청? request)

@@ -1,44 +1,78 @@
+@page "/shipper/request/detail"
 @page "/shipper/request/{RequestId}"
 @inject 화주결제정산Service 결제정산Service
+@inject WebAuthSessionService AuthSession
+@inject ICommunityProcurementClient WorkflowMetadata
 @inject NavigationManager Navigation
 
-<WebPageHeader Eyebrow="Shipper Web"
-               Title="운송 의뢰 상세 타임라인"
-               Description="결제, 배차, 수락, 상차, 하차, 정산 상태가 서버 API 상태와 맞물려 이어지는지 검증합니다."
-               Badge="@Display(RequestId)" />
+<WebPageHeader Eyebrow="운송 의뢰"
+               Title="운송 의뢰 상세"
+               Description="등록한 운송 의뢰를 같은 ID로 다시 읽어 접수부터 정산까지 현재 상태를 확인합니다."
+               Badge="@(string.IsNullOrWhiteSpace(RequestId) ? "ID 조회" : Display(RequestId))" />
 
 <MudStack Spacing="3">
-    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.body2" Color="Color.Secondary">화주 운송 의뢰 ID</MudText>
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6">의뢰 ID로 조회</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">등록 결과에 표시된 ID를 입력하면 주소도 해당 상세 경로로 바뀝니다.</MudText>
+                </MudStack>
+                @if (Request is not null)
+                {
+                    <MudChip T="string" Color="@ResolveOverallColor(Request)" Variant="Variant.Filled">
+                        @ResolveOverallLabel(Request)
+                    </MudChip>
+                }
+            </MudStack>
+
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
                 <MudTextField @bind-Value="LookupRequestId"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense"
-                              Label="의뢰 ID"
-                              Style="min-width: 220px;" />
+                              Label="운송 의뢰 ID"
+                              Placeholder="예: HD-WEB-001"
+                              Immediate="true"
+                              Style="min-width: min(100%, 280px);" />
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
-                           StartIcon="@Icons.Material.Filled.Refresh"
+                           StartIcon="@Icons.Material.Filled.Search"
                            Disabled="@IsBusy"
-                           OnClick="LoadRequestAsync">
-                    상태 조회
+                           OnClick="OpenRequestAsync">
+                    의뢰 조회
                 </MudButton>
-                <MudButton Variant="Variant.Outlined"
+                <MudButton Href="@ShipperRoutes.Request"
+                           Variant="Variant.Outlined"
                            Color="Color.Secondary"
-                           StartIcon="@Icons.Material.Filled.Payments"
-                           OnClick="GoPaymentStatus">
-                    결제 점검
+                           StartIcon="@Icons.Material.Filled.Add">
+                    새 의뢰 작성
                 </MudButton>
+                @if (Request is not null)
+                {
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Payments"
+                               OnClick="GoPaymentStatus">
+                        결제·정산 확인
+                    </MudButton>
+                }
             </MudStack>
         </MudStack>
-        @if (Request is not null)
-        {
-            <MudChip T="string" Color="@ResolveOverallColor(Request)" Variant="Variant.Filled">
-                @ResolveOverallLabel(Request)
-            </MudChip>
-        }
-    </MudStack>
+    </MudPaper>
+
+    @if (Created && Request is not null)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Filled">
+            @Request.의뢰Id 의뢰가 서버에 저장되었고, 같은 ID로 다시 조회되었습니다.
+        </MudAlert>
+    }
+
+    @if (Request is not null)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+            이 화면은 저장된 운송 상태를 조회합니다. 화면을 여는 것만으로 자동 배차, 계약 확정이나 실결제가 실행되지는 않습니다.
+        </MudAlert>
+    }
 
     @if (!string.IsNullOrWhiteSpace(StatusMessage))
     {
@@ -51,9 +85,61 @@
     }
     else if (Request is null)
     {
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-            의뢰 ID를 입력하고 상태 조회를 실행하세요. 이 화면은 화주 의뢰 단건 API를 기준으로 타임라인을 그립니다.
-        </MudAlert>
+        @if (RequiresLogin)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">로그인이 필요합니다</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        상하차 주소와 결제 조건이 포함된 화면이므로 의뢰를 등록한 계정 또는 관리자만 조회할 수 있습니다.
+                    </MudText>
+                    <MudButton Href="/login" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login">
+                        로그인하러 가기
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (IsTransportWorkflowEnabled == false)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">운송 의뢰 조회가 현재 비활성입니다</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        현재 배포 환경에서는 국내 운송 워크플로우가 꺼져 있습니다. 커뮤니티 화물 글과 브라우저 초안은 계속 사용할 수 있지만 서버 의뢰 조회·배차·계약은 시작되지 않습니다.
+                    </MudText>
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudButton Href="@ShipperRoutes.Request" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EditNote">
+                            초안 작성하기
+                        </MudButton>
+                        <MudButton OnClick="RetryLoadAsync" Variant="Variant.Text" Color="Color.Secondary" Disabled="@IsBusy">
+                            서버 상태 다시 확인
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        }
+        else
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.body2">
+                        @(string.IsNullOrWhiteSpace(LookupRequestId)
+                            ? "등록 결과에 표시된 의뢰 ID를 입력해 주세요."
+                            : "의뢰 ID를 확인하거나 서버 연결 상태를 점검한 뒤 다시 조회해 주세요.")
+                    </MudText>
+                    @if (!string.IsNullOrWhiteSpace(LookupRequestId))
+                    {
+                        <MudButton OnClick="RetryLoadAsync"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Refresh"
+                                   Disabled="@IsBusy">
+                            다시 조회
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudPaper>
+        }
     }
     else
     {
@@ -74,6 +160,14 @@
                         <MudDivider />
 
                         <MudGrid>
+                            <MudItem xs="6">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">의뢰 상태</MudText>
+                                <MudText Typo="Typo.body2">@Display(Request.의뢰상태)</MudText>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">등록 시각</MudText>
+                                <MudText Typo="Typo.body2">@Request.생성일시.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudText>
+                            </MudItem>
                             <MudItem xs="6">
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">결제</MudText>
                                 <MudText Typo="Typo.body2">@Display(Request.결제상태)</MudText>
@@ -112,8 +206,8 @@
                     <MudPaper Elevation="0" Outlined="true" Class="pa-4">
                         <MudStack Spacing="2">
                             <MudStack Spacing="0">
-                                <MudText Typo="Typo.h6">1.0 운송 워크플로우</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">서버 원장 상태를 화주가 이해해야 하는 단계로 다시 묶어 표시합니다.</MudText>
+                                <MudText Typo="Typo.h6">운송 진행 타임라인</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">서버에 저장된 상태를 화주가 확인하기 쉬운 순서로 묶어 표시합니다.</MudText>
                             </MudStack>
 
                             <MudGrid>
@@ -168,17 +262,54 @@
 </MudStack>
 
 @code {
+    private const string DomesticTransportFeatureKey = "DomesticTransportWorkflow";
+
     [Parameter] public string? RequestId { get; set; }
 
-    private string LookupRequestId { get; set; } = "HD-WEB-001";
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "created")]
+    public bool Created { get; set; }
+
+    private string LookupRequestId { get; set; } = string.Empty;
     private bool IsBusy { get; set; }
+    private bool RequiresLogin { get; set; }
+    private bool? IsTransportWorkflowEnabled { get; set; }
     private string? StatusMessage { get; set; }
     private Severity StatusSeverity { get; set; } = Severity.Info;
     private Ssalddel.Contracts.Shipper.Request.화주운송의뢰응답? Request { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        LookupRequestId = string.IsNullOrWhiteSpace(RequestId) ? LookupRequestId : RequestId;
+        LookupRequestId = NormalizeRequestId(RequestId) ?? string.Empty;
+        Request = null;
+        RequiresLogin = false;
+
+        if (string.IsNullOrWhiteSpace(LookupRequestId))
+        {
+            IsTransportWorkflowEnabled = null;
+            SetStatus("등록 결과에 표시된 운송 의뢰 ID를 입력해 주세요.", Severity.Info);
+            return;
+        }
+
+        await LoadRequestAsync();
+    }
+
+    private async Task OpenRequestAsync()
+    {
+        var requestId = NormalizeRequestId(LookupRequestId);
+        if (requestId is null)
+        {
+            Request = null;
+            SetStatus("의뢰 ID를 입력해 주세요.", Severity.Warning);
+            return;
+        }
+
+        if (!string.Equals(requestId, NormalizeRequestId(RequestId), StringComparison.Ordinal))
+        {
+            Navigation.NavigateTo(ShipperRoutes.RequestDetailFor(requestId));
+            return;
+        }
+
         await LoadRequestAsync();
     }
 
@@ -189,7 +320,8 @@
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(LookupRequestId))
+        var requestId = NormalizeRequestId(LookupRequestId);
+        if (requestId is null)
         {
             Request = null;
             SetStatus("의뢰 ID를 입력해 주세요.", Severity.Warning);
@@ -197,17 +329,39 @@
         }
 
         IsBusy = true;
+        Request = null;
+        RequiresLogin = false;
         SetStatus("서버에서 운송 의뢰 상태를 조회하는 중입니다.", Severity.Info);
 
         try
         {
-            Request = await 결제정산Service.의뢰조회Async(LookupRequestId);
-            SetStatus($"{Request.의뢰Id} 상태를 서버 API에서 불러왔습니다.", Severity.Success);
+            if (!await EnsureTransportWorkflowEnabledAsync())
+            {
+                return;
+            }
+
+            await AuthSession.RestoreAsync();
+            if (!AuthSession.IsLoggedIn)
+            {
+                RequiresLogin = true;
+                SetStatus("운송 의뢰 상세는 로그인 후 조회할 수 있습니다.", Severity.Warning);
+                return;
+            }
+
+            Request = await 결제정산Service.의뢰조회Async(requestId);
+            LookupRequestId = Request.의뢰Id;
+            SetStatus($"{Request.의뢰Id} 의뢰를 서버에서 다시 조회했습니다.", Severity.Success);
         }
         catch (Exception ex)
         {
             Request = null;
-            SetStatus($"운송 의뢰 조회 실패: {ex.Message}", Severity.Error);
+            RequiresLogin = IsAuthenticationFailure(ex);
+            if (IsFeatureDisabledFailure(ex))
+            {
+                IsTransportWorkflowEnabled = false;
+            }
+
+            SetStatus(ResolveLookupFailureMessage(ex), ResolveLookupFailureSeverity(ex));
         }
         finally
         {
@@ -215,9 +369,91 @@
         }
     }
 
+    private async Task<bool> EnsureTransportWorkflowEnabledAsync()
+    {
+        try
+        {
+            var metadata = await WorkflowMetadata.GetVersionWorkflowMetadataAsync();
+            IsTransportWorkflowEnabled = metadata.Flags.TryGetValue(
+                DomesticTransportFeatureKey,
+                out var enabled)
+                && enabled;
+
+            if (IsTransportWorkflowEnabled != true)
+            {
+                SetStatus(
+                    "현재 배포 환경에서는 국내 운송 의뢰 조회가 비활성화되어 있습니다.",
+                    Severity.Warning);
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            IsTransportWorkflowEnabled = null;
+            SetStatus(
+                "운송 의뢰 조회 가능 여부를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+                Severity.Error);
+            return false;
+        }
+    }
+
+    private async Task RetryLoadAsync()
+    {
+        IsTransportWorkflowEnabled = null;
+        await LoadRequestAsync();
+    }
+
     private void GoPaymentStatus()
     {
-        Navigation.NavigateTo("/shipper/request/payment-status");
+        Navigation.NavigateTo(ShipperRoutes.PaymentStatus);
+    }
+
+    private static string? NormalizeRequestId(string? requestId)
+        => string.IsNullOrWhiteSpace(requestId) ? null : requestId.Trim();
+
+    private static bool IsAuthenticationFailure(Exception exception)
+        => exception is HttpRequestException { StatusCode: System.Net.HttpStatusCode.Unauthorized }
+           || exception.Message.Contains("서버 인증이 필요", StringComparison.Ordinal);
+
+    private static bool IsFeatureDisabledFailure(Exception exception)
+        => exception.Message.Contains("FeatureDisabled", StringComparison.OrdinalIgnoreCase);
+
+    private static Severity ResolveLookupFailureSeverity(Exception exception)
+        => exception is HttpRequestException
+           {
+               StatusCode: System.Net.HttpStatusCode.NotFound
+                   or System.Net.HttpStatusCode.Unauthorized
+                   or System.Net.HttpStatusCode.Forbidden
+           }
+            || IsAuthenticationFailure(exception)
+                ? Severity.Warning
+                : Severity.Error;
+
+    private static string ResolveLookupFailureMessage(Exception exception)
+    {
+        if (IsFeatureDisabledFailure(exception))
+        {
+            return "현재 배포 환경에서는 국내 운송 의뢰 조회가 비활성화되어 있습니다.";
+        }
+
+        if (IsAuthenticationFailure(exception))
+        {
+            return "로그인이 만료되었거나 필요합니다. 다시 로그인한 뒤 조회해 주세요.";
+        }
+
+        if (exception is HttpRequestException { StatusCode: System.Net.HttpStatusCode.Forbidden })
+        {
+            return "이 운송 의뢰를 조회할 권한이 없습니다.";
+        }
+
+        if (exception is HttpRequestException { StatusCode: System.Net.HttpStatusCode.NotFound })
+        {
+            return "운송 의뢰를 찾을 수 없거나 현재 계정의 조회 대상이 아닙니다.";
+        }
+
+        return "운송 의뢰를 불러오지 못했습니다. 서버 연결 상태를 확인한 뒤 다시 시도해 주세요.";
     }
 
     private static IReadOnlyList<WorkflowStep> BuildTimeline(Ssalddel.Contracts.Shipper.Request.화주운송의뢰응답 item)

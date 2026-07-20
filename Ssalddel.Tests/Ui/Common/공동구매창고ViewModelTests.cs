@@ -317,6 +317,11 @@ public sealed class 공동구매창고ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult(입고목록응답);
 
+        public Task<입고요청항목응답?> 입고상세조회Async(
+            long inboundId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(입고목록응답.FirstOrDefault(item => item.Id == inboundId));
+
         public Task<입고요청페이지응답> 입고예정관점목록조회Async(
             string perspectiveCode,
             string? communityLedgerId,

@@ -8,7 +8,10 @@ public static class WebNavigationCatalog
     public const string DiagramRoute = "/diagram";
 
     private static readonly WebNavigationItem Home =
-        new("역할별 화면", "/", Icons.Material.Filled.Dashboard, true);
+        new("통합 홈", "/", Icons.Material.Filled.Hub, true);
+
+    private static readonly WebNavigationItem Community =
+        new("공개 커뮤니티", "/community", Icons.Material.Filled.Forum, true);
 
     private static readonly WebNavigationItem Diagram =
         new("업무 다이어그램", DiagramRoute, Icons.Material.Filled.AccountTree);
@@ -49,7 +52,8 @@ public static class WebNavigationCatalog
 
     private static readonly IReadOnlyList<WebNavigationItem> OrdererItems =
     [
-        new("주문자·공동주문 홈", "/orderer", Icons.Material.Filled.Groups),
+        new("주문자·공동주문 홈", WebOrdererRoutes.Home, Icons.Material.Filled.Groups),
+        new("마트 공개 상품", WebOrdererRoutes.Mart, Icons.Material.Filled.Storefront),
         new("예정 품목 문서", "/tools/expected-item-documents", Icons.Material.Filled.Print),
         new("번호 QR·바코드", "/tools/identifier-codes", Icons.Material.Filled.QrCodeScanner)
     ];
@@ -69,7 +73,13 @@ public static class WebNavigationCatalog
         new("화주·판매자", ShipperRoutes.Home, Icons.Material.Filled.LocalShipping),
         new("기사", "/driver/home", Icons.Material.Filled.Route),
         new("창고·현장", WarehouseManagerRoutes.Home, Icons.Material.Filled.Warehouse),
-        new("주문자·공동주문", "/orderer", Icons.Material.Filled.Groups)
+        new("주문자·공동주문", WebOrdererRoutes.Home, Icons.Material.Filled.Groups)
+    ];
+
+    public static IReadOnlyList<WebNavigationItem> IntegratedItems { get; } =
+    [
+        Home,
+        Community
     ];
 
     public static IReadOnlyList<WebNavigationItem> CommunityItems { get; } =
@@ -77,6 +87,7 @@ public static class WebNavigationCatalog
         new("내 정보", "/community/me", Icons.Material.Filled.AccountCircle, true),
         new("내 글", "/community/me/posts", Icons.Material.Filled.Article),
         new("참여 중", "/community/me/actions", Icons.Material.Filled.Groups),
+        new("역할 지원", "/community/roles/apply", Icons.Material.Filled.VolunteerActivism),
         new("내 원장", "/community/me/ledgers", Icons.Material.Filled.Assignment),
         new("알림", "/community/me/notifications", Icons.Material.Filled.Notifications),
         new("꾸미기", "/community/decorations", Icons.Material.Filled.Palette),
@@ -107,7 +118,7 @@ public static class WebNavigationCatalog
             "driver" => "/driver/home",
             "shipper" => ShipperRoutes.Home,
             "warehouse" => WarehouseManagerRoutes.Home,
-            "orderer" => "/orderer",
+            "orderer" => WebOrdererRoutes.Home,
             "customs" => GlobalTradeRoutes.ImportRequests,
             _ => "/"
         };

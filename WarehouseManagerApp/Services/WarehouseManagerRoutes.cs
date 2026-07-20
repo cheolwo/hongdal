@@ -39,4 +39,14 @@ public static class WarehouseManagerRoutes
     public const string MartWorkBoard = "/mart/work-board";
 
     public static string WorkbenchScan(string processCode) => $"/work/{processCode}/workbench";
+
+    public static string WorkBoardForInbound(long inboundId)
+    {
+        if (inboundId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(inboundId));
+        }
+
+        return $"{WorkBoard}?inboundId={inboundId}";
+    }
 }

@@ -1,4 +1,4 @@
-# HumanResourcesManagerApp-P01 - 인사/고용 관리 홈
+# HumanResourcesManagerApp-P01 - 역할 지원·배정 검토
 
 [전체 화면 문서](../../README.md) / [HumanResourcesManagerApp 화면 목록](../README.md) / [앱 전체 카탈로그](../../../app-page-catalog.md)
 
@@ -11,7 +11,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | HumanResourcesManagerApp |
-| 페이지 ID / 제목 | HumanResourcesManagerApp-P01 - 인사/고용 관리 홈 |
+| 페이지 ID / 제목 | HumanResourcesManagerApp-P01 - 역할 지원·배정 검토 |
 | 라우트 | / |
 | 소스 파일 | [HumanResourcesManagerApp/Components/Pages/Home.razor](../../../../../HumanResourcesManagerApp/Components/Pages/Home.razor) |
 | 분류 | 확장 |
@@ -20,7 +20,7 @@
 
 ## 왜 필요한가
 
-이 화면은 인사/고용 관리 홈을 담당하므로, 1.0 이후의 해외 물류, 창고, 주문자 집단, 판매채널 확장을 화면 단위로 검증하기 위해 필요합니다.
+이 화면은 사용자가 자발적으로 남긴 역할 지원·철회 원장과 운영자가 남긴 역할 배정·해제 원장을 같은 검토 ID 기준으로 확인하기 위해 필요합니다.
 
 ## 사용자와 참여자
 
@@ -30,10 +30,10 @@
 
 ## 화면에서 다루는 일
 
-- 주 책임: 인사/고용 관리 홈
-- 사용자가 확인해야 하는 것: 이 화면에서 상태, 입력값, 다음 행동이 명확히 보이는지 확인합니다.
-- 사용자가 조작해야 하는 것: 버튼, 입력, 선택, 업로드, 조회 같은 조작이 이 화면의 책임 안에 머무는지 확인합니다.
-- 화면 밖으로 넘길 일: 다른 앱이나 관리자 화면에서 처리해야 하는 상태 변경은 이 화면에 과하게 넣지 않습니다.
+- 주 책임: 영속 역할 지원·배정 원장의 검색, 서버 페이징과 정확한 검토 ID 상세 조회
+- 사용자가 확인해야 하는 것: 지원과 배정 원장의 구분, 검토 상태, 역할·범위, 지원 동의 또는 배정 접근 조건
+- 사용자가 조작해야 하는 것: 원장·상태·참여자·범위 필터, 검색, 페이지 이동과 상세 선택
+- 화면 밖으로 넘길 일: 지원 승인, 역할 배정·해제, 근무 조건, 계약·급여와 외부 신고 상태 변경
 
 ## 다른 화면과의 관계
 
@@ -51,6 +51,8 @@
 
 | 구분 | 메서드 | API 경로 | 클라이언트/문서 근거 | 서버 근거 |
 | --- | --- | --- | --- | --- |
+| 역할 지원·배정 검토 | GET | `api/v1/admin/hr-role-reviews` | `Ssalddel.Ui.Common/Areas/App/Services/인사역할검토Client.cs` | `Ssalddel/Controllers/Admin/HumanResources/HrRoleReviewsController.cs` |
+| 정확한 검토 상세 | GET | `api/v1/admin/hr-role-reviews/{reviewId}` | `Ssalddel.Ui.Common/Areas/App/ViewModels/인사역할검토페이지ViewModels.cs` | `Ssalddel/Controllers/Admin/HumanResources/HrRoleReviewsController.cs` |
 | 워크플로우 문서 | - | `api/v1/admin/documents` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/admin/documents/policies` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs)<br>`PUT api/v1/admin/documents/policies/{documentCode}` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs)<br>`GET api/v1/admin/documents` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs)<br>`GET api/v1/admin/documents/logs` [Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs](../../../../../Ssalddel/Controllers/Admin/04_증빙/문서관리Controller.cs) |
 | 워크플로우 문서 | - | `api/v1/admin/hr-employment-contracts` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/admin/hr-employment-contracts` [Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs](../../../../../Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs)<br>`GET api/v1/admin/hr-employment-contracts/{contractId:guid}` [Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs](../../../../../Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs)<br>`POST api/v1/admin/hr-employment-contracts` [Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs](../../../../../Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs)<br>`POST api/v1/admin/hr-employment-contracts/{contractId:guid}/sign` [Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs](../../../../../Ssalddel/Controllers/Admin/HumanResources/HrEmploymentContractsController.cs) |
 | 워크플로우 문서 | - | `api/v1/admin/hr-participation-benefits` | [docs/ProjectOverview/workflow-app-screen-map.md](../../../workflow-app-screen-map.md) | `GET api/v1/admin/hr-participation-benefits` [Ssalddel/Controllers/Admin/HumanResources/HrParticipationBenefitsController.cs](../../../../../Ssalddel/Controllers/Admin/HumanResources/HrParticipationBenefitsController.cs)<br>`POST api/v1/admin/hr-participation-benefits/transfer` [Ssalddel/Controllers/Admin/HumanResources/HrParticipationBenefitsController.cs](../../../../../Ssalddel/Controllers/Admin/HumanResources/HrParticipationBenefitsController.cs) |
@@ -76,7 +78,7 @@
 
 ## 보안과 개인정보 점검
 
-위치, 주소, 운행 상태는 최소 공개와 최신성 표시가 필요합니다.
+서버관리자 정책과 HR 기능 플래그를 모두 확인합니다. 내부 사용자 ID와 연락처, 주소, 계좌는 응답하지 않으며 작업장 IP 범위 원문은 등록 개수로만 표시합니다. 역할 지원은 승인·고용·계약으로 해석하지 않습니다.
 
 ## 캡처와 문서 상태
 

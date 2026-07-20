@@ -1,6 +1,7 @@
 using System.Reflection;
 using Ssalddel.Controllers.Common;
 using Ssalddel.Controllers.Shipper.Payment02;
+using Ssalddel.Controllers.Shipper.Request01;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Ssalddel.Tests.Controllers;
@@ -28,6 +29,16 @@ public sealed class OperationalEndpointAuthorizationTests
         var authorize = GetAuthorizeAttribute(typeof(파일업로드Controller), nameof(파일업로드Controller.업로드));
 
         Assert.Equal("물류운영사용자전용", authorize.Policy);
+    }
+
+    [Fact]
+    public void AdminRequestCancelRefund_RequiresServerAdminPolicy()
+    {
+        var authorize = GetAuthorizeAttribute(
+            typeof(화주운송의뢰Controller),
+            nameof(화주운송의뢰Controller.관리자취소환불));
+
+        Assert.Equal("서버관리자전용", authorize.Policy);
     }
 
     [Fact]

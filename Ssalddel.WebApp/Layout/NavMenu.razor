@@ -7,7 +7,7 @@
     <div class="web-navigation-main">
         <MudStack Spacing="0" Class="px-4 pt-3 pb-2">
             <MudText Typo="Typo.overline" Color="Color.Secondary">
-                @(IsCommunityMode ? "내 커뮤니티" : "살뜰 업무")
+                @(IsCommunityMode ? "통합 베타 · 커뮤니티" : "통합 베타 · 업무")
             </MudText>
             <MudText Typo="Typo.subtitle2">@NavigationIdentityLabel</MudText>
         </MudStack>
@@ -15,10 +15,14 @@
         <MudNavMenu Class="platform-navigation-menu">
             @foreach (var item in CurrentItems)
             {
+                var pageState = IntegratedBetaCatalog.Resolve(item.Href);
                 <MudNavLink Href="@item.Href"
                             Match="@(item.MatchAll ? NavLinkMatch.All : NavLinkMatch.Prefix)"
                             Icon="@item.Icon">
-                    @item.Title
+                    <span class="web-navigation-item-copy">
+                        <span>@item.Title</span>
+                        <small class="@IntegratedBetaCatalog.StageCssClass(pageState.Stage)">@pageState.StageLabel</small>
+                    </span>
                 </MudNavLink>
             }
         </MudNavMenu>
@@ -85,6 +89,53 @@
         padding-bottom: 12px;
     }
 
+    .web-navigation-item-copy {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .web-navigation-item-copy > span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .web-navigation-item-copy small {
+        flex: 0 0 auto;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 0.64rem;
+        font-weight: 800;
+        line-height: 1.35;
+    }
+
+    .web-navigation-item-copy small.integrated-stage--live {
+        background: #f0fdf4;
+        color: #15803d;
+    }
+
+    .web-navigation-item-copy small.integrated-stage--beta {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .web-navigation-item-copy small.integrated-stage--experience {
+        background: #f0f9ff;
+        color: #0369a1;
+    }
+
+    .web-navigation-item-copy small.integrated-stage--preparing {
+        background: #fefce8;
+        color: #a16207;
+    }
+
     .web-navigation-mode-switch {
         position: sticky;
         bottom: 0;
@@ -103,6 +154,12 @@
         => WebNavigationCatalog.IsCommunityRoute(Navigation.ToBaseRelativePath(Navigation.Uri));
 
     private IReadOnlyList<WebNavigationItem> CurrentItems
+        => WebNavigationCatalog.IntegratedItems
+            .Concat(ContextualItems)
+            .DistinctBy(item => item.Href, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyList<WebNavigationItem> ContextualItems
         => IsCommunityMode
             ? PersonalPreferences.Current.UseCompactPersonalMenu
                 ? WebNavigationCatalog.CommunityItems

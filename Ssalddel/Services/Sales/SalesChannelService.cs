@@ -36,11 +36,40 @@ public sealed class SalesChannelService : ISalesChannelService
                 채널종류 = x.채널종류,
                 상점명 = x.상점명,
                 연결상태 = x.연결상태,
-                마지막동기화일시 = x.마지막동기화일시
+                마지막동기화일시 = x.마지막동기화일시,
+                등록일시 = x.CreatedAt,
+                수정일시 = x.UpdatedAt
             })
             .ToArrayAsync(cancellationToken);
 
         return new 판매채널계정목록응답 { Items = items };
+    }
+
+    public async Task<판매채널계정항목응답?> GetAccountAsync(
+        long accountId,
+        CancellationToken cancellationToken)
+    {
+        var userId = RequireUserId();
+        var query = _db.판매채널계정
+            .AsNoTracking()
+            .Where(x => x.Id == accountId);
+        if (!IsServerAdmin())
+        {
+            query = query.Where(x => x.UserId == userId);
+        }
+
+        return await query
+            .Select(x => new 판매채널계정항목응답
+            {
+                Id = x.Id,
+                채널종류 = x.채널종류,
+                상점명 = x.상점명,
+                연결상태 = x.연결상태,
+                마지막동기화일시 = x.마지막동기화일시,
+                등록일시 = x.CreatedAt,
+                수정일시 = x.UpdatedAt
+            })
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<판매채널계정항목응답> CreateAccountAsync(판매채널계정저장요청 request, CancellationToken cancellationToken)
@@ -67,7 +96,9 @@ public sealed class SalesChannelService : ISalesChannelService
             채널종류 = entity.채널종류,
             상점명 = entity.상점명,
             연결상태 = entity.연결상태,
-            마지막동기화일시 = entity.마지막동기화일시
+            마지막동기화일시 = entity.마지막동기화일시,
+            등록일시 = entity.CreatedAt,
+            수정일시 = entity.UpdatedAt
         };
     }
 
@@ -419,7 +450,9 @@ public sealed class SalesChannelService : ISalesChannelService
             채널종류 = entity.채널종류,
             상점명 = entity.상점명,
             연결상태 = entity.연결상태,
-            마지막동기화일시 = entity.마지막동기화일시
+            마지막동기화일시 = entity.마지막동기화일시,
+            등록일시 = entity.CreatedAt,
+            수정일시 = entity.UpdatedAt
         };
 
     private static 판매상품항목응답 ToProductResponse(판매상품 entity)

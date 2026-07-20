@@ -1,0 +1,260 @@
+@inherits MvvmComponentBase<마트주문작성PageViewModel>
+@using Ssalddel.Contracts.Mart
+@using Ssalddel.Ui.Common.Areas.App.Models.Auth
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="mart-order-request" aria-label="알뜰살뜰 마트 주문 요청 작성">
+    @if (Access.처리중 && Access.화면상태 == 마트페이지접근상태.확인전)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="mart-order-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+            <MudText Typo="Typo.body1">알뜰살뜰 마트 기능 상태를 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (Access.화면상태 == 마트페이지접근상태.오류)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudText Typo="Typo.subtitle2">마트 주문 요청 화면을 준비하지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@ErrorMessage(Access.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="InitializeAsync" Class="mt-3">다시 확인</MudButton>
+        </MudAlert>
+    }
+    else if (Access.기능비활성)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            <MudText Typo="Typo.subtitle2">마트 주문 요청이 현재 비활성입니다.</MudText>
+            <MudText Typo="Typo.body2"><code>SsalddelMartWorkflow</code>가 활성화된 환경에서만 요청 원장을 저장합니다.</MudText>
+        </MudAlert>
+    }
+    else if (Access.사용가능)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mart-order-boundary">
+            이 페이지는 상품 한 건의 비구속 주문 요청만 플랫폼에 저장합니다. 재고 차감·예약, 결제, 주문 확정, 피킹·포장과 배송은 실행하지 않습니다.
+        </MudAlert>
+
+        @if (RequestId is null && ProductId is null)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="mart-order-state">
+                <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" Color="Color.Success" Size="Size.Large" />
+                <MudText Typo="Typo.h6">주문 요청할 상품을 먼저 선택해 주세요.</MudText>
+                <MudText Typo="Typo.body2">첫 상품이나 샘플 상품을 자동 선택하지 않습니다.</MudText>
+                <MudButton Href="@CatalogHref" Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Storefront">
+                    공개 상품 보기
+                </MudButton>
+            </MudPaper>
+        }
+        else if (ProductId is not null)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="mart-order-panel">
+                @if (Product.처리중)
+                {
+                    <div class="mart-order-state mart-order-state--compact">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+                        <MudText Typo="Typo.body2">선택한 공개 상품을 다시 확인하고 있습니다.</MudText>
+                    </div>
+                }
+                else if (Product.오류발생)
+                {
+                    <div class="mart-order-state mart-order-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">공개 상품을 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@ErrorMessage(Product.오류메시지)</MudText>
+                        @if (ProductId is long productId)
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(() => Product.조회Async(productId))">다시 시도</MudButton>
+                        }
+                    </div>
+                }
+                else if (Product.찾을수없음)
+                {
+                    <div class="mart-order-state mart-order-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">공개된 상품을 찾을 수 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">비공개·삭제된 ID를 다른 상품으로 대체하지 않습니다.</MudText>
+                        <MudButton Href="@CatalogHref" Variant="Variant.Outlined" Color="Color.Success">다른 상품 보기</MudButton>
+                    </div>
+                }
+                else if (Product.상세 is { } product)
+                {
+                    <div class="mart-order-product-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">PUBLIC PRODUCT #@product.Id</MudText>
+                            <MudText Typo="Typo.h5">@product.상품명</MudText>
+                            <MudText Typo="Typo.body2">@ValueOrDash(product.카테고리) · @ValueOrDash(product.판매단위)</MudText>
+                        </div>
+                        <MudChip T="string" Color="@(product.판매가능여부 ? Color.Success : Color.Default)" Variant="Variant.Outlined">
+                            @(product.판매가능여부 ? $"판매 가능 {product.판매가능수량:N0}" : "품절·판매 준비 중")
+                        </MudChip>
+                    </div>
+                    <div class="mart-order-product-meta">
+                        <strong>@product.판매가.ToString("N0")원</strong>
+                        <span>재고 기준 @FormatDate(product.재고기준시각Utc)</span>
+                    </div>
+                    @if (!product.판매가능여부)
+                    {
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+                            현재 판매 요청을 받을 수 없습니다. 공개 상품을 새로고침해 상태를 다시 확인해 주세요.
+                        </MudAlert>
+                    }
+                }
+            </MudPaper>
+        }
+
+        @if ((ProductId is not null || RequestId is not null) && Authentication.처리중 && !Authentication.초기화됨)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="mart-order-state">
+                <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+                <MudText Typo="Typo.body1">저장된 주문자 로그인 세션을 확인하고 있습니다.</MudText>
+            </MudPaper>
+        }
+        else if ((ProductId is not null || RequestId is not null) && !Authentication.로그인됨)
+        {
+            <div class="mart-order-login-layout">
+                <Ssalddel공통로그인Panel 제목="주문 요청 로그인"
+                                     설명="공개 상품은 회원가입 없이 볼 수 있고, 내 주문 요청 원장을 저장하거나 다시 볼 때만 로그인이 필요합니다."
+                                     상태메시지="@Authentication.오류메시지"
+                                     상태Severity="@AuthenticationSeverity"
+                                     일반로그인표시="true"
+                                     소셜로그인표시="false"
+                                     일반로그인버튼텍스트="로그인하고 계속"
+                                     IsBusy="@Authentication.처리중"
+                                     Elevation="0"
+                                     Class="mart-order-login-card"
+                                     OnPasswordLogin="LoginAsync" />
+
+                <MudPaper Elevation="0" Outlined="true" Class="mart-order-login-note">
+                    <MudIcon Icon="@Icons.Material.Filled.PrivacyTip" Color="Color.Info" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">배송 개인정보는 아직 받지 않습니다.</MudText>
+                    <MudText Typo="Typo.body2">
+                        이 단계는 계정 ID, 선택 상품, 수량과 안내 확인만 저장합니다. 수령인·전화번호·주소·결제정보는 입력하지 않습니다.
+                    </MudText>
+                    <MudButton Href="@CatalogHref" Variant="Variant.Outlined" Color="Color.Success">로그인 없이 상품 더 보기</MudButton>
+                </MudPaper>
+            </div>
+        }
+        else if ((ProductId is not null || RequestId is not null) && Authentication.로그인됨)
+        {
+            <div class="mart-order-toolbar">
+                <MudChip T="string" Variant="Variant.Outlined" Color="Color.Success" Icon="@Icons.Material.Filled.VerifiedUser">
+                    @Authentication.현재사용자표시
+                </MudChip>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@Authentication.처리중" OnClick="LogoutAsync">로그아웃</MudButton>
+            </div>
+
+            @if (RequestId is Guid)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="mart-order-panel">
+                    @if (RequestDetail.처리중)
+                    {
+                        <div class="mart-order-state mart-order-state--detail">
+                            <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+                            <MudText Typo="Typo.body2">저장된 주문 요청을 같은 ID로 다시 조회하고 있습니다.</MudText>
+                        </div>
+                    }
+                    else if (RequestDetail.오류발생)
+                    {
+                        <div class="mart-order-state mart-order-state--detail">
+                            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                            <MudText Typo="Typo.subtitle2">주문 요청을 다시 조회하지 못했습니다.</MudText>
+                            <MudText Typo="Typo.body2">@ErrorMessage(RequestDetail.오류메시지)</MudText>
+                            @if (RequestId is Guid retryId)
+                            {
+                                <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(() => RequestDetail.조회Async(retryId))">다시 시도</MudButton>
+                            }
+                        </div>
+                    }
+                    else if (RequestDetail.찾을수없음)
+                    {
+                        <div class="mart-order-state mart-order-state--detail">
+                            <MudIcon Icon="@Icons.Material.Filled.NoAccounts" Size="Size.Large" />
+                            <MudText Typo="Typo.subtitle2">이 계정의 주문 요청을 찾을 수 없습니다.</MudText>
+                            <MudText Typo="Typo.body2">없는 ID와 다른 사용자의 요청 ID는 동일하게 처리하며 다른 요청으로 대체하지 않습니다.</MudText>
+                        </div>
+                    }
+                    else if (RequestDetail.상세 is { } request)
+                    {
+                        <div class="mart-order-request-heading">
+                            <div>
+                                <MudText Typo="Typo.overline">PERSISTED REQUEST</MudText>
+                                <MudText Typo="Typo.h5">@request.상품명</MudText>
+                                <MudText Typo="Typo.caption">요청 ID @ShortId(request.주문요청Id)</MudText>
+                            </div>
+                            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">@request.상태명</MudChip>
+                        </div>
+                        <div class="mart-order-receipt">
+                            <div><span>수량</span><strong>@($"{request.수량:N0} {ValueOrDash(request.판매단위)}")</strong></div>
+                            <div><span>서버 확인 단가</span><strong>@($"{request.단가:N0}원")</strong></div>
+                            <div><span>서버 계산 합계</span><strong>@($"{request.합계:N0}원")</strong></div>
+                            <div><span>제출 시 판매 가능 수량</span><strong>@($"{request.제출시판매가능수량:N0}")</strong></div>
+                            <div><span>재고 기준</span><strong>@FormatDate(request.재고기준시각Utc)</strong></div>
+                            <div><span>제출 시각</span><strong>@FormatDate(request.제출일시Utc)</strong></div>
+                        </div>
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+                            저장 완료는 재고 예약이나 결제를 뜻하지 않습니다. 현재 응답의 재고 예약: @(request.재고예약됨 ? "예" : "아니요"), 결제: @(request.결제됨 ? "예" : "아니요").
+                        </MudAlert>
+                        <div class="mart-order-actions">
+                            <MudButton Href="@CatalogHref" Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Storefront">
+                                다른 상품 보기
+                            </MudButton>
+                        </div>
+                    }
+                </MudPaper>
+            }
+            else if (Product.상세 is { 판매가능여부: true } product)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="mart-order-panel">
+                    <MudText Typo="Typo.overline">NON-BINDING ORDER REQUEST</MudText>
+                    <MudText Typo="Typo.h6">수량과 저장 경계 확인</MudText>
+
+                    <div class="mart-order-form-grid">
+                        <MudNumericField T="int"
+                                         @bind-Value="Writer.수량"
+                                         Label="요청 수량"
+                                         Min="1"
+                                         Max="100"
+                                         Variant="Variant.Outlined"
+                                         Immediate="true"
+                                         Disabled="@Writer.처리중" />
+                        <div class="mart-order-estimate">
+                            <span>화면 예상 합계</span>
+                            <strong>@EstimatedTotal(product).ToString("N0")원</strong>
+                            <small>제출 시 서버가 공개 단가와 수량을 다시 계산합니다.</small>
+                        </div>
+                    </div>
+
+                    <div class="mart-order-notice">
+                        @foreach (var notice in 마트주문요청안내.문구)
+                        {
+                            <div><MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Color="Color.Success" Size="Size.Small" /><span>@notice</span></div>
+                        }
+                    </div>
+
+                    <MudCheckBox T="bool"
+                                 @bind-Value="Writer.비구속주문요청확인"
+                                 Color="Color.Success"
+                                 Disabled="@Writer.처리중">
+                        위 안내를 확인했으며 비구속 주문 요청으로 저장합니다.
+                    </MudCheckBox>
+
+                    @if (Writer.오류발생)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+                            @ErrorMessage(Writer.오류메시지)
+                        </MudAlert>
+                    }
+
+                    <div class="mart-order-actions">
+                        <MudButton Href="@CatalogHref" Variant="Variant.Text" Color="Color.Secondary" Disabled="@Writer.처리중">상품 다시 선택</MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.Save"
+                                   Disabled="@(!Writer.제출가능)"
+                                   OnClick="SubmitAsync">
+                            @(Writer.처리중 ? "서버 확인 중" : "주문 요청 저장")
+                        </MudButton>
+                    </div>
+                </MudPaper>
+            }
+        }
+    }
+</section>

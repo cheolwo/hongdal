@@ -1,4 +1,5 @@
 using FluentResults;
+using Microsoft.AspNetCore.Http;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.Sales;
 using 살뜰.Services.Audit;
@@ -9,6 +10,7 @@ namespace Ssalddel.Application.Sales;
 public interface I판매채널UseCase
 {
     Task<Result<판매채널계정목록응답>> 계정목록Async(CancellationToken cancellationToken);
+    Task<Result<판매채널계정항목응답>> 계정상세Async(long accountId, CancellationToken cancellationToken);
     Task<Result<판매채널계정항목응답>> 계정생성Async(판매채널계정저장요청 request, 판매채널요청Context context, CancellationToken cancellationToken);
     Task<Result<판매채널계정항목응답>> 계정수정Async(long accountId, 판매채널계정저장요청 request, 판매채널요청Context context, CancellationToken cancellationToken);
     Task<Result> 계정삭제Async(long accountId, 판매채널요청Context context, CancellationToken cancellationToken);
@@ -52,6 +54,21 @@ public sealed class 판매채널UseCase : I판매채널UseCase
 
     public async Task<Result<판매채널계정목록응답>> 계정목록Async(CancellationToken cancellationToken)
         => await _salesChannelService.GetAccountsAsync(cancellationToken);
+
+    public async Task<Result<판매채널계정항목응답>> 계정상세Async(
+        long accountId,
+        CancellationToken cancellationToken)
+    {
+        if (accountId <= 0)
+        {
+            return Result.Fail<판매채널계정항목응답>("조회할 판매채널 계정 ID를 확인해 주세요.");
+        }
+
+        var account = await _salesChannelService.GetAccountAsync(accountId, cancellationToken);
+        return account is null
+            ? NotFound<판매채널계정항목응답>("판매채널 계정을 찾을 수 없습니다.")
+            : Result.Ok(account);
+    }
 
     public async Task<Result<판매채널계정항목응답>> 계정생성Async(
         판매채널계정저장요청 request,
@@ -186,6 +203,10 @@ public sealed class 판매채널UseCase : I판매채널UseCase
             MetadataJson = metadataJson
         }, cancellationToken);
     }
+
+    private static Result<T> NotFound<T>(string message)
+        => Result.Fail<T>(new Error(message)
+            .WithMetadata("StatusCode", StatusCodes.Status404NotFound));
 }
 
 public sealed record 판매채널요청Context(

@@ -1,0 +1,324 @@
+@inherits MvvmComponentBase<판매채널주문PageViewModel>
+@using Ssalddel.Contracts.Common.Sales
+@using Ssalddel.Contracts.Common.Warehouse
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="sales-order-workspace" aria-label="판매채널 주문 출고 후보">
+    @if (Access.처리중 && Access.화면상태 == 판매채널페이지접근상태.확인전)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="sales-order-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">판매채널 기능과 주문 원장 접근 권한을 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (Access.화면상태 == 판매채널페이지접근상태.오류)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="sales-order-access-alert">
+            <MudText Typo="Typo.subtitle2">주문 출고 후보 화면을 준비하지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@AccessErrorMessage(Access.오류, Access.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="RetryAccessAsync" Class="mt-3">다시 확인</MudButton>
+        </MudAlert>
+    }
+    else if (Access.기능비활성)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="sales-order-access-alert">
+            <MudText Typo="Typo.subtitle2">판매채널 출고 기능이 현재 비활성입니다.</MudText>
+            <MudText Typo="Typo.body2">
+                <code>SalesChannelFulfillmentWorkflow</code>가 비활성인 동안에는 주문 출고 원장을 조회하지 않습니다.
+            </MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/shipper" Class="mt-2">화주 홈으로</MudButton>
+        </MudAlert>
+    }
+    else if (Access.로그인필요)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="sales-order-access-alert">
+            <MudText Typo="Typo.subtitle2">판매채널 주문 출고 후보는 화주·판매자 로그인이 필요합니다.</MudText>
+            <MudText Typo="Typo.body2">로그인하지 않아도 공개 커뮤니티의 익명 글과 댓글은 계속 이용할 수 있습니다.</MudText>
+            <MudStack Row="true" Spacing="1" Class="mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" Href="/login">로그인</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Default" Href="/community">공개 커뮤니티 보기</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (Access.역할없음)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="sales-order-access-alert">
+            <MudText Typo="Typo.subtitle2">화주 또는 판매자 역할이 필요한 화면입니다.</MudText>
+            <MudText Typo="Typo.body2">현재 로그인은 유지되지만 다른 사용자의 주문 출고 원장은 조회하지 않습니다.</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/community" Class="mt-2">공개 커뮤니티 보기</MudButton>
+        </MudAlert>
+    }
+    else if (Access.사용가능)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="sales-order-boundary">
+            이 화면은 외부 채널 주문 중 <strong>재고 예약과 출고예정 저장까지 성공한 후보</strong>만 읽습니다. 새로고침은 외부 주문 수집·상품 발행·피킹·포장·운송 인계를 실행하지 않습니다.
+        </MudAlert>
+
+        <div class="sales-order-toolbar">
+            <div>
+                <MudText Typo="Typo.overline">PERSISTED OUTBOUND CANDIDATES</MudText>
+                <MudText Typo="Typo.h6">내 주문 출고 후보</MudText>
+                <MudText Typo="Typo.body2">로그인한 판매자의 출고 원장을 주문참조번호별로 묶어 표시합니다.</MudText>
+            </div>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="@List.처리중"
+                       OnClick="ReloadListAsync">
+                새로고침
+            </MudButton>
+        </div>
+
+        <div class="sales-order-metrics" aria-label="현재 조회 요약">
+            <MudPaper Elevation="0" Outlined="true"><strong>@List.전체건수.ToString("N0")</strong><span>검색된 주문 후보</span></MudPaper>
+            <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageLineCount.ToString("N0")</strong><span>현재 페이지 출고 라인</span></MudPaper>
+            <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageWarehouseCount.ToString("N0")</strong><span>현재 페이지 창고 연결</span></MudPaper>
+            <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageTransportCount.ToString("N0")</strong><span>운송 인계 표시</span></MudPaper>
+        </div>
+
+        <div class="sales-order-layout">
+            <MudPaper Elevation="0" Outlined="true" Class="sales-order-panel sales-order-list-panel">
+                <div class="sales-order-filters">
+                    <MudTextField T="string"
+                                  @bind-Value="List.검색어"
+                                  Label="주문번호·상품·SKU"
+                                  Placeholder="예: N-240710, 냉장 세트"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                    <MudSelect T="string"
+                               @bind-Value="List.국내외구분"
+                               Label="국내·해외"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        <MudSelectItem T="string" Value="@CommerceChannelOrderSyncScopes.Domestic">국내 채널</MudSelectItem>
+                        <MudSelectItem T="string" Value="@CommerceChannelOrderSyncScopes.Overseas">해외 채널</MudSelectItem>
+                    </MudSelect>
+                    <MudSelect T="string"
+                               @bind-Value="List.출고상태"
+                               Label="출고 상태"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        <MudSelectItem T="string" Value="@출고상태코드.예정">출고예정</MudSelectItem>
+                        <MudSelectItem T="string" Value="@출고상태코드.준비중">출고준비중</MudSelectItem>
+                        <MudSelectItem T="string" Value="@출고상태코드.완료">출고완료</MudSelectItem>
+                        <MudSelectItem T="string" Value="@출고상태코드.취소">출고취소</MudSelectItem>
+                    </MudSelect>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@List.처리중" OnClick="SearchAsync">조회</MudButton>
+                </div>
+
+                @if (List.처리중)
+                {
+                    <div class="sales-order-state sales-order-state--compact">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2">영속된 주문 출고 후보를 불러오고 있습니다.</MudText>
+                    </div>
+                }
+                else if (List.오류발생)
+                {
+                    <div class="sales-order-state sales-order-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" />
+                        <MudText Typo="Typo.subtitle2">주문 출고 후보를 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@AccessErrorMessage(List.오류, List.오류메시지)</MudText>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadListAsync">다시 시도</MudButton>
+                    </div>
+                }
+                else if (List.원장없음)
+                {
+                    <div class="sales-order-state sales-order-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.subtitle2">저장된 주문 출고 후보가 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">연결 준비 계정만으로 외부 주문을 수집하지 않습니다. 출고 후보가 영속된 뒤 여기에 표시됩니다.</MudText>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/shipper/sales/channels">채널 연결 준비 확인</MudButton>
+                    </div>
+                }
+                else if (List.검색결과없음)
+                {
+                    <div class="sales-order-state sales-order-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">검색 조건에 맞는 출고 후보가 없습니다.</MudText>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ClearFiltersAsync">필터 지우기</MudButton>
+                    </div>
+                }
+                else if (List.초기화됨)
+                {
+                    <MudText Typo="Typo.caption" Class="sales-order-count">@($"전체 {List.전체건수:N0}건 · {List.현재페이지}/{List.총페이지수}페이지")</MudText>
+                    <MudTable T="판매채널주문요약응답"
+                              Items="@List.주문목록"
+                              Dense="true"
+                              Hover="true"
+                              Breakpoint="Breakpoint.Sm"
+                              Class="sales-order-table">
+                        <HeaderContent>
+                            <MudTh>채널·주문</MudTh>
+                            <MudTh>상품·수량</MudTh>
+                            <MudTh>출고 창고</MudTh>
+                            <MudTh>상태</MudTh>
+                            <MudTh>최근 변경</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="채널·주문">
+                                <strong>@ChannelName(context.채널종류)</strong>
+                                <span>@context.채널주문번호</span>
+                            </MudTd>
+                            <MudTd DataLabel="상품·수량">
+                                <strong>@context.대표상품명</strong>
+                                <span>@($"{context.출고라인수:N0}개 라인 · 총 {context.총수량:N0}개")</span>
+                            </MudTd>
+                            <MudTd DataLabel="출고 창고">@context.출고창고표시</MudTd>
+                            <MudTd DataLabel="상태">
+                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.출고상태)" Variant="Variant.Outlined">@context.출고상태</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="최근 변경">@DateTimeLabel(context.수정일시)</MudTd>
+                            <MudTd>
+                                <MudButton Size="Size.Small"
+                                           Variant="@(Detail.요청OrderId == context.OrderId ? Variant.Filled : Variant.Outlined)"
+                                           Color="Color.Primary"
+                                           OnClick="@(() => SelectOrderAsync(context.OrderId))">
+                                    상세
+                                </MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+
+                    @if (List.총페이지수 > 1)
+                    {
+                        <div class="sales-order-pagination">
+                            <MudPagination Count="@List.총페이지수"
+                                           Selected="@List.현재페이지"
+                                           SelectedChanged="ChangePageAsync"
+                                           Disabled="@List.처리중"
+                                           ShowFirstButton="true"
+                                           ShowLastButton="true" />
+                        </div>
+                    }
+                }
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="sales-order-panel sales-order-detail-panel">
+                @if (Detail.처리중)
+                {
+                    <div class="sales-order-state sales-order-state--detail">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.body1">선택한 주문의 출고 후보 라인을 불러오고 있습니다.</MudText>
+                    </div>
+                }
+                else if (Detail.오류발생)
+                {
+                    <div class="sales-order-state sales-order-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" />
+                        <MudText Typo="Typo.h6">주문 상세를 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@AccessErrorMessage(Detail.오류, Detail.오류메시지)</MudText>
+                        @if (Detail.요청OrderId is long retryId)
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectOrderAsync(retryId, false))">다시 시도</MudButton>
+                        }
+                    </div>
+                }
+                else if (Detail.찾을수없음)
+                {
+                    <div class="sales-order-state sales-order-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">주문 출고 후보를 찾을 수 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">주소의 orderId를 확인하세요. 다른 판매자의 ID도 찾을 수 없음으로 처리합니다.</MudText>
+                    </div>
+                }
+                else if (Detail.상세 is null)
+                {
+                    <div class="sales-order-state sales-order-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.LocalShipping" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.h6">주문을 선택해 출고 후보를 확인하세요.</MudText>
+                        <MudText Typo="Typo.body2">선택 전에는 첫 주문이나 샘플 주문을 대신 표시하지 않습니다.</MudText>
+                    </div>
+                }
+                else
+                {
+                    var detail = Detail.상세;
+                    var order = detail.주문;
+
+                    <div class="sales-order-detail-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">ORDER #@order.OrderId · @ScopeName(order.국내외구분)</MudText>
+                            <MudText Typo="Typo.h5">@order.채널주문번호</MudText>
+                            <MudText Typo="Typo.subtitle1">@ChannelName(order.채널종류)</MudText>
+                        </div>
+                        <MudChip T="string" Color="@StatusColor(order.출고상태)" Variant="Variant.Filled">@order.출고상태</MudChip>
+                    </div>
+
+                    <div class="sales-order-detail-metrics">
+                        <div><strong>@order.출고라인수.ToString("N0")</strong><span>출고 라인</span></div>
+                        <div><strong>@order.총수량.ToString("N0")</strong><span>예약 수량</span></div>
+                        <div><strong>@order.출고창고수.ToString("N0")</strong><span>출고 창고</span></div>
+                        <div><strong>@(order.운송인계여부 ? "있음" : "없음")</strong><span>운송 인계 표시</span></div>
+                    </div>
+
+                    <section class="sales-order-section">
+                        <div class="sales-order-section-title">
+                            <MudIcon Icon="@Icons.Material.Filled.Inventory" Color="Color.Primary" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">영속 출고 후보 라인</MudText>
+                                <MudText Typo="Typo.caption">수령인·구매자 식별 정보와 창고 전체 주소는 이 화면에 반환하지 않습니다.</MudText>
+                            </div>
+                        </div>
+                        <div class="sales-order-line-list">
+                            @foreach (var line in detail.출고라인목록)
+                            {
+                                <article class="sales-order-line-card">
+                                    <div class="sales-order-line-heading">
+                                        <div>
+                                            <MudText Typo="Typo.subtitle2">@line.상품명</MudText>
+                                            <MudText Typo="Typo.caption">@($"SKU {ValueOrDash(line.SKU)} · 출고 라인 #{line.Id}")</MudText>
+                                        </div>
+                                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(line.상태)" Variant="Variant.Outlined">@line.상태</MudChip>
+                                    </div>
+                                    <dl>
+                                        <div><dt>수량</dt><dd>@line.수량.ToString("N0")개</dd></div>
+                                        <div><dt>창고</dt><dd>@WarehouseName(line)</dd></div>
+                                        <div><dt>출고 묶음</dt><dd>@NullableIdLabel(line.출고묶음Id)</dd></div>
+                                        <div><dt>운송 의뢰</dt><dd>@ValueOrDash(line.운송의뢰Id)</dd></div>
+                                    </dl>
+                                </article>
+                            }
+                        </div>
+                    </section>
+
+                    <section class="sales-order-section sales-order-source">
+                        <div class="sales-order-section-title">
+                            <MudIcon Icon="@Icons.Material.Filled.Source" Color="Color.Info" />
+                            <div>
+                                <MudText Typo="Typo.subtitle1">원장 근거와 기준 시각</MudText>
+                                <MudText Typo="Typo.caption">외부 주문 원본이 아니라 RDB 출고예정 투영을 기준으로 합니다.</MudText>
+                            </div>
+                        </div>
+                        <dl class="sales-order-source-grid">
+                            <div><dt>주문 참조</dt><dd>@order.주문참조번호</dd></div>
+                            <div><dt>최초 투영</dt><dd>@DateTimeLabel(order.생성일시)</dd></div>
+                            <div><dt>최근 변경</dt><dd>@DateTimeLabel(order.수정일시)</dd></div>
+                            <div><dt>재고 경계</dt><dd>예약 성공 후보만 표시</dd></div>
+                        </dl>
+                    </section>
+
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="sales-order-decision-boundary">
+                        매핑 실패, 재고 부족, 외부 수집 실패 주문은 아직 별도의 영속 주문 원장이 없어 이 목록에 나타나지 않습니다. 이 화면의 “없음”을 외부 채널 주문 없음으로 해석하지 마세요.
+                    </MudAlert>
+
+                    <div class="sales-order-next-actions">
+                        <div>
+                            <MudText Typo="Typo.subtitle2">관련 판매 준비 확인</MudText>
+                            <MudText Typo="Typo.body2">아래 이동은 조회 화면만 열며 피킹·포장·운송 상태를 자동 변경하지 않습니다.</MudText>
+                        </div>
+                        <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/shipper/sales/channels">채널 계정</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/shipper/sales/listings">상품·출품 준비</MudButton>
+                        </MudStack>
+                    </div>
+                }
+            </MudPaper>
+        </div>
+    }
+</section>

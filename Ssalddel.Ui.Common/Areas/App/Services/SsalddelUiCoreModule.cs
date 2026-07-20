@@ -15,7 +15,9 @@ internal static class SsalddelUiCoreModule
         services.TryAddScoped<ISsalddel현재사용자Context, SsalddelAccessToken현재사용자Context>();
         services.TryAddScoped<SsalddelProtectedApiClient>();
         services.TryAddScoped<ISsalddelJsonApiClient, SsalddelJsonApiClient>();
+        services.TryAddScoped<I주문자앱인증Service, 미구성주문자앱인증Service>();
         services.TryAddTransient<공통Controller기능모음ViewModel>();
+        services.TryAddTransient<주문자앱인증ViewModel>();
 
         return services;
     }

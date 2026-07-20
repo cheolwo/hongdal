@@ -26,6 +26,7 @@ builder.Services.AddTransient<화주Controller기능모음ViewModel>();
 builder.Services.AddSsalddelDocumentOutputServices();
 builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
 builder.Services.AddScoped<WebAuthSessionService>();
+builder.Services.AddScoped<I주문자앱인증Service, WebOrdererAuthenticationService>();
 builder.Services.AddScoped<CommunityPersonalPreferenceService>();
 builder.Services.AddScoped<IDiagramCollaborationClientService, DiagramCollaborationClientService>();
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
@@ -36,6 +37,7 @@ builder.Services.AddScoped<IWarehouseWorkEntryGateService, SampleWarehouseWorkEn
 builder.Services.AddScoped<IInboundReceivingWorkflowService, SampleInboundReceivingWorkflowService>();
 builder.Services.AddScoped<IWarehousePickingBatchWorkspaceService, SampleWarehousePickingBatchWorkspaceService>();
 builder.Services.AddScoped<운송의뢰자동저장Service>();
+builder.Services.AddScoped<커뮤니티화물글초안가져오기Service>();
 builder.Services.AddScoped<화주운송의뢰등록Service>();
 builder.Services.AddScoped<화주결제정산Service>();
 builder.Services.AddScoped<기사내정보Service>();

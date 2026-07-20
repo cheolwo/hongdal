@@ -273,9 +273,12 @@ public sealed class 화주결제정산Service
         }
 
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
-            ? $"{actionName} 실패: HTTP {(int)response.StatusCode}"
-            : $"{actionName} 실패: HTTP {(int)response.StatusCode}: {body}");
+        throw new HttpRequestException(
+            string.IsNullOrWhiteSpace(body)
+                ? $"{actionName} 실패: HTTP {(int)response.StatusCode}"
+                : $"{actionName} 실패: HTTP {(int)response.StatusCode}: {body}",
+            inner: null,
+            response.StatusCode);
     }
 
     private void Observe(화주운송의뢰응답 item, string source)

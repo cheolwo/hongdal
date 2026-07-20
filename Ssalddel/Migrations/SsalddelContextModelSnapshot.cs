@@ -22,87 +22,136 @@ namespace Ssalddel.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityBoardRequest", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext");
 
-                    b.Property<string>("AppKey")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
-                    b.Property<DateTime?>("ApprovedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("BoardKey")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("OperatorMemo")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<DateTime?>("RejectedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("RequestReason")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<string>("RequestedBy")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
-
-                    b.Property<string>("RequestedByUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)");
-
-                    b.Property<string>("ReviewedByUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("varchar(60)");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)");
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppKey", "BoardKey", "IsDeleted");
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
 
-                    b.HasIndex("AppKey", "Status", "IsDeleted", "UpdatedAtUtc");
+                    b.ToTable("AspNetRoles", (string)null);
+                });
 
-                    b.HasIndex("RequestedByUserId", "Status", "IsDeleted", "CreatedAtUtc")
-                        .HasDatabaseName("IX_community_board_requests_requester_status");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.ToTable("platform_community_board_requests", (string)null);
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotification", b =>
@@ -312,7 +361,7 @@ namespace Ssalddel.Migrations
                     b.ToTable("community_keyword_subscriptions", (string)null);
                 });
 
-            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostKeywordScan", b =>
+            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityBoardRequest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -320,56 +369,79 @@ namespace Ssalddel.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("int")
-                        .HasColumnName("attempt_count");
+                    b.Property<string>("AppKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
 
-                    b.Property<DateTime?>("CompletedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("completed_at_utc");
+                    b.Property<DateTime?>("ApprovedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("BoardKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<string>("LastError")
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)")
-                        .HasColumnName("last_error");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
-                    b.Property<DateTime?>("NextAttemptAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("next_attempt_at_utc");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
-                    b.Property<long>("PostId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("post_id");
+                    b.Property<string>("OperatorMemo")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
-                    b.Property<string>("ProcessingToken")
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar(32)")
-                        .HasColumnName("processing_token");
+                    b.Property<DateTime?>("RejectedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("RequestReason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("RequestedBy")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("RequestedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
+
+                    b.Property<string>("ReviewedByUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("status");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
 
                     b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId")
-                        .IsUnique()
-                        .HasDatabaseName("UX_community_keyword_scan_post");
+                    b.HasIndex("AppKey", "BoardKey", "IsDeleted");
 
-                    b.HasIndex("Status", "NextAttemptAtUtc")
-                        .HasDatabaseName("IX_community_keyword_scan_due");
+                    b.HasIndex("AppKey", "Status", "IsDeleted", "UpdatedAtUtc");
 
-                    b.ToTable("platform_community_post_keyword_scans", (string)null);
+                    b.HasIndex("RequestedByUserId", "Status", "IsDeleted", "CreatedAtUtc")
+                        .HasDatabaseName("IX_community_board_requests_requester_status");
+
+                    b.ToTable("platform_community_board_requests", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPost", b =>
@@ -385,10 +457,6 @@ namespace Ssalddel.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("varchar(80)");
 
-                    b.Property<string>("AuthorUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)");
-
                     b.Property<string>("AuthorDisplayCountryCode")
                         .HasMaxLength(2)
                         .HasColumnType("varchar(2)");
@@ -396,6 +464,10 @@ namespace Ssalddel.Migrations
                     b.Property<string>("AuthorDisplayCountryName")
                         .HasMaxLength(80)
                         .HasColumnType("varchar(80)");
+
+                    b.Property<string>("AuthorUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
 
                     b.Property<string>("Body")
                         .IsRequired()
@@ -427,13 +499,13 @@ namespace Ssalddel.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<bool>("IsAuthorDisplayCountryPublic")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsCommunityMomentumPromoted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsOperatorPinned")
@@ -504,12 +576,12 @@ namespace Ssalddel.Migrations
                     b.Property<string>("SalesOfferJson")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime?>("ScheduledPublishAtUtc")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("SharedLinkUrl")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
-
-                    b.Property<DateTime?>("ScheduledPublishAtUtc")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -893,6 +965,66 @@ namespace Ssalddel.Migrations
                     b.ToTable("platform_community_post_comments", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostKeywordScan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("completed_at_utc");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTime?>("NextAttemptAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("next_attempt_at_utc");
+
+                    b.Property<long>("PostId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("post_id");
+
+                    b.Property<string>("ProcessingToken")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("processing_token");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_community_keyword_scan_post");
+
+                    b.HasIndex("Status", "NextAttemptAtUtc")
+                        .HasDatabaseName("IX_community_keyword_scan_due");
+
+                    b.ToTable("platform_community_post_keyword_scans", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostRecommendation", b =>
                 {
                     b.Property<long>("Id")
@@ -1175,8 +1307,8 @@ namespace Ssalddel.Migrations
                         .HasDatabaseName("IX_hh_cards_download_status");
 
                     b.HasIndex("SourceKey")
-                        .HasDatabaseName("IX_hh_cards_source_key")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("IX_hh_cards_source_key");
 
                     b.HasIndex("IsActive", "LastSeenAtUtc")
                         .HasDatabaseName("IX_hh_cards_active_last_seen");
@@ -1185,6 +1317,95 @@ namespace Ssalddel.Migrations
                         .HasDatabaseName("IX_hh_cards_community_publication");
 
                     b.ToTable("hongik_hakdang_cards", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollection", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsAdminEnabled")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_admin_enabled");
+
+                    b.Property<DateTime>("LastSeenAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_seen_at_utc");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("sort_order");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("source_key");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceKey")
+                        .IsUnique()
+                        .HasDatabaseName("IX_hh_card_collections_source_key");
+
+                    b.HasIndex("IsActive", "SortOrder")
+                        .HasDatabaseName("IX_hh_card_collections_active_order");
+
+                    b.ToTable("hongik_hakdang_card_collections", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollectionItem", b =>
+                {
+                    b.Property<long>("CollectionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("collection_id");
+
+                    b.Property<long>("CardId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("card_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTime>("LastSeenAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_seen_at_utc");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("sort_order");
+
+                    b.HasKey("CollectionId", "CardId");
+
+                    b.HasIndex("CardId", "IsActive")
+                        .HasDatabaseName("IX_hh_card_items_card_active");
+
+                    b.HasIndex("CollectionId", "IsActive", "SortOrder")
+                        .HasDatabaseName("IX_hh_card_items_collection_active_order");
+
+                    b.ToTable("hongik_hakdang_card_collection_items", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardDeliveryOutbox", b =>
@@ -1410,13 +1631,13 @@ namespace Ssalddel.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("card_id");
 
-                    b.Property<DateOnly>("SelectionDate")
-                        .HasColumnType("date")
-                        .HasColumnName("selection_date");
-
                     b.Property<DateTime>("SelectedAtUtc")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("selected_at_utc");
+
+                    b.Property<DateOnly>("SelectionDate")
+                        .HasColumnType("date")
+                        .HasColumnName("selection_date");
 
                     b.Property<string>("TimeZoneId")
                         .IsRequired()
@@ -1436,225 +1657,6 @@ namespace Ssalddel.Migrations
                     b.ToTable("hongik_hakdang_daily_card_selections", (string)null);
                 });
 
-            modelBuilder.Entity("Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AppKey")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("app_key");
-
-                    b.Property<string>("AppVersion")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("app_version");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<string>("DeviceModel")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("device_model");
-
-                    b.Property<string>("InstallationId")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("installation_id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<string>("Platform")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("platform");
-
-                    b.Property<string>("PushToken")
-                        .IsRequired()
-                        .HasMaxLength(4096)
-                        .HasColumnType("varchar(4096)")
-                        .HasColumnName("push_token");
-
-                    b.Property<string>("PushTokenHash")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("push_token_hash");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PushTokenHash")
-                        .HasDatabaseName("IX_mobile_push_token_hash");
-
-                    b.HasIndex("UserId", "IsActive")
-                        .HasDatabaseName("IX_mobile_push_user_active");
-
-                    b.HasIndex("AppKey", "InstallationId")
-                        .IsUnique()
-                        .HasDatabaseName("UX_mobile_push_app_installation");
-
-                    b.ToTable("ssalddel_mobile_push_installations", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollection", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<bool>("IsAdminEnabled")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_admin_enabled");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("name");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("sort_order");
-
-                    b.Property<string>("SourceKey")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("source_key");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SourceKey")
-                        .HasDatabaseName("IX_hh_card_collections_source_key")
-                        .IsUnique();
-
-                    b.HasIndex("IsActive", "SortOrder")
-                        .HasDatabaseName("IX_hh_card_collections_active_order");
-
-                    b.ToTable("hongik_hakdang_card_collections", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardDeliveryOutbox", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_card_outbox_cards")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation", "Installation")
-                        .WithMany()
-                        .HasForeignKey("InstallationId")
-                        .HasConstraintName("FK_hh_card_outbox_installations")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-
-                    b.Navigation("Installation");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardImageVariant", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany("ImageVariants")
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_card_variants_cards")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangDailyCardSelection", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_daily_cards_cards")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollectionItem", b =>
-                {
-                    b.Property<long>("CollectionId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("collection_id");
-
-                    b.Property<long>("CardId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("card_id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastSeenAtUtc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("last_seen_at_utc");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasColumnName("sort_order");
-
-                    b.HasKey("CollectionId", "CardId");
-
-                    b.HasIndex("CardId", "IsActive")
-                        .HasDatabaseName("IX_hh_card_items_card_active");
-
-                    b.HasIndex("CollectionId", "IsActive", "SortOrder")
-                        .HasDatabaseName("IX_hh_card_items_collection_active_order");
-
-                    b.ToTable("hongik_hakdang_card_collection_items", (string)null);
-                });
-
             modelBuilder.Entity("Ssalddel.Domain.Content.YouTube감시채널", b =>
                 {
                     b.Property<long>("Id")
@@ -1669,16 +1671,31 @@ namespace Ssalddel.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("channel_id");
 
+                    b.Property<string>("Handle")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("channel_handle");
+
                     b.Property<string>("UploadsPlaylistId")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("uploads_playlist_id");
 
-                    b.Property<string>("Handle")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("channel_handle");
+                    b.Property<string>("공식출처Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("official_source_url");
+
+                    b.Property<string>("관점표시")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("perspective_label");
+
+                    b.Property<int>("구매발견점수")
+                        .HasColumnType("int")
+                        .HasColumnName("purchase_discovery_score");
 
                     b.Property<string>("국가코드")
                         .IsRequired()
@@ -1691,10 +1708,6 @@ namespace Ssalddel.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("varchar(10)")
                         .HasColumnName("default_language_code");
-
-                    b.Property<int>("구매발견점수")
-                        .HasColumnType("int")
-                        .HasColumnName("purchase_discovery_score");
 
                     b.Property<DateTime?>("마지막동기화일시Utc")
                         .HasColumnType("datetime(6)")
@@ -1709,17 +1722,21 @@ namespace Ssalddel.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("latest_video_published_at_utc");
 
+                    b.Property<bool>("반야게시허용여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_prajna_publication_allowed");
+
                     b.Property<DateTime>("생성일시Utc")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at_utc");
 
-                    b.Property<DateTime>("수정일시Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
                     b.Property<int>("수입발견점수")
                         .HasColumnType("int")
                         .HasColumnName("import_discovery_score");
+
+                    b.Property<DateTime>("수정일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
 
                     b.Property<string>("썸네일Url")
                         .HasMaxLength(1000)
@@ -1736,39 +1753,14 @@ namespace Ssalddel.Migrations
                         .HasColumnType("varchar(300)")
                         .HasColumnName("food_category_codes");
 
-                    b.Property<string>("조사근거Url")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("research_source_url");
-
-                    b.Property<string>("공식출처Url")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("official_source_url");
-
-                    b.Property<string>("관점표시")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("perspective_label");
-
                     b.Property<DateTime?>("자료확인일시Utc")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("source_verified_at_utc");
 
-                    b.Property<bool>("지식성찰채널여부")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_knowledge_reflection_channel");
-
-                    b.Property<string>("지식성찰분류")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("knowledge_reflection_category_codes");
-
-                    b.Property<bool>("반야게시허용여부")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_prajna_publication_allowed");
+                    b.Property<string>("조사근거Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("research_source_url");
 
                     b.Property<string>("조사메모")
                         .HasMaxLength(1000)
@@ -1778,6 +1770,16 @@ namespace Ssalddel.Migrations
                     b.Property<DateTime?>("조사확인일시Utc")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("research_verified_at_utc");
+
+                    b.Property<string>("지식성찰분류")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("knowledge_reflection_category_codes");
+
+                    b.Property<bool>("지식성찰채널여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_knowledge_reflection_channel");
 
                     b.Property<string>("채널명")
                         .IsRequired()
@@ -1798,6 +1800,8 @@ namespace Ssalddel.Migrations
                     b.HasIndex("ChannelId")
                         .IsUnique();
 
+                    b.HasIndex("활성화여부", "마지막동기화일시Utc");
+
                     b.HasIndex("국가코드", "활성화여부", "마지막동기화일시Utc")
                         .HasDatabaseName("IX_youtube_watched_channels_country_active_sync");
 
@@ -1806,30 +1810,141 @@ namespace Ssalddel.Migrations
                     b.HasIndex("지식성찰채널여부", "반야게시허용여부", "활성화여부")
                         .HasDatabaseName("IX_youtube_watched_channels_knowledge_prajna_active");
 
-                    b.HasIndex("활성화여부", "마지막동기화일시Utc");
-
                     b.ToTable("youtube_watched_channels", (string)null);
                 });
 
-            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollectionItem", b =>
+            modelBuilder.Entity("Ssalddel.Domain.Content.YouTube영상상품후보", b =>
                 {
-                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
-                        .WithMany("Collections")
-                        .HasForeignKey("CardId")
-                        .HasConstraintName("FK_hh_card_items_cards")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
 
-                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCardCollection", "Collection")
-                        .WithMany("Items")
-                        .HasForeignKey("CollectionId")
-                        .HasConstraintName("FK_hh_card_items_collections")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
-                    b.Navigation("Card");
+                    b.Property<string>("HS코드후보")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("hs_code_candidate");
 
-                    b.Navigation("Collection");
+                    b.Property<long>("YouTube채널영상Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("youtube_channel_video_id");
+
+                    b.Property<string>("검수메모")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("review_note");
+
+                    b.Property<string>("검수상태")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("review_status");
+
+                    b.Property<DateTime?>("검수일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("reviewed_at_utc");
+
+                    b.Property<string>("검수자UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("reviewer_user_id");
+
+                    b.Property<string>("공식구매Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("official_purchase_url");
+
+                    b.Property<string>("물류방식")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("logistics_mode");
+
+                    b.Property<string>("발견근거")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("discovery_evidence");
+
+                    b.Property<string>("브랜드명")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("brand_name");
+
+                    b.Property<string>("상품명")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("product_name");
+
+                    b.Property<string>("상품키")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("product_key");
+
+                    b.Property<DateTime>("생성일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("수정일시Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<decimal>("신뢰도")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)")
+                        .HasColumnName("confidence");
+
+                    b.Property<int?>("영상구간초")
+                        .HasColumnType("int")
+                        .HasColumnName("video_timestamp_seconds");
+
+                    b.Property<string>("온도코드")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("temperature_code");
+
+                    b.Property<string>("원산지국가코드")
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)")
+                        .HasColumnName("origin_country_code");
+
+                    b.Property<string>("추출방식")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("extraction_method");
+
+                    b.Property<string>("허용의향유형")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("allowed_intent_types");
+
+                    b.Property<string>("협찬표시상태")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("sponsorship_disclosure_status");
+
+                    b.Property<string>("후보유형")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("candidate_type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("YouTube채널영상Id", "상품키")
+                        .IsUnique();
+
+                    b.HasIndex("검수상태", "수정일시Utc");
+
+                    b.HasIndex("후보유형", "검수상태");
+
+                    b.ToTable("youtube_video_product_candidates", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Content.YouTube채널영상", b =>
@@ -1902,140 +2017,6 @@ namespace Ssalddel.Migrations
                     b.HasIndex("신규업로드여부", "공유상태", "최초감지일시Utc");
 
                     b.ToTable("youtube_channel_videos", (string)null);
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Content.YouTube영상상품후보", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("YouTube채널영상Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("youtube_channel_video_id");
-
-                    b.Property<string>("HS코드후보")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("hs_code_candidate");
-
-                    b.Property<string>("검수메모")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("review_note");
-
-                    b.Property<string>("검수상태")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("review_status");
-
-                    b.Property<DateTime?>("검수일시Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("reviewed_at_utc");
-
-                    b.Property<string>("검수자UserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("reviewer_user_id");
-
-                    b.Property<string>("공식구매Url")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("official_purchase_url");
-
-                    b.Property<string>("물류방식")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("logistics_mode");
-
-                    b.Property<string>("발견근거")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("discovery_evidence");
-
-                    b.Property<string>("브랜드명")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("brand_name");
-
-                    b.Property<DateTime>("생성일시Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at_utc");
-
-                    b.Property<DateTime>("수정일시Utc")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at_utc");
-
-                    b.Property<decimal>("신뢰도")
-                        .HasPrecision(5, 4)
-                        .HasColumnType("decimal(5,4)")
-                        .HasColumnName("confidence");
-
-                    b.Property<string>("상품명")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("product_name");
-
-                    b.Property<string>("상품키")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("product_key");
-
-                    b.Property<string>("온도코드")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("temperature_code");
-
-                    b.Property<string>("원산지국가코드")
-                        .HasMaxLength(2)
-                        .HasColumnType("varchar(2)")
-                        .HasColumnName("origin_country_code");
-
-                    b.Property<int?>("영상구간초")
-                        .HasColumnType("int")
-                        .HasColumnName("video_timestamp_seconds");
-
-                    b.Property<string>("추출방식")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("extraction_method");
-
-                    b.Property<string>("허용의향유형")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("allowed_intent_types");
-
-                    b.Property<string>("협찬표시상태")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("sponsorship_disclosure_status");
-
-                    b.Property<string>("후보유형")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("candidate_type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("검수상태", "수정일시Utc");
-
-                    b.HasIndex("후보유형", "검수상태");
-
-                    b.HasIndex("YouTube채널영상Id", "상품키")
-                        .IsUnique();
-
-                    b.ToTable("youtube_video_product_candidates", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Education.교육과정", b =>
@@ -2869,6 +2850,113 @@ namespace Ssalddel.Migrations
                     b.ToTable("hs_code_platform_agency_experiences", (string)null);
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.HumanResources.HrRoleApplicationRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ActiveApplicationKey")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("active_application_key");
+
+                    b.Property<string>("ApplicantUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("applicant_user_id");
+
+                    b.Property<bool>("ConfirmedNoRoleOrEmploymentGuarantee")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("confirmed_no_role_or_employment_guarantee");
+
+                    b.Property<bool>("ConfirmedReviewDataUse")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("confirmed_review_data_use");
+
+                    b.Property<bool>("ConfirmedVoluntaryApplication")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("confirmed_voluntary_application");
+
+                    b.Property<string>("ConsentVersion")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("consent_version");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ParticipantCategory")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("participant_category");
+
+                    b.Property<string>("RequestedRoleCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("requested_role_code");
+
+                    b.Property<string>("RequestedRoleName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("requested_role_name");
+
+                    b.Property<string>("ScopeId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("scope_id");
+
+                    b.Property<string>("ScopeType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("scope_type");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("status_code");
+
+                    b.Property<Guid>("SubmissionRequestId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("submission_request_id");
+
+                    b.Property<DateTime>("SubmittedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("submitted_at_utc");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<DateTime?>("WithdrawnAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("withdrawn_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActiveApplicationKey")
+                        .IsUnique();
+
+                    b.HasIndex("ApplicantUserId", "SubmissionRequestId")
+                        .IsUnique();
+
+                    b.HasIndex("ApplicantUserId", "SubmittedAtUtc");
+
+                    b.HasIndex("StatusCode", "SubmittedAtUtc");
+
+                    b.ToTable("hr_role_applications");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.HumanResources.WorkRelationshipSnapshotRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2982,6 +3070,91 @@ namespace Ssalddel.Migrations
                     b.HasIndex("WorkDomain", "WorkProcess", "ActionCode", "OccurredAtUtc");
 
                     b.ToTable("work_relationship_snapshots", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AppKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("app_key");
+
+                    b.Property<string>("AppVersion")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("app_version");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("DeviceModel")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("device_model");
+
+                    b.Property<string>("InstallationId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("installation_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTime>("LastSeenAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_seen_at_utc");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("platform");
+
+                    b.Property<string>("PushToken")
+                        .IsRequired()
+                        .HasMaxLength(4096)
+                        .HasColumnType("varchar(4096)")
+                        .HasColumnName("push_token");
+
+                    b.Property<string>("PushTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("push_token_hash");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PushTokenHash")
+                        .HasDatabaseName("IX_mobile_push_token_hash");
+
+                    b.HasIndex("AppKey", "InstallationId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_mobile_push_app_installation");
+
+                    b.HasIndex("UserId", "IsActive")
+                        .HasDatabaseName("IX_mobile_push_user_active");
+
+                    b.ToTable("ssalddel_mobile_push_installations", (string)null);
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Speech.Typecast음성", b =>
@@ -3109,138 +3282,6 @@ namespace Ssalddel.Migrations
                     b.ToTable("typecast_voice_use_cases", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
             modelBuilder.Entity("살뜰.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -3285,6 +3326,13 @@ namespace Ssalddel.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("PrivacyConsentVersion")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTime?>("PrivacyConsentedAtUtc")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");
@@ -3413,7 +3461,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("결제", (string)null);
+                    b.ToTable("결제");
                 });
 
             modelBuilder.Entity("살뜰.도메인.공통.생성이미지작업", b =>
@@ -3557,7 +3605,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("이미지용도", "대상타입", "대상식별자", "상태");
 
-                    b.ToTable("생성이미지작업", (string)null);
+                    b.ToTable("생성이미지작업");
                 });
 
             modelBuilder.Entity("살뜰.도메인.공통콘텐츠.살뜰공통콘텐츠", b =>
@@ -3642,7 +3690,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("활성화여부", "노출시작시각", "노출종료시각");
 
-                    b.ToTable("살뜰_공통콘텐츠", (string)null);
+                    b.ToTable("살뜰_공통콘텐츠");
                 });
 
             modelBuilder.Entity("살뜰.도메인.공통콘텐츠.살뜰콘텐츠보상정책", b =>
@@ -3688,7 +3736,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("살뜰_콘텐츠보상정책", (string)null);
+                    b.ToTable("살뜰_콘텐츠보상정책");
                 });
 
             modelBuilder.Entity("살뜰.도메인.공통콘텐츠.살뜰콘텐츠보상지급", b =>
@@ -3745,7 +3793,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("사용자Id", "결제사용여부", "지급시각");
 
-                    b.ToTable("살뜰_콘텐츠보상지급", (string)null);
+                    b.ToTable("살뜰_콘텐츠보상지급");
                 });
 
             modelBuilder.Entity("살뜰.도메인.공통콘텐츠.살뜰콘텐츠시청세션", b =>
@@ -3801,7 +3849,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("사용자Id", "콘텐츠Id", "시작시각");
 
-                    b.ToTable("살뜰_콘텐츠시청세션", (string)null);
+                    b.ToTable("살뜰_콘텐츠시청세션");
                 });
 
             modelBuilder.Entity("살뜰.도메인.기사.기사근무", b =>
@@ -4023,7 +4071,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("배달기사", (string)null);
+                    b.ToTable("배달기사");
                 });
 
             modelBuilder.Entity("살뜰.도메인.기사.배차계획신청", b =>
@@ -4082,7 +4130,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("배차계획신청", (string)null);
+                    b.ToTable("배차계획신청");
                 });
 
             modelBuilder.Entity("살뜰.도메인.기사.용달기사", b =>
@@ -4164,7 +4212,95 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("용달기사", (string)null);
+                    b.ToTable("용달기사");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.마트.마트공개상품", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<bool>("공개여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("공개여부");
+
+                    b.Property<string>("대표이미지Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("대표이미지_url");
+
+                    b.Property<string>("상품명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("상품명");
+
+                    b.Property<string>("설명")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("설명");
+
+                    b.Property<DateTime>("재고기준시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("재고기준시각_utc");
+
+                    b.Property<string>("짧은설명")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("짧은설명");
+
+                    b.Property<string>("카테고리")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("카테고리");
+
+                    b.Property<decimal>("판매가")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("판매가");
+
+                    b.Property<int>("판매가능수량")
+                        .HasColumnType("int")
+                        .HasColumnName("판매가능수량");
+
+                    b.Property<string>("판매단위")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("판매단위");
+
+                    b.Property<long?>("판매상품Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("판매상품_id");
+
+                    b.Property<bool>("판매허용여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("판매허용여부");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("판매상품Id")
+                        .IsUnique();
+
+                    b.HasIndex("카테고리", "상품명");
+
+                    b.HasIndex("공개여부", "판매허용여부", "UpdatedAtUtc");
+
+                    b.ToTable("마트공개상품");
                 });
 
             modelBuilder.Entity("살뜰.도메인.마트.마트주문", b =>
@@ -4307,6 +4443,97 @@ namespace Ssalddel.Migrations
                         .IsUnique();
 
                     b.ToTable("마트주문상품", (string)null);
+                });
+
+            modelBuilder.Entity("살뜰.도메인.마트.마트주문요청", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<long>("공개상품Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("공개상품_id");
+
+                    b.Property<decimal>("단가Snapshot")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("단가_snapshot");
+
+                    b.Property<bool>("비구속주문요청확인")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("비구속_주문요청_확인");
+
+                    b.Property<string>("상태코드")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("상태_code");
+
+                    b.Property<string>("상품명Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("상품명_snapshot");
+
+                    b.Property<int>("수량")
+                        .HasColumnType("int")
+                        .HasColumnName("수량");
+
+                    b.Property<string>("안내버전")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("안내_version");
+
+                    b.Property<string>("요청자UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("요청자_user_id");
+
+                    b.Property<DateTime>("재고기준시각Utc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("재고기준시각_utc");
+
+                    b.Property<int>("제출시판매가능수량")
+                        .HasColumnType("int")
+                        .HasColumnName("제출시_판매가능수량");
+
+                    b.Property<Guid>("클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("클라이언트_요청_id");
+
+                    b.Property<string>("통화")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)")
+                        .HasColumnName("통화");
+
+                    b.Property<string>("판매단위Snapshot")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("판매단위_snapshot");
+
+                    b.Property<decimal>("합계Snapshot")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("합계_snapshot");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("공개상품Id", "CreatedAtUtc");
+
+                    b.HasIndex("요청자UserId", "CreatedAtUtc");
+
+                    b.HasIndex("요청자UserId", "클라이언트요청Id")
+                        .IsUnique();
+
+                    b.ToTable("마트주문요청");
                 });
 
             modelBuilder.Entity("살뜰.도메인.배차.기사배차", b =>
@@ -4570,7 +4797,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("WorkerUserId", "EmployerScopeType", "EmployerScopeId", "ContractStatus");
 
-                    b.ToTable("hr_employment_contracts", (string)null);
+                    b.ToTable("hr_employment_contracts");
                 });
 
             modelBuilder.Entity("살뜰.도메인.사용자.HrPayrollScheduleRecord", b =>
@@ -4656,7 +4883,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("WorkerUserId", "ScheduledPaymentDate", "Status");
 
-                    b.ToTable("hr_payroll_schedules", (string)null);
+                    b.ToTable("hr_payroll_schedules");
                 });
 
             modelBuilder.Entity("살뜰.도메인.사용자.HrRoleAssignmentRecord", b =>
@@ -4764,7 +4991,85 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("UserId", "ScopeType", "ScopeId", "RoleCode", "IsActive");
 
-                    b.ToTable("hr_role_assignments", (string)null);
+                    b.ToTable("hr_role_assignments");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.사용자.살뜰참여자", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<DateTimeOffset>("가입시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("가입시각");
+
+                    b.Property<string>("표시이름")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("표시이름");
+
+                    b.Property<bool>("활성화여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("활성화여부");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("활성화여부");
+
+                    b.ToTable("살뜰참여자");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.사용자.살뜰참여자역할", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<DateTimeOffset>("부여시각")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("부여시각");
+
+                    b.Property<int>("역할유형")
+                        .HasColumnType("int")
+                        .HasColumnName("역할유형");
+
+                    b.Property<string>("참여자Id")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("참여자_id");
+
+                    b.Property<bool>("활성화여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("활성화여부");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("참여자Id", "역할유형", "활성화여부");
+
+                    b.ToTable("살뜰참여자역할");
                 });
 
             modelBuilder.Entity("살뜰.도메인.사용자.연락처공개동의", b =>
@@ -4831,7 +5136,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("인연연결요청Id", "동의자참여자Id")
                         .IsUnique();
 
-                    b.ToTable("연락처공개동의", (string)null);
+                    b.ToTable("연락처공개동의");
                 });
 
             modelBuilder.Entity("살뜰.도메인.사용자.인연연결요청", b =>
@@ -4912,7 +5217,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("요청자참여자Id", "상태", "요청일시");
 
-                    b.ToTable("인연연결요청", (string)null);
+                    b.ToTable("인연연결요청");
                 });
 
             modelBuilder.Entity("살뜰.도메인.사용자.주문자프로필", b =>
@@ -4961,85 +5266,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("주문자프로필", (string)null);
-                });
-
-            modelBuilder.Entity("살뜰.도메인.사용자.살뜰참여자", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<DateTimeOffset>("가입시각")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("가입시각");
-
-                    b.Property<string>("표시이름")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("표시이름");
-
-                    b.Property<bool>("활성화여부")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("활성화여부");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("활성화여부");
-
-                    b.ToTable("살뜰참여자", (string)null);
-                });
-
-            modelBuilder.Entity("살뜰.도메인.사용자.살뜰참여자역할", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<DateTimeOffset>("부여시각")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("부여시각");
-
-                    b.Property<int>("역할유형")
-                        .HasColumnType("int")
-                        .HasColumnName("역할유형");
-
-                    b.Property<string>("참여자Id")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)")
-                        .HasColumnName("참여자_id");
-
-                    b.Property<bool>("활성화여부")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("활성화여부");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("참여자Id", "역할유형", "활성화여부");
-
-                    b.ToTable("살뜰참여자역할", (string)null);
+                    b.ToTable("주문자프로필");
                 });
 
             modelBuilder.Entity("살뜰.도메인.설정.Command알림Outbox", b =>
@@ -5108,7 +5335,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("Status", "CreatedAt");
 
-                    b.ToTable("Command_알림_Outbox", (string)null);
+                    b.ToTable("Command_알림_Outbox");
                 });
 
             modelBuilder.Entity("살뜰.도메인.설정.결제승인완료Outbox", b =>
@@ -5192,7 +5419,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("처리상태", "CreatedAt");
 
-                    b.ToTable("결제승인완료_Outbox", (string)null);
+                    b.ToTable("결제승인완료_Outbox");
                 });
 
             modelBuilder.Entity("살뜰.도메인.설정.배차추천알림Outbox", b =>
@@ -5317,7 +5544,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("사용자Id", "CommandName", "FeatureName")
                         .IsUnique();
 
-                    b.ToTable("사용자_Command_기능설정", (string)null);
+                    b.ToTable("사용자_Command_기능설정");
                 });
 
             modelBuilder.Entity("살뜰.도메인.설정.사용자View설정", b =>
@@ -5364,7 +5591,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("UserId", "AppKey", "ViewKey")
                         .IsUnique();
 
-                    b.ToTable("사용자_View_설정", (string)null);
+                    b.ToTable("사용자_View_설정");
                 });
 
             modelBuilder.Entity("살뜰.도메인.설정.사용자행위로그", b =>
@@ -5475,7 +5702,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("사용자_행위_로그", (string)null);
+                    b.ToTable("사용자_행위_로그");
                 });
 
             modelBuilder.Entity("살뜰.도메인.설정.플랫폼View정책", b =>
@@ -5548,7 +5775,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("AppKey", "ViewKey", "RoleName")
                         .IsUnique();
 
-                    b.ToTable("플랫폼_View_정책", (string)null);
+                    b.ToTable("플랫폼_View_정책");
                 });
 
             modelBuilder.Entity("살뜰.도메인.업체.업체", b =>
@@ -5619,7 +5846,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("업체", (string)null);
+                    b.ToTable("업체");
                 });
 
             modelBuilder.Entity("살뜰.도메인.운송.운송원장", b =>
@@ -6323,17 +6550,6 @@ namespace Ssalddel.Migrations
                     b.ToTable("음식주문", (string)null);
                 });
 
-            modelBuilder.Entity("살뜰.도메인.음식.음식점메뉴", b =>
-                {
-                    b.HasOne("살뜰.도메인.음식.음식점공개프로필", "음식점공개프로필")
-                        .WithMany("메뉴목록")
-                        .HasForeignKey("음식점공개프로필Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("음식점공개프로필");
-                });
-
             modelBuilder.Entity("살뜰.도메인.음식.음식주문상태이력", b =>
                 {
                     b.Property<long>("Id")
@@ -6477,7 +6693,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("TargetParticipantCategory", "IsActive", "EffectiveStartDate");
 
-                    b.ToTable("platform_profit_return_policies", (string)null);
+                    b.ToTable("platform_profit_return_policies");
                 });
 
             modelBuilder.Entity("살뜰.도메인.정산.PlatformProfitReturnScheduleRecord", b =>
@@ -6571,7 +6787,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("ParticipantUserId", "ScheduledPaymentDate", "Status");
 
-                    b.ToTable("platform_profit_return_schedules", (string)null);
+                    b.ToTable("platform_profit_return_schedules");
                 });
 
             modelBuilder.Entity("살뜰.도메인.정산.PlatformRevenueEntryRecord", b =>
@@ -6645,7 +6861,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("SourceReferenceType", "SourceReferenceId");
 
-                    b.ToTable("platform_revenue_entries", (string)null);
+                    b.ToTable("platform_revenue_entries");
                 });
 
             modelBuilder.Entity("살뜰.도메인.차량.차량제원", b =>
@@ -6771,7 +6987,7 @@ namespace Ssalddel.Migrations
 
                     b.HasKey("차량코드");
 
-                    b.ToTable("차량제원", (string)null);
+                    b.ToTable("차량제원");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.입고상품", b =>
@@ -6936,7 +7152,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("창고Id", "소유자UserId", "상태");
 
-                    b.ToTable("입고상품", (string)null);
+                    b.ToTable("입고상품");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.입고요청", b =>
@@ -7138,7 +7354,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("창고Id", "주문자UserId", "상태");
 
-                    b.ToTable("입고요청", (string)null);
+                    b.ToTable("입고요청");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.재고이동", b =>
@@ -7228,7 +7444,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("창고Id", "SKU", "발생일시");
 
-                    b.ToTable("재고이동", (string)null);
+                    b.ToTable("재고이동");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.재고이력", b =>
@@ -7288,7 +7504,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("입고상품Id", "처리일시");
 
-                    b.ToTable("재고이력", (string)null);
+                    b.ToTable("재고이력");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.창고", b =>
@@ -7392,7 +7608,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("소유자UserId", "소유자유형", "기본창고여부");
 
-                    b.ToTable("창고", (string)null);
+                    b.ToTable("창고");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.창고사용자", b =>
@@ -7437,7 +7653,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("창고Id", "UserId", "역할명")
                         .IsUnique();
 
-                    b.ToTable("창고사용자", (string)null);
+                    b.ToTable("창고사용자");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.출고묶음", b =>
@@ -7666,7 +7882,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("판매자UserId", "상태", "CreatedAt");
 
-                    b.ToTable("출고예정", (string)null);
+                    b.ToTable("출고예정");
                 });
 
             modelBuilder.Entity("살뜰.도메인.창고.피킹포장작업", b =>
@@ -7923,7 +8139,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("기사Id", "화주UserId")
                         .IsUnique();
 
-                    b.ToTable("기사화주관계집계", (string)null);
+                    b.ToTable("기사화주관계집계");
                 });
 
             modelBuilder.Entity("살뜰.도메인.탐색캠페인.탐색캠페인", b =>
@@ -8026,7 +8242,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("개시자UserId", "운행예정일", "탐색상태");
 
-                    b.ToTable("탐색캠페인", (string)null);
+                    b.ToTable("탐색캠페인");
                 });
 
             modelBuilder.Entity("살뜰.도메인.탐색캠페인.탐색캠페인대상자", b =>
@@ -8101,7 +8317,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("탐색캠페인Id", "대상UserId")
                         .IsUnique();
 
-                    b.ToTable("탐색캠페인대상자", (string)null);
+                    b.ToTable("탐색캠페인대상자");
                 });
 
             modelBuilder.Entity("살뜰.도메인.탐색캠페인.탐색캠페인응답", b =>
@@ -8179,7 +8395,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("탐색캠페인Id", "응답자UserId")
                         .IsUnique();
 
-                    b.ToTable("탐색캠페인응답", (string)null);
+                    b.ToTable("탐색캠페인응답");
                 });
 
             modelBuilder.Entity("살뜰.도메인.통관.관세사프로필", b =>
@@ -8249,7 +8465,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("관리자승인여부", "수임가능여부");
 
-                    b.ToTable("관세사프로필", (string)null);
+                    b.ToTable("관세사프로필");
                 });
 
             modelBuilder.Entity("살뜰.도메인.통관.통관수임", b =>
@@ -8300,7 +8516,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("통관절차Id", "관세사참여자Id", "상태");
 
-                    b.ToTable("통관수임", (string)null);
+                    b.ToTable("통관수임");
                 });
 
             modelBuilder.Entity("살뜰.도메인.통관.통관절차", b =>
@@ -8375,7 +8591,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("주문Id", "주문참조번호", "상태");
 
-                    b.ToTable("통관절차", (string)null);
+                    b.ToTable("통관절차");
                 });
 
             modelBuilder.Entity("살뜰.도메인.통관.통관조회연동", b =>
@@ -8463,7 +8679,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("화물관리번호", "MasterBl", "HouseBl");
 
-                    b.ToTable("통관조회연동", (string)null);
+                    b.ToTable("통관조회연동");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.감사메시지", b =>
@@ -8545,7 +8761,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("대상역할", "대상참여자Id", "작성일시");
 
-                    b.ToTable("감사메시지", (string)null);
+                    b.ToTable("감사메시지");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.상품물류자산", b =>
@@ -8604,7 +8820,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("상품Id", "자산유형", "등록시각");
 
-                    b.ToTable("상품물류자산", (string)null);
+                    b.ToTable("상품물류자산");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.상품상세이미지생성작업", b =>
@@ -8668,7 +8884,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("상품Id", "상태", "생성시각");
 
-                    b.ToTable("상품상세이미지생성작업", (string)null);
+                    b.ToTable("상품상세이미지생성작업");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.상품식별코드맵", b =>
@@ -8713,7 +8929,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("상품Id", "활성여부");
 
-                    b.ToTable("상품식별코드맵", (string)null);
+                    b.ToTable("상품식별코드맵");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.상품판매이미지초안", b =>
@@ -8775,7 +8991,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("상품Id", "생성시각");
 
-                    b.ToTable("상품판매이미지초안", (string)null);
+                    b.ToTable("상품판매이미지초안");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.채널출품", b =>
@@ -8832,7 +9048,7 @@ namespace Ssalddel.Migrations
                     b.HasIndex("판매상품Id", "판매채널계정Id")
                         .IsUnique();
 
-                    b.ToTable("채널출품", (string)null);
+                    b.ToTable("채널출품");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.판매상품", b =>
@@ -8918,7 +9134,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("샘플데이터여부", "이미지생성상태", "UpdatedAt");
 
-                    b.ToTable("판매상품", (string)null);
+                    b.ToTable("판매상품");
                 });
 
             modelBuilder.Entity("살뜰.도메인.판매.판매채널계정", b =>
@@ -8976,7 +9192,7 @@ namespace Ssalddel.Migrations
 
                     b.HasIndex("UserId", "채널종류", "상점명");
 
-                    b.ToTable("판매채널계정", (string)null);
+                    b.ToTable("판매채널계정");
                 });
 
             modelBuilder.Entity("살뜰.도메인.화물.화물요구조건", b =>
@@ -9331,6 +9547,90 @@ namespace Ssalddel.Migrations
                     b.ToTable("shipper_requests", (string)null);
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("살뜰.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("살뜰.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("살뜰.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("살뜰.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotification", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_notification_post");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotificationDelivery", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation", "Installation")
+                        .WithMany()
+                        .HasForeignKey("InstallationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_delivery_installation");
+
+                    b.HasOne("Ssalddel.Domain.Community.CommunityKeywordNotification", "Notification")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_delivery_notification");
+
+                    b.Navigation("Installation");
+
+                    b.Navigation("Notification");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostAttachment", b =>
                 {
                     b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "Post")
@@ -9397,6 +9697,18 @@ namespace Ssalddel.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostKeywordScan", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "Post")
+                        .WithOne("KeywordNotificationScan")
+                        .HasForeignKey("Ssalddel.Domain.Community.PlatformCommunityPostKeywordScan", "PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_community_keyword_scan_post");
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostRecommendation", b =>
                 {
                     b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "Post")
@@ -9419,15 +9731,70 @@ namespace Ssalddel.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Ssalddel.Domain.Content.YouTube채널영상", b =>
+            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardCollectionItem", b =>
                 {
-                    b.HasOne("Ssalddel.Domain.Content.YouTube감시채널", "감시채널")
-                        .WithMany("영상")
-                        .HasForeignKey("YouTube감시채널Id")
+                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
+                        .WithMany("Collections")
+                        .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_hh_card_items_cards");
 
-                    b.Navigation("감시채널");
+                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCardCollection", "Collection")
+                        .WithMany("Items")
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_hh_card_items_collections");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("Collection");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardDeliveryOutbox", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_hh_card_outbox_cards");
+
+                    b.HasOne("Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation", "Installation")
+                        .WithMany()
+                        .HasForeignKey("InstallationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_hh_card_outbox_installations");
+
+                    b.Navigation("Card");
+
+                    b.Navigation("Installation");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangCardImageVariant", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
+                        .WithMany("ImageVariants")
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_hh_card_variants_cards");
+
+                    b.Navigation("Card");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.HongikHakdangDailyCardSelection", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Content.HongikHakdangCard", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_hh_daily_cards_cards");
+
+                    b.Navigation("Card");
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Content.YouTube영상상품후보", b =>
@@ -9439,6 +9806,17 @@ namespace Ssalddel.Migrations
                         .IsRequired();
 
                     b.Navigation("영상");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.Content.YouTube채널영상", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.Content.YouTube감시채널", "감시채널")
+                        .WithMany("영상")
+                        .HasForeignKey("YouTube감시채널Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("감시채널");
                 });
 
             modelBuilder.Entity("Ssalddel.Domain.Education.교육과정과목", b =>
@@ -9585,57 +9963,6 @@ namespace Ssalddel.Migrations
                     b.Navigation("Typecast음성");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("살뜰.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("살뜰.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("살뜰.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("살뜰.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("살뜰.도메인.공통콘텐츠.살뜰공통콘텐츠", b =>
                 {
                     b.HasOne("살뜰.도메인.공통콘텐츠.살뜰콘텐츠보상정책", "보상정책")
@@ -9690,6 +10017,17 @@ namespace Ssalddel.Migrations
                     b.Navigation("참여자");
                 });
 
+            modelBuilder.Entity("살뜰.도메인.음식.음식점메뉴", b =>
+                {
+                    b.HasOne("살뜰.도메인.음식.음식점공개프로필", "음식점공개프로필")
+                        .WithMany("메뉴목록")
+                        .HasForeignKey("음식점공개프로필Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("음식점공개프로필");
+                });
+
             modelBuilder.Entity("살뜰.도메인.음식.음식주문상태이력", b =>
                 {
                     b.HasOne("살뜰.도메인.음식.음식주문", "음식주문")
@@ -9733,6 +10071,11 @@ namespace Ssalddel.Migrations
                     b.Navigation("출고묶음");
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotification", b =>
+                {
+                    b.Navigation("Deliveries");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPost", b =>
                 {
                     b.Navigation("Attachments");
@@ -9740,6 +10083,8 @@ namespace Ssalddel.Migrations
                     b.Navigation("Audio");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("KeywordNotificationScan");
 
                     b.Navigation("Recommendations");
 
@@ -9847,61 +10192,6 @@ namespace Ssalddel.Migrations
 
                     b.Navigation("상품목록");
                 });
-            modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotification", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_community_keyword_notification_post");
-
-                    b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotificationDelivery", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.Notifications.SsalddelMobilePushInstallation", "Installation")
-                        .WithMany()
-                        .HasForeignKey("InstallationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_community_keyword_delivery_installation");
-
-                    b.HasOne("Ssalddel.Domain.Community.CommunityKeywordNotification", "Notification")
-                        .WithMany("Deliveries")
-                        .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK_community_keyword_delivery_notification")
-                        .IsRequired();
-
-                    b.Navigation("Installation");
-
-                    b.Navigation("Notification");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPostKeywordScan", b =>
-                {
-                    b.HasOne("Ssalddel.Domain.Community.PlatformCommunityPost", "Post")
-                        .WithOne("KeywordNotificationScan")
-                        .HasForeignKey("Ssalddel.Domain.Community.PlatformCommunityPostKeywordScan", "PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_community_keyword_scan_post");
-
-                    b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Community.CommunityKeywordNotification", b =>
-                {
-                    b.Navigation("Deliveries");
-                });
-
-            modelBuilder.Entity("Ssalddel.Domain.Community.PlatformCommunityPost", b =>
-                {
-                    b.Navigation("KeywordNotificationScan");
-                });
-
 #pragma warning restore 612, 618
         }
     }

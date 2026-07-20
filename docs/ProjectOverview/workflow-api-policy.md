@@ -96,6 +96,8 @@ OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업�
 
 `GET /api/v1/version-feature-flags`의 `Workflows[].Screens`는 위 앱/화면 매핑을 반환합니다. 메뉴, 권한, 온보딩 안내, 비활성 기능 안내는 이 값을 기준으로 구성할 수 있습니다.
 
+같은 응답의 `PageCapabilities`는 통합 웹과 역할별 대표 진입점의 현재 완성 단계, 도입 버전, 실행 경계, 인증 필요 여부, 외부 효과 가능성, 연결된 기능 플래그와 워크플로우를 반환합니다. `Workflows[].Screens`가 업무 설계상의 대표 화면을 설명한다면, `PageCapabilities`는 현재 환경에서 그 화면을 어느 수준까지 열어도 되는지를 설명합니다. 화면에서 별도의 실행 모드를 만들지 않고 이 메타데이터와 전역 `SsalddelExecution:Mode`를 함께 사용합니다.
+
 ## 메타데이터 규칙
 
 컨트롤러와 action은 `SsalddelApiVersionAttribute`를 유지합니다. 이 값은 도입 시점을 기록합니다. 워크플로우에 속한 API는 `SsalddelApiWorkflowAttribute`도 함께 붙입니다.

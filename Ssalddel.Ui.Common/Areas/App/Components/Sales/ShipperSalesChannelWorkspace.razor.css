@@ -1,0 +1,196 @@
+.sales-channel-workspace {
+    display: grid;
+    gap: 1rem;
+}
+
+.sales-channel-toolbar,
+.sales-channel-preparation-heading,
+.sales-channel-detail-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.sales-channel-toolbar > div,
+.sales-channel-preparation-heading > div,
+.sales-channel-detail-heading > div {
+    min-width: 0;
+}
+
+.sales-channel-boundary,
+.sales-channel-access-alert {
+    border-radius: .9rem;
+}
+
+.sales-channel-preparation {
+    padding: 1.1rem;
+    border-radius: 1rem;
+    border-color: color-mix(in srgb, var(--mud-palette-primary) 30%, transparent);
+    background: color-mix(in srgb, var(--mud-palette-primary) 4%, var(--mud-palette-surface));
+}
+
+.sales-channel-preparation-form {
+    display: grid;
+    grid-template-columns: minmax(12rem, .8fr) minmax(14rem, 1.3fr) auto;
+    gap: .75rem;
+    align-items: start;
+    margin-top: 1rem;
+}
+
+.sales-channel-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(24rem, .95fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.sales-channel-panel {
+    min-width: 0;
+    padding: 1.2rem;
+    border-radius: 1rem;
+}
+
+.sales-channel-detail-panel {
+    position: sticky;
+    top: 1rem;
+}
+
+.sales-channel-filters {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1.4fr) minmax(10rem, .8fr);
+    gap: .75rem;
+}
+
+.sales-channel-state {
+    min-height: 16rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .8rem;
+    text-align: center;
+    border-radius: 1rem;
+}
+
+.sales-channel-state--compact {
+    min-height: 14rem;
+    padding: 1.5rem .75rem;
+}
+
+.sales-channel-state--detail {
+    min-height: 28rem;
+}
+
+.sales-channel-count {
+    display: block;
+    margin: .85rem 0 .25rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.sales-channel-table strong,
+.sales-channel-table span {
+    display: block;
+}
+
+.sales-channel-table span {
+    max-width: 18rem;
+    margin-top: .15rem;
+    color: var(--mud-palette-text-secondary);
+    font-size: .76rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sales-channel-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+    margin: 1.2rem 0;
+}
+
+.sales-channel-detail-grid > div {
+    min-width: 0;
+    padding: .8rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: .75rem;
+    background: var(--mud-palette-background-gray);
+}
+
+.sales-channel-detail-grid dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: .72rem;
+}
+
+.sales-channel-detail-grid dd {
+    margin: .2rem 0 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.sales-channel-integration-boundary {
+    border-radius: .8rem;
+}
+
+.sales-channel-next-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.sales-channel-catalog {
+    display: grid;
+    gap: .75rem;
+    padding-top: .25rem;
+}
+
+.sales-channel-catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.sales-channel-catalog-card {
+    display: grid;
+    gap: .45rem;
+    align-content: start;
+    padding: 1rem;
+    border-radius: .85rem;
+}
+
+@media (max-width: 1100px) {
+    .sales-channel-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sales-channel-detail-panel {
+        position: static;
+    }
+
+    .sales-channel-catalog-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .sales-channel-toolbar,
+    .sales-channel-preparation-heading,
+    .sales-channel-detail-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sales-channel-preparation-form,
+    .sales-channel-filters,
+    .sales-channel-detail-grid,
+    .sales-channel-catalog-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sales-channel-panel,
+    .sales-channel-preparation {
+        padding: 1rem;
+    }
+}

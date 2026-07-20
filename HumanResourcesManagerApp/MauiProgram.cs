@@ -1,6 +1,5 @@
 using Ssalddel.Ui.Common.Areas.App.Services;
-using Ssalddel.Ui.Common.Areas.App.ViewModels;
-using HumanResourcesManagerApp.ViewModels;
+using HumanResourcesManagerApp.Services;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 
@@ -15,13 +14,8 @@ public static class MauiProgram
 
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
-        builder.Services.AddSsalddelUiCommonAppServices();
-        builder.Services.AddTransient<인사Controller기능모음ViewModel>();
-        builder.Services.AddTransient<고용계약기능ViewModel>();
-        builder.Services.AddTransient<참여혜택기능ViewModel>();
-        builder.Services.AddTransient<인사역할기능ViewModel>();
-        builder.Services.AddTransient<사회보험신고기능ViewModel>();
-        builder.Services.AddTransient<인사Api기능모음ViewModel>();
+        builder.Services.AddHumanResourcesManagerApplication();
+        builder.Services.AddSsalddelUiCommonAppServices<HumanResourcesAccessTokenProvider>();
         builder.Services.AddSsalddelApiHttpClient(SsalddelApiEndpoint.ResolveBaseAddress(
             builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
             new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)));

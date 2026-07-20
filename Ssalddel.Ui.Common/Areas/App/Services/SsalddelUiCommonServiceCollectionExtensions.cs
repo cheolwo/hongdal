@@ -80,7 +80,10 @@ public static class SsalddelUiCommonServiceCollectionExtensions
         services.AddSalesUiModule();
         services.AddOrderUiModule();
         services.AddWarehouseUiModule();
+        services.AddCustomsUiModule();
         services.AddFoodDiscoveryUiModule();
+        services.AddMartDiscoveryUiModule();
+        services.AddHumanResourcesUiModule();
         return services;
     }
 

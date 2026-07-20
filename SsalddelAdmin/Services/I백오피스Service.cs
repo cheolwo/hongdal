@@ -8,7 +8,11 @@ public interface I백오피스Service
     Task<IReadOnlyList<화주운송의뢰응답>> 의뢰목록조회Async(string? 결제상태 = null, string? 배차상태 = null, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<공개화물요약응답>> 공개화물요약조회Async(CancellationToken cancellationToken = default);
     Task<화주운송의뢰응답?> 의뢰상세조회Async(string requestId, CancellationToken cancellationToken = default);
-    Task<화주운송의뢰응답?> 의뢰취소환불처리Async(string requestId, CancellationToken cancellationToken = default);
+    Task 의뢰취소환불처리Async(
+        string requestId,
+        string 확인의뢰Id,
+        string 사유,
+        CancellationToken cancellationToken = default);
     Task<운송워크플로우관제상세응답?> 운송워크플로우관제상세조회Async(string requestId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<결제목록응답>> 결제목록조회Async(string? 결제상태 = null, string? 의뢰Id = null, CancellationToken cancellationToken = default);
     Task<토스결제환경응답> 토스결제환경조회Async(CancellationToken cancellationToken = default);

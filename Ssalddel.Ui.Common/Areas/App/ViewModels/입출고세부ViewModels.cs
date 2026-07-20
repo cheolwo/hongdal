@@ -191,21 +191,7 @@ public sealed class 입고예정조회ViewModel : 업무조각ViewModelBase,
         목록조회요청 요청,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(요청);
-        var normalized = 요청.정규화();
-        var expectedRequest = normalized with
-        {
-            필터조건 = normalized.필터조건
-                .Where(filter => !string.Equals(
-                    filter.필드,
-                    nameof(입고요청항목응답.상태),
-                    StringComparison.OrdinalIgnoreCase))
-                .Append(new 목록필터조건(
-                    nameof(입고요청항목응답.상태),
-                    "Equal",
-                    입고상태코드.예정))
-                .ToArray()
-        };
+        var expectedRequest = 입고예정조회조건정책.적용(요청);
         최근요청 = expectedRequest;
 
         return 작업실행Async(

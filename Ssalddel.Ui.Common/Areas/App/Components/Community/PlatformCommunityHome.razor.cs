@@ -99,6 +99,9 @@ public partial class PlatformCommunityHome
     public RenderFragment? WorkModeContent { get; set; }
 
     [Parameter]
+    public string? CargoRequestDraftHrefBase { get; set; }
+
+    [Parameter]
     public string? QueryLedgerTemplateKey { get; set; }
 
     [Parameter]

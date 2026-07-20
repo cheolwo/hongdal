@@ -1,4 +1,7 @@
 @inject PlatformCommunityService CommunityService
+@inject Ssalddel.Ui.Common.Areas.App.ViewModels.공동구매공개목록ViewModel 목록ViewModel
+@inject Ssalddel.Ui.Common.Areas.App.ViewModels.공동구매공개상세ViewModel 상세ViewModel
+@inject ISsalddel현재사용자Context CurrentUserContext
 
 <div class="group-purchase-workspace">
     <header class="group-purchase-hero">
@@ -16,11 +19,25 @@
             <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadCampaignsAsync" Disabled="@isBusy">
                 새로고침
             </MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PostAdd" OnClick="@(() => showCreatePanel = !showCreatePanel)">
-                공동구매 제안
-            </MudButton>
+            @if (isAuthenticated)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PostAdd" OnClick="@(() => showCreatePanel = !showCreatePanel)">
+                    공동구매 제안
+                </MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" Href="/login">
+                    로그인 후 제안
+                </MudButton>
+            }
         </MudStack>
     </header>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="group-purchase-alert">
+        공개 모집·참여 현황 조회와 닉네임·비밀번호 방식의 이의제기는 로그인 없이 이용할 수 있습니다.
+        제안·수요 참여·마감·결의·서명 저장은 로그인이 필요하며, 참여 의향은 결제나 계약 확정을 뜻하지 않습니다.
+    </MudAlert>
 
     @if (!string.IsNullOrWhiteSpace(statusMessage))
     {
@@ -78,9 +95,19 @@
                 </div>
             </div>
 
-            @if (isLoading)
+            @if (목록ViewModel.처리중)
             {
                 <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            }
+            else if (목록ViewModel.오류발생)
+            {
+                <div class="group-purchase-empty">
+                    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" />
+                    <MudText Typo="Typo.body2">@목록ViewModel.오류메시지</MudText>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="LoadCampaignsAsync">
+                        다시 시도
+                    </MudButton>
+                </div>
             }
             else if (campaigns.Count == 0)
             {
@@ -106,7 +133,36 @@
         </aside>
 
         <main class="group-purchase-detail">
-            @if (selectedCampaign is null)
+            @if (상세ViewModel.처리중)
+            {
+                <div class="group-purchase-empty group-purchase-empty--detail">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">선택한 공동구매를 불러오는 중입니다.</MudText>
+                </div>
+            }
+            else if (상세ViewModel.오류발생)
+            {
+                <div class="group-purchase-empty group-purchase-empty--detail">
+                    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">공동구매 상세를 불러오지 못했습니다.</MudText>
+                    <MudText Typo="Typo.body2">@상세ViewModel.오류메시지</MudText>
+                    @if (상세ViewModel.요청CampaignId is Guid retryCampaignId)
+                    {
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectCampaignAsync(retryCampaignId, false))">
+                            다시 시도
+                        </MudButton>
+                    }
+                </div>
+            }
+            else if (상세ViewModel.찾을수없음)
+            {
+                <div class="group-purchase-empty group-purchase-empty--detail">
+                    <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                    <MudText Typo="Typo.h6">공개된 공동구매를 찾을 수 없습니다.</MudText>
+                    <MudText Typo="Typo.body2">주소의 campaignId를 확인하거나 왼쪽 목록에서 다른 모집을 선택해 주세요.</MudText>
+                </div>
+            }
+            else if (selectedCampaign is null)
             {
                 <div class="group-purchase-empty group-purchase-empty--detail">
                     <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Large" />
@@ -181,6 +237,13 @@
 
                 <div class="group-purchase-action-grid">
                     <section class="group-purchase-panel">
+                        @if (!isAuthenticated && RequiresAuthenticatedCommand(selectedStageCode))
+                        {
+                            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined" Class="mb-3">
+                                공개 내용은 그대로 볼 수 있습니다. 이 단계의 서버 저장은 로그인 후 이용해 주세요.
+                                <MudButton Href="/login" Variant="Variant.Text" Color="Color.Primary" Size="Size.Small">로그인</MudButton>
+                            </MudAlert>
+                        }
                         @if (selectedStageCode == StageRecruitment)
                         {
                             <MudText Typo="Typo.h6">수요 모집 참여</MudText>
@@ -207,7 +270,7 @@
                                 </MudSelect>
                             }
                             <MudTextField Label="참여자 표시명" @bind-Value="participation.DisplayName" Variant="Variant.Outlined" Class="mt-3" />
-                            <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="CastDemandAsync" Disabled="@isBusy" Class="mt-3">
+                            <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="CastDemandAsync" Disabled="@(!isAuthenticated || isBusy)" Class="mt-3">
                                 수요 참여 확정
                             </MudButton>
                         }
@@ -219,7 +282,7 @@
                                 <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3">모집을 마감하기 전에 접수된 이의를 검토했다는 확인이 필요합니다.</MudAlert>
                                 <MudCheckBox T="bool" @bind-Value="objectionReviewConfirmed" Label="접수된 이의와 변경 필요 사항을 검토했습니다." Class="mt-3" />
                                 <MudTextField Label="마감 처리자" @bind-Value="operatorDisplayName" Variant="Variant.Outlined" Class="mt-2" />
-                                <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" Disabled="@(!objectionReviewConfirmed || isBusy)" OnClick="CloseCampaignAsync" Class="mt-3">
+                                <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" Disabled="@(!isAuthenticated || !objectionReviewConfirmed || isBusy)" OnClick="CloseCampaignAsync" Class="mt-3">
                                     수요 모집 마감
                                 </MudButton>
                             }
@@ -228,7 +291,7 @@
                                 <MudTextField Label="결의문 제목" @bind-Value="resolutionTitle" Variant="Variant.Outlined" Class="mt-3" />
                                 <MudTextField Label="확정 내용" @bind-Value="resolutionText" Variant="Variant.Outlined" Lines="5" Class="mt-3" />
                                 <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3">현재 수요 참여자 전원이 서명 대상에 자동 포함됩니다.</MudAlert>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Disabled="@isBusy" OnClick="CreateResolutionAsync" Class="mt-3">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Disabled="@(!isAuthenticated || isBusy)" OnClick="CreateResolutionAsync" Class="mt-3">
                                     결의문 초안 만들기
                                 </MudButton>
                             }
@@ -241,7 +304,7 @@
                                 {
                                     <MudTextField Label="검토자" @bind-Value="operatorDisplayName" Variant="Variant.Outlined" Class="mt-3" />
                                     <MudTextField Label="검토 메모" @bind-Value="reviewMemo" Variant="Variant.Outlined" Lines="2" Class="mt-2" />
-                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Disabled="@isBusy" OnClick="MarkReadyToSignAsync" Class="mt-3">
+                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Disabled="@(!isAuthenticated || isBusy)" OnClick="MarkReadyToSignAsync" Class="mt-3">
                                         서명 가능 상태로 전환
                                     </MudButton>
                                 }
@@ -275,7 +338,7 @@
                                                      Description="선택한 서명 요청의 당사자만 직접 서명해 주세요."
                                                      SignerName="@selectedSignerDisplayName"
                                                      SignerNameChanged="UpdateSignerDisplayName"
-                                                     Disabled="@(string.IsNullOrWhiteSpace(selectedSignerPartyId) || !signatureConsent || isBusy)"
+                                                     Disabled="@(!isAuthenticated || string.IsNullOrWhiteSpace(selectedSignerPartyId) || !signatureConsent || isBusy)"
                                                      SignatureCaptured="SubmitSignatureAsync" />
                             }
                         }
@@ -341,6 +404,12 @@
 </div>
 
 @code {
+    [Parameter]
+    public Guid? CampaignId { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> CampaignSelected { get; set; }
+
     private const string StageProposal = "proposal";
     private const string StageRecruitment = "recruitment";
     private const string StageObjection = "objection";
@@ -361,11 +430,13 @@
     private readonly CampaignDraft draft = new();
     private readonly ParticipationDraft participation = new();
     private readonly ObjectionDraft objection = new();
-    private List<CommunityVoteResponse> campaigns = [];
-    private List<PlatformCommunityPostCommentResponse> comments = [];
-    private CommunityVoteResponse? selectedCampaign;
-    private bool isLoading;
-    private bool isBusy;
+    private IReadOnlyList<CommunityVoteResponse> campaigns => 목록ViewModel.모집목록;
+    private IReadOnlyList<PlatformCommunityPostCommentResponse> comments => 상세ViewModel.의견목록;
+    private CommunityVoteResponse? selectedCampaign => 상세ViewModel.공동구매;
+    private bool isAuthenticated => CurrentUserContext.현재사용자.인증됨;
+    private bool isBusy => isCommandBusy || 목록ViewModel.처리중 || 상세ViewModel.처리중;
+    private bool isCommandBusy;
+    private bool initialized;
     private bool showCreatePanel;
     private bool objectionReviewConfirmed;
     private bool signatureConsent;
@@ -379,79 +450,87 @@
     private string statusMessage = string.Empty;
     private Severity statusSeverity = Severity.Info;
 
-    protected override async Task OnInitializedAsync() => await LoadCampaignsAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCampaignsAsync();
+        initialized = true;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!initialized
+            || CampaignId is not Guid campaignId
+            || 상세ViewModel.요청CampaignId == campaignId)
+        {
+            return;
+        }
+
+        await SelectCampaignAsync(campaignId, false);
+    }
 
     private async Task LoadCampaignsAsync()
     {
-        isLoading = true;
-        try
+        var previousCampaignId = CampaignId;
+        if (previousCampaignId is null
+            && selectedCampaign is not null
+            && campaigns.Any(campaign => campaign.Id == selectedCampaign.Id))
         {
-            var response = await CommunityService.GetGroupPurchaseVotesAsync();
-            campaigns = response.Items
-                .Where(campaign => !CommunityVoteWorkflowClassifier.IsGroupImport(campaign))
-                .OrderByDescending(x => x.CreatedAtUtc)
-                .ToList();
-            if (selectedCampaign is not null && campaigns.Any(campaign => campaign.Id == selectedCampaign.Id))
-            {
-                await SelectCampaignAsync(selectedCampaign.Id);
-            }
-            else if (campaigns.Count > 0)
-            {
-                await SelectCampaignAsync(campaigns[0].Id);
-            }
-            else
-            {
-                selectedCampaign = null;
-            }
+            previousCampaignId = selectedCampaign.Id;
         }
-        catch (Exception ex)
+
+        if (!await 목록ViewModel.조회Async())
         {
-            ShowError($"공동구매 목록을 불러오지 못했습니다. 로그인 상태를 확인해 주세요. {ex.Message}");
+            return;
         }
-        finally
+
+        if (previousCampaignId is Guid campaignId)
         {
-            isLoading = false;
+            await SelectCampaignAsync(campaignId, false);
+            return;
+        }
+
+        if (campaigns.Count > 0)
+        {
+            await SelectCampaignAsync(campaigns[0].Id);
+            return;
+        }
+
+        상세ViewModel.선택해제();
+    }
+
+    private async Task SelectCampaignAsync(Guid campaignId, bool updateAddress = true)
+    {
+        if (!await 상세ViewModel.조회Async(campaignId)
+            || selectedCampaign is null)
+        {
+            return;
+        }
+
+        목록ViewModel.공동구매갱신(selectedCampaign);
+        ApplySelectedCampaignDefaults(selectedCampaign);
+
+        if (updateAddress && CampaignSelected.HasDelegate)
+        {
+            await CampaignSelected.InvokeAsync(selectedCampaign.Id);
         }
     }
 
-    private async Task SelectCampaignAsync(Guid voteId)
+    private void ApplySelectedCampaignDefaults(CommunityVoteResponse campaign)
     {
-        isBusy = true;
-        try
-        {
-            selectedCampaign = await CommunityService.GetGroupPurchaseVoteAsync(voteId);
-            if (selectedCampaign is null)
-            {
-                return;
-            }
-
-            var index = campaigns.FindIndex(x => x.Id == selectedCampaign.Id);
-            if (index >= 0)
-            {
-                campaigns[index] = selectedCampaign;
-            }
-
-            comments = selectedCampaign.SourcePostId is long postId
-                ? (await CommunityService.GetCommentsAsync(postId)).ToList()
-                : [];
-            participation.OptionId = selectedCampaign.Options.FirstOrDefault()?.OptionId ?? string.Empty;
-            participation.PickupPointId = selectedCampaign.GroupPurchase?.PickupPoints.FirstOrDefault()?.PickupPointId;
-            resolutionTitle = $"{selectedCampaign.Title} 공동구매 확정안";
-            resolutionText = BuildDefaultResolutionText(selectedCampaign);
-            ResetSignatureSelection();
-        }
-        catch (Exception ex)
-        {
-            ShowError($"공동구매 상세 정보를 불러오지 못했습니다. {ex.Message}");
-        }
-        finally
-        {
-            isBusy = false;
-        }
+        participation.OptionId = campaign.Options.FirstOrDefault()?.OptionId ?? string.Empty;
+        participation.PickupPointId = campaign.GroupPurchase?.PickupPoints.FirstOrDefault()?.PickupPointId;
+        resolutionTitle = $"{campaign.Title} 공동구매 확정안";
+        resolutionText = BuildDefaultResolutionText(campaign);
+        ResetSignatureSelection();
     }
 
     private async Task CreateCampaignAsync()
     {
+        if (!EnsureAuthenticatedCommand("공동구매 제안"))
+        {
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(draft.Title)
             || string.IsNullOrWhiteSpace(draft.ProductName)
             || string.IsNullOrWhiteSpace(draft.Nickname)
@@ -461,7 +540,7 @@
             return;
         }
 
-        isBusy = true;
+        isCommandBusy = true;
         PlatformCommunityPostResponse? post = null;
         try
         {
@@ -535,8 +614,7 @@
                 throw new InvalidOperationException("공동구매 수요 투표 생성 응답이 비어 있습니다.");
             }
 
-            campaigns.Insert(0, vote);
-            selectedCampaign = vote;
+            목록ViewModel.공동구매갱신(vote);
             showCreatePanel = false;
             selectedStageCode = StageRecruitment;
             await SelectCampaignAsync(vote.Id);
@@ -550,12 +628,17 @@
         }
         finally
         {
-            isBusy = false;
+            isCommandBusy = false;
         }
     }
 
     private async Task CastDemandAsync()
     {
+        if (!EnsureAuthenticatedCommand("수요 참여"))
+        {
+            return;
+        }
+
         if (selectedCampaign is null || string.IsNullOrWhiteSpace(participation.OptionId))
         {
             ShowError("참여할 상품을 선택해 주세요.");
@@ -582,12 +665,12 @@
                     : null,
                 AllowNearbyPickupPointFallback = true
             });
-            if (updated is not null)
+            if (updated is null)
             {
-                selectedCampaign = updated;
-                ReplaceCampaign(updated);
+                throw new InvalidOperationException("공동구매 수요 참여 응답이 비어 있습니다.");
             }
 
+            await RefreshSelectedCampaignAsync();
             ShowSuccess("공동구매 수요 참여가 반영됐습니다.");
         });
     }
@@ -613,7 +696,7 @@
             });
             if (created is not null)
             {
-                comments.Add(created);
+                상세ViewModel.의견추가(created);
             }
 
             objection.Body = string.Empty;
@@ -623,6 +706,11 @@
 
     private async Task CloseCampaignAsync()
     {
+        if (!EnsureAuthenticatedCommand("모집 마감"))
+        {
+            return;
+        }
+
         if (selectedCampaign is null)
         {
             return;
@@ -634,12 +722,12 @@
             {
                 ClosedByDisplayName = operatorDisplayName
             });
-            if (updated is not null)
+            if (updated is null)
             {
-                selectedCampaign = updated;
-                ReplaceCampaign(updated);
+                throw new InvalidOperationException("공동구매 모집 마감 응답이 비어 있습니다.");
             }
 
+            await RefreshSelectedCampaignAsync();
             objectionReviewConfirmed = false;
             ShowSuccess("수요 모집을 마감했습니다. 이제 확정안 결의문을 만들 수 있습니다.");
         });
@@ -647,6 +735,11 @@
 
     private async Task CreateResolutionAsync()
     {
+        if (!EnsureAuthenticatedCommand("결의문 작성"))
+        {
+            return;
+        }
+
         if (selectedCampaign is null)
         {
             return;
@@ -668,6 +761,11 @@
 
     private async Task MarkReadyToSignAsync()
     {
+        if (!EnsureAuthenticatedCommand("서명 준비"))
+        {
+            return;
+        }
+
         if (selectedCampaign is null)
         {
             return;
@@ -688,6 +786,11 @@
 
     private async Task SubmitSignatureAsync(SsalddelSignatureCaptureResult signature)
     {
+        if (!EnsureAuthenticatedCommand("전자서명"))
+        {
+            return;
+        }
+
         if (selectedCampaign is null || string.IsNullOrWhiteSpace(selectedSignerPartyId) || !signatureConsent)
         {
             ShowError("서명 요청을 선택하고 전자서명 동의 여부를 확인해 주세요.");
@@ -719,17 +822,25 @@
             return;
         }
 
-        var refreshed = await CommunityService.GetGroupPurchaseVoteAsync(selectedCampaign.Id);
-        if (refreshed is not null)
+        var campaignId = selectedCampaign.Id;
+        if (!await 상세ViewModel.조회Async(campaignId))
         {
-            selectedCampaign = refreshed;
-            ReplaceCampaign(refreshed);
+            throw new InvalidOperationException(
+                상세ViewModel.오류메시지 ?? "저장된 공동구매를 다시 조회하지 못했습니다.");
         }
+
+        var refreshed = selectedCampaign;
+        if (refreshed is null)
+        {
+            throw new InvalidOperationException("저장된 공동구매를 공개 상세에서 다시 찾지 못했습니다.");
+        }
+
+        목록ViewModel.공동구매갱신(refreshed);
     }
 
     private async Task RunBusyAsync(Func<Task> action)
     {
-        isBusy = true;
+        isCommandBusy = true;
         try
         {
             await action();
@@ -740,9 +851,23 @@
         }
         finally
         {
-            isBusy = false;
+            isCommandBusy = false;
         }
     }
+
+    private bool EnsureAuthenticatedCommand(string actionName)
+    {
+        if (isAuthenticated)
+        {
+            return true;
+        }
+
+        ShowError($"{actionName} 저장은 로그인이 필요합니다. 공개 모집 조회와 익명 이의제기는 로그인 없이 이용할 수 있습니다.");
+        return false;
+    }
+
+    private static bool RequiresAuthenticatedCommand(string stageCode)
+        => stageCode is StageRecruitment or StageResolution or StageSignature;
 
     private void SelectStage(string stageCode) => selectedStageCode = stageCode;
 
@@ -775,15 +900,6 @@
 
         var missing = plan.MissingRequiredPartyIds.ToHashSet(StringComparer.Ordinal);
         return plan.Bundle.SignatureRequests.Where(x => missing.Contains(x.PartyId)).ToArray();
-    }
-
-    private void ReplaceCampaign(CommunityVoteResponse campaign)
-    {
-        var index = campaigns.FindIndex(x => x.Id == campaign.Id);
-        if (index >= 0)
-        {
-            campaigns[index] = campaign;
-        }
     }
 
     private IEnumerable<PlatformCommunityPostCommentResponse> GetStageObjections(string stageCode) =>

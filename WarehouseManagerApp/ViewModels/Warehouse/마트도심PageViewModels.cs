@@ -92,33 +92,6 @@ public sealed class 마트주문처리PageViewModel : 창고PageViewModelBase
     }
 }
 
-public sealed class 마트피킹포장PageViewModel : 창고PageViewModelBase
-{
-    public 마트피킹포장PageViewModel(
-        창고작업세션상태ViewModel 세션,
-        출고재고조회ViewModel 재고조회,
-        출고포장ViewModel 포장,
-        IWarehousePickingBatchWorkspaceService 피킹Service)
-        : base(
-            세션,
-            창고PageCodes.마트피킹포장,
-            "마트 피킹·포장",
-            창고운영ProfileCodes.마트도심)
-    {
-        this.재고조회 = 구성요소등록(재고조회);
-        this.포장 = 구성요소등록(포장);
-        this.피킹Service = 피킹Service;
-    }
-
-    public 출고재고조회ViewModel 재고조회 { get; }
-    public 출고포장ViewModel 포장 { get; }
-    public IWarehousePickingBatchWorkspaceService 피킹Service { get; }
-    public bool 처리중 => 재고조회.처리중 || 포장.처리중;
-
-    public Task<bool> 초기화Async(CancellationToken cancellationToken = default)
-        => 재고조회.조회Async(cancellationToken);
-}
-
 public sealed class 마트기사픽업PageViewModel : 창고PageViewModelBase
 {
     public 마트기사픽업PageViewModel(

@@ -1524,6 +1524,11 @@ public sealed class 공동구매화면ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<판매채널계정항목응답>>([]);
 
+        public Task<판매채널계정항목응답?> 계정상세조회Async(
+            long accountId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<판매채널계정항목응답?>(null);
+
         public Task<판매채널계정항목응답?> 계정생성Async(
             판매채널계정저장요청 request,
             CancellationToken cancellationToken = default)
@@ -1660,6 +1665,11 @@ public sealed class 공동구매화면ViewModelTests
         public Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<입고요청항목응답>>([]);
+
+        public Task<입고요청항목응답?> 입고상세조회Async(
+            long inboundId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<입고요청항목응답?>(null);
 
         public Task<입고요청페이지응답> 입고예정관점목록조회Async(
             string perspectiveCode,

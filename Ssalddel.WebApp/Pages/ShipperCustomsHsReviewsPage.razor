@@ -1,166 +1,30 @@
 @page "/shipper/customs/hs-reviews"
+@inject NavigationManager Navigation
+
+<PageTitle>HS 코드 검토</PageTitle>
 
 <WebPageHeader Eyebrow="Shipper Web"
                Title="HS 코드 검토"
-               Description="수출입 물류 흐름이 감지되면 HS 코드 리스크와 관세사 검토 상태를 확인합니다."
-               Badge="통관" />
+               Description="활성 HS 코드 원장, 공식 공개 분류사례와 공개 동의된 대행 경험을 한 ID 기준으로 확인합니다."
+               Badge="읽기 전용 베타" />
 
-@if (!string.IsNullOrWhiteSpace(Message))
-{
-    <MudAlert Severity="@MessageSeverity" Class="mb-4">@Message</MudAlert>
-}
-
-<MudGrid>
-    <MudItem xs="12" lg="5">
-        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-            <MudStack Spacing="3">
-                <MudText Typo="Typo.h6">HS 코드 기반 대행 가능성 조회</MudText>
-                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.End" Wrap="Wrap.Wrap">
-                    <MudTextField @bind-Value="HsCodeQuery" Label="HS 코드" Placeholder="예: 9401.69" Variant="Variant.Outlined" Margin="Margin.Dense" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LookupHsCode">조회</MudButton>
-                </MudStack>
-
-                <MudTable Items="CapabilitySamples" Dense="true" Hover="true">
-                    <HeaderContent>
-                        <MudTh>HS 코드</MudTh>
-                        <MudTh>분류</MudTh>
-                        <MudTh>리스크</MudTh>
-                        <MudTh></MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="HS 코드">@context.HsCode</MudTd>
-                        <MudTd DataLabel="분류">@context.Category</MudTd>
-                        <MudTd DataLabel="리스크"><MudChip T="string" Size="Size.Small" Color="@context.Color" Variant="Variant.Outlined">@context.Risk</MudChip></MudTd>
-                        <MudTd><MudButton Size="Size.Small" Variant="Variant.Outlined" OnClick="@(() => SelectCapability(context))">상세</MudButton></MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </MudStack>
-        </MudPaper>
-    </MudItem>
-
-    <MudItem xs="12" lg="7">
-        <MudStack Spacing="3">
-            @if (SelectedCapability is not null)
-            {
-                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                    <MudText Typo="Typo.h6" Class="mb-3">@SelectedCapability.HsCode 조회 결과</MudText>
-                    <MudGrid>
-                        <MudItem xs="12" sm="3">@Metric("통관 대행", SelectedCapability.CustomsCases.ToString(), Color.Primary)</MudItem>
-                        <MudItem xs="12" sm="3">@Metric("수입 대행", SelectedCapability.ImportCases.ToString(), Color.Info)</MudItem>
-                        <MudItem xs="12" sm="3">@Metric("리스크", SelectedCapability.Risk, SelectedCapability.Color)</MudItem>
-                        <MudItem xs="12" sm="3">@Metric("분류", SelectedCapability.Category, Color.Secondary)</MudItem>
-                    </MudGrid>
-                    <MudAlert Severity="Severity.Info" Class="mt-3">@SelectedCapability.Summary</MudAlert>
-                </MudPaper>
-            }
-
-            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                    <MudText Typo="Typo.h6">관세사 HS 검토함</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="IsBusy" OnClick="CreateSampleReviewAsync">샘플 수출 의뢰 등록</MudButton>
-                </MudStack>
-
-                <MudTable Items="Reviews.OrderByDescending(x => x.CreatedAt)" Dense="true" Hover="true" Class="mt-3">
-                    <HeaderContent>
-                        <MudTh>의뢰</MudTh>
-                        <MudTh>흐름</MudTh>
-                        <MudTh>상품</MudTh>
-                        <MudTh>후보 HS</MudTh>
-                        <MudTh>관세사</MudTh>
-                        <MudTh>상태</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="의뢰">@context.RequestId</MudTd>
-                        <MudTd DataLabel="흐름">@context.Flow</MudTd>
-                        <MudTd DataLabel="상품">@context.CargoName</MudTd>
-                        <MudTd DataLabel="후보 HS">@context.SuggestedHsCode</MudTd>
-                        <MudTd DataLabel="관세사">@context.Broker</MudTd>
-                        <MudTd DataLabel="상태"><MudChip T="string" Size="Size.Small" Color="@context.Color" Variant="Variant.Outlined">@context.Status</MudChip></MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </MudPaper>
-        </MudStack>
-    </MudItem>
-</MudGrid>
+<ShipperHsCodeReviewWorkspace ReviewId="@ReviewId"
+                              ReviewSelected="HandleReviewSelected" />
 
 @code {
-    private readonly List<HsReviewRow> Reviews =
-    [
-        new("SHP-EXP-001", "수출", "원목 의자 세트", "9401.69", "김관세사", "검토중", Color.Info, DateTime.Now.AddHours(-3)),
-        new("SHP-IMP-240", "수입", "캠핑 테이블", "9403.20", "박관세사", "검토완료", Color.Success, DateTime.Now.AddDays(-1))
-    ];
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "reviewId")]
+    public long? ReviewId { get; set; }
 
-    private static readonly IReadOnlyList<HsCapability> CapabilitySamples =
-    [
-        new("9401.69", "일반 화물", "중간", Color.Warning, 4, 2, "목재 또는 혼합 소재 의자는 재질, 용도, 원산지 증빙 확인이 필요합니다."),
-        new("2106.90", "식품 관련", "높음", Color.Error, 2, 1, "식품류는 성분표, 검역, 표시사항 검토가 먼저 필요합니다."),
-        new("9403.20", "일반 화물", "낮음", Color.Success, 6, 3, "가구류 처리 이력이 있어 기본 서류만 맞으면 대행 가능성이 높습니다.")
-    ];
-
-    private HsCapability? SelectedCapability { get; set; } = CapabilitySamples[0];
-    private string HsCodeQuery = "9401.69";
-    private bool IsBusy;
-    private string? Message;
-    private Severity MessageSeverity = Severity.Info;
-
-    private void LookupHsCode()
+    private void HandleReviewSelected(long reviewId)
     {
-        SelectedCapability = CapabilitySamples.FirstOrDefault(x => string.Equals(x.HsCode, HsCodeQuery.Trim(), StringComparison.OrdinalIgnoreCase))
-            ?? new HsCapability(HsCodeQuery.Trim(), "미분류", "확인필요", Color.Warning, 0, 0, "플랫폼 샘플 이력이 없습니다. 관세사 검토 요청이 필요합니다.");
-        MessageSeverity = Severity.Info;
-        Message = $"{SelectedCapability.HsCode} 조회 결과를 표시했습니다.";
-    }
-
-    private void SelectCapability(HsCapability capability)
-    {
-        SelectedCapability = capability;
-        HsCodeQuery = capability.HsCode;
-    }
-
-    private async Task CreateSampleReviewAsync()
-    {
-        if (IsBusy)
+        if (ReviewId == reviewId)
         {
             return;
         }
 
-        IsBusy = true;
-        try
-        {
-            await Task.Delay(120);
-            Reviews.Add(new($"SHP-EXP-{DateTime.Now:HHmmss}", "수출", "샘플 수출 상품", HsCodeQuery, "배정대기", "요청", Color.Warning, DateTime.Now));
-            MessageSeverity = Severity.Success;
-            Message = "수출 운송의뢰를 등록하고 HS 코드 검토 요청을 생성했습니다.";
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        Navigation.NavigateTo(
+            $"/shipper/customs/hs-reviews?reviewId={reviewId}",
+            replace: true);
     }
-
-    private static RenderFragment Metric(string label, string value, Color color) => builder =>
-    {
-        builder.OpenComponent<MudPaper>(0);
-        builder.AddAttribute(1, "Elevation", 0);
-        builder.AddAttribute(2, "Outlined", true);
-        builder.AddAttribute(3, "Class", "pa-3 h-100");
-        builder.AddAttribute(4, "ChildContent", (RenderFragment)(childBuilder =>
-        {
-            childBuilder.OpenComponent<MudText>(0);
-            childBuilder.AddAttribute(1, "Typo", Typo.caption);
-            childBuilder.AddAttribute(2, "Color", Color.Secondary);
-            childBuilder.AddAttribute(3, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, label)));
-            childBuilder.CloseComponent();
-            childBuilder.OpenComponent<MudText>(4);
-            childBuilder.AddAttribute(5, "Typo", Typo.h6);
-            childBuilder.AddAttribute(6, "Color", color);
-            childBuilder.AddAttribute(7, "ChildContent", (RenderFragment)(textBuilder => textBuilder.AddContent(0, value)));
-            childBuilder.CloseComponent();
-        }));
-        builder.CloseComponent();
-    };
-
-    private sealed record HsCapability(string HsCode, string Category, string Risk, Color Color, int CustomsCases, int ImportCases, string Summary);
-
-    private sealed record HsReviewRow(string RequestId, string Flow, string CargoName, string SuggestedHsCode, string Broker, string Status, Color Color, DateTime CreatedAt);
 }

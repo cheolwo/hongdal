@@ -2,12 +2,20 @@ using Ssalddel.Contracts.Common.Sales;
 
 namespace Ssalddel.Ui.Common.Areas.App.Services;
 
-/// <summary>판매채널 계정을 연결하고 조회하는 기본 업무 경계입니다.</summary>
-public interface I판매채널계정Service
+/// <summary>판매채널 계정의 사용자 소유 목록과 정확한 ID 상세만 조회합니다.</summary>
+public interface I판매채널계정읽기Service
 {
     Task<IReadOnlyList<판매채널계정항목응답>> 계정목록조회Async(
         CancellationToken cancellationToken = default);
 
+    Task<판매채널계정항목응답?> 계정상세조회Async(
+        long accountId,
+        CancellationToken cancellationToken = default);
+}
+
+/// <summary>판매채널 계정을 연결하고 조회하는 기본 업무 경계입니다.</summary>
+public interface I판매채널계정Service : I판매채널계정읽기Service
+{
     Task<판매채널계정항목응답?> 계정생성Async(
         판매채널계정저장요청 request,
         CancellationToken cancellationToken = default);
@@ -70,11 +78,24 @@ public sealed class 판매채널Client(ISsalddelJsonApiClient client) : I판매�
 
     public async Task<IReadOnlyList<판매채널계정항목응답>> 계정목록조회Async(
         CancellationToken cancellationToken = default)
-        => (await client.GetAsync<판매채널계정목록응답>(
-                $"{BasePath}/accounts",
-                "판매채널 계정 목록 조회",
-                cancellationToken: cancellationToken))?.Items
-           ?? [];
+    {
+        var response = await client.GetAsync<판매채널계정목록응답>(
+            $"{BasePath}/accounts",
+            "판매채널 계정 목록 조회",
+            allowNotFound: false,
+            cancellationToken);
+        return response?.Items
+               ?? throw new InvalidOperationException("판매채널 계정 목록 응답이 비어 있습니다.");
+    }
+
+    public Task<판매채널계정항목응답?> 계정상세조회Async(
+        long accountId,
+        CancellationToken cancellationToken = default)
+        => client.GetAsync<판매채널계정항목응답>(
+            $"{BasePath}/accounts/{accountId}",
+            "판매채널 계정 상세 조회",
+            allowNotFound: true,
+            cancellationToken);
 
     public Task<판매채널계정항목응답?> 계정생성Async(
         판매채널계정저장요청 request,

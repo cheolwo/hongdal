@@ -54,6 +54,33 @@
                                          Post="@Post"
                                          IsReportPost="@IsReportPost" />
 
+        @if (CanCreateCargoRequestDraft)
+        {
+            <MudAlert Severity="Severity.Info"
+                      Variant="Variant.Outlined"
+                      Icon="@Icons.Material.Filled.LocalShipping">
+                <MudStack Row="true"
+                          AlignItems="AlignItems.Center"
+                          Justify="Justify.SpaceBetween"
+                          Wrap="Wrap.Wrap"
+                          Spacing="2">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">이 화물 글에서 운송 의뢰 초안을 만들 수 있습니다.</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            글 제목·본문만 가져오며 주소·연락처·운임은 직접 확인해 입력합니다. 초안 생성은 배차나 계약 확정이 아닙니다.
+                        </MudText>
+                    </MudStack>
+                    <MudButton Href="@BuildCargoRequestDraftHref()"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.PostAdd">
+                        운송 의뢰 초안 만들기
+                    </MudButton>
+                </MudStack>
+            </MudAlert>
+        }
+
         @if (Post.IsCommunityMomentumPromoted
              && !string.IsNullOrWhiteSpace(Post.CommunityMomentumMessage))
         {
@@ -125,11 +152,25 @@
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> EditRequested { get; set; }
 
+    [Parameter]
+    public string? CargoRequestDraftHrefBase { get; set; }
+
     private bool IsReportPost
         => Post.IsReportBoardPost
            || Post.Category.Contains("신고", StringComparison.OrdinalIgnoreCase)
            || Post.Category.Contains("분쟁", StringComparison.OrdinalIgnoreCase)
            || Post.Category.Contains("report", StringComparison.OrdinalIgnoreCase);
+
+    private bool CanCreateCargoRequestDraft
+        => !string.IsNullOrWhiteSpace(CargoRequestDraftHrefBase)
+           && CommunityBoardCatalog.Find(Post.Category)?.Key == CommunityBoardKeys.Cargo;
+
+    private string BuildCargoRequestDraftHref()
+    {
+        var href = CargoRequestDraftHrefBase?.Trim() ?? string.Empty;
+        var separator = href.Contains('?') ? '&' : '?';
+        return $"{href}{separator}sourcePostId={Post.Id}";
+    }
 
     private static string CommunityMomentumLabel(string? code)
         => code switch

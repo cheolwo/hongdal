@@ -5,6 +5,13 @@ namespace Ssalddel.Ui.Common.Areas.App.Models.Auth;
 
 public sealed record 공통로그인요청(string UserNameOrEmail, string Password);
 
+public sealed record 공통커뮤니티회원가입요청(
+    string UserName,
+    string Email,
+    string Password,
+    bool PrivacyConsentAccepted,
+    string PrivacyConsentVersion);
+
 public sealed record 공통소셜로그인요청(string ProviderId, string ProviderDisplayName);
 
 public sealed record 소셜로그인ProviderOption(

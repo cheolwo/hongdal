@@ -1,0 +1,254 @@
+@using Ssalddel.Contracts.Common.Hr
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudStack Spacing="3" data-testid="ssalddel-hr-role-application-workspace">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h5">역할 지원</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                내가 돕고 싶은 역할을 자발적으로 표시하고, 제출한 지원을 직접 철회합니다.
+            </MudText>
+        </MudStack>
+        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Handshake">
+            Beta · 플랫폼 저장
+        </MudChip>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Info">
+        이 지원은 관심 표시 원장입니다. 역할 배정, 채용, 고용·업무 계약, 보수 지급이나 실제 업무 시작을 뜻하지 않으며
+        전화번호·주소·계좌·주민등록번호를 입력받지 않습니다.
+    </MudAlert>
+
+    <MudGrid>
+        <MudItem xs="12" md="5">
+            <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                <MudStack Spacing="3">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">새 지원</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            한 역할에 활성 지원은 하나만 유지됩니다. 다른 역할에는 별도로 지원할 수 있습니다.
+                        </MudText>
+                    </MudStack>
+
+                    <MudSelect T="string"
+                               Label="지원할 역할"
+                               @bind-Value="Model.작성.선택역할코드"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Disabled="@Model.처리중">
+                        @foreach (var option in Model.목록.역할선택지)
+                        {
+                            <MudSelectItem T="string" Value="@option.RoleCode">@option.RoleName</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    @if (SelectedOption is { } selected)
+                    {
+                        <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.subtitle2">@selected.RoleName</MudText>
+                                <MudText Typo="Typo.body2">@selected.Summary</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @selected.ParticipantCategoryName · @ScopeText(selected.ScopeType, selected.ScopeId)
+                                </MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+
+                    <MudDivider />
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2">지원·개인정보 안내</MudText>
+                        @foreach (var line in HrRoleApplicationConsent.NoticeLines)
+                        {
+                            <MudText Typo="Typo.body2">• @line</MudText>
+                        }
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            안내 버전 @HrRoleApplicationConsent.CurrentVersion
+                        </MudText>
+                    </MudStack>
+
+                    <MudCheckBox T="bool"
+                                 @bind-Value="Model.작성.자발적지원확인"
+                                 Label="내 의사로 이 역할에 관심을 표시합니다."
+                                 Color="Color.Primary"
+                                 Disabled="@Model.처리중" />
+                    <MudCheckBox T="bool"
+                                 @bind-Value="Model.작성.역할고용비보장확인"
+                                 Label="지원이 역할 배정·채용·계약·보수를 보장하지 않음을 확인합니다."
+                                 Color="Color.Primary"
+                                 Disabled="@Model.처리중" />
+                    <MudCheckBox T="bool"
+                                 @bind-Value="Model.작성.검토정보이용동의"
+                                 Label="위 최소 정보를 역할 지원 검토에 이용하는 데 동의합니다."
+                                 Color="Color.Primary"
+                                 Disabled="@Model.처리중" />
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Send"
+                               FullWidth="true"
+                               Disabled="@(!Model.작성.제출가능 || Model.처리중)"
+                               OnClick="SubmitAsync">
+                        @(Model.작성.처리중 ? "저장 중…" : "역할 지원 제출")
+                    </MudButton>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.작성.오류메시지))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">
+                            @Model.작성.오류메시지
+                        </MudAlert>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.작성.성공메시지))
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">
+                            @Model.작성.성공메시지
+                        </MudAlert>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="7">
+            <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">내 지원 이력</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                활성 @(Model.목록.활성지원수)건 · 전체 @(Model.목록.지원목록.Count)건
+                            </MudText>
+                        </MudStack>
+                        <MudButton Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Filled.Refresh"
+                                   Disabled="@Model.처리중"
+                                   OnClick="RefreshAsync">
+                            새로고침
+                        </MudButton>
+                    </MudStack>
+
+                    @if (Model.목록.처리중 && !Model.목록.초기화됨)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="pa-6">
+                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">역할 지원 원장을 조회하고 있습니다.</MudText>
+                        </MudStack>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.목록.오류메시지))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudText>@Model.목록.오류메시지</MudText>
+                                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RefreshAsync">다시 조회</MudButton>
+                            </MudStack>
+                        </MudAlert>
+                    }
+                    else if (Model.목록.지원없음)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="pa-6">
+                            <MudIcon Icon="@Icons.Material.Filled.VolunteerActivism" Size="Size.Large" Color="Color.Secondary" />
+                            <MudText Typo="Typo.subtitle1">아직 제출한 역할 지원이 없습니다.</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                왼쪽에서 역할과 안내를 확인한 뒤 자발적으로 지원할 수 있습니다.
+                            </MudText>
+                        </MudStack>
+                    }
+                    else
+                    {
+                        @foreach (var application in Model.목록.지원목록)
+                        {
+                            <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle1">@application.RoleName</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @application.RoleCode · @application.ParticipantCategoryName
+                                            </MudText>
+                                        </MudStack>
+                                        <MudChip T="string"
+                                                 Size="Size.Small"
+                                                 Color="@StatusColor(application.StatusCode)"
+                                                 Variant="Variant.Outlined">
+                                            @application.StatusName
+                                        </MudChip>
+                                    </MudStack>
+
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">제출 시각</MudText>
+                                            <MudText Typo="Typo.body2">@DateTimeText(application.SubmittedAtUtc)</MudText>
+                                        </MudItem>
+                                        <MudItem xs="12" sm="6">
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">검토 범위</MudText>
+                                            <MudText Typo="Typo.body2">@ScopeText(application.ScopeType, application.ScopeId)</MudText>
+                                        </MudItem>
+                                    </MudGrid>
+
+                                    @if (application.WithdrawnAtUtc is { } withdrawnAt)
+                                    {
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @DateTimeText(withdrawnAt)에 철회되어 활성 검토에서 제외되었습니다.
+                                        </MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudStack Row="true" Justify="Justify.FlexEnd">
+                                            <MudButton Variant="Variant.Outlined"
+                                                       Color="Color.Warning"
+                                                       Size="Size.Small"
+                                                       StartIcon="@Icons.Material.Filled.Undo"
+                                                       Disabled="@(Model.처리중 || !application.CanWithdraw)"
+                                                       OnClick="@(() => WithdrawAsync(application.ApplicationId))">
+                                                @(Model.철회.처리중지원Id == application.ApplicationId ? "철회 중…" : "지원 철회")
+                                            </MudButton>
+                                        </MudStack>
+                                    }
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.철회.오류메시지))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">
+                            @Model.철회.오류메시지
+                        </MudAlert>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.철회.성공메시지))
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">
+                            @Model.철회.성공메시지
+                        </MudAlert>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public 인사역할지원PageViewModel Model { get; set; } = default!;
+
+    private HrRoleApplicationOptionResponse? SelectedOption
+        => Model.목록.역할선택지.FirstOrDefault(item =>
+            string.Equals(item.RoleCode, Model.작성.선택역할코드, StringComparison.Ordinal));
+
+    private Task SubmitAsync() => Model.제출후재조회Async();
+    private Task WithdrawAsync(Guid applicationId) => Model.철회후재조회Async(applicationId);
+    private Task RefreshAsync() => Model.목록.조회Async();
+
+    private static Color StatusColor(string? statusCode)
+        => string.Equals(statusCode, HrRoleApplicationStatusCodes.Withdrawn, StringComparison.Ordinal)
+            ? Color.Default
+            : Color.Info;
+
+    private static string ScopeText(string? scopeType, string? scopeId)
+        => $"{ValueOrFallback(scopeType)} · {ValueOrFallback(scopeId)}";
+
+    private static string DateTimeText(DateTime value)
+        => value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+
+    private static string ValueOrFallback(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "정보 없음" : value.Trim();
+}

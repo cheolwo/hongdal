@@ -53,6 +53,10 @@ public interface I입출고작업Service
             await 입고목록조회Async(cancellationToken),
             request);
 
+    Task<입고요청항목응답?> 입고상세조회Async(
+        long inboundId,
+        CancellationToken cancellationToken = default);
+
     Task<입고요청페이지응답> 입고예정관점목록조회Async(
         string perspectiveCode,
         string? communityLedgerId,
@@ -214,6 +218,15 @@ public class 입출고작업Service(ISsalddelJsonApiClient client) : I입출고�
                Page = Math.Max(0, request.Page),
                PageSize = Math.Clamp(request.PageSize, 1, 200)
            };
+
+    public Task<입고요청항목응답?> 입고상세조회Async(
+        long inboundId,
+        CancellationToken cancellationToken = default)
+        => client.GetAsync<입고요청항목응답>(
+            $"{BasePath}/inbounds/{inboundId}",
+            "입고 요청 상세 조회",
+            allowNotFound: true,
+            cancellationToken);
 
     public async Task<입고요청페이지응답> 입고예정관점목록조회Async(
         string perspectiveCode,

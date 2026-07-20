@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.WarehouseScanning;
 using Ssalddel.Ui.Common.Areas.App.Models;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -53,100 +54,238 @@ public sealed class 창고홈PageViewModel : 창고PageViewModelBase
 public sealed class 창고작업보드PageViewModel : 창고PageViewModelBase
 {
     private readonly I창고작업구성Resolver _구성Resolver;
-    private readonly IWarehousePickingBatchWorkspaceService _피킹Service;
-    private IReadOnlyList<WarehousePickingTaskItem> _피킹작업목록 = [];
-    private bool _조회중;
-    private string? _오류메시지;
+    private readonly WarehousePageAvailabilityService _페이지사용가능성;
+    private bool _초기화됨;
+    private bool _초기화중;
+    private bool _기능사용가능;
+    private long? _입고요청Id;
+    private string _기능안내 = "창고 작업 보드 기능 상태를 확인하고 있습니다.";
+    private string? _페이지오류메시지;
 
     public 창고작업보드PageViewModel(
         창고작업세션상태ViewModel 세션,
         I창고작업구성Resolver 구성Resolver,
-        입고조회ViewModel 입고조회,
-        출고재고조회ViewModel 재고조회,
-        IWarehousePickingBatchWorkspaceService 피킹Service)
+        창고로그인ViewModel 인증,
+        WarehousePageAvailabilityService 페이지사용가능성,
+        입고상세조회ViewModel 입고상세조회)
         : base(세션, 창고PageCodes.작업보드, "창고 작업 보드")
     {
         _구성Resolver = 구성Resolver;
-        _피킹Service = 피킹Service;
-        this.입고조회 = 구성요소등록(입고조회);
-        this.재고조회 = 구성요소등록(재고조회);
+        _페이지사용가능성 = 페이지사용가능성;
+        this.인증 = 구성요소등록(인증);
+        this.입고상세조회 = 구성요소등록(입고상세조회);
     }
 
-    public 입고조회ViewModel 입고조회 { get; }
-    public 출고재고조회ViewModel 재고조회 { get; }
+    public 창고로그인ViewModel 인증 { get; }
+    public 입고상세조회ViewModel 입고상세조회 { get; }
     public IReadOnlyList<창고PageDefinition> 작업영역목록
         => _구성Resolver.페이지목록조회(세션.운영ProfileCode)
-            .Where(page => page.페이지코드 != 창고PageCodes.홈)
+            .Where(page => page.화면연결됨)
+            .Where(page => page.페이지코드 is not 창고PageCodes.홈 and not 창고PageCodes.작업보드)
             .ToArray();
 
-    public IReadOnlyList<WarehousePickingTaskItem> 피킹작업목록
+    public bool 초기화됨
     {
-        get => _피킹작업목록;
-        private set => SetProperty(ref _피킹작업목록, value);
+        get => _초기화됨;
+        private set => SetProperty(ref _초기화됨, value);
     }
 
-    public bool 조회중
+    public bool 초기화중
     {
-        get => _조회중;
-        private set => SetProperty(ref _조회중, value);
+        get => _초기화중;
+        private set => SetProperty(ref _초기화중, value);
     }
 
-    public string? 오류메시지
+    public bool 기능사용가능
     {
-        get => _오류메시지;
-        private set => SetProperty(ref _오류메시지, value);
+        get => _기능사용가능;
+        private set => SetProperty(ref _기능사용가능, value);
     }
 
-    public async Task<bool> 초기화Async(CancellationToken cancellationToken = default)
+    public long? 입고요청Id
     {
-        if (조회중)
-        {
-            return false;
-        }
+        get => _입고요청Id;
+        private set => SetProperty(ref _입고요청Id, value);
+    }
 
-        var warehouse = 세션.선택된창고;
-        if (warehouse is null)
-        {
-            오류메시지 = "작업 보드를 조회할 창고를 먼저 선택해 주세요.";
-            return false;
-        }
+    public string 기능안내
+    {
+        get => _기능안내;
+        private set => SetProperty(ref _기능안내, value);
+    }
 
-        조회중 = true;
-        오류메시지 = null;
+    public string? 페이지오류메시지
+    {
+        get => _페이지오류메시지;
+        private set => SetProperty(ref _페이지오류메시지, value);
+    }
+
+    public 입고작업보드상태? 작업상태
+        => 입고상세조회.항목 is { } item
+            ? 입고작업보드정책.해석(item.상태)
+            : null;
+    public bool 처리중 => 초기화중 || 인증.처리중 || 입고상세조회.처리중;
+    public bool 조회대상선택됨 => 입고요청Id.HasValue;
+
+    public async Task<bool> 초기화Async(
+        long? inboundId,
+        CancellationToken cancellationToken = default)
+    {
+        입고요청Id = inboundId is > 0 ? inboundId : null;
+        입고상세조회.조회대상설정(입고요청Id);
+        초기화됨 = false;
+        초기화중 = true;
+        페이지오류메시지 = null;
         try
         {
-            var inboundLoaded = await 입고조회.조회Async(cancellationToken);
-            var inventoryLoaded = await 재고조회.조회Async(cancellationToken);
-            피킹작업목록 = await _피킹Service.GetAssignedTasksAsync(warehouse.Id, cancellationToken);
-            return inboundLoaded && inventoryLoaded;
+            var availability = await _페이지사용가능성.GetWorkBoardAsync(cancellationToken);
+            기능사용가능 = availability.IsEnabled;
+            기능안내 = availability.Notice;
+            if (기능사용가능)
+            {
+                await 인증.초기화Async(cancellationToken);
+            }
         }
-        catch (Exception ex)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            오류메시지 = ex.Message;
-            return false;
+            기능사용가능 = false;
+            페이지오류메시지 = "기능 상태 확인 시간이 초과되었습니다.";
+        }
+        catch (HttpRequestException)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "서버에서 창고 기능 상태를 확인하지 못했습니다.";
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "창고 기능 상태 응답을 처리하지 못했습니다.";
         }
         finally
         {
-            조회중 = false;
+            초기화중 = false;
         }
+
+        if (!기능사용가능 || !인증.창고업무접근가능)
+        {
+            초기화됨 = true;
+            return false;
+        }
+
+        return await 인증후조회Async(cancellationToken);
+    }
+
+    public async Task<bool> 인증후조회Async(CancellationToken cancellationToken = default)
+    {
+        if (!기능사용가능 || !인증.창고업무접근가능 || 초기화중)
+        {
+            초기화됨 = true;
+            return false;
+        }
+
+        초기화중 = true;
+        try
+        {
+            if (!입고요청Id.HasValue)
+            {
+                return true;
+            }
+
+            return await 입고상세조회.조회Async(cancellationToken);
+        }
+        finally
+        {
+            초기화중 = false;
+            초기화됨 = true;
+        }
+    }
+
+    public Task<bool> 다시조회Async(CancellationToken cancellationToken = default)
+        => 인증후조회Async(cancellationToken);
+
+    public void 인증해제적용()
+    {
+        입고상세조회.조회결과초기화();
+        초기화됨 = true;
     }
 }
 
 public sealed class 창고입고예정조회PageViewModel : 창고PageViewModelBase
 {
+    private bool _초기화됨;
+    private bool _초기화중;
+    private bool _기능사용가능;
+    private long? _선택된창고Id;
+    private int _목록갱신번호;
+    private string _기능안내 = "창고 입출고 기능 상태를 확인하고 있습니다.";
+    private string? _페이지오류메시지;
+    private readonly WarehousePageAvailabilityService _페이지사용가능성;
+
     public 창고입고예정조회PageViewModel(
         창고작업세션상태ViewModel 세션,
+        창고로그인ViewModel 인증,
+        WarehousePageAvailabilityService 페이지사용가능성,
         창고목록조회ViewModel 창고조회,
         입고예정조회ViewModel 입고예정조회)
         : base(세션, 창고PageCodes.입고예정조회, "입고 예정 조회")
     {
+        _페이지사용가능성 = 페이지사용가능성;
+        this.인증 = 구성요소등록(인증);
         this.창고조회 = 구성요소등록(창고조회);
         this.입고예정조회 = 구성요소등록(입고예정조회);
     }
 
+    public 창고로그인ViewModel 인증 { get; }
     public 창고목록조회ViewModel 창고조회 { get; }
     public 입고예정조회ViewModel 입고예정조회 { get; }
-    public bool 처리중 => 창고조회.처리중 || 입고예정조회.처리중;
+    public bool 초기화됨
+    {
+        get => _초기화됨;
+        private set => SetProperty(ref _초기화됨, value);
+    }
+
+    public bool 초기화중
+    {
+        get => _초기화중;
+        private set => SetProperty(ref _초기화중, value);
+    }
+
+    public bool 기능사용가능
+    {
+        get => _기능사용가능;
+        private set => SetProperty(ref _기능사용가능, value);
+    }
+
+    public string 기능안내
+    {
+        get => _기능안내;
+        private set => SetProperty(ref _기능안내, value);
+    }
+
+    public string? 페이지오류메시지
+    {
+        get => _페이지오류메시지;
+        private set => SetProperty(ref _페이지오류메시지, value);
+    }
+
+    public long? 선택된창고Id
+    {
+        get => _선택된창고Id;
+        private set => SetProperty(ref _선택된창고Id, value);
+    }
+
+    public int 목록갱신번호
+    {
+        get => _목록갱신번호;
+        private set => SetProperty(ref _목록갱신번호, value);
+    }
+
+    public bool 처리중
+        => 초기화중 || 인증.처리중 || 창고조회.처리중 || 입고예정조회.처리중;
+    public bool 창고목록비어있음
+        => 초기화됨
+           && string.IsNullOrWhiteSpace(창고조회.오류메시지)
+           && 창고조회.항목목록.Count == 0;
 
     public string 입고작업경로
         => 세션.운영ProfileCode switch
@@ -159,20 +298,114 @@ public sealed class 창고입고예정조회PageViewModel : 창고PageViewModelB
 
     public async Task<bool> 초기화Async(CancellationToken cancellationToken = default)
     {
-        var profileCode = 세션.운영ProfileCode;
-        var loaded = await 창고조회.조회Async(cancellationToken);
-        if (loaded && !string.Equals(세션.운영ProfileCode, profileCode, StringComparison.OrdinalIgnoreCase))
+        초기화됨 = false;
+        초기화중 = true;
+        페이지오류메시지 = null;
+        try
         {
-            세션.운영Profile설정(profileCode);
+            var availability = await _페이지사용가능성.GetExpectedInboundsAsync(cancellationToken);
+            기능사용가능 = availability.IsEnabled;
+            기능안내 = availability.Notice;
+            if (기능사용가능)
+            {
+                await 인증.초기화Async(cancellationToken);
+            }
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "기능 상태 확인 시간이 초과되었습니다.";
+        }
+        catch (HttpRequestException)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "서버에서 창고 기능 상태를 확인하지 못했습니다.";
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "창고 기능 상태 응답을 처리하지 못했습니다.";
+        }
+        finally
+        {
+            초기화중 = false;
         }
 
-        return loaded;
+        if (!기능사용가능 || !인증.창고업무접근가능)
+        {
+            초기화됨 = true;
+            return false;
+        }
+
+        return await 인증후조회Async(cancellationToken);
     }
 
-    public bool 창고선택(long warehouseId)
+    public async Task<bool> 인증후조회Async(CancellationToken cancellationToken = default)
     {
+        if (!기능사용가능 || !인증.창고업무접근가능 || 초기화중)
+        {
+            초기화됨 = true;
+            return false;
+        }
+
+        초기화중 = true;
         var profileCode = 세션.운영ProfileCode;
-        return 세션.창고선택(warehouseId, profileCode);
+        try
+        {
+            var loaded = await 창고조회.조회Async(cancellationToken);
+            if (loaded && !string.Equals(세션.운영ProfileCode, profileCode, StringComparison.OrdinalIgnoreCase))
+            {
+                세션.운영Profile설정(profileCode);
+            }
+
+            선택된창고Id = 세션.선택된창고?.Id;
+            초기화됨 = true;
+            return loaded;
+        }
+        finally
+        {
+            초기화중 = false;
+        }
+    }
+
+    public bool 창고선택(long? warehouseId)
+    {
+        if (!warehouseId.HasValue)
+        {
+            return false;
+        }
+
+        var profileCode = 세션.운영ProfileCode;
+        if (!세션.창고선택(warehouseId.Value, profileCode))
+        {
+            return false;
+        }
+
+        선택된창고Id = warehouseId;
+        목록새로고침요청();
+        return true;
+    }
+
+    public void 목록새로고침요청()
+    {
+        if (인증.창고업무접근가능 && 선택된창고Id.HasValue)
+        {
+            목록갱신번호++;
+        }
+    }
+
+    public string? 입고작업선택(입고요청항목응답 item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        return 입고예정조회.선택(item.Id)
+            ? WarehouseManagerRoutes.WorkBoardForInbound(item.Id)
+            : null;
+    }
+
+    public void 인증해제적용()
+    {
+        선택된창고Id = null;
+        초기화됨 = true;
     }
 }
 

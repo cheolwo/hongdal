@@ -207,6 +207,11 @@ public sealed class 기본판매주문ViewModelTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<IReadOnlyList<판매채널계정항목응답>>([]);
 
+        public Task<판매채널계정항목응답?> 계정상세조회Async(
+            long accountId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<판매채널계정항목응답?>(null);
+
         public Task<판매채널계정항목응답?> 계정생성Async(
             판매채널계정저장요청 request,
             CancellationToken cancellationToken = default)

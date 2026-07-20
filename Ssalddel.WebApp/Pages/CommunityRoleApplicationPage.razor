@@ -1,0 +1,90 @@
+@page "/community/roles/apply"
+@using Ssalddel.Ui.Common.Areas.App.Components.HumanResources
+@inherits MvvmComponentBase<인사역할지원PageViewModel>
+@inject WebAuthSessionService AuthSession
+
+<PageTitle>역할 지원 · 살뜰 커뮤니티</PageTitle>
+
+<WebPageHeader Eyebrow="Community Participation"
+               Title="역할 지원"
+               Description="회원 계정으로 자발적인 역할 관심을 남기고 언제든 철회할 수 있습니다."
+               Badge="Beta · 플랫폼 저장" />
+
+@if (!AuthSession.IsLoggedIn)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="pa-6">
+        <MudStack AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Large" Color="Color.Secondary" />
+            <MudText Typo="Typo.h6">역할 지원에는 로그인이 필요합니다.</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                지원과 철회를 본인 계정에 연결하기 위한 경계입니다. 커뮤니티 글과 댓글은 게시판 정책에 따라 회원가입 없이도 익명으로 작성할 수 있습니다.
+            </MudText>
+            <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap" Justify="Justify.Center">
+                <MudButton Href="/login" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login">
+                    로그인·회원가입
+                </MudButton>
+                <MudButton Href="/community" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Forum">
+                    익명 커뮤니티 보기
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+}
+else
+{
+    <SsalddelHrRoleApplicationWorkspace Model="@ViewModel" />
+}
+
+@code {
+    private bool _loaded;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        AuthSession.Changed += AuthChanged;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthSession.IsLoggedIn && !_loaded)
+        {
+            await LoadAsync();
+        }
+    }
+
+    private void AuthChanged()
+        => _ = InvokeAsync(async () =>
+        {
+            if (AuthSession.IsLoggedIn)
+            {
+                await LoadAsync(force: true);
+            }
+            else
+            {
+                ViewModel.결과초기화();
+                _loaded = false;
+            }
+
+            StateHasChanged();
+        });
+
+    private async Task LoadAsync(bool force = false)
+    {
+        if (!force && _loaded)
+        {
+            return;
+        }
+
+        _loaded = await ViewModel.초기화Async();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            AuthSession.Changed -= AuthChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+}

@@ -14,6 +14,10 @@ internal static class SalesUiModule
         services.TryAddScoped<I판매페이지Client, 판매페이지Client>();
         services.TryAddScoped<I판매채널계정Service>(provider =>
             provider.GetRequiredService<I판매채널Client>());
+        services.TryAddScoped<I판매채널계정읽기Service>(provider =>
+            provider.GetRequiredService<I판매채널Client>());
+        services.TryAddScoped<I판매채널페이지접근Service, 판매채널페이지접근Service>();
+        services.TryAddScoped<I판매채널주문읽기Service, 판매채널주문Client>();
         services.TryAddScoped<I상품등록Service>(provider =>
             provider.GetRequiredService<I판매채널Client>());
         services.TryAddScoped<I채널출품Service>(provider =>
@@ -41,6 +45,14 @@ internal static class SalesUiModule
         services.TryAddTransient<판매ViewModel>();
         services.TryAddTransient<국내판매ViewModel>();
         services.TryAddTransient<해외수출ViewModel>();
+        services.TryAddTransient<판매채널페이지접근ViewModel>();
+        services.TryAddTransient<판매채널계정목록PageViewModel>();
+        services.TryAddTransient<판매채널계정상세PageViewModel>();
+        services.TryAddTransient<판매채널계정연결준비ViewModel>();
+        services.TryAddTransient<판매채널계정PageViewModel>();
+        services.TryAddTransient<판매채널주문목록PageViewModel>();
+        services.TryAddTransient<판매채널주문상세PageViewModel>();
+        services.TryAddTransient<판매채널주문PageViewModel>();
 
         return services;
     }

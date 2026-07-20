@@ -99,6 +99,58 @@ public sealed class WebAuthSessionService : ISsalddelAccessTokenProvider
         NotifyChanged();
     }
 
+    public async Task<커뮤니티회원가입응답> RegisterCommunityAsync(
+        string userName,
+        string email,
+        string password,
+        bool privacyConsentAccepted,
+        string privacyConsentVersion,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(userName)
+            || string.IsNullOrWhiteSpace(email)
+            || string.IsNullOrWhiteSpace(password))
+        {
+            throw new InvalidOperationException("아이디, 이메일과 비밀번호를 입력해 주세요.");
+        }
+
+        if (!커뮤니티회원가입개인정보동의문.유효한동의(
+                privacyConsentAccepted,
+                privacyConsentVersion))
+        {
+            throw new InvalidOperationException("현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요.");
+        }
+
+        using var response = await _httpClient.PostAsJsonAsync(
+            "api/v1/auth/register/community",
+            new 커뮤니티회원가입요청
+            {
+                UserName = userName.Trim(),
+                Email = email.Trim(),
+                Password = password,
+                PrivacyConsentAccepted = privacyConsentAccepted,
+                PrivacyConsentVersion = privacyConsentVersion
+            },
+            cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
+                ? $"회원가입에 실패했습니다. HTTP {(int)response.StatusCode}"
+                : $"회원가입에 실패했습니다. HTTP {(int)response.StatusCode}: {body}");
+        }
+
+        var registration = await response.Content.ReadFromJsonAsync<커뮤니티회원가입응답>(cancellationToken);
+        if (registration is null || string.IsNullOrWhiteSpace(registration.UserId))
+        {
+            throw new InvalidOperationException("회원가입 응답에서 계정 정보를 읽을 수 없습니다.");
+        }
+
+        await LoginAsync(userName, password, cancellationToken);
+        return registration;
+    }
+
     public async Task ClearAsync(CancellationToken cancellationToken = default)
     {
         _snapshot = null;

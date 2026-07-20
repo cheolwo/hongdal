@@ -1,29 +1,71 @@
 @page "/"
 
-<PageTitle>역할별 화면 체험 | 살뜰</PageTitle>
+<PageTitle>살뜰 통합 베타</PageTitle>
 
 <main class="role-experience @SelectedRole.ThemeClass">
     <header class="role-experience__header">
         <div>
-            <span>SSALDDEL WEB PREVIEW</span>
-            <h1>역할별 화면 체험</h1>
-            <p>현재 구현된 주요 화면을 역할에 따라 바로 열어볼 수 있습니다.</p>
+            <span>SSALDDEL INTEGRATED BETA</span>
+            <h1>커뮤니티에서 업무까지, 한곳에서 이어집니다</h1>
+            <p>회원가입은 선택입니다. 익명 커뮤니티를 바로 쓰거나, 계정을 만들어 내 글·참여·업무 흐름을 이어갈 수 있습니다.</p>
         </div>
-        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Visibility">
-            @(WebExperienceCatalog.Roles.Count)개 역할
-        </MudChip>
+        <MudButton Href="/community"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Forum"
+                   EndIcon="@Icons.Material.Filled.ArrowForward"
+                   Class="role-experience__header-action">
+            커뮤니티 시작
+        </MudButton>
     </header>
 
-    <nav class="role-experience__selector" aria-label="체험할 역할 선택">
+    <section class="role-experience__release" aria-labelledby="integrated-release-title">
+        <div class="role-experience__release-heading">
+            <div>
+                <span>RELEASE STATUS</span>
+                <h2 id="integrated-release-title">통합 배포 현황</h2>
+                <p>@(RepresentativeScreenCount)개 대표 화면을 같은 기준으로 분류했습니다.</p>
+            </div>
+            <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Hub">
+                @(WebExperienceCatalog.Roles.Count)개 영역
+            </MudChip>
+        </div>
+
+        <div class="role-experience__release-grid">
+            @foreach (var stage in IntegratedBetaCatalog.StageOrder)
+            {
+                <article class="role-experience__release-card @IntegratedBetaCatalog.StageCssClass(stage)">
+                    <span class="role-experience__release-icon">
+                        <MudIcon Icon="@IntegratedBetaCatalog.StageIcon(stage)" Size="Size.Small" />
+                    </span>
+                    <strong>@StageCount(stage)</strong>
+                    <span>@IntegratedBetaPageState.StageLabelFor(stage)</span>
+                    <small>@IntegratedBetaPageState.StageDescriptionFor(stage)</small>
+                </article>
+            }
+        </div>
+
+        <MudAlert Severity="Severity.Info"
+                  Variant="Variant.Outlined"
+                  Icon="@Icons.Material.Filled.Security"
+                  Class="role-experience__release-notice">
+            통합 베타에서도 실제 실행 경계는 <strong>SsalddelExecution:Mode</strong> 한 곳을 따릅니다.
+            유상 화물 추천·자동 배차·계약 확정·실결제·실정산·실보관은 활성화하지 않으며, 관련 화면은 Simulation 또는 준비 중으로 표시합니다.
+        </MudAlert>
+    </section>
+
+    <nav class="role-experience__selector" aria-label="살펴볼 영역 선택">
         @foreach (var role in WebExperienceCatalog.Roles)
         {
             var isSelected = role.Key == SelectedRole.Key;
+            var roleState = IntegratedBetaCatalog.Resolve(role.StartHref);
             <button type="button"
                     class="role-experience__role-button @(isSelected ? "is-selected" : null)"
                     aria-pressed="@isSelected"
                     @onclick="@(() => SelectRole(role))">
                 <MudIcon Icon="@role.Icon" Size="Size.Small" />
                 <span>@role.Title</span>
+                <small class="@IntegratedBetaCatalog.StageCssClass(roleState.Stage)">@roleState.StageLabel</small>
             </button>
         }
     </nav>
@@ -45,6 +87,16 @@
                     <span>@SelectedRole.Eyebrow</span>
                     <h2>@SelectedRole.Title</h2>
                     <p>@SelectedRole.Description</p>
+                    <div class="role-experience__selected-status">
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Color="@IntegratedBetaCatalog.StageColor(SelectedRoleState.Stage)"
+                                 Variant="Variant.Outlined"
+                                 Icon="@IntegratedBetaCatalog.StageIcon(SelectedRoleState.Stage)">
+                            @SelectedRoleState.StageLabel
+                        </MudChip>
+                        <span>@SelectedRoleState.BoundaryLabel · @SelectedRoleState.AccessLabel</span>
+                    </div>
                 </div>
                 <MudButton Href="@SelectedRole.StartHref"
                            Variant="Variant.Filled"
@@ -58,7 +110,10 @@
             <div class="role-experience__screen-list">
                 @foreach (var screen in SelectedRole.Screens)
                 {
-                    <a class="role-experience__screen-link" href="@screen.Href">
+                    var screenState = IntegratedBetaCatalog.Resolve(screen.Href);
+                    <a class="role-experience__screen-link"
+                       href="@screen.Href"
+                       title="@screenState.Notice">
                         <span class="role-experience__screen-icon">
                             <MudIcon Icon="@screen.Icon" Size="Size.Small" />
                         </span>
@@ -67,10 +122,14 @@
                             <small>@screen.Description</small>
                         </span>
                         <span class="role-experience__screen-meta">
-                            <small>@screen.AreaLabel</small>
-                            <em>@screen.Status</em>
+                            <span class="role-experience__stage-pill @IntegratedBetaCatalog.StageCssClass(screenState.Stage)">
+                                @screenState.StageLabel
+                            </span>
+                            <small>@screenState.BoundaryLabel · @screenState.AccessLabel</small>
                         </span>
-                        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                        <span class="role-experience__screen-arrow">
+                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                        </span>
                     </a>
                 }
             </div>
@@ -80,7 +139,8 @@
     <section class="role-experience__community">
         <div class="role-experience__section-title">
             <span>PUBLIC COMMUNITY</span>
-            <h2>지금 공개된 커뮤니티</h2>
+            <h2>가입 없이도 시작할 수 있는 커뮤니티</h2>
+            <p>공개 글을 읽고 익명으로 글과 댓글을 남길 수 있습니다. 계정은 내 활동을 이어서 관리하고 싶을 때 만들면 됩니다.</p>
         </div>
         <실시간베스트Section />
     </section>
@@ -88,6 +148,22 @@
 
 @code {
     private WebExperienceRole SelectedRole { get; set; } = WebExperienceCatalog.DefaultRole;
+
+    private IntegratedBetaPageState SelectedRoleState
+        => IntegratedBetaCatalog.Resolve(SelectedRole.StartHref);
+
+    private static int RepresentativeScreenCount
+        => WebExperienceCatalog.Roles
+            .SelectMany(role => role.Screens)
+            .Select(screen => screen.Href)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
+
+    private static int StageCount(IntegratedBetaStage stage)
+        => WebExperienceCatalog.Roles
+            .SelectMany(role => role.Screens)
+            .DistinctBy(screen => screen.Href, StringComparer.OrdinalIgnoreCase)
+            .Count(screen => IntegratedBetaCatalog.Resolve(screen.Href).Stage == stage);
 
     private void SelectRole(WebExperienceRole role)
     {

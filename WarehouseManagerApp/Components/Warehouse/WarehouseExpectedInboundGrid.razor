@@ -12,24 +12,24 @@
     <Columns>
         <TemplateColumn T="입고요청항목응답" Title="업체" Sortable="false">
             <CellTemplate>
-                <MudText Typo="Typo.body2">@DisplaySupplierName(context.Item)</MudText>
-                <MudText Typo="Typo.caption" Color="Color.Secondary">@DisplaySupplierCode(context.Item)</MudText>
+                <MudText Typo="Typo.body2">@입고예정표시정책.공급처명(context.Item)</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@입고예정표시정책.공급처코드(context.Item)</MudText>
             </CellTemplate>
         </TemplateColumn>
         <TemplateColumn T="입고요청항목응답" Title="예정 품목" Sortable="false">
             <CellTemplate>
-                <MudText Typo="Typo.body2">@DisplayProductName(context.Item)</MudText>
+                <MudText Typo="Typo.body2">@입고예정표시정책.상품명(context.Item)</MudText>
                 @if (!string.IsNullOrWhiteSpace(context.Item.예정SKU) || context.Item.예정수량.HasValue)
                 {
                     <MudText Typo="Typo.caption" Color="Color.Secondary">
-                        @DisplayProductDetail(context.Item)
+                        @입고예정표시정책.상품상세(context.Item)
                     </MudText>
                 }
             </CellTemplate>
         </TemplateColumn>
         <TemplateColumn T="입고요청항목응답" Title="참조번호" Sortable="false">
             <CellTemplate>
-                <MudText Typo="Typo.body2">@DisplayReference(context.Item)</MudText>
+                <MudText Typo="Typo.body2">@입고예정표시정책.참조번호(context.Item)</MudText>
                 <MudText Typo="Typo.caption" Color="Color.Secondary">@($"입고 #{context.Item.Id}")</MudText>
             </CellTemplate>
         </TemplateColumn>
@@ -77,38 +77,30 @@
     [Parameter]
     public Color Color { get; set; } = Color.Primary;
 
+    [Parameter]
+    public int ReloadVersion { get; set; }
+
+    private bool _rendered;
+    private int _observedReloadVersion;
+
     public Task ReloadAsync()
         => _grid?.ReloadAsync() ?? Task.CompletedTask;
 
-    private static string DisplaySupplierName(입고요청항목응답 item)
-        => string.IsNullOrWhiteSpace(item.공급처명) ? "업체명 미등록" : item.공급처명;
-
-    private static string DisplaySupplierCode(입고요청항목응답 item)
-        => string.IsNullOrWhiteSpace(item.공급처코드) ? "코드 미등록" : item.공급처코드;
-
-    private static string DisplayProductName(입고요청항목응답 item)
-        => string.IsNullOrWhiteSpace(item.예정상품명) ? "품목 정보 없음" : item.예정상품명;
-
-    private static string DisplayProductDetail(입고요청항목응답 item)
+    protected override async Task OnParametersSetAsync()
     {
-        var values = new List<string>(2);
-        if (!string.IsNullOrWhiteSpace(item.예정SKU))
+        if (_rendered && ReloadVersion != _observedReloadVersion && _grid is not null)
         {
-            values.Add(item.예정SKU);
+            _observedReloadVersion = ReloadVersion;
+            await _grid.ReloadAsync();
         }
-
-        if (item.예정수량.HasValue)
-        {
-            values.Add($"{item.예정수량.Value:N0}개");
-        }
-
-        return string.Join(" · ", values);
     }
 
-    private static string DisplayReference(입고요청항목응답 item)
-        => !string.IsNullOrWhiteSpace(item.주문참조번호)
-            ? item.주문참조번호
-            : !string.IsNullOrWhiteSpace(item.원주문참조번호)
-                ? item.원주문참조번호
-                : "참조번호 없음";
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _rendered = true;
+            _observedReloadVersion = ReloadVersion;
+        }
+    }
 }

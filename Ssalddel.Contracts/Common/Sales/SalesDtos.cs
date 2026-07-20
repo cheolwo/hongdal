@@ -7,6 +7,8 @@ public sealed class 판매채널계정항목응답
     public string 상점명 { get; set; } = string.Empty;
     public string 연결상태 { get; set; } = string.Empty;
     public DateTime? 마지막동기화일시 { get; set; }
+    public DateTime 등록일시 { get; set; }
+    public DateTime 수정일시 { get; set; }
 }
 
 public sealed class 판매채널계정목록응답

@@ -1,502 +1,417 @@
+@using Ssalddel.Contracts.Mart
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
 <MudStack Spacing="3" data-testid="ssalddel-mart-picking-packing-workflow">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
         <MudStack Spacing="0">
-            <MudText Typo="Typo.h5">출고 예정품 피킹/포장</MudText>
+            <MudText Typo="Typo.h5">영속 주문 피킹/포장 조회</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                알뜰살뜰 마트 주문을 출고 예정품 기준으로 확인하고 피킹, 포장, 출고 완료 요청까지 처리합니다.
+                현재 계정이 담당하거나 접근할 수 있는 창고의 마트 주문과 피킹·포장 작업만 표시합니다.
             </MudText>
         </MudStack>
-        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-            <MudButton Href="@WorkBoardUrl" Variant="Variant.Outlined" Color="Color.Default" StartIcon="@Icons.Material.Filled.ViewKanban">
-                작업 보드
-            </MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="ResetDemo">
-                샘플 초기화
-            </MudButton>
-        </MudStack>
+        <MudButton Href="@WorkBoardUrl"
+                   Variant="Variant.Outlined"
+                   Color="Color.Default"
+                   StartIcon="@Icons.Material.Filled.ViewKanban">
+            작업 보드
+        </MudButton>
     </MudStack>
 
+    <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+        <MudStack Row="true" AlignItems="AlignItems.End" Spacing="2" Wrap="Wrap.Wrap">
+            <MudTextField T="string"
+                          Label="주문·상품·SKU 검색"
+                          Placeholder="주문 참조번호 또는 상품명"
+                          @bind-Value="Model.목록.검색어"
+                          Immediate="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Style="min-width: 240px; flex: 1 1 320px;" />
+            <MudSelect T="string"
+                       Label="작업 상태"
+                       @bind-Value="Model.목록.작업상태"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Style="min-width: 160px;">
+                <MudSelectItem T="string" Value="@string.Empty">전체 상태</MudSelectItem>
+                <MudSelectItem T="string" Value="@마트피킹작업상태코드.대기">대기</MudSelectItem>
+                <MudSelectItem T="string" Value="@마트피킹작업상태코드.진행중">진행 중</MudSelectItem>
+                <MudSelectItem T="string" Value="@마트피킹작업상태코드.완료">완료</MudSelectItem>
+                <MudSelectItem T="string" Value="@마트피킹작업상태코드.취소">취소</MudSelectItem>
+            </MudSelect>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@Model.목록.처리중"
+                       OnClick="SearchAsync"
+                       StartIcon="@Icons.Material.Filled.Search">
+                조회
+            </MudButton>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Default"
+                       Disabled="@(!Model.목록.검색조건사용중 || Model.목록.처리중)"
+                       OnClick="ResetFiltersAsync">
+                조건 초기화
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
     <MudGrid>
-        @foreach (var metric in SummaryMetrics)
-        {
-            <MudItem xs="6" md="3">
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">전체 검색 결과</MudText>
+                <MudText Typo="Typo.h5">@($"{Model.목록.전체건수:N0}건")</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">서버 페이징 기준</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">현재 페이지 작업</MudText>
+                <MudText Typo="Typo.h5">@($"{CurrentPageTaskCount:N0}건")</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">접근 가능한 작업만</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">현재 페이지 완료</MudText>
+                <MudText Typo="Typo.h5">@($"{CurrentPageCompletedTaskCount:N0}건")</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Success">서버 완료 상태 기준</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">상태 변경</MudText>
+                <MudText Typo="Typo.h5">없음</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Info">Beta · ReadOnly</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @if (Model.목록.처리중)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Rounded="true" />
+    }
+    else if (!string.IsNullOrWhiteSpace(Model.목록.오류메시지))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText>@Model.목록.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RefreshListAsync">다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (!Model.목록.초기화됨)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">마트 피킹 주문 목록을 준비하고 있습니다.</MudAlert>
+    }
+    else if (Model.목록.결과없음)
+    {
+        <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Large" Color="Color.Secondary" />
+                <MudText Typo="Typo.h6">조회 가능한 피킹 주문이 없습니다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                    현재 계정의 창고 범위에 작업이 없거나 검색 조건과 일치하지 않습니다.
+                </MudText>
+                @if (Model.목록.검색조건사용중)
+                {
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ResetFiltersAsync">전체 조건으로 다시 조회</MudButton>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="12" lg="4">
                 <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                    <MudStack Spacing="1">
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">@metric.Label</MudText>
-                        <MudText Typo="Typo.h5">@metric.Value</MudText>
-                        <MudText Typo="Typo.body2" Color="@metric.Color">@metric.Note</MudText>
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6">마트 주문</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">
+                                @($"{Model.목록.전체건수:N0}건")
+                            </MudChip>
+                        </MudStack>
+
+                        @foreach (var order in Model.목록.주문목록)
+                        {
+                            <MudPaper Class="@OrderPanelClass(order)"
+                                      Elevation="0"
+                                      Outlined="true"
+                                      data-testid="@($"mart-order-{order.주문Id}")">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle2">@ValueOrFallback(order.주문참조번호)</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @WarehouseSummary(order.창고목록)
+                                            </MudText>
+                                        </MudStack>
+                                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(order.주문상태)" Variant="Variant.Outlined">
+                                            @ValueOrFallback(order.현재단계 ?? order.주문상태)
+                                        </MudChip>
+                                    </MudStack>
+
+                                    <MudText Typo="Typo.body2">
+                                        상품 @(order.상품종류수)종 · 주문 @order.주문수량.ToString("N0")개 · 작업 @(order.작업수)건
+                                    </MudText>
+                                    <MudProgressLinear Color="@ProgressColor(order)" Value="@Progress(order)" Rounded="true" />
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        완료 @order.완료작업수 / @order.작업수 · @DateTimeText(order.최근수정일시Utc)
+                                    </MudText>
+
+                                    <MudButton FullWidth="true"
+                                               Variant="@(IsSelected(order) ? Variant.Filled : Variant.Outlined)"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               OnClick="@(() => SelectOrderAsync(order.주문Id))">
+                                        정확한 주문 상세 열기
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        }
+
+                        @if (Model.목록.총페이지수 > 1)
+                        {
+                            <MudPagination Count="@Model.목록.총페이지수"
+                                           Selected="@Model.목록.현재페이지"
+                                           SelectedChanged="ChangePageAsync"
+                                           Color="Color.Primary"
+                                           Size="Size.Small" />
+                        }
                     </MudStack>
                 </MudPaper>
             </MudItem>
-        }
-    </MudGrid>
 
-    @if (!string.IsNullOrWhiteSpace(Message))
-    {
-        <MudAlert Severity="@MessageSeverity" Variant="Variant.Outlined">@Message</MudAlert>
-    }
-
-    <MudGrid>
-        <MudItem xs="12" lg="4">
-            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                <MudStack Spacing="2">
-                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                        <MudText Typo="Typo.h6">출고 예정 주문</MudText>
-                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@($"{Orders.Count}건")</MudChip>
-                    </MudStack>
-
-                    @foreach (var order in Orders)
+            <MudItem xs="12" lg="8">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    @if (!Model.상세.요청OrderId.HasValue)
                     {
-                        <MudPaper Class="@OrderPanelClass(order)" Elevation="0" Outlined="true" data-testid="@($"mart-order-{order.OrderNo}")">
-                            <MudStack Spacing="2">
-                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                                    <MudStack Spacing="0">
-                                        <MudText Typo="Typo.subtitle2">@order.OrderNo</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@order.CustomerArea · @order.PromiseTime</MudText>
-                                    </MudStack>
-                                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(order.Status)">@order.Status</MudChip>
-                                </MudStack>
-
-                                <MudText Typo="Typo.body2">@order.Summary</MudText>
-                                <MudProgressLinear Color="@StatusColor(order.Status)" Value="@order.ProgressPercent" Rounded="true" />
-
-                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@order.TemperatureBand</MudChip>
-                                    <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@order.PackingMemo</MudChip>
-                                </MudStack>
-
-                                <MudButton FullWidth="true"
-                                           Variant="@(order.OrderNo == SelectedOrderNo ? Variant.Filled : Variant.Outlined)"
-                                           Color="Color.Primary"
-                                           Size="Size.Small"
-                                           OnClick="@(() => SelectOrder(order.OrderNo))">
-                                    주문 작업 열기
-                                </MudButton>
-                            </MudStack>
-                        </MudPaper>
-                    }
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-
-        <MudItem xs="12" lg="8">
-            <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
-                <MudStack Spacing="3">
-                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                        <MudStack Spacing="0">
-                            <MudText Typo="Typo.h6">@CurrentOrder.OrderNo 피킹/포장</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                                @CurrentOrder.CustomerArea · @CurrentOrder.DeliveryMemo
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8">
+                            <MudIcon Icon="@Icons.Material.Filled.FactCheck" Size="Size.Large" Color="Color.Secondary" />
+                            <MudText Typo="Typo.h6">확인할 주문을 선택해 주세요.</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                목록의 주문 ID를 그대로 서버에 요청하며 다른 주문이나 첫 주문으로 대체하지 않습니다.
                             </MudText>
                         </MudStack>
-                        <MudChip T="string" Color="@StatusColor(CurrentOrder.Status)" Variant="Variant.Filled">@CurrentOrder.Status</MudChip>
-                    </MudStack>
-
-                    <MudGrid>
-                        <MudItem xs="12" md="4">
-                            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">원장/OS</MudText>
-                                <MudText Typo="Typo.subtitle2">알뜰살뜰 마트 즉시배송 원장</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">알뜰살뜰 마트 도심 물류 OS</MudText>
-                            </MudPaper>
-                        </MudItem>
-                        <MudItem xs="12" md="4">
-                            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">피킹 진행</MudText>
-                                <MudText Typo="Typo.subtitle2">@CurrentOrder.PickedLineCount / @CurrentOrder.Lines.Count 라인</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">@CurrentOrder.PickedQuantity / @CurrentOrder.PlannedQuantity 개</MudText>
-                            </MudPaper>
-                        </MudItem>
-                        <MudItem xs="12" md="4">
-                            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">출고 묶음</MudText>
-                                <MudText Typo="Typo.subtitle2">@CurrentOrder.OutboundBatchNo</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">@CurrentOrder.RiderHint</MudText>
-                            </MudPaper>
-                        </MudItem>
-                    </MudGrid>
-
-                    <MudTable Items="CurrentOrder.Lines" Dense="true" Hover="true" data-testid="mart-planned-outbound-items">
-                        <HeaderContent>
-                            <MudTh>출고 예정품</MudTh>
-                            <MudTh>위치</MudTh>
-                            <MudTh>수량</MudTh>
-                            <MudTh>피킹</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="출고 예정품">
+                    }
+                    else if (Model.상세.처리중)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8">
+                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">주문 #@Model.상세.요청OrderId 상세를 조회하고 있습니다.</MudText>
+                        </MudStack>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.상세.오류메시지))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudText>@Model.상세.오류메시지</MudText>
+                                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RetryDetailAsync">상세 다시 조회</MudButton>
+                            </MudStack>
+                        </MudAlert>
+                    }
+                    else if (Model.상세.찾을수없음)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8">
+                            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" />
+                            <MudText Typo="Typo.h6">마트 주문을 찾을 수 없습니다.</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                주문 #@Model.상세.요청OrderId 이(가) 없거나 현재 계정의 창고 조회 범위에 없습니다.
+                            </MudText>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ClearSelectionAsync">목록으로 돌아가기</MudButton>
+                        </MudStack>
+                    }
+                    else if (Model.상세.상세 is { } detail)
+                    {
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
                                 <MudStack Spacing="0">
-                                    <MudText Typo="Typo.body2">@context.ProductName</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.Sku · @context.Barcode</MudText>
+                                    <MudText Typo="Typo.h6">@ValueOrFallback(detail.주문참조번호)</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        주문 #@detail.주문Id · 수정 @DateTimeText(detail.수정일시Utc)
+                                    </MudText>
                                 </MudStack>
-                            </MudTd>
-                            <MudTd DataLabel="위치">
-                                <MudStack Spacing="0">
-                                    <MudText Typo="Typo.body2">@context.PickLocation</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@context.StorageType</MudText>
+                                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                    <MudChip T="string" Color="@StatusColor(detail.주문상태)" Variant="Variant.Outlined">
+                                        @ValueOrFallback(detail.현재단계 ?? detail.주문상태)
+                                    </MudChip>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                                   Color="Color.Default"
+                                                   OnClick="ClearSelectionAsync"
+                                                   aria-label="주문 상세 닫기" />
                                 </MudStack>
-                            </MudTd>
-                            <MudTd DataLabel="수량">@context.PickedQuantity / @context.PlannedQuantity</MudTd>
-                            <MudTd DataLabel="피킹">
-                                <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                                    <MudButton Size="Size.Small"
-                                               Variant="Variant.Outlined"
-                                               Color="Color.Primary"
-                                               Disabled="@context.IsPicked"
-                                               OnClick="@(() => PickOne(context))"
-                                               data-testid="@($"mart-pick-one-{context.LineKey}")">
-                                        +1
-                                    </MudButton>
-                                    <MudButton Size="Size.Small"
-                                               Variant="Variant.Filled"
-                                               Color="Color.Success"
-                                               Disabled="@context.IsPicked"
-                                               OnClick="@(() => PickAll(context))"
-                                               data-testid="@($"mart-pick-all-{context.LineKey}")">
-                                        라인 완료
-                                    </MudButton>
-                                </MudStack>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
-
-                    <MudPaper Class="pa-3" Elevation="0" Outlined="true">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.subtitle2">단계 처리</MudText>
-                            <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
-                                <MudButton Variant="Variant.Outlined"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.Filled.PlayArrow"
-                                           Disabled="@(!CanStartPicking(CurrentOrder))"
-                                           OnClick="StartPicking"
-                                           data-testid="mart-start-picking">
-                                    피킹 시작
-                                </MudButton>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.Filled.TaskAlt"
-                                           Disabled="@(!CanCompletePicking(CurrentOrder))"
-                                           OnClick="CompletePicking"
-                                           data-testid="mart-complete-picking">
-                                    피킹 완료
-                                </MudButton>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Warning"
-                                           StartIcon="@Icons.Material.Filled.Inventory"
-                                           Disabled="@(!CanCompletePacking(CurrentOrder))"
-                                           OnClick="CompletePacking"
-                                           data-testid="mart-complete-packing">
-                                    포장 완료
-                                </MudButton>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Secondary"
-                                           StartIcon="@Icons.Material.Filled.LocalShipping"
-                                           Disabled="@(!CanRequestOutboundCompletion(CurrentOrder))"
-                                           OnClick="RequestOutboundCompletion"
-                                           data-testid="mart-request-outbound-completion">
-                                    출고 완료 요청
-                                </MudButton>
                             </MudStack>
 
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Visibility">
+                                서버 원본을 읽는 Beta/ReadOnly 상세입니다. 피킹 수량·포장·출고 상태를 이 화면에서 변경하지 않습니다.
+                            </MudAlert>
+
                             <MudGrid>
-                                <MudItem xs="12" md="4">
-                                    <MudSelect T="string" Label="포장 방식" @bind-Value="CurrentOrder.PackageType" Variant="Variant.Outlined" Dense="true">
-                                        <MudSelectItem T="string" Value="@("상온 박스")">상온 박스</MudSelectItem>
-                                        <MudSelectItem T="string" Value="@("냉장 보냉백")">냉장 보냉백</MudSelectItem>
-                                        <MudSelectItem T="string" Value="@("냉동 보냉백")">냉동 보냉백</MudSelectItem>
-                                        <MudSelectItem T="string" Value="@("분리 포장")">분리 포장</MudSelectItem>
-                                    </MudSelect>
+                                <MudItem xs="6" md="3">
+                                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">주문 상품</MudText>
+                                        <MudText Typo="Typo.h6">@($"{detail.상품목록.Count}종")</MudText>
+                                    </MudPaper>
                                 </MudItem>
-                                <MudItem xs="12" md="4">
-                                    <MudTextField T="string" Label="출고 묶음 바코드" @bind-Value="CurrentOrder.OutboundBundleBarcode" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudItem xs="6" md="3">
+                                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">피킹 작업</MudText>
+                                        <MudText Typo="Typo.h6">@($"{detail.작업목록.Count(task => task.작업유형 == "피킹")}건")</MudText>
+                                    </MudPaper>
                                 </MudItem>
-                                <MudItem xs="12" md="4">
-                                    <MudTextField T="string" Label="라이더/픽업 메모" @bind-Value="CurrentOrder.RiderMemo" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                <MudItem xs="6" md="3">
+                                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">포장 작업</MudText>
+                                        <MudText Typo="Typo.h6">@($"{detail.작업목록.Count(task => task.작업유형 == "포장")}건")</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="6" md="3">
+                                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">완료 작업</MudText>
+                                        <MudText Typo="Typo.h6">@($"{detail.작업목록.Count(task => task.상태 == 마트피킹작업상태코드.완료)}건")</MudText>
+                                    </MudPaper>
                                 </MudItem>
                             </MudGrid>
+
+                            <MudText Typo="Typo.subtitle1">주문 상품</MudText>
+                            <MudTable Items="detail.상품목록" Dense="true" Hover="true">
+                                <HeaderContent>
+                                    <MudTh>상품</MudTh>
+                                    <MudTh>SKU</MudTh>
+                                    <MudTh>수량</MudTh>
+                                    <MudTh>상태</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="상품">@context.상품명</MudTd>
+                                    <MudTd DataLabel="SKU">@ValueOrFallback(context.SKU)</MudTd>
+                                    <MudTd DataLabel="수량">@context.수량.ToString("N0")개</MudTd>
+                                    <MudTd DataLabel="상태">@ValueOrFallback(context.상태)</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+
+                            <MudText Typo="Typo.subtitle1">접근 가능한 피킹·포장 작업</MudText>
+                            @if (detail.작업목록.Count == 0)
+                            {
+                                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">이 주문에 조회 가능한 작업이 없습니다.</MudAlert>
+                            }
+                            else
+                            {
+                                <MudTable Items="detail.작업목록" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                                    <HeaderContent>
+                                        <MudTh>작업</MudTh>
+                                        <MudTh>상품</MudTh>
+                                        <MudTh>창고·위치</MudTh>
+                                        <MudTh>담당</MudTh>
+                                        <MudTh>상태</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="작업">
+                                            <MudStack Spacing="0">
+                                                <MudText Typo="Typo.body2">@context.작업유형 · @context.처리방식</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@context.작업Key</MudText>
+                                            </MudStack>
+                                        </MudTd>
+                                        <MudTd DataLabel="상품">
+                                            <MudStack Spacing="0">
+                                                <MudText Typo="Typo.body2">@context.상품명</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@context.SKU · @context.수량.ToString("N0")개</MudText>
+                                            </MudStack>
+                                        </MudTd>
+                                        <MudTd DataLabel="창고·위치">
+                                            <MudStack Spacing="0">
+                                                <MudText Typo="Typo.body2">@ValueOrFallback(context.창고명)</MudText>
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">@LocationText(context)</MudText>
+                                            </MudStack>
+                                        </MudTd>
+                                        <MudTd DataLabel="담당">@ValueOrFallback(context.작업자표시명)</MudTd>
+                                        <MudTd DataLabel="상태">
+                                            <MudChip T="string" Size="Size.Small" Color="@TaskStatusColor(context.상태)" Variant="Variant.Outlined">
+                                                @ValueOrFallback(context.상태)
+                                            </MudChip>
+                                        </MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            }
                         </MudStack>
-                    </MudPaper>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
 </MudStack>
 
 @code {
+    [Parameter, EditorRequired]
+    public 마트피킹작업PageViewModel Model { get; set; } = default!;
+
     [Parameter]
     public string WorkBoardUrl { get; set; } = "/warehouse/mart/work-board";
 
-    private List<MartOutboundOrder> Orders = CreateOrders();
-    private string SelectedOrderNo = "MART-2401";
-    private string? Message;
-    private Severity MessageSeverity = Severity.Info;
+    [Parameter]
+    public EventCallback<long?> OnOrderSelected { get; set; }
 
-    private MartOutboundOrder CurrentOrder => Orders.FirstOrDefault(x => x.OrderNo == SelectedOrderNo) ?? Orders[0];
+    private int CurrentPageTaskCount => Model.목록.주문목록.Sum(order => order.작업수);
+    private int CurrentPageCompletedTaskCount => Model.목록.주문목록.Sum(order => order.완료작업수);
 
-    private IReadOnlyList<SummaryMetric> SummaryMetrics =>
-    [
-        new("출고 예정", Orders.Count(x => x.Status != MartOrderStatus.OutboundCompletionRequested).ToString(), "피킹/포장 대상 주문", Color.Primary),
-        new("피킹 완료", Orders.Count(x => x.Status is MartOrderStatus.PickingCompleted or MartOrderStatus.Packed or MartOrderStatus.OutboundCompletionRequested).ToString(), "포장 가능 주문", Color.Info),
-        new("포장 완료", Orders.Count(x => x.Status is MartOrderStatus.Packed or MartOrderStatus.OutboundCompletionRequested).ToString(), "기사 픽업 대기", Color.Warning),
-        new("검토 대기", Orders.Count(x => x.Status == MartOrderStatus.OutboundCompletionRequested).ToString(), "OS/관리자 확인 필요", Color.Secondary)
-    ];
+    private Task SearchAsync() => Model.목록.조회Async();
+    private Task ResetFiltersAsync() => Model.목록.조건초기화후조회Async();
+    private Task RefreshListAsync() => Model.목록.새로고침Async();
+    private Task ChangePageAsync(int page) => Model.목록.페이지조회Async(page);
+    private Task SelectOrderAsync(long orderId) => OnOrderSelected.InvokeAsync(orderId);
+    private Task ClearSelectionAsync() => OnOrderSelected.InvokeAsync(null);
 
-    private void SelectOrder(string orderNo)
-    {
-        SelectedOrderNo = orderNo;
-        Message = null;
-    }
+    private Task RetryDetailAsync()
+        => Model.상세.요청OrderId is > 0
+            ? Model.상세.조회Async(Model.상세.요청OrderId.Value)
+            : Task.CompletedTask;
 
-    private void StartPicking()
-    {
-        if (!CanStartPicking(CurrentOrder))
-        {
-            return;
-        }
+    private bool IsSelected(마트피킹주문요약응답 order)
+        => Model.상세.요청OrderId == order.주문Id;
 
-        CurrentOrder.Status = MartOrderStatus.Picking;
-        MessageSeverity = Severity.Info;
-        Message = $"{CurrentOrder.OrderNo} 피킹을 시작했습니다. 출고 예정품을 위치별로 확인하세요.";
-    }
+    private string OrderPanelClass(마트피킹주문요약응답 order)
+        => IsSelected(order) ? "pa-3 mud-theme-primary" : "pa-3";
 
-    private void PickOne(MartOutboundLine line)
-    {
-        if (line.IsPicked)
-        {
-            return;
-        }
+    private static double Progress(마트피킹주문요약응답 order)
+        => order.작업수 <= 0 ? 0 : Math.Clamp(order.완료작업수 * 100d / order.작업수, 0, 100);
 
-        EnsurePickingStarted(CurrentOrder);
-        line.PickedQuantity = Math.Min(line.PlannedQuantity, line.PickedQuantity + 1);
-        UpdatePickedStatus(CurrentOrder);
-    }
+    private static Color ProgressColor(마트피킹주문요약응답 order)
+        => order.작업수 > 0 && order.완료작업수 == order.작업수 ? Color.Success : Color.Primary;
 
-    private void PickAll(MartOutboundLine line)
-    {
-        if (line.IsPicked)
-        {
-            return;
-        }
-
-        EnsurePickingStarted(CurrentOrder);
-        line.PickedQuantity = line.PlannedQuantity;
-        UpdatePickedStatus(CurrentOrder);
-    }
-
-    private void CompletePicking()
-    {
-        if (!CurrentOrder.AllLinesPicked)
-        {
-            MessageSeverity = Severity.Warning;
-            Message = "아직 피킹되지 않은 출고 예정품이 있습니다.";
-            return;
-        }
-
-        CurrentOrder.Status = MartOrderStatus.PickingCompleted;
-        MessageSeverity = Severity.Success;
-        Message = $"{CurrentOrder.OrderNo} 피킹 완료. 포장 방식과 출고 묶음 바코드를 확인하세요.";
-    }
-
-    private void CompletePacking()
-    {
-        if (!CanCompletePacking(CurrentOrder))
-        {
-            return;
-        }
-
-        CurrentOrder.Status = MartOrderStatus.Packed;
-        MessageSeverity = Severity.Success;
-        Message = $"{CurrentOrder.OrderNo} 포장 완료. 배달 기사 픽업과 출고 완료 요청이 가능합니다.";
-    }
-
-    private void RequestOutboundCompletion()
-    {
-        if (!CanRequestOutboundCompletion(CurrentOrder))
-        {
-            return;
-        }
-
-        CurrentOrder.Status = MartOrderStatus.OutboundCompletionRequested;
-        MessageSeverity = Severity.Info;
-        Message = $"{CurrentOrder.OrderNo} 출고 완료 요청을 올렸습니다. 실제 완료 확정은 OS/API 확인 뒤 처리됩니다.";
-    }
-
-    private void ResetDemo()
-    {
-        Orders = CreateOrders();
-        SelectedOrderNo = "MART-2401";
-        MessageSeverity = Severity.Info;
-        Message = "알뜰살뜰 마트 피킹/포장 샘플을 초기화했습니다.";
-    }
-
-    private static void EnsurePickingStarted(MartOutboundOrder order)
-    {
-        if (order.Status == MartOrderStatus.Planned)
-        {
-            order.Status = MartOrderStatus.Picking;
-        }
-    }
-
-    private void UpdatePickedStatus(MartOutboundOrder order)
-    {
-        if (order.AllLinesPicked)
-        {
-            order.Status = MartOrderStatus.PickingCompleted;
-            MessageSeverity = Severity.Success;
-            Message = $"{order.OrderNo} 모든 출고 예정품 피킹이 끝났습니다.";
-        }
-        else
-        {
-            MessageSeverity = Severity.Info;
-            Message = $"{order.OrderNo} 피킹 진행 중입니다.";
-        }
-    }
-
-    private static bool CanStartPicking(MartOutboundOrder order)
-        => order.Status == MartOrderStatus.Planned;
-
-    private static bool CanCompletePicking(MartOutboundOrder order)
-        => order.Status == MartOrderStatus.Picking && order.AllLinesPicked;
-
-    private static bool CanCompletePacking(MartOutboundOrder order)
-        => order.Status == MartOrderStatus.PickingCompleted;
-
-    private static bool CanRequestOutboundCompletion(MartOutboundOrder order)
-        => order.Status == MartOrderStatus.Packed;
-
-    private static Color StatusColor(string status)
+    private static Color StatusColor(string? status)
         => status switch
         {
-            MartOrderStatus.Planned => Color.Default,
-            MartOrderStatus.Picking => Color.Primary,
-            MartOrderStatus.PickingCompleted => Color.Info,
-            MartOrderStatus.Packed => Color.Warning,
-            MartOrderStatus.OutboundCompletionRequested => Color.Secondary,
-            _ => Color.Default
+            "완료" or "출고 완료" => Color.Success,
+            "취소" => Color.Error,
+            "출고 예정" => Color.Warning,
+            _ => Color.Info
         };
 
-    private string OrderPanelClass(MartOutboundOrder order)
-        => order.OrderNo == SelectedOrderNo ? "pa-3 h-100 mud-border-primary" : "pa-3 h-100";
+    private static Color TaskStatusColor(string? status)
+        => status switch
+        {
+            마트피킹작업상태코드.완료 => Color.Success,
+            마트피킹작업상태코드.진행중 => Color.Info,
+            마트피킹작업상태코드.취소 => Color.Error,
+            _ => Color.Warning
+        };
 
-    private static List<MartOutboundOrder> CreateOrders()
-        =>
-        [
-            new()
-            {
-                OrderNo = "MART-2401",
-                CustomerArea = "상암 DMC",
-                PromiseTime = "11:00 이전",
-                Summary = "냉장 2개, 상온 1개, 대체 후보 1건",
-                TemperatureBand = "냉장+상온",
-                PackingMemo = "분리 포장",
-                DeliveryMemo = "오피스 로비 전달",
-                OutboundBatchNo = "HDM-OB-1100-A",
-                OutboundBundleBarcode = "PKG-MART-2401",
-                RiderHint = "RIDER-73 추천 가능",
-                RiderMemo = "로비 앞 5분 대기",
-                PackageType = "분리 포장",
-                Lines =
-                [
-                    new("L1", "HDM-MILK-1L", "우유 1L", "8801000-2401", "COLD-A-01", "냉장 피킹존", 2),
-                    new("L2", "HDM-SALAD-SET", "샐러드 세트", "8801000-2402", "COLD-A-03", "냉장 피킹존", 1),
-                    new("L3", "HDM-WATER-500", "생수 500ml", "8801000-2403", "AMB-B-02", "상온 피킹존", 3)
-                ]
-            },
-            new()
-            {
-                OrderNo = "MART-2402",
-                CustomerArea = "마포 래미안",
-                PromiseTime = "11:10 이전",
-                Summary = "상온 4개, 냉동 1개",
-                TemperatureBand = "냉동+상온",
-                PackingMemo = "보냉백",
-                DeliveryMemo = "문앞 전달",
-                OutboundBatchNo = "HDM-OB-1110-B",
-                OutboundBundleBarcode = "PKG-MART-2402",
-                RiderHint = "RIDER-81 묶음 가능",
-                RiderMemo = "공동현관 호출",
-                PackageType = "냉동 보냉백",
-                Lines =
-                [
-                    new("L1", "HDM-DUMPLING", "냉동 만두", "8802000-2401", "FRZ-F-01", "냉동 피킹존", 1),
-                    new("L2", "HDM-RAMEN-5", "라면 5입", "8802000-2402", "AMB-C-04", "상온 피킹존", 2),
-                    new("L3", "HDM-TISSUE", "미니 티슈", "8802000-2403", "AMB-D-01", "상온 피킹존", 1)
-                ]
-            },
-            new()
-            {
-                OrderNo = "MART-2403",
-                CustomerArea = "합정역",
-                PromiseTime = "11:25 이전",
-                Summary = "상온 2개, 포장 완료 후 즉시 픽업",
-                TemperatureBand = "상온",
-                PackingMemo = "소형 박스",
-                DeliveryMemo = "역 2번 출구",
-                OutboundBatchNo = "HDM-OB-1125-C",
-                OutboundBundleBarcode = "PKG-MART-2403",
-                RiderHint = "근거리 공개 픽업",
-                RiderMemo = "역 출구에서 연락",
-                PackageType = "상온 박스",
-                Lines =
-                [
-                    new("L1", "HDM-COFFEE", "캔커피", "8803000-2401", "AMB-B-05", "상온 피킹존", 2),
-                    new("L2", "HDM-SNACK", "스낵 묶음", "8803000-2402", "AMB-B-07", "상온 피킹존", 1)
-                ]
-            }
-        ];
+    private static string WarehouseSummary(IReadOnlyList<string> warehouses)
+        => warehouses.Count == 0 ? "창고 연결 정보 없음" : string.Join(" · ", warehouses);
 
-    private sealed record SummaryMetric(string Label, string Value, string Note, Color Color);
-
-    private static class MartOrderStatus
+    private static string LocationText(마트피킹작업응답 task)
     {
-        public const string Planned = "출고예정";
-        public const string Picking = "피킹중";
-        public const string PickingCompleted = "피킹완료";
-        public const string Packed = "포장완료";
-        public const string OutboundCompletionRequested = "출고검토대기";
+        var values = new[] { task.적재대코드, task.보관위치코드 }
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value!.Trim())
+            .ToArray();
+        return values.Length == 0 ? $"창고 #{task.창고Id}" : string.Join(" · ", values);
     }
 
-    private sealed class MartOutboundOrder
-    {
-        public string OrderNo { get; init; } = string.Empty;
-        public string CustomerArea { get; init; } = string.Empty;
-        public string PromiseTime { get; init; } = string.Empty;
-        public string Summary { get; init; } = string.Empty;
-        public string TemperatureBand { get; init; } = string.Empty;
-        public string PackingMemo { get; init; } = string.Empty;
-        public string DeliveryMemo { get; init; } = string.Empty;
-        public string OutboundBatchNo { get; init; } = string.Empty;
-        public string OutboundBundleBarcode { get; set; } = string.Empty;
-        public string RiderHint { get; init; } = string.Empty;
-        public string RiderMemo { get; set; } = string.Empty;
-        public string PackageType { get; set; } = "상온 박스";
-        public string Status { get; set; } = MartOrderStatus.Planned;
-        public List<MartOutboundLine> Lines { get; init; } = [];
+    private static string DateTimeText(DateTime value)
+        => value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
 
-        public int PlannedQuantity => Lines.Sum(x => x.PlannedQuantity);
-        public int PickedQuantity => Lines.Sum(x => x.PickedQuantity);
-        public int PickedLineCount => Lines.Count(x => x.IsPicked);
-        public bool AllLinesPicked => Lines.Count > 0 && Lines.All(x => x.IsPicked);
-        public double ProgressPercent => PlannedQuantity == 0 ? 0 : Math.Round(PickedQuantity * 100d / PlannedQuantity, 1);
-    }
-
-    private sealed class MartOutboundLine(
-        string lineKey,
-        string sku,
-        string productName,
-        string barcode,
-        string pickLocation,
-        string storageType,
-        int plannedQuantity)
-    {
-        public string LineKey { get; } = lineKey;
-        public string Sku { get; } = sku;
-        public string ProductName { get; } = productName;
-        public string Barcode { get; } = barcode;
-        public string PickLocation { get; } = pickLocation;
-        public string StorageType { get; } = storageType;
-        public int PlannedQuantity { get; } = plannedQuantity;
-        public int PickedQuantity { get; set; }
-        public bool IsPicked => PickedQuantity >= PlannedQuantity;
-    }
+    private static string ValueOrFallback(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "정보 없음" : value.Trim();
 }

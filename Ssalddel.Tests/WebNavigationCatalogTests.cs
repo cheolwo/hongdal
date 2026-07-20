@@ -49,6 +49,7 @@ public sealed class WebNavigationCatalogTests
             "/community/me",
             "/community/me/posts",
             "/community/me/actions",
+            "/community/roles/apply",
             "/community/me/ledgers",
             "/community/me/notifications",
             "/community/decorations",

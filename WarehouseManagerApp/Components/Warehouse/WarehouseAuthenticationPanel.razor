@@ -1,0 +1,60 @@
+@using Ssalddel.Ui.Common.Areas.App.Models.Auth
+@using Ssalddel.Ui.Common.Areas.App.Components.Auth
+
+<Ssalddel공통로그인Panel 제목="창고 업무 로그인"
+                         설명="창고 업무 정보는 관계자에게만 공개됩니다. 서버가 창고관리자 역할과 HR 세부 역할을 최종 확인합니다."
+                         현재사용자표시="@ViewModel.현재사용자표시"
+                         상태메시지="@ViewModel.안내메시지"
+                         상태Severity="@StatusSeverity"
+                         일반로그인표시="@(!ViewModel.로그인됨)"
+                         소셜로그인표시="false"
+                         일반로그인버튼텍스트="창고 업무 로그인"
+                         IsBusy="@ViewModel.처리중"
+                         Elevation="0"
+                         Class="pa-4"
+                         OnPasswordLogin="LoginAsync">
+    @if (ViewModel.로그인됨)
+    {
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   FullWidth="true"
+                   Disabled="@ViewModel.처리중"
+                   OnClick="LogoutAsync">
+            다른 계정으로 로그인
+        </MudButton>
+    }
+</Ssalddel공통로그인Panel>
+
+@code {
+    [Parameter, EditorRequired]
+    public 창고로그인ViewModel ViewModel { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnAuthenticated { get; set; }
+
+    [Parameter]
+    public EventCallback OnLoggedOut { get; set; }
+
+    private Severity StatusSeverity
+        => ViewModel.안내수준 switch
+        {
+            창고인증안내수준.성공 => Severity.Success,
+            창고인증안내수준.주의 => Severity.Warning,
+            창고인증안내수준.오류 => Severity.Error,
+            _ => Severity.Info
+        };
+
+    private async Task LoginAsync(공통로그인요청 request)
+    {
+        if (await ViewModel.로그인Async(request.UserNameOrEmail, request.Password))
+        {
+            await OnAuthenticated.InvokeAsync();
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        await ViewModel.로그아웃Async();
+        await OnLoggedOut.InvokeAsync();
+    }
+}

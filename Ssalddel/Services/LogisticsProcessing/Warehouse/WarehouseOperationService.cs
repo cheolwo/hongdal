@@ -334,6 +334,31 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         };
     }
 
+    public async Task<입고요청항목응답?> GetInboundAsync(
+        long inboundId,
+        CancellationToken cancellationToken)
+    {
+        if (inboundId <= 0)
+        {
+            return null;
+        }
+
+        var entity = await 접근가능입고Query(RequireUserId())
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == inboundId, cancellationToken);
+        if (entity is null)
+        {
+            return null;
+        }
+
+        var expectedOutbound = await _db.출고예정
+            .AsNoTracking()
+            .Where(outbound => outbound.입고요청Id == entity.Id)
+            .OrderBy(outbound => outbound.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        return ToInboundResponse(entity, expectedOutbound);
+    }
+
     public async Task<입고요청항목응답> CreateInboundAsync(입고요청저장요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();

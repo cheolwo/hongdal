@@ -58,6 +58,36 @@ public sealed class 공동구매창고ServiceTests
     }
 
     [Fact]
+    public async Task 입고상세조회는_같은입고번호의Get경로를사용한다()
+    {
+        var item = new 입고요청항목응답 { Id = 29, 상태 = 입고상태코드.운송중 };
+        var client = new RecordingJsonApiClient { Response = item };
+        var service = new 입출고작업Service(client);
+
+        var result = await service.입고상세조회Async(29);
+
+        Assert.Same(item, result);
+        Assert.Equal(HttpMethod.Get, client.LastMethod);
+        Assert.Equal("api/v1/warehouse-operations/inbounds/29", client.LastPath);
+        Assert.True(client.LastAllowNotFound);
+    }
+
+    [Fact]
+    public async Task 입고상세조회ViewModel은_404응답을오류가아닌대상없음으로분리한다()
+    {
+        var client = new RecordingJsonApiClient();
+        var viewModel = new 입고상세조회ViewModel(new 입출고작업Service(client));
+        viewModel.조회대상설정(404);
+
+        var succeeded = await viewModel.조회Async();
+
+        Assert.True(succeeded);
+        Assert.True(viewModel.대상없음);
+        Assert.Null(viewModel.항목);
+        Assert.Null(viewModel.오류메시지);
+    }
+
+    [Fact]
     public async Task 입고예정조회ViewModel은_상태조건을입고예정으로고정한다()
     {
         var client = new RecordingJsonApiClient
@@ -176,6 +206,7 @@ public sealed class 공동구매창고ServiceTests
         public string? LastPath { get; private set; }
         public HttpMethod? LastMethod { get; private set; }
         public object? LastRequest { get; private set; }
+        public bool? LastAllowNotFound { get; private set; }
 
         public Task<TResponse?> GetAsync<TResponse>(
             string path,
@@ -183,7 +214,7 @@ public sealed class 공동구매창고ServiceTests
             bool allowNotFound = true,
             CancellationToken cancellationToken = default)
         {
-            Record(HttpMethod.Get, path, null);
+            Record(HttpMethod.Get, path, null, allowNotFound);
             return Task.FromResult(Response is null ? default : (TResponse)Response);
         }
 
@@ -231,11 +262,12 @@ public sealed class 공동구매창고ServiceTests
             return Task.CompletedTask;
         }
 
-        private void Record(HttpMethod method, string path, object? request)
+        private void Record(HttpMethod method, string path, object? request, bool? allowNotFound = null)
         {
             LastMethod = method;
             LastPath = path;
             LastRequest = request;
+            LastAllowNotFound = allowNotFound;
         }
     }
 }

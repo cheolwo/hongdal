@@ -259,6 +259,26 @@ public sealed class SsalddelApiVersionAttributeTests
             operatingSystem.FeatureKey == string.Empty &&
             operatingSystem.IsEnabled &&
             operatingSystem.Engines.All(engine => engine.RuntimeStatus == RuntimeCapabilityStatuses.Declared));
+        Assert.Contains(response.PageCapabilities, capability =>
+            capability.PageKey == "community-home" &&
+            capability.AppCode == SsalddelPageAppCodes.IntegratedWeb &&
+            capability.StageCode == nameof(PageCapabilityStage.Live) &&
+            capability.BoundaryCode == nameof(PageInteractionBoundary.PlatformPersistence) &&
+            capability.IsFeatureEnabled &&
+            capability.WorkflowCodes.Contains(nameof(SsalddelWorkflow.CommunityTrust)));
+        Assert.Contains(response.PageCapabilities, capability =>
+            capability.PageKey == "shipper-request" &&
+            capability.IntroducedVersion == "1.0" &&
+            capability.HasExternalEffects &&
+            capability.IsFeatureEnabled &&
+            capability.FeatureKeys.Contains(VersionFeatureFlagKeys.DomesticTransportWorkflow));
+        Assert.Contains(response.PageCapabilities, capability =>
+            capability.PageKey == "orderer-food-restaurants" &&
+            capability.StageCode == nameof(PageCapabilityStage.Beta) &&
+            capability.BoundaryCode == nameof(PageInteractionBoundary.ReadOnly) &&
+            !capability.RequiresAuthentication &&
+            !capability.HasExternalEffects &&
+            !capability.IsFeatureEnabled);
     }
 
     [Fact]

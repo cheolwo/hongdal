@@ -1,0 +1,471 @@
+@using Ssalddel.Contracts.Common.Hr
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudStack Spacing="3" data-testid="ssalddel-hr-role-review-workspace">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h5">역할 지원·배정 검토</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                사용자가 제출·철회한 역할 지원과 운영자가 배정·해제한 역할 원장을 함께 확인합니다.
+            </MudText>
+        </MudStack>
+        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Visibility">
+            Beta · ReadOnly
+        </MudChip>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Info">
+        지원 원장은 관심 표시이며 역할 배정·채용·계약을 뜻하지 않습니다. 이 화면은 두 원장을 읽기 전용으로 연결하며,
+        역할 승인·해제, 근무 시간, 작업장 IP, 계약 또는 급여를 변경하지 않습니다.
+    </MudAlert>
+
+    <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+        <MudStack Row="true" AlignItems="AlignItems.End" Spacing="2" Wrap="Wrap.Wrap">
+            <MudTextField T="string"
+                          Label="사용자·역할·범위·검토 ID 검색"
+                          Placeholder="사용자명, 역할명, 범위 ID"
+                          @bind-Value="Model.목록.검색어"
+                          Immediate="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Style="min-width: 260px; flex: 1 1 340px;" />
+            <MudSelect T="string"
+                       Label="원장 유형"
+                       @bind-Value="Model.목록.원장유형"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Style="min-width: 150px;">
+                <MudSelectItem T="string" Value="@string.Empty">전체 원장</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrRoleReviewSourceCodes.RoleApplication">역할 지원</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrRoleReviewSourceCodes.RoleAssignment">역할 배정</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string"
+                       Label="처리 상태"
+                       @bind-Value="Model.목록.상태코드"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Style="min-width: 140px;">
+                <MudSelectItem T="string" Value="@string.Empty">전체 상태</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrRoleReviewStatusCodes.Submitted">검토 대기</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrRoleReviewStatusCodes.Withdrawn">철회됨</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrRoleReviewStatusCodes.Assigned">배정됨</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrRoleReviewStatusCodes.Revoked">해제됨</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string"
+                       Label="참여자 성격"
+                       @bind-Value="Model.목록.참여자유형"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Style="min-width: 190px;">
+                <MudSelectItem T="string" Value="@string.Empty">전체 참여자</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrParticipantCategoryCodes.InternalProjectOperator">내부 실무/프로젝트 담당자</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrParticipantCategoryCodes.CounterpartyRepresentative">거래 상대/대표</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrParticipantCategoryCodes.ExternalProfessional">외부 전문 참여자</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrParticipantCategoryCodes.OrdererGroupMember">주문자 집단 구성원</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrParticipantCategoryCodes.CommunityPartTimeWorker">공동주문 단기 근로자</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="string"
+                       Label="업무 범위"
+                       @bind-Value="Model.목록.범위유형"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Style="min-width: 155px;">
+                <MudSelectItem T="string" Value="@string.Empty">전체 범위</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrScopeTypes.Platform">플랫폼</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrScopeTypes.Warehouse">창고</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrScopeTypes.Immigration">출입국</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrScopeTypes.PurchasingAgency">구매대행</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrScopeTypes.ShippingAgency">배송대행</MudSelectItem>
+                <MudSelectItem T="string" Value="@HrScopeTypes.OrdererGroup">주문자 집단</MudSelectItem>
+            </MudSelect>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@Model.목록.처리중"
+                       OnClick="SearchAsync"
+                       StartIcon="@Icons.Material.Filled.Search">
+                조회
+            </MudButton>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Default"
+                       Disabled="@(!Model.목록.검색조건사용중 || Model.목록.처리중)"
+                       OnClick="ResetFiltersAsync">
+                조건 초기화
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    <MudGrid>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">전체 검색 결과</MudText>
+                <MudText Typo="Typo.h5">@($"{Model.목록.전체건수:N0}건")</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">서버 페이징 기준</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">현재 페이지 검토 대기</MudText>
+                <MudText Typo="Typo.h5">@($"{SubmittedCount:N0}건")</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Info">자발적 지원 기준</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">현재 페이지 활성 배정</MudText>
+                <MudText Typo="Typo.h5">@($"{AssignedCount:N0}건")</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Success">역할 원장 기준</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" md="3">
+            <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">화면 상태 변경</MudText>
+                <MudText Typo="Typo.h5">없음</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Info">조회 전용</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @if (Model.목록.처리중)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Rounded="true" />
+    }
+    else if (!string.IsNullOrWhiteSpace(Model.목록.오류메시지))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText>@Model.목록.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RefreshListAsync">다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (!Model.목록.초기화됨)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">HR 역할 지원·배정 원장을 준비하고 있습니다.</MudAlert>
+    }
+    else if (Model.목록.결과없음)
+    {
+        <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Large" Color="Color.Secondary" />
+                <MudText Typo="Typo.h6">조회할 역할 지원·배정 기록이 없습니다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                    서버 원장이 없거나 검색 조건과 일치하지 않습니다. 샘플 지원자나 인력은 대신 표시하지 않습니다.
+                </MudText>
+                @if (Model.목록.검색조건사용중)
+                {
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ResetFiltersAsync">전체 조건으로 다시 조회</MudButton>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="12" lg="5">
+                <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6">지원·배정 원장</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">
+                                @($"{Model.목록.전체건수:N0}건")
+                            </MudChip>
+                        </MudStack>
+
+                        @foreach (var review in Model.목록.검토목록)
+                        {
+                            <MudPaper Class="@ReviewPanelClass(review)"
+                                      Elevation="0"
+                                      Outlined="true"
+                                      data-testid="@($"hr-review-{review.ReviewId:D}")">
+                                <MudStack Spacing="2">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.subtitle2">@ValueOrFallback(review.ParticipantDisplayName)</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @ValueOrFallback(review.ParticipantUserName) · @review.ParticipantCategoryName
+                                            </MudText>
+                                        </MudStack>
+                                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(review.StatusCode)" Variant="Variant.Outlined">
+                                            @review.StatusName
+                                        </MudChip>
+                                    </MudStack>
+
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.body2">@ValueOrFallback(review.RoleName)</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @review.RoleCode · @ScopeText(review.ScopeType, review.ScopeId)
+                                        </MudText>
+                                    </MudStack>
+
+                                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@review.SourceName</MudChip>
+                                        @if (review.WorkScheduleEnabled)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Schedule">근무 시간 제한</MudChip>
+                                        }
+                                        @if (review.WorksiteIpRestrictionEnabled)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Wifi">작업장 IP 제한</MudChip>
+                                        }
+                                    </MudStack>
+
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">기록 @DateTimeText(review.RecordedAtUtc)</MudText>
+                                    <MudButton FullWidth="true"
+                                               Variant="@(IsSelected(review) ? Variant.Filled : Variant.Outlined)"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               OnClick="@(() => SelectReviewAsync(review.ReviewId))">
+                                        정확한 검토 상세 열기
+                                    </MudButton>
+                                </MudStack>
+                            </MudPaper>
+                        }
+
+                        @if (Model.목록.총페이지수 > 1)
+                        {
+                            <MudPagination Count="@Model.목록.총페이지수"
+                                           Selected="@Model.목록.현재페이지"
+                                           SelectedChanged="ChangePageAsync"
+                                           Color="Color.Primary"
+                                           Size="Size.Small" />
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" lg="7">
+                <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
+                    @if (!Model.상세.요청ReviewId.HasValue)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8">
+                            <MudIcon Icon="@Icons.Material.Filled.FactCheck" Size="Size.Large" Color="Color.Secondary" />
+                            <MudText Typo="Typo.h6">확인할 지원·배정 기록을 선택해 주세요.</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                선택한 검토 ID를 그대로 서버에 요청하며 첫 기록이나 다른 사용자로 대체하지 않습니다.
+                            </MudText>
+                        </MudStack>
+                    }
+                    else if (Model.상세.처리중)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8">
+                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">역할 검토 상세를 조회하고 있습니다.</MudText>
+                        </MudStack>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(Model.상세.오류메시지))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudText>@Model.상세.오류메시지</MudText>
+                                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RetryDetailAsync">상세 다시 조회</MudButton>
+                            </MudStack>
+                        </MudAlert>
+                    }
+                    else if (Model.상세.찾을수없음)
+                    {
+                        <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8">
+                            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" />
+                            <MudText Typo="Typo.h6">역할 검토 기록을 찾을 수 없습니다.</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                                요청한 검토 ID가 없거나 삭제된 원장입니다. 다른 기록으로 자동 전환하지 않습니다.
+                            </MudText>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ClearSelectionAsync">목록으로 돌아가기</MudButton>
+                        </MudStack>
+                    }
+                    else if (Model.상세.상세 is { } detail)
+                    {
+                        <MudStack Spacing="3">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.h6">@ValueOrFallback(detail.ParticipantDisplayName)</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        @ValueOrFallback(detail.ParticipantUserName) · 검토 @detail.ReviewId.ToString("D")
+                                    </MudText>
+                                </MudStack>
+                                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                    <MudChip T="string" Color="@StatusColor(detail.StatusCode)" Variant="Variant.Outlined">@detail.StatusName</MudChip>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                                   Color="Color.Default"
+                                                   OnClick="ClearSelectionAsync"
+                                                   aria-label="역할 검토 상세 닫기" />
+                                </MudStack>
+                            </MudStack>
+
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Visibility">
+                                @detail.SourceName 원본을 읽는 상세입니다. 연락처와 작업장 IP 범위 원문은 개인정보·보안 최소화를 위해 노출하지 않습니다.
+                            </MudAlert>
+
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">역할</MudText>
+                                        <MudText Typo="Typo.subtitle1">@ValueOrFallback(detail.RoleName)</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@detail.RoleCode</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">범위</MudText>
+                                        <MudText Typo="Typo.subtitle1">@ScopeText(detail.ScopeType, detail.ScopeId)</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@detail.ParticipantCategoryName</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                            </MudGrid>
+
+                            @if (detail.SourceCode == HrRoleReviewSourceCodes.RoleApplication)
+                            {
+                                <MudText Typo="Typo.subtitle1">지원 확인</MudText>
+                                <MudTable Items="@ApplicationConfirmations(detail)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                                    <HeaderContent>
+                                        <MudTh>확인 항목</MudTh>
+                                        <MudTh>상태</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="확인 항목">@context.Name</MudTd>
+                                        <MudTd DataLabel="상태">
+                                            <MudChip T="string" Size="Size.Small" Color="@(context.Enabled ? Color.Success : Color.Error)" Variant="Variant.Outlined">
+                                                @(context.Enabled ? "확인됨" : "확인 안 됨")
+                                            </MudChip>
+                                        </MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    안내 버전 @ValueOrFallback(detail.ConsentVersion)
+                                    @if (detail.WithdrawnAtUtc is { } withdrawnAt)
+                                    {
+                                        <span> · 철회 @DateTimeText(withdrawnAt)</span>
+                                    }
+                                </MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.subtitle1">접근 조건</MudText>
+                                <MudTable Items="@AccessConditions(detail)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                                    <HeaderContent>
+                                        <MudTh>조건</MudTh>
+                                        <MudTh>설정</MudTh>
+                                        <MudTh>확인 내용</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="조건">@context.Name</MudTd>
+                                        <MudTd DataLabel="설정">
+                                            <MudChip T="string" Size="Size.Small" Color="@(context.Enabled ? Color.Info : Color.Default)" Variant="Variant.Outlined">
+                                                @(context.Enabled ? "사용" : "미사용")
+                                            </MudChip>
+                                        </MudTd>
+                                        <MudTd DataLabel="확인 내용">@context.Description</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            }
+
+                            <MudDivider />
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">기록 주체</MudText>
+                                    <MudText Typo="Typo.body2">@ValueOrFallback(detail.RecordedByDisplayName)</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">기록·수정 시각</MudText>
+                                    <MudText Typo="Typo.body2">@DateTimeText(detail.RecordedAtUtc) · @DateTimeText(detail.UpdatedAtUtc)</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudStack>
+                    }
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public 인사역할검토PageViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<Guid?> OnReviewSelected { get; set; }
+
+    private int SubmittedCount => Model.목록.검토목록.Count(item => item.StatusCode == HrRoleReviewStatusCodes.Submitted);
+    private int AssignedCount => Model.목록.검토목록.Count(item => item.StatusCode == HrRoleReviewStatusCodes.Assigned);
+
+    private Task SearchAsync() => Model.목록.조회Async();
+    private Task ResetFiltersAsync() => Model.목록.조건초기화후조회Async();
+    private Task RefreshListAsync() => Model.목록.새로고침Async();
+    private Task ChangePageAsync(int page) => Model.목록.페이지조회Async(page);
+    private Task SelectReviewAsync(Guid reviewId) => OnReviewSelected.InvokeAsync(reviewId);
+    private Task ClearSelectionAsync() => OnReviewSelected.InvokeAsync(null);
+
+    private Task RetryDetailAsync()
+        => Model.상세.요청ReviewId is { } reviewId
+            ? Model.상세.조회Async(reviewId)
+            : Task.CompletedTask;
+
+    private bool IsSelected(HrRoleReviewSummaryResponse review)
+        => Model.상세.요청ReviewId == review.ReviewId;
+
+    private string ReviewPanelClass(HrRoleReviewSummaryResponse review)
+        => IsSelected(review) ? "pa-3 mud-theme-primary" : "pa-3";
+
+    private static Color StatusColor(string? statusCode)
+        => statusCode switch
+        {
+            HrRoleReviewStatusCodes.Submitted => Color.Info,
+            HrRoleReviewStatusCodes.Withdrawn => Color.Default,
+            HrRoleReviewStatusCodes.Revoked => Color.Warning,
+            _ => Color.Success
+        };
+
+    private static string ScopeText(string? scopeType, string? scopeId)
+        => $"{ValueOrFallback(scopeType)} · {ValueOrFallback(scopeId)}";
+
+    private static IReadOnlyList<AccessConditionRow> AccessConditions(HrRoleReviewDetailResponse detail)
+        =>
+        [
+            new(
+                "근무 시간",
+                detail.WorkScheduleEnabled,
+                detail.WorkScheduleEnabled
+                    ? $"{DayText(detail.AllowedDaysOfWeek)} · {TimeText(detail.WorkStartLocalTime)}~{TimeText(detail.WorkEndLocalTime)} · {detail.TimeZoneId}"
+                    : "시간대 제한 없음"),
+            new(
+                "작업장 IP",
+                detail.WorksiteIpRestrictionEnabled,
+                detail.WorksiteIpRestrictionEnabled
+                    ? $"허용 범위 {detail.AllowedWorksiteIpRangeCount:N0}개 등록 · 원문 비노출"
+                    : "IP 제한 없음")
+        ];
+
+    private static IReadOnlyList<AccessConditionRow> ApplicationConfirmations(HrRoleReviewDetailResponse detail)
+        =>
+        [
+            new("자발적 지원", detail.ConfirmedVoluntaryApplication, string.Empty),
+            new("역할·고용 비보장", detail.ConfirmedNoRoleOrEmploymentGuarantee, string.Empty),
+            new("최소 검토정보 이용", detail.ConfirmedReviewDataUse, string.Empty)
+        ];
+
+    private static string DayText(IReadOnlyList<DayOfWeek> days)
+        => days.Count == 0
+            ? "허용 요일 미설정"
+            : string.Join("·", days.Select(day => day switch
+            {
+                DayOfWeek.Monday => "월",
+                DayOfWeek.Tuesday => "화",
+                DayOfWeek.Wednesday => "수",
+                DayOfWeek.Thursday => "목",
+                DayOfWeek.Friday => "금",
+                DayOfWeek.Saturday => "토",
+                _ => "일"
+            }));
+
+    private static string TimeText(TimeOnly? time)
+        => time?.ToString("HH:mm") ?? "미설정";
+
+    private static string DateTimeText(DateTime value)
+        => value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+
+    private static string ValueOrFallback(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "정보 없음" : value.Trim();
+
+    private sealed record AccessConditionRow(string Name, bool Enabled, string Description);
+}

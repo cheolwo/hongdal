@@ -189,6 +189,7 @@ public sealed class 공동구매주문집계재고배분ViewModelTests
         public Task<창고사용자항목응답?> 창고사용자수정Async(long warehouseId, long warehouseUserId, 창고사용자저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<창고사용자항목응답?>(null);
         public Task 창고사용자삭제Async(long warehouseId, long warehouseUserId, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<IReadOnlyList<입고요청항목응답>> 입고목록조회Async(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<입고요청항목응답>>([]);
+        public Task<입고요청항목응답?> 입고상세조회Async(long inboundId, CancellationToken cancellationToken = default) => Task.FromResult<입고요청항목응답?>(null);
         public Task<입고요청페이지응답> 입고예정관점목록조회Async(string perspectiveCode, string? communityLedgerId, 입고요청목록조회요청 request, CancellationToken cancellationToken = default) => Task.FromResult(new 입고요청페이지응답());
         public Task<출고예정페이지응답> 출고예정관점목록조회Async(string perspectiveCode, string? communityLedgerId, 출고예정목록조회요청 request, CancellationToken cancellationToken = default) => Task.FromResult(new 출고예정페이지응답());
         public Task<입고요청항목응답?> 입고요청생성Async(입고요청저장요청 request, CancellationToken cancellationToken = default) => Task.FromResult<입고요청항목응답?>(null);

@@ -13,6 +13,7 @@ using Ssalddel.Application.CommonContents;
 using Ssalddel.Application.Images;
 using Ssalddel.Application.Driver.Food;
 using Ssalddel.Application.Food;
+using Ssalddel.Application.Mart;
 using Ssalddel.Application.PublicData;
 using Ssalddel.Application.Evidence;
 using Ssalddel.Application.Files;
@@ -49,6 +50,9 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I참여자실행권한검사, 참여자실행권한검사>();
         services.AddScoped<I사회보험신고UseCase, 사회보험신고UseCase>();
         services.AddScoped<IHR참여운영UseCase, HR참여운영UseCase>();
+        services.AddScoped<IHR역할검토조회UseCase, HR역할검토조회UseCase>();
+        services.AddScoped<IHR역할지원조회UseCase, HR역할지원조회UseCase>();
+        services.AddScoped<IHR역할지원CommandUseCase, HR역할지원CommandUseCase>();
         services.AddScoped<I인연스냅샷조회UseCase, 인연스냅샷조회UseCase>();
         services.AddScoped<I기사운송상태변경CommandExecutor, 기사운송상태변경CommandExecutor>();
         services.AddScoped<I운송증빙첨부JsonWriter, 운송증빙첨부JsonWriter>();
@@ -63,6 +67,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I사용자행위로그Service, 사용자행위로그Service>();
         services.AddScoped<ISalesChannelService, SalesChannelService>();
         services.AddScoped<I판매채널UseCase, 판매채널UseCase>();
+        services.AddScoped<ISalesChannelOrderReadService, SalesChannelOrderReadService>();
+        services.AddScoped<I판매채널주문조회UseCase, 판매채널주문조회UseCase>();
         services.AddScoped<I판매페이지Service, 판매페이지Service>();
         services.AddScoped<I판매페이지UseCase, 판매페이지UseCase>();
         services.AddScoped<IView가시성Service, View가시성Service>();
@@ -70,6 +76,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I관리자View정책UseCase, 관리자View정책UseCase>();
         services.AddScoped<I보조기능설정UseCase, 보조기능설정UseCase>();
         services.AddScoped<IHS코드운영UseCase, HS코드운영UseCase>();
+        services.AddScoped<I화주HS코드검토조회UseCase, 화주HS코드검토조회UseCase>();
         services.AddScoped<I공동수입HS코드조회UseCase, 공동수입HS코드조회UseCase>();
         services.AddScoped<I사용자행위로그조회UseCase, 사용자행위로그조회UseCase>();
         services.AddScoped<I공통콘텐츠관리UseCase, 공통콘텐츠관리UseCase>();
@@ -81,6 +88,10 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I음식주문접수UseCase, 음식주문접수UseCase>();
         services.AddScoped<I주문자음식주문조회UseCase, 주문자음식주문조회UseCase>();
         services.AddScoped<I음식점탐색조회UseCase, 음식점탐색조회UseCase>();
+        services.AddScoped<I마트공개상품조회UseCase, 마트공개상품조회UseCase>();
+        services.AddScoped<I마트주문요청조회UseCase, 마트주문요청조회UseCase>();
+        services.AddScoped<I마트주문요청작성UseCase, 마트주문요청작성UseCase>();
+        services.AddScoped<I마트피킹조회UseCase, 마트피킹조회UseCase>();
         services.AddScoped<I공공데이터조회UseCase, 공공데이터조회UseCase>();
         services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
         services.AddScoped<I문서관리UseCase, 문서관리UseCase>();

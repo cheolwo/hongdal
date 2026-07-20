@@ -19,10 +19,10 @@ public static class WebExperienceCatalog
             "/community",
             "게시판 열기",
             [
-                new("살뜰 게시판", "동네 글과 댓글, 연결된 업무 원장을 함께 봅니다.", "/community", Icons.Material.Filled.Forum, "커뮤니티", "바로 보기"),
-                new("공동구매 제안", "참여자와 수량, 가격, 공급 조건을 맞춥니다.", "/community/group-purchase", Icons.Material.Filled.GroupAdd, "공동구매", "흐름 체험"),
-                new("공동수입 검토", "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", "/community/group-import", Icons.Material.Filled.Public, "공동수입", "흐름 체험"),
-                new("3개국 농수산물 가격", "한국·미국·호주의 공식 가격 자료를 단위와 조사 단계별로 비교합니다.", "/information/public-data", Icons.Material.Filled.Insights, "공개 정보", "바로 보기")
+                new("살뜰 게시판", "동네 글과 댓글, 연결된 업무 원장을 함께 봅니다.", "/community", Icons.Material.Filled.Forum, "커뮤니티"),
+                new("공동구매 제안", "참여자와 수량, 가격, 공급 조건을 맞춥니다.", "/community/group-purchase", Icons.Material.Filled.GroupAdd, "공동구매"),
+                new("공동수입 검토", "해외 공급과 국내 수요를 수입 흐름으로 연결합니다.", "/community/group-import", Icons.Material.Filled.Public, "공동수입"),
+                new("3개국 농수산물 가격", "한국·미국·호주의 공식 가격 자료를 단위와 조사 단계별로 비교합니다.", "/information/public-data", Icons.Material.Filled.Insights, "공개 정보")
             ]),
         new(
             "global-supplier",
@@ -36,10 +36,10 @@ public static class WebExperienceCatalog
             GlobalTradeRoutes.Home,
             "Global 화면 열기",
             [
-                new("글로벌 상품", "한국 시장을 찾는 해외 상품과 공급 조건을 둘러봅니다.", GlobalTradeRoutes.Home, Icons.Material.Filled.TravelExplore, "Global", "바로 보기"),
-                new("상품 제출", "회사, 상품, MOQ와 무역 조건을 제출합니다.", GlobalTradeRoutes.SupplierApply, Icons.Material.Filled.AddBusiness, "공급자", "세션 체험"),
-                new("상품 상세", "샘플, HS 코드 제안과 수입 검토 정보를 확인합니다.", GlobalTradeRoutes.Product("indonesian-rattan-storage-basket"), Icons.Material.Filled.Inventory2, "상품", "바로 보기"),
-                new("무역 대화", "해외 공급자와 국내 참여자가 조건을 공개적으로 맞춥니다.", GlobalTradeRoutes.CommunityThread(101), Icons.Material.Filled.Translate, "대화", "세션 체험")
+                new("글로벌 상품", "한국 시장을 찾는 해외 상품과 공급 조건을 둘러봅니다.", GlobalTradeRoutes.Home, Icons.Material.Filled.TravelExplore, "Global"),
+                new("상품 제출", "회사, 상품, MOQ와 무역 조건을 제출합니다.", GlobalTradeRoutes.SupplierApply, Icons.Material.Filled.AddBusiness, "공급자"),
+                new("상품 상세", "샘플, HS 코드 제안과 수입 검토 정보를 확인합니다.", GlobalTradeRoutes.Product("indonesian-rattan-storage-basket"), Icons.Material.Filled.Inventory2, "상품"),
+                new("무역 대화", "해외 공급자와 국내 참여자가 조건을 공개적으로 맞춥니다.", GlobalTradeRoutes.CommunityThread(101), Icons.Material.Filled.Translate, "대화")
             ]),
         new(
             "shipper-seller",
@@ -53,10 +53,10 @@ public static class WebExperienceCatalog
             ShipperRoutes.Home,
             "화주 작업공간 열기",
             [
-                new("운송 의뢰", "화물, 상하차지, 차량과 결제 조건을 입력합니다.", ShipperRoutes.Request, Icons.Material.Filled.PostAdd, "운송", "로그인 후 실행"),
-                new("입고 대시보드", "입고 예정과 완료, 보관 재고를 한눈에 봅니다.", ShipperRoutes.InboundDashboard, Icons.Material.Filled.MoveToInbox, "입고", "화면 체험"),
-                new("판매채널", "판매채널 계정과 연결 상태를 관리합니다.", ShipperRoutes.SalesChannels, Icons.Material.Filled.Storefront, "판매", "화면 체험"),
-                new("통관·FCL/LCL", "수입량과 비용을 비교하고 운송 방식을 검토합니다.", ShipperRoutes.FclLclPlanner, Icons.Material.Filled.Public, "통관", "화면 체험")
+                new("운송 의뢰", "화물, 상하차지, 차량과 결제 조건을 입력합니다.", ShipperRoutes.Request, Icons.Material.Filled.PostAdd, "운송"),
+                new("입고 대시보드", "입고 예정과 완료, 보관 재고를 한눈에 봅니다.", ShipperRoutes.InboundDashboard, Icons.Material.Filled.MoveToInbox, "입고"),
+                new("판매채널", "판매채널 계정과 연결 상태를 관리합니다.", ShipperRoutes.SalesChannels, Icons.Material.Filled.Storefront, "판매"),
+                new("통관·FCL/LCL", "수입량과 비용을 비교하고 운송 방식을 검토합니다.", ShipperRoutes.FclLclPlanner, Icons.Material.Filled.Public, "통관")
             ]),
         new(
             "driver",
@@ -70,10 +70,10 @@ public static class WebExperienceCatalog
             "/driver/home",
             "기사 홈 열기",
             [
-                new("기사 홈", "현재 위치와 진행 중 운송을 중심으로 봅니다.", "/driver/home", Icons.Material.Filled.Route, "운행", "화면 체험"),
-                new("추천 운송", "거리, 예상 수익과 상하차 조건을 비교합니다.", "/driver/recommendations", Icons.Material.Filled.TaskAlt, "배차", "로그인 후 실행"),
-                new("진행 중 운송", "수락한 운송의 현재 단계와 다음 행동을 확인합니다.", "/driver/transports/current", Icons.Material.Filled.LocalShipping, "운송", "로그인 후 실행"),
-                new("운송 증빙", "상차와 하차 사진, 예외 증빙 흐름을 확인합니다.", "/driver/transport/proof", Icons.Material.Filled.AddAPhoto, "증빙", "화면 체험")
+                new("기사 홈", "현재 위치와 진행 중 운송을 중심으로 봅니다.", "/driver/home", Icons.Material.Filled.Route, "운행"),
+                new("추천 운송", "거리, 예상 수익과 상하차 조건을 비교합니다.", "/driver/recommendations", Icons.Material.Filled.TaskAlt, "배차"),
+                new("진행 중 운송", "수락한 운송의 현재 단계와 다음 행동을 확인합니다.", "/driver/transports/current", Icons.Material.Filled.LocalShipping, "운송"),
+                new("운송 증빙", "상차와 하차 사진, 예외 증빙 흐름을 확인합니다.", "/driver/transport/proof", Icons.Material.Filled.AddAPhoto, "증빙")
             ]),
         new(
             "warehouse",
@@ -87,10 +87,10 @@ public static class WebExperienceCatalog
             WarehouseManagerRoutes.Home,
             "창고 작업공간 열기",
             [
-                new("작업 보드", "입고와 출고 작업, 연결 대상을 한곳에서 봅니다.", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban, "현장", "화면 체험"),
-                new("입고 상품 확인", "상품 바코드로 입고 예정 항목을 찾습니다.", WarehouseManagerRoutes.InboundProductScan, Icons.Material.Filled.QrCodeScanner, "입고", "화면 체험"),
-                new("입고 검수", "수량 차이, 파손과 보관 조건을 확인합니다.", WarehouseManagerRoutes.InboundInspection, Icons.Material.Filled.FactCheck, "검수", "화면 체험"),
-                new("마트 피킹·포장", "도심 주문을 피킹하고 포장 완료까지 처리합니다.", WarehouseManagerRoutes.MartPickingPacking, Icons.Material.Filled.ShoppingCartCheckout, "출고", "화면 체험")
+                new("작업 보드", "입고와 출고 작업, 연결 대상을 한곳에서 봅니다.", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban, "현장"),
+                new("입고 상품 확인", "상품 바코드로 입고 예정 항목을 찾습니다.", WarehouseManagerRoutes.InboundProductScan, Icons.Material.Filled.QrCodeScanner, "입고"),
+                new("입고 검수", "수량 차이, 파손과 보관 조건을 확인합니다.", WarehouseManagerRoutes.InboundInspection, Icons.Material.Filled.FactCheck, "검수"),
+                new("마트 피킹·포장", "도심 주문을 피킹하고 포장 완료까지 처리합니다.", WarehouseManagerRoutes.MartPickingPacking, Icons.Material.Filled.ShoppingCartCheckout, "출고")
             ])
     ];
 

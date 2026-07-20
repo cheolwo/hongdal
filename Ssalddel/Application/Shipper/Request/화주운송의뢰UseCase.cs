@@ -1,5 +1,6 @@
 using FluentResults;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Contracts.Admin.Transport;
 using Ssalddel.Contracts.Shipper.Request;
 
 namespace Ssalddel.Application.Shipper.Request;
@@ -39,6 +40,11 @@ public interface I화주운송의뢰UseCase
     Task<Result<화주운송의뢰응답>> 의뢰수정Async(
         string requestId,
         화주운송의뢰수정요청 request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<화주운송의뢰응답>> 관리자취소환불Async(
+        string requestId,
+        관리자운송의뢰취소환불요청 request,
         CancellationToken cancellationToken = default);
 
     Task<Result> 의뢰삭제Async(
@@ -187,6 +193,14 @@ public sealed class 화주운송의뢰UseCase : I화주운송의뢰UseCase
             new 위치정보입력값(request.하차?.주소?.도로명주소, request.하차?.주소?.상세주소, request.하차?.주소?.위도, request.하차?.주소?.경도, request.하차?.연락처?.이름, request.하차?.연락처?.전화번호, request.하차?.시간창?.시작일시, request.하차?.시간창?.종료일시),
             new 요청조건입력값(request.요금옵션?.요청사항),
             request.정산조건 is null ? null : new 정산조건입력값(request.결제수단, request.정산조건)), cancellationToken);
+
+    public async Task<Result<화주운송의뢰응답>> 관리자취소환불Async(
+        string requestId,
+        관리자운송의뢰취소환불요청 request,
+        CancellationToken cancellationToken = default)
+        => await _sender.Send(
+            new 관리자운송의뢰취소환불Command(requestId, request.확인의뢰Id, request.사유),
+            cancellationToken);
 
     public async Task<Result> 의뢰삭제Async(
         string requestId,

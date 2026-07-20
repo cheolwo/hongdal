@@ -1,0 +1,334 @@
+@inherits MvvmComponentBase<판매채널계정PageViewModel>
+@using Ssalddel.Contracts.Common.Sales
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="sales-channel-workspace" aria-label="판매채널 연결 준비">
+    @if (Access.처리중 && Access.화면상태 == 판매채널페이지접근상태.확인전)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="sales-channel-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">판매채널 기능과 계정 접근 권한을 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (Access.화면상태 == 판매채널페이지접근상태.오류)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="sales-channel-access-alert">
+            <MudText Typo="Typo.subtitle2">판매채널 화면을 준비하지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@AccessErrorMessage(Access.오류, Access.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="RetryAccessAsync" Class="mt-3">
+                다시 확인
+            </MudButton>
+        </MudAlert>
+    }
+    else if (Access.기능비활성)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="sales-channel-access-alert">
+            <MudText Typo="Typo.subtitle2">판매채널 출고 기능이 현재 비활성입니다.</MudText>
+            <MudText Typo="Typo.body2">
+                운영 환경에서 <code>SalesChannelFulfillmentWorkflow</code>를 활성화하기 전에는 계정 원장을 읽거나 쓰지 않습니다.
+            </MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/shipper" Class="mt-2">화주 홈으로</MudButton>
+        </MudAlert>
+    }
+    else if (Access.로그인필요)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="sales-channel-access-alert">
+            <MudText Typo="Typo.subtitle2">판매채널 연결 준비는 화주·판매자 로그인이 필요합니다.</MudText>
+            <MudText Typo="Typo.body2">회원가입 없이도 자유·생활 게시판의 익명 글과 댓글은 계속 이용할 수 있습니다.</MudText>
+            <MudStack Row="true" Spacing="1" Class="mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" Href="/login">
+                    로그인
+                </MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Default" Href="/community">공개 커뮤니티 보기</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (Access.역할없음)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="sales-channel-access-alert">
+            <MudText Typo="Typo.subtitle2">화주 또는 판매자 역할이 필요한 화면입니다.</MudText>
+            <MudText Typo="Typo.body2">현재 로그인은 유지되지만 다른 사용자의 판매채널 계정은 조회하지 않습니다.</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/community" Class="mt-2">공개 커뮤니티 보기</MudButton>
+        </MudAlert>
+    }
+    else if (Access.사용가능)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="sales-channel-boundary">
+            이 화면은 Ssalddel 안에 판매채널 <strong>연결 준비 기록</strong>만 저장합니다. 외부 OAuth·API 자격증명 입력, 상품 발행, 주문 수집과 동기화는 실행하지 않습니다.
+        </MudAlert>
+
+        <div class="sales-channel-toolbar">
+            <div>
+                <MudText Typo="Typo.overline">OWNER-SCOPED CHANNEL LEDGER</MudText>
+                <MudText Typo="Typo.h6">내 판매채널 계정</MudText>
+                <MudText Typo="Typo.body2">로그인한 사용자가 만든 원장만 서버에서 조회합니다.</MudText>
+            </div>
+            <MudStack Row="true" Spacing="1">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@List.처리중"
+                           OnClick="ReloadListAsync">
+                    새로고침
+                </MudButton>
+                <MudButton Variant="@(_showPreparation ? Variant.Outlined : Variant.Filled)"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.AddLink"
+                           OnClick="TogglePreparation">
+                    @(_showPreparation ? "입력 닫기" : "연결 준비 추가")
+                </MudButton>
+            </MudStack>
+        </div>
+
+        @if (_showPreparation)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="sales-channel-preparation">
+                <div class="sales-channel-preparation-heading">
+                    <div>
+                        <MudText Typo="Typo.subtitle1">새 연결 준비 기록</MudText>
+                        <MudText Typo="Typo.body2">채널과 상점명만 저장합니다. 비밀번호, API 키, access token은 입력하지 마세요.</MudText>
+                    </div>
+                    <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined" Size="Size.Small">외부 인증 미연결</MudChip>
+                </div>
+
+                <div class="sales-channel-preparation-form">
+                    <MudSelect T="string"
+                               @bind-Value="Preparation.채널종류"
+                               Label="판매채널"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        @foreach (var option in 판매채널연결옵션Catalog.Items)
+                        {
+                            <MudSelectItem T="string" Value="@option.Code">@option.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField T="string"
+                                  @bind-Value="Preparation.상점명"
+                                  Label="상점명"
+                                  Placeholder="판매채널에서 구분할 이름"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  MaxLength="100" />
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               Disabled="@Preparation.처리중"
+                               OnClick="CreatePreparationAsync">
+                        준비 기록 저장
+                    </MudButton>
+                </div>
+
+                @if (Preparation.처리중)
+                {
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mt-3" />
+                }
+                else if (Preparation.오류발생)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Text" Dense="true" Class="mt-3">
+                        @AccessErrorMessage(Preparation.오류, Preparation.오류메시지)
+                    </MudAlert>
+                }
+                else if (Preparation.성공함)
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Text" Dense="true" Class="mt-3">
+                        @Preparation.성공메시지
+                    </MudAlert>
+                }
+            </MudPaper>
+        }
+
+        <div class="sales-channel-layout">
+            <MudPaper Elevation="0" Outlined="true" Class="sales-channel-panel sales-channel-list-panel">
+                <div class="sales-channel-filters">
+                    <MudTextField T="string"
+                                  @bind-Value="List.검색어"
+                                  Label="상점명·상태 검색"
+                                  Placeholder="예: 스마트스토어, 준비"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" />
+                    <MudSelect T="string"
+                               @bind-Value="List.채널종류"
+                               Label="채널"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        @foreach (var option in 판매채널연결옵션Catalog.Items)
+                        {
+                            <MudSelectItem T="string" Value="@option.Code">@option.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+
+                @if (List.처리중)
+                {
+                    <div class="sales-channel-state sales-channel-state--compact">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2">내 판매채널 계정을 불러오고 있습니다.</MudText>
+                    </div>
+                }
+                else if (List.오류발생)
+                {
+                    <div class="sales-channel-state sales-channel-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" />
+                        <MudText Typo="Typo.subtitle2">계정 목록을 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@AccessErrorMessage(List.오류, List.오류메시지)</MudText>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadListAsync">다시 시도</MudButton>
+                    </div>
+                }
+                else if (List.계정없음)
+                {
+                    <div class="sales-channel-state sales-channel-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.AddBusiness" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.subtitle2">아직 연결 준비 기록이 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">외부 자격증명 없이 채널과 상점명부터 기록할 수 있습니다.</MudText>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenPreparation">첫 기록 만들기</MudButton>
+                    </div>
+                }
+                else if (List.검색결과없음)
+                {
+                    <div class="sales-channel-state sales-channel-state--compact">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">검색 조건에 맞는 계정이 없습니다.</MudText>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ClearFilters">필터 지우기</MudButton>
+                    </div>
+                }
+                else if (List.초기화됨)
+                {
+                    <MudText Typo="Typo.caption" Class="sales-channel-count">@($"표시 {List.표시목록.Count:N0}건 · 전체 {List.계정목록.Count:N0}건")</MudText>
+                    <MudTable T="판매채널계정항목응답"
+                              Items="@List.표시목록"
+                              Dense="true"
+                              Hover="true"
+                              Breakpoint="Breakpoint.Sm"
+                              Class="sales-channel-table">
+                        <HeaderContent>
+                            <MudTh>채널·상점</MudTh>
+                            <MudTh>내부 상태</MudTh>
+                            <MudTh>최근 변경</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="채널·상점">
+                                <strong>@ChannelName(context.채널종류)</strong>
+                                <span>@context.상점명</span>
+                            </MudTd>
+                            <MudTd DataLabel="내부 상태">
+                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.연결상태)" Variant="Variant.Outlined">
+                                    @ValueOrDash(context.연결상태)
+                                </MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="최근 변경">@DateTimeLabel(context.수정일시)</MudTd>
+                            <MudTd>
+                                <MudButton Size="Size.Small"
+                                           Variant="@(Detail.요청AccountId == context.Id ? Variant.Filled : Variant.Outlined)"
+                                           Color="Color.Primary"
+                                           OnClick="@(() => SelectAccountAsync(context.Id))">
+                                    상세
+                                </MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudPaper>
+
+            <MudPaper Elevation="0" Outlined="true" Class="sales-channel-panel sales-channel-detail-panel">
+                @if (Detail.처리중)
+                {
+                    <div class="sales-channel-state sales-channel-state--detail">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.body1">선택한 계정 원장을 불러오고 있습니다.</MudText>
+                    </div>
+                }
+                else if (Detail.오류발생)
+                {
+                    <div class="sales-channel-state sales-channel-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" />
+                        <MudText Typo="Typo.h6">계정 상세를 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@AccessErrorMessage(Detail.오류, Detail.오류메시지)</MudText>
+                        @if (Detail.요청AccountId is long retryId)
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectAccountAsync(retryId, false))">다시 시도</MudButton>
+                        }
+                    </div>
+                }
+                else if (Detail.찾을수없음)
+                {
+                    <div class="sales-channel-state sales-channel-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                        <MudText Typo="Typo.h6">계정 원장을 찾을 수 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">주소의 accountId를 확인하세요. 다른 사용자의 계정도 찾을 수 없음으로 처리합니다.</MudText>
+                    </div>
+                }
+                else if (Detail.계정 is null)
+                {
+                    <div class="sales-channel-state sales-channel-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Large" Color="Color.Primary" />
+                        <MudText Typo="Typo.h6">계정을 선택해 내부 준비 상태를 확인하세요.</MudText>
+                        <MudText Typo="Typo.body2">선택 전에는 첫 계정이나 샘플 계정을 대신 표시하지 않습니다.</MudText>
+                    </div>
+                }
+                else
+                {
+                    var account = Detail.계정;
+                    var option = 판매채널연결옵션Catalog.찾기(account.채널종류);
+
+                    <div class="sales-channel-detail-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">ACCOUNT #@account.Id · @(option?.Market ?? "채널 구분 확인 필요")</MudText>
+                            <MudText Typo="Typo.h5">@account.상점명</MudText>
+                            <MudText Typo="Typo.subtitle1">@(option?.Name ?? account.채널종류)</MudText>
+                        </div>
+                        <MudChip T="string" Color="@StatusColor(account.연결상태)" Variant="Variant.Filled">
+                            @ValueOrDash(account.연결상태)
+                        </MudChip>
+                    </div>
+
+                    <dl class="sales-channel-detail-grid">
+                        <div><dt>플랫폼 기록</dt><dd>@ValueOrDash(account.연결상태)</dd></div>
+                        <div><dt>외부 연동</dt><dd>@(option?.IntegrationState ?? "외부 인증 미확인")</dd></div>
+                        <div><dt>등록 시각</dt><dd>@DateTimeLabel(account.등록일시)</dd></div>
+                        <div><dt>최근 변경</dt><dd>@DateTimeLabel(account.수정일시)</dd></div>
+                        <div><dt>마지막 동기화</dt><dd>@DateTimeLabel(account.마지막동기화일시)</dd></div>
+                        <div><dt>원장 범위</dt><dd>현재 사용자 소유</dd></div>
+                    </dl>
+
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="sales-channel-integration-boundary">
+                        <MudText Typo="Typo.subtitle2">아직 외부 판매채널과 연결된 상태가 아닙니다.</MudText>
+                        <MudText Typo="Typo.body2">@(option?.Boundary ?? "외부 API 인증과 동기화 경계는 별도 구현과 운영 승인이 필요합니다.")</MudText>
+                    </MudAlert>
+
+                    <section class="sales-channel-next-actions">
+                        <MudText Typo="Typo.subtitle1">다음 판매 흐름</MudText>
+                        <MudText Typo="Typo.body2">상품·주문 화면도 각각 원장과 실행 경계를 확인한 뒤 순서대로 연결합니다.</MudText>
+                        <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1" Class="mt-3">
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/shipper/sales/listings">상품·출품 준비</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/shipper/sales/orders">주문·출고 보기</MudButton>
+                        </MudStack>
+                    </section>
+                }
+            </MudPaper>
+        </div>
+
+        <section class="sales-channel-catalog" aria-label="지원 판매채널 경계">
+            <div>
+                <MudText Typo="Typo.overline">SUPPORTED PREPARATION TYPES</MudText>
+                <MudText Typo="Typo.h6">기록할 수 있는 채널 종류</MudText>
+            </div>
+            <div class="sales-channel-catalog-grid">
+                @foreach (var option in 판매채널연결옵션Catalog.Items)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="sales-channel-catalog-card">
+                        <MudText Typo="Typo.caption">@option.Market</MudText>
+                        <MudText Typo="Typo.subtitle2">@option.Name</MudText>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">@option.IntegrationState</MudChip>
+                        <MudText Typo="Typo.body2">@option.Boundary</MudText>
+                    </MudPaper>
+                }
+            </div>
+        </section>
+    }
+</section>

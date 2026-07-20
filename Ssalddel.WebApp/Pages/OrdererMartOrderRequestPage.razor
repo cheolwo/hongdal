@@ -1,0 +1,29 @@
+@page "/orderer/mart/order"
+@inject NavigationManager Navigation
+
+<WebPageHeader Eyebrow="Orderer · Mart"
+               Title="알뜰살뜰 마트 주문 요청"
+               Description="선택한 공개 상품의 비구속 주문 의향을 저장하고 같은 요청 ID를 서버에서 다시 확인합니다."
+               Badge="플랫폼 저장" />
+
+<OrdererMartOrderRequestWorkspace ProductId="@ProductId"
+                                  RequestId="@RequestId"
+                                  CatalogHref="@WebOrdererRoutes.Mart"
+                                  RequestSelected="OnRequestSelectedAsync" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "productId")]
+    public long? ProductId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "requestId")]
+    public Guid? RequestId { get; set; }
+
+    private Task OnRequestSelectedAsync(Guid? requestId)
+    {
+        var target = requestId.HasValue
+            ? $"{WebOrdererRoutes.MartOrderRequest}?requestId={requestId.Value:D}"
+            : WebOrdererRoutes.MartOrderRequest;
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
+}

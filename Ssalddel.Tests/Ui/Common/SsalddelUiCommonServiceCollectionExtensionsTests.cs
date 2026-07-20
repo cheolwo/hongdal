@@ -260,6 +260,72 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             x.ServiceType == typeof(I판매채널계정Service)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(I판매채널계정읽기Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I판매채널페이지접근Service)
+            && x.ImplementationType == typeof(판매채널페이지접근Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(판매채널계정PageViewModel)
+            && x.ImplementationType == typeof(판매채널계정PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I판매채널주문읽기Service)
+            && x.ImplementationType == typeof(판매채널주문Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(판매채널주문PageViewModel)
+            && x.ImplementationType == typeof(판매채널주문PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I음식점공개읽기Service)
+            && x.ImplementationType == typeof(음식점공개Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(음식점탐색PageViewModel)
+            && x.ImplementationType == typeof(음식점탐색PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I주문자앱인증Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(주문자앱인증ViewModel)
+            && x.ImplementationType == typeof(주문자앱인증ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I주문자음식주문읽기Service)
+            && x.ImplementationType == typeof(주문자음식주문Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(주문자음식주문PageViewModel)
+            && x.ImplementationType == typeof(주문자음식주문PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I마트공개상품읽기Service)
+            && x.ImplementationType == typeof(마트공개상품Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(마트공개상품PageViewModel)
+            && x.ImplementationType == typeof(마트공개상품PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I마트주문요청Service)
+            && x.ImplementationType == typeof(마트주문요청Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(마트주문작성PageViewModel)
+            && x.ImplementationType == typeof(마트주문작성PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I마트피킹읽기Service)
+            && x.ImplementationType == typeof(마트피킹Client)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(마트피킹작업PageViewModel)
+            && x.ImplementationType == typeof(마트피킹작업PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(I상품등록Service)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>

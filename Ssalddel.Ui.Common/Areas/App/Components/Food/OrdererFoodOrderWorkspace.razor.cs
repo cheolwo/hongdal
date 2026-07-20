@@ -17,7 +17,7 @@ public partial class OrdererFoodOrderWorkspace
     public EventCallback<string?> OrderSelected { get; set; }
 
     private 음식배달페이지접근ViewModel Access => ViewModel.접근;
-    private 주문자음식주문인증ViewModel Authentication => ViewModel.인증;
+    private 주문자앱인증ViewModel Authentication => ViewModel.인증;
     private 주문자음식주문목록ViewModel List => ViewModel.목록;
     private 주문자음식주문상세ViewModel Detail => ViewModel.상세;
 

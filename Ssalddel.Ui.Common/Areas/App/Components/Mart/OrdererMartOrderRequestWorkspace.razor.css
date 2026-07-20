@@ -1,0 +1,168 @@
+.mart-order-request {
+    display: grid;
+    gap: 1rem;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.mart-order-boundary,
+.mart-order-panel,
+.mart-order-login-card,
+.mart-order-login-note {
+    border-radius: 16px;
+}
+
+.mart-order-panel,
+.mart-order-login-card,
+.mart-order-login-note {
+    padding: 1rem;
+}
+
+.mart-order-state {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.mart-order-state--compact {
+    min-height: 150px;
+}
+
+.mart-order-state--detail {
+    min-height: 300px;
+}
+
+.mart-order-login-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, .85fr) minmax(300px, 1.15fr);
+    gap: 1rem;
+}
+
+.mart-order-login-note {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: .75rem;
+}
+
+.mart-order-toolbar,
+.mart-order-product-heading,
+.mart-order-request-heading,
+.mart-order-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.mart-order-toolbar,
+.mart-order-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.mart-order-product-heading,
+.mart-order-request-heading {
+    align-items: flex-start;
+}
+
+.mart-order-product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    margin-top: .75rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.mart-order-product-meta strong {
+    color: var(--mud-palette-success);
+    font-size: 1.25rem;
+}
+
+.mart-order-form-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, .7fr) minmax(260px, 1.3fr);
+    gap: 1rem;
+    align-items: stretch;
+    margin-top: 1rem;
+}
+
+.mart-order-estimate {
+    display: grid;
+    align-content: center;
+    gap: .2rem;
+    padding: .8rem 1rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+}
+
+.mart-order-estimate strong {
+    font-size: 1.35rem;
+    color: var(--mud-palette-success);
+}
+
+.mart-order-estimate small,
+.mart-order-estimate span {
+    color: var(--mud-palette-text-secondary);
+}
+
+.mart-order-notice {
+    display: grid;
+    gap: .55rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--mud-palette-background-gray);
+}
+
+.mart-order-notice > div {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+}
+
+.mart-order-receipt {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.mart-order-receipt > div {
+    display: grid;
+    gap: .2rem;
+    padding: .75rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+}
+
+.mart-order-receipt span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .78rem;
+}
+
+.mart-order-actions {
+    margin-top: 1rem;
+}
+
+@media (max-width: 720px) {
+    .mart-order-login-layout,
+    .mart-order-form-grid,
+    .mart-order-receipt {
+        grid-template-columns: 1fr;
+    }
+
+    .mart-order-product-heading,
+    .mart-order-request-heading {
+        flex-direction: column;
+    }
+
+    .mart-order-actions,
+    .mart-order-toolbar {
+        justify-content: stretch;
+    }
+}

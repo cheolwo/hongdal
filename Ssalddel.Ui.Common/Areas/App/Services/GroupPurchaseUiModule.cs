@@ -10,6 +10,7 @@ internal static class GroupPurchaseUiModule
     {
         ArgumentNullException.ThrowIfNull(services);
 
+        services.TryAddScoped<I공동구매공개조회Service, PlatformCommunity공동구매공개조회Service>();
         services.TryAddScoped<I공동구매업무Service, PlatformCommunity공동구매업무Service>();
         services.TryAddScoped<I공동구매공급Service, PlatformCommunity공동구매공급Service>();
         services.TryAddScoped<I공동구매물류Service, PlatformCommunity공동구매물류Service>();
@@ -20,6 +21,8 @@ internal static class GroupPurchaseUiModule
         services.TryAddScoped<I공동구매가격의사결정Service, 공동구매가격의사결정Service>();
         services.TryAddScoped<IOperatingMarketProfileClient, OperatingMarketProfileClient>();
         services.TryAddScoped<공동구매화면상태ViewModel>();
+        services.TryAddScoped<공동구매공개목록ViewModel>();
+        services.TryAddScoped<공동구매공개상세ViewModel>();
         services.TryAddScoped<공동구매목록ViewModel>();
         services.TryAddScoped<공동구매거래경로판정ViewModel>();
         services.TryAddScoped<공동수입전환준비ViewModel>();

@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Ssalddel.Client.Infrastructure.Transport;
+using Ssalddel.Contracts.Admin.Transport;
 using Ssalddel.Contracts.CommonContents;
 
 namespace SsalddelAdmin.Services;
@@ -68,39 +69,35 @@ public sealed partial class 백오피스조회Service : I백오피스Service
         return item;
     }
 
-    public async Task<화주운송의뢰응답?> 의뢰취소환불처리Async(string requestId, CancellationToken cancellationToken = default)
+    public async Task 의뢰취소환불처리Async(
+        string requestId,
+        string 확인의뢰Id,
+        string 사유,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(requestId))
         {
-            return null;
+            throw new ArgumentException("의뢰 ID가 필요합니다.", nameof(requestId));
         }
 
         ApplyAuthorizationHeader();
 
-        var response = await _httpClient.PutAsJsonAsync(
-            $"api/v1/shipper/requests/{Uri.EscapeDataString(requestId.Trim())}",
-            new 화주운송의뢰수정요청
+        var response = await _httpClient.PostAsJsonAsync(
+            $"api/v1/shipper/requests/{Uri.EscapeDataString(requestId.Trim())}/admin/cancel-refund",
+            new 관리자운송의뢰취소환불요청
             {
-                상태 = "취소",
-                결제상태 = "환불됨",
-                배차상태 = "취소"
+                확인의뢰Id = 확인의뢰Id,
+                사유 = 사유
             },
             cancellationToken);
-
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            return null;
-        }
 
         response.EnsureSuccessStatusCode();
         var item = await response.Content.ReadFromJsonAsync<화주운송의뢰응답>(cancellationToken: cancellationToken);
         if (item is not null)
         {
-            Observe(item, "SsalddelAdmin.RequestCanceled");
-            _ledgerObserver.RequestRefresh(item.의뢰Id, "SsalddelAdmin.RequestCanceled");
+            Observe(item, "SsalddelAdmin.RequestCancelRefund");
+            _ledgerObserver.RequestRefresh(item.의뢰Id, "SsalddelAdmin.RequestCancelRefund");
         }
-
-        return item;
     }
 
     public async Task<IReadOnlyList<결제목록응답>> 결제목록조회Async(string? 결제상태 = null, string? 의뢰Id = null, CancellationToken cancellationToken = default)

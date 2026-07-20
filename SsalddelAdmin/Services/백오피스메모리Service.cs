@@ -47,21 +47,49 @@ public sealed partial class 백오피스메모리Service : I백오피스Service
     public Task<화주운송의뢰응답?> 의뢰상세조회Async(string requestId, CancellationToken cancellationToken = default)
         => Task.FromResult(_requests.FirstOrDefault(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase)));
 
-    public Task<화주운송의뢰응답?> 의뢰취소환불처리Async(string requestId, CancellationToken cancellationToken = default)
+    public Task 의뢰취소환불처리Async(
+        string requestId,
+        string 확인의뢰Id,
+        string 사유,
+        CancellationToken cancellationToken = default)
     {
         var item = _requests.FirstOrDefault(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase));
-        if (item is null) return Task.FromResult<화주운송의뢰응답?>(null);
+        if (item is null)
+        {
+            throw new InvalidOperationException("의뢰를 찾을 수 없습니다.");
+        }
+
+        var confirmationError = Ssalddel.Contracts.Admin.Transport.관리자운송의뢰취소환불정책.명시적확인오류(
+            requestId,
+            확인의뢰Id,
+            사유);
+        if (confirmationError is not null)
+        {
+            throw new InvalidOperationException(confirmationError);
+        }
+
+        var decision = Ssalddel.Contracts.Admin.Transport.관리자운송의뢰취소환불정책.평가(
+            item.의뢰상태,
+            item.결제상태,
+            item.정산상태,
+            item.배차상태);
+        if (!decision.처리가능)
+        {
+            throw new InvalidOperationException(decision.안내문구);
+        }
+
         item.의뢰상태 = "취소";
-        item.결제상태 = "환불됨";
+        item.결제상태 = decision.환불상태기록필요 ? "환불됨" : "결제취소";
+        item.정산상태 = "정산취소";
         item.배차상태 = "취소";
         var payment = _payments.FirstOrDefault(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase));
         if (payment is not null)
         {
-            payment.결제상태 = "환불됨";
+            payment.결제상태 = decision.환불상태기록필요 ? "환불됨" : "결제취소";
         }
 
         _dispatchWait.RemoveAll(x => string.Equals(x.의뢰Id, requestId, StringComparison.OrdinalIgnoreCase));
-        return Task.FromResult<화주운송의뢰응답?>(item);
+        return Task.CompletedTask;
     }
 
     public Task<IReadOnlyList<결제목록응답>> 결제목록조회Async(string? 결제상태 = null, string? 의뢰Id = null, CancellationToken cancellationToken = default)

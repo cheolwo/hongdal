@@ -5,6 +5,7 @@ namespace 살뜰.Services.Sales;
 public interface ISalesChannelService
 {
     Task<판매채널계정목록응답> GetAccountsAsync(CancellationToken cancellationToken);
+    Task<판매채널계정항목응답?> GetAccountAsync(long accountId, CancellationToken cancellationToken);
     Task<판매채널계정항목응답> CreateAccountAsync(판매채널계정저장요청 request, CancellationToken cancellationToken);
     Task<판매채널계정항목응답> UpdateAccountAsync(long accountId, 판매채널계정저장요청 request, CancellationToken cancellationToken);
     Task DeleteAccountAsync(long accountId, CancellationToken cancellationToken);

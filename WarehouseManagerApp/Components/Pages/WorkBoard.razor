@@ -1,145 +1,313 @@
 @page "/work-board"
+@inherits MvvmComponentBase<창고작업보드PageViewModel>
 
 <PageTitle>창고 작업 보드</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-    <MudStack Spacing="3">
-        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-            <MudStack Spacing="0">
-                <MudText Typo="Typo.h4">창고 작업 보드</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    입고, 적재, 출고, 포장 업무가 누구와 직접 연결되는지 먼저 확인한 뒤 상세 업무를 펼쳐봅니다.
-                </MudText>
-            </MudStack>
+<WarehousePageShell Model="@ViewModel"
+                    Title="창고 작업 보드"
+                    Description="입고 예정에서 선택한 같은 요청을 서버에서 다시 조회하고 다음 업무를 확인합니다."
+                    Icon="@Icons.Material.Filled.ViewKanban"
+                    Color="Color.Primary">
+    <Actions>
+        @if (ViewModel.기능사용가능 && ViewModel.인증.창고업무접근가능)
+        {
             <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
-                <MudButton Href="@WarehouseManagerRoutes.PickingBatch" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Inventory2">피킹 배치</MudButton>
-                <MudButton Href="scan" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner">스캔</MudButton>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">
+                    @ViewModel.인증.현재사용자표시
+                </MudChip>
+                <MudTooltip Text="선택 입고 다시 조회">
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                                   Color="Color.Default"
+                                   Disabled="@(ViewModel.처리중 || !ViewModel.조회대상선택됨)"
+                                   OnClick="RetryInboundAsync"
+                                   aria-label="선택 입고 다시 조회" />
+                </MudTooltip>
+                <MudButton Href="@WarehouseManagerRoutes.ExpectedInbounds"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.EventAvailable">
+                    입고 예정 선택
+                </MudButton>
             </MudStack>
-        </MudStack>
+        }
+    </Actions>
+    <ChildContent>
+        @if (!ViewModel.초기화됨 || ViewModel.초기화중)
+        {
+            <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+                <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        창고 업무 권한과 선택한 입고 요청을 확인하고 있습니다.
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (!string.IsNullOrWhiteSpace(ViewModel.페이지오류메시지))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText>@ViewModel.페이지오류메시지</MudText>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Error"
+                               Disabled="@ViewModel.처리중"
+                               OnClick="RetryPageAsync">
+                        다시 확인
+                    </MudButton>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (!ViewModel.기능사용가능)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle1">창고 작업 보드가 비활성입니다.</MudText>
+                    <MudText Typo="Typo.body2">@ViewModel.기능안내</MudText>
+                    <MudText Typo="Typo.caption">
+                        기능 플래그가 활성화된 환경에서만 서버 입고 원장을 조회합니다.
+                    </MudText>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (!ViewModel.인증.창고업무접근가능)
+        {
+            <WarehouseAuthenticationPanel ViewModel="@ViewModel.인증"
+                                          OnAuthenticated="AfterAuthenticationAsync"
+                                          OnLoggedOut="OnLoggedOut" />
+        }
+        else if (!ViewModel.조회대상선택됨)
+        {
+            <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+                <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Filled.PlaylistAddCheck" Size="Size.Large" Color="Color.Secondary" />
+                    <MudText Typo="Typo.h6">확인할 입고 요청을 선택해 주세요.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                        입고 예정 목록에서 한 건을 선택하면 해당 inboundId를 서버에서 다시 조회합니다.
+                    </MudText>
+                    <MudButton Href="@WarehouseManagerRoutes.ExpectedInbounds"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               EndIcon="@Icons.Material.Filled.ChevronRight">
+                        입고 예정 목록 열기
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (!string.IsNullOrWhiteSpace(ViewModel.입고상세조회.오류메시지))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText>@ViewModel.입고상세조회.오류메시지</MudText>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Error"
+                               Disabled="@ViewModel.처리중"
+                               StartIcon="@Icons.Material.Filled.Refresh"
+                               OnClick="RetryInboundAsync">
+                        입고 요청 다시 조회
+                    </MudButton>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (ViewModel.입고상세조회.대상없음)
+        {
+            <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+                <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" />
+                    <MudText Typo="Typo.h6">입고 요청을 찾을 수 없습니다.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                        입고 요청 #@ViewModel.입고요청Id 이(가) 없거나 현재 계정의 창고 조회 범위에 없습니다.
+                    </MudText>
+                    <MudButton Href="@WarehouseManagerRoutes.ExpectedInbounds"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary">
+                        다른 입고 요청 선택
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (ViewModel.입고상세조회.항목 is { } item && ViewModel.작업상태 is { } workState)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Science">
+                서버 원본을 읽는 Beta/ReadOnly 페이지입니다. 검수·적재·실제 보관·정산 상태 전이는 여기서 실행하지 않습니다.
+            </MudAlert>
 
-        <MudGrid>
-            @foreach (var item in BoardItems)
-            {
-                <MudItem xs="12" md="6" lg="4">
+            <MudGrid>
+                <MudItem xs="12" lg="8">
                     <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
                         <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.subtitle1">@item.Title</MudText>
-                                <MudChip T="string" Color="@item.Color" Variant="Variant.Outlined">@item.Status</MudChip>
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.h6">입고 요청 #@item.Id</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        @InboundSummary(item)
+                                    </MudText>
+                                </MudStack>
+                                <MudChip T="string" Color="@StatusColor(item.상태)" Variant="Variant.Outlined">
+                                    @workState.현재단계
+                                </MudChip>
                             </MudStack>
 
-                            <SsalddelSensitiveDisclosureList Title="업무 관계와 상세"
-                                                            Summary="@item.Description"
-                                                            RelatedParties="@item.RelatedParties"
-                                                            PrivacyHint="업무에 필요한 대상만 먼저 확인하고, 세부 정보는 펼쳐서 확인합니다."
-                                                            Icon="@item.Icon"
-                                                            Color="@item.Color"
+                            <MudGrid Spacing="2">
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">예정 상품</MudText>
+                                    <MudText Typo="Typo.body1">@ValueOrFallback(item.예정상품명)</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">SKU · 예정 수량</MudText>
+                                    <MudText Typo="Typo.body1">@SkuAndQuantity(item)</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">예정 도착</MudText>
+                                    <MudText Typo="Typo.body1">@DateTimeText(item.예정도착일)</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">입고 흐름</MudText>
+                                    <MudText Typo="Typo.body1">@입고흐름유형코드.GetDisplayName(item.입고흐름유형)</MudText>
+                                </MudItem>
+                            </MudGrid>
+
+                            <SsalddelSensitiveDisclosureList Title="업무 관계와 원장 연결"
+                                                            Summary="창고·주문·공급 관계 식별자는 업무상 필요할 때만 펼쳐 확인합니다."
+                                                            RelatedParties="@($"{ValueOrFallback(item.공급처명)} · 창고 #{item.창고Id}")"
+                                                            PrivacyHint="연락처와 상세 주소는 이 조회 응답에 포함하지 않습니다."
+                                                            Icon="@Icons.Material.Filled.AccountTree"
+                                                            Color="Color.Primary"
                                                             Compact="true">
-                                <MudExpansionPanel Text="업무 정보" Icon="@Icons.Material.Filled.Assignment">
-                                    <SsalddelSensitiveInfoRow Label="업무 번호" Value="@item.WorkNo" />
-                                    <SsalddelSensitiveInfoRow Label="처리 단계" Value="@item.Stage" />
-                                    <SsalddelSensitiveInfoRow Label="상태" Value="@item.Status" />
+                                <MudExpansionPanel Text="입고 기준정보" Icon="@Icons.Material.Filled.Assignment">
+                                    <SsalddelSensitiveInfoRow Label="창고 ID" Value="@item.창고Id.ToString()" />
+                                    <SsalddelSensitiveInfoRow Label="공급처" Value="@ValueOrFallback(item.공급처명)" />
+                                    <SsalddelSensitiveInfoRow Label="공급처 코드" Value="@ValueOrFallback(item.공급처코드)" />
+                                    <SsalddelSensitiveInfoRow Label="생성 경로" Value="@ValueOrFallback(item.입고생성경로)" />
                                 </MudExpansionPanel>
-                                <MudExpansionPanel Text="연결 대상" Icon="@Icons.Material.Filled.Group">
-                                    <SsalddelSensitiveInfoRow Label="직접 관련 대상" Value="@item.RelatedParties" />
-                                    <SsalddelSensitiveInfoRow Label="다음 연락 가능성" Value="@item.ContactContext" />
-                                    <SsalddelSensitiveInfoRow Label="관계 기록" Value="업무 완료 시 관계 스냅샷 후보로 남깁니다." />
+                                <MudExpansionPanel Text="주문·원장 연결" Icon="@Icons.Material.Filled.Hub">
+                                    <SsalddelSensitiveInfoRow Label="주문 참조" Value="@ValueOrFallback(item.주문참조번호)" />
+                                    <SsalddelSensitiveInfoRow Label="원주문 참조" Value="@ValueOrFallback(item.원주문참조번호)" />
+                                    <SsalddelSensitiveInfoRow Label="운송 의뢰" Value="@ValueOrFallback(item.운송의뢰Id)" />
+                                    <SsalddelSensitiveInfoRow Label="공동 원장" Value="@ValueOrFallback(item.커뮤니티원장Id)" />
                                 </MudExpansionPanel>
-                                <MudExpansionPanel Text="주의 사항" Icon="@Icons.Material.Filled.Info">
-                                    <SsalddelSensitiveInfoRow Label="작업 메모" Value="@item.Note" />
-                                    <SsalddelSensitiveInfoRow Label="노출 기준" Value="연락처와 상세 주소는 실제 업무 진입 후 필요한 범위에서만 표시합니다." />
+                                <MudExpansionPanel Text="계약 스냅샷" Icon="@Icons.Material.Filled.Description">
+                                    <SsalddelSensitiveInfoRow Label="계약 번호" Value="@ValueOrFallback(item.계약정보.계약번호)" />
+                                    <SsalddelSensitiveInfoRow Label="계약 유형" Value="@입고계약유형코드.GetDisplayName(item.계약정보.계약유형)" />
+                                    <SsalddelSensitiveInfoRow Label="계약 상대방" Value="@ValueOrFallback(item.계약정보.계약상대방명)" />
+                                    <SsalddelSensitiveInfoRow Label="통관 필요" Value="@(item.계약정보.통관필요여부 ? "예" : "아니요")" />
                                 </MudExpansionPanel>
                             </SsalddelSensitiveDisclosureList>
-
-                            <MudButton Variant="Variant.Text" Color="@item.Color" EndIcon="@Icons.Material.Filled.ChevronRight">처리</MudButton>
                         </MudStack>
                     </MudPaper>
                 </MudItem>
-            }
-        </MudGrid>
-    </MudStack>
-</MudContainer>
+
+                <MudItem xs="12" lg="4">
+                    <MudStack Spacing="2">
+                        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                            <MudStack Spacing="2">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Filled.Route" Color="Color.Primary" />
+                                    <MudText Typo="Typo.subtitle1">서버 상태 기준 다음 단계</MudText>
+                                </MudStack>
+                                <MudChip T="string"
+                                         Color="@(workState.상태전이후보 ? Color.Warning : Color.Default)"
+                                         Variant="Variant.Outlined">
+                                    @workState.다음행동
+                                </MudChip>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@workState.안내</MudText>
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Disabled="true"
+                                           StartIcon="@Icons.Material.Filled.LockClock">
+                                    상태 전이는 별도 Simulation에서
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+
+                        @if (item.입고완료일시.HasValue)
+                        {
+                            <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">입고 완료 시각</MudText>
+                                <MudText Typo="Typo.body1">@DateTimeText(item.입고완료일시)</MudText>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+
+            <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.subtitle1">다른 작업 영역</MudText>
+                    <MudGrid Spacing="2">
+                        @foreach (var area in ViewModel.작업영역목록)
+                        {
+                            <MudItem xs="12" sm="6" lg="4">
+                                <MudButton Href="@area.경로"
+                                           Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           FullWidth="true"
+                                           EndIcon="@Icons.Material.Filled.ChevronRight">
+                                    @area.표시명
+                                </MudButton>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@area.설명</MudText>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudStack>
+            </MudPaper>
+        }
+    </ChildContent>
+</WarehousePageShell>
 
 @code {
-    private static IReadOnlyList<BoardItem> BoardItems =>
-    [
-        new(
-            "입고 검수",
-            "INB-1001 / 생활용품 20개 검수",
-            "대기",
-            Color.Warning,
-            Icons.Material.Filled.MoveToInbox,
-            "INB-1001",
-            "입고 확인 후 검수",
-            "입고 담당자 · 공급사 포장상사 · 화주 재고 담당자 · 검수 담당자",
-            "수량 차이나 파손이 있으면 공급사 또는 화주 재고 담당자에게 확인할 수 있습니다.",
-            "예정 수량, 실제 수량, 파손 여부를 확인합니다."),
-        new(
-            "적재 위치 배정",
-            "SKU-MKT-330 / LOC-A-01 필요",
-            "진행",
-            Color.Info,
-            Icons.Material.Filled.Warehouse,
-            "PUT-2044",
-            "입고 완료 후 적재",
-            "입고 담당자 · 재고 관리자 · 피킹 담당자",
-            "위치가 잘못 잡히면 이후 피킹 담당자가 해당 기록을 보고 문의할 수 있습니다.",
-            "보관 조건과 피킹 빈도를 기준으로 위치를 배정합니다."),
-        new(
-            "마켓 출고 피킹",
-            "NAVER-20260704-01 / 3라인",
-            "대기",
-            Color.Primary,
-            Icons.Material.Filled.Outbox,
-            "OUT-7781",
-            "주문 출고 피킹",
-            "피킹 담당자 · 주문자 · 포장 담당자 · 배달 기사",
-            "상품 누락이나 대체 상품이 있으면 포장 담당자 또는 주문 처리 담당자와 이어집니다.",
-            "주문 라인별 상품과 수량을 확인합니다."),
-        new(
-            "포장",
-            "BOX-01 / 송장 출력 전 포장 확인",
-            "대기",
-            Color.Success,
-            Icons.Material.Filled.Inventory,
-            "PKG-3102",
-            "포장 및 송장 전 확인",
-            "포장 담당자 · 피킹 담당자 · 주문자 · 배송 담당자",
-            "포장 상태나 송장 오류가 있으면 피킹 담당자와 배송 담당자에게 확인할 수 있습니다.",
-            "완충재, 냉장 여부, 송장 정보가 일치하는지 확인합니다."),
-        new(
-            "해외 배송대행",
-            "CN 입고건 / 통관 검토 연결",
-            "검토",
-            Color.Secondary,
-            Icons.Material.Filled.Public,
-            "FWD-5509",
-            "입고와 통관 검토 연결",
-            "배송대행 담당자 · 해외 창고 · 화주 · 관세사",
-            "HS 코드나 신고 정보가 불명확하면 화주 또는 관세사와 확인해야 합니다.",
-            "상품명, HS 코드 후보, 수량, 통관 서류 상태를 확인합니다."),
-        new(
-            "국내 배송대행",
-            "재위탁 배송 연결 대기",
-            "대기",
-            Color.Tertiary,
-            Icons.Material.Filled.LocalShipping,
-            "DLV-6610",
-            "국내 재위탁 배송",
-            "배송대행 담당자 · 화주 · 운송 기사 · 수령지 담당자",
-            "상차/하차 확인 중 문제가 생기면 운송 기사와 수령지 담당자에게 이어집니다.",
-            "화물 상태와 전달 조건을 확인한 뒤 운송 의뢰로 연결합니다.")
-    ];
+    private bool _parametersLoaded;
+    private long? _loadedInboundId;
 
-    private sealed record BoardItem(
-        string Title,
-        string Description,
-        string Status,
-        Color Color,
-        string Icon,
-        string WorkNo,
-        string Stage,
-        string RelatedParties,
-        string ContactContext,
-        string Note);
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "inboundId")]
+    public long? InboundId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_parametersLoaded && _loadedInboundId == InboundId)
+        {
+            return;
+        }
+
+        _parametersLoaded = true;
+        _loadedInboundId = InboundId;
+        await ViewModel.초기화Async(InboundId);
+    }
+
+    private async Task AfterAuthenticationAsync()
+        => await ViewModel.인증후조회Async();
+
+    private void OnLoggedOut()
+        => ViewModel.인증해제적용();
+
+    private async Task RetryInboundAsync()
+        => await ViewModel.다시조회Async();
+
+    private async Task RetryPageAsync()
+        => await ViewModel.초기화Async(InboundId);
+
+    private static Color StatusColor(string? status)
+        => status switch
+        {
+            입고상태코드.예정 => Color.Warning,
+            입고상태코드.운송중 => Color.Info,
+            입고상태코드.완료 => Color.Success,
+            입고상태코드.취소 => Color.Error,
+            _ => Color.Default
+        };
+
+    private static string InboundSummary(입고요청항목응답 item)
+        => $"창고 #{item.창고Id} · {ValueOrFallback(item.공급처명)}";
+
+    private static string SkuAndQuantity(입고요청항목응답 item)
+    {
+        var sku = ValueOrFallback(item.예정SKU);
+        return item.예정수량.HasValue ? $"{sku} · {item.예정수량:N0}개" : sku;
+    }
+
+    private static string DateTimeText(DateTime? value)
+        => value?.ToString("yyyy-MM-dd HH:mm") ?? "미정";
+
+    private static string ValueOrFallback(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "연결 정보 없음" : value.Trim();
 }

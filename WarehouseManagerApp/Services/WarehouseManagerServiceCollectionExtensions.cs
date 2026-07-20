@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Ssalddel.Client.Infrastructure.Security;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using WarehouseManagerApp.ViewModels;
 using WarehouseManagerApp.ViewModels.Warehouse;
+using WarehouseManagerApp.Services.Security;
 
 namespace WarehouseManagerApp.Services;
 
@@ -10,6 +12,14 @@ public static class WarehouseManagerServiceCollectionExtensions
     public static IServiceCollection AddWarehouseManagerApplication(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddSingleton<IClientSecureTokenStore, WarehouseMauiSecureTokenStore>();
+        services.TryAddSingleton<IClientSessionGuard, ClientSessionGuard>();
+        services.TryAddSingleton<ClientAuthSession>();
+        services.TryAddSingleton<WarehouseAccessTokenProvider>();
+        services.TryAddSingleton<WarehouseAccessPolicyService>();
+        services.TryAddScoped<WarehouseAuthApiService>();
+        services.TryAddScoped<WarehousePageAvailabilityService>();
 
         services.AddTransient<창고Controller기능모음ViewModel>();
         services.AddTransient<창고기준정보업무ViewModel>();
@@ -33,6 +43,7 @@ public static class WarehouseManagerServiceCollectionExtensions
         services.AddTransient<창고홈PageViewModel>();
         services.AddTransient<창고작업보드PageViewModel>();
         services.AddTransient<창고입고예정조회PageViewModel>();
+        services.AddTransient<창고로그인ViewModel>();
         services.AddTransient<창고작업시작PageViewModel>();
         services.AddTransient<창고작업대스캔PageViewModel>();
         services.AddTransient<창고스캔스테이션PageViewModel>();

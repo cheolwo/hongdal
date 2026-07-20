@@ -1,32 +1,62 @@
 @page "/login"
 @inject WebAuthSessionService AuthSession
 
-<WebPageHeader Eyebrow="Web Login"
-               Title="웹 로그인"
-               Description="서버 인증 API로 토큰을 받아 WebApp API 호출에 사용합니다."
-               Badge="공통 로그인 패널" />
+<WebPageHeader Eyebrow="Community Account"
+               Title="로그인과 선택 회원가입"
+               Description="계정이 필요한 기능은 로그인하고, 익명 허용 게시판은 회원가입 없이 이용할 수 있습니다."
+               Badge="0.0 커뮤니티" />
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+    <MudStack Spacing="1">
+        <MudText Typo="Typo.body2">
+            회원가입은 선택입니다. 자유·생활 등 익명 쓰기를 허용한 게시판에서는 별도 계정 없이 닉네임과 글 비밀번호로 글과 댓글을 작성할 수 있습니다.
+        </MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">
+            로그인 전용 게시판이나 내 활동 관리처럼 계정 식별이 필요한 기능을 사용할 때만 가입해 주세요.
+        </MudText>
+        <MudButton Href="/community"
+                   Variant="Variant.Text"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Forum">
+            가입 없이 커뮤니티 보기
+        </MudButton>
+    </MudStack>
+</MudAlert>
 
 <MudGrid Justify="Justify.Center">
-    <MudItem xs="12" md="7" lg="5">
-        <Ssalddel공통로그인Panel 제목="살뜰 로그인"
-                              설명="화주, 기사, 창고 관리자, 주문자 웹 화면을 같은 로그인 패턴으로 확인합니다."
-                              초기아이디="web-user@ssalddel.local"
-                              상태메시지="@StatusMessage"
-                              상태Severity="@StatusSeverity"
-                              개발힌트목록="Hints"
-                              OnPasswordLogin="HandlePasswordLoginAsync"
-                              OnSocialLogin="HandleSocialLoginAsync">
-            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
-                로그인에 성공하면 브라우저 localStorage에 웹앱용 토큰을 보관하고, 대표 역할에 맞춰 웹앱 레이아웃 색상이 바뀝니다.
-            </MudAlert>
-        </Ssalddel공통로그인Panel>
+    <MudItem xs="12" md="9" lg="7">
+        <MudTabs Rounded="true" Elevation="0">
+            <MudTabPanel Text="로그인">
+                <Ssalddel공통로그인Panel 제목="살뜰 로그인"
+                                      설명="이미 계정이 있거나 로그인 전용 기능이 필요할 때 이용합니다."
+                                      초기아이디="web-user@ssalddel.local"
+                                      상태메시지="@LoginStatusMessage"
+                                      상태Severity="@LoginStatusSeverity"
+                                      개발힌트목록="Hints"
+                                      OnPasswordLogin="HandlePasswordLoginAsync"
+                                      OnSocialLogin="HandleSocialLoginAsync">
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                        로그인에 성공하면 브라우저 localStorage에 웹앱용 토큰을 보관하고, 대표 역할에 맞춰 웹앱 레이아웃 색상이 바뀝니다.
+                    </MudAlert>
+                </Ssalddel공통로그인Panel>
+            </MudTabPanel>
+            <MudTabPanel Text="선택 회원가입">
+                <Ssalddel공통회원가입Panel 상태메시지="@RegistrationStatusMessage"
+                                          상태Severity="@RegistrationStatusSeverity"
+                                          IsBusy="@RegistrationBusy"
+                                          OnRegister="HandleCommunityRegisterAsync" />
+            </MudTabPanel>
+        </MudTabs>
     </MudItem>
 </MudGrid>
 
 @code {
     private static readonly IReadOnlyList<string> Hints = ["화주", "기사", "창고관리자", "주문자", "흥여회"];
-    private string? StatusMessage { get; set; }
-    private Severity StatusSeverity { get; set; } = Severity.Info;
+    private string? LoginStatusMessage { get; set; }
+    private Severity LoginStatusSeverity { get; set; } = Severity.Info;
+    private string? RegistrationStatusMessage { get; set; }
+    private Severity RegistrationStatusSeverity { get; set; } = Severity.Info;
+    private bool RegistrationBusy { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -38,8 +68,8 @@
         await AuthSession.RestoreAsync();
         if (AuthSession.IsLoggedIn)
         {
-            StatusSeverity = Severity.Success;
-            StatusMessage = $"{AuthSession.UserName ?? AuthSession.UserId} 계정의 서버 인증 토큰을 복구했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
+            LoginStatusSeverity = Severity.Success;
+            LoginStatusMessage = $"{AuthSession.UserName ?? AuthSession.UserId} 계정의 서버 인증 토큰을 복구했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
             StateHasChanged();
         }
     }
@@ -48,25 +78,54 @@
     {
         try
         {
-            StatusSeverity = Severity.Info;
-            StatusMessage = "서버 인증 API로 로그인하는 중입니다.";
+            LoginStatusSeverity = Severity.Info;
+            LoginStatusMessage = "서버 인증 API로 로그인하는 중입니다.";
 
             await AuthSession.LoginAsync(request.UserNameOrEmail, request.Password);
 
-            StatusSeverity = Severity.Success;
-            StatusMessage = $"{AuthSession.UserName ?? request.UserNameOrEmail} 계정으로 서버 인증을 완료했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
+            LoginStatusSeverity = Severity.Success;
+            LoginStatusMessage = $"{AuthSession.UserName ?? request.UserNameOrEmail} 계정으로 서버 인증을 완료했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
         }
         catch (Exception ex)
         {
-            StatusSeverity = Severity.Error;
-            StatusMessage = ex.Message;
+            LoginStatusSeverity = Severity.Error;
+            LoginStatusMessage = ex.Message;
+        }
+    }
+
+    private async Task HandleCommunityRegisterAsync(공통커뮤니티회원가입요청 request)
+    {
+        RegistrationBusy = true;
+        RegistrationStatusSeverity = Severity.Info;
+        RegistrationStatusMessage = "개인정보 동의를 확인하고 회원 계정을 만드는 중입니다.";
+
+        try
+        {
+            var registration = await AuthSession.RegisterCommunityAsync(
+                request.UserName,
+                request.Email,
+                request.Password,
+                request.PrivacyConsentAccepted,
+                request.PrivacyConsentVersion);
+
+            RegistrationStatusSeverity = Severity.Success;
+            RegistrationStatusMessage = $"{registration.UserName} 계정을 만들고 로그인했습니다. 익명 허용 게시판에서는 로그인하지 않고도 계속 참여할 수 있습니다.";
+        }
+        catch (Exception ex)
+        {
+            RegistrationStatusSeverity = Severity.Error;
+            RegistrationStatusMessage = ex.Message;
+        }
+        finally
+        {
+            RegistrationBusy = false;
         }
     }
 
     private Task HandleSocialLoginAsync(공통소셜로그인요청 request)
     {
-        StatusSeverity = Severity.Info;
-        StatusMessage = $"{request.ProviderDisplayName} OAuth 연결은 서버 인증 API 연결 단계에서 활성화됩니다.";
+        LoginStatusSeverity = Severity.Info;
+        LoginStatusMessage = $"{request.ProviderDisplayName} OAuth 연결은 서버 인증 API 연결 단계에서 활성화됩니다.";
         return Task.CompletedTask;
     }
 }

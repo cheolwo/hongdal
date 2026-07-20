@@ -63,7 +63,7 @@
         new("공개 화물정보", "공개 상태의 화물 목록과 배차 가능 상태를 확인합니다.", ShipperRoutes.PublicCargo, Icons.Material.Filled.ViewList, "운송"),
         new("받은 탐색 문의함", "기사나 파트너가 먼저 보낸 운행 가능성 문의에 응답합니다.", ShipperRoutes.ExplorationInbox, Icons.Material.Filled.Inbox, "운송"),
         new("결제/정산 상태 점검", "결제상태와 정산상태 변화가 화면에 반영되는지 확인합니다.", ShipperRoutes.PaymentStatus, Icons.Material.Filled.Payments, "운송"),
-        new("의뢰 상세 타임라인", "결제, 배차, 수락, 상차, 하차, 정산 상태를 한 화면으로 검증합니다.", ShipperRoutes.RequestDetailFor("HD-WEB-001"), Icons.Material.Filled.Timeline, "운송")
+        new("의뢰 상세 타임라인", "등록한 의뢰 ID로 접수, 결제, 배차, 상하차와 정산 상태를 확인합니다.", ShipperRoutes.RequestDetailLookup, Icons.Material.Filled.Timeline, "운송")
     ];
 
     private static readonly IReadOnlyList<WebAppPageLink> WarehouseLinks =

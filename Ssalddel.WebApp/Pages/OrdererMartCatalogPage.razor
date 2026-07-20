@@ -1,0 +1,25 @@
+@page "/orderer/mart"
+@inject NavigationManager Navigation
+
+<WebPageHeader Eyebrow="Orderer · Mart"
+               Title="알뜰살뜰 마트 공개 상품"
+               Description="내부 창고 원장과 분리된 공개 상품과 마지막 투영 시각 기준 판매 가능 수량을 확인합니다."
+               Badge="익명 공개 조회" />
+
+<OrdererMartCatalogWorkspace ProductId="@ProductId"
+                             OrderRequestBasePath="@WebOrdererRoutes.MartOrderRequest"
+                             ProductSelected="OnProductSelectedAsync" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "productId")]
+    public long? ProductId { get; set; }
+
+    private Task OnProductSelectedAsync(long? productId)
+    {
+        var target = productId.HasValue
+            ? $"{WebOrdererRoutes.Mart}?productId={productId.Value}"
+            : WebOrdererRoutes.Mart;
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
+}

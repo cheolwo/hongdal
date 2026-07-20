@@ -1,0 +1,464 @@
+namespace Ssalddel.Contracts.Common.Versioning;
+
+public enum PageCapabilityMatchKind
+{
+    Exact,
+    Prefix
+}
+
+public enum PageCapabilityStage
+{
+    Live,
+    Beta,
+    Experience,
+    Preparing
+}
+
+public enum PageInteractionBoundary
+{
+    ReadOnly,
+    PlatformPersistence,
+    Simulation
+}
+
+public static class SsalddelPageAppCodes
+{
+    public const string IntegratedWeb = "Ssalddel.WebApp";
+    public const string Admin = "SsalddelAdmin";
+    public const string Driver = "DriverApp";
+    public const string Orderer = "OrdererApp";
+    public const string Shipper = "SsalddelApp";
+    public const string Warehouse = "WarehouseManagerApp";
+    public const string HumanResources = "HumanResourcesManagerApp";
+}
+
+public sealed record SsalddelPageCapabilityRule(
+    string PageKey,
+    string AppCode,
+    string RoutePattern,
+    PageCapabilityMatchKind MatchKind,
+    PageCapabilityStage Stage,
+    PageInteractionBoundary Boundary,
+    bool RequiresAuthentication,
+    bool HasExternalEffects,
+    string IntroducedVersion,
+    IReadOnlyList<string> FeatureKeys,
+    IReadOnlyList<string> WorkflowCodes,
+    string Notice);
+
+public sealed class PageCapabilityDto
+{
+    public string PageKey { get; init; } = string.Empty;
+
+    public string AppCode { get; init; } = string.Empty;
+
+    public string RoutePattern { get; init; } = string.Empty;
+
+    public string MatchKindCode { get; init; } = string.Empty;
+
+    public string StageCode { get; init; } = string.Empty;
+
+    public string StageName { get; init; } = string.Empty;
+
+    public string BoundaryCode { get; init; } = string.Empty;
+
+    public string BoundaryName { get; init; } = string.Empty;
+
+    public bool RequiresAuthentication { get; init; }
+
+    public bool HasExternalEffects { get; init; }
+
+    public string IntroducedVersion { get; init; } = string.Empty;
+
+    public IReadOnlyList<string> FeatureKeys { get; init; } = [];
+
+    public bool IsFeatureEnabled { get; init; }
+
+    public IReadOnlyList<string> WorkflowCodes { get; init; } = [];
+
+    public string Notice { get; init; } = string.Empty;
+}
+
+public static class PageCapabilityLabels
+{
+    public static string StageName(PageCapabilityStage stage)
+        => stage switch
+        {
+            PageCapabilityStage.Live => "운영",
+            PageCapabilityStage.Beta => "베타",
+            PageCapabilityStage.Experience => "체험",
+            PageCapabilityStage.Preparing => "준비 중",
+            _ => "준비 중"
+        };
+
+    public static string BoundaryName(PageInteractionBoundary boundary)
+        => boundary switch
+        {
+            PageInteractionBoundary.ReadOnly => "조회",
+            PageInteractionBoundary.PlatformPersistence => "플랫폼 저장",
+            PageInteractionBoundary.Simulation => "Simulation",
+            _ => "상태 확인"
+        };
+}
+
+/// <summary>
+/// 통합 웹의 실제 라우트 계열과 여러 역할 앱의 대표 진입점을 같은 기준으로 설명합니다.
+/// 기능 플래그는 노출 가능성을, 실행 경계는 외부 효과 허용 여부를 각각 따로 표현합니다.
+/// </summary>
+public static class SsalddelPageCapabilityCatalog
+{
+    private const string Community = "CommunityTrustWorkflow";
+    private const string DomesticTransport = "DomesticTransportWorkflow";
+    private const string Warehouse = "WarehouseFulfillmentWorkflow";
+    private const string Customs = "CustomsAndTradeDataWorkflow";
+    private const string GroupPurchase = "GroupPurchaseImportWorkflow";
+    private const string Sales = "SalesChannelFulfillmentWorkflow";
+    private const string Hr = "HrParticipationWorkflow";
+    private const string Food = "FoodDeliveryWorkflow";
+    private const string Mart = "SsalddelMartWorkflow";
+
+    private static readonly IReadOnlyList<SsalddelPageCapabilityRule> Items =
+    [
+        Exact("web-home", SsalddelPageAppCodes.IntegratedWeb, "/", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0",
+            "커뮤니티와 업무 도구를 한곳에서 찾는 통합 시작점입니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Exact("web-login", SsalddelPageAppCodes.IntegratedWeb, "/login", PageCapabilityStage.Live,
+            PageInteractionBoundary.PlatformPersistence, false, "0.0",
+            "회원가입은 선택이며, 가입할 때만 개인정보 수집·이용에 동의합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Exact("web-not-found", SsalddelPageAppCodes.IntegratedWeb, "/not-found", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "찾을 수 없는 주소를 안전하게 안내합니다."),
+
+        Exact("community-home", SsalddelPageAppCodes.IntegratedWeb, "/community", PageCapabilityStage.Live,
+            PageInteractionBoundary.PlatformPersistence, false, "0.0",
+            "로그인하지 않아도 공개 글을 읽고 익명 글과 댓글을 등록할 수 있습니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Prefix("community-boards", SsalddelPageAppCodes.IntegratedWeb, "/community/boards", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "공개 게시판과 게시판별 글을 조회합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Prefix("community-write", SsalddelPageAppCodes.IntegratedWeb, "/community/write", PageCapabilityStage.Live,
+            PageInteractionBoundary.PlatformPersistence, false, "0.0", "회원 또는 익명 작성자로 커뮤니티 글을 저장합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Prefix("community-posts", SsalddelPageAppCodes.IntegratedWeb, "/community/posts", PageCapabilityStage.Live,
+            PageInteractionBoundary.PlatformPersistence, false, "0.0", "공개 글과 익명 댓글을 조회하고 저장합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Exact("community-workspace", SsalddelPageAppCodes.IntegratedWeb, "/community/workspace", PageCapabilityStage.Live,
+            PageInteractionBoundary.PlatformPersistence, false, "0.0", "커뮤니티 글쓰기와 상세 흐름을 연결하는 작업공간입니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Exact("community-group-purchase-public", SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, false, "0.0",
+            "공개 모집과 비구속 참여 현황은 익명으로 조회하며, 제안·참여 저장은 로그인과 기능 경계를 확인합니다.",
+            true, [Community], ["CommunityTrust"]),
+        Prefix("community-group-purchase", SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "2.5", "참여와 가격 조건을 검증하되 실제 결제·계약은 실행하지 않습니다.", true,
+            [GroupPurchase], ["GroupPurchaseImport", "CommunityTrust"]),
+        Prefix("community-group-import", SsalddelPageAppCodes.IntegratedWeb, "/community/group-import", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.5", "공동수입의 공급·물류·비용 연결 구조를 Simulation으로 살펴봅니다.", true,
+            [GroupPurchase], ["GroupPurchaseImport", "CustomsAndTradeData"]),
+        Prefix("community-global-trade", SsalddelPageAppCodes.IntegratedWeb, "/community/global-trade", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, false, "2.0", "해외 공급자와 국내 참여자의 공개 대화 흐름을 체험합니다.", false,
+            [Customs], ["CustomsAndTradeData", "CommunityTrust"]),
+        Prefix("community-actions", SsalddelPageAppCodes.IntegratedWeb, "/community/actions", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "0.0", "관심과 참여를 명시적으로 나누며 실제 실행 전 단계까지만 검증합니다.", false,
+            [Community], ["CommunityTrust"]),
+        Prefix("community-bagua", SsalddelPageAppCodes.IntegratedWeb, "/community/bagua", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, false, "0.0", "대화에서 공동행동으로 이어지는 다이어그램 전환을 체험합니다.", false,
+            [Community], ["CommunityTrust"]),
+        Prefix("community-discover", SsalddelPageAppCodes.IntegratedWeb, "/community/discover", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "공개 정보에 근거한 주변 후보를 조회합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Prefix("community-safety", SsalddelPageAppCodes.IntegratedWeb, "/community/safety", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "0.0", "신고와 안전 조치 흐름을 로그인 사용자 기준으로 검증합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Exact("community-role-application", SsalddelPageAppCodes.IntegratedWeb, "/community/roles/apply", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "2.5",
+            "자발적인 역할 관심을 최소 정보로 저장하고 본인이 철회하며, 역할 배정·채용·계약·보수는 실행하지 않습니다.",
+            featureKeys: [Hr], workflowCodes: ["HrParticipation", "CommunityTrust"]),
+        Prefix("community-personal", SsalddelPageAppCodes.IntegratedWeb, "/community/me", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "0.0", "내 글·참여·원장·알림과 개인 설정을 관리합니다.",
+            featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
+        Prefix("community-decorations", SsalddelPageAppCodes.IntegratedWeb, "/community/decorations", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "0.0", "꾸미기와 FakePG 흐름은 Simulation 범위에서만 체험합니다.", true,
+            [Community], ["CommunityTrust"]),
+
+        Prefix("public-data", SsalddelPageAppCodes.IntegratedWeb, "/information/public-data", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "출처와 기준 시각을 함께 표시하는 공개 정보 조회 화면입니다."),
+        Prefix("public-price-comparison", SsalddelPageAppCodes.IntegratedWeb, "/information/agricultural-fisheries-price-comparison", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "공개 가격 자료의 출처·단위·기준 시각을 비교합니다."),
+
+        Exact("global-home", SsalddelPageAppCodes.IntegratedWeb, "/global", PageCapabilityStage.Experience,
+            PageInteractionBoundary.ReadOnly, false, "2.0", "해외 상품과 공급 조건을 공개 탐색합니다.",
+            featureKeys: [Customs], workflowCodes: ["CustomsAndTradeData"]),
+        Prefix("global-products", SsalddelPageAppCodes.IntegratedWeb, "/global/products", PageCapabilityStage.Experience,
+            PageInteractionBoundary.ReadOnly, false, "2.0", "샘플 상품의 상세 정보와 수입 검토 항목을 조회합니다.",
+            featureKeys: [Customs], workflowCodes: ["CustomsAndTradeData"]),
+        Prefix("global-suppliers", SsalddelPageAppCodes.IntegratedWeb, "/global/suppliers", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, false, "2.0", "공급자 제출 내용은 체험 세션에서만 다룹니다.", false,
+            [Customs], ["CustomsAndTradeData"]),
+        Prefix("global-import-requests", SsalddelPageAppCodes.IntegratedWeb, "/global/import-requests", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.5", "수입 요청을 Simulation 원장으로 검토합니다.", true,
+            [GroupPurchase, Customs], ["GroupPurchaseImport", "CustomsAndTradeData"]),
+        Prefix("global-orders", SsalddelPageAppCodes.IntegratedWeb, "/global/orders", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.5", "수입 주문 원장의 연결 구조를 체험합니다.", true,
+            [GroupPurchase, Customs], ["GroupPurchaseImport", "CustomsAndTradeData"]),
+
+        Prefix("shipper-public-cargo", SsalddelPageAppCodes.IntegratedWeb, "/shipper/public-cargo", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, "1.0", "공개 설정된 화물 정보만 조회합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+        Prefix("shipper-payment-status", SsalddelPageAppCodes.IntegratedWeb, "/shipper/request/payment-status", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "1.0", "실결제와 정산은 비활성이고 FakePG 상태만 검증합니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("shipper-request", SsalddelPageAppCodes.IntegratedWeb, "/shipper/request", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.0", "운송 의뢰 저장을 검증하되 자동 배차·계약 확정은 실행하지 않습니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("shipper-inbound", SsalddelPageAppCodes.IntegratedWeb, "/shipper/inbound", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.5", "입고와 재고 전환 흐름을 Simulation 데이터로 검증합니다.", true,
+            [Warehouse], ["WarehouseFulfillment"]),
+        Prefix("shipper-warehouse", SsalddelPageAppCodes.IntegratedWeb, "/shipper/warehouse", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.5", "화주 관점의 창고·재고 흐름을 Simulation으로 검증합니다.", true,
+            [Warehouse], ["WarehouseFulfillment"]),
+        Prefix("shipper-exploration", SsalddelPageAppCodes.IntegratedWeb, "/shipper/exploration", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.0", "운행 가능성 문의를 계약 확정과 분리해 검증합니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("shipper-reconsignment", SsalddelPageAppCodes.IntegratedWeb, "/shipper/reconsignment", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "1.5", "재위탁 운송은 실제 배차 없이 Simulation으로만 준비합니다.", true,
+            [Warehouse, DomesticTransport], ["WarehouseFulfillment", "DomesticTransport"]),
+        Exact("shipper-sales-channels", SsalddelPageAppCodes.IntegratedWeb, "/shipper/sales/channels", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "2.5",
+            "사용자 소유 판매채널 연결 준비 원장을 조회·저장하며 외부 인증·발행·주문 동기화는 실행하지 않습니다.", false,
+            [Sales], ["SalesChannelFulfillment"]),
+        Exact("shipper-sales-orders", SsalddelPageAppCodes.IntegratedWeb, "/shipper/sales/orders", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "2.5",
+            "재고 예약과 함께 영속된 사용자 소유 판매채널 주문 출고 후보만 조회하며 외부 주문 수집과 출고 실행은 하지 않습니다.", false,
+            [Sales], ["SalesChannelFulfillment"]),
+        Prefix("shipper-sales", SsalddelPageAppCodes.IntegratedWeb, "/shipper/sales", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.5", "외부 판매채널 발행 없이 판매·출고 화면을 체험합니다.", true,
+            [Sales], ["SalesChannelFulfillment"]),
+        Exact("shipper-customs-hs-reviews", SsalddelPageAppCodes.IntegratedWeb, "/shipper/customs/hs-reviews", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "2.0",
+            "활성 HS 코드 원장과 공개 동의된 근거를 조회하며 품목분류·세율·신고를 확정하지 않습니다.", false,
+            [Customs], ["CustomsAndTradeData"]),
+        Prefix("shipper-customs", SsalddelPageAppCodes.IntegratedWeb, "/shipper/customs", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.0", "HS 코드 후보와 검토 상태를 체험하며 전문 판단을 확정하지 않습니다.", true,
+            [Customs], ["CustomsAndTradeData"]),
+        Prefix("shipper-international", SsalddelPageAppCodes.IntegratedWeb, "/shipper/international", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.0", "FCL/LCL 비용 판단을 Simulation으로 비교합니다.", true,
+            [Customs], ["CustomsAndTradeData"]),
+        Prefix("shipper-settings", SsalddelPageAppCodes.IntegratedWeb, "/shipper/settings", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "1.0", "사용자별 화면·프로필 설정을 관리합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+        Prefix("shipper-home", SsalddelPageAppCodes.IntegratedWeb, "/shipper", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.0", "화주·판매자 업무는 통합 베타에서 Simulation 경계를 유지합니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("dispatch-address", SsalddelPageAppCodes.IntegratedWeb, "/dispatch", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "1.0", "주소 입력은 검증할 수 있지만 자동 배차는 비활성입니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+
+        Prefix("driver-recommendations", SsalddelPageAppCodes.IntegratedWeb, "/driver/recommendations", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "1.0", "추천 후보를 표시하지만 자동 배차나 계약 확정은 실행하지 않습니다.", true,
+            [DomesticTransport, Food], ["DomesticTransport", "FoodDelivery"]),
+        Prefix("driver-transports", SsalddelPageAppCodes.IntegratedWeb, "/driver/transports", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "1.0", "운송 단계 전환은 실제 운송과 분리된 Simulation입니다.", true,
+            [DomesticTransport, Food], ["DomesticTransport", "FoodDelivery"]),
+        Prefix("driver-settlements", SsalddelPageAppCodes.IntegratedWeb, "/driver/settlements", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "1.0", "실정산은 비활성이고 화면 흐름만 준비합니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("driver-work", SsalddelPageAppCodes.IntegratedWeb, "/driver/work", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.0", "기사 운행 설정과 시작 흐름을 Simulation으로 검증합니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("driver-proof", SsalddelPageAppCodes.IntegratedWeb, "/driver/transport/proof", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.0", "상·하차 증빙 화면을 실제 운송과 분리해 검증합니다.", true,
+            [DomesticTransport], ["DomesticTransport"]),
+        Prefix("driver-account", SsalddelPageAppCodes.IntegratedWeb, "/driver/account", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "1.0", "민감정보 마스킹과 계좌 설정 흐름을 검증합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+        Prefix("driver-profile", SsalddelPageAppCodes.IntegratedWeb, "/driver/me", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "1.0", "기사 개인 설정을 관리합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+        Prefix("driver-notifications", SsalddelPageAppCodes.IntegratedWeb, "/driver/notifications", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "1.0", "기사 알림과 알림 설정을 관리합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+        Prefix("driver-settings", SsalddelPageAppCodes.IntegratedWeb, "/driver/settings", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "1.0", "기사 화면 설정을 관리합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+        Prefix("driver-home", SsalddelPageAppCodes.IntegratedWeb, "/driver", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "1.0", "기사 업무 현황을 통합 베타에서 조회합니다.",
+            featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
+
+        Exact("web-warehouse-mart-picking", SsalddelPageAppCodes.IntegratedWeb, "/warehouse/mart/picking", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "3.5", "로그인 계정이 접근할 수 있는 영속 마트 주문과 피킹·포장 작업만 조회합니다.",
+            featureKeys: [Mart], workflowCodes: ["SsalddelMart"]),
+        Prefix("warehouse", SsalddelPageAppCodes.IntegratedWeb, "/warehouse", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.5", "입고·검수·피킹·포장을 실제 보관 계약과 분리해 검증합니다.", true,
+            [Warehouse, Mart], ["WarehouseFulfillment", "SsalddelMart"]),
+        Prefix("warehouse-work-alias", SsalddelPageAppCodes.IntegratedWeb, "/work", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.5", "창고 현장 호환 경로이며 Simulation 경계를 유지합니다.", true,
+            [Warehouse, Mart], ["WarehouseFulfillment", "SsalddelMart"]),
+        Exact("warehouse-work-board-alias", SsalddelPageAppCodes.IntegratedWeb, "/work-board", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.5", "창고 작업 보드 호환 경로이며 Simulation 경계를 유지합니다.", true,
+            [Warehouse], ["WarehouseFulfillment"]),
+        Exact("warehouse-app-expected-inbounds", SsalddelPageAppCodes.Warehouse, "/warehouse/inbounds/expected", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "1.5", "창고 역할과 HR 세부 역할을 확인한 뒤 서버의 입고 예정 목록을 조회합니다.",
+            featureKeys: [Warehouse], workflowCodes: ["WarehouseFulfillment"]),
+        Exact("warehouse-app-work-board", SsalddelPageAppCodes.Warehouse, "/work-board", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "1.5", "선택한 입고 요청을 같은 ID로 다시 조회하고 서버 상태에 따른 다음 업무를 확인합니다.",
+            featureKeys: [Warehouse], workflowCodes: ["WarehouseFulfillment"]),
+        Exact("warehouse-app-mart-picking", SsalddelPageAppCodes.Warehouse, "/mart/picking", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "3.5", "접근 가능한 창고의 영속 마트 주문과 피킹·포장 작업을 조회하며 상태는 변경하지 않습니다.",
+            featureKeys: [Mart], workflowCodes: ["SsalddelMart"]),
+        Exact("web-mart-picking-alias", SsalddelPageAppCodes.IntegratedWeb, "/mart/picking", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "3.5", "통합 웹의 마트 피킹 호환 경로이며 영속 작업을 읽기 전용으로 조회합니다.",
+            featureKeys: [Mart], workflowCodes: ["SsalddelMart"]),
+        Prefix("mart-work", SsalddelPageAppCodes.IntegratedWeb, "/mart", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "3.5", "도심 마트 작업을 Simulation 데이터로 검증합니다.", true,
+            [Mart], ["SsalddelMart"]),
+        Exact("warehouse-scan-alias", SsalddelPageAppCodes.IntegratedWeb, "/scan", PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.5", "브라우저 스캔 입력을 Simulation으로 검증합니다.", true,
+            [Warehouse], ["WarehouseFulfillment"]),
+
+        Exact("web-orderer-mart-order-request", SsalddelPageAppCodes.IntegratedWeb, "/orderer/mart/order", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "3.5",
+            "한 공개 상품의 비구속 주문 요청을 멱등 저장하고 같은 ID를 다시 조회하며 재고·결제·출고 원장은 변경하지 않습니다.", false,
+            [Mart], ["SsalddelMart"]),
+        Exact("web-orderer-mart", SsalddelPageAppCodes.IntegratedWeb, "/orderer/mart", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, "3.5",
+            "내부 창고 원장과 분리된 공개 상품과 판매 가능 수량 투영을 익명으로 조회합니다.", false,
+            [Mart], ["SsalddelMart"]),
+        Prefix("orderer-home", SsalddelPageAppCodes.IntegratedWeb, "/orderer", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "2.5", "공동주문 집단화와 실제 결제 연결 전 화면 골격을 준비합니다.", true,
+            [GroupPurchase], ["GroupPurchaseImport"]),
+        Prefix("document-tools", SsalddelPageAppCodes.IntegratedWeb, "/tools", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "1.0", "업무 문서와 식별자 출력을 생성 전 미리 확인합니다."),
+        Prefix("diagram", SsalddelPageAppCodes.IntegratedWeb, "/diagram", PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "0.0", "공동 원장과 업무 노드의 연결 구조를 체험합니다.", false,
+            [Community], ["CommunityTrust"]),
+
+        Exact("admin-hr-dashboard", SsalddelPageAppCodes.Admin, "/dashboard", PageCapabilityStage.Preparing,
+            PageInteractionBoundary.Simulation, true, "2.5", "역할·계약·4대보험 신고 준비를 실제 외부 신고와 분리해 검증합니다.", true,
+            [Hr], ["HrParticipation"]),
+        Exact("human-resources-role-reviews", SsalddelPageAppCodes.HumanResources, "/", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "2.5",
+            "서버관리자가 영속 HR 역할 지원·철회와 배정·해제 원장을 검색하고 정확한 검토 ID 상세를 조회합니다.",
+            featureKeys: [Hr], workflowCodes: ["HrParticipation"]),
+        Exact("orderer-food-restaurants", SsalddelPageAppCodes.Orderer, "/food/restaurants", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, "3.0",
+            "사용자가 선택한 공개 행정권역 기준점과 반경으로 영속된 공개 음식점·메뉴를 조회합니다.",
+            featureKeys: [Food], workflowCodes: ["FoodDelivery"]),
+        Exact("orderer-food-orders", SsalddelPageAppCodes.Orderer, "/orders", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "3.0",
+            "로그인한 주문자가 소유한 영속 음식 주문 목록과 정확한 주문번호 상세만 조회합니다.", false,
+            [Food], ["FoodDelivery"]),
+        Exact("orderer-mart", SsalddelPageAppCodes.Orderer, "/food/mart", PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, "3.5",
+            "내부 창고 원장과 분리해 영속된 공개 상품·판매 가능 수량 투영을 조회하며 장바구니·주문·피킹·배송을 실행하지 않습니다.", false,
+            [Mart], ["SsalddelMart"]),
+        Exact("orderer-mart-order-request", SsalddelPageAppCodes.Orderer, "/food/mart/order", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, "3.5",
+            "한 공개 상품의 비구속 주문 요청을 멱등 저장하고 같은 ID를 다시 조회하며 재고·결제·출고 원장은 변경하지 않습니다.", false,
+            [Mart], ["SsalddelMart"])
+    ];
+
+    public static IReadOnlyList<SsalddelPageCapabilityRule> GetAll() => Items;
+
+    public static bool TryResolve(string appCode, string? route, out SsalddelPageCapabilityRule rule)
+    {
+        var normalizedRoute = NormalizeRoute(route);
+        var match = Items
+            .Where(item => string.Equals(item.AppCode, appCode, StringComparison.Ordinal))
+            .Where(item => Matches(item, normalizedRoute))
+            .OrderBy(item => item.MatchKind == PageCapabilityMatchKind.Exact ? 0 : 1)
+            .ThenByDescending(item => item.RoutePattern.Length)
+            .FirstOrDefault();
+
+        if (match is null)
+        {
+            rule = default!;
+            return false;
+        }
+
+        rule = match;
+        return true;
+    }
+
+    private static bool Matches(SsalddelPageCapabilityRule rule, string route)
+        => rule.MatchKind == PageCapabilityMatchKind.Exact
+            ? string.Equals(rule.RoutePattern, route, StringComparison.OrdinalIgnoreCase)
+            : string.Equals(rule.RoutePattern, route, StringComparison.OrdinalIgnoreCase)
+              || route.StartsWith($"{rule.RoutePattern}/", StringComparison.OrdinalIgnoreCase);
+
+    private static string NormalizeRoute(string? route)
+    {
+        var value = route?.Trim() ?? string.Empty;
+        if (Uri.TryCreate(value, UriKind.Absolute, out var absoluteUri))
+        {
+            value = absoluteUri.AbsolutePath;
+        }
+
+        value = value.Split('?', '#')[0].Trim();
+        if (string.IsNullOrEmpty(value))
+        {
+            return "/";
+        }
+
+        value = $"/{value.Trim('/')}";
+        return value.Length == 1 ? value : value.TrimEnd('/');
+    }
+
+    private static SsalddelPageCapabilityRule Exact(
+        string pageKey,
+        string appCode,
+        string route,
+        PageCapabilityStage stage,
+        PageInteractionBoundary boundary,
+        bool requiresAuthentication,
+        string introducedVersion,
+        string notice,
+        bool hasExternalEffects = false,
+        string[]? featureKeys = null,
+        string[]? workflowCodes = null)
+        => Rule(pageKey, appCode, route, PageCapabilityMatchKind.Exact, stage, boundary,
+            requiresAuthentication, introducedVersion, notice, hasExternalEffects, featureKeys, workflowCodes);
+
+    private static SsalddelPageCapabilityRule Prefix(
+        string pageKey,
+        string appCode,
+        string route,
+        PageCapabilityStage stage,
+        PageInteractionBoundary boundary,
+        bool requiresAuthentication,
+        string introducedVersion,
+        string notice,
+        bool hasExternalEffects = false,
+        string[]? featureKeys = null,
+        string[]? workflowCodes = null)
+        => Rule(pageKey, appCode, route, PageCapabilityMatchKind.Prefix, stage, boundary,
+            requiresAuthentication, introducedVersion, notice, hasExternalEffects, featureKeys, workflowCodes);
+
+    private static SsalddelPageCapabilityRule Rule(
+        string pageKey,
+        string appCode,
+        string route,
+        PageCapabilityMatchKind matchKind,
+        PageCapabilityStage stage,
+        PageInteractionBoundary boundary,
+        bool requiresAuthentication,
+        string introducedVersion,
+        string notice,
+        bool hasExternalEffects,
+        string[]? featureKeys,
+        string[]? workflowCodes)
+        => new(
+            pageKey,
+            appCode,
+            NormalizeRoute(route),
+            matchKind,
+            stage,
+            boundary,
+            requiresAuthentication,
+            hasExternalEffects,
+            introducedVersion,
+            featureKeys ?? [],
+            workflowCodes ?? [],
+            notice);
+}

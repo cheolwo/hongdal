@@ -1,5 +1,6 @@
 using Ssalddel.Controllers;
 using Ssalddel.Application.Shipper.Request;
+using Ssalddel.Contracts.Admin.Transport;
 using Ssalddel.Contracts.Shipper.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -84,6 +85,17 @@ namespace Ssalddel.Controllers.Shipper.Request01
         public async Task<IActionResult> 의뢰수정(string requestId, [FromBody] 화주운송의뢰수정요청 req)
         {
             var result = await _useCase.의뢰수정Async(requestId, req);
+            return this.ToActionResult(result);
+        }
+
+        [Authorize(Policy = "서버관리자전용")]
+        [HttpPost("{requestId}/admin/cancel-refund")]
+        public async Task<IActionResult> 관리자취소환불(
+            string requestId,
+            [FromBody] 관리자운송의뢰취소환불요청 request,
+            CancellationToken cancellationToken)
+        {
+            var result = await _useCase.관리자취소환불Async(requestId, request, cancellationToken);
             return this.ToActionResult(result);
         }
 

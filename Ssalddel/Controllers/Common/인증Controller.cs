@@ -33,6 +33,13 @@ public class 인증Controller : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpPost("register/community")]
+    public async Task<IActionResult> 커뮤니티회원가입([FromBody] 커뮤니티회원가입요청 request)
+    {
+        var result = await _인증UseCase.커뮤니티회원가입Async(request);
+        return this.ToActionResult(result);
+    }
+
     [SsalddelApiVersion(SsalddelProductVersion.V2_5)]
     [HttpPost("register/orderer")]
     public async Task<IActionResult> 주문자회원가입([FromBody] 주문자회원가입요청 request)

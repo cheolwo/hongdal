@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Ssalddel.Contracts.Common.Hr;
 using 살뜰.도메인.공통;
 using 살뜰.도메인.기사;
 using 살뜰.도메인.차량;
@@ -20,6 +21,7 @@ namespace 살뜰.Data
 
             var roles = new[]
             {
+                역할명.커뮤니티회원,
                 역할명.기사,
                 역할명.화주,
                 역할명.판매자,
@@ -160,6 +162,13 @@ namespace 살뜰.Data
             {
                 await userManager.AddToRoleAsync(shipperUser, 역할명.창고관리자);
             }
+
+            await EnsureHrRoleAssignmentAsync(
+                db,
+                shipperUser.Id,
+                adminUser.Id,
+                HrDetailedRoleCodes.WarehouseManager,
+                "개발용 창고 관리자");
 
             await EnsureOrdererProfileAsync(db, adminUser, "관리자 주문자", "010-0000-0001");
             await EnsureOrdererProfileAsync(db, driverUser, "개발용 기사 주문자", "010-0000-0000");
@@ -828,6 +837,50 @@ namespace 살뜰.Data
             profile.연락처 = string.IsNullOrWhiteSpace(profile.연락처) ? phoneNumber : profile.연락처;
             profile.기본주소 ??= string.Empty;
             profile.UpdatedAt = DateTime.UtcNow;
+        }
+
+        private static async Task EnsureHrRoleAssignmentAsync(
+            SsalddelContext db,
+            string userId,
+            string assignedByUserId,
+            string roleCode,
+            string roleName)
+        {
+            var assignment = await db.HrRoleAssignments.FirstOrDefaultAsync(x =>
+                x.UserId == userId
+                && x.ScopeType == HrScopeTypes.Platform
+                && x.ScopeId == HrScopeIds.Global
+                && x.RoleCode == roleCode);
+
+            if (assignment is null)
+            {
+                db.HrRoleAssignments.Add(new HrRoleAssignmentRecord
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    ScopeType = HrScopeTypes.Platform,
+                    ScopeId = HrScopeIds.Global,
+                    ParticipantCategory = HrParticipantCategoryCodes.InternalProjectOperator,
+                    RoleCode = roleCode,
+                    RoleName = roleName,
+                    IsActive = true,
+                    AssignedAtUtc = DateTime.UtcNow,
+                    AssignedByUserId = assignedByUserId,
+                    WorkScheduleEnabled = false,
+                    TimeZoneId = HrWorkScheduleDefaults.TimeZoneId,
+                    WorksiteIpRestrictionEnabled = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                return;
+            }
+
+            assignment.RoleName = roleName;
+            assignment.IsActive = true;
+            assignment.AssignedByUserId = assignedByUserId;
+            assignment.WorkScheduleEnabled = false;
+            assignment.WorksiteIpRestrictionEnabled = false;
+            assignment.UpdatedAt = DateTime.UtcNow;
         }
 
         private static void ApplyVehicleRecommendationDefaults(차량제원 spec, int priority)
