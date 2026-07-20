@@ -17,22 +17,30 @@ public sealed class FoodMartProjectionModelTests
         using var context = CreateContext();
 
         var foodOrder = context.Model.FindEntityType(typeof(음식주문));
+        var restaurant = context.Model.FindEntityType(typeof(음식점공개프로필));
+        var menu = context.Model.FindEntityType(typeof(음식점메뉴));
         var martOrder = context.Model.FindEntityType(typeof(마트주문));
         var martOrderItem = context.Model.FindEntityType(typeof(마트주문상품));
         var pickingPackingTask = context.Model.FindEntityType(typeof(피킹포장작업));
         var ledgerStateEvent = context.Model.FindEntityType(typeof(커뮤니티원장상태이벤트));
 
         Assert.NotNull(foodOrder);
+        Assert.NotNull(restaurant);
+        Assert.NotNull(menu);
         Assert.NotNull(martOrder);
         Assert.NotNull(martOrderItem);
         Assert.NotNull(pickingPackingTask);
         Assert.NotNull(ledgerStateEvent);
         Assert.Equal("음식주문", foodOrder!.GetTableName());
+        Assert.Equal("음식점공개프로필", restaurant!.GetTableName());
+        Assert.Equal("음식점메뉴", menu!.GetTableName());
         Assert.Equal("마트주문", martOrder!.GetTableName());
         Assert.Equal("피킹포장작업", pickingPackingTask!.GetTableName());
         Assert.Equal("community_ledger_state_events", ledgerStateEvent!.GetTableName());
         Assert.Contains(foodOrder.GetIndexes(), index =>
             index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["주문번호"]));
+        Assert.Contains(menu.GetIndexes(), index =>
+            index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["음식점공개프로필Id", "메뉴명"]));
         Assert.Contains(martOrder.GetIndexes(), index =>
             index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["주문참조번호"]));
         Assert.Contains(martOrderItem!.GetIndexes(), index =>

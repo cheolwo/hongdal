@@ -131,6 +131,8 @@ namespace 살뜰.Data
         public DbSet<상품상세이미지생성작업> 상품상세이미지생성작업 { get; set; } = null!;
         public DbSet<상품판매이미지초안> 상품판매이미지초안 { get; set; } = null!;
         public DbSet<감사메시지> 감사메시지 { get; set; } = null!;
+        public DbSet<음식점공개프로필> 음식점공개프로필 { get; set; } = null!;
+        public DbSet<음식점메뉴> 음식점메뉴 { get; set; } = null!;
         public DbSet<음식주문> 음식주문 { get; set; } = null!;
         public DbSet<음식주문상품> 음식주문상품 { get; set; } = null!;
         public DbSet<음식주문상태이력> 음식주문상태이력 { get; set; } = null!;

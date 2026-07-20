@@ -6003,6 +6003,156 @@ namespace Ssalddel.Migrations
                     b.ToTable("차량단가", (string)null);
                 });
 
+            modelBuilder.Entity("살뜰.도메인.음식.음식점공개프로필", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<decimal>("경도")
+                        .HasColumnType("decimal(18,10)")
+                        .HasColumnName("경도");
+
+                    b.Property<bool>("공개여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("공개여부");
+
+                    b.Property<string>("공개주소")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("공개주소");
+
+                    b.Property<string>("대표이미지Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("대표이미지_url");
+
+                    b.Property<string>("상호명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("상호명");
+
+                    b.Property<string>("소개")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("소개");
+
+                    b.Property<long?>("업체Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("업체_id");
+
+                    b.Property<int>("예상조리분")
+                        .HasColumnType("int")
+                        .HasColumnName("예상조리분");
+
+                    b.Property<decimal>("위도")
+                        .HasColumnType("decimal(18,10)")
+                        .HasColumnName("위도");
+
+                    b.Property<bool>("주문가능여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("주문가능여부");
+
+                    b.Property<decimal>("최소주문금액")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("최소주문금액");
+
+                    b.Property<string>("카테고리")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("카테고리");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("업체Id")
+                        .IsUnique();
+
+                    b.HasIndex("위도", "경도");
+
+                    b.HasIndex("공개여부", "주문가능여부", "UpdatedAtUtc");
+
+                    b.ToTable("음식점공개프로필");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.음식.음식점메뉴", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at_utc");
+
+                    b.Property<bool>("공개여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("공개여부");
+
+                    b.Property<string>("대표이미지Url")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("대표이미지_url");
+
+                    b.Property<string>("메뉴명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("메뉴명");
+
+                    b.Property<string>("설명")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("설명");
+
+                    b.Property<long>("음식점공개프로필Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("음식점공개프로필_id");
+
+                    b.Property<decimal>("판매가")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("판매가");
+
+                    b.Property<int>("표시순서")
+                        .HasColumnType("int")
+                        .HasColumnName("표시순서");
+
+                    b.Property<bool>("품절여부")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("품절여부");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("음식점공개프로필Id", "메뉴명")
+                        .IsUnique();
+
+                    b.HasIndex("음식점공개프로필Id", "공개여부", "표시순서");
+
+                    b.ToTable("음식점메뉴");
+                });
+
             modelBuilder.Entity("살뜰.도메인.음식.음식주문", b =>
                 {
                     b.Property<long>("Id")
@@ -6171,6 +6321,17 @@ namespace Ssalddel.Migrations
                     b.HasIndex("주문자UserId", "상태", "CreatedAt");
 
                     b.ToTable("음식주문", (string)null);
+                });
+
+            modelBuilder.Entity("살뜰.도메인.음식.음식점메뉴", b =>
+                {
+                    b.HasOne("살뜰.도메인.음식.음식점공개프로필", "음식점공개프로필")
+                        .WithMany("메뉴목록")
+                        .HasForeignKey("음식점공개프로필Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("음식점공개프로필");
                 });
 
             modelBuilder.Entity("살뜰.도메인.음식.음식주문상태이력", b =>
@@ -9673,6 +9834,11 @@ namespace Ssalddel.Migrations
             modelBuilder.Entity("살뜰.도메인.사용자.살뜰참여자", b =>
                 {
                     b.Navigation("역할목록");
+                });
+
+            modelBuilder.Entity("살뜰.도메인.음식.음식점공개프로필", b =>
+                {
+                    b.Navigation("메뉴목록");
                 });
 
             modelBuilder.Entity("살뜰.도메인.음식.음식주문", b =>

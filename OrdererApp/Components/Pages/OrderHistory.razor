@@ -1,81 +1,32 @@
 @page "/orders"
+@inject NavigationManager Navigation
 
-<PageTitle>주문 내역</PageTitle>
+<PageTitle>음식 주문 내역</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
     <MudStack Spacing="3">
         <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">주문 내역</MudText>
+            <MudText Typo="Typo.h4">음식 주문 내역</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                음식점, 홈달마트, 화물·공산품 주문을 한 곳에서 확인합니다.
+                로그인한 계정의 실제 음식 주문 목록과 선택한 정확한 주문 상세를 확인합니다.
             </MudText>
         </MudStack>
 
-        <MudGrid>
-            @foreach (var order in Orders)
-            {
-                <MudItem xs="12" md="6">
-                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-                                <MudStack Spacing="0">
-                                    <MudText Typo="Typo.subtitle1">@order.Title</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@order.Type · @order.Eta</MudText>
-                                </MudStack>
-                                <MudChip T="string" Size="Size.Small" Color="@order.Color">@order.Status</MudChip>
-                            </MudStack>
-
-                            <SsalddelSensitiveDisclosureList Title="주문 상세"
-                                                            Summary="@order.Type"
-                                                            RelatedParties="@order.RelatedParties"
-                                                            Icon="@Icons.Material.Filled.ReceiptLong"
-                                                            Color="@order.Color"
-                                                            PrivacyHint="결제, 배송, 상대 정보는 필요할 때만 펼쳐 확인합니다.">
-                                <MudExpansionPanel Text="주문 정보" Expanded="true">
-                                    <SsalddelSensitiveInfoRow Label="주문 유형" Value="@order.Type" />
-                                    <SsalddelSensitiveInfoRow Label="주문 내용" Value="@order.Title" />
-                                    <SsalddelSensitiveInfoRow Label="진행 상태" Value="@order.Status" />
-                                </MudExpansionPanel>
-                                <MudExpansionPanel Text="배송 정보">
-                                    <SsalddelSensitiveInfoRow Label="예정" Value="@order.Eta" />
-                                    <SsalddelSensitiveInfoRow Label="수령 방식" Value="@order.DeliveryMethod" />
-                                    <SsalddelSensitiveInfoRow Label="수령 위치" Value="@order.DeliveryArea" />
-                                </MudExpansionPanel>
-                                <MudExpansionPanel Text="결제 정보">
-                                    <SsalddelSensitiveInfoRow Label="결제 상태" Value="@order.PaymentStatus" />
-                                    <SsalddelSensitiveInfoRow Label="결제 수단" Value="@order.PaymentMethod" />
-                                </MudExpansionPanel>
-                                <MudExpansionPanel Text="상대 정보">
-                                    <SsalddelSensitiveInfoRow Label="처리 주체" Value="@order.Counterparty" />
-                                    <SsalddelSensitiveInfoRow Label="노출 범위" Value="필요 시에만 상세 확인" />
-                                </MudExpansionPanel>
-                            </SsalddelSensitiveDisclosureList>
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            }
-        </MudGrid>
+        <OrdererFoodOrderWorkspace OrderNo="@OrderNo"
+                                   OrderSelected="OnOrderSelectedAsync" />
     </MudStack>
 </MudContainer>
 
 @code {
-    private static readonly IReadOnlyList<OrderRow> Orders =
-    [
-        new("홈달마트", "샐러드 키트 외 3건", "포장 완료", "배달 기사 8분 뒤 도착", Color.Success, "배달", "강서구 수령지", "결제 완료", "카드", "홈달마트 피킹팀", "주문자 · 홈달마트 피킹팀 · 배달 기사"),
-        new("음식점", "살뜰분식 김밥 세트", "조리 중", "25분", Color.Primary, "음식 배달", "주문자 주소", "결제 완료", "간편결제", "살뜰분식", "주문자 · 살뜰분식 · 배달 기사"),
-        new("화물", "소형 가전 운송 의뢰", "배차 대기", "오늘 15:00", Color.Warning, "화물 운송", "하차지 주소", "결제 대기", "카드", "운송 매칭 대기", "주문자 · 화주/판매자 · 배차 예정 기사")
-    ];
+    [SupplyParameterFromQuery(Name = "orderNo")]
+    public string? OrderNo { get; set; }
 
-    private sealed record OrderRow(
-        string Type,
-        string Title,
-        string Status,
-        string Eta,
-        Color Color,
-        string DeliveryMethod,
-        string DeliveryArea,
-        string PaymentStatus,
-        string PaymentMethod,
-        string Counterparty,
-        string RelatedParties);
+    private Task OnOrderSelectedAsync(string? orderNo)
+    {
+        var target = string.IsNullOrWhiteSpace(orderNo)
+            ? "/orders"
+            : $"/orders?orderNo={Uri.EscapeDataString(orderNo.Trim())}";
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
 }

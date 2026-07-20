@@ -79,6 +79,8 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IFoodDeliveryDriverWorkspaceUseCase, FoodDeliveryDriverWorkspaceUseCase>();
         services.AddScoped<IFoodDeliveryDriverRouteService, FoodDeliveryDriverRouteService>();
         services.AddScoped<I음식주문접수UseCase, 음식주문접수UseCase>();
+        services.AddScoped<I주문자음식주문조회UseCase, 주문자음식주문조회UseCase>();
+        services.AddScoped<I음식점탐색조회UseCase, 음식점탐색조회UseCase>();
         services.AddScoped<I공공데이터조회UseCase, 공공데이터조회UseCase>();
         services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
         services.AddScoped<I문서관리UseCase, 문서관리UseCase>();

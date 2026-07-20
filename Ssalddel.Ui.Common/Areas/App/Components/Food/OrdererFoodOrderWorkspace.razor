@@ -1,0 +1,320 @@
+@inherits MvvmComponentBase<주문자음식주문PageViewModel>
+@using Ssalddel.Contracts.Food
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="food-order-workspace" aria-label="내 음식 주문 내역">
+    @if (Access.처리중 && Access.화면상태 == 음식배달페이지접근상태.확인전)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="food-order-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">음식 배달 기능 상태를 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (Access.화면상태 == 음식배달페이지접근상태.오류)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudText Typo="Typo.subtitle2">주문 내역 화면을 준비하지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@ErrorMessage(Access.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="InitializeAsync" Class="mt-3">다시 확인</MudButton>
+        </MudAlert>
+    }
+    else if (Access.기능비활성)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            <MudText Typo="Typo.subtitle2">음식 주문 조회가 현재 비활성입니다.</MudText>
+            <MudText Typo="Typo.body2"><code>FoodDeliveryWorkflow</code>가 활성화된 환경에서만 개인 주문 원장을 조회합니다.</MudText>
+        </MudAlert>
+    }
+    else if (Access.사용가능 && Authentication.처리중 && !Authentication.초기화됨)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="food-order-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">저장된 주문자 로그인 세션을 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (Access.사용가능 && !Authentication.로그인됨)
+    {
+        <div class="food-order-login-layout">
+            <Ssalddel공통로그인Panel 제목="주문 내역 로그인"
+                                     설명="음식 주문 내역에는 수령지와 결제 정보가 포함될 수 있어 주문한 계정으로만 확인합니다."
+                                     상태메시지="@Authentication.오류메시지"
+                                     상태Severity="@AuthenticationSeverity"
+                                     일반로그인표시="true"
+                                     소셜로그인표시="false"
+                                     일반로그인버튼텍스트="내 주문 확인"
+                                     IsBusy="@Authentication.처리중"
+                                     Elevation="0"
+                                     Class="food-order-login-card"
+                                     OnPasswordLogin="LoginAsync" />
+
+            <MudPaper Elevation="0" Outlined="true" Class="food-order-login-note">
+                <MudIcon Icon="@Icons.Material.Filled.PrivacyTip" Color="Color.Info" Size="Size.Large" />
+                <MudText Typo="Typo.h6">공개 탐색은 로그인 없이 가능합니다.</MudText>
+                <MudText Typo="Typo.body2">
+                    음식점과 공개 메뉴는 회원가입 없이 둘러볼 수 있습니다. 주문번호·수령 정보처럼 개인 원장에 속한 내용만 로그인이 필요합니다.
+                </MudText>
+                <MudButton Href="/food/restaurants" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Storefront">
+                    공개 음식점 보기
+                </MudButton>
+            </MudPaper>
+        </div>
+    }
+    else if (Access.사용가능)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="food-order-boundary">
+            로그인한 계정이 소유한 영속 음식 주문만 조회합니다. 이 화면은 주문 생성·음식점 수락·결제 승인·배차 상태 전이를 실행하지 않으며, 마트·화물 주문을 샘플 카드로 대신 표시하지 않습니다.
+        </MudAlert>
+
+        <div class="food-order-toolbar">
+            <MudChip T="string" Variant="Variant.Outlined" Color="Color.Success" Icon="@Icons.Material.Filled.VerifiedUser">
+                @Authentication.현재사용자표시
+            </MudChip>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@Authentication.처리중" OnClick="LogoutAsync">
+                로그아웃
+            </MudButton>
+        </div>
+
+        <div class="food-order-layout">
+            <div class="food-order-main">
+                <MudPaper Elevation="0" Outlined="true" Class="food-order-panel">
+                    <div class="food-order-panel-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">MY FOOD ORDERS</MudText>
+                            <MudText Typo="Typo.h6">음식 주문 검색</MudText>
+                        </div>
+                        @if (List.초기화됨)
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Disabled="@List.처리중" StartIcon="@Icons.Material.Filled.Refresh" OnClick="ReloadListAsync">
+                                새로고침
+                            </MudButton>
+                        }
+                    </div>
+
+                    <div class="food-order-filter-grid">
+                        <MudTextField T="string"
+                                      @bind-Value="List.검색어"
+                                      Label="주문번호·음식점·상품"
+                                      Placeholder="예: FOOD-, 김밥"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" />
+                        <MudSelect T="string"
+                                   @bind-Value="List.상태필터"
+                                   Label="주문 상태"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Clearable="true">
+                            @foreach (var status in 음식주문상태코드.전체)
+                            {
+                                <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                    <div class="food-order-filter-actions">
+                        @if (List.검색조건있음)
+                        {
+                            <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@List.처리중" OnClick="ResetFiltersAsync">조건 초기화</MudButton>
+                        }
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@List.처리중" StartIcon="@Icons.Material.Filled.ManageSearch" OnClick="SearchAsync">
+                            내 주문 조회
+                        </MudButton>
+                    </div>
+                </MudPaper>
+
+                <MudPaper Elevation="0" Outlined="true" Class="food-order-panel food-order-list-panel">
+                    <div class="food-order-panel-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">PERSISTENT LEDGER</MudText>
+                            <MudText Typo="Typo.h6">내 음식 주문</MudText>
+                        </div>
+                        @if (List.초기화됨)
+                        {
+                            <MudText Typo="Typo.caption">@($"전체 {List.전체건수:N0}건")</MudText>
+                        }
+                    </div>
+
+                    @if (List.처리중)
+                    {
+                        <div class="food-order-state food-order-state--compact">
+                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2">내 음식 주문 원장을 조회하고 있습니다.</MudText>
+                        </div>
+                    }
+                    else if (List.오류발생)
+                    {
+                        <div class="food-order-state food-order-state--compact">
+                            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                            <MudText Typo="Typo.subtitle2">주문 목록을 불러오지 못했습니다.</MudText>
+                            <MudText Typo="Typo.body2">@ErrorMessage(List.오류메시지)</MudText>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadListAsync">다시 시도</MudButton>
+                        </div>
+                    }
+                    else if (List.원장없음)
+                    {
+                        <div class="food-order-state food-order-state--compact">
+                            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" Size="Size.Large" />
+                            <MudText Typo="Typo.subtitle2">저장된 음식 주문이 없습니다.</MudText>
+                            <MudText Typo="Typo.body2">실제 주문 원장이 생기면 이 계정의 내역만 표시됩니다.</MudText>
+                            <MudButton Href="/food/restaurants" Variant="Variant.Outlined" Color="Color.Primary">음식점과 메뉴 보기</MudButton>
+                        </div>
+                    }
+                    else if (List.검색결과없음)
+                    {
+                        <div class="food-order-state food-order-state--compact">
+                            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+                            <MudText Typo="Typo.subtitle2">조건에 맞는 내 주문이 없습니다.</MudText>
+                            <MudText Typo="Typo.body2">검색어나 주문 상태를 바꿔 다시 조회해 주세요.</MudText>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ResetFiltersAsync">전체 내역 보기</MudButton>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="food-order-card-list">
+                            @foreach (var order in List.주문목록)
+                            {
+                                <article class="food-order-card @(Detail.요청OrderNo == order.주문번호 ? "food-order-card--selected" : string.Empty)">
+                                    <div class="food-order-card-heading">
+                                        <div>
+                                            <MudText Typo="Typo.subtitle1">@RestaurantLabel(order)</MudText>
+                                            <MudText Typo="Typo.caption">@order.주문번호 · @FormatDate(order.CreatedAtUtc)</MudText>
+                                        </div>
+                                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(order.상태)" Variant="Variant.Outlined">@order.상태</MudChip>
+                                    </div>
+                                    <MudText Typo="Typo.body2">@order.상품요약</MudText>
+                                    <div class="food-order-card-meta">
+                                        <span>@($"{order.상품종류수:N0}종 · {order.총수량:N0}개")</span>
+                                        <span>@($"{order.총주문금액:N0}원")</span>
+                                        <span>@DispatchLabel(order.배차상태)</span>
+                                    </div>
+                                    <MudButton Variant="@(Detail.요청OrderNo == order.주문번호 ? Variant.Filled : Variant.Outlined)"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.ReceiptLong"
+                                               OnClick="@(() => SelectOrderAsync(order.주문번호))">
+                                        정확한 주문 상세
+                                    </MudButton>
+                                </article>
+                            }
+                        </div>
+
+                        @if (List.총페이지수 > 1)
+                        {
+                            <div class="food-order-pagination">
+                                <MudPagination Count="@List.총페이지수"
+                                               Selected="@List.현재페이지"
+                                               SelectedChanged="ChangePageAsync"
+                                               Disabled="@List.처리중"
+                                               ShowFirstButton="true"
+                                               ShowLastButton="true" />
+                            </div>
+                        }
+                    }
+                </MudPaper>
+            </div>
+
+            <MudPaper Elevation="0" Outlined="true" Class="food-order-panel food-order-detail-panel">
+                @if (Detail.처리중)
+                {
+                    <div class="food-order-state food-order-state--detail">
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2">정확한 주문번호의 상세를 조회하고 있습니다.</MudText>
+                    </div>
+                }
+                else if (Detail.오류발생)
+                {
+                    <div class="food-order-state food-order-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">주문 상세를 불러오지 못했습니다.</MudText>
+                        <MudText Typo="Typo.body2">@ErrorMessage(Detail.오류메시지)</MudText>
+                        @if (!string.IsNullOrWhiteSpace(Detail.요청OrderNo))
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectOrderAsync(Detail.요청OrderNo!, false))">다시 시도</MudButton>
+                        }
+                    </div>
+                }
+                else if (Detail.찾을수없음)
+                {
+                    <div class="food-order-state food-order-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.NoAccounts" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">이 계정의 음식 주문을 찾을 수 없습니다.</MudText>
+                        <MudText Typo="Typo.body2">없는 주문번호와 다른 사용자의 주문번호는 동일하게 처리하며 다른 주문으로 대체하지 않습니다.</MudText>
+                    </div>
+                }
+                else if (Detail.상세 is { } detail)
+                {
+                    <div class="food-order-detail-heading">
+                        <div>
+                            <MudText Typo="Typo.overline">EXACT ORDER</MudText>
+                            <MudText Typo="Typo.h6">@detail.주문.주문번호</MudText>
+                            <MudText Typo="Typo.body2">@RestaurantLabel(detail.주문) · @detail.주문.상품요약</MudText>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="ClearSelectionAsync" aria-label="주문 상세 닫기" />
+                    </div>
+
+                    <div class="food-order-detail-summary">
+                        <MudChip T="string" Color="@StatusColor(detail.주문.상태)" Variant="Variant.Filled">@detail.주문.상태</MudChip>
+                        <span>@($"{detail.주문.총주문금액:N0}원")</span>
+                        <span>@DispatchLabel(detail.주문.배차상태)</span>
+                    </div>
+
+                    <SsalddelSensitiveDisclosureList Title="내 음식 주문 상세"
+                                                    Summary="@detail.주문.상품요약"
+                                                    RelatedParties="주문자 · 음식점 · 배달 업무 담당자"
+                                                    Icon="@Icons.Material.Filled.ReceiptLong"
+                                                    Color="Color.Primary"
+                                                    PrivacyHint="수령지와 연락처는 주문한 계정에서 필요할 때만 펼쳐 확인합니다.">
+                        <MudExpansionPanel Text="주문 상품" Expanded="true">
+                            @foreach (var item in detail.상품목록)
+                            {
+                                <div class="food-order-line-item">
+                                    <span>@item.상품명</span>
+                                    <span>@($"{item.수량:N0}개 × {item.단가:N0}원")</span>
+                                </div>
+                            }
+                            <SsalddelSensitiveInfoRow Label="결제 수단" Value="@ValueOrDash(detail.결제수단)" />
+                            <SsalddelSensitiveInfoRow Label="주문 시각" Value="@FormatDate(detail.주문.CreatedAtUtc)" />
+                        </MudExpansionPanel>
+                        <MudExpansionPanel Text="수령 정보">
+                            <SsalddelSensitiveInfoRow Label="수령인" Value="@ValueOrDash(detail.수령인정보.수령인명)" />
+                            <SsalddelSensitiveInfoRow Label="연락처" Value="@ValueOrDash(detail.수령인정보.연락처)" />
+                            <SsalddelSensitiveInfoRow Label="수령지" Value="@Address(detail.수령인정보.주소, detail.수령인정보.상세주소)" />
+                            <SsalddelSensitiveInfoRow Label="요청사항" Value="@ValueOrDash(detail.수령인정보.요청사항)" />
+                        </MudExpansionPanel>
+                        <MudExpansionPanel Text="음식점 처리">
+                            <SsalddelSensitiveInfoRow Label="음식점" Value="@RestaurantLabel(detail.주문)" />
+                            <SsalddelSensitiveInfoRow Label="음식점 주소" Value="@Address(detail.음식점주소, detail.음식점상세주소)" />
+                            <SsalddelSensitiveInfoRow Label="수락 시각" Value="@FormatOptionalDate(detail.음식점수락시각Utc)" />
+                            <SsalddelSensitiveInfoRow Label="조리 예상 완료" Value="@FormatOptionalDate(detail.주문.조리예상완료시각Utc)" />
+                            <SsalddelSensitiveInfoRow Label="수락 메모" Value="@ValueOrDash(detail.수락메모)" />
+                        </MudExpansionPanel>
+                        <MudExpansionPanel Text="상태 이력">
+                            @if (detail.상태이력.Count == 0)
+                            {
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">기록된 상태 전이가 없습니다.</MudText>
+                            }
+                            else
+                            {
+                                @foreach (var transition in detail.상태이력)
+                                {
+                                    <div class="food-order-history-item">
+                                        <span>@($"{ValueOrDash(transition.이전상태)} → {transition.다음상태}")</span>
+                                        <span>@FormatDate(transition.전이시각Utc) · @ValueOrDash(transition.사유)</span>
+                                    </div>
+                                }
+                            }
+                        </MudExpansionPanel>
+                    </SsalddelSensitiveDisclosureList>
+                }
+                else
+                {
+                    <div class="food-order-state food-order-state--detail">
+                        <MudIcon Icon="@Icons.Material.Filled.TouchApp" Color="Color.Primary" Size="Size.Large" />
+                        <MudText Typo="Typo.subtitle2">확인할 주문을 직접 선택해 주세요.</MudText>
+                        <MudText Typo="Typo.body2">첫 주문이나 예시 주문을 자동 선택하지 않습니다.</MudText>
+                    </div>
+                }
+            </MudPaper>
+        </div>
+    }
+</section>

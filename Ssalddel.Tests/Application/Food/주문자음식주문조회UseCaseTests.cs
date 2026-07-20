@@ -1,0 +1,150 @@
+using Microsoft.EntityFrameworkCore;
+using Ssalddel.Application.Food;
+using Ssalddel.Contracts.Food;
+using 살뜰.Data;
+using 살뜰.Infrastructure.Security;
+using 살뜰.도메인.음식;
+
+namespace Ssalddel.Tests.Application.Food;
+
+public sealed class 주문자음식주문조회UseCaseTests
+{
+    [Fact]
+    public async Task 목록은_로그인주문자소유범위에서검색상태와페이징을적용한다()
+    {
+        await using var context = CreateContext();
+        await SeedAsync(context);
+        var useCase = new 주문자음식주문조회UseCase(context);
+
+        var result = await useCase.목록Async(new 주문자음식주문목록조회요청
+        {
+            검색어 = "김밥",
+            상태 = 음식주문상태코드.조리중,
+            Page = 1,
+            PageSize = 10
+        }, "user-a", CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1, result.Value.TotalCount);
+        var item = Assert.Single(result.Value.Items);
+        Assert.Equal("FOOD-A-002", item.주문번호);
+        Assert.Equal("김밥집", item.음식점명);
+        Assert.Equal("김밥", item.상품요약);
+        Assert.Equal(2, item.총수량);
+        Assert.Equal(9000m, item.총주문금액);
+    }
+
+    [Fact]
+    public async Task 상세는_정확한소유주문만반환하고다른사용자주문은404로숨긴다()
+    {
+        await using var context = CreateContext();
+        await SeedAsync(context);
+        var useCase = new 주문자음식주문조회UseCase(context);
+
+        var own = await useCase.상세Async("FOOD-A-001", "user-a", CancellationToken.None);
+        var other = await useCase.상세Async("FOOD-B-001", "user-a", CancellationToken.None);
+
+        Assert.True(own.IsSuccess);
+        Assert.Equal("FOOD-A-001", own.Value.주문.주문번호);
+        Assert.Equal("서울 강서구 수령로 1", own.Value.수령인정보.주소);
+        Assert.Equal("010-1234-5678", own.Value.수령인정보.연락처);
+        Assert.Equal("돈까스", Assert.Single(own.Value.상품목록).상품명);
+        Assert.True(other.IsFailed);
+        Assert.Equal(404, other.Errors.Single().Metadata["StatusCode"]);
+    }
+
+    [Fact]
+    public async Task 로그인사용자가없으면401이고지원하지않는상태는거부한다()
+    {
+        await using var context = CreateContext();
+        var useCase = new 주문자음식주문조회UseCase(context);
+
+        var anonymous = await useCase.목록Async(new(), null, CancellationToken.None);
+        var invalidStatus = await useCase.목록Async(
+            new 주문자음식주문목록조회요청 { 상태 = "알수없음" },
+            "user-a",
+            CancellationToken.None);
+
+        Assert.True(anonymous.IsFailed);
+        Assert.Equal(401, anonymous.Errors.Single().Metadata["StatusCode"]);
+        Assert.True(invalidStatus.IsFailed);
+        Assert.Contains("상태를 확인", invalidStatus.Errors.Single().Message);
+    }
+
+    private static SsalddelContext CreateContext()
+    {
+        var options = new DbContextOptionsBuilder<SsalddelContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))
+            .Options;
+        return new SsalddelContext(options, new DummyPersonalDataEncryptionService());
+    }
+
+    private static async Task SeedAsync(SsalddelContext context)
+    {
+        context.음식주문.AddRange(
+            CreateOrder(
+                "FOOD-A-001",
+                "user-a",
+                "돈까스집",
+                음식주문상태코드.주문대기,
+                new 음식주문상품 { 상품명 = "돈까스", 수량 = 1, 단가 = 11000m },
+                new DateTime(2026, 7, 20, 1, 0, 0, DateTimeKind.Utc)),
+            CreateOrder(
+                "FOOD-A-002",
+                "user-a",
+                "김밥집",
+                음식주문상태코드.조리중,
+                new 음식주문상품 { 상품명 = "김밥", 수량 = 2, 단가 = 4500m },
+                new DateTime(2026, 7, 20, 2, 0, 0, DateTimeKind.Utc)),
+            CreateOrder(
+                "FOOD-B-001",
+                "user-b",
+                "비공개식당",
+                음식주문상태코드.조리중,
+                new 음식주문상품 { 상품명 = "김밥", 수량 = 10, 단가 = 1m },
+                new DateTime(2026, 7, 20, 3, 0, 0, DateTimeKind.Utc)));
+        await context.SaveChangesAsync();
+    }
+
+    private static 음식주문 CreateOrder(
+        string orderNo,
+        string userId,
+        string restaurantName,
+        string status,
+        음식주문상품 product,
+        DateTime createdAt)
+        => new()
+        {
+            주문번호 = orderNo,
+            음식점Id = 7,
+            음식점명 = restaurantName,
+            음식점주소 = "서울 강서구 음식로 2",
+            주문자UserId = userId,
+            수령인명 = "주문자",
+            수령인연락처 = "010-1234-5678",
+            수령지주소 = "서울 강서구 수령로 1",
+            수령지상세주소 = "101호",
+            총주문금액 = product.단가 * product.수량,
+            상태 = status,
+            배차상태 = 음식주문배차상태코드.미요청,
+            CreatedAt = createdAt,
+            UpdatedAt = createdAt,
+            상품목록 = [product],
+            상태이력 =
+            [
+                new 음식주문상태이력
+                {
+                    이전상태 = string.Empty,
+                    다음상태 = 음식주문상태코드.주문대기,
+                    사유 = "주문 등록",
+                    전이시각Utc = createdAt
+                }
+            ]
+        };
+
+    private sealed class DummyPersonalDataEncryptionService : IPersonalDataEncryptionService
+    {
+        public string? Protect(string? value) => value;
+        public string? Unprotect(string? value) => value;
+    }
+}

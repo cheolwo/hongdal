@@ -17,18 +17,17 @@ public static class MauiProgram
 
         builder.Services.AddMudServices();
         builder.Services.AddMauiBlazorWebView();
-        builder.Services.AddSsalddelUiCommonAppServices();
+        builder.Services.AddOrdererSecurityServices();
+        builder.Services.AddSsalddelUiCommonAppServices<OrdererAccessTokenProvider>();
         builder.Services.AddTransient<주문자Controller기능모음ViewModel>();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
         builder.Services.AddTransient<주문자공동구매기능ViewModel>();
-        builder.Services.AddTransient<주문자음식점탐색기능ViewModel>();
         builder.Services.AddTransient<주문자Api기능모음ViewModel>();
         builder.Services.AddSsalddelApiHttpClient(
             SsalddelApiEndpoint.ResolveBaseAddress(
                 builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
                 new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)),
             ServiceLifetime.Singleton);
-        builder.Services.AddSingleton<IRestaurantSearchPolicyService, HttpRestaurantSearchPolicyService>();
         builder.Services.AddSingleton<IGroupPurchaseShipmentTrackingService, HttpGroupPurchaseShipmentTrackingService>();
 
 #if DEBUG

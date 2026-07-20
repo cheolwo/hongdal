@@ -1,6 +1,5 @@
 using Ssalddel.ApiMetadata;
 using Ssalddel.Application.Food.Commands;
-using Ssalddel.Application.Food.Queries;
 using Ssalddel.Contracts.Food;
 using MediatR;
 
@@ -8,10 +7,6 @@ namespace Ssalddel.Application.Food;
 
 public interface I음식주문접수UseCase
 {
-    Task<음식주문목록응답> 목록조회Async(CancellationToken cancellationToken);
-
-    Task<음식주문응답?> 상세조회Async(string orderNo, CancellationToken cancellationToken);
-
     Task<음식주문응답> 등록Async(음식주문등록요청 request, CancellationToken cancellationToken);
 
     Task<음식주문응답?> 음식점수락Async(string orderNo, 음식점주문수락요청 request, string? 처리UserId, CancellationToken cancellationToken);
@@ -35,16 +30,6 @@ public interface I음식주문접수UseCase
     Summary = "음식 주문과 배달 완료 이력을 배달 기사 월정산 흐름으로 확장합니다.")]
 public sealed class 음식주문접수UseCase(ISender sender) : I음식주문접수UseCase
 {
-    public Task<음식주문목록응답> 목록조회Async(CancellationToken cancellationToken)
-    {
-        return sender.Send(new 음식주문목록조회Query(), cancellationToken);
-    }
-
-    public Task<음식주문응답?> 상세조회Async(string orderNo, CancellationToken cancellationToken)
-    {
-        return sender.Send(new 음식주문상세조회Query(orderNo), cancellationToken);
-    }
-
     public Task<음식주문응답> 등록Async(음식주문등록요청 request, CancellationToken cancellationToken)
     {
         return sender.Send(new 음식주문등록Command(request), cancellationToken);

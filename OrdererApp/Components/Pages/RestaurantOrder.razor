@@ -1,121 +1,32 @@
 @page "/food/restaurants"
-@inject IRestaurantSearchPolicyService SearchPolicyService
+@inject NavigationManager Navigation
 
-<PageTitle>음식점 주문</PageTitle>
+<PageTitle>음식점과 메뉴</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
     <MudStack Spacing="3">
         <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">음식점 주문</MudText>
+            <MudText Typo="Typo.h4">음식점과 메뉴</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                주문 가능 반경 안의 음식점만 조회합니다. 운영 반경 정책은 서비스로 분리되어 나중에 Admin 설정과 연결할 수 있습니다.
+                공개 행정권역 기준으로 음식점을 찾고, 선택한 정확한 음식점의 공개 메뉴를 확인합니다.
             </MudText>
         </MudStack>
 
-        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
-            <MudStack Spacing="2">
-                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h6">조회 반경</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">현재 위치 기준 @($"{radiusKm:0.0}")km 이내 음식점을 보여줍니다.</MudText>
-                    </MudStack>
-                    <MudChip T="string" Color="@RadiusChipColor" Variant="Variant.Filled">@RadiusLabel</MudChip>
-                </MudStack>
-
-                <MudSlider T="double"
-                           @bind-Value="radiusKm"
-                           Min="@policy.MinRadiusKm"
-                           Max="@policy.MaxRadiusKm"
-                           Step="@policy.RadiusStepKm"
-                           Color="@RadiusChipColor"
-                           ValueLabel="true" />
-
-                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                    @foreach (var option in policy.QuickRadiusOptions)
-                    {
-                        <MudButton Size="Size.Small"
-                                   Variant="@(Math.Abs(radiusKm - option) < 0.01 ? Variant.Filled : Variant.Outlined)"
-                                   Color="Color.Primary"
-                                   OnClick="@(() => radiusKm = option)">
-                            @($"{option:0.#}km")
-                        </MudButton>
-                    }
-                </MudStack>
-            </MudStack>
-        </MudPaper>
-
-        <MudGrid>
-            @foreach (var restaurant in FilteredRestaurants)
-            {
-                <MudItem xs="12" md="4">
-                    <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start">
-                                <MudText Typo="Typo.h6">@restaurant.Name</MudText>
-                                <MudChip T="string" Size="Size.Small" Color="Color.Info">@($"{restaurant.DistanceKm:0.0}km")</MudChip>
-                            </MudStack>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">@restaurant.Description</MudText>
-                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Size="Size.Small" />
-                                <MudText Typo="Typo.body2">@restaurant.Meta</MudText>
-                            </MudStack>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">@restaurant.DeliveryNote</MudText>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RestaurantMenu">메뉴 보기</MudButton>
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            }
-        </MudGrid>
-
-        @if (!FilteredRestaurants.Any())
-        {
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-                선택한 반경 안에 주문 가능한 음식점이 없습니다. 반경을 넓히거나 주소를 다시 확인해 주세요.
-            </MudAlert>
-        }
+        <OrdererRestaurantWorkspace RestaurantId="@RestaurantId"
+                                    RestaurantSelected="OnRestaurantSelectedAsync" />
     </MudStack>
 </MudContainer>
 
 @code {
-    private RestaurantSearchPolicy policy = new(7, 1, 10, 0.5, [3, 5, 7, 10], 7, 10);
-    private double radiusKm = 7;
+    [SupplyParameterFromQuery(Name = "restaurantId")]
+    public long? RestaurantId { get; set; }
 
-    private IEnumerable<RestaurantItem> FilteredRestaurants =>
-        Restaurants
-            .Where(x => x.DistanceKm <= radiusKm)
-            .OrderBy(x => x.DistanceKm);
-
-    private Color RadiusChipColor => radiusKm <= policy.RecommendedRadiusKm
-        ? Color.Success
-        : radiusKm <= policy.DeliveryFeeCautionRadiusKm
-            ? Color.Warning
-            : Color.Error;
-
-    private string RadiusLabel => radiusKm <= policy.RecommendedRadiusKm
-        ? "기본 운영 반경"
-        : radiusKm <= policy.DeliveryFeeCautionRadiusKm
-            ? "배달료 주의"
-            : "장거리 주문";
-
-    protected override async Task OnInitializedAsync()
+    private Task OnRestaurantSelectedAsync(long? restaurantId)
     {
-        policy = await SearchPolicyService.GetPolicyAsync();
-        radiusKm = policy.DefaultRadiusKm;
+        var target = restaurantId.HasValue
+            ? $"/food/restaurants?restaurantId={restaurantId.Value}"
+            : "/food/restaurants";
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
     }
-
-    private static readonly IReadOnlyList<RestaurantItem> Restaurants =
-    [
-        new("살뜰분식", "김밥, 떡볶이, 튀김", "4.8 / 25분", 1.2, "가까운 거리라 기본 배달료로 주문 가능합니다."),
-        new("도심국밥", "국밥, 수육, 정식", "4.7 / 35분", 2.4, "피크 시간에도 기사 배차 부담이 낮은 거리입니다."),
-        new("샐러드키친", "샐러드, 샌드위치", "4.9 / 20분", 3.8, "기본 운영 반경 안에서 주문 가능합니다."),
-        new("한강피자", "피자, 파스타, 사이드", "4.6 / 45분", 5.6, "기본 운영 반경 안에서 주문 가능합니다."),
-        new("외곽초밥", "초밥, 덮밥", "4.5 / 55분", 7.2, "기본 반경을 조금 넘는 거리라 배달료 주의 대상입니다.")
-    ];
-
-    private sealed record RestaurantItem(
-        string Name,
-        string Description,
-        string Meta,
-        double DistanceKm,
-        string DeliveryNote);
 }
