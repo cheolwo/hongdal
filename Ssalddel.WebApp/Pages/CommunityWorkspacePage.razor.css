@@ -1,0 +1,58 @@
+.community-workspace-page {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem 0 5rem;
+}
+
+.community-workspace-page__context {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.2rem;
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--community-reading-border, rgba(83, 99, 82, .16));
+    border-radius: 6px;
+    background: var(--community-reading-surface, #fff);
+}
+
+.community-workspace-page__context > a {
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    color: var(--community-reading-muted, #50604f);
+    text-decoration: none;
+}
+
+.community-workspace-page__context span {
+    color: var(--community-reading-accent, #60745e);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.community-workspace-page__context h1 {
+    margin: .15rem 0;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.community-workspace-page__context p {
+    margin: 0;
+    color: var(--community-reading-muted, #657066);
+}
+
+@media (max-width: 720px) {
+    .community-workspace-page {
+        padding-top: .5rem;
+    }
+
+    .community-workspace-page__context {
+        grid-template-columns: 1fr;
+        width: min(100% - .75rem, 1180px);
+    }
+
+    .community-workspace-page__context .mud-button-root {
+        width: 100%;
+    }
+}

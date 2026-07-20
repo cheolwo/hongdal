@@ -64,7 +64,20 @@
     }
     else if (!string.IsNullOrWhiteSpace(ErrorMessage))
     {
-        <MudAlert Severity="Severity.Error">@ErrorMessage</MudAlert>
+        <section class="community-board-page__error" aria-live="assertive">
+            <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
+            <div>
+                <strong>글 목록을 열지 못했습니다.</strong>
+                <span>@ErrorMessage</span>
+            </div>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="@IsLoading"
+                       OnClick="LoadBoardAsync">
+                다시 불러오기
+            </MudButton>
+        </section>
     }
     else
     {
@@ -144,14 +157,20 @@
             .Where(MatchesSearch)
             .ToArray();
 
-    protected override async Task OnParametersSetAsync()
+    protected override Task OnParametersSetAsync()
+        => LoadBoardAsync();
+
+    private async Task LoadBoardAsync()
     {
         IsLoading = true;
         ErrorMessage = null;
+        BoardSummaries = MergeWithCoreBoards([]);
+        CurrentBoard = ResolveCurrentBoard(BoardSummaries);
         try
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            BoardSummaries = await CommunityService.GetBoardSummariesAsync("shipper", timeout.Token);
+            var serverBoards = await CommunityService.GetBoardSummariesAsync("shipper", timeout.Token);
+            BoardSummaries = MergeWithCoreBoards(serverBoards);
             CurrentBoard = ResolveCurrentBoard(BoardSummaries);
             var resolvedKey = CurrentBoard?.BoardKey
                               ?? CommunityBoardCatalog.Find(BoardKey ?? LegacyBoardName)?.Key;
@@ -168,14 +187,39 @@
                 pageSize: 50,
                 cancellationToken: timeout.Token);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            ErrorMessage = $"글 목록을 불러오지 못했습니다: {ex.Message}";
+            Result = new PlatformCommunityPostListResponse();
+            ErrorMessage = "네트워크 상태를 확인한 뒤 다시 시도해 주세요.";
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    private static IReadOnlyList<CommunityBoardSummaryResponse> MergeWithCoreBoards(
+        IReadOnlyList<CommunityBoardSummaryResponse> serverBoards)
+    {
+        var byKey = serverBoards
+            .Where(board => !string.IsNullOrWhiteSpace(board.BoardKey))
+            .GroupBy(board => board.BoardKey, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+        var merged = CommunityBoardCatalog.PublicBoards
+            .Select(board => byKey.TryGetValue(board.Key, out var serverBoard)
+                ? serverBoard
+                : new CommunityBoardSummaryResponse
+                {
+                    BoardKey = board.Key,
+                    DisplayName = board.DisplayName,
+                    Description = board.Description,
+                    GroupCode = board.GroupCode,
+                    GroupDisplayName = board.GroupDisplayName,
+                    IsUserCreatable = board.IsUserCreatable
+                })
+            .ToList();
+        merged.AddRange(serverBoards.Where(board => board.IsCustom));
+        return merged;
     }
 
     private CommunityBoardSummaryResponse? ResolveCurrentBoard(

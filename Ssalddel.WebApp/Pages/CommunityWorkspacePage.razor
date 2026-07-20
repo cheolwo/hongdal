@@ -5,18 +5,44 @@
 @inject PlatformDiagramPaletteStateService DiagramPalette
 @inject NavigationManager Navigation
 
-<PlatformCommunityHome AppName="살뜰"
-                       RoleLabel="웹 사용자"
-                       AppKey="shipper"
-                       CargoRequestDraftHrefBase="/shipper/request"
-                       UseBaguaRoleTransitionPages="true"
-                       QuickActions="QuickActions"
-                       QueryLedgerTemplateKey="@QueryLedgerTemplateKey"
-                       QueryDiagramMode="@QueryDiagramMode"
-                       QueryPostId="@(PostId ?? QueryPostId)"
-                       QuerySeedPostTitle="@QuerySeedPostTitle"
-                       QueryBoardName="@QueryBoardName"
-                       StartInComposeMode="@IsWriteRoute" />
+<PageTitle>@WorkspaceTitle</PageTitle>
+
+<main class="community-workspace-page">
+    <header class="community-workspace-page__context">
+        <a href="/community/boards">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            글 목록
+        </a>
+        <div>
+            <span>@WorkspaceEyebrow</span>
+            <h1>@WorkspaceHeading</h1>
+            <p>@WorkspaceDescription</p>
+        </div>
+        @if (!IsWriteRoute)
+        {
+            <MudButton Href="/community/write"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Edit">
+                새 글 쓰기
+            </MudButton>
+        }
+    </header>
+
+    <PlatformCommunityHome @key="WorkspaceKey"
+                           AppName="살뜰"
+                           RoleLabel="웹 사용자"
+                           AppKey="shipper"
+                           CargoRequestDraftHrefBase="/shipper/request"
+                           UseBaguaRoleTransitionPages="true"
+                           QuickActions="QuickActions"
+                           QueryLedgerTemplateKey="@QueryLedgerTemplateKey"
+                           QueryDiagramMode="@QueryDiagramMode"
+                           QueryPostId="@(PostId ?? QueryPostId)"
+                           QuerySeedPostTitle="@QuerySeedPostTitle"
+                           QueryBoardName="@QueryBoardName"
+                           StartInComposeMode="@IsWriteRoute" />
+</main>
 
 @code {
     [Parameter]
@@ -46,6 +72,15 @@
         => Navigation.ToBaseRelativePath(Navigation.Uri)
             .Split('?', '#')[0]
             .Equals("community/write", StringComparison.OrdinalIgnoreCase);
+
+    private long? EffectivePostId => PostId ?? QueryPostId;
+    private string WorkspaceKey => $"{(IsWriteRoute ? "write" : "detail")}-{EffectivePostId?.ToString() ?? "workspace"}-{QueryBoardName}";
+    private string WorkspaceTitle => IsWriteRoute ? "글쓰기 · 살뜰 커뮤니티" : "게시글 · 살뜰 커뮤니티";
+    private string WorkspaceEyebrow => IsWriteRoute ? "COMMUNITY COMPOSE" : "COMMUNITY POST";
+    private string WorkspaceHeading => IsWriteRoute ? "커뮤니티에 글쓰기" : EffectivePostId is long id ? $"게시글 #{id:N0}" : "커뮤니티 글과 공동 원장";
+    private string WorkspaceDescription => IsWriteRoute
+        ? "필요한 일과 가능한 일을 알리고, 당사자가 직접 선택하고 합의할 수 있도록 조건을 분명하게 적습니다."
+        : "글의 대화와 참여 기록을 확인하고, 합의한 경우에만 공동 원장과 업무 흐름으로 이어갑니다.";
 
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [

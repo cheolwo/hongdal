@@ -23,7 +23,18 @@
 
     @if (!string.IsNullOrWhiteSpace(StatusMessage))
     {
-        <MudAlert Severity="Severity.Warning" Dense="true">@StatusMessage</MudAlert>
+        <MudAlert Severity="Severity.Warning" Dense="true">
+            <div class="community-directory__recoverable-error">
+                <span>@StatusMessage</span>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Warning"
+                           Size="Size.Small"
+                           Disabled="@IsLoading"
+                           OnClick="LoadBoardSummariesAsync">
+                    다시 불러오기
+                </MudButton>
+            </div>
+        </MudAlert>
     }
 
     <a class="community-directory__all" href="/community/boards">
@@ -107,8 +118,13 @@
             .GroupBy(board => board.GroupCode)
             .ToArray();
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
+        => LoadBoardSummariesAsync();
+
+    private async Task LoadBoardSummariesAsync()
     {
+        IsLoading = true;
+        StatusMessage = null;
         try
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
@@ -118,7 +134,7 @@
         catch (Exception)
         {
             BoardSummaries = MergeWithCoreBoards([]);
-            StatusMessage = "게시글 수를 불러오지 못해 기본 게시판 구성을 표시합니다.";
+            StatusMessage = "게시글 수를 불러오지 못했습니다. 기본 게시판을 먼저 표시합니다.";
         }
         finally
         {

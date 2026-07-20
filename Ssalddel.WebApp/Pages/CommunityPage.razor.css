@@ -133,6 +133,14 @@
     color: var(--community-reading-muted, #657066);
 }
 
+.community-directory__recoverable-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
 .community-directory__safety {
     padding: 1.15rem;
     border: 1px solid rgba(174, 66, 57, .22);
@@ -171,5 +179,10 @@
 
     .community-directory__safety .mud-button-root {
         grid-column: 1 / -1;
+    }
+
+    .community-directory__recoverable-error {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
