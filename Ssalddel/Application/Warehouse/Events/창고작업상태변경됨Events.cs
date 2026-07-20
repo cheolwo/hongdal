@@ -52,6 +52,17 @@ public sealed record 창고피킹완료됨Event(
     DateTime 발생시각Utc,
     string AppKey) : INotification;
 
+public sealed record 창고출고인계준비완료됨Event(
+    string 사용자Id,
+    string 역할명,
+    long 입고상품Id,
+    long 출고예정Id,
+    int 인계수량,
+    string Route,
+    string TraceId,
+    DateTime 발생시각Utc,
+    string AppKey) : INotification;
+
 public sealed record 창고재위탁운송생성됨Event(
     string 사용자Id,
     string 역할명,

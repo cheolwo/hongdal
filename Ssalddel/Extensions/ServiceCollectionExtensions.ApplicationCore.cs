@@ -124,6 +124,12 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IIndividualOrderPerspectiveReadService, IndividualOrderPerspectiveReadService>();
         services.AddScoped<IGroupOrderPerspectiveReadService, GroupOrderPerspectiveReadService>();
         services.AddScoped<I창고작업UseCase, 창고작업UseCase>();
+        services.AddScoped<I피킹작업UseCase, 피킹작업UseCase>();
+        services.AddScoped<I재고현황UseCase, 재고현황UseCase>();
+        services.AddScoped<I적재작업UseCase, 적재작업UseCase>();
+        services.AddScoped<I포장작업UseCase, 포장작업UseCase>();
+        services.AddScoped<I출고인계준비UseCase, 출고인계준비UseCase>();
+        services.AddScoped<I출고예정검토UseCase, 출고예정검토UseCase>();
         services.AddScoped<IWarehouseServiceAreaPolicy, WarehouseServiceAreaPolicy>();
         services.AddScoped<IWarehouseDistanceCostEstimator, WarehouseDistanceCostEstimator>();
         services.AddScoped<IOutboundBatchEngine, OutboundBatchEngine>();

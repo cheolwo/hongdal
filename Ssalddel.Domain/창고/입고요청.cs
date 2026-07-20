@@ -57,6 +57,36 @@ public class 입고요청
     [MaxLength(100)]
     public string 공급처코드 { get; set; } = string.Empty;
 
+    [Column("현장입고_클라이언트_요청_id")]
+    public Guid? 현장입고클라이언트요청Id { get; set; }
+
+    [Column("예정상품명")]
+    [MaxLength(200)]
+    public string 예정상품명 { get; set; } = string.Empty;
+
+    [Column("예정_sku")]
+    [MaxLength(100)]
+    public string 예정SKU { get; set; } = string.Empty;
+
+    [Column("예정수량")]
+    public int? 예정수량 { get; set; }
+
+    [Column("입고묶음바코드")]
+    [MaxLength(100)]
+    public string 입고묶음바코드 { get; set; } = string.Empty;
+
+    [Column("보관조건")]
+    [MaxLength(50)]
+    public string 보관조건 { get; set; } = string.Empty;
+
+    [Column("현장입고사유")]
+    [MaxLength(1000)]
+    public string 현장입고사유 { get; set; } = string.Empty;
+
+    [Column("현장입고_안내_version")]
+    [MaxLength(32)]
+    public string 현장입고안내버전 { get; set; } = string.Empty;
+
     [Column("원주문참조번호")]
     [MaxLength(100)]
     public string 원주문참조번호 { get; set; } = string.Empty;

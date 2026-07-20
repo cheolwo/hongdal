@@ -73,6 +73,11 @@ public interface I입출고작업Service
         입고요청저장요청 request,
         CancellationToken cancellationToken = default);
 
+    Task<입고요청항목응답?> 현장입고요청생성Async(
+        현장입고요청등록요청 request,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 창고 adapter는 현장 입고 요청 저장을 지원하지 않습니다.");
+
     Task<입고요청항목응답?> 입고요청수정Async(
         long inboundId,
         입고요청저장요청 request,
@@ -296,6 +301,16 @@ public class 입출고작업Service(ISsalddelJsonApiClient client) : I입출고�
             "입고 요청 생성",
             cancellationToken: cancellationToken);
 
+    public Task<입고요청항목응답?> 현장입고요청생성Async(
+        현장입고요청등록요청 request,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync<현장입고요청등록요청, 입고요청항목응답>(
+            HttpMethod.Post,
+            $"{BasePath}/inbounds/unplanned-requests",
+            request,
+            "현장 입고 요청 생성",
+            cancellationToken: cancellationToken);
+
     public Task<입고요청항목응답?> 입고요청수정Async(
         long inboundId,
         입고요청저장요청 request,
@@ -393,6 +408,7 @@ public class 입출고작업Service(ISsalddelJsonApiClient client) : I입출고�
         AddQueryValue(values, "sortBy", request.SortBy);
         AddQueryValue(values, "status", request.Status);
         AddQueryValue(values, "flowType", request.FlowType);
+        AddQueryValue(values, "sku", request.Sku);
         if (request.WarehouseId is > 0)
         {
             values.Add($"warehouseId={request.WarehouseId.Value.ToString(CultureInfo.InvariantCulture)}");

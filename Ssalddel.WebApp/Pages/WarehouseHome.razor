@@ -49,8 +49,14 @@
         new("입고 시작", "입고 작업자 확인 후 작업대 바코드와 상품 확인으로 이어갑니다.", WarehouseManagerRoutes.InboundWorkStart, Icons.Material.Filled.MoveToInbox, "창고"),
         new("입고 상품 확인", "상품 바코드로 입고 예정 상품을 찾고 현장 입고 예외를 등록합니다.", WarehouseManagerRoutes.InboundProductScan, Icons.Material.Filled.QrCodeScanner, "창고"),
         new("입고 검수", "수량 차이, 파손, 유통기한, 보관 조건을 검수합니다.", WarehouseManagerRoutes.InboundInspection, Icons.Material.Filled.FactCheck, "창고"),
+        new("재고 현황", "현재 계정의 창고 범위에서 가용·예약 수량과 입고 근거를 확인합니다.", WarehouseManagerRoutes.GeneralInventory, Icons.Material.Filled.Warehouse, "창고"),
+        new("적재 작업", "검수 완료 재고의 위치 표찰을 확인하고 보관 위치를 확정합니다.", WarehouseManagerRoutes.PutAwayTask, Icons.Material.Filled.Inventory, "창고"),
+        new("포장 작업", "적재 완료 재고의 전체 가용수량과 포장 표찰을 확인합니다.", WarehouseManagerRoutes.PackingTask, Icons.Material.Filled.Inventory2, "창고"),
+        new("출고 인계 준비", "포장 완료 재고를 출고예정 원장에 기록하고 운송 생성은 분리합니다.", WarehouseManagerRoutes.GeneralTransportHandoff, Icons.Material.Filled.LocalShipping, "창고"),
+        new("출고예정 검토", "준비된 출고예정 원장과 운송의뢰 필수 입력을 읽기 전용으로 확인합니다.", WarehouseManagerRoutes.OutboundPlanReview, Icons.Material.Filled.FactCheck, "창고"),
+        new("운송의뢰 초안", "검토를 통과한 출고예정의 하차지·희망 일정·차량 조건을 로컬에서 구성합니다.", WarehouseManagerRoutes.TransportRequestDraft, Icons.Material.Filled.EditNote, "창고"),
         new("일반 작업 보드", "입고, 적재, 출고, 포장 업무와 연결 대상을 확인합니다.", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban, "창고"),
-        new("피킹 배치", "창고별 피킹/포장 방식과 적재대별 피킹 작업을 처리합니다.", WarehouseManagerRoutes.PickingBatch, Icons.Material.Filled.Inventory2, "창고"),
+        new("피킹 작업", "서버에 배정된 피킹 작업의 시작·완료 상태를 처리합니다.", WarehouseManagerRoutes.PickingBatch, Icons.Material.Filled.Inventory2, "창고"),
         new("스캔 스테이션", "입고, 적재, 번들, 포장 작업의 바코드 스캔을 처리합니다.", WarehouseManagerRoutes.Scan, Icons.Material.Filled.QrCodeScanner, "창고")
     ];
 

@@ -39,6 +39,9 @@ public sealed class 창고작업결과응답
     public string 처리UserId { get; set; } = string.Empty;
     public DateTime 처리일시 { get; set; }
     public string 메모 { get; set; } = string.Empty;
+
+    /// <summary>같은 검수 결과가 이미 적용되어 추가 상태 변경이나 Event 발행 없이 반환되었는지 나타냅니다.</summary>
+    public bool 멱등재시도여부 { get; set; }
 }
 
 public sealed class 입고검수요청

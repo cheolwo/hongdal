@@ -15,6 +15,42 @@ public sealed class WarehousePageAvailabilityService(ICommunityProcurementClient
         CancellationToken cancellationToken = default)
         => await GetAsync(WarehouseManagerRoutes.ExpectedInbounds, WarehouseFeatureKey, cancellationToken);
 
+    public async Task<WarehousePageAvailability> GetInboundProductReceivingAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.InboundProductScan, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetInboundInspectionAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.InboundInspection, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetPickingBatchAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.PickingBatch, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetGeneralInventoryAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.GeneralInventory, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetPutAwayTaskAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.PutAwayTask, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetPackingTaskAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.PackingTask, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetOutboundHandoffAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.GeneralTransportHandoff, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetOutboundPlanReviewAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.OutboundPlanReview, WarehouseFeatureKey, cancellationToken);
+
+    public async Task<WarehousePageAvailability> GetTransportRequestDraftAsync(
+        CancellationToken cancellationToken = default)
+        => await GetAsync(WarehouseManagerRoutes.TransportRequestDraft, WarehouseFeatureKey, cancellationToken);
+
     public async Task<WarehousePageAvailability> GetWorkBoardAsync(
         CancellationToken cancellationToken = default)
         => await GetAsync(WarehouseManagerRoutes.WorkBoard, WarehouseFeatureKey, cancellationToken);

@@ -41,6 +41,8 @@ public static class 창고PageCodes
     public const string 일반재고 = "general-inventory";
     public const string 일반출고 = "general-outbound";
     public const string 일반운송인계 = "general-transport-handoff";
+    public const string 일반출고예정검토 = "general-outbound-plan-review";
+    public const string 일반운송의뢰초안 = "general-transport-request-draft";
 
     public const string 수입화물반입 = "import-arrival";
     public const string 보세통관상태 = "bonded-customs-status";
@@ -167,7 +169,9 @@ public sealed class 일반입출고작업구성Provider : I창고작업구성Pro
         new(창고PageCodes.일반입고, "입고 작업", "상품 확인, 검수와 적재를 처리합니다.", WarehouseManagerRoutes.InboundProductScan, 40),
         new(창고PageCodes.일반재고, "재고 현황", "재고 수량과 보관 위치를 확인합니다.", WarehouseManagerRoutes.GeneralInventory, 50),
         new(창고PageCodes.일반출고, "출고 작업", "피킹과 포장을 처리합니다.", WarehouseManagerRoutes.PickingBatch, 60),
-        new(창고PageCodes.일반운송인계, "운송 인계", "출고 화물을 운송 업무로 인계합니다.", WarehouseManagerRoutes.GeneralTransportHandoff, 70)
+        new(창고PageCodes.일반운송인계, "운송 인계", "출고 화물을 운송 업무로 인계합니다.", WarehouseManagerRoutes.GeneralTransportHandoff, 70),
+        new(창고PageCodes.일반출고예정검토, "출고예정 검토", "운송의뢰 생성 전 원장과 필수 입력을 검토합니다.", WarehouseManagerRoutes.OutboundPlanReview, 72),
+        new(창고PageCodes.일반운송의뢰초안, "운송의뢰 초안", "하차지·희망 일정·차량 조건을 로컬에서 검토합니다.", WarehouseManagerRoutes.TransportRequestDraft, 73)
     ];
 }
 

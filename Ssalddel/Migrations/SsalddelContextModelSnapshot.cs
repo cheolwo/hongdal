@@ -7226,6 +7226,12 @@ namespace Ssalddel.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("보관료일단가");
 
+                    b.Property<string>("보관조건")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("보관조건");
+
                     b.Property<string>("비고")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -7238,9 +7244,25 @@ namespace Ssalddel.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("상태");
 
+                    b.Property<string>("예정SKU")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("예정_sku");
+
                     b.Property<DateTime?>("예정도착일")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("예정도착일");
+
+                    b.Property<string>("예정상품명")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("예정상품명");
+
+                    b.Property<int?>("예정수량")
+                        .HasColumnType("int")
+                        .HasColumnName("예정수량");
 
                     b.Property<string>("운송의뢰Id")
                         .HasMaxLength(100)
@@ -7252,6 +7274,12 @@ namespace Ssalddel.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("원주문참조번호");
+
+                    b.Property<string>("입고묶음바코드")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("입고묶음바코드");
 
                     b.Property<string>("입고생성경로")
                         .IsRequired()
@@ -7342,6 +7370,22 @@ namespace Ssalddel.Migrations
                         .HasColumnType("varchar(450)")
                         .HasColumnName("판매자_user_id");
 
+                    b.Property<string>("현장입고사유")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("현장입고사유");
+
+                    b.Property<string>("현장입고안내버전")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("현장입고_안내_version");
+
+                    b.Property<Guid?>("현장입고클라이언트요청Id")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("현장입고_클라이언트_요청_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("출고예정Id");
@@ -7351,6 +7395,11 @@ namespace Ssalddel.Migrations
                     b.HasIndex("입고흐름유형", "자동생성여부");
 
                     b.HasIndex("주문Id", "주문자UserId");
+
+                    b.HasIndex("주문자UserId", "현장입고클라이언트요청Id")
+                        .IsUnique();
+
+                    b.HasIndex("창고Id", "예정SKU", "상태");
 
                     b.HasIndex("창고Id", "주문자UserId", "상태");
 

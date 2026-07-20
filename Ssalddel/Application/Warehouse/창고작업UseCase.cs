@@ -26,10 +26,20 @@ public interface I창고작업UseCase
     Task<Result<입고요청페이지응답>> 입고목록조회Async(입고요청목록조회요청 request, CancellationToken cancellationToken);
     Task<Result<입고요청항목응답>> 입고상세Async(long inboundId, CancellationToken cancellationToken);
     Task<Result<입고요청항목응답>> 입고생성Async(입고요청저장요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
+    Task<Result<입고요청항목응답>> 현장입고요청생성Async(
+        현장입고요청등록요청 request,
+        창고작업요청Context context,
+        CancellationToken cancellationToken);
     Task<Result<입고요청항목응답>> 입고수정Async(long inboundId, 입고요청저장요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result> 입고취소Async(long inboundId, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result<입고상품목록응답>> 입고완료Async(long inboundId, 입고완료요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result<재고목록응답>> 재고목록Async(CancellationToken cancellationToken);
+    Task<Result<입고검수대상페이지응답>> 입고검수대상목록Async(
+        입고검수대상목록조회요청 request,
+        CancellationToken cancellationToken);
+    Task<Result<입고검수대상상세응답>> 입고검수대상상세Async(
+        long inboundItemId,
+        CancellationToken cancellationToken);
     Task<Result<창고작업결과응답>> 입고검수Async(long inboundItemId, 입고검수요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result<창고작업결과응답>> 적재위치배정Async(long inboundItemId, 적재위치배정요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
     Task<Result<창고작업결과응답>> 포장작업Async(long inboundItemId, 포장작업요청 request, 창고작업요청Context context, CancellationToken cancellationToken);
@@ -162,6 +172,22 @@ public sealed class 창고작업UseCase : I창고작업UseCase
         return result;
     }
 
+    public async Task<Result<입고요청항목응답>> 현장입고요청생성Async(
+        현장입고요청등록요청 request,
+        창고작업요청Context context,
+        CancellationToken cancellationToken)
+    {
+        var result = await _warehouseOperationService.CreateUnplannedInboundRequestAsync(request, cancellationToken);
+        await 로그Async(
+            "Inbound",
+            "UnplannedRequested",
+            context,
+            cancellationToken,
+            entityId: result.Id,
+            metadataJson: $"{{\"warehouseId\":{result.창고Id},\"flowType\":\"{입고흐름유형코드.현장임시입고}\"}}");
+        return result;
+    }
+
     public async Task<Result<입고요청항목응답>> 입고수정Async(
         long inboundId,
         입고요청저장요청 request,
@@ -204,9 +230,31 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     public async Task<Result<재고목록응답>> 재고목록Async(CancellationToken cancellationToken)
         => await _warehouseOperationService.GetInventoryAsync(cancellationToken);
 
+    public async Task<Result<입고검수대상페이지응답>> 입고검수대상목록Async(
+        입고검수대상목록조회요청 request,
+        CancellationToken cancellationToken)
+        => await _warehouseOperationService.QueryInboundInspectionTargetsAsync(request, cancellationToken);
+
+    public async Task<Result<입고검수대상상세응답>> 입고검수대상상세Async(
+        long inboundItemId,
+        CancellationToken cancellationToken)
+    {
+        var item = await _warehouseOperationService.GetInboundInspectionTargetAsync(inboundItemId, cancellationToken);
+        return item is not null
+            ? Result.Ok(item)
+            : Result.Fail<입고검수대상상세응답>(
+                new Error("입고 검수 대상을 찾을 수 없거나 조회 범위에 없습니다.")
+                    .WithMetadata("StatusCode", StatusCodes.Status404NotFound));
+    }
+
     public async Task<Result<창고작업결과응답>> 입고검수Async(long inboundItemId, 입고검수요청 request, 창고작업요청Context context, CancellationToken cancellationToken)
     {
         var result = await _warehouseOperationService.InspectInboundItemAsync(inboundItemId, request, cancellationToken);
+        if (result.멱등재시도여부)
+        {
+            return result;
+        }
+
         await 로그Async("WarehouseWork", "InboundInspected", context, cancellationToken, entityId: inboundItemId, metadataJson: $"{{\"available\":{result.가용수량},\"defect\":{result.불량수량}}}");
         await _publisher.Publish(
             new 창고입고검수완료됨Event(

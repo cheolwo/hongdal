@@ -1,0 +1,17 @@
+@page "/warehouse/work/outbound/packing"
+@page "/work/outbound/packing"
+@inject NavigationManager Navigation
+@inject WebAuthSessionService AuthSession
+@implements IDisposable
+
+<PageTitle>포장 작업 · 살뜰</PageTitle>
+<WebPageHeader Eyebrow="Warehouse Web" Title="포장 작업" Description="적재 완료 재고의 전체 가용수량과 포장 표찰을 확인하고 같은 입고상품 ID로 결과를 다시 조회합니다." Badge="Beta · Simulation" />
+@if (!AuthSession.IsLoggedIn) { <MudPaper Elevation="0" Outlined="true" Class="pa-6"><MudStack AlignItems="AlignItems.Center" Spacing="2"><MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Large" /><MudText Typo="Typo.h6">포장 작업에는 로그인이 필요합니다.</MudText><MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">서버에서 창고 배정과 HR 출고 역할을 확인합니다. 익명 허용 커뮤니티는 로그인 없이 이용할 수 있습니다.</MudText><MudStack Row="true"><MudButton Href="/login" Variant="Variant.Filled">로그인</MudButton><MudButton Href="/community" Variant="Variant.Outlined">익명 커뮤니티 보기</MudButton></MudStack></MudStack></MudPaper> }
+else { <SsalddelPackingTaskWorkspace InboundItemId="@InboundItemId" OnTaskSelected="UpdateRoute" /> }
+@code {
+    [SupplyParameterFromQuery(Name="inboundItemId")] public long? InboundItemId { get; set; }
+    protected override void OnInitialized() => AuthSession.Changed += AuthChanged;
+    private void AuthChanged() => _ = InvokeAsync(StateHasChanged);
+    private Task UpdateRoute(long? id) { Navigation.NavigateTo(id is > 0 ? $"{WarehouseManagerRoutes.PackingTask}?inboundItemId={id}" : WarehouseManagerRoutes.PackingTask, replace:true); return Task.CompletedTask; }
+    public void Dispose() => AuthSession.Changed -= AuthChanged;
+}

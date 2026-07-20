@@ -1,92 +1,90 @@
 @page "/work/inbound/inspection"
+@inherits MvvmComponentBase<창고입고검수PageViewModel>
+@inject NavigationManager Navigation
 
 <PageTitle>입고 검수 작업</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-    <MudStack Spacing="3">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">입고 검수 작업</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                입고 확인 상태로 변경된 상품을 검수합니다. 수량 차이, 파손, 유통기한, 보관 조건을 확인하면서 관련 대상을 함께 인지합니다.
-            </MudText>
-        </MudStack>
-
-        <MudGrid>
-            @foreach (var item in InspectionItems)
-            {
-                <MudItem xs="12" md="6" lg="4">
-                    <MudPaper Class="pa-4 h-100" Elevation="0" Outlined="true">
-                        <MudStack Spacing="2">
-                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                                <MudText Typo="Typo.h6">@item.Name</MudText>
-                                <MudChip T="string" Color="@item.Color">@item.Status</MudChip>
-                            </MudStack>
-
-                            <SsalddelSensitiveDisclosureList Title="검수 관계와 상세"
-                                                            Summary="@item.Description"
-                                                            RelatedParties="@item.RelatedParties"
-                                                            PrivacyHint="검수 결과에 따라 누가 후속 확인 대상인지 먼저 확인합니다."
-                                                            Icon="@Icons.Material.Filled.FactCheck"
-                                                            Color="@item.Color"
-                                                            Compact="true">
-                                <MudExpansionPanel Text="검수 정보" Icon="@Icons.Material.Filled.Inventory2">
-                                    <SsalddelSensitiveInfoRow Label="상품명" Value="@item.Name" />
-                                    <SsalddelSensitiveInfoRow Label="검수 항목" Value="@item.CheckPoint" />
-                                    <SsalddelSensitiveInfoRow Label="상태" Value="@item.Status" />
-                                </MudExpansionPanel>
-                                <MudExpansionPanel Text="후속 확인" Icon="@Icons.Material.Filled.Group">
-                                    <SsalddelSensitiveInfoRow Label="직접 관련 대상" Value="@item.RelatedParties" />
-                                    <SsalddelSensitiveInfoRow Label="문의 경로" Value="@item.ContactContext" />
-                                    <SsalddelSensitiveInfoRow Label="관계 기록" Value="검수 완료 후 입고 담당자와 공급사/화주 간 업무 연결 기록 후보가 됩니다." />
-                                </MudExpansionPanel>
-                            </SsalddelSensitiveDisclosureList>
-
-                            <MudButton Variant="Variant.Filled" Color="@item.Color" StartIcon="@Icons.Material.Filled.FactCheck">
-                                검수 진행
-                            </MudButton>
-                        </MudStack>
-                    </MudPaper>
-                </MudItem>
-            }
-        </MudGrid>
-    </MudStack>
-</MudContainer>
+<WarehousePageShell Model="@ViewModel"
+                    Title="입고 검수 작업"
+                    Description="서버의 입고 완료 상품을 조회하고 수량·불량 검수 결과를 기록한 뒤 같은 ID를 다시 확인합니다."
+                    Icon="@Icons.Material.Filled.FactCheck"
+                    Color="Color.Warning">
+    <Actions>
+        @if (ViewModel.기능사용가능 && ViewModel.인증.창고업무접근가능)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">
+                @ViewModel.인증.현재사용자표시
+            </MudChip>
+        }
+    </Actions>
+    <ChildContent>
+        @if (!ViewModel.초기화됨 || ViewModel.초기화중)
+        {
+            <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+                <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Warning" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">창고 검수 권한과 기능 상태를 확인하고 있습니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (!string.IsNullOrWhiteSpace(ViewModel.페이지오류메시지))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText>@ViewModel.페이지오류메시지</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="RetryPageAsync">다시 확인</MudButton>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (!ViewModel.기능사용가능)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle1">창고 입고 검수 기능이 비활성입니다.</MudText>
+                    <MudText Typo="Typo.body2">@ViewModel.기능안내</MudText>
+                    <MudText Typo="Typo.caption">현재 0.0 공개 커뮤니티에는 영향이 없으며, 창고 기능 플래그가 활성화된 환경에서만 사용합니다.</MudText>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (!ViewModel.인증.창고업무접근가능)
+        {
+            <WarehouseAuthenticationPanel ViewModel="@ViewModel.인증"
+                                          OnAuthenticated="AfterAuthenticationAsync"
+                                          OnLoggedOut="OnLoggedOut" />
+        }
+        else
+        {
+            <SsalddelInboundInspectionWorkspace InboundItemId="@InboundItemId"
+                                                OnInboundItemSelected="UpdateInboundItemRoute" />
+        }
+    </ChildContent>
+</WarehousePageShell>
 
 @code {
-    private static readonly IReadOnlyList<InspectionItem> InspectionItems =
-    [
-        new(
-            "우유 1L",
-            "예정 수량과 실제 수량이 일치합니다. 포장 상태와 유통기한을 확인합니다.",
-            "검수 대기",
-            Color.Success,
-            "수량, 냉장 상태, 유통기한",
-            "검수 담당자 · 입고 담당자 · 공급사 서울유업 · 화주 재고 담당자",
-            "유통기한 또는 냉장 상태 문제가 있으면 공급사와 화주 재고 담당자에게 확인합니다."),
-        new(
-            "샐러드 세트",
-            "냉장 상품입니다. 파손, 누락, 유통기한을 확인합니다.",
-            "검수 대기",
-            Color.Info,
-            "파손, 누락, 유통기한",
-            "검수 담당자 · 입고 담당자 · 공급사 그린팜 · 화주 재고 담당자",
-            "누락이나 변질이 있으면 입고 담당자와 공급사에게 확인합니다."),
-        new(
-            "생수 6팩",
-            "상온 상품입니다. 박스 파손과 수량 차이를 확인합니다.",
-            "검수 대기",
-            Color.Warning,
-            "박스 파손, 수량 차이",
-            "검수 담당자 · 입고 담당자 · 공급사 한강물류 · 화주 재고 담당자",
-            "파손 수량이 있으면 화주 재고 담당자와 교환/차감 처리를 확인합니다.")
-    ];
+    [SupplyParameterFromQuery(Name = "inboundItemId")]
+    public long? InboundItemId { get; set; }
 
-    private sealed record InspectionItem(
-        string Name,
-        string Description,
-        string Status,
-        Color Color,
-        string CheckPoint,
-        string RelatedParties,
-        string ContactContext);
+    protected override async Task OnInitializedAsync()
+        => await ViewModel.초기화Async();
+
+    private Task AfterAuthenticationAsync()
+    {
+        ViewModel.인증후준비();
+        return Task.CompletedTask;
+    }
+
+    private void OnLoggedOut()
+        => ViewModel.인증해제적용();
+
+    private async Task RetryPageAsync()
+        => await ViewModel.초기화Async();
+
+    private Task UpdateInboundItemRoute(long? inboundItemId)
+    {
+        var target = inboundItemId is > 0
+            ? $"{WarehouseManagerRoutes.InboundInspection}?inboundItemId={inboundItemId.Value}"
+            : WarehouseManagerRoutes.InboundInspection;
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
 }

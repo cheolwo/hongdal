@@ -43,6 +43,8 @@ public static class WarehouseManagerServiceCollectionExtensions
         services.AddTransient<창고홈PageViewModel>();
         services.AddTransient<창고작업보드PageViewModel>();
         services.AddTransient<창고입고예정조회PageViewModel>();
+        services.AddTransient<창고입고상품수령PageViewModel>();
+        services.AddTransient<창고입고검수PageViewModel>();
         services.AddTransient<창고로그인ViewModel>();
         services.AddTransient<창고작업시작PageViewModel>();
         services.AddTransient<창고작업대스캔PageViewModel>();
@@ -51,11 +53,16 @@ public static class WarehouseManagerServiceCollectionExtensions
         services.AddTransient<창고작업이력PageViewModel>();
         services.AddTransient<창고설정PageViewModel>();
         services.AddTransient<창고피킹배치PageViewModel>();
+        services.AddTransient<창고적재작업PageViewModel>();
+        services.AddTransient<창고포장작업PageViewModel>();
 
         services.AddTransient<일반입고작업PageViewModel>();
         services.AddTransient<일반재고현황PageViewModel>();
         services.AddTransient<일반출고작업PageViewModel>();
         services.AddTransient<일반운송인계PageViewModel>();
+        services.AddTransient<창고출고인계준비PageViewModel>();
+        services.AddTransient<창고출고예정검토PageViewModel>();
+        services.AddTransient<창고운송의뢰초안PageViewModel>();
 
         services.AddTransient<수입화물반입PageViewModel>();
         services.AddTransient<보세통관상태PageViewModel>();

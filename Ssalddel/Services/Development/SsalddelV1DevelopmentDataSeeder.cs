@@ -1,5 +1,6 @@
 ﻿using Ssalddel.Contracts.Common.Warehouse;
 using Ssalddel.Contracts.Driver.Development;
+using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Services.Driver.Development;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
@@ -21,6 +22,8 @@ public static class SsalddelV1DevelopmentDataSeeder
     private const string DevelopmentWarehouseName = "V1 개발 3PL 냉장 창고";
     private const string CompletedInboundReference = "V1-DEV-INB-001";
     private const string PlannedInboundReference = "V1-DEV-INB-002";
+    private const string PendingPickingTaskKey = "V1-DEV-PICK-001";
+    private const string ActivePickingTaskKey = "V1-DEV-PICK-002";
 
     private static readonly string[] SampleRequestIds =
     [
@@ -507,7 +510,7 @@ public static class SsalddelV1DevelopmentDataSeeder
             now,
             cancellationToken);
 
-        await EnsureInboundAsync(
+        var plannedInbound = await EnsureInboundAsync(
             db,
             warehouse.Id,
             shipperId,
@@ -520,6 +523,13 @@ public static class SsalddelV1DevelopmentDataSeeder
             "통관 완료 후 국내 운송 의뢰로 넘어갈 예정인 검증용 입고",
             now,
             cancellationToken);
+        plannedInbound.예정상품명 = "스마트스토어 판매 샘플 생활용품";
+        plannedInbound.예정SKU = "V1-DEV-LIVING-BOX";
+        plannedInbound.예정수량 = 120;
+        plannedInbound.입고묶음바코드 = "BND:V1-DEV-INB-002";
+        plannedInbound.보관조건 = 현장입고보관조건.상온;
+        plannedInbound.UpdatedAt = now;
+        await db.SaveChangesAsync(cancellationToken);
 
         var porkItem = await EnsureInboundItemAsync(
             db,
@@ -559,6 +569,77 @@ public static class SsalddelV1DevelopmentDataSeeder
             "개발 시드 입고 완료와 재고 이력 검증",
             now,
             cancellationToken);
+        await EnsurePickingTaskAsync(
+            db,
+            warehouse,
+            shipperId,
+            PendingPickingTaskKey,
+            피킹포장작업상태.대기,
+            "수입 냉장 삼겹살 3kg 묶음",
+            "V1-DEV-PORK-3KG",
+            8,
+            "A-01-03",
+            now,
+            cancellationToken);
+        await EnsurePickingTaskAsync(
+            db,
+            warehouse,
+            shipperId,
+            ActivePickingTaskKey,
+            피킹포장작업상태.진행중,
+            "스마트스토어 판매 샘플 생활용품",
+            "V1-DEV-LIVING-BOX",
+            12,
+            "B-02-01",
+            now,
+            cancellationToken);
+    }
+
+    private static async Task EnsurePickingTaskAsync(
+        SsalddelContext db,
+        창고 warehouse,
+        string shipperId,
+        string taskKey,
+        string status,
+        string productName,
+        string sku,
+        int quantity,
+        string rackCode,
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        var task = await db.피킹포장작업
+            .FirstOrDefaultAsync(item => item.작업Key == taskKey, cancellationToken);
+        if (task is null)
+        {
+            task = new 피킹포장작업
+            {
+                작업Key = taskKey,
+                CreatedAt = now
+            };
+            db.피킹포장작업.Add(task);
+        }
+
+        task.작업유형 = 피킹포장작업유형.피킹;
+        task.처리방식 = "피킹포장분리";
+        task.상태 = status;
+        task.창고Id = warehouse.Id;
+        task.창고명 = warehouse.창고명;
+        task.작업자UserId = shipperId;
+        task.작업자표시명 = "shipper1 창고 작업자";
+        task.주문참조번호 = CompletedInboundReference;
+        task.라인Key = $"{CompletedInboundReference}:{sku}";
+        task.상품명 = productName;
+        task.SKU = sku;
+        task.수량 = quantity;
+        task.적재대코드 = rackCode;
+        task.보관위치코드 = rackCode;
+        task.묶음바코드 = $"BND:{taskKey}";
+        task.할당사유 = "공동주문 입고 원장에서 생성된 개발 검증용 피킹 작업";
+        task.시작일시Utc = status == 피킹포장작업상태.진행중 ? now.AddMinutes(-15) : null;
+        task.완료일시Utc = null;
+        task.UpdatedAt = now;
+        await db.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task<창고> EnsureDevelopmentWarehouseAsync(

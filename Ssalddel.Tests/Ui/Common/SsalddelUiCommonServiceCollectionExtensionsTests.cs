@@ -241,6 +241,34 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(입출고작업Service)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(I입고검수페이지Service)
+            && x.ImplementationType == typeof(입고검수페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I피킹작업페이지Service)
+            && x.ImplementationType == typeof(피킹작업페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I재고현황페이지Service)
+            && x.ImplementationType == typeof(재고현황페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I적재작업페이지Service)
+            && x.ImplementationType == typeof(적재작업페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I포장작업페이지Service)
+            && x.ImplementationType == typeof(포장작업페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I출고인계준비페이지Service)
+            && x.ImplementationType == typeof(출고인계준비페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(I출고예정검토페이지Service)
+            && x.ImplementationType == typeof(출고예정검토페이지Service)
+            && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(I입출고원장조회Service)
             && x.ImplementationType == typeof(PlatformCommunity입출고원장조회Service)
             && x.Lifetime == ServiceLifetime.Scoped);
@@ -398,6 +426,78 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             x.ServiceType == typeof(입고예정조회ViewModel)
             && x.ImplementationType == typeof(입고예정조회ViewModel)
             && x.Lifetime == ServiceLifetime.Scoped);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고상품수령창고ViewModel)
+            && x.ImplementationType == typeof(입고상품수령창고ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고예정상품검색ViewModel)
+            && x.ImplementationType == typeof(입고예정상품검색ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(현장입고요청작성ViewModel)
+            && x.ImplementationType == typeof(현장입고요청작성ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고상품수령상세ViewModel)
+            && x.ImplementationType == typeof(입고상품수령상세ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고상품수령PageViewModel)
+            && x.ImplementationType == typeof(입고상품수령PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고검수대상목록ViewModel)
+            && x.ImplementationType == typeof(입고검수대상목록ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고검수대상상세ViewModel)
+            && x.ImplementationType == typeof(입고검수대상상세ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고검수작성ViewModel)
+            && x.ImplementationType == typeof(입고검수작성ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(입고검수PageViewModel)
+            && x.ImplementationType == typeof(입고검수PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(피킹작업PageViewModel)
+            && x.ImplementationType == typeof(피킹작업PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(재고현황PageViewModel)
+            && x.ImplementationType == typeof(재고현황PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(적재작업PageViewModel)
+            && x.ImplementationType == typeof(적재작업PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(포장작업PageViewModel)
+            && x.ImplementationType == typeof(포장작업PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(출고인계준비PageViewModel)
+            && x.ImplementationType == typeof(출고인계준비PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(출고예정검토PageViewModel)
+            && x.ImplementationType == typeof(출고예정검토PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(운송의뢰초안원장ViewModel)
+            && x.ImplementationType == typeof(운송의뢰초안원장ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(운송의뢰초안작성ViewModel)
+            && x.ImplementationType == typeof(운송의뢰초안작성ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(운송의뢰초안PageViewModel)
+            && x.ImplementationType == typeof(운송의뢰초안PageViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(출고포장ViewModel)
             && x.ImplementationType == typeof(출고포장ViewModel)

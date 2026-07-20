@@ -2,6 +2,7 @@
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Inventory;
 using Ssalddel.Contracts.Common.Warehouse;
+using Ssalddel.Contracts.Common.WarehouseScanning;
 using Ssalddel.Services.Community;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
@@ -270,6 +271,15 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             query = query.Where(x => x.입고흐름유형 == flowType);
         }
 
+        if (!string.IsNullOrWhiteSpace(request.Sku))
+        {
+            var sku = NormalizeBarcode(request.Sku);
+            query = query.Where(x =>
+                x.예정SKU == sku
+                || _db.출고예정.Any(outbound =>
+                    outbound.입고요청Id == x.Id && outbound.SKU == sku));
+        }
+
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             var search = request.Search.Trim();
@@ -278,6 +288,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
                 (idMatched && x.Id == inboundId)
                 || x.공급처코드.Contains(search)
                 || x.공급처명.Contains(search)
+                || x.예정상품명.Contains(search)
+                || x.예정SKU.Contains(search)
+                || x.입고묶음바코드.Contains(search)
                 || x.원주문참조번호.Contains(search)
                 || x.주문참조번호.Contains(search)
                 || x.계약번호.Contains(search)
@@ -311,6 +324,9 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             nameof(입고요청항목응답.예정도착일) => descending
                 ? query.OrderByDescending(x => x.예정도착일).ThenByDescending(x => x.Id)
                 : query.OrderBy(x => x.예정도착일).ThenBy(x => x.Id),
+            nameof(입고요청항목응답.CreatedAtUtc) => descending
+                ? query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+                : query.OrderBy(x => x.CreatedAt).ThenBy(x => x.Id),
             _ => query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
         };
 
@@ -407,31 +423,75 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         _db.입고요청.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return new 입고요청항목응답
+        return ToInboundResponse(entity);
+    }
+
+    public async Task<입고요청항목응답> CreateUnplannedInboundRequestAsync(
+        현장입고요청등록요청 request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var userId = RequireUserId();
+        ValidateUnplannedInboundRequest(request);
+        await 창고접근확인Async(request.창고Id, userId, cancellationToken);
+
+        var existing = await FindUnplannedRequestByClientIdAsync(
+            userId,
+            request.클라이언트요청Id,
+            cancellationToken);
+        if (existing is not null)
         {
-            Id = entity.Id,
-            창고Id = entity.창고Id,
-            커뮤니티원장Id = entity.커뮤니티원장Id,
-            커뮤니티원장템플릿Key = entity.커뮤니티원장템플릿Key,
-            커뮤니티원장상태 = entity.커뮤니티원장상태,
-            입고흐름유형 = entity.입고흐름유형,
-            입고생성경로 = entity.입고생성경로,
-            계약선행여부 = entity.계약선행여부,
-            자동생성여부 = entity.자동생성여부,
-            주문Id = entity.주문Id,
-            주문참조번호 = entity.주문참조번호,
-            주문자UserId = entity.주문자UserId,
-            판매자UserId = entity.판매자UserId,
-            출고예정Id = entity.출고예정Id,
-            운송의뢰Id = entity.운송의뢰Id,
-            공급처코드 = entity.공급처코드,
-            공급처명 = entity.공급처명,
-            원주문참조번호 = entity.원주문참조번호,
-            상태 = entity.상태,
-            예정도착일 = entity.예정도착일,
-            입고완료일시 = entity.입고완료일시,
-            계약정보 = CreateContractSnapshot(entity)
+            return ResolveIdempotentUnplannedRequest(existing, request);
+        }
+
+        var now = DateTime.UtcNow;
+        var entity = new 입고요청
+        {
+            창고Id = request.창고Id,
+            입고흐름유형 = 입고흐름유형코드.현장임시입고,
+            입고생성경로 = "현장 입고 요청 페이지",
+            계약선행여부 = false,
+            자동생성여부 = false,
+            주문자UserId = userId,
+            공급처코드 = string.Empty,
+            공급처명 = request.공급처명.Trim(),
+            현장입고클라이언트요청Id = request.클라이언트요청Id,
+            예정상품명 = request.상품명.Trim(),
+            예정SKU = NormalizeBarcode(request.상품바코드),
+            예정수량 = request.입고수량,
+            입고묶음바코드 = NormalizeBarcode(request.입고묶음바코드),
+            보관조건 = 현장입고보관조건.Normalize(request.보관조건),
+            현장입고사유 = request.현장입고사유.Trim(),
+            현장입고안내버전 = 현장입고요청안내.현재버전,
+            상태 = 입고상태코드.예정,
+            계약유형 = 입고계약유형코드.보관대행,
+            계약상대방명 = request.공급처명.Trim(),
+            계약메모 = "계약 연결 전 현장 입고 요청",
+            CreatedAt = now,
+            UpdatedAt = now
         };
+        _db.입고요청.Add(entity);
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            _db.Entry(entity).State = EntityState.Detached;
+            var concurrentlyCreated = await FindUnplannedRequestByClientIdAsync(
+                userId,
+                request.클라이언트요청Id,
+                cancellationToken);
+            if (concurrentlyCreated is null)
+            {
+                throw;
+            }
+
+            return ResolveIdempotentUnplannedRequest(concurrentlyCreated, request);
+        }
+
+        return ToInboundResponse(entity);
     }
 
     public async Task<입고요청항목응답> UpdateInboundAsync(
@@ -649,10 +709,177 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         return new 재고목록응답 { Items = items };
     }
 
+    public async Task<입고검수대상페이지응답> QueryInboundInspectionTargetsAsync(
+        입고검수대상목록조회요청 request,
+        CancellationToken cancellationToken)
+    {
+        var userId = RequireUserId();
+        var page = Math.Max(0, request.Page);
+        var pageSize = Math.Clamp(request.PageSize, 1, 50);
+        var inspectionStatus = 입고검수조회상태코드.Normalize(request.InspectionStatus);
+        var search = (request.Search ?? string.Empty).Trim();
+        var query = 입고검수접근가능재고Query(userId).AsNoTracking();
+
+        if (request.WarehouseId is > 0)
+        {
+            query = query.Where(item => item.창고Id == request.WarehouseId.Value);
+        }
+
+        query = inspectionStatus switch
+        {
+            입고검수조회상태코드.대기 => query.Where(item => item.상태 == "보관중"),
+            입고검수조회상태코드.완료 => query.Where(item => item.상태.StartsWith("검수완료")),
+            _ => query
+        };
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var idMatched = long.TryParse(search, out var inboundItemId);
+            var normalizedSearch = search.ToUpperInvariant();
+            query = query.Where(item =>
+                (idMatched && item.Id == inboundItemId)
+                || item.상품명.Contains(search)
+                || item.SKU.ToUpper().Contains(normalizedSearch)
+                || item.옵션명.Contains(search));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var warehouseNames = _db.창고.AsNoTracking();
+        var rows = await query
+            .OrderByDescending(item => item.UpdatedAt)
+            .ThenByDescending(item => item.Id)
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .Select(item => new
+            {
+                item.Id,
+                item.입고요청Id,
+                item.창고Id,
+                창고명 = warehouseNames
+                    .Where(warehouse => warehouse.Id == item.창고Id)
+                    .Select(warehouse => warehouse.창고명)
+                    .FirstOrDefault(),
+                item.상품명,
+                item.SKU,
+                item.입고수량,
+                item.불량수량,
+                item.상태,
+                item.입고완료일시,
+                item.UpdatedAt
+            })
+            .ToArrayAsync(cancellationToken);
+
+        return new 입고검수대상페이지응답
+        {
+            Items = rows.Select(row => new 입고검수대상목록항목응답
+            {
+                InboundItemId = row.Id,
+                InboundId = row.입고요청Id,
+                WarehouseId = row.창고Id,
+                WarehouseName = row.창고명 ?? string.Empty,
+                ProductName = row.상품명,
+                Sku = row.SKU,
+                ReceivedQuantity = row.입고수량,
+                DefectiveQuantity = row.불량수량,
+                InventoryStatus = row.상태,
+                CanInspect = string.Equals(row.상태, "보관중", StringComparison.Ordinal),
+                ReceivedAtUtc = AsUtc(row.입고완료일시),
+                UpdatedAtUtc = AsUtc(row.UpdatedAt)
+            }).ToArray(),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
+
+    public async Task<입고검수대상상세응답?> GetInboundInspectionTargetAsync(
+        long inboundItemId,
+        CancellationToken cancellationToken)
+    {
+        if (inboundItemId <= 0)
+        {
+            return null;
+        }
+
+        var userId = RequireUserId();
+        var warehouseNames = _db.창고.AsNoTracking();
+        var inboundRequests = _db.입고요청.AsNoTracking();
+        var row = await 입고검수접근가능재고Query(userId)
+            .AsNoTracking()
+            .Where(item => item.Id == inboundItemId)
+            .Select(item => new
+            {
+                item.Id,
+                item.입고요청Id,
+                item.창고Id,
+                창고명 = warehouseNames
+                    .Where(warehouse => warehouse.Id == item.창고Id)
+                    .Select(warehouse => warehouse.창고명)
+                    .FirstOrDefault(),
+                item.상품명,
+                item.SKU,
+                item.옵션명,
+                공급처명 = inboundRequests
+                    .Where(inbound => inbound.Id == item.입고요청Id)
+                    .Select(inbound => inbound.공급처명)
+                    .FirstOrDefault(),
+                보관조건 = inboundRequests
+                    .Where(inbound => inbound.Id == item.입고요청Id)
+                    .Select(inbound => inbound.보관조건)
+                    .FirstOrDefault(),
+                item.입고수량,
+                item.가용수량,
+                item.예약수량,
+                item.불량수량,
+                item.상태,
+                item.보관위치,
+                item.입고완료일시,
+                item.UpdatedAt
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (row is null)
+        {
+            return null;
+        }
+
+        var latestInspection = await _db.재고이력
+            .AsNoTracking()
+            .Where(history => history.입고상품Id == inboundItemId && history.이력유형 == "입고검수")
+            .OrderByDescending(history => history.처리일시)
+            .ThenByDescending(history => history.Id)
+            .Select(history => new { history.처리일시, history.메모 })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return new 입고검수대상상세응답
+        {
+            InboundItemId = row.Id,
+            InboundId = row.입고요청Id,
+            WarehouseId = row.창고Id,
+            WarehouseName = row.창고명 ?? string.Empty,
+            ProductName = row.상품명,
+            Sku = row.SKU,
+            OptionName = row.옵션명,
+            SupplierName = row.공급처명 ?? string.Empty,
+            ReceivedQuantity = row.입고수량,
+            AvailableQuantity = row.가용수량,
+            ReservedQuantity = row.예약수량,
+            DefectiveQuantity = row.불량수량,
+            InventoryStatus = row.상태,
+            StorageLocation = row.보관위치,
+            StorageCondition = row.보관조건 ?? string.Empty,
+            CanInspect = string.Equals(row.상태, "보관중", StringComparison.Ordinal),
+            ReceivedAtUtc = AsUtc(row.입고완료일시),
+            InspectedAtUtc = AsUtc(latestInspection?.처리일시),
+            InspectionMemo = latestInspection?.메모 ?? string.Empty,
+            UpdatedAtUtc = AsUtc(row.UpdatedAt)
+        };
+    }
+
     public async Task<창고작업결과응답> InspectInboundItemAsync(long inboundItemId, 입고검수요청 request, CancellationToken cancellationToken)
     {
         var userId = RequireUserId();
-        var item = await 접근가능재고Query(userId)
+        var item = await 입고검수접근가능재고Query(userId)
             .FirstOrDefaultAsync(x => x.Id == inboundItemId, cancellationToken)
             ?? throw new InvalidOperationException("입고상품을 찾을 수 없거나 접근할 수 없습니다.");
 
@@ -664,6 +891,44 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         if (request.불량수량 < 0 || request.불량수량 > request.검수수량)
         {
             throw new InvalidOperationException("불량수량은 검수수량보다 클 수 없습니다.");
+        }
+
+        if (request.검수수량 > 100_000)
+        {
+            throw new InvalidOperationException("검수수량은 100,000개 이하여야 합니다.");
+        }
+
+        var inspectionMemo = (request.검수메모 ?? string.Empty).Trim();
+        if (inspectionMemo.Length > 400)
+        {
+            throw new InvalidOperationException("검수 메모는 400자 이하로 입력해 주세요.");
+        }
+
+        if (item.상태.StartsWith("검수완료", StringComparison.Ordinal))
+        {
+            if (item.입고수량 == request.검수수량 && item.불량수량 == request.불량수량)
+            {
+                var existingInspection = await _db.재고이력
+                    .AsNoTracking()
+                    .Where(history => history.입고상품Id == item.Id && history.이력유형 == "입고검수")
+                    .OrderByDescending(history => history.처리일시)
+                    .ThenByDescending(history => history.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+                return ToWarehouseWorkResult(
+                    item,
+                    "입고검수",
+                    existingInspection?.처리UserId ?? userId,
+                    existingInspection?.처리일시 ?? item.UpdatedAt,
+                    existingInspection?.메모 ?? inspectionMemo,
+                    idempotentReplay: true);
+            }
+
+            throw new InvalidOperationException("이미 완료된 입고 검수 결과를 다른 수량으로 다시 저장할 수 없습니다.");
+        }
+
+        if (!string.Equals(item.상태, "보관중", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("보관중 상태의 입고상품만 검수할 수 있습니다.");
         }
 
         var now = DateTime.UtcNow;
@@ -684,17 +949,17 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             원인유형 = "입고검수",
             원인Id = item.입고요청Id,
             처리UserId = userId,
-            메모 = $"검수 {request.검수수량}, 불량 {request.불량수량}. {request.검수메모}".Trim(),
+            메모 = $"검수 {request.검수수량}, 불량 {request.불량수량}. {inspectionMemo}".Trim(),
             처리일시 = now
         });
 
         if (item.불량수량 != previousDefect)
         {
-            _db.재고이동.Add(CreateInventoryMovement(item, "입고검수", Math.Abs(item.불량수량 - previousDefect), userId, request.검수메모, now));
+            _db.재고이동.Add(CreateInventoryMovement(item, "입고검수", Math.Abs(item.불량수량 - previousDefect), userId, inspectionMemo, now));
         }
 
         await _db.SaveChangesAsync(cancellationToken);
-        return ToWarehouseWorkResult(item, "입고검수", userId, now, request.검수메모);
+        return ToWarehouseWorkResult(item, "입고검수", userId, now, inspectionMemo);
     }
 
     public async Task<창고작업결과응답> PutAwayInventoryItemAsync(long inboundItemId, 적재위치배정요청 request, CancellationToken cancellationToken)
@@ -950,9 +1215,18 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             운송의뢰Id = entity.운송의뢰Id,
             공급처코드 = entity.공급처코드,
             공급처명 = entity.공급처명,
-            예정상품명 = expectedOutbound?.상품명 ?? string.Empty,
-            예정SKU = expectedOutbound?.SKU ?? string.Empty,
-            예정수량 = expectedOutbound?.수량,
+            예정상품명 = string.IsNullOrWhiteSpace(entity.예정상품명)
+                ? expectedOutbound?.상품명 ?? string.Empty
+                : entity.예정상품명,
+            예정SKU = string.IsNullOrWhiteSpace(entity.예정SKU)
+                ? expectedOutbound?.SKU ?? string.Empty
+                : entity.예정SKU,
+            예정수량 = entity.예정수량 ?? expectedOutbound?.수량,
+            입고묶음바코드 = entity.입고묶음바코드,
+            보관조건 = entity.보관조건,
+            현장입고사유 = entity.현장입고사유,
+            안내버전 = entity.현장입고안내버전,
+            CreatedAtUtc = DateTime.SpecifyKind(entity.CreatedAt, DateTimeKind.Utc),
             원주문참조번호 = entity.원주문참조번호,
             상태 = entity.상태,
             예정도착일 = entity.예정도착일,
@@ -964,8 +1238,8 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         IReadOnlyCollection<입고요청> inbounds,
         CancellationToken cancellationToken)
     {
-        var inboundIds = inbounds.Select(entity => entity.Id).Distinct().ToArray();
-        if (inboundIds.Length == 0)
+        var inboundIds = inbounds.Select(entity => entity.Id).Distinct().ToList();
+        if (inboundIds.Count == 0)
         {
             return new Dictionary<long, 출고예정>();
         }
@@ -1013,6 +1287,13 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             || _db.창고사용자.Any(user =>
                 user.창고Id == item.창고Id && user.UserId == userId));
 
+    private IQueryable<입고상품> 입고검수접근가능재고Query(string userId)
+        => _db.입고상품.Where(item =>
+            _db.창고.Any(warehouse =>
+                warehouse.Id == item.창고Id && warehouse.소유자UserId == userId)
+            || _db.창고사용자.Any(user =>
+                user.창고Id == item.창고Id && user.UserId == userId));
+
     private async Task 창고접근확인Async(
         long warehouseId,
         string userId,
@@ -1025,6 +1306,100 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             throw new InvalidOperationException("창고를 찾을 수 없거나 접근할 수 없습니다.");
         }
     }
+
+    private Task<입고요청?> FindUnplannedRequestByClientIdAsync(
+        string userId,
+        Guid clientRequestId,
+        CancellationToken cancellationToken)
+        => _db.입고요청
+            .AsNoTracking()
+            .SingleOrDefaultAsync(inbound =>
+                inbound.주문자UserId == userId
+                && inbound.현장입고클라이언트요청Id == clientRequestId,
+                cancellationToken);
+
+    private static 입고요청항목응답 ResolveIdempotentUnplannedRequest(
+        입고요청 existing,
+        현장입고요청등록요청 request)
+    {
+        if (existing.창고Id != request.창고Id
+            || !string.Equals(existing.입고흐름유형, 입고흐름유형코드.현장임시입고, StringComparison.Ordinal)
+            || !string.Equals(existing.예정SKU, NormalizeBarcode(request.상품바코드), StringComparison.Ordinal)
+            || !string.Equals(existing.입고묶음바코드, NormalizeBarcode(request.입고묶음바코드), StringComparison.Ordinal)
+            || !string.Equals(existing.예정상품명, request.상품명.Trim(), StringComparison.Ordinal)
+            || !string.Equals(existing.공급처명, request.공급처명.Trim(), StringComparison.Ordinal)
+            || existing.예정수량 != request.입고수량
+            || !string.Equals(existing.보관조건, 현장입고보관조건.Normalize(request.보관조건), StringComparison.Ordinal)
+            || !string.Equals(existing.현장입고사유, request.현장입고사유.Trim(), StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("이미 사용한 현장 입고 요청 ID를 다른 내용에 다시 사용할 수 없습니다.");
+        }
+
+        return ToInboundResponse(existing);
+    }
+
+    private static void ValidateUnplannedInboundRequest(현장입고요청등록요청 request)
+    {
+        if (request.클라이언트요청Id == Guid.Empty)
+        {
+            throw new InvalidOperationException("현장 입고 요청 ID를 확인해 주세요.");
+        }
+
+        if (request.창고Id <= 0)
+        {
+            throw new InvalidOperationException("현장 입고를 기록할 창고를 선택해 주세요.");
+        }
+
+        var productBarcode = (request.상품바코드 ?? string.Empty).Trim();
+        if (productBarcode.Length is < 1 or > 100)
+        {
+            throw new InvalidOperationException("상품 바코드는 1자 이상 100자 이하로 입력해 주세요.");
+        }
+
+        var bundleBarcode = (request.입고묶음바코드 ?? string.Empty).Trim();
+        if (bundleBarcode.Length is < 1 or > 100
+            || WarehouseBarcodeParser.Parse(bundleBarcode).Kind != WarehouseBarcodeKindCode.Bundle)
+        {
+            throw new InvalidOperationException("입고 묶음 바코드는 BND: 또는 BUNDLE: 형식으로 입력해 주세요.");
+        }
+
+        var productName = (request.상품명 ?? string.Empty).Trim();
+        if (productName.Length is < 1 or > 200)
+        {
+            throw new InvalidOperationException("상품명은 1자 이상 200자 이하로 입력해 주세요.");
+        }
+
+        var supplier = (request.공급처명 ?? string.Empty).Trim();
+        if (supplier.Length is < 1 or > 200)
+        {
+            throw new InvalidOperationException("공급처 또는 반입자는 1자 이상 200자 이하로 입력해 주세요.");
+        }
+
+        if (request.입고수량 is < 1 or > 100_000)
+        {
+            throw new InvalidOperationException("입고 수량은 1개 이상 100,000개 이하로 입력해 주세요.");
+        }
+
+        var storageCondition = (request.보관조건 ?? string.Empty).Trim();
+        if (!현장입고보관조건.전체.Contains(storageCondition, StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException("지원하는 보관 조건을 선택해 주세요.");
+        }
+
+        var reason = (request.현장입고사유 ?? string.Empty).Trim();
+        if (reason.Length is < 5 or > 1000)
+        {
+            throw new InvalidOperationException("현장 입고 사유는 5자 이상 1,000자 이하로 입력해 주세요.");
+        }
+
+        if (!현장입고요청안내.유효한확인(request))
+        {
+            throw new InvalidOperationException("현재 현장 입고 요청 안내를 확인해 주세요.");
+        }
+    }
+
+    private static string NormalizeBarcode(string? value)
+        => (value ?? string.Empty).Trim().ToUpperInvariant();
 
     private static 재고이동 CreateInventoryMovement(입고상품 item, string movementType, int quantity, string userId, string memo, DateTime occurredAt)
     {
@@ -1043,7 +1418,13 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
         };
     }
 
-    private static 창고작업결과응답 ToWarehouseWorkResult(입고상품 item, string workType, string userId, DateTime processedAt, string memo)
+    private static 창고작업결과응답 ToWarehouseWorkResult(
+        입고상품 item,
+        string workType,
+        string userId,
+        DateTime processedAt,
+        string memo,
+        bool idempotentReplay = false)
     {
         return new 창고작업결과응답
         {
@@ -1056,9 +1437,18 @@ public sealed class WarehouseOperationService : IWarehouseOperationService
             불량수량 = item.불량수량,
             처리UserId = userId,
             처리일시 = processedAt,
-            메모 = memo
+            메모 = memo,
+            멱등재시도여부 = idempotentReplay
         };
     }
+
+    private static DateTime AsUtc(DateTime value)
+        => value.Kind == DateTimeKind.Utc
+            ? value
+            : DateTime.SpecifyKind(value, DateTimeKind.Utc);
+
+    private static DateTime? AsUtc(DateTime? value)
+        => value.HasValue ? AsUtc(value.Value) : null;
 
     private static 입고계약스냅샷 CreateContractSnapshot(입고요청 inbound)
         => new 입고계약스냅샷

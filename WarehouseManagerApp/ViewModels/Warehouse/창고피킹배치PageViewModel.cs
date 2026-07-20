@@ -1,314 +1,110 @@
-using Ssalddel.Contracts.Common.Warehouse;
 using WarehouseManagerApp.Services;
 
 namespace WarehouseManagerApp.ViewModels.Warehouse;
 
-public enum 창고페이지메시지수준
-{
-    안내,
-    성공,
-    경고,
-    오류
-}
-
+/// <summary>피킹 작업 페이지의 기능 노출과 창고 업무 인증만 관리합니다.</summary>
 public sealed class 창고피킹배치PageViewModel : 창고PageViewModelBase
 {
-    private readonly IWarehousePickingBatchWorkspaceService _피킹Service;
-    private IReadOnlyList<WarehousePickingWarehouseOption> _창고옵션목록 = [];
-    private IReadOnlyList<WarehousePickingTaskItem> _배정작업목록 = [];
-    private IReadOnlyList<WarehousePickingTaskItem> _적재대작업목록 = [];
-    private WarehousePickingTaskItem? _선택작업;
-    private long _선택창고Id = 10;
-    private 피킹포장처리방식 _선택처리방식 = 피킹포장처리방식.피킹포장분리;
-    private bool _상품Barcode검증필수 = true;
-    private string _적재대Barcode = "LOC-A-01-02";
-    private string _상품Barcode = string.Empty;
-    private int _피킹수량 = 1;
-    private string? _옵션메시지;
-    private string? _스캔메시지;
-    private 창고페이지메시지수준 _옵션메시지수준;
-    private 창고페이지메시지수준 _스캔메시지수준;
-    private bool _처리중;
+    private readonly WarehousePageAvailabilityService _페이지사용가능성;
+    private bool _초기화됨;
+    private bool _초기화중;
+    private bool _기능사용가능;
+    private string _기능안내 = "피킹 작업 기능 상태를 확인하고 있습니다.";
+    private string? _페이지오류메시지;
 
     public 창고피킹배치PageViewModel(
         창고작업세션상태ViewModel 세션,
-        IWarehousePickingBatchWorkspaceService 피킹Service)
+        창고로그인ViewModel 인증,
+        WarehousePageAvailabilityService 페이지사용가능성)
         : base(
             세션,
             창고PageCodes.일반출고,
-            "피킹 배치",
+            "피킹 작업",
             창고운영ProfileCodes.일반입출고)
     {
-        _피킹Service = 피킹Service;
+        _페이지사용가능성 = 페이지사용가능성;
+        this.인증 = 구성요소등록(인증);
     }
 
-    public IReadOnlyList<WarehousePickingWarehouseOption> 창고옵션목록
+    public 창고로그인ViewModel 인증 { get; }
+
+    public bool 초기화됨
     {
-        get => _창고옵션목록;
-        private set => SetProperty(ref _창고옵션목록, value);
+        get => _초기화됨;
+        private set => SetProperty(ref _초기화됨, value);
     }
 
-    public IReadOnlyList<WarehousePickingTaskItem> 배정작업목록
+    public bool 초기화중
     {
-        get => _배정작업목록;
-        private set => SetProperty(ref _배정작업목록, value);
+        get => _초기화중;
+        private set => SetProperty(ref _초기화중, value);
     }
 
-    public IReadOnlyList<WarehousePickingTaskItem> 적재대작업목록
+    public bool 기능사용가능
     {
-        get => _적재대작업목록;
-        private set => SetProperty(ref _적재대작업목록, value);
+        get => _기능사용가능;
+        private set => SetProperty(ref _기능사용가능, value);
     }
 
-    public WarehousePickingTaskItem? 선택작업
+    public string 기능안내
     {
-        get => _선택작업;
-        private set => SetProperty(ref _선택작업, value);
+        get => _기능안내;
+        private set => SetProperty(ref _기능안내, value);
     }
 
-    public long 선택창고Id
+    public string? 페이지오류메시지
     {
-        get => _선택창고Id;
-        private set
-        {
-            if (!SetProperty(ref _선택창고Id, value))
-            {
-                return;
-            }
-
-            OnPropertyChanged(nameof(선택창고명));
-            OnPropertyChanged(nameof(선택창고옵션));
-        }
+        get => _페이지오류메시지;
+        private set => SetProperty(ref _페이지오류메시지, value);
     }
 
-    public 피킹포장처리방식 선택처리방식
-    {
-        get => _선택처리방식;
-        set => SetProperty(ref _선택처리방식, value);
-    }
-
-    public bool 상품Barcode검증필수
-    {
-        get => _상품Barcode검증필수;
-        set => SetProperty(ref _상품Barcode검증필수, value);
-    }
-
-    public string 적재대Barcode
-    {
-        get => _적재대Barcode;
-        set => SetProperty(ref _적재대Barcode, value ?? string.Empty);
-    }
-
-    public string 상품Barcode
-    {
-        get => _상품Barcode;
-        set => SetProperty(ref _상품Barcode, value ?? string.Empty);
-    }
-
-    public int 피킹수량
-    {
-        get => _피킹수량;
-        set => SetProperty(ref _피킹수량, Math.Max(0, value));
-    }
-
-    public string? 옵션메시지
-    {
-        get => _옵션메시지;
-        private set => SetProperty(ref _옵션메시지, value);
-    }
-
-    public string? 스캔메시지
-    {
-        get => _스캔메시지;
-        private set => SetProperty(ref _스캔메시지, value);
-    }
-
-    public 창고페이지메시지수준 옵션메시지수준
-    {
-        get => _옵션메시지수준;
-        private set => SetProperty(ref _옵션메시지수준, value);
-    }
-
-    public 창고페이지메시지수준 스캔메시지수준
-    {
-        get => _스캔메시지수준;
-        private set => SetProperty(ref _스캔메시지수준, value);
-    }
-
-    public bool 처리중
-    {
-        get => _처리중;
-        private set => SetProperty(ref _처리중, value);
-    }
-
-    public string 선택창고명
-        => 선택창고옵션?.WarehouseName ?? "창고";
-
-    public WarehousePickingWarehouseOption? 선택창고옵션
-        => 창고옵션목록.FirstOrDefault(option => option.WarehouseId == 선택창고Id);
+    public bool 처리중 => 초기화중 || 인증.처리중;
 
     public async Task<bool> 초기화Async(CancellationToken cancellationToken = default)
     {
-        if (처리중)
-        {
-            return false;
-        }
-
-        처리중 = true;
+        초기화됨 = false;
+        초기화중 = true;
+        페이지오류메시지 = null;
         try
         {
-            일반입출고Profile확인();
-            창고옵션목록 = await _피킹Service.GetWarehouseOptionsAsync(cancellationToken);
-            var first = 창고옵션목록.FirstOrDefault();
-            if (first is not null)
+            var availability = await _페이지사용가능성.GetPickingBatchAsync(cancellationToken);
+            기능사용가능 = availability.IsEnabled;
+            기능안내 = availability.Notice;
+            if (기능사용가능)
             {
-                창고옵션적용(first);
+                await 인증.초기화Async(cancellationToken);
             }
-
-            await 배정작업조회Async(cancellationToken);
-            return true;
         }
-        catch (Exception ex)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            스캔메시지수준 = 창고페이지메시지수준.오류;
-            스캔메시지 = ex.Message;
-            return false;
+            기능사용가능 = false;
+            페이지오류메시지 = "기능 상태 확인 시간이 초과되었습니다.";
+        }
+        catch (HttpRequestException)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "서버에서 창고 기능 상태를 확인하지 못했습니다.";
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            기능사용가능 = false;
+            페이지오류메시지 = "피킹 작업 기능 응답을 처리하지 못했습니다.";
         }
         finally
         {
-            처리중 = false;
+            초기화중 = false;
+            초기화됨 = true;
         }
+
+        return 기능사용가능 && 인증.창고업무접근가능;
     }
 
-    public async Task 창고변경Async(long warehouseId, CancellationToken cancellationToken = default)
+    public bool 인증후준비()
     {
-        선택창고Id = warehouseId;
-        var option = 선택창고옵션;
-        if (option is not null)
-        {
-            창고옵션적용(option);
-        }
-
-        적재대작업목록 = [];
-        선택작업 = null;
-        스캔메시지 = null;
-        await 배정작업조회Async(cancellationToken);
+        초기화됨 = true;
+        return 기능사용가능 && 인증.창고업무접근가능;
     }
 
-    public async Task 옵션저장Async(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var option = await _피킹Service.UpdateWarehouseOptionAsync(
-                선택창고Id,
-                선택처리방식,
-                상품Barcode검증필수,
-                cancellationToken);
-            창고옵션목록 = 창고옵션목록
-                .Select(item => item.WarehouseId == option.WarehouseId ? option : item)
-                .ToArray();
-            OnPropertyChanged(nameof(선택창고명));
-            OnPropertyChanged(nameof(선택창고옵션));
-            옵션메시지수준 = 창고페이지메시지수준.성공;
-            옵션메시지 = $"{option.WarehouseName} 옵션을 저장했습니다.";
-            await 배정작업조회Async(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            옵션메시지수준 = 창고페이지메시지수준.오류;
-            옵션메시지 = ex.Message;
-        }
-    }
-
-    public async Task 적재대조회Async(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var result = await _피킹Service.ScanRackAsync(
-                선택창고Id,
-                적재대Barcode,
-                cancellationToken);
-            적재대작업목록 = result.Items;
-            작업선택적용(적재대작업목록.FirstOrDefault());
-            스캔메시지수준 = result.IsSuccess
-                ? 창고페이지메시지수준.성공
-                : 창고페이지메시지수준.경고;
-            스캔메시지 = result.Message;
-            await 배정작업조회Async(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            스캔메시지수준 = 창고페이지메시지수준.오류;
-            스캔메시지 = ex.Message;
-        }
-    }
-
-    public void 작업선택(WarehousePickingTaskItem item)
-    {
-        ArgumentNullException.ThrowIfNull(item);
-        작업선택적용(item);
-    }
-
-    public async Task 피킹완료Async(CancellationToken cancellationToken = default)
-    {
-        if (선택작업 is null)
-        {
-            return;
-        }
-
-        try
-        {
-            var result = await _피킹Service.CompletePickAsync(
-                선택작업.TaskKey,
-                적재대Barcode,
-                상품Barcode,
-                피킹수량,
-                cancellationToken);
-            스캔메시지수준 = result.IsSuccess
-                ? 창고페이지메시지수준.성공
-                : 창고페이지메시지수준.오류;
-            스캔메시지 = result.Message;
-            await 배정작업조회Async(cancellationToken);
-
-            var rackResult = await _피킹Service.ScanRackAsync(
-                선택창고Id,
-                적재대Barcode,
-                cancellationToken);
-            적재대작업목록 = rackResult.Items;
-            작업선택적용(적재대작업목록.FirstOrDefault());
-        }
-        catch (Exception ex)
-        {
-            스캔메시지수준 = 창고페이지메시지수준.오류;
-            스캔메시지 = ex.Message;
-        }
-    }
-
-    private async Task 배정작업조회Async(CancellationToken cancellationToken)
-        => 배정작업목록 = await _피킹Service.GetAssignedTasksAsync(선택창고Id, cancellationToken);
-
-    private void 창고옵션적용(WarehousePickingWarehouseOption option)
-    {
-        선택창고Id = option.WarehouseId;
-        선택처리방식 = option.Mode;
-        상품Barcode검증필수 = option.IsBarcodeRequired;
-    }
-
-    private void 작업선택적용(WarehousePickingTaskItem? item)
-    {
-        선택작업 = item;
-        상품Barcode = item?.ProductBarcode ?? string.Empty;
-        피킹수량 = item is null ? 1 : Math.Min(1, item.RemainingQuantity);
-    }
-
-    private void 일반입출고Profile확인()
-    {
-        if (!string.Equals(
-                세션.운영ProfileCode,
-                창고운영ProfileCodes.일반입출고,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            세션.운영Profile설정(창고운영ProfileCodes.일반입출고);
-        }
-    }
+    public void 인증해제적용()
+        => 초기화됨 = true;
 }

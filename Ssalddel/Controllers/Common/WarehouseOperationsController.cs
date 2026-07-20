@@ -26,10 +26,29 @@ namespace Ssalddel.Controllers.Common;
 public sealed class WarehouseOperationsController : ControllerBase
 {
     private readonly I창고작업UseCase _useCase;
+    private readonly I피킹작업UseCase _pickingTaskUseCase;
+    private readonly I재고현황UseCase _inventoryOverviewUseCase;
+    private readonly I적재작업UseCase _putAwayTaskUseCase;
+    private readonly I포장작업UseCase _packingTaskUseCase;
+    private readonly I출고인계준비UseCase _outboundHandoffUseCase;
+    private readonly I출고예정검토UseCase _outboundPlanReviewUseCase;
 
-    public WarehouseOperationsController(I창고작업UseCase useCase)
+    public WarehouseOperationsController(
+        I창고작업UseCase useCase,
+        I피킹작업UseCase pickingTaskUseCase,
+        I재고현황UseCase inventoryOverviewUseCase,
+        I적재작업UseCase putAwayTaskUseCase,
+        I포장작업UseCase packingTaskUseCase,
+        I출고인계준비UseCase outboundHandoffUseCase,
+        I출고예정검토UseCase outboundPlanReviewUseCase)
     {
         _useCase = useCase;
+        _pickingTaskUseCase = pickingTaskUseCase;
+        _inventoryOverviewUseCase = inventoryOverviewUseCase;
+        _putAwayTaskUseCase = putAwayTaskUseCase;
+        _packingTaskUseCase = packingTaskUseCase;
+        _outboundHandoffUseCase = outboundHandoffUseCase;
+        _outboundPlanReviewUseCase = outboundPlanReviewUseCase;
     }
 
     [HttpGet("warehouses")]
@@ -155,6 +174,18 @@ public sealed class WarehouseOperationsController : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpPost("inbounds/unplanned-requests")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInboundOperator)]
+    public async Task<IActionResult> 현장입고요청생성(
+        [FromBody] 현장입고요청등록요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.현장입고요청생성Async(request, 요청Context생성(), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpPut("inbounds/{inboundId:long}")]
     [RequireHrRole(
         HrDetailedRoleCodes.WarehouseManager,
@@ -195,6 +226,28 @@ public sealed class WarehouseOperationsController : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpGet("inventory/inspection-targets")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInboundOperator)]
+    public async Task<IActionResult> 입고검수대상목록(
+        [FromQuery] 입고검수대상목록조회요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.입고검수대상목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("inventory/{inboundItemId:long}/inspection-target")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInboundOperator)]
+    public async Task<IActionResult> 입고검수대상상세(long inboundItemId, CancellationToken cancellationToken)
+    {
+        var result = await _useCase.입고검수대상상세Async(inboundItemId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpPost("inventory/{inboundItemId:long}/inspect")]
     [RequireHrRole(
         HrDetailedRoleCodes.WarehouseManager,
@@ -222,6 +275,187 @@ public sealed class WarehouseOperationsController : ControllerBase
     public async Task<IActionResult> 포장작업(long inboundItemId, [FromBody] 포장작업요청 request, CancellationToken cancellationToken)
     {
         var result = await _useCase.포장작업Async(inboundItemId, request, 요청Context생성(), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("inventory-overview")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInventoryOperator,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 재고현황목록(
+        [FromQuery] 창고재고현황목록조회요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _inventoryOverviewUseCase.목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("inventory-overview/{inboundItemId:long}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInventoryOperator,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 재고현황상세(long inboundItemId, CancellationToken cancellationToken)
+    {
+        var result = await _inventoryOverviewUseCase.상세Async(inboundItemId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("put-away-tasks")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInventoryOperator)]
+    public async Task<IActionResult> 적재작업목록([FromQuery] 적재작업목록조회요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _putAwayTaskUseCase.목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("put-away-tasks/{inboundItemId:long}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInventoryOperator)]
+    public async Task<IActionResult> 적재작업상세(long inboundItemId, CancellationToken cancellationToken)
+    {
+        var result = await _putAwayTaskUseCase.상세Async(inboundItemId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("put-away-tasks/{inboundItemId:long}/complete")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseInventoryOperator)]
+    public async Task<IActionResult> 적재작업완료(long inboundItemId, [FromBody] 적재작업완료요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _putAwayTaskUseCase.완료Async(inboundItemId, request, 요청Context생성(), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("packing-tasks")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 포장작업목록([FromQuery] 포장작업목록조회요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _packingTaskUseCase.목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("packing-tasks/{inboundItemId:long}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 포장작업상세(long inboundItemId, CancellationToken cancellationToken)
+    {
+        var result = await _packingTaskUseCase.상세Async(inboundItemId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("packing-tasks/{inboundItemId:long}/complete")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 포장작업완료(long inboundItemId, [FromBody] 포장작업완료요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _packingTaskUseCase.완료Async(inboundItemId, request, 요청Context생성(), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("outbound-handoff-tasks")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 출고인계준비목록([FromQuery] 출고인계준비목록조회요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _outboundHandoffUseCase.목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("outbound-handoff-tasks/{inboundItemId:long}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 출고인계준비상세(long inboundItemId, CancellationToken cancellationToken)
+    {
+        var result = await _outboundHandoffUseCase.상세Async(inboundItemId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("outbound-handoff-tasks/{inboundItemId:long}/complete")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 출고인계준비완료(long inboundItemId, [FromBody] 출고인계준비완료요청 request, CancellationToken cancellationToken)
+    {
+        var result = await _outboundHandoffUseCase.완료Async(inboundItemId, request, 요청Context생성(), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("outbound-plan-reviews")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 출고예정검토목록(
+        [FromQuery] 출고예정검토목록조회요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _outboundPlanReviewUseCase.목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("outbound-plan-reviews/{outboundPlanId:long}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 출고예정검토상세(long outboundPlanId, CancellationToken cancellationToken)
+    {
+        var result = await _outboundPlanReviewUseCase.상세Async(outboundPlanId, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("picking-tasks")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 피킹작업목록(
+        [FromQuery] 피킹작업목록조회요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _pickingTaskUseCase.목록Async(request, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("picking-tasks/{taskKey}")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 피킹작업상세(string taskKey, CancellationToken cancellationToken)
+    {
+        var result = await _pickingTaskUseCase.상세Async(taskKey, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("picking-tasks/{taskKey}/start")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 피킹작업시작(string taskKey, CancellationToken cancellationToken)
+    {
+        var result = await _pickingTaskUseCase.시작Async(taskKey, 요청Context생성(), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost("picking-tasks/{taskKey}/complete")]
+    [RequireHrRole(
+        HrDetailedRoleCodes.WarehouseManager,
+        HrDetailedRoleCodes.WarehouseDispatchOperator)]
+    public async Task<IActionResult> 피킹작업완료(
+        string taskKey,
+        [FromBody] 피킹작업완료요청 request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _pickingTaskUseCase.완료Async(taskKey, request, 요청Context생성(), cancellationToken);
         return this.ToActionResult(result);
     }
 

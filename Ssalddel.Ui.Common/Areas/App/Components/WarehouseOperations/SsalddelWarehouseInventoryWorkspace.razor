@@ -1,0 +1,221 @@
+@using Ssalddel.Contracts.Common.Inventory
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<재고현황PageViewModel>
+
+<MudStack Spacing="3" Class="inventory-workspace">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Hub">
+        <MudText Typo="Typo.subtitle2">공동의 필요에서 입고된 물품을 창고 근거로 확인합니다.</MudText>
+        <MudText Typo="Typo.body2">목록은 현재 계정에 배정된 창고 범위만 보여 줍니다. 원장 연결 여부는 최소 표시하고, 선택한 한 건에서만 주문 참조와 원장 상태를 확인합니다.</MudText>
+    </MudAlert>
+
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Visibility">
+        <MudText Typo="Typo.subtitle2">읽기 전용 재고 현황</MudText>
+        <MudText Typo="Typo.body2">이 페이지는 재고를 차감·이동·판매하거나 운송을 확정하지 않습니다. 사용자 ID와 계약·정산 내용도 목록과 상세에 포함하지 않습니다.</MudText>
+    </MudAlert>
+
+    <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string" Label="상품·SKU·옵션·보관 위치·주문 참조 검색"
+                              Value="@ViewModel.목록.검색어" ValueChanged="SetSearch"
+                              OnKeyDown="SearchKeyDownAsync" Immediate="true" Variant="Variant.Outlined"
+                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                              Disabled="@ViewModel.처리중" />
+            </MudItem>
+            <MudItem xs="12" sm="7" md="3">
+                <MudSelect T="string" Label="재고 조건" Value="@ViewModel.목록.조회상태"
+                           ValueChanged="StatusChangedAsync" Variant="Variant.Outlined" Disabled="@ViewModel.처리중">
+                    @foreach (var status in ViewModel.목록.조회상태목록)
+                    {
+                        <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="5" md="3">
+                <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh" Disabled="@ViewModel.처리중" OnClick="SearchAsync">
+                    서버 재고 조회
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @if (ViewModel.목록.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText>@ViewModel.목록.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="SearchAsync">다시 시도</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+
+    <MudGrid>
+        <MudItem xs="6" md="3"><MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true"><MudText Typo="Typo.caption" Color="Color.Secondary">재고 품목</MudText><MudText Typo="Typo.h5">@ViewModel.목록.응답.TotalCount.ToString("N0")</MudText></MudPaper></MudItem>
+        <MudItem xs="6" md="3"><MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true"><MudText Typo="Typo.caption" Color="Color.Secondary">가용 수량</MudText><MudText Typo="Typo.h5">@ViewModel.목록.응답.TotalAvailableQuantity.ToString("N0")</MudText></MudPaper></MudItem>
+        <MudItem xs="6" md="3"><MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true"><MudText Typo="Typo.caption" Color="Color.Secondary">예약 수량</MudText><MudText Typo="Typo.h5">@ViewModel.목록.응답.TotalReservedQuantity.ToString("N0")</MudText></MudPaper></MudItem>
+        <MudItem xs="6" md="3"><MudPaper Class="pa-3 h-100" Elevation="0" Outlined="true"><MudText Typo="Typo.caption" Color="Color.Secondary">위치 미배정</MudText><MudText Typo="Typo.h5">@ViewModel.목록.응답.UnassignedLocationCount.ToString("N0")</MudText></MudPaper></MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <MudItem xs="12" lg="5">
+            <MudPaper Class="pa-4 inventory-panel" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">보관 재고</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">서버 조건 집계 · @ViewModel.목록.응답.TotalCount.ToString("N0")건</MudText>
+                        </MudStack>
+                        @if (ViewModel.목록.처리중)
+                        {
+                            <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                        }
+                    </MudStack>
+
+                    @if (ViewModel.목록.비어있음)
+                    {
+                        <div class="inventory-empty"><MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Large" Color="Color.Secondary" /><MudText Typo="Typo.subtitle1">조건에 맞는 재고가 없습니다.</MudText><MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">서버 저장 재고가 없으면 샘플 항목으로 대신 표시하지 않습니다.</MudText></div>
+                    }
+                    else
+                    {
+                        <div class="inventory-list">
+                            @foreach (var item in ViewModel.목록.항목목록)
+                            {
+                                var selected = ViewModel.상세.조회대상Id == item.InboundItemId;
+                                <button type="button" class="inventory-item @(selected ? "is-selected" : null)"
+                                        disabled="@ViewModel.처리중" @onclick="@(() => SelectInventoryAsync(item.InboundItemId))">
+                                    <span class="inventory-title-row">
+                                        <span class="inventory-title">@Display(item.ProductName)</span>
+                                        <span class="inventory-status">@Display(item.Status)</span>
+                                    </span>
+                                    <span class="inventory-meta">@Display(item.Sku) · @Display(item.OptionName)</span>
+                                    <span class="inventory-quantity">가용 @item.AvailableQuantity.ToString("N0") · 예약 @item.ReservedQuantity.ToString("N0")</span>
+                                    <span class="inventory-meta">@Display(item.WarehouseName) · 위치 @Display(item.StorageLocation)</span>
+                                    <span class="inventory-meta">@(item.HasCommunityLedger ? "원장 연결" : "원장 미연결") · @FormatDateTime(item.UpdatedAtUtc)</span>
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <MudButton Variant="Variant.Text" Disabled="@(!ViewModel.목록.이전페이지있음 || ViewModel.처리중)" OnClick="PreviousPageAsync">이전</MudButton>
+                        <MudText Typo="Typo.caption">@(ViewModel.목록.응답.Page + 1)페이지</MudText>
+                        <MudButton Variant="Variant.Text" Disabled="@(!ViewModel.목록.다음페이지있음 || ViewModel.처리중)" OnClick="NextPageAsync">다음</MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" lg="7">
+            <MudPaper Class="pa-4 inventory-panel" Elevation="0" Outlined="true">
+                @if (ViewModel.상세.처리중)
+                {
+                    <div class="inventory-empty"><MudProgressCircular Indeterminate="true" Color="Color.Primary" /><MudText>같은 입고상품 ID를 서버에서 확인하고 있습니다.</MudText></div>
+                }
+                else if (ViewModel.상세.오류발생)
+                {
+                    <div class="inventory-empty"><MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" Color="Color.Error" /><MudText Typo="Typo.subtitle1">재고 상세를 조회하지 못했습니다.</MudText><MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">@ViewModel.상세.오류메시지</MudText></div>
+                }
+                else if (ViewModel.상세.대상없음)
+                {
+                    <div class="inventory-empty">
+                        <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" />
+                        <MudText Typo="Typo.subtitle1">재고를 찾을 수 없습니다.</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">주소의 ID가 없거나 현재 계정의 창고 범위 밖입니다. 다른 재고로 자동 대체하지 않습니다.</MudText>
+                        <MudButton Variant="Variant.Outlined" Disabled="@ViewModel.처리중" OnClick="ClearSelectionAsync">선택 해제</MudButton>
+                    </div>
+                }
+                else if (ViewModel.상세.항목 is not { } item)
+                {
+                    <div class="inventory-empty"><MudIcon Icon="@Icons.Material.Filled.TouchApp" Size="Size.Large" Color="Color.Secondary" /><MudText Typo="Typo.subtitle1">확인할 재고를 선택해 주세요.</MudText><MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">목록에서 한 건을 선택할 때만 서버에서 정확한 상세를 조회합니다.</MudText></div>
+                }
+                else
+                {
+                    <MudStack Spacing="3">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0"><MudText Typo="Typo.h5">@Display(item.ProductName)</MudText><MudText Typo="Typo.body2" Color="Color.Secondary">입고상품 #@item.InboundItemId · @Display(item.Sku)</MudText></MudStack>
+                            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">@Display(item.Status)</MudChip>
+                        </MudStack>
+
+                        <MudGrid>
+                            <MudItem xs="6" sm="4"><SsalddelSensitiveInfoRow Label="창고" Value="@Display(item.WarehouseName)" /></MudItem>
+                            <MudItem xs="6" sm="4"><SsalddelSensitiveInfoRow Label="보관 위치" Value="@Display(item.StorageLocation)" /></MudItem>
+                            <MudItem xs="6" sm="4"><SsalddelSensitiveInfoRow Label="보관 조건" Value="@Display(item.StorageCondition)" /></MudItem>
+                            <MudItem xs="6" sm="3"><SsalddelSensitiveInfoRow Label="입고" Value="@($"{item.InboundQuantity:N0}개")" /></MudItem>
+                            <MudItem xs="6" sm="3"><SsalddelSensitiveInfoRow Label="가용" Value="@($"{item.AvailableQuantity:N0}개")" /></MudItem>
+                            <MudItem xs="6" sm="3"><SsalddelSensitiveInfoRow Label="예약" Value="@($"{item.ReservedQuantity:N0}개")" /></MudItem>
+                            <MudItem xs="6" sm="3"><SsalddelSensitiveInfoRow Label="불량" Value="@($"{item.DefectiveQuantity:N0}개")" /></MudItem>
+                            <MudItem xs="12" sm="6"><SsalddelSensitiveInfoRow Label="주문 참조" Value="@Display(item.OrderReference)" /></MudItem>
+                            <MudItem xs="12" sm="6"><SsalddelSensitiveInfoRow Label="입고 묶음" Value="@Display(item.BundleBarcode)" /></MudItem>
+                            <MudItem xs="6"><SsalddelSensitiveInfoRow Label="입고 흐름" Value="@Display(item.InboundFlowType)" /></MudItem>
+                            <MudItem xs="6"><SsalddelSensitiveInfoRow Label="생성 경로" Value="@Display(item.InboundPath)" /></MudItem>
+                        </MudGrid>
+
+                        <MudAlert Severity="@(string.IsNullOrWhiteSpace(item.CommunityLedgerId) ? Severity.Normal : Severity.Info)" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.AccountTree">
+                            <MudText Typo="Typo.subtitle2">공동 원장 연결 근거</MudText>
+                            @if (string.IsNullOrWhiteSpace(item.CommunityLedgerId))
+                            {
+                                <MudText Typo="Typo.body2">이 재고에는 연결된 커뮤니티 원장이 없습니다.</MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2">원장 @item.CommunityLedgerId · @Display(item.CommunityLedgerState)</MudText>
+                                <MudText Typo="Typo.caption">템플릿 @Display(item.CommunityLedgerTemplateKey)</MudText>
+                            }
+                        </MudAlert>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">입고 완료 @FormatDateTime(item.ReceivedAtUtc) · 최종 갱신 @FormatDateTime(item.UpdatedAtUtc)</MudText>
+                    </MudStack>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+@code {
+    [Parameter] public long? InboundItemId { get; set; }
+    [Parameter] public EventCallback<long?> OnInventorySelected { get; set; }
+
+    private bool _initialized;
+    private long? _loadedInboundItemId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var normalizedId = InboundItemId is > 0 ? InboundItemId : null;
+        if (!_initialized)
+        {
+            _initialized = true;
+            _loadedInboundItemId = normalizedId;
+            await ViewModel.초기화Async(normalizedId);
+            return;
+        }
+
+        if (normalizedId == _loadedInboundItemId) return;
+        _loadedInboundItemId = normalizedId;
+        if (normalizedId is > 0) await ViewModel.대상선택Async(normalizedId.Value);
+        else ViewModel.선택해제();
+    }
+
+    private void SetSearch(string value) => ViewModel.목록.검색어 = value ?? string.Empty;
+    private async Task SearchKeyDownAsync(KeyboardEventArgs args) { if (args.Key is "Enter" or "NumpadEnter") await SearchAsync(); }
+    private async Task StatusChangedAsync(string value) { ViewModel.목록.조회상태 = 창고재고조회상태코드.Normalize(value); await SearchAsync(); }
+    private Task SearchAsync() => ViewModel.검색Async();
+    private Task PreviousPageAsync() => ViewModel.목록.이전페이지Async();
+    private Task NextPageAsync() => ViewModel.목록.다음페이지Async();
+
+    private async Task SelectInventoryAsync(long inboundItemId)
+    {
+        if (!await ViewModel.대상선택Async(inboundItemId)) return;
+        _loadedInboundItemId = inboundItemId;
+        await OnInventorySelected.InvokeAsync(inboundItemId);
+    }
+
+    private async Task ClearSelectionAsync()
+    {
+        ViewModel.선택해제();
+        _loadedInboundItemId = null;
+        await OnInventorySelected.InvokeAsync(null);
+    }
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatDateTime(DateTime? value) => value.HasValue ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-";
+}

@@ -14,6 +14,12 @@ public static class WarehouseManagerRoutes
     public const string PickingBatch = "/warehouse/work/picking-batch";
     public const string InboundProductScan = "/warehouse/work/inbound/products";
     public const string InboundInspection = "/warehouse/work/inbound/inspection";
+    public const string GeneralInventory = "/warehouse/general/inventory";
+    public const string PutAwayTask = "/warehouse/work/inbound/put-away";
+    public const string PackingTask = "/warehouse/work/outbound/packing";
+    public const string GeneralTransportHandoff = "/warehouse/general/transport-handoff";
+    public const string OutboundPlanReview = "/warehouse/general/outbound-plan-review";
+    public const string TransportRequestDraft = "/warehouse/general/transport-request-draft";
     public const string MartHome = "/warehouse/mart";
     public const string MartInboundWorkStart = "/warehouse/mart/work/mart-inbound";
     public const string MartReplenishmentWorkStart = "/warehouse/mart/work/mart-replenishment";

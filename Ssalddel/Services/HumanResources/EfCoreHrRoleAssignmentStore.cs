@@ -182,7 +182,10 @@ public sealed class EfCoreHrRoleAssignmentStore : IHrRoleAssignmentStore
         var normalizedUserId = userId.Trim();
         var normalizedScopeType = NormalizeOptional(scopeType, HrScopeTypes.Platform);
         var normalizedScopeId = NormalizeOptional(scopeId, HrScopeIds.Global);
-        var normalizedRoleCodes = roleCodes.Select(x => x.Trim()).ToArray();
+        // Keep the query parameter as a List. On .NET 10 an array can bind to the
+        // ReadOnlySpan-based Contains overload, which EF cannot interpret while
+        // extracting query parameters.
+        var normalizedRoleCodes = roleCodes.Select(x => x.Trim()).ToList();
 
         var records = await _db.HrRoleAssignments.AsNoTracking()
             .Where(x => x.IsActive && x.UserId == normalizedUserId && normalizedRoleCodes.Contains(x.RoleCode))

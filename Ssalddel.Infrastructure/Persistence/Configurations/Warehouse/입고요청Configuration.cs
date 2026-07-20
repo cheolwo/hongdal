@@ -40,5 +40,8 @@ public sealed class 입고요청Configuration : IEntityTypeConfiguration<입고�
         builder.HasIndex(x => new { x.주문Id, x.주문자UserId });
         builder.HasIndex(x => x.출고예정Id);
         builder.HasIndex(x => new { x.입고흐름유형, x.자동생성여부 });
+        builder.HasIndex(x => new { x.주문자UserId, x.현장입고클라이언트요청Id })
+            .IsUnique();
+        builder.HasIndex(x => new { x.창고Id, x.예정SKU, x.상태 });
     }
 }

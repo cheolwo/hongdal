@@ -1,0 +1,42 @@
+@page "/warehouse/general/inventory"
+@page "/warehouse/inventory"
+@inject NavigationManager Navigation
+@inject WebAuthSessionService AuthSession
+@implements IDisposable
+
+<PageTitle>일반 재고 현황 · 살뜰</PageTitle>
+
+<WebPageHeader Eyebrow="Warehouse Web" Title="일반 재고 현황"
+               Description="현재 계정의 창고 범위에서 서버 재고와 한 건의 입고 근거를 읽기 전용으로 확인합니다."
+               Badge="Beta · Read only" />
+
+@if (!AuthSession.IsLoggedIn)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="pa-6">
+        <MudStack AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Large" Color="Color.Secondary" />
+            <MudText Typo="Typo.h6">창고 재고 현황에는 로그인이 필요합니다.</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">서버에서 창고 소유·배정 범위와 HR 재고 역할을 확인합니다. 익명 허용 커뮤니티 게시판은 로그인 없이 계속 이용할 수 있습니다.</MudText>
+            <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap" Justify="Justify.Center"><MudButton Href="/login" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login">로그인</MudButton><MudButton Href="/community" Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Forum">익명 커뮤니티 보기</MudButton></MudStack>
+        </MudStack>
+    </MudPaper>
+}
+else
+{
+    <SsalddelWarehouseInventoryWorkspace InboundItemId="@InboundItemId" OnInventorySelected="UpdateInventoryRoute" />
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "inboundItemId")]
+    public long? InboundItemId { get; set; }
+
+    protected override void OnInitialized() => AuthSession.Changed += AuthChanged;
+    private void AuthChanged() => _ = InvokeAsync(StateHasChanged);
+    private Task UpdateInventoryRoute(long? inboundItemId)
+    {
+        var target = inboundItemId is > 0 ? $"{WarehouseManagerRoutes.GeneralInventory}?inboundItemId={inboundItemId.Value}" : WarehouseManagerRoutes.GeneralInventory;
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
+    public void Dispose() => AuthSession.Changed -= AuthChanged;
+}

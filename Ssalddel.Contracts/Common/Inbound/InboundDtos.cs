@@ -45,6 +45,54 @@ public static class 입고상태코드
     public const string 취소 = "입고취소";
 }
 
+public static class 현장입고보관조건
+{
+    public const string 상온 = "상온";
+    public const string 냉장 = "냉장";
+    public const string 냉동 = "냉동";
+    public const string 미지정 = "미지정";
+
+    public static IReadOnlyList<string> 전체 { get; } = [상온, 냉장, 냉동, 미지정];
+
+    public static string Normalize(string? value)
+        => 전체.Contains(value?.Trim() ?? string.Empty, StringComparer.Ordinal)
+            ? value!.Trim()
+            : 미지정;
+}
+
+public static class 현장입고요청안내
+{
+    public const string 현재버전 = "2026-07-20";
+
+    public static IReadOnlyList<string> 문구 { get; } =
+    [
+        "이 요청은 입고 예정이나 계약 연결이 확인되지 않은 현장 반입 사실을 창고 원장에 기록합니다.",
+        "저장만으로 실제 검수, 적재, 보관 책임, 계약, 정산과 재고 생성이 확정되지 않습니다.",
+        "공급처 또는 반입자, 수량, 보관 조건과 현장 반입 사유는 담당자가 다시 확인해야 합니다.",
+        "입고 완료와 재고 생성은 별도의 서버 상태 전이와 검수 기록을 거쳐야 합니다."
+    ];
+
+    public static bool 유효한확인(현장입고요청등록요청? request)
+        => request is not null
+           && request.임시입고안내확인
+           && string.Equals(request.안내버전, 현재버전, StringComparison.Ordinal);
+}
+
+public sealed class 현장입고요청등록요청
+{
+    public Guid 클라이언트요청Id { get; set; }
+    public long 창고Id { get; set; }
+    public string 상품바코드 { get; set; } = string.Empty;
+    public string 입고묶음바코드 { get; set; } = string.Empty;
+    public string 상품명 { get; set; } = string.Empty;
+    public string 공급처명 { get; set; } = string.Empty;
+    public int 입고수량 { get; set; } = 1;
+    public string 보관조건 { get; set; } = 현장입고보관조건.미지정;
+    public string 현장입고사유 { get; set; } = string.Empty;
+    public bool 임시입고안내확인 { get; set; }
+    public string 안내버전 { get; set; } = string.Empty;
+}
+
 public sealed class 입고요청항목응답
 {
     public long Id { get; set; }
@@ -67,6 +115,11 @@ public sealed class 입고요청항목응답
     public string 예정상품명 { get; set; } = string.Empty;
     public string 예정SKU { get; set; } = string.Empty;
     public int? 예정수량 { get; set; }
+    public string 입고묶음바코드 { get; set; } = string.Empty;
+    public string 보관조건 { get; set; } = string.Empty;
+    public string 현장입고사유 { get; set; } = string.Empty;
+    public string 안내버전 { get; set; } = string.Empty;
+    public DateTime CreatedAtUtc { get; set; }
     public string 원주문참조번호 { get; set; } = string.Empty;
     public string 상태 { get; set; } = string.Empty;
     public DateTime? 예정도착일 { get; set; }
@@ -90,6 +143,7 @@ public sealed class 입고요청목록조회요청
     public long? WarehouseId { get; set; }
     public string? Status { get; set; }
     public string? FlowType { get; set; }
+    public string? Sku { get; set; }
 }
 
 public sealed class 입고요청페이지응답

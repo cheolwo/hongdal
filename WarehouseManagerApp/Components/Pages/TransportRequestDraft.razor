@@ -1,0 +1,22 @@
+@page "/warehouse/general/transport-request-draft"
+@inherits MvvmComponentBase<창고운송의뢰초안PageViewModel>
+
+<PageTitle>운송의뢰 로컬 초안</PageTitle>
+<WarehousePageShell Model="@ViewModel" Title="운송의뢰 로컬 초안" Description="검토를 통과한 출고예정의 하차지·희망 일정·차량 조건만 구성합니다." Icon="@Icons.Material.Filled.EditNote" Color="Color.Info">
+    <Actions>@if(ViewModel.기능사용가능&&ViewModel.인증.창고업무접근가능){<MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">@ViewModel.인증.현재사용자표시</MudChip>}</Actions>
+    <ChildContent>
+        @if(!ViewModel.초기화됨||ViewModel.초기화중){<MudPaper Class="pa-6" Elevation="0" Outlined="true"><MudStack AlignItems="AlignItems.Center"><MudProgressCircular Indeterminate="true" /><MudText>운송의뢰 초안 기능과 창고 업무 권한을 확인하고 있습니다.</MudText></MudStack></MudPaper>}
+        else if(!string.IsNullOrWhiteSpace(ViewModel.페이지오류메시지)){<MudAlert Severity="Severity.Error">@ViewModel.페이지오류메시지 <MudButton Variant="Variant.Text" OnClick="RetryAsync">다시 확인</MudButton></MudAlert>}
+        else if(!ViewModel.기능사용가능){<MudAlert Severity="Severity.Info"><MudText Typo="Typo.subtitle1">운송의뢰 초안 기능이 비활성입니다.</MudText><MudText>@ViewModel.기능안내</MudText></MudAlert>}
+        else if(!ViewModel.인증.창고업무접근가능){<WarehouseAuthenticationPanel ViewModel="@ViewModel.인증" OnAuthenticated="AfterAuthAsync" OnLoggedOut="OnLoggedOut" />}
+        else{<SsalddelTransportRequestDraftWorkspace OutboundPlanId="@OutboundPlanId" />}
+    </ChildContent>
+</WarehousePageShell>
+
+@code {
+    [SupplyParameterFromQuery(Name="outboundPlanId")] public long? OutboundPlanId { get; set; }
+    protected override async Task OnInitializedAsync()=>await ViewModel.초기화Async();
+    private Task AfterAuthAsync(){ViewModel.인증후준비();return Task.CompletedTask;}
+    private void OnLoggedOut()=>ViewModel.인증해제적용();
+    private async Task RetryAsync()=>await ViewModel.초기화Async();
+}

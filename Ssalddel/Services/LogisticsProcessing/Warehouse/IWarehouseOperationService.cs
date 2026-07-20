@@ -19,10 +19,19 @@ public interface IWarehouseOperationService
     Task<입고요청페이지응답> QueryInboundsAsync(입고요청목록조회요청 request, CancellationToken cancellationToken);
     Task<입고요청항목응답?> GetInboundAsync(long inboundId, CancellationToken cancellationToken);
     Task<입고요청항목응답> CreateInboundAsync(입고요청저장요청 request, CancellationToken cancellationToken);
+    Task<입고요청항목응답> CreateUnplannedInboundRequestAsync(
+        현장입고요청등록요청 request,
+        CancellationToken cancellationToken);
     Task<입고요청항목응답> UpdateInboundAsync(long inboundId, 입고요청저장요청 request, CancellationToken cancellationToken);
     Task CancelInboundAsync(long inboundId, CancellationToken cancellationToken);
     Task<입고상품목록응답> CompleteInboundAsync(long inboundId, 입고완료요청 request, CancellationToken cancellationToken);
     Task<재고목록응답> GetInventoryAsync(CancellationToken cancellationToken);
+    Task<입고검수대상페이지응답> QueryInboundInspectionTargetsAsync(
+        입고검수대상목록조회요청 request,
+        CancellationToken cancellationToken);
+    Task<입고검수대상상세응답?> GetInboundInspectionTargetAsync(
+        long inboundItemId,
+        CancellationToken cancellationToken);
     Task<창고작업결과응답> InspectInboundItemAsync(long inboundItemId, 입고검수요청 request, CancellationToken cancellationToken);
     Task<창고작업결과응답> PutAwayInventoryItemAsync(long inboundItemId, 적재위치배정요청 request, CancellationToken cancellationToken);
     Task<창고작업결과응답> PackInventoryItemAsync(long inboundItemId, 포장작업요청 request, CancellationToken cancellationToken);

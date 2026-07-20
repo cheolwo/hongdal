@@ -1,49 +1,25 @@
 @page "/warehouse/general/transport-handoff"
-@inherits MvvmComponentBase<일반운송인계PageViewModel>
+@inherits MvvmComponentBase<창고출고인계준비PageViewModel>
+@inject NavigationManager Navigation
 
-<PageTitle>일반 운송 인계</PageTitle>
+<PageTitle>출고 인계 준비</PageTitle>
 
 <WarehousePageShell Model="@ViewModel"
-                    Title="일반 운송 인계"
-                    Description="출고 재고를 선택하고 국내 운송 업무로 인계합니다."
+                    Title="출고 인계 준비"
+                    Description="포장 완료 재고를 확인해 출고예정 원장에 기록하고 운송의뢰 생성은 별도 단계로 유지합니다."
                     Icon="@Icons.Material.Filled.LocalShipping"
                     Color="Color.Success">
-    <Actions>
-        <MudButton Href="@WarehouseManagerRoutes.GeneralInventory"
-                   Variant="Variant.Outlined"
-                   StartIcon="@Icons.Material.Filled.Inventory2">
-            재고 현황
-        </MudButton>
-    </Actions>
+    <Actions>@if(ViewModel.기능사용가능&&ViewModel.인증.창고업무접근가능){<MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">@ViewModel.인증.현재사용자표시</MudChip>}</Actions>
     <ChildContent>
-        @if (!string.IsNullOrWhiteSpace(ViewModel.재고조회.오류메시지))
-        {
-            <MudAlert Severity="Severity.Error">@ViewModel.재고조회.오류메시지</MudAlert>
-        }
-
-        <WarehouseTransportHandoffPanel Inventory="@ViewModel.재고조회"
-                                        Handoff="@ViewModel.운송인계"
-                                        OnCompleted="ReloadAsync" />
+        @if(!ViewModel.초기화됨||ViewModel.초기화중){<MudPaper Class="pa-6" Elevation="0" Outlined="true"><MudStack AlignItems="AlignItems.Center"><MudProgressCircular Indeterminate="true" /><MudText>출고 인계 기능과 창고 업무 권한을 확인하고 있습니다.</MudText></MudStack></MudPaper>}
+        else if(!string.IsNullOrWhiteSpace(ViewModel.페이지오류메시지)){<MudAlert Severity="Severity.Error">@ViewModel.페이지오류메시지 <MudButton Variant="Variant.Text" OnClick="RetryAsync">다시 확인</MudButton></MudAlert>}
+        else if(!ViewModel.기능사용가능){<MudAlert Severity="Severity.Info"><MudText Typo="Typo.subtitle1">출고 인계 준비 기능이 비활성입니다.</MudText><MudText>@ViewModel.기능안내</MudText><MudText Typo="Typo.caption">0.0 공개 커뮤니티에는 영향이 없습니다.</MudText></MudAlert>}
+        else if(!ViewModel.인증.창고업무접근가능){<WarehouseAuthenticationPanel ViewModel="@ViewModel.인증" OnAuthenticated="AfterAuthAsync" OnLoggedOut="OnLoggedOut" />}
+        else{<SsalddelOutboundHandoffWorkspace InboundItemId="@InboundItemId" OnTaskSelected="UpdateRoute" />}
     </ChildContent>
 </WarehousePageShell>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        EnsureProfile();
-        await ViewModel.초기화Async();
-    }
-
-    private Task ReloadAsync() => ViewModel.초기화Async();
-
-    private void EnsureProfile()
-    {
-        if (!string.Equals(
-                ViewModel.세션.운영ProfileCode,
-                창고운영ProfileCodes.일반입출고,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            ViewModel.세션.운영Profile설정(창고운영ProfileCodes.일반입출고);
-        }
-    }
+    [SupplyParameterFromQuery(Name="inboundItemId")]public long? InboundItemId{get;set;}
+    protected override async Task OnInitializedAsync()=>await ViewModel.초기화Async(); private Task AfterAuthAsync(){ViewModel.인증후준비();return Task.CompletedTask;}private void OnLoggedOut()=>ViewModel.인증해제적용();private async Task RetryAsync()=>await ViewModel.초기화Async();private Task UpdateRoute(long? id){Navigation.NavigateTo(id is>0?$"{WarehouseManagerRoutes.GeneralTransportHandoff}?inboundItemId={id}":WarehouseManagerRoutes.GeneralTransportHandoff,replace:true);return Task.CompletedTask;}
 }

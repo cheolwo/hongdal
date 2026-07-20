@@ -1,0 +1,440 @@
+@using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<입고상품수령PageViewModel>
+
+<MudStack Spacing="3" Class="inbound-receiving-workspace">
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Policy">
+        <MudText Typo="Typo.subtitle2">이 페이지가 저장하는 범위</MudText>
+        <ul class="inbound-boundary-list">
+            @foreach (var notice in 현장입고요청안내.문구)
+            {
+                <li>@notice</li>
+            }
+        </ul>
+    </MudAlert>
+
+    @if (!ViewModel.초기화됨 || ViewModel.창고.처리중)
+    {
+        <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                <MudText Typo="Typo.body2" Color="Color.Secondary">접근 가능한 창고를 서버에서 확인하고 있습니다.</MudText>
+            </MudStack>
+        </MudPaper>
+    }
+    else if (ViewModel.창고.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText>@ViewModel.창고.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="RetryWarehousesAsync">
+                    다시 조회
+                </MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (ViewModel.창고.비어있음)
+    {
+        <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.Warehouse" Size="Size.Large" Color="Color.Secondary" />
+                <MudText Typo="Typo.h6">조회 가능한 창고가 없습니다.</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                    서버의 창고 배정과 HR 세부 역할을 확인한 뒤 다시 조회해 주세요.
+                </MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Disabled="@ViewModel.처리중" OnClick="RetryWarehousesAsync">
+                    창고 다시 조회
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+    else
+    {
+        <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+            <MudStack Spacing="3">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">1. 창고와 상품 바코드 확인</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            선택한 창고에서 상품 바코드와 정확히 일치하는 입고예정 원장만 조회합니다.
+                        </MudText>
+                    </MudStack>
+                    @if (!string.IsNullOrWhiteSpace(ExpectedInboundPath))
+                    {
+                        <MudButton Href="@ExpectedInboundPath" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EventAvailable">
+                            업체별 입고예정
+                        </MudButton>
+                    }
+                </MudStack>
+
+                <MudGrid>
+                    <MudItem xs="12" md="5">
+                        <MudSelect T="long?"
+                                   Label="작업 창고"
+                                   Value="@ViewModel.창고.선택된창고Id"
+                                   ValueChanged="WarehouseChangedAsync"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Disabled="@ViewModel.처리중">
+                            @foreach (var warehouse in ViewModel.창고.항목목록)
+                            {
+                                <MudSelectItem T="long?" Value="@((long?)warehouse.Id)">
+                                    @warehouse.창고명@(warehouse.기본창고여부 ? " · 기본" : string.Empty)
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="7">
+                        <MudTextField T="string"
+                                      Label="상품 바코드"
+                                      Value="@ViewModel.검색.상품바코드"
+                                      ValueChanged="ProductBarcodeChangedAsync"
+                                      Variant="Variant.Outlined"
+                                      Immediate="true"
+                                      MaxLength="100"
+                                      Placeholder="상품 또는 SKU 바코드를 입력하세요"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                                      OnKeyDown="OnSearchKeyDownAsync" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               Disabled="@(!ViewModel.창고.선택됨 || !ViewModel.검색.검색가능)"
+                               OnClick="SearchAsync">
+                        입고예정 조회
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Secondary"
+                               StartIcon="@Icons.Material.Filled.Backspace"
+                               Disabled="@ViewModel.처리중"
+                               OnClick="ClearSearchAsync">
+                        다시 입력
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        @if (ViewModel.검색.오류발생)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.검색.오류메시지</MudAlert>
+        }
+
+        @if (ViewModel.검색.후보목록.Count > 0)
+        {
+            <MudPaper Class="pa-4" Elevation="0" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudText Typo="Typo.h6">2. 일치한 입고예정 선택</MudText>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                            @ViewModel.검색.후보목록.Count 건
+                        </MudChip>
+                    </MudStack>
+
+                    @foreach (var item in ViewModel.검색.후보목록)
+                    {
+                        <MudPaper Class="pa-3 inbound-candidate" Elevation="0" Outlined="true">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.subtitle1">@Display(item.예정상품명)</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        @item.예정SKU · 예정 @(item.예정수량?.ToString() ?? "-")개 · @Display(item.공급처명)
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">입고 ID @item.Id · @item.상태</MudText>
+                                </MudStack>
+                                <MudButton Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           Disabled="@ViewModel.처리중"
+                                           OnClick="@(() => SelectInboundAsync(item.Id))">
+                                    이 입고예정 확인
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+            </MudPaper>
+        }
+        else if (ViewModel.검색.결과없음 && !ViewModel.작성.폼표시)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.subtitle1">정확히 일치하는 입고예정이 없습니다.</MudText>
+                    <MudText Typo="Typo.body2">
+                        바코드를 다시 확인하거나, 이미 현장에 반입된 경우에만 계약 연결 전 현장 입고 요청을 작성해 주세요.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Warning"
+                               StartIcon="@Icons.Material.Filled.AddBusiness"
+                               Disabled="@ViewModel.처리중"
+                               OnClick="StartUnplannedInbound">
+                        현장 입고 요청 작성
+                    </MudButton>
+                </MudStack>
+            </MudAlert>
+        }
+
+        @if (ViewModel.작성.폼표시)
+        {
+            <MudPaper Class="pa-4 inbound-unplanned-form" Elevation="0" Outlined="true">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">3. 계약 연결 전 현장 입고 요청</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                저장 결과는 입고예정 원장 한 건이며, 재고나 입고완료 상태를 만들지 않습니다.
+                            </MudText>
+                        </MudStack>
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">입고예정 요청</MudChip>
+                    </MudStack>
+
+                    <MudGrid>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" Label="상품 바코드" Value="@ViewModel.작성.상품바코드" ValueChanged="SetUnplannedProductBarcode" Immediate="true" MaxLength="100" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" Label="입고 묶음 바코드" Value="@ViewModel.작성.입고묶음바코드" ValueChanged="SetBundleBarcode" Immediate="true" MaxLength="100" Variant="Variant.Outlined" Required="true" Placeholder="BND:IN-001" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" Label="상품명" Value="@ViewModel.작성.상품명" ValueChanged="SetProductName" Immediate="true" MaxLength="200" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" Label="공급처 또는 반입자" Value="@ViewModel.작성.공급처명" ValueChanged="SetSupplierName" Immediate="true" MaxLength="200" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudNumericField T="int" Label="반입 수량" Value="@ViewModel.작성.입고수량" ValueChanged="SetQuantity" Min="1" Max="100000" Variant="Variant.Outlined" Required="true" />
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudSelect T="string" Label="보관 조건" Value="@ViewModel.작성.보관조건" ValueChanged="SetStorageCondition" Variant="Variant.Outlined">
+                                @foreach (var option in ViewModel.작성.보관조건목록)
+                                {
+                                    <MudSelectItem T="string" Value="@option">@option</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField T="string" Label="현장 반입 사유" Value="@ViewModel.작성.현장입고사유" ValueChanged="SetUnplannedReason" Immediate="true" MaxLength="1000" Variant="Variant.Outlined" Lines="3" Required="true" />
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                        <MudStack Spacing="1">
+                            @foreach (var notice in 현장입고요청안내.문구)
+                            {
+                                <MudText Typo="Typo.body2">• @notice</MudText>
+                            }
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">안내 버전 @현장입고요청안내.현재버전</MudText>
+                        </MudStack>
+                    </MudAlert>
+
+                    <MudCheckBox T="bool"
+                                 Value="@ViewModel.작성.임시입고안내확인"
+                                 ValueChanged="SetNoticeAccepted"
+                                 Color="Color.Warning"
+                                 Label="위 안내를 확인했으며, 이 저장만으로 검수·재고·보관 책임·계약·정산이 확정되지 않음을 이해했습니다." />
+
+                    @if (ViewModel.작성.오류발생)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.작성.오류메시지</MudAlert>
+                    }
+
+                    <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Warning"
+                                   StartIcon="@Icons.Material.Filled.Save"
+                                   Disabled="@(!ViewModel.작성.제출가능)"
+                                   OnClick="SaveUnplannedInboundAsync">
+                            입고예정 요청 저장
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Default" Disabled="@ViewModel.처리중" OnClick="CancelUnplannedInbound">
+                            취소
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        }
+
+        @if (ViewModel.상세.오류발생)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.상세.오류메시지</MudAlert>
+        }
+        else if (ViewModel.상세.대상없음)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">선택한 입고예정 원장을 다시 찾지 못했습니다.</MudAlert>
+        }
+        else if (ViewModel.상세.항목 is { } selected)
+        {
+            <MudPaper Class="pa-4 inbound-persisted-detail" Elevation="0" Outlined="true">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">서버에 저장된 입고예정</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">등록 또는 선택 뒤 같은 입고 ID로 다시 조회한 결과입니다.</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">ID @selected.Id</MudChip>
+                            <MudChip T="string" Color="@StatusColor(selected.상태)" Variant="Variant.Filled">@selected.상태</MudChip>
+                        </MudStack>
+                    </MudStack>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="상품명" Value="@Display(selected.예정상품명)" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="상품 바코드" Value="@Display(selected.예정SKU)" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="예정 수량" Value="@(selected.예정수량?.ToString() ?? "-")" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="공급처·반입자" Value="@Display(selected.공급처명)" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="보관 조건" Value="@Display(selected.보관조건)" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="입고 묶음 바코드" Value="@Display(selected.입고묶음바코드)" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="입고 흐름" Value="@Display(selected.입고흐름유형)" /></MudItem>
+                        <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="저장 시각" Value="@FormatCreatedAt(selected.CreatedAtUtc)" /></MudItem>
+                        <MudItem xs="12"><SsalddelSensitiveInfoRow Label="현장 반입 사유" Value="@Display(selected.현장입고사유)" /></MudItem>
+                    </MudGrid>
+
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                        현재 상태는 <strong>@selected.상태</strong>입니다. 이 페이지에서는 재고 생성, 검수 완료, 적재 위치 확정, 계약 연결이나 정산을 수행하지 않습니다.
+                    </MudAlert>
+
+                    @if (WorkBoardHref is { } workBoardHref)
+                    {
+                        <MudButton Href="@workBoardHref" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChevronRight">
+                            후속 작업 보드에서 확인
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudPaper>
+        }
+    }
+</MudStack>
+
+@code {
+    [Parameter] public long? InitialWarehouseId { get; set; }
+    [Parameter] public long? InboundId { get; set; }
+    [Parameter] public string? ExpectedInboundPath { get; set; }
+    [Parameter] public string? WorkBoardPath { get; set; }
+    [Parameter] public EventCallback<long?> OnInboundSelected { get; set; }
+
+    private bool _initialized;
+    private long? _loadedInboundId;
+
+    private string? WorkBoardHref
+        => ViewModel.상세.항목 is { Id: > 0 } item && !string.IsNullOrWhiteSpace(WorkBoardPath)
+            ? $"{WorkBoardPath}?inboundId={item.Id}"
+            : null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!_initialized)
+        {
+            _initialized = true;
+            _loadedInboundId = InboundId is > 0 ? InboundId : null;
+            await ViewModel.초기화Async(InitialWarehouseId, _loadedInboundId);
+            return;
+        }
+
+        var normalizedInboundId = InboundId is > 0 ? InboundId : null;
+        if (normalizedInboundId != _loadedInboundId)
+        {
+            _loadedInboundId = normalizedInboundId;
+            if (normalizedInboundId.HasValue)
+            {
+                await ViewModel.입고선택Async(normalizedInboundId.Value);
+            }
+            else
+            {
+                ViewModel.입고선택해제();
+            }
+        }
+    }
+
+    private async Task RetryWarehousesAsync()
+        => await ViewModel.초기화Async(InitialWarehouseId, _loadedInboundId);
+
+    private async Task WarehouseChangedAsync(long? warehouseId)
+    {
+        if (!ViewModel.창고선택(warehouseId))
+        {
+            return;
+        }
+
+        _loadedInboundId = null;
+        await OnInboundSelected.InvokeAsync(null);
+    }
+
+    private async Task ProductBarcodeChangedAsync(string value)
+    {
+        var hadSelection = ViewModel.상세.항목 is not null;
+        ViewModel.상품바코드변경(value);
+        if (hadSelection)
+        {
+            _loadedInboundId = null;
+            await OnInboundSelected.InvokeAsync(null);
+        }
+    }
+
+    private async Task OnSearchKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "NumpadEnter")
+        {
+            await SearchAsync();
+        }
+    }
+
+    private async Task SearchAsync()
+        => await ViewModel.검색Async();
+
+    private async Task ClearSearchAsync()
+    {
+        ViewModel.상품바코드변경(string.Empty);
+        _loadedInboundId = null;
+        await OnInboundSelected.InvokeAsync(null);
+    }
+
+    private void StartUnplannedInbound()
+        => ViewModel.현장입고작성시작();
+
+    private void CancelUnplannedInbound()
+        => ViewModel.작성.닫기();
+
+    private async Task SaveUnplannedInboundAsync()
+    {
+        if (!await ViewModel.현장입고등록후조회Async() || ViewModel.상세.항목 is not { } item)
+        {
+            return;
+        }
+
+        _loadedInboundId = item.Id;
+        await OnInboundSelected.InvokeAsync(item.Id);
+    }
+
+    private async Task SelectInboundAsync(long inboundId)
+    {
+        if (!await ViewModel.입고선택Async(inboundId))
+        {
+            return;
+        }
+
+        _loadedInboundId = inboundId;
+        await OnInboundSelected.InvokeAsync(inboundId);
+    }
+
+    private void SetUnplannedProductBarcode(string value) => ViewModel.작성.상품바코드 = value ?? string.Empty;
+    private void SetBundleBarcode(string value) => ViewModel.작성.입고묶음바코드 = value ?? string.Empty;
+    private void SetProductName(string value) => ViewModel.작성.상품명 = value ?? string.Empty;
+    private void SetSupplierName(string value) => ViewModel.작성.공급처명 = value ?? string.Empty;
+    private void SetQuantity(int value) => ViewModel.작성.입고수량 = value;
+    private void SetStorageCondition(string value) => ViewModel.작성.보관조건 = value ?? 현장입고보관조건.미지정;
+    private void SetUnplannedReason(string value) => ViewModel.작성.현장입고사유 = value ?? string.Empty;
+    private void SetNoticeAccepted(bool value) => ViewModel.작성.임시입고안내확인 = value;
+
+    private static string Display(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private static string FormatCreatedAt(DateTime value)
+        => value == default ? "-" : $"{value.ToLocalTime():yyyy-MM-dd HH:mm} (기기 시각)";
+
+    private static Color StatusColor(string? status)
+        => string.Equals(status, 입고상태코드.예정, StringComparison.Ordinal)
+            ? Color.Info
+            : Color.Default;
+}
