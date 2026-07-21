@@ -31,6 +31,10 @@ public sealed class OperatingMarketServiceModuleTests
         Assert.DoesNotContain(
             services,
             descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopeService));
+        Assert.Contains(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IOperatingMarketDeliveryScopeService)
+                          && descriptor.ImplementationType == typeof(KoreaDeliveryScopeService));
         AssertDirectoryService<UnavailableThirdPartyLogisticsProviderDirectoryService>(services);
         AssertOutreachService<
             UnavailableThirdPartyLogisticsProviderOutreachPreparationService>(services);
@@ -58,6 +62,10 @@ public sealed class OperatingMarketServiceModuleTests
         Assert.Contains(
             services,
             descriptor => descriptor.ServiceType == typeof(IUnitedStatesDeliveryScopeService));
+        Assert.Contains(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IOperatingMarketDeliveryScopeService)
+                          && descriptor.ImplementationType == typeof(UnitedStatesDeliveryScopeService));
         AssertDirectoryService<UnitedStatesThirdPartyLogisticsProviderDirectoryService>(services);
         AssertOutreachService<
             UnitedStatesThirdPartyLogisticsProviderOutreachPreparationService>(services);

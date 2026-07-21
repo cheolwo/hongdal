@@ -1,0 +1,257 @@
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Contracts.Common.PublicData
+@inject IGroupPurchaseShipmentTrackingService ShipmentTrackingService
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h5">@Product.상품명 공동 주문 집단</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    상품 기준과 예상 원가는 정보용으로 분리해 보여 주며, 수요 등록은 아래 모집권 흐름에서 직접 확인합니다.
+                </MudText>
+            </MudStack>
+            <MudChip T="string" Color="@GroupPurchasePresentation.PriorityColor(ProductPlan.활성화우선순위)" Variant="Variant.Filled">
+                @GroupPurchasePresentation.PriorityLabel(ProductPlan.활성화우선순위)
+            </MudChip>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">HS 코드</MudText>
+                    <MudText Typo="Typo.h6">@Product.HS코드</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">예상 물류</MudText>
+                    <MudText Typo="Typo.h6">@Product.예상물류방식</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">예상 단가</MudText>
+                    <MudText Typo="Typo.h6">@GroupPurchasePresentation.Money(Product.ExpectedUnitPrice)</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">HS 수입 단가 참고 신호</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            HS 코드·국가·월별 통관 통계를 시장 참고값으로만 사용합니다.
+                        </MudText>
+                    </MudStack>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.QueryStats"
+                               Disabled="@_isMarketSignalLoading"
+                               OnClick="LoadMarketSignalAsync">
+                        새로고침
+                    </MudButton>
+                </MudStack>
+
+                @if (_isMarketSignalLoading)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                }
+                else if (_marketSignal is { Success: true })
+                {
+                    <MudGrid>
+                        <MudItem xs="12" sm="3">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">평균 수입단가</MudText>
+                            <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.UsdPerKg(_marketSignal.AverageImportUnitValueUsdPerKg)</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="3">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">원화 환산</MudText>
+                            <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.KrwPerKg(_marketSignal.AverageImportUnitValueKrwPerKg)</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="3">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">예상 도착단가</MudText>
+                            <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.KrwPerKg(_marketSignal.ExpectedLandedCostKrwPerKg)</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="3">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">참고 신호</MudText>
+                            <MudChip T="string" Size="Size.Small" Color="@GroupPurchasePresentation.MarketSignalColor(_marketSignal.PriceSignalCode)">
+                                @_marketSignal.PriceSignalCode
+                            </MudChip>
+                        </MudItem>
+                    </MudGrid>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@_marketSignal.Summary</MudText>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                        @(_marketSignal?.Summary ?? "아직 불러온 통관 수입 단가 참고 신호가 없습니다.")
+                    </MudAlert>
+                }
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.subtitle2">수입 도착원가 경로</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            해외 판매자 지급부터 국내 3PL 입고까지의 예상 비용을 단계별로 분리합니다.
+                        </MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                        @GroupPurchasePresentation.KrwPerKg(LandedCostPlan.예상도착단가Krw)
+                    </MudChip>
+                </MudStack>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">예상 CIF</MudText>
+                        <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.KrwPerKg(LandedCostPlan.예상Cif단가Krw)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">세후 단가</MudText>
+                        <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.KrwPerKg(LandedCostPlan.예상세후단가Krw)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">3PL 입고 총액</MudText>
+                        <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.KrwTotal(LandedCostPlan.예상도착총액Krw)</MudText>
+                    </MudItem>
+                </MudGrid>
+
+                <MudStack Spacing="1">
+                    @foreach (var stage in LandedCostPlan.단계목록)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-2">
+                            <MudStack Spacing="1">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.body2">@(stage.순서). @stage.표시명</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@stage.설명</MudText>
+                                    </MudStack>
+                                    <MudStack Spacing="0" AlignItems="AlignItems.End">
+                                        <MudText Typo="Typo.body2">@GroupPurchasePresentation.KrwPerKg(stage.단가Krw)</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">누적 @GroupPurchasePresentation.KrwPerKg(stage.Accumulated단가Krw)</MudText>
+                                    </MudStack>
+                                </MudStack>
+                                <MudProgressLinear Color="@GroupPurchasePresentation.CostStageColor(stage.상태코드)"
+                                                   Value="@CostStagePercent(stage)"
+                                                   Rounded="true" />
+                            </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+
+                @foreach (var warning in LandedCostPlan.경고목록)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@warning</MudAlert>
+                }
+            </MudStack>
+        </MudPaper>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private const string MarketSignalCountryCode = "CN";
+    private const decimal MarketSignalFxRateKrwPerUsd = 1350m;
+    private const decimal MarketSignalDomesticLogisticsCostKrwPerKg = 1000m;
+    private const decimal ImportOverseasHandlingUnitCostKrw = 500m;
+    private const decimal ImportInternationalFreightInsuranceUnitCostKrw = 1000m;
+    private const decimal ImportCustomsDutyRate = 0.08m;
+    private const decimal ImportVatRate = 0.1m;
+    private const decimal ImportBondedWarehouseUnitCostKrw = 200m;
+    private const decimal ImportCustomsBrokerageUnitCostKrw = 100m;
+    private const decimal ImportDomesticTransportTo3plUnitCostKrw = 300m;
+    private const decimal ImportThreePlInboundUnitCostKrw = 400m;
+
+    private string? _loadedProductId;
+    private HsCountryImportUnitPriceSimulationResult? _marketSignal;
+    private bool _isMarketSignalLoading;
+
+    [Parameter, EditorRequired]
+    public HS먹거리공동구매상품카드 Product { get; set; } = default!;
+
+    [Parameter]
+    public decimal QuantityKg { get; set; }
+
+    private string MarketSignalMonth => DateTime.UtcNow.AddMonths(-2).ToString("yyyyMM");
+
+    private 냉장냉동먹거리공동구매계획 ProductPlan
+        => 냉장냉동먹거리공동구매계획기.계획(new 냉장냉동먹거리공동구매초안(
+            상품명: Product.상품명,
+            주문자집단배송권키: "unselected-delivery-scope",
+            TargetQuantityKg: Product.SuggestedTargetQuantityKg,
+            CurrentIntentQuantityKg: 0m,
+            TargetUnitPrice: Product.ExpectedUnitPrice,
+            HS코드: Product.HS코드,
+            온도코드: Product.온도코드,
+            LogisticsMode: Product.예상물류방식,
+            RequiresImportFoodReview: Product.RequiresImportFoodReview,
+            RequiresMfdsManufacturerReview: Product.RequiresMfdsManufacturerReview,
+            RequiresColdStorage: Product.온도코드 is 공동구매온도코드.냉동 or 공동구매온도코드.냉장));
+
+    private 수입도착원가계획 LandedCostPlan
+        => 공동구매수입도착원가계획기.계획(new 수입도착원가초안(
+            수량Kg: QuantityKg,
+            상품매입단가Krw: Product.ExpectedUnitPrice,
+            해외처리단가Krw: ImportOverseasHandlingUnitCostKrw,
+            국제운임보험단가Krw: ImportInternationalFreightInsuranceUnitCostKrw,
+            관세율: ImportCustomsDutyRate,
+            수입부가세율: ImportVatRate,
+            보세창고단가Krw: ImportBondedWarehouseUnitCostKrw,
+            관세사수수료단가Krw: ImportCustomsBrokerageUnitCostKrw,
+            국내3PL운송단가Krw: ImportDomesticTransportTo3plUnitCostKrw,
+            물류대행입고단가Krw: ImportThreePlInboundUnitCostKrw,
+            통관검토필요: true));
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.Equals(_loadedProductId, Product.상품카드Id, StringComparison.Ordinal))
+        {
+            _loadedProductId = Product.상품카드Id;
+            _marketSignal = null;
+            await LoadMarketSignalAsync();
+        }
+    }
+
+    private async Task LoadMarketSignalAsync()
+    {
+        _isMarketSignalLoading = true;
+
+        try
+        {
+            _marketSignal = await ShipmentTrackingService.SimulateImportUnitPriceAsync(
+                new HsCountryMonthlyTradeUnitPriceRequest
+                {
+                    HsCode = Product.HS코드,
+                    CountryCode = MarketSignalCountryCode,
+                    Month = MarketSignalMonth,
+                    LookbackMonths = 3,
+                    ExpectedFxRateKrwPerUsd = MarketSignalFxRateKrwPerUsd,
+                    ExpectedPurchaseUnitPriceKrwPerKg = Product.ExpectedUnitPrice,
+                    ExpectedDomesticLogisticsCostKrwPerKg = MarketSignalDomesticLogisticsCostKrwPerKg,
+                    ExpectedSellingUnitPriceKrwPerKg = Product.ExpectedUnitPrice * 1.35m,
+                    ParticipantQuantityKg = QuantityKg
+                });
+        }
+        finally
+        {
+            _isMarketSignalLoading = false;
+        }
+    }
+
+    private double CostStagePercent(수입도착원가단계 stage)
+    {
+        if (LandedCostPlan.예상도착단가Krw <= 0)
+        {
+            return 0;
+        }
+
+        return decimal.ToDouble(decimal.Round(
+            stage.Accumulated단가Krw / LandedCostPlan.예상도착단가Krw * 100m,
+            2));
+    }
+}

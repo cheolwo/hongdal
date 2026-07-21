@@ -1,0 +1,31 @@
+<MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h6">1차 수직 흐름</MudText>
+        <MudList T="string" Dense="true">
+            <MudListItem Icon="@Icons.Material.Filled.Inventory2">상품 카드 선택</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Map">국가별 주소를 표준 모집권 후보로 변환</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.GroupAdd">사용자가 모집권 직접 선택·확인</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.ShoppingCart">로그인 사용자의 비구속 수요 등록</MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.AcUnit">같은 상품·모집권 자동집단 재조회</MudListItem>
+        </MudList>
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+            이 1차 흐름은 수요 원장까지만 저장합니다. 결제, 재고 차감, 배차, 배송 확정은 실행하지 않습니다.
+        </MudAlert>
+
+        <MudDivider />
+
+        <MudText Typo="Typo.subtitle2">운영 검토 항목</MudText>
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            @foreach (var step in RequiredAdminReviewSteps)
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">@step</MudChip>
+            }
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<string> RequiredAdminReviewSteps { get; set; } = [];
+}

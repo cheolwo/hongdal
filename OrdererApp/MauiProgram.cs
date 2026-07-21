@@ -22,13 +22,14 @@ public static class MauiProgram
         builder.Services.AddTransient<주문자Controller기능모음ViewModel>();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();
         builder.Services.AddTransient<주문자공동구매기능ViewModel>();
+        builder.Services.AddTransient<GroupPurchaseIntentPageViewModel>();
         builder.Services.AddTransient<주문자Api기능모음ViewModel>();
         builder.Services.AddSsalddelApiHttpClient(
             SsalddelApiEndpoint.ResolveBaseAddress(
                 builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
                 new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)),
             ServiceLifetime.Singleton);
-        builder.Services.AddSingleton<IGroupPurchaseShipmentTrackingService, HttpGroupPurchaseShipmentTrackingService>();
+        builder.Services.AddScoped<IGroupPurchaseShipmentTrackingService, HttpGroupPurchaseShipmentTrackingService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

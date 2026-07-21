@@ -202,7 +202,9 @@ public sealed class UnitedStatesDeliveryScopePlanner : IUnitedStatesDeliveryScop
         };
 }
 
-public sealed class UnitedStatesDeliveryScopeService : IUnitedStatesDeliveryScopeService
+public sealed class UnitedStatesDeliveryScopeService :
+    IUnitedStatesDeliveryScopeService,
+    IOperatingMarketDeliveryScopeService
 {
     private readonly IOperatingMarketAddressLookupService _addressLookupService;
     private readonly IUnitedStatesDeliveryScopePlanner _scopePlanner;
@@ -240,6 +242,22 @@ public sealed class UnitedStatesDeliveryScopeService : IUnitedStatesDeliveryScop
         return candidate is null
             ? Failure("No Census address match was found for delivery-scope planning.")
             : _scopePlanner.Build(candidate, participantCount);
+    }
+
+    public Task<OperatingMarketDeliveryScopePlan> ResolveAsync(
+        OperatingMarketDeliveryScopeResolveRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (!string.IsNullOrWhiteSpace(request.MarketCode) &&
+            (!OperatingMarketCodes.TryNormalize(request.MarketCode, out var marketCode) ||
+             marketCode != OperatingMarketCodes.UnitedStates))
+        {
+            return Task.FromResult(Failure(
+                "A United States operating-market request is required."));
+        }
+
+        return ResolveAsync(request.Address, request.ParticipantCount, cancellationToken);
     }
 
     private static OperatingMarketDeliveryScopePlan Failure(string message)

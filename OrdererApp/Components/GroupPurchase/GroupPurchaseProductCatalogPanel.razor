@@ -1,0 +1,76 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h6">HS 먹거리 상품 카드</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                먼저 먹거리 수요가 모이기 쉬운 상품부터 공동주문 후보로 노출합니다.
+            </MudText>
+        </MudStack>
+
+        @foreach (var product in Products)
+        {
+            var plan = PlanProduct(product);
+            <MudPaper Elevation="0" Outlined="true" Class="@ProductCardClass(product)">
+                <MudStack Spacing="2">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.subtitle1">@product.상품명</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">HS @product.HS코드 · @product.HS표시명</MudText>
+                        </MudStack>
+                        <MudChip T="string" Size="Size.Small" Color="@GroupPurchasePresentation.PriorityColor(plan.활성화우선순위)">
+                            @GroupPurchasePresentation.PriorityLabel(plan.활성화우선순위)
+                        </MudChip>
+                    </MudStack>
+
+                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@GroupPurchasePresentation.TemperatureLabel(product.온도코드)</MudChip>
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@product.예상물류방식</MudChip>
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{product.SuggestedTargetQuantityKg:N0}kg 목표")</MudChip>
+                    </MudStack>
+
+                    <MudText Typo="Typo.body2">@plan.요약</MudText>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Groups"
+                               OnClick="@(() => ProductSelected.InvokeAsync(product.상품카드Id))">
+                        이 상품으로 집단 개설 신청
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<HS먹거리공동구매상품카드> Products { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public string SelectedProductId { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ProductSelected { get; set; }
+
+    private 냉장냉동먹거리공동구매계획 PlanProduct(HS먹거리공동구매상품카드 product)
+        => 냉장냉동먹거리공동구매계획기.계획(new 냉장냉동먹거리공동구매초안(
+            상품명: product.상품명,
+            주문자집단배송권키: "unselected-delivery-scope",
+            TargetQuantityKg: product.SuggestedTargetQuantityKg,
+            CurrentIntentQuantityKg: 0m,
+            TargetUnitPrice: product.ExpectedUnitPrice,
+            HS코드: product.HS코드,
+            온도코드: product.온도코드,
+            LogisticsMode: product.예상물류방식,
+            RequiresImportFoodReview: product.RequiresImportFoodReview,
+            RequiresMfdsManufacturerReview: product.RequiresMfdsManufacturerReview,
+            RequiresColdStorage: product.온도코드 is 공동구매온도코드.냉동 or 공동구매온도코드.냉장));
+
+    private string ProductCardClass(HS먹거리공동구매상품카드 product)
+        => product.상품카드Id == SelectedProductId
+            ? "pa-3 product-card product-card--selected"
+            : "pa-3 product-card";
+}

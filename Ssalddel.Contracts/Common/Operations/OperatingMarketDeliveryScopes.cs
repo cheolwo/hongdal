@@ -2,6 +2,9 @@ namespace Ssalddel.Contracts.Common.Operations;
 
 public static class OperatingGeographicAreaTypeCodes
 {
+    public const string AdministrativeLevel1 = "AdministrativeLevel1";
+    public const string AdministrativeLevel2 = "AdministrativeLevel2";
+    public const string AdministrativeLevel3 = "AdministrativeLevel3";
     public const string State = "State";
     public const string County = "County";
     public const string IncorporatedPlace = "IncorporatedPlace";
@@ -11,10 +14,25 @@ public static class OperatingGeographicAreaTypeCodes
 
 public static class OperatingDeliveryScopeTypeCodes
 {
+    public const string AdministrativeLevel2Recruitment = "AdministrativeLevel2Recruitment";
+    public const string AdministrativeLevel3Delivery = "AdministrativeLevel3Delivery";
     public const string StateDiscovery = "StateDiscovery";
     public const string CountyRecruitment = "CountyRecruitment";
     public const string PlaceRecruitment = "PlaceRecruitment";
     public const string ZctaRecruitment = "ZctaRecruitment";
+}
+
+public sealed class OperatingMarketDeliveryScopeResolveRequest
+{
+    public string? MarketCode { get; init; }
+
+    public string Address { get; init; } = string.Empty;
+
+    public decimal? Latitude { get; init; }
+
+    public decimal? Longitude { get; init; }
+
+    public int? ParticipantCount { get; init; }
 }
 
 public static class OperatingDeliveryBoundaryPolicyCodes

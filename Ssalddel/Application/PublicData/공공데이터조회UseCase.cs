@@ -1,6 +1,8 @@
 using FluentResults;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.PublicData;
+using Ssalddel.Contracts.Common.Operations;
+using Ssalddel.Services.Operations;
 using Microsoft.AspNetCore.Http;
 using 살뜰.Services.External.PublicData;
 using 살뜰.Services.Versioning;
@@ -17,6 +19,10 @@ public interface I공공데이터조회UseCase
 
     Result<PublicDataLookupResponse<주문자집단배송권후보항목>> 주문자집단배송권검색(
         주문자집단배송권조회요청 request);
+
+    Task<Result<OperatingMarketDeliveryScopePlan>> 공동주문배송권해결Async(
+        OperatingMarketDeliveryScopeResolveRequest request,
+        CancellationToken cancellationToken);
 
     Task<Result<PublicDataLookupResponse<ApartmentComplexItem>>> 공동주택단지검색Async(
         ApartmentComplexSearchRequest request,
@@ -50,6 +56,7 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
     private readonly IApartmentComplexLookupService _apartmentComplexLookupService;
     private readonly IApartmentManagementFeeLookupService _apartmentManagementFeeLookupService;
     private readonly I주문자집단배송권조회Service _ordererGroupScopeLookupService;
+    private readonly IOperatingMarketDeliveryScopeService _operatingMarketDeliveryScopeService;
     private readonly IHsCountryTradeUnitPriceLookupService _hsCountryTradeUnitPriceLookupService;
 
     public 공공데이터조회UseCase(
@@ -57,12 +64,14 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
         IApartmentComplexLookupService apartmentComplexLookupService,
         IApartmentManagementFeeLookupService apartmentManagementFeeLookupService,
         I주문자집단배송권조회Service ordererGroupScopeLookupService,
+        IOperatingMarketDeliveryScopeService operatingMarketDeliveryScopeService,
         IHsCountryTradeUnitPriceLookupService hsCountryTradeUnitPriceLookupService)
     {
         _roadAddressLookupService = roadAddressLookupService;
         _apartmentComplexLookupService = apartmentComplexLookupService;
         _apartmentManagementFeeLookupService = apartmentManagementFeeLookupService;
         _ordererGroupScopeLookupService = ordererGroupScopeLookupService;
+        _operatingMarketDeliveryScopeService = operatingMarketDeliveryScopeService;
         _hsCountryTradeUnitPriceLookupService = hsCountryTradeUnitPriceLookupService;
     }
 
@@ -86,6 +95,16 @@ public sealed class 공공데이터조회UseCase : I공공데이터조회UseCase
         주문자집단배송권조회요청 request)
     {
         return Result.Ok(_ordererGroupScopeLookupService.후보검색(request));
+    }
+
+    public async Task<Result<OperatingMarketDeliveryScopePlan>> 공동주문배송권해결Async(
+        OperatingMarketDeliveryScopeResolveRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _operatingMarketDeliveryScopeService.ResolveAsync(
+            request,
+            cancellationToken);
+        return Result.Ok(result);
     }
 
     public async Task<Result<PublicDataLookupResponse<ApartmentComplexItem>>> 공동주택단지검색Async(

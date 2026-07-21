@@ -1,0 +1,127 @@
+@using Ssalddel.Contracts.Common.Orderer
+@inject IGroupPurchaseShipmentTrackingService ShipmentTrackingService
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">공동수입 화물 위치 조회</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    플랫폼에 등록된 문서관리번호로 B/L 또는 AWB 기준 선적 상태와 공개 위치 이력을 확인합니다.
+                </MudText>
+            </MudStack>
+            @if (_tracking is not null)
+            {
+                <MudChip T="string" Color="@GroupPurchasePresentation.ShipmentStatusColor(_tracking.현재상태코드)" Variant="Variant.Filled">
+                    @GroupPurchasePresentation.ShipmentStatusLabel(_tracking.현재상태코드)
+                </MudChip>
+            }
+        </MudStack>
+
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Wrap="Wrap.Wrap">
+            <MudTextField T="string"
+                          Label="문서관리번호"
+                          @bind-Value="_documentManagementNumber"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          Class="flex-grow-1" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Search"
+                       Disabled="@_isLoading"
+                       OnClick="LookupAsync">
+                조회
+            </MudButton>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <MudAlert Severity="@_messageSeverity" Variant="Variant.Outlined">@_message</MudAlert>
+        }
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        }
+        else if (_tracking is not null)
+        {
+            <MudGrid>
+                <MudItem xs="12" md="4">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">현재 위치</MudText>
+                        <MudText Typo="Typo.subtitle1">@_tracking.현재위치요약</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">운송 문서</MudText>
+                        <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.TransportDocumentLabel(_tracking.운송문서유형) @_tracking.운송문서번호</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">도착 예정</MudText>
+                        <MudText Typo="Typo.subtitle1">@GroupPurchasePresentation.DateLabel(_tracking.예상도착시각Utc)</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <MudStack Spacing="2">
+                @foreach (var item in _tracking.이벤트목록.OrderByDescending(x => x.발생시각Utc))
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.subtitle2">@item.표시명</MudText>
+                                <MudText Typo="Typo.body2">@item.위치요약</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@item.출처주체코드</MudText>
+                            </MudStack>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@GroupPurchasePresentation.DateLabel(item.발생시각Utc)</MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    private string _documentManagementNumber = "HD-GP-IMPORT-2026-0001";
+    private 공동구매해외선적공개Dto? _tracking;
+    private bool _isLoading;
+    private string? _message;
+    private Severity _messageSeverity = Severity.Info;
+
+    private async Task LookupAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_documentManagementNumber))
+        {
+            _tracking = null;
+            _messageSeverity = Severity.Warning;
+            _message = "문서관리번호를 입력해 주세요.";
+            return;
+        }
+
+        _isLoading = true;
+        _message = null;
+
+        try
+        {
+            _tracking = await ShipmentTrackingService.LookupAsync(_documentManagementNumber);
+            if (_tracking is null)
+            {
+                _messageSeverity = Severity.Warning;
+                _message = "해당 문서관리번호로 조회 가능한 공동수입 선적 정보가 없습니다.";
+                return;
+            }
+
+            _messageSeverity = Severity.Success;
+            _message = $"{_tracking.상품요약} 선적 정보를 조회했습니다.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Common.Operations;
 using Ssalddel.Contracts.Common.PublicData;
+using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace OrdererApp.Services;
 
@@ -15,18 +17,34 @@ public interface IGroupPurchaseShipmentTrackingService
         HsCountryMonthlyTradeUnitPriceRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<공동구매자동집단응답?> RegisterDemandAsync(
+    Task<OperatingMarketRuntimeProfileResponse?> GetOperatingMarketAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<OperatingMarketDeliveryScopePlan?> ResolveDeliveryScopesAsync(
+        OperatingMarketDeliveryScopeResolveRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<공동구매자동집단사용자응답?> RegisterDemandAsync(
         공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<공동구매자동집단요약응답>?> ListGroupsAsync(
+        string productKey,
+        string deliveryScopeKey,
         CancellationToken cancellationToken = default);
 }
 
 public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShipmentTrackingService
 {
     private readonly HttpClient _httpClient;
+    private readonly ISsalddelJsonApiClient _authenticatedApiClient;
 
-    public HttpGroupPurchaseShipmentTrackingService(HttpClient httpClient)
+    public HttpGroupPurchaseShipmentTrackingService(
+        HttpClient httpClient,
+        ISsalddelJsonApiClient authenticatedApiClient)
     {
         _httpClient = httpClient;
+        _authenticatedApiClient = authenticatedApiClient;
     }
 
     public async Task<공동구매해외선적공개Dto?> LookupAsync(
@@ -87,22 +105,13 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
         }
     }
 
-    public async Task<공동구매자동집단응답?> RegisterDemandAsync(
-        공동구매자동수요등록Command request,
+    public async Task<OperatingMarketRuntimeProfileResponse?> GetOperatingMarketAsync(
         CancellationToken cancellationToken = default)
     {
         try
         {
-            using var response = await _httpClient.PostAsJsonAsync(
-                "api/v1/orderer/group-purchase-auto-groups/demands",
-                request,
-                cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            return await response.Content.ReadFromJsonAsync<공동구매자동집단응답>(
+            return await _httpClient.GetFromJsonAsync<OperatingMarketRuntimeProfileResponse>(
+                "api/v1/operations/market-profile",
                 cancellationToken);
         }
         catch (HttpRequestException)
@@ -113,5 +122,58 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
         {
             return null;
         }
+    }
+
+    public async Task<OperatingMarketDeliveryScopePlan?> ResolveDeliveryScopesAsync(
+        OperatingMarketDeliveryScopeResolveRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var response = await _httpClient.PostAsJsonAsync(
+                "api/v1/orderer/public-data/group-purchase/delivery-scopes/resolve",
+                request,
+                cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<OperatingMarketDeliveryScopePlan>(
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+    }
+
+    public Task<공동구매자동집단사용자응답?> RegisterDemandAsync(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+        => _authenticatedApiClient.SendAsync<공동구매자동수요등록Command, 공동구매자동집단사용자응답>(
+            HttpMethod.Post,
+            "api/v1/orderer/group-purchase-auto-groups/demands",
+            request,
+            "공동주문 수요 등록",
+            cancellationToken: cancellationToken);
+
+    public Task<IReadOnlyList<공동구매자동집단요약응답>?> ListGroupsAsync(
+        string productKey,
+        string deliveryScopeKey,
+        CancellationToken cancellationToken = default)
+    {
+        var path = "api/v1/orderer/group-purchase-auto-groups" +
+                   $"?productKey={Uri.EscapeDataString(productKey.Trim())}" +
+                   $"&deliveryScopeKey={Uri.EscapeDataString(deliveryScopeKey.Trim())}";
+        return _authenticatedApiClient.GetAsync<IReadOnlyList<공동구매자동집단요약응답>>(
+            path,
+            "공동주문 자동집단 재조회",
+            allowNotFound: false,
+            cancellationToken);
     }
 }

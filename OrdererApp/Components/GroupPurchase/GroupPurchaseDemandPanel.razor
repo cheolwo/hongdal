@@ -1,0 +1,481 @@
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Contracts.Common.Operations
+@using Ssalddel.Ui.Common.Areas.App.Services
+@inject IGroupPurchaseShipmentTrackingService ShipmentTrackingService
+@inject 주문자앱인증ViewModel Authentication
+
+<MudStack Spacing="3">
+    @if (!string.IsNullOrWhiteSpace(_statusMessage))
+    {
+        <MudAlert Severity="@_statusSeverity" Variant="Variant.Outlined">@_statusMessage</MudAlert>
+    }
+
+    <MudGrid>
+        <MudItem xs="12" md="7">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                <MudStack Spacing="3">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h6">1. 같은 상품·배송권 수요 등록</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                국가별 주소 서비스로 모집권 후보를 확인하고 직접 선택한 뒤 수요를 등록합니다.
+                            </MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@OperatingMarketLabel</MudChip>
+                            <MudChip T="string" Color="Color.Default" Variant="Variant.Outlined">
+                                @GroupPurchasePresentation.ApplicationStatusLabel(CurrentApplicationPlan.제안상태)
+                            </MudChip>
+                        </MudStack>
+                    </MudStack>
+
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                        상세주소는 자동집단 원장에 저장하지 않습니다. 선택한 시·군·구 또는 미국 Census 모집권 키만 수요 묶음에 사용합니다.
+                    </MudAlert>
+
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Wrap="Wrap.Wrap">
+                        <MudTextField T="string"
+                                      Label="@DeliveryAddressLabel"
+                                      @bind-Value="_deliveryAddressQuery"
+                                      Placeholder="@DeliveryAddressPlaceholder"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      Class="flex-grow-1" />
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.MyLocation"
+                                   Disabled="@(_isDeliveryScopeLoading || string.IsNullOrWhiteSpace(_deliveryAddressQuery))"
+                                   OnClick="ResolveDeliveryScopesAsync">
+                            @(_isDeliveryScopeLoading ? "확인 중" : "모집권 확인")
+                        </MudButton>
+                    </MudStack>
+
+                    @if (_isDeliveryScopeLoading)
+                    {
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_deliveryScopeMessage))
+                    {
+                        <MudAlert Severity="@_deliveryScopeSeverity" Variant="Variant.Outlined" Dense="true">
+                            @_deliveryScopeMessage
+                        </MudAlert>
+                    }
+
+                    @if (_deliveryScopePlan is { Success: true })
+                    {
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle2">2. 사용할 모집권 선택</MudText>
+                            @foreach (var scope in _deliveryScopePlan.Items)
+                            {
+                                <MudPaper Elevation="0" Outlined="true" Class="@DeliveryScopeClass(scope)">
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                        <MudStack Spacing="0">
+                                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                                <MudText Typo="Typo.subtitle2">@scope.DisplayName</MudText>
+                                                @if (scope.IsRecommendedRecruitmentScope)
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Color="Color.Success">권장</MudChip>
+                                                }
+                                                @if (scope.IsFineGrained)
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">세부권</MudChip>
+                                                }
+                                            </MudStack>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @scope.ScopeKey · 공개 기준 @(scope.MinimumParticipantsForPublicDisplay)명 이상
+                                            </MudText>
+                                        </MudStack>
+                                        <MudButton Variant="@(scope.ScopeKey == _groupScopeKey ? Variant.Filled : Variant.Outlined)"
+                                                   Color="@(scope.ScopeKey == _groupScopeKey ? Color.Success : Color.Primary)"
+                                                   Size="Size.Small"
+                                                   OnClick="@(() => SelectDeliveryScope(scope))">
+                                            @(scope.ScopeKey == _groupScopeKey ? "선택됨" : "이 범위 선택")
+                                        </MudButton>
+                                    </MudStack>
+                                </MudPaper>
+                            }
+                        </MudStack>
+                    }
+
+                    <MudDivider />
+
+                    <MudText Typo="Typo.subtitle2">3. 수요 내용 확인</MudText>
+                    <MudTextField T="string" Label="선택한 주문자 집단 범위" Value="@_groupScopeName" ReadOnly="true" Variant="Variant.Outlined" />
+                    <MudNumericField T="decimal"
+                                     Label="내 구매 의향 수량(kg)"
+                                     Value="@DesiredQuantityKg"
+                                     ValueChanged="UpdateDesiredQuantityAsync"
+                                     Min="1"
+                                     Step="1M"
+                                     Variant="Variant.Outlined" />
+                    <MudNumericField T="decimal"
+                                     Label="희망 단가"
+                                     Value="@DesiredUnitPrice"
+                                     ValueChanged="UpdateDesiredUnitPriceAsync"
+                                     Min="1"
+                                     Step="100M"
+                                     Variant="Variant.Outlined" />
+                    <MudTextField T="string" Label="개설 신청 메모" @bind-Value="_requestMemo" Lines="3" Variant="Variant.Outlined" />
+                    <MudCheckBox T="bool"
+                                 @bind-Value="_deliveryScopeConfirmed"
+                                 Disabled="@string.IsNullOrWhiteSpace(_groupScopeKey)"
+                                 Label="선택한 모집권으로 같은 상품 수요가 묶이는 것에 동의합니다."
+                                 Color="Color.Success" />
+                    <MudCheckBox T="bool"
+                                 @bind-Value="_nonBindingAgreementAccepted"
+                                 Label="이 신청은 구매 확정이 아니라 공동 주문 집단 개설 의향임을 확인합니다."
+                                 Color="Color.Primary" />
+
+                    @if (Authentication.처리중 && !Authentication.초기화됨)
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">저장된 주문자 로그인 세션을 확인하고 있습니다.</MudText>
+                        </MudStack>
+                    }
+                    else if (!Authentication.로그인됨)
+                    {
+                        <Ssalddel공통로그인Panel 제목="4. 수요 원장 로그인"
+                                             설명="모집권 확인은 익명으로 할 수 있고, 수요를 본인 원장에 저장할 때만 로그인합니다."
+                                             상태메시지="@Authentication.오류메시지"
+                                             상태Severity="@AuthenticationSeverity"
+                                             일반로그인표시="true"
+                                             소셜로그인표시="false"
+                                             일반로그인버튼텍스트="로그인하고 수요 등록 준비"
+                                             IsBusy="@Authentication.처리중"
+                                             Elevation="0"
+                                             Class="pa-3 group-demand-login"
+                                             OnPasswordLogin="LoginAsync" />
+                    }
+                    else
+                    {
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                            <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">
+                                @Authentication.현재사용자표시
+                            </MudChip>
+                            <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="LogoutAsync">로그아웃</MudButton>
+                        </MudStack>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Groups"
+                               Disabled="@(!CanSubmitDemand || _isSubmitting)"
+                               OnClick="SubmitDemandAsync">
+                        @(_isSubmitting ? "등록 후 다시 읽는 중" : "수요 등록하고 자동집단 다시 읽기")
+                    </MudButton>
+
+                    @if (_registeredGroup is not null)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 group-demand-result">
+                            <MudStack Spacing="1">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                    <MudText Typo="Typo.subtitle2">서버에서 다시 읽은 자동집단</MudText>
+                                    <MudChip T="string" Color="Color.Success" Size="Size.Small">
+                                        @GroupPurchasePresentation.AutoGroupStatusLabel(_registeredGroup.현재상태)
+                                    </MudChip>
+                                </MudStack>
+                                <MudText Typo="Typo.body2">@_registeredGroup.상품명 · @_registeredGroup.배송권명</MudText>
+                                <MudText Typo="Typo.h6">@_registeredGroup.수요건수.ToString("N0")건 · @_registeredGroup.총희망수량.ToString("N0")@_registeredGroup.수량단위</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">자동집단 @_registeredGroup.자동집단Id</MudText>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="5">
+            <GroupPurchaseDemandFlowSummary RequiredAdminReviewSteps="CurrentApplicationPlan.RequiredAdminReviewSteps" />
+        </MudItem>
+    </MudGrid>
+
+    <GroupPurchasePaymentSchedule GroupPurchaseId="Product.상품카드Id"
+                                  OrdererDisplayName="OrdererDisplayName"
+                                  QuantityKg="DesiredQuantityKg"
+                                  UnitPrice="DesiredUnitPrice" />
+</MudStack>
+
+@code {
+    private string? _currentProductId;
+    private string _groupScopeKey = string.Empty;
+    private string _groupScopeName = string.Empty;
+    private string _operatingMarketCode = OperatingMarketCodes.Korea;
+    private string _deliveryAddressQuery = string.Empty;
+    private OperatingMarketDeliveryScopePlan? _deliveryScopePlan;
+    private bool _isDeliveryScopeLoading;
+    private string? _deliveryScopeMessage;
+    private Severity _deliveryScopeSeverity = Severity.Info;
+    private bool _deliveryScopeConfirmed;
+    private 공동구매자동집단요약응답? _registeredGroup;
+    private string _requestMemo = "같은 지역 주문자들과 함께 먼저 수요를 모아보고 싶습니다.";
+    private bool _nonBindingAgreementAccepted;
+    private bool _isSubmitting;
+    private string? _statusMessage;
+    private Severity _statusSeverity = Severity.Info;
+
+    [Parameter, EditorRequired]
+    public HS먹거리공동구매상품카드 Product { get; set; } = default!;
+
+    [Parameter]
+    public decimal DesiredQuantityKg { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal> DesiredQuantityKgChanged { get; set; }
+
+    [Parameter]
+    public decimal DesiredUnitPrice { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal> DesiredUnitPriceChanged { get; set; }
+
+    private 주문자집단개설신청계획 CurrentApplicationPlan
+        => 주문자집단개설신청계획기.계획(CreateApplicationDraft());
+
+    private bool CanSubmitDemand
+        => Authentication.로그인됨
+           && _deliveryScopeConfirmed
+           && !string.IsNullOrWhiteSpace(_groupScopeKey)
+           && CurrentApplicationPlan.CanSubmit;
+
+    private string OperatingMarketLabel
+        => _operatingMarketCode == OperatingMarketCodes.UnitedStates
+            ? "미국 · Census 모집권"
+            : "한국 · 도로명주소/Naver·Kakao";
+
+    private string DeliveryAddressLabel
+        => _operatingMarketCode == OperatingMarketCodes.UnitedStates
+            ? "배송지 주소(미국)"
+            : "배송지 도로명주소(한국)";
+
+    private string DeliveryAddressPlaceholder
+        => _operatingMarketCode == OperatingMarketCodes.UnitedStates
+            ? "예: 4600 Silver Hill Rd, Washington, DC"
+            : "예: 경기도 수원시 영통구 ...";
+
+    private string OrdererDisplayName
+        => Authentication.로그인됨 ? Authentication.현재사용자표시 : "unconfirmed-orderer";
+
+    private Severity AuthenticationSeverity
+        => Authentication.오류발생 ? Severity.Error : Severity.Info;
+
+    protected override void OnParametersSet()
+    {
+        if (!string.Equals(_currentProductId, Product.상품카드Id, StringComparison.Ordinal))
+        {
+            _currentProductId = Product.상품카드Id;
+            _registeredGroup = null;
+            _statusMessage = null;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationTask = Authentication.초기화됨
+            ? Task.FromResult(true)
+            : Authentication.복원Async();
+        await Task.WhenAll(LoadOperatingMarketAsync(), authenticationTask);
+    }
+
+    private async Task LoadOperatingMarketAsync()
+    {
+        var operatingMarket = await ShipmentTrackingService.GetOperatingMarketAsync();
+        if (operatingMarket is not null &&
+            OperatingMarketCodes.TryNormalize(operatingMarket.MarketCode, out var marketCode))
+        {
+            _operatingMarketCode = marketCode;
+        }
+    }
+
+    private async Task ResolveDeliveryScopesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_deliveryAddressQuery))
+        {
+            _deliveryScopeSeverity = Severity.Warning;
+            _deliveryScopeMessage = "모집권을 확인할 주소를 입력해 주세요.";
+            return;
+        }
+
+        _isDeliveryScopeLoading = true;
+        _deliveryScopeMessage = null;
+        _deliveryScopePlan = null;
+        _groupScopeKey = string.Empty;
+        _groupScopeName = string.Empty;
+        _deliveryScopeConfirmed = false;
+        _registeredGroup = null;
+
+        try
+        {
+            _deliveryScopePlan = await ShipmentTrackingService.ResolveDeliveryScopesAsync(
+                new OperatingMarketDeliveryScopeResolveRequest
+                {
+                    MarketCode = _operatingMarketCode,
+                    Address = _deliveryAddressQuery,
+                    ParticipantCount = 1
+                });
+
+            if (_deliveryScopePlan is null)
+            {
+                _deliveryScopeSeverity = Severity.Error;
+                _deliveryScopeMessage = "주소 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+                return;
+            }
+
+            if (!_deliveryScopePlan.Success || _deliveryScopePlan.Items.Count == 0)
+            {
+                _deliveryScopeSeverity = Severity.Warning;
+                _deliveryScopeMessage = _deliveryScopePlan.ErrorMessage
+                    ?? "이 주소에서 사용할 모집권 후보를 찾지 못했습니다.";
+                return;
+            }
+
+            var recommended = _deliveryScopePlan.Items.FirstOrDefault(scope =>
+                                  scope.IsRecommendedRecruitmentScope)
+                              ?? _deliveryScopePlan.Items[0];
+            SelectDeliveryScope(recommended);
+            _deliveryScopeSeverity = Severity.Success;
+            _deliveryScopeMessage = $"{recommended.DisplayName}을 권장 모집권으로 찾았습니다. 사용자가 최종 확인해야 등록됩니다.";
+        }
+        finally
+        {
+            _isDeliveryScopeLoading = false;
+        }
+    }
+
+    private void SelectDeliveryScope(OperatingMarketDeliveryScopeCandidate scope)
+    {
+        _groupScopeKey = scope.ScopeKey;
+        _groupScopeName = scope.DisplayName;
+        _deliveryScopeConfirmed = false;
+        _registeredGroup = null;
+    }
+
+    private Task UpdateDesiredQuantityAsync(decimal quantityKg)
+        => DesiredQuantityKgChanged.InvokeAsync(quantityKg);
+
+    private Task UpdateDesiredUnitPriceAsync(decimal unitPrice)
+        => DesiredUnitPriceChanged.InvokeAsync(unitPrice);
+
+    private async Task LoginAsync(공통로그인요청 request)
+    {
+        if (await Authentication.로그인Async(request.UserNameOrEmail, request.Password))
+        {
+            _statusSeverity = Severity.Success;
+            _statusMessage = "주문자 계정으로 로그인했습니다. 모집권 동의를 확인하면 수요를 등록할 수 있습니다.";
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        await Authentication.로그아웃Async();
+        _registeredGroup = null;
+        _statusMessage = null;
+    }
+
+    private async Task SubmitDemandAsync()
+    {
+        if (!Authentication.로그인됨)
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "수요를 본인 원장에 저장하려면 먼저 로그인해 주세요.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_groupScopeKey) || !_deliveryScopeConfirmed)
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "주소로 모집권을 확인하고, 선택한 범위를 직접 동의해 주세요.";
+            return;
+        }
+
+        if (!CurrentApplicationPlan.CanSubmit)
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "비구속 신청 동의와 HS 식품 코드 확인이 필요합니다.";
+            return;
+        }
+
+        _isSubmitting = true;
+        _registeredGroup = null;
+        try
+        {
+            var group = await ShipmentTrackingService.RegisterDemandAsync(new 공동구매자동수요등록Command
+            {
+                수요출처키 = $"orderer-app:{Product.상품카드Id}",
+                상품키 = Product.상품카드Id,
+                상품명 = Product.상품명,
+                HS코드 = Product.HS코드,
+                온도코드 = Product.온도코드,
+                물류방식 = Product.예상물류방식,
+                주문자표시명 = Authentication.현재사용자표시,
+                배송권키 = _groupScopeKey,
+                배송권명 = _groupScopeName,
+                희망수량 = DesiredQuantityKg,
+                수량단위 = "kg",
+                수요유형 = 공동구매자동수요유형코드.관심표시,
+                결제상태 = 공동구매자동결제상태코드.미결제,
+                메모 = _requestMemo,
+                목표수량 = Product.SuggestedTargetQuantityKg
+            });
+
+            if (group is null)
+            {
+                _statusSeverity = Severity.Error;
+                _statusMessage = "공동 주문 수요를 서버에 등록하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+                return;
+            }
+
+            var groups = await ShipmentTrackingService.ListGroupsAsync(Product.상품카드Id, _groupScopeKey);
+            _registeredGroup = groups?.FirstOrDefault(item =>
+                string.Equals(item.자동집단Id, group.자동집단Id, StringComparison.Ordinal));
+
+            if (_registeredGroup is null)
+            {
+                _statusSeverity = Severity.Warning;
+                _statusMessage = $"{Product.상품명} 수요는 등록되었지만 자동집단을 다시 읽지 못했습니다. 새로고침 후 확인해 주세요.";
+                return;
+            }
+
+            _statusSeverity = Severity.Success;
+            _statusMessage = $"수요 등록 후 서버 원장을 다시 확인했습니다. 현재 {_registeredGroup.수요건수:N0}건, {_registeredGroup.총희망수량:N0}{_registeredGroup.수량단위}이 같은 상품·모집권에 모였습니다.";
+        }
+        catch (SsalddelApiException ex)
+        {
+            _statusSeverity = Severity.Error;
+            _statusMessage = ex.StatusCode == 401
+                ? "로그인 세션이 만료되었습니다. 다시 로그인해 주세요."
+                : "공동주문 수요 원장을 저장하거나 다시 읽지 못했습니다. 잠시 후 다시 시도해 주세요.";
+        }
+        catch (InvalidOperationException)
+        {
+            _statusSeverity = Severity.Error;
+            _statusMessage = "공동주문 API에 연결하지 못했습니다. 서버 상태를 확인해 주세요.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private 주문자집단개설신청초안 CreateApplicationDraft()
+        => new(
+            ApplicantOrdererId: OrdererDisplayName,
+            상품카드: Product,
+            주문자집단배송권키: string.IsNullOrWhiteSpace(_groupScopeKey)
+                ? "unselected-delivery-scope"
+                : _groupScopeKey,
+            주문자집단배송권명: string.IsNullOrWhiteSpace(_groupScopeName)
+                ? "모집권 미선택"
+                : _groupScopeName,
+            희망수량Kg: DesiredQuantityKg,
+            DesiredUnitPrice: DesiredUnitPrice,
+            NonBindingAgreementAccepted: _nonBindingAgreementAccepted,
+            Request메모: _requestMemo);
+
+    private string DeliveryScopeClass(OperatingMarketDeliveryScopeCandidate scope)
+        => scope.ScopeKey == _groupScopeKey
+            ? "delivery-scope-card delivery-scope-card--selected"
+            : "delivery-scope-card";
+}

@@ -1,0 +1,16 @@
+::deep .delivery-scope-card {
+    padding: 12px;
+    border-radius: 8px;
+    transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+::deep .delivery-scope-card--selected,
+::deep .group-demand-result {
+    border-color: var(--mud-palette-success);
+    background: color-mix(in srgb, var(--mud-palette-surface) 92%, var(--mud-palette-success) 8%);
+}
+
+::deep .group-demand-login {
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 8px;
+}

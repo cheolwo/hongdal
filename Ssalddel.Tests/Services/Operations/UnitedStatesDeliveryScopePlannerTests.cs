@@ -145,9 +145,12 @@ public sealed class UnitedStatesDeliveryScopePlannerTests
             new StubAddressLookupService(address),
             CreateSut());
 
-        var result = await sut.ResolveAsync(
-            "4600 Silver Hill Rd, Washington, DC 20233",
-            participantCount: 5);
+        var result = await sut.ResolveAsync(new OperatingMarketDeliveryScopeResolveRequest
+        {
+            MarketCode = OperatingMarketCodes.UnitedStates,
+            Address = "4600 Silver Hill Rd, Washington, DC 20233",
+            ParticipantCount = 5
+        });
 
         Assert.True(result.Success);
         Assert.Equal("us-place:2475725", result.RecommendedScopeKey);

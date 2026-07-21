@@ -1,0 +1,58 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">공동수입 지급 일정</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    전액 선결제 대신 상차, 하차, 분배 확인 시점에 맞춰 나누는 Simulation 계획입니다.
+                </MudText>
+            </MudStack>
+            <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@PaymentPlan.요약</MudChip>
+        </MudStack>
+
+        <MudGrid>
+            @foreach (var line in PaymentPlan.라인목록)
+            {
+                <MudItem xs="12" md="4">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudStack Spacing="1">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                                <MudText Typo="Typo.subtitle2">@line.표시명</MudText>
+                                <MudChip T="string" Size="Size.Small" Color="@GroupPurchasePresentation.PaymentStatusColor(line.상태)">
+                                    @GroupPurchasePresentation.PaymentStatusLabel(line.상태)
+                                </MudChip>
+                            </MudStack>
+                            <MudText Typo="Typo.h6">@GroupPurchasePresentation.Money(line.금액)</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@line.지급조건</MudText>
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public string GroupPurchaseId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string OrdererDisplayName { get; set; } = "unconfirmed-orderer";
+
+    [Parameter]
+    public decimal QuantityKg { get; set; }
+
+    [Parameter]
+    public decimal UnitPrice { get; set; }
+
+    private 공동구매결제단계계획 PaymentPlan
+        => 공동구매결제단계계획기.계획(new 공동구매결제단계초안(
+            공동구매Id: GroupPurchaseId,
+            주문자Id: OrdererDisplayName,
+            총금액: QuantityKg * UnitPrice,
+            상차완료여부: true,
+            하차완료여부: false,
+            분배확인율: 0m));
+}

@@ -9,7 +9,11 @@
 
   <ItemGroup>
     <Content Include="..\..\..\OrdererApp\Components\**\*.razor" LinkBase="Components" />
-    <Compile Include="..\..\..\OrdererApp\Services\**\*.cs" LinkBase="Services" />
+    <Content Include="..\..\..\OrdererApp\Components\**\*.razor.css" LinkBase="Components" />
+    <Compile Include="..\..\..\OrdererApp\Components\GroupPurchase\*.cs" LinkBase="Components\GroupPurchase" />
+    <Compile Include="..\..\..\OrdererApp\Services\GroupPurchaseShipmentTrackingService.cs" LinkBase="Services" />
+    <Compile Include="..\..\..\OrdererApp\Services\OrdererRoutes.cs" LinkBase="Services" />
+    <Compile Include="..\..\..\OrdererApp\ViewModels\GroupPurchaseIntentPageViewModel.cs" LinkBase="ViewModels" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="MudBlazor" />
   </ItemGroup>
 </Project>

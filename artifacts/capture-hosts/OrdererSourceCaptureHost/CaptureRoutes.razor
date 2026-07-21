@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Components.Routing
+@using MudBlazor
+@using OrdererApp.Components.Layout
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(MainLayout)">
+            <MudAlert Severity="Severity.Warning">요청한 화면을 찾을 수 없습니다.</MudAlert>
+        </LayoutView>
+    </NotFound>
+</Router>

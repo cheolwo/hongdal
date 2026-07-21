@@ -478,6 +478,11 @@ public sealed class SsalddelApiVersionAttributeTests
             "Ssalddel.Controllers.Orderer.PublicDataLookupController.주문자집단배송권검색",
             SsalddelWorkflow.GroupPurchaseImport,
             missingWorkflow);
+        AddIfMissingWorkflow(
+            typeof(PublicDataLookupController).GetMethod(nameof(PublicDataLookupController.공동주문배송권해결)),
+            "Ssalddel.Controllers.Orderer.PublicDataLookupController.공동주문배송권해결",
+            SsalddelWorkflow.GroupPurchaseImport,
+            missingWorkflow);
 
         Assert.Empty(missingWorkflow);
     }

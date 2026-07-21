@@ -1,0 +1,9 @@
+::deep .product-card {
+    border-radius: 8px;
+    transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+::deep .product-card--selected {
+    border-color: var(--mud-palette-primary);
+    background: color-mix(in srgb, var(--mud-palette-surface) 88%, var(--mud-palette-primary) 12%);
+}

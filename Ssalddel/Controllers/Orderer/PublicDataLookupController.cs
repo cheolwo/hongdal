@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.PublicData;
+using Ssalddel.Contracts.Common.Operations;
 using Ssalddel.Filters;
 using Ssalddel.Application.PublicData;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +53,18 @@ public sealed class PublicDataLookupController : ControllerBase
             PageSize = pageSize
         });
 
+        return this.ToActionResult(result);
+    }
+
+    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [HttpPost("group-purchase/delivery-scopes/resolve")]
+    public async Task<IActionResult> 공동주문배송권해결(
+        [FromBody] OperatingMarketDeliveryScopeResolveRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.공동주문배송권해결Async(request, cancellationToken);
         return this.ToActionResult(result);
     }
 
