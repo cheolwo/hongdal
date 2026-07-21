@@ -1,0 +1,113 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Food
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="restaurant-panel restaurant-search-panel">
+    <div class="restaurant-panel-heading">
+        <div>
+            <MudText Typo="Typo.overline">PUBLIC RESTAURANT DIRECTORY</MudText>
+            <MudText Typo="Typo.h6">조회 기준 직접 선택</MudText>
+        </div>
+        @if (Criteria.선택권역 is not null)
+        {
+            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@Criteria.선택권역.표시명</MudChip>
+        }
+    </div>
+
+    @if (Criteria.처리중)
+    {
+        <div class="restaurant-state restaurant-state--compact">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2">서버 탐색 정책과 공개 권역을 불러오고 있습니다.</MudText>
+        </div>
+    }
+    else if (Criteria.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">
+            @OrdererRestaurantPresentation.ErrorMessage(Criteria.오류메시지)
+            <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RetryRequested">다시 시도</MudButton>
+        </MudAlert>
+    }
+    else if (Criteria.정책 is not null)
+    {
+        <div class="restaurant-search-grid">
+            <MudSelect T="string"
+                       @bind-Value="Criteria.선택배달권키"
+                       Label="공개 행정권역"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Clearable="true">
+                @foreach (var scope in Criteria.권역목록)
+                {
+                    <MudSelectItem T="string" Value="@scope.배달권키">@scope.표시명 · @scope.기준지명</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string"
+                          @bind-Value="List.검색어"
+                          Label="상호·카테고리·소개"
+                          Placeholder="예: 분식, 국밥"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" />
+        </div>
+
+        <div class="restaurant-radius-row">
+            <div>
+                <MudText Typo="Typo.subtitle2">조회 반경 @($"{Criteria.반경Km:0.#}km")</MudText>
+                <MudText Typo="Typo.caption">선택한 행정기관 공개 기준점으로부터의 직선거리입니다.</MudText>
+            </div>
+            <MudSlider T="double"
+                       @bind-Value="Criteria.반경Km"
+                       Min="@Criteria.정책.MinRadiusKm"
+                       Max="@Criteria.정책.MaxRadiusKm"
+                       Step="@Criteria.정책.RadiusStepKm"
+                       ValueLabel="true"
+                       Color="Color.Primary" />
+        </div>
+
+        <div class="restaurant-search-actions">
+            <div class="restaurant-quick-radius">
+                @foreach (var radius in Criteria.정책.QuickRadiusOptions)
+                {
+                    <MudButton Size="Size.Small"
+                               Variant="@(Math.Abs(Criteria.반경Km - radius) < 0.01 ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               OnClick="@(() => RadiusSelected.InvokeAsync(radius))">
+                        @($"{radius:0.#}km")
+                    </MudButton>
+                }
+            </div>
+            <MudCheckBox T="bool" @bind-Value="List.주문가능만" Color="Color.Primary">주문 가능한 곳만</MudCheckBox>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.TravelExplore"
+                       Disabled="@(!Criteria.조회가능 || List.처리중)"
+                       OnClick="SearchRequested">
+                음식점 조회
+            </MudButton>
+        </div>
+
+        @if (Criteria.선택권역 is not null)
+        {
+            <MudText Typo="Typo.caption" Class="restaurant-basis">@Criteria.선택권역.거리기준안내</MudText>
+        }
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 음식점탐색기준ViewModel Criteria { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public 음식점공개목록ViewModel List { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback RetryRequested { get; set; }
+
+    [Parameter]
+    public EventCallback SearchRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<double> RadiusSelected { get; set; }
+}

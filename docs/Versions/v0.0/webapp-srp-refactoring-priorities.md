@@ -21,7 +21,7 @@
 | `P0-2` 완료 | 커뮤니티 `PlatformCommunityPostList.razor` | 546줄에서 조립 shell 97줄로 축소 | 도구막대, 표 목록, 카드 목록, 검색 footer, 언어·상태·가격 표현 규칙 | 공개 목록이 후속 업무 모듈 없이 동작하고 상위 조회 상태·오류 계약을 유지 |
 | `P0-3` 완료 | 커뮤니티 `PlatformCommunityHome.razor` | 736줄에서 route/mode shell 313줄로 축소 | 머리글, 공개 feed, 다이어그램 stage, 생활 원장 초안, 업무 workspace | 기본 진입의 전통 게시판 목록과 명시적으로 여는 연결 도구 경계 유지, 공용 UI/WebApp/MAUI 빌드 |
 | `P0-4` | 커뮤니티 `CommunityGroupPurchaseWorkspace.razor` | 1,170줄, 현재 다른 작업과 겹침 | 모집 개요, 조건 협의, 참여 의사, 연락 동의, 가원장 전환 | 국내 공동구매 대표 파일럿의 직접 협의가 영속화되고 플랫폼 추천·거래 대리가 없음 |
-| `P1-1` | 주문자 `OrdererRestaurantWorkspace.razor` | 303줄, 깨끗한 작업 대상 | 공개 탐색 조건, 검색 결과, 선택 상세, 로그인 보호 요청 | 초기 공개 정보와 보호 정보를 분리하고 수동 공급 요청만 생성 |
+| `P1-1` 완료 | 주문자 `OrdererRestaurantWorkspace.razor` | 303줄에서 조립 shell 35줄로 축소 | 기능 접근, 공개 탐색 조건, 검색 결과, 정확한 선택 상세, 표현 규칙 | 기능 플래그와 정확한 ID 조회를 유지하고 주문·결제·조리·배차 효과 없이 공개 정보만 표시 |
 | `P1-2` | 주문자 `OrdererMartOrderRequestWorkspace.razor` | 260줄, 깨끗한 작업 대상 | 주문 입력, 금액/수량 요약, 제출 상태, 실패 복구 | 서버가 소유권과 현재 상태를 재검증하고 성공 뒤 같은 주문을 재조회 |
 | `P1-3` | 판매 `OrderFulfillment.razor` | 631줄, 깨끗한 작업 대상 | 주문 목록/필터, 선택 상세, 이행 상태, 사용자 Command | 기능 플래그 뒤에서 수동 상태 전이만 제공하고 결제·정산을 활성화하지 않음 |
 | `P1-4` | 판매 `ProductListings.razor` | 209줄, 깨끗한 작업 대상 | 판매상품 선택, 채널 계정 확인, 출품 초안, 결과 상태 | 정확한 계정 ID를 조회하고 외부 출품 효과는 명시적 실행 경계로 제한 |
@@ -57,4 +57,4 @@
 
 ## 다음 작업
 
-`P0-3` 커뮤니티 홈은 route/mode shell과 화면별 component로 분리했다. `P0-4` 공동구매 workspace는 현재 다른 변경과 겹치므로 해당 변경이 먼저 검증·commit될 때까지 보류한다. 그 사이 다음 깨끗한 세로 단위는 `P1-1` 주문자 `OrdererRestaurantWorkspace.razor`이며, 공개 탐색 조건·검색 결과·선택 상세·로그인 보호 요청을 분리한다.
+`P1-1` 주문자 음식점 탐색은 35줄 조립 shell과 접근·검색·결과·정확한 상세 component로 분리했다. `P0-4` 공동구매 workspace는 현재 다른 변경과 겹치므로 해당 변경이 먼저 검증·commit될 때까지 보류한다. 다음 깨끗한 세로 단위는 `P1-2` 주문자 `OrdererMartOrderRequestWorkspace.razor`이며, 주문 입력·금액/수량 요약·제출 상태·실패 복구를 분리한다.

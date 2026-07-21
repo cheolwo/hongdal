@@ -1,0 +1,93 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Food
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="restaurant-panel restaurant-detail-panel">
+    @if (Detail.처리중)
+    {
+        <div class="restaurant-state restaurant-state--detail">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2">정확한 음식점과 공개 메뉴를 불러오고 있습니다.</MudText>
+        </div>
+    }
+    else if (Detail.오류발생)
+    {
+        <div class="restaurant-state restaurant-state--detail">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">음식점 상세를 불러오지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@OrdererRestaurantPresentation.ErrorMessage(Detail.오류메시지)</MudText>
+            @if (Detail.요청RestaurantId is long retryId)
+            {
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => RetryRequested.InvokeAsync(retryId))">다시 시도</MudButton>
+            }
+        </div>
+    }
+    else if (Detail.찾을수없음)
+    {
+        <div class="restaurant-state restaurant-state--detail">
+            <MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">공개된 음식점을 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2">비공개·삭제된 ID를 다른 음식점으로 대체하지 않습니다.</MudText>
+        </div>
+    }
+    else if (Detail.상세 is { } detail)
+    {
+        <div class="restaurant-detail-heading">
+            <div>
+                <MudText Typo="Typo.overline">EXACT RESTAURANT #@detail.음식점.Id</MudText>
+                <MudText Typo="Typo.h5">@detail.음식점.상호명</MudText>
+                <MudText Typo="Typo.body2">@detail.음식점.카테고리 · @OrdererRestaurantPresentation.ValueOrDash(detail.음식점.공개주소)</MudText>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="ClearRequested" aria-label="음식점 상세 닫기" />
+        </div>
+        <MudText Typo="Typo.body2">@OrdererRestaurantPresentation.ValueOrDash(detail.음식점.소개)</MudText>
+        <MudDivider Class="my-3" />
+        <MudText Typo="Typo.subtitle1">공개 메뉴 @detail.메뉴목록.Count.ToString("N0")개</MudText>
+        @if (detail.메뉴목록.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">현재 공개된 메뉴가 없습니다.</MudAlert>
+        }
+        else
+        {
+            <div class="restaurant-menu-list">
+                @foreach (var menu in detail.메뉴목록)
+                {
+                    <div class="restaurant-menu-item">
+                        <div>
+                            <MudText Typo="Typo.subtitle2">@menu.메뉴명</MudText>
+                            <MudText Typo="Typo.caption">@OrdererRestaurantPresentation.ValueOrDash(menu.설명)</MudText>
+                        </div>
+                        <div class="restaurant-menu-price">
+                            <strong>@menu.판매가.ToString("N0")원</strong>
+                            @if (menu.품절여부)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Default">품절</MudChip>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Text" Dense="true" Class="mt-3">
+            메뉴 선택과 주문 상세 생성은 다음 P1 페이지에서 연결합니다. 현재 메뉴 조회는 주문 의향이나 결제를 저장하지 않습니다.
+        </MudAlert>
+    }
+    else
+    {
+        <div class="restaurant-state restaurant-state--detail">
+            <MudIcon Icon="@Icons.Material.Filled.RestaurantMenu" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">음식점을 선택하면 공개 메뉴를 확인할 수 있습니다.</MudText>
+            <MudText Typo="Typo.body2">선택 전에는 첫 음식점이나 샘플 메뉴를 대신 표시하지 않습니다.</MudText>
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 음식점공개상세ViewModel Detail { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<long> RetryRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ClearRequested { get; set; }
+}

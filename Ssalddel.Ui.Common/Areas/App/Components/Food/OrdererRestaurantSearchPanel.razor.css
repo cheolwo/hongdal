@@ -1,0 +1,71 @@
+.restaurant-panel {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.restaurant-panel-heading,
+.restaurant-search-actions,
+.restaurant-radius-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.restaurant-search-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(220px, 1fr);
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.restaurant-radius-row {
+    display: grid;
+    grid-template-columns: minmax(180px, .45fr) minmax(260px, 1fr);
+    margin-top: 1rem;
+}
+
+.restaurant-search-actions {
+    flex-wrap: wrap;
+    margin-top: .75rem;
+}
+
+.restaurant-quick-radius {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+}
+
+.restaurant-basis {
+    display: block;
+    margin-top: .75rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.restaurant-state {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 16px;
+}
+
+.restaurant-state--compact {
+    min-height: 180px;
+}
+
+@media (max-width: 700px) {
+    .restaurant-search-grid,
+    .restaurant-radius-row {
+        grid-template-columns: 1fr;
+    }
+
+    .restaurant-panel-heading,
+    .restaurant-search-actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

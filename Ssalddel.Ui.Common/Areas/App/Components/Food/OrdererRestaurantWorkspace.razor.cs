@@ -18,10 +18,6 @@ public partial class OrdererRestaurantWorkspace
     private 음식점공개목록ViewModel List => ViewModel.목록;
     private 음식점공개상세ViewModel Detail => ViewModel.상세;
 
-    private string EmptyMessage => List.검색조건사용중
-        ? "검색어나 주문 가능 조건을 바꿔 다시 조회해 주세요."
-        : "운영자가 공개 프로필과 메뉴를 등록하면 이 권역에 표시됩니다.";
-
     protected override async Task OnInitializedAsync()
     {
         await InitializeAsync();
@@ -83,6 +79,12 @@ public partial class OrdererRestaurantWorkspace
         await Detail.조회Async(restaurantId);
     }
 
+    private Task SelectRestaurantFromListAsync(long restaurantId)
+        => SelectRestaurantAsync(restaurantId);
+
+    private Task RetryRestaurantAsync(long restaurantId)
+        => SelectRestaurantAsync(restaurantId, updateAddress: false);
+
     private async Task ClearSelectionAsync()
     {
         Detail.선택해제();
@@ -92,12 +94,4 @@ public partial class OrdererRestaurantWorkspace
         }
     }
 
-    private static string DistanceLabel(decimal? distanceKm)
-        => distanceKm.HasValue ? $"기준점 {distanceKm.Value:0.##}km" : "거리 기준 없음";
-
-    private static string ValueOrDash(string? value)
-        => string.IsNullOrWhiteSpace(value) ? "—" : value.Trim();
-
-    private static string ErrorMessage(string? value)
-        => string.IsNullOrWhiteSpace(value) ? "서버 응답을 확인할 수 없습니다." : value;
 }

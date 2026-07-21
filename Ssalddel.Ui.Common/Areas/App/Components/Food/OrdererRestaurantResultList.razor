@@ -1,0 +1,110 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Food
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="restaurant-panel restaurant-list-panel">
+    <div class="restaurant-panel-heading">
+        <div>
+            <MudText Typo="Typo.overline">SERVER RESULTS</MudText>
+            <MudText Typo="Typo.h6">공개 음식점</MudText>
+        </div>
+        @if (List.초기화됨)
+        {
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" Disabled="@List.처리중" OnClick="ReloadRequested">새로고침</MudButton>
+        }
+    </div>
+
+    @if (List.처리중)
+    {
+        <div class="restaurant-state restaurant-state--compact">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2">공개 음식점 원장을 조회하고 있습니다.</MudText>
+        </div>
+    }
+    else if (List.오류발생)
+    {
+        <div class="restaurant-state restaurant-state--compact">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">음식점 목록을 불러오지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@OrdererRestaurantPresentation.ErrorMessage(List.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadRequested">다시 시도</MudButton>
+        </div>
+    }
+    else if (!List.초기화됨)
+    {
+        <div class="restaurant-state restaurant-state--compact">
+            <MudIcon Icon="@Icons.Material.Filled.LocationCity" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">조회할 공개 행정권역을 선택해 주세요.</MudText>
+            <MudText Typo="Typo.body2">첫 음식점이나 임의 위치를 자동 선택하지 않습니다.</MudText>
+        </div>
+    }
+    else if (List.결과없음)
+    {
+        <div class="restaurant-state restaurant-state--compact">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">선택한 기준에 공개된 음식점이 없습니다.</MudText>
+            <MudText Typo="Typo.body2">@OrdererRestaurantPresentation.EmptyMessage(List)</MudText>
+        </div>
+    }
+    else
+    {
+        <MudText Typo="Typo.caption">@($"전체 {List.전체건수:N0}곳 · {List.현재페이지}/{List.총페이지수}페이지")</MudText>
+        <div class="restaurant-card-grid">
+            @foreach (var restaurant in List.음식점목록)
+            {
+                <article class="restaurant-card @(SelectedRestaurantId == restaurant.Id ? "restaurant-card--selected" : string.Empty)">
+                    <div class="restaurant-card-heading">
+                        <div>
+                            <MudText Typo="Typo.h6">@restaurant.상호명</MudText>
+                            <MudText Typo="Typo.caption">@restaurant.카테고리 · @OrdererRestaurantPresentation.DistanceLabel(restaurant.거리Km)</MudText>
+                        </div>
+                        <MudChip T="string" Size="Size.Small" Color="@(restaurant.주문가능여부 ? Color.Success : Color.Default)" Variant="Variant.Outlined">
+                            @(restaurant.주문가능여부 ? "주문 가능" : "현재 준비 중")
+                        </MudChip>
+                    </div>
+                    <MudText Typo="Typo.body2">@OrdererRestaurantPresentation.ValueOrDash(restaurant.소개)</MudText>
+                    <MudText Typo="Typo.caption">@OrdererRestaurantPresentation.ValueOrDash(restaurant.공개주소)</MudText>
+                    <div class="restaurant-card-meta">
+                        <span>메뉴 @restaurant.공개메뉴수.ToString("N0")개</span>
+                        <span>최소 @restaurant.최소주문금액.ToString("N0")원</span>
+                        <span>예상 조리 @(restaurant.예상조리분)분</span>
+                    </div>
+                    <MudButton Variant="@(SelectedRestaurantId == restaurant.Id ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.RestaurantMenu"
+                               OnClick="@(() => RestaurantSelected.InvokeAsync(restaurant.Id))">
+                        공개 메뉴 보기
+                    </MudButton>
+                </article>
+            }
+        </div>
+
+        @if (List.총페이지수 > 1)
+        {
+            <div class="restaurant-pagination">
+                <MudPagination Count="@List.총페이지수"
+                               Selected="@List.현재페이지"
+                               SelectedChanged="PageChanged"
+                               Disabled="@List.처리중"
+                               ShowFirstButton="true"
+                               ShowLastButton="true" />
+            </div>
+        }
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 음식점공개목록ViewModel List { get; set; } = null!;
+
+    [Parameter]
+    public long? SelectedRestaurantId { get; set; }
+
+    [Parameter]
+    public EventCallback ReloadRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<long> RestaurantSelected { get; set; }
+}
