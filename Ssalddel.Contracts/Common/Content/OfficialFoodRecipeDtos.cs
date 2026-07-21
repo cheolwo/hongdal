@@ -199,7 +199,27 @@ public sealed record OfficialFoodIngredientDto(
     string ClassificationState,
     int RecipeVariantCount,
     DateTime UpdatedAtUtc,
-    IReadOnlyList<OfficialFoodIngredientPublicPriceDto>? PublicPrices = null);
+    IReadOnlyList<OfficialFoodIngredientPublicPriceDto>? PublicPrices = null,
+    IReadOnlyList<OfficialFoodIngredientRelatedRecipeDto>? RelatedRecipes = null);
+
+public sealed record OfficialFoodIngredientRelatedRecipeDto(
+    string DishKey,
+    string RecipeRecordKey,
+    string SourceKey,
+    string Provider,
+    string CountryCode,
+    string DishName,
+    string RecipeTitle,
+    string RegionName,
+    string Category,
+    string IngredientGroupName,
+    string IngredientSourceName,
+    string QuantityText,
+    string UnitText,
+    string PreparationNote,
+    string OriginalUrl,
+    DateTime LastCollectedAtUtc,
+    bool IsFreshForPublication);
 
 public sealed record OfficialFoodRecipeIngredientDto(
     string IngredientKey,

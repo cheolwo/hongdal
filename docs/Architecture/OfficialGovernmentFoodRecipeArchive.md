@@ -71,6 +71,8 @@ OfficialFoodRecipeCollectionRun
 - 언어와 정규화 재료명이 같으면 여러 레시피가 하나의 재료 마스터를 공유한다. 조리 상태나 상품 차이를 성급히 합치지 않도록 `다진 마늘`, `저염간장` 같은 원천 이름은 보존한다.
 - 규칙으로 분류하지 못한 재료는 `other`와 `PendingReview`로 명시한다. 낮은 신뢰도를 숨기거나 임의의 식품군으로 확정하지 않는다.
 - parser 버전을 레시피 변형과 사용 행에 기록해 규칙이 바뀌면 명시적으로 재색인할 수 있게 한다.
+- 재료 조회는 실제 사용 행에서 대표 레시피를 최대 3개까지 `RelatedRecipes`로 반환한다. 승인·대표 상태, freshness와 최근 수집을 우선하되 먼저 서로 다른 음식을 고르고, 음식이 부족할 때만 같은 음식의 다른 실제 레시피 변형으로 채운다.
+- 관계가 3개 미만인 재료는 유사 재료나 같은 분류의 레시피를 추정해 채우지 않는다. 원천에서 제거된 레시피와 제외된 음식은 대표 관계에 포함하지 않는다.
 
 ### 재료 공공가격 연결 원칙
 
@@ -89,12 +91,12 @@ OfficialFoodRecipeCollectionRun
 | `GET` | `/api/v1/admin/content/official-food-recipes/dishes` | 원천·국가·지역·검토 상태·검색어별 음식 후보 조회 |
 | `GET` | `/api/v1/admin/content/official-food-recipes/dishes/{dishKey}/variants` | 음식 후보의 출처별 레시피, 귀속 문구와 freshness 조회 |
 | `GET` | `/api/v1/admin/content/official-food-recipes/ingredients/categories` | 18개 재료 분류와 분류별 마스터 수 조회 |
-| `GET` | `/api/v1/admin/content/official-food-recipes/ingredients` | 분류·언어·검토 상태·검색어별 표준 재료 조회 |
+| `GET` | `/api/v1/admin/content/official-food-recipes/ingredients` | 분류·언어·검토 상태·검색어별 표준 재료와 실제 대표 레시피 최대 3개 조회 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/ingredients/index` | 기존 원문 재료를 parser 버전에 맞춰 배치 색인 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/ingredients/prices/index` | 명확한 재료만 KAMIS·USDA 품목에 매핑하고 실제 가격 가용 건수 집계 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/collections` | 허용된 원천을 페이지·항목 상한 안에서 명시적으로 수집 |
 
-모든 API는 `서버관리자전용`이다. `ingredients`와 레시피 `variants` 응답의 구조화 재료에는 연결 가능한 `PublicPrices`가 포함된다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
+모든 API는 `서버관리자전용`이다. `ingredients` 응답에는 연결 가능한 `PublicPrices`와 `RelatedRecipes`, 레시피 `variants` 응답의 구조화 재료에는 `PublicPrices`가 포함된다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
 
 ## 설정과 순서별 실행
 

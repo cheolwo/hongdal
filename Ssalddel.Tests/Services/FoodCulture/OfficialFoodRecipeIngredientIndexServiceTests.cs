@@ -200,8 +200,73 @@ public sealed class OfficialFoodRecipeIngredientIndexServiceTests
         Assert.Equal(2, forced.ProcessedRecipeVariantCount);
         Assert.Equal(3, await db.OfficialFoodIngredients.CountAsync());
         Assert.Equal(4, await db.OfficialFoodRecipeIngredients.CountAsync());
-        Assert.Equal(2, ingredients.Single(item => item.CanonicalName == "두부").RecipeVariantCount);
+        var tofu = ingredients.Single(item => item.CanonicalName == "두부");
+        Assert.Equal(2, tofu.RecipeVariantCount);
+        Assert.Equal(2, tofu.RelatedRecipes?.Count);
+        Assert.Single(tofu.RelatedRecipes!.Select(item => item.DishKey).Distinct());
         Assert.Equal(18, (await service.GetCategoriesAsync()).Count);
+    }
+
+    [Fact]
+    public async Task 재료조회는_실제사용관계에서_서로다른_대표음식_세개를_우선한다()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<AgriculturalFisheriesDbContext>()
+            .UseSqlite(connection)
+            .Options;
+        await using var db = new AgriculturalFisheriesDbContext(options);
+        await db.Database.EnsureCreatedAsync();
+        var source = await db.OfficialFoodRecipeSources.SingleAsync(
+            item => item.SourceKey == OfficialFoodRecipeSourceKeys.MfdsCookRecipe);
+        var run = new OfficialFoodRecipeCollectionRun
+        {
+            SourceKey = source.SourceKey,
+            StatusCode = OfficialFoodRecipeCollectionStatuses.Completed
+        };
+        var dishes = Enumerable.Range(1, 4)
+            .Select(index => new OfficialFoodDish
+            {
+                DishKey = $"dish-{index}",
+                CountryCode = "KR",
+                Name = $"두부 요리 {index}",
+                OriginalName = $"두부 요리 {index}",
+                RepresentationState = index == 1
+                    ? OfficialFoodRecipeRepresentationStates.Representative
+                    : OfficialFoodRecipeRepresentationStates.Candidate,
+                ReviewState = index == 1
+                    ? OfficialFoodRecipeReviewStates.Approved
+                    : OfficialFoodRecipeReviewStates.PendingReview
+            })
+            .ToArray();
+        db.Add(run);
+        db.AddRange(dishes);
+        db.OfficialFoodRecipeVariants.AddRange(dishes.Select((dish, index) =>
+            Variant(source, run, dish, $"recipe-{index + 1}", ["두부 20g"])));
+        await db.SaveChangesAsync();
+        var timeProvider = new OfficialFoodRecipeArchiveServiceTests.MutableTimeProvider(
+            new DateTimeOffset(2026, 7, 21, 9, 0, 0, TimeSpan.Zero));
+        var priceService = new OfficialFoodIngredientPublicPriceService(
+            db,
+            new OfficialFoodIngredientPriceMatchCatalog(new FoodPriceCrosswalkCatalog()),
+            timeProvider);
+        var service = new OfficialFoodRecipeIngredientIndexService(
+            db,
+            new OfficialFoodRecipeIngredientParser(),
+            priceService,
+            timeProvider);
+
+        await service.RebuildAsync(new OfficialFoodIngredientIndexRequest(source.SourceKey, 10));
+        var tofu = Assert.Single(await service.SearchIngredientsAsync(
+            new OfficialFoodIngredientQuery { SearchText = "두부" }));
+        var relatedRecipes = tofu.RelatedRecipes
+            ?? throw new Xunit.Sdk.XunitException("대표 레시피 관계가 반환되지 않았습니다.");
+
+        Assert.Equal(4, tofu.RecipeVariantCount);
+        Assert.Equal(3, relatedRecipes.Count);
+        Assert.Equal(3, relatedRecipes.Select(item => item.DishKey).Distinct().Count());
+        Assert.Equal("dish-1", relatedRecipes[0].DishKey);
+        Assert.All(relatedRecipes, item => Assert.Equal(source.SourceKey, item.SourceKey));
     }
 
     private static OfficialFoodRecipeVariant Variant(

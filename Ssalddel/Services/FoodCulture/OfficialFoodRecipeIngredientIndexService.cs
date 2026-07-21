@@ -33,6 +33,7 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private const int BatchSize = 100;
+    private const int RelatedRecipeLimit = 3;
 
     private readonly AgriculturalFisheriesDbContext _db;
     private readonly OfficialFoodRecipeIngredientParser _parser;
@@ -132,10 +133,14 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
         var prices = await _priceService.GetLatestPricesAsync(
             rows.Select(row => row.Id).ToArray(),
             cancellationToken);
+        var relatedRecipes = await GetRelatedRecipesAsync(
+            rows.Select(row => row.Id).ToArray(),
+            cancellationToken);
         return rows
             .Select(row => row.Dto with
             {
-                PublicPrices = prices.GetValueOrDefault(row.Id, [])
+                PublicPrices = prices.GetValueOrDefault(row.Id, []),
+                RelatedRecipes = relatedRecipes.GetValueOrDefault(row.Id, [])
             })
             .ToArray();
     }
@@ -370,6 +375,154 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
         return parsed.Count;
     }
 
+    private async Task<IReadOnlyDictionary<long, IReadOnlyList<OfficialFoodIngredientRelatedRecipeDto>>>
+        GetRelatedRecipesAsync(
+            IReadOnlyCollection<long> ingredientIds,
+            CancellationToken cancellationToken)
+    {
+        var ids = ingredientIds
+            .Where(id => id > 0)
+            .Distinct()
+            .ToArray();
+        if (ids.Length == 0)
+        {
+            return new Dictionary<long, IReadOnlyList<OfficialFoodIngredientRelatedRecipeDto>>();
+        }
+
+        var candidates = await _db.OfficialFoodRecipeIngredients
+            .AsNoTracking()
+            .Where(item => Enumerable.Contains(ids, item.IngredientId)
+                           && item.RecipeVariant != null
+                           && !item.RecipeVariant.IsRemovedAtSource
+                           && item.RecipeVariant.Dish != null
+                           && item.RecipeVariant.Source != null
+                           && item.RecipeVariant.Dish.ReviewState
+                           != OfficialFoodRecipeReviewStates.Excluded
+                           && item.RecipeVariant.Dish.RepresentationState
+                           != OfficialFoodRecipeRepresentationStates.Excluded)
+            .Select(item => new RelatedRecipeCandidate(
+                item.Id,
+                item.IngredientId,
+                item.RecipeVariantId,
+                item.RecipeVariant!.DishId,
+                item.RecipeVariant.Dish!.DishKey,
+                item.RecipeVariant.RecordKey,
+                item.RecipeVariant.Source!.SourceKey,
+                item.RecipeVariant.Source.Provider,
+                item.RecipeVariant.Dish.CountryCode,
+                item.RecipeVariant.Dish.Name,
+                item.RecipeVariant.Title,
+                item.RecipeVariant.RegionName,
+                item.RecipeVariant.Dish.RegionName,
+                item.RecipeVariant.Category,
+                item.RecipeVariant.Dish.Category,
+                item.GroupName,
+                item.SourceName,
+                item.QuantityText,
+                item.UnitText,
+                item.PreparationNote,
+                item.DisplayOrder,
+                item.RecipeVariant.OriginalUrl,
+                item.RecipeVariant.LastCollectedAtUtc,
+                item.RecipeVariant.ContentExpiresAtUtc,
+                item.RecipeVariant.Dish.RepresentationState,
+                item.RecipeVariant.Dish.ReviewState))
+            .ToArrayAsync(cancellationToken);
+
+        var nowUtc = UtcNow();
+        var candidatesByIngredient = candidates.ToLookup(candidate => candidate.IngredientId);
+        return ids.ToDictionary(
+            ingredientId => ingredientId,
+            ingredientId => SelectRelatedRecipes(
+                candidatesByIngredient[ingredientId],
+                nowUtc));
+    }
+
+    private static IReadOnlyList<OfficialFoodIngredientRelatedRecipeDto> SelectRelatedRecipes(
+        IEnumerable<RelatedRecipeCandidate> candidates,
+        DateTime nowUtc)
+    {
+        var ordered = candidates
+            .GroupBy(candidate => candidate.RecipeVariantId)
+            .Select(group => group
+                .OrderBy(candidate => candidate.DisplayOrder)
+                .ThenBy(candidate => candidate.RelationId)
+                .First())
+            .OrderBy(candidate => candidate.ReviewState == OfficialFoodRecipeReviewStates.Approved ? 0 : 1)
+            .ThenBy(candidate => candidate.RepresentationState
+                                 == OfficialFoodRecipeRepresentationStates.Representative
+                ? 0
+                : 1)
+            .ThenBy(candidate => IsFresh(candidate, nowUtc) ? 0 : 1)
+            .ThenByDescending(candidate => candidate.LastCollectedAtUtc)
+            .ThenBy(candidate => candidate.DishKey, StringComparer.Ordinal)
+            .ThenBy(candidate => candidate.RecipeRecordKey, StringComparer.Ordinal)
+            .ToArray();
+
+        var selected = new List<RelatedRecipeCandidate>(RelatedRecipeLimit);
+        var selectedVariantIds = new HashSet<long>();
+        var selectedDishIds = new HashSet<long>();
+        foreach (var candidate in ordered)
+        {
+            if (selected.Count == RelatedRecipeLimit)
+            {
+                break;
+            }
+
+            if (selectedDishIds.Add(candidate.DishId))
+            {
+                selected.Add(candidate);
+                selectedVariantIds.Add(candidate.RecipeVariantId);
+            }
+        }
+
+        if (selected.Count < RelatedRecipeLimit)
+        {
+            foreach (var candidate in ordered)
+            {
+                if (selected.Count == RelatedRecipeLimit)
+                {
+                    break;
+                }
+
+                if (selectedVariantIds.Add(candidate.RecipeVariantId))
+                {
+                    selected.Add(candidate);
+                }
+            }
+        }
+
+        return selected.Select(candidate => new OfficialFoodIngredientRelatedRecipeDto(
+                candidate.DishKey,
+                candidate.RecipeRecordKey,
+                candidate.SourceKey,
+                candidate.Provider,
+                candidate.CountryCode,
+                string.IsNullOrWhiteSpace(candidate.DishName)
+                    ? candidate.RecipeTitle
+                    : candidate.DishName,
+                candidate.RecipeTitle,
+                string.IsNullOrWhiteSpace(candidate.RecipeRegionName)
+                    ? candidate.DishRegionName
+                    : candidate.RecipeRegionName,
+                string.IsNullOrWhiteSpace(candidate.RecipeCategory)
+                    ? candidate.DishCategory
+                    : candidate.RecipeCategory,
+                candidate.IngredientGroupName,
+                candidate.IngredientSourceName,
+                candidate.QuantityText,
+                candidate.UnitText,
+                candidate.PreparationNote,
+                candidate.OriginalUrl,
+                candidate.LastCollectedAtUtc,
+                IsFresh(candidate, nowUtc)))
+            .ToArray();
+    }
+
+    private static bool IsFresh(RelatedRecipeCandidate candidate, DateTime nowUtc)
+        => !candidate.ContentExpiresAtUtc.HasValue
+           || candidate.ContentExpiresAtUtc.Value > nowUtc;
+
     private static T Deserialize<T>(string json, T fallback)
     {
         try
@@ -389,4 +542,32 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
         var text = value?.Trim() ?? string.Empty;
         return text.Length <= maxLength ? text : text[..maxLength];
     }
+
+    private sealed record RelatedRecipeCandidate(
+        long RelationId,
+        long IngredientId,
+        long RecipeVariantId,
+        long DishId,
+        string DishKey,
+        string RecipeRecordKey,
+        string SourceKey,
+        string Provider,
+        string CountryCode,
+        string DishName,
+        string RecipeTitle,
+        string RecipeRegionName,
+        string DishRegionName,
+        string RecipeCategory,
+        string DishCategory,
+        string IngredientGroupName,
+        string IngredientSourceName,
+        string QuantityText,
+        string UnitText,
+        string PreparationNote,
+        int DisplayOrder,
+        string OriginalUrl,
+        DateTime LastCollectedAtUtc,
+        DateTime? ContentExpiresAtUtc,
+        string RepresentationState,
+        string ReviewState);
 }
