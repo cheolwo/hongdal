@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | 표준 재료 조회 응답에 실제 사용 관계에서 고른 대표 레시피를 최대 3개 포함 | 화면 없음 — 관리자 재료 API의 `RelatedRecipes` 계약 확장 | 관련 단위 테스트와 서버 빌드로 간접 확인 |
 | 저장된 표준 재료·공공가격·대표 레시피를 공개 읽기 API로 제공 | 화면 없음 — `GET /api/v1/agricultural-fisheries/food-ingredients` 추가 | 공개 route 특성 테스트와 서버 빌드로 간접 확인 |
+| 공개 재료 검색 client/ViewModel과 공동구매용 안전한 deep-link seed 추가 | 간접 확인 — 실제 컴포넌트 렌더링은 후속 시각 검증 커밋으로 분리 | query 인코딩·50건 상한·비HTTP URL 제거·초안 문구 테스트 |
 
 ## 선택 규칙
 
