@@ -1,0 +1,24 @@
+<MudPaper Elevation="0" Outlined="true" Class="pa-3">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.subtitle1">운송 상태 타임라인</MudText>
+        <MudGrid>
+            @foreach (var step in DriverCurrentTransportPresentation.BuildTimeline(Status))
+            {
+                <MudItem xs="6" sm="4" md="2">
+                    <MudStack Spacing="1" AlignItems="AlignItems.Center">
+                        <MudIcon Icon="@step.Icon" Color="@step.Color" Size="Size.Medium" />
+                        <MudText Typo="Typo.caption" Align="Align.Center">@step.Label</MudText>
+                        <MudChip T="string" Size="Size.Small" Color="@step.Color" Variant="@step.Variant">
+                            @step.Status
+                        </MudChip>
+                    </MudStack>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? Status { get; set; }
+}
