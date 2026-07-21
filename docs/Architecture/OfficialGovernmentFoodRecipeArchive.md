@@ -83,7 +83,15 @@ OfficialFoodRecipeCollectionRun
 - KRW/1kg 유통 조사가격과 USD 원문 단위의 미국 생산자 수취가격은 직접 비교하거나 자동 환산하지 않는다. 각 가격에는 국가, 시장 단계, 기준일, 통화, 단위, 지역, 갱신 시각, 매칭 품질과 주의문을 함께 반환한다.
 - 가격은 레시피 수량을 곱한 구매비용이나 판매·주문 견적이 아니다. 원천 관측이 없거나 최신 통합 계열을 고를 수 없으면 매핑이 있더라도 가격을 표시하지 않는다.
 
-## 관리자 API
+## 공개 조회와 관리자 API
+
+| Method | Path | 용도 |
+| --- | --- | --- |
+| `GET` | `/api/v1/agricultural-fisheries/food-ingredients` | 표준 재료, 출처가 확인된 한국·미국 공공가격, 실제 사용 관계의 대표 레시피 최대 3개 조회 |
+
+공개 조회는 이미 DB에 보관·색인된 자료만 읽는다. 외부 공공 API를 즉시 호출하거나 재료 분류·가격 매핑·레시피 관계를 확정하지 않으며, 정확한 매핑이 없으면 가격을 비워 둔다.
+
+### 관리자 API
 
 | Method | Path | 용도 |
 | --- | --- | --- |
@@ -96,7 +104,7 @@ OfficialFoodRecipeCollectionRun
 | `POST` | `/api/v1/admin/content/official-food-recipes/ingredients/prices/index` | 명확한 재료만 KAMIS·USDA 품목에 매핑하고 실제 가격 가용 건수 집계 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/collections` | 허용된 원천을 페이지·항목 상한 안에서 명시적으로 수집 |
 
-모든 API는 `서버관리자전용`이다. `ingredients` 응답에는 연결 가능한 `PublicPrices`와 `RelatedRecipes`, 레시피 `variants` 응답의 구조화 재료에는 `PublicPrices`가 포함된다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
+관리자 표의 API는 모두 `서버관리자전용`이다. 관리자 `ingredients` 응답과 공개 재료 조회 응답에는 연결 가능한 `PublicPrices`와 실제 사용 관계의 `RelatedRecipes`가 포함되고, 레시피 `variants` 응답의 구조화 재료에는 `PublicPrices`가 포함된다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
 
 ## 설정과 순서별 실행
 

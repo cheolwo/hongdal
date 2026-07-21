@@ -1,6 +1,8 @@
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common.AgriculturalFisheries;
+using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Services.AgriculturalFisheries.Information;
+using Ssalddel.Services.FoodCulture;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,17 +18,20 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
     private readonly I미국농수산가격조회Service _usPriceService;
     private readonly I호주농수산식품가격조회Service _australiaFoodPriceService;
     private readonly I미국농어업경영체정보원천Service _usOperatorSourceService;
+    private readonly IOfficialFoodRecipeIngredientIndexService _ingredientIndexService;
 
     public AgriculturalFisheriesInformationController(
         IAgriculturalFisheriesInformationService informationService,
         I미국농수산가격조회Service usPriceService,
         I호주농수산식품가격조회Service australiaFoodPriceService,
-        I미국농어업경영체정보원천Service usOperatorSourceService)
+        I미국농어업경영체정보원천Service usOperatorSourceService,
+        IOfficialFoodRecipeIngredientIndexService ingredientIndexService)
     {
         _informationService = informationService;
         _usPriceService = usPriceService;
         _australiaFoodPriceService = australiaFoodPriceService;
         _usOperatorSourceService = usOperatorSourceService;
+        _ingredientIndexService = ingredientIndexService;
     }
 
     [HttpGet]
@@ -40,6 +45,24 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 30)
         => Ok(_informationService.SearchItems(query, categoryCode, page, pageSize));
+
+    [HttpGet("food-ingredients")]
+    public async Task<ActionResult<IReadOnlyList<OfficialFoodIngredientDto>>> SearchFoodIngredients(
+        [FromQuery] OfficialFoodIngredientQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        var publicQuery = new OfficialFoodIngredientQuery
+        {
+            CategoryCode = query.CategoryCode,
+            LanguageCode = query.LanguageCode,
+            ClassificationState = query.ClassificationState,
+            SearchText = query.SearchText,
+            Take = Math.Clamp(query.Take, 1, 50)
+        };
+        return Ok(await _ingredientIndexService.SearchIngredientsAsync(
+            publicQuery,
+            cancellationToken));
+    }
 
     [HttpGet("items/{hsCode}/domestic-price")]
     public async Task<ActionResult<AgriculturalFisheriesDomesticPriceResponse>> GetDomesticPrice(
