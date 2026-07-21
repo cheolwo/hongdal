@@ -1,0 +1,33 @@
+<section class="ingredient-prices" aria-label="@($"{IngredientName} 공공 가격")">
+    <h4>공공 가격 참고</h4>
+    @if (Prices.Count == 0)
+    {
+        <p class="ingredient-prices__empty">농수산·축산 가격으로 확인되는 자료가 아직 없습니다.</p>
+    }
+    else
+    {
+        @foreach (var price in Prices.Take(3))
+        {
+            <div class="ingredient-price">
+                <div>
+                    <strong>@price.CountryName · @price.MarketStageName</strong>
+                    <span>@price.CommodityName @price.VarietyOrClass</span>
+                </div>
+                <b>@OfficialFoodIngredientPresentation.FormatPrice(price)</b>
+                <small>@price.ReferenceDate.ToString("yyyy.MM.dd") · @price.RegionName · @price.Provider</small>
+                @if (OfficialFoodIngredientPresentation.SafeHttpUrl(price.SourceUrl) is string priceUrl)
+                {
+                    <a href="@priceUrl" target="_blank" rel="noreferrer">가격 원천</a>
+                }
+            </div>
+        }
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string IngredientName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OfficialFoodIngredientPublicPriceDto> Prices { get; set; } = [];
+}

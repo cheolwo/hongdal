@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Ui.Common.Areas.App.Components.Information;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -111,6 +112,32 @@ public sealed class OfficialFoodIngredientJourneyTests
     }
 
     [Fact]
+    public void 표시책임은_가격과레시피를_개인정보없는공동구매Seed로조립한다()
+    {
+        var ingredient = Ingredient("두부");
+        var recipe = Assert.Single(ingredient.RelatedRecipes ?? []);
+
+        var seed = OfficialFoodIngredientPresentation.CreatePurchaseSeed(
+            new OfficialFoodIngredientPurchaseSelection(ingredient, recipe));
+
+        Assert.NotNull(seed);
+        Assert.Equal("두부", seed!.IngredientName);
+        Assert.Equal("건강한 두부전골", seed.RecipeTitle);
+        Assert.Equal("kg", seed.PurchaseUnit);
+        Assert.Contains("한국 소매", seed.PriceReference, StringComparison.Ordinal);
+        Assert.Contains("식품의약품안전처 · KR", seed.RecipeSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("ledger", seed.ToNavigationUri(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData("https://foodsafety.example/recipe/1", true)]
+    [InlineData("http://www.kamis.or.kr/price", true)]
+    [InlineData("javascript:alert(1)", false)]
+    [InlineData("/relative/recipe", false)]
+    public void 원문링크표시는_HTTP계열만허용한다(string value, bool expected)
+        => Assert.Equal(expected, OfficialFoodIngredientPresentation.SafeHttpUrl(value) is not null);
+
+    [Fact]
     public void 공통Ui등록은_공개재료Client와여정ViewModel을포함한다()
     {
         var services = new ServiceCollection();
@@ -125,6 +152,51 @@ public sealed class OfficialFoodIngredientJourneyTests
             descriptor.ServiceType == typeof(OfficialFoodIngredientJourneyViewModel)
             && descriptor.ImplementationType == typeof(OfficialFoodIngredientJourneyViewModel)
             && descriptor.Lifetime == ServiceLifetime.Transient);
+    }
+
+    [Fact]
+    public void 공식재료화면은_재료이름과_좁은폭동작영역을_실제값으로연결한다()
+    {
+        var componentDirectory = FindComponentDirectory();
+        var card = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCard.razor"));
+        var journeyCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientJourney.razor.css"));
+        var cardCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCard.razor.css"));
+        var recipeCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientRecipePanel.razor.css"));
+        var searchCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientSearchPanel.razor.css"));
+
+        Assert.Contains("IngredientName=\"@Ingredient.CanonicalName\"", card);
+        Assert.Contains("@media (max-width: 900px)", journeyCss);
+        Assert.Contains("@media (max-width: 640px)", cardCss);
+        Assert.Contains("@media (max-width: 640px)", recipeCss);
+        Assert.Contains("@media (max-width: 640px)", searchCss);
+        Assert.Contains("min-height: 44px", journeyCss);
+        Assert.Contains("min-height: 44px", cardCss);
+        Assert.Contains("min-height: 44px", recipeCss);
+        Assert.Contains("min-height: 44px", searchCss);
+    }
+
+    private static string FindComponentDirectory()
+        => Path.Combine(
+            FindRepositoryRoot(),
+            "Ssalddel.Ui.Common",
+            "Areas",
+            "App",
+            "Components",
+            "Information");
+
+    private static string FindRepositoryRoot()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
+             directory is not null;
+             directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "Ssalddel.slnx")))
+            {
+                return directory.FullName;
+            }
+        }
+
+        throw new DirectoryNotFoundException("Ssalddel 저장소 루트를 찾지 못했습니다.");
     }
 
     private static OfficialFoodIngredientDto Ingredient(string name)

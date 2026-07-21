@@ -1,5 +1,4 @@
 @inherits MvvmComponentBase<농수산가격비교PageViewModel>
-@using Ssalddel.Ui.Common.Areas.App.Models
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
 
 <section class="public-data-workspace">
@@ -16,20 +15,20 @@
         </div>
     </header>
 
-    <div class="public-data-workspace__layout">
-        <aside class="public-data-workspace__navigator" aria-label="공공데이터 종류 선택">
-            <SsalddelLaterHeavenBaguaNavigator RoleLabel="공공데이터"
-                                               NavigationItems="InformationNavigationItems"
-                                               AccentColor="#0f766e"
-                                               CenterSymbol="ⓘ"
-                                               CenterTrigramName="정보"
-                                               CenterDestinationLabel="3개국 비교"
-                                               ShowTaegeukCenter="false"
-                                               CenterSelected="ViewModel.ShowComparisonAsync"
-                                               DestinationSelected="ViewModel.SelectSectionAsync" />
-        </aside>
+    <nav class="public-data-workspace__section-nav" aria-label="농수산물 가격 화면 선택">
+        @foreach (var item in SectionNavigationItems)
+        {
+            <button type="button"
+                    class="@BuildSectionButtonClass(item.Section)"
+                    aria-current="@(ViewModel.ActiveSection == item.Section ? "page" : null)"
+                    @onclick="@(() => ViewModel.SelectSection(item.Section))">
+                <span>@item.Eyebrow</span>
+                <strong>@item.Label</strong>
+            </button>
+        }
+    </nav>
 
-        <main class="public-data-workspace__content">
+    <main class="public-data-workspace__content">
             <header class="public-data-workspace__section-header">
                 <div>
                     <span>@ViewModel.CurrentSectionEyebrow</span>
@@ -153,21 +152,31 @@
                     <농수산가격ComparisonWorkspace ViewModel="ViewModel" />
                     break;
             }
-        </main>
-    </div>
+    </main>
 </section>
 
 @code {
-    private static readonly IReadOnlyList<SsalddelCardinalNavigationOption> InformationNavigationItems =
+    private static readonly IReadOnlyList<PriceSectionNavigationItem> SectionNavigationItems =
     [
-        new("li", "리", "☲", "남", "한국 aT", "information") { BusinessLabel = "국내가격" },
-        new("dui", "태", "☱", "서", "USDA NASS", "information") { BusinessLabel = "미국가격" },
-        new("kan", "감", "☵", "북", "호주 ABS", "information") { BusinessLabel = "호주지수" },
-        new("zhen", "진", "☳", "동", "공식 원천", "information") { BusinessLabel = "데이터출처" }
+        new(농수산가격비교Section.비교, "COMPARE", "3개국 비교"),
+        new(농수산가격비교Section.국내, "KR", "한국 aT"),
+        new(농수산가격비교Section.미국, "US", "USDA NASS"),
+        new(농수산가격비교Section.호주, "AU", "호주 ABS"),
+        new(농수산가격비교Section.출처, "SOURCE", "공식 데이터 출처")
     ];
+
+    private string BuildSectionButtonClass(농수산가격비교Section section)
+        => ViewModel.ActiveSection == section
+            ? "public-data-workspace__section-nav-item public-data-workspace__section-nav-item--active"
+            : "public-data-workspace__section-nav-item";
 
     protected override async Task OnInitializedAsync()
     {
         await ViewModel.초기화Async();
     }
+
+    private sealed record PriceSectionNavigationItem(
+        농수산가격비교Section Section,
+        string Eyebrow,
+        string Label);
 }

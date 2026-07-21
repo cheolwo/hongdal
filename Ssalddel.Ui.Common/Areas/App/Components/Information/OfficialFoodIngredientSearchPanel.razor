@@ -1,0 +1,40 @@
+<form class="ingredient-search" @onsubmit="HandleSearchAsync" @onsubmit:preventDefault>
+    <label>
+        <span>찾을 재료</span>
+        <input value="@SearchText"
+               @oninput="HandleSearchTextChangedAsync"
+               placeholder="예: 두부, 감자, 양파"
+               autocomplete="off" />
+    </label>
+    <button type="submit" disabled="@Busy">재료 찾기</button>
+    @if (!string.IsNullOrWhiteSpace(SearchText))
+    {
+        <button type="button"
+                class="ingredient-search__clear"
+                disabled="@Busy"
+                @onclick="HandleClearAsync">
+            전체 보기
+        </button>
+    }
+</form>
+
+@code {
+    [Parameter] public string SearchText { get; set; } = string.Empty;
+
+    [Parameter] public EventCallback<string> SearchTextChanged { get; set; }
+
+    [Parameter] public bool Busy { get; set; }
+
+    [Parameter] public EventCallback SearchRequested { get; set; }
+
+    [Parameter] public EventCallback ClearRequested { get; set; }
+
+    private Task HandleSearchTextChangedAsync(ChangeEventArgs args)
+        => SearchTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task HandleSearchAsync()
+        => SearchRequested.InvokeAsync();
+
+    private Task HandleClearAsync()
+        => ClearRequested.InvokeAsync();
+}

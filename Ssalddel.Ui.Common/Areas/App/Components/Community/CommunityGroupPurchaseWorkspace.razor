@@ -2,6 +2,7 @@
 @inject Ssalddel.Ui.Common.Areas.App.ViewModels.공동구매공개목록ViewModel 목록ViewModel
 @inject Ssalddel.Ui.Common.Areas.App.ViewModels.공동구매공개상세ViewModel 상세ViewModel
 @inject ISsalddel현재사용자Context CurrentUserContext
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
 
 <div class="group-purchase-workspace">
     <header class="group-purchase-hero">
@@ -54,6 +55,37 @@
                 </div>
                 <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="@(() => showCreatePanel = false)" />
             </div>
+
+            @if (activeIngredientSeed is { } ingredientSeed)
+            {
+                <section class="group-purchase-source-context" aria-label="공공데이터에서 이어온 공동구매 초안 근거">
+                    <div class="group-purchase-source-context__heading">
+                        <MudIcon Icon="@Icons.Material.Filled.Hub" Color="Color.Success" />
+                        <div>
+                            <strong>재료 정보에서 이어온 초안</strong>
+                            <span>@ingredientSeed.IngredientName · 가격과 레시피는 참고 근거이며 구매 조건은 아직 정해지지 않았습니다.</span>
+                        </div>
+                    </div>
+                    <dl>
+                        @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeTitle))
+                        {
+                            <div><dt>참고 레시피</dt><dd>@ingredientSeed.RecipeTitle</dd></div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeQuantity))
+                        {
+                            <div><dt>레시피 재료 표기</dt><dd>@ingredientSeed.RecipeQuantity</dd></div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ingredientSeed.PriceReference))
+                        {
+                            <div><dt>공공 가격</dt><dd>@ingredientSeed.PriceReference</dd></div>
+                        }
+                    </dl>
+                    @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeUrl))
+                    {
+                        <a href="@ingredientSeed.RecipeUrl" target="_blank" rel="noreferrer">공식 레시피 원문 다시 보기</a>
+                    }
+                </section>
+            }
 
             <div class="group-purchase-form-grid">
                 <MudTextField Label="제안 제목" @bind-Value="draft.Title" Variant="Variant.Outlined" Required="true" />
@@ -410,6 +442,9 @@
     [Parameter]
     public EventCallback<Guid> CampaignSelected { get; set; }
 
+    [Parameter]
+    public CommunityGroupPurchaseIngredientSeed? IngredientSeed { get; set; }
+
     private const string StageProposal = "proposal";
     private const string StageRecruitment = "recruitment";
     private const string StageObjection = "objection";
@@ -449,15 +484,20 @@
     private string selectedSignerDisplayName = string.Empty;
     private string statusMessage = string.Empty;
     private Severity statusSeverity = Severity.Info;
+    private CommunityGroupPurchaseIngredientSeed? activeIngredientSeed;
+    private string? appliedIngredientSeedFingerprint;
 
     protected override async Task OnInitializedAsync()
     {
+        ApplyIngredientSeed();
         await LoadCampaignsAsync();
         initialized = true;
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        ApplyIngredientSeed();
+
         if (!initialized
             || CampaignId is not Guid campaignId
             || 상세ViewModel.요청CampaignId == campaignId)
@@ -466,6 +506,41 @@
         }
 
         await SelectCampaignAsync(campaignId, false);
+    }
+
+    private void ApplyIngredientSeed()
+    {
+        if (IngredientSeed is null)
+        {
+            if (CampaignId is not null && activeIngredientSeed is not null)
+            {
+                activeIngredientSeed = null;
+                appliedIngredientSeedFingerprint = null;
+                showCreatePanel = false;
+            }
+
+            return;
+        }
+
+        if (CampaignId is not null
+            || string.Equals(
+                appliedIngredientSeedFingerprint,
+                IngredientSeed.Fingerprint,
+                StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        activeIngredientSeed = IngredientSeed;
+        appliedIngredientSeedFingerprint = IngredientSeed.Fingerprint;
+        draft.Title = IngredientSeed.SuggestedTitle;
+        draft.ProductName = IngredientSeed.IngredientName;
+        draft.ProductKey = IngredientSeed.SuggestedProductKey;
+        draft.QuantityUnit = IngredientSeed.PurchaseUnit;
+        draft.Description = IngredientSeed.BuildSuggestedDescription();
+        showCreatePanel = true;
+        statusSeverity = Severity.Info;
+        statusMessage = "공공 가격과 공식 레시피의 출처를 공동구매 제안 초안으로 가져왔습니다. 수량·포장·지역 조건을 확인해 주세요.";
     }
 
     private async Task LoadCampaignsAsync()
@@ -486,6 +561,12 @@
         if (previousCampaignId is Guid campaignId)
         {
             await SelectCampaignAsync(campaignId, false);
+            return;
+        }
+
+        if (IngredientSeed is not null)
+        {
+            상세ViewModel.선택해제();
             return;
         }
 

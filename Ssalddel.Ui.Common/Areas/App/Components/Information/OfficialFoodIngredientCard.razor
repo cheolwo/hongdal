@@ -1,0 +1,34 @@
+<article class="ingredient-card">
+    <header class="ingredient-card__header">
+        <div>
+            <span>@Ingredient.CategoryName</span>
+            <h3>@Ingredient.CanonicalName</h3>
+        </div>
+        <small>공식 레시피 @Ingredient.RecipeVariantCount.ToString("N0")건</small>
+    </header>
+
+    <OfficialFoodIngredientPricePanel IngredientName="@Ingredient.CanonicalName"
+                                      Prices="@(Ingredient.PublicPrices ?? [])" />
+
+    <OfficialFoodIngredientRecipePanel Ingredient="Ingredient"
+                                       Recipes="@(Ingredient.RelatedRecipes ?? [])"
+                                       PurchaseRequested="PurchaseRequested" />
+
+    <footer class="ingredient-card__footer">
+        <span>수량·포장·수령지는 제안 화면에서 직접 정합니다.</span>
+        <button type="button" @onclick="StartIngredientPurchaseAsync">
+            @Ingredient.CanonicalName 공동구매 초안
+        </button>
+    </footer>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfficialFoodIngredientDto Ingredient { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<OfficialFoodIngredientPurchaseSelection> PurchaseRequested { get; set; }
+
+    private Task StartIngredientPurchaseAsync()
+        => PurchaseRequested.InvokeAsync(new(Ingredient, null));
+}

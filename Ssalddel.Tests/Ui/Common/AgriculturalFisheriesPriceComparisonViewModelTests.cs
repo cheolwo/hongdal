@@ -85,6 +85,24 @@ public sealed class AgriculturalFisheriesPriceComparisonViewModelTests
         Assert.False(viewModel.IsLoading);
     }
 
+    [Theory]
+    [InlineData(농수산가격비교Section.비교, "한국·미국·호주 가격 비교")]
+    [InlineData(농수산가격비교Section.국내, "한국 농수산물 가격")]
+    [InlineData(농수산가격비교Section.미국, "미국 농수산물 가격")]
+    [InlineData(농수산가격비교Section.호주, "호주 식품 가격지수")]
+    [InlineData(농수산가격비교Section.출처, "공식 데이터 출처")]
+    public void SelectSection_UsesPlainPriceSections(
+        농수산가격비교Section section,
+        string expectedTitle)
+    {
+        using var viewModel = CreateViewModel(new FakePublicDataClient());
+
+        viewModel.SelectSection(section);
+
+        Assert.Equal(section, viewModel.ActiveSection);
+        Assert.Equal(expectedTitle, viewModel.CurrentSectionTitle);
+    }
+
     private static 농수산가격비교PageViewModel CreateViewModel(
         I농수산공공데이터Client client)
         => new(

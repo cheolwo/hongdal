@@ -1,5 +1,4 @@
 using Ssalddel.Contracts.Common.AgriculturalFisheries;
-using Ssalddel.Ui.Common.Areas.App.Models;
 using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -82,23 +81,8 @@ public sealed class 농수산가격비교PageViewModel : PageViewModelBase
         _ => "한국·미국·호주 가격 비교"
     };
 
-    public Task SelectSectionAsync(SsalddelCardinalNavigationOption option)
-    {
-        ActiveSection = option.TrigramKey switch
-        {
-            "li" => 농수산가격비교Section.국내,
-            "dui" => 농수산가격비교Section.미국,
-            "kan" => 농수산가격비교Section.호주,
-            _ => 농수산가격비교Section.출처
-        };
-        return Task.CompletedTask;
-    }
-
-    public Task ShowComparisonAsync()
-    {
-        ActiveSection = 농수산가격비교Section.비교;
-        return Task.CompletedTask;
-    }
+    public void SelectSection(농수산가격비교Section section)
+        => ActiveSection = section;
 
     public Task LoadDomesticAsync(CancellationToken cancellationToken = default)
         => 국내.조회Async(cancellationToken);

@@ -1,0 +1,15 @@
+<div class="ingredient-results" aria-label="공식 레시피 재료 검색 결과">
+    @foreach (var ingredient in Ingredients)
+    {
+        <OfficialFoodIngredientCard Ingredient="ingredient"
+                                    PurchaseRequested="PurchaseRequested" />
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OfficialFoodIngredientDto> Ingredients { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<OfficialFoodIngredientPurchaseSelection> PurchaseRequested { get; set; }
+}

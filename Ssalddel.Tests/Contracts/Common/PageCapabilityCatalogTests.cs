@@ -54,6 +54,22 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
+    public void 공식재료페이지는_비로그인읽기전용으로분류한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            "/information/food-ingredients?searchText=양파",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("official-food-ingredients", capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Live, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+    }
+
+    [Fact]
     public void 창고입고예정페이지는_인증된서버조회Beta로분류한다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(

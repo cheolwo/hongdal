@@ -202,6 +202,8 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.ReadOnly, false, "0.0", "출처와 기준 시각을 함께 표시하는 공개 정보 조회 화면입니다."),
         Prefix("public-price-comparison", SsalddelPageAppCodes.IntegratedWeb, "/information/agricultural-fisheries-price-comparison", PageCapabilityStage.Live,
             PageInteractionBoundary.ReadOnly, false, "0.0", "공개 가격 자료의 출처·단위·기준 시각을 비교합니다."),
+        Exact("official-food-ingredients", SsalddelPageAppCodes.IntegratedWeb, "/information/food-ingredients", PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "공식 레시피의 표준 재료, 출처가 확인된 공공가격과 실제 관련 레시피를 조회합니다."),
 
         Exact("global-home", SsalddelPageAppCodes.IntegratedWeb, "/global", PageCapabilityStage.Experience,
             PageInteractionBoundary.ReadOnly, false, "2.0", "해외 상품과 공급 조건을 공개 탐색합니다.",

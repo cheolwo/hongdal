@@ -1,0 +1,115 @@
+.ingredient-journey {
+    --ingredient-ink: #18251f;
+    --ingredient-muted: #637168;
+    --ingredient-line: #d9e5dd;
+    --ingredient-soft: #f4f8f5;
+    --ingredient-accent: #176b4d;
+    width: min(1240px, 100%);
+    margin: 0 auto;
+    color: var(--ingredient-ink);
+}
+
+.ingredient-journey__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: end;
+}
+
+.ingredient-journey__eyebrow {
+    color: var(--ingredient-accent);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+}
+
+.ingredient-journey__header h2 {
+    margin: 5px 0 0;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.ingredient-journey__header p {
+    max-width: 760px;
+    margin: 9px 0 0;
+    color: var(--ingredient-muted);
+    line-height: 1.65;
+}
+
+.ingredient-journey__steps {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.ingredient-journey__steps span {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--ingredient-line);
+    border-radius: 999px;
+    background: #fff;
+    color: #385247;
+    font-size: .75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.ingredient-journey__steps b {
+    display: grid;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e4f3eb;
+    color: var(--ingredient-accent);
+    font-size: .68rem;
+}
+
+.ingredient-journey__notice {
+    margin: 10px 2px 18px;
+    color: #745323;
+    font-size: .78rem;
+    line-height: 1.55;
+}
+
+.ingredient-journey__state {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 34px 20px;
+    border: 1px dashed #bdccc2;
+    border-radius: 14px;
+    background: var(--ingredient-soft);
+    color: var(--ingredient-muted);
+    text-align: center;
+}
+
+.ingredient-journey__state button {
+    min-height: 44px;
+    padding: 8px 13px;
+    border: 1px solid var(--ingredient-accent);
+    border-radius: 8px;
+    background: var(--ingredient-accent);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 750;
+}
+
+.ingredient-journey__state--error {
+    border-color: #e5c7c7;
+    background: #fff7f7;
+    color: #8b3d3d;
+}
+
+@media (max-width: 900px) {
+    .ingredient-journey__header {
+        grid-template-columns: 1fr;
+    }
+
+    .ingredient-journey__steps {
+        overflow-x: auto;
+    }
+}

@@ -1,0 +1,44 @@
+<section class="ingredient-recipes" aria-label="@($"{Ingredient.CanonicalName} 관련 레시피")">
+    <h4>이 재료가 쓰인 대표 레시피</h4>
+    @if (Recipes.Count == 0)
+    {
+        <p class="ingredient-recipes__empty">공개할 수 있는 실제 레시피 관계가 아직 없습니다.</p>
+    }
+    else
+    {
+        @foreach (var recipe in Recipes.Take(3))
+        {
+            <div class="ingredient-recipe">
+                <div class="ingredient-recipe__copy">
+                    <span>@recipe.CountryCode · @recipe.Provider</span>
+                    <strong>@recipe.DishName</strong>
+                    <p>@recipe.RecipeTitle</p>
+                    <small>@OfficialFoodIngredientPresentation.BuildRecipeIngredientText(recipe)</small>
+                </div>
+                <div class="ingredient-recipe__actions">
+                    @if (OfficialFoodIngredientPresentation.SafeHttpUrl(recipe.OriginalUrl) is string recipeUrl)
+                    {
+                        <a href="@recipeUrl" target="_blank" rel="noreferrer">원문 레시피</a>
+                    }
+                    <button type="button" @onclick="@(() => StartRecipePurchaseAsync(recipe))">
+                        이 레시피로 제안
+                    </button>
+                </div>
+            </div>
+        }
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfficialFoodIngredientDto Ingredient { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OfficialFoodIngredientRelatedRecipeDto> Recipes { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<OfficialFoodIngredientPurchaseSelection> PurchaseRequested { get; set; }
+
+    private Task StartRecipePurchaseAsync(OfficialFoodIngredientRelatedRecipeDto recipe)
+        => PurchaseRequested.InvokeAsync(new(Ingredient, recipe));
+}
