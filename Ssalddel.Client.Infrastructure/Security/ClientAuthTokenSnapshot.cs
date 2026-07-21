@@ -7,4 +7,5 @@ public sealed record ClientAuthTokenSnapshot(
     DateTime RefreshTokenExpiresAtUtc,
     string UserId,
     string UserName,
-    IReadOnlyList<string> Roles);
+    IReadOnlyList<string> Roles,
+    string? PreferredLanguageCode = null);

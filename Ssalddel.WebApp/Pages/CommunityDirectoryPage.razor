@@ -1,4 +1,5 @@
 @page "/community/categories"
+@using Ssalddel.WebApp.ViewModels
 @inject PlatformCommunityService CommunityService
 
 <PageTitle>게시판 전체보기 · 살뜰</PageTitle>
@@ -16,21 +17,21 @@
             <input type="search"
                    aria-label="게시판 검색"
                    placeholder="게시판 이름이나 주제 검색"
-                   value="@SearchText"
+                   value="@ViewModel.SearchText"
                    @oninput="HandleSearchInput" />
         </label>
     </header>
 
-    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
     {
         <MudAlert Severity="Severity.Warning" Dense="true">
             <div class="community-directory__recoverable-error">
-                <span>@StatusMessage</span>
+                <span>@ViewModel.StatusMessage</span>
                 <MudButton Variant="Variant.Text"
                            Color="Color.Warning"
                            Size="Size.Small"
-                           Disabled="@IsLoading"
-                           OnClick="LoadBoardSummariesAsync">
+                           Disabled="@ViewModel.IsLoading"
+                           OnClick="ReloadAsync">
                     다시 불러오기
                 </MudButton>
             </div>
@@ -40,18 +41,18 @@
     <a class="community-directory__all" href="/community/boards">
         <span class="community-directory__icon"><MudIcon Icon="@Icons.Material.Filled.DynamicFeed" /></span>
         <span><strong>전체 글</strong><small>공개 게시판의 글을 한 번에 봅니다.</small></span>
-        <b>@TotalPostCount.ToString("N0")</b>
+        <b>@ViewModel.TotalPostCount.ToString("N0")</b>
         <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
     </a>
 
-    @if (IsLoading)
+    @if (ViewModel.IsLoading)
     {
         <div class="community-directory__state" aria-live="polite">
             <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
             <span>게시판을 불러오는 중입니다.</span>
         </div>
     }
-    else if (VisibleGroups.Count == 0)
+    else if (ViewModel.VisibleGroups.Count == 0)
     {
         <div class="community-directory__state">
             <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
@@ -60,15 +61,15 @@
     }
     else
     {
-        @foreach (var group in VisibleGroups)
+        @foreach (var group in ViewModel.VisibleGroups)
         {
             <section class="community-directory__group" aria-labelledby="@($"board-group-{group.Key}")">
                 <header>
                     <span>@GroupEyebrow(group.Key)</span>
-                    <h2 id="@($"board-group-{group.Key}")">@group.First().GroupDisplayName</h2>
+                    <h2 id="@($"board-group-{group.Key}")">@group.DisplayName</h2>
                 </header>
                 <div class="community-directory__list">
-                    @foreach (var board in group)
+                    @foreach (var board in group.Boards)
                     {
                         <a class="community-directory__board"
                            href="@BoardHref(board.BoardKey)">
@@ -105,78 +106,19 @@
 </PlatformCommunityReadingThemeFrame>
 
 @code {
-    private IReadOnlyList<CommunityBoardSummaryResponse> BoardSummaries { get; set; } = [];
-    private string SearchText { get; set; } = string.Empty;
-    private string? StatusMessage { get; set; }
-    private bool IsLoading { get; set; } = true;
+    private CommunityDirectoryPageViewModel ViewModel { get; set; } = default!;
 
-    private int TotalPostCount => BoardSummaries.Sum(board => board.PostCount);
-
-    private IReadOnlyList<IGrouping<string, CommunityBoardSummaryResponse>> VisibleGroups
-        => BoardSummaries
-            .Where(MatchesSearch)
-            .GroupBy(board => board.GroupCode)
-            .ToArray();
-
-    protected override Task OnInitializedAsync()
-        => LoadBoardSummariesAsync();
-
-    private async Task LoadBoardSummariesAsync()
+    protected override async Task OnInitializedAsync()
     {
-        IsLoading = true;
-        StatusMessage = null;
-        try
-        {
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-            var serverBoards = await CommunityService.GetBoardSummariesAsync("shipper", timeout.Token);
-            BoardSummaries = MergeWithCoreBoards(serverBoards);
-        }
-        catch (Exception)
-        {
-            BoardSummaries = MergeWithCoreBoards([]);
-            StatusMessage = "게시글 수를 불러오지 못했습니다. 기본 게시판을 먼저 표시합니다.";
-        }
-        finally
-        {
-            IsLoading = false;
-        }
+        ViewModel = new CommunityDirectoryPageViewModel(
+            cancellationToken => CommunityService.GetBoardSummariesAsync("shipper", cancellationToken));
+        await ViewModel.LoadAsync();
     }
 
-    private static IReadOnlyList<CommunityBoardSummaryResponse> MergeWithCoreBoards(
-        IReadOnlyList<CommunityBoardSummaryResponse> serverBoards)
-    {
-        var byKey = serverBoards
-            .Where(board => !string.IsNullOrWhiteSpace(board.BoardKey))
-            .GroupBy(board => board.BoardKey, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
-        var merged = CommunityBoardCatalog.PublicBoards
-            .Select(board => byKey.TryGetValue(board.Key, out var serverBoard)
-                ? serverBoard
-                : new CommunityBoardSummaryResponse
-                {
-                    BoardKey = board.Key,
-                    DisplayName = board.DisplayName,
-                    Description = board.Description,
-                    GroupCode = board.GroupCode,
-                    GroupDisplayName = board.GroupDisplayName,
-                    IsUserCreatable = board.IsUserCreatable
-                })
-            .ToList();
-        merged.AddRange(serverBoards.Where(board => board.IsCustom));
-        return merged;
-    }
-
-    private bool MatchesSearch(CommunityBoardSummaryResponse board)
-    {
-        var search = SearchText.Trim();
-        return search.Length == 0
-               || board.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
-               || board.Description.Contains(search, StringComparison.OrdinalIgnoreCase)
-               || board.GroupDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase);
-    }
+    private Task ReloadAsync() => ViewModel.LoadAsync();
 
     private void HandleSearchInput(ChangeEventArgs args)
-        => SearchText = args.Value?.ToString() ?? string.Empty;
+        => ViewModel.UpdateSearch(args.Value?.ToString());
 
     private static string BoardHref(string boardKey)
         => $"/community/boards?boardKey={Uri.EscapeDataString(boardKey)}";

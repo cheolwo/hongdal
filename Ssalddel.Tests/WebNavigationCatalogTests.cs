@@ -71,6 +71,8 @@ public sealed class WebNavigationCatalogTests
     [InlineData("community")]
     [InlineData("community/group-purchase")]
     [InlineData("community/global-trade/101?tab=ledger")]
+    [InlineData("ko/community")]
+    [InlineData("en/community")]
     public void IsCommunityRoute_ReturnsTrueForCommunityArea(string relativePath)
     {
         Assert.True(WebNavigationCatalog.IsCommunityRoute(relativePath));

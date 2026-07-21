@@ -130,11 +130,7 @@ public static class WebNavigationCatalog
         };
 
     public static bool IsCommunityRoute(string? relativePath)
-    {
-        var path = NormalizePath(relativePath);
-        return path.Equals("community", StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith("community/", StringComparison.OrdinalIgnoreCase);
-    }
+        => WebLocalePolicy.IsCommunityPath(relativePath);
 
     private static string NormalizePath(string? relativePath)
         => (relativePath ?? string.Empty)

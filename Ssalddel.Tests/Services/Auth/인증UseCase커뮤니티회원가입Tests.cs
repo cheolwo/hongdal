@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ssalddel.Contracts.Common;
+using Ssalddel.Contracts.Common.Localization;
 using Ssalddel.Security;
 using Ssalddel.Services.Auth;
 using 살뜰.Data;
@@ -55,6 +56,35 @@ public sealed class 인증UseCase커뮤니티회원가입Tests
         Assert.InRange(user.PrivacyConsentedAtUtc.Value, beforeUtc, DateTime.UtcNow);
         Assert.Contains(역할명.커뮤니티회원, await fixture.UserManager.GetRolesAsync(user));
         Assert.Equal(user.PrivacyConsentedAtUtc, result.Value.PrivacyConsentedAtUtc);
+    }
+
+    [Fact]
+    public async Task 로그인사용자의_표시언어를_계정Claim으로_저장하고_교체한다()
+    {
+        await using var fixture = await IdentityFixture.CreateAsync();
+        var user = new ApplicationUser
+        {
+            UserName = "language-member",
+            Email = "language-member@example.com"
+        };
+        Assert.True((await fixture.UserManager.CreateAsync(user)).Succeeded);
+        var useCase = CreateUseCase(fixture.UserManager);
+
+        var first = await useCase.표시언어설정Async(
+            new 표시언어설정요청 { LanguageCode = "en" },
+            user.Id);
+        var second = await useCase.표시언어설정Async(
+            new 표시언어설정요청 { LanguageCode = "ko" },
+            user.Id);
+
+        Assert.True(first.IsSuccess);
+        Assert.True(second.IsSuccess);
+        Assert.Equal(DisplayLanguageCodes.Korean, second.Value.LanguageCode);
+        var languageClaims = (await fixture.UserManager.GetClaimsAsync(user))
+            .Where(claim => claim.Type == SsalddelDisplayLanguageClaimTypes.PreferredLanguage)
+            .ToArray();
+        var languageClaim = Assert.Single(languageClaims);
+        Assert.Equal(DisplayLanguageCodes.Korean, languageClaim.Value);
     }
 
     private static 인증UseCase CreateUseCase(UserManager<ApplicationUser> userManager)

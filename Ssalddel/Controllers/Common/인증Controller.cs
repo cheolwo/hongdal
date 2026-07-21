@@ -73,6 +73,16 @@ public class 인증Controller : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [Authorize]
+    [HttpPut("preferences/language")]
+    public async Task<IActionResult> 표시언어설정([FromBody] 표시언어설정요청 request)
+    {
+        var result = await _인증UseCase.표시언어설정Async(
+            request,
+            User.FindFirstValue(ClaimTypes.NameIdentifier));
+        return this.ToActionResult(result);
+    }
+
     private 인증요청Context 요청Context생성()
         => new(
             Request.Path.Value ?? "/api/v1/auth/login",

@@ -1,31 +1,32 @@
 @using System.Globalization
+@using Ssalddel.Contracts.Common.Localization
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
 
-<section id="community-forum-list" class="platform-community-forum" aria-label="@($"{BoardName} 글 목록")">
+<section id="community-forum-list" class="platform-community-forum" aria-label="@($"{DisplayBoardName(BoardName)} {UiText("글 목록", "post list")}")">
     <header class="platform-community-forum-toolbar">
         <div class="platform-community-forum-toolbar-title">
-            <span>@BoardName</span>
-            <strong>글 목록</strong>
-            <small>@($"{VisiblePostCount:N0}개 글")</small>
+            <span>@DisplayBoardName(BoardName)</span>
+            <strong>@UiText("글 목록", "Posts")</strong>
+            <small>@($"{VisiblePostCount:N0}{UiText("개 글", " posts")}")</small>
         </div>
-        <div class="platform-community-forum-view-tabs" role="group" aria-label="글 목록 필터">
+        <div class="platform-community-forum-view-tabs" role="group" aria-label="@UiText("글 목록 필터", "Post filters")">
             @foreach (var filter in FilterOptions)
             {
                 <button type="button"
                         class="@BuildFilterClass(filter)"
                         aria-pressed="@string.Equals(SelectedFilter, filter, StringComparison.OrdinalIgnoreCase)"
                         @onclick="@(() => SelectedFilterChanged.InvokeAsync(filter))">
-                    @filter
+                    @DisplayFilter(filter)
                 </button>
             }
         </div>
-        <div class="platform-community-forum-display-switch" role="radiogroup" aria-label="게시글 보기 방식">
+        <div class="platform-community-forum-display-switch" role="radiogroup" aria-label="@UiText("게시글 보기 방식", "Post display")">
             <button type="button"
                     class="@BuildViewModeClass(CommunityPostViewMode.List)"
                     role="radio"
                     aria-checked="@(ViewMode == CommunityPostViewMode.List)"
-                    aria-label="목록형으로 보기"
-                    title="목록형으로 보기"
+                    aria-label="@UiText("목록형으로 보기", "List view")"
+                    title="@UiText("목록형으로 보기", "List view")"
                     @onclick="@(() => ViewModeChanged.InvokeAsync(CommunityPostViewMode.List))">
                 <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
             </button>
@@ -33,8 +34,8 @@
                     class="@BuildViewModeClass(CommunityPostViewMode.Cards)"
                     role="radio"
                     aria-checked="@(ViewMode == CommunityPostViewMode.Cards)"
-                    aria-label="카드형으로 보기"
-                    title="카드형으로 보기"
+                    aria-label="@UiText("카드형으로 보기", "Card view")"
+                    title="@UiText("카드형으로 보기", "Card view")"
                     @onclick="@(() => ViewModeChanged.InvokeAsync(CommunityPostViewMode.Cards))">
                 <MudIcon Icon="@Icons.Material.Filled.GridView" Size="Size.Small" />
             </button>
@@ -44,28 +45,28 @@
                    Size="Size.Small"
                    StartIcon="@Icons.Material.Filled.Edit"
                    OnClick="ComposeRequested">
-            글쓰기
+            @UiText("글쓰기", "Write")
         </MudButton>
     </header>
 
     @if (ViewMode == CommunityPostViewMode.List)
     {
-        <div class="platform-community-forum-table" role="table" aria-label="커뮤니티 글 목록">
+        <div class="platform-community-forum-table" role="table" aria-label="@UiText("커뮤니티 글 목록", "Community posts")">
             <div class="platform-community-forum-row platform-community-forum-row--head" role="row">
-                <span role="columnheader">번호</span>
-                <span role="columnheader">분류</span>
-                <span role="columnheader">제목</span>
-                <span role="columnheader">글쓴이</span>
-                <span role="columnheader">작성일</span>
-                <span role="columnheader">추천</span>
-                <span role="columnheader">댓글</span>
+                <span role="columnheader">@UiText("번호", "No.")</span>
+                <span role="columnheader">@UiText("분류", "Board")</span>
+                <span role="columnheader">@UiText("제목", "Title")</span>
+                <span role="columnheader">@UiText("글쓴이", "Author")</span>
+                <span role="columnheader">@UiText("작성일", "Date")</span>
+                <span role="columnheader">@UiText("추천", "Likes")</span>
+                <span role="columnheader">@UiText("댓글", "Replies")</span>
             </div>
 
             @foreach (var post in Posts)
             {
                 <div class="@BuildPostRowClass(post)" role="row">
-                    <span class="platform-community-forum-number" role="cell">@(post.IsOperatorPinned ? "공지" : post.IsSystemGenerated ? CommunitySystemPostDisplay.ShortLabel(post.SystemPostKind) : post.Id.ToString(CultureInfo.InvariantCulture))</span>
-                    <span class="platform-community-forum-category" role="cell">@post.Category</span>
+                    <span class="platform-community-forum-number" role="cell">@DisplayPostNumber(post)</span>
+                    <span class="platform-community-forum-category" role="cell">@DisplayBoardName(post.Category)</span>
                     <span class="platform-community-forum-subject" role="cell">
                         <button type="button"
                                 aria-expanded="@IsPostSelected(post)"
@@ -106,7 +107,7 @@
                         <span>@DisplayPostNickname(post)</span>
                         @if (HasPublicAuthorCountry(post))
                         {
-                            <span class="platform-community-country" title="활동 국가: @post.AuthorDisplayCountryName">
+                            <span class="platform-community-country" title="@UiText("활동 국가", "Activity country"): @post.AuthorDisplayCountryName">
                                 <b>@post.AuthorDisplayCountryCode</b>
                                 <span>@post.AuthorDisplayCountryName</span>
                             </span>
@@ -116,8 +117,8 @@
                     <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
                     <span class="platform-community-forum-count platform-community-forum-count--comments"
                           role="cell"
-                          aria-label="@($"댓글 {post.CommentCount}개")">
-                        <span class="platform-community-forum-count-label" aria-hidden="true">댓글</span>
+                          aria-label="@($"{UiText("댓글", "Replies")} {post.CommentCount}")">
+                        <span class="platform-community-forum-count-label" aria-hidden="true">@UiText("댓글", "Replies")</span>
                         @post.CommentCount
                     </span>
                 </div>
@@ -126,8 +127,8 @@
             @foreach (var post in SeedPosts)
             {
                 <div class="@BuildSeedPostRowClass(post)" role="row">
-                    <span class="platform-community-forum-number platform-community-forum-number--recommended" role="cell">추천</span>
-                    <span class="platform-community-forum-category" role="cell">@post.Category</span>
+                    <span class="platform-community-forum-number platform-community-forum-number--recommended" role="cell">@UiText("추천", "Pick")</span>
+                    <span class="platform-community-forum-category" role="cell">@DisplayBoardName(post.Category)</span>
                     <span class="platform-community-forum-subject" role="cell">
                         <button type="button"
                                 aria-expanded="@IsSeedPostSelected(post)"
@@ -139,15 +140,15 @@
                                 <b>[@post.CommentCount]</b>
                             }
                         </button>
-                        <small>살뜰 추천 · @post.Category · @post.Author · @post.Meta</small>
+                        <small>@UiText("살뜰 추천", "Ssalddel pick") · @DisplayBoardName(post.Category) · @post.Author · @post.Meta</small>
                     </span>
                     <span class="platform-community-forum-author" role="cell">@post.Author</span>
                     <span role="cell">@post.Meta</span>
                     <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
                     <span class="platform-community-forum-count platform-community-forum-count--comments"
                           role="cell"
-                          aria-label="@($"댓글 {post.CommentCount}개")">
-                        <span class="platform-community-forum-count-label" aria-hidden="true">댓글</span>
+                          aria-label="@($"{UiText("댓글", "Replies")} {post.CommentCount}")">
+                        <span class="platform-community-forum-count-label" aria-hidden="true">@UiText("댓글", "Replies")</span>
                         @post.CommentCount
                     </span>
                 </div>
@@ -157,19 +158,19 @@
             {
                 <div class="platform-community-forum-empty" role="row">
                     <MudIcon Icon="@Icons.Material.Filled.Inbox" />
-                    <span>조건에 맞는 글이 없습니다.</span>
+                    <span>@UiText("조건에 맞는 글이 없습니다.", "No posts match these conditions.")</span>
                 </div>
             }
         </div>
     }
     else
     {
-        <div class="platform-community-forum-card-grid" aria-label="커뮤니티 글 카드 목록">
+        <div class="platform-community-forum-card-grid" aria-label="@UiText("커뮤니티 글 카드 목록", "Community post cards")">
             @foreach (var post in Posts)
             {
                 <article class="@BuildPostCardClass(post)">
                     <header>
-                        <span>@post.Category</span>
+                        <span>@DisplayBoardName(post.Category)</span>
                         <time datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@FormatForumDate(post.CreatedAtUtc)</time>
                     </header>
                     <button type="button"
@@ -228,7 +229,7 @@
                             <span>@DisplayPostNickname(post)</span>
                             @if (HasPublicAuthorCountry(post))
                             {
-                                <span class="platform-community-country" title="작성자가 공개한 활동 국가">
+                                <span class="platform-community-country" title="@UiText("작성자가 공개한 활동 국가", "Activity country shared by the author")">
                                     <b>@post.AuthorDisplayCountryCode</b>
                                     <span>@post.AuthorDisplayCountryName</span>
                                 </span>
@@ -247,7 +248,7 @@
             {
                 <article class="@BuildSeedPostCardClass(post)">
                     <header>
-                        <span>@post.Category</span>
+                        <span>@DisplayBoardName(post.Category)</span>
                         <span>@post.Meta</span>
                     </header>
                     <button type="button"
@@ -260,7 +261,7 @@
                     <p>@post.Body</p>
                     <footer>
                         <span class="platform-community-forum-card-author">@post.Author</span>
-                        <span class="platform-community-forum-card-tags">살뜰 추천</span>
+                        <span class="platform-community-forum-card-tags">@UiText("살뜰 추천", "Ssalddel pick")</span>
                         <span class="platform-community-forum-card-metrics">
                             <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="Size.Small" /> @post.RecommendationCount
                             <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" /> @post.CommentCount
@@ -273,7 +274,7 @@
             {
                 <div class="platform-community-forum-empty platform-community-forum-card-empty">
                     <MudIcon Icon="@Icons.Material.Filled.Inbox" />
-                    <span>조건에 맞는 글이 없습니다.</span>
+                    <span>@UiText("조건에 맞는 글이 없습니다.", "No posts match these conditions.")</span>
                 </div>
             }
         </div>
@@ -283,24 +284,30 @@
         <label>
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
             <input type="search"
-                   aria-label="게시글 검색"
-                   placeholder="제목, 내용, 작성자 검색"
+                   aria-label="@UiText("게시글 검색", "Search posts")"
+                   placeholder="@UiText("제목, 내용, 작성자 검색", "Search title, content or author")"
                    value="@SearchText"
                    @oninput="HandleSearchInput" />
             @if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                <button type="button" title="검색어 지우기" aria-label="검색어 지우기" @onclick="ClearSearchAsync">
+                <button type="button"
+                        title="@UiText("검색어 지우기", "Clear search")"
+                        aria-label="@UiText("검색어 지우기", "Clear search")"
+                        @onclick="ClearSearchAsync">
                     <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
                 </button>
             }
         </label>
-        <span>게시글 제목을 누르면 본문과 업무 흐름을 확인할 수 있습니다.</span>
+        <span>@UiText("게시글 제목을 누르면 본문과 업무 흐름을 확인할 수 있습니다.", "Select a post title to read the original content and its workflow.")</span>
     </footer>
 </section>
 
 @code {
     [Parameter, EditorRequired]
     public string BoardName { get; set; } = "전체";
+
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
 
     [Parameter]
     public IReadOnlyList<string> FilterOptions { get; set; } = [];
@@ -346,6 +353,63 @@
 
     [Parameter]
     public EventCallback<string> SearchTextChanged { get; set; }
+
+    private bool IsEnglishDisplay
+        => DisplayLanguageCodes.Normalize(DisplayLanguageCode) == DisplayLanguageCodes.English;
+
+    private string UiText(string korean, string english)
+        => IsEnglishDisplay ? english : korean;
+
+    private string DisplayFilter(string filter)
+        => !IsEnglishDisplay
+            ? filter
+            : filter switch
+            {
+                "전체글" => "All",
+                "추천글" => "Recommended",
+                "공지" => "Notices",
+                _ => filter
+            };
+
+    private string DisplayBoardName(string boardName)
+        => !IsEnglishDisplay
+            ? boardName
+            : boardName switch
+            {
+                "전체" => "All boards",
+                "공지·안내" => "Notices & Guides",
+                "서원·발원" => "Vows & Intentions",
+                "자유·생활" => "Life & Community",
+                "질문·도움" => "Questions & Help",
+                "정보·시세" => "Information & Prices",
+                "참여·모집" => "Participation",
+                "판매·공급" => "Sales & Supply",
+                "원장·진행" => "Ledgers & Progress",
+                "완료·후기" => "Results & Reviews",
+                "반야" => "Prajna",
+                "음식·맛집" => "Food & Places",
+                "화물" => "Cargo",
+                "시스템 다이어그램" => "System Diagrams",
+                "운송 실무" => "Transport Operations",
+                "업무 질문" => "Work Questions",
+                "업무 기록" => "Work Records",
+                "생활 원장" => "Community Ledgers",
+                "개선 제안" => "Improvement Proposals",
+                "신고/분쟁" => "Reports & Disputes",
+                _ => boardName
+            };
+
+    private string DisplayPostNumber(PlatformCommunityPostResponse post)
+    {
+        if (post.IsOperatorPinned)
+        {
+            return UiText("공지", "Notice");
+        }
+
+        return post.IsSystemGenerated
+            ? CommunitySystemPostDisplay.ShortLabel(post.SystemPostKind)
+            : post.Id.ToString(CultureInfo.InvariantCulture);
+    }
 
     private bool IsPostSelected(PlatformCommunityPostResponse post)
         => SelectedPostId == post.Id;

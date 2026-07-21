@@ -8,6 +8,8 @@ public sealed class IntegratedBetaCatalogTests
 {
     [Theory]
     [InlineData("/community")]
+    [InlineData("/ko/community")]
+    [InlineData("/en/community")]
     [InlineData("/community/write")]
     [InlineData("/community/posts/42")]
     public void 익명_커뮤니티_핵심_경로는_운영_상태이며_로그인이_선택이다(string href)

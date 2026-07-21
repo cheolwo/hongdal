@@ -260,41 +260,41 @@
                     <div class="platform-community-forum-title">
                         <SsalddelWonBangGakMark Size="@(UseClassicForumLayout ? 34 : 48)" />
                         <div>
-                            <span>@AppName · 살뜰 커뮤니티</span>
+                            <span>@AppName · @UiText("살뜰 커뮤니티", "Ssalddel Community")</span>
                             <MudText Typo="Typo.h4" Class="platform-community-hero-title">@CurrentCommunityBoardTitle</MudText>
                             <MudText Typo="Typo.body2" Color="Color.Secondary" Class="platform-community-hero-copy">
                                 @CurrentCommunityBoardDescription
                             </MudText>
                         </div>
                     </div>
-                    <div class="platform-community-forum-status" aria-label="현재 게시판 정보">
-                        <span><strong>@GetCommunityBoardPostCount(selectedBoardFilter)</strong>개 글</span>
-                        <span>@RoleLabel 참여</span>
+                    <div class="platform-community-forum-status" aria-label="@UiText("현재 게시판 정보", "Current board information")">
+                        <span><strong>@GetCommunityBoardPostCount(selectedBoardFilter)</strong>@UiText("개 글", " posts")</span>
+                        <span>@RoleLabel @UiText("참여", "participation")</span>
                         <MudChip T="string" Size="Size.Small" Color="@CurrentModeColor" Variant="Variant.Outlined">@CurrentModeLabel</MudChip>
                     </div>
                 </div>
 
                 @if (UseClassicForumLayout)
                 {
-                    <nav class="platform-community-classic-actions" aria-label="게시판 바로가기">
+                    <nav class="platform-community-classic-actions" aria-label="@UiText("게시판 바로가기", "Board shortcuts")">
                         <MudButton Href="/community/categories"
                                    Variant="Variant.Text"
                                    Size="Size.Small"
                                    StartIcon="@Icons.Material.Filled.List">
-                            게시판 전체보기
+                            @UiText("게시판 전체보기", "All boards")
                         </MudButton>
                         <MudButton Href="/community/workspace"
                                    Variant="Variant.Text"
                                    Size="Size.Small"
                                    StartIcon="@Icons.Material.Filled.AccountTree">
-                            업무·원장
+                            @UiText("업무·원장", "Work & ledgers")
                         </MudButton>
                         <MudButton Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    Size="Size.Small"
                                    StartIcon="@Icons.Material.Filled.Edit"
                                    OnClick="HandleCommunityComposeRequested">
-                            글쓰기
+                            @UiText("글쓰기", "Write")
                         </MudButton>
                     </nav>
                 }
@@ -370,6 +370,7 @@
         @if (!WorkspaceOnly && (CommunityFeedOnly || !isWorkMode))
         {
             <PlatformCommunityBoardShelf Items="@PostIndexBoardItems"
+                                         DisplayLanguageCode="@DisplayLanguageCode"
                                          ItemSelected="HandleCommunityBoardSelected" />
         }
 
@@ -381,6 +382,7 @@
                     @if (!isLoading)
                     {
                         <PlatformCommunityPostList BoardName="@selectedBoardFilter"
+                                                   DisplayLanguageCode="@DisplayLanguageCode"
                                                    FilterOptions="@ForumListFilterOptions"
                                                    SelectedFilter="@selectedForumListFilter"
                                                    SelectedFilterChanged="SelectForumListFilter"

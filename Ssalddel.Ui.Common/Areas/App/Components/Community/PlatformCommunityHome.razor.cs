@@ -1,6 +1,7 @@
 using System.Globalization;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Inbound;
+using Ssalddel.Contracts.Common.Localization;
 using Ssalddel.Contracts.Common.Versioning;
 using Ssalddel.Contracts.Common.Warehouse;
 using Ssalddel.Ui.Common.Areas.App.Models;
@@ -49,6 +50,9 @@ public partial class PlatformCommunityHome
 
     [Parameter]
     public string RoleLabel { get; set; } = "플랫폼 구성원";
+
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
 
     [Parameter]
     public string AppKey { get; set; } = "platform";

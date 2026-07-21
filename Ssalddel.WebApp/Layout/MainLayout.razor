@@ -1,13 +1,16 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject WebAuthSessionService AuthSession
+@inject WebLocalePreferenceService Locale
+@inject NavigationManager Navigation
 
 <MudLayout Class="@CurrentTheme.ShellClass">
     <MudAppBar Elevation="1" Color="Color.Default" Dense="true" Class="web-appbar">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Color="Color.Inherit" OnClick="ToggleDrawer" />
-        <MudText Typo="Typo.h6">살뜰 통합 베타</MudText>
+        <MudText Typo="Typo.h6">@Locale.Text("살뜰 통합 베타", "Ssalddel Integrated Beta")</MudText>
         <MudSpacer />
-        <MudChip T="string" Class="web-role-chip" Variant="Variant.Filled" Size="Size.Small">@CurrentTheme.RoleLabel</MudChip>
+        <WebLanguageSwitcher />
+        <MudChip T="string" Class="web-role-chip" Variant="Variant.Filled" Size="Size.Small">@CurrentRoleLabel</MudChip>
     </MudAppBar>
 
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="DrawerVariant.Responsive" Class="web-drawer">
@@ -24,10 +27,25 @@
 @code {
     private bool _drawerOpen = true;
     private WebRoleTheme CurrentTheme => AuthSession.CurrentTheme;
+    private string CurrentRoleLabel
+        => Locale.IsEnglish
+            ? CurrentTheme.RoleLabel switch
+            {
+                "방문자" => "Visitor",
+                "화주" => "Shipper",
+                "기사" => "Driver",
+                "창고 관리자" => "Warehouse manager",
+                "주문자" => "Orderer",
+                "관세사" => "Customs broker",
+                _ => CurrentTheme.RoleLabel
+            }
+            : CurrentTheme.RoleLabel;
 
     protected override void OnInitialized()
     {
         AuthSession.Changed += HandleAuthChanged;
+        Locale.Changed += HandleLocaleChanged;
+        Navigation.LocationChanged += HandleLocationChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,6 +56,7 @@
         }
 
         await AuthSession.RestoreAsync();
+        await Locale.InitializeAsync();
     }
 
     private void ToggleDrawer()
@@ -47,11 +66,23 @@
 
     private void HandleAuthChanged()
     {
-        _ = InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(async () =>
+        {
+            await Locale.InitializeAsync();
+            StateHasChanged();
+        });
     }
+
+    private void HandleLocaleChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+        => _ = InvokeAsync(() => Locale.InitializeAsync());
 
     public void Dispose()
     {
         AuthSession.Changed -= HandleAuthChanged;
+        Locale.Changed -= HandleLocaleChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
     }
 }

@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Localization;
 using Ssalddel.Ui.Common.Areas.App.Models;
 using MudBlazor;
 
@@ -6,7 +7,13 @@ namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
-private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체글", "추천글", "공지"];
+    private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체글", "추천글", "공지"];
+
+    private bool IsEnglishDisplay
+        => DisplayLanguageCodes.Normalize(DisplayLanguageCode) == DisplayLanguageCodes.English;
+
+    private string UiText(string korean, string english)
+        => IsEnglishDisplay ? english : korean;
 
     private bool IsDiagramMode => DiagramPalette.IsDiagramMode;
 
@@ -44,12 +51,12 @@ private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체�
         : "pa-4 platform-work-panel platform-home-section-hidden";
 
     private string CurrentModeLabel => CommunityFeedOnly
-        ? "커뮤니티 모드"
+        ? UiText("커뮤니티 모드", "Community")
         : IsDiagramMode
-        ? "다이어그램 모드"
+        ? UiText("다이어그램 모드", "Diagram")
         : isWorkMode
-        ? "업무 모드"
-        : "커뮤니티 모드";
+        ? UiText("업무 모드", "Work")
+        : UiText("커뮤니티 모드", "Community");
 
     private Color CurrentModeColor => CommunityFeedOnly
         ? Color.Primary
@@ -146,11 +153,36 @@ private static readonly IReadOnlyList<string> ForumListFilterOptions = ["전체�
 
     private string CurrentCommunityBoardTitle
         => string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
-            ? "살뜰 게시판"
-            : $"{selectedBoardFilter} 게시판";
+            ? UiText("살뜰 게시판", "Ssalddel Community Board")
+            : IsEnglishDisplay
+                ? $"{DisplayCommunityBoardName(selectedBoardFilter)} Board"
+                : $"{selectedBoardFilter} 게시판";
 
     private string CurrentCommunityBoardDescription
         => string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
-            ? "질문과 경험을 나누고, 필요한 일은 원장과 업무 흐름으로 이어가는 공간입니다."
+            ? UiText(
+                "질문과 경험을 나누고, 필요한 일은 원장과 업무 흐름으로 이어가는 공간입니다.",
+                "Share questions and experience, then connect agreed needs to ledgers and practical workflows.")
             : ResolveCommunityBoardDescription(selectedBoardFilter);
+
+    private string DisplayCommunityBoardName(string boardName)
+        => !IsEnglishDisplay
+            ? boardName
+            : boardName switch
+            {
+                "전체" => "All",
+                "공지·안내" => "Notices & Guides",
+                "서원·발원" => "Vows & Intentions",
+                "자유·생활" => "Life & Community",
+                "질문·도움" => "Questions & Help",
+                "정보·시세" => "Information & Prices",
+                "참여·모집" => "Participation",
+                "판매·공급" => "Sales & Supply",
+                "원장·진행" => "Ledgers & Progress",
+                "완료·후기" => "Results & Reviews",
+                "반야" => "Prajna",
+                "음식·맛집" => "Food & Places",
+                "화물" => "Cargo",
+                _ => boardName
+            };
 }

@@ -31,6 +31,7 @@ using 살뜰.Services.Sales;
 using 살뜰.Services.ViewSettings;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
 using Ssalddel.Services.LogisticsProcessing.VehicleLoading;
+using Ssalddel.Services.Localization;
 using Ssalddel.Application.Driver.Transport;
 
 namespace Ssalddel.Extensions;
@@ -47,6 +48,7 @@ public static partial class ServiceCollectionExtensions
 
         services.AddSsalddelInfrastructure();
         services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+        services.AddSingleton<IPublicLocaleRecommendationUseCase, PublicLocaleRecommendationUseCase>();
         services.AddScoped<I참여자실행권한검사, 참여자실행권한검사>();
         services.AddScoped<I사회보험신고UseCase, 사회보험신고UseCase>();
         services.AddScoped<IHR참여운영UseCase, HR참여운영UseCase>();

@@ -1,10 +1,76 @@
 @page "/community"
+@page "/{LanguageSegment}/community"
+@implements IDisposable
+@inject WebLocalePreferenceService Locale
+@inject NavigationManager Navigation
 
-<PageTitle>살뜰 생활 게시판</PageTitle>
+<PageTitle>@Locale.Text("살뜰 생활 게시판", "Ssalddel Community")</PageTitle>
 
-<PlatformCommunityHome AppName="살뜰"
-                       RoleLabel="웹 사용자"
-                       AppKey="shipper"
-                       UseDedicatedCommunityRoutes="true"
-                       CommunityFeedOnly="true"
-                       UseClassicForumLayout="true" />
+@if (!Locale.IsInitialized || IsBareCommunityRoute)
+{
+    <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8" aria-live="polite">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <MudText>@Locale.Text("알맞은 언어의 커뮤니티를 준비하고 있습니다.", "Preparing your community language.")</MudText>
+    </MudStack>
+}
+else
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+        @Locale.Text(
+            "국가와 화면 언어는 따로 적용됩니다. 게시글 본문은 작성자의 원문을 유지합니다.",
+            "Country context and display language are managed separately. User posts remain in their original language.")
+    </MudAlert>
+
+    <PlatformCommunityHome AppName="@LocalizedAppName"
+                           RoleLabel="@LocalizedRoleLabel"
+                           DisplayLanguageCode="@Locale.LanguageCode"
+                           AppKey="shipper"
+                           UseDedicatedCommunityRoutes="true"
+                           CommunityFeedOnly="true"
+                           UseClassicForumLayout="true" />
+}
+
+@code {
+    [Parameter]
+    public string? LanguageSegment { get; set; }
+
+    private string LocalizedAppName => Locale.Text("살뜰", "Ssalddel");
+    private string LocalizedRoleLabel => Locale.Text("웹 사용자", "Web visitor");
+
+    private bool IsBareCommunityRoute
+        => Navigation.ToBaseRelativePath(Navigation.Uri)
+            .Split('?', '#')[0]
+            .Trim('/')
+            .Equals("community", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        Locale.Changed += HandleLocaleChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(LanguageSegment)
+            && !LanguageSegment.Equals("ko", StringComparison.OrdinalIgnoreCase)
+            && !LanguageSegment.Equals("en", StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo("/ko/community", replace: true);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (Locale.IsInitialized && IsBareCommunityRoute)
+        {
+            Navigation.NavigateTo(
+                WebLocalePolicy.LocalizedCommunityHome(Locale.LanguageCode),
+                replace: true);
+        }
+    }
+
+    private void HandleLocaleChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+        => Locale.Changed -= HandleLocaleChanged;
+}

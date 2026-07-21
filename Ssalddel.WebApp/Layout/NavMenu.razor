@@ -2,12 +2,15 @@
 @inject NavigationManager Navigation
 @inject WebAuthSessionService AuthSession
 @inject CommunityPersonalPreferenceService PersonalPreferences
+@inject WebLocalePreferenceService Locale
 
 <div class="web-navigation-shell">
     <div class="web-navigation-main">
         <MudStack Spacing="0" Class="px-4 pt-3 pb-2">
             <MudText Typo="Typo.overline" Color="Color.Secondary">
-                @(IsCommunityMode ? "통합 베타 · 커뮤니티" : "통합 베타 · 업무")
+                @(IsCommunityMode
+                    ? Locale.Text("통합 베타 · 커뮤니티", "Integrated Beta · Community")
+                    : Locale.Text("통합 베타 · 업무", "Integrated Beta · Work"))
             </MudText>
             <MudText Typo="Typo.subtitle2">@NavigationIdentityLabel</MudText>
         </MudStack>
@@ -16,12 +19,12 @@
             @foreach (var item in CurrentItems)
             {
                 var pageState = IntegratedBetaCatalog.Resolve(item.Href);
-                <MudNavLink Href="@item.Href"
+                <MudNavLink Href="@EffectiveHref(item)"
                             Match="@(item.MatchAll ? NavLinkMatch.All : NavLinkMatch.Prefix)"
                             Icon="@item.Icon">
                     <span class="web-navigation-item-copy">
-                        <span>@item.Title</span>
-                        <small class="@IntegratedBetaCatalog.StageCssClass(pageState.Stage)">@pageState.StageLabel</small>
+                        <span>@NavigationTitle(item)</span>
+                        <small class="@IntegratedBetaCatalog.StageCssClass(pageState.Stage)">@StageLabel(pageState.StageLabel)</small>
                     </span>
                 </MudNavLink>
             }
@@ -38,7 +41,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Forum"
                            OnClick="OpenCommunityMode">
-                    게시판
+                    @Locale.Text("게시판", "Boards")
                 </MudButton>
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
@@ -46,7 +49,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Edit"
                            OnClick="OpenCommunityCompose">
-                    글쓰기
+                    @Locale.Text("글쓰기", "Write")
                 </MudButton>
             </MudStack>
         }
@@ -59,7 +62,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Work"
                            OnClick="OpenBusinessMode">
-                    업무
+                    @Locale.Text("업무", "Work")
                 </MudButton>
                 <MudButton Variant="@CommunityModeVariant"
                            Color="Color.Secondary"
@@ -67,7 +70,7 @@
                            FullWidth="true"
                            StartIcon="@Icons.Material.Filled.Forum"
                            OnClick="OpenCommunityMode">
-                    커뮤니티
+                    @Locale.Text("커뮤니티", "Community")
                 </MudButton>
             </MudStack>
         }
@@ -174,8 +177,60 @@
 
     private string NavigationIdentityLabel
         => IsCommunityMode
-            ? AuthSession.UserName ?? AuthSession.CurrentTheme.RoleLabel
-            : AuthSession.CurrentTheme.RoleLabel;
+            ? AuthSession.UserName ?? LocalizedRoleLabel
+            : LocalizedRoleLabel;
+
+    private string LocalizedRoleLabel
+        => !Locale.IsEnglish
+            ? AuthSession.CurrentTheme.RoleLabel
+            : AuthSession.CurrentTheme.RoleLabel switch
+            {
+                "방문자" => "Visitor",
+                "회원" => "Member",
+                "운영자" => "Operator",
+                "관리자" => "Administrator",
+                _ => AuthSession.CurrentTheme.RoleLabel
+            };
+
+    private string StageLabel(string label)
+        => !Locale.IsEnglish
+            ? label
+            : label switch
+            {
+                "운영" => "Live",
+                "베타" => "Beta",
+                "체험" => "Preview",
+                "준비" => "Planned",
+                _ => label
+            };
+
+    private string EffectiveHref(WebNavigationItem item)
+        => string.Equals(item.Href, "/community", StringComparison.OrdinalIgnoreCase)
+            ? WebLocalePolicy.LocalizedCommunityHome(Locale.LanguageCode)
+            : item.Href;
+
+    private string NavigationTitle(WebNavigationItem item)
+    {
+        if (!Locale.IsEnglish)
+        {
+            return item.Title;
+        }
+
+        return item.Title switch
+        {
+            "통합 홈" => "Integrated Home",
+            "공개 커뮤니티" => "Public Community",
+            "내 정보" => "My Profile",
+            "내 글" => "My Posts",
+            "참여 중" => "My Participation",
+            "역할 지원" => "Role Applications",
+            "내 원장" => "My Ledgers",
+            "알림" => "Notifications",
+            "꾸미기" => "Decorations",
+            "사용 설정" => "Preferences",
+            _ => item.Title
+        };
+    }
 
     private Variant BusinessModeVariant => IsCommunityMode ? Variant.Outlined : Variant.Filled;
 
@@ -185,6 +240,7 @@
     {
         AuthSession.Changed += HandleStateChanged;
         PersonalPreferences.Changed += HandleStateChanged;
+        Locale.Changed += HandleStateChanged;
         Navigation.LocationChanged += HandleLocationChanged;
     }
 
@@ -203,7 +259,7 @@
         => Navigation.NavigateTo(WebNavigationCatalog.GetBusinessHome(AuthSession.CurrentTheme.ThemeCode));
 
     private void OpenCommunityMode()
-        => Navigation.NavigateTo("/community");
+        => Navigation.NavigateTo(WebLocalePolicy.LocalizedCommunityHome(Locale.LanguageCode));
 
     private void OpenCommunityCompose()
         => Navigation.NavigateTo("/community/write");
@@ -218,6 +274,7 @@
     {
         AuthSession.Changed -= HandleStateChanged;
         PersonalPreferences.Changed -= HandleStateChanged;
+        Locale.Changed -= HandleStateChanged;
         Navigation.LocationChanged -= HandleLocationChanged;
     }
 }

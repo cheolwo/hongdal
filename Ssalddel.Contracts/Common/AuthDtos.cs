@@ -60,6 +60,17 @@ public sealed class 토큰응답
     public string UserId { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
     public string[] Roles { get; set; } = Array.Empty<string>();
+    public string? PreferredLanguageCode { get; set; }
+}
+
+public sealed class 표시언어설정요청
+{
+    public string LanguageCode { get; set; } = string.Empty;
+}
+
+public sealed class 표시언어설정응답
+{
+    public string LanguageCode { get; set; } = string.Empty;
 }
 
 public static class 커뮤니티회원가입개인정보동의문

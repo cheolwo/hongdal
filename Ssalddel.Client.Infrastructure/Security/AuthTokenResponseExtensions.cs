@@ -15,6 +15,7 @@ public static class AuthTokenResponseExtensions
             response.RefreshTokenExpiresAtUtc,
             response.UserId,
             response.UserName,
-            response.Roles ?? []);
+            response.Roles ?? [],
+            response.PreferredLanguageCode);
     }
 }

@@ -31,6 +31,7 @@ public sealed class WebAuthSessionService : ISsalddelAccessTokenProvider
     public string? AccessToken => _snapshot?.AccessToken;
     public string? UserId => _snapshot?.UserId;
     public string? UserName => _snapshot?.UserName;
+    public string? PreferredLanguageCode => _snapshot?.PreferredLanguageCode;
     public IReadOnlyList<string> Roles => _snapshot?.Roles ?? [];
     public string PrimaryRole => WebRoleThemeResolver.ResolvePrimaryRole(Roles);
     public WebRoleTheme CurrentTheme => WebRoleThemeResolver.Resolve(Roles);
@@ -156,6 +157,35 @@ public sealed class WebAuthSessionService : ISsalddelAccessTokenProvider
         _snapshot = null;
         await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", cancellationToken, StorageKey);
         NotifyChanged();
+    }
+
+    public async Task<string> SetPreferredLanguageAsync(
+        string languageCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (!IsLoggedIn || _snapshot is null)
+        {
+            throw new InvalidOperationException("로그인 계정의 언어를 저장하려면 먼저 로그인해 주세요.");
+        }
+
+        using var response = await _httpClient.PutAsJsonAsync(
+            "api/v1/auth/preferences/language",
+            new 표시언어설정요청 { LanguageCode = languageCode },
+            cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
+                ? $"화면 언어 저장에 실패했습니다. HTTP {(int)response.StatusCode}"
+                : $"화면 언어 저장에 실패했습니다. HTTP {(int)response.StatusCode}: {body}");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<표시언어설정응답>(cancellationToken)
+                     ?? throw new InvalidOperationException("화면 언어 저장 응답이 비어 있습니다.");
+        _snapshot = _snapshot with { PreferredLanguageCode = result.LanguageCode };
+        await SaveSnapshotAsync(cancellationToken);
+        NotifyChanged();
+        return result.LanguageCode;
     }
 
     private async Task SaveSnapshotAsync(CancellationToken cancellationToken)

@@ -3,6 +3,7 @@ using FluentResults;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Contracts.Common;
 using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Contracts.Common.Localization;
 using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.ViewSettings;
 using Ssalddel.Security;
@@ -24,6 +25,7 @@ public interface I인증UseCase
     Task<Result<IReadOnlyList<가입인연후보항목응답>>> 가입온보딩인연후보조회Async(가입인연후보조회요청? request, CancellationToken cancellationToken);
     Task<Result<주문자집단자동배정응답>> 주문자집단온보딩Async(주문자집단온보딩요청? request, string? userId);
     Task<Result<토큰응답>> 토큰갱신Async(토큰갱신요청? request);
+    Task<Result<표시언어설정응답>> 표시언어설정Async(표시언어설정요청? request, string? userId);
 }
 
 [SsalddelUseCaseActor(SsalddelActor.Driver)]
@@ -85,6 +87,66 @@ public sealed class 인증UseCase : I인증UseCase
         var response = await 토큰발급Async(user);
         await 로그인로그기록Async(userNameOrEmail, user, true, string.Empty, string.Empty, context);
         return response;
+    }
+
+    public async Task<Result<표시언어설정응답>> 표시언어설정Async(
+        표시언어설정요청? request,
+        string? userId)
+    {
+        if (request is null)
+        {
+            return Result.Fail<표시언어설정응답>("request body is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return 인증실패<표시언어설정응답>("로그인 세션을 확인해 주세요.");
+        }
+
+        if (!DisplayLanguageCodes.TryNormalize(request.LanguageCode, out var languageCode))
+        {
+            return 상태실패<표시언어설정응답>(
+                "현재 ko-KR과 en-US만 화면 언어로 선택할 수 있습니다.",
+                StatusCodes.Status400BadRequest);
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return 상태실패<표시언어설정응답>(
+                "언어 설정을 저장할 사용자를 찾을 수 없습니다.",
+                StatusCodes.Status404NotFound);
+        }
+
+        var claims = await _userManager.GetClaimsAsync(user);
+        var existingClaims = claims
+            .Where(claim => string.Equals(
+                claim.Type,
+                SsalddelDisplayLanguageClaimTypes.PreferredLanguage,
+                StringComparison.Ordinal))
+            .ToArray();
+        if (existingClaims.Length > 0)
+        {
+            var removal = await _userManager.RemoveClaimsAsync(user, existingClaims);
+            if (!removal.Succeeded)
+            {
+                return 상태실패<표시언어설정응답>(
+                    "기존 화면 언어 설정을 갱신하지 못했습니다.",
+                    StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        var addition = await _userManager.AddClaimAsync(
+            user,
+            new Claim(SsalddelDisplayLanguageClaimTypes.PreferredLanguage, languageCode));
+        if (!addition.Succeeded)
+        {
+            return 상태실패<표시언어설정응답>(
+                "화면 언어 설정을 저장하지 못했습니다.",
+                StatusCodes.Status500InternalServerError);
+        }
+
+        return new 표시언어설정응답 { LanguageCode = languageCode };
     }
 
     [SsalddelCommunityV0Module(
@@ -353,7 +415,8 @@ public sealed class 인증UseCase : I인증UseCase
     private async Task<Result<토큰응답>> 토큰발급Async(ApplicationUser user)
     {
         var roles = await _userManager.GetRolesAsync(user);
-        var accessToken = _authTokenService.CreateAccessToken(user, roles, out var accessTokenExpiresAtUtc, await _userManager.GetClaimsAsync(user));
+        var claims = await _userManager.GetClaimsAsync(user);
+        var accessToken = _authTokenService.CreateAccessToken(user, roles, out var accessTokenExpiresAtUtc, claims);
         var refreshToken = _authTokenService.GenerateRefreshToken();
         var refreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenDays);
 
@@ -367,7 +430,12 @@ public sealed class 인증UseCase : I인증UseCase
             RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc,
             UserId = user.Id,
             UserName = user.UserName ?? string.Empty,
-            Roles = roles.ToArray()
+            Roles = roles.ToArray(),
+            PreferredLanguageCode = claims
+                .LastOrDefault(claim => string.Equals(
+                    claim.Type,
+                    SsalddelDisplayLanguageClaimTypes.PreferredLanguage,
+                    StringComparison.Ordinal))?.Value
         };
     }
 

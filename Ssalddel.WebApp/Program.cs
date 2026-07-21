@@ -28,6 +28,7 @@ builder.Services.AddSingleton<IClientSessionGuard, ClientSessionGuard>();
 builder.Services.AddScoped<WebAuthSessionService>();
 builder.Services.AddScoped<I주문자앱인증Service, WebOrdererAuthenticationService>();
 builder.Services.AddScoped<CommunityPersonalPreferenceService>();
+builder.Services.AddScoped<WebLocalePreferenceService>();
 builder.Services.AddScoped<IDiagramCollaborationClientService, DiagramCollaborationClientService>();
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkspaceService>(sp => sp.GetRequiredService<WebShipperWarehouseWorkspaceService>());
