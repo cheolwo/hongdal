@@ -1,0 +1,40 @@
+.food-order-panel {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.food-order-panel-heading,
+.food-order-filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.food-order-filter-grid {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(180px, .5fr);
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.food-order-filter-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-top: .75rem;
+}
+
+@media (max-width: 720px) {
+    .food-order-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .food-order-panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .food-order-filter-actions {
+        justify-content: stretch;
+    }
+}

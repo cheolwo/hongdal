@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Food;
+using Ssalddel.Ui.Common.Areas.App.Models.Auth;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -63,16 +64,170 @@ public sealed class 음식주문페이지ViewModelTests
         Assert.Null(viewModel.상세);
     }
 
+    [Fact]
+    public async Task 기능비활성은_인증과개인주문API를호출하지않는다()
+    {
+        var accessService = new FakeFoodAccessService(false);
+        var authenticationService = new FakeAuthenticationService();
+        var orderService = new FakeFoodOrderService();
+        var page = CreatePage(accessService, authenticationService, orderService);
+
+        await page.초기화Async("FOOD-PRIVATE");
+
+        Assert.True(page.접근.기능비활성);
+        Assert.Equal(0, authenticationService.RestoreCalls);
+        Assert.Empty(orderService.ListRequests);
+        Assert.Empty(orderService.DetailOrderNos);
+    }
+
+    [Fact]
+    public async Task 익명세션은_개인주문API를호출하지않는다()
+    {
+        var accessService = new FakeFoodAccessService(true);
+        var authenticationService = new FakeAuthenticationService();
+        var orderService = new FakeFoodOrderService();
+        var page = CreatePage(accessService, authenticationService, orderService);
+
+        await page.초기화Async("FOOD-PRIVATE");
+
+        Assert.True(page.접근.사용가능);
+        Assert.True(page.인증.초기화됨);
+        Assert.False(page.인증.로그인됨);
+        Assert.Equal(1, authenticationService.RestoreCalls);
+        Assert.Empty(orderService.ListRequests);
+        Assert.Empty(orderService.DetailOrderNos);
+    }
+
+    [Fact]
+    public async Task 로그인세션복원은_목록과경로의정확한주문을조회한다()
+    {
+        var accessService = new FakeFoodAccessService(true);
+        var authenticationService = new FakeAuthenticationService
+        {
+            RestoreResult = SignedInResult()
+        };
+        var orderService = new FakeFoodOrderService
+        {
+            DetailResponse = new 주문자음식주문상세응답()
+        };
+        var page = CreatePage(accessService, authenticationService, orderService);
+
+        await page.초기화Async("  FOOD-EXACT-9  ");
+
+        Assert.Single(orderService.ListRequests);
+        Assert.Equal(["FOOD-EXACT-9"], orderService.DetailOrderNos);
+        Assert.Equal("FOOD-EXACT-9", page.상세.요청OrderNo);
+        Assert.NotNull(page.상세.상세);
+    }
+
+    [Fact]
+    public async Task 경로변경은_같은주문을중복조회하지않고_빈경로에서선택을해제한다()
+    {
+        var orderService = new FakeFoodOrderService
+        {
+            DetailResponse = new 주문자음식주문상세응답()
+        };
+        var page = CreatePage(
+            new FakeFoodAccessService(true),
+            new FakeAuthenticationService { RestoreResult = SignedInResult() },
+            orderService);
+        await page.초기화Async("FOOD-1");
+
+        await page.경로선택반영Async("FOOD-1");
+        await page.경로선택반영Async("FOOD-2");
+        await page.경로선택반영Async(null);
+
+        Assert.Equal(["FOOD-1", "FOOD-2"], orderService.DetailOrderNos);
+        Assert.Null(page.상세.요청OrderNo);
+        Assert.Null(page.상세.상세);
+    }
+
+    [Fact]
+    public async Task 명시적로그인뒤_목록과정확한주문을조회하고_로그아웃은개인상태를비운다()
+    {
+        var authenticationService = new FakeAuthenticationService();
+        var orderService = new FakeFoodOrderService
+        {
+            ListResponse = new 주문자음식주문목록응답
+            {
+                Items = [new 주문자음식주문요약응답 { 주문번호 = "FOOD-LOGIN" }],
+                TotalCount = 1,
+                Page = 1,
+                PageSize = 12
+            },
+            DetailResponse = new 주문자음식주문상세응답()
+        };
+        var page = CreatePage(
+            new FakeFoodAccessService(true),
+            authenticationService,
+            orderService);
+        await page.초기화Async("FOOD-LOGIN");
+
+        Assert.True(await page.로그인Async(
+            new 공통로그인요청("orderer", "password"),
+            "FOOD-LOGIN"));
+        Assert.True(page.목록.초기화됨);
+        Assert.Equal("FOOD-LOGIN", page.상세.요청OrderNo);
+
+        Assert.True(await page.로그아웃Async());
+
+        Assert.Equal(1, authenticationService.LoginCalls);
+        Assert.Equal(1, authenticationService.LogoutCalls);
+        Assert.False(page.인증.로그인됨);
+        Assert.False(page.목록.초기화됨);
+        Assert.Empty(page.목록.주문목록);
+        Assert.Null(page.상세.요청OrderNo);
+    }
+
+    private static 주문자음식주문PageViewModel CreatePage(
+        I음식배달페이지접근Service accessService,
+        I주문자앱인증Service authenticationService,
+        I주문자음식주문읽기Service orderService)
+        => new(
+            new 음식배달페이지접근ViewModel(accessService),
+            new 주문자앱인증ViewModel(authenticationService),
+            new 주문자음식주문목록ViewModel(orderService),
+            new 주문자음식주문상세ViewModel(orderService));
+
+    private static 주문자앱인증결과 SignedInResult()
+        => new(new 주문자앱세션상태(true, "user-1", "주문자"));
+
+    private sealed class FakeFoodAccessService(bool enabled) : I음식배달페이지접근Service
+    {
+        public int Calls { get; private set; }
+
+        public Task<bool> 기능활성여부Async(CancellationToken cancellationToken = default)
+        {
+            Calls++;
+            return Task.FromResult(enabled);
+        }
+    }
+
     private sealed class FakeAuthenticationService : I주문자앱인증Service
     {
+        public 주문자앱인증결과 RestoreResult { get; init; } = new(주문자앱세션상태.익명);
+        public 주문자앱인증결과 LoginResult { get; init; } = SignedInResult();
+        public int RestoreCalls { get; private set; }
+        public int LoginCalls { get; private set; }
+        public int LogoutCalls { get; private set; }
+
         public Task<주문자앱인증결과> 복원Async(CancellationToken cancellationToken = default)
-            => Task.FromResult(new 주문자앱인증결과(주문자앱세션상태.익명));
+        {
+            RestoreCalls++;
+            return Task.FromResult(RestoreResult);
+        }
 
         public Task<주문자앱인증결과> 로그인Async(string userNameOrEmail, string password, CancellationToken cancellationToken = default)
-            => Task.FromResult(new 주문자앱인증결과(new 주문자앱세션상태(true, "user-1", "주문자")));
+        {
+            LoginCalls++;
+            return Task.FromResult(LoginResult);
+        }
 
         public Task 로그아웃Async(CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+        {
+            LogoutCalls++;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FakeFoodOrderService : I주문자음식주문읽기Service
@@ -80,14 +235,20 @@ public sealed class 음식주문페이지ViewModelTests
         public 주문자음식주문목록응답 ListResponse { get; init; } = new();
         public 주문자음식주문상세응답? DetailResponse { get; init; }
         public 주문자음식주문목록조회요청? LastRequest { get; private set; }
+        public List<주문자음식주문목록조회요청> ListRequests { get; } = [];
+        public List<string> DetailOrderNos { get; } = [];
 
         public Task<주문자음식주문목록응답> 목록Async(주문자음식주문목록조회요청 request, CancellationToken cancellationToken = default)
         {
             LastRequest = request;
+            ListRequests.Add(request);
             return Task.FromResult(ListResponse);
         }
 
         public Task<주문자음식주문상세응답?> 상세Async(string orderNo, CancellationToken cancellationToken = default)
-            => Task.FromResult(DetailResponse);
+        {
+            DetailOrderNos.Add(orderNo);
+            return Task.FromResult(DetailResponse);
+        }
     }
 }

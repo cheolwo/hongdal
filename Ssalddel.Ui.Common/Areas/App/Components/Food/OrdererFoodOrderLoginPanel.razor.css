@@ -1,0 +1,29 @@
+.food-order-login-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, .8fr) minmax(300px, 1.2fr);
+    gap: 1rem;
+    align-items: stretch;
+}
+
+::deep .food-order-login-card,
+.food-order-login-note {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.food-order-login-note {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: .75rem;
+}
+
+.food-order-login-layout ::deep .mud-button-root {
+    min-height: 44px;
+}
+
+@media (max-width: 720px) {
+    .food-order-login-layout {
+        grid-template-columns: 1fr;
+    }
+}

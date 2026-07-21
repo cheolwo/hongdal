@@ -23,11 +23,12 @@
 | `P0-4` | 커뮤니티 `CommunityGroupPurchaseWorkspace.razor` | 1,170줄, 현재 다른 작업과 겹침 | 모집 개요, 조건 협의, 참여 의사, 연락 동의, 가원장 전환 | 국내 공동구매 대표 파일럿의 직접 협의가 영속화되고 플랫폼 추천·거래 대리가 없음 |
 | `P1-1` 완료 | 주문자 `OrdererRestaurantWorkspace.razor` | 303줄에서 조립 shell 35줄로 축소 | 기능 접근, 공개 탐색 조건, 검색 결과, 정확한 선택 상세, 표현 규칙 | 기능 플래그와 정확한 ID 조회를 유지하고 주문·결제·조리·배차 효과 없이 공개 정보만 표시 |
 | `P1-2` 완료 | 주문자 `OrdererMartOrderRequestWorkspace.razor` | 260줄에서 조립 shell 54줄로 축소 | 기능 접근, 상품 선택 안내, 정확한 상품, 주문자 인증, 비구속 요청 작성, 저장 영수증, 표현 규칙 | 서버가 소유권과 현재 상태를 재검증하고 성공 뒤 같은 주문 요청 ID를 재조회 |
+| `P1-2a` 완료 | 주문자 `OrdererFoodOrderWorkspace.razor` | 320줄에서 조립 shell 40줄로 축소 | 기능 접근, 주문자 인증, 검색, 개인 원장 목록, 정확한 주문 상세, 개인정보 disclosure, 표현 규칙 | 기능 비활성·익명에서는 개인 API를 호출하지 않고 선택한 정확한 `orderNo`만 조회하며 주문·결제·수락·배차 상태를 변경하지 않음 |
 | `P1-3` 완료 | 판매 `OrderFulfillment.razor` | 631줄에서 조립 shell 61줄로 축소 | 주문 조회·필터, 정확한 선택 상세, Simulation 샘플, 재고·입고, 피킹·포장 Command, 알림 정책 | 로컬 메모리 Simulation에서 수동 상태 전이만 제공하고 외부 주문·실재고·메시지·운송·결제·정산 효과를 활성화하지 않음 |
 | `P1-4` 완료 | 판매 `ProductListings.razor` | 209줄에서 조립 shell 47줄로 축소 | 현황 조회, 판매상품 직접 선택, 정확한 채널 계정, payload 검토, Simulation 생성 영수증 | 정확한 계정 ID를 조회하고 외부 API 비호출 확인 뒤 로컬 원장만 생성하며 같은 출품 ID를 재조회 |
-| `P2-1` | 창고 `WorkBoard.razor` | 313줄, 깨끗한 작업 대상 | 작업 대기열, 필터, 선택 상세, 단계 handoff | 합의된 원장 참조만 읽고 Simulation에서 상태·오류·재시도를 검증 |
-| `P2-2` | 창고 `SsalddelInboundReceivingWorkspace.razor` | 438줄, 깨끗한 작업 대상 | 예정 조회, 수령 확인, 불일치 입력, 저장 결과 | 입고 ID·권한·멱등성을 서버가 검증하고 같은 ID를 재조회 |
-| `P2-3` | 운송 `DriverTransportDropoffPage.razor` | 429줄, 깨끗한 작업 대상 | 운송 요약, 하차 증빙, 예외, 완료 이동 | 기존 상차·통합 증빙 컴포넌트를 재사용하고 Operational 모드 없이 실행 효과 없음 |
+| `P2-1` | 창고 `SsalddelInboundReceivingWorkspace.razor` | 438줄, 깨끗한 작업 대상 | 창고·바코드 검색, 예정 후보, 현장 반입 요청, 정확한 저장 결과 | 입고 ID·권한·멱등성을 서버가 검증하고 같은 ID를 재조회 |
+| `P2-2` | 운송 `DriverTransportDropoffPage.razor` | 429줄, 깨끗한 작업 대상 | 운송 요약, 하차 증빙, 예외, 완료 이동 | 기존 상차·통합 증빙 컴포넌트를 재사용하고 Operational 모드 없이 실행 효과 없음 |
+| `P2-3` | 창고 `WorkBoard.razor` | 313줄이나 이미 ViewModel 기반 ReadOnly 상세 | 접근·인증 상태, 정확한 입고 상세, 다음 단계 설명, 관련 업무 이동, 표현 규칙 | 대기열·필터를 새로 만들지 않고 선택한 입고 ID의 서버 원본과 다음 단계 설명만 유지 |
 | `P3` 보존 | 운송 `DriverRecommendations.razor` | 673줄이나 1.0 이후 추천 흐름 | 후보 표시와 설명 책임은 향후 분리 | 0.0에서 기본 비노출, 상대 추천·순위·자동 배차 확장 금지 |
 
 ## 현재 겹치는 파일의 처리
@@ -37,7 +38,6 @@
 | 문맥 | 파일 | 현재 처리 |
 | --- | --- | --- |
 | 커뮤니티 | `CommunityGroupPurchaseWorkspace.razor` | 현재 변경을 먼저 검증·commit한 뒤 `P0-4` 분리 |
-| 주문자 | `OrdererFoodOrderWorkspace.razor` | 목록·상세·로그인·검색 분리가 진행 중이므로 해당 맥락에서 완료 |
 | 주문자 | `OrdererMartCatalogWorkspace.razor` | 현재 카탈로그 변경 완료 뒤 책임 재감사 |
 | 창고 | `SsalddelInboundRequestManager.razor` | 입고 요청 변경 완료 뒤 입력·목록·상세 책임 재감사 |
 | 판매 | `SsalddelSalesPageComposer.razor` | 현재 작성기 변경 완료 뒤 wrapper와 저장 책임 재감사 |
@@ -57,4 +57,4 @@
 
 ## 다음 작업
 
-`P1-4` 판매상품 출품은 47줄 조립 shell과 조회·판매상품 직접 선택·정확한 채널 계정 재조회·payload 검토·로컬 Simulation 생성 및 같은 ID 재조회 책임으로 분리했다. OAuth/API 자격증명, 외부 상품 생성·수정·발행, 재고 동기화, 주문 수집과 비용 발생은 실행하지 않는다. `P0-4` 공동구매 workspace는 현재 다른 변경과 겹치므로 해당 변경이 먼저 검증·commit될 때까지 보류한다. 다음 깨끗한 세로 단위는 `P2-1` 창고 `WorkBoard.razor`이며, 작업 대기열·필터·정확한 선택 상세·단계 handoff를 분리한다.
+`P1-2a` 주문자 음식 주문 내역은 40줄 조립 shell과 기능 접근·인증·검색·개인 원장 목록·정확한 주문 상세·개인정보 disclosure 책임으로 분리했다. 기능 비활성 또는 익명 상태에서는 개인 주문 API를 호출하지 않고, 로그인 뒤에도 선택한 정확한 `orderNo`만 조회하며 주문·결제·수락·배차 상태를 변경하지 않는다. `P0-4` 공동구매 workspace는 현재 다른 변경과 겹치므로 해당 변경이 먼저 검증·commit될 때까지 보류한다. 다음 깨끗한 세로 단위는 `P2-1` 창고 `SsalddelInboundReceivingWorkspace.razor`이며, 창고·바코드 검색·입고예정 후보·현장 반입 요청·정확한 저장 결과를 분리한다. `WorkBoard.razor`는 이미 ViewModel 기반 ReadOnly 상세이므로 신규 대기열·필터를 만들지 않고 후순위 조립 정돈 대상으로 둔다.

@@ -1,0 +1,115 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="food-order-panel">
+    <div class="food-order-panel-heading">
+        <div>
+            <MudText Typo="Typo.overline">PERSISTENT LEDGER</MudText>
+            <MudText Typo="Typo.h6">내 음식 주문</MudText>
+        </div>
+        @if (List.초기화됨)
+        {
+            <MudText Typo="Typo.caption">@($"전체 {List.전체건수:N0}건")</MudText>
+        }
+    </div>
+
+    @if (List.처리중)
+    {
+        <div class="food-order-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2">내 음식 주문 원장을 조회하고 있습니다.</MudText>
+        </div>
+    }
+    else if (List.오류발생)
+    {
+        <div class="food-order-state">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">주문 목록을 불러오지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@OrdererFoodOrderPresentation.ErrorMessage(List.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ReloadRequested">다시 시도</MudButton>
+        </div>
+    }
+    else if (List.원장없음)
+    {
+        <div class="food-order-state">
+            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">저장된 음식 주문이 없습니다.</MudText>
+            <MudText Typo="Typo.body2">실제 주문 원장이 생기면 이 계정의 내역만 표시됩니다.</MudText>
+            <MudButton Href="/food/restaurants" Variant="Variant.Outlined" Color="Color.Primary">음식점과 메뉴 보기</MudButton>
+        </div>
+    }
+    else if (List.검색결과없음)
+    {
+        <div class="food-order-state">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">조건에 맞는 내 주문이 없습니다.</MudText>
+            <MudText Typo="Typo.body2">검색어나 주문 상태를 바꿔 다시 조회해 주세요.</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ResetRequested">전체 내역 보기</MudButton>
+        </div>
+    }
+    else
+    {
+        <div class="food-order-card-list">
+            @foreach (var order in List.주문목록)
+            {
+                <article class="food-order-card @(SelectedOrderNo == order.주문번호 ? "food-order-card--selected" : string.Empty)">
+                    <div class="food-order-card-heading">
+                        <div>
+                            <MudText Typo="Typo.subtitle1">@OrdererFoodOrderPresentation.RestaurantLabel(order)</MudText>
+                            <MudText Typo="Typo.caption">@order.주문번호 · @OrdererFoodOrderPresentation.FormatDate(order.CreatedAtUtc)</MudText>
+                        </div>
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Color="@OrdererFoodOrderPresentation.StatusColor(order.상태)"
+                                 Variant="Variant.Outlined">
+                            @order.상태
+                        </MudChip>
+                    </div>
+                    <MudText Typo="Typo.body2">@order.상품요약</MudText>
+                    <div class="food-order-card-meta">
+                        <span>@($"{order.상품종류수:N0}종 · {order.총수량:N0}개")</span>
+                        <span>@($"{order.총주문금액:N0}원")</span>
+                        <span>@OrdererFoodOrderPresentation.DispatchLabel(order.배차상태)</span>
+                    </div>
+                    <MudButton Variant="@(SelectedOrderNo == order.주문번호 ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.ReceiptLong"
+                               OnClick="@(() => OrderSelected.InvokeAsync(order.주문번호))">
+                        정확한 주문 상세
+                    </MudButton>
+                </article>
+            }
+        </div>
+
+        @if (List.총페이지수 > 1)
+        {
+            <div class="food-order-pagination">
+                <MudPagination Count="@List.총페이지수"
+                               Selected="@List.현재페이지"
+                               SelectedChanged="PageChanged"
+                               Disabled="@List.처리중"
+                               ShowFirstButton="true"
+                               ShowLastButton="true" />
+            </div>
+        }
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 주문자음식주문목록ViewModel List { get; set; } = default!;
+
+    [Parameter]
+    public string? SelectedOrderNo { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OrderSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public EventCallback ReloadRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ResetRequested { get; set; }
+}

@@ -1,0 +1,28 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="food-order-boundary">
+    로그인한 계정이 소유한 영속 음식 주문만 조회합니다. 이 화면은 주문 생성·음식점 수락·결제 승인·배차 상태 전이를 실행하지 않으며, 마트·화물 주문을 샘플 카드로 대신 표시하지 않습니다.
+</MudAlert>
+
+<div class="food-order-toolbar">
+    <MudChip T="string"
+             Variant="Variant.Outlined"
+             Color="Color.Success"
+             Icon="@Icons.Material.Filled.VerifiedUser">
+        @Authentication.현재사용자표시
+    </MudChip>
+    <MudButton Variant="Variant.Text"
+               Color="Color.Secondary"
+               Disabled="@Authentication.처리중"
+               OnClick="LogoutRequested">
+        로그아웃
+    </MudButton>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public 주문자앱인증ViewModel Authentication { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback LogoutRequested { get; set; }
+}

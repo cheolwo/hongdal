@@ -1,0 +1,70 @@
+.food-order-panel {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.food-order-panel-heading,
+.food-order-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.food-order-state {
+    min-height: 190px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.food-order-card-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+    margin-top: .75rem;
+}
+
+.food-order-card {
+    display: grid;
+    align-content: start;
+    gap: .75rem;
+    padding: 1rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 14px;
+    background: var(--mud-palette-surface);
+}
+
+.food-order-card--selected {
+    border-color: var(--mud-palette-primary);
+    box-shadow: 0 0 0 1px var(--mud-palette-primary);
+}
+
+.food-order-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem .8rem;
+    color: var(--mud-palette-text-secondary);
+    font-size: .78rem;
+}
+
+.food-order-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+@media (max-width: 720px) {
+    .food-order-card-list {
+        grid-template-columns: 1fr;
+    }
+
+    .food-order-panel-heading,
+    .food-order-card-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

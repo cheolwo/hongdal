@@ -1,0 +1,49 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (Access.처리중 && Access.화면상태 == 음식배달페이지접근상태.확인전)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="food-order-access-state">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <MudText Typo="Typo.body1">음식 배달 기능 상태를 확인하고 있습니다.</MudText>
+    </MudPaper>
+}
+else if (Access.화면상태 == 음식배달페이지접근상태.오류)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        <MudText Typo="Typo.subtitle2">주문 내역 화면을 준비하지 못했습니다.</MudText>
+        <MudText Typo="Typo.body2">@OrdererFoodOrderPresentation.ErrorMessage(Access.오류메시지)</MudText>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Error"
+                   OnClick="RetryRequested"
+                   Class="mt-3">
+            다시 확인
+        </MudButton>
+    </MudAlert>
+}
+else if (Access.기능비활성)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        <MudText Typo="Typo.subtitle2">음식 주문 조회가 현재 비활성입니다.</MudText>
+        <MudText Typo="Typo.body2">
+            <code>FoodDeliveryWorkflow</code>가 활성화된 환경에서만 개인 주문 원장을 조회합니다.
+        </MudText>
+    </MudAlert>
+}
+else if (Access.사용가능 && Authentication.처리중 && !Authentication.초기화됨)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="food-order-access-state">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <MudText Typo="Typo.body1">저장된 주문자 로그인 세션을 확인하고 있습니다.</MudText>
+    </MudPaper>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public 음식배달페이지접근ViewModel Access { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public 주문자앱인증ViewModel Authentication { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback RetryRequested { get; set; }
+}

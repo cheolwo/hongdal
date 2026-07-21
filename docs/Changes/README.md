@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [주문자 음식 주문 내역 단일책임 분리](2026-07-22-orderer-food-order-srp.md) | 320줄 화면을 40줄 shell과 접근·인증·검색·목록·정확한 상세 책임으로 분리하고 실제 OrdererApp desktop·390px mobile 로그인 경계 검증 |
 | 2026-07-22 | [판매상품 출품 페이지 단일책임 분리](2026-07-22-product-listings-srp.md) | 209줄 화면을 47줄 shell과 조회·정확한 선택·payload 검토·로컬 Simulation 생성 책임으로 분리하고 실제 MAUI desktop·390px mobile 작업 흐름 검증 |
 | 2026-07-22 | [판매 주문 이행 페이지 단일책임 분리](2026-07-22-order-fulfillment-srp.md) | 631줄 화면을 61줄 shell과 조회·Simulation·재고·피킹·포장·알림 정책 책임으로 분리하고 실제 MAUI desktop·390px mobile 작업 흐름 검증 |
 | 2026-07-21 | [주문자 마트 주문 요청 단일책임 분리](2026-07-21-orderer-mart-order-request-srp.md) | 260줄 화면을 54줄 shell과 접근·선택·상품·인증·작성·저장 영수증 책임으로 분리하고 로그인·저장·동일 ID 재조회 desktop 검증 |

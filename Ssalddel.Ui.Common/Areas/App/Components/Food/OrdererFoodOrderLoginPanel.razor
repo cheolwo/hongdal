@@ -1,0 +1,37 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<div class="food-order-login-layout">
+    <Ssalddel공통로그인Panel 제목="주문 내역 로그인"
+                             설명="음식 주문 내역에는 수령지와 결제 정보가 포함될 수 있어 주문한 계정으로만 확인합니다."
+                             상태메시지="@Authentication.오류메시지"
+                             상태Severity="@AuthenticationSeverity"
+                             일반로그인표시="true"
+                             소셜로그인표시="false"
+                             일반로그인버튼텍스트="내 주문 확인"
+                             IsBusy="@Authentication.처리중"
+                             Elevation="0"
+                             Class="food-order-login-card"
+                             OnPasswordLogin="LoginRequested" />
+
+    <MudPaper Elevation="0" Outlined="true" Class="food-order-login-note">
+        <MudIcon Icon="@Icons.Material.Filled.PrivacyTip" Color="Color.Info" Size="Size.Large" />
+        <MudText Typo="Typo.h6">공개 탐색은 로그인 없이 가능합니다.</MudText>
+        <MudText Typo="Typo.body2">
+            음식점과 공개 메뉴는 회원가입 없이 둘러볼 수 있습니다. 주문번호·수령 정보처럼 개인 원장에 속한 내용만 로그인이 필요합니다.
+        </MudText>
+        <MudButton Href="/food/restaurants" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Storefront">
+            공개 음식점 보기
+        </MudButton>
+    </MudPaper>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public 주문자앱인증ViewModel Authentication { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<공통로그인요청> LoginRequested { get; set; }
+
+    private Severity AuthenticationSeverity
+        => Authentication.오류발생 ? Severity.Error : Severity.Info;
+}

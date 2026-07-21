@@ -1,0 +1,129 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="food-order-panel">
+    @if (Detail.처리중)
+    {
+        <div class="food-order-state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2">정확한 주문번호의 상세를 조회하고 있습니다.</MudText>
+        </div>
+    }
+    else if (Detail.오류발생)
+    {
+        <div class="food-order-state">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">주문 상세를 불러오지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@OrdererFoodOrderPresentation.ErrorMessage(Detail.오류메시지)</MudText>
+            @if (!string.IsNullOrWhiteSpace(Detail.요청OrderNo))
+            {
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           OnClick="@(() => RetryRequested.InvokeAsync(Detail.요청OrderNo!))">
+                    다시 시도
+                </MudButton>
+            }
+        </div>
+    }
+    else if (Detail.찾을수없음)
+    {
+        <div class="food-order-state">
+            <MudIcon Icon="@Icons.Material.Filled.NoAccounts" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">이 계정의 음식 주문을 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2">없는 주문번호와 다른 사용자의 주문번호는 동일하게 처리하며 다른 주문으로 대체하지 않습니다.</MudText>
+        </div>
+    }
+    else if (Detail.상세 is { } detail)
+    {
+        <div class="food-order-detail-heading">
+            <div>
+                <MudText Typo="Typo.overline">EXACT ORDER</MudText>
+                <MudText Typo="Typo.h6">@detail.주문.주문번호</MudText>
+                <MudText Typo="Typo.body2">
+                    @OrdererFoodOrderPresentation.RestaurantLabel(detail.주문) · @detail.주문.상품요약
+                </MudText>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                           OnClick="CloseRequested"
+                           aria-label="주문 상세 닫기" />
+        </div>
+
+        <div class="food-order-detail-summary">
+            <MudChip T="string"
+                     Color="@OrdererFoodOrderPresentation.StatusColor(detail.주문.상태)"
+                     Variant="Variant.Filled">
+                @detail.주문.상태
+            </MudChip>
+            <span>@($"{detail.주문.총주문금액:N0}원")</span>
+            <span>@OrdererFoodOrderPresentation.DispatchLabel(detail.주문.배차상태)</span>
+        </div>
+
+        <SsalddelSensitiveDisclosureList Title="내 음식 주문 상세"
+                                         Summary="@detail.주문.상품요약"
+                                         RelatedParties="주문자 · 음식점 · 배달 업무 담당자"
+                                         Icon="@Icons.Material.Filled.ReceiptLong"
+                                         Color="Color.Primary"
+                                         PrivacyHint="수령지와 연락처는 주문한 계정에서 필요할 때만 펼쳐 확인합니다.">
+            <MudExpansionPanel Text="주문 상품" Expanded="true">
+                @foreach (var item in detail.상품목록)
+                {
+                    <div class="food-order-line-item">
+                        <span>@item.상품명</span>
+                        <span>@($"{item.수량:N0}개 × {item.단가:N0}원")</span>
+                    </div>
+                }
+                <SsalddelSensitiveInfoRow Label="결제 수단" Value="@OrdererFoodOrderPresentation.ValueOrDash(detail.결제수단)" />
+                <SsalddelSensitiveInfoRow Label="주문 시각" Value="@OrdererFoodOrderPresentation.FormatDate(detail.주문.CreatedAtUtc)" />
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="수령 정보">
+                <SsalddelSensitiveInfoRow Label="수령인" Value="@OrdererFoodOrderPresentation.ValueOrDash(detail.수령인정보.수령인명)" />
+                <SsalddelSensitiveInfoRow Label="연락처" Value="@OrdererFoodOrderPresentation.ValueOrDash(detail.수령인정보.연락처)" />
+                <SsalddelSensitiveInfoRow Label="수령지" Value="@OrdererFoodOrderPresentation.Address(detail.수령인정보.주소, detail.수령인정보.상세주소)" />
+                <SsalddelSensitiveInfoRow Label="요청사항" Value="@OrdererFoodOrderPresentation.ValueOrDash(detail.수령인정보.요청사항)" />
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="음식점 처리">
+                <SsalddelSensitiveInfoRow Label="음식점" Value="@OrdererFoodOrderPresentation.RestaurantLabel(detail.주문)" />
+                <SsalddelSensitiveInfoRow Label="음식점 주소" Value="@OrdererFoodOrderPresentation.Address(detail.음식점주소, detail.음식점상세주소)" />
+                <SsalddelSensitiveInfoRow Label="수락 시각" Value="@OrdererFoodOrderPresentation.FormatOptionalDate(detail.음식점수락시각Utc)" />
+                <SsalddelSensitiveInfoRow Label="조리 예상 완료" Value="@OrdererFoodOrderPresentation.FormatOptionalDate(detail.주문.조리예상완료시각Utc)" />
+                <SsalddelSensitiveInfoRow Label="수락 메모" Value="@OrdererFoodOrderPresentation.ValueOrDash(detail.수락메모)" />
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="상태 이력">
+                @if (detail.상태이력.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">기록된 상태 전이가 없습니다.</MudText>
+                }
+                else
+                {
+                    @foreach (var transition in detail.상태이력)
+                    {
+                        <div class="food-order-history-item">
+                            <span>@($"{OrdererFoodOrderPresentation.ValueOrDash(transition.이전상태)} → {transition.다음상태}")</span>
+                            <span>
+                                @OrdererFoodOrderPresentation.FormatDate(transition.전이시각Utc) · @OrdererFoodOrderPresentation.ValueOrDash(transition.사유)
+                            </span>
+                        </div>
+                    }
+                }
+            </MudExpansionPanel>
+        </SsalddelSensitiveDisclosureList>
+    }
+    else
+    {
+        <div class="food-order-state">
+            <MudIcon Icon="@Icons.Material.Filled.TouchApp" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">확인할 주문을 직접 선택해 주세요.</MudText>
+            <MudText Typo="Typo.body2">첫 주문이나 예시 주문을 자동 선택하지 않습니다.</MudText>
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 주문자음식주문상세ViewModel Detail { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<string> RetryRequested { get; set; }
+
+    [Parameter]
+    public EventCallback CloseRequested { get; set; }
+}

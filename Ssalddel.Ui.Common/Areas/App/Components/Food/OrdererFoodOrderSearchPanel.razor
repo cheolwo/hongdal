@@ -1,0 +1,76 @@
+@using Ssalddel.Contracts.Food
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="food-order-panel">
+    <div class="food-order-panel-heading">
+        <div>
+            <MudText Typo="Typo.overline">MY FOOD ORDERS</MudText>
+            <MudText Typo="Typo.h6">음식 주문 검색</MudText>
+        </div>
+        @if (List.초기화됨)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       Disabled="@List.처리중"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       OnClick="ReloadRequested">
+                새로고침
+            </MudButton>
+        }
+    </div>
+
+    <div class="food-order-filter-grid">
+        <MudTextField T="string"
+                      @bind-Value="List.검색어"
+                      Label="주문번호·음식점·상품"
+                      Placeholder="예: FOOD-, 김밥"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" />
+        <MudSelect T="string"
+                   @bind-Value="List.상태필터"
+                   Label="주문 상태"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Clearable="true">
+            @foreach (var status in 음식주문상태코드.전체)
+            {
+                <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+    <div class="food-order-filter-actions">
+        @if (List.검색조건있음)
+        {
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Secondary"
+                       Disabled="@List.처리중"
+                       OnClick="ResetRequested">
+                조건 초기화
+            </MudButton>
+        }
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Disabled="@List.처리중"
+                   StartIcon="@Icons.Material.Filled.ManageSearch"
+                   OnClick="SearchRequested">
+            내 주문 조회
+        </MudButton>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 주문자음식주문목록ViewModel List { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback SearchRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ReloadRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ResetRequested { get; set; }
+}

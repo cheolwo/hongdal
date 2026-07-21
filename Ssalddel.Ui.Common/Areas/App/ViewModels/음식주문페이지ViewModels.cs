@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ssalddel.Contracts.Food;
+using Ssalddel.Ui.Common.Areas.App.Models.Auth;
 using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -122,7 +123,7 @@ public sealed partial class 주문자음식주문상세ViewModel(
     }
 }
 
-/// <summary>기능 접근, 주문자 인증, 음식 주문 목록과 정확한 상세를 조립합니다.</summary>
+/// <summary>기능 접근, 인증, 목록과 정확한 상세를 조립하고 음식 주문 내역 페이지 흐름만 조율합니다.</summary>
 public sealed class 주문자음식주문PageViewModel : 조립ViewModelBase
 {
     public 주문자음식주문PageViewModel(
@@ -141,4 +142,109 @@ public sealed class 주문자음식주문PageViewModel : 조립ViewModelBase
     public 주문자앱인증ViewModel 인증 { get; }
     public 주문자음식주문목록ViewModel 목록 { get; }
     public 주문자음식주문상세ViewModel 상세 { get; }
+
+    public async Task 초기화Async(
+        string? orderNo,
+        CancellationToken cancellationToken = default)
+    {
+        if (!await 접근.확인Async(cancellationToken) || !접근.사용가능)
+        {
+            return;
+        }
+
+        if (!인증.초기화됨 && !await 인증.복원Async(cancellationToken))
+        {
+            return;
+        }
+
+        if (인증.로그인됨)
+        {
+            await 인증콘텐츠조회Async(orderNo, cancellationToken);
+        }
+    }
+
+    public Task 경로선택반영Async(
+        string? orderNo,
+        CancellationToken cancellationToken = default)
+    {
+        if (!접근.사용가능 || !인증.로그인됨)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (!string.IsNullOrWhiteSpace(orderNo))
+        {
+            var normalizedOrderNo = orderNo.Trim();
+            return string.Equals(상세.요청OrderNo, normalizedOrderNo, StringComparison.Ordinal)
+                ? Task.CompletedTask
+                : 상세.조회Async(normalizedOrderNo, cancellationToken);
+        }
+
+        if (!string.IsNullOrWhiteSpace(상세.요청OrderNo))
+        {
+            상세.선택해제();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public async Task<bool> 로그인Async(
+        공통로그인요청 request,
+        string? orderNo,
+        CancellationToken cancellationToken = default)
+    {
+        if (!await 인증.로그인Async(
+                request.UserNameOrEmail,
+                request.Password,
+                cancellationToken))
+        {
+            return false;
+        }
+
+        await 인증콘텐츠조회Async(orderNo, cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> 로그아웃Async(CancellationToken cancellationToken = default)
+    {
+        if (!await 인증.로그아웃Async(cancellationToken))
+        {
+            return false;
+        }
+
+        목록.세션초기화();
+        상세.선택해제();
+        return true;
+    }
+
+    public Task 목록검색Async(CancellationToken cancellationToken = default)
+        => 목록.조회Async(cancellationToken);
+
+    public Task 목록새로고침Async(CancellationToken cancellationToken = default)
+        => 목록.페이지조회Async(Math.Max(1, 목록.현재페이지), cancellationToken);
+
+    public Task 페이지변경Async(int page, CancellationToken cancellationToken = default)
+        => 목록.페이지조회Async(page, cancellationToken);
+
+    public async Task 검색조건초기화Async(CancellationToken cancellationToken = default)
+    {
+        목록.필터초기화();
+        await 목록.조회Async(cancellationToken);
+    }
+
+    public Task 주문선택Async(string orderNo, CancellationToken cancellationToken = default)
+        => 상세.조회Async(orderNo, cancellationToken);
+
+    public void 주문선택해제() => 상세.선택해제();
+
+    private async Task 인증콘텐츠조회Async(
+        string? orderNo,
+        CancellationToken cancellationToken)
+    {
+        var listTask = 목록.조회Async(cancellationToken);
+        var detailTask = string.IsNullOrWhiteSpace(orderNo)
+            ? Task.FromResult(true)
+            : 상세.조회Async(orderNo.Trim(), cancellationToken);
+        await Task.WhenAll(listTask, detailTask);
+    }
 }

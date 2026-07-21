@@ -1,0 +1,10 @@
+.food-order-access-state {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 16px;
+}
