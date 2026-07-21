@@ -6,6 +6,10 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [구매 근거를 잇는 상품 상세·판매 초안 UI](2026-07-22-purchase-evidence-ui.md) | 완료 원장·공개 후기 근거를 마트 상품 상세와 판매 초안에 비식별로 표시하고 실제 판매 초안 desktop 렌더링 검증 |
+| 2026-07-22 | [공식 재료·가격·레시피에서 공동구매 초안까지](2026-07-22-official-ingredient-journey.md) | 실제 KAMIS 가격과 식약처 관련 레시피를 재료별로 표시하고 비식별 근거만 공동구매 초안으로 연결, desktop 렌더링 검증 |
+| 2026-07-22 | [도심 생활물류센터 창고 Profile 계층](2026-07-22-urban-logistics-profile.md) | 간접 확인 — 일반 창고 기능을 상속하는 도심 생활물류센터와 마트·공동주택 파생 Profile 조립 |
+| 2026-07-22 | [커뮤니티 WebApp 페이지 상태 책임 분리](2026-07-22-community-page-state-srp.md) | 화면 없음 — 게시판 조회·검색·필터 상태와 업무 공간 route 문맥을 Razor 페이지에서 분리 |
 | 2026-07-22 | [주문자 음식 주문 내역 단일책임 분리](2026-07-22-orderer-food-order-srp.md) | 320줄 화면을 40줄 shell과 접근·인증·검색·목록·정확한 상세 책임으로 분리하고 실제 OrdererApp desktop·390px mobile 로그인 경계 검증 |
 | 2026-07-22 | [판매상품 출품 페이지 단일책임 분리](2026-07-22-product-listings-srp.md) | 209줄 화면을 47줄 shell과 조회·정확한 선택·payload 검토·로컬 Simulation 생성 책임으로 분리하고 실제 MAUI desktop·390px mobile 작업 흐름 검증 |
 | 2026-07-22 | [판매 주문 이행 페이지 단일책임 분리](2026-07-22-order-fulfillment-srp.md) | 631줄 화면을 61줄 shell과 조회·Simulation·재고·피킹·포장·알림 정책 책임으로 분리하고 실제 MAUI desktop·390px mobile 작업 흐름 검증 |

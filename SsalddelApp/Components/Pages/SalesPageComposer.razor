@@ -1,8 +1,52 @@
 @page "/shipper/sales/pages/new"
 @using Ssalddel.Ui.Common.Areas.App.Components.Sales
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
 
 <PageTitle>판매 페이지 만들기</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-6">
-    <SsalddelSalesPageComposer />
+    <SsalddelSalesPageComposer EvidenceSeed="@EvidenceSeed" />
 </MudContainer>
+
+@code {
+    [SupplyParameterFromQuery(Name = "sourceProductId")]
+    public long? SourceProductId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "productName")]
+    public string? ProductName { get; set; }
+
+    [SupplyParameterFromQuery(Name = "category")]
+    public string? Category { get; set; }
+
+    [SupplyParameterFromQuery(Name = "description")]
+    public string? Description { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sellingUnit")]
+    public string? SellingUnit { get; set; }
+
+    [SupplyParameterFromQuery(Name = "referencePrice")]
+    public decimal? ReferencePrice { get; set; }
+
+    [SupplyParameterFromQuery(Name = "completedLedgerVerified")]
+    public bool CompletedLedgerVerified { get; set; }
+
+    [SupplyParameterFromQuery(Name = "reviewCount")]
+    public int ReviewCount { get; set; }
+
+    [SupplyParameterFromQuery(Name = "evidenceAtUtc")]
+    public DateTime? EvidenceAtUtc { get; set; }
+
+    private 판매페이지공개상품Seed? EvidenceSeed
+        => SourceProductId is > 0 && !string.IsNullOrWhiteSpace(ProductName)
+            ? new(
+                SourceProductId.Value,
+                ProductName,
+                Category,
+                Description,
+                SellingUnit,
+                ReferencePrice,
+                CompletedLedgerVerified,
+                Math.Max(0, ReviewCount),
+                EvidenceAtUtc)
+            : null;
+}

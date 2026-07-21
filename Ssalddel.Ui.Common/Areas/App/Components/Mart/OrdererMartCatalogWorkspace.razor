@@ -223,20 +223,195 @@
                     <MudAlert Severity="Severity.Info" Variant="Variant.Text" Dense="true" Class="mt-3">
                         @detail.재고기준안내
                     </MudAlert>
+
+                    <section class="mart-purchase-evidence" aria-label="구매 원장과 구매후기">
+                        <div class="mart-evidence-heading">
+                            <div>
+                                <MudText Typo="Typo.overline">PURCHASE EVIDENCE</MudText>
+                                <MudText Typo="Typo.subtitle1">구매 원장과 후기</MudText>
+                            </div>
+                            <MudChip T="string"
+                                     Size="Size.Small"
+                                     Color="@(detail.구매근거.완료원장확인여부 ? Color.Success : Color.Default)"
+                                     Variant="Variant.Outlined">
+                                @detail.구매근거.원장근거상태
+                            </MudChip>
+                        </div>
+
+                        <div class="mart-evidence-stats">
+                            <div>
+                                <span>완료 흐름</span>
+                                <strong>@(detail.구매근거.완료원장확인여부 ? "확인됨" : "미확인")</strong>
+                            </div>
+                            <div>
+                                <span>공개 후기</span>
+                                <strong>@($"{detail.구매근거.공개후기수:N0}건")</strong>
+                            </div>
+                            <div>
+                                <span>근거 기준</span>
+                                <strong>@EvidenceTime(detail.구매근거.근거기준시각Utc)</strong>
+                            </div>
+                        </div>
+
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            @detail.구매근거.공개범위안내
+                        </MudText>
+
+                        @if (detail.구매근거.구매후기목록.Count > 0)
+                        {
+                            <div class="mart-review-list">
+                                @foreach (var review in detail.구매근거.구매후기목록)
+                                {
+                                    <article class="mart-review-card">
+                                        <div class="mart-review-heading">
+                                            <div>
+                                                <strong>@review.제목</strong>
+                                                <span>@review.작성자표시명 · @EvidenceTime(review.작성시각Utc)</span>
+                                            </div>
+                                            @if (!string.IsNullOrWhiteSpace(CommunityPostBasePath))
+                                            {
+                                                <MudButton Href="@CommunityPostHref(review.게시글Id)"
+                                                           Variant="Variant.Text"
+                                                           Size="Size.Small"
+                                                           EndIcon="@Icons.Material.Filled.OpenInNew">
+                                                    게시글
+                                                </MudButton>
+                                            }
+                                        </div>
+                                        <p>@review.본문요약</p>
+                                        <div class="mart-review-meta">
+                                            <span><MudIcon Icon="@Icons.Material.Filled.Recommend" Size="Size.Small" /> @review.추천수.ToString("N0")</span>
+                                            <span><MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" /> @review.댓글수.ToString("N0")</span>
+                                        </div>
+                                    </article>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mart-review-empty">
+                                <MudIcon Icon="@Icons.Material.Filled.RateReview" />
+                                <span>@(detail.구매근거.완료원장확인여부 ? "아직 공개된 구매후기가 없습니다." : "구매 원장이 완료되면 참여자가 후기를 남길 수 있습니다.")</span>
+                            </div>
+                        }
+
+                        @if (Review.성공함 && !string.IsNullOrWhiteSpace(Review.성공메시지))
+                        {
+                            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">
+                                @Review.성공메시지
+                            </MudAlert>
+                        }
+
+                        <div class="mart-evidence-actions">
+                            @if (detail.구매근거.후기작성가능여부)
+                            {
+                                @if (Review.사용자확인됨)
+                                {
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Success"
+                                               StartIcon="@Icons.Material.Filled.RateReview"
+                                               Disabled="@Review.처리중"
+                                               OnClick="OpenReviewForm">
+                                        구매후기 작성
+                                    </MudButton>
+                                }
+                                else
+                                {
+                                    <MudButton Href="@LoginPath"
+                                               Variant="Variant.Outlined"
+                                               Color="Color.Success"
+                                               StartIcon="@Icons.Material.Filled.Login">
+                                        로그인 후 후기 작성
+                                    </MudButton>
+                                }
+                            }
+
+                            @if (detail.구매근거.완료원장확인여부
+                                 && !string.IsNullOrWhiteSpace(SalesPageComposerPath))
+                            {
+                                <MudButton Href="@SalesPageHref(detail)"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.Storefront">
+                                    이 근거로 판매페이지 초안 만들기
+                                </MudButton>
+                            }
+                        </div>
+
+                        @if (_reviewFormVisible && Review.사용자확인됨)
+                        {
+                            <MudPaper Elevation="0" Outlined="true" Class="mart-review-form">
+                                <MudText Typo="Typo.subtitle2">완료 사례·후기 게시판에 공개 후기 작성</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    서버가 로그인 사용자와 완료 원장 접근 권한을 다시 확인합니다. 주소·연락처·결제정보 등 개인정보는 적지 마세요.
+                                </MudText>
+                                <MudTextField T="string"
+                                              @bind-Value="Review.작성자표시명"
+                                              Label="작성자 표시명"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              MaxLength="40" />
+                                <MudTextField T="string"
+                                              @bind-Value="Review.글비밀번호"
+                                              Label="글 비밀번호"
+                                              HelperText="후기 수정·삭제에 사용할 4자 이상의 비밀번호"
+                                              InputType="InputType.Password"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              MaxLength="100" />
+                                <MudTextField T="string"
+                                              @bind-Value="Review.제목"
+                                              Label="후기 제목"
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              MaxLength="160" />
+                                <MudTextField T="string"
+                                              @bind-Value="Review.본문"
+                                              Label="구매 후기"
+                                              Placeholder="상품 상태, 함께 구매한 경험, 다시 구매할 의향 등 공개 가능한 내용을 적어주세요."
+                                              Variant="Variant.Outlined"
+                                              Margin="Margin.Dense"
+                                              Lines="5"
+                                              MaxLength="4000" />
+                                @if (Review.오류발생)
+                                {
+                                    <MudAlert Severity="Severity.Error" Variant="Variant.Text" Dense="true">
+                                        @ErrorMessage(Review.오류메시지)
+                                    </MudAlert>
+                                }
+                                <div class="mart-review-form-actions">
+                                    <MudButton Variant="Variant.Text"
+                                               Disabled="@Review.처리중"
+                                               OnClick="CloseReviewForm">
+                                        취소
+                                    </MudButton>
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Success"
+                                               StartIcon="@Icons.Material.Filled.Publish"
+                                               Disabled="@Review.처리중"
+                                               OnClick="SubmitReviewAsync">
+                                        @(Review.처리중 ? "등록 중" : "후기 공개 등록")
+                                    </MudButton>
+                                </div>
+                            </MudPaper>
+                        }
+                    </section>
+
                     <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
                         이 상세 조회만으로 구매 의향이나 재고 예약을 저장하지 않습니다. 주문 요청 작성은 별도 페이지에서 로그인·서버 검증·멱등 저장으로 처리합니다.
                     </MudAlert>
-                    @if (!string.IsNullOrWhiteSpace(OrderRequestBasePath))
-                    {
-                        <MudButton Href="@OrderRequestHref(detail.Id)"
-                                   Variant="Variant.Filled"
-                                   Color="Color.Success"
-                                   StartIcon="@Icons.Material.Filled.AddShoppingCart"
-                                   Disabled="@(!detail.판매가능여부)"
-                                   Class="mt-3">
-                            주문 요청 작성
-                        </MudButton>
-                    }
+                    <div class="mart-detail-actions">
+                        @if (!string.IsNullOrWhiteSpace(OrderRequestBasePath))
+                        {
+                            <MudButton Href="@OrderRequestHref(detail.Id)"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.AddShoppingCart"
+                                       Disabled="@(!detail.판매가능여부)">
+                                주문 요청 작성
+                            </MudButton>
+                        }
+                    </div>
                 }
                 else
                 {

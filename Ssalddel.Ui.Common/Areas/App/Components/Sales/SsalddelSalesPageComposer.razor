@@ -19,6 +19,32 @@
         공동주문은 상품 종류가 아니라 주문 방식입니다. 개별주문과 공동주문을 모두 열거나 필요한 방식만 선택할 수 있습니다.
     </MudAlert>
 
+    @if (EvidenceSeed is { } evidence)
+    {
+        <section class="sales-evidence" aria-label="공개 상품 구매 근거">
+            <div class="sales-evidence__heading">
+                <div>
+                    <MudText Typo="Typo.overline">PUBLIC PURCHASE EVIDENCE</MudText>
+                    <MudText Typo="Typo.h6">공개 상품 #@(evidence.SourceProductId)에서 가져온 검토 자료</MudText>
+                </div>
+                <MudChip T="string"
+                         Size="Size.Small"
+                         Color="@(evidence.CompletedLedgerVerified ? Color.Success : Color.Warning)"
+                         Variant="Variant.Outlined">
+                    @(evidence.CompletedLedgerVerified ? "완료 원장 확인" : "완료 원장 미확인")
+                </MudChip>
+            </div>
+            <dl>
+                <div><dt>공개 후기</dt><dd>@($"{Math.Max(0, evidence.ReviewCount):N0}건")</dd></div>
+                <div><dt>공개 참고가</dt><dd>@ReferencePriceLabel(evidence.ReferencePrice)</dd></div>
+                <div><dt>근거 기준</dt><dd>@EvidenceTimeLabel(evidence.EvidenceAtUtc)</dd></div>
+            </dl>
+            <MudText Typo="Typo.caption">
+                원장 ID·참여자·주문·결제 정보는 전달하지 않았습니다. 이 자료는 판매 가능성을 검토하는 초안 근거이며 상품 사실이나 판매 조건을 자동 확정하지 않습니다.
+            </MudText>
+        </section>
+    }
+
     @if (!string.IsNullOrWhiteSpace(ViewModel.오류메시지))
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4">
@@ -50,6 +76,21 @@
                 <MudTextField T="string" Label="한 줄 소개" Placeholder="이 상품을 선택할 이유를 짧게 적어주세요"
                               Variant="Variant.Outlined" Margin="Margin.Dense" MaxLength="500"
                               @bind-Value="ViewModel.초안.한줄소개" />
+                <MudTextField T="string" Label="상세 설명" Placeholder="상품의 특징, 구성, 보관·사용 방법과 확인할 사항을 적어주세요"
+                              Variant="Variant.Outlined" Margin="Margin.Dense" MaxLength="4000"
+                              Lines="6" @bind-Value="ViewModel.초안.상세설명" />
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string" Label="원산지 표시" Placeholder="확인 후 직접 입력"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense" MaxLength="300"
+                                      @bind-Value="ViewModel.초안.원산지표시" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string" Label="출고지 표시" Placeholder="확인 후 직접 입력"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense" MaxLength="300"
+                                      @bind-Value="ViewModel.초안.출고지표시" />
+                    </MudItem>
+                </MudGrid>
 
                 <MudDivider />
                 <div>
@@ -76,6 +117,8 @@
                                       MaxLength="10" @bind-Value="ViewModel.초안.통화코드" />
                     </MudItem>
                 </MudGrid>
+                <MudNumericField T="int" Label="최소 주문 수량" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                 Min="1" @bind-Value="ViewModel.초안.최소주문수량" />
                 <div class="order-mode-grid">
                     <label class="order-mode-card">
                         <MudSwitch T="bool" Color="Color.Primary" @bind-Value="ViewModel.초안.개별주문허용" />
@@ -143,6 +186,17 @@
                         </div>
                     }
 
+                    @if (HasPreviewEvidence)
+                    {
+                        <div class="purchase-evidence-callout">
+                            <MudIcon Icon="@Icons.Material.Filled.Verified" />
+                            <span>
+                                <strong>@(PreviewEvidenceCompleted ? "완료된 구매 흐름을 확인했어요" : "구매 완료 근거를 확인 중이에요")</strong>
+                                <small>@($"공개 후기 {PreviewEvidenceReviewCount:N0}건 · {PreviewEvidenceStatusLabel}")</small>
+                            </span>
+                        </div>
+                    }
+
                     @if (ViewModel.저장결과?.외부참고자료 is not null)
                     {
                         <div class="external-reference-note">
@@ -161,6 +215,9 @@
 </section>
 
 @code {
+    [Parameter]
+    public 판매페이지공개상품Seed? EvidenceSeed { get; set; }
+
     private static readonly IReadOnlyList<(string Value, string Label)> SellerTypes =
     [
         (판매자유형코드.일반판매자, "일반 판매자"),
@@ -187,9 +244,34 @@
         (false, true) => "공동주문",
         _ => "선택 필요"
     };
+    private bool HasPreviewEvidence
+        => ViewModel.저장결과?.공개구매근거 is not null || ViewModel.공개상품근거 is not null;
+    private bool PreviewEvidenceCompleted
+        => ViewModel.저장결과?.공개구매근거?.완료원장확인여부
+           ?? ViewModel.공개상품근거?.CompletedLedgerVerified
+           ?? false;
+    private int PreviewEvidenceReviewCount
+        => Math.Max(
+            0,
+            ViewModel.저장결과?.공개구매근거?.공개후기수
+            ?? ViewModel.공개상품근거?.ReviewCount
+            ?? 0);
+    private string PreviewEvidenceStatusLabel
+        => ViewModel.저장결과?.공개구매근거 is not null
+            ? "서버 검증 스냅샷 저장됨"
+            : "저장 전 공개 투영";
+
+    protected override void OnParametersSet()
+        => ViewModel.공개상품근거적용(EvidenceSeed);
 
     private Task CreateDraftAsync() => ViewModel.초안생성Async();
 
     private static string? FirstNonEmpty(params string?[] values)
         => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim();
+
+    private static string ReferencePriceLabel(decimal? price)
+        => price is decimal value ? $"{value:N0}원 · 확정 전" : "없음";
+
+    private static string EvidenceTimeLabel(DateTime? value)
+        => value.HasValue ? $"{value.Value:yyyy.MM.dd HH:mm} UTC" : "기준 시각 없음";
 }
