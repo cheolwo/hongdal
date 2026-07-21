@@ -62,16 +62,19 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
     private readonly AgriculturalFisheriesDbContext _db;
     private readonly IReadOnlyDictionary<string, IOfficialFoodRecipeRemoteSource> _remoteSources;
     private readonly IOfficialFoodRecipeIngredientIndexService _ingredientIndexService;
+    private readonly IOfficialFoodIngredientPublicPriceService _ingredientPriceService;
     private readonly TimeProvider _timeProvider;
 
     public OfficialFoodRecipeArchiveService(
         AgriculturalFisheriesDbContext db,
         IEnumerable<IOfficialFoodRecipeRemoteSource> remoteSources,
         IOfficialFoodRecipeIngredientIndexService ingredientIndexService,
+        IOfficialFoodIngredientPublicPriceService ingredientPriceService,
         TimeProvider timeProvider)
     {
         _db = db;
         _ingredientIndexService = ingredientIndexService;
+        _ingredientPriceService = ingredientPriceService;
         _timeProvider = timeProvider;
 
         var sourceList = remoteSources.ToArray();
@@ -199,7 +202,15 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             .OrderByDescending(variant => variant.LastCollectedAtUtc)
             .ToArrayAsync(cancellationToken);
 
-        return variants.Select(variant => ToDto(variant, nowUtc)).ToArray();
+        var ingredientIds = variants
+            .SelectMany(variant => variant.RecipeIngredients)
+            .Select(recipeIngredient => recipeIngredient.IngredientId)
+            .Distinct()
+            .ToArray();
+        var prices = await _ingredientPriceService.GetLatestPricesAsync(
+            ingredientIds,
+            cancellationToken);
+        return variants.Select(variant => ToDto(variant, nowUtc, prices)).ToArray();
     }
 
     public async Task<OfficialFoodRecipeCollectionResponse> CollectAsync(
@@ -457,7 +468,8 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
 
     private static OfficialFoodRecipeVariantDto ToDto(
         OfficialFoodRecipeVariant variant,
-        DateTime nowUtc)
+        DateTime nowUtc,
+        IReadOnlyDictionary<long, IReadOnlyList<OfficialFoodIngredientPublicPriceDto>> prices)
     {
         var source = variant.Source
             ?? throw new InvalidOperationException("레시피 원천 관계가 없습니다.");
@@ -495,12 +507,13 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             isFresh,
             variant.RecipeIngredients
                 .OrderBy(item => item.DisplayOrder)
-                .Select(ToIngredientDto)
+                .Select(item => ToIngredientDto(item, prices))
                 .ToArray());
     }
 
     private static OfficialFoodRecipeIngredientDto ToIngredientDto(
-        OfficialFoodRecipeIngredient recipeIngredient)
+        OfficialFoodRecipeIngredient recipeIngredient,
+        IReadOnlyDictionary<long, IReadOnlyList<OfficialFoodIngredientPublicPriceDto>> prices)
     {
         var ingredient = recipeIngredient.Ingredient
             ?? throw new InvalidOperationException("표준 재료 관계가 없습니다.");
@@ -522,7 +535,8 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             recipeIngredient.DisplayOrder,
             recipeIngredient.ParserVersion,
             recipeIngredient.ParseConfidence,
-            recipeIngredient.RequiresReview);
+            recipeIngredient.RequiresReview,
+            prices.GetValueOrDefault(ingredient.Id, []));
     }
 
     private static T Deserialize<T>(string json, T fallback)

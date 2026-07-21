@@ -66,7 +66,7 @@ public sealed class UsdaNassPriceArchiveService : IUsdaNassPriceArchiveService
         {
             YearFrom = yearFrom,
             QuerySummary =
-                $"SURVEY / CROPS / PRICE RECEIVED / NATIONAL / MONTHLY / year >= {yearFrom}",
+                $"SURVEY / 농작물·축산물·양식 수산물 / PRICE RECEIVED / NATIONAL / MONTHLY / year >= {yearFrom}",
             SourceUrl = SourceUrl,
             StartedAtUtc = DateTime.UtcNow
         };
@@ -81,7 +81,6 @@ public sealed class UsdaNassPriceArchiveService : IUsdaNassPriceArchiveService
                 {
                     ["key"] = apiKey,
                     ["source_desc"] = "SURVEY",
-                    ["sector_desc"] = "CROPS",
                     ["statisticcat_desc"] = "PRICE RECEIVED",
                     ["agg_level_desc"] = "NATIONAL",
                     ["freq_desc"] = "MONTHLY",

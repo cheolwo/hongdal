@@ -5,6 +5,7 @@ using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Domain.FoodCulture;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Services.FoodCulture;
+using 살뜰.Services.External.PublicData;
 
 namespace Ssalddel.Tests.Services.FoodCulture;
 
@@ -170,9 +171,14 @@ public sealed class OfficialFoodRecipeIngredientIndexServiceTests
         await db.SaveChangesAsync();
         var timeProvider = new OfficialFoodRecipeArchiveServiceTests.MutableTimeProvider(
             new DateTimeOffset(2026, 7, 21, 9, 0, 0, TimeSpan.Zero));
+        var priceService = new OfficialFoodIngredientPublicPriceService(
+            db,
+            new OfficialFoodIngredientPriceMatchCatalog(new FoodPriceCrosswalkCatalog()),
+            timeProvider);
         var service = new OfficialFoodRecipeIngredientIndexService(
             db,
             new OfficialFoodRecipeIngredientParser(),
+            priceService,
             timeProvider);
 
         var first = await service.RebuildAsync(new OfficialFoodIngredientIndexRequest(

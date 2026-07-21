@@ -36,15 +36,18 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
 
     private readonly AgriculturalFisheriesDbContext _db;
     private readonly OfficialFoodRecipeIngredientParser _parser;
+    private readonly IOfficialFoodIngredientPublicPriceService _priceService;
     private readonly TimeProvider _timeProvider;
 
     public OfficialFoodRecipeIngredientIndexService(
         AgriculturalFisheriesDbContext db,
         OfficialFoodRecipeIngredientParser parser,
+        IOfficialFoodIngredientPublicPriceService priceService,
         TimeProvider timeProvider)
     {
         _db = db;
         _parser = parser;
+        _priceService = priceService;
         _timeProvider = timeProvider;
     }
 
@@ -102,26 +105,39 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
         }
 
         var take = Math.Clamp(query.Take, 1, 500);
-        return await ingredients
+        var rows = await ingredients
             .OrderByDescending(ingredient => ingredient.RecipeIngredients.Count)
             .ThenBy(ingredient => ingredient.CanonicalName)
             .Take(take)
-            .Select(ingredient => new OfficialFoodIngredientDto(
-                ingredient.IngredientKey,
-                ingredient.LanguageCode,
-                ingredient.CanonicalName,
-                ingredient.NormalizedName,
-                ingredient.CategoryCode,
-                ingredient.Category!.KoreanName,
-                ingredient.ClassificationMethod,
-                ingredient.ClassificationConfidence,
-                ingredient.ClassificationState,
-                ingredient.RecipeIngredients
-                    .Select(recipeIngredient => recipeIngredient.RecipeVariantId)
-                    .Distinct()
-                    .Count(),
-                ingredient.UpdatedAtUtc))
+            .Select(ingredient => new
+            {
+                ingredient.Id,
+                Dto = new OfficialFoodIngredientDto(
+                    ingredient.IngredientKey,
+                    ingredient.LanguageCode,
+                    ingredient.CanonicalName,
+                    ingredient.NormalizedName,
+                    ingredient.CategoryCode,
+                    ingredient.Category!.KoreanName,
+                    ingredient.ClassificationMethod,
+                    ingredient.ClassificationConfidence,
+                    ingredient.ClassificationState,
+                    ingredient.RecipeIngredients
+                        .Select(recipeIngredient => recipeIngredient.RecipeVariantId)
+                        .Distinct()
+                        .Count(),
+                    ingredient.UpdatedAtUtc)
+            })
             .ToArrayAsync(cancellationToken);
+        var prices = await _priceService.GetLatestPricesAsync(
+            rows.Select(row => row.Id).ToArray(),
+            cancellationToken);
+        return rows
+            .Select(row => row.Dto with
+            {
+                PublicPrices = prices.GetValueOrDefault(row.Id, [])
+            })
+            .ToArray();
     }
 
     public async Task<OfficialFoodIngredientIndexResponse> RebuildAsync(
@@ -202,6 +218,10 @@ internal sealed class OfficialFoodRecipeIngredientIndexService
                 != OfficialFoodIngredientClassificationStates.Confirmed
                 && !ingredient.RecipeIngredients.Any())
             .ExecuteDeleteAsync(cancellationToken);
+
+        await _priceService.RebuildMappingsAsync(
+            new OfficialFoodIngredientPriceIndexRequest(5000, request.Force),
+            cancellationToken);
 
         var categoryCounts = await _db.OfficialFoodIngredients
             .AsNoTracking()

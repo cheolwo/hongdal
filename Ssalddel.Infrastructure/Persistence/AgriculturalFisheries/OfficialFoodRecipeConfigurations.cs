@@ -404,6 +404,39 @@ internal sealed class OfficialFoodRecipeIngredientConfiguration
     }
 }
 
+internal sealed class OfficialFoodIngredientPriceMappingConfiguration
+    : IEntityTypeConfiguration<OfficialFoodIngredientPriceMapping>, IDedicatedDbContextConfiguration
+{
+    public void Configure(EntityTypeBuilder<OfficialFoodIngredientPriceMapping> builder)
+    {
+        builder.ToTable("food_official_ingredient_price_mappings");
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.CountryCode).HasMaxLength(2).IsRequired();
+        builder.Property(x => x.SourceKey).HasMaxLength(80).IsRequired();
+        builder.Property(x => x.ExternalCategoryCode).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.ExternalItemCode).HasMaxLength(80).IsRequired();
+        builder.Property(x => x.ExternalItemName).HasMaxLength(160).IsRequired();
+        builder.Property(x => x.ExternalVariantCode).HasMaxLength(80).IsRequired();
+        builder.Property(x => x.ExternalVariantName).HasMaxLength(180).IsRequired();
+        builder.Property(x => x.MatchMethod).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.MatchQualityCode).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.MatchConfidence).HasPrecision(5, 4);
+        builder.Property(x => x.MappingState).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.MappingNote).HasMaxLength(1000).IsRequired();
+        builder.Property(x => x.SourceUrl).HasMaxLength(1000).IsRequired();
+
+        builder.HasOne(x => x.Ingredient)
+            .WithMany(x => x.PublicPriceMappings)
+            .HasForeignKey(x => x.IngredientId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => new { x.IngredientId, x.CountryCode, x.SourceKey }).IsUnique();
+        builder.HasIndex(x => new { x.SourceKey, x.ExternalItemCode, x.IsActive });
+        builder.HasIndex(x => new { x.MappingState, x.IsActive });
+    }
+}
+
 internal sealed class OfficialFoodRecipeCollectionRunConfiguration
     : IEntityTypeConfiguration<OfficialFoodRecipeCollectionRun>, IDedicatedDbContextConfiguration
 {

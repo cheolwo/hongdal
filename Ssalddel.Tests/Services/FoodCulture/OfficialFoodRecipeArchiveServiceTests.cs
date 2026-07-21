@@ -4,6 +4,7 @@ using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Services.Content;
 using Ssalddel.Services.FoodCulture;
+using 살뜰.Services.External.PublicData;
 
 namespace Ssalddel.Tests.Services.FoodCulture;
 
@@ -152,14 +153,20 @@ public sealed class OfficialFoodRecipeArchiveServiceTests
         public OfficialFoodRecipeArchiveService CreateService()
         {
             var parser = new OfficialFoodRecipeIngredientParser();
+            var priceService = new OfficialFoodIngredientPublicPriceService(
+                Db,
+                new OfficialFoodIngredientPriceMatchCatalog(new FoodPriceCrosswalkCatalog()),
+                TimeProvider);
             var ingredientIndexService = new OfficialFoodRecipeIngredientIndexService(
                 Db,
                 parser,
+                priceService,
                 TimeProvider);
             return new OfficialFoodRecipeArchiveService(
                 Db,
                 _sources,
                 ingredientIndexService,
+                priceService,
                 TimeProvider);
         }
 

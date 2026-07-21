@@ -23,13 +23,16 @@ public sealed class OfficialFoodRecipeArchiveController : ControllerBase
 {
     private readonly IOfficialFoodRecipeArchiveService _service;
     private readonly IOfficialFoodRecipeIngredientIndexService _ingredientIndexService;
+    private readonly IOfficialFoodIngredientPublicPriceService _ingredientPriceService;
 
     public OfficialFoodRecipeArchiveController(
         IOfficialFoodRecipeArchiveService service,
-        IOfficialFoodRecipeIngredientIndexService ingredientIndexService)
+        IOfficialFoodRecipeIngredientIndexService ingredientIndexService,
+        IOfficialFoodIngredientPublicPriceService ingredientPriceService)
     {
         _service = service;
         _ingredientIndexService = ingredientIndexService;
+        _ingredientPriceService = ingredientPriceService;
     }
 
     [HttpGet("sources")]
@@ -86,6 +89,21 @@ public sealed class OfficialFoodRecipeArchiveController : ControllerBase
         catch (KeyNotFoundException exception)
         {
             return NotFound(CreateProblem(exception.Message));
+        }
+    }
+
+    [HttpPost("ingredients/prices/index")]
+    public async Task<ActionResult<OfficialFoodIngredientPriceIndexResponse>> IndexIngredientPrices(
+        [FromBody] OfficialFoodIngredientPriceIndexRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await _ingredientPriceService.RebuildMappingsAsync(request, cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateProblem(exception.Message));
         }
     }
 

@@ -67,6 +67,29 @@ public static class OfficialFoodIngredientClassificationStates
     public const string Confirmed = "Confirmed";
 }
 
+public static class OfficialFoodIngredientPublicPriceSourceKeys
+{
+    public const string Kamis = "kamis-price-observations";
+
+    public const string UsdaNass = "usda-nass-price-observations";
+}
+
+public static class OfficialFoodIngredientPriceMappingStates
+{
+    public const string AutoMatched = "AutoMatched";
+
+    public const string Confirmed = "Confirmed";
+}
+
+public static class OfficialFoodIngredientPriceMarketStages
+{
+    public const string Retail = "Retail";
+
+    public const string Wholesale = "Wholesale";
+
+    public const string ProducerReceived = "ProducerReceived";
+}
+
 public sealed record OfficialFoodRecipeSourceDto(
     string SourceKey,
     string Provider,
@@ -175,7 +198,8 @@ public sealed record OfficialFoodIngredientDto(
     decimal ClassificationConfidence,
     string ClassificationState,
     int RecipeVariantCount,
-    DateTime UpdatedAtUtc);
+    DateTime UpdatedAtUtc,
+    IReadOnlyList<OfficialFoodIngredientPublicPriceDto>? PublicPrices = null);
 
 public sealed record OfficialFoodRecipeIngredientDto(
     string IngredientKey,
@@ -195,7 +219,33 @@ public sealed record OfficialFoodRecipeIngredientDto(
     int DisplayOrder,
     string ParserVersion,
     decimal ParseConfidence,
-    bool RequiresReview);
+    bool RequiresReview,
+    IReadOnlyList<OfficialFoodIngredientPublicPriceDto>? PublicPrices = null);
+
+public sealed record OfficialFoodIngredientPublicPriceDto(
+    string CountryCode,
+    string CountryName,
+    string SourceKey,
+    string Provider,
+    string MarketStageCode,
+    string MarketStageName,
+    string CommodityName,
+    string VarietyOrClass,
+    decimal AveragePrice,
+    decimal MinimumPrice,
+    decimal MaximumPrice,
+    string CurrencyCode,
+    string Unit,
+    DateOnly ReferenceDate,
+    string ReferencePeriod,
+    string RegionName,
+    string FrequencyCode,
+    int SampleCount,
+    string MatchQualityCode,
+    string MappingNote,
+    string SourceUrl,
+    DateTime DataCollectedAtUtc,
+    bool IsDirectlyComparableAcrossCountries = false);
 
 public sealed record OfficialFoodRecipeCollectionRequest(
     string SourceKey,
@@ -224,4 +274,20 @@ public sealed record OfficialFoodIngredientIndexResponse(
     int CatalogIngredientCount,
     int PendingReviewIngredientCount,
     IReadOnlyDictionary<string, int> CategoryCounts,
+    DateTime CompletedAtUtc);
+
+public sealed record OfficialFoodIngredientPriceIndexRequest(
+    int MaxItems = 5000,
+    bool Force = false);
+
+public sealed record OfficialFoodIngredientPriceIndexResponse(
+    int ProcessedIngredientCount,
+    int MappedIngredientCount,
+    int MappingCount,
+    int KoreanMappingCount,
+    int UnitedStatesMappingCount,
+    int UnmappedIngredientCount,
+    int PricedIngredientCount,
+    int KoreanPriceCount,
+    int UnitedStatesPriceCount,
     DateTime CompletedAtUtc);

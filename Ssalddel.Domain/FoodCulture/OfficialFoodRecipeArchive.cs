@@ -211,6 +211,50 @@ public sealed class OfficialFoodIngredient
 
     public ICollection<OfficialFoodRecipeIngredient> RecipeIngredients { get; set; } =
         new List<OfficialFoodRecipeIngredient>();
+
+    public ICollection<OfficialFoodIngredientPriceMapping> PublicPriceMappings { get; set; } =
+        new List<OfficialFoodIngredientPriceMapping>();
+}
+
+public sealed class OfficialFoodIngredientPriceMapping
+{
+    public long Id { get; set; }
+
+    public long IngredientId { get; set; }
+
+    public OfficialFoodIngredient? Ingredient { get; set; }
+
+    public string CountryCode { get; set; } = string.Empty;
+
+    public string SourceKey { get; set; } = string.Empty;
+
+    public string ExternalCategoryCode { get; set; } = string.Empty;
+
+    public string ExternalItemCode { get; set; } = string.Empty;
+
+    public string ExternalItemName { get; set; } = string.Empty;
+
+    public string ExternalVariantCode { get; set; } = string.Empty;
+
+    public string ExternalVariantName { get; set; } = string.Empty;
+
+    public string MatchMethod { get; set; } = string.Empty;
+
+    public string MatchQualityCode { get; set; } = string.Empty;
+
+    public decimal MatchConfidence { get; set; }
+
+    public string MappingState { get; set; } = "AutoMatched";
+
+    public string MappingNote { get; set; } = string.Empty;
+
+    public string SourceUrl { get; set; } = string.Empty;
+
+    public bool IsActive { get; set; } = true;
+
+    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
 }
 
 public sealed class OfficialFoodRecipeIngredient

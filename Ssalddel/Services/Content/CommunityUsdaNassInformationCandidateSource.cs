@@ -52,7 +52,7 @@ public sealed class CommunityUsdaNassInformationCandidateSource
         CommunityInformationSourceKeys.UsdaNassPriceObservations,
         CommunityInformationSourceTypes.PublicData,
         "USDA National Agricultural Statistics Service (NASS)",
-        "USDA NASS 미국 농산물 월별 생산자가격",
+        "USDA NASS 미국 농축수산물 월별 생산자가격",
         CommunityInformationCollectionModes.ScheduledArchive,
         "서버 배치 월 1회, USDA Quick Stats 원천은 평일 갱신",
         "서버가 보관한 미국 전국 월별 PRICE RECEIVED 관측값만 글쓰기 근거 후보로 제공합니다.",

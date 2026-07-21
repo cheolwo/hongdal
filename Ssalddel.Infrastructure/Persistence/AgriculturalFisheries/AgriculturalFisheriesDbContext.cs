@@ -35,6 +35,9 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
 
     public DbSet<OfficialFoodIngredient> OfficialFoodIngredients => Set<OfficialFoodIngredient>();
 
+    public DbSet<OfficialFoodIngredientPriceMapping> OfficialFoodIngredientPriceMappings =>
+        Set<OfficialFoodIngredientPriceMapping>();
+
     public DbSet<OfficialFoodRecipeIngredient> OfficialFoodRecipeIngredients =>
         Set<OfficialFoodRecipeIngredient>();
 
@@ -51,6 +54,7 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodIngredientCategoryConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodIngredientConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodIngredientPriceMappingConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeIngredientConfiguration());
     }
 }

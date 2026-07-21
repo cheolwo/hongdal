@@ -117,6 +117,10 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
             serviceProvider.GetRequiredService<NhsHealthierFamiliesRecipeRemoteSource>());
         services.AddSingleton<OfficialFoodRecipeIngredientParser>();
+        services.AddSingleton<IOfficialFoodIngredientPriceMatchCatalog,
+            OfficialFoodIngredientPriceMatchCatalog>();
+        services.AddScoped<IOfficialFoodIngredientPublicPriceService,
+            OfficialFoodIngredientPublicPriceService>();
         services.AddScoped<IOfficialFoodRecipeIngredientIndexService,
             OfficialFoodRecipeIngredientIndexService>();
         services.AddScoped<IOfficialFoodRecipeArchiveService, OfficialFoodRecipeArchiveService>();

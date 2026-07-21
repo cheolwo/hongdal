@@ -370,6 +370,46 @@ if (args.Any(argument => string.Equals(
     return;
 }
 
+if (args.Any(argument => string.Equals(
+        argument,
+        "--index-official-food-ingredient-prices",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var maxItemsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--max-items=", StringComparison.OrdinalIgnoreCase));
+    var maxItems = int.TryParse(
+        maxItemsArgument?["--max-items=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedMaxItems)
+        ? parsedMaxItems
+        : 5000;
+    var force = args.Any(argument => string.Equals(
+        argument,
+        "--force",
+        StringComparison.OrdinalIgnoreCase));
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var priceService = scope.ServiceProvider
+        .GetRequiredService<IOfficialFoodIngredientPublicPriceService>();
+    var indexResult = await priceService.RebuildMappingsAsync(
+        new OfficialFoodIngredientPriceIndexRequest(maxItems, force));
+    app.Logger.LogInformation(
+        "공식 음식 재료 공공가격 매핑 완료. Processed={Processed}, MappedIngredients={MappedIngredients}, Mappings={Mappings}, KR={Korean}, US={UnitedStates}, Unmapped={Unmapped}, PricedIngredients={PricedIngredients}, KoreanPrices={KoreanPrices}, UnitedStatesPrices={UnitedStatesPrices}",
+        indexResult.ProcessedIngredientCount,
+        indexResult.MappedIngredientCount,
+        indexResult.MappingCount,
+        indexResult.KoreanMappingCount,
+        indexResult.UnitedStatesMappingCount,
+        indexResult.UnmappedIngredientCount,
+        indexResult.PricedIngredientCount,
+        indexResult.KoreanPriceCount,
+        indexResult.UnitedStatesPriceCount);
+    return;
+}
+
 var officialFoodRecipeSourceKey = args.Any(argument =>
         string.Equals(argument, "--collect-mfds-recipes", StringComparison.OrdinalIgnoreCase))
     ? OfficialFoodRecipeSourceKeys.MfdsCookRecipe

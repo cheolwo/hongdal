@@ -32,13 +32,13 @@ flowchart LR
 | ABS Consumer Price Index | 선택 기간의 호주 전국 월별 식품 소비자물가지수 | 사용자가 원천을 명시 선택하고 식품 지수 항목을 검색한 경우 | 실제 A$/kg 단가가 아닌 지수다. 같은 지수·측정방식·지역·기준시점 계열만 비교한다. |
 | 금융위원회 금융통계 수산업협동조합정보 | 사용자가 선택한 최대 13개월의 조합별 임직원 일반현황 | 기준년월, 조합명, 임직원 구분과 인원수가 있는 공식 관측값 | 같은 조합·같은 임직원 구분만 비교한다. 현재 영업상태, 제휴, 재무건전성 또는 물류 수행능력으로 해석하지 않는다. |
 | Reddit·X·Instagram·Facebook 공개 게시물 | 관리자 요청에 따른 Apify Actor dataset 결과 또는 Reddit 공개 RSS/Atom 피드 | YouTube 영상의 핵심·인접 주제와 연결된 공개 게시물 후보 | 원문 링크와 짧은 발췌만 검수 대기로 반환하며 자동 게시하지 않는다. Adapter와 비용·권한 경계는 [Apify SNS 공개 자료 조사 모듈](ApifySocialMediaResearch.md)에 둔다. |
-| 식약처·농촌진흥청·일본 MAFF·영국 NHS 공식 음식 레시피 | 권리 정책과 함께 보관한 대표 음식 후보·출처별 레시피 변형 | freshness가 유효하고 자동 수집이 허용된 DB 원문 | 모두 검토 대기로만 제공한다. 이미지 파일은 저장하지 않고 후보 thumbnail도 반환하지 않는다. 세부 기준은 [각국 정부 공식 음식 레시피 아카이브](OfficialGovernmentFoodRecipeArchive.md)에 둔다. |
+| 식약처·농촌진흥청·일본 MAFF·영국 NHS 공식 음식 레시피 | 권리 정책과 함께 보관한 대표 음식 후보·출처별 레시피 변형 | freshness가 유효하고 자동 수집이 허용된 DB 원문 | 모두 검토 대기로만 제공한다. 구조화 재료 중 명확한 원재료만 보관 KAMIS·USDA 가격과 연결하며 서로 다른 통화·단위·시장 단계를 합치지 않는다. 이미지 파일은 저장하지 않고 후보 thumbnail도 반환하지 않는다. 세부 기준은 [각국 정부 공식 음식 레시피 아카이브](OfficialGovernmentFoodRecipeArchive.md)에 둔다. |
 
 YouTube 업로드 확인은 채널의 업로드 재생목록과 `playlistItems.list`를 사용한다. 일반 검색 결과를 반복 수집하는 크롤러로 운영하지 않는다. 공식 구현 기준은 [YouTube PlaylistItems: list](https://developers.google.com/youtube/v3/docs/playlistItems/list)와 [YouTube API 개발자 정책](https://developers.google.com/youtube/terms/developer-policies)을 따른다.
 
 KAMIS는 [가격정보 Open API 안내](https://www.kamis.or.kr/customer/reference/openapi_list.do)를 원 출처로 둔다. 후보에는 조사 기준일, 수집 시각, KRW, 단위와 비교 한계를 함께 남긴다.
 
-USDA NASS는 [Quick Stats API](https://quickstats.nass.usda.gov/api)를 원 출처로 둔다. 현재 서버 배치가 보관하는 미국 전국 농작물 월별 생산자가격만 후보화하며, 억제값과 기준월을 복원할 수 없는 행은 숫자 통계에서 제외한다.
+USDA NASS는 [Quick Stats API](https://quickstats.nass.usda.gov/api)를 원 출처로 둔다. 현재 서버 배치가 보관하는 미국 전국 농작물·축산물·조사 대상 양식 수산물의 월별 생산자 수취가격을 후보화하며, 억제값과 기준월을 복원할 수 없는 행은 숫자 통계에서 제외한다.
 
 ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-interfaces-apis/data-api-user-guide)의 월별 CPI를 사용한다. 외부 호출 원천이므로 전체 후보 조회에는 자동 포함하지 않고, 달력 통계에서 해당 원천을 선택했을 때만 최대 100건을 조회한다.
 

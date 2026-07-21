@@ -46,6 +46,11 @@ OfficialFoodIngredient
   ├─ 표준 표시명·정규화명·분류
   └─ 자동 분류 방식·신뢰도·확정/검토 대기 상태
 
+OfficialFoodIngredientPriceMapping
+  ├─ 표준 재료와 국가별 공공가격 품목의 명시적 연결
+  ├─ 국가·원천·외부 부류/품목 코드와 매칭 방식·신뢰도
+  └─ 자동 매칭/운영자 확정 상태, 근거와 원천 URL
+
 OfficialFoodRecipeIngredient
   ├─ 레시피 변형과 표준 재료의 N:M 사용 관계
   ├─ 주재료·양념장·고명 등 원문 묶음과 표시 순서
@@ -67,6 +72,15 @@ OfficialFoodRecipeCollectionRun
 - 규칙으로 분류하지 못한 재료는 `other`와 `PendingReview`로 명시한다. 낮은 신뢰도를 숨기거나 임의의 식품군으로 확정하지 않는다.
 - parser 버전을 레시피 변형과 사용 행에 기록해 규칙이 바뀌면 명시적으로 재색인할 수 있게 한다.
 
+### 재료 공공가격 연결 원칙
+
+- 한국은 [KAMIS 가격정보 Open API](https://www.kamis.or.kr/customer/reference/openapi_list.do)에 보관된 전국 도매·소매 관측값을 사용한다. API가 제공하는 식량작물·채소·특용작물·과일·축산·수산 부류와 품목 코드를 유지한다.
+- 미국은 [USDA NASS Quick Stats](https://quickstats.nass.usda.gov/api)의 `SURVEY / PRICE RECEIVED / NATIONAL` 관측값을 사용한다. 농작물뿐 아니라 축산물과 NASS 조사 대상 양식 수산물도 수집하되, 생산자가 받은 가격이지 소매가격이 아님을 표시한다.
+- `PendingReview`, `other`, 가공식품·장류·조미료 또는 정확한 공공 품목을 확인할 수 없는 재료에는 매핑 행을 만들지 않는다. 분류만으로 유사 품목 가격을 추정하지 않는다.
+- 한국은 최신 조사일의 품종·등급 표본을 도매와 소매로 나눠 평균·최소·최대·표본 수를 제공한다. 기존 검토 교차표에 국산 품종 코드가 지정된 품목은 그 코드만 포함한다. 미국은 원문 품목·단위·기준월과 통계를 그대로 제공한다.
+- KRW/1kg 유통 조사가격과 USD 원문 단위의 미국 생산자 수취가격은 직접 비교하거나 자동 환산하지 않는다. 각 가격에는 국가, 시장 단계, 기준일, 통화, 단위, 지역, 갱신 시각, 매칭 품질과 주의문을 함께 반환한다.
+- 가격은 레시피 수량을 곱한 구매비용이나 판매·주문 견적이 아니다. 원천 관측이 없거나 최신 통합 계열을 고를 수 없으면 매핑이 있더라도 가격을 표시하지 않는다.
+
 ## 관리자 API
 
 | Method | Path | 용도 |
@@ -77,9 +91,10 @@ OfficialFoodRecipeCollectionRun
 | `GET` | `/api/v1/admin/content/official-food-recipes/ingredients/categories` | 18개 재료 분류와 분류별 마스터 수 조회 |
 | `GET` | `/api/v1/admin/content/official-food-recipes/ingredients` | 분류·언어·검토 상태·검색어별 표준 재료 조회 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/ingredients/index` | 기존 원문 재료를 parser 버전에 맞춰 배치 색인 |
+| `POST` | `/api/v1/admin/content/official-food-recipes/ingredients/prices/index` | 명확한 재료만 KAMIS·USDA 품목에 매핑하고 실제 가격 가용 건수 집계 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/collections` | 허용된 원천을 페이지·항목 상한 안에서 명시적으로 수집 |
 
-모든 API는 `서버관리자전용`이다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
+모든 API는 `서버관리자전용`이다. `ingredients`와 레시피 `variants` 응답의 구조화 재료에는 연결 가능한 `PublicPrices`가 포함된다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
 
 ## 설정과 순서별 실행
 
@@ -91,11 +106,16 @@ dotnet run --project Ssalddel -- --collect-rda-local-food --max-pages=1 --max-it
 dotnet run --project Ssalddel -- --collect-maff-regional-cuisines --max-pages=1 --max-items=100
 dotnet run --project Ssalddel -- --collect-nhs-recipes --max-pages=1 --max-items=100
 dotnet run --project Ssalddel -- --index-official-food-recipe-ingredients --source=mfds-cookrcp01 --max-items=5000
+dotnet run --project Ssalddel -- --collect-kamis-prices --target-date=2026-07-20
+dotnet run --project Ssalddel -- --collect-usda-nass-prices --year-from=2025
+dotnet run --project Ssalddel -- --index-official-food-ingredient-prices --max-items=5000 --force
 ```
 
 `--max-pages`와 `--max-items`는 최초 소량 검증을 위한 안전 상한이다. 전체 수집 전에는 원천 트래픽 정책, 응답 필드 변화, DB 용량과 이용조건을 다시 확인한다. 운영 scheduler는 아직 켜지 않았으므로 자동 외부 호출은 발생하지 않는다.
 
 재료 색인은 현재 parser 버전이 없는 레시피만 기본 처리한다. 규칙을 바꾸고 전체를 다시 계산할 때만 `--force`를 붙이며, 운영자가 `Confirmed`로 확정한 재료 분류는 자동 규칙이 덮어쓰지 않는다.
+
+공공가격 매핑도 같은 재료에 중복 행을 만들지 않는다. 자동 매핑 규칙을 바꿨을 때만 `--force`로 다시 계산하며, 운영자가 `Confirmed`로 확정한 매핑은 자동 규칙이 덮어쓰거나 비활성화하지 않는다. 매핑 색인은 외부 API를 호출하지 않고 먼저 보관된 KAMIS·USDA 관측값을 읽는다.
 
 ## 커뮤니티 검토 후보
 
