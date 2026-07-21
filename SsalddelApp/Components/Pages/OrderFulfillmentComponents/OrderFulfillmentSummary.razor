@@ -1,0 +1,14 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<div class="order-fulfillment-summary" aria-label="Simulation 주문 이행 요약">
+    <MudPaper Elevation="0" Outlined="true"><span>국내 주문</span><strong>@Read.국내주문수</strong></MudPaper>
+    <MudPaper Elevation="0" Outlined="true"><span>해외 주문</span><strong>@Read.해외주문수</strong></MudPaper>
+    <MudPaper Elevation="0" Outlined="true"><span>출고대기 라인</span><strong>@Read.출고대기라인수</strong></MudPaper>
+    <MudPaper Elevation="0" Outlined="true"><span>입고 필요</span><strong>@Read.입고필요수</strong></MudPaper>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+}

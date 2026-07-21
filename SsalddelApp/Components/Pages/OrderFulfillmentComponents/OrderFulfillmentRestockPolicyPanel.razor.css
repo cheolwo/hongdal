@@ -1,0 +1,36 @@
+.restock-policy-workspace {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.restock-policy-panel {
+    min-width: 0;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.restock-policy-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .8rem;
+    margin-bottom: .9rem;
+}
+
+.restock-policy-panel strong,
+.restock-policy-panel span {
+    display: block;
+}
+
+.restock-policy-panel span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .72rem;
+}
+
+@media (max-width: 720px) {
+    .restock-policy-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

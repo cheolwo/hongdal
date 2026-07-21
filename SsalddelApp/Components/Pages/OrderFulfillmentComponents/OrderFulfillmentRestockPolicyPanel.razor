@@ -1,0 +1,104 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<div class="restock-policy-workspace">
+    @if (Policy.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Policy.오류메시지</MudAlert>
+    }
+    else if (Policy.성공함)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@Policy.성공메시지</MudAlert>
+    }
+
+    <MudPaper Elevation="0" Outlined="true" Class="restock-policy-panel">
+        <div class="restock-policy-heading">
+            <div>
+                <MudText Typo="Typo.overline">EXPLICIT NOTIFICATION CONSENT</MudText>
+                <MudText Typo="Typo.h6">판매자 입고 알림 정책</MudText>
+                <MudText Typo="Typo.body2">관리자 허용과 판매자 수신 동의를 분리해 저장합니다.</MudText>
+            </div>
+        </div>
+
+        @if (Read.스냅샷.입고알림정책.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">설정할 판매자 입고 알림 정책이 없습니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@Read.스냅샷.입고알림정책" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>판매자·채널</MudTh>
+                    <MudTh>관리자 허용</MudTh>
+                    <MudTh>판매자 수신</MudTh>
+                    <MudTh>내부 알림</MudTh>
+                    <MudTh>상태</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="판매자·채널"><strong>@context.SellerName</strong><span>@context.KakaoTalkChannelName</span></MudTd>
+                    <MudTd DataLabel="관리자 허용">
+                        <MudSwitch T="bool" Value="@context.AdminAllowsKakaoTalk" ValueChanged="@((bool value) => UpdateRequested.InvokeAsync(new(context.SellerUserId, AdminAllowsKakaoTalk: value)))" Disabled="@IsBusy" />
+                    </MudTd>
+                    <MudTd DataLabel="판매자 수신">
+                        <MudSwitch T="bool" Value="@context.SellerWantsKakaoTalk" ValueChanged="@((bool value) => UpdateRequested.InvokeAsync(new(context.SellerUserId, SellerWantsKakaoTalk: value)))" Disabled="@IsBusy" />
+                    </MudTd>
+                    <MudTd DataLabel="내부 알림">
+                        <MudSwitch T="bool" Value="@context.UseInternalNotification" ValueChanged="@((bool value) => UpdateRequested.InvokeAsync(new(context.SellerUserId, UseInternalNotification: value)))" Disabled="@IsBusy" />
+                    </MudTd>
+                    <MudTd DataLabel="상태"><MudChip T="string" Size="Size.Small" Color="@(context.CanSendKakaoTalk ? Color.Success : Color.Warning)" Variant="Variant.Outlined">@context.StatusLabel</MudChip></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="restock-policy-panel">
+        <div class="restock-policy-heading">
+            <div>
+                <MudText Typo="Typo.overline">LOCAL OUTBOX INTENT</MudText>
+                <MudText Typo="Typo.h6">카카오톡 발송 의도</MudText>
+                <MudText Typo="Typo.body2">실제 메시지가 아니라 동의 조합에 따라 생성·억제된 로컬 의도만 표시합니다.</MudText>
+            </div>
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@Read.스냅샷.카카오발송의도.Count.ToString("N0")건</MudChip>
+        </div>
+
+        @if (Read.스냅샷.카카오발송의도.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">생성된 로컬 발송 의도가 없습니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@Read.스냅샷.카카오발송의도.OrderByDescending(item => item.CreatedAt)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>판매자</MudTh>
+                    <MudTh>주문·SKU</MudTh>
+                    <MudTh>상태</MudTh>
+                    <MudTh>사유</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="판매자">@context.SellerName</MudTd>
+                    <MudTd DataLabel="주문·SKU"><strong>@context.ChannelOrderNo</strong><span>@context.Sku</span></MudTd>
+                    <MudTd DataLabel="상태"><MudChip T="string" Size="Size.Small" Color="@(context.Status == "Pending" ? Color.Success : Color.Warning)" Variant="Variant.Outlined">@context.Status</MudChip></MudTd>
+                    <MudTd DataLabel="사유">@OrderFulfillmentPresentation.ValueOrDash(context.SuppressedReason)</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+            이 페이지는 카카오톡 API를 호출하지 않으며 발송 예약이나 비용 발생을 만들지 않습니다.
+        </MudAlert>
+    </MudPaper>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public OrderFulfillmentRestockPolicyViewModel Policy { get; set; } = null!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<OrderFulfillmentRestockPreferenceUpdate> UpdateRequested { get; set; }
+}

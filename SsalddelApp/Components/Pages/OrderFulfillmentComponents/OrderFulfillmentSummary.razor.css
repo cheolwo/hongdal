@@ -1,0 +1,32 @@
+.order-fulfillment-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.order-fulfillment-summary > div {
+    padding: 1rem;
+    border-radius: .85rem;
+}
+
+.order-fulfillment-summary span,
+.order-fulfillment-summary strong {
+    display: block;
+}
+
+.order-fulfillment-summary span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .75rem;
+}
+
+.order-fulfillment-summary strong {
+    margin-top: .25rem;
+    color: var(--mud-palette-primary);
+    font-size: 1.6rem;
+}
+
+@media (max-width: 720px) {
+    .order-fulfillment-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

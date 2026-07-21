@@ -31,6 +31,12 @@ internal static class ShipperSalesModule
         services.AddScoped<ICommerceChannelListingService, CommerceChannelListingService>();
         services.AddScoped<ICommerceOrderFulfillmentService, CommerceOrderFulfillmentService>();
         services.AddSingleton<ICommerceOrderSampleFeedService, CommerceOrderSampleFeedService>();
+        services.AddTransient<OrderFulfillmentReadViewModel>();
+        services.AddTransient<OrderFulfillmentSimulationViewModel>();
+        services.AddTransient<OrderFulfillmentRestockPolicyViewModel>();
+        services.AddTransient<OrderFulfillmentPickingViewModel>();
+        services.AddTransient<OrderFulfillmentPackingViewModel>();
+        services.AddTransient<OrderFulfillmentPageViewModel>();
         services.AddScoped<IAppCommandHandler<ProcessCommerceOrderCommand, CommerceOrderFulfillmentResult>,
             ProcessCommerceOrderCommandHandler>();
         services.AddSingleton<IAppEventHandler<CommerceOrderProcessedEvent>, CommerceOrderProcessedEventHandler>();

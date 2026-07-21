@@ -1,0 +1,87 @@
+.order-fulfillment-panel {
+    min-width: 0;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.order-list-heading,
+.order-list-item-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.order-list-filters {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1.5fr) minmax(7rem, .65fr) minmax(8rem, .75fr);
+    gap: .65rem;
+    margin: 1rem 0;
+}
+
+.order-list-items {
+    display: grid;
+    gap: .7rem;
+    max-height: 42rem;
+    overflow: auto;
+}
+
+.order-list-item {
+    padding: .9rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: .8rem;
+}
+
+.order-list-item--selected {
+    border-color: var(--mud-palette-primary);
+    background: color-mix(in srgb, var(--mud-palette-primary) 5%, var(--mud-palette-surface));
+}
+
+.order-list-item-heading strong,
+.order-list-item-heading span {
+    display: block;
+}
+
+.order-list-item-heading span,
+.order-list-item p,
+.order-list-item dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: .75rem;
+}
+
+.order-list-item p {
+    margin: .7rem 0;
+}
+
+.order-list-item dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .5rem;
+    margin: 0 0 .8rem;
+}
+
+.order-list-item dd {
+    margin: .1rem 0 0;
+    font-weight: 600;
+}
+
+.order-list-empty {
+    min-height: 18rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    .order-list-filters,
+    .order-list-item dl {
+        grid-template-columns: 1fr;
+    }
+
+    .order-list-item-heading {
+        align-items: flex-start;
+    }
+}

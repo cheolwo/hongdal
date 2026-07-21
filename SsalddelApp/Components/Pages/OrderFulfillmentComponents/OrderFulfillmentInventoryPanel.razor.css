@@ -1,0 +1,36 @@
+.inventory-workspace {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.inventory-panel {
+    min-width: 0;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.inventory-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .8rem;
+    margin-bottom: .9rem;
+}
+
+.inventory-panel strong,
+.inventory-panel span {
+    display: block;
+}
+
+.inventory-panel span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .72rem;
+}
+
+@media (max-width: 720px) {
+    .inventory-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

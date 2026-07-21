@@ -1,0 +1,89 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.Services.Commerce.Orders
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="order-fulfillment-panel">
+    <div class="order-list-heading">
+        <div>
+            <MudText Typo="Typo.overline">MANUAL SELECTION</MudText>
+            <MudText Typo="Typo.h6">주문 후보 직접 선택</MudText>
+        </div>
+        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">
+            @Read.필터된주문목록.Count.ToString("N0")건
+        </MudChip>
+    </div>
+
+    <div class="order-list-filters">
+        <MudTextField T="string"
+                      @bind-Value="Read.검색어"
+                      Label="주문번호·상품·SKU·창고"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" />
+        <MudSelect T="string" @bind-Value="Read.국내외필터" Label="국내·해외" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem T="string" Value="@OrderFulfillmentFilterValues.All">전체</MudSelectItem>
+            <MudSelectItem T="string" Value="@CommerceOrderScopeCodes.Domestic">국내</MudSelectItem>
+            <MudSelectItem T="string" Value="@CommerceOrderScopeCodes.International">해외</MudSelectItem>
+        </MudSelect>
+        <MudSelect T="string" @bind-Value="Read.상태필터" Label="상태" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelectItem T="string" Value="@OrderFulfillmentFilterValues.All">전체</MudSelectItem>
+            @foreach (var status in Read.상태옵션)
+            {
+                <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+
+    @if (Read.원장없음)
+    {
+        <div class="order-list-empty">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle1">Simulation 주문 후보가 없습니다.</MudText>
+            <MudText Typo="Typo.body2">샘플 반영은 외부 주문을 수집하지 않고 로컬 원장만 준비합니다.</MudText>
+        </div>
+    }
+    else if (Read.검색결과없음)
+    {
+        <div class="order-list-empty">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle1">필터에 맞는 주문 후보가 없습니다.</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="Read.필터초기화">필터 지우기</MudButton>
+        </div>
+    }
+    else
+    {
+        <div class="order-list-items">
+            @foreach (var order in Read.필터된주문목록)
+            {
+                <article class="order-list-item @(Read.선택주문Key == order.Key ? "order-list-item--selected" : null)">
+                    <div class="order-list-item-heading">
+                        <div>
+                            <strong>@order.채널주문번호</strong>
+                            <span>@OrderFulfillmentPresentation.ChannelName(order.채널종류) · @OrderFulfillmentPresentation.ScopeName(order.국내외구분)</span>
+                        </div>
+                        <MudChip T="string" Size="Size.Small" Color="@OrderFulfillmentPresentation.StatusColor(order.상태)" Variant="Variant.Outlined">@order.상태</MudChip>
+                    </div>
+                    <p>@order.대표상품명</p>
+                    <dl>
+                        <div><dt>수량</dt><dd>@order.총수량.ToString("N0")개</dd></div>
+                        <div><dt>창고</dt><dd>@order.창고수.ToString("N0")곳</dd></div>
+                        <div><dt>기준</dt><dd>@OrderFulfillmentPresentation.DateLabel(order.생성시각)</dd></div>
+                    </dl>
+                    <MudButton Variant="@(Read.선택주문Key == order.Key ? Variant.Filled : Variant.Outlined)"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               OnClick="@(() => Read.주문선택(order.Key))">
+                        정확한 주문 보기
+                    </MudButton>
+                </article>
+            }
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+}

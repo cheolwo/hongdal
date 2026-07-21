@@ -1,0 +1,81 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<div class="inventory-workspace">
+    <MudPaper Elevation="0" Outlined="true" Class="inventory-panel">
+        <div class="inventory-heading">
+            <div>
+                <MudText Typo="Typo.overline">MARKET INVENTORY SNAPSHOT</MudText>
+                <MudText Typo="Typo.h6">마켓 주문 가능 재고</MudText>
+            </div>
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@Read.스냅샷.마켓재고.Count.ToString("N0")개 SKU</MudChip>
+        </div>
+
+        @if (Read.스냅샷.마켓재고.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">마켓 주문 가능 대상으로 매핑된 Simulation 재고가 없습니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@Read.스냅샷.마켓재고.OrderBy(item => item.ProductName)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>상품·SKU</MudTh>
+                    <MudTh>계약</MudTh>
+                    <MudTh>가용</MudTh>
+                    <MudTh>예약</MudTh>
+                    <MudTh>안전재고</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="상품·SKU"><strong>@context.ProductName</strong><span>@context.Sku</span></MudTd>
+                    <MudTd DataLabel="계약"><strong>@context.ContractType</strong><span>@context.ContractNo</span></MudTd>
+                    <MudTd DataLabel="가용"><MudChip T="string" Size="Size.Small" Color="@(context.CanOrder ? Color.Success : Color.Warning)" Variant="Variant.Outlined">@context.AvailableQuantity</MudChip></MudTd>
+                    <MudTd DataLabel="예약">@context.ReservedQuantity</MudTd>
+                    <MudTd DataLabel="안전재고"><MudChip T="string" Size="Size.Small" Color="@(context.NeedsInbound ? Color.Warning : Color.Default)" Variant="Variant.Outlined">@context.SafetyStockQuantity</MudChip></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="inventory-panel">
+        <div class="inventory-heading">
+            <div>
+                <MudText Typo="Typo.overline">RESTOCK SIGNAL</MudText>
+                <MudText Typo="Typo.h6">입고 필요 알림</MudText>
+            </div>
+            <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">@Read.스냅샷.입고필요알림.Count.ToString("N0")건</MudChip>
+        </div>
+
+        @if (Read.스냅샷.입고필요알림.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">안전재고 이하로 내려간 Simulation 상품이 없습니다.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="@Read.스냅샷.입고필요알림.OrderByDescending(item => item.CreatedAt)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>채널·주문</MudTh>
+                    <MudTh>상품·SKU</MudTh>
+                    <MudTh>가용/안전</MudTh>
+                    <MudTh>권장입고</MudTh>
+                    <MudTh>계약 상대</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="채널·주문"><strong>@OrderFulfillmentPresentation.ChannelName(context.ChannelType)</strong><span>@context.ChannelOrderNo</span></MudTd>
+                    <MudTd DataLabel="상품·SKU"><strong>@context.ProductName</strong><span>@context.Sku</span></MudTd>
+                    <MudTd DataLabel="가용/안전">@context.AvailableQuantity / @context.SafetyStockQuantity</MudTd>
+                    <MudTd DataLabel="권장입고">@context.SuggestedInboundQuantity</MudTd>
+                    <MudTd DataLabel="계약 상대"><strong>@context.ContractPartnerName</strong><span>@context.ContractNo</span></MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+            입고 필요 표시는 검토 신호이며 입고 요청, 구매, 창고 예약 또는 공급자 연락을 자동 실행하지 않습니다.
+        </MudAlert>
+    </MudPaper>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+}

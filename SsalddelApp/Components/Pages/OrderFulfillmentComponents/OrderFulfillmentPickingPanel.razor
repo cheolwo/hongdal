@@ -1,0 +1,102 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.Services.Warehouse.Fulfillment
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="picking-panel">
+    <MudText Typo="Typo.overline">MANUAL PICKING COMMAND</MudText>
+    <MudText Typo="Typo.h6">피킹 작업</MudText>
+    <MudText Typo="Typo.body2">작업을 직접 선택한 뒤 적재함과 상품 바코드를 순서대로 반영합니다.</MudText>
+
+    @if (Picking.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-3">@Picking.오류메시지</MudAlert>
+    }
+    else if (Picking.성공함)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mt-3">@(Picking.최근결과메시지 ?? Picking.성공메시지)</MudAlert>
+    }
+
+    @if (Picking.작업목록.Count == 0)
+    {
+        <div class="picking-empty">
+            <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle1">피킹 작업이 없습니다.</MudText>
+            <MudText Typo="Typo.body2">출고 가능한 Simulation 주문을 반영한 뒤 작업을 직접 선택하세요.</MudText>
+        </div>
+    }
+    else
+    {
+        <div class="picking-inputs">
+            <MudSelect T="long?" @bind-Value="Picking.선택작업Id" Label="피킹 작업 직접 선택" Variant="Variant.Outlined" Clearable="true">
+                @foreach (var task in Picking.작업목록.OrderByDescending(item => item.CreatedAt))
+                {
+                    <MudSelectItem T="long?" Value="@task.Id">@task.ChannelOrderNo · @task.Status · @task.PickedLineCount/@task.TotalLineCount</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" @bind-Value="Picking.스캔바코드" Label="바코드" Variant="Variant.Outlined" Placeholder="BIN:A-01-03 또는 SKU:..." Immediate="true" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!Picking.스캔가능 || IsBusy)" OnClick="ScanRequested">스캔 반영</MudButton>
+        </div>
+
+        <div class="picking-exception">
+            <MudTextField T="string" @bind-Value="Picking.예외사유" Label="보류·취소 사유" Variant="Variant.Outlined" Placeholder="바코드 훼손, 위치 불일치, 상품 파손 등" Immediate="true" />
+            <MudButton Variant="Variant.Outlined" Color="Color.Warning" Disabled="@(!Picking.예외처리가능 || IsBusy)" OnClick="HoldRequested">보류</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" Disabled="@(!Picking.예외처리가능 || IsBusy)" OnClick="CancelRequested">취소</MudButton>
+        </div>
+
+        @if (Picking.선택작업 is null && Picking.선택작업Id.HasValue)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">선택한 작업을 찾을 수 없으며 다른 작업으로 대체하지 않았습니다.</MudAlert>
+        }
+        else if (Picking.선택작업 is { } selected)
+        {
+            <div class="picking-task-heading">
+                <div>
+                    <strong>@selected.ChannelOrderNo</strong>
+                    <span>@selected.WarehouseName · @selected.Status</span>
+                </div>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@selected.PickedLineCount/@selected.TotalLineCount 라인</MudChip>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(selected.ExceptionReason))
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@selected.ExceptionReason</MudAlert>
+            }
+
+            <div class="picking-lines">
+                @foreach (var line in selected.Lines.OrderBy(item => item.RouteSequence))
+                {
+                    <article>
+                        <span class="picking-sequence">@line.RouteSequence</span>
+                        <div><strong>@line.BinCode</strong><small>@line.BinBarcode</small></div>
+                        <div><strong>@line.ProductName</strong><small>@line.ProductBarcode · @line.PickQuantity.ToString("N0")개</small></div>
+                        <div class="picking-scan-state">
+                            <MudChip T="string" Size="Size.Small" Color="@(line.BinScanned ? Color.Success : Color.Default)" Variant="Variant.Outlined">적재함</MudChip>
+                            <MudChip T="string" Size="Size.Small" Color="@(line.ProductScanned ? Color.Success : Color.Default)" Variant="Variant.Outlined">상품</MudChip>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    }
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+        수령인·주소는 피킹 화면에 표시하지 않습니다. 이 Command는 Simulation 작업 상태만 바꾸며 실제 재고와 출고를 확정하지 않습니다.
+    </MudAlert>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderFulfillmentPickingViewModel Picking { get; set; } = null!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback ScanRequested { get; set; }
+
+    [Parameter]
+    public EventCallback HoldRequested { get; set; }
+
+    [Parameter]
+    public EventCallback CancelRequested { get; set; }
+}

@@ -1,0 +1,68 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="order-detail-panel">
+    @if (Read.선택요청없음)
+    {
+        <div class="order-detail-state">
+            <MudIcon Icon="@Icons.Material.Filled.TouchApp" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.h6">주문 후보를 직접 선택하세요.</MudText>
+            <MudText Typo="Typo.body2">첫 주문이나 최근 주문을 자동 선택하지 않습니다.</MudText>
+        </div>
+    }
+    else if (Read.선택주문찾을수없음)
+    {
+        <div class="order-detail-state">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Color="Color.Warning" Size="Size.Large" />
+            <MudText Typo="Typo.h6">선택한 주문 후보를 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2">다른 주문으로 대체하지 않았습니다. 목록을 새로고침하거나 선택을 해제해 주세요.</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="Read.선택해제">선택 해제</MudButton>
+        </div>
+    }
+    else if (Read.선택주문 is { } order)
+    {
+        <div class="order-detail-heading">
+            <div>
+                <MudText Typo="Typo.overline">EXACT SIMULATION ORDER</MudText>
+                <MudText Typo="Typo.h5">@order.채널주문번호</MudText>
+                <MudText Typo="Typo.body2">@OrderFulfillmentPresentation.ChannelName(order.채널종류) · @OrderFulfillmentPresentation.ScopeName(order.국내외구분)</MudText>
+            </div>
+            <MudChip T="string" Color="@OrderFulfillmentPresentation.StatusColor(order.상태)" Variant="Variant.Filled">@order.상태</MudChip>
+        </div>
+
+        <div class="order-detail-metrics">
+            <div><span>출고 라인</span><strong>@order.출고라인목록.Count.ToString("N0")</strong></div>
+            <div><span>요청 수량</span><strong>@order.총수량.ToString("N0")</strong></div>
+            <div><span>연결 창고</span><strong>@order.창고수.ToString("N0")</strong></div>
+        </div>
+
+        <div class="order-detail-lines">
+            @foreach (var line in order.출고라인목록)
+            {
+                <article>
+                    <div class="order-detail-line-heading">
+                        <div>
+                            <strong>@line.ProductName</strong>
+                            <span>SKU @OrderFulfillmentPresentation.ValueOrDash(line.Sku)</span>
+                        </div>
+                        <MudChip T="string" Size="Size.Small" Color="@OrderFulfillmentPresentation.StatusColor(line.Status)" Variant="Variant.Outlined">@line.Status</MudChip>
+                    </div>
+                    <dl>
+                        <div><dt>수량</dt><dd>@line.RequestedQuantity.ToString("N0")개</dd></div>
+                        <div><dt>창고</dt><dd>@OrderFulfillmentPresentation.ValueOrDash(line.WarehouseName)</dd></div>
+                        <div><dt>피킹 후보</dt><dd>@OrderFulfillmentPresentation.FormatPickPlan(line)</dd></div>
+                    </dl>
+                </article>
+            }
+        </div>
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+            이 상세는 Simulation 출고 후보를 읽기만 합니다. 피킹·포장은 별도 탭에서 사용자가 작업과 명령을 직접 선택해야 변경됩니다.
+        </MudAlert>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+}
