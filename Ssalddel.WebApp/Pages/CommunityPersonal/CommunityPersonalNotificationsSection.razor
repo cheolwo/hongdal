@@ -1,0 +1,23 @@
+@using Ssalddel.WebApp.ViewModels
+
+<section class="community-personal-section" aria-labelledby="personal-notifications-title">
+    <div class="community-personal-section-heading">
+        <div><span>NOTIFICATIONS</span><h2 id="personal-notifications-title">알림</h2></div>
+    </div>
+    <div class="community-personal-setting-row">
+        <span><strong>댓글과 답글</strong><small>내 글과 댓글에 새 답글이 달릴 때 알립니다.</small></span>
+        <MudSwitch T="bool" @bind-Value="Preferences.Current.NotifyReplies" Color="Color.Primary" />
+    </div>
+    <div class="community-personal-setting-row">
+        <span><strong>참여 흐름 변경</strong><small>가원장 생성, 역할 참여, 실행 가능성 변경을 알립니다.</small></span>
+        <MudSwitch T="bool" @bind-Value="Preferences.Current.NotifyJourneyChanges" Color="Color.Primary" />
+    </div>
+    <div class="community-personal-setting-actions">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => Preferences.SaveAsync())">알림 설정 저장</MudButton>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPersonalPreferencesViewModel Preferences { get; set; } = default!;
+}

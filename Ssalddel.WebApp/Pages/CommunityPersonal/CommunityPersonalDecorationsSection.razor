@@ -1,0 +1,79 @@
+@using Ssalddel.WebApp.Models
+@using Ssalddel.WebApp.ViewModels
+
+<section class="community-personal-section" aria-labelledby="personal-decorations-title">
+    <div class="community-personal-section-heading">
+        <div><span>APPEARANCE</span><h2 id="personal-decorations-title">꾸미기</h2></div>
+        @if (!string.IsNullOrWhiteSpace(ProductKey))
+        {
+            <MudButton Href="/community/decorations" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ArrowBack">전체 보기</MudButton>
+        }
+    </div>
+
+    <div class="community-personal-decoration-toggles">
+        <MudSwitch T="bool" Value="@Decorations.IsHomeThemeEnabled" ValueChanged="@((bool value) => Decorations.SetTargetAsync(CommunityDecorationTarget.HomeNavigatorTheme, value))" Color="Color.Primary" Label="홈 · 게시판 테마" />
+        <MudSwitch T="bool" Value="@Decorations.IsTraditionalMarketThemeEnabled" ValueChanged="@((bool value) => Decorations.SetTargetAsync(CommunityDecorationTarget.TraditionalMarketTheme, value))" Color="Color.Primary" Label="전통시장 꾸미기 팩" />
+        <MudSwitch T="bool" Value="@Decorations.IsBaguaDecorationEnabled" ValueChanged="@((bool value) => Decorations.SetTargetAsync(CommunityDecorationTarget.Bagua, value))" Color="Color.Primary" Label="사방 이동판" />
+        <MudSwitch T="bool" Value="@Decorations.IsNodeDecorationEnabled" ValueChanged="@((bool value) => Decorations.SetTargetAsync(CommunityDecorationTarget.DiagramNode, value))" Color="Color.Primary" Label="다이어그램 도형" />
+        <MudSwitch T="bool" Value="@Decorations.IsBaguaMotionEnabled" ValueChanged="@((bool value) => Decorations.SetTargetAsync(CommunityDecorationTarget.BaguaTransitionMotion, value))" Color="Color.Primary" Label="이동 효과" />
+    </div>
+
+    <div class="community-decoration-products">
+        @foreach (var product in Decorations.ProductsFor(ProductKey))
+        {
+            <article class="@CommunityPersonalPresentation.BuildDecorationProductClass(product, Decorations.IsProductActive(product))">
+                @if (product.TraditionalMarketTheme is { } marketTheme)
+                {
+                    <div class="community-decoration-product-market-preview">
+                        <TraditionalMarketThemePreview Theme="marketTheme" Title="@product.Title" Compact="true" />
+                    </div>
+                }
+                else
+                {
+                    <div class="community-decoration-product-preview" style="@($"--decoration-accent: {CommunityPersonalPresentation.ResolveProductAccent(product)}")">
+                        <span>@CommunityPersonalPresentation.ResolveProductSymbol(product)</span>
+                    </div>
+                }
+                <div class="community-decoration-product-copy">
+                    <span>@CommunityPersonalPresentation.ResolveDecorationTargetLabel(product.Target)</span>
+                    <h3>@product.Title</h3>
+                    <p>@product.Summary</p>
+                    @if (product.IsHomeTheme)
+                    {
+                        <small>홈 · 게시판 · 글 목록 · 글 본문</small>
+                    }
+                    else if (product.TraditionalMarketTheme is { } traditionalMarketTheme)
+                    {
+                        <small>@traditionalMarketTheme.MarketName · 상인회 @traditionalMarketTheme.AssociationApprovalStatus</small>
+                        <small>@traditionalMarketTheme.DesignerCompensationPolicyLabel</small>
+                    }
+                    <small>@product.CreatorName</small>
+                </div>
+                <div class="community-decoration-product-action">
+                    @if (Decorations.IsProductActive(product))
+                    {
+                        <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined" Size="Size.Small">사용 중</MudChip>
+                    }
+                    else if (Decorations.IsProductOwned(product))
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="@(() => Decorations.ApplyAsync(product))">사용</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="@(() => Decorations.OwnAsync(product))">
+                            @(product.IsFree ? "보유" : $"{product.PriceAmount:N0} {product.CurrencyCode}")
+                        </MudButton>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPersonalDecorationsViewModel Decorations { get; set; } = default!;
+
+    [Parameter]
+    public string? ProductKey { get; set; }
+}

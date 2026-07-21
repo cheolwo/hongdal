@@ -1,0 +1,33 @@
+@using Ssalddel.WebApp.ViewModels
+
+<section class="community-personal-section" aria-labelledby="personal-settings-title">
+    <div class="community-personal-section-heading">
+        <div><span>PREFERENCES</span><h2 id="personal-settings-title">사용 설정</h2></div>
+    </div>
+    <div class="community-personal-setting-row community-personal-setting-row--stacked">
+        <span><strong>게시글 보기 방식</strong><small>게시판을 열었을 때 선호하는 기본 형태입니다.</small></span>
+        <MudRadioGroup T="string" @bind-Value="Preferences.Current.PostViewMode">
+            <MudStack Row="true" Spacing="2">
+                <MudRadio T="string" Value="@("목록형")" Color="Color.Primary">목록형</MudRadio>
+                <MudRadio T="string" Value="@("카드형")" Color="Color.Primary">카드형</MudRadio>
+            </MudStack>
+        </MudRadioGroup>
+    </div>
+    <div class="community-personal-setting-row">
+        <span><strong>활동 국가 표시</strong><small>글을 쓸 때 내 활동 국가 공개 선택을 기본으로 사용합니다.</small></span>
+        <MudSwitch T="bool" @bind-Value="Preferences.Current.ShowActivityCountry" Color="Color.Primary" />
+    </div>
+    <div class="community-personal-setting-row">
+        <span><strong>간결한 개인 메뉴</strong><small>개인 메뉴에서 자주 쓰는 항목을 먼저 보도록 저장합니다.</small></span>
+        <MudSwitch T="bool" @bind-Value="Preferences.Current.UseCompactPersonalMenu" Color="Color.Primary" />
+    </div>
+    <div class="community-personal-setting-actions">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => Preferences.SaveAsync())">설정 저장</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="@(() => Preferences.ResetAsync())">기본값</MudButton>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPersonalPreferencesViewModel Preferences { get; set; } = default!;
+}

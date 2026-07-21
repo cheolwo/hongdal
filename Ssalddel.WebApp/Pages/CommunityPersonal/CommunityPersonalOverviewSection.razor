@@ -1,0 +1,45 @@
+@using Ssalddel.WebApp.ViewModels
+
+<section class="community-personal-section" aria-labelledby="personal-overview-title">
+    <div class="community-personal-section-heading">
+        <div>
+            <span>OVERVIEW</span>
+            <h2 id="personal-overview-title">내 정보</h2>
+        </div>
+        <MudButton Href="/community" Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.ChevronRight">
+            게시판 보기
+        </MudButton>
+    </div>
+
+    <div class="community-personal-facts">
+        <div><span>표시 이름</span><strong>@Activity.IdentityLabel</strong></div>
+        <div><span>현재 역할</span><strong>@Activity.RoleLabel</strong></div>
+        <div><span>내 글</span><strong>@Activity.Posts.Count</strong></div>
+        <div><span>내 원장</span><strong>@Activity.Ledgers.Count</strong></div>
+        <div><span>보유 꾸미기</span><strong>@Decorations.OwnedCount</strong></div>
+        <div><span>현재 테마</span><strong>@Decorations.ActiveThemeTitle</strong></div>
+    </div>
+
+    <div class="community-personal-shortcuts">
+        <a href="/community/write">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" />
+            <span><strong>새 글</strong><small>가볍게 쓰고 필요할 때 원장과 공동행동으로 이어갑니다.</small></span>
+        </a>
+        <a href="/community/me/actions">
+            <MudIcon Icon="@Icons.Material.Filled.Groups" />
+            <span><strong>참여 중</strong><small>내가 관심을 표시하거나 함께하기 시작한 흐름을 봅니다.</small></span>
+        </a>
+        <a href="/community/decorations">
+            <MudIcon Icon="@Icons.Material.Filled.Palette" />
+            <span><strong>꾸미기</strong><small>홈 이동판과 다이어그램 표시를 내 취향에 맞춥니다.</small></span>
+        </a>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPersonalActivityViewModel Activity { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public CommunityPersonalDecorationsViewModel Decorations { get; set; } = default!;
+}
