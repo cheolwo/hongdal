@@ -1,0 +1,84 @@
+@using Ssalddel.Contracts.Common.Localization
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<header class="platform-community-forum-toolbar">
+    <div class="platform-community-forum-toolbar-title">
+        <span>@DisplayBoardName(BoardName)</span>
+        <strong>@UiText("글 목록", "Posts")</strong>
+        <small>@($"{VisiblePostCount:N0}{UiText("개 글", " posts")}")</small>
+    </div>
+    <div class="platform-community-forum-view-tabs" role="group" aria-label="@UiText("글 목록 필터", "Post filters")">
+        @foreach (var filter in FilterOptions)
+        {
+            <button type="button"
+                    class="@PlatformCommunityPostListPresentation.BuildFilterClass(SelectedFilter, filter)"
+                    aria-pressed="@string.Equals(SelectedFilter, filter, StringComparison.OrdinalIgnoreCase)"
+                    @onclick="@(() => SelectedFilterChanged.InvokeAsync(filter))">
+                @PlatformCommunityPostListPresentation.DisplayFilter(DisplayLanguageCode, filter)
+            </button>
+        }
+    </div>
+    <div class="platform-community-forum-display-switch" role="radiogroup" aria-label="@UiText("게시글 보기 방식", "Post display")">
+        <button type="button"
+                class="@PlatformCommunityPostListPresentation.BuildViewModeClass(ViewMode, CommunityPostViewMode.List)"
+                role="radio"
+                aria-checked="@(ViewMode == CommunityPostViewMode.List)"
+                aria-label="@UiText("목록형으로 보기", "List view")"
+                title="@UiText("목록형으로 보기", "List view")"
+                @onclick="@(() => ViewModeChanged.InvokeAsync(CommunityPostViewMode.List))">
+            <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="Size.Small" />
+        </button>
+        <button type="button"
+                class="@PlatformCommunityPostListPresentation.BuildViewModeClass(ViewMode, CommunityPostViewMode.Cards)"
+                role="radio"
+                aria-checked="@(ViewMode == CommunityPostViewMode.Cards)"
+                aria-label="@UiText("카드형으로 보기", "Card view")"
+                title="@UiText("카드형으로 보기", "Card view")"
+                @onclick="@(() => ViewModeChanged.InvokeAsync(CommunityPostViewMode.Cards))">
+            <MudIcon Icon="@Icons.Material.Filled.GridView" Size="Size.Small" />
+        </button>
+    </div>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Size="Size.Small"
+               StartIcon="@Icons.Material.Filled.Edit"
+               OnClick="ComposeRequested">
+        @UiText("글쓰기", "Write")
+    </MudButton>
+</header>
+
+@code {
+    [Parameter, EditorRequired]
+    public string BoardName { get; set; } = "전체";
+
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
+
+    [Parameter]
+    public IReadOnlyList<string> FilterOptions { get; set; } = [];
+
+    [Parameter]
+    public string SelectedFilter { get; set; } = "전체글";
+
+    [Parameter]
+    public EventCallback<string> SelectedFilterChanged { get; set; }
+
+    [Parameter]
+    public CommunityPostViewMode ViewMode { get; set; }
+
+    [Parameter]
+    public EventCallback<CommunityPostViewMode> ViewModeChanged { get; set; }
+
+    [Parameter]
+    public EventCallback ComposeRequested { get; set; }
+
+    [Parameter]
+    public int VisiblePostCount { get; set; }
+
+    private string UiText(string korean, string english)
+        => PlatformCommunityPostListPresentation.UiText(DisplayLanguageCode, korean, english);
+
+    private string DisplayBoardName(string boardName)
+        => PlatformCommunityPostListPresentation.DisplayBoardName(DisplayLanguageCode, boardName);
+}

@@ -1,0 +1,150 @@
+@using System.Globalization
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Localization
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<div class="platform-community-forum-card-grid" aria-label="@UiText("커뮤니티 글 카드 목록", "Community post cards")">
+    @foreach (var post in Posts)
+    {
+        <article class="@PlatformCommunityPostListPresentation.BuildPostCardClass(post, SelectedPostId)">
+            <header>
+                <span>@DisplayBoardName(post.Category)</span>
+                <time datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@PlatformCommunityPostListPresentation.FormatForumDate(post.CreatedAtUtc)</time>
+            </header>
+            <button type="button"
+                    class="platform-community-forum-card-title"
+                    aria-expanded="@PlatformCommunityPostListPresentation.IsPostSelected(SelectedPostId, post)"
+                    @onclick="@(() => PostSelected.InvokeAsync(post))">
+                @if (post.IsSystemGenerated)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Verified" Size="Size.Small" />
+                }
+                else if (post.IsOperatorPinned)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Campaign" Size="Size.Small" />
+                }
+                else if (post.IsTrending)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" />
+                }
+                else if (PlatformCommunityPostListPresentation.IsFoodVideoPost(post))
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.SmartDisplay" Size="Size.Small" />
+                }
+                <strong>@post.Title</strong>
+                @if (post.IsCommunityMomentumPromoted)
+                {
+                    <em class="platform-community-momentum-label">@PlatformCommunityPostListPresentation.CommunityMomentumLabel(post.CommunityMomentumCode)</em>
+                }
+            </button>
+            @if (post.SalesOffer is { } offer)
+            {
+                var thumbnail = post.Attachments.FirstOrDefault();
+                <div class="platform-community-sales-summary">
+                    @if (thumbnail is not null)
+                    {
+                        <img src="@thumbnail.Url" alt="@($"{offer.ProductTitle} 썸네일")" />
+                    }
+                    else
+                    {
+                        <span class="platform-community-sales-summary__placeholder" aria-hidden="true">
+                            <MudIcon Icon="@Icons.Material.Filled.Image" />
+                        </span>
+                    }
+                    <div>
+                        <span>@PlatformCommunityPostListPresentation.SalesStatusLabel(offer.Status) @(offer.AllowsGroupPurchase ? "· 공동구매 제안 가능" : string.Empty)</span>
+                        <strong>@offer.ProductTitle</strong>
+                        <small>@PlatformCommunityPostListPresentation.FormatSalesPrice(offer) / @offer.QuantityUnit · 남은 수량 @PlatformCommunityPostListPresentation.FormatSalesQuantity(offer.AvailableQuantity)@offer.QuantityUnit</small>
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(post.Body))
+            {
+                <p>@PlatformCommunityPostPresentation.ResolveVisibleBody(post.Body)</p>
+            }
+            <footer>
+                <span class="platform-community-forum-card-author">
+                    <span>@PlatformCommunityPostListPresentation.DisplayPostNickname(post)</span>
+                    @if (PlatformCommunityPostListPresentation.HasPublicAuthorCountry(post))
+                    {
+                        <span class="platform-community-country" title="@UiText("작성자가 공개한 활동 국가", "Activity country shared by the author")">
+                            <b>@post.AuthorDisplayCountryCode</b>
+                            <span>@post.AuthorDisplayCountryName</span>
+                        </span>
+                    }
+                </span>
+                <span class="platform-community-forum-card-tags">@post.WorkflowTag · @post.RoleTag</span>
+                <span class="platform-community-forum-card-metrics">
+                    <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="Size.Small" /> @post.RecommendationCount
+                    <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" /> @post.CommentCount
+                </span>
+            </footer>
+        </article>
+    }
+
+    @foreach (var post in SeedPosts)
+    {
+        <article class="@PlatformCommunityPostListPresentation.BuildSeedPostCardClass(post, SelectedSeedPostTitle)">
+            <header>
+                <span>@DisplayBoardName(post.Category)</span>
+                <span>@post.Meta</span>
+            </header>
+            <button type="button"
+                    class="platform-community-forum-card-title"
+                    aria-expanded="@PlatformCommunityPostListPresentation.IsSeedPostSelected(SelectedSeedPostTitle, post)"
+                    @onclick="@(() => SeedPostSelected.InvokeAsync(post))">
+                <MudIcon Icon="@post.Icon" Size="Size.Small" />
+                <strong>@post.Title</strong>
+            </button>
+            <p>@post.Body</p>
+            <footer>
+                <span class="platform-community-forum-card-author">@post.Author</span>
+                <span class="platform-community-forum-card-tags">@UiText("살뜰 추천", "Ssalddel pick")</span>
+                <span class="platform-community-forum-card-metrics">
+                    <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="Size.Small" /> @post.RecommendationCount
+                    <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" /> @post.CommentCount
+                </span>
+            </footer>
+        </article>
+    }
+
+    @if (VisiblePostCount == 0)
+    {
+        <div class="platform-community-forum-empty platform-community-forum-card-empty">
+            <MudIcon Icon="@Icons.Material.Filled.Inbox" />
+            <span>@UiText("조건에 맞는 글이 없습니다.", "No posts match these conditions.")</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
+
+    [Parameter]
+    public IReadOnlyList<PlatformCommunityPostResponse> Posts { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyList<CommunitySeedPost> SeedPosts { get; set; } = [];
+
+    [Parameter]
+    public int VisiblePostCount { get; set; }
+
+    [Parameter]
+    public long? SelectedPostId { get; set; }
+
+    [Parameter]
+    public string? SelectedSeedPostTitle { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }
+
+    private string UiText(string korean, string english)
+        => PlatformCommunityPostListPresentation.UiText(DisplayLanguageCode, korean, english);
+
+    private string DisplayBoardName(string boardName)
+        => PlatformCommunityPostListPresentation.DisplayBoardName(DisplayLanguageCode, boardName);
+}

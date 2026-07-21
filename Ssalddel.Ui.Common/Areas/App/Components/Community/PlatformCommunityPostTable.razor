@@ -1,0 +1,148 @@
+@using System.Globalization
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Contracts.Common.Localization
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<div class="platform-community-forum-table" role="table" aria-label="@UiText("커뮤니티 글 목록", "Community posts")">
+    <div class="platform-community-forum-row platform-community-forum-row--head" role="row">
+        <span role="columnheader">@UiText("번호", "No.")</span>
+        <span role="columnheader">@UiText("분류", "Board")</span>
+        <span role="columnheader">@UiText("제목", "Title")</span>
+        <span role="columnheader">@UiText("글쓴이", "Author")</span>
+        <span role="columnheader">@UiText("작성일", "Date")</span>
+        <span role="columnheader">@UiText("추천", "Likes")</span>
+        <span role="columnheader">@UiText("댓글", "Replies")</span>
+    </div>
+
+    @foreach (var post in Posts)
+    {
+        <div class="@PlatformCommunityPostListPresentation.BuildPostRowClass(post, SelectedPostId)" role="row">
+            <span class="platform-community-forum-number" role="cell">@PlatformCommunityPostListPresentation.DisplayPostNumber(DisplayLanguageCode, post)</span>
+            <span class="platform-community-forum-category" role="cell">@DisplayBoardName(post.Category)</span>
+            <span class="platform-community-forum-subject" role="cell">
+                <button type="button"
+                        aria-expanded="@PlatformCommunityPostListPresentation.IsPostSelected(SelectedPostId, post)"
+                        @onclick="@(() => PostSelected.InvokeAsync(post))">
+                    @if (post.IsSystemGenerated)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Verified" Size="Size.Small" />
+                    }
+                    else if (post.IsOperatorPinned)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Campaign" Size="Size.Small" />
+                    }
+                    else if (post.IsTrending)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Size="Size.Small" />
+                    }
+                    else if (PlatformCommunityPostListPresentation.IsFoodVideoPost(post))
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.SmartDisplay" Size="Size.Small" />
+                    }
+                    <strong>@post.Title</strong>
+                    @if (post.SalesOffer is { } salesOffer)
+                    {
+                        <em class="platform-community-sales-label">@PlatformCommunityPostListPresentation.SalesStatusLabel(salesOffer.Status) · @PlatformCommunityPostListPresentation.FormatSalesPrice(salesOffer)</em>
+                    }
+                    @if (post.IsCommunityMomentumPromoted)
+                    {
+                        <em class="platform-community-momentum-label">@PlatformCommunityPostListPresentation.CommunityMomentumLabel(post.CommunityMomentumCode)</em>
+                    }
+                    @if (post.CommentCount > 0)
+                    {
+                        <b>[@post.CommentCount]</b>
+                    }
+                </button>
+                <small>@post.WorkflowTag · @post.RoleTag · @PlatformCommunityPostListPresentation.DisplayPostNickname(post)@PlatformCommunityPostListPresentation.FormatPostCountryInline(post) · @PlatformCommunityPostListPresentation.FormatForumDate(post.CreatedAtUtc)</small>
+            </span>
+            <span class="platform-community-forum-author" role="cell">
+                <span>@PlatformCommunityPostListPresentation.DisplayPostNickname(post)</span>
+                @if (PlatformCommunityPostListPresentation.HasPublicAuthorCountry(post))
+                {
+                    <span class="platform-community-country" title="@UiText("활동 국가", "Activity country"): @post.AuthorDisplayCountryName">
+                        <b>@post.AuthorDisplayCountryCode</b>
+                        <span>@post.AuthorDisplayCountryName</span>
+                    </span>
+                }
+            </span>
+            <time role="cell" datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@PlatformCommunityPostListPresentation.FormatForumDate(post.CreatedAtUtc)</time>
+            <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
+            <span class="platform-community-forum-count platform-community-forum-count--comments"
+                  role="cell"
+                  aria-label="@($"{UiText("댓글", "Replies")} {post.CommentCount}")">
+                <span class="platform-community-forum-count-label" aria-hidden="true">@UiText("댓글", "Replies")</span>
+                @post.CommentCount
+            </span>
+        </div>
+    }
+
+    @foreach (var post in SeedPosts)
+    {
+        <div class="@PlatformCommunityPostListPresentation.BuildSeedPostRowClass(post, SelectedSeedPostTitle)" role="row">
+            <span class="platform-community-forum-number platform-community-forum-number--recommended" role="cell">@UiText("추천", "Pick")</span>
+            <span class="platform-community-forum-category" role="cell">@DisplayBoardName(post.Category)</span>
+            <span class="platform-community-forum-subject" role="cell">
+                <button type="button"
+                        aria-expanded="@PlatformCommunityPostListPresentation.IsSeedPostSelected(SelectedSeedPostTitle, post)"
+                        @onclick="@(() => SeedPostSelected.InvokeAsync(post))">
+                    <MudIcon Icon="@post.Icon" Size="Size.Small" />
+                    <strong>@post.Title</strong>
+                    @if (post.CommentCount > 0)
+                    {
+                        <b>[@post.CommentCount]</b>
+                    }
+                </button>
+                <small>@UiText("살뜰 추천", "Ssalddel pick") · @DisplayBoardName(post.Category) · @post.Author · @post.Meta</small>
+            </span>
+            <span class="platform-community-forum-author" role="cell">@post.Author</span>
+            <span role="cell">@post.Meta</span>
+            <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
+            <span class="platform-community-forum-count platform-community-forum-count--comments"
+                  role="cell"
+                  aria-label="@($"{UiText("댓글", "Replies")} {post.CommentCount}")">
+                <span class="platform-community-forum-count-label" aria-hidden="true">@UiText("댓글", "Replies")</span>
+                @post.CommentCount
+            </span>
+        </div>
+    }
+
+    @if (VisiblePostCount == 0)
+    {
+        <div class="platform-community-forum-empty" role="row">
+            <MudIcon Icon="@Icons.Material.Filled.Inbox" />
+            <span>@UiText("조건에 맞는 글이 없습니다.", "No posts match these conditions.")</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
+
+    [Parameter]
+    public IReadOnlyList<PlatformCommunityPostResponse> Posts { get; set; } = [];
+
+    [Parameter]
+    public IReadOnlyList<CommunitySeedPost> SeedPosts { get; set; } = [];
+
+    [Parameter]
+    public int VisiblePostCount { get; set; }
+
+    [Parameter]
+    public long? SelectedPostId { get; set; }
+
+    [Parameter]
+    public string? SelectedSeedPostTitle { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }
+
+    private string UiText(string korean, string english)
+        => PlatformCommunityPostListPresentation.UiText(DisplayLanguageCode, korean, english);
+
+    private string DisplayBoardName(string boardName)
+        => PlatformCommunityPostListPresentation.DisplayBoardName(DisplayLanguageCode, boardName);
+}

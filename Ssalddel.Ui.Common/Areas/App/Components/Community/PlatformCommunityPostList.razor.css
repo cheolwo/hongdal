@@ -1,4 +1,4 @@
-.platform-community-sales-label {
+::deep .platform-community-sales-label {
     background: #e5f7ec;
     border-radius: 999px;
     color: #17653b;
@@ -10,7 +10,7 @@
     white-space: nowrap;
 }
 
-.platform-community-sales-summary {
+::deep .platform-community-sales-summary {
     background: #f7fbf8;
     border: 1px solid #dce9df;
     border-radius: 12px;
@@ -20,22 +20,22 @@
     overflow: hidden;
 }
 
-.platform-community-sales-summary > img,
-.platform-community-sales-summary__placeholder {
+::deep .platform-community-sales-summary > img,
+::deep .platform-community-sales-summary__placeholder {
     background: #e9f3ec;
     height: 4.5rem;
     object-fit: cover;
     width: 4.5rem;
 }
 
-.platform-community-sales-summary__placeholder {
+::deep .platform-community-sales-summary__placeholder {
     align-items: center;
     color: #58806a;
     display: flex;
     justify-content: center;
 }
 
-.platform-community-sales-summary > div {
+::deep .platform-community-sales-summary > div {
     align-self: center;
     display: flex;
     flex-direction: column;
@@ -44,24 +44,24 @@
     padding: 0.35rem 0.65rem 0.35rem 0;
 }
 
-.platform-community-sales-summary span {
+::deep .platform-community-sales-summary span {
     color: #397052;
     font-size: 0.68rem;
     font-weight: 700;
 }
 
-.platform-community-sales-summary strong {
+::deep .platform-community-sales-summary strong {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.platform-community-sales-summary small {
+::deep .platform-community-sales-summary small {
     color: #64748b;
 }
 
 @media (max-width: 640px) {
-    .platform-community-sales-label {
+    ::deep .platform-community-sales-label {
         display: inline-flex;
         margin-left: 0;
         margin-top: 0.25rem;
