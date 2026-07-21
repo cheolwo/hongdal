@@ -33,15 +33,39 @@ OfficialFoodDish
 
 OfficialFoodRecipeVariant
   ├─ 출처+원천 ID 기반 안정 RecordKey
-  ├─ 재료·단계·영양·태그 JSON
+  ├─ 원문 재료 JSON, 단계·영양·태그 JSON
   ├─ 원문 URL·원문 payload·checksum
-  └─ 수집 당시 라이선스·귀속 문구·이미지 정책 snapshot
+  ├─ 수집 당시 라이선스·귀속 문구·이미지 정책 snapshot
+  └─ 재료 parser 버전·색인 시각·구조화 재료 수
+
+OfficialFoodIngredientCategory
+  └─ 곡류·채소·수산물·장류 등 18개 분류 코드와 설명
+
+OfficialFoodIngredient
+  ├─ 언어+정규화 이름 기반 안정 IngredientKey
+  ├─ 표준 표시명·정규화명·분류
+  └─ 자동 분류 방식·신뢰도·확정/검토 대기 상태
+
+OfficialFoodRecipeIngredient
+  ├─ 레시피 변형과 표준 재료의 N:M 사용 관계
+  ├─ 주재료·양념장·고명 등 원문 묶음과 표시 순서
+  ├─ 원문 항목·원천 재료명·수량·표준 단위·가정 계량
+  └─ parser 버전·파싱 신뢰도·검토 필요 여부
 
 OfficialFoodRecipeCollectionRun
   └─ 시작·완료·실패, 조회 범위, 신규·갱신·기존 건수
 ```
 
 동일 출처의 동일 원천 ID를 다시 수집하면 변형을 중복 생성하지 않고 checksum을 비교한다. 이름이 같은 음식은 같은 국가 안에서 대표 음식 후보를 공유할 수 있지만, 자동 병합 결과도 검토 전 상태를 유지한다.
+
+### 재료 전산화 원칙
+
+- `IngredientsJson`은 원문 증거로 계속 보관하고 구조화 행으로 대체하지 않는다.
+- 쉼표와 줄바꿈을 괄호 밖에서만 분리하고, `주재료`, `양념장`, `고명`, `육수` 같은 묶음을 각 사용 행에 남긴다.
+- `75g(3/4모)`는 수치 `75`, 표준 단위 `g`, 가정 계량 `3/4모`로 나누며 `약간`과 무수량 재료도 버리지 않는다.
+- 언어와 정규화 재료명이 같으면 여러 레시피가 하나의 재료 마스터를 공유한다. 조리 상태나 상품 차이를 성급히 합치지 않도록 `다진 마늘`, `저염간장` 같은 원천 이름은 보존한다.
+- 규칙으로 분류하지 못한 재료는 `other`와 `PendingReview`로 명시한다. 낮은 신뢰도를 숨기거나 임의의 식품군으로 확정하지 않는다.
+- parser 버전을 레시피 변형과 사용 행에 기록해 규칙이 바뀌면 명시적으로 재색인할 수 있게 한다.
 
 ## 관리자 API
 
@@ -50,6 +74,9 @@ OfficialFoodRecipeCollectionRun
 | `GET` | `/api/v1/admin/content/official-food-recipes/sources` | 7개 원천의 권리·갱신·자동화 정책 조회 |
 | `GET` | `/api/v1/admin/content/official-food-recipes/dishes` | 원천·국가·지역·검토 상태·검색어별 음식 후보 조회 |
 | `GET` | `/api/v1/admin/content/official-food-recipes/dishes/{dishKey}/variants` | 음식 후보의 출처별 레시피, 귀속 문구와 freshness 조회 |
+| `GET` | `/api/v1/admin/content/official-food-recipes/ingredients/categories` | 18개 재료 분류와 분류별 마스터 수 조회 |
+| `GET` | `/api/v1/admin/content/official-food-recipes/ingredients` | 분류·언어·검토 상태·검색어별 표준 재료 조회 |
+| `POST` | `/api/v1/admin/content/official-food-recipes/ingredients/index` | 기존 원문 재료를 parser 버전에 맞춰 배치 색인 |
 | `POST` | `/api/v1/admin/content/official-food-recipes/collections` | 허용된 원천을 페이지·항목 상한 안에서 명시적으로 수집 |
 
 모든 API는 `서버관리자전용`이다. 미국·캐나다·프랑스 메타데이터 전용 원천에 수집 요청을 보내면 서버가 거부한다.
@@ -63,9 +90,12 @@ dotnet run --project Ssalddel -- --collect-mfds-recipes --max-pages=1 --max-item
 dotnet run --project Ssalddel -- --collect-rda-local-food --max-pages=1 --max-items=100
 dotnet run --project Ssalddel -- --collect-maff-regional-cuisines --max-pages=1 --max-items=100
 dotnet run --project Ssalddel -- --collect-nhs-recipes --max-pages=1 --max-items=100
+dotnet run --project Ssalddel -- --index-official-food-recipe-ingredients --source=mfds-cookrcp01 --max-items=5000
 ```
 
 `--max-pages`와 `--max-items`는 최초 소량 검증을 위한 안전 상한이다. 전체 수집 전에는 원천 트래픽 정책, 응답 필드 변화, DB 용량과 이용조건을 다시 확인한다. 운영 scheduler는 아직 켜지 않았으므로 자동 외부 호출은 발생하지 않는다.
+
+재료 색인은 현재 parser 버전이 없는 레시피만 기본 처리한다. 규칙을 바꾸고 전체를 다시 계산할 때만 `--force`를 붙이며, 운영자가 `Confirmed`로 확정한 재료 분류는 자동 규칙이 덮어쓰지 않는다.
 
 ## 커뮤니티 검토 후보
 

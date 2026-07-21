@@ -22,10 +22,14 @@ namespace Ssalddel.Controllers.Admin.Content07;
 public sealed class OfficialFoodRecipeArchiveController : ControllerBase
 {
     private readonly IOfficialFoodRecipeArchiveService _service;
+    private readonly IOfficialFoodRecipeIngredientIndexService _ingredientIndexService;
 
-    public OfficialFoodRecipeArchiveController(IOfficialFoodRecipeArchiveService service)
+    public OfficialFoodRecipeArchiveController(
+        IOfficialFoodRecipeArchiveService service,
+        IOfficialFoodRecipeIngredientIndexService ingredientIndexService)
     {
         _service = service;
+        _ingredientIndexService = ingredientIndexService;
     }
 
     [HttpGet("sources")]
@@ -52,6 +56,36 @@ public sealed class OfficialFoodRecipeArchiveController : ControllerBase
         catch (ArgumentException exception)
         {
             return BadRequest(CreateProblem(exception.Message));
+        }
+    }
+
+    [HttpGet("ingredients/categories")]
+    public async Task<ActionResult<IReadOnlyList<OfficialFoodIngredientCategoryDto>>> GetIngredientCategories(
+        CancellationToken cancellationToken)
+        => Ok(await _ingredientIndexService.GetCategoriesAsync(cancellationToken));
+
+    [HttpGet("ingredients")]
+    public async Task<ActionResult<IReadOnlyList<OfficialFoodIngredientDto>>> GetIngredients(
+        [FromQuery] OfficialFoodIngredientQuery query,
+        CancellationToken cancellationToken)
+        => Ok(await _ingredientIndexService.SearchIngredientsAsync(query, cancellationToken));
+
+    [HttpPost("ingredients/index")]
+    public async Task<ActionResult<OfficialFoodIngredientIndexResponse>> IndexIngredients(
+        [FromBody] OfficialFoodIngredientIndexRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return Ok(await _ingredientIndexService.RebuildAsync(request, cancellationToken));
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(CreateProblem(exception.Message));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(CreateProblem(exception.Message));
         }
     }
 

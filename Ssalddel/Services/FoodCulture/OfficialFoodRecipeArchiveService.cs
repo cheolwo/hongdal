@@ -61,14 +61,17 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly AgriculturalFisheriesDbContext _db;
     private readonly IReadOnlyDictionary<string, IOfficialFoodRecipeRemoteSource> _remoteSources;
+    private readonly IOfficialFoodRecipeIngredientIndexService _ingredientIndexService;
     private readonly TimeProvider _timeProvider;
 
     public OfficialFoodRecipeArchiveService(
         AgriculturalFisheriesDbContext db,
         IEnumerable<IOfficialFoodRecipeRemoteSource> remoteSources,
+        IOfficialFoodRecipeIngredientIndexService ingredientIndexService,
         TimeProvider timeProvider)
     {
         _db = db;
+        _ingredientIndexService = ingredientIndexService;
         _timeProvider = timeProvider;
 
         var sourceList = remoteSources.ToArray();
@@ -189,6 +192,9 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             .AsNoTracking()
             .Include(variant => variant.Source)
             .Include(variant => variant.Dish)
+            .Include(variant => variant.RecipeIngredients)
+                .ThenInclude(recipeIngredient => recipeIngredient.Ingredient)
+                    .ThenInclude(ingredient => ingredient!.Category)
             .Where(variant => variant.Dish != null && variant.Dish.DishKey == dishKey.Trim())
             .OrderByDescending(variant => variant.LastCollectedAtUtc)
             .ToArrayAsync(cancellationToken);
@@ -358,6 +364,13 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             };
             ApplyCollectedRecord(variant, source, record, checksum, nowUtc);
             _db.OfficialFoodRecipeVariants.Add(variant);
+            await _ingredientIndexService.SynchronizeVariantAsync(
+                variant,
+                source.LanguageCode,
+                record.Ingredients,
+                nowUtc,
+                force: true,
+                cancellationToken);
             run.InsertedCount++;
             return;
         }
@@ -368,6 +381,21 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             checksum,
             StringComparison.Ordinal);
         ApplyCollectedRecord(variant, source, record, checksum, nowUtc);
+        if (changed
+            || !string.Equals(
+                variant.IngredientParserVersion,
+                OfficialFoodRecipeIngredientParser.ParserVersion,
+                StringComparison.Ordinal))
+        {
+            await _ingredientIndexService.SynchronizeVariantAsync(
+                variant,
+                source.LanguageCode,
+                record.Ingredients,
+                nowUtc,
+                force: true,
+                cancellationToken);
+        }
+
         if (changed)
         {
             run.UpdatedCount++;
@@ -418,19 +446,11 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
         OfficialFoodRecipeCollectionRun run,
         string errorMessage)
     {
-        foreach (var entry in _db.ChangeTracker.Entries().ToArray())
-        {
-            if (!ReferenceEquals(entry.Entity, run)
-                && entry.State is not EntityState.Unchanged
-                && entry.State is not EntityState.Detached)
-            {
-                entry.State = EntityState.Detached;
-            }
-        }
-
+        _db.ChangeTracker.Clear();
         run.StatusCode = OfficialFoodRecipeCollectionStatuses.Failed;
         run.CompletedAtUtc = UtcNow();
         run.ErrorMessage = errorMessage;
+        _db.OfficialFoodRecipeCollectionRuns.Attach(run);
         _db.Entry(run).State = EntityState.Modified;
         await _db.SaveChangesAsync(CancellationToken.None);
     }
@@ -472,7 +492,37 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
             variant.AttributionText,
             variant.LastCollectedAtUtc,
             variant.ContentExpiresAtUtc,
-            isFresh);
+            isFresh,
+            variant.RecipeIngredients
+                .OrderBy(item => item.DisplayOrder)
+                .Select(ToIngredientDto)
+                .ToArray());
+    }
+
+    private static OfficialFoodRecipeIngredientDto ToIngredientDto(
+        OfficialFoodRecipeIngredient recipeIngredient)
+    {
+        var ingredient = recipeIngredient.Ingredient
+            ?? throw new InvalidOperationException("표준 재료 관계가 없습니다.");
+        return new OfficialFoodRecipeIngredientDto(
+            ingredient.IngredientKey,
+            ingredient.CanonicalName,
+            ingredient.CategoryCode,
+            ingredient.Category?.KoreanName ?? ingredient.CategoryCode,
+            recipeIngredient.GroupName,
+            recipeIngredient.OriginalText,
+            recipeIngredient.SourceName,
+            recipeIngredient.QuantityText,
+            recipeIngredient.QuantityValue,
+            recipeIngredient.QuantityMaxValue,
+            recipeIngredient.UnitCode,
+            recipeIngredient.UnitText,
+            recipeIngredient.HouseholdMeasureText,
+            recipeIngredient.PreparationNote,
+            recipeIngredient.DisplayOrder,
+            recipeIngredient.ParserVersion,
+            recipeIngredient.ParseConfidence,
+            recipeIngredient.RequiresReview);
     }
 
     private static T Deserialize<T>(string json, T fallback)
@@ -508,6 +558,9 @@ public static class OfficialFoodRecipeKeys
 
     public static string CreateRecordKey(string sourceKey, string externalId)
         => Hash($"{Normalize(sourceKey)}|{Normalize(externalId)}");
+
+    public static string CreateIngredientKey(string languageCode, string normalizedName)
+        => Hash($"{Normalize(languageCode)}|{Normalize(normalizedName)}");
 
     public static string CreateContentChecksum(OfficialFoodRecipeCollectedRecord record)
         => Hash(JsonSerializer.Serialize(record, new JsonSerializerOptions(JsonSerializerDefaults.Web)));

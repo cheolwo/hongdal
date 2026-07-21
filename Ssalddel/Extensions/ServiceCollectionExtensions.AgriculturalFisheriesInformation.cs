@@ -116,6 +116,9 @@ public static partial class ServiceCollectionExtensions
             .RemoveAllLoggers();
         services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
             serviceProvider.GetRequiredService<NhsHealthierFamiliesRecipeRemoteSource>());
+        services.AddSingleton<OfficialFoodRecipeIngredientParser>();
+        services.AddScoped<IOfficialFoodRecipeIngredientIndexService,
+            OfficialFoodRecipeIngredientIndexService>();
         services.AddScoped<IOfficialFoodRecipeArchiveService, OfficialFoodRecipeArchiveService>();
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();

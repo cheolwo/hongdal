@@ -35,6 +35,9 @@ public sealed class OfficialFoodRecipeArchiveServiceTests
         Assert.Single(variants);
         Assert.False(string.IsNullOrWhiteSpace(variants[0].AttributionText));
         Assert.Contains("이미지 파일은 복제하지", variants[0].ImageReusePolicy);
+        Assert.Equal(2, variants[0].StructuredIngredients?.Count);
+        Assert.Equal(2, await fixture.Db.OfficialFoodIngredients.CountAsync());
+        Assert.Equal(2, await fixture.Db.OfficialFoodRecipeIngredients.CountAsync());
     }
 
     [Fact]
@@ -147,7 +150,18 @@ public sealed class OfficialFoodRecipeArchiveServiceTests
         }
 
         public OfficialFoodRecipeArchiveService CreateService()
-            => new(Db, _sources, TimeProvider);
+        {
+            var parser = new OfficialFoodRecipeIngredientParser();
+            var ingredientIndexService = new OfficialFoodRecipeIngredientIndexService(
+                Db,
+                parser,
+                TimeProvider);
+            return new OfficialFoodRecipeArchiveService(
+                Db,
+                _sources,
+                ingredientIndexService,
+                TimeProvider);
+        }
 
         public async ValueTask DisposeAsync()
         {

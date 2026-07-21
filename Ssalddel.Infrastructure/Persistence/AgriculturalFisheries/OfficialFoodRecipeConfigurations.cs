@@ -254,6 +254,7 @@ internal sealed class OfficialFoodRecipeVariantConfiguration
         builder.Property(x => x.Category).HasMaxLength(300).IsRequired();
         builder.Property(x => x.ServingText).HasMaxLength(300).IsRequired();
         builder.Property(x => x.IngredientsJson).HasColumnType("json").IsRequired();
+        builder.Property(x => x.IngredientParserVersion).HasMaxLength(40).IsRequired();
         builder.Property(x => x.InstructionsJson).HasColumnType("json").IsRequired();
         builder.Property(x => x.NutritionJson).HasColumnType("json").IsRequired();
         builder.Property(x => x.TagsJson).HasColumnType("json").IsRequired();
@@ -284,6 +285,122 @@ internal sealed class OfficialFoodRecipeVariantConfiguration
         builder.HasIndex(x => new { x.SourceId, x.ExternalId }).IsUnique();
         builder.HasIndex(x => new { x.DishId, x.LastCollectedAtUtc });
         builder.HasIndex(x => new { x.ContentExpiresAtUtc, x.IsRemovedAtSource });
+    }
+}
+
+internal sealed class OfficialFoodIngredientCategoryConfiguration
+    : IEntityTypeConfiguration<OfficialFoodIngredientCategory>, IDedicatedDbContextConfiguration
+{
+    public void Configure(EntityTypeBuilder<OfficialFoodIngredientCategory> builder)
+    {
+        builder.ToTable("food_official_ingredient_categories");
+        builder.HasKey(x => x.CategoryCode);
+
+        builder.Property(x => x.CategoryCode).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.KoreanName).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.EnglishName).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.Description).HasMaxLength(1000).IsRequired();
+        builder.HasIndex(x => new { x.IsActive, x.SortOrder });
+
+        builder.HasData(
+            Category(OfficialFoodIngredientCategoryCodes.GrainAndStarch, "곡류·전분", "Grains and starches", "쌀, 밀, 면, 떡, 가루와 전분류", 10),
+            Category(OfficialFoodIngredientCategoryCodes.LegumeAndSoy, "콩·두류·두부", "Legumes and soy", "콩, 두류, 두부와 두유 등 콩 가공품", 20),
+            Category(OfficialFoodIngredientCategoryCodes.Vegetable, "채소류", "Vegetables", "잎·뿌리·열매·줄기 채소와 생채소", 30),
+            Category(OfficialFoodIngredientCategoryCodes.Fruit, "과일류", "Fruits", "생과일, 건과일과 과일즙", 40),
+            Category(OfficialFoodIngredientCategoryCodes.Mushroom, "버섯류", "Mushrooms", "생버섯과 건버섯", 50),
+            Category(OfficialFoodIngredientCategoryCodes.Seaweed, "해조류", "Seaweeds", "김, 미역, 다시마 등 해조류", 60),
+            Category(OfficialFoodIngredientCategoryCodes.Meat, "육류", "Meat", "소·돼지 등 포유류 고기와 부위", 70),
+            Category(OfficialFoodIngredientCategoryCodes.PoultryAndEgg, "가금류·알류", "Poultry and eggs", "닭·오리 등 가금류와 달걀", 80),
+            Category(OfficialFoodIngredientCategoryCodes.Seafood, "수산물", "Seafood", "생선, 조개, 갑각류와 수산 건제품", 90),
+            Category(OfficialFoodIngredientCategoryCodes.Dairy, "유제품", "Dairy", "우유, 치즈, 요구르트와 크림", 100),
+            Category(OfficialFoodIngredientCategoryCodes.NutAndSeed, "견과·종실류", "Nuts and seeds", "견과류, 깨와 식용 씨앗", 110),
+            Category(OfficialFoodIngredientCategoryCodes.OilAndFat, "유지류", "Oils and fats", "식용유, 참기름, 버터 등 조리용 지방", 120),
+            Category(OfficialFoodIngredientCategoryCodes.SeasoningAndSpice, "조미료·향신료", "Seasonings and spices", "소금, 설탕, 후추와 향신 재료", 130),
+            Category(OfficialFoodIngredientCategoryCodes.SauceAndFermented, "장류·소스류", "Sauces and fermented condiments", "간장, 된장, 고추장, 식초와 소스", 140),
+            Category(OfficialFoodIngredientCategoryCodes.ProcessedFood, "가공식품", "Processed foods", "햄, 소시지, 김치, 피클 등 가공 재료", 150),
+            Category(OfficialFoodIngredientCategoryCodes.BeverageAndAlcohol, "음료·주류", "Beverages and alcohol", "음료, 와인과 조리용 주류", 160),
+            Category(OfficialFoodIngredientCategoryCodes.WaterAndStock, "물·육수", "Water and stocks", "물, 쌀뜨물과 조리용 육수", 170),
+            Category(OfficialFoodIngredientCategoryCodes.Other, "기타·검토 필요", "Other or review required", "규칙으로 분류하지 못해 운영자 검토가 필요한 재료", 999));
+    }
+
+    private static OfficialFoodIngredientCategory Category(
+        string code,
+        string koreanName,
+        string englishName,
+        string description,
+        int sortOrder)
+        => new()
+        {
+            CategoryCode = code,
+            KoreanName = koreanName,
+            EnglishName = englishName,
+            Description = description,
+            SortOrder = sortOrder,
+            IsActive = true
+        };
+}
+
+internal sealed class OfficialFoodIngredientConfiguration
+    : IEntityTypeConfiguration<OfficialFoodIngredient>, IDedicatedDbContextConfiguration
+{
+    public void Configure(EntityTypeBuilder<OfficialFoodIngredient> builder)
+    {
+        builder.ToTable("food_official_ingredients");
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.IngredientKey).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.LanguageCode).HasMaxLength(10).IsRequired();
+        builder.Property(x => x.CanonicalName).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.NormalizedName).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.CategoryCode).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.ClassificationMethod).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.ClassificationConfidence).HasPrecision(5, 4);
+        builder.Property(x => x.ClassificationState).HasMaxLength(40).IsRequired();
+
+        builder.HasOne(x => x.Category)
+            .WithMany(x => x.Ingredients)
+            .HasForeignKey(x => x.CategoryCode)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.IngredientKey).IsUnique();
+        builder.HasIndex(x => new { x.CategoryCode, x.ClassificationState, x.CanonicalName });
+        builder.HasIndex(x => new { x.LanguageCode, x.NormalizedName });
+    }
+}
+
+internal sealed class OfficialFoodRecipeIngredientConfiguration
+    : IEntityTypeConfiguration<OfficialFoodRecipeIngredient>, IDedicatedDbContextConfiguration
+{
+    public void Configure(EntityTypeBuilder<OfficialFoodRecipeIngredient> builder)
+    {
+        builder.ToTable("food_official_recipe_ingredients");
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.GroupName).HasMaxLength(160).IsRequired();
+        builder.Property(x => x.OriginalText).HasMaxLength(1000).IsRequired();
+        builder.Property(x => x.SourceName).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.QuantityText).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.QuantityValue).HasPrecision(18, 6);
+        builder.Property(x => x.QuantityMaxValue).HasPrecision(18, 6);
+        builder.Property(x => x.UnitCode).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.UnitText).HasMaxLength(80).IsRequired();
+        builder.Property(x => x.HouseholdMeasureText).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.PreparationNote).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.ParserVersion).HasMaxLength(40).IsRequired();
+        builder.Property(x => x.ParseConfidence).HasPrecision(5, 4);
+
+        builder.HasOne(x => x.RecipeVariant)
+            .WithMany(x => x.RecipeIngredients)
+            .HasForeignKey(x => x.RecipeVariantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.Ingredient)
+            .WithMany(x => x.RecipeIngredients)
+            .HasForeignKey(x => x.IngredientId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => new { x.RecipeVariantId, x.DisplayOrder }).IsUnique();
+        builder.HasIndex(x => new { x.IngredientId, x.RecipeVariantId });
+        builder.HasIndex(x => new { x.RequiresReview, x.ParseConfidence });
     }
 }
 

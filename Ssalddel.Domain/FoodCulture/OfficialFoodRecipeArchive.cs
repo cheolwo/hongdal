@@ -119,6 +119,12 @@ public sealed class OfficialFoodRecipeVariant
 
     public string IngredientsJson { get; set; } = "[]";
 
+    public string IngredientParserVersion { get; set; } = string.Empty;
+
+    public int IngredientCount { get; set; }
+
+    public DateTime? IngredientsIndexedAtUtc { get; set; }
+
     public string InstructionsJson { get; set; } = "[]";
 
     public string NutritionJson { get; set; } = "{}";
@@ -152,6 +158,102 @@ public sealed class OfficialFoodRecipeVariant
     public DateTime? ContentExpiresAtUtc { get; set; }
 
     public bool IsRemovedAtSource { get; set; }
+
+    public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public ICollection<OfficialFoodRecipeIngredient> RecipeIngredients { get; set; } =
+        new List<OfficialFoodRecipeIngredient>();
+}
+
+public sealed class OfficialFoodIngredientCategory
+{
+    public string CategoryCode { get; set; } = string.Empty;
+
+    public string KoreanName { get; set; } = string.Empty;
+
+    public string EnglishName { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public int SortOrder { get; set; }
+
+    public bool IsActive { get; set; } = true;
+
+    public ICollection<OfficialFoodIngredient> Ingredients { get; set; } =
+        new List<OfficialFoodIngredient>();
+}
+
+public sealed class OfficialFoodIngredient
+{
+    public long Id { get; set; }
+
+    public string IngredientKey { get; set; } = string.Empty;
+
+    public string LanguageCode { get; set; } = string.Empty;
+
+    public string CanonicalName { get; set; } = string.Empty;
+
+    public string NormalizedName { get; set; } = string.Empty;
+
+    public string CategoryCode { get; set; } = string.Empty;
+
+    public OfficialFoodIngredientCategory? Category { get; set; }
+
+    public string ClassificationMethod { get; set; } = string.Empty;
+
+    public decimal ClassificationConfidence { get; set; }
+
+    public string ClassificationState { get; set; } = "PendingReview";
+
+    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public ICollection<OfficialFoodRecipeIngredient> RecipeIngredients { get; set; } =
+        new List<OfficialFoodRecipeIngredient>();
+}
+
+public sealed class OfficialFoodRecipeIngredient
+{
+    public long Id { get; set; }
+
+    public long RecipeVariantId { get; set; }
+
+    public OfficialFoodRecipeVariant? RecipeVariant { get; set; }
+
+    public long IngredientId { get; set; }
+
+    public OfficialFoodIngredient? Ingredient { get; set; }
+
+    public string GroupName { get; set; } = string.Empty;
+
+    public string OriginalText { get; set; } = string.Empty;
+
+    public string SourceName { get; set; } = string.Empty;
+
+    public string QuantityText { get; set; } = string.Empty;
+
+    public decimal? QuantityValue { get; set; }
+
+    public decimal? QuantityMaxValue { get; set; }
+
+    public string UnitCode { get; set; } = string.Empty;
+
+    public string UnitText { get; set; } = string.Empty;
+
+    public string HouseholdMeasureText { get; set; } = string.Empty;
+
+    public string PreparationNote { get; set; } = string.Empty;
+
+    public int DisplayOrder { get; set; }
+
+    public string ParserVersion { get; set; } = string.Empty;
+
+    public decimal ParseConfidence { get; set; }
+
+    public bool RequiresReview { get; set; }
+
+    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAtUtc { get; set; } = DateTime.UtcNow;
 }

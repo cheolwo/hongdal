@@ -326,6 +326,50 @@ if (args.Any(argument =>
     return;
 }
 
+if (args.Any(argument => string.Equals(
+        argument,
+        "--index-official-food-recipe-ingredients",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var sourceArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--source=", StringComparison.OrdinalIgnoreCase));
+    var sourceKey = sourceArgument?["--source=".Length..];
+    var maxItemsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--max-items=", StringComparison.OrdinalIgnoreCase));
+    var maxItems = int.TryParse(
+        maxItemsArgument?["--max-items=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedMaxItems)
+        ? parsedMaxItems
+        : 5000;
+    var force = args.Any(argument => string.Equals(
+        argument,
+        "--force",
+        StringComparison.OrdinalIgnoreCase));
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var ingredientIndexService = scope.ServiceProvider
+        .GetRequiredService<IOfficialFoodRecipeIngredientIndexService>();
+    var indexResult = await ingredientIndexService.RebuildAsync(
+        new OfficialFoodIngredientIndexRequest(sourceKey, maxItems, force));
+    app.Logger.LogInformation(
+        "공식 음식 레시피 재료 전산화 완료. Source={SourceKey}, Variants={Variants}, RecipeIngredients={RecipeIngredients}, CatalogIngredients={CatalogIngredients}, PendingReview={PendingReview}, Categories={Categories}",
+        indexResult.SourceKey ?? "all",
+        indexResult.ProcessedRecipeVariantCount,
+        indexResult.RecipeIngredientCount,
+        indexResult.CatalogIngredientCount,
+        indexResult.PendingReviewIngredientCount,
+        string.Join(
+            ", ",
+            indexResult.CategoryCounts
+                .OrderBy(item => item.Key)
+                .Select(item => $"{item.Key}:{item.Value}")));
+    return;
+}
+
 var officialFoodRecipeSourceKey = args.Any(argument =>
         string.Equals(argument, "--collect-mfds-recipes", StringComparison.OrdinalIgnoreCase))
     ? OfficialFoodRecipeSourceKeys.MfdsCookRecipe

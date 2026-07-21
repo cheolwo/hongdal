@@ -30,6 +30,14 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
     public DbSet<OfficialFoodRecipeCollectionRun> OfficialFoodRecipeCollectionRuns =>
         Set<OfficialFoodRecipeCollectionRun>();
 
+    public DbSet<OfficialFoodIngredientCategory> OfficialFoodIngredientCategories =>
+        Set<OfficialFoodIngredientCategory>();
+
+    public DbSet<OfficialFoodIngredient> OfficialFoodIngredients => Set<OfficialFoodIngredient>();
+
+    public DbSet<OfficialFoodRecipeIngredient> OfficialFoodRecipeIngredients =>
+        Set<OfficialFoodRecipeIngredient>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UsdaNassPriceCollectionRunConfiguration());
@@ -41,5 +49,8 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new OfficialFoodDishConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeVariantConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeCollectionRunConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodIngredientCategoryConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodIngredientConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodRecipeIngredientConfiguration());
     }
 }
