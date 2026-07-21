@@ -6,6 +6,7 @@ public static class 창고운영ProfileCodes
 {
     public const string 일반입출고 = "general-inout";
     public const string 보세수입 = "bonded-import";
+    public const string 도심생활물류센터 = "urban-logistics-center";
     public const string 마트도심 = "urban-mart";
     public const string 공동주택물류 = "apartment-logistics";
 
@@ -13,6 +14,7 @@ public static class 창고운영ProfileCodes
     [
         일반입출고,
         보세수입,
+        도심생활물류센터,
         마트도심,
         공동주택물류
     ];
@@ -64,7 +66,8 @@ public static class 창고PageCodes
 public sealed record 창고운영ProfileDefinition(
     string 코드,
     string 표시명,
-    string 설명);
+    string 설명,
+    string? 기반ProfileCode = null);
 
 public static class 창고운영ProfileCatalog
 {
@@ -79,19 +82,58 @@ public static class 창고운영ProfileCatalog
             "보세·수입 창고",
             "수입 화물 반입, 통관 상태 확인, 반출과 국내 운송 인계를 처리합니다."),
         new(
+            창고운영ProfileCodes.도심생활물류센터,
+            "도심 생활물류센터",
+            "일반 창고의 입출고를 바탕으로 공동 물량의 검수, 분류, 보관, 공동 수령과 근거리 배송 인계를 처리합니다.",
+            창고운영ProfileCodes.일반입출고),
+        new(
             창고운영ProfileCodes.마트도심,
             "마트 도심 창고",
-            "재고 보충, 주문 단위 피킹·포장과 배달 기사 픽업을 처리합니다."),
+            "도심 생활물류센터를 바탕으로 재고 보충, 주문 단위 피킹·포장과 배달 기사 픽업을 처리합니다.",
+            창고운영ProfileCodes.도심생활물류센터),
         new(
             창고운영ProfileCodes.공동주택물류,
             "공동주택 물류 거점",
-            "반출 완료 화물을 단지에 반입하고 세대별로 배분하여 입주민에게 인계합니다.")
+            "도심 생활물류센터를 바탕으로 반출 완료 화물을 단지에 반입하고 세대별로 배분하여 입주민에게 인계합니다.",
+            창고운영ProfileCodes.도심생활물류센터)
     ];
 
     public static 창고운영ProfileDefinition 조회(string? profileCode)
     {
         var normalized = 창고운영ProfileCodes.정규화(profileCode);
         return 전체.First(profile => string.Equals(profile.코드, normalized, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static IReadOnlyList<창고운영ProfileDefinition> 상속계층조회(string? profileCode)
+    {
+        var result = new Stack<창고운영ProfileDefinition>();
+        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var current = 조회(profileCode);
+
+        while (true)
+        {
+            if (!visited.Add(current.코드))
+            {
+                throw new InvalidOperationException($"창고 운영 Profile 상속에 순환이 있습니다: {current.코드}");
+            }
+
+            result.Push(current);
+            if (string.IsNullOrWhiteSpace(current.기반ProfileCode))
+            {
+                break;
+            }
+
+            current = 조회(current.기반ProfileCode);
+        }
+
+        return result.ToArray();
+    }
+
+    public static bool 같거나파생됨(string? profileCode, string 기반ProfileCode)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(기반ProfileCode);
+        return 상속계층조회(profileCode).Any(profile =>
+            string.Equals(profile.코드, 기반ProfileCode, StringComparison.OrdinalIgnoreCase));
     }
 }
 
@@ -153,8 +195,11 @@ public sealed class 창고작업구성Resolver : I창고작업구성Resolver
     public IReadOnlyList<창고PageDefinition> 페이지목록조회(string? profileCode)
     {
         var normalized = 창고운영ProfileCodes.정규화(profileCode);
+        var profileChain = 창고운영ProfileCatalog.상속계층조회(normalized);
         return 공통페이지목록
-            .Concat(_providers[normalized].전용페이지목록)
+            .Concat(profileChain.SelectMany(profile => _providers[profile.코드].전용페이지목록))
+            .GroupBy(page => page.페이지코드, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
             .OrderBy(page => page.순서)
             .ToArray();
     }
@@ -186,6 +231,15 @@ public sealed class 보세수입작업구성Provider : I창고작업구성Provid
         new(창고PageCodes.수입화물반출, "수입 화물 반출", "반출 가능 여부와 반출 지시를 관리합니다.", WarehouseManagerRoutes.ImportRelease, 60),
         new(창고PageCodes.수입국내운송인계, "국내 운송 인계", "반출 화물을 국내 운송으로 연결합니다.", WarehouseManagerRoutes.ImportDomesticHandoff, 70)
     ];
+}
+
+public sealed class 도심생활물류센터작업구성Provider : I창고작업구성Provider
+{
+    public string 운영ProfileCode => 창고운영ProfileCodes.도심생활물류센터;
+
+    // 도심 생활물류센터의 기본 작업은 일반 입출고 Profile에서 상속합니다.
+    // 전용 화면이 생기면 이 목록에만 추가하여 마트·공동주택 Profile도 함께 재사용합니다.
+    public IReadOnlyList<창고PageDefinition> 전용페이지목록 { get; } = [];
 }
 
 public sealed class 마트도심작업구성Provider : I창고작업구성Provider

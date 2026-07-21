@@ -36,6 +36,7 @@ public static class WarehouseManagerServiceCollectionExtensions
         services.TryAddScoped<창고작업세션상태ViewModel>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<I창고작업구성Provider, 일반입출고작업구성Provider>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<I창고작업구성Provider, 보세수입작업구성Provider>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<I창고작업구성Provider, 도심생활물류센터작업구성Provider>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<I창고작업구성Provider, 마트도심작업구성Provider>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<I창고작업구성Provider, 공동주택물류작업구성Provider>());
         services.TryAddSingleton<I창고작업구성Resolver, 창고작업구성Resolver>();

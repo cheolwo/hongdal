@@ -130,6 +130,16 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
             "다른 사용자가 공개한 가까운 창고에 물류 대행 가능 여부를 신청서로 작성합니다.",
             false),
         new(
+            "default:urban-logistics-center",
+            null,
+            "도심 생활물류센터",
+            "생활권 공동물류 후보",
+            LogisticsProxySiteTypes.UrbanLogisticsCenter,
+            LogisticsProxySiteTypes.GetDisplayName(LogisticsProxySiteTypes.UrbanLogisticsCenter),
+            "생활권·서비스 반경 기준 조회 필요",
+            "공동주문 물량의 입고, 검수, 분류, 보관, 공동 수령과 근거리 배송 인계를 신청서로 작성합니다.",
+            false),
+        new(
             "default:market-fulfillment",
             null,
             "마켓 물류 대행 창고",

@@ -45,6 +45,26 @@ public sealed class PlatformCommunityWarehouseProxyViewModelTests
     }
 
     [Fact]
+    public async Task SelectCandidate_UrbanLogisticsCenter_UsesSharedWarehouseFlow()
+    {
+        using var services = new ServiceCollection().BuildServiceProvider();
+        var viewModel = new PlatformCommunityWarehouseProxyViewModel(services);
+        await viewModel.OpenAsync(new(
+            "공동주문 생활물류",
+            "창고",
+            "공동 물량을 검수하고 주민 수령 단위로 분류합니다."));
+
+        viewModel.SelectCandidate("default:urban-logistics-center");
+
+        Assert.Equal(
+            Ssalddel.Contracts.Common.Warehouse.LogisticsProxySiteTypes.UrbanLogisticsCenter,
+            viewModel.SelectedCandidate?.ProxyTypeCode);
+        Assert.Equal("도심 생활물류센터", viewModel.SelectedCandidate?.ProxyTypeLabel);
+        Assert.Equal(입고계약유형코드.보관대행, viewModel.Draft.ContractType);
+        Assert.Contains("공동주문 생활물류", viewModel.Draft.Notes);
+    }
+
+    [Fact]
     public async Task Close_ClearsPanelStateAndDraft()
     {
         using var services = new ServiceCollection().BuildServiceProvider();

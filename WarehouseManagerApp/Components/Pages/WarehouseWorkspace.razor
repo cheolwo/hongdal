@@ -140,6 +140,7 @@
         => profileCode switch
         {
             창고운영ProfileCodes.보세수입 => WarehouseManagerRoutes.ImportArrival,
+            창고운영ProfileCodes.도심생활물류센터 => WarehouseManagerRoutes.GeneralInventory,
             창고운영ProfileCodes.마트도심 => WarehouseManagerRoutes.MartHome,
             창고운영ProfileCodes.공동주택물류 => WarehouseManagerRoutes.ApartmentArrivals,
             _ => WarehouseManagerRoutes.GeneralInventory
@@ -149,6 +150,7 @@
         => profileCode switch
         {
             창고운영ProfileCodes.보세수입 => Icons.Material.Filled.Public,
+            창고운영ProfileCodes.도심생활물류센터 => Icons.Material.Filled.Hub,
             창고운영ProfileCodes.마트도심 => Icons.Material.Filled.Storefront,
             창고운영ProfileCodes.공동주택물류 => Icons.Material.Filled.Group,
             _ => Icons.Material.Filled.Inventory2
@@ -158,6 +160,7 @@
         => profileCode switch
         {
             창고운영ProfileCodes.보세수입 => Color.Info,
+            창고운영ProfileCodes.도심생활물류센터 => Color.Warning,
             창고운영ProfileCodes.마트도심 => Color.Success,
             창고운영ProfileCodes.공동주택물류 => Color.Secondary,
             _ => Color.Primary

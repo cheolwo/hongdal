@@ -29,7 +29,9 @@ public abstract class 창고PageViewModelBase : 조립ViewModelBase
     public string 페이지코드 { get; }
     public string 페이지명 { get; }
     public IReadOnlySet<string> 지원ProfileCodes => _지원ProfileCodes;
-    public bool 현재창고에서사용가능 => _지원ProfileCodes.Contains(세션.운영ProfileCode);
+    public bool 현재창고에서사용가능
+        => _지원ProfileCodes.Any(profileCode =>
+            창고운영ProfileCatalog.같거나파생됨(세션.운영ProfileCode, profileCode));
 
     protected T 구성요소등록<T>(T viewModel)
         where T : class, INotifyPropertyChanged
