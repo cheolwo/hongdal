@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-21 | [주문자 앱 판매채널 계정 상세조회 계약 복구](2026-07-21-shipper-sales-account-detail-contract.md) | 화면 없음 — MAUI 판매채널 adapter의 정확한 계정 ID 조회 계약 누락을 보완해 Windows 배포 빌드 복구 |
 | 2026-07-21 | [커뮤니티 글쓰기 단일책임 분리](2026-07-21-community-post-composer-srp.md) | 794줄 글쓰기를 215줄 조립 shell과 머리글·상태·본문·판매·첨부·문맥·설정 책임으로 분리, 화면 유지·간접 확인 |
 | 2026-07-21 | [기사 상차 처리 페이지 단일책임 분리](2026-07-21-driver-transport-pickup-srp.md) | 436줄 route 페이지를 67줄 조립 shell과 운송 요약·이동·상차 사진·인수증·상차 예외 책임으로 분리하고 desktop·390px mobile 검증 |
 | 2026-07-21 | [기사 통합 운송 증빙 페이지 단일책임 분리](2026-07-21-driver-transport-proof-srp.md) | 518줄 route 페이지를 59줄 조립 shell과 대상·상차·하차·예외 workflow 및 입력 컴포넌트로 분리하고 desktop·390px mobile 검증 |

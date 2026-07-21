@@ -117,6 +117,14 @@ public sealed class ShipperSalesService : IShipperSalesService
         CancellationToken cancellationToken = default)
         => (await GetAccountsAsync(cancellationToken))?.Items ?? [];
 
+    public Task<판매채널계정항목응답?> 계정상세조회Async(
+        long accountId,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(_store.FindAccount(accountId));
+    }
+
     public Task<판매채널계정항목응답?> 계정생성Async(
         판매채널계정저장요청 request,
         CancellationToken cancellationToken = default)
