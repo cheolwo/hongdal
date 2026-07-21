@@ -84,6 +84,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddScoped<ICommunityLedgerNodeActionService>(provider =>
             provider.GetRequiredService<CommunityLedgerNodeActionService>());
         services.TryAddTransient<CommunityLedgerNodeActionViewModel>();
+        services.TryAddTransient<CommunityLedgerDiagramDetailViewModel>();
         services.TryAddScoped<YouTube관리콘텐츠Service>();
         services.TryAddScoped<PlatformCommunityDecorationStateService>();
         services.TryAddScoped<PlatformCommunityPostDraftStateService>();

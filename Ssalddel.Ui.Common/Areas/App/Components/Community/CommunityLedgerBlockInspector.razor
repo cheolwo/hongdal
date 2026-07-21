@@ -1,0 +1,184 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Contracts.Common.Community
+
+<aside class="ledger-diagram-detail__inspector" aria-label="선택한 블록 내부 데이터">
+    <div class="ledger-diagram-detail__inspector-heading">
+        <span class="ledger-diagram-detail__inspector-icon">
+            <MudIcon Icon="@(SelectedNode is null ? Icons.Material.Filled.DataObject : CommunityLedgerDiagramPresentation.ResolveNodeIcon(SelectedNode))" />
+        </span>
+        <div>
+            <span>선택한 블록</span>
+            <strong>@(SelectedNode?.Title ?? "블록을 선택하세요")</strong>
+        </div>
+        <button type="button"
+                class="ledger-diagram-detail__refresh"
+                title="원장 새로고침"
+                aria-label="원장 새로고침"
+                disabled="@IsRefreshing"
+                @onclick="RefreshAsync">
+            <MudIcon Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" />
+        </button>
+    </div>
+
+    <div class="ledger-diagram-detail__live-status" aria-live="polite">
+        <i class="@(RealtimeConnected ? "is-connected" : string.Empty)"></i>
+        <span>@RealtimeStatus</span>
+    </div>
+
+    @if (SelectedNode is null)
+    {
+        <p>다이어그램에서 확인할 블록을 선택하세요.</p>
+    }
+    else
+    {
+        <dl class="ledger-diagram-detail__metadata">
+            <div>
+                <dt>블록 ID</dt>
+                <dd>@SelectedNode.NodeId</dd>
+            </div>
+            <div>
+                <dt>블록 유형</dt>
+                <dd>@(SelectedBlock?.블록유형 ?? SelectedNode.Kind)</dd>
+            </div>
+            <div>
+                <dt>상태</dt>
+                <dd>@CommunityLedgerDiagramPresentation.BuildNodeState(Context, SelectedNode)</dd>
+            </div>
+        </dl>
+
+        @if (Context.상세조회가능여부 || Context.역할범위조회여부)
+        {
+            <section class="ledger-diagram-detail__assignees" aria-label="블록 담당자">
+                <strong>블록 담당자</strong>
+                @if (SelectedBlock is { 담당자목록.Count: > 0 } assignedBlock)
+                {
+                    <MudChipSet T="string" ReadOnly="true">
+                        @foreach (var assignee in assignedBlock.담당자목록)
+                        {
+                            <MudChip T="string" Value="@assignee.UserId" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">
+                                @($"{assignee.ResponsibilityName} · {assignee.DisplayName} ({assignee.RoleLabel})")
+                            </MudChip>
+                        }
+                    </MudChipSet>
+                }
+                else
+                {
+                    <span>아직 지정된 담당자가 없습니다.</span>
+                }
+            </section>
+
+            @if (Context.상세조회가능여부)
+            {
+                <CommunityLedgerBlockAssignmentPanel LedgerId="@Context.원장Id"
+                                                     BlockId="@SelectedNode.NodeId"
+                                                     Saved="RefreshAsync" />
+            }
+        }
+
+        @if (SelectedNode.OrganizationReferences is { Count: > 0 } organizationReferences)
+        {
+            <section class="ledger-diagram-detail__organizations" aria-label="연결 업체 후보">
+                <div class="ledger-diagram-detail__organizations-heading">
+                    <strong>연결 업체·기관</strong>
+                    <span>@($"{organizationReferences.Count:N0}곳")</span>
+                </div>
+                @foreach (var organization in organizationReferences)
+                {
+                    var websiteUrl = CommunityLedgerDiagramPresentation.ResolveExternalHttpUrl(organization.OfficialWebsiteUrl);
+                    var sourceUrl = CommunityLedgerDiagramPresentation.ResolveExternalHttpUrl(organization.SourceReferenceUrl);
+                    <article>
+                        <div>
+                            <strong>@organization.DisplayName</strong>
+                            <span>@organization.RoleLabel · @organization.CountryCode</span>
+                        </div>
+                        <MudChipSet T="string" ReadOnly="true">
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">
+                                @CommunityLedgerDiagramPresentation.ResolveOrganizationRelationshipLabel(organization)
+                            </MudChip>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">
+                                @CommunityLedgerDiagramPresentation.ResolveOrganizationVerificationLabel(organization)
+                            </MudChip>
+                        </MudChipSet>
+                        @if (websiteUrl is not null || sourceUrl is not null)
+                        {
+                            <div class="ledger-diagram-detail__organization-links">
+                                @if (websiteUrl is not null)
+                                {
+                                    <a href="@websiteUrl" target="_blank" rel="noopener noreferrer">공식 사이트</a>
+                                }
+                                @if (sourceUrl is not null && !string.Equals(sourceUrl, websiteUrl, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <a href="@sourceUrl" target="_blank" rel="noopener noreferrer">조사 출처</a>
+                                }
+                            </div>
+                        }
+                    </article>
+                }
+                <small>연결 정보는 조사 후보이며 선정·계약·면허 확인을 대신하지 않습니다.</small>
+            </section>
+        }
+
+        @if (SelectedBlock is { 항목.Count: > 0 } block)
+        {
+            <div class="ledger-diagram-detail__fields">
+                @foreach (var item in block.항목)
+                {
+                    <div>
+                        <span>@item.Key</span>
+                        <strong>@item.Value</strong>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="ledger-diagram-detail__empty-fields">
+                <MudIcon Icon="@Icons.Material.Filled.VisibilityOff" Color="Color.Default" />
+                <span>이 블록에 공개된 세부 항목이 없습니다.</span>
+            </div>
+        }
+
+        @if (Context.상세조회가능여부)
+        {
+            <CommunityLedgerNodeActionPanel NodeId="@SelectedNode.NodeId"
+                                                    Actions="@SelectedNodeActions"
+                                                    Completed="RefreshAsync" />
+        }
+    }
+
+    <p class="ledger-diagram-detail__privacy">
+        <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" />
+        공개 설정과 참여 권한에 따라 서버에서 허용한 항목만 표시합니다.
+    </p>
+</aside>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityPostLedgerContextResponse Context { get; set; } = default!;
+
+    [Parameter]
+    public string? SelectedNodeId { get; set; }
+
+    [Parameter]
+    public bool RealtimeConnected { get; set; }
+
+    [Parameter]
+    public string RealtimeStatus { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsRefreshing { get; set; }
+
+    [Parameter]
+    public EventCallback RefreshRequested { get; set; }
+
+    private DiagramNodeDto? SelectedNode
+        => CommunityLedgerDiagramPresentation.FindNode(Context, SelectedNodeId);
+
+    private PlatformCommunityLedgerBlockResponse? SelectedBlock
+        => CommunityLedgerDiagramPresentation.FindBlock(Context, SelectedNodeId);
+
+    private IReadOnlyList<PlatformCommunityLedgerNodeActionResponse> SelectedNodeActions
+        => CommunityLedgerDiagramPresentation.FindNodeActions(Context, SelectedNodeId);
+
+    private Task RefreshAsync() => RefreshRequested.InvokeAsync();
+}

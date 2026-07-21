@@ -1,0 +1,144 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Contracts.Common.Community
+
+@{
+    var nodeLayouts = CommunityLedgerDiagramPresentation.BuildNodeLayouts(Diagram);
+    var canvasHeight = CommunityLedgerDiagramPresentation.BuildCanvasHeight(nodeLayouts.Count);
+}
+
+<div class="ledger-diagram-detail__canvas-section">
+    <div class="ledger-diagram-detail__canvas-heading">
+        <div>
+            <MudIcon Icon="@Icons.Material.Filled.AccountTree" Color="Color.Primary" />
+            <strong>@(string.IsNullOrWhiteSpace(Diagram.DiagramName) ? "원장 흐름" : Diagram.DiagramName)</strong>
+        </div>
+        <div class="ledger-diagram-detail__canvas-meta">
+            <span>@($"{Diagram.Nodes.Count}개 블록 · {Diagram.Edges.Count}개 연결")</span>
+            <span class="ledger-diagram-detail__legend" aria-label="노드 상태 범례">
+                <i class="ledger-diagram-detail__legend-dot ledger-diagram-detail__legend-dot--complete"></i>완료
+                <i class="ledger-diagram-detail__legend-dot ledger-diagram-detail__legend-dot--active"></i>진행
+                <i class="ledger-diagram-detail__legend-dot ledger-diagram-detail__legend-dot--upcoming"></i>예정
+            </span>
+        </div>
+    </div>
+
+    <div class="ledger-diagram-detail__desktop-scroll">
+        <div class="ledger-diagram-detail__canvas" style="@($"height:{canvasHeight}px")">
+            <svg class="ledger-diagram-detail__edges"
+                 viewBox="@($"0 0 {CommunityLedgerDiagramPresentation.CanvasWidth} {canvasHeight}")"
+                 preserveAspectRatio="xMinYMin meet"
+                 aria-hidden="true">
+                <defs>
+                    <marker id="ledger-detail-arrow"
+                            markerWidth="9"
+                            markerHeight="9"
+                            refX="8"
+                            refY="4.5"
+                            orient="auto">
+                        <path d="M 0 0 L 9 4.5 L 0 9 z" class="ledger-diagram-detail__arrow" />
+                    </marker>
+                </defs>
+                @foreach (var edge in Diagram.Edges)
+                {
+                    var from = nodeLayouts.FirstOrDefault(item =>
+                        string.Equals(item.Node.NodeId, edge.FromNodeId, StringComparison.OrdinalIgnoreCase));
+                    var to = nodeLayouts.FirstOrDefault(item =>
+                        string.Equals(item.Node.NodeId, edge.ToNodeId, StringComparison.OrdinalIgnoreCase));
+                    if (from is not null && to is not null)
+                    {
+                        <path d="@CommunityLedgerDiagramPresentation.BuildEdgePath(from, to)"
+                              class="ledger-diagram-detail__edge"
+                              marker-end="url(#ledger-detail-arrow)" />
+                    }
+                }
+            </svg>
+
+            @foreach (var nodeLayout in nodeLayouts)
+            {
+                var assigneeSummary = CommunityLedgerDiagramPresentation.BuildAssigneeSummary(Context, nodeLayout.Node.NodeId);
+                <button type="button"
+                        class="@CommunityLedgerDiagramPresentation.BuildNodeClass(Context, nodeLayout.Node, SelectedNodeId)"
+                        style="@CommunityLedgerDiagramPresentation.BuildNodeStyle(nodeLayout)"
+                        aria-pressed="@(CommunityLedgerDiagramPresentation.IsSelected(nodeLayout.Node.NodeId, SelectedNodeId) ? "true" : "false")"
+                        @onclick="@(() => SelectNodeAsync(nodeLayout.Node.NodeId))">
+                    <span class="ledger-diagram-detail__node-type">
+                        <span class="ledger-diagram-detail__node-icon">
+                            <MudIcon Icon="@CommunityLedgerDiagramPresentation.ResolveNodeIcon(nodeLayout.Node)" Size="Size.Small" />
+                        </span>
+                        @CommunityLedgerDiagramPresentation.ResolveNodeTypeLabel(nodeLayout.Node)
+                        @if (nodeLayout.Node.OrganizationReferences?.Count > 0)
+                        {
+                            <span class="ledger-diagram-detail__node-organization-count">@($"업체 {nodeLayout.Node.OrganizationReferences.Count}")</span>
+                        }
+                    </span>
+                    <strong>@nodeLayout.Node.Title</strong>
+                    @if (!string.IsNullOrWhiteSpace(assigneeSummary))
+                    {
+                        <small class="ledger-diagram-detail__node-assignee">담당 · @assigneeSummary</small>
+                    }
+                    <small class="ledger-diagram-detail__node-state">
+                        <i></i>
+                        @CommunityLedgerDiagramPresentation.BuildNodeState(Context, nodeLayout.Node)
+                    </small>
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="ledger-diagram-detail__mobile-flow" aria-label="모바일 원장 흐름">
+        @foreach (var node in CommunityLedgerDiagramPresentation.OrderedNodes(Diagram))
+        {
+            var assigneeSummary = CommunityLedgerDiagramPresentation.BuildAssigneeSummary(Context, node.NodeId);
+            <button type="button"
+                    class="@CommunityLedgerDiagramPresentation.BuildMobileNodeClass(Context, node, SelectedNodeId)"
+                    aria-pressed="@(CommunityLedgerDiagramPresentation.IsSelected(node.NodeId, SelectedNodeId) ? "true" : "false")"
+                    @onclick="@(() => SelectNodeAsync(node.NodeId))">
+                <span class="ledger-diagram-detail__mobile-step">@CommunityLedgerDiagramPresentation.BuildNodeSequence(Diagram, node)</span>
+                <span class="ledger-diagram-detail__mobile-content">
+                    <span class="ledger-diagram-detail__mobile-type">
+                        <MudIcon Icon="@CommunityLedgerDiagramPresentation.ResolveNodeIcon(node)" Size="Size.Small" />
+                        @CommunityLedgerDiagramPresentation.ResolveNodeTypeLabel(node)
+                        @if (node.OrganizationReferences?.Count > 0)
+                        {
+                            <span class="ledger-diagram-detail__node-organization-count">@($"업체 {node.OrganizationReferences.Count}")</span>
+                        }
+                    </span>
+                    <strong>@node.Title</strong>
+                    @if (!string.IsNullOrWhiteSpace(assigneeSummary))
+                    {
+                        <small class="ledger-diagram-detail__mobile-assignee">담당 · @assigneeSummary</small>
+                    }
+                    <small class="ledger-diagram-detail__mobile-state">
+                        <i></i>
+                        @CommunityLedgerDiagramPresentation.BuildNodeState(Context, node)
+                    </small>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Default" />
+            </button>
+            @foreach (var edge in CommunityLedgerDiagramPresentation.OutgoingEdges(Diagram, node.NodeId))
+            {
+                <div class="ledger-diagram-detail__mobile-edge">
+                    <MudIcon Icon="@Icons.Material.Filled.South" Color="Color.Primary" Size="Size.Small" />
+                    <span>@(string.IsNullOrWhiteSpace(edge.Label) ? "다음" : edge.Label)</span>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityPostLedgerContextResponse Context { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public DiagramSnapshotDto Diagram { get; set; } = default!;
+
+    [Parameter]
+    public string? SelectedNodeId { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SelectedNodeChanged { get; set; }
+
+    private Task SelectNodeAsync(string nodeId)
+        => SelectedNodeChanged.InvokeAsync(nodeId);
+}
