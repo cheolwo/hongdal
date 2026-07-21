@@ -1,4 +1,5 @@
 using Ssalddel.Domain.AgriculturalFisheries;
+using Ssalddel.Domain.FoodCulture;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
@@ -20,6 +21,15 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
 
     public DbSet<KamisPriceObservation> KamisPriceObservations => Set<KamisPriceObservation>();
 
+    public DbSet<OfficialFoodRecipeSource> OfficialFoodRecipeSources => Set<OfficialFoodRecipeSource>();
+
+    public DbSet<OfficialFoodDish> OfficialFoodDishes => Set<OfficialFoodDish>();
+
+    public DbSet<OfficialFoodRecipeVariant> OfficialFoodRecipeVariants => Set<OfficialFoodRecipeVariant>();
+
+    public DbSet<OfficialFoodRecipeCollectionRun> OfficialFoodRecipeCollectionRuns =>
+        Set<OfficialFoodRecipeCollectionRun>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UsdaNassPriceCollectionRunConfiguration());
@@ -27,5 +37,9 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new HsUsdaCommodityMappingConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceCollectionRunConfiguration());
         modelBuilder.ApplyConfiguration(new KamisPriceObservationConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodRecipeSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodDishConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodRecipeVariantConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodRecipeCollectionRunConfiguration());
     }
 }

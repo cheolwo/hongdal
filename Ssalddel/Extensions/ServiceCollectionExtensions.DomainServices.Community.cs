@@ -83,6 +83,10 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityInformationCandidateSource, CommunityUsdaNassInformationCandidateSource>();
         services.AddScoped<ICommunityInformationCandidateSource, CommunityAbsFoodPriceIndexInformationCandidateSource>();
         services.AddScoped<ICommunityInformationCandidateSource, CommunityFishCooperativeInformationCandidateSource>();
+        services.AddScoped<ICommunityInformationCandidateSource, CommunityMfdsCookRecipeCandidateSource>();
+        services.AddScoped<ICommunityInformationCandidateSource, CommunityRdaLocalFoodRecipeCandidateSource>();
+        services.AddScoped<ICommunityInformationCandidateSource, CommunityMaffRegionalCuisineRecipeCandidateSource>();
+        services.AddScoped<ICommunityInformationCandidateSource, CommunityNhsHealthierFamiliesRecipeCandidateSource>();
         services.AddScoped<ICommunityInformationCollectionService, CommunityInformationCollectionService>();
         services.AddScoped<ICommunityAuthoringAiEvidenceTool, CommunityInformationAuthoringAiEvidenceTool>();
         services.AddScoped<ICommunityAuthoringAiEvidenceTool, YouTubeSocialContextAuthoringAiEvidenceTool>();

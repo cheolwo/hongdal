@@ -1,6 +1,8 @@
 using System.Net;
 using Ssalddel.Services.AgriculturalFisheries.Information;
 using Ssalddel.Services.AgriculturalFisheries.ImportReadiness;
+using Ssalddel.Services.FoodCulture;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using 살뜰.Services.External.PublicData;
 using 살뜰.Services.Options;
@@ -12,6 +14,7 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddAgriculturalFisheriesInformationModule(
         this IServiceCollection services)
     {
+        services.TryAddSingleton(TimeProvider.System);
         services.AddHttpClient<IAtDomesticFoodPriceLookupService, AtDomesticFoodPriceLookupService>(
             (serviceProvider, client) =>
             {
@@ -65,6 +68,55 @@ public static partial class ServiceCollectionExtensions
                 })
             .RemoveAllLoggers();
         services.AddScoped<IKamisPriceArchiveService, KamisPriceArchiveService>();
+        services
+            .AddHttpClient<MfdsCookRecipeRemoteSource>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.MfdsCookRecipe.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Ssalddel-Official-Food-Recipe-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
+            serviceProvider.GetRequiredService<MfdsCookRecipeRemoteSource>());
+        services
+            .AddHttpClient<RdaLocalFoodRemoteSource>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.RdaLocalFood.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Ssalddel-Official-Food-Recipe-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(90, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
+            serviceProvider.GetRequiredService<RdaLocalFoodRemoteSource>());
+        services
+            .AddHttpClient<MaffRegionalCuisineRemoteSource>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.MaffRegionalCuisine.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Ssalddel-Official-Food-Recipe-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
+            serviceProvider.GetRequiredService<MaffRegionalCuisineRemoteSource>());
+        services
+            .AddHttpClient<NhsHealthierFamiliesRecipeRemoteSource>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.NhsHealthierFamiliesRecipes.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Ssalddel-Official-Food-Recipe-Collector/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(30, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
+            serviceProvider.GetRequiredService<NhsHealthierFamiliesRecipeRemoteSource>());
+        services.AddScoped<IOfficialFoodRecipeArchiveService, OfficialFoodRecipeArchiveService>();
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();
         services.AddScoped<I미국농수산가격조회Service, 미국농수산가격조회Service>();

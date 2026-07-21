@@ -7,6 +7,10 @@ public static class CommunityInformationSourceKeys
     public const string UsdaNassPriceObservations = "usda-nass-price-observations";
     public const string AbsFoodPriceIndex = "abs-cpi-food-price-index";
     public const string FishCooperativeGeneralStatistics = "fish-cooperative-general-statistics";
+    public const string MfdsCookRecipes = "mfds-cookrcp01";
+    public const string RdaLocalFoodRecipes = "rda-local-food";
+    public const string MaffRegionalCuisineRecipes = "maff-regional-cuisines";
+    public const string NhsHealthierFamiliesRecipes = "nhs-healthier-families-recipes";
     public const string RedditPublicPosts = "reddit-public-posts";
     public const string RedditRssPublicPosts = "reddit-rss-public-posts";
     public const string XPublicPosts = "x-public-posts";

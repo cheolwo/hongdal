@@ -9,6 +9,7 @@ flowchart LR
     A["YouTube 채널 감시"] --> C["기존 수집·보관 DB"]
     B["KAMIS 공공데이터 배치"] --> C
     B1["USDA NASS 월별 가격 배치"] --> C
+    B4["각국 정부 공식 음식 레시피 수집"] --> C
     C --> D["공통 정보 후보 조회"]
     B3["ABS 식품 소비자물가지수"] -->|명시 선택 시 조회| D
     B2["수산업협동조합 월별 통계"] -->|명시 선택 시 조회| D
@@ -31,6 +32,7 @@ flowchart LR
 | ABS Consumer Price Index | 선택 기간의 호주 전국 월별 식품 소비자물가지수 | 사용자가 원천을 명시 선택하고 식품 지수 항목을 검색한 경우 | 실제 A$/kg 단가가 아닌 지수다. 같은 지수·측정방식·지역·기준시점 계열만 비교한다. |
 | 금융위원회 금융통계 수산업협동조합정보 | 사용자가 선택한 최대 13개월의 조합별 임직원 일반현황 | 기준년월, 조합명, 임직원 구분과 인원수가 있는 공식 관측값 | 같은 조합·같은 임직원 구분만 비교한다. 현재 영업상태, 제휴, 재무건전성 또는 물류 수행능력으로 해석하지 않는다. |
 | Reddit·X·Instagram·Facebook 공개 게시물 | 관리자 요청에 따른 Apify Actor dataset 결과 또는 Reddit 공개 RSS/Atom 피드 | YouTube 영상의 핵심·인접 주제와 연결된 공개 게시물 후보 | 원문 링크와 짧은 발췌만 검수 대기로 반환하며 자동 게시하지 않는다. Adapter와 비용·권한 경계는 [Apify SNS 공개 자료 조사 모듈](ApifySocialMediaResearch.md)에 둔다. |
+| 식약처·농촌진흥청·일본 MAFF·영국 NHS 공식 음식 레시피 | 권리 정책과 함께 보관한 대표 음식 후보·출처별 레시피 변형 | freshness가 유효하고 자동 수집이 허용된 DB 원문 | 모두 검토 대기로만 제공한다. 이미지 파일은 저장하지 않고 후보 thumbnail도 반환하지 않는다. 세부 기준은 [각국 정부 공식 음식 레시피 아카이브](OfficialGovernmentFoodRecipeArchive.md)에 둔다. |
 
 YouTube 업로드 확인은 채널의 업로드 재생목록과 `playlistItems.list`를 사용한다. 일반 검색 결과를 반복 수집하는 크롤러로 운영하지 않는다. 공식 구현 기준은 [YouTube PlaylistItems: list](https://developers.google.com/youtube/v3/docs/playlistItems/list)와 [YouTube API 개발자 정책](https://developers.google.com/youtube/terms/developer-policies)을 따른다.
 
@@ -63,6 +65,10 @@ ABS는 [Data API](https://www.abs.gov.au/statistics/application-programming-inte
 | --- | --- | --- |
 | `GET` | `/api/v1/admin/content/information/sources` | 현재 공통 후보를 제공하는 원천과 게시 정책 조회 |
 | `GET` | `/api/v1/admin/content/information/candidates` | 원천·국가·검수상태·검색어별 최근 후보 조회 |
+| `GET` | `/api/v1/admin/content/official-food-recipes/sources` | 공식 음식 원천의 국가·언어·권리·갱신·자동화 정책 조회 |
+| `GET` | `/api/v1/admin/content/official-food-recipes/dishes` | 국가·지역·출처별 대표 음식 검토 후보 조회 |
+| `GET` | `/api/v1/admin/content/official-food-recipes/dishes/{dishKey}/variants` | 한 음식의 출처별 재료·조리 단계와 수집 당시 권리 snapshot 조회 |
+| `POST` | `/api/v1/admin/content/official-food-recipes/collections` | 명시한 원천을 제한된 페이지·항목 수로 DB에 수집 |
 | `POST` | `/api/v1/admin/content/information/authoring/ai-drafts` | 허용된 자료 Adapter와 현재 글쓰기 문맥으로 검토 전용 LLM 초안 생성 |
 | `POST` | `/api/v1/admin/content/information/authoring/images/prompt-plan` | 현재 글을 연속 문맥으로 나누고 문맥별 Kie.ai 프롬프트 계획 생성. 외부 이미지 API는 호출하지 않음 |
 | `POST` | `/api/v1/admin/content/information/authoring/images` | Kie.ai GPT Image 글쓰기 이미지 작업 등록 |

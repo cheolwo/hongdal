@@ -31,6 +31,7 @@ public sealed class SsalddelCommunityV0ModuleMetadataTests
         Assert.Contains(modules, module => module.Component == typeof(Mongo커뮤니티원장투영작업저장소));
         Assert.Contains(modules, module => module.Component == typeof(CommunityBoardWritePolicy));
         Assert.Contains(modules, module => module.Component == typeof(CommunityInformationCollectionController));
+        Assert.Contains(modules, module => module.Component == typeof(OfficialFoodRecipeArchiveController));
         Assert.Contains(modules, module => module.Component == typeof(CommunityContentApplicationModule));
         Assert.Contains(modules, module => module.Component == typeof(CommunityParticipationApplicationModule));
         Assert.Contains(modules, module => module.Component == typeof(CommunityLedgerApplicationModule));

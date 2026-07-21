@@ -43,6 +43,8 @@ using Microsoft.Extensions.FileProviders;
 using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Services.AgriculturalFisheries.Information;
+using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Services.FoodCulture;
 using Ssalddel.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -321,6 +323,64 @@ if (args.Any(argument =>
         archiveResult.UpdatedCount,
         archiveResult.ExistingCount,
         archiveResult.LatestSurveyDate);
+    return;
+}
+
+var officialFoodRecipeSourceKey = args.Any(argument =>
+        string.Equals(argument, "--collect-mfds-recipes", StringComparison.OrdinalIgnoreCase))
+    ? OfficialFoodRecipeSourceKeys.MfdsCookRecipe
+    : args.Any(argument =>
+        string.Equals(argument, "--collect-rda-local-food", StringComparison.OrdinalIgnoreCase))
+        ? OfficialFoodRecipeSourceKeys.RdaLocalFood
+        : args.Any(argument =>
+            string.Equals(argument, "--collect-maff-regional-cuisines", StringComparison.OrdinalIgnoreCase))
+            ? OfficialFoodRecipeSourceKeys.MaffRegionalCuisine
+            : args.Any(argument =>
+                string.Equals(argument, "--collect-nhs-recipes", StringComparison.OrdinalIgnoreCase))
+                ? OfficialFoodRecipeSourceKeys.NhsHealthierFamilies
+                : args.Any(argument =>
+                    string.Equals(argument, "--collect-official-food-recipes", StringComparison.OrdinalIgnoreCase))
+                    ? args.FirstOrDefault(argument =>
+                            argument.StartsWith("--source=", StringComparison.OrdinalIgnoreCase))?
+                        ["--source=".Length..]
+                    : null;
+if (!string.IsNullOrWhiteSpace(officialFoodRecipeSourceKey))
+{
+    var maxPagesArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--max-pages=", StringComparison.OrdinalIgnoreCase));
+    var maxPages = int.TryParse(
+        maxPagesArgument?["--max-pages=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedMaxPages)
+        ? parsedMaxPages
+        : 1;
+    var maxItemsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--max-items=", StringComparison.OrdinalIgnoreCase));
+    var maxItems = int.TryParse(
+        maxItemsArgument?["--max-items=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedMaxItems)
+        ? parsedMaxItems
+        : 100;
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService = scope.ServiceProvider.GetRequiredService<IOfficialFoodRecipeArchiveService>();
+    var archiveResult = await archiveService.CollectAsync(new OfficialFoodRecipeCollectionRequest(
+        officialFoodRecipeSourceKey,
+        maxPages,
+        maxItems));
+    app.Logger.LogInformation(
+        "공식 음식 레시피 DB 저장 완료. Source={SourceKey}, RunId={RunId}, Fetched={Fetched}, Inserted={Inserted}, Updated={Updated}, Existing={Existing}",
+        archiveResult.SourceKey,
+        archiveResult.CollectionRunId,
+        archiveResult.FetchedCount,
+        archiveResult.InsertedCount,
+        archiveResult.UpdatedCount,
+        archiveResult.ExistingCount);
     return;
 }
 

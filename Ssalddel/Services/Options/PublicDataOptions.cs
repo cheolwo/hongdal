@@ -33,6 +33,14 @@ public sealed class PublicDataOptions
     public TraditionalMarketOptions TraditionalMarket { get; set; } = new();
 
     public FishCooperativeStatisticsOptions FishCooperativeStatistics { get; set; } = new();
+
+    public MfdsCookRecipeOptions MfdsCookRecipe { get; set; } = new();
+
+    public RdaLocalFoodOptions RdaLocalFood { get; set; } = new();
+
+    public MaffRegionalCuisineOptions MaffRegionalCuisine { get; set; } = new();
+
+    public NhsHealthierFamiliesRecipeOptions NhsHealthierFamiliesRecipes { get; set; } = new();
 }
 
 public sealed class RoadAddressOptions
@@ -160,4 +168,42 @@ public sealed class FishCooperativeStatisticsOptions
     public string GeneralStatisticsTitle { get; set; } = "수협_일반현황_임직원현황";
 
     public int PageSize { get; set; } = 1000;
+}
+
+public sealed class MfdsCookRecipeOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://openapi.foodsafetykorea.go.kr";
+
+    public string ServiceId { get; set; } = "COOKRCP01";
+
+    public int PageSize { get; set; } = 1000;
+}
+
+public sealed class RdaLocalFoodOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://api.nongsaro.go.kr";
+
+    public string ListPath { get; set; } = "/service/nvpcFdCkry/fdNmLst";
+
+    public string DetailPath { get; set; } = "/service/nvpcFdCkry/fdNmDtl";
+
+    public int PageSize { get; set; } = 100;
+}
+
+public sealed class MaffRegionalCuisineOptions
+{
+    public string BaseUrl { get; set; } = "https://www.maff.go.jp";
+
+    public string IndexPath { get; set; } = "/e/policies/market/k_ryouri/";
+}
+
+public sealed class NhsHealthierFamiliesRecipeOptions
+{
+    public string BaseUrl { get; set; } = "https://www.nhs.uk";
+
+    public string IndexPath { get; set; } = "/healthier-families/recipes/";
 }
