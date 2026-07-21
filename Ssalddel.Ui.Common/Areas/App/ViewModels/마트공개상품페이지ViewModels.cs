@@ -145,20 +145,143 @@ public sealed partial class 마트공개상품상세ViewModel(
     }
 }
 
-/// <summary>기능 접근, 공개 목록과 정확한 상세 ViewModel을 조립합니다.</summary>
+/// <summary>완료된 구매 원장에 접근할 수 있는 사용자의 명시적 후기 작성만 수행합니다.</summary>
+public sealed partial class 마트공개상품후기작성ViewModel : 업무작업ViewModelBase
+{
+    private readonly I마트공개상품후기작성Service _service;
+
+    public 마트공개상품후기작성ViewModel(
+        I마트공개상품후기작성Service service,
+        ISsalddel현재사용자Context currentUserContext)
+    {
+        _service = service;
+        현재사용자Context연결(currentUserContext);
+    }
+
+    [ObservableProperty]
+    public partial long? 상품Id { get; private set; }
+
+    [ObservableProperty]
+    public partial string 작성자표시명 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 글비밀번호 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 제목 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string 본문 { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial 마트공개상품구매후기응답? 작성결과 { get; private set; }
+
+    public void 준비(long productId, string? productName)
+    {
+        if (productId <= 0)
+        {
+            return;
+        }
+
+        if (상품Id == productId)
+        {
+            return;
+        }
+
+        상품Id = productId;
+        작성자표시명 = 현재사용자.UserName?.Trim() ?? string.Empty;
+        글비밀번호 = string.Empty;
+        제목 = string.IsNullOrWhiteSpace(productName)
+            ? "구매 후기"
+            : $"{productName.Trim()} 구매 후기";
+        본문 = string.Empty;
+        작성결과 = null;
+        작업상태초기화();
+    }
+
+    public void 선택해제()
+    {
+        if (처리중)
+        {
+            return;
+        }
+
+        상품Id = null;
+        글비밀번호 = string.Empty;
+        본문 = string.Empty;
+        작성결과 = null;
+        작업상태초기화();
+    }
+
+    public async Task<bool> 작성Async(CancellationToken cancellationToken = default)
+    {
+        if (!사용자확인됨)
+        {
+            return 유효성실패("구매후기는 로그인한 원장 참여자만 작성할 수 있습니다.");
+        }
+
+        if (상품Id is not long productId || productId <= 0)
+        {
+            return 유효성실패("후기를 작성할 상품을 다시 선택해 주세요.");
+        }
+
+        if (string.IsNullOrWhiteSpace(작성자표시명) || 작성자표시명.Trim().Length > 40)
+        {
+            return 유효성실패("표시명은 1자 이상 40자 이하로 입력해 주세요.");
+        }
+
+        if (string.IsNullOrWhiteSpace(글비밀번호)
+            || 글비밀번호.Trim().Length is < 4 or > 100)
+        {
+            return 유효성실패("글 비밀번호는 4자 이상 100자 이하로 입력해 주세요.");
+        }
+
+        if (string.IsNullOrWhiteSpace(제목) || 제목.Trim().Length > 160)
+        {
+            return 유효성실패("후기 제목은 1자 이상 160자 이하로 입력해 주세요.");
+        }
+
+        if (string.IsNullOrWhiteSpace(본문) || 본문.Trim().Length > 4_000)
+        {
+            return 유효성실패("후기 내용은 1자 이상 4,000자 이하로 입력해 주세요.");
+        }
+
+        return await 작업실행Async(
+            async token =>
+            {
+                작성결과 = await _service.작성Async(productId, new 마트공개상품구매후기작성요청
+                {
+                    작성자표시명 = 작성자표시명.Trim(),
+                    글비밀번호 = 글비밀번호,
+                    제목 = 제목.Trim(),
+                    본문 = 본문.Trim()
+                }, token);
+                글비밀번호 = string.Empty;
+                본문 = string.Empty;
+            },
+            "구매후기를 완료 사례·후기 게시판에 등록했습니다.",
+            cancellationToken,
+            ex => $"구매후기를 등록하지 못했습니다. {ex.Message}");
+    }
+}
+
+/// <summary>기능 접근, 공개 목록, 정확한 상세와 구매후기 ViewModel을 조립합니다.</summary>
 public sealed class 마트공개상품PageViewModel : 조립ViewModelBase
 {
     public 마트공개상품PageViewModel(
         마트페이지접근ViewModel access,
         마트공개상품목록ViewModel list,
-        마트공개상품상세ViewModel detail)
+        마트공개상품상세ViewModel detail,
+        마트공개상품후기작성ViewModel review)
     {
         접근 = 하위ViewModel등록(access);
         목록 = 하위ViewModel등록(list);
         상세 = 하위ViewModel등록(detail);
+        후기 = 하위ViewModel등록(review);
     }
 
     public 마트페이지접근ViewModel 접근 { get; }
     public 마트공개상품목록ViewModel 목록 { get; }
     public 마트공개상품상세ViewModel 상세 { get; }
+    public 마트공개상품후기작성ViewModel 후기 { get; }
 }

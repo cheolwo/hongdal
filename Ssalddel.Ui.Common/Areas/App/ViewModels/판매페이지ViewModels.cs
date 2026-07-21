@@ -8,6 +8,8 @@ public sealed class 판매페이지작성ViewModel(I판매페이지Client client
 {
     private 판매페이지초안생성요청 _초안 = 새초안();
     private 판매페이지초안응답? _저장결과;
+    private 판매페이지공개상품Seed? _공개상품근거;
+    private string? _적용된공개상품근거Fingerprint;
     private bool _처리중;
     private string? _오류메시지;
     private string _상태메시지 = "직접 입력하거나 외부 상품 상세를 참고해 시작할 수 있습니다.";
@@ -22,6 +24,12 @@ public sealed class 판매페이지작성ViewModel(I판매페이지Client client
     {
         get => _저장결과;
         private set => SetProperty(ref _저장결과, value);
+    }
+
+    public 판매페이지공개상품Seed? 공개상품근거
+    {
+        get => _공개상품근거;
+        private set => SetProperty(ref _공개상품근거, value);
     }
 
     public bool 처리중
@@ -45,6 +53,30 @@ public sealed class 판매페이지작성ViewModel(I판매페이지Client client
     public void 입력변경알림()
     {
         오류메시지 = null;
+        OnPropertyChanged(nameof(초안));
+    }
+
+    public void 공개상품근거적용(판매페이지공개상품Seed? seed)
+    {
+        if (seed is null
+            || seed.SourceProductId <= 0
+            || string.IsNullOrWhiteSpace(seed.ProductName)
+            || string.Equals(_적용된공개상품근거Fingerprint, seed.Fingerprint, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _적용된공개상품근거Fingerprint = seed.Fingerprint;
+        공개상품근거 = seed;
+        저장결과 = null;
+        오류메시지 = null;
+        초안.원본공개상품Id = seed.SourceProductId;
+        초안.상품명 = 자르기(seed.ProductName, 300);
+        초안.한줄소개 = seed.CompletedLedgerVerified
+            ? 자르기($"완료 구매 원장과 공개 후기 {Math.Max(0, seed.ReviewCount):N0}건을 참고한 상품", 500)
+            : 자르기(seed.Description, 500);
+        초안.상세설명 = 자르기(seed.BuildSuggestedDescription(), 4_000);
+        상태메시지 = "공개 상품과 완료 원장의 공개 근거를 초안에 가져왔습니다. 판매 조건과 상품 사실을 확인한 뒤 직접 저장해 주세요.";
         OnPropertyChanged(nameof(초안));
     }
 
@@ -81,6 +113,8 @@ public sealed class 판매페이지작성ViewModel(I판매페이지Client client
     {
         초안 = 새초안();
         저장결과 = null;
+        공개상품근거 = null;
+        _적용된공개상품근거Fingerprint = null;
         오류메시지 = null;
         상태메시지 = "새 판매 페이지 내용을 입력해 주세요.";
     }
@@ -95,4 +129,10 @@ public sealed class 판매페이지작성ViewModel(I판매페이지Client client
             공동주문허용 = true,
             공동주문최소수량 = 10
         };
+
+    private static string 자르기(string? value, int maxLength)
+    {
+        var normalized = value?.Trim() ?? string.Empty;
+        return normalized.Length <= maxLength ? normalized : normalized[..maxLength];
+    }
 }

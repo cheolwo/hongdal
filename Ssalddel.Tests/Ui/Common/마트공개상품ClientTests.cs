@@ -38,11 +38,36 @@ public sealed class 마트공개상품ClientTests
         Assert.True(api.LastAllowNotFound);
     }
 
+    [Fact]
+    public async Task 후기Client는_정확한상품하위경로에Post하고404를숨기지않는다()
+    {
+        var response = new 마트공개상품구매후기응답 { 게시글Id = 92, 제목 = "구매 후기" };
+        var api = new RecordingJsonApiClient { Response = response };
+        var client = new 마트공개상품후기Client(api);
+        var request = new 마트공개상품구매후기작성요청
+        {
+            작성자표시명 = "구매자",
+            글비밀번호 = "1234",
+            제목 = "구매 후기",
+            본문 = "좋았습니다."
+        };
+
+        var result = await client.작성Async(41, request);
+
+        Assert.Same(response, result);
+        Assert.Equal(HttpMethod.Post, api.LastMethod);
+        Assert.Equal("api/v1/orderer/mart/products/41/reviews", api.LastPath);
+        Assert.False(api.LastAllowNotFound);
+        Assert.Same(request, api.LastRequest);
+    }
+
     private sealed class RecordingJsonApiClient : ISsalddelJsonApiClient
     {
         public object? Response { get; init; }
         public string? LastPath { get; private set; }
         public bool LastAllowNotFound { get; private set; }
+        public HttpMethod? LastMethod { get; private set; }
+        public object? LastRequest { get; private set; }
 
         public Task<TResponse?> GetAsync<TResponse>(string path, string operationName, bool allowNotFound = true, CancellationToken cancellationToken = default)
         {
@@ -52,7 +77,21 @@ public sealed class 마트공개상품ClientTests
         }
 
         public Task<TResponse?> SendAsync<TResponse>(HttpMethod method, string path, string operationName, bool allowNotFound = false, CancellationToken cancellationToken = default) => throw new NotSupportedException();
-        public Task<TResponse?> SendAsync<TRequest, TResponse>(HttpMethod method, string path, TRequest request, string operationName, bool allowNotFound = false, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<TResponse?> SendAsync<TRequest, TResponse>(
+            HttpMethod method,
+            string path,
+            TRequest request,
+            string operationName,
+            bool allowNotFound = false,
+            CancellationToken cancellationToken = default)
+        {
+            LastMethod = method;
+            LastPath = path;
+            LastRequest = request;
+            LastAllowNotFound = allowNotFound;
+            return Task.FromResult((TResponse?)Response);
+        }
         public Task SendAsync(HttpMethod method, string path, string operationName, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task SendAsync<TRequest>(HttpMethod method, string path, TRequest request, string operationName, CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }

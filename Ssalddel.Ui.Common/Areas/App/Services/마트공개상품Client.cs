@@ -83,3 +83,36 @@ public sealed class 마트공개상품Client(ISsalddelJsonApiClient apiClient)
             allowNotFound: true,
             cancellationToken);
 }
+
+public interface I마트공개상품후기작성Service
+{
+    Task<마트공개상품구매후기응답> 작성Async(
+        long productId,
+        마트공개상품구매후기작성요청 request,
+        CancellationToken cancellationToken = default);
+}
+
+public sealed class 마트공개상품후기Client(ISsalddelJsonApiClient apiClient)
+    : I마트공개상품후기작성Service
+{
+    public async Task<마트공개상품구매후기응답> 작성Async(
+        long productId,
+        마트공개상품구매후기작성요청 request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (productId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(productId));
+        }
+
+        return await apiClient.SendAsync<마트공개상품구매후기작성요청, 마트공개상품구매후기응답>(
+                   HttpMethod.Post,
+                   $"api/v1/orderer/mart/products/{productId}/reviews",
+                   request,
+                   "마트 공개 상품 구매후기 작성",
+                   allowNotFound: false,
+                   cancellationToken)
+               ?? throw new InvalidOperationException("마트 공개 상품 구매후기 응답이 비어 있습니다.");
+    }
+}

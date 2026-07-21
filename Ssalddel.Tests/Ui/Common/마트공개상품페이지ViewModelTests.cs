@@ -61,6 +61,49 @@ public sealed class 마트공개상품페이지ViewModelTests
         Assert.False(viewModel.사용가능);
     }
 
+    [Fact]
+    public async Task 후기ViewModel은_로그인사용자의명시적입력을완료원장후기요청으로전달한다()
+    {
+        var service = new FakeReviewService();
+        var viewModel = new 마트공개상품후기작성ViewModel(
+            service,
+            new FakeCurrentUserContext(new 현재사용자Snapshot("buyer-1", "감자 구매자", ["Orderer"])));
+        viewModel.준비(41, "제철 감자");
+        viewModel.글비밀번호 = "safe-password";
+        viewModel.본문 = "상품 상태와 공동구매 경험이 좋았습니다.";
+
+        var succeeded = await viewModel.작성Async();
+
+        Assert.True(succeeded);
+        Assert.Equal(41, service.LastProductId);
+        Assert.NotNull(service.LastRequest);
+        Assert.Equal("감자 구매자", service.LastRequest.작성자표시명);
+        Assert.Equal("제철 감자 구매 후기", service.LastRequest.제목);
+        Assert.Equal("상품 상태와 공동구매 경험이 좋았습니다.", service.LastRequest.본문);
+        Assert.Equal(string.Empty, viewModel.글비밀번호);
+        Assert.Equal(string.Empty, viewModel.본문);
+        Assert.True(viewModel.성공함);
+    }
+
+    [Fact]
+    public async Task 후기ViewModel은_익명사용자에게서버요청을보내지않는다()
+    {
+        var service = new FakeReviewService();
+        var viewModel = new 마트공개상품후기작성ViewModel(
+            service,
+            new FakeCurrentUserContext(현재사용자Snapshot.익명));
+        viewModel.준비(41, "제철 감자");
+        viewModel.작성자표시명 = "익명";
+        viewModel.글비밀번호 = "1234";
+        viewModel.본문 = "완료 후기";
+
+        var succeeded = await viewModel.작성Async();
+
+        Assert.False(succeeded);
+        Assert.Null(service.LastRequest);
+        Assert.Contains("로그인", viewModel.오류메시지);
+    }
+
     private sealed class FakeAccessService(bool enabled) : I마트페이지접근Service
     {
         public Task<bool> 기능활성여부Async(CancellationToken cancellationToken = default)
@@ -85,5 +128,34 @@ public sealed class 마트공개상품페이지ViewModelTests
             long productId,
             CancellationToken cancellationToken = default)
             => Task.FromResult(DetailResponse);
+    }
+
+    private sealed class FakeReviewService : I마트공개상품후기작성Service
+    {
+        public long? LastProductId { get; private set; }
+        public 마트공개상품구매후기작성요청? LastRequest { get; private set; }
+
+        public Task<마트공개상품구매후기응답> 작성Async(
+            long productId,
+            마트공개상품구매후기작성요청 request,
+            CancellationToken cancellationToken = default)
+        {
+            LastProductId = productId;
+            LastRequest = request;
+            return Task.FromResult(new 마트공개상품구매후기응답
+            {
+                게시글Id = 93,
+                제목 = request.제목,
+                본문요약 = request.본문,
+                작성자표시명 = request.작성자표시명,
+                작성시각Utc = new DateTime(2026, 7, 21, 9, 0, 0, DateTimeKind.Utc)
+            });
+        }
+    }
+
+    private sealed class FakeCurrentUserContext(현재사용자Snapshot user)
+        : ISsalddel현재사용자Context
+    {
+        public 현재사용자Snapshot 현재사용자 { get; } = user;
     }
 }
