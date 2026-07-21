@@ -8,7 +8,7 @@ namespace Ssalddel.Ui.Common.Areas.App.Services;
 [SsalddelCommunityV0Module(
     SsalddelCommunityV0ModuleKeys.Ui,
     SsalddelModuleKind.ClientComposition,
-    "커뮤니티 홈·게시판·글쓰기·다이어그램 ViewModel과 browser state adapter를 조립",
+    "커뮤니티 홈의 공개 게시판·연결 도구 ViewModel과 browser state adapter를 조립",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.IndependentExecution,
     Boundary = "후속 업무 proxy의 DI 등록은 운영 노출을 뜻하지 않으며 메뉴와 API는 버전 기능 플래그를 따라야 합니다.")]
 internal static class CommunityPlatformUiModule
@@ -53,6 +53,8 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<PlatformCommunityDiagramWorkspaceViewModel>();
         services.TryAddTransient<PlatformCommunityWishFlowViewModel>();
         services.TryAddTransient<PlatformCommunityWarehouseProxyViewModel>();
+        services.TryAddTransient<PlatformCommunityPublicBoardViewModel>();
+        services.TryAddTransient<PlatformCommunityConnectedToolsViewModel>();
         services.TryAddTransient<PlatformCommunityHomePageViewModel>();
         services.TryAddTransient<ICommunityCollectiveActionSource, PlatformCommunityCollectiveActionSource>();
         services.TryAddTransient<CommunityActionJourneyNavigationViewModel>();

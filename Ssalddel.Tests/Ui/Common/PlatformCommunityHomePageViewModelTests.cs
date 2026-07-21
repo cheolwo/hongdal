@@ -27,19 +27,25 @@ public sealed class PlatformCommunityHomePageViewModelTests
         var evidenceChart = new CommunityAuthoringEvidenceChartViewModel();
         using var services = new ServiceCollection().BuildServiceProvider();
         var warehouseProxy = new PlatformCommunityWarehouseProxyViewModel(services);
-        using var page = new PlatformCommunityHomePageViewModel(
+        var publicBoard = new PlatformCommunityPublicBoardViewModel(
             composer,
             postList,
             shell,
             boards,
             engagement,
-            ledgerPicker,
+            ledgerPicker);
+        var connectedTools = new PlatformCommunityConnectedToolsViewModel(
             foodDiscovery,
             diagramWorkspace,
             wishFlow,
             evidenceChart,
             warehouseProxy);
+        using var page = new PlatformCommunityHomePageViewModel(
+            publicBoard,
+            connectedTools);
 
+        Assert.Same(publicBoard, page.PublicBoard);
+        Assert.Same(connectedTools, page.ConnectedTools);
         Assert.Same(composer, page.Composer);
         Assert.Same(postList, page.PostList);
         Assert.Same(shell, page.Shell);
@@ -52,6 +58,12 @@ public sealed class PlatformCommunityHomePageViewModelTests
         Assert.Same(evidenceChart, page.EvidenceChart);
         Assert.Same(warehouseProxy, page.WarehouseProxy);
         Assert.Same(engagement.Journeys, page.ActionJourneys);
+
+        var pageChangeCount = 0;
+        page.PropertyChanged += (_, _) => pageChangeCount++;
+        shell.IsLoading = false;
+
+        Assert.True(pageChangeCount > 0);
     }
 
     [Fact]
@@ -59,19 +71,23 @@ public sealed class PlatformCommunityHomePageViewModelTests
     {
         var service = CreateService();
         using var services = new ServiceCollection().BuildServiceProvider();
-        using var page = new PlatformCommunityHomePageViewModel(
+        var publicBoard = new PlatformCommunityPublicBoardViewModel(
             new CommunityPostComposerViewModel(service, new EmptyDraftStore()),
             new CommunityPostListPageViewModel(service),
             new PlatformCommunityHomeShellViewModel(),
             new PlatformCommunityBoardWorkspaceViewModel(service),
             new PlatformCommunityPostEngagementViewModel(service),
-            new PlatformCommunityLedgerPickerViewModel(service),
+            new PlatformCommunityLedgerPickerViewModel(service));
+        var connectedTools = new PlatformCommunityConnectedToolsViewModel(
             new YouTubeFoodCommunityDiscoveryViewModel(
                 new YouTubeFoodCommunityDiscoveryService(new HttpClient(), null!)),
             new PlatformCommunityDiagramWorkspaceViewModel(),
             new PlatformCommunityWishFlowViewModel(),
             new CommunityAuthoringEvidenceChartViewModel(),
             new PlatformCommunityWarehouseProxyViewModel(services));
+        using var page = new PlatformCommunityHomePageViewModel(
+            publicBoard,
+            connectedTools);
 
         page.Composer.Draft.Title = "함께 주문하면 배송비를 줄일 수 있을까";
         page.OpenEvidenceChartTool();

@@ -188,6 +188,14 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(PlatformCommunityHomePageViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityPublicBoardViewModel)
+            && x.ImplementationType == typeof(PlatformCommunityPublicBoardViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(PlatformCommunityConnectedToolsViewModel)
+            && x.ImplementationType == typeof(PlatformCommunityConnectedToolsViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
             x.ServiceType == typeof(PlatformCommunityHomeShellViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
