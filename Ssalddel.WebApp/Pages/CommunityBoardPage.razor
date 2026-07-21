@@ -1,8 +1,9 @@
 @page "/community/boards"
+@using Ssalddel.WebApp.ViewModels
 @inject PlatformCommunityService CommunityService
 @inject NavigationManager Navigation
 
-<PageTitle>@($"{CurrentBoardName} 게시판")</PageTitle>
+<PageTitle>@($"{ViewModel.CurrentBoardName} 게시판")</PageTitle>
 
 <PlatformCommunityReadingThemeFrame>
 <main class="community-board-page platform-home--classic-forum">
@@ -13,10 +14,10 @@
         </a>
         <div>
             <span>COMMUNITY BOARD</span>
-            <h1>@CurrentBoardName</h1>
-            <p>@CurrentBoardDescription</p>
+            <h1>@ViewModel.CurrentBoardName</h1>
+            <p>@ViewModel.CurrentBoardDescription</p>
         </div>
-        @if (CurrentBoard?.IsUserCreatable != false)
+        @if (ViewModel.CanCompose)
         {
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
@@ -29,7 +30,7 @@
 
     <nav class="community-board-page__navigation" aria-label="게시판 선택">
         <a class="@BuildBoardLinkClass(null)" href="/community/boards">전체</a>
-        @foreach (var board in BoardSummaries)
+        @foreach (var board in ViewModel.BoardSummaries)
         {
             <a class="@BuildBoardLinkClass(board.BoardKey)"
                href="@BoardHref(board.BoardKey)">
@@ -51,11 +52,11 @@
             {
                 <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">@RoleTag</MudChip>
             }
-            <MudButton Href="@BoardHref(CurrentBoard?.BoardKey)" Variant="Variant.Text" Size="Size.Small">필터 지우기</MudButton>
+            <MudButton Href="@BoardHref(ViewModel.CurrentBoard?.BoardKey)" Variant="Variant.Text" Size="Size.Small">필터 지우기</MudButton>
         </div>
     }
 
-    @if (IsLoading)
+    @if (ViewModel.IsLoading)
     {
         <div class="community-board-page__state" aria-live="polite">
             <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
@@ -64,49 +65,49 @@
     }
     else
     {
-        @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
         {
             <section class="community-board-page__error" aria-live="polite">
                 <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
                 <div>
                     <strong>새 글을 불러오지 못했습니다.</strong>
-                    <span>@ErrorMessage 기존 게시판 구조는 계속 사용할 수 있습니다.</span>
+                    <span>@ViewModel.ErrorMessage 기존 게시판 구조는 계속 사용할 수 있습니다.</span>
                 </div>
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.Refresh"
-                           Disabled="@IsLoading"
-                           OnClick="LoadBoardAsync">
+                           Disabled="@ViewModel.IsLoading"
+                           OnClick="ReloadAsync">
                     재시도
                 </MudButton>
             </section>
         }
 
-        <PlatformCommunityPostList BoardName="@CurrentBoardName"
+        <PlatformCommunityPostList BoardName="@ViewModel.CurrentBoardName"
                                    FilterOptions="@ListFilters"
-                                   SelectedFilter="@SelectedFilter"
-                                   SelectedFilterChanged="SelectListFilter"
-                                   ViewMode="@ViewMode"
-                                   ViewModeChanged="SelectViewMode"
+                                   SelectedFilter="@ViewModel.SelectedFilter"
+                                   SelectedFilterChanged="ViewModel.SelectListFilter"
+                                   ViewMode="@ViewModel.ViewMode"
+                                   ViewModeChanged="ViewModel.SelectViewMode"
                                    ComposeRequested="OpenCompose"
-                                   Posts="@VisiblePosts"
+                                   Posts="@ViewModel.VisiblePosts"
                                    SeedPosts="@NoSeedPosts"
-                                   VisiblePostCount="@VisiblePosts.Count"
+                                   VisiblePostCount="@ViewModel.VisiblePosts.Count"
                                    PostSelected="OpenPost"
-                                   SearchText="@SearchText"
-                                   SearchTextChanged="SetSearchText" />
+                                   SearchText="@ViewModel.SearchText"
+                                   SearchTextChanged="ViewModel.SetSearchText" />
 
-        @if (Result.Page > 1 || Result.Page * Result.PageSize < Result.TotalCount)
+        @if (ViewModel.Result.Page > 1 || ViewModel.Result.Page * ViewModel.Result.PageSize < ViewModel.Result.TotalCount)
         {
             <nav class="community-board-page__pagination" aria-label="글 목록 페이지">
-                <MudButton Disabled="@(Result.Page <= 1)"
-                           Href="@PageHref(Result.Page - 1)"
+                <MudButton Disabled="@(ViewModel.Result.Page <= 1)"
+                           Href="@PageHref(ViewModel.Result.Page - 1)"
                            Variant="Variant.Outlined">
                     이전
                 </MudButton>
-                <span>@Result.Page / @TotalPages</span>
-                <MudButton Disabled="@(Result.Page >= TotalPages)"
-                           Href="@PageHref(Result.Page + 1)"
+                <span>@ViewModel.Result.Page / @ViewModel.TotalPages</span>
+                <MudButton Disabled="@(ViewModel.Result.Page >= ViewModel.TotalPages)"
+                           Href="@PageHref(ViewModel.Result.Page + 1)"
                            Variant="Variant.Outlined">
                     다음
                 </MudButton>
@@ -139,147 +140,35 @@
 
     private static readonly IReadOnlyList<string> ListFilters = ["전체글", "공지", "추천글"];
     private static readonly IReadOnlyList<CommunitySeedPost> NoSeedPosts = [];
-    private IReadOnlyList<CommunityBoardSummaryResponse> BoardSummaries { get; set; } = [];
-    private CommunityBoardSummaryResponse? CurrentBoard { get; set; }
-    private PlatformCommunityPostListResponse Result { get; set; } = new();
-    private string SelectedFilter { get; set; } = "전체글";
-    private string SearchText { get; set; } = string.Empty;
-    private CommunityPostViewMode ViewMode { get; set; }
-    private string? ErrorMessage { get; set; }
-    private bool IsLoading { get; set; }
+    private CommunityBoardPageViewModel ViewModel { get; set; } = default!;
 
-    private string CurrentBoardName => CurrentBoard?.DisplayName ?? "전체 글";
-    private string CurrentBoardDescription => CurrentBoard?.Description ?? "공개 게시판의 글을 한 번에 봅니다.";
-    private int TotalPages => Math.Max(1, (int)Math.Ceiling(Result.TotalCount / (double)Math.Max(1, Result.PageSize)));
-
-    private IReadOnlyList<PlatformCommunityPostResponse> VisiblePosts
-        => Result.Items
-            .Where(MatchesListFilter)
-            .Where(MatchesSearch)
-            .ToArray();
+    protected override void OnInitialized()
+    {
+        ViewModel = new CommunityBoardPageViewModel(
+            cancellationToken => CommunityService.GetBoardSummariesAsync("shipper", cancellationToken),
+            (query, cancellationToken) => CommunityService.GetBoardPostsAsync(
+                "shipper",
+                boardKey: query.BoardKey,
+                category: query.LegacyCategory,
+                workflowTag: query.WorkflowTag,
+                roleTag: query.RoleTag,
+                page: query.Page,
+                pageSize: query.PageSize,
+                cancellationToken: cancellationToken));
+    }
 
     protected override Task OnParametersSetAsync()
-        => LoadBoardAsync();
+        => ViewModel.LoadAsync(CurrentRequest());
 
-    private async Task LoadBoardAsync()
-    {
-        IsLoading = true;
-        ErrorMessage = null;
-        BoardSummaries = MergeWithCoreBoards([]);
-        CurrentBoard = ResolveCurrentBoard(BoardSummaries);
-        try
-        {
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var serverBoards = await CommunityService.GetBoardSummariesAsync("shipper", timeout.Token);
-            BoardSummaries = MergeWithCoreBoards(serverBoards);
-            CurrentBoard = ResolveCurrentBoard(BoardSummaries);
-            var resolvedKey = CurrentBoard?.BoardKey
-                              ?? CommunityBoardCatalog.Find(BoardKey ?? LegacyBoardName)?.Key;
-            var legacyCategory = resolvedKey is null && !string.IsNullOrWhiteSpace(LegacyBoardName)
-                ? LegacyBoardName
-                : null;
-            Result = await CommunityService.GetBoardPostsAsync(
-                "shipper",
-                boardKey: resolvedKey,
-                category: legacyCategory,
-                workflowTag: WorkflowTag,
-                roleTag: RoleTag,
-                page: Math.Max(1, Page),
-                pageSize: 50,
-                cancellationToken: timeout.Token);
-        }
-        catch (Exception)
-        {
-            Result = new PlatformCommunityPostListResponse();
-            ErrorMessage = "네트워크 상태를 확인한 뒤 다시 시도해 주세요.";
-        }
-        finally
-        {
-            IsLoading = false;
-        }
-    }
+    private Task ReloadAsync() => ViewModel.LoadAsync(CurrentRequest());
 
-    private static IReadOnlyList<CommunityBoardSummaryResponse> MergeWithCoreBoards(
-        IReadOnlyList<CommunityBoardSummaryResponse> serverBoards)
-    {
-        var byKey = serverBoards
-            .Where(board => !string.IsNullOrWhiteSpace(board.BoardKey))
-            .GroupBy(board => board.BoardKey, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
-        var merged = CommunityBoardCatalog.PublicBoards
-            .Select(board => byKey.TryGetValue(board.Key, out var serverBoard)
-                ? serverBoard
-                : new CommunityBoardSummaryResponse
-                {
-                    BoardKey = board.Key,
-                    DisplayName = board.DisplayName,
-                    Description = board.Description,
-                    GroupCode = board.GroupCode,
-                    GroupDisplayName = board.GroupDisplayName,
-                    IsUserCreatable = board.IsUserCreatable
-                })
-            .ToList();
-        merged.AddRange(serverBoards.Where(board => board.IsCustom));
-        return merged;
-    }
+    private CommunityBoardPageRequest CurrentRequest()
+        => new(BoardKey, LegacyBoardName, WorkflowTag, RoleTag, Page);
 
-    private CommunityBoardSummaryResponse? ResolveCurrentBoard(
-        IReadOnlyList<CommunityBoardSummaryResponse> boards)
-    {
-        var requested = BoardKey ?? LegacyBoardName;
-        if (string.IsNullOrWhiteSpace(requested))
-        {
-            return null;
-        }
-
-        var catalogBoard = CommunityBoardCatalog.Find(requested);
-        var key = catalogBoard?.Key ?? requested.Trim();
-        return boards.FirstOrDefault(board =>
-                   string.Equals(board.BoardKey, key, StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(board.DisplayName, requested, StringComparison.OrdinalIgnoreCase))
-               ?? (catalogBoard is null
-                   ? null
-                   : new CommunityBoardSummaryResponse
-                   {
-                       BoardKey = catalogBoard.Key,
-                       DisplayName = catalogBoard.DisplayName,
-                       Description = catalogBoard.Description,
-                       GroupCode = catalogBoard.GroupCode,
-                       GroupDisplayName = catalogBoard.GroupDisplayName,
-                       IsUserCreatable = catalogBoard.IsUserCreatable
-                   });
-    }
-
-    private bool MatchesListFilter(PlatformCommunityPostResponse post)
-        => SelectedFilter switch
-        {
-            "공지" => post.IsOperatorPinned,
-            "추천글" => post.IsTrending || post.RecommendationCount >= 5,
-            _ => true
-        };
-
-    private bool MatchesSearch(PlatformCommunityPostResponse post)
-    {
-        var search = SearchText.Trim();
-        return search.Length == 0
-               || Contains(post.Title, search)
-               || Contains(post.Body, search)
-               || Contains(post.Nickname, search)
-               || Contains(post.WorkflowTag, search)
-               || Contains(post.RoleTag, search);
-    }
-
-    private static bool Contains(string? value, string search)
-        => !string.IsNullOrWhiteSpace(value)
-           && value.Contains(search, StringComparison.OrdinalIgnoreCase);
-
-    private void SelectListFilter(string value) => SelectedFilter = value;
-    private void SelectViewMode(CommunityPostViewMode value) => ViewMode = value;
-    private void SetSearchText(string value) => SearchText = value;
     private void OpenPost(PlatformCommunityPostResponse post)
     {
-        var boardQuery = !string.IsNullOrWhiteSpace(CurrentBoard?.BoardKey)
-            ? $"?boardKey={Uri.EscapeDataString(CurrentBoard.BoardKey)}"
+        var boardQuery = !string.IsNullOrWhiteSpace(ViewModel.CurrentBoard?.BoardKey)
+            ? $"?boardKey={Uri.EscapeDataString(ViewModel.CurrentBoard.BoardKey)}"
             : !string.IsNullOrWhiteSpace(post.Category)
                 ? $"?board={Uri.EscapeDataString(post.Category)}"
                 : string.Empty;
@@ -288,15 +177,15 @@
 
     private void OpenCompose()
     {
-        var suffix = CurrentBoard is null
+        var suffix = ViewModel.CurrentBoard is null
             ? string.Empty
-            : $"?board={Uri.EscapeDataString(CurrentBoard.DisplayName)}";
+            : $"?board={Uri.EscapeDataString(ViewModel.CurrentBoard.DisplayName)}";
         Navigation.NavigateTo($"/community/write{suffix}");
     }
 
     private string BuildBoardLinkClass(string? boardKey)
-        => string.Equals(CurrentBoard?.BoardKey, boardKey, StringComparison.OrdinalIgnoreCase)
-            || (CurrentBoard is null && boardKey is null)
+        => string.Equals(ViewModel.CurrentBoard?.BoardKey, boardKey, StringComparison.OrdinalIgnoreCase)
+            || (ViewModel.CurrentBoard is null && boardKey is null)
                 ? "community-board-page__board-link community-board-page__board-link--active"
                 : "community-board-page__board-link";
 
@@ -308,9 +197,9 @@
     private string PageHref(int page)
     {
         var query = new List<string>();
-        if (CurrentBoard is not null)
+        if (ViewModel.CurrentBoard is not null)
         {
-            query.Add($"boardKey={Uri.EscapeDataString(CurrentBoard.BoardKey)}");
+            query.Add($"boardKey={Uri.EscapeDataString(ViewModel.CurrentBoard.BoardKey)}");
         }
         if (!string.IsNullOrWhiteSpace(WorkflowTag))
         {

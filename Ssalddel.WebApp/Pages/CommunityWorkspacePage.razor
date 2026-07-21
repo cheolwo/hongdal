@@ -6,20 +6,20 @@
 @inject PlatformDiagramPaletteStateService DiagramPalette
 @inject NavigationManager Navigation
 
-<PageTitle>@WorkspaceTitle</PageTitle>
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
 
 <main class="community-workspace-page">
     <header class="community-workspace-page__context">
-        <a href="@BackHref">
+        <a href="@RouteContext.BackHref">
             <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
-            @BackLabel
+            @RouteContext.BackLabel
         </a>
         <div>
-            <span>@WorkspaceEyebrow</span>
-            <h1>@WorkspaceHeading</h1>
-            <p>@WorkspaceDescription</p>
+            <span>@RouteContext.WorkspaceEyebrow</span>
+            <h1>@RouteContext.WorkspaceHeading</h1>
+            <p>@RouteContext.WorkspaceDescription</p>
         </div>
-        @if (!IsWriteRoute)
+        @if (!RouteContext.IsWriteRoute)
         {
             <MudButton Href="/community/write"
                        Variant="Variant.Filled"
@@ -30,7 +30,7 @@
         }
     </header>
 
-    @if (IsWorkspaceLandingRoute)
+    @if (RouteContext.IsWorkspaceLandingRoute)
     {
         <nav class="community-workspace-page__sections" aria-label="업무·원장 공간 바로가기">
             <a href="#community-workspace-hub">
@@ -48,22 +48,22 @@
         </nav>
     }
 
-    <PlatformCommunityHome @key="WorkspaceKey"
+    <PlatformCommunityHome @key="RouteContext.WorkspaceKey"
                            AppName="살뜰"
                            RoleLabel="웹 사용자"
                            AppKey="shipper"
                            CargoRequestDraftHrefBase="/shipper/request"
                            UseDedicatedCommunityRoutes="true"
-                           WorkspaceOnly="@IsWorkspaceLandingRoute"
-                           PostDetailOnly="@IsPostDetailRoute"
+                           WorkspaceOnly="@RouteContext.IsWorkspaceLandingRoute"
+                           PostDetailOnly="@RouteContext.IsPostDetailRoute"
                            UseBaguaRoleTransitionPages="true"
                            QuickActions="QuickActions"
                            QueryLedgerTemplateKey="@QueryLedgerTemplateKey"
                            QueryDiagramMode="@QueryDiagramMode"
-                           QueryPostId="@(PostId ?? QueryPostId)"
+                           QueryPostId="@RouteContext.EffectivePostId"
                            QuerySeedPostTitle="@QuerySeedPostTitle"
                            QueryBoardName="@QueryBoardName"
-                           StartInComposeMode="@IsWriteRoute" />
+                           StartInComposeMode="@RouteContext.IsWriteRoute" />
 </main>
 
 @code {
@@ -94,64 +94,8 @@
     [SupplyParameterFromQuery(Name = "diagram")]
     public string? QueryDiagramMode { get; set; }
 
-    private bool IsWriteRoute
-        => Navigation.ToBaseRelativePath(Navigation.Uri)
-            .Split('?', '#')[0]
-            .Equals("community/write", StringComparison.OrdinalIgnoreCase);
-
-    private bool IsWorkspaceRoute
-        => Navigation.ToBaseRelativePath(Navigation.Uri)
-            .Split('?', '#')[0]
-            .Equals("community/workspace", StringComparison.OrdinalIgnoreCase);
-
-    private bool IsPostDetailRoute
-        => EffectivePostId is not null || !string.IsNullOrWhiteSpace(QuerySeedPostTitle);
-
-    private bool IsDiagramRoute => IsTruthyQueryValue(QueryDiagramMode);
-
-    private bool IsWorkspaceLandingRoute
-        => IsWorkspaceRoute && !IsPostDetailRoute && !IsDiagramRoute;
-
-    private long? EffectivePostId => PostId ?? QueryPostId;
-    private string WorkspaceKey => $"{(IsWriteRoute ? "write" : IsWorkspaceLandingRoute ? "workspace" : "detail")}-{EffectivePostId?.ToString() ?? "none"}-{QuerySeedPostTitle}-{QueryBoardName}-{QueryBoardKey}-{QueryDiagramMode}";
-    private string WorkspaceTitle => IsWriteRoute
-        ? "글쓰기 · 살뜰 커뮤니티"
-        : IsWorkspaceLandingRoute
-            ? "업무·원장 공간 · 살뜰 커뮤니티"
-            : IsDiagramRoute
-                ? "업무 다이어그램 · 살뜰 커뮤니티"
-            : "게시글 · 살뜰 커뮤니티";
-    private string WorkspaceEyebrow => IsWriteRoute
-        ? "COMMUNITY COMPOSE"
-        : IsWorkspaceLandingRoute
-            ? "COMMUNITY WORKSPACE"
-            : IsDiagramRoute
-                ? "LEDGER DIAGRAM"
-            : "COMMUNITY POST";
-    private string WorkspaceHeading => IsWriteRoute
-        ? "커뮤니티에 글쓰기"
-        : IsWorkspaceLandingRoute
-            ? "업무·원장 공간"
-            : IsDiagramRoute
-                ? "업무 다이어그램"
-            : EffectivePostId is long id
-                ? $"게시글 #{id:N0}"
-                : "추천 게시글";
-    private string WorkspaceDescription => IsWriteRoute
-        ? "필요한 일과 가능한 일을 알리고, 당사자가 직접 선택하고 합의할 수 있도록 조건을 분명하게 적습니다."
-        : IsWorkspaceLandingRoute
-            ? "게시판에서 모인 필요를 게시판 운영, 업무 연결과 공동 원장 도구로 차분히 정리합니다."
-            : IsDiagramRoute
-                ? "공동 원장의 참여자, 상태와 다음 업무를 하나의 흐름으로 확인합니다."
-            : "글의 대화와 참여 기록을 확인하고, 합의한 경우에만 공동 원장과 업무 흐름으로 이어갑니다.";
-    private string BackHref => IsWorkspaceLandingRoute
-        ? "/community"
-        : !string.IsNullOrWhiteSpace(QueryBoardKey)
-            ? $"/community/boards?boardKey={Uri.EscapeDataString(QueryBoardKey)}"
-            : !string.IsNullOrWhiteSpace(QueryBoardName)
-                ? $"/community/boards?board={Uri.EscapeDataString(QueryBoardName)}"
-                : "/community/boards";
-    private string BackLabel => IsWorkspaceLandingRoute ? "공개 커뮤니티" : "글 목록";
+    private CommunityWorkspaceRouteContext RouteContext { get; set; }
+        = CommunityWorkspaceRouteContext.Resolve("community/workspace", null, null, null, null, null, null);
 
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [
@@ -170,18 +114,19 @@
 
     protected override void OnParametersSet()
     {
-        if (IsTruthyQueryValue(QueryDiagramMode))
+        RouteContext = CommunityWorkspaceRouteContext.Resolve(
+            Navigation.ToBaseRelativePath(Navigation.Uri),
+            PostId,
+            QueryPostId,
+            QuerySeedPostTitle,
+            QueryBoardName,
+            QueryBoardKey,
+            QueryDiagramMode);
+        if (RouteContext.IsDiagramRoute)
         {
             DiagramPalette.SetDiagramMode(true);
         }
     }
-
-    private static bool IsTruthyQueryValue(string? value)
-        => !string.IsNullOrWhiteSpace(value) &&
-           (value.Equals("1", StringComparison.OrdinalIgnoreCase) ||
-            value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-            value.Equals("yes", StringComparison.OrdinalIgnoreCase) ||
-            value.Equals("diagram", StringComparison.OrdinalIgnoreCase));
 
     private void HandleDiagramModeChanged()
         => _ = InvokeAsync(StateHasChanged);
