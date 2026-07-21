@@ -2,7 +2,10 @@ using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Ssalddel.ApiMetadata;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Mart;
+using Ssalddel.Domain.Community;
+using Ssalddel.Services.Community;
 using 살뜰.Data;
 using 살뜰.도메인.마트;
 
@@ -118,9 +121,143 @@ public sealed class 마트공개상품조회UseCase(SsalddelContext db) : I마�
             판매가능여부 = IsAvailable(item),
             재고기준시각Utc = item.재고기준시각Utc,
             수정일시Utc = item.UpdatedAtUtc,
-            재고기준안내 = 재고기준안내문
+            재고기준안내 = 재고기준안내문,
+            구매근거 = await 구매근거Async(item.판매상품Id, cancellationToken)
         });
     }
+
+    private async Task<마트공개상품구매근거응답> 구매근거Async(
+        long? 판매상품Id,
+        CancellationToken cancellationToken)
+    {
+        const string privacyNotice =
+            "완료 여부와 공개 후기만 비식별 집계합니다. 참여자, 주소, 결제·계약, 개별 수량과 내부 재고 원문은 공개하지 않습니다.";
+        if (판매상품Id is not > 0)
+        {
+            return new 마트공개상품구매근거응답
+            {
+                원장근거상태 = "연결된 구매 원장 없음",
+                공개범위안내 = privacyNotice
+            };
+        }
+
+        var source = await (
+                from salesProduct in db.판매상품.AsNoTracking()
+                join inboundProduct in db.입고상품.AsNoTracking()
+                    on salesProduct.입고상품Id equals inboundProduct.Id
+                where salesProduct.Id == 판매상품Id.Value
+                select new
+                {
+                    inboundProduct.커뮤니티원장Id,
+                    inboundProduct.커뮤니티원장상태,
+                    inboundProduct.커뮤니티원장동기화시각Utc
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+        if (source is null || string.IsNullOrWhiteSpace(source.커뮤니티원장Id))
+        {
+            return new 마트공개상품구매근거응답
+            {
+                원장근거상태 = "연결된 구매 원장 없음",
+                공개범위안내 = privacyNotice
+            };
+        }
+
+        var ledgerId = source.커뮤니티원장Id.Trim();
+        var now = DateTime.UtcNow;
+        var publishedPosts = db.PlatformCommunityPosts
+            .AsNoTracking()
+            .Where(post => !post.IsDeleted
+                           && !post.IsReportBoardPost
+                           && post.커뮤니티원장Id == ledgerId
+                           && post.PublicationStatusCode == PlatformCommunityPostPublicationStatusCodes.Published
+                           && post.PublishedAtUtc.HasValue
+                           && post.PublishedAtUtc <= now);
+        var completedAtUtc = await publishedPosts
+            .Where(post => post.AuthorUserId == CommunityLedgerCompletionPublication.SystemAuthorKey)
+            .OrderByDescending(post => post.PublishedAtUtc)
+            .Select(post => (DateTime?)(post.PublishedAtUtc ?? post.CreatedAtUtc))
+            .FirstOrDefaultAsync(cancellationToken);
+        var completed = string.Equals(
+                            source.커뮤니티원장상태,
+                            커뮤니티원장상태.완료,
+                            StringComparison.OrdinalIgnoreCase)
+                        || completedAtUtc.HasValue;
+        if (!completed)
+        {
+            return new 마트공개상품구매근거응답
+            {
+                원장근거상태 = "구매 원장 완료 확인 전",
+                근거기준시각Utc = source.커뮤니티원장동기화시각Utc,
+                공개범위안내 = privacyNotice
+            };
+        }
+
+        var reviewQuery = publishedPosts
+            .Where(post => post.Category == CommunityLedgerCompletionPublication.Category
+                           && post.AuthorUserId != CommunityLedgerCompletionPublication.SystemAuthorKey);
+        var reviewCount = await reviewQuery.CountAsync(cancellationToken);
+        var reviewRows = await reviewQuery
+            .OrderByDescending(post => post.PublishedAtUtc)
+            .ThenByDescending(post => post.Id)
+            .Take(3)
+            .Select(post => new
+            {
+                post.Id,
+                post.Title,
+                post.Body,
+                post.Nickname,
+                post.RecommendationCount,
+                post.CommentCount,
+                작성시각Utc = post.PublishedAtUtc ?? post.CreatedAtUtc
+            })
+            .ToArrayAsync(cancellationToken);
+        var reviews = reviewRows
+            .Select(row => new 마트공개상품구매후기응답
+            {
+                게시글Id = row.Id,
+                제목 = row.Title,
+                본문요약 = 요약(row.Body, 280),
+                작성자표시명 = row.Nickname,
+                추천수 = row.RecommendationCount,
+                댓글수 = row.CommentCount,
+                작성시각Utc = row.작성시각Utc
+            })
+            .ToArray();
+        var latestReviewAtUtc = reviews.FirstOrDefault()?.작성시각Utc;
+
+        return new 마트공개상품구매근거응답
+        {
+            완료원장확인여부 = true,
+            원장근거상태 = "완료된 공동구매 원장 확인",
+            공개후기수 = reviewCount,
+            완료확인시각Utc = completedAtUtc ?? source.커뮤니티원장동기화시각Utc,
+            근거기준시각Utc = 최근시각(
+                source.커뮤니티원장동기화시각Utc,
+                completedAtUtc,
+                latestReviewAtUtc),
+            후기작성가능여부 = true,
+            구매후기목록 = reviews,
+            공개범위안내 = privacyNotice
+        };
+    }
+
+    private static string 요약(string? value, int maxLength)
+    {
+        var normalized = string.Join(' ', (value ?? string.Empty)
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        return normalized.Length <= maxLength
+            ? normalized
+            : $"{normalized[..maxLength].TrimEnd()}…";
+    }
+
+    private static DateTime? 최근시각(params DateTime?[] values)
+        => values
+            .Where(value => value.HasValue)
+            .Select(value => value!.Value)
+            .DefaultIfEmpty()
+            .Max() is var latest && latest != default
+                ? latest
+                : null;
 
     private static bool IsAvailable(마트공개상품 item)
         => item.판매허용여부 && item.판매가능수량 > 0;

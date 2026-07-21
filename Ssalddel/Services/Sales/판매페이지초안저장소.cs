@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using Ssalddel.Contracts.Common.Sales;
 using 살뜰.Services.Options;
 
 namespace 살뜰.Services.Sales;
@@ -155,6 +156,7 @@ public sealed class Mongo판매페이지초안저장소 : I판매페이지초안
             이미지Url목록 = source.이미지Url목록.ToArray(),
             핵심정보목록 = source.핵심정보목록.ToArray(),
             외부참고자료 = source.외부참고자료,
+            공개구매근거 = source.공개구매근거,
             연결된판매상품Id = source.연결된판매상품Id,
             Revision = revision,
             생성시각Utc = source.생성시각Utc,
@@ -183,6 +185,7 @@ public sealed class Mongo판매페이지초안저장소 : I판매페이지초안
             이미지Url목록 = source.이미지Url목록,
             핵심정보목록 = source.핵심정보목록,
             외부참고자료 = source.외부참고자료,
+            공개구매근거 = source.공개구매근거,
             연결된판매상품Id = source.연결된판매상품Id,
             Revision = source.Revision,
             생성시각Utc = source.생성시각Utc,
@@ -213,6 +216,7 @@ public sealed class 판매페이지초안문서
     public IReadOnlyList<string> 이미지Url목록 { get; set; } = [];
     public IReadOnlyList<string> 핵심정보목록 { get; set; } = [];
     public 판매페이지외부참고저장모델? 외부참고자료 { get; set; }
+    public 판매페이지공개구매근거Dto? 공개구매근거 { get; set; }
     public long? 연결된판매상품Id { get; set; }
     public long Revision { get; set; }
     public DateTime 생성시각Utc { get; set; }

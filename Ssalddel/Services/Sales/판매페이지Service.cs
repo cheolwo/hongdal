@@ -8,7 +8,11 @@ public interface I판매페이지Service
 {
     Task<판매페이지초안목록응답> 초안목록Async(string ownerUserId, CancellationToken cancellationToken);
     Task<판매페이지초안응답?> 초안조회Async(string pageId, string ownerUserId, CancellationToken cancellationToken);
-    Task<판매페이지초안응답> 초안생성Async(판매페이지초안생성요청 request, string ownerUserId, CancellationToken cancellationToken);
+    Task<판매페이지초안응답> 초안생성Async(
+        판매페이지초안생성요청 request,
+        string ownerUserId,
+        CancellationToken cancellationToken,
+        판매페이지공개구매근거Dto? verifiedPublicEvidence = null);
     Task<판매페이지초안응답> 초안수정Async(string pageId, 판매페이지초안수정요청 request, string ownerUserId, CancellationToken cancellationToken);
 }
 
@@ -50,7 +54,8 @@ public sealed class 판매페이지Service : I판매페이지Service
     public async Task<판매페이지초안응답> 초안생성Async(
         판매페이지초안생성요청 request,
         string ownerUserId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        판매페이지공개구매근거Dto? verifiedPublicEvidence = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         var owner = Required(ownerUserId, "판매자 인증 정보");
@@ -66,6 +71,9 @@ public sealed class 판매페이지Service : I판매페이지Service
 
         var productName = FirstNonEmpty(request.상품명, reference?.상품명)
             ?? throw new InvalidOperationException("상품명 또는 참고할 Amazon 상품 상세 URL이 필요합니다.");
+        var publicEvidence = NormalizePublicEvidence(
+            request.원본공개상품Id,
+            verifiedPublicEvidence);
         var now = DateTime.UtcNow;
         var model = new 판매페이지초안저장모델
         {
@@ -88,6 +96,7 @@ public sealed class 판매페이지Service : I판매페이지Service
             이미지Url목록 = reference?.이미지Url목록.Take(10).ToArray() ?? [],
             핵심정보목록 = reference?.특징목록.Take(12).ToArray() ?? [],
             외부참고자료 = reference is null ? null : ToExternalReference(reference),
+            공개구매근거 = publicEvidence,
             생성시각Utc = now,
             수정시각Utc = now
         };
@@ -186,6 +195,7 @@ public sealed class 판매페이지Service : I판매페이지Service
                     source.외부참고자료.관측리뷰수,
                     source.외부참고자료.관측일시Utc,
                     source.외부참고자료.안내문),
+            공개구매근거 = CopyPublicEvidence(source.공개구매근거),
             연결된판매상품Id = source.연결된판매상품Id,
             판매준비안내 = source.연결된판매상품Id.HasValue
                 ? "연결된 판매상품의 재고·가격·권한을 확인한 뒤 공개 검수를 진행할 수 있습니다."
@@ -207,6 +217,44 @@ public sealed class 판매페이지Service : I판매페이지Service
             throw new InvalidOperationException("공동주문 최소 수량은 2개 이상이어야 합니다.");
         }
     }
+
+    private static 판매페이지공개구매근거Dto? NormalizePublicEvidence(
+        long? requestedProductId,
+        판매페이지공개구매근거Dto? verifiedEvidence)
+    {
+        if (!requestedProductId.HasValue)
+        {
+            return null;
+        }
+
+        if (requestedProductId <= 0)
+        {
+            throw new InvalidOperationException("원본 공개 상품 ID를 확인해 주세요.");
+        }
+
+        if (verifiedEvidence is null
+            || verifiedEvidence.원본공개상품Id != requestedProductId.Value
+            || !verifiedEvidence.완료원장확인여부)
+        {
+            throw new InvalidOperationException("완료된 공개 상품 구매 근거를 서버에서 확인해야 합니다.");
+        }
+
+        return CopyPublicEvidence(verifiedEvidence);
+    }
+
+    private static 판매페이지공개구매근거Dto? CopyPublicEvidence(
+        판매페이지공개구매근거Dto? source)
+        => source is null
+            ? null
+            : new 판매페이지공개구매근거Dto
+            {
+                원본공개상품Id = source.원본공개상품Id,
+                원본공개상품명 = Limit(source.원본공개상품명, 300),
+                완료원장확인여부 = source.완료원장확인여부,
+                공개후기수 = Math.Max(0, source.공개후기수),
+                근거기준시각Utc = source.근거기준시각Utc,
+                공개범위안내 = Limit(source.공개범위안내, 1_000)
+            };
 
     private static string NormalizeSellerType(string? value)
     {
@@ -285,6 +333,7 @@ public sealed class 판매페이지초안저장모델
     public IReadOnlyList<string> 이미지Url목록 { get; set; } = [];
     public IReadOnlyList<string> 핵심정보목록 { get; set; } = [];
     public 판매페이지외부참고저장모델? 외부참고자료 { get; set; }
+    public 판매페이지공개구매근거Dto? 공개구매근거 { get; set; }
     public long? 연결된판매상품Id { get; set; }
     public long Revision { get; set; }
     public DateTime 생성시각Utc { get; set; }

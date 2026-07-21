@@ -22,6 +22,8 @@ public static class 판매페이지상태코드
 /// </summary>
 public sealed class 판매페이지초안생성요청
 {
+    /// <summary>판매 근거로 삼을 공개 상품 ID입니다. 완료 원장·후기 여부는 서버가 다시 검증합니다.</summary>
+    public long? 원본공개상품Id { get; set; }
     public string 판매자유형 { get; set; } = 판매자유형코드.일반판매자;
     public string 판매자표시명 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
@@ -92,11 +94,25 @@ public sealed class 판매페이지초안응답
     public IReadOnlyList<string> 이미지Url목록 { get; set; } = [];
     public IReadOnlyList<string> 핵심정보목록 { get; set; } = [];
     public 판매페이지외부참고자료Dto? 외부참고자료 { get; set; }
+    public 판매페이지공개구매근거Dto? 공개구매근거 { get; set; }
     public long? 연결된판매상품Id { get; set; }
     public string 판매준비안내 { get; set; } = string.Empty;
     public long Revision { get; set; }
     public DateTime 생성시각Utc { get; set; }
     public DateTime 수정시각Utc { get; set; }
+}
+
+/// <summary>
+/// 판매 페이지 초안 생성 시 서버가 공개 상품과 완료 원장을 다시 확인해 저장한 비식별 스냅샷입니다.
+/// </summary>
+public sealed class 판매페이지공개구매근거Dto
+{
+    public long 원본공개상품Id { get; set; }
+    public string 원본공개상품명 { get; set; } = string.Empty;
+    public bool 완료원장확인여부 { get; set; }
+    public int 공개후기수 { get; set; }
+    public DateTime? 근거기준시각Utc { get; set; }
+    public string 공개범위안내 { get; set; } = string.Empty;
 }
 
 public sealed class 판매페이지초안목록응답

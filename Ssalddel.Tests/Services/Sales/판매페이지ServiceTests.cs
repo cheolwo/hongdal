@@ -84,6 +84,44 @@ public sealed class 판매페이지ServiceTests
         Assert.Contains("하나 이상", exception.Message);
     }
 
+    [Fact]
+    public async Task 공개구매근거는_서버검증스냅샷이있을때만초안에보존된다()
+    {
+        var service = new 판매페이지Service(new MemoryStore(), new StubAmazonResearchService());
+        var request = new 판매페이지초안생성요청
+        {
+            원본공개상품Id = 41,
+            판매자표시명 = "동네 협동조합",
+            상품명 = "제철 감자",
+            개별주문허용 = true,
+            공동주문허용 = true,
+            공동주문최소수량 = 10
+        };
+
+        var rejected = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.초안생성Async(request, "seller-1", CancellationToken.None));
+        Assert.Contains("서버에서 확인", rejected.Message);
+
+        var saved = await service.초안생성Async(
+            request,
+            "seller-1",
+            CancellationToken.None,
+            new 판매페이지공개구매근거Dto
+            {
+                원본공개상품Id = 41,
+                원본공개상품명 = "제철 감자 10kg",
+                완료원장확인여부 = true,
+                공개후기수 = 3,
+                근거기준시각Utc = new DateTime(2026, 7, 21, 9, 0, 0, DateTimeKind.Utc),
+                공개범위안내 = "개인정보를 제외한 공개 투영"
+            });
+
+        Assert.NotNull(saved.공개구매근거);
+        Assert.Equal(41, saved.공개구매근거.원본공개상품Id);
+        Assert.Equal(3, saved.공개구매근거.공개후기수);
+        Assert.True(saved.공개구매근거.완료원장확인여부);
+    }
+
     private static Amazon상품참고자료Dto CreateAmazonReference()
         => new(
             "amazon:us:b0clwnbwvt",

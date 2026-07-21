@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ssalddel.ApiMetadata;
 using Ssalddel.Controllers.Orderer;
@@ -29,5 +30,18 @@ public sealed class 마트공개상품ControllerTests
 
         Assert.NotNull(method);
         Assert.Equal("{productId:long}", method.GetCustomAttribute<HttpGetAttribute>()?.Template);
+    }
+
+    [Fact]
+    public void 구매후기작성은_로그인필수인ProductId하위Post경로를사용한다()
+    {
+        var method = typeof(마트공개상품Controller)
+            .GetMethod(nameof(마트공개상품Controller.구매후기작성));
+
+        Assert.NotNull(method);
+        Assert.Equal(
+            "{productId:long}/reviews",
+            method.GetCustomAttribute<HttpPostAttribute>()?.Template);
+        Assert.NotNull(method.GetCustomAttribute<AuthorizeAttribute>());
     }
 }
