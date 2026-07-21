@@ -1,11 +1,12 @@
 using Ssalddel.Domain.TraditionalMarkets;
+using Ssalddel.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 
 public sealed class TraditionalMarketLogisticsHubConfiguration
-    : IEntityTypeConfiguration<TraditionalMarketLogisticsHub>
+    : IEntityTypeConfiguration<TraditionalMarketLogisticsHub>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<TraditionalMarketLogisticsHub> builder)
     {

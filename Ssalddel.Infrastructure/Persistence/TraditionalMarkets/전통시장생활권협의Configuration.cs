@@ -1,10 +1,12 @@
 using Ssalddel.Domain.TraditionalMarkets;
+using Ssalddel.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 
-public sealed class 전통시장생활권협의체Configuration : IEntityTypeConfiguration<전통시장생활권협의체>
+public sealed class 전통시장생활권협의체Configuration
+    : IEntityTypeConfiguration<전통시장생활권협의체>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<전통시장생활권협의체> builder)
     {
@@ -38,7 +40,8 @@ public sealed class 전통시장생활권협의체Configuration : IEntityTypeCon
     }
 }
 
-public sealed class 전통시장교역안건Configuration : IEntityTypeConfiguration<전통시장교역안건>
+public sealed class 전통시장교역안건Configuration
+    : IEntityTypeConfiguration<전통시장교역안건>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<전통시장교역안건> builder)
     {

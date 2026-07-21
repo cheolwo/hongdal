@@ -1,10 +1,12 @@
 using Ssalddel.Domain.TraditionalMarkets;
+using Ssalddel.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 
-public sealed class TraditionalMarketConfiguration : IEntityTypeConfiguration<TraditionalMarket>
+public sealed class TraditionalMarketConfiguration
+    : IEntityTypeConfiguration<TraditionalMarket>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<TraditionalMarket> builder)
     {

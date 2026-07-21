@@ -13,7 +13,7 @@
         </ul>
     </MudAlert>
 
-    @if (!ViewModel.초기화됨 || ViewModel.창고.처리중)
+    @if (ViewModel.상태 is PageViewModel상태.대기 or PageViewModel상태.불러오는중)
     {
         <MudPaper Class="pa-6" Elevation="0" Outlined="true">
             <MudStack AlignItems="AlignItems.Center" Spacing="2">
@@ -22,11 +22,11 @@
             </MudStack>
         </MudPaper>
     }
-    else if (ViewModel.창고.오류발생)
+    else if (ViewModel.상태 == PageViewModel상태.실패 || ViewModel.창고.오류발생)
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
-                <MudText>@ViewModel.창고.오류메시지</MudText>
+                <MudText>@(ViewModel.오류메시지 ?? ViewModel.창고.오류메시지)</MudText>
                 <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="RetryWarehousesAsync">
                     다시 조회
                 </MudButton>
@@ -315,6 +315,7 @@
     [Parameter] public EventCallback<long?> OnInboundSelected { get; set; }
 
     private bool _initialized;
+    private long? _loadedWarehouseId;
     private long? _loadedInboundId;
 
     private string? WorkBoardHref
@@ -327,23 +328,20 @@
         if (!_initialized)
         {
             _initialized = true;
+            _loadedWarehouseId = InitialWarehouseId is > 0 ? InitialWarehouseId : null;
             _loadedInboundId = InboundId is > 0 ? InboundId : null;
-            await ViewModel.초기화Async(InitialWarehouseId, _loadedInboundId);
+            await ViewModel.초기화Async(_loadedWarehouseId, _loadedInboundId);
             return;
         }
 
+        var normalizedWarehouseId = InitialWarehouseId is > 0 ? InitialWarehouseId : null;
         var normalizedInboundId = InboundId is > 0 ? InboundId : null;
-        if (normalizedInboundId != _loadedInboundId)
+        if (normalizedWarehouseId != _loadedWarehouseId
+            || normalizedInboundId != _loadedInboundId)
         {
+            _loadedWarehouseId = normalizedWarehouseId;
             _loadedInboundId = normalizedInboundId;
-            if (normalizedInboundId.HasValue)
-            {
-                await ViewModel.입고선택Async(normalizedInboundId.Value);
-            }
-            else
-            {
-                ViewModel.입고선택해제();
-            }
+            await ViewModel.경로변경Async(_loadedWarehouseId, _loadedInboundId);
         }
     }
 

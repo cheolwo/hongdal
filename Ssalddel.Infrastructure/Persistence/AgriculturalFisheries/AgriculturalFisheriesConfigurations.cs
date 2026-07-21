@@ -1,11 +1,12 @@
 using Ssalddel.Domain.AgriculturalFisheries;
+using Ssalddel.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 
 internal sealed class UsdaNassPriceCollectionRunConfiguration
-    : IEntityTypeConfiguration<UsdaNassPriceCollectionRun>
+    : IEntityTypeConfiguration<UsdaNassPriceCollectionRun>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<UsdaNassPriceCollectionRun> builder)
     {
@@ -24,7 +25,7 @@ internal sealed class UsdaNassPriceCollectionRunConfiguration
 }
 
 internal sealed class UsdaNassPriceObservationConfiguration
-    : IEntityTypeConfiguration<UsdaNassPriceObservation>
+    : IEntityTypeConfiguration<UsdaNassPriceObservation>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<UsdaNassPriceObservation> builder)
     {
@@ -76,7 +77,7 @@ internal sealed class UsdaNassPriceObservationConfiguration
 }
 
 internal sealed class HsUsdaCommodityMappingConfiguration
-    : IEntityTypeConfiguration<HsUsdaCommodityMapping>
+    : IEntityTypeConfiguration<HsUsdaCommodityMapping>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<HsUsdaCommodityMapping> builder)
     {
@@ -105,7 +106,7 @@ internal sealed class HsUsdaCommodityMappingConfiguration
 }
 
 internal sealed class KamisPriceCollectionRunConfiguration
-    : IEntityTypeConfiguration<KamisPriceCollectionRun>
+    : IEntityTypeConfiguration<KamisPriceCollectionRun>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<KamisPriceCollectionRun> builder)
     {
@@ -127,7 +128,7 @@ internal sealed class KamisPriceCollectionRunConfiguration
 }
 
 internal sealed class KamisPriceObservationConfiguration
-    : IEntityTypeConfiguration<KamisPriceObservation>
+    : IEntityTypeConfiguration<KamisPriceObservation>, IDedicatedDbContextConfiguration
 {
     public void Configure(EntityTypeBuilder<KamisPriceObservation> builder)
     {

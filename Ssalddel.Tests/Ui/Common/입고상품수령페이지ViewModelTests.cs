@@ -115,6 +115,8 @@ public sealed class 입고상품수령페이지ViewModelTests
             new 현장입고요청작성ViewModel(service),
             new 입고상품수령상세ViewModel(service));
         Assert.True(await page.초기화Async(17));
+        Assert.Equal(PageViewModel상태.준비됨, page.상태);
+        Assert.True(page.초기화됨);
         page.현장입고작성시작();
         page.작성.상품바코드 = "SKU:FIELD-001";
         page.작성.입고묶음바코드 = "BND:FIELD-001";
@@ -189,6 +191,74 @@ public sealed class 입고상품수령페이지ViewModelTests
         Assert.True(page.작성.폼표시);
         Assert.True(page.상세.대상없음);
         Assert.Equal(88, page.작성.등록응답?.Id);
+    }
+
+    [Fact]
+    public async Task 페이지는_창고조회실패를_초기화완료로숨기지않는다()
+    {
+        var client = new ScenarioJsonApiClient
+        {
+            Responder = (_, path, _, _) => path == "api/v1/warehouse-operations/warehouses"
+                ? throw new InvalidOperationException("창고 API 중단")
+                : null
+        };
+        var service = new 입출고작업Service(client);
+        using var page = new 입고상품수령PageViewModel(
+            new 입고상품수령창고ViewModel(service),
+            new 입고예정상품검색ViewModel(service),
+            new 현장입고요청작성ViewModel(service),
+            new 입고상품수령상세ViewModel(service));
+
+        var initialized = await page.초기화Async(17);
+
+        Assert.False(initialized);
+        Assert.False(page.초기화됨);
+        Assert.Equal(PageViewModel상태.실패, page.상태);
+        Assert.Contains("창고 API 중단", page.오류메시지);
+        Assert.True(page.창고.오류발생);
+    }
+
+    [Fact]
+    public async Task 페이지는_주소의입고Id를찾지못하면_실패상태를보존한다()
+    {
+        var client = new ScenarioJsonApiClient
+        {
+            Responder = (method, path, responseType, _) =>
+            {
+                if (responseType == typeof(창고목록응답))
+                {
+                    return new 창고목록응답
+                    {
+                        Items = [new 창고요약응답 { Id = 17, 창고명 = "공동 창고", IsActive = true }]
+                    };
+                }
+
+                if (method == HttpMethod.Get
+                    && path == "api/v1/warehouse-operations/inbounds/88")
+                {
+                    return null;
+                }
+
+                throw new InvalidOperationException($"예상하지 않은 요청: {method} {path}");
+            }
+        };
+        var service = new 입출고작업Service(client);
+        using var page = new 입고상품수령PageViewModel(
+            new 입고상품수령창고ViewModel(service),
+            new 입고예정상품검색ViewModel(service),
+            new 현장입고요청작성ViewModel(service),
+            new 입고상품수령상세ViewModel(service));
+
+        var initialized = await page.초기화Async(17, 88);
+
+        Assert.False(initialized);
+        Assert.Equal(PageViewModel상태.실패, page.상태);
+        Assert.True(page.상세.대상없음);
+        Assert.Contains("찾을 수 없", page.오류메시지);
+
+        Assert.True(await page.경로변경Async(17, null));
+        Assert.Equal(PageViewModel상태.준비됨, page.상태);
+        Assert.Null(page.상세.입고요청Id);
     }
 
     private sealed record RecordedRequest(HttpMethod Method, string Path, object? Request);

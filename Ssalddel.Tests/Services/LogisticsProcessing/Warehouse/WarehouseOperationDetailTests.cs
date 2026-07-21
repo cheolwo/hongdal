@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using MediatR;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Application.Warehouse;
 using Ssalddel.Contracts.Common.Inbound;
@@ -7,6 +10,7 @@ using Ssalddel.Contracts.Common.Inventory;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
+using 살뜰.Services.Audit;
 using 살뜰.도메인.창고;
 
 namespace Ssalddel.Tests.Services.LogisticsProcessing.Warehouse;
@@ -148,6 +152,141 @@ public sealed class WarehouseOperationDetailTests
     }
 
     [Fact]
+    public async Task 입고완료는_같은상품재시도에_재고와이력을중복생성하지않는다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            null!);
+        var request = BuildCompletionRequest();
+
+        var first = await service.CompleteInboundAsync(41, request, default);
+        var retried = await service.CompleteInboundAsync(41, request, default);
+
+        Assert.Equal(Assert.Single(first.Items).Id, Assert.Single(retried.Items).Id);
+        Assert.False(first.멱등재시도여부);
+        Assert.True(retried.멱등재시도여부);
+        Assert.Equal(입고상태.입고완료, (await db.입고요청.SingleAsync(x => x.Id == 41)).상태);
+        Assert.Equal(1, await db.입고상품.CountAsync(x => x.입고요청Id == 41));
+        Assert.Equal(1, await db.재고이력.CountAsync(x => x.원인유형 == "입고완료" && x.원인Id == 41));
+        Assert.Equal(1, await db.재고이동.CountAsync(x => x.입고요청Id == 41 && x.이동유형 == 재고이동유형.입고));
+    }
+
+    [Fact]
+    public async Task 입고완료는_선택입력의Null을빈값으로정규화하고_같은요청재시도를허용한다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            null!);
+        var request = BuildCompletionRequest();
+        request.Items[0].옵션명 = null!;
+        request.Items[0].보관위치 = null!;
+
+        var first = await service.CompleteInboundAsync(41, request, default);
+        var retried = await service.CompleteInboundAsync(41, request, default);
+
+        Assert.Equal(string.Empty, Assert.Single(first.Items).옵션명);
+        Assert.Equal(string.Empty, Assert.Single(retried.Items).보관위치);
+        Assert.True(retried.멱등재시도여부);
+    }
+
+    [Fact]
+    public async Task 입고완료재시도는_다른상품내용으로기존재고를덮어쓰지않는다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            null!);
+        var request = BuildCompletionRequest();
+        await service.CompleteInboundAsync(41, request, default);
+        request.Items[0].입고수량++;
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => service.CompleteInboundAsync(41, request, default));
+
+        Assert.Contains("다른 상품 내용", error.Message);
+        Assert.Equal(1, await db.입고상품.CountAsync(x => x.입고요청Id == 41));
+    }
+
+    [Fact]
+    public async Task 입고완료UseCase는_멱등재시도에_감사와Event를중복발행하지않는다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        var log = new RecordingActivityLogService();
+        var publisher = new RecordingPublisher();
+        var useCase = new 창고작업UseCase(
+            new WarehouseOperationService(
+                db,
+                new TestCurrentUserAccessor("warehouse-owner"),
+                null!),
+            log,
+            publisher);
+        var context = new 창고작업요청Context(
+            "warehouse-manager",
+            "warehouse-owner",
+            "창고 관리자",
+            "WarehouseManager",
+            "/api/v1/warehouse-operations/inbounds/41/complete",
+            "trace-41",
+            "127.0.0.1",
+            "test");
+        var request = BuildCompletionRequest();
+
+        var first = await useCase.입고완료Async(41, request, context, default);
+        var retried = await useCase.입고완료Async(41, request, context, default);
+
+        Assert.True(first.IsSuccess);
+        Assert.True(retried.IsSuccess);
+        Assert.False(first.Value.멱등재시도여부);
+        Assert.True(retried.Value.멱등재시도여부);
+        Assert.Single(log.Entries);
+        Assert.Single(publisher.Notifications);
+    }
+
+    [Fact]
+    public async Task 입고완료는_재고이력저장실패시_상태와재고를함께롤백한다()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var interceptor = new FailInventoryHistorySaveInterceptor();
+        var options = new DbContextOptionsBuilder<SsalddelContext>()
+            .UseSqlite(connection)
+            .AddInterceptors(interceptor)
+            .Options;
+
+        await using (var db = new SsalddelContext(options, new DummyPersonalDataEncryptionService()))
+        {
+            await db.Database.EnsureCreatedAsync();
+            await SeedAsync(db);
+            interceptor.Enabled = true;
+            var service = new WarehouseOperationService(
+                db,
+                new TestCurrentUserAccessor("warehouse-owner"),
+                null!);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.CompleteInboundAsync(41, BuildCompletionRequest(), default));
+        }
+
+        interceptor.Enabled = false;
+        await using var verification = new SsalddelContext(
+            options,
+            new DummyPersonalDataEncryptionService());
+        Assert.Equal(입고상태.운송중, (await verification.입고요청.SingleAsync(x => x.Id == 41)).상태);
+        Assert.Equal(0, await verification.입고상품.CountAsync(x => x.입고요청Id == 41));
+        Assert.Equal(0, await verification.재고이력.CountAsync());
+        Assert.Equal(0, await verification.재고이동.CountAsync(x => x.입고요청Id == 41));
+    }
+
+    [Fact]
     public async Task 입고목록은_선택창고의정확한Sku와예정상태만조회한다()
     {
         await using var db = CreateContext();
@@ -262,11 +401,114 @@ public sealed class WarehouseOperationDetailTests
 
         Assert.False(first.멱등재시도여부);
         Assert.True(retried.멱등재시도여부);
+        Assert.Equal(request.검수메모, first.메모);
+        Assert.Equal(first.메모, retried.메모);
         Assert.Equal("검수완료-불량포함", reloaded!.InventoryStatus);
         Assert.Equal(10, reloaded.AvailableQuantity);
         Assert.Equal(2, reloaded.DefectiveQuantity);
         Assert.False(reloaded.CanInspect);
         Assert.Equal(1, await db.재고이력.CountAsync(x => x.입고상품Id == 71 && x.이력유형 == "입고검수"));
+    }
+
+    [Fact]
+    public async Task 입고검수재시도는_같은수량의다른메모를기존근거로오인하지않는다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        await SeedInspectionItemAsync(db);
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            null!);
+        await service.InspectInboundItemAsync(71, new 입고검수요청
+        {
+            검수수량 = 12,
+            불량수량 = 1,
+            검수메모 = "첫 검수 근거"
+        }, default);
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.InspectInboundItemAsync(71, new 입고검수요청
+            {
+                검수수량 = 12,
+                불량수량 = 1,
+                검수메모 = "바뀐 검수 근거"
+            }, default));
+
+        Assert.Contains("다른 수량이나 메모", error.Message);
+        var history = await db.재고이력.SingleAsync(x =>
+            x.입고상품Id == 71 && x.이력유형 == "입고검수");
+        Assert.Contains("첫 검수 근거", history.메모);
+        Assert.DoesNotContain("바뀐 검수 근거", history.메모);
+    }
+
+    [Fact]
+    public async Task 입고검수는_정상수량이이미예약된수량보다작아지는변경을거부한다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        await SeedInspectionItemAsync(db);
+        var item = await db.입고상품.SingleAsync(x => x.Id == 71);
+        item.예약수량 = 5;
+        item.가용수량 = 7;
+        await db.SaveChangesAsync();
+        var service = new WarehouseOperationService(
+            db,
+            new TestCurrentUserAccessor("warehouse-owner"),
+            null!);
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.InspectInboundItemAsync(71, new 입고검수요청
+            {
+                검수수량 = 5,
+                불량수량 = 1
+            }, default));
+
+        Assert.Contains("예약된 수량", error.Message);
+        Assert.Equal("보관중", item.상태);
+        Assert.Empty(await db.재고이력.Where(x => x.입고상품Id == 71).ToArrayAsync());
+    }
+
+    [Fact]
+    public async Task 입고검수UseCase는_정확한멱등재시도에_감사와Event를중복발행하지않는다()
+    {
+        await using var db = CreateContext();
+        await SeedAsync(db);
+        await SeedInspectionItemAsync(db);
+        var log = new RecordingActivityLogService();
+        var publisher = new RecordingPublisher();
+        var useCase = new 창고작업UseCase(
+            new WarehouseOperationService(
+                db,
+                new TestCurrentUserAccessor("warehouse-owner"),
+                null!),
+            log,
+            publisher);
+        var context = new 창고작업요청Context(
+            "warehouse-manager",
+            "warehouse-owner",
+            "창고 관리자",
+            "WarehouseManager",
+            "/api/v1/warehouse-operations/inventory/71/inspect",
+            "trace-inspection-71",
+            "127.0.0.1",
+            "test");
+        var request = new 입고검수요청
+        {
+            검수수량 = 12,
+            불량수량 = 1,
+            검수메모 = "같은 검수 근거"
+        };
+
+        var first = await useCase.입고검수Async(71, request, context, default);
+        var retried = await useCase.입고검수Async(71, request, context, default);
+
+        Assert.True(first.IsSuccess);
+        Assert.True(retried.IsSuccess);
+        Assert.False(first.Value.멱등재시도여부);
+        Assert.True(retried.Value.멱등재시도여부);
+        Assert.Single(log.Entries);
+        Assert.Single(publisher.Notifications);
     }
 
     [Fact]
@@ -284,7 +526,7 @@ public sealed class WarehouseOperationDetailTests
         var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.InspectInboundItemAsync(71, new 입고검수요청 { 검수수량 = 11, 불량수량 = 1 }, default));
 
-        Assert.Contains("다른 수량", error.Message);
+        Assert.Contains("다른 수량이나 메모", error.Message);
         Assert.Equal(1, await db.재고이력.CountAsync(x => x.입고상품Id == 71 && x.이력유형 == "입고검수"));
     }
 
@@ -371,6 +613,76 @@ public sealed class WarehouseOperationDetailTests
             임시입고안내확인 = true,
             안내버전 = 현장입고요청안내.현재버전
         };
+
+    private static 입고완료요청 BuildCompletionRequest()
+        => new()
+        {
+            Items =
+            [
+                new 입고상품저장요청
+                {
+                    상품명 = "감자",
+                    SKU = "POTATO-01",
+                    옵션명 = "10kg",
+                    입고수량 = 12,
+                    불량수량 = 1,
+                    보관위치 = "검수 대기 구역"
+                }
+            ]
+        };
+
+    private sealed class FailInventoryHistorySaveInterceptor : SaveChangesInterceptor
+    {
+        public bool Enabled { get; set; }
+
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
+        {
+            if (Enabled
+                && eventData.Context?.ChangeTracker.Entries<재고이력>()
+                    .Any(entry => entry.State == EntityState.Added) == true)
+            {
+                throw new InvalidOperationException("재고 이력 저장 실패");
+            }
+
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+    }
+
+    private sealed class RecordingActivityLogService : I사용자행위로그Service
+    {
+        public List<사용자행위로그기록> Entries { get; } = [];
+
+        public Task 기록Async(
+            사용자행위로그기록 entry,
+            CancellationToken cancellationToken = default)
+        {
+            Entries.Add(entry);
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingPublisher : IPublisher
+    {
+        public List<object> Notifications { get; } = [];
+
+        public Task Publish(object notification, CancellationToken cancellationToken = default)
+        {
+            Notifications.Add(notification);
+            return Task.CompletedTask;
+        }
+
+        public Task Publish<TNotification>(
+            TNotification notification,
+            CancellationToken cancellationToken = default)
+            where TNotification : INotification
+        {
+            Notifications.Add(notification);
+            return Task.CompletedTask;
+        }
+    }
 
     private sealed record TestCurrentUserAccessor(string? UserId) : ICurrentUserAccessor
     {

@@ -19,6 +19,7 @@ public sealed class 입고검수페이지ViewModelTests
         Assert.Null(page.상세.조회대상Id);
         Assert.Null(page.상세.항목);
         Assert.Empty(service.DetailRequestIds);
+        Assert.Equal(PageViewModel상태.준비됨, page.상태);
     }
 
     [Fact]
@@ -33,6 +34,44 @@ public sealed class 입고검수페이지ViewModelTests
         Assert.Equal([71L], service.DetailRequestIds);
         Assert.Equal(71, page.상세.항목!.InboundItemId);
         Assert.Equal(12, page.작성.검수수량);
+    }
+
+    [Fact]
+    public async Task 초기목록조회실패는_초기화완료로숨기지않고_새로고침으로복구한다()
+    {
+        var service = CreateService();
+        service.ListError = new InvalidOperationException("목록 서버 오류");
+        using var page = CreatePage(service);
+
+        var loaded = await page.초기화Async();
+
+        Assert.False(loaded);
+        Assert.False(page.초기화됨);
+        Assert.Equal(PageViewModel상태.실패, page.상태);
+        Assert.Contains("목록 서버 오류", page.오류메시지);
+
+        service.ListError = null;
+        Assert.True(await page.새로고침Async());
+        Assert.Equal(PageViewModel상태.준비됨, page.상태);
+    }
+
+    [Fact]
+    public async Task 주소의정확한Id가없으면_페이지실패상태를유지한다()
+    {
+        var service = CreateService();
+        using var page = CreatePage(service);
+
+        var loaded = await page.초기화Async(999);
+
+        Assert.False(loaded);
+        Assert.False(page.초기화됨);
+        Assert.Equal(PageViewModel상태.실패, page.상태);
+        Assert.Equal([999L], service.DetailRequestIds);
+        Assert.Contains("찾을 수 없", page.오류메시지);
+
+        Assert.True(await page.경로대상변경Async(null));
+        Assert.Equal(PageViewModel상태.준비됨, page.상태);
+        Assert.Null(page.상세.조회대상Id);
     }
 
     [Fact]
@@ -109,12 +148,18 @@ public sealed class 입고검수페이지ViewModelTests
         public long? LastInspectionId { get; private set; }
         public 입고검수요청? LastInspectionRequest { get; private set; }
         public 입고검수대상상세응답? Detail { get; set; }
+        public Exception? ListError { get; set; }
 
         public Task<입고검수대상페이지응답> 목록조회Async(
             입고검수대상목록조회요청 request,
             CancellationToken cancellationToken = default)
         {
             ListRequestCount++;
+            if (ListError is not null)
+            {
+                throw ListError;
+            }
+
             입고검수대상목록항목응답[] items = Detail is null
                 ? []
                 : new[]

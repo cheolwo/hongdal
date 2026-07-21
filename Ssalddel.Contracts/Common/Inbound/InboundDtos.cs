@@ -204,6 +204,7 @@ public sealed class 입고상품항목응답
 public sealed class 입고상품목록응답
 {
     public IReadOnlyList<입고상품항목응답> Items { get; set; } = [];
+    public bool 멱등재시도여부 { get; set; }
 }
 
 public sealed class 입고상품저장요청

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using 살뜰.Data;
 
@@ -11,9 +12,11 @@ using 살뜰.Data;
 namespace Ssalddel.Migrations
 {
     [DbContext(typeof(SsalddelContext))]
-    partial class SsalddelContextModelSnapshot : ModelSnapshot
+    [Migration("20260721001000_AddWarehouseInboundRequestLookupIndex")]
+    partial class AddWarehouseInboundRequestLookupIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -7490,8 +7493,6 @@ namespace Ssalddel.Migrations
                         .HasColumnName("판매상품_id");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("입고상품Id", "발생일시");
 
                     b.HasIndex("주문Id", "이동유형");
 

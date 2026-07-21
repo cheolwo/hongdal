@@ -6,6 +6,7 @@ using Ssalddel.Domain.Education;
 using Ssalddel.Domain.HumanResources;
 using Ssalddel.Domain.HsCodes;
 using Ssalddel.Domain.Speech;
+using Ssalddel.Infrastructure.Persistence;
 using 살뜰.도메인.기사;
 using 살뜰.도메인.업체;
 using 살뜰.도메인.배차;
@@ -170,17 +171,12 @@ namespace 살뜰.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyPersonalDataProtection(_personalDataProtector);
+            // 같은 assembly에 있는 전용 Context 구성은 명시적 소유권 표식으로 격리합니다.
             modelBuilder.ApplyConfigurationsFromAssembly(
                 typeof(SsalddelContext).Assembly,
                 configurationType =>
-                    !string.Equals(
-                        configurationType.Namespace,
-                        "Ssalddel.Infrastructure.Persistence.AgriculturalFisheries",
-                        StringComparison.Ordinal)
-                    && !string.Equals(
-                        configurationType.Namespace,
-                        "Ssalddel.Infrastructure.Persistence.TraditionalMarkets",
-                        StringComparison.Ordinal));
+                    !typeof(IDedicatedDbContextConfiguration)
+                        .IsAssignableFrom(configurationType));
 
         }
 

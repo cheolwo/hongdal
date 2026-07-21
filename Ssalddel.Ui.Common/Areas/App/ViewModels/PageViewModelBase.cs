@@ -45,7 +45,8 @@ public abstract class PageViewModelBase : 조립ViewModelBase, IPageViewModel
         }
     }
 
-    public bool 처리중 => 상태 == PageViewModel상태.불러오는중;
+    public bool 처리중
+        => 상태 == PageViewModel상태.불러오는중 || 하위ViewModel처리중;
     public bool 초기화됨 => 상태 == PageViewModel상태.준비됨;
 
     public string? 오류메시지
@@ -68,6 +69,12 @@ public abstract class PageViewModelBase : 조립ViewModelBase, IPageViewModel
     protected abstract Task 불러오기Async(
         bool 새로고침,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// 페이지가 조립한 하위 ViewModel의 진행 상태를 페이지 전체 진행 상태에 포함합니다.
+    /// 하위 상태 변경은 <see cref="조립ViewModelBase"/>가 상위로 전달합니다.
+    /// </summary>
+    protected virtual bool 하위ViewModel처리중 => false;
 
     protected void 오류설정(string message)
     {

@@ -212,6 +212,11 @@ public sealed class 창고작업UseCase : I창고작업UseCase
     public async Task<Result<입고상품목록응답>> 입고완료Async(long inboundId, 입고완료요청 request, 창고작업요청Context context, CancellationToken cancellationToken)
     {
         var result = await _warehouseOperationService.CompleteInboundAsync(inboundId, request, cancellationToken);
+        if (result.멱등재시도여부)
+        {
+            return result;
+        }
+
         await 로그Async("Inbound", "Completed", context, cancellationToken, entityId: inboundId, metadataJson: $"{{\"createdItems\":{result.Items.Count}}}");
         await _publisher.Publish(
             new 창고입고완료됨Event(

@@ -327,8 +327,11 @@ public sealed partial class 입고상품수령상세ViewModel(
 }
 
 /// <summary>창고 선택, 바코드 검색, 현장 요청 작성과 저장 후 같은 ID 재조회만 조립합니다.</summary>
-public sealed partial class 입고상품수령PageViewModel : 조립ViewModelBase
+public sealed class 입고상품수령PageViewModel : PageViewModelBase
 {
+    private long? _초기창고Id;
+    private long? _초기입고요청Id;
+
     public 입고상품수령PageViewModel(
         입고상품수령창고ViewModel warehouses,
         입고예정상품검색ViewModel search,
@@ -346,36 +349,64 @@ public sealed partial class 입고상품수령PageViewModel : 조립ViewModelBas
     public 현장입고요청작성ViewModel 작성 { get; }
     public 입고상품수령상세ViewModel 상세 { get; }
 
-    [ObservableProperty]
-    public partial bool 초기화됨 { get; private set; }
+    protected override bool 하위ViewModel처리중
+        => 창고.처리중 || 검색.처리중 || 작성.처리중 || 상세.처리중;
 
-    public bool 처리중 => 창고.처리중 || 검색.처리중 || 작성.처리중 || 상세.처리중;
-
-    public async Task<bool> 초기화Async(
-        long? initialWarehouseId = null,
+    public Task<bool> 초기화Async(
+        long? initialWarehouseId,
         long? inboundId = null,
         CancellationToken cancellationToken = default)
     {
-        초기화됨 = false;
-        var warehousesLoaded = await 창고.초기화Async(initialWarehouseId, cancellationToken);
+        초기경로설정(initialWarehouseId, inboundId);
+        return base.초기화Async(cancellationToken);
+    }
+
+    public Task<bool> 경로변경Async(
+        long? initialWarehouseId,
+        long? inboundId,
+        CancellationToken cancellationToken = default)
+    {
+        초기경로설정(initialWarehouseId, inboundId);
+        return base.새로고침Async(cancellationToken);
+    }
+
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
+    {
+        var warehousesLoaded = await 창고.초기화Async(_초기창고Id, cancellationToken);
         if (!warehousesLoaded)
         {
-            초기화됨 = true;
-            return false;
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new InvalidOperationException(
+                창고.오류메시지 ?? "입고 작업 창고를 조회하지 못했습니다.");
         }
 
-        if (inboundId is > 0)
+        if (_초기입고요청Id is > 0)
         {
-            await 입고선택Async(inboundId.Value, cancellationToken);
-            if (상세.항목 is { } item)
+            var inboundLoaded = await 입고선택Async(_초기입고요청Id.Value, cancellationToken);
+            if (!inboundLoaded)
             {
-                창고.선택(item.창고Id);
-                검색.상품바코드 = item.예정SKU;
+                cancellationToken.ThrowIfCancellationRequested();
+                throw new InvalidOperationException(
+                    상세.오류메시지
+                    ?? (상세.대상없음
+                        ? "선택한 입고 요청을 찾을 수 없거나 조회 범위에 없습니다."
+                        : "선택한 입고 요청을 조회하지 못했습니다."));
             }
+
+            var item = 상세.항목!;
+            if (!창고.선택(item.창고Id))
+            {
+                throw new InvalidOperationException(
+                    "선택한 입고 요청의 창고가 현재 작업 범위에 없습니다.");
+            }
+
+            검색.검색어설정(item.예정SKU);
+            return;
         }
 
-        초기화됨 = true;
-        return true;
+        상세.조회대상설정(null);
     }
 
     public bool 창고선택(long? warehouseId)
@@ -433,4 +464,23 @@ public sealed partial class 입고상품수령PageViewModel : 조립ViewModelBas
 
     public void 입고선택해제()
         => 상세.조회대상설정(null);
+
+    private void 초기경로설정(long? initialWarehouseId, long? inboundId)
+    {
+        _초기창고Id = initialWarehouseId is > 0 ? initialWarehouseId : null;
+        _초기입고요청Id = inboundId is > 0 ? inboundId : null;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            창고.작업취소();
+            검색.작업취소();
+            작성.작업취소();
+            상세.작업취소();
+        }
+
+        base.Dispose(disposing);
+    }
 }

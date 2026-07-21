@@ -52,7 +52,7 @@
         </MudGrid>
     </MudPaper>
 
-    @if (!ViewModel.초기화됨 && ViewModel.목록.처리중)
+    @if (ViewModel.상태 is PageViewModel상태.대기 or PageViewModel상태.불러오는중)
     {
         <MudPaper Class="pa-6" Elevation="0" Outlined="true">
             <MudStack AlignItems="AlignItems.Center" Spacing="2">
@@ -60,6 +60,17 @@
                 <MudText Typo="Typo.body2" Color="Color.Secondary">접근 가능한 입고 검수 대상을 서버에서 조회하고 있습니다.</MudText>
             </MudStack>
         </MudPaper>
+    }
+    else if (ViewModel.상태 == PageViewModel상태.실패)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText>@ViewModel.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="RetryPageAsync">
+                    다시 조회
+                </MudButton>
+            </MudStack>
+        </MudAlert>
     }
     else
     {
@@ -307,14 +318,7 @@
         }
 
         _loadedInboundItemId = normalizedId;
-        if (normalizedId.HasValue)
-        {
-            await ViewModel.대상선택Async(normalizedId.Value);
-        }
-        else
-        {
-            ViewModel.선택해제();
-        }
+        await ViewModel.경로대상변경Async(normalizedId);
     }
 
     private void SetSearch(string value) => ViewModel.목록.검색어 = value ?? string.Empty;
@@ -340,6 +344,7 @@
         await SearchAsync();
     }
 
+    private async Task RetryPageAsync() => await ViewModel.새로고침Async();
     private async Task SearchAsync() => await ViewModel.검색Async();
     private async Task PreviousPageAsync() => await ViewModel.목록.이전페이지Async();
     private async Task NextPageAsync() => await ViewModel.목록.다음페이지Async();

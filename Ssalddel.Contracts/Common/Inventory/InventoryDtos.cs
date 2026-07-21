@@ -40,7 +40,7 @@ public sealed class 창고작업결과응답
     public DateTime 처리일시 { get; set; }
     public string 메모 { get; set; } = string.Empty;
 
-    /// <summary>같은 검수 결과가 이미 적용되어 추가 상태 변경이나 Event 발행 없이 반환되었는지 나타냅니다.</summary>
+    /// <summary>같은 검수 수량·불량 수량·메모가 이미 적용되어 추가 상태 변경이나 Event 발행 없이 반환되었는지 나타냅니다.</summary>
     public bool 멱등재시도여부 { get; set; }
 }
 
