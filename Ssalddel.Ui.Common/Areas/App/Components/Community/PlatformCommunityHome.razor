@@ -130,86 +130,7 @@
         }
         else if (IsDiagramMode)
         {
-            var blockFlowDiagram = 선택원장블록흐름도;
-            var flowNodes = 정렬된원장블록노드목록가져오기(blockFlowDiagram);
-            var 선택흐름노드 = 선택원장블록노드;
-            var diagramEdges = BuildDiagramEdges(flowNodes);
-            var desktopDiagramPresentation = BuildDesktopDiagramPresentation(flowNodes, diagramEdges, DiagramModeCanvasMinHeight);
-            var mobileDiagramSteps = BuildMobileDiagramSteps(flowNodes, diagramEdges);
-            var selectedDiagramEdge = diagramEdges.FirstOrDefault(edge =>
-                string.Equals(edge.Id, selectedDiagramEdgeId, StringComparison.OrdinalIgnoreCase));
-
-            <div class="platform-diagram-mode-stage">
-                <div class="platform-ledger-diagram-workbench platform-ledger-diagram-workbench--stage" aria-label="원장 다이어그램 캔버스">
-                    <PlatformCommunityDiagramToolbar Canvas="@DiagramCanvas"
-                                                             Layers="@다이어그램레이어정의s"
-                                                             FormNodes="@DiagramFormPaletteBlocks"
-                                                             ShowClose="true"
-                                                             UseResponsiveOrderActions="true"
-                                                             CanMoveBackward="@CanMove선택원장블록노드(-1)"
-                                                             CanMoveForward="@CanMove선택원장블록노드(1)"
-                                                             CanBringToFront="@CanBringSelectedDiagramNodeToFront()"
-                                                             CanSendToBack="@CanSendSelectedDiagramNodeToBack()"
-                                                             CanStartConnection="@(선택흐름노드 is not null && CanStartDiagramConnection(선택흐름노드))"
-                                                             OnClose="OpenCommunityMode"
-                                                             OnMoveBackward="@(() => Move선택원장블록노드(-1))"
-                                                             OnMoveForward="@(() => Move선택원장블록노드(1))"
-                                                             OnBringToFront="BringSelectedDiagramNodeToFront"
-                                                             OnSendToBack="SendSelectedDiagramNodeToBack"
-                                                             OnFormNodeSelected="AddPaletteBlockToCanvas"
-                                                             OnStartConnection="StartDiagramEdgeFromSelectedNode"
-                                                             OnReset="원장블록흐름도배치초기화"
-                                                             OnCancelConnection="CancelDiagramEdgeCreation" />
-                    <PlatformCommunityDiagramDesktopCanvas Presentation="@desktopDiagramPresentation"
-                                                                EdgeSelected="SelectDiagramEdge"
-                                                                NodeSelected="원장블록노드클릭처리"
-                                                                NodeContextRequested="원장블록노드컨텍스트메뉴처리Async"
-                                                                HandlePointerStartRequested="BeginDiagramHandlePointerDrag"
-                                                                HandlePointerUpRequested="CompleteDiagramHandlePointerUp"
-                                                                HandleClicked="HandleDiagramDesktopHandleClick"
-                                                                DragPointerChanged="HandleDiagramDragPointerChanged"
-                                                                HandleDropRequested="CompleteDiagramHandleDrop" />
-                    <PlatformCommunityDiagramMobileFlow Steps="@mobileDiagramSteps"
-                                                               FormNodes="@DiagramFormPaletteBlocks"
-                                                               ConnectionStartNodeTitle="@connectionStartNodeTitle"
-                                                               CanBringToFront="@CanBringSelectedDiagramNodeToFront()"
-                                                               CanSendToBack="@CanSendSelectedDiagramNodeToBack()"
-                                                               CanMoveBackward="@CanMove선택원장블록노드(-1)"
-                                                               CanMoveForward="@CanMove선택원장블록노드(1)"
-                                                               FormNodeSelected="AddPaletteBlockToCanvas"
-                                                               NodeSelected="원장블록노드클릭처리"
-                                                               NodeDetailRequested="OpenNodeDetailPanel"
-                                                               EdgeSelected="SelectDiagramEdge"
-                                                               NodeMoveRequested="Move선택원장블록노드"
-                                                               ConnectionStartRequested="StartDiagramEdgeFromSelectedNode"
-                                                               ConnectionCancelRequested="CancelDiagramEdgeCreation"
-                                                               BringToFrontRequested="BringSelectedDiagramNodeToFront"
-                                                               SendToBackRequested="SendSelectedDiagramNodeToBack" />
-                    <PlatformCommunityDiagramEdgeOptionsDock Canvas="@DiagramCanvas"
-                                                               SelectedEdge="@selectedDiagramEdge"
-                                                               LabelChanged="UpdateSelectedDiagramEdgeLabel"
-                                                               StyleChanged="UpdateSelectedDiagramEdgeStyle"
-                                                               DeleteRequested="DeleteSelectedDiagramEdge" />
-                    <PlatformCommunityWarehouseProxyPanel ViewModel="@WarehouseProxy"
-                                                                  WorkspaceRequested="NavigateToWarehouseProxyWorkspace" />
-                    <PlatformCommunityDiagramChatPanel ViewModel="@DiagramChat"
-                                                               Context="@BuildDiagramChatContext()"
-                                                               NodeCount="@flowNodes.Count"
-                                                               EdgeCount="@diagramEdges.Count"
-                                                               CanOpenWork="@(선택흐름노드 is not null)"
-                                                               OnOpenWork="NavigateToNodeDetailPage" />
-                    <button type="button"
-                            class="platform-diagram-community-fab"
-                            title="다이어그램으로 커뮤니티 글쓰기"
-                            aria-label="다이어그램으로 커뮤니티 글쓰기"
-                            @onclick="@(() => 다이어그램커뮤니티초안준비(flowNodes, diagramEdges))"
-                            @onclick:stopPropagation="true"
-                            @onpointerdown:stopPropagation="true"
-                            @onpointerup:stopPropagation="true">
-                        <MudIcon Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" />
-                    </button>
-                </div>
-            </div>
+            <PlatformCommunityHomeDiagramStage Context="@DiagramStage" />
         }
         else if (IsCompactHomeSummaryVisible)
         {
@@ -254,86 +175,22 @@
         {
         @if (!WorkspaceOnly)
         {
-        <MudPaper id="community-home-top" Elevation="0" Class="pa-4 platform-community-hero platform-community-forum-header">
-            <MudStack Spacing="2">
-                <div class="platform-community-forum-heading">
-                    <div class="platform-community-forum-title">
-                        <SsalddelWonBangGakMark Size="@(UseClassicForumLayout ? 34 : 48)" />
-                        <div>
-                            <span>@AppName · @UiText("살뜰 커뮤니티", "Ssalddel Community")</span>
-                            <MudText Typo="Typo.h4" Class="platform-community-hero-title">@CurrentCommunityBoardTitle</MudText>
-                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="platform-community-hero-copy">
-                                @CurrentCommunityBoardDescription
-                            </MudText>
-                        </div>
-                    </div>
-                    <div class="platform-community-forum-status" aria-label="@UiText("현재 게시판 정보", "Current board information")">
-                        <span><strong>@GetCommunityBoardPostCount(selectedBoardFilter)</strong>@UiText("개 글", " posts")</span>
-                        <span>@RoleLabel @UiText("참여", "participation")</span>
-                        <MudChip T="string" Size="Size.Small" Color="@CurrentModeColor" Variant="Variant.Outlined">@CurrentModeLabel</MudChip>
-                    </div>
-                </div>
-
-                @if (UseClassicForumLayout)
-                {
-                    <nav class="platform-community-classic-actions" aria-label="@UiText("게시판 바로가기", "Board shortcuts")">
-                        <MudButton Href="/community/categories"
-                                   Variant="Variant.Text"
-                                   Size="Size.Small"
-                                   StartIcon="@Icons.Material.Filled.List">
-                            @UiText("게시판 전체보기", "All boards")
-                        </MudButton>
-                        <MudButton Href="/community/workspace"
-                                   Variant="Variant.Text"
-                                   Size="Size.Small"
-                                   StartIcon="@Icons.Material.Filled.AccountTree">
-                            @UiText("업무·원장", "Work & ledgers")
-                        </MudButton>
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   Size="Size.Small"
-                                   StartIcon="@Icons.Material.Filled.Edit"
-                                   OnClick="HandleCommunityComposeRequested">
-                            @UiText("글쓰기", "Write")
-                        </MudButton>
-                    </nav>
-                }
-                else if (CommunityFeedOnly || !isWorkMode)
-                {
-                    <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="platform-community-hero-actions">
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Edit"
-                                   OnClick="HandleCommunityComposeRequested">
-                            글쓰기
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Secondary"
-                                   StartIcon="@Icons.Material.Filled.Description"
-                                   OnClick="OpenMyLedgerComposeAsync">
-                            원장으로 글쓰기
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Info"
-                                   StartIcon="@Icons.Material.Filled.AccountTree"
-                                   OnClick="현재원장다이어그램열기">
-                            다이어그램 모드
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Secondary"
-                                   StartIcon="@Icons.Material.Filled.Storefront"
-                                   OnClick="OpenDecorationStore">
-                            꾸미기 상점
-                        </MudButton>
-                        <MudButton Variant="Variant.Text"
-                                   Color="Color.Success"
-                                   EndIcon="@Icons.Material.Filled.ChevronRight"
-                                   OnClick="OpenWorkMode">
-                            업무 보기
-                        </MudButton>
-                    </MudStack>
-                }
-
+            <PlatformCommunityHomeHero AppName="@AppName"
+                                       DisplayLanguageCode="@DisplayLanguageCode"
+                                       UseClassicForumLayout="@UseClassicForumLayout"
+                                       BoardTitle="@CurrentCommunityBoardTitle"
+                                       BoardDescription="@CurrentCommunityBoardDescription"
+                                       PostCount="@GetCommunityBoardPostCount(selectedBoardFilter)"
+                                       RoleLabel="@RoleLabel"
+                                       ModeColor="@CurrentModeColor"
+                                       ModeLabel="@CurrentModeLabel"
+                                       CommunityFeedOnly="@CommunityFeedOnly"
+                                       IsWorkMode="@isWorkMode"
+                                       ComposeRequested="HandleCommunityComposeRequested"
+                                       LedgerComposeRequested="OpenMyLedgerComposeAsync"
+                                       DiagramRequested="현재원장다이어그램열기"
+                                       StoreRequested="OpenDecorationStore"
+                                       WorkRequested="OpenWorkMode">
                 @if (!UseClassicForumLayout)
                 {
                     <PlatformCommunityBaguaDock DecorationState="@DecorationState"
@@ -357,8 +214,7 @@
                                                  CenterTransferCompleted="HandleBaguaCenterTransferCompletedAsync"
                                                  DestinationSelected="HandleBaguaDestinationSelectedAsync" />
                 }
-            </MudStack>
-        </MudPaper>
+            </PlatformCommunityHomeHero>
         }
 
         @if (!WorkspaceOnly && (CommunityFeedOnly || !isWorkMode) && ShowRealtimeBest)
@@ -377,318 +233,42 @@
         <MudGrid Class="@CommunityGridClass">
             @if (!WorkspaceOnly)
             {
-            <MudItem xs="12">
-                <MudStack Spacing="2">
-                    @if (!isLoading)
-                    {
-                        <PlatformCommunityPostList BoardName="@selectedBoardFilter"
-                                                   DisplayLanguageCode="@DisplayLanguageCode"
-                                                   FilterOptions="@ForumListFilterOptions"
-                                                   SelectedFilter="@selectedForumListFilter"
-                                                   SelectedFilterChanged="SelectForumListFilter"
-                                                   ViewMode="@communityPostViewMode"
-                                                   ViewModeChanged="SelectCommunityPostViewMode"
-                                                   ComposeRequested="HandleCommunityComposeRequested"
-                                                   Posts="@VisiblePosts"
-                                                   SeedPosts="@VisibleSeedPosts"
-                                                   VisiblePostCount="@ForumVisiblePostCount"
-                                                   SelectedPostId="@selectedForumPostId"
-                                                   SelectedSeedPostTitle="@selectedForumSeedPostTitle"
-                                                   PostSelected="ToggleForumPostAsync"
-                                                   SeedPostSelected="ToggleForumSeedPost"
-                                                   SearchText="@communityPostSearchText"
-                                                   SearchTextChanged="HandleCommunityPostSearchChanged" />
-                    }
-
-                    @if (isLoading)
-                    {
-                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-                                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">커뮤니티 글을 불러오는 중입니다.</MudText>
-                            </MudStack>
-                        </MudPaper>
-                    }
-                    @if (!isLoading && VisiblePosts.Count > 0)
-                    {
-                        @foreach (var post in VisiblePosts)
-                        {
-                            @if (IsForumPostSelected(post))
-                            {
-                                <PlatformCommunityReadingThemeFrame Compact="true">
-                                    <PlatformCommunityPostDetail Post="@post"
-                                                                 ViewModel="@Engagement"
-                                                                 CanManagePosts="@CanManageCommunityPosts"
-                                                                 CargoRequestDraftHrefBase="@CargoRequestDraftHrefBase"
-                                                                 IsSharedLedgerReusing="@isSharedLedgerReusing"
-                                                                 SalesInquiryRequested="@((string message) => BeginSalesInquiryAsync(post, message))"
-                                                                 CommandCompleted="ApplyCommandResultAsync"
-                                                                 PromoteRequested="@((string intentTypeCode) => PromotePostParticipationAsync(post, intentTypeCode))"
-                                                                 JoinPartyRoleRequested="@((string roleCode) => JoinPostPartyRoleAsync(post, roleCode))"
-                                                                 JoinProfessionalRoleRequested="@((string roleCode) => JoinPostProfessionalRoleAsync(post, roleCode))"
-                                                                 DiagramRequested="OpenSharedLedgerDiagram"
-                                                                 StartFromCompletionRequested="StartFromCompletionCase"
-                                                                 ReuseRequested="ReuseSharedLedgerAsync"
-                                                                 EditRequested="BeginEdit" />
-                                </PlatformCommunityReadingThemeFrame>
-                            }
-                        }
-                    }
-
-
-                    @if (!isLoading && VisiblePosts.Count == 0 && VisibleSeedPosts.Count == 0)
-                    {
-                        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
-                            <MudText Typo="Typo.body2" Color="Color.Secondary">선택한 게시판에 아직 글이 없습니다. 첫 글을 남겨 보세요.</MudText>
-                        </MudPaper>
-                    }
-
-                    @if (VisibleSeedPosts.Count > 0)
-                    {
-                        @foreach (var post in VisibleSeedPosts)
-                        {
-                            @if (IsForumSeedPostSelected(post))
-                            {
-                                <PlatformCommunityReadingThemeFrame Compact="true">
-                                    <PlatformCommunitySeedPostDetail Post="@post" />
-                                </PlatformCommunityReadingThemeFrame>
-                            }
-                        }
-                    }
-
-                    @if (CommunityModeContent is not null &&
-                         string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase))
-                    {
-                        <section class="platform-community-app-notice" aria-label="앱 공지">
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                                <MudText Typo="Typo.subtitle2">앱 공지</MudText>
-                                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">PINNED</MudChip>
-                            </MudStack>
-                            @CommunityModeContent
-                        </section>
-                    }
-                </MudStack>
-            </MudItem>
+            <PlatformCommunityHomeFeed BoardName="@selectedBoardFilter"
+                                       DisplayLanguageCode="@DisplayLanguageCode"
+                                       IsLoading="@isLoading"
+                                       FilterOptions="@ForumListFilterOptions"
+                                       SelectedFilter="@selectedForumListFilter"
+                                       SelectedFilterChanged="SelectForumListFilter"
+                                       ViewMode="@communityPostViewMode"
+                                       ViewModeChanged="SelectCommunityPostViewMode"
+                                       ComposeRequested="HandleCommunityComposeRequested"
+                                       Posts="@VisiblePosts"
+                                       SeedPosts="@VisibleSeedPosts"
+                                       SelectedPostId="@selectedForumPostId"
+                                       SelectedSeedPostTitle="@selectedForumSeedPostTitle"
+                                       PostSelected="ToggleForumPostAsync"
+                                       SeedPostSelected="ToggleForumSeedPost"
+                                       SearchText="@communityPostSearchText"
+                                       SearchTextChanged="HandleCommunityPostSearchChanged"
+                                       Engagement="@Engagement"
+                                       CanManagePosts="@CanManageCommunityPosts"
+                                       CargoRequestDraftHrefBase="@CargoRequestDraftHrefBase"
+                                       IsSharedLedgerReusing="@isSharedLedgerReusing"
+                                       SalesInquiryRequested="BeginSalesInquiryAsync"
+                                       CommandCompleted="ApplyCommandResultAsync"
+                                       PromoteRequested="PromotePostParticipationAsync"
+                                       JoinPartyRoleRequested="JoinPostPartyRoleAsync"
+                                       JoinProfessionalRoleRequested="JoinPostProfessionalRoleAsync"
+                                       DiagramRequested="OpenSharedLedgerDiagram"
+                                       StartFromCompletionRequested="StartFromCompletionCase"
+                                       ReuseRequested="ReuseSharedLedgerAsync"
+                                       EditRequested="BeginEdit"
+                                       CommunityModeContent="@CommunityModeContent" />
             }
 
             @if (!CommunityFeedOnly)
             {
-            <MudItem xs="12" Class="platform-community-secondary-flow">
-                <MudStack Spacing="2">
-                    <section id="community-board-management" class="platform-community-workspace-section">
-                        <PlatformCommunityBoardManagementPanel IsLoading="@isBoardLoading"
-                                                               IsSaving="@isSavingBoardRequest"
-                                                               CanManage="@CanManageCommunityPosts"
-                                                               ApprovedBoards="@approvedBoards"
-                                                               PendingBoards="@pendingBoardRequests"
-                                                               Form="@boardForm"
-                                                               ReviewMemos="@boardReviewMemo"
-                                                               BoardSelected="SelectBoard"
-                                                               SaveRequested="SaveBoardRequestAsync"
-                                                               ApproveRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, true))"
-                                                               RejectRequested="@((PlatformCommunityBoardResponse board) => ReviewBoardAsync(board, false))" />
-                    </section>
-
-                    <section id="community-workspace-hub" class="platform-community-workspace-section">
-                        <PlatformCommunityWorkspaceHub Workspaces="@UnifiedWorkspaces"
-                                                       LedgerDraftRequested="@((string templateKey) => PrepareLedgerCommunityDraft(templateKey))" />
-                    </section>
-
-                    <MudPaper id="community-ledger-draft" Elevation="0" Outlined="true" Class="pa-4 platform-ledger-draft-paper platform-community-workspace-section">
-                        <MudStack Spacing="2">
-                            <MudText Typo="Typo.subtitle1">생활 원장 초안</MudText>
-                            <PlatformCommunityWishIntakePanel Wish="@원함입력"
-                                                              WishChanged="@((string value) => 원함입력 = value)"
-                                                              Conditions="@원함조건입력"
-                                                              ConditionsChanged="@((string value) => 원함조건입력 = value)"
-                                                              CanAnalyze="@원함입력됨"
-                                                              HasAnalysis="@(원함분석결과 is not null)"
-                                                              DecisionLabel="@원장화판정"
-                                                              DecisionColor="@원장화판정Color"
-                                                              RecommendedTemplateName="@원함추천템플릿.DisplayName"
-                                                              AnalyzeRequested="원함분석하기" />
-                            @{
-                                var contextTemplate = SelectedLedgerTemplate;
-                                var contextDiagram = 선택원장블록흐름도;
-                                var 컨텍스트흐름노드목록 = 정렬된원장블록노드목록가져오기(contextDiagram);
-                                var 컨텍스트다이어그램연결선목록 = BuildDiagramEdges(컨텍스트흐름노드목록);
-                                var 컨텍스트업무공간 = 현재원장업무공간해결(contextTemplate);
-                                var 컨텍스트보완항목목록 = 현재원장컨텍스트보완항목생성(contextTemplate, 컨텍스트흐름노드목록, 컨텍스트다이어그램연결선목록);
-                                var 선택컨텍스트원장 = 선택현재원장;
-                                var activeWorkflowModeLabel = ResolveDiagramWorkflowModeLabel(DiagramPalette.WorkflowModeKey);
-                            }
-                            <PlatformCommunityCurrentLedgerPanel Ledgers="@현재원장스냅샷목록"
-                                                                 SelectedLedger="@선택컨텍스트원장"
-                                                                 Template="@contextTemplate"
-                                                                 ContextSummary="@현재원장컨텍스트요약생성(contextTemplate)"
-                                                                 WorkflowModeLabel="@activeWorkflowModeLabel"
-                                                                 DecisionLabel="@원장화판정"
-                                                                 DecisionColor="@원장화판정Color"
-                                                                 OperatingSystemLabel="@원장처리체계표시명(contextTemplate.TargetOperatingSystemName)"
-                                                                 WishTitle="@현재원장원함제목생성(contextTemplate)"
-                                                                 WishDetails="@현재원장원함상세생성(contextTemplate)"
-                                                                 NodeCount="@컨텍스트흐름노드목록.Count"
-                                                                 EdgeCount="@컨텍스트다이어그램연결선목록.Count"
-                                                                 ImprovementItems="@컨텍스트보완항목목록"
-                                                                 Workspace="@컨텍스트업무공간"
-                                                                 LedgerSelected="현재원장컨텍스트불러오기"
-                                                                 OpenDiagramRequested="현재원장다이어그램열기"
-                                                                 CommunityDraftRequested="@(() => PrepareLedgerCommunityDraft())" />
-                            <MudDivider />
-                            <MudSelect T="string" Label="원장 유형" @bind-Value="selectedLedgerTemplateKey" Variant="Variant.Outlined">
-                                @foreach (var template in LedgerTemplates)
-                                {
-                                    <MudSelectItem Value="@template.Key">@template.DisplayName</MudSelectItem>
-                                }
-                            </MudSelect>
-                            @{
-                                var blockFlowDiagram = 선택원장블록흐름도;
-                                var flowNodes = 정렬된원장블록노드목록가져오기(blockFlowDiagram);
-                                var 선택흐름노드 = 선택원장블록노드;
-                                var 선택흐름노드관련블록목록 = 선택흐름노드 is null
-                                    ? Array.Empty<CommunityLedgerBlockResponse>()
-                                    : 흐름노드관련블록해결(선택흐름노드);
-                                var 선택흐름노드처리표면목록 = 선택흐름노드 is null
-                                    ? Array.Empty<CommunityLedgerProcessingSurfaceResponse>()
-                                    : 흐름노드처리표면해결(선택흐름노드);
-                                var diagramEdges = BuildDiagramEdges(flowNodes);
-                                var selectedDiagramEdge = diagramEdges.FirstOrDefault(edge =>
-                                    string.Equals(edge.Id, selectedDiagramEdgeId, StringComparison.OrdinalIgnoreCase));
-                                var inlineDiagramPresentation = BuildDesktopDiagramPresentation(
-                                    flowNodes,
-                                    diagramEdges,
-                                    DefaultDiagramCanvasMinHeight,
-                                    useStageCanvasStyle: false);
-                            }
-                            <div class="platform-ledger-diagram-workbench">
-                                <PlatformCommunityDiagramToolbar Canvas="@DiagramCanvas"
-                                                                         Layers="@다이어그램레이어정의s"
-                                                                         FormNodes="@DiagramFormPaletteBlocks"
-                                                                         CanMoveBackward="@CanMove선택원장블록노드(-1)"
-                                                                         CanMoveForward="@CanMove선택원장블록노드(1)"
-                                                                         CanBringToFront="@CanBringSelectedDiagramNodeToFront()"
-                                                                         CanSendToBack="@CanSendSelectedDiagramNodeToBack()"
-                                                                         CanStartConnection="@(선택흐름노드 is not null && CanStartDiagramConnection(선택흐름노드))"
-                                                                         OnMoveBackward="@(() => Move선택원장블록노드(-1))"
-                                                                         OnMoveForward="@(() => Move선택원장블록노드(1))"
-                                                                         OnBringToFront="BringSelectedDiagramNodeToFront"
-                                                                         OnSendToBack="SendSelectedDiagramNodeToBack"
-                                                                         OnFormNodeSelected="AddPaletteBlockToCanvas"
-                                                                         OnStartConnection="StartDiagramEdgeFromSelectedNode"
-                                                                         OnReset="원장블록흐름도배치초기화"
-                                                                         OnCancelConnection="CancelDiagramEdgeCreation" />
-                                <PlatformCommunityDiagramDesktopCanvas Presentation="@inlineDiagramPresentation"
-                                                                        ShowHandles="false"
-                                                                        ShowSelectionHint="true"
-                                                                        EdgeSelected="SelectDiagramEdge"
-                                                                        NodeSelected="원장블록노드클릭처리"
-                                                                        NodeContextRequested="원장블록노드컨텍스트메뉴처리Async" />
-                                @if (selectedDiagramEdge is not null)
-                                {
-                                    <div class="platform-ledger-edge-editor">
-                                        <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
-                                            @($"{selectedDiagramEdge.FromTitle} -> {selectedDiagramEdge.ToTitle}")
-                                        </MudChip>
-                                        @if (selectedDiagramEdge.IsCustom)
-                                        {
-                                            <MudTextField T="string"
-                                                          Value="@selectedDiagramEdge.Label"
-                                                          ValueChanged="@((string value) => UpdateSelectedDiagramEdgeLabel(value))"
-                                                          Placeholder="화살표 의미"
-                                                          Immediate="true"
-                                                          Variant="Variant.Outlined"
-                                                          Class="platform-ledger-edge-label-input" />
-                                            <MudButton Variant="Variant.Text"
-                                                       Color="Color.Error"
-                                                       Size="Size.Small"
-                                                       StartIcon="@Icons.Material.Filled.Delete"
-                                                       OnClick="DeleteSelectedDiagramEdge">
-                                                연결 삭제
-                                            </MudButton>
-                                        }
-                                        else
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">기본 연결</MudChip>
-                                        }
-                                    </div>
-                                }
-                                @if (선택흐름노드 is not null)
-                                {
-                                    <div class="platform-ledger-diagram-inspector">
-                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="@선택흐름노드.Color">@선택흐름노드.Title</MudChip>
-                                        @foreach (var block in 선택흐름노드관련블록목록.Take(4))
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@block.DisplayName</MudChip>
-                                        }
-                                        @foreach (var surface in 선택흐름노드처리표면목록.Take(3))
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Color="@ResolveSurfaceStatusColor(surface)" Variant="Variant.Outlined" Class="platform-ledger-diagram-route-chip">
-                                                @($"{ResolveSurfaceMethod(surface)} {BuildResolvedApiRoute(surface)}")
-                                            </MudChip>
-                                        }
-                                    </div>
-                                }
-                            </div>
-                            <PlatformCommunityLedgerMetadataEditor Template="@SelectedLedgerTemplate"
-                                                                    Workspace="@DiagramWorkspace"
-                                                                    ApiRouteParameterNames="@SelectedApiRouteParameterNames"
-                                                                    ApiSurfaces="@BuildLedgerApiSurfacePresentations()"
-                                                                    ResultMessage="@원장전송결과메시지"
-                                                                    ResultSeverity="@원장전송결과Severity"
-                                                                    ValuesChanged="ClearLedgerMetadataResult"
-                                                                    ApiRoutePrepareRequested="원장Api경로준비" />
-                            <PlatformCommunityLedgerTemplateGuidance Template="@SelectedLedgerTemplate" />
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Success"
-                                       StartIcon="@Icons.Material.Filled.Assignment"
-                                       OnClick="PrepareLedgerCommunityDraft">
-                                원함을 원장 초안으로 정리
-                            </MudButton>
-                        </MudStack>
-                    </MudPaper>
-
-                    <PlatformCommunityPostComposer ViewModel="@Composer"
-                                                       BoardCategories="@BoardCategoryOptions"
-                                                       RoleTags="@RoleTagOptions"
-                                                       SelectedWorkClassification="@SelectedWorkClassification"
-                                                       SelectedWorkFeatureEnabled="@SelectedWorkFeatureEnabled"
-                                                       LedgerPickerLoading="@isMyLedgersLoading"
-                                                       ExternalStatusMessage="@statusMessage"
-                                                       ExternalStatusSeverity="@statusSeverity"
-                                                       LedgerPickerRequested="OpenLedgerPickerAsync"
-                                                       EvidenceToolsRequested="OpenEvidenceChartTool"
-                                                       AuthoringToolVisible="@ViewModel.IsEvidenceChartToolOpen"
-                                                       Closed="CloseCompose"
-                                                       CancelEditRequested="CancelEdit"
-                                                       Saved="HandleComposerSavedAsync">
-                        <LedgerSettings>
-                            <PlatformCommunityLedgerComposerSettings SelectedLedgerId="@form.커뮤니티원장Id"
-                                                                      Ledgers="@myLedgers"
-                                                                      SharingSettings="@ledgerSharingSettings"
-                                                                      IsPickerLoading="@isMyLedgersLoading"
-                                                                      IsSharingSettingsSaving="@isLedgerSharingSaving"
-                                                                      PickerRequested="OpenLedgerPickerAsync"
-                                                                      SharingSettingsRequested="OpenLedgerSharingSettingsAsync"
-                                                                      ClearRequested="ClearSelectedLedger"
-                                                                      CloseSharingSettingsRequested="CloseLedgerSharingSettings"
-                                                                      SaveSharingSettingsRequested="SaveLedgerSharingSettingsAsync" />
-                        </LedgerSettings>
-                        <AuthoringTool>
-                            @if (ViewModel.IsEvidenceChartToolOpen)
-                            {
-                                <CommunityAuthoringEvidenceChartTool ViewModel="@EvidenceChart"
-                                                                      CloseRequested="CloseEvidenceChartTool"
-                                                                      ApplyToDraftRequested="ApplyEvidenceChartToDraft" />
-                            }
-                        </AuthoringTool>
-                    </PlatformCommunityPostComposer>
-
-                    <section id="community-workspace-support" class="platform-community-workspace-section">
-                        <PlatformCommunitySupportPanels QuickActions="@QuickActions"
-                                                        OperatingNotes="@OperatingNotes" />
-                    </section>
-                </MudStack>
-            </MudItem>
+                <PlatformCommunityHomeWorkspace Context="@Workspace" />
             }
         </MudGrid>
 

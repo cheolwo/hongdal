@@ -1,0 +1,150 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@{
+    var flowNodes = Context.FlowNodes;
+    var diagramEdges = Context.BuildEdges(flowNodes);
+    var selectedNode = Context.Diagram.SelectedNode;
+    var selectedNodeBlocks = selectedNode is null
+        ? []
+        : Context.ResolveBlocks(selectedNode);
+    var selectedNodeSurfaces = selectedNode is null
+        ? []
+        : Context.ResolveSurfaces(selectedNode);
+    var selectedEdge = diagramEdges.FirstOrDefault(edge =>
+        string.Equals(edge.Id, Context.Diagram.Canvas.SelectedEdgeId, StringComparison.OrdinalIgnoreCase));
+    var inlinePresentation = Context.BuildInlinePresentation(flowNodes, diagramEdges);
+}
+
+<MudPaper id="community-ledger-draft" Elevation="0" Outlined="true" Class="pa-4 platform-ledger-draft-paper platform-community-workspace-section">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.subtitle1">생활 원장 초안</MudText>
+        <PlatformCommunityWishIntakePanel Wish="@Context.Wish"
+                                          WishChanged="@((string value) => Context.Wish = value)"
+                                          Conditions="@Context.Conditions"
+                                          ConditionsChanged="@((string value) => Context.Conditions = value)"
+                                          CanAnalyze="@Context.CanAnalyze"
+                                          HasAnalysis="@Context.HasAnalysis"
+                                          DecisionLabel="@Context.DecisionLabel"
+                                          DecisionColor="@Context.DecisionColor"
+                                          RecommendedTemplateName="@Context.RecommendedTemplateName"
+                                          AnalyzeRequested="@Context.Analyze" />
+        <PlatformCommunityCurrentLedgerPanel Ledgers="@Context.Ledgers"
+                                             SelectedLedger="@Context.SelectedLedger"
+                                             Template="@Context.Template"
+                                             ContextSummary="@Context.ContextSummary"
+                                             WorkflowModeLabel="@Context.WorkflowModeLabel"
+                                             DecisionLabel="@Context.DecisionLabel"
+                                             DecisionColor="@Context.DecisionColor"
+                                             OperatingSystemLabel="@Context.OperatingSystemLabel"
+                                             WishTitle="@Context.WishTitle"
+                                             WishDetails="@Context.WishDetails"
+                                             NodeCount="@flowNodes.Count"
+                                             EdgeCount="@diagramEdges.Count"
+                                             ImprovementItems="@Context.BuildImprovementItems(flowNodes, diagramEdges)"
+                                             Workspace="@Context.Workspace"
+                                             LedgerSelected="@Context.SelectLedger"
+                                             OpenDiagramRequested="@Context.OpenDiagram"
+                                             CommunityDraftRequested="@Context.PrepareCommunityDraft" />
+        <MudDivider />
+        <MudSelect T="string"
+                   Label="원장 유형"
+                   Value="@Context.SelectedTemplateKey"
+                   ValueChanged="@((string value) => Context.SelectedTemplateKey = value)"
+                   Variant="Variant.Outlined">
+            @foreach (var template in Context.Templates)
+            {
+                <MudSelectItem Value="@template.Key">@template.DisplayName</MudSelectItem>
+            }
+        </MudSelect>
+        <div class="platform-ledger-diagram-workbench">
+            <PlatformCommunityDiagramToolbar Canvas="@Context.Diagram.Canvas"
+                                             Layers="@Context.Diagram.Layers"
+                                             FormNodes="@Context.Diagram.FormNodes"
+                                             CanMoveBackward="@Context.Diagram.CanMoveBackward"
+                                             CanMoveForward="@Context.Diagram.CanMoveForward"
+                                             CanBringToFront="@Context.Diagram.CanBringToFront"
+                                             CanSendToBack="@Context.Diagram.CanSendToBack"
+                                             CanStartConnection="@Context.Diagram.CanStartConnection"
+                                             OnMoveBackward="@Context.Diagram.MoveBackward"
+                                             OnMoveForward="@Context.Diagram.MoveForward"
+                                             OnBringToFront="@Context.Diagram.BringToFront"
+                                             OnSendToBack="@Context.Diagram.SendToBack"
+                                             OnFormNodeSelected="@Context.Diagram.AddFormNode"
+                                             OnStartConnection="@Context.Diagram.StartConnection"
+                                             OnReset="@Context.Diagram.Reset"
+                                             OnCancelConnection="@Context.Diagram.CancelConnection" />
+            <PlatformCommunityDiagramDesktopCanvas Presentation="@inlinePresentation"
+                                                   ShowHandles="false"
+                                                   ShowSelectionHint="true"
+                                                   EdgeSelected="@Context.Diagram.SelectEdge"
+                                                   NodeSelected="@Context.Diagram.SelectNode"
+                                                   NodeContextRequested="@Context.Diagram.OpenNodeContextAsync" />
+            @if (selectedEdge is not null)
+            {
+                <div class="platform-ledger-edge-editor">
+                    <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
+                        @($"{selectedEdge.FromTitle} -> {selectedEdge.ToTitle}")
+                    </MudChip>
+                    @if (selectedEdge.IsCustom)
+                    {
+                        <MudTextField T="string"
+                                      Value="@selectedEdge.Label"
+                                      ValueChanged="@Context.Diagram.ChangeEdgeLabel"
+                                      Placeholder="화살표 의미"
+                                      Immediate="true"
+                                      Variant="Variant.Outlined"
+                                      Class="platform-ledger-edge-label-input" />
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   OnClick="@Context.Diagram.DeleteEdge">
+                            연결 삭제
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">기본 연결</MudChip>
+                    }
+                </div>
+            }
+            @if (selectedNode is not null)
+            {
+                <div class="platform-ledger-diagram-inspector">
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="@selectedNode.Color">@selectedNode.Title</MudChip>
+                    @foreach (var block in selectedNodeBlocks.Take(4))
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@block.DisplayName</MudChip>
+                    }
+                    @foreach (var surface in selectedNodeSurfaces.Take(3))
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="@Context.ResolveSurfaceColor(surface)" Variant="Variant.Outlined" Class="platform-ledger-diagram-route-chip">
+                            @Context.ResolveSurfaceRoute(surface)
+                        </MudChip>
+                    }
+                </div>
+            }
+        </div>
+        <PlatformCommunityLedgerMetadataEditor Template="@Context.Template"
+                                                Workspace="@Context.DiagramWorkspace"
+                                                ApiRouteParameterNames="@Context.ApiRouteParameterNames"
+                                                ApiSurfaces="@Context.ApiSurfaces"
+                                                ResultMessage="@Context.ResultMessage"
+                                                ResultSeverity="@Context.ResultSeverity"
+                                                ValuesChanged="@Context.ClearMetadataResult"
+                                                ApiRoutePrepareRequested="@Context.PrepareApiRoute" />
+        <PlatformCommunityLedgerTemplateGuidance Template="@Context.Template" />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Assignment"
+                   OnClick="@Context.PrepareCommunityDraft">
+            원함을 원장 초안으로 정리
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityHome.LedgerDraftSurface Context { get; set; } = null!;
+}

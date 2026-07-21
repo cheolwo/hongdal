@@ -1,0 +1,187 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudItem xs="12">
+    <MudStack Spacing="2">
+        @if (!IsLoading)
+        {
+            <PlatformCommunityPostList BoardName="@BoardName"
+                                       DisplayLanguageCode="@DisplayLanguageCode"
+                                       FilterOptions="@FilterOptions"
+                                       SelectedFilter="@SelectedFilter"
+                                       SelectedFilterChanged="SelectedFilterChanged"
+                                       ViewMode="@ViewMode"
+                                       ViewModeChanged="ViewModeChanged"
+                                       ComposeRequested="ComposeRequested"
+                                       Posts="@Posts"
+                                       SeedPosts="@SeedPosts"
+                                       VisiblePostCount="@(Posts.Count + SeedPosts.Count)"
+                                       SelectedPostId="@SelectedPostId"
+                                       SelectedSeedPostTitle="@SelectedSeedPostTitle"
+                                       PostSelected="PostSelected"
+                                       SeedPostSelected="SeedPostSelected"
+                                       SearchText="@SearchText"
+                                       SearchTextChanged="SearchTextChanged" />
+        }
+
+        @if (IsLoading)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">커뮤니티 글을 불러오는 중입니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else
+        {
+            @foreach (var post in Posts.Where(IsPostSelected))
+            {
+                <PlatformCommunityReadingThemeFrame Compact="true">
+                    <PlatformCommunityPostDetail Post="@post"
+                                                 ViewModel="@Engagement"
+                                                 CanManagePosts="@CanManagePosts"
+                                                 CargoRequestDraftHrefBase="@CargoRequestDraftHrefBase"
+                                                 IsSharedLedgerReusing="@IsSharedLedgerReusing"
+                                                 SalesInquiryRequested="@((string message) => SalesInquiryRequested(post, message))"
+                                                 CommandCompleted="CommandCompleted"
+                                                 PromoteRequested="@((string intentTypeCode) => PromoteRequested(post, intentTypeCode))"
+                                                 JoinPartyRoleRequested="@((string roleCode) => JoinPartyRoleRequested(post, roleCode))"
+                                                 JoinProfessionalRoleRequested="@((string roleCode) => JoinProfessionalRoleRequested(post, roleCode))"
+                                                 DiagramRequested="DiagramRequested"
+                                                 StartFromCompletionRequested="StartFromCompletionRequested"
+                                                 ReuseRequested="ReuseRequested"
+                                                 EditRequested="EditRequested" />
+                </PlatformCommunityReadingThemeFrame>
+            }
+
+            @if (Posts.Count == 0 && SeedPosts.Count == 0)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">선택한 게시판에 아직 글이 없습니다. 첫 글을 남겨 보세요.</MudText>
+                </MudPaper>
+            }
+        }
+
+        @foreach (var post in SeedPosts.Where(IsSeedPostSelected))
+        {
+            <PlatformCommunityReadingThemeFrame Compact="true">
+                <PlatformCommunitySeedPostDetail Post="@post" />
+            </PlatformCommunityReadingThemeFrame>
+        }
+
+        @if (CommunityModeContent is not null &&
+             string.Equals(BoardName, "전체", StringComparison.OrdinalIgnoreCase))
+        {
+            <section class="platform-community-app-notice" aria-label="앱 공지">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <MudText Typo="Typo.subtitle2">앱 공지</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">PINNED</MudChip>
+                </MudStack>
+                @CommunityModeContent
+            </section>
+        }
+    </MudStack>
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public string BoardName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string DisplayLanguageCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<string> FilterOptions { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public string SelectedFilter { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> SelectedFilterChanged { get; set; }
+
+    [Parameter]
+    public CommunityPostViewMode ViewMode { get; set; }
+
+    [Parameter]
+    public EventCallback<CommunityPostViewMode> ViewModeChanged { get; set; }
+
+    [Parameter]
+    public EventCallback ComposeRequested { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformCommunityPostResponse> Posts { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CommunitySeedPost> SeedPosts { get; set; } = [];
+
+    [Parameter]
+    public long? SelectedPostId { get; set; }
+
+    [Parameter]
+    public string? SelectedSeedPostTitle { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }
+
+    [Parameter]
+    public string SearchText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> SearchTextChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public PlatformCommunityPostEngagementViewModel Engagement { get; set; } = null!;
+
+    [Parameter]
+    public bool CanManagePosts { get; set; }
+
+    [Parameter]
+    public string? CargoRequestDraftHrefBase { get; set; }
+
+    [Parameter]
+    public bool IsSharedLedgerReusing { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<PlatformCommunityPostResponse, string, Task> SalesInquiryRequested { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<PlatformCommunityCommandResult> CommandCompleted { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<PlatformCommunityPostResponse, string, Task> PromoteRequested { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Func<PlatformCommunityPostResponse, string, Task> JoinPartyRoleRequested { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Func<PlatformCommunityPostResponse, string, Task> JoinProfessionalRoleRequested { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostLedgerContextResponse> DiagramRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostLedgerContextResponse> StartFromCompletionRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostLedgerContextResponse> ReuseRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> EditRequested { get; set; }
+
+    [Parameter]
+    public RenderFragment? CommunityModeContent { get; set; }
+
+    private bool IsPostSelected(PlatformCommunityPostResponse post)
+        => post.Id == SelectedPostId;
+
+    private bool IsSeedPostSelected(CommunitySeedPost post)
+        => string.Equals(post.Title, SelectedSeedPostTitle, StringComparison.Ordinal);
+}

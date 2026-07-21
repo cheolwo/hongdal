@@ -1,0 +1,88 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@{
+    var flowNodes = Context.FlowNodes;
+    var diagramEdges = Context.BuildEdges(flowNodes);
+    var desktopPresentation = Context.BuildDesktopPresentation(flowNodes, diagramEdges);
+    var mobileSteps = Context.BuildMobileSteps(flowNodes, diagramEdges);
+    var selectedEdge = diagramEdges.FirstOrDefault(edge =>
+        string.Equals(edge.Id, Context.Canvas.SelectedEdgeId, StringComparison.OrdinalIgnoreCase));
+}
+
+<div class="platform-diagram-mode-stage">
+    <div class="platform-ledger-diagram-workbench platform-ledger-diagram-workbench--stage" aria-label="원장 다이어그램 캔버스">
+        <PlatformCommunityDiagramToolbar Canvas="@Context.Canvas"
+                                         Layers="@Context.Layers"
+                                         FormNodes="@Context.FormNodes"
+                                         ShowClose="true"
+                                         UseResponsiveOrderActions="true"
+                                         CanMoveBackward="@Context.CanMoveBackward"
+                                         CanMoveForward="@Context.CanMoveForward"
+                                         CanBringToFront="@Context.CanBringToFront"
+                                         CanSendToBack="@Context.CanSendToBack"
+                                         CanStartConnection="@Context.CanStartConnection"
+                                         OnClose="@Context.Close"
+                                         OnMoveBackward="@Context.MoveBackward"
+                                         OnMoveForward="@Context.MoveForward"
+                                         OnBringToFront="@Context.BringToFront"
+                                         OnSendToBack="@Context.SendToBack"
+                                         OnFormNodeSelected="@Context.AddFormNode"
+                                         OnStartConnection="@Context.StartConnection"
+                                         OnReset="@Context.Reset"
+                                         OnCancelConnection="@Context.CancelConnection" />
+        <PlatformCommunityDiagramDesktopCanvas Presentation="@desktopPresentation"
+                                                EdgeSelected="@Context.SelectEdge"
+                                                NodeSelected="@Context.SelectNode"
+                                                NodeContextRequested="@Context.OpenNodeContextAsync"
+                                                HandlePointerStartRequested="@Context.BeginHandleDrag"
+                                                HandlePointerUpRequested="@Context.CompleteHandlePointerUp"
+                                                HandleClicked="@Context.HandleDesktopHandleClick"
+                                                DragPointerChanged="@Context.ChangeDragPointer"
+                                                HandleDropRequested="@Context.CompleteHandleDrop" />
+        <PlatformCommunityDiagramMobileFlow Steps="@mobileSteps"
+                                            FormNodes="@Context.FormNodes"
+                                            ConnectionStartNodeTitle="@Context.ConnectionStartNodeTitle"
+                                            CanBringToFront="@Context.CanBringToFront"
+                                            CanSendToBack="@Context.CanSendToBack"
+                                            CanMoveBackward="@Context.CanMoveBackward"
+                                            CanMoveForward="@Context.CanMoveForward"
+                                            FormNodeSelected="@Context.AddFormNode"
+                                            NodeSelected="@Context.SelectNode"
+                                            NodeDetailRequested="@Context.OpenNodeDetail"
+                                            EdgeSelected="@Context.SelectEdge"
+                                            NodeMoveRequested="@Context.MoveNode"
+                                            ConnectionStartRequested="@Context.StartConnection"
+                                            ConnectionCancelRequested="@Context.CancelConnection"
+                                            BringToFrontRequested="@Context.BringToFront"
+                                            SendToBackRequested="@Context.SendToBack" />
+        <PlatformCommunityDiagramEdgeOptionsDock Canvas="@Context.Canvas"
+                                                   SelectedEdge="@selectedEdge"
+                                                   LabelChanged="@Context.ChangeEdgeLabel"
+                                                   StyleChanged="@Context.ChangeEdgeStyle"
+                                                   DeleteRequested="@Context.DeleteEdge" />
+        <PlatformCommunityWarehouseProxyPanel ViewModel="@Context.WarehouseProxy"
+                                              WorkspaceRequested="@Context.OpenWarehouseWorkspace" />
+        <PlatformCommunityDiagramChatPanel ViewModel="@Context.DiagramChat"
+                                           Context="@Context.ChatContext"
+                                           NodeCount="@flowNodes.Count"
+                                           EdgeCount="@diagramEdges.Count"
+                                           CanOpenWork="@(Context.SelectedNode is not null)"
+                                           OnOpenWork="@Context.OpenSelectedWork" />
+        <button type="button"
+                class="platform-diagram-community-fab"
+                title="다이어그램으로 커뮤니티 글쓰기"
+                aria-label="다이어그램으로 커뮤니티 글쓰기"
+                @onclick="@(() => Context.PrepareCommunityDraft(flowNodes, diagramEdges))"
+                @onclick:stopPropagation="true"
+                @onpointerdown:stopPropagation="true"
+                @onpointerup:stopPropagation="true">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" />
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityHome.DiagramStageSurface Context { get; set; } = null!;
+}

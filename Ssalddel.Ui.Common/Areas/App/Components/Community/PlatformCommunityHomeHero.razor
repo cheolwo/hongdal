@@ -1,0 +1,142 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Contracts.Common.Localization
+
+<MudPaper id="community-home-top" Elevation="0" Class="pa-4 platform-community-hero platform-community-forum-header">
+    <MudStack Spacing="2">
+        <div class="platform-community-forum-heading">
+            <div class="platform-community-forum-title">
+                <SsalddelWonBangGakMark Size="@(UseClassicForumLayout ? 34 : 48)" />
+                <div>
+                    <span>@AppName · @UiText("살뜰 커뮤니티", "Ssalddel Community")</span>
+                    <MudText Typo="Typo.h4" Class="platform-community-hero-title">@BoardTitle</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="platform-community-hero-copy">
+                        @BoardDescription
+                    </MudText>
+                </div>
+            </div>
+            <div class="platform-community-forum-status" aria-label="@UiText("현재 게시판 정보", "Current board information")">
+                <span><strong>@PostCount</strong>@UiText("개 글", " posts")</span>
+                <span>@RoleLabel @UiText("참여", "participation")</span>
+                <MudChip T="string" Size="Size.Small" Color="@ModeColor" Variant="Variant.Outlined">@ModeLabel</MudChip>
+            </div>
+        </div>
+
+        @if (UseClassicForumLayout)
+        {
+            <nav class="platform-community-classic-actions" aria-label="@UiText("게시판 바로가기", "Board shortcuts")">
+                <MudButton Href="/community/categories"
+                           Variant="Variant.Text"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.List">
+                    @UiText("게시판 전체보기", "All boards")
+                </MudButton>
+                <MudButton Href="/community/workspace"
+                           Variant="Variant.Text"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.AccountTree">
+                    @UiText("업무·원장", "Work & ledgers")
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Edit"
+                           OnClick="ComposeRequested">
+                    @UiText("글쓰기", "Write")
+                </MudButton>
+            </nav>
+        }
+        else if (CommunityFeedOnly || !IsWorkMode)
+        {
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Class="platform-community-hero-actions">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Edit"
+                           OnClick="ComposeRequested">
+                    글쓰기
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Description"
+                           OnClick="LedgerComposeRequested">
+                    원장으로 글쓰기
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Material.Filled.AccountTree"
+                           OnClick="DiagramRequested">
+                    다이어그램 모드
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Storefront"
+                           OnClick="StoreRequested">
+                    꾸미기 상점
+                </MudButton>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Success"
+                           EndIcon="@Icons.Material.Filled.ChevronRight"
+                           OnClick="WorkRequested">
+                    업무 보기
+                </MudButton>
+            </MudStack>
+        }
+
+        @ChildContent
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public string AppName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string DisplayLanguageCode { get; set; } = DisplayLanguageCodes.Korean;
+
+    [Parameter]
+    public bool UseClassicForumLayout { get; set; }
+
+    [Parameter, EditorRequired]
+    public string BoardTitle { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string BoardDescription { get; set; } = string.Empty;
+
+    [Parameter]
+    public int PostCount { get; set; }
+
+    [Parameter, EditorRequired]
+    public string RoleLabel { get; set; } = string.Empty;
+
+    [Parameter]
+    public Color ModeColor { get; set; }
+
+    [Parameter, EditorRequired]
+    public string ModeLabel { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool CommunityFeedOnly { get; set; }
+
+    [Parameter]
+    public bool IsWorkMode { get; set; }
+
+    [Parameter]
+    public EventCallback ComposeRequested { get; set; }
+
+    [Parameter]
+    public EventCallback LedgerComposeRequested { get; set; }
+
+    [Parameter]
+    public EventCallback DiagramRequested { get; set; }
+
+    [Parameter]
+    public EventCallback StoreRequested { get; set; }
+
+    [Parameter]
+    public EventCallback WorkRequested { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string UiText(string korean, string english)
+        => PlatformCommunityPostListPresentation.UiText(DisplayLanguageCode, korean, english);
+}
