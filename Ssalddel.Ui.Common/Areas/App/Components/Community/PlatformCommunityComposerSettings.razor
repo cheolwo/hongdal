@@ -1,0 +1,208 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="platform-community-compose-settings" aria-label="게시 설정">
+    <header>
+        <div>
+            <MudIcon Icon="@Icons.Material.Filled.Tune" Size="Size.Small" />
+            <strong>게시 설정</strong>
+        </div>
+        <MudIconButton Icon="@Icons.Material.Filled.Close"
+                       Size="Size.Small"
+                       OnClick="Model.ToggleSettings"
+                       aria-label="게시 설정 닫기" />
+    </header>
+
+    <div class="platform-community-compose-settings-grid platform-community-compose-settings-grid--identity">
+        @if (PostingAccess.UsesAutomaticAnonymousNickname)
+        {
+            <MudTextField T="string"
+                          Label="자동 익명 닉네임"
+                          Value="@PostingAccess.AutomaticAnonymousNicknameDisplay"
+                          ReadOnly="true"
+                          HelperText="실제 등록할 때 별표가 짧은 무작위 표식으로 바뀝니다."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        }
+        else
+        {
+            <MudTextField T="string"
+                          Label="닉네임"
+                          @bind-Value="Model.Draft.Nickname"
+                          Immediate="true"
+                          MaxLength="40"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        }
+        <MudTextField T="string"
+                      Label="글 비밀번호"
+                      @bind-Value="Model.Draft.Password"
+                      InputType="InputType.Password"
+                      Immediate="true"
+                      MaxLength="100"
+                      HelperText="수정과 사진 첨부에 다시 사용하므로 4자 이상 입력하세요."
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense" />
+    </div>
+
+    @if (Model.AllowScheduledPublication && Model.EditingPostId is null)
+    {
+        <div class="platform-community-compose-schedule">
+            <MudSwitch T="bool"
+                       @bind-Value="Model.IsScheduledPublication"
+                       Color="Color.Primary"
+                       Label="예약 발행" />
+            @if (Model.IsScheduledPublication)
+            {
+                <div class="platform-community-compose-schedule-fields">
+                    <MudDatePicker Label="발행 날짜"
+                                   @bind-Date="Model.ScheduledPublishDateLocal"
+                                   MinDate="@DateTime.Today"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" />
+                    <MudTimePicker Label="발행 시간"
+                                   @bind-Time="Model.ScheduledPublishTimeLocal"
+                                   AmPm="false"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" />
+                </div>
+                <small>
+                    <MudIcon Icon="@Icons.Material.Filled.Public" Size="Size.Small" />
+                    @Model.LocalTimeZoneDisplayName 기준입니다. 저장 후 서버가 해당 시각에 공개합니다.
+                </small>
+            }
+        </div>
+    }
+
+    <div class="platform-community-compose-settings-grid">
+        <MudSelect T="string"
+                   Label="업무 분류"
+                   @bind-Value="Model.Draft.WorkflowTag"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense">
+            @foreach (var classification in CommunityWorkClassificationCatalog.All)
+            {
+                <MudSelectItem Value="@classification.WorkflowTag">@classification.DisplayName</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string"
+                   Label="역할 태그"
+                   @bind-Value="Model.Draft.RoleTag"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense">
+            @foreach (var roleTag in RoleTags)
+            {
+                <MudSelectItem Value="@roleTag">@roleTag</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+
+    @if (SelectedWorkClassification is { } classification)
+    {
+        <div class="platform-community-compose-feature-state">
+            <MudIcon Icon="@(SelectedWorkFeatureEnabled ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.ChatBubbleOutline)"
+                     Color="@(SelectedWorkFeatureEnabled ? Color.Success : Color.Default)"
+                     Size="Size.Small" />
+            <span>@(SelectedWorkFeatureEnabled ? "원장 연결 가능" : "대화 게시글")</span>
+            <small>@(classification.LedgerTemplateKeys.Count == 0
+                ? "연결 원장 없음"
+                : string.Join(" · ", classification.LedgerTemplateKeys.Select(key => CommunityLedgerTemplateCatalog.Find(key).DisplayName)))</small>
+        </div>
+    }
+
+    <MudTextField T="string"
+                  Label="공유 링크 또는 영상 링크"
+                  @bind-Value="Model.Draft.SharedLinkUrl"
+                  MaxLength="1000"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Link" />
+
+    <div class="platform-community-compose-setting-row">
+        <MudCheckBox T="bool"
+                     @bind-Value="Model.Draft.IsAuthorDisplayCountryPublic"
+                     Label="활동 국가 공개"
+                     Color="Color.Primary" />
+        <MudCheckBox T="bool"
+                     @bind-Value="Model.Draft.IsReportBoardPost"
+                     Label="신고·분쟁 게시글"
+                     Color="Color.Error" />
+    </div>
+
+    @if (Model.Draft.IsAuthorDisplayCountryPublic)
+    {
+        <div class="platform-community-compose-settings-grid platform-community-country-fields">
+            <MudTextField T="string"
+                          Label="국가 코드"
+                          Placeholder="KR"
+                          @bind-Value="Model.Draft.AuthorDisplayCountryCode"
+                          MaxLength="2"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+            <MudTextField T="string"
+                          Label="활동 국가"
+                          Placeholder="대한민국"
+                          @bind-Value="Model.Draft.AuthorDisplayCountryName"
+                          MaxLength="80"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </div>
+    }
+
+    @if (Model.Draft.IsReportBoardPost)
+    {
+        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Text">
+            신고 관계자는 공개 화면에서 익명으로 표시됩니다.
+        </MudAlert>
+        <div class="platform-community-compose-settings-grid">
+            <MudTextField T="string"
+                          Label="신고한 사람 표시명"
+                          @bind-Value="Model.Draft.ReporterDisplayName"
+                          MaxLength="40"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+            <MudTextField T="string"
+                          Label="신고받는 사람 표시명"
+                          @bind-Value="Model.Draft.ReportedDisplayName"
+                          MaxLength="40"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </div>
+    }
+
+    @LedgerSettings
+
+    @if (Model.EditingPostId is not null)
+    {
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Error"
+                   Disabled="@Model.IsSaving"
+                   OnClick="CancelEditRequested"
+                   StartIcon="@Icons.Material.Filled.Close">
+            수정 취소
+        </MudButton>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public PlatformCommunityComposerPostingAccess PostingAccess { get; set; } = default!;
+
+    [Parameter]
+    public IReadOnlyList<string> RoleTags { get; set; } = [];
+
+    [Parameter]
+    public CommunityWorkClassificationResponse? SelectedWorkClassification { get; set; }
+
+    [Parameter]
+    public bool SelectedWorkFeatureEnabled { get; set; }
+
+    [Parameter]
+    public RenderFragment? LedgerSettings { get; set; }
+
+    [Parameter]
+    public EventCallback CancelEditRequested { get; set; }
+}

@@ -1,0 +1,31 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudTextField T="string"
+              Placeholder="제목"
+              @bind-Value="Model.Draft.Title"
+              OnBlur="DraftBlurred"
+              Immediate="true"
+              MaxLength="160"
+              Variant="Variant.Text"
+              Margin="Margin.Dense"
+              Class="platform-community-compose-title-field"
+              aria-label="게시글 제목" />
+<MudTextField T="string"
+              Placeholder="내용"
+              @bind-Value="Model.Draft.Body"
+              OnBlur="DraftBlurred"
+              Immediate="true"
+              Lines="12"
+              MaxLength="4000"
+              Variant="Variant.Text"
+              Margin="Margin.Dense"
+              Class="platform-community-compose-body-field"
+              aria-label="게시글 내용" />
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<FocusEventArgs> DraftBlurred { get; set; }
+}

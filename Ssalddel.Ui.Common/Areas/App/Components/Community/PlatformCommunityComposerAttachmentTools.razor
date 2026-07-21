@@ -1,0 +1,165 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (Model.SelectedFiles.Count > 0)
+{
+    <div class="platform-community-compose-file-list" aria-label="선택한 사진">
+        @for (var index = 0; index < Math.Min(Model.SelectedFiles.Count, 4); index++)
+        {
+            var file = Model.SelectedFiles[index];
+            <span>
+                <b>@(Model.Draft.IsSalesPost ? index == 0 ? "썸네일" : "상세" : "사진")</b>
+                <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" /> @file.Name
+                <MudIconButton Icon="@Icons.Material.Filled.Close"
+                               Size="Size.Small"
+                               OnClick="@(() => Model.RemoveFile(file))"
+                               aria-label="@($"{file.Name} 첨부 제외")" />
+            </span>
+        }
+        @if (Model.SelectedFiles.Count > 4)
+        {
+            <span>@($"외 {Model.SelectedFiles.Count - 4}개")</span>
+        }
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Error"
+                   Size="Size.Small"
+                   OnClick="Model.ClearFiles">
+            모두 빼기
+        </MudButton>
+    </div>
+}
+
+<div class="platform-community-compose-tools" aria-label="글 첨부 도구">
+    <MudTooltip Text="사진 첨부">
+        <label class="platform-community-compose-tool-button" aria-label="사진 첨부">
+            <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" />
+            <InputFile OnChange="FilesSelected"
+                       multiple
+                       accept="image/jpeg,image/png,image/webp,image/gif"
+                       class="platform-community-file-input" />
+        </label>
+    </MudTooltip>
+    @if (ImageGeneratorToolsRequested.HasDelegate)
+    {
+        <MudTooltip Text="AI 이미지 생성">
+            <MudIconButton Icon="@Icons.Material.Filled.AutoFixHigh"
+                           Color="Color.Default"
+                           OnClick="ImageGeneratorToolsRequested"
+                           aria-label="AI 이미지 생성" />
+        </MudTooltip>
+    }
+    <MudTooltip Text="링크 추가">
+        <MudIconButton Icon="@Icons.Material.Filled.Link"
+                       Color="Color.Default"
+                       OnClick="Model.OpenSettings"
+                       aria-label="공유 링크 추가" />
+    </MudTooltip>
+    <MudTooltip Text="판매 정보 붙이기">
+        <MudIconButton Icon="@Icons.Material.Filled.Storefront"
+                       Color="@(Model.Draft.IsSalesPost ? Color.Primary : Color.Default)"
+                       OnClick="SalesToggleRequested"
+                       aria-label="판매 정보 붙이기" />
+    </MudTooltip>
+    @if (LedgerPickerRequested.HasDelegate)
+    {
+        <MudTooltip Text="원장 첨부">
+            <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
+                           Color="Color.Default"
+                           Disabled="@LedgerPickerLoading"
+                           OnClick="LedgerPickerRequested"
+                           aria-label="원장 첨부" />
+        </MudTooltip>
+    }
+    @if (ResearchToolsRequested.HasDelegate)
+    {
+        <MudTooltip Text="자료 찾기">
+            <MudIconButton Icon="@Icons.Material.Filled.TravelExplore"
+                           Color="Color.Default"
+                           OnClick="ResearchToolsRequested"
+                           aria-label="자료 찾기" />
+        </MudTooltip>
+    }
+    @if (DiagramToolsRequested.HasDelegate)
+    {
+        <MudTooltip Text="다이어그램 작성">
+            <MudIconButton Icon="@Icons.Material.Filled.Hub"
+                           Color="Color.Default"
+                           OnClick="DiagramToolsRequested"
+                           aria-label="다이어그램 작성" />
+        </MudTooltip>
+    }
+    @if (EvidenceToolsRequested.HasDelegate)
+    {
+        <MudTooltip Text="근거 그래프 작성">
+            <MudIconButton Icon="@Icons.Material.Filled.InsertChart"
+                           Color="Color.Default"
+                           OnClick="EvidenceToolsRequested"
+                           aria-label="근거 그래프 작성" />
+        </MudTooltip>
+    }
+    @if (PeriodStatisticsToolsRequested.HasDelegate)
+    {
+        <MudTooltip Text="기간 통계">
+            <MudIconButton Icon="@Icons.Material.Filled.DateRange"
+                           Color="Color.Default"
+                           OnClick="PeriodStatisticsToolsRequested"
+                           aria-label="기간 통계" />
+        </MudTooltip>
+    }
+    @if (MutualBenefitToolsRequested.HasDelegate)
+    {
+        <MudTooltip Text="상호 이익 검토">
+            <MudIconButton Icon="@Icons.Material.Filled.Handshake"
+                           Color="Color.Default"
+                           OnClick="MutualBenefitToolsRequested"
+                           aria-label="상호 이익 검토" />
+        </MudTooltip>
+    }
+    <MudTooltip Text="활동 국가와 역할 설정">
+        <MudIconButton Icon="@Icons.Material.Filled.Public"
+                       Color="Color.Default"
+                       OnClick="Model.OpenSettings"
+                       aria-label="활동 국가와 역할 설정" />
+    </MudTooltip>
+    <MudTooltip Text="게시 설정">
+        <MudIconButton Icon="@Icons.Material.Filled.Tune"
+                       Color="Color.Default"
+                       OnClick="Model.ToggleSettings"
+                       aria-label="게시 설정" />
+    </MudTooltip>
+    <span class="platform-community-compose-character-count">@($"{Model.Draft.Body.Length:N0}/4,000")</span>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public bool LedgerPickerLoading { get; set; }
+
+    [Parameter]
+    public EventCallback<InputFileChangeEventArgs> FilesSelected { get; set; }
+
+    [Parameter]
+    public EventCallback SalesToggleRequested { get; set; }
+
+    [Parameter]
+    public EventCallback LedgerPickerRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ResearchToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback DiagramToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback EvidenceToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback PeriodStatisticsToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback MutualBenefitToolsRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ImageGeneratorToolsRequested { get; set; }
+}

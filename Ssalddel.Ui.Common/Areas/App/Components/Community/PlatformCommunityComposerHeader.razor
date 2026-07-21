@@ -1,0 +1,103 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<div class="platform-community-compose-top">
+    <header class="platform-community-compose-appbar">
+        <div class="platform-community-compose-appbar-leading">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                           Color="Color.Inherit"
+                           OnClick="CloseRequested"
+                           aria-label="글쓰기 닫기" />
+            <span class="platform-community-compose-mark" aria-hidden="true">
+                <MudIcon Icon="@Icons.Material.Filled.Forum" Size="Size.Small" />
+            </span>
+            <span class="platform-community-compose-appbar-title">
+                <strong>@(Model.EditingPostId is null ? "글쓰기" : "글 수정")</strong>
+                <small>@Model.Draft.Category</small>
+            </span>
+        </div>
+        <div class="platform-community-compose-appbar-actions">
+            <MudTooltip Text="게시 설정">
+                <MudIconButton Icon="@Icons.Material.Filled.MoreHoriz"
+                               Color="Color.Inherit"
+                               OnClick="Model.ToggleSettings"
+                               aria-label="게시 설정 열기" />
+            </MudTooltip>
+            @if (Model.EditingPostId is null
+                 && (Model.Draft.HasContent
+                     || Model.LocalDraftSavedAtUtc.HasValue
+                     || Model.SelectedFiles.Count > 0))
+            {
+                <MudTooltip Text="초안 비우기">
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+                                   Color="Color.Inherit"
+                                   Disabled="@Model.IsSaving"
+                                   OnClick="DiscardDraftRequested"
+                                   aria-label="초안 비우기" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="임시 저장">
+                <MudIconButton Icon="@Icons.Material.Filled.Save"
+                               Color="Color.Inherit"
+                               Disabled="@Model.IsSaving"
+                               OnClick="SaveDraftRequested"
+                               Class="platform-community-compose-draft-action"
+                               aria-label="임시 저장" />
+            </MudTooltip>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Small"
+                       Disabled="@Model.IsSaving"
+                       OnClick="PublishRequested"
+                       Class="platform-community-compose-publish-action">
+                @PublishActionText
+            </MudButton>
+        </div>
+    </header>
+
+    <nav class="platform-community-compose-board-tabs" aria-label="게시판 선택">
+        @foreach (var category in BoardCategories)
+        {
+            <button type="button"
+                    class="@PlatformCommunityComposerPresentation.BuildCategoryClass(Model.Draft.Category, category)"
+                    disabled="@PlatformCommunityComposerPresentation.IsCategoryLocked(Model, category)"
+                    aria-pressed="@string.Equals(Model.Draft.Category, category, StringComparison.OrdinalIgnoreCase)"
+                    aria-disabled="@PlatformCommunityComposerPresentation.IsCategoryLocked(Model, category)"
+                    @onclick="@(() => Model.SelectCategory(category))">
+                @category
+            </button>
+        }
+    </nav>
+    <MudAlert Severity="@PostingAccess.Severity"
+              Dense="true"
+              Variant="Variant.Text"
+              aria-live="polite">
+        <strong>@PostingAccess.Label</strong>
+        <span> — @PostingAccess.Notice</span>
+    </MudAlert>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public IReadOnlyList<string> BoardCategories { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public PlatformCommunityComposerPostingAccess PostingAccess { get; set; } = default!;
+
+    [Parameter]
+    public string PublishActionText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback CloseRequested { get; set; }
+
+    [Parameter]
+    public EventCallback DiscardDraftRequested { get; set; }
+
+    [Parameter]
+    public EventCallback SaveDraftRequested { get; set; }
+
+    [Parameter]
+    public EventCallback PublishRequested { get; set; }
+}

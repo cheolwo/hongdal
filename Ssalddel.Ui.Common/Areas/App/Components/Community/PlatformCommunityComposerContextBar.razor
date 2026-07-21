@@ -1,0 +1,41 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<div class="platform-community-compose-context" aria-label="현재 게시 설정">
+    <span>@Model.Draft.WorkflowTag</span>
+    <span>@Model.Draft.RoleTag</span>
+    @if (Model.Draft.IsAuthorDisplayCountryPublic && !string.IsNullOrWhiteSpace(Model.Draft.AuthorDisplayCountryCode))
+    {
+        <span>@Model.Draft.AuthorDisplayCountryCode.ToUpperInvariant()</span>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Draft.커뮤니티원장Id))
+    {
+        <span class="platform-community-compose-context--ledger"><MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" /> 원장 연결</span>
+    }
+    @if (Model.Draft.IsSalesPost)
+    {
+        <span class="platform-community-compose-context--sales">
+            <MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" />
+            판매글 · @Model.Draft.SalesAvailableQuantity@Model.Draft.SalesQuantityUnit
+        </span>
+    }
+    @if (Model.Draft.IsReportBoardPost)
+    {
+        <span class="platform-community-compose-context--report">신고·분쟁</span>
+    }
+    @if (Model.IsScheduledPublication && Model.ScheduledPublishAtUtc is DateTime scheduledAtUtc)
+    {
+        <span class="platform-community-compose-context--schedule">
+            <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" />
+            @scheduledAtUtc.ToLocalTime().ToString("MM-dd HH:mm") 예약
+        </span>
+    }
+    @if (Model.LocalDraftSavedAtUtc is DateTime savedAtUtc)
+    {
+        <small>@($"임시저장 {savedAtUtc.ToLocalTime():HH:mm}")</small>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+}

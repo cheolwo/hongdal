@@ -1,0 +1,93 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="community-sales-compose" aria-label="판매 정보">
+    <button type="button"
+            class="community-sales-compose__toggle @(Model.Draft.IsSalesPost ? "is-active" : string.Empty)"
+            aria-pressed="@Model.Draft.IsSalesPost"
+            @onclick="SalesToggleRequested">
+        <span><MudIcon Icon="@Icons.Material.Filled.Storefront" Size="Size.Small" /> 판매 정보 붙이기</span>
+        <small>@(Model.Draft.IsSalesPost
+            ? "판매 게시판에 자동 분류됩니다. 댓글에서 거래 조건을 이야기해 주세요."
+            : "상품 정보를 붙이면 판매 게시판으로 자동 분류됩니다.")</small>
+    </button>
+
+    @if (Model.Draft.IsSalesPost)
+    {
+        <div class="community-sales-compose__fields">
+            <MudTextField T="string"
+                          Label="상품명"
+                          Placeholder="예: 햇복숭아 3kg 한 상자"
+                          @bind-Value="Model.Draft.SalesProductTitle"
+                          Immediate="true"
+                          MaxLength="160"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Class="community-sales-compose__product" />
+            <MudNumericField T="decimal"
+                             Label="판매 가능 수량"
+                             @bind-Value="Model.Draft.SalesAvailableQuantity"
+                             Min="@((decimal)0.01)"
+                             Max="@((decimal)1000000)"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense" />
+            <MudTextField T="string"
+                          Label="수량 단위"
+                          Placeholder="개, 상자, kg"
+                          @bind-Value="Model.Draft.SalesQuantityUnit"
+                          MaxLength="20"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+            <MudNumericField T="decimal"
+                             Label="개당 가격"
+                             @bind-Value="Model.Draft.SalesUnitPrice"
+                             Min="@((decimal)0.01)"
+                             Max="@((decimal)1000000000)"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense" />
+            <MudTextField T="string"
+                          Label="통화"
+                          Placeholder="KRW"
+                          @bind-Value="Model.Draft.SalesCurrencyCode"
+                          MaxLength="3"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </div>
+
+        <div class="community-sales-compose__payments" role="group" aria-label="협의 가능한 결제 방법">
+            <strong>협의 가능한 결제</strong>
+            <div>
+                <MudCheckBox T="bool" @bind-Value="Model.Draft.AcceptsTossPayments" Label="토스결제" Dense="true" />
+                <MudCheckBox T="bool" @bind-Value="Model.Draft.AcceptsNaverPay" Label="네이버페이" Dense="true" />
+                <MudCheckBox T="bool" @bind-Value="Model.Draft.AcceptsPayPal" Label="PayPal" Dense="true" />
+                <MudCheckBox T="bool" @bind-Value="Model.Draft.AcceptsDirectCash" Label="당사자 간 현금" Dense="true" />
+            </div>
+            <MudCheckBox T="bool"
+                         @bind-Value="Model.Draft.AllowsGroupPurchase"
+                         Label="주문자들이 수량을 모아 공동구매를 제안할 수 있음"
+                         Dense="true" />
+            <small>결제 수단은 가능 여부를 표시하는 정보입니다. 실제 결제·현금 전달은 댓글에서 조건을 합의한 뒤 별도로 진행합니다.</small>
+        </div>
+
+        @if (Model.EditingPostId is not null)
+        {
+            <MudSelect T="string"
+                       Label="판매 상태"
+                       @bind-Value="Model.Draft.SalesStatus"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="community-sales-compose__status">
+                <MudSelectItem Value="@PlatformCommunitySalesOfferStatuses.Open">판매 중</MudSelectItem>
+                <MudSelectItem Value="@PlatformCommunitySalesOfferStatuses.SoldOut">품절</MudSelectItem>
+                <MudSelectItem Value="@PlatformCommunitySalesOfferStatuses.Closed">판매 종료</MudSelectItem>
+            </MudSelect>
+        }
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback SalesToggleRequested { get; set; }
+}
