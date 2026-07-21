@@ -1,0 +1,124 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Microsoft.AspNetCore.Components.Forms
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<CommunityLedgerNodeActionViewModel>
+
+<section class="ledger-diagram-detail__node-actions" aria-label="선택한 블록 업무">
+    <div class="ledger-diagram-detail__node-actions-heading">
+        <div>
+            <MudIcon Icon="@Icons.Material.Filled.PlayCircle" Size="Size.Small" />
+            <strong>이 블록에서 할 수 있는 일</strong>
+        </div>
+        <span>@($"{Actions.Count(action => action.실행가능여부)}개 실행 가능")</span>
+    </div>
+
+    @if (Actions.Count == 0)
+    {
+        <p class="ledger-diagram-detail__node-actions-empty">현재 계정과 진행 상태에서 실행할 수 있는 업무가 없습니다.</p>
+    }
+    else
+    {
+        @foreach (var action in Actions)
+        {
+            <div class="@(action.실행가능여부 ? "ledger-diagram-detail__action-item" : "ledger-diagram-detail__action-item ledger-diagram-detail__action-item--disabled")">
+                <div>
+                    <strong>@action.표시명</strong>
+                    <span>@action.설명</span>
+                    @if (!action.실행가능여부 && !string.IsNullOrWhiteSpace(action.비활성사유))
+                    {
+                        <small>@action.비활성사유</small>
+                    }
+                </div>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           Disabled="@(!action.실행가능여부 || ViewModel.IsExecuting)"
+                           OnClick="@(() => ViewModel.Begin(action))">
+                    실행
+                </MudButton>
+            </div>
+        }
+    }
+
+    @if (ViewModel.PendingAction is { } pendingAction)
+    {
+        <div class="ledger-diagram-detail__action-confirm">
+            <div class="ledger-diagram-detail__action-confirm-title">
+                <MudIcon Icon="@Icons.Material.Filled.TaskAlt" Size="Size.Small" />
+                <strong>@pendingAction.표시명 확인</strong>
+            </div>
+            <p>@pendingAction.설명</p>
+
+            @if (pendingAction.사진필수여부)
+            {
+                <label class="ledger-diagram-detail__evidence-picker">
+                    <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" Size="Size.Small" />
+                    <span>@(ViewModel.EvidenceFile is null ? "상차·인수 증빙 사진 선택" : ViewModel.EvidenceFile.Name)</span>
+                    <InputFile OnChange="HandleEvidenceSelected" accept="image/*" />
+                </label>
+                <MudCheckBox T="bool"
+                             @bind-Value="ViewModel.EvidenceConfirmed"
+                             Color="Color.Primary"
+                             Label="사진에 현장 상차 또는 인수 확인 내용이 포함되어 있습니다." />
+            }
+
+            <div class="ledger-diagram-detail__action-confirm-buttons">
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Default"
+                           Disabled="@ViewModel.IsExecuting"
+                           OnClick="ViewModel.Cancel">
+                    취소
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Check"
+                           Disabled="@(!ViewModel.CanExecutePendingAction)"
+                           OnClick="ExecuteAsync">
+                    @(ViewModel.IsExecuting ? "처리 중" : "확인 후 실행")
+                </MudButton>
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ViewModel.ActionStatusMessage))
+    {
+        <div class="@(ViewModel.ActionSucceeded ? "ledger-diagram-detail__action-status ledger-diagram-detail__action-status--success" : "ledger-diagram-detail__action-status ledger-diagram-detail__action-status--error")">
+            <MudIcon Icon="@(ViewModel.ActionSucceeded ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.ErrorOutline)" Size="Size.Small" />
+            <span>@ViewModel.ActionStatusMessage</span>
+        </div>
+    }
+</section>
+
+@code {
+    private string? _nodeId;
+
+    [Parameter]
+    public string NodeId { get; set; } = string.Empty;
+
+    [Parameter]
+    public IReadOnlyList<PlatformCommunityLedgerNodeActionResponse> Actions { get; set; } = [];
+
+    [Parameter]
+    public EventCallback Completed { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.Equals(_nodeId, NodeId, StringComparison.OrdinalIgnoreCase))
+        {
+            _nodeId = NodeId;
+            ViewModel.Reset();
+        }
+    }
+
+    private void HandleEvidenceSelected(InputFileChangeEventArgs args)
+        => ViewModel.SelectEvidence(args.File);
+
+    private async Task ExecuteAsync()
+    {
+        if (await ViewModel.ExecuteAsync())
+        {
+            await Completed.InvokeAsync();
+        }
+    }
+}

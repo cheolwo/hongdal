@@ -1,9 +1,7 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 @using Ssalddel.Contracts.Common.Community
 @using Ssalddel.Ui.Common.Areas.App.Services
-@using Microsoft.AspNetCore.Components.Forms
 @implements IAsyncDisposable
-@inject CommunityLedgerNodeActionService NodeActionService
 @inject IDiagramCollaborationClientService DiagramCollaborationClient
 
 <section class="ledger-diagram-detail" aria-label="원장 다이어그램 상세">
@@ -334,91 +332,9 @@
 
                         @if (Context.상세조회가능여부)
                         {
-                            <section class="ledger-diagram-detail__node-actions" aria-label="선택한 블록 업무">
-                                <div class="ledger-diagram-detail__node-actions-heading">
-                                    <div>
-                                        <MudIcon Icon="@Icons.Material.Filled.PlayCircle" Size="Size.Small" />
-                                        <strong>이 블록에서 할 수 있는 일</strong>
-                                    </div>
-                                    <span>@($"{SelectedNodeActions.Count(action => action.실행가능여부)}개 실행 가능")</span>
-                                </div>
-
-                                @if (SelectedNodeActions.Count == 0)
-                                {
-                                    <p class="ledger-diagram-detail__node-actions-empty">현재 계정과 진행 상태에서 실행할 수 있는 업무가 없습니다.</p>
-                                }
-                                else
-                                {
-                                    @foreach (var action in SelectedNodeActions)
-                                    {
-                                        <div class="@(action.실행가능여부 ? "ledger-diagram-detail__action-item" : "ledger-diagram-detail__action-item ledger-diagram-detail__action-item--disabled")">
-                                            <div>
-                                                <strong>@action.표시명</strong>
-                                                <span>@action.설명</span>
-                                                @if (!action.실행가능여부 && !string.IsNullOrWhiteSpace(action.비활성사유))
-                                                {
-                                                    <small>@action.비활성사유</small>
-                                                }
-                                            </div>
-                                            <MudButton Variant="Variant.Outlined"
-                                                       Color="Color.Primary"
-                                                       Size="Size.Small"
-                                                       Disabled="@(!action.실행가능여부 || isExecutingAction)"
-                                                       OnClick="@(() => BeginAction(action))">
-                                                실행
-                                            </MudButton>
-                                        </div>
-                                    }
-                                }
-
-                                @if (pendingAction is not null)
-                                {
-                                    <div class="ledger-diagram-detail__action-confirm">
-                                        <div class="ledger-diagram-detail__action-confirm-title">
-                                            <MudIcon Icon="@Icons.Material.Filled.TaskAlt" Size="Size.Small" />
-                                            <strong>@pendingAction.표시명 확인</strong>
-                                        </div>
-                                        <p>@pendingAction.설명</p>
-
-                                        @if (pendingAction.사진필수여부)
-                                        {
-                                            <label class="ledger-diagram-detail__evidence-picker">
-                                                <MudIcon Icon="@Icons.Material.Filled.AddPhotoAlternate" Size="Size.Small" />
-                                                <span>@(evidenceFile is null ? "상차·인수 증빙 사진 선택" : evidenceFile.Name)</span>
-                                                <InputFile OnChange="HandleEvidenceSelected" accept="image/*" />
-                                            </label>
-                                            <MudCheckBox T="bool"
-                                                         @bind-Value="evidenceConfirmed"
-                                                         Color="Color.Primary"
-                                                         Label="사진에 현장 상차 또는 인수 확인 내용이 포함되어 있습니다." />
-                                        }
-
-                                        <div class="ledger-diagram-detail__action-confirm-buttons">
-                                            <MudButton Variant="Variant.Text"
-                                                       Color="Color.Default"
-                                                       Disabled="@isExecutingAction"
-                                                       OnClick="CancelAction">
-                                                취소
-                                            </MudButton>
-                                            <MudButton Variant="Variant.Filled"
-                                                       Color="Color.Primary"
-                                                       StartIcon="@Icons.Material.Filled.Check"
-                                                       Disabled="@(!CanExecutePendingAction)"
-                                                       OnClick="ExecutePendingActionAsync">
-                                                @(isExecutingAction ? "처리 중" : "확인 후 실행")
-                                            </MudButton>
-                                        </div>
-                                    </div>
-                                }
-
-                                @if (!string.IsNullOrWhiteSpace(actionStatusMessage))
-                                {
-                                    <div class="@(actionSucceeded ? "ledger-diagram-detail__action-status ledger-diagram-detail__action-status--success" : "ledger-diagram-detail__action-status ledger-diagram-detail__action-status--error")">
-                                        <MudIcon Icon="@(actionSucceeded ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.ErrorOutline)" Size="Size.Small" />
-                                        <span>@actionStatusMessage</span>
-                                    </div>
-                                }
-                            </section>
+                            <CommunityLedgerNodeActionPanel NodeId="@SelectedNode.NodeId"
+                                                            Actions="@SelectedNodeActions"
+                                                            Completed="RequestRefreshAsync" />
                         }
                     }
 
@@ -466,14 +382,9 @@
     private string? selectedNodeId;
     private string? loadedLedgerId;
     private string? joinedLedgerRoomId;
-    private PlatformCommunityLedgerNodeActionResponse? pendingAction;
-    private IBrowserFile? evidenceFile;
     private string realtimeStatus = "실시간 연결 준비 중";
-    private string? actionStatusMessage;
     private bool realtimeConnected;
     private bool isJoiningLedgerRoom;
-    private bool evidenceConfirmed;
-    private bool isExecutingAction;
     private bool isRefreshing;
     private bool disposed;
 
@@ -533,11 +444,6 @@
                .ToArray()
            ?? [];
 
-    private bool CanExecutePendingAction
-        => pendingAction is not null
-           && !isExecutingAction
-           && (!pendingAction.사진필수여부 || evidenceFile is not null && evidenceConfirmed);
-
     private static string ResolveAccessScopeLabel(PlatformCommunityPostLedgerContextResponse context)
         => context.역할범위조회여부
             ? $"{context.접근역할명} 역할 범위"
@@ -585,9 +491,6 @@
         {
             loadedLedgerId = Context.원장Id;
             selectedNodeId = Context.다이어그램?.Nodes.FirstOrDefault()?.NodeId;
-            pendingAction = null;
-            evidenceFile = null;
-            actionStatusMessage = null;
         }
 
         await JoinLedgerRoomAsync(Context);
@@ -715,10 +618,6 @@
     private void SelectNode(string nodeId)
     {
         selectedNodeId = nodeId;
-        pendingAction = null;
-        evidenceFile = null;
-        evidenceConfirmed = false;
-        actionStatusMessage = null;
     }
 
     private string BuildNodeState(DiagramNodeDto node)
@@ -739,82 +638,6 @@
     private Task HandleBackAsync() => OnBack.InvokeAsync();
 
     private Task HandleAttachAsync() => OnAttach.InvokeAsync();
-
-    private void BeginAction(PlatformCommunityLedgerNodeActionResponse action)
-    {
-        pendingAction = action;
-        evidenceFile = null;
-        evidenceConfirmed = false;
-        actionStatusMessage = null;
-    }
-
-    private void CancelAction()
-    {
-        pendingAction = null;
-        evidenceFile = null;
-        evidenceConfirmed = false;
-    }
-
-    private void HandleEvidenceSelected(InputFileChangeEventArgs args)
-    {
-        var file = args.File;
-        if (file.Size > CommunityLedgerNodeActionService.MaxEvidenceFileBytes)
-        {
-            evidenceFile = null;
-            actionSucceeded = false;
-            actionStatusMessage = "증빙 사진은 8MB 이하만 선택할 수 있습니다.";
-            return;
-        }
-
-        if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-        {
-            evidenceFile = null;
-            actionSucceeded = false;
-            actionStatusMessage = "이미지 형식의 증빙 파일을 선택해 주세요.";
-            return;
-        }
-
-        evidenceFile = file;
-        actionStatusMessage = null;
-    }
-
-    private bool actionSucceeded;
-
-    private async Task ExecutePendingActionAsync()
-    {
-        if (pendingAction is null || !CanExecutePendingAction)
-        {
-            return;
-        }
-
-        isExecutingAction = true;
-        actionStatusMessage = null;
-        try
-        {
-            CommunityLedgerEvidenceUploadResult? evidence = null;
-            if (pendingAction.사진필수여부 && evidenceFile is not null)
-            {
-                evidence = await NodeActionService.상차증빙업로드Async(pendingAction, evidenceFile);
-            }
-
-            var result = await NodeActionService.실행Async(pendingAction, evidence);
-            actionSucceeded = true;
-            actionStatusMessage = $"{pendingAction.표시명} 처리가 완료되었습니다. 현재 상태는 {result.상태}입니다.";
-            pendingAction = null;
-            evidenceFile = null;
-            evidenceConfirmed = false;
-            await RequestRefreshAsync();
-        }
-        catch (Exception ex)
-        {
-            actionSucceeded = false;
-            actionStatusMessage = ex.Message;
-        }
-        finally
-        {
-            isExecutingAction = false;
-        }
-    }
 
     private async Task JoinLedgerRoomAsync(PlatformCommunityPostLedgerContextResponse context)
     {

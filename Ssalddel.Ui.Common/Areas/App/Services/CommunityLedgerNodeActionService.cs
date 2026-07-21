@@ -7,10 +7,26 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Ssalddel.Ui.Common.Areas.App.Services;
 
-public sealed class CommunityLedgerNodeActionService
+public static class CommunityLedgerEvidencePolicy
 {
-    public const long MaxEvidenceFileBytes = 8 * 1024 * 1024;
+    public const long MaxFileBytes = 8 * 1024 * 1024;
+}
 
+public interface ICommunityLedgerNodeActionService
+{
+    Task<CommunityLedgerEvidenceUploadResult> 상차증빙업로드Async(
+        PlatformCommunityLedgerNodeActionResponse action,
+        IBrowserFile file,
+        CancellationToken cancellationToken = default);
+
+    Task<기사운송상태변경응답> 실행Async(
+        PlatformCommunityLedgerNodeActionResponse action,
+        CommunityLedgerEvidenceUploadResult? evidence = null,
+        CancellationToken cancellationToken = default);
+}
+
+public sealed class CommunityLedgerNodeActionService : ICommunityLedgerNodeActionService
+{
     private readonly SsalddelProtectedApiClient protectedApiClient;
 
     public CommunityLedgerNodeActionService(SsalddelProtectedApiClient protectedApiClient)
@@ -27,7 +43,7 @@ public sealed class CommunityLedgerNodeActionService
         ArgumentNullException.ThrowIfNull(file);
         var transportId = ResolveTransportId(action);
 
-        await using var stream = file.OpenReadStream(MaxEvidenceFileBytes, cancellationToken);
+        await using var stream = file.OpenReadStream(CommunityLedgerEvidencePolicy.MaxFileBytes, cancellationToken);
         using var content = new MultipartFormDataContent();
         using var fileContent = new StreamContent(stream);
         fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(

@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-21 | [공동 원장 블록 업무 실행 책임 분리](2026-07-21-community-ledger-node-action-srp.md) | 원장 상세에서 증빙 검증·업로드·운송 상태 Command를 독립 컴포넌트와 ViewModel로 분리하고 desktop·390px mobile 검증 |
 | 2026-07-21 | [개인 커뮤니티 페이지 단일책임 분리](2026-07-21-community-personal-srp.md) | 576줄 다중 책임 route 페이지를 얇은 조립 셸과 활동·알림·꾸미기 ViewModel, 일곱 section 컴포넌트로 분리하고 desktop·390px mobile 검증 |
 | 2026-07-21 | [구매 근거를 잇는 상품 상세·판매 초안 서버 흐름](2026-07-21-purchase-evidence-product-detail.md) | 화면 없음 — 완료 원장과 공개 후기를 비식별 투영하고, 로그인 후기 작성과 서버 재검증 판매 초안 근거를 연결 |
 | 2026-07-21 | [공식 재료별 대표 레시피 관계](2026-07-21-official-ingredient-related-recipes.md) | 화면 없음 — 각 재료에 실제 대표 레시피를 최대 3개 연결하고 저장된 재료·공공가격을 공개 읽기 API로 제공 |

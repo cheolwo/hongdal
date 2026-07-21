@@ -81,6 +81,9 @@ internal static class CommunityPlatformUiModule
         services.TryAddTransient<농수산가격비교PageViewModel>();
         services.TryAddTransient<OfficialFoodIngredientJourneyViewModel>();
         services.TryAddScoped<CommunityLedgerNodeActionService>();
+        services.TryAddScoped<ICommunityLedgerNodeActionService>(provider =>
+            provider.GetRequiredService<CommunityLedgerNodeActionService>());
+        services.TryAddTransient<CommunityLedgerNodeActionViewModel>();
         services.TryAddScoped<YouTube관리콘텐츠Service>();
         services.TryAddScoped<PlatformCommunityDecorationStateService>();
         services.TryAddScoped<PlatformCommunityPostDraftStateService>();
