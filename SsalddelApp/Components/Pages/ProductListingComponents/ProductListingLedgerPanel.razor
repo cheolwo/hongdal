@@ -1,0 +1,66 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="listing-ledger-panel">
+    <div class="listing-ledger-heading">
+        <div>
+            <MudText Typo="Typo.overline">LOCAL LISTING LEDGER</MudText>
+            <MudText Typo="Typo.h6">Simulation 출품 원장</MudText>
+            <MudText Typo="Typo.body2">상품·계정 ID를 화면 이름과 함께 다시 조합해 표시합니다.</MudText>
+        </div>
+        <MudChip T="string" Size="Size.Small" Color="@(Read.검토필요수 > 0 ? Color.Warning : Color.Default)" Variant="Variant.Outlined">검토 @Read.검토필요수.ToString("N0")건</MudChip>
+    </div>
+
+    <MudTextField T="string"
+                  @bind-Value="Read.출품검색어"
+                  Immediate="true"
+                  Label="상품·SKU·채널·상점·상태 검색"
+                  Variant="Variant.Outlined"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="mt-3" />
+
+    @if (Read.출품없음)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">등록된 Simulation 출품 원장이 없습니다.</MudAlert>
+    }
+    else if (Read.출품검색결과없음)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">검색 조건에 맞는 출품 원장이 없습니다.</MudAlert>
+    }
+    else
+    {
+        <div class="listing-ledger-list">
+            @foreach (var row in Read.표시출품행목록)
+            {
+                <article>
+                    <div class="listing-ledger-row-heading">
+                        <div>
+                            <strong>@row.상품명</strong>
+                            <span>@row.판매Sku</span>
+                        </div>
+                        <MudChip T="string" Size="Size.Small" Color="@ProductListingPresentation.SyncColor(row.출품.동기화상태)" Variant="Variant.Outlined">@row.출품.동기화상태</MudChip>
+                    </div>
+                    <dl>
+                        <div><dt>채널·상점</dt><dd>@ProductListingPresentation.ChannelName(row.채널종류) · @row.상점명</dd></div>
+                        <div><dt>로컬 원장</dt><dd>#@row.Id.ToString("N0") · @ProductListingPresentation.ValueOrDash(row.출품.채널상품번호)</dd></div>
+                        <div><dt>상태</dt><dd>@row.출품.출품상태</dd></div>
+                    </dl>
+                    @if (!string.IsNullOrWhiteSpace(row.출품.에러메시지))
+                    {
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">@row.출품.에러메시지</MudAlert>
+                    }
+                </article>
+            }
+        </div>
+    }
+
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+        원장의 출품·동기화 상태는 로컬 준비 기록이며 외부 판매채널에서 실제 발행되었다는 뜻이 아닙니다.
+    </MudAlert>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+}

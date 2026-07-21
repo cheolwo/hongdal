@@ -1,0 +1,14 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<div class="product-listing-summary" aria-label="판매채널 출품 요약">
+    <MudPaper Elevation="0" Outlined="true"><span>판매상품</span><strong>@Read.스냅샷.상품목록.Count.ToString("N0")</strong></MudPaper>
+    <MudPaper Elevation="0" Outlined="true"><span>채널 계정</span><strong>@Read.스냅샷.계정목록.Count.ToString("N0")</strong></MudPaper>
+    <MudPaper Elevation="0" Outlined="true"><span>로컬 출품 원장</span><strong>@Read.스냅샷.출품목록.Count.ToString("N0")</strong></MudPaper>
+    <MudPaper Elevation="0" Outlined="true"><span>외부 발행 실행</span><strong>0</strong></MudPaper>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+}

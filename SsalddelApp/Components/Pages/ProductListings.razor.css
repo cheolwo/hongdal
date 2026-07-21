@@ -1,0 +1,41 @@
+.product-listings-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    min-width: 0;
+}
+
+.product-listings-shell > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.product-listings-overview-grid,
+.product-listings-draft-grid {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+}
+
+.product-listings-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-listings-draft-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(20rem, .75fr);
+}
+
+@media (max-width: 1100px) {
+    .product-listings-overview-grid,
+    .product-listings-draft-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    .product-listings-shell,
+    .product-listings-overview-grid,
+    .product-listings-draft-grid {
+        gap: .75rem;
+    }
+}

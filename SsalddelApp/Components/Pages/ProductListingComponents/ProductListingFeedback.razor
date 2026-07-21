@@ -1,0 +1,36 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+@if (Read.초기화됨 && Read.오류발생)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        최신 조회에 실패해 직전 화면을 유지합니다. @Read.오류메시지
+    </MudAlert>
+}
+
+@if (Draft.오류발생)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Draft.오류메시지</MudAlert>
+}
+
+@if (Create.오류발생)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Create.오류메시지</MudAlert>
+}
+else if (Create.성공함 && Create.재조회결과 is not null)
+{
+    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+        @Create.성공메시지 생성한 원장 #@Create.재조회결과.Id.ToString("N0")을 같은 ID로 다시 확인했습니다.
+    </MudAlert>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public ProductListingDraftViewModel Draft { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public ProductListingCreateViewModel Create { get; set; } = null!;
+}

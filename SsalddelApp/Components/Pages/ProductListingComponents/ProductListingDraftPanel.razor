@@ -1,0 +1,128 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="listing-draft-panel">
+    <MudText Typo="Typo.overline">REVIEW BEFORE LOCAL COMMAND</MudText>
+    <MudText Typo="Typo.h6">출품 검토 초안</MudText>
+    <MudText Typo="Typo.body2">상품을 직접 고르고, 선택한 accountId 한 건을 다시 조회한 뒤 payload를 검토합니다.</MudText>
+
+    <div class="listing-draft-selectors">
+        <MudSelect T="long?"
+                   Label="판매상품 직접 선택"
+                   Value="@Draft.선택상품Id"
+                   ValueChanged="ProductSelected"
+                   Variant="Variant.Outlined"
+                   Clearable="true"
+                   Disabled="@IsBusy">
+            @foreach (var product in Read.스냅샷.상품목록.OrderBy(item => item.대표상품명))
+            {
+                <MudSelectItem T="long?" Value="@((long?)product.Id)">@product.대표상품명 (@product.판매SKU)</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="long?"
+                   Label="채널 계정 ID 직접 선택"
+                   Value="@Draft.선택계정Id"
+                   ValueChanged="AccountSelected"
+                   Variant="Variant.Outlined"
+                   Clearable="true"
+                   Disabled="@IsBusy">
+            @foreach (var account in Read.스냅샷.계정목록.OrderBy(item => item.채널종류).ThenBy(item => item.상점명))
+            {
+                <MudSelectItem T="long?" Value="@((long?)account.Id)">@ProductListingPresentation.ChannelName(account.채널종류) · @account.상점명 · #@account.Id</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+
+    @if (Read.계정없음)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">선택할 채널 계정이 없습니다. 채널 연결에서 로컬 연결 준비 기록을 먼저 만드세요.</MudAlert>
+    }
+    else if (Draft.상품찾을수없음 || Draft.계정찾을수없음)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mt-3">요청한 정확한 상품 또는 계정을 찾지 못했으며 다른 항목으로 대체하지 않았습니다.</MudAlert>
+    }
+    else if (Draft.선택상품 is null || Draft.선택계정 is null)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">첫 항목을 자동 선택하지 않습니다. 상품과 채널 계정을 각각 선택해 주세요.</MudAlert>
+    }
+    else
+    {
+        <div class="listing-draft-exact-selection">
+            <article>
+                <span>정확한 판매상품</span>
+                <strong>@Draft.선택상품.대표상품명</strong>
+                <small>@Draft.선택상품.판매SKU · ID @Draft.선택상품.Id</small>
+            </article>
+            <article>
+                <span>정확한 채널 계정</span>
+                <strong>@ProductListingPresentation.ChannelName(Draft.선택계정.채널종류) · @Draft.선택계정.상점명</strong>
+                <small>ID @Draft.선택계정.Id · @Draft.선택계정.연결상태</small>
+            </article>
+        </div>
+    }
+
+    @if (Draft.처리중)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mt-3" />
+    }
+    else if (Draft.준비결과 is not null)
+    {
+        <section class="listing-payload-review" aria-label="외부 발행 전 payload 검토 초안">
+            <div class="listing-payload-heading">
+                <div>
+                    <MudText Typo="Typo.subtitle1">@Draft.준비결과.Channel.DisplayName payload 초안</MudText>
+                    <MudText Typo="Typo.caption">@Draft.준비결과.Message</MudText>
+                </div>
+                <MudChip T="string" Size="Size.Small" Color="@ProductListingPresentation.SyncColor(Draft.준비결과.SyncStatus)" Variant="Variant.Outlined">@Draft.준비결과.SyncStatus</MudChip>
+            </div>
+            <dl>
+                <div><dt>Provider</dt><dd>@Draft.준비결과.Channel.ProviderName</dd></div>
+                <div><dt>연동 상태</dt><dd>@Draft.준비결과.Channel.IntegrationStatus</dd></div>
+                <div><dt>외부 생성 지원 표기</dt><dd>@(Draft.준비결과.Channel.SupportsProductCreate ? "카탈로그상 지원" : "미지원")</dd></div>
+                <div><dt>현재 실행</dt><dd>검토 초안만</dd></div>
+            </dl>
+            <pre>@ProductListingPresentation.Payload(Draft.준비결과)</pre>
+        </section>
+    }
+
+    @if (Draft.중복출품)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">
+            같은 상품·계정 조합의 Simulation 출품 #@Draft.기존출품!.Id.ToString("N0")이 이미 있어 중복 생성을 막았습니다.
+        </MudAlert>
+    }
+
+    <div class="listing-draft-command">
+        <MudCheckBox T="bool"
+                     @bind-Value="Draft.외부효과없음확인"
+                     Disabled="@(IsBusy || Draft.준비결과 is null || Draft.중복출품)"
+                     Label="외부 상품 API를 호출하지 않고 로컬 Simulation 출품 원장만 생성함을 확인했습니다." />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Science"
+                   Disabled="@(IsBusy || !Draft.생성가능)"
+                   OnClick="CreateRequested">
+            @(IsBusy ? "처리 중" : "Simulation 출품 원장 생성")
+        </MudButton>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public ProductListingDraftViewModel Draft { get; set; } = null!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<long?> ProductSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<long?> AccountSelected { get; set; }
+
+    [Parameter]
+    public EventCallback CreateRequested { get; set; }
+}

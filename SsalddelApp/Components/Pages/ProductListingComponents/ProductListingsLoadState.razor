@@ -1,0 +1,27 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="product-listings-load-state">
+    @if (Read.처리중)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <MudText Typo="Typo.h6">판매상품과 Simulation 출품 원장을 불러오고 있습니다.</MudText>
+    }
+    else if (Read.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Read.오류메시지</MudAlert>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="RetryRequested">다시 시도</MudButton>
+    }
+    else
+    {
+        <MudText Typo="Typo.body2">출품 관리 현황을 준비하고 있습니다.</MudText>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback RetryRequested { get; set; }
+}

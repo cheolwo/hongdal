@@ -1,0 +1,71 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="product-catalog-panel">
+    <div class="product-catalog-heading">
+        <div>
+            <MudText Typo="Typo.overline">MANUAL PRODUCT SELECTION</MudText>
+            <MudText Typo="Typo.h6">판매상품 직접 선택</MudText>
+            <MudText Typo="Typo.body2">첫 상품을 자동 선택하지 않습니다.</MudText>
+        </div>
+        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@Read.표시상품목록.Count.ToString("N0")건</MudChip>
+    </div>
+
+    <MudTextField T="string"
+                  @bind-Value="Read.상품검색어"
+                  Immediate="true"
+                  Label="상품명·SKU·상태 검색"
+                  Variant="Variant.Outlined"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="mt-3" />
+
+    @if (Read.상품없음)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+            등록된 판매상품이 없습니다. 재고 허브나 판매 페이지 만들기에서 먼저 상품을 준비해 주세요.
+        </MudAlert>
+    }
+    else if (Read.상품검색결과없음)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">검색 조건에 맞는 판매상품이 없습니다.</MudAlert>
+    }
+    else
+    {
+        <div class="product-catalog-list">
+            @foreach (var product in Read.표시상품목록)
+            {
+                <button type="button"
+                        class="@ProductClass(product.Id)"
+                        aria-pressed="@(Draft.선택상품Id == product.Id)"
+                        disabled="@IsBusy"
+                        @onclick="@(() => ProductSelected.InvokeAsync(product.Id))">
+                    <span class="product-catalog-card-heading">
+                        <strong>@product.대표상품명</strong>
+                        <MudChip T="string" Size="Size.Small" Color="@ProductListingPresentation.StatusColor(product.상태)" Variant="Variant.Outlined">@product.상태</MudChip>
+                    </span>
+                    <span>@product.판매SKU</span>
+                    <span>@ProductListingPresentation.Money(product.판매가)</span>
+                    <small>판매상품 ID @product.Id.ToString("N0")</small>
+                </button>
+            }
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public ProductListingDraftViewModel Draft { get; set; } = null!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<long?> ProductSelected { get; set; }
+
+    private string ProductClass(long productId)
+        => Draft.선택상품Id == productId ? "product-catalog-card selected" : "product-catalog-card";
+}

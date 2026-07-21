@@ -1,0 +1,51 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+
+<MudPaper Elevation="0" Outlined="true" Class="listing-result-panel">
+    <MudText Typo="Typo.overline">EXACT LOCAL RECEIPT</MudText>
+    <MudText Typo="Typo.h6">Simulation 생성 결과</MudText>
+    <MudText Typo="Typo.body2">Command 응답의 출품 ID를 같은 로컬 원장에서 다시 조회합니다.</MudText>
+
+    @if (Create.명령결과 is null)
+    {
+        <div class="listing-result-empty">
+            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Large" Color="Color.Default" />
+            <MudText Typo="Typo.subtitle1">아직 생성한 출품 원장이 없습니다.</MudText>
+            <MudText Typo="Typo.body2">payload 검토와 실행 경계 확인 뒤에만 로컬 영수증이 표시됩니다.</MudText>
+        </div>
+    }
+    else
+    {
+        var result = Create.재조회결과 ?? Create.명령결과;
+        var row = Read.출품행찾기(result.Id);
+        <article class="listing-result-receipt">
+            <div class="listing-result-heading">
+                <div>
+                    <span>Simulation 출품 원장</span>
+                    <strong>#@result.Id.ToString("N0")</strong>
+                </div>
+                <MudChip T="string" Size="Size.Small" Color="@ProductListingPresentation.SyncColor(result.동기화상태)" Variant="Variant.Outlined">@result.동기화상태</MudChip>
+            </div>
+            <dl>
+                <div><dt>판매상품</dt><dd>@(row?.상품명 ?? $"#{result.판매상품Id}")</dd></div>
+                <div><dt>채널 계정</dt><dd>@(row is null ? $"#{result.판매채널계정Id}" : $"{ProductListingPresentation.ChannelName(row.채널종류)} · {row.상점명}")</dd></div>
+                <div><dt>로컬 채널상품번호</dt><dd>@ProductListingPresentation.ValueOrDash(result.채널상품번호)</dd></div>
+                <div><dt>원장 상태</dt><dd>@result.출품상태</dd></div>
+                <div><dt>같은 ID 재조회</dt><dd>@(Create.재조회결과 is null ? "확인 필요" : "확인 완료")</dd></div>
+                <div><dt>외부 API 호출</dt><dd>0건</dd></div>
+            </dl>
+        </article>
+    }
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+        이 영수증은 외부 판매채널 발행 증빙이 아닙니다. 실제 발행은 자격증명·필수 필드·권한·비용·재시도 정책이 준비된 별도 Operational 경계가 필요합니다.
+    </MudAlert>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductListingReadViewModel Read { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public ProductListingCreateViewModel Create { get; set; } = null!;
+}

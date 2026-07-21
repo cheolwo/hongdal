@@ -24,6 +24,7 @@ internal static class ShipperSalesModule
         services.AddScoped<ShipperSalesService>();
         services.AddScoped<IShipperSalesService>(provider => provider.GetRequiredService<ShipperSalesService>());
         services.AddScoped<I판매채널계정Service>(provider => provider.GetRequiredService<ShipperSalesService>());
+        services.AddScoped<I판매채널계정읽기Service>(provider => provider.GetRequiredService<ShipperSalesService>());
         services.AddScoped<I상품등록Service>(provider => provider.GetRequiredService<ShipperSalesService>());
         services.AddScoped<I채널출품Service>(provider => provider.GetRequiredService<ShipperSalesService>());
         services.AddTransient<화주판매채널계정PageViewModel>();
@@ -37,6 +38,10 @@ internal static class ShipperSalesModule
         services.AddTransient<OrderFulfillmentPickingViewModel>();
         services.AddTransient<OrderFulfillmentPackingViewModel>();
         services.AddTransient<OrderFulfillmentPageViewModel>();
+        services.AddTransient<ProductListingReadViewModel>();
+        services.AddTransient<ProductListingDraftViewModel>();
+        services.AddTransient<ProductListingCreateViewModel>();
+        services.AddTransient<ProductListingsPageViewModel>();
         services.AddScoped<IAppCommandHandler<ProcessCommerceOrderCommand, CommerceOrderFulfillmentResult>,
             ProcessCommerceOrderCommandHandler>();
         services.AddSingleton<IAppEventHandler<CommerceOrderProcessedEvent>, CommerceOrderProcessedEventHandler>();
