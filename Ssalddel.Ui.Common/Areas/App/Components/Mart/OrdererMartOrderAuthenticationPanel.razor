@@ -1,0 +1,62 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Mart
+@using Ssalddel.Ui.Common.Areas.App.Models.Auth
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (Authentication.처리중 && !Authentication.초기화됨)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="mart-order-state">
+        <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+        <MudText Typo="Typo.body1">저장된 주문자 로그인 세션을 확인하고 있습니다.</MudText>
+    </MudPaper>
+}
+else if (!Authentication.로그인됨)
+{
+    <div class="mart-order-login-layout">
+        <Ssalddel공통로그인Panel 제목="주문 요청 로그인"
+                             설명="공개 상품은 회원가입 없이 볼 수 있고, 내 주문 요청 원장을 저장하거나 다시 볼 때만 로그인이 필요합니다."
+                             상태메시지="@Authentication.오류메시지"
+                             상태Severity="@AuthenticationSeverity"
+                             일반로그인표시="true"
+                             소셜로그인표시="false"
+                             일반로그인버튼텍스트="로그인하고 계속"
+                             IsBusy="@Authentication.처리중"
+                             Elevation="0"
+                             Class="mart-order-login-card"
+                             OnPasswordLogin="LoginRequested" />
+
+        <MudPaper Elevation="0" Outlined="true" Class="mart-order-login-note">
+            <MudIcon Icon="@Icons.Material.Filled.PrivacyTip" Color="Color.Info" Size="Size.Large" />
+            <MudText Typo="Typo.h6">배송 개인정보는 아직 받지 않습니다.</MudText>
+            <MudText Typo="Typo.body2">
+                이 단계는 계정 ID, 선택 상품, 수량과 안내 확인만 저장합니다. 수령인·전화번호·주소·결제정보는 입력하지 않습니다.
+            </MudText>
+            <MudButton Href="@CatalogHref" Variant="Variant.Outlined" Color="Color.Success">로그인 없이 상품 더 보기</MudButton>
+        </MudPaper>
+    </div>
+}
+else
+{
+    <div class="mart-order-toolbar">
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Success" Icon="@Icons.Material.Filled.VerifiedUser">
+            @Authentication.현재사용자표시
+        </MudChip>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@Authentication.처리중" OnClick="LogoutRequested">로그아웃</MudButton>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public 주문자앱인증ViewModel Authentication { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string CatalogHref { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<공통로그인요청> LoginRequested { get; set; }
+
+    [Parameter]
+    public EventCallback LogoutRequested { get; set; }
+
+    private Severity AuthenticationSeverity
+        => Authentication.오류발생 ? Severity.Error : Severity.Info;
+}

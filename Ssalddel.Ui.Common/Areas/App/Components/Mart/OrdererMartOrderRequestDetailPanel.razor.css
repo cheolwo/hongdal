@@ -1,0 +1,70 @@
+.mart-order-panel {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.mart-order-state {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.mart-order-state--detail {
+    min-height: 300px;
+}
+
+.mart-order-request-heading,
+.mart-order-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.mart-order-request-heading {
+    align-items: flex-start;
+}
+
+.mart-order-receipt {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.mart-order-receipt > div {
+    display: grid;
+    gap: .2rem;
+    padding: .75rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+}
+
+.mart-order-receipt span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .78rem;
+}
+
+.mart-order-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+@media (max-width: 720px) {
+    .mart-order-receipt {
+        grid-template-columns: 1fr;
+    }
+
+    .mart-order-request-heading {
+        flex-direction: column;
+    }
+
+    .mart-order-actions {
+        justify-content: stretch;
+    }
+}

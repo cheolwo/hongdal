@@ -1,0 +1,65 @@
+.mart-order-panel {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.mart-order-form-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, .7fr) minmax(260px, 1.3fr);
+    gap: 1rem;
+    align-items: stretch;
+    margin-top: 1rem;
+}
+
+.mart-order-estimate {
+    display: grid;
+    align-content: center;
+    gap: .2rem;
+    padding: .8rem 1rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+}
+
+.mart-order-estimate strong {
+    font-size: 1.35rem;
+    color: var(--mud-palette-success);
+}
+
+.mart-order-estimate small,
+.mart-order-estimate span {
+    color: var(--mud-palette-text-secondary);
+}
+
+.mart-order-notice {
+    display: grid;
+    gap: .55rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--mud-palette-background-gray);
+}
+
+.mart-order-notice > div {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+}
+
+.mart-order-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 720px) {
+    .mart-order-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mart-order-actions {
+        justify-content: stretch;
+    }
+}

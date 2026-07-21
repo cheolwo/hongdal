@@ -1,0 +1,70 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Mart
+@using Ssalddel.Contracts.Mart
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="mart-order-panel">
+    <MudText Typo="Typo.overline">NON-BINDING ORDER REQUEST</MudText>
+    <MudText Typo="Typo.h6">수량과 저장 경계 확인</MudText>
+
+    <div class="mart-order-form-grid">
+        <MudNumericField T="int"
+                         @bind-Value="Writer.수량"
+                         Label="요청 수량"
+                         Min="1"
+                         Max="100"
+                         Variant="Variant.Outlined"
+                         Immediate="true"
+                         Disabled="@Writer.처리중" />
+        <div class="mart-order-estimate">
+            <span>화면 예상 합계</span>
+            <strong>@OrdererMartOrderRequestPresentation.EstimatedTotal(Product, Writer.수량).ToString("N0")원</strong>
+            <small>제출 시 서버가 공개 단가와 수량을 다시 계산합니다.</small>
+        </div>
+    </div>
+
+    <div class="mart-order-notice">
+        @foreach (var notice in 마트주문요청안내.문구)
+        {
+            <div><MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Color="Color.Success" Size="Size.Small" /><span>@notice</span></div>
+        }
+    </div>
+
+    <MudCheckBox T="bool"
+                 @bind-Value="Writer.비구속주문요청확인"
+                 Color="Color.Success"
+                 Disabled="@Writer.처리중">
+        위 안내를 확인했으며 비구속 주문 요청으로 저장합니다.
+    </MudCheckBox>
+
+    @if (Writer.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+            @OrdererMartOrderRequestPresentation.ErrorMessage(Writer.오류메시지)
+        </MudAlert>
+    }
+
+    <div class="mart-order-actions">
+        <MudButton Href="@CatalogHref" Variant="Variant.Text" Color="Color.Secondary" Disabled="@Writer.처리중">상품 다시 선택</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   Disabled="@(!Writer.제출가능)"
+                   OnClick="SubmitRequested">
+            @(Writer.처리중 ? "서버 확인 중" : "주문 요청 저장")
+        </MudButton>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 마트공개상품상세응답 Product { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public 마트주문작성ViewModel Writer { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string CatalogHref { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback SubmitRequested { get; set; }
+}

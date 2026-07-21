@@ -1,0 +1,67 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Mart
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="mart-order-panel">
+    @if (Product.처리중)
+    {
+        <div class="mart-order-state mart-order-state--compact">
+            <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+            <MudText Typo="Typo.body2">선택한 공개 상품을 다시 확인하고 있습니다.</MudText>
+        </div>
+    }
+    else if (Product.오류발생)
+    {
+        <div class="mart-order-state mart-order-state--compact">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">공개 상품을 불러오지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@OrdererMartOrderRequestPresentation.ErrorMessage(Product.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="@(() => RetryRequested.InvokeAsync(ProductId))">다시 시도</MudButton>
+        </div>
+    }
+    else if (Product.찾을수없음)
+    {
+        <div class="mart-order-state mart-order-state--compact">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">공개된 상품을 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2">비공개·삭제된 ID를 다른 상품으로 대체하지 않습니다.</MudText>
+            <MudButton Href="@CatalogHref" Variant="Variant.Outlined" Color="Color.Success">다른 상품 보기</MudButton>
+        </div>
+    }
+    else if (Product.상세 is { } product)
+    {
+        <div class="mart-order-product-heading">
+            <div>
+                <MudText Typo="Typo.overline">PUBLIC PRODUCT #@product.Id</MudText>
+                <MudText Typo="Typo.h5">@product.상품명</MudText>
+                <MudText Typo="Typo.body2">@OrdererMartOrderRequestPresentation.ValueOrDash(product.카테고리) · @OrdererMartOrderRequestPresentation.ValueOrDash(product.판매단위)</MudText>
+            </div>
+            <MudChip T="string" Color="@(product.판매가능여부 ? Color.Success : Color.Default)" Variant="Variant.Outlined">
+                @(product.판매가능여부 ? $"판매 가능 {product.판매가능수량:N0}" : "품절·판매 준비 중")
+            </MudChip>
+        </div>
+        <div class="mart-order-product-meta">
+            <strong>@product.판매가.ToString("N0")원</strong>
+            <span>재고 기준 @OrdererMartOrderRequestPresentation.FormatDate(product.재고기준시각Utc)</span>
+        </div>
+        @if (!product.판매가능여부)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+                현재 판매 요청을 받을 수 없습니다. 공개 상품을 새로고침해 상태를 다시 확인해 주세요.
+            </MudAlert>
+        }
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public long ProductId { get; set; }
+
+    [Parameter, EditorRequired]
+    public 마트공개상품상세ViewModel Product { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string CatalogHref { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<long> RetryRequested { get; set; }
+}

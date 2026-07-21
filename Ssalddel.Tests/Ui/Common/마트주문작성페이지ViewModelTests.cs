@@ -57,16 +57,45 @@ public sealed class 마트주문작성페이지ViewModelTests
         Assert.NotEqual(previous, viewModel.클라이언트요청Id);
     }
 
+    [Fact]
+    public async Task 등록실패후_같은멱등요청Id로_다시시도할수있다()
+    {
+        var service = new FakeMartOrderRequestService { FailNextSubmit = true };
+        var viewModel = new 마트주문작성ViewModel(service)
+        {
+            수량 = 2,
+            비구속주문요청확인 = true
+        };
+        var requestId = viewModel.클라이언트요청Id;
+
+        Assert.False(await viewModel.등록Async(41));
+        Assert.True(viewModel.오류발생);
+        Assert.Equal(requestId, service.LastSubmitRequest!.클라이언트요청Id);
+
+        Assert.True(await viewModel.등록Async(41));
+        Assert.Equal(2, service.SubmitCallCount);
+        Assert.Equal(requestId, service.LastSubmitRequest!.클라이언트요청Id);
+    }
+
     private sealed class FakeMartOrderRequestService : I마트주문요청Service
     {
         public 마트주문요청등록요청? LastSubmitRequest { get; private set; }
         public 마트주문요청응답? DetailResponse { get; init; }
+        public bool FailNextSubmit { get; set; }
+        public int SubmitCallCount { get; private set; }
 
         public Task<마트주문요청응답> 등록Async(
             마트주문요청등록요청 request,
             CancellationToken cancellationToken = default)
         {
+            SubmitCallCount++;
             LastSubmitRequest = request;
+            if (FailNextSubmit)
+            {
+                FailNextSubmit = false;
+                throw new InvalidOperationException("일시적인 저장 실패");
+            }
+
             return Task.FromResult(new 마트주문요청응답 { 주문요청Id = Guid.NewGuid() });
         }
 

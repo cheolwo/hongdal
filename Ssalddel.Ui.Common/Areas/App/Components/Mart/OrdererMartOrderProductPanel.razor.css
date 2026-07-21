@@ -1,0 +1,44 @@
+.mart-order-panel {
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.mart-order-state {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .75rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.mart-order-state--compact {
+    min-height: 150px;
+}
+
+.mart-order-product-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.mart-order-product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    margin-top: .75rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.mart-order-product-meta strong {
+    color: var(--mud-palette-success);
+    font-size: 1.25rem;
+}
+
+@media (max-width: 720px) {
+    .mart-order-product-heading {
+        flex-direction: column;
+    }
+}

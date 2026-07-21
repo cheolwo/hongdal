@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
-using Ssalddel.Contracts.Mart;
 using Ssalddel.Ui.Common.Areas.App.Models.Auth;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -27,9 +25,6 @@ public partial class OrdererMartOrderRequestWorkspace
     private 마트공개상품상세ViewModel Product => ViewModel.상품;
     private 마트주문작성ViewModel Writer => ViewModel.작성;
     private 마트주문요청상세ViewModel RequestDetail => ViewModel.요청상세;
-
-    private Severity AuthenticationSeverity
-        => Authentication.오류발생 ? Severity.Error : Severity.Info;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,6 +99,12 @@ public partial class OrdererMartOrderRequestWorkspace
         Writer.새요청준비();
     }
 
+    private Task RetryProductAsync(long productId)
+        => Product.조회Async(productId);
+
+    private Task RetryRequestAsync(Guid requestId)
+        => RequestDetail.조회Async(requestId);
+
     private async Task SubmitAsync()
     {
         if (Product.상세 is not { 판매가능여부: true } product
@@ -120,19 +121,4 @@ public partial class OrdererMartOrderRequestWorkspace
 
         await RequestDetail.조회Async(response.주문요청Id);
     }
-
-    private decimal EstimatedTotal(마트공개상품상세응답 product)
-        => product.판매가 * Math.Clamp(Writer.수량, 0, 100);
-
-    private static string ShortId(Guid value)
-        => value.ToString("N")[..12].ToUpperInvariant();
-
-    private static string FormatDate(DateTime value)
-        => DateTime.SpecifyKind(value, DateTimeKind.Utc).ToLocalTime().ToString("yyyy.MM.dd HH:mm");
-
-    private static string ValueOrDash(string? value)
-        => string.IsNullOrWhiteSpace(value) ? "—" : value.Trim();
-
-    private static string ErrorMessage(string? value)
-        => string.IsNullOrWhiteSpace(value) ? "서버 응답을 확인할 수 없습니다." : value;
 }
