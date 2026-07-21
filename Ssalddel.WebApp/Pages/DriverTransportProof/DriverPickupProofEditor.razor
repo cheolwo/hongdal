@@ -1,0 +1,62 @@
+@using Ssalddel.WebApp.ViewModels
+
+<MudGrid Class="pt-3">
+    <MudItem xs="12" md="7">
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h6">상차 완료 사진</MudText>
+            <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                사진 선택 즉시 서버 업로드를 시도합니다. 업로드 성공 후 `ObjectName`이 있어야 상차 완료 버튼이 활성화됩니다.
+            </MudAlert>
+            <InputFile OnChange="OnPhotoSelectedAsync" accept="image/*" />
+            @if (!string.IsNullOrWhiteSpace(Model.PreviewUrl))
+            {
+                <img src="@Model.PreviewUrl" alt="상차 증빙 미리보기" class="driver-proof-preview" />
+                <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @Model.FileName</MudText>
+            }
+            @if (Model.Upload is not null)
+            {
+                <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+                    업로드 완료: @Model.Upload.ObjectName
+                </MudAlert>
+            }
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       Disabled="@(Model.Upload is null || IsBusy)"
+                       StartIcon="@Icons.Material.Filled.CheckCircle"
+                       OnClick="Model.CompleteAsync">
+                상차 완료 처리
+            </MudButton>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12" md="5">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">인수증/서명</MudText>
+            <MudSelect T="string" @bind-Value="Model.ReceiptEvidenceMethod" Label="인수증 증빙 방식" Variant="Variant.Outlined">
+                <MudSelectItem T="string" Value="@("사진")">사진</MudSelectItem>
+                <MudSelectItem T="string" Value="@("전자서명")">전자서명</MudSelectItem>
+                <MudSelectItem T="string" Value="@("서명생략")">서명생략</MudSelectItem>
+            </MudSelect>
+            <MudTextField @bind-Value="Model.RecipientName" Label="인수자명" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="Model.RecipientOrganization" Label="인수자 소속" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="Model.RecipientSignature" Label="인수자 서명값" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="Model.DriverSignature" Label="기사 서명값" Variant="Variant.Outlined" />
+            <MudCheckBox T="bool" @bind-Value="Model.ReceiptConfirmed" Label="인수증 확인 완료" Color="Color.Primary" />
+            <MudCheckBox T="bool" @bind-Value="Model.SignatureOmitted" Label="서명 생략 확인" Color="Color.Warning" />
+            <MudTextField @bind-Value="Model.SignatureOmissionReason"
+                          Label="서명 생략 사유"
+                          Variant="Variant.Outlined"
+                          Disabled="@(!Model.SignatureOmitted)" />
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverPickupProofViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    private Task OnPhotoSelectedAsync(InputFileChangeEventArgs args)
+        => Model.UploadAsync(args.File);
+}

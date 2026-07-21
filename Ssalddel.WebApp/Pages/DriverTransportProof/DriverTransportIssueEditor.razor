@@ -1,0 +1,52 @@
+@using Ssalddel.WebApp.ViewModels
+
+<MudGrid Class="pt-3">
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h6">현장 예외 신고</MudText>
+            <MudSelect T="string" Label="예외 사유" @bind-Value="Model.IssueCode" Variant="Variant.Outlined">
+                @foreach (var reason in DriverTransportIssueViewModel.Reasons)
+                {
+                    <MudSelectItem T="string" Value="@reason.Code">@reason.Label</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" Label="현장 메모" @bind-Value="Model.Memo" Lines="4" Variant="Variant.Outlined" />
+            <MudCheckBox T="bool" @bind-Value="Model.RequireAdminReview" Label="관리자 확인 요청" Color="Color.Warning" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Warning"
+                       Disabled="@IsBusy"
+                       StartIcon="@Icons.Material.Filled.ReportProblem"
+                       OnClick="Model.ReportAsync">
+                예외 사유 기록
+            </MudButton>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h6">예외 증빙 사진</MudText>
+            <InputFile OnChange="OnPhotoSelectedAsync" accept="image/*" />
+            @if (!string.IsNullOrWhiteSpace(Model.PreviewUrl))
+            {
+                <img src="@Model.PreviewUrl" alt="예외 증빙 미리보기" class="driver-proof-preview" />
+                <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @Model.FileName</MudText>
+            }
+            @if (Model.Upload is not null)
+            {
+                <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+                    예외 증빙 업로드 완료: @Model.Upload.ObjectName
+                </MudAlert>
+            }
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverTransportIssueViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    private Task OnPhotoSelectedAsync(InputFileChangeEventArgs args)
+        => Model.UploadAsync(args.File);
+}

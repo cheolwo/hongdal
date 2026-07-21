@@ -1,0 +1,38 @@
+@using Ssalddel.WebApp.ViewModels
+
+<MudStack Spacing="3" Class="pt-3">
+    <MudText Typo="Typo.h6">하차 완료 사진</MudText>
+    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+        하차도 사진 업로드 성공 응답 이후에만 인수 완료 상태로 전환합니다.
+    </MudAlert>
+    <InputFile OnChange="OnPhotoSelectedAsync" accept="image/*" />
+    @if (!string.IsNullOrWhiteSpace(Model.PreviewUrl))
+    {
+        <img src="@Model.PreviewUrl" alt="하차 증빙 미리보기" class="driver-proof-preview" />
+        <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @Model.FileName</MudText>
+    }
+    @if (Model.Upload is not null)
+    {
+        <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">
+            업로드 완료: @Model.Upload.ObjectName
+        </MudAlert>
+    }
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               Disabled="@(Model.Upload is null || IsBusy)"
+               StartIcon="@Icons.Material.Filled.CheckCircle"
+               OnClick="Model.CompleteAsync">
+        하차 완료 처리
+    </MudButton>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverDropoffProofViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    private Task OnPhotoSelectedAsync(InputFileChangeEventArgs args)
+        => Model.UploadAsync(args.File);
+}

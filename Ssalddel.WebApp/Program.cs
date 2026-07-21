@@ -49,6 +49,7 @@ builder.Services.AddScoped<기사추천수신Service>();
 builder.Services.AddScoped<I기사추천수신Service>(sp => sp.GetRequiredService<기사추천수신Service>());
 builder.Services.AddScoped<기사운송증빙Service>();
 builder.Services.AddTransient<DriverCurrentTransportPageViewModel>();
+builder.Services.AddTransient<DriverTransportProofPageViewModel>();
 builder.Services.AddScoped<운송의뢰작성ViewModel>();
 builder.Services.AddMudServices();
 

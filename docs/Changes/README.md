@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-21 | [기사 통합 운송 증빙 페이지 단일책임 분리](2026-07-21-driver-transport-proof-srp.md) | 518줄 route 페이지를 59줄 조립 shell과 대상·상차·하차·예외 workflow 및 입력 컴포넌트로 분리하고 desktop·390px mobile 검증 |
 | 2026-07-21 | [기사 현재 운송 페이지 단일책임 분리](2026-07-21-driver-current-transport-srp.md) | 541줄 route 페이지를 74줄 조립 shell과 운송 workflow ViewModel, 개요·타임라인·현장 전환·이동 컴포넌트로 분리하고 desktop·390px mobile 검증 |
 | 2026-07-21 | [공동 원장 다이어그램 상세 단일책임 조립](2026-07-21-community-ledger-detail-srp.md) | 740줄 상세 컴포넌트를 157줄 shell과 canvas·inspector·실시간 session·presentation 책임으로 분리하고 선택 전환과 desktop·390px mobile 검증 |
 | 2026-07-21 | [공동 원장 블록 업무 실행 책임 분리](2026-07-21-community-ledger-node-action-srp.md) | 원장 상세에서 증빙 검증·업로드·운송 상태 Command를 독립 컴포넌트와 ViewModel로 분리하고 desktop·390px mobile 검증 |
