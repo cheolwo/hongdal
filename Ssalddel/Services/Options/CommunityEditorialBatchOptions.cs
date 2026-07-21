@@ -16,6 +16,12 @@ public sealed class CommunityEditorialBatchOptions
 
     public int KamisPriceBriefMaxItems { get; set; } = 5;
 
+    public bool UsdaNassPriceBriefEnabled { get; set; } = true;
+
+    public string UsdaNassPriceBriefCronExpression { get; set; } = "0 0 8 10 * ?";
+
+    public int UsdaNassPriceBriefMaxItems { get; set; } = 5;
+
     public bool ReflectionEnabled { get; set; } = true;
 
     public string ReflectionCronExpression { get; set; } = "0 0 9 ? * MON,THU";

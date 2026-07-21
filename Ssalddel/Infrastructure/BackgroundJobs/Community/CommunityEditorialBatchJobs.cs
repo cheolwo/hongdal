@@ -31,6 +31,9 @@ public sealed class CommunityEditorialBatchRunner
     public Task RunKamisPriceBriefAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.KamisPriceBrief, cancellationToken);
 
+    public Task RunUsdaNassPriceBriefAsync(CancellationToken cancellationToken)
+        => RunSourceAsync(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, cancellationToken);
+
     public Task RunReflectionAsync(CancellationToken cancellationToken)
         => RunSourceAsync(CommunityAutomatedPostSourceKeys.Reflection, cancellationToken);
 
@@ -95,6 +98,32 @@ public sealed class CommunityKamisPriceBriefJob : IJob
         => CommunityEditorialJobExecution.RunAsync(
             "CommunityKamisPriceBrief",
             _runner.RunKamisPriceBriefAsync,
+            context,
+            _options,
+            _logger);
+}
+
+[DisallowConcurrentExecution]
+public sealed class CommunityUsdaNassPriceBriefJob : IJob
+{
+    private readonly CommunityEditorialBatchRunner _runner;
+    private readonly CommunityEditorialBatchOptions _options;
+    private readonly ILogger<CommunityUsdaNassPriceBriefJob> _logger;
+
+    public CommunityUsdaNassPriceBriefJob(
+        CommunityEditorialBatchRunner runner,
+        IOptions<CommunityEditorialBatchOptions> options,
+        ILogger<CommunityUsdaNassPriceBriefJob> logger)
+    {
+        _runner = runner;
+        _options = options.Value;
+        _logger = logger;
+    }
+
+    public Task Execute(IJobExecutionContext context)
+        => CommunityEditorialJobExecution.RunAsync(
+            "CommunityUsdaNassPriceBrief",
+            _runner.RunUsdaNassPriceBriefAsync,
             context,
             _options,
             _logger);

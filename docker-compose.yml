@@ -27,6 +27,7 @@ services:
       IsmsPProtectedData__TransportPrivateKeyPem: "${SSALDDEL_ISMSP_TRANSPORT_PRIVATE_KEY_PEM:-}"
       IsmsPProtectedData__FailWhenKeyMissing: "${SSALDDEL_ISMSP_FAIL_WHEN_KEY_MISSING:-false}"
       AgriculturalFisheriesBatch__Enabled: "${SSALDDEL_AGRICULTURAL_FISHERIES_BATCH_ENABLED:-false}"
+      AgriculturalFisheriesBatch__PublishCommunityPriceBriefs: "${SSALDDEL_AGRICULTURAL_FISHERIES_COMMUNITY_PUBLICATION_ENABLED:-false}"
       AgriculturalFisheriesBatch__KamisDailyEnabled: "${SSALDDEL_KAMIS_DAILY_BATCH_ENABLED:-true}"
       AgriculturalFisheriesBatch__KamisDailyCronExpression: "${SSALDDEL_KAMIS_DAILY_CRON_EXPRESSION:-0 30 6 * * ?}"
       AgriculturalFisheriesBatch__KamisMonthlyEnabled: "${SSALDDEL_KAMIS_MONTHLY_BATCH_ENABLED:-true}"

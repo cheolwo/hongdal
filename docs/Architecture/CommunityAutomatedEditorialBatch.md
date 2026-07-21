@@ -7,6 +7,7 @@
 ```mermaid
 flowchart LR
     A["KAMIS 가격 보관 자료"] --> D["출처별 초안 Source"]
+    A1["USDA NASS 생산자 가격 보관 자료"] --> D
     B["비식별 완료 원장 게시 기록"] --> D
     C["살뜰 운영 성찰문 카탈로그"] --> D
     P["관리자 승인 반야 카드·영상"] --> D
@@ -22,11 +23,14 @@ flowchart LR
 | 원천 | 게시판 | 기본 일정(한국 시간) | 게시 조건 |
 | --- | --- | --- | --- |
 | KAMIS 일별 관측값 | `정보·시세` | 매일 06:50 | 보관 DB에 가격·조사일·단위가 있는 최근 일별 관측값이 존재함 |
+| USDA NASS 월별 생산자 가격 | `정보·시세` | 매월 10일 08:00 | 미국 전국 `PRICE RECEIVED` 중 기준월·단위가 있고 비억제된 통합 계열이 존재함 |
 | 살뜰 운영 성찰문 | `자유·생활` | 월·목 09:00 | 시스템 작성임과 실제 인용문이 아님을 본문에 명시함 |
 | 완료 원장 활동 요약 | `완료 사례·후기` | 매일 08:30 | 전날 비식별 원장 성립 글이 1건 이상 존재함 |
 | 반야 선별 자료 | `반야` | 매일 09:15 | 전체 반야 배치가 켜지고 카드 또는 영상이 관리자의 명시적 게시 승인을 받음 |
 
-KAMIS 가격 글은 관측 항목 일부를 표시하며 전체 시장 평균이나 판매 권고로 표현하지 않는다. 조사일, KRW, 품목·품종·등급·단위, 전일 비교 가능 여부, 원천 링크와 비교 주의를 함께 표시한다. KAMIS 가격 수집은 별도의 [농수산물 가격 수집 배치](AgriculturalFisheriesBatchJobs.md)가 먼저 수행한다.
+KAMIS 가격 글은 관측 항목 일부를 표시하며 전체 시장 평균이나 판매 권고로 표현하지 않는다. 조사일, KRW, 품목·품종·등급·단위, 전일 비교 가능 여부, 원천 링크와 비교 주의를 함께 표시한다. USDA 글은 최신 기준월의 전국 생산자 수취가격 중 통합 계열만 표시하고 원문 단위를 유지한다. 미국 소매가, 한국 유통가 또는 개별 견적으로 해석하지 않는다는 경계를 본문에 적는다.
+
+가격 수집은 [농수산물 가격 수집 배치](AgriculturalFisheriesBatchJobs.md)가 담당한다. `PublishCommunityPriceBriefs`를 켜면 KAMIS 일별·USDA 월별 수집 성공 직후 게시까지 같은 파이프라인에서 수행한다. 아래 독립 일정은 같은 기준기간 키를 다시 확인하는 조정 작업으로도 사용할 수 있다.
 
 활동 요약은 원시 거래 로그를 읽지 않는다. 기존 원장 완료 Event가 만든 비식별 시스템 게시글을 날짜와 업무 태그별 건수로만 집계한다. 사용자명, 연락처, 상세 주소, 금액, 상품·화물 값, 증빙, trace ID와 원시 메모는 조회하거나 본문에 넣지 않는다. 건수는 거래액·매출·플랫폼 중개 실적이 아니라 `완료` 상태로 저장된 공개 가능 원장 기록 수임을 본문에 적는다.
 
@@ -56,6 +60,9 @@ KAMIS 가격 글은 관측 항목 일부를 표시하며 전체 시장 평균이
     "KamisPriceBriefEnabled": true,
     "KamisPriceBriefCronExpression": "0 50 6 * * ?",
     "KamisPriceBriefMaxItems": 5,
+    "UsdaNassPriceBriefEnabled": true,
+    "UsdaNassPriceBriefCronExpression": "0 0 8 10 * ?",
+    "UsdaNassPriceBriefMaxItems": 5,
     "ReflectionEnabled": true,
     "ReflectionCronExpression": "0 0 9 ? * MON,THU",
     "ActivityDigestEnabled": true,

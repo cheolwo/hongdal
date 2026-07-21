@@ -7,12 +7,12 @@ namespace Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 [DisallowConcurrentExecution]
 public sealed class KamisDailyPriceCollectionJob : IJob
 {
-    private readonly AgriculturalFisheriesBatchRunner _runner;
+    private readonly AgriculturalFisheriesCommunityPipelineRunner _runner;
     private readonly AgriculturalFisheriesBatchOptions _options;
     private readonly ILogger<KamisDailyPriceCollectionJob> _logger;
 
     public KamisDailyPriceCollectionJob(
-        AgriculturalFisheriesBatchRunner runner,
+        AgriculturalFisheriesCommunityPipelineRunner runner,
         IOptions<AgriculturalFisheriesBatchOptions> options,
         ILogger<KamisDailyPriceCollectionJob> logger)
     {
@@ -33,12 +33,12 @@ public sealed class KamisDailyPriceCollectionJob : IJob
 [DisallowConcurrentExecution]
 public sealed class KamisMonthlyPriceCollectionJob : IJob
 {
-    private readonly AgriculturalFisheriesBatchRunner _runner;
+    private readonly AgriculturalFisheriesCommunityPipelineRunner _runner;
     private readonly AgriculturalFisheriesBatchOptions _options;
     private readonly ILogger<KamisMonthlyPriceCollectionJob> _logger;
 
     public KamisMonthlyPriceCollectionJob(
-        AgriculturalFisheriesBatchRunner runner,
+        AgriculturalFisheriesCommunityPipelineRunner runner,
         IOptions<AgriculturalFisheriesBatchOptions> options,
         ILogger<KamisMonthlyPriceCollectionJob> logger)
     {
@@ -59,12 +59,12 @@ public sealed class KamisMonthlyPriceCollectionJob : IJob
 [DisallowConcurrentExecution]
 public sealed class UsdaMonthlyPriceCollectionJob : IJob
 {
-    private readonly AgriculturalFisheriesBatchRunner _runner;
+    private readonly AgriculturalFisheriesCommunityPipelineRunner _runner;
     private readonly AgriculturalFisheriesBatchOptions _options;
     private readonly ILogger<UsdaMonthlyPriceCollectionJob> _logger;
 
     public UsdaMonthlyPriceCollectionJob(
-        AgriculturalFisheriesBatchRunner runner,
+        AgriculturalFisheriesCommunityPipelineRunner runner,
         IOptions<AgriculturalFisheriesBatchOptions> options,
         ILogger<UsdaMonthlyPriceCollectionJob> logger)
     {

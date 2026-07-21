@@ -61,6 +61,25 @@ public sealed class CommunityAutomatedPostServiceTests
             CommunityAutomatedPostPublication.GetSystemPostKind(post));
     }
 
+    [Fact]
+    public void UsdaPriceBrief_IsClearlyMarkedAsAutomatedEditorial()
+    {
+        var post = new PlatformCommunityPost
+        {
+            AuthorUserId = CommunityAutomatedPostPublication.BuildSystemAuthorKey(
+                CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief,
+                "202606")
+        };
+
+        Assert.Equal(
+            PlatformCommunitySystemPostKinds.AutomatedEditorial,
+            CommunityAutomatedPostPublication.GetSystemPostKind(post));
+        Assert.Contains(
+            "출처와 기준 시각",
+            CommunityAutomatedPostPublication.GetPrivacyNotice(
+                PlatformCommunitySystemPostKinds.AutomatedEditorial));
+    }
+
     [Theory]
     [InlineData(CommunityAutomatedPostSourceKeys.PrajnaCard)]
     [InlineData(CommunityAutomatedPostSourceKeys.PrajnaVideo)]

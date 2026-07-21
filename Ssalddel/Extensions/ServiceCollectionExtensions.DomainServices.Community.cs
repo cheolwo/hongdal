@@ -35,6 +35,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityLedgerCompletionPostService, CommunityLedgerCompletionPostService>();
         services.AddScoped<ICommunityAutomatedPostPublisher, EfCommunityAutomatedPostPublisher>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityKamisPriceBriefSource>();
+        services.AddScoped<ICommunityAutomatedPostSource, CommunityUsdaNassPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityReflectionSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityActivityDigestSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityPrajnaPostSource>();

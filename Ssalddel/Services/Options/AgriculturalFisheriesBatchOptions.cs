@@ -10,6 +10,8 @@ public sealed class AgriculturalFisheriesBatchOptions
 
     public int ImmediateRetryCount { get; set; } = 1;
 
+    public bool PublishCommunityPriceBriefs { get; set; }
+
     public bool KamisDailyEnabled { get; set; } = true;
 
     public string KamisDailyCronExpression { get; set; } = "0 30 6 * * ?";

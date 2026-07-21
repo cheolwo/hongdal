@@ -47,6 +47,21 @@ public sealed class CommunityEditorialBatchRunnerTests
         Assert.Equal(CommunityAutomatedPostSourceKeys.Prajna, publisher.Draft?.SourceKey);
     }
 
+    [Fact]
+    public async Task UsdaPriceRun_PublishesVerifiedMonthlyDraft()
+    {
+        var source = new RecordingSource(
+            CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief,
+            hasDraft: true);
+        var publisher = new RecordingPublisher();
+        var runner = CreateRunner(source, publisher);
+
+        await runner.RunUsdaNassPriceBriefAsync(CancellationToken.None);
+
+        Assert.Equal(1, publisher.CallCount);
+        Assert.Equal(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, publisher.Draft?.SourceKey);
+    }
+
     private static CommunityEditorialBatchRunner CreateRunner(
         ICommunityAutomatedPostSource targetSource,
         RecordingPublisher publisher)
@@ -55,6 +70,7 @@ public sealed class CommunityEditorialBatchRunnerTests
         {
             targetSource,
             new RecordingSource(CommunityAutomatedPostSourceKeys.KamisPriceBrief, hasDraft: false),
+            new RecordingSource(CommunityAutomatedPostSourceKeys.UsdaNassPriceBrief, hasDraft: false),
             new RecordingSource(CommunityAutomatedPostSourceKeys.Reflection, hasDraft: false),
             new RecordingSource(CommunityAutomatedPostSourceKeys.ActivityDigest, hasDraft: false)
         }

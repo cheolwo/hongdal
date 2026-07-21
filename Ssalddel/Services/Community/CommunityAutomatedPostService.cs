@@ -16,6 +16,7 @@ namespace Ssalddel.Services.Community;
 public static class CommunityAutomatedPostSourceKeys
 {
     public const string KamisPriceBrief = "kamis-price-brief";
+    public const string UsdaNassPriceBrief = "usda-nass-price-brief";
     public const string Reflection = "reflection";
     public const string ActivityDigest = "activity-digest";
     public const string Prajna = "prajna";

@@ -26,6 +26,7 @@ public static partial class ServiceCollectionExtensions
     {
         services.AddScoped<AgriculturalFisheriesBatchRunner>();
         services.AddScoped<CommunityEditorialBatchRunner>();
+        services.AddScoped<AgriculturalFisheriesCommunityPipelineRunner>();
         services.AddQuartz(q =>
         {
             if (executionOptions.Mode == SsalddelExecutionMode.Operational)
@@ -206,6 +207,20 @@ public static partial class ServiceCollectionExtensions
                 .WithIdentity("CommunityKamisPriceBrief-trigger")
                 .WithCronSchedule(
                     options.KamisPriceBriefCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
+        if (options.UsdaNassPriceBriefEnabled)
+        {
+            var jobKey = new JobKey("CommunityUsdaNassPriceBrief");
+            quartz.AddJob<CommunityUsdaNassPriceBriefJob>(job => job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("CommunityUsdaNassPriceBrief-trigger")
+                .WithCronSchedule(
+                    options.UsdaNassPriceBriefCronExpression,
                     schedule => schedule
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionDoNothing()));
