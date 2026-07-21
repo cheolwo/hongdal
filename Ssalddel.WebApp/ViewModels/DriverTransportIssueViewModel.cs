@@ -7,13 +7,9 @@ namespace Ssalddel.WebApp.ViewModels;
 
 public sealed record DriverTransportIssueReason(string Code, string Label, string Stage);
 
-public sealed class DriverTransportIssueViewModel(
-    Func<long> transportId,
-    Func<long, 운송증빙단계, string, string, byte[], CancellationToken, Task<기사운송사진업로드결과>> uploadPhoto,
-    Func<기사운송문제신고요청, CancellationToken, Task> reportIssue,
-    DriverTransportProofCommandRunner run) : 조립ViewModelBase
+public sealed class DriverTransportIssueViewModel : 조립ViewModelBase
 {
-    public static readonly IReadOnlyList<DriverTransportIssueReason> Reasons =
+    public static readonly IReadOnlyList<DriverTransportIssueReason> DefaultReasons =
     [
         new("상차물건없음", "상차지에 물건이 없음", "상차"),
         new("수량불일치", "수량이 다름", "상차"),
@@ -24,12 +20,33 @@ public sealed class DriverTransportIssueViewModel(
         new("증빙업로드실패", "증빙 업로드 실패", "증빙")
     ];
 
-    private string _issueCode = Reasons[0].Code;
+    private readonly Func<long> _transportId;
+    private readonly Func<long, 운송증빙단계, string, string, byte[], CancellationToken, Task<기사운송사진업로드결과>> _uploadPhoto;
+    private readonly Func<기사운송문제신고요청, CancellationToken, Task> _reportIssue;
+    private readonly DriverTransportProofCommandRunner _run;
+    private string _issueCode;
     private string? _memo;
     private bool _requireAdminReview = true;
     private string? _previewUrl;
     private string? _fileName;
     private 기사운송사진업로드결과? _upload;
+
+    public DriverTransportIssueViewModel(
+        Func<long> transportId,
+        Func<long, 운송증빙단계, string, string, byte[], CancellationToken, Task<기사운송사진업로드결과>> uploadPhoto,
+        Func<기사운송문제신고요청, CancellationToken, Task> reportIssue,
+        DriverTransportProofCommandRunner run,
+        IReadOnlyList<DriverTransportIssueReason>? reasons = null)
+    {
+        _transportId = transportId;
+        _uploadPhoto = uploadPhoto;
+        _reportIssue = reportIssue;
+        _run = run;
+        Reasons = reasons is { Count: > 0 } ? reasons : DefaultReasons;
+        _issueCode = Reasons[0].Code;
+    }
+
+    public IReadOnlyList<DriverTransportIssueReason> Reasons { get; }
 
     public string IssueCode
     {
@@ -70,7 +87,7 @@ public sealed class DriverTransportIssueViewModel(
     public Task UploadAsync(IBrowserFile file)
     {
         ClearEvidence();
-        return run("예외 사진을 업로드했습니다.", async cancellationToken =>
+        return _run("예외 사진을 업로드했습니다.", async cancellationToken =>
         {
             var image = await DriverTransportProofImageReader.ReadAsync(file, cancellationToken);
             await UploadImageCoreAsync(image, cancellationToken);
@@ -80,7 +97,7 @@ public sealed class DriverTransportIssueViewModel(
     public Task UploadImageAsync(DriverTransportProofImage image)
     {
         ClearEvidence();
-        return run(
+        return _run(
             "예외 사진을 업로드했습니다.",
             cancellationToken => UploadImageCoreAsync(image, cancellationToken));
     }
@@ -98,9 +115,9 @@ public sealed class DriverTransportIssueViewModel(
             증빙Url = Upload?.Url,
             관리자확인요청 = RequireAdminReview
         };
-        return run(
+        return _run(
             "예외 사유를 서버에 기록했습니다.",
-            cancellationToken => reportIssue(request, cancellationToken));
+            cancellationToken => _reportIssue(request, cancellationToken));
     }
 
     public void Reset()
@@ -115,8 +132,8 @@ public sealed class DriverTransportIssueViewModel(
         DriverTransportProofImage image,
         CancellationToken cancellationToken)
     {
-        var upload = await uploadPhoto(
-            transportId(),
+        var upload = await _uploadPhoto(
+            _transportId(),
             운송증빙단계.예외,
             image.FileName,
             image.ContentType,

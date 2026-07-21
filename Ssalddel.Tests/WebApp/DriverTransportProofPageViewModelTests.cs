@@ -41,7 +41,7 @@ public sealed class DriverTransportProofPageViewModelTests
         Assert.Null(viewModel.Issue.Upload);
         Assert.Null(viewModel.Pickup.RecipientName);
         Assert.Null(viewModel.Issue.Memo);
-        Assert.Equal(DriverTransportIssueViewModel.Reasons[0].Code, viewModel.Issue.IssueCode);
+        Assert.Equal(DriverTransportIssueViewModel.DefaultReasons[0].Code, viewModel.Issue.IssueCode);
     }
 
     [Fact]

@@ -4,6 +4,12 @@ namespace Ssalddel.WebApp.Pages.DriverTransportProof;
 
 public static class DriverTransportProofPresentation
 {
+    public static string Display(params string?[] values)
+        => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+
+    public static string DisplayMoney(decimal? value)
+        => value.HasValue ? $"{value.Value:N0}원" : "금액 미정";
+
     public static Color ResolveTransportStateColor(string? status)
     {
         if (ContainsAny(status, "완료", "인수"))

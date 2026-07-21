@@ -1,0 +1,58 @@
+@using Ssalddel.WebApp.ViewModels
+
+<MudGrid>
+    <MudItem xs="12" md="@(TwoColumnLayout ? 6 : 12)">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">인수증/서명</MudText>
+            <MudSelect T="string" @bind-Value="Model.ReceiptEvidenceMethod" Label="인수증 증빙 방식" Variant="Variant.Outlined">
+                <MudSelectItem T="string" Value="@("사진")">사진</MudSelectItem>
+                <MudSelectItem T="string" Value="@("전자서명")">전자서명</MudSelectItem>
+                <MudSelectItem T="string" Value="@("서명생략")">서명생략</MudSelectItem>
+            </MudSelect>
+            <MudTextField @bind-Value="Model.RecipientName" Label="인수자명" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="Model.RecipientOrganization" Label="인수자 소속" Variant="Variant.Outlined" />
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12" md="@(TwoColumnLayout ? 6 : 12)">
+        <MudStack Spacing="2">
+            @if (TwoColumnLayout)
+            {
+                <MudText Typo="Typo.h6">확인 항목</MudText>
+            }
+            <MudTextField @bind-Value="Model.RecipientSignature" Label="인수자 서명값" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="Model.DriverSignature" Label="기사 서명값" Variant="Variant.Outlined" />
+            <MudCheckBox T="bool" @bind-Value="Model.ReceiptConfirmed" Label="인수증 확인 완료" Color="Color.Primary" />
+            <MudCheckBox T="bool" @bind-Value="Model.SignatureOmitted" Label="서명 생략 확인" Color="Color.Warning" />
+            <MudTextField @bind-Value="Model.SignatureOmissionReason"
+                          Label="서명 생략 사유"
+                          Variant="Variant.Outlined"
+                          Disabled="@(!Model.SignatureOmitted)" />
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@if (ShowCompleteButton)
+{
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               Class="mt-3"
+               Disabled="@(Model.Upload is null || IsBusy)"
+               StartIcon="@Icons.Material.Filled.CheckCircle"
+               OnClick="Model.CompleteAsync">
+        상차 완료 처리
+    </MudButton>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public DriverPickupProofViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public bool ShowCompleteButton { get; set; }
+
+    [Parameter]
+    public bool TwoColumnLayout { get; set; }
+}

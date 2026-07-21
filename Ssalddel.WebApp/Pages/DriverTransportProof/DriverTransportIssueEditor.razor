@@ -3,9 +3,9 @@
 <MudGrid Class="pt-3">
     <MudItem xs="12" md="6">
         <MudStack Spacing="3">
-            <MudText Typo="Typo.h6">현장 예외 신고</MudText>
+            <MudText Typo="Typo.h6">@Title</MudText>
             <MudSelect T="string" Label="예외 사유" @bind-Value="Model.IssueCode" Variant="Variant.Outlined">
-                @foreach (var reason in DriverTransportIssueViewModel.Reasons)
+                @foreach (var reason in Model.Reasons)
                 {
                     <MudSelectItem T="string" Value="@reason.Code">@reason.Label</MudSelectItem>
                 }
@@ -17,7 +17,7 @@
                        Disabled="@IsBusy"
                        StartIcon="@Icons.Material.Filled.ReportProblem"
                        OnClick="Model.ReportAsync">
-                예외 사유 기록
+                @SubmitLabel
             </MudButton>
         </MudStack>
     </MudItem>
@@ -27,7 +27,7 @@
             <InputFile OnChange="OnPhotoSelectedAsync" accept="image/*" />
             @if (!string.IsNullOrWhiteSpace(Model.PreviewUrl))
             {
-                <img src="@Model.PreviewUrl" alt="예외 증빙 미리보기" class="driver-proof-preview" />
+                <img src="@Model.PreviewUrl" alt="@PreviewAlt" class="driver-proof-preview" />
                 <MudText Typo="Typo.caption" Color="Color.Secondary">첨부 파일: @Model.FileName</MudText>
             }
             @if (Model.Upload is not null)
@@ -46,6 +46,15 @@
 
     [Parameter]
     public bool IsBusy { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "현장 예외 신고";
+
+    [Parameter]
+    public string SubmitLabel { get; set; } = "예외 사유 기록";
+
+    [Parameter]
+    public string PreviewAlt { get; set; } = "예외 증빙 미리보기";
 
     private Task OnPhotoSelectedAsync(InputFileChangeEventArgs args)
         => Model.UploadAsync(args.File);
