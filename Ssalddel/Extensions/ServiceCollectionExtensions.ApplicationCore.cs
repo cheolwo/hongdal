@@ -110,6 +110,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<I커뮤니티게시글UseCase>(provider =>
             provider.GetRequiredService<커뮤니티게시글UseCase>());
         services.AddScoped<I커뮤니티게시글조회UseCase, 커뮤니티게시글조회UseCase>();
+        services.AddScoped<I커뮤니티게시글조회수기록UseCase, 커뮤니티게시글조회수기록UseCase>();
         services.AddScoped<I커뮤니티게시글발행UseCase, 커뮤니티게시글발행UseCase>();
         services.AddScoped<I커뮤니티게시글예약발행UseCase, 커뮤니티게시글예약발행UseCase>();
         services.AddScoped<I커뮤니티게시글첨부UseCase, 커뮤니티게시글첨부UseCase>();

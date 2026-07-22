@@ -9,7 +9,8 @@
                        PostDetailOnly="true"
                        UseBaguaRoleTransitionPages="@UseBaguaRoleTransitionPages"
                        QueryPostId="@PostId"
-                       QueryBoardName="@BoardName" />
+                       QueryBoardName="@BoardName"
+                       ListReturnPath="@ListReturnPath" />
 
 @code {
     [Parameter] public string AppName { get; set; } = "살뜰";
@@ -19,6 +20,7 @@
     [Parameter] public bool UseBaguaRoleTransitionPages { get; set; } = true;
     [Parameter, EditorRequired] public long PostId { get; set; }
     [Parameter] public string? BoardName { get; set; }
+    [Parameter] public string? ListReturnPath { get; set; }
 
     private string ScreenKey => $"post-{PostId}-{BoardName}";
 }

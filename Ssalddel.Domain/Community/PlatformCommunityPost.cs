@@ -12,6 +12,7 @@ public sealed class PlatformCommunityPost
     public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
     public string? SalesOfferJson { get; set; }
+    public bool IsInterestGatheringEnabled { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public string? AuthorUserId { get; set; }
     public string Nickname { get; set; } = string.Empty;
@@ -36,6 +37,7 @@ public sealed class PlatformCommunityPost
     public string? CommunityMomentumMessage { get; set; }
     public int CommunityMomentumRoleParticipantCount { get; set; }
     public DateTime? CommunityMomentumUpdatedAtUtc { get; set; }
+    public long ViewCount { get; set; }
     public int RecommendationCount { get; set; }
     public int CommentCount { get; set; }
     public DateTime? LastEngagedAtUtc { get; set; }

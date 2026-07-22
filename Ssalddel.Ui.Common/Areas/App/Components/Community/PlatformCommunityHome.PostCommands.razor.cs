@@ -67,6 +67,14 @@ public partial class PlatformCommunityHome
             return;
         }
 
+        if (!CommunityPostInterestGatheringPolicy.IsEnabledFor(
+                detail.Category,
+                detail.IsInterestGatheringEnabled))
+        {
+            Engagement.SetOpportunity(postId, null);
+            return;
+        }
+
         try
         {
             await RefreshPostOpportunitiesAsync(postId);
@@ -164,6 +172,61 @@ public partial class PlatformCommunityHome
         statusMessage = "작성할 때 입력한 비밀번호를 넣고 수정 저장을 누르세요.";
         statusSeverity = Severity.Info;
         OpenCommunityMode();
+    }
+
+    private async Task BeginDeleteAsync(PlatformCommunityPostResponse post)
+    {
+        if (!post.CanDelete)
+        {
+            statusSeverity = Severity.Warning;
+            statusMessage = "관리자나 원작성자만 이 글을 삭제할 수 있습니다.";
+            return;
+        }
+
+        var parameters = new DialogParameters
+        {
+            [nameof(PlatformCommunityPostDeleteDialog.PostTitle)] = post.Title,
+            [nameof(PlatformCommunityPostDeleteDialog.RequiresPassword)] = post.DeleteRequiresPassword
+        };
+        var dialog = await DialogService.ShowAsync<PlatformCommunityPostDeleteDialog>(
+            "게시글 삭제",
+            parameters,
+            new DialogOptions
+            {
+                MaxWidth = MaxWidth.ExtraSmall,
+                FullWidth = true,
+                CloseButton = true,
+                CloseOnEscapeKey = true
+            });
+        var dialogResult = await dialog.Result;
+        if (dialogResult is null || dialogResult.Canceled)
+        {
+            return;
+        }
+
+        try
+        {
+            var password = dialogResult.Data as string;
+            await CommunityService.DeletePostAsync(post.Id, password);
+            selectedForumPostId = null;
+            statusSeverity = Severity.Success;
+            statusMessage = "게시글을 삭제했습니다.";
+
+            if (UseDedicatedCommunityRoutes && PostDetailOnly)
+            {
+                Navigation.NavigateTo(string.IsNullOrWhiteSpace(ListReturnPath)
+                    ? CommunityPageRoutes.BoardsFor(boardName: post.Category)
+                    : ListReturnPath);
+                return;
+            }
+
+            await LoadPostsAsync();
+        }
+        catch (HttpRequestException exception)
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = exception.Message;
+        }
     }
 
     private void CancelEdit()

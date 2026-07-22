@@ -108,5 +108,13 @@ internal static class CommunityPostOpportunityGuard
         {
             throw new InvalidOperationException("신고·분쟁 게시글에서는 관심 모집, 가원장 또는 거래 역할 참여를 시작할 수 없습니다.");
         }
+
+        if (!CommunityPostInterestGatheringPolicy.IsEnabledFor(
+                source.Category,
+                source.IsInterestGatheringEnabled))
+        {
+            throw new InvalidOperationException(
+                "공동구매 모집 글에서 작성자가 마음 모으기를 사용한 경우에만 관심 모집과 가원장 흐름을 시작할 수 있습니다.");
+        }
     }
 }

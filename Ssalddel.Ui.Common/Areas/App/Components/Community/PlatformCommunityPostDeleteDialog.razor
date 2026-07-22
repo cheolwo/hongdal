@@ -1,0 +1,62 @@
+@using MudBlazor
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                <strong>@PostTitle</strong> 글을 삭제합니다. 삭제한 글은 게시판과 상세 화면에서 더 이상 보이지 않습니다.
+            </MudAlert>
+
+            @if (RequiresPassword)
+            {
+                <MudTextField T="string"
+                              Label="글 비밀번호"
+                              HelperText="익명으로 글을 쓸 때 입력한 비밀번호를 입력하세요."
+                              InputType="InputType.Password"
+                              Immediate="true"
+                              MaxLength="100"
+                              Autofocus="true"
+                              @bind-Value="password" />
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    로그인한 관리자 또는 원작성자 권한으로 삭제합니다.
+                </MudText>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">취소</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Error"
+                   StartIcon="@Icons.Material.Filled.DeleteOutline"
+                   Disabled="@(!CanSubmit)"
+                   OnClick="Submit">
+            삭제
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private string password = string.Empty;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string PostTitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool RequiresPassword { get; set; }
+
+    private bool CanSubmit
+        => !RequiresPassword || password.Trim().Length >= 4;
+
+    private void Submit()
+        => MudDialog.Close(DialogResult.Ok(password.Trim()));
+
+    private void Cancel()
+        => MudDialog.Cancel();
+}

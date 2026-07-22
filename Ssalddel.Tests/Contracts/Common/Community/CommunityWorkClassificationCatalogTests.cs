@@ -37,7 +37,7 @@ public sealed class CommunityWorkClassificationCatalogTests
         Assert.DoesNotContain(CommunityLedgerTemplateKeys.GroupImport, groupPurchase.LedgerTemplateKeys);
         Assert.Equal([CommunityLedgerTemplateKeys.GroupImport], groupImport.LedgerTemplateKeys);
         Assert.Equal("CommunityTrustWorkflow", groupPurchase.FeatureFlagKey);
-        Assert.Equal("GroupPurchaseImportWorkflow", groupImport.FeatureFlagKey);
+        Assert.Equal("CustomsAndTradeDataWorkflow", groupImport.FeatureFlagKey);
     }
 
     [Fact]

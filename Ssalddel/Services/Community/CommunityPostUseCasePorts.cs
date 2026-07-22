@@ -24,6 +24,13 @@ public interface I커뮤니티게시글조회UseCase
         CancellationToken cancellationToken);
 }
 
+public interface I커뮤니티게시글조회수기록UseCase
+{
+    Task<bool> 조회기록Async(
+        long id,
+        CancellationToken cancellationToken);
+}
+
 public interface I커뮤니티게시글발행UseCase
 {
     Task<Result<PlatformCommunityPostResponse>> 생성Async(

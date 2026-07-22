@@ -21,6 +21,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.OriginalLanguageCode).HasMaxLength(16);
         builder.Property(x => x.SharedLinkUrl).HasMaxLength(1000);
         builder.Property(x => x.SalesOfferJson).HasColumnType("longtext");
+        builder.Property(x => x.IsInterestGatheringEnabled).HasDefaultValue(false);
         builder.Property(x => x.커뮤니티원장Id).HasMaxLength(120);
         builder.Property(x => x.AuthorUserId).HasMaxLength(450);
         builder.Property(x => x.Nickname).HasMaxLength(40).IsRequired();
@@ -30,6 +31,7 @@ public sealed class PlatformCommunityPostConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.ReportedDisplayName).HasMaxLength(40);
         builder.Property(x => x.CommunityMomentumCode).HasMaxLength(40);
         builder.Property(x => x.CommunityMomentumMessage).HasMaxLength(240);
+        builder.Property(x => x.ViewCount).HasDefaultValue(0L);
         builder.Property(x => x.PasswordHash).HasMaxLength(200).IsRequired();
         builder.Property(x => x.PublicationStatusCode)
             .HasMaxLength(30)

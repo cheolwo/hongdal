@@ -24,6 +24,7 @@
                                     SelectedPostId="@SelectedPostId"
                                     SelectedSeedPostTitle="@SelectedSeedPostTitle"
                                     PostSelected="@PostSelected"
+                                    DeleteRequested="@DeleteRequested"
                                     SeedPostSelected="@SeedPostSelected" />
     }
     else
@@ -35,6 +36,7 @@
                                     SelectedPostId="@SelectedPostId"
                                     SelectedSeedPostTitle="@SelectedSeedPostTitle"
                                     PostSelected="@PostSelected"
+                                    DeleteRequested="@DeleteRequested"
                                     SeedPostSelected="@SeedPostSelected" />
     }
 
@@ -85,6 +87,9 @@
 
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> DeleteRequested { get; set; }
 
     [Parameter]
     public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }

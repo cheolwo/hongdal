@@ -22,6 +22,7 @@ namespace Ssalddel.Controllers.Common;
 public sealed class 커뮤니티게시글Controller : ControllerBase
 {
     private readonly I커뮤니티게시글조회UseCase _readUseCase;
+    private readonly I커뮤니티게시글조회수기록UseCase _viewCountUseCase;
     private readonly I커뮤니티게시글발행UseCase _publishingUseCase;
     private readonly I커뮤니티게시글음성조회Service _audioService;
     private readonly ICommunityPostTranslationService _translationService;
@@ -30,6 +31,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
 
     public 커뮤니티게시글Controller(
         I커뮤니티게시글조회UseCase readUseCase,
+        I커뮤니티게시글조회수기록UseCase viewCountUseCase,
         I커뮤니티게시글발행UseCase publishingUseCase,
         I커뮤니티게시글음성조회Service audioService,
         ICommunityPostTranslationService translationService,
@@ -37,6 +39,7 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
         I게시글원장표시ContextService ledgerContextService)
     {
         _readUseCase = readUseCase;
+        _viewCountUseCase = viewCountUseCase;
         _publishingUseCase = publishingUseCase;
         _audioService = audioService;
         _translationService = translationService;
@@ -123,7 +126,10 @@ public sealed class 커뮤니티게시글Controller : ControllerBase
     [HttpGet("{id:long}")]
     [AllowAnonymous]
     public async Task<IActionResult> Get(long id, CancellationToken cancellationToken)
-        => this.ToActionResult(await _readUseCase.상세Async(id, cancellationToken));
+    {
+        await _viewCountUseCase.조회기록Async(id, cancellationToken);
+        return this.ToActionResult(await _readUseCase.상세Async(id, cancellationToken));
+    }
 
     [HttpPost("{id:long}/translations/{targetLanguageCode}")]
     [AllowAnonymous]

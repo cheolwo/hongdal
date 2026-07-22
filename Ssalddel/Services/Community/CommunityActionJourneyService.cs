@@ -116,7 +116,10 @@ internal static class CommunityActionJourneyProjection
             displayLanguageCode,
             CommunityDisplayLanguageCodes.English,
             StringComparison.OrdinalIgnoreCase);
-        if (source.IsReportBoardPost)
+        if (source.IsReportBoardPost
+            || !CommunityPostInterestGatheringPolicy.IsEnabledFor(
+                source.Category,
+                source.IsInterestGatheringEnabled))
         {
             return new CommunityActionJourneyResponse
             {

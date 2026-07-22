@@ -4,6 +4,20 @@ namespace Ssalddel.Tests.Contracts.Community;
 
 public sealed class CommunityBoardCatalogTests
 {
+    [Theory]
+    [InlineData("모집·함께하기", true)]
+    [InlineData("공동구매", true)]
+    [InlineData("서원", false)]
+    [InlineData("자유·생활", false)]
+    public void 마음모으기는_공동구매모집게시판에서만_활성화한다(
+        string category,
+        bool expected)
+    {
+        Assert.Equal(expected, CommunityPostInterestGatheringPolicy.IsGroupPurchaseCategory(category));
+        Assert.Equal(expected, CommunityPostInterestGatheringPolicy.ResolveEnabled(category, requested: true));
+        Assert.False(CommunityPostInterestGatheringPolicy.ResolveEnabled(category, requested: false));
+    }
+
     [Fact]
     public void 공개게시판은_글목적별로구성하고_신고분쟁은제외한다()
     {

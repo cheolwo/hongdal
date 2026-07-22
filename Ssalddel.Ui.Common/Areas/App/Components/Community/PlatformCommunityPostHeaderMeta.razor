@@ -1,0 +1,16 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<div class="platform-community-post-header-meta" aria-label="게시글 정보">
+    <span>조회 <strong>@Post.ViewCount</strong></span>
+    <span>추천 <strong>@Post.RecommendationCount</strong></span>
+    <span>댓글 <strong>@Post.CommentCount</strong></span>
+    <time datetime="@Post.CreatedAtUtc.ToString("O")">작성 @FormatDate(Post.CreatedAtUtc)</time>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformCommunityPostResponse Post { get; set; } = null!;
+
+    private static string FormatDate(DateTime createdAtUtc)
+        => createdAtUtc.ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+}

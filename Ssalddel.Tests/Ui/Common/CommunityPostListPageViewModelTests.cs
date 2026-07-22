@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.JSInterop;
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -52,7 +53,10 @@ public sealed class CommunityPostListPageViewModelTests
         {
             BaseAddress = new Uri("https://localhost/")
         };
-        var service = new PlatformCommunityService(httpClient, null!);
+        await using var encryption = new SsalddelIsmsPClientEncryptionService(new NoopJsRuntime());
+        var service = new PlatformCommunityService(
+            httpClient,
+            new SsalddelProtectedApiClient(httpClient, encryption, new EmptyAccessTokenProvider()));
         using var viewModel = new CommunityPostListPageViewModel(service);
         viewModel.Configure("platform");
 
@@ -86,5 +90,22 @@ public sealed class CommunityPostListPageViewModelTests
             {
                 Content = JsonContent.Create(response)
             });
+    }
+
+    private sealed class EmptyAccessTokenProvider : ISsalddelAccessTokenProvider
+    {
+        public string? AccessToken => null;
+    }
+
+    private sealed class NoopJsRuntime : IJSRuntime
+    {
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
+            => throw new NotSupportedException();
+
+        public ValueTask<TValue> InvokeAsync<TValue>(
+            string identifier,
+            CancellationToken cancellationToken,
+            object?[]? args)
+            => throw new NotSupportedException();
     }
 }

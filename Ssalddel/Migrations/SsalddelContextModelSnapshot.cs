@@ -508,6 +508,11 @@ namespace Ssalddel.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsInterestGatheringEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsOperatorPinned")
                         .HasColumnType("tinyint(1)");
 
@@ -590,6 +595,11 @@ namespace Ssalddel.Migrations
 
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<long>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.Property<string>("WorkflowTag")
                         .IsRequired()

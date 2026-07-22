@@ -49,6 +49,34 @@ public sealed class CommunityPostAggregateModelTests
             DeleteBehavior.Restrict);
     }
 
+    [Fact]
+    public void Model_게시글조회수는_bigint_기본값_0으로_저장한다()
+    {
+        using var context = CreateContext();
+        var entity = Assert.IsAssignableFrom<IEntityType>(
+            context.Model.FindEntityType(typeof(PlatformCommunityPost)));
+        var property = Assert.IsAssignableFrom<IProperty>(
+            entity.FindProperty(nameof(PlatformCommunityPost.ViewCount)));
+
+        Assert.Equal(typeof(long), property.ClrType);
+        Assert.Equal("bigint", property.GetColumnType());
+        Assert.Equal(0L, property.GetDefaultValue());
+    }
+
+    [Fact]
+    public void Model_마음모으기선택값은_기본적으로_비활성이다()
+    {
+        using var context = CreateContext();
+        var entity = Assert.IsAssignableFrom<IEntityType>(
+            context.Model.FindEntityType(typeof(PlatformCommunityPost)));
+        var property = Assert.IsAssignableFrom<IProperty>(
+            entity.FindProperty(nameof(PlatformCommunityPost.IsInterestGatheringEnabled)));
+
+        Assert.Equal(typeof(bool), property.ClrType);
+        Assert.Equal("tinyint(1)", property.GetColumnType());
+        Assert.Equal(false, property.GetDefaultValue());
+    }
+
     private static void AssertRelationship<TDependent, TPrincipal>(
         SsalddelContext context,
         DeleteBehavior deleteBehavior,

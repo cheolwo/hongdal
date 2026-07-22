@@ -43,6 +43,7 @@
                                    SeedPosts="@SeedPosts"
                                    VisiblePostCount="@VisiblePostCount"
                                    PostSelected="@PostSelected"
+                                   DeleteRequested="@DeleteRequested"
                                    SeedPostSelected="@SeedPostSelected"
                                    SearchText="@SearchText"
                                    SearchTextChanged="@SearchTextChanged" />
@@ -88,6 +89,9 @@
 
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> DeleteRequested { get; set; }
 
     [Parameter]
     public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }

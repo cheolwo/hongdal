@@ -105,10 +105,7 @@ public sealed class CommunityPostProfessionalParticipationService : ICommunityPo
     {
         var source = await _postStore.GetAsync(postId, cancellationToken)
                      ?? throw new KeyNotFoundException("커뮤니티 게시글을 찾을 수 없습니다.");
-        if (source.IsReportBoardPost)
-        {
-            throw new InvalidOperationException("신고·분쟁 게시글에서는 거래 역할에 참여할 수 없습니다.");
-        }
+        CommunityPostOpportunityGuard.EnsureCollectiveActionAllowed(source);
 
         if (string.IsNullOrWhiteSpace(source.LinkedLedgerId)
             || !string.Equals(source.LinkedLedgerId, provisionalLedgerId?.Trim(), StringComparison.OrdinalIgnoreCase))

@@ -1,0 +1,29 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (Model.Draft.IsInterestGatheringAvailable)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+        <MudStack Row="true"
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween"
+                  Wrap="Wrap.Wrap"
+                  Spacing="2">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.subtitle2">마음 모으기</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    관심 역할만 비구속적으로 모읍니다. 주문·계약·결제·배차는 자동으로 시작되지 않습니다.
+                </MudText>
+            </MudStack>
+            <MudSwitch T="bool"
+                       Label="이 글에서 사용"
+                       Color="Color.Primary"
+                       @bind-Value="Model.Draft.IsInterestGatheringEnabled" />
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityPostComposerViewModel Model { get; set; } = null!;
+}

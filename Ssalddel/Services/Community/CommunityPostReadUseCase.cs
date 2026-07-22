@@ -105,7 +105,10 @@ public sealed class 커뮤니티게시글조회UseCase : I커뮤니티게시글�
         return Result.Ok(new PlatformCommunityPostListResponse
         {
             Items = entities
-                .Select(entity => CommunityPostResponseMapper.ToResponse(entity))
+                .Select(entity => CommunityPostResponseMapper.ToResponse(
+                    entity,
+                    currentUserId: _currentUserAccessor.UserId,
+                    currentUserRole: _currentUserAccessor.Role))
                 .ToArray(),
             TotalCount = totalCount,
             Page = page,
@@ -215,7 +218,11 @@ public sealed class 커뮤니티게시글조회UseCase : I커뮤니티게시글�
                     entity.커뮤니티원장Id,
                     _currentUserAccessor.UserId,
                     cancellationToken);
-        return Result.Ok(CommunityPostResponseMapper.ToResponse(entity, ledgerContext));
+        return Result.Ok(CommunityPostResponseMapper.ToResponse(
+            entity,
+            ledgerContext,
+            _currentUserAccessor.UserId,
+            _currentUserAccessor.Role));
     }
 
     private async Task<IReadOnlyList<string>> ResolveBoardCategoryNamesAsync(

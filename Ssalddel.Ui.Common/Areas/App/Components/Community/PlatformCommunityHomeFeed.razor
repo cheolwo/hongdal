@@ -20,6 +20,7 @@
                                        SelectedPostId="@SelectedPostId"
                                        SelectedSeedPostTitle="@SelectedSeedPostTitle"
                                        PostSelected="PostSelected"
+                                       DeleteRequested="DeleteRequested"
                                        SeedPostSelected="SeedPostSelected"
                                        SearchText="@SearchText"
                                        SearchTextChanged="SearchTextChanged" />
@@ -52,7 +53,8 @@
                                                  DiagramRequested="DiagramRequested"
                                                  StartFromCompletionRequested="StartFromCompletionRequested"
                                                  ReuseRequested="ReuseRequested"
-                                                 EditRequested="EditRequested" />
+                                                 EditRequested="EditRequested"
+                                                 DeleteRequested="DeleteRequested" />
                 </PlatformCommunityReadingThemeFrame>
             }
 
@@ -175,6 +177,9 @@
 
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> EditRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> DeleteRequested { get; set; }
 
     [Parameter]
     public RenderFragment? CommunityModeContent { get; set; }

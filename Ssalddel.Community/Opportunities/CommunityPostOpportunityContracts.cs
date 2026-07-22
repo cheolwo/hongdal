@@ -110,7 +110,8 @@ public sealed record CommunityPostOpportunitySource(
     string? SalesOfferJson = null,
     DateTime CreatedAtUtc = default,
     string? Category = null,
-    string? WorkflowTag = null);
+    string? WorkflowTag = null,
+    bool IsInterestGatheringEnabled = false);
 
 public enum CommunityPostLedgerLinkResult
 {

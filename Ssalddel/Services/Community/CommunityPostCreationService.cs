@@ -143,6 +143,9 @@ public sealed class 커뮤니티게시글생성Service
                 body),
             SharedLinkUrl = CommunityPostWritePolicy.NormalizeOptionalUrl(request.SharedLinkUrl),
             SalesOfferJson = CommunityPostWritePolicy.SerializeSalesOffer(request.SalesOffer),
+            IsInterestGatheringEnabled = CommunityPostInterestGatheringPolicy.ResolveEnabled(
+                category,
+                request.IsInterestGatheringEnabled),
             커뮤니티원장Id = linkedLedger?.원장Id,
             AuthorUserId = CommunityPostWritePolicy.NormalizeOptional(
                 _currentUserAccessor.UserId,

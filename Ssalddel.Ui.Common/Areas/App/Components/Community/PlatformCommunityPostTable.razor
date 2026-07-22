@@ -10,6 +10,7 @@
         <span role="columnheader">@UiText("제목", "Title")</span>
         <span role="columnheader">@UiText("글쓴이", "Author")</span>
         <span role="columnheader">@UiText("작성일", "Date")</span>
+        <span role="columnheader">@UiText("조회", "Views")</span>
         <span role="columnheader">@UiText("추천", "Likes")</span>
         <span role="columnheader">@UiText("댓글", "Replies")</span>
     </div>
@@ -56,6 +57,15 @@
                     }
                 </button>
                 <small>@post.WorkflowTag · @post.RoleTag · @PlatformCommunityPostListPresentation.DisplayPostNickname(post)@PlatformCommunityPostListPresentation.FormatPostCountryInline(post) · @PlatformCommunityPostListPresentation.FormatForumDate(post.CreatedAtUtc)</small>
+                @if (post.CanDelete)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   Class="platform-community-post-delete"
+                                   aria-label="@($"'{post.Title}' 글 삭제")"
+                                   OnClick="@(() => DeleteRequested.InvokeAsync(post))" />
+                }
             </span>
             <span class="platform-community-forum-author" role="cell">
                 <span>@PlatformCommunityPostListPresentation.DisplayPostNickname(post)</span>
@@ -68,6 +78,7 @@
                 }
             </span>
             <time role="cell" datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@PlatformCommunityPostListPresentation.FormatForumDate(post.CreatedAtUtc)</time>
+            <span class="platform-community-forum-count platform-community-forum-count--views" role="cell">@post.ViewCount</span>
             <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
             <span class="platform-community-forum-count platform-community-forum-count--comments"
                   role="cell"
@@ -98,6 +109,7 @@
             </span>
             <span class="platform-community-forum-author" role="cell">@post.Author</span>
             <span role="cell">@post.Meta</span>
+            <span class="platform-community-forum-count platform-community-forum-count--views" role="cell">0</span>
             <span class="platform-community-forum-count platform-community-forum-count--recommendations" role="cell">@post.RecommendationCount</span>
             <span class="platform-community-forum-count platform-community-forum-count--comments"
                   role="cell"
@@ -138,6 +150,9 @@
 
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> DeleteRequested { get; set; }
 
     [Parameter]
     public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }

@@ -11,7 +11,7 @@ namespace Ssalddel.Services.Community;
 [SsalddelCommunityV0Module(
     SsalddelCommunityV0ModuleKeys.Content,
     SsalddelModuleKind.Application,
-    "즉시 게시글 생성과 작성자 비밀번호에 의한 수정·삭제를 처리",
+    "즉시 게시글 생성과 로그인 작성자·관리자·익명 비밀번호 권한에 의한 수정·삭제를 처리",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "게시글 작성자의 명시적 요청만 반영하며 예약 발행 관리와 운영자 심의 상태는 변경하지 않습니다.")]
 public sealed class 커뮤니티게시글발행UseCase : I커뮤니티게시글발행UseCase
@@ -94,7 +94,17 @@ public sealed class 커뮤니티게시글발행UseCase : I커뮤니티게시글�
             return Forbidden<PlatformCommunityPostResponse>("원장 성립 시스템 기록은 수정할 수 없습니다.");
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
+        var mutationCapabilities = CommunityPostMutationAccessPolicy.Resolve(
+            entity,
+            _currentUserAccessor.UserId,
+            _currentUserAccessor.Role);
+        if (!mutationCapabilities.CanEdit)
+        {
+            return Forbidden<PlatformCommunityPostResponse>("작성자만 이 게시글을 수정할 수 있습니다.");
+        }
+
+        if (mutationCapabilities.EditRequiresPassword
+            && !BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
         {
             return Forbidden<PlatformCommunityPostResponse>("게시글 비밀번호가 일치하지 않습니다.");
         }
@@ -143,6 +153,9 @@ public sealed class 커뮤니티게시글발행UseCase : I커뮤니티게시글�
             entity.Body);
         entity.SharedLinkUrl = CommunityPostWritePolicy.NormalizeOptionalUrl(request.SharedLinkUrl);
         entity.SalesOfferJson = CommunityPostWritePolicy.SerializeSalesOffer(request.SalesOffer);
+        entity.IsInterestGatheringEnabled = CommunityPostInterestGatheringPolicy.ResolveEnabled(
+            category,
+            request.IsInterestGatheringEnabled);
         if (request.커뮤니티원장Id is not null)
         {
             entity.커뮤니티원장Id = linkedLedger?.원장Id;
@@ -177,7 +190,11 @@ public sealed class 커뮤니티게시글발행UseCase : I커뮤니티게시글�
             entity.커뮤니티원장Id,
             _currentUserAccessor.UserId,
             cancellationToken);
-        return Result.Ok(CommunityPostResponseMapper.ToResponse(entity, ledgerContext));
+        return Result.Ok(CommunityPostResponseMapper.ToResponse(
+            entity,
+            ledgerContext,
+            _currentUserAccessor.UserId,
+            _currentUserAccessor.Role));
     }
 
     public async Task<Result> 삭제Async(
@@ -185,11 +202,6 @@ public sealed class 커뮤니티게시글발행UseCase : I커뮤니티게시글�
         PlatformCommunityPostPasswordRequest? request,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request?.Password))
-        {
-            return BadRequest("비밀번호를 입력해야 합니다.");
-        }
-
         var entity = await _db.PlatformCommunityPosts
             .FirstOrDefaultAsync(post => post.Id == id && !post.IsDeleted, cancellationToken);
         if (entity is null)
@@ -202,7 +214,23 @@ public sealed class 커뮤니티게시글발행UseCase : I커뮤니티게시글�
             return Forbidden("원장 성립 시스템 기록은 삭제할 수 없습니다.");
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(request.Password.Trim(), entity.PasswordHash))
+        var mutationCapabilities = CommunityPostMutationAccessPolicy.Resolve(
+            entity,
+            _currentUserAccessor.UserId,
+            _currentUserAccessor.Role);
+        if (!mutationCapabilities.CanDelete)
+        {
+            return Forbidden("관리자나 작성자만 이 게시글을 삭제할 수 있습니다.");
+        }
+
+        if (mutationCapabilities.DeleteRequiresPassword
+            && string.IsNullOrWhiteSpace(request?.Password))
+        {
+            return BadRequest("익명 게시글을 삭제하려면 작성 시 비밀번호를 입력해야 합니다.");
+        }
+
+        if (mutationCapabilities.DeleteRequiresPassword
+            && !BCrypt.Net.BCrypt.Verify(request!.Password.Trim(), entity.PasswordHash))
         {
             return Forbidden("게시글 비밀번호가 일치하지 않습니다.");
         }

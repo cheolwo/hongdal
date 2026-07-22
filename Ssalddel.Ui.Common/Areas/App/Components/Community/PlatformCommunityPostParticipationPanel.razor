@@ -1,7 +1,10 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 @using Ssalddel.Ui.Common.Areas.App.ViewModels
 
-@if (ViewModel.Opportunities.TryGetValue(Post.Id, out var opportunity))
+@if (CommunityPostInterestGatheringPolicy.IsEnabledFor(
+         Post.Category,
+         Post.IsInterestGatheringEnabled)
+     && ViewModel.Opportunities.TryGetValue(Post.Id, out var opportunity))
 {
     var participation = opportunity.Participation;
     var flow = CommunityPostActionFlowViewModel.Create(opportunity);

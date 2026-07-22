@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
 using Ssalddel.Contracts.Common.Localization;
 using Microsoft.Extensions.Options;
@@ -6,42 +7,28 @@ using 살뜰.Services.Options;
 
 namespace Ssalddel.Services.Community;
 
-public sealed record CommunityTextTranslationResult(
-    string Title,
-    string Body,
-    string Provider,
-    string ProviderModelVersion);
-
-public interface ICommunityTextTranslationProvider
-{
-    bool IsAvailable { get; }
-
-    Task<CommunityTextTranslationResult> TranslateAsync(
-        string title,
-        string body,
-        string sourceLanguageCode,
-        string targetLanguageCode,
-        CancellationToken cancellationToken);
-}
-
 public sealed class AzureCommunityTextTranslationProvider : ICommunityTextTranslationProvider
 {
     private const string ProviderName = "AzureTranslator";
+    private const string GlobalEndpointHost = "api.cognitive.microsofttranslator.com";
     private readonly HttpClient _httpClient;
     private readonly CommunityPostTranslationOptions _options;
+    private readonly IAzureTranslatorAccessTokenProvider _accessTokenProvider;
 
     public AzureCommunityTextTranslationProvider(
         HttpClient httpClient,
-        IOptions<CommunityPostTranslationOptions> options)
+        IOptions<CommunityPostTranslationOptions> options,
+        IAzureTranslatorAccessTokenProvider accessTokenProvider)
     {
         _httpClient = httpClient;
         _options = options.Value;
+        _accessTokenProvider = accessTokenProvider;
     }
 
     public bool IsAvailable
         => _options.Enabled
            && string.Equals(_options.Provider, ProviderName, StringComparison.OrdinalIgnoreCase)
-           && !string.IsNullOrWhiteSpace(_options.ApiKey);
+           && HasValidAuthenticationConfiguration();
 
     public async Task<CommunityTextTranslationResult> TranslateAsync(
         string title,
@@ -67,11 +54,7 @@ public sealed class AzureCommunityTextTranslationProvider : ICommunityTextTransl
                 new AzureTranslationRequest(body)
             })
         };
-        request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey);
-        if (!string.IsNullOrWhiteSpace(_options.Region))
-        {
-            request.Headers.Add("Ocp-Apim-Subscription-Region", _options.Region.Trim());
-        }
+        await ApplyAuthenticationAsync(request, cancellationToken);
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -90,6 +73,60 @@ public sealed class AzureCommunityTextTranslationProvider : ICommunityTextTransl
             payload[1].Translations[0].Text,
             ProviderName,
             "v3.0-general");
+    }
+
+    private bool HasValidAuthenticationConfiguration()
+    {
+        if (string.Equals(
+                _options.AuthenticationMode,
+                AzureTranslatorAuthenticationModes.MicrosoftEntraId,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return !UsesGlobalEndpoint()
+                   || (!string.IsNullOrWhiteSpace(_options.ResourceId)
+                       && !string.IsNullOrWhiteSpace(_options.Region));
+        }
+
+        return string.Equals(
+                   _options.AuthenticationMode,
+                   AzureTranslatorAuthenticationModes.ApiKey,
+                   StringComparison.OrdinalIgnoreCase)
+               && !string.IsNullOrWhiteSpace(_options.ApiKey);
+    }
+
+    private async Task ApplyAuthenticationAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        if (string.Equals(
+                _options.AuthenticationMode,
+                AzureTranslatorAuthenticationModes.MicrosoftEntraId,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            var accessToken = await _accessTokenProvider.GetTokenAsync(cancellationToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            AddOptionalHeader(request, "Ocp-Apim-ResourceId", _options.ResourceId);
+            AddOptionalHeader(request, "Ocp-Apim-Subscription-Region", _options.Region);
+            return;
+        }
+
+        request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey.Trim());
+        AddOptionalHeader(request, "Ocp-Apim-Subscription-Region", _options.Region);
+    }
+
+    private bool UsesGlobalEndpoint()
+        => Uri.TryCreate(_options.Endpoint, UriKind.Absolute, out var endpoint)
+           && string.Equals(endpoint.Host, GlobalEndpointHost, StringComparison.OrdinalIgnoreCase);
+
+    private static void AddOptionalHeader(
+        HttpRequestMessage request,
+        string name,
+        string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            request.Headers.Add(name, value.Trim());
+        }
     }
 
     private sealed record AzureTranslationRequest(

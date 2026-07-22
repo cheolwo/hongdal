@@ -59,6 +59,10 @@ public interface ICommunityPostClient
         long postId,
         PlatformCommunityPostUpdateRequest request,
         CancellationToken cancellationToken = default);
+    Task DeletePostAsync(
+        long postId,
+        string? password = null,
+        CancellationToken cancellationToken = default);
     Task<PlatformCommunityPostResponse?> SetOperatorPinAsync(
         long postId,
         bool isOperatorPinned,

@@ -25,6 +25,8 @@ erDiagram
         string AuthorUserId
         string CommunityLedgerId "Mongo external id"
         string PublicationStatusCode
+        bool IsInterestGatheringEnabled
+        long ViewCount
     }
     POST_ATTACHMENT {
         long Id PK
@@ -80,6 +82,8 @@ erDiagram
 - 사용자에게 생성된 키워드 알림은 독립 이력이므로 게시글 삭제로 함께 지우지 않고 `Restrict`한다.
 - 알림 delivery는 알림의 실행 상세이므로 알림에 `Cascade`다.
 - push installation 삭제가 전송 이력을 지우지 않도록 installation 관계는 `Restrict`한다.
+- `IsInterestGatheringEnabled`는 `모집·함께하기` 게시글에서 작성자가 명시적으로 선택한 경우에만 `true`이며 기본값은 `false`다.
+- `ViewCount`는 공개 상세 API 조회가 성립할 때마다 원자적으로 1씩 증가하며 목록 조회는 증가시키지 않는다.
 
 이 관계는 `CommunityPostAggregateModelTests`가 EF 런타임 모델에서 검증한다.
 

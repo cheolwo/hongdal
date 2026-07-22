@@ -29,7 +29,8 @@ public sealed class EfCommunityPostOpportunityStore : ICommunityPostOpportunityS
                 post.SalesOfferJson,
                 post.CreatedAtUtc,
                 post.Category,
-                post.WorkflowTag))
+                post.WorkflowTag,
+                post.IsInterestGatheringEnabled))
             .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<CommunityPostLedgerLinkResult> LinkLedgerAsync(

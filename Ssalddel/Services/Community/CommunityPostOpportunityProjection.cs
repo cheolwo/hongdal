@@ -95,6 +95,24 @@ internal static class CommunityPostOpportunityProjection
             };
         }
 
+        if (!CommunityPostInterestGatheringPolicy.IsEnabledFor(
+                source.Category,
+                source.IsInterestGatheringEnabled))
+        {
+            return new CommunityPostParticipationEntryResponse
+            {
+                StateCode = CommunityPostParticipationStateCodes.Closed,
+                Title = english ? "Interest gathering is not enabled" : "마음 모으기를 사용하지 않는 글입니다",
+                Summary = english
+                    ? "The author can enable non-binding interest gathering when writing a group-purchase post."
+                    : "공동구매 모집 글을 작성하거나 수정할 때 작성자가 비구속적 마음 모으기를 선택할 수 있습니다.",
+                CanStart = false,
+                CanJoin = false,
+                NonBinding = true,
+                RoleOptions = []
+            };
+        }
+
         var open = vote?.Status == CommunityVoteStatusCodes.Open;
         var provisionalLedgerId = vote?.CommunityLedgerId;
         var promoted = !string.IsNullOrWhiteSpace(provisionalLedgerId);

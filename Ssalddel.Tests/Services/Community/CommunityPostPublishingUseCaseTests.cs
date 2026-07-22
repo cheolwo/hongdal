@@ -73,6 +73,28 @@ public sealed class CommunityPostPublishingUseCaseTests
             cancelled.Value.PublicationStatusCode);
     }
 
+    [Theory]
+    [InlineData("모집·함께하기", true)]
+    [InlineData("서원", false)]
+    public async Task 마음모으기_선택은_공동구매모집글에만_저장한다(
+        string category,
+        bool expected)
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var request = CreateRequest("마음 모으기 정책");
+        request.Category = category;
+        request.Nickname = "작성자";
+        request.IsInterestGatheringEnabled = true;
+
+        var result = await CreateCreationService(database.Context, new RecordingPublisher())
+            .CreateAsync(request, null, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(expected, result.Value.IsInterestGatheringEnabled);
+        var stored = await database.Context.PlatformCommunityPosts.SingleAsync(post => post.Id == result.Value.Id);
+        Assert.Equal(expected, stored.IsInterestGatheringEnabled);
+    }
+
     [Fact]
     public async Task 지원하지_않는_예약_상태_필터는_저장소를_조회하지_않고_거절한다()
     {
@@ -83,6 +105,104 @@ public sealed class CommunityPostPublishingUseCaseTests
 
         Assert.True(result.IsFailed);
         Assert.Contains("지원하지 않는", result.Errors.Single().Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 로그인한_원작성자는_비밀번호없이_자신의_글을_삭제한다()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var post = CreateStoredPost("author-1");
+        database.Context.PlatformCommunityPosts.Add(post);
+        await database.Context.SaveChangesAsync();
+        var useCase = CreatePublishingUseCase(
+            database.Context,
+            new TestUserAccessor("author-1", 역할명.커뮤니티회원));
+
+        var result = await useCase.삭제Async(
+            post.Id,
+            new PlatformCommunityPostPasswordRequest(),
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.True(post.IsDeleted);
+    }
+
+    [Fact]
+    public async Task 서버관리자는_다른_작성자의_글을_비밀번호없이_삭제한다()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var post = CreateStoredPost("author-1");
+        database.Context.PlatformCommunityPosts.Add(post);
+        await database.Context.SaveChangesAsync();
+        var useCase = CreatePublishingUseCase(
+            database.Context,
+            new TestUserAccessor("admin-1", 역할명.서버관리자));
+
+        var result = await useCase.삭제Async(
+            post.Id,
+            new PlatformCommunityPostPasswordRequest(),
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.True(post.IsDeleted);
+    }
+
+    [Fact]
+    public async Task 로그인한_비작성자는_글비밀번호를_알아도_등록회원_글을_삭제하거나_수정할수없다()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var post = CreateStoredPost("author-1");
+        database.Context.PlatformCommunityPosts.Add(post);
+        await database.Context.SaveChangesAsync();
+        var useCase = CreatePublishingUseCase(
+            database.Context,
+            new TestUserAccessor("other-user", 역할명.커뮤니티회원));
+
+        var deleteResult = await useCase.삭제Async(
+            post.Id,
+            new PlatformCommunityPostPasswordRequest { Password = "post-password" },
+            CancellationToken.None);
+        var updateResult = await useCase.수정Async(
+            post.Id,
+            CreateUpdateRequest("다른 사용자의 수정"),
+            CancellationToken.None);
+
+        Assert.True(deleteResult.IsFailed);
+        Assert.Equal(403, deleteResult.Errors.Single().Metadata["StatusCode"]);
+        Assert.True(updateResult.IsFailed);
+        Assert.Equal(403, updateResult.Errors.Single().Metadata["StatusCode"]);
+        Assert.False(post.IsDeleted);
+        Assert.NotEqual("다른 사용자의 수정", post.Title);
+    }
+
+    [Fact]
+    public async Task 익명_글은_작성할때_입력한_비밀번호가_맞아야_수정하고_삭제한다()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var post = CreateStoredPost(authorUserId: null);
+        database.Context.PlatformCommunityPosts.Add(post);
+        await database.Context.SaveChangesAsync();
+        var useCase = CreatePublishingUseCase(database.Context, new AnonymousUserAccessor());
+
+        var wrongDelete = await useCase.삭제Async(
+            post.Id,
+            new PlatformCommunityPostPasswordRequest { Password = "wrong-password" },
+            CancellationToken.None);
+        var updateResult = await useCase.수정Async(
+            post.Id,
+            CreateUpdateRequest("익명 작성자 수정"),
+            CancellationToken.None);
+        var deleteResult = await useCase.삭제Async(
+            post.Id,
+            new PlatformCommunityPostPasswordRequest { Password = "post-password" },
+            CancellationToken.None);
+
+        Assert.True(wrongDelete.IsFailed);
+        Assert.Equal(403, wrongDelete.Errors.Single().Metadata["StatusCode"]);
+        Assert.True(updateResult.IsSuccess);
+        Assert.Equal("익명 작성자 수정", post.Title);
+        Assert.True(deleteResult.IsSuccess);
+        Assert.True(post.IsDeleted);
     }
 
     private static 커뮤니티게시글생성Service CreateCreationService(
@@ -99,6 +219,17 @@ public sealed class CommunityPostPublishingUseCaseTests
             publisher,
             NullLogger<커뮤니티게시글생성Service>.Instance);
 
+    private static 커뮤니티게시글발행UseCase CreatePublishingUseCase(
+        SsalddelContext db,
+        ICurrentUserAccessor currentUserAccessor)
+        => new(
+            null!,
+            db,
+            null!,
+            new EmptyLedgerDisplayService(),
+            new AllowAllBoardWritePolicy(),
+            currentUserAccessor);
+
     private static PlatformCommunityPostCreateRequest CreateRequest(string title)
         => new()
         {
@@ -110,6 +241,37 @@ public sealed class CommunityPostPublishingUseCaseTests
             Body = "발행 파이프라인을 검증합니다.",
             Nickname = string.Empty,
             Password = "post-password"
+        };
+
+    private static PlatformCommunityPostUpdateRequest CreateUpdateRequest(string title)
+        => new()
+        {
+            Category = CommunityBoardCatalog.FreeLife.DisplayName,
+            WorkflowTag = "커뮤니티 신뢰",
+            RoleTag = "구성원",
+            Title = title,
+            Body = "수정된 본문입니다.",
+            Nickname = "작성자",
+            Password = "post-password"
+        };
+
+    private static PlatformCommunityPost CreateStoredPost(string? authorUserId)
+        => new()
+        {
+            AppKey = "platform",
+            Category = CommunityBoardCatalog.FreeLife.DisplayName,
+            WorkflowTag = "커뮤니티 신뢰",
+            RoleTag = "구성원",
+            Title = "권한 테스트 글",
+            Body = "권한을 검증합니다.",
+            OriginalLanguageCode = "ko",
+            AuthorUserId = authorUserId,
+            Nickname = "작성자",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("post-password"),
+            PublicationStatusCode = PlatformCommunityPostPublicationStatusCodes.Published,
+            PublishedAtUtc = DateTime.UtcNow,
+            CreatedAtUtc = DateTime.UtcNow,
+            UpdatedAtUtc = DateTime.UtcNow
         };
 
     private sealed class AllowAllBoardWritePolicy : ICommunityBoardWritePolicy
@@ -126,6 +288,22 @@ public sealed class CommunityPostPublishingUseCaseTests
     {
         public string? UserId => null;
         public string? Role => null;
+    }
+
+    private sealed record TestUserAccessor(string? UserId, string? Role) : ICurrentUserAccessor;
+
+    private sealed class EmptyLedgerDisplayService : I게시글원장표시ContextService
+    {
+        public Task<PlatformCommunityPostLedgerContextResponse?> 조회Async(
+            string? 원장Id,
+            string? 사용자UserId,
+            CancellationToken cancellationToken)
+            => Task.FromResult<PlatformCommunityPostLedgerContextResponse?>(null);
+
+        public Task<PlatformCommunityPostLedgerContextResponse?> 비식별성립사례조회Async(
+            string? 원장Id,
+            CancellationToken cancellationToken)
+            => Task.FromResult<PlatformCommunityPostLedgerContextResponse?>(null);
     }
 
     private sealed class RecordingPublisher : IPublisher

@@ -170,7 +170,9 @@ public sealed class CommunityActionJourneyProjectionTests
                 AllowsGroupPurchase = true,
                 Status = PlatformCommunitySalesOfferStatuses.Open
             }, new JsonSerializerOptions(JsonSerializerDefaults.Web)),
-            CreatedAtUtc: DateTime.UtcNow.AddHours(-2));
+            CreatedAtUtc: DateTime.UtcNow.AddHours(-2),
+            Category: CommunityBoardCatalog.Participation.DisplayName,
+            IsInterestGatheringEnabled: true);
 
     private static CommunityVoteResponse CreateInterestVote()
         => new()

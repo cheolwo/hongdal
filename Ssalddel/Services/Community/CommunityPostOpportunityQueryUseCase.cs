@@ -40,10 +40,15 @@ public sealed class CommunityPostOpportunityQueryUseCase : ICommunityPostOpportu
         }
 
         var language = CommunityDisplayLanguageCodes.Normalize(displayLanguageCode);
+        var collectiveActionEnabled = CommunityPostInterestGatheringPolicy.IsEnabledFor(
+            source.Category,
+            source.IsInterestGatheringEnabled);
         var analysis = _analyzer.Analyze(source.Title, source.Body);
         var expectedLedgerId = MeatImportReadinessCaseIds.FromCommunityPost(postId);
         var isActive = string.Equals(source.LinkedLedgerId, expectedLedgerId, StringComparison.OrdinalIgnoreCase);
-        var items = !source.IsReportBoardPost && (analysis.SuggestMeatImportReadiness || isActive)
+        var items = collectiveActionEnabled
+                    && !source.IsReportBoardPost
+                    && (analysis.SuggestMeatImportReadiness || isActive)
             ? new[] { CommunityPostOpportunityProjection.BuildOpportunity(source, analysis, language) }
             : [];
         var participationVote = await CommunityPostOpportunityProjection.FindParticipationVoteAsync(

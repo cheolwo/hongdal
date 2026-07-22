@@ -64,6 +64,7 @@ public sealed class PlatformCommunityPostResponse
     public string OriginalLanguageCode { get; set; } = CommunityDisplayLanguageCodes.Korean;
     public string? SharedLinkUrl { get; set; }
     public PlatformCommunityPostSalesOfferResponse? SalesOffer { get; set; }
+    public bool IsInterestGatheringEnabled { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public PlatformCommunityPostLedgerContextResponse? 원장Context { get; set; }
     public string Nickname { get; set; } = string.Empty;
@@ -73,6 +74,10 @@ public sealed class PlatformCommunityPostResponse
     public bool IsSystemGenerated { get; set; }
     public string? SystemPostKind { get; set; }
     public string? PrivacyNotice { get; set; }
+    public bool CanEdit { get; set; }
+    public bool EditRequiresPassword { get; set; }
+    public bool CanDelete { get; set; }
+    public bool DeleteRequiresPassword { get; set; }
     public bool IsReportBoardPost { get; set; }
     public string ReporterDisplayName { get; set; } = string.Empty;
     public string ReportedDisplayName { get; set; } = string.Empty;
@@ -85,6 +90,7 @@ public sealed class PlatformCommunityPostResponse
     public string? CommunityMomentumMessage { get; set; }
     public int CommunityMomentumRoleParticipantCount { get; set; }
     public DateTime? CommunityMomentumUpdatedAtUtc { get; set; }
+    public long ViewCount { get; set; }
     public int RecommendationCount { get; set; }
     public int CommentCount { get; set; }
     public DateTime? LastEngagedAtUtc { get; set; }
@@ -156,6 +162,7 @@ public sealed class PlatformCommunityPostCreateRequest
     public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
     public PlatformCommunityPostSalesOfferRequest? SalesOffer { get; set; }
+    public bool IsInterestGatheringEnabled { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsAuthorDisplayCountryPublic { get; set; }
@@ -223,6 +230,7 @@ public sealed class PlatformCommunityPostUpdateRequest
     public string? OriginalLanguageCode { get; set; }
     public string? SharedLinkUrl { get; set; }
     public PlatformCommunityPostSalesOfferRequest? SalesOffer { get; set; }
+    public bool IsInterestGatheringEnabled { get; set; }
     public string? 커뮤니티원장Id { get; set; }
     public string Nickname { get; set; } = string.Empty;
     public bool IsAuthorDisplayCountryPublic { get; set; }

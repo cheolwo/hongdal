@@ -106,6 +106,19 @@ public partial class CommunityPlatformClient
         return await response.Content.ReadFromJsonAsync<PlatformCommunityPostResponse>(cancellationToken: cancellationToken);
     }
 
+    public async Task DeletePostAsync(
+        long postId,
+        string? password = null,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _protectedApiClient.SendAsProtectedJsonAsync(
+            HttpMethod.Delete,
+            $"api/v1/community/posts/{postId}",
+            new PlatformCommunityPostPasswordRequest { Password = password?.Trim() ?? string.Empty },
+            cancellationToken);
+        await EnsureCommunityWriteSucceededAsync(response, cancellationToken);
+    }
+
     public async Task<PlatformCommunityPostResponse?> SetOperatorPinAsync(
         long postId,
         bool isOperatorPinned,

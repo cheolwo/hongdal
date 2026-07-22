@@ -31,6 +31,7 @@ public sealed record CommunityPostComposerSnapshot
     public string Title { get; init; } = string.Empty;
     public string Body { get; init; } = string.Empty;
     public string SharedLinkUrl { get; init; } = string.Empty;
+    public bool IsInterestGatheringEnabled { get; init; }
     public bool IsSalesPost { get; init; }
     public string SalesProductTitle { get; init; } = string.Empty;
     public decimal SalesAvailableQuantity { get; init; } = 1;
@@ -78,6 +79,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     private string _title = string.Empty;
     private string _body = string.Empty;
     private string _sharedLinkUrl = string.Empty;
+    private bool _isInterestGatheringEnabled;
     private bool _isSalesPost;
     private string _salesProductTitle = string.Empty;
     private decimal _salesAvailableQuantity = 1;
@@ -103,15 +105,33 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
     public string Category
     {
         get => _category;
-        set => SetProperty(
-            ref _category,
-            _isSalesPost ? PlatformCommunityPostCategories.Sales : value);
+        set
+        {
+            var category = _isSalesPost ? PlatformCommunityPostCategories.Sales : value;
+            if (!SetProperty(ref _category, category))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(IsInterestGatheringAvailable));
+            if (!IsInterestGatheringAvailable)
+            {
+                IsInterestGatheringEnabled = false;
+            }
+        }
     }
     public string WorkflowTag { get => _workflowTag; set => SetProperty(ref _workflowTag, value); }
     public string RoleTag { get => _roleTag; set => SetProperty(ref _roleTag, value); }
     public string Title { get => _title; set => SetProperty(ref _title, value); }
     public string Body { get => _body; set => SetProperty(ref _body, value); }
     public string SharedLinkUrl { get => _sharedLinkUrl; set => SetProperty(ref _sharedLinkUrl, value); }
+    public bool IsInterestGatheringAvailable
+        => CommunityPostInterestGatheringPolicy.IsGroupPurchaseCategory(Category);
+    public bool IsInterestGatheringEnabled
+    {
+        get => _isInterestGatheringEnabled;
+        set => SetProperty(ref _isInterestGatheringEnabled, IsInterestGatheringAvailable && value);
+    }
     public bool IsSalesPost
     {
         get => _isSalesPost;
@@ -254,6 +274,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         Title = string.Empty;
         Body = string.Empty;
         SharedLinkUrl = string.Empty;
+        IsInterestGatheringEnabled = false;
         SalesProductTitle = string.Empty;
         SalesAvailableQuantity = 1;
         SalesQuantityUnit = "개";
@@ -285,6 +306,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         Title = post.Title;
         Body = post.Body;
         SharedLinkUrl = post.SharedLinkUrl ?? string.Empty;
+        IsInterestGatheringEnabled = post.IsInterestGatheringEnabled;
         Apply(post.SalesOffer);
         커뮤니티원장Id = post.커뮤니티원장Id ?? string.Empty;
         IsReportBoardPost = string.Equals(post.Category, "신고/분쟁", StringComparison.OrdinalIgnoreCase)
@@ -307,6 +329,7 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
         Title = snapshot.Title;
         Body = snapshot.Body;
         SharedLinkUrl = snapshot.SharedLinkUrl;
+        IsInterestGatheringEnabled = snapshot.IsInterestGatheringEnabled;
         IsSalesPost = snapshot.IsSalesPost;
         SalesProductTitle = snapshot.SalesProductTitle;
         SalesAvailableQuantity = snapshot.SalesAvailableQuantity;
@@ -339,6 +362,9 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             Title = Title,
             Body = Body,
             SharedLinkUrl = SharedLinkUrl,
+            IsInterestGatheringEnabled = CommunityPostInterestGatheringPolicy.ResolveEnabled(
+                Category,
+                IsInterestGatheringEnabled),
             IsSalesPost = IsSalesPost,
             SalesProductTitle = SalesProductTitle,
             SalesAvailableQuantity = SalesAvailableQuantity,
@@ -367,6 +393,9 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             Title = Title,
             Body = Body,
             SharedLinkUrl = SharedLinkUrl,
+            IsInterestGatheringEnabled = CommunityPostInterestGatheringPolicy.ResolveEnabled(
+                PlatformCommunityPostCategoryPolicy.Resolve(Category, IsSalesPost),
+                IsInterestGatheringEnabled),
             SalesOffer = CreateSalesOfferRequest(),
             커뮤니티원장Id = 커뮤니티원장Id,
             Nickname = Nickname,
@@ -388,6 +417,9 @@ public sealed class CommunityPostComposerDraftViewModel : ObservableObject
             Title = Title,
             Body = Body,
             SharedLinkUrl = SharedLinkUrl,
+            IsInterestGatheringEnabled = CommunityPostInterestGatheringPolicy.ResolveEnabled(
+                PlatformCommunityPostCategoryPolicy.Resolve(Category, IsSalesPost),
+                IsInterestGatheringEnabled),
             SalesOffer = CreateSalesOfferRequest(),
             커뮤니티원장Id = 커뮤니티원장Id,
             Nickname = Nickname,

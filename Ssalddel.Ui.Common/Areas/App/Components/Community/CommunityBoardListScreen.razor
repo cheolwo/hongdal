@@ -4,6 +4,8 @@
 @inject PlatformCommunityService CommunityService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <PlatformCommunityReadingThemeFrame>
 <main class="community-board-page platform-home--classic-forum"
@@ -100,6 +102,7 @@
                                    VisiblePostCount="@ViewModel.VisiblePosts.Count"
                                    SelectedPostId="@FocusedPostId"
                                    PostSelected="OpenPost"
+                                   DeleteRequested="BeginDeleteAsync"
                                    SearchText="@ViewModel.SearchText"
                                    SearchTextChanged="HandleSearchChanged" />
 
@@ -230,6 +233,47 @@
                 ViewModel.CurrentBoard is null ? post.Category : null,
                 ViewModel.CurrentBoard?.BoardKey,
                 returnPath));
+    }
+
+    private async Task BeginDeleteAsync(PlatformCommunityPostResponse post)
+    {
+        if (!post.CanDelete)
+        {
+            Snackbar.Add("관리자나 원작성자만 이 글을 삭제할 수 있습니다.", Severity.Warning);
+            return;
+        }
+
+        var parameters = new DialogParameters
+        {
+            [nameof(PlatformCommunityPostDeleteDialog.PostTitle)] = post.Title,
+            [nameof(PlatformCommunityPostDeleteDialog.RequiresPassword)] = post.DeleteRequiresPassword
+        };
+        var dialog = await DialogService.ShowAsync<PlatformCommunityPostDeleteDialog>(
+            "게시글 삭제",
+            parameters,
+            new DialogOptions
+            {
+                MaxWidth = MaxWidth.ExtraSmall,
+                FullWidth = true,
+                CloseButton = true,
+                CloseOnEscapeKey = true
+            });
+        var dialogResult = await dialog.Result;
+        if (dialogResult is null || dialogResult.Canceled)
+        {
+            return;
+        }
+
+        try
+        {
+            await CommunityService.DeletePostAsync(post.Id, dialogResult.Data as string);
+            Snackbar.Add("게시글을 삭제했습니다.", Severity.Success);
+            await ViewModel.LoadAsync(CurrentRequest());
+        }
+        catch (HttpRequestException exception)
+        {
+            Snackbar.Add(exception.Message, Severity.Error);
+        }
     }
 
     private void OpenCompose()

@@ -355,6 +355,26 @@ public sealed class CommunityPostComposerViewModelTests
     }
 
     [Fact]
+    public void 마음모으기는_공동구매모집글에서_작성자가_선택한경우에만_요청한다()
+    {
+        var draft = ValidDraft();
+        draft.Category = CommunityBoardCatalog.Participation.DisplayName;
+        draft.IsInterestGatheringEnabled = true;
+
+        var enabledRequest = draft.CreateRequest("platform");
+
+        Assert.True(draft.IsInterestGatheringAvailable);
+        Assert.True(enabledRequest.IsInterestGatheringEnabled);
+
+        draft.Category = CommunityBoardCatalog.Vow.DisplayName;
+        var vowRequest = draft.CreateRequest("platform");
+
+        Assert.False(draft.IsInterestGatheringAvailable);
+        Assert.False(draft.IsInterestGatheringEnabled);
+        Assert.False(vowRequest.IsInterestGatheringEnabled);
+    }
+
+    [Fact]
     public void 판매정보를_붙이면_판매게시판으로_자동분류되고_다른분류로_바뀌지않는다()
     {
         var draft = new CommunityPostComposerDraftViewModel

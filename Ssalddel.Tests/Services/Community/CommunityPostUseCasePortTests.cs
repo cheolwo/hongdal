@@ -40,6 +40,8 @@ public sealed class CommunityPostUseCasePortTests
             .IsAssignableFrom(typeof(커뮤니티게시글참여UseCase)));
         Assert.True(typeof(I커뮤니티게시글조회UseCase)
             .IsAssignableFrom(typeof(커뮤니티게시글조회UseCase)));
+        Assert.True(typeof(I커뮤니티게시글조회수기록UseCase)
+            .IsAssignableFrom(typeof(커뮤니티게시글조회수기록UseCase)));
         Assert.True(typeof(I커뮤니티게시글발행UseCase)
             .IsAssignableFrom(typeof(커뮤니티게시글발행UseCase)));
         Assert.True(typeof(I커뮤니티게시글예약발행UseCase)
@@ -67,6 +69,7 @@ public sealed class CommunityPostUseCasePortTests
         var postControllerDependencies = ConstructorDependencies<커뮤니티게시글Controller>();
         Assert.DoesNotContain(typeof(I커뮤니티게시글UseCase), postControllerDependencies);
         Assert.Contains(typeof(I커뮤니티게시글조회UseCase), postControllerDependencies);
+        Assert.Contains(typeof(I커뮤니티게시글조회수기록UseCase), postControllerDependencies);
         Assert.Contains(typeof(I커뮤니티게시글발행UseCase), postControllerDependencies);
         Assert.Contains(typeof(I게시글원장선택조회Service), postControllerDependencies);
         Assert.Contains(typeof(I게시글원장표시ContextService), postControllerDependencies);
@@ -181,6 +184,12 @@ public sealed class CommunityPostUseCasePortTests
             descriptor => descriptor.ServiceType == typeof(I커뮤니티게시글조회UseCase));
         Assert.Equal(ServiceLifetime.Scoped, read.Lifetime);
         Assert.Equal(typeof(커뮤니티게시글조회UseCase), read.ImplementationType);
+
+        var viewCount = Assert.Single(
+            services,
+            descriptor => descriptor.ServiceType == typeof(I커뮤니티게시글조회수기록UseCase));
+        Assert.Equal(ServiceLifetime.Scoped, viewCount.Lifetime);
+        Assert.Equal(typeof(커뮤니티게시글조회수기록UseCase), viewCount.ImplementationType);
 
         var publishing = Assert.Single(
             services,

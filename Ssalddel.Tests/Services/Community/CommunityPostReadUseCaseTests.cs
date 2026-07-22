@@ -14,8 +14,10 @@ public sealed class CommunityPostReadUseCaseTests
     public async Task 목록은_보호_게시글을_제외하고_페이지_범위를_보정한다()
     {
         await using var db = CreateContext();
+        var publicPost = CreatePost("공개 글", CommunityBoardCatalog.FreeLife.DisplayName);
+        publicPost.ViewCount = 12;
         db.PlatformCommunityPosts.AddRange(
-            CreatePost("공개 글", CommunityBoardCatalog.FreeLife.DisplayName),
+            publicPost,
             CreatePost("신고 글", CommunityBoardCatalog.SafetyReport.DisplayName, isReport: true),
             CreatePost("다른 앱 글", CommunityBoardCatalog.FreeLife.DisplayName, appKey: "another-app"));
         await db.SaveChangesAsync();
@@ -36,6 +38,7 @@ public sealed class CommunityPostReadUseCaseTests
         Assert.Equal(50, result.Value.PageSize);
         var item = Assert.Single(result.Value.Items);
         Assert.Equal("공개 글", item.Title);
+        Assert.Equal(12, item.ViewCount);
         Assert.False(item.IsReportBoardPost);
     }
 
@@ -78,8 +81,64 @@ public sealed class CommunityPostReadUseCaseTests
         Assert.Equal(404, result.Errors.Single().Metadata["StatusCode"]);
     }
 
-    private static 커뮤니티게시글조회UseCase CreateUseCase(SsalddelContext db)
-        => new(db, null!, new AnonymousUserAccessor());
+    [Fact]
+    public async Task 목록은_익명_원작성자_관리자와_다른회원의_권한을_구분한다()
+    {
+        await using var db = CreateContext();
+        var anonymousPost = CreatePost("익명 글", CommunityBoardCatalog.FreeLife.DisplayName);
+        var memberPost = CreatePost("회원 글", CommunityBoardCatalog.FreeLife.DisplayName);
+        memberPost.AuthorUserId = "author-1";
+        db.PlatformCommunityPosts.AddRange(anonymousPost, memberPost);
+        await db.SaveChangesAsync();
+
+        var anonymousView = await ListAsync(db, new AnonymousUserAccessor());
+        var ownerView = await ListAsync(db, new TestUserAccessor("author-1", 역할명.커뮤니티회원));
+        var administratorView = await ListAsync(db, new TestUserAccessor("admin-1", 역할명.서버관리자));
+        var otherMemberView = await ListAsync(db, new TestUserAccessor("other-1", 역할명.커뮤니티회원));
+
+        var anonymousItem = anonymousView.Single(item => item.Id == anonymousPost.Id);
+        Assert.True(anonymousItem.CanEdit);
+        Assert.True(anonymousItem.EditRequiresPassword);
+        Assert.True(anonymousItem.CanDelete);
+        Assert.True(anonymousItem.DeleteRequiresPassword);
+
+        var ownerItem = ownerView.Single(item => item.Id == memberPost.Id);
+        Assert.True(ownerItem.CanEdit);
+        Assert.True(ownerItem.EditRequiresPassword);
+        Assert.True(ownerItem.CanDelete);
+        Assert.False(ownerItem.DeleteRequiresPassword);
+
+        var administratorItem = administratorView.Single(item => item.Id == memberPost.Id);
+        Assert.False(administratorItem.CanEdit);
+        Assert.True(administratorItem.CanDelete);
+        Assert.False(administratorItem.DeleteRequiresPassword);
+
+        var otherMemberItem = otherMemberView.Single(item => item.Id == memberPost.Id);
+        Assert.False(otherMemberItem.CanEdit);
+        Assert.False(otherMemberItem.CanDelete);
+    }
+
+    private static 커뮤니티게시글조회UseCase CreateUseCase(
+        SsalddelContext db,
+        ICurrentUserAccessor? currentUserAccessor = null)
+        => new(db, null!, currentUserAccessor ?? new AnonymousUserAccessor());
+
+    private static async Task<IReadOnlyList<PlatformCommunityPostResponse>> ListAsync(
+        SsalddelContext db,
+        ICurrentUserAccessor currentUserAccessor)
+    {
+        var result = await CreateUseCase(db, currentUserAccessor).목록Async(
+            "platform",
+            null,
+            CommunityBoardKeys.FreeLife,
+            null,
+            null,
+            1,
+            50,
+            CancellationToken.None);
+        Assert.True(result.IsSuccess);
+        return result.Value.Items;
+    }
 
     private static PlatformCommunityPost CreatePost(
         string title,
@@ -117,6 +176,8 @@ public sealed class CommunityPostReadUseCaseTests
         public string? UserId => null;
         public string? Role => null;
     }
+
+    private sealed record TestUserAccessor(string? UserId, string? Role) : ICurrentUserAccessor;
 
     private sealed class DummyPersonalDataEncryptionService : IPersonalDataEncryptionService
     {

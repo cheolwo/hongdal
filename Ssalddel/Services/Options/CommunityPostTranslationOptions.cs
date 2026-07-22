@@ -1,5 +1,11 @@
 namespace 살뜰.Services.Options;
 
+public static class AzureTranslatorAuthenticationModes
+{
+    public const string MicrosoftEntraId = "MicrosoftEntraId";
+    public const string ApiKey = "ApiKey";
+}
+
 public sealed class CommunityPostTranslationOptions
 {
     public const string SectionName = "CommunityPostTranslation";
@@ -7,6 +13,9 @@ public sealed class CommunityPostTranslationOptions
     public bool Enabled { get; set; }
     public string Provider { get; set; } = "AzureTranslator";
     public string Endpoint { get; set; } = "https://api.cognitive.microsofttranslator.com";
+    public string AuthenticationMode { get; set; } = AzureTranslatorAuthenticationModes.MicrosoftEntraId;
+    public string ResourceId { get; set; } = string.Empty;
+    public string? ManagedIdentityClientId { get; set; }
     public string ApiKey { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;
     public int TimeoutSeconds { get; set; } = 15;

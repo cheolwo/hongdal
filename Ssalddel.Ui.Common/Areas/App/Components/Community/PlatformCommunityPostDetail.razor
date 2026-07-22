@@ -3,46 +3,49 @@
 
 <MudPaper Elevation="0" Outlined="true" Class="pa-4 platform-community-post platform-community-post--expanded">
     <MudStack Spacing="2">
-        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
-            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+        <header class="platform-community-post-header">
+            <div class="platform-community-post-header__title">
                 <MudIcon Icon="@(Post.IsSystemGenerated ? Icons.Material.Filled.Verified : Icons.Material.Filled.Forum)"
                          Color="@(Post.IsSystemGenerated ? Color.Success : Color.Primary)" />
                 <MudText Typo="Typo.subtitle1">@Post.Title</MudText>
-            </MudStack>
-            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
-                @if (Post.IsOperatorPinned)
-                {
-                    <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">운영 고정</MudChip>
-                }
-                else if (Post.IsTrending)
-                {
-                    <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">활동 글</MudChip>
-                }
-                @if (Post.IsSystemGenerated)
-                {
-                    <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
-                        @CommunitySystemPostDisplay.BadgeLabel(Post.SystemPostKind)
-                    </MudChip>
-                }
-                @if (Post.IsCommunityMomentumPromoted)
-                {
-                    <MudChip T="string"
-                             Size="Size.Small"
-                             Color="Color.Warning"
-                             Variant="Variant.Outlined"
-                             Icon="@Icons.Material.Filled.Hub">
-                        @CommunityMomentumLabel(Post.CommunityMomentumCode)
-                    </MudChip>
-                }
-                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@Post.Category</MudChip>
-                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@Post.WorkflowTag</MudChip>
-                <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@Post.RoleTag</MudChip>
-                @if (IsReportPost)
-                {
-                    <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Outlined">신고 게시판</MudChip>
-                }
-            </MudStack>
-        </MudStack>
+            </div>
+            <div class="platform-community-post-header__aside">
+                <PlatformCommunityPostHeaderMeta Post="@Post" />
+                <div class="platform-community-post-header__tags">
+                    @if (Post.IsOperatorPinned)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">운영 고정</MudChip>
+                    }
+                    else if (Post.IsTrending)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">활동 글</MudChip>
+                    }
+                    @if (Post.IsSystemGenerated)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
+                            @CommunitySystemPostDisplay.BadgeLabel(Post.SystemPostKind)
+                        </MudChip>
+                    }
+                    @if (Post.IsCommunityMomentumPromoted)
+                    {
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Color="Color.Warning"
+                                 Variant="Variant.Outlined"
+                                 Icon="@Icons.Material.Filled.Hub">
+                            @CommunityMomentumLabel(Post.CommunityMomentumCode)
+                        </MudChip>
+                    }
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@Post.Category</MudChip>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@Post.WorkflowTag</MudChip>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@Post.RoleTag</MudChip>
+                    @if (IsReportPost)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Outlined">신고 게시판</MudChip>
+                    }
+                </div>
+            </div>
+        </header>
 
         @if (Post.SalesOffer is not null)
         {
@@ -53,6 +56,10 @@
         <CommunityPostTranslationContent @key="Post.Id"
                                          Post="@Post"
                                          IsReportPost="@IsReportPost" />
+
+        <PlatformCommunityPostAttachmentGallery Post="@Post"
+                                                ViewModel="@ViewModel"
+                                                CommandCompleted="@CommandCompleted" />
 
         @if (CanCreateCargoRequestDraft)
         {
@@ -108,7 +115,8 @@
                                                  ViewModel="@ViewModel"
                                                  CanManagePosts="@CanManagePosts"
                                                  CommandCompleted="@CommandCompleted"
-                                                 EditRequested="@EditRequested" />
+                                                 EditRequested="@EditRequested"
+                                                 DeleteRequested="@DeleteRequested" />
     </MudStack>
 </MudPaper>
 
@@ -151,6 +159,9 @@
 
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> EditRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> DeleteRequested { get; set; }
 
     [Parameter]
     public string? CargoRequestDraftHrefBase { get; set; }

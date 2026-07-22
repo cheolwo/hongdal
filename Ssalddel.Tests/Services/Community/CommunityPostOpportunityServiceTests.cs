@@ -70,7 +70,7 @@ public sealed class CommunityPostOpportunityServiceTests
     }
 
     [Fact]
-    public async Task 평범한_게시글도_가벼운_참여진입을_제공한다()
+    public async Task 공동구매모집글에서_작성자가_선택하면_가벼운_참여진입을_제공한다()
     {
         var store = new InMemoryPostStore(CreateOrdinaryPost());
         var service = CreateService(store);
@@ -86,6 +86,29 @@ public sealed class CommunityPostOpportunityServiceTests
         Assert.True(result.Participation.NonBinding);
         Assert.True(result.Participation.RequiresExplicitPromotionToPlanning);
         Assert.Equal(CommunityPostParticipationRoleCodes.All.Count, result.Participation.RoleOptions.Count);
+    }
+
+    [Fact]
+    public async Task 서원글이나_작성자가_선택하지않은글은_마음모으기를_제공하지않는다()
+    {
+        var source = CreateOrdinaryPost() with
+        {
+            Category = CommunityBoardCatalog.Vow.DisplayName,
+            IsInterestGatheringEnabled = false
+        };
+        var service = CreateService(new InMemoryPostStore(source));
+
+        var result = await service.GetAsync(source.PostId, "ko-KR");
+
+        Assert.NotNull(result);
+        Assert.Equal(CommunityPostParticipationStateCodes.Closed, result.Participation.StateCode);
+        Assert.False(result.Participation.CanStart);
+        Assert.False(result.Journey.IsAvailable);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.StartParticipationAsync(
+            source.PostId,
+            CreateParticipationStartRequest(),
+            "reader-1",
+            "읽던 사람"));
     }
 
     [Fact]
@@ -741,7 +764,9 @@ public sealed class CommunityPostOpportunityServiceTests
             "미국산 돼지고기 수입을 함께 검토합니다",
             "해외 작업장과 한국 수입업자가 검역·통관 준비 정보를 함께 확인하고 싶습니다.",
             authorUserId,
-            null);
+            null,
+            Category: CommunityBoardCatalog.Participation.DisplayName,
+            IsInterestGatheringEnabled: true);
 
     private static CommunityPostOpportunitySource CreateOrdinaryPost()
         => new(
@@ -750,7 +775,9 @@ public sealed class CommunityPostOpportunityServiceTests
             "아파트 장터에서 같이 나눌 사람 있나요",
             "일단 편하게 의견부터 나눠봅니다.",
             "author-2",
-            null);
+            null,
+            Category: CommunityBoardCatalog.Participation.DisplayName,
+            IsInterestGatheringEnabled: true);
 
     private static StartCommunityPostParticipationRequest CreateParticipationStartRequest()
         => new()

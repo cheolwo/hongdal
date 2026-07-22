@@ -10,11 +10,17 @@ internal static class CommunityPostResponseMapper
 
     public static PlatformCommunityPostResponse ToResponse(
         PlatformCommunityPost entity,
-        PlatformCommunityPostLedgerContextResponse? ledgerContext = null)
+        PlatformCommunityPostLedgerContextResponse? ledgerContext = null,
+        string? currentUserId = null,
+        string? currentUserRole = null)
     {
         var isReportBoardPost = IsReportCategory(entity.Category) || entity.IsReportBoardPost;
         var systemPostKind = CommunityAutomatedPostPublication.GetSystemPostKind(entity);
         var isSystemGenerated = systemPostKind is not null;
+        var mutationCapabilities = CommunityPostMutationAccessPolicy.Resolve(
+            entity,
+            currentUserId,
+            currentUserRole);
         var reporterDisplayName = isReportBoardPost ? "신고자" : entity.Nickname;
         var reportedDisplayName = isReportBoardPost ? "피신고자" : string.Empty;
 
@@ -37,6 +43,10 @@ internal static class CommunityPostResponseMapper
                     entity.Body),
             SharedLinkUrl = isReportBoardPost ? null : entity.SharedLinkUrl,
             SalesOffer = isReportBoardPost ? null : DeserializeSalesOffer(entity.SalesOfferJson),
+            IsInterestGatheringEnabled = !isReportBoardPost
+                                         && CommunityPostInterestGatheringPolicy.IsEnabledFor(
+                                             entity.Category,
+                                             entity.IsInterestGatheringEnabled),
             커뮤니티원장Id = isReportBoardPost ? null : entity.커뮤니티원장Id,
             원장Context = isReportBoardPost ? null : ledgerContext,
             Nickname = isReportBoardPost ? reporterDisplayName : entity.Nickname,
@@ -52,6 +62,10 @@ internal static class CommunityPostResponseMapper
             PrivacyNotice = isReportBoardPost
                 ? "신고·분쟁 기록은 공개 목록에서 제외되며 원문과 첨부·댓글을 공개하지 않습니다."
                 : CommunityAutomatedPostPublication.GetPrivacyNotice(systemPostKind),
+            CanEdit = mutationCapabilities.CanEdit,
+            EditRequiresPassword = mutationCapabilities.EditRequiresPassword,
+            CanDelete = mutationCapabilities.CanDelete,
+            DeleteRequiresPassword = mutationCapabilities.DeleteRequiresPassword,
             IsReportBoardPost = isReportBoardPost,
             ReporterDisplayName = reporterDisplayName,
             ReportedDisplayName = reportedDisplayName,
@@ -72,6 +86,7 @@ internal static class CommunityPostResponseMapper
             CommunityMomentumUpdatedAtUtc = !isReportBoardPost && entity.IsCommunityMomentumPromoted
                 ? entity.CommunityMomentumUpdatedAtUtc
                 : null,
+            ViewCount = entity.ViewCount,
             RecommendationCount = isReportBoardPost ? 0 : entity.RecommendationCount,
             CommentCount = isReportBoardPost ? 0 : entity.CommentCount,
             LastEngagedAtUtc = isReportBoardPost ? null : entity.LastEngagedAtUtc,

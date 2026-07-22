@@ -494,14 +494,14 @@ public sealed class CommunityInformationReviewPageViewModelTests
     public void VowDraft_UsesSelectedRoadmapVersionWithoutEnablingItsOperations()
     {
         using var viewModel = CreateViewModel(new RecordingClient([], []));
-        viewModel.SelectVowVersion("2.0");
+        viewModel.SelectVowVersion("1.5");
 
         viewModel.OpenVowDraft("관리자");
 
-        Assert.Equal("살뜰 2.0 · 국제 물류·통관", viewModel.Composer.Draft.WorkflowTag);
-        Assert.StartsWith("[서원][살뜰 2.0]", viewModel.Composer.Draft.Title, StringComparison.Ordinal);
-        Assert.Contains("HS 코드", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
-        Assert.Contains("자격 있는 관세사", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Equal("살뜰 1.5 · 공급·가격·무역 준비", viewModel.Composer.Draft.WorkflowTag);
+        Assert.StartsWith("[서원][살뜰 1.5]", viewModel.Composer.Draft.Title, StringComparison.Ordinal);
+        Assert.Contains("HS·HTS 후보", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
+        Assert.Contains("자격 있는 전문가", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
         Assert.Contains("실행 기능의 활성화", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
     }
 
@@ -512,6 +512,7 @@ public sealed class CommunityInformationReviewPageViewModelTests
             ["0.0", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "future"],
             CommunityVowVersionCatalog.All.Select(version => version.Code));
         Assert.True(CommunityVowVersionCatalog.Current.IsCurrentFocus);
+        Assert.Equal("1.5", CommunityVowVersionCatalog.Current.Code);
         Assert.True(CommunityVowVersionCatalog.Find("future").IsFutureExploration);
         Assert.Equal(
             CommunityVowVersionCatalog.All.Count,
@@ -522,17 +523,17 @@ public sealed class CommunityInformationReviewPageViewModelTests
     public void VowJourneyTemplate_SourceDraftSeparatesFactsFromInterpretation()
     {
         using var viewModel = CreateViewModel(new RecordingClient([], []));
-        viewModel.SelectVowVersion("2.0");
+        viewModel.SelectVowVersion("1.5");
         viewModel.SelectVowJourneyTemplate(CommunityVowJourneyTemplateCatalog.SourceKey);
 
         viewModel.OpenVowDraft("관리자");
 
-        Assert.StartsWith("[서원][살뜰 2.0] 이 자료에서 시작한 여정", viewModel.Composer.Draft.Title, StringComparison.Ordinal);
+        Assert.StartsWith("[서원][살뜰 1.5] 이 자료에서 시작한 여정", viewModel.Composer.Draft.Title, StringComparison.Ordinal);
         Assert.Contains("자료에서 확인한 사실", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
         Assert.Contains("사실과 구분한 나의 해석", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
         Assert.Contains("가격·통계 근거", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
         Assert.Contains("가원장에 남길 참여 의사와 질문", viewModel.Composer.Draft.Body, StringComparison.Ordinal);
-        Assert.Equal("살뜰 2.0 · 국제 물류·통관", viewModel.Composer.Draft.WorkflowTag);
+        Assert.Equal("살뜰 1.5 · 공급·가격·무역 준비", viewModel.Composer.Draft.WorkflowTag);
         Assert.Equal(CommunityBoardCatalog.Vow.DisplayName, viewModel.Composer.Draft.Category);
     }
 

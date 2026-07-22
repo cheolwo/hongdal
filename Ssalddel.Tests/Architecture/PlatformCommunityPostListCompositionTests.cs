@@ -34,6 +34,34 @@ public sealed class PlatformCommunityPostListCompositionTests
         Assert.NotEmpty(File.ReadAllText(componentPath));
     }
 
+    [Fact]
+    public void 전통_게시판_목록과_상세는_서버_조회수를_표시한다()
+    {
+        var componentDirectory = FindComponentDirectory();
+        var table = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostTable.razor"));
+        var cards = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostCards.razor"));
+        var headerMeta = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostHeaderMeta.razor"));
+
+        Assert.Contains("post.ViewCount", table);
+        Assert.Contains("post.ViewCount", cards);
+        Assert.Contains("Post.ViewCount", headerMeta);
+    }
+
+    [Fact]
+    public void 글목록과_상세는_서버가_허용한_글에_삭제_행동을_제공한다()
+    {
+        var componentDirectory = FindComponentDirectory();
+        var table = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostTable.razor"));
+        var cards = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostCards.razor"));
+        var conversation = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostConversationPanel.razor"));
+        var dialog = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityPostDeleteDialog.razor"));
+
+        Assert.Contains("post.CanDelete", table);
+        Assert.Contains("post.CanDelete", cards);
+        Assert.Contains("Post.CanDelete", conversation);
+        Assert.Contains("RequiresPassword", dialog);
+    }
+
     private static string FindComponentDirectory()
         => Path.Combine(
             FindRepositoryRoot(),

@@ -14,7 +14,7 @@ namespace Ssalddel.Tests.Services.Community;
 public sealed class CommunityPostTranslationServiceTests
 {
     [Fact]
-    public async Task AzureProvider_SendsKeyRegionAndTwoTextSegments()
+    public async Task AzureProvider_ApiKeyMode_SendsKeyRegionAndTwoTextSegments()
     {
         var handler = new RecordingHttpHandler();
         var client = new HttpClient(handler)
@@ -26,9 +26,11 @@ public sealed class CommunityPostTranslationServiceTests
             Options.Create(new CommunityPostTranslationOptions
             {
                 Enabled = true,
+                AuthenticationMode = AzureTranslatorAuthenticationModes.ApiKey,
                 ApiKey = "translator-key",
                 Region = "koreacentral"
-            }));
+            }),
+            new RecordingAccessTokenProvider());
 
         var result = await provider.TranslateAsync(
             "제목",
@@ -45,6 +47,44 @@ public sealed class CommunityPostTranslationServiceTests
         using var requestJson = System.Text.Json.JsonDocument.Parse(handler.RequestBody);
         Assert.Equal("제목", requestJson.RootElement[0].GetProperty("Text").GetString());
         Assert.Equal("본문", requestJson.RootElement[1].GetProperty("Text").GetString());
+    }
+
+    [Fact]
+    public async Task AzureProvider_MicrosoftEntraIdMode_SendsManagedIdentityTokenAndResourceBoundary()
+    {
+        var handler = new RecordingHttpHandler();
+        var client = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.cognitive.microsofttranslator.com/")
+        };
+        var tokenProvider = new RecordingAccessTokenProvider();
+        var provider = new AzureCommunityTextTranslationProvider(
+            client,
+            Options.Create(new CommunityPostTranslationOptions
+            {
+                Enabled = true,
+                AuthenticationMode = AzureTranslatorAuthenticationModes.MicrosoftEntraId,
+                ResourceId = "/subscriptions/test/resourceGroups/ssalddel/providers/Microsoft.CognitiveServices/accounts/translator",
+                Region = "koreacentral"
+            }),
+            tokenProvider);
+
+        var result = await provider.TranslateAsync(
+            "제목",
+            "본문",
+            DisplayLanguageCodes.Korean,
+            DisplayLanguageCodes.English,
+            default);
+
+        Assert.Equal("Translated title", result.Title);
+        Assert.Equal(1, tokenProvider.CallCount);
+        Assert.Equal("Bearer", handler.AuthorizationScheme);
+        Assert.Equal("managed-identity-token", handler.AuthorizationParameter);
+        Assert.Equal(
+            "/subscriptions/test/resourceGroups/ssalddel/providers/Microsoft.CognitiveServices/accounts/translator",
+            handler.ResourceId);
+        Assert.Equal("koreacentral", handler.Region);
+        Assert.Empty(handler.ApiKey);
     }
 
     [Theory]
@@ -198,6 +238,9 @@ public sealed class CommunityPostTranslationServiceTests
         public string RequestUri { get; private set; } = string.Empty;
         public string ApiKey { get; private set; } = string.Empty;
         public string Region { get; private set; } = string.Empty;
+        public string ResourceId { get; private set; } = string.Empty;
+        public string AuthorizationScheme { get; private set; } = string.Empty;
+        public string AuthorizationParameter { get; private set; } = string.Empty;
         public string RequestBody { get; private set; } = string.Empty;
 
         protected override async Task<HttpResponseMessage> SendAsync(
@@ -205,8 +248,11 @@ public sealed class CommunityPostTranslationServiceTests
             CancellationToken cancellationToken)
         {
             RequestUri = request.RequestUri?.ToString() ?? string.Empty;
-            ApiKey = request.Headers.GetValues("Ocp-Apim-Subscription-Key").Single();
-            Region = request.Headers.GetValues("Ocp-Apim-Subscription-Region").Single();
+            ApiKey = ReadHeader(request, "Ocp-Apim-Subscription-Key");
+            Region = ReadHeader(request, "Ocp-Apim-Subscription-Region");
+            ResourceId = ReadHeader(request, "Ocp-Apim-ResourceId");
+            AuthorizationScheme = request.Headers.Authorization?.Scheme ?? string.Empty;
+            AuthorizationParameter = request.Headers.Authorization?.Parameter ?? string.Empty;
             RequestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
 
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
@@ -217,6 +263,22 @@ public sealed class CommunityPostTranslationServiceTests
                     System.Text.Encoding.UTF8,
                     "application/json")
             };
+        }
+
+        private static string ReadHeader(HttpRequestMessage request, string name)
+            => request.Headers.TryGetValues(name, out var values)
+                ? values.Single()
+                : string.Empty;
+    }
+
+    private sealed class RecordingAccessTokenProvider : IAzureTranslatorAccessTokenProvider
+    {
+        public int CallCount { get; private set; }
+
+        public ValueTask<string> GetTokenAsync(CancellationToken cancellationToken)
+        {
+            CallCount++;
+            return ValueTask.FromResult("managed-identity-token");
         }
     }
 

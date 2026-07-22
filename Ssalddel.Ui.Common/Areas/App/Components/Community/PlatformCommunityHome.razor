@@ -47,6 +47,7 @@
                                             SeedPosts="@VisibleSeedPosts"
                                             VisiblePostCount="@ForumVisiblePostCount"
                                             PostSelected="OpenCommunityPostPage"
+                                            DeleteRequested="BeginDeleteAsync"
                                             SeedPostSelected="OpenCommunitySeedPostPage"
                                             SearchText="@communityPostSearchText"
                                             SearchTextChanged="HandleCommunityPostSearchChanged" />
@@ -89,7 +90,8 @@
                                                      DiagramRequested="OpenSharedLedgerDiagram"
                                                      StartFromCompletionRequested="StartFromCompletionCase"
                                                      ReuseRequested="ReuseSharedLedgerAsync"
-                                                     EditRequested="BeginEdit" />
+                                                     EditRequested="BeginEdit"
+                                                     DeleteRequested="BeginDeleteAsync" />
                     }
                     else if (routeSeedPost is not null)
                     {
@@ -269,6 +271,7 @@
                                        StartFromCompletionRequested="StartFromCompletionCase"
                                        ReuseRequested="ReuseSharedLedgerAsync"
                                        EditRequested="BeginEdit"
+                                       DeleteRequested="BeginDeleteAsync"
                                        CommunityModeContent="@CommunityModeContent" />
             }
 

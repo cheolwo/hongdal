@@ -52,6 +52,7 @@ public static partial class ServiceCollectionExtensions
             provider.GetRequiredService<I게시글원장표시ContextService>()));
         services.AddScoped<I게시글원장ContextService>(provider =>
             provider.GetRequiredService<게시글원장ContextService>());
+        services.AddSingleton<IAzureTranslatorAccessTokenProvider, AzureTranslatorAccessTokenProvider>();
         services.AddScoped<ICommunityPostTranslationService, CommunityPostTranslationService>();
         services.AddSingleton<ICommunityPostOpportunityAnalyzer, CommunityPostOpportunityAnalyzer>();
         services.AddSingleton<ICommunityDynamicTopicClassifier, CommunityDynamicTopicClassifier>();

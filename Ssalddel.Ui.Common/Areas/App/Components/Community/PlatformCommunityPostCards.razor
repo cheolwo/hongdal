@@ -75,7 +75,17 @@
                     }
                 </span>
                 <span class="platform-community-forum-card-tags">@post.WorkflowTag · @post.RoleTag</span>
+                @if (post.CanDelete)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   Class="platform-community-post-delete"
+                                   aria-label="@($"'{post.Title}' 글 삭제")"
+                                   OnClick="@(() => DeleteRequested.InvokeAsync(post))" />
+                }
                 <span class="platform-community-forum-card-metrics">
+                    <MudIcon Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" /> @post.ViewCount
                     <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="Size.Small" /> @post.RecommendationCount
                     <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" /> @post.CommentCount
                 </span>
@@ -102,6 +112,7 @@
                 <span class="platform-community-forum-card-author">@post.Author</span>
                 <span class="platform-community-forum-card-tags">@UiText("살뜰 추천", "Ssalddel pick")</span>
                 <span class="platform-community-forum-card-metrics">
+                    <MudIcon Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" /> 0
                     <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="Size.Small" /> @post.RecommendationCount
                     <MudIcon Icon="@Icons.Material.Filled.ChatBubbleOutline" Size="Size.Small" /> @post.CommentCount
                 </span>
@@ -139,6 +150,9 @@
 
     [Parameter]
     public EventCallback<PlatformCommunityPostResponse> PostSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<PlatformCommunityPostResponse> DeleteRequested { get; set; }
 
     [Parameter]
     public EventCallback<CommunitySeedPost> SeedPostSelected { get; set; }
