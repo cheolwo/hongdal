@@ -2,22 +2,22 @@
 
 살뜰 API는 버전별 기능 묶음에서 업무 처리 절차별 워크플로우 묶음으로 이동합니다.
 
-`0.0`, `1.0`, `1.5`, `2.5`, `3.5` 같은 제품 버전은 기능이 처음 정리된 시점을 기록합니다. 실제 API 노출, 메뉴 노출, 권한, 운영 가능 여부는 워크플로우 기준으로 관리합니다.
+`0.0`, `1.0`, `1.5`, `2.0`, `2.5`, `3.0`, `3.5` 제품 버전은 기능이 어떤 결과를 먼저 완성하고 다음 단계에 무엇을 인계하는지 기록합니다. 실제 API 노출, 메뉴 노출, 권한, 운영 가능 여부는 워크플로우 기준으로 관리합니다.
 
 ## 핵심 개념
 
 | 개념 | 의미 |
 | --- | --- |
-| 제품 버전 | API나 기능이 처음 들어온 로드맵 단계. 커뮤니티 기반은 0.0, 첫 실행 모듈인 국내 화물/용달은 1.0부터 시작 |
+| 제품 버전 | API나 기능이 속한 로드맵 단계. 커뮤니티 기반은 0.0, 공동구매 집단화는 1.0, 공급·무역 준비는 1.5, 운송 이행은 2.0부터 시작 |
 | HIOPS | Ssalddel Integrated Operations & Policy System. 여러 참여자의 입장과 책임을 조율하기 위해 하위 OS, 워크플로우, 엔진을 조합하는 최상위 운영 체제 |
-| 하위 OS | HIOPS 안에서 특정 운영 목적을 맡는 실행 단위. 예: 국내 화물 운송 OS, 공동주문 수입 OS, 창고·커머스 이행 OS |
+| 하위 OS | HIOPS 안에서 특정 운영 목적을 맡는 실행 단위. 예: 공동구매 수요·모집 OS, 공동주문 수입 OS, 국내 화물 운송 OS, 창고·커머스 이행 OS |
 | 워크플로우 | 하나의 업무 절차를 완성하기 위해 묶이는 API 집합 |
 | 액터 | 유스케이스를 직접 실행하거나 보조로 참여하는 사용자·운영 주체 |
 | 유스케이스 | 액터가 워크플로우 안에서 목적을 달성하기 위해 호출하는 업무 기능 단위 |
 | 워크플로우 플래그 | 해당 업무 절차를 현재 환경에서 열지 말지 결정하는 스위치 |
 | 성장 트랙 | 커뮤니티처럼 여러 워크플로우와 버전에 걸쳐 계속 커지는 기능 축 |
 
-OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업무 절차와 책임 경계를 설명하고, OS는 그 절차들을 어떤 목적과 정책으로 묶어 엔진을 호출할지 결정합니다. 예를 들어 `공동주문 수입 OS`는 `공동주문 수입`, `통관·무역 데이터`, `창고 입출고`, `국내 화물 운송` 워크플로우를 조합하고, 필요할 때 집단화 엔진, 출고 배치 엔진, 피킹 배치 엔진, 운송 의뢰 배차 엔진을 호출합니다.
+OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업무 절차와 책임 경계를 설명하고, OS는 그 절차들을 어떤 목적과 정책으로 묶어 엔진을 호출할지 결정합니다. 예를 들어 `공동구매 수요·모집 OS`는 `공동구매 수요·모집`과 `커뮤니티 신뢰` 워크플로우를 조합해 주문자 집단화 엔진을 호출합니다. 사람이 인계를 승인한 뒤에는 `공동주문 수입 OS`가 `공동주문 수입`, `통관·무역 데이터`, `창고 입출고`, `국내 화물 운송` 워크플로우를 조율합니다.
 
 원장 블록, 조합 규칙, OS, 엔진, API/UseCase, 저장소의 전체 책임 경계는 [HIOPS Layer Model](../Architecture/HIOPSLayerModel.md)을 기준으로 봅니다. 이 문서는 API와 워크플로우 노출 정책을 다루고, 층위 모델 문서는 각 계층이 무엇을 직접 실행하고 무엇을 넘겨야 하는지 다룹니다.
 
@@ -39,7 +39,8 @@ OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업�
 | 국내 화물 운송 | `DomesticTransport` | `DomesticTransportWorkflow` | 화주 의뢰, 기사 추천, 수락/거절, 상차, 하차, 증빙, 정산 |
 | 창고 입출고 | `WarehouseFulfillment` | `WarehouseFulfillmentWorkflow` | 입고, 적재, 재고, 포장, 출고 배치, 재위탁 |
 | 통관·무역 데이터 | `CustomsAndTradeData` | `CustomsAndTradeDataWorkflow` | HS 코드, 통관 조회, 관세사 보정, 수출입 단가 데이터 |
-| 공동주문 수입 | `GroupPurchaseImport` | `GroupPurchaseImportWorkflow` | 주문자 집단, 해외 선적 추적, 통관 단계, 보세구역 반출, 국내 운송 인계 |
+| 공동구매 수요·모집 | `GroupPurchaseDemand` | `GroupPurchaseDemandWorkflow` | 비구속 수요, 자동 집단화 미리보기, 모집 현황, 수요 철회 |
+| 공동수입 준비 | `GroupPurchaseImport` | `CustomsAndTradeDataWorkflow` | 공급·HS 후보 검토, 공동수입 원장, 통관 준비 자료 |
 | 판매채널 출고 | `SalesChannelFulfillment` | `SalesChannelFulfillmentWorkflow` | 판매채널 계정, 상품 출품, 주문 수집, 창고 재고 연결, 출고 요청 |
 | 커뮤니티 신뢰 | `CommunityTrust` | `CommunityTrustWorkflow` | 커뮤니티 글, 댓글, 후기, 활동 신호, 투표, 관계 기록 |
 | 참여 인력 관리 | `HrParticipation` | `HrParticipationWorkflow` | 역할, 근로계약, 4대보험 신고 준비, 참여 보상 |
@@ -82,8 +83,10 @@ OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업�
 | 창고 입출고 | 화주·판매자 | 화주 앱 | 창고 재고 | `/shipper/warehouse/inventory` | 입고상품, 재고, 출고 가능 상태 확인 |
 | 통관·무역 데이터 | 관세사 | 관세사 앱 | 관세사 홈 | `/` | HS 코드, 식품/일반화물 분류, 통관 주의 태그 보정 |
 | 통관·무역 데이터 | 화주·판매자 | 화주 앱 | HS 코드 검토 | `/shipper/customs/hs-reviews` | HS 코드 후보, 통관 리스크, 관세사 검토 필요성 확인 |
-| 공동주문 수입 | 주문자 | 주문자 앱 | 수입 공동구매 | `/group-purchase` | 공동주문 상품, 비용, 선적·통관 상태, 분배 조건 확인 |
-| 공동주문 수입 | 주문자 집단 대표 | 주문자 앱 | 수입 공동구매 | `/group-purchase` | 공동주문 개설, 운송 방식, 분배 기준 조정 |
+| 공동구매 1.0 | 주문자 | 주문자 앱 | 재료 자동집단화·근거 상세 | `/group-purchase/products`, `/group-purchase/products/{ProductId}` | 카드 클릭으로 배치 미리보기와 비구속 저장을 이어서 실행하며 상세는 근거만 확인 |
+| 공동구매 1.0 | 주문자 | 주문자 앱 | 수요 상세 조건 | `/group-purchase/demands/new/{ProductId}` | 배송권·희망 수량을 직접 조정하는 보조 비구속 Action |
+| 공동주문 수입 준비 | 주문자 집단 대표 | 주문자 앱 | 수입 원가 참고 | `/group-purchase/import-review/{ProductId}` | 1.5 Simulation 원가와 검토 필요 항목 확인 |
+| 공동주문 수입 준비 | 주문자 | 주문자 앱 | 선적 조회 | `/group-purchase/shipments` | 문서관리번호 한 건의 공개 선적 상태 조회 |
 | 판매채널 출고 | 판매자 | 화주 앱 | 판매채널 연결 | `/shipper/sales/channels` | 판매채널 계정 연결 |
 | 판매채널 출고 | 판매자 | 화주 앱 | 상품 출품 | `/shipper/sales/listings` | 판매상품을 채널별 출품 후보로 준비 |
 | 판매채널 출고 | 판매자 | 화주 앱 | 판매 주문 원장 | `/shipper/sales/orders`, `/shipper/sales/orders/{OrderId}` | 판매채널 주문과 출고 투영을 읽기 전용으로 확인 |
@@ -104,19 +107,21 @@ OS와 워크플로우는 같은 계층이 아닙니다. 워크플로우는 업�
 컨트롤러와 action은 `SsalddelApiVersionAttribute`를 유지합니다. 이 값은 도입 시점을 기록합니다. 워크플로우에 속한 API는 `SsalddelApiWorkflowAttribute`도 함께 붙입니다.
 
 ```csharp
-[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
-[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
-public sealed class 공동구매해외선적추적Controller : ControllerBase
+[SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+public sealed class 공동구매자동집단화Controller : ControllerBase
 {
 }
 ```
 
 위 예시는 다음 뜻입니다.
 
-- 도입 시점: `2.5`
-- 업무 절차: `공동주문 수입`
-- 운영 스위치: `GroupPurchaseImportWorkflow`
+- 도입 시점: `1.0`
+- 업무 절차: `비구속 공동구매 수요·집단화`
+- 운영 스위치: `GroupPurchaseDemandWorkflow`
+
+공급·HS·공동수입 준비 API는 `1.5`의 `GroupPurchaseImport` 또는 `CustomsAndTradeDataWorkflow`, 해외 선적은 `2.0`의 `DomesticTransportWorkflow`, 창고 이행은 `2.5`의 `WarehouseFulfillmentWorkflow`로 별도 차단합니다.
 
 유스케이스는 `SsalddelUseCaseActorAttribute`로 주 액터와 보조 액터를 기록합니다. 이 값은 권한을 강제하는 장치라기보다, 설계 문서와 코드에서 “누가 이 업무를 주로 쓰는가”를 드러내는 메타데이터입니다. 실제 권한 검사는 기존 `Authorize`, 정책, HR 역할 검사와 함께 둡니다.
 
@@ -267,7 +272,7 @@ services.AddScoped<I파일POD관리UseCase, 파일POD관리UseCase>();
 | `CargoYongdalV1` | `DomesticTransportWorkflow` | 국내 화물 운송 |
 | `WarehouseV15` | `WarehouseFulfillmentWorkflow` | 창고 입출고 |
 | `CustomsHsV20` | `CustomsAndTradeDataWorkflow` | 통관·무역 데이터 |
-| `OrdererGroupOrderV25`, `ApartmentGroupOrderV25` | `GroupPurchaseImportWorkflow` | 공동주문 수입 |
+| `GroupPurchaseImportWorkflow`, `OrdererGroupOrderV25`, `ApartmentGroupOrderV25` | `GroupPurchaseDemandWorkflow` | 비구속 공동구매 수요 |
 | `FoodDeliveryV30` | `FoodDeliveryWorkflow` | 음식 배달 |
 | `SsalddelMartV35` | `SsalddelMartWorkflow` | 알뜰살뜰 마트 |
 
@@ -320,4 +325,4 @@ flowchart LR
 
 ## 통합 규칙
 
-0.0 커뮤니티 신뢰는 모든 실행 워크플로우보다 먼저 독립적으로 동작하는 기반입니다. 1.0 국내 화물 운송은 그 위에 올라가는 첫 공통 실행 워크플로우이며, 공동주문 수입, 창고 입출고, 판매채널 출고, 음식 배달, 알뜰살뜰 마트는 실제 상차, 하차, 증빙, 정산이 필요할 때 국내 화물 운송 워크플로우로 합류합니다.
+0.0 커뮤니티 신뢰는 모든 실행 워크플로우보다 먼저 독립적으로 동작하는 기반입니다. 1.0 공동구매는 먼저 수요와 주문자 집단을 만들고, 1.5 공급·무역 준비를 거쳐 실제 이동이 필요한 시점에 2.0 국내 화물 운송으로 인계합니다. 창고 입출고와 판매채널 출고는 2.5에서 결과를 이어받고, 음식 배달과 알뜰살뜰 마트도 실제 상차·하차·증빙이 필요할 때 운송 워크플로우를 재사용합니다.

@@ -10,7 +10,7 @@ namespace Ssalddel.Controllers.Shipper.Customs;
 [ApiController]
 [Authorize(Policy = "화주또는판매자전용")]
 [SsalddelApiVersion(
-    SsalddelProductVersion.V2_0,
+    SsalddelProductVersion.V1_5,
     FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
     WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.CustomsAndTradeData)]

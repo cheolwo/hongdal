@@ -9,7 +9,7 @@ using Ssalddel.ApiMetadata;
 
 namespace Ssalddel.Controllers.Driver.Notification07;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [ApiController]
 [Authorize(Roles = 역할명.기사)]
 [Route("api/v1/driver/command-feature-settings")]

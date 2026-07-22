@@ -8,6 +8,7 @@ public static class OperatingSystemIds
 {
     public const string DomesticCargoTransport = "DomesticCargoTransportOS";
     public const string WarehouseCommerceFulfillment = "WarehouseCommerceFulfillmentOS";
+    public const string GroupPurchaseDemand = "GroupPurchaseDemandOS";
     public const string GroupPurchaseImport = "GroupPurchaseImportOS";
     public const string FoodDelivery = "FoodDeliveryOS";
     public const string SsalddelMartUrbanLogistics = "SsalddelMartUrbanLogisticsOS";
@@ -19,6 +20,7 @@ public static class OperatingSystemIds
     [
         DomesticCargoTransport,
         WarehouseCommerceFulfillment,
+        GroupPurchaseDemand,
         GroupPurchaseImport,
         FoodDelivery,
         SsalddelMartUrbanLogistics,
@@ -34,6 +36,8 @@ public static class OperatingSystemIds
             ["DomesticCargoTransport"] = DomesticCargoTransport,
             [WarehouseCommerceFulfillment] = WarehouseCommerceFulfillment,
             ["WarehouseCommerceFulfillment"] = WarehouseCommerceFulfillment,
+            [GroupPurchaseDemand] = GroupPurchaseDemand,
+            ["GroupPurchaseDemand"] = GroupPurchaseDemand,
             [GroupPurchaseImport] = GroupPurchaseImport,
             ["GroupPurchaseImport"] = GroupPurchaseImport,
             [FoodDelivery] = FoodDelivery,
@@ -93,12 +97,26 @@ public static class EngineImplementationIds
     public const string FoodDeliveryDispatch = "FoodDeliveryDispatchEngine";
     public const string OutboundBatch = EngineFamilyIds.OutboundBatch;
     public const string PickingBatch = EngineFamilyIds.PickingBatch;
+    public const string GroupPurchaseClustering = EngineFamilyIds.GroupPurchaseClustering;
 }
 
 public static class RuntimeCapabilityStatuses
 {
     public const string Active = "Active";
     public const string Declared = "Declared";
+}
+
+public static class SchedulingPolicyImplementationCatalog
+{
+    private static readonly IReadOnlySet<string> ActivePolicyCodes = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "DemandClusterBatching",
+        "RecruitmentDeadlineEdf",
+        "DemandRecruitmentAging"
+    };
+
+    public static bool IsActive(string policyCode)
+        => ActivePolicyCodes.Contains(policyCode);
 }
 
 public sealed record EngineImplementationBinding(
@@ -113,7 +131,8 @@ public static class EngineImplementationCatalog
             [EngineImplementationIds.CargoYongdalDispatch] = EngineFamilyIds.TransportRequestDispatch,
             [EngineImplementationIds.FoodDeliveryDispatch] = EngineFamilyIds.TransportRequestDispatch,
             [EngineImplementationIds.OutboundBatch] = EngineFamilyIds.OutboundBatch,
-            [EngineImplementationIds.PickingBatch] = EngineFamilyIds.PickingBatch
+            [EngineImplementationIds.PickingBatch] = EngineFamilyIds.PickingBatch,
+            [EngineImplementationIds.GroupPurchaseClustering] = EngineFamilyIds.GroupPurchaseClustering
         };
 
     public static IReadOnlyList<EngineImplementationBinding> GetAll()

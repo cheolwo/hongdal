@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Mart;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.Sales;
 using Ssalddel.Contracts.Shipper;
 
@@ -116,7 +117,7 @@ public static class SsalddelPageCapabilityCatalog
     private const string DomesticTransport = "DomesticTransportWorkflow";
     private const string Warehouse = "WarehouseFulfillmentWorkflow";
     private const string Customs = "CustomsAndTradeDataWorkflow";
-    private const string GroupPurchase = "GroupPurchaseImportWorkflow";
+    private const string GroupPurchase = "GroupPurchaseDemandWorkflow";
     private const string Sales = "SalesChannelFulfillmentWorkflow";
     private const string Hr = "HrParticipationWorkflow";
     private const string Food = "FoodDeliveryWorkflow";
@@ -195,29 +196,29 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.PlatformPersistence, false, "0.0", "당사자가 합의할 조건과 담당 흐름을 Web과 같은 공용 원장 초안 Screen에서 정리합니다.",
             featureKeys: [Community], workflowCodes: ["CommunityTrust"]),
         Exact("community-group-purchase-public", SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase", PageCapabilityStage.Beta,
-            PageInteractionBoundary.ReadOnly, false, "0.0",
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             "공개 공동구매 목록만 조회하며 선택한 모집은 campaign ID 상세 route에서 엽니다.",
             false, [Community], ["CommunityTrust"]),
         Exact("community-group-purchase-create", SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase/new", PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, true, "0.0",
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             "상품·수량·수령 조건을 비구속 공동구매 제안과 수요 투표로 저장하며 결제나 계약을 확정하지 않습니다.",
             true, [Community, GroupPurchase], ["CommunityTrust"]),
         Exact("community-group-purchase-demand", SsalddelPageAppCodes.IntegratedWeb, CommunityPageRoutes.GroupPurchaseDemand, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, false, "1.0",
+            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             "공개 재료 근거를 유지해 집단화 결과를 미리 보고, 로그인한 사용자만 비구속 수요를 저장하거나 철회합니다.",
-            false, [Community, "GroupPurchaseDemandWorkflow"], ["CommunityTrust"]),
+            false, [Community, GroupPurchase], ["CommunityTrust"]),
         Exact("shipper-community-group-purchase-demand", SsalddelPageAppCodes.Shipper, CommunityPageRoutes.GroupPurchaseDemand, PageCapabilityStage.Beta,
-            PageInteractionBoundary.PlatformPersistence, false, "1.0",
+            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
             "Web과 같은 공용 Screen에서 재료 근거와 수령 조건을 확인하고 로그인한 사용자만 비구속 수요를 저장하거나 철회합니다.",
-            false, [Community, "GroupPurchaseDemandWorkflow"], ["CommunityTrust"]),
+            false, [Community, GroupPurchase], ["CommunityTrust"]),
         Prefix("community-group-purchase", SsalddelPageAppCodes.IntegratedWeb, "/community/group-purchase", PageCapabilityStage.Beta,
-            PageInteractionBoundary.Simulation, false, "0.0", "campaign ID의 공개 상세를 읽고 참여·합의 Command는 화면과 서버에서 별도로 인증하며 실제 결제·계약·자동 배차는 실행하지 않습니다.", true,
-            [Community, GroupPurchase], ["CommunityTrust"]),
+            PageInteractionBoundary.Simulation, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion, "campaign ID의 공개 상세를 읽고 참여·합의 Command는 화면과 서버에서 별도로 인증하며 실제 결제·계약·자동 배차는 실행하지 않습니다.", true,
+            [Community, GroupPurchase], ["CommunityTrust", "GroupPurchaseDemand"]),
         Prefix("community-group-import", SsalddelPageAppCodes.IntegratedWeb, "/community/group-import", PageCapabilityStage.Experience,
-            PageInteractionBoundary.Simulation, true, "2.5", "공동수입의 공급·물류·비용 연결 구조를 Simulation으로 살펴봅니다.", true,
-            [GroupPurchase], ["GroupPurchaseImport", "CustomsAndTradeData"]),
+            PageInteractionBoundary.Simulation, true, SsalddelProductRoadmapCatalog.TradeReadinessVersion, "공동수입의 공급·물류·비용 연결 구조를 Simulation으로 살펴봅니다.", true,
+            [Customs], ["GroupPurchaseImport", "CustomsAndTradeData"]),
         Prefix("community-global-trade", SsalddelPageAppCodes.IntegratedWeb, "/community/global-trade", PageCapabilityStage.Experience,
-            PageInteractionBoundary.Simulation, false, "2.0", "해외 공급자와 국내 참여자의 공개 대화 흐름을 체험합니다.", false,
+            PageInteractionBoundary.Simulation, false, SsalddelProductRoadmapCatalog.TradeReadinessVersion, "해외 공급자와 국내 참여자의 공개 대화 흐름을 체험합니다.", false,
             [Customs], ["CustomsAndTradeData", "CommunityTrust"]),
         Prefix("community-actions", SsalddelPageAppCodes.IntegratedWeb, "/community/actions", PageCapabilityStage.Beta,
             PageInteractionBoundary.Simulation, true, "0.0", "관심과 참여를 명시적으로 나누며 실제 실행 전 단계까지만 검증합니다.", false,
@@ -269,6 +270,9 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.ReadOnly, false, "0.0", "공개 가격 자료의 출처·단위·기준 시각을 비교합니다."),
         Exact("official-food-ingredients", SsalddelPageAppCodes.IntegratedWeb, "/information/food-ingredients", PageCapabilityStage.Live,
             PageInteractionBoundary.ReadOnly, false, "0.0", "공식 레시피의 표준 재료, 출처가 확인된 공공가격과 실제 관련 레시피를 조회합니다."),
+        Exact("us-korean-food-group-buy", SsalddelPageAppCodes.IntegratedWeb, "/us/korean-food-group-buy", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion, "한국 음식과 식재료를 공개 탐색하고 로그인 사용자의 비구속 수요만 미국 ZIP 단위 자동집단에 기록합니다. 결제·주문·통관 신고는 실행하지 않습니다.", false,
+            [GroupPurchase], ["GroupPurchaseDemand"]),
 
         Exact("global-home", SsalddelPageAppCodes.IntegratedWeb, "/global", PageCapabilityStage.Experience,
             PageInteractionBoundary.ReadOnly, false, "2.0", "해외 상품과 공급 조건을 공개 탐색합니다.",
@@ -293,13 +297,13 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.Simulation, true, "1.0", "실결제와 정산은 비활성이고 FakePG 상태만 검증합니다.", true,
             [DomesticTransport], ["DomesticTransport"]),
         Prefix("shipper-request", SsalddelPageAppCodes.IntegratedWeb, "/shipper/request", PageCapabilityStage.Beta,
-            PageInteractionBoundary.Simulation, true, "1.0", "운송 의뢰 저장을 검증하되 자동 배차·계약 확정은 실행하지 않습니다.", true,
+            PageInteractionBoundary.Simulation, true, SsalddelProductRoadmapCatalog.TransportVersion, "운송 의뢰 저장을 검증하되 자동 배차·계약 확정은 실행하지 않습니다.", true,
             [DomesticTransport], ["DomesticTransport"]),
         Prefix("shipper-inbound", SsalddelPageAppCodes.IntegratedWeb, "/shipper/inbound", PageCapabilityStage.Beta,
             PageInteractionBoundary.Simulation, true, "1.5", "입고와 재고 전환 흐름을 Simulation 데이터로 검증합니다.", true,
             [Warehouse], ["WarehouseFulfillment"]),
         Prefix("shipper-warehouse", SsalddelPageAppCodes.IntegratedWeb, "/shipper/warehouse", PageCapabilityStage.Beta,
-            PageInteractionBoundary.Simulation, true, "1.5", "화주 관점의 창고·재고 흐름을 Simulation으로 검증합니다.", true,
+            PageInteractionBoundary.Simulation, true, SsalddelProductRoadmapCatalog.FulfillmentVersion, "화주 관점의 창고·재고 흐름을 Simulation으로 검증합니다.", true,
             [Warehouse], ["WarehouseFulfillment"]),
         Prefix("shipper-exploration", SsalddelPageAppCodes.IntegratedWeb, "/shipper/exploration", PageCapabilityStage.Beta,
             PageInteractionBoundary.Simulation, true, "1.0", "운행 가능성 문의를 계약 확정과 분리해 검증합니다.", true,
@@ -371,7 +375,7 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.Simulation, true, "2.5", "외부 판매채널 발행 없이 판매·출고 화면을 체험합니다.", true,
             [Sales], ["SalesChannelFulfillment"]),
         Exact("shipper-customs-hs-reviews", SsalddelPageAppCodes.IntegratedWeb, "/shipper/customs/hs-reviews", PageCapabilityStage.Beta,
-            PageInteractionBoundary.ReadOnly, true, "2.0",
+            PageInteractionBoundary.ReadOnly, true, SsalddelProductRoadmapCatalog.TradeReadinessVersion,
             "활성 HS 코드 원장과 공개 동의된 근거를 조회하며 품목분류·세율·신고를 확정하지 않습니다.", false,
             [Customs], ["CustomsAndTradeData"]),
         Prefix("shipper-customs", SsalddelPageAppCodes.IntegratedWeb, "/shipper/customs", PageCapabilityStage.Experience,
@@ -623,8 +627,8 @@ public static class SsalddelPageCapabilityCatalog
             "내부 창고 원장과 분리된 공개 상품과 판매 가능 수량 투영을 익명으로 조회합니다.", false,
             [Mart], ["SsalddelMart"]),
         Prefix("orderer-home", SsalddelPageAppCodes.IntegratedWeb, "/orderer", PageCapabilityStage.Preparing,
-            PageInteractionBoundary.Simulation, true, "2.5", "공동주문 집단화와 실제 결제 연결 전 화면 골격을 준비합니다.", true,
-            [GroupPurchase], ["GroupPurchaseImport"]),
+            PageInteractionBoundary.Simulation, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion, "공동주문 집단화와 실제 결제 연결 전 화면 골격을 준비합니다.", true,
+            [GroupPurchase], ["GroupPurchaseDemand"]),
         Prefix("document-tools", SsalddelPageAppCodes.IntegratedWeb, "/tools", PageCapabilityStage.Beta,
             PageInteractionBoundary.ReadOnly, true, "1.0", "업무 문서와 식별자 출력을 생성 전 미리 확인합니다."),
         Exact("diagram", SsalddelPageAppCodes.IntegratedWeb, CommunityPageRoutes.Diagram, PageCapabilityStage.Experience,
@@ -637,10 +641,38 @@ public static class SsalddelPageCapabilityCatalog
         Exact("admin-hr-dashboard", SsalddelPageAppCodes.Admin, "/dashboard", PageCapabilityStage.Preparing,
             PageInteractionBoundary.Simulation, true, "2.5", "역할·계약·4대보험 신고 준비를 실제 외부 신고와 분리해 검증합니다.", true,
             [Hr], ["HrParticipation"]),
+        Exact("admin-group-import-trade-readiness", SsalddelPageAppCodes.Admin, "/trade-readiness", PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.TradeReadinessVersion,
+            "서버관리자가 승인된 1.0 수요 집단에 공급자·견적·원가·품목분류·국가별 검토와 책임 초안을 저장하며 계약·결제·신고·운송 실행은 열지 않습니다.", true,
+            [GroupPurchase, Customs], ["GroupPurchaseDemand", "GroupPurchaseImport", "CustomsAndTradeData"]),
         Exact("human-resources-role-reviews", SsalddelPageAppCodes.HumanResources, "/", PageCapabilityStage.Beta,
             PageInteractionBoundary.ReadOnly, true, "2.5",
             "서버관리자가 영속 HR 역할 지원·철회와 배정·해제 원장을 검색하고 정확한 검토 ID 상세를 조회합니다.",
             featureKeys: [Hr], workflowCodes: ["HrParticipation"]),
+        Exact("orderer-group-purchase-home", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.Root, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            "공동구매 순서와 비구속 수요 집단화 경계를 읽기 전용으로 안내합니다.",
+            featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
+        Exact("orderer-group-purchase-products", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.ProductsRoot, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            "공개 음식·재료 근거가 연결된 공동구매 후보 상품을 읽기 전용으로 탐색합니다.",
+            featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
+        Prefix("orderer-group-purchase-product-detail", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.ProductsRoot, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            "한 상품의 재료·공공데이터·HS 근거를 읽되 구매·결제·계약을 실행하지 않습니다.",
+            featureKeys: [GroupPurchase], workflowCodes: ["GroupPurchaseDemand"]),
+        Prefix("orderer-group-purchase-demand-create", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.DemandCreateRoot, PageCapabilityStage.Beta,
+            PageInteractionBoundary.PlatformPersistence, true, SsalddelProductRoadmapCatalog.GroupPurchaseVersion,
+            "로그인한 주문자의 비구속 수요를 멱등 저장하고 서버 집단화 대상으로 인계하며 결제나 계약을 만들지 않습니다.", true,
+            [GroupPurchase], ["GroupPurchaseDemand"]),
+        Prefix("orderer-group-purchase-import-review", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.ImportReviewRoot, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.TradeReadinessVersion,
+            "승인된 수요 집단의 공급자·견적·원가·HSK/HTS·한국/미국 검토 근거를 확인하며 계약·결제·신고·운송은 실행하지 않습니다.", false,
+            [GroupPurchase, Customs], ["GroupPurchaseDemand", "GroupPurchaseImport", "CustomsAndTradeData"]),
+        Exact("orderer-group-purchase-shipments", SsalddelPageAppCodes.Orderer, GroupPurchasePageRoutes.Shipments, PageCapabilityStage.Experience,
+            PageInteractionBoundary.ReadOnly, false, SsalddelProductRoadmapCatalog.TransportVersion,
+            "문서관리번호가 별도로 발급된 기존 건의 공개 선적 상태만 읽는 2.0 준비 자산이며 1.5 흐름에서 선적·통관·운송 상태를 만들거나 변경하지 않습니다.", false,
+            [DomesticTransport], ["GroupPurchaseTransport", "DomesticTransport"]),
         Exact("orderer-food-restaurants", SsalddelPageAppCodes.Orderer, "/food/restaurants", PageCapabilityStage.Beta,
             PageInteractionBoundary.ReadOnly, false, "3.0",
             "사용자가 선택한 공개 행정권역 기준점과 반경으로 영속된 공개 음식점·메뉴를 조회합니다.",
@@ -765,8 +797,43 @@ public static class SsalddelPageCapabilityCatalog
             boundary,
             requiresAuthentication,
             hasExternalEffects,
-            introducedVersion,
+            ResolveRoadmapVersion(pageKey, introducedVersion, featureKeys),
             featureKeys ?? [],
             workflowCodes ?? [],
             notice);
+
+    private static string ResolveRoadmapVersion(
+        string pageKey,
+        string fallbackVersion,
+        IReadOnlyCollection<string>? featureKeys)
+    {
+        if (string.Equals(pageKey, "us-korean-food-group-buy", StringComparison.Ordinal))
+        {
+            return SsalddelProductRoadmapCatalog.GroupPurchaseVersion;
+        }
+
+        if (featureKeys?.Contains(Sales, StringComparer.Ordinal) == true
+            || featureKeys?.Contains(Warehouse, StringComparer.Ordinal) == true
+            || featureKeys?.Contains(Hr, StringComparer.Ordinal) == true)
+        {
+            return SsalddelProductRoadmapCatalog.FulfillmentVersion;
+        }
+
+        if (featureKeys?.Contains(DomesticTransport, StringComparer.Ordinal) == true)
+        {
+            return SsalddelProductRoadmapCatalog.TransportVersion;
+        }
+
+        if (featureKeys?.Contains(Customs, StringComparer.Ordinal) == true)
+        {
+            return SsalddelProductRoadmapCatalog.TradeReadinessVersion;
+        }
+
+        if (featureKeys?.Contains(GroupPurchase, StringComparer.Ordinal) == true)
+        {
+            return SsalddelProductRoadmapCatalog.GroupPurchaseVersion;
+        }
+
+        return fallbackVersion;
+    }
 }

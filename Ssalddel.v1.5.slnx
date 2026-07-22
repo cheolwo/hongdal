@@ -5,7 +5,7 @@
       <Deploy Solution="Debug|*" />
     </Project>
   </Folder>
-  <Folder Name="/Group Purchase Clients/">
+  <Folder Name="/Trade Readiness Clients/">
     <Project Path="OrdererApp/OrdererApp.csproj">
       <Deploy Solution="Debug|*" />
     </Project>

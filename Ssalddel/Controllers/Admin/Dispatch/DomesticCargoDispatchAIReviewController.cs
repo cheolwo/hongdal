@@ -8,7 +8,7 @@ using 살뜰.Services.Dispatch.Coordination;
 
 namespace Ssalddel.Controllers.Admin.Dispatch;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/dispatch/domestic-cargo-ai-review")]

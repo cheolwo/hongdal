@@ -9,7 +9,7 @@ using Ssalddel.ApiMetadata;
 
 namespace Ssalddel.Controllers.Admin.Evidence04;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [ApiController]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/documents")]

@@ -9,7 +9,7 @@ using 살뜰.Services.Versioning;
 namespace Ssalddel.Controllers.Common;
 
 [SsalddelApiVersion(
-    SsalddelProductVersion.V1_5,
+    SsalddelProductVersion.V2_5,
     FeatureKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow,
     WorkflowKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.WarehouseFulfillment)]

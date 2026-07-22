@@ -70,7 +70,8 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
         => flags.WarehouseFulfillmentWorkflow || flags.WarehouseV15;
 
     private static bool IsCustomsAndTradeDataEnabled(VersionFeatureFlagsOptions flags)
-        => flags.CustomsAndTradeDataWorkflow || flags.CustomsHsV20;
+        => IsGroupPurchaseDemandEnabled(flags)
+            && (flags.CustomsAndTradeDataWorkflow || flags.CustomsHsV20);
 
     private static bool IsGroupPurchaseDemandEnabled(VersionFeatureFlagsOptions flags)
         => flags.CommunityTrustWorkflow

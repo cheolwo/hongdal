@@ -11,7 +11,7 @@ using 살뜰.Services.Versioning;
 namespace Ssalddel.Controllers.Shipper.Request01
 {
     [SsalddelApiVersion(
-        SsalddelProductVersion.V1_0,
+        SsalddelProductVersion.V2_0,
         FeatureKey = VersionFeatureFlagKeys.DomesticTransportWorkflow,
         WorkflowKey = VersionFeatureFlagKeys.DomesticTransportWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]

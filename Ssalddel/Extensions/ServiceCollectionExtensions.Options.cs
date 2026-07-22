@@ -89,6 +89,7 @@ public static partial class ServiceCollectionExtensions
         services.Configure<CommunityPostTranslationOptions>(configuration.GetSection(CommunityPostTranslationOptions.SectionName));
         services.Configure<CommunityKeywordNotificationOptions>(configuration.GetSection(CommunityKeywordNotificationOptions.SectionName));
         services.Configure<CommunityLedgerProjectionOptions>(configuration.GetSection(CommunityLedgerProjectionOptions.SectionName));
+        services.Configure<GroupPurchaseDemandOsOptions>(configuration.GetSection(GroupPurchaseDemandOsOptions.SectionName));
 
         return services;
     }

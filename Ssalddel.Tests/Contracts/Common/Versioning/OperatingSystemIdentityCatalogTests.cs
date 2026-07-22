@@ -10,6 +10,8 @@ public sealed class OperatingSystemIdentityCatalogTests
     [Theory]
     [InlineData("DomesticCargoTransport", OperatingSystemIds.DomesticCargoTransport)]
     [InlineData("DomesticCargoTransportOS", OperatingSystemIds.DomesticCargoTransport)]
+    [InlineData("GroupPurchaseDemand", OperatingSystemIds.GroupPurchaseDemand)]
+    [InlineData("GroupPurchaseDemandOS", OperatingSystemIds.GroupPurchaseDemand)]
     [InlineData("fooddelivery", OperatingSystemIds.FoodDelivery)]
     [InlineData("FoodDeliveryOS", OperatingSystemIds.FoodDelivery)]
     public void LegacyAndPersistentAliases_NormalizeToCanonicalId(string value, string expected)
@@ -78,7 +80,11 @@ public sealed class OperatingSystemIdentityCatalogTests
         Assert.True(EngineImplementationCatalog.TryGetFamilyId(
             EngineImplementationIds.PickingBatch,
             out var pickingFamily));
+        Assert.True(EngineImplementationCatalog.TryGetFamilyId(
+            EngineImplementationIds.GroupPurchaseClustering,
+            out var groupPurchaseFamily));
         Assert.Equal(EngineFamilyIds.OutboundBatch, outboundFamily);
         Assert.Equal(EngineFamilyIds.PickingBatch, pickingFamily);
+        Assert.Equal(EngineFamilyIds.GroupPurchaseClustering, groupPurchaseFamily);
     }
 }

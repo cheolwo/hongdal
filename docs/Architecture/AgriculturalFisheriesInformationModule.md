@@ -153,7 +153,7 @@ ABS 웹 자료와 ABARES 출판물은 원칙적으로 CC BY 4.0 귀속 조건을
 - 시작한 원장은 결정적 ID로 게시글과 연결되어 재시도해도 중복 생성하지 않는다.
 - 이미 다른 원장이 연결된 게시글에는 덮어쓰지 않고 충돌을 반환한다.
 - 한국 측 또는 해외 측 어느 쪽이든 게시글 작성자로 시작할 수 있으며, `InitiatorSideCode`는 업무상 참여자 측을 나타낼 뿐 앱 종류나 표시 언어를 결정하지 않는다.
-- 준비도 원장은 `CommunityTrustWorkflow`에 속한다. 향후 공동수입 실행용 `GroupPurchaseImportWorkflow`와 자동으로 연결하지 않는다.
+- 준비도 원장은 `CommunityTrustWorkflow`에 속한다. `1.0`의 `GroupPurchaseDemandWorkflow`나 향후 공동수입 검토용 `CustomsAndTradeDataWorkflow`와 자동으로 연결하지 않는다.
 
 표시 언어는 국가·역할·국내외 운영 프로필에서 추론하지 않는다. 클라이언트가 사용자 설정의 `displayLanguage`를 전달하면 서버는 같은 제안 코드, 같은 권한, 같은 원장 템플릿과 같은 API 경로를 유지한 채 제목·설명·질문 문구만 현지화한다. 현재 커뮤니티 제안 응답은 `ko-KR`과 `en-US`를 지원하며 알 수 없는 값은 `ko-KR`로 정규화한다.
 

@@ -7,7 +7,7 @@ using Ssalddel.ApiMetadata;
 
 namespace Ssalddel.Controllers.Common;
 
-[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V1_5)]
 [ApiController]
 [Authorize]
 [Route("api/v1/customs")]

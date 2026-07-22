@@ -13,6 +13,26 @@
         </MudText>
         <MudSpacer />
         <WebLanguageSwitcher />
+        @if (AuthSession.IsLoggedIn)
+        {
+            <MudTooltip Text="@($"{AuthSession.UserName ?? AuthSession.UserId} 로그아웃")">
+                <MudIconButton Icon="@Icons.Material.Filled.Logout"
+                               Color="Color.Inherit"
+                               Size="Size.Small"
+                               aria-label="로그아웃"
+                               OnClick="LogoutAsync" />
+            </MudTooltip>
+        }
+        else
+        {
+            <MudButton Href="@LoginHref"
+                       Variant="Variant.Text"
+                       Color="Color.Inherit"
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.Login">
+                @Locale.Text("로그인", "Sign in")
+            </MudButton>
+        }
         <MudChip T="string" Class="web-role-chip" Variant="Variant.Filled" Size="Size.Small">@CurrentRoleLabel</MudChip>
     </MudAppBar>
 
@@ -22,15 +42,37 @@
 
     <MudMainContent Class="web-main">
         <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-            <PageReturnContextBar />
-            @Body
+            @if (_sessionInitialized)
+            {
+                <PageReturnContextBar />
+                @Body
+            }
+            else
+            {
+                <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8" aria-live="polite">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">로그인 상태를 확인하는 중입니다.</MudText>
+                </MudStack>
+            }
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
 @code {
     private bool _drawerOpen = true;
+    private bool _sessionInitialized;
     private WebRoleTheme CurrentTheme => AuthSession.CurrentTheme;
+    private string LoginHref
+    {
+        get
+        {
+            var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri);
+            var returnUrl = string.IsNullOrWhiteSpace(relativePath) ? "/" : $"/{relativePath}";
+            return returnUrl.StartsWith("/login", StringComparison.OrdinalIgnoreCase)
+                ? "/login"
+                : $"/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        }
+    }
     private string CurrentRoleLabel
         => Locale.IsEnglish
             ? CurrentTheme.RoleLabel switch
@@ -59,13 +101,27 @@
             return;
         }
 
-        await AuthSession.RestoreAsync();
-        await Locale.InitializeAsync();
+        try
+        {
+            await AuthSession.RestoreAsync();
+            await Locale.InitializeAsync();
+        }
+        finally
+        {
+            _sessionInitialized = true;
+            StateHasChanged();
+        }
     }
 
     private void ToggleDrawer()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthSession.ClearAsync();
+        Navigation.NavigateTo("/login");
     }
 
     private void HandleAuthChanged()

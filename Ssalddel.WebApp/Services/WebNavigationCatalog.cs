@@ -14,6 +14,9 @@ public static class WebNavigationCatalog
     private static readonly WebNavigationItem Community =
         new("공개 커뮤니티", "/community", Icons.Material.Filled.Forum, true);
 
+    private static readonly WebNavigationItem UnitedStatesFoodGroupBuy =
+        new("U.S. Korean food group buy", "/us/korean-food-group-buy", Icons.Material.Filled.ShoppingBasket, true);
+
     private static readonly WebNavigationItem Diagram =
         new("업무 다이어그램", DiagramRoute, Icons.Material.Filled.AccountTree);
 
@@ -86,7 +89,8 @@ public static class WebNavigationCatalog
     public static IReadOnlyList<WebNavigationItem> IntegratedItems { get; } =
     [
         Home,
-        Community
+        Community,
+        UnitedStatesFoodGroupBuy
     ];
 
     public static IReadOnlyList<WebNavigationItem> CommunityItems { get; } =

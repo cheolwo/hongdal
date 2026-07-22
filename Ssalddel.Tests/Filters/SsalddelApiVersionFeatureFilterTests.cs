@@ -54,7 +54,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
         });
 
         Assert.False(nextCalled);
-        Assert.Equal([VersionFeatureFlagKeys.GroupPurchaseImportWorkflow], featureFlags.CheckedFeatureKeys);
+        Assert.Equal([VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow], featureFlags.CheckedFeatureKeys);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public sealed class SsalddelApiVersionFeatureFilterTests
 
         [SsalddelApiVersion(
             SsalddelProductVersion.V2_5,
-            FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+            FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
         public void ActionFeature()
         {
         }

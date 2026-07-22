@@ -1,15 +1,25 @@
 # Ssalddel 1.0 Migration Notes
 
-1.0에서는 국내 화물/용달 운송 안정화에 필요한 최소 데이터 구조를 우선합니다.
+## 2026-07-22 · 공동구매 우선 재분류
 
-## 기록 대상
+- `1.0`의 의미를 국내 화물·용달에서 공동구매·주문자 집단화로 변경했습니다.
+- 공동구매 자동집단화, 수요 투표, 주문자 집단 운영 주체와 국내 생산자 협의 API 메타데이터를 `1.0`으로 이동했습니다.
+- 기존 `GroupPurchaseImportWorkflow`, `OrdererGroupOrderV25`와 `ApartmentGroupOrderV25` 설정은 호환 별칭으로 유지하고 신규 설정은 `GroupPurchaseDemandWorkflow`를 사용합니다.
+- HTTP `/api/v1/...` 계약 버전과 저장 데이터 식별자는 변경하지 않습니다.
+- 이번 재분류 자체는 DB 스키마 마이그레이션을 요구하지 않습니다.
 
-- 운송 의뢰 관련 테이블 변경
-- 배차 대기/추천/확정 관련 테이블 변경
-- 상차/하차 증빙 파일 참조 변경
-- 결제/정산 기본 필드 변경
-- 커뮤니티 보조 모드 설정 변경
+## 2026-07-22 · 수요 모집과 후속 이행 플래그 분리
 
-## 주의
+- `GroupPurchaseDemandWorkflow`는 `1.0` 비구속 수요·자동집단화·모집만 활성화합니다.
+- `1.5` 공급·HS·무역 준비는 `CustomsAndTradeDataWorkflow`, `2.0` 운송은 `DomesticTransportWorkflow`, `2.5` 창고·판매 이행은 각 이행 플래그를 사용합니다.
+- 수요 플래그를 켜도 판매채널과 인사 참여 플래그가 자동 활성화되지 않습니다.
+- 기존 `GroupPurchaseImportWorkflow=true`는 마이그레이션 기간 동안 `GroupPurchaseDemandWorkflow=true`와 같은 의미로만 해석합니다.
 
-1.5 이후 실험 테이블이 1.0 운영 흐름을 필수 의존하지 않도록 분리합니다.
+## 2026-07-22 · 비구속 수요와 모집 종료 계약
+
+- 신규·변경 수요는 `PUT /api/v1/orderer/group-purchase-auto-groups/demands/{demandSourceKey}`와 `Idempotency-Key`를 사용합니다.
+- 철회는 같은 경로의 `DELETE`와 별도 멱등 키를 사용하며, 본인 수요만 철회할 수 있습니다.
+- 기존 `POST .../demands`는 호환을 위해 유지하지만 비구속 저장으로만 처리합니다. 결제 상태, 주소, 창고와 후속 주문 원장은 생성하지 않습니다.
+- 자동집단은 생성 후 기본 14일간 모집합니다. 기한이 지났고 조건이 미달이면 `RecruitmentClosedTargetNotReached`로 표시하고 신규·변경 수요를 거절합니다.
+- 기존 Mongo 문서에 모집 종료 시각이 없으면 생성 시각에 14일을 더해 계산하므로 별도 스키마 마이그레이션은 필요하지 않습니다.
+- 공개 응답은 `모집종료시각Utc`, `모집종료여부`, `모집조건충족여부`를 제공하며 개인 주소·결제액·내부 원장은 계속 제외합니다.

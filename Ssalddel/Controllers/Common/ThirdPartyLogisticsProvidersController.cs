@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ssalddel.Controllers.Common;
 
 [ApiController]
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [Route("api/v1/operations/third-party-logistics/providers")]
 public sealed class ThirdPartyLogisticsProvidersController : ControllerBase
 {

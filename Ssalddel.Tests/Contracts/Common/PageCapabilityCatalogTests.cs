@@ -5,6 +5,35 @@ namespace Ssalddel.Tests.Contracts.Common;
 public sealed class PageCapabilityCatalogTests
 {
     [Fact]
+    public void 제품로드맵은_공동구매뒤에_무역준비와운송을배치한다()
+    {
+        Assert.Equal(
+            ["0.0", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5"],
+            SsalddelProductRoadmapCatalog.All.Select(stage => stage.Version));
+        Assert.Equal("1.5", SsalddelProductRoadmapCatalog.CurrentVersion);
+        Assert.Equal("공동구매·주문자 집단화", SsalddelProductRoadmapCatalog.Find("1.0").DisplayName);
+        Assert.Equal("1.0", SsalddelProductRoadmapCatalog.Find("1.5").PrerequisiteVersion);
+        Assert.Equal("1.5", SsalddelProductRoadmapCatalog.Find("2.0").PrerequisiteVersion);
+    }
+
+    [Theory]
+    [InlineData("community-group-purchase-public", "1.0")]
+    [InlineData("us-korean-food-group-buy", "1.0")]
+    [InlineData("global-home", "1.5")]
+    [InlineData("shipper-request", "2.0")]
+    [InlineData("shipper-warehouse", "2.5")]
+    public void 대표화면은_공동구매우선로드맵버전을사용한다(
+        string pageKey,
+        string expectedVersion)
+    {
+        var capability = Assert.Single(
+            SsalddelPageCapabilityCatalog.GetAll(),
+            item => item.PageKey == pageKey);
+
+        Assert.Equal(expectedVersion, capability.IntroducedVersion);
+    }
+
+    [Fact]
     public void 페이지_키와_앱별_라우트_규칙은_중복되지_않는다()
     {
         var capabilities = SsalddelPageCapabilityCatalog.GetAll();
@@ -21,7 +50,7 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
-    public void 아홉_업무_흐름은_각각_대표_page_capability를_가진다()
+    public void 핵심_업무_흐름은_각각_대표_page_capability를_가진다()
     {
         var workflowCodes = SsalddelPageCapabilityCatalog.GetAll()
             .SelectMany(item => item.WorkflowCodes)
@@ -31,6 +60,7 @@ public sealed class PageCapabilityCatalogTests
             "DomesticTransport",
             "WarehouseFulfillment",
             "CustomsAndTradeData",
+            "GroupPurchaseDemand",
             "GroupPurchaseImport",
             "SalesChannelFulfillment",
             "CommunityTrust",
@@ -355,7 +385,7 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
         Assert.False(capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects);
-        Assert.Equal("0.0", capability.IntroducedVersion);
+        Assert.Equal("1.0", capability.IntroducedVersion);
         Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
         Assert.Contains("CommunityTrust", capability.WorkflowCodes);
     }
@@ -415,6 +445,63 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
+    public void 주문자_공동수입검토는_1점5_읽기전용_무역준비경계다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            "/group-purchase/import-review/ingredient-onion",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("orderer-group-purchase-import-review", capability.PageKey);
+        Assert.Equal("1.5", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("CustomsAndTradeDataWorkflow", capability.FeatureKeys);
+        Assert.Contains("GroupPurchaseImport", capability.WorkflowCodes);
+        Assert.Contains("계약·결제·신고·운송은 실행하지 않습니다", capability.Notice);
+    }
+
+    [Fact]
+    public void 관리자_공동수입작업대는_1점5_인증저장경계다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Admin,
+            "/trade-readiness",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("admin-group-import-trade-readiness", capability.PageKey);
+        Assert.Equal("1.5", capability.IntroducedVersion);
+        Assert.Equal(PageInteractionBoundary.PlatformPersistence, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.True(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("CustomsAndTradeDataWorkflow", capability.FeatureKeys);
+        Assert.Contains("계약·결제·신고·운송 실행은 열지 않습니다", capability.Notice);
+    }
+
+    [Fact]
+    public void 주문자_선적조회는_1점5가아닌_2점0_읽기전용준비자산이다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            "/group-purchase/shipments",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("orderer-group-purchase-shipments", capability.PageKey);
+        Assert.Equal("2.0", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Experience, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("DomesticTransportWorkflow", capability.FeatureKeys);
+    }
+
+    [Fact]
     public void 화주HS코드검토페이지는_인증된읽기전용Beta로분류한다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
@@ -428,7 +515,7 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
         Assert.True(capability.RequiresAuthentication);
         Assert.False(capability.HasExternalEffects);
-        Assert.Equal("2.0", capability.IntroducedVersion);
+        Assert.Equal("1.5", capability.IntroducedVersion);
         Assert.Contains("CustomsAndTradeDataWorkflow", capability.FeatureKeys);
         Assert.Contains("CustomsAndTradeData", capability.WorkflowCodes);
     }

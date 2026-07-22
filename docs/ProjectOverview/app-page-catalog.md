@@ -8,12 +8,12 @@
 | --- | --- |
 | 수집 기준 | `*.razor` 파일의 `@page` 라우트 선언 |
 | 페이지 ID / 제목 | 실제 프로젝트명을 접두사로 붙인 `ProjectName-P번호`와 사람이 읽는 화면 제목을 함께 표기 |
-| 필수 워크플로우 연결 | 1.0 필수 페이지 문서와 직접 연결되는 경우 같은 ID를 병기 |
+| 필수 워크플로우 연결 | 레거시 운송 필수 페이지 문서와 직접 연결되는 경우 같은 ID를 병기 |
 | 분류 | `필수`, `보조`, `확장`, `운영`, `시스템` |
 | 캡처 | 실제 캡처 파일이 있으면 `완료`, 인증 장벽이 먼저 뜨면 `인증 필요`, 현재 실행 표면이 없으면 `캡처 대기`로 표시 |
 | 제외 기준 | `@page`가 없는 공용 컴포넌트, 서비스, 레이아웃, 팝업 내부 섹션 |
 
-전체 페이지 캡처 파일은 `docs/ProjectOverview/assets/app-pages/{앱명}/{페이지ID}.png`에 둔다. 기존 1.0 대표 캡처는 링크 안정성을 위해 `docs/ProjectOverview/assets/v1-pages/`에도 남긴다.
+전체 페이지 캡처 파일은 `docs/ProjectOverview/assets/app-pages/{앱명}/{페이지ID}.png`에 둔다. 기존 운송 대표 캡처는 링크 안정성을 위해 레거시 경로 `docs/ProjectOverview/assets/v1-pages/`에도 남긴다.
 
 화면별 상세 설명은 [화면별 상세 README](page-docs/README.md)에서 코드 프로젝트별/페이지별로 확인한다. 이 카탈로그는 빠른 색인이고, 개별 README는 캡처와 화면 책임, 사용자/참여자, API/보안 점검을 함께 둔다.
 
@@ -234,7 +234,12 @@
 | 페이지 ID / 제목 | 라우트 | 파일 | 분류 | 화면 책임 | 필수 연결 | 캡처 |
 | --- | --- | --- | --- | --- | --- | --- |
 | `OrdererApp-P01 - 주문자 홈` | `/` | `OrdererApp/Components/Pages/Home.razor` | 보조 | 주문자 홈 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P01.png" alt="OrdererApp-P01" width="160"> |
-| `OrdererApp-P02 - 공동구매 의사 표시/집단화` | `/group-purchase` | `OrdererApp/Components/Pages/GroupPurchaseIntent.razor` | 확장 | 공동구매 의사 표시/집단화 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P02.png" alt="OrdererApp-P02" width="160"> |
+| `OrdererApp-P02 - 공동구매 개요` | `/group-purchase` | `OrdererApp/Components/Pages/GroupPurchaseHome.razor` | 1.0 | 공동구매 화면 진입과 버전 경계 안내 | - | route SRP 재캡처 필요 |
+| `OrdererApp-P02-1 - 재료 자동집단화` | `/group-purchase/products` | `OrdererApp/Components/Pages/GroupPurchaseProducts.razor` | 1.0 | 재료 카드 한 번 클릭으로 서버 배치 미리보기·비구속 저장·카드 내 철회 | `OrdererApp-P02` | 원클릭 집단화 재캡처 필요 |
+| `OrdererApp-P02-2 - 공동구매 상품 근거 상세` | `/group-purchase/products/{ProductId}` | `OrdererApp/Components/Pages/GroupPurchaseProductDetail.razor` | 1.0 | 한 상품의 HS·보관·모집 근거 읽기 | `OrdererApp-P02-1` | route SRP 재캡처 필요 |
+| `OrdererApp-P02-3 - 공동구매 수요 상세 조건` | `/group-purchase/demands/new/{ProductId}` | `OrdererApp/Components/Pages/GroupPurchaseDemandCreate.razor` | 1.0 | 배송권·희망 수량을 직접 조정하는 보조 비구속 Action | `OrdererApp-P02-1` | route SRP 재캡처 필요 |
+| `OrdererApp-P02-4 - 수입 단가·도착원가 참고` | `/group-purchase/import-review/{ProductId}` | `OrdererApp/Components/Pages/GroupPurchaseImportReview.razor` | 1.5 준비 | 한 상품의 수입 참고 신호와 Simulation 원가 조회 | `OrdererApp-P02-2` | 운영 효과 없음 · 재캡처 필요 |
+| `OrdererApp-P02-5 - 공동구매 선적 조회` | `/group-purchase/shipments` | `OrdererApp/Components/Pages/GroupPurchaseShipments.razor` | 1.5 준비 | 문서관리번호 한 건의 공개 선적 상태 조회 | `OrdererApp-P02` | 운영 효과 없음 · 재캡처 필요 |
 | `OrdererApp-P03 - 주문자 화물 주문` | `/cargo` | `OrdererApp/Components/Pages/CargoOrder.razor` | 확장 | 주문자 화물 주문 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P03.png" alt="OrdererApp-P03" width="160"> |
 | `OrdererApp-P04 - 음식 주문 홈` | `/food` | `OrdererApp/Components/Pages/FoodOrderHome.razor` | 확장 | 음식 주문 홈 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P04.png" alt="OrdererApp-P04" width="160"> |
 | `OrdererApp-P04-1 - 음식점 주문` | `/food/restaurants` | `OrdererApp/Components/Pages/RestaurantOrder.razor` | 확장 | 음식점 주문 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P04-1.png" alt="OrdererApp-P04-1" width="160"> |
@@ -265,7 +270,7 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 필수 페이지와 전체 페이지의 관계 | 필수 페이지는 1.0 운송 루프를 닫는 최소 화면이고, 이 문서는 코드 프로젝트 전체 화면을 찾기 위한 색인이다. |
+| 필수 페이지와 전체 페이지의 관계 | 레거시 필수 페이지 문서는 2.0 운송 루프를 닫는 최소 화면이고, 이 문서는 코드 프로젝트 전체 화면을 찾기 위한 색인이다. |
 | 라우트 충돌 후보 | `SsalddelApp`과 `RestaurantDeskApp` 모두 `/dispatch/address-form`을 가진다. 앱이 다르므로 런타임 충돌은 아니지만 문서에서 책임을 구분해야 한다. |
 | 템플릿성 화면 | `Counter`, `Weather`는 시스템/샘플 화면으로 분류했다. 출시 전 제거 또는 숨김 여부를 따로 판단한다. |
 | 미발견 페이지 | `NotFound`는 사용자 업무 화면이 아니지만 앱 운영에 필요한 라우트로 남긴다. |

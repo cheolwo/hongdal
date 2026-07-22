@@ -76,7 +76,8 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
             ToWorkflowState(SsalddelWorkflow.DomesticTransport, VersionFeatureFlagKeys.DomesticTransportWorkflow, flags),
             ToWorkflowState(SsalddelWorkflow.WarehouseFulfillment, VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow, flags),
             ToWorkflowState(SsalddelWorkflow.CustomsAndTradeData, VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow, flags),
-            ToWorkflowState(SsalddelWorkflow.GroupPurchaseImport, VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, flags),
+            ToWorkflowState(SsalddelWorkflow.GroupPurchaseDemand, VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, flags),
+            ToWorkflowState(SsalddelWorkflow.GroupPurchaseImport, VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow, flags),
             ToWorkflowState(SsalddelWorkflow.SalesChannelFulfillment, VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow, flags),
             ToWorkflowState(SsalddelWorkflow.CommunityTrust, VersionFeatureFlagKeys.CommunityTrustWorkflow, flags),
             ToWorkflowState(SsalddelWorkflow.HrParticipation, VersionFeatureFlagKeys.HrParticipationWorkflow, flags),
@@ -331,7 +332,8 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
         {
             SsalddelOperatingSystem.DomesticCargoTransport => VersionFeatureFlagKeys.DomesticTransportWorkflow,
             SsalddelOperatingSystem.WarehouseCommerceFulfillment => VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow,
-            SsalddelOperatingSystem.GroupPurchaseImport => VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
+            SsalddelOperatingSystem.GroupPurchaseDemand => VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow,
+            SsalddelOperatingSystem.GroupPurchaseImport => VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
             SsalddelOperatingSystem.FoodDelivery => VersionFeatureFlagKeys.FoodDeliveryWorkflow,
             SsalddelOperatingSystem.SsalddelMartUrbanLogistics => VersionFeatureFlagKeys.SsalddelMartWorkflow,
             SsalddelOperatingSystem.CommunityTrust => VersionFeatureFlagKeys.CommunityTrustWorkflow,
@@ -372,6 +374,9 @@ public sealed class 버전워크플로우UseCase : I버전워크플로우UseCase
     {
         return new OperatingSystemSchedulingPolicyDto
         {
+            RuntimeStatus = SchedulingPolicyImplementationCatalog.IsActive(policy.PolicyCode)
+                ? RuntimeCapabilityStatuses.Active
+                : RuntimeCapabilityStatuses.Declared,
             PolicyKindCode = policy.Kind.ToString(),
             PolicyKindName = SsalddelSchedulingPolicyKindLabels.GetLabel(policy.Kind),
             PolicyCode = policy.PolicyCode,

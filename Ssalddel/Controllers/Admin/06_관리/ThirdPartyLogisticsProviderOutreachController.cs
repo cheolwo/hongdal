@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ssalddel.Controllers.Admin.Master06;
 
 [ApiController]
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/operations/third-party-logistics/outreach")]
 public sealed class ThirdPartyLogisticsProviderOutreachController : ControllerBase

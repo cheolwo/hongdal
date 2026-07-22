@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Ssalddel.Controllers.Admin.Inflow02
 {
-    [SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+    [SsalddelApiVersion(SsalddelProductVersion.V2_0)]
     [ApiController]
     [Route("api/v1/dispatch/wait")]
     [Authorize(Policy = "서버관리자전용")]

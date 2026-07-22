@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System.Text;
 using System.Text.Json;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Tests.Ui.Common;
 
@@ -725,6 +726,38 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void 현재사용자Context_주문자배송권Claim을_원클릭집단화용Snapshot으로읽는다()
+    {
+        var tokenProvider = new TestAccessTokenProvider
+        {
+            AccessToken = CreateToken(
+                "orderer-17",
+                "이웃 주문자",
+                ["Orderer"],
+                new Dictionary<string, object?>
+                {
+                    [주문자집단배송권ClaimTypes.ScopeKey] = "road-address-level-2:서울특별시:강남구",
+                    [주문자집단배송권ClaimTypes.DisplayName] = "서울특별시 강남구",
+                    [주문자집단배송권ClaimTypes.Basis] = "도로명주소 시군구"
+                })
+        };
+        var services = new ServiceCollection();
+        services.AddSingleton(tokenProvider);
+        services.AddSsalddelUiCommonAppServices<TestAccessTokenProvider>();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var currentUser = scope.ServiceProvider
+            .GetRequiredService<ISsalddel현재사용자Context>()
+            .현재사용자;
+
+        var ordererScope = Assert.IsType<주문자집단배송권Snapshot>(currentUser.주문자집단배송권);
+        Assert.Equal("road-address-level-2:서울특별시:강남구", ordererScope.ScopeKey);
+        Assert.Equal("서울특별시 강남구", ordererScope.DisplayName);
+        Assert.Equal("도로명주소 시군구", ordererScope.Basis);
+    }
+
+    [Fact]
     public void AddSsalddelApiHttpClient_NormalizesAddressAndPreservesOptions()
     {
         var services = new ServiceCollection();
@@ -791,7 +824,8 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
     private static string CreateToken(
         string? userId,
         string userName,
-        IReadOnlyList<string> roles)
+        IReadOnlyList<string> roles,
+        IReadOnlyDictionary<string, object?>? additionalClaims = null)
     {
         var payload = new Dictionary<string, object?>
         {
@@ -799,6 +833,14 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             ["name"] = userName,
             ["roles"] = roles
         };
+        if (additionalClaims is not null)
+        {
+            foreach (var (key, value) in additionalClaims)
+            {
+                payload[key] = value;
+            }
+        }
+
         return $"{Base64Url("{\"alg\":\"none\"}")}.{Base64Url(JsonSerializer.Serialize(payload))}.";
     }
 

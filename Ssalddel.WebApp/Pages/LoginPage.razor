@@ -1,5 +1,6 @@
 @page "/login"
 @inject WebAuthSessionService AuthSession
+@inject NavigationManager Navigation
 
 <WebPageHeader Eyebrow="Community Account"
                Title="로그인과 선택 회원가입"
@@ -12,7 +13,7 @@
             회원가입은 선택입니다. 자유·생활 등 익명 쓰기를 허용한 게시판에서는 별도 계정 없이 닉네임과 글 비밀번호로 글과 댓글을 작성할 수 있습니다.
         </MudText>
         <MudText Typo="Typo.caption" Color="Color.Secondary">
-            로그인 전용 게시판이나 내 활동 관리처럼 계정 식별이 필요한 기능을 사용할 때만 가입해 주세요.
+            로그인 전용 게시판, 내 글 관리 또는 관리자 기능처럼 계정 식별이 필요한 기능을 사용할 때만 가입해 주세요.
         </MudText>
         <MudButton Href="/community"
                    Variant="Variant.Text"
@@ -51,7 +52,11 @@
 </MudGrid>
 
 @code {
-    private static readonly IReadOnlyList<string> Hints = ["화주", "기사", "창고관리자", "주문자", "흥여회"];
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    private static readonly IReadOnlyList<string> Hints = ["서버관리자", "화주", "기사", "창고관리자", "주문자", "흥여회"];
     private string? LoginStatusMessage { get; set; }
     private Severity LoginStatusSeverity { get; set; } = Severity.Info;
     private string? RegistrationStatusMessage { get; set; }
@@ -85,6 +90,7 @@
 
             LoginStatusSeverity = Severity.Success;
             LoginStatusMessage = $"{AuthSession.UserName ?? request.UserNameOrEmail} 계정으로 서버 인증을 완료했습니다. 현재 레이아웃 역할: {AuthSession.CurrentTheme.RoleLabel}";
+            NavigateToReturnUrl();
         }
         catch (Exception ex)
         {
@@ -110,6 +116,7 @@
 
             RegistrationStatusSeverity = Severity.Success;
             RegistrationStatusMessage = $"{registration.UserName} 계정을 만들고 로그인했습니다. 익명 허용 게시판에서는 로그인하지 않고도 계속 참여할 수 있습니다.";
+            NavigateToReturnUrl();
         }
         catch (Exception ex)
         {
@@ -127,5 +134,21 @@
         LoginStatusSeverity = Severity.Info;
         LoginStatusMessage = $"{request.ProviderDisplayName} OAuth 연결은 서버 인증 API 연결 단계에서 활성화됩니다.";
         return Task.CompletedTask;
+    }
+
+    private void NavigateToReturnUrl()
+    {
+        var returnUrl = ReturnUrl?.Trim();
+        if (string.IsNullOrWhiteSpace(returnUrl)
+            || !returnUrl.StartsWith("/", StringComparison.Ordinal)
+            || returnUrl.StartsWith("//", StringComparison.Ordinal)
+            || returnUrl.Contains('\\')
+            || returnUrl.Contains('\r')
+            || returnUrl.Contains('\n'))
+        {
+            return;
+        }
+
+        Navigation.NavigateTo(returnUrl);
     }
 }

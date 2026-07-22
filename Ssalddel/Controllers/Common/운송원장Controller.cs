@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ssalddel.Controllers.Common;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [ApiController]
 [Route("api/v1/transport-request-ledgers")]
 [Authorize(Policy = "물류운영사용자전용")]

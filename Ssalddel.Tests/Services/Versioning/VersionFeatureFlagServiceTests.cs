@@ -83,6 +83,29 @@ public sealed class VersionFeatureFlagServiceTests
         Assert.False(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow));
     }
 
+    [Fact]
+    public void TradeReadiness_RequiresDemandAndDoesNotEnableTransportOrWarehouse()
+    {
+        var customsOnly = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = true,
+            CustomsAndTradeDataWorkflow = true
+        });
+        var fullReadiness = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = true,
+            GroupPurchaseDemandWorkflow = true,
+            CustomsAndTradeDataWorkflow = true
+        });
+
+        Assert.False(customsOnly.IsEnabled(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow));
+        Assert.True(fullReadiness.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow));
+        Assert.True(fullReadiness.IsEnabled(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow));
+        Assert.False(fullReadiness.IsEnabled(VersionFeatureFlagKeys.DomesticTransportWorkflow));
+        Assert.False(fullReadiness.IsEnabled(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow));
+        Assert.False(fullReadiness.IsEnabled(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow));
+    }
+
     private static VersionFeatureFlagService CreateService(VersionFeatureFlagsOptions options)
         => new(new StaticOptionsMonitor<VersionFeatureFlagsOptions>(options));
 

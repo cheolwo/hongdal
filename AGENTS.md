@@ -6,7 +6,7 @@
 
 1. 시스템/개발자 지침과 현재 스레드의 최신 사용자 요청을 가장 먼저 따른다.
 2. 하위 폴더에 별도 `AGENTS.md`가 있으면 그 폴더 안에서는 더 가까운 지침을 따른다.
-3. 별도 지시가 없으면 이 파일과 [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 기본 기준으로 삼는다.
+3. 별도 지시가 없으면 이 파일과 [1.0 공동구매 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 기본 기준으로 삼는다.
 4. 문서와 코드가 다르면 실제 코드, 테스트, 실행 설정을 확인한 뒤 차이를 사용자에게 알리고 함께 정합화한다. 추측으로 한쪽을 덮지 않는다.
 5. 과거 대화나 오래된 선호보다 현재 저장소 문서와 최신 사용자 요청을 우선한다.
 
@@ -21,12 +21,12 @@
 ## 현재 제품 기준
 
 - Ssalddel의 중심은 **정보 공개형 커뮤니티**다. 대화와 모집이 공동 원장·다이어그램으로 이어지고, 운송·창고·음식·마트·공동주문은 그 위에 붙는 업무 도구다.
-- 기본 개발 집중 범위는 `0.0`이다. `1.0` 이후 코드는 미래 자산으로 보존하되, 명시적인 요청 없이 운영 노출이나 실제 외부 효과를 켜지 않는다.
+- `0.0`은 커뮤니티·공공데이터 기반으로 유지하고, 기본 개발 집중 범위는 `1.0` 공동구매·주문자 집단화다. `1.5` 이후 코드는 후속 자산으로 보존하되, 명시적인 요청 없이 운영 노출이나 실제 외부 효과를 켜지 않는다.
 - 유상 화물 추천·자동 배차·계약 중개·운임 수취·보관·정산은 허가·제휴·법률·운영 준비 전 기본 비활성이다. 개발 검증은 샘플 데이터, FakePG, 모의 흐름을 사용한다.
 - 실행 효과는 `SsalddelExecution:Mode`의 `Simulation`과 `Operational` 경계로 통제한다. 화면이나 API마다 별도 실행 모드를 임의로 만들지 않는다.
 - 사용자가 특정 버전이나 업무 모듈을 명시하면 그 범위에서 작업하되, 현재 운영 경계와 기능 플래그를 유지한다.
 
-제품 경계는 [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md), 세부 우선순위는 [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 따른다.
+제품 경계는 [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md), 세부 우선순위는 [1.0 공동구매 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)을 따른다.
 
 ## 개발 철학
 
@@ -103,7 +103,7 @@
 ## 우선 참고 문서
 
 1. [README](README.md)
-2. [0.0 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)
+2. [1.0 공동구매 집중 로드맵](docs/Versions/v0.0/focus-roadmap.md)
 3. [이웃에서 시작하는 공동행동 개발 철학](docs/Architecture/NeighborCenteredDevelopmentPhilosophy.md)
 4. [커뮤니티 0.0 기반 제품 원칙](docs/Architecture/CommunityFoundationV0Policy.md)
 5. [HIOPS Layer Model](docs/Architecture/HIOPSLayerModel.md)

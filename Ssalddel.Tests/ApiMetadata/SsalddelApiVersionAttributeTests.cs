@@ -45,6 +45,7 @@ public sealed class SsalddelApiVersionAttributeTests
 
     [Theory]
     [InlineData(SsalddelWorkflow.DomesticTransport, "국내 화물 운송")]
+    [InlineData(SsalddelWorkflow.GroupPurchaseDemand, "공동구매 수요·모집")]
     [InlineData(SsalddelWorkflow.GroupPurchaseImport, "공동주문 수입")]
     [InlineData(SsalddelWorkflow.WarehouseFulfillment, "창고 입출고")]
     [InlineData(SsalddelWorkflow.SalesChannelFulfillment, "판매채널 출고")]
@@ -99,6 +100,10 @@ public sealed class SsalddelApiVersionAttributeTests
         var relations = SsalddelWorkflowRelations.GetAll();
 
         Assert.Contains(relations, relation =>
+            relation.Source == SsalddelWorkflow.GroupPurchaseDemand &&
+            relation.Target == SsalddelWorkflow.GroupPurchaseImport &&
+            relation.Kind == SsalddelWorkflowRelationKind.HandsOffTo);
+        Assert.Contains(relations, relation =>
             relation.Source == SsalddelWorkflow.GroupPurchaseImport &&
             relation.Target == SsalddelWorkflow.DomesticTransport &&
             relation.Kind == SsalddelWorkflowRelationKind.HandsOffTo);
@@ -132,12 +137,12 @@ public sealed class SsalddelApiVersionAttributeTests
     [Fact]
     public void WorkflowParticipants_RecordPrimaryUsersAndBoundaries()
     {
-        var groupPurchaseParticipants = SsalddelWorkflowParticipants.GetByWorkflow(SsalddelWorkflow.GroupPurchaseImport);
+        var groupPurchaseParticipants = SsalddelWorkflowParticipants.GetByWorkflow(SsalddelWorkflow.GroupPurchaseDemand);
         var domesticBoundary = SsalddelWorkflowParticipants.GetBoundarySummary(SsalddelWorkflow.DomesticTransport);
 
         Assert.Contains(groupPurchaseParticipants, participant =>
             participant.ActorName == "주문자 집단 대표" &&
-            participant.IsPrimary);
+            !participant.IsPrimary);
         Assert.Contains(groupPurchaseParticipants, participant =>
             participant.ActorName == "주문자" &&
             participant.IsPrimary);
@@ -164,7 +169,7 @@ public sealed class SsalddelApiVersionAttributeTests
     {
         AssertUseCaseHasWorkflow(typeof(화주운송의뢰UseCase), SsalddelWorkflow.DomesticTransport);
         AssertUseCaseHasWorkflow(typeof(기사배차추천UseCase), SsalddelWorkflow.DomesticTransport);
-        AssertUseCaseHasWorkflow(typeof(공동구매자동집단화UseCase), SsalddelWorkflow.GroupPurchaseImport);
+        AssertUseCaseHasWorkflow(typeof(공동구매자동집단화UseCase), SsalddelWorkflow.GroupPurchaseDemand);
         AssertUseCaseHasWorkflow(typeof(공동구매커머스이행계획UseCase), SsalddelWorkflow.GroupPurchaseImport);
         AssertUseCaseHasWorkflow(typeof(창고작업UseCase), SsalddelWorkflow.WarehouseFulfillment);
         AssertUseCaseHasWorkflow(typeof(판매채널UseCase), SsalddelWorkflow.SalesChannelFulfillment);
@@ -184,7 +189,7 @@ public sealed class SsalddelApiVersionAttributeTests
     {
         var domesticScreens = SsalddelWorkflowScreens.GetByWorkflow(SsalddelWorkflow.DomesticTransport);
         var groupPurchaseScreens = SsalddelWorkflowScreens.GetByWorkflowAndActor(
-            SsalddelWorkflow.GroupPurchaseImport,
+            SsalddelWorkflow.GroupPurchaseDemand,
             "Orderer");
 
         Assert.Contains(domesticScreens, screen =>
@@ -196,8 +201,8 @@ public sealed class SsalddelApiVersionAttributeTests
             screen.AppCode == "DriverApp" &&
             screen.Route == "/driver/recommendations");
         Assert.Contains(groupPurchaseScreens, screen =>
-            screen.AppCode == "SsalddelApp" &&
-            screen.Route == "/community/group-import");
+            screen.AppCode == "Ssalddel.WebApp" &&
+            screen.Route == "/community/group-purchase");
     }
 
     [Fact]
@@ -211,11 +216,12 @@ public sealed class SsalddelApiVersionAttributeTests
         var response = Assert.IsType<Ssalddel.Contracts.Common.Versioning.VersionFeatureFlagsResponse>(ok.Value);
 
         Assert.Contains(response.Workflows, workflow =>
-            workflow.WorkflowCode == nameof(SsalddelWorkflow.GroupPurchaseImport) &&
-            workflow.WorkflowName == "공동주문 수입" &&
-            workflow.FlagKey == VersionFeatureFlagKeys.GroupPurchaseImportWorkflow &&
-            workflow.Participants.Any(participant => participant.ActorName == "주문자 집단 대표" && participant.IsPrimary) &&
-            workflow.Screens.Any(screen => screen.AppCode == "SsalddelApp" && screen.Route == "/community/group-import") &&
+            workflow.WorkflowCode == nameof(SsalddelWorkflow.GroupPurchaseDemand) &&
+            workflow.WorkflowName == "공동구매 수요·모집" &&
+            workflow.FlagKey == VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow &&
+            workflow.Participants.Any(participant => participant.ActorName == "주문자" && participant.IsPrimary) &&
+            workflow.Participants.Any(participant => participant.ActorName == "주문자 집단 대표" && !participant.IsPrimary) &&
+            workflow.Screens.Any(screen => screen.AppCode == "Ssalddel.WebApp" && screen.Route == "/community/group-purchase") &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(공동구매자동집단화UseCase) &&
                 useCase.PrimaryActors.Any(actor => actor.ActorCode == nameof(SsalddelActor.Orderer)) &&
                 useCase.Relations.Any(relation =>
@@ -230,8 +236,8 @@ public sealed class SsalddelApiVersionAttributeTests
                     relation.TargetUseCaseCode == "문서관리UseCase")) &&
             workflow.UseCases.Any(useCase => useCase.UseCaseCode == nameof(기사배차추천UseCase)));
         Assert.Contains(response.WorkflowRelations, relation =>
-            relation.SourceWorkflowName == "공동주문 수입" &&
-            relation.TargetWorkflowName == "국내 화물 운송" &&
+            relation.SourceWorkflowName == "공동구매 수요·모집" &&
+            relation.TargetWorkflowName == "공동주문 수입" &&
             relation.RelationKindName == "인계");
         Assert.Contains(response.OperatingSystems, operatingSystem =>
             operatingSystem.OperatingSystemCode == nameof(SsalddelOperatingSystem.DomesticCargoTransport) &&
@@ -255,6 +261,24 @@ public sealed class SsalddelApiVersionAttributeTests
             operatingSystem.SchedulingPolicies.Any(policy => policy.PolicyKindCode == nameof(SsalddelSchedulingPolicyKind.Sjf)) &&
             operatingSystem.SchedulingPolicies.Any(policy => policy.PolicyKindCode == nameof(SsalddelSchedulingPolicyKind.Affinity)));
         Assert.Contains(response.OperatingSystems, operatingSystem =>
+            operatingSystem.OperatingSystemCode == nameof(SsalddelOperatingSystem.GroupPurchaseDemand) &&
+            operatingSystem.CanonicalOperatingSystemId == OperatingSystemIds.GroupPurchaseDemand &&
+            operatingSystem.FeatureKey == VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow &&
+            !operatingSystem.IsEnabled &&
+            operatingSystem.Engines.Any(engine =>
+                engine.EngineCode == EngineFamilyIds.GroupPurchaseClustering &&
+                engine.RuntimeStatus == RuntimeCapabilityStatuses.Active &&
+                engine.ImplementationIds.Contains(EngineImplementationIds.GroupPurchaseClustering)) &&
+            operatingSystem.SchedulingPolicies.Any(policy =>
+                policy.PolicyKindCode == nameof(SsalddelSchedulingPolicyKind.Batching) &&
+                policy.RuntimeStatus == RuntimeCapabilityStatuses.Active) &&
+            operatingSystem.SchedulingPolicies.Any(policy =>
+                policy.PolicyKindCode == nameof(SsalddelSchedulingPolicyKind.Edf) &&
+                policy.RuntimeStatus == RuntimeCapabilityStatuses.Active) &&
+            operatingSystem.SchedulingPolicies.Any(policy =>
+                policy.PolicyKindCode == nameof(SsalddelSchedulingPolicyKind.Aging) &&
+                policy.RuntimeStatus == RuntimeCapabilityStatuses.Active));
+        Assert.Contains(response.OperatingSystems, operatingSystem =>
             operatingSystem.OperatingSystemCode == nameof(SsalddelOperatingSystem.PlatformOperations) &&
             operatingSystem.FeatureKey == string.Empty &&
             operatingSystem.IsEnabled &&
@@ -268,7 +292,7 @@ public sealed class SsalddelApiVersionAttributeTests
             capability.WorkflowCodes.Contains(nameof(SsalddelWorkflow.CommunityTrust)));
         Assert.Contains(response.PageCapabilities, capability =>
             capability.PageKey == "shipper-request" &&
-            capability.IntroducedVersion == "1.0" &&
+            capability.IntroducedVersion == "2.0" &&
             capability.HasExternalEffects &&
             capability.IsFeatureEnabled &&
             capability.FeatureKeys.Contains(VersionFeatureFlagKeys.DomesticTransportWorkflow));
@@ -295,7 +319,7 @@ public sealed class SsalddelApiVersionAttributeTests
             endpoint.EndpointKey == "화주운송의뢰Controller.의뢰생성" &&
             endpoint.Method == "POST" &&
             endpoint.RoutePattern == "api/v1/shipper/requests" &&
-            endpoint.ProductVersionName == "1.0" &&
+            endpoint.ProductVersionName == "2.0" &&
             endpoint.FeatureKey == VersionFeatureFlagKeys.DomesticTransportWorkflow &&
             endpoint.IsEnabled);
         Assert.Contains(response.ApiEndpoints, endpoint =>
@@ -463,7 +487,7 @@ public sealed class SsalddelApiVersionAttributeTests
 
         AddIfMissingWorkflow(typeof(공동구매해외선적추적Controller), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
         AddIfMissingWorkflow(typeof(공동구매커머스이행계획Controller), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
-        AddIfMissingWorkflow(typeof(공동구매자동집단화Controller), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
+        AddIfMissingWorkflow(typeof(공동구매자동집단화Controller), SsalddelWorkflow.GroupPurchaseDemand, missingWorkflow);
         AddIfMissingWorkflow(typeof(공동구매물류워크플로우Controller), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
         AddIfMissingWorkflow(typeof(주문자집단운영주체Controller), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
         AddIfMissingWorkflow(typeof(공동구매해외선적추적AdminController), SsalddelWorkflow.GroupPurchaseImport, missingWorkflow);
@@ -530,13 +554,26 @@ public sealed class SsalddelApiVersionAttributeTests
     }
 
     [Fact]
-    public void DomesticTransportApis_RemainVersionOne()
+    public void ProductWorkflowEntryPoints_FollowGroupPurchaseFirstRoadmap()
     {
-        var version = typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)
-            .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?.Version;
-
-        Assert.Equal(SsalddelProductVersion.V1_0, version);
+        Assert.Equal(
+            SsalddelProductVersion.V1_0,
+            VersionOf(typeof(공동구매자동집단화Controller)));
+        Assert.Equal(
+            SsalddelProductVersion.V1_5,
+            VersionOf(typeof(공동수입원장Controller)));
+        Assert.Equal(
+            SsalddelProductVersion.V2_0,
+            VersionOf(typeof(Ssalddel.Controllers.Shipper.Request01.화주운송의뢰Controller)));
+        Assert.Equal(
+            SsalddelProductVersion.V2_5,
+            VersionOf(typeof(WarehouseOperationsController)));
     }
+
+    private static SsalddelProductVersion? VersionOf(Type controllerType)
+        => controllerType
+            .GetCustomAttribute<SsalddelApiVersionAttribute>(inherit: true)?
+            .Version;
 
     private static IEnumerable<Type> GetControllerTypes()
     {
@@ -651,6 +688,7 @@ public sealed class SsalddelApiVersionAttributeTests
                 [VersionFeatureFlagKeys.DomesticTransportWorkflow] = true,
                 [VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow] = false,
                 [VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow] = false,
+                [VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow] = false,
                 [VersionFeatureFlagKeys.GroupPurchaseImportWorkflow] = false,
                 [VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow] = false,
                 [VersionFeatureFlagKeys.CommunityTrustWorkflow] = true,

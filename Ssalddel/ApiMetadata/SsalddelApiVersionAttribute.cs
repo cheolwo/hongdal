@@ -131,7 +131,8 @@ public enum SsalddelOperatingSystem
     FoodDelivery = 400,
     SsalddelMartUrbanLogistics = 500,
     CommunityTrust = 600,
-    PlatformOperations = 700
+    PlatformOperations = 700,
+    GroupPurchaseDemand = 800
 }
 
 public enum SsalddelSchedulingPolicyKind
@@ -158,7 +159,8 @@ public enum SsalddelWorkflow
     CommunityTrust = 600,
     HrParticipation = 700,
     FoodDelivery = 800,
-    SsalddelMart = 900
+    SsalddelMart = 900,
+    GroupPurchaseDemand = 1000
 }
 
 public enum SsalddelWorkflowRelationKind
@@ -274,6 +276,7 @@ public static class SsalddelOperatingSystemLabels
         {
             SsalddelOperatingSystem.DomesticCargoTransport => "국내 화물 운송 OS",
             SsalddelOperatingSystem.WarehouseCommerceFulfillment => "창고·커머스 이행 OS",
+            SsalddelOperatingSystem.GroupPurchaseDemand => "공동구매 수요·모집 OS",
             SsalddelOperatingSystem.GroupPurchaseImport => "공동주문 수입 OS",
             SsalddelOperatingSystem.FoodDelivery => "음식 배달 OS",
             SsalddelOperatingSystem.SsalddelMartUrbanLogistics => "알뜰살뜰 마트 도심 물류 OS",
@@ -314,6 +317,7 @@ public static class SsalddelWorkflowLabels
             SsalddelWorkflow.DomesticTransport => "국내 화물 운송",
             SsalddelWorkflow.WarehouseFulfillment => "창고 입출고",
             SsalddelWorkflow.CustomsAndTradeData => "통관·무역 데이터",
+            SsalddelWorkflow.GroupPurchaseDemand => "공동구매 수요·모집",
             SsalddelWorkflow.GroupPurchaseImport => "공동주문 수입",
             SsalddelWorkflow.SalesChannelFulfillment => "판매채널 출고",
             SsalddelWorkflow.CommunityTrust => "커뮤니티 신뢰",
@@ -361,20 +365,30 @@ public static class SsalddelOperatingSystems
                 new(SsalddelSchedulingPolicyKind.Priority, "ColdChainPriority", "냉장·냉동 우선", "출고예정", EngineFamilyIds.OutboundBatch, "온도 민감 상품과 보관 시간 제한이 있는 상품에 우선순위를 부여합니다.", "냉장·냉동 작업이 일반 작업을 계속 밀어내지 않도록 일반 작업 Aging 점수를 유지합니다.")
             ]),
         new(
+            SsalddelOperatingSystem.GroupPurchaseDemand,
+            SsalddelOperatingSystemLabels.GetLabel(SsalddelOperatingSystem.GroupPurchaseDemand),
+            "비구속 구매 의사를 품목·배송권·수령 조건별로 안전하게 모으고, 모집 진행과 마감을 조율하며, 사람의 확인을 거쳐 공급·무역 준비 단계로 인계합니다.",
+            [SsalddelWorkflow.GroupPurchaseDemand, SsalddelWorkflow.CommunityTrust],
+            [
+                new(EngineFamilyIds.GroupPurchaseClustering, "주문자 집단화 엔진", "상품, 배송권, 보관 온도와 물류 방식이 같은 수요를 결정적으로 묶고 배치·보류 이유를 반환합니다.")
+            ],
+            [
+                new(SsalddelSchedulingPolicyKind.Batching, "DemandClusterBatching", "수요 집단화 묶음", "비구속수요대기", EngineFamilyIds.GroupPurchaseClustering, "같은 상품, 배송권, 보관 온도와 물류 방식의 수요를 같은 모집 후보로 묶습니다.", "모집 마감이나 목표 미달 시 자동 확정하지 않고 보류 이유와 새 모집 회차 선택지를 표시합니다."),
+                new(SsalddelSchedulingPolicyKind.Edf, "RecruitmentDeadlineEdf", "모집 마감 임박 검토", "모집중", EngineFamilyIds.GroupPurchaseClustering, "모집 종료가 가까운 집단을 재계산·안내 대상으로 먼저 올립니다.", "마감 임박을 참여자 차별이나 자동 구매 확정 근거로 사용하지 않습니다."),
+                new(SsalddelSchedulingPolicyKind.Aging, "DemandRecruitmentAging", "장기 모집 정체 보정", "모집중", EngineFamilyIds.GroupPurchaseClustering, "오래 정체된 모집을 운영자 검토와 추가 모집 안내 대상으로 올립니다.", "효율이 낮은 참여자를 제외하지 않고 더 넓은 모집권, 다른 시간창 또는 수령 방식을 제안합니다.")
+            ]),
+        new(
             SsalddelOperatingSystem.GroupPurchaseImport,
             SsalddelOperatingSystemLabels.GetLabel(SsalddelOperatingSystem.GroupPurchaseImport),
-            "주문자 수요를 모으고 해외 선적, 통관, 보세구역 반출, 국내 3PL 입고 또는 세대 배송까지 이어지는 공동주문 실행을 조정합니다.",
+            "확인된 공동구매 모집 결과를 공급·무역 준비 원장으로 받아 해외 선적, 통관, 보세구역 반출, 국내 3PL 입고 또는 세대 배송 인계를 조정합니다.",
             [SsalddelWorkflow.GroupPurchaseImport, SsalddelWorkflow.CustomsAndTradeData, SsalddelWorkflow.WarehouseFulfillment, SsalddelWorkflow.DomesticTransport, SsalddelWorkflow.CommunityTrust],
             [
-                new(EngineFamilyIds.GroupPurchaseClustering, "집단화 엔진", "같은 상품과 배송권 안의 수요를 자동으로 묶습니다."),
                 new(EngineFamilyIds.OutboundBatch, "출고 배치 엔진", "국내 3PL 입고 뒤 판매나 재출고가 필요한 물량을 창고 기준으로 조정합니다."),
                 new(EngineFamilyIds.TransportRequestDispatch, "운송 의뢰 배차 엔진", "보세구역 반출 뒤 3PL 입고 운송 또는 세대 직배송을 조정합니다.")
             ],
             [
-                new(SsalddelSchedulingPolicyKind.Batching, "DemandClusterBatching", "수요 집단화 묶음", "구매의사대기", EngineFamilyIds.GroupPurchaseClustering, "같은 상품, 같은 배송권, 비슷한 수령 조건을 가진 주문자 수요를 묶습니다.", "모집 기간이 끝났거나 최소 수량에 못 미치면 보류·환불·단독 구매 후보로 전환합니다."),
                 new(SsalddelSchedulingPolicyKind.Priority, "CustomsReadyPriority", "통관·반출 가능 우선", "수입반출대기", EngineFamilyIds.TransportRequestDispatch, "통관 완료, 반출 가능 시각 확정, BL/AWB 확인 완료 건을 국내 운송 후보로 우선 올립니다.", "통관 지연 건은 장기 보류 알림과 운영자 확인 큐로 분리합니다."),
-                new(SsalddelSchedulingPolicyKind.Edf, "BondedReleaseEdf", "보세구역 반출 마감 우선", "수입반출대기", EngineFamilyIds.TransportRequestDispatch, "보세구역 반출 가능 시간창과 보관 비용 증가 시점을 기준으로 우선순위를 계산합니다.", "마감 임박 건만 계속 선점하지 않도록 집단별 비용 부담과 Aging을 같이 반영합니다."),
-                new(SsalddelSchedulingPolicyKind.Aging, "GroupPurchaseAging", "공동주문 장기 대기 보정", "공동주문원장", EngineFamilyIds.GroupPurchaseClustering, "모집, 통관, 반출, 분배 단계에서 오래 머문 원장의 운영 우선순위를 높입니다.", "장기 정체 원장은 투표, 운영자 승인, 환불 후보로 전환합니다.")
+                new(SsalddelSchedulingPolicyKind.Edf, "BondedReleaseEdf", "보세구역 반출 마감 우선", "수입반출대기", EngineFamilyIds.TransportRequestDispatch, "보세구역 반출 가능 시간창과 보관 비용 증가 시점을 기준으로 우선순위를 계산합니다.", "마감 임박 건만 계속 선점하지 않도록 집단별 비용 부담과 Aging을 같이 반영합니다.")
             ]),
         new(
             SsalddelOperatingSystem.FoodDelivery,
@@ -443,6 +457,7 @@ public static class SsalddelOperatingSystems
         {
             SsalddelOperatingSystem.DomesticCargoTransport => OperatingSystemIds.DomesticCargoTransport,
             SsalddelOperatingSystem.WarehouseCommerceFulfillment => OperatingSystemIds.WarehouseCommerceFulfillment,
+            SsalddelOperatingSystem.GroupPurchaseDemand => OperatingSystemIds.GroupPurchaseDemand,
             SsalddelOperatingSystem.GroupPurchaseImport => OperatingSystemIds.GroupPurchaseImport,
             SsalddelOperatingSystem.FoodDelivery => OperatingSystemIds.FoodDelivery,
             SsalddelOperatingSystem.SsalddelMartUrbanLogistics => OperatingSystemIds.SsalddelMartUrbanLogistics,
@@ -528,6 +543,16 @@ public static class SsalddelWorkflowRelations
     private static readonly IReadOnlyList<SsalddelWorkflowRelation> Items =
     [
         new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            SsalddelWorkflow.GroupPurchaseImport,
+            SsalddelWorkflowRelationKind.HandsOffTo,
+            "목표를 충족한 모집도 자동 주문으로 확정하지 않고, 참여 의사와 공급 조건을 사람이 확인한 뒤 공급·무역 준비로 인계합니다."),
+        new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            SsalddelWorkflow.CommunityTrust,
+            SsalddelWorkflowRelationKind.PublishesSignalTo,
+            "공동구매 모집, 참여자 수, 목표 수량과 진행 상태를 개인정보 보호 범위 안에서 커뮤니티 신호로 보냅니다."),
+        new(
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.CustomsAndTradeData,
             SsalddelWorkflowRelationKind.References,
@@ -586,7 +611,7 @@ public static class SsalddelWorkflowRelations
             SsalddelWorkflow.GroupPurchaseImport,
             SsalddelWorkflow.CommunityTrust,
             SsalddelWorkflowRelationKind.PublishesSignalTo,
-            "공동주문 모집, 투표, 진행 상태, 분배 후기를 개인정보 보호 범위 안에서 커뮤니티 신호로 보냅니다."),
+            "공급·무역 준비와 분배 후기를 개인정보 보호 범위 안에서 커뮤니티 신호로 보냅니다."),
         new(
             SsalddelWorkflow.SalesChannelFulfillment,
             SsalddelWorkflow.CommunityTrust,
@@ -655,6 +680,24 @@ public static class SsalddelWorkflowParticipants
             "플랫폼 운영자",
             false,
             "공공 데이터 조회 결과와 내부 원장을 연결합니다."),
+        new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            "Orderer",
+            "주문자",
+            true,
+            "비구속 구매 의사와 희망 수량·수령 조건을 등록·변경·철회합니다."),
+        new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            "OrdererGroupLeader",
+            "주문자 집단 대표",
+            false,
+            "모집 목표와 조건을 제안하고 목표 충족 뒤 다음 단계 인계 여부를 함께 확인합니다."),
+        new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            "PlatformOperator",
+            "플랫폼 운영자",
+            false,
+            "집단화 정책, 모집 마감, 보류와 인계 예외를 관리합니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             "OrdererGroupLeader",
@@ -753,6 +796,7 @@ public static class SsalddelWorkflowParticipants
             SsalddelWorkflow.DomesticTransport => "운송 의뢰가 배차되어 상차, 하차, 증빙, 정산 후보 상태까지 진행되는 범위를 책임집니다.",
             SsalddelWorkflow.WarehouseFulfillment => "물품이 창고에 들어온 뒤 재고화되고 출고 가능 상태가 되거나 출고 배치로 넘어가는 범위를 책임집니다.",
             SsalddelWorkflow.CustomsAndTradeData => "수출입 판단에 필요한 공공 데이터, HS 코드, 통관 상태, 관세사 검토 정보를 제공하는 범위를 책임집니다.",
+            SsalddelWorkflow.GroupPurchaseDemand => "비구속 구매 의사를 결정적 기준으로 묶고 모집 진행·마감·철회를 반영하며, 사람의 확인 전에는 주문·결제·계약을 만들지 않는 범위를 책임집니다.",
             SsalddelWorkflow.GroupPurchaseImport => "주문자 집단이 해외 상품을 공동으로 들여와 통관, 국내 반출, 분배 또는 3PL 입고로 넘기는 범위를 책임집니다.",
             SsalddelWorkflow.SalesChannelFulfillment => "상품을 판매채널에 출품하고 주문을 창고 출고 또는 운송 인계로 연결하는 범위를 책임집니다.",
             SsalddelWorkflow.CommunityTrust => "업무 활동에서 공개 가능한 신뢰 신호, 후기, 투표, 관계 기록을 개인정보 보호 범위 안에서 다루는 책임을 가집니다.",
@@ -864,6 +908,22 @@ public static class SsalddelWorkflowScreens
             "HS 코드 운영",
             "/customs/hs-codes",
             "운영자가 HS 코드 데이터와 통관 보정 정보를 관리합니다."),
+        new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            "Orderer",
+            "Ssalddel.WebApp",
+            "통합 웹앱",
+            "공동구매 수요·모집",
+            "/community/group-purchase",
+            "주문자가 공개 모집을 확인하고 본인의 비구속 수요를 등록·변경·철회합니다."),
+        new(
+            SsalddelWorkflow.GroupPurchaseDemand,
+            "Orderer",
+            "OrdererApp",
+            "주문자 앱",
+            "공동구매 의사 표시·집단화",
+            "/group-purchase",
+            "주문자가 저장 전 집단화 미리보기와 모집 진행 상태를 확인합니다."),
         new(
             SsalddelWorkflow.GroupPurchaseImport,
             "Orderer",

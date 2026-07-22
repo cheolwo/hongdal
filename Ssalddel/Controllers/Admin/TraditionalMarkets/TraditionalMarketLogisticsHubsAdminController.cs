@@ -13,10 +13,10 @@ namespace Ssalddel.Controllers.Admin.TraditionalMarkets;
 [Authorize(Policy = "서버관리자전용")]
 [SsalddelApiVersion(
     SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    FeatureKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [Route("api/v1/admin/traditional-market-logistics-hubs")]
 public sealed class TraditionalMarketLogisticsHubsAdminController : ControllerBase
 {

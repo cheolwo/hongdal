@@ -12,10 +12,10 @@ namespace Ssalddel.Controllers.Common;
 [AllowAnonymous]
 [SsalddelApiVersion(
     SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    FeatureKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [Route("api/v1/traditional-market-logistics-hubs")]
 public sealed class TraditionalMarketLogisticsHubsController : ControllerBase
 {

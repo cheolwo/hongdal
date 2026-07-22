@@ -1,10 +1,10 @@
 ﻿# 워크플로우 앱 화면 지도
 
-이 문서는 살뜰의 워크플로우가 실제 앱 화면에서 어떻게 성립되는지 정리한다. 중심은 살뜰 1.0 국내 화물/용달 운송이다. 다른 워크플로우는 독립적으로 펼쳐 놓기보다, 어떤 상태에서 국내 운송으로 합류하고 기사님 화면에 어떤 의뢰로 보이는지를 기준으로 읽는다.
+이 문서는 살뜰의 워크플로우가 실제 앱 화면에서 어떻게 성립되는지 정리한다. 현재 제품 중심은 1.5 공급·가격·무역 준비이고, 1.0 주문자 집단을 입력으로 사용한다. 이 문서에 남은 기존 운송 화면 지도는 2.0 운송 이행 자산으로 읽는다.
 
 기본 정책은 [workflow-api-policy.md](workflow-api-policy.md)를 따른다. 이 문서는 그 정책을 화면, 앱, 부족한 페이지 후보 관점으로 풀어쓴다.
 
-살뜰 1.0을 실제로 닫기 위한 필수 화면 체크리스트는 [살뜰 1.0 필수 페이지 기준](ssalddel-v1-required-pages.md)에 둔다. 이 문서는 여러 워크플로우가 앱 화면 사이에서 어떻게 이어지는지를 설명하고, 필수 페이지 기준 문서는 그중 1.0 국내 화물/용달 운송을 완성하는 화면 단위를 고정한다.
+운송 이행을 닫기 위한 기존 체크리스트는 레거시 파일명인 [운송 필수 페이지 기준](ssalddel-v1-required-pages.md)에 둔다. 해당 문서의 제품 범위는 이제 2.0이며, 1.0 공동구매 화면 기준은 [공동구매 집중 로드맵](../Versions/v0.0/focus-roadmap.md)을 따른다.
 
 ## 읽는 방법
 
@@ -18,7 +18,7 @@
 
 ## 문서의 중심축
 
-가장 먼저 닫아야 할 화면 흐름은 `SsalddelApp` 운송 의뢰, `SsalddelAdmin` 배차 대기, `DriverApp` 추천/수락/상차/하차, `SsalddelAdmin` 운송·증빙·정산 관리다.
+아래 흐름은 2.0에서 닫아야 할 운송 화면 자산이다. 현재 1.5에서는 1.0 수요 집단에 공급자·가격·HSK/HTS·국가별 검토 원장을 연결하되 실제 운송은 열지 않는다.
 
 ```mermaid
 flowchart TD
@@ -49,11 +49,11 @@ flowchart TD
 | `SsalddelAdmin` | 플랫폼 운영자 | 배차 대기, 운송 진행, 기사/화주 관리, 문서, 정산, HS 코드, HR, 운영 정책 |
 | `Ssalddel.WebApp` | 관세사, 화주, 판매자 | 통관·무역 데이터 검토와 보정의 사용자 접점 |
 
-## 1.0 중심 연결 그림
+## 2.0 운송 연결 그림
 
 ```mermaid
 flowchart LR
-    Core["살뜰 1.0 국내 화물/용달 운송<br/>기사 추천 → 수락 → 상차 → 하차 → 증빙 → 정산"]
+    Core["살뜰 2.0 국내 화물/용달 운송<br/>기사 추천 → 수락 → 상차 → 하차 → 증빙 → 정산"]
     Shipper["SsalddelApp<br/>일반 화주 운송 의뢰"]
     Group["OrdererApp<br/>공동주문 수입"]
     Customs["Ssalddel.WebApp / SsalddelAdmin<br/>통관·HS 판단"]
@@ -88,10 +88,10 @@ flowchart LR
 | 1 | 기사 수락 | `DriverApp` `/driver/recommendations/{의뢰Id}/decision` | `SsalddelApp` 운송 의뢰 상세, `SsalddelAdmin` `/transports`, `DriverApp` `/driver/transports/current` | 추천 상태가 진행 중 운송 상태로 바뀐다. |
 | 1 | 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `SsalddelAdmin` `/documents`, `SsalddelApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
 | 1 | 현장 예외 신고 | `DriverApp` `/driver/transports/{운송Id}/pickup`, `/driver/transports/{운송Id}/dropoff`, `/driver/transports/current` | `SsalddelAdmin` `/transports`, `SsalddelApp` 운송 의뢰 상세 후보 | 상차물건없음, 수량불일치, 담당자부재, 하차지부재, 증빙업로드실패 같은 상황이 단계와 예외코드로 남고 다음 행동 안내가 내려간다. |
-| 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `SsalddelAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
+| 2 | 공동주문 운송 방식 확정 | 향후 전용 Action route. 현재 `OrdererApp` `/group-purchase`는 화면 색인만 담당 | `SsalddelAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택은 1.0 비구속 수요 화면과 분리해야 한다. |
 | 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `SsalddelApp` `/shipper/warehouse/inventory`, `SsalddelApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매 주문 원장의 출고 가능 투영으로 전파된다. |
 | 2 | 판매채널 주문 출고 배치 | 향후 운영 Action route. 현재 `SsalddelApp` `/shipper/sales/fulfillment`는 로컬 Simulation | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 운영 준비 전에는 외부 주문·재고·운송 상태를 변경하지 않고 피킹/포장 흐름만 검증한다. |
-| 3 | 통관 상태 보정 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `SsalddelApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
+| 3 | 통관 상태 보정 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase/import-review/{ProductId}`, `SsalddelApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
 | 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `SsalddelAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
 
 ### 국내 운송 상태 전파
@@ -157,14 +157,14 @@ sequenceDiagram
 
 ### 공동주문 수입 통관완료 후 기사 추천으로 이어지는 흐름
 
-공동주문 수입이 국내 보세구역에 들어온 뒤에는 새 운송 워크플로우를 따로 만들기보다, 살뜰 1.0 국내 화물/용달 운송 흐름으로 합류한다. 이때 주문자 집단이 법적 화주가 아닐 수 있으므로 운송 의뢰 주체는 플랫폼으로 두고, 비용 부담과 정산 범위는 주문자 집단으로 남긴다.
+공동주문 수입이 국내 보세구역에 들어온 뒤에는 새 운송 워크플로우를 따로 만들기보다, 살뜰 2.0 국내 화물/용달 운송 흐름으로 합류한다. 운송 의뢰 주체와 비용 부담·정산 범위는 실제 계약과 책임 주체를 확인해 별도로 기록한다.
 
 ```mermaid
 sequenceDiagram
     participant Orderer as OrdererApp /group-purchase
     participant ImportLedger as 공동주문 수입 원장
     participant Admin as SsalddelAdmin 공동주문 운영
-    participant Dispatch as 살뜰 1.0 배차대기
+    participant Dispatch as 살뜰 2.0 배차대기
     participant DriverList as DriverApp 추천목록
     participant DriverDetail as DriverApp 추천상세
 
@@ -213,7 +213,7 @@ sequenceDiagram
 
 ## 국내 화물 운송
 
-국내 화물 운송은 살뜰 1.0에서 시작한 핵심 실행 워크플로우다. 공동주문 수입, 창고 입출고, 판매채널 출고, 음식 배달, 알뜰살뜰 마트도 실제 상차와 하차가 필요하면 이 흐름으로 합류한다.
+국내 화물 운송은 살뜰 2.0의 실행 워크플로우다. 공동구매·수입, 창고 입출고, 판매채널 출고, 음식 배달, 알뜰살뜰 마트도 실제 상차와 하차가 필요하면 이 흐름으로 합류한다.
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
@@ -254,7 +254,8 @@ sequenceDiagram
 
 | 참여자 | 현재 화면 | 주요 API |
 | --- | --- | --- |
-| 주문자, 주문자 집단 대표 | `OrdererApp` `/group-purchase` | `api/v1/orderer/group-purchase-logistics-workflows`, `api/v1/orderer/group-purchase-overseas-shipments` |
+| 주문자 | `OrdererApp` `/group-purchase/products` 카드 원클릭 집단화, 상품 근거와 상세 조건 route | `group-purchase-auto-groups/placement-preview`, `group-purchase-auto-groups/demands/{DemandSourceKey}`, 배송권 resolve API |
+| 주문자, 주문자 집단 대표 | `OrdererApp` `/group-purchase/import-review/{ProductId}`, `/group-purchase/shipments` | `api/v1/orderer/group-purchase-logistics-workflows`, `api/v1/orderer/group-purchase-overseas-shipments` |
 | 주문자 | `OrdererApp` `/orders` | 공동주문 상태와 개인 주문 확인 |
 | 플랫폼 운영자 | `SsalddelAdmin` `/dashboard`, `/documents`, `/activity-logs` | `api/v1/admin/orderer/group-purchase-*`, `api/v1/admin/documents` |
 | 관세사 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | `api/v1/customs`, `api/v1/admin/hs-codes` |
@@ -264,7 +265,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A["OrdererApp: 공동주문 생성/참여"] --> B["공동주문 원장"]
+    A["OrdererApp: 재료 카드 클릭<br/>배치 미리보기 → 비구속 참여"] --> B["공동주문 원장"]
     B --> C{"판매자 출처"}
     C -->|국내| D["국내 판매자 포장/상차 인계"]
     C -->|해외| E["해외 판매자 또는 배송대행지<br/>BL/AWB, 문서관리번호 등록"]
@@ -348,7 +349,7 @@ flowchart LR
 | 화주·판매자 | `SsalddelApp` `/shipper/customs/hs-reviews`, `/shipper/international/fcl-lcl` | HS 코드 검토, FCL/LCL 판단 |
 | 관세사 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | 관세사 검토와 보정 |
 | 플랫폼 운영자 | `SsalddelAdmin` `/customs/hs-codes` | HS 코드 운영 |
-| 주문자 | `OrdererApp` `/group-purchase` | 공동수입 상태와 예상 단가 확인 |
+| 주문자 | `OrdererApp` `/group-purchase/import-review/{ProductId}`, `/group-purchase/shipments` | 공동수입 예상 단가와 문서관리번호별 선적 상태를 서로 다른 화면에서 확인 |
 
 보완 후보:
 
@@ -433,7 +434,7 @@ flowchart LR
 
 | 순위 | 보완 항목 | 이유 |
 | --- | --- | --- |
-| 1 | `DriverApp` 추천 상세의 업무 유형 강화 | 살뜰 1.0의 첫 판단 화면이다. 일반 화물, 공동주문 세대 배송, 음식, 마트 배송은 기사 책임 범위가 다르다. |
+| 1 | `DriverApp` 추천 상세의 업무 유형 강화 | 살뜰 2.0 운송의 첫 판단 화면이다. 일반 화물, 공동주문 세대 배송, 음식, 마트 배송은 기사 책임 범위가 다르다. |
 | 2 | `DriverApp` 상차·하차 증빙 화면 강화 | 기사님 운행 흐름에서 실제 법적·정산 증빙이 닫히는 지점이다. 인수증, 사진, 서명, 생략 사유가 안정적으로 남아야 한다. |
 | 3 | `SsalddelAdmin` 국내 운송 운영 보드 | 배차 대기, 진행 중, 상차 완료, 하차 완료, 정산 후보를 1.0 중심 상태로 먼저 볼 수 있어야 한다. |
 | 4 | 공동주문 수입 원장 콘솔 | BL/AWB, 통관, 보세구역, 국내 운송, 3PL 입고가 하나의 원장으로 이어져야 한다. |

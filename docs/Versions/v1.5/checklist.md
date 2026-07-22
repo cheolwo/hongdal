@@ -1,23 +1,24 @@
-﻿# Ssalddel 1.5 Checklist
+# Ssalddel 1.5 Checklist
 
-- [ ] 입고 업무 시작 화면 확인
-- [ ] 휴대폰 뒤 8자리 작업자 확인 흐름 확인
-- [ ] 입고 작업대 바코드 확인 흐름 확인
-- [ ] 상품 바코드 스캔과 입고 예정 매칭 확인
-- [ ] 현장 임시 입고 편입 흐름 확인
-- [ ] 검수와 적재 위치 기록 확인
-- [ ] 단일 상품 주문이 가까운 창고 또는 최적 창고 출고 배치로 계획되는지 확인
-- [ ] 복수 상품 주문이 한 창고에서 충족되지 않을 때 복수 창고 분할 출고 계획으로 전환되는지 확인
-- [ ] 출고 창고 선택 시 주문자 주소와 창고의 배송권, 거리, 예상 운송비가 반영되는지 확인
-- [ ] `StorageOnly` 입고상품은 판매채널 출고 후보에서 제외되는지 확인
-- [ ] `ConsignmentSale`, `MarketFulfillment`, `ImportCustomsFulfillment` 입고상품은 출고 후보로 사용되는지 확인
-- [ ] 판매상품에 연결된 선호 입고상품이 후보 점수에 반영되는지 확인
-- [ ] 재고 부족 라인이 `UnallocatedLines`에 사유와 함께 반환되는지 확인
-- [ ] 판매채널 주문 동기화가 `채널출품 -> 판매상품 -> 입고상품` 매핑 후 `출고예정`을 생성하는지 확인
-- [ ] 주문 결제 완료 후 창고 출고 알림 확인
-- [ ] 플랫폼 참여 주문자 자동 입고 예정 생성 확인
-- [ ] 외부 주문자에게 불필요한 입고 알림이 가지 않는지 확인
-- [ ] 창고 출고 연계 운송이 화물/용달 배차와 연결되는지 확인
-- [ ] 내부 테스트 또는 1.5 릴리즈에서 `WarehouseV15=true` 확인
-- [ ] `CustomsHsV20`, `OrdererGroupOrderV25`, `FoodDeliveryV30`, `SsalddelMartV35` 기본 비활성 확인
-- [ ] [공통 릴리즈 게이트](../release-gates.md) 통과 확인
+- [x] 공급자·기업 자료마다 원출처, 확인 시각과 식별 근거가 있습니다.
+- [x] 견적에 통화, 단위, MOQ, 납기, 포장, Incoterms 후보와 유효기간이 있습니다.
+- [x] 상품·국제 운송보험·관세·세금·국내 이행 예상비가 분리됩니다.
+- [x] HSK·HTSUS 후보에 분류 근거, 신뢰도와 검토 상태가 있습니다.
+- [x] 한국 MFDS와 미국 수입 검토 항목을 국가별로 분리합니다.
+- [x] 판매자·수입자·관세사·플랫폼 책임이 원장에 구분됩니다.
+- [x] 미확인 규제·계약 항목이 완료로 표시되지 않습니다.
+- [x] 실제 신고, 계약 서명, 결제와 운송 지시는 실행하지 않습니다.
+- [x] 핵심 API·화면 메타데이터와 독립 솔루션이 제품 버전 `1.5`를 사용합니다.
+
+## 검증 근거
+
+- 계약·평가 정책: `Ssalddel.Contracts/Common/Orderer/공동수입준비원장Dtos.cs`
+- 승인 인계·멱등·Revision 영속 흐름: `Ssalddel/Services/Orderer/공동수입준비원장Service.cs`
+- 원천·대상 양방향 추적: `Ssalddel/Services/Orderer/공동구매수요모집OS.cs`, `Ssalddel/Services/Orderer/공동구매자동집단화저장소.cs`
+- 관리자·기능 플래그 경계: `Ssalddel/Controllers/Admin/Orderer/공동수입준비원장AdminController.cs`
+- 공식 근거 읽기 화면: `OrdererApp/Components/GroupPurchase/GroupPurchaseTradeReadinessEvidencePanel.razor`
+- 관리자 작성·검토 화면: `Ssalddel.Ui.Common/Areas/BackOffice/Components/공동수입준비관리작업대.razor`
+- 독립 릴리스 구성: `Ssalddel.v1.5.slnx`, `.github/workflows/release-readiness.yml`
+- 자동 검증: 서비스·컨트롤러·기능 플래그·화면 조립·솔루션 구성 테스트
+
+체크 완료는 **기술적 Simulation 계약의 완결**을 뜻합니다. 실제 수입 적격성, 품목분류, 법률·인허가, 계약 또는 운영 승인을 뜻하지 않습니다.

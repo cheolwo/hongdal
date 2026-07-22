@@ -2,7 +2,7 @@
 
 이 폴더는 루트 `README.md`에서 덜어낸 상세 문서를 모아 둡니다. 처음에는 기술 구조보다 **현재 존재하는 화면과 캡처**를 먼저 봅니다.
 
-루트 README는 현재 집중 제품인 커뮤니티 0.0의 의도와 대표 화면을 먼저 보여 주고, 1.0 이후 실행 모듈은 확장 방향으로 구분합니다. 이 폴더에서는 글쓰기에서 가원장과 공동행동으로 이어지는 통합 클라이언트를 먼저 보고, 코드 프로젝트별 화면과 기술 설명을 뒤에서 확인합니다.
+루트 README는 0.0 커뮤니티·공공데이터 기반, 1.0 공동구매·주문자 집단화와 현재 1.5 공급·무역 준비 흐름을 먼저 보여 줍니다. 이 폴더에서는 글쓰기와 음식·재료 탐색에서 준비 원장으로 이어지는 통합 클라이언트를 먼저 보고, 코드 프로젝트별 화면과 기술 설명을 뒤에서 확인합니다.
 
 ## 화면으로 먼저 보기
 
@@ -44,8 +44,8 @@
 | 02 | [unified-community-client.md](unified-community-client.md) | 통합 홈, 역할, 모바일 다이어그램, 사방 이동, 꾸미기 상점 |
 | 03 | [ThreeStageClientNavigation.md](../Architecture/ThreeStageClientNavigation.md) | 사방괘 → 다이어그램 → 구체 데이터 페이지의 사용자 화면 구조 |
 | 04 | [app-page-catalog.md](app-page-catalog.md) | 코드 프로젝트에 실제로 선언된 `@page` 화면 전체 카탈로그와 인라인 캡처 |
-| 05 | [ssalddel-v1-required-pages.md](ssalddel-v1-required-pages.md) | 살뜰 1.0 운송 흐름을 성립시키기 위해 필요한 화주, 기사, 관리자 화면 |
-| 06 | [ssalddel-v1-page-validation-walkthrough.md](ssalddel-v1-page-validation-walkthrough.md) | 1.0 필수 페이지를 하나씩 검증하는 순례 순서와 확인 항목 |
+| 05 | [ssalddel-v1-required-pages.md](ssalddel-v1-required-pages.md) | 레거시 파일명으로 보존된 살뜰 2.0 운송 흐름의 화주, 기사, 관리자 화면 |
+| 06 | [ssalddel-v1-page-validation-walkthrough.md](ssalddel-v1-page-validation-walkthrough.md) | 레거시 파일명으로 보존된 2.0 운송 페이지 검증 순서와 확인 항목 |
 | 07 | [ssalddel-v1-render-capture-summary.md](ssalddel-v1-render-capture-summary.md) | 실제 화면 캡처 방식, 렌더링 확인 결과, 남은 검증 항목 |
 | 08 | [workflow-app-screen-map.md](workflow-app-screen-map.md) | 여러 코드 프로젝트의 화면이 하나의 업무 흐름을 완성하는 관계를 설명 |
 | 09 | [screen-flows.md](screen-flows.md) | 화면의 버튼, 노드 행동, 모드 전환이 다음 행동으로 이어지는 흐름 |
@@ -78,7 +78,7 @@
 
 ## 관리 원칙
 
-1. 루트 README에는 커뮤니티 0.0의 제품 의도와 대표 화면을 먼저 두고, 1.0 이후 화면은 확장 모듈로 구분한다.
+1. 루트 README에는 커뮤니티 0.0 기반과 1.0 공동구매의 제품 의도·대표 화면을 먼저 두고, 1.5 이후 화면은 후속 모듈로 구분한다.
 2. 화면별 README와 전체 페이지 카탈로그를 첨부 문서의 앞순위에 둔다.
 3. OS, 엔진, AI, API 같은 기술 설명은 뒤쪽 참고 문서로 둔다.
 4. 새 화면을 추가하면 `app-page-catalog.md`, `page-docs/`, 캡처 이미지부터 갱신한다.

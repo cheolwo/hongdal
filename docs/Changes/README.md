@@ -6,9 +6,11 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [공동구매 수요·모집 OS 분리](2026-07-22-group-purchase-demand-os.md) | 화면 없음 — 1.0 수요 변경·마감·Aging·검토 큐·사람 승인 인계를 실제 원장 조율 OS로 구현하고 1.5 외부 실행은 분리 |
 | 2026-07-22 | [음식·재료 탐색에서 비구속 수요 등록까지](2026-07-22-food-ingredient-nonbinding-demand.md) | 공개 재료 근거를 유지하는 독립 수요 Route와 Web·모바일 공용 Screen을 추가하고 로그인 저장·철회, 주문·결제·운송 비실행 경계를 desktop·390px에서 실제 확인 |
-| 2026-07-22 | [공동구매 비구속 수요 수명주기](2026-07-22-group-purchase-demand-lifecycle.md) | 화면 없음 — 익명 집단 탐색과 인증된 멱등 수요 저장·변경·철회, 소유권 검증, 철회 수요 집계 제외를 서버에 구현 |
 | 2026-07-22 | [Warehouse 플랫폼 Home·커뮤니티 Route 단일책임 분리](2026-07-22-warehouse-platform-home-srp.md) | 공용 `CommunityWorkspaceScreen` 기반 Home에는 사방괘·업무 허브만 남기고 게시판 목록·개설 신청·글쓰기·상세·원장·다이어그램을 독립 Route로 분리, desktop·561px 실제 확인 |
+| 2026-07-22 | [공동구매 비구속 수요 수명주기](2026-07-22-group-purchase-demand-lifecycle.md) | 화면 없음 — 익명 집단 탐색과 인증된 멱등 수요 저장·변경·철회, 소유권 검증, 철회 수요 집계 제외를 서버에 구현 |
+| 2026-07-22 | [공동구매 우선 제품 버전 재정렬](2026-07-22-group-purchase-first-version-roadmap.md) | 화면 구조 변경 없음 — 1.0 공동구매, 1.5 공급·무역 준비, 2.0 운송, 2.5 창고·판매 이행으로 코드·문서 메타데이터 정렬 |
 | 2026-07-22 | [Azure Blob 기반 객체 저장소 전환](2026-07-22-azure-object-storage.md) | 화면 없음·간접 확인 — 공개 게시글 이미지와 비공개 증빙·음성의 저장 경계를 분리하고 기존 첨부 UI를 유지한 채 Azure Managed Identity 기반 Blob 저장으로 전환 |
 | 2026-07-22 | [사방괘 기본 목적지 Navigation 계약 정렬](2026-07-22-bagua-navigation-contract.md) | 화면 없음·간접 확인 — 공용 사방괘의 판매·창고·운송·합의 링크를 Web·모바일 공통 route 계약과 실제 제공 Route Page로 정렬 |
 | 2026-07-22 | [다이어그램 노드 앱별 Navigation Adapter](2026-07-22-diagram-node-navigation-adapter.md) | Web·메인·창고·기사·주문 앱이 실제 제공 화면만 열고 미지원 node는 비활성 안내와 원장 문맥을 유지하도록 분리, 실제 MAUI Windows 확인 |
@@ -27,6 +29,7 @@
 | 2026-07-22 | [다이어그램 Route·공용 Screen 단일책임 분리](2026-07-22-diagram-route-screen-srp.md) | Web·모바일 `/diagram`을 공용 Screen으로 통합하고 desktop sidebar·mobile bottom sheet, 선택 node·zoom·filter·출발 page 복원을 실제 확인 |
 | 2026-07-22 | [공동구매 Route·공용 Screen 단일책임 분리](2026-07-22-group-purchase-route-screen-srp.md) | 목록·개설·stable-ID 상세와 참여·협의·이의·결의·서명·이행 화면을 Web·모바일 공용 Screen으로 분리, desktop·390px 실제 확인 |
 | 2026-07-22 | [커뮤니티 Route·공용 Screen 단일책임 분리](2026-07-22-community-route-screen-srp.md) | 작업공간·게시판 관리·원장 초안·글쓰기·추천 목록·추천 상세·영속 글 상세를 독립 Route Page와 공용 Screen으로 분리, desktop·390px 핵심 route 확인 |
+| 2026-07-22 | [창고 입고상품 수령 화면 단일책임 분리](2026-07-22-inbound-receiving-srp.md) | 438줄 화면을 43줄 shell과 상태·검색·후보·현장 요청·정확한 저장 결과 책임으로 분리, 실제 재캡처 대기 |
 | 2026-07-22 | [구매 근거를 잇는 상품 상세·판매 초안 UI](2026-07-22-purchase-evidence-ui.md) | 완료 원장·공개 후기 근거를 마트 상품 상세와 판매 초안에 비식별로 표시하고 실제 판매 초안 desktop 렌더링 검증 |
 | 2026-07-22 | [공식 재료·가격·레시피에서 공동구매 초안까지](2026-07-22-official-ingredient-journey.md) | 실제 KAMIS 가격과 식약처 관련 레시피를 재료별로 표시하고 비식별 근거만 공동구매 초안으로 연결, desktop 렌더링 검증 |
 | 2026-07-22 | [도심 생활물류센터 창고 Profile 계층](2026-07-22-urban-logistics-profile.md) | 간접 확인 — 일반 창고 기능을 상속하는 도심 생활물류센터와 마트·공동주택 파생 Profile 조립 |

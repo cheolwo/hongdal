@@ -5,7 +5,7 @@ using Ssalddel.ApiMetadata;
 
 namespace Ssalddel.Controllers.Security;
 
-[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
 [ApiController]
 [Route("api/v1/security/isms-p/transport")]
 public sealed class IsmsPTransportProtectionController : ControllerBase

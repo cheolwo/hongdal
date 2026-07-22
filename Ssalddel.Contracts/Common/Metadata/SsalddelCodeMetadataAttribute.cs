@@ -5,6 +5,8 @@ namespace Ssalddel.Contracts.Common.Metadata;
 public static class SsalddelCodeFeatureKeys
 {
     public const string CommunityAuthoringImage = "community-authoring-image";
+    public const string GroupPurchaseDemandOperatingSystem = "group-purchase-demand-operating-system";
+    public const string GroupImportTradeReadiness = "group-import-trade-readiness";
 }
 
 public enum SsalddelCodeLayer
