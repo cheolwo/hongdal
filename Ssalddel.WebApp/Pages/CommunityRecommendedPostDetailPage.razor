@@ -8,7 +8,7 @@
                          Heading="@RouteContext.WorkspaceHeading"
                          Description="@RouteContext.WorkspaceDescription"
                          ShowComposeAction="true"
-                         ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName)">
+                         ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, RouteContext.BackHref)">
     <CommunityRecommendedPostDetailScreen AppName="살뜰"
                                           RoleLabel="웹 사용자"
                                           AppKey="shipper"
@@ -29,6 +29,10 @@
     [SupplyParameterFromQuery(Name = "boardKey")]
     public string? QueryBoardKey { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
     private CommunityWorkspaceRouteContext RouteContext
         => CommunityWorkspaceRouteContext.Resolve(
             CommunityPageRoutes.RecommendedPostDetail,
@@ -37,5 +41,6 @@
             QuerySeedPostTitle,
             QueryBoardName,
             QueryBoardKey,
-            null);
+            null,
+            QueryReturnPath);
 }

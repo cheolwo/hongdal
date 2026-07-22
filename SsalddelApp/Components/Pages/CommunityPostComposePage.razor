@@ -8,7 +8,7 @@
                          Heading="@RouteContext.WorkspaceHeading"
                          Description="@RouteContext.WorkspaceDescription">
     <CommunityPostComposeScreen AppName="살뜰"
-                                RoleLabel="웹 사용자"
+                                RoleLabel="앱 사용자"
                                 AppKey="shipper"
                                 CargoRequestDraftHrefBase="/shipper/request"
                                 CloseHref="@RouteContext.BackHref"
@@ -17,16 +17,13 @@
 </CommunityRoutePageFrame>
 
 @code {
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "board")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
     public string? QueryBoardName { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "boardKey")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
     public string? QueryBoardKey { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
     public string? QueryReturnPath { get; set; }
 
     private CommunityWorkspaceRouteContext RouteContext

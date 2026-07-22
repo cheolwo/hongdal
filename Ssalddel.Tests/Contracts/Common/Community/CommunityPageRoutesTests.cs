@@ -17,6 +17,26 @@ public sealed class CommunityPageRoutesTests
     }
 
     [Fact]
+    public void 게시판경로는_검색필터보기focus를한문맥으로보존한다()
+    {
+        var focus = CommunityBoardNavigationContext.FocusForPost(42);
+        var route = CommunityPageRoutes.BoardsFor(
+            boardKey: "free life",
+            workflowTag: "생활 협업",
+            roleTag: "이웃",
+            page: 3,
+            search: "창고 경험",
+            listFilter: "추천글",
+            viewMode: CommunityBoardNavigationContext.CardViewMode,
+            focusTarget: focus);
+
+        Assert.Equal(
+            $"/community/boards?boardKey=free%20life&workflowTag={Uri.EscapeDataString("생활 협업")}&roleTag={Uri.EscapeDataString("이웃")}&page=3&q={Uri.EscapeDataString("창고 경험")}&filter={Uri.EscapeDataString("추천글")}&view=cards&focus={focus}",
+            route);
+        Assert.Equal(42, CommunityBoardNavigationContext.PostIdFromFocus(focus));
+    }
+
+    [Fact]
     public void 영속글과추천sample글은_서로다른상세route를사용한다()
     {
         Assert.Equal(
@@ -25,6 +45,37 @@ public sealed class CommunityPageRoutesTests
         Assert.Equal(
             $"/community/posts/recommended/detail?seed={Uri.EscapeDataString("추천 글")}&board={Uri.EscapeDataString("자유")}",
             CommunityPageRoutes.RecommendedPostDetailFor("추천 글", "자유"));
+    }
+
+    [Fact]
+    public void 상세와글쓰기는_정확한로컬목록returnPath를encode한다()
+    {
+        var returnPath = "/community/boards?boardKey=free&q=창고&filter=추천글&focus=community-post-42";
+
+        Assert.Equal(
+            $"/community/posts/42?boardKey=free&from={Uri.EscapeDataString(returnPath)}",
+            CommunityPageRoutes.PostDetailFor(42, boardKey: "free", returnPath: returnPath));
+        Assert.Equal(
+            $"/community/write?boardKey=free&from={Uri.EscapeDataString(returnPath)}",
+            CommunityPageRoutes.ComposeFor(boardKey: "free", returnPath: returnPath));
+        Assert.Equal(
+            $"/shipper/request?source=diagram-node&from={Uri.EscapeDataString("/diagram?node=수요 모집&zoom=120")}",
+            PageNavigationContext.WithReturnPath(
+                "/shipper/request?source=diagram-node",
+                "/diagram?node=수요 모집&zoom=120"));
+    }
+
+    [Theory]
+    [InlineData("https://outside.example/path")]
+    [InlineData("//outside.example/path")]
+    [InlineData("/\\outside")]
+    [InlineData("/%5C%5Coutside")]
+    public void 공용returnPath는_외부또는역슬래시경로를거부한다(string unsafePath)
+    {
+        Assert.Null(PageNavigationContext.NormalizeReturnPath(unsafePath));
+        Assert.Equal(
+            CommunityPageRoutes.Boards,
+            PageNavigationContext.ResolveReturnPath(unsafePath, CommunityPageRoutes.Boards));
     }
 
     [Fact]

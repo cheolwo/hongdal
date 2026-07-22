@@ -126,7 +126,10 @@ public partial class PlatformCommunityHome
         {
             if (!result.WasScheduled && result.Post is { } savedPost)
             {
-                Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(savedPost.Id, savedPost.Category));
+                Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(
+                    savedPost.Id,
+                    savedPost.Category,
+                    returnPath: EffectiveComposeCloseHref));
             }
             else
             {

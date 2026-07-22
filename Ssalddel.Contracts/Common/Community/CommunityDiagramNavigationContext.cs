@@ -35,18 +35,9 @@ public sealed record CommunityDiagramNavigationContext
             MaximumZoomPercent);
 
     public static string NormalizeReturnPath(string? returnPath)
-    {
-        var value = returnPath?.Trim();
-        if (string.IsNullOrWhiteSpace(value)
-            || !value.StartsWith("/", StringComparison.Ordinal)
-            || value.StartsWith("//", StringComparison.Ordinal)
-            || value.Contains('\\'))
-        {
-            return CommunityPageRoutes.Workspace;
-        }
-
-        return value;
-    }
+        => PageNavigationContext.ResolveReturnPath(
+            returnPath,
+            CommunityPageRoutes.Workspace);
 }
 
 public static class CommunityDiagramNavigationQueryNames

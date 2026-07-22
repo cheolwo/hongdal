@@ -106,7 +106,7 @@ public partial class PlatformCommunityHome
     {
         HomeModeState.SetWorkMode(true);
         DiagramPalette.SetDiagramMode(false);
-        Navigation.NavigateTo(targetUrl);
+        Navigation.NavigateTo(PageNavigationContext.WithReturnPath(targetUrl, DiagramReturnHref));
     }
 
     private void CloseDiagramSurface()

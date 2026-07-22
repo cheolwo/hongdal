@@ -33,6 +33,10 @@
     [SupplyParameterFromQuery(Name = "diagram")]
     public string? QueryDiagramMode { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
     private bool IsLegacyDiagramRequest
         => !string.IsNullOrWhiteSpace(QueryDiagramMode)
            && (QueryDiagramMode.Equals("1", StringComparison.OrdinalIgnoreCase)
@@ -60,7 +64,8 @@
             null,
             null,
             null,
-            QueryDiagramMode);
+            QueryDiagramMode,
+            QueryReturnPath);
 
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [

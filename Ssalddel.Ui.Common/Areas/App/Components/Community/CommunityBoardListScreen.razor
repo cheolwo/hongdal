@@ -1,0 +1,304 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@implements IAsyncDisposable
+@inject PlatformCommunityService CommunityService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PlatformCommunityReadingThemeFrame>
+<main class="community-board-page platform-home--classic-forum"
+      data-board-key="@ViewModel.CurrentBoard?.BoardKey"
+      data-search="@ViewModel.SearchText"
+      data-filter="@ViewModel.SelectedFilter"
+      data-view="@ViewModeCode"
+      data-focus="@normalizedFocusTarget">
+    <header class="community-board-page__header">
+        <a href="@BackHref">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            공개 커뮤니티
+        </a>
+        <div>
+            <span>COMMUNITY BOARD</span>
+            <h1>@ViewModel.CurrentBoardName</h1>
+            <p>@ViewModel.CurrentBoardDescription</p>
+        </div>
+        @if (ViewModel.CanCompose)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick="OpenCompose">
+                글쓰기
+            </MudButton>
+        }
+    </header>
+
+    <nav class="community-board-page__navigation" aria-label="게시판 선택">
+        <a class="@BuildBoardLinkClass(null)" href="@CommunityPageRoutes.Boards">전체</a>
+        @foreach (var board in ViewModel.BoardSummaries)
+        {
+            <a class="@BuildBoardLinkClass(board.BoardKey)"
+               href="@BoardHref(board.BoardKey)">
+                <span>@board.DisplayName</span>
+                <b>@board.PostCount</b>
+            </a>
+        }
+    </nav>
+
+    @if (!string.IsNullOrWhiteSpace(WorkflowTag) || !string.IsNullOrWhiteSpace(RoleTag))
+    {
+        <div class="community-board-page__filters" aria-label="적용된 업무 필터">
+            <span>적용된 필터</span>
+            @if (!string.IsNullOrWhiteSpace(WorkflowTag))
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@WorkflowTag</MudChip>
+            }
+            @if (!string.IsNullOrWhiteSpace(RoleTag))
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary">@RoleTag</MudChip>
+            }
+            <MudButton Href="@BoardHref(ViewModel.CurrentBoard?.BoardKey)" Variant="Variant.Text" Size="Size.Small">필터 지우기</MudButton>
+        </div>
+    }
+
+    @if (ViewModel.IsLoading)
+    {
+        <div class="community-board-page__state" aria-live="polite">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <span>글 목록을 불러오는 중입니다.</span>
+        </div>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <section class="community-board-page__error" aria-live="polite">
+                <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
+                <div>
+                    <strong>새 글을 불러오지 못했습니다.</strong>
+                    <span>@ViewModel.ErrorMessage 기존 게시판 구조는 계속 사용할 수 있습니다.</span>
+                </div>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@ViewModel.IsLoading"
+                           OnClick="ReloadAsync">
+                    재시도
+                </MudButton>
+            </section>
+        }
+
+        <PlatformCommunityPostList BoardName="@ViewModel.CurrentBoardName"
+                                   FilterOptions="@ListFilters"
+                                   SelectedFilter="@ViewModel.SelectedFilter"
+                                   SelectedFilterChanged="HandleListFilterChanged"
+                                   ViewMode="@ViewModel.ViewMode"
+                                   ViewModeChanged="HandleViewModeChanged"
+                                   ComposeRequested="OpenCompose"
+                                   Posts="@ViewModel.VisiblePosts"
+                                   SeedPosts="@NoSeedPosts"
+                                   VisiblePostCount="@ViewModel.VisiblePosts.Count"
+                                   SelectedPostId="@FocusedPostId"
+                                   PostSelected="OpenPost"
+                                   SearchText="@ViewModel.SearchText"
+                                   SearchTextChanged="HandleSearchChanged" />
+
+        @if (ViewModel.Result.Page > 1 || ViewModel.Result.Page * ViewModel.Result.PageSize < ViewModel.Result.TotalCount)
+        {
+            <nav class="community-board-page__pagination" aria-label="글 목록 페이지">
+                <MudButton Disabled="@(ViewModel.Result.Page <= 1)"
+                           Href="@PageHref(ViewModel.Result.Page - 1)"
+                           Variant="Variant.Outlined">
+                    이전
+                </MudButton>
+                <span>@ViewModel.Result.Page / @ViewModel.TotalPages</span>
+                <MudButton Disabled="@(ViewModel.Result.Page >= ViewModel.TotalPages)"
+                           Href="@PageHref(ViewModel.Result.Page + 1)"
+                           Variant="Variant.Outlined">
+                    다음
+                </MudButton>
+            </nav>
+        }
+    }
+</main>
+</PlatformCommunityReadingThemeFrame>
+
+@code {
+    [Parameter] public string AppKey { get; set; } = "shipper";
+    [Parameter] public string BackHref { get; set; } = CommunityPageRoutes.Home;
+    [Parameter] public string? BoardKey { get; set; }
+    [Parameter] public string? BoardName { get; set; }
+    [Parameter] public string? WorkflowTag { get; set; }
+    [Parameter] public string? RoleTag { get; set; }
+    [Parameter] public int Page { get; set; } = 1;
+    [Parameter] public string? SearchText { get; set; }
+    [Parameter] public string? ListFilter { get; set; }
+    [Parameter] public string? ViewMode { get; set; }
+    [Parameter] public string? FocusTarget { get; set; }
+
+    private static readonly IReadOnlyList<string> ListFilters = ["전체글", "공지", "추천글"];
+    private static readonly IReadOnlyList<CommunitySeedPost> NoSeedPosts = [];
+    private CommunityBoardPageViewModel ViewModel { get; set; } = default!;
+    private string? lastDataRequestKey;
+    private string? normalizedFocusTarget;
+    private string? pendingFocusTarget;
+    private string? scrolledFocusTarget;
+    private IJSObjectReference? navigationModule;
+
+    private long? FocusedPostId
+        => CommunityBoardNavigationContext.PostIdFromFocus(normalizedFocusTarget);
+
+    private string ViewModeCode
+        => ViewModel.ViewMode == CommunityPostViewMode.Cards
+            ? CommunityBoardNavigationContext.CardViewMode
+            : CommunityBoardNavigationContext.ListViewMode;
+
+    protected override void OnInitialized()
+    {
+        ViewModel = new CommunityBoardPageViewModel(
+            cancellationToken => CommunityService.GetBoardSummariesAsync(AppKey, cancellationToken),
+            (query, cancellationToken) => CommunityService.GetBoardPostsAsync(
+                AppKey,
+                boardKey: query.BoardKey,
+                category: query.LegacyCategory,
+                workflowTag: query.WorkflowTag,
+                roleTag: query.RoleTag,
+                page: query.Page,
+                pageSize: query.PageSize,
+                cancellationToken: cancellationToken));
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        normalizedFocusTarget = PageNavigationContext.NormalizeFocusTarget(FocusTarget);
+        var request = CurrentRequest();
+        var dataRequestKey = $"{request.BoardKey}|{request.LegacyBoardName}|{request.WorkflowTag}|{request.RoleTag}|{request.Page}";
+        if (!string.Equals(lastDataRequestKey, dataRequestKey, StringComparison.Ordinal))
+        {
+            lastDataRequestKey = dataRequestKey;
+            await ViewModel.LoadAsync(request);
+        }
+        else
+        {
+            ViewModel.RestoreListState(request.SearchText, request.ListFilter, request.ViewMode);
+        }
+
+        if (!string.Equals(scrolledFocusTarget, normalizedFocusTarget, StringComparison.Ordinal))
+        {
+            pendingFocusTarget = normalizedFocusTarget;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (ViewModel.IsLoading || string.IsNullOrWhiteSpace(pendingFocusTarget))
+        {
+            return;
+        }
+
+        navigationModule ??= await JS.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/Ssalddel.Ui.Common/js/pageNavigation.js");
+        var target = pendingFocusTarget;
+        pendingFocusTarget = null;
+        if (await navigationModule.InvokeAsync<bool>("scrollToFocusTarget", target))
+        {
+            scrolledFocusTarget = target;
+        }
+    }
+
+    private Task ReloadAsync()
+        => ViewModel.LoadAsync(CurrentRequest());
+
+    private CommunityBoardPageRequest CurrentRequest()
+        => new(
+            BoardKey,
+            BoardName,
+            WorkflowTag,
+            RoleTag,
+            CommunityBoardNavigationContext.NormalizePage(Page),
+            SearchText,
+            ListFilter,
+            ViewMode);
+
+    private void OpenPost(PlatformCommunityPostResponse post)
+    {
+        var returnPath = CurrentBoardPath(CommunityBoardNavigationContext.FocusForPost(post.Id));
+        Navigation.NavigateTo(
+            CommunityPageRoutes.PostDetailFor(
+                post.Id,
+                ViewModel.CurrentBoard is null ? post.Category : null,
+                ViewModel.CurrentBoard?.BoardKey,
+                returnPath));
+    }
+
+    private void OpenCompose()
+        => Navigation.NavigateTo(
+            CommunityPageRoutes.ComposeFor(
+                ViewModel.CurrentBoard?.DisplayName,
+                ViewModel.CurrentBoard?.BoardKey,
+                CurrentBoardPath()));
+
+    private void HandleListFilterChanged(string value)
+    {
+        ViewModel.SelectListFilter(value);
+        ReplaceRouteState();
+    }
+
+    private void HandleViewModeChanged(CommunityPostViewMode value)
+    {
+        ViewModel.SelectViewMode(value);
+        ReplaceRouteState();
+    }
+
+    private void HandleSearchChanged(string value)
+    {
+        ViewModel.SetSearchText(value);
+        ReplaceRouteState();
+    }
+
+    private void ReplaceRouteState()
+    {
+        normalizedFocusTarget = null;
+        Navigation.NavigateTo(CurrentBoardPath(), replace: true);
+    }
+
+    private string BuildBoardLinkClass(string? boardKey)
+        => string.Equals(ViewModel.CurrentBoard?.BoardKey, boardKey, StringComparison.OrdinalIgnoreCase)
+            || (ViewModel.CurrentBoard is null && boardKey is null)
+                ? "community-board-page__board-link community-board-page__board-link--active"
+                : "community-board-page__board-link";
+
+    private static string BoardHref(string? boardKey)
+        => CommunityPageRoutes.BoardsFor(boardKey: boardKey);
+
+    private string PageHref(int page)
+        => CurrentBoardPath(page: page);
+
+    private string CurrentBoardPath(string? focusTarget = null, int? page = null)
+        => CommunityPageRoutes.BoardsFor(
+            ViewModel.CurrentBoard is null ? BoardName : null,
+            ViewModel.CurrentBoard?.BoardKey ?? BoardKey,
+            WorkflowTag,
+            RoleTag,
+            page ?? CommunityBoardNavigationContext.NormalizePage(Page),
+            ViewModel.SearchText,
+            ViewModel.SelectedFilter,
+            ViewModeCode,
+            focusTarget);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (navigationModule is not null)
+        {
+            try
+            {
+                await navigationModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // 앱 또는 브라우저 종료 중에는 JS 정리 실패를 무시합니다.
+            }
+        }
+    }
+}

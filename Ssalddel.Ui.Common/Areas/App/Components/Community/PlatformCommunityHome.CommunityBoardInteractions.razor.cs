@@ -129,14 +129,25 @@ public partial class PlatformCommunityHome
         => boardIndexSearchText = value;
 
     private void OpenCommunityPostPage(PlatformCommunityPostResponse post)
-        => Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(post.Id, post.Category));
+        => Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(
+            post.Id,
+            post.Category,
+            QueryBoardKey,
+            ListReturnPath));
 
     private void OpenCommunitySeedPostPage(CommunitySeedPost post)
         => Navigation.NavigateTo(
-            CommunityPageRoutes.RecommendedPostDetailFor(post.Title, post.Category));
+            CommunityPageRoutes.RecommendedPostDetailFor(
+                post.Title,
+                post.Category,
+                QueryBoardKey,
+                ListReturnPath));
 
     private void OpenCommunityComposePage()
-        => Navigation.NavigateTo(CommunityPageRoutes.ComposeFor(selectedBoardFilter));
+        => Navigation.NavigateTo(CommunityPageRoutes.ComposeFor(
+            selectedBoardFilter,
+            QueryBoardKey,
+            ListReturnPath));
 
     private bool MatchesForumListFilter(CommunitySeedPost post)
         => selectedForumListFilter switch

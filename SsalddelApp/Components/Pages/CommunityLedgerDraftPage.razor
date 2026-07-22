@@ -8,14 +8,13 @@
                          Heading="공동 원장 초안"
                          Description="참여자와 조건을 합의하기 위한 원장 구조만 작성합니다. 실제 주문·운송·결제 실행은 별도 업무 화면에서 확인합니다.">
     <CommunityLedgerDraftScreen AppName="살뜰"
-                                RoleLabel="웹 사용자"
+                                RoleLabel="앱 사용자"
                                 AppKey="shipper"
                                 LedgerTemplateKey="@QueryLedgerTemplateKey" />
 </CommunityRoutePageFrame>
 
 @code {
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "ledgerTemplate")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.LedgerTemplate)]
     public string? QueryLedgerTemplateKey { get; set; }
 
     [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]

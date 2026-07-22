@@ -306,6 +306,33 @@ public sealed class PageCapabilityCatalogTests
         Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
     }
 
+    [Theory]
+    [InlineData("/community", "shipper-community-home", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("/community/boards?q=창고&filter=추천글", "shipper-community-boards", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/community/write?board=자유", "shipper-community-write", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("/community/posts/42?from=%2Fcommunity%2Fboards", "shipper-community-posts", PageInteractionBoundary.PlatformPersistence)]
+    [InlineData("/community/workspace", "shipper-community-workspace", PageInteractionBoundary.ReadOnly)]
+    [InlineData("/community/ledgers/new", "shipper-community-ledger-draft", PageInteractionBoundary.PlatformPersistence)]
+    public void 모바일커뮤니티route는_Web공용Screen의실행경계를명시한다(
+        string route,
+        string pageKey,
+        PageInteractionBoundary boundary)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Shipper,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Live, capability.Stage);
+        Assert.Equal(boundary, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Equal("0.0", capability.IntroducedVersion);
+        Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
+    }
+
     [Fact]
     public void 공동구매목록은_익명공개읽기Beta로분류한다()
     {

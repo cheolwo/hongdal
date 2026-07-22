@@ -1,0 +1,43 @@
+.page-return-context {
+    width: min(1180px, calc(100% - 1rem));
+    margin: .5rem auto 0;
+}
+
+.page-return-context a {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    min-height: 44px;
+    padding: .45rem .8rem;
+    border: 1px solid rgba(var(--mud-palette-secondary-rgb), .22);
+    border-radius: 999px;
+    background: var(--mud-palette-surface);
+    color: var(--mud-palette-secondary);
+    text-decoration: none;
+}
+
+.page-return-context span {
+    display: grid;
+    gap: .05rem;
+}
+
+.page-return-context strong {
+    font-size: .78rem;
+}
+
+.page-return-context small {
+    color: var(--mud-palette-text-secondary);
+    font-size: .68rem;
+}
+
+@media (max-width: 720px) {
+    .page-return-context {
+        width: 100%;
+        margin-top: .35rem;
+    }
+
+    .page-return-context a {
+        width: 100%;
+        border-radius: 12px;
+    }
+}

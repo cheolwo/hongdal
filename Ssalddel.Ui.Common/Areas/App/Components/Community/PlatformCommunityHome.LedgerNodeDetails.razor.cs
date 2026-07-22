@@ -67,7 +67,8 @@ public partial class PlatformCommunityHome
             ["ledgerId"] = 선택현재원장?.Id,
             ["nodeTitle"] = node.Title,
             ["nodeKind"] = node.Kind,
-            ["formKind"] = node.FormKind
+            ["formKind"] = node.FormKind,
+            [PageNavigationQueryNames.ReturnPath] = PageNavigationContext.NormalizeReturnPath(DiagramReturnHref)
         };
 
         return new(

@@ -1,0 +1,73 @@
+@page "/community/workspace"
+@inject NavigationManager Navigation
+
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
+
+@if (!IsLegacyDiagramRequest)
+{
+    <CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                             BackLabel="@RouteContext.BackLabel"
+                             Eyebrow="@RouteContext.WorkspaceEyebrow"
+                             Heading="@RouteContext.WorkspaceHeading"
+                             Description="@RouteContext.WorkspaceDescription"
+                             ShowComposeAction="true"
+                             ShowWorkspaceSections="@RouteContext.IsWorkspaceLandingRoute">
+        <CommunityWorkspaceScreen AppName="살뜰"
+                                  RoleLabel="앱 사용자"
+                                  AppKey="shipper"
+                                  CargoRequestDraftHrefBase="/shipper/request"
+                                  WorkspaceOnly="@RouteContext.IsWorkspaceLandingRoute"
+                                  UseBaguaRoleTransitionPages="true"
+                                  QuickActions="QuickActions"
+                                  LedgerTemplateKey="@QueryLedgerTemplateKey"
+                                  DiagramMode="@QueryDiagramMode" />
+    </CommunityRoutePageFrame>
+}
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.LedgerTemplate)]
+    public string? QueryLedgerTemplateKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "diagram")]
+    public string? QueryDiagramMode { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
+    private bool IsLegacyDiagramRequest
+        => !string.IsNullOrWhiteSpace(QueryDiagramMode)
+           && (QueryDiagramMode.Equals("1", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("true", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("yes", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("diagram", StringComparison.OrdinalIgnoreCase));
+
+    protected override void OnParametersSet()
+    {
+        if (IsLegacyDiagramRequest)
+        {
+            Navigation.NavigateTo(
+                CommunityPageRoutes.DiagramFor(
+                    QueryLedgerTemplateKey,
+                    returnPath: CommunityPageRoutes.Workspace),
+                replace: true);
+        }
+    }
+
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            CommunityPageRoutes.Workspace,
+            null,
+            null,
+            null,
+            null,
+            null,
+            QueryDiagramMode,
+            QueryReturnPath);
+
+    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    [
+        new("함께 하는 일", "마음 모으기부터 실행 중 추가 참여와 완료 기록까지 이어서 봅니다.", CommunityPageRoutes.CollectiveActions, Icons.Material.Filled.Groups, Color.Success),
+        new("공동구매 제안", "제안 글부터 수요 모집, 이의 검토와 전자서명까지 한 흐름으로 진행합니다.", CommunityPageRoutes.GroupPurchaseCreate, Icons.Material.Filled.GroupAdd, Color.Success),
+        new("운송 단가 질문", "운송 의뢰 작성 중 생성한 초안을 게시판에서 다듬습니다.", "/shipper/request", Icons.Material.Filled.PostAdd, Color.Primary)
+    ];
+}

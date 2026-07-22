@@ -149,6 +149,9 @@ public partial class PlatformCommunityHome
     public string? DiagramCloseHref { get; set; }
 
     [Parameter]
+    public string? DiagramReturnHref { get; set; }
+
+    [Parameter]
     public EventCallback<string?> DiagramSelectedNodeChanged { get; set; }
 
     [Parameter]
@@ -159,5 +162,11 @@ public partial class PlatformCommunityHome
 
     [Parameter]
     public string? QueryBoardName { get; set; }
+
+    [Parameter]
+    public string? QueryBoardKey { get; set; }
+
+    [Parameter]
+    public string? ListReturnPath { get; set; }
 
 }

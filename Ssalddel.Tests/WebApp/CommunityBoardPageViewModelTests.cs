@@ -1,5 +1,5 @@
 using Ssalddel.Contracts.Common.Community;
-using Ssalddel.WebApp.ViewModels;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace Ssalddel.Tests.WebApp;
 
@@ -93,6 +93,27 @@ public sealed class CommunityBoardPageViewModelTests
         viewModel.SelectListFilter("전체글");
         viewModel.SetSearchText("현장 이웃");
         Assert.Equal(3, Assert.Single(viewModel.VisiblePosts).Id);
+    }
+
+    [Fact]
+    public async Task LoadAsync_RestoresSearchFilterAndCardViewFromRouteContext()
+    {
+        var viewModel = CreateViewModel(
+            loadPosts: (_, _) => Task.FromResult(new PlatformCommunityPostListResponse()));
+
+        await viewModel.LoadAsync(new CommunityBoardPageRequest(
+            null,
+            null,
+            null,
+            null,
+            1,
+            SearchText: "  창고 경험  ",
+            ListFilter: "추천글",
+            ViewMode: CommunityBoardNavigationContext.CardViewMode));
+
+        Assert.Equal("창고 경험", viewModel.SearchText);
+        Assert.Equal("추천글", viewModel.SelectedFilter);
+        Assert.Equal(CommunityPostViewMode.Cards, viewModel.ViewMode);
     }
 
     [Fact]

@@ -45,6 +45,7 @@ public sealed class CommunityDiagramRouteCompositionTests
         Assert.Contains("QueryDiagramSelectedNode", source);
         Assert.Contains("QueryDiagramZoomPercent", source);
         Assert.Contains("DiagramCloseHref", source);
+        Assert.Contains("DiagramReturnHref", source);
         Assert.Contains("DiagramSelectedNodeChanged", source);
         Assert.Contains("CommunityPageRoutes.DiagramFor", source);
     }
@@ -62,6 +63,21 @@ public sealed class CommunityDiagramRouteCompositionTests
         Assert.Contains("BuildZoomedDiagramCanvasStyle", presentation);
         Assert.Contains("DiagramSelectedNodeChanged.InvokeAsync", interactions);
         Assert.Contains("Navigation.NavigateTo(action.Url)", interactions);
+
+        var nodeDetails = File.ReadAllText(ComponentFile("PlatformCommunityHome.LedgerNodeDetails.razor.cs"));
+        Assert.Contains("PageNavigationQueryNames.ReturnPath", nodeDetails);
+        Assert.Contains("DiagramReturnHref", nodeDetails);
+    }
+
+    [Theory]
+    [InlineData("Ssalddel.WebApp", "Layout/MainLayout.razor")]
+    [InlineData("SsalddelApp", "Components/Layout/MainLayout.razor")]
+    public void Web과모바일Shell은_diagramNode의공용복귀표시를조립한다(
+        string project,
+        string relativePath)
+    {
+        var source = File.ReadAllText(ProjectFile(project, relativePath));
+        Assert.Contains("<PageReturnContextBar", source);
     }
 
     [Fact]

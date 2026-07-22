@@ -1,4 +1,4 @@
-@page "/community/posts/{PostId:long}"
+@page "/community/posts/recommended/detail"
 
 <PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
 
@@ -9,37 +9,32 @@
                          Description="@RouteContext.WorkspaceDescription"
                          ShowComposeAction="true"
                          ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, RouteContext.BackHref)">
-    <CommunityPostDetailScreen AppName="살뜰"
-                               RoleLabel="웹 사용자"
-                               AppKey="shipper"
-                               CargoRequestDraftHrefBase="/shipper/request"
-                               UseBaguaRoleTransitionPages="true"
-                               PostId="@PostId"
-                               BoardName="@QueryBoardName" />
+    <CommunityRecommendedPostDetailScreen AppName="살뜰"
+                                          RoleLabel="앱 사용자"
+                                          AppKey="shipper"
+                                          SeedPostTitle="@(QuerySeedPostTitle ?? string.Empty)"
+                                          BoardName="@QueryBoardName" />
 </CommunityRoutePageFrame>
 
 @code {
-    [Parameter]
-    public long PostId { get; set; }
+    [Parameter, SupplyParameterFromQuery(Name = "seed")]
+    public string? QuerySeedPostTitle { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "board")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
     public string? QueryBoardName { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "boardKey")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
     public string? QueryBoardKey { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
     public string? QueryReturnPath { get; set; }
 
     private CommunityWorkspaceRouteContext RouteContext
         => CommunityWorkspaceRouteContext.Resolve(
-            $"/community/posts/{PostId}",
-            PostId,
+            CommunityPageRoutes.RecommendedPostDetail,
             null,
             null,
+            QuerySeedPostTitle,
             QueryBoardName,
             QueryBoardKey,
             null,

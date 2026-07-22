@@ -1,0 +1,75 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Microsoft.AspNetCore.Components.Routing
+@implements IDisposable
+@inject NavigationManager Navigation
+
+@if (ReturnHref is not null)
+{
+    <nav class="page-return-context" aria-label="이전 탐색 화면으로 돌아가기">
+        <a href="@ReturnHref">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            <span>
+                <strong>다이어그램으로 돌아가기</strong>
+                @if (!string.IsNullOrWhiteSpace(NodeTitle))
+                {
+                    <small>@NodeTitle 노드의 선택·확대 상태를 복원합니다.</small>
+                }
+            </span>
+        </a>
+    </nav>
+}
+
+@code {
+    private string? ReturnHref { get; set; }
+    private string? NodeTitle { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += HandleLocationChanged;
+        ReadContext();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        ReadContext(args.Location);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void ReadContext(string? absoluteUri = null)
+    {
+        var uri = new Uri(absoluteUri ?? Navigation.Uri, UriKind.Absolute);
+        var query = ParseQuery(uri.Query);
+        var source = query.GetValueOrDefault("source");
+        ReturnHref = source?.StartsWith("diagram-", StringComparison.OrdinalIgnoreCase) == true
+            ? PageNavigationContext.NormalizeReturnPath(
+                query.GetValueOrDefault(PageNavigationQueryNames.ReturnPath))
+            : null;
+        NodeTitle = ReturnHref is null ? null : query.GetValueOrDefault("nodeTitle");
+    }
+
+    private static IReadOnlyDictionary<string, string> ParseQuery(string query)
+    {
+        try
+        {
+            return query.TrimStart('?')
+                .Split('&', StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => item.Split('=', 2))
+                .Where(parts => parts.Length > 0 && !string.IsNullOrWhiteSpace(parts[0]))
+                .GroupBy(
+                    parts => Uri.UnescapeDataString(parts[0].Replace('+', ' ')),
+                    StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    group => group.Key,
+                    group => Uri.UnescapeDataString(
+                        (group.Last().Length > 1 ? group.Last()[1] : string.Empty).Replace('+', ' ')),
+                    StringComparer.OrdinalIgnoreCase);
+        }
+        catch (UriFormatException)
+        {
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    public void Dispose()
+        => Navigation.LocationChanged -= HandleLocationChanged;
+}

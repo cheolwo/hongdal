@@ -18,32 +18,80 @@ public static class CommunityPageRoutes
     public const string GroupPurchaseCreate = "/community/group-purchase/new";
     public const string Diagram = "/diagram";
 
-    public static string BoardsFor(string? boardName = null, string? boardKey = null)
+    public static string BoardsFor(
+        string? boardName = null,
+        string? boardKey = null,
+        string? workflowTag = null,
+        string? roleTag = null,
+        int? page = null,
+        string? search = null,
+        string? listFilter = null,
+        string? viewMode = null,
+        string? focusTarget = null)
         => WithQuery(
             Boards,
-            ("boardKey", boardKey),
-            ("board", boardName));
+            (CommunityBoardNavigationQueryNames.BoardKey, boardKey),
+            (CommunityBoardNavigationQueryNames.BoardName, boardName),
+            (CommunityBoardNavigationQueryNames.WorkflowTag, workflowTag),
+            (CommunityBoardNavigationQueryNames.RoleTag, roleTag),
+            (CommunityBoardNavigationQueryNames.Page, CommunityBoardNavigationContext.NormalizePage(page) <= 1
+                ? null
+                : CommunityBoardNavigationContext.NormalizePage(page).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+            (CommunityBoardNavigationQueryNames.Search, CommunityBoardNavigationContext.NormalizeSearch(search)),
+            (CommunityBoardNavigationQueryNames.ListFilter, CommunityBoardNavigationContext.NormalizeFilter(listFilter) == "전체글"
+                ? null
+                : CommunityBoardNavigationContext.NormalizeFilter(listFilter)),
+            (CommunityBoardNavigationQueryNames.ViewMode, CommunityBoardNavigationContext.NormalizeViewMode(viewMode) == CommunityBoardNavigationContext.ListViewMode
+                ? null
+                : CommunityBoardNavigationContext.CardViewMode),
+            (PageNavigationQueryNames.FocusTarget, PageNavigationContext.NormalizeFocusTarget(focusTarget)));
 
-    public static string ComposeFor(string? boardName = null)
-        => string.IsNullOrWhiteSpace(boardName)
-           || boardName.Equals("전체", StringComparison.OrdinalIgnoreCase)
-            ? Compose
-            : WithQuery(Compose, ("board", boardName));
+    public static string ComposeFor(
+        string? boardName = null,
+        string? boardKey = null,
+        string? returnPath = null)
+        => WithQuery(
+            Compose,
+            (CommunityBoardNavigationQueryNames.BoardKey, boardKey),
+            (CommunityBoardNavigationQueryNames.BoardName,
+                string.IsNullOrWhiteSpace(boardName)
+                || boardName.Equals("전체", StringComparison.OrdinalIgnoreCase)
+                    ? null
+                    : boardName),
+            (PageNavigationQueryNames.ReturnPath, PageNavigationContext.NormalizeReturnPath(returnPath)));
 
     public static string PostDetailFor(
         long postId,
         string? boardName = null,
-        string? boardKey = null)
+        string? boardKey = null,
+        string? returnPath = null)
         => WithQuery(
             $"/community/posts/{postId}",
-            ("boardKey", boardKey),
-            ("board", boardName));
+            (CommunityBoardNavigationQueryNames.BoardKey, boardKey),
+            (CommunityBoardNavigationQueryNames.BoardName, boardName),
+            (PageNavigationQueryNames.ReturnPath, PageNavigationContext.NormalizeReturnPath(returnPath)));
 
-    public static string RecommendedPostDetailFor(string seedPostTitle, string? boardName = null)
+    public static string RecommendedPostsFor(
+        string? boardName = null,
+        string? boardKey = null,
+        string? returnPath = null)
+        => WithQuery(
+            RecommendedPosts,
+            (CommunityBoardNavigationQueryNames.BoardKey, boardKey),
+            (CommunityBoardNavigationQueryNames.BoardName, boardName),
+            (PageNavigationQueryNames.ReturnPath, PageNavigationContext.NormalizeReturnPath(returnPath)));
+
+    public static string RecommendedPostDetailFor(
+        string seedPostTitle,
+        string? boardName = null,
+        string? boardKey = null,
+        string? returnPath = null)
         => WithQuery(
             RecommendedPostDetail,
             ("seed", seedPostTitle),
-            ("board", boardName));
+            (CommunityBoardNavigationQueryNames.BoardKey, boardKey),
+            (CommunityBoardNavigationQueryNames.BoardName, boardName),
+            (PageNavigationQueryNames.ReturnPath, PageNavigationContext.NormalizeReturnPath(returnPath)));
 
     public static string DiagramFor(
         string? ledgerTemplateKey = null,

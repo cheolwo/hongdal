@@ -6,7 +6,8 @@
 <div class="platform-community-forum-card-grid" aria-label="@UiText("커뮤니티 글 카드 목록", "Community post cards")">
     @foreach (var post in Posts)
     {
-        <article class="@PlatformCommunityPostListPresentation.BuildPostCardClass(post, SelectedPostId)">
+        <article id="@CommunityBoardNavigationContext.FocusForPost(post.Id)"
+                 class="@PlatformCommunityPostListPresentation.BuildPostCardClass(post, SelectedPostId)">
             <header>
                 <span>@DisplayBoardName(post.Category)</span>
                 <time datetime="@post.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">@PlatformCommunityPostListPresentation.FormatForumDate(post.CreatedAtUtc)</time>

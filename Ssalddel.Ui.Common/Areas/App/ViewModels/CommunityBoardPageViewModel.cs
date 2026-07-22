@@ -1,15 +1,17 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Metadata;
-using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
-namespace Ssalddel.WebApp.ViewModels;
+namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 public sealed record CommunityBoardPageRequest(
     string? BoardKey,
     string? LegacyBoardName,
     string? WorkflowTag,
     string? RoleTag,
-    int Page);
+    int Page,
+    string? SearchText = null,
+    string? ListFilter = null,
+    string? ViewMode = null);
 
 public sealed record CommunityBoardPostQuery(
     string? BoardKey,
@@ -22,7 +24,7 @@ public sealed record CommunityBoardPostQuery(
 [SsalddelCommunityV0Module(
     SsalddelCommunityV0ModuleKeys.Ui,
     SsalddelModuleKind.ClientFeature,
-    "선택한 공개 게시판 문맥과 글 목록의 조회·검색·필터 상태를 관리",
+    "Web과 모바일에서 선택한 공개 게시판 문맥과 글 목록의 조회·검색·필터 상태를 관리",
     ReleaseStage = SsalddelCommunityV0ReleaseStages.Persistence,
     Boundary = "게시글은 사용자가 선택한 게시판과 명시적 필터로만 좁히며 상대 적합성·성사 가능성으로 순위화하지 않습니다.")]
 public sealed class CommunityBoardPageViewModel(
@@ -57,6 +59,7 @@ public sealed class CommunityBoardPageViewModel(
         CommunityBoardPageRequest request,
         CancellationToken cancellationToken = default)
     {
+        RestoreListState(request.SearchText, request.ListFilter, request.ViewMode);
         IsLoading = true;
         ErrorMessage = null;
         BoardSummaries = MergeWithCoreBoards([]);
@@ -81,7 +84,7 @@ public sealed class CommunityBoardPageViewModel(
                     legacyCategory,
                     request.WorkflowTag,
                     request.RoleTag,
-                    Math.Max(1, request.Page),
+                    CommunityBoardNavigationContext.NormalizePage(request.Page),
                     50),
                 timeout.Token);
         }
@@ -101,12 +104,23 @@ public sealed class CommunityBoardPageViewModel(
         }
     }
 
+    public void RestoreListState(string? searchText, string? listFilter, string? viewMode)
+    {
+        SearchText = CommunityBoardNavigationContext.NormalizeSearch(searchText);
+        SelectedFilter = CommunityBoardNavigationContext.NormalizeFilter(listFilter);
+        ViewMode = CommunityBoardNavigationContext.NormalizeViewMode(viewMode)
+                   == CommunityBoardNavigationContext.CardViewMode
+            ? CommunityPostViewMode.Cards
+            : CommunityPostViewMode.List;
+    }
+
     public void SelectListFilter(string? value)
-        => SelectedFilter = string.IsNullOrWhiteSpace(value) ? "전체글" : value.Trim();
+        => SelectedFilter = CommunityBoardNavigationContext.NormalizeFilter(value);
 
     public void SelectViewMode(CommunityPostViewMode value) => ViewMode = value;
 
-    public void SetSearchText(string? value) => SearchText = value ?? string.Empty;
+    public void SetSearchText(string? value)
+        => SearchText = CommunityBoardNavigationContext.NormalizeSearch(value);
 
     private static IReadOnlyList<CommunityBoardSummaryResponse> MergeWithCoreBoards(
         IReadOnlyList<CommunityBoardSummaryResponse> serverBoards)

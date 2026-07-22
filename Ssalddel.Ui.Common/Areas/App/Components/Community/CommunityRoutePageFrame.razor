@@ -1,3 +1,5 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
 <main class="community-route-page">
     <header class="community-route-page__context">
         <a href="@BackHref">
@@ -27,7 +29,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.PostAdd" Size="Size.Small" />
                 <span><strong>원장 초안</strong><small>조건과 진행 흐름 정리하기</small></span>
             </a>
-            <a href="@CommunityPageRoutes.DiagramFor()">
+            <a href="@CommunityPageRoutes.DiagramFor(returnPath: CommunityPageRoutes.Workspace)">
                 <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
                 <span><strong>다이어그램</strong><small>참여자와 단계 관계 살펴보기</small></span>
             </a>

@@ -16,7 +16,9 @@
 
     @foreach (var post in Posts)
     {
-        <div class="@PlatformCommunityPostListPresentation.BuildPostRowClass(post, SelectedPostId)" role="row">
+        <div id="@CommunityBoardNavigationContext.FocusForPost(post.Id)"
+             class="@PlatformCommunityPostListPresentation.BuildPostRowClass(post, SelectedPostId)"
+             role="row">
             <span class="platform-community-forum-number" role="cell">@PlatformCommunityPostListPresentation.DisplayPostNumber(DisplayLanguageCode, post)</span>
             <span class="platform-community-forum-category" role="cell">@DisplayBoardName(post.Category)</span>
             <span class="platform-community-forum-subject" role="cell">

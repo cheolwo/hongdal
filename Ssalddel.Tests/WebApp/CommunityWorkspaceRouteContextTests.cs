@@ -1,5 +1,5 @@
-using Ssalddel.WebApp.Models;
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace Ssalddel.Tests.WebApp;
 
@@ -66,6 +66,41 @@ public sealed class CommunityWorkspaceRouteContextTests
         Assert.Equal("게시글 #42", context.WorkspaceHeading);
         Assert.Equal("/community/boards?boardKey=free%20life", context.BackHref);
         Assert.Equal("글 목록", context.BackLabel);
+    }
+
+    [Fact]
+    public void DetailRoute_ExplicitLocalReturnPathWinsAndKeepsListState()
+    {
+        var returnPath = "/community/boards?boardKey=free&q=창고&filter=추천글&view=cards&focus=community-post-42";
+        var context = CommunityWorkspaceRouteContext.Resolve(
+            "community/posts/42",
+            routePostId: 42,
+            queryPostId: null,
+            seedPostTitle: null,
+            boardName: null,
+            boardKey: "free",
+            diagramMode: null,
+            returnPath: returnPath);
+
+        Assert.Equal(returnPath, context.BackHref);
+        Assert.Equal("글 목록", context.BackLabel);
+    }
+
+    [Fact]
+    public void DetailRoute_DiagramReturnPathUsesDiagramBackLabel()
+    {
+        var context = CommunityWorkspaceRouteContext.Resolve(
+            "community/posts/42",
+            42,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "/diagram?node=수요%20모집&zoom=120");
+
+        Assert.StartsWith("/diagram?", context.BackHref);
+        Assert.Equal("다이어그램", context.BackLabel);
     }
 
     [Fact]

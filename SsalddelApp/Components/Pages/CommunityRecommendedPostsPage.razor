@@ -20,7 +20,7 @@ else
                              ShowComposeAction="true"
                              ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, CurrentListPath)">
         <CommunityRecommendedPostListScreen AppName="살뜰"
-                                            RoleLabel="웹 사용자"
+                                            RoleLabel="앱 사용자"
                                             AppKey="shipper"
                                             BoardName="@QueryBoardName"
                                             BoardKey="@QueryBoardKey"
@@ -29,20 +29,16 @@ else
 }
 
 @code {
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "seed")]
+    [Parameter, SupplyParameterFromQuery(Name = "seed")]
     public string? LegacySeedPostTitle { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "board")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
     public string? QueryBoardName { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "boardKey")]
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
     public string? QueryBoardKey { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
     public string? QueryReturnPath { get; set; }
 
     private bool IsLegacyDetailLink => !string.IsNullOrWhiteSpace(LegacySeedPostTitle);
@@ -59,10 +55,7 @@ else
             QueryReturnPath);
 
     private string CurrentListPath
-        => CommunityPageRoutes.RecommendedPostsFor(
-            QueryBoardName,
-            QueryBoardKey,
-            QueryReturnPath);
+        => CommunityPageRoutes.RecommendedPostsFor(QueryBoardName, QueryBoardKey, QueryReturnPath);
 
     protected override void OnParametersSet()
     {

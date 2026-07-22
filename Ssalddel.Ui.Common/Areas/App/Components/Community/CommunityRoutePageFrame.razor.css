@@ -22,6 +22,7 @@
     display: flex;
     align-items: center;
     gap: .3rem;
+    min-height: 44px;
     color: var(--community-reading-muted, #50604f);
     text-decoration: none;
 }
@@ -119,6 +120,7 @@
 
     .community-route-page__context .mud-button-root {
         width: 100%;
+        min-height: 44px;
     }
 
     .community-route-page__sections {

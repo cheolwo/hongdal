@@ -159,6 +159,7 @@
                                QueryDiagramSelectedNode="@selectedNode"
                                QueryDiagramZoomPercent="@diagramZoomPercent"
                                DiagramCloseHref="@normalizedReturnPath"
+                               DiagramReturnHref="@CurrentDiagramPath"
                                DiagramSelectedNodeChanged="HandleSelectedNodeChanged" />
     </MudPaper>
 </div>
@@ -669,6 +670,14 @@
 
     private string normalizedReturnPath
         => CommunityDiagramNavigationContext.NormalizeReturnPath(ReturnPath);
+
+    private string CurrentDiagramPath
+        => CommunityPageRoutes.DiagramFor(
+            ActiveLedgerTemplate.Key,
+            selectedNode,
+            diagramZoomPercent,
+            paletteFilter,
+            normalizedReturnPath);
 
     private string PaletteCssClass
         => isMobilePaletteOpen
