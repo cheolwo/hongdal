@@ -59,7 +59,7 @@
 | `SsalddelAdmin` | 42 | 관리자, 운영자 | 배차, 운송 원장, 문서/POD, 결제/정산, 정책 운영 |
 | `SsalddelAdminApp` | 6 | 커뮤니티 운영자 | 공통 홈, 커뮤니티 운영, 출처 자료 검토·글쓰기, 반야 선별 운영 |
 | `WarehouseManagerApp` | 13 | 창고 관리자, 작업자 | 작업 보드, 입고 검수, 스캔, 피킹 배치, 알뜰살뜰 마트 창고 |
-| `OrdererApp` | 9 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
+| `OrdererApp` | 11 | 주문자, 공동구매 참여자 | 공동구매, 음식/마트 주문, 화물 주문, 주문 이력 |
 | `RestaurantDeskApp` | 5 | 음식점/매장 운영자 | 주변/인기 음식점, 리뷰 관리, 배차 주소 |
 | `HumanResourcesManagerApp` | 1 | 인사/고용 담당자 | 인사 관리 홈 |
 
@@ -67,9 +67,9 @@
 
 | 상태 | 수 | 의미 |
 | --- | ---: | --- |
-| 완료 | 118 | 현재 문서에서 인라인 이미지로 바로 확인할 수 있는 화면 |
+| 완료 | 121 | 현재 문서에서 인라인 이미지 또는 실제 렌더링 변경 기록으로 확인할 수 있는 화면 |
 | 인증 필요 | 0 | 관리자 보호 라우트도 개발용 인증 세션과 문서용 메모리 데이터로 운영 화면까지 캡처한 상태 |
-| 캡처 대기 | 5 | 운송 업무, 내 꾸미기 만들기, Admin Fake PG/정산, 마트 피킹/포장, 마트 주문 요청 전용 캡처 필요 |
+| 캡처 대기 | 4 | 운송 업무, 내 꾸미기 만들기, Admin Fake PG/정산, 마트 피킹/포장 전용 캡처 필요 |
 
 ## SsalddelApp
 
@@ -227,8 +227,10 @@
 | `OrdererApp-P03 - 주문자 화물 주문` | `/cargo` | `OrdererApp/Components/Pages/CargoOrder.razor` | 확장 | 주문자 화물 주문 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P03.png" alt="OrdererApp-P03" width="160"> |
 | `OrdererApp-P04 - 음식 주문 홈` | `/food` | `OrdererApp/Components/Pages/FoodOrderHome.razor` | 확장 | 음식 주문 홈 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P04.png" alt="OrdererApp-P04" width="160"> |
 | `OrdererApp-P04-1 - 음식점 주문` | `/food/restaurants` | `OrdererApp/Components/Pages/RestaurantOrder.razor` | 확장 | 음식점 주문 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P04-1.png" alt="OrdererApp-P04-1" width="160"> |
-| `OrdererApp-P04-2 - 마트 주문` | `/food/mart` | `OrdererApp/Components/Pages/MartOrder.razor` | 확장 | 마트 주문 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P04-2.png" alt="OrdererApp-P04-2" width="160"> |
-| `OrdererApp-P04-3 - 마트 비구속 주문 요청` | `/food/mart/order` | `OrdererApp/Components/Pages/MartOrderRequest.razor` | 확장 | 공개 상품 한 건의 주문 요청 저장과 같은 ID 재조회 | - | 캡처 대기 |
+| `OrdererApp-P04-2 - 마트 공개 상품 목록` | `/food/mart` | `OrdererApp/Components/Pages/MartOrder.razor` | 확장 | 공개 상품 검색·판매 가능 조건·서버 페이징 | - | 재캡처 완료: [변경 기록](../Changes/2026-07-22-mart-product-route-srp.md)<br><img src="../assets/changes/2026-07-22-mart-product-route-srp/mart-product-list-desktop.png" alt="OrdererApp-P04-2 desktop" width="160"> |
+| `OrdererApp-P04-2-1 - 마트 공개 상품 상세` | `/food/mart/products/{ProductId}` | `OrdererApp/Components/Pages/MartProductDetail.razor` | 확장 | stable product ID 공개 설명·재고 투영·구매 근거 읽기 | `OrdererApp-P04-2` | stable-ID 실제 확인: [변경 기록](../Changes/2026-07-22-mart-product-route-srp.md) |
+| `OrdererApp-P04-2-2 - 마트 상품 구매후기 작성` | `/food/mart/reviews/{ProductId}` | `OrdererApp/Components/Pages/MartProductReview.razor` | 확장 | 완료 원장 참여자의 명시적 공개 후기 저장과 같은 상품 재조회 | `OrdererApp-P04-2-1` | 390px 완료: [변경 기록](../Changes/2026-07-22-mart-product-route-srp.md)<br><img src="../assets/changes/2026-07-22-mart-product-route-srp/mart-product-review-mobile.png" alt="OrdererApp-P04-2-2 mobile" width="160"> |
+| `OrdererApp-P04-3 - 마트 비구속 주문 요청` | `/food/mart/order/{ProductId}` | `OrdererApp/Components/Pages/MartOrderRequest.razor` | 확장 | 공개 상품 한 건의 주문 요청 저장과 같은 요청 ID 재조회 | `OrdererApp-P04-2-1` | stable-ID·390px 로그인 경계 확인: [변경 기록](../Changes/2026-07-22-mart-product-route-srp.md) |
 | `OrdererApp-P05 - 주문 이력` | `/orders` | `OrdererApp/Components/Pages/OrderHistory.razor` | 보조 | 주문 이력 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P05.png" alt="OrdererApp-P05" width="160"> |
 | `OrdererApp-P99 - 미발견 페이지` | `/not-found` | `OrdererApp/Components/Pages/NotFound.razor` | 시스템 | 미발견 페이지 | - | 완료<br><img src="assets/app-pages/OrdererApp/OrdererApp-P99.png" alt="OrdererApp-P99" width="160"> |
 

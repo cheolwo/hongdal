@@ -19,7 +19,7 @@ internal static class MartDiscoveryUiModule
         services.TryAddTransient<마트공개상품목록ViewModel>();
         services.TryAddTransient<마트공개상품상세ViewModel>();
         services.TryAddTransient<마트공개상품후기작성ViewModel>();
-        services.TryAddTransient<마트공개상품PageViewModel>();
+        services.TryAddTransient<마트공개상품후기PageViewModel>();
         services.TryAddTransient<마트주문작성ViewModel>();
         services.TryAddTransient<마트주문요청상세ViewModel>();
         services.TryAddTransient<마트주문작성PageViewModel>();

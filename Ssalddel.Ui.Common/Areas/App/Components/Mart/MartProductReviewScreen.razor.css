@@ -1,0 +1,72 @@
+.mart-product-review {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.mart-product-review__heading {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    align-items: flex-start;
+}
+
+.mart-product-review__summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .65rem;
+}
+
+.mart-product-review__summary > div {
+    display: grid;
+    gap: .2rem;
+    padding: .75rem;
+    border: 1px solid rgba(46, 125, 50, .2);
+    border-radius: .75rem;
+    background: rgba(232, 245, 233, .55);
+}
+
+.mart-product-review__summary span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .75rem;
+}
+
+.mart-product-review__form {
+    display: grid;
+    gap: .75rem;
+}
+
+.mart-product-review__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .55rem;
+}
+
+.mart-product-review__state {
+    min-height: 18rem;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .65rem;
+    text-align: center;
+}
+
+@media (max-width: 680px) {
+    .mart-product-review__heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .mart-product-review__summary {
+        grid-template-columns: 1fr;
+    }
+
+    .mart-product-review__actions {
+        display: grid;
+    }
+
+    .mart-product-review__actions ::deep .mud-button-root {
+        min-height: 48px;
+    }
+}

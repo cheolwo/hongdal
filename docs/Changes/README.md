@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [마트 공개 상품 Route·공용 Screen 단일책임 분리](2026-07-22-mart-product-route-srp.md) | 목록·stable-ID 상세·후기·비구속 주문 요청을 Web·주문자 앱 공용 Screen과 독립 route로 분리하고 desktop·390px 실제 확인 |
 | 2026-07-22 | [피킹 작업 Route·공용 Screen 단일책임 분리](2026-07-22-picking-task-route-srp.md) | 목록·stable-key 상세·피킹 실행을 Web·창고 앱 공용 Screen과 독립 route로 분리하고 같은 Key 재조회, desktop·390px 실제 확인 |
 | 2026-07-22 | [입고 검수 Route·공용 Screen 단일책임 분리](2026-07-22-inbound-inspection-route-srp.md) | 목록·stable-ID 상세·검수 실행을 Web·창고 앱 공용 Screen과 독립 route로 분리하고 Command 뒤 같은 ID 재조회, desktop·390px 실제 확인 |
 | 2026-07-22 | [입고 요청 Route·공용 Screen 단일책임 분리](2026-07-22-inbound-request-route-srp.md) | 목록·신규 신청·stable-ID 상세·입고 완료·창고 등록을 Web·모바일 공용 Screen과 독립 route로 분리하고 Command 뒤 같은 ID 재조회, desktop·390px 실제 확인 |

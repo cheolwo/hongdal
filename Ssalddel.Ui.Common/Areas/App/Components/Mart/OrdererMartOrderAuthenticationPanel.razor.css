@@ -40,6 +40,14 @@
         grid-template-columns: 1fr;
     }
 
+    .mart-order-login-layout ::deep .mud-input-root,
+    .mart-order-login-layout ::deep .mud-input,
+    .mart-order-login-layout ::deep .mud-input-control-input-container,
+    .mart-order-login-layout ::deep .mud-input-control,
+    .mart-order-login-layout ::deep .mud-button-root {
+        min-height: 48px;
+    }
+
     .mart-order-toolbar {
         justify-content: stretch;
     }

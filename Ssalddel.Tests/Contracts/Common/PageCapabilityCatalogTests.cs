@@ -543,6 +543,33 @@ public sealed class PageCapabilityCatalogTests
         Assert.Contains("SsalddelMartWorkflow", capability.FeatureKeys);
     }
 
+    [Theory]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/food/mart", "web-orderer-mart-canonical", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/food/mart/products/41", "web-orderer-mart-detail", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/food/mart/reviews/41", "web-orderer-mart-review", PageInteractionBoundary.PlatformPersistence, true)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/food/mart/order/41", "web-orderer-mart-order-request-canonical", PageInteractionBoundary.PlatformPersistence, true)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/orderer/mart/products/41", "web-orderer-mart-detail-legacy", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData(SsalddelPageAppCodes.Orderer, "/food/mart/products/41", "orderer-mart-detail", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData(SsalddelPageAppCodes.Orderer, "/food/mart/reviews/41", "orderer-mart-review", PageInteractionBoundary.PlatformPersistence, true)]
+    [InlineData(SsalddelPageAppCodes.Orderer, "/food/mart/order/41", "orderer-mart-order-request", PageInteractionBoundary.PlatformPersistence, true)]
+    public void 마트상품책임별Route는_조회와명시적저장경계를분리한다(
+        string appCode,
+        string route,
+        string expectedPageKey,
+        PageInteractionBoundary expectedBoundary,
+        bool expectedAuthentication)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(appCode, route, out var capability);
+
+        Assert.True(found);
+        Assert.Equal(expectedPageKey, capability.PageKey);
+        Assert.Equal(expectedBoundary, capability.Boundary);
+        Assert.Equal(expectedAuthentication, capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("SsalddelMartWorkflow", capability.FeatureKeys);
+        Assert.Contains("SsalddelMart", capability.WorkflowCodes);
+    }
+
     [Fact]
     public void 인사역할검토홈은_인증된영속배정원장조회Beta로분류한다()
     {

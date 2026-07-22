@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Ssalddel.Contracts.Common.Mart;
 using Ssalddel.Ui.Common.Areas.App.Models.Auth;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
@@ -15,12 +16,11 @@ public partial class OrdererMartOrderRequestWorkspace
     public Guid? RequestId { get; set; }
 
     [Parameter]
-    public string CatalogHref { get; set; } = "/food/mart";
+    public string CatalogHref { get; set; } = MartProductPageRoutes.Root;
 
     [Parameter]
     public EventCallback<Guid?> RequestSelected { get; set; }
 
-    private 마트페이지접근ViewModel Access => ViewModel.접근;
     private 주문자앱인증ViewModel Authentication => ViewModel.인증;
     private 마트공개상품상세ViewModel Product => ViewModel.상품;
     private 마트주문작성ViewModel Writer => ViewModel.작성;
@@ -34,7 +34,7 @@ public partial class OrdererMartOrderRequestWorkspace
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!_initialized || !Access.사용가능)
+        if (!_initialized)
         {
             return;
         }
@@ -64,11 +64,6 @@ public partial class OrdererMartOrderRequestWorkspace
 
     private async Task InitializeAsync()
     {
-        if (!await Access.확인Async() || !Access.사용가능)
-        {
-            return;
-        }
-
         var productTask = ProductId is long productId
             ? Product.조회Async(productId)
             : Task.FromResult(true);

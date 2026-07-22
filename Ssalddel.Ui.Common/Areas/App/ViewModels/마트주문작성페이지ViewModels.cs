@@ -111,24 +111,21 @@ public sealed partial class 마트주문요청상세ViewModel(
     }
 }
 
-/// <summary>기능 접근, 주문자 인증, 공개 상품, 작성과 저장 후 재조회를 조립합니다.</summary>
+/// <summary>주문자 인증, 공개 상품, 작성과 저장 후 재조회를 조립합니다. 기능 접근은 공용 route frame이 담당합니다.</summary>
 public sealed class 마트주문작성PageViewModel : 조립ViewModelBase
 {
     public 마트주문작성PageViewModel(
-        마트페이지접근ViewModel access,
         주문자앱인증ViewModel authentication,
         마트공개상품상세ViewModel product,
         마트주문작성ViewModel writer,
         마트주문요청상세ViewModel requestDetail)
     {
-        접근 = 하위ViewModel등록(access);
         인증 = 하위ViewModel등록(authentication);
         상품 = 하위ViewModel등록(product);
         작성 = 하위ViewModel등록(writer);
         요청상세 = 하위ViewModel등록(requestDetail);
     }
 
-    public 마트페이지접근ViewModel 접근 { get; }
     public 주문자앱인증ViewModel 인증 { get; }
     public 마트공개상품상세ViewModel 상품 { get; }
     public 마트주문작성ViewModel 작성 { get; }

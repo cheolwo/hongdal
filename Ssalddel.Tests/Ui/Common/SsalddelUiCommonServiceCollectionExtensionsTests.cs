@@ -342,8 +342,8 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(마트공개상품Client)
             && x.Lifetime == ServiceLifetime.Scoped);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(마트공개상품PageViewModel)
-            && x.ImplementationType == typeof(마트공개상품PageViewModel)
+            x.ServiceType == typeof(마트공개상품후기PageViewModel)
+            && x.ImplementationType == typeof(마트공개상품후기PageViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(I마트주문요청Service)

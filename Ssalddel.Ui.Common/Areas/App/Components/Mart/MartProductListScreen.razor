@@ -1,0 +1,194 @@
+@inherits MvvmComponentBase<마트공개상품목록ViewModel>
+@using Microsoft.AspNetCore.Components.Web
+@using Ssalddel.Contracts.Common.Mart
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<div class="mart-product-list" aria-label="마트 공개 상품 목록">
+    <MudPaper Elevation="0" Outlined="true" Class="mart-product-list__panel">
+        <div class="mart-product-list__heading">
+            <div>
+                <MudText Typo="Typo.overline">PUBLIC MART CATALOG</MudText>
+                <MudText Typo="Typo.h6">공개 판매 상품 찾기</MudText>
+            </div>
+            @if (ViewModel.초기화됨)
+            {
+                <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">
+                    @($"{ViewModel.전체건수:N0}개 공개")
+                </MudChip>
+            }
+        </div>
+
+        <div class="mart-product-list__search">
+            <MudTextField T="string"
+                          @bind-Value="ViewModel.검색어"
+                          Label="상품명·카테고리·설명"
+                          Placeholder="예: 생수, 생활용품"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          OnKeyDown="HandleSearchKeyAsync" />
+            <MudCheckBox T="bool" @bind-Value="ViewModel.판매가능만" Color="Color.Success">판매 가능한 상품만</MudCheckBox>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       StartIcon="@Icons.Material.Filled.TravelExplore"
+                       Disabled="@ViewModel.처리중"
+                       OnClick="SearchAsync">
+                상품 조회
+            </MudButton>
+        </div>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="mart-product-list__panel mart-product-list__results">
+        <div class="mart-product-list__heading">
+            <div>
+                <MudText Typo="Typo.overline">SERVER RESULTS</MudText>
+                <MudText Typo="Typo.h6">마트 공개 상품</MudText>
+            </div>
+            @if (ViewModel.초기화됨)
+            {
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@ViewModel.처리중"
+                           OnClick="ReloadAsync">새로고침</MudButton>
+            }
+        </div>
+
+        @if (ViewModel.처리중)
+        {
+            <div class="mart-product-list__state">
+                <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+                <MudText Typo="Typo.body2">영속된 공개 상품 원장을 조회하고 있습니다.</MudText>
+            </div>
+        }
+        else if (ViewModel.오류발생)
+        {
+            <div class="mart-product-list__state">
+                <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                <MudText Typo="Typo.subtitle2">마트 상품 목록을 불러오지 못했습니다.</MudText>
+                <MudText Typo="Typo.body2">@MartProductPresentation.ErrorMessage(ViewModel.오류메시지)</MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="ReloadAsync">다시 시도</MudButton>
+            </div>
+        }
+        else if (ViewModel.결과없음)
+        {
+            <div class="mart-product-list__state">
+                <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Large" />
+                <MudText Typo="Typo.subtitle2">공개된 마트 상품이 없습니다.</MudText>
+                <MudText Typo="Typo.body2">@EmptyMessage</MudText>
+            </div>
+        }
+        else if (ViewModel.초기화됨)
+        {
+            <MudText Typo="Typo.caption">@($"전체 {ViewModel.전체건수:N0}개 · {ViewModel.현재페이지}/{ViewModel.총페이지수}페이지")</MudText>
+            <div class="mart-product-list__grid">
+                @foreach (var product in ViewModel.상품목록)
+                {
+                    <article class="mart-product-card">
+                        <div class="mart-product-card__visual">
+                            @if (!string.IsNullOrWhiteSpace(product.대표이미지Url))
+                            {
+                                <img src="@product.대표이미지Url" alt="@($"{product.상품명} 공개 이미지")" loading="lazy" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Success" Size="Size.Large" />
+                            }
+                        </div>
+                        <div class="mart-product-card__heading">
+                            <div>
+                                <MudText Typo="Typo.h6">@product.상품명</MudText>
+                                <MudText Typo="Typo.caption">@MartProductPresentation.ValueOrDash(product.카테고리) · @MartProductPresentation.ValueOrDash(product.판매단위)</MudText>
+                            </div>
+                            <MudChip T="string" Size="Size.Small" Color="@(product.판매가능여부 ? Color.Success : Color.Default)" Variant="Variant.Outlined">
+                                @(product.판매가능여부 ? "판매 가능" : "품절·준비 중")
+                            </MudChip>
+                        </div>
+                        <MudText Typo="Typo.body2">@MartProductPresentation.ValueOrDash(product.짧은설명)</MudText>
+                        <div class="mart-product-card__meta">
+                            <strong>@product.판매가.ToString("N0")원</strong>
+                            <span>판매 가능 @product.판매가능수량.ToString("N0")</span>
+                            <span>@MartProductPresentation.ProjectionTime(product.재고기준시각Utc)</span>
+                        </div>
+                        <MudButton Href="@Context.PathFor(MartProductScreenKind.Detail, product.Id)"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.FindInPage">
+                            공개 상세 보기
+                        </MudButton>
+                    </article>
+                }
+            </div>
+
+            @if (ViewModel.총페이지수 > 1)
+            {
+                <div class="mart-product-list__pagination">
+                    <MudPagination Count="@ViewModel.총페이지수"
+                                   Selected="@ViewModel.현재페이지"
+                                   SelectedChanged="ChangePageAsync"
+                                   Disabled="@ViewModel.처리중"
+                                   ShowFirstButton="true"
+                                   ShowLastButton="true" />
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(ViewModel.응답.재고기준안내))
+            {
+                <MudText Typo="Typo.caption" Class="mart-product-list__basis">@ViewModel.응답.재고기준안내</MudText>
+            }
+        }
+    </MudPaper>
+</div>
+
+@code {
+    private string? _loadedState;
+
+    [Parameter, EditorRequired] public MartProductNavigationContext Context { get; set; } = new();
+    [Parameter] public EventCallback<MartProductNavigationContext> ContextChanged { get; set; }
+
+    private string EmptyMessage => ViewModel.검색조건사용중
+        ? "검색어나 판매 가능 조건을 바꿔 다시 조회해 주세요."
+        : "운영자가 공개 판매 상품 투영을 등록하면 이 목록에 표시됩니다.";
+
+    protected override Task OnParametersSetAsync() => LoadContextAsync();
+
+    private async Task LoadContextAsync()
+    {
+        var state = $"{Context.Search}\u001f{Context.AvailableOnly}\u001f{Context.Page}";
+        if (string.Equals(_loadedState, state, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedState = state;
+        ViewModel.검색어 = Context.Search ?? string.Empty;
+        ViewModel.판매가능만 = Context.AvailableOnly;
+        await ViewModel.페이지조회Async(Context.Page);
+    }
+
+    private Task SearchAsync()
+        => NavigateOrLoadAsync(Context.WithListState(ViewModel.검색어, ViewModel.판매가능만, 1));
+
+    private Task ChangePageAsync(int page)
+        => NavigateOrLoadAsync(Context.WithListState(ViewModel.검색어, ViewModel.판매가능만, page));
+
+    private Task HandleSearchKeyAsync(KeyboardEventArgs args)
+        => string.Equals(args.Key, "Enter", StringComparison.Ordinal) ? SearchAsync() : Task.CompletedTask;
+
+    private Task ReloadAsync() => ViewModel.새로고침Async();
+
+    private async Task NavigateOrLoadAsync(MartProductNavigationContext context)
+    {
+        if (ContextChanged.HasDelegate)
+        {
+            await ContextChanged.InvokeAsync(context);
+            return;
+        }
+
+        Context = context;
+        _loadedState = null;
+        await LoadContextAsync();
+    }
+}

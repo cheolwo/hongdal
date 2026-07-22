@@ -1,0 +1,25 @@
+@page "/food/mart/reviews/{ProductId:long}"
+@page "/orderer/mart/reviews/{ProductId:long}"
+@inject NavigationManager Navigation
+@using Ssalddel.Contracts.Common.Mart
+
+<PageTitle>마트 상품 구매후기 작성 · 살뜰</PageTitle>
+
+<MartProductAccessFrame Context="@Context"
+                        CurrentScreen="MartProductScreenKind.Review"
+                        ProductId="@ProductId"
+                        Eyebrow="REVIEW"
+                        Title="마트 상품 구매후기 작성"
+                        Description="한 상품의 완료 원장 참여자가 공개 가능한 후기만 명시적으로 등록합니다."
+                        HomeHref="@WebOrdererRoutes.Home">
+    <MartProductReviewScreen ProductId="@ProductId"
+                             Context="@Context"
+                             LoginPath="/login" />
+</MartProductAccessFrame>
+
+@code {
+    [Parameter] public long ProductId { get; set; }
+
+    private MartProductNavigationContext Context
+        => MartProductNavigationContext.Parse(Navigation.Uri);
+}

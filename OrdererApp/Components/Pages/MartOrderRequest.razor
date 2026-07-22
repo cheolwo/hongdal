@@ -1,37 +1,65 @@
 @page "/food/mart/order"
+@page "/food/mart/order/{ProductId:long}"
 @inject NavigationManager Navigation
+@using Ssalddel.Contracts.Common.Mart
 
 <PageTitle>알뜰살뜰 마트 주문 요청</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-    <MudStack Spacing="3">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">알뜰살뜰 마트 주문 요청</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                선택한 공개 상품의 비구속 주문 의향을 저장하고 같은 요청 ID를 서버에서 다시 확인합니다.
-            </MudText>
-        </MudStack>
-
-        <OrdererMartOrderRequestWorkspace ProductId="@ProductId"
+    <MartProductAccessFrame Context="@Context"
+                            CurrentScreen="MartProductScreenKind.Order"
+                            ProductId="@EffectiveProductId"
+                            Eyebrow="ORDER REQUEST"
+                            Title="알뜰살뜰 마트 주문 요청"
+                            Description="선택한 공개 상품 한 건의 비구속 주문 의향만 저장하고 같은 요청 ID를 다시 확인합니다."
+                            HomeHref="@OrdererRoutes.Food">
+        <OrdererMartOrderRequestWorkspace ProductId="@EffectiveProductId"
                                           RequestId="@RequestId"
-                                          CatalogHref="@OrdererRoutes.Mart"
+                                          CatalogHref="@Context.PathFor(MartProductScreenKind.List)"
                                           RequestSelected="OnRequestSelectedAsync" />
-    </MudStack>
+    </MartProductAccessFrame>
 </MudContainer>
 
 @code {
+    [Parameter] public long? ProductId { get; set; }
+
     [SupplyParameterFromQuery(Name = "productId")]
-    public long? ProductId { get; set; }
+    public long? LegacyProductId { get; set; }
 
     [SupplyParameterFromQuery(Name = "requestId")]
     public Guid? RequestId { get; set; }
 
+    private long? EffectiveProductId => ProductId is > 0 ? ProductId : LegacyProductId;
+
+    private MartProductNavigationContext Context
+        => MartProductNavigationContext.Parse(Navigation.Uri);
+
+    protected override void OnParametersSet()
+    {
+        if (ProductId is not > 0 && LegacyProductId is > 0)
+        {
+            var target = Context.PathFor(MartProductScreenKind.Order, LegacyProductId);
+            Navigation.NavigateTo(AppendRequestId(target, RequestId), replace: true);
+        }
+    }
+
     private Task OnRequestSelectedAsync(Guid? requestId)
     {
-        var target = requestId.HasValue
-            ? $"{OrdererRoutes.MartOrderRequest}?requestId={requestId.Value:D}"
-            : OrdererRoutes.MartOrderRequest;
-        Navigation.NavigateTo(target, replace: true);
+        var target = EffectiveProductId is > 0
+            ? Context.PathFor(MartProductScreenKind.Order, EffectiveProductId)
+            : MartProductPageRoutes.OrderRoot;
+        Navigation.NavigateTo(AppendRequestId(target, requestId), replace: true);
         return Task.CompletedTask;
+    }
+
+    private static string AppendRequestId(string path, Guid? requestId)
+    {
+        if (!requestId.HasValue)
+        {
+            return path;
+        }
+
+        var separator = path.Contains('?', StringComparison.Ordinal) ? '&' : '?';
+        return $"{path}{separator}requestId={requestId.Value:D}";
     }
 }

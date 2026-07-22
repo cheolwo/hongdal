@@ -1,0 +1,113 @@
+.mart-product-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.mart-product-list__panel {
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.mart-product-list__heading,
+.mart-product-card__heading {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    align-items: flex-start;
+}
+
+.mart-product-list__search {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1fr) auto auto;
+    gap: .75rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.mart-product-list__results {
+    display: grid;
+    gap: 1rem;
+}
+
+.mart-product-list__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.mart-product-card {
+    min-width: 0;
+    display: grid;
+    gap: .75rem;
+    padding: .9rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: .9rem;
+    background: var(--mud-palette-surface);
+}
+
+.mart-product-card__visual {
+    min-height: 7rem;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: .7rem;
+    background: rgba(46, 125, 50, .07);
+}
+
+.mart-product-card__visual img {
+    width: 100%;
+    height: 8rem;
+    object-fit: cover;
+}
+
+.mart-product-card__meta {
+    display: grid;
+    gap: .15rem;
+    color: var(--mud-palette-text-secondary);
+    font-size: .78rem;
+}
+
+.mart-product-card__meta strong {
+    color: var(--mud-palette-text-primary);
+    font-size: 1rem;
+}
+
+.mart-product-list__state {
+    min-height: 11rem;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .65rem;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.mart-product-list__pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.mart-product-list__basis {
+    display: block;
+    padding-top: .25rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+@media (max-width: 980px) {
+    .mart-product-list__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .mart-product-list__search,
+    .mart-product-list__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mart-product-list__heading,
+    .mart-product-card__heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

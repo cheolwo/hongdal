@@ -1,33 +1,38 @@
 @page "/food/mart"
 @inject NavigationManager Navigation
+@using Ssalddel.Contracts.Common.Mart
 
 <PageTitle>알뜰살뜰 마트 상품</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-    <MudStack Spacing="3">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">알뜰살뜰 마트 상품</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                내부 창고 원장과 분리된 공개 판매 상품과 마지막 투영 시각 기준의 판매 가능 수량을 확인합니다.
-            </MudText>
-        </MudStack>
-
-        <OrdererMartCatalogWorkspace ProductId="@ProductId"
-                                     OrderRequestBasePath="@OrdererRoutes.MartOrderRequest"
-                                     ProductSelected="OnProductSelectedAsync" />
-    </MudStack>
+    <MartProductAccessFrame Context="@Context"
+                            CurrentScreen="MartProductScreenKind.List"
+                            Eyebrow="LIST"
+                            Title="알뜰살뜰 마트 공개 상품"
+                            Description="공개된 상품과 마지막 투영 시각 기준 판매 가능 수량을 검색하고 stable-ID 상세로 이동합니다."
+                            HomeHref="@OrdererRoutes.Food">
+        <MartProductListScreen Context="@Context" ContextChanged="OnContextChangedAsync" />
+    </MartProductAccessFrame>
 </MudContainer>
 
 @code {
     [SupplyParameterFromQuery(Name = "productId")]
-    public long? ProductId { get; set; }
+    public long? LegacyProductId { get; set; }
 
-    private Task OnProductSelectedAsync(long? productId)
+    private MartProductNavigationContext Context
+        => MartProductNavigationContext.Parse(Navigation.Uri);
+
+    protected override void OnParametersSet()
     {
-        var target = productId.HasValue
-            ? $"/food/mart?productId={productId.Value}"
-            : "/food/mart";
-        Navigation.NavigateTo(target, replace: true);
+        if (LegacyProductId is > 0)
+        {
+            Navigation.NavigateTo(Context.PathFor(MartProductScreenKind.Detail, LegacyProductId), replace: true);
+        }
+    }
+
+    private Task OnContextChangedAsync(MartProductNavigationContext context)
+    {
+        Navigation.NavigateTo(context.PathFor(MartProductScreenKind.List), replace: true);
         return Task.CompletedTask;
     }
 }

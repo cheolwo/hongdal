@@ -1,0 +1,158 @@
+@inherits MvvmComponentBase<마트공개상품후기PageViewModel>
+@using Ssalddel.Contracts.Common.Mart
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="mart-product-review" aria-label="마트 공개 상품 구매후기 작성">
+    @if (Detail.처리중)
+    {
+        <div class="mart-product-review__state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+            <MudText Typo="Typo.body2">후기를 작성할 정확한 공개 상품을 불러오고 있습니다.</MudText>
+        </div>
+    }
+    else if (Detail.오류발생)
+    {
+        <div class="mart-product-review__state">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">상품을 불러오지 못했습니다.</MudText>
+            <MudText Typo="Typo.body2">@MartProductPresentation.ErrorMessage(Detail.오류메시지)</MudText>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" OnClick="ReloadAsync">다시 시도</MudButton>
+        </div>
+    }
+    else if (Detail.찾을수없음 || Detail.상세 is null)
+    {
+        <div class="mart-product-review__state">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle2">후기를 작성할 공개 상품을 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2">다른 상품이나 sample 상품으로 대체하지 않습니다.</MudText>
+            <MudButton Href="@Context.PathFor(MartProductScreenKind.List)" Variant="Variant.Outlined" Color="Color.Success">상품 목록</MudButton>
+        </div>
+    }
+    else
+    {
+        var product = Detail.상세;
+
+        <header class="mart-product-review__heading">
+            <div>
+                <MudText Typo="Typo.overline">PRODUCT #@product.Id · PURCHASE REVIEW</MudText>
+                <MudText Typo="Typo.h5">@product.상품명 구매후기</MudText>
+                <MudText Typo="Typo.body2">완료 사례·후기 게시판에 공개할 내용만 작성합니다.</MudText>
+            </div>
+            <MudChip T="string"
+                     Color="@(product.구매근거.후기작성가능여부 ? Color.Success : Color.Default)"
+                     Variant="Variant.Outlined">
+                @(product.구매근거.후기작성가능여부 ? "후기 자격 확인 가능" : "후기 작성 불가")
+            </MudChip>
+        </header>
+
+        <div class="mart-product-review__summary">
+            <div><span>상품</span><strong>@product.상품명</strong></div>
+            <div><span>완료 원장</span><strong>@product.구매근거.원장근거상태</strong></div>
+            <div><span>공개 후기</span><strong>@($"{product.구매근거.공개후기수:N0}건")</strong></div>
+        </div>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+            서버가 로그인 사용자와 완료 원장 접근 권한을 다시 확인합니다. 주소·연락처·결제정보 등 개인정보는 적지 마세요.
+        </MudAlert>
+
+        @if (!product.구매근거.후기작성가능여부)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                완료된 구매 원장과 후기 작성 가능 상태가 확인되지 않았습니다. 이 화면에서는 자격을 우회하거나 임시 후기를 저장하지 않습니다.
+            </MudAlert>
+        }
+        else if (!Review.사용자확인됨)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                구매후기는 로그인한 원장 참여자만 작성할 수 있습니다.
+            </MudAlert>
+            <MudButton Href="@LoginPath"
+                       Variant="Variant.Filled"
+                       Color="Color.Success"
+                       StartIcon="@Icons.Material.Filled.Login">
+                로그인 후 후기 작성
+            </MudButton>
+        }
+        else
+        {
+            @if (Review.성공함 && !string.IsNullOrWhiteSpace(Review.성공메시지))
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@Review.성공메시지</MudAlert>
+            }
+
+            <div class="mart-product-review__form">
+                <MudTextField T="string"
+                              @bind-Value="Review.작성자표시명"
+                              Label="작성자 표시명"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              MaxLength="40" />
+                <MudTextField T="string"
+                              @bind-Value="Review.글비밀번호"
+                              Label="글 비밀번호"
+                              HelperText="후기 수정·삭제에 사용할 4자 이상의 비밀번호"
+                              InputType="InputType.Password"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              MaxLength="100" />
+                <MudTextField T="string"
+                              @bind-Value="Review.제목"
+                              Label="후기 제목"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              MaxLength="160" />
+                <MudTextField T="string"
+                              @bind-Value="Review.본문"
+                              Label="구매 후기"
+                              Placeholder="상품 상태, 함께 구매한 경험, 다시 구매할 의향 등 공개 가능한 내용을 적어주세요."
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="6"
+                              MaxLength="4000" />
+
+                @if (Review.오류발생)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Text" Dense="true">
+                        @MartProductPresentation.ErrorMessage(Review.오류메시지)
+                    </MudAlert>
+                }
+
+                <div class="mart-product-review__actions">
+                    <MudButton Href="@Context.PathFor(MartProductScreenKind.Detail, product.Id)"
+                               Variant="Variant.Text"
+                               Disabled="@Review.처리중">
+                        상세로 돌아가기
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               StartIcon="@Icons.Material.Filled.Publish"
+                               Disabled="@Review.처리중"
+                               OnClick="SubmitAsync">
+                        @(Review.처리중 ? "등록 중" : "후기 공개 등록")
+                    </MudButton>
+                </div>
+            </div>
+        }
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public long ProductId { get; set; }
+    [Parameter, EditorRequired] public MartProductNavigationContext Context { get; set; } = new();
+    [Parameter] public string LoginPath { get; set; } = "/login";
+
+    private 마트공개상품상세ViewModel Detail => ViewModel.상세;
+    private 마트공개상품후기작성ViewModel Review => ViewModel.후기;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Detail.요청ProductId != ProductId || Detail.상세 is null)
+        {
+            await ViewModel.상세조회Async(ProductId);
+        }
+    }
+
+    private Task ReloadAsync() => ViewModel.상세조회Async(ProductId);
+
+    private Task SubmitAsync() => ViewModel.작성후같은상품재조회Async();
+}

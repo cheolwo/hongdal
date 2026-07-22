@@ -104,6 +104,36 @@ public sealed class 마트공개상품페이지ViewModelTests
         Assert.Contains("로그인", viewModel.오류메시지);
     }
 
+    [Fact]
+    public async Task 후기PageViewModel은_작성성공뒤목록이아니라같은상품Id만다시조회한다()
+    {
+        var productService = new FakeMartProductService
+        {
+            DetailResponse = new 마트공개상품상세응답
+            {
+                Id = 41,
+                상품명 = "제철 감자"
+            }
+        };
+        var reviewService = new FakeReviewService();
+        var viewModel = new 마트공개상품후기PageViewModel(
+            new 마트공개상품상세ViewModel(productService),
+            new 마트공개상품후기작성ViewModel(
+                reviewService,
+                new FakeCurrentUserContext(new 현재사용자Snapshot("buyer-1", "감자 구매자", ["Orderer"]))));
+
+        Assert.True(await viewModel.상세조회Async(41));
+        viewModel.후기.글비밀번호 = "safe-password";
+        viewModel.후기.본문 = "공개 가능한 구매 후기입니다.";
+
+        var succeeded = await viewModel.작성후같은상품재조회Async();
+
+        Assert.True(succeeded);
+        Assert.Equal([41L, 41L], productService.DetailProductIds);
+        Assert.Null(productService.LastRequest);
+        Assert.Equal(41, viewModel.상세.요청ProductId);
+    }
+
     private sealed class FakeAccessService(bool enabled) : I마트페이지접근Service
     {
         public Task<bool> 기능활성여부Async(CancellationToken cancellationToken = default)
@@ -115,6 +145,7 @@ public sealed class 마트공개상품페이지ViewModelTests
         public 마트공개상품목록응답 ListResponse { get; init; } = new();
         public 마트공개상품상세응답? DetailResponse { get; init; }
         public 마트공개상품목록조회요청? LastRequest { get; private set; }
+        public List<long> DetailProductIds { get; } = [];
 
         public Task<마트공개상품목록응답> 목록Async(
             마트공개상품목록조회요청 request,
@@ -127,7 +158,10 @@ public sealed class 마트공개상품페이지ViewModelTests
         public Task<마트공개상품상세응답?> 상세Async(
             long productId,
             CancellationToken cancellationToken = default)
-            => Task.FromResult(DetailResponse);
+        {
+            DetailProductIds.Add(productId);
+            return Task.FromResult(DetailResponse);
+        }
     }
 
     private sealed class FakeReviewService : I마트공개상품후기작성Service

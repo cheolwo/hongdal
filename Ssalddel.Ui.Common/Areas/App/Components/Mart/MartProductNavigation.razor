@@ -1,0 +1,49 @@
+@using Ssalddel.Contracts.Common.Mart
+
+<nav class="mart-product-nav" aria-label="마트 공개 상품 화면">
+    @foreach (var item in Items)
+    {
+        if (item.RequiresProductId && ProductId is not > 0)
+        {
+            <span class="mart-product-nav__item mart-product-nav__item--disabled" aria-disabled="true">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span><strong>@item.Label</strong><small>@item.Description</small></span>
+            </span>
+        }
+        else
+        {
+            <a class="@BuildClass(item.Screen)"
+               href="@Context.PathFor(item.Screen, ProductId)"
+               aria-current="@(item.Screen == CurrentScreen ? "page" : null)">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span><strong>@item.Label</strong><small>@item.Description</small></span>
+            </a>
+        }
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public MartProductNavigationContext Context { get; set; } = new();
+    [Parameter] public MartProductScreenKind CurrentScreen { get; set; }
+    [Parameter] public long? ProductId { get; set; }
+
+    private static readonly IReadOnlyList<NavigationItem> Items =
+    [
+        new(MartProductScreenKind.List, "목록", "검색·상품 선택", Icons.Material.Filled.Storefront, false),
+        new(MartProductScreenKind.Detail, "상세", "공개 원장 읽기", Icons.Material.Filled.Description, true),
+        new(MartProductScreenKind.Review, "후기", "구매후기 작성", Icons.Material.Filled.RateReview, true),
+        new(MartProductScreenKind.Order, "주문 요청", "비구속 의향 저장", Icons.Material.Filled.AddShoppingCart, true)
+    ];
+
+    private string BuildClass(MartProductScreenKind screen)
+        => screen == CurrentScreen
+            ? "mart-product-nav__item mart-product-nav__item--active"
+            : "mart-product-nav__item";
+
+    private sealed record NavigationItem(
+        MartProductScreenKind Screen,
+        string Label,
+        string Description,
+        string Icon,
+        bool RequiresProductId);
+}

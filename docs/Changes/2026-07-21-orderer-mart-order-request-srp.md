@@ -4,8 +4,8 @@
 
 | 변경 축 | 화면 변경 여부 | 책임 경계 |
 | --- | --- | --- |
-| 주문 요청 조립 shell | 구조 정돈 | 260줄 화면을 54줄 shell로 줄이고 접근·선택·상품·인증·저장 영수증·작성 책임만 조립 |
-| 기능 접근 상태 | 화면 유지 | 기능 확인 전·비활성·오류·재시도를 전용 component로 분리 |
+| 주문 요청 조립 shell | 구조 정돈 | 260줄 화면을 42줄 shell로 줄이고 선택·상품·인증·저장 영수증·작성 책임만 조립 |
+| 기능 접근 상태 | 화면 유지 | 후속 마트 route 분리에서 목록·상세·후기·주문 요청이 공유하는 `MartProductAccessFrame`으로 이동 |
 | 정확한 상품 상태 | 화면 유지 | 주소의 `productId` 한 건만 조회하고 loading·not-found·error·retry를 담당 |
 | 주문자 인증 | 구조 정돈 | 세션 복원, 로그인·로그아웃과 배송 개인정보 비수집 안내를 독립 영역으로 분리 |
 | 비구속 요청 작성 | 구조 정돈 | 수량, 화면 예상 합계, 네 가지 실행 경계 확인과 저장 action만 담당 |
@@ -16,17 +16,19 @@
 ## 조립 구조
 
 ```text
-OrdererMartOrderRequestWorkspace (54줄 shell)
-├─ OrdererMartOrderRequestAccessState
-├─ OrdererMartOrderSelectionPrompt
-├─ OrdererMartOrderProductPanel
-├─ OrdererMartOrderAuthenticationPanel
-├─ OrdererMartOrderRequestForm
-├─ OrdererMartOrderRequestDetailPanel
-└─ OrdererMartOrderRequestPresentation
+MartProductAccessFrame (목록·상세·후기·주문 요청 공용 기능 접근)
+└─ OrdererMartOrderRequestWorkspace (42줄 shell)
+   ├─ OrdererMartOrderSelectionPrompt
+   ├─ OrdererMartOrderProductPanel
+   ├─ OrdererMartOrderAuthenticationPanel
+   ├─ OrdererMartOrderRequestForm
+   ├─ OrdererMartOrderRequestDetailPanel
+   └─ OrdererMartOrderRequestPresentation
 ```
 
-기존 `마트주문작성PageViewModel`은 기능 접근, 주문자 인증, 공개 상품, 작성과 저장 영수증 ViewModel의 수명을 계속 조립한다. 하위 화면은 전달받은 상태와 event만 표현하며 API 호출, 인증 저장소 또는 영속 상태 확정을 새로 소유하지 않는다.
+`마트주문작성PageViewModel`은 주문자 인증, 공개 상품, 작성과 저장 영수증 ViewModel의 수명만 조립한다. 기능 접근은 공용 route frame이 담당하고, 하위 화면은 전달받은 상태와 event만 표현하며 API 호출, 인증 저장소 또는 영속 상태 확정을 새로 소유하지 않는다.
+
+2026-07-22 후속 route 분리에서 `productId` query는 `/food/mart/order/{ProductId}` stable-ID route로 호환 이동한다. 기존 `/food/mart/order?productId=...`와 Web `/orderer/mart/order?...` 링크는 보존한다.
 
 ## 유지한 제품 경계
 
@@ -51,7 +53,7 @@ OrdererMartOrderRequestWorkspace (54줄 shell)
 
 ![마트 주문 요청 저장 영수증 데스크톱 화면](../assets/changes/2026-07-21-orderer-mart-order-request-srp/orderer-mart-order-receipt.png)
 
-캡처는 격리된 검증 host의 비식별 샘플 데이터로 만들었고 검증용 service 등록은 제거했다. 현재 브라우저 제어 surface가 390px viewport 전환을 허용하지 않아 mobile PNG는 만들지 못했다. 대신 720px 반응형 단일 열 규칙을 구조 테스트로 고정했다.
+캡처는 격리된 검증 host의 비식별 샘플 데이터로 만들었고 검증용 service 등록은 제거했다. 2026-07-22 route 분리 후속 검증에서는 390px browsing context로 stable-ID 주문 route의 상품·로그인 경계를 다시 확인했다. horizontal overflow 없이 단일 열로 전환됐고 로그인 입력은 69px, 버튼은 48px 터치 영역을 가졌다. 대표 mobile PNG와 전체 결과는 [마트 공개 상품 Route·공용 Screen 단일책임 분리](2026-07-22-mart-product-route-srp.md)에 기록했다.
 
 ## 검증
 

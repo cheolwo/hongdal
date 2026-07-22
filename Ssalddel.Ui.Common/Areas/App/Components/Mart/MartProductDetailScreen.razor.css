@@ -1,0 +1,132 @@
+.mart-product-detail {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.mart-product-detail__heading,
+.mart-product-detail__price,
+.mart-product-evidence__heading,
+.mart-product-review-card__heading {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+    align-items: flex-start;
+}
+
+.mart-product-detail__price {
+    align-items: baseline;
+}
+
+.mart-product-detail__description,
+.mart-product-evidence,
+.mart-product-evidence__reviews {
+    display: grid;
+    gap: .75rem;
+}
+
+.mart-product-evidence {
+    padding: .9rem;
+    border: 1px solid rgba(46, 125, 50, .24);
+    border-radius: .85rem;
+    background: linear-gradient(145deg, rgba(232, 245, 233, .72), rgba(255, 255, 255, .96));
+}
+
+.mart-product-evidence__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .5rem;
+}
+
+.mart-product-evidence__stats > div {
+    display: grid;
+    gap: .15rem;
+    padding: .65rem;
+    border-radius: .65rem;
+    background: rgba(255, 255, 255, .82);
+}
+
+.mart-product-evidence__stats span,
+.mart-product-review-card__heading span,
+.mart-product-review-card__meta {
+    color: var(--mud-palette-text-secondary);
+    font-size: .75rem;
+}
+
+.mart-product-review-card {
+    display: grid;
+    gap: .45rem;
+    padding: .75rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: .7rem;
+    background: var(--mud-palette-surface);
+}
+
+.mart-product-review-card__heading > div {
+    min-width: 0;
+    display: grid;
+    gap: .15rem;
+}
+
+.mart-product-review-card p {
+    margin: 0;
+    color: var(--mud-palette-text-secondary);
+    line-height: 1.55;
+}
+
+.mart-product-review-card__meta,
+.mart-product-review-card__meta span,
+.mart-product-evidence__empty,
+.mart-product-detail__actions {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.mart-product-review-card__meta {
+    gap: .9rem;
+}
+
+.mart-product-evidence__empty {
+    padding: .75rem;
+    border-radius: .7rem;
+    background: rgba(255, 255, 255, .72);
+    color: var(--mud-palette-text-secondary);
+}
+
+.mart-product-detail__actions {
+    flex-wrap: wrap;
+}
+
+.mart-product-detail__state {
+    min-height: 18rem;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: .65rem;
+    text-align: center;
+}
+
+@media (max-width: 680px) {
+    .mart-product-detail__heading,
+    .mart-product-detail__price,
+    .mart-product-evidence__heading,
+    .mart-product-review-card__heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .mart-product-evidence__stats {
+        grid-template-columns: 1fr;
+    }
+
+    .mart-product-detail__actions {
+        display: grid;
+    }
+
+    .mart-product-detail__actions ::deep .mud-button-root {
+        width: 100%;
+        min-height: 48px;
+    }
+}

@@ -1,0 +1,24 @@
+@page "/food/mart/reviews/{ProductId:long}"
+@inject NavigationManager Navigation
+@using Ssalddel.Contracts.Common.Mart
+
+<PageTitle>마트 상품 구매후기 작성</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MartProductAccessFrame Context="@Context"
+                            CurrentScreen="MartProductScreenKind.Review"
+                            ProductId="@ProductId"
+                            Eyebrow="REVIEW"
+                            Title="마트 상품 구매후기 작성"
+                            Description="한 상품의 완료 원장 참여자가 공개 가능한 후기만 명시적으로 등록합니다."
+                            HomeHref="@OrdererRoutes.Food">
+        <MartProductReviewScreen ProductId="@ProductId" Context="@Context" LoginPath="/login" />
+    </MartProductAccessFrame>
+</MudContainer>
+
+@code {
+    [Parameter] public long ProductId { get; set; }
+
+    private MartProductNavigationContext Context
+        => MartProductNavigationContext.Parse(Navigation.Uri);
+}

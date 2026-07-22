@@ -265,23 +265,42 @@ public sealed partial class 마트공개상품후기작성ViewModel : 업무작�
     }
 }
 
-/// <summary>기능 접근, 공개 목록, 정확한 상세와 구매후기 ViewModel을 조립합니다.</summary>
-public sealed class 마트공개상품PageViewModel : 조립ViewModelBase
+/// <summary>정확한 공개 상품 상세와 그 상품의 명시적 후기 작성 순서만 조정합니다.</summary>
+public sealed class 마트공개상품후기PageViewModel : 조립ViewModelBase
 {
-    public 마트공개상품PageViewModel(
-        마트페이지접근ViewModel access,
-        마트공개상품목록ViewModel list,
+    public 마트공개상품후기PageViewModel(
         마트공개상품상세ViewModel detail,
         마트공개상품후기작성ViewModel review)
     {
-        접근 = 하위ViewModel등록(access);
-        목록 = 하위ViewModel등록(list);
         상세 = 하위ViewModel등록(detail);
         후기 = 하위ViewModel등록(review);
     }
 
-    public 마트페이지접근ViewModel 접근 { get; }
-    public 마트공개상품목록ViewModel 목록 { get; }
     public 마트공개상품상세ViewModel 상세 { get; }
     public 마트공개상품후기작성ViewModel 후기 { get; }
+
+    public async Task<bool> 상세조회Async(long productId, CancellationToken cancellationToken = default)
+    {
+        var succeeded = await 상세.조회Async(productId, cancellationToken);
+        if (succeeded && 상세.상세 is { } product)
+        {
+            후기.준비(product.Id, product.상품명);
+        }
+        else
+        {
+            후기.선택해제();
+        }
+
+        return succeeded;
+    }
+
+    public async Task<bool> 작성후같은상품재조회Async(CancellationToken cancellationToken = default)
+    {
+        if (상세.상세 is not { } product || !await 후기.작성Async(cancellationToken))
+        {
+            return false;
+        }
+
+        return await 상세조회Async(product.Id, cancellationToken);
+    }
 }

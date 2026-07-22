@@ -11,6 +11,9 @@
 | [OrdererApp-P03 - 주문자 화물 주문](OrdererApp-P03/) | /cargo | 확장 | 주문자 화물 주문 | 완료 |
 | [OrdererApp-P04 - 음식 주문 홈](OrdererApp-P04/) | /food | 확장 | 음식 주문 홈 | 완료 |
 | [OrdererApp-P04-1 - 음식점 주문](OrdererApp-P04-1/) | /food/restaurants | 확장 | 음식점 주문 | 완료 |
-| [OrdererApp-P04-2 - 마트 주문](OrdererApp-P04-2/) | /food/mart | 확장 | 마트 주문 | 완료 |
+| [OrdererApp-P04-2 - 마트 공개 상품 목록](OrdererApp-P04-2/) | `/food/mart` | 확장 | 공개 상품 검색·판매 가능 조건·서버 페이징 | desktop 완료 |
+| [OrdererApp-P04-2-1 - 마트 공개 상품 상세](OrdererApp-P04-2-1/) | `/food/mart/products/{ProductId}` | 확장 | stable product ID 공개 설명·재고 투영·구매 근거 읽기 | stable-ID 실제 확인 |
+| [OrdererApp-P04-2-2 - 마트 상품 구매후기 작성](OrdererApp-P04-2-2/) | `/food/mart/reviews/{ProductId}` | 확장 | 완료 원장 참여자의 명시적 공개 후기 저장과 같은 상품 재조회 | 390px 완료 |
+| [OrdererApp-P04-3 - 마트 비구속 주문 요청](OrdererApp-P04-3/) | `/food/mart/order/{ProductId}` | 확장 | 공개 상품 한 건의 주문 요청 저장과 같은 요청 ID 재조회 | stable-ID·390px 로그인 경계 확인 |
 | [OrdererApp-P05 - 주문 이력](OrdererApp-P05/) | /orders | 보조 | 주문 이력 | 완료 |
 | [OrdererApp-P99 - 미발견 페이지](OrdererApp-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

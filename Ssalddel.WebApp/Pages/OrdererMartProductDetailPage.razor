@@ -1,0 +1,26 @@
+@page "/food/mart/products/{ProductId:long}"
+@page "/orderer/mart/products/{ProductId:long}"
+@inject NavigationManager Navigation
+@using Ssalddel.Contracts.Common.Mart
+
+<PageTitle>마트 상품 상세 · 살뜰</PageTitle>
+
+<MartProductAccessFrame Context="@Context"
+                        CurrentScreen="MartProductScreenKind.Detail"
+                        ProductId="@ProductId"
+                        Eyebrow="DETAIL"
+                        Title="마트 공개 상품 상세"
+                        Description="stable product ID 한 건의 공개 설명·판매 가능 수량·구매 근거와 후기를 읽기 전용으로 확인합니다."
+                        HomeHref="@WebOrdererRoutes.Home">
+    <MartProductDetailScreen ProductId="@ProductId"
+                             Context="@Context"
+                             SalesPageComposerPath="/shipper/sales/pages/new"
+                             CommunityPostBasePath="/community/posts" />
+</MartProductAccessFrame>
+
+@code {
+    [Parameter] public long ProductId { get; set; }
+
+    private MartProductNavigationContext Context
+        => MartProductNavigationContext.Parse(Navigation.Uri);
+}
