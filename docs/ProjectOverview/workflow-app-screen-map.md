@@ -89,8 +89,8 @@ flowchart LR
 | 1 | 상차 완료 | `DriverApp` `/driver/transports/{운송Id}/pickup` | `SsalddelAdmin` `/documents`, `SsalddelApp` 운송 상태, 커뮤니티 활동 신호 후보 | 사진, 인수증, 서명 여부가 증빙 원장으로 전파된다. |
 | 1 | 현장 예외 신고 | `DriverApp` `/driver/transports/{운송Id}/pickup`, `/driver/transports/{운송Id}/dropoff`, `/driver/transports/current` | `SsalddelAdmin` `/transports`, `SsalddelApp` 운송 의뢰 상세 후보 | 상차물건없음, 수량불일치, 담당자부재, 하차지부재, 증빙업로드실패 같은 상황이 단계와 예외코드로 남고 다음 행동 안내가 내려간다. |
 | 2 | 공동주문 운송 방식 확정 | `OrdererApp` `/group-purchase` | `SsalddelAdmin` 공동주문 원장, `DriverApp` 추천 상세, `WarehouseManagerApp` 작업 보드 | 세대 배송 또는 3PL 입고 선택이 후속 작업 화면을 갈라놓는다. |
-| 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `SsalddelApp` `/shipper/warehouse/inventory`, `SsalddelApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매채널 출고 가능 상태로 전파된다. |
-| 2 | 판매채널 주문 출고 배치 | `SsalddelApp` `/shipper/sales/orders` | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 주문 이행 요청이 피킹/포장 작업과 배송 추천으로 이어진다. |
+| 2 | 창고 입고 검수 완료 | `WarehouseManagerApp` `/work/inbound/inspection` | `SsalddelApp` `/shipper/warehouse/inventory`, `SsalddelApp` `/shipper/sales/orders` | 실물 입고가 재고와 판매 주문 원장의 출고 가능 투영으로 전파된다. |
+| 2 | 판매채널 주문 출고 배치 | 향후 운영 Action route. 현재 `SsalddelApp` `/shipper/sales/fulfillment`는 로컬 Simulation | `WarehouseManagerApp` `/work-board`, `DriverApp` `/driver/recommendations` | 운영 준비 전에는 외부 주문·재고·운송 상태를 변경하지 않고 피킹/포장 흐름만 검증한다. |
 | 3 | 통관 상태 보정 | `Ssalddel.WebApp` `/shipper/customs/hs-reviews` 또는 `SsalddelAdmin` `/customs/hs-codes` | `OrdererApp` `/group-purchase`, `SsalddelApp` `/shipper/customs/hs-reviews` | 관세사 검토 결과가 주문자와 판매자 화면의 리스크 표시로 반영된다. |
 | 보조 | 투표 결정 | `OrdererApp` 공동주문 투표 화면 후보 | `SsalddelAdmin` 문서/활동 로그, 커뮤니티 홈 | 집단 결정이 문서화와 공개 가능한 활동 신호로 이어진다. |
 
@@ -194,23 +194,21 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Seller as SsalddelApp /shipper/sales/orders
-    participant Server as Ssalddel 판매·출고 원장
+    participant Seller as SsalddelApp /shipper/sales/fulfillment
+    participant Server as 로컬 판매·출고 Simulation
     participant Warehouse as WarehouseManagerApp /work-board
     participant Driver as DriverApp /driver/recommendations
     participant Admin as SsalddelAdmin /transports
 
-    Seller->>Server: 판매채널 주문 동기화
+    Seller->>Server: 비식별 샘플 주문 반영
     Server->>Seller: 주문 상태=출고대기
     Seller->>Server: 출고 배치 요청
-    Server->>Warehouse: 피킹/포장 작업 생성
-    Warehouse->>Server: 피킹 완료
-    Server->>Seller: 주문 상태=피킹완료
-    Warehouse->>Server: 포장 완료, 배송 인계 요청
-    Server->>Driver: 배송 추천 생성
-    Driver->>Server: 배송 수락
-    Server->>Admin: 운송 상태=배차완료
-    Server->>Seller: 주문 상태=배송중
+    Server->>Seller: 로컬 피킹/포장 작업 생성
+    Note over Seller,Admin: 아래 앱 간 전파는 허가·제휴·운영 준비 후의 목표이며 현재 Simulation은 실행하지 않음
+    Server-->>Warehouse: 향후 피킹/포장 작업 인계
+    Warehouse-->>Driver: 향후 포장 완료·배송 인계
+    Driver-->>Admin: 향후 배송 수락·배차 상태 반영
+    Admin-->>Seller: 향후 주문 배송 상태 투영
 ```
 
 ## 국내 화물 운송
@@ -328,7 +326,8 @@ flowchart LR
 | --- | --- | --- |
 | 판매자 | `SsalddelApp` `/shipper/sales/channels` | `api/v1/sales-channels` |
 | 판매자 | `SsalddelApp` `/shipper/sales/listings` | 상품 출품 후보와 채널 상품 연결 |
-| 판매자 | `SsalddelApp` `/shipper/sales/orders` | 판매채널 주문과 창고 출고 연결 |
+| 판매자 | `SsalddelApp` `/shipper/sales/orders`, `/shipper/sales/orders/{OrderId}` | 영속 판매 주문과 창고 출고 투영 읽기 |
+| 판매자 | `SsalddelApp` `/shipper/sales/fulfillment` | 로컬 주문·재고·피킹·포장 Simulation |
 | 창고 관리자 | `WarehouseManagerApp` `/work-board`, `/work/outbound`, `/work/packing` | 출고, 피킹, 포장 |
 | 기사 | `DriverApp` 국내 화물 운송 화면 | 출고 후 국내 배송 |
 

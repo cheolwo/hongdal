@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Sales;
 
 namespace Ssalddel.Ui.Common.Areas.App.Models;
 
@@ -201,7 +202,7 @@ public static class BaguaRoleTransitionPageCatalog
     internal static (string Name, string Href) ResolveDefaultTargetWorkspace(string businessCode)
         => businessCode switch
         {
-            BaguaBusinessCodes.Order => ("주문 업무", "/shipper/sales/orders"),
+            BaguaBusinessCodes.Order => ("판매 주문 원장", SalesOrderPageRoutes.Root),
             BaguaBusinessCodes.Sales => ("판매 업무", "/shipper/sales/listings"),
             BaguaBusinessCodes.Warehouse => ("창고 업무", "/shipper/warehouse/workspace"),
             BaguaBusinessCodes.Transport => ("운송 업무", "/shipper/transport"),

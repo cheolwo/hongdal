@@ -449,6 +449,38 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
+    public void 판매채널주문상세는_Web과_모바일에서_같은ReadOnly경계를사용한다()
+    {
+        foreach (var appCode in new[] { SsalddelPageAppCodes.IntegratedWeb, SsalddelPageAppCodes.Shipper })
+        {
+            var found = SsalddelPageCapabilityCatalog.TryResolve(
+                appCode,
+                "/shipper/sales/orders/73?from=%2Fshipper%2Fsales%2Forders%3Fpage%3D2",
+                out var capability);
+
+            Assert.True(found);
+            Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+            Assert.True(capability.RequiresAuthentication);
+            Assert.False(capability.HasExternalEffects);
+            Assert.Contains("SalesChannelFulfillmentWorkflow", capability.FeatureKeys);
+        }
+    }
+
+    [Fact]
+    public void 모바일_판매주문이행route는_조회원장과분리된Simulation이다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Shipper,
+            "/shipper/sales/fulfillment",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("shipper-app-sales-fulfillment", capability.PageKey);
+        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.True(capability.HasExternalEffects);
+    }
+
+    [Fact]
     public void 음식점메뉴페이지는_익명공개조회Beta로분류한다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(

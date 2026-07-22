@@ -40,7 +40,7 @@ public static class View카탈로그
         new(App식별자.SsalddelApp, View식별자.Shipper.ReconsignmentOrders, "재위탁 운송", "/shipper/reconsignment/orders", Icons.Shipper.ReconsignmentOrders, 역할명.화주, false, true, 90),
         new(App식별자.SsalddelApp, View식별자.Shipper.SalesChannels, "판매채널 연결", "/shipper/sales/channels", Icons.Shipper.SalesChannels, 역할명.화주, false, true, 100),
         new(App식별자.SsalddelApp, View식별자.Shipper.ProductListings, "출품 관리", "/shipper/sales/listings", Icons.Shipper.ProductListings, 역할명.화주, false, true, 110),
-        new(App식별자.SsalddelApp, View식별자.Shipper.OrderFulfillment, "주문 출고 알림", "/shipper/sales/orders", Icons.Shipper.OrderFulfillment, 역할명.화주, false, true, 120),
+        new(App식별자.SsalddelApp, View식별자.Shipper.OrderFulfillment, "판매 주문 원장", "/shipper/sales/orders", Icons.Shipper.OrderFulfillment, 역할명.화주, false, true, 120),
         new(App식별자.SsalddelApp, View식별자.Shipper.CustomsHsReviews, "HS 코드 검토", "/shipper/customs/hs-reviews", Icons.Shipper.CustomsHsReviews, 역할명.화주, false, true, 130),
         new(App식별자.SsalddelApp, View식별자.Shipper.ViewSettings, "화면 설정", "/shipper/settings/views", Icons.Common.Settings, 역할명.화주, true, true, 140),
 

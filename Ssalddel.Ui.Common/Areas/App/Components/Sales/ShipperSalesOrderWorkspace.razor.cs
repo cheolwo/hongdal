@@ -5,19 +5,45 @@ using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Sales;
 
+public enum ShipperSalesOrderWorkspaceMode
+{
+    List,
+    Detail,
+    Combined
+}
+
 public partial class ShipperSalesOrderWorkspace
 {
     private bool _initialized;
+    private bool _initialListStateApplied;
 
     [Parameter]
     public long? OrderId { get; set; }
 
     [Parameter]
-    public EventCallback<long> OrderSelected { get; set; }
+    public ShipperSalesOrderWorkspaceMode Mode { get; set; } = ShipperSalesOrderWorkspaceMode.List;
+
+    [Parameter]
+    public string? InitialSearch { get; set; }
+
+    [Parameter]
+    public string? InitialSyncScope { get; set; }
+
+    [Parameter]
+    public string? InitialStatus { get; set; }
+
+    [Parameter]
+    public int InitialPage { get; set; } = 1;
 
     private 판매채널페이지접근ViewModel Access => ViewModel.접근;
     private 판매채널주문목록PageViewModel List => ViewModel.목록;
     private 판매채널주문상세PageViewModel Detail => ViewModel.상세;
+
+    private bool ShowList => Mode is ShipperSalesOrderWorkspaceMode.List or ShipperSalesOrderWorkspaceMode.Combined;
+    private bool ShowDetail => Mode is ShipperSalesOrderWorkspaceMode.Detail or ShipperSalesOrderWorkspaceMode.Combined;
+    private string WorkspaceLayoutClass => Mode == ShipperSalesOrderWorkspaceMode.Combined
+        ? "sales-order-layout"
+        : "sales-order-screen";
 
     private int CurrentPageLineCount => List.주문목록.Sum(item => item.출고라인수);
     private int CurrentPageWarehouseCount => List.주문목록.Sum(item => item.출고창고수);
@@ -25,6 +51,7 @@ public partial class ShipperSalesOrderWorkspace
 
     protected override async Task OnInitializedAsync()
     {
+        ApplyInitialListState();
         await CheckAccessAndLoadAsync();
         _initialized = true;
     }
@@ -36,14 +63,14 @@ public partial class ShipperSalesOrderWorkspace
             return;
         }
 
-        if (OrderId is long orderId)
+        if (ShowDetail && OrderId is long orderId)
         {
             if (Detail.요청OrderId != orderId)
             {
                 await Detail.조회Async(orderId);
             }
         }
-        else if (Detail.요청OrderId.HasValue)
+        else if (ShowDetail && Detail.요청OrderId.HasValue)
         {
             Detail.선택해제();
         }
@@ -56,8 +83,14 @@ public partial class ShipperSalesOrderWorkspace
             return;
         }
 
-        var listTask = List.초기화됨 ? Task.FromResult(true) : List.조회Async();
-        var detailTask = OrderId is long orderId ? Detail.조회Async(orderId) : Task.FromResult(true);
+        var listTask = ShowList
+            ? List.초기화됨
+                ? Task.FromResult(true)
+                : List.페이지조회Async(Math.Max(1, InitialPage))
+            : Task.FromResult(true);
+        var detailTask = ShowDetail && OrderId is long orderId
+            ? Detail.조회Async(orderId)
+            : Task.FromResult(true);
         await Task.WhenAll(listTask, detailTask);
     }
 
@@ -75,14 +108,30 @@ public partial class ShipperSalesOrderWorkspace
         await List.조회Async();
     }
 
-    private async Task SelectOrderAsync(long orderId, bool updateAddress = true)
+    private Task SelectOrderAsync(long orderId)
+        => Detail.조회Async(orderId);
+
+    private void ApplyInitialListState()
     {
-        if (updateAddress && OrderSelected.HasDelegate)
+        if (_initialListStateApplied || !ShowList)
         {
-            await OrderSelected.InvokeAsync(orderId);
+            return;
         }
 
-        await Detail.조회Async(orderId);
+        List.검색어 = InitialSearch ?? string.Empty;
+        List.국내외구분 = InitialSyncScope;
+        List.출고상태 = InitialStatus;
+        _initialListStateApplied = true;
+    }
+
+    private string DetailPath(long orderId)
+    {
+        var listPath = new SalesOrderNavigationContext()
+            .WithListState(List.검색어, List.국내외구분, List.출고상태, List.현재페이지)
+            .PathFor(SalesOrderScreenKind.List);
+
+        return new SalesOrderNavigationContext { From = listPath }
+            .PathFor(SalesOrderScreenKind.Detail, orderId);
     }
 
     private static string ChannelName(string? channelType)

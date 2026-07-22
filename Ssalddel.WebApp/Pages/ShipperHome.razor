@@ -31,7 +31,7 @@
             <MudStack Spacing="3">
                 <MudStack Spacing="1">
                     <MudText Typo="Typo.h6">판매·통관 업무</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">판매채널, 출품, 주문 출고, HS 검토, FCL/LCL 판단을 같은 셸 안에 둡니다.</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">판매채널, 출품, 판매 주문 원장, HS 검토, FCL/LCL 판단을 같은 셸 안에 둡니다.</MudText>
                 </MudStack>
                 <WebPageLinkGrid Items="CommerceLinks" />
             </MudStack>
@@ -80,7 +80,7 @@
     [
         new("판매채널 연결", "스마트스토어, 쿠팡, 해외 채널 계정 연결 상태를 관리합니다.", ShipperRoutes.SalesChannels, Icons.Material.Filled.Storefront, "판매"),
         new("출품 관리", "판매상품과 채널출품 상태를 조회하고 추가 출품합니다.", ShipperRoutes.ProductListings, Icons.Material.Filled.Sell, "판매"),
-        new("주문 출고 알림", "판매채널 주문을 재고, 피킹, 포장 흐름으로 연결합니다.", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Outbox, "판매"),
+        new("판매 주문 원장", "판매채널 주문과 출고 투영을 검색하고 정확한 주문 상세를 확인합니다.", ShipperRoutes.SalesOrders, Icons.Material.Filled.ReceiptLong, "판매"),
         new("FCL/LCL 판단", "수입 전 화물량, 비용, 판매 마진을 기준으로 운송 방식을 비교합니다.", ShipperRoutes.FclLclPlanner, Icons.Material.Filled.Public, "통관"),
         new("HS 코드 검토", "HS 코드 리스크와 관세사 검토 상태를 확인합니다.", ShipperRoutes.CustomsHsReviews, Icons.Material.Filled.FactCheck, "통관"),
         new("화주 화면 설정", "통합 웹앱에서 표시할 화주 업무 화면을 확인합니다.", ShipperRoutes.ViewSettings, Icons.Material.Filled.Settings, "설정")

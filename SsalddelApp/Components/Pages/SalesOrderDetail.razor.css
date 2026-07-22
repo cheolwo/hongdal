@@ -1,0 +1,16 @@
+.sales-order-detail-page-header {
+    display: grid;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.sales-order-detail-page-header > div {
+    min-width: 0;
+}
+
+@media (max-width: 620px) {
+    .sales-order-detail-page-header ::deep .mud-button-root {
+        justify-self: stretch;
+        min-height: 48px;
+    }
+}

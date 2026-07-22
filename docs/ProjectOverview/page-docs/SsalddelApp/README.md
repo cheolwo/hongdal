@@ -24,7 +24,9 @@
 | [SsalddelApp-P05-3 - 창고 프로세스별 작업 시작](SsalddelApp-P05-3/) | /shipper/warehouse/work/{ProcessCode} | 확장 | 창고 프로세스별 작업 시작 | 완료 |
 | [SsalddelApp-P06 - 판매채널 연결/관리](SsalddelApp-P06/) | /shipper/sales/channels | 확장 | 판매채널 연결/관리 | 완료 |
 | [SsalddelApp-P06-1 - 상품 등록/리스팅](SsalddelApp-P06-1/) | /shipper/sales/listings | 확장 | 상품 등록/리스팅 | 완료 |
-| [SsalddelApp-P06-2 - 판매 주문 이행/출고 연결](SsalddelApp-P06-2/) | /shipper/sales/orders | 확장 | 판매 주문 이행/출고 연결 | 완료 |
+| [SsalddelApp-P06-2 - 판매 주문 이행 Simulation](SsalddelApp-P06-2/) | /shipper/sales/fulfillment | 개발·확장 | 로컬 주문·재고·피킹·포장·알림 정책 Simulation | 완료 |
+| [SsalddelApp-P06-2-1 - 판매 주문 원장 목록](SsalddelApp-P06-2-1/) | /shipper/sales/orders | 확장 | 영속 판매 주문 검색·필터·페이지 조회 | 공용 Screen Web host 확인 |
+| [SsalddelApp-P06-2-2 - 판매 주문 원장 상세](SsalddelApp-P06-2-2/) | /shipper/sales/orders/{OrderId} | 확장 | stable order ID의 주문·출고 투영 읽기 | 공용 Screen Web host 390px 확인 |
 | [SsalddelApp-P07 - FCL/LCL 해외 물류 계획](SsalddelApp-P07/) | /shipper/international/fcl-lcl | 확장 | FCL/LCL 해외 물류 계획 | 완료 |
 | [SsalddelApp-P07-1 - HS 코드/통관 검토](SsalddelApp-P07-1/) | /shipper/customs/hs-reviews | 확장 | HS 코드/통관 검토 | 완료 |
 | [SsalddelApp-P08 - 재위탁/재운송 주문](SsalddelApp-P08/) | /shipper/reconsignment/orders | 확장 | 재위탁/재운송 주문 | 완료 |

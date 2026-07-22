@@ -1,0 +1,22 @@
+@page "/shipper/sales/orders/{OrderId:long}"
+
+<PageTitle>판매채널 주문 상세</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-6">
+    <header class="sales-order-detail-page-header">
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.ArrowBack"
+                   Href="@ReturnPath">
+            주문 목록으로
+        </MudButton>
+        <div>
+            <MudText Typo="Typo.overline">PERSISTED ORDER #@OrderId</MudText>
+            <MudText Typo="Typo.h4">판매채널 주문 상세</MudText>
+            <MudText Typo="Typo.body2">선택한 주문 ID와 연결된 영속 출고 후보만 읽습니다.</MudText>
+        </div>
+    </header>
+
+    <ShipperSalesOrderWorkspace Mode="ShipperSalesOrderWorkspaceMode.Detail"
+                                OrderId="@OrderId" />
+</MudContainer>

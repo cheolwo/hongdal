@@ -1,0 +1,6 @@
+@media (max-width: 620px) {
+    .sales-order-detail-back ::deep .mud-button-root {
+        width: 100%;
+        min-height: 48px;
+    }
+}

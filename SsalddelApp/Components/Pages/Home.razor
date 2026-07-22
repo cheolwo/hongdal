@@ -192,7 +192,7 @@
             "판매 운영",
             "판매채널 주문과 출고 연결 상태를 확인합니다.",
             "채널 · 출고",
-            ShipperRoutes.OrderFulfillment,
+            ShipperRoutes.SalesOrders,
             Icons.Material.Filled.Storefront,
             Color.Info),
         new(
@@ -218,7 +218,7 @@
         new("운송 업무", "결제, 배차, 운송 상태를 의뢰별로 관리합니다.", ShipperRoutes.TransportWorkspace, Icons.Material.Filled.LocalShipping, Color.Primary),
         new("운송 의뢰", "화물 운송 의뢰를 새로 등록합니다.", ShipperRoutes.Request, Icons.Material.Filled.AddRoad, Color.Primary),
         new("창고 작업대", "입고, 재고, 스캔과 출고 작업을 시작합니다.", ShipperRoutes.WarehouseWorkspace, Icons.Material.Filled.Warehouse, Color.Warning),
-        new("판매 주문", "판매 채널 주문 출고 알림을 확인합니다.", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Storefront, Color.Info)
+        new("판매 주문", "Web과 같은 영속 판매 주문 원장을 확인합니다.", ShipperRoutes.SalesOrders, Icons.Material.Filled.Storefront, Color.Info)
     ];
 
     protected override async Task OnInitializedAsync()

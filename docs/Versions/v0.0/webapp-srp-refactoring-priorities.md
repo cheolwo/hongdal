@@ -43,7 +43,7 @@
 | `P1-1` 완료 | 운송 요청 작성 | 변경 전에는 Web 한 화면 606줄, Web mode route 4개, 모바일 997줄 복합 Panel이 서로 다른 workflow를 가졌음 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당하며 diagram·커뮤니티 출발 문맥을 단계 사이에 보존함 |
 | `P1-2` 완료 | 운송 요청 상세 | 변경 전에는 Web 828줄과 모바일 988줄의 독립 monolith가 요약·진행·결제·증빙을 함께 수행했음 | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
 | `P1-3` 완료 | 입고 요청 | 변경 전에는 `SsalddelInboundRequestManager` 한 route가 창고 등록·입고 신청·목록·상세·완료를 함께 수행했음 | 목록, 신규 신청, 상세, 입고 완료와 별도 창고 등록 Screen | Web·모바일이 같은 route 계약·공용 Screen을 사용하고 성공 뒤 같은 inbound ID를 재조회하며 desktop·390px 실제 검증을 통과함 |
-| `P1-4` 진행 중 — 입고 검수·피킹·마트 상품 완료, 판매 주문 감사 대기 | 창고·판매 master-detail-action | 변경 전 입고 검수와 피킹, 마트 상품은 한 query 화면에 목록·상세·후기 저장을 함께 배치했고 판매 주문은 Web 읽기 원장과 모바일 Simulation 의미가 다름 | List, Detail, Action Screen과 adaptive desktop composition | 입고 검수·피킹·마트 상품은 전체 게이트 완료, 다음은 판매 주문의 Web 읽기 원장과 모바일 Simulation 실행 route 의미 분리 |
+| `P1-4` 진행 중 — 입고 검수·피킹·마트 상품·판매 주문 조회 route 완료, Simulation Action 분리 대기 | 창고·판매 master-detail-action | 변경 전 입고 검수와 피킹, 마트 상품은 한 query 화면에 목록·상세·후기 저장을 함께 배치했고 판매 주문은 Web 읽기 원장과 모바일 Simulation 의미가 달랐음 | List, Detail, Action Screen과 adaptive desktop composition | 영속 판매 주문은 Web·모바일 공통 목록·stable-ID 상세로 통합하고 Simulation 실행은 별도 root로 격리함. 다음은 Simulation root 안의 피킹·포장·정책 Action route 분리 |
 | `P2-1` | 개인 공간·꾸미기 | Web 개인 route multiplexer와 모바일 전용 꾸미기 route의 의미가 다름 | 개인 개요와 꾸미기 상점·상품·checkout Screen 분리 | 같은 route가 플랫폼마다 다른 기능을 뜻하지 않으며 FakePG 경계를 유지함 |
 | `P2-2` | `/shipper` 홈 | Web은 링크 디렉터리, 모바일은 커뮤니티 홈·인증·dashboard를 수행함 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route의 주된 목표가 같고 1.0 이후 기능은 flag 뒤에 유지됨 |
 | `P3` 보존 | 기사 추천·정산·통관 등 1.0 이후 화면 | 큰 Web 전용 화면이 남아 있으나 0.0 범위가 아님 | 재활성화 시 List·Detail·Action Screen으로 분리 | 0.0 기본 비노출, 추천·자동 배차·결제·정산 운영 효과 확장 금지 |
@@ -149,6 +149,21 @@ Web과 `OrdererApp`은 같은 canonical route와 공용 Screen을 사용하고 �
 
 실제 Web 검증에서 1280px 목록, stable-ID 상세·후기·주문 요청, legacy query redirect와 390px 후기·주문 로그인 경계를 확인했다. 390px navigation은 2열·63px, 마트 주 행동은 48px 이상이고 horizontal overflow와 final console 오류가 없었다. 주문 로그인 터치 영역도 최소 48px로 보완했다. 대표 PNG와 상세 결과는 [마트 공개 상품 Route·공용 Screen 단일책임 분리](../../Changes/2026-07-22-mart-product-route-srp.md)에 기록했다. 공통 Web 언어 전환의 31px 버튼은 다음 셸 모바일 감사 항목이다.
 
+## 판매 주문 목표 route 지도
+
+| 화면 | 사용자 목표 | Route |
+| --- | --- | --- |
+| 영속 주문 목록 | 인증된 판매 주문 원장 검색·상태·동기화 범위·페이지 확인 | `/shipper/sales/orders` |
+| 영속 주문 상세 | stable order ID 한 건의 주문·출고 투영 읽기 | `/shipper/sales/orders/{OrderId:long}` |
+| legacy query | query ID와 목록 문맥을 stable-ID 상세 route로 호환 연결 | `/shipper/sales/orders?orderId=...&q=...&scope=...&status=...&page=...` |
+| 로컬 이행 Simulation | 샘플 주문·재고·피킹·포장·입고 알림 정책을 운영 효과 없이 검증 | `/shipper/sales/fulfillment` |
+
+기존에는 Web의 `/shipper/sales/orders`가 인증된 영속 읽기 원장이지만 `SsalddelApp`의 같은 route는 `InMemoryShipperStore` 기반 Simulation Command 화면이었다. 이제 두 앱의 canonical 주문 route는 같은 `ShipperSalesOrderWorkspace`를 목록 또는 상세 mode로 조립하고, 모바일의 실행성 Simulation은 capability까지 분리된 `/shipper/sales/fulfillment`에 둔다. 목록 검색·동기화 범위·상태·페이지는 상세의 안전한 `from`에 보존되며 기존 query ID는 replace redirect로 stable-ID route에 연결된다.
+
+실제 Web 검증에서 1280px 목록과 390px stable-ID 상세의 인증 경계, legacy query redirect와 목록 복귀 문맥을 확인했다. 390px에서 horizontal overflow가 없고 새 뒤로가기 동작은 48px 터치 영역을 만족한다. 인증된 실제 주문 데이터나 Command는 사용하지 않았다. 대표 PNG와 상세 결과는 [판매 주문 조회 Route 의미·단일책임 정렬](../../Changes/2026-07-22-sales-order-mobile-route-srp.md)에 기록한다. 공통 Web 언어 전환의 31px 버튼은 별도 셸 후속 항목이다.
+
+`/shipper/sales/fulfillment`의 기존 shell은 내부 component와 ViewModel 책임은 분리되어 있으나 주문 조회, 재고·입고, 피킹, 포장, 알림 정책이라는 여러 사용자 목표를 한 route의 탭으로 실행한다. 따라서 이번 단계는 같은 URL의 플랫폼 의미 충돌을 제거한 완료 단위이며, `P1-4` 전체 완료 전에는 각 실행 목표의 stable-key Action route와 성공 뒤 같은 원장 재조회를 추가로 분리한다.
+
 ## 기존 component 리팩터링의 재분류
 
 아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
@@ -188,4 +203,6 @@ Web과 `OrdererApp`은 같은 canonical route와 공용 Screen을 사용하고 �
 
 세 번째 수직 단위인 마트 공개 상품은 기존 query master-detail-review Workspace를 제거하고 목록, stable-ID 상세, 후기 작성과 기존 주문 요청 Route Page로 분리했다. 목록·상세는 읽기 전용이며 후기 route만 공개 후기 저장 뒤 같은 product ID를 다시 조회하고, 주문 route는 비구속 요청 뒤 같은 request ID를 다시 조회한다. 자동 테스트, 소비 앱 빌드, 실제 desktop·390px와 PNG 완료 게이트를 통과했다.
 
-다음은 판매 주문을 감사한다. 특히 Web의 영속 출고 후보 읽기와 `SsalddelApp`의 Simulation 피킹·포장 흐름이 같은 `/shipper/sales/orders` 의미를 공유하지 않는 문제를 먼저 분리해, 공용 읽기 원장과 명시적 실행 route의 단계적 통합 순서를 확정한다. 동시에 공통 Web 셸의 언어 전환처럼 48px 미만인 전역 터치 대상은 업무 Screen 리팩터링과 분리해 공통 셸 기준으로 보완한다.
+네 번째 수직 단위인 판매 주문은 Web의 영속 읽기 원장과 모바일의 로컬 Simulation이 같은 URL을 사용하던 충돌을 제거했다. `/shipper/sales/orders`와 stable-ID 상세는 Web·모바일 공용 읽기 Screen이며, 기존 모바일 Simulation은 `/shipper/sales/fulfillment`로 이동했다. route 계약, legacy query, 안전한 목록 복귀와 capability를 자동 테스트로 고정하고 실제 desktop·390px 인증 경계를 확인했다.
+
+다음은 `/shipper/sales/fulfillment`의 주문 조회, 재고·입고, 피킹, 포장, 알림 정책 탭을 사용자 목표별 Route Page로 분리한다. 피킹·포장 Action은 stable task key, 확인 입력, 중복 실행 방지와 성공 뒤 같은 Simulation 원장 재조회를 갖고, 운영 효과는 계속 비활성으로 유지한다. 동시에 공통 Web 셸의 언어 전환처럼 48px 미만인 전역 터치 대상은 업무 Screen 리팩터링과 분리해 공통 셸 기준으로 보완한다.

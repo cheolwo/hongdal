@@ -1,0 +1,23 @@
+.sales-orders-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.sales-orders-page-header > div {
+    min-width: 0;
+}
+
+@media (max-width: 620px) {
+    .sales-orders-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sales-orders-page-header ::deep .mud-button-root {
+        width: 100%;
+        min-height: 48px;
+    }
+}

@@ -125,7 +125,7 @@ public sealed class ShipperViewVisibilityService
             CreateItem(View식별자.Shipper.ReconsignmentOrders, "재위탁 운송", ShipperRoutes.ReconsignmentOrders, "local_shipping", sortOrder: 90),
             CreateItem(View식별자.Shipper.SalesChannels, "판매채널 연결", ShipperRoutes.SalesChannels, "storefront", sortOrder: 100),
             CreateItem(View식별자.Shipper.ProductListings, "출품 관리", ShipperRoutes.ProductListings, "sell", sortOrder: 110),
-            CreateItem(View식별자.Shipper.OrderFulfillment, "주문 출고 알림", ShipperRoutes.OrderFulfillment, "outbox", sortOrder: 120),
+            CreateItem(View식별자.Shipper.OrderFulfillment, "판매 주문 원장", ShipperRoutes.SalesOrders, "outbox", sortOrder: 120),
             CreateItem(View식별자.Shipper.CustomsHsReviews, "HS 코드 검토", ShipperRoutes.CustomsHsReviews, "fact_check", sortOrder: 130),
             CreateItem(View식별자.Shipper.ViewSettings, "화면 설정", ShipperRoutes.ViewSettings, "settings", isRequired: true, sortOrder: 140)
         ];

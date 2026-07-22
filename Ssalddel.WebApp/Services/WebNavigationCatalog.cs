@@ -39,7 +39,7 @@ public static class WebNavigationCatalog
         new("운송 의뢰 작성", ShipperRoutes.Request, Icons.Material.Filled.PostAdd),
         new("입고 대시보드", ShipperRoutes.InboundDashboard, Icons.Material.Filled.MoveToInbox),
         new("재고 목록", ShipperRoutes.WarehouseInventory, Icons.Material.Filled.Inventory2),
-        new("주문 출고", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Outbox)
+        new("판매 주문 원장", ShipperRoutes.SalesOrders, Icons.Material.Filled.ReceiptLong)
     ];
 
     private static readonly IReadOnlyList<WebNavigationItem> WarehouseItems =

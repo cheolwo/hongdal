@@ -206,7 +206,7 @@
             "" or ShipperRoutes.Home => "primary",
             ShipperRoutes.TransportWorkspace or ShipperRoutes.Request or ShipperRoutes.PublicCargo or ShipperRoutes.ExplorationInbox or ShipperRoutes.DispatchAddressForm or ShipperRoutes.CustomsHsReviews or ShipperRoutes.FclLclPlanner => "transport",
             ShipperRoutes.WarehouseWorkspace or ShipperRoutes.InboundDashboard or ShipperRoutes.InboundRequests or ShipperRoutes.WarehouseInventory or ShipperRoutes.ReconsignmentOrders or ShipperRoutes.WarehouseScan => "warehouse",
-            ShipperRoutes.SalesChannels or ShipperRoutes.SalesPageComposer or ShipperRoutes.ProductListings or ShipperRoutes.OrderFulfillment => "sales",
+            ShipperRoutes.SalesChannels or ShipperRoutes.SalesPageComposer or ShipperRoutes.ProductListings or ShipperRoutes.SalesOrders or ShipperRoutes.OrderFulfillment => "sales",
             _ when normalizedRoute.StartsWith("/shipper/settings", StringComparison.OrdinalIgnoreCase) => "settings",
             _ => "primary"
         };
@@ -220,7 +220,7 @@
             return normalizedRoute is not ShipperRoutes.InboundDashboard and not ShipperRoutes.InboundRequests;
         }
 
-        return normalizedRoute is not ShipperRoutes.SalesChannels and not ShipperRoutes.SalesPageComposer and not ShipperRoutes.ProductListings and not ShipperRoutes.OrderFulfillment;
+        return normalizedRoute is not ShipperRoutes.SalesChannels and not ShipperRoutes.SalesPageComposer and not ShipperRoutes.ProductListings and not ShipperRoutes.SalesOrders and not ShipperRoutes.OrderFulfillment;
     }
 
     private string ProfileLabel => RoleService.CurrentRole switch

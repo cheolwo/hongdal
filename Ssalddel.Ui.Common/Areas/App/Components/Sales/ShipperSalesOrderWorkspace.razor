@@ -54,29 +54,34 @@
             이 화면은 외부 채널 주문 중 <strong>재고 예약과 출고예정 저장까지 성공한 후보</strong>만 읽습니다. 새로고침은 외부 주문 수집·상품 발행·피킹·포장·운송 인계를 실행하지 않습니다.
         </MudAlert>
 
-        <div class="sales-order-toolbar">
-            <div>
-                <MudText Typo="Typo.overline">PERSISTED OUTBOUND CANDIDATES</MudText>
-                <MudText Typo="Typo.h6">내 주문 출고 후보</MudText>
-                <MudText Typo="Typo.body2">로그인한 판매자의 출고 원장을 주문참조번호별로 묶어 표시합니다.</MudText>
+        @if (ShowList)
+        {
+            <div class="sales-order-toolbar">
+                <div>
+                    <MudText Typo="Typo.overline">PERSISTED OUTBOUND CANDIDATES</MudText>
+                    <MudText Typo="Typo.h6">내 주문 출고 후보</MudText>
+                    <MudText Typo="Typo.body2">로그인한 판매자의 출고 원장을 주문참조번호별로 묶어 표시합니다.</MudText>
+                </div>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@List.처리중"
+                           OnClick="ReloadListAsync">
+                    새로고침
+                </MudButton>
             </div>
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Refresh"
-                       Disabled="@List.처리중"
-                       OnClick="ReloadListAsync">
-                새로고침
-            </MudButton>
-        </div>
 
-        <div class="sales-order-metrics" aria-label="현재 조회 요약">
-            <MudPaper Elevation="0" Outlined="true"><strong>@List.전체건수.ToString("N0")</strong><span>검색된 주문 후보</span></MudPaper>
-            <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageLineCount.ToString("N0")</strong><span>현재 페이지 출고 라인</span></MudPaper>
-            <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageWarehouseCount.ToString("N0")</strong><span>현재 페이지 창고 연결</span></MudPaper>
-            <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageTransportCount.ToString("N0")</strong><span>운송 인계 표시</span></MudPaper>
-        </div>
+            <div class="sales-order-metrics" aria-label="현재 조회 요약">
+                <MudPaper Elevation="0" Outlined="true"><strong>@List.전체건수.ToString("N0")</strong><span>검색된 주문 후보</span></MudPaper>
+                <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageLineCount.ToString("N0")</strong><span>현재 페이지 출고 라인</span></MudPaper>
+                <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageWarehouseCount.ToString("N0")</strong><span>현재 페이지 창고 연결</span></MudPaper>
+                <MudPaper Elevation="0" Outlined="true"><strong>@CurrentPageTransportCount.ToString("N0")</strong><span>운송 인계 표시</span></MudPaper>
+            </div>
+        }
 
-        <div class="sales-order-layout">
+        <div class="@WorkspaceLayoutClass">
+            @if (ShowList)
+            {
             <MudPaper Elevation="0" Outlined="true" Class="sales-order-panel sales-order-list-panel">
                 <div class="sales-order-filters">
                     <MudTextField T="string"
@@ -177,9 +182,9 @@
                             <MudTd DataLabel="최근 변경">@DateTimeLabel(context.수정일시)</MudTd>
                             <MudTd>
                                 <MudButton Size="Size.Small"
-                                           Variant="@(Detail.요청OrderId == context.OrderId ? Variant.Filled : Variant.Outlined)"
+                                           Variant="Variant.Outlined"
                                            Color="Color.Primary"
-                                           OnClick="@(() => SelectOrderAsync(context.OrderId))">
+                                           Href="@DetailPath(context.OrderId)">
                                     상세
                                 </MudButton>
                             </MudTd>
@@ -199,7 +204,10 @@
                     }
                 }
             </MudPaper>
+            }
 
+            @if (ShowDetail)
+            {
             <MudPaper Elevation="0" Outlined="true" Class="sales-order-panel sales-order-detail-panel">
                 @if (Detail.처리중)
                 {
@@ -216,7 +224,7 @@
                         <MudText Typo="Typo.body2">@AccessErrorMessage(Detail.오류, Detail.오류메시지)</MudText>
                         @if (Detail.요청OrderId is long retryId)
                         {
-                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectOrderAsync(retryId, false))">다시 시도</MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => SelectOrderAsync(retryId))">다시 시도</MudButton>
                         }
                     </div>
                 }
@@ -319,6 +327,7 @@
                     </div>
                 }
             </MudPaper>
+            }
         </div>
     }
 </section>

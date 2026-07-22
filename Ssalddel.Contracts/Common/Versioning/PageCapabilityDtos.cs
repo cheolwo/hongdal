@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Mart;
+using Ssalddel.Contracts.Common.Sales;
 
 namespace Ssalddel.Contracts.Common.Versioning;
 
@@ -280,9 +281,25 @@ public static class SsalddelPageCapabilityCatalog
             PageInteractionBoundary.PlatformPersistence, true, "2.5",
             "사용자 소유 판매채널 연결 준비 원장을 조회·저장하며 외부 인증·발행·주문 동기화는 실행하지 않습니다.", false,
             [Sales], ["SalesChannelFulfillment"]),
-        Exact("shipper-sales-orders", SsalddelPageAppCodes.IntegratedWeb, "/shipper/sales/orders", PageCapabilityStage.Beta,
+        Exact("shipper-sales-orders", SsalddelPageAppCodes.IntegratedWeb, SalesOrderPageRoutes.Root, PageCapabilityStage.Beta,
             PageInteractionBoundary.ReadOnly, true, "2.5",
             "재고 예약과 함께 영속된 사용자 소유 판매채널 주문 출고 후보만 조회하며 외부 주문 수집과 출고 실행은 하지 않습니다.", false,
+            [Sales], ["SalesChannelFulfillment"]),
+        Prefix("shipper-sales-order-routes", SsalddelPageAppCodes.IntegratedWeb, SalesOrderPageRoutes.Root, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "2.5",
+            "Web과 모바일이 공유하는 stable 주문 ID 상세 경로이며 사용자 소유 영속 출고 후보만 읽습니다.", false,
+            [Sales], ["SalesChannelFulfillment"]),
+        Exact("shipper-app-sales-orders", SsalddelPageAppCodes.Shipper, SalesOrderPageRoutes.Root, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "2.5",
+            "모바일 앱에서 Web과 같은 사용자 소유 판매 주문 원장을 읽으며 외부 주문 수집과 출고 실행은 하지 않습니다.", false,
+            [Sales], ["SalesChannelFulfillment"]),
+        Prefix("shipper-app-sales-order-routes", SsalddelPageAppCodes.Shipper, SalesOrderPageRoutes.Root, PageCapabilityStage.Beta,
+            PageInteractionBoundary.ReadOnly, true, "2.5",
+            "모바일 앱의 stable 주문 ID 상세 경로이며 사용자 소유 영속 출고 후보만 읽습니다.", false,
+            [Sales], ["SalesChannelFulfillment"]),
+        Prefix("shipper-app-sales-fulfillment", SsalddelPageAppCodes.Shipper, SalesOrderPageRoutes.FulfillmentRoot, PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "2.5",
+            "로컬 메모리 주문 샘플과 피킹·포장 상태만 변경하며 외부 주문·재고·출고·운송·결제에는 영향을 주지 않습니다.", true,
             [Sales], ["SalesChannelFulfillment"]),
         Prefix("shipper-sales", SsalddelPageAppCodes.IntegratedWeb, "/shipper/sales", PageCapabilityStage.Experience,
             PageInteractionBoundary.Simulation, true, "2.5", "외부 판매채널 발행 없이 판매·출고 화면을 체험합니다.", true,

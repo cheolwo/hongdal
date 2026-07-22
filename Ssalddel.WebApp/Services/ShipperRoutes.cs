@@ -1,4 +1,5 @@
 using Ssalddel.Contracts.Common.Inbound;
+using Ssalddel.Contracts.Common.Sales;
 using Ssalddel.Contracts.Shipper.Request;
 
 namespace Ssalddel.WebApp.Services;
@@ -30,7 +31,7 @@ public static class ShipperRoutes
     public const string SalesChannels = "/shipper/sales/channels";
     public const string SalesPageComposer = "/shipper/sales/pages/new";
     public const string ProductListings = "/shipper/sales/listings";
-    public const string OrderFulfillment = "/shipper/sales/orders";
+    public const string SalesOrders = SalesOrderPageRoutes.Root;
     public const string CustomsHsReviews = "/shipper/customs/hs-reviews";
     public const string FclLclPlanner = "/shipper/international/fcl-lcl";
     public const string ViewSettings = "/shipper/settings/views";
@@ -61,4 +62,7 @@ public static class ShipperRoutes
 
     public static string ReconsignmentOrdersForInventory(long inventoryItemId)
         => $"{ReconsignmentOrders}?inventoryItemId={inventoryItemId}";
+
+    public static string SalesOrderDetailFor(long orderId)
+        => SalesOrderPageRoutes.DetailFor(orderId);
 }

@@ -2,7 +2,7 @@
 
 <WebPageHeader Eyebrow="Shipper Web"
                Title="창고 운영 허브"
-               Description="화주·판매자가 입고, 재고, 재위탁 운송, 주문 출고로 이동하는 작업대입니다."
+               Description="화주·판매자가 입고, 재고, 재위탁 운송, 판매 주문 원장으로 이동하는 작업대입니다."
                Badge="창고/재고" />
 
 <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
@@ -19,6 +19,6 @@
         new("재고 목록", "가용 재고를 판매 등록 또는 재위탁 운송으로 연결합니다.", ShipperRoutes.WarehouseInventory, Icons.Material.Filled.Inventory2, "재고"),
         new("스캔 스테이션", "입고, 상품, 번들, 적재 위치 바코드 흐름을 검증합니다.", ShipperRoutes.WarehouseScan, Icons.Material.Filled.QrCodeScanner, "재고"),
         new("재위탁 운송", "창고 재고를 다른 목적지로 보내는 운송 흐름을 관리합니다.", ShipperRoutes.ReconsignmentOrders, Icons.Material.Filled.LocalShipping, "배송"),
-        new("주문 출고 알림", "판매채널 주문을 창고 출고 작업으로 전환해야 하는 대상을 확인합니다.", ShipperRoutes.OrderFulfillment, Icons.Material.Filled.Outbox, "출고")
+        new("판매 주문 원장", "판매채널 주문과 창고 출고 투영을 읽기 전용으로 확인합니다.", ShipperRoutes.SalesOrders, Icons.Material.Filled.ReceiptLong, "출고")
     ];
 }

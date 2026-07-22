@@ -66,7 +66,7 @@ route shell은 하위 상태와 event만 연결한다. 읽기 ViewModel은 여�
 
 ![판매 주문 이행 모바일 피킹 화면](../assets/changes/2026-07-22-order-fulfillment-srp/order-fulfillment-mobile.png)
 
-캡처는 clean 격리 worktree의 실제 MAUI Blazor `/shipper/sales/orders` route를 WebView2로 렌더링한 결과다. 비식별 샘플만 사용했으며 외부 주문·재고·메시지·운송·결제 효과는 실행하지 않았다.
+캡처 당시에는 clean 격리 worktree의 실제 MAUI Blazor `/shipper/sales/orders` route를 WebView2로 렌더링했다. 이후 Web·모바일 route 의미를 맞추는 작업에서 이 동일한 Simulation 화면은 `/shipper/sales/fulfillment`로 이동했고, `/shipper/sales/orders`는 공용 영속 원장 목록·상세가 되었다. 비식별 샘플만 사용했으며 외부 주문·재고·메시지·운송·결제 효과는 실행하지 않았다.
 
 ## 검증
 

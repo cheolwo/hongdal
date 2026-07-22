@@ -1,0 +1,25 @@
+@page "/shipper/sales/orders"
+
+<PageTitle>판매채널 주문 원장</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
+    <header class="sales-orders-page-header">
+        <div>
+            <MudText Typo="Typo.overline">SHIPPER · SALES · PERSISTED LEDGER</MudText>
+            <MudText Typo="Typo.h4">판매채널 주문 원장</MudText>
+            <MudText Typo="Typo.body2">Web과 같은 서버 원장에서 로그인한 판매자의 출고 후보를 읽습니다.</MudText>
+        </div>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Filled.QrCodeScanner"
+                   Href="@SalesOrderPageRoutes.FulfillmentRoot">
+            피킹·포장 Simulation
+        </MudButton>
+    </header>
+
+    <ShipperSalesOrderWorkspace Mode="ShipperSalesOrderWorkspaceMode.List"
+                                InitialSearch="@NavigationContext.Search"
+                                InitialSyncScope="@NavigationContext.SyncScope"
+                                InitialStatus="@NavigationContext.Status"
+                                InitialPage="@NavigationContext.Page" />
+</MudContainer>

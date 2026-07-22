@@ -61,6 +61,10 @@
     align-items: start;
 }
 
+.sales-order-screen {
+    min-width: 0;
+}
+
 .sales-order-panel {
     min-width: 0;
     padding: 1.2rem;
@@ -258,5 +262,9 @@
 
     .sales-order-panel {
         padding: 1rem;
+    }
+
+    .sales-order-workspace ::deep .mud-button-root {
+        min-height: 48px;
     }
 }
