@@ -19,5 +19,6 @@ global using 살뜰.Services.Notifications;
 global using 살뜰.Services.Options;
 global using 살뜰.Services.Settlement;
 global using 살뜰.Services.Storage.Local;
+global using Ssalddel.Services.Storage;
 global using 살뜰.Infrastructure.Storage.Local;
 global using 살뜰.Infrastructure.Storage.Redis;

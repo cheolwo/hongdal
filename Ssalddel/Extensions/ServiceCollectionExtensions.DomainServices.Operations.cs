@@ -3,6 +3,7 @@ using Ssalddel.Application.Driver.Profile;
 using Ssalddel.Application.Driver.Transport;
 using Ssalddel.Services.LogisticsProcessing.VehicleLoading;
 using Ssalddel.Services.LogisticsProcessing.Warehouse;
+using Ssalddel.Services.Storage.Azure;
 using 살뜰.Services.Dispatch.Coordination;
 using 살뜰.Services.Dispatch.Engine;
 using 살뜰.Services.Dispatch.Notification;
@@ -18,7 +19,23 @@ public static partial class ServiceCollectionExtensions
 {
     private static IServiceCollection AddSsalddelOperationsDomainServices(this IServiceCollection services)
     {
-        services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
+        services.AddSingleton<AzureBlobStorageService>();
+        services.AddSingleton<GoogleCloudStorageService>();
+        services.AddSingleton<DevelopmentLocalStorageService>();
+        services.AddSingleton<IObjectStorageService>(serviceProvider =>
+        {
+            var provider = serviceProvider
+                .GetRequiredService<Microsoft.Extensions.Options.IOptions<ObjectStorageOptions>>()
+                .Value.Provider?
+                .Trim() ?? string.Empty;
+            return provider switch
+            {
+                ObjectStorageProviderNames.AzureBlob => serviceProvider.GetRequiredService<AzureBlobStorageService>(),
+                ObjectStorageProviderNames.GoogleCloud => serviceProvider.GetRequiredService<GoogleCloudStorageService>(),
+                ObjectStorageProviderNames.Local => serviceProvider.GetRequiredService<DevelopmentLocalStorageService>(),
+                _ => throw new InvalidOperationException($"Unsupported ObjectStorage provider: {provider}")
+            };
+        });
         services.AddScoped<I국내화물운송기사상태Service, 국내화물운송기사상태Service>();
         services.AddSingleton<ICommandFileStoragePathResolver, CommandFileStoragePathResolver>();
         services.AddSingleton<IDispatchRecommendationLogStore, DispatchRecommendationLogStore>();

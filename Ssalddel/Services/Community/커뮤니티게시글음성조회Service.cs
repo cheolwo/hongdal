@@ -2,7 +2,7 @@ using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Domain.Community;
 using Microsoft.EntityFrameworkCore;
 using 살뜰.Data;
-using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 
 namespace Ssalddel.Services.Community;
 
@@ -30,11 +30,11 @@ public interface I커뮤니티게시글음성조회Service
 public sealed class 커뮤니티게시글음성조회Service : I커뮤니티게시글음성조회Service
 {
     private readonly SsalddelContext _db;
-    private readonly IGoogleCloudStorageService _storageService;
+    private readonly IObjectStorageService _storageService;
 
     public 커뮤니티게시글음성조회Service(
         SsalddelContext db,
-        IGoogleCloudStorageService storageService)
+        IObjectStorageService storageService)
     {
         _db = db;
         _storageService = storageService;

@@ -1,25 +1,11 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Options;
+using Ssalddel.Services.Storage;
 
 namespace 살뜰.Services.External.Google
 {
-    public interface IGoogleCloudStorageService
-    {
-        Task<GoogleCloudStorageUploadResult> UploadAsync(
-            Stream stream,
-            string originalFileName,
-            string? contentType,
-            string? folder,
-            CancellationToken cancellationToken = default);
-
-        Task<byte[]> DownloadAsync(
-            string bucketName,
-            string objectName,
-            CancellationToken cancellationToken = default);
-    }
-
-    public sealed class GoogleCloudStorageService : IGoogleCloudStorageService
+    public sealed class GoogleCloudStorageService : IObjectStorageService
     {
         private readonly GoogleCloudStorageOptions _options;
         private readonly Lazy<StorageClient> _storageClient;
@@ -32,16 +18,21 @@ namespace 살뜰.Services.External.Google
                 LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
-        public async Task<GoogleCloudStorageUploadResult> UploadAsync(
+        public bool IsConfigured(ObjectStorageAccess access)
+            => !string.IsNullOrWhiteSpace(ResolveBucketName(access));
+
+        public async Task<ObjectStorageUploadResult> UploadAsync(
             Stream stream,
             string originalFileName,
             string? contentType,
             string? folder,
+            ObjectStorageAccess access,
             CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(_options.BucketName))
+            var bucketName = ResolveBucketName(access);
+            if (string.IsNullOrWhiteSpace(bucketName))
             {
-                throw new InvalidOperationException("GoogleCloudStorage:BucketName configuration is required.");
+                throw new InvalidOperationException($"Google Cloud Storage bucket configuration is required for {access} objects.");
             }
 
             if (stream == null || !stream.CanRead)
@@ -49,20 +40,20 @@ namespace 살뜰.Services.External.Google
                 throw new ArgumentException("Readable stream is required.", nameof(stream));
             }
 
-            var objectName = BuildObjectName(originalFileName, folder);
+            var objectName = ObjectStorageObjectName.Create(originalFileName, folder);
             var resolvedContentType = string.IsNullOrWhiteSpace(contentType)
                 ? "application/octet-stream"
                 : contentType;
 
             await _storageClient.Value.UploadObjectAsync(
-                bucket: _options.BucketName,
+                bucket: bucketName,
                 objectName: objectName,
                 contentType: resolvedContentType,
                 source: stream,
                 cancellationToken: cancellationToken);
 
-            var publicUrl = $"{_options.PublicBaseUrl.TrimEnd('/')}/{_options.BucketName}/{objectName}";
-            return new GoogleCloudStorageUploadResult(_options.BucketName, objectName, publicUrl);
+            var url = $"{_options.PublicBaseUrl.TrimEnd('/')}/{bucketName}/{objectName}";
+            return new ObjectStorageUploadResult(bucketName, objectName, url);
         }
 
         public async Task<byte[]> DownloadAsync(
@@ -72,6 +63,7 @@ namespace 살뜰.Services.External.Google
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
             ArgumentException.ThrowIfNullOrWhiteSpace(objectName);
+            EnsureKnownBucket(bucketName);
 
             await using var stream = new MemoryStream();
             await _storageClient.Value.DownloadObjectAsync(
@@ -93,25 +85,27 @@ namespace 살뜰.Services.External.Google
             return StorageClient.Create();
         }
 
-        private static string BuildObjectName(string originalFileName, string? folder)
+        private string ResolveBucketName(ObjectStorageAccess access)
+            => access == ObjectStorageAccess.Public
+                ? FirstConfigured(_options.PublicBucketName, _options.BucketName)
+                : FirstConfigured(_options.PrivateBucketName, _options.BucketName);
+
+        private void EnsureKnownBucket(string bucketName)
         {
-            var safeFileName = Path.GetFileName(originalFileName);
-            var extension = Path.GetExtension(safeFileName);
-            var generated = $"{Guid.NewGuid():N}{extension}";
-
-            if (string.IsNullOrWhiteSpace(folder))
+            var publicBucket = ResolveBucketName(ObjectStorageAccess.Public);
+            var privateBucket = ResolveBucketName(ObjectStorageAccess.Private);
+            if (!string.Equals(bucketName, publicBucket, StringComparison.Ordinal)
+                && !string.Equals(bucketName, privateBucket, StringComparison.Ordinal))
             {
-                return generated;
+                throw new InvalidOperationException("The requested bucket is outside the configured object storage boundary.");
             }
-
-            var normalizedFolder = folder.Trim().Trim('/').Replace("\\", "/");
-            return string.IsNullOrWhiteSpace(normalizedFolder)
-                ? generated
-                : $"{normalizedFolder}/{generated}";
         }
-    }
 
-    public sealed record GoogleCloudStorageUploadResult(string BucketName, string ObjectName, string PublicUrl);
+        private static string FirstConfigured(string? preferred, string? fallback)
+            => string.IsNullOrWhiteSpace(preferred)
+                ? fallback?.Trim() ?? string.Empty
+                : preferred.Trim();
+    }
 }
 
 

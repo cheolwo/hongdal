@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 살뜰.Data;
-using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 using 살뜰.Services.Options;
 
 namespace Ssalddel.Services.Community;
@@ -20,12 +20,12 @@ namespace Ssalddel.Services.Community;
 public sealed class 커뮤니티게시글첨부UseCase : I커뮤니티게시글첨부UseCase
 {
     private readonly SsalddelContext _db;
-    private readonly IGoogleCloudStorageService _storageService;
+    private readonly IObjectStorageService _storageService;
     private readonly CommunityPostStorageOptions _storageOptions;
 
     public 커뮤니티게시글첨부UseCase(
         SsalddelContext db,
-        IGoogleCloudStorageService storageService,
+        IObjectStorageService storageService,
         IOptions<CommunityPostStorageOptions> storageOptions)
     {
         _db = db;
@@ -89,14 +89,15 @@ public sealed class 커뮤니티게시글첨부UseCase : I커뮤니티게시글�
             command.FileName,
             command.ContentType,
             folder,
+            ObjectStorageAccess.Public,
             cancellationToken);
         var now = DateTime.UtcNow;
         var attachment = new PlatformCommunityPostAttachment
         {
             PostId = entity.Id,
-            BucketName = uploadResult.BucketName,
+            BucketName = uploadResult.ContainerName,
             ObjectName = uploadResult.ObjectName,
-            Url = uploadResult.PublicUrl,
+            Url = uploadResult.Url,
             OriginalFileName = Path.GetFileName(command.FileName),
             ContentType = command.ContentType,
             FileSizeBytes = command.Length,

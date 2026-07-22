@@ -3,7 +3,7 @@ using Ssalddel.ApiMetadata;
 using Ssalddel.Application.CommandProcessing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
-using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 using 살뜰.Services.Storage.Local;
 
 namespace Ssalddel.Application.Files;
@@ -30,18 +30,18 @@ public sealed record 파일업로드응답(
 [SsalddelUseCaseActor(SsalddelActor.PlatformOperator, SsalddelUseCaseActorRole.Supporting)]
 public sealed class 파일업로드UseCase : I파일업로드UseCase
 {
-    private readonly IGoogleCloudStorageService _googleCloudStorageService;
+    private readonly IObjectStorageService _objectStorageService;
     private readonly ICommandFileStoragePathResolver _pathResolver;
     private readonly SsalddelContext _db;
     private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public 파일업로드UseCase(
-        IGoogleCloudStorageService googleCloudStorageService,
+        IObjectStorageService objectStorageService,
         ICommandFileStoragePathResolver pathResolver,
         SsalddelContext db,
         ICurrentUserAccessor currentUserAccessor)
     {
-        _googleCloudStorageService = googleCloudStorageService;
+        _objectStorageService = objectStorageService;
         _pathResolver = pathResolver;
         _db = db;
         _currentUserAccessor = currentUserAccessor;
@@ -72,17 +72,18 @@ public sealed class 파일업로드UseCase : I파일업로드UseCase
 
         var folder = _pathResolver.ResolveCommandFolder(command.CommandName, command.ReferenceId);
         await using var stream = command.File.OpenReadStream();
-        var result = await _googleCloudStorageService.UploadAsync(
+        var result = await _objectStorageService.UploadAsync(
             stream,
             command.File.FileName,
             command.File.ContentType,
             folder,
+            ObjectStorageAccess.Private,
             cancellationToken);
 
         return Result.Ok(new 파일업로드응답(
-            result.BucketName,
+            result.ContainerName,
             result.ObjectName,
-            result.PublicUrl));
+            result.Url));
     }
 
     private async Task<Result> ValidateReferenceOwnershipAsync(파일업로드Command command, CancellationToken cancellationToken)

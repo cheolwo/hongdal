@@ -3,7 +3,7 @@ using Ssalddel.Contracts.Common.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 살뜰.Data;
-using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 using 살뜰.Services.Images;
 using 살뜰.Services.Options;
 using 살뜰.도메인.공통;
@@ -52,13 +52,13 @@ public sealed class CommunityAuthoringImageService : ICommunityAuthoringImageSer
 
     private readonly SsalddelContext _db;
     private readonly I샘플이미지생성Service _imageGenerationService;
-    private readonly IGoogleCloudStorageService _storageService;
+    private readonly IObjectStorageService _storageService;
     private readonly KieAiOptions _options;
 
     public CommunityAuthoringImageService(
         SsalddelContext db,
         I샘플이미지생성Service imageGenerationService,
-        IGoogleCloudStorageService storageService,
+        IObjectStorageService storageService,
         IOptions<KieAiOptions> options)
     {
         _db = db;

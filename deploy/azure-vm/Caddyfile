@@ -1,6 +1,10 @@
 {$SSALDDEL_SITE_HOST} {
 	encode zstd gzip
 
+	handle /community-media/* {
+		respond "Community media has moved to Azure Blob Storage." 410
+	}
+
 	@backend path /api/* /hubs/* /health/*
 	handle @backend {
 		reverse_proxy app:8080

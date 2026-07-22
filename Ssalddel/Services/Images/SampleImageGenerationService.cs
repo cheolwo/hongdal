@@ -33,7 +33,7 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
     private readonly IKieAiImageGenerationClient _kieAiClient;
     private readonly 이미지프롬프트생성기Resolver _promptResolver;
     private readonly I샘플이미지대상ResolverResolver _targetResolverResolver;
-    private readonly IGoogleCloudStorageService _googleCloudStorageService;
+    private readonly IObjectStorageService _objectStorageService;
     private readonly KieAiOptions _options;
 
     public 샘플이미지생성Service(
@@ -41,14 +41,14 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
         IKieAiImageGenerationClient kieAiClient,
         이미지프롬프트생성기Resolver promptResolver,
         I샘플이미지대상ResolverResolver targetResolverResolver,
-        IGoogleCloudStorageService googleCloudStorageService,
+        IObjectStorageService objectStorageService,
         Microsoft.Extensions.Options.IOptions<KieAiOptions> options)
     {
         _db = db;
         _kieAiClient = kieAiClient;
         _promptResolver = promptResolver;
         _targetResolverResolver = targetResolverResolver;
-        _googleCloudStorageService = googleCloudStorageService;
+        _objectStorageService = objectStorageService;
         _options = options.Value;
     }
 
@@ -290,16 +290,26 @@ public sealed class 샘플이미지생성Service : I샘플이미지생성Service
         var fileName = $"{entity.작업코드}{extension}";
         var rootFolder = entity.샘플데이터여부 ? "sample-images" : "generated-images";
         var folder = $"{rootFolder}/{entity.이미지용도}/{entity.대상타입}/{entity.대상식별자}";
-        var uploadResult = await _googleCloudStorageService.UploadAsync(imageStream, fileName, ResolveContentType(extension), folder, cancellationToken);
+        var storageAccess = entity.이미지용도 is 생성이미지용도.기사상차인증사진
+            or 생성이미지용도.기사배차완료인증사진
+            ? ObjectStorageAccess.Private
+            : ObjectStorageAccess.Public;
+        var uploadResult = await _objectStorageService.UploadAsync(
+            imageStream,
+            fileName,
+            ResolveContentType(extension),
+            folder,
+            storageAccess,
+            cancellationToken);
 
-        entity.저장Bucket = uploadResult.BucketName;
+        entity.저장Bucket = uploadResult.ContainerName;
         entity.저장ObjectName = uploadResult.ObjectName;
-        entity.저장Url = uploadResult.PublicUrl;
+        entity.저장Url = uploadResult.Url;
         entity.상태 = 생성이미지작업상태.완료;
         entity.완료시각 = DateTime.UtcNow;
         entity.수정시각 = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
-        await TryMarkTargetCompletedAsync(entity, uploadResult.PublicUrl, cancellationToken);
+        await TryMarkTargetCompletedAsync(entity, uploadResult.Url, cancellationToken);
         return true;
     }
 

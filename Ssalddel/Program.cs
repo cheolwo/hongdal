@@ -24,6 +24,7 @@ using 살뜰.Services.Audit;
 using Ssalddel.Services.Auth;
 using 살뜰.Services.Documents;
 using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 using 살뜰.Services.External.KieAi;
 using 살뜰.Services.Images;
 using 살뜰.Services.Options;
@@ -215,7 +216,7 @@ builder.Services.AddYouTubeSocialContextWorkspace(builder.Configuration);
 builder.Services.AddSsalddelDomainServices();
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.Replace(ServiceDescriptor.Singleton<IGoogleCloudStorageService, DevelopmentLocalCloudStorageService>());
+    builder.Services.Replace(ServiceDescriptor.Singleton<IObjectStorageService, DevelopmentLocalStorageService>());
 }
 builder.Services.AddSingleton<Ssalddel.Services.Orderer.IRestaurantSearchPolicyStore, Ssalddel.Services.Orderer.InMemoryRestaurantSearchPolicyStore>();
 builder.Services.AddSingleton<I기사개발스냅샷Provider, InMemory기사개발스냅샷Provider>();
@@ -474,12 +475,12 @@ if (app.Environment.IsDevelopment())
 
     var localStorageRoot = Path.Combine(
         app.Environment.ContentRootPath,
-        DevelopmentLocalCloudStorageService.StorageDirectoryName);
+        DevelopmentLocalStorageService.PublicStorageDirectoryName);
     Directory.CreateDirectory(localStorageRoot);
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(localStorageRoot),
-        RequestPath = DevelopmentLocalCloudStorageService.RequestPath
+        RequestPath = DevelopmentLocalStorageService.PublicRequestPath
     });
 }
 

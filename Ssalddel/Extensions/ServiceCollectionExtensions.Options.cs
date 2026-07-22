@@ -22,6 +22,8 @@ public static partial class ServiceCollectionExtensions
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.Configure<TossPaymentsOptions>(configuration.GetSection(TossPaymentsOptions.SectionName));
         services.Configure<GoogleCloudStorageOptions>(configuration.GetSection(GoogleCloudStorageOptions.SectionName));
+        services.Configure<ObjectStorageOptions>(configuration.GetSection(ObjectStorageOptions.SectionName));
+        services.Configure<AzureBlobStorageOptions>(configuration.GetSection(AzureBlobStorageOptions.SectionName));
         services.Configure<CommunityPostStorageOptions>(configuration.GetSection(CommunityPostStorageOptions.SectionName));
         services.Configure<KieAiOptions>(configuration.GetSection(KieAiOptions.SectionName));
         services.Configure<HIOPSAIOptions>(configuration.GetSection(HIOPSAIOptions.SectionName));

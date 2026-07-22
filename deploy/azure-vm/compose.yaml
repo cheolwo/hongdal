@@ -74,11 +74,14 @@ services:
       WorkRelationshipSnapshots__Enabled: "false"
       YouTube__Enabled: "false"
       HongikHakdangCards__Enabled: "false"
-      CommunityPostStorage__Folder: /app/community/posts
+      ObjectStorage__Provider: AzureBlob
+      AzureBlobStorage__ServiceUri: "https://${SSALDDEL_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
+      AzureBlobStorage__PublicContainerName: community-public
+      AzureBlobStorage__PrivateContainerName: platform-private
+      CommunityPostStorage__Folder: community/posts
     volumes:
       - app_data:/app/App_Data
       - app_uploads:/app/uploads
-      - app_community:/app/community
     depends_on:
       mysql:
         condition: service_healthy
@@ -116,6 +119,5 @@ volumes:
   mongo_data:
   app_data:
   app_uploads:
-  app_community:
   caddy_data:
   caddy_config:

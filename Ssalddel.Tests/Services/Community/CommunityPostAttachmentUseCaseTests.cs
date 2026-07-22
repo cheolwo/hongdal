@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 살뜰.Data;
 using 살뜰.Infrastructure.Security;
-using 살뜰.Services.External.Google;
 using 살뜰.Services.Options;
+using Ssalddel.Services.Storage;
 
 namespace Ssalddel.Tests.Services.Community;
 
@@ -34,6 +34,7 @@ public sealed class CommunityPostAttachmentUseCaseTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal($"community/posts/{post.Id}", storage.UploadFolder);
+        Assert.Equal(ObjectStorageAccess.Public, storage.UploadAccess);
         var attachment = await db.PlatformCommunityPostAttachments.SingleAsync();
         Assert.Equal(post.Id, attachment.PostId);
         Assert.Equal("object/sample.png", attachment.ObjectName);
@@ -60,7 +61,7 @@ public sealed class CommunityPostAttachmentUseCaseTests
 
     private static 커뮤니티게시글첨부UseCase CreateUseCase(
         SsalddelContext db,
-        IGoogleCloudStorageService storage)
+        IObjectStorageService storage)
         => new(
             db,
             storage,
@@ -110,21 +111,26 @@ public sealed class CommunityPostAttachmentUseCaseTests
         return new SsalddelContext(options, new DummyPersonalDataEncryptionService());
     }
 
-    private sealed class RecordingStorageService : IGoogleCloudStorageService
+    private sealed class RecordingStorageService : IObjectStorageService
     {
         public int UploadCount { get; private set; }
         public string? UploadFolder { get; private set; }
+        public ObjectStorageAccess? UploadAccess { get; private set; }
 
-        public Task<GoogleCloudStorageUploadResult> UploadAsync(
+        public bool IsConfigured(ObjectStorageAccess access) => true;
+
+        public Task<ObjectStorageUploadResult> UploadAsync(
             Stream stream,
             string originalFileName,
             string? contentType,
             string? folder,
+            ObjectStorageAccess access,
             CancellationToken cancellationToken = default)
         {
             UploadCount++;
             UploadFolder = folder;
-            return Task.FromResult(new GoogleCloudStorageUploadResult(
+            UploadAccess = access;
+            return Task.FromResult(new ObjectStorageUploadResult(
                 "test-bucket",
                 $"object/{Path.GetFileName(originalFileName)}",
                 $"https://storage.test/{Path.GetFileName(originalFileName)}"));

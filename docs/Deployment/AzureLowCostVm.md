@@ -7,6 +7,8 @@
 - `SsalddelExecution:Mode=Simulation`을 유지한다.
 - MySQL과 MongoDB 포트는 VM 외부에 공개하지 않는다.
 - Caddy만 80·443 포트를 공개하고 WebApp 정적 파일과 API를 같은 출처로 제공한다.
+- 게시글 공개 이미지는 같은 `Korea Central`의 Blob `community-public`, POD·운송 증빙·음성은 비공개 `platform-private`에 저장한다.
+- 앱은 VM Managed Identity와 컨테이너 범위 RBAC로 Blob에 접근하며 연결 문자열과 Storage Account Key를 사용하지 않는다.
 - 비밀값은 VM의 `/opt/ssalddel/.env`에만 저장하고 Git에 넣지 않는다.
 - B1ms 2GB는 기능 확인용 목표 최소 사양이고 현재 미리보기 VM은 B2als_v2 4GB다. 이후 B1ms 용량이 생기면 메모리 사용량을 확인한 뒤 축소할 수 있다.
 - 단일 VM이므로 VM 장애 시 웹·API·DB가 함께 중단된다. 관리형 DB, 백업, 모니터링을 갖춘 운영 구성으로 보지 않는다.
@@ -16,8 +18,12 @@
 1. `Ssalddel` 이미지를 `ssalddel-server:azure-preview`로 빌드한다.
 2. `Ssalddel.WebApp`을 Release/Production으로 게시한다.
 3. VM에 `deploy/azure-vm`, WebApp 게시 파일과 Docker 이미지를 전송한다.
-4. MySQL과 MongoDB를 먼저 시작한다.
-5. 같은 서버 이미지로 `--initialize-database`를 한 번 실행한다.
-6. 앱과 Caddy를 시작하고 공개 HTTPS URL에서 `/health/live`, `/health/ready`, 게시판과 글쓰기를 확인한다.
+4. Storage Account와 공개·비공개 컨테이너를 만들고 VM Managed Identity에 각 컨테이너 범위의 `Storage Blob Data Contributor`를 부여한다.
+5. `.env`의 `SSALDDEL_STORAGE_ACCOUNT_NAME`을 설정한다. 키나 연결 문자열은 넣지 않는다.
+6. MySQL과 MongoDB를 먼저 시작한다.
+7. 같은 서버 이미지로 `--initialize-database`를 한 번 실행한다.
+8. 앱과 Caddy를 시작하고 공개 HTTPS URL에서 `/health/live`, `/health/ready`, 게시판과 실제 이미지 첨부를 확인한다.
 
-배포 후에는 Azure Portal의 비용 분석과 무료 크레딧 잔액을 확인한다. 미리보기가 필요 없으면 VM을 중지하는 것만으로는 OS 디스크와 공인 IP 비용이 남을 수 있으므로, 보존할 데이터가 없다면 리소스 그룹 전체 삭제를 검토한다.
+Blob 이전이 완료되면 Caddy와 앱에서 `app_community` 볼륨 연결을 제거한다. 롤백 확인 전에는 기존 명명된 볼륨 자체를 즉시 삭제하지 않는다.
+
+배포 후에는 Azure Portal의 비용 분석과 무료 크레딧 잔액을 확인한다. Blob도 저장 용량·요청·외부 전송량에 따라 소액이 발생할 수 있어 완전 무료로 표현하지 않는다. 미리보기가 필요 없으면 VM을 중지하는 것만으로는 OS 디스크와 공인 IP 비용이 남을 수 있으므로, 보존할 데이터가 없다면 리소스 그룹 전체 삭제를 검토한다.

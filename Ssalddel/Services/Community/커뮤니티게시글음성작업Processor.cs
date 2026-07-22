@@ -3,7 +3,7 @@ using Ssalddel.Services.External.Typecast;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using 살뜰.Data;
-using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 using 살뜰.Services.Options;
 
 namespace Ssalddel.Services.Community;
@@ -17,21 +17,19 @@ public sealed class 커뮤니티게시글음성작업Processor : I커뮤니티�
 {
     private readonly SsalddelContext _db;
     private readonly ITypecastClient _typecastClient;
-    private readonly IGoogleCloudStorageService _storageService;
+    private readonly IObjectStorageService _storageService;
     private readonly I커뮤니티게시글음성본문분할기 _본문분할기;
     private readonly CommunityPostAudioOptions _options;
     private readonly TypecastOptions _typecastOptions;
-    private readonly GoogleCloudStorageOptions _storageOptions;
     private readonly ILogger<커뮤니티게시글음성작업Processor> _logger;
 
     public 커뮤니티게시글음성작업Processor(
         SsalddelContext db,
         ITypecastClient typecastClient,
-        IGoogleCloudStorageService storageService,
+        IObjectStorageService storageService,
         I커뮤니티게시글음성본문분할기 본문분할기,
         IOptions<CommunityPostAudioOptions> options,
         IOptions<TypecastOptions> typecastOptions,
-        IOptions<GoogleCloudStorageOptions> storageOptions,
         ILogger<커뮤니티게시글음성작업Processor> logger)
     {
         _db = db;
@@ -40,7 +38,6 @@ public sealed class 커뮤니티게시글음성작업Processor : I커뮤니티�
         _본문분할기 = 본문분할기;
         _options = options.Value;
         _typecastOptions = typecastOptions.Value;
-        _storageOptions = storageOptions.Value;
         _logger = logger;
     }
 
@@ -168,7 +165,7 @@ public sealed class 커뮤니티게시글음성작업Processor : I커뮤니티�
             }
 
             var folder = $"{_options.StorageFolder.Trim().Trim('/')}/{job.PostId}/{token}";
-            var uploaded = new List<(string Text, GoogleCloudStorageUploadResult Storage, Typecast음성합성결과 Audio)>();
+            var uploaded = new List<(string Text, ObjectStorageUploadResult Storage, Typecast음성합성결과 Audio)>();
             for (var index = 0; index < generated.Count; index++)
             {
                 var item = generated[index];
@@ -178,6 +175,7 @@ public sealed class 커뮤니티게시글음성작업Processor : I커뮤니티�
                     $"post-{job.PostId}-audio-{index + 1}.{job.AudioFormat}",
                     item.Audio.ContentType,
                     folder,
+                    ObjectStorageAccess.Private,
                     cancellationToken);
                 uploaded.Add((item.Text, upload, item.Audio));
             }
@@ -191,7 +189,7 @@ public sealed class 커뮤니티게시글음성작업Processor : I커뮤니티�
                 {
                     Sequence = index + 1,
                     CharacterCount = item.Text.Length,
-                    BucketName = item.Storage.BucketName,
+                    BucketName = item.Storage.ContainerName,
                     ObjectName = item.Storage.ObjectName,
                     ContentType = item.Audio.ContentType,
                     FileSizeBytes = item.Audio.오디오.LongLength,
@@ -261,9 +259,9 @@ public sealed class 커뮤니티게시글음성작업Processor : I커뮤니티�
             return "CommunityPostAudio:DefaultVoiceId 설정이 필요합니다.";
         }
 
-        if (string.IsNullOrWhiteSpace(_storageOptions.BucketName))
+        if (!_storageService.IsConfigured(ObjectStorageAccess.Private))
         {
-            return "GoogleCloudStorage:BucketName 설정이 필요합니다.";
+            return "ObjectStorage 비공개 저장소 설정이 필요합니다.";
         }
 
         return null;

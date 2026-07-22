@@ -1,7 +1,7 @@
 using FluentResults;
 using Ssalddel.ApiMetadata;
 using Microsoft.AspNetCore.Http;
-using 살뜰.Services.External.Google;
+using Ssalddel.Services.Storage;
 using 살뜰.Services.Storage.Local;
 
 namespace Ssalddel.Application.Evidence;
@@ -45,16 +45,16 @@ public sealed record 파일POD응답(
     Summary = "POD 파일을 문서 정책, 다운로드, 감사 로그 흐름으로 확장합니다.")]
 public sealed class 파일POD관리UseCase : I파일POD관리UseCase
 {
-    private readonly IGoogleCloudStorageService _googleCloudStorageService;
+    private readonly IObjectStorageService _objectStorageService;
     private readonly ICommandFileStoragePathResolver _pathResolver;
     private readonly IAdminFilePodStore _store;
 
     public 파일POD관리UseCase(
-        IGoogleCloudStorageService googleCloudStorageService,
+        IObjectStorageService objectStorageService,
         ICommandFileStoragePathResolver pathResolver,
         IAdminFilePodStore store)
     {
-        _googleCloudStorageService = googleCloudStorageService;
+        _objectStorageService = objectStorageService;
         _pathResolver = pathResolver;
         _store = store;
     }
@@ -80,20 +80,21 @@ public sealed class 파일POD관리UseCase : I파일POD관리UseCase
         var fileType = command.FileType.Trim();
         var requestId = command.RequestId?.Trim() ?? string.Empty;
         var folder = _pathResolver.ResolveAdminFilePodFolder(fileType, requestId);
-        var uploadResult = await _googleCloudStorageService.UploadAsync(
+        var uploadResult = await _objectStorageService.UploadAsync(
             stream,
             command.File.FileName,
             command.File.ContentType,
             folder,
+            ObjectStorageAccess.Private,
             cancellationToken);
 
         var metadata = _store.Add(new AdminFilePodMetadata(
             Id: Guid.NewGuid(),
             FileType: fileType,
             RequestId: requestId,
-            BucketName: uploadResult.BucketName,
+            BucketName: uploadResult.ContainerName,
             ObjectName: uploadResult.ObjectName,
-            Url: uploadResult.PublicUrl,
+            Url: uploadResult.Url,
             OriginalFileName: command.File.FileName,
             UploadStatus: "업로드완료",
             UploadedAtUtc: DateTime.UtcNow,
