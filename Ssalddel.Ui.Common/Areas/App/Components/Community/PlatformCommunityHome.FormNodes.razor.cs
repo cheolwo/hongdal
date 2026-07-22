@@ -1,4 +1,3 @@
-using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
@@ -123,14 +122,4 @@ public partial class PlatformCommunityHome
             _ => "사용자 정의 양식"
         };
 
-    private static string? ResolveDiagramFormDetailPath(string? formKind)
-        => formKind switch
-        {
-            PlatformDiagramFormKinds.TransportRequest => "/shipper/request",
-            PlatformDiagramFormKinds.WarehouseOutbound => "/warehouse/work-board",
-            PlatformDiagramFormKinds.WarehouseInbound => InboundRequestPageRoutes.Create,
-            PlatformDiagramFormKinds.TransportPickupConfirmation or
-            PlatformDiagramFormKinds.TransportDropoffConfirmation => "/driver/transport/proof",
-            _ => null
-        };
 }

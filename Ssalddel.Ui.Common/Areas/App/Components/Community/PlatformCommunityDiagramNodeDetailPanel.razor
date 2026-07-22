@@ -165,8 +165,9 @@
             <MudButton Variant="Variant.Filled"
                        Color="@Presentation.Action.Color"
                        StartIcon="@Presentation.Action.Icon"
+                       Disabled="@(!Presentation.Action.CanNavigate)"
                        OnClick="NavigateRequested">
-                상세 정보 확인
+                @(Presentation.Action.CanNavigate ? "상세 정보 확인" : "연결된 화면 없음")
             </MudButton>
             @if (Presentation.IsDiagramMode)
             {

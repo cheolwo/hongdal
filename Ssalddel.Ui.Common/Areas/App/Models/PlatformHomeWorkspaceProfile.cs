@@ -69,7 +69,7 @@ public static class PlatformHomeWorkspaceCatalog
             "공동수입",
             "공동구매 수요를 이어 해외 선적, 통관, 3PL 입고와 국내 분배를 처리하는 업무",
             CommunityLedgerTemplateKeys.GroupImport,
-            "/community/group-import",
+            CommunityPageRoutes.GroupImport,
             Icons.Material.Filled.Public,
             Color.Info),
         Create(

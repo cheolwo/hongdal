@@ -50,4 +50,14 @@ public sealed class PlatformHomeWorkspaceCatalogTests
         Assert.Contains("공동수입 OS", osNames);
         Assert.Contains("커뮤니티 신뢰 OS", osNames);
     }
+
+    [Fact]
+    public void GroupImportWorkspace_UsesTheSharedCommunityRoute()
+    {
+        var workspace = Assert.Single(
+            PlatformHomeWorkspaceCatalog.DefaultWorkspaces,
+            candidate => candidate.LedgerTemplateKey == CommunityLedgerTemplateKeys.GroupImport);
+
+        Assert.Equal(CommunityPageRoutes.GroupImport, workspace.EntryHref);
+    }
 }

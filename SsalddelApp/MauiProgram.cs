@@ -26,6 +26,7 @@ public static class MauiProgram
 			builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],
 			new Uri(SsalddelApiEndpoint.LocalDevelopmentBaseAddress)));
 		builder.Services.AddSsalddelAppServices(builder.Configuration);
+		builder.Services.AddSingleton<IPlatformCommunityNodeNavigationResolver, SsalddelAppPlatformCommunityNodeNavigationResolver>();
 		builder.Services.AddSsalddelUiCommonAppServices<IAuthSession>();
 		builder.Services.AddSsalddelDocumentOutputServices();
 		builder.Services.AddMudServices();

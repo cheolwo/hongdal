@@ -22,6 +22,7 @@ var apiBaseAddress = SsalddelApiEndpoint.ResolveBaseAddress(
 builder.Services.AddSsalddelApiHttpClient(apiBaseAddress);
 builder.Services.Configure<ClientDataModeOptions>(builder.Configuration.GetSection(ClientDataModeOptions.SectionName));
 builder.Services.AddScoped<ITransportRequestLedgerObserver, TransportRequestLedgerObserver>();
+builder.Services.AddSingleton<IPlatformCommunityNodeNavigationResolver, WebPlatformCommunityNodeNavigationResolver>();
 builder.Services.AddSsalddelUiCommonAppServices<WebAuthSessionService>();
 builder.Services.AddTransient<화주Controller기능모음ViewModel>();
 builder.Services.AddSsalddelDocumentOutputServices();

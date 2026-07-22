@@ -68,6 +68,10 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
                 descriptor.ServiceType == contractType
                 && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Scoped));
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(IPlatformCommunityNodeNavigationResolver)
+            && descriptor.ImplementationType == typeof(UnsupportedPlatformCommunityNodeNavigationResolver)
+            && descriptor.Lifetime == ServiceLifetime.Singleton);
     }
 
     [Fact]

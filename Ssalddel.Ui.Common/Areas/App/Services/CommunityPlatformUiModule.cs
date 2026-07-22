@@ -33,6 +33,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddScoped<ICommunityDecorationSelectionStore, BrowserCommunityDecorationSelectionStore>();
         services.TryAddScoped<ICommunityDecorationPurchaseClient, LocalSimulationCommunityDecorationPurchaseClient>();
         services.TryAddScoped<IShipperHomeDashboardClient, ShipperHomeDashboardClient>();
+        services.TryAddSingleton<IPlatformCommunityNodeNavigationResolver, UnsupportedPlatformCommunityNodeNavigationResolver>();
         services.TryAddTransient<ShipperHomePageViewModel>();
         services.TryAddTransient<CommunityScheduledPostListViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();

@@ -77,6 +77,7 @@ namespace FDriverApp
             builder.Services.AddSingleton<ProjectListPageModel>();
             builder.Services.AddSingleton<ManageMetaPageModel>();
 
+            builder.Services.AddSingleton<IPlatformCommunityNodeNavigationResolver, FDriverPlatformCommunityNodeNavigationResolver>();
             builder.Services.AddSsalddelUiCommonAppServices<IFDriverAuthSession>();
             builder.Services.AddTransient<음식배달기사Controller기능모음ViewModel>();
             builder.Services.AddTransient<기사Controller기능모음ViewModel>();

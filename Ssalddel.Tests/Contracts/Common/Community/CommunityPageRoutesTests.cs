@@ -117,6 +117,7 @@ public sealed class CommunityPageRoutesTests
         var root = $"/community/group-purchase/{campaignId:D}";
 
         Assert.Equal("/community/group-purchase", CommunityPageRoutes.GroupPurchase);
+        Assert.Equal("/community/group-import", CommunityPageRoutes.GroupImport);
         Assert.Equal("/community/group-purchase/new", CommunityPageRoutes.GroupPurchaseCreate);
         Assert.Equal("/community/actions", CommunityPageRoutes.CollectiveActions);
         Assert.Equal(root, CommunityPageRoutes.GroupPurchaseDetailFor(campaignId));

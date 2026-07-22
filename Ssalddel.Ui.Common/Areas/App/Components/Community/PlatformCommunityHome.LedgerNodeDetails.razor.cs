@@ -1,19 +1,16 @@
-using System.Globalization;
 using Ssalddel.Contracts.Common.Community;
-using Ssalddel.Contracts.Common.Inbound;
-using Ssalddel.Contracts.Common.Versioning;
-using Ssalddel.Contracts.Common.Warehouse;
 using Ssalddel.Ui.Common.Areas.App;
-using Ssalddel.Ui.Common.Areas.App.Models;
 using Ssalddel.Ui.Common.Areas.App.Services;
-using Ssalddel.Ui.Common.Areas.App.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
+    [Inject]
+    private IPlatformCommunityNodeNavigationResolver NodeNavigationResolver { get; set; } = default!;
+
     private PlatformCommunityDiagramNodeDetailPresentation BuildNodeDetailPresentation(원장블록노드 node)
     {
         var state = ResolveNodeDetailProcessingState(node);
@@ -59,7 +56,21 @@ public partial class PlatformCommunityHome
 
     private 도형상세동작 BuildNodeDetailAction(원장블록노드 node)
     {
-        var basePath = ResolveNodeDetailBasePath(node);
+        var target = NodeNavigationResolver.Resolve(new(
+            selectedLedgerTemplateKey,
+            node.Title,
+            node.Kind,
+            node.FormKind));
+        var basePath = PageNavigationContext.NormalizeReturnPath(target?.Path);
+        if (target is null || basePath is null)
+        {
+            return new(
+                null,
+                $"현재 앱에는 {node.Title} 노드와 연결된 전용 화면이 없습니다. 원장 맥락은 이 패널에서 계속 확인할 수 있습니다.",
+                Icons.Material.Filled.LinkOff,
+                Color.Default);
+        }
+
         var values = new Dictionary<string, string?>
         {
             ["source"] = "diagram-node",
@@ -73,172 +84,28 @@ public partial class PlatformCommunityHome
 
         return new(
             PlatformCommunityNavigationQuery.Build(basePath, values),
-            BuildNodeDetailActionDescription(node, basePath),
-            ResolveNodeDetailActionIcon(basePath),
-            ResolveNodeDetailActionColor(basePath));
+            $"{node.Title} 노드를 {target.DestinationLabel}에서 확인합니다.",
+            ResolveNodeDetailActionIcon(target.Area),
+            ResolveNodeDetailActionColor(target.Area));
     }
 
-    private string ResolveNodeDetailBasePath(원장블록노드 node)
-    {
-        if (node.Kind.Equals("form", StringComparison.OrdinalIgnoreCase) &&
-            ResolveDiagramFormDetailPath(node.FormKind) is { } formPath)
+    private static string ResolveNodeDetailActionIcon(PlatformCommunityNodeNavigationArea area)
+        => area switch
         {
-            return formPath;
-        }
-
-        var title = node.Title;
-        if (selectedLedgerTemplateKey is CommunityLedgerTemplateKeys.CargoTransport)
-        {
-            if (ContainsAny(title, "운송 의뢰"))
-            {
-                return "/shipper/request";
-            }
-
-            if (ContainsAny(title, "배차", "기사 수락", "기사 거절"))
-            {
-                return "/driver/recommendations";
-            }
-
-            if (ContainsAny(title, "운송 구간"))
-            {
-                return "/driver/transports/current";
-            }
-
-            if (ContainsAny(title, "상차", "하차", "수령", "인수", "증빙"))
-            {
-                return "/driver/transport/proof";
-            }
-
-            if (ContainsAny(title, "정산"))
-            {
-                return "/shipper/request/payment-status";
-            }
-
-            return "/shipper/request/HD-WEB-001";
-        }
-
-        if (selectedLedgerTemplateKey is CommunityLedgerTemplateKeys.SsalddelMart)
-        {
-            if (ContainsAny(title, "피킹", "포장", "픽업"))
-            {
-                return "/warehouse/mart/picking";
-            }
-
-            if (ContainsAny(title, "재고", "창고"))
-            {
-                return "/warehouse/mart/work-board";
-            }
-
-            return "/warehouse/mart";
-        }
-
-        if (selectedLedgerTemplateKey is CommunityLedgerTemplateKeys.WarehouseInbound)
-        {
-            if (ContainsAny(title, "운송 하차", "하차 증빙"))
-            {
-                return "/driver/transport/proof";
-            }
-
-            if (ContainsAny(title, "검수"))
-            {
-                return "/warehouse/work/inbound/inspection";
-            }
-
-            if (ContainsAny(title, "상품", "바코드", "입고"))
-            {
-                return "/warehouse/work/inbound/products";
-            }
-
-            return "/shipper/inbound/requests";
-        }
-
-        if (selectedLedgerTemplateKey is CommunityLedgerTemplateKeys.WarehouseOutbound)
-        {
-            if (ContainsAny(title, "운송 상차", "운송 하차", "상차 증빙", "하차 증빙"))
-            {
-                return "/driver/transport/proof";
-            }
-
-            if (ContainsAny(title, "창고 입고"))
-            {
-                return "/warehouse/work/inbound/products";
-            }
-
-            if (ContainsAny(title, "피킹"))
-            {
-                return "/warehouse/work/picking-batch";
-            }
-
-            if (ContainsAny(title, "출고", "포장", "작업"))
-            {
-                return "/warehouse/work-board";
-            }
-
-            if (ContainsAny(title, "배송", "운송"))
-            {
-                return "/driver/recommendations";
-            }
-
-            return "/warehouse";
-        }
-
-        if (selectedLedgerTemplateKey is CommunityLedgerTemplateKeys.FoodOrder)
-        {
-            return "/community";
-        }
-
-        if (selectedLedgerTemplateKey is CommunityLedgerTemplateKeys.FoodDelivery)
-        {
-            return "/driver/recommendations";
-        }
-
-        return node.Kind switch
-        {
-            "warehouse" => "/warehouse",
-            "delivery" => "/driver/recommendations",
-            "confirm" => "/community",
-            _ => "/community"
-        };
-    }
-
-    private static string BuildNodeDetailActionDescription(원장블록노드 node, string basePath)
-        => basePath switch
-        {
-            "/shipper/request" => $"{node.Title} 노드를 운송 의뢰 작성 화면에서 확인합니다.",
-            "/shipper/request/HD-WEB-001" => $"{node.Title} 노드를 의뢰 상세 타임라인에서 확인합니다.",
-            "/driver/recommendations" => $"{node.Title} 노드를 기사 배차/추천 화면에서 확인합니다.",
-            "/driver/transports/current" => $"{node.Title} 노드를 진행 중 운송 화면에서 확인합니다.",
-            "/driver/transport/proof" => $"{node.Title} 노드를 상차/하차 증빙 확인 화면에서 확인합니다.",
-            "/shipper/request/payment-status" => $"{node.Title} 노드를 결제/정산 상태 화면에서 확인합니다.",
-            "/warehouse/mart" => $"{node.Title} 노드를 알뜰살뜰 마트 화면에서 확인합니다.",
-            "/warehouse/mart/picking" => $"{node.Title} 노드를 알뜰살뜰 마트 피킹/포장 화면에서 확인합니다.",
-            "/warehouse/mart/work-board" => $"{node.Title} 노드를 알뜰살뜰 마트 작업 보드에서 확인합니다.",
-            "/warehouse/work/inbound/inspection" => $"{node.Title} 노드를 입고 검수 화면에서 확인합니다.",
-            "/warehouse/work/inbound/products" => $"{node.Title} 노드를 입고 상품 확인 화면에서 확인합니다.",
-            "/shipper/inbound/requests" => $"{node.Title} 노드를 입고 요청 목록에서 확인합니다.",
-            "/warehouse/work/picking-batch" => $"{node.Title} 노드를 피킹 배치 화면에서 확인합니다.",
-            "/warehouse/work-board" => $"{node.Title} 노드를 창고 작업 보드에서 확인합니다.",
-            "/warehouse" => $"{node.Title} 노드를 창고·현장 화면에서 확인합니다.",
-            _ => $"{node.Title} 노드를 현재 커뮤니티 원장 맥락에서 확인합니다."
-        };
-
-    private static string ResolveNodeDetailActionIcon(string basePath)
-        => basePath switch
-        {
-            var path when path.Contains("warehouse", StringComparison.OrdinalIgnoreCase) => Icons.Material.Filled.Warehouse,
-            var path when path.Contains("driver", StringComparison.OrdinalIgnoreCase) => Icons.Material.Filled.LocalShipping,
-            var path when path.Contains("payment", StringComparison.OrdinalIgnoreCase) => Icons.Material.Filled.Payments,
-            var path when path.Contains("shipper", StringComparison.OrdinalIgnoreCase) => Icons.Material.Filled.Assignment,
+            PlatformCommunityNodeNavigationArea.Warehouse => Icons.Material.Filled.Warehouse,
+            PlatformCommunityNodeNavigationArea.Driver => Icons.Material.Filled.LocalShipping,
+            PlatformCommunityNodeNavigationArea.Shipper => Icons.Material.Filled.Assignment,
+            PlatformCommunityNodeNavigationArea.Food => Icons.Material.Filled.Restaurant,
             _ => Icons.Material.Filled.OpenInNew
         };
 
-    private static Color ResolveNodeDetailActionColor(string basePath)
-        => basePath switch
+    private static Color ResolveNodeDetailActionColor(PlatformCommunityNodeNavigationArea area)
+        => area switch
         {
-            var path when path.Contains("warehouse", StringComparison.OrdinalIgnoreCase) => Color.Success,
-            var path when path.Contains("driver", StringComparison.OrdinalIgnoreCase) => Color.Secondary,
-            var path when path.Contains("payment", StringComparison.OrdinalIgnoreCase) => Color.Info,
-            var path when path.Contains("shipper", StringComparison.OrdinalIgnoreCase) => Color.Primary,
+            PlatformCommunityNodeNavigationArea.Warehouse => Color.Success,
+            PlatformCommunityNodeNavigationArea.Driver => Color.Secondary,
+            PlatformCommunityNodeNavigationArea.Shipper => Color.Primary,
+            PlatformCommunityNodeNavigationArea.Food => Color.Warning,
             _ => Color.Default
         };
 

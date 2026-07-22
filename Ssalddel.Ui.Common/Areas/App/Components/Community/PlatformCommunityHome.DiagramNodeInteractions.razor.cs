@@ -86,6 +86,13 @@ public partial class PlatformCommunityHome
         }
 
         var action = BuildNodeDetailAction(node);
+        if (!action.CanNavigate || action.Url is null)
+        {
+            statusSeverity = Severity.Info;
+            statusMessage = action.Description;
+            return;
+        }
+
         CloseNodeDetailPanel();
         WarehouseProxy.Close();
 

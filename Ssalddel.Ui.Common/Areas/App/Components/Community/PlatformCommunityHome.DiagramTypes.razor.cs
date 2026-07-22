@@ -5,10 +5,13 @@ using MudBlazor;
 namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 
 public sealed record 도형상세동작(
-        string Url,
+        string? Url,
         string Description,
         string Icon,
-        Color Color);
+        Color Color)
+    {
+        public bool CanNavigate => !string.IsNullOrWhiteSpace(Url);
+    }
 
 public sealed record 도형레이어배지(
         string LayerKey,
