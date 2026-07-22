@@ -72,6 +72,10 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             descriptor.ServiceType == typeof(IPlatformCommunityNodeNavigationResolver)
             && descriptor.ImplementationType == typeof(UnsupportedPlatformCommunityNodeNavigationResolver)
             && descriptor.Lifetime == ServiceLifetime.Singleton);
+        Assert.Contains(services, descriptor =>
+            descriptor.ServiceType == typeof(IPlatformHomeWorkspaceNavigationResolver)
+            && descriptor.ImplementationType == typeof(UnsupportedPlatformHomeWorkspaceNavigationResolver)
+            && descriptor.Lifetime == ServiceLifetime.Singleton);
     }
 
     [Fact]

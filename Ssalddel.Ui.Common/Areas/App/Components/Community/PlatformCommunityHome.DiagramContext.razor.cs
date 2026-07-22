@@ -17,6 +17,9 @@ namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 
 public partial class PlatformCommunityHome
 {
+    [Inject]
+    private IPlatformHomeWorkspaceNavigationResolver WorkspaceNavigationResolver { get; set; } = default!;
+
     private static 다이어그램레이어정의? FindDiagramLayer(string key)
         => 다이어그램레이어정의s.FirstOrDefault(layer => string.Equals(layer.Key, key, StringComparison.OrdinalIgnoreCase));
 
@@ -38,7 +41,17 @@ public partial class PlatformCommunityHome
     private static IReadOnlyList<CommunityLedgerTemplateResponse> LedgerTemplates => CommunityLedgerTemplateCatalog.All;
 
     private IReadOnlyList<PlatformHomeWorkspaceProfile> UnifiedWorkspaces
-        => Workspaces.Count > 0 ? Workspaces : PlatformHomeWorkspaceCatalog.DefaultWorkspaces;
+        => (Workspaces.Count > 0 ? Workspaces : PlatformHomeWorkspaceCatalog.DefaultWorkspaces)
+            .Select(ResolveWorkspaceNavigation)
+            .ToArray();
+
+    private PlatformHomeWorkspaceProfile ResolveWorkspaceNavigation(
+        PlatformHomeWorkspaceProfile workspace)
+        => workspace with
+        {
+            EntryHref = PageNavigationContext.NormalizeReturnPath(
+                WorkspaceNavigationResolver.ResolveEntryHref(workspace))
+        };
 
     private CommunityLedgerTemplateResponse SelectedLedgerTemplate
         => CommunityLedgerTemplateCatalog.Find(selectedLedgerTemplateKey);

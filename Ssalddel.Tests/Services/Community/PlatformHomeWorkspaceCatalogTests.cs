@@ -14,7 +14,7 @@ public sealed class PlatformHomeWorkspaceCatalogTests
 
             Assert.Equal(workspace.LedgerTemplateKey, template.Key);
             Assert.False(string.IsNullOrWhiteSpace(workspace.OperatingSystemName));
-            Assert.False(string.IsNullOrWhiteSpace(workspace.EntryHref));
+            Assert.Null(workspace.EntryHref);
         }
     }
 
@@ -52,12 +52,12 @@ public sealed class PlatformHomeWorkspaceCatalogTests
     }
 
     [Fact]
-    public void GroupImportWorkspace_UsesTheSharedCommunityRoute()
+    public void GroupImportWorkspace_DoesNotOwnAHostRoute()
     {
         var workspace = Assert.Single(
             PlatformHomeWorkspaceCatalog.DefaultWorkspaces,
             candidate => candidate.LedgerTemplateKey == CommunityLedgerTemplateKeys.GroupImport);
 
-        Assert.Equal(CommunityPageRoutes.GroupImport, workspace.EntryHref);
+        Assert.Null(workspace.EntryHref);
     }
 }

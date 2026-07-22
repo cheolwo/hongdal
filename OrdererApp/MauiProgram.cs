@@ -19,6 +19,7 @@ public static class MauiProgram
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddOrdererSecurityServices();
         builder.Services.AddSingleton<IPlatformCommunityNodeNavigationResolver, OrdererPlatformCommunityNodeNavigationResolver>();
+        builder.Services.AddSingleton<IPlatformHomeWorkspaceNavigationResolver, OrdererPlatformHomeWorkspaceNavigationResolver>();
         builder.Services.AddSsalddelUiCommonAppServices<OrdererAccessTokenProvider>();
         builder.Services.AddTransient<주문자Controller기능모음ViewModel>();
         builder.Services.AddTransient<음식Controller기능모음ViewModel>();

@@ -35,7 +35,7 @@
 
 | 우선순위 | 문맥 | 현재 신호 | 목표 route·Screen | 완료 조건 |
 | --- | --- | --- | --- | --- |
-| `P0-0` 진행 · 사방괘·node handoff 2차 완료 | 공용 navigation 계약 | WebApp·모바일 route catalog와 `Ui.Common`의 URL literal이 분산됨 | 공용 `CommunityPageRoutes`, page key·diagram return context와 host navigation adapter | 공용 Screen이 플랫폼 namespace를 참조하지 않고 Web·모바일 deep link가 같은 의미로 해석됨 |
+| `P0-0` 완료 · host capability 3차 완료 | 공용 navigation 계약 | 변경 전에는 WebApp·모바일 route catalog와 `Ui.Common`의 URL literal이 분산됐음 | 공용 route catalog, page key·diagram return context와 host navigation adapter | 공용 Screen이 플랫폼 namespace를 참조하지 않고 Web·모바일 deep link가 host가 실제 제공하는 화면으로 해석되며 미지원 진입은 비활성 표시됨 |
 | `P0-1` 완료 | 커뮤니티 기본 흐름 | 한 `CommunityWorkspacePage.razor`가 작업공간·게시판 관리·원장 초안·글쓰기·추천 목록·추천 상세·일반 상세를 mode로 전환했음 | 허브, 게시판 관리, 원장 초안, 글쓰기, 추천 목록·상세, 영속 글 상세 전용 Route Page와 공용 Screen | route 파일마다 하나의 의미와 공용 Screen 하나만 가지며 작업공간은 탐색 허브만 맡고 기존 `?seed=` 링크가 새 추천 상세 route로 호환 이동함 |
 | `P0-2` 완료 | 국내 공동구매 대표 파일럿 | 변경 전에는 내부 component가 나뉘어도 한 route가 제안·목록·상세·공급자·배송 정보·이행 초안·협상·단계 전이·이의제기를 모두 실행했음 | 목록, 개설, 캠페인 상세, 참여, 공급자, 협상, 이의제기, 결의, 서명, 배송 가능 정보, 이행 초안 Screen | Web·모바일이 같은 공용 Screen을 조립하고 각 단계가 stable campaign ID와 직접 URL을 가지며 저장 뒤 같은 ID를 재조회하고 추천·자동 배차·결제·계약을 확정하지 않음 |
 | `P0-3` 완료 | 다이어그램 | 변경 전에는 Web 전용 `DiagramWorkbenchPage`가 palette·preset·canvas를 함께 소유하고 모바일 route가 없었음 | 공용 diagram Screen, desktop sidebar, mobile bottom sheet | Web·모바일 `/diagram`이 같은 Screen을 조립하고 선택 node·zoom·filter·출발 page를 복원하며 구체 업무 Command는 3단계 Screen으로 이동함 |
@@ -268,4 +268,6 @@ Web Route Page는 같은 공용 Screen 아래에 기존 전문 도구 디렉터�
 
 아홉 번째 수직 단위는 `P0-0` 다이어그램 원장 node → 구체 데이터 페이지 handoff다. 공용 node 상세에서 업무 URL literal과 임시 화주 요청 ID를 제거하고 Web·메인 앱·창고·기사·주문자 host별 navigation adapter가 실제 제공 화면만 반환하도록 분리했다. 목적지가 없는 전문 앱은 다른 앱 URL을 열지 않고 비활성 안내와 현재 원장 문맥을 유지한다. node 문맥과 복귀 주소는 공용 query builder로 전달하며 목적지 화면의 인증·기능 플래그·서버 권한 경계는 그대로 유지한다.
 
-다음 우선순위는 `PlatformHomeWorkspaceProfile`의 교차 앱 entry href다. 공용 profile에 남은 화주·음식·기사·입출고·커뮤니티 URL literal을 host capability로 해석하고, 전문 앱이 제공하지 않는 workspace 진입은 숨기거나 비활성 안내로 표현한다. `P3`의 기사 추천·자동 배차·결제·정산·통관 운영 효과는 계속 보존·비활성 상태로 둔다.
+열 번째 수직 단위는 `P0-0` workspace 앱별 navigation capability다. `PlatformHomeWorkspaceProfile`은 원장 template과 표시 정보만 소유하고 Web·메인 앱·창고·기사·주문자 host resolver가 실제 제공 Route Page만 연결한다. 목적지가 없는 workspace는 원장 초안 작성을 보존하면서 교차 앱 `열기`를 `현재 앱 미지원`으로 비활성 표시한다. 공용 UI는 resolver 결과도 local route로 정규화하며 목적지의 인증·기능 플래그·서버 권한 경계를 우회하지 않는다.
+
+`P0-0` 공용 navigation 계약은 사방괘 기본 목적지, 다이어그램 node handoff와 workspace capability까지 완료했다. 다음 구현 우선순위는 [0.0 집중 로드맵](./focus-roadmap.md)의 남은 대표 수직 여정으로 돌아가되, 실제 모바일 기기에서 deep link·뒤로가기·좁은 화면을 다시 검증한다. `P3`의 기사 추천·자동 배차·결제·정산·통관 운영 효과는 계속 보존·비활성 상태로 둔다.

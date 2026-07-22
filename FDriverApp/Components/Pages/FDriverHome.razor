@@ -76,6 +76,5 @@
     private static readonly IReadOnlyList<PlatformHomeWorkspaceProfile> FoodDeliveryWorkspaces =
         PlatformHomeWorkspaceCatalog.DefaultWorkspaces
             .Where(workspace => workspace.LedgerTemplateKey == CommunityLedgerTemplateKeys.FoodDelivery)
-            .Select(workspace => workspace with { EntryHref = "/food-delivery/open/workspace" })
             .ToArray();
 }

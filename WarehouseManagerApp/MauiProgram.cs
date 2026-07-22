@@ -21,6 +21,7 @@ public static class MauiProgram
         builder.Services.AddMudServices();
         builder.Services.AddWarehouseManagerApplication();
         builder.Services.AddSingleton<IPlatformCommunityNodeNavigationResolver, WarehousePlatformCommunityNodeNavigationResolver>();
+        builder.Services.AddSingleton<IPlatformHomeWorkspaceNavigationResolver, WarehousePlatformHomeWorkspaceNavigationResolver>();
         builder.Services.AddSsalddelUiCommonAppServices<WarehouseAccessTokenProvider>();
         builder.Services.AddSsalddelApiHttpClient(SsalddelApiEndpoint.ResolveBaseAddress(
             builder.Configuration[SsalddelApiEndpoint.ConfigurationKey],

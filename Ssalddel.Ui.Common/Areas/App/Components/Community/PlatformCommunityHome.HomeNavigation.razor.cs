@@ -155,7 +155,9 @@ public partial class PlatformCommunityHome
     {
         var roleActions = QuickActions
             .Select(action => (Title: action.Title, Href: action.Href))
-            .Concat(Workspaces.Select(workspace => (Title: workspace.Title, Href: workspace.EntryHref)))
+            .Concat(UnifiedWorkspaces
+                .Where(workspace => !string.IsNullOrWhiteSpace(workspace.EntryHref))
+                .Select(workspace => (Title: workspace.Title, Href: workspace.EntryHref!)))
             .Where(action => !string.IsNullOrWhiteSpace(action.Href))
             .DistinctBy(action => action.Href, StringComparer.OrdinalIgnoreCase)
             .Take(4)

@@ -109,6 +109,16 @@
                 관련 업무 열기
             </MudButton>
         }
+        else if (Workspace is not null)
+        {
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Default"
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.LinkOff"
+                       Disabled="true">
+                현재 앱 미지원
+            </MudButton>
+        }
     </MudStack>
 </div>
 
