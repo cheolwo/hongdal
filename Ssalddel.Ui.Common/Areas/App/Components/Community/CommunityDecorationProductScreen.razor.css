@@ -16,6 +16,7 @@
 .decoration-detail__breadcrumb button {
     appearance: none;
     display: inline-flex;
+    min-height: 48px;
     align-items: center;
     gap: 4px;
     padding: 6px 8px;
@@ -59,7 +60,7 @@
 .decoration-detail__preview-toolbar button {
     appearance: none;
     display: inline-flex;
-    min-height: 36px;
+    min-height: 48px;
     align-items: center;
     gap: 4px;
     padding: 7px 10px;
@@ -334,6 +335,11 @@
     line-height: 1.55;
 }
 
+.decoration-detail__info ::deep .mud-button-root,
+.decoration-detail--missing ::deep .mud-button-root {
+    min-height: 48px;
+}
+
 .decoration-detail__price {
     display: grid;
     gap: 3px;
@@ -520,6 +526,10 @@
     .decoration-detail__product {
         grid-template-columns: 1fr;
         gap: 18px;
+    }
+
+    .decoration-detail__info {
+        order: -1;
     }
 
     .decoration-detail__stage {

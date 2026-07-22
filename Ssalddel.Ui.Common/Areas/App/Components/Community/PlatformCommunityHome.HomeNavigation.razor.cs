@@ -262,7 +262,7 @@ public partial class PlatformCommunityHome
     }
 
     private void OpenDecorationStore()
-        => Navigation.NavigateTo("/community/decorations");
+        => Navigation.NavigateTo(CommunityPageRoutes.Decorations);
 
     private async Task OpenBaguaAnchorAsync(bool workMode, string anchorId)
     {

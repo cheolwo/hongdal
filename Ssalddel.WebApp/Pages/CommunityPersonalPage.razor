@@ -1,11 +1,8 @@
 @page "/community/me"
 @page "/community/me/{SectionKey}"
-@page "/community/decorations"
-@page "/community/decorations/{ProductKey}"
 @inherits MvvmComponentBase<CommunityPersonalPageViewModel>
 @using Ssalddel.WebApp.Pages.CommunityPersonal
 @using Ssalddel.WebApp.ViewModels
-@inject NavigationManager Navigation
 
 <PageTitle>@RouteContext.PageTitle</PageTitle>
 
@@ -51,8 +48,7 @@
             <CommunityPersonalNotificationsSection Preferences="@ViewModel.Preferences" />
             break;
         case "decorations":
-            <CommunityPersonalDecorationsSection Decorations="@ViewModel.Decorations"
-                                                 ProductKey="@RouteContext.ProductKey" />
+            <CommunityPersonalDecorationsSection Decorations="@ViewModel.Decorations" />
             break;
         case "settings":
             <CommunityPersonalSettingsSection Preferences="@ViewModel.Preferences" />
@@ -75,18 +71,12 @@
     [Parameter]
     public string? SectionKey { get; set; }
 
-    [Parameter]
-    public string? ProductKey { get; set; }
-
     private CommunityPersonalRouteContext RouteContext { get; set; }
-        = CommunityPersonalRouteContext.Resolve("community/me", null, null);
+        = CommunityPersonalRouteContext.Resolve(sectionKey: null);
 
     protected override void OnParametersSet()
     {
-        RouteContext = CommunityPersonalRouteContext.Resolve(
-            Navigation.ToBaseRelativePath(Navigation.Uri),
-            SectionKey,
-            ProductKey);
+        RouteContext = CommunityPersonalRouteContext.Resolve(SectionKey);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

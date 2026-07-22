@@ -134,4 +134,39 @@ public sealed class CommunityPageRoutesTests
     public void 공동구매route는_빈CampaignId를허용하지않는다()
         => Assert.Throws<ArgumentException>(() =>
             CommunityPageRoutes.GroupPurchaseDetailFor(Guid.Empty));
+
+    [Fact]
+    public void 꾸미기상점은_목록_상품_checkout의_canonicalRoute를분리한다()
+    {
+        const string productKey = "market-theme-한글";
+        var escapedKey = Uri.EscapeDataString(productKey);
+
+        Assert.Equal("/community/me", CommunityPageRoutes.Personal);
+        Assert.Equal("/community/decorations", CommunityPageRoutes.Decorations);
+        Assert.Equal(
+            $"/community/decorations/products/{escapedKey}",
+            CommunityPageRoutes.DecorationProductFor(productKey));
+        Assert.Equal(
+            $"/community/decorations/checkout/{escapedKey}",
+            CommunityPageRoutes.DecorationCheckoutFor(productKey));
+        Assert.Equal(
+            $"/community/decorations/{escapedKey}",
+            CommunityPageRoutes.LegacyDecorationProductFor(productKey));
+        Assert.Equal(
+            $"/community/decorations/{escapedKey}/checkout",
+            CommunityPageRoutes.LegacyDecorationCheckoutFor(productKey));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("pack/child")]
+    [InlineData("pack?next=checkout")]
+    [InlineData("pack#preview")]
+    [InlineData("pack\\child")]
+    public void 꾸미기상품key는_빈값과경로구분자를거부한다(string productKey)
+    {
+        Assert.Throws<ArgumentException>(() => CommunityPageRoutes.DecorationProductFor(productKey));
+        Assert.Throws<ArgumentException>(() => CommunityPageRoutes.DecorationCheckoutFor(productKey));
+    }
 }

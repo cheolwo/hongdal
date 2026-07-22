@@ -4,10 +4,11 @@
 <section class="community-personal-section" aria-labelledby="personal-decorations-title">
     <div class="community-personal-section-heading">
         <div><span>APPEARANCE</span><h2 id="personal-decorations-title">꾸미기</h2></div>
-        @if (!string.IsNullOrWhiteSpace(ProductKey))
-        {
-            <MudButton Href="/community/decorations" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ArrowBack">전체 보기</MudButton>
-        }
+        <MudButton Href="@CommunityPageRoutes.Decorations"
+                   Variant="Variant.Outlined"
+                   StartIcon="@Icons.Material.Filled.Storefront">
+            꾸미기 상점
+        </MudButton>
     </div>
 
     <div class="community-personal-decoration-toggles">
@@ -19,7 +20,7 @@
     </div>
 
     <div class="community-decoration-products">
-        @foreach (var product in Decorations.ProductsFor(ProductKey))
+        @foreach (var product in Decorations.ProductsFor(productKey: null))
         {
             <article class="@CommunityPersonalPresentation.BuildDecorationProductClass(product, Decorations.IsProductActive(product))">
                 @if (product.TraditionalMarketTheme is { } marketTheme)
@@ -60,8 +61,10 @@
                     }
                     else
                     {
-                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="@(() => Decorations.OwnAsync(product))">
-                            @(product.IsFree ? "보유" : $"{product.PriceAmount:N0} {product.CurrencyCode}")
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   Href="@CommunityPageRoutes.DecorationProductFor(product.Key)">
+                            상점에서 보기
                         </MudButton>
                     }
                 </div>
@@ -73,7 +76,4 @@
 @code {
     [Parameter, EditorRequired]
     public CommunityPersonalDecorationsViewModel Decorations { get; set; } = default!;
-
-    [Parameter]
-    public string? ProductKey { get; set; }
 }

@@ -84,7 +84,7 @@ public sealed record 꾸미기구매처리결과(
     string 안내문구,
     노드스티커FakePg결제승인Response? 결제승인 = null);
 
-public sealed class 꾸미기보유권동기화Service
+public sealed class 꾸미기보유권동기화Service : ICommunityDecorationPurchaseClient
 {
     private const string EntitlementsPath = "api/v1/community/node-sticker-store/entitlements/me";
     private const string ConfirmPath = "api/v1/community/node-sticker-store/fake-pg/confirm";
@@ -169,6 +169,13 @@ public sealed class 꾸미기보유권동기화Service
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(product);
+        if (!TryGetAuthenticatedUser(out _, out _))
+        {
+            return new(
+                false,
+                "꾸미기 보유권을 기록하려면 먼저 로그인해 주세요.");
+        }
+
         if (!서버구매지원상품인가(product))
         {
             return new(false, "아직 서버 구매와 연결되지 않은 꾸미기 상품입니다.");
@@ -221,6 +228,29 @@ public sealed class 꾸미기보유권동기화Service
         await MergeApprovedEntitlementAsync(userId, approval.보유권, cancellationToken);
         await SynchronizeAsync(cancellationToken);
         return new(true, "구매한 꾸미기를 이 기기에 저장하고 계정 보유권과 동기화했습니다.", approval);
+    }
+
+    public async Task<CommunityDecorationPurchaseResult> ConfirmAsync(
+        CommunityDecorationProduct product,
+        string paymentMethod,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(product);
+        if (!서버구매지원상품인가(product))
+        {
+            decorationState.Purchase(product);
+            var localOrderId = $"FAKE-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}"[..34];
+            return new(
+                true,
+                "개발용 구매·보유권을 이 앱 실행에만 기록했습니다.",
+                localOrderId);
+        }
+
+        var result = await ConfirmFakePurchaseAsync(product, paymentMethod, cancellationToken);
+        return new(
+            result.성공,
+            result.안내문구,
+            result.결제승인?.OrderId);
     }
 
     public void ClearVisibleEntitlements()

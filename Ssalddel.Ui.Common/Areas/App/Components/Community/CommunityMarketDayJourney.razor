@@ -47,7 +47,7 @@
                         <div><dt>사용</dt><dd>@marketTheme.LicenseLabel</dd></div>
                         <div><dt>보상</dt><dd>@marketTheme.DesignerCompensationPolicyLabel</dd></div>
                     </dl>
-                    <MudButton Href="@($"/community/decorations/{marketThemeProduct.Key}")"
+                    <MudButton Href="@CommunityPageRoutes.DecorationProductFor(marketThemeProduct.Key)"
                                Variant="Variant.Text"
                                Color="Color.Primary"
                                EndIcon="@Icons.Material.Filled.ChevronRight">

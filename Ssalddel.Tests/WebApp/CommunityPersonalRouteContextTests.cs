@@ -7,10 +7,7 @@ public sealed class CommunityPersonalRouteContextTests
     [Fact]
     public void BaseRoute_UsesOverviewSection()
     {
-        var context = CommunityPersonalRouteContext.Resolve(
-            "community/me",
-            sectionKey: null,
-            productKey: null);
+        var context = CommunityPersonalRouteContext.Resolve(sectionKey: null);
 
         Assert.Equal("overview", context.SectionKey);
         Assert.Equal("내 정보 · 살뜰 커뮤니티", context.PageTitle);
@@ -24,37 +21,25 @@ public sealed class CommunityPersonalRouteContextTests
     [InlineData("settings", "사용 설정")]
     public void KnownSection_UsesDedicatedPageContext(string sectionKey, string title)
     {
-        var context = CommunityPersonalRouteContext.Resolve(
-            $"community/me/{sectionKey}",
-            sectionKey,
-            productKey: null);
+        var context = CommunityPersonalRouteContext.Resolve(sectionKey);
 
         Assert.Equal(sectionKey, context.SectionKey);
         Assert.Equal($"{title} · 살뜰 커뮤니티", context.PageTitle);
     }
 
-    [Theory]
-    [InlineData("community/decorations", null, null)]
-    [InlineData("community/decorations/theme-pack", null, "theme-pack")]
-    [InlineData("community/me/decorations", "decorations", null)]
-    public void DecorationRoute_UsesDecorationSection(
-        string path,
-        string? sectionKey,
-        string? productKey)
+    [Fact]
+    public void PersonalDecorationSection_UsesManagementRoute()
     {
-        var context = CommunityPersonalRouteContext.Resolve(path, sectionKey, productKey);
+        var context = CommunityPersonalRouteContext.Resolve("decorations");
 
         Assert.Equal("decorations", context.SectionKey);
-        Assert.Equal(productKey, context.ProductKey);
+        Assert.Equal("/community/me/decorations", context.Section.Href);
     }
 
     [Fact]
     public void UnknownSection_FallsBackToOverview()
     {
-        var context = CommunityPersonalRouteContext.Resolve(
-            "community/me/unknown",
-            "unknown",
-            productKey: null);
+        var context = CommunityPersonalRouteContext.Resolve("unknown");
 
         Assert.Equal("overview", context.SectionKey);
     }

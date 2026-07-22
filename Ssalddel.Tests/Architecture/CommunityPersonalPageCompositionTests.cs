@@ -22,6 +22,25 @@ public sealed class CommunityPersonalPageCompositionTests
         Assert.DoesNotContain("CommunityPersonalPreferenceService", source);
         Assert.DoesNotContain("GetPostsAsync", source);
         Assert.DoesNotContain("SaveDecorationSelectionAsync", source);
+        Assert.DoesNotContain("@page \"/community/decorations", source);
+    }
+
+    [Fact]
+    public void 개인꾸미기관리는_상점과FakePG를직접실행하지않는다()
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "Ssalddel.WebApp",
+            "Pages",
+            "CommunityPersonal",
+            "CommunityPersonalDecorationsSection.razor"));
+
+        Assert.Contains("CommunityPageRoutes.Decorations", source);
+        Assert.Contains("CommunityPageRoutes.DecorationProductFor", source);
+        Assert.DoesNotContain("OwnAsync", source);
+        Assert.DoesNotContain("Purchase(", source);
+        Assert.DoesNotContain("FakePG", source);
     }
 
     [Theory]

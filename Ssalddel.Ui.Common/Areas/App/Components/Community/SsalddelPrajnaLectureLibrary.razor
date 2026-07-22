@@ -379,7 +379,7 @@
     public string CommunityHref { get; set; } = "/";
 
     [Parameter]
-    public string DecorationStoreHref { get; set; } = "/community/decorations";
+    public string DecorationStoreHref { get; set; } = CommunityPageRoutes.Decorations;
 
     [Parameter]
     public string? InitialPlaylistId { get; set; }
@@ -651,7 +651,12 @@
             : playlist.설명;
 
     private string DecorationProductHref(ScriptureDecorationDefinition definition)
-        => $"{DecorationStoreHref.TrimEnd('/')}/{Uri.EscapeDataString(definition.ProductKey)}";
+    {
+        var root = DecorationStoreHref.TrimEnd('/');
+        return string.Equals(root, CommunityPageRoutes.Decorations, StringComparison.OrdinalIgnoreCase)
+            ? CommunityPageRoutes.DecorationProductFor(definition.ProductKey)
+            : $"{root}/products/{Uri.EscapeDataString(definition.ProductKey)}";
+    }
 
     private static string PlaylistElementId(YouTube재생목록Dto playlist)
         => $"prajna-playlist-{playlist.PlaylistId}";

@@ -1,6 +1,4 @@
-using Ssalddel.Ui.Common.Areas.App.Services;
-
-namespace SsalddelApp.Services;
+namespace Ssalddel.Ui.Common.Areas.App.Services;
 
 public static class SsalddelClientContentPolicy
 {

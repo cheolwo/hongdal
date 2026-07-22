@@ -1,0 +1,12 @@
+@page "/community/decorations/{ProductKey}/checkout"
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter]
+    public string ProductKey { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+        => Navigation.NavigateTo(
+            CommunityPageRoutes.DecorationCheckoutFor(ProductKey),
+            replace: true);
+}

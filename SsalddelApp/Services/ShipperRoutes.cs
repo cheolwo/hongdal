@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Sales;
 using Ssalddel.Contracts.Shipper.Request;
@@ -44,7 +45,7 @@ public static class ShipperRoutes
     public const string ViewSettings = "/shipper/settings/views";
     public const string ProfileSettings = "/shipper/settings/profile";
     public const string PublicDataInformation = "/information/public-data";
-    public const string CommunityDecorations = "/community/decorations";
+    public const string CommunityDecorations = CommunityPageRoutes.Decorations;
     public const string CommunityGroupImport = "/community/group-import";
     public const string CommunityDecorationCreate = "/community/decorations/create";
     public const string CommunityDecorationThemeSubmit = "/community/decorations/themes/submit";
@@ -81,9 +82,9 @@ public static class ShipperRoutes
         => OrderFulfillmentSimulationPageRoutes.PackingTaskFor(taskId);
 
     public static string CommunityDecorationDetailFor(string productKey)
-        => $"{CommunityDecorations}/{Uri.EscapeDataString(productKey)}";
+        => CommunityPageRoutes.DecorationProductFor(productKey);
 
     public static string CommunityDecorationCheckoutFor(string productKey)
-        => $"{CommunityDecorationDetailFor(productKey)}/checkout";
+        => CommunityPageRoutes.DecorationCheckoutFor(productKey);
 
 }

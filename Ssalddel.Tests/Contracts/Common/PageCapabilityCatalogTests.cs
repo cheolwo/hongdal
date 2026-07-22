@@ -627,6 +627,34 @@ public sealed class PageCapabilityCatalogTests
         Assert.Contains("SsalddelMart", capability.WorkflowCodes);
     }
 
+    [Theory]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/community/decorations", "community-decoration-store", PageInteractionBoundary.ReadOnly, false, false)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/community/decorations/products/theme-pack", "community-decoration-products", PageInteractionBoundary.PlatformPersistence, false, false)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/community/decorations/checkout/theme-pack", "community-decoration-checkout", PageInteractionBoundary.Simulation, true, true)]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "/community/decorations/theme-pack", "community-decoration-legacy", PageInteractionBoundary.Simulation, true, true)]
+    [InlineData(SsalddelPageAppCodes.Shipper, "/community/decorations", "shipper-app-community-decoration-store", PageInteractionBoundary.ReadOnly, false, false)]
+    [InlineData(SsalddelPageAppCodes.Shipper, "/community/decorations/products/theme-pack", "shipper-app-community-decoration-products", PageInteractionBoundary.PlatformPersistence, false, false)]
+    [InlineData(SsalddelPageAppCodes.Shipper, "/community/decorations/checkout/theme-pack", "shipper-app-community-decoration-checkout", PageInteractionBoundary.Simulation, true, true)]
+    [InlineData(SsalddelPageAppCodes.Shipper, "/community/decorations/theme-pack/checkout", "shipper-app-community-decoration-legacy", PageInteractionBoundary.Simulation, true, true)]
+    public void 꾸미기Route는_Web과모바일에서_조회와FakePG경계를같게분리한다(
+        string appCode,
+        string route,
+        string expectedPageKey,
+        PageInteractionBoundary expectedBoundary,
+        bool expectedAuthentication,
+        bool expectedExternalEffects)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(appCode, route, out var capability);
+
+        Assert.True(found);
+        Assert.Equal(expectedPageKey, capability.PageKey);
+        Assert.Equal(expectedBoundary, capability.Boundary);
+        Assert.Equal(expectedAuthentication, capability.RequiresAuthentication);
+        Assert.Equal(expectedExternalEffects, capability.HasExternalEffects);
+        Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
+        Assert.Contains("CommunityTrust", capability.WorkflowCodes);
+    }
+
     [Fact]
     public void 인사역할검토홈은_인증된영속배정원장조회Beta로분류한다()
     {

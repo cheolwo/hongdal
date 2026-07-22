@@ -5,6 +5,7 @@ using SsalddelApp.Services.CommonContents;
 using SsalddelApp.Services.Localization;
 using SsalddelApp.Services.Samples;
 using SsalddelApp.Services.Security;
+using Ssalddel.Ui.Common.Areas.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SsalddelApp.Services;
@@ -20,6 +21,8 @@ internal static class ShipperPlatformModule
         services.AddScoped<AuthApiService>();
         services.AddSingleton<I꾸미기보유권LocalStore, Maui꾸미기보유권LocalStore>();
         services.AddScoped<꾸미기보유권동기화Service>();
+        services.AddScoped<ICommunityDecorationPurchaseClient>(provider =>
+            provider.GetRequiredService<꾸미기보유권동기화Service>());
         services.AddSingleton<SsalddelClientRoleService>();
         services.AddSingleton<ShipperOperatingProfileService>();
         services.AddSingleton<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();

@@ -16,6 +16,14 @@ public static class CommunityPageRoutes
     public const string CollectiveActions = "/community/actions";
     public const string GroupPurchase = "/community/group-purchase";
     public const string GroupPurchaseCreate = "/community/group-purchase/new";
+    public const string Personal = "/community/me";
+    public const string Decorations = "/community/decorations";
+    public const string DecorationProducts = $"{Decorations}/products";
+    public const string DecorationProductTemplate = $"{DecorationProducts}/{{ProductKey}}";
+    public const string DecorationCheckout = $"{Decorations}/checkout";
+    public const string DecorationCheckoutTemplate = $"{DecorationCheckout}/{{ProductKey}}";
+    public const string LegacyDecorationProductTemplate = $"{Decorations}/{{ProductKey}}";
+    public const string LegacyDecorationCheckoutTemplate = $"{Decorations}/{{ProductKey}}/checkout";
     public const string Diagram = "/diagram";
 
     public static string BoardsFor(
@@ -143,6 +151,18 @@ public static class CommunityPageRoutes
     public static string GroupPurchaseFulfillmentDraftFor(Guid campaignId)
         => GroupPurchaseCampaignRoute(campaignId, "fulfillment-draft");
 
+    public static string DecorationProductFor(string productKey)
+        => $"{DecorationProducts}/{EscapePathKey(productKey, nameof(productKey))}";
+
+    public static string DecorationCheckoutFor(string productKey)
+        => $"{DecorationCheckout}/{EscapePathKey(productKey, nameof(productKey))}";
+
+    public static string LegacyDecorationProductFor(string productKey)
+        => $"{Decorations}/{EscapePathKey(productKey, nameof(productKey))}";
+
+    public static string LegacyDecorationCheckoutFor(string productKey)
+        => $"{LegacyDecorationProductFor(productKey)}/checkout";
+
     private static string GroupPurchaseCampaignRoute(Guid campaignId, string? suffix = null)
     {
         if (campaignId == Guid.Empty)
@@ -154,6 +174,18 @@ public static class CommunityPageRoutes
         return string.IsNullOrWhiteSpace(suffix)
             ? route
             : $"{route}/{suffix}";
+    }
+
+    private static string EscapePathKey(string value, string parameterName)
+    {
+        var normalized = value?.Trim();
+        if (string.IsNullOrWhiteSpace(normalized)
+            || normalized.IndexOfAny(['/', '\\', '?', '#']) >= 0)
+        {
+            throw new ArgumentException("경로 key는 비어 있지 않고 경로 구분자를 포함하지 않아야 합니다.", parameterName);
+        }
+
+        return Uri.EscapeDataString(normalized);
     }
 
     private static string WithQuery(

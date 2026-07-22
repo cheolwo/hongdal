@@ -253,4 +253,43 @@ public sealed class PlatformCommunityDecorationStateServiceTests
         Assert.Null(product);
         Assert.Contains("traditional-market:", message);
     }
+
+    [Fact]
+    public async Task WebFakePGadapter는_실제결제없이_세션보유권만기록한다()
+    {
+        var state = new PlatformCommunityDecorationStateService();
+        var client = new LocalSimulationCommunityDecorationPurchaseClient(
+            state,
+            new Test현재사용자Context(new("user-1", "tester", [])));
+        var product = state.Products.First(item => !item.IsFree && !state.IsProductOwned(item));
+
+        var result = await client.ConfirmAsync(product, "FakeCard");
+
+        Assert.True(result.Success);
+        Assert.StartsWith("FAKE-", result.OrderId, StringComparison.Ordinal);
+        Assert.True(state.IsProductOwned(product));
+        Assert.Contains("세션", result.Message);
+    }
+
+    [Fact]
+    public async Task WebFakePGadapter는_익명사용자의보유권을기록하지않는다()
+    {
+        var state = new PlatformCommunityDecorationStateService();
+        var client = new LocalSimulationCommunityDecorationPurchaseClient(
+            state,
+            new Test현재사용자Context(현재사용자Snapshot.익명));
+        var product = state.Products.First(item => !item.IsFree && !state.IsProductOwned(item));
+
+        var result = await client.ConfirmAsync(product, "FakeCard");
+
+        Assert.False(result.Success);
+        Assert.False(state.IsProductOwned(product));
+        Assert.Contains("로그인", result.Message);
+    }
+
+    private sealed class Test현재사용자Context(현재사용자Snapshot snapshot)
+        : ISsalddel현재사용자Context
+    {
+        public 현재사용자Snapshot 현재사용자 { get; } = snapshot;
+    }
 }

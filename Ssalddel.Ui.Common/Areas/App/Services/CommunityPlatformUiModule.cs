@@ -31,6 +31,7 @@ internal static class CommunityPlatformUiModule
         services.TryAddScoped<YouTubeFoodCommunityDiscoveryService>();
         services.TryAddScoped<ICommunityDynamicDiscoveryClient, CommunityDynamicDiscoveryClient>();
         services.TryAddScoped<ICommunityDecorationSelectionStore, BrowserCommunityDecorationSelectionStore>();
+        services.TryAddScoped<ICommunityDecorationPurchaseClient, LocalSimulationCommunityDecorationPurchaseClient>();
         services.TryAddTransient<CommunityScheduledPostListViewModel>();
         services.TryAddTransient<CommunityPostListPageViewModel>();
         services.TryAddTransient<PlatformCommunityHomeShellViewModel>();

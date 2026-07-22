@@ -204,23 +204,6 @@ public sealed class CommunityPersonalDecorationsViewModel(
         }
     }
 
-    public async Task OwnAsync(
-        CommunityDecorationProduct product,
-        CancellationToken cancellationToken = default)
-    {
-        decorationState.Purchase(product);
-        decorationState.ApplyProduct(product);
-        NotifyStateChanged();
-        if (!await SaveSelectionAsync(cancellationToken))
-        {
-            return;
-        }
-
-        publishFeedback(
-            $"{product.Title} 꾸미기를 현재 브라우저에서 사용할 수 있게 했습니다.",
-            CommunityPersonalMessageTone.Success);
-    }
-
     public async Task ApplyAsync(
         CommunityDecorationProduct product,
         CancellationToken cancellationToken = default)

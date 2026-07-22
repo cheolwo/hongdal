@@ -44,7 +44,7 @@
 | `P1-2` 완료 | 운송 요청 상세 | 변경 전에는 Web 828줄과 모바일 988줄의 독립 monolith가 요약·진행·결제·증빙을 함께 수행했음 | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
 | `P1-3` 완료 | 입고 요청 | 변경 전에는 `SsalddelInboundRequestManager` 한 route가 창고 등록·입고 신청·목록·상세·완료를 함께 수행했음 | 목록, 신규 신청, 상세, 입고 완료와 별도 창고 등록 Screen | Web·모바일이 같은 route 계약·공용 Screen을 사용하고 성공 뒤 같은 inbound ID를 재조회하며 desktop·390px 실제 검증을 통과함 |
 | `P1-4` 완료 | 창고·판매 master-detail-action | 변경 전 입고 검수와 피킹, 마트 상품은 한 query 화면에 목록·상세·후기 저장을 함께 배치했고 판매 주문은 Web 읽기 원장과 모바일 Simulation 의미가 달랐음 | List, Detail, Action Screen과 adaptive desktop composition | 영속 판매 주문은 Web·모바일 공통 목록·stable-ID 상세로 통합하고, 로컬 Simulation도 허브·조회·stable-key Action route로 분리해 Command 뒤 같은 원장을 재조회함 |
-| `P2-1` | 개인 공간·꾸미기 | Web 개인 route multiplexer와 모바일 전용 꾸미기 route의 의미가 다름 | 개인 개요와 꾸미기 상점·상품·checkout Screen 분리 | 같은 route가 플랫폼마다 다른 기능을 뜻하지 않으며 FakePG 경계를 유지함 |
+| `P2-1` 완료 | 개인 공간·꾸미기 | 변경 전에는 Web 개인 route multiplexer가 꾸미기 상점·상품까지 해석하고 모바일만 별도 상점·상세·checkout을 가졌음 | 개인 관리, 꾸미기 상점, stable-key 상품 상세, FakePG checkout 공용 Screen | Web·모바일이 같은 canonical route·Screen을 사용하고 구매·보유권 생성은 로그인 후 checkout에만 남김 |
 | `P2-2` | `/shipper` 홈 | Web은 링크 디렉터리, 모바일은 커뮤니티 홈·인증·dashboard를 수행함 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route의 주된 목표가 같고 1.0 이후 기능은 flag 뒤에 유지됨 |
 | `P3` 보존 | 기사 추천·정산·통관 등 1.0 이후 화면 | 큰 Web 전용 화면이 남아 있으나 0.0 범위가 아님 | 재활성화 시 List·Detail·Action Screen으로 분리 | 0.0 기본 비노출, 추천·자동 배차·결제·정산 운영 효과 확장 금지 |
 
@@ -173,6 +173,23 @@ Web과 `OrdererApp`은 같은 canonical route와 공용 Screen을 사용하고 �
 
 `/shipper/sales/fulfillment`는 이제 상태를 바꾸지 않는 목표 허브다. 주문·재고·피킹·포장·정책은 독립 Route Page를 가지며, 목록 route는 읽기 전용이고 피킹·포장 Command는 주소의 stable task ID 화면에서만 실행한다. 존재하지 않는 key는 다른 주문이나 task로 자동 대체하지 않는다. 실제 MAUI Windows 앱에서 desktop과 플랫폼 최소 501px 좁은 창을 확인했고, 좁은 창의 route 이동이 이전 스크롤 위치를 이어받던 문제도 공용 상단 복원으로 보완했다. Android·iOS 실기기 확인은 배포 대상이 정해질 때 별도 수행한다.
 
+## 개인 공간·꾸미기 목표 route 지도
+
+| 화면 | 사용자 목표 | Route | 효과 경계 |
+| --- | --- | --- | --- |
+| 개인 공간 | 내 글·참여·원장·알림·사용 설정 관리 | `/community/me`, `/community/me/{SectionKey}` | 로그인 기반 개인 관리 |
+| 내 꾸미기 관리 | 현재 보유·적용 상태 확인과 상점 이동 | `/community/me/decorations` | 기존 보유 항목의 로컬 적용 선택 |
+| 꾸미기 상점 | 공개 상품 분류·탐색 | `/community/decorations` | 읽기 전용 |
+| 상품 상세 | stable product key의 미리보기·가격·사용 범위 확인, 이미 보유한 항목의 적용·해제 | `/community/decorations/products/{ProductKey}` | 로컬 선택 저장, 구매·보유권 생성 없음 |
+| FakePG checkout | 개발 결제 조건에 동의하고 한 상품의 보유권 기록 | `/community/decorations/checkout/{ProductKey}` | 로그인 필요, Simulation, 실제 승인·청구·정산 없음 |
+| legacy 호환 | 기존 상품·checkout 링크를 canonical route로 교체 이동 | `/community/decorations/{ProductKey}`와 `/{ProductKey}/checkout` | 새 효과 없음 |
+
+Web 개인 Page는 더 이상 현재 URL을 해석해 상점 또는 상품 상세로 mode 전환하지 않는다. Web과 `SsalddelApp`의 얇은 Route Page는 `Ssalddel.Ui.Common`의 상점·상품·checkout Screen을 동일하게 조립한다. 상점은 checkout adapter를 알지 못하고, 상품 상세는 보유권을 생성하지 않으며, checkout만 플랫폼별 `ICommunityDecorationPurchaseClient`를 호출한다.
+
+Web sample adapter와 모바일 adapter는 로그인하지 않은 사용자의 보유권을 기록하지 않는다. Web은 브라우저 세션에만 개발용 보유 상태를 남기고, 모바일은 서버 지원 노드 스티커만 기존 FakePG API·계정 보유권과 동기화한다. 지원되지 않은 테마 상품은 앱 실행 동안의 로컬 Simulation에 머물며 실제 카드 승인·청구·창작자 정산은 실행하지 않는다.
+
+실제 Web 검증에서 390px 상점·상품·checkout의 단일 열, 48px 이상 주 행동, 가로 넘침 없음과 legacy replace redirect를 확인했다. 상품 상세는 모바일에서 큰 미리보기보다 제목·가격·결제 행동을 먼저 배치하고 desktop 상점은 같은 Screen을 3열로 확장한다. 대표 PNG와 세부 결과는 [개인 공간·꾸미기 Route 의미·단일책임 정렬](../../Changes/2026-07-22-community-decoration-route-srp.md)에 기록했다. 공통 Web 모바일 머리말의 제목 줄바꿈은 `P2-2` 셸 감사에서 함께 다룬다.
+
 ## 기존 component 리팩터링의 재분류
 
 아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
@@ -216,4 +233,6 @@ Web과 `OrdererApp`은 같은 canonical route와 공용 Screen을 사용하고 �
 
 다섯 번째 수직 단위인 로컬 판매 주문 이행 Simulation은 복합 탭을 상태 변경 없는 허브, 주문·재고 목록, stable 주문 상세, 피킹·포장 목록과 stable task Action, 알림 정책 route로 분리했다. route 계약, capability, 개인정보 비노출, 48px 주 행동과 새 route 상단 복원을 자동 테스트로 고정하고 실제 desktop·501px MAUI Windows 화면을 확인했다. 외부 주문 수집, 실제 재고 예약·차감, 메시지 발송, 출고·운송·결제·정산은 계속 비활성이다.
 
-다음 우선순위는 `P2-1` 개인 개요·꾸미기 상점·상품·FakePG checkout의 플랫폼 의미와 Route Page 책임을 정렬하는 것이다. 공통 Web 셸의 언어 전환처럼 48px 미만인 전역 터치 대상은 업무 Screen 리팩터링과 분리해 공통 셸 기준으로 보완한다.
+여섯 번째 수직 단위인 개인 공간·꾸미기는 Web 개인 route multiplexer에서 상점·상품 해석을 제거하고, Web·모바일의 상점·stable-key 상품·FakePG checkout을 같은 canonical route와 공용 Screen으로 통합했다. 상품 상세의 로컬 적용 선택과 checkout의 로그인·Simulation 보유권 생성 경계를 분리하고 기존 주소는 replace redirect로 보존했다.
+
+다음 우선순위는 `P2-2` `/shipper` 홈이다. Web 링크 디렉터리와 모바일 커뮤니티 홈·인증·dashboard가 같은 주소에서 서로 다른 목표를 갖는 문제를 공용 화주 허브 Screen과 플랫폼 shell로 정렬한다. 이때 공통 Web 모바일 머리말의 제목 줄바꿈과 48px 미만 언어 전환도 셸 책임으로 함께 감사한다.
