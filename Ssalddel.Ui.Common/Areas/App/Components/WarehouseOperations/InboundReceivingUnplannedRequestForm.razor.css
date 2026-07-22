@@ -1,0 +1,34 @@
+.inbound-unplanned-form {
+    padding: 1rem;
+    border-color: color-mix(in srgb, var(--mud-palette-warning) 55%, transparent);
+    border-radius: 14px;
+}
+
+.inbound-form-heading,
+.inbound-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.inbound-form-actions {
+    justify-content: flex-start;
+}
+
+.inbound-form-actions ::deep .mud-button-root {
+    min-height: 44px;
+}
+
+@media (max-width: 720px) {
+    .inbound-form-heading,
+    .inbound-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .inbound-form-actions ::deep .mud-button-root {
+        width: 100%;
+    }
+}

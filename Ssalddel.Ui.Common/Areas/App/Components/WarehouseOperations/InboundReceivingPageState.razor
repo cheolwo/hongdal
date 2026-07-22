@@ -1,0 +1,56 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (PageState is PageViewModel상태.대기 or PageViewModel상태.불러오는중)
+{
+    <MudPaper Class="inbound-state" Elevation="0" Outlined="true">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <MudText Typo="Typo.body2" Color="Color.Secondary">접근 가능한 창고를 서버에서 확인하고 있습니다.</MudText>
+    </MudPaper>
+}
+else if (PageState == PageViewModel상태.실패 || Warehouses.오류발생)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        <div class="inbound-state-row">
+            <MudText>@(PageError ?? Warehouses.오류메시지 ?? "입고 작업 창고를 조회하지 못했습니다.")</MudText>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Error"
+                       Disabled="@IsBusy"
+                       OnClick="RetryRequested">
+                다시 조회
+            </MudButton>
+        </div>
+    </MudAlert>
+}
+else if (Warehouses.비어있음)
+{
+    <MudPaper Class="inbound-state" Elevation="0" Outlined="true">
+        <MudIcon Icon="@Icons.Material.Filled.Warehouse" Size="Size.Large" Color="Color.Secondary" />
+        <MudText Typo="Typo.h6">조회 가능한 창고가 없습니다.</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+            서버의 창고 배정과 HR 세부 역할을 확인한 뒤 다시 조회해 주세요.
+        </MudText>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Primary"
+                   Disabled="@IsBusy"
+                   OnClick="RetryRequested">
+            창고 다시 조회
+        </MudButton>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public PageViewModel상태 PageState { get; set; }
+
+    [Parameter]
+    public string? PageError { get; set; }
+
+    [Parameter, EditorRequired]
+    public 입고상품수령창고ViewModel Warehouses { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback RetryRequested { get; set; }
+}

@@ -1,0 +1,35 @@
+.inbound-search-panel {
+    padding: 1rem;
+    border-radius: 14px;
+}
+
+.inbound-search-heading,
+.inbound-search-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.inbound-search-actions {
+    justify-content: flex-start;
+}
+
+.inbound-search-heading ::deep .mud-button-root,
+.inbound-search-actions ::deep .mud-button-root {
+    min-height: 44px;
+}
+
+@media (max-width: 720px) {
+    .inbound-search-heading,
+    .inbound-search-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .inbound-search-heading ::deep .mud-button-root,
+    .inbound-search-actions ::deep .mud-button-root {
+        width: 100%;
+    }
+}

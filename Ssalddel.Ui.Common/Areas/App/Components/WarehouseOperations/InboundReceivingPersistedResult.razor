@@ -1,0 +1,66 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<div class="inbound-result-region" aria-live="polite">
+    @if (Detail.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Detail.오류메시지</MudAlert>
+    }
+    else if (Detail.대상없음)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            선택한 입고예정 원장을 다시 찾지 못했습니다. 다른 원장을 대신 표시하지 않습니다.
+        </MudAlert>
+    }
+    else if (Detail.항목 is { } selected)
+    {
+        <MudPaper Class="inbound-persisted-detail" Elevation="0" Outlined="true" aria-label="서버에 저장된 입고예정">
+            <MudStack Spacing="3">
+                <div class="inbound-result-heading">
+                    <div>
+                        <MudText Typo="Typo.h6">서버에 저장된 입고예정</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">등록 또는 선택 뒤 같은 입고 ID로 다시 조회한 결과입니다.</MudText>
+                    </div>
+                    <div class="inbound-result-chips">
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">ID @selected.Id</MudChip>
+                        <MudChip T="string" Color="@InboundReceivingPresentation.StatusColor(selected.상태)" Variant="Variant.Filled">@selected.상태</MudChip>
+                    </div>
+                </div>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="상품명" Value="@InboundReceivingPresentation.Display(selected.예정상품명)" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="상품 바코드" Value="@InboundReceivingPresentation.Display(selected.예정SKU)" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="예정 수량" Value="@(selected.예정수량?.ToString() ?? "-")" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="공급처·반입자" Value="@InboundReceivingPresentation.Display(selected.공급처명)" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="보관 조건" Value="@InboundReceivingPresentation.Display(selected.보관조건)" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="입고 묶음 바코드" Value="@InboundReceivingPresentation.Display(selected.입고묶음바코드)" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="입고 흐름" Value="@InboundReceivingPresentation.Display(selected.입고흐름유형)" /></MudItem>
+                    <MudItem xs="12" sm="6" md="4"><SsalddelSensitiveInfoRow Label="저장 시각" Value="@InboundReceivingPresentation.FormatCreatedAt(selected.CreatedAtUtc)" /></MudItem>
+                    <MudItem xs="12"><SsalddelSensitiveInfoRow Label="현장 반입 사유" Value="@InboundReceivingPresentation.Display(selected.현장입고사유)" /></MudItem>
+                </MudGrid>
+
+                <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Outlined">
+                    현재 상태는 <strong>@selected.상태</strong>입니다. 이 페이지에서는 재고 생성, 검수 완료, 적재 위치 확정, 계약 연결이나 정산을 수행하지 않습니다.
+                </MudAlert>
+
+                @if (!string.IsNullOrWhiteSpace(WorkBoardHref))
+                {
+                    <MudButton Href="@WorkBoardHref"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               EndIcon="@Icons.Material.Filled.ChevronRight"
+                               Class="inbound-result-action">
+                        후속 작업 보드에서 확인
+                    </MudButton>
+                }
+            </MudStack>
+        </MudPaper>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public 입고상품수령상세ViewModel Detail { get; set; } = default!;
+
+    [Parameter]
+    public string? WorkBoardHref { get; set; }
+}

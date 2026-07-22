@@ -1,0 +1,37 @@
+.inbound-state {
+    min-height: 12rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+}
+
+.inbound-state-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
+::deep .mud-button-root {
+    min-height: 44px;
+}
+
+@media (max-width: 720px) {
+    .inbound-state {
+        min-height: 10rem;
+        padding: 1.25rem;
+    }
+
+    .inbound-state-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .inbound-state-row ::deep .mud-button-root {
+        width: 100%;
+    }
+}

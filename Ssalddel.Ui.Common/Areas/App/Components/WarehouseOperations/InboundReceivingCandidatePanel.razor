@@ -1,0 +1,81 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (Search.오류발생)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Search.오류메시지</MudAlert>
+}
+
+@if (Search.후보목록.Count > 0)
+{
+    <MudPaper Class="inbound-candidate-panel" Elevation="0" Outlined="true" aria-label="일치한 입고예정">
+        <div class="inbound-candidate-heading">
+            <MudText Typo="Typo.h6">2. 일치한 입고예정 선택</MudText>
+            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                @Search.후보목록.Count 건
+            </MudChip>
+        </div>
+
+        <div class="inbound-candidate-list">
+            @foreach (var item in Search.후보목록)
+            {
+                <MudPaper Class="inbound-candidate" Elevation="0" Outlined="true">
+                    <div class="inbound-candidate-content">
+                        <div class="inbound-candidate-copy">
+                            <MudText Typo="Typo.subtitle1">@InboundReceivingPresentation.Display(item.예정상품명)</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                @item.예정SKU · 예정 @(item.예정수량?.ToString() ?? "-")개 · @InboundReceivingPresentation.Display(item.공급처명)
+                            </MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">입고 ID @item.Id · @item.상태</MudText>
+                        </div>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   Disabled="@IsBusy"
+                                   aria-label="@($"{InboundReceivingPresentation.Display(item.예정상품명)} 입고 ID {item.Id} 확인")"
+                                   OnClick="@(() => SelectInboundAsync(item.Id))">
+                            이 입고예정 확인
+                        </MudButton>
+                    </div>
+                </MudPaper>
+            }
+        </div>
+    </MudPaper>
+}
+else if (Search.결과없음 && !Writer.폼표시)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.subtitle1">정확히 일치하는 입고예정이 없습니다.</MudText>
+            <MudText Typo="Typo.body2">
+                바코드를 다시 확인하거나, 이미 현장에 반입된 경우에만 계약 연결 전 현장 입고 요청을 작성해 주세요.
+            </MudText>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Warning"
+                       StartIcon="@Icons.Material.Filled.AddBusiness"
+                       Disabled="@IsBusy"
+                       Class="inbound-unplanned-start"
+                       OnClick="UnplannedRequested">
+                현장 입고 요청 작성
+            </MudButton>
+        </MudStack>
+    </MudAlert>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public 입고예정상품검색ViewModel Search { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public 현장입고요청작성ViewModel Writer { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<long> InboundSelected { get; set; }
+
+    [Parameter]
+    public EventCallback UnplannedRequested { get; set; }
+
+    private Task SelectInboundAsync(long inboundId)
+        => InboundSelected.InvokeAsync(inboundId);
+}

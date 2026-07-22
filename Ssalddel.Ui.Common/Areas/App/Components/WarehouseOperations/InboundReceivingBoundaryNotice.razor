@@ -1,0 +1,14 @@
+@using Ssalddel.Contracts.Common.Inbound
+
+<MudAlert Severity="Severity.Warning"
+          Variant="Variant.Outlined"
+          Icon="@Icons.Material.Filled.Policy"
+          Class="inbound-boundary">
+    <MudText Typo="Typo.subtitle2">이 페이지가 저장하는 범위</MudText>
+    <ul class="inbound-boundary-list">
+        @foreach (var notice in 현장입고요청안내.문구)
+        {
+            <li>@notice</li>
+        }
+    </ul>
+</MudAlert>

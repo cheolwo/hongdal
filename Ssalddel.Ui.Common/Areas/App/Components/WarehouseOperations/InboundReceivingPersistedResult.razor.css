@@ -1,0 +1,38 @@
+.inbound-result-region {
+    width: 100%;
+}
+
+.inbound-persisted-detail {
+    padding: 1rem;
+    border-color: color-mix(in srgb, var(--mud-palette-primary) 45%, transparent);
+    border-radius: 14px;
+}
+
+.inbound-result-heading,
+.inbound-result-chips {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.inbound-result-action {
+    align-self: flex-start;
+}
+
+::deep .inbound-result-action {
+    min-height: 44px;
+}
+
+@media (max-width: 720px) {
+    .inbound-result-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .inbound-result-action,
+    ::deep .inbound-result-action {
+        width: 100%;
+    }
+}

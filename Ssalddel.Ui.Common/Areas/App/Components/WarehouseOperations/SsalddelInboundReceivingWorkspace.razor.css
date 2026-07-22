@@ -1,27 +1,9 @@
-.inbound-boundary-list {
-    margin: 0.5rem 0 0;
-    padding-left: 1.25rem;
+.inbound-receiving-region,
+.inbound-receiving-workspace {
+    width: 100%;
 }
 
-.inbound-boundary-list li + li {
-    margin-top: 0.25rem;
-}
-
-.inbound-candidate,
-.inbound-unplanned-form,
-.inbound-persisted-detail {
-    border-radius: 14px;
-}
-
-.inbound-unplanned-form {
-    border-color: color-mix(in srgb, var(--mud-palette-warning) 55%, transparent);
-}
-
-.inbound-persisted-detail {
-    border-color: color-mix(in srgb, var(--mud-palette-primary) 45%, transparent);
-}
-
-@media (max-width: 600px) {
+@media (max-width: 720px) {
     .inbound-receiving-workspace {
         gap: 0.75rem;
     }

@@ -52,7 +52,13 @@
 - `현장입고요청작성ViewModel`: 최소 입력, 안내 동의와 멱등 요청 ID
 - `입고상품수령상세ViewModel`: 선택하거나 생성한 같은 입고 ID 재조회
 - `입고상품수령PageViewModel`: 위 책임의 순서 조정
-- `SsalddelInboundReceivingWorkspace`: 공용 렌더링과 사용자 event 전달
+- `SsalddelInboundReceivingWorkspace`: 경로 parameter와 업무 event만 조립하는 43줄 shell
+- `InboundReceivingPageState`: loading, error, retry와 빈 창고 상태
+- `InboundReceivingSearchPanel`: 작업 창고와 정확한 상품 바코드 검색
+- `InboundReceivingCandidatePanel`: 서버가 반환한 일치 입고예정 후보와 현장 요청 진입
+- `InboundReceivingUnplannedRequestForm`: 현장 반입 입력, 안내 확인과 저장 event
+- `InboundReceivingPersistedResult`: 선택·저장 뒤 같은 입고 ID의 서버 재조회 결과
+- `InboundReceivingPresentation`: 빈 값, 시각, 상태 색과 작업 보드 경로 표현
 - `I입출고작업Service`: 보호된 Controller API 호출
 
 `IInboundReceivingWorkflowService`와 `SampleInboundReceivingWorkflowService`는 아직 다른 창고 prototype에 남아 있지만 이 라우트에서는 사용하지 않는다. 이 페이지는 서버 RDB의 입고요청만 조회·저장하며 API 실패를 샘플 성공으로 바꾸지 않는다.

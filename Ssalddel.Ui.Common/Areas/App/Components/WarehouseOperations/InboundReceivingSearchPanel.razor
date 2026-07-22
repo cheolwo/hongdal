@@ -1,0 +1,104 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Class="inbound-search-panel" Elevation="0" Outlined="true" aria-label="입고예정 검색">
+    <MudStack Spacing="3">
+        <div class="inbound-search-heading">
+            <div>
+                <MudText Typo="Typo.h6">1. 창고와 상품 바코드 확인</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    선택한 창고에서 상품 바코드와 정확히 일치하는 입고예정 원장만 조회합니다.
+                </MudText>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(ExpectedInboundPath))
+            {
+                <MudButton Href="@ExpectedInboundPath"
+                           Variant="Variant.Text"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.EventAvailable">
+                    업체별 입고예정
+                </MudButton>
+            }
+        </div>
+
+        <MudGrid>
+            <MudItem xs="12" md="5">
+                <MudSelect T="long?"
+                           Label="작업 창고"
+                           Value="@Warehouses.선택된창고Id"
+                           ValueChanged="WarehouseChanged"
+                           Variant="Variant.Outlined"
+                           Dense="true"
+                           Disabled="@IsBusy">
+                    @foreach (var warehouse in Warehouses.항목목록)
+                    {
+                        <MudSelectItem T="long?" Value="@((long?)warehouse.Id)">
+                            @warehouse.창고명@(warehouse.기본창고여부 ? " · 기본" : string.Empty)
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="7">
+                <MudTextField T="string"
+                              Label="상품 바코드"
+                              Value="@Search.상품바코드"
+                              ValueChanged="BarcodeChanged"
+                              Variant="Variant.Outlined"
+                              Immediate="true"
+                              MaxLength="100"
+                              Placeholder="상품 또는 SKU 바코드를 입력하세요"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                              Disabled="@IsBusy"
+                              OnKeyDown="SearchKeyDownAsync" />
+            </MudItem>
+        </MudGrid>
+
+        <div class="inbound-search-actions">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Search"
+                       Disabled="@(IsBusy || !Warehouses.선택됨 || !Search.검색가능)"
+                       OnClick="SearchRequested">
+                입고예정 조회
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Backspace"
+                       Disabled="@IsBusy"
+                       OnClick="ClearRequested">
+                다시 입력
+            </MudButton>
+        </div>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 입고상품수령창고ViewModel Warehouses { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public 입고예정상품검색ViewModel Search { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public string? ExpectedInboundPath { get; set; }
+
+    [Parameter]
+    public EventCallback<long?> WarehouseChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> BarcodeChanged { get; set; }
+
+    [Parameter]
+    public EventCallback SearchRequested { get; set; }
+
+    [Parameter]
+    public EventCallback ClearRequested { get; set; }
+
+    private Task SearchKeyDownAsync(KeyboardEventArgs args)
+        => args.Key is "Enter" or "NumpadEnter"
+            ? SearchRequested.InvokeAsync()
+            : Task.CompletedTask;
+}

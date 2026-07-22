@@ -1,0 +1,106 @@
+@using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<MudPaper Class="inbound-unplanned-form" Elevation="0" Outlined="true" aria-label="현장 입고 요청 작성">
+    <MudStack Spacing="3">
+        <div class="inbound-form-heading">
+            <div>
+                <MudText Typo="Typo.h6">3. 계약 연결 전 현장 입고 요청</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    저장 결과는 입고예정 원장 한 건이며, 재고나 입고완료 상태를 만들지 않습니다.
+                </MudText>
+            </div>
+            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled">입고예정 요청</MudChip>
+        </div>
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string" Label="상품 바코드" Value="@Writer.상품바코드" ValueChanged="SetProductBarcode" Immediate="true" MaxLength="100" Variant="Variant.Outlined" Required="true" Disabled="@IsBusy" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string" Label="입고 묶음 바코드" Value="@Writer.입고묶음바코드" ValueChanged="SetBundleBarcode" Immediate="true" MaxLength="100" Variant="Variant.Outlined" Required="true" Disabled="@IsBusy" Placeholder="BND:IN-001" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string" Label="상품명" Value="@Writer.상품명" ValueChanged="SetProductName" Immediate="true" MaxLength="200" Variant="Variant.Outlined" Required="true" Disabled="@IsBusy" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string" Label="공급처 또는 반입자" Value="@Writer.공급처명" ValueChanged="SetSupplierName" Immediate="true" MaxLength="200" Variant="Variant.Outlined" Required="true" Disabled="@IsBusy" />
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudNumericField T="int" Label="반입 수량" Value="@Writer.입고수량" ValueChanged="SetQuantity" Min="1" Max="100000" Variant="Variant.Outlined" Required="true" Disabled="@IsBusy" />
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudSelect T="string" Label="보관 조건" Value="@Writer.보관조건" ValueChanged="SetStorageCondition" Variant="Variant.Outlined" Disabled="@IsBusy">
+                    @foreach (var option in Writer.보관조건목록)
+                    {
+                        <MudSelectItem T="string" Value="@option">@option</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField T="string" Label="현장 반입 사유" Value="@Writer.현장입고사유" ValueChanged="SetUnplannedReason" Immediate="true" MaxLength="1000" Variant="Variant.Outlined" Lines="3" Required="true" Disabled="@IsBusy" />
+            </MudItem>
+        </MudGrid>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+            <MudStack Spacing="1">
+                @foreach (var notice in 현장입고요청안내.문구)
+                {
+                    <MudText Typo="Typo.body2">• @notice</MudText>
+                }
+                <MudText Typo="Typo.caption" Color="Color.Secondary">안내 버전 @현장입고요청안내.현재버전</MudText>
+            </MudStack>
+        </MudAlert>
+
+        <MudCheckBox T="bool"
+                     Value="@Writer.임시입고안내확인"
+                     ValueChanged="SetNoticeAccepted"
+                     Disabled="@IsBusy"
+                     Color="Color.Warning"
+                     Label="위 안내를 확인했으며, 이 저장만으로 검수·재고·보관 책임·계약·정산이 확정되지 않음을 이해했습니다." />
+
+        @if (Writer.오류발생)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Writer.오류메시지</MudAlert>
+        }
+
+        <div class="inbound-form-actions">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Warning"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       Disabled="@(IsBusy || !Writer.제출가능)"
+                       OnClick="SubmitRequested">
+                입고예정 요청 저장
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       Disabled="@IsBusy"
+                       OnClick="CancelRequested">
+                취소
+            </MudButton>
+        </div>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public 현장입고요청작성ViewModel Writer { get; set; } = default!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback SubmitRequested { get; set; }
+
+    [Parameter]
+    public EventCallback CancelRequested { get; set; }
+
+    private void SetProductBarcode(string? value) => Writer.상품바코드 = value ?? string.Empty;
+    private void SetBundleBarcode(string? value) => Writer.입고묶음바코드 = value ?? string.Empty;
+    private void SetProductName(string? value) => Writer.상품명 = value ?? string.Empty;
+    private void SetSupplierName(string? value) => Writer.공급처명 = value ?? string.Empty;
+    private void SetQuantity(int value) => Writer.입고수량 = value;
+    private void SetStorageCondition(string? value) => Writer.보관조건 = value ?? 현장입고보관조건.미지정;
+    private void SetUnplannedReason(string? value) => Writer.현장입고사유 = value ?? string.Empty;
+    private void SetNoticeAccepted(bool value) => Writer.임시입고안내확인 = value;
+}

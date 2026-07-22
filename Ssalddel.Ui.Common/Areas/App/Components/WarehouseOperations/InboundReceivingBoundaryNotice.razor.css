@@ -1,0 +1,14 @@
+.inbound-boundary-list {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+}
+
+.inbound-boundary-list li + li {
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 720px) {
+    .inbound-boundary-list {
+        padding-left: 1rem;
+    }
+}
