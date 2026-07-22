@@ -1,0 +1,51 @@
+<div class="group-purchase-recruitment-stage">
+    <MudText Typo="Typo.h6">수요 모집 참여</MudText>
+    <MudText Typo="Typo.body2">상품, 수량과 수령 방법을 선택하면 공동구매 수요에 반영됩니다.</MudText>
+    <MudSelect T="string" Label="상품" @bind-Value="Draft.OptionId" Variant="Variant.Outlined" Class="mt-3">
+        @foreach (var option in Campaign.Options)
+        {
+            <MudSelectItem Value="@option.OptionId">@option.Text</MudSelectItem>
+        }
+    </MudSelect>
+    <MudNumericField T="int" Label="수량" @bind-Value="Draft.Quantity" Min="1" Variant="Variant.Outlined" Class="mt-3" />
+    <MudSelect T="string" Label="참여 방법" @bind-Value="Draft.MethodCode" Variant="Variant.Outlined" Class="mt-3">
+        <MudSelectItem Value="@CommunityVoteParticipationMethodCodes.CommunityMember">커뮤니티 구성원</MudSelectItem>
+        <MudSelectItem Value="@CommunityVoteParticipationMethodCodes.ServiceArea">인근 지역 참여</MudSelectItem>
+        <MudSelectItem Value="@CommunityVoteParticipationMethodCodes.PickupPoint">공동 수령소 픽업</MudSelectItem>
+    </MudSelect>
+    @if (Draft.MethodCode == CommunityVoteParticipationMethodCodes.PickupPoint)
+    {
+        <MudSelect T="string" Label="공동 수령소" @bind-Value="Draft.PickupPointId" Variant="Variant.Outlined" Class="mt-3">
+            @foreach (var point in Campaign.GroupPurchase?.PickupPoints ?? [])
+            {
+                <MudSelectItem Value="@point.PickupPointId">@($"{point.Name} · {point.AddressSummary}")</MudSelectItem>
+            }
+        </MudSelect>
+    }
+    <MudTextField Label="참여자 표시명" @bind-Value="Draft.DisplayName" Variant="Variant.Outlined" Class="mt-3" />
+    <MudButton FullWidth="true"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               OnClick="@(() => DemandSubmitted.InvokeAsync())"
+               Disabled="@(!IsAuthenticated || IsBusy)"
+               Class="mt-3">
+        수요 참여 확정
+    </MudButton>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public CommunityGroupPurchaseParticipationDraft Draft { get; set; } = new();
+
+    [Parameter]
+    public bool IsAuthenticated { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback DemandSubmitted { get; set; }
+}

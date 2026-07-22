@@ -1,0 +1,99 @@
+<header class="group-purchase-hero">
+    <div>
+        <MudText Typo="Typo.overline" Class="group-purchase-kicker">COMMUNITY GROUP PURCHASE</MudText>
+        <MudText Typo="Typo.h4">@Heading</MudText>
+        <MudText Typo="Typo.body1" Class="group-purchase-hero-copy">
+            @Description
+        </MudText>
+    </div>
+    <div class="group-purchase-hero-actions">
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Default"
+                   StartIcon="@Icons.Material.Filled.ArrowBack"
+                   Href="@BackHref">
+            @BackLabel
+        </MudButton>
+        @if (ShowRefreshAction)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       OnClick="@(() => RefreshRequested.InvokeAsync())"
+                       Disabled="@IsBusy">
+                새로고침
+            </MudButton>
+        }
+        @if (ShowCreateAction && IsAuthenticated)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.PostAdd"
+                       Href="@CommunityPageRoutes.GroupPurchaseCreate">
+                공동구매 제안
+            </MudButton>
+        }
+        else if (ShowCreateAction)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Href="/login">
+                로그인 후 제안
+            </MudButton>
+        }
+    </div>
+</header>
+
+<MudAlert Severity="Severity.Info"
+          Variant="Variant.Outlined"
+          Dense="true"
+          Class="group-purchase-alert">
+    공개 모집·참여 현황 조회와 닉네임·비밀번호 방식의 이의제기는 로그인 없이 이용할 수 있습니다.
+    제안·수요 참여·마감·결의·서명 저장은 로그인이 필요하며, 참여 의향은 결제나 계약 확정을 뜻하지 않습니다.
+</MudAlert>
+
+@if (!string.IsNullOrWhiteSpace(StatusMessage))
+{
+    <MudAlert Severity="@StatusSeverity"
+              Variant="Variant.Outlined"
+              Dense="true"
+              Class="group-purchase-alert">
+        @StatusMessage
+    </MudAlert>
+}
+
+@code {
+    [Parameter]
+    public string Heading { get; set; } = "같이 정하고, 확인하고, 서명하는 공동구매";
+
+    [Parameter]
+    public string Description { get; set; } = "제안, 참여와 합의 단계를 나누어 필요한 화면에서 한 가지 목표에 집중합니다.";
+
+    [Parameter]
+    public string BackHref { get; set; } = CommunityPageRoutes.CollectiveActions;
+
+    [Parameter]
+    public string BackLabel { get; set; } = "함께 하는 일";
+
+    [Parameter]
+    public bool IsAuthenticated { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public bool ShowRefreshAction { get; set; } = true;
+
+    [Parameter]
+    public bool ShowCreateAction { get; set; } = true;
+
+    [Parameter]
+    public string StatusMessage { get; set; } = string.Empty;
+
+    [Parameter]
+    public Severity StatusSeverity { get; set; } = Severity.Info;
+
+    [Parameter]
+    public EventCallback RefreshRequested { get; set; }
+
+}

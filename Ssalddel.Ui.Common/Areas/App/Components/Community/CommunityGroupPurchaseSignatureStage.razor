@@ -1,0 +1,69 @@
+<div class="group-purchase-signature-stage">
+    <MudText Typo="Typo.h6">구성원 전자서명</MudText>
+    @if (Campaign.ResolutionDocument?.SignaturePlan is null)
+    {
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3">확정안 결의문이 준비되면 전자서명을 받을 수 있습니다.</MudAlert>
+    }
+    else if (Campaign.ResolutionDocument.Status == CommunityVoteResolutionStatusCodes.LegalReviewRequired)
+    {
+        <MudAlert Severity="Severity.Warning" Dense="true" Class="mt-3">운영 검토가 끝난 뒤 서명을 시작할 수 있습니다.</MudAlert>
+    }
+    else if (Campaign.ResolutionDocument.SignaturePlan.IsFullySigned)
+    {
+        <MudAlert Severity="Severity.Success" Dense="true" Class="mt-3">필수 구성원의 전자서명이 모두 완료됐습니다.</MudAlert>
+    }
+    else
+    {
+        <MudSelect T="string"
+                   Label="내 서명 요청 선택"
+                   Value="@State.SelectedSignerPartyId"
+                   ValueChanged="SelectSigner"
+                   Variant="Variant.Outlined"
+                   Class="mt-3">
+            @foreach (var signer in MissingSigners)
+            {
+                <MudSelectItem Value="@signer.PartyId">@($"{signer.SignerDisplayName} · {signer.RoleCode}")</MudSelectItem>
+            }
+        </MudSelect>
+        <MudCheckBox T="bool" @bind-Value="State.SignatureConsent" Label="결의문 내용을 확인했으며 전자서명에 동의합니다." Class="mt-2" />
+        <SsalddelSignaturePad Title="공동구매 결의 전자서명"
+                             Description="선택한 서명 요청의 당사자만 직접 서명해 주세요."
+                             SignerName="@State.SelectedSignerDisplayName"
+                             SignerNameChanged="UpdateSignerDisplayName"
+                             Disabled="@(!IsAuthenticated || string.IsNullOrWhiteSpace(State.SelectedSignerPartyId) || !State.SignatureConsent || IsBusy)"
+                             SignatureCaptured="SignatureSubmitted" />
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public CommunityGroupPurchaseWorkspaceState State { get; set; } = new();
+
+    [Parameter]
+    public bool IsAuthenticated { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<SsalddelSignatureCaptureResult> SignatureSubmitted { get; set; }
+
+    private IReadOnlyList<Ssalddel.Contracts.Common.ContractManagement.ContractSignatureRequest> MissingSigners
+        => CommunityGroupPurchasePresentation.MissingSigners(Campaign);
+
+    private void SelectSigner(string partyId)
+    {
+        State.SelectedSignerPartyId = partyId;
+        State.SelectedSignerDisplayName = MissingSigners
+            .FirstOrDefault(signer => signer.PartyId == partyId)?.SignerDisplayName ?? string.Empty;
+    }
+
+    private Task UpdateSignerDisplayName(string value)
+    {
+        State.SelectedSignerDisplayName = value;
+        return Task.CompletedTask;
+    }
+}

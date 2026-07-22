@@ -1,0 +1,71 @@
+<section class="group-purchase-panel group-purchase-objections">
+    <div class="group-purchase-section-heading">
+        <div>
+            <MudText Typo="Typo.h6">@($"{CommunityGroupPurchasePresentation.StageTitle(StageCode)} 단계 이의제기")</MudText>
+            <MudText Typo="Typo.body2">이 단계의 조건이나 처리 방식에 문제가 있다면 기록을 남겨 구성원이 함께 검토합니다.</MudText>
+        </div>
+        <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">@($"{StageObjectionCount}건")</MudChip>
+    </div>
+
+    @if (Campaign.SourcePostId is null)
+    {
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3">연결된 제안 글이 없어 이의제기를 남길 수 없습니다.</MudAlert>
+    }
+    else
+    {
+        <div class="group-purchase-objection-list">
+            @foreach (var objection in StageObjections)
+            {
+                <article>
+                    <div>
+                        <strong>@objection.Nickname</strong>
+                        <span>@objection.CreatedAtUtc.ToLocalTime().ToString("MM.dd HH:mm")</span>
+                    </div>
+                    <p>@CommunityGroupPurchasePresentation.StripObjectionPrefix(objection.Body)</p>
+                </article>
+            }
+            @if (StageObjectionCount == 0)
+            {
+                <MudText Typo="Typo.body2" Class="group-purchase-objection-empty">이 단계에 접수된 이의가 없습니다.</MudText>
+            }
+        </div>
+        <MudTextField Label="표시명" @bind-Value="Draft.Nickname" Variant="Variant.Outlined" Class="mt-3" />
+        <MudTextField Label="게시글 비밀번호" @bind-Value="Draft.Password" InputType="InputType.Password" Variant="Variant.Outlined" Class="mt-2" />
+        <MudTextField Label="이의 내용" @bind-Value="Draft.Body" Variant="Variant.Outlined" Lines="3" Class="mt-2" />
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Warning"
+                   FullWidth="true"
+                   StartIcon="@Icons.Material.Filled.ReportProblem"
+                   OnClick="@(() => ObjectionSubmitted.InvokeAsync())"
+                   Disabled="@IsBusy"
+                   Class="mt-3">
+            이 단계에 이의제기 등록
+        </MudButton>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+
+    [Parameter]
+    public string StageCode { get; set; } = CommunityGroupPurchasePresentation.StageProposal;
+
+    [Parameter]
+    public IReadOnlyList<PlatformCommunityPostCommentResponse> Comments { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public CommunityGroupPurchaseObjectionDraft Draft { get; set; } = new();
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback ObjectionSubmitted { get; set; }
+
+    private IEnumerable<PlatformCommunityPostCommentResponse> StageObjections
+        => CommunityGroupPurchasePresentation.StageObjections(Comments, StageCode);
+
+    private int StageObjectionCount
+        => CommunityGroupPurchasePresentation.StageObjectionCount(Comments, StageCode);
+}

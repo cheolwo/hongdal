@@ -1,0 +1,9 @@
+@page "/community/group-purchase/{CampaignId:guid}/participation"
+
+<PageTitle>공동구매 참여</PageTitle>
+
+<CommunityGroupPurchaseParticipationScreen CampaignId="@CampaignId" />
+
+@code {
+    [Parameter] public Guid CampaignId { get; set; }
+}

@@ -1,0 +1,64 @@
+<section class="group-purchase-process" aria-label="공동구매 절차 다이어그램">
+    <div class="group-purchase-section-heading">
+        <div>
+            <MudText Typo="Typo.h6">공동구매 절차</MudText>
+            <MudText Typo="Typo.body2">단계를 누르면 해당 단계의 설명과 이의제기를 확인할 수 있습니다.</MudText>
+        </div>
+        <MudChip T="string"
+                 Color="@CommunityGroupPurchasePresentation.CampaignColor(Campaign)"
+                 Variant="Variant.Outlined">
+            @CommunityGroupPurchasePresentation.CampaignStateLabel(Campaign)
+        </MudChip>
+    </div>
+
+    <div class="group-purchase-flow">
+        @foreach (var stage in CommunityGroupPurchasePresentation.Stages)
+        {
+            <a class="@CommunityGroupPurchasePresentation.StageClass(stage, Campaign, SelectedStageCode)"
+               href="@StageHref(stage.Code)">
+                <span class="group-purchase-stage-index">@stage.Number</span>
+                <span class="group-purchase-stage-copy">
+                    <strong>@stage.Title</strong>
+                    <small>@CommunityGroupPurchasePresentation.StageCaption(stage, Campaign)</small>
+                </span>
+                @if (CommunityGroupPurchasePresentation.StageObjectionCount(Comments, stage.Code) > 0)
+                {
+                    <span class="group-purchase-stage-objections">
+                        @CommunityGroupPurchasePresentation.StageObjectionCount(Comments, stage.Code)
+                    </span>
+                }
+            </a>
+            @if (stage.Number < CommunityGroupPurchasePresentation.Stages.Count)
+            {
+                <span class="group-purchase-flow-arrow" aria-hidden="true">→</span>
+            }
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<PlatformCommunityPostCommentResponse> Comments { get; set; } = [];
+
+    [Parameter]
+    public string SelectedStageCode { get; set; } = CommunityGroupPurchasePresentation.StageProposal;
+
+    private string StageHref(string stageCode)
+        => stageCode switch
+        {
+            CommunityGroupPurchasePresentation.StageRecruitment =>
+                CommunityPageRoutes.GroupPurchaseParticipationFor(Campaign.Id),
+            CommunityGroupPurchasePresentation.StageObjection =>
+                CommunityPageRoutes.GroupPurchaseObjectionsFor(Campaign.Id),
+            CommunityGroupPurchasePresentation.StageResolution =>
+                CommunityPageRoutes.GroupPurchaseResolutionFor(Campaign.Id),
+            CommunityGroupPurchasePresentation.StageSignature =>
+                CommunityPageRoutes.GroupPurchaseSignatureFor(Campaign.Id),
+            CommunityGroupPurchasePresentation.StageExecution =>
+                CommunityPageRoutes.GroupPurchaseFulfillmentDraftFor(Campaign.Id),
+            _ => CommunityPageRoutes.GroupPurchaseDetailFor(Campaign.Id)
+        };
+}

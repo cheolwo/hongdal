@@ -1,0 +1,42 @@
+<nav class="group-purchase-route-nav" aria-label="공동구매 세부 화면">
+    @foreach (var item in Items)
+    {
+        <a class="@ItemClass(item.Surface)" href="@item.Href">
+            <MudIcon Icon="@item.Icon" Size="Size.Small" />
+            <span><strong>@item.Title</strong><small>@item.Description</small></span>
+        </a>
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid CampaignId { get; set; }
+
+    [Parameter]
+    public CommunityGroupPurchaseSurfaceKind ActiveSurface { get; set; }
+
+    private IReadOnlyList<RouteItem> Items =>
+    [
+        new(CommunityGroupPurchaseSurfaceKind.Overview, "현황", "조건과 절차", Icons.Material.Filled.FactCheck, CommunityPageRoutes.GroupPurchaseDetailFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.Participation, "참여", "수량과 수령 방법", Icons.Material.Filled.HowToReg, CommunityPageRoutes.GroupPurchaseParticipationFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.Suppliers, "공급자", "직접 찾고 연락 요청", Icons.Material.Filled.Storefront, CommunityPageRoutes.GroupPurchaseSuppliersFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.Negotiation, "공개 협의", "조건 변경 기록", Icons.Material.Filled.Forum, CommunityPageRoutes.GroupPurchaseNegotiationFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.Objections, "이의제기", "단계별 문제 기록", Icons.Material.Filled.ReportProblem, CommunityPageRoutes.GroupPurchaseObjectionsFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.Resolution, "확정안", "마감과 결의문", Icons.Material.Filled.Gavel, CommunityPageRoutes.GroupPurchaseResolutionFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.Signature, "전자서명", "당사자 직접 동의", Icons.Material.Filled.Draw, CommunityPageRoutes.GroupPurchaseSignatureFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.DeliveryOptions, "배송 정보", "가능 시간 직접 확인", Icons.Material.Filled.LocalShipping, CommunityPageRoutes.GroupPurchaseDeliveryOptionsFor(CampaignId)),
+        new(CommunityGroupPurchaseSurfaceKind.FulfillmentDraft, "이행 초안", "발주·원장 계획", Icons.Material.Filled.AccountTree, CommunityPageRoutes.GroupPurchaseFulfillmentDraftFor(CampaignId))
+    ];
+
+    private string ItemClass(CommunityGroupPurchaseSurfaceKind surface)
+        => surface == ActiveSurface
+            ? "group-purchase-route-nav__item group-purchase-route-nav__item--active"
+            : "group-purchase-route-nav__item";
+
+    private sealed record RouteItem(
+        CommunityGroupPurchaseSurfaceKind Surface,
+        string Title,
+        string Description,
+        string Icon,
+        string Href);
+}

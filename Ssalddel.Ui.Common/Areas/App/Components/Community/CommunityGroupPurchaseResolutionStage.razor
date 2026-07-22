@@ -1,0 +1,75 @@
+<div class="group-purchase-resolution-stage">
+    <MudText Typo="Typo.h6">확정안과 결의문</MudText>
+    @if (Campaign.Status == CommunityVoteStatusCodes.Open)
+    {
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3">모집을 마감하기 전에 접수된 이의를 검토했다는 확인이 필요합니다.</MudAlert>
+        <MudCheckBox T="bool" @bind-Value="State.ObjectionReviewConfirmed" Label="접수된 이의와 변경 필요 사항을 검토했습니다." Class="mt-3" />
+        <MudTextField Label="마감 처리자" @bind-Value="State.OperatorDisplayName" Variant="Variant.Outlined" Class="mt-2" />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Warning"
+                   FullWidth="true"
+                   Disabled="@(!IsAuthenticated || !State.ObjectionReviewConfirmed || IsBusy)"
+                   OnClick="@(() => CampaignClosed.InvokeAsync())"
+                   Class="mt-3">
+            수요 모집 마감
+        </MudButton>
+    }
+    else if (Campaign.ResolutionDocument is null)
+    {
+        <MudTextField Label="결의문 제목" @bind-Value="State.ResolutionTitle" Variant="Variant.Outlined" Class="mt-3" />
+        <MudTextField Label="확정 내용" @bind-Value="State.ResolutionText" Variant="Variant.Outlined" Lines="5" Class="mt-3" />
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mt-3">현재 수요 참여자 전원이 서명 대상에 자동 포함됩니다.</MudAlert>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   FullWidth="true"
+                   Disabled="@(!IsAuthenticated || IsBusy)"
+                   OnClick="@(() => ResolutionCreated.InvokeAsync())"
+                   Class="mt-3">
+            결의문 초안 만들기
+        </MudButton>
+    }
+    else
+    {
+        <MudText Typo="Typo.subtitle2" Class="mt-3">@Campaign.ResolutionDocument.DocumentTitle</MudText>
+        <MudText Typo="Typo.body2" Class="group-purchase-resolution-text">@Campaign.ResolutionDocument.ResolutionText</MudText>
+        <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+            @CommunityGroupPurchasePresentation.ResolutionStatusLabel(Campaign)
+        </MudChip>
+        @if (Campaign.ResolutionDocument.Status == CommunityVoteResolutionStatusCodes.LegalReviewRequired)
+        {
+            <MudTextField Label="검토자" @bind-Value="State.OperatorDisplayName" Variant="Variant.Outlined" Class="mt-3" />
+            <MudTextField Label="검토 메모" @bind-Value="State.ReviewMemo" Variant="Variant.Outlined" Lines="2" Class="mt-2" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="@(!IsAuthenticated || IsBusy)"
+                       OnClick="@(() => ResolutionReadyToSign.InvokeAsync())"
+                       Class="mt-3">
+                서명 가능 상태로 전환
+            </MudButton>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public CommunityGroupPurchaseWorkspaceState State { get; set; } = new();
+
+    [Parameter]
+    public bool IsAuthenticated { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback CampaignClosed { get; set; }
+
+    [Parameter]
+    public EventCallback ResolutionCreated { get; set; }
+
+    [Parameter]
+    public EventCallback ResolutionReadyToSign { get; set; }
+}

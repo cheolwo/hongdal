@@ -1,0 +1,14 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<CommunityGroupPurchaseWorkspace @key="@($"{CampaignId:D}-{StageCode}")"
+                                 CampaignId="@CampaignId"
+                                 Surface="CommunityGroupPurchaseSurfaceKind.Objections"
+                                 ObjectionStageCode="@StageCode" />
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid CampaignId { get; set; }
+
+    [Parameter]
+    public string? StageCode { get; set; }
+}

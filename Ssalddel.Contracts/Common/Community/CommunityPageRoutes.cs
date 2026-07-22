@@ -13,6 +13,9 @@ public static class CommunityPageRoutes
     public const string LedgerDraft = "/community/ledgers/new";
     public const string RecommendedPosts = "/community/posts/recommended";
     public const string RecommendedPostDetail = "/community/posts/recommended/detail";
+    public const string CollectiveActions = "/community/actions";
+    public const string GroupPurchase = "/community/group-purchase";
+    public const string GroupPurchaseCreate = "/community/group-purchase/new";
 
     public static string BoardsFor(string? boardName = null, string? boardKey = null)
         => WithQuery(
@@ -49,6 +52,48 @@ public static class CommunityPageRoutes
 
     public static string LedgerDraftFor(string? ledgerTemplateKey = null)
         => WithQuery(LedgerDraft, ("ledgerTemplate", ledgerTemplateKey));
+
+    public static string GroupPurchaseDetailFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId);
+
+    public static string GroupPurchaseParticipationFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "participation");
+
+    public static string GroupPurchaseSuppliersFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "suppliers");
+
+    public static string GroupPurchaseNegotiationFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "negotiation");
+
+    public static string GroupPurchaseObjectionsFor(Guid campaignId, string? stageCode = null)
+        => WithQuery(
+            GroupPurchaseCampaignRoute(campaignId, "objections"),
+            ("stage", stageCode));
+
+    public static string GroupPurchaseResolutionFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "resolution");
+
+    public static string GroupPurchaseSignatureFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "signature");
+
+    public static string GroupPurchaseDeliveryOptionsFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "delivery-options");
+
+    public static string GroupPurchaseFulfillmentDraftFor(Guid campaignId)
+        => GroupPurchaseCampaignRoute(campaignId, "fulfillment-draft");
+
+    private static string GroupPurchaseCampaignRoute(Guid campaignId, string? suffix = null)
+    {
+        if (campaignId == Guid.Empty)
+        {
+            throw new ArgumentException("공동구매 campaign ID는 비어 있을 수 없습니다.", nameof(campaignId));
+        }
+
+        var route = $"{GroupPurchase}/{campaignId:D}";
+        return string.IsNullOrWhiteSpace(suffix)
+            ? route
+            : $"{route}/{suffix}";
+    }
 
     private static string WithQuery(
         string path,

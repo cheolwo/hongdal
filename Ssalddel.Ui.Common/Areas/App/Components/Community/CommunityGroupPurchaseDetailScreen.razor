@@ -1,0 +1,10 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<CommunityGroupPurchaseWorkspace @key="CampaignId"
+                                 CampaignId="@CampaignId"
+                                 Surface="CommunityGroupPurchaseSurfaceKind.Overview" />
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid CampaignId { get; set; }
+}

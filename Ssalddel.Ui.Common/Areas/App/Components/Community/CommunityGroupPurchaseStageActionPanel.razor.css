@@ -1,0 +1,14 @@
+.group-purchase-panel {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--gp-line);
+    border-radius: 18px;
+    background: #fff;
+}
+
+@media (max-width: 720px) {
+    .group-purchase-panel ::deep .mud-button-root,
+    .group-purchase-panel ::deep .mud-input-control {
+        min-height: 44px;
+    }
+}

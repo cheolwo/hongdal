@@ -1,0 +1,102 @@
+.group-purchase-list {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid var(--gp-line);
+    border-radius: 18px;
+    background: var(--gp-soft);
+}
+
+.group-purchase-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.group-purchase-card {
+    appearance: none;
+    display: grid;
+    gap: 7px;
+    width: 100%;
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    background: #fff;
+    color: var(--gp-ink);
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.group-purchase-card:hover,
+.group-purchase-card:focus-visible {
+    border-color: #a8c8b5;
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.group-purchase-card--selected {
+    border-color: var(--gp-primary);
+    box-shadow: 0 8px 24px rgba(23, 107, 77, .12);
+}
+
+.group-purchase-card-state {
+    width: fit-content;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--gp-primary-soft);
+    color: var(--gp-primary);
+    font-size: .7rem;
+    font-weight: 800;
+}
+
+.group-purchase-card > span:not(.group-purchase-card-state) {
+    color: var(--gp-muted);
+    font-size: .78rem;
+}
+
+.group-purchase-card-progress {
+    padding-top: 7px;
+    border-top: 1px solid #edf2ee;
+    font-weight: 700;
+}
+
+.group-purchase-empty {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 30px 16px;
+    color: var(--gp-muted);
+    text-align: center;
+}
+
+@media (min-width: 721px) {
+    .group-purchase-list {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .group-purchase-list-header,
+    .group-purchase-list > .mud-progress-linear,
+    .group-purchase-list > .group-purchase-empty {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .group-purchase-list {
+        grid-template-columns: 1fr;
+    }
+
+    .group-purchase-list-header,
+    .group-purchase-list > .mud-progress-linear,
+    .group-purchase-list > .group-purchase-empty {
+        grid-column: auto;
+    }
+
+    .group-purchase-card,
+    .group-purchase-empty ::deep .mud-button-root {
+        min-height: 44px;
+    }
+}

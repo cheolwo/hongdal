@@ -1,0 +1,12 @@
+@page "/community/group-purchase/{CampaignId:guid}/objections"
+
+<PageTitle>공동구매 이의제기</PageTitle>
+
+<CommunityGroupPurchaseObjectionsScreen CampaignId="@CampaignId" StageCode="@StageCode" />
+
+@code {
+    [Parameter] public Guid CampaignId { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "stage")]
+    public string? StageCode { get; set; }
+}

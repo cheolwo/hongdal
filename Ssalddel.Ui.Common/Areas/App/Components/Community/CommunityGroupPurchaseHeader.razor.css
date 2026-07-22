@@ -1,0 +1,53 @@
+.group-purchase-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: clamp(24px, 4vw, 42px);
+    overflow: hidden;
+    border: 1px solid #cfe0d5;
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at 86% 12%, rgba(204, 235, 214, .9), transparent 32%),
+        linear-gradient(135deg, #fbfdfb 0%, #edf6f0 100%);
+}
+
+.group-purchase-kicker {
+    color: var(--gp-primary);
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+
+.group-purchase-hero-copy {
+    max-width: 680px;
+    margin-top: 10px;
+    color: var(--gp-muted);
+}
+
+.group-purchase-hero-actions {
+    display: flex;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.group-purchase-alert {
+    border-radius: 14px;
+}
+
+@media (max-width: 720px) {
+    .group-purchase-hero {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .group-purchase-hero-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .group-purchase-hero-actions ::deep .mud-button-root {
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 44px;
+    }
+}

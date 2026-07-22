@@ -205,6 +205,6 @@ public static class BaguaRoleTransitionPageCatalog
             BaguaBusinessCodes.Sales => ("판매 업무", "/shipper/sales/listings"),
             BaguaBusinessCodes.Warehouse => ("창고 업무", "/shipper/warehouse/workspace"),
             BaguaBusinessCodes.Transport => ("운송 업무", "/shipper/transport"),
-            _ => ("공동구매 합의", "/community/group-purchase")
+            _ => ("공동구매 합의", CommunityPageRoutes.GroupPurchase)
         };
 }

@@ -1,0 +1,22 @@
+.group-purchase-empty {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 30px 16px;
+    color: var(--gp-muted);
+    text-align: center;
+}
+
+.group-purchase-empty--detail {
+    min-height: 420px;
+    align-content: center;
+    border: 1px dashed #becdc3;
+    border-radius: 18px;
+    background: var(--gp-soft);
+}
+
+@media (max-width: 720px) {
+    .group-purchase-empty ::deep .mud-button-root {
+        min-height: 44px;
+    }
+}

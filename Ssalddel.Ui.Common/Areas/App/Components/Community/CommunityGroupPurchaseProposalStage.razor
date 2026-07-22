@@ -1,0 +1,12 @@
+<div class="group-purchase-proposal-stage">
+    <MudText Typo="Typo.h6">제안 내용</MudText>
+    <MudText Typo="Typo.body2" Class="mt-3">@Campaign.Description</MudText>
+    <MudText Typo="Typo.caption" Class="mt-3">
+        제안자 @Campaign.CreatedByDisplayName · @Campaign.CreatedAtUtc.ToLocalTime().ToString("yyyy.MM.dd HH:mm")
+    </MudText>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+}

@@ -1,0 +1,9 @@
+@page "/community/group-purchase/{CampaignId:guid}/delivery-options"
+
+<PageTitle>공동구매 배송 가능 정보</PageTitle>
+
+<CommunityGroupPurchaseDeliveryOptionsScreen CampaignId="@CampaignId" />
+
+@code {
+    [Parameter] public Guid CampaignId { get; set; }
+}

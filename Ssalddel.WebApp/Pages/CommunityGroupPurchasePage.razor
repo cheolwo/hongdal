@@ -1,69 +1,25 @@
 @page "/community/group-purchase"
 @inject NavigationManager Navigation
 
-<PageTitle>공동구매 운영 공간</PageTitle>
+<PageTitle>공동구매 목록</PageTitle>
 
-<CommunityGroupPurchaseWorkspace CampaignId="@CampaignId"
-                                 IngredientSeed="@IngredientSeed"
-                                 CampaignSelected="HandleCampaignSelected" />
+@if (LegacyCampaignId is null)
+{
+    <CommunityGroupPurchaseListScreen />
+}
 
 @code {
     [Parameter]
     [SupplyParameterFromQuery(Name = "campaignId")]
-    public Guid? CampaignId { get; set; }
+    public Guid? LegacyCampaignId { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.IngredientKeyQueryName)]
-    public string? IngredientKey { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.IngredientNameQueryName)]
-    public string? IngredientName { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeTitleQueryName)]
-    public string? RecipeTitle { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeUrlQueryName)]
-    public string? RecipeUrl { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeSourceQueryName)]
-    public string? RecipeSource { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeQuantityQueryName)]
-    public string? RecipeQuantity { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.PriceReferenceQueryName)]
-    public string? PriceReference { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.PurchaseUnitQueryName)]
-    public string? PurchaseUnit { get; set; }
-
-    private CommunityGroupPurchaseIngredientSeed? IngredientSeed
-        => CommunityGroupPurchaseIngredientSeed.Create(
-            IngredientKey,
-            IngredientName,
-            RecipeTitle,
-            RecipeUrl,
-            RecipeSource,
-            RecipeQuantity,
-            PriceReference,
-            PurchaseUnit);
-
-    private void HandleCampaignSelected(Guid campaignId)
+    protected override void OnParametersSet()
     {
-        if (CampaignId == campaignId)
+        if (LegacyCampaignId is Guid campaignId && campaignId != Guid.Empty)
         {
-            return;
+            Navigation.NavigateTo(
+                CommunityPageRoutes.GroupPurchaseDetailFor(campaignId),
+                replace: true);
         }
-
-        Navigation.NavigateTo(
-            $"/community/group-purchase?campaignId={campaignId:D}",
-            replace: true);
     }
 }

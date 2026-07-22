@@ -1,8 +1,10 @@
+using Ssalddel.Contracts.Common.Community;
+
 namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 public sealed record CommunityGroupPurchaseIngredientSeed
 {
-    public const string Route = "/community/group-purchase";
+    public const string Route = CommunityPageRoutes.GroupPurchaseCreate;
     public const string IngredientKeyQueryName = "ingredientKey";
     public const string IngredientNameQueryName = "ingredient";
     public const string RecipeTitleQueryName = "recipe";

@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Ui.Common.Areas.App.Components.Information;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
@@ -90,7 +91,7 @@ public sealed class OfficialFoodIngredientJourneyTests
         Assert.Contains("참고 레시피: 두부전골", seed.BuildSuggestedDescription(), StringComparison.Ordinal);
         Assert.Contains("실제 구매가나 계약 조건으로 확정되지 않습니다", seed.BuildSuggestedDescription(), StringComparison.Ordinal);
         var uri = Uri.UnescapeDataString(seed.ToNavigationUri());
-        Assert.StartsWith("/community/group-purchase?", uri, StringComparison.Ordinal);
+        Assert.StartsWith($"{CommunityPageRoutes.GroupPurchaseCreate}?", uri, StringComparison.Ordinal);
         Assert.Contains("ingredient=두부", uri, StringComparison.Ordinal);
         Assert.Contains("recipe=두부전골", uri, StringComparison.Ordinal);
         Assert.Contains("priceReference=한국 소매", uri, StringComparison.Ordinal);

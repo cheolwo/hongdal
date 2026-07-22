@@ -1,0 +1,19 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inject NavigationManager Navigation
+
+<CommunityGroupPurchaseWorkspace Surface="CommunityGroupPurchaseSurfaceKind.Create"
+                                 IngredientSeed="@IngredientSeed"
+                                 CampaignCreated="OpenCreatedCampaign"
+                                 CreateCancelled="OpenCampaignList" />
+
+@code {
+    [Parameter]
+    public CommunityGroupPurchaseIngredientSeed? IngredientSeed { get; set; }
+
+    private void OpenCreatedCampaign(Guid campaignId)
+        => Navigation.NavigateTo(CommunityPageRoutes.GroupPurchaseDetailFor(campaignId));
+
+    private void OpenCampaignList()
+        => Navigation.NavigateTo(CommunityPageRoutes.GroupPurchase);
+}

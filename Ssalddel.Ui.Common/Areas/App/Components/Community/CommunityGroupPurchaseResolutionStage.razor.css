@@ -1,0 +1,7 @@
+.group-purchase-resolution-text {
+    margin: 10px 0;
+    padding: 14px;
+    white-space: pre-line;
+    border-radius: 12px;
+    background: var(--gp-soft);
+}

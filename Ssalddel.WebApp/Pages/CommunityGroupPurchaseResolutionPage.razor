@@ -1,0 +1,9 @@
+@page "/community/group-purchase/{CampaignId:guid}/resolution"
+
+<PageTitle>공동구매 확정안</PageTitle>
+
+<CommunityGroupPurchaseResolutionScreen CampaignId="@CampaignId" />
+
+@code {
+    [Parameter] public Guid CampaignId { get; set; }
+}

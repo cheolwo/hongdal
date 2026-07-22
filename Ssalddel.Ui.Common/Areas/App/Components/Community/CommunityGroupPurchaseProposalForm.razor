@@ -1,0 +1,103 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+@if (Visible)
+{
+    <MudPaper Class="group-purchase-create" Elevation="0">
+        <div class="group-purchase-section-heading">
+            <div>
+                <MudText Typo="Typo.h6">새 공동구매 제안</MudText>
+                <MudText Typo="Typo.body2">게시글과 수요 투표를 한 번에 만들고 절차 다이어그램을 시작합니다.</MudText>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                           aria-label="공동구매 제안 닫기"
+                           OnClick="@(() => CloseRequested.InvokeAsync())" />
+        </div>
+
+        @if (IngredientSeed is { } ingredientSeed)
+        {
+            <section class="group-purchase-source-context" aria-label="공공데이터에서 이어온 공동구매 초안 근거">
+                <div class="group-purchase-source-context__heading">
+                    <MudIcon Icon="@Icons.Material.Filled.Hub" Color="Color.Success" />
+                    <div>
+                        <strong>재료 정보에서 이어온 초안</strong>
+                        <span>@ingredientSeed.IngredientName · 가격과 레시피는 참고 근거이며 구매 조건은 아직 정해지지 않았습니다.</span>
+                    </div>
+                </div>
+                <dl>
+                    @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeTitle))
+                    {
+                        <div><dt>참고 레시피</dt><dd>@ingredientSeed.RecipeTitle</dd></div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeQuantity))
+                    {
+                        <div><dt>레시피 재료 표기</dt><dd>@ingredientSeed.RecipeQuantity</dd></div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(ingredientSeed.PriceReference))
+                    {
+                        <div><dt>공공 가격</dt><dd>@ingredientSeed.PriceReference</dd></div>
+                    }
+                </dl>
+                @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeUrl))
+                {
+                    <a href="@ingredientSeed.RecipeUrl" target="_blank" rel="noreferrer">공식 레시피 원문 다시 보기</a>
+                }
+            </section>
+        }
+
+        <div class="group-purchase-form-grid">
+            <MudTextField Label="제안 제목" @bind-Value="Draft.Title" Variant="Variant.Outlined" Required="true" />
+            <MudTextField Label="제안자 표시명" @bind-Value="Draft.Nickname" Variant="Variant.Outlined" Required="true" />
+            <MudTextField Label="상품명" @bind-Value="Draft.ProductName" Variant="Variant.Outlined" Required="true" />
+            <MudTextField Label="상품 키" @bind-Value="Draft.ProductKey" Variant="Variant.Outlined" HelperText="상품 카탈로그 키 또는 운영용 식별자" />
+            <MudTextField Label="커뮤니티·지역 범위" @bind-Value="Draft.CommunityScope" Variant="Variant.Outlined" />
+            <MudSelect T="string" Label="참여 방식" @bind-Value="Draft.ParticipationPolicyCode" Variant="Variant.Outlined">
+                <MudSelectItem Value="@CommunityVoteParticipationPolicyCodes.Hybrid">커뮤니티·지역·픽업 모두 허용</MudSelectItem>
+                <MudSelectItem Value="@CommunityVoteParticipationPolicyCodes.CommunityOnly">커뮤니티 구성원만</MudSelectItem>
+                <MudSelectItem Value="@CommunityVoteParticipationPolicyCodes.ServiceAreaOnly">인근 지역만</MudSelectItem>
+                <MudSelectItem Value="@CommunityVoteParticipationPolicyCodes.PickupPoint">픽업 가능자</MudSelectItem>
+            </MudSelect>
+            <MudNumericField T="int" Label="최소 참여 인원" @bind-Value="Draft.MinimumParticipantCount" Variant="Variant.Outlined" Min="1" />
+            <MudNumericField T="int" Label="최소 주문 수량" @bind-Value="Draft.MinimumTotalQuantity" Variant="Variant.Outlined" Min="1" />
+            <MudTextField Label="수량 단위" @bind-Value="Draft.QuantityUnit" Variant="Variant.Outlined" />
+            <MudNumericField T="int?" Label="참여 반경(m)" @bind-Value="Draft.RadiusMeters" Variant="Variant.Outlined" Min="100" />
+            <MudTextField Label="공동 수령소 이름" @bind-Value="Draft.PickupPointName" Variant="Variant.Outlined" />
+            <MudTextField Label="공동 수령소 주소" @bind-Value="Draft.PickupPointAddress" Variant="Variant.Outlined" />
+            <MudTextField Label="게시글 비밀번호" @bind-Value="Draft.Password" InputType="InputType.Password" Variant="Variant.Outlined" Required="true" />
+            <MudTextField Label="제안 내용과 주의사항" @bind-Value="Draft.Description" Variant="Variant.Outlined" Lines="4" Class="group-purchase-form-wide" />
+        </div>
+
+        <div class="group-purchase-create-footer">
+            <MudText Typo="Typo.caption">기본 모집 기간은 7일이며, 확정 전에는 이의제기를 검토해야 합니다.</MudText>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.RocketLaunch"
+                       OnClick="@(() => SubmitRequested.InvokeAsync())"
+                       Disabled="@(!CanSubmit || IsBusy)">
+                제안 글과 수요 투표 만들기
+            </MudButton>
+        </div>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter, EditorRequired]
+    public CommunityGroupPurchaseCampaignDraft Draft { get; set; } = new();
+
+    [Parameter]
+    public CommunityGroupPurchaseIngredientSeed? IngredientSeed { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public bool CanSubmit { get; set; } = true;
+
+    [Parameter]
+    public EventCallback CloseRequested { get; set; }
+
+    [Parameter]
+    public EventCallback SubmitRequested { get; set; }
+}

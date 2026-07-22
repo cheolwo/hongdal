@@ -222,7 +222,7 @@ public partial class PlatformCommunityHome
             return Task.CompletedTask;
         }
 
-        Navigation.NavigateTo("/community/group-purchase");
+        Navigation.NavigateTo(CommunityPageRoutes.GroupPurchase);
         return Task.CompletedTask;
     }
 

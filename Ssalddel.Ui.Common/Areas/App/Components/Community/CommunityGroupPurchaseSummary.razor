@@ -1,0 +1,21 @@
+<section class="group-purchase-summary">
+    <div>
+        <MudText Typo="Typo.overline">@Campaign.CommunityScope</MudText>
+        <MudText Typo="Typo.h5">@Campaign.Title</MudText>
+        <MudText Typo="Typo.body2">@Campaign.Description</MudText>
+    </div>
+    <div class="group-purchase-summary-metrics">
+        <div><strong>@Campaign.TotalVoteCount</strong><span>참여자</span></div>
+        <div><strong>@(Campaign.GroupPurchase?.TotalRequestedQuantity ?? 0)</strong><span>@($"요청 {Campaign.GroupPurchase?.QuantityUnit}")</span></div>
+        <div><strong>@ObjectionCount</strong><span>이의제기</span></div>
+        <div><strong>@CommunityGroupPurchasePresentation.SignatureProgress(Campaign)</strong><span>전자서명</span></div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityVoteResponse Campaign { get; set; } = new();
+
+    [Parameter]
+    public int ObjectionCount { get; set; }
+}

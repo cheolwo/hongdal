@@ -62,7 +62,7 @@ public static class PlatformHomeWorkspaceCatalog
             "공동구매",
             "모집, 구매, 분배, 정산 표시를 함께 굴리는 공동 업무",
             CommunityLedgerTemplateKeys.GroupPurchase,
-            "/community/group-purchase",
+            CommunityPageRoutes.GroupPurchase,
             Icons.Material.Filled.Groups,
             Color.Primary),
         Create(

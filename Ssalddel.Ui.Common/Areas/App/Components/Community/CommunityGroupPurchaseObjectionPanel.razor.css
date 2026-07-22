@@ -1,0 +1,55 @@
+.group-purchase-panel {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--gp-line);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.group-purchase-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.group-purchase-objection-list {
+    display: grid;
+    gap: 10px;
+    max-height: 280px;
+    margin-top: 16px;
+    overflow-y: auto;
+}
+
+.group-purchase-objection-list article {
+    padding: 12px;
+    border-left: 3px solid #e7b56f;
+    border-radius: 0 10px 10px 0;
+    background: #fff9ef;
+}
+
+.group-purchase-objection-list article > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: .78rem;
+}
+
+.group-purchase-objection-list article span,
+.group-purchase-objection-list article p,
+.group-purchase-objection-empty {
+    color: var(--gp-muted);
+}
+
+.group-purchase-objection-list article p {
+    margin: 6px 0 0;
+    font-size: .84rem;
+    line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+    .group-purchase-panel ::deep .mud-button-root,
+    .group-purchase-panel ::deep .mud-input-control {
+        min-height: 44px;
+    }
+}

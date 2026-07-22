@@ -1,0 +1,10 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@inject NavigationManager Navigation
+
+<CommunityGroupPurchaseWorkspace Surface="CommunityGroupPurchaseSurfaceKind.List"
+                                 CampaignSelected="OpenCampaign" />
+
+@code {
+    private void OpenCampaign(Guid campaignId)
+        => Navigation.NavigateTo(CommunityPageRoutes.GroupPurchaseDetailFor(campaignId));
+}

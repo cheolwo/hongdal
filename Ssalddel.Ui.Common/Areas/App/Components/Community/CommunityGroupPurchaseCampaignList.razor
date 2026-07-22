@@ -1,0 +1,71 @@
+<aside class="group-purchase-list" aria-label="공동구매 목록">
+    <div class="group-purchase-list-header">
+        <div>
+            <MudText Typo="Typo.subtitle1">진행 중인 공동구매</MudText>
+            <MudText Typo="Typo.caption">@($"{Campaigns.Count}건")</MudText>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (HasError)
+    {
+        <div class="group-purchase-empty">
+            <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Large" />
+            <MudText Typo="Typo.body2">@ErrorMessage</MudText>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       OnClick="@(() => RetryRequested.InvokeAsync())">
+                다시 시도
+            </MudButton>
+        </div>
+    }
+    else if (Campaigns.Count == 0)
+    {
+        <div class="group-purchase-empty">
+            <MudIcon Icon="@Icons.Material.Filled.Groups" Size="Size.Large" />
+            <MudText Typo="Typo.body2">아직 표시할 공동구매가 없습니다.</MudText>
+        </div>
+    }
+    else
+    {
+        @foreach (var campaign in Campaigns)
+        {
+            <button type="button"
+                    class="@CommunityGroupPurchasePresentation.CampaignClass(campaign.Id, SelectedCampaignId)"
+                    @onclick="@(() => CampaignSelected.InvokeAsync(campaign.Id))">
+                <span class="group-purchase-card-state">@CommunityGroupPurchasePresentation.CampaignStateLabel(campaign)</span>
+                <strong>@campaign.Title</strong>
+                <span>@CommunityGroupPurchasePresentation.ProductSummary(campaign)</span>
+                <span class="group-purchase-card-progress">
+                    @($"{campaign.TotalVoteCount}/{campaign.GroupPurchase?.MinimumParticipantCount ?? 0}명 · {CommunityGroupPurchasePresentation.QuantitySummary(campaign)}")
+                </span>
+            </button>
+        }
+    }
+</aside>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<CommunityVoteResponse> Campaigns { get; set; } = [];
+
+    [Parameter]
+    public Guid? SelectedCampaignId { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public bool HasError { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback RetryRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> CampaignSelected { get; set; }
+}

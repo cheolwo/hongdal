@@ -285,7 +285,7 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
-    public void 공동구매공개페이지는_익명조회와로그인후저장을분리한Beta로분류한다()
+    public void 공동구매목록은_익명공개읽기Beta로분류한다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.IntegratedWeb,
@@ -295,12 +295,43 @@ public sealed class PageCapabilityCatalogTests
         Assert.True(found);
         Assert.Equal("community-group-purchase-public", capability.PageKey);
         Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
-        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
         Assert.False(capability.RequiresAuthentication);
-        Assert.True(capability.HasExternalEffects);
+        Assert.False(capability.HasExternalEffects);
         Assert.Equal("0.0", capability.IntroducedVersion);
         Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
         Assert.Contains("CommunityTrust", capability.WorkflowCodes);
+    }
+
+    [Fact]
+    public void 공동구매개설은_인증된플랫폼저장으로분류한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            "/community/group-purchase/new",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("community-group-purchase-create", capability.PageKey);
+        Assert.Equal(PageInteractionBoundary.PlatformPersistence, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.True(capability.HasExternalEffects);
+    }
+
+    [Fact]
+    public void 공동구매상세단계는_익명조회와Command인증경계를함께안내한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            "/community/group-purchase/ad1bcf9c-7e02-4dc4-a17a-96f9d4818f15/participation",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("community-group-purchase", capability.PageKey);
+        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.True(capability.HasExternalEffects);
+        Assert.Contains("별도로 인증", capability.Notice);
     }
 
     [Fact]
