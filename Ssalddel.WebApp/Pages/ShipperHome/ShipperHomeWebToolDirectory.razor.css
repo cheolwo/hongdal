@@ -1,0 +1,8 @@
+.shipper-web-tools {
+    display: grid;
+    gap: 1rem;
+}
+
+.shipper-web-tools ::deep .mud-paper {
+    border-radius: 16px;
+}

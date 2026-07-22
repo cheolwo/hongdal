@@ -1,0 +1,327 @@
+.shipper-home {
+    display: grid;
+    gap: 1rem;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    color: #172033;
+}
+
+.shipper-home__hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: end;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    border-radius: 26px;
+    color: #fff;
+    background:
+        radial-gradient(circle at 88% 18%, rgba(88, 201, 181, .24), transparent 30%),
+        linear-gradient(135deg, #10243e 0%, #183556 58%, #244b57 100%);
+    box-shadow: 0 20px 48px rgba(15, 35, 60, .16);
+}
+
+.shipper-home__hero-copy {
+    min-width: 0;
+}
+
+.shipper-home__hero-copy > span,
+.shipper-home__section-heading span,
+.shipper-home__status > div:first-child > span,
+.shipper-home__latest > div:first-child > span {
+    display: block;
+    margin-bottom: .35rem;
+    color: #58c9b5;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.shipper-home__hero h1,
+.shipper-home__status h2,
+.shipper-home__latest h2,
+.shipper-home__section-heading h2,
+.shipper-home-workflow h3 {
+    margin: 0;
+}
+
+.shipper-home__hero h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.1;
+}
+
+.shipper-home__hero p {
+    max-width: 700px;
+    margin: .7rem 0 0;
+    color: rgba(255, 255, 255, .8);
+    line-height: 1.65;
+}
+
+.shipper-home__hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .65rem;
+}
+
+.shipper-home__hero-actions ::deep .mud-button-root {
+    min-height: 48px;
+}
+
+.shipper-home__state,
+.shipper-home__status,
+.shipper-home__latest,
+.shipper-home__login,
+.shipper-home__additional,
+.shipper-home__workflows {
+    border: 1px solid #dce5ee;
+    border-radius: 20px;
+    background: #fff;
+}
+
+.shipper-home__state {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 132px;
+    padding: 1.25rem;
+}
+
+.shipper-home__state div {
+    display: grid;
+    gap: .25rem;
+}
+
+.shipper-home__state span,
+.shipper-home__status p,
+.shipper-home__latest p,
+.shipper-home__section-heading p,
+.shipper-home-workflow p,
+.shipper-home-workflow small {
+    color: #627086;
+}
+
+.shipper-home__status,
+.shipper-home__latest {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.15rem;
+}
+
+.shipper-home__status p,
+.shipper-home__latest p {
+    margin: .35rem 0 0;
+}
+
+.shipper-home__metrics,
+.shipper-home__latest-statuses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.shipper-home__metrics span,
+.shipper-home__latest-statuses span {
+    display: grid;
+    min-width: 88px;
+    min-height: 52px;
+    place-content: center;
+    padding: .5rem .75rem;
+    border-radius: 14px;
+    background: #f2f6fa;
+    color: #526278;
+    font-size: .78rem;
+    text-align: center;
+}
+
+.shipper-home__metrics b {
+    color: #183556;
+    font-size: 1.05rem;
+}
+
+.shipper-home__status ::deep .mud-button-root,
+.shipper-home__latest ::deep .mud-button-root,
+.shipper-home__login ::deep .mud-button-root,
+.shipper-home__alert-content ::deep .mud-button-root {
+    min-height: 48px;
+}
+
+.shipper-home__workflows,
+.shipper-home__login,
+.shipper-home__additional {
+    padding: 1.15rem;
+}
+
+.shipper-home__section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+}
+
+.shipper-home__section-heading p {
+    max-width: 560px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.shipper-home__workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .8rem;
+}
+
+.shipper-home-workflow {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: .9rem;
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid #dce5ee;
+    border-radius: 18px;
+    background: #f8fafc;
+}
+
+.shipper-home-workflow.is-enabled {
+    border-color: #98cabb;
+    background: linear-gradient(180deg, #f8fffc 0%, #fff 100%);
+}
+
+.shipper-home-workflow header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .5rem;
+}
+
+.shipper-home-workflow__icon {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 14px;
+    color: #183556;
+    background: #e5edf5;
+}
+
+.shipper-home-workflow__state {
+    padding: .28rem .55rem;
+    border-radius: 999px;
+    color: #5e6c7e;
+    background: #e9eef4;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.shipper-home-workflow.is-enabled .shipper-home-workflow__state {
+    color: #17664f;
+    background: #dff5ec;
+}
+
+.shipper-home-workflow p {
+    min-height: 4.6em;
+    margin: .45rem 0;
+    line-height: 1.5;
+}
+
+.shipper-home-workflow small {
+    display: block;
+    line-height: 1.45;
+}
+
+.shipper-home-workflow ::deep .mud-button-root {
+    width: 100%;
+    min-height: 48px;
+}
+
+.shipper-home__alert-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+@media (max-width: 1000px) {
+    .shipper-home__workflow-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .shipper-home__status,
+    .shipper-home__latest {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .shipper-home__status > :last-child,
+    .shipper-home__latest > :last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .shipper-home {
+        gap: .8rem;
+    }
+
+    .shipper-home__hero,
+    .shipper-home__status,
+    .shipper-home__latest {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .shipper-home__hero-actions {
+        justify-content: stretch;
+    }
+
+    .shipper-home__hero-actions ::deep .mud-button-root {
+        flex: 1 1 100%;
+    }
+
+    .shipper-home__workflow-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .shipper-home__section-heading {
+        display: grid;
+        align-items: start;
+    }
+
+    .shipper-home__metrics,
+    .shipper-home__latest-statuses {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .shipper-home__metrics span,
+    .shipper-home__latest-statuses span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .shipper-home-workflow p {
+        min-height: 0;
+    }
+
+    .shipper-home__alert-content {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 420px) {
+    .shipper-home__hero,
+    .shipper-home__workflows,
+    .shipper-home__login,
+    .shipper-home__additional,
+    .shipper-home__status,
+    .shipper-home__latest {
+        padding: 1rem;
+        border-radius: 17px;
+    }
+
+    .shipper-home__metrics,
+    .shipper-home__latest-statuses {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

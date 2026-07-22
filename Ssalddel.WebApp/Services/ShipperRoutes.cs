@@ -1,12 +1,13 @@
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Sales;
+using Ssalddel.Contracts.Shipper;
 using Ssalddel.Contracts.Shipper.Request;
 
 namespace Ssalddel.WebApp.Services;
 
 public static class ShipperRoutes
 {
-    public const string Home = "/shipper";
+    public const string Home = ShipperHomePageRoutes.Root;
     public const string Request = ShipperRequestPageRoutes.Root;
     public const string RequestBulk = ShipperRequestPageRoutes.Bulk;
     public const string RequestDetail = ShipperRequestPageRoutes.Root;

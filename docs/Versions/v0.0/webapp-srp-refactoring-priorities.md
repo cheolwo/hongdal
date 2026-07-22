@@ -45,7 +45,7 @@
 | `P1-3` 완료 | 입고 요청 | 변경 전에는 `SsalddelInboundRequestManager` 한 route가 창고 등록·입고 신청·목록·상세·완료를 함께 수행했음 | 목록, 신규 신청, 상세, 입고 완료와 별도 창고 등록 Screen | Web·모바일이 같은 route 계약·공용 Screen을 사용하고 성공 뒤 같은 inbound ID를 재조회하며 desktop·390px 실제 검증을 통과함 |
 | `P1-4` 완료 | 창고·판매 master-detail-action | 변경 전 입고 검수와 피킹, 마트 상품은 한 query 화면에 목록·상세·후기 저장을 함께 배치했고 판매 주문은 Web 읽기 원장과 모바일 Simulation 의미가 달랐음 | List, Detail, Action Screen과 adaptive desktop composition | 영속 판매 주문은 Web·모바일 공통 목록·stable-ID 상세로 통합하고, 로컬 Simulation도 허브·조회·stable-key Action route로 분리해 Command 뒤 같은 원장을 재조회함 |
 | `P2-1` 완료 | 개인 공간·꾸미기 | 변경 전에는 Web 개인 route multiplexer가 꾸미기 상점·상품까지 해석하고 모바일만 별도 상점·상세·checkout을 가졌음 | 개인 관리, 꾸미기 상점, stable-key 상품 상세, FakePG checkout 공용 Screen | Web·모바일이 같은 canonical route·Screen을 사용하고 구매·보유권 생성은 로그인 후 checkout에만 남김 |
-| `P2-2` | `/shipper` 홈 | Web은 링크 디렉터리, 모바일은 커뮤니티 홈·인증·dashboard를 수행함 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route의 주된 목표가 같고 1.0 이후 기능은 flag 뒤에 유지됨 |
+| `P2-2` 완료 | `/shipper` 홈 | 변경 전에는 Web이 링크 디렉터리, 모바일이 커뮤니티 홈·인증·dashboard를 서로 다르게 수행했음 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route가 읽기 전용 업무 요약·기능별 진입이라는 같은 목표를 가지며 1.0 이후 기능은 로그인·서버 flag 뒤에 유지됨 |
 | `P3` 보존 | 기사 추천·정산·통관 등 1.0 이후 화면 | 큰 Web 전용 화면이 남아 있으나 0.0 범위가 아님 | 재활성화 시 List·Detail·Action Screen으로 분리 | 0.0 기본 비노출, 추천·자동 배차·결제·정산 운영 효과 확장 금지 |
 
 ## 커뮤니티 목표 route 지도
@@ -147,7 +147,7 @@
 
 Web과 `OrdererApp`은 같은 canonical route와 공용 Screen을 사용하고 기존 `/orderer/mart`·query 링크를 보존한다. route 계약, 안전한 `from`, 검색·판매 가능 조건·페이지 복귀, capability의 ReadOnly·PlatformPersistence 분리, route→Screen 구성과 같은 ID 재조회 테스트를 포함한 clean commit 기준 전체 테스트 2,528개가 통과했다. `Ssalddel.WebApp`, `OrdererApp`, `SsalddelApp`, `SsalddelAdminApp` 소비 빌드도 경고·오류 없이 통과했다.
 
-실제 Web 검증에서 1280px 목록, stable-ID 상세·후기·주문 요청, legacy query redirect와 390px 후기·주문 로그인 경계를 확인했다. 390px navigation은 2열·63px, 마트 주 행동은 48px 이상이고 horizontal overflow와 final console 오류가 없었다. 주문 로그인 터치 영역도 최소 48px로 보완했다. 대표 PNG와 상세 결과는 [마트 공개 상품 Route·공용 Screen 단일책임 분리](../../Changes/2026-07-22-mart-product-route-srp.md)에 기록했다. 공통 Web 언어 전환의 31px 버튼은 다음 셸 모바일 감사 항목이다.
+실제 Web 검증에서 1280px 목록, stable-ID 상세·후기·주문 요청, legacy query redirect와 390px 후기·주문 로그인 경계를 확인했다. 390px navigation은 2열·63px, 마트 주 행동은 48px 이상이고 horizontal overflow와 final console 오류가 없었다. 주문 로그인 터치 영역도 최소 48px로 보완했다. 대표 PNG와 상세 결과는 [마트 공개 상품 Route·공용 Screen 단일책임 분리](../../Changes/2026-07-22-mart-product-route-srp.md)에 기록했다. 당시 남긴 공통 Web 언어 전환 31px 문제는 `P2-2` 셸 감사에서 최소 48px로 보완했다.
 
 ## 판매 주문 목표 route 지도
 
@@ -169,7 +169,7 @@ Web과 `OrdererApp`은 같은 canonical route와 공용 Screen을 사용하고 �
 
 기존에는 Web의 `/shipper/sales/orders`가 인증된 영속 읽기 원장이지만 `SsalddelApp`의 같은 route는 `InMemoryShipperStore` 기반 Simulation Command 화면이었다. 이제 두 앱의 canonical 주문 route는 같은 `ShipperSalesOrderWorkspace`를 목록 또는 상세 mode로 조립하고, 모바일의 실행성 Simulation은 capability까지 분리된 `/shipper/sales/fulfillment`에 둔다. 목록 검색·동기화 범위·상태·페이지는 상세의 안전한 `from`에 보존되며 기존 query ID는 replace redirect로 stable-ID route에 연결된다.
 
-실제 Web 검증에서 1280px 목록과 390px stable-ID 상세의 인증 경계, legacy query redirect와 목록 복귀 문맥을 확인했다. 390px에서 horizontal overflow가 없고 새 뒤로가기 동작은 48px 터치 영역을 만족한다. 인증된 실제 주문 데이터나 Command는 사용하지 않았다. 대표 PNG와 상세 결과는 [판매 주문 조회 Route 의미·단일책임 정렬](../../Changes/2026-07-22-sales-order-mobile-route-srp.md)에 기록한다. 공통 Web 언어 전환의 31px 버튼은 별도 셸 후속 항목이다.
+실제 Web 검증에서 1280px 목록과 390px stable-ID 상세의 인증 경계, legacy query redirect와 목록 복귀 문맥을 확인했다. 390px에서 horizontal overflow가 없고 새 뒤로가기 동작은 48px 터치 영역을 만족한다. 인증된 실제 주문 데이터나 Command는 사용하지 않았다. 대표 PNG와 상세 결과는 [판매 주문 조회 Route 의미·단일책임 정렬](../../Changes/2026-07-22-sales-order-mobile-route-srp.md)에 기록한다. 당시 남긴 공통 Web 언어 전환 31px 문제는 `P2-2` 셸 감사에서 최소 48px로 보완했다.
 
 `/shipper/sales/fulfillment`는 이제 상태를 바꾸지 않는 목표 허브다. 주문·재고·피킹·포장·정책은 독립 Route Page를 가지며, 목록 route는 읽기 전용이고 피킹·포장 Command는 주소의 stable task ID 화면에서만 실행한다. 존재하지 않는 key는 다른 주문이나 task로 자동 대체하지 않는다. 실제 MAUI Windows 앱에서 desktop과 플랫폼 최소 501px 좁은 창을 확인했고, 좁은 창의 route 이동이 이전 스크롤 위치를 이어받던 문제도 공용 상단 복원으로 보완했다. Android·iOS 실기기 확인은 배포 대상이 정해질 때 별도 수행한다.
 
@@ -188,7 +188,22 @@ Web 개인 Page는 더 이상 현재 URL을 해석해 상점 또는 상품 상�
 
 Web sample adapter와 모바일 adapter는 로그인하지 않은 사용자의 보유권을 기록하지 않는다. Web은 브라우저 세션에만 개발용 보유 상태를 남기고, 모바일은 서버 지원 노드 스티커만 기존 FakePG API·계정 보유권과 동기화한다. 지원되지 않은 테마 상품은 앱 실행 동안의 로컬 Simulation에 머물며 실제 카드 승인·청구·창작자 정산은 실행하지 않는다.
 
-실제 Web 검증에서 390px 상점·상품·checkout의 단일 열, 48px 이상 주 행동, 가로 넘침 없음과 legacy replace redirect를 확인했다. 상품 상세는 모바일에서 큰 미리보기보다 제목·가격·결제 행동을 먼저 배치하고 desktop 상점은 같은 Screen을 3열로 확장한다. 대표 PNG와 세부 결과는 [개인 공간·꾸미기 Route 의미·단일책임 정렬](../../Changes/2026-07-22-community-decoration-route-srp.md)에 기록했다. 공통 Web 모바일 머리말의 제목 줄바꿈은 `P2-2` 셸 감사에서 함께 다룬다.
+실제 Web 검증에서 390px 상점·상품·checkout의 단일 열, 48px 이상 주 행동, 가로 넘침 없음과 legacy replace redirect를 확인했다. 상품 상세는 모바일에서 큰 미리보기보다 제목·가격·결제 행동을 먼저 배치하고 desktop 상점은 같은 Screen을 3열로 확장한다. 대표 PNG와 세부 결과는 [개인 공간·꾸미기 Route 의미·단일책임 정렬](../../Changes/2026-07-22-community-decoration-route-srp.md)에 기록했다. 당시 남긴 공통 Web 모바일 머리말 줄바꿈은 `P2-2`에서 좁은 화면용 짧은 제목으로 보완했다.
+
+## 화주 홈 목표 route 지도
+
+| 화면 | 사용자 목표 | Route | 효과 경계 |
+| --- | --- | --- | --- |
+| 공개 커뮤니티 | 가입 없이 공동의 필요와 글 탐색 | `/community` | 공개 읽기 |
+| 화주 업무 허브 | 로그인·기능 상태와 운송·입고·재고 요약을 읽고 정확한 업무 목적지 선택 | `/shipper` | 읽기 전용, Command 없음 |
+| 운송 | 의뢰 작성 또는 운송 원장 확인 | `/shipper/request`, `/shipper/transport` | 로그인과 `DomesticTransportWorkflow` 필요 |
+| 입고·창고 | 입고 예정·가용 재고와 창고 업무 확인 | `/shipper/warehouse/workspace` | 로그인과 `WarehouseFulfillmentWorkflow` 필요 |
+| 판매 주문 | 영속 판매 주문 원장 확인 | `/shipper/sales/orders` | 로그인과 `SalesChannelFulfillmentWorkflow` 필요 |
+| 통관·국제 | FCL/LCL·HS 검토 자료 확인 | `/shipper/international/fcl-lcl` | 로그인과 `CustomsAndTradeDataWorkflow` 필요, 신고·분류 확정 없음 |
+
+`ShipperHomeScreen`은 익명 사용자에게 공개 커뮤니티와 로그인 경계만 보여 주고 개인 원장 API를 호출하지 않는다. 로그인 뒤에도 서버 기능 플래그가 꺼진 업무 API는 호출하지 않으며, 플래그 메타데이터를 읽지 못하면 1.0 이후 업무를 안전하게 비활성으로 표시한다. 허브 자체는 상태 변경 Command를 실행하지 않는다.
+
+Web Route Page는 같은 공용 Screen 아래에 기존 전문 도구 디렉터리를 추가한다. `SsalddelApp` 플랫폼 shell은 기존 `PlatformCommunityHome`, 커뮤니티 콘텐츠, 로그인·꾸미기 보유권·화면 노출 설정과 네 개 빠른 행동을 보존하면서 업무 mode에서 같은 Screen을 조립한다. 공통 Web 머리말은 720px 이하에서 짧은 제품명을 사용하고 언어 전환 행동을 최소 48px로 맞춘다.
 
 ## 기존 component 리팩터링의 재분류
 
@@ -235,4 +250,6 @@ Web sample adapter와 모바일 adapter는 로그인하지 않은 사용자의 �
 
 여섯 번째 수직 단위인 개인 공간·꾸미기는 Web 개인 route multiplexer에서 상점·상품 해석을 제거하고, Web·모바일의 상점·stable-key 상품·FakePG checkout을 같은 canonical route와 공용 Screen으로 통합했다. 상품 상세의 로컬 적용 선택과 checkout의 로그인·Simulation 보유권 생성 경계를 분리하고 기존 주소는 replace redirect로 보존했다.
 
-다음 우선순위는 `P2-2` `/shipper` 홈이다. Web 링크 디렉터리와 모바일 커뮤니티 홈·인증·dashboard가 같은 주소에서 서로 다른 목표를 갖는 문제를 공용 화주 허브 Screen과 플랫폼 shell로 정렬한다. 이때 공통 Web 모바일 머리말의 제목 줄바꿈과 48px 미만 언어 전환도 셸 책임으로 함께 감사한다.
+일곱 번째 수직 단위인 `/shipper` 홈은 Web 링크 디렉터리와 모바일 커뮤니티 홈·인증·dashboard가 같은 주소에서 서로 다른 목표를 갖던 문제를 제거했다. 두 플랫폼은 이제 읽기 전용 업무 요약과 기능별 진입을 담당하는 같은 `ShipperHomeScreen`을 조립하고, 1.0 이후 기능은 로그인과 서버 기능 플래그 뒤에 유지한다. 공통 Web 모바일 머리말도 짧은 제목과 최소 48px 언어 전환 행동으로 보완했다.
+
+다음 우선순위는 `P0-0`에 남은 navigation contract 감사다. 공용 Screen 안에 남은 업무 route literal을 계약으로 올리고, 사방괘 → 다이어그램 → 구체 데이터 페이지의 stable-ID·복귀 문맥을 Web과 모바일이 같은 의미로 해석하는지 수직 단위별로 확인한다. `P3`의 기사 추천·자동 배차·결제·정산·통관 운영 효과는 계속 보존·비활성 상태로 둔다.

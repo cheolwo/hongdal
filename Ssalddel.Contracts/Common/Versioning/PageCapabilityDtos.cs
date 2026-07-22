@@ -1,6 +1,7 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Mart;
 using Ssalddel.Contracts.Common.Sales;
+using Ssalddel.Contracts.Shipper;
 
 namespace Ssalddel.Contracts.Common.Versioning;
 
@@ -374,8 +375,14 @@ public static class SsalddelPageCapabilityCatalog
         Prefix("shipper-settings", SsalddelPageAppCodes.IntegratedWeb, "/shipper/settings", PageCapabilityStage.Beta,
             PageInteractionBoundary.PlatformPersistence, true, "1.0", "사용자별 화면·프로필 설정을 관리합니다.",
             featureKeys: [DomesticTransport], workflowCodes: ["DomesticTransport"]),
-        Prefix("shipper-home", SsalddelPageAppCodes.IntegratedWeb, "/shipper", PageCapabilityStage.Beta,
-            PageInteractionBoundary.Simulation, true, "1.0", "화주·판매자 업무는 통합 베타에서 Simulation 경계를 유지합니다.", true,
+        Exact("shipper-home", SsalddelPageAppCodes.IntegratedWeb, ShipperHomePageRoutes.Root, PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "커뮤니티에서 시작해 기능 플래그가 허용한 화주 업무만 찾고, 허브 자체는 상태 변경 Command를 실행하지 않습니다.", false,
+            [Community], ["CommunityTrust"]),
+        Exact("shipper-app-home", SsalddelPageAppCodes.Shipper, ShipperHomePageRoutes.Root, PageCapabilityStage.Live,
+            PageInteractionBoundary.ReadOnly, false, "0.0", "Web과 같은 공용 화주 허브 Screen에서 로그인·기능 플래그·읽기 요약을 확인하며 상태를 변경하지 않습니다.", false,
+            [Community], ["CommunityTrust"]),
+        Prefix("shipper-fallback", SsalddelPageAppCodes.IntegratedWeb, ShipperHomePageRoutes.Root, PageCapabilityStage.Beta,
+            PageInteractionBoundary.Simulation, true, "1.0", "별도 capability가 없는 화주·판매자 도구는 통합 베타 Simulation 경계를 유지합니다.", true,
             [DomesticTransport], ["DomesticTransport"]),
         Prefix("dispatch-address", SsalddelPageAppCodes.IntegratedWeb, "/dispatch", PageCapabilityStage.Preparing,
             PageInteractionBoundary.Simulation, true, "1.0", "주소 입력은 검증할 수 있지만 자동 배차는 비활성입니다.", true,

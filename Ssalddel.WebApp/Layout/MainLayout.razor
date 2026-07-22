@@ -7,7 +7,10 @@
 <MudLayout Class="@CurrentTheme.ShellClass">
     <MudAppBar Elevation="1" Color="Color.Default" Dense="true" Class="web-appbar">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Color="Color.Inherit" OnClick="ToggleDrawer" />
-        <MudText Typo="Typo.h6">@Locale.Text("살뜰 통합 베타", "Ssalddel Integrated Beta")</MudText>
+        <MudText Typo="Typo.h6" Class="web-app-title">
+            <span class="web-app-title__full">@Locale.Text("살뜰 통합 베타", "Ssalddel Integrated Beta")</span>
+            <span class="web-app-title__compact">@Locale.Text("살뜰", "Ssalddel")</span>
+        </MudText>
         <MudSpacer />
         <WebLanguageSwitcher />
         <MudChip T="string" Class="web-role-chip" Variant="Variant.Filled" Size="Size.Small">@CurrentRoleLabel</MudChip>

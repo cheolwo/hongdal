@@ -1,0 +1,56 @@
+@inject I화주공통콘텐츠Service 화주공통콘텐츠Service
+@inject ShipperLocalizationService L
+
+@if (혜택콘텐츠 is not null || 공지콘텐츠 is not null)
+{
+    <MudCard Elevation="0" Class="shipper-panel">
+        <MudCardContent>
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">@L.T("Home.CommonContent")</MudText>
+
+                @if (혜택콘텐츠 is not null)
+                {
+                    <MudPaper Elevation="0" Class="pa-3 shipper-panel" Style="border-color: var(--mud-palette-info);">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Info">@L.T("Home.Benefit")</MudText>
+                        <MudText Typo="Typo.body1" Class="fw-bold">@혜택콘텐츠.제목</MudText>
+                        @if (!string.IsNullOrWhiteSpace(혜택콘텐츠.설명))
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@혜택콘텐츠.설명</MudText>
+                        }
+                    </MudPaper>
+                }
+
+                @if (공지콘텐츠 is not null)
+                {
+                    <MudPaper Elevation="0" Class="pa-3 shipper-panel" Style="border-color: var(--mud-palette-warning);">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Warning">@L.T("Home.Notice")</MudText>
+                        <MudText Typo="Typo.body1" Class="fw-bold">@공지콘텐츠.제목</MudText>
+                        @if (!string.IsNullOrWhiteSpace(공지콘텐츠.설명))
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@공지콘텐츠.설명</MudText>
+                        }
+                    </MudPaper>
+                }
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
+}
+
+@code {
+    private 살뜰위젯콘텐츠Dto? 혜택콘텐츠;
+    private 살뜰위젯콘텐츠Dto? 공지콘텐츠;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            혜택콘텐츠 = await 화주공통콘텐츠Service.혜택콘텐츠조회Async();
+            공지콘텐츠 = await 화주공통콘텐츠Service.공지콘텐츠조회Async();
+        }
+        catch
+        {
+            혜택콘텐츠 = null;
+            공지콘텐츠 = null;
+        }
+    }
+}

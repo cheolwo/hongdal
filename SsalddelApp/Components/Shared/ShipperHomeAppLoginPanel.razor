@@ -1,0 +1,67 @@
+@inject AuthApiService AuthApi
+@inject IAuthSession AuthSession
+@inject 꾸미기보유권동기화Service 꾸미기보유권동기화Service
+@inject ShipperViewVisibilityService ViewVisibilityService
+@inject ShipperLocalizationService L
+
+<Ssalddel공통로그인Panel 제목='@L.T("Home.LoginTitle")'
+                         설명='@L.T("Home.LoginDescription")'
+                         아이디Label='@L.T("Home.LoginId")'
+                         비밀번호Label='@L.T("Home.Password")'
+                         일반로그인버튼텍스트='@L.T("Home.Login")'
+                         로그인진행텍스트='@L.T("Home.LoggingIn")'
+                         일반로그인Color="Color.Success"
+                         Class="pa-4 shipper-panel"
+                         Elevation="0"
+                         상태메시지="@statusMessage"
+                         상태Severity="@statusSeverity"
+                         IsBusy="@isBusy"
+                         OnPasswordLogin="LoginAsync"
+                         OnSocialLogin="SocialLoginAsync" />
+
+@code {
+    [Parameter]
+    public EventCallback OnAuthenticated { get; set; }
+
+    private string? statusMessage;
+    private Severity statusSeverity = Severity.Info;
+    private bool isBusy;
+
+    private async Task LoginAsync(공통로그인요청 request)
+    {
+        if (isBusy)
+        {
+            return;
+        }
+
+        isBusy = true;
+        statusMessage = null;
+        try
+        {
+            var result = await AuthApi.LoginAsync(request.UserNameOrEmail, request.Password);
+            if (!result.IsSuccess)
+            {
+                statusSeverity = Severity.Error;
+                statusMessage = result.ErrorMessage;
+                return;
+            }
+
+            await ViewVisibilityService.ReloadAsync();
+            await 꾸미기보유권동기화Service.RestoreAndSynchronizeAsync();
+            statusSeverity = Severity.Success;
+            statusMessage = L.T("Home.Message.LoginSucceeded", AuthSession.UserName);
+            await OnAuthenticated.InvokeAsync();
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private Task SocialLoginAsync(공통소셜로그인요청 request)
+    {
+        statusSeverity = Severity.Info;
+        statusMessage = $"{request.ProviderDisplayName} 요청을 받았습니다. 계정 연결 정책이 준비되면 활성화합니다.";
+        return Task.CompletedTask;
+    }
+}

@@ -655,6 +655,43 @@ public sealed class PageCapabilityCatalogTests
         Assert.Contains("CommunityTrust", capability.WorkflowCodes);
     }
 
+    [Theory]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "shipper-home")]
+    [InlineData(SsalddelPageAppCodes.Shipper, "shipper-app-home")]
+    public void 화주허브는_Web과모바일에서_공개읽기전용0점0화면이다(
+        string appCode,
+        string expectedPageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            appCode,
+            "/shipper?from=%2Fcommunity",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(expectedPageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Live, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Equal("0.0", capability.IntroducedVersion);
+        Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
+    }
+
+    [Fact]
+    public void 별도분류가없는Web화주하위도구는_보수적인Simulationfallback을유지한다()
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.IntegratedWeb,
+            "/shipper/future-tool",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("shipper-fallback", capability.PageKey);
+        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.True(capability.HasExternalEffects);
+    }
+
     [Fact]
     public void 인사역할검토홈은_인증된영속배정원장조회Beta로분류한다()
     {

@@ -1,6 +1,7 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Sales;
+using Ssalddel.Contracts.Shipper;
 using Ssalddel.Contracts.Shipper.Request;
 
 namespace SsalddelApp.Services;
@@ -8,8 +9,8 @@ namespace SsalddelApp.Services;
 public static class ShipperRoutes
 {
     public const string Home = "/";
-    public const string ShipperHome = "/shipper";
-    public const string TransportWorkspace = "/shipper/transport";
+    public const string ShipperHome = ShipperHomePageRoutes.Root;
+    public const string TransportWorkspace = ShipperHomePageRoutes.TransportWorkspace;
     public const string Request = ShipperRequestPageRoutes.Root;
     public const string RequestBulk = ShipperRequestPageRoutes.Bulk;
     public const string RequestDetail = ShipperRequestPageRoutes.Root;
@@ -19,7 +20,7 @@ public static class ShipperRoutes
     public const string InboundRequests = InboundRequestPageRoutes.Root;
     public const string InboundRequestCreate = InboundRequestPageRoutes.Create;
     public const string WarehouseRegistration = InboundRequestPageRoutes.WarehouseRegistration;
-    public const string WarehouseWorkspace = "/shipper/warehouse/workspace";
+    public const string WarehouseWorkspace = ShipperHomePageRoutes.WarehouseWorkspace;
     public const string WarehouseInventory = "/shipper/warehouse/inventory";
     public const string WarehouseScan = "/shipper/warehouse/scan";
     public const string WarehouseInboundWorkStart = "/shipper/warehouse/work/inbound";
@@ -41,7 +42,7 @@ public static class ShipperRoutes
     public const string OrderFulfillmentPacking = OrderFulfillmentSimulationPageRoutes.Packing;
     public const string OrderFulfillmentRestockPolicy = OrderFulfillmentSimulationPageRoutes.RestockPolicy;
     public const string CustomsHsReviews = "/shipper/customs/hs-reviews";
-    public const string FclLclPlanner = "/shipper/international/fcl-lcl";
+    public const string FclLclPlanner = ShipperHomePageRoutes.InternationalPlanner;
     public const string ViewSettings = "/shipper/settings/views";
     public const string ProfileSettings = "/shipper/settings/profile";
     public const string PublicDataInformation = "/information/public-data";

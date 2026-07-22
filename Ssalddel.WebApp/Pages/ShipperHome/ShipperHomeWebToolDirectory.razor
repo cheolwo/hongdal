@@ -1,0 +1,65 @@
+@namespace Ssalddel.WebApp.Pages
+
+<div class="shipper-web-tools">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h6">운송 업무</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">작성·공개 조회·탐색 문의·결제 상태처럼 목적이 다른 화면을 각각 엽니다.</MudText>
+            </MudStack>
+            <WebPageLinkGrid Items="TransportLinks" />
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h6">입고·창고 업무</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">입고 예정, 재고, 재위탁 운송과 스캔 검증 화면을 보존합니다.</MudText>
+            </MudStack>
+            <WebPageLinkGrid Items="WarehouseLinks" />
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.h6">판매·통관 업무</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">판매채널, 출품, 주문 원장, HS 검토와 FCL/LCL 화면을 목적별로 엽니다.</MudText>
+            </MudStack>
+            <WebPageLinkGrid Items="CommerceLinks" />
+        </MudStack>
+    </MudPaper>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<WebAppPageLink> TransportLinks =
+    [
+        new("운송 의뢰 작성", "화물, 운송, 절차와 최종 확인을 같은 draft로 단계 작성합니다.", ShipperRoutes.Request, Icons.Material.Filled.PostAdd, "운송"),
+        new("CSV 일괄등록", "여러 운송 의뢰를 붙여넣고 저장 전 미리보기합니다.", ShipperRoutes.RequestBulk, Icons.Material.Filled.UploadFile, "운송"),
+        new("공개 화물정보", "공개 설정된 화물 목록만 읽습니다.", ShipperRoutes.PublicCargo, Icons.Material.Filled.ViewList, "운송"),
+        new("받은 탐색 문의함", "운행 가능성 문의를 계약 확정과 분리해 확인합니다.", ShipperRoutes.ExplorationInbox, Icons.Material.Filled.Inbox, "운송"),
+        new("결제·정산 상태", "실결제 없이 허용된 FakePG 상태 경계를 확인합니다.", ShipperRoutes.PaymentStatus, Icons.Material.Filled.Payments, "운송"),
+        new("의뢰 상세 찾기", "의뢰 ID를 stable-ID 요약·이력·결제·증빙 화면으로 연결합니다.", ShipperRoutes.RequestDetailLookup, Icons.Material.Filled.Timeline, "운송")
+    ];
+
+    private static readonly IReadOnlyList<WebAppPageLink> WarehouseLinks =
+    [
+        new("입고 대시보드", "창고와 입고 예정·완료·보관 재고 요약을 확인합니다.", ShipperRoutes.InboundDashboard, Icons.Material.Filled.Dashboard, "창고"),
+        new("입고 요청 원장", "목록·신규 신청·stable-ID 상세·완료 화면으로 이동합니다.", ShipperRoutes.InboundRequests, Icons.Material.Filled.MoveToInbox, "창고"),
+        new("창고 작업대", "입고, 재고, 재위탁과 주문 출고 목적지를 확인합니다.", ShipperRoutes.WarehouseWorkspace, Icons.Material.Filled.Warehouse, "창고"),
+        new("재고 목록", "가용 재고를 읽고 판매 또는 재위탁 목적지로 이동합니다.", ShipperRoutes.WarehouseInventory, Icons.Material.Filled.Inventory2, "창고"),
+        new("창고 스캔", "입고·상품·번들·적재 위치 바코드 흐름을 검증합니다.", ShipperRoutes.WarehouseScan, Icons.Material.Filled.QrCodeScanner, "창고"),
+        new("재위탁 운송", "창고 재고를 운송 의뢰 초안과 연결합니다.", ShipperRoutes.ReconsignmentOrders, Icons.Material.Filled.LocalShipping, "창고")
+    ];
+
+    private static readonly IReadOnlyList<WebAppPageLink> CommerceLinks =
+    [
+        new("판매채널 연결", "외부 발행 없이 판매채널 연결 준비 원장을 관리합니다.", ShipperRoutes.SalesChannels, Icons.Material.Filled.Storefront, "판매"),
+        new("출품 관리", "판매상품과 채널 출품 상태를 확인합니다.", ShipperRoutes.ProductListings, Icons.Material.Filled.Sell, "판매"),
+        new("판매 주문 원장", "판매채널 주문과 출고 투영의 stable-ID 상세를 읽습니다.", ShipperRoutes.SalesOrders, Icons.Material.Filled.ReceiptLong, "판매"),
+        new("FCL/LCL 판단", "실제 예약 없이 수입 운송 방식을 비교합니다.", ShipperRoutes.FclLclPlanner, Icons.Material.Filled.Public, "통관"),
+        new("HS 코드 검토", "근거 자료를 읽고 품목분류·세율·신고 확정과 분리합니다.", ShipperRoutes.CustomsHsReviews, Icons.Material.Filled.FactCheck, "통관"),
+        new("화주 화면 설정", "사용자별 화주 업무 화면 노출 설정을 확인합니다.", ShipperRoutes.ViewSettings, Icons.Material.Filled.Settings, "설정")
+    ];
+}

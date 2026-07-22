@@ -112,12 +112,34 @@ h1:focus {
     background: var(--web-appbar-bg) !important;
     color: var(--web-appbar-fg) !important;
     border-bottom: 1px solid var(--web-border);
+    white-space: nowrap;
+}
+
+.web-app-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.web-app-title__compact {
+    display: none;
 }
 
 .web-shell .web-role-chip {
     background: rgba(255, 255, 255, 0.18);
     color: var(--web-appbar-fg);
     border: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+@media (max-width: 720px) {
+    .web-app-title__full {
+        display: none;
+    }
+
+    .web-app-title__compact {
+        display: inline;
+    }
 }
 
 .web-shell .web-drawer,

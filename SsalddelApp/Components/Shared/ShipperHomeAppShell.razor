@@ -1,0 +1,85 @@
+@using Ssalddel.Ui.Common.Areas.App.Components.Shipper
+@inject IAuthSession AuthSession
+@inject 꾸미기보유권동기화Service 꾸미기보유권동기화Service
+@inject ShipperViewVisibilityService ViewVisibilityService
+
+@if (isInitializing)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="pa-5">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body1">화주 앱의 로그인과 화면 설정을 확인하고 있습니다.</MudText>
+        </MudStack>
+    </MudPaper>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(initializationWarning))
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-3">@initializationWarning</MudAlert>
+    }
+
+    <PlatformCommunityHome AppName="살뜰"
+                           RoleLabel="화주"
+                           AppKey="shipper"
+                           UseBaguaRoleTransitionPages="true"
+                           UseCompactHomeSummary="true"
+                           ShowRealtimeBest="true"
+                           QuickActions="QuickActions">
+        <CommunityModeContent>
+            <ShipperHomeCommunityContent />
+        </CommunityModeContent>
+
+        <WorkModeContent>
+            <ShipperHomeScreen @ref="homeScreen"
+                               TransportHref="@ShipperRoutes.Request"
+                               WarehouseHref="@ShipperRoutes.WarehouseWorkspace"
+                               SalesHref="@ShipperRoutes.SalesOrders"
+                               InternationalHref="@ShipperRoutes.FclLclPlanner">
+                <AnonymousContent>
+                    <ShipperHomeAppLoginPanel OnAuthenticated="HandleAuthenticatedAsync" />
+                </AnonymousContent>
+            </ShipperHomeScreen>
+        </WorkModeContent>
+    </PlatformCommunityHome>
+}
+
+@code {
+    private ShipperHomeScreen? homeScreen;
+    private bool isInitializing = true;
+    private string? initializationWarning;
+
+    private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
+    [
+        new("운송 업무", "결제, 배차, 운송 상태를 의뢰별로 관리합니다.", ShipperRoutes.TransportWorkspace, Icons.Material.Filled.LocalShipping, Color.Primary),
+        new("운송 의뢰", "화물 운송 의뢰를 새로 등록합니다.", ShipperRoutes.Request, Icons.Material.Filled.AddRoad, Color.Primary),
+        new("창고 작업대", "입고, 재고, 스캔과 출고 작업을 시작합니다.", ShipperRoutes.WarehouseWorkspace, Icons.Material.Filled.Warehouse, Color.Warning),
+        new("판매 주문", "Web과 같은 영속 판매 주문 원장을 확인합니다.", ShipperRoutes.SalesOrders, Icons.Material.Filled.Storefront, Color.Info)
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await AuthSession.RestoreAsync();
+            await 꾸미기보유권동기화Service.RestoreAndSynchronizeAsync();
+            await ViewVisibilityService.EnsureLoadedAsync();
+        }
+        catch (Exception exception)
+        {
+            initializationWarning = $"일부 앱 설정을 복원하지 못했습니다. 업무 기능은 각 화면에서 다시 확인합니다. {exception.Message}";
+        }
+        finally
+        {
+            isInitializing = false;
+        }
+    }
+
+    private async Task HandleAuthenticatedAsync()
+    {
+        if (homeScreen is not null)
+        {
+            await homeScreen.RefreshAsync();
+        }
+    }
+}

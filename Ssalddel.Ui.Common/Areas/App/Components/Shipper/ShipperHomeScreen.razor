@@ -1,0 +1,325 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Shipper
+@using Ssalddel.Contracts.Common.Sales
+@using Ssalddel.Contracts.Shipper
+@using Ssalddel.Contracts.Shipper.Request
+@inject ShipperHomePageViewModel ViewModel
+
+<PageTitle>화주 업무 허브 · Ssalddel</PageTitle>
+
+<main class="shipper-home">
+    <header class="shipper-home__hero">
+        <div class="shipper-home__hero-copy">
+            <span>COMMUNITY-FIRST SHIPPER HUB</span>
+            <h1>화주 업무 허브</h1>
+            <p>커뮤니티에서 확인한 필요를 바탕으로, 지금 활성화된 운송·창고·판매·통관 업무만 명시적으로 시작합니다.</p>
+        </div>
+        <div class="shipper-home__hero-actions">
+            <MudButton Href="@CommunityPageRoutes.Home"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Forum">
+                공개 커뮤니티
+            </MudButton>
+            @if (CanOpen(TransportArea))
+            {
+                <MudButton Href="@ShipperRequestPageRoutes.Root"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.AddRoad">
+                    운송 의뢰 작성
+                </MudButton>
+            }
+        </div>
+    </header>
+
+    @if (ViewModel.IsLoading && !ViewModel.HasLoaded)
+    {
+        <section class="shipper-home__state" aria-live="polite">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <div><strong>업무 경계를 확인하고 있습니다.</strong><span>로그인 상태와 0.0 기능 플래그를 먼저 읽습니다.</span></div>
+        </section>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                <div class="shipper-home__alert-content">
+                    <span>@ViewModel.ErrorMessage</span>
+                    <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RefreshAsync">다시 시도</MudButton>
+                </div>
+            </MudAlert>
+        }
+
+        @foreach (var warning in Snapshot.Warnings)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">@warning</MudAlert>
+        }
+
+        <section class="shipper-home__status" aria-labelledby="shipper-home-status-title">
+            <div>
+                <span>현재 문맥</span>
+                <h2 id="shipper-home-status-title">@Snapshot.IdentityLabel</h2>
+                <p>@(Snapshot.IsAuthenticated
+                    ? "서버 원장을 읽되, 이 허브에서는 상태 변경 Command를 실행하지 않습니다."
+                    : "공개 설명은 볼 수 있고 개인 원장과 업무 실행은 로그인 후 사용할 수 있습니다.")</p>
+            </div>
+            <div class="shipper-home__metrics" aria-label="화주 업무 요약">
+                <span><b>@Snapshot.ActiveRequestCount</b>진행 운송</span>
+                <span><b>@Snapshot.PendingInboundCount</b>입고 예정</span>
+                <span><b>@Snapshot.ActionableInventoryCount</b>가용 재고</span>
+            </div>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="@ViewModel.IsLoading"
+                       OnClick="RefreshAsync">
+                상태 새로고침
+            </MudButton>
+        </section>
+
+        @if (Snapshot.IsAuthenticated && Snapshot.LatestRequest is { } latest)
+        {
+            <section class="shipper-home__latest" aria-labelledby="shipper-home-latest-title">
+                <div>
+                    <span>가장 최근 운송 의뢰</span>
+                    <h2 id="shipper-home-latest-title">@latest.RequestId</h2>
+                    <p>다음 확인: @NextCheck(latest)</p>
+                </div>
+                <div class="shipper-home__latest-statuses">
+                    <span>@DisplayStatus(latest.RequestStatus, "상태 확인")</span>
+                    <span>@DisplayStatus(latest.PaymentStatus, "결제 상태 확인")</span>
+                    <span>@DisplayStatus(latest.DispatchStatus, "배차 상태 확인")</span>
+                </div>
+                <MudButton Href="@ShipperRequestDetailPageRoutes.SummaryFor(latest.RequestId)"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           EndIcon="@Icons.Material.Filled.ArrowForward">
+                    정확한 의뢰 보기
+                </MudButton>
+            </section>
+        }
+
+        <section class="shipper-home__workflows" aria-labelledby="shipper-home-workflows-title">
+            <div class="shipper-home__section-heading">
+                <div>
+                    <span>FEATURE-GATED WORKFLOWS</span>
+                    <h2 id="shipper-home-workflows-title">업무 영역</h2>
+                </div>
+                <p>기능 플래그가 꺼진 1.0 이후 도구는 목록에서 설명만 보이고 열리지 않습니다.</p>
+            </div>
+            <div class="shipper-home__workflow-grid">
+                @foreach (var area in WorkflowAreas)
+                {
+                    <article class="shipper-home-workflow @(CanOpen(area) ? "is-enabled" : "is-disabled")">
+                        <header>
+                            <span class="shipper-home-workflow__icon"><MudIcon Icon="@area.Icon" /></span>
+                            <span class="shipper-home-workflow__state">@AvailabilityLabel(area)</span>
+                        </header>
+                        <div>
+                            <h3>@area.Title</h3>
+                            <p>@area.Description</p>
+                            <small>@AreaStatus(area)</small>
+                        </div>
+                        @if (CanOpen(area))
+                        {
+                            <MudButton Href="@area.Href"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       EndIcon="@Icons.Material.Filled.ChevronRight">
+                                업무 열기
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Default"
+                                       Disabled="true"
+                                       StartIcon="@Icons.Material.Filled.Lock">
+                                @DisabledActionLabel(area)
+                            </MudButton>
+                        }
+                    </article>
+                }
+            </div>
+        </section>
+
+        @if (!Snapshot.IsAuthenticated)
+        {
+            <section class="shipper-home__login" aria-labelledby="shipper-home-login-title">
+                <div class="shipper-home__section-heading">
+                    <div>
+                        <span>EXPLICIT SIGN-IN</span>
+                        <h2 id="shipper-home-login-title">내 원장은 로그인 후 확인합니다.</h2>
+                    </div>
+                    <p>공개 커뮤니티 이용에는 가입이 필요하지 않습니다. 개인 의뢰·입고·재고를 조회할 때만 인증합니다.</p>
+                </div>
+                @if (AnonymousContent is not null)
+                {
+                    @AnonymousContent
+                }
+                else if (!string.IsNullOrWhiteSpace(LoginHref))
+                {
+                    <MudButton Href="@LoginHref"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Login">
+                        로그인·선택 회원가입
+                    </MudButton>
+                }
+            </section>
+        }
+
+        @if (AdditionalTools is not null)
+        {
+            <section class="shipper-home__additional" aria-labelledby="shipper-home-additional-title">
+                <div class="shipper-home__section-heading">
+                    <div>
+                        <span>PLATFORM TOOL DIRECTORY</span>
+                        <h2 id="shipper-home-additional-title">플랫폼별 전문 도구</h2>
+                    </div>
+                    <p>기존 전문 화면은 보존하며 각 목적지에서 인증·기능 플래그·Simulation 경계를 다시 확인합니다.</p>
+                </div>
+                @AdditionalTools
+            </section>
+        }
+    }
+</main>
+
+@code {
+    [Parameter]
+    public string TransportHref { get; set; } = ShipperHomePageRoutes.DefaultTransportEntry;
+
+    [Parameter]
+    public string WarehouseHref { get; set; } = ShipperHomePageRoutes.WarehouseWorkspace;
+
+    [Parameter]
+    public string SalesHref { get; set; } = SalesOrderPageRoutes.Root;
+
+    [Parameter]
+    public string InternationalHref { get; set; } = ShipperHomePageRoutes.InternationalPlanner;
+
+    [Parameter]
+    public string? LoginHref { get; set; }
+
+    [Parameter]
+    public RenderFragment? AnonymousContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? AdditionalTools { get; set; }
+
+    private ShipperHomeDashboardSnapshot Snapshot => ViewModel.Snapshot;
+
+    private ShipperHomeWorkflowArea TransportArea
+        => new(
+            "transport",
+            "운송 관리",
+            "운송 의뢰를 작성하고 결제·배차·상하차 진행 원장을 확인합니다.",
+            TransportHref,
+            ShipperHomeFeatureKeys.DomesticTransport,
+            Icons.Material.Filled.LocalShipping);
+
+    private IReadOnlyList<ShipperHomeWorkflowArea> WorkflowAreas =>
+    [
+        TransportArea,
+        new(
+            "warehouse",
+            "입고·창고",
+            "계약 기반 입고 예정과 가용 재고를 정확한 원장에서 확인합니다.",
+            WarehouseHref,
+            ShipperHomeFeatureKeys.WarehouseFulfillment,
+            Icons.Material.Filled.Warehouse),
+        new(
+            "sales",
+            "판매 주문",
+            "판매채널 주문과 출고 투영을 읽고 실행성 Simulation과 구분합니다.",
+            SalesHref,
+            ShipperHomeFeatureKeys.SalesChannelFulfillment,
+            Icons.Material.Filled.Storefront),
+        new(
+            "customs",
+            "통관·국제",
+            "FCL/LCL 비교와 HS 검토 자료를 전문 판단·신고 확정과 분리합니다.",
+            InternationalHref,
+            ShipperHomeFeatureKeys.CustomsAndTradeData,
+            Icons.Material.Filled.Public)
+    ];
+
+    protected override Task OnInitializedAsync()
+        => ViewModel.LoadAsync();
+
+    public async Task RefreshAsync()
+    {
+        await ViewModel.LoadAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private bool CanOpen(ShipperHomeWorkflowArea area)
+        => Snapshot.IsAuthenticated
+           && Snapshot.FeatureMetadataAvailable
+           && Snapshot.IsFeatureEnabled(area.FeatureKey);
+
+    private string AvailabilityLabel(ShipperHomeWorkflowArea area)
+        => !Snapshot.FeatureMetadataAvailable
+            ? "확인 대기"
+            : Snapshot.IsFeatureEnabled(area.FeatureKey)
+                ? Snapshot.IsAuthenticated ? "사용 가능" : "로그인 필요"
+                : "기능 꺼짐";
+
+    private string DisabledActionLabel(ShipperHomeWorkflowArea area)
+        => !Snapshot.FeatureMetadataAvailable
+            ? "상태 확인 대기"
+            : Snapshot.IsFeatureEnabled(area.FeatureKey)
+                ? "로그인 후 열기"
+                : "0.0 기본 비활성";
+
+    private string AreaStatus(ShipperHomeWorkflowArea area)
+        => area.Key switch
+        {
+            "transport" => $"진행 운송 {Snapshot.ActiveRequestCount:N0}건",
+            "warehouse" => $"입고 예정 {Snapshot.PendingInboundCount:N0}건 · 가용 재고 {Snapshot.ActionableInventoryCount:N0}건",
+            "sales" => "판매 주문 원장 · 외부 채널 발행 없음",
+            "customs" => "검토 자료 · 신고와 품목분류 확정 없음",
+            _ => "상태 확인"
+        };
+
+    private static string NextCheck(ShipperHomeRequestSummary request)
+    {
+        if (Matches(request.PaymentStatus, "결제대기", "미결제", "대기"))
+        {
+            return "결제 조건 확인";
+        }
+
+        if (Matches(request.DispatchStatus, "매칭중", "배차대기", "대기"))
+        {
+            return "기사 매칭 상태";
+        }
+
+        if (Matches(request.DispatchStatus, "기사배정", "배차확정"))
+        {
+            return "상차 준비";
+        }
+
+        if (Matches(request.DispatchStatus, "운송중", "상차완료", "운송"))
+        {
+            return "하차 진행";
+        }
+
+        return "상세 원장 확인";
+    }
+
+    private static string DisplayStatus(string? status, string fallback)
+        => string.IsNullOrWhiteSpace(status) ? fallback : status.Trim();
+
+    private static bool Matches(string? value, params string[] keywords)
+        => !string.IsNullOrWhiteSpace(value)
+           && keywords.Any(keyword => value.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+    private sealed record ShipperHomeWorkflowArea(
+        string Key,
+        string Title,
+        string Description,
+        string Href,
+        string FeatureKey,
+        string Icon);
+}
