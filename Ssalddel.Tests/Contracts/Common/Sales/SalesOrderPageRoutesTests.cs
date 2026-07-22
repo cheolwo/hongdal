@@ -56,4 +56,70 @@ public sealed class SalesOrderPageRoutesTests
         Assert.Equal(1, parsed.Page);
         Assert.Equal(SalesOrderPageRoutes.Root, new SalesOrderNavigationContext().PathFor(SalesOrderScreenKind.List));
     }
+
+    [Fact]
+    public void FulfillmentRoutes_UseStableTaskIdsAndRejectInvalidIds()
+    {
+        Assert.Equal(
+            "/shipper/sales/fulfillment/picking/17",
+            OrderFulfillmentSimulationPageRoutes.PickingTaskFor(17));
+        Assert.Equal(
+            "/shipper/sales/fulfillment/packing/23",
+            OrderFulfillmentSimulationPageRoutes.PackingTaskFor(23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFulfillmentSimulationPageRoutes.PickingTaskFor(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => OrderFulfillmentSimulationPageRoutes.PackingTaskFor(-1));
+    }
+
+    [Fact]
+    public void FulfillmentOrderRoute_RoundTripsOpaqueUnicodeKey()
+    {
+        var route = OrderFulfillmentSimulationPageRoutes.OrderDetailFor(
+            "Smart/Store",
+            "주문 2026-07/22+A");
+        var orderKey = route[(route.LastIndexOf('/') + 1)..];
+
+        var decoded = OrderFulfillmentSimulationPageRoutes.TryDecodeOrderKey(
+            orderKey,
+            out var channelType,
+            out var channelOrderNo);
+
+        Assert.True(decoded);
+        Assert.Equal("Smart/Store", channelType);
+        Assert.Equal("주문 2026-07/22+A", channelOrderNo);
+        Assert.DoesNotContain("Smart/Store", route, StringComparison.Ordinal);
+        Assert.DoesNotContain("주문", route, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("not-base64!")]
+    [InlineData("YQ")]
+    public void FulfillmentOrderRoute_DoesNotGuessInvalidKeys(string? orderKey)
+    {
+        var decoded = OrderFulfillmentSimulationPageRoutes.TryDecodeOrderKey(
+            orderKey,
+            out var channelType,
+            out var channelOrderNo);
+
+        Assert.False(decoded);
+        Assert.Empty(channelType);
+        Assert.Empty(channelOrderNo);
+    }
+
+    [Fact]
+    public void FulfillmentOrderContext_PreservesFiltersInSafeReturnPath()
+    {
+        var context = new FulfillmentOrderNavigationContext()
+            .WithListState(" 냉장 세트 ", "국내", "출고대기");
+        var listPath = context.ListPath();
+        var detailPath = context.DetailPath(CommerceChannelKeys.SmartStore, "ORDER-73");
+        var parsedList = FulfillmentOrderNavigationContext.Parse(listPath);
+        var parsedDetail = FulfillmentOrderNavigationContext.Parse(detailPath);
+
+        Assert.Equal("냉장 세트", parsedList.Search);
+        Assert.Equal("국내", parsedList.Scope);
+        Assert.Equal("출고대기", parsedList.Status);
+        Assert.Equal(listPath, parsedDetail.ResolveReturnPath());
+    }
 }

@@ -34,6 +34,10 @@
     gap: .65rem;
 }
 
+.packing-actions ::deep .mud-button-root {
+    min-height: 48px;
+}
+
 .packing-heading strong,
 .packing-heading span {
     display: block;

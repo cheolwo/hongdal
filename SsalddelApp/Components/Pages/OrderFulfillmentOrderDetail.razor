@@ -1,0 +1,23 @@
+@page "/shipper/sales/fulfillment/orders/{OrderKey}"
+@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+
+<PageTitle>Simulation 주문 상세</PageTitle>
+
+<OrderFulfillmentRouteFrame Title="Simulation 주문 상세"
+                            Description="주소의 stable 주문 key가 가리키는 로컬 주문 후보 한 건만 읽습니다."
+                            BackHref="@ReturnPath"
+                            BackLabel="주문 목록으로"
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAndSelectAsync">
+    @if (InvalidOrderKey)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+            주문 key를 해석할 수 없습니다. 다른 주문으로 자동 대체하지 않았습니다.
+        </MudAlert>
+    }
+    else
+    {
+        <OrderFulfillmentOrderDetailPanel Read="@Read" />
+    }
+</OrderFulfillmentRouteFrame>

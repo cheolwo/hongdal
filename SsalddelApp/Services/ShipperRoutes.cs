@@ -32,7 +32,13 @@ public static class ShipperRoutes
     public const string SalesPageComposer = "/shipper/sales/pages/new";
     public const string ProductListings = "/shipper/sales/listings";
     public const string SalesOrders = SalesOrderPageRoutes.Root;
-    public const string OrderFulfillment = SalesOrderPageRoutes.FulfillmentRoot;
+    public const string OrderFulfillment = OrderFulfillmentSimulationPageRoutes.Root;
+    public const string OrderFulfillmentSamples = OrderFulfillmentSimulationPageRoutes.Samples;
+    public const string OrderFulfillmentOrders = OrderFulfillmentSimulationPageRoutes.Orders;
+    public const string OrderFulfillmentInventory = OrderFulfillmentSimulationPageRoutes.Inventory;
+    public const string OrderFulfillmentPicking = OrderFulfillmentSimulationPageRoutes.Picking;
+    public const string OrderFulfillmentPacking = OrderFulfillmentSimulationPageRoutes.Packing;
+    public const string OrderFulfillmentRestockPolicy = OrderFulfillmentSimulationPageRoutes.RestockPolicy;
     public const string CustomsHsReviews = "/shipper/customs/hs-reviews";
     public const string FclLclPlanner = "/shipper/international/fcl-lcl";
     public const string ViewSettings = "/shipper/settings/views";
@@ -64,6 +70,15 @@ public static class ShipperRoutes
 
     public static string InboundRequestCompleteFor(long inboundId)
         => InboundRequestPageRoutes.CompleteFor(inboundId);
+
+    public static string OrderFulfillmentOrderFor(string channelType, string channelOrderNo)
+        => OrderFulfillmentSimulationPageRoutes.OrderDetailFor(channelType, channelOrderNo);
+
+    public static string OrderFulfillmentPickingTaskFor(long taskId)
+        => OrderFulfillmentSimulationPageRoutes.PickingTaskFor(taskId);
+
+    public static string OrderFulfillmentPackingTaskFor(long taskId)
+        => OrderFulfillmentSimulationPageRoutes.PackingTaskFor(taskId);
 
     public static string CommunityDecorationDetailFor(string productKey)
         => $"{CommunityDecorations}/{Uri.EscapeDataString(productKey)}";

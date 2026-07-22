@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [판매 주문 이행 목표별 Route 단일책임 분리](2026-07-22-order-fulfillment-route-srp.md) | 로컬 복합 탭을 상태 변경 없는 허브와 주문·재고·피킹·포장·정책 route로 분리하고 stable key Action·상단 스크롤 복원, desktop·501px 실제 확인 |
 | 2026-07-22 | [판매 주문 조회 Route 의미·단일책임 정렬](2026-07-22-sales-order-mobile-route-srp.md) | Web·모바일 영속 주문 목록·stable-ID 상세를 공용 읽기 Screen으로 통합하고 로컬 이행 Simulation을 별도 route로 분리, desktop·390px 실제 확인 |
 | 2026-07-22 | [마트 공개 상품 Route·공용 Screen 단일책임 분리](2026-07-22-mart-product-route-srp.md) | 목록·stable-ID 상세·후기·비구속 주문 요청을 Web·주문자 앱 공용 Screen과 독립 route로 분리하고 desktop·390px 실제 확인 |
 | 2026-07-22 | [피킹 작업 Route·공용 Screen 단일책임 분리](2026-07-22-picking-task-route-srp.md) | 목록·stable-key 상세·피킹 실행을 Web·창고 앱 공용 Screen과 독립 route로 분리하고 같은 Key 재조회, desktop·390px 실제 확인 |

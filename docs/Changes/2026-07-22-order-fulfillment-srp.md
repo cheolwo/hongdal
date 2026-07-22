@@ -1,5 +1,7 @@
 # 판매 주문 이행 페이지 단일책임 분리
 
+> 후속 상태: 이 기록은 한 route 내부의 component·ViewModel 책임을 먼저 나눈 시점의 이력이다. 이후 [판매 주문 이행 목표별 Route 단일책임 분리](2026-07-22-order-fulfillment-route-srp.md)에서 복합 탭을 허브·목록·상세·stable task Action·정책 route로 다시 분리했으며, 아래 화면은 변경 전 구조를 설명하는 역사적 증거로 보존한다.
+
 ## 변경 기록
 
 | 변경 축 | 화면 변경 여부 | 책임 경계 |

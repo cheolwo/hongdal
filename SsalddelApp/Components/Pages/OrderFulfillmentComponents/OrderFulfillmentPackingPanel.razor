@@ -4,8 +4,8 @@
 
 <MudPaper Elevation="0" Outlined="true" Class="packing-panel">
     <MudText Typo="Typo.overline">MANUAL PACKING COMMAND</MudText>
-    <MudText Typo="Typo.h6">포장 작업</MudText>
-    <MudText Typo="Typo.body2">피킹 완료 뒤 생성된 작업에서 시작과 완료를 각각 명시적으로 선택합니다.</MudText>
+    <MudText Typo="Typo.h6">포장 task 실행</MudText>
+    <MudText Typo="Typo.body2">주소로 선택한 정확한 task ID에서 시작과 완료를 각각 명시적으로 실행합니다.</MudText>
 
     @if (Packing.오류발생)
     {
@@ -16,44 +16,41 @@
         <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mt-3">@(Packing.최근결과메시지 ?? Packing.성공메시지)</MudAlert>
     }
 
-    @if (Tasks.Count == 0)
+    @if (SelectedTask is null)
     {
         <div class="packing-empty">
-            <MudIcon Icon="@Icons.Material.Filled.Inventory" Color="Color.Primary" Size="Size.Large" />
-            <MudText Typo="Typo.subtitle1">포장 작업이 없습니다.</MudText>
-            <MudText Typo="Typo.body2">모든 피킹 라인이 완료된 뒤 포장 작업이 표시됩니다.</MudText>
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Color="Color.Warning" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle1">포장 task를 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2">다른 task로 자동 대체하지 않았습니다. 목록에서 정확한 task를 다시 선택하세요.</MudText>
         </div>
     }
     else
     {
         <div class="packing-list">
-            @foreach (var task in Tasks.OrderByDescending(item => item.CreatedAt))
-            {
-                <article>
-                    <div class="packing-heading">
-                        <div>
-                            <strong>@task.ChannelOrderNo</strong>
-                            <span>@task.WarehouseName · @task.LineCount.ToString("N0")개 라인</span>
-                        </div>
-                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@task.Status</MudChip>
+            <article>
+                <div class="packing-heading">
+                    <div>
+                        <strong>@SelectedTask.ChannelOrderNo</strong>
+                        <span>@SelectedTask.WarehouseName · @SelectedTask.LineCount.ToString("N0")개 라인</span>
                     </div>
-                    <div class="packing-actions">
-                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary" Disabled="@(IsBusy || task.Status != WarehousePackingStatusCodes.ReadyForPacking)" OnClick="@(() => StartRequested.InvokeAsync(task.Id))">포장 시작</MudButton>
-                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Success" Disabled="@(IsBusy || task.Status != WarehousePackingStatusCodes.PackingInProgress)" OnClick="@(() => CompleteRequested.InvokeAsync(task.Id))">포장 완료</MudButton>
-                    </div>
-                </article>
-            }
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@SelectedTask.Status</MudChip>
+                </div>
+                <div class="packing-actions">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Disabled="@(IsBusy || SelectedTask.Status != WarehousePackingStatusCodes.ReadyForPacking)" OnClick="@(() => StartRequested.InvokeAsync(SelectedTask.Id))">포장 시작</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(IsBusy || SelectedTask.Status != WarehousePackingStatusCodes.PackingInProgress)" OnClick="@(() => CompleteRequested.InvokeAsync(SelectedTask.Id))">포장 완료</MudButton>
+                </div>
+            </article>
         </div>
     }
 
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-3">
-        수령인·주소는 포장 목록에 표시하지 않습니다. 포장 완료는 실제 출고·운송 인계를 자동 생성하지 않습니다.
+        수령인·주소는 포장 화면에 표시하지 않습니다. 이 Command는 주소의 task ID에 해당하는 Simulation 작업만 바꾸고 같은 ID를 다시 조회하며 실제 출고·운송 인계를 만들지 않습니다.
     </MudAlert>
 </MudPaper>
 
 @code {
-    [Parameter, EditorRequired]
-    public IReadOnlyList<WarehousePackingTask> Tasks { get; set; } = [];
+    [Parameter]
+    public WarehousePackingTask? SelectedTask { get; set; }
 
     [Parameter, EditorRequired]
     public OrderFulfillmentPackingViewModel Packing { get; set; } = null!;

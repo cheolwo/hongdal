@@ -45,7 +45,7 @@
 | 운송 | 운송 업무 | `/shipper/transport` |
 | 운송 의뢰 | 의뢰 상세 | `/shipper/request/{RequestId}` |
 | 상품·판매채널 | 판매 주문 원장·상세 | `/shipper/sales/orders`, `/shipper/sales/orders/{OrderId}` |
-| 상품·판매채널 | 로컬 주문 이행 Simulation | `/shipper/sales/fulfillment` |
+| 상품·판매채널 | 로컬 주문 이행 허브·목표별 Simulation | `/shipper/sales/fulfillment`와 `/samples`, `/orders`, `/inventory`, `/picking`, `/packing`, `/restock-policy` 하위 route |
 | 마트 주문 | 피킹·포장 | `/mart/picking` |
 | 운송 원장 | 이벤트·증빙·정산 | `/transports/{RequestId}/events`, `/proofs`, `/settlement` |
 
@@ -94,9 +94,18 @@
 | `SsalddelApp-P05-3 - 창고 프로세스별 작업 시작` | `/shipper/warehouse/work/{ProcessCode}` | `SsalddelApp/Components/Pages/WarehouseWorkStart.razor` | 확장 | 창고 프로세스별 작업 시작 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P05-3.png" alt="SsalddelApp-P05-3" width="160"> |
 | `SsalddelApp-P06 - 판매채널 연결/관리` | `/shipper/sales/channels` | `SsalddelApp/Components/Pages/SalesChannels.razor` | 확장 | 판매채널 연결/관리 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P06.png" alt="SsalddelApp-P06" width="160"> |
 | `SsalddelApp-P06-1 - 상품 등록/리스팅` | `/shipper/sales/listings` | `SsalddelApp/Components/Pages/ProductListings.razor` | 확장 | 상품 등록/리스팅 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P06-1.png" alt="SsalddelApp-P06-1" width="160"> |
-| `SsalddelApp-P06-2 - 판매 주문 이행 Simulation` | `/shipper/sales/fulfillment` | `SsalddelApp/Components/Pages/OrderFulfillment.razor` | 개발·확장 | 로컬 주문·재고·피킹·포장·알림 정책 Simulation | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P06-2.png" alt="SsalddelApp-P06-2" width="160"> |
+| `SsalddelApp-P06-2 - 판매 주문 이행 Simulation 허브` | `/shipper/sales/fulfillment` | `SsalddelApp/Components/Pages/OrderFulfillment.razor` | 개발·확장 | 상태 변경 없는 로컬 주문 이행 목표 탐색 | - | 실제 desktop·501px 확인<br><img src="../assets/changes/2026-07-22-order-fulfillment-route-srp/fulfillment-hub-mobile-501.png" alt="SsalddelApp-P06-2" width="160"> |
 | `SsalddelApp-P06-2-1 - 판매 주문 원장 목록` | `/shipper/sales/orders` | `SsalddelApp/Components/Pages/SalesOrders.razor` | 확장 | 영속 판매 주문 검색·필터·페이지 조회 | - | 공용 Screen Web host 확인<br><img src="../assets/changes/2026-07-22-sales-order-mobile-route-srp/sales-orders-desktop.png" alt="SsalddelApp-P06-2-1 공용 Screen" width="160"> |
 | `SsalddelApp-P06-2-2 - 판매 주문 원장 상세` | `/shipper/sales/orders/{OrderId}` | `SsalddelApp/Components/Pages/SalesOrderDetail.razor` | 확장 | stable order ID의 주문·출고 투영 읽기 | - | 공용 Screen Web host 390px 확인<br><img src="../assets/changes/2026-07-22-sales-order-mobile-route-srp/sales-order-detail-mobile.png" alt="SsalddelApp-P06-2-2 공용 Screen" width="160"> |
+| `SsalddelApp-P06-2-3 - Simulation 샘플 반영` | `/shipper/sales/fulfillment/samples` | `SsalddelApp/Components/Pages/OrderFulfillmentSamples.razor` | 개발·확장 | 외부 수집 없는 비식별 로컬 샘플 준비 | - | route·build 확인 |
+| `SsalddelApp-P06-2-4 - Simulation 주문 목록` | `/shipper/sales/fulfillment/orders` | `SsalddelApp/Components/Pages/OrderFulfillmentOrders.razor` | 개발·확장 | 로컬 주문 후보 검색·필터 | - | 실제 desktop·501px 확인<br><img src="../assets/changes/2026-07-22-order-fulfillment-route-srp/simulation-orders-mobile-501.png" alt="SsalddelApp-P06-2-4" width="160"> |
+| `SsalddelApp-P06-2-4-1 - Simulation 주문 상세` | `/shipper/sales/fulfillment/orders/{OrderKey}` | `SsalddelApp/Components/Pages/OrderFulfillmentOrderDetail.razor` | 개발·확장 | opaque stable 주문 key 한 건 조회 | - | route·build 확인 |
+| `SsalddelApp-P06-2-5 - 재고·입고 신호` | `/shipper/sales/fulfillment/inventory` | `SsalddelApp/Components/Pages/OrderFulfillmentInventory.razor` | 개발·확장 | 로컬 재고 snapshot과 입고 검토 신호 조회 | - | route·build 확인 |
+| `SsalddelApp-P06-2-6 - 피킹 task 목록` | `/shipper/sales/fulfillment/picking` | `SsalddelApp/Components/Pages/OrderFulfillmentPicking.razor` | 개발·확장 | 피킹 task 목록과 stable ID 선택 | - | route·build 확인 |
+| `SsalddelApp-P06-2-6-1 - 피킹 task Action` | `/shipper/sales/fulfillment/picking/{TaskId}` | `SsalddelApp/Components/Pages/OrderFulfillmentPickingTask.razor` | 개발·확장 | 정확한 task의 로컬 스캔·보류·취소 | - | route·build 확인 |
+| `SsalddelApp-P06-2-7 - 포장 task 목록` | `/shipper/sales/fulfillment/packing` | `SsalddelApp/Components/Pages/OrderFulfillmentPacking.razor` | 개발·확장 | 포장 task 목록과 stable ID 선택 | - | route·build 확인 |
+| `SsalddelApp-P06-2-7-1 - 포장 task Action` | `/shipper/sales/fulfillment/packing/{TaskId}` | `SsalddelApp/Components/Pages/OrderFulfillmentPackingTask.razor` | 개발·확장 | 정확한 task의 로컬 시작·완료 | - | route·build 확인 |
+| `SsalddelApp-P06-2-8 - 입고 알림 정책` | `/shipper/sales/fulfillment/restock-policy` | `SsalddelApp/Components/Pages/OrderFulfillmentRestockPolicy.razor` | 개발·확장 | 판매자별 로컬 동의·발송 의도 편집 | - | route·build 확인 |
 | `SsalddelApp-P07 - FCL/LCL 해외 물류 계획` | `/shipper/international/fcl-lcl` | `SsalddelApp/Components/Pages/FclLclPlanner.razor` | 확장 | FCL/LCL 해외 물류 계획 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P07.png" alt="SsalddelApp-P07" width="160"> |
 | `SsalddelApp-P07-1 - HS 코드/통관 검토` | `/shipper/customs/hs-reviews` | `SsalddelApp/Components/Pages/CustomsHsReviews.razor` | 확장 | HS 코드/통관 검토 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P07-1.png" alt="SsalddelApp-P07-1" width="160"> |
 | `SsalddelApp-P08 - 재위탁/재운송 주문` | `/shipper/reconsignment/orders` | `SsalddelApp/Components/Pages/ReconsignmentOrders.razor` | 확장 | 재위탁/재운송 주문 | - | 완료<br><img src="assets/app-pages/SsalddelApp/SsalddelApp-P08.png" alt="SsalddelApp-P08" width="160"> |

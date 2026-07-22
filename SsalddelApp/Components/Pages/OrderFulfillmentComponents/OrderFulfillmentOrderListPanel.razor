@@ -57,7 +57,7 @@
         <div class="order-list-items">
             @foreach (var order in Read.필터된주문목록)
             {
-                <article class="order-list-item @(Read.선택주문Key == order.Key ? "order-list-item--selected" : null)">
+                <article class="order-list-item">
                     <div class="order-list-item-heading">
                         <div>
                             <strong>@order.채널주문번호</strong>
@@ -71,10 +71,10 @@
                         <div><dt>창고</dt><dd>@order.창고수.ToString("N0")곳</dd></div>
                         <div><dt>기준</dt><dd>@OrderFulfillmentPresentation.DateLabel(order.생성시각)</dd></div>
                     </dl>
-                    <MudButton Variant="@(Read.선택주문Key == order.Key ? Variant.Filled : Variant.Outlined)"
+                    <MudButton Variant="Variant.Outlined"
                                Color="Color.Primary"
                                Size="Size.Small"
-                               OnClick="@(() => Read.주문선택(order.Key))">
+                               Href="@DetailHref(order)">
                         정확한 주문 보기
                     </MudButton>
                 </article>
@@ -86,4 +86,7 @@
 @code {
     [Parameter, EditorRequired]
     public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Func<OrderFulfillmentOrderSummary, string> DetailHref { get; set; } = null!;
 }

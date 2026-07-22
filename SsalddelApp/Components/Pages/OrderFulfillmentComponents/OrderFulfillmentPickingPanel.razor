@@ -4,8 +4,8 @@
 
 <MudPaper Elevation="0" Outlined="true" Class="picking-panel">
     <MudText Typo="Typo.overline">MANUAL PICKING COMMAND</MudText>
-    <MudText Typo="Typo.h6">피킹 작업</MudText>
-    <MudText Typo="Typo.body2">작업을 직접 선택한 뒤 적재함과 상품 바코드를 순서대로 반영합니다.</MudText>
+    <MudText Typo="Typo.h6">피킹 task 실행</MudText>
+    <MudText Typo="Typo.body2">주소로 선택한 정확한 task ID에 적재함과 상품 바코드를 순서대로 반영합니다.</MudText>
 
     @if (Picking.오류발생)
     {
@@ -27,12 +27,6 @@
     else
     {
         <div class="picking-inputs">
-            <MudSelect T="long?" @bind-Value="Picking.선택작업Id" Label="피킹 작업 직접 선택" Variant="Variant.Outlined" Clearable="true">
-                @foreach (var task in Picking.작업목록.OrderByDescending(item => item.CreatedAt))
-                {
-                    <MudSelectItem T="long?" Value="@task.Id">@task.ChannelOrderNo · @task.Status · @task.PickedLineCount/@task.TotalLineCount</MudSelectItem>
-                }
-            </MudSelect>
             <MudTextField T="string" @bind-Value="Picking.스캔바코드" Label="바코드" Variant="Variant.Outlined" Placeholder="BIN:A-01-03 또는 SKU:..." Immediate="true" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!Picking.스캔가능 || IsBusy)" OnClick="ScanRequested">스캔 반영</MudButton>
         </div>
@@ -80,7 +74,7 @@
     }
 
     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-3">
-        수령인·주소는 피킹 화면에 표시하지 않습니다. 이 Command는 Simulation 작업 상태만 바꾸며 실제 재고와 출고를 확정하지 않습니다.
+        수령인·주소는 피킹 화면에 표시하지 않습니다. 이 Command는 주소의 task ID에 해당하는 Simulation 작업만 바꾸고 같은 ID를 다시 조회하며 실제 재고와 출고를 확정하지 않습니다.
     </MudAlert>
 </MudPaper>
 

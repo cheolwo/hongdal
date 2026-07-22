@@ -217,6 +217,9 @@ public sealed class OrderFulfillmentReadViewModel(
         }
     }
 
+    public void 주문선택(string channelType, string channelOrderNo)
+        => 주문선택(CreateOrderKey(channelType, channelOrderNo));
+
     public void 선택해제() => 선택주문Key = null;
 
     public void 필터초기화()

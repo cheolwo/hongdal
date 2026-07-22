@@ -1,61 +1,31 @@
 @page "/shipper/sales/fulfillment"
 @inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
 
-<PageTitle>주문 출고 알림</PageTitle>
+<PageTitle>판매 주문 이행 Simulation 허브</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
-    <section class="order-fulfillment-shell" aria-label="판매 주문 이행 Simulation 작업공간">
-        <OrderFulfillmentHeader Read="@Read"
-                                Simulation="@Simulation"
-                                IsBusy="@ViewModel.처리중"
-                                RefreshRequested="RefreshAsync"
-                                SimulationRequested="RunSimulationAsync" />
+<OrderFulfillmentRouteFrame Title="판매 주문 이행 Simulation"
+                            Description="한 화면의 복합 탭 대신 주문, 재고, 피킹, 포장과 알림 정책을 목표별 화면으로 엽니다."
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAsync">
+    <OrderFulfillmentSummary Read="@Read" />
 
-        @if (!Read.초기화됨)
+    <nav class="order-fulfillment-destinations" aria-label="판매 주문 이행 세부 화면">
+        @foreach (var destination in Destinations)
         {
-            <OrderFulfillmentLoadState Read="@Read"
-                                       RetryRequested="RefreshAsync" />
+            <MudPaper Elevation="0" Outlined="true" Class="order-fulfillment-destination">
+                <MudIcon Icon="@destination.Icon" Color="@destination.Color" Size="Size.Large" />
+                <div>
+                    <MudText Typo="Typo.h6">@destination.Title</MudText>
+                    <MudText Typo="Typo.body2">@destination.Description</MudText>
+                </div>
+                <MudButton Variant="Variant.Outlined"
+                           Color="@destination.Color"
+                           EndIcon="@Icons.Material.Filled.ChevronRight"
+                           Href="@destination.Href">
+                    화면 열기
+                </MudButton>
+            </MudPaper>
         }
-        else
-        {
-            @if (Read.처리중)
-            {
-                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
-            }
-
-            <OrderFulfillmentSummary Read="@Read" />
-
-            <MudTabs Elevation="0" Outlined="true" Rounded="true" Class="order-fulfillment-tabs">
-                <MudTabPanel Text="주문 후보" Icon="@Icons.Material.Filled.ReceiptLong">
-                    <div class="order-fulfillment-primary-grid">
-                        <OrderFulfillmentOrderListPanel Read="@Read" />
-                        <OrderFulfillmentOrderDetailPanel Read="@Read" />
-                    </div>
-                </MudTabPanel>
-                <MudTabPanel Text="재고·입고" Icon="@Icons.Material.Filled.Inventory2">
-                    <OrderFulfillmentInventoryPanel Read="@Read" />
-                </MudTabPanel>
-                <MudTabPanel Text="피킹·포장" Icon="@Icons.Material.Filled.QrCodeScanner">
-                    <div class="order-fulfillment-operation-grid">
-                        <OrderFulfillmentPickingPanel Picking="@Picking"
-                                                      IsBusy="@ViewModel.처리중"
-                                                      ScanRequested="ScanPickingAsync"
-                                                      HoldRequested="HoldPickingAsync"
-                                                      CancelRequested="CancelPickingAsync" />
-                        <OrderFulfillmentPackingPanel Tasks="@Read.스냅샷.포장작업"
-                                                      Packing="@Packing"
-                                                      IsBusy="@ViewModel.처리중"
-                                                      StartRequested="StartPackingAsync"
-                                                      CompleteRequested="CompletePackingAsync" />
-                    </div>
-                </MudTabPanel>
-                <MudTabPanel Text="알림 정책" Icon="@Icons.Material.Filled.NotificationsActive">
-                    <OrderFulfillmentRestockPolicyPanel Read="@Read"
-                                                        Policy="@RestockPolicy"
-                                                        IsBusy="@ViewModel.처리중"
-                                                        UpdateRequested="UpdateRestockPolicyAsync" />
-                </MudTabPanel>
-            </MudTabs>
-        }
-    </section>
-</MudContainer>
+    </nav>
+</OrderFulfillmentRouteFrame>

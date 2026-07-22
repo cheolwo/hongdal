@@ -1,0 +1,124 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.ViewModels.Shipper
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-6">
+    <section class="order-fulfillment-route" aria-label="@Title">
+        <header class="order-fulfillment-route-header">
+            <div>
+                <MudText Typo="Typo.overline">@Eyebrow</MudText>
+                <MudText Typo="Typo.h4" HtmlTag="h1">@Title</MudText>
+                <MudText Typo="Typo.body2">@Description</MudText>
+            </div>
+            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1" Class="order-fulfillment-route-actions">
+                @if (!string.IsNullOrWhiteSpace(BackHref))
+                {
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.ArrowBack"
+                               Href="@BackHref"
+                               Class="order-fulfillment-route-action">
+                        @BackLabel
+                    </MudButton>
+                }
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@IsBusy"
+                           OnClick="RefreshRequested"
+                           Class="order-fulfillment-route-action">
+                    새로고침
+                </MudButton>
+            </MudStack>
+        </header>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+            이 화면의 변경은 <strong>로컬 메모리 Simulation</strong>에만 남습니다. 외부 주문 수집, 실제 재고 예약·차감, 카카오톡 발송, 출고·운송·결제·정산을 실행하지 않습니다.
+        </MudAlert>
+
+        @if (Read.초기화됨 && Read.오류발생)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                최신 상태를 불러오지 못해 직전 Simulation 화면을 유지합니다. @Read.오류메시지
+            </MudAlert>
+        }
+
+        @if (!Read.초기화됨)
+        {
+            <OrderFulfillmentLoadState Read="@Read"
+                                       RetryRequested="RefreshRequested" />
+        }
+        else
+        {
+            @if (Read.처리중)
+            {
+                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            }
+
+            @ChildContent
+        }
+    </section>
+</MudContainer>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Eyebrow { get; set; } = "SHIPPER · SALES · SIMULATION";
+
+    [Parameter]
+    public string? BackHref { get; set; }
+
+    [Parameter]
+    public string BackLabel { get; set; } = "이행 허브로";
+
+    [Parameter, EditorRequired]
+    public OrderFulfillmentReadViewModel Read { get; set; } = null!;
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback RefreshRequested { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private IJSObjectReference? navigationModule;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        navigationModule = await JS.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/Ssalddel.Ui.Common/js/pageNavigation.js");
+        await navigationModule.InvokeVoidAsync("scrollToPageTop");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (navigationModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await navigationModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // 앱 종료 중에는 JS module 정리 실패를 무시합니다.
+        }
+    }
+}

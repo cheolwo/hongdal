@@ -1,34 +1,97 @@
+using Ssalddel.Contracts.Common.Sales;
+
 namespace Ssalddel.Tests.Architecture;
 
 public sealed class OrderFulfillmentPageCompositionTests
 {
     [Fact]
-    public void 판매주문이행_라우트는_상태영역과_workflow만_조립한다()
+    public void 판매주문이행_root는_Command탭이아닌_목표별허브다()
     {
-        var pagePath = Path.Combine(FindRepositoryRoot(), "SsalddelApp", "Components", "Pages", "OrderFulfillment.razor");
-        var source = File.ReadAllText(pagePath);
+        var source = ReadPage("OrderFulfillment.razor");
+        var navigation = Read("SsalddelApp", "Components", "Layout", "NavMenu.razor");
 
-        Assert.True(File.ReadLines(pagePath).Count() <= 80);
-        Assert.Contains("<OrderFulfillmentHeader", source);
-        Assert.Contains("<OrderFulfillmentLoadState", source);
+        Assert.Contains($"@page \"{OrderFulfillmentSimulationPageRoutes.Root}\"", source);
+        Assert.Contains("<OrderFulfillmentRouteFrame", source);
         Assert.Contains("<OrderFulfillmentSummary", source);
-        Assert.Contains("<OrderFulfillmentOrderListPanel", source);
-        Assert.Contains("<OrderFulfillmentOrderDetailPanel", source);
-        Assert.Contains("<OrderFulfillmentInventoryPanel", source);
-        Assert.Contains("<OrderFulfillmentPickingPanel", source);
-        Assert.Contains("<OrderFulfillmentPackingPanel", source);
-        Assert.Contains("<OrderFulfillmentRestockPolicyPanel", source);
-        Assert.DoesNotContain("<MudTable", source);
+        Assert.Contains("Destinations", source);
+        Assert.DoesNotContain("<MudTabs", source);
+        Assert.DoesNotContain("<OrderFulfillmentPickingPanel", source);
+        Assert.DoesNotContain("<OrderFulfillmentPackingPanel", source);
+        Assert.DoesNotContain("<OrderFulfillmentRestockPolicyPanel", source);
         Assert.DoesNotContain("ICommerceOrderFulfillmentService", source);
-        Assert.DoesNotContain("ICommerceOrderSampleFeedService", source);
-        Assert.DoesNotContain("@code", source);
+        Assert.Contains("주문 이행 Simulation", navigation);
+        Assert.Contains("ShipperRoutes.OrderFulfillment", navigation);
+    }
+
+    [Theory]
+    [InlineData("OrderFulfillmentSamples.razor", OrderFulfillmentSimulationPageRoutes.Samples, "샘플 주문 반영")]
+    [InlineData("OrderFulfillmentOrders.razor", OrderFulfillmentSimulationPageRoutes.Orders, "<OrderFulfillmentOrderListPanel")]
+    [InlineData("OrderFulfillmentOrderDetail.razor", OrderFulfillmentSimulationPageRoutes.OrderDetailTemplate, "<OrderFulfillmentOrderDetailPanel")]
+    [InlineData("OrderFulfillmentInventory.razor", OrderFulfillmentSimulationPageRoutes.Inventory, "<OrderFulfillmentInventoryPanel")]
+    [InlineData("OrderFulfillmentPicking.razor", OrderFulfillmentSimulationPageRoutes.Picking, "<OrderFulfillmentPickingListPanel")]
+    [InlineData("OrderFulfillmentPickingTask.razor", OrderFulfillmentSimulationPageRoutes.PickingTaskTemplate, "<OrderFulfillmentPickingPanel")]
+    [InlineData("OrderFulfillmentPacking.razor", OrderFulfillmentSimulationPageRoutes.Packing, "<OrderFulfillmentPackingListPanel")]
+    [InlineData("OrderFulfillmentPackingTask.razor", OrderFulfillmentSimulationPageRoutes.PackingTaskTemplate, "<OrderFulfillmentPackingPanel")]
+    [InlineData("OrderFulfillmentRestockPolicy.razor", OrderFulfillmentSimulationPageRoutes.RestockPolicy, "<OrderFulfillmentRestockPolicyPanel")]
+    public void 사용자목표는_각각_독립RoutePage를가진다(string fileName, string route, string expectedScreen)
+    {
+        var source = ReadPage(fileName);
+
+        Assert.Contains($"@page \"{route}\"", source);
+        Assert.Contains("<OrderFulfillmentRouteFrame", source);
+        Assert.Contains(expectedScreen, source);
+        Assert.DoesNotContain("<MudTabs", source);
+    }
+
+    [Fact]
+    public void 피킹과포장Command는_stableTaskId화면에서만_같은원장을재조회한다()
+    {
+        var pickingPage = ReadPage("OrderFulfillmentPickingTask.razor.cs");
+        var packingPage = ReadPage("OrderFulfillmentPackingTask.razor.cs");
+        var pickingPanel = ReadComponent("OrderFulfillmentPickingPanel.razor");
+        var packingPanel = ReadComponent("OrderFulfillmentPackingPanel.razor");
+        var viewModels = Read(
+            "SsalddelApp",
+            "ViewModels",
+            "Shipper",
+            "OrderFulfillmentPageViewModels.cs");
+
+        Assert.Contains("Picking.선택작업Id = TaskId", pickingPage);
+        Assert.Contains("OnParametersSetAsync", pickingPage);
+        Assert.Contains("ViewModel.피킹스캔Async", pickingPage);
+        Assert.Contains("item.Id == TaskId", packingPage);
+        Assert.Contains("OnParametersSetAsync", packingPage);
+        Assert.Contains("ViewModel.포장시작Async", packingPage);
+        Assert.DoesNotContain("<MudSelect", pickingPanel);
+        Assert.Contains("SelectedTask", packingPanel);
+        Assert.Contains("실행후새로고침Async", viewModels);
+        Assert.DoesNotContain("선택작업Id ??=", viewModels);
+    }
+
+    [Fact]
+    public void Simulation주문목록은_stableKey상세와_필터복귀문맥을사용한다()
+    {
+        var listPage = ReadPage("OrderFulfillmentOrders.razor.cs");
+        var detailPage = ReadPage("OrderFulfillmentOrderDetail.razor.cs");
+        var listPanel = ReadComponent("OrderFulfillmentOrderListPanel.razor");
+
+        Assert.Contains("FulfillmentOrderNavigationContext.Parse", listPage);
+        Assert.Contains(".DetailPath(order.채널종류, order.채널주문번호)", listPage);
+        Assert.Contains("TryDecodeOrderKey", detailPage);
+        Assert.Contains("OnParametersSetAsync", detailPage);
+        Assert.Contains("Read.주문선택(ChannelType, ChannelOrderNo)", detailPage);
+        Assert.Contains("Href=\"@DetailHref(order)\"", listPanel);
+        Assert.DoesNotContain("Read.주문선택(order.Key)", listPanel);
     }
 
     [Fact]
     public void 판매주문이행_조회와_Command는_독립_ViewModel로_분리한다()
     {
-        var path = Path.Combine(FindRepositoryRoot(), "SsalddelApp", "ViewModels", "Shipper", "OrderFulfillmentPageViewModels.cs");
-        var source = File.ReadAllText(path);
+        var source = Read(
+            "SsalddelApp",
+            "ViewModels",
+            "Shipper",
+            "OrderFulfillmentPageViewModels.cs");
 
         Assert.Contains("class OrderFulfillmentReadViewModel", source);
         Assert.Contains("class OrderFulfillmentSimulationViewModel", source);
@@ -37,28 +100,21 @@ public sealed class OrderFulfillmentPageCompositionTests
         Assert.Contains("class OrderFulfillmentPackingViewModel", source);
         Assert.Contains("class OrderFulfillmentPageViewModel", source);
         Assert.Contains("Task.WhenAll", source);
-        Assert.DoesNotContain("선택작업Id ??=", source);
     }
 
     [Theory]
-    [InlineData("OrderFulfillmentHeader.razor")]
-    [InlineData("OrderFulfillmentHeader.razor.css")]
+    [InlineData("OrderFulfillmentRouteFrame.razor")]
+    [InlineData("OrderFulfillmentRouteFrame.razor.css")]
     [InlineData("OrderFulfillmentLoadState.razor")]
-    [InlineData("OrderFulfillmentLoadState.razor.css")]
     [InlineData("OrderFulfillmentSummary.razor")]
-    [InlineData("OrderFulfillmentSummary.razor.css")]
     [InlineData("OrderFulfillmentOrderListPanel.razor")]
-    [InlineData("OrderFulfillmentOrderListPanel.razor.css")]
     [InlineData("OrderFulfillmentOrderDetailPanel.razor")]
-    [InlineData("OrderFulfillmentOrderDetailPanel.razor.css")]
     [InlineData("OrderFulfillmentInventoryPanel.razor")]
-    [InlineData("OrderFulfillmentInventoryPanel.razor.css")]
+    [InlineData("OrderFulfillmentPickingListPanel.razor")]
     [InlineData("OrderFulfillmentPickingPanel.razor")]
-    [InlineData("OrderFulfillmentPickingPanel.razor.css")]
+    [InlineData("OrderFulfillmentPackingListPanel.razor")]
     [InlineData("OrderFulfillmentPackingPanel.razor")]
-    [InlineData("OrderFulfillmentPackingPanel.razor.css")]
     [InlineData("OrderFulfillmentRestockPolicyPanel.razor")]
-    [InlineData("OrderFulfillmentRestockPolicyPanel.razor.css")]
     [InlineData("OrderFulfillmentPresentation.cs")]
     public void 판매주문이행_화면책임은_전용파일로_존재한다(string fileName)
     {
@@ -71,49 +127,60 @@ public sealed class OrderFulfillmentPageCompositionTests
     [Fact]
     public void Simulation_경계와_개인정보_비노출을_화면에_고정한다()
     {
+        var frame = ReadComponent("OrderFulfillmentRouteFrame.razor");
+        var picking = ReadComponent("OrderFulfillmentPickingPanel.razor");
+        var packing = ReadComponent("OrderFulfillmentPackingPanel.razor");
+        var navigationScript = Read("Ssalddel.Ui.Common", "wwwroot", "js", "pageNavigation.js");
         var directory = FindComponentDirectory();
-        var header = File.ReadAllText(Path.Combine(directory, "OrderFulfillmentHeader.razor"));
-        var picking = File.ReadAllText(Path.Combine(directory, "OrderFulfillmentPickingPanel.razor"));
-        var packing = File.ReadAllText(Path.Combine(directory, "OrderFulfillmentPackingPanel.razor"));
         var visibleComponents = string.Join('\n', Directory.GetFiles(directory, "*.razor").Select(File.ReadAllText));
 
-        Assert.Contains("로컬 메모리 Simulation", header);
-        Assert.Contains("외부 주문 수집", header);
-        Assert.Contains("실제 재고 예약·차감", header);
+        Assert.Contains("로컬 메모리 Simulation", frame);
+        Assert.Contains("외부 주문 수집", frame);
+        Assert.Contains("실제 재고 예약·차감", frame);
+        Assert.Contains("HtmlTag=\"h1\"", frame);
+        Assert.Contains("scrollToPageTop", frame);
+        Assert.Contains("export function scrollToPageTop", navigationScript);
         Assert.Contains("수령인·주소는 피킹 화면에 표시하지 않습니다", picking);
-        Assert.Contains("수령인·주소는 포장 목록에 표시하지 않습니다", packing);
+        Assert.Contains("수령인·주소는 포장 화면에 표시하지 않습니다", packing);
         Assert.DoesNotContain("RecipientName", visibleComponents);
         Assert.DoesNotContain("RecipientAddress", visibleComponents);
     }
 
     [Fact]
-    public void 판매주문이행_화면은_좁은폭에서_단일열로_전환한다()
+    public void 모바일화면은_단일열과_48px주행동을_고정한다()
     {
-        var pages = Path.Combine(FindRepositoryRoot(), "SsalddelApp", "Components", "Pages");
-        var rootCss = File.ReadAllText(Path.Combine(pages, "OrderFulfillment.razor.css"));
-        var listCss = File.ReadAllText(Path.Combine(FindComponentDirectory(), "OrderFulfillmentOrderListPanel.razor.css"));
-        var pickingCss = File.ReadAllText(Path.Combine(FindComponentDirectory(), "OrderFulfillmentPickingPanel.razor.css"));
+        var rootCss = ReadPage("OrderFulfillment.razor.css");
+        var frameCss = ReadComponent("OrderFulfillmentRouteFrame.razor.css");
+        var pickingCss = ReadComponent("OrderFulfillmentPickingPanel.razor.css");
+        var packingCss = ReadComponent("OrderFulfillmentPackingPanel.razor.css");
 
-        Assert.Contains("grid-template-columns: minmax(0, 1fr)", rootCss);
-        Assert.Contains(".order-fulfillment-shell > *", rootCss);
         Assert.Contains("@media (max-width: 720px)", rootCss);
-        Assert.Contains("grid-template-columns: 1fr", rootCss);
-        Assert.Contains("@media (max-width: 720px)", listCss);
-        Assert.Contains("grid-template-columns: 1fr", listCss);
-        Assert.Contains("@media (max-width: 720px)", pickingCss);
+        Assert.Contains("grid-template-columns: minmax(0, 1fr)", rootCss);
+        Assert.Contains("@media (max-width: 720px)", frameCss);
+        Assert.Contains("min-height: 48px", frameCss);
         Assert.Contains("grid-template-columns: 1fr", pickingCss);
+        Assert.Contains("min-height: 48px", pickingCss);
+        Assert.Contains("min-height: 48px", packingCss);
     }
 
     [Fact]
     public void 판매주문이행_PageViewModel은_DI에_명시적으로_등록한다()
     {
-        var modulePath = Path.Combine(FindRepositoryRoot(), "SsalddelApp", "Services", "ShipperSalesModule.cs");
-        var source = File.ReadAllText(modulePath);
+        var source = Read("SsalddelApp", "Services", "ShipperSalesModule.cs");
 
         Assert.Contains("AddTransient<OrderFulfillmentReadViewModel>", source);
         Assert.Contains("AddTransient<OrderFulfillmentSimulationViewModel>", source);
         Assert.Contains("AddTransient<OrderFulfillmentPageViewModel>", source);
     }
+
+    private static string ReadPage(string fileName)
+        => Read("SsalddelApp", "Components", "Pages", fileName);
+
+    private static string ReadComponent(string fileName)
+        => File.ReadAllText(Path.Combine(FindComponentDirectory(), fileName));
+
+    private static string Read(params string[] segments)
+        => File.ReadAllText(Path.Combine([FindRepositoryRoot(), .. segments]));
 
     private static string FindComponentDirectory()
         => Path.Combine(

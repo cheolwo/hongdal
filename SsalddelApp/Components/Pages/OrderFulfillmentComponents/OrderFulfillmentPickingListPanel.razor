@@ -1,0 +1,46 @@
+@namespace SsalddelApp.Components.Pages
+@using SsalddelApp.Services.Warehouse.Fulfillment
+
+<MudPaper Elevation="0" Outlined="true" Class="fulfillment-task-list-panel">
+    <div class="fulfillment-task-list-heading">
+        <div>
+            <MudText Typo="Typo.overline">STABLE TASK ID</MudText>
+            <MudText Typo="Typo.h6">피킹 task 목록</MudText>
+            <MudText Typo="Typo.body2">명령은 이 목록이 아니라 정확한 task ID 화면에서 실행합니다.</MudText>
+        </div>
+        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@Tasks.Count.ToString("N0")건</MudChip>
+    </div>
+
+    @if (Tasks.Count == 0)
+    {
+        <div class="fulfillment-task-list-empty">
+            <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.subtitle1">피킹 task가 없습니다.</MudText>
+            <MudText Typo="Typo.body2">출고 가능한 샘플 주문을 반영하면 로컬 task가 생성됩니다.</MudText>
+        </div>
+    }
+    else
+    {
+        <div class="fulfillment-task-list">
+            @foreach (var task in Tasks.OrderByDescending(item => item.CreatedAt))
+            {
+                <article>
+                    <div>
+                        <strong>@task.ChannelOrderNo</strong>
+                        <span>@task.WarehouseName · @task.PickedLineCount/@task.TotalLineCount 라인</span>
+                    </div>
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@task.Status</MudChip>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="@DetailHref(task.Id)">task 열기</MudButton>
+                </article>
+            }
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<WarehouseOrderPickingTask> Tasks { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public Func<long, string> DetailHref { get; set; } = null!;
+}

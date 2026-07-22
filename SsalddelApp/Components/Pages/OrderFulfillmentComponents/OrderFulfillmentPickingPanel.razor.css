@@ -13,7 +13,7 @@
 }
 
 .picking-inputs {
-    grid-template-columns: minmax(12rem, 1fr) minmax(12rem, 1fr) auto;
+    grid-template-columns: minmax(12rem, 1fr) auto;
 }
 
 .picking-exception {
@@ -79,6 +79,11 @@
 .picking-scan-state {
     display: flex;
     gap: .35rem;
+}
+
+.picking-inputs ::deep .mud-button-root,
+.picking-exception ::deep .mud-button-root {
+    min-height: 48px;
 }
 
 @media (max-width: 720px) {

@@ -1,0 +1,38 @@
+@page "/shipper/sales/fulfillment/samples"
+@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+
+<PageTitle>Simulation 샘플 주문 반영</PageTitle>
+
+<OrderFulfillmentRouteFrame Title="샘플 주문 반영"
+                            Description="외부 판매채널을 호출하지 않고 비식별 샘플 주문만 로컬 Simulation 원장에 반영합니다."
+                            BackHref="@OrderFulfillmentSimulationPageRoutes.Root"
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAsync">
+    <MudPaper Elevation="0" Outlined="true" Class="order-fulfillment-sample-action">
+        <MudIcon Icon="@Icons.Material.Filled.Science" Color="Color.Success" Size="Size.Large" />
+        <div>
+            <MudText Typo="Typo.h6">로컬 샘플 주문 준비</MudText>
+            <MudText Typo="Typo.body2">명시적으로 실행하면 샘플 feed의 주문만 `InMemoryShipperStore`에 반영하고 같은 원장을 다시 조회합니다.</MudText>
+        </div>
+
+        @if (Simulation.오류발생)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Simulation.오류메시지</MudAlert>
+        }
+        else if (Simulation.성공함)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                @Simulation.성공메시지 처리한 샘플 @Simulation.처리건수.ToString("N0")건을 같은 Simulation 원장에서 다시 조회했습니다.
+            </MudAlert>
+        }
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Science"
+                   Disabled="@ViewModel.처리중"
+                   OnClick="RunSimulationAsync">
+            @(Simulation.처리중 ? "샘플 반영 중" : "샘플 주문 반영")
+        </MudButton>
+    </MudPaper>
+</OrderFulfillmentRouteFrame>

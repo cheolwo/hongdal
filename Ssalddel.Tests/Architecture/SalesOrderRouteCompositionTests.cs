@@ -33,7 +33,7 @@ public sealed class SalesOrderRouteCompositionTests
         Assert.Contains($"@page \"{SalesOrderPageRoutes.FulfillmentRoot}\"", simulationPage);
         Assert.DoesNotContain($"@page \"{SalesOrderPageRoutes.Root}\"", simulationPage);
         Assert.Contains("SalesOrders = SalesOrderPageRoutes.Root", routes);
-        Assert.Contains("OrderFulfillment = SalesOrderPageRoutes.FulfillmentRoot", routes);
+        Assert.Contains("OrderFulfillment = OrderFulfillmentSimulationPageRoutes.Root", routes);
     }
 
     [Fact]

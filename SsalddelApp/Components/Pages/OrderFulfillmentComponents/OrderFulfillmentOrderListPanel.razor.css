@@ -32,11 +32,6 @@
     border-radius: .8rem;
 }
 
-.order-list-item--selected {
-    border-color: var(--mud-palette-primary);
-    background: color-mix(in srgb, var(--mud-palette-primary) 5%, var(--mud-palette-surface));
-}
-
 .order-list-item-heading strong,
 .order-list-item-heading span {
     display: block;
@@ -63,6 +58,10 @@
 .order-list-item dd {
     margin: .1rem 0 0;
     font-weight: 600;
+}
+
+.order-list-item ::deep .mud-button-root {
+    min-height: 48px;
 }
 
 .order-list-empty {

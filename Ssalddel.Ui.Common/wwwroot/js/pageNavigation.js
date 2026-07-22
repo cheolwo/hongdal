@@ -15,3 +15,17 @@ export function scrollToFocusTarget(targetId) {
     }
     return true;
 }
+
+export function scrollToPageTop() {
+    const mainContent = document.querySelector(".mud-main-content");
+    if (mainContent instanceof HTMLElement) {
+        mainContent.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+
+    if (document.scrollingElement) {
+        document.scrollingElement.scrollTop = 0;
+        document.scrollingElement.scrollLeft = 0;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+}

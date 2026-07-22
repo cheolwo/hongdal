@@ -1,0 +1,18 @@
+@page "/shipper/sales/fulfillment/packing/{TaskId:long}"
+@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+
+<PageTitle>Simulation 포장 task #@TaskId</PageTitle>
+
+<OrderFulfillmentRouteFrame Title="@($"포장 task #{TaskId}")"
+                            Description="주소의 정확한 task ID에만 포장 시작·완료 Command를 적용합니다."
+                            BackHref="@OrderFulfillmentSimulationPageRoutes.Packing"
+                            BackLabel="포장 목록으로"
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAsync">
+    <OrderFulfillmentPackingPanel SelectedTask="@SelectedTask"
+                                  Packing="@Packing"
+                                  IsBusy="@ViewModel.처리중"
+                                  StartRequested="StartPackingAsync"
+                                  CompleteRequested="CompletePackingAsync" />
+</OrderFulfillmentRouteFrame>

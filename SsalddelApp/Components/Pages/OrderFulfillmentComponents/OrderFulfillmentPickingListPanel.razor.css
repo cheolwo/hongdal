@@ -1,0 +1,56 @@
+.fulfillment-task-list-panel {
+    min-width: 0;
+    padding: 1rem;
+}
+
+.fulfillment-task-list-heading,
+.fulfillment-task-list article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.fulfillment-task-list {
+    display: grid;
+    gap: .65rem;
+    margin-top: 1rem;
+}
+
+.fulfillment-task-list article {
+    padding: .8rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: .75rem;
+}
+
+.fulfillment-task-list strong,
+.fulfillment-task-list span {
+    display: block;
+}
+
+.fulfillment-task-list span {
+    color: var(--mud-palette-text-secondary);
+    font-size: .75rem;
+}
+
+.fulfillment-task-list-empty {
+    min-height: 18rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    text-align: center;
+}
+
+.fulfillment-task-list ::deep .mud-button-root {
+    min-height: 48px;
+}
+
+@media (max-width: 720px) {
+    .fulfillment-task-list-heading,
+    .fulfillment-task-list article {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,16 @@
+@page "/shipper/sales/fulfillment/restock-policy"
+@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+
+<PageTitle>Simulation 입고 알림 정책</PageTitle>
+
+<OrderFulfillmentRouteFrame Title="입고 알림 정책"
+                            Description="판매자별 관리자 허용·수신 동의·내부 알림과 로컬 발송 의도를 별도로 관리합니다."
+                            BackHref="@OrderFulfillmentSimulationPageRoutes.Root"
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAsync">
+    <OrderFulfillmentRestockPolicyPanel Read="@Read"
+                                        Policy="@RestockPolicy"
+                                        IsBusy="@ViewModel.처리중"
+                                        UpdateRequested="UpdateRestockPolicyAsync" />
+</OrderFulfillmentRouteFrame>

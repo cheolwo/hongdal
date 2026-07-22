@@ -1,0 +1,13 @@
+@page "/shipper/sales/fulfillment/inventory"
+@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+
+<PageTitle>Simulation 재고·입고 신호</PageTitle>
+
+<OrderFulfillmentRouteFrame Title="재고·입고 신호"
+                            Description="로컬 마켓 재고 snapshot과 입고 필요 검토 신호만 읽습니다."
+                            BackHref="@OrderFulfillmentSimulationPageRoutes.Root"
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAsync">
+    <OrderFulfillmentInventoryPanel Read="@Read" />
+</OrderFulfillmentRouteFrame>

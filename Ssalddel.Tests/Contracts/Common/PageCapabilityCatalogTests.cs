@@ -467,7 +467,7 @@ public sealed class PageCapabilityCatalogTests
     }
 
     [Fact]
-    public void 모바일_판매주문이행route는_조회원장과분리된Simulation이다()
+    public void 모바일_판매주문이행root는_상태를바꾸지않는목표허브다()
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.Shipper,
@@ -476,8 +476,33 @@ public sealed class PageCapabilityCatalogTests
 
         Assert.True(found);
         Assert.Equal("shipper-app-sales-fulfillment", capability.PageKey);
-        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
-        Assert.True(capability.HasExternalEffects);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.False(capability.HasExternalEffects);
+    }
+
+    [Theory]
+    [InlineData("/shipper/sales/fulfillment/orders/order-key", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/sales/fulfillment/inventory", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/sales/fulfillment/picking", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/sales/fulfillment/packing", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/shipper/sales/fulfillment/samples", PageInteractionBoundary.Simulation, true)]
+    [InlineData("/shipper/sales/fulfillment/picking/17", PageInteractionBoundary.Simulation, true)]
+    [InlineData("/shipper/sales/fulfillment/packing/23", PageInteractionBoundary.Simulation, true)]
+    [InlineData("/shipper/sales/fulfillment/restock-policy", PageInteractionBoundary.Simulation, true)]
+    public void 모바일_판매주문이행하위route는_조회와Command경계를분리한다(
+        string route,
+        PageInteractionBoundary boundary,
+        bool hasExternalEffects)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Shipper,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(boundary, capability.Boundary);
+        Assert.Equal(hasExternalEffects, capability.HasExternalEffects);
+        Assert.True(capability.RequiresAuthentication);
     }
 
     [Fact]

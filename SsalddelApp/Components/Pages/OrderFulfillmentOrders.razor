@@ -1,0 +1,14 @@
+@page "/shipper/sales/fulfillment/orders"
+@inherits MvvmComponentBase<OrderFulfillmentPageViewModel>
+
+<PageTitle>Simulation 주문 목록</PageTitle>
+
+<OrderFulfillmentRouteFrame Title="Simulation 주문 목록"
+                            Description="로컬 주문 후보를 검색하고 정확한 stable 주문 key 상세로 이동합니다."
+                            BackHref="@OrderFulfillmentSimulationPageRoutes.Root"
+                            Read="@Read"
+                            IsBusy="@ViewModel.처리중"
+                            RefreshRequested="RefreshAsync">
+    <OrderFulfillmentOrderListPanel Read="@Read"
+                                    DetailHref="OrderDetailHref" />
+</OrderFulfillmentRouteFrame>

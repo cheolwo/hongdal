@@ -168,6 +168,11 @@
             visibleItems.Add(new NavMenuItem(L.T("Nav.DispatchAddress"), ShipperRoutes.DispatchAddressForm, "local_shipping", "transport", 900));
             visibleItems.Add(new NavMenuItem("FCL/LCL 판단", ShipperRoutes.FclLclPlanner, "public", "transport", 905));
             visibleItems.Add(new NavMenuItem("창고 작업대", ShipperRoutes.WarehouseWorkspace, "warehouse", "warehouse", 910));
+            if (ProfileService.IsDomestic)
+            {
+                visibleItems.Add(new NavMenuItem("주문 이행 Simulation", ShipperRoutes.OrderFulfillment, "qr_code_scanner", "sales", 125));
+            }
+
             visibleItems.Add(new NavMenuItem(L.T("ProfileSettings.Nav"), ShipperRoutes.ProfileSettings, "person", "settings", 920));
         }
 
@@ -207,6 +212,7 @@
             ShipperRoutes.TransportWorkspace or ShipperRoutes.Request or ShipperRoutes.PublicCargo or ShipperRoutes.ExplorationInbox or ShipperRoutes.DispatchAddressForm or ShipperRoutes.CustomsHsReviews or ShipperRoutes.FclLclPlanner => "transport",
             ShipperRoutes.WarehouseWorkspace or ShipperRoutes.InboundDashboard or ShipperRoutes.InboundRequests or ShipperRoutes.WarehouseInventory or ShipperRoutes.ReconsignmentOrders or ShipperRoutes.WarehouseScan => "warehouse",
             ShipperRoutes.SalesChannels or ShipperRoutes.SalesPageComposer or ShipperRoutes.ProductListings or ShipperRoutes.SalesOrders or ShipperRoutes.OrderFulfillment => "sales",
+            _ when normalizedRoute.StartsWith($"{ShipperRoutes.OrderFulfillment}/", StringComparison.OrdinalIgnoreCase) => "sales",
             _ when normalizedRoute.StartsWith("/shipper/settings", StringComparison.OrdinalIgnoreCase) => "settings",
             _ => "primary"
         };
