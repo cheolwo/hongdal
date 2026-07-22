@@ -1,0 +1,32 @@
+.shipper-timeline {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.shipper-timeline__step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.shipper-timeline__content {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.shipper-timeline__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+@media (max-width: 720px) {
+    .shipper-timeline {
+        grid-template-columns: 1fr;
+    }
+}

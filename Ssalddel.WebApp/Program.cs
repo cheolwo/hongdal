@@ -41,6 +41,7 @@ builder.Services.AddScoped<운송의뢰자동저장Service>();
 builder.Services.AddScoped<커뮤니티화물글초안가져오기Service>();
 builder.Services.AddScoped<화주운송의뢰등록Service>();
 builder.Services.AddScoped<ShipperRequestAuthoringPageViewModel>();
+builder.Services.AddScoped<ShipperRequestDetailPageViewModel>();
 builder.Services.AddScoped<화주결제정산Service>();
 builder.Services.AddScoped<기사내정보Service>();
 builder.Services.AddScoped<기사정산Service>();

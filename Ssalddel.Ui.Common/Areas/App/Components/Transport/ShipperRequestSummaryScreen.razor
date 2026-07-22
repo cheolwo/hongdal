@@ -1,0 +1,121 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+
+<ShipperRequestDetailScreenFrame State="@State"
+                                 Context="@Context"
+                                 CurrentScreen="ShipperRequestDetailScreenKind.Summary"
+                                 Eyebrow="요약"
+                                 Title="운송 의뢰 요약"
+                                 Description="화물, 경로, 비용과 현재 상태를 한 번에 확인합니다."
+                                 HomeHref="@HomeHref"
+                                 NewRequestHref="@NewRequestHref"
+                                 LoginHref="@LoginHref"
+                                 RefreshRequested="RefreshRequested">
+    <EmptyContent>
+        <MudIcon Icon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Large" />
+        <MudText Typo="Typo.h6">의뢰 ID로 조회</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">등록 결과에 표시된 운송 의뢰 ID를 입력해 주세요.</MudText>
+        <div class="shipper-summary__lookup">
+            <MudTextField @bind-Value="State.LookupRequestId"
+                          Label="운송 의뢰 ID"
+                          Placeholder="예: HD-WEB-001"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Search"
+                       Disabled="@string.IsNullOrWhiteSpace(State.LookupRequestId)"
+                       OnClick="LookupAsync">
+                의뢰 조회
+            </MudButton>
+        </div>
+    </EmptyContent>
+    <ChildContent>
+        @if (State.Request is { } item)
+        {
+            <div class="shipper-summary">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__hero">
+                    <div>
+                        <MudText Typo="Typo.overline" Color="Color.Secondary">REQUEST ID</MudText>
+                        <MudText Typo="Typo.h5">@item.RequestId</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            @ShipperRequestDetailPresentation.Display(item.CargoType) · @ShipperRequestDetailPresentation.Display(item.TransportMethod) · @ShipperRequestDetailPresentation.Display(item.VehicleType)
+                        </MudText>
+                    </div>
+                    <MudChip T="string" Color="@ResolveStateColor(ShipperRequestDetailPresentation.ResolveOverallState(item))" Variant="Variant.Filled">
+                        @ShipperRequestDetailPresentation.ResolveOverallLabel(item)
+                    </MudChip>
+                </MudPaper>
+
+                <div class="shipper-summary__grid">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__card">
+                        <MudText Typo="Typo.h6">현재 상태</MudText>
+                        <dl>
+                            <div><dt>의뢰</dt><dd>@ShipperRequestDetailPresentation.Display(item.RequestStatus)</dd></div>
+                            <div><dt>배차</dt><dd>@ShipperRequestDetailPresentation.Display(item.DispatchStatus)</dd></div>
+                            <div><dt>결제</dt><dd>@ShipperRequestDetailPresentation.Display(item.PaymentStatus)</dd></div>
+                            <div><dt>정산</dt><dd>@ShipperRequestDetailPresentation.Display(item.SettlementStatus)</dd></div>
+                        </dl>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__card">
+                        <MudText Typo="Typo.h6">경로</MudText>
+                        <div class="shipper-summary__route">
+                            <span><MudIcon Icon="@Icons.Material.Filled.TripOrigin" Color="Color.Primary" Size="Size.Small" /> 상차</span>
+                            <strong>@ShipperRequestDetailPresentation.Display(item.PickupAddress)</strong>
+                            <span><MudIcon Icon="@Icons.Material.Filled.LocationOn" Color="Color.Secondary" Size="Size.Small" /> 하차</span>
+                            <strong>@ShipperRequestDetailPresentation.Display(item.DropoffAddress)</strong>
+                        </div>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__card">
+                        <MudText Typo="Typo.h6">비용·조건</MudText>
+                        <dl>
+                            <div><dt>결제 예정</dt><dd>@ShipperRequestDetailPresentation.Money(item.ExpectedPaymentAmount)</dd></div>
+                            <div><dt>최종 운임</dt><dd>@ShipperRequestDetailPresentation.Money(item.FinalFare)</dd></div>
+                            <div><dt>결제 수단</dt><dd>@ShipperRequestDetailPresentation.Display(item.PaymentMethod)</dd></div>
+                            <div><dt>정산 시점</dt><dd>@ShipperRequestDetailPresentation.Display(item.SettlementTiming)</dd></div>
+                        </dl>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-summary__card">
+                        <MudText Typo="Typo.h6">화물·등록</MudText>
+                        <dl>
+                            <div><dt>화물</dt><dd>@ShipperRequestDetailPresentation.Display(item.CargoType)</dd></div>
+                            <div><dt>규격</dt><dd>@ShipperRequestDetailPresentation.Display(item.CargoDimensions)</dd></div>
+                            <div><dt>팔레트</dt><dd>@(item.PalletCount?.ToString("N0") ?? "-")</dd></div>
+                            <div><dt>등록 시각</dt><dd>@DisplayDateTime(item.CreatedAt)</dd></div>
+                        </dl>
+                    </MudPaper>
+                </div>
+            </div>
+        }
+    </ChildContent>
+</ShipperRequestDetailScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string NewRequestHref { get; set; } = string.Empty;
+    [Parameter] public string LoginHref { get; set; } = "/login";
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+    [Parameter] public EventCallback<string> LookupRequested { get; set; }
+
+    private Task LookupAsync()
+        => LookupRequested.HasDelegate
+            ? LookupRequested.InvokeAsync(State.LookupRequestId)
+            : Task.CompletedTask;
+
+    private static Color ResolveStateColor(ShipperRequestProgressState state)
+        => state switch
+        {
+            ShipperRequestProgressState.Completed => Color.Success,
+            ShipperRequestProgressState.Active => Color.Primary,
+            ShipperRequestProgressState.Attention => Color.Error,
+            _ => Color.Default
+        };
+
+    private static string DisplayDateTime(DateTime value)
+        => value == default ? "-" : value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+}

@@ -1,0 +1,29 @@
+.shipper-proofs {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.shipper-proofs__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.shipper-proofs__heading,
+.shipper-proofs__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shipper-proofs__heading {
+    justify-content: space-between;
+}
+
+@media (max-width: 720px) {
+    .shipper-proofs {
+        grid-template-columns: 1fr;
+    }
+}

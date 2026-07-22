@@ -1,0 +1,83 @@
+.shipper-payment,
+.shipper-payment__card,
+.shipper-payment__window {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.shipper-payment__summary,
+.shipper-payment__window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.shipper-payment__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.shipper-payment__card dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.shipper-payment__card dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.75rem;
+}
+
+.shipper-payment__card dd {
+    margin: 2px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.shipper-payment__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.52);
+}
+
+.shipper-payment__window {
+    width: min(560px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border: 1px solid var(--mud-palette-lines-default);
+}
+
+.shipper-payment__amount {
+    border: 1px solid var(--mud-palette-warning);
+    background: color-mix(in srgb, var(--mud-palette-warning) 8%, var(--mud-palette-surface));
+}
+
+@media (max-width: 720px) {
+    .shipper-payment__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .shipper-payment__summary {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .shipper-payment__backdrop {
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .shipper-payment__window {
+        max-height: calc(100vh - 24px);
+    }
+}

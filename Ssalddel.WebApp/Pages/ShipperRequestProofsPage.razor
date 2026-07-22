@@ -1,0 +1,27 @@
+@page "/shipper/request/{RequestId}/proofs"
+@inject ShipperRequestDetailPageViewModel PageModel
+
+<PageTitle>운송 의뢰 증빙</PageTitle>
+
+<ShipperRequestProofsScreen State="@PageModel.State"
+                            Context="@RouteContext"
+                            HomeHref="@ShipperRoutes.Home"
+                            NewRequestHref="@ShipperRoutes.Request"
+                            LoginHref="/login"
+                            RefreshRequested="RefreshAsync" />
+
+@code {
+    [Parameter] public string? RequestId { get; set; }
+
+    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? ReturnPath { get; set; }
+
+    private ShipperRequestDetailNavigationContext RouteContext
+        => new() { ReturnPath = ReturnPath };
+
+    protected override Task OnParametersSetAsync()
+        => PageModel.LoadAsync(RequestId);
+
+    private Task RefreshAsync()
+        => PageModel.LoadAsync(RequestId);
+}

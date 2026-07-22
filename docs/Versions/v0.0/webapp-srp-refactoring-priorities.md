@@ -39,7 +39,7 @@
 | `P0-3` 완료 | 다이어그램 | 변경 전에는 Web 전용 `DiagramWorkbenchPage`가 palette·preset·canvas를 함께 소유하고 모바일 route가 없었음 | 공용 diagram Screen, desktop sidebar, mobile bottom sheet | Web·모바일 `/diagram`이 같은 Screen을 조립하고 선택 node·zoom·filter·출발 page를 복원하며 구체 업무 Command는 3단계 Screen으로 이동함 |
 | `P0-4` 완료 | 커뮤니티 화면 복귀 문맥 | 변경 전에는 board query가 화면 상태 전체를 표현하지 못하고 diagram node에서 3단계 업무 화면으로 이동한 뒤 돌아갈 공용 계약이 없었음 | 공용 `PageNavigationContext`, `CommunityBoardNavigationContext`와 Web·모바일 route adapter | 게시판의 board·검색·필터·보기·focus와 다이어그램의 원장·node·zoom·filter·출발 page를 URL로 복원하고, 3단계 Screen이 안전한 local `from`으로 원래 화면에 돌아가며 deep link test를 통과함 |
 | `P1-1` 완료 | 운송 요청 작성 | 변경 전에는 Web 한 화면 606줄, Web mode route 4개, 모바일 997줄 복합 Panel이 서로 다른 workflow를 가졌음 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당하며 diagram·커뮤니티 출발 문맥을 단계 사이에 보존함 |
-| `P1-2` | 운송 요청 상세 | Web 828줄과 모바일 988줄의 독립 monolith | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
+| `P1-2` 완료 | 운송 요청 상세 | 변경 전에는 Web 828줄과 모바일 988줄의 독립 monolith가 요약·진행·결제·증빙을 함께 수행했음 | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
 | `P1-3` | 입고 요청 | `SsalddelInboundRequestManager` 한 route에서 창고 빠른 등록·입고 신청·목록·완료 처리를 수행함 | 목록, 신규 신청, 상세, 입고 완료 Screen | 목록과 Command가 분리되고 성공 뒤 같은 inbound ID를 재조회함 |
 | `P1-4` | 창고·판매 master-detail-action | 입고 검수·피킹·마트 상품·판매 주문이 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 모바일에서 각 Screen을 독립 route로 열고 desktop split pane은 선택적 조립으로만 제공함 |
 | `P2-1` | 개인 공간·꾸미기 | Web 개인 route multiplexer와 모바일 전용 꾸미기 route의 의미가 다름 | 개인 개요와 꾸미기 상점·상품·checkout Screen 분리 | 같은 route가 플랫폼마다 다른 기능을 뜻하지 않으며 FakePG 경계를 유지함 |
@@ -78,6 +78,18 @@
 
 `SsalddelApp`의 `/shipper/request`는 query 문맥을 보존해 화물 정보 단계로 호환 이동한다. 네 단계 Route Page는 공용 Screen과 scoped draft만 조립하며 서버/sample adapter 호출은 앱 PageViewModel이 맡는다.
 
+## 운송 의뢰 상세 목표 route 지도
+
+| 화면 | 사용자 목표 | Route |
+| --- | --- | --- |
+| 요약 | 의뢰·경로·비용과 현재 상태 확인 | `/shipper/request/{RequestId}` |
+| 진행 이력 | 결제·배차·수락·상차·하차·정산 순서 확인 | `/shipper/request/{RequestId}/timeline` |
+| 결제 | 수납 조건 확인과 허용된 개발 환경의 명시적 FakePG 실행 | `/shipper/request/{RequestId}/payment` |
+| 증빙 | 상차·하차/POD·인수증·세무 증빙 연결 상태 확인 | `/shipper/request/{RequestId}/proofs` |
+| legacy 조회 | query ID를 stable-ID 요약 route로 호환 연결 | `/shipper/request/detail?id=...` |
+
+네 Route Page는 같은 `ShipperRequestDetailPresentation`과 request ID를 사용한다. Web PageViewModel은 인증·기능 플래그·서버 원장 조회만 조율하고, 모바일 PageViewModel은 기존 transport adapter·원장 observer와 명시적인 payment route의 FakePG 개발 흐름만 조율한다. 증빙 Screen은 원본 저장소의 연결 상태를 읽기 전용으로 표시하며 조회만으로 증빙을 생성하거나 완료 처리하지 않는다.
+
 ## 기존 component 리팩터링의 재분류
 
 아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
@@ -111,6 +123,6 @@
 
 ## 다음 작업
 
-`P1-1`에서 운송 요청 작성의 화물, 운송, 절차·결제, 최종 확인을 `Ssalddel.Ui.Common`의 독립 Screen으로 분리했다. Web 한 화면 조립과 Web·모바일 단계 route가 같은 `운송의뢰작성ViewModel`, draft, validation과 `ShipperRequestNavigationContext`를 공유한다. route adapter는 플랫폼 navigation만 담당하고 자동저장·서버 등록·커뮤니티 글 가져오기·모바일 transport adapter 호출은 각 PageViewModel로 이동했다. 추천·자동 배차·계약·결제 운영 효과는 새로 열지 않았다.
+`P1-2`에서 운송 요청 상세의 요약, 진행 이력, 결제, 증빙을 `Ssalddel.Ui.Common`의 독립 Screen으로 분리했다. Web과 모바일은 공용 route 계약, presentation과 request ID를 공유하며 플랫폼 PageViewModel만 서버·adapter와 FakePG 개발 경계를 조율한다. 조회 route는 자동 배차·계약 확정·실결제·증빙 생성을 실행하지 않는다.
 
-다음 수직 단위는 `P1-2` 운송 요청 상세다. Web과 모바일의 독립 monolith를 요약, 진행 이력, 결제, 증빙 Screen으로 분리하고 같은 request ID와 서버 원본을 사용하며 결제·증빙 Command는 명시적 별도 route에서만 실행하도록 맞춘다.
+다음 수직 단위는 `P1-3` 입고 요청이다. 목록, 신규 신청, 상세, 입고 완료를 stable inbound ID 기반 route와 공용 Screen으로 분리하고, 성공 뒤 같은 ID를 서버에서 다시 조회하도록 맞춘다.

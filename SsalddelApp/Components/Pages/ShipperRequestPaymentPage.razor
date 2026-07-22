@@ -1,0 +1,58 @@
+@page "/shipper/request/{RequestId}/payment"
+@using Ssalddel.Contracts.Common.Payments
+@inject ShipperRequestDetailPageViewModel PageModel
+@implements IDisposable
+
+<PageTitle>운송 의뢰 결제</PageTitle>
+
+<ShipperRequestPaymentScreen State="@PageModel.State"
+                             Context="@RouteContext"
+                             HomeHref="@ShipperRoutes.ShipperHome"
+                             NewRequestHref="@ShipperRoutes.Request"
+                             RefreshRequested="RefreshAsync"
+                             SimulationAvailable="true"
+                             PaymentWindowOpen="@PageModel.PaymentWindowOpen"
+                             PaymentCompleting="@PageModel.PaymentCompleting"
+                             PaymentAmount="@PageModel.PaymentAmount"
+                             PaymentOrderName="@PageModel.PaymentOrderName"
+                             PaymentMethod="@PageModel.PaymentMethod"
+                             SettlementMode="@PageModel.SettlementMode"
+                             PaymentMemo="@PageModel.PaymentMemo"
+                             Receipt="@PageModel.Receipt"
+                             OpenSimulationRequested="PageModel.OpenPaymentWindow"
+                             CloseSimulationRequested="PageModel.ClosePaymentWindow"
+                             PaymentMethodChanged="PageModel.SetPaymentMethod"
+                             SettlementModeChanged="PageModel.SetSettlementMode"
+                             PaymentMemoChanged="PageModel.SetPaymentMemo"
+                             PaymentRequested="CompletePaymentAsync" />
+
+@code {
+    [Parameter] public string? RequestId { get; set; }
+
+    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? ReturnPath { get; set; }
+
+    private ShipperRequestDetailNavigationContext RouteContext
+        => new() { ReturnPath = ReturnPath };
+
+    protected override void OnInitialized()
+        => PageModel.StateChanged += OnPageModelStateChanged;
+
+    protected override Task OnParametersSetAsync()
+        => PageModel.InitializeAsync(RequestId);
+
+    private Task RefreshAsync()
+        => PageModel.LoadAsync(RequestId);
+
+    private Task CompletePaymentAsync(PaymentRequestPlan plan)
+        => PageModel.CompletePaymentAsync(plan);
+
+    private void OnPageModelStateChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        PageModel.StateChanged -= OnPageModelStateChanged;
+        PageModel.Dispose();
+    }
+}

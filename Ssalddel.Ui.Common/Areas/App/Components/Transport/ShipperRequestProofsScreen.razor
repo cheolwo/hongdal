@@ -1,0 +1,89 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+
+<ShipperRequestDetailScreenFrame State="@State"
+                                 Context="@Context"
+                                 CurrentScreen="ShipperRequestDetailScreenKind.Proofs"
+                                 Eyebrow="증빙"
+                                 Title="운송 증빙"
+                                 Description="상차·하차/POD, 인수증과 세무 증빙 조건을 원장 메타데이터로 확인합니다."
+                                 HomeHref="@HomeHref"
+                                 NewRequestHref="@NewRequestHref"
+                                 LoginHref="@LoginHref"
+                                 RefreshRequested="RefreshRequested">
+    <ChildContent>
+        @if (State.Request is { } item)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+                사진·서명 원본은 기사 증빙 저장소에서 검수합니다. 이 화면은 화주 의뢰 원장의 연결 상태를 보여 주며 증빙을 새로 생성하거나 완료 처리하지 않습니다.
+            </MudAlert>
+
+            <div class="shipper-proofs">
+                @foreach (var proof in ShipperRequestDetailPresentation.BuildProofs(item))
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-proofs__card" Style="@BuildStyle(proof.State)">
+                        <div class="shipper-proofs__heading">
+                            <div class="shipper-proofs__title">
+                                <MudIcon Icon="@ResolveIcon(proof.State)" Color="@ResolveColor(proof.State)" />
+                                <MudText Typo="Typo.h6">@proof.Title</MudText>
+                            </div>
+                            <MudChip T="string" Size="Size.Small" Color="@ResolveColor(proof.State)" Variant="Variant.Outlined">
+                                @ResolveLabel(proof.State)
+                            </MudChip>
+                        </div>
+                        <MudText Typo="Typo.subtitle2">@proof.Status</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@proof.Description</MudText>
+                        <MudText Typo="Typo.caption">@proof.Detail</MudText>
+                    </MudPaper>
+                }
+            </div>
+        }
+    </ChildContent>
+</ShipperRequestDetailScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string NewRequestHref { get; set; } = string.Empty;
+    [Parameter] public string LoginHref { get; set; } = "/login";
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+
+    private static Color ResolveColor(ShipperRequestProgressState state)
+        => state switch
+        {
+            ShipperRequestProgressState.Completed => Color.Success,
+            ShipperRequestProgressState.Active => Color.Primary,
+            ShipperRequestProgressState.Attention => Color.Error,
+            _ => Color.Default
+        };
+
+    private static string ResolveIcon(ShipperRequestProgressState state)
+        => state switch
+        {
+            ShipperRequestProgressState.Completed => Icons.Material.Filled.Verified,
+            ShipperRequestProgressState.Active => Icons.Material.Filled.PendingActions,
+            ShipperRequestProgressState.Attention => Icons.Material.Filled.ReportProblem,
+            _ => Icons.Material.Filled.InsertDriveFile
+        };
+
+    private static string ResolveLabel(ShipperRequestProgressState state)
+        => state switch
+        {
+            ShipperRequestProgressState.Completed => "원장 기록",
+            ShipperRequestProgressState.Active => "검수 대기",
+            ShipperRequestProgressState.Attention => "확인 필요",
+            _ => "생성 전"
+        };
+
+    private static string BuildStyle(ShipperRequestProgressState state)
+        => $"border-top: 3px solid {ResolveCssColor(state)};";
+
+    private static string ResolveCssColor(ShipperRequestProgressState state)
+        => state switch
+        {
+            ShipperRequestProgressState.Completed => "var(--mud-palette-success)",
+            ShipperRequestProgressState.Active => "var(--mud-palette-primary)",
+            ShipperRequestProgressState.Attention => "var(--mud-palette-error)",
+            _ => "var(--mud-palette-lines-default)"
+        };
+}

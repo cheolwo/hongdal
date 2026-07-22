@@ -1,0 +1,27 @@
+@page "/shipper/request/{RequestId}/timeline"
+@inject ShipperRequestDetailPageViewModel PageModel
+
+<PageTitle>운송 의뢰 진행 이력</PageTitle>
+
+<ShipperRequestTimelineScreen State="@PageModel.State"
+                              Context="@RouteContext"
+                              HomeHref="@ShipperRoutes.Home"
+                              NewRequestHref="@ShipperRoutes.Request"
+                              LoginHref="/login"
+                              RefreshRequested="RefreshAsync" />
+
+@code {
+    [Parameter] public string? RequestId { get; set; }
+
+    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? ReturnPath { get; set; }
+
+    private ShipperRequestDetailNavigationContext RouteContext
+        => new() { ReturnPath = ReturnPath };
+
+    protected override Task OnParametersSetAsync()
+        => PageModel.LoadAsync(RequestId);
+
+    private Task RefreshAsync()
+        => PageModel.LoadAsync(RequestId);
+}

@@ -16,6 +16,20 @@ public sealed class ShipperRequestItem
     public decimal? 예상거리Km { get; set; }
     public decimal? 기준운임 { get; set; }
     public decimal? 기사지급예정운임 { get; set; }
+    public string 정산시점 { get; set; } = string.Empty;
+    public string 증빙방식 { get; set; } = string.Empty;
+    public string 수납주체 { get; set; } = string.Empty;
+    public bool 세금계산서필요 { get; set; }
+    public bool 현금영수증필요 { get; set; }
+    public string 정산메모 { get; set; } = string.Empty;
+    public string 인수증번호 { get; set; } = string.Empty;
+    public DateTime? 인수증등록일시 { get; set; }
+    public DateTime? 현장수금확인일시 { get; set; }
+    public string 현장지급메모 { get; set; } = string.Empty;
+    public int? 화물길이Mm { get; set; }
+    public int? 화물폭Mm { get; set; }
+    public int? 화물높이Mm { get; set; }
+    public int? 팔레트개수 { get; set; }
     public int 알선단계 { get; set; } = 1;
     public bool 재알선금지 { get; set; } = true;
     public bool 정책위반 { get; set; }

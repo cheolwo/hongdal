@@ -8,7 +8,7 @@ public static class ShipperRoutes
     public const string Request = ShipperRequestPageRoutes.Root;
     public const string RequestBulk = ShipperRequestPageRoutes.Bulk;
     public const string RequestDetail = ShipperRequestPageRoutes.Root;
-    public const string RequestDetailLookup = "/shipper/request/detail";
+    public const string RequestDetailLookup = ShipperRequestDetailPageRoutes.LegacyLookup;
     public const string PaymentStatus = "/shipper/request/payment-status";
     public const string PublicCargo = "/shipper/public-cargo";
     public const string ExplorationInbox = "/shipper/exploration/inbox";
@@ -35,10 +35,20 @@ public static class ShipperRoutes
     public const string DispatchAddressForm = "/dispatch/address-form";
 
     public static string RequestDetailFor(string requestId)
-        => $"{RequestDetail}/{Uri.EscapeDataString(requestId)}";
+        => ShipperRequestDetailPageRoutes.SummaryFor(requestId);
 
     public static string CreatedRequestDetailFor(string requestId)
-        => $"{RequestDetailFor(requestId)}?created=true";
+        => new ShipperRequestDetailNavigationContext { Created = true }
+            .PathFor(ShipperRequestDetailScreenKind.Summary, requestId);
+
+    public static string RequestTimelineFor(string requestId)
+        => ShipperRequestDetailPageRoutes.TimelineFor(requestId);
+
+    public static string RequestPaymentFor(string requestId)
+        => ShipperRequestDetailPageRoutes.PaymentFor(requestId);
+
+    public static string RequestProofsFor(string requestId)
+        => ShipperRequestDetailPageRoutes.ProofsFor(requestId);
 
     public static string ReconsignmentOrdersForInventory(long inventoryItemId)
         => $"{ReconsignmentOrders}?inventoryItemId={inventoryItemId}";

@@ -43,7 +43,16 @@ public static class ShipperRoutes
         => $"{ReconsignmentOrders}?inventoryItemId={inventoryItemId}";
 
     public static string RequestDetailFor(string requestId)
-        => $"{RequestDetail}/{Uri.EscapeDataString(requestId)}";
+        => ShipperRequestDetailPageRoutes.SummaryFor(requestId);
+
+    public static string RequestTimelineFor(string requestId)
+        => ShipperRequestDetailPageRoutes.TimelineFor(requestId);
+
+    public static string RequestPaymentFor(string requestId)
+        => ShipperRequestDetailPageRoutes.PaymentFor(requestId);
+
+    public static string RequestProofsFor(string requestId)
+        => ShipperRequestDetailPageRoutes.ProofsFor(requestId);
 
     public static string CommunityDecorationDetailFor(string productKey)
         => $"{CommunityDecorations}/{Uri.EscapeDataString(productKey)}";

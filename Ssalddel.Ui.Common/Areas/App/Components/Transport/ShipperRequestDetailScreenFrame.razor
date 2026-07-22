@@ -1,0 +1,122 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+
+<section class="shipper-detail-screen" data-detail-screen="@CurrentScreen.ToString().ToLowerInvariant()">
+    <header class="shipper-detail-screen__header">
+        <div class="shipper-detail-screen__title">
+            <span>TRANSPORT REQUEST · @Eyebrow</span>
+            <h1>@Title</h1>
+            <p>@Description</p>
+        </div>
+
+        <div class="shipper-detail-screen__actions">
+            <MudButton Href="@Context.ResolveReturnPath(HomeHref)"
+                       Variant="Variant.Text"
+                       Color="Color.Default"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                돌아가기
+            </MudButton>
+            <MudButton Href="@NewRequestHref"
+                       Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Add">
+                새 의뢰
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="@State.IsBusy"
+                       OnClick="RefreshRequested">
+                새로고침
+            </MudButton>
+        </div>
+    </header>
+
+    @if (State.Created && State.Request is not null)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Filled">
+            @State.Request.RequestId 의뢰가 저장되었고 같은 ID로 다시 조회되었습니다.
+        </MudAlert>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(State.StatusMessage))
+    {
+        <MudAlert Severity="@ResolveSeverity(State.StatusTone)" Variant="Variant.Outlined">
+            @State.StatusMessage
+        </MudAlert>
+    }
+
+    @if (State.IsBusy)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (State.Request is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 shipper-detail-screen__empty">
+            @if (State.RequiresLogin)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Warning" Size="Size.Large" />
+                <MudText Typo="Typo.h6">로그인이 필요합니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    주소와 결제 조건이 포함된 원장이므로 의뢰를 등록한 계정 또는 관리자만 조회할 수 있습니다.
+                </MudText>
+                <MudButton Href="@LoginHref" Variant="Variant.Filled" Color="Color.Primary">로그인</MudButton>
+            }
+            else if (State.IsWorkflowEnabled == false)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.ToggleOff" Color="Color.Warning" Size="Size.Large" />
+                <MudText Typo="Typo.h6">운송 의뢰 조회가 비활성입니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    현재 배포 환경에서는 국내 운송 workflow가 꺼져 있습니다. 이 화면에서 배차·계약·결제를 시작하지 않습니다.
+                </MudText>
+            }
+            else if (EmptyContent is not null)
+            {
+                @EmptyContent
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.SearchOff" Color="Color.Default" Size="Size.Large" />
+                <MudText Typo="Typo.h6">의뢰 정보를 찾지 못했습니다</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">의뢰 ID와 서버 연결 상태를 확인한 뒤 다시 조회해 주세요.</MudText>
+            }
+        </MudPaper>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+            @State.SourceBoundaryMessage 화면 조회만으로 자동 배차, 계약 확정, 실결제 또는 증빙 생성은 실행되지 않습니다.
+        </MudAlert>
+
+        <ShipperRequestDetailNavigation RequestId="@State.Request.RequestId"
+                                        Context="@Context"
+                                        CurrentScreen="@CurrentScreen" />
+
+        <main class="shipper-detail-screen__body">
+            @ChildContent
+        </main>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ShipperRequestDetailPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestDetailNavigationContext Context { get; set; } = new();
+    [Parameter] public ShipperRequestDetailScreenKind CurrentScreen { get; set; }
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string NewRequestHref { get; set; } = string.Empty;
+    [Parameter] public string LoginHref { get; set; } = "/login";
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+    [Parameter] public RenderFragment? EmptyContent { get; set; }
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+
+    private static Severity ResolveSeverity(ShipperRequestDetailMessageTone tone)
+        => tone switch
+        {
+            ShipperRequestDetailMessageTone.Success => Severity.Success,
+            ShipperRequestDetailMessageTone.Warning => Severity.Warning,
+            ShipperRequestDetailMessageTone.Error => Severity.Error,
+            _ => Severity.Info
+        };
+}

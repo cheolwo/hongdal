@@ -1,0 +1,39 @@
+@page "/shipper/request/{RequestId}/timeline"
+@inject ShipperRequestDetailPageViewModel PageModel
+@implements IDisposable
+
+<PageTitle>운송 의뢰 진행 이력</PageTitle>
+
+<ShipperRequestTimelineScreen State="@PageModel.State"
+                              Context="@RouteContext"
+                              HomeHref="@ShipperRoutes.ShipperHome"
+                              NewRequestHref="@ShipperRoutes.Request"
+                              RefreshRequested="RefreshAsync" />
+
+@code {
+    [Parameter] public string? RequestId { get; set; }
+
+    [SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? ReturnPath { get; set; }
+
+    private ShipperRequestDetailNavigationContext RouteContext
+        => new() { ReturnPath = ReturnPath };
+
+    protected override void OnInitialized()
+        => PageModel.StateChanged += OnPageModelStateChanged;
+
+    protected override Task OnParametersSetAsync()
+        => PageModel.InitializeAsync(RequestId);
+
+    private Task RefreshAsync()
+        => PageModel.LoadAsync(RequestId);
+
+    private void OnPageModelStateChanged()
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        PageModel.StateChanged -= OnPageModelStateChanged;
+        PageModel.Dispose();
+    }
+}
