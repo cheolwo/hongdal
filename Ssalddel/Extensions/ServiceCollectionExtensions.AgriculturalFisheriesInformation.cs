@@ -81,6 +81,17 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient<IOfficialFoodRecipeRemoteSource>(serviceProvider =>
             serviceProvider.GetRequiredService<MfdsCookRecipeRemoteSource>());
         services
+            .AddHttpClient<IOfficialFoodIngredientDomesticCompanySource,
+                MfdsIngredientProductCompanySource>(
+                (serviceProvider, client) =>
+                {
+                    var options = serviceProvider.GetRequiredService<IOptions<PublicDataOptions>>().Value;
+                    client.BaseAddress = new Uri(options.MfdsIngredientCompanies.BaseUrl);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Ssalddel-Ingredient-Company-Research/0.0");
+                    client.Timeout = TimeSpan.FromSeconds(Math.Max(20, options.TimeoutSeconds));
+                })
+            .RemoveAllLoggers();
+        services
             .AddHttpClient<RdaLocalFoodRemoteSource>(
                 (serviceProvider, client) =>
                 {
@@ -124,6 +135,14 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<IOfficialFoodRecipeIngredientIndexService,
             OfficialFoodRecipeIngredientIndexService>();
         services.AddScoped<IOfficialFoodRecipeArchiveService, OfficialFoodRecipeArchiveService>();
+        services.AddScoped<IOfficialFoodIngredientImportedCompanySource,
+            MfdsImportedFoodIngredientCompanySource>();
+        services.AddScoped<IOfficialFoodIngredientCompanyResearchService,
+            OfficialFoodIngredientCompanyResearchService>();
+        services.AddScoped<IOfficialFoodIngredientCompanyArchiveService,
+            OfficialFoodIngredientCompanyArchiveService>();
+        services.AddScoped<IOfficialFoodIngredientHsMappingService,
+            OfficialFoodIngredientHsMappingService>();
         services.AddSingleton<IFoodPriceCrosswalkCatalog, FoodPriceCrosswalkCatalog>();
         services.AddScoped<IAgriculturalFisheriesInformationService, AgriculturalFisheriesInformationService>();
         services.AddScoped<I미국농수산가격조회Service, 미국농수산가격조회Service>();

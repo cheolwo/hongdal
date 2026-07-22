@@ -1,0 +1,312 @@
+.ingredient-company {
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid #cbdcd1;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.ingredient-company__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: start;
+}
+
+.ingredient-company__header span {
+    color: #176b4d;
+    font-size: .66rem;
+    font-weight: 850;
+    letter-spacing: .09em;
+}
+
+.ingredient-company__header h5 {
+    margin: 3px 0 0;
+    color: #23382f;
+    font-size: 1rem;
+}
+
+.ingredient-company__header p {
+    margin: 5px 0 0;
+    color: #68776f;
+    font-size: .75rem;
+    line-height: 1.5;
+}
+
+.ingredient-company__header button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #176b4d;
+    border-radius: 9px;
+    background: #fff;
+    color: #176b4d;
+    cursor: pointer;
+    font: inherit;
+    font-size: .76rem;
+    font-weight: 800;
+}
+
+.ingredient-company__header button:disabled {
+    cursor: wait;
+    opacity: .6;
+}
+
+.ingredient-company__state {
+    display: grid;
+    gap: 4px;
+    margin-top: 11px;
+    padding: 12px;
+    border: 1px dashed #c7d6cc;
+    border-radius: 9px;
+    background: #f7faf8;
+    color: #65736b;
+    font-size: .74rem;
+    line-height: 1.5;
+}
+
+.ingredient-company__state--error {
+    border-color: #e4c5c5;
+    background: #fff7f7;
+    color: #873d3d;
+}
+
+.ingredient-company__archive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    align-items: center;
+    margin-top: 11px;
+    padding: 9px 11px;
+    border: 1px solid #b9d8c5;
+    border-radius: 9px;
+    background: #eef8f1;
+    color: #295440;
+    font-size: .7rem;
+}
+
+.ingredient-company__archive small {
+    color: #708077;
+    overflow-wrap: anywhere;
+}
+
+.ingredient-company__sources {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.ingredient-company__sources article {
+    padding: 10px;
+    border: 1px solid #d9e4dc;
+    border-radius: 9px;
+    background: #fafcfb;
+}
+
+.ingredient-company__sources article > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 7px;
+    align-items: start;
+}
+
+.ingredient-company__sources strong {
+    color: #2a4036;
+    font-size: .73rem;
+}
+
+.ingredient-company__sources span {
+    flex: 0 0 auto;
+    padding: 3px 6px;
+    border-radius: 999px;
+    font-size: .61rem;
+    font-weight: 800;
+}
+
+.ingredient-company__sources span.is-available {
+    background: #e2f3e9;
+    color: #176b4d;
+}
+
+.ingredient-company__sources span.is-failed {
+    background: #fdeaea;
+    color: #914242;
+}
+
+.ingredient-company__sources span.is-unconfigured {
+    background: #fff1d5;
+    color: #7d571a;
+}
+
+.ingredient-company__sources span.is-supporting {
+    background: #eaf0f7;
+    color: #465d75;
+}
+
+.ingredient-company__sources p {
+    margin: 7px 0;
+    color: #6b7971;
+    font-size: .68rem;
+    line-height: 1.45;
+}
+
+.ingredient-company a {
+    color: #176b4d;
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.ingredient-company__candidates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.ingredient-company__candidates > article {
+    padding: 12px;
+    border: 1px solid #d7e2da;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.ingredient-company__candidates > article.has-attention {
+    border-color: #d19a69;
+    background: #fffaf5;
+}
+
+.ingredient-company__candidates header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ingredient-company__candidates header > div {
+    display: grid;
+    gap: 2px;
+}
+
+.ingredient-company__candidates header span {
+    color: #176b4d;
+    font-size: .65rem;
+    font-weight: 800;
+}
+
+.ingredient-company__candidates header strong {
+    color: #21362d;
+    font-size: .86rem;
+}
+
+.ingredient-company__candidates header small {
+    color: #6e7b74;
+    font-size: .67rem;
+}
+
+.ingredient-company__candidates dl {
+    display: grid;
+    gap: 4px;
+    margin: 9px 0;
+}
+
+.ingredient-company__candidates dl > div {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 7px;
+}
+
+.ingredient-company__candidates dt,
+.ingredient-company__candidates dd,
+.ingredient-company__candidates > article > p {
+    margin: 0;
+    font-size: .68rem;
+    line-height: 1.45;
+}
+
+.ingredient-company__candidates dt {
+    color: #718078;
+}
+
+.ingredient-company__candidates dd {
+    color: #33483e;
+    overflow-wrap: anywhere;
+}
+
+.ingredient-company__candidates > article > p {
+    color: #66756d;
+}
+
+.ingredient-company__raw-evidence {
+    margin-top: 8px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    background: #f4f7f5;
+    color: #52665b;
+    font-size: .67rem;
+}
+
+.ingredient-company__raw-evidence summary {
+    cursor: pointer;
+    color: #32604b;
+    font-weight: 800;
+}
+
+.ingredient-company__raw-evidence p {
+    margin: 6px 0 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.ingredient-company__candidates footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 9px;
+    color: #486255;
+    font-size: .65rem;
+}
+
+.ingredient-company__attention {
+    margin-top: 8px;
+    padding: 7px;
+    border-radius: 7px;
+    background: #fff0e1;
+    color: #824718;
+    font-size: .67rem;
+    line-height: 1.45;
+}
+
+.ingredient-company__notices {
+    margin-top: 11px;
+    padding-top: 8px;
+    border-top: 1px solid #e1e8e3;
+}
+
+.ingredient-company__notices p {
+    margin: 3px 0;
+    color: #6b7770;
+    font-size: .66rem;
+    line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+    .ingredient-company__sources {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .ingredient-company__header,
+    .ingredient-company__candidates header,
+    .ingredient-company__candidates footer {
+        display: grid;
+    }
+
+    .ingredient-company__header button {
+        width: 100%;
+    }
+
+    .ingredient-company__candidates {
+        grid-template-columns: 1fr;
+    }
+}

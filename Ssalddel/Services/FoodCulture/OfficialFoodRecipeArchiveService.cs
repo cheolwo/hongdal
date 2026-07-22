@@ -47,6 +47,10 @@ public interface IOfficialFoodRecipeArchiveService
         OfficialFoodRecipeQuery query,
         CancellationToken cancellationToken = default);
 
+    Task<OfficialFoodRecipeDishDto?> GetDishAsync(
+        string dishKey,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<OfficialFoodRecipeVariantDto>> GetVariantsAsync(
         string dishKey,
         CancellationToken cancellationToken = default);
@@ -163,6 +167,15 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
                 || dish.Category.Contains(searchText));
         }
 
+        if (query.OnlyWithBrowsableIngredients)
+        {
+            var nowUtc = UtcNow();
+            dishes = dishes.Where(dish => dish.RecipeVariants.Any(variant =>
+                !variant.IsRemovedAtSource
+                && (!variant.ContentExpiresAtUtc.HasValue || variant.ContentExpiresAtUtc > nowUtc)
+                && variant.RecipeIngredients.Any()));
+        }
+
         var take = Math.Clamp(query.Take, 1, 100);
         return await dishes
             .OrderBy(dish => dish.CountryCode)
@@ -183,6 +196,31 @@ public sealed class OfficialFoodRecipeArchiveService : IOfficialFoodRecipeArchiv
                 dish.RecipeVariants.Count,
                 dish.UpdatedAtUtc))
             .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<OfficialFoodRecipeDishDto?> GetDishAsync(
+        string dishKey,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(dishKey);
+        var normalizedDishKey = dishKey.Trim();
+        return await _db.OfficialFoodDishes
+            .AsNoTracking()
+            .Where(dish => dish.DishKey == normalizedDishKey)
+            .Select(dish => new OfficialFoodRecipeDishDto(
+                dish.DishKey,
+                dish.CountryCode,
+                dish.RegionName,
+                dish.Name,
+                dish.OriginalName,
+                dish.EnglishName,
+                dish.Category,
+                dish.Summary,
+                dish.RepresentationState,
+                dish.ReviewState,
+                dish.RecipeVariants.Count,
+                dish.UpdatedAtUtc))
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<OfficialFoodRecipeVariantDto>> GetVariantsAsync(

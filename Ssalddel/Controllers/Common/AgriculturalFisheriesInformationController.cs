@@ -19,19 +19,25 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
     private readonly I호주농수산식품가격조회Service _australiaFoodPriceService;
     private readonly I미국농어업경영체정보원천Service _usOperatorSourceService;
     private readonly IOfficialFoodRecipeIngredientIndexService _ingredientIndexService;
+    private readonly IOfficialFoodRecipeArchiveService _recipeArchiveService;
+    private readonly IOfficialFoodIngredientCompanyArchiveService _companyArchiveService;
 
     public AgriculturalFisheriesInformationController(
         IAgriculturalFisheriesInformationService informationService,
         I미국농수산가격조회Service usPriceService,
         I호주농수산식품가격조회Service australiaFoodPriceService,
         I미국농어업경영체정보원천Service usOperatorSourceService,
-        IOfficialFoodRecipeIngredientIndexService ingredientIndexService)
+        IOfficialFoodRecipeIngredientIndexService ingredientIndexService,
+        IOfficialFoodRecipeArchiveService recipeArchiveService,
+        IOfficialFoodIngredientCompanyArchiveService companyArchiveService)
     {
         _informationService = informationService;
         _usPriceService = usPriceService;
         _australiaFoodPriceService = australiaFoodPriceService;
         _usOperatorSourceService = usOperatorSourceService;
         _ingredientIndexService = ingredientIndexService;
+        _recipeArchiveService = recipeArchiveService;
+        _companyArchiveService = companyArchiveService;
     }
 
     [HttpGet]
@@ -62,6 +68,158 @@ public sealed class AgriculturalFisheriesInformationController : ControllerBase
         return Ok(await _ingredientIndexService.SearchIngredientsAsync(
             publicQuery,
             cancellationToken));
+    }
+
+    [HttpGet("food-ingredients/hs-codes")]
+    public async Task<ActionResult<OfficialFoodIngredientHsMappingResponse>>
+        GetFoodIngredientHsCodes(
+            [FromServices] IOfficialFoodIngredientHsMappingService mappingService,
+            [FromQuery] OfficialFoodIngredientHsQuery query,
+            CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(query.IngredientKey)
+            && string.IsNullOrWhiteSpace(query.IngredientName))
+        {
+            return BadRequest();
+        }
+
+        try
+        {
+            return Ok(await mappingService.GetOrCreateAsync(query, cancellationToken));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpGet("food-ingredients/companies")]
+    public async Task<ActionResult<OfficialFoodIngredientCompanyResearchResponse>>
+        SearchFoodIngredientCompanies(
+            [FromQuery] OfficialFoodIngredientCompanyQuery query,
+            CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(query.IngredientName)
+            || (query.IngredientName.Trim().Length < 2
+                && string.IsNullOrWhiteSpace(query.IngredientKey)))
+        {
+            return BadRequest();
+        }
+
+        try
+        {
+            return Ok(await _companyArchiveService.ResearchAndArchiveAsync(
+                new OfficialFoodIngredientCompanyQuery
+                {
+                    IngredientKey = query.IngredientKey,
+                    IngredientName = query.IngredientName,
+                    Take = Math.Clamp(query.Take, 1, 20)
+                },
+                cancellationToken: cancellationToken));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpGet("food-ingredients/companies/archive")]
+    public async Task<ActionResult<OfficialFoodIngredientCompanyArchiveResponse>>
+        GetFoodIngredientCompanyArchive(
+            [FromQuery] string? ingredientKey,
+            [FromQuery] string? ingredientName,
+            [FromQuery] bool includeInactive = false,
+            CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(ingredientKey)
+            && string.IsNullOrWhiteSpace(ingredientName))
+        {
+            return BadRequest();
+        }
+
+        var archive = await _companyArchiveService.GetArchiveAsync(
+            ingredientKey,
+            ingredientName,
+            includeInactive,
+            cancellationToken);
+        return archive is null ? NotFound() : Ok(archive);
+    }
+
+    [HttpGet("food-ingredients/companies/coverage")]
+    public async Task<ActionResult<OfficialFoodIngredientCompanyCoverageResponse>>
+        GetFoodIngredientCompanyCoverage(
+            [FromQuery] int staleAfterDays = 30,
+            CancellationToken cancellationToken = default)
+        => Ok(await _companyArchiveService.GetCoverageAsync(
+            Math.Clamp(staleAfterDays, 1, 3650),
+            cancellationToken));
+
+    [HttpGet("food-dishes")]
+    public async Task<ActionResult<IReadOnlyList<OfficialFoodRecipeDishDto>>> SearchFoodDishes(
+        [FromQuery] OfficialFoodDishDiscoveryQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        var dishes = await _recipeArchiveService.SearchDishesAsync(
+            new OfficialFoodRecipeQuery
+            {
+                CountryCode = string.IsNullOrWhiteSpace(query.CountryCode)
+                    ? null
+                    : query.CountryCode.Trim().ToUpperInvariant(),
+                SearchText = query.SearchText,
+                Take = Math.Clamp(query.Take, 1, 50),
+                OnlyWithBrowsableIngredients = true
+            },
+            cancellationToken);
+        return Ok(dishes
+            .Where(dish => dish.ReviewState != OfficialFoodRecipeReviewStates.Excluded
+                           && dish.RepresentationState != OfficialFoodRecipeRepresentationStates.Excluded)
+            .ToArray());
+    }
+
+    [HttpGet("food-dishes/{dishKey}")]
+    public async Task<ActionResult<OfficialFoodDishDetailDto>> GetFoodDish(
+        string dishKey,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var dish = await _recipeArchiveService.GetDishAsync(dishKey, cancellationToken);
+            if (dish is null
+                || dish.ReviewState == OfficialFoodRecipeReviewStates.Excluded
+                || dish.RepresentationState == OfficialFoodRecipeRepresentationStates.Excluded)
+            {
+                return NotFound();
+            }
+
+            var variants = await _recipeArchiveService.GetVariantsAsync(dish.DishKey, cancellationToken);
+            var representative = variants.FirstOrDefault(variant =>
+                variant.IsFreshForPublication && variant.StructuredIngredients?.Count > 0);
+            if (representative is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new OfficialFoodDishDetailDto(
+                dish,
+                representative.RecordKey,
+                representative.SourceKey,
+                representative.Provider,
+                representative.Title,
+                representative.ServingText,
+                representative.OriginalUrl,
+                representative.AttributionText,
+                representative.CollectedAtUtc,
+                representative.IsFreshForPublication,
+                representative.StructuredIngredients ?? []));
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest();
+        }
     }
 
     [HttpGet("items/{hsCode}/domestic-price")]

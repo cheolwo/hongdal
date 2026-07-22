@@ -44,17 +44,51 @@ public interface I주문원장Service
 }
 
 /// <summary>
+/// 탐색에서 이어온 구매 의향을 집단화 미리보기, 비구속 저장과 철회로 닫는 최소 API 경계입니다.
+/// 결제·주문·수입·운송·창고 실행은 이 경계에 포함하지 않습니다.
+/// </summary>
+public interface I비구속공동구매수요Service
+{
+    Task<공동구매자동집단배치미리보기응답?> 수요배치미리보기Async(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 서비스는 비구속 수요 배치 미리보기를 지원하지 않습니다.");
+
+    Task<공동구매자동집단사용자응답?> 비구속수요저장Async(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 서비스는 비구속 수요 저장을 지원하지 않습니다.");
+
+    Task<공동구매자동수요철회응답?> 비구속수요철회Async(
+        string demandSourceKey,
+        string idempotencyKey,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 서비스는 비구속 수요 철회를 지원하지 않습니다.");
+}
+
+/// <summary>
 /// 공동구매 확정 이후 자동집단, 기본 주문원장 업무와 커머스 이행을 연결하는 API 경계입니다.
 /// </summary>
-public interface I공동구매실행Service : I주문원장Service
+public interface I공동구매실행Service : I주문원장Service, I비구속공동구매수요Service
 {
     Task<IReadOnlyList<공동구매자동집단응답>> 자동집단목록조회Async(
         공동구매자동집단조회조건 condition,
         CancellationToken cancellationToken = default);
 
+    Task<공동구매자동집단배치미리보기응답?> 자동배치미리보기Async(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default);
+
     Task<공동구매자동집단응답?> 자동수요등록Async(
         공동구매자동수요등록Command request,
         CancellationToken cancellationToken = default);
+
+    Task<공동구매자동수요철회응답?> 자동수요철회Async(
+        string demandSourceKey,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 공동구매 실행 서비스는 비구속 수요 철회를 지원하지 않습니다.");
 
     Task<IReadOnlyList<공동구매커머스이행계획공개Dto>> 공동구매별커머스이행조회Async(
         string groupPurchaseId,
@@ -67,6 +101,7 @@ public interface I공동구매실행Service : I주문원장Service
 
 public sealed class 공동구매실행Service(ISsalddelJsonApiClient client) : I공동구매실행Service
 {
+    private const string IdempotencyHeaderName = "Idempotency-Key";
     private const string AutoGroupsPath = "api/v1/orderer/group-purchase-auto-groups";
     private const string OrderLedgersPath = "api/v1/community/order-ledgers";
     private const string CommercePath = "api/v1/orderer/group-purchase-commerce-fulfillment-plans";
@@ -89,15 +124,104 @@ public sealed class 공동구매실행Service(ISsalddelJsonApiClient client) : I
                ?? [];
     }
 
+    public Task<공동구매자동집단배치미리보기응답?> 자동배치미리보기Async(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+        => client.SendAsync<공동구매자동수요등록Command, 공동구매자동집단배치미리보기응답>(
+            HttpMethod.Post,
+            $"{AutoGroupsPath}/placement-preview",
+            request,
+            "공동구매 자동집단 배치 미리보기",
+            cancellationToken: cancellationToken);
+
+    public Task<공동구매자동집단배치미리보기응답?> 수요배치미리보기Async(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+        => 자동배치미리보기Async(request, cancellationToken);
+
     public Task<공동구매자동집단응답?> 자동수요등록Async(
         공동구매자동수요등록Command request,
         CancellationToken cancellationToken = default)
-        => client.SendAsync<공동구매자동수요등록Command, 공동구매자동집단응답>(
-            HttpMethod.Post,
-            $"{AutoGroupsPath}/demands",
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.수요출처키);
+        request.요청멱등키 = string.IsNullOrWhiteSpace(request.요청멱등키)
+            ? $"demand-save:{Guid.NewGuid():N}"
+            : request.요청멱등키.Trim();
+
+        return client.SendWithHeadersAsync<공동구매자동수요등록Command, 공동구매자동집단응답>(
+            HttpMethod.Put,
+            $"{AutoGroupsPath}/demands/{Segment(request.수요출처키)}",
             request,
-            "공동구매 자동집단 수요 등록",
+            IdempotencyHeaders(request.요청멱등키),
+            "공동구매 자동집단 비구속 수요 저장",
             cancellationToken: cancellationToken);
+    }
+
+    public Task<공동구매자동수요철회응답?> 자동수요철회Async(
+        string demandSourceKey,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+    {
+        var path = $"{AutoGroupsPath}/demands/{Segment(demandSourceKey)}";
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            path += $"?reason={Uri.EscapeDataString(reason.Trim())}";
+        }
+
+        var idempotencyKey = $"demand-withdraw:{Guid.NewGuid():N}";
+        return client.SendWithHeadersAsync<공동구매자동수요철회응답>(
+            HttpMethod.Delete,
+            path,
+            IdempotencyHeaders(idempotencyKey),
+            "공동구매 자동집단 비구속 수요 철회",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<공동구매자동집단사용자응답?> 비구속수요저장Async(
+        공동구매자동수요등록Command request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.수요출처키);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.요청멱등키);
+
+        return client.SendWithHeadersAsync<공동구매자동수요등록Command, 공동구매자동집단사용자응답>(
+            HttpMethod.Put,
+            $"{AutoGroupsPath}/demands/{Segment(request.수요출처키)}",
+            request,
+            IdempotencyHeaders(request.요청멱등키.Trim()),
+            "공동구매 탐색 비구속 수요 저장",
+            cancellationToken: cancellationToken);
+    }
+
+    public Task<공동구매자동수요철회응답?> 비구속수요철회Async(
+        string demandSourceKey,
+        string idempotencyKey,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(demandSourceKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(idempotencyKey);
+        var path = $"{AutoGroupsPath}/demands/{Segment(demandSourceKey)}";
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            path += $"?reason={Uri.EscapeDataString(reason.Trim())}";
+        }
+
+        return client.SendWithHeadersAsync<공동구매자동수요철회응답>(
+            HttpMethod.Delete,
+            path,
+            IdempotencyHeaders(idempotencyKey.Trim()),
+            "공동구매 탐색 비구속 수요 철회",
+            cancellationToken: cancellationToken);
+    }
+
+    private static IReadOnlyDictionary<string, string> IdempotencyHeaders(string idempotencyKey)
+        => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [IdempotencyHeaderName] = idempotencyKey
+        };
 
     public Task<주문원장역할별조회공개Dto?> 주문원장보호조회Async(
         string orderLedgerId,

@@ -29,4 +29,16 @@ public sealed class AgriculturalFisheriesBatchOptions
     public string UsdaMonthlyCronExpression { get; set; } = "0 30 7 10 * ?";
 
     public int UsdaLookbackYears { get; set; } = 1;
+
+    public bool IngredientCompanyResearchEnabled { get; set; }
+
+    public string IngredientCompanyResearchCronExpression { get; set; } = "0 0 3 ? * SUN";
+
+    public int IngredientCompanyResearchMaxIngredients { get; set; } = 500;
+
+    public int IngredientCompanyResearchCandidatesPerIngredient { get; set; } = 100;
+
+    public int IngredientCompanyResearchRefreshAfterDays { get; set; } = 30;
+
+    public int IngredientCompanyResearchRequestDelayMilliseconds { get; set; } = 250;
 }

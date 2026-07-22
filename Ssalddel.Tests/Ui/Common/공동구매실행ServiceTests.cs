@@ -32,6 +32,72 @@ public sealed class 공동구매실행ServiceTests
     }
 
     [Fact]
+    public async Task 자동배치미리보기는_수요를저장하지않는전용경로로전달한다()
+    {
+        var response = new 공동구매자동집단배치미리보기응답
+        {
+            배치유형 = 공동구매자동집단배치유형코드.기존집단
+        };
+        var client = new RecordingJsonApiClient { Response = response };
+        var service = new 공동구매실행Service(client);
+        var request = new 공동구매자동수요등록Command
+        {
+            상품키 = "official-ingredient:onion",
+            배송권키 = "us-zcta:10001"
+        };
+
+        var result = await service.자동배치미리보기Async(request);
+
+        Assert.Same(response, result);
+        Assert.Equal(HttpMethod.Post, client.LastMethod);
+        Assert.Equal(
+            "api/v1/orderer/group-purchase-auto-groups/placement-preview",
+            client.LastPath);
+        Assert.Same(request, client.LastRequest);
+        Assert.Equal(typeof(공동구매자동집단배치미리보기응답), client.LastResponseType);
+    }
+
+    [Fact]
+    public async Task 자동수요등록은_멱등헤더를가진비구속Put으로전달한다()
+    {
+        var response = new 공동구매자동집단응답 { 자동집단Id = "auto-group-1" };
+        var client = new RecordingJsonApiClient { Response = response };
+        var service = new 공동구매실행Service(client);
+        var request = new 공동구매자동수요등록Command
+        {
+            수요출처키 = "ingredient:onion/us:10001"
+        };
+
+        var result = await service.자동수요등록Async(request);
+
+        Assert.Same(response, result);
+        Assert.Equal(HttpMethod.Put, client.LastMethod);
+        Assert.Equal(
+            $"api/v1/orderer/group-purchase-auto-groups/demands/{Uri.EscapeDataString(request.수요출처키)}",
+            client.LastPath);
+        Assert.StartsWith("demand-save:", request.요청멱등키, StringComparison.Ordinal);
+        Assert.Equal(request.요청멱등키, client.LastHeaders!["Idempotency-Key"]);
+    }
+
+    [Fact]
+    public async Task 자동수요철회는_사유와멱등헤더를가진Delete로전달한다()
+    {
+        var response = new 공동구매자동수요철회응답 { 철회완료 = true };
+        var client = new RecordingJsonApiClient { Response = response };
+        var service = new 공동구매실행Service(client);
+
+        var result = await service.자동수요철회Async("ingredient:onion/us:10001", "changed mind");
+
+        Assert.Same(response, result);
+        Assert.Equal(HttpMethod.Delete, client.LastMethod);
+        Assert.Equal(
+            $"api/v1/orderer/group-purchase-auto-groups/demands/{Uri.EscapeDataString("ingredient:onion/us:10001")}" +
+            $"?reason={Uri.EscapeDataString("changed mind")}",
+            client.LastPath);
+        Assert.StartsWith("demand-withdraw:", client.LastHeaders!["Idempotency-Key"], StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task 주문원장조회_기본경로를보호형역할응답으로읽는다()
     {
         var response = new 주문원장역할별조회공개Dto { 주문원장Id = "order/root 1" };
@@ -89,6 +155,7 @@ public sealed class 공동구매실행ServiceTests
         public object? LastRequest { get; private set; }
         public Type? LastResponseType { get; private set; }
         public bool LastAllowNotFound { get; private set; }
+        public IReadOnlyDictionary<string, string>? LastHeaders { get; private set; }
 
         public Task<TResponse?> GetAsync<TResponse>(
             string path,
@@ -119,6 +186,33 @@ public sealed class 공동구매실행ServiceTests
             bool allowNotFound = false,
             CancellationToken cancellationToken = default)
         {
+            Record(method, path, request, typeof(TResponse), allowNotFound);
+            return Task.FromResult(Response is null ? default : (TResponse)Response);
+        }
+
+        public Task<TResponse?> SendWithHeadersAsync<TResponse>(
+            HttpMethod method,
+            string path,
+            IReadOnlyDictionary<string, string> headers,
+            string operationName,
+            bool allowNotFound = false,
+            CancellationToken cancellationToken = default)
+        {
+            LastHeaders = headers;
+            Record(method, path, null, typeof(TResponse), allowNotFound);
+            return Task.FromResult(Response is null ? default : (TResponse)Response);
+        }
+
+        public Task<TResponse?> SendWithHeadersAsync<TRequest, TResponse>(
+            HttpMethod method,
+            string path,
+            TRequest request,
+            IReadOnlyDictionary<string, string> headers,
+            string operationName,
+            bool allowNotFound = false,
+            CancellationToken cancellationToken = default)
+        {
+            LastHeaders = headers;
             Record(method, path, request, typeof(TResponse), allowNotFound);
             return Task.FromResult(Response is null ? default : (TResponse)Response);
         }

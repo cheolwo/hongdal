@@ -73,6 +73,21 @@
     line-height: 1.55;
 }
 
+.ingredient-journey__catalog-heading {
+    margin: 26px 0 12px;
+}
+
+.ingredient-journey__catalog-heading span {
+    color: var(--ingredient-accent);
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.ingredient-journey__catalog-heading h3 {
+    margin: 3px 0 0;
+    font-size: 1.18rem;
+}
+
 .ingredient-journey__state {
     display: grid;
     justify-items: center;

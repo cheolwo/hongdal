@@ -1,0 +1,133 @@
+<section class="ingredient-hs" aria-labelledby="ingredient-hs-title">
+    <header class="ingredient-hs__header">
+        <div>
+            <span>HS REVIEW CANDIDATES</span>
+            <h5 id="ingredient-hs-title">@IngredientName HS·HSK·HTS 연결 후보</h5>
+            <p>재료명과 공식 카탈로그를 연결하되 신고 코드로 자동 확정하지 않습니다.</p>
+        </div>
+        <button type="button" disabled="@Busy" @onclick="MappingRequested">
+            @(Mapping is null ? "HS 후보 확인" : "카탈로그 다시 대조")
+        </button>
+    </header>
+
+    @if (Busy)
+    {
+        <div class="ingredient-hs__state" role="status">공식 HS 카탈로그와 재료명을 대조하고 있습니다.</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="ingredient-hs__state ingredient-hs__state--error" role="alert">
+            <strong>HS 후보를 불러오지 못했습니다.</strong>
+            <span>@ErrorMessage</span>
+        </div>
+    }
+    else if (Mapping is null)
+    {
+        <div class="ingredient-hs__state">
+            사용자가 요청할 때만 후보를 조회합니다. 실제 상품의 상태·성분·용도를 함께 확인해야 합니다.
+        </div>
+    }
+    else
+    {
+        <div class="ingredient-hs__warning" role="note">
+            <strong>신고용 확정값 아님</strong>
+            <span>한국 수출 HSK와 도착국 수입 세번은 별도로 검토합니다.</span>
+        </div>
+
+        @if (!Mapping.HasActiveCatalog)
+        {
+            <div class="ingredient-hs__state">
+                조건에 맞는 활성 HS 카탈로그가 없습니다. 카탈로그 버전과 출처를 먼저 적재해야 합니다.
+            </div>
+        }
+        else if (Mapping.Candidates.Count == 0)
+        {
+            <div class="ingredient-hs__state">
+                재료명만으로 안전하게 제시할 후보를 찾지 못했습니다. 상품 설명을 구체화한 뒤 수동 검색이 필요합니다.
+            </div>
+        }
+        else
+        {
+            <div class="ingredient-hs__candidates">
+                @foreach (var candidate in Mapping.Candidates)
+                {
+                    <article>
+                        <header>
+                            <div>
+                                <span>@JurisdictionLabel(candidate)</span>
+                                <strong>@candidate.HsCode</strong>
+                            </div>
+                            <small>@candidate.StandardCode · @candidate.CatalogRevision</small>
+                        </header>
+                        <h6>@DisplayName(candidate)</h6>
+                        <p>@candidate.MatchBasis</p>
+                        <dl>
+                            <div>
+                                <dt>후보 신뢰도</dt>
+                                <dd>@candidate.MatchConfidence.ToString("P0") · 검토 필요</dd>
+                            </div>
+                            <div>
+                                <dt>카탈로그 효력</dt>
+                                <dd>@candidate.CatalogEffectiveFrom.ToString("yyyy-MM-dd")</dd>
+                            </div>
+                        </dl>
+                        <details>
+                            <summary>코드 확정 전에 필요한 상품 정보</summary>
+                            <ul>
+                                @foreach (var detail in candidate.RequiredProductDetails)
+                                {
+                                    <li>@detail</li>
+                                }
+                            </ul>
+                            <p>@candidate.ReviewReason</p>
+                        </details>
+                        @if (OfficialFoodIngredientPresentation.SafeHttpUrl(candidate.SourceUrl) is string sourceUrl)
+                        {
+                            <a href="@sourceUrl" target="_blank" rel="noreferrer">@candidate.SourceName 원문</a>
+                        }
+                    </article>
+                }
+            </div>
+        }
+
+        <ul class="ingredient-hs__notices">
+            @foreach (var notice in Mapping.Notices)
+            {
+                <li>@notice</li>
+            }
+        </ul>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string IngredientName { get; set; } = string.Empty;
+
+    [Parameter]
+    public OfficialFoodIngredientHsMappingResponse? Mapping { get; set; }
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback MappingRequested { get; set; }
+
+    private static string DisplayName(OfficialFoodIngredientHsCandidateDto candidate)
+        => !string.IsNullOrWhiteSpace(candidate.KoreanName)
+            ? candidate.KoreanName
+            : !string.IsNullOrWhiteSpace(candidate.EnglishName)
+                ? candidate.EnglishName
+                : candidate.Description;
+
+    private static string JurisdictionLabel(OfficialFoodIngredientHsCandidateDto candidate)
+        => candidate.JurisdictionUseCode switch
+        {
+            OfficialFoodIngredientHsJurisdictionUseCodes.KoreaExportDeclaration => "한국 수출 HSK 후보",
+            OfficialFoodIngredientHsJurisdictionUseCodes.UnitedStatesImportEntry => "미국 수입 HTS 후보",
+            OfficialFoodIngredientHsJurisdictionUseCodes.InternationalHsReference => "국제 HS 6단위 참고",
+            _ => $"{candidate.CountryCode} 국가 세번 참고"
+        };
+}

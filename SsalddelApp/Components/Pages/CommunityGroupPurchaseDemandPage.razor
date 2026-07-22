@@ -1,0 +1,56 @@
+@page "/community/group-purchase/demand"
+@using Ssalddel.Ui.Common.Areas.App.Components.Information
+
+<PageTitle>비구속 재료 수요</PageTitle>
+
+<OfficialFoodIngredientDemandScreen IngredientSeed="@IngredientSeed"
+                                    LoginHref="/" />
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.IngredientKeyQueryName)]
+    public string? IngredientKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.IngredientNameQueryName)]
+    public string? IngredientName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeTitleQueryName)]
+    public string? RecipeTitle { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeUrlQueryName)]
+    public string? RecipeUrl { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeSourceQueryName)]
+    public string? RecipeSource { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.RecipeQuantityQueryName)]
+    public string? RecipeQuantity { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.PriceReferenceQueryName)]
+    public string? PriceReference { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.PurchaseUnitQueryName)]
+    public string? PurchaseUnit { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.FoodNameQueryName)]
+    public string? FoodName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.FoodCountryCodeQueryName)]
+    public string? FoodCountryCode { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.SourcingModeQueryName)]
+    public string? SourcingModeCode { get; set; }
+
+    private CommunityGroupPurchaseIngredientSeed? IngredientSeed
+        => CommunityGroupPurchaseIngredientSeed.Create(
+            IngredientKey,
+            IngredientName,
+            RecipeTitle,
+            RecipeUrl,
+            RecipeSource,
+            RecipeQuantity,
+            PriceReference,
+            PurchaseUnit,
+            FoodName,
+            FoodCountryCode,
+            SourcingModeCode);
+}

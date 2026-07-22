@@ -25,6 +25,7 @@ public static partial class ServiceCollectionExtensions
         SsalddelExecutionOptions executionOptions)
     {
         services.AddScoped<AgriculturalFisheriesBatchRunner>();
+        services.AddScoped<OfficialFoodIngredientCompanyBatchRunner>();
         services.AddScoped<CommunityEditorialBatchRunner>();
         services.AddScoped<AgriculturalFisheriesCommunityPipelineRunner>();
         services.AddQuartz(q =>
@@ -186,6 +187,21 @@ public static partial class ServiceCollectionExtensions
                 .WithIdentity("UsdaMonthlyPriceCollection-trigger")
                 .WithCronSchedule(
                     options.UsdaMonthlyCronExpression,
+                    schedule => schedule
+                        .InTimeZone(timeZone)
+                        .WithMisfireHandlingInstructionDoNothing()));
+        }
+
+        if (options.IngredientCompanyResearchEnabled)
+        {
+            var jobKey = new JobKey("OfficialFoodIngredientCompanyResearch");
+            quartz.AddJob<OfficialFoodIngredientCompanyResearchJob>(job =>
+                job.WithIdentity(jobKey));
+            quartz.AddTrigger(trigger => trigger
+                .ForJob(jobKey)
+                .WithIdentity("OfficialFoodIngredientCompanyResearch-trigger")
+                .WithCronSchedule(
+                    options.IngredientCompanyResearchCronExpression,
                     schedule => schedule
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionDoNothing()));

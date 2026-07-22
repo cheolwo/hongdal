@@ -1,0 +1,183 @@
+<section class="ingredient-company" aria-labelledby="ingredient-company-title">
+    <header class="ingredient-company__header">
+        <div>
+            <span>ORGANIZATION EVIDENCE</span>
+            <h5 id="ingredient-company-title">@IngredientName 관련 국내외 기업 조사</h5>
+            <p>공식 제품 원재료 보고와 수입식품 표시 이력에서 관계 근거가 있는 사업체만 확인합니다.</p>
+        </div>
+        <button type="button" disabled="@Busy" @onclick="ResearchRequested">
+            @(Research is null ? "관련 기업 조사" : "공식 자료 다시 조회")
+        </button>
+    </header>
+
+    @if (Busy)
+    {
+        <div class="ingredient-company__state" role="status">
+            국내 품목제조보고와 수입식품 표시·해외 제조업소 자료를 확인하고 있습니다.
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="ingredient-company__state ingredient-company__state--error" role="alert">
+            <strong>기업 조사 자료를 불러오지 못했습니다.</strong>
+            <span>@ErrorMessage</span>
+        </div>
+    }
+    else if (Research is null)
+    {
+        <div class="ingredient-company__state">
+            자동 조회하지 않습니다. 사용자가 요청할 때만 공식 원천을 조회하며 업체를 자동 추천·선정·초대하거나 연락하지 않습니다.
+        </div>
+    }
+    else
+    {
+        @if (Research.Archived)
+        {
+            <div class="ingredient-company__archive" role="status">
+                <strong>조사 결과 전산화 완료</strong>
+                <span>업체 @Research.ArchivedOrganizationCount.ToString("N0")곳 · 제품 근거 @Research.ArchivedEvidenceCount.ToString("N0")건</span>
+                <small>실행 키 @Research.ArchiveRunKey</small>
+            </div>
+        }
+
+        <div class="ingredient-company__sources" aria-label="기업 조사 공식 원천 상태">
+            @foreach (var source in Research.Sources)
+            {
+                <article>
+                    <div>
+                        <strong>@source.DisplayName</strong>
+                        <span class="@SourceStatusClass(source.StatusCode)">
+                            @OfficialFoodIngredientPresentation.CompanySourceStatusLabel(source.StatusCode)
+                        </span>
+                    </div>
+                    <p>@source.StatusMessage</p>
+                    @if (OfficialFoodIngredientPresentation.SafeHttpUrl(source.OfficialUrl) is string sourceUrl)
+                    {
+                        <a href="@sourceUrl" target="_blank" rel="noreferrer">공식 원천</a>
+                    }
+                </article>
+            }
+        </div>
+
+        @if (Research.Candidates.Count == 0)
+        {
+            <div class="ingredient-company__state">
+                현재 조회 범위에서 관계 근거가 있는 업체를 찾지 못했습니다. 미등재가 공급 불가능이나 부적격을 뜻하지 않습니다.
+            </div>
+        }
+        else
+        {
+            <div class="ingredient-company__candidates" aria-label="재료 관련 기업 근거 후보">
+                @foreach (var candidate in Research.Candidates)
+                {
+                    <article class="@(candidate.RequiresAttention ? "has-attention" : string.Empty)">
+                        <header>
+                            <div>
+                                <span>@OfficialFoodIngredientPresentation.CompanyRelationLabel(candidate.RelationCode)</span>
+                                <strong>@candidate.OrganizationName</strong>
+                            </div>
+                            <small>@CountryLabel(candidate)</small>
+                        </header>
+                        <dl>
+                            <div>
+                                <dt>관계 제품</dt>
+                                <dd>@Display(candidate.RelatedProductName)</dd>
+                            </div>
+                            <div>
+                                <dt>제품 분류</dt>
+                                <dd>@Display(candidate.ProductCategory)</dd>
+                            </div>
+                            <div>
+                                <dt>공식 식별자</dt>
+                                <dd>@Display(candidate.OfficialIdentifier, "추가 공식 대조 필요")</dd>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(candidate.EvidenceRecordIdentifier))
+                            {
+                                <div>
+                                    <dt>근거 기록번호</dt>
+                                    <dd>@candidate.EvidenceRecordIdentifier</dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(candidate.EvidenceDate))
+                            {
+                                <div>
+                                    <dt>보고·처리일</dt>
+                                    <dd>@candidate.EvidenceDate</dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(candidate.EvidenceLastChangedDate))
+                            {
+                                <div>
+                                    <dt>최종 변경일</dt>
+                                    <dd>@candidate.EvidenceLastChangedDate</dd>
+                                </div>
+                            }
+                        </dl>
+                        <p>@candidate.EvidenceSummary</p>
+                        @if (!string.IsNullOrWhiteSpace(candidate.RawIngredientText))
+                        {
+                            <details class="ingredient-company__raw-evidence">
+                                <summary>공식 원재료 표기 확인</summary>
+                                <p>@candidate.RawIngredientText</p>
+                            </details>
+                        }
+                        <footer>
+                            <span>@OfficialFoodIngredientPresentation.CompanyVerificationLabel(candidate.VerificationStatusCode)</span>
+                            @if (OfficialFoodIngredientPresentation.SafeHttpUrl(candidate.SourceUrl) is string evidenceUrl)
+                            {
+                                <a href="@evidenceUrl" target="_blank" rel="noreferrer">근거 원천</a>
+                            }
+                        </footer>
+                        @if (candidate.RequiresAttention)
+                        {
+                            <div class="ingredient-company__attention" role="note">
+                                주의 상태: @Display(candidate.AttentionReason, "최신 공식 상태를 직접 확인하세요.")
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+
+        <div class="ingredient-company__notices">
+            @foreach (var notice in Research.Notices)
+            {
+                <p>@notice</p>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string IngredientName { get; set; } = string.Empty;
+
+    [Parameter]
+    public OfficialFoodIngredientCompanyResearchResponse? Research { get; set; }
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback ResearchRequested { get; set; }
+
+    private static string SourceStatusClass(string statusCode)
+        => statusCode switch
+        {
+            OfficialFoodIngredientCompanySourceStatusCodes.Available => "is-available",
+            OfficialFoodIngredientCompanySourceStatusCodes.Failed => "is-failed",
+            OfficialFoodIngredientCompanySourceStatusCodes.NotConfigured => "is-unconfigured",
+            _ => "is-supporting"
+        };
+
+    private static string CountryLabel(OfficialFoodIngredientCompanyCandidateDto candidate)
+        => !string.IsNullOrWhiteSpace(candidate.CountryName)
+            ? candidate.CountryName
+            : OfficialFoodIngredientPresentation.CountryName(candidate.CountryCode);
+
+    private static string Display(string? value, string fallback = "정보 없음")
+        => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+}

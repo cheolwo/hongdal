@@ -36,6 +36,8 @@ public sealed class PublicDataOptions
 
     public MfdsCookRecipeOptions MfdsCookRecipe { get; set; } = new();
 
+    public MfdsIngredientCompanyOptions MfdsIngredientCompanies { get; set; } = new();
+
     public RdaLocalFoodOptions RdaLocalFood { get; set; } = new();
 
     public MaffRegionalCuisineOptions MaffRegionalCuisine { get; set; } = new();
@@ -179,6 +181,19 @@ public sealed class MfdsCookRecipeOptions
     public string ServiceId { get; set; } = "COOKRCP01";
 
     public int PageSize { get; set; } = 1000;
+}
+
+public sealed class MfdsIngredientCompanyOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+
+    public string BaseUrl { get; set; } = "https://openapi.foodsafetykorea.go.kr";
+
+    public string ServiceId { get; set; } = "C002";
+
+    public int PageSize { get; set; } = 100;
+
+    public int MaxForeignFacilityLookups { get; set; } = 5;
 }
 
 public sealed class RdaLocalFoodOptions

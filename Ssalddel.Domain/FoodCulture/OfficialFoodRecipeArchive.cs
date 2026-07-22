@@ -214,6 +214,14 @@ public sealed class OfficialFoodIngredient
 
     public ICollection<OfficialFoodIngredientPriceMapping> PublicPriceMappings { get; set; } =
         new List<OfficialFoodIngredientPriceMapping>();
+
+    public OfficialFoodIngredientCompanyProfile? CompanyResearchProfile { get; set; }
+
+    public ICollection<OfficialFoodIngredientCompanyEvidence> CompanyEvidence { get; set; } =
+        new List<OfficialFoodIngredientCompanyEvidence>();
+
+    public ICollection<OfficialFoodIngredientCompanySourceObservation> CompanySourceObservations
+        { get; set; } = new List<OfficialFoodIngredientCompanySourceObservation>();
 }
 
 public sealed class OfficialFoodIngredientPriceMapping

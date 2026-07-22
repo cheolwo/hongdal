@@ -18,6 +18,7 @@ public static class CommunityPageRoutes
     public const string GroupPurchase = "/community/group-purchase";
     public const string GroupImport = "/community/group-import";
     public const string GroupPurchaseCreate = "/community/group-purchase/new";
+    public const string GroupPurchaseDemand = "/community/group-purchase/demand";
     public const string Personal = "/community/me";
     public const string Decorations = "/community/decorations";
     public const string DecorationProducts = $"{Decorations}/products";

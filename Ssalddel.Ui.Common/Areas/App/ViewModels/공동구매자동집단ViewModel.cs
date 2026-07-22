@@ -123,18 +123,14 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매실�
             return 유효성실패("0보다 큰 희망 수량과 수량 단위를 입력해 주세요.");
         }
 
-        if (주문확정수요인가(수요초안)
-            && 수요초안.도착창고Id is not > 0
-            && string.IsNullOrWhiteSpace(수요초안.수령도로명주소))
-        {
-            return 유효성실패("예약 결제 주문은 보유 창고를 선택하거나 자택 등 수령 주소를 입력해 주세요.");
-        }
-
         if (string.IsNullOrWhiteSpace(수요초안.수요출처키))
         {
             수요초안.수요출처키 = $"community-vote:{campaign.Id:N}:{수요초안.주문자키.Trim()}";
             OnPropertyChanged(nameof(수요초안));
         }
+
+        비구속경계적용(수요초안);
+        OnPropertyChanged(nameof(수요초안));
 
         return await 작업실행Async(
             async token =>
@@ -146,20 +142,10 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매실�
                     .Prepend(group)
                     .ToArray();
                 _실행상태.자동집단적용(group);
-                var registeredDemand = group.수요목록.FirstOrDefault(item =>
-                    string.Equals(item.수요출처키, 수요초안.수요출처키, StringComparison.Ordinal))
-                    ?? group.수요목록.FirstOrDefault(item =>
-                        string.Equals(item.주문자키, 수요초안.주문자키, StringComparison.Ordinal));
-                if (registeredDemand is not null)
-                {
-                    _실행상태.주문집계선택(registeredDemand.공동구매주문집계원장Id);
-                    if (!string.IsNullOrWhiteSpace(registeredDemand.개별주문원장Id))
-                    {
-                        _실행상태.주문원장선택(registeredDemand.개별주문원장Id);
-                    }
-                }
+                _실행상태.주문집계선택(null);
+                _실행상태.주문원장선택(null);
             },
-            "수요를 공동구매에 등록하고 주문집계와 내 개별 주문을 연결했습니다.",
+            "비구속 구매 의향을 공동구매 후보 집단에 등록했습니다. 결제·주문·입고·운송은 실행하지 않았습니다.",
             cancellationToken);
     }
 
@@ -318,10 +304,19 @@ public sealed partial class 공동구매자동집단ViewModel : 공동구매실�
         입력변경알림();
     }
 
-    private static bool 주문확정수요인가(공동구매자동수요등록Command command)
-        => command.수요유형 == 공동구매자동수요유형코드.예약결제
-           || command.결제상태 is 공동구매자동결제상태코드.예약됨
-               or 공동구매자동결제상태코드.결제확정;
+    private static void 비구속경계적용(공동구매자동수요등록Command command)
+    {
+        command.수요유형 = 공동구매자동수요유형코드.관심표시;
+        command.결제상태 = 공동구매자동결제상태코드.미결제;
+        command.예약결제금액 = null;
+        command.도착창고Id = null;
+        command.도착창고유형 = string.Empty;
+        command.도착창고명 = string.Empty;
+        command.수령지주소참조키 = string.Empty;
+        command.수령지표시명 = string.Empty;
+        command.수령도로명주소 = string.Empty;
+        command.수령상세주소 = string.Empty;
+    }
 
     private static string First(params string?[] candidates)
         => candidates.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim() ?? string.Empty;

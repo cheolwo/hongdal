@@ -375,6 +375,29 @@ public sealed class PageCapabilityCatalogTests
         Assert.True(capability.HasExternalEffects);
     }
 
+    [Theory]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "community-group-purchase-demand")]
+    [InlineData(SsalddelPageAppCodes.Shipper, "shipper-community-group-purchase-demand")]
+    public void 재료수요등록은_Web과모바일에서_공개탐색과로그인저장경계를공유한다(
+        string appCode,
+        string pageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            appCode,
+            "/community/group-purchase/demand?ingredientKey=ingredient%3Aonion",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.PlatformPersistence, capability.Boundary);
+        Assert.False(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("로그인한 사용자만", capability.Notice);
+    }
+
     [Fact]
     public void 공동구매상세단계는_익명조회와Command인증경계를함께안내한다()
     {

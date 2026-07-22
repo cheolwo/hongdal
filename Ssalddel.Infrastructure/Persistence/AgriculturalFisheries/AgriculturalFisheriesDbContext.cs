@@ -38,8 +38,25 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
     public DbSet<OfficialFoodIngredientPriceMapping> OfficialFoodIngredientPriceMappings =>
         Set<OfficialFoodIngredientPriceMapping>();
 
+    public DbSet<OfficialFoodIngredientHsMapping> OfficialFoodIngredientHsMappings =>
+        Set<OfficialFoodIngredientHsMapping>();
+
     public DbSet<OfficialFoodRecipeIngredient> OfficialFoodRecipeIngredients =>
         Set<OfficialFoodRecipeIngredient>();
+
+    public DbSet<OfficialFoodIngredientCompanyResearchRun>
+        OfficialFoodIngredientCompanyResearchRuns =>
+        Set<OfficialFoodIngredientCompanyResearchRun>();
+
+    public DbSet<OfficialFoodIngredientCompanyProfile> OfficialFoodIngredientCompanyProfiles =>
+        Set<OfficialFoodIngredientCompanyProfile>();
+
+    public DbSet<OfficialFoodIngredientCompanyEvidence> OfficialFoodIngredientCompanyEvidence =>
+        Set<OfficialFoodIngredientCompanyEvidence>();
+
+    public DbSet<OfficialFoodIngredientCompanySourceObservation>
+        OfficialFoodIngredientCompanySourceObservations =>
+        Set<OfficialFoodIngredientCompanySourceObservation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,6 +72,13 @@ public sealed class AgriculturalFisheriesDbContext : DbContext
         modelBuilder.ApplyConfiguration(new OfficialFoodIngredientCategoryConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodIngredientConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodIngredientPriceMappingConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodIngredientHsMappingConfiguration());
         modelBuilder.ApplyConfiguration(new OfficialFoodRecipeIngredientConfiguration());
+        modelBuilder.ApplyConfiguration(
+            new OfficialFoodIngredientCompanyResearchRunConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodIngredientCompanyProfileConfiguration());
+        modelBuilder.ApplyConfiguration(new OfficialFoodIngredientCompanyEvidenceConfiguration());
+        modelBuilder.ApplyConfiguration(
+            new OfficialFoodIngredientCompanySourceObservationConfiguration());
     }
 }

@@ -42,6 +42,24 @@ public sealed class OfficialFoodRecipeArchiveServiceTests
     }
 
     [Fact]
+    public async Task 음식키로_공개탐색에필요한_대표음식메타데이터를조회한다()
+    {
+        await using var fixture = await ArchiveFixture.CreateAsync(
+            OfficialFoodRecipeSourceKeys.MfdsCookRecipe);
+        var service = fixture.CreateService();
+        await service.CollectAsync(new OfficialFoodRecipeCollectionRequest(
+            OfficialFoodRecipeSourceKeys.MfdsCookRecipe));
+        var listed = Assert.Single(await service.SearchDishesAsync(new OfficialFoodRecipeQuery()));
+
+        var detail = await service.GetDishAsync(listed.DishKey);
+
+        Assert.NotNull(detail);
+        Assert.Equal(listed.DishKey, detail!.DishKey);
+        Assert.Equal("이웃 채소밥", detail.Name);
+        Assert.Equal("KR", detail.CountryCode);
+    }
+
+    [Fact]
     public async Task 한_응답의_동명이음식_변형은_대표후보하나를_공유한다()
     {
         await using var fixture = await ArchiveFixture.CreateAsync(
@@ -97,11 +115,21 @@ public sealed class OfficialFoodRecipeArchiveServiceTests
             fixture.TimeProvider);
 
         var fresh = await candidateSource.ReadAsync(new CommunityInformationCollectionQuery());
+        var freshDishes = await service.SearchDishesAsync(new OfficialFoodRecipeQuery
+        {
+            OnlyWithBrowsableIngredients = true
+        });
         fixture.TimeProvider.SetUtcNow(expiresAt.AddSeconds(1));
         var expired = await candidateSource.ReadAsync(new CommunityInformationCollectionQuery());
+        var expiredDishes = await service.SearchDishesAsync(new OfficialFoodRecipeQuery
+        {
+            OnlyWithBrowsableIngredients = true
+        });
 
         Assert.Single(fresh);
+        Assert.Single(freshDishes);
         Assert.Empty(expired);
+        Assert.Empty(expiredDishes);
         Assert.Null(fresh[0].ThumbnailUrl);
         Assert.Equal(CommunityInformationReviewStates.PendingReview, fresh[0].ReviewState);
     }

@@ -45,6 +45,7 @@ using Ssalddel.Infrastructure.Persistence.AgriculturalFisheries;
 using Ssalddel.Infrastructure.Persistence.TraditionalMarkets;
 using Ssalddel.Services.AgriculturalFisheries.Information;
 using Ssalddel.Contracts.Common.Content;
+using Ssalddel.Services.Customs;
 using Ssalddel.Services.FoodCulture;
 using Ssalddel.Startup;
 
@@ -373,6 +374,75 @@ if (args.Any(argument => string.Equals(
 
 if (args.Any(argument => string.Equals(
         argument,
+        "--research-official-food-ingredient-companies",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var maxItemsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--max-items=", StringComparison.OrdinalIgnoreCase));
+    var maxItems = int.TryParse(
+        maxItemsArgument?["--max-items=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedMaxItems)
+        ? parsedMaxItems
+        : 500;
+    var candidatesArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--candidates-per-ingredient=", StringComparison.OrdinalIgnoreCase));
+    var candidatesPerIngredient = int.TryParse(
+        candidatesArgument?["--candidates-per-ingredient=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedCandidatesPerIngredient)
+        ? parsedCandidatesPerIngredient
+        : 100;
+    var refreshDaysArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--refresh-after-days=", StringComparison.OrdinalIgnoreCase));
+    var refreshAfterDays = int.TryParse(
+        refreshDaysArgument?["--refresh-after-days=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedRefreshAfterDays)
+        ? parsedRefreshAfterDays
+        : 30;
+    var delayArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--request-delay-ms=", StringComparison.OrdinalIgnoreCase));
+    var requestDelayMilliseconds = int.TryParse(
+        delayArgument?["--request-delay-ms=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedRequestDelayMilliseconds)
+        ? parsedRequestDelayMilliseconds
+        : 250;
+    var force = args.Any(argument => string.Equals(
+        argument,
+        "--force",
+        StringComparison.OrdinalIgnoreCase));
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var archiveService = scope.ServiceProvider
+        .GetRequiredService<IOfficialFoodIngredientCompanyArchiveService>();
+    var result = await archiveService.CollectCatalogAsync(
+        new OfficialFoodIngredientCompanyCollectionRequest(
+            maxItems,
+            candidatesPerIngredient,
+            force,
+            refreshAfterDays,
+            requestDelayMilliseconds));
+    app.Logger.LogInformation(
+        "공식 음식 재료별 국내외 기업 조사 전산화 완료. Run={RunKey}, Status={Status}, Requested={Requested}, Processed={Processed}, Failed={Failed}, Evidence={Evidence}",
+        result.RunKey,
+        result.StatusCode,
+        result.RequestedIngredientCount,
+        result.ProcessedIngredientCount,
+        result.FailedIngredientCount,
+        result.ObservedEvidenceCount);
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
         "--index-official-food-ingredient-prices",
         StringComparison.OrdinalIgnoreCase)))
 {
@@ -408,6 +478,104 @@ if (args.Any(argument => string.Equals(
         indexResult.PricedIngredientCount,
         indexResult.KoreanPriceCount,
         indexResult.UnitedStatesPriceCount);
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--import-kcs-hsk-catalog",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var yearArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--year=", StringComparison.OrdinalIgnoreCase));
+    var year = int.TryParse(
+        yearArgument?["--year=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedYear)
+        ? parsedYear
+        : DateTime.UtcNow.Year;
+    var chaptersArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--chapters=", StringComparison.OrdinalIgnoreCase));
+    var chapters = KcsHskFoodChapterSelection.Parse(chaptersArgument?["--chapters=".Length..]);
+    var delayArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--request-delay-ms=", StringComparison.OrdinalIgnoreCase));
+    var requestDelayMilliseconds = int.TryParse(
+        delayArgument?["--request-delay-ms=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedRequestDelayMilliseconds)
+        ? parsedRequestDelayMilliseconds
+        : 150;
+    var force = args.Any(argument => string.Equals(
+        argument,
+        "--force",
+        StringComparison.OrdinalIgnoreCase));
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<SsalddelContext>();
+    await db.Database.MigrateAsync();
+    var importService = scope.ServiceProvider.GetRequiredService<IKcsHskCatalogImportService>();
+    var result = await importService.ImportAsync(new KcsHskCatalogImportRequest(
+        year,
+        chapters,
+        requestDelayMilliseconds,
+        force));
+    app.Logger.LogInformation(
+        "관세청 HSK 식품 카탈로그 처리 완료. Imported={Imported}, VersionId={VersionId}, Entries={Entries}, Added={Added}, Updated={Updated}, Deactivated={Deactivated}, Requests={Requests}, EffectiveFrom={EffectiveFrom:yyyy-MM-dd}",
+        result.Imported,
+        result.CatalogVersionId,
+        result.EntryCount,
+        result.AddedCount,
+        result.UpdatedCount,
+        result.DeactivatedCount,
+        result.RequestCount,
+        result.EffectiveFrom);
+    return;
+}
+
+if (args.Any(argument => string.Equals(
+        argument,
+        "--index-official-food-ingredient-hs-codes",
+        StringComparison.OrdinalIgnoreCase)))
+{
+    var maxItemsArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--max-items=", StringComparison.OrdinalIgnoreCase));
+    var maxItems = int.TryParse(
+        maxItemsArgument?["--max-items=".Length..],
+        NumberStyles.Integer,
+        CultureInfo.InvariantCulture,
+        out var parsedMaxItems)
+        ? parsedMaxItems
+        : 5000;
+    var countryCodesArgument = args.FirstOrDefault(argument =>
+        argument.StartsWith("--countries=", StringComparison.OrdinalIgnoreCase));
+    var countryCodes = countryCodesArgument?["--countries=".Length..]
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(countryCode => countryCode.ToUpperInvariant())
+        .Distinct(StringComparer.Ordinal)
+        .ToArray();
+    var force = args.Any(argument => string.Equals(
+        argument,
+        "--force",
+        StringComparison.OrdinalIgnoreCase));
+
+    await using var scope = app.Services.CreateAsyncScope();
+    var archiveDb = scope.ServiceProvider.GetRequiredService<AgriculturalFisheriesDbContext>();
+    await archiveDb.Database.MigrateAsync();
+    var mappingService = scope.ServiceProvider
+        .GetRequiredService<IOfficialFoodIngredientHsMappingService>();
+    var result = await mappingService.RebuildAsync(
+        new OfficialFoodIngredientHsIndexRequest(maxItems, force, countryCodes));
+    app.Logger.LogInformation(
+        "공식 음식 재료 HS 후보 연결 완료. Processed={Processed}, Mapped={Mapped}, Candidates={Candidates}, Unmapped={Unmapped}, CatalogVersions={CatalogVersions}, CatalogEntries={CatalogEntries}, Countries={Countries}",
+        result.ProcessedIngredientCount,
+        result.MappedIngredientCount,
+        result.CandidateCount,
+        result.UnmappedIngredientCount,
+        result.ActiveCatalogVersionCount,
+        result.ActiveCatalogEntryCount,
+        string.Join(", ", result.CountryCandidateCounts.Select(item => $"{item.Key}:{item.Value}")));
     return;
 }
 

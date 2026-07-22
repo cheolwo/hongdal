@@ -54,6 +54,124 @@ public sealed class OfficialFoodIngredientJourneyTests
     }
 
     [Fact]
+    public async Task 공개음식Client는_국가별목록과_구조화재료상세를조회한다()
+    {
+        var detail = DishDetail();
+        var requestedUris = new List<Uri>();
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUris.Add(request.RequestUri!);
+            var value = request.RequestUri!.AbsolutePath.EndsWith("/food-dishes", StringComparison.Ordinal)
+                ? JsonSerializer.Serialize(new[] { detail.Dish })
+                : JsonSerializer.Serialize(detail);
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(value, Encoding.UTF8, "application/json")
+            };
+        });
+        var client = new OfficialFoodIngredientDiscoveryClient(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ssalddel.test/")
+        });
+
+        var dishes = await client.SearchDishesAsync(new OfficialFoodDishDiscoveryQuery
+        {
+            CountryCode = "JP",
+            SearchText = "rice",
+            Take = 100
+        });
+        var selected = await client.GetDishAsync(detail.Dish.DishKey);
+
+        Assert.Single(dishes);
+        Assert.NotNull(selected);
+        Assert.Equal("양파", Assert.Single(selected!.Ingredients).CanonicalName);
+        Assert.Equal("/api/v1/agricultural-fisheries/food-dishes", requestedUris[0].AbsolutePath);
+        var listQuery = Uri.UnescapeDataString(requestedUris[0].Query);
+        Assert.Contains("countryCode=JP", listQuery, StringComparison.Ordinal);
+        Assert.Contains("searchText=rice", listQuery, StringComparison.Ordinal);
+        Assert.Contains("take=50", listQuery, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 공개재료Client는_재료관련기업근거를_인코딩해조회한다()
+    {
+        Uri? requestedUri = null;
+        var expected = CompanyResearchResponse();
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(expected),
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new OfficialFoodIngredientDiscoveryClient(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ssalddel.test/")
+        });
+
+        var result = await client.SearchCompaniesAsync(new OfficialFoodIngredientCompanyQuery
+        {
+            IngredientKey = " ingredient:onion ",
+            IngredientName = " 양파 ",
+            Take = 100
+        });
+
+        Assert.Single(result.Candidates);
+        Assert.NotNull(requestedUri);
+        Assert.Equal(
+            "/api/v1/agricultural-fisheries/food-ingredients/companies",
+            requestedUri!.AbsolutePath);
+        var query = Uri.UnescapeDataString(requestedUri.Query);
+        Assert.Contains("ingredientKey=ingredient:onion", query, StringComparison.Ordinal);
+        Assert.Contains("ingredientName=양파", query, StringComparison.Ordinal);
+        Assert.Contains("take=20", query, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 공개재료Client는_재료HS후보조건을_인코딩해조회한다()
+    {
+        Uri? requestedUri = null;
+        var expected = HsMappingResponse();
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            requestedUri = request.RequestUri;
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(expected),
+                    Encoding.UTF8,
+                    "application/json")
+            };
+        });
+        var client = new OfficialFoodIngredientDiscoveryClient(new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://api.ssalddel.test/")
+        });
+
+        var result = await client.GetHsCodesAsync(new OfficialFoodIngredientHsQuery
+        {
+            IngredientKey = " ingredient:onion ",
+            IngredientName = " 양파 ",
+            CountryCode = " US ",
+            Refresh = true
+        });
+
+        Assert.Single(result.Candidates);
+        Assert.Equal(
+            "/api/v1/agricultural-fisheries/food-ingredients/hs-codes",
+            requestedUri!.AbsolutePath);
+        var query = Uri.UnescapeDataString(requestedUri.Query);
+        Assert.Contains("ingredientKey=ingredient:onion", query, StringComparison.Ordinal);
+        Assert.Contains("ingredientName=양파", query, StringComparison.Ordinal);
+        Assert.Contains("countryCode=US", query, StringComparison.Ordinal);
+        Assert.Contains("refresh=true", query, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task 재료탐색ViewModel은_검색어와_대표레시피가격을함께보존한다()
     {
         var client = new FakeIngredientClient([Ingredient("두부")]);
@@ -70,6 +188,73 @@ public sealed class OfficialFoodIngredientJourneyTests
         var ingredient = Assert.Single(viewModel.Ingredients);
         Assert.Single(ingredient.PublicPrices ?? []);
         Assert.Single(ingredient.RelatedRecipes ?? []);
+    }
+
+    [Fact]
+    public async Task 음식탐색ViewModel은_국가음식재료선택을_한페이지상태로보존한다()
+    {
+        var detail = DishDetail();
+        var client = new FakeIngredientClient(
+            [Ingredient("두부")],
+            [detail.Dish],
+            detail);
+        using var viewModel = new OfficialFoodIngredientJourneyViewModel(client);
+
+        var loaded = await viewModel.초기화Async();
+        var countryChanged = await viewModel.SelectCountryAsync("JP");
+
+        Assert.True(loaded);
+        Assert.True(countryChanged);
+        Assert.True(viewModel.HasDishes);
+        Assert.Equal("JP", viewModel.SelectedCountryCode);
+        Assert.Equal("JP", client.LastDishQuery?.CountryCode);
+        Assert.Equal(detail.Dish.DishKey, viewModel.SelectedDish?.Dish.DishKey);
+        Assert.Equal("양파", viewModel.SelectedDishIngredient?.CanonicalName);
+    }
+
+    [Fact]
+    public async Task 음식탐색ViewModel은_사용자요청시에만_선택재료기업근거를조회한다()
+    {
+        var detail = DishDetail();
+        var client = new FakeIngredientClient(
+            [Ingredient("두부")],
+            [detail.Dish],
+            detail,
+            CompanyResearchResponse());
+        using var viewModel = new OfficialFoodIngredientJourneyViewModel(client);
+
+        await viewModel.초기화Async();
+        Assert.Null(viewModel.CompanyResearch);
+
+        var researched = await viewModel.ResearchSelectedIngredientCompaniesAsync();
+
+        Assert.True(researched);
+        Assert.NotNull(viewModel.CompanyResearch);
+        Assert.Equal("ingredient:onion", client.LastCompanyQuery?.IngredientKey);
+        Assert.Equal("양파", client.LastCompanyQuery?.IngredientName);
+    }
+
+    [Fact]
+    public async Task 음식탐색ViewModel은_사용자요청시에만_선택재료HS후보를조회한다()
+    {
+        var detail = DishDetail();
+        var client = new FakeIngredientClient(
+            [Ingredient("두부")],
+            [detail.Dish],
+            detail,
+            hsMapping: HsMappingResponse());
+        using var viewModel = new OfficialFoodIngredientJourneyViewModel(client);
+
+        await viewModel.초기화Async();
+        Assert.Null(viewModel.HsMapping);
+
+        var loaded = await viewModel.LoadSelectedIngredientHsCodesAsync();
+
+        Assert.True(loaded);
+        Assert.NotNull(viewModel.HsMapping);
+        Assert.Equal("ingredient:onion", client.LastHsQuery?.IngredientKey);
+        Assert.Equal("양파", client.LastHsQuery?.IngredientName);
+        Assert.False(Assert.Single(viewModel.HsMapping!.Candidates).IsDeclarationReady);
     }
 
     [Fact]
@@ -110,6 +295,28 @@ public sealed class OfficialFoodIngredientJourneyTests
         Assert.Empty(seed!.RecipeUrl);
         Assert.Equal("kg", seed.PurchaseUnit);
         Assert.DoesNotContain("recipeUrl=", seed.ToNavigationUri(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void 음식재료의_공동수입선택은_문화국가와상품출발국을분리한초안을만든다()
+    {
+        var detail = DishDetail();
+        var selection = new OfficialFoodDishIngredientPurchaseSelection(
+            detail,
+            Assert.Single(detail.Ingredients),
+            CommunityIngredientSourcingModeCodes.GroupImportReview);
+
+        var seed = OfficialFoodIngredientPresentation.CreatePurchaseSeed(selection);
+
+        Assert.NotNull(seed);
+        Assert.True(seed!.IsGroupImportReview);
+        Assert.Equal("양파 공동수입 검토 제안", seed.SuggestedTitle);
+        Assert.Equal("JP", seed.FoodCountryCode);
+        Assert.Contains("상품 원산지·출발국으로 자동 사용하지 않음", seed.BuildSuggestedDescription(), StringComparison.Ordinal);
+        Assert.Contains("실제 상품 출발국", seed.BuildSuggestedDescription(), StringComparison.Ordinal);
+        var uri = Uri.UnescapeDataString(seed.ToNavigationUri());
+        Assert.Contains("foodCountry=JP", uri, StringComparison.Ordinal);
+        Assert.Contains("sourcingMode=GroupImportReview", uri, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -162,6 +369,12 @@ public sealed class OfficialFoodIngredientJourneyTests
         var card = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCard.razor"));
         var journeyCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientJourney.razor.css"));
         var cardCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCard.razor.css"));
+        var dishBrowser = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodDishBrowsePanel.razor"));
+        var dishBrowserCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodDishBrowsePanel.razor.css"));
+        var companyPanel = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCompanyPanel.razor"));
+        var companyPanelCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientCompanyPanel.razor.css"));
+        var hsPanel = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientHsPanel.razor"));
+        var hsPanelCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientHsPanel.razor.css"));
         var recipeCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientRecipePanel.razor.css"));
         var searchCss = File.ReadAllText(Path.Combine(componentDirectory, "OfficialFoodIngredientSearchPanel.razor.css"));
 
@@ -174,6 +387,23 @@ public sealed class OfficialFoodIngredientJourneyTests
         Assert.Contains("min-height: 44px", cardCss);
         Assert.Contains("min-height: 44px", recipeCss);
         Assert.Contains("min-height: 44px", searchCss);
+        Assert.Contains("음식 국가 ≠ 상품 출발국", dishBrowser);
+        Assert.Contains("국내 공동구매 수요 등록", dishBrowser);
+        Assert.Contains("공동수입 관심 수요 등록", dishBrowser);
+        Assert.Contains("OfficialFoodIngredientCompanyPanel", dishBrowser);
+        Assert.Contains("OfficialFoodIngredientHsPanel", dishBrowser);
+        Assert.Contains("관련 국내외 기업 조사", companyPanel);
+        Assert.Contains("자동 조회하지 않습니다", companyPanel);
+        Assert.Contains("자동 추천·선정·초대", companyPanel);
+        Assert.Contains("@media (max-width: 640px)", dishBrowserCss);
+        Assert.Contains("min-height: 44px", dishBrowserCss);
+        Assert.Contains("@media (max-width: 640px)", companyPanelCss);
+        Assert.Contains("min-height: 44px", companyPanelCss);
+        Assert.Contains("신고용 확정값 아님", hsPanel);
+        Assert.Contains("한국 수출 HSK", hsPanel);
+        Assert.Contains("미국 수입 HTS", hsPanel);
+        Assert.Contains("@media (max-width: 640px)", hsPanelCss);
+        Assert.Contains("min-height: 44px", hsPanelCss);
     }
 
     private static string FindComponentDirectory()
@@ -259,11 +489,209 @@ public sealed class OfficialFoodIngredientJourneyTests
                     true)
             ]);
 
+    private static OfficialFoodDishDetailDto DishDetail()
+    {
+        var collectedAtUtc = new DateTime(2026, 7, 21, 8, 0, 0, DateTimeKind.Utc);
+        var dish = new OfficialFoodRecipeDishDto(
+            "dish:jp-onion-rice",
+            "JP",
+            "교토",
+            "양파밥",
+            "玉ねぎご飯",
+            "Onion rice",
+            "밥",
+            "양파를 넣어 함께 짓는 지역 음식",
+            OfficialFoodRecipeRepresentationStates.Candidate,
+            OfficialFoodRecipeReviewStates.PendingReview,
+            1,
+            collectedAtUtc);
+        var ingredient = new OfficialFoodRecipeIngredientDto(
+            "ingredient:onion",
+            "양파",
+            OfficialFoodIngredientCategoryCodes.Vegetable,
+            "채소",
+            "주재료",
+            "양파 1개",
+            "양파",
+            "1개",
+            1,
+            null,
+            "count",
+            "개",
+            string.Empty,
+            "잘게 썰기",
+            1,
+            "test-parser",
+            0.98m,
+            false,
+            [
+                new OfficialFoodIngredientPublicPriceDto(
+                    "KR",
+                    "한국",
+                    OfficialFoodIngredientPublicPriceSourceKeys.Kamis,
+                    "한국농수산식품유통공사",
+                    OfficialFoodIngredientPriceMarketStages.Retail,
+                    "소매",
+                    "양파",
+                    string.Empty,
+                    2_000m,
+                    1_800m,
+                    2_200m,
+                    "KRW",
+                    "kg",
+                    new DateOnly(2026, 7, 20),
+                    "2026-07-20",
+                    "전국",
+                    "Daily",
+                    10,
+                    OfficialFoodIngredientPriceMappingStates.AutoMatched,
+                    "이름 일치",
+                    "https://www.kamis.or.kr",
+                    collectedAtUtc)
+            ]);
+        return new OfficialFoodDishDetailDto(
+            dish,
+            "recipe:jp-onion-rice:1",
+            OfficialFoodRecipeSourceKeys.MaffRegionalCuisine,
+            "일본 농림수산성",
+            "양파밥",
+            "2인분",
+            "https://www.maff.go.jp/example/onion-rice",
+            "출처: 일본 농림수산성",
+            collectedAtUtc,
+            true,
+            [ingredient]);
+    }
+
+    private static OfficialFoodIngredientCompanyResearchResponse CompanyResearchResponse()
+        => new(
+            OfficialFoodIngredientCompanyResearchStatusCodes.Available,
+            "ingredient:onion",
+            "양파",
+            new DateTimeOffset(2026, 7, 22, 3, 0, 0, TimeSpan.Zero),
+            [
+                new OfficialFoodIngredientCompanySourceDto(
+                    "mfds-domestic-product-ingredient-report",
+                    "식품의약품안전처",
+                    "품목제조보고",
+                    "대한민국",
+                    "https://foodsafetykorea.go.kr",
+                    OfficialFoodIngredientCompanySourceStatusCodes.Available,
+                    "조회 완료",
+                    true,
+                    false,
+                    true)
+            ],
+            [
+                new OfficialFoodIngredientCompanyCandidateDto(
+                    "organization-candidate:1",
+                    "양파식품",
+                    "KR",
+                    "대한민국",
+                    OfficialFoodIngredientCompanyRelationCodes.DomesticManufacturer,
+                    OfficialFoodIngredientCompanyEvidenceCodes.DomesticProductIngredientReport,
+                    "양파 원재료 제품 이력",
+                    "양파 소스",
+                    "소스",
+                    "20010000001",
+                    OfficialFoodIngredientCompanyVerificationStatusCodes.OfficialProductReport,
+                    false,
+                    string.Empty,
+                    "mfds-domestic-product-ingredient-report",
+                    "품목제조보고",
+                    "https://foodsafetykorea.go.kr",
+                    new DateTimeOffset(2026, 7, 22, 3, 0, 0, TimeSpan.Zero),
+                    true,
+                    false,
+                    false)
+            ],
+            ["자동 선정하지 않습니다."]);
+
+    private static OfficialFoodIngredientHsMappingResponse HsMappingResponse()
+        => new(
+            "ingredient:onion",
+            "양파",
+            null,
+            true,
+            new DateTime(2026, 7, 22, 4, 0, 0, DateTimeKind.Utc),
+            [
+                new OfficialFoodIngredientHsCandidateDto(
+                    1,
+                    10,
+                    "US",
+                    OfficialFoodIngredientHsJurisdictionUseCodes.UnitedStatesImportEntry,
+                    "HTSUS",
+                    "2026-r11",
+                    10,
+                    "0703.10.2000",
+                    "0703102000",
+                    10,
+                    "양파",
+                    "Onions",
+                    "Fresh or chilled onions",
+                    "CuratedHsFamilySearch",
+                    OfficialFoodIngredientHsMatchQualityCodes.CuratedHsFamilyCandidate,
+                    0.64m,
+                    OfficialFoodIngredientHsMappingStates.Candidate,
+                    "양파 재료군 후보",
+                    "신선·건조 여부를 확인해야 합니다.",
+                    ["신선·냉장·건조·분말 여부"],
+                    "USITC HTS",
+                    "https://hts.usitc.gov/",
+                    new DateTime(2026, 1, 1),
+                    null,
+                    new DateTime(2026, 7, 1),
+                    new DateTime(2026, 7, 22, 4, 0, 0, DateTimeKind.Utc),
+                    true,
+                    false)
+            ],
+            ["신고용 확정값이 아닙니다."]);
+
     private sealed class FakeIngredientClient(
-        IReadOnlyList<OfficialFoodIngredientDto> ingredients)
+        IReadOnlyList<OfficialFoodIngredientDto> ingredients,
+        IReadOnlyList<OfficialFoodRecipeDishDto>? dishes = null,
+        OfficialFoodDishDetailDto? dishDetail = null,
+        OfficialFoodIngredientCompanyResearchResponse? companyResearch = null,
+        OfficialFoodIngredientHsMappingResponse? hsMapping = null)
         : IOfficialFoodIngredientDiscoveryClient
     {
         public OfficialFoodIngredientQuery? LastQuery { get; private set; }
+
+        public OfficialFoodDishDiscoveryQuery? LastDishQuery { get; private set; }
+
+        public OfficialFoodIngredientCompanyQuery? LastCompanyQuery { get; private set; }
+
+        public OfficialFoodIngredientHsQuery? LastHsQuery { get; private set; }
+
+        public Task<IReadOnlyList<OfficialFoodRecipeDishDto>> SearchDishesAsync(
+            OfficialFoodDishDiscoveryQuery query,
+            CancellationToken cancellationToken = default)
+        {
+            LastDishQuery = query;
+            return Task.FromResult(dishes ?? []);
+        }
+
+        public Task<OfficialFoodDishDetailDto?> GetDishAsync(
+            string dishKey,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(
+                dishDetail?.Dish.DishKey == dishKey ? dishDetail : null);
+
+        public Task<OfficialFoodIngredientCompanyResearchResponse> SearchCompaniesAsync(
+            OfficialFoodIngredientCompanyQuery query,
+            CancellationToken cancellationToken = default)
+        {
+            LastCompanyQuery = query;
+            return Task.FromResult(companyResearch ?? CompanyResearchResponse());
+        }
+
+        public Task<OfficialFoodIngredientHsMappingResponse> GetHsCodesAsync(
+            OfficialFoodIngredientHsQuery query,
+            CancellationToken cancellationToken = default)
+        {
+            LastHsQuery = query;
+            return Task.FromResult(hsMapping ?? HsMappingResponse());
+        }
 
         public Task<IReadOnlyList<OfficialFoodIngredientDto>> SearchAsync(
             OfficialFoodIngredientQuery query,

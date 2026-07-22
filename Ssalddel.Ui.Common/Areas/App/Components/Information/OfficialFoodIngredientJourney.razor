@@ -5,16 +5,47 @@
 <section class="ingredient-journey" aria-labelledby="ingredient-journey-title">
     <header class="ingredient-journey__header">
         <div>
-            <span class="ingredient-journey__eyebrow">INGREDIENT → RECIPE → COMMUNITY</span>
-            <h2 id="ingredient-journey-title">재료 가격에서 레시피, 공동구매 제안까지</h2>
-            <p>공식 레시피에 실제로 쓰인 재료와 공공 가격을 확인하고, 필요한 경우 그 근거를 공동구매 초안으로 이어갑니다.</p>
+            <span class="ingredient-journey__eyebrow">FOOD → INGREDIENT → EVIDENCE → NONBINDING DEMAND</span>
+            <h2 id="ingredient-journey-title">세계 음식에서 재료 근거와 비구속 수요까지</h2>
+            <p>공식 음식과 재료를 보고 공개 근거를 확인한 뒤, 수령 지역과 희망 수량을 직접 정해 비구속 공동구매 수요로 이어갑니다.</p>
         </div>
         <div class="ingredient-journey__steps" aria-label="이용 순서">
-            <span><b>1</b>재료·가격</span>
-            <span><b>2</b>관련 레시피</span>
-            <span><b>3</b>공동구매 초안</span>
+            <span><b>1</b>나라·음식</span>
+            <span><b>2</b>레시피 재료</span>
+            <span><b>3</b>기업 근거</span>
+            <span><b>4</b>국내·수입 분기</span>
+            <span><b>5</b>비구속 수요</span>
         </div>
     </header>
+
+    <OfficialFoodDishBrowsePanel Countries="OfficialFoodIngredientJourneyViewModel.CountryOptions"
+                                 SelectedCountryCode="@ViewModel.SelectedCountryCode"
+                                 CountryChanged="SelectCountryAsync"
+                                 SearchText="@ViewModel.DishSearchText"
+                                 SearchTextChanged="OnDishSearchTextChanged"
+                                 SearchRequested="SearchDishesAsync"
+                                 Dishes="@ViewModel.Dishes"
+                                 SelectedDish="@ViewModel.SelectedDish"
+                                 SelectedIngredientKey="@ViewModel.SelectedDishIngredientKey"
+                                 SelectedIngredient="@ViewModel.SelectedDishIngredient"
+                                 DishSelected="SelectDishAsync"
+                                 IngredientSelected="SelectDishIngredient"
+                                 PurchaseRequested="StartDishIngredientPurchase"
+                                 Busy="@ViewModel.DishDetailBusy"
+                                 ErrorMessage="@ViewModel.DishErrorMessage"
+                                 CompanyResearch="@ViewModel.CompanyResearch"
+                                 CompanyResearchBusy="@ViewModel.CompanyResearchBusy"
+                                 CompanyResearchErrorMessage="@ViewModel.CompanyResearchErrorMessage"
+                                 CompanyResearchRequested="ResearchSelectedIngredientCompaniesAsync"
+                                 HsMapping="@ViewModel.HsMapping"
+                                 HsMappingBusy="@ViewModel.HsMappingBusy"
+                                 HsMappingErrorMessage="@ViewModel.HsMappingErrorMessage"
+                                 HsMappingRequested="LoadSelectedIngredientHsCodesAsync" />
+
+    <div class="ingredient-journey__catalog-heading">
+        <span>재료명을 알고 있다면</span>
+        <h3>공식 재료·가격에서 바로 찾기</h3>
+    </div>
 
     <OfficialFoodIngredientSearchPanel SearchText="@ViewModel.SearchText"
                                        SearchTextChanged="OnSearchTextChanged"
@@ -70,12 +101,42 @@
     private void OnSearchTextChanged(string value)
         => ViewModel.SearchText = value;
 
+    private void OnDishSearchTextChanged(string value)
+        => ViewModel.DishSearchText = value;
+
+    private Task SelectCountryAsync(string countryCode)
+        => ViewModel.SelectCountryAsync(countryCode);
+
+    private Task SearchDishesAsync()
+        => ViewModel.SearchDishesAsync();
+
+    private Task SelectDishAsync(string dishKey)
+        => ViewModel.SelectDishAsync(dishKey);
+
+    private void SelectDishIngredient(string ingredientKey)
+        => ViewModel.SelectDishIngredient(ingredientKey);
+
+    private Task ResearchSelectedIngredientCompaniesAsync()
+        => ViewModel.ResearchSelectedIngredientCompaniesAsync();
+
+    private Task LoadSelectedIngredientHsCodesAsync()
+        => ViewModel.LoadSelectedIngredientHsCodesAsync();
+
     private void StartGroupPurchase(OfficialFoodIngredientPurchaseSelection selection)
     {
         var seed = OfficialFoodIngredientPresentation.CreatePurchaseSeed(selection);
         if (seed is not null)
         {
-            Navigation.NavigateTo(seed.ToNavigationUri());
+            Navigation.NavigateTo(seed.ToDemandNavigationUri());
+        }
+    }
+
+    private void StartDishIngredientPurchase(OfficialFoodDishIngredientPurchaseSelection selection)
+    {
+        var seed = OfficialFoodIngredientPresentation.CreatePurchaseSeed(selection);
+        if (seed is not null)
+        {
+            Navigation.NavigateTo(seed.ToDemandNavigationUri());
         }
     }
 }

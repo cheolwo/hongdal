@@ -124,6 +124,17 @@ public sealed class OfficialFoodRecipeQuery
     public string? SearchText { get; init; }
 
     public int Take { get; init; } = 50;
+
+    public bool OnlyWithBrowsableIngredients { get; init; }
+}
+
+public sealed class OfficialFoodDishDiscoveryQuery
+{
+    public string? CountryCode { get; init; }
+
+    public string? SearchText { get; init; }
+
+    public int Take { get; init; } = 24;
 }
 
 public sealed record OfficialFoodRecipeDishDto(
@@ -139,6 +150,19 @@ public sealed record OfficialFoodRecipeDishDto(
     string ReviewState,
     int VariantCount,
     DateTime UpdatedAtUtc);
+
+public sealed record OfficialFoodDishDetailDto(
+    OfficialFoodRecipeDishDto Dish,
+    string RecipeRecordKey,
+    string SourceKey,
+    string Provider,
+    string RecipeTitle,
+    string ServingText,
+    string OriginalUrl,
+    string AttributionText,
+    DateTime LastCollectedAtUtc,
+    bool IsFreshForPublication,
+    IReadOnlyList<OfficialFoodRecipeIngredientDto> Ingredients);
 
 public sealed record OfficialFoodRecipeVariantDto(
     string RecordKey,

@@ -1,0 +1,253 @@
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+
+<section class="food-dish-browser" aria-labelledby="food-dish-browser-title">
+    <header class="food-dish-browser__header">
+        <div>
+            <span>WORLD FOOD DISCOVERY</span>
+            <h3 id="food-dish-browser-title">여러 나라의 음식부터 둘러보기</h3>
+            <p>음식의 문화적 배경과 공식 레시피 재료를 확인한 뒤, 필요한 재료의 조달 방향을 직접 선택합니다.</p>
+        </div>
+        <span class="food-dish-browser__boundary">음식 국가 ≠ 상품 출발국</span>
+    </header>
+
+    <div class="food-dish-browser__countries" aria-label="음식 국가 선택">
+        @foreach (var country in Countries)
+        {
+            <button type="button"
+                    class="@CountryClass(country.CountryCode)"
+                    aria-pressed="@(country.CountryCode == SelectedCountryCode)"
+                    @onclick="@(() => CountryChanged.InvokeAsync(country.CountryCode))">
+                @country.DisplayName
+            </button>
+        }
+    </div>
+
+    <form class="food-dish-browser__search" @onsubmit="SearchAsync" @onsubmit:preventDefault>
+        <label for="food-dish-search">음식 이름 검색</label>
+        <div>
+            <input id="food-dish-search"
+                   value="@SearchText"
+                   @oninput="OnSearchTextChanged"
+                   placeholder="예: 전골, rice, curry" />
+            <button type="submit" disabled="@Busy">음식 찾기</button>
+        </div>
+    </form>
+
+    @if (Busy)
+    {
+        <div class="food-dish-browser__state" role="status">선택한 나라의 음식과 재료를 불러오고 있습니다.</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="food-dish-browser__state food-dish-browser__state--error" role="alert">@ErrorMessage</div>
+    }
+    else if (Dishes.Count == 0)
+    {
+        <div class="food-dish-browser__state">
+            이 국가에는 공개 가능한 공식 음식 자료가 아직 없습니다. 다른 국가를 선택하거나 자료 수집 상태를 확인해 주세요.
+        </div>
+    }
+    else
+    {
+        <div class="food-dish-browser__workspace">
+            <div class="food-dish-browser__list" aria-label="공식 음식 목록">
+                @foreach (var dish in Dishes)
+                {
+                    <button type="button"
+                            class="@DishClass(dish.DishKey)"
+                            @onclick="@(() => DishSelected.InvokeAsync(dish.DishKey))">
+                        <span>@OfficialFoodIngredientPresentation.CountryName(dish.CountryCode) · @dish.RegionName</span>
+                        <strong>@dish.Name</strong>
+                        <small>@dish.Category · 공식 변형 @dish.VariantCount.ToString("N0")건</small>
+                    </button>
+                }
+            </div>
+
+            @if (SelectedDish is { } detail)
+            {
+                <article class="food-dish-browser__detail">
+                    <header>
+                        <div>
+                            <span>@OfficialFoodIngredientPresentation.CountryName(detail.Dish.CountryCode) · @detail.Provider</span>
+                            <h4>@detail.Dish.Name</h4>
+                            <p>@detail.Dish.Summary</p>
+                        </div>
+                        <span class="food-dish-browser__review">@OfficialFoodIngredientPresentation.ReviewStateLabel(detail.Dish.ReviewState)</span>
+                    </header>
+
+                    <div class="food-dish-browser__ingredients" aria-label="선택 음식의 재료">
+                        <h5>이 음식에 들어가는 재료</h5>
+                        <div>
+                            @foreach (var dishIngredient in detail.Ingredients)
+                            {
+                                <button type="button"
+                                        class="@IngredientClass(dishIngredient.IngredientKey)"
+                                        aria-pressed="@(dishIngredient.IngredientKey == SelectedIngredientKey)"
+                                        @onclick="@(() => IngredientSelected.InvokeAsync(dishIngredient.IngredientKey))">
+                                    <strong>@dishIngredient.CanonicalName</strong>
+                                    <span>@dishIngredient.QuantityText</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (SelectedIngredient is { } selectedIngredient)
+                    {
+                        <section class="food-dish-browser__decision" aria-label="선택 재료 조달 방향">
+                            <div>
+                                <span>선택 재료</span>
+                                <h5>@selectedIngredient.CanonicalName</h5>
+                                <p>@OfficialFoodIngredientPresentation.BuildRecipeIngredientText(selectedIngredient)</p>
+                            </div>
+
+                            @if ((selectedIngredient.PublicPrices ?? []).Count > 0)
+                            {
+                                <div class="food-dish-browser__prices" aria-label="선택 재료 공공 가격">
+                                    @foreach (var price in (selectedIngredient.PublicPrices ?? []).Take(3))
+                                    {
+                                        <span>
+                                            <strong>@price.CountryName @price.MarketStageName</strong>
+                                            @OfficialFoodIngredientPresentation.FormatPrice(price) · @price.ReferenceDate.ToString("yyyy.MM.dd")
+                                        </span>
+                                    }
+                                </div>
+                            }
+
+                            <OfficialFoodIngredientCompanyPanel IngredientName="@selectedIngredient.CanonicalName"
+                                                                Research="@CompanyResearch"
+                                                                Busy="@CompanyResearchBusy"
+                                                                ErrorMessage="@CompanyResearchErrorMessage"
+                                                                ResearchRequested="@CompanyResearchRequested" />
+
+                            <OfficialFoodIngredientHsPanel IngredientName="@selectedIngredient.CanonicalName"
+                                                           Mapping="@HsMapping"
+                                                           Busy="@HsMappingBusy"
+                                                           ErrorMessage="@HsMappingErrorMessage"
+                                                           MappingRequested="@HsMappingRequested" />
+
+                            <div class="food-dish-browser__routes">
+                                <button type="button"
+                                        class="food-dish-browser__route food-dish-browser__route--domestic"
+                                        @onclick="@(() => StartPurchaseAsync(CommunityIngredientSourcingModeCodes.DomesticGroupPurchase))">
+                                    <strong>국내 공동구매 수요 등록</strong>
+                                    <span>수령 권역과 희망 수량을 직접 입력해 비구속 수요로 모읍니다.</span>
+                                </button>
+                                <button type="button"
+                                        class="food-dish-browser__route food-dish-browser__route--import"
+                                        @onclick="@(() => StartPurchaseAsync(CommunityIngredientSourcingModeCodes.GroupImportReview))">
+                                    <strong>공동수입 관심 수요 등록</strong>
+                                    <span>수요만 먼저 모으며 실제 출발국·통관·HS 코드는 다음 단계에서 확인합니다.</span>
+                                </button>
+                            </div>
+                        </section>
+                    }
+
+                    <footer>
+                        <div>
+                            <span>레시피 출처와 재료 정보는 구매·수입 계약을 자동 확정하지 않습니다.</span>
+                            <small>@detail.AttributionText</small>
+                        </div>
+                        @if (OfficialFoodIngredientPresentation.SafeHttpUrl(detail.OriginalUrl) is string recipeUrl)
+                        {
+                            <a href="@recipeUrl" target="_blank" rel="noreferrer">공식 원문</a>
+                        }
+                    </footer>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OfficialFoodCountryOption> Countries { get; set; } = [];
+
+    [Parameter]
+    public string SelectedCountryCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> CountryChanged { get; set; }
+
+    [Parameter]
+    public string SearchText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> SearchTextChanged { get; set; }
+
+    [Parameter]
+    public EventCallback SearchRequested { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OfficialFoodRecipeDishDto> Dishes { get; set; } = [];
+
+    [Parameter]
+    public OfficialFoodDishDetailDto? SelectedDish { get; set; }
+
+    [Parameter]
+    public string SelectedIngredientKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public OfficialFoodRecipeIngredientDto? SelectedIngredient { get; set; }
+
+    [Parameter]
+    public EventCallback<string> DishSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<string> IngredientSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<OfficialFoodDishIngredientPurchaseSelection> PurchaseRequested { get; set; }
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public OfficialFoodIngredientCompanyResearchResponse? CompanyResearch { get; set; }
+
+    [Parameter]
+    public bool CompanyResearchBusy { get; set; }
+
+    [Parameter]
+    public string? CompanyResearchErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback CompanyResearchRequested { get; set; }
+
+    [Parameter]
+    public OfficialFoodIngredientHsMappingResponse? HsMapping { get; set; }
+
+    [Parameter]
+    public bool HsMappingBusy { get; set; }
+
+    [Parameter]
+    public string? HsMappingErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback HsMappingRequested { get; set; }
+
+    private string CountryClass(string countryCode)
+        => countryCode == SelectedCountryCode ? "is-selected" : string.Empty;
+
+    private string DishClass(string dishKey)
+        => SelectedDish?.Dish.DishKey == dishKey ? "is-selected" : string.Empty;
+
+    private string IngredientClass(string ingredientKey)
+        => ingredientKey == SelectedIngredientKey ? "is-selected" : string.Empty;
+
+    private Task SearchAsync()
+        => SearchRequested.InvokeAsync();
+
+    private Task OnSearchTextChanged(ChangeEventArgs args)
+        => SearchTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task StartPurchaseAsync(string sourcingModeCode)
+        => SelectedDish is null || SelectedIngredient is null
+            ? Task.CompletedTask
+            : PurchaseRequested.InvokeAsync(new(
+                SelectedDish,
+                SelectedIngredient,
+                sourcingModeCode));
+}

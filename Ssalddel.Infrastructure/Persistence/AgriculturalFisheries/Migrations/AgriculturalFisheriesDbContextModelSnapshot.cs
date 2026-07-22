@@ -949,6 +949,526 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyEvidence", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AttentionReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("CanAutoContact")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("CanAutoSelect")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("CandidateKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<string>("CountryName")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("varchar(160)");
+
+                    b.Property<string>("EvidenceCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("EvidenceDate")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("EvidenceLastChangedDate")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("EvidenceRecordIdentifier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("EvidenceSequence")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("EvidenceSummary")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("FirstObservedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("IngredientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("LastObservedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("LastResearchRunId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("NormalizedOrganizationName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("ObservationCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OfficialIdentifier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("OrganizationKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("OrganizationName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ProductCategory")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("RawIngredientText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RelatedProductName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("RelationCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<bool>("RequiresAttention")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("RequiresLiveRecheck")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ResearchQueryTerm")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("VerificationStatusCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LastResearchRunId");
+
+                    b.HasIndex("IngredientId", "CandidateKey")
+                        .IsUnique();
+
+                    b.HasIndex("CountryCode", "RelationCode", "IsCurrent");
+
+                    b.HasIndex("IngredientId", "IsCurrent", "RelationCode");
+
+                    b.HasIndex("IngredientId", "OrganizationKey", "IsCurrent");
+
+                    b.HasIndex("SourceKey", "IsCurrent", "LastObservedAtUtc");
+
+                    b.ToTable("food_ingredient_company_evidence", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyProfile", b =>
+                {
+                    b.Property<long>("IngredientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("AvailableSourceCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ConsecutiveFailureCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DomesticImporterCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DomesticManufacturerCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EvidenceCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FailedSourceCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ForeignManufacturerCount")
+                        .HasColumnType("int");
+
+                    b.Property<long>("LastResearchRunId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastResearchedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("NotConfiguredSourceCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganizationCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResearchQueryTerm")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("IngredientId");
+
+                    b.HasIndex("LastResearchRunId");
+
+                    b.HasIndex("StatusCode", "LastResearchedAtUtc");
+
+                    b.ToTable("food_ingredient_company_profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyResearchRun", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AvailableIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FailedIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoResultIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NotConfiguredIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ObservedEvidenceCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PartialIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessedIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequestedIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RunKey")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<int>("SkippedIngredientCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("TriggerCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RunKey")
+                        .IsUnique();
+
+                    b.HasIndex("TriggerCode", "StatusCode", "StartedAtUtc");
+
+                    b.ToTable("food_ingredient_company_research_runs", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanySourceObservation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("CanVerifyCurrentOrganizationStatus")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("CountryScope")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<long>("IngredientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ObservedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("OfficialUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<bool>("ProvidesDirectIngredientEvidence")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("RequiresLiveRecheck")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("ResearchRunId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("StatusCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("StatusMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientId", "ObservedAtUtc");
+
+                    b.HasIndex("ResearchRunId", "IngredientId", "SourceKey")
+                        .IsUnique();
+
+                    b.HasIndex("SourceKey", "StatusCode", "ObservedAtUtc");
+
+                    b.ToTable("food_ingredient_company_source_observations", (string)null);
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientHsMapping", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CatalogEffectiveFrom")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("CatalogEffectiveTo")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CatalogImportedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CatalogRevision")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("CodeDigits")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EnglishName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("HsCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<long>("HsCodeCatalogVersionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("HsCodeEntryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("HsCodeLevel")
+                        .HasColumnType("int");
+
+                    b.Property<long>("IngredientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("JurisdictionUseCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("KoreanName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime>("LastCheckedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MappingState")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("MatchBasis")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<decimal>("MatchConfidence")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<string>("MatchMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("MatchQualityCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("NormalizedHsCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("RequiredProductDetailsJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<bool>("RequiresProfessionalReview")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ReviewReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("StandardCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientId", "CountryCode", "IsActive");
+
+                    b.HasIndex("IngredientId", "HsCodeCatalogVersionId", "HsCodeEntryId")
+                        .IsUnique();
+
+                    b.HasIndex("MappingState", "IsActive", "LastCheckedAtUtc");
+
+                    b.HasIndex("NormalizedHsCode", "CountryCode", "IsActive");
+
+                    b.ToTable("food_official_ingredient_hs_mappings", (string)null);
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientPriceMapping", b =>
                 {
                     b.Property<long>("Id")
@@ -1664,6 +2184,74 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyEvidence", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", "Ingredient")
+                        .WithMany("CompanyEvidence")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyResearchRun", "LastResearchRun")
+                        .WithMany()
+                        .HasForeignKey("LastResearchRunId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("LastResearchRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyProfile", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", "Ingredient")
+                        .WithOne("CompanyResearchProfile")
+                        .HasForeignKey("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyProfile", "IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyResearchRun", "LastResearchRun")
+                        .WithMany()
+                        .HasForeignKey("LastResearchRunId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("LastResearchRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanySourceObservation", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", "Ingredient")
+                        .WithMany("CompanySourceObservations")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientCompanyResearchRun", "ResearchRun")
+                        .WithMany()
+                        .HasForeignKey("ResearchRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("ResearchRun");
+                });
+
+            modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientHsMapping", b =>
+                {
+                    b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+                });
+
             modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredientPriceMapping", b =>
                 {
                     b.HasOne("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", "Ingredient")
@@ -1738,6 +2326,12 @@ namespace Ssalddel.Infrastructure.Persistence.AgriculturalFisheries.Migrations
 
             modelBuilder.Entity("Ssalddel.Domain.FoodCulture.OfficialFoodIngredient", b =>
                 {
+                    b.Navigation("CompanyEvidence");
+
+                    b.Navigation("CompanyResearchProfile");
+
+                    b.Navigation("CompanySourceObservations");
+
                     b.Navigation("PublicPriceMappings");
 
                     b.Navigation("RecipeIngredients");

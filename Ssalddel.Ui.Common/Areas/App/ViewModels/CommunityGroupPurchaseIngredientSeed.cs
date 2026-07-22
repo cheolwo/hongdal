@@ -13,6 +13,9 @@ public sealed record CommunityGroupPurchaseIngredientSeed
     public const string RecipeQuantityQueryName = "recipeQuantity";
     public const string PriceReferenceQueryName = "priceReference";
     public const string PurchaseUnitQueryName = "purchaseUnit";
+    public const string FoodNameQueryName = "food";
+    public const string FoodCountryCodeQueryName = "foodCountry";
+    public const string SourcingModeQueryName = "sourcingMode";
 
     private CommunityGroupPurchaseIngredientSeed(
         string ingredientKey,
@@ -22,7 +25,10 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         string recipeSource,
         string recipeQuantity,
         string priceReference,
-        string purchaseUnit)
+        string purchaseUnit,
+        string foodName,
+        string foodCountryCode,
+        string sourcingModeCode)
     {
         IngredientKey = ingredientKey;
         IngredientName = ingredientName;
@@ -32,6 +38,9 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         RecipeQuantity = recipeQuantity;
         PriceReference = priceReference;
         PurchaseUnit = purchaseUnit;
+        FoodName = foodName;
+        FoodCountryCode = foodCountryCode;
+        SourcingModeCode = sourcingModeCode;
     }
 
     public string IngredientKey { get; }
@@ -50,7 +59,26 @@ public sealed record CommunityGroupPurchaseIngredientSeed
 
     public string PurchaseUnit { get; }
 
-    public string SuggestedTitle => $"{IngredientName} 공동구매 제안";
+    public string FoodName { get; }
+
+    public string FoodCountryCode { get; }
+
+    public string SourcingModeCode { get; }
+
+    public bool IsGroupImportReview
+        => SourcingModeCode == CommunityIngredientSourcingModeCodes.GroupImportReview;
+
+    public string SourcingModeLabel
+        => SourcingModeCode switch
+        {
+            CommunityIngredientSourcingModeCodes.DomesticGroupPurchase => "국내 공동구매 검토",
+            CommunityIngredientSourcingModeCodes.GroupImportReview => "공동수입 검토",
+            _ => "조달 경로 미정"
+        };
+
+    public string SuggestedTitle => IsGroupImportReview
+        ? $"{IngredientName} 공동수입 검토 제안"
+        : $"{IngredientName} 공동구매 제안";
 
     public string SuggestedProductKey => $"official-ingredient:{IngredientKey}";
 
@@ -60,7 +88,10 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         RecipeTitle,
         RecipeUrl,
         PriceReference,
-        PurchaseUnit);
+        PurchaseUnit,
+        FoodName,
+        FoodCountryCode,
+        SourcingModeCode);
 
     public static CommunityGroupPurchaseIngredientSeed? Create(
         string? ingredientKey,
@@ -70,7 +101,10 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         string? recipeSource = null,
         string? recipeQuantity = null,
         string? priceReference = null,
-        string? purchaseUnit = null)
+        string? purchaseUnit = null,
+        string? foodName = null,
+        string? foodCountryCode = null,
+        string? sourcingModeCode = null)
     {
         var normalizedName = Normalize(ingredientName, 160);
         if (string.IsNullOrWhiteSpace(normalizedName))
@@ -92,10 +126,19 @@ public sealed record CommunityGroupPurchaseIngredientSeed
             Normalize(recipeSource, 240),
             Normalize(recipeQuantity, 160),
             Normalize(priceReference, 600),
-            Normalize(purchaseUnit, 40, "kg"));
+            Normalize(purchaseUnit, 40, "kg"),
+            Normalize(foodName, 240),
+            NormalizeCountryCode(foodCountryCode),
+            CommunityIngredientSourcingModeCodes.Normalize(sourcingModeCode));
     }
 
     public string ToNavigationUri()
+        => BuildNavigationUri(Route);
+
+    public string ToDemandNavigationUri()
+        => BuildNavigationUri(CommunityPageRoutes.GroupPurchaseDemand);
+
+    private string BuildNavigationUri(string route)
     {
         var parameters = new List<string>();
         AddParameter(parameters, IngredientKeyQueryName, IngredientKey);
@@ -106,7 +149,10 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         AddParameter(parameters, RecipeQuantityQueryName, RecipeQuantity);
         AddParameter(parameters, PriceReferenceQueryName, PriceReference);
         AddParameter(parameters, PurchaseUnitQueryName, PurchaseUnit);
-        return $"{Route}?{string.Join('&', parameters)}";
+        AddParameter(parameters, FoodNameQueryName, FoodName);
+        AddParameter(parameters, FoodCountryCodeQueryName, FoodCountryCode);
+        AddParameter(parameters, SourcingModeQueryName, SourcingModeCode);
+        return $"{route}?{string.Join('&', parameters)}";
     }
 
     public string BuildSuggestedDescription()
@@ -120,12 +166,22 @@ public sealed record CommunityGroupPurchaseIngredientSeed
         };
 
         AddLine(lines, "참고 레시피", RecipeTitle);
+        AddLine(lines, "둘러본 음식", FoodName);
+        if (!string.IsNullOrWhiteSpace(FoodCountryCode))
+        {
+            lines.Add($"음식 문화 국가: {FoodCountryCode} (상품 원산지·출발국으로 자동 사용하지 않음)");
+        }
+        AddLine(lines, "조달 검토 방향", SourcingModeLabel);
         AddLine(lines, "레시피 재료 표기", RecipeQuantity);
         AddLine(lines, "레시피 출처", RecipeSource);
         AddLine(lines, "공공 가격 참고", PriceReference);
         AddLine(lines, "레시피 원문", RecipeUrl);
         lines.Add(string.Empty);
         lines.Add("※ 공개 가격은 국가·지역·통화·단위·유통단계와 기준일이 서로 달라 실제 구매가나 계약 조건으로 확정되지 않습니다.");
+        if (IsGroupImportReview)
+        {
+            lines.Add("※ 공동수입 여부는 실제 상품 출발국, 최종 배송국, 통관 상태와 HS 코드를 입력한 뒤 별도 거래경로 판정에서 결정합니다.");
+        }
         lines.Add("참여자는 목표 수량, 포장 규격, 공급 조건과 수령 방법을 직접 확인하고 합의해 주세요.");
         return string.Join(Environment.NewLine, lines);
     }
@@ -168,4 +224,24 @@ public sealed record CommunityGroupPurchaseIngredientSeed
             ? uri.AbsoluteUri
             : string.Empty;
     }
+
+    private static string NormalizeCountryCode(string? value)
+    {
+        var normalized = Normalize(value, 2).ToUpperInvariant();
+        return normalized.Length == 2 && normalized.All(character => character is >= 'A' and <= 'Z')
+            ? normalized
+            : string.Empty;
+    }
+}
+
+public static class CommunityIngredientSourcingModeCodes
+{
+    public const string Unspecified = "Unspecified";
+    public const string DomesticGroupPurchase = "DomesticGroupPurchase";
+    public const string GroupImportReview = "GroupImportReview";
+
+    public static string Normalize(string? value)
+        => value is DomesticGroupPurchase or GroupImportReview
+            ? value
+            : Unspecified;
 }
