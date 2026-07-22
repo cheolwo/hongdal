@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Common.Community;
+
 namespace Ssalddel.Contracts.Common.Versioning;
 
 public enum PageCapabilityMatchKind
@@ -466,8 +468,11 @@ public static class SsalddelPageCapabilityCatalog
             [GroupPurchase], ["GroupPurchaseImport"]),
         Prefix("document-tools", SsalddelPageAppCodes.IntegratedWeb, "/tools", PageCapabilityStage.Beta,
             PageInteractionBoundary.ReadOnly, true, "1.0", "업무 문서와 식별자 출력을 생성 전 미리 확인합니다."),
-        Prefix("diagram", SsalddelPageAppCodes.IntegratedWeb, "/diagram", PageCapabilityStage.Experience,
+        Exact("diagram", SsalddelPageAppCodes.IntegratedWeb, CommunityPageRoutes.Diagram, PageCapabilityStage.Experience,
             PageInteractionBoundary.Simulation, true, "0.0", "공동 원장과 업무 노드의 연결 구조를 체험합니다.", false,
+            [Community], ["CommunityTrust"]),
+        Exact("shipper-diagram", SsalddelPageAppCodes.Shipper, CommunityPageRoutes.Diagram, PageCapabilityStage.Experience,
+            PageInteractionBoundary.Simulation, true, "0.0", "Web과 같은 공용 Screen에서 공동 원장과 업무 노드의 연결 구조를 탐색합니다.", false,
             [Community], ["CommunityTrust"]),
 
         Exact("admin-hr-dashboard", SsalddelPageAppCodes.Admin, "/dashboard", PageCapabilityStage.Preparing,

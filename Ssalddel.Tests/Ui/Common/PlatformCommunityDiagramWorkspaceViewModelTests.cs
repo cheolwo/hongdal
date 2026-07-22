@@ -105,6 +105,21 @@ public sealed class PlatformCommunityDiagramWorkspaceViewModelTests
     }
 
     [Fact]
+    public void Canvas_ClampsRestoredZoomToNavigationRange()
+    {
+        var viewModel = new PlatformCommunityDiagramCanvasViewModel();
+
+        viewModel.ZoomPercent = 900;
+        Assert.Equal(CommunityDiagramNavigationContext.MaximumZoomPercent, viewModel.ZoomPercent);
+
+        viewModel.ZoomPercent = 10;
+        Assert.Equal(CommunityDiagramNavigationContext.MinimumZoomPercent, viewModel.ZoomPercent);
+
+        viewModel.ZoomPercent = 120;
+        Assert.Equal(120, viewModel.ZoomPercent);
+    }
+
+    [Fact]
     public void Canvas_AddOrSelectCustomEdgeDoesNotDuplicateSameHandles()
     {
         var viewModel = new PlatformCommunityDiagramCanvasViewModel();

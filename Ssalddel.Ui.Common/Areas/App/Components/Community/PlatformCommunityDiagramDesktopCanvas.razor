@@ -225,7 +225,9 @@
 
         try
         {
-            diagramJsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/platformDiagram.js");
+            diagramJsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/_content/Ssalddel.Ui.Common/js/platformDiagram.js");
             return diagramJsModule;
         }
         catch

@@ -284,6 +284,28 @@ public sealed class PageCapabilityCatalogTests
         Assert.Contains("SsalddelMartWorkflow", capability.FeatureKeys);
     }
 
+    [Theory]
+    [InlineData(SsalddelPageAppCodes.IntegratedWeb, "diagram")]
+    [InlineData(SsalddelPageAppCodes.Shipper, "shipper-diagram")]
+    public void 다이어그램은_Web과모바일모두_무효력Simulation으로분류한다(
+        string appCode,
+        string pageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            appCode,
+            "/diagram?ledgerTemplate=group-purchase&node=%EC%88%98%EC%9A%94%20%EB%AA%A8%EC%A7%91&zoom=120",
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal(PageCapabilityStage.Experience, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.Simulation, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Equal("0.0", capability.IntroducedVersion);
+        Assert.Contains("CommunityTrustWorkflow", capability.FeatureKeys);
+    }
+
     [Fact]
     public void 공동구매목록은_익명공개읽기Beta로분류한다()
     {

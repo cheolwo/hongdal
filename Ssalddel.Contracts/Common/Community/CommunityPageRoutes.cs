@@ -16,6 +16,7 @@ public static class CommunityPageRoutes
     public const string CollectiveActions = "/community/actions";
     public const string GroupPurchase = "/community/group-purchase";
     public const string GroupPurchaseCreate = "/community/group-purchase/new";
+    public const string Diagram = "/diagram";
 
     public static string BoardsFor(string? boardName = null, string? boardKey = null)
         => WithQuery(
@@ -44,11 +45,23 @@ public static class CommunityPageRoutes
             ("seed", seedPostTitle),
             ("board", boardName));
 
-    public static string DiagramFor(string? ledgerTemplateKey = null)
+    public static string DiagramFor(
+        string? ledgerTemplateKey = null,
+        string? selectedNode = null,
+        int? zoomPercent = null,
+        string? filter = null,
+        string? returnPath = null)
         => WithQuery(
-            Workspace,
-            ("diagram", "true"),
-            ("ledgerTemplate", ledgerTemplateKey));
+            Diagram,
+            (CommunityDiagramNavigationQueryNames.LedgerTemplate, ledgerTemplateKey),
+            (CommunityDiagramNavigationQueryNames.SelectedNode, selectedNode),
+            (CommunityDiagramNavigationQueryNames.Zoom, zoomPercent is null
+                ? null
+                : CommunityDiagramNavigationContext.NormalizeZoom(zoomPercent).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+            (CommunityDiagramNavigationQueryNames.Filter, filter),
+            (CommunityDiagramNavigationQueryNames.ReturnPath, string.IsNullOrWhiteSpace(returnPath)
+                ? null
+                : CommunityDiagramNavigationContext.NormalizeReturnPath(returnPath)));
 
     public static string LedgerDraftFor(string? ledgerTemplateKey = null)
         => WithQuery(LedgerDraft, ("ledgerTemplate", ledgerTemplateKey));

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Ui.Common.Areas.App.Services;
 using MudBlazor;
 
@@ -67,6 +68,7 @@ public sealed class PlatformCommunityDiagramCanvasViewModel : ObservableObject
     private bool _handleDragMoved;
     private bool _suppressNextHandleClick;
     private string _newConnectionLabel = "다음 단계";
+    private int _zoomPercent = CommunityDiagramNavigationContext.DefaultZoomPercent;
     private CommunityComposerMessageKind _connectionMessageKind = CommunityComposerMessageKind.Info;
 
     public List<string> NodeOrder { get; } = [];
@@ -140,6 +142,14 @@ public sealed class PlatformCommunityDiagramCanvasViewModel : ObservableObject
     {
         get => _connectionMessageKind;
         set => SetProperty(ref _connectionMessageKind, value);
+    }
+
+    public int ZoomPercent
+    {
+        get => _zoomPercent;
+        set => SetProperty(
+            ref _zoomPercent,
+            CommunityDiagramNavigationContext.NormalizeZoom(value));
     }
 
     public void Reset()

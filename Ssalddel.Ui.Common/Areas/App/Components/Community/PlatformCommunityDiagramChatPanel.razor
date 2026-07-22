@@ -164,7 +164,9 @@
         }
 
         ViewModel.MarkFeedScrolled();
-        diagramModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/platformDiagram.js");
+        diagramModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "/_content/Ssalddel.Ui.Common/js/platformDiagram.js");
         await diagramModule.InvokeVoidAsync("scrollToBottom", feedElement);
     }
 

@@ -168,13 +168,31 @@ public partial class PlatformCommunityHome
             : string.Empty;
         return new(
             BuildDiagramCanvasClass($"platform-ledger-flow-diagram platform-ledger-flow-diagram--canvas{stageCanvasClass}"),
-            BuildDiagramCanvasStyle(nodes, minimumHeight),
+            BuildZoomedDiagramCanvasStyle(nodes, minimumHeight),
             BuildDiagramViewBox(nodes, minimumHeight),
             presentedEdges,
             presentedNodes,
             presentedHandles,
             previewPath,
             activeDiagramHandleDrag);
+    }
+
+    private string BuildZoomedDiagramCanvasStyle(
+        IReadOnlyList<원장블록노드> nodes,
+        double minimumHeight)
+    {
+        var baseStyle = BuildDiagramCanvasStyle(nodes, minimumHeight);
+        var zoom = DiagramCanvas.ZoomPercent / 100d;
+        if (Math.Abs(zoom - 1d) < 0.001d)
+        {
+            return baseStyle;
+        }
+
+        var diagramHeight = GetDiagramHeight(nodes, minimumHeight);
+        var width = 100d / zoom;
+        var marginBottom = diagramHeight * (zoom - 1d);
+        return FormattableString.Invariant(
+            $"{baseStyle} width: {width:0.###}%; transform: scale({zoom:0.###}); transform-origin: top left; margin-bottom: {marginBottom:0.##}px;");
     }
 
     private 원장블록처리상태 원장블록처리상태해결(

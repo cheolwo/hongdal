@@ -140,6 +140,18 @@ public partial class PlatformCommunityHome
     public string? QueryDiagramMode { get; set; }
 
     [Parameter]
+    public string? QueryDiagramSelectedNode { get; set; }
+
+    [Parameter]
+    public int? QueryDiagramZoomPercent { get; set; }
+
+    [Parameter]
+    public string? DiagramCloseHref { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> DiagramSelectedNodeChanged { get; set; }
+
+    [Parameter]
     public long? QueryPostId { get; set; }
 
     [Parameter]

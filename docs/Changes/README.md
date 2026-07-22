@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [다이어그램 Route·공용 Screen 단일책임 분리](2026-07-22-diagram-route-screen-srp.md) | Web·모바일 `/diagram`을 공용 Screen으로 통합하고 desktop sidebar·mobile bottom sheet, 선택 node·zoom·filter·출발 page 복원을 실제 확인 |
 | 2026-07-22 | [공동구매 Route·공용 Screen 단일책임 분리](2026-07-22-group-purchase-route-screen-srp.md) | 목록·개설·stable-ID 상세와 참여·협의·이의·결의·서명·이행 화면을 Web·모바일 공용 Screen으로 분리, desktop·390px 실제 확인 |
 | 2026-07-22 | [커뮤니티 Route·공용 Screen 단일책임 분리](2026-07-22-community-route-screen-srp.md) | 작업공간·게시판 관리·원장 초안·글쓰기·추천 목록·추천 상세·영속 글 상세를 독립 Route Page와 공용 Screen으로 분리, desktop·390px 핵심 route 확인 |
 | 2026-07-22 | [구매 근거를 잇는 상품 상세·판매 초안 UI](2026-07-22-purchase-evidence-ui.md) | 완료 원장·공개 후기 근거를 마트 상품 상세와 판매 초안에 비식별로 표시하고 실제 판매 초안 desktop 렌더링 검증 |

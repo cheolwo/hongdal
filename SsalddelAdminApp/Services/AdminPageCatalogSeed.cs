@@ -105,6 +105,15 @@ internal static class AdminPageCatalogSeed
                 ["회원", "전문가"], review: AdminPageReviewState.Verified,
                 navigation: AdminPageNavigationState.Contextual, desktop: true, mobile: true),
             Page(
+                "community-diagram", "web-community", "Ssalddel Web", "community", "커뮤니티",
+                "업무 다이어그램", "/diagram", "Ssalddel.WebApp/Pages/DiagramWorkbenchPage.razor",
+                "선택한 공동 원장의 노드 관계를 살펴보고 구체 업무 화면으로 이동합니다.", "커뮤니티 참여자",
+                ["회원", "전문가"], lifecycle: AdminPageLifecycle.Preview,
+                execution: AdminPageExecutionMode.Simulation, review: AdminPageReviewState.Verified,
+                navigation: AdminPageNavigationState.Contextual, desktop: true, mobile: true,
+                authentication: true,
+                previewPath: "/diagram?ledgerTemplate=group-purchase&node=수요%20모집&zoom=120&filter=수요&from=%2Fcommunity%2Fworkspace"),
+            Page(
                 "community-actions", "web-community", "Ssalddel Web", "collective-action", "공동행동",
                 "공동행동 진행", "/community/actions/{PageKey}", "Ssalddel.WebApp/Pages/CommunityCollectiveActionsPage.razor",
                 "마음이 모인 가원장의 역할, 수량, 시장 입고와 이행 단계를 확인합니다.", "공동행동 참여자",

@@ -1,11 +1,12 @@
 using Ssalddel.WebApp.Models;
+using Ssalddel.Contracts.Common.Community;
 using MudBlazor;
 
 namespace Ssalddel.WebApp.Services;
 
 public static class WebNavigationCatalog
 {
-    public const string DiagramRoute = "/diagram";
+    public const string DiagramRoute = CommunityPageRoutes.Diagram;
 
     private static readonly WebNavigationItem Home =
         new("통합 홈", "/", Icons.Material.Filled.Hub, true);

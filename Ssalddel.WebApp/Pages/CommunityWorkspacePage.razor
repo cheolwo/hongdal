@@ -1,7 +1,10 @@
 @page "/community/workspace"
+@inject NavigationManager Navigation
 
 <PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
 
+@if (!IsLegacyDiagramRequest)
+{
 <CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
                          BackLabel="@RouteContext.BackLabel"
                          Eyebrow="@RouteContext.WorkspaceEyebrow"
@@ -19,6 +22,7 @@
                               LedgerTemplateKey="@QueryLedgerTemplateKey"
                               DiagramMode="@QueryDiagramMode" />
 </CommunityRoutePageFrame>
+}
 
 @code {
     [Parameter]
@@ -28,6 +32,25 @@
     [Parameter]
     [SupplyParameterFromQuery(Name = "diagram")]
     public string? QueryDiagramMode { get; set; }
+
+    private bool IsLegacyDiagramRequest
+        => !string.IsNullOrWhiteSpace(QueryDiagramMode)
+           && (QueryDiagramMode.Equals("1", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("true", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("yes", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("diagram", StringComparison.OrdinalIgnoreCase));
+
+    protected override void OnParametersSet()
+    {
+        if (IsLegacyDiagramRequest)
+        {
+            Navigation.NavigateTo(
+                CommunityPageRoutes.DiagramFor(
+                    QueryLedgerTemplateKey,
+                    returnPath: CommunityPageRoutes.Workspace),
+                replace: true);
+        }
+    }
 
     private CommunityWorkspaceRouteContext RouteContext
         => CommunityWorkspaceRouteContext.Resolve(

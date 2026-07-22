@@ -28,15 +28,35 @@ public sealed class CommunityPageRoutesTests
     }
 
     [Fact]
-    public void 다이어그램경로는_원장template문맥을보존한다()
+    public void 다이어그램경로는_선택확대필터출발문맥을보존한다()
     {
         Assert.Equal(
-            "/community/workspace?diagram=true&ledgerTemplate=group-purchase",
-            CommunityPageRoutes.DiagramFor("group-purchase"));
+            $"/diagram?ledgerTemplate=group-purchase&node={Uri.EscapeDataString("수요 모집")}&zoom=125&filter={Uri.EscapeDataString("수요")}&from={Uri.EscapeDataString("/community/boards?board=공동구매")}",
+            CommunityPageRoutes.DiagramFor(
+                "group-purchase",
+                "수요 모집",
+                125,
+                "수요",
+                "/community/boards?board=공동구매"));
+        Assert.Equal("/diagram?ledgerTemplate=group-purchase", CommunityPageRoutes.DiagramFor("group-purchase"));
         Assert.Equal(
             "/community/ledgers/new?ledgerTemplate=group-purchase",
             CommunityPageRoutes.LedgerDraftFor("group-purchase"));
         Assert.Equal("/community/boards/manage", CommunityPageRoutes.BoardManagement);
+    }
+
+    [Fact]
+    public void 다이어그램문맥은_zoom과외부returnPath를안전한범위로정규화한다()
+    {
+        Assert.Equal(
+            $"/diagram?zoom=150&from={Uri.EscapeDataString(CommunityPageRoutes.Workspace)}",
+            CommunityPageRoutes.DiagramFor(
+                zoomPercent: 900,
+                returnPath: "https://outside.example/redirect"));
+        Assert.Equal(75, CommunityDiagramNavigationContext.NormalizeZoom(10));
+        Assert.Equal(
+            CommunityPageRoutes.Workspace,
+            CommunityDiagramNavigationContext.NormalizeReturnPath("//outside.example"));
     }
 
     [Fact]

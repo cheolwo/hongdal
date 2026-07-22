@@ -62,7 +62,7 @@ public partial class PlatformCommunityHome
 
         public CommunityDiagramChatContext ChatContext => owner.BuildDiagramChatContext();
 
-        public void Close() => owner.OpenCommunityMode();
+        public void Close() => owner.CloseDiagramSurface();
 
         public void MoveBackward() => owner.Move선택원장블록노드(-1);
 

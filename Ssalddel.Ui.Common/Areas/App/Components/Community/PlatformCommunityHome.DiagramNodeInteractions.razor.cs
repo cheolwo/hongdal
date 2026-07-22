@@ -1,4 +1,5 @@
 using MudBlazor;
+using Ssalddel.Contracts.Common.Community;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
 
@@ -9,6 +10,7 @@ public partial class PlatformCommunityHome
         선택원장블록노드제목 = node.Title;
         selectedDiagramEdgeId = null;
         isDiagramEdgeOptionDockCollapsed = true;
+        _ = DiagramSelectedNodeChanged.InvokeAsync(node.Title);
     }
 
     private void 원장블록노드클릭처리(원장블록노드 node)
@@ -20,6 +22,7 @@ public partial class PlatformCommunityHome
             {
                 선택원장블록노드제목 = node.Title;
                 connectionStartNodeTitle = null;
+                _ = DiagramSelectedNodeChanged.InvokeAsync(node.Title);
             }
 
             return;
@@ -104,5 +107,18 @@ public partial class PlatformCommunityHome
         HomeModeState.SetWorkMode(true);
         DiagramPalette.SetDiagramMode(false);
         Navigation.NavigateTo(targetUrl);
+    }
+
+    private void CloseDiagramSurface()
+    {
+        if (!string.IsNullOrWhiteSpace(DiagramCloseHref))
+        {
+            DiagramPalette.SetDiagramMode(false);
+            Navigation.NavigateTo(
+                CommunityDiagramNavigationContext.NormalizeReturnPath(DiagramCloseHref));
+            return;
+        }
+
+        OpenCommunityMode();
     }
 }

@@ -124,6 +124,11 @@ public partial class PlatformCommunityHome
         var requestedDiagramMode = string.IsNullOrWhiteSpace(QueryDiagramMode)
             ? GetCommunityQueryValue(query, "diagram")
             : QueryDiagramMode;
+        var requestedDiagramNode = string.IsNullOrWhiteSpace(QueryDiagramSelectedNode)
+            ? GetCommunityQueryValue(query, CommunityDiagramNavigationQueryNames.SelectedNode)
+            : QueryDiagramSelectedNode;
+        var requestedDiagramZoom = QueryDiagramZoomPercent
+            ?? ParseDiagramZoom(GetCommunityQueryValue(query, CommunityDiagramNavigationQueryNames.Zoom));
 
         if (!string.IsNullOrWhiteSpace(requestedLedgerTemplateKey) &&
             LedgerTemplates.Any(template => string.Equals(template.Key, requestedLedgerTemplateKey, StringComparison.OrdinalIgnoreCase)))
@@ -142,8 +147,32 @@ public partial class PlatformCommunityHome
             hasChanges = true;
         }
 
+        var normalizedZoom = CommunityDiagramNavigationContext.NormalizeZoom(requestedDiagramZoom);
+        if (DiagramCanvas.ZoomPercent != normalizedZoom)
+        {
+            DiagramCanvas.ZoomPercent = normalizedZoom;
+            hasChanges = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(requestedDiagramNode))
+        {
+            var requestedNode = 선택원장블록흐름도.Nodes.FirstOrDefault(node =>
+                string.Equals(node.Title, requestedDiagramNode, StringComparison.OrdinalIgnoreCase));
+            if (requestedNode is not null
+                && !string.Equals(선택원장블록노드제목, requestedNode.Title, StringComparison.OrdinalIgnoreCase))
+            {
+                선택원장블록노드제목 = requestedNode.Title;
+                hasChanges = true;
+            }
+        }
+
         return hasChanges;
     }
+
+    private static int? ParseDiagramZoom(string? value)
+        => int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var zoom)
+            ? zoom
+            : null;
 
     private static bool IsTruthyQueryValue(string? value)
         => !string.IsNullOrWhiteSpace(value) &&
