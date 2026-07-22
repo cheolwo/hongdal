@@ -1,91 +1,26 @@
 @page "/community/workspace"
-@page "/community/write"
-@page "/community/posts/{PostId:long}"
-@page "/community/posts/recommended"
-@implements IDisposable
-@inject PlatformDiagramPaletteStateService DiagramPalette
-@inject NavigationManager Navigation
 
 <PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
 
-<main class="community-workspace-page">
-    <header class="community-workspace-page__context">
-        <a href="@RouteContext.BackHref">
-            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
-            @RouteContext.BackLabel
-        </a>
-        <div>
-            <span>@RouteContext.WorkspaceEyebrow</span>
-            <h1>@RouteContext.WorkspaceHeading</h1>
-            <p>@RouteContext.WorkspaceDescription</p>
-        </div>
-        @if (!RouteContext.IsWriteRoute)
-        {
-            <MudButton Href="/community/write"
-                       Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Edit">
-                새 글 쓰기
-            </MudButton>
-        }
-    </header>
-
-    @if (RouteContext.IsWorkspaceLandingRoute)
-    {
-        <nav class="community-workspace-page__sections" aria-label="업무·원장 공간 바로가기">
-            <a href="#community-workspace-hub">
-                <MudIcon Icon="@Icons.Material.Filled.Hub" Size="Size.Small" />
-                <span><strong>업무 연결</strong><small>필요에 맞는 업무 도구 찾기</small></span>
-            </a>
-            <a href="#community-ledger-draft">
-                <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
-                <span><strong>원장 초안</strong><small>조건과 진행 흐름 정리하기</small></span>
-            </a>
-            <a href="#community-board-management">
-                <MudIcon Icon="@Icons.Material.Filled.AddComment" Size="Size.Small" />
-                <span><strong>게시판 개설</strong><small>새 주제 공간 신청하기</small></span>
-            </a>
-        </nav>
-    }
-
-    <PlatformCommunityHome @key="RouteContext.WorkspaceKey"
-                           AppName="살뜰"
-                           RoleLabel="웹 사용자"
-                           AppKey="shipper"
-                           CargoRequestDraftHrefBase="/shipper/request"
-                           UseDedicatedCommunityRoutes="true"
-                           WorkspaceOnly="@RouteContext.IsWorkspaceLandingRoute"
-                           PostDetailOnly="@RouteContext.IsPostDetailRoute"
-                           UseBaguaRoleTransitionPages="true"
-                           QuickActions="QuickActions"
-                           QueryLedgerTemplateKey="@QueryLedgerTemplateKey"
-                           QueryDiagramMode="@QueryDiagramMode"
-                           QueryPostId="@RouteContext.EffectivePostId"
-                           QuerySeedPostTitle="@QuerySeedPostTitle"
-                           QueryBoardName="@QueryBoardName"
-                           StartInComposeMode="@RouteContext.IsWriteRoute" />
-</main>
+<CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                         BackLabel="@RouteContext.BackLabel"
+                         Eyebrow="@RouteContext.WorkspaceEyebrow"
+                         Heading="@RouteContext.WorkspaceHeading"
+                         Description="@RouteContext.WorkspaceDescription"
+                         ShowComposeAction="true"
+                         ShowWorkspaceSections="@RouteContext.IsWorkspaceLandingRoute">
+    <CommunityWorkspaceScreen AppName="살뜰"
+                              RoleLabel="웹 사용자"
+                              AppKey="shipper"
+                              CargoRequestDraftHrefBase="/shipper/request"
+                              WorkspaceOnly="@RouteContext.IsWorkspaceLandingRoute"
+                              UseBaguaRoleTransitionPages="true"
+                              QuickActions="QuickActions"
+                              LedgerTemplateKey="@QueryLedgerTemplateKey"
+                              DiagramMode="@QueryDiagramMode" />
+</CommunityRoutePageFrame>
 
 @code {
-    [Parameter]
-    public long? PostId { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "postId")]
-    public long? QueryPostId { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "seed")]
-    public string? QuerySeedPostTitle { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "board")]
-    public string? QueryBoardName { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "boardKey")]
-    public string? QueryBoardKey { get; set; }
-
     [Parameter]
     [SupplyParameterFromQuery(Name = "ledgerTemplate")]
     public string? QueryLedgerTemplateKey { get; set; }
@@ -94,8 +29,15 @@
     [SupplyParameterFromQuery(Name = "diagram")]
     public string? QueryDiagramMode { get; set; }
 
-    private CommunityWorkspaceRouteContext RouteContext { get; set; }
-        = CommunityWorkspaceRouteContext.Resolve("community/workspace", null, null, null, null, null, null);
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            CommunityPageRoutes.Workspace,
+            null,
+            null,
+            null,
+            null,
+            null,
+            QueryDiagramMode);
 
     private static readonly IReadOnlyList<PlatformHomeQuickAction> QuickActions =
     [
@@ -106,31 +48,4 @@
         new("운송 단가 질문", "운송 의뢰 작성 중 생성한 초안을 게시판에서 다듬습니다.", "/shipper/request", Icons.Material.Filled.PostAdd, Color.Primary),
         new("기사 경험 보기", "추천 배차와 현장 예외 상황을 기사 관점에서 봅니다.", "/driver/recommendations", Icons.Material.Filled.Route, Color.Info)
     ];
-
-    protected override void OnInitialized()
-    {
-        DiagramPalette.Changed += HandleDiagramModeChanged;
-    }
-
-    protected override void OnParametersSet()
-    {
-        RouteContext = CommunityWorkspaceRouteContext.Resolve(
-            Navigation.ToBaseRelativePath(Navigation.Uri),
-            PostId,
-            QueryPostId,
-            QuerySeedPostTitle,
-            QueryBoardName,
-            QueryBoardKey,
-            QueryDiagramMode);
-        if (RouteContext.IsDiagramRoute)
-        {
-            DiagramPalette.SetDiagramMode(true);
-        }
-    }
-
-    private void HandleDiagramModeChanged()
-        => _ = InvokeAsync(StateHasChanged);
-
-    public void Dispose()
-        => DiagramPalette.Changed -= HandleDiagramModeChanged;
 }

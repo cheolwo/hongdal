@@ -43,6 +43,14 @@ public partial class PlatformCommunityHome
 
     private void PrepareLedgerCommunityDraft(string templateKey)
     {
+        if (UseDedicatedCommunityRoutes
+            && WorkspaceOnly
+            && WorkspaceSection == CommunityWorkspaceSurfaceKind.Hub)
+        {
+            Navigation.NavigateTo(CommunityPageRoutes.LedgerDraftFor(templateKey));
+            return;
+        }
+
         selectedLedgerTemplateKey = templateKey;
         PrepareLedgerCommunityDraft();
     }
@@ -51,7 +59,7 @@ public partial class PlatformCommunityHome
     {
         if (UseDedicatedCommunityRoutes && CommunityFeedOnly)
         {
-            Navigation.NavigateTo("/community/workspace?diagram=true");
+            Navigation.NavigateTo(CommunityPageRoutes.DiagramFor());
             return;
         }
 

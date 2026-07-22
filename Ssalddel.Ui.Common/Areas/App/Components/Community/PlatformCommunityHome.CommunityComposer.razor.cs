@@ -30,7 +30,7 @@ public partial class PlatformCommunityHome
     {
         if (UseDedicatedCommunityRoutes && CommunityFeedOnly)
         {
-            Navigation.NavigateTo("/community/workspace");
+            Navigation.NavigateTo(CommunityPageRoutes.Workspace);
             return;
         }
 
@@ -175,5 +175,15 @@ public partial class PlatformCommunityHome
         isLedgerPickerOpen = false;
         pendingLedgerId = null;
         ledgerSharingSettings = null;
+
+        if (UseDedicatedCommunityRoutes && ComposeOnly)
+        {
+            Navigation.NavigateTo(EffectiveComposeCloseHref);
+        }
     }
+
+    private string EffectiveComposeCloseHref
+        => string.IsNullOrWhiteSpace(ComposeCloseHref)
+            ? "/community/boards"
+            : ComposeCloseHref;
 }

@@ -1,0 +1,37 @@
+@page "/community/write"
+
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
+
+<CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                         BackLabel="@RouteContext.BackLabel"
+                         Eyebrow="@RouteContext.WorkspaceEyebrow"
+                         Heading="@RouteContext.WorkspaceHeading"
+                         Description="@RouteContext.WorkspaceDescription">
+    <CommunityPostComposeScreen AppName="살뜰"
+                                RoleLabel="웹 사용자"
+                                AppKey="shipper"
+                                CargoRequestDraftHrefBase="/shipper/request"
+                                CloseHref="@RouteContext.BackHref"
+                                UseBaguaRoleTransitionPages="true"
+                                BoardName="@QueryBoardName" />
+</CommunityRoutePageFrame>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "board")]
+    public string? QueryBoardName { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "boardKey")]
+    public string? QueryBoardKey { get; set; }
+
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            CommunityPageRoutes.Compose,
+            null,
+            null,
+            null,
+            QueryBoardName,
+            QueryBoardKey,
+            null);
+}

@@ -1,0 +1,24 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<PlatformCommunityHome @key="ScreenKey"
+                       AppName="@AppName"
+                       RoleLabel="@RoleLabel"
+                       AppKey="@AppKey"
+                       CargoRequestDraftHrefBase="@CargoRequestDraftHrefBase"
+                       UseDedicatedCommunityRoutes="true"
+                       PostDetailOnly="true"
+                       UseBaguaRoleTransitionPages="@UseBaguaRoleTransitionPages"
+                       QueryPostId="@PostId"
+                       QueryBoardName="@BoardName" />
+
+@code {
+    [Parameter] public string AppName { get; set; } = "살뜰";
+    [Parameter] public string RoleLabel { get; set; } = "사용자";
+    [Parameter] public string AppKey { get; set; } = "shipper";
+    [Parameter] public string? CargoRequestDraftHrefBase { get; set; }
+    [Parameter] public bool UseBaguaRoleTransitionPages { get; set; } = true;
+    [Parameter, EditorRequired] public long PostId { get; set; }
+    [Parameter] public string? BoardName { get; set; }
+
+    private string ScreenKey => $"post-{PostId}-{BoardName}";
+}

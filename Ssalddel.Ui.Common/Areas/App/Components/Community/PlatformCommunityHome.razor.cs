@@ -25,6 +25,12 @@ public partial class PlatformCommunityHome
     public bool ListOnly { get; set; }
 
     [Parameter]
+    public bool ComposeOnly { get; set; }
+
+    [Parameter]
+    public string? ComposeCloseHref { get; set; }
+
+    [Parameter]
     public bool UseDedicatedCommunityRoutes { get; set; }
 
     [Parameter]
@@ -37,10 +43,17 @@ public partial class PlatformCommunityHome
     public bool WorkspaceOnly { get; set; }
 
     [Parameter]
+    public CommunityWorkspaceSurfaceKind WorkspaceSection { get; set; }
+        = CommunityWorkspaceSurfaceKind.Full;
+
+    [Parameter]
     public bool PostDetailOnly { get; set; }
 
     [Parameter]
     public string? InitialBoard { get; set; }
+
+    [Parameter]
+    public string? InitialListFilter { get; set; }
 
     [Parameter]
     public bool StartInComposeMode { get; set; }

@@ -1,0 +1,25 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<PlatformCommunityHome @key="ScreenKey"
+                       AppName="@AppName"
+                       RoleLabel="@RoleLabel"
+                       AppKey="@AppKey"
+                       CargoRequestDraftHrefBase="@CargoRequestDraftHrefBase"
+                       UseDedicatedCommunityRoutes="true"
+                       ComposeOnly="true"
+                       ComposeCloseHref="@CloseHref"
+                       UseBaguaRoleTransitionPages="@UseBaguaRoleTransitionPages"
+                       QueryBoardName="@BoardName"
+                       StartInComposeMode="true" />
+
+@code {
+    [Parameter] public string AppName { get; set; } = "살뜰";
+    [Parameter] public string RoleLabel { get; set; } = "사용자";
+    [Parameter] public string AppKey { get; set; } = "shipper";
+    [Parameter] public string? CargoRequestDraftHrefBase { get; set; }
+    [Parameter] public string CloseHref { get; set; } = CommunityPageRoutes.Boards;
+    [Parameter] public bool UseBaguaRoleTransitionPages { get; set; } = true;
+    [Parameter] public string? BoardName { get; set; }
+
+    private string ScreenKey => $"compose-{BoardName}-{CloseHref}";
+}

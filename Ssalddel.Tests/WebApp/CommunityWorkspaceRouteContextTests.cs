@@ -1,4 +1,5 @@
 using Ssalddel.WebApp.Models;
+using Ssalddel.Contracts.Common.Community;
 
 namespace Ssalddel.Tests.WebApp;
 
@@ -71,7 +72,7 @@ public sealed class CommunityWorkspaceRouteContextTests
     public void RecommendedSeedRoute_IsDetailWithoutInventingPostId()
     {
         var context = CommunityWorkspaceRouteContext.Resolve(
-            "community/posts/recommended",
+            CommunityPageRoutes.RecommendedPostDetail,
             null,
             null,
             "추천 글",
@@ -80,9 +81,30 @@ public sealed class CommunityWorkspaceRouteContextTests
             null);
 
         Assert.True(context.IsPostDetailRoute);
+        Assert.False(context.IsRecommendedListRoute);
         Assert.Null(context.EffectivePostId);
         Assert.Equal("추천 게시글", context.WorkspaceHeading);
         Assert.Equal("/community/boards", context.BackHref);
+    }
+
+    [Fact]
+    public void RecommendedRoute_WithoutSeed_IsDedicatedListContext()
+    {
+        var context = CommunityWorkspaceRouteContext.Resolve(
+            "community/posts/recommended",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+
+        Assert.True(context.IsRecommendedListRoute);
+        Assert.False(context.IsPostDetailRoute);
+        Assert.False(context.IsWorkspaceLandingRoute);
+        Assert.Equal("추천 글 · 살뜰 커뮤니티", context.WorkspaceTitle);
+        Assert.Equal("추천 글 모아보기", context.WorkspaceHeading);
+        Assert.StartsWith("recommended-list-none-", context.WorkspaceKey);
     }
 
     [Theory]

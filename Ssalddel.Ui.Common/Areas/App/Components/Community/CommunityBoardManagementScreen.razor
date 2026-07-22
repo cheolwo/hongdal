@@ -1,0 +1,16 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<PlatformCommunityHome AppName="@AppName"
+                       RoleLabel="@RoleLabel"
+                       AppKey="@AppKey"
+                       UseDedicatedCommunityRoutes="true"
+                       WorkspaceOnly="true"
+                       WorkspaceSection="CommunityWorkspaceSurfaceKind.BoardManagement"
+                       CanManageCommunityPosts="@CanManageCommunityPosts" />
+
+@code {
+    [Parameter] public string AppName { get; set; } = "살뜰";
+    [Parameter] public string RoleLabel { get; set; } = "사용자";
+    [Parameter] public string AppKey { get; set; } = "shipper";
+    [Parameter] public bool CanManageCommunityPosts { get; set; }
+}

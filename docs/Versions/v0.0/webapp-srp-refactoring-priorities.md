@@ -2,59 +2,96 @@
 
 기준일: 2026-07-22
 
-이 문서는 주문자, 커뮤니티, 창고, 운송, 판매 앱의 현재 페이지를 단일책임 원칙과 0.0 릴리즈 범위로 다시 평가한 작업 순서다. 파일 길이는 책임 혼합을 찾는 신호일 뿐이며, 실제 우선순위는 [0.0 집중 로드맵](./focus-roadmap.md)의 사용자 여정과 운영 경계를 먼저 따른다.
+이 문서는 WebApp의 화면을 모바일 앱의 기반으로 다시 사용할 수 있도록 **route와 사용자 목표 단위**로 재평가한 작업 순서다. 파일 길이와 내부 component 분리는 책임 혼합을 찾는 보조 신호일 뿐이며, 완료 판단은 [0.0 집중 로드맵](./focus-roadmap.md)의 사용자 여정과 [통합 클라이언트 3단계 내비게이션](../../Architecture/ThreeStageClientNavigation.md)을 따른다.
 
-## 판단 기준
+## 완료 단위
 
-1. `게시 -> 직접 검색·선택 -> 상호 동의 -> 공동 원장 -> 완료 사례` 흐름을 완성하는가
-2. 한 페이지가 화면 조립, 조회, 입력 검증, 상태 전이, 외부 효과를 함께 맡고 있는가
-3. loading, empty, error, retry, disabled와 인증 전환 상태를 독립적으로 검증할 수 있는가
-4. `SsalddelExecution:Mode`와 기능 플래그 없이 운송·보관·결제 같은 운영 효과를 만들지 않는가
-5. 공용 UI 변경 뒤 WebApp과 MAUI 소비 앱을 함께 빌드하고 desktop·390px mobile에서 확인할 수 있는가
-6. 현재 작업 트리의 다른 변경과 겹치지 않고 맥락별 commit으로 되돌릴 수 있는가
+이 문서에서 사용하는 단위는 다음과 같다.
 
-## 실행 순서
+| 단위 | 책임 |
+| --- | --- |
+| `Route Page` | URL parameter와 query를 읽고 플랫폼 navigation shell과 공용 Screen 하나를 조립한다. |
+| `Screen` | 사용자가 완료하려는 하나의 주된 목표를 표현하며 `Ssalddel.Ui.Common`에 둔다. |
+| `ViewModel/UseCase` | 조회, 입력 검증, 상태 전이와 서버 재조회 workflow를 맡는다. |
+| `Navigation Contract` | Web과 모바일이 공유할 page key, route builder, diagram 복귀 문맥과 deep link를 정의한다. |
 
-| 우선순위 | 문맥·현재 페이지 | 현재 신호 | 분리할 책임 | 완료 조건 |
+페이지 단일책임은 카드나 입력 항목마다 route를 만드는 뜻이 아니다. loading, empty, error, retry, 인증 안내와 목표 수행에 필요한 읽기 전용 요약은 같은 Screen의 보조 상태로 둘 수 있다. 반면 목록 탐색, 상세 조회, 작성, 결제, 증빙, 승인, 예외 보고처럼 사용자가 별도로 시작·취소·완료할 수 있는 목표는 별도 Screen으로 분리한다.
+
+1단계 허브와 2단계 다이어그램은 여러 목적지의 관계를 보여 줄 수 있지만 3단계 업무의 입력·결제·승인·완료 Command를 대신 실행하지 않는다. desktop은 여러 Screen을 split pane으로 조립할 수 있고, 모바일은 같은 Screen을 navigation stack, drawer 또는 bottom sheet로 배치한다.
+
+## 2026-07-22 감사 기준선
+
+- WebApp은 87개 Razor route 파일에 119개 route 선언이 있다.
+- 통합 모바일 앱은 38개 route 파일에 41개 route 선언이 있다.
+- 두 앱에서 문자열이 같은 route 35개 중 같은 최상위 공용 Screen을 명시적으로 조립하는 경로는 15개다.
+- WebApp에는 150줄 이상이면서 공용 feature Screen을 직접 조립하지 않는 route page가 19개 있다.
+- `Ssalddel.Ui.Common`에도 업무 route literal이 남아 있어 앱별 route 의미와 deep link가 어긋날 수 있다.
+
+이 수치는 우선순위 신호다. 줄 수를 줄이거나 내부 component 파일을 늘리는 것만으로 완료 처리하지 않는다.
+
+## Route·Screen 실행 순서
+
+| 우선순위 | 문맥 | 현재 신호 | 목표 route·Screen | 완료 조건 |
 | --- | --- | --- | --- | --- |
-| `P0-1` 완료 | 커뮤니티 `PlatformCommunityPostComposer.razor` | 변경 전 794줄에서 조립 shell 215줄로 축소 | 머리글·게시판 조건, 상태/초안 폐기, 제목·본문, 판매 정보, 첨부 도구, 현재 문맥, 게시 설정, 표현 규칙 | 기존 저장·임시저장·첨부·예약·판매 전환 계약 유지, 공용 UI/WebApp/MAUI 빌드, desktop/mobile 렌더링 |
-| `P0-2` 완료 | 커뮤니티 `PlatformCommunityPostList.razor` | 546줄에서 조립 shell 97줄로 축소 | 도구막대, 표 목록, 카드 목록, 검색 footer, 언어·상태·가격 표현 규칙 | 공개 목록이 후속 업무 모듈 없이 동작하고 상위 조회 상태·오류 계약을 유지 |
-| `P0-3` 완료 | 커뮤니티 `PlatformCommunityHome.razor` | 736줄에서 route/mode shell 313줄로 축소 | 머리글, 공개 feed, 다이어그램 stage, 생활 원장 초안, 업무 workspace | 기본 진입의 전통 게시판 목록과 명시적으로 여는 연결 도구 경계 유지, 공용 UI/WebApp/MAUI 빌드 |
-| `P0-4` | 커뮤니티 `CommunityGroupPurchaseWorkspace.razor` | 1,170줄, 현재 다른 작업과 겹침 | 모집 개요, 조건 협의, 참여 의사, 연락 동의, 가원장 전환 | 국내 공동구매 대표 파일럿의 직접 협의가 영속화되고 플랫폼 추천·거래 대리가 없음 |
-| `P1-1` 완료 | 주문자 `OrdererRestaurantWorkspace.razor` | 303줄에서 조립 shell 35줄로 축소 | 기능 접근, 공개 탐색 조건, 검색 결과, 정확한 선택 상세, 표현 규칙 | 기능 플래그와 정확한 ID 조회를 유지하고 주문·결제·조리·배차 효과 없이 공개 정보만 표시 |
-| `P1-2` 완료 | 주문자 `OrdererMartOrderRequestWorkspace.razor` | 260줄에서 조립 shell 54줄로 축소 | 기능 접근, 상품 선택 안내, 정확한 상품, 주문자 인증, 비구속 요청 작성, 저장 영수증, 표현 규칙 | 서버가 소유권과 현재 상태를 재검증하고 성공 뒤 같은 주문 요청 ID를 재조회 |
-| `P1-2a` 완료 | 주문자 `OrdererFoodOrderWorkspace.razor` | 320줄에서 조립 shell 40줄로 축소 | 기능 접근, 주문자 인증, 검색, 개인 원장 목록, 정확한 주문 상세, 개인정보 disclosure, 표현 규칙 | 기능 비활성·익명에서는 개인 API를 호출하지 않고 선택한 정확한 `orderNo`만 조회하며 주문·결제·수락·배차 상태를 변경하지 않음 |
-| `P1-3` 완료 | 판매 `OrderFulfillment.razor` | 631줄에서 조립 shell 61줄로 축소 | 주문 조회·필터, 정확한 선택 상세, Simulation 샘플, 재고·입고, 피킹·포장 Command, 알림 정책 | 로컬 메모리 Simulation에서 수동 상태 전이만 제공하고 외부 주문·실재고·메시지·운송·결제·정산 효과를 활성화하지 않음 |
-| `P1-4` 완료 | 판매 `ProductListings.razor` | 209줄에서 조립 shell 47줄로 축소 | 현황 조회, 판매상품 직접 선택, 정확한 채널 계정, payload 검토, Simulation 생성 영수증 | 정확한 계정 ID를 조회하고 외부 API 비호출 확인 뒤 로컬 원장만 생성하며 같은 출품 ID를 재조회 |
-| `P2-1` | 창고 `SsalddelInboundReceivingWorkspace.razor` | 438줄, 깨끗한 작업 대상 | 창고·바코드 검색, 예정 후보, 현장 반입 요청, 정확한 저장 결과 | 입고 ID·권한·멱등성을 서버가 검증하고 같은 ID를 재조회 |
-| `P2-2` | 운송 `DriverTransportDropoffPage.razor` | 429줄, 깨끗한 작업 대상 | 운송 요약, 하차 증빙, 예외, 완료 이동 | 기존 상차·통합 증빙 컴포넌트를 재사용하고 Operational 모드 없이 실행 효과 없음 |
-| `P2-3` | 창고 `WorkBoard.razor` | 313줄이나 이미 ViewModel 기반 ReadOnly 상세 | 접근·인증 상태, 정확한 입고 상세, 다음 단계 설명, 관련 업무 이동, 표현 규칙 | 대기열·필터를 새로 만들지 않고 선택한 입고 ID의 서버 원본과 다음 단계 설명만 유지 |
-| `P3` 보존 | 운송 `DriverRecommendations.razor` | 673줄이나 1.0 이후 추천 흐름 | 후보 표시와 설명 책임은 향후 분리 | 0.0에서 기본 비노출, 상대 추천·순위·자동 배차 확장 금지 |
+| `P0-0` 진행 | 공용 navigation 계약 | WebApp·모바일 route catalog와 `Ui.Common`의 URL literal이 분산됨 | 공용 `CommunityPageRoutes`, 이후 page key·diagram return context | 공용 Screen이 플랫폼 namespace를 참조하지 않고 Web·모바일 deep link가 같은 의미로 해석됨 |
+| `P0-1` 완료 | 커뮤니티 기본 흐름 | 한 `CommunityWorkspacePage.razor`가 작업공간·게시판 관리·원장 초안·글쓰기·추천 목록·추천 상세·일반 상세를 mode로 전환했음 | 허브, 게시판 관리, 원장 초안, 글쓰기, 추천 목록·상세, 영속 글 상세 전용 Route Page와 공용 Screen | route 파일마다 하나의 의미와 공용 Screen 하나만 가지며 작업공간은 탐색 허브만 맡고 기존 `?seed=` 링크가 새 추천 상세 route로 호환 이동함 |
+| `P0-2` 다음 | 국내 공동구매 대표 파일럿 | `CommunityGroupPurchaseWorkspace` 내부 파일은 분리됐지만 한 route에서 제안·목록·상세·생산자·기사·동선·협상·단계 전이·이의제기를 실행함 | 목록, 개설, 캠페인 상세, 참여, 협상, 이의제기, 결의, 서명 Screen | 각 단계가 stable campaign ID와 직접 URL을 가지며 서버 상태 재조회와 0.0 비중개 경계를 유지함 |
+| `P0-3` | 다이어그램 | Web 전용 `DiagramWorkbenchPage`가 palette·preset·canvas를 함께 소유하고 모바일 route가 없음 | 공용 diagram Screen, desktop sidebar, mobile bottom sheet | 선택 node·zoom·filter·출발 page를 복원하고 구체 업무 Command는 3단계 Screen으로 이동함 |
+| `P0-4` | 커뮤니티 화면 복귀 문맥 | board query는 있으나 diagram node와 return context 계약이 없음 | 공용 `PageNavigationContext`와 route adapter | Web·모바일에서 게시판·다이어그램으로 돌아갈 때 선택 상태가 복원되고 deep link test를 통과함 |
+| `P1-1` | 운송 요청 작성 | Web 한 화면 606줄, Web 단계 route 4개, 모바일 wizard가 서로 다른 workflow를 가짐 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당함 |
+| `P1-2` | 운송 요청 상세 | Web 828줄과 모바일 988줄의 독립 monolith | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
+| `P1-3` | 입고 요청 | `SsalddelInboundRequestManager` 한 route에서 창고 빠른 등록·입고 신청·목록·완료 처리를 수행함 | 목록, 신규 신청, 상세, 입고 완료 Screen | 목록과 Command가 분리되고 성공 뒤 같은 inbound ID를 재조회함 |
+| `P1-4` | 창고·판매 master-detail-action | 입고 검수·피킹·마트 상품·판매 주문이 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 모바일에서 각 Screen을 독립 route로 열고 desktop split pane은 선택적 조립으로만 제공함 |
+| `P2-1` | 개인 공간·꾸미기 | Web 개인 route multiplexer와 모바일 전용 꾸미기 route의 의미가 다름 | 개인 개요와 꾸미기 상점·상품·checkout Screen 분리 | 같은 route가 플랫폼마다 다른 기능을 뜻하지 않으며 FakePG 경계를 유지함 |
+| `P2-2` | `/shipper` 홈 | Web은 링크 디렉터리, 모바일은 커뮤니티 홈·인증·dashboard를 수행함 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route의 주된 목표가 같고 1.0 이후 기능은 flag 뒤에 유지됨 |
+| `P3` 보존 | 기사 추천·정산·통관 등 1.0 이후 화면 | 큰 Web 전용 화면이 남아 있으나 0.0 범위가 아님 | 재활성화 시 List·Detail·Action Screen으로 분리 | 0.0 기본 비노출, 추천·자동 배차·결제·정산 운영 효과 확장 금지 |
 
-## 현재 겹치는 파일의 처리
+## 커뮤니티 목표 route 지도
 
-다음 파일은 이미 다른 맥락의 변경이 진행 중이므로, 그 변경이 commit되거나 인계되기 전에는 같은 파일을 다시 구조 변경하지 않는다.
-
-| 문맥 | 파일 | 현재 처리 |
+| 단계 | 사용자 목표 | Route |
 | --- | --- | --- |
-| 커뮤니티 | `CommunityGroupPurchaseWorkspace.razor` | 현재 변경을 먼저 검증·commit한 뒤 `P0-4` 분리 |
-| 주문자 | `OrdererMartCatalogWorkspace.razor` | 현재 카탈로그 변경 완료 뒤 책임 재감사 |
-| 창고 | `SsalddelInboundRequestManager.razor` | 입고 요청 변경 완료 뒤 입력·목록·상세 책임 재감사 |
-| 판매 | `SsalddelSalesPageComposer.razor` | 현재 작성기 변경 완료 뒤 wrapper와 저장 책임 재감사 |
+| 1단계 | 공개 커뮤니티·게시판 탐색 | `/community`, `/community/boards` |
+| 2단계 | 업무·원장 목적지 탐색 | `/community/workspace` |
+| 2단계 | 공동 원장 초안 작성 | `/community/ledgers/new` |
+| 2단계 | 게시판 개설·관리 | `/community/boards/manage` |
+| 2단계 | 참여자·업무 관계 확인 | 향후 공용 diagram route |
+| 3단계 | 새 글 작성 | `/community/write` |
+| 3단계 | 추천 글 목록 | `/community/posts/recommended` |
+| 3단계 | 추천 sample 글 상세 | `/community/posts/recommended/detail?seed=...` |
+| 3단계 | 영속 게시글 상세 | `/community/posts/{PostId:long}` |
+| 3단계 | 공동구매 목록·개설·상세·단계 행동 | `P0-2`에서 campaign ID 기반으로 분리 |
 
-## 페이지별 배포 게이트
+## 기존 component 리팩터링의 재분류
+
+아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
+
+| 기존 작업 | 재평가 |
+| --- | --- |
+| `PlatformCommunityPostComposer` 794줄 → 215줄 shell | 글쓰기 Screen 내부 component 책임 분리 완료 |
+| `PlatformCommunityPostList` 546줄 → 97줄 shell | 목록 Screen 내부 표현 책임 분리 완료 |
+| `PlatformCommunityHome` 736줄 → 약 313줄 mode shell | 내부 surface 분리 완료, route별 공용 Screen 경계 추가 후 mode 제거는 후속 작업 |
+| `CommunityGroupPurchaseWorkspace` root shell 축소 | 내부 component 분리 완료, route 단위 제안·목록·상세·단계 행동 분리는 `P0-2` |
+| `SsalddelInboundReceivingWorkspace` 438줄 → 43줄 shell | 입고 수령 Screen 내부 책임 분리 완료 |
+| 주문자·판매·창고의 기존 조립 shell | desktop 조립 기반 완료, 모바일용 List·Detail·Action route 감사 필요 |
+
+## 페이지별 완료 게이트
 
 각 페이지는 다음을 모두 만족한 뒤 완료로 표시한다.
 
-- route 또는 최상위 component는 화면 영역과 workflow만 조립하며, 세부 입력과 표시 규칙을 직접 소유하지 않는다.
-- ViewModel/UseCase가 조회·검증·상태 전이를 맡고 View는 서버 응답 전 상태를 확정하지 않는다.
-- loading, empty, error, retry, disabled, 인증 필요 상태를 제공한다.
-- 공용 contract/UI 변경은 서버 project뿐 아니라 WebApp과 해당 MAUI/전문 앱 소비 project를 빌드한다.
-- 핵심 상태 전이와 책임 조립을 자동 테스트로 고정한다.
-- desktop과 390px mobile에서 실제 렌더링, overflow, dialog/drawer, 터치 영역을 확인한다.
-- 화면 변경 PNG와 검증 결과를 `docs/Changes`에 남긴다.
-- 운송·창고·판매 운영 효과는 기능 플래그와 `SsalddelExecution:Mode` 경계를 통과하고 0.0 기본값에서는 비활성이다.
+- 하나의 의미 route만 소유한다. 여러 `@page` 선언은 동일 화면의 언어·legacy alias처럼 의미가 완전히 같을 때만 허용한다.
+- Route Page는 query·route parameter와 플랫폼 navigation shell만 조립하고 API 호출, `try/catch`, 업무 검증과 상태 전이를 직접 소유하지 않는다.
+- Route Page는 `Ssalddel.Ui.Common`의 feature Screen 하나를 주 콘텐츠로 사용한다.
+- Screen은 하나의 주된 사용자 목표를 가지며 loading, empty, error, retry, disabled와 인증 필요 상태를 제공한다.
+- 공용 Screen은 `Ssalddel.WebApp`, `SsalddelApp` 또는 전문 앱 namespace와 서비스를 참조하지 않는다.
+- 업무 route는 공용 route catalog 또는 navigation intent를 사용하고 `Ui.Common`에 새 URL literal을 추가하지 않는다.
+- stable 업무 ID로 직접 열 수 있고, diagram·목록에서 넘어온 context와 돌아갈 위치를 복원한다.
+- ViewModel/UseCase가 조회·검증·상태 전이를 맡고 View는 서버 성공 응답 전 상태를 확정하지 않는다.
+- 공용 contract/UI 변경은 서버뿐 아니라 WebApp과 해당 모바일 소비 project를 빌드한다.
+- route 유일성, route→Screen 구성, Web·모바일 의미 parity와 핵심 상태 전이를 자동 테스트로 고정한다.
+- desktop과 390px mobile에서 overflow, fixed navigation, drawer/dialog/bottom sheet와 터치 영역을 실제 확인한다.
+- 화면 변경은 PNG와 함께 `docs/Changes`에 남기고, 구조만 바뀌어 화면이 같으면 `간접 확인`과 미검증 범위를 명시한다.
+- 운송·창고·판매 운영 효과는 기능 플래그와 `SsalddelExecution:Mode` 경계를 통과하며 0.0 기본값에서는 비활성이다.
 
 ## 다음 작업
 
-`P1-2a` 주문자 음식 주문 내역은 40줄 조립 shell과 기능 접근·인증·검색·개인 원장 목록·정확한 주문 상세·개인정보 disclosure 책임으로 분리했다. 기능 비활성 또는 익명 상태에서는 개인 주문 API를 호출하지 않고, 로그인 뒤에도 선택한 정확한 `orderNo`만 조회하며 주문·결제·수락·배차 상태를 변경하지 않는다. `P0-4` 공동구매 workspace는 현재 다른 변경과 겹치므로 해당 변경이 먼저 검증·commit될 때까지 보류한다. 다음 깨끗한 세로 단위는 `P2-1` 창고 `SsalddelInboundReceivingWorkspace.razor`이며, 창고·바코드 검색·입고예정 후보·현장 반입 요청·정확한 저장 결과를 분리한다. `WorkBoard.razor`는 이미 ViewModel 기반 ReadOnly 상세이므로 신규 대기열·필터를 만들지 않고 후순위 조립 정돈 대상으로 둔다.
+`P0-1`에서 커뮤니티 핵심 route와 공용 Screen 경계를 먼저 고정했다. 다음 수직 단위는 `P0-2` 국내 공동구매다. 우선 목록과 신규 제안을 분리하고, 선택한 campaign ID의 상세를 직접 열 수 있게 한 뒤 참여·협상·이의제기·결의·서명을 한 단계씩 별도 Screen으로 옮긴다. 각 단계는 기존 영속 API와 당사자 직접 선택 원칙을 유지하며 생산자·기사 추천, 계약 대리와 자동 배차를 추가하지 않는다.

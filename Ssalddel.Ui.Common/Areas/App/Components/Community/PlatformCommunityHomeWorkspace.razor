@@ -2,71 +2,56 @@
 
 <MudItem xs="12" Class="platform-community-secondary-flow">
     <MudStack Spacing="2">
-        <section id="community-board-management" class="platform-community-workspace-section">
-            <PlatformCommunityBoardManagementPanel IsLoading="@Context.IsBoardLoading"
-                                                   IsSaving="@Context.IsSavingBoardRequest"
-                                                   CanManage="@Context.CanManagePosts"
-                                                   ApprovedBoards="@Context.ApprovedBoards"
-                                                   PendingBoards="@Context.PendingBoards"
-                                                   Form="@Context.BoardForm"
-                                                   ReviewMemos="@Context.BoardReviewMemos"
-                                                   BoardSelected="@Context.SelectBoard"
-                                                   SaveRequested="@Context.SaveBoardRequestAsync"
-                                                   ApproveRequested="@Context.ApproveBoardAsync"
-                                                   RejectRequested="@Context.RejectBoardAsync" />
-        </section>
+        @if (Surface is CommunityWorkspaceSurfaceKind.Full or CommunityWorkspaceSurfaceKind.BoardManagement)
+        {
+            <section class="platform-community-workspace-section">
+                <PlatformCommunityBoardManagementPanel IsLoading="@Context.IsBoardLoading"
+                                                       IsSaving="@Context.IsSavingBoardRequest"
+                                                       CanManage="@Context.CanManagePosts"
+                                                       ApprovedBoards="@Context.ApprovedBoards"
+                                                       PendingBoards="@Context.PendingBoards"
+                                                       Form="@Context.BoardForm"
+                                                       ReviewMemos="@Context.BoardReviewMemos"
+                                                       BoardSelected="@Context.SelectBoard"
+                                                       SaveRequested="@Context.SaveBoardRequestAsync"
+                                                       ApproveRequested="@Context.ApproveBoardAsync"
+                                                       RejectRequested="@Context.RejectBoardAsync" />
+            </section>
+        }
 
-        <section id="community-workspace-hub" class="platform-community-workspace-section">
-            <PlatformCommunityWorkspaceHub Workspaces="@Context.Workspaces"
-                                           LedgerDraftRequested="@Context.PrepareLedgerDraft" />
-        </section>
+        @if (Surface is CommunityWorkspaceSurfaceKind.Full or CommunityWorkspaceSurfaceKind.Hub)
+        {
+            <section class="platform-community-workspace-section">
+                <PlatformCommunityWorkspaceHub Workspaces="@Context.Workspaces"
+                                               LedgerDraftRequested="@Context.PrepareLedgerDraft" />
+            </section>
+        }
 
-        <PlatformCommunityHomeLedgerDraft Context="@Context.LedgerDraft" />
+        @if (Surface is CommunityWorkspaceSurfaceKind.Full or CommunityWorkspaceSurfaceKind.LedgerDraft)
+        {
+            <PlatformCommunityHomeLedgerDraft Context="@Context.LedgerDraft" />
+        }
 
-        <PlatformCommunityPostComposer ViewModel="@Context.Composer"
-                                       BoardCategories="@Context.BoardCategories"
-                                       RoleTags="@Context.RoleTags"
-                                       SelectedWorkClassification="@Context.SelectedWorkClassification"
-                                       SelectedWorkFeatureEnabled="@Context.SelectedWorkFeatureEnabled"
-                                       LedgerPickerLoading="@Context.IsLedgerPickerLoading"
-                                       ExternalStatusMessage="@Context.StatusMessage"
-                                       ExternalStatusSeverity="@Context.StatusSeverity"
-                                       LedgerPickerRequested="@Context.OpenLedgerPickerAsync"
-                                       EvidenceToolsRequested="@Context.OpenEvidenceChart"
-                                       AuthoringToolVisible="@Context.IsEvidenceChartOpen"
-                                       Closed="@Context.CloseComposer"
-                                       CancelEditRequested="@Context.CancelEdit"
-                                       Saved="@Context.HandleSavedAsync">
-            <LedgerSettings>
-                <PlatformCommunityLedgerComposerSettings SelectedLedgerId="@Context.SelectedLedgerId"
-                                                          Ledgers="@Context.Ledgers"
-                                                          SharingSettings="@Context.SharingSettings"
-                                                          IsPickerLoading="@Context.IsLedgerPickerLoading"
-                                                          IsSharingSettingsSaving="@Context.IsLedgerSharingSaving"
-                                                          PickerRequested="@Context.OpenLedgerPickerAsync"
-                                                          SharingSettingsRequested="@Context.OpenLedgerSharingSettingsAsync"
-                                                          ClearRequested="@Context.ClearSelectedLedger"
-                                                          CloseSharingSettingsRequested="@Context.CloseLedgerSharingSettings"
-                                                          SaveSharingSettingsRequested="@Context.SaveLedgerSharingSettingsAsync" />
-            </LedgerSettings>
-            <AuthoringTool>
-                @if (Context.IsEvidenceChartOpen)
-                {
-                    <CommunityAuthoringEvidenceChartTool ViewModel="@Context.EvidenceChart"
-                                                          CloseRequested="@Context.CloseEvidenceChart"
-                                                          ApplyToDraftRequested="@Context.ApplyEvidenceChart" />
-                }
-            </AuthoringTool>
-        </PlatformCommunityPostComposer>
+        @if (Surface == CommunityWorkspaceSurfaceKind.Full)
+        {
+            <PlatformCommunityHomeComposer Context="@Context" />
+        }
 
-        <section id="community-workspace-support" class="platform-community-workspace-section">
-            <PlatformCommunitySupportPanels QuickActions="@Context.QuickActions"
-                                            OperatingNotes="@Context.OperatingNotes" />
-        </section>
+        @if (Surface is CommunityWorkspaceSurfaceKind.Full or CommunityWorkspaceSurfaceKind.Hub)
+        {
+            <section class="platform-community-workspace-section">
+                <PlatformCommunitySupportPanels QuickActions="@Context.QuickActions"
+                                                OperatingNotes="@Context.OperatingNotes" />
+            </section>
+        }
     </MudStack>
 </MudItem>
 
 @code {
     [Parameter, EditorRequired]
     public PlatformCommunityHome.WorkspaceSurface Context { get; set; } = null!;
+
+    [Parameter]
+    public CommunityWorkspaceSurfaceKind Surface { get; set; }
+        = CommunityWorkspaceSurfaceKind.Full;
 }

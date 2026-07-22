@@ -1,0 +1,54 @@
+<main class="community-route-page">
+    <header class="community-route-page__context">
+        <a href="@BackHref">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            @BackLabel
+        </a>
+        <div>
+            <span>@Eyebrow</span>
+            <h1>@Heading</h1>
+            <p>@Description</p>
+        </div>
+        @if (ShowComposeAction)
+        {
+            <MudButton Href="@ComposeHref"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Edit">
+                새 글 쓰기
+            </MudButton>
+        }
+    </header>
+
+    @if (ShowWorkspaceSections)
+    {
+        <nav class="community-route-page__sections" aria-label="업무·원장 공간 바로가기">
+            <a href="@CommunityPageRoutes.LedgerDraft">
+                <MudIcon Icon="@Icons.Material.Filled.PostAdd" Size="Size.Small" />
+                <span><strong>원장 초안</strong><small>조건과 진행 흐름 정리하기</small></span>
+            </a>
+            <a href="@CommunityPageRoutes.DiagramFor()">
+                <MudIcon Icon="@Icons.Material.Filled.AccountTree" Size="Size.Small" />
+                <span><strong>다이어그램</strong><small>참여자와 단계 관계 살펴보기</small></span>
+            </a>
+            <a href="@CommunityPageRoutes.BoardManagement">
+                <MudIcon Icon="@Icons.Material.Filled.AddComment" Size="Size.Small" />
+                <span><strong>게시판 개설</strong><small>새 주제 공간 신청하기</small></span>
+            </a>
+        </nav>
+    }
+
+    @ChildContent
+</main>
+
+@code {
+    [Parameter, EditorRequired] public string BackHref { get; set; } = CommunityPageRoutes.Home;
+    [Parameter, EditorRequired] public string BackLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Heading { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter] public bool ShowComposeAction { get; set; }
+    [Parameter] public string ComposeHref { get; set; } = CommunityPageRoutes.Compose;
+    [Parameter] public bool ShowWorkspaceSections { get; set; }
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+}

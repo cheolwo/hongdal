@@ -166,22 +166,15 @@
         => new(BoardKey, LegacyBoardName, WorkflowTag, RoleTag, Page);
 
     private void OpenPost(PlatformCommunityPostResponse post)
-    {
-        var boardQuery = !string.IsNullOrWhiteSpace(ViewModel.CurrentBoard?.BoardKey)
-            ? $"?boardKey={Uri.EscapeDataString(ViewModel.CurrentBoard.BoardKey)}"
-            : !string.IsNullOrWhiteSpace(post.Category)
-                ? $"?board={Uri.EscapeDataString(post.Category)}"
-                : string.Empty;
-        Navigation.NavigateTo($"/community/posts/{post.Id}{boardQuery}");
-    }
+        => Navigation.NavigateTo(
+            CommunityPageRoutes.PostDetailFor(
+                post.Id,
+                ViewModel.CurrentBoard is null ? post.Category : null,
+                ViewModel.CurrentBoard?.BoardKey));
 
     private void OpenCompose()
-    {
-        var suffix = ViewModel.CurrentBoard is null
-            ? string.Empty
-            : $"?board={Uri.EscapeDataString(ViewModel.CurrentBoard.DisplayName)}";
-        Navigation.NavigateTo($"/community/write{suffix}");
-    }
+        => Navigation.NavigateTo(
+            CommunityPageRoutes.ComposeFor(ViewModel.CurrentBoard?.DisplayName));
 
     private string BuildBoardLinkClass(string? boardKey)
         => string.Equals(ViewModel.CurrentBoard?.BoardKey, boardKey, StringComparison.OrdinalIgnoreCase)
@@ -190,9 +183,7 @@
                 : "community-board-page__board-link";
 
     private static string BoardHref(string? boardKey)
-        => string.IsNullOrWhiteSpace(boardKey)
-            ? "/community/boards"
-            : $"/community/boards?boardKey={Uri.EscapeDataString(boardKey)}";
+        => CommunityPageRoutes.BoardsFor(boardKey: boardKey);
 
     private string PageHref(int page)
     {

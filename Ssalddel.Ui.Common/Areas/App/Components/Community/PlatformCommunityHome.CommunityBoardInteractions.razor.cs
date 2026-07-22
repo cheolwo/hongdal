@@ -123,24 +123,20 @@ public partial class PlatformCommunityHome
     }
 
     private static string BuildCommunityBoardHref(string board)
-        => $"/community/boards?board={Uri.EscapeDataString(board)}";
+        => CommunityPageRoutes.BoardsFor(boardName: board);
 
     private void HandleBoardIndexSearchChanged(string value)
         => boardIndexSearchText = value;
 
     private void OpenCommunityPostPage(PlatformCommunityPostResponse post)
-        => Navigation.NavigateTo(
-            $"/community/posts/{post.Id}?board={Uri.EscapeDataString(post.Category)}");
+        => Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(post.Id, post.Category));
 
     private void OpenCommunitySeedPostPage(CommunitySeedPost post)
         => Navigation.NavigateTo(
-            $"/community/posts/recommended?seed={Uri.EscapeDataString(post.Title)}&board={Uri.EscapeDataString(post.Category)}");
+            CommunityPageRoutes.RecommendedPostDetailFor(post.Title, post.Category));
 
     private void OpenCommunityComposePage()
-        => Navigation.NavigateTo(
-            string.Equals(selectedBoardFilter, "전체", StringComparison.OrdinalIgnoreCase)
-                ? "/community/write"
-                : $"/community/write?board={Uri.EscapeDataString(selectedBoardFilter)}");
+        => Navigation.NavigateTo(CommunityPageRoutes.ComposeFor(selectedBoardFilter));
 
     private bool MatchesForumListFilter(CommunitySeedPost post)
         => selectedForumListFilter switch
@@ -208,13 +204,12 @@ public partial class PlatformCommunityHome
         {
             if (베스트글.게시글Id is long postId)
             {
-                Navigation.NavigateTo(
-                    $"/community/posts/{postId}?board={Uri.EscapeDataString(베스트글.분류)}");
+                Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(postId, 베스트글.분류));
             }
             else if (!string.IsNullOrWhiteSpace(베스트글.추천글제목))
             {
                 Navigation.NavigateTo(
-                    $"/community/posts/recommended?seed={Uri.EscapeDataString(베스트글.추천글제목)}&board={Uri.EscapeDataString(베스트글.분류)}");
+                    CommunityPageRoutes.RecommendedPostDetailFor(베스트글.추천글제목, 베스트글.분류));
             }
 
             return;

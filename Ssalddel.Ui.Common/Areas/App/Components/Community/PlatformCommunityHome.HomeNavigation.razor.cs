@@ -29,7 +29,7 @@ public partial class PlatformCommunityHome
     {
         if (UseDedicatedCommunityRoutes && WorkspaceOnly)
         {
-            Navigation.NavigateTo("/community");
+            Navigation.NavigateTo(CommunityPageRoutes.Home);
             return;
         }
 
@@ -52,7 +52,7 @@ public partial class PlatformCommunityHome
     {
         if (UseDedicatedCommunityRoutes && WorkspaceOnly)
         {
-            Navigation.NavigateTo("/community");
+            Navigation.NavigateTo(CommunityPageRoutes.Home);
             return;
         }
 
@@ -92,7 +92,7 @@ public partial class PlatformCommunityHome
     {
         if (UseDedicatedCommunityRoutes)
         {
-            Navigation.NavigateTo("/community/workspace");
+            Navigation.NavigateTo(CommunityPageRoutes.Workspace);
             return;
         }
 

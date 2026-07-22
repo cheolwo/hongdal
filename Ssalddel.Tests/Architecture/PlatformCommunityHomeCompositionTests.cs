@@ -13,6 +13,7 @@ public sealed class PlatformCommunityHomeCompositionTests
         Assert.Contains("<PlatformCommunityHomeHero", source);
         Assert.Contains("<PlatformCommunityHomeDiagramStage", source);
         Assert.Contains("<PlatformCommunityHomeFeed", source);
+        Assert.Contains("<PlatformCommunityHomeComposer", source);
         Assert.Contains("<PlatformCommunityHomeWorkspace", source);
         Assert.DoesNotContain("<PlatformCommunityDiagramToolbar", source);
         Assert.DoesNotContain("<PlatformCommunityPostComposer", source);
@@ -23,18 +24,63 @@ public sealed class PlatformCommunityHomeCompositionTests
     [Theory]
     [InlineData("PlatformCommunityHomeHero.razor")]
     [InlineData("PlatformCommunityHomeFeed.razor")]
+    [InlineData("PlatformCommunityHomeComposer.razor")]
     [InlineData("PlatformCommunityHomeDiagramStage.razor")]
     [InlineData("PlatformCommunityHome.DiagramStageSurface.razor.cs")]
     [InlineData("PlatformCommunityHomeLedgerDraft.razor")]
     [InlineData("PlatformCommunityHome.LedgerDraftSurface.razor.cs")]
     [InlineData("PlatformCommunityHomeWorkspace.razor")]
     [InlineData("PlatformCommunityHome.WorkspaceSurface.razor.cs")]
+    [InlineData("CommunityWorkspaceScreen.razor")]
+    [InlineData("CommunityBoardManagementScreen.razor")]
+    [InlineData("CommunityLedgerDraftScreen.razor")]
+    [InlineData("CommunityPostComposeScreen.razor")]
+    [InlineData("CommunityRecommendedPostListScreen.razor")]
+    [InlineData("CommunityRecommendedPostDetailScreen.razor")]
+    [InlineData("CommunityPostDetailScreen.razor")]
     public void 커뮤니티_홈_화면_책임은_전용_파일로_존재한다(string fileName)
     {
         var componentPath = Path.Combine(FindComponentDirectory(), fileName);
 
         Assert.True(File.Exists(componentPath), $"커뮤니티 홈 전용 파일이 없습니다: {fileName}");
         Assert.NotEmpty(File.ReadAllText(componentPath));
+    }
+
+    [Fact]
+    public void 글쓰기전용mode는_홈피드와업무도구없이_작성기만조립한다()
+    {
+        var componentDirectory = FindComponentDirectory();
+        var home = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityHome.razor"));
+        var workspace = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityHomeWorkspace.razor"));
+        var composer = File.ReadAllText(Path.Combine(componentDirectory, "PlatformCommunityHomeComposer.razor"));
+
+        Assert.Contains("else if (ComposeOnly)", home);
+        Assert.Contains("<PlatformCommunityHomeComposer Context=\"@Workspace\"", home);
+        Assert.Contains("Surface == CommunityWorkspaceSurfaceKind.Full", workspace);
+        Assert.Contains("<PlatformCommunityHomeComposer Context=\"@Context\"", workspace);
+        Assert.Contains("CommunityWorkspaceSurfaceKind.Full", workspace);
+        Assert.Contains("CommunityWorkspaceSurfaceKind.BoardManagement", workspace);
+        Assert.Contains("CommunityWorkspaceSurfaceKind.LedgerDraft", workspace);
+        Assert.Contains("CommunityWorkspaceSurfaceKind.Hub", workspace);
+
+        var workspaceRouteScreen = File.ReadAllText(Path.Combine(
+            componentDirectory,
+            "CommunityWorkspaceScreen.razor"));
+        Assert.Contains("WorkspaceSection=\"CommunityWorkspaceSurfaceKind.Hub\"", workspaceRouteScreen);
+        Assert.DoesNotContain("<PlatformCommunityPostComposer", workspace);
+        Assert.Contains("<PlatformCommunityPostComposer", composer);
+        Assert.DoesNotContain("<PlatformCommunityHomeFeed", composer);
+        Assert.DoesNotContain("<PlatformCommunityWorkPanel", composer);
+        Assert.DoesNotContain("<PlatformCommunityBoardManagementPanel", composer);
+
+        var composerFlow = File.ReadAllText(Path.Combine(
+            componentDirectory,
+            "PlatformCommunityHome.CommunityComposer.razor.cs"));
+        var postCommands = File.ReadAllText(Path.Combine(
+            componentDirectory,
+            "PlatformCommunityHome.PostCommands.razor.cs"));
+        Assert.Contains("Navigation.NavigateTo(EffectiveComposeCloseHref)", composerFlow);
+        Assert.Contains("CommunityPageRoutes.PostDetailFor", postCommands);
     }
 
     private static string FindComponentDirectory()

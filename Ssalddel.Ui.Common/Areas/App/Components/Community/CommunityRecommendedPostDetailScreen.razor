@@ -1,0 +1,20 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+
+<PlatformCommunityHome @key="ScreenKey"
+                       AppName="@AppName"
+                       RoleLabel="@RoleLabel"
+                       AppKey="@AppKey"
+                       UseDedicatedCommunityRoutes="true"
+                       PostDetailOnly="true"
+                       QuerySeedPostTitle="@SeedPostTitle"
+                       QueryBoardName="@BoardName" />
+
+@code {
+    [Parameter] public string AppName { get; set; } = "살뜰";
+    [Parameter] public string RoleLabel { get; set; } = "사용자";
+    [Parameter] public string AppKey { get; set; } = "shipper";
+    [Parameter, EditorRequired] public string SeedPostTitle { get; set; } = string.Empty;
+    [Parameter] public string? BoardName { get; set; }
+
+    private string ScreenKey => $"recommended-detail-{SeedPostTitle}-{BoardName}";
+}

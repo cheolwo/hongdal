@@ -121,6 +121,21 @@ public partial class PlatformCommunityHome
         };
         statusMessage = result.Message;
         ViewModel.ResetEvidenceChartTool();
+
+        if (UseDedicatedCommunityRoutes && ComposeOnly && result.Succeeded)
+        {
+            if (!result.WasScheduled && result.Post is { } savedPost)
+            {
+                Navigation.NavigateTo(CommunityPageRoutes.PostDetailFor(savedPost.Id, savedPost.Category));
+            }
+            else
+            {
+                Navigation.NavigateTo(EffectiveComposeCloseHref);
+            }
+
+            return;
+        }
+
         await LoadPostsAsync();
     }
 
@@ -153,6 +168,10 @@ public partial class PlatformCommunityHome
         ResetForm();
         statusMessage = null;
         isComposeOpen = false;
+        if (UseDedicatedCommunityRoutes && ComposeOnly)
+        {
+            Navigation.NavigateTo(EffectiveComposeCloseHref);
+        }
     }
 
     private bool ApplyPendingCommunityPostDraft()

@@ -37,6 +37,7 @@ public partial class PlatformCommunityHome
     {
         ViewModel.Configure(AppKey, ResolveRoleTag(RoleLabel));
         ApplyRequestedBoardSelection();
+        ApplyRequestedListFilter();
         if (!BoardIndexOnly && !ListOnly)
         {
             ApplyCommunityQueryParameters();
@@ -65,6 +66,17 @@ public partial class PlatformCommunityHome
         {
             form.Category = selectedBoardFilter;
         }
+    }
+
+    private void ApplyRequestedListFilter()
+    {
+        if (string.IsNullOrWhiteSpace(InitialListFilter)
+            || !ForumListFilterOptions.Contains(InitialListFilter, StringComparer.Ordinal))
+        {
+            return;
+        }
+
+        selectedForumListFilter = InitialListFilter;
     }
 
     private void ApplySeedPostRouteSelection()
@@ -153,7 +165,7 @@ public partial class PlatformCommunityHome
                 return;
             }
 
-            if (!WorkspaceOnly)
+            if (!WorkspaceOnly && !ComposeOnly)
             {
                 await LoadPostsAsync();
                 if (isDisposed)
