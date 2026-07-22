@@ -1,0 +1,36 @@
+@page "/shipper/request/review"
+@page "/shipper/request/summary"
+@inject ShipperRequestAuthoringPageViewModel PageModel
+@inject NavigationManager Navigation
+
+<PageTitle>운송 의뢰 작성 - 최종 확인</PageTitle>
+
+<ShipperRequestReviewScreen ViewModel="PageModel.State"
+                            NavigationContext="RouteContext"
+                            RootBackHref="@RouteContext.RootPath"
+                            RegistrationEnabled="PageModel.RegistrationEnabled"
+                            RegistrationBoundaryMessage="@PageModel.RegistrationBoundaryMessage"
+                            StatusMessage="@PageModel.StatusMessage"
+                            StatusSeverity="PageModel.StatusSeverity"
+                            IsBusy="PageModel.IsBusy"
+                            Changed="PageModel.AutoSaveAsync"
+                            SaveRequested="PageModel.SaveAsync"
+                            ResetRequested="PageModel.ResetAsync"
+                            SubmitRequested="PageModel.SubmitAsync"
+                            RetryRegistrationCheck="PageModel.LoadTransportRegistrationAvailabilityAsync" />
+
+@code {
+    private ShipperRequestNavigationContext RouteContext
+        => ShipperRequestNavigationContext.Parse(Navigation.Uri);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await PageModel.InitializeAsync(RouteContext);
+        StateHasChanged();
+    }
+}

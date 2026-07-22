@@ -1,0 +1,57 @@
+.shipper-request-screen {
+    display: grid;
+    gap: 1rem;
+}
+
+.shipper-request-screen__header {
+    display: grid;
+    gap: .2rem;
+}
+
+.shipper-request-screen__header > span {
+    color: var(--mud-palette-primary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.shipper-request-screen__header h2,
+.shipper-request-screen__header p {
+    margin: 0;
+}
+
+.shipper-request-screen__header h2 {
+    font-size: 1.35rem;
+}
+
+.shipper-request-screen__header p {
+    color: var(--mud-palette-text-secondary);
+    line-height: 1.5;
+}
+
+.shipper-request-screen__body {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.shipper-request-screen ::deep .mud-input-control {
+    min-width: 0;
+}
+
+@media (max-width: 720px) {
+    .shipper-request-screen {
+        gap: .75rem;
+    }
+
+    .shipper-request-screen__header h2 {
+        font-size: 1.2rem;
+    }
+
+    .shipper-request-screen ::deep button,
+    .shipper-request-screen ::deep a,
+    .shipper-request-screen ::deep input,
+    .shipper-request-screen ::deep [role="button"] {
+        min-height: 44px;
+    }
+}

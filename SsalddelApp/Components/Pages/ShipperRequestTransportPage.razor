@@ -1,0 +1,27 @@
+@page "/shipper/request/transport"
+@inject ShipperRequestAuthoringPageViewModel PageModel
+@inject NavigationManager Navigation
+
+<PageTitle>화주 운송 의뢰 - 운송 정보</PageTitle>
+
+<ShipperRequestTransportScreen ViewModel="PageModel.State"
+                               NavigationContext="RouteContext"
+                               RootBackHref="@ShipperRoutes.ShipperHome"
+                               RootBackLabel="화주 홈"
+                               Changed="PageModel.AutoSaveAsync" />
+
+@code {
+    private ShipperRequestNavigationContext RouteContext
+        => ShipperRequestNavigationContext.Parse(Navigation.Uri);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await PageModel.InitializeAsync();
+        StateHasChanged();
+    }
+}

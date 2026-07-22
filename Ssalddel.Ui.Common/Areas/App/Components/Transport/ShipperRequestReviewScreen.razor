@@ -1,0 +1,98 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+
+<ShipperRequestScreenFrame ViewModel="ViewModel"
+                           NavigationContext="NavigationContext"
+                           Step="ShipperRequestAuthoringStep.Review"
+                           Title="최종 확인"
+                           Description="작성한 초안과 필수 입력, 운영 경계를 확인한 뒤 사용자가 명시적으로 저장 또는 등록합니다."
+                           ShowNavigation="ShowNavigation"
+                           RootBackHref="@RootBackHref"
+                           RootBackLabel="@RootBackLabel"
+                           Changed="Changed">
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <MudAlert Severity="StatusSeverity">@StatusMessage</MudAlert>
+    }
+
+    <운송의뢰작성요약Panel ViewModel="ViewModel" />
+    <운송의뢰검증Panel ViewModel="ViewModel" NavigationContext="NavigationContext" />
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">실행 경계</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    의뢰 등록은 현재 화면의 명시적 버튼으로만 요청합니다. 등록 뒤에도 추천·자동 배차·계약·결제는 별도 동의와 서버 상태 검증 없이 확정하지 않습니다.
+                </MudText>
+            </MudStack>
+
+            @if (RegistrationEnabled != true)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+                        <span>@RegistrationBoundaryMessage</span>
+                        @if (RetryRegistrationCheck.HasDelegate)
+                        {
+                            <MudButton Variant="Variant.Text" Color="Color.Warning" Disabled="IsBusy" OnClick="RetryRegistrationCheck">다시 확인</MudButton>
+                        }
+                    </MudStack>
+                </MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    @RegistrationBoundaryMessage
+                </MudAlert>
+            }
+
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap" Justify="Justify.FlexEnd">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.RestartAlt"
+                           Disabled="IsBusy"
+                           OnClick="ResetRequested">
+                    초기화
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           Disabled="IsBusy"
+                           OnClick="SaveRequested">
+                    초안 저장
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                           Disabled="@(!CanSubmit)"
+                           OnClick="SubmitRequested">
+                    @(IsBusy ? "처리 중" : SubmitLabel)
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+</ShipperRequestScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestNavigationContext NavigationContext { get; set; } = new();
+    [Parameter] public bool? RegistrationEnabled { get; set; }
+    [Parameter] public string RegistrationBoundaryMessage { get; set; } = "현재 환경의 등록 가능 여부를 확인하고 있습니다. 초안은 계속 작성할 수 있습니다.";
+    [Parameter] public string? StatusMessage { get; set; }
+    [Parameter] public Severity StatusSeverity { get; set; } = Severity.Info;
+    [Parameter] public string SubmitLabel { get; set; } = "운송 의뢰 등록";
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public bool ShowNavigation { get; set; } = true;
+    [Parameter] public string RootBackHref { get; set; } = ShipperRequestPageRoutes.Root;
+    [Parameter] public string RootBackLabel { get; set; } = "한 화면 입력";
+    [Parameter] public EventCallback Changed { get; set; }
+    [Parameter] public EventCallback SaveRequested { get; set; }
+    [Parameter] public EventCallback ResetRequested { get; set; }
+    [Parameter] public EventCallback SubmitRequested { get; set; }
+    [Parameter] public EventCallback RetryRegistrationCheck { get; set; }
+
+    private bool CanSubmit
+        => RegistrationEnabled == true
+           && ViewModel.서버등록가능
+           && !IsBusy
+           && SubmitRequested.HasDelegate;
+}

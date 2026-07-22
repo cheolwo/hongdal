@@ -23,21 +23,22 @@ public sealed class IntegratedBetaCatalogTests
     }
 
     [Theory]
-    [InlineData("/community/group-purchase", IntegratedBetaStage.Beta)]
-    [InlineData("/community/group-import", IntegratedBetaStage.Experience)]
-    [InlineData("/shipper/request", IntegratedBetaStage.Beta)]
-    [InlineData("/driver/recommendations", IntegratedBetaStage.Preparing)]
-    [InlineData("/driver/transports/current", IntegratedBetaStage.Preparing)]
-    [InlineData("/warehouse/work-board", IntegratedBetaStage.Beta)]
-    public void 외부_업무_효과가_있는_대표_경로는_Simulation_경계를_유지한다(
+    [InlineData("/community/group-purchase", IntegratedBetaStage.Beta, WebInteractionBoundary.ReadOnly)]
+    [InlineData("/community/group-import", IntegratedBetaStage.Experience, WebInteractionBoundary.Simulation)]
+    [InlineData("/shipper/request", IntegratedBetaStage.Beta, WebInteractionBoundary.Simulation)]
+    [InlineData("/driver/recommendations", IntegratedBetaStage.Preparing, WebInteractionBoundary.Simulation)]
+    [InlineData("/driver/transports/current", IntegratedBetaStage.Preparing, WebInteractionBoundary.Simulation)]
+    [InlineData("/warehouse/work-board", IntegratedBetaStage.Beta, WebInteractionBoundary.Simulation)]
+    public void 대표_업무_경로는_공용Capability의_명시적_실행_경계를_유지한다(
         string href,
-        IntegratedBetaStage expectedStage)
+        IntegratedBetaStage expectedStage,
+        WebInteractionBoundary expectedBoundary)
     {
         var state = IntegratedBetaCatalog.Resolve(href);
 
         Assert.True(state.IsCataloged);
         Assert.Equal(expectedStage, state.Stage);
-        Assert.Equal(WebInteractionBoundary.Simulation, state.Boundary);
+        Assert.Equal(expectedBoundary, state.Boundary);
         Assert.NotEqual(IntegratedBetaStage.Live, state.Stage);
     }
 

@@ -1,5 +1,5 @@
 using Ssalddel.Contracts.Common.Community;
-using Ssalddel.WebApp.Models;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace Ssalddel.WebApp.Services;
 

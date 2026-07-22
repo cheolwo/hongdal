@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Ssalddel.Client.Infrastructure.Transport;
 using Ssalddel.Contracts.Shipper.Request;
-using Ssalddel.WebApp.Models;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 namespace Ssalddel.WebApp.Services;
 

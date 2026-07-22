@@ -1,0 +1,69 @@
+@namespace Ssalddel.WebApp.Shared
+@using Ssalddel.WebApp.ViewModels
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.overline" Color="Color.Primary">커뮤니티에서 이어서 작성</MudText>
+                <MudText Typo="Typo.h6">화물 글을 운송 의뢰 초안으로 가져오기</MudText>
+            </MudStack>
+            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                배차·계약 전 초안
+            </MudChip>
+        </MudStack>
+
+        @if (PageModel.IsSourcePostLoading)
+        {
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                <MudText Typo="Typo.body2">화물 글을 불러오는 중입니다.</MudText>
+            </MudStack>
+        }
+        else if (!string.IsNullOrWhiteSpace(PageModel.SourcePostError))
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@PageModel.SourcePostError</MudAlert>
+        }
+        else if (PageModel.SourcePost is not null)
+        {
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.subtitle1">@PageModel.SourcePost.Title</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@PageModel.SourcePostPreview</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    가져오기를 눌러야 입력값이 바뀝니다. 제목은 비어 있는 화물 종류에만 채우고 본문은 화물 설명에 덧붙입니다.
+                    주소·연락처·수량·운임은 글에서 자동 추출하지 않습니다.
+                </MudText>
+            </MudStack>
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudButton OnClick="ApplyAsync"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Disabled="@(PageModel.IsSourcePostApplying || PageModel.SourcePostApplied)"
+                           StartIcon="@Icons.Material.Filled.PostAdd">
+                    @(PageModel.SourcePostApplied ? "초안에 반영됨" : "초안에 반영")
+                </MudButton>
+                <MudButton Href="@CommunityPageRoutes.PostDetailFor(PageModel.SourcePost.Id, returnPath: ReturnPath)"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.OpenInNew">
+                    원문 보기
+                </MudButton>
+            </MudStack>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public ShipperRequestAuthoringPageViewModel PageModel { get; set; } = default!;
+    [Parameter] public string? ReturnPath { get; set; }
+    [Parameter] public EventCallback Applied { get; set; }
+
+    private async Task ApplyAsync()
+    {
+        await PageModel.ApplySourcePostAsync();
+        if (Applied.HasDelegate)
+        {
+            await Applied.InvokeAsync();
+        }
+    }
+}

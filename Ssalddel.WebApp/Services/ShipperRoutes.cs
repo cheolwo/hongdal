@@ -1,11 +1,13 @@
+using Ssalddel.Contracts.Shipper.Request;
+
 namespace Ssalddel.WebApp.Services;
 
 public static class ShipperRoutes
 {
     public const string Home = "/shipper";
-    public const string Request = "/shipper/request";
-    public const string RequestBulk = "/shipper/request/bulk";
-    public const string RequestDetail = "/shipper/request";
+    public const string Request = ShipperRequestPageRoutes.Root;
+    public const string RequestBulk = ShipperRequestPageRoutes.Bulk;
+    public const string RequestDetail = ShipperRequestPageRoutes.Root;
     public const string RequestDetailLookup = "/shipper/request/detail";
     public const string PaymentStatus = "/shipper/request/payment-status";
     public const string PublicCargo = "/shipper/public-cargo";

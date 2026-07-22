@@ -1,0 +1,117 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+@inject NavigationManager Navigation
+
+@if (ShowSteps)
+{
+    <nav class="shipper-request-steps" aria-label="운송 의뢰 작성 단계">
+        @foreach (var item in ViewModel.단계목록)
+        {
+            <a class="@BuildStepClass(item)"
+               href="@NavigationContext.PathFor(item.단계)"
+               aria-current="@(item.단계 == CurrentStep ? "step" : null)"
+               @onclick="@(() => NavigateAsync(NavigationContext.PathFor(item.단계)))"
+               @onclick:preventDefault="true">
+                <span>@StepNumber(item.단계)</span>
+                <strong>@item.제목</strong>
+                <small>@(item.완료 ? "입력됨" : item.설명)</small>
+            </a>
+        }
+    </nav>
+}
+
+@if (ShowFooter)
+{
+    <footer class="shipper-request-step-footer">
+        <a class="shipper-request-step-action shipper-request-step-action--back"
+           href="@PreviousHref"
+           @onclick="@(() => NavigateAsync(PreviousHref))"
+           @onclick:preventDefault="true">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            @PreviousLabel
+        </a>
+
+        @if (NextStep is not null)
+        {
+            <a class="shipper-request-step-action shipper-request-step-action--next"
+               href="@NavigationContext.PathFor(NextStep.Value)"
+               @onclick="@(() => NavigateAsync(NavigationContext.PathFor(NextStep.Value)))"
+               @onclick:preventDefault="true">
+                @NextLabel
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+            </a>
+        }
+    </footer>
+}
+
+@code {
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestNavigationContext NavigationContext { get; set; } = new();
+    [Parameter] public ShipperRequestAuthoringStep CurrentStep { get; set; }
+    [Parameter] public bool ShowSteps { get; set; } = true;
+    [Parameter] public bool ShowFooter { get; set; } = true;
+    [Parameter] public string RootBackHref { get; set; } = ShipperRequestPageRoutes.Root;
+    [Parameter] public string RootBackLabel { get; set; } = "한 화면 입력";
+    [Parameter] public EventCallback BeforeNavigate { get; set; }
+
+    private string PreviousHref => CurrentStep switch
+    {
+        ShipperRequestAuthoringStep.Cargo => RootBackHref,
+        ShipperRequestAuthoringStep.Transport => NavigationContext.PathFor(ShipperRequestAuthoringStep.Cargo),
+        ShipperRequestAuthoringStep.Procedure => NavigationContext.PathFor(ShipperRequestAuthoringStep.Transport),
+        ShipperRequestAuthoringStep.Review => NavigationContext.PathFor(ShipperRequestAuthoringStep.Procedure),
+        _ => RootBackHref
+    };
+
+    private string PreviousLabel => CurrentStep switch
+    {
+        ShipperRequestAuthoringStep.Cargo => RootBackLabel,
+        ShipperRequestAuthoringStep.Transport => "화물 정보",
+        ShipperRequestAuthoringStep.Procedure => "운송 정보",
+        ShipperRequestAuthoringStep.Review => "절차/결제 정보",
+        _ => RootBackLabel
+    };
+
+    private ShipperRequestAuthoringStep? NextStep => CurrentStep switch
+    {
+        ShipperRequestAuthoringStep.Cargo => ShipperRequestAuthoringStep.Transport,
+        ShipperRequestAuthoringStep.Transport => ShipperRequestAuthoringStep.Procedure,
+        ShipperRequestAuthoringStep.Procedure => ShipperRequestAuthoringStep.Review,
+        _ => null
+    };
+
+    private string NextLabel => CurrentStep switch
+    {
+        ShipperRequestAuthoringStep.Cargo => "운송 정보",
+        ShipperRequestAuthoringStep.Transport => "절차/결제 정보",
+        ShipperRequestAuthoringStep.Procedure => "최종 확인",
+        _ => string.Empty
+    };
+
+    private async Task NavigateAsync(string href)
+    {
+        if (BeforeNavigate.HasDelegate)
+        {
+            await BeforeNavigate.InvokeAsync();
+        }
+
+        Navigation.NavigateTo(href);
+    }
+
+    private string BuildStepClass(운송의뢰작성단계 item)
+    {
+        var classes = new List<string> { "shipper-request-step-link" };
+        if (item.단계 == CurrentStep)
+        {
+            classes.Add("shipper-request-step-link--active");
+        }
+
+        if (item.완료)
+        {
+            classes.Add("shipper-request-step-link--complete");
+        }
+
+        return string.Join(' ', classes);
+    }
+
+    private static int StepNumber(ShipperRequestAuthoringStep step) => (int)step + 1;
+}

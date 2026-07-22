@@ -1,0 +1,110 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+
+<main class="shipper-request-authoring">
+    <header class="shipper-request-authoring__header">
+        <div>
+            <span>SHIPPER · TRANSPORT REQUEST</span>
+            <h1>운송 의뢰 작성</h1>
+            <p>desktop에서는 네 책임을 한 문맥에서 조립하고, 작은 화면에서는 같은 초안을 단계 route로 나눠 작성합니다.</p>
+        </div>
+        <nav aria-label="운송 의뢰 작성 방식">
+            <MudButton Href="@NavigationContext.PathFor(ShipperRequestAuthoringStep.Cargo)"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.ViewWeek">
+                단계 입력
+            </MudButton>
+            @if (!string.IsNullOrWhiteSpace(BulkHref))
+            {
+                <MudButton Href="@BulkHref" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.UploadFile">CSV 일괄등록</MudButton>
+            }
+        </nav>
+    </header>
+
+    @if (BeforeContent is not null)
+    {
+        @BeforeContent
+    }
+
+    @if (!string.IsNullOrWhiteSpace(AutoSaveMessage))
+    {
+        <MudText Typo="Typo.caption" Color="Color.Secondary">@AutoSaveMessage</MudText>
+    }
+
+    <div class="shipper-request-authoring__layout">
+        <div class="shipper-request-authoring__forms">
+            <ShipperRequestCargoScreen ViewModel="ViewModel"
+                                       NavigationContext="NavigationContext"
+                                       ShowNavigation="false"
+                                       Changed="Changed" />
+
+            <MudDivider />
+
+            <ShipperRequestTransportScreen ViewModel="ViewModel"
+                                           NavigationContext="NavigationContext"
+                                           ShowNavigation="false"
+                                           Changed="Changed" />
+
+            <MudDivider />
+
+            <ShipperRequestProcedureScreen ViewModel="ViewModel"
+                                           NavigationContext="NavigationContext"
+                                           VehicleTypes="VehicleTypes"
+                                           FareEstimateRequested="FareEstimateRequested"
+                                           IsBusy="IsBusy"
+                                           ShowNavigation="false"
+                                           CommunityConsultationHref="@CommunityConsultationHref"
+                                           Changed="Changed" />
+
+            <MudDivider />
+
+            <ShipperRequestReviewScreen ViewModel="ViewModel"
+                                        NavigationContext="NavigationContext"
+                                        RegistrationEnabled="RegistrationEnabled"
+                                        RegistrationBoundaryMessage="@RegistrationBoundaryMessage"
+                                        StatusMessage="@StatusMessage"
+                                        StatusSeverity="StatusSeverity"
+                                        SubmitLabel="@SubmitLabel"
+                                        IsBusy="IsBusy"
+                                        ShowNavigation="false"
+                                        Changed="Changed"
+                                        SaveRequested="SaveRequested"
+                                        ResetRequested="ResetRequested"
+                                        SubmitRequested="SubmitRequested"
+                                        RetryRegistrationCheck="RetryRegistrationCheck" />
+        </div>
+
+        <aside class="shipper-request-authoring__summary" aria-label="운송 의뢰 초안 요약">
+            <운송의뢰작성요약Panel ViewModel="ViewModel" />
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle2">책임 분리</MudText>
+                    <MudText Typo="Typo.body2">화물 → 운송 → 절차·결제 → 최종 확인</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">모든 화면은 같은 draft와 validation을 사용합니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        </aside>
+    </div>
+</main>
+
+@code {
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestNavigationContext NavigationContext { get; set; } = new();
+    [Parameter] public IReadOnlyList<string> VehicleTypes { get; set; } = [];
+    [Parameter] public Func<string, decimal, Task<decimal?>>? FareEstimateRequested { get; set; }
+    [Parameter] public bool? RegistrationEnabled { get; set; }
+    [Parameter] public string RegistrationBoundaryMessage { get; set; } = "현재 환경의 등록 가능 여부를 확인하고 있습니다.";
+    [Parameter] public string? StatusMessage { get; set; }
+    [Parameter] public Severity StatusSeverity { get; set; } = Severity.Info;
+    [Parameter] public string? AutoSaveMessage { get; set; }
+    [Parameter] public string SubmitLabel { get; set; } = "운송 의뢰 등록";
+    [Parameter] public string? BulkHref { get; set; } = ShipperRequestPageRoutes.Bulk;
+    [Parameter] public string? CommunityConsultationHref { get; set; }
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public RenderFragment? BeforeContent { get; set; }
+    [Parameter] public EventCallback Changed { get; set; }
+    [Parameter] public EventCallback SaveRequested { get; set; }
+    [Parameter] public EventCallback ResetRequested { get; set; }
+    [Parameter] public EventCallback SubmitRequested { get; set; }
+    [Parameter] public EventCallback RetryRegistrationCheck { get; set; }
+}

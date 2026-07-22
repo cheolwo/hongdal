@@ -1,0 +1,35 @@
+@page "/shipper/request/procedure"
+@inject ShipperRequestAuthoringPageViewModel PageModel
+@inject NavigationManager Navigation
+
+<PageTitle>운송 의뢰 작성 - 절차·결제 정보</PageTitle>
+
+<ShipperRequestProcedureScreen ViewModel="PageModel.State"
+                               NavigationContext="RouteContext"
+                               RootBackHref="@RouteContext.RootPath"
+                               VehicleTypes="PageModel.VehicleTypes"
+                               IsBusy="PageModel.IsBusy"
+                               CommunityConsultationHref="@CommunityConsultationHref"
+                               Changed="PageModel.AutoSaveAsync" />
+
+@code {
+    private ShipperRequestNavigationContext RouteContext
+        => ShipperRequestNavigationContext.Parse(Navigation.Uri);
+
+    private string CommunityConsultationHref
+        => CommunityPageRoutes.ComposeFor(
+            boardName: "화물",
+            boardKey: CommunityBoardKeys.Cargo,
+            returnPath: RouteContext.PathFor(ShipperRequestAuthoringStep.Procedure));
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await PageModel.InitializeAsync(RouteContext);
+        StateHasChanged();
+    }
+}

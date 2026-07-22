@@ -1,0 +1,36 @@
+@page "/shipper/request/review"
+@page "/shipper/request/summary"
+@inject ShipperRequestAuthoringPageViewModel PageModel
+@inject NavigationManager Navigation
+
+<PageTitle>화주 운송 의뢰 - 최종 확인</PageTitle>
+
+<ShipperRequestReviewScreen ViewModel="PageModel.State"
+                            NavigationContext="RouteContext"
+                            RegistrationEnabled="PageModel.RegistrationEnabled"
+                            RegistrationBoundaryMessage="@PageModel.RegistrationBoundaryMessage"
+                            StatusMessage="@PageModel.StatusMessage"
+                            StatusSeverity="PageModel.StatusSeverity"
+                            IsBusy="PageModel.IsBusy"
+                            RootBackHref="@ShipperRoutes.ShipperHome"
+                            RootBackLabel="화주 홈"
+                            Changed="PageModel.AutoSaveAsync"
+                            SaveRequested="PageModel.SaveAsync"
+                            ResetRequested="PageModel.ResetAsync"
+                            SubmitRequested="PageModel.SubmitAsync" />
+
+@code {
+    private ShipperRequestNavigationContext RouteContext
+        => ShipperRequestNavigationContext.Parse(Navigation.Uri);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await PageModel.InitializeAsync();
+        StateHasChanged();
+    }
+}

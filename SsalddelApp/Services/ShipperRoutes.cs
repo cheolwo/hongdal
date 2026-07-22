@@ -1,3 +1,5 @@
+using Ssalddel.Contracts.Shipper.Request;
+
 namespace SsalddelApp.Services;
 
 public static class ShipperRoutes
@@ -5,9 +7,9 @@ public static class ShipperRoutes
     public const string Home = "/";
     public const string ShipperHome = "/shipper";
     public const string TransportWorkspace = "/shipper/transport";
-    public const string Request = "/shipper/request";
-    public const string RequestBulk = "/shipper/request/bulk";
-    public const string RequestDetail = "/shipper/request";
+    public const string Request = ShipperRequestPageRoutes.Root;
+    public const string RequestBulk = ShipperRequestPageRoutes.Bulk;
+    public const string RequestDetail = ShipperRequestPageRoutes.Root;
     public const string PublicCargo = "/shipper/public-cargo";
     public const string ExplorationInbox = "/shipper/exploration/inbox";
     public const string InboundDashboard = "/shipper/inbound/dashboard";

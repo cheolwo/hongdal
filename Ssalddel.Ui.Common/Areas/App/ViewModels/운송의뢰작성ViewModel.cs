@@ -1,6 +1,7 @@
 using Ssalddel.Ui.Common.Areas.App.Models;
+using Ssalddel.Contracts.Shipper.Request;
 
-namespace Ssalddel.WebApp.Models;
+namespace Ssalddel.Ui.Common.Areas.App.ViewModels;
 
 public sealed class 운송의뢰작성ViewModel
 {
@@ -63,6 +64,7 @@ public sealed class 운송의뢰작성ViewModel
     public IReadOnlyList<운송정보입력요구사항> 운송정보요구사항목록 => 운송정보입력정책.Get요구사항(화물적재형태);
     public IReadOnlyList<string> 운송정보경고목록 =>
         운송정보입력정책.Get경고목록(화물적재형태, 상차도로명주소, 하차도로명주소, 요청사항);
+    public IReadOnlyList<string> 요금정책경고목록 => Build요금정책경고목록();
 
     public IReadOnlyList<string> 추천차량종류목록 => Build추천차량종류목록();
     public string 추천운송설명 => Build추천운송설명();
@@ -73,10 +75,10 @@ public sealed class 운송의뢰작성ViewModel
 
     public IReadOnlyList<운송의뢰작성단계> 단계목록 =>
     [
-        new("화물 정보", "품목, 수량, 중량", 화물정보입력됨),
-        new("운송 정보", "상차지, 하차지, 연락처", 운송정보입력됨),
-        new("절차/결제 정보", "차량, 운임, 알선 절차", 절차정보입력됨),
-        new("작성 요약", "전체 입력값 확인", 전체입력됨)
+        new(ShipperRequestAuthoringStep.Cargo, "화물 정보", "품목, 수량, 중량", 화물정보입력됨),
+        new(ShipperRequestAuthoringStep.Transport, "운송 정보", "상차지, 하차지, 연락처", 운송정보입력됨),
+        new(ShipperRequestAuthoringStep.Procedure, "절차/결제 정보", "차량, 운임, 알선 절차", 절차정보입력됨),
+        new(ShipperRequestAuthoringStep.Review, "최종 확인", "전체 입력값 확인", 전체입력됨)
     ];
 
     public void 화물기반추천적용()
@@ -109,9 +111,11 @@ public sealed class 운송의뢰작성ViewModel
             정책경고목록.Add($"운송정보확인: {warning}");
         }
 
+        정책경고목록.AddRange(요금정책경고목록);
+
         return new 운송모델작성Draft
         {
-            작성출처 = "웹앱 운송 의뢰 작성",
+            작성출처 = "공용 운송 의뢰 작성",
             화물종류 = 화물종류,
             화물설명 = 화물설명,
             화물적재형태 = 화물적재형태,
@@ -309,59 +313,96 @@ public sealed class 운송의뢰작성ViewModel
 
         if (string.IsNullOrWhiteSpace(화물종류))
         {
-            messages.Add(new("화물 정보", "화물 종류를 입력해야 합니다.", "/shipper/request/cargo", true));
+            messages.Add(new("화물 정보", "화물 종류를 입력해야 합니다.", ShipperRequestAuthoringStep.Cargo, true));
         }
 
         if (!화물수량.HasValue && !화물중량Kg.HasValue && !화물부피Cbm.HasValue)
         {
-            messages.Add(new("화물 정보", "수량, 중량, 부피 중 하나 이상을 입력해야 합니다.", "/shipper/request/cargo", true));
+            messages.Add(new("화물 정보", "수량, 중량, 부피 중 하나 이상을 입력해야 합니다.", ShipperRequestAuthoringStep.Cargo, true));
         }
 
         if (string.IsNullOrWhiteSpace(상차도로명주소))
         {
-            messages.Add(new("운송 정보", "상차 도로명 주소를 입력해야 합니다.", "/shipper/request/transport", true));
+            messages.Add(new("운송 정보", "상차 도로명 주소를 입력해야 합니다.", ShipperRequestAuthoringStep.Transport, true));
         }
 
         if (string.IsNullOrWhiteSpace(하차도로명주소))
         {
-            messages.Add(new("운송 정보", "하차 도로명 주소를 입력해야 합니다.", "/shipper/request/transport", true));
+            messages.Add(new("운송 정보", "하차 도로명 주소를 입력해야 합니다.", ShipperRequestAuthoringStep.Transport, true));
         }
 
         if (string.IsNullOrWhiteSpace(상차연락처전화번호))
         {
-            messages.Add(new("운송 정보", "상차 담당자 연락처가 있으면 기사님 도착/상차 준비 알림이 쉬워집니다.", "/shipper/request/transport", false));
+            messages.Add(new("운송 정보", "상차 담당자 연락처가 있으면 기사님 도착/상차 준비 알림이 쉬워집니다.", ShipperRequestAuthoringStep.Transport, false));
         }
 
         if (string.IsNullOrWhiteSpace(하차연락처전화번호))
         {
-            messages.Add(new("운송 정보", "하차 담당자 연락처가 있으면 부재/예외 상황 대응이 쉬워집니다.", "/shipper/request/transport", false));
+            messages.Add(new("운송 정보", "하차 담당자 연락처가 있으면 부재/예외 상황 대응이 쉬워집니다.", ShipperRequestAuthoringStep.Transport, false));
         }
 
         if (string.IsNullOrWhiteSpace(차량종류))
         {
-            messages.Add(new("절차/결제 정보", "차량 종류를 선택해야 합니다.", "/shipper/request/procedure", true));
+            messages.Add(new("절차/결제 정보", "차량 종류를 선택해야 합니다.", ShipperRequestAuthoringStep.Procedure, true));
         }
 
         if (string.IsNullOrWhiteSpace(결제수단))
         {
-            messages.Add(new("절차/결제 정보", "결제 수단을 선택해야 합니다.", "/shipper/request/procedure", true));
+            messages.Add(new("절차/결제 정보", "결제 수단을 선택해야 합니다.", ShipperRequestAuthoringStep.Procedure, true));
         }
 
         if (!결제예정금액.HasValue || 결제예정금액.Value <= 0)
         {
-            messages.Add(new("절차/결제 정보", "결제 예정 금액을 입력해야 정산 흐름을 검증할 수 있습니다.", "/shipper/request/procedure", true));
+            messages.Add(new("절차/결제 정보", "결제 예정 금액을 입력해야 정산 흐름을 검증할 수 있습니다.", ShipperRequestAuthoringStep.Procedure, true));
         }
 
         foreach (var warning in 운송정보경고목록)
         {
-            messages.Add(new("운송 정보", warning, "/shipper/request/transport", false));
+            messages.Add(new("운송 정보", warning, ShipperRequestAuthoringStep.Transport, false));
+        }
+
+        foreach (var warning in 요금정책경고목록)
+        {
+            messages.Add(new("절차/결제 정보", warning, ShipperRequestAuthoringStep.Procedure, false));
         }
 
         return messages;
     }
+
+    private IReadOnlyList<string> Build요금정책경고목록()
+    {
+        var warnings = new List<string>();
+
+        if (기준운임.HasValue && 결제예정금액.HasValue && 결제예정금액.Value < 기준운임.Value)
+        {
+            warnings.Add($"기준운임미달: 결제예정금액이 기준운임 {기준운임:N0}원보다 낮습니다.");
+        }
+
+        if (!기사지급예정운임.HasValue)
+        {
+            warnings.Add("기사 지급 예정 운임을 입력해야 재알선/수수료 구조를 확인할 수 있습니다.");
+        }
+        else if (기준운임.HasValue && 기사지급예정운임.Value < 기준운임.Value * 0.7m)
+        {
+            warnings.Add("기사 지급 예정 운임이 기준운임의 70%보다 낮아 알선 단계 확인이 필요합니다.");
+        }
+
+        if (재알선금지 && 알선단계 > 1)
+        {
+            warnings.Add("재알선차단필요: 재알선 금지 의뢰인데 알선 단계가 2단계 이상입니다.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(알선소Id) && 알선단계 > 1)
+        {
+            warnings.Add($"재알선의심: 알선소 {알선소Id}를 통한 {알선단계}단계 알선입니다.");
+        }
+
+        return warnings;
+    }
 }
 
 public sealed record 운송의뢰작성단계(
+    ShipperRequestAuthoringStep 단계,
     string 제목,
     string 설명,
     bool 완료);
@@ -369,5 +410,5 @@ public sealed record 운송의뢰작성단계(
 public sealed record 운송의뢰검증메시지(
     string 구분,
     string 내용,
-    string 이동Href,
+    ShipperRequestAuthoringStep 단계,
     bool 필수);

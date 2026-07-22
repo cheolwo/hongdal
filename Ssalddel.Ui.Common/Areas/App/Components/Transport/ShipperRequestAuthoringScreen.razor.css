@@ -1,0 +1,94 @@
+.shipper-request-authoring {
+    display: grid;
+    gap: 1rem;
+    width: min(1320px, 100%);
+    margin: 0 auto;
+}
+
+.shipper-request-authoring__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-top: 3px solid var(--mud-palette-primary);
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+.shipper-request-authoring__header > div {
+    display: grid;
+    gap: .25rem;
+}
+
+.shipper-request-authoring__header span {
+    color: var(--mud-palette-primary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.shipper-request-authoring__header h1,
+.shipper-request-authoring__header p {
+    margin: 0;
+}
+
+.shipper-request-authoring__header p {
+    color: var(--mud-palette-text-secondary);
+}
+
+.shipper-request-authoring__header nav {
+    display: flex;
+    flex: 0 0 auto;
+    gap: .5rem;
+}
+
+.shipper-request-authoring__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    align-items: start;
+    gap: 1rem;
+}
+
+.shipper-request-authoring__forms {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.shipper-request-authoring__summary {
+    position: sticky;
+    top: 1rem;
+    display: grid;
+    gap: .75rem;
+}
+
+@media (max-width: 960px) {
+    .shipper-request-authoring__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .shipper-request-authoring__summary {
+        position: static;
+        order: -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .shipper-request-authoring__header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: .75rem 0;
+    }
+
+    .shipper-request-authoring__header nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .shipper-request-authoring ::deep button,
+    .shipper-request-authoring ::deep a,
+    .shipper-request-authoring ::deep input,
+    .shipper-request-authoring ::deep [role="button"] {
+        min-height: 44px;
+    }
+}

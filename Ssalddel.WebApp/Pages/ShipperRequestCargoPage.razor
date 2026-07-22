@@ -1,0 +1,42 @@
+@page "/shipper/request/cargo"
+@inject ShipperRequestAuthoringPageViewModel PageModel
+@inject NavigationManager Navigation
+
+<PageTitle>운송 의뢰 작성 - 화물 정보</PageTitle>
+
+<ShipperRequestCargoScreen ViewModel="PageModel.State"
+                           NavigationContext="RouteContext"
+                           RootBackHref="@RouteContext.RootPath"
+                           BulkHref="@ShipperRequestPageRoutes.Bulk"
+                           Changed="PageModel.AutoSaveAsync">
+    <BeforeContent>
+        @if (RouteContext.SourcePostId is > 0)
+        {
+            <ShipperRequestSourcePostImportPanel PageModel="PageModel"
+                                                 ReturnPath="@RouteContext.PathFor(ShipperRequestAuthoringStep.Cargo)"
+                                                 Applied="RefreshAsync" />
+        }
+    </BeforeContent>
+</ShipperRequestCargoScreen>
+
+@code {
+    private ShipperRequestNavigationContext RouteContext
+        => ShipperRequestNavigationContext.Parse(Navigation.Uri);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await PageModel.InitializeAsync(RouteContext);
+        StateHasChanged();
+    }
+
+    private Task RefreshAsync()
+    {
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,242 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Transport
+
+<ShipperRequestScreenFrame ViewModel="ViewModel"
+                           NavigationContext="NavigationContext"
+                           Step="ShipperRequestAuthoringStep.Procedure"
+                           Title="절차·결제 정보"
+                           Description="차량, 운임, 부가비용과 알선 정책을 확인합니다. 이 단계에서 배차나 결제를 확정하지 않습니다."
+                           ShowNavigation="ShowNavigation"
+                           RootBackHref="@RootBackHref"
+                           RootBackLabel="@RootBackLabel"
+                           Changed="Changed">
+    <운송의뢰추천Panel ViewModel="ViewModel" OnApplied="NotifyChangedAsync" />
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.subtitle1">차량 선택</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">화물 조건을 확인한 사용자가 후보 중 하나를 직접 선택합니다.</MudText>
+            </MudStack>
+
+            <div class="shipper-request-vehicle-grid" role="radiogroup" aria-label="차량 종류">
+                @foreach (var vehicle in EffectiveVehicleTypes)
+                {
+                    <button type="button"
+                            class="@VehicleClass(vehicle)"
+                            role="radio"
+                            aria-checked="@IsSelectedVehicle(vehicle)"
+                            @onclick="@(() => SelectVehicleAsync(vehicle))">
+                        <img src="@VehicleImage(vehicle)" alt="" aria-hidden="true" />
+                        <span>
+                            <strong>@vehicle</strong>
+                            <small>@VehicleDescription(vehicle)</small>
+                        </span>
+                        @if (IsSelectedVehicle(vehicle))
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" />
+                        }
+                    </button>
+                }
+            </div>
+
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudNumericField T="decimal?" @bind-Value="ViewModel.예상거리Km" Label="예상 거리 km" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <Ssalddel결제수단선택Buttons @bind-Value="ViewModel.결제수단" Disabled="IsBusy" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudNumericField T="int?" @bind-Value="ViewModel.결제예정금액" Label="결제 예정 금액" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudNumericField T="decimal?" @bind-Value="ViewModel.기준운임" Label="기준 운임" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudNumericField T="int?" @bind-Value="ViewModel.기사지급예정운임" Label="기사 지급 예정 운임" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudNumericField T="decimal?" @bind-Value="ViewModel.대기료" Label="대기료" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudNumericField T="decimal?" @bind-Value="ViewModel.수작업비" Label="수작업비" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudNumericField T="decimal?" @bind-Value="ViewModel.할증" Label="할증" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+            </MudGrid>
+
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Calculate"
+                           Disabled="@(IsBusy || FareEstimateRequested is null)"
+                           OnClick="EstimateFareAsync">
+                    기준운임 확인
+                </MudButton>
+                @if (!string.IsNullOrWhiteSpace(FareStatusMessage))
+                {
+                    <MudText Typo="Typo.caption" Color="@(FareStatusIsError ? Color.Error : Color.Secondary)">@FareStatusMessage</MudText>
+                }
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+
+    <운송의뢰결제후속절차Panel ViewModel="ViewModel" />
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.subtitle1">알선·재알선 경계</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">후보와 경고를 검토할 뿐 계약이나 자동 배차를 확정하지 않습니다.</MudText>
+            </MudStack>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudNumericField T="int" @bind-Value="ViewModel.알선단계" Label="알선 단계" Min="1" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="ViewModel.알선소Id" Label="알선소 ID" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudCheckBox T="bool" @bind-Value="ViewModel.재알선금지" Label="재알선 금지 의뢰로 표시합니다." Color="Color.Warning" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="ViewModel.절차메모" Label="절차 메모" Lines="3" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+            </MudGrid>
+
+            @if (ViewModel.요금정책경고목록.Count == 0)
+            {
+                <MudAlert Severity="Severity.Success" Dense="true" Variant="Variant.Outlined">현재 입력값에 요금·재알선 정책 경고가 없습니다.</MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                    @foreach (var warning in ViewModel.요금정책경고목록)
+                    {
+                        <div>@warning</div>
+                    }
+                </MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+
+    @if (!string.IsNullOrWhiteSpace(CommunityConsultationHref))
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+            운임이나 차량 선택이 애매하면 상세 주소·담당자·전화번호를 제외한 뒤 커뮤니티에서 먼저 질문할 수 있습니다.
+            <MudButton Href="@CommunityConsultationHref" Variant="Variant.Text" Color="Color.Info" StartIcon="@Icons.Material.Filled.Forum">커뮤니티 질문 작성</MudButton>
+        </MudAlert>
+    }
+</ShipperRequestScreenFrame>
+
+@code {
+    private static readonly IReadOnlyList<string> DefaultVehicleTypes =
+    [
+        "오토바이 퀵",
+        "1톤 카고",
+        "1.4톤 윙바디",
+        "2.5톤 탑차",
+        "냉동탑차",
+        "5톤 트럭",
+        "컨테이너 트레일러"
+    ];
+
+    [Parameter, EditorRequired] public 운송의뢰작성ViewModel ViewModel { get; set; } = default!;
+    [Parameter, EditorRequired] public ShipperRequestNavigationContext NavigationContext { get; set; } = new();
+    [Parameter] public IReadOnlyList<string> VehicleTypes { get; set; } = [];
+    [Parameter] public Func<string, decimal, Task<decimal?>>? FareEstimateRequested { get; set; }
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public bool ShowNavigation { get; set; } = true;
+    [Parameter] public string RootBackHref { get; set; } = ShipperRequestPageRoutes.Root;
+    [Parameter] public string RootBackLabel { get; set; } = "한 화면 입력";
+    [Parameter] public string? CommunityConsultationHref { get; set; }
+    [Parameter] public EventCallback Changed { get; set; }
+
+    private string FareStatusMessage { get; set; } = string.Empty;
+    private bool FareStatusIsError { get; set; }
+    private IReadOnlyList<string> EffectiveVehicleTypes
+        => (VehicleTypes.Count == 0 ? DefaultVehicleTypes : VehicleTypes)
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+    private async Task SelectVehicleAsync(string vehicle)
+    {
+        ViewModel.차량종류 = vehicle;
+        await NotifyChangedAsync();
+    }
+
+    private async Task EstimateFareAsync()
+    {
+        if (FareEstimateRequested is null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(ViewModel.차량종류) || ViewModel.예상거리Km is null or <= 0)
+        {
+            FareStatusIsError = true;
+            FareStatusMessage = "차량과 예상 거리를 먼저 입력하세요.";
+            return;
+        }
+
+        try
+        {
+            FareStatusIsError = false;
+            FareStatusMessage = "서버 기준운임을 확인하고 있습니다.";
+            var estimate = await FareEstimateRequested(ViewModel.차량종류, ViewModel.예상거리Km.Value);
+            if (!estimate.HasValue)
+            {
+                FareStatusIsError = true;
+                FareStatusMessage = "기준운임 응답이 비어 있습니다.";
+                return;
+            }
+
+            ViewModel.기준운임 = estimate.Value;
+            FareStatusMessage = $"기준운임 {estimate.Value:N0}원을 확인했습니다.";
+            await NotifyChangedAsync();
+        }
+        catch (Exception ex)
+        {
+            FareStatusIsError = true;
+            FareStatusMessage = $"기준운임을 확인하지 못했습니다: {ex.Message}";
+        }
+    }
+
+    private bool IsSelectedVehicle(string vehicle)
+        => string.Equals(ViewModel.차량종류, vehicle, StringComparison.OrdinalIgnoreCase);
+
+    private string VehicleClass(string vehicle)
+        => IsSelectedVehicle(vehicle)
+            ? "shipper-request-vehicle shipper-request-vehicle--selected"
+            : "shipper-request-vehicle";
+
+    private static string VehicleImage(string vehicle)
+    {
+        var file = vehicle switch
+        {
+            var value when value.Contains("오토바이", StringComparison.OrdinalIgnoreCase) => "vehicle-motorcycle-quick.svg",
+            var value when value.Contains("냉동", StringComparison.OrdinalIgnoreCase) => "vehicle-refrigerated.svg",
+            var value when value.Contains("1.4", StringComparison.OrdinalIgnoreCase) || value.Contains("윙", StringComparison.OrdinalIgnoreCase) => "vehicle-14ton-wing.svg",
+            var value when value.Contains("2.5", StringComparison.OrdinalIgnoreCase) || value.Contains("탑", StringComparison.OrdinalIgnoreCase) => "vehicle-25ton-box.svg",
+            var value when value.Contains("5톤", StringComparison.OrdinalIgnoreCase) || value.Contains("컨테이너", StringComparison.OrdinalIgnoreCase) => "vehicle-5ton-truck.svg",
+            _ => "vehicle-1ton-cargo.svg"
+        };
+
+        return $"_content/Ssalddel.Ui.Common/images/vehicles/{file}";
+    }
+
+    private static string VehicleDescription(string vehicle)
+        => vehicle switch
+        {
+            var value when value.Contains("오토바이", StringComparison.OrdinalIgnoreCase) => "소량·근거리 긴급 운송 후보",
+            var value when value.Contains("냉동", StringComparison.OrdinalIgnoreCase) => "냉장·냉동 온도 조건 후보",
+            var value when value.Contains("컨테이너", StringComparison.OrdinalIgnoreCase) => "FCL 반출·반입 조건 확인 필요",
+            var value when value.Contains("5톤", StringComparison.OrdinalIgnoreCase) => "중량·대형 화물 후보",
+            _ => "화물 수량·부피와 현장 조건을 확인하세요"
+        };
+
+    private Task NotifyChangedAsync()
+        => Changed.HasDelegate ? Changed.InvokeAsync() : Task.CompletedTask;
+}

@@ -16,6 +16,8 @@ internal static class ShipperTransportModule
         services.AddTransient<화주Controller기능모음ViewModel>();
         services.AddTransient<화주운송의뢰조회ViewModel>();
         services.AddTransient<화주운송의뢰작성ViewModel>();
+        services.AddScoped<운송의뢰작성ViewModel>();
+        services.AddScoped<ShipperRequestAuthoringPageViewModel>();
         services.AddTransient<화주운송의뢰일괄ViewModel>();
         services.AddScoped<화주운송의뢰상태ViewModel>();
         services.AddScoped<화주운송의뢰목록조회ViewModel>();

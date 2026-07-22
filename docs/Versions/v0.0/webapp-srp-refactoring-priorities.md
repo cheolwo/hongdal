@@ -38,7 +38,7 @@
 | `P0-2` 완료 | 국내 공동구매 대표 파일럿 | 변경 전에는 내부 component가 나뉘어도 한 route가 제안·목록·상세·공급자·배송 정보·이행 초안·협상·단계 전이·이의제기를 모두 실행했음 | 목록, 개설, 캠페인 상세, 참여, 공급자, 협상, 이의제기, 결의, 서명, 배송 가능 정보, 이행 초안 Screen | Web·모바일이 같은 공용 Screen을 조립하고 각 단계가 stable campaign ID와 직접 URL을 가지며 저장 뒤 같은 ID를 재조회하고 추천·자동 배차·결제·계약을 확정하지 않음 |
 | `P0-3` 완료 | 다이어그램 | 변경 전에는 Web 전용 `DiagramWorkbenchPage`가 palette·preset·canvas를 함께 소유하고 모바일 route가 없었음 | 공용 diagram Screen, desktop sidebar, mobile bottom sheet | Web·모바일 `/diagram`이 같은 Screen을 조립하고 선택 node·zoom·filter·출발 page를 복원하며 구체 업무 Command는 3단계 Screen으로 이동함 |
 | `P0-4` 완료 | 커뮤니티 화면 복귀 문맥 | 변경 전에는 board query가 화면 상태 전체를 표현하지 못하고 diagram node에서 3단계 업무 화면으로 이동한 뒤 돌아갈 공용 계약이 없었음 | 공용 `PageNavigationContext`, `CommunityBoardNavigationContext`와 Web·모바일 route adapter | 게시판의 board·검색·필터·보기·focus와 다이어그램의 원장·node·zoom·filter·출발 page를 URL로 복원하고, 3단계 Screen이 안전한 local `from`으로 원래 화면에 돌아가며 deep link test를 통과함 |
-| `P1-1` | 운송 요청 작성 | Web 한 화면 606줄, Web 단계 route 4개, 모바일 wizard가 서로 다른 workflow를 가짐 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당함 |
+| `P1-1` 완료 | 운송 요청 작성 | 변경 전에는 Web 한 화면 606줄, Web mode route 4개, 모바일 997줄 복합 Panel이 서로 다른 workflow를 가졌음 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당하며 diagram·커뮤니티 출발 문맥을 단계 사이에 보존함 |
 | `P1-2` | 운송 요청 상세 | Web 828줄과 모바일 988줄의 독립 monolith | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
 | `P1-3` | 입고 요청 | `SsalddelInboundRequestManager` 한 route에서 창고 빠른 등록·입고 신청·목록·완료 처리를 수행함 | 목록, 신규 신청, 상세, 입고 완료 Screen | 목록과 Command가 분리되고 성공 뒤 같은 inbound ID를 재조회함 |
 | `P1-4` | 창고·판매 master-detail-action | 입고 검수·피킹·마트 상품·판매 주문이 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 모바일에서 각 Screen을 독립 route로 열고 desktop split pane은 선택적 조립으로만 제공함 |
@@ -63,6 +63,20 @@
 | 3단계 | 공동구매 상세·참여·공급자·협의 | `/community/group-purchase/{CampaignId:guid}`와 하위 `/participation`, `/suppliers`, `/negotiation` |
 | 3단계 | 공동구매 이의·결의·서명 | campaign 하위 `/objections`, `/resolution`, `/signature` |
 | 3단계 | 공동구매 배송 정보·이행 초안 | campaign 하위 `/delivery-options`, `/fulfillment-draft` |
+
+## 운송 의뢰 작성 목표 route 지도
+
+| 화면 | 사용자 목표 | Route |
+| --- | --- | --- |
+| Web adaptive 조립 | 네 책임을 한 문맥에서 최종 조립 | `/shipper/request` |
+| 화물 정보 | 품목·적재·수량·중량·부피 입력 | `/shipper/request/cargo` |
+| 운송 정보 | 상차·하차·연락 대상·서비스 조건 입력 | `/shipper/request/transport` |
+| 절차·결제 정보 | 차량·운임·부가비용·알선 경계 검토 | `/shipper/request/procedure` |
+| 최종 확인 | 공통 validation·실행 경계 확인과 명시적 저장·등록 | `/shipper/request/review` |
+| legacy alias | 기존 최종 요약 링크의 같은 의미 호환 | `/shipper/request/summary` |
+| CSV 일괄등록 | 단건 작성과 분리된 여러 의뢰 준비 | `/shipper/request/bulk` |
+
+`SsalddelApp`의 `/shipper/request`는 query 문맥을 보존해 화물 정보 단계로 호환 이동한다. 네 단계 Route Page는 공용 Screen과 scoped draft만 조립하며 서버/sample adapter 호출은 앱 PageViewModel이 맡는다.
 
 ## 기존 component 리팩터링의 재분류
 
@@ -97,6 +111,6 @@
 
 ## 다음 작업
 
-`P0-4`에서 게시판 목록을 `Ssalddel.Ui.Common`의 공용 Screen으로 옮기고 WebApp과 `SsalddelApp`의 커뮤니티 route를 같은 의미로 맞췄다. 게시판은 `boardKey`, 검색어, 필터, 목록·카드 보기와 focus를 URL로 보존하고, 추천 목록·추천 상세·영속 상세·글쓰기는 안전하게 정규화한 local `from`으로 정확한 출발 목록에 돌아간다. 다이어그램에서 3단계 업무 Screen으로 이동할 때도 현재 원장, 선택 node, zoom, filter와 출발 page를 `from`에 담아 공용 복귀 bar가 같은 상태를 복원한다.
+`P1-1`에서 운송 요청 작성의 화물, 운송, 절차·결제, 최종 확인을 `Ssalddel.Ui.Common`의 독립 Screen으로 분리했다. Web 한 화면 조립과 Web·모바일 단계 route가 같은 `운송의뢰작성ViewModel`, draft, validation과 `ShipperRequestNavigationContext`를 공유한다. route adapter는 플랫폼 navigation만 담당하고 자동저장·서버 등록·커뮤니티 글 가져오기·모바일 transport adapter 호출은 각 PageViewModel로 이동했다. 추천·자동 배차·계약·결제 운영 효과는 새로 열지 않았다.
 
-다음 수직 단위는 `P1-1` 운송 요청 작성이다. Web의 한 화면 입력과 모바일 wizard가 같은 draft·validation·저장 경계를 공유하도록 화물, 운송, 절차, 최종 확인 Screen을 분리하고, Web은 adaptive composition, 모바일은 단계 navigation만 맡게 한다.
+다음 수직 단위는 `P1-2` 운송 요청 상세다. Web과 모바일의 독립 monolith를 요약, 진행 이력, 결제, 증빙 Screen으로 분리하고 같은 request ID와 서버 원본을 사용하며 결제·증빙 Command는 명시적 별도 route에서만 실행하도록 맞춘다.

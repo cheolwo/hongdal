@@ -1,0 +1,48 @@
+.shipper-request-vehicle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: .7rem;
+}
+
+.shipper-request-vehicle {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .65rem;
+    min-height: 88px;
+    padding: .55rem;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 8px;
+    background: var(--mud-palette-surface);
+    color: var(--mud-palette-text-primary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.shipper-request-vehicle img {
+    width: 72px;
+    height: 58px;
+    object-fit: contain;
+}
+
+.shipper-request-vehicle span {
+    display: grid;
+    gap: .2rem;
+    min-width: 0;
+}
+
+.shipper-request-vehicle small {
+    color: var(--mud-palette-text-secondary);
+    line-height: 1.35;
+}
+
+.shipper-request-vehicle--selected {
+    border-color: var(--mud-palette-primary);
+    box-shadow: 0 0 0 1px var(--mud-palette-primary);
+}
+
+@media (max-width: 520px) {
+    .shipper-request-vehicle-grid {
+        grid-template-columns: 1fr;
+    }
+}

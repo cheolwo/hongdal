@@ -371,7 +371,7 @@ flowchart LR
 | 번호 | 필수 화면 | 현재 라우트/파일 | 주 책임 | 연결 API/상태 | 현재 판정 |
 | --- | --- | --- | --- | --- | --- |
 | SsalddelApp-P01 | 화주 홈/업무 진입 | `/shipper`<br>`SsalddelApp/Components/Pages/Home.razor`<br>`/`는 `UnifiedHome.razor`의 역할 진입점 | 운송 의뢰, 의뢰 타임라인, 창고/판매 업무로 이동 | 서버 상태 요약, 최근 의뢰 | 라우트 확인 |
-| SsalddelApp-P02 | 운송 의뢰 작성 | `/shipper/request`<br>`SsalddelApp/Components/Pages/ShipperRequestWizard.razor` | 상차지, 하차지, 화물, 차량 조건, 결제 조건을 입력해 의뢰를 생성 | `api/v1/shipper/requests` | 1.0 필수 |
+| SsalddelApp-P02 | 운송 의뢰 작성 | `/shipper/request` → `/cargo`<br>`/transport`<br>`/procedure`<br>`/review`<br>`SsalddelApp/Components/Pages/ShipperRequest*Page.razor` | 같은 공용 draft로 화물, 상하차, 차량·결제 조건을 단계별 확인해 의뢰 원장 등록을 요청 | `api/v1/shipper/requests` | 1.0 필수 |
 | SsalddelApp-P02-1 | 운송 의뢰 대량 등록 | `/shipper/request/bulk`<br>`SsalddelApp/Components/Pages/ShipperBulkImport.razor` | 여러 의뢰를 한 번에 등록 | `api/v1/shipper/requests` 대량 등록 후보 | SsalddelApp-P02의 보조 화면 |
 | SsalddelApp-P03 | 의뢰 상세/타임라인 | `/shipper/request/{RequestId}`<br>`SsalddelApp/Components/Pages/ShipperRequestDetail.razor` | 결제, 배차, 수락, 상차, 하차, POD, 정산 상태를 한 화면에서 확인 | `api/v1/shipper/requests`, `api/v1/payments`, 운송 이벤트 | 1.0 필수 |
 | SsalddelApp-P03-1 | 결제/입금 안내 | 우선 SsalddelApp-P03 안에 포함 | 운송완료후정산, 가상계좌 입금대기, 1/3/7일 알림 상태 확인 | `api/v1/payments` | 상세 화면 안에서 먼저 닫고, 커지면 분리 |
@@ -523,7 +523,7 @@ flowchart LR
 | 번호 | 검증할 페이지 | 클라이언트 코드 | 서버/API 연결 | 검증 포인트 |
 | --- | --- | --- | --- | --- |
 | SsalddelApp-P01 | 화주 홈/업무 진입 | `SsalddelApp/Components/Pages/Home.razor`<br>`SsalddelApp/Services/ShipperRoutes.cs` | `ServerBackedShipperOperationsService`의 `api/v1/shipper/requests` 조회 | 최근 의뢰에서 SsalddelApp-P03으로 이동하고, 홈이 직접 상태 변경을 하지 않는지 확인 |
-| SsalddelApp-P02 | 운송 의뢰 작성 | `ShipperRequestWizard.razor`<br>`ServerBackedShipperOperationsService.CreateAsync` | `화주운송의뢰Controller`<br>`api/v1/shipper/requests` | 등록 후 의뢰 원장과 배차대기 진입 조건이 맞는지 확인 |
+| SsalddelApp-P02 | 운송 의뢰 작성 | `ShipperRequestCargoPage.razor` 등 네 단계 route<br>`ShipperRequestAuthoringPageViewModel`<br>`ServerBackedShipperOperationsService.AddRequestAsync` | `화주운송의뢰Controller`<br>`api/v1/shipper/requests` | 네 단계가 같은 draft·validation을 사용하고 등록 후 같은 의뢰 ID 상세로 이동하며 등록만으로 자동 배차·계약·결제를 확정하지 않는지 확인 |
 | SsalddelApp-P02-1 | 운송 의뢰 대량 등록 | `ShipperBulkImport.razor` | 대량 등록 API 후보 | 여러 의뢰 생성 시 행별 검증과 실패 행 안내가 분리되는지 확인 |
 | SsalddelApp-P03 | 의뢰 상세/타임라인 | `ShipperRequestDetail.razor`<br>`ServerBackedShipperOperationsService.GetRequestAsync` | `api/v1/shipper/requests/{id}`<br>`api/v1/payments` | 결제, 배차, 수락, 상차, 하차, 정산 상태가 한 화면에서 끊기지 않는지 확인 |
 | SsalddelApp-P03-1 | 결제/입금 안내 | 우선 SsalddelApp-P03 내부 섹션 | `화주결제Controller`<br>`토스결제준비CommandHandler`<br>`토스결제승인CommandHandler` | 운송완료후정산, 가상계좌/결제대기, 1/3/7일 알림 상태를 화주가 이해할 수 있는지 확인 |

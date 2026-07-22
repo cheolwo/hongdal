@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Ssalddel.Ui.Common.Areas.App.Models;
-using Ssalddel.WebApp.Models;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Microsoft.JSInterop;
 
 namespace Ssalddel.WebApp.Services;
