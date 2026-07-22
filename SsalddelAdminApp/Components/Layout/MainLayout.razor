@@ -5,10 +5,14 @@
 
 <MudLayout>
     <MudAppBar Dense="true" Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="ToggleDrawer"
+                       aria-label="관리자 메뉴 열기 또는 닫기" />
         <MudStack Spacing="0" Class="ml-2">
             <MudText Typo="Typo.subtitle1">살뜰 관리자</MudText>
-            <MudText Typo="Typo.caption">글쓰기·자료 검토·발행 관리</MudText>
+            <MudText Typo="Typo.caption">커뮤니티·공급·무역 준비 관리</MudText>
         </MudStack>
         <MudSpacer />
         @if (Session.IsServerAdmin)
@@ -21,6 +25,9 @@
         <MudNavMenu Class="pa-3">
             <MudNavLink Href="/information-review" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EditNote">글쓰기 작업대</MudNavLink>
             <MudNavLink Href="/prajna" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoStories">외부 콘텐츠 검토</MudNavLink>
+            <MudNavGroup Title="공동구매 1.5" Icon="@Icons.Material.Filled.PlaylistAddCheckCircle" Expanded="true">
+                <MudNavLink Href="/trade-readiness" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FactCheck">공급·무역 준비</MudNavLink>
+            </MudNavGroup>
             <MudDivider Class="my-3" />
             <MudNavGroup Title="보조 관리" Icon="@Icons.Material.Filled.Settings" Expanded="false">
                 <MudNavLink Href="/overview" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">관리 개요</MudNavLink>

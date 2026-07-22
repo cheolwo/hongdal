@@ -19,7 +19,7 @@
     }
     else
     {
-        @foreach (var item in AdminV1NavigationPolicy.MenuItems.Where(x => IsVisible(x.Route)))
+        @foreach (var item in AdminV1NavigationPolicy.MenuItems.Where(IsVisible))
         {
             <MudNavLink Href="@AdminV1NavigationPolicy.ToHref(item.Route)"
                         Match="@(item.Exact ? NavLinkMatch.All : NavLinkMatch.Prefix)"
@@ -56,8 +56,9 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private bool IsVisible(string route)
-        => ViewPolicyService.GetBlockingItem(route) is null;
+    private bool IsVisible(AdminV1NavigationItem item)
+        => (!item.ServerAdminOnly || !관리자인증세션Service.로그인됨 || 관리자인증세션Service.서버관리자인가)
+           && ViewPolicyService.GetBlockingItem(item.Route) is null;
 
     private static string ResolveIcon(string iconKey) => iconKey switch
     {
@@ -77,6 +78,7 @@
         "outbox" => Icons.Material.Filled.Outbox,
         "public" => Icons.Material.Filled.Public,
         "fact_check" => Icons.Material.Filled.FactCheck,
+        "manage_search" => Icons.Material.Filled.ManageSearch,
         "calculate" => Icons.Material.Filled.Calculate,
         "route" => Icons.Material.Filled.Route,
         "payments" => Icons.Material.Filled.Payments,

@@ -1,6 +1,7 @@
 using Ssalddel.Ui.Common.Areas.App.Services;
 using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using Ssalddel.Ui.Common.Areas.BackOffice.ViewModels;
+using Ssalddel.Ui.Common.Areas.BackOffice.Services;
 using SsalddelAdminApp.Services;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -24,6 +25,8 @@ public static class MauiProgram
         builder.Services.AddScoped<CommunityManagementAdminService>();
         builder.Services.AddScoped<HongikHakdangAdminService>();
         builder.Services.AddScoped<CommunityInformationAdminService>();
+        builder.Services.AddScoped<I공동수입준비관리Client, 공동수입준비관리Client>();
+        builder.Services.AddTransient<공동수입준비관리ViewModel>();
         builder.Services.AddScoped<ICommunityInformationReviewClient>(services =>
             services.GetRequiredService<CommunityInformationAdminService>());
         builder.Services.AddScoped<ICommunityAuthoringImageClient>(services =>

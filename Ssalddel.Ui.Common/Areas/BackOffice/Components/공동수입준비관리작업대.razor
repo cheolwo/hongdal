@@ -1,0 +1,616 @@
+@using System.ComponentModel
+@using Ssalddel.Contracts.Common.Metadata
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Ui.Common.Areas.BackOffice.ViewModels
+@attribute [SsalddelCodeMetadata(SsalddelCodeFeatureKeys.GroupImportTradeReadiness, SsalddelCodeLayer.View, "1.0 인계 대상과 1.5 공급·가격·무역 준비 근거·차단 사유를 한 작업대에서 보여 줍니다.", ContractType = typeof(공동수입준비관리ViewModel), FlowOrder = 60, Effects = SsalddelCodeEffect.UiStateMutation, Boundary = "사람의 승인과 전문 검토를 요구하며 계약·결제·신고·운송 실행 버튼을 제공하지 않습니다.")]
+@inject 공동수입준비관리ViewModel ViewModel
+@implements IDisposable
+
+<MudStack Spacing="3" Class="trade-readiness-workbench">
+    <header class="trade-readiness-workbench__header">
+        <div>
+            <MudText Typo="Typo.overline" Color="Color.Primary">GROUP IMPORT · 1.5</MudText>
+            <MudText Typo="Typo.h4">공급·가격·무역 준비 작업대</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                1.0에서 사람이 승인한 수요 집단에 공급자 근거, 견적, 예상 원가, HS·HTS와 국가별 검토 자료를 연결합니다.
+            </MudText>
+        </div>
+        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">의사결정 지원 · 실행 없음</MudChip>
+    </header>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+        이 작업대는 계약 서명, 결제, 수입 신고, 공급자 자동 선정, 운송·창고 지시를 실행하지 않습니다.
+        완료 표시는 자격 있는 담당자에게 검토 자료를 인계할 수 있다는 뜻입니다.
+    </MudAlert>
+
+    @if (!IsServerAdmin)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">
+            서버관리자 로그인이 필요합니다.
+            <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="RequestLoginAsync">로그인</MudButton>
+        </MudAlert>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(ViewModel.메시지))
+        {
+            <MudAlert Severity="@(ViewModel.오류메시지 ? Severity.Error : Severity.Info)"
+                      Variant="Variant.Outlined"
+                      Dense="true">
+                @ViewModel.메시지
+            </MudAlert>
+        }
+
+        @if (ViewModel.처리중 && !ViewModel.초기화됨)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" />
+        }
+        else
+        {
+            <section class="trade-readiness-summary" aria-label="1.5 준비 작업 요약">
+                <div><span>관리 대상</span><strong>@ViewModel.작업대목록.Count.ToString("N0")</strong></div>
+                <div class="is-warning"><span>인계 승인 필요</span><strong>@ViewModel.인계승인필요건수.ToString("N0")</strong></div>
+                <div class="is-info"><span>확정 집단</span><strong>@ViewModel.확정집단건수.ToString("N0")</strong></div>
+                <div class="is-success"><span>현재 검토 완료</span><strong>@ViewModel.완료검토항목수 / 6</strong></div>
+            </section>
+
+            <MudGrid Spacing="3">
+                <MudItem xs="12" lg="4">
+                    <MudPaper Elevation="0" Outlined="true" Class="trade-readiness-queue pa-3">
+                        <div class="trade-readiness-section-title">
+                            <div>
+                                <MudText Typo="Typo.h6">1.0 인계 대기열</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">확정 검토 또는 확정 상태의 수요 집단</MudText>
+                            </div>
+                            <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                                           Color="Color.Primary"
+                                           Disabled="@ViewModel.처리중"
+                                           OnClick="RefreshAsync"
+                                           aria-label="대기열 새로고침" />
+                        </div>
+
+                        <MudTextField T="string"
+                                      Label="상품·HS·배송권 검색"
+                                      Value="@ViewModel.검색어"
+                                      ValueChanged="SetSearch"
+                                      Immediate="true"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" />
+                        <MudSelect T="string"
+                                   Label="단계"
+                                   Value="@ViewModel.목록필터"
+                                   ValueChanged="SetQueueFilter"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@공동수입준비작업대필터코드.전체">전체</MudSelectItem>
+                            <MudSelectItem T="string" Value="@공동수입준비작업대필터코드.인계승인필요">인계 승인 필요</MudSelectItem>
+                            <MudSelectItem T="string" Value="@공동수입준비작업대필터코드.인계후보">확정 집단</MudSelectItem>
+                        </MudSelect>
+
+                        <div class="trade-readiness-queue__items">
+                            @if (ViewModel.필터된작업대목록.Count == 0)
+                            {
+                                <div class="trade-readiness-empty">
+                                    <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Secondary" />
+                                    <span>조건에 맞는 인계 대상이 없습니다.</span>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var item in ViewModel.필터된작업대목록)
+                                {
+                                    <button type="button"
+                                            class="@QueueItemClass(item)"
+                                            aria-pressed="@(ViewModel.선택집단?.자동집단Id == item.자동집단Id)"
+                                            @onclick="() => SelectAsync(item)">
+                                        <span class="trade-readiness-queue__topline">
+                                            <strong>@Display(item.상품명)</strong>
+                                            <span class="trade-readiness-state @GroupStateClass(item.현재상태)">@GroupStateLabel(item.현재상태)</span>
+                                        </span>
+                                        <span>@Display(item.HS코드) · @Display(item.배송권명)</span>
+                                        <span>@item.총희망수량.ToString("N2") @Display(item.수량단위) · @item.참여자수.ToString("N0")명</span>
+                                    </button>
+                                }
+                            }
+                        </div>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" lg="8">
+                    @if (ViewModel.선택집단 is null)
+                    {
+                        <MudPaper Elevation="0" Outlined="true" Class="trade-readiness-empty trade-readiness-empty--detail pa-6">
+                            <MudIcon Icon="@Icons.Material.Filled.PlaylistAddCheckCircle" Color="Color.Primary" Size="Size.Large" />
+                            <MudText Typo="Typo.h6">왼쪽에서 준비 대상을 선택해 주세요.</MudText>
+                        </MudPaper>
+                    }
+                    else
+                    {
+                        <section class="trade-readiness-detail" @oninput="ViewModel.초안변경됨">
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                                <div class="trade-readiness-detail__header">
+                                    <div>
+                                        <MudText Typo="Typo.h5">@Display(ViewModel.선택집단.상품명)</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">@ViewModel.선택집단.자동집단Id</MudText>
+                                    </div>
+                                    <div class="trade-readiness-detail__chips">
+                                        <MudChip T="string" Size="Size.Small" Color="@GroupStateColor(ViewModel.선택집단.현재상태)">@GroupStateLabel(ViewModel.선택집단.현재상태)</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Color="@(ViewModel.인계승인됨 ? Color.Success : Color.Warning)">@HandoffLabel()</MudChip>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@(ViewModel.운영상태?.실행모드 ?? "확인 중")</MudChip>
+                                    </div>
+                                </div>
+
+                                <dl class="trade-readiness-facts">
+                                    <div><dt>HS 기준</dt><dd>@Display(ViewModel.선택집단.HS코드)</dd></div>
+                                    <div><dt>모인 수요</dt><dd>@ViewModel.선택집단.총희망수량.ToString("N2") @Display(ViewModel.선택집단.수량단위)</dd></div>
+                                    <div><dt>배송권</dt><dd>@Display(ViewModel.선택집단.배송권명)</dd></div>
+                                    <div><dt>원장</dt><dd>@(ViewModel.저장원장 is null ? "아직 없음" : $"Rev. {ViewModel.저장원장.Revision}")</dd></div>
+                                </dl>
+                            </MudPaper>
+
+                            @if (!ViewModel.후속기능활성)
+                            {
+                                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                                    1.5 기능 플래그가 꺼져 있습니다. 입력 내용은 서버에 저장되지 않으며 운영 승인 후 사용할 수 있습니다.
+                                </MudAlert>
+                            }
+                            else if (!ViewModel.인계승인됨)
+                            {
+                                <MudPaper Elevation="0" Outlined="true" Class="pa-4 trade-readiness-approval">
+                                    <MudText Typo="Typo.h6">사람의 1.5 인계 승인</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                        모집 목표, 수요 근거와 인계 필요성을 확인한 관리자가 승인 사유를 남깁니다.
+                                    </MudText>
+                                    <MudTextField T="string"
+                                                  Label="승인 사유"
+                                                  @bind-Value="ViewModel.승인사유"
+                                                  Lines="2"
+                                                  Variant="Variant.Outlined"
+                                                  Required="true" />
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.Approval"
+                                               Disabled="@(!ViewModel.인계승인가능)"
+                                               OnClick="ApproveHandoffAsync">
+                                        1.5 준비 인계 승인
+                                    </MudButton>
+                                </MudPaper>
+                            }
+
+                            <MudExpansionPanels MultiExpansion="true" Class="trade-readiness-editors">
+                                <MudExpansionPanel Text="1. 기본 조건" Expanded="true">
+                                    <MudGrid Spacing="2">
+                                        <MudItem xs="12" md="6"><MudTextField T="string" Label="재료·상품 키" @bind-Value="ViewModel.초안.재료키" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                        <MudItem xs="12" md="6"><MudTextField T="string" Label="재료·상품명" @bind-Value="ViewModel.초안.재료명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                        <MudItem xs="12" md="4"><MudTextField T="string" Label="출발 국가 ISO 2자리" @bind-Value="ViewModel.초안.출발국가코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                        <MudItem xs="12" md="4">
+                                            <MudSelect T="string" Label="도착 국가" Value="@ViewModel.초안.도착국가코드" ValueChanged="ViewModel.도착국가변경" Variant="Variant.Outlined" Required="true">
+                                                <MudSelectItem T="string" Value="@공동수입준비국가코드.대한민국">한국 (KR)</MudSelectItem>
+                                                <MudSelectItem T="string" Value="@공동수입준비국가코드.미국">미국 (US)</MudSelectItem>
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem xs="12" md="4"><MudTextField T="string" Label="비교 기준 통화" @bind-Value="ViewModel.초안.기준통화코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                    </MudGrid>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="2. 공급자·기업 근거" Expanded="true">
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">플랫폼이 공급자를 자동 선정하지 않습니다. 원출처와 검토자를 남긴 후보만 기록합니다.</MudText>
+                                    @foreach (var supplier in ViewModel.초안.공급자근거목록.ToArray())
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 mb-3 trade-readiness-editor-card">
+                                            <div class="trade-readiness-editor-card__header">
+                                                <MudText Typo="Typo.subtitle1">@Display(supplier.조직명, supplier.공급자후보키)</MudText>
+                                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="() => ViewModel.공급자삭제(supplier)" aria-label="공급자 근거 삭제" />
+                                            </div>
+                                            <MudGrid Spacing="2">
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="후보 키" @bind-Value="supplier.공급자후보키" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="5"><MudTextField T="string" Label="조직명" @bind-Value="supplier.조직명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="3"><MudTextField T="string" Label="국가 코드" @bind-Value="supplier.국가코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="관계" Placeholder="생산자·수출자·유통사" @bind-Value="supplier.관계코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="8"><MudTextField T="string" Label="공식 식별자" Placeholder="사업자·법인·등록 번호 또는 공식 명칭" @bind-Value="supplier.공식식별자" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="식별·선정 근거 요약" @bind-Value="supplier.근거요약" Lines="2" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="원출처명" @bind-Value="supplier.원출처명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="8"><MudTextField T="string" Label="원출처 URL" @bind-Value="supplier.원출처Url" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudDatePicker Label="확인일" Date="@DateValue(supplier.확인시각Utc)" DateChanged="@(date => supplier.확인시각Utc = OffsetValue(date))" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="검토자" @bind-Value="supplier.검토자표시명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudDatePicker Label="검토일" Date="@DateValue(supplier.검토시각Utc)" DateChanged="@(date => supplier.검토시각Utc = NullableOffsetValue(date))" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudCheckBox T="bool" @bind-Value="supplier.최신상태재확인필요" Label="거래 전 최신 영업·등록 상태 재확인" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudCheckBox T="bool" @bind-Value="supplier.플랫폼자동선정여부" Label="플랫폼 자동 선정" Color="Color.Error" /></MudItem>
+                                            </MudGrid>
+                                        </MudPaper>
+                                    }
+                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" OnClick="ViewModel.공급자추가">공급자 후보 추가</MudButton>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="3. 견적·MOQ·납기·포장">
+                                    @foreach (var quote in ViewModel.초안.견적목록.ToArray())
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 mb-3 trade-readiness-editor-card">
+                                            <div class="trade-readiness-editor-card__header">
+                                                <MudText Typo="Typo.subtitle1">@Display(quote.견적키)</MudText>
+                                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="() => ViewModel.견적삭제(quote)" aria-label="견적 삭제" />
+                                            </div>
+                                            <MudGrid Spacing="2">
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="견적 키" @bind-Value="quote.견적키" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="8">
+                                                    <MudSelect T="string" Label="공급자 후보" @bind-Value="quote.공급자후보키" Variant="Variant.Outlined" Required="true">
+                                                        @foreach (var supplier in ViewModel.초안.공급자근거목록)
+                                                        {
+                                                            <MudSelectItem T="string" Value="@supplier.공급자후보키">@Display(supplier.조직명, supplier.공급자후보키)</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudItem>
+                                                <MudItem xs="12" sm="4"><MudTextField T="string" Label="통화" @bind-Value="quote.통화코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" sm="4"><MudTextField T="string" Label="수량 단위" @bind-Value="quote.수량단위" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" sm="4"><MudNumericField T="decimal" Label="MOQ" @bind-Value="quote.최소주문수량" Min="0" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" sm="4"><MudNumericField T="decimal" Label="단가" @bind-Value="quote.단가" Min="0" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" sm="4"><MudNumericField T="int" Label="납기 일수" @bind-Value="quote.납기일수" Min="0" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" sm="4"><MudTextField T="string" Label="Incoterms 후보" @bind-Value="quote.Incoterms후보" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="포장 조건" @bind-Value="quote.포장조건" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="원출처명" @bind-Value="quote.원출처명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="8"><MudTextField T="string" Label="원출처 URL" @bind-Value="quote.원출처Url" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudDatePicker Label="견적 확인일" Date="@DateValue(quote.확인시각Utc)" DateChanged="@(date => quote.확인시각Utc = OffsetValue(date))" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudDatePicker Label="견적 유효기한" Date="@DateValue(quote.유효기한Utc)" DateChanged="@(date => quote.유효기한Utc = OffsetValue(date, endOfDay: true))" Variant="Variant.Outlined" /></MudItem>
+                                            </MudGrid>
+                                        </MudPaper>
+                                    }
+                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" OnClick="ViewModel.견적추가">견적 추가</MudButton>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="4. 예상 총원가 분해">
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">상품·국제 운송보험·관세·세금·국내 이행비를 서로 합치지 않고 근거별로 기록합니다.</MudText>
+                                    @foreach (var cost in ViewModel.초안.예상비용목록.ToArray())
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 mb-3 trade-readiness-editor-card">
+                                            <div class="trade-readiness-editor-card__header">
+                                                <MudText Typo="Typo.subtitle1">@Display(cost.표시명, cost.범주코드)</MudText>
+                                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="() => ViewModel.비용삭제(cost)" aria-label="예상 비용 삭제" />
+                                            </div>
+                                            <MudGrid Spacing="2">
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="비용 키" @bind-Value="cost.비용키" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4">
+                                                    <MudSelect T="string" Label="비용 범주" @bind-Value="cost.범주코드" Variant="Variant.Outlined" Required="true">
+                                                        @foreach (var category in CostCategories)
+                                                        {
+                                                            <MudSelectItem T="string" Value="@category">@CostLabel(category)</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="표시명" @bind-Value="cost.표시명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="통화" @bind-Value="cost.통화코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="8"><MudNumericField T="decimal" Label="예상 금액" @bind-Value="cost.예상금액" Min="0" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="계산 근거" @bind-Value="cost.계산근거" Lines="2" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="원출처 URL" @bind-Value="cost.원출처Url" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudDatePicker Label="근거 확인일" Date="@DateValue(cost.확인시각Utc)" DateChanged="@(date => cost.확인시각Utc = OffsetValue(date))" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudDatePicker Label="근거 유효기한(선택)" Date="@DateValue(cost.유효기한Utc)" DateChanged="@(date => cost.유효기한Utc = NullableOffsetValue(date, endOfDay: true))" Variant="Variant.Outlined" /></MudItem>
+                                            </MudGrid>
+                                        </MudPaper>
+                                    }
+                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" OnClick="ViewModel.비용추가">기타 비용 추가</MudButton>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="5. HS·HTS 후보">
+                                    @foreach (var classification in ViewModel.초안.품목분류후보목록.ToArray())
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 mb-3 trade-readiness-editor-card">
+                                            <div class="trade-readiness-editor-card__header">
+                                                <MudText Typo="Typo.subtitle1">@Display(classification.품목코드, classification.후보키)</MudText>
+                                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="() => ViewModel.품목분류삭제(classification)" aria-label="품목분류 후보 삭제" />
+                                            </div>
+                                            <MudGrid Spacing="2">
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="후보 키" @bind-Value="classification.후보키" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="2"><MudTextField T="string" Label="관할 국가" @bind-Value="classification.관할국가코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="3"><MudTextField T="string" Label="분류 체계" @bind-Value="classification.분류체계코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="3"><MudTextField T="string" Label="HS·HTS 코드" @bind-Value="classification.품목코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="분류 근거" @bind-Value="classification.분류근거" Lines="2" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudNumericField T="decimal" Label="후보 신뢰도 (0~1)" @bind-Value="classification.신뢰도" Min="0" Max="1" Step="0.05M" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="8">
+                                                    <MudSelect T="string" Label="검토 상태" @bind-Value="classification.검토상태코드" Variant="Variant.Outlined">
+                                                        @foreach (var status in ReviewStatuses)
+                                                        {
+                                                            <MudSelectItem T="string" Value="@status">@ReviewStatusLabel(status)</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudItem>
+                                                <MudItem xs="12" md="6"><MudTextField T="string" Label="검토자" @bind-Value="classification.검토자표시명" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudDatePicker Label="확인일" Date="@DateValue(classification.확인시각Utc)" DateChanged="@(date => classification.확인시각Utc = OffsetValue(date))" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="원출처 URL" @bind-Value="classification.원출처Url" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudCheckBox T="bool" @bind-Value="classification.전문가검토필요" Label="자격 있는 전문가 검토 필요" /></MudItem>
+                                            </MudGrid>
+                                        </MudPaper>
+                                    }
+                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" OnClick="ViewModel.품목분류추가">HS·HTS 후보 추가</MudButton>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="6. 국가별 식품·통관 검토">
+                                    @foreach (var review in ViewModel.초안.국가별검토항목목록.ToArray())
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 mb-3 trade-readiness-editor-card">
+                                            <div class="trade-readiness-editor-card__header">
+                                                <MudText Typo="Typo.subtitle1">@Display(review.표시명, review.항목코드)</MudText>
+                                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="() => ViewModel.국가검토삭제(review)" aria-label="국가별 검토 항목 삭제" />
+                                            </div>
+                                            <MudGrid Spacing="2">
+                                                <MudItem xs="12" md="2"><MudTextField T="string" Label="국가" @bind-Value="review.관할국가코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudTextField T="string" Label="항목 코드" @bind-Value="review.항목코드" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="6"><MudTextField T="string" Label="검토 항목" @bind-Value="review.표시명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="6">
+                                                    <MudSelect T="string" Label="검토 상태" @bind-Value="review.검토상태코드" Variant="Variant.Outlined">
+                                                        @foreach (var status in ReviewStatuses)
+                                                        {
+                                                            <MudSelectItem T="string" Value="@status">@ReviewStatusLabel(status)</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudItem>
+                                                <MudItem xs="12" md="6">
+                                                    <MudSelect T="string" Label="책임 역할" @bind-Value="review.책임역할코드" Variant="Variant.Outlined">
+                                                        @foreach (var role in ResponsibilityRoles)
+                                                        {
+                                                            <MudSelectItem T="string" Value="@role">@RoleLabel(role)</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="공식 원출처 URL" @bind-Value="review.공식원출처Url" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12" md="4"><MudDatePicker Label="확인일" Date="@DateValue(review.확인시각Utc)" DateChanged="@(date => review.확인시각Utc = OffsetValue(date))" Variant="Variant.Outlined" /></MudItem>
+                                                <MudItem xs="12" md="8"><MudTextField T="string" Label="미확인 사유" @bind-Value="review.미확인사유" Variant="Variant.Outlined" /></MudItem>
+                                            </MudGrid>
+                                        </MudPaper>
+                                    }
+                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" OnClick="ViewModel.국가검토추가">국가별 검토 항목 추가</MudButton>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="7. 책임 초안·미확인 항목">
+                                    @foreach (var responsibility in ViewModel.초안.책임초안목록.ToArray())
+                                    {
+                                        <MudPaper Elevation="0" Outlined="true" Class="pa-3 mb-3 trade-readiness-editor-card">
+                                            <div class="trade-readiness-editor-card__header">
+                                                <MudText Typo="Typo.subtitle1">@RoleLabel(responsibility.역할코드)</MudText>
+                                                <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" OnClick="() => ViewModel.책임삭제(responsibility)" aria-label="책임 초안 삭제" />
+                                            </div>
+                                            <MudGrid Spacing="2">
+                                                <MudItem xs="12" md="4">
+                                                    <MudSelect T="string" Label="역할" @bind-Value="responsibility.역할코드" Variant="Variant.Outlined">
+                                                        @foreach (var role in ResponsibilityRoles)
+                                                        {
+                                                            <MudSelectItem T="string" Value="@role">@RoleLabel(role)</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudItem>
+                                                <MudItem xs="12" md="8"><MudTextField T="string" Label="당사자 표시명" @bind-Value="responsibility.당사자표시명" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudTextField T="string" Label="책임 범위" @bind-Value="responsibility.책임요약" Lines="2" Variant="Variant.Outlined" Required="true" /></MudItem>
+                                                <MudItem xs="12"><MudCheckBox T="bool" @bind-Value="responsibility.당사자확인여부" Label="당사자 확인 완료" /></MudItem>
+                                            </MudGrid>
+                                        </MudPaper>
+                                    }
+                                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" OnClick="ViewModel.책임추가">책임 역할 추가</MudButton>
+                                    <MudTextField T="string"
+                                                  Label="미확인 규제·계약 항목 (한 줄에 하나)"
+                                                  Value="@ViewModel.미확인항목Text"
+                                                  ValueChanged="value => ViewModel.미확인항목Text = value"
+                                                  Lines="5"
+                                                  Variant="Variant.Outlined"
+                                                  Class="mt-4" />
+                                </MudExpansionPanel>
+                            </MudExpansionPanels>
+
+                            <MudPaper Elevation="0" Outlined="true" Class="pa-4 trade-readiness-evaluation">
+                                <div class="trade-readiness-section-title">
+                                    <div>
+                                        <MudText Typo="Typo.h6">준비 상태 판정</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">저장 전 미리보기로 최신 판정을 확인합니다.</MudText>
+                                    </div>
+                                    <strong>@ViewModel.완료검토항목수 / 6</strong>
+                                </div>
+                                <MudProgressLinear Value="@(ViewModel.완료검토항목수 / 6d * 100d)" Color="Color.Primary" Rounded="true" Class="mb-3" />
+                                @if (ViewModel.현재평가 is not null)
+                                {
+                                    <div class="trade-readiness-checks">
+                                        @foreach (var item in EvaluationItems(ViewModel.현재평가))
+                                        {
+                                            <div class="@(item.Ready ? "is-ready" : "is-blocked")">
+                                                <MudIcon Icon="@(item.Ready ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" Size="Size.Small" />
+                                                <span>@item.Label</span>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (ViewModel.현재평가.차단사유목록.Count > 0)
+                                    {
+                                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+                                            <strong>차단 사유</strong>
+                                            <ul>
+                                                @foreach (var blocker in ViewModel.현재평가.차단사유목록)
+                                                {
+                                                    <li>@blocker</li>
+                                                }
+                                            </ul>
+                                        </MudAlert>
+                                    }
+                                    @if (ViewModel.현재평가.경고목록.Count > 0)
+                                    {
+                                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-3">
+                                            <strong>재확인 안내</strong>
+                                            <ul>
+                                                @foreach (var warning in ViewModel.현재평가.경고목록)
+                                                {
+                                                    <li>@warning</li>
+                                                }
+                                            </ul>
+                                        </MudAlert>
+                                    }
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">미리보기를 실행하면 여섯 준비 영역의 차단 사유를 표시합니다.</MudText>
+                                }
+
+                                <div class="trade-readiness-actions">
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.Preview"
+                                               Disabled="@(!ViewModel.미리보기가능)"
+                                               OnClick="PreviewAsync">
+                                        준비 상태 미리보기
+                                    </MudButton>
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.Save"
+                                               Disabled="@(!ViewModel.저장가능)"
+                                               OnClick="SaveAsync">
+                                        1.5 준비 원장 저장
+                                    </MudButton>
+                                </div>
+                                <div class="trade-readiness-boundary" aria-label="실행 차단 상태">
+                                    <span>계약 불가</span><span>결제 불가</span><span>신고 불가</span><span>운송 지시 불가</span>
+                                </div>
+                            </MudPaper>
+                        </section>
+                    }
+                </MudItem>
+            </MudGrid>
+        }
+    }
+</MudStack>
+
+@code {
+    [Parameter] public bool IsServerAdmin { get; set; }
+    [Parameter] public string? AdministratorDisplayName { get; set; }
+    [Parameter] public EventCallback LoginRequested { get; set; }
+
+    private static readonly IReadOnlyList<string> CostCategories = 공동수입준비비용범주코드.필수목록;
+    private static readonly IReadOnlyList<string> ReviewStatuses = 공동수입준비검토상태코드.지원목록.OrderBy(value => value).ToArray();
+    private static readonly IReadOnlyList<string> ResponsibilityRoles =
+    [
+        공동수입준비책임역할코드.판매자수출자,
+        공동수입준비책임역할코드.수입자,
+        공동수입준비책임역할코드.관세사,
+        공동수입준비책임역할코드.플랫폼,
+        공동수입준비책임역할코드.운송수행자
+    ];
+
+    protected override void OnInitialized()
+        => ViewModel.PropertyChanged += HandlePropertyChanged;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsServerAdmin)
+        {
+            await ViewModel.초기화Async(AdministratorDisplayName);
+        }
+    }
+
+    private Task RequestLoginAsync() => LoginRequested.InvokeAsync();
+    private Task RefreshAsync() => ViewModel.새로고침Async();
+    private Task SelectAsync(공동구매자동집단요약응답 item) => ViewModel.선택Async(item);
+    private Task ApproveHandoffAsync() => ViewModel.인계승인Async();
+    private Task PreviewAsync() => ViewModel.미리보기Async();
+    private Task SaveAsync() => ViewModel.저장Async();
+    private void SetSearch(string value) => ViewModel.검색어 = value;
+    private void SetQueueFilter(string value) => ViewModel.목록필터 = value;
+
+    private string QueueItemClass(공동구매자동집단요약응답 item)
+        => ViewModel.선택집단?.자동집단Id == item.자동집단Id
+            ? "trade-readiness-queue__item is-selected"
+            : "trade-readiness-queue__item";
+
+    private string HandoffLabel()
+        => ViewModel.운영상태 is null
+            ? "OS 상태 없음"
+            : ViewModel.인계승인됨
+                ? "1.5 인계 승인됨"
+                : "인계 승인 필요";
+
+    private static string GroupStateLabel(string? state)
+        => state switch
+        {
+            공동구매자동집단상태코드.확정대기 => "확정 검토",
+            공동구매자동집단상태코드.확정 => "확정",
+            공동구매자동집단상태코드.모집종료목표미달 => "목표 미달 종료",
+            _ => "모집 중"
+        };
+
+    private static string GroupStateClass(string? state)
+        => state == 공동구매자동집단상태코드.확정대기 ? "is-warning" : "is-confirmed";
+
+    private static Color GroupStateColor(string? state)
+        => state == 공동구매자동집단상태코드.확정대기 ? Color.Warning : Color.Success;
+
+    private static string ReviewStatusLabel(string status)
+        => status switch
+        {
+            공동수입준비검토상태코드.미확인 => "미확인",
+            공동수입준비검토상태코드.근거수집 => "근거 수집",
+            공동수입준비검토상태코드.전문가검토필요 => "전문가 검토 필요",
+            공동수입준비검토상태코드.전문가검토완료 => "전문가 검토 완료",
+            공동수입준비검토상태코드.해당없음 => "해당 없음",
+            _ => status
+        };
+
+    private static string RoleLabel(string? role)
+        => role switch
+        {
+            공동수입준비책임역할코드.판매자수출자 => "판매자·수출자",
+            공동수입준비책임역할코드.수입자 => "수입자",
+            공동수입준비책임역할코드.관세사 => "관세사",
+            공동수입준비책임역할코드.플랫폼 => "플랫폼",
+            공동수입준비책임역할코드.운송수행자 => "운송 수행자",
+            _ => Display(role)
+        };
+
+    private static string CostLabel(string category)
+        => category switch
+        {
+            공동수입준비비용범주코드.상품원가 => "상품 원가",
+            공동수입준비비용범주코드.국제운송보험 => "국제 운송·보험",
+            공동수입준비비용범주코드.관세 => "예상 관세",
+            공동수입준비비용범주코드.세금 => "예상 수입 세금",
+            공동수입준비비용범주코드.국내이행 => "국내 이행 예상비",
+            _ => category
+        };
+
+    private static IReadOnlyList<(string Label, bool Ready)> EvaluationItems(공동수입준비원장평가응답 evaluation)
+        =>
+        [
+            ("공급자 근거", evaluation.공급자근거구조완료),
+            ("견적 조건", evaluation.견적구조완료),
+            ("예상 총원가", evaluation.예상비용구조완료),
+            ("HS·HTS 후보", evaluation.품목분류후보구조완료),
+            ("국가별 검토", evaluation.국가별검토구조완료),
+            ("책임 초안", evaluation.책임초안구조완료)
+        ];
+
+    private static DateTime? DateValue(DateTimeOffset value)
+        => value == default ? null : value.ToLocalTime().Date;
+
+    private static DateTime? DateValue(DateTimeOffset? value)
+        => value.HasValue ? value.Value.ToLocalTime().Date : null;
+
+    private static DateTimeOffset OffsetValue(DateTime? value, bool endOfDay = false)
+    {
+        if (!value.HasValue)
+        {
+            return default;
+        }
+
+        var local = endOfDay ? value.Value.Date.AddDays(1).AddTicks(-1) : value.Value.Date.AddHours(12);
+        return new DateTimeOffset(local, TimeZoneInfo.Local.GetUtcOffset(local)).ToUniversalTime();
+    }
+
+    private static DateTimeOffset? NullableOffsetValue(DateTime? value, bool endOfDay = false)
+        => value.HasValue ? OffsetValue(value, endOfDay) : null;
+
+    private static string Display(string? primary, string? fallback = null)
+        => !string.IsNullOrWhiteSpace(primary)
+            ? primary.Trim()
+            : !string.IsNullOrWhiteSpace(fallback)
+                ? fallback.Trim()
+                : "-";
+
+    private void HandlePropertyChanged(object? sender, PropertyChangedEventArgs args)
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+        => ViewModel.PropertyChanged -= HandlePropertyChanged;
+}

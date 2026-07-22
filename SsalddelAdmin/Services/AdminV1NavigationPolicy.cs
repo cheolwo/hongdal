@@ -4,13 +4,16 @@ public sealed record AdminV1NavigationItem(
     string Label,
     string Route,
     string IconKey,
-    bool Exact = false);
+    bool Exact = false,
+    bool ServerAdminOnly = true);
 
 public static class AdminV1NavigationPolicy
 {
     public static IReadOnlyList<AdminV1NavigationItem> MenuItems { get; } =
     [
         new("1.0 운영 대시보드", "/dashboard", "dashboard", true),
+        new("1.5 공급·무역 준비", "/trade-readiness", "fact_check"),
+        new("HS 코드 운영", "/customs/hs-codes", "manage_search", ServerAdminOnly: false),
         new("의뢰 목록", "/requests", "view_list"),
         new("배차대기", "/dispatch/wait", "inbox"),
         new("운행 기사", "/drivers/operating", "local_shipping"),
@@ -25,6 +28,8 @@ public static class AdminV1NavigationPolicy
     {
         "/",
         "/dashboard",
+        "/trade-readiness",
+        "/customs/hs-codes",
         "/dispatch/wait",
         "/drivers/operating",
         "/payments",

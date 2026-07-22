@@ -79,6 +79,12 @@
     private void NavigateAfterLogin()
     {
         var defaultRoute = 관리자인증세션Service.서버관리자인가 ? "/" : "/customs/hs-codes";
-        NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? defaultRoute : ReturnUrl);
+        NavigationManager.NavigateTo(IsSafeLocalRoute(ReturnUrl) ? ReturnUrl! : defaultRoute);
     }
+
+    private static bool IsSafeLocalRoute(string? route)
+        => !string.IsNullOrWhiteSpace(route)
+           && route.StartsWith("/", StringComparison.Ordinal)
+           && !route.StartsWith("//", StringComparison.Ordinal)
+           && !route.StartsWith("/\\", StringComparison.Ordinal);
 }

@@ -1,0 +1,15 @@
+@page "/trade-readiness"
+@rendermode InteractiveServer
+@inject 관리자인증세션Service Session
+@inject NavigationManager Navigation
+
+<PageTitle>1.5 공급·무역 준비</PageTitle>
+
+<공동수입준비관리작업대 IsServerAdmin="@Session.서버관리자인가"
+                         AdministratorDisplayName="@Session.UserName"
+                         LoginRequested="OpenLogin" />
+
+@code {
+    private void OpenLogin()
+        => Navigation.NavigateTo($"/login?returnUrl={Uri.EscapeDataString("/trade-readiness")}");
+}

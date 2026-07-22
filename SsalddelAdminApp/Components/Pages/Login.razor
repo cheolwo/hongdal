@@ -15,6 +15,10 @@
                      OnSocialLogin="HandleSocialLoginAsync" />
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
     private bool isBusy;
     private string? statusMessage;
     private Severity statusSeverity = Severity.Info;
@@ -24,7 +28,7 @@
         await Session.RestoreAsync();
         if (Session.IsServerAdmin)
         {
-            Navigation.NavigateTo("/community-management");
+            NavigateAfterLogin();
         }
     }
 
@@ -47,7 +51,7 @@
                 return;
             }
 
-            Navigation.NavigateTo("/community-management");
+            NavigateAfterLogin();
         }
         catch (Exception ex)
         {
@@ -66,4 +70,13 @@
         statusMessage = $"{request.ProviderDisplayName} 관리자 로그인은 아직 연결하지 않았습니다.";
         return Task.CompletedTask;
     }
+
+    private void NavigateAfterLogin()
+        => Navigation.NavigateTo(IsSafeLocalRoute(ReturnUrl) ? ReturnUrl! : "/community-management");
+
+    private static bool IsSafeLocalRoute(string? route)
+        => !string.IsNullOrWhiteSpace(route)
+           && route.StartsWith("/", StringComparison.Ordinal)
+           && !route.StartsWith("//", StringComparison.Ordinal)
+           && !route.StartsWith("/\\", StringComparison.Ordinal);
 }
