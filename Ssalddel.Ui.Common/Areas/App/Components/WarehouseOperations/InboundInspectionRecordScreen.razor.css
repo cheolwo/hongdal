@@ -1,0 +1,104 @@
+.inbound-inspection-record__state {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.inbound-inspection-record__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    gap: 16px;
+}
+
+.inbound-inspection-record__form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.inbound-inspection-record__form > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.inbound-inspection-record__form > header > div {
+    min-width: 0;
+}
+
+.inbound-inspection-record__form > header span,
+.inbound-inspection-record__summary > span {
+    color: var(--mud-palette-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+}
+
+.inbound-inspection-record__form h2,
+.inbound-inspection-record__form p {
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.inbound-inspection-record__form p {
+    color: var(--mud-palette-text-secondary);
+}
+
+.inbound-inspection-record__checklist {
+    display: grid;
+    gap: 4px;
+    padding: 12px 14px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+}
+
+.inbound-inspection-record__summary {
+    position: sticky;
+    top: 80px;
+    padding: 18px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 14px;
+    background: var(--mud-palette-surface);
+}
+
+.inbound-inspection-record__summary h2 {
+    margin: 6px 0 16px;
+    overflow-wrap: anywhere;
+    font-size: 1.2rem;
+}
+
+.inbound-inspection-record__summary dl {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+}
+
+.inbound-inspection-record__summary dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.75rem;
+}
+
+.inbound-inspection-record__summary dd {
+    margin: 2px 0 0;
+}
+
+@media (max-width: 920px) {
+    .inbound-inspection-record__layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .inbound-inspection-record__summary {
+        position: static;
+    }
+}
+
+@media (max-width: 560px) {
+    .inbound-inspection-record__form > header {
+        flex-direction: column;
+    }
+}

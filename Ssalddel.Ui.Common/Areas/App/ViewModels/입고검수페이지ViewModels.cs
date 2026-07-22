@@ -211,41 +211,38 @@ public sealed partial class 입고검수작성ViewModel(
     }
 }
 
-/// <summary>목록, 정확한 상세, 검수 Command와 저장 후 같은 ID 재조회 순서만 조정합니다.</summary>
-public sealed class 입고검수PageViewModel : PageViewModelBase
+/// <summary>한 입고상품의 검수 Command와 성공 뒤 같은 ID 재조회 순서만 조정합니다.</summary>
+public sealed class 입고검수실행ViewModel : PageViewModelBase
 {
-    private long? _초기입고상품Id;
+    private long _inboundItemId;
 
-    public 입고검수PageViewModel(
-        입고검수대상목록ViewModel list,
+    public 입고검수실행ViewModel(
         입고검수대상상세ViewModel detail,
         입고검수작성ViewModel writer)
     {
-        목록 = 하위ViewModel등록(list);
         상세 = 하위ViewModel등록(detail);
         작성 = 하위ViewModel등록(writer);
     }
 
-    public 입고검수대상목록ViewModel 목록 { get; }
     public 입고검수대상상세ViewModel 상세 { get; }
     public 입고검수작성ViewModel 작성 { get; }
 
     protected override bool 하위ViewModel처리중
-        => 목록.처리중 || 상세.처리중 || 작성.처리중;
+        => 상세.처리중 || 작성.처리중;
 
     public Task<bool> 초기화Async(
-        long? inboundItemId,
+        long inboundItemId,
         CancellationToken cancellationToken = default)
     {
-        경로대상설정(inboundItemId);
+        _inboundItemId = inboundItemId > 0 ? inboundItemId : 0;
         return base.초기화Async(cancellationToken);
     }
 
     public Task<bool> 경로대상변경Async(
-        long? inboundItemId,
+        long inboundItemId,
         CancellationToken cancellationToken = default)
     {
-        경로대상설정(inboundItemId);
+        _inboundItemId = inboundItemId > 0 ? inboundItemId : 0;
         return base.새로고침Async(cancellationToken);
     }
 
@@ -253,78 +250,45 @@ public sealed class 입고검수PageViewModel : PageViewModelBase
         bool 새로고침,
         CancellationToken cancellationToken)
     {
-        var listLoaded = await 목록.조회Async(0, cancellationToken);
-        if (!listLoaded)
+        if (_inboundItemId <= 0)
+        {
+            throw new InvalidOperationException("검수할 입고상품 ID가 필요합니다.");
+        }
+
+        상세.조회대상설정(_inboundItemId);
+        var loaded = await 상세.조회Async(cancellationToken);
+        if (!loaded || 상세.항목?.InboundItemId != _inboundItemId)
         {
             cancellationToken.ThrowIfCancellationRequested();
             throw new InvalidOperationException(
-                목록.오류메시지 ?? "입고 검수 대상 목록을 조회하지 못했습니다.");
+                상세.오류메시지
+                ?? (상세.대상없음
+                    ? "선택한 입고 검수 대상을 찾을 수 없거나 조회 범위에 없습니다."
+                    : "선택한 입고 검수 대상을 조회하지 못했습니다."));
         }
 
-        if (_초기입고상품Id is > 0)
-        {
-            var detailLoaded = await 대상선택Async(_초기입고상품Id.Value, cancellationToken);
-            if (!detailLoaded)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                throw new InvalidOperationException(
-                    상세.오류메시지
-                    ?? (상세.대상없음
-                        ? "선택한 입고 검수 대상을 찾을 수 없거나 조회 범위에 없습니다."
-                        : "선택한 입고 검수 대상을 조회하지 못했습니다."));
-            }
-        }
-        else
-        {
-            상세.조회대상설정(null);
-            작성.대상준비(null);
-        }
-    }
-
-    public async Task<bool> 검색Async(CancellationToken cancellationToken = default)
-        => await 목록.조회Async(0, cancellationToken);
-
-    public async Task<bool> 대상선택Async(
-        long inboundItemId,
-        CancellationToken cancellationToken = default)
-    {
-        상세.조회대상설정(inboundItemId);
-        var loaded = await 상세.조회Async(cancellationToken);
         작성.대상준비(상세.항목);
-        return loaded && !상세.대상없음 && 상세.항목?.InboundItemId == inboundItemId;
     }
 
     public async Task<bool> 검수후재조회Async(CancellationToken cancellationToken = default)
     {
         var selected = 상세.항목;
-        if (selected is null || !await 작성.실행Async(selected, cancellationToken))
+        if (selected is null || selected.InboundItemId != _inboundItemId
+            || !await 작성.실행Async(selected, cancellationToken))
         {
             return false;
         }
 
-        var inboundItemId = selected.InboundItemId;
-        상세.조회대상설정(inboundItemId);
         var detailReloaded = await 상세.조회Async(cancellationToken);
-        await 목록.조회Async(목록.응답.Page, cancellationToken);
         return detailReloaded
-               && 상세.항목?.InboundItemId == inboundItemId
+               && 상세.항목?.InboundItemId == _inboundItemId
                && 상세.항목.CanInspect == false;
     }
-
-    public void 선택해제()
-    {
-        상세.조회대상설정(null);
-        작성.대상준비(null);
-    }
-
-    private void 경로대상설정(long? inboundItemId)
-        => _초기입고상품Id = inboundItemId is > 0 ? inboundItemId : null;
 
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
-            목록.작업취소();
             상세.작업취소();
             작성.작업취소();
         }

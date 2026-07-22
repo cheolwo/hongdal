@@ -13,7 +13,13 @@ public static class WarehouseManagerRoutes
     public const string WorkBoard = "/warehouse/work-board";
     public const string PickingBatch = "/warehouse/work/picking-batch";
     public const string InboundProductScan = "/warehouse/work/inbound/products";
-    public const string InboundInspection = "/warehouse/work/inbound/inspection";
+    public const string InboundInspection = Ssalddel.Contracts.Common.Inventory.InboundInspectionPageRoutes.Root;
+
+    public static string InboundInspectionDetail(long inboundItemId)
+        => Ssalddel.Contracts.Common.Inventory.InboundInspectionPageRoutes.DetailFor(inboundItemId);
+
+    public static string InboundInspectionRecord(long inboundItemId)
+        => Ssalddel.Contracts.Common.Inventory.InboundInspectionPageRoutes.RecordFor(inboundItemId);
     public const string GeneralInventory = "/warehouse/general/inventory";
     public const string PutAwayTask = "/warehouse/work/inbound/put-away";
     public const string PackingTask = "/warehouse/work/outbound/packing";

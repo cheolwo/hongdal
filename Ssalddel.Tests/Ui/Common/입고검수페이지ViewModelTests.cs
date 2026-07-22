@@ -7,78 +7,84 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed class 입고검수페이지ViewModelTests
 {
     [Fact]
-    public async Task 초기화는_서버목록을읽되_첫검수대상을자동선택하지않는다()
+    public async Task 목록조회는_상세나Command를호출하지않는다()
     {
         var service = CreateService();
-        using var page = CreatePage(service);
+        var list = new 입고검수대상목록ViewModel(service);
 
-        var loaded = await page.초기화Async();
+        var loaded = await list.조회Async(0);
 
         Assert.True(loaded);
-        Assert.Single(page.목록.항목목록);
-        Assert.Null(page.상세.조회대상Id);
-        Assert.Null(page.상세.항목);
+        Assert.Single(list.항목목록);
         Assert.Empty(service.DetailRequestIds);
-        Assert.Equal(PageViewModel상태.준비됨, page.상태);
+        Assert.Null(service.LastInspectionRequest);
     }
 
     [Fact]
-    public async Task 주소의Id는_다른항목으로대체하지않고_정확한상세만조회한다()
+    public async Task 상세조회는_주소의Id를_다른항목으로대체하지않는다()
     {
         var service = CreateService();
-        using var page = CreatePage(service);
+        var detail = new 입고검수대상상세ViewModel(service);
+        detail.조회대상설정(71);
+
+        var loaded = await detail.조회Async();
+
+        Assert.True(loaded);
+        Assert.Equal([71L], service.DetailRequestIds);
+        Assert.Equal(71, detail.항목!.InboundItemId);
+        Assert.Null(service.LastInspectionRequest);
+    }
+
+    [Fact]
+    public async Task 목록조회실패는_오류로남고_같은목록에서복구할수있다()
+    {
+        var service = CreateService();
+        service.ListError = new InvalidOperationException("목록 서버 오류");
+        var list = new 입고검수대상목록ViewModel(service);
+
+        Assert.False(await list.조회Async(0));
+        Assert.True(list.오류발생);
+        Assert.Contains("목록 서버 오류", list.오류메시지);
+
+        service.ListError = null;
+        Assert.True(await list.조회Async(0));
+        Assert.False(list.오류발생);
+    }
+
+    [Fact]
+    public async Task 정확한Id가없으면_상세는_다른항목대신_대상없음을표시한다()
+    {
+        var service = CreateService();
+        var detail = new 입고검수대상상세ViewModel(service);
+        detail.조회대상설정(999);
+
+        var loaded = await detail.조회Async();
+
+        Assert.True(loaded);
+        Assert.True(detail.대상없음);
+        Assert.Null(detail.항목);
+        Assert.Equal([999L], service.DetailRequestIds);
+    }
+
+    [Fact]
+    public async Task 실행화면은_목록없이_정확한상세만조회한다()
+    {
+        var service = CreateService();
+        using var page = CreateAction(service);
 
         var loaded = await page.초기화Async(71);
 
         Assert.True(loaded);
         Assert.Equal([71L], service.DetailRequestIds);
-        Assert.Equal(71, page.상세.항목!.InboundItemId);
+        Assert.Equal(0, service.ListRequestCount);
         Assert.Equal(12, page.작성.검수수량);
     }
 
     [Fact]
-    public async Task 초기목록조회실패는_초기화완료로숨기지않고_새로고침으로복구한다()
+    public async Task 검수저장은_확인항목을검증하고_성공뒤같은Id상세만다시조회한다()
     {
         var service = CreateService();
-        service.ListError = new InvalidOperationException("목록 서버 오류");
-        using var page = CreatePage(service);
-
-        var loaded = await page.초기화Async();
-
-        Assert.False(loaded);
-        Assert.False(page.초기화됨);
-        Assert.Equal(PageViewModel상태.실패, page.상태);
-        Assert.Contains("목록 서버 오류", page.오류메시지);
-
-        service.ListError = null;
-        Assert.True(await page.새로고침Async());
-        Assert.Equal(PageViewModel상태.준비됨, page.상태);
-    }
-
-    [Fact]
-    public async Task 주소의정확한Id가없으면_페이지실패상태를유지한다()
-    {
-        var service = CreateService();
-        using var page = CreatePage(service);
-
-        var loaded = await page.초기화Async(999);
-
-        Assert.False(loaded);
-        Assert.False(page.초기화됨);
-        Assert.Equal(PageViewModel상태.실패, page.상태);
-        Assert.Equal([999L], service.DetailRequestIds);
-        Assert.Contains("찾을 수 없", page.오류메시지);
-
-        Assert.True(await page.경로대상변경Async(null));
-        Assert.Equal(PageViewModel상태.준비됨, page.상태);
-        Assert.Null(page.상세.조회대상Id);
-    }
-
-    [Fact]
-    public async Task 검수저장은_확인항목을검증하고_성공뒤같은Id상세와목록을다시조회한다()
-    {
-        var service = CreateService();
-        using var page = CreatePage(service);
+        using var page = CreateAction(service);
         Assert.True(await page.초기화Async(71));
         page.작성.검수수량 = 12;
         page.작성.불량수량 = 2;
@@ -94,7 +100,7 @@ public sealed class 입고검수페이지ViewModelTests
         Assert.Equal(71, service.LastInspectionId);
         Assert.Equal(2, service.LastInspectionRequest!.불량수량);
         Assert.Equal([71L, 71L], service.DetailRequestIds);
-        Assert.Equal(2, service.ListRequestCount);
+        Assert.Equal(0, service.ListRequestCount);
         Assert.False(page.상세.항목!.CanInspect);
         Assert.Equal("검수완료-불량포함", page.상세.항목.InventoryStatus);
     }
@@ -103,7 +109,7 @@ public sealed class 입고검수페이지ViewModelTests
     public async Task 검수저장은_확인항목이빠지면_Command를호출하지않는다()
     {
         var service = CreateService();
-        using var page = CreatePage(service);
+        using var page = CreateAction(service);
         Assert.True(await page.초기화Async(71));
         page.작성.수량대조확인 = true;
         page.작성.포장파손확인 = true;
@@ -116,9 +122,8 @@ public sealed class 입고검수페이지ViewModelTests
         Assert.Contains("네 가지", page.작성.오류메시지);
     }
 
-    private static 입고검수PageViewModel CreatePage(Fake입고검수페이지Service service)
+    private static 입고검수실행ViewModel CreateAction(Fake입고검수페이지Service service)
         => new(
-            new 입고검수대상목록ViewModel(service),
             new 입고검수대상상세ViewModel(service),
             new 입고검수작성ViewModel(service));
 
@@ -162,8 +167,8 @@ public sealed class 입고검수페이지ViewModelTests
 
             입고검수대상목록항목응답[] items = Detail is null
                 ? []
-                : new[]
-                {
+                :
+                [
                     new 입고검수대상목록항목응답
                     {
                         InboundItemId = Detail.InboundItemId,
@@ -177,7 +182,7 @@ public sealed class 입고검수페이지ViewModelTests
                         InventoryStatus = Detail.InventoryStatus,
                         CanInspect = Detail.CanInspect
                     }
-                };
+                ];
             if (request.InspectionStatus == 입고검수조회상태코드.대기)
             {
                 items = items.Where(item => item.CanInspect).ToArray();

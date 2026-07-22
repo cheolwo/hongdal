@@ -50,7 +50,7 @@ internal static class WarehouseUiModule
         services.TryAddTransient<입고검수대상목록ViewModel>();
         services.TryAddTransient<입고검수대상상세ViewModel>();
         services.TryAddTransient<입고검수작성ViewModel>();
-        services.TryAddTransient<입고검수PageViewModel>();
+        services.TryAddTransient<입고검수실행ViewModel>();
         services.TryAddTransient<피킹작업목록ViewModel>();
         services.TryAddTransient<피킹작업상세ViewModel>();
         services.TryAddTransient<피킹작업처리ViewModel>();

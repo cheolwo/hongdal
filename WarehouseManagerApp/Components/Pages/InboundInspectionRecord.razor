@@ -1,0 +1,19 @@
+@page "/work/inbound/inspection/{InboundItemId:long}/record"
+@using Ssalddel.Contracts.Common.Inventory
+@inject NavigationManager Navigation
+
+<PageTitle>입고 검수 실행</PageTitle>
+
+<InboundInspectionAccessFrame Title="입고 검수 실행"
+                              Description="실제 수량과 현장 확인을 검토하고 한 입고상품의 검수 결과를 명시적으로 저장합니다.">
+    <InboundInspectionRecordScreen InboundItemId="@InboundItemId"
+                                   Context="@Context"
+                                   HomeHref="@WarehouseManagerRoutes.WorkBoard" />
+</InboundInspectionAccessFrame>
+
+@code {
+    [Parameter] public long InboundItemId { get; set; }
+
+    private InboundInspectionNavigationContext Context
+        => InboundInspectionNavigationContext.Parse(Navigation.Uri);
+}

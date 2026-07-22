@@ -1,0 +1,124 @@
+@using Ssalddel.Contracts.Common.Inventory
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<입고검수대상상세ViewModel>
+
+<InboundInspectionScreenFrame Context="@Context"
+                                 CurrentScreen="InboundInspectionScreenKind.Detail"
+                                 InboundItemId="@InboundItemId"
+                                 Eyebrow="상세"
+                                 Title="입고 검수 원장"
+                                 Description="선택한 입고상품 한 건을 정확한 ID로 읽고 검수 가능 상태를 확인합니다."
+                                 HomeHref="@HomeHref"
+                                 Busy="@ViewModel.처리중"
+                                 RefreshRequested="LoadAsync">
+    @if (ViewModel.처리중 && ViewModel.항목 is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 inbound-inspection-detail__state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">입고상품 #@(InboundItemId)을 서버에서 조회하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (ViewModel.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Spacing="2">
+                <MudText>@ViewModel.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="LoadAsync">같은 ID 다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (ViewModel.대상없음 || ViewModel.항목 is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 inbound-inspection-detail__state">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" />
+            <MudText Typo="Typo.subtitle1">검수 대상을 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                주소의 입고상품 ID가 없거나 현재 계정의 창고 범위 밖입니다. 다른 상품으로 자동 대체하지 않습니다.
+            </MudText>
+            <MudButton Href="@Context.PathFor(InboundInspectionScreenKind.List)" Variant="Variant.Outlined">목록으로</MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        var selected = ViewModel.항목!;
+        <article class="inbound-inspection-detail__card">
+            <header>
+                <div>
+                    <span>INBOUND ITEM #@selected.InboundItemId</span>
+                    <h2>@Display(selected.ProductName)</h2>
+                    <p>@Display(selected.Sku) · 입고 요청 #@selected.InboundId</p>
+                </div>
+                <MudChip T="string" Color="@(selected.CanInspect ? Color.Warning : Color.Success)" Variant="Variant.Filled">
+                    @(selected.CanInspect ? "검수 대기" : selected.InventoryStatus)
+                </MudChip>
+            </header>
+
+            <section>
+                <h3>입고·재고 기준</h3>
+                <dl>
+                    <div><dt>창고</dt><dd>@Display(selected.WarehouseName)</dd></div>
+                    <div><dt>공급처</dt><dd>@Display(selected.SupplierName)</dd></div>
+                    <div><dt>입고 수량</dt><dd>@selected.ReceivedQuantity.ToString("N0")개</dd></div>
+                    <div><dt>현재 가용</dt><dd>@selected.AvailableQuantity.ToString("N0")개</dd></div>
+                    <div><dt>현재 불량</dt><dd>@selected.DefectiveQuantity.ToString("N0")개</dd></div>
+                    <div><dt>보관 조건</dt><dd>@Display(selected.StorageCondition)</dd></div>
+                    <div><dt>보관 위치</dt><dd>@Display(selected.StorageLocation)</dd></div>
+                    <div><dt>입고 시각</dt><dd>@FormatDateTime(selected.ReceivedAtUtc)</dd></div>
+                </dl>
+            </section>
+
+            @if (!selected.CanInspect)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2">서버 검수 완료 상태</MudText>
+                        <MudText Typo="Typo.body2">완료 시각: @FormatDateTime(selected.InspectedAtUtc)</MudText>
+                        <MudText Typo="Typo.body2">검수 기록: @Display(selected.InspectionMemo)</MudText>
+                    </MudStack>
+                </MudAlert>
+            }
+
+            <footer>
+                <MudButton Href="@Context.PathFor(InboundInspectionScreenKind.List)" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ListAlt">목록</MudButton>
+                @if (selected.CanInspect)
+                {
+                    <MudButton Href="@Context.PathFor(InboundInspectionScreenKind.Record, selected.InboundItemId)"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.FactCheck">
+                        검수 실행 화면
+                    </MudButton>
+                }
+            </footer>
+        </article>
+    }
+</InboundInspectionScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public long InboundItemId { get; set; }
+    [Parameter, EditorRequired] public InboundInspectionNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+
+    private long _loadedInboundItemId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (InboundItemId <= 0 || _loadedInboundItemId == InboundItemId)
+        {
+            return;
+        }
+
+        _loadedInboundItemId = InboundItemId;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        ViewModel.조회대상설정(InboundItemId);
+        await ViewModel.조회Async();
+    }
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatDateTime(DateTime? value)
+        => value.HasValue ? $"{value.Value.ToLocalTime():yyyy-MM-dd HH:mm} (기기 시각)" : "-";
+}

@@ -1,33 +1,35 @@
-# WarehouseManagerApp-P03 - 입고 검수
+# WarehouseManagerApp-P03 - 입고 검수 목록·상세·실행
 
 [전체 화면 문서](../../README.md) / [WarehouseManagerApp 화면 목록](../README.md) / [앱 전체 카탈로그](../../../app-page-catalog.md)
 
 ## 화면 캡처
 
-![입고 검수 실제 화면](../../../../assets/changes/2026-07-20-inbound-inspection/desktop.png)
+![입고 검수 공용 목록 desktop 화면](../../../../assets/changes/2026-07-22-inbound-inspection-route-srp/inbound-inspection-list-desktop.png)
+
+![입고 검수 공용 실행 mobile 화면](../../../../assets/changes/2026-07-22-inbound-inspection-route-srp/inbound-inspection-record-form-mobile.png)
 
 ## 기본 정보
 
 | 항목 | 내용 |
 | --- | --- |
 | 앱 | WarehouseManagerApp, 통합 WebApp |
-| 페이지 ID / 제목 | WarehouseManagerApp-P03 - 입고 검수 |
-| 라우트 | `/work/inbound/inspection`, `/warehouse/work/inbound/inspection` |
-| host 소스 | `WarehouseManagerApp/Components/Pages/InboundInspection.razor`, `Ssalddel.WebApp/Pages/WarehouseInboundInspectionPage.razor` |
-| 공용 화면 | `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/SsalddelInboundInspectionWorkspace.razor` |
+| 페이지 ID / 제목 | WarehouseManagerApp-P03 - 입고 검수 목록·상세·실행 |
+| 라우트 | `/work/inbound/inspection`, `/work/inbound/inspection/{InboundItemId}`, `/work/inbound/inspection/{InboundItemId}/record` |
+| host 소스 | `WarehouseManagerApp/Components/Pages/InboundInspection*.razor`, `Ssalddel.WebApp/Pages/WarehouseInboundInspection*Page.razor` |
+| 공용 화면 | `InboundInspectionListScreen`, `InboundInspectionDetailScreen`, `InboundInspectionRecordScreen` |
 | 단계 / 실행 경계 | `Beta / Simulation` |
-| 캡처 상태 | 실제 WebApp 데스크톱 검증 완료 |
+| 캡처 상태 | 공용 Web route desktop·390px 실제 재검증 완료 |
 
 ## 단일 책임 경계
 
-이 페이지는 접근 가능한 창고의 `보관중` 입고상품을 조회하고, 실제 검수 수량과 불량 수량을 한 번 기록한 뒤 같은 입고상품 ID를 다시 확인하는 일만 담당한다.
+입고 검수는 세 Route Page로 나뉜다. 목록은 접근 가능한 창고의 `보관중` 입고상품 검색·필터만, 상세는 정확한 입고상품 ID 읽기만, 검수 실행은 실제 수량과 네 가지 확인을 저장하고 같은 ID를 다시 읽는 일만 담당한다.
 
 - `입고검수대상목록ViewModel`: 검색어·검수 상태·서버 페이징 목록만 담당한다.
 - `입고검수대상상세ViewModel`: 사용자가 명시적으로 선택한 `inboundItemId` 한 건의 상세만 조회한다. 첫 항목을 자동 선택하거나 없는 ID를 다른 항목으로 대체하지 않는다.
 - `입고검수작성ViewModel`: 수량, 네 가지 현장 확인, 메모와 저장 명령만 담당한다.
-- `입고검수PageViewModel`: 목록·상세·작성 순서를 조정하고 저장 성공 뒤 같은 ID 상세와 목록을 서버에서 다시 조회한다.
-- 공용 workspace는 상태를 렌더링하고 사용자 event를 ViewModel에 전달한다.
-- 각 host는 인증, capability와 URL query 동기화만 맡는다.
+- `입고검수실행ViewModel`: 정확한 상세·작성 순서만 조정하고 저장 성공 뒤 같은 ID 상세를 서버에서 다시 조회한다.
+- 세 공용 Screen은 각 route 책임의 상태만 렌더링한다. 목록·상세 Screen에는 Command 입력이 없다.
+- 각 host는 인증, capability와 stable-ID route 조립만 맡고 기존 `?inboundItemId=`는 상세 route로 호환 이동한다.
 
 적재 위치 확정, 출고, 운송 인계, 계약, 보관 책임, 결제와 정산은 이 페이지 책임이 아니다.
 

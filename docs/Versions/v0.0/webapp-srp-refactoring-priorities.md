@@ -41,7 +41,7 @@
 | `P1-1` 완료 | 운송 요청 작성 | 변경 전에는 Web 한 화면 606줄, Web mode route 4개, 모바일 997줄 복합 Panel이 서로 다른 workflow를 가졌음 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당하며 diagram·커뮤니티 출발 문맥을 단계 사이에 보존함 |
 | `P1-2` 완료 | 운송 요청 상세 | 변경 전에는 Web 828줄과 모바일 988줄의 독립 monolith가 요약·진행·결제·증빙을 함께 수행했음 | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
 | `P1-3` 완료 | 입고 요청 | 변경 전에는 `SsalddelInboundRequestManager` 한 route가 창고 등록·입고 신청·목록·상세·완료를 함께 수행했음 | 목록, 신규 신청, 상세, 입고 완료와 별도 창고 등록 Screen | Web·모바일이 같은 route 계약·공용 Screen을 사용하고 성공 뒤 같은 inbound ID를 재조회하며 desktop·390px 실제 검증을 통과함 |
-| `P1-4` | 창고·판매 master-detail-action | 입고 검수·피킹·마트 상품·판매 주문이 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 모바일에서 각 Screen을 독립 route로 열고 desktop split pane은 선택적 조립으로만 제공함 |
+| `P1-4` 진행 중 — 입고 검수 완료 | 창고·판매 master-detail-action | 변경 전 입고 검수와 현재 피킹·마트 상품·판매 주문은 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 입고 검수는 코드·자동 테스트·소비 앱 빌드·desktop·390px 실제 검증 완료, 다음 수직 단위는 피킹 작업 |
 | `P2-1` | 개인 공간·꾸미기 | Web 개인 route multiplexer와 모바일 전용 꾸미기 route의 의미가 다름 | 개인 개요와 꾸미기 상점·상품·checkout Screen 분리 | 같은 route가 플랫폼마다 다른 기능을 뜻하지 않으며 FakePG 경계를 유지함 |
 | `P2-2` | `/shipper` 홈 | Web은 링크 디렉터리, 모바일은 커뮤니티 홈·인증·dashboard를 수행함 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route의 주된 목표가 같고 1.0 이후 기능은 flag 뒤에 유지됨 |
 | `P3` 보존 | 기사 추천·정산·통관 등 1.0 이후 화면 | 큰 Web 전용 화면이 남아 있으나 0.0 범위가 아님 | 재활성화 시 List·Detail·Action Screen으로 분리 | 0.0 기본 비노출, 추천·자동 배차·결제·정산 운영 효과 확장 금지 |
@@ -102,6 +102,20 @@
 
 다이어그램 창고 후보는 신규 신청 route에 초안만 전달하며 API를 직접 실행하지 않는다. 입고 신청과 완료 성공 뒤에는 같은 inbound ID를 구성된 adapter에서 다시 조회한다. 현장 임시 입고는 안내 동의·멱등 요청 ID가 있는 입고상품 수령 화면, 주문 자동 입고 예정은 주문 workflow에 남겨 일반 신청 route가 우회 생성하지 못하게 한다.
 
+## 입고 검수 목표 route 지도
+
+| 화면 | 사용자 목표 | Route |
+| --- | --- | --- |
+| 목록 | 접근 가능한 검수 대상 검색·필터와 선택 | `/work/inbound/inspection` |
+| 상세 | stable inbound item ID의 입고·재고·검수 상태 읽기 | `/work/inbound/inspection/{InboundItemId:long}` |
+| 검수 실행 | 실제 수량·불량 수량과 네 가지 현장 확인 뒤 명시적 저장 | `/work/inbound/inspection/{InboundItemId:long}/record` |
+| legacy Web alias | 통합 Web의 기존 경로 호환 | `/warehouse/work/inbound/inspection[/...]` |
+| legacy query | query ID를 stable-ID 상세 route로 호환 연결 | `/work/inbound/inspection?inboundItemId=...` |
+
+목록과 상세 Screen은 `I입고검수페이지Service`의 Command를 호출하지 않는다. 검수 실행 Screen만 `입고검수실행ViewModel`을 통해 저장하고 성공 뒤 같은 inbound item ID를 다시 조회한다. 목록 검색·상태·페이지는 상세와 실행 route에 보존되며 Web과 `WarehouseManagerApp`이 같은 공용 Screen을 조립한다.
+
+실제 Web 검증에서 목록 2건의 stable-ID 상세 이동, 실행 route의 네 확인 항목 저장 gate, desktop·390px horizontal overflow 없음과 mobile navigation 2열·58px를 확인했다. 추적 설정의 기능 플래그 기본값은 유지하고 검증 프로세스에서만 `WarehouseFulfillmentWorkflow`를 활성화했으며 실제 저장 Command는 실행하지 않았다. 대표 PNG와 상세 결과는 [입고 검수 Route·공용 Screen 단일책임 분리](../../Changes/2026-07-22-inbound-inspection-route-srp.md)에 기록했다.
+
 ## 기존 component 리팩터링의 재분류
 
 아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
@@ -135,6 +149,6 @@
 
 ## 다음 작업
 
-`P1-3`에서 기존 복합 Manager를 제거하고 Web·모바일이 목록, 신규 신청, stable-ID 상세, 입고 완료와 별도 창고 등록 공용 Screen을 조립하도록 분리했다. 다이어그램은 신규 신청서 초안만 전달하고, 저장과 완료 뒤 같은 inbound ID를 다시 조회한다. 전체 테스트와 세 소비 앱 빌드, Web desktop 1270×720·mobile 390×844 실제 렌더링을 통과했으며 변경 PNG를 기록했다.
+`P1-4`의 첫 수직 단위인 입고 검수는 목록, stable-ID 상세와 검수 실행 Route Page로 분리했다. 기존 query 선택과 376줄 복합 Workspace를 제거하고 Web·창고 앱이 공용 Screen을 조립한다. 목록·상세는 읽기 전용이며 실행 route만 Command를 호출하고 같은 inbound item ID를 재조회한다. 자동 테스트, 소비 앱 빌드와 실제 desktop·390px 완료 게이트를 통과했다.
 
-다음 수직 단위는 `P1-4` 창고·판매 master-detail-action이다. 입고 검수·피킹·마트 상품·판매 주문의 현재 route와 공용 Screen 조립 상태를 먼저 감사하고, 모바일 독립 List·Detail·Action route와 desktop 선택형 split pane의 우선순위를 확정한다.
+다음 수직 단위는 같은 query 기반 master-detail-action 구조인 피킹 작업이다. 현재 route·ViewModel·Command 경계를 먼저 감사한 뒤 목록, stable task detail과 실행 route를 분리하고 desktop adaptive 조립·mobile 독립 화면을 같은 공용 Screen으로 맞춘다.

@@ -1,0 +1,77 @@
+@inherits MvvmComponentBase<창고입고검수PageViewModel>
+
+<WarehousePageShell Model="@ViewModel"
+                    Title="@Title"
+                    Description="@Description"
+                    Icon="@Icons.Material.Filled.FactCheck"
+                    Color="Color.Warning">
+    <Actions>
+        @if (ViewModel.기능사용가능 && ViewModel.인증.창고업무접근가능)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.VerifiedUser">
+                @ViewModel.인증.현재사용자표시
+            </MudChip>
+        }
+    </Actions>
+    <ChildContent>
+        @if (!ViewModel.초기화됨 || ViewModel.초기화중)
+        {
+            <MudPaper Class="pa-6" Elevation="0" Outlined="true">
+                <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Warning" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">창고 검수 권한과 기능 상태를 확인하고 있습니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (!string.IsNullOrWhiteSpace(ViewModel.페이지오류메시지))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText>@ViewModel.페이지오류메시지</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="RetryPageAsync">다시 확인</MudButton>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (!ViewModel.기능사용가능)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle1">창고 입고 검수 기능이 비활성입니다.</MudText>
+                    <MudText Typo="Typo.body2">@ViewModel.기능안내</MudText>
+                    <MudText Typo="Typo.caption">현재 0.0 공개 커뮤니티에는 영향이 없으며, 창고 기능 플래그가 활성화된 환경에서만 사용합니다.</MudText>
+                </MudStack>
+            </MudAlert>
+        }
+        else if (!ViewModel.인증.창고업무접근가능)
+        {
+            <WarehouseAuthenticationPanel ViewModel="@ViewModel.인증"
+                                          OnAuthenticated="AfterAuthenticationAsync"
+                                          OnLoggedOut="OnLoggedOut" />
+        }
+        else
+        {
+            @ChildContent
+        }
+    </ChildContent>
+</WarehousePageShell>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+        => await ViewModel.초기화Async();
+
+    private Task AfterAuthenticationAsync()
+    {
+        ViewModel.인증후준비();
+        return Task.CompletedTask;
+    }
+
+    private void OnLoggedOut()
+        => ViewModel.인증해제적용();
+
+    private async Task RetryPageAsync()
+        => await ViewModel.초기화Async();
+}

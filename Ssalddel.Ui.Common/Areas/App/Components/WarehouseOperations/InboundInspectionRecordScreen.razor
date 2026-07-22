@@ -1,0 +1,169 @@
+@using Ssalddel.Contracts.Common.Inventory
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<입고검수실행ViewModel>
+
+<InboundInspectionScreenFrame Context="@Context"
+                                 CurrentScreen="InboundInspectionScreenKind.Record"
+                                 InboundItemId="@InboundItemId"
+                                 Eyebrow="검수 실행"
+                                 Title="입고 검수 결과 기록"
+                                 Description="한 입고상품의 실제 수량과 네 가지 현장 확인을 검토한 뒤 명시적으로 저장합니다."
+                                 HomeHref="@HomeHref"
+                                 Busy="@ViewModel.처리중"
+                                 RefreshRequested="ReloadAsync">
+    @if (ViewModel.상태 is PageViewModel상태.대기 or PageViewModel상태.불러오는중)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 inbound-inspection-record__state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">입고상품 #@(InboundItemId)의 검수 가능 상태를 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (ViewModel.상태 == PageViewModel상태.실패 || ViewModel.상세.항목 is null)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Spacing="2">
+                <MudText>@(ViewModel.오류메시지 ?? "검수 대상을 찾을 수 없거나 현재 계정의 조회 범위에 없습니다.")</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="ReloadAsync">같은 ID 다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else
+    {
+        var selected = ViewModel.상세.항목!;
+        <div class="inbound-inspection-record__layout">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 inbound-inspection-record__form">
+                <header>
+                    <div>
+                        <span>INBOUND ITEM #@selected.InboundItemId</span>
+                        <h2>@Display(selected.ProductName)</h2>
+                        <p>@Display(selected.Sku) · @Display(selected.WarehouseName)</p>
+                    </div>
+                    <MudChip T="string" Color="@(selected.CanInspect ? Color.Warning : Color.Success)" Variant="Variant.Filled" Size="Size.Small">
+                        @(selected.CanInspect ? "검수 대기" : selected.InventoryStatus)
+                    </MudChip>
+                </header>
+
+                @if (selected.CanInspect)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                        입고 수량 @selected.ReceivedQuantity.ToString("N0")개를 기준으로 실제 검수 수량과 불량 수량을 확인합니다.
+                    </MudAlert>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudNumericField T="int"
+                                             Label="실제 검수 수량"
+                                             Value="@ViewModel.작성.검수수량"
+                                             ValueChanged="SetInspectedQuantity"
+                                             Min="1"
+                                             Max="100000"
+                                             Variant="Variant.Outlined"
+                                             Disabled="@ViewModel.처리중" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudNumericField T="int"
+                                             Label="불량 수량"
+                                             Value="@ViewModel.작성.불량수량"
+                                             ValueChanged="SetDefectiveQuantity"
+                                             Min="0"
+                                             Max="@Math.Max(0, ViewModel.작성.검수수량)"
+                                             Variant="Variant.Outlined"
+                                             Disabled="@ViewModel.처리중" />
+                        </MudItem>
+                    </MudGrid>
+
+                    <div class="inbound-inspection-record__checklist">
+                        <MudCheckBox T="bool" Value="@ViewModel.작성.수량대조확인" ValueChanged="SetQuantityChecked" Label="입고 예정 또는 인계 기록과 실제 수량을 대조했습니다." Disabled="@ViewModel.처리중" />
+                        <MudCheckBox T="bool" Value="@ViewModel.작성.포장파손확인" ValueChanged="SetPackagingChecked" Label="포장 파손·누락·오염 여부를 확인했습니다." Disabled="@ViewModel.처리중" />
+                        <MudCheckBox T="bool" Value="@ViewModel.작성.품질기한확인" ValueChanged="SetQualityChecked" Label="품질·유통기한 또는 사용기한을 확인했습니다." Disabled="@ViewModel.처리중" />
+                        <MudCheckBox T="bool" Value="@ViewModel.작성.보관조건확인" ValueChanged="SetStorageChecked" Label="표시된 보관 조건과 현재 상태를 확인했습니다." Disabled="@ViewModel.처리중" />
+                    </div>
+
+                    <MudTextField T="string"
+                                  Label="검수 메모 (선택)"
+                                  Value="@ViewModel.작성.검수메모"
+                                  ValueChanged="SetInspectionMemo"
+                                  Variant="Variant.Outlined"
+                                  Lines="3"
+                                  MaxLength="400"
+                                  Counter="400"
+                                  Immediate="true"
+                                  Disabled="@ViewModel.처리중" />
+
+                    @if (ViewModel.작성.오류발생)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.작성.오류메시지</MudAlert>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.FactCheck"
+                               Disabled="@(!ViewModel.작성.제출가능 || ViewModel.처리중)"
+                               OnClick="SubmitInspectionAsync">
+                        검수 결과 저장
+                    </MudButton>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt">
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.subtitle2">같은 ID로 검수 완료 원장을 다시 조회했습니다.</MudText>
+                            <MudText Typo="Typo.body2">가용 @selected.AvailableQuantity.ToString("N0")개 · 불량 @selected.DefectiveQuantity.ToString("N0")개</MudText>
+                            <MudText Typo="Typo.body2">검수 기록: @Display(selected.InspectionMemo)</MudText>
+                            <MudText Typo="Typo.caption">현재 상태에서는 검수 Command를 다시 실행할 수 없습니다.</MudText>
+                        </MudStack>
+                    </MudAlert>
+                }
+
+                <MudButton Href="@Context.PathFor(InboundInspectionScreenKind.Detail, selected.InboundItemId)"
+                           Variant="Variant.Text"
+                           StartIcon="@Icons.Material.Filled.Description">
+                    읽기 전용 상세로 돌아가기
+                </MudButton>
+            </MudPaper>
+
+            <aside class="inbound-inspection-record__summary">
+                <span>INSPECTION CHECK</span>
+                <h2>@Display(selected.ProductName)</h2>
+                <dl>
+                    <div><dt>입고 수량</dt><dd>@selected.ReceivedQuantity.ToString("N0")개</dd></div>
+                    <div><dt>검수 수량</dt><dd>@ViewModel.작성.검수수량.ToString("N0")개</dd></div>
+                    <div><dt>불량 수량</dt><dd>@ViewModel.작성.불량수량.ToString("N0")개</dd></div>
+                    <div><dt>보관 조건</dt><dd>@Display(selected.StorageCondition)</dd></div>
+                </dl>
+            </aside>
+        </div>
+    }
+</InboundInspectionScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public long InboundItemId { get; set; }
+    [Parameter, EditorRequired] public InboundInspectionNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+
+    private long _loadedInboundItemId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (InboundItemId <= 0 || _loadedInboundItemId == InboundItemId)
+        {
+            return;
+        }
+
+        _loadedInboundItemId = InboundItemId;
+        await ViewModel.초기화Async(InboundItemId);
+    }
+
+    private Task ReloadAsync() => ViewModel.경로대상변경Async(InboundItemId);
+    private Task SubmitInspectionAsync() => ViewModel.검수후재조회Async();
+    private void SetInspectedQuantity(int value) => ViewModel.작성.검수수량 = value;
+    private void SetDefectiveQuantity(int value) => ViewModel.작성.불량수량 = value;
+    private void SetInspectionMemo(string value) => ViewModel.작성.검수메모 = value ?? string.Empty;
+    private void SetQuantityChecked(bool value) => ViewModel.작성.수량대조확인 = value;
+    private void SetPackagingChecked(bool value) => ViewModel.작성.포장파손확인 = value;
+    private void SetQualityChecked(bool value) => ViewModel.작성.품질기한확인 = value;
+    private void SetStorageChecked(bool value) => ViewModel.작성.보관조건확인 = value;
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

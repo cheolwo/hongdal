@@ -103,14 +103,17 @@ PageViewModel은 공통 `PageViewModelBase`의 `대기 → 불러오는중 → �
    └─ 창고작업UseCase
       └─ WarehouseOperationsController
          └─ I입고검수페이지Service
-            └─ 입고검수PageViewModel
-               ├─ 입고검수대상목록ViewModel
+            ├─ 입고검수대상목록ViewModel
+            │  └─ InboundInspectionListScreen
+            ├─ 입고검수대상상세ViewModel
+            │  └─ InboundInspectionDetailScreen
+            └─ 입고검수실행ViewModel
                ├─ 입고검수대상상세ViewModel
-               └─ 입고검수작성ViewModel
-                  └─ SsalddelInboundInspectionWorkspace
+               ├─ 입고검수작성ViewModel
+               └─ InboundInspectionRecordScreen
 ```
 
-검수 PageViewModel도 같은 공통 페이지 상태를 사용한다. 최초 목록 또는 URL의 정확한 입고상품 ID를
-조회하지 못하면 실패 상태와 다시 조회 동작을 유지하며, 화면이 폐기되면 세 하위 ViewModel의 진행
-요청을 취소한다. 같은 화면에서 경로 식별자가 바뀌면 새 식별자를 저장한 뒤 페이지를 다시 불러와,
-이전 경로의 실패 상태나 선택이 다음 경로에 남지 않게 한다. 수령 화면도 같은 경로 변경 규칙을 쓴다.
+목록, 상세와 검수 실행은 각각 독립 route와 공용 Screen을 사용한다. 목록 조회는 상세나 Command를
+호출하지 않고, 상세는 URL의 정확한 입고상품 ID만 읽는다. 실행 ViewModel은 정확한 상세와 작성만
+조립하며 저장 성공 뒤 같은 ID를 다시 조회한다. 화면이 폐기되면 조립한 하위 ViewModel의 진행 요청을
+취소하고, 다른 route의 실패 상태나 선택을 공유하지 않는다.

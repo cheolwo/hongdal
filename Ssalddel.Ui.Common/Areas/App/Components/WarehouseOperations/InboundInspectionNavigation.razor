@@ -1,0 +1,48 @@
+@using Ssalddel.Contracts.Common.Inventory
+
+<nav class="inbound-inspection-nav" aria-label="입고 검수 화면">
+    @foreach (var item in Items)
+    {
+        if (item.RequiresInboundItemId && InboundItemId is not > 0)
+        {
+            <span class="inbound-inspection-nav__item inbound-inspection-nav__item--disabled" aria-disabled="true">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span><strong>@item.Label</strong><small>@item.Description</small></span>
+            </span>
+        }
+        else
+        {
+            <a class="@BuildClass(item.Screen)"
+               href="@Context.PathFor(item.Screen, InboundItemId)"
+               aria-current="@(item.Screen == CurrentScreen ? "page" : null)">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span><strong>@item.Label</strong><small>@item.Description</small></span>
+            </a>
+        }
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public InboundInspectionNavigationContext Context { get; set; } = new();
+    [Parameter] public InboundInspectionScreenKind CurrentScreen { get; set; }
+    [Parameter] public long? InboundItemId { get; set; }
+
+    private static readonly IReadOnlyList<NavigationItem> Items =
+    [
+        new(InboundInspectionScreenKind.List, "목록", "검색·대상 선택", Icons.Material.Filled.ListAlt, false),
+        new(InboundInspectionScreenKind.Detail, "상세", "원장 읽기", Icons.Material.Filled.Description, true),
+        new(InboundInspectionScreenKind.Record, "검수 실행", "수량·확인 저장", Icons.Material.Filled.FactCheck, true)
+    ];
+
+    private string BuildClass(InboundInspectionScreenKind screen)
+        => screen == CurrentScreen
+            ? "inbound-inspection-nav__item inbound-inspection-nav__item--active"
+            : "inbound-inspection-nav__item";
+
+    private sealed record NavigationItem(
+        InboundInspectionScreenKind Screen,
+        string Label,
+        string Description,
+        string Icon,
+        bool RequiresInboundItemId);
+}

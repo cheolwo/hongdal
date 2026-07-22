@@ -129,6 +129,10 @@ public sealed class PageCapabilityCatalogTests
     [InlineData("WarehouseManagerApp", "/work/inbound/inspection?inboundItemId=88", "warehouse-app-inbound-inspection")]
     [InlineData("Ssalddel.WebApp", "/warehouse/work/inbound/inspection?inboundItemId=88", "web-warehouse-inbound-inspection")]
     [InlineData("Ssalddel.WebApp", "/work/inbound/inspection?inboundItemId=88", "web-warehouse-inbound-inspection-alias")]
+    [InlineData("WarehouseManagerApp", "/work/inbound/inspection/88", "warehouse-app-inbound-inspection-routes")]
+    [InlineData("WarehouseManagerApp", "/work/inbound/inspection/88/record", "warehouse-app-inbound-inspection-routes")]
+    [InlineData("Ssalddel.WebApp", "/warehouse/work/inbound/inspection/88", "web-warehouse-inbound-inspection-routes")]
+    [InlineData("Ssalddel.WebApp", "/work/inbound/inspection/88/record", "web-warehouse-inbound-inspection-alias-routes")]
     public void 입고검수페이지는_서버Simulation상태만변경하는Beta로분류한다(
         string appCode,
         string route,

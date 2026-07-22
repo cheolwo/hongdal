@@ -11,7 +11,7 @@
 | [WarehouseManagerApp-P02-1 - 프로세스별 창고 작업 시작](WarehouseManagerApp-P02-1/) | /work/{ProcessCode} | 확장 | 프로세스별 창고 작업 시작 | 완료 |
 | [WarehouseManagerApp-P02-2 - 작업대 스캔](WarehouseManagerApp-P02-2/) | /work/{ProcessCode}/workbench | 확장 | 작업대 스캔 | 완료 |
 | [WarehouseManagerApp-P02-3 - 범용 스캔 스테이션](WarehouseManagerApp-P02-3/) | /scan | 확장 | 범용 스캔 스테이션 | 완료 |
-| [WarehouseManagerApp-P03 - 입고 검수](WarehouseManagerApp-P03/) | /work/inbound/inspection | 확장 | 서버 검수대상 조회·수량 검수·같은 ID 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P03 - 입고 검수 목록·상세·실행](WarehouseManagerApp-P03/) | `/work/inbound/inspection`<br>`/work/inbound/inspection/{InboundItemId}`<br>`/work/inbound/inspection/{InboundItemId}/record` | 확장 | 목록 조회·stable-ID 상세·명시적 검수 Command와 같은 ID 재조회 | Web route desktop·390px 실제 재검증 |
 | [WarehouseManagerApp-P03-1 - 입고상품 수령](WarehouseManagerApp-P03-1/) | /work/inbound/products | 확장 | 정확한 입고예정 조회와 현장 반입 요청 | 완료 |
 | [WarehouseManagerApp-P03-2 - 일반 재고 현황](WarehouseManagerApp-P03-2/) | /warehouse/general/inventory | 확장 | 창고 범위 최소 재고 목록·서버 집계·정확한 상세 | 실제 캡처 |
 | [WarehouseManagerApp-P03-3 - 적재 작업](WarehouseManagerApp-P03-3/) | /work/inbound/put-away | 확장 | 검수 완료 재고의 위치 확정과 같은 ID 재조회 | 실제 캡처 |
