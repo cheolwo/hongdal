@@ -1,0 +1,29 @@
+@page "/diagram"
+
+<PageTitle>살뜰 창고 · 업무 다이어그램</PageTitle>
+
+<CommunityDiagramWorkbenchScreen AppName="살뜰 창고"
+                                 RoleLabel="창고 관리자"
+                                 AppKey="warehouse-manager"
+                                 LedgerTemplateKey="@LedgerTemplateKey"
+                                 SelectedNode="@SelectedNode"
+                                 ZoomPercent="@ZoomPercent"
+                                 Filter="@Filter"
+                                 ReturnPath="@ReturnPath" />
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.LedgerTemplate)]
+    public string? LedgerTemplateKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.SelectedNode)]
+    public string? SelectedNode { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.Zoom)]
+    public int? ZoomPercent { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.Filter)]
+    public string? Filter { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.ReturnPath)]
+    public string? ReturnPath { get; set; }
+}

@@ -1,0 +1,44 @@
+@page "/community/boards"
+
+<PageTitle>살뜰 창고 · 커뮤니티 게시판</PageTitle>
+
+<CommunityBoardListScreen AppKey="warehouse-manager"
+                          BackHref="@CommunityPageRoutes.Home"
+                          BoardKey="@BoardKey"
+                          BoardName="@BoardName"
+                          WorkflowTag="@WorkflowTag"
+                          RoleTag="@RoleTag"
+                          Page="@Page"
+                          SearchText="@SearchText"
+                          ListFilter="@ListFilter"
+                          ViewMode="@ViewMode"
+                          FocusTarget="@FocusTarget" />
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
+    public string? BoardKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
+    public string? BoardName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.WorkflowTag)]
+    public string? WorkflowTag { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.RoleTag)]
+    public string? RoleTag { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.Page)]
+    public int Page { get; set; } = 1;
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.Search)]
+    public string? SearchText { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.ListFilter)]
+    public string? ListFilter { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.ViewMode)]
+    public string? ViewMode { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.FocusTarget)]
+    public string? FocusTarget { get; set; }
+}

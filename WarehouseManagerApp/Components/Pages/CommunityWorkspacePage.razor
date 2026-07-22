@@ -1,0 +1,69 @@
+@page "/community/workspace"
+@inject NavigationManager Navigation
+
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
+
+@if (!IsLegacyDiagramRequest)
+{
+    <CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                             BackLabel="@RouteContext.BackLabel"
+                             Eyebrow="@RouteContext.WorkspaceEyebrow"
+                             Heading="@RouteContext.WorkspaceHeading"
+                             Description="@RouteContext.WorkspaceDescription"
+                             ShowComposeAction="true"
+                             ShowWorkspaceSections="@RouteContext.IsWorkspaceLandingRoute">
+        <CommunityWorkspaceScreen AppName="살뜰 창고"
+                                  RoleLabel="창고 관리자"
+                                  AppKey="warehouse-manager"
+                                  CargoRequestDraftHrefBase="@WarehouseManagerRoutes.TransportRequestDraft"
+                                  WorkspaceOnly="@RouteContext.IsWorkspaceLandingRoute"
+                                  ShowWorkspaceNavigation="@RouteContext.IsWorkspaceLandingRoute"
+                                  UseBaguaRoleTransitionPages="false"
+                                  StoreHref="@WarehouseManagerRoutes.MartHome"
+                                  QuickActions="@WarehousePlatformHomeNavigationCatalog.QuickActions"
+                                  CardinalNavigationOptions="@WarehousePlatformHomeNavigationCatalog.CardinalNavigationOptions"
+                                  LedgerTemplateKey="@QueryLedgerTemplateKey"
+                                  DiagramMode="@QueryDiagramMode" />
+    </CommunityRoutePageFrame>
+}
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.LedgerTemplate)]
+    public string? QueryLedgerTemplateKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "diagram")]
+    public string? QueryDiagramMode { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
+    private bool IsLegacyDiagramRequest
+        => !string.IsNullOrWhiteSpace(QueryDiagramMode)
+           && (QueryDiagramMode.Equals("1", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("true", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("yes", StringComparison.OrdinalIgnoreCase)
+               || QueryDiagramMode.Equals("diagram", StringComparison.OrdinalIgnoreCase));
+
+    protected override void OnParametersSet()
+    {
+        if (IsLegacyDiagramRequest)
+        {
+            Navigation.NavigateTo(
+                CommunityPageRoutes.DiagramFor(
+                    QueryLedgerTemplateKey,
+                    returnPath: CommunityPageRoutes.Workspace),
+                replace: true);
+        }
+    }
+
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            CommunityPageRoutes.Workspace,
+            null,
+            null,
+            null,
+            null,
+            null,
+            QueryDiagramMode,
+            QueryReturnPath);
+}

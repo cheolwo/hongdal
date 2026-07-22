@@ -1,0 +1,73 @@
+@page "/community/posts/recommended"
+@inject NavigationManager Navigation
+
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
+
+@if (IsLegacyDetailLink)
+{
+    <MudStack AlignItems="AlignItems.Center" Spacing="2" Class="py-8" aria-live="polite">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        <MudText>추천 게시글 상세 화면으로 이동하고 있습니다.</MudText>
+    </MudStack>
+}
+else
+{
+    <CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                             BackLabel="@RouteContext.BackLabel"
+                             Eyebrow="@RouteContext.WorkspaceEyebrow"
+                             Heading="@RouteContext.WorkspaceHeading"
+                             Description="@RouteContext.WorkspaceDescription"
+                             ShowComposeAction="true"
+                             ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, CurrentListPath)">
+        <CommunityRecommendedPostListScreen AppName="살뜰 창고"
+                                            RoleLabel="창고 관리자"
+                                            AppKey="warehouse-manager"
+                                            BoardName="@QueryBoardName"
+                                            BoardKey="@QueryBoardKey"
+                                            ReturnPath="@CurrentListPath" />
+    </CommunityRoutePageFrame>
+}
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "seed")]
+    public string? LegacySeedPostTitle { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
+    public string? QueryBoardName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
+    public string? QueryBoardKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
+    private bool IsLegacyDetailLink => !string.IsNullOrWhiteSpace(LegacySeedPostTitle);
+
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            CommunityPageRoutes.RecommendedPosts,
+            null,
+            null,
+            null,
+            QueryBoardName,
+            QueryBoardKey,
+            null,
+            QueryReturnPath);
+
+    private string CurrentListPath
+        => CommunityPageRoutes.RecommendedPostsFor(QueryBoardName, QueryBoardKey, QueryReturnPath);
+
+    protected override void OnParametersSet()
+    {
+        if (IsLegacyDetailLink)
+        {
+            Navigation.NavigateTo(
+                CommunityPageRoutes.RecommendedPostDetailFor(
+                    LegacySeedPostTitle!,
+                    QueryBoardName,
+                    QueryBoardKey,
+                    CurrentListPath),
+                replace: true);
+        }
+    }
+}

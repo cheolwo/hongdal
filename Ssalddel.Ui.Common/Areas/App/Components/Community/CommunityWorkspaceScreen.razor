@@ -1,5 +1,12 @@
 @namespace Ssalddel.Ui.Common.Areas.App.Components.Community
 
+@if (ShowWorkspaceNavigation)
+{
+    <PlatformWorkspaceCardinalNavigation RoleLabel="@RoleLabel"
+                                         NavigationItems="@CardinalNavigationOptions"
+                                         StoreHref="@StoreHref" />
+}
+
 <PlatformCommunityHome @key="ScreenKey"
                        AppName="@AppName"
                        RoleLabel="@RoleLabel"
@@ -9,6 +16,7 @@
                        WorkspaceOnly="@WorkspaceOnly"
                        WorkspaceSection="CommunityWorkspaceSurfaceKind.Hub"
                        UseBaguaRoleTransitionPages="@UseBaguaRoleTransitionPages"
+                       BaguaPerspectiveRoleCode="@BaguaPerspectiveRoleCode"
                        QuickActions="@QuickActions"
                        QueryLedgerTemplateKey="@LedgerTemplateKey"
                        QueryDiagramMode="@DiagramMode" />
@@ -19,8 +27,12 @@
     [Parameter] public string AppKey { get; set; } = "shipper";
     [Parameter] public string? CargoRequestDraftHrefBase { get; set; }
     [Parameter] public bool WorkspaceOnly { get; set; } = true;
+    [Parameter] public bool ShowWorkspaceNavigation { get; set; }
     [Parameter] public bool UseBaguaRoleTransitionPages { get; set; } = true;
+    [Parameter] public string? BaguaPerspectiveRoleCode { get; set; }
+    [Parameter] public string? StoreHref { get; set; }
     [Parameter] public IReadOnlyList<PlatformHomeQuickAction> QuickActions { get; set; } = [];
+    [Parameter] public IReadOnlyList<SsalddelCardinalNavigationOption> CardinalNavigationOptions { get; set; } = [];
     [Parameter] public string? LedgerTemplateKey { get; set; }
     [Parameter] public string? DiagramMode { get; set; }
 

@@ -1,0 +1,42 @@
+@page "/community/posts/recommended/detail"
+
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
+
+<CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                         BackLabel="@RouteContext.BackLabel"
+                         Eyebrow="@RouteContext.WorkspaceEyebrow"
+                         Heading="@RouteContext.WorkspaceHeading"
+                         Description="@RouteContext.WorkspaceDescription"
+                         ShowComposeAction="true"
+                         ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, RouteContext.BackHref)">
+    <CommunityRecommendedPostDetailScreen AppName="살뜰 창고"
+                                          RoleLabel="창고 관리자"
+                                          AppKey="warehouse-manager"
+                                          SeedPostTitle="@(QuerySeedPostTitle ?? string.Empty)"
+                                          BoardName="@QueryBoardName" />
+</CommunityRoutePageFrame>
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "seed")]
+    public string? QuerySeedPostTitle { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
+    public string? QueryBoardName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
+    public string? QueryBoardKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            CommunityPageRoutes.RecommendedPostDetail,
+            null,
+            null,
+            QuerySeedPostTitle,
+            QueryBoardName,
+            QueryBoardKey,
+            null,
+            QueryReturnPath);
+}

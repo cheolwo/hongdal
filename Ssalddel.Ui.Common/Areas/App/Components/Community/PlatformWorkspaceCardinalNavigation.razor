@@ -1,0 +1,54 @@
+@namespace Ssalddel.Ui.Common.Areas.App.Components.Community
+@using Ssalddel.Contracts.Common.Community
+@using Ssalddel.Ui.Common.Areas.App.Models
+@inject NavigationManager Navigation
+
+<SsalddelLaterHeavenBaguaNavigator RoleLabel="@RoleLabel"
+                                   NavigationItems="@NavigationItems"
+                                   CenterSymbol="☶"
+                                   CenterTrigramName="간"
+                                   CenterDestinationLabel="커뮤니티"
+                                   TaegeukYangDestinationLabel="커뮤니티"
+                                   TaegeukYinDestinationLabel="상점"
+                                   DestinationSelected="NavigateCardinalAsync"
+                                   CenterSelected="OpenCommunity"
+                                   TaegeukYangSelected="OpenCommunity"
+                                   TaegeukYinSelected="OpenStore" />
+
+@code {
+    [Parameter] public string RoleLabel { get; set; } = "사용자";
+    [Parameter] public IReadOnlyList<SsalddelCardinalNavigationOption> NavigationItems { get; set; } = [];
+    [Parameter] public string CommunityHref { get; set; } = CommunityPageRoutes.Home;
+    [Parameter] public string? StoreHref { get; set; } = CommunityPageRoutes.Decorations;
+
+    private Task NavigateCardinalAsync(SsalddelCardinalNavigationOption option)
+    {
+        var target = option.ActionKind switch
+        {
+            SsalddelCardinalNavigationActionKinds.Route => option.Target,
+            SsalddelCardinalNavigationActionKinds.CommunityHome => CommunityHref,
+            SsalddelCardinalNavigationActionKinds.Compose => CommunityPageRoutes.Compose,
+            SsalddelCardinalNavigationActionKinds.Diagram => CommunityPageRoutes.DiagramFor(returnPath: CommunityPageRoutes.Workspace),
+            SsalddelCardinalNavigationActionKinds.Work => CommunityPageRoutes.Workspace,
+            _ => null
+        };
+
+        NavigateLocal(target);
+        return Task.CompletedTask;
+    }
+
+    private void OpenCommunity()
+        => NavigateLocal(CommunityHref);
+
+    private void OpenStore()
+        => NavigateLocal(StoreHref);
+
+    private void NavigateLocal(string? target)
+    {
+        var normalizedTarget = PageNavigationContext.NormalizeReturnPath(target);
+        if (normalizedTarget is not null)
+        {
+            Navigation.NavigateTo(normalizedTarget);
+        }
+    }
+}

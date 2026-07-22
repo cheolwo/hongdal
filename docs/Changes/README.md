@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [Warehouse 플랫폼 Home·커뮤니티 Route 단일책임 분리](2026-07-22-warehouse-platform-home-srp.md) | 공용 `CommunityWorkspaceScreen` 기반 Home에는 사방괘·업무 허브만 남기고 게시판 목록·개설 신청·글쓰기·상세·원장·다이어그램을 독립 Route로 분리, desktop·561px 실제 확인 |
 | 2026-07-22 | [Azure Blob 기반 객체 저장소 전환](2026-07-22-azure-object-storage.md) | 화면 없음·간접 확인 — 공개 게시글 이미지와 비공개 증빙·음성의 저장 경계를 분리하고 기존 첨부 UI를 유지한 채 Azure Managed Identity 기반 Blob 저장으로 전환 |
 | 2026-07-22 | [사방괘 기본 목적지 Navigation 계약 정렬](2026-07-22-bagua-navigation-contract.md) | 화면 없음·간접 확인 — 공용 사방괘의 판매·창고·운송·합의 링크를 Web·모바일 공통 route 계약과 실제 제공 Route Page로 정렬 |
 | 2026-07-22 | [다이어그램 노드 앱별 Navigation Adapter](2026-07-22-diagram-node-navigation-adapter.md) | Web·메인·창고·기사·주문 앱이 실제 제공 화면만 열고 미지원 node는 비활성 안내와 원장 문맥을 유지하도록 분리, 실제 MAUI Windows 확인 |

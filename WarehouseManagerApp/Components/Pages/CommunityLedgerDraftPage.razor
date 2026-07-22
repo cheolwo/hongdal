@@ -1,0 +1,25 @@
+@page "/community/ledgers/new"
+
+<PageTitle>살뜰 창고 · 공동 원장 초안</PageTitle>
+
+<CommunityRoutePageFrame BackHref="@BackHref"
+                         BackLabel="업무·원장 공간"
+                         Eyebrow="COMMUNITY LEDGER DRAFT"
+                         Heading="공동 원장 초안"
+                         Description="참여자와 조건을 합의하기 위한 원장 구조만 작성합니다. 실제 입고·출고·운송 실행은 전용 창고 화면에서 확인합니다.">
+    <CommunityLedgerDraftScreen AppName="살뜰 창고"
+                                RoleLabel="창고 관리자"
+                                AppKey="warehouse-manager"
+                                LedgerTemplateKey="@QueryLedgerTemplateKey" />
+</CommunityRoutePageFrame>
+
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = CommunityDiagramNavigationQueryNames.LedgerTemplate)]
+    public string? QueryLedgerTemplateKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
+    private string BackHref
+        => PageNavigationContext.ResolveReturnPath(QueryReturnPath, CommunityPageRoutes.Workspace);
+}

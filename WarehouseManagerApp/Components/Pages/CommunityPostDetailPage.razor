@@ -1,0 +1,43 @@
+@page "/community/posts/{PostId:long}"
+
+<PageTitle>@RouteContext.WorkspaceTitle</PageTitle>
+
+<CommunityRoutePageFrame BackHref="@RouteContext.BackHref"
+                         BackLabel="@RouteContext.BackLabel"
+                         Eyebrow="@RouteContext.WorkspaceEyebrow"
+                         Heading="@RouteContext.WorkspaceHeading"
+                         Description="@RouteContext.WorkspaceDescription"
+                         ShowComposeAction="true"
+                         ComposeHref="@CommunityPageRoutes.ComposeFor(QueryBoardName, QueryBoardKey, RouteContext.BackHref)">
+    <CommunityPostDetailScreen AppName="살뜰 창고"
+                               RoleLabel="창고 관리자"
+                               AppKey="warehouse-manager"
+                               CargoRequestDraftHrefBase="@WarehouseManagerRoutes.TransportRequestDraft"
+                               UseBaguaRoleTransitionPages="false"
+                               PostId="@PostId"
+                               BoardName="@QueryBoardName" />
+</CommunityRoutePageFrame>
+
+@code {
+    [Parameter] public long PostId { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardName)]
+    public string? QueryBoardName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityBoardNavigationQueryNames.BoardKey)]
+    public string? QueryBoardKey { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = PageNavigationQueryNames.ReturnPath)]
+    public string? QueryReturnPath { get; set; }
+
+    private CommunityWorkspaceRouteContext RouteContext
+        => CommunityWorkspaceRouteContext.Resolve(
+            $"/community/posts/{PostId}",
+            PostId,
+            null,
+            null,
+            QueryBoardName,
+            QueryBoardKey,
+            null,
+            QueryReturnPath);
+}

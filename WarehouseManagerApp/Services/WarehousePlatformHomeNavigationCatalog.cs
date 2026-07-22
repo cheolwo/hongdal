@@ -1,0 +1,63 @@
+using MudBlazor;
+using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Ui.Common.Areas.App.Models;
+using Color = MudBlazor.Color;
+
+namespace WarehouseManagerApp.Services;
+
+public static class WarehousePlatformHomeNavigationCatalog
+{
+    public static IReadOnlyList<PlatformHomeQuickAction> QuickActions { get; } =
+    [
+        new("입고 작업", "입고 검수와 적재 전환", WarehouseManagerRoutes.InboundWorkStart, Icons.Material.Filled.MoveToInbox, Color.Warning),
+        new("출고 작업", "주문 피킹과 출고 준비", WarehouseManagerRoutes.OutboundWorkStart, Icons.Material.Filled.Outbox, Color.Primary),
+        new("피킹 작업", "배정된 작업의 시작·완료 처리", WarehouseManagerRoutes.PickingBatch, Icons.Material.Filled.Inventory2, Color.Info),
+        new("재고 현황", "창고 범위의 가용·예약 재고 조회", WarehouseManagerRoutes.GeneralInventory, Icons.Material.Filled.Warehouse, Color.Primary),
+        new("적재 작업", "검수 완료 재고의 위치 확정", WarehouseManagerRoutes.PutAwayTask, Icons.Material.Filled.Inventory, Color.Warning),
+        new("포장 작업", "적재 완료 재고의 출고 준비 포장", WarehouseManagerRoutes.PackingTask, Icons.Material.Filled.Inventory2, Color.Info),
+        new("출고 인계 준비", "포장 완료 재고의 출고예정 원장 확인", WarehouseManagerRoutes.GeneralTransportHandoff, Icons.Material.Filled.LocalShipping, Color.Success),
+        new("출고예정 검토", "운송의뢰 생성 전 원장과 필수 입력 확인", WarehouseManagerRoutes.OutboundPlanReview, Icons.Material.Filled.FactCheck, Color.Info),
+        new("운송의뢰 초안", "하차지·희망 일정·차량 조건의 로컬 검토", WarehouseManagerRoutes.TransportRequestDraft, Icons.Material.Filled.EditNote, Color.Info),
+        new("포장 작업", "포장 시작과 출고 연결", WarehouseManagerRoutes.PackingWorkStart, Icons.Material.Filled.Inventory, Color.Success),
+        new("스캔 스테이션", "공정 스캔과 현장 확인", WarehouseManagerRoutes.Scan, Icons.Material.Filled.QrCodeScanner, Color.Info),
+        new("일반 작업 보드", "대기 중인 창고 작업 확인", WarehouseManagerRoutes.WorkBoard, Icons.Material.Filled.ViewKanban, Color.Secondary),
+        new("게시판 개설 신청", "새 주제 공간 신청을 글 목록과 분리된 화면에서 작성", CommunityPageRoutes.BoardManagement, Icons.Material.Filled.AddComment, Color.Secondary),
+        new("알뜰살뜰 마트", "창고 재고 기반 도심 마트 풀필먼트", WarehouseManagerRoutes.MartHome, Icons.Material.Filled.Storefront, Color.Success)
+    ];
+
+    public static IReadOnlyList<SsalddelCardinalNavigationOption> CardinalNavigationOptions { get; } =
+    [
+        new(
+            "li",
+            "리",
+            "☲",
+            "남",
+            "판매",
+            SsalddelCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.MarketFulfillmentWorkStart),
+        new(
+            "dui",
+            "태",
+            "☱",
+            "서",
+            "출고",
+            SsalddelCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.OutboundWorkStart),
+        new(
+            "kan",
+            "감",
+            "☵",
+            "북",
+            "배송",
+            SsalddelCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.DeliveryAgencyWorkStart),
+        new(
+            "zhen",
+            "진",
+            "☳",
+            "동",
+            "입고",
+            SsalddelCardinalNavigationActionKinds.Route,
+            WarehouseManagerRoutes.InboundWorkStart)
+    ];
+}
