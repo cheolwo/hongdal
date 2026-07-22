@@ -69,7 +69,12 @@ services:
       CustomsBrokerCors__AllowedOrigins__0: "https://${SSALDDEL_SITE_HOST}"
       AgriculturalFisheriesBatch__Enabled: "false"
       CommunityEditorialBatch__Enabled: "false"
-      CommunityPostTranslation__Enabled: "false"
+      CommunityPostTranslation__Enabled: "${SSALDDEL_COMMUNITY_TRANSLATION_ENABLED:-false}"
+      CommunityPostTranslation__AuthenticationMode: MicrosoftEntraId
+      CommunityPostTranslation__Endpoint: "${SSALDDEL_AZURE_TRANSLATOR_ENDPOINT:-https://api.cognitive.microsofttranslator.com}"
+      CommunityPostTranslation__ResourceId: "${SSALDDEL_AZURE_TRANSLATOR_RESOURCE_ID:-}"
+      CommunityPostTranslation__ManagedIdentityClientId: "${SSALDDEL_AZURE_TRANSLATOR_MANAGED_IDENTITY_CLIENT_ID:-}"
+      CommunityPostTranslation__Region: "${SSALDDEL_AZURE_TRANSLATOR_REGION:-koreacentral}"
       SalesChannelOrderSync__Enabled: "false"
       WorkRelationshipSnapshots__Enabled: "false"
       YouTube__Enabled: "false"

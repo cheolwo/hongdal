@@ -17,7 +17,9 @@
 
 기존 MySQL·MongoDB 볼륨을 이미 만든 경우에는 최초 생성 때 사용한 비밀번호를 계속 사용해야 한다. `.env`의 비밀번호와 연결 문자열의 비밀번호가 기존 볼륨과 다르면 컨테이너 환경변수만 바꿔도 DB 계정 비밀번호는 바뀌지 않는다.
 
-게시글 번역은 기본적으로 꺼져 있다. Azure Translator 리소스를 준비한 뒤 `SSALDDEL_AZURE_TRANSLATOR_KEY`, `SSALDDEL_AZURE_TRANSLATOR_REGION`을 비밀 저장소에서 주입하고 `SSALDDEL_COMMUNITY_TRANSLATION_ENABLED=true`로 바꾼다. 원문은 MySQL 게시글에 그대로 유지되고 `ko-KR`·`en-US` 번역은 상세 화면에서 처음 요청될 때 생성되어 `platform_community_post_translations`에 캐시된다. 글이 수정되면 원문 해시가 달라져 기존 번역은 재사용되지 않으며, 신고·분쟁 글은 기본 정책상 외부 번역 대상에서 제외된다.
+게시글 번역은 기본적으로 꺼져 있다. 운영에서는 Azure VM의 Managed Identity에 Translator 리소스 범위의 `Cognitive Services User` 역할을 부여하고, `SSALDDEL_AZURE_TRANSLATOR_RESOURCE_ID`, `SSALDDEL_AZURE_TRANSLATOR_REGION`을 설정한 뒤 `SSALDDEL_COMMUNITY_TRANSLATION_ENABLED=true`로 바꾼다. 애플리케이션은 `DefaultAzureCredential`로 짧은 수명의 Microsoft Entra ID Token을 얻으므로 Translator 구독 키를 VM이나 컨테이너에 저장하지 않는다. 사용자 할당 Managed Identity를 사용할 때만 `SSALDDEL_AZURE_TRANSLATOR_MANAGED_IDENTITY_CLIENT_ID`를 추가한다.
+
+로컬에서 Managed Identity를 사용할 수 없을 때는 `SSALDDEL_AZURE_TRANSLATOR_AUTHENTICATION_MODE=ApiKey`와 `SSALDDEL_AZURE_TRANSLATOR_KEY`를 Git에서 제외된 `.env`에만 넣을 수 있다. 운영 기본값은 `MicrosoftEntraId`다. 원문은 MySQL 게시글에 그대로 유지되고 `ko-KR`·`en-US` 번역은 상세 화면에서 처음 요청될 때 생성되어 `platform_community_post_translations`에 캐시된다. 글이 수정되면 원문 해시가 달라져 기존 번역은 재사용되지 않으며, 신고·분쟁 글은 기본 정책상 외부 번역 대상에서 제외된다.
 
 ## 2. 이미지 빌드
 
