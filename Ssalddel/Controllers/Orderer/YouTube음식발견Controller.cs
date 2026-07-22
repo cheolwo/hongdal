@@ -12,11 +12,11 @@ namespace Ssalddel.Controllers.Orderer;
 [ApiController]
 [Authorize]
 [SsalddelApiVersion(
-    SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
-[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    SsalddelProductVersion.V1_0,
+    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/youtube-food-discovery")]
 public sealed class YouTube음식발견Controller : ControllerBase
 {

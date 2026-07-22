@@ -311,6 +311,7 @@ public sealed class YouTube음식상품발견Service : IYouTube음식상품발�
         {
             var command = new 공동구매자동수요등록Command
             {
+                요청멱등키 = $"youtube-interest:{Guid.NewGuid():N}",
                 수요출처키 = CreateDemandSourceKey(candidate.Id, 사용자Id),
                 상품키 = candidate.상품키,
                 상품명 = candidate.상품명,
@@ -335,7 +336,7 @@ public sealed class YouTube음식상품발견Service : IYouTube음식상품발�
                 목표수량 = 요청.목표수량
             };
 
-            var groupResult = await _공동구매UseCase.수요등록Async(command, cancellationToken);
+            var groupResult = await _공동구매UseCase.비구속수요저장Async(command, cancellationToken);
             if (!groupResult.성공 || groupResult.값 is null)
             {
                 return groupResult.상태코드 == 404

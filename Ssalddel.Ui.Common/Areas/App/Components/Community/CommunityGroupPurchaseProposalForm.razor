@@ -19,8 +19,8 @@
                 <div class="group-purchase-source-context__heading">
                     <MudIcon Icon="@Icons.Material.Filled.Hub" Color="Color.Success" />
                     <div>
-                        <strong>재료 정보에서 이어온 초안</strong>
-                        <span>@ingredientSeed.IngredientName · 가격과 레시피는 참고 근거이며 구매 조건은 아직 정해지지 않았습니다.</span>
+                        <strong>음식·재료 탐색에서 이어온 초안</strong>
+                        <span>@ingredientSeed.IngredientName · @ingredientSeed.SourcingModeLabel · 가격과 레시피는 참고 근거이며 구매 조건은 아직 정해지지 않았습니다.</span>
                     </div>
                 </div>
                 <dl>
@@ -28,6 +28,11 @@
                     {
                         <div><dt>참고 레시피</dt><dd>@ingredientSeed.RecipeTitle</dd></div>
                     }
+                    @if (!string.IsNullOrWhiteSpace(ingredientSeed.FoodName))
+                    {
+                        <div><dt>둘러본 음식</dt><dd>@ingredientSeed.FoodName · @ingredientSeed.FoodCountryCode</dd></div>
+                    }
+                    <div><dt>조달 검토</dt><dd>@ingredientSeed.SourcingModeLabel</dd></div>
                     @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeQuantity))
                     {
                         <div><dt>레시피 재료 표기</dt><dd>@ingredientSeed.RecipeQuantity</dd></div>
@@ -40,6 +45,12 @@
                 @if (!string.IsNullOrWhiteSpace(ingredientSeed.RecipeUrl))
                 {
                     <a href="@ingredientSeed.RecipeUrl" target="_blank" rel="noreferrer">공식 레시피 원문 다시 보기</a>
+                }
+                @if (ingredientSeed.IsGroupImportReview)
+                {
+                    <MudAlert Severity="Severity.Warning" Dense="true" Class="mt-3">
+                        음식의 국가를 상품 출발국으로 자동 사용하지 않습니다. 실제 출발국·배송국·통관 상태와 HS 코드는 제안 이후 거래경로 단계에서 확인합니다.
+                    </MudAlert>
                 }
             </section>
         }

@@ -9,9 +9,9 @@ using 살뜰.Services.Versioning;
 namespace Ssalddel.Controllers.Orderer;
 
 [ApiController]
-[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow, WorkflowKey = VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow)]
 [Route("api/v1/orderer/group-purchase-commerce-fulfillment-plans")]
 public sealed class 공동구매커머스이행계획Controller : ControllerBase
 {

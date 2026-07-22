@@ -29,6 +29,15 @@
     [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.PurchaseUnitQueryName)]
     public string? PurchaseUnit { get; set; }
 
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.FoodNameQueryName)]
+    public string? FoodName { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.FoodCountryCodeQueryName)]
+    public string? FoodCountryCode { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = CommunityGroupPurchaseIngredientSeed.SourcingModeQueryName)]
+    public string? SourcingModeCode { get; set; }
+
     private CommunityGroupPurchaseIngredientSeed? IngredientSeed
         => CommunityGroupPurchaseIngredientSeed.Create(
             IngredientKey,
@@ -38,5 +47,8 @@
             RecipeSource,
             RecipeQuantity,
             PriceReference,
-            PurchaseUnit);
+            PurchaseUnit,
+            FoodName,
+            FoodCountryCode,
+            SourcingModeCode);
 }

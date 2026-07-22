@@ -11,11 +11,11 @@ namespace Ssalddel.Controllers.Common;
 [ApiController]
 [AllowAnonymous]
 [SsalddelApiVersion(
-    SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    SsalddelProductVersion.V1_5,
+    FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [Route("api/v1/customs/hs-codes")]
 public sealed class 공동수입HS코드Controller : ControllerBase
 {

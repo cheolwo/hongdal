@@ -2,7 +2,7 @@
 
 ## 목적
 
-2.5 공동 주문은 초기에는 모든 커머스 상품을 같은 비중으로 다루지 않는다. 먼저 HS 코드상 식품 또는 식품 인접 화물로 볼 수 있는 품목을 중심으로 공동구매를 활성화한다.
+1.0 공동구매는 초기에는 모든 커머스 상품을 같은 비중으로 다루지 않는다. 먼저 HS 코드상 식품 또는 식품 인접 화물로 볼 수 있는 품목을 중심으로 비구속 수요 집단화를 활성화한다.
 
 이유는 다음과 같다.
 
@@ -27,14 +27,15 @@
 
 ```mermaid
 flowchart TD
-    A["운영자/화주: HS 식품 상품 카드 게시"] --> B["주문자: 상품 카드 확인"]
-    B --> C["주문자: 공동 주문 집단 개설 신청"]
-    C --> D{"HS chapter 01~24인가"}
-    D -->|예| E["먹거리 공동구매 우선 후보"]
-    D -->|아니오| X["일반 공동구매 후보"]
-    E --> F["운영자: 주문자 집단 범위와 신청 내용 승인"]
-    F --> G["공동 주문 집단 생성"]
-    G --> H["다른 주문자 구매 의향 참여"]
+    A["운영자/화주: HS 식품 재료 카드 게시"] --> B["주문자: 재료 카드 확인"]
+    B --> C["주문자: 이 재료로 집단화 클릭"]
+    C --> D{"같은 상품·배송권·온도·물류 집단이 있는가"}
+    D -->|예| E["기존 비구속 집단에 합류"]
+    D -->|아니오| X["새 집단 후보"]
+    E --> F["카드에 집단화 결과 표시"]
+    X --> F
+    F --> G["비구속 수요 모집"]
+    G --> H["다른 주문자의 카드 참여"]
     H --> I{"목표 수요율 충족"}
     I -->|아니오| J["커뮤니티 모집 유지"]
     I -->|예| K["콜드체인/수입식품 검토"]
@@ -44,17 +45,17 @@ flowchart TD
     M --> O["통관/입고/집단 내 분류 계획"]
 ```
 
-## 상품 카드 기반 개설 신청
+## 재료 카드 집단화
 
-초기 화면은 주문자에게 복잡한 수입 견적 화면을 먼저 보여주지 않는다. 대신 HS 코드로 식품 후보가 확인된 상품 카드를 보여주고, 주문자가 “이 상품으로 우리 지역 공동 주문 집단을 열고 싶다”는 신청을 하게 한다.
+초기 화면은 복잡한 견적이나 긴 신청서를 먼저 보여주지 않는다. 재료 카드의 집단화 버튼을 누르면 배송권과 카드 조건으로 기존 집단 합류 또는 새 집단 시작을 판단한다. 이 클릭은 비구속 수요 동의이며 결제나 주문 동의가 아니다.
 
 | 단계 | 상태 | 설명 |
 | --- | --- | --- |
-| 상품 카드 노출 | `HS먹거리공동구매상품카드` | 상품명, HS 코드, 식품명, 온도 조건, 예상 물류 방식, 목표 수량, 예상 단가 표시 |
-| 개설 신청 | `주문자집단개설신청초안` | 주문자, 상품 카드, 주문자 집단 범위, 구매 의향 수량, 희망 단가, 비구속 동의 저장 |
-| 운영 승인 대기 | `PendingApproval` | 운영자가 HS 식품 코드, 지역 범위, 냉장/냉동, 수입식품 검토 필요성을 확인 |
-| 집단 생성 | `ApprovedGroupReady` | 승인되면 같은 주문자 집단 범위 안의 다른 주문자가 참여 가능 |
-| 참여 모집 | `DemandChecking` | 참여자의 구매 의향을 수집하고 목표 수요율을 확인 |
+| 재료 카드 노출 | `HS먹거리공동구매상품카드` | 상품명, HS 코드, 온도, 물류 방식, 목표 수량과 내 기본 참여 수량 표시 |
+| 카드 참여 클릭 | `공동구매자동수요등록Command` | 사용자·상품·배송권의 해시 키로 관심 수요를 저장하고 결제는 `NotPaid` 유지 |
+| 자동 배치 | `배치미리보기응답` | 같은 상품·배송권·온도·물류 집단을 서버 정책으로 판단 |
+| 집단화 결과 | `자동집단사용자응답` | 기존 집단 합류 또는 새 집단 시작을 표시 |
+| 참여 모집 | `CollectingDemand` | 카드에서 현황 확인과 본인 수요 철회 |
 
 ## 마일스톤 지급
 
@@ -116,7 +117,7 @@ DTO 속성에는 `IsmsPProtectedDataAttribute`를 붙여 어떤 값이 ISMS-P �
 - ISMS-P 보호 어트리뷰트: `Ssalddel.Contracts/Common/Privacy/IsmsPProtectedDataAttribute.cs`
 - 개인정보 필드 보호 카탈로그: `Ssalddel.Contracts/Common/Privacy/PersonalDataFieldProtectionCatalog.cs`
 - 공통 서명 입력 UI: `Ssalddel.Ui.Common/Areas/App/Components/Contracts/SsalddelSignatureGate.razor`, `SsalddelSignaturePad.razor`
-- 주문자 앱 화면: `OrdererApp/Components/Pages/GroupPurchaseIntent.razor`
+- 주문자 앱 화면: `OrdererApp/Components/Pages/GroupPurchaseHome.razor`, `GroupPurchaseProducts.razor`, `GroupPurchaseProductDetail.razor`, `GroupPurchaseDemandCreate.razor`
 - HS 식품 분류 기준: `Ssalddel.Domain/HS코드s/HS코드BusinessCategoryClassifier.cs`
 - 수입식품 조회 모듈: `Ssalddel/Services/External/Mfds/*`
 - 주문자 집단 범위 후보: `Ssalddel/Services/External/PublicData/주문자집단배송권조회Service.cs`

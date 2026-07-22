@@ -8,9 +8,9 @@ namespace Ssalddel.Controllers.Orderer;
 
 [ApiController]
 [Authorize]
-[SsalddelApiVersion(SsalddelProductVersion.V0_0)]
-[SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
-[SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+[SsalddelApiWorkflow(SsalddelWorkflow.DomesticTransport)]
+[SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.CoreLogistics)]
 [Route("api/v1/orderer/domestic-group-purchases/{campaignId:guid}/vehicle-recommendations")]
 public sealed class DomesticGroupPurchaseVehicleRecommendationsController : ControllerBase
 {

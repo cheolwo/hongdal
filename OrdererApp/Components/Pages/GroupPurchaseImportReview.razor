@@ -1,0 +1,39 @@
+@page "/group-purchase/import-review/{ProductId}"
+@using Ssalddel.Contracts.Common.Orderer
+@inject GroupPurchaseCatalogViewModel Catalog
+
+<PageTitle>공동구매 수입 검토 참고</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.ImportReview"
+                              Eyebrow="GROUP PURCHASE · 1.5 PREVIEW"
+                              Title="수입 단가·도착원가 참고"
+                              Description="상품 한 건의 수입 참고 신호와 Simulation 원가만 조회합니다."
+                              BackHref="@BackHref"
+                              BoundarySeverity="Severity.Warning"
+                              BoundaryMessage="이 화면은 1.5 준비 자산입니다. 표시값은 견적·계약·수입 신고·결제 또는 운송 요청을 만들지 않습니다.">
+        @if (!_productFound)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                요청한 공동구매 상품을 찾지 못했습니다.
+            </MudAlert>
+        }
+        else
+        {
+            <GroupPurchaseProductAnalysisPanel Product="Catalog.SelectedProduct"
+                                               QuantityKg="Catalog.DesiredQuantityKg" />
+        }
+    </GroupPurchaseScreenFrame>
+</MudContainer>
+
+@code {
+    [Parameter] public string ProductId { get; set; } = string.Empty;
+
+    private bool _productFound;
+    private string BackHref => _productFound
+        ? GroupPurchasePageRoutes.ProductDetailFor(Catalog.SelectedProduct.상품카드Id)
+        : GroupPurchasePageRoutes.ProductsRoot;
+
+    protected override void OnParametersSet()
+        => _productFound = Catalog.TrySelectProduct(ProductId);
+}

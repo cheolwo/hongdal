@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ssalddel.Controllers.Shipper;
 
-[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_5)]
 [ApiController]
 [Route("api/v1/shipper/import-food/korean-labels")]
 [Authorize(Roles = 역할명.화주)]

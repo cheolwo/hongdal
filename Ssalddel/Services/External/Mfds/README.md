@@ -9,8 +9,9 @@
 | 수입식품 제품DB | typed `HttpClient` 서비스 | 내부 서비스 `I수입식품제품조회Service` | [공공데이터포털](https://www.data.go.kr/data/15073949/openapi.do) |
 | 해외제조업소 정보 | typed `HttpClient`, MediatR query, 화주 API | `GET /api/v1/shipper/import-food/oversea-manufacturers` | [공공데이터포털](https://www.data.go.kr/data/15073967/openapi.do) |
 | 제품별 한글표시사항 | typed `HttpClient`, MediatR query, 화주 API | `GET /api/v1/shipper/import-food/korean-labels` | [공공데이터포털](https://www.data.go.kr/data/15110214/openapi.do) |
+| 식품 품목제조보고 원재료 | typed `HttpClient`, 재료-업체 근거 변환 | `GET /api/v1/agricultural-fisheries/food-ingredients/companies` | [식품안전나라 C002](https://www.foodsafetykorea.go.kr/api/openApiInfo.do?menu_grp=MENU_GRP31&menu_no=661&show_cnt=10&start_idx=1&svc_no=C002) |
 
-화면 컴포넌트는 연결하지 않았다. 공개 API 계약과 활용 주의사항은 `PublicDataApiMetadataCatalog`의 `ImportedFood` 도메인에서도 조회할 수 있다.
+재료-기업 조사 화면은 공개 음식·재료 여정에 연결했다. 기존 화주 전용 수입식품 조회 화면은 별도로 연결하지 않았으며, 공개 API 계약과 활용 주의사항은 `PublicDataApiMetadataCatalog`의 `ImportedFood` 도메인에서도 조회할 수 있다.
 
 ## 설정
 
@@ -19,7 +20,13 @@
 ```json
 {
   "PublicData": {
-    "DataGoKrServiceKey": "YOUR_DATA_GO_KR_SERVICE_KEY"
+    "DataGoKrServiceKey": "YOUR_DATA_GO_KR_SERVICE_KEY",
+    "MfdsIngredientCompanies": {
+      "ApiKey": "FOODSAFETYKOREA_API_KEY",
+      "ServiceId": "C002",
+      "PageSize": 100,
+      "MaxForeignFacilityLookups": 5
+    }
   },
   "해외제조업소조회": {
     "ServiceKey": ""
@@ -32,6 +39,22 @@
   }
 }
 ```
+
+`MfdsIngredientCompanies:ApiKey`가 비어 있으면 같은 식품안전나라 키를 사용하는 `MfdsCookRecipe:ApiKey`를 재사용한다. 수입업체·해외 제조업소 관계는 공공데이터포털 서비스키가 설정된 경우에만 조회한다. 키가 없거나 원천이 일시 중단되면 공개 화면은 확인된 다른 원천의 결과를 유지하고 해당 원천을 `연동 준비 필요` 또는 `일시 조회 실패`로 표시한다.
+
+식품안전나라 키를 재사용할 때도 `C002` 서비스의 데이터활용 권한을 별도로 확인한다. 원천이 HTTP 200과 함께 HTML 오류 페이지를 반환하면 JSON 파싱 오류로 방치하지 않고 콘텐츠 유형, 서비스 권한, 호출 제한 점검 안내를 조사 이력에 기록하며 기업 근거는 생성하지 않는다.
+
+## 재료-기업 조사 계약
+
+공개 재료 화면은 사용자가 `관련 기업 조사`를 눌렀을 때만 외부 원천을 조회한다. 조회 결과는 농수산 전용 DB에 제품 근거 단위로 저장되고, 예약 배치는 별도 설정을 켠 경우에만 전체 재료 색인을 순차 조사한다.
+
+1. 식품안전나라 `C002`에서 원재료명으로 품목제조보고를 찾아 국내 제조업소명, 인허가번호, 제품명과 품목유형을 근거 후보로 변환한다.
+2. 수입식품 한글표시사항에서 같은 원재료가 기재된 제품의 국내 수입업체명과 해외 제조업소명을 별도 역할로 변환한다.
+3. 해외 제조업소명과 국가가 정확히 일치하는 경우에만 해외 제조업소 코드를 보조 연결하고 취소·중단 주의 상태를 함께 표시한다.
+4. 대표자명, 전화번호, 상세 주소와 같은 개인 또는 직접 연락 정보는 공개 응답에서 제외한다.
+5. 후보는 공급능력·재고·판매 의사·계약 권한을 보증하지 않으며 자동 추천, 자동 초대, 자동 업체 선정에 사용하지 않는다.
+
+저장 모델은 조사 실행, 재료별 프로필, 원천별 관찰 이력과 제품 근거를 분리한다. 원천 조회가 실패한 실행은 이전 근거를 삭제하지 않으며, 직접 근거 원천이 정상 응답한 경우에만 해당 원천에서 사라진 제품 근거를 비활성화한다. 업체 묶음 키는 이름·국가·역할의 정규화 결과일 뿐 법인 동일성 확정값이 아니다.
 
 각 서비스는 XML과 JSON 응답을 모두 지원한다. 기본 제한시간은 20초이며 `TimeoutSeconds`로 조정한다.
 

@@ -9,9 +9,9 @@ namespace Ssalddel.Controllers.Orderer;
 
 [ApiController]
 [Authorize]
-[SsalddelApiVersion(SsalddelProductVersion.V0_0)]
-[SsalddelApiWorkflow(SsalddelWorkflow.CommunityTrust)]
-[SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.Community)]
+[SsalddelApiVersion(SsalddelProductVersion.V1_0)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
+[SsalddelApiGrowthTrack(SsalddelApiGrowthTrack.OrdererGroupCommerce)]
 [Route("api/v1/orderer/domestic-group-purchases/{campaignId:guid}/negotiation")]
 public sealed class DomesticGroupPurchaseNegotiationsController : ControllerBase
 {

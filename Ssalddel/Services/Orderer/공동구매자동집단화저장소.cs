@@ -1,4 +1,6 @@
 using Ssalddel.Contracts.Common.Orderer;
+using Ssalddel.Contracts.Common.Metadata;
+using Ssalddel.Contracts.Common.Versioning;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -36,10 +38,21 @@ public interface I공동구매자동집단화저장소
         CancellationToken cancellationToken = default);
 }
 
-public sealed class Mongo공동구매자동집단화저장소 : I공동구매자동집단화저장소
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeLayer.Infrastructure,
+    "공동구매 모집 상태전이, OS 큐, 점검 시각과 사람 승인 인계를 Mongo 원장에 원자적으로 기록합니다.",
+    ContractType = typeof(I공동구매수요모집Os상태전이Port),
+    FlowOrder = 40,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    Boundary = "낙관적 동시성과 멱등 키를 검증하며 승인 상태만 기록하고 1.5 원장이나 외부 실행은 생성하지 않습니다.")]
+public sealed class Mongo공동구매자동집단화저장소 :
+    I공동구매자동집단화저장소,
+    I공동구매수요모집Os상태전이Port
 {
     private const string 컬렉션명 = "orderer_group_purchase_auto_groups";
     private const int 최대동시성재시도횟수 = 8;
+    private static readonly DateTime Os점검없음Utc = new(9999, 12, 31, 23, 59, 59, DateTimeKind.Utc);
     private readonly IMongoCollection<공동구매자동집단문서> _컬렉션;
     private readonly I공동구매주문자집단화Engine _집단화Engine;
     private readonly SemaphoreSlim _인덱스Lock = new(1, 1);
@@ -406,6 +419,277 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         return document is null ? null : 응답으로(document);
     }
 
+    public async Task<공동구매수요모집Os조율응답> 운영조율Async(
+        string 자동집단Id,
+        string 트리거코드,
+        string 조율멱등키,
+        IReadOnlyList<string> 정책코드목록,
+        DateTime 기준시각Utc,
+        TimeSpan 장기모집점검주기,
+        string 실행모드,
+        bool 후속워크플로우활성여부,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(트리거코드);
+        ArgumentNullException.ThrowIfNull(정책코드목록);
+        await 인덱스준비Async(cancellationToken);
+
+        var now = Utc시각(기준시각Utc);
+        var 정규화조율키 = 정규화(조율멱등키, string.Empty, 240);
+        var 상태변경 = false;
+        var 큐변경 = false;
+        var 문서 = await 집단저장Async(
+            자동집단Id.Trim(),
+            생성허용: false,
+            기존문서 =>
+            {
+                var 변경문서 = 기존문서
+                    ?? throw new InvalidOperationException("조율할 공동구매 자동집단을 찾을 수 없습니다.");
+                if (!string.IsNullOrWhiteSpace(정규화조율키)
+                    && 변경문서.최근Os조율멱등키목록.Contains(정규화조율키, StringComparer.Ordinal))
+                {
+                    상태변경 = false;
+                    큐변경 = false;
+                    return 집단저장계획.보존(변경문서);
+                }
+
+                var 이전상태 = 변경문서.현재상태;
+                var 이전큐 = 변경문서.현재Os큐;
+                재계산(변경문서, now);
+                var 현재큐 = Os큐코드(변경문서);
+                상태변경 = !string.Equals(이전상태, 변경문서.현재상태, StringComparison.Ordinal);
+                큐변경 = !string.Equals(이전큐, 현재큐, StringComparison.Ordinal);
+
+                변경문서.운영체제Id = OperatingSystemIds.GroupPurchaseDemand;
+                변경문서.Os정책버전 = "1.0";
+                변경문서.현재Os큐 = 현재큐;
+                변경문서.마지막Os트리거 = 정규화(트리거코드, 공동구매수요모집Os트리거코드.수동재조율, 100);
+                변경문서.적용Os정책코드목록 = 정책코드목록
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Select(x => 정규화(x, string.Empty, 100))
+                    .Distinct(StringComparer.Ordinal)
+                    .ToList();
+                변경문서.마지막Os조율시각Utc = now;
+                변경문서.다음Os운영점검시각Utc = 다음운영점검시각(
+                    변경문서,
+                    now,
+                    장기모집점검주기);
+                변경문서.실행모드 = 정규화(실행모드, "Simulation", 40);
+                변경문서.후속워크플로우활성여부 = 후속워크플로우활성여부;
+                if (변경문서.인계상태 != 공동구매수요모집인계상태코드.승인후속대기)
+                {
+                    변경문서.인계상태 = 변경문서.현재상태 is 공동구매자동집단상태코드.확정대기
+                        or 공동구매자동집단상태코드.확정
+                        ? 공동구매수요모집인계상태코드.승인대기
+                        : 공동구매수요모집인계상태코드.미요청;
+                }
+
+                if (!string.IsNullOrWhiteSpace(정규화조율키))
+                {
+                    변경문서.최근Os조율멱등키목록.Add(정규화조율키);
+                    if (변경문서.최근Os조율멱등키목록.Count > 64)
+                    {
+                        변경문서.최근Os조율멱등키목록.RemoveRange(
+                            0,
+                            변경문서.최근Os조율멱등키목록.Count - 64);
+                    }
+                }
+
+                변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
+                {
+                    이벤트유형 = "GroupPurchaseDemandOsCoordinated",
+                    요약 = $"{OperatingSystemIds.GroupPurchaseDemand}가 {변경문서.마지막Os트리거} 트리거를 처리해 {현재큐} 큐로 조율했습니다.",
+                    발생시각Utc = now
+                });
+                변경문서.수정시각Utc = now;
+                return 집단저장계획.변경(변경문서);
+            },
+            cancellationToken);
+
+        return new 공동구매수요모집Os조율응답
+        {
+            집단 = 응답으로(문서),
+            운영상태 = Os상태응답으로(문서),
+            집단상태변경여부 = 상태변경,
+            운영큐변경여부 = 큐변경
+        };
+    }
+
+    public async Task<IReadOnlyList<string>> 운영점검대상조회Async(
+        DateTime 기준시각Utc,
+        int 최대건수,
+        CancellationToken cancellationToken)
+    {
+        await 인덱스준비Async(cancellationToken);
+        var now = Utc시각(기준시각Utc);
+        var builder = Builders<공동구매자동집단문서>.Filter;
+        var 진행상태 = builder.In(
+            x => x.현재상태,
+            [공동구매자동집단상태코드.수요수집중, 공동구매자동집단상태코드.확정대기]);
+        var 점검시각도래 = builder.Lte(x => x.다음Os운영점검시각Utc, now)
+            | builder.Exists(x => x.다음Os운영점검시각Utc, false);
+
+        return await _컬렉션
+            .Find(진행상태 & 점검시각도래)
+            .SortBy(x => x.모집종료시각Utc)
+            .ThenBy(x => x.생성시각Utc)
+            .Limit(Math.Clamp(최대건수, 1, 1000))
+            .Project(x => x.자동집단Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<공동구매수요모집Os상태응답?> 운영상태조회Async(
+        string 자동집단Id,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
+        await 인덱스준비Async(cancellationToken);
+        var 문서 = await _컬렉션
+            .Find(x => x.자동집단Id == 자동집단Id.Trim())
+            .FirstOrDefaultAsync(cancellationToken);
+        return 문서 is null ? null : Os상태응답으로(문서);
+    }
+
+    public async Task<공동구매수요모집인계승인응답> 인계승인Async(
+        string 자동집단Id,
+        공동구매수요모집인계승인요청 요청,
+        string 승인자키,
+        DateTime 승인시각Utc,
+        string 실행모드,
+        bool 후속워크플로우활성여부,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
+        ArgumentNullException.ThrowIfNull(요청);
+        ArgumentException.ThrowIfNullOrWhiteSpace(승인자키);
+        await 인덱스준비Async(cancellationToken);
+
+        var now = Utc시각(승인시각Utc);
+        var 요청멱등키 = 정규화(요청.요청멱등키, string.Empty, 160);
+        var 이미처리됨 = false;
+        var 문서 = await 집단저장Async(
+            자동집단Id.Trim(),
+            생성허용: false,
+            기존문서 =>
+            {
+                var 변경문서 = 기존문서
+                    ?? throw new InvalidOperationException("인계 승인할 공동구매 자동집단을 찾을 수 없습니다.");
+                if (변경문서.인계상태 == 공동구매수요모집인계상태코드.승인후속대기
+                    && !string.IsNullOrWhiteSpace(변경문서.인계요청Id))
+                {
+                    이미처리됨 = true;
+                    return 집단저장계획.보존(변경문서);
+                }
+
+                재계산(변경문서, now);
+                if (변경문서.현재상태 is not 공동구매자동집단상태코드.확정대기
+                    and not 공동구매자동집단상태코드.확정)
+                {
+                    throw new InvalidOperationException("모집 목표를 충족해 확정 검토 큐에 들어온 집단만 1.5 준비 단계로 인계 승인할 수 있습니다.");
+                }
+
+                변경문서.현재상태 = 공동구매자동집단상태코드.확정;
+                변경문서.운영체제Id = OperatingSystemIds.GroupPurchaseDemand;
+                변경문서.Os정책버전 = "1.0";
+                변경문서.현재Os큐 = 공동구매수요모집Os큐코드.인계준비;
+                변경문서.마지막Os트리거 = 공동구매수요모집Os트리거코드.인계승인;
+                변경문서.마지막Os조율시각Utc = now;
+                변경문서.다음Os운영점검시각Utc = Os점검없음Utc;
+                변경문서.인계상태 = 공동구매수요모집인계상태코드.승인후속대기;
+                변경문서.인계요청Id = ObjectId.GenerateNewId().ToString();
+                변경문서.인계승인멱등키 = 요청멱등키;
+                변경문서.대상운영체제Id = OperatingSystemIds.GroupPurchaseImport;
+                변경문서.대상워크플로우코드 = "GroupPurchaseImport";
+                변경문서.승인자키 = 정규화(승인자키, "admin", 160);
+                변경문서.승인시각Utc = now;
+                변경문서.승인사유 = 정규화(요청.승인사유, string.Empty, 1000);
+                변경문서.실행모드 = 정규화(실행모드, "Simulation", 40);
+                변경문서.후속워크플로우활성여부 = 후속워크플로우활성여부;
+                변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
+                {
+                    이벤트유형 = "GroupPurchaseDemandHandoffApproved",
+                    요약 = "운영자가 모집 결과를 확인하고 공동주문 수입 준비 단계로의 인계를 승인했습니다. 후속 원장은 별도 UseCase가 생성합니다.",
+                    발생시각Utc = now
+                });
+                변경문서.수정시각Utc = now;
+                return 집단저장계획.변경(변경문서);
+            },
+            cancellationToken);
+
+        return new 공동구매수요모집인계승인응답
+        {
+            요청멱등키 = 요청멱등키,
+            이미처리됨 = 이미처리됨,
+            집단 = 응답으로(문서),
+            운영상태 = Os상태응답으로(문서),
+            안내 = 이미처리됨
+                ? "이미 인계 승인된 모집 결과입니다. 중복 후속 실행은 만들지 않았습니다."
+                : 후속워크플로우활성여부
+                    ? "인계 승인을 원장에 기록했습니다. 1.5 준비 원장은 별도 승인된 UseCase가 생성해야 합니다."
+                    : "인계 승인을 원장에 기록했습니다. 1.5 기능 플래그가 꺼져 있어 후속 원장은 생성하지 않았습니다."
+        };
+    }
+
+    public async Task<공동구매수요모집Os상태응답> 후속원장연결Async(
+        string 자동집단Id,
+        string 인계요청Id,
+        string 대상원장Id,
+        DateTime 연결시각Utc,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(인계요청Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(대상원장Id);
+        await 인덱스준비Async(cancellationToken);
+
+        var now = Utc시각(연결시각Utc);
+        var normalizedHandoffId = 인계요청Id.Trim();
+        var normalizedLedgerId = 대상원장Id.Trim();
+        var 문서 = await 집단저장Async(
+            자동집단Id.Trim(),
+            생성허용: false,
+            기존문서 =>
+            {
+                var 변경문서 = 기존문서
+                    ?? throw new InvalidOperationException("후속 원장을 연결할 공동구매 자동집단을 찾을 수 없습니다.");
+                if (!string.Equals(
+                        변경문서.인계상태,
+                        공동구매수요모집인계상태코드.승인후속대기,
+                        StringComparison.Ordinal)
+                    || !string.Equals(변경문서.인계요청Id, normalizedHandoffId, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("승인된 1.0 인계 요청과 일치하는 1.5 원장만 연결할 수 있습니다.");
+                }
+
+                if (string.Equals(변경문서.대상원장Id, normalizedLedgerId, StringComparison.Ordinal))
+                {
+                    return 집단저장계획.보존(변경문서);
+                }
+                if (!string.IsNullOrWhiteSpace(변경문서.대상원장Id))
+                {
+                    throw new InvalidOperationException("이 인계 요청에는 이미 다른 1.5 대상 원장이 연결되어 있습니다.");
+                }
+
+                변경문서.대상운영체제Id = OperatingSystemIds.GroupPurchaseImport;
+                변경문서.대상워크플로우코드 = "GroupPurchaseImport";
+                변경문서.대상원장Id = normalizedLedgerId;
+                변경문서.마지막Os트리거 = 공동구매수요모집Os트리거코드.후속원장연결;
+                변경문서.마지막Os조율시각Utc = now;
+                변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
+                {
+                    이벤트유형 = "GroupPurchaseImportReadinessLedgerLinked",
+                    요약 = "승인된 수요 인계 요청에 1.5 공급·가격·무역 준비 원장을 연결했습니다. 계약·결제·신고·운송 실행은 열지 않았습니다.",
+                    발생시각Utc = now
+                });
+                변경문서.수정시각Utc = now;
+                return 집단저장계획.변경(변경문서);
+            },
+            cancellationToken);
+
+        return Os상태응답으로(문서);
+    }
+
     public async Task<공동구매자동집단응답> 개별주문원장연결Async(
         string 자동집단Id,
         string 수요Id,
@@ -730,7 +1014,12 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
                         .Descending(x => x.수정시각Utc)),
                 new CreateIndexModel<공동구매자동집단문서>(
                     Builders<공동구매자동집단문서>.IndexKeys
-                        .Ascending("수요목록.수요출처키"))
+                        .Ascending("수요목록.수요출처키")),
+                new CreateIndexModel<공동구매자동집단문서>(
+                    Builders<공동구매자동집단문서>.IndexKeys
+                        .Ascending(x => x.현재상태)
+                        .Ascending(x => x.다음Os운영점검시각Utc)
+                        .Ascending(x => x.모집종료시각Utc))
             };
 
             await _컬렉션.Indexes.CreateManyAsync(indexes, cancellationToken);
@@ -880,6 +1169,93 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             수요목록 = 수요목록,
             이벤트목록 = 문서.이벤트목록.OrderByDescending(x => x.발생시각Utc).Take(20).Select(응답으로).ToArray()
         };
+    }
+
+    private static 공동구매수요모집Os상태응답 Os상태응답으로(공동구매자동집단문서 문서)
+    {
+        var 실행모드 = string.IsNullOrWhiteSpace(문서.실행모드)
+            ? "Simulation"
+            : 문서.실행모드;
+        var 인계상태 = string.IsNullOrWhiteSpace(문서.인계상태)
+            ? 문서.현재상태 switch
+            {
+                공동구매자동집단상태코드.확정 => string.IsNullOrWhiteSpace(문서.인계요청Id)
+                    ? 공동구매수요모집인계상태코드.승인대기
+                    : 공동구매수요모집인계상태코드.승인후속대기,
+                공동구매자동집단상태코드.확정대기 => 공동구매수요모집인계상태코드.승인대기,
+                _ => 공동구매수요모집인계상태코드.미요청
+            }
+            : 문서.인계상태;
+
+        return new 공동구매수요모집Os상태응답
+        {
+            운영체제Id = string.IsNullOrWhiteSpace(문서.운영체제Id)
+                ? OperatingSystemIds.GroupPurchaseDemand
+                : 문서.운영체제Id,
+            정책버전 = string.IsNullOrWhiteSpace(문서.Os정책버전) ? "1.0" : 문서.Os정책버전,
+            자동집단Id = 문서.자동집단Id,
+            집단상태 = 문서.현재상태,
+            현재큐 = string.IsNullOrWhiteSpace(문서.현재Os큐)
+                ? Os큐코드(문서)
+                : 문서.현재Os큐,
+            마지막트리거 = 문서.마지막Os트리거,
+            적용정책코드목록 = 문서.적용Os정책코드목록.ToArray(),
+            마지막조율시각Utc = 문서.마지막Os조율시각Utc == default
+                ? null
+                : 문서.마지막Os조율시각Utc,
+            다음운영점검시각Utc = 문서.다음Os운영점검시각Utc == default
+                || 문서.다음Os운영점검시각Utc >= Os점검없음Utc
+                    ? null
+                    : 문서.다음Os운영점검시각Utc,
+            인계상태 = 인계상태,
+            인계요청Id = 문서.인계요청Id,
+            대상운영체제Id = string.IsNullOrWhiteSpace(문서.대상운영체제Id)
+                ? OperatingSystemIds.GroupPurchaseImport
+                : 문서.대상운영체제Id,
+            대상워크플로우코드 = string.IsNullOrWhiteSpace(문서.대상워크플로우코드)
+                ? "GroupPurchaseImport"
+                : 문서.대상워크플로우코드,
+            대상원장Id = 문서.대상원장Id,
+            승인자키 = 문서.승인자키,
+            승인시각Utc = 문서.승인시각Utc,
+            승인사유 = 문서.승인사유,
+            실행모드 = 실행모드,
+            시뮬레이션여부 = string.Equals(실행모드, "Simulation", StringComparison.OrdinalIgnoreCase),
+            후속워크플로우활성여부 = 문서.후속워크플로우활성여부
+        };
+    }
+
+    private static string Os큐코드(공동구매자동집단문서 문서)
+        => 문서.현재상태 switch
+        {
+            공동구매자동집단상태코드.확정대기 => 공동구매수요모집Os큐코드.확정검토,
+            공동구매자동집단상태코드.모집종료목표미달 => 공동구매수요모집Os큐코드.모집종료,
+            공동구매자동집단상태코드.확정 =>
+                문서.인계상태 == 공동구매수요모집인계상태코드.승인후속대기
+                && !string.IsNullOrWhiteSpace(문서.인계요청Id)
+                    ? 공동구매수요모집Os큐코드.인계준비
+                    : 공동구매수요모집Os큐코드.확정검토,
+            _ => 공동구매수요모집Os큐코드.모집중
+        };
+
+    private static DateTime 다음운영점검시각(
+        공동구매자동집단문서 문서,
+        DateTime 기준시각Utc,
+        TimeSpan 장기모집점검주기)
+    {
+        if (문서.현재상태 != 공동구매자동집단상태코드.수요수집중)
+        {
+            return Os점검없음Utc;
+        }
+
+        var 점검주기 = 장기모집점검주기 < TimeSpan.FromHours(1)
+            ? TimeSpan.FromHours(1)
+            : 장기모집점검주기;
+        var 장기모집점검시각Utc = 기준시각Utc.Add(점검주기);
+        var 모집마감시각Utc = 모집종료시각(문서, 기준시각Utc);
+        return 모집마감시각Utc <= 장기모집점검시각Utc
+            ? 모집마감시각Utc
+            : 장기모집점검시각Utc;
     }
 
     private static 공동구매자동수요응답 응답으로(공동구매자동수요문서 문서, string 자동집단Id)
@@ -1236,6 +1612,25 @@ public sealed class 공동구매자동집단문서
     public int? 목표참여자수 { get; set; }
     public decimal? 목표수량 { get; set; }
     public DateTime 모집종료시각Utc { get; set; }
+    public string 운영체제Id { get; set; } = string.Empty;
+    public string Os정책버전 { get; set; } = string.Empty;
+    public string 현재Os큐 { get; set; } = string.Empty;
+    public string 마지막Os트리거 { get; set; } = string.Empty;
+    public List<string> 적용Os정책코드목록 { get; set; } = [];
+    public DateTime 마지막Os조율시각Utc { get; set; }
+    public DateTime 다음Os운영점검시각Utc { get; set; }
+    public List<string> 최근Os조율멱등키목록 { get; set; } = [];
+    public string 인계상태 { get; set; } = string.Empty;
+    public string 인계요청Id { get; set; } = string.Empty;
+    public string 인계승인멱등키 { get; set; } = string.Empty;
+    public string 대상운영체제Id { get; set; } = string.Empty;
+    public string 대상워크플로우코드 { get; set; } = string.Empty;
+    public string 대상원장Id { get; set; } = string.Empty;
+    public string 승인자키 { get; set; } = string.Empty;
+    public DateTime? 승인시각Utc { get; set; }
+    public string 승인사유 { get; set; } = string.Empty;
+    public string 실행모드 { get; set; } = string.Empty;
+    public bool 후속워크플로우활성여부 { get; set; }
     public List<공동구매자동수요문서> 수요목록 { get; set; } = [];
     public List<공동구매자동집단이벤트문서> 이벤트목록 { get; set; } = [];
     public DateTime 생성시각Utc { get; set; }

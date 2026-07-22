@@ -1,18 +1,21 @@
 @using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
 
 <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
     <MudStack Spacing="3">
         <MudStack Spacing="0">
-            <MudText Typo="Typo.h6">HS 먹거리 상품 카드</MudText>
+            <MudText Typo="Typo.h6">집단화할 재료 카드</MudText>
             <MudText Typo="Typo.body2" Color="Color.Secondary">
-                먼저 먹거리 수요가 모이기 쉬운 상품부터 공동주문 후보로 노출합니다.
+                재료를 훑다가 버튼을 누르면 내 배송권·권장 수량 기준으로 자동집단을 찾고 비구속 수요를 저장합니다.
             </MudText>
         </MudStack>
 
         @foreach (var product in Products)
         {
             var plan = PlanProduct(product);
-            <MudPaper Elevation="0" Outlined="true" Class="@ProductCardClass(product)">
+            var groupingState = ResolveGroupingState(product.상품카드Id);
+            var suggestedQuantity = ResolveSuggestedQuantity(product);
+            <MudPaper Elevation="0" Outlined="true" Class="@ProductCardClass(product, groupingState)">
                 <MudStack Spacing="2">
                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
                         <MudStack Spacing="0">
@@ -28,17 +31,65 @@
                         <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@GroupPurchasePresentation.TemperatureLabel(product.온도코드)</MudChip>
                         <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@product.예상물류방식</MudChip>
                         <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{product.SuggestedTargetQuantityKg:N0}kg 목표")</MudChip>
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="Color.Info">@($"내 참여 {suggestedQuantity:N0}kg")</MudChip>
                     </MudStack>
 
                     <MudText Typo="Typo.body2">@plan.요약</MudText>
 
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               Size="Size.Small"
-                               StartIcon="@Icons.Material.Filled.Groups"
-                               OnClick="@(() => ProductSelected.InvokeAsync(product.상품카드Id))">
-                        이 상품으로 집단 개설 신청
-                    </MudButton>
+                    <MudGrid Spacing="1">
+                        <MudItem xs="12" sm="7">
+                            <MudButton Variant="Variant.Filled"
+                                       Color="@(groupingState?.HasActiveDemand == true ? Color.Success : Color.Primary)"
+                                       Size="Size.Small"
+                                       StartIcon="@(groupingState?.HasActiveDemand == true ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Groups)"
+                                       FullWidth="true"
+                                       Disabled="@(!CanAutoGroup || groupingState?.IsBusy == true || groupingState?.HasActiveDemand == true)"
+                                       OnClick="@(() => GroupRequested.InvokeAsync(product))">
+                                @GroupActionLabel(groupingState)
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="12" sm="5">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Info"
+                                       FullWidth="true"
+                                       OnClick="@(() => ProductSelected.InvokeAsync(product.상품카드Id))">
+                                @ActionLabel
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+
+                    @if (!string.IsNullOrWhiteSpace(groupingState?.ErrorMessage))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">
+                            @groupingState.ErrorMessage
+                        </MudAlert>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(groupingState?.Notice))
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">
+                            @groupingState.Notice
+                        </MudAlert>
+                    }
+
+                    @if (groupingState?.RegisteredGroup is { } group)
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="1" Wrap="Wrap.Wrap">
+                            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                                <MudChip T="string" Size="Size.Small" Color="Color.Success">@PlacementLabel(groupingState)</MudChip>
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{group.참여자수:N0}명 참여")</MudChip>
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@($"{group.총희망수량:N0}{group.수량단위}")</MudChip>
+                            </MudStack>
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Warning"
+                                       Size="Size.Small"
+                                       Disabled="@groupingState.IsBusy"
+                                       OnClick="@(() => GroupWithdrawRequested.InvokeAsync(product))">
+                                참여 철회
+                            </MudButton>
+                        </MudStack>
+                    }
                 </MudStack>
             </MudPaper>
         }
@@ -55,6 +106,24 @@
     [Parameter]
     public EventCallback<string> ProductSelected { get; set; }
 
+    [Parameter]
+    public EventCallback<HS먹거리공동구매상품카드> GroupRequested { get; set; }
+
+    [Parameter]
+    public EventCallback<HS먹거리공동구매상품카드> GroupWithdrawRequested { get; set; }
+
+    [Parameter]
+    public Func<string, OrdererIngredientCardGroupingState>? GroupingStateResolver { get; set; }
+
+    [Parameter]
+    public Func<HS먹거리공동구매상품카드, decimal>? SuggestedQuantityResolver { get; set; }
+
+    [Parameter]
+    public bool CanAutoGroup { get; set; }
+
+    [Parameter]
+    public string ActionLabel { get; set; } = "상품 근거 보기";
+
     private 냉장냉동먹거리공동구매계획 PlanProduct(HS먹거리공동구매상품카드 product)
         => 냉장냉동먹거리공동구매계획기.계획(new 냉장냉동먹거리공동구매초안(
             상품명: product.상품명,
@@ -69,8 +138,32 @@
             RequiresMfdsManufacturerReview: product.RequiresMfdsManufacturerReview,
             RequiresColdStorage: product.온도코드 is 공동구매온도코드.냉동 or 공동구매온도코드.냉장));
 
-    private string ProductCardClass(HS먹거리공동구매상품카드 product)
-        => product.상품카드Id == SelectedProductId
-            ? "pa-3 product-card product-card--selected"
-            : "pa-3 product-card";
+    private OrdererIngredientCardGroupingState? ResolveGroupingState(string productId)
+        => GroupingStateResolver?.Invoke(productId);
+
+    private decimal ResolveSuggestedQuantity(HS먹거리공동구매상품카드 product)
+        => SuggestedQuantityResolver?.Invoke(product) ?? 1m;
+
+    private string GroupActionLabel(OrdererIngredientCardGroupingState? state)
+        => state switch
+        {
+            { IsBusy: true } => "자동집단 찾는 중",
+            { HasActiveDemand: true } => "집단화 참여 중",
+            _ when CanAutoGroup => "이 재료로 집단화",
+            _ => "집단화 준비 필요"
+        };
+
+    private static string PlacementLabel(OrdererIngredientCardGroupingState state)
+        => state.PlacementPreview?.배치유형 == 공동구매자동집단배치유형코드.기존집단
+            ? "기존 집단 합류"
+            : "새 집단 시작";
+
+    private string ProductCardClass(
+        HS먹거리공동구매상품카드 product,
+        OrdererIngredientCardGroupingState? state)
+        => state?.HasActiveDemand == true
+            ? "pa-3 product-card product-card--grouped"
+            : product.상품카드Id == SelectedProductId
+                ? "pa-3 product-card product-card--selected"
+                : "pa-3 product-card";
 }

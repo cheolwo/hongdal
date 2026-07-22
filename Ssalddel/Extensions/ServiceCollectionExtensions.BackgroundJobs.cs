@@ -1,9 +1,11 @@
 using Quartz;
+using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Infrastructure.BackgroundJobs.AgriculturalFisheries;
 using Ssalddel.Infrastructure.BackgroundJobs.Community;
 using Ssalddel.Infrastructure.BackgroundJobs.Content;
 using Ssalddel.Infrastructure.BackgroundJobs.SalesOrders;
 using Ssalddel.Services.LogisticsProcessing.SalesOrders;
+using Ssalddel.Services.Orderer;
 using 살뜰.Infrastructure.BackgroundJobs.Customs;
 using 살뜰.Infrastructure.BackgroundJobs.DispatchQueue;
 using 살뜰.Infrastructure.BackgroundJobs.Notifications;
@@ -24,6 +26,10 @@ public static partial class ServiceCollectionExtensions
         CommunityEditorialBatchOptions communityEditorialBatchOptions,
         SsalddelExecutionOptions executionOptions)
     {
+        var 공동구매Os배치등록계획 = 공동구매수요모집Os배치등록계획.생성(
+            agriculturalFisheriesBatchOptions,
+            communityEditorialBatchOptions);
+        services.AddSingleton(공동구매Os배치등록계획);
         services.AddScoped<AgriculturalFisheriesBatchRunner>();
         services.AddScoped<OfficialFoodIngredientCompanyBatchRunner>();
         services.AddScoped<CommunityEditorialBatchRunner>();
@@ -131,12 +137,18 @@ public static partial class ServiceCollectionExtensions
 
             if (agriculturalFisheriesBatchOptions.Enabled)
             {
-                AddAgriculturalFisheriesBatchJobs(q, agriculturalFisheriesBatchOptions);
+                AddAgriculturalFisheriesBatchJobs(
+                    q,
+                    agriculturalFisheriesBatchOptions,
+                    공동구매Os배치등록계획);
             }
 
             if (communityEditorialBatchOptions.Enabled)
             {
-                AddCommunityEditorialBatchJobs(q, communityEditorialBatchOptions);
+                AddCommunityEditorialBatchJobs(
+                    q,
+                    communityEditorialBatchOptions,
+                    공동구매Os배치등록계획);
             }
         });
 
@@ -146,11 +158,13 @@ public static partial class ServiceCollectionExtensions
 
     private static void AddAgriculturalFisheriesBatchJobs(
         IServiceCollectionQuartzConfigurator quartz,
-        AgriculturalFisheriesBatchOptions options)
+        AgriculturalFisheriesBatchOptions options,
+        공동구매수요모집Os배치등록계획 등록계획)
     {
         var timeZone = AgriculturalFisheriesBatchSchedule.ResolveTimeZone(options.TimeZoneId);
 
-        if (options.KamisDailyEnabled)
+        if (등록계획.Quartz등록여부(
+                공동구매수요모집Os배치작업코드.Kamis일별가격수집))
         {
             var jobKey = new JobKey("KamisDailyPriceCollection");
             quartz.AddJob<KamisDailyPriceCollectionJob>(job => job.WithIdentity(jobKey));
@@ -164,7 +178,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.KamisMonthlyEnabled)
+        if (등록계획.Quartz등록여부(
+                공동구매수요모집Os배치작업코드.Kamis월별가격이력수집))
         {
             var jobKey = new JobKey("KamisMonthlyPriceCollection");
             quartz.AddJob<KamisMonthlyPriceCollectionJob>(job => job.WithIdentity(jobKey));
@@ -178,7 +193,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.UsdaMonthlyEnabled)
+        if (등록계획.Quartz등록여부(
+                공동구매수요모집Os배치작업코드.UsdaNass월별가격수집))
         {
             var jobKey = new JobKey("UsdaMonthlyPriceCollection");
             quartz.AddJob<UsdaMonthlyPriceCollectionJob>(job => job.WithIdentity(jobKey));
@@ -192,7 +208,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.IngredientCompanyResearchEnabled)
+        if (등록계획.Quartz등록여부(
+                공동구매수요모집Os배치작업코드.공식재료기업근거수집))
         {
             var jobKey = new JobKey("OfficialFoodIngredientCompanyResearch");
             quartz.AddJob<OfficialFoodIngredientCompanyResearchJob>(job =>
@@ -210,11 +227,13 @@ public static partial class ServiceCollectionExtensions
 
     private static void AddCommunityEditorialBatchJobs(
         IServiceCollectionQuartzConfigurator quartz,
-        CommunityEditorialBatchOptions options)
+        CommunityEditorialBatchOptions options,
+        공동구매수요모집Os배치등록계획 등록계획)
     {
         var timeZone = AgriculturalFisheriesBatchSchedule.ResolveTimeZone(options.TimeZoneId);
 
-        if (options.KamisPriceBriefEnabled)
+        if (등록계획.Quartz등록여부(
+                공동구매수요모집Os배치작업코드.Kamis가격브리프게시))
         {
             var jobKey = new JobKey("CommunityKamisPriceBrief");
             quartz.AddJob<CommunityKamisPriceBriefJob>(job => job.WithIdentity(jobKey));
@@ -228,7 +247,8 @@ public static partial class ServiceCollectionExtensions
                         .WithMisfireHandlingInstructionDoNothing()));
         }
 
-        if (options.UsdaNassPriceBriefEnabled)
+        if (등록계획.Quartz등록여부(
+                공동구매수요모집Os배치작업코드.UsdaNass가격브리프게시))
         {
             var jobKey = new JobKey("CommunityUsdaNassPriceBrief");
             quartz.AddJob<CommunityUsdaNassPriceBriefJob>(job => job.WithIdentity(jobKey));

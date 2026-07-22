@@ -7,7 +7,12 @@
 | 페이지 ID / 제목 | 라우트 | 분류 | 화면 책임 | 캡처 |
 | --- | --- | --- | --- | --- |
 | [OrdererApp-P01 - 주문자 홈](OrdererApp-P01/) | / | 보조 | 주문자 홈 | 완료 |
-| [OrdererApp-P02 - 공동구매 의사 표시/집단화](OrdererApp-P02/) | /group-purchase | 확장 | 공동구매 의사 표시/집단화 | 완료 |
+| [OrdererApp-P02 - 공동구매 개요](OrdererApp-P02/) | `/group-purchase` | 1.0 | 공동구매 화면 진입과 버전 경계 안내 | 재캡처 필요 |
+| OrdererApp-P02-1 - 재료 자동집단화 | `/group-purchase/products` | 1.0 | 카드 한 번 클릭으로 기존 집단 합류 또는 새 비구속 집단 시작 | 재캡처 필요 |
+| OrdererApp-P02-2 - 공동구매 상품 근거 상세 | `/group-purchase/products/{ProductId}` | 1.0 | 한 상품의 HS·보관·모집 근거 읽기 | 재캡처 필요 |
+| OrdererApp-P02-3 - 수요 상세 조건 | `/group-purchase/demands/new/{ProductId}` | 1.0 | 배송권·희망 수량을 직접 조정하는 보조 Action | 재캡처 필요 |
+| OrdererApp-P02-4 - 수입 원가 참고 | `/group-purchase/import-review/{ProductId}` | 1.5 준비 | 한 상품의 Simulation 원가 조회 | 재캡처 필요 |
+| OrdererApp-P02-5 - 선적 조회 | `/group-purchase/shipments` | 1.5 준비 | 문서관리번호 한 건 조회 | 재캡처 필요 |
 | [OrdererApp-P03 - 주문자 화물 주문](OrdererApp-P03/) | /cargo | 확장 | 주문자 화물 주문 | 완료 |
 | [OrdererApp-P04 - 음식 주문 홈](OrdererApp-P04/) | /food | 확장 | 음식 주문 홈 | 완료 |
 | [OrdererApp-P04-1 - 음식점 주문](OrdererApp-P04-1/) | /food/restaurants | 확장 | 음식점 주문 | 완료 |

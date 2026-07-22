@@ -3,9 +3,9 @@
 <MudLayout>
     <MudAppBar Dense="true" Elevation="1" Color="Color.Primary">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
-        <MudText Typo="Typo.h6" Class="ml-2">살뜰 주문</MudText>
+        <MudText Typo="Typo.h6" Class="ml-2 orderer-app-title">살뜰 주문</MudText>
         <MudSpacer />
-        <MudChip T="string" Color="Color.Success" Variant="Variant.Filled">음식 / 홈달마트 / 화물 / 공동구매</MudChip>
+        <MudChip T="string" Color="Color.Success" Variant="Variant.Filled" Class="orderer-app-scope">음식 / 홈달마트 / 화물 / 공동구매</MudChip>
     </MudAppBar>
 
     <MudDrawer Open="@drawerOpen" Variant="DrawerVariant.Temporary" Elevation="1" ClipMode="DrawerClipMode.Always">
@@ -18,7 +18,7 @@
 </MudLayout>
 
 @code {
-    private bool drawerOpen = true;
+    private bool drawerOpen;
 
     private void ToggleDrawer() => drawerOpen = !drawerOpen;
 }

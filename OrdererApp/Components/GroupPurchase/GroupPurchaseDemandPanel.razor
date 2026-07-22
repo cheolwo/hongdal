@@ -11,7 +11,7 @@
     }
 
     <MudGrid>
-        <MudItem xs="12" md="7">
+        <MudItem xs="12" md="@(ShowFlowSummary ? 7 : 12)">
             <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
                 <MudStack Spacing="3">
                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
@@ -164,8 +164,18 @@
                                StartIcon="@Icons.Material.Filled.Groups"
                                Disabled="@(!CanSubmitDemand || _isSubmitting)"
                                OnClick="SubmitDemandAsync">
-                        @(_isSubmitting ? "등록 후 다시 읽는 중" : "수요 등록하고 자동집단 다시 읽기")
+                        @(_isSubmitting ? "저장 후 모집 현황 확인 중" : "비구속 수요 저장하고 모집 현황 보기")
                     </MudButton>
+
+                    @if (!string.IsNullOrWhiteSpace(_registeredDemandSourceKey))
+                    {
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Warning"
+                                   Disabled="@_isSubmitting"
+                                   OnClick="WithdrawDemandAsync">
+                            내 비구속 수요 철회
+                        </MudButton>
+                    }
 
                     @if (_registeredGroup is not null)
                     {
@@ -173,12 +183,15 @@
                             <MudStack Spacing="1">
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
                                     <MudText Typo="Typo.subtitle2">서버에서 다시 읽은 자동집단</MudText>
-                                    <MudChip T="string" Color="Color.Success" Size="Size.Small">
+                                    <MudChip T="string" Color="@GroupPurchasePresentation.AutoGroupStatusColor(_registeredGroup.현재상태)" Size="Size.Small">
                                         @GroupPurchasePresentation.AutoGroupStatusLabel(_registeredGroup.현재상태)
                                     </MudChip>
                                 </MudStack>
                                 <MudText Typo="Typo.body2">@_registeredGroup.상품명 · @_registeredGroup.배송권명</MudText>
                                 <MudText Typo="Typo.h6">@_registeredGroup.수요건수.ToString("N0")건 · @_registeredGroup.총희망수량.ToString("N0")@_registeredGroup.수량단위</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    모집 마감 @GroupPurchasePresentation.DateLabel(_registeredGroup.모집종료시각Utc) · 조건 @(_registeredGroup.모집조건충족여부 ? "충족" : "미충족")
+                                </MudText>
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">자동집단 @_registeredGroup.자동집단Id</MudText>
                             </MudStack>
                         </MudPaper>
@@ -187,15 +200,14 @@
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="12" md="5">
-            <GroupPurchaseDemandFlowSummary RequiredAdminReviewSteps="CurrentApplicationPlan.RequiredAdminReviewSteps" />
-        </MudItem>
+        @if (ShowFlowSummary)
+        {
+            <MudItem xs="12" md="5">
+                <GroupPurchaseDemandFlowSummary RequiredAdminReviewSteps="CurrentApplicationPlan.RequiredAdminReviewSteps" />
+            </MudItem>
+        }
     </MudGrid>
 
-    <GroupPurchasePaymentSchedule GroupPurchaseId="Product.상품카드Id"
-                                  OrdererDisplayName="OrdererDisplayName"
-                                  QuantityKg="DesiredQuantityKg"
-                                  UnitPrice="DesiredUnitPrice" />
 </MudStack>
 
 @code {
@@ -210,6 +222,7 @@
     private Severity _deliveryScopeSeverity = Severity.Info;
     private bool _deliveryScopeConfirmed;
     private 공동구매자동집단요약응답? _registeredGroup;
+    private string _registeredDemandSourceKey = string.Empty;
     private string _requestMemo = "같은 지역 주문자들과 함께 먼저 수요를 모아보고 싶습니다.";
     private bool _nonBindingAgreementAccepted;
     private bool _isSubmitting;
@@ -230,6 +243,9 @@
 
     [Parameter]
     public EventCallback<decimal> DesiredUnitPriceChanged { get; set; }
+
+    [Parameter]
+    public bool ShowFlowSummary { get; set; } = true;
 
     private 주문자집단개설신청계획 CurrentApplicationPlan
         => 주문자집단개설신청계획기.계획(CreateApplicationDraft());
@@ -397,13 +413,22 @@
             return;
         }
 
+        var demandSourceKey = CreateDemandSourceKey();
+        if (!string.IsNullOrWhiteSpace(_registeredDemandSourceKey)
+            && !string.Equals(_registeredDemandSourceKey, demandSourceKey, StringComparison.Ordinal))
+        {
+            _statusSeverity = Severity.Warning;
+            _statusMessage = "현재 표시된 수요를 먼저 철회한 뒤 다른 상품 수요를 등록해 주세요.";
+            return;
+        }
+
         _isSubmitting = true;
         _registeredGroup = null;
         try
         {
             var group = await ShipmentTrackingService.RegisterDemandAsync(new 공동구매자동수요등록Command
             {
-                수요출처키 = $"orderer-app:{Product.상품카드Id}",
+                수요출처키 = demandSourceKey,
                 상품키 = Product.상품카드Id,
                 상품명 = Product.상품명,
                 HS코드 = Product.HS코드,
@@ -426,6 +451,8 @@
                 _statusMessage = "공동 주문 수요를 서버에 등록하지 못했습니다. 잠시 후 다시 시도해 주세요.";
                 return;
             }
+
+            _registeredDemandSourceKey = demandSourceKey;
 
             var groups = await ShipmentTrackingService.ListGroupsAsync(Product.상품카드Id, _groupScopeKey);
             _registeredGroup = groups?.FirstOrDefault(item =>
@@ -457,6 +484,59 @@
         {
             _isSubmitting = false;
         }
+    }
+
+    private async Task WithdrawDemandAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_registeredDemandSourceKey) || _isSubmitting)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        try
+        {
+            var response = await ShipmentTrackingService.WithdrawDemandAsync(
+                _registeredDemandSourceKey,
+                "주문자 앱에서 철회");
+            if (response is null || !response.철회완료)
+            {
+                _statusSeverity = Severity.Error;
+                _statusMessage = response?.안내 ?? "비구속 수요를 철회하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+                return;
+            }
+
+            _registeredDemandSourceKey = string.Empty;
+            _registeredGroup = null;
+            _statusSeverity = Severity.Success;
+            _statusMessage = "비구속 수요를 철회했습니다. 결제·주문·수입·운송 작업은 실행되지 않았습니다.";
+        }
+        catch (SsalddelApiException ex)
+        {
+            _statusSeverity = Severity.Error;
+            _statusMessage = ex.StatusCode == 401
+                ? "로그인 세션이 만료되었습니다. 다시 로그인해 주세요."
+                : "비구속 수요를 철회하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+        }
+        catch (InvalidOperationException)
+        {
+            _statusSeverity = Severity.Error;
+            _statusMessage = "공동주문 API에 연결하지 못했습니다. 서버 상태를 확인해 주세요.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private string CreateDemandSourceKey()
+    {
+        var userId = Authentication.세션.UserId
+            ?? throw new InvalidOperationException("로그인 사용자 식별자를 찾을 수 없습니다.");
+        var material = System.Text.Encoding.UTF8.GetBytes($"{userId.Trim()}|{Product.상품카드Id}");
+        var digest = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(material))
+            .ToLowerInvariant();
+        return $"orderer-app:{digest[..32]}";
     }
 
     private 주문자집단개설신청초안 CreateApplicationDraft()

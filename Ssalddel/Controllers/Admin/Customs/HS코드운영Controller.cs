@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ssalddel.Controllers.Admin.Customs;
 
-[SsalddelApiVersion(SsalddelProductVersion.V2_0)]
+[SsalddelApiVersion(SsalddelProductVersion.V1_5)]
 [SsalddelApiWorkflow(SsalddelWorkflow.CustomsAndTradeData)]
 [ApiController]
 [Authorize(Policy = "HsCode운영자전용")]

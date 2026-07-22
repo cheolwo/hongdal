@@ -12,7 +12,7 @@ namespace Ssalddel.Controllers.Orderer;
 [ApiController]
 [Authorize]
 [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
-[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/group-purchase-auto-groups")]
 public sealed class 공동구매자동집단화Controller : ControllerBase

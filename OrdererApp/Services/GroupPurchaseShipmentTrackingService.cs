@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Ssalddel.Contracts.Common.Content;
 using Ssalddel.Contracts.Common.Orderer;
 using Ssalddel.Contracts.Common.Operations;
 using Ssalddel.Contracts.Common.PublicData;
@@ -28,10 +29,26 @@ public interface IGroupPurchaseShipmentTrackingService
         공동구매자동수요등록Command request,
         CancellationToken cancellationToken = default);
 
+    Task<공동구매자동수요철회응답?> WithdrawDemandAsync(
+        string demandSourceKey,
+        string? reason = null,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<공동구매자동집단요약응답>?> ListGroupsAsync(
         string productKey,
         string deliveryScopeKey,
         CancellationToken cancellationToken = default);
+
+    Task<OfficialFoodIngredientCompanyResearchResponse?> ResearchCompaniesAsync(
+        string ingredientName,
+        CancellationToken cancellationToken = default)
+        => Task.FromResult<OfficialFoodIngredientCompanyResearchResponse?>(null);
+
+    Task<OfficialFoodIngredientHsMappingResponse?> GetHsCandidatesAsync(
+        string ingredientName,
+        string countryCode,
+        CancellationToken cancellationToken = default)
+        => Task.FromResult<OfficialFoodIngredientHsMappingResponse?>(null);
 }
 
 public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShipmentTrackingService
@@ -155,12 +172,24 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
     public Task<공동구매자동집단사용자응답?> RegisterDemandAsync(
         공동구매자동수요등록Command request,
         CancellationToken cancellationToken = default)
-        => _authenticatedApiClient.SendAsync<공동구매자동수요등록Command, 공동구매자동집단사용자응답>(
-            HttpMethod.Post,
-            "api/v1/orderer/group-purchase-auto-groups/demands",
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.수요출처키);
+        request.요청멱등키 = string.IsNullOrWhiteSpace(request.요청멱등키)
+            ? $"demand-save:{Guid.NewGuid():N}"
+            : request.요청멱등키.Trim();
+
+        return _authenticatedApiClient.SendWithHeadersAsync<공동구매자동수요등록Command, 공동구매자동집단사용자응답>(
+            HttpMethod.Put,
+            $"api/v1/orderer/group-purchase-auto-groups/demands/{Uri.EscapeDataString(request.수요출처키.Trim())}",
             request,
-            "공동주문 수요 등록",
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Idempotency-Key"] = request.요청멱등키
+            },
+            "공동주문 비구속 수요 저장",
             cancellationToken: cancellationToken);
+    }
 
     public Task<IReadOnlyList<공동구매자동집단요약응답>?> ListGroupsAsync(
         string productKey,
@@ -175,5 +204,82 @@ public sealed class HttpGroupPurchaseShipmentTrackingService : IGroupPurchaseShi
             "공동주문 자동집단 재조회",
             allowNotFound: false,
             cancellationToken);
+    }
+
+    public Task<공동구매자동수요철회응답?> WithdrawDemandAsync(
+        string demandSourceKey,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(demandSourceKey);
+        var path = $"api/v1/orderer/group-purchase-auto-groups/demands/{Uri.EscapeDataString(demandSourceKey.Trim())}";
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            path += $"?reason={Uri.EscapeDataString(reason.Trim())}";
+        }
+
+        return _authenticatedApiClient.SendWithHeadersAsync<공동구매자동수요철회응답>(
+            HttpMethod.Delete,
+            path,
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Idempotency-Key"] = $"demand-withdraw:{Guid.NewGuid():N}"
+            },
+            "공동주문 비구속 수요 철회",
+            cancellationToken: cancellationToken);
+    }
+
+    public async Task<OfficialFoodIngredientCompanyResearchResponse?> ResearchCompaniesAsync(
+        string ingredientName,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(ingredientName))
+        {
+            return null;
+        }
+
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<OfficialFoodIngredientCompanyResearchResponse>(
+                "api/v1/agricultural-fisheries/food-ingredients/companies" +
+                $"?ingredientName={Uri.EscapeDataString(ingredientName.Trim())}&take=6",
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+    }
+
+    public async Task<OfficialFoodIngredientHsMappingResponse?> GetHsCandidatesAsync(
+        string ingredientName,
+        string countryCode,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(ingredientName) || string.IsNullOrWhiteSpace(countryCode))
+        {
+            return null;
+        }
+
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<OfficialFoodIngredientHsMappingResponse>(
+                "api/v1/agricultural-fisheries/food-ingredients/hs-codes" +
+                $"?ingredientName={Uri.EscapeDataString(ingredientName.Trim())}" +
+                $"&countryCode={Uri.EscapeDataString(countryCode.Trim().ToUpperInvariant())}",
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
     }
 }

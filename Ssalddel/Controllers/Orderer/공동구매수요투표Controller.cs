@@ -13,11 +13,11 @@ namespace Ssalddel.Controllers.Orderer;
 [ApiController]
 [Authorize]
 [SsalddelApiVersion(
-    SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
-[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    SsalddelProductVersion.V1_0,
+    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/group-purchase-demand-votes")]
 public sealed class 공동구매수요투표Controller : ControllerBase
 {

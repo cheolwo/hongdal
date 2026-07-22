@@ -31,9 +31,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [HttpGet("orderer-group-scopes")]
     public IActionResult 주문자집단배송권검색(
         [FromQuery] string? roadAddress,
@@ -56,9 +56,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [HttpPost("group-purchase/delivery-scopes/resolve")]
     public async Task<IActionResult> 공동주문배송권해결(
         [FromBody] OperatingMarketDeliveryScopeResolveRequest request,
@@ -68,9 +68,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [HttpGet("apartment-complexes")]
     public async Task<IActionResult> SearchApartmentComplexes(
         [FromQuery] string? sidoCode,
@@ -96,9 +96,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [HttpGet("apartment-complexes/{complexCode}/basic")]
     public async Task<IActionResult> GetApartmentComplexBasicInfo(
         string complexCode,
@@ -108,9 +108,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [HttpGet("apartment-complexes/{complexCode}/management-fee-snapshot")]
     public async Task<IActionResult> GetApartmentManagementFeeSnapshot(
         string complexCode,
@@ -121,9 +121,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
     [HttpPost("apartment-complexes/group-commerce-offset-simulation")]
     public async Task<IActionResult> SimulateGroupCommerceOffset(
         [FromBody] ApartmentGroupCommerceOffsetSimulationRequest request,
@@ -133,9 +133,9 @@ public sealed class PublicDataLookupController : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [SsalddelApiVersion(SsalddelProductVersion.V1_5, FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow, WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
     [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-    [RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    [RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
     [HttpPost("customs/hs-country-import-unit-price-simulation")]
     public async Task<IActionResult> SimulateHsCountryImportUnitPrice(
         [FromBody] HsCountryMonthlyTradeUnitPriceRequest request,

@@ -1,0 +1,336 @@
+@inherits MvvmComponentBase<UnitedStatesKoreanFoodGroupBuyStorefrontViewModel>
+
+<main class="us-food-storefront" aria-labelledby="us-food-storefront-title">
+    <section class="us-food-storefront__hero">
+        <div>
+            <span class="us-food-storefront__eyebrow">KOREAN FOOD · SHARED DEMAND · U.S. DELIVERY</span>
+            <h1 id="us-food-storefront-title">Discover Korean food. Pool ingredient demand.</h1>
+            <p>Explore public Korean recipe data, choose an ingredient, review tariff references, and see how your interest could join other buyers near your U.S. ZIP code.</p>
+            <div class="us-food-storefront__promise">
+                <strong>Why group demand?</strong>
+                <span>More combined volume can improve quote and shipment options. A lower final price is a goal, not a guarantee.</span>
+            </div>
+        </div>
+        <ol class="us-food-storefront__steps" aria-label="Group-buy flow">
+            <li><b>1</b><span>Browse dishes</span></li>
+            <li><b>2</b><span>Choose ingredient</span></li>
+            <li><b>3</b><span>Review HS / HTS</span></li>
+            <li><b>4</b><span>Preview ZIP pool</span></li>
+            <li><b>5</b><span>Join interest</span></li>
+        </ol>
+    </section>
+
+    @if (ViewModel.처리중 && !ViewModel.초기화됨)
+    {
+        <section class="us-food-storefront__state" role="status">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Info" />
+            <span>Loading Korean dishes and recipe ingredients…</span>
+        </section>
+    }
+    else if (!string.IsNullOrWhiteSpace(ViewModel.오류메시지))
+    {
+        <section class="us-food-storefront__state us-food-storefront__state--error" role="alert">
+            <strong>We could not load the storefront.</strong>
+            <span>@ViewModel.오류메시지</span>
+            <button type="button" @onclick="ReloadAsync">Try again</button>
+        </section>
+    }
+    else
+    {
+        <section class="us-food-storefront__section" aria-labelledby="browse-korean-dishes">
+            <div class="us-food-storefront__section-heading">
+                <span>STEP 1</span>
+                <div>
+                    <h2 id="browse-korean-dishes">Browse Korean dishes</h2>
+                    <p>The catalog is limited to recipes identified with country code KR.</p>
+                </div>
+            </div>
+
+            <div class="us-food-storefront__search">
+                <label for="korean-dish-search">Dish search</label>
+                <div>
+                    <input id="korean-dish-search"
+                           type="search"
+                           placeholder="Try kimchi, rice, soup…"
+                           @bind="ViewModel.DishSearchText"
+                           @bind:event="oninput" />
+                    <button type="button" disabled="@ViewModel.ActionBusy" @onclick="SearchDishesAsync">Search</button>
+                </div>
+            </div>
+
+            @if (ViewModel.Dishes.Count == 0)
+            {
+                <div class="us-food-storefront__empty">No Korean dishes matched this search.</div>
+            }
+            else
+            {
+                <div class="us-food-storefront__dish-grid">
+                    @foreach (var dish in ViewModel.Dishes)
+                    {
+                        var selected = string.Equals(
+                            ViewModel.SelectedDish?.Dish.DishKey,
+                            dish.DishKey,
+                            StringComparison.Ordinal);
+                        <button type="button"
+                                class="us-food-storefront__dish @(selected ? "is-selected" : null)"
+                                aria-pressed="@selected"
+                                @onclick="() => SelectDishAsync(dish.DishKey)">
+                            <span>@DishName(dish)</span>
+                            <small>@dish.Name · @dish.Category</small>
+                            <em>@dish.VariantCount recipe source@(dish.VariantCount == 1 ? string.Empty : "s")</em>
+                        </button>
+                    }
+                </div>
+            }
+        </section>
+
+        @if (ViewModel.SelectedDish is { } selectedDish)
+        {
+            <section class="us-food-storefront__section" aria-labelledby="choose-recipe-ingredient">
+                <div class="us-food-storefront__section-heading">
+                    <span>STEP 2</span>
+                    <div>
+                        <h2 id="choose-recipe-ingredient">Choose an ingredient from @DishName(selectedDish.Dish)</h2>
+                        <p>@selectedDish.Provider · @selectedDish.AttributionText · collected @selectedDish.LastCollectedAtUtc.ToString("yyyy-MM-dd")</p>
+                    </div>
+                </div>
+
+                <div class="us-food-storefront__ingredient-grid">
+                    @foreach (var ingredient in selectedDish.Ingredients)
+                    {
+                        var selected = string.Equals(
+                            ViewModel.SelectedIngredientKey,
+                            ingredient.IngredientKey,
+                            StringComparison.Ordinal);
+                        <button type="button"
+                                class="us-food-storefront__ingredient @(selected ? "is-selected" : null)"
+                                aria-pressed="@selected"
+                                @onclick="() => ViewModel.SelectIngredient(ingredient.IngredientKey)">
+                            <strong>@ingredient.CanonicalName</strong>
+                            <span>@ingredient.OriginalText</span>
+                            <small>@ingredient.CategoryName · @ingredient.GroupName</small>
+                        </button>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (ViewModel.SelectedIngredient is { } selectedIngredient)
+        {
+            <section class="us-food-storefront__section" aria-labelledby="review-tariff-references">
+                <div class="us-food-storefront__section-heading">
+                    <span>STEP 3</span>
+                    <div>
+                        <h2 id="review-tariff-references">Review HS / HTS planning references</h2>
+                        <p>References for <strong>@selectedIngredient.CanonicalName</strong> remain candidates until product details and the destination tariff schedule are verified.</p>
+                    </div>
+                </div>
+
+                @if (ViewModel.HsMapping is null)
+                {
+                    <div class="us-food-storefront__callout">
+                        <div>
+                            <strong>No tariff reference selected</strong>
+                            <span>Load indexed Korean HSK or U.S. HTS candidates, then explicitly choose one for grouping context.</span>
+                        </div>
+                        <button type="button" disabled="@ViewModel.ActionBusy" @onclick="LoadHsReferencesAsync">Load tariff references</button>
+                    </div>
+                }
+                else if (ViewModel.HsMapping.Candidates.Count == 0)
+                {
+                    <div class="us-food-storefront__empty">No active HS or HTS candidate is indexed. This ingredient cannot enter the ZIP pool from this page yet.</div>
+                }
+                else
+                {
+                    <div class="us-food-storefront__tariff-grid">
+                        @foreach (var candidate in ViewModel.HsMapping.Candidates)
+                        {
+                            var selected = ViewModel.SelectedHsMappingId == candidate.MappingId;
+                            <article class="us-food-storefront__tariff @(selected ? "is-selected" : null)">
+                                <div class="us-food-storefront__tariff-code">
+                                    <span>@TariffLabel(candidate)</span>
+                                    <strong>@candidate.HsCode</strong>
+                                </div>
+                                <h3>@TariffDescription(candidate)</h3>
+                                <p>@candidate.MatchBasis</p>
+                                <dl>
+                                    <div><dt>Catalog</dt><dd>@candidate.StandardCode · @candidate.CatalogRevision</dd></div>
+                                    <div><dt>Confidence</dt><dd>@candidate.MatchConfidence.ToString("P0")</dd></div>
+                                    <div><dt>Source check</dt><dd>@candidate.LastCheckedAtUtc.ToString("yyyy-MM-dd")</dd></div>
+                                </dl>
+                                <div class="us-food-storefront__warning">Not declaration-ready · professional review: @(candidate.RequiresProfessionalReview ? "required" : "check before filing")</div>
+                                <button type="button"
+                                        disabled="@ViewModel.ActionBusy"
+                                        aria-pressed="@selected"
+                                        @onclick="() => ViewModel.SelectHsReference(candidate.MappingId)">
+                                    @(selected ? "Selected planning reference" : "Use as planning reference")
+                                </button>
+                            </article>
+                        }
+                    </div>
+                    <p class="us-food-storefront__source-note">Indexed notices: @string.Join(" ", ViewModel.HsMapping.Notices)</p>
+                }
+            </section>
+        }
+
+        <section class="us-food-storefront__section" aria-labelledby="preview-us-demand-pool">
+            <div class="us-food-storefront__section-heading">
+                <span>STEPS 4–5</span>
+                <div>
+                    <h2 id="preview-us-demand-pool">Preview your U.S. demand pool</h2>
+                    <p>The server groups interest by ingredient, five-digit ZIP, storage temperature, and LCL logistics mode.</p>
+                </div>
+            </div>
+
+            <div class="us-food-storefront__order-grid">
+                <label>
+                    <span>U.S. ZIP code</span>
+                    <input type="text"
+                           inputmode="numeric"
+                           maxlength="5"
+                           autocomplete="postal-code"
+                           placeholder="10001"
+                           @bind="ViewModel.UsZipCode"
+                           @bind:event="oninput" />
+                </label>
+                <label>
+                    <span>Desired quantity</span>
+                    <div class="us-food-storefront__quantity">
+                        <input type="number" min="0.1" step="0.1" @bind="ViewModel.DesiredQuantity" />
+                        <b>kg</b>
+                    </div>
+                </label>
+                <label>
+                    <span>Storage temperature</span>
+                    <select @bind="ViewModel.TemperatureCode">
+                        <option value="상온">Ambient</option>
+                        <option value="냉장">Chilled</option>
+                        <option value="냉동">Frozen</option>
+                    </select>
+                </label>
+            </div>
+
+            @if (!ViewModel.IsAuthenticated)
+            {
+                <div class="us-food-storefront__login">
+                    <div>
+                        <strong>Sign in to preview or join</strong>
+                        <span>Browsing is public. Group placement uses your authenticated account without displaying your identity to other buyers.</span>
+                    </div>
+                    <a href="/login">Sign in</a>
+                </div>
+            }
+            else
+            {
+                <div class="us-food-storefront__actions">
+                    <button type="button" class="secondary" disabled="@ViewModel.ActionBusy" @onclick="PreviewPlacementAsync">Preview my group</button>
+                    <button type="button" class="primary" disabled="@ViewModel.ActionBusy" @onclick="JoinDemandPoolAsync">Join demand pool</button>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(ViewModel.ActionError))
+            {
+                <div class="us-food-storefront__message us-food-storefront__message--error" role="alert">@ViewModel.ActionError</div>
+            }
+            else if (!string.IsNullOrWhiteSpace(ViewModel.ActionNotice))
+            {
+                <div class="us-food-storefront__message" role="status">@ViewModel.ActionNotice</div>
+            }
+
+            @if (ViewModel.PlacementPreview is { } preview)
+            {
+                <article class="us-food-storefront__progress-card">
+                    <div>
+                        <span>PREVIEW · @PlacementLabel(preview)</span>
+                        <h3>@preview.예상진행.참여자수 interested buyer@(preview.예상진행.참여자수 == 1 ? string.Empty : "s") · @preview.예상진행.총희망수량.ToString("0.##") kg</h3>
+                        <p>@preview.예상진행.안내</p>
+                    </div>
+                    <dl>
+                        <div><dt>More buyers needed</dt><dd>@NumberOrDash(preview.예상진행.추가필요참여자수)</dd></div>
+                        <div><dt>More quantity needed</dt><dd>@QuantityOrDash(preview.예상진행.추가필요수량)</dd></div>
+                        <div><dt>Next stage</dt><dd>@preview.예상진행.다음단계코드</dd></div>
+                        <div><dt>Recruitment closes</dt><dd>@RecruitmentDeadline(preview.예상진행.모집종료시각Utc)</dd></div>
+                    </dl>
+                    <small>@preview.비구속안내</small>
+                </article>
+            }
+
+            @if (ViewModel.RegisteredGroup is { } group)
+            {
+                <article class="us-food-storefront__progress-card us-food-storefront__progress-card--joined">
+                    <div>
+                        <span>INTEREST REGISTERED</span>
+                        <h3>@group.참여자수 interested buyer@(group.참여자수 == 1 ? string.Empty : "s") · @group.총희망수량.ToString("0.##") @group.수량단위</h3>
+                        <p>Pool @group.자동집단Id · @group.배송권명 · status @group.현재상태 · closes @RecruitmentDeadline(group.모집종료시각Utc)</p>
+                    </div>
+                    <strong>No payment, purchase order, import declaration, or supply contract was created.</strong>
+                    @if (ViewModel.CanWithdrawDemand)
+                    {
+                        <button type="button" class="secondary" disabled="@ViewModel.ActionBusy" @onclick="WithdrawDemandAsync">Withdraw interest</button>
+                    }
+                </article>
+            }
+        </section>
+
+        <section class="us-food-storefront__boundary" aria-labelledby="before-you-buy">
+            <div>
+                <span>BEFORE A PURCHASE CAN OPEN</span>
+                <h2 id="before-you-buy">Demand is only the first checkpoint</h2>
+            </div>
+            <ul>
+                <li>Final pricing must include the product quote, international and domestic logistics, customs and duties, taxes, payment fees, and fulfillment.</li>
+                <li>Korean HSK and U.S. HTS references serve different filings. The actual product and importer workflow must be reviewed before entry.</li>
+                <li>Food eligibility, labeling, origin evidence, supplier records, and import responsibilities remain unresolved until an authorized operator confirms them.</li>
+                <li>Reaching the displayed target opens a confirmation review; it does not automatically charge buyers or select a supplier, broker, carrier, or warehouse.</li>
+            </ul>
+        </section>
+    }
+</main>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.초기화Async();
+    }
+
+    private Task ReloadAsync() => ViewModel.새로고침Async();
+    private Task SearchDishesAsync() => ViewModel.SearchDishesAsync();
+    private Task SelectDishAsync(string dishKey) => ViewModel.SelectDishAsync(dishKey);
+    private Task LoadHsReferencesAsync() => ViewModel.LoadHsReferencesAsync();
+    private Task PreviewPlacementAsync() => ViewModel.PreviewPlacementAsync();
+    private Task JoinDemandPoolAsync() => ViewModel.JoinDemandPoolAsync();
+    private Task WithdrawDemandAsync() => ViewModel.WithdrawDemandAsync();
+
+    private static string DishName(OfficialFoodRecipeDishDto dish)
+        => !string.IsNullOrWhiteSpace(dish.EnglishName) ? dish.EnglishName : dish.Name;
+
+    private static string TariffLabel(OfficialFoodIngredientHsCandidateDto candidate)
+        => candidate.JurisdictionUseCode switch
+        {
+            OfficialFoodIngredientHsJurisdictionUseCodes.KoreaExportDeclaration => "Korean export HSK reference",
+            OfficialFoodIngredientHsJurisdictionUseCodes.UnitedStatesImportEntry => "U.S. import HTS reference",
+            _ => $"{candidate.CountryCode} tariff reference"
+        };
+
+    private static string TariffDescription(OfficialFoodIngredientHsCandidateDto candidate)
+        => !string.IsNullOrWhiteSpace(candidate.EnglishName)
+            ? candidate.EnglishName
+            : candidate.Description;
+
+    private static string PlacementLabel(공동구매자동집단배치미리보기응답 preview)
+        => string.Equals(
+            preview.배치유형,
+            공동구매자동집단배치유형코드.기존집단,
+            StringComparison.Ordinal)
+            ? "JOIN EXISTING POOL"
+            : "START NEW POOL";
+
+    private static string RecruitmentDeadline(DateTime value)
+        => value == default ? "pending" : $"{value:yyyy-MM-dd HH:mm} UTC";
+
+    private static string NumberOrDash(int? value)
+        => value?.ToString() ?? "—";
+
+    private static string QuantityOrDash(decimal? value)
+        => value is null ? "—" : $"{value:0.##} kg";
+}

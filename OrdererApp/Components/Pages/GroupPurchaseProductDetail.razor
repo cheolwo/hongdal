@@ -1,0 +1,62 @@
+@page "/group-purchase/products/{ProductId}"
+@using Ssalddel.Contracts.Common.Orderer
+@inject GroupPurchaseCatalogViewModel Catalog
+
+<PageTitle>공동구매 상품 근거</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.ProductDetail"
+                              Eyebrow="GROUP PURCHASE · DETAIL"
+                              Title="상품 근거 확인"
+                              Description="한 상품의 공개 근거만 읽고, 수요 등록은 별도 Action route에서 시작합니다."
+                              BackHref="@GroupPurchasePageRoutes.ProductsRoot">
+        @if (!_productFound)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                요청한 공동구매 상품을 찾지 못했습니다.
+            </MudAlert>
+        }
+        else
+        {
+            <MudStack Spacing="3">
+                <GroupPurchaseProductEvidencePanel Product="Catalog.SelectedProduct" />
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6">이 상품의 비구속 수요를 남길까요?</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            다음 화면에서는 모집권과 희망 수량만 확인합니다. 저장해도 결제나 주문이 확정되지 않습니다.
+                        </MudText>
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" sm="6">
+                                <MudButton Href="@GroupPurchasePageRoutes.DemandCreateFor(Catalog.SelectedProduct.상품카드Id)"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.GroupAdd"
+                                           FullWidth="true">
+                                    비구속 수요 등록
+                                </MudButton>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudButton Href="@GroupPurchasePageRoutes.ImportReviewFor(Catalog.SelectedProduct.상품카드Id)"
+                                           Variant="Variant.Text"
+                                           Color="Color.Secondary"
+                                           FullWidth="true">
+                                    1.5 수입 검토 참고
+                                </MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStack>
+                </MudPaper>
+            </MudStack>
+        }
+    </GroupPurchaseScreenFrame>
+</MudContainer>
+
+@code {
+    [Parameter] public string ProductId { get; set; } = string.Empty;
+
+    private bool _productFound;
+
+    protected override void OnParametersSet()
+        => _productFound = Catalog.TrySelectProduct(ProductId);
+}

@@ -14,12 +14,6 @@ public sealed class 해외제조업소조회Service : I해외제조업소조회S
     {
         _httpClient = httpClient;
         _옵션 = 옵션.Value;
-
-        if (string.IsNullOrWhiteSpace(_옵션.ServiceKey))
-        {
-            throw new InvalidOperationException(
-                "해외제조업소조회:ServiceKey 또는 PublicData:DataGoKrServiceKey 설정이 필요합니다.");
-        }
     }
 
     public async Task<해외제조업소조회응답> 조회Async(
@@ -27,6 +21,11 @@ public sealed class 해외제조업소조회Service : I해외제조업소조회S
         CancellationToken 취소토큰 = default)
     {
         ArgumentNullException.ThrowIfNull(요청);
+        if (string.IsNullOrWhiteSpace(_옵션.ServiceKey))
+        {
+            throw new InvalidOperationException(
+                "해외제조업소조회:ServiceKey 또는 PublicData:DataGoKrServiceKey 설정이 필요합니다.");
+        }
 
         var 페이지번호 = 요청.페이지번호 <= 0 ? 1 : 요청.페이지번호;
         var 한페이지결과수 = 요청.한페이지결과수 <= 0 ? 10 : 요청.한페이지결과수;

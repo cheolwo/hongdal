@@ -14,12 +14,6 @@ public sealed class 수입식품한글표시사항조회Service : I수입식품�
     {
         _httpClient = httpClient;
         _옵션 = 옵션.Value;
-
-        if (string.IsNullOrWhiteSpace(_옵션.ServiceKey))
-        {
-            throw new InvalidOperationException(
-                "수입식품한글표시사항조회:ServiceKey 또는 PublicData:DataGoKrServiceKey 설정이 필요합니다.");
-        }
     }
 
     public async Task<수입식품한글표시사항조회응답DTO> 조회Async(
@@ -27,6 +21,11 @@ public sealed class 수입식품한글표시사항조회Service : I수입식품�
         CancellationToken 취소토큰 = default)
     {
         ArgumentNullException.ThrowIfNull(요청);
+        if (string.IsNullOrWhiteSpace(_옵션.ServiceKey))
+        {
+            throw new InvalidOperationException(
+                "수입식품한글표시사항조회:ServiceKey 또는 PublicData:DataGoKrServiceKey 설정이 필요합니다.");
+        }
 
         var 페이지번호 = Math.Max(1, 요청.페이지번호);
         var 한페이지결과수 = Math.Clamp(요청.한페이지결과수, 1, 100);

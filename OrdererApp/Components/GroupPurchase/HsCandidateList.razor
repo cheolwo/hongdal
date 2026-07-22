@@ -1,0 +1,35 @@
+@using Ssalddel.Contracts.Common.Content
+
+@if (Candidates.Count == 0)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">@EmptyMessage</MudAlert>
+}
+else
+{
+    @foreach (var candidate in Candidates.Take(3))
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-2">
+            <MudStack Spacing="1">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                    <MudText Typo="Typo.body2">@candidate.HsCode</MudText>
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">
+                        @candidate.MatchConfidence.ToString("P0") · @candidate.MappingState
+                    </MudChip>
+                </MudStack>
+                <MudText Typo="Typo.caption">@candidate.KoreanName</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@candidate.MatchBasis</MudText>
+                <MudLink Href="@candidate.SourceUrl" Target="_blank" Typo="Typo.caption">
+                    @candidate.SourceName · @(candidate.RequiresProfessionalReview ? "전문 검토 필요" : "검토 상태 확인")
+                </MudLink>
+            </MudStack>
+        </MudPaper>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<OfficialFoodIngredientHsCandidateDto> Candidates { get; set; } = [];
+
+    [Parameter]
+    public string EmptyMessage { get; set; } = "품목분류 후보가 없습니다.";
+}

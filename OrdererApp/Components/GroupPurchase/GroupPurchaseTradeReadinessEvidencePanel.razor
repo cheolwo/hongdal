@@ -1,0 +1,125 @@
+@using Ssalddel.Contracts.Common.Content
+@using Ssalddel.Contracts.Common.Orderer
+@inject IGroupPurchaseShipmentTrackingService ShipmentTrackingService
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">공급자·HS/HTS 공식 근거</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    MFDS 기업 이력과 국가별 품목분류 후보를 같은 1.5 검토 화면에서 확인합니다.
+                </MudText>
+            </MudStack>
+            <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">전문 검토 전 후보</MudChip>
+        </MudStack>
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+            플랫폼은 표시된 기업을 자동 선정·연락하지 않으며 HS·HTS 후보를 신고 코드로 확정하지 않습니다. 실제 거래 전 원출처 최신 상태와 자격 있는 검토자의 판단이 필요합니다.
+        </MudAlert>
+
+        @if (_isLoading)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        }
+        else
+        {
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                        <MudStack Spacing="2">
+                            <MudText Typo="Typo.subtitle1">재료 관련 기업 후보</MudText>
+                            @if (_companies?.Candidates.Count > 0)
+                            {
+                                @foreach (var candidate in _companies.Candidates.Take(4))
+                                {
+                                    <MudPaper Elevation="0" Outlined="true" Class="pa-2">
+                                        <MudStack Spacing="1">
+                                            <MudText Typo="Typo.body2">@candidate.OrganizationName</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                @candidate.CountryCode · @candidate.RelationCode · @candidate.VerificationStatusCode
+                                            </MudText>
+                                            <MudText Typo="Typo.caption">@candidate.EvidenceSummary</MudText>
+                                            <MudLink Href="@candidate.SourceUrl" Target="_blank" Typo="Typo.caption">
+                                                @candidate.SourceName · @DateLabel(candidate.ObservedAtUtc)
+                                            </MudLink>
+                                        </MudStack>
+                                    </MudPaper>
+                                }
+                            }
+                            else
+                            {
+                                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                                    공식 원천 설정 또는 재료명 일치 결과가 없습니다. 후보 없음도 원장에 미확인 상태로 남겨야 합니다.
+                                </MudAlert>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudStack Spacing="2">
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                            <MudStack Spacing="2">
+                                <MudText Typo="Typo.subtitle1">한국 HSK 후보</MudText>
+                                <HsCandidateList Candidates="@(_koreanHs?.Candidates ?? [])" EmptyMessage="한국 관세 분류 후보가 없습니다." />
+                            </MudStack>
+                        </MudPaper>
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                            <MudStack Spacing="2">
+                                <MudText Typo="Typo.subtitle1">미국 HTS 후보</MudText>
+                                <HsCandidateList Candidates="@(_unitedStatesHs?.Candidates ?? [])" EmptyMessage="미국 HTS 분류 후보가 없습니다." />
+                            </MudStack>
+                        </MudPaper>
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">공급자 원출처·확인시각</MudChip>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">견적·MOQ·납기·포장·유효기간</MudChip>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">상품·운송·관세·세금·국내이행 원가</MudChip>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">한국·미국 규제 항목 분리</MudChip>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">판매자·수입자·관세사·플랫폼 책임</MudChip>
+            </MudStack>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    private string? _loadedProductId;
+    private bool _isLoading;
+    private OfficialFoodIngredientCompanyResearchResponse? _companies;
+    private OfficialFoodIngredientHsMappingResponse? _koreanHs;
+    private OfficialFoodIngredientHsMappingResponse? _unitedStatesHs;
+
+    [Parameter, EditorRequired]
+    public HS먹거리공동구매상품카드 Product { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.Equals(_loadedProductId, Product.상품카드Id, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedProductId = Product.상품카드Id;
+        _isLoading = true;
+        try
+        {
+            var companiesTask = ShipmentTrackingService.ResearchCompaniesAsync(Product.상품명);
+            var koreanHsTask = ShipmentTrackingService.GetHsCandidatesAsync(Product.상품명, 공동수입준비국가코드.대한민국);
+            var unitedStatesHsTask = ShipmentTrackingService.GetHsCandidatesAsync(Product.상품명, 공동수입준비국가코드.미국);
+            await Task.WhenAll(companiesTask, koreanHsTask, unitedStatesHsTask);
+            _companies = await companiesTask;
+            _koreanHs = await koreanHsTask;
+            _unitedStatesHs = await unitedStatesHsTask;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static string DateLabel(DateTimeOffset value)
+        => value == default ? "확인시각 미상" : value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+}

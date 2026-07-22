@@ -841,7 +841,7 @@ public sealed class 공동구매화면ViewModelTests
     }
 
     [Fact]
-    public async Task 자동집단_선택된공동구매를수요초안으로만들고실행Id를공유한다()
+    public async Task 자동집단_선택된공동구매를비구속수요로등록하고후속원장은선택하지않는다()
     {
         var campaign = Campaign("햇감자 공동구매", DateTime.UtcNow, sourcePostId: 51);
         campaign.CommunityLedgerId = "community-ledger-51";
@@ -888,12 +888,14 @@ public sealed class 공동구매화면ViewModelTests
         Assert.True(await automaticGroup.수요등록Async());
 
         Assert.Equal("auto-potato-seoul", fixture.ViewModel.실행.상태.실행공동구매Id);
-        Assert.Equal("aggregation-potato-seoul", fixture.ViewModel.실행.상태.공동구매주문집계원장Id);
-        Assert.Equal("individual-order-51", fixture.ViewModel.실행.상태.선택된주문원장Id);
+        Assert.True(string.IsNullOrWhiteSpace(fixture.ViewModel.실행.상태.공동구매주문집계원장Id));
+        Assert.True(string.IsNullOrWhiteSpace(fixture.ViewModel.실행.상태.선택된주문원장Id));
         Assert.Same(executionService.자동수요응답, automaticGroup.선택된자동집단);
         Assert.Equal(
             $"community-vote:{campaign.Id:N}:orderer-51",
             executionService.마지막자동수요요청?.수요출처키);
+        Assert.Equal(공동구매자동수요유형코드.관심표시, executionService.마지막자동수요요청?.수요유형);
+        Assert.Equal(공동구매자동결제상태코드.미결제, executionService.마지막자동수요요청?.결제상태);
     }
 
     [Fact]
@@ -1753,6 +1755,11 @@ public sealed class 공동구매화면ViewModelTests
             공동구매자동집단조회조건 condition,
             CancellationToken cancellationToken = default)
             => Task.FromResult(자동집단목록응답);
+
+        public Task<공동구매자동집단배치미리보기응답?> 자동배치미리보기Async(
+            공동구매자동수요등록Command request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<공동구매자동집단배치미리보기응답?>(null);
 
         public Task<공동구매자동집단응답?> 자동수요등록Async(
             공동구매자동수요등록Command request,

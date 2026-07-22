@@ -200,6 +200,11 @@ public sealed class DomesticGroupPurchaseVehicleRecommendationServiceTests
             CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
+        public Task<공동구매자동수요철회응답> 수요철회Async(
+            공동구매자동수요철회Command command,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
+
         public Task<IReadOnlyList<공동구매자동집단응답>> 집단목록조회Async(
             공동구매자동집단조회조건 조건,
             CancellationToken cancellationToken = default)

@@ -1,0 +1,78 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h5">@Product.상품명</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    비구속 수요를 남기기 전에 품목 근거와 모집 기준만 확인합니다.
+                </MudText>
+            </MudStack>
+            <MudChip T="string" Color="@GroupPurchasePresentation.PriorityColor(ProductPlan.활성화우선순위)" Variant="Variant.Filled">
+                @GroupPurchasePresentation.PriorityLabel(ProductPlan.활성화우선순위)
+            </MudChip>
+        </MudStack>
+
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">HS 품목 근거</MudText>
+                    <MudText Typo="Typo.h6">@Product.HS코드</MudText>
+                    <MudText Typo="Typo.body2">@Product.HS표시명</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">보관·물류 참고</MudText>
+                    <MudText Typo="Typo.h6">@GroupPurchasePresentation.TemperatureLabel(Product.온도코드)</MudText>
+                    <MudText Typo="Typo.body2">예상 방식 @Product.예상물류방식</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">모집 목표</MudText>
+                    <MudText Typo="Typo.h6">@Product.SuggestedTargetQuantityKg.ToString("N0")kg</MudText>
+                    <MudText Typo="Typo.body2">같은 품목·모집권 수요를 집계하는 참고 기준</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3 h-100">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">공개 단가 참고</MudText>
+                    <MudText Typo="Typo.h6">@GroupPurchasePresentation.Money(Product.ExpectedUnitPrice)</MudText>
+                    <MudText Typo="Typo.body2">구매 가격이나 계약 조건이 아닙니다.</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+            @ProductPlan.요약
+        </MudAlert>
+
+        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+            @foreach (var step in ProductPlan.RequiredReviewSteps)
+            {
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@step</MudChip>
+            }
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public HS먹거리공동구매상품카드 Product { get; set; } = default!;
+
+    private 냉장냉동먹거리공동구매계획 ProductPlan
+        => 냉장냉동먹거리공동구매계획기.계획(new 냉장냉동먹거리공동구매초안(
+            상품명: Product.상품명,
+            주문자집단배송권키: "unselected-delivery-scope",
+            TargetQuantityKg: Product.SuggestedTargetQuantityKg,
+            CurrentIntentQuantityKg: 0m,
+            TargetUnitPrice: Product.ExpectedUnitPrice,
+            HS코드: Product.HS코드,
+            온도코드: Product.온도코드,
+            LogisticsMode: Product.예상물류방식,
+            RequiresImportFoodReview: Product.RequiresImportFoodReview,
+            RequiresMfdsManufacturerReview: Product.RequiresMfdsManufacturerReview,
+            RequiresColdStorage: Product.온도코드 is 공동구매온도코드.냉동 or 공동구매온도코드.냉장));
+}

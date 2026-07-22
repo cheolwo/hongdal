@@ -1,0 +1,51 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<section class="group-purchase-screen" data-group-purchase-screen="@CurrentScreen.ToString().ToLowerInvariant()">
+    <header class="group-purchase-screen__header">
+        <div class="group-purchase-screen__title">
+            <span>@Eyebrow</span>
+            <h1>@Title</h1>
+            <p>@Description</p>
+        </div>
+        <div class="group-purchase-screen__actions">
+            @if (!string.IsNullOrWhiteSpace(BackHref))
+            {
+                <MudButton Href="@BackHref"
+                           Variant="Variant.Text"
+                           Color="Color.Default"
+                           StartIcon="@Icons.Material.Filled.ArrowBack">
+                    이전 화면
+                </MudButton>
+            }
+            @if (CurrentScreen != GroupPurchaseScreenKind.Overview)
+            {
+                <MudButton Href="@GroupPurchasePageRoutes.Root"
+                           Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Hub">
+                    공동구매 개요
+                </MudButton>
+            }
+        </div>
+    </header>
+
+    <MudAlert Severity="@BoundarySeverity" Variant="Variant.Outlined" Dense="true" Class="group-purchase-screen__boundary">
+        @BoundaryMessage
+    </MudAlert>
+
+    <main class="group-purchase-screen__body">
+        @ChildContent
+    </main>
+</section>
+
+@code {
+    [Parameter] public GroupPurchaseScreenKind CurrentScreen { get; set; }
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter] public string? BackHref { get; set; }
+    [Parameter] public Severity BoundarySeverity { get; set; } = Severity.Info;
+    [Parameter] public string BoundaryMessage { get; set; }
+        = "1.0 공동구매 화면은 비구속 수요와 공개 모집까지만 다룹니다. 결제·계약·수입 신고·배차는 실행하지 않습니다.";
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+}

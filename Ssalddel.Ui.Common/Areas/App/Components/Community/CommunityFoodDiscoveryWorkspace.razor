@@ -31,6 +31,6 @@
     private void ShareToCommunity(PlatformCommunityPostDraft draft)
     {
         CommunityPostDrafts.Prepare(draft);
-        Navigation.NavigateTo("/community/write");
+        Navigation.NavigateTo(CommunityPageRoutes.Compose);
     }
 }

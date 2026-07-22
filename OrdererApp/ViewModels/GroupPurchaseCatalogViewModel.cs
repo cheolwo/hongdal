@@ -3,10 +3,10 @@ using Ssalddel.Contracts.Common.Orderer;
 namespace OrdererApp.ViewModels;
 
 /// <summary>
-/// 공동구매 페이지가 공유해야 하는 상품 선택과 수량·단가만 소유합니다.
-/// 선적, 시세, 배송권과 수요 등록 상태는 각 하위 컴포넌트가 따로 관리합니다.
+/// 공동구매 상품 카탈로그와 선택한 수요 초안 값만 소유합니다.
+/// route, 선적, 시세, 배송권과 저장 상태는 각 화면과 업무 컴포넌트가 따로 관리합니다.
 /// </summary>
-public sealed class GroupPurchaseIntentPageViewModel
+public sealed class GroupPurchaseCatalogViewModel
 {
     private readonly IReadOnlyList<HS먹거리공동구매상품카드> _productCards =
     [
@@ -41,7 +41,7 @@ public sealed class GroupPurchaseIntentPageViewModel
             RequiresMfdsManufacturerReview: true)
     ];
 
-    public GroupPurchaseIntentPageViewModel()
+    public GroupPurchaseCatalogViewModel()
     {
         SelectedProduct = _productCards[0];
         DesiredQuantityKg = DefaultQuantity(SelectedProduct);
@@ -53,19 +53,27 @@ public sealed class GroupPurchaseIntentPageViewModel
     public decimal DesiredQuantityKg { get; private set; }
     public decimal DesiredUnitPrice { get; private set; }
 
-    public void SelectProduct(string productId)
+    public bool TrySelectProduct(string? productId)
     {
         var product = _productCards.FirstOrDefault(item =>
             string.Equals(item.상품카드Id, productId, StringComparison.Ordinal));
-        if (product is null || ReferenceEquals(product, SelectedProduct))
+        if (product is null)
         {
-            return;
+            return false;
+        }
+
+        if (ReferenceEquals(product, SelectedProduct))
+        {
+            return true;
         }
 
         SelectedProduct = product;
         DesiredQuantityKg = DefaultQuantity(product);
         DesiredUnitPrice = product.ExpectedUnitPrice;
+        return true;
     }
+
+    public void SelectProduct(string productId) => _ = TrySelectProduct(productId);
 
     public void UpdateDesiredQuantity(decimal quantityKg)
         => DesiredQuantityKg = Math.Max(1m, quantityKg);

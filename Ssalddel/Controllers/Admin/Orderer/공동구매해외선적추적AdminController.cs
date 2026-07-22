@@ -11,9 +11,9 @@ using 살뜰.Services.Versioning;
 namespace Ssalddel.Controllers.Admin.Orderer;
 
 [ApiController]
-[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[SsalddelApiVersion(SsalddelProductVersion.V2_0, FeatureKey = VersionFeatureFlagKeys.DomesticTransportWorkflow, WorkflowKey = VersionFeatureFlagKeys.DomesticTransportWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.DomesticTransportWorkflow)]
 [Authorize(Policy = "서버관리자전용")]
 [Route("api/v1/admin/orderer/group-purchase-overseas-shipments")]
 public sealed class 공동구매해외선적추적AdminController : ControllerBase

@@ -5,19 +5,20 @@ namespace Ssalddel.Services.Orderer;
 
 internal sealed class CommunityVoteOrdererDemandHandoff : ICommunityGroupPurchaseDemandHandoff
 {
-    private readonly I공동구매자동집단화저장소 _store;
+    private readonly I공동구매수요모집OS _os;
 
-    public CommunityVoteOrdererDemandHandoff(I공동구매자동집단화저장소 store)
+    public CommunityVoteOrdererDemandHandoff(I공동구매수요모집OS os)
     {
-        _store = store;
+        _os = os;
     }
 
     public async Task<string> SyncAsync(
         CommunityGroupPurchaseDemandHandoffRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await _store.수요등록Async(new 공동구매자동수요등록Command
+        var result = await _os.수요등록조율Async(new 공동구매자동수요등록Command
         {
+            요청멱등키 = $"community-vote:{request.VoteId:N}:{request.VoterHash}",
             수요출처키 = $"community-vote:{request.VoteId:N}:{request.VoterHash}",
             커뮤니티게시글Id = request.SourcePostId,
             커뮤니티원장Id = request.CommunityLedgerId ?? string.Empty,

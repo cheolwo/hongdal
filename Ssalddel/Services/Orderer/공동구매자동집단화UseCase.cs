@@ -1,4 +1,5 @@
 using Ssalddel.ApiMetadata;
+using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Services.Orderer;
@@ -26,7 +27,7 @@ public interface I공동구매자동집단화UseCase
         CancellationToken cancellationToken = default);
 }
 
-[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
+[SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseDemand)]
 [SsalddelUseCase("공동구매 자동 집단화", Summary = "주문자의 구매 의사를 배송권 기준으로 모아 공동구매 집단 후보를 형성합니다.")]
 [SsalddelUseCaseActor(SsalddelActor.Orderer)]
 [SsalddelUseCaseActor(SsalddelActor.OrdererGroupLeader, SsalddelUseCaseActorRole.Supporting)]
@@ -41,23 +42,34 @@ public interface I공동구매자동집단화UseCase
     "커뮤니티게시글UseCase",
     Condition = "구매 의사를 다른 주문자에게 공개해 모집하거나 토론하는 경우",
     Summary = "자동 집단화 후보를 커뮤니티 게시글과 태그 기반 모집 흐름으로 확장합니다.")]
+[SsalddelCodeMetadata(
+    SsalddelCodeFeatureKeys.GroupPurchaseDemandOperatingSystem,
+    SsalddelCodeLayer.Application,
+    "사용자 수요 Command를 검증한 뒤 공동구매 수요·모집 OS 조율 흐름으로 전달합니다.",
+    ContractType = typeof(I공동구매자동집단화UseCase),
+    FlowOrder = 20,
+    Effects = SsalddelCodeEffect.PersistentRead | SsalddelCodeEffect.PersistentWrite,
+    Boundary = "비구속 수요는 주문·결제·운송을 만들지 않으며 상태 확정은 서버 원장 검증 뒤에만 수행합니다.")]
 public sealed class 공동구매자동집단화UseCase : I공동구매자동집단화UseCase
 {
     private readonly I공동구매자동집단화저장소 _저장소;
     private readonly I공동구매수령창고Service _수령창고Service;
     private readonly I공동구매개별주문원장Service _개별주문원장Service;
     private readonly I공동구매주문자집단화Engine _집단화Engine;
+    private readonly I공동구매수요모집OS? _수요모집OS;
 
     public 공동구매자동집단화UseCase(
         I공동구매자동집단화저장소 저장소,
         I공동구매수령창고Service 수령창고Service,
         I공동구매개별주문원장Service 개별주문원장Service,
-        I공동구매주문자집단화Engine 집단화Engine)
+        I공동구매주문자집단화Engine 집단화Engine,
+        I공동구매수요모집OS? 수요모집OS = null)
     {
         _저장소 = 저장소;
         _수령창고Service = 수령창고Service;
         _개별주문원장Service = 개별주문원장Service;
         _집단화Engine = 집단화Engine;
+        _수요모집OS = 수요모집OS;
     }
 
     public async Task<공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>> 목록조회Async(
@@ -93,7 +105,7 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
         {
             비구속수요검증(command);
             비구속경계적용(command);
-            var group = await _저장소.수요등록Async(command, cancellationToken);
+            var group = await 수요등록조율Async(command, cancellationToken);
             return 공동구매처리결과<공동구매자동집단응답>.성공결과(group);
         }
         catch (InvalidOperationException ex)
@@ -109,7 +121,9 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
         try
         {
             철회검증(command);
-            var response = await _저장소.수요철회Async(command, cancellationToken);
+            var response = _수요모집OS is null
+                ? await _저장소.수요철회Async(command, cancellationToken)
+                : await _수요모집OS.수요철회조율Async(command, cancellationToken);
             return 공동구매처리결과<공동구매자동수요철회응답>.성공결과(response);
         }
         catch (KeyNotFoundException)
@@ -144,7 +158,7 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
                 command.수령지주소참조키 = warehouse.주소참조키;
             }
 
-            var group = await _저장소.수요등록Async(command, cancellationToken);
+            var group = await 수요등록조율Async(command, cancellationToken);
             if (주문확정수요)
             {
                 var demand = group.수요목록.FirstOrDefault(x =>
@@ -181,6 +195,13 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
             return 공동구매처리결과<공동구매자동집단응답>.잘못된요청(ex.Message);
         }
     }
+
+    private Task<공동구매자동집단응답> 수요등록조율Async(
+        공동구매자동수요등록Command command,
+        CancellationToken cancellationToken)
+        => _수요모집OS is null
+            ? _저장소.수요등록Async(command, cancellationToken)
+            : _수요모집OS.수요등록조율Async(command, cancellationToken);
 
     private static bool 주문확정수요인가(공동구매자동수요등록Command command)
         => command.수요유형 == 공동구매자동수요유형코드.예약결제

@@ -99,7 +99,9 @@ internal static class GroupPurchaseUiModule
         services.TryAddScoped<공동구매커머스문서조회ViewModel>();
         services.TryAddTransient<공동구매실행기능ViewModel>();
         services.TryAddTransient<공동구매화면ViewModel>();
+        services.TryAddTransient<UnitedStatesKoreanFoodGroupBuyStorefrontViewModel>();
         services.TryAddTransient<OfficialFoodIngredientDemandViewModel>();
+        services.TryAddScoped<OrdererIngredientCardAutoGroupingViewModel>();
 
         return services;
     }

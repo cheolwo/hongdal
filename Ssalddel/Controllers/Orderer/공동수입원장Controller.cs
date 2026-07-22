@@ -12,11 +12,11 @@ namespace Ssalddel.Controllers.Orderer;
 [ApiController]
 [Authorize]
 [SsalddelApiVersion(
-    SsalddelProductVersion.V2_5,
-    FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow,
-    WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+    SsalddelProductVersion.V1_5,
+    FeatureKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow,
+    WorkflowKey = VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow)]
 [Route("api/v1/orderer/group-purchase-demand-votes/{campaignId:guid}/group-import-ledger")]
 public sealed class 공동수입원장Controller : ControllerBase
 {

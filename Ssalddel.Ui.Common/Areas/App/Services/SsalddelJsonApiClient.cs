@@ -56,6 +56,25 @@ public interface ISsalddelJsonApiClient
         bool allowNotFound = false,
         CancellationToken cancellationToken = default);
 
+    Task<TResponse?> SendWithHeadersAsync<TResponse>(
+        HttpMethod method,
+        string path,
+        IReadOnlyDictionary<string, string> headers,
+        string operationName,
+        bool allowNotFound = false,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 JSON API 클라이언트는 사용자 지정 요청 헤더를 지원하지 않습니다.");
+
+    Task<TResponse?> SendWithHeadersAsync<TRequest, TResponse>(
+        HttpMethod method,
+        string path,
+        TRequest request,
+        IReadOnlyDictionary<string, string> headers,
+        string operationName,
+        bool allowNotFound = false,
+        CancellationToken cancellationToken = default)
+        => throw new NotSupportedException("이 JSON API 클라이언트는 사용자 지정 요청 헤더를 지원하지 않습니다.");
+
     Task SendAsync(
         HttpMethod method,
         string path,
@@ -131,6 +150,53 @@ public sealed class SsalddelJsonApiClient : ISsalddelJsonApiClient
         return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
     }
 
+    public async Task<TResponse?> SendWithHeadersAsync<TResponse>(
+        HttpMethod method,
+        string path,
+        IReadOnlyDictionary<string, string> headers,
+        string operationName,
+        bool allowNotFound = false,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await SendCoreAsync(method, path, headers, operationName, cancellationToken);
+        if (allowNotFound && response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return default;
+        }
+
+        await EnsureSuccessAsync(response, operationName, cancellationToken);
+        if (response.StatusCode == HttpStatusCode.NoContent)
+        {
+            return default;
+        }
+
+        return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<TResponse?> SendWithHeadersAsync<TRequest, TResponse>(
+        HttpMethod method,
+        string path,
+        TRequest request,
+        IReadOnlyDictionary<string, string> headers,
+        string operationName,
+        bool allowNotFound = false,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await SendCoreAsync(method, path, request, headers, operationName, cancellationToken);
+        if (allowNotFound && response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return default;
+        }
+
+        await EnsureSuccessAsync(response, operationName, cancellationToken);
+        if (response.StatusCode == HttpStatusCode.NoContent)
+        {
+            return default;
+        }
+
+        return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
+    }
+
     public async Task SendAsync(
         HttpMethod method,
         string path,
@@ -172,6 +238,27 @@ public sealed class SsalddelJsonApiClient : ISsalddelJsonApiClient
         }
     }
 
+    private async Task<HttpResponseMessage> SendCoreAsync(
+        HttpMethod method,
+        string path,
+        IReadOnlyDictionary<string, string> headers,
+        string operationName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _protectedClient.SendAsync(method, path, headers, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"{operationName} API에 연결할 수 없습니다.", ex);
+        }
+        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new InvalidOperationException($"{operationName} API 응답 시간이 초과되었습니다.", ex);
+        }
+    }
+
     private async Task<HttpResponseMessage> SendCoreAsync<TRequest>(
         HttpMethod method,
         string path,
@@ -182,6 +269,33 @@ public sealed class SsalddelJsonApiClient : ISsalddelJsonApiClient
         try
         {
             return await _protectedClient.SendAsProtectedJsonAsync(method, path, request, cancellationToken);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"{operationName} API에 연결할 수 없습니다.", ex);
+        }
+        catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new InvalidOperationException($"{operationName} API 응답 시간이 초과되었습니다.", ex);
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendCoreAsync<TRequest>(
+        HttpMethod method,
+        string path,
+        TRequest request,
+        IReadOnlyDictionary<string, string> headers,
+        string operationName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _protectedClient.SendAsProtectedJsonAsync(
+                method,
+                path,
+                request,
+                headers,
+                cancellationToken);
         }
         catch (HttpRequestException ex)
         {

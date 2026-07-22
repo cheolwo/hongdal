@@ -1,0 +1,53 @@
+@page "/group-purchase/demands/new/{ProductId}"
+@using Ssalddel.Contracts.Common.Orderer
+@inject GroupPurchaseCatalogViewModel Catalog
+
+<PageTitle>비구속 공동구매 수요 등록</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.DemandCreate"
+                              Eyebrow="GROUP PURCHASE · ACTION"
+                              Title="비구속 수요 등록"
+                              Description="선택한 상품 한 건의 모집권과 희망 수량을 확인해 사용자 소유 수요 원장에 저장합니다."
+                              BackHref="@BackHref">
+        @if (!_productFound)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                요청한 공동구매 상품을 찾지 못했습니다.
+            </MudAlert>
+        }
+        else
+        {
+            <GroupPurchaseDemandPanel Product="Catalog.SelectedProduct"
+                                      DesiredQuantityKg="Catalog.DesiredQuantityKg"
+                                      DesiredQuantityKgChanged="UpdateDesiredQuantityAsync"
+                                      DesiredUnitPrice="Catalog.DesiredUnitPrice"
+                                      DesiredUnitPriceChanged="UpdateDesiredUnitPriceAsync"
+                                      ShowFlowSummary="false" />
+        }
+    </GroupPurchaseScreenFrame>
+</MudContainer>
+
+@code {
+    [Parameter] public string ProductId { get; set; } = string.Empty;
+
+    private bool _productFound;
+    private string BackHref => _productFound
+        ? GroupPurchasePageRoutes.ProductDetailFor(Catalog.SelectedProduct.상품카드Id)
+        : GroupPurchasePageRoutes.ProductsRoot;
+
+    protected override void OnParametersSet()
+        => _productFound = Catalog.TrySelectProduct(ProductId);
+
+    private Task UpdateDesiredQuantityAsync(decimal quantityKg)
+    {
+        Catalog.UpdateDesiredQuantity(quantityKg);
+        return Task.CompletedTask;
+    }
+
+    private Task UpdateDesiredUnitPriceAsync(decimal unitPrice)
+    {
+        Catalog.UpdateDesiredUnitPrice(unitPrice);
+        return Task.CompletedTask;
+    }
+}

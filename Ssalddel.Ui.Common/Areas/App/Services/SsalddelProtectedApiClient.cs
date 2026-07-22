@@ -43,15 +43,23 @@ public sealed class SsalddelProtectedApiClient
         return await httpClient.SendAsync(message, cancellationToken);
     }
 
+    public Task<HttpResponseMessage> SendAsync(
+        HttpMethod method,
+        string requestUri,
+        CancellationToken cancellationToken = default)
+        => SendAsync(method, requestUri, headers: null, cancellationToken: cancellationToken);
+
     public async Task<HttpResponseMessage> SendAsync(
         HttpMethod method,
         string requestUri,
+        IReadOnlyDictionary<string, string>? headers,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(method);
         ArgumentException.ThrowIfNullOrWhiteSpace(requestUri);
         using var message = new HttpRequestMessage(method, requestUri);
         ApplyAuthorization(message);
+        ApplyHeaders(message, headers);
         return await httpClient.SendAsync(message, cancellationToken);
     }
 
@@ -103,10 +111,23 @@ public sealed class SsalddelProtectedApiClient
         return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
     }
 
+    public Task<HttpResponseMessage> SendAsProtectedJsonAsync<TRequest>(
+        HttpMethod method,
+        string requestUri,
+        TRequest request,
+        CancellationToken cancellationToken = default)
+        => SendAsProtectedJsonAsync(
+            method,
+            requestUri,
+            request,
+            headers: null,
+            cancellationToken: cancellationToken);
+
     public async Task<HttpResponseMessage> SendAsProtectedJsonAsync<TRequest>(
         HttpMethod method,
         string requestUri,
         TRequest request,
+        IReadOnlyDictionary<string, string>? headers,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(method);
@@ -114,6 +135,7 @@ public sealed class SsalddelProtectedApiClient
 
         using var message = new HttpRequestMessage(method, requestUri);
         ApplyAuthorization(message);
+        ApplyHeaders(message, headers);
         message.Content = await CreateProtectedJsonContentAsync(requestUri, request, cancellationToken);
         return await httpClient.SendAsync(message, cancellationToken);
     }
@@ -124,6 +146,27 @@ public sealed class SsalddelProtectedApiClient
         if (!string.IsNullOrWhiteSpace(token))
         {
             message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+    }
+
+    private static void ApplyHeaders(
+        HttpRequestMessage message,
+        IReadOnlyDictionary<string, string>? headers)
+    {
+        if (headers is null)
+        {
+            return;
+        }
+
+        foreach (var (name, value) in headers)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentException.ThrowIfNullOrWhiteSpace(value);
+            if (string.Equals(name, "Authorization", StringComparison.OrdinalIgnoreCase)
+                || !message.Headers.TryAddWithoutValidation(name, value.Trim()))
+            {
+                throw new InvalidOperationException($"요청 헤더 '{name}'을(를) 적용할 수 없습니다.");
+            }
         }
     }
 

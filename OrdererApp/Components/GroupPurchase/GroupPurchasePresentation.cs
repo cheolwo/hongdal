@@ -96,7 +96,17 @@ internal static class GroupPurchasePresentation
             공동구매자동집단상태코드.수요수집중 => "수요 수집 중",
             공동구매자동집단상태코드.확정대기 => "확정 검토 대기",
             공동구매자동집단상태코드.확정 => "집단 확정",
+            공동구매자동집단상태코드.모집종료목표미달 => "모집 종료 · 목표 미달",
             _ => value
+        };
+
+    public static Color AutoGroupStatusColor(string value)
+        => value switch
+        {
+            공동구매자동집단상태코드.확정 => Color.Success,
+            공동구매자동집단상태코드.확정대기 => Color.Info,
+            공동구매자동집단상태코드.모집종료목표미달 => Color.Warning,
+            _ => Color.Default
         };
 
     public static string TransportDocumentLabel(string value)
@@ -110,7 +120,7 @@ internal static class GroupPurchasePresentation
         => value.HasValue ? DateLabel(value.Value) : "-";
 
     public static string DateLabel(DateTime value)
-        => value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+        => value == default ? "-" : value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
 
     public static string ShipmentStatusLabel(string value)
         => value switch

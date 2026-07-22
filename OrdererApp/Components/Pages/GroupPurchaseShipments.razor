@@ -1,0 +1,16 @@
+@page "/group-purchase/shipments"
+@using Ssalddel.Contracts.Common.Orderer
+
+<PageTitle>공동구매 선적 조회</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.ShipmentTracking"
+                              Eyebrow="TRANSPORT · 2.0 PREVIEW"
+                              Title="공동구매 선적 조회"
+                              Description="문서관리번호 한 건의 공개 선적 상태를 조회합니다."
+                              BackHref="@GroupPurchasePageRoutes.Root"
+                              BoundarySeverity="Severity.Warning"
+                              BoundaryMessage="이 화면은 2.0 운송 단계의 읽기 전용 준비 자산입니다. 1.5 준비 원장에서 계약·구매·출고가 확정되지 않았으며 선적·통관·운송 상태를 변경하지 않습니다.">
+        <GroupPurchaseShipmentTrackingPanel />
+    </GroupPurchaseScreenFrame>
+</MudContainer>

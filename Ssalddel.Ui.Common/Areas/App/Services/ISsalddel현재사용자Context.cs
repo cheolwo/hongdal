@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Ssalddel.Contracts.Common.Orderer;
 
 namespace Ssalddel.Ui.Common.Areas.App.Services;
 
@@ -7,10 +8,16 @@ namespace Ssalddel.Ui.Common.Areas.App.Services;
 /// 화면이 표시와 입력 제어에 사용할 로그인 사용자 스냅샷입니다.
 /// 서버 권한 판정은 이 값이 아니라 요청의 Bearer 토큰과 서버 클레임을 기준으로 합니다.
 /// </summary>
+public sealed record 주문자집단배송권Snapshot(
+    string ScopeKey,
+    string DisplayName,
+    string Basis);
+
 public sealed record 현재사용자Snapshot(
     string? UserId,
     string? UserName,
-    IReadOnlyList<string> Roles)
+    IReadOnlyList<string> Roles,
+    주문자집단배송권Snapshot? 주문자집단배송권 = null)
 {
     public static 현재사용자Snapshot 익명 { get; } = new(null, null, []);
 
@@ -93,8 +100,15 @@ internal sealed class SsalddelAccessToken현재사용자Context(
                     "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
+            var scopeKey = FirstString(root, 주문자집단배송권ClaimTypes.ScopeKey);
+            var ordererGroupScope = string.IsNullOrWhiteSpace(scopeKey)
+                ? null
+                : new 주문자집단배송권Snapshot(
+                    scopeKey.Trim(),
+                    FirstString(root, 주문자집단배송권ClaimTypes.DisplayName)?.Trim() ?? scopeKey.Trim(),
+                    FirstString(root, 주문자집단배송권ClaimTypes.Basis)?.Trim() ?? string.Empty);
 
-            return new 현재사용자Snapshot(userId.Trim(), userName?.Trim(), roles);
+            return new 현재사용자Snapshot(userId.Trim(), userName?.Trim(), roles, ordererGroupScope);
         }
         catch (Exception exception) when (exception is FormatException or JsonException)
         {
