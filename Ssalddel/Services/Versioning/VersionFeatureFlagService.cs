@@ -23,9 +23,10 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow => IsWarehouseFulfillmentEnabled(flags),
             VersionFeatureFlagKeys.CustomsHsV20 => IsCustomsAndTradeDataEnabled(flags),
             VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow => IsCustomsAndTradeDataEnabled(flags),
-            VersionFeatureFlagKeys.OrdererGroupOrderV25 => IsGroupPurchaseImportEnabled(flags),
-            VersionFeatureFlagKeys.ApartmentGroupOrderV25 => IsGroupPurchaseImportEnabled(flags),
-            VersionFeatureFlagKeys.GroupPurchaseImportWorkflow => IsGroupPurchaseImportEnabled(flags),
+            VersionFeatureFlagKeys.OrdererGroupOrderV25 => IsGroupPurchaseDemandEnabled(flags),
+            VersionFeatureFlagKeys.ApartmentGroupOrderV25 => IsGroupPurchaseDemandEnabled(flags),
+            VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow => IsGroupPurchaseDemandEnabled(flags),
+            VersionFeatureFlagKeys.GroupPurchaseImportWorkflow => IsGroupPurchaseDemandEnabled(flags),
             VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow => IsSalesChannelFulfillmentEnabled(flags),
             VersionFeatureFlagKeys.CommunityTrustWorkflow => IsCommunityTrustEnabled(flags),
             VersionFeatureFlagKeys.HrParticipationWorkflow => IsHrParticipationEnabled(flags),
@@ -45,7 +46,8 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             [VersionFeatureFlagKeys.DomesticTransportWorkflow] = IsDomesticTransportEnabled(flags),
             [VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow] = IsWarehouseFulfillmentEnabled(flags),
             [VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow] = IsCustomsAndTradeDataEnabled(flags),
-            [VersionFeatureFlagKeys.GroupPurchaseImportWorkflow] = IsGroupPurchaseImportEnabled(flags),
+            [VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow] = IsGroupPurchaseDemandEnabled(flags),
+            [VersionFeatureFlagKeys.GroupPurchaseImportWorkflow] = IsGroupPurchaseDemandEnabled(flags),
             [VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow] = IsSalesChannelFulfillmentEnabled(flags),
             [VersionFeatureFlagKeys.CommunityTrustWorkflow] = IsCommunityTrustEnabled(flags),
             [VersionFeatureFlagKeys.HrParticipationWorkflow] = IsHrParticipationEnabled(flags),
@@ -54,7 +56,7 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
             [VersionFeatureFlagKeys.CargoYongdalV1] = IsDomesticTransportEnabled(flags),
             [VersionFeatureFlagKeys.WarehouseV15] = IsWarehouseFulfillmentEnabled(flags),
             [VersionFeatureFlagKeys.CustomsHsV20] = IsCustomsAndTradeDataEnabled(flags),
-            [VersionFeatureFlagKeys.OrdererGroupOrderV25] = IsGroupPurchaseImportEnabled(flags),
+            [VersionFeatureFlagKeys.OrdererGroupOrderV25] = IsGroupPurchaseDemandEnabled(flags),
             [VersionFeatureFlagKeys.FoodDeliveryV30] = IsFoodDeliveryEnabled(flags),
             [VersionFeatureFlagKeys.SsalddelMartV35] = IsSsalddelMartEnabled(flags)
         };
@@ -70,17 +72,21 @@ public sealed class VersionFeatureFlagService : IVersionFeatureFlagService
     private static bool IsCustomsAndTradeDataEnabled(VersionFeatureFlagsOptions flags)
         => flags.CustomsAndTradeDataWorkflow || flags.CustomsHsV20;
 
-    private static bool IsGroupPurchaseImportEnabled(VersionFeatureFlagsOptions flags)
-        => flags.GroupPurchaseImportWorkflow || flags.OrdererGroupOrderV25 || flags.ApartmentGroupOrderV25;
+    private static bool IsGroupPurchaseDemandEnabled(VersionFeatureFlagsOptions flags)
+        => flags.CommunityTrustWorkflow
+            && (flags.GroupPurchaseDemandWorkflow
+                || flags.GroupPurchaseImportWorkflow
+                || flags.OrdererGroupOrderV25
+                || flags.ApartmentGroupOrderV25);
 
     private static bool IsSalesChannelFulfillmentEnabled(VersionFeatureFlagsOptions flags)
-        => flags.SalesChannelFulfillmentWorkflow || IsWarehouseFulfillmentEnabled(flags) || IsGroupPurchaseImportEnabled(flags);
+        => flags.SalesChannelFulfillmentWorkflow || IsWarehouseFulfillmentEnabled(flags);
 
     private static bool IsCommunityTrustEnabled(VersionFeatureFlagsOptions flags)
         => flags.CommunityTrustWorkflow;
 
     private static bool IsHrParticipationEnabled(VersionFeatureFlagsOptions flags)
-        => flags.HrParticipationWorkflow || IsGroupPurchaseImportEnabled(flags);
+        => flags.HrParticipationWorkflow;
 
     private static bool IsFoodDeliveryEnabled(VersionFeatureFlagsOptions flags)
         => flags.FoodDeliveryWorkflow || flags.FoodDeliveryV30;
@@ -102,6 +108,8 @@ public static class VersionFeatureFlagKeys
     public const string CustomsAndTradeDataWorkflow = nameof(CustomsAndTradeDataWorkflow);
 
     public const string CustomsHsV20 = nameof(CustomsHsV20);
+
+    public const string GroupPurchaseDemandWorkflow = nameof(GroupPurchaseDemandWorkflow);
 
     public const string GroupPurchaseImportWorkflow = nameof(GroupPurchaseImportWorkflow);
 

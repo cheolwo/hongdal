@@ -11,9 +11,9 @@ namespace Ssalddel.Controllers.Orderer;
 
 [ApiController]
 [Authorize]
-[SsalddelApiVersion(SsalddelProductVersion.V2_5, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[SsalddelApiVersion(SsalddelProductVersion.V1_0, FeatureKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow, WorkflowKey = VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [SsalddelApiWorkflow(SsalddelWorkflow.GroupPurchaseImport)]
-[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow)]
+[RequireVersionFeature(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow)]
 [Route("api/v1/orderer/group-purchase-auto-groups")]
 public sealed class 공동구매자동집단화Controller : ControllerBase
 {
@@ -25,6 +25,7 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(IReadOnlyList<공동구매자동집단요약응답>), StatusCodes.Status200OK)]
     public async Task<IActionResult> 목록(
         [FromQuery(Name = "productKey")] string? 상품키,
@@ -50,20 +51,108 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("placement-preview")]
+    [ProducesResponseType(typeof(공동구매자동집단배치미리보기응답), StatusCodes.Status200OK)]
+    public async Task<IActionResult> 배치미리보기(
+        [FromBody] 공동구매자동수요등록Command command,
+        CancellationToken cancellationToken)
+    {
+        command.주문자키 = CurrentUserId();
+        if (string.IsNullOrWhiteSpace(command.주문자표시명))
+        {
+            command.주문자표시명 = User.Identity?.Name ?? command.주문자키;
+        }
+
+        var result = await _useCase.배치미리보기Async(command, cancellationToken);
+        if (!result.성공)
+        {
+            return this.ToProblemActionResult(result.메시지, result.상태코드);
+        }
+
+        return result.값 is null
+            ? this.ToNotFoundProblem("공동구매 자동집단 배치 미리보기를 만들 수 없습니다.")
+            : Ok(result.값);
+    }
+
+    [HttpPut("demands/{demandSourceKey}")]
+    [ProducesResponseType(typeof(공동구매자동집단사용자응답), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> 비구속수요저장(
+        [FromRoute(Name = "demandSourceKey")] string 수요출처키,
+        [FromBody] 공동구매자동수요등록Command command,
+        [FromHeader(Name = "Idempotency-Key")] string? 요청멱등키,
+        CancellationToken cancellationToken)
+    {
+        var currentUserId = CurrentUserId();
+        command.수요출처키 = 수요출처키;
+        command.요청멱등키 = !string.IsNullOrWhiteSpace(요청멱등키)
+            ? 요청멱등키.Trim()
+            : command.요청멱등키?.Trim() ?? string.Empty;
+        command.주문자키 = currentUserId;
+        if (string.IsNullOrWhiteSpace(command.주문자표시명))
+        {
+            command.주문자표시명 = User.Identity?.Name ?? currentUserId;
+        }
+
+        var result = await _useCase.비구속수요저장Async(command, cancellationToken);
+        if (!result.성공)
+        {
+            return this.ToProblemActionResult(result.메시지, result.상태코드);
+        }
+
+        return result.값 is null
+            ? this.ToNotFoundProblem("저장된 공동구매 수요 집단을 찾을 수 없습니다.")
+            : Ok(사용자응답으로(result.값, currentUserId, command.수요출처키));
+    }
+
+    [HttpDelete("demands/{demandSourceKey}")]
+    [ProducesResponseType(typeof(공동구매자동수요철회응답), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> 비구속수요철회(
+        [FromRoute(Name = "demandSourceKey")] string 수요출처키,
+        [FromHeader(Name = "Idempotency-Key")] string? 요청멱등키,
+        [FromQuery(Name = "reason")] string? 철회사유,
+        CancellationToken cancellationToken)
+    {
+        var result = await _useCase.수요철회Async(new 공동구매자동수요철회Command
+        {
+            수요출처키 = 수요출처키,
+            요청멱등키 = 요청멱등키?.Trim() ?? string.Empty,
+            주문자키 = CurrentUserId(),
+            철회사유 = 철회사유?.Trim() ?? string.Empty
+        }, cancellationToken);
+        if (!result.성공)
+        {
+            return this.ToProblemActionResult(result.메시지, result.상태코드);
+        }
+
+        return result.값 is null
+            ? this.ToNotFoundProblem("철회된 공동구매 수요를 찾을 수 없습니다.")
+            : Ok(result.값);
+    }
+
     [HttpPost("demands")]
     [ProducesResponseType(typeof(공동구매자동집단사용자응답), StatusCodes.Status200OK)]
     public async Task<IActionResult> 수요등록(
         [FromBody] 공동구매자동수요등록Command command,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        [FromHeader(Name = "Idempotency-Key")] string? 요청멱등키 = null)
     {
         var currentUserId = CurrentUserId();
+        command.요청멱등키 = !string.IsNullOrWhiteSpace(요청멱등키)
+            ? 요청멱등키.Trim()
+            : string.IsNullOrWhiteSpace(command.요청멱등키)
+                ? $"legacy-post:{Guid.NewGuid():N}"
+                : command.요청멱등키.Trim();
+
         command.주문자키 = currentUserId;
         if (string.IsNullOrWhiteSpace(command.주문자표시명))
         {
             command.주문자표시명 = User.Identity?.Name ?? command.주문자키;
         }
 
-        var result = await _useCase.수요등록Async(command, cancellationToken);
+        var result = await _useCase.비구속수요저장Async(command, cancellationToken);
         if (!result.성공)
         {
             return this.ToProblemActionResult(result.메시지, result.상태코드);
@@ -122,10 +211,15 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
             현재상태 = source.현재상태,
             수요건수 = source.수요건수,
             예약결제건수 = source.예약결제건수,
+            참여자수 = source.참여자수,
+            예약결제참여자수 = source.예약결제참여자수,
             총희망수량 = source.총희망수량,
             수량단위 = source.수량단위,
             목표참여자수 = source.목표참여자수,
             목표수량 = source.목표수량,
+            모집종료시각Utc = source.모집종료시각Utc,
+            모집종료여부 = source.모집종료여부,
+            모집조건충족여부 = source.모집조건충족여부,
             생성시각Utc = source.생성시각Utc,
             수정시각Utc = source.수정시각Utc
         };

@@ -9,6 +9,18 @@ public interface I공동구매자동집단화UseCase
         공동구매자동집단조회조건 조건,
         CancellationToken cancellationToken = default);
 
+    Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(
+        공동구매자동수요등록Command command,
+        CancellationToken cancellationToken = default);
+
+    Task<공동구매처리결과<공동구매자동집단응답>> 비구속수요저장Async(
+        공동구매자동수요등록Command command,
+        CancellationToken cancellationToken = default);
+
+    Task<공동구매처리결과<공동구매자동수요철회응답>> 수요철회Async(
+        공동구매자동수요철회Command command,
+        CancellationToken cancellationToken = default);
+
     Task<공동구매처리결과<공동구매자동집단응답>> 수요등록Async(
         공동구매자동수요등록Command command,
         CancellationToken cancellationToken = default);
@@ -34,15 +46,18 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
     private readonly I공동구매자동집단화저장소 _저장소;
     private readonly I공동구매수령창고Service _수령창고Service;
     private readonly I공동구매개별주문원장Service _개별주문원장Service;
+    private readonly I공동구매주문자집단화Engine _집단화Engine;
 
     public 공동구매자동집단화UseCase(
         I공동구매자동집단화저장소 저장소,
         I공동구매수령창고Service 수령창고Service,
-        I공동구매개별주문원장Service 개별주문원장Service)
+        I공동구매개별주문원장Service 개별주문원장Service,
+        I공동구매주문자집단화Engine 집단화Engine)
     {
         _저장소 = 저장소;
         _수령창고Service = 수령창고Service;
         _개별주문원장Service = 개별주문원장Service;
+        _집단화Engine = 집단화Engine;
     }
 
     public async Task<공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>> 목록조회Async(
@@ -51,6 +66,66 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
     {
         var items = await _저장소.집단목록조회Async(조건, cancellationToken);
         return 공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>.성공결과(items);
+    }
+
+    public async Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(
+        공동구매자동수요등록Command command,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var 자동집단Id = _집단화Engine.자동집단Id생성(command);
+            var 기존집단 = await _저장소.집단조회Async(자동집단Id, cancellationToken);
+            var 미리보기 = _집단화Engine.배치미리보기(command, 기존집단);
+            return 공동구매처리결과<공동구매자동집단배치미리보기응답>.성공결과(미리보기);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return 공동구매처리결과<공동구매자동집단배치미리보기응답>.잘못된요청(ex.Message);
+        }
+    }
+
+    public async Task<공동구매처리결과<공동구매자동집단응답>> 비구속수요저장Async(
+        공동구매자동수요등록Command command,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            비구속수요검증(command);
+            비구속경계적용(command);
+            var group = await _저장소.수요등록Async(command, cancellationToken);
+            return 공동구매처리결과<공동구매자동집단응답>.성공결과(group);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return 공동구매처리결과<공동구매자동집단응답>.잘못된요청(ex.Message);
+        }
+    }
+
+    public async Task<공동구매처리결과<공동구매자동수요철회응답>> 수요철회Async(
+        공동구매자동수요철회Command command,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            철회검증(command);
+            var response = await _저장소.수요철회Async(command, cancellationToken);
+            return 공동구매처리결과<공동구매자동수요철회응답>.성공결과(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return 공동구매처리결과<공동구매자동수요철회응답>.찾을수없음(
+                "철회할 본인 공동구매 수요를 찾을 수 없습니다.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return 공동구매처리결과<공동구매자동수요철회응답>.찾을수없음(
+                "철회할 본인 공동구매 수요를 찾을 수 없습니다.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return 공동구매처리결과<공동구매자동수요철회응답>.잘못된요청(ex.Message);
+        }
     }
 
     public async Task<공동구매처리결과<공동구매자동집단응답>> 수요등록Async(
@@ -111,4 +186,68 @@ public sealed class 공동구매자동집단화UseCase : I공동구매자동집�
         => command.수요유형 == 공동구매자동수요유형코드.예약결제
            || command.결제상태 is 공동구매자동결제상태코드.예약됨
                or 공동구매자동결제상태코드.결제확정;
+
+    private static void 비구속수요검증(공동구매자동수요등록Command command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        if (string.IsNullOrWhiteSpace(command.요청멱등키))
+        {
+            throw new InvalidOperationException("비구속 수요 저장에는 요청 멱등 키가 필요합니다.");
+        }
+
+        if (command.요청멱등키.Trim().Length > 160)
+        {
+            throw new InvalidOperationException("요청 멱등 키는 160자 이하여야 합니다.");
+        }
+
+        if (string.IsNullOrWhiteSpace(command.수요출처키))
+        {
+            throw new InvalidOperationException("비구속 수요 저장에는 수요출처키가 필요합니다.");
+        }
+
+        if (command.수요출처키.Trim().Length > 200)
+        {
+            throw new InvalidOperationException("수요출처키는 200자 이하여야 합니다.");
+        }
+
+        if (string.IsNullOrWhiteSpace(command.주문자키))
+        {
+            throw new InvalidOperationException("비구속 수요 저장에는 주문자 식별키가 필요합니다.");
+        }
+    }
+
+    private static void 비구속경계적용(공동구매자동수요등록Command command)
+    {
+        command.수요유형 = 공동구매자동수요유형코드.관심표시;
+        command.결제상태 = 공동구매자동결제상태코드.미결제;
+        command.예약결제금액 = null;
+        command.도착창고Id = null;
+        command.도착창고유형 = string.Empty;
+        command.도착창고명 = string.Empty;
+        command.수령지주소참조키 = string.Empty;
+        command.수령지표시명 = string.Empty;
+        command.수령도로명주소 = string.Empty;
+        command.수령상세주소 = string.Empty;
+    }
+
+    private static void 철회검증(공동구매자동수요철회Command command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        if (string.IsNullOrWhiteSpace(command.요청멱등키))
+        {
+            throw new InvalidOperationException("수요 철회에는 요청 멱등 키가 필요합니다.");
+        }
+
+        if (string.IsNullOrWhiteSpace(command.수요출처키)
+            || string.IsNullOrWhiteSpace(command.주문자키))
+        {
+            throw new InvalidOperationException("수요 철회에는 수요출처키와 주문자 식별키가 필요합니다.");
+        }
+
+        if (command.요청멱등키.Trim().Length > 160
+            || command.수요출처키.Trim().Length > 200)
+        {
+            throw new InvalidOperationException("요청 멱등 키는 160자, 수요출처키는 200자 이하여야 합니다.");
+        }
+    }
 }

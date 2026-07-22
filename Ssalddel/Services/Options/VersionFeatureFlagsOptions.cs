@@ -20,6 +20,8 @@ public sealed class VersionFeatureFlagsOptions
 
     public bool ApartmentGroupOrderV25 { get; set; }
 
+    public bool GroupPurchaseDemandWorkflow { get; set; }
+
     public bool GroupPurchaseImportWorkflow { get; set; }
 
     public bool SalesChannelFulfillmentWorkflow { get; set; }

@@ -27,6 +27,11 @@ public static class 공동구매자동집단화계획기
         int? 목표참여자수,
         decimal? 목표수량)
     {
+        if (수요건수 < 2)
+        {
+            return 공동구매자동집단상태코드.수요수집중;
+        }
+
         var 참여자목표충족 = !목표참여자수.HasValue || 수요건수 >= 목표참여자수.Value;
         var 수량목표충족 = !목표수량.HasValue || 총희망수량 >= 목표수량.Value;
         var 명시목표존재 = 목표참여자수.HasValue || 목표수량.HasValue;

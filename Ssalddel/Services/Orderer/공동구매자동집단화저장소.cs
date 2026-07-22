@@ -3,6 +3,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Ssalddel.Services.Orderer;
 
@@ -10,6 +13,10 @@ public interface I공동구매자동집단화저장소
 {
     Task<공동구매자동집단응답> 수요등록Async(
         공동구매자동수요등록Command command,
+        CancellationToken cancellationToken = default);
+
+    Task<공동구매자동수요철회응답> 수요철회Async(
+        공동구매자동수요철회Command command,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<공동구매자동집단응답>> 집단목록조회Async(
@@ -34,10 +41,14 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
     private const string 컬렉션명 = "orderer_group_purchase_auto_groups";
     private const int 최대동시성재시도횟수 = 8;
     private readonly IMongoCollection<공동구매자동집단문서> _컬렉션;
+    private readonly I공동구매주문자집단화Engine _집단화Engine;
     private readonly SemaphoreSlim _인덱스Lock = new(1, 1);
     private bool _인덱스준비됨;
 
-    public Mongo공동구매자동집단화저장소(IMongoClient mongoClient, IOptions<MongoDbOptions> options)
+    public Mongo공동구매자동집단화저장소(
+        IMongoClient mongoClient,
+        IOptions<MongoDbOptions> options,
+        I공동구매주문자집단화Engine 집단화Engine)
     {
         var databaseName = options.Value.Database;
         if (string.IsNullOrWhiteSpace(databaseName))
@@ -48,6 +59,7 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         _컬렉션 = mongoClient
             .GetDatabase(databaseName.Trim())
             .GetCollection<공동구매자동집단문서>(컬렉션명);
+        _집단화Engine = 집단화Engine;
     }
 
     public async Task<공동구매자동집단응답> 수요등록Async(
@@ -62,25 +74,42 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         var 배송권키 = 정규화(command.배송권키, "unknown-scope", 160);
         var 온도코드 = 정규화(command.온도코드, "상온", 40);
         var 물류방식 = 정규화(command.물류방식, "LCL", 40);
+        var 주문자키 = 정규화(command.주문자키, "anonymous-orderer", 120);
         var 수요출처키 = 정규화(
             command.수요출처키,
-            $"orderer:{정규화(command.주문자키, "anonymous-orderer", 120)}",
+            $"orderer:{주문자키}",
             200);
-        var 자동집단Id = 공동구매자동집단화계획기.자동집단키생성(
-            상품키,
-            배송권키,
-            온도코드,
-            물류방식);
+        var 자동집단Id = _집단화Engine.자동집단Id생성(command);
         var 갱신토큰 = ObjectId.GenerateNewId().ToString();
+        var 요청멱등키 = 정규화(command.요청멱등키, $"legacy:{갱신토큰}", 160);
+        var 요청지문 = 공동구매자동수요멱등정책.저장요청지문(command);
 
         var 기존출처문서목록 = await _컬렉션
             .Find(Builders<공동구매자동집단문서>.Filter.ElemMatch(
                 x => x.수요목록,
                 x => x.수요출처키 == 수요출처키))
             .ToListAsync(cancellationToken);
-        var 기존출처수요 = 공동구매자동수요동시성정책
-            .최신수요위치(기존출처문서목록, 수요출처키)?
-            .수요;
+        var 기존출처위치 = 공동구매자동수요동시성정책
+            .최신수요위치(기존출처문서목록, 수요출처키);
+        var 기존출처수요 = 기존출처위치?.수요;
+        if (기존출처수요 is not null
+            && !string.IsNullOrWhiteSpace(기존출처수요.주문자키)
+            && !string.Equals(기존출처수요.주문자키, 주문자키, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("동일한 수요출처키를 다른 주문자가 사용할 수 없습니다.");
+        }
+
+        if (기존출처수요 is not null
+            && 공동구매자동수요멱등정책.이미처리됨(
+                기존출처수요.명령목록,
+                요청멱등키,
+                공동구매자동수요명령유형코드.저장,
+                요청지문))
+        {
+            return 응답으로(기존출처위치!.문서);
+        }
+
+        수요저장가능검증(기존출처위치?.문서, now);
 
         await 집단저장Async(
             자동집단Id,
@@ -93,12 +122,31 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
                     .ThenByDescending(x => x.갱신토큰, StringComparer.Ordinal)
                     .FirstOrDefault();
                 if (같은집단수요 is not null
+                    && !string.IsNullOrWhiteSpace(같은집단수요.주문자키)
+                    && !string.Equals(같은집단수요.주문자키, 주문자키, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("동일한 수요출처키를 다른 주문자가 사용할 수 없습니다.");
+                }
+
+                var 기존수요 = 더최근수요(같은집단수요, 기존출처수요);
+                if (기존수요 is not null
+                    && 공동구매자동수요멱등정책.이미처리됨(
+                        기존수요.명령목록,
+                        요청멱등키,
+                        공동구매자동수요명령유형코드.저장,
+                        요청지문))
+                {
+                    return 집단저장계획.보존(기존문서!);
+                }
+
+                수요저장가능검증(기존문서, now);
+
+                if (같은집단수요 is not null
                     && 공동구매자동수요동시성정책.기존수요보존(같은집단수요, now, 갱신토큰))
                 {
                     return 집단저장계획.보존(기존문서!);
                 }
 
-                var 기존수요 = 더최근수요(같은집단수요, 기존출처수요);
                 var 수요 = new 공동구매자동수요문서
                 {
                     수요Id = 기존수요?.수요Id ?? ObjectId.GenerateNewId().ToString(),
@@ -109,7 +157,7 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
                     상품명 = 정규화(command.상품명, 상품키, 160),
                     배송권키 = 배송권키,
                     배송권명 = 정규화(command.배송권명, 배송권키, 160),
-                    주문자키 = 정규화(command.주문자키, "anonymous-orderer", 120),
+                    주문자키 = 주문자키,
                     주문자표시명 = 정규화(command.주문자표시명, "주문자", 80),
                     도착창고Id = command.도착창고Id is > 0 ? command.도착창고Id : null,
                     도착창고유형 = 정규화(command.도착창고유형, string.Empty, 50),
@@ -129,10 +177,20 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
                     메모 = 정규화(command.메모, string.Empty, 1000),
                     목표참여자수 = 양수값(command.목표참여자수),
                     목표수량 = 양수값(command.목표수량),
+                    상태 = 공동구매자동수요상태코드.활성,
+                    철회시각Utc = null,
+                    철회사유 = string.Empty,
+                    명령목록 = 기존수요?.명령목록.ToList() ?? [],
                     생성시각Utc = 기존수요?.생성시각Utc ?? now,
                     갱신시각Utc = now,
                     갱신토큰 = 갱신토큰
                 };
+                공동구매자동수요멱등정책.기록추가(
+                    수요.명령목록,
+                    요청멱등키,
+                    공동구매자동수요명령유형코드.저장,
+                    요청지문,
+                    now);
 
                 var 변경문서 = 기존문서 ?? new 공동구매자동집단문서
                 {
@@ -146,15 +204,21 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
                     배송권키 = 배송권키,
                     배송권명 = 수요.배송권명,
                     현재상태 = 공동구매자동집단상태코드.수요수집중,
-                    생성시각Utc = now
+                    생성시각Utc = now,
+                    모집종료시각Utc = 공동구매자동집단모집정책.기본모집종료시각Utc(now)
                 };
 
                 변경문서.수요목록.RemoveAll(x => x.수요출처키 == 수요출처키);
                 변경문서.수요목록.Add(수요);
+                var 재활성화 = 기존수요?.상태 == 공동구매자동수요상태코드.철회;
                 변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
                 {
-                    이벤트유형 = 기존수요 is null ? "DemandRegistered" : "DemandUpdated",
-                    요약 = $"{수요.주문자표시명} 수요가 {수요.희망수량:N0}{수요.수량단위} {(기존수요 is null ? "등록" : "변경")}되었습니다.",
+                    이벤트유형 = 기존수요 is null
+                        ? "DemandRegistered"
+                        : 재활성화
+                            ? "DemandReactivated"
+                            : "DemandUpdated",
+                    요약 = $"{수요.주문자표시명} 수요가 {수요.희망수량:N0}{수요.수량단위} {(기존수요 is null ? "등록" : 재활성화 ? "재등록" : "변경")}되었습니다.",
                     발생시각Utc = now
                 });
                 재계산(변경문서, now);
@@ -178,6 +242,116 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         return 응답으로(최신위치.문서);
     }
 
+    public async Task<공동구매자동수요철회응답> 수요철회Async(
+        공동구매자동수요철회Command command,
+        CancellationToken cancellationToken = default)
+    {
+        await 인덱스준비Async(cancellationToken);
+        철회검증(command);
+
+        var 수요출처키 = 정규화(command.수요출처키, string.Empty, 200);
+        var 주문자키 = 정규화(command.주문자키, string.Empty, 120);
+        var 요청멱등키 = 정규화(command.요청멱등키, string.Empty, 160);
+        var 요청지문 = 공동구매자동수요멱등정책.철회요청지문(command);
+        var 문서목록 = await _컬렉션
+            .Find(Builders<공동구매자동집단문서>.Filter.ElemMatch(
+                x => x.수요목록,
+                x => x.수요출처키 == 수요출처키))
+            .ToListAsync(cancellationToken);
+        var 기존위치 = 공동구매자동수요동시성정책.최신수요위치(문서목록, 수요출처키)
+            ?? throw new KeyNotFoundException("철회할 공동구매 수요를 찾을 수 없습니다.");
+        본인수요검증(기존위치.수요, 주문자키);
+
+        if (공동구매자동수요멱등정책.이미처리됨(
+                기존위치.수요.명령목록,
+                요청멱등키,
+                공동구매자동수요명령유형코드.철회,
+                요청지문))
+        {
+            return 철회응답으로(기존위치.문서, 기존위치.수요, 요청멱등키, true);
+        }
+
+        var 이미처리됨 = false;
+        var now = DateTime.UtcNow;
+        var 문서 = await 집단저장Async(
+            기존위치.문서.자동집단Id,
+            생성허용: false,
+            기존문서 =>
+            {
+                var 변경문서 = 기존문서
+                    ?? throw new KeyNotFoundException("철회할 공동구매 수요 집단을 찾을 수 없습니다.");
+                var 수요 = 변경문서.수요목록
+                    .Where(x => x.수요출처키 == 수요출처키)
+                    .OrderByDescending(수요갱신시각)
+                    .ThenByDescending(x => x.갱신토큰, StringComparer.Ordinal)
+                    .FirstOrDefault()
+                    ?? throw new KeyNotFoundException("철회할 공동구매 수요를 찾을 수 없습니다.");
+                본인수요검증(수요, 주문자키);
+
+                if (공동구매자동수요멱등정책.이미처리됨(
+                        수요.명령목록,
+                        요청멱등키,
+                        공동구매자동수요명령유형코드.철회,
+                        요청지문))
+                {
+                    이미처리됨 = true;
+                    return 집단저장계획.보존(변경문서);
+                }
+
+                var 활성수요 = 활성수요인가(수요);
+                if (활성수요 && 변경문서.현재상태 == 공동구매자동집단상태코드.확정)
+                {
+                    throw new InvalidOperationException("확정된 공동구매의 수요는 비구속 철회 API에서 철회할 수 없습니다.");
+                }
+
+                if (활성수요 && !비구속수요인가(수요))
+                {
+                    throw new InvalidOperationException("결제 또는 주문 원장에 연결된 수요는 비구속 철회 API에서 철회할 수 없습니다.");
+                }
+
+                이미처리됨 = !활성수요;
+                if (활성수요)
+                {
+                    수요.상태 = 공동구매자동수요상태코드.철회;
+                    수요.철회시각Utc = now;
+                    수요.철회사유 = 정규화(command.철회사유, string.Empty, 500);
+                    변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
+                    {
+                        이벤트유형 = "DemandWithdrawn",
+                        요약 = $"{수요.주문자표시명} 수요가 철회되었습니다.",
+                        발생시각Utc = now
+                    });
+                }
+
+                공동구매자동수요멱등정책.기록추가(
+                    수요.명령목록,
+                    요청멱등키,
+                    공동구매자동수요명령유형코드.철회,
+                    요청지문,
+                    now);
+                수요.갱신시각Utc = now;
+                수요.갱신토큰 = ObjectId.GenerateNewId().ToString();
+                if (활성수요)
+                {
+                    재계산(변경문서, now);
+                }
+                else
+                {
+                    변경문서.수정시각Utc = now;
+                }
+
+                return 집단저장계획.변경(변경문서);
+            },
+            cancellationToken);
+
+        var 철회수요 = 문서.수요목록
+            .Where(x => x.수요출처키 == 수요출처키)
+            .OrderByDescending(수요갱신시각)
+            .ThenByDescending(x => x.갱신토큰, StringComparer.Ordinal)
+            .First();
+        return 철회응답으로(문서, 철회수요, 요청멱등키, 이미처리됨);
+    }
+
     public async Task<IReadOnlyList<공동구매자동집단응답>> 집단목록조회Async(
         공동구매자동집단조회조건 조건,
         CancellationToken cancellationToken = default)
@@ -197,18 +371,25 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             filter &= builder.Eq(x => x.배송권키, 정규화(조건.배송권키, string.Empty, 160));
         }
 
-        if (!string.IsNullOrWhiteSpace(조건.현재상태))
-        {
-            filter &= builder.Eq(x => x.현재상태, 정규화(조건.현재상태, string.Empty, 40));
-        }
-
         var items = await _컬렉션
             .Find(filter)
             .SortByDescending(x => x.수정시각Utc)
-            .Limit(100)
+            .Limit(500)
             .ToListAsync(cancellationToken);
 
-        return items.Select(응답으로).ToArray();
+        var responses = items
+            .Select(응답으로)
+            .Where(x => x.수요건수 > 0);
+        if (!string.IsNullOrWhiteSpace(조건.현재상태))
+        {
+            var 현재상태 = 정규화(조건.현재상태, string.Empty, 80);
+            responses = responses.Where(x =>
+                string.Equals(x.현재상태, 현재상태, StringComparison.Ordinal));
+        }
+
+        return responses
+            .Take(100)
+            .ToArray();
     }
 
     public async Task<공동구매자동집단응답?> 집단조회Async(
@@ -478,31 +659,36 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
            && 첫번째.수요.수요Id == 두번째.수요.수요Id
            && 첫번째.수요.갱신토큰 == 두번째.수요.갱신토큰;
 
-    private static void 재계산(공동구매자동집단문서 문서, DateTime now)
+    private void 재계산(공동구매자동집단문서 문서, DateTime now)
     {
-        문서.수요건수 = 문서.수요목록.Count;
-        문서.예약결제건수 = 문서.수요목록.Count(x =>
-            x.수요유형 == 공동구매자동수요유형코드.예약결제 ||
-            x.결제상태 is 공동구매자동결제상태코드.예약됨 or 공동구매자동결제상태코드.결제확정);
-        문서.총희망수량 = 문서.수요목록.Sum(x => x.희망수량);
-        문서.예약결제합계 = 문서.수요목록.Sum(x => Math.Max(0, x.예약결제금액 ?? 0));
-        문서.수량단위 = 문서.수요목록.LastOrDefault()?.수량단위 ?? "kg";
-        문서.목표참여자수 = 문서.수요목록
+        var 모집종료시각Utc = 모집종료시각(문서, now);
+        문서.모집종료시각Utc = 모집종료시각Utc;
+        var 활성수요목록 = 문서.수요목록.Where(활성수요인가).ToArray();
+        문서.예약결제합계 = 활성수요목록.Sum(x => Math.Max(0, x.예약결제금액 ?? 0));
+        문서.목표참여자수 = 활성수요목록
             .Where(x => x.목표참여자수 is > 0)
             .Select(x => x.목표참여자수)
             .Min();
-        문서.목표수량 = 문서.수요목록
+        문서.목표수량 = 활성수요목록
             .Where(x => x.목표수량 is > 0)
             .Select(x => x.목표수량)
             .Min();
 
         var 이전상태 = 문서.현재상태;
-        문서.현재상태 = 공동구매자동집단화계획기.상태제안(
-            문서.수요건수,
-            문서.예약결제건수,
-            문서.총희망수량,
+        var 진행 = _집단화Engine.진행계산(
+            활성수요목록.Select(x => 응답으로(x, 문서.자동집단Id)).ToArray(),
             문서.목표참여자수,
-            문서.목표수량);
+            문서.목표수량,
+            문서.현재상태,
+            모집종료시각Utc,
+            now);
+        문서.현재상태 = 진행.현재상태;
+        문서.수요건수 = 진행.수요건수;
+        문서.예약결제건수 = 진행.예약결제건수;
+        문서.참여자수 = 진행.참여자수;
+        문서.예약결제참여자수 = 진행.예약결제참여자수;
+        문서.총희망수량 = 진행.총희망수량;
+        문서.수량단위 = string.IsNullOrWhiteSpace(진행.수량단위) ? "kg" : 진행.수량단위;
         if (이전상태 != 문서.현재상태)
         {
             문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
@@ -541,7 +727,10 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
                         .Ascending(x => x.상품키)
                         .Ascending(x => x.배송권키)
                         .Ascending(x => x.현재상태)
-                        .Descending(x => x.수정시각Utc))
+                        .Descending(x => x.수정시각Utc)),
+                new CreateIndexModel<공동구매자동집단문서>(
+                    Builders<공동구매자동집단문서>.IndexKeys
+                        .Ascending("수요목록.수요출처키"))
             };
 
             await _컬렉션.Indexes.CreateManyAsync(indexes, cancellationToken);
@@ -555,6 +744,12 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
 
     private static void 검증(공동구매자동수요등록Command command)
     {
+        if (!string.IsNullOrWhiteSpace(command.요청멱등키)
+            && command.요청멱등키.Trim().Length > 160)
+        {
+            throw new InvalidOperationException("요청 멱등 키는 160자 이하여야 합니다.");
+        }
+
         if (string.IsNullOrWhiteSpace(command.상품키) ||
             string.IsNullOrWhiteSpace(command.상품명) ||
             string.IsNullOrWhiteSpace(command.배송권키))
@@ -586,8 +781,76 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         }
     }
 
-    private static 공동구매자동집단응답 응답으로(공동구매자동집단문서 문서)
+    private static void 철회검증(공동구매자동수요철회Command command)
     {
+        ArgumentNullException.ThrowIfNull(command);
+        if (string.IsNullOrWhiteSpace(command.수요출처키)
+            || string.IsNullOrWhiteSpace(command.주문자키)
+            || string.IsNullOrWhiteSpace(command.요청멱등키))
+        {
+            throw new InvalidOperationException("수요출처키, 주문자 식별키와 요청 멱등 키를 입력해야 합니다.");
+        }
+
+        if (command.요청멱등키.Trim().Length > 160
+            || command.수요출처키.Trim().Length > 200)
+        {
+            throw new InvalidOperationException("요청 멱등 키는 160자, 수요출처키는 200자 이하여야 합니다.");
+        }
+    }
+
+    private static void 본인수요검증(공동구매자동수요문서 수요, string 주문자키)
+    {
+        if (!string.Equals(수요.주문자키, 주문자키, StringComparison.Ordinal))
+        {
+            throw new UnauthorizedAccessException("다른 주문자의 공동구매 수요는 변경할 수 없습니다.");
+        }
+    }
+
+    private 공동구매자동수요철회응답 철회응답으로(
+        공동구매자동집단문서 문서,
+        공동구매자동수요문서 수요,
+        string 요청멱등키,
+        bool 이미처리됨)
+    {
+        var 철회완료 = !활성수요인가(수요);
+        var 집단응답 = 응답으로(문서);
+        return new 공동구매자동수요철회응답
+        {
+            요청멱등키 = 요청멱등키,
+            수요출처키 = 수요.수요출처키,
+            자동집단Id = 문서.자동집단Id,
+            철회완료 = 철회완료,
+            이미처리됨 = 이미처리됨,
+            남은수요건수 = 집단응답.수요건수,
+            남은참여자수 = 집단응답.참여자수,
+            남은희망수량 = 집단응답.총희망수량,
+            현재상태 = 집단응답.현재상태,
+            철회시각Utc = 수요.철회시각Utc ?? default,
+            안내 = 철회완료
+                ? 이미처리됨
+                    ? "이미 철회된 비구속 수요입니다. 추가 주문·결제·운송 작업은 실행되지 않았습니다."
+                    : "비구속 수요를 철회했습니다. 추가 주문·결제·운송 작업은 실행되지 않았습니다."
+                : "같은 멱등 요청은 처리되었지만 이후 수요가 다시 등록되어 현재는 활성 상태입니다."
+        };
+    }
+
+    private 공동구매자동집단응답 응답으로(공동구매자동집단문서 문서)
+    {
+        var 기준시각Utc = DateTime.UtcNow;
+        var 모집종료시각Utc = 모집종료시각(문서, 기준시각Utc);
+        var 수요목록 = 문서.수요목록
+            .Where(활성수요인가)
+            .OrderByDescending(x => x.생성시각Utc)
+            .Select(x => 응답으로(x, 문서.자동집단Id))
+            .ToArray();
+        var 진행 = _집단화Engine.진행계산(
+            수요목록,
+            문서.목표참여자수,
+            문서.목표수량,
+            문서.현재상태,
+            모집종료시각Utc,
+            기준시각Utc);
+
         return new 공동구매자동집단응답
         {
             자동집단Id = 문서.자동집단Id,
@@ -599,17 +862,22 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             물류방식 = 문서.물류방식,
             배송권키 = 문서.배송권키,
             배송권명 = 문서.배송권명,
-            현재상태 = 문서.현재상태,
-            수요건수 = 문서.수요건수,
-            예약결제건수 = 문서.예약결제건수,
-            총희망수량 = 문서.총희망수량,
-            수량단위 = 문서.수량단위,
+            현재상태 = 진행.현재상태,
+            수요건수 = 진행.수요건수,
+            예약결제건수 = 진행.예약결제건수,
+            참여자수 = 진행.참여자수,
+            예약결제참여자수 = 진행.예약결제참여자수,
+            총희망수량 = 진행.총희망수량,
+            수량단위 = string.IsNullOrWhiteSpace(진행.수량단위) ? 문서.수량단위 : 진행.수량단위,
             예약결제합계 = 문서.예약결제합계,
-            목표참여자수 = 문서.목표참여자수,
-            목표수량 = 문서.목표수량,
+            목표참여자수 = 진행.목표참여자수,
+            목표수량 = 진행.목표수량,
+            모집종료시각Utc = 진행.모집종료시각Utc,
+            모집종료여부 = 진행.모집종료여부,
+            모집조건충족여부 = 진행.모집조건충족여부,
             생성시각Utc = 문서.생성시각Utc,
             수정시각Utc = 문서.수정시각Utc,
-            수요목록 = 문서.수요목록.OrderByDescending(x => x.생성시각Utc).Select(x => 응답으로(x, 문서.자동집단Id)).ToArray(),
+            수요목록 = 수요목록,
             이벤트목록 = 문서.이벤트목록.OrderByDescending(x => x.발생시각Utc).Take(20).Select(응답으로).ToArray()
         };
     }
@@ -642,6 +910,8 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
             희망수량 = 문서.희망수량,
             수량단위 = 문서.수량단위,
             예약결제금액 = 문서.예약결제금액,
+            목표참여자수 = 문서.목표참여자수,
+            목표수량 = 문서.목표수량,
             생성시각Utc = 문서.생성시각Utc
         };
     }
@@ -677,6 +947,55 @@ public sealed class Mongo공동구매자동집단화저장소 : I공동구매자
         => command.수요유형 == 공동구매자동수요유형코드.예약결제
            || command.결제상태 is 공동구매자동결제상태코드.예약됨
                or 공동구매자동결제상태코드.결제확정;
+
+    private static bool 활성수요인가(공동구매자동수요문서 수요)
+        => 수요.상태 != 공동구매자동수요상태코드.철회;
+
+    private static bool 비구속수요인가(공동구매자동수요문서 수요)
+        => 수요.수요유형 == 공동구매자동수요유형코드.관심표시
+           && 수요.결제상태 == 공동구매자동결제상태코드.미결제
+           && string.IsNullOrWhiteSpace(수요.개별주문원장Id)
+           && string.IsNullOrWhiteSpace(수요.입고예정원장Id);
+
+    private static void 수요저장가능검증(공동구매자동집단문서? 문서, DateTime 기준시각Utc)
+    {
+        if (문서 is null)
+        {
+            return;
+        }
+
+        if (문서.현재상태 == 공동구매자동집단상태코드.확정)
+        {
+            throw new InvalidOperationException("확정된 공동구매에는 수요를 등록하거나 변경할 수 없습니다.");
+        }
+
+        if (문서.현재상태 == 공동구매자동집단상태코드.모집종료목표미달
+            || 기준시각Utc >= 모집종료시각(문서, 기준시각Utc))
+        {
+            throw new InvalidOperationException("모집이 종료된 자동집단에는 수요를 등록하거나 변경할 수 없습니다.");
+        }
+    }
+
+    private static DateTime 모집종료시각(공동구매자동집단문서 문서, DateTime 기준시각Utc)
+    {
+        if (문서.모집종료시각Utc != default)
+        {
+            return Utc시각(문서.모집종료시각Utc);
+        }
+
+        var 시작시각Utc = 문서.생성시각Utc == default
+            ? Utc시각(기준시각Utc)
+            : Utc시각(문서.생성시각Utc);
+        return 공동구매자동집단모집정책.기본모집종료시각Utc(시작시각Utc);
+    }
+
+    private static DateTime Utc시각(DateTime 값)
+        => 값.Kind switch
+        {
+            DateTimeKind.Utc => 값,
+            DateTimeKind.Local => 값.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(값, DateTimeKind.Utc)
+        };
 
     private static string 정규화(string? 값, string 기본값, int 최대길이)
     {
@@ -796,6 +1115,103 @@ internal static class 낙관적동시성재시도기
     }
 }
 
+internal static class 공동구매자동수요명령유형코드
+{
+    internal const string 저장 = "UpsertDemand";
+    internal const string 철회 = "WithdrawDemand";
+}
+
+internal static class 공동구매자동수요멱등정책
+{
+    private const int 최대명령기록수 = 32;
+
+    internal static string 저장요청지문(공동구매자동수요등록Command command)
+        => 지문(
+            command.수요출처키,
+            command.커뮤니티게시글Id?.ToString(CultureInfo.InvariantCulture),
+            command.커뮤니티원장Id,
+            command.상품키,
+            command.상품명,
+            command.HS코드,
+            command.온도코드,
+            command.물류방식,
+            command.주문자키,
+            command.주문자표시명,
+            command.배송권키,
+            command.배송권명,
+            command.도착창고Id?.ToString(CultureInfo.InvariantCulture),
+            command.도착창고유형,
+            command.도착창고명,
+            command.수령지주소참조키,
+            command.수령지표시명,
+            command.수령도로명주소,
+            command.수령상세주소,
+            command.희망수량.ToString("G29", CultureInfo.InvariantCulture),
+            command.수량단위,
+            command.예약결제금액?.ToString("G29", CultureInfo.InvariantCulture),
+            command.수요유형,
+            command.결제상태,
+            command.메모,
+            command.목표참여자수?.ToString(CultureInfo.InvariantCulture),
+            command.목표수량?.ToString("G29", CultureInfo.InvariantCulture));
+
+    internal static string 철회요청지문(공동구매자동수요철회Command command)
+        => 지문(command.수요출처키, command.주문자키, command.철회사유);
+
+    internal static bool 이미처리됨(
+        IEnumerable<공동구매자동수요명령문서> 명령목록,
+        string 요청멱등키,
+        string 명령유형,
+        string 요청지문)
+    {
+        var 기존명령 = 명령목록.FirstOrDefault(x =>
+            string.Equals(x.요청멱등키, 요청멱등키, StringComparison.Ordinal));
+        if (기존명령 is null)
+        {
+            return false;
+        }
+
+        if (!string.Equals(기존명령.명령유형, 명령유형, StringComparison.Ordinal)
+            || !string.Equals(기존명령.요청지문, 요청지문, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("같은 멱등 키를 다른 공동구매 수요 명령에 재사용할 수 없습니다.");
+        }
+
+        return true;
+    }
+
+    internal static void 기록추가(
+        List<공동구매자동수요명령문서> 명령목록,
+        string 요청멱등키,
+        string 명령유형,
+        string 요청지문,
+        DateTime 처리시각Utc)
+    {
+        if (이미처리됨(명령목록, 요청멱등키, 명령유형, 요청지문))
+        {
+            return;
+        }
+
+        명령목록.Add(new 공동구매자동수요명령문서
+        {
+            요청멱등키 = 요청멱등키,
+            명령유형 = 명령유형,
+            요청지문 = 요청지문,
+            처리시각Utc = 처리시각Utc
+        });
+        if (명령목록.Count > 최대명령기록수)
+        {
+            명령목록.RemoveRange(0, 명령목록.Count - 최대명령기록수);
+        }
+    }
+
+    private static string 지문(params string?[] 값목록)
+    {
+        var 원문 = string.Join('\u001f', 값목록.Select(x => x?.Trim() ?? string.Empty));
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(원문)));
+    }
+}
+
 public sealed class 공동구매자동집단문서
 {
     [BsonId]
@@ -812,11 +1228,14 @@ public sealed class 공동구매자동집단문서
     public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
     public int 수요건수 { get; set; }
     public int 예약결제건수 { get; set; }
+    public int 참여자수 { get; set; }
+    public int 예약결제참여자수 { get; set; }
     public decimal 총희망수량 { get; set; }
     public string 수량단위 { get; set; } = "kg";
     public decimal 예약결제합계 { get; set; }
     public int? 목표참여자수 { get; set; }
     public decimal? 목표수량 { get; set; }
+    public DateTime 모집종료시각Utc { get; set; }
     public List<공동구매자동수요문서> 수요목록 { get; set; } = [];
     public List<공동구매자동집단이벤트문서> 이벤트목록 { get; set; } = [];
     public DateTime 생성시각Utc { get; set; }
@@ -852,9 +1271,21 @@ public sealed class 공동구매자동수요문서
     public string 메모 { get; set; } = string.Empty;
     public int? 목표참여자수 { get; set; }
     public decimal? 목표수량 { get; set; }
+    public string 상태 { get; set; } = 공동구매자동수요상태코드.활성;
+    public DateTime? 철회시각Utc { get; set; }
+    public string 철회사유 { get; set; } = string.Empty;
+    public List<공동구매자동수요명령문서> 명령목록 { get; set; } = [];
     public DateTime 생성시각Utc { get; set; }
     public DateTime 갱신시각Utc { get; set; }
     public string 갱신토큰 { get; set; } = string.Empty;
+}
+
+public sealed class 공동구매자동수요명령문서
+{
+    public string 요청멱등키 { get; set; } = string.Empty;
+    public string 명령유형 { get; set; } = string.Empty;
+    public string 요청지문 { get; set; } = string.Empty;
+    public DateTime 처리시각Utc { get; set; }
 }
 
 public sealed class 공동구매자동집단이벤트문서

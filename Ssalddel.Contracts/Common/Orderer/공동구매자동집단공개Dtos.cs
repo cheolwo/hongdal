@@ -17,12 +17,57 @@ public class 공동구매자동집단요약응답
     public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
     public int 수요건수 { get; set; }
     public int 예약결제건수 { get; set; }
+    public int 참여자수 { get; set; }
+    public int 예약결제참여자수 { get; set; }
     public decimal 총희망수량 { get; set; }
     public string 수량단위 { get; set; } = string.Empty;
     public int? 목표참여자수 { get; set; }
     public decimal? 목표수량 { get; set; }
+    public DateTime 모집종료시각Utc { get; set; }
+    public bool 모집종료여부 { get; set; }
+    public bool 모집조건충족여부 { get; set; }
     public DateTime 생성시각Utc { get; set; }
     public DateTime 수정시각Utc { get; set; }
+}
+
+public sealed class 공동구매자동집단배치미리보기응답
+{
+    public string 정책버전 { get; set; } = 공동구매주문자집단화정책코드.현재버전;
+    public string 자동집단Id { get; set; } = string.Empty;
+    public string 배치유형 { get; set; } = 공동구매자동집단배치유형코드.신규집단;
+    public bool 기존수요갱신여부 { get; set; }
+    public IReadOnlyList<공동구매자동집단배치기준응답> 적용기준목록 { get; set; } = [];
+    public 공동구매자동집단진행응답 현재진행 { get; set; } = new();
+    public 공동구매자동집단진행응답 예상진행 { get; set; } = new();
+    public string 안내 { get; set; } = string.Empty;
+    public string 비구속안내 { get; set; } = string.Empty;
+}
+
+public sealed class 공동구매자동집단배치기준응답
+{
+    public string 기준코드 { get; set; } = string.Empty;
+    public string 기준값 { get; set; } = string.Empty;
+}
+
+public sealed class 공동구매자동집단진행응답
+{
+    public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
+    public int 수요건수 { get; set; }
+    public int 예약결제건수 { get; set; }
+    public int 참여자수 { get; set; }
+    public int 예약결제참여자수 { get; set; }
+    public decimal 총희망수량 { get; set; }
+    public string 수량단위 { get; set; } = string.Empty;
+    public int? 목표참여자수 { get; set; }
+    public decimal? 목표수량 { get; set; }
+    public int? 추가필요참여자수 { get; set; }
+    public decimal? 추가필요수량 { get; set; }
+    public DateTime 모집종료시각Utc { get; set; }
+    public bool 모집종료여부 { get; set; }
+    public bool 모집조건충족여부 { get; set; }
+    public bool 확정검토가능 { get; set; }
+    public string 다음단계코드 { get; set; } = 공동구매자동집단다음단계코드.수요추가모집;
+    public string 안내 { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -60,4 +105,52 @@ public sealed class 공동구매자동본인수요응답
     public string 수량단위 { get; set; } = string.Empty;
     public decimal? 예약결제금액 { get; set; }
     public DateTime 생성시각Utc { get; set; }
+}
+
+public static class 공동구매주문자집단화정책코드
+{
+    public const string 현재버전 = "orderer-grouping-v1";
+}
+
+public static class 공동구매자동집단배치유형코드
+{
+    public const string 신규집단 = "NewGroup";
+    public const string 기존집단 = "ExistingGroup";
+}
+
+public static class 공동구매자동집단배치기준코드
+{
+    public const string 상품키 = "ProductKey";
+    public const string 배송권 = "DeliveryScope";
+    public const string 보관온도 = "Temperature";
+    public const string 물류방식 = "LogisticsMode";
+}
+
+public static class 공동구매자동집단다음단계코드
+{
+    public const string 수요추가모집 = "CollectMoreDemand";
+    public const string 확정검토 = "ReviewConfirmation";
+    public const string 확정완료 = "Confirmed";
+    public const string 모집종료 = "RecruitmentClosed";
+}
+
+public static class 공동구매자동집단모집정책
+{
+    public const int 기본모집일수 = 14;
+
+    public static DateTime 기본모집종료시각Utc(DateTime 모집시작시각Utc)
+    {
+        if (모집시작시각Utc == default)
+        {
+            throw new ArgumentException("모집 시작 시각이 필요합니다.", nameof(모집시작시각Utc));
+        }
+
+        var 시작시각Utc = 모집시작시각Utc.Kind switch
+        {
+            DateTimeKind.Utc => 모집시작시각Utc,
+            DateTimeKind.Local => 모집시작시각Utc.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(모집시작시각Utc, DateTimeKind.Utc)
+        };
+        return 시작시각Utc.AddDays(기본모집일수);
+    }
 }

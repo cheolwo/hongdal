@@ -36,6 +36,53 @@ public sealed class VersionFeatureFlagServiceTests
         Assert.False(service.IsEnabled(VersionFeatureFlagKeys.CargoYongdalV1));
     }
 
+    [Fact]
+    public void GroupPurchaseDemand_CanRunWithoutTradeTransportOrFulfillment()
+    {
+        var service = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = true,
+            GroupPurchaseDemandWorkflow = true
+        });
+
+        Assert.True(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow));
+        Assert.True(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.DomesticTransportWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.SalesChannelFulfillmentWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.HrParticipationWorkflow));
+    }
+
+    [Fact]
+    public void LegacyGroupPurchaseImportKey_EnablesDemandOnly()
+    {
+        var service = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = true,
+            GroupPurchaseImportWorkflow = true
+        });
+
+        Assert.True(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow));
+        Assert.True(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.CustomsAndTradeDataWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.DomesticTransportWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.WarehouseFulfillmentWorkflow));
+    }
+
+    [Fact]
+    public void GroupPurchaseDemand_RequiresCommunityFoundation()
+    {
+        var service = CreateService(new VersionFeatureFlagsOptions
+        {
+            CommunityTrustWorkflow = false,
+            GroupPurchaseDemandWorkflow = true
+        });
+
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseDemandWorkflow));
+        Assert.False(service.IsEnabled(VersionFeatureFlagKeys.GroupPurchaseImportWorkflow));
+    }
+
     private static VersionFeatureFlagService CreateService(VersionFeatureFlagsOptions options)
         => new(new StaticOptionsMonitor<VersionFeatureFlagsOptions>(options));
 

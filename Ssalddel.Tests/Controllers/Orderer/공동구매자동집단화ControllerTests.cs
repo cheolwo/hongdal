@@ -18,6 +18,12 @@ public sealed class 공동구매자동집단화ControllerTests
             .GetCustomAttribute<AuthorizeAttribute>());
 
     [Fact]
+    public void 공개목록은_비로그인탐색을허용한다()
+        => Assert.NotNull(typeof(공동구매자동집단화Controller)
+            .GetMethod(nameof(공동구매자동집단화Controller.목록))!
+            .GetCustomAttribute<AllowAnonymousAttribute>());
+
+    [Fact]
     public async Task 목록은참여자와결제정보가없는요약만반환한다()
     {
         var useCase = new RecordingUseCase
@@ -50,11 +56,11 @@ public sealed class 공동구매자동집단화ControllerTests
     }
 
     [Fact]
-    public async Task 수요등록은요청의주문자키를로그인사용자로교체한다()
+    public async Task 기존Post수요등록도_로그인사용자의비구속저장으로강제한다()
     {
         var useCase = new RecordingUseCase
         {
-            RegisterResult = Group(
+            NonBindingSaveResult = Group(
                 Demand("authenticated-orderer", "인증 주문자", "address:mine", 30_003m, "source-mine"),
                 Demand("other-orderer", "다른 참여자", "address:other", 40_004m, "source-other"))
         };
@@ -69,9 +75,11 @@ public sealed class 공동구매자동집단화ControllerTests
         var result = await controller.수요등록(command, CancellationToken.None);
 
         Assert.IsType<OkObjectResult>(result);
-        Assert.Same(command, useCase.LastCommand);
-        Assert.Equal("authenticated-orderer", useCase.LastCommand!.주문자키);
-        Assert.Equal("인증 주문자", useCase.LastCommand.주문자표시명);
+        Assert.Null(useCase.LastCommand);
+        Assert.Same(command, useCase.LastNonBindingCommand);
+        Assert.Equal("authenticated-orderer", useCase.LastNonBindingCommand!.주문자키);
+        Assert.Equal("인증 주문자", useCase.LastNonBindingCommand.주문자표시명);
+        Assert.StartsWith("legacy-post:", useCase.LastNonBindingCommand.요청멱등키, StringComparison.Ordinal);
 
         var ok = Assert.IsType<OkObjectResult>(result);
         var response = Assert.IsType<공동구매자동집단사용자응답>(ok.Value);
@@ -87,6 +95,95 @@ public sealed class 공동구매자동집단화ControllerTests
         Assert.DoesNotContain("다른 참여자", json, StringComparison.Ordinal);
         Assert.DoesNotContain("address:other", json, StringComparison.Ordinal);
         Assert.DoesNotContain("40004", json, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task 배치미리보기는_로그인사용자를적용하고_수요를저장하지않는다()
+    {
+        var useCase = new RecordingUseCase
+        {
+            PreviewResult = new 공동구매자동집단배치미리보기응답
+            {
+                자동집단Id = "auto-group-preview",
+                배치유형 = 공동구매자동집단배치유형코드.기존집단,
+                예상진행 = new 공동구매자동집단진행응답
+                {
+                    참여자수 = 2,
+                    현재상태 = 공동구매자동집단상태코드.수요수집중
+                }
+            }
+        };
+        var controller = Controller(useCase, "authenticated-orderer", "인증 주문자");
+        var command = new 공동구매자동수요등록Command
+        {
+            주문자키 = "spoofed-orderer",
+            주문자표시명 = string.Empty
+        };
+
+        var result = await controller.배치미리보기(command, CancellationToken.None);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var response = Assert.IsType<공동구매자동집단배치미리보기응답>(ok.Value);
+        Assert.Equal("auto-group-preview", response.자동집단Id);
+        Assert.Same(command, useCase.LastPreviewCommand);
+        Assert.Equal("authenticated-orderer", command.주문자키);
+        Assert.Equal("인증 주문자", command.주문자표시명);
+        Assert.Null(useCase.LastCommand);
+    }
+
+    [Fact]
+    public async Task 비구속수요저장은_경로와로그인사용자와멱등키를적용한다()
+    {
+        var useCase = new RecordingUseCase
+        {
+            NonBindingSaveResult = Group(
+                Demand("authenticated-orderer", "인증 주문자", "", 0, "ingredient:garlic:seoul"))
+        };
+        var controller = Controller(useCase, "authenticated-orderer", "인증 주문자");
+        var command = new 공동구매자동수요등록Command
+        {
+            수요출처키 = "spoofed-source",
+            주문자키 = "spoofed-orderer"
+        };
+
+        var result = await controller.비구속수요저장(
+            "ingredient:garlic:seoul",
+            command,
+            "save-demand-1",
+            CancellationToken.None);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        Assert.IsType<공동구매자동집단사용자응답>(ok.Value);
+        Assert.Same(command, useCase.LastNonBindingCommand);
+        Assert.Equal("ingredient:garlic:seoul", command.수요출처키);
+        Assert.Equal("authenticated-orderer", command.주문자키);
+        Assert.Equal("save-demand-1", command.요청멱등키);
+    }
+
+    [Fact]
+    public async Task 비구속수요철회는_로그인사용자와멱등키만전달한다()
+    {
+        var useCase = new RecordingUseCase
+        {
+            WithdrawalResult = new 공동구매자동수요철회응답
+            {
+                철회완료 = true,
+                수요출처키 = "ingredient:garlic:seoul"
+            }
+        };
+        var controller = Controller(useCase, "authenticated-orderer");
+
+        var result = await controller.비구속수요철회(
+            "ingredient:garlic:seoul",
+            "withdraw-demand-1",
+            "더 이상 필요하지 않음",
+            CancellationToken.None);
+
+        Assert.IsType<OkObjectResult>(result);
+        Assert.NotNull(useCase.LastWithdrawalCommand);
+        Assert.Equal("authenticated-orderer", useCase.LastWithdrawalCommand!.주문자키);
+        Assert.Equal("withdraw-demand-1", useCase.LastWithdrawalCommand.요청멱등키);
+        Assert.Equal("ingredient:garlic:seoul", useCase.LastWithdrawalCommand.수요출처키);
     }
 
     [Fact]
@@ -149,6 +246,8 @@ public sealed class 공동구매자동집단화ControllerTests
             배송권명 = "테스트 배송권",
             수요건수 = demands.Length,
             예약결제건수 = demands.Length,
+            참여자수 = demands.Select(item => item.주문자키).Distinct(StringComparer.Ordinal).Count(),
+            예약결제참여자수 = demands.Select(item => item.주문자키).Distinct(StringComparer.Ordinal).Count(),
             총희망수량 = demands.Sum(item => item.희망수량),
             수량단위 = "개",
             예약결제합계 = demands.Sum(item => item.예약결제금액 ?? 0),
@@ -181,14 +280,29 @@ public sealed class 공동구매자동집단화ControllerTests
     private sealed class RecordingUseCase : I공동구매자동집단화UseCase
     {
         public 공동구매자동수요등록Command? LastCommand { get; private set; }
+        public 공동구매자동수요등록Command? LastPreviewCommand { get; private set; }
+        public 공동구매자동수요등록Command? LastNonBindingCommand { get; private set; }
+        public 공동구매자동수요철회Command? LastWithdrawalCommand { get; private set; }
         public IReadOnlyList<공동구매자동집단응답> Groups { get; set; } = [];
         public 공동구매자동집단응답 RegisterResult { get; set; } = new();
+        public 공동구매자동집단응답 NonBindingSaveResult { get; set; } = new();
+        public 공동구매자동집단배치미리보기응답 PreviewResult { get; set; } = new();
+        public 공동구매자동수요철회응답 WithdrawalResult { get; set; } = new();
 
         public Task<공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>> 목록조회Async(
             공동구매자동집단조회조건 조건,
             CancellationToken cancellationToken = default)
             => Task.FromResult(
                 공동구매처리결과<IReadOnlyList<공동구매자동집단응답>>.성공결과(Groups));
+
+        public Task<공동구매처리결과<공동구매자동집단배치미리보기응답>> 배치미리보기Async(
+            공동구매자동수요등록Command command,
+            CancellationToken cancellationToken = default)
+        {
+            LastPreviewCommand = command;
+            return Task.FromResult(
+                공동구매처리결과<공동구매자동집단배치미리보기응답>.성공결과(PreviewResult));
+        }
 
         public Task<공동구매처리결과<공동구매자동집단응답>> 수요등록Async(
             공동구매자동수요등록Command command,
@@ -197,6 +311,24 @@ public sealed class 공동구매자동집단화ControllerTests
             LastCommand = command;
             return Task.FromResult(
                 공동구매처리결과<공동구매자동집단응답>.성공결과(RegisterResult));
+        }
+
+        public Task<공동구매처리결과<공동구매자동집단응답>> 비구속수요저장Async(
+            공동구매자동수요등록Command command,
+            CancellationToken cancellationToken = default)
+        {
+            LastNonBindingCommand = command;
+            return Task.FromResult(
+                공동구매처리결과<공동구매자동집단응답>.성공결과(NonBindingSaveResult));
+        }
+
+        public Task<공동구매처리결과<공동구매자동수요철회응답>> 수요철회Async(
+            공동구매자동수요철회Command command,
+            CancellationToken cancellationToken = default)
+        {
+            LastWithdrawalCommand = command;
+            return Task.FromResult(
+                공동구매처리결과<공동구매자동수요철회응답>.성공결과(WithdrawalResult));
         }
     }
 }

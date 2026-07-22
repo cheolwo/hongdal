@@ -2,6 +2,7 @@ namespace Ssalddel.Contracts.Common.Orderer;
 
 public sealed class 공동구매자동수요등록Command
 {
+    public string 요청멱등키 { get; set; } = string.Empty;
     public string 수요출처키 { get; set; } = string.Empty;
     public long? 커뮤니티게시글Id { get; set; }
     public string 커뮤니티원장Id { get; set; } = string.Empty;
@@ -31,6 +32,29 @@ public sealed class 공동구매자동수요등록Command
     public decimal? 목표수량 { get; set; }
 }
 
+public sealed class 공동구매자동수요철회Command
+{
+    public string 요청멱등키 { get; set; } = string.Empty;
+    public string 수요출처키 { get; set; } = string.Empty;
+    public string 주문자키 { get; set; } = string.Empty;
+    public string 철회사유 { get; set; } = string.Empty;
+}
+
+public sealed class 공동구매자동수요철회응답
+{
+    public string 요청멱등키 { get; set; } = string.Empty;
+    public string 수요출처키 { get; set; } = string.Empty;
+    public string 자동집단Id { get; set; } = string.Empty;
+    public bool 철회완료 { get; set; }
+    public bool 이미처리됨 { get; set; }
+    public int 남은수요건수 { get; set; }
+    public int 남은참여자수 { get; set; }
+    public decimal 남은희망수량 { get; set; }
+    public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
+    public DateTime 철회시각Utc { get; set; }
+    public string 안내 { get; set; } = string.Empty;
+}
+
 public sealed class 공동구매자동수요응답
 {
     public string 수요Id { get; set; } = string.Empty;
@@ -57,6 +81,8 @@ public sealed class 공동구매자동수요응답
     public decimal 희망수량 { get; set; }
     public string 수량단위 { get; set; } = string.Empty;
     public decimal? 예약결제금액 { get; set; }
+    public int? 목표참여자수 { get; set; }
+    public decimal? 목표수량 { get; set; }
     public DateTime 생성시각Utc { get; set; }
 }
 
@@ -74,11 +100,16 @@ public sealed class 공동구매자동집단응답
     public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
     public int 수요건수 { get; set; }
     public int 예약결제건수 { get; set; }
+    public int 참여자수 { get; set; }
+    public int 예약결제참여자수 { get; set; }
     public decimal 총희망수량 { get; set; }
     public string 수량단위 { get; set; } = string.Empty;
     public decimal 예약결제합계 { get; set; }
     public int? 목표참여자수 { get; set; }
     public decimal? 목표수량 { get; set; }
+    public DateTime 모집종료시각Utc { get; set; }
+    public bool 모집종료여부 { get; set; }
+    public bool 모집조건충족여부 { get; set; }
     public DateTime 생성시각Utc { get; set; }
     public DateTime 수정시각Utc { get; set; }
     public IReadOnlyList<공동구매자동수요응답> 수요목록 { get; set; } = [];
@@ -105,6 +136,12 @@ public static class 공동구매자동수요유형코드
     public const string 예약결제 = "PaidReservation";
 }
 
+public static class 공동구매자동수요상태코드
+{
+    public const string 활성 = "Active";
+    public const string 철회 = "Withdrawn";
+}
+
 public static class 공동구매자동결제상태코드
 {
     public const string 미결제 = "NotPaid";
@@ -117,6 +154,7 @@ public static class 공동구매자동집단상태코드
     public const string 수요수집중 = "CollectingDemand";
     public const string 확정대기 = "ReadyToConfirm";
     public const string 확정 = "Confirmed";
+    public const string 모집종료목표미달 = "RecruitmentClosedTargetNotReached";
 }
 
 /// <summary>
