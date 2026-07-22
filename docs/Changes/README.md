@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [사방괘 기본 목적지 Navigation 계약 정렬](2026-07-22-bagua-navigation-contract.md) | 화면 없음·간접 확인 — 공용 사방괘의 판매·창고·운송·합의 링크를 Web·모바일 공통 route 계약과 실제 제공 Route Page로 정렬 |
 | 2026-07-22 | [화주 홈 Route 의미·단일책임 정렬](2026-07-22-shipper-home-route-srp.md) | Web·모바일 `/shipper`를 읽기 전용 업무 요약·기능별 진입 공용 Screen으로 통합하고 1.0 이후 기능을 로그인·서버 flag 뒤에 유지, desktop·좁은 viewport 실제 확인 |
 | 2026-07-22 | [개인 공간·꾸미기 Route 의미·단일책임 정렬](2026-07-22-community-decoration-route-srp.md) | Web 개인 관리를 상점에서 분리하고 Web·모바일 상점·stable-key 상품·FakePG checkout을 공용 Screen과 canonical route로 통합, desktop·390px 실제 확인 |
 | 2026-07-22 | [판매 주문 이행 목표별 Route 단일책임 분리](2026-07-22-order-fulfillment-route-srp.md) | 로컬 복합 탭을 상태 변경 없는 허브와 주문·재고·피킹·포장·정책 route로 분리하고 stable key Action·상단 스크롤 복원, desktop·501px 실제 확인 |

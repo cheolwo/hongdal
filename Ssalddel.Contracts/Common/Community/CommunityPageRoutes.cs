@@ -14,6 +14,7 @@ public static class CommunityPageRoutes
     public const string RecommendedPosts = "/community/posts/recommended";
     public const string RecommendedPostDetail = "/community/posts/recommended/detail";
     public const string CollectiveActions = "/community/actions";
+    public const string Bagua = "/community/bagua";
     public const string GroupPurchase = "/community/group-purchase";
     public const string GroupPurchaseCreate = "/community/group-purchase/new";
     public const string Personal = "/community/me";

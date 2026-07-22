@@ -60,8 +60,9 @@ public sealed class BaguaRoleTransitionPageViewModelTests
         Assert.Equal(5, viewModel.역할선택지.Count);
         Assert.Empty(viewModel.전환행);
         Assert.Equal("업무 인계", viewModel.전환흐름?.표시명);
+        Assert.Equal(CommunityPageRoutes.Home, viewModel.커뮤니티경로);
         Assert.Equal(
-            "/community/bagua/orderer/zhen/dui",
+            $"{CommunityPageRoutes.Bagua}/orderer/zhen/dui",
             viewModel.역할경로(BaguaActorRoleCodes.Orderer));
     }
 

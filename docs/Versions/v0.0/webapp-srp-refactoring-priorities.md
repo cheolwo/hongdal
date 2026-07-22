@@ -35,7 +35,7 @@
 
 | 우선순위 | 문맥 | 현재 신호 | 목표 route·Screen | 완료 조건 |
 | --- | --- | --- | --- | --- |
-| `P0-0` 진행 | 공용 navigation 계약 | WebApp·모바일 route catalog와 `Ui.Common`의 URL literal이 분산됨 | 공용 `CommunityPageRoutes`, 이후 page key·diagram return context | 공용 Screen이 플랫폼 namespace를 참조하지 않고 Web·모바일 deep link가 같은 의미로 해석됨 |
+| `P0-0` 진행 · 사방괘 1차 완료 | 공용 navigation 계약 | WebApp·모바일 route catalog와 `Ui.Common`의 URL literal이 분산됨 | 공용 `CommunityPageRoutes`, 이후 page key·diagram return context | 공용 Screen이 플랫폼 namespace를 참조하지 않고 Web·모바일 deep link가 같은 의미로 해석됨 |
 | `P0-1` 완료 | 커뮤니티 기본 흐름 | 한 `CommunityWorkspacePage.razor`가 작업공간·게시판 관리·원장 초안·글쓰기·추천 목록·추천 상세·일반 상세를 mode로 전환했음 | 허브, 게시판 관리, 원장 초안, 글쓰기, 추천 목록·상세, 영속 글 상세 전용 Route Page와 공용 Screen | route 파일마다 하나의 의미와 공용 Screen 하나만 가지며 작업공간은 탐색 허브만 맡고 기존 `?seed=` 링크가 새 추천 상세 route로 호환 이동함 |
 | `P0-2` 완료 | 국내 공동구매 대표 파일럿 | 변경 전에는 내부 component가 나뉘어도 한 route가 제안·목록·상세·공급자·배송 정보·이행 초안·협상·단계 전이·이의제기를 모두 실행했음 | 목록, 개설, 캠페인 상세, 참여, 공급자, 협상, 이의제기, 결의, 서명, 배송 가능 정보, 이행 초안 Screen | Web·모바일이 같은 공용 Screen을 조립하고 각 단계가 stable campaign ID와 직접 URL을 가지며 저장 뒤 같은 ID를 재조회하고 추천·자동 배차·결제·계약을 확정하지 않음 |
 | `P0-3` 완료 | 다이어그램 | 변경 전에는 Web 전용 `DiagramWorkbenchPage`가 palette·preset·canvas를 함께 소유하고 모바일 route가 없었음 | 공용 diagram Screen, desktop sidebar, mobile bottom sheet | Web·모바일 `/diagram`이 같은 Screen을 조립하고 선택 node·zoom·filter·출발 page를 복원하며 구체 업무 Command는 3단계 Screen으로 이동함 |
@@ -205,6 +205,18 @@ Web sample adapter와 모바일 adapter는 로그인하지 않은 사용자의 �
 
 Web Route Page는 같은 공용 Screen 아래에 기존 전문 도구 디렉터리를 추가한다. `SsalddelApp` 플랫폼 shell은 기존 `PlatformCommunityHome`, 커뮤니티 콘텐츠, 로그인·꾸미기 보유권·화면 노출 설정과 네 개 빠른 행동을 보존하면서 업무 mode에서 같은 Screen을 조립한다. 공통 Web 머리말은 720px 이하에서 짧은 제품명을 사용하고 언어 전환 행동을 최소 48px로 맞춘다.
 
+## 사방괘 기본 목적지 navigation 계약
+
+| 도착 업무 | 공용 기본 목적지 | 선택 이유 |
+| --- | --- | --- |
+| 주문 | `/shipper/sales/orders` | Web·모바일이 같은 영속 판매 주문 원장을 읽음 |
+| 판매 | `/shipper/sales/orders` | 기존 `/shipper/sales/listings`는 Web의 서버 출품과 모바일 로컬 Simulation 의미가 아직 달라 공용 목적지에서 제외 |
+| 창고 | `/shipper/warehouse/workspace` | 두 플랫폼이 같은 공용 창고 Screen을 조립 |
+| 운송 | `/shipper/request` | 두 플랫폼에 모두 존재하는 운송 의뢰 작성 흐름이며 Web에 없는 모바일 전용 `/shipper/transport`를 공용 링크로 사용하지 않음 |
+| 합의 | `/community/group-purchase` | 공동구매 합의와 후속 단계의 canonical 진입점 |
+
+`BaguaRoleTransitionPageModel`은 이제 업무 URL literal을 소유하지 않고 `CommunityPageRoutes`, `SalesOrderPageRoutes`, `ShipperHomePageRoutes`만 해석한다. 역할별 화면은 권한을 부여하지 않으며 목적지 화면이 로그인, 원장 참여, 기능 플래그와 서버 권한을 다시 확인한다. Web·모바일 Route Page가 위 세 업무 목적지를 실제 제공하는지는 조립 회귀 테스트로 고정했다.
+
 ## 기존 component 리팩터링의 재분류
 
 아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
@@ -252,4 +264,6 @@ Web Route Page는 같은 공용 Screen 아래에 기존 전문 도구 디렉터�
 
 일곱 번째 수직 단위인 `/shipper` 홈은 Web 링크 디렉터리와 모바일 커뮤니티 홈·인증·dashboard가 같은 주소에서 서로 다른 목표를 갖던 문제를 제거했다. 두 플랫폼은 이제 읽기 전용 업무 요약과 기능별 진입을 담당하는 같은 `ShipperHomeScreen`을 조립하고, 1.0 이후 기능은 로그인과 서버 기능 플래그 뒤에 유지한다. 공통 Web 모바일 머리말도 짧은 제목과 최소 48px 언어 전환 행동으로 보완했다.
 
-다음 우선순위는 `P0-0`에 남은 navigation contract 감사다. 공용 Screen 안에 남은 업무 route literal을 계약으로 올리고, 사방괘 → 다이어그램 → 구체 데이터 페이지의 stable-ID·복귀 문맥을 Web과 모바일이 같은 의미로 해석하는지 수직 단위별로 확인한다. `P3`의 기사 추천·자동 배차·결제·정산·통관 운영 효과는 계속 보존·비활성 상태로 둔다.
+여덟 번째 수직 단위는 `P0-0` 사방괘 기본 목적지다. 사방괘 base·커뮤니티 복귀·주문·판매·창고·운송·합의 링크를 공용 계약으로 올리고, Web에 없던 모바일 전용 운송 작업대와 플랫폼별 의미가 달랐던 출품 화면을 공용 기본 목적지에서 제거했다. 사방괘 화면의 표현과 권한 경계는 바꾸지 않고 두 플랫폼에 실제 존재하는 Route Page만 기본 진입점으로 사용한다.
+
+다음 우선순위는 `PlatformCommunityHome`의 다이어그램 원장 node → 구체 데이터 페이지 handoff다. node 상세에 남은 업무 URL literal과 임시 화주 요청 ID를 stable-ID route builder·안전한 `from` 문맥으로 교체하고 Web·모바일 및 전문 앱이 지원하지 않는 목적지를 열지 않도록 platform navigation adapter를 정의한다. `P3`의 기사 추천·자동 배차·결제·정산·통관 운영 효과는 계속 보존·비활성 상태로 둔다.

@@ -1,4 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
+using Ssalddel.Contracts.Common.Sales;
+using Ssalddel.Contracts.Shipper;
 using Ssalddel.Ui.Common.Areas.App.Models;
 
 namespace Ssalddel.Tests.Services.Community;
@@ -18,10 +20,10 @@ public sealed class BaguaRoleTransitionPageCatalogTests
 
         Assert.Equal(125, routes.Length);
         Assert.Equal(125, routes.Distinct(StringComparer.OrdinalIgnoreCase).Count());
-        Assert.All(routes, route => Assert.StartsWith("/community/bagua/", route));
-        Assert.Contains("/community/bagua/orderer/zhen/gen", routes);
-        Assert.Contains("/community/bagua/seller/zhen/gen", routes);
-        Assert.Contains("/community/bagua/cooperative-coordinator/gen/zhen", routes);
+        Assert.All(routes, route => Assert.StartsWith($"{CommunityPageRoutes.Bagua}/", route));
+        Assert.Contains($"{CommunityPageRoutes.Bagua}/orderer/zhen/gen", routes);
+        Assert.Contains($"{CommunityPageRoutes.Bagua}/seller/zhen/gen", routes);
+        Assert.Contains($"{CommunityPageRoutes.Bagua}/cooperative-coordinator/gen/zhen", routes);
     }
 
     [Fact]
@@ -31,9 +33,29 @@ public sealed class BaguaRoleTransitionPageCatalogTests
             BaguaTrigramKeys.Zhen,
             BaguaTrigramKeys.Gen);
 
-        Assert.Equal("/community/bagua/zhen/gen", route);
+        Assert.Equal($"{CommunityPageRoutes.Bagua}/zhen/gen", route);
         Assert.DoesNotContain(BaguaActorRoleCodes.Orderer, route);
         Assert.DoesNotContain(BaguaActorRoleCodes.Seller, route);
+    }
+
+    [Theory]
+    [InlineData(BaguaTrigramKeys.Zhen, "판매 주문 원장", SalesOrderPageRoutes.Root)]
+    [InlineData(BaguaTrigramKeys.Li, "판매 업무", ShipperHomePageRoutes.DefaultSalesEntry)]
+    [InlineData(BaguaTrigramKeys.Dui, "창고 업무", ShipperHomePageRoutes.WarehouseWorkspace)]
+    [InlineData(BaguaTrigramKeys.Kan, "운송 업무", ShipperHomePageRoutes.DefaultTransportEntry)]
+    [InlineData(BaguaTrigramKeys.Gen, "공동구매 합의", CommunityPageRoutes.GroupPurchase)]
+    public void TargetArea_UsesCrossPlatformCanonicalWorkspace(
+        string targetTrigramKey,
+        string expectedName,
+        string expectedHref)
+    {
+        var page = BaguaRoleTransitionPageCatalog.Build(
+            BaguaActorRoleCodes.Orderer,
+            BaguaTrigramKeys.Zhen,
+            targetTrigramKey);
+
+        Assert.Equal(expectedName, page.TargetWorkspaceName);
+        Assert.Equal(expectedHref, page.TargetWorkspaceHref);
     }
 
     [Fact]
@@ -80,7 +102,7 @@ public sealed class BaguaRoleTransitionPageCatalogTests
             ["안건 제안", "참여·수요 확인", "이의 검토", "확정안 작성", "전자서명", "실행 연결"],
             page.Steps.Select(step => step.Title));
         Assert.Equal("공동구매 합의", page.TargetWorkspaceName);
-        Assert.Equal("/community/group-purchase", page.TargetWorkspaceHref);
+        Assert.Equal(CommunityPageRoutes.GroupPurchase, page.TargetWorkspaceHref);
         Assert.Equal(BaguaRolePerspectiveModes.Governor, page.Perspective.PerspectiveMode);
         Assert.Equal("gather", page.Animation.MotionKind);
         Assert.Equal("✍", page.Animation.PayloadSymbol);

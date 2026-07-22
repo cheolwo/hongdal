@@ -301,7 +301,7 @@ public sealed class BaguaRoleTransitionPageViewModel : 조립ViewModelBase
     public IReadOnlyList<BaguaBusinessAreaDefinition> 업무영역 => BaguaTransitionCatalog.Areas;
     public IReadOnlyDictionary<string, Bagua업무영역ViewModel> 업무모듈 => _domains;
     public string PageTitleText => 페이지?.Perspective.ViewTitle ?? 전환?.PageTitle ?? "팔괘 업무 전환";
-    public string 커뮤니티경로 => "/community";
+    public string 커뮤니티경로 => CommunityPageRoutes.Home;
     public string? 목표업무경로 => 페이지?.TargetWorkspaceHref;
     public bool 역할선택화면 => 오류메시지 is null && 전환 is not null && 페이지 is null;
     public bool 역할화면 => 오류메시지 is null && 페이지 is not null;

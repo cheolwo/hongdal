@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Common.Community;
 using Ssalddel.Contracts.Common.Sales;
+using Ssalddel.Contracts.Shipper;
 
 namespace Ssalddel.Ui.Common.Areas.App.Models;
 
@@ -33,7 +34,7 @@ public sealed record BaguaRoleTransitionPageModel(
 
 public static class BaguaRoleTransitionRoutes
 {
-    public const string BasePath = "/community/bagua";
+    public const string BasePath = CommunityPageRoutes.Bagua;
 
     public static string Build(
         string roleCode,
@@ -203,9 +204,9 @@ public static class BaguaRoleTransitionPageCatalog
         => businessCode switch
         {
             BaguaBusinessCodes.Order => ("판매 주문 원장", SalesOrderPageRoutes.Root),
-            BaguaBusinessCodes.Sales => ("판매 업무", "/shipper/sales/listings"),
-            BaguaBusinessCodes.Warehouse => ("창고 업무", "/shipper/warehouse/workspace"),
-            BaguaBusinessCodes.Transport => ("운송 업무", "/shipper/transport"),
+            BaguaBusinessCodes.Sales => ("판매 업무", ShipperHomePageRoutes.DefaultSalesEntry),
+            BaguaBusinessCodes.Warehouse => ("창고 업무", ShipperHomePageRoutes.WarehouseWorkspace),
+            BaguaBusinessCodes.Transport => ("운송 업무", ShipperHomePageRoutes.DefaultTransportEntry),
             _ => ("공동구매 합의", CommunityPageRoutes.GroupPurchase)
         };
 }
