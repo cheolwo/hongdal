@@ -164,6 +164,9 @@ public sealed class WebShipperWarehouseWorkspaceService : IWarehouseWorkspaceSer
     public Task<입고요청목록응답?> GetInboundsAsync(CancellationToken cancellationToken = default)
         => Task.FromResult<입고요청목록응답?>(new() { Items = _inbounds.ToArray() });
 
+    public Task<입고요청항목응답?> GetInboundAsync(long inboundId, CancellationToken cancellationToken = default)
+        => Task.FromResult(_inbounds.FirstOrDefault(item => item.Id == inboundId));
+
     public Task<입고요청항목응답?> CreateInboundAsync(입고요청저장요청 payload, CancellationToken cancellationToken = default)
     {
         var inbound = new 입고요청항목응답
@@ -179,6 +182,7 @@ public sealed class WebShipperWarehouseWorkspaceService : IWarehouseWorkspaceSer
             판매자UserId = payload.판매자UserId,
             출고예정Id = payload.출고예정Id,
             운송의뢰Id = payload.운송의뢰Id,
+            공급처코드 = payload.공급처코드.Trim(),
             공급처명 = payload.공급처명.Trim(),
             원주문참조번호 = payload.원주문참조번호.Trim(),
             상태 = "입고예정",

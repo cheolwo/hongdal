@@ -1,0 +1,83 @@
+@using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Contracts.Common.Warehouse
+
+<InboundRequestScreenFrame State="@State"
+                           Context="@Context"
+                           CurrentScreen="InboundRequestScreenKind.WarehouseRegistration"
+                           Eyebrow="창고 등록"
+                           Title="입고 창고 등록"
+                           Description="입고 신청과 분리된 화면에서 창고 기본 정보 한 건을 등록합니다."
+                           HomeHref="@HomeHref">
+    <div class="warehouse-registration-layout">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 warehouse-registration-form">
+            @if (string.Equals(Context.Source, "diagram-warehouse-proxy", StringComparison.OrdinalIgnoreCase))
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Filled">
+                    다이어그램의 <strong>@Display(Context.WarehouseName)</strong> 후보를 창고 초안으로 가져왔습니다.
+                    창고 등록 후 원래 입고 신청서 초안으로 돌아갑니다.
+                </MudAlert>
+            }
+
+            <MudTextField Label="창고명" Variant="Variant.Outlined" Required="true" @bind-Value="Draft.Name" />
+            <MudSelect T="string" Label="물류 대행지 분류" Variant="Variant.Outlined" @bind-Value="Draft.ProxyType">
+                @foreach (var option in ProxyTypes)
+                {
+                    <MudSelectItem T="string" Value="@option">@LogisticsProxySiteTypes.GetDisplayName(option)</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField Label="주소" Variant="Variant.Outlined" Required="true" @bind-Value="Draft.Address" />
+            <MudGrid>
+                <MudItem xs="12" md="6"><MudTextField Label="담당자명" Variant="Variant.Outlined" @bind-Value="Draft.ManagerName" /></MudItem>
+                <MudItem xs="12" md="6"><MudTextField Label="연락처" Variant="Variant.Outlined" @bind-Value="Draft.Phone" /></MudItem>
+            </MudGrid>
+
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                창고 등록은 입고 요청이나 보관 계약을 자동 생성하지 않습니다. 등록 후 입고 신청 화면에서 대상 창고와 계약 조건을 다시 확인합니다.
+            </MudAlert>
+
+            <div class="warehouse-registration-form__actions">
+                <MudButton Href="@Context.PathFor(InboundRequestScreenKind.Create)"
+                           Variant="Variant.Outlined"
+                           Color="Color.Default">
+                    신청서로 돌아가기
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           Disabled="@State.IsBusy"
+                           OnClick="CreateRequested">
+                    창고 등록
+                </MudButton>
+            </div>
+        </MudPaper>
+
+        <aside class="warehouse-registration-summary">
+            <span>WAREHOUSE DRAFT</span>
+            <h2>@Display(Draft.Name)</h2>
+            <dl>
+                <div><dt>분류</dt><dd>@LogisticsProxySiteTypes.GetDisplayName(Draft.ProxyType)</dd></div>
+                <div><dt>주소</dt><dd>@Display(Draft.Address)</dd></div>
+                <div><dt>담당자</dt><dd>@Display(Draft.ManagerName)</dd></div>
+            </dl>
+        </aside>
+    </div>
+</InboundRequestScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public InboundRequestPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public WarehouseRegistrationDraft Draft { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter] public EventCallback CreateRequested { get; set; }
+
+    private static readonly IReadOnlyList<string> ProxyTypes =
+    [
+        LogisticsProxySiteTypes.DeliveryAgency,
+        LogisticsProxySiteTypes.UrbanLogisticsCenter,
+        LogisticsProxySiteTypes.MarketFulfillment,
+        LogisticsProxySiteTypes.OverseasCustomsAgency
+    ];
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "입력 전" : value;
+}

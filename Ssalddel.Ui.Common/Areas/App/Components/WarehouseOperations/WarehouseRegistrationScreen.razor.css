@@ -1,0 +1,67 @@
+.warehouse-registration-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    gap: 16px;
+}
+
+.warehouse-registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.warehouse-registration-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.warehouse-registration-summary {
+    position: sticky;
+    top: 80px;
+    padding: 18px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 14px;
+    background: var(--mud-palette-surface);
+}
+
+.warehouse-registration-summary > span {
+    color: var(--mud-palette-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.warehouse-registration-summary h2 {
+    margin: 6px 0 16px;
+    overflow-wrap: anywhere;
+    font-size: 1.2rem;
+}
+
+.warehouse-registration-summary dl {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+}
+
+.warehouse-registration-summary dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.75rem;
+}
+
+.warehouse-registration-summary dd {
+    margin: 2px 0 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 920px) {
+    .warehouse-registration-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .warehouse-registration-summary {
+        position: static;
+        order: -1;
+    }
+}

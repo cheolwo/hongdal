@@ -1,5 +1,28 @@
 @page "/shipper/inbound/requests"
+@using Ssalddel.Contracts.Common.Inbound
+@inject InboundRequestPageViewModel ViewModel
+@inject NavigationManager Navigation
 
-<SsalddelInboundRequestManager
-    Title="입고 현황"
-    Description="창고를 만들고 입고 요청을 등록한 뒤, 도착 상품을 입고완료 처리해 재고로 전환합니다." />
+<PageTitle>입고 요청 목록</PageTitle>
+
+<InboundRequestListScreen State="@ViewModel.State"
+                          Context="@Context"
+                          HomeHref="@ShipperRoutes.WarehouseWorkspace"
+                          RefreshRequested="RefreshAsync"
+                          FilterRequested="ApplyFilterAsync" />
+
+@code {
+    private InboundRequestNavigationContext Context { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Context = InboundRequestNavigationContext.Parse(Navigation.Uri);
+        await ViewModel.LoadListAsync();
+    }
+
+    private Task RefreshAsync()
+        => ViewModel.LoadListAsync(ViewModel.State.ListFilter);
+
+    private Task ApplyFilterAsync(InboundRequestListFilter filter)
+        => ViewModel.LoadListAsync(filter);
+}

@@ -1,5 +1,6 @@
 using Ssalddel.Contracts.Shipper.Request;
 using Ssalddel.Ui.Common.Areas.App.Services;
+using Ssalddel.Ui.Common.Areas.App.ViewModels;
 using SsalddelApp.Services.Application;
 using SsalddelApp.Services.Warehouse.Fulfillment;
 using SsalddelApp.Services.Warehouse.Reconsignment.Commands;
@@ -17,6 +18,7 @@ internal static class ShipperWarehouseModule
             provider.GetRequiredService<ShipperWarehouseService>());
         services.AddScoped<IShipperWarehouseWorkflowService>(provider =>
             provider.GetRequiredService<ShipperWarehouseService>());
+        services.AddTransient<InboundRequestPageViewModel>();
         services.AddScoped<IWarehousePickingPlanner, WarehousePickingPlanner>();
         services.AddScoped<IAppCommandHandler<CreateReconsignmentOrderCommand, 화주운송의뢰응답?>,
             CreateReconsignmentOrderCommandHandler>();

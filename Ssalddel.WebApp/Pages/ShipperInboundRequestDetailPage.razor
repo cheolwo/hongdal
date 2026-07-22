@@ -1,0 +1,33 @@
+@page "/shipper/inbound/requests/{InboundId:long}"
+@using Ssalddel.Contracts.Common.Inbound
+@inject InboundRequestPageViewModel ViewModel
+@inject NavigationManager Navigation
+
+<PageTitle>입고 요청 #@InboundId</PageTitle>
+
+<InboundRequestDetailScreen State="@ViewModel.State"
+                            Context="@Context"
+                            InboundId="@InboundId"
+                            HomeHref="@ShipperRoutes.WarehouseWorkspace"
+                            RefreshRequested="RefreshAsync" />
+
+@code {
+    [Parameter] public long InboundId { get; set; }
+
+    private InboundRequestNavigationContext Context { get; set; } = new();
+    private long loadedInboundId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Context = InboundRequestNavigationContext.Parse(Navigation.Uri);
+        if (loadedInboundId == InboundId)
+        {
+            return;
+        }
+
+        loadedInboundId = InboundId;
+        await ViewModel.LoadDetailAsync(InboundId, Context.Created);
+    }
+
+    private Task RefreshAsync() => ViewModel.LoadDetailAsync(InboundId, Context.Created);
+}

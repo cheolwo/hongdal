@@ -1,0 +1,101 @@
+.inbound-complete-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    gap: 16px;
+}
+
+.inbound-complete-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.inbound-complete-form > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.inbound-complete-form > header span,
+.inbound-complete-summary > span {
+    color: var(--mud-palette-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.inbound-complete-form h2,
+.inbound-complete-form p {
+    margin: 4px 0 0;
+}
+
+.inbound-complete-form p {
+    color: var(--mud-palette-text-secondary);
+}
+
+.inbound-complete-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.inbound-complete-summary {
+    position: sticky;
+    top: 80px;
+    padding: 18px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 14px;
+    background: var(--mud-palette-surface);
+}
+
+.inbound-complete-summary h2 {
+    margin: 6px 0 16px;
+    overflow-wrap: anywhere;
+    font-size: 1.2rem;
+}
+
+.inbound-complete-summary dl {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+}
+
+.inbound-complete-summary dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.75rem;
+}
+
+.inbound-complete-summary dd {
+    margin: 2px 0 0;
+}
+
+.inbound-complete-results {
+    display: grid;
+    gap: 8px;
+}
+
+.inbound-complete-results article {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--mud-palette-success) 8%, var(--mud-palette-surface));
+}
+
+.inbound-complete-results article span {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 920px) {
+    .inbound-complete-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .inbound-complete-summary {
+        position: static;
+        order: -1;
+    }
+}

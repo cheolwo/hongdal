@@ -1,0 +1,83 @@
+@using Ssalddel.Contracts.Common.Inbound
+
+<section class="inbound-request-screen" data-inbound-screen="@CurrentScreen.ToString().ToLowerInvariant()">
+    <header class="inbound-request-screen__header">
+        <div class="inbound-request-screen__title">
+            <span>WAREHOUSE INBOUND · @Eyebrow</span>
+            <h1>@Title</h1>
+            <p>@Description</p>
+        </div>
+
+        <div class="inbound-request-screen__actions">
+            <MudButton Href="@Context.ResolveReturnPath(HomeHref)"
+                       Variant="Variant.Text"
+                       Color="Color.Default"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                돌아가기
+            </MudButton>
+            <MudButton Href="@Context.PathFor(InboundRequestScreenKind.Create)"
+                       Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Add">
+                신규 신청
+            </MudButton>
+            @if (RefreshRequested.HasDelegate)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@State.IsBusy"
+                           OnClick="RefreshRequested">
+                    새로고침
+                </MudButton>
+            }
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(State.Message))
+    {
+        <MudAlert Severity="@ResolveSeverity(State.MessageTone)" Variant="Variant.Outlined">
+            @State.Message
+        </MudAlert>
+    }
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+        목록과 상세 조회는 상태를 바꾸지 않습니다. 입고 신청과 재고 전환은 각각의 전용 route에서 명시적으로 실행하며,
+        구성된 adapter의 기능 플래그·인증·창고 역할 검증을 통과해야 합니다.
+    </MudAlert>
+
+    <InboundRequestNavigation Context="@Context"
+                              CurrentScreen="@CurrentScreen"
+                              InboundId="@InboundId" />
+
+    @if (State.IsBusy)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+
+    <main class="inbound-request-screen__body">
+        @ChildContent
+    </main>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public InboundRequestPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestNavigationContext Context { get; set; } = new();
+    [Parameter] public InboundRequestScreenKind CurrentScreen { get; set; }
+    [Parameter] public long? InboundId { get; set; }
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+
+    private static Severity ResolveSeverity(InboundRequestPageMessageTone tone)
+        => tone switch
+        {
+            InboundRequestPageMessageTone.Success => Severity.Success,
+            InboundRequestPageMessageTone.Warning => Severity.Warning,
+            InboundRequestPageMessageTone.Error => Severity.Error,
+            _ => Severity.Info
+        };
+}

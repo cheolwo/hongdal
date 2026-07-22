@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Ui.Common.Areas.App.Services;
 
 namespace Ssalddel.Ui.Common.Areas.App.Components.Community;
@@ -127,7 +128,7 @@ public partial class PlatformCommunityHome
         {
             PlatformDiagramFormKinds.TransportRequest => "/shipper/request",
             PlatformDiagramFormKinds.WarehouseOutbound => "/warehouse/work-board",
-            PlatformDiagramFormKinds.WarehouseInbound => "/shipper/inbound/requests",
+            PlatformDiagramFormKinds.WarehouseInbound => InboundRequestPageRoutes.Create,
             PlatformDiagramFormKinds.TransportPickupConfirmation or
             PlatformDiagramFormKinds.TransportDropoffConfirmation => "/driver/transport/proof",
             _ => null

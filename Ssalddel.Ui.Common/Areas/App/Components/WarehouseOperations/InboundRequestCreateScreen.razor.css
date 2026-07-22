@@ -1,0 +1,97 @@
+.inbound-create-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    gap: 16px;
+}
+
+.inbound-create-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.inbound-create-form section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.inbound-create-form section > header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.inbound-create-form section > header > span {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--mud-palette-primary);
+    color: var(--mud-palette-primary-text);
+    font-weight: 800;
+}
+
+.inbound-create-form h2,
+.inbound-create-form p {
+    margin: 0;
+}
+
+.inbound-create-form h2 {
+    font-size: 1.15rem;
+}
+
+.inbound-create-form p {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.85rem;
+}
+
+.inbound-create-summary {
+    position: sticky;
+    top: 80px;
+    padding: 18px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 14px;
+    background: var(--mud-palette-surface);
+}
+
+.inbound-create-summary > span {
+    color: var(--mud-palette-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.inbound-create-summary h2 {
+    margin: 6px 0 16px;
+    overflow-wrap: anywhere;
+    font-size: 1.2rem;
+}
+
+.inbound-create-summary dl {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+}
+
+.inbound-create-summary dt {
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.75rem;
+}
+
+.inbound-create-summary dd {
+    margin: 2px 0 0;
+}
+
+@media (max-width: 920px) {
+    .inbound-create-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .inbound-create-summary {
+        position: static;
+    }
+}

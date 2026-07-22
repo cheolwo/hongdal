@@ -1,3 +1,4 @@
+using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Shipper.Request;
 
 namespace SsalddelApp.Services;
@@ -13,7 +14,9 @@ public static class ShipperRoutes
     public const string PublicCargo = "/shipper/public-cargo";
     public const string ExplorationInbox = "/shipper/exploration/inbox";
     public const string InboundDashboard = "/shipper/inbound/dashboard";
-    public const string InboundRequests = "/shipper/inbound/requests";
+    public const string InboundRequests = InboundRequestPageRoutes.Root;
+    public const string InboundRequestCreate = InboundRequestPageRoutes.Create;
+    public const string WarehouseRegistration = InboundRequestPageRoutes.WarehouseRegistration;
     public const string WarehouseWorkspace = "/shipper/warehouse/workspace";
     public const string WarehouseInventory = "/shipper/warehouse/inventory";
     public const string WarehouseScan = "/shipper/warehouse/scan";
@@ -53,6 +56,12 @@ public static class ShipperRoutes
 
     public static string RequestProofsFor(string requestId)
         => ShipperRequestDetailPageRoutes.ProofsFor(requestId);
+
+    public static string InboundRequestDetailFor(long inboundId)
+        => InboundRequestPageRoutes.DetailFor(inboundId);
+
+    public static string InboundRequestCompleteFor(long inboundId)
+        => InboundRequestPageRoutes.CompleteFor(inboundId);
 
     public static string CommunityDecorationDetailFor(string productKey)
         => $"{CommunityDecorations}/{Uri.EscapeDataString(productKey)}";

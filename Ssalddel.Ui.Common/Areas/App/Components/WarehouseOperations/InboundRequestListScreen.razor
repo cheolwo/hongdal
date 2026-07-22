@@ -1,0 +1,179 @@
+@using Ssalddel.Contracts.Common.Inbound
+
+<InboundRequestScreenFrame State="@State"
+                           Context="@Context"
+                           CurrentScreen="InboundRequestScreenKind.List"
+                           Eyebrow="목록"
+                           Title="입고 요청 목록"
+                           Description="서버 원장을 검색하고 한 건을 상세 또는 입고완료 화면으로 엽니다."
+                           HomeHref="@HomeHref"
+                           RefreshRequested="RefreshRequested">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4 inbound-request-list__filters">
+        <MudGrid>
+            <MudItem xs="12" md="5">
+                <MudTextField Label="검색"
+                              Placeholder="입고 ID, 공급처, 상품, SKU, 참조번호"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              @bind-Value="search" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" Label="상태" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="status">
+                    <MudSelectItem T="string" Value="@string.Empty">전체</MudSelectItem>
+                    <MudSelectItem T="string" Value="@입고상태코드.예정">입고예정</MudSelectItem>
+                    <MudSelectItem T="string" Value="@입고상태코드.운송중">운송중</MudSelectItem>
+                    <MudSelectItem T="string" Value="@입고상태코드.완료">입고완료</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudSelect T="string" Label="입고 흐름" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="flowType">
+                    <MudSelectItem T="string" Value="@string.Empty">전체</MudSelectItem>
+                    @foreach (var option in FlowTypes)
+                    {
+                        <MudSelectItem T="string" Value="@option">@입고흐름유형코드.GetDisplayName(option)</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="1">
+                <MudButton FullWidth="true"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Disabled="@State.IsBusy"
+                           OnClick="ApplyFilterAsync">
+                    조회
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <div class="inbound-request-list__summary">
+        <strong>@State.TotalCount.ToString("N0")건</strong>
+        <span>현재 조건에서 최대 100건을 빠르게 훑어볼 수 있습니다.</span>
+    </div>
+
+    @if (!State.IsBusy && State.Items.Count == 0)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-5">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Color="Color.Default" Size="Size.Large" />
+            <MudText Typo="Typo.h6" Class="mt-2">표시할 입고 요청이 없습니다</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">검색 조건을 바꾸거나 신규 신청 화면에서 입고 예정을 등록해 주세요.</MudText>
+        </MudPaper>
+    }
+    else
+    {
+        <div class="inbound-request-list__grid">
+            @foreach (var item in State.Items)
+            {
+                <article class="inbound-request-card">
+                    <header>
+                        <div>
+                            <span>INBOUND #@item.Id</span>
+                            <h2>@DisplaySupplier(item)</h2>
+                        </div>
+                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(item.상태)" Variant="Variant.Filled">
+                            @Display(item.상태)
+                        </MudChip>
+                    </header>
+
+                    <dl>
+                        <div><dt>창고</dt><dd>#@item.창고Id</dd></div>
+                        <div><dt>흐름</dt><dd>@입고흐름유형코드.GetDisplayName(item.입고흐름유형)</dd></div>
+                        <div><dt>예정 품목</dt><dd>@DisplayExpectedItem(item)</dd></div>
+                        <div><dt>예정일</dt><dd>@FormatDate(item.예정도착일)</dd></div>
+                        <div><dt>참조번호</dt><dd>@Display(item.원주문참조번호)</dd></div>
+                        <div><dt>계약</dt><dd>@입고계약유형코드.GetDisplayName(item.계약정보.계약유형)</dd></div>
+                    </dl>
+
+                    <footer>
+                        <MudButton Href="@Context.PathFor(InboundRequestScreenKind.Detail, item.Id)"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Description">
+                            상세
+                        </MudButton>
+                        @if (CanComplete(item))
+                        {
+                            <MudButton Href="@Context.PathFor(InboundRequestScreenKind.Complete, item.Id)"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.Inventory">
+                                입고완료
+                            </MudButton>
+                        }
+                    </footer>
+                </article>
+            }
+        </div>
+    }
+</InboundRequestScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public InboundRequestPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+    [Parameter] public EventCallback<InboundRequestListFilter> FilterRequested { get; set; }
+
+    private string search = string.Empty;
+    private string status = string.Empty;
+    private string flowType = string.Empty;
+    private bool filterInitialized;
+
+    private static readonly IReadOnlyList<string> FlowTypes =
+    [
+        입고흐름유형코드.계약기반입고,
+        입고흐름유형코드.현장임시입고,
+        입고흐름유형코드.주문자동입고예정
+    ];
+
+    protected override void OnParametersSet()
+    {
+        if (filterInitialized)
+        {
+            return;
+        }
+
+        filterInitialized = true;
+        search = State.ListFilter.Search ?? string.Empty;
+        status = State.ListFilter.Status ?? string.Empty;
+        flowType = State.ListFilter.FlowType ?? string.Empty;
+    }
+
+    private Task ApplyFilterAsync()
+        => FilterRequested.InvokeAsync(new InboundRequestListFilter(
+            NullIfWhiteSpace(search),
+            NullIfWhiteSpace(status),
+            NullIfWhiteSpace(flowType)));
+
+    private static string? NullIfWhiteSpace(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static bool CanComplete(입고요청항목응답 item)
+        => !string.Equals(item.상태, 입고상태코드.완료, StringComparison.OrdinalIgnoreCase)
+           && !string.Equals(item.상태, 입고상태코드.취소, StringComparison.OrdinalIgnoreCase);
+
+    private static Color StatusColor(string? value)
+        => value switch
+        {
+            입고상태코드.완료 => Color.Success,
+            입고상태코드.운송중 => Color.Info,
+            입고상태코드.취소 => Color.Default,
+            _ => Color.Warning
+        };
+
+    private static string DisplaySupplier(입고요청항목응답 item)
+        => string.IsNullOrWhiteSpace(item.공급처명) ? "공급처 미지정" : item.공급처명;
+
+    private static string DisplayExpectedItem(입고요청항목응답 item)
+        => string.IsNullOrWhiteSpace(item.예정상품명)
+            ? "-"
+            : item.예정수량 is > 0
+                ? $"{item.예정상품명} · {item.예정수량:N0}개"
+                : item.예정상품명;
+
+    private static string Display(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private static string FormatDate(DateTime? value)
+        => value?.ToString("yyyy-MM-dd") ?? "-";
+}

@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [입고 요청 Route·공용 Screen 단일책임 분리](2026-07-22-inbound-request-route-srp.md) | 목록·신규 신청·stable-ID 상세·입고 완료·창고 등록을 Web·모바일 공용 Screen과 독립 route로 분리하고 Command 뒤 같은 ID 재조회, desktop·390px 실제 확인 |
 | 2026-07-22 | [운송 의뢰 상세 Route·공용 Screen 단일책임 분리](2026-07-22-shipper-request-detail-srp.md) | Web·모바일 요약·진행 이력·결제·증빙을 같은 request ID·서버 원장을 사용하는 공용 Screen과 독립 route로 분리, desktop·390px 실제 확인 |
 | 2026-07-22 | [운송 의뢰 작성 Route·공용 Screen 단일책임 분리](2026-07-22-shipper-request-authoring-srp.md) | Web adaptive 조립과 Web·모바일 화물·운송·절차·최종 확인 route가 같은 draft·validation·다이어그램 복귀 문맥을 사용하도록 통합, desktop·390px 실제 확인 |
 | 2026-07-22 | [커뮤니티 목록·다이어그램 복귀 문맥 통합](2026-07-22-community-return-context.md) | 게시판 검색·필터·보기·focus와 다이어그램 원장·node·zoom·출발 page를 Web·모바일 공용 URL 계약으로 복원하고 3단계 업무 화면 왕복을 desktop·390px에서 실제 확인 |

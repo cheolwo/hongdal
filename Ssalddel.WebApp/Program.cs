@@ -34,6 +34,7 @@ builder.Services.AddScoped<WebLocalePreferenceService>();
 builder.Services.AddScoped<IDiagramCollaborationClientService, DiagramCollaborationClientService>();
 builder.Services.AddScoped<WebShipperWarehouseWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkspaceService>(sp => sp.GetRequiredService<WebShipperWarehouseWorkspaceService>());
+builder.Services.AddTransient<InboundRequestPageViewModel>();
 builder.Services.AddScoped<WebShipperSalesWorkspaceService>();
 builder.Services.AddScoped<GlobalTradeWorkspaceService>();
 builder.Services.AddScoped<IWarehouseWorkEntryGateService, SampleWarehouseWorkEntryGateService>();

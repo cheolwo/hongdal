@@ -28,6 +28,11 @@ public sealed class ShipperWarehouseService : IShipperWarehouseWorkflowService
     public Task<입고요청목록응답?> GetInboundsAsync(CancellationToken cancellationToken = default)
         => GetAuthorizedJsonAsync<입고요청목록응답>("api/v1/warehouse-operations/inbounds", cancellationToken);
 
+    public Task<입고요청항목응답?> GetInboundAsync(long inboundId, CancellationToken cancellationToken = default)
+        => GetAuthorizedJsonAsync<입고요청항목응답>(
+            $"api/v1/warehouse-operations/inbounds/{inboundId.ToString(CultureInfo.InvariantCulture)}",
+            cancellationToken);
+
     public Task<입고요청페이지응답?> QueryInboundsAsync(
         입고요청목록조회요청 request,
         CancellationToken cancellationToken = default)

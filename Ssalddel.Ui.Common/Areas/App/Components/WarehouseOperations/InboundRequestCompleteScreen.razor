@@ -1,0 +1,143 @@
+@using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Contracts.Common.Sales
+
+<InboundRequestScreenFrame State="@State"
+                           Context="@Context"
+                           CurrentScreen="InboundRequestScreenKind.Complete"
+                           InboundId="@InboundId"
+                           Eyebrow="입고 완료"
+                           Title="입고완료·재고 전환"
+                           Description="선택한 입고 요청의 실제 수량을 확인하고 명시적으로 재고 생성을 요청합니다."
+                           HomeHref="@HomeHref"
+                           RefreshRequested="RefreshRequested">
+    @if (!State.IsBusy && State.Current is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-5">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <MudText Typo="Typo.h6" Class="mt-2">완료할 입고 요청을 찾지 못했습니다</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">목록에서 유효한 입고 요청을 다시 선택해 주세요.</MudText>
+        </MudPaper>
+    }
+    else if (State.Current is { } item)
+    {
+        <div class="inbound-complete-layout">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 inbound-complete-form">
+                <header>
+                    <div>
+                        <span>INBOUND #@item.Id</span>
+                        <h2>@Display(item.공급처명)</h2>
+                        <p>창고 #@item.창고Id · @Display(item.원주문참조번호)</p>
+                    </div>
+                    <MudChip T="string" Color="@StatusColor(item.상태)" Variant="Variant.Filled">@Display(item.상태)</MudChip>
+                </header>
+
+                @if (!CanComplete)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                        현재 상태에서는 입고완료 Command를 다시 실행할 수 없습니다. 상세 화면에서 저장된 원장을 확인해 주세요.
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                        이 동작은 입고 요청 상태를 완료로 바꾸고 재고를 생성합니다. 실제 검수 수량과 불량 수량, 보관 위치를 확인한 뒤 실행하세요.
+                    </MudAlert>
+                }
+
+                <SsalddelAutocomplete TItem="판매상품항목응답"
+                                     ViewModel="@ProductSearchViewModel"
+                                     Value="@SelectedSalesProduct"
+                                     ValueChanged="SalesProductChanged"
+                                     ToStringFunc="FormatSalesProduct"
+                                     Label="기존 판매상품"
+                                     Placeholder="상품명 또는 SKU 검색"
+                                     Disabled="@(State.IsBusy || !CanComplete)" />
+
+                <MudGrid>
+                    <MudItem xs="12" md="6"><MudTextField Label="상품명" Variant="Variant.Outlined" Required="true" Disabled="@(!CanComplete)" @bind-Value="Draft.ItemName" /></MudItem>
+                    <MudItem xs="12" md="6"><MudTextField Label="SKU" Variant="Variant.Outlined" Disabled="@(!CanComplete)" @bind-Value="Draft.Sku" /></MudItem>
+                    <MudItem xs="12" md="4"><MudTextField Label="옵션명" Variant="Variant.Outlined" Disabled="@(!CanComplete)" @bind-Value="Draft.OptionName" /></MudItem>
+                    <MudItem xs="12" md="4"><MudNumericField T="int" Label="입고수량" Variant="Variant.Outlined" Min="1" Disabled="@(!CanComplete)" @bind-Value="Draft.Quantity" /></MudItem>
+                    <MudItem xs="12" md="4"><MudNumericField T="int" Label="불량수량" Variant="Variant.Outlined" Min="0" Disabled="@(!CanComplete)" @bind-Value="Draft.DefectQuantity" /></MudItem>
+                    <MudItem xs="12"><MudTextField Label="보관위치" Variant="Variant.Outlined" Disabled="@(!CanComplete)" @bind-Value="Draft.StorageLocation" /></MudItem>
+                </MudGrid>
+
+                <div class="inbound-complete-form__actions">
+                    <MudButton Href="@Context.PathFor(InboundRequestScreenKind.Detail, item.Id)"
+                               Variant="Variant.Outlined"
+                               Color="Color.Default">
+                        상세로 돌아가기
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.Inventory"
+                               Disabled="@(State.IsBusy || !CanComplete)"
+                               OnClick="CompleteRequested">
+                        입고완료 처리
+                    </MudButton>
+                </div>
+            </MudPaper>
+
+            <aside class="inbound-complete-summary">
+                <span>COMPLETION CHECK</span>
+                <h2>@Display(Draft.ItemName)</h2>
+                <dl>
+                    <div><dt>입고수량</dt><dd>@Draft.Quantity.ToString("N0")개</dd></div>
+                    <div><dt>불량수량</dt><dd>@Draft.DefectQuantity.ToString("N0")개</dd></div>
+                    <div><dt>가용 예상</dt><dd>@Math.Max(0, Draft.Quantity - Draft.DefectQuantity).ToString("N0")개</dd></div>
+                    <div><dt>보관위치</dt><dd>@Display(Draft.StorageLocation)</dd></div>
+                </dl>
+            </aside>
+        </div>
+
+        @if (State.CompletionItems.Count > 0)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 mt-4">
+                <MudText Typo="Typo.h6">재조회한 재고 전환 결과</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">
+                    Command 응답 뒤 입고 요청 #@(item.Id)을 다시 조회했으며, 아래는 생성된 재고 항목입니다.
+                </MudText>
+                <div class="inbound-complete-results">
+                    @foreach (var result in State.CompletionItems)
+                    {
+                        <article>
+                            <strong>@result.상품명</strong>
+                            <span>@Display(result.SKU) · 가용 @result.가용수량.ToString("N0")개 · @Display(result.보관위치)</span>
+                        </article>
+                    }
+                </div>
+            </MudPaper>
+        }
+    }
+</InboundRequestScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public InboundRequestPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestCompletionDraft Draft { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public long InboundId { get; set; }
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public 판매상품조회ViewModel ProductSearchViewModel { get; set; } = default!;
+    [Parameter] public 판매상품항목응답? SelectedSalesProduct { get; set; }
+    [Parameter] public bool CanComplete { get; set; }
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+    [Parameter] public EventCallback CompleteRequested { get; set; }
+    [Parameter] public EventCallback<판매상품항목응답?> SalesProductChanged { get; set; }
+
+    private static string FormatSalesProduct(판매상품항목응답 product)
+        => string.IsNullOrWhiteSpace(product.판매SKU)
+            ? product.대표상품명
+            : $"{product.대표상품명} · {product.판매SKU}";
+
+    private static Color StatusColor(string? status)
+        => status switch
+        {
+            입고상태코드.완료 => Color.Success,
+            입고상태코드.운송중 => Color.Info,
+            입고상태코드.취소 => Color.Default,
+            _ => Color.Warning
+        };
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

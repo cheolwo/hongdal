@@ -1,0 +1,34 @@
+@page "/shipper/inbound/requests/new"
+@using Ssalddel.Contracts.Common.Inbound
+@inject InboundRequestPageViewModel ViewModel
+@inject NavigationManager Navigation
+
+<PageTitle>입고 요청 등록</PageTitle>
+
+<InboundRequestCreateScreen State="@ViewModel.State"
+                            Draft="@ViewModel.CreateDraft"
+                            Context="@Context"
+                            HomeHref="@ShipperRoutes.WarehouseWorkspace"
+                            RefreshWarehousesRequested="RefreshWarehousesAsync"
+                            CreateRequested="CreateAsync" />
+
+@code {
+    private InboundRequestNavigationContext Context { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Context = InboundRequestNavigationContext.Parse(Navigation.Uri);
+        await ViewModel.LoadCreateAsync(Context);
+    }
+
+    private async Task CreateAsync()
+    {
+        var inboundId = await ViewModel.CreateInboundAsync();
+        if (inboundId is > 0)
+        {
+            Navigation.NavigateTo((Context with { Created = true }).PathFor(InboundRequestScreenKind.Detail, inboundId));
+        }
+    }
+
+    private Task RefreshWarehousesAsync() => ViewModel.RefreshWarehousesAsync();
+}

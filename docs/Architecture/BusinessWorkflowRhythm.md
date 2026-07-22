@@ -112,7 +112,12 @@ flowchart TD
 - `Ssalddel.Domain/창고/입고요청.cs`
 - `Ssalddel.Domain/창고/입고상품.cs`
 - `Ssalddel/Services/Warehouse/WarehouseOperationService.cs`
-- `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/SsalddelInboundRequestManager.razor`
+- `Ssalddel.Contracts/Common/Inbound/InboundRequestPageRoutes.cs`
+- `Ssalddel.Ui.Common/Areas/App/ViewModels/InboundRequestPageViewModel.cs`
+- `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/InboundRequestListScreen.razor`
+- `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/InboundRequestCreateScreen.razor`
+- `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/InboundRequestDetailScreen.razor`
+- `Ssalddel.Ui.Common/Areas/App/Components/WarehouseOperations/InboundRequestCompleteScreen.razor`
 
 ## 2. 마켓 주문, 피킹, 포장 흐름
 

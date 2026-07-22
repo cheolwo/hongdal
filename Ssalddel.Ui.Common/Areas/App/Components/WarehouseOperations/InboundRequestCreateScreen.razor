@@ -1,0 +1,164 @@
+@using Ssalddel.Contracts.Common.Inbound
+@using Ssalddel.Contracts.Common.Warehouse
+
+<InboundRequestScreenFrame State="@State"
+                           Context="@Context"
+                           CurrentScreen="InboundRequestScreenKind.Create"
+                           Eyebrow="신규 신청"
+                           Title="입고 요청 등록"
+                           Description="창고·공급처·도착 예정과 계약 스냅샷을 검토한 뒤 입고 예정 원장을 저장합니다."
+                           HomeHref="@HomeHref"
+                           RefreshRequested="RefreshWarehousesRequested">
+    @if (string.Equals(Context.Source, "diagram-warehouse-proxy", StringComparison.OrdinalIgnoreCase))
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mb-4">
+            다이어그램의 <strong>@Display(Context.NodeTitle)</strong> 노드와 <strong>@Display(Context.WarehouseName)</strong> 후보에서 가져온 초안입니다.
+            이 화면에서 검토하고 등록 버튼을 눌러야 서버 원장이 생성됩니다.
+        </MudAlert>
+    }
+
+    <div class="inbound-create-layout">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4 inbound-create-form">
+            <section>
+                <header>
+                    <span>1</span>
+                    <div><h2>입고 위치와 흐름</h2><p>실제 접근 가능한 창고와 생성 경로를 선택합니다.</p></div>
+                </header>
+                <MudGrid>
+                    <MudItem xs="12" md="7">
+                        <MudSelect T="long?" Label="창고" Variant="Variant.Outlined" @bind-Value="Draft.WarehouseId" Required="true">
+                            @foreach (var warehouse in State.Warehouses)
+                            {
+                                <MudSelectItem T="long?" Value="@((long?)warehouse.Id)">
+                                    @warehouse.창고명 · @LogisticsProxySiteTypes.GetDisplayName(warehouse.물류대행지분류)
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="5">
+                        <MudSelect T="string" Label="입고 흐름" Variant="Variant.Outlined" @bind-Value="Draft.FlowType">
+                            @foreach (var option in FlowTypes)
+                            {
+                                <MudSelectItem T="string" Value="@option">@입고흐름유형코드.GetDisplayName(option)</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudAlert Severity="@FlowSeverity" Variant="Variant.Outlined" Dense="true">
+                            @입고흐름유형코드.GetDescription(Draft.FlowType)
+                        </MudAlert>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            현장 임시 입고는 안내 동의와 멱등 요청 ID가 있는 창고관리자 입고상품 수령 화면에서만 기록하고,
+                            주문 자동 입고 예정은 주문 workflow가 생성합니다.
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+
+                <MudButton Href="@Context.PathFor(InboundRequestScreenKind.WarehouseRegistration)"
+                           Variant="Variant.Text"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Warehouse">
+                    필요한 창고가 없으면 별도 화면에서 등록
+                </MudButton>
+            </section>
+
+            <section>
+                <header>
+                    <span>2</span>
+                    <div><h2>공급처와 도착 예정</h2><p>입고 원장을 찾고 대조할 최소 기준을 입력합니다.</p></div>
+                </header>
+                <MudGrid>
+                    <MudItem xs="12" md="4"><MudTextField Label="공급처 코드" Variant="Variant.Outlined" @bind-Value="Draft.SupplierCode" /></MudItem>
+                    <MudItem xs="12" md="8"><MudTextField Label="공급처명" Variant="Variant.Outlined" Required="true" @bind-Value="Draft.SupplierName" /></MudItem>
+                    <MudItem xs="12" md="6"><MudTextField Label="원주문 참조번호" Variant="Variant.Outlined" @bind-Value="Draft.OrderReference" /></MudItem>
+                    <MudItem xs="12" md="6"><MudDatePicker Label="예정 도착일" Variant="Variant.Outlined" @bind-Date="Draft.ExpectedArrivalDate" /></MudItem>
+                    <MudItem xs="12"><MudTextField Label="입고 메모" Variant="Variant.Outlined" Lines="3" @bind-Value="Draft.Notes" /></MudItem>
+                </MudGrid>
+            </section>
+
+            <section>
+                <header>
+                    <span>3</span>
+                    <div><h2>계약 스냅샷</h2><p>입고 뒤 재고까지 이어질 계약 기준을 함께 저장합니다.</p></div>
+                </header>
+                <MudGrid>
+                    <MudItem xs="12" md="6"><MudTextField Label="계약번호" Variant="Variant.Outlined" @bind-Value="Draft.ContractNo" /></MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string" Label="계약 유형" Variant="Variant.Outlined" @bind-Value="Draft.ContractType">
+                            @foreach (var option in ContractTypes)
+                            {
+                                <MudSelectItem T="string" Value="@option">@입고계약유형코드.GetDisplayName(option)</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6"><MudTextField Label="계약 상대방" Variant="Variant.Outlined" @bind-Value="Draft.ContractCounterpartyName" /></MudItem>
+                    <MudItem xs="12" md="6"><MudTextField Label="정산방식" Variant="Variant.Outlined" @bind-Value="Draft.ContractSettlementType" /></MudItem>
+                    <MudItem xs="12" md="6"><MudNumericField T="decimal" Label="판매수수료율(%)" Variant="Variant.Outlined" Min="0" Max="100" @bind-Value="Draft.ContractCommissionRate" /></MudItem>
+                    <MudItem xs="12" md="6"><MudNumericField T="decimal" Label="일 보관료" Variant="Variant.Outlined" Min="0" @bind-Value="Draft.ContractDailyStorageFee" /></MudItem>
+                </MudGrid>
+            </section>
+
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                등록은 입고 예정 원장만 생성합니다. 실제 검수, 적재, 보관 책임, 정산과 재고 생성은 이 버튼으로 확정되지 않습니다.
+            </MudAlert>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       Disabled="@(State.IsBusy || State.Warehouses.Count == 0)"
+                       OnClick="CreateRequested">
+                입고 요청 등록
+            </MudButton>
+        </MudPaper>
+
+        <aside class="inbound-create-summary">
+            <span>DRAFT SUMMARY</span>
+            <h2>@Display(Draft.SupplierName)</h2>
+            <dl>
+                <div><dt>창고</dt><dd>@SelectedWarehouseName</dd></div>
+                <div><dt>흐름</dt><dd>@입고흐름유형코드.GetDisplayName(Draft.FlowType)</dd></div>
+                <div><dt>예정일</dt><dd>@(Draft.ExpectedArrivalDate?.ToString("yyyy-MM-dd") ?? "-")</dd></div>
+                <div><dt>계약</dt><dd>@입고계약유형코드.GetDisplayName(Draft.ContractType)</dd></div>
+            </dl>
+        </aside>
+    </div>
+</InboundRequestScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public InboundRequestPageState State { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestCreateDraft Draft { get; set; } = default!;
+    [Parameter, EditorRequired] public InboundRequestNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter] public EventCallback RefreshWarehousesRequested { get; set; }
+    [Parameter] public EventCallback CreateRequested { get; set; }
+
+    private static readonly IReadOnlyList<string> FlowTypes =
+    [
+        입고흐름유형코드.계약기반입고
+    ];
+
+    private static readonly IReadOnlyList<string> ContractTypes =
+    [
+        입고계약유형코드.보관대행,
+        입고계약유형코드.위탁판매,
+        입고계약유형코드.마켓풀필먼트,
+        입고계약유형코드.수입통관풀필먼트
+    ];
+
+    private Severity FlowSeverity
+        => 입고흐름유형코드.Normalize(Draft.FlowType) switch
+        {
+            입고흐름유형코드.현장임시입고 => Severity.Warning,
+            입고흐름유형코드.주문자동입고예정 => Severity.Info,
+            _ => Severity.Success
+        };
+
+    private string SelectedWarehouseName
+        => State.Warehouses.FirstOrDefault(item => item.Id == Draft.WarehouseId)?.창고명 ?? "미선택";
+
+    private static string Display(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "입력 전" : value;
+}

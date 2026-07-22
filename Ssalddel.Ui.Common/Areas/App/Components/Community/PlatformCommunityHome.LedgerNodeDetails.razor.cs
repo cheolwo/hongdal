@@ -215,7 +215,7 @@ public partial class PlatformCommunityHome
             "/warehouse/mart/work-board" => $"{node.Title} 노드를 알뜰살뜰 마트 작업 보드에서 확인합니다.",
             "/warehouse/work/inbound/inspection" => $"{node.Title} 노드를 입고 검수 화면에서 확인합니다.",
             "/warehouse/work/inbound/products" => $"{node.Title} 노드를 입고 상품 확인 화면에서 확인합니다.",
-            "/shipper/inbound/requests" => $"{node.Title} 노드를 입고/물류 대행 신청 화면에서 확인합니다.",
+            "/shipper/inbound/requests" => $"{node.Title} 노드를 입고 요청 목록에서 확인합니다.",
             "/warehouse/work/picking-batch" => $"{node.Title} 노드를 피킹 배치 화면에서 확인합니다.",
             "/warehouse/work-board" => $"{node.Title} 노드를 창고 작업 보드에서 확인합니다.",
             "/warehouse" => $"{node.Title} 노드를 창고·현장 화면에서 확인합니다.",

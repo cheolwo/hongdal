@@ -23,7 +23,6 @@ public sealed class PlatformCommunityWarehouseProxyViewModelTests
         Assert.Equal("다이어그램 물류 대행 신청", viewModel.Draft.SupplierName);
         Assert.Equal(입고계약유형코드.보관대행, viewModel.Draft.ContractType);
         Assert.Contains("공동 주문 입고", viewModel.Draft.Notes);
-        Assert.False(viewModel.CanSubmit);
     }
 
     [Fact]
@@ -39,8 +38,9 @@ public sealed class PlatformCommunityWarehouseProxyViewModelTests
         var url = viewModel.BuildWorkspaceUrl();
 
         Assert.NotNull(url);
-        Assert.StartsWith("/shipper/inbound/requests?", url, StringComparison.Ordinal);
+        Assert.StartsWith("/shipper/inbound/requests/new?", url, StringComparison.Ordinal);
         Assert.Contains("source=diagram-warehouse-proxy", url, StringComparison.Ordinal);
+        Assert.Contains("supplierName=", url, StringComparison.Ordinal);
         Assert.Contains("nodeTitle=%EC%9E%85%EA%B3%A0%20%EB%B0%8F%20%EA%B2%80%EC%88%98", url, StringComparison.Ordinal);
     }
 

@@ -12,6 +12,19 @@ public interface IWarehouseWorkspaceService
 
     Task<입고요청목록응답?> GetInboundsAsync(CancellationToken cancellationToken = default);
 
+    async Task<입고요청항목응답?> GetInboundAsync(
+        long inboundId,
+        CancellationToken cancellationToken = default)
+    {
+        if (inboundId <= 0)
+        {
+            return null;
+        }
+
+        var response = await GetInboundsAsync(cancellationToken);
+        return response?.Items.FirstOrDefault(item => item.Id == inboundId);
+    }
+
     async Task<입고요청페이지응답?> QueryInboundsAsync(
         입고요청목록조회요청 request,
         CancellationToken cancellationToken = default)

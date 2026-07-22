@@ -1,0 +1,31 @@
+@page "/shipper/warehouses/new"
+@using Ssalddel.Contracts.Common.Inbound
+@inject InboundRequestPageViewModel ViewModel
+@inject NavigationManager Navigation
+
+<PageTitle>입고 창고 등록</PageTitle>
+
+<WarehouseRegistrationScreen State="@ViewModel.State"
+                             Draft="@ViewModel.WarehouseDraft"
+                             Context="@Context"
+                             HomeHref="@ShipperRoutes.WarehouseWorkspace"
+                             CreateRequested="CreateAsync" />
+
+@code {
+    private InboundRequestNavigationContext Context { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        Context = InboundRequestNavigationContext.Parse(Navigation.Uri);
+        ViewModel.ApplyWarehouseContext(Context);
+    }
+
+    private async Task CreateAsync()
+    {
+        var warehouseId = await ViewModel.CreateWarehouseAsync();
+        if (warehouseId is > 0)
+        {
+            Navigation.NavigateTo((Context with { WarehouseId = warehouseId }).PathFor(InboundRequestScreenKind.Create));
+        }
+    }
+}

@@ -1,5 +1,28 @@
 @page "/shipper/inbound/requests"
+@using Ssalddel.Contracts.Common.Inbound
+@inject InboundRequestPageViewModel ViewModel
+@inject NavigationManager Navigation
 
-<PageTitle>입고 현황</PageTitle>
+<PageTitle>입고 요청 목록</PageTitle>
 
-<SsalddelInboundRequestManager />
+<InboundRequestListScreen State="@ViewModel.State"
+                          Context="@Context"
+                          HomeHref="@ShipperRoutes.WarehouseWorkspace"
+                          RefreshRequested="RefreshAsync"
+                          FilterRequested="ApplyFilterAsync" />
+
+@code {
+    private InboundRequestNavigationContext Context { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Context = InboundRequestNavigationContext.Parse(Navigation.Uri);
+        await ViewModel.LoadListAsync();
+    }
+
+    private Task RefreshAsync()
+        => ViewModel.LoadListAsync(ViewModel.State.ListFilter);
+
+    private Task ApplyFilterAsync(InboundRequestListFilter filter)
+        => ViewModel.LoadListAsync(filter);
+}

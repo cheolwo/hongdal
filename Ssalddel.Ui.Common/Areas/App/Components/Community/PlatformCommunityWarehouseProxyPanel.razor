@@ -150,18 +150,11 @@
             }
             <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
                 <MudButton Variant="Variant.Filled"
-                           Color="Color.Success"
-                           StartIcon="@Icons.Material.Filled.Send"
-                           Disabled="@(!ViewModel.CanSubmit)"
-                           OnClick="@(() => ViewModel.SubmitAsync())">
-                    @(ViewModel.IsSubmitting ? "신청 중" : "다이어그램에서 신청")
-                </MudButton>
-                <MudButton Variant="Variant.Outlined"
                            Color="Color.Primary"
                            StartIcon="@Icons.Material.Filled.OpenInNew"
                            Disabled="@(selectedCandidate is null)"
                            OnClick="OpenWorkspaceAsync">
-                    업무 화면에서 자세히 작성
+                    신청 화면에서 검토
                 </MudButton>
             </MudStack>
         </MudStack>

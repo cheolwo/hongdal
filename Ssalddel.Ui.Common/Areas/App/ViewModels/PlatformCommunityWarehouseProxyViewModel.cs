@@ -1,4 +1,3 @@
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ssalddel.Contracts.Common.Inbound;
 using Ssalddel.Contracts.Common.Warehouse;
@@ -156,14 +155,12 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
     private WarehouseProxySourceNode? _sourceNode;
     private string? _selectedCandidateKey;
     private bool _isLoading;
-    private bool _isSubmitting;
     private string? _message;
     private Severity _messageSeverity = Severity.Info;
 
     public PlatformCommunityWarehouseProxyViewModel(IServiceProvider services)
     {
         _services = services;
-        Draft.PropertyChanged += (_, _) => OnPropertyChanged(nameof(CanSubmit));
     }
 
     public static IReadOnlyList<string> ContractTypeOptions { get; } =
@@ -179,7 +176,6 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
     public WarehouseProxySourceNode? SourceNode { get => _sourceNode; private set => SetProperty(ref _sourceNode, value); }
     public string? SelectedCandidateKey { get => _selectedCandidateKey; private set => SetProperty(ref _selectedCandidateKey, value); }
     public bool IsLoading { get => _isLoading; private set => SetProperty(ref _isLoading, value); }
-    public bool IsSubmitting { get => _isSubmitting; private set { if (SetProperty(ref _isSubmitting, value)) OnPropertyChanged(nameof(CanSubmit)); } }
     public string? Message { get => _message; private set => SetProperty(ref _message, value); }
     public Severity MessageSeverity { get => _messageSeverity; private set => SetProperty(ref _messageSeverity, value); }
 
@@ -188,13 +184,6 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
             ? null
             : _candidates.FirstOrDefault(candidate =>
                 string.Equals(candidate.Key, SelectedCandidateKey, StringComparison.OrdinalIgnoreCase));
-
-    public bool CanSubmit
-        => !IsSubmitting
-           && SelectedCandidate?.WarehouseId is not null
-           && _services.GetService<IWarehouseWorkspaceService>() is not null
-           && !string.IsNullOrWhiteSpace(Draft.SupplierName)
-           && !string.IsNullOrWhiteSpace(Draft.OrderReference);
 
     public async Task OpenAsync(
         WarehouseProxySourceNode sourceNode,
@@ -216,7 +205,6 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
         Draft.Reset();
         OnPropertyChanged(nameof(Candidates));
         OnPropertyChanged(nameof(SelectedCandidate));
-        OnPropertyChanged(nameof(CanSubmit));
     }
 
     public void SelectCandidate(string candidateKey)
@@ -234,88 +222,9 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
         SetMessage(
             candidate.WarehouseId is null
                 ? "이 후보는 아직 실제 창고가 아니므로 업무 화면에서 창고 등록 후 신청을 이어가세요."
-                : "이 창고 후보로 다이어그램 안에서 입고/물류 대행 요청을 등록할 수 있습니다.",
+                : "이 창고 후보와 입력 초안을 신청 화면으로 가져가 검토할 수 있습니다.",
             candidate.WarehouseId is null ? Severity.Info : Severity.Success);
         OnPropertyChanged(nameof(SelectedCandidate));
-        OnPropertyChanged(nameof(CanSubmit));
-    }
-
-    public async Task SubmitAsync(CancellationToken cancellationToken = default)
-    {
-        var sourceNode = SourceNode;
-        var candidate = SelectedCandidate;
-        if (sourceNode is null || candidate is null)
-        {
-            SetMessage("물류 대행을 신청할 창고 블록과 후보를 먼저 선택하세요.", Severity.Warning);
-            return;
-        }
-
-        if (candidate.WarehouseId is null)
-        {
-            SetMessage("실제 창고 ID가 없는 후보입니다. 업무 화면에서 창고를 등록한 뒤 신청을 이어가세요.", Severity.Warning);
-            return;
-        }
-
-        var warehouseService = _services.GetService<IWarehouseWorkspaceService>();
-        if (warehouseService is null)
-        {
-            SetMessage("현재 화면에는 창고 업무 서비스가 연결되어 있지 않습니다. 업무 화면에서 신청서를 작성하세요.", Severity.Warning);
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(Draft.SupplierName)
-            || string.IsNullOrWhiteSpace(Draft.OrderReference))
-        {
-            SetMessage("공급처명과 원주문 참조번호를 입력해야 신청할 수 있습니다.", Severity.Warning);
-            return;
-        }
-
-        IsSubmitting = true;
-        SetMessage("다이어그램 신청 값을 창고 입고 API로 전송하고 있습니다.", Severity.Info);
-        try
-        {
-            var response = await warehouseService.CreateInboundAsync(new 입고요청저장요청
-            {
-                창고Id = candidate.WarehouseId.Value,
-                입고흐름유형 = 입고흐름유형코드.계약기반입고,
-                입고생성경로 = $"다이어그램 창고 블록/{sourceNode.Title}",
-                계약선행여부 = true,
-                자동생성여부 = false,
-                공급처코드 = Draft.SupplierCode.Trim(),
-                공급처명 = Draft.SupplierName.Trim(),
-                원주문참조번호 = Draft.OrderReference.Trim(),
-                예정도착일 = Draft.ExpectedArrivalDate,
-                비고 = Draft.Notes.Trim(),
-                계약정보 = new 입고계약스냅샷
-                {
-                    계약번호 = Draft.ContractNo,
-                    계약유형 = Draft.ContractType,
-                    계약상대방명 = string.IsNullOrWhiteSpace(Draft.ContractCounterpartyName)
-                        ? candidate.Name
-                        : Draft.ContractCounterpartyName,
-                    정산방식 = Draft.ContractSettlementType,
-                    판매수수료율 = Draft.ContractCommissionRate,
-                    보관료일단가 = Draft.ContractDailyStorageFee,
-                    통관필요여부 = 입고계약유형코드.RequiresCustoms(Draft.ContractType),
-                    계약시작일 = DateTime.Today,
-                    계약메모 = $"다이어그램 노드 '{sourceNode.Title}'에서 {candidate.Name} 후보로 생성한 물류 대행 계약 초안입니다."
-                }.Normalize()
-            });
-
-            SetMessage(
-                response is null
-                    ? "입고/물류 대행 요청을 등록했습니다. 창고 업무 화면에서 목록을 새로고침해 확인하세요."
-                    : $"입고/물류 대행 요청 #{response.Id.ToString(CultureInfo.InvariantCulture)}을 등록했습니다. 상태: {response.상태}",
-                Severity.Success);
-        }
-        catch (Exception ex)
-        {
-            SetMessage($"입고/물류 대행 요청 등록에 실패했습니다: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            IsSubmitting = false;
-        }
     }
 
     public string? BuildWorkspaceUrl()
@@ -328,19 +237,29 @@ public sealed class PlatformCommunityWarehouseProxyViewModel : ObservableObject
             return null;
         }
 
-        var values = new Dictionary<string, string?>
+        return new InboundRequestNavigationContext
         {
-            ["source"] = "diagram-warehouse-proxy",
-            ["warehouseId"] = candidate.WarehouseId?.ToString(CultureInfo.InvariantCulture),
-            ["warehouseName"] = candidate.Name,
-            ["proxyType"] = candidate.ProxyTypeCode,
-            ["warehouseAddress"] = candidate.Address,
-            ["nodeTitle"] = sourceNode.Title,
-            ["nodeGroup"] = sourceNode.GroupLabel,
-            ["nodeDescription"] = sourceNode.Description,
-            ["scope"] = candidate.ScopeLabel
-        };
-        return PlatformCommunityNavigationQuery.Build("/shipper/inbound/requests", values);
+            Source = "diagram-warehouse-proxy",
+            WarehouseId = candidate.WarehouseId,
+            WarehouseName = candidate.Name,
+            ProxyType = candidate.ProxyTypeCode,
+            WarehouseAddress = candidate.Address,
+            SupplierCode = Draft.SupplierCode,
+            SupplierName = Draft.SupplierName,
+            OrderReference = Draft.OrderReference,
+            ExpectedArrivalDate = Draft.ExpectedArrivalDate,
+            Notes = Draft.Notes,
+            ContractNo = Draft.ContractNo,
+            ContractType = Draft.ContractType,
+            ContractCounterpartyName = Draft.ContractCounterpartyName,
+            ContractSettlementType = Draft.ContractSettlementType,
+            ContractCommissionRate = Draft.ContractCommissionRate,
+            ContractDailyStorageFee = Draft.ContractDailyStorageFee,
+            NodeTitle = sourceNode.Title,
+            NodeGroup = sourceNode.GroupLabel,
+            NodeDescription = sourceNode.Description,
+            Scope = candidate.ScopeLabel
+        }.PathFor(InboundRequestScreenKind.Create);
     }
 
     private async Task LoadCandidatesAsync(CancellationToken cancellationToken)
