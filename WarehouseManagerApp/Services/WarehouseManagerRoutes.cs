@@ -29,7 +29,11 @@ public static class WarehouseManagerRoutes
     public const string DeliveryAgencyWorkStart = "/work/delivery-agency";
     public const string Scan = "/scan";
     public const string WorkBoard = "/work-board";
-    public const string PickingBatch = "/work/picking-batch";
+    public const string PickingBatch = Ssalddel.Contracts.Common.Warehouse.PickingTaskPageRoutes.Root;
+    public static string PickingBatchDetail(string taskKey)
+        => Ssalddel.Contracts.Common.Warehouse.PickingTaskPageRoutes.DetailFor(taskKey);
+    public static string PickingBatchExecute(string taskKey)
+        => Ssalddel.Contracts.Common.Warehouse.PickingTaskPageRoutes.ExecuteFor(taskKey);
     public const string InboundProductScan = "/work/inbound/products";
     public const string InboundInspection = Ssalddel.Contracts.Common.Inventory.InboundInspectionPageRoutes.Root;
     public static string InboundInspectionDetail(long inboundItemId)

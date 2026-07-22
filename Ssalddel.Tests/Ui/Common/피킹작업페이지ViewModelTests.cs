@@ -7,20 +7,20 @@ namespace Ssalddel.Tests.Ui.Common;
 public sealed class 피킹작업페이지ViewModelTests
 {
     [Fact]
-    public async Task 초기화는_서버목록을읽되_첫작업을자동선택하지않는다()
+    public async Task 목록조회는_상세를자동조회하지않는다()
     {
         var service = CreateService();
-        using var page = CreatePage(service);
+        var list = new 피킹작업목록ViewModel(service);
 
-        Assert.True(await page.초기화Async());
+        Assert.True(await list.조회Async());
 
-        Assert.Single(page.목록.항목목록);
-        Assert.Null(page.상세.조회대상Key);
+        Assert.Single(list.항목목록);
+        Assert.Equal(1, service.ListRequestCount);
         Assert.Empty(service.DetailRequestKeys);
     }
 
     [Fact]
-    public async Task 시작성공뒤_같은TaskKey상세와목록을다시조회한다()
+    public async Task 시작성공뒤_목록없이_같은TaskKey상세만다시조회한다()
     {
         var service = CreateService();
         using var page = CreatePage(service);
@@ -30,7 +30,7 @@ public sealed class 피킹작업페이지ViewModelTests
 
         Assert.True(started);
         Assert.Equal(["PICK-71", "PICK-71"], service.DetailRequestKeys);
-        Assert.Equal(2, service.ListRequestCount);
+        Assert.Equal(0, service.ListRequestCount);
         Assert.Equal("진행중", page.상세.항목!.Status);
         Assert.Equal("PICK-71", page.상세.조회대상Key);
     }
@@ -55,9 +55,8 @@ public sealed class 피킹작업페이지ViewModelTests
         Assert.Equal("완료", page.상세.항목!.Status);
     }
 
-    private static 피킹작업PageViewModel CreatePage(FakePickingService service)
+    private static 피킹작업실행ViewModel CreatePage(FakePickingService service)
         => new(
-            new 피킹작업목록ViewModel(service),
             new 피킹작업상세ViewModel(service),
             new 피킹작업처리ViewModel(service));
 

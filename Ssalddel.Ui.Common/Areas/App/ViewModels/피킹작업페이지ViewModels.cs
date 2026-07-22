@@ -204,95 +204,103 @@ public sealed partial class 피킹작업처리ViewModel(
     }
 }
 
-/// <summary>목록, 정확한 상세, 시작·완료와 각 Command 뒤 같은 Key 재조회 순서만 조정합니다.</summary>
-public sealed partial class 피킹작업PageViewModel : 조립ViewModelBase
+/// <summary>한 피킹 작업의 시작·완료 Command와 성공 뒤 같은 Key 재조회 순서만 조정합니다.</summary>
+public sealed class 피킹작업실행ViewModel : PageViewModelBase
 {
-    public 피킹작업PageViewModel(
-        피킹작업목록ViewModel list,
+    private string _taskKey = string.Empty;
+
+    public 피킹작업실행ViewModel(
         피킹작업상세ViewModel detail,
         피킹작업처리ViewModel action)
     {
-        목록 = 하위ViewModel등록(list);
         상세 = 하위ViewModel등록(detail);
         처리 = 하위ViewModel등록(action);
     }
 
-    public 피킹작업목록ViewModel 목록 { get; }
     public 피킹작업상세ViewModel 상세 { get; }
     public 피킹작업처리ViewModel 처리 { get; }
 
-    [ObservableProperty]
-    public partial bool 초기화됨 { get; private set; }
+    protected override bool 하위ViewModel처리중
+        => 상세.처리중 || 처리.처리중;
 
-    public bool 처리중 => 목록.처리중 || 상세.처리중 || 처리.처리중;
-
-    public async Task<bool> 초기화Async(
-        string? taskKey = null,
-        CancellationToken cancellationToken = default)
-    {
-        초기화됨 = false;
-        var listLoaded = await 목록.조회Async(0, cancellationToken);
-        if (!string.IsNullOrWhiteSpace(taskKey))
-        {
-            await 대상선택Async(taskKey, cancellationToken);
-        }
-        else
-        {
-            상세.조회대상설정(null);
-            처리.대상준비(null);
-        }
-
-        초기화됨 = true;
-        return listLoaded && (string.IsNullOrWhiteSpace(taskKey) || 상세.항목 is not null);
-    }
-
-    public Task<bool> 검색Async(CancellationToken cancellationToken = default)
-        => 목록.조회Async(0, cancellationToken);
-
-    public async Task<bool> 대상선택Async(
+    public Task<bool> 초기화Async(
         string taskKey,
         CancellationToken cancellationToken = default)
     {
-        상세.조회대상설정(taskKey);
-        var loaded = await 상세.조회Async(cancellationToken);
-        처리.대상준비(상세.항목);
-        return loaded
-               && !상세.대상없음
-               && string.Equals(상세.항목?.TaskKey, taskKey.Trim(), StringComparison.Ordinal);
+        _taskKey = NormalizeTaskKey(taskKey);
+        return base.초기화Async(cancellationToken);
     }
 
-    public async Task<bool> 시작후재조회Async(CancellationToken cancellationToken = default)
-        => await 명령후재조회Async(처리.시작Async, 피킹포장작업상태코드.진행중, cancellationToken);
-
-    public async Task<bool> 완료후재조회Async(CancellationToken cancellationToken = default)
-        => await 명령후재조회Async(처리.완료Async, 피킹포장작업상태코드.완료, cancellationToken);
-
-    public void 선택해제()
+    public Task<bool> 경로대상변경Async(
+        string taskKey,
+        CancellationToken cancellationToken = default)
     {
-        상세.조회대상설정(null);
-        처리.대상준비(null);
+        _taskKey = NormalizeTaskKey(taskKey);
+        return base.새로고침Async(cancellationToken);
     }
+
+    protected override async Task 불러오기Async(
+        bool 새로고침,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(_taskKey))
+        {
+            throw new InvalidOperationException("실행할 피킹 작업 Key가 필요합니다.");
+        }
+
+        상세.조회대상설정(_taskKey);
+        var loaded = await 상세.조회Async(cancellationToken);
+        if (!loaded || !string.Equals(상세.항목?.TaskKey, _taskKey, StringComparison.Ordinal))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new InvalidOperationException(
+                상세.오류메시지
+                ?? (상세.대상없음
+                    ? "선택한 피킹 작업을 찾을 수 없거나 조회 범위에 없습니다."
+                    : "선택한 피킹 작업을 조회하지 못했습니다."));
+        }
+
+        처리.대상준비(상세.항목);
+    }
+
+    public Task<bool> 시작후재조회Async(CancellationToken cancellationToken = default)
+        => 명령후재조회Async(처리.시작Async, 피킹포장작업상태코드.진행중, cancellationToken);
+
+    public Task<bool> 완료후재조회Async(CancellationToken cancellationToken = default)
+        => 명령후재조회Async(처리.완료Async, 피킹포장작업상태코드.완료, cancellationToken);
 
     private async Task<bool> 명령후재조회Async(
         Func<CancellationToken, Task<bool>> command,
         string expectedStatus,
         CancellationToken cancellationToken)
     {
-        var taskKey = 상세.항목?.TaskKey;
-        if (string.IsNullOrWhiteSpace(taskKey) || !await command(cancellationToken))
+        if (!string.Equals(상세.항목?.TaskKey, _taskKey, StringComparison.Ordinal)
+            || !await command(cancellationToken))
         {
             return false;
         }
 
-        상세.조회대상설정(taskKey);
         var detailReloaded = await 상세.조회Async(cancellationToken);
         처리.대상준비(상세.항목);
-        await 목록.조회Async(목록.응답.Page, cancellationToken);
         return detailReloaded
                && 상세.항목 is { } reloaded
-               && string.Equals(reloaded.TaskKey, taskKey, StringComparison.Ordinal)
+               && string.Equals(reloaded.TaskKey, _taskKey, StringComparison.Ordinal)
                && string.Equals(reloaded.Status, expectedStatus, StringComparison.Ordinal);
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            상세.작업취소();
+            처리.작업취소();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private static string NormalizeTaskKey(string taskKey)
+        => string.IsNullOrWhiteSpace(taskKey) ? string.Empty : taskKey.Trim();
 }
 
 internal static class 피킹포장작업상태코드

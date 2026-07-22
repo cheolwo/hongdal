@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-22 | [피킹 작업 Route·공용 Screen 단일책임 분리](2026-07-22-picking-task-route-srp.md) | 목록·stable-key 상세·피킹 실행을 Web·창고 앱 공용 Screen과 독립 route로 분리하고 같은 Key 재조회, desktop·390px 실제 확인 |
 | 2026-07-22 | [입고 검수 Route·공용 Screen 단일책임 분리](2026-07-22-inbound-inspection-route-srp.md) | 목록·stable-ID 상세·검수 실행을 Web·창고 앱 공용 Screen과 독립 route로 분리하고 Command 뒤 같은 ID 재조회, desktop·390px 실제 확인 |
 | 2026-07-22 | [입고 요청 Route·공용 Screen 단일책임 분리](2026-07-22-inbound-request-route-srp.md) | 목록·신규 신청·stable-ID 상세·입고 완료·창고 등록을 Web·모바일 공용 Screen과 독립 route로 분리하고 Command 뒤 같은 ID 재조회, desktop·390px 실제 확인 |
 | 2026-07-22 | [운송 의뢰 상세 Route·공용 Screen 단일책임 분리](2026-07-22-shipper-request-detail-srp.md) | Web·모바일 요약·진행 이력·결제·증빙을 같은 request ID·서버 원장을 사용하는 공용 Screen과 독립 route로 분리, desktop·390px 실제 확인 |

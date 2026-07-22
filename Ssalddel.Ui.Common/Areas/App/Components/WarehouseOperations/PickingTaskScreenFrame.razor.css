@@ -1,0 +1,68 @@
+.picking-task-screen {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.picking-task-screen__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.picking-task-screen__title {
+    min-width: 0;
+}
+
+.picking-task-screen__title > span {
+    color: var(--mud-palette-primary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.picking-task-screen__title h1 {
+    margin: 4px 0;
+    font-size: clamp(1.65rem, 4vw, 2.2rem);
+    line-height: 1.2;
+}
+
+.picking-task-screen__title p {
+    margin: 0;
+    color: var(--mud-palette-text-secondary);
+}
+
+.picking-task-screen__actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.picking-task-screen__body {
+    min-width: 0;
+}
+
+@media (max-width: 720px) {
+    .picking-task-screen {
+        padding: 14px 12px 28px;
+    }
+
+    .picking-task-screen__header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .picking-task-screen__title,
+    .picking-task-screen__actions {
+        width: 100%;
+    }
+
+    .picking-task-screen__actions {
+        justify-content: flex-start;
+    }
+}

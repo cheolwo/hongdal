@@ -1,0 +1,19 @@
+@page "/work/picking-batch/{TaskKey}/execute"
+@using Ssalddel.Contracts.Common.Warehouse
+@inject NavigationManager Navigation
+
+<PageTitle>피킹 작업 실행</PageTitle>
+
+<PickingBatchAccessFrame Title="피킹 작업 실행"
+                         Description="한 작업의 현재 상태에 맞춰 시작하거나 현장 확인 뒤 완료합니다.">
+    <PickingTaskExecuteScreen TaskKey="@TaskKey"
+                              Context="@Context"
+                              HomeHref="@WarehouseManagerRoutes.WorkBoard" />
+</PickingBatchAccessFrame>
+
+@code {
+    [Parameter] public string TaskKey { get; set; } = string.Empty;
+
+    private PickingTaskNavigationContext Context
+        => PickingTaskNavigationContext.Parse(Navigation.Uri);
+}

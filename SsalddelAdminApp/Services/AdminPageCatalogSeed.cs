@@ -336,8 +336,8 @@ internal static class AdminPageCatalogSeed
                 execution: AdminPageExecutionMode.Simulation, navigation: AdminPageNavigationState.Primary),
             Page(
                 "warehouse-picking-task", "warehouse", "WarehouseManagerApp", "warehouse-outbound", "출고",
-                "피킹 작업", "/work/picking-batch", "WarehouseManagerApp/Components/Pages/PickingBatchWorkspace.razor",
-                "접근 가능한 서버 피킹 작업의 시작·완료 상태만 저장하고 같은 작업 Key를 다시 확인합니다. 재고·포장·출고·정산은 별도입니다.", "피킹 작업자",
+                "피킹 작업", "/work/picking-batch", "WarehouseManagerApp/Components/Pages/PickingBatch*.razor",
+                "목록과 stable-key 상세는 읽기 전용이며 별도 실행 경로만 시작·완료 상태를 저장하고 같은 작업 Key를 다시 확인합니다. 재고·포장·출고·정산은 별도입니다.", "피킹 작업자",
                 ["창고 관리자", "피킹 작업자"], lifecycle: AdminPageLifecycle.Preview,
                 execution: AdminPageExecutionMode.Simulation, navigation: AdminPageNavigationState.Primary),
             Page(

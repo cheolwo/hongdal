@@ -15,7 +15,7 @@
 | [WarehouseManagerApp-P03-1 - 입고상품 수령](WarehouseManagerApp-P03-1/) | /work/inbound/products | 확장 | 정확한 입고예정 조회와 현장 반입 요청 | 완료 |
 | [WarehouseManagerApp-P03-2 - 일반 재고 현황](WarehouseManagerApp-P03-2/) | /warehouse/general/inventory | 확장 | 창고 범위 최소 재고 목록·서버 집계·정확한 상세 | 실제 캡처 |
 | [WarehouseManagerApp-P03-3 - 적재 작업](WarehouseManagerApp-P03-3/) | /work/inbound/put-away | 확장 | 검수 완료 재고의 위치 확정과 같은 ID 재조회 | 실제 캡처 |
-| [WarehouseManagerApp-P04 - 피킹 작업](WarehouseManagerApp-P04/) | /work/picking-batch | 확장 | 서버 피킹 목록·정확한 상세·시작/완료·같은 Key 재조회 | 실제 캡처 |
+| [WarehouseManagerApp-P04 - 피킹 작업 목록·상세·실행](WarehouseManagerApp-P04/) | `/work/picking-batch`<br>`/work/picking-batch/{TaskKey}`<br>`/work/picking-batch/{TaskKey}/execute` | 확장 | 목록 조회·stable-key 상세·명시적 시작/완료와 같은 Key 재조회 | Web route desktop·390px 실제 재검증 |
 | [WarehouseManagerApp-P04-1 - 포장 작업](WarehouseManagerApp-P04-1/) | /work/outbound/packing | 확장 | 적재 완료 재고의 전체 가용수량 포장·같은 ID 재조회 | 실제 캡처 |
 | [WarehouseManagerApp-P04-2 - 출고 인계 준비](WarehouseManagerApp-P04-2/) | /warehouse/general/transport-handoff | 확장 | 포장 완료 재고의 출고예정 원장 준비·같은 ID 재조회 | 실제 캡처 |
 | [WarehouseManagerApp-P04-3 - 출고예정 운송 전 검토](WarehouseManagerApp-P04-3/) | /warehouse/general/outbound-plan-review | 확장 | 준비된 출고예정의 포장·수량·출발 창고 근거와 운송 전 입력 필요 항목 확인 | 실제 캡처 |

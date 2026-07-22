@@ -1,0 +1,190 @@
+@using Ssalddel.Contracts.Common.Warehouse
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<피킹작업실행ViewModel>
+
+<PickingTaskScreenFrame Context="@Context"
+                        CurrentScreen="PickingTaskScreenKind.Execute"
+                        TaskKey="@TaskKey"
+                        Eyebrow="피킹 실행"
+                        Title="피킹 현장 실행"
+                        Description="한 작업의 현재 상태에 따라 시작하거나 적재대·상품·전체 수량을 확인한 뒤 완료합니다."
+                        HomeHref="@HomeHref"
+                        Busy="@ViewModel.처리중"
+                        RefreshRequested="ReloadAsync">
+    @if (ViewModel.상태 is PageViewModel상태.대기 or PageViewModel상태.불러오는중)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 picking-task-execute__state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">@Display(TaskKey)의 실행 가능 상태를 확인하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (ViewModel.상태 == PageViewModel상태.실패 || ViewModel.상세.항목 is null)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Spacing="2">
+                <MudText>@(ViewModel.오류메시지 ?? "피킹 작업을 찾을 수 없거나 현재 계정의 조회 범위에 없습니다.")</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="ReloadAsync">같은 Key 다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else
+    {
+        var selected = ViewModel.상세.항목!;
+        <div class="picking-task-execute__layout">
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4 picking-task-execute__form">
+                <header>
+                    <div>
+                        <span>@Display(selected.TaskKey)</span>
+                        <h2>@Display(selected.ProductName)</h2>
+                        <p>@Display(selected.Sku) · @Display(selected.WarehouseName)</p>
+                    </div>
+                    <MudChip T="string" Color="@StatusColor(selected.Status)" Variant="Variant.Filled" Size="Size.Small">
+                        @Display(selected.Status)
+                    </MudChip>
+                </header>
+
+                @if (selected.CanStart)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                        대기 작업입니다. 상품·수량·적재대 기준을 확인한 뒤 이 작업만 시작 상태로 바꿉니다.
+                    </MudAlert>
+
+                    @if (ViewModel.처리.오류발생)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.처리.오류메시지</MudAlert>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.PlayArrow"
+                               Disabled="@(!ViewModel.처리.시작가능 || ViewModel.처리중)"
+                               OnClick="StartTaskAsync">
+                        피킹 작업 시작
+                    </MudButton>
+                }
+                else if (selected.CanComplete)
+                {
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                        진행 중 작업입니다. 표시된 적재대와 실제 상품·전체 수량을 대조한 뒤 완료합니다.
+                    </MudAlert>
+
+                    <MudTextField T="string"
+                                  Label="적재대 확인 코드"
+                                  Value="@ViewModel.처리.적재대확인코드"
+                                  ValueChanged="SetRackCode"
+                                  Variant="Variant.Outlined"
+                                  MaxLength="120"
+                                  Immediate="true"
+                                  Disabled="@ViewModel.처리중"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.QrCodeScanner" />
+
+                    <div class="picking-task-execute__checklist">
+                        <MudCheckBox T="bool" Value="@ViewModel.처리.상품확인" ValueChanged="SetProductConfirmed" Label="표시된 상품과 SKU가 실제 피킹 상품과 일치합니다." Disabled="@ViewModel.처리중" />
+                        <MudCheckBox T="bool" Value="@ViewModel.처리.전체수량확인" ValueChanged="SetQuantityConfirmed" Label="표시된 전체 수량을 한 번에 피킹했습니다." Disabled="@ViewModel.처리중" />
+                    </div>
+
+                    @if (ViewModel.처리.오류발생)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.처리.오류메시지</MudAlert>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               Size="Size.Large"
+                               FullWidth="true"
+                               StartIcon="@Icons.Material.Filled.DoneAll"
+                               Disabled="@(!ViewModel.처리.완료가능 || ViewModel.처리중)"
+                               OnClick="CompleteTaskAsync">
+                        피킹 작업 완료
+                    </MudButton>
+                }
+                else if (string.Equals(selected.Status, 피킹작업조회상태코드.완료, StringComparison.Ordinal))
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt">
+                        <MudStack Spacing="1">
+                            <MudText Typo="Typo.subtitle2">같은 Key로 피킹 완료 원장을 다시 조회했습니다.</MudText>
+                            <MudText Typo="Typo.body2">완료 시각: @FormatDateTime(selected.CompletedAtUtc)</MudText>
+                            <MudText Typo="Typo.caption">현재 상태에서는 피킹 Command를 다시 실행할 수 없습니다.</MudText>
+                        </MudStack>
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                        현재 상태에서는 시작 또는 완료 Command를 실행할 수 없습니다. 같은 Key를 다시 조회하거나 목록에서 다른 작업을 선택해 주세요.
+                    </MudAlert>
+                }
+
+                <MudButton Href="@Context.PathFor(PickingTaskScreenKind.Detail, selected.TaskKey)"
+                           Variant="Variant.Text"
+                           StartIcon="@Icons.Material.Filled.Description">
+                    읽기 전용 상세로 돌아가기
+                </MudButton>
+            </MudPaper>
+
+            <aside class="picking-task-execute__summary">
+                <span>PICKING CHECK</span>
+                <h2>@Display(selected.ProductName)</h2>
+                <dl>
+                    <div><dt>작업 Key</dt><dd>@Display(selected.TaskKey)</dd></div>
+                    <div><dt>피킹 수량</dt><dd>@selected.Quantity.ToString("N0")개</dd></div>
+                    <div><dt>적재대</dt><dd>@Display(selected.RackCode)</dd></div>
+                    <div><dt>보관 위치</dt><dd>@Display(selected.StorageLocationCode)</dd></div>
+                    <div><dt>담당</dt><dd>@Display(selected.WorkerDisplayName)</dd></div>
+                </dl>
+            </aside>
+        </div>
+    }
+</PickingTaskScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public string TaskKey { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public PickingTaskNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+
+    private string? _loadedTaskKey;
+    private bool _initialized;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var normalized = TaskKey?.Trim();
+        if (string.IsNullOrWhiteSpace(normalized)
+            || string.Equals(_loadedTaskKey, normalized, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedTaskKey = normalized;
+        if (_initialized)
+        {
+            await ViewModel.경로대상변경Async(normalized);
+        }
+        else
+        {
+            _initialized = true;
+            await ViewModel.초기화Async(normalized);
+        }
+    }
+
+    private Task ReloadAsync() => ViewModel.경로대상변경Async(TaskKey);
+    private Task StartTaskAsync() => ViewModel.시작후재조회Async();
+    private Task CompleteTaskAsync() => ViewModel.완료후재조회Async();
+    private void SetRackCode(string value) => ViewModel.처리.적재대확인코드 = value ?? string.Empty;
+    private void SetProductConfirmed(bool value) => ViewModel.처리.상품확인 = value;
+    private void SetQuantityConfirmed(bool value) => ViewModel.처리.전체수량확인 = value;
+
+    private static Color StatusColor(string status)
+        => status switch
+        {
+            피킹작업조회상태코드.완료 => Color.Success,
+            피킹작업조회상태코드.진행중 => Color.Info,
+            _ => Color.Warning
+        };
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatDateTime(DateTime? value)
+        => value.HasValue ? $"{value.Value.ToLocalTime():yyyy-MM-dd HH:mm} (기기 시각)" : "-";
+}

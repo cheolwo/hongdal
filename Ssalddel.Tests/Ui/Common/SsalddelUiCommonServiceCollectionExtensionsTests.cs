@@ -471,8 +471,20 @@ public sealed class SsalddelUiCommonServiceCollectionExtensionsTests
             && x.ImplementationType == typeof(입고검수실행ViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
-            x.ServiceType == typeof(피킹작업PageViewModel)
-            && x.ImplementationType == typeof(피킹작업PageViewModel)
+            x.ServiceType == typeof(피킹작업목록ViewModel)
+            && x.ImplementationType == typeof(피킹작업목록ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(피킹작업상세ViewModel)
+            && x.ImplementationType == typeof(피킹작업상세ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(피킹작업처리ViewModel)
+            && x.ImplementationType == typeof(피킹작업처리ViewModel)
+            && x.Lifetime == ServiceLifetime.Transient);
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(피킹작업실행ViewModel)
+            && x.ImplementationType == typeof(피킹작업실행ViewModel)
             && x.Lifetime == ServiceLifetime.Transient);
         Assert.Contains(services, x =>
             x.ServiceType == typeof(재고현황PageViewModel)

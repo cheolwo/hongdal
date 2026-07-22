@@ -1,12 +1,8 @@
-@page "/work/picking-batch"
 @inherits MvvmComponentBase<창고피킹배치PageViewModel>
-@inject NavigationManager Navigation
-
-<PageTitle>피킹 작업</PageTitle>
 
 <WarehousePageShell Model="@ViewModel"
-                    Title="피킹 작업"
-                    Description="서버에 배정된 피킹 작업을 조회하고 시작·완료 상태를 같은 작업 Key로 확인합니다."
+                    Title="@Title"
+                    Description="@Description"
                     Icon="@Icons.Material.Filled.Inventory2"
                     Color="Color.Info">
     <Actions>
@@ -54,15 +50,15 @@
         }
         else
         {
-            <SsalddelPickingTaskWorkspace TaskKey="@TaskKey"
-                                          OnTaskSelected="UpdateTaskRoute" />
+            @ChildContent
         }
     </ChildContent>
 </WarehousePageShell>
 
 @code {
-    [SupplyParameterFromQuery(Name = "taskKey")]
-    public string? TaskKey { get; set; }
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
         => await ViewModel.초기화Async();
@@ -78,13 +74,4 @@
 
     private async Task RetryPageAsync()
         => await ViewModel.초기화Async();
-
-    private Task UpdateTaskRoute(string? taskKey)
-    {
-        var target = string.IsNullOrWhiteSpace(taskKey)
-            ? WarehouseManagerRoutes.PickingBatch
-            : $"{WarehouseManagerRoutes.PickingBatch}?taskKey={Uri.EscapeDataString(taskKey)}";
-        Navigation.NavigateTo(target, replace: true);
-        return Task.CompletedTask;
-    }
 }

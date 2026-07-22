@@ -1,0 +1,145 @@
+@using Ssalddel.Contracts.Common.Warehouse
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<피킹작업상세ViewModel>
+
+<PickingTaskScreenFrame Context="@Context"
+                        CurrentScreen="PickingTaskScreenKind.Detail"
+                        TaskKey="@TaskKey"
+                        Eyebrow="상세"
+                        Title="피킹 작업 원장"
+                        Description="선택한 피킹 작업 한 건을 정확한 Key로 읽고 현재 실행 가능 상태를 확인합니다."
+                        HomeHref="@HomeHref"
+                        Busy="@ViewModel.처리중"
+                        RefreshRequested="LoadAsync">
+    @if (ViewModel.처리중 && ViewModel.항목 is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 picking-task-detail__state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">@Display(TaskKey)를 서버에서 조회하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (ViewModel.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Spacing="2">
+                <MudText>@ViewModel.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="LoadAsync">같은 Key 다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (ViewModel.대상없음 || ViewModel.항목 is null)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 picking-task-detail__state">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Warning" />
+            <MudText Typo="Typo.subtitle1">피킹 작업을 찾을 수 없습니다.</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                주소의 작업 Key가 없거나 현재 계정의 창고 범위 밖입니다. 다른 작업으로 자동 대체하지 않습니다.
+            </MudText>
+            <MudButton Href="@Context.PathFor(PickingTaskScreenKind.List)" Variant="Variant.Outlined">목록으로</MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        var selected = ViewModel.항목!;
+        <article class="picking-task-detail__card">
+            <header>
+                <div>
+                    <span>@Display(selected.TaskKey)</span>
+                    <h2>@Display(selected.ProductName)</h2>
+                    <p>@Display(selected.Sku) · 주문 @Display(selected.OrderReference)</p>
+                </div>
+                <MudChip T="string" Color="@StatusColor(selected.Status)" Variant="Variant.Filled">
+                    @Display(selected.Status)
+                </MudChip>
+            </header>
+
+            <section>
+                <h3>현장 작업 기준</h3>
+                <dl>
+                    <div><dt>창고</dt><dd>@Display(selected.WarehouseName)</dd></div>
+                    <div><dt>담당</dt><dd>@Display(selected.WorkerDisplayName)</dd></div>
+                    <div><dt>피킹 수량</dt><dd>@selected.Quantity.ToString("N0")개</dd></div>
+                    <div><dt>적재대</dt><dd>@Display(selected.RackCode)</dd></div>
+                    <div><dt>보관 위치</dt><dd>@Display(selected.StorageLocationCode)</dd></div>
+                    <div><dt>처리 방식</dt><dd>@Display(selected.ProcessingMode)</dd></div>
+                    <div><dt>작업 묶음</dt><dd>@Display(selected.BundleBarcode)</dd></div>
+                    <div><dt>갱신 시각</dt><dd>@FormatDateTime(selected.UpdatedAtUtc)</dd></div>
+                </dl>
+            </section>
+
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.subtitle2">다음 단계</MudText>
+                    <MudText Typo="Typo.body2">@Display(selected.NextStep)</MudText>
+                    @if (!string.IsNullOrWhiteSpace(selected.AssignmentReason))
+                    {
+                        <MudText Typo="Typo.caption">배정 근거: @selected.AssignmentReason</MudText>
+                    }
+                </MudStack>
+            </MudAlert>
+
+            @if (string.Equals(selected.Status, 피킹작업조회상태코드.완료, StringComparison.Ordinal))
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.TaskAlt">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2">서버 피킹 완료 상태</MudText>
+                        <MudText Typo="Typo.body2">완료 시각: @FormatDateTime(selected.CompletedAtUtc)</MudText>
+                        <MudText Typo="Typo.caption">포장·출고·운송 인계는 각 후속 서버 작업에서 진행합니다.</MudText>
+                    </MudStack>
+                </MudAlert>
+            }
+
+            <footer>
+                <MudButton Href="@Context.PathFor(PickingTaskScreenKind.List)" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ListAlt">목록</MudButton>
+                @if (selected.CanStart || selected.CanComplete)
+                {
+                    <MudButton Href="@Context.PathFor(PickingTaskScreenKind.Execute, selected.TaskKey)"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.PlaylistAddCheck">
+                        피킹 실행 화면
+                    </MudButton>
+                }
+            </footer>
+        </article>
+    }
+</PickingTaskScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public string TaskKey { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public PickingTaskNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+
+    private string? _loadedTaskKey;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var normalized = TaskKey?.Trim();
+        if (string.IsNullOrWhiteSpace(normalized)
+            || string.Equals(_loadedTaskKey, normalized, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedTaskKey = normalized;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        ViewModel.조회대상설정(TaskKey);
+        await ViewModel.조회Async();
+    }
+
+    private static Color StatusColor(string status)
+        => status switch
+        {
+            피킹작업조회상태코드.완료 => Color.Success,
+            피킹작업조회상태코드.진행중 => Color.Info,
+            _ => Color.Warning
+        };
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatDateTime(DateTime? value)
+        => value.HasValue ? $"{value.Value.ToLocalTime():yyyy-MM-dd HH:mm} (기기 시각)" : "-";
+}

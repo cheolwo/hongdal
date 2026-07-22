@@ -155,6 +155,10 @@ public sealed class PageCapabilityCatalogTests
     [InlineData("WarehouseManagerApp", "/work/picking-batch?taskKey=PICK-88", "warehouse-app-picking-task")]
     [InlineData("Ssalddel.WebApp", "/warehouse/work/picking-batch?taskKey=PICK-88", "web-warehouse-picking-task")]
     [InlineData("Ssalddel.WebApp", "/work/picking-batch?taskKey=PICK-88", "web-warehouse-picking-task-alias")]
+    [InlineData("WarehouseManagerApp", "/work/picking-batch/PICK-88", "warehouse-app-picking-task-routes")]
+    [InlineData("WarehouseManagerApp", "/work/picking-batch/PICK-88/execute", "warehouse-app-picking-task-routes")]
+    [InlineData("Ssalddel.WebApp", "/warehouse/work/picking-batch/PICK-88", "web-warehouse-picking-task-routes")]
+    [InlineData("Ssalddel.WebApp", "/work/picking-batch/PICK-88/execute", "web-warehouse-picking-task-alias-routes")]
     public void 피킹작업페이지는_피킹상태만변경하는BetaSimulation으로분류한다(
         string appCode,
         string route,

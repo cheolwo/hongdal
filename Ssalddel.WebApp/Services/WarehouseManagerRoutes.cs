@@ -11,7 +11,11 @@ public static class WarehouseManagerRoutes
     public const string DeliveryAgencyWorkStart = "/warehouse/work/delivery-agency";
     public const string Scan = "/warehouse/scan";
     public const string WorkBoard = "/warehouse/work-board";
-    public const string PickingBatch = "/warehouse/work/picking-batch";
+    public const string PickingBatch = Ssalddel.Contracts.Common.Warehouse.PickingTaskPageRoutes.Root;
+    public static string PickingBatchDetail(string taskKey)
+        => Ssalddel.Contracts.Common.Warehouse.PickingTaskPageRoutes.DetailFor(taskKey);
+    public static string PickingBatchExecute(string taskKey)
+        => Ssalddel.Contracts.Common.Warehouse.PickingTaskPageRoutes.ExecuteFor(taskKey);
     public const string InboundProductScan = "/warehouse/work/inbound/products";
     public const string InboundInspection = Ssalddel.Contracts.Common.Inventory.InboundInspectionPageRoutes.Root;
 

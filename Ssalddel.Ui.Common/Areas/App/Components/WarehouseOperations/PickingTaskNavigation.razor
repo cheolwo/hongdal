@@ -1,0 +1,48 @@
+@using Ssalddel.Contracts.Common.Warehouse
+
+<nav class="picking-task-nav" aria-label="피킹 작업 화면">
+    @foreach (var item in Items)
+    {
+        if (item.RequiresTaskKey && string.IsNullOrWhiteSpace(TaskKey))
+        {
+            <span class="picking-task-nav__item picking-task-nav__item--disabled" aria-disabled="true">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span><strong>@item.Label</strong><small>@item.Description</small></span>
+            </span>
+        }
+        else
+        {
+            <a class="@BuildClass(item.Screen)"
+               href="@Context.PathFor(item.Screen, TaskKey)"
+               aria-current="@(item.Screen == CurrentScreen ? "page" : null)">
+                <MudIcon Icon="@item.Icon" Size="Size.Small" />
+                <span><strong>@item.Label</strong><small>@item.Description</small></span>
+            </a>
+        }
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public PickingTaskNavigationContext Context { get; set; } = new();
+    [Parameter] public PickingTaskScreenKind CurrentScreen { get; set; }
+    [Parameter] public string? TaskKey { get; set; }
+
+    private static readonly IReadOnlyList<NavigationItem> Items =
+    [
+        new(PickingTaskScreenKind.List, "목록", "검색·대상 선택", Icons.Material.Filled.ListAlt, false),
+        new(PickingTaskScreenKind.Detail, "상세", "작업 원장 읽기", Icons.Material.Filled.Description, true),
+        new(PickingTaskScreenKind.Execute, "피킹 실행", "시작·완료 확인", Icons.Material.Filled.PlaylistAddCheck, true)
+    ];
+
+    private string BuildClass(PickingTaskScreenKind screen)
+        => screen == CurrentScreen
+            ? "picking-task-nav__item picking-task-nav__item--active"
+            : "picking-task-nav__item";
+
+    private sealed record NavigationItem(
+        PickingTaskScreenKind Screen,
+        string Label,
+        string Description,
+        string Icon,
+        bool RequiresTaskKey);
+}

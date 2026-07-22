@@ -1,0 +1,184 @@
+@using Ssalddel.Contracts.Common.Warehouse
+@using Ssalddel.Ui.Common.Areas.App.ViewModels
+@inherits MvvmComponentBase<피킹작업목록ViewModel>
+
+<PickingTaskScreenFrame Context="@Context"
+                        CurrentScreen="PickingTaskScreenKind.List"
+                        Eyebrow="목록"
+                        Title="피킹 작업 목록"
+                        Description="접근 가능한 피킹 작업을 검색하고 정확한 작업 Key 상세로 이동합니다."
+                        HomeHref="@HomeHref"
+                        Busy="@ViewModel.처리중"
+                        RefreshRequested="RefreshAsync">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4 picking-task-list__filters">
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string"
+                              Label="작업 Key·주문참조·상품·SKU·적재대 검색"
+                              Value="@ViewModel.검색어"
+                              ValueChanged="SetSearch"
+                              OnKeyDown="SearchKeyDownAsync"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              Immediate="true"
+                              Disabled="@ViewModel.처리중" />
+            </MudItem>
+            <MudItem xs="12" sm="7" md="3">
+                <MudSelect T="string"
+                           Label="작업 상태"
+                           Value="@ViewModel.조회상태"
+                           ValueChanged="StatusChangedAsync"
+                           Variant="Variant.Outlined"
+                           Disabled="@ViewModel.처리중">
+                    @foreach (var status in ViewModel.조회상태목록)
+                    {
+                        <MudSelectItem T="string" Value="@status">@status</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="5" md="3">
+                <MudButton FullWidth="true"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           Disabled="@ViewModel.처리중"
+                           OnClick="SearchAsync">
+                    조회
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @if (!ViewModel.초기화됨 && ViewModel.처리중)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 picking-task-list__state">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">피킹 작업 목록을 서버에서 조회하고 있습니다.</MudText>
+        </MudPaper>
+    }
+    else if (ViewModel.오류발생)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText>@ViewModel.오류메시지</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Error" Disabled="@ViewModel.처리중" OnClick="RefreshAsync">다시 조회</MudButton>
+            </MudStack>
+        </MudAlert>
+    }
+    else if (ViewModel.비어있음)
+    {
+        <MudPaper Elevation="0" Outlined="true" Class="pa-6 picking-task-list__state">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Size="Size.Large" Color="Color.Secondary" />
+            <MudText Typo="Typo.subtitle1">조건에 맞는 피킹 작업이 없습니다.</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                출고 배치가 영속 피킹 작업을 만들기 전에는 sample 항목으로 대신 표시하지 않습니다.
+            </MudText>
+        </MudPaper>
+    }
+    else
+    {
+        <div class="picking-task-list__summary">
+            <strong>@ViewModel.응답.TotalCount.ToString("N0")건</strong>
+            <span>목록 선택은 상태를 바꾸지 않고 stable-key 상세 route만 엽니다.</span>
+        </div>
+
+        <div class="picking-task-list__cards">
+            @foreach (var item in ViewModel.항목목록)
+            {
+                <article>
+                    <div class="picking-task-list__card-title">
+                        <div>
+                            <span>@Display(item.TaskKey)</span>
+                            <h2>@Display(item.ProductName)</h2>
+                            <p>@Display(item.Sku)</p>
+                        </div>
+                        <MudChip T="string" Color="@StatusColor(item.Status)" Variant="Variant.Filled" Size="Size.Small">
+                            @Display(item.Status)
+                        </MudChip>
+                    </div>
+                    <dl>
+                        <div><dt>창고</dt><dd>@Display(item.WarehouseName)</dd></div>
+                        <div><dt>적재대</dt><dd>@Display(item.RackCode)</dd></div>
+                        <div><dt>피킹 수량</dt><dd>@item.Quantity.ToString("N0")개</dd></div>
+                        <div><dt>담당</dt><dd>@Display(item.WorkerDisplayName)</dd></div>
+                        <div><dt>갱신 시각</dt><dd>@FormatDateTime(item.UpdatedAtUtc)</dd></div>
+                    </dl>
+                    <MudButton Href="@DetailHref(item.TaskKey)"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.ChevronRight">
+                        상세 확인
+                    </MudButton>
+                </article>
+            }
+        </div>
+
+        @if (ViewModel.응답.TotalCount > 0)
+        {
+            <nav class="picking-task-list__pager" aria-label="피킹 작업 목록 페이지">
+                <MudButton Variant="Variant.Text" Disabled="@(!ViewModel.이전페이지있음 || ViewModel.처리중)" OnClick="PreviousPageAsync">이전</MudButton>
+                <MudText Typo="Typo.caption">@(ViewModel.응답.Page + 1)페이지</MudText>
+                <MudButton Variant="Variant.Text" Disabled="@(!ViewModel.다음페이지있음 || ViewModel.처리중)" OnClick="NextPageAsync">다음</MudButton>
+            </nav>
+        }
+    }
+</PickingTaskScreenFrame>
+
+@code {
+    [Parameter, EditorRequired] public PickingTaskNavigationContext Context { get; set; } = new();
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+
+    private string? _loadedContextKey;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = $"{Context.Search}|{Context.Status}|{Context.Page}";
+        if (string.Equals(key, _loadedContextKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedContextKey = key;
+        ViewModel.검색어 = Context.Search ?? string.Empty;
+        ViewModel.조회상태 = 피킹작업조회상태코드.Normalize(Context.Status);
+        await ViewModel.조회Async(Context.Page);
+    }
+
+    private void SetSearch(string value) => ViewModel.검색어 = value ?? string.Empty;
+
+    private async Task SearchKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "NumpadEnter")
+        {
+            await SearchAsync();
+        }
+    }
+
+    private async Task StatusChangedAsync(string value)
+    {
+        ViewModel.조회상태 = 피킹작업조회상태코드.Normalize(value);
+        await SearchAsync();
+    }
+
+    private Task SearchAsync() => ViewModel.조회Async(0);
+    private Task RefreshAsync() => ViewModel.조회Async(ViewModel.응답.Page);
+    private Task PreviousPageAsync() => ViewModel.이전페이지Async();
+    private Task NextPageAsync() => ViewModel.다음페이지Async();
+
+    private string DetailHref(string taskKey)
+        => Context
+            .WithListState(ViewModel.검색어, ViewModel.조회상태, ViewModel.응답.Page)
+            .PathFor(PickingTaskScreenKind.Detail, taskKey);
+
+    private static Color StatusColor(string status)
+        => status switch
+        {
+            피킹작업조회상태코드.완료 => Color.Success,
+            피킹작업조회상태코드.진행중 => Color.Info,
+            _ => Color.Warning
+        };
+
+    private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatDateTime(DateTime value) => $"{value.ToLocalTime():yyyy-MM-dd HH:mm}";
+}

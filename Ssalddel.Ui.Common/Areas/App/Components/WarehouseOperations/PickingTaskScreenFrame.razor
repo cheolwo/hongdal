@@ -1,0 +1,67 @@
+@using Ssalddel.Contracts.Common.Warehouse
+
+<section class="picking-task-screen" data-picking-task-screen="@CurrentScreen.ToString().ToLowerInvariant()">
+    <header class="picking-task-screen__header">
+        <div class="picking-task-screen__title">
+            <span>WAREHOUSE PICKING · @Eyebrow</span>
+            <h1>@Title</h1>
+            <p>@Description</p>
+        </div>
+
+        <div class="picking-task-screen__actions">
+            <MudButton Href="@Context.ResolveReturnPath(HomeHref)"
+                       Variant="Variant.Text"
+                       Color="Color.Default"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                돌아가기
+            </MudButton>
+            <MudButton Href="@Context.PathFor(PickingTaskScreenKind.List)"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.ListAlt">
+                피킹 목록
+            </MudButton>
+            @if (RefreshRequested.HasDelegate)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           Disabled="@Busy"
+                           OnClick="RefreshRequested">
+                    새로고침
+                </MudButton>
+            }
+        </div>
+    </header>
+
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+        목록과 상세는 읽기 전용입니다. 시작·완료 상태 변경은 별도 실행 route에서만 가능하며,
+        Command 뒤 같은 작업 Key를 서버에서 다시 조회합니다. 재고 차감·포장·출고·운송·결제·정산은 실행하지 않습니다.
+    </MudAlert>
+
+    <PickingTaskNavigation Context="@Context"
+                           CurrentScreen="@CurrentScreen"
+                           TaskKey="@TaskKey" />
+
+    @if (Busy)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+
+    <main class="picking-task-screen__body">
+        @ChildContent
+    </main>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public PickingTaskNavigationContext Context { get; set; } = new();
+    [Parameter] public PickingTaskScreenKind CurrentScreen { get; set; }
+    [Parameter] public string? TaskKey { get; set; }
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string HomeHref { get; set; } = string.Empty;
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public EventCallback RefreshRequested { get; set; }
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
+}

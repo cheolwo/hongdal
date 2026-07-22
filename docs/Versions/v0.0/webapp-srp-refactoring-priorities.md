@@ -41,7 +41,7 @@
 | `P1-1` 완료 | 운송 요청 작성 | 변경 전에는 Web 한 화면 606줄, Web mode route 4개, 모바일 997줄 복합 Panel이 서로 다른 workflow를 가졌음 | 화물, 운송, 절차, 최종 확인 공용 Screen | 같은 draft와 validation을 공유하고 Web은 adaptive layout, 모바일은 단계 navigation만 담당하며 diagram·커뮤니티 출발 문맥을 단계 사이에 보존함 |
 | `P1-2` 완료 | 운송 요청 상세 | 변경 전에는 Web 828줄과 모바일 988줄의 독립 monolith가 요약·진행·결제·증빙을 함께 수행했음 | 요약, 진행 이력, 결제, 증빙 Screen | 같은 request ID와 서버 원본을 사용하고 결제·증빙은 명시적 별도 route에서만 실행함 |
 | `P1-3` 완료 | 입고 요청 | 변경 전에는 `SsalddelInboundRequestManager` 한 route가 창고 등록·입고 신청·목록·상세·완료를 함께 수행했음 | 목록, 신규 신청, 상세, 입고 완료와 별도 창고 등록 Screen | Web·모바일이 같은 route 계약·공용 Screen을 사용하고 성공 뒤 같은 inbound ID를 재조회하며 desktop·390px 실제 검증을 통과함 |
-| `P1-4` 진행 중 — 입고 검수 완료 | 창고·판매 master-detail-action | 변경 전 입고 검수와 현재 피킹·마트 상품·판매 주문은 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 입고 검수는 코드·자동 테스트·소비 앱 빌드·desktop·390px 실제 검증 완료, 다음 수직 단위는 피킹 작업 |
+| `P1-4` 진행 중 — 입고 검수·피킹 완료 | 창고·판매 master-detail-action | 변경 전 입고 검수와 피킹, 현재 마트 상품·판매 주문은 desktop 한 화면에 목록·상세·행동을 함께 배치함 | List, Detail, Action Screen과 adaptive desktop composition | 입고 검수와 피킹은 전체 게이트 완료, 다음은 마트 상품·판매 주문의 route·Command 경계를 감사해 수직 단위를 선택함 |
 | `P2-1` | 개인 공간·꾸미기 | Web 개인 route multiplexer와 모바일 전용 꾸미기 route의 의미가 다름 | 개인 개요와 꾸미기 상점·상품·checkout Screen 분리 | 같은 route가 플랫폼마다 다른 기능을 뜻하지 않으며 FakePG 경계를 유지함 |
 | `P2-2` | `/shipper` 홈 | Web은 링크 디렉터리, 모바일은 커뮤니티 홈·인증·dashboard를 수행함 | 공용 화주 허브 Screen과 플랫폼 shell | 같은 route의 주된 목표가 같고 1.0 이후 기능은 flag 뒤에 유지됨 |
 | `P3` 보존 | 기사 추천·정산·통관 등 1.0 이후 화면 | 큰 Web 전용 화면이 남아 있으나 0.0 범위가 아님 | 재활성화 시 List·Detail·Action Screen으로 분리 | 0.0 기본 비노출, 추천·자동 배차·결제·정산 운영 효과 확장 금지 |
@@ -116,6 +116,20 @@
 
 실제 Web 검증에서 목록 2건의 stable-ID 상세 이동, 실행 route의 네 확인 항목 저장 gate, desktop·390px horizontal overflow 없음과 mobile navigation 2열·58px를 확인했다. 추적 설정의 기능 플래그 기본값은 유지하고 검증 프로세스에서만 `WarehouseFulfillmentWorkflow`를 활성화했으며 실제 저장 Command는 실행하지 않았다. 대표 PNG와 상세 결과는 [입고 검수 Route·공용 Screen 단일책임 분리](../../Changes/2026-07-22-inbound-inspection-route-srp.md)에 기록했다.
 
+## 피킹 작업 목표 route 지도
+
+| 화면 | 사용자 목표 | Route |
+| --- | --- | --- |
+| 목록 | 접근 가능한 피킹 작업 검색·상태 필터와 대상 선택 | `/work/picking-batch` |
+| 상세 | stable task key의 상품·수량·적재대·담당·현재 상태 읽기 | `/work/picking-batch/{TaskKey}` |
+| 피킹 실행 | 대기 작업 시작 또는 진행 중 작업의 적재대·상품·전체 수량 확인 뒤 완료 | `/work/picking-batch/{TaskKey}/execute` |
+| legacy Web alias | 통합 Web의 기존 경로 호환 | `/warehouse/work/picking-batch[/...]` |
+| legacy query | query key를 stable-key 상세 route로 호환 연결 | `/work/picking-batch?taskKey=...` |
+
+목록 Screen은 `피킹작업목록ViewModel`, 상세 Screen은 `피킹작업상세ViewModel`만 사용해 Command 입력을 소유하지 않는다. 실행 Screen만 `피킹작업실행ViewModel`을 통해 시작·완료 Command를 호출하고 성공 뒤 목록 전체가 아니라 같은 task key 상세 한 건만 다시 조회한다. 목록 검색·상태·페이지와 안전한 `from`은 상세와 실행 route에 보존되며 Web과 `WarehouseManagerApp`이 같은 공용 Screen을 조립한다.
+
+실제 Web 검증에서 stable-key 상세와 실행 route, legacy query·Web alias, desktop·390px horizontal overflow 없음과 mobile navigation 2열·58px를 확인했다. 실행 화면은 확인 폼을 작업 요약보다 먼저 표시하고 적재대·상품·전체 수량 조건이 모두 충족된 뒤에만 완료 버튼을 활성화했다. 추적 설정의 기능 플래그 기본값은 유지하고 검증 프로세스에서만 `WarehouseFulfillmentWorkflow`를 활성화했으며 실제 시작·완료 Command는 실행하지 않았다. 대표 PNG와 상세 결과는 [피킹 작업 Route·공용 Screen 단일책임 분리](../../Changes/2026-07-22-picking-task-route-srp.md)에 기록했다.
+
 ## 기존 component 리팩터링의 재분류
 
 아래 작업은 유효한 내부 책임 분리이며 되돌리지 않는다. 다만 route 하나가 여러 사용자 목표를 계속 수행하면 **페이지 SRP 완료**가 아니라 공용 Screen을 만들기 위한 기반 완료로 본다.
@@ -149,6 +163,8 @@
 
 ## 다음 작업
 
-`P1-4`의 첫 수직 단위인 입고 검수는 목록, stable-ID 상세와 검수 실행 Route Page로 분리했다. 기존 query 선택과 376줄 복합 Workspace를 제거하고 Web·창고 앱이 공용 Screen을 조립한다. 목록·상세는 읽기 전용이며 실행 route만 Command를 호출하고 같은 inbound item ID를 재조회한다. 자동 테스트, 소비 앱 빌드와 실제 desktop·390px 완료 게이트를 통과했다.
+`P1-4`의 첫 수직 단위인 입고 검수는 목록, stable-ID 상세와 검수 실행 Route Page로 분리해 전체 완료 게이트를 통과했다.
 
-다음 수직 단위는 같은 query 기반 master-detail-action 구조인 피킹 작업이다. 현재 route·ViewModel·Command 경계를 먼저 감사한 뒤 목록, stable task detail과 실행 route를 분리하고 desktop adaptive 조립·mobile 독립 화면을 같은 공용 Screen으로 맞춘다.
+두 번째 수직 단위인 피킹 작업은 기존 query 선택과 복합 Workspace를 제거하고 목록, stable-key 상세, 실행 Route Page로 분리했다. 목록·상세는 읽기 전용이며 실행 route만 시작·완료 Command를 호출하고 같은 task key 한 건을 재조회한다. 자동 테스트, 소비 앱 빌드와 실제 desktop·390px 완료 게이트를 통과했다.
+
+다음 수직 단위는 마트 상품과 판매 주문의 route, stable ID, 조회·Command 결합 정도를 코드 기준으로 비교 감사한 뒤 선택한다. 기존 내부 component 분리는 보존하고, 사용자 목표가 하나인 Route Page와 Web·모바일 공용 Screen 경계를 우선한다.

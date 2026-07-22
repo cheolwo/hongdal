@@ -1,14 +1,13 @@
-@page "/warehouse/work/picking-batch"
 @page "/work/picking-batch"
-@inject NavigationManager Navigation
 @using Ssalddel.Contracts.Common.Warehouse
+@inject NavigationManager Navigation
 
-<PageTitle>피킹 작업 목록 · 살뜰</PageTitle>
+<PageTitle>피킹 작업 목록</PageTitle>
 
-<WarehousePickingBatchAccessFrame Title="피킹 작업 목록"
-                                  Description="접근 가능한 피킹 작업을 검색하고 stable-key 상세 화면으로 이동합니다.">
+<PickingBatchAccessFrame Title="피킹 작업 목록"
+                         Description="접근 가능한 피킹 작업을 검색하고 stable-key 상세 화면으로 이동합니다.">
     <PickingTaskListScreen Context="@Context" HomeHref="@WarehouseManagerRoutes.WorkBoard" />
-</WarehousePickingBatchAccessFrame>
+</PickingBatchAccessFrame>
 
 @code {
     [SupplyParameterFromQuery(Name = "taskKey")]

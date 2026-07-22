@@ -54,7 +54,7 @@ internal static class WarehouseUiModule
         services.TryAddTransient<피킹작업목록ViewModel>();
         services.TryAddTransient<피킹작업상세ViewModel>();
         services.TryAddTransient<피킹작업처리ViewModel>();
-        services.TryAddTransient<피킹작업PageViewModel>();
+        services.TryAddTransient<피킹작업실행ViewModel>();
         services.TryAddTransient<재고현황목록ViewModel>();
         services.TryAddTransient<재고현황상세ViewModel>();
         services.TryAddTransient<재고현황PageViewModel>();

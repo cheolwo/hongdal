@@ -1,0 +1,20 @@
+@page "/work/picking-batch/{TaskKey}"
+@page "/warehouse/work/picking-batch/{TaskKey}"
+@using Ssalddel.Contracts.Common.Warehouse
+@inject NavigationManager Navigation
+
+<PageTitle>피킹 작업 상세 · 살뜰</PageTitle>
+
+<WarehousePickingBatchAccessFrame Title="피킹 작업 상세"
+                                  Description="한 피킹 작업의 현장 기준과 현재 서버 상태를 읽기 전용으로 확인합니다.">
+    <PickingTaskDetailScreen TaskKey="@TaskKey"
+                             Context="@Context"
+                             HomeHref="@WarehouseManagerRoutes.WorkBoard" />
+</WarehousePickingBatchAccessFrame>
+
+@code {
+    [Parameter] public string TaskKey { get; set; } = string.Empty;
+
+    private PickingTaskNavigationContext Context
+        => PickingTaskNavigationContext.Parse(Navigation.Uri);
+}
