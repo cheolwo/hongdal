@@ -42,6 +42,8 @@ Thumbs.db
 # Generated verification output (keep already-selected screenshots and capture hosts tracked)
 **/.artifacts/
 **/.codex-build/
+/artifacts/local/
+/artifacts/worktrees/
 /artifacts/build-check/
 /artifacts/build/
 /artifacts/*-bin/
@@ -54,6 +56,7 @@ Thumbs.db
 /artifacts/obj/
 /artifacts/obj-check/
 /artifacts/run-logs/
+/artifacts/test-results/
 /artifacts/tools/
 
 # Local capture sessions and raw verification output
