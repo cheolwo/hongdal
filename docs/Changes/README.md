@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-24 | [Figma 커뮤·업무 모드 토글](2026-07-24-figma-community-mode-toggle.md) | Community 우측 상단에 `업무` OFF/ON 스위치를 추가해 커뮤모드의 생활 게시판과 업무모드의 업무 게시판 상태를 한 section에서 비교 |
 | 2026-07-24 | [Figma Community 생활·업무 게시판 통합](2026-07-24-figma-community-board-consolidation.md) | `01D` 업무단위 게시판을 `01A`에 통합하고 12개 화면을 생활 게시판 6개·업무 게시판 6개로 재배치해 게시판 모음을 두 부류로 단순화 |
 | 2026-07-24 | [Figma 01~05 역할 레이어와 업무단위 게시판](2026-07-24-figma-role-layer-milestone.md) | Figma의 Community·Orderer·Shipper·Driver·Warehouse 화면을 역할별 페이지로 분리하고, 커뮤니티에 6개 업무단위 게시판 화면을 추가한 설계 성과를 실제 PNG로 기록 |
 | 2026-07-24 | [업무단위 간괘 게시판 산맥 확정](2026-07-24-community-board-mountains.md) | 간접 확인 — 버전별 일곱 산을 16개 업무단위 산으로 재분류하고 Command·Event·페이지 및 공개 투영 여부를 카드에서 점검, 간괘 `☶` 유지 |

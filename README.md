@@ -20,12 +20,12 @@
 
 ## 역할별 화면 설계
 
-게시판에서 시작한 생각을 `생활 게시판`과 `업무 게시판` 두 갈래로 살피고, 주문자·화주·기사·창고 담당자가 각자의 화면에서 같은 흐름을 이어 가도록 [Figma 역할 레이어](https://www.figma.com/design/0KhuQLc1MleUBIQnARC21Z/ssalddle?node-id=0-1) `01~05`를 정리했습니다.
+게시판에서 시작한 생각을 우측 상단 `업무` 토글로 전환합니다. OFF인 커뮤모드에서는 생활 게시판을, ON인 업무모드에서는 업무 게시판을 보여 주고, 주문자·화주·기사·창고 담당자가 각자의 화면에서 같은 흐름을 이어 가도록 [Figma 역할 레이어](https://www.figma.com/design/0KhuQLc1MleUBIQnARC21Z/ssalddle?node-id=0-1) `01~05`를 정리했습니다.
 
 ### 01 Community
 
 <p align="center">
-  <img src="docs/assets/changes/2026-07-24-figma-community-board-consolidation/community-boards-unified.png" alt="생활 게시판과 업무 게시판으로 통합된 01 Community 화면 레이어" width="900">
+  <img src="docs/assets/changes/2026-07-24-figma-community-mode-toggle/community-mode-toggle.png" alt="업무 토글 OFF 커뮤모드와 ON 업무모드를 함께 보여 주는 01 Community 화면 레이어" width="900">
 </p>
 
 ### 02 Orderer
@@ -52,7 +52,7 @@
   <img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/warehouse-layer.png" alt="05 Warehouse 화면 레이어" width="900">
 </p>
 
-화면 분리 범위와 검증 결과는 [Figma 역할 레이어 정리 기록](docs/Changes/2026-07-24-figma-role-layer-milestone.md)과 [Community 게시판 통합 기록](docs/Changes/2026-07-24-figma-community-board-consolidation.md)에 남겼습니다. 이 이미지는 구현 완료를 뜻하는 화면 캡처가 아니라, 기존 구현과 앞으로의 화면 책임을 맞추기 위한 설계 기준입니다.
+화면 분리 범위와 검증 결과는 [Figma 역할 레이어 정리 기록](docs/Changes/2026-07-24-figma-role-layer-milestone.md), [Community 게시판 통합 기록](docs/Changes/2026-07-24-figma-community-board-consolidation.md), [커뮤·업무 모드 토글 기록](docs/Changes/2026-07-24-figma-community-mode-toggle.md)에 남겼습니다. 이 이미지는 구현 완료를 뜻하는 화면 캡처가 아니라, 기존 구현과 앞으로의 화면 책임을 맞추기 위한 설계 기준입니다.
 
 ## 커뮤니티 게시판에서 업무까지
 
