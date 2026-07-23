@@ -58,9 +58,9 @@ public sealed class CommunityDirectoryPageViewModelTests
     }
 
     [Theory]
-    [InlineData("운송상차완료됨Event", "activity-loading-completed")]
-    [InlineData("3.5", "activity-mart-order-paid")]
-    [InlineData("Command", "activity-content-watch-completed")]
+    [InlineData("운송상차완료됨Event", "activity-transport")]
+    [InlineData("3.5", "activity-mart")]
+    [InlineData("Command", "activity-foundation")]
     public async Task UpdateSearch_FindsActivityBoardsBySourceAndVersion(
         string search,
         string expectedBoardKey)

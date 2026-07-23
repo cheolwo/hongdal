@@ -16,12 +16,12 @@ public sealed class CommunityActivityBoardContentServiceTests
         var first = await service.EnsureAnnouncementsAsync();
         var second = await service.EnsureAnnouncementsAsync();
 
-        Assert.Equal(CommunityActivityBoardCatalog.All.Count, first.AttemptedCount);
-        Assert.Equal(CommunityActivityBoardCatalog.All.Count, first.CreatedCount);
-        Assert.Equal(CommunityActivityBoardCatalog.All.Count, second.AttemptedCount);
+        Assert.Equal(CommunityActivityBoardCatalog.Bundles.Count, first.AttemptedCount);
+        Assert.Equal(CommunityActivityBoardCatalog.Bundles.Count, first.CreatedCount);
+        Assert.Equal(CommunityActivityBoardCatalog.Bundles.Count, second.AttemptedCount);
         Assert.Equal(0, second.CreatedCount);
         Assert.All(
-            publisher.Drafts.Take(CommunityActivityBoardCatalog.All.Count),
+            publisher.Drafts.Take(CommunityActivityBoardCatalog.Bundles.Count),
             draft =>
             {
                 Assert.StartsWith("[게시판 안내]", draft.Title);
@@ -30,12 +30,14 @@ public sealed class CommunityActivityBoardContentServiceTests
                 Assert.False(draft.PublishCreatedEvent);
             });
 
-        foreach (var definition in CommunityActivityBoardCatalog.All)
+        foreach (var bundle in CommunityActivityBoardCatalog.Bundles)
         {
             var draft = Assert.Single(
-                publisher.Drafts.Take(CommunityActivityBoardCatalog.All.Count),
-                item => item.Category == definition.Board.DisplayName);
-            Assert.Contains(definition.SourceName, draft.Body);
+                publisher.Drafts.Take(CommunityActivityBoardCatalog.Bundles.Count),
+                item => item.Category == bundle.Board.DisplayName);
+            Assert.All(bundle.Activities, activity => Assert.Contains(activity.SourceName, draft.Body));
+            Assert.All(bundle.Pages, page => Assert.Contains(page.Route, draft.Body));
+            Assert.Contains("☶ 간괘", draft.Body);
             Assert.Contains(
                 CommunityActivityBoardCatalog.SurfaceMappingBoundary,
                 draft.Body);
@@ -49,7 +51,7 @@ public sealed class CommunityActivityBoardContentServiceTests
         var service = new CommunityActivityBoardContentService(
             publisher,
             new FixedTimeProvider());
-        var expectedCount = CommunityActivityBoardCatalog.All.Count * 2;
+        var expectedCount = CommunityActivityBoardCatalog.Bundles.Count * 2;
 
         var first = await service.SeedTestActivityPostsAsync(
             "Observation Scenario #1",

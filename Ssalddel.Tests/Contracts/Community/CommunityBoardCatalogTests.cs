@@ -35,6 +35,24 @@ public sealed class CommunityBoardCatalogTests
     }
 
     [Fact]
+    public void 시스템활동게시판은_CommandEvent별이아니라_0점0부터3점5까지일곱산으로확정한다()
+    {
+        var activityBoards = CommunityBoardCatalog.PublicBoards
+            .Where(board => board.GroupCode == CommunityBoardGroupCodes.ActivityRoadmap)
+            .ToArray();
+
+        Assert.Equal(7, activityBoards.Length);
+        Assert.Equal(
+            CommunityActivityBoardCatalog.Boards.Select(board => board.Key),
+            activityBoards.Select(board => board.Key));
+        Assert.All(activityBoards, board =>
+        {
+            Assert.False(board.IsUserCreatable);
+            Assert.Equal(CommunityBoardPostingAccessCodes.OperatorOnly, board.PostingAccessCode);
+        });
+    }
+
+    [Fact]
     public void 반야는_관리자선별용고정게시판이다()
     {
         Assert.True(CommunityBoardCatalog.Prajna.IsPublic);

@@ -35,7 +35,7 @@ public sealed class CommunityActivityPostHandlersTests
         await handler.Handle(notification, CancellationToken.None);
 
         var publication = Assert.Single(publisher.Publications);
-        Assert.Equal("activity-loading-completed", publication.Definition.Board.Key);
+        Assert.Equal("activity-transport", publication.Definition.Board.Key);
         Assert.Same(notification, publication.Occurrence);
     }
 
@@ -106,7 +106,7 @@ public sealed class CommunityActivityPostHandlersTests
         Assert.False(incomplete!.완료여부);
         Assert.True(completed!.완료여부);
         var publication = Assert.Single(publisher.Publications);
-        Assert.Equal("activity-content-watch-completed", publication.Definition.Board.Key);
+        Assert.Equal("activity-foundation", publication.Definition.Board.Key);
         Assert.Same(command, publication.Occurrence);
     }
 
