@@ -8,9 +8,6 @@ public static class WebNavigationCatalog
 {
     public const string DiagramRoute = CommunityPageRoutes.Diagram;
 
-    private static readonly WebNavigationItem Home =
-        new("통합 홈", "/", Icons.Material.Filled.Hub, true);
-
     private static readonly WebNavigationItem Community =
         new("공개 커뮤니티", "/community", Icons.Material.Filled.Forum, true);
 
@@ -22,7 +19,6 @@ public static class WebNavigationCatalog
 
     private static readonly IReadOnlyList<WebNavigationItem> GuestItems =
     [
-        Home,
         new("웹 로그인", "/login", Icons.Material.Filled.Login),
         new("글로벌 상품 탐색", GlobalTradeRoutes.Home, Icons.Material.Filled.Language)
     ];
@@ -78,7 +74,6 @@ public static class WebNavigationCatalog
 
     private static readonly IReadOnlyList<WebNavigationItem> GeneralItems =
     [
-        Home,
         new("글로벌 상품 탐색", GlobalTradeRoutes.Home, Icons.Material.Filled.Language),
         new("화주·판매자", ShipperRoutes.Home, Icons.Material.Filled.LocalShipping),
         new("기사", "/driver/home", Icons.Material.Filled.Route),
@@ -88,7 +83,6 @@ public static class WebNavigationCatalog
 
     public static IReadOnlyList<WebNavigationItem> IntegratedItems { get; } =
     [
-        Home,
         Community,
         UnitedStatesFoodGroupBuy
     ];
