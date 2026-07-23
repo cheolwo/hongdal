@@ -36,6 +36,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityLedgerCompletionPostService, CommunityLedgerCompletionPostService>();
         services.AddScoped<ICommunityAutomatedPostPublisher, EfCommunityAutomatedPostPublisher>();
         services.AddScoped<ICommunityActivityPostPublisher, CommunityActivityPostPublisher>();
+        services.AddScoped<ICommunityActivityBoardContentService, CommunityActivityBoardContentService>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityKamisPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityUsdaNassPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityReflectionSource>();
@@ -129,6 +130,7 @@ public static partial class ServiceCollectionExtensions
         services.AddHostedService<CommunityScheduledPostPublicationWorker>();
         services.AddHostedService<커뮤니티게시글음성Worker>();
         services.AddHostedService<CommunityKeywordNotificationWorker>();
+        services.AddHostedService<CommunityActivityBoardContentWorker>();
         services.AddHostedService<커뮤니티원장투영Worker>();
         services.AddHostedService<CommunityGroupPurchaseDemandOutboxWorker>();
         services.AddScoped<I인증UseCase, 인증UseCase>();

@@ -72,6 +72,8 @@ public static partial class ServiceCollectionExtensions
         services.Configure<PublicDataOptions>(configuration.GetSection(PublicDataOptions.SectionName));
         services.Configure<AgriculturalFisheriesBatchOptions>(configuration.GetSection(AgriculturalFisheriesBatchOptions.SectionName));
         services.Configure<CommunityEditorialBatchOptions>(configuration.GetSection(CommunityEditorialBatchOptions.SectionName));
+        services.Configure<CommunityActivityBoardContentOptions>(
+            configuration.GetSection(CommunityActivityBoardContentOptions.SectionName));
         services.Configure<CommunityContextDiscoveryOptions>(configuration.GetSection(CommunityContextDiscoveryOptions.SectionName));
         services.Configure<VersionFeatureFlagsOptions>(configuration.GetSection(VersionFeatureFlagsOptions.SectionName));
         services.Configure<SsalddelExecutionOptions>(configuration.GetSection(SsalddelExecutionOptions.SectionName));
