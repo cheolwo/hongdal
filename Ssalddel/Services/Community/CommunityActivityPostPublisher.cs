@@ -33,7 +33,7 @@ public sealed class CommunityActivityPostPublisher(
             definition.Board.DisplayName,
             $"{definition.RoadmapStage.ProductName} {definition.ProductVersion} 공개 활동",
             "자동 활동",
-            $"[{definition.SourceKindDisplayName} 활동] {definition.Board.DisplayName}",
+            $"[{definition.SourceKindDisplayName} 활동] {definition.ActivityDisplayName}",
             BuildPublicBody(definition, occurredAtUtc),
             "살뜰 활동봇");
         await automatedPostPublisher.PublishIfMissingAsync(draft, cancellationToken);

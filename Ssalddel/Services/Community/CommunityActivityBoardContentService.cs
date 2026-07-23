@@ -28,7 +28,7 @@ public sealed class CommunityActivityBoardContentService(
     public Task<CommunityActivityBoardContentPublishResult> EnsureAnnouncementsAsync(
         CancellationToken cancellationToken = default)
         => PublishAsync(
-            CommunityActivityBoardCatalog.All.Select(BuildAnnouncementDraft),
+            CommunityActivityBoardCatalog.Bundles.Select(BuildAnnouncementDraft),
             cancellationToken);
 
     public Task<CommunityActivityBoardContentPublishResult> SeedTestActivityPostsAsync(
@@ -39,10 +39,10 @@ public sealed class CommunityActivityBoardContentService(
         var normalizedScenarioKey = NormalizeKey(scenarioKey, "development-observation-v1");
         var normalizedPostsPerBoard = Math.Clamp(postsPerBoard, 1, 5);
         var occurredAtUtc = timeProvider.GetUtcNow().UtcDateTime;
-        var drafts = CommunityActivityBoardCatalog.All.SelectMany(definition =>
+        var drafts = CommunityActivityBoardCatalog.Bundles.SelectMany(bundle =>
             Enumerable.Range(1, normalizedPostsPerBoard)
                 .Select(sequence => BuildTestActivityDraft(
-                    definition,
+                    bundle,
                     normalizedScenarioKey,
                     sequence,
                     occurredAtUtc)));
@@ -72,18 +72,32 @@ public sealed class CommunityActivityBoardContentService(
     }
 
     internal static CommunityAutomatedPostDraft BuildAnnouncementDraft(
-        CommunityActivityBoardDefinition definition)
+        CommunityActivityBoardBundleDefinition bundle)
     {
         var body = new StringBuilder()
             .AppendLine("[게시판 안내]")
-            .AppendLine($"{definition.Board.DisplayName} 게시판은 프로젝트에서 발생하는 공개 가능한 활동을 관찰하는 읽기 전용 공간입니다.")
+            .AppendLine($"{bundle.Board.DisplayName} 게시판은 프로젝트에서 발생하는 공개 가능한 활동을 관찰하는 읽기 전용 공간입니다.")
             .AppendLine()
-            .AppendLine($"로드맵: {definition.RoadmapStage.FullDisplayName}")
-            .AppendLine($"관찰 대상: {definition.SourceKindDisplayName} · {definition.SourceName}")
-            .AppendLine($"기록 내용: {definition.PublicActivitySummary}")
+            .AppendLine($"상징: {CommunityActivityBoardBundleDefinition.MountainSymbol} {CommunityActivityBoardBundleDefinition.MountainName}괘 · 산")
+            .AppendLine($"로드맵: {bundle.RoadmapStage.FullDisplayName}")
+            .AppendLine($"연결 수: Command {bundle.CommandCount} · Event {bundle.EventCount} · 페이지 {bundle.Pages.Count}")
+            .AppendLine()
+            .AppendLine("관찰 Command·Event:");
+        foreach (var activity in bundle.Activities)
+        {
+            body.AppendLine($"- {activity.SourceKindDisplayName} · {activity.SourceName} · {activity.ActivityDisplayName}");
+        }
+
+        body
             .AppendLine()
             .AppendLine("관련 App·페이지:")
-            .AppendLine($"- {CommunityActivityBoardCatalog.SurfaceMappingBoundary}")
+            .AppendLine($"- {CommunityActivityBoardCatalog.SurfaceMappingBoundary}");
+        foreach (var page in bundle.Pages)
+        {
+            body.AppendLine($"- {page.Surface} · {page.PageName} · {page.Route} · {page.Responsibility}");
+        }
+
+        body
             .AppendLine()
             .AppendLine("기록 원칙:")
             .AppendLine("- 성공 또는 완료된 활동의 발생 사실만 게시합니다.")
@@ -91,12 +105,12 @@ public sealed class CommunityActivityBoardContentService(
             .AppendLine("- 테스트 글은 제목과 본문에 테스트 데이터임을 명확히 표시합니다.");
 
         return new CommunityAutomatedPostDraft(
-            $"activity-board-notice-{definition.Board.Key}",
-            "notice-v1",
-            definition.Board.DisplayName,
-            $"{definition.RoadmapStage.ProductName} {definition.ProductVersion} 활동 관찰",
+            $"activity-board-notice-{bundle.Board.Key}",
+            "notice-v2",
+            bundle.Board.DisplayName,
+            $"{bundle.RoadmapStage.ProductName} {bundle.ProductVersion} 활동 관찰",
             "게시판 안내",
-            $"[게시판 안내] {definition.Board.DisplayName}",
+            $"[게시판 안내] {bundle.Board.DisplayName}",
             body.ToString().Trim(),
             "살뜰 활동 안내봇",
             IsOperatorPinned: true,
@@ -105,11 +119,12 @@ public sealed class CommunityActivityBoardContentService(
     }
 
     internal static CommunityAutomatedPostDraft BuildTestActivityDraft(
-        CommunityActivityBoardDefinition definition,
+        CommunityActivityBoardBundleDefinition bundle,
         string scenarioKey,
         int sequence,
         DateTime occurredAtUtc)
     {
+        var definition = bundle.Activities[(sequence - 1) % bundle.Activities.Count];
         var body = string.Join(
             Environment.NewLine,
             "[테스트 데이터 안내] 화면·Command·Event 연결과 게시판 목록 표시를 검증하기 위해 생성한 가상 활동입니다.",
@@ -124,12 +139,12 @@ public sealed class CommunityActivityBoardContentService(
             definition.PublicActivitySummary,
             CommunityActivityBoardCatalog.PrivacyBoundary);
         return new CommunityAutomatedPostDraft(
-            $"activity-board-test-{definition.Board.Key}",
+            $"activity-board-test-{bundle.Board.Key}",
             $"{scenarioKey}-{sequence.ToString("00", CultureInfo.InvariantCulture)}",
-            definition.Board.DisplayName,
+            bundle.Board.DisplayName,
             $"{definition.RoadmapStage.ProductName} {definition.ProductVersion} 테스트 활동",
             "테스트 관찰",
-            $"[테스트 데이터] {definition.Board.DisplayName} 활동 #{sequence.ToString(CultureInfo.InvariantCulture)}",
+            $"[테스트 데이터] {bundle.Board.DisplayName} 활동 #{sequence.ToString(CultureInfo.InvariantCulture)}",
             body,
             "살뜰 테스트봇",
             IsOperatorPinned: false,

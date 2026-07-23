@@ -60,6 +60,7 @@ public static class CommunityBoardGroupCodes
 {
     public const string PeopleAndInformation = "people-information";
     public const string CollectiveWork = "collective-work";
+    public const string ActivityRoadmap = "activity-roadmap";
     public const string ServiceOperation = "service-operation";
     public const string Safety = "safety";
 }
