@@ -1,0 +1,9 @@
+# Hongdal repository defaults.
+# Raise reasoning per task with /reasoning when a security, release, or
+# cross-cutting architecture review benefits from deeper exploration.
+model_reasoning_effort = "medium"
+model_verbosity = "low"
+
+# Keep a single large tool result from dominating a long session. Detailed
+# validation output is written under artifacts/local/validation instead.
+tool_output_token_limit = 6000
