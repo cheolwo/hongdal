@@ -30,6 +30,20 @@ public static class CommunityActivityBoardKeys
     public const string Mart = "activity-mart";
 }
 
+public static class CommunityActivityProductNames
+{
+    public const string CultureTransport = "문화교통";
+    public const string Ssalddel = "살뜰";
+
+    public static string ForVersion(string productVersion)
+        => productVersion is
+            SsalddelProductRoadmapCatalog.FoundationVersion
+            or SsalddelProductRoadmapCatalog.GroupPurchaseVersion
+            or SsalddelProductRoadmapCatalog.TradeReadinessVersion
+                ? CultureTransport
+                : Ssalddel;
+}
+
 public sealed record CommunityActivityPageDefinition(
     string Surface,
     string PageName,
@@ -57,6 +71,12 @@ public sealed record CommunityActivityBoardDefinition(
     public SsalddelProductRoadmapStage RoadmapStage
         => SsalddelProductRoadmapCatalog.Find(ProductVersion);
 
+    public string ProductName
+        => CommunityActivityProductNames.ForVersion(ProductVersion);
+
+    public string RoadmapDisplayName
+        => $"{ProductName} {ProductVersion} · {RoadmapStage.DisplayName}";
+
     public string SourceKindDisplayName
         => CommunityActivitySourceKinds.DisplayName(SourceKind);
 }
@@ -72,6 +92,12 @@ public sealed record CommunityActivityBoardBundleDefinition(
 
     public SsalddelProductRoadmapStage RoadmapStage
         => SsalddelProductRoadmapCatalog.Find(ProductVersion);
+
+    public string ProductName
+        => CommunityActivityProductNames.ForVersion(ProductVersion);
+
+    public string RoadmapDisplayName
+        => $"{ProductName} {ProductVersion} · {RoadmapStage.DisplayName}";
 
     public int CommandCount
         => Activities.Count(activity => activity.SourceKind == CommunityActivitySourceKinds.Command);
@@ -347,9 +373,9 @@ public static class CommunityActivityBoardCatalog
             pages:
             [
                 WebPage("마트 공개 상품", MartProductPageRoutes.Root, "공개 상품 목록"),
-                WebPage("마트 피킹 주문", MartPickingPageRoutes.WebRoot, "접근 가능한 피킹 주문 목록"),
+                WebPage("마트 피킹 주문", "/warehouse/mart/picking", "접근 가능한 피킹 주문 목록"),
                 WebPage("마트 업무 흐름", "/warehouse/mart/work-board", "입고·재고·피킹 책임별 진입"),
-                WebPage("마트 주문 상세", MartPickingPageRoutes.WebDetailTemplate, "stable-ID 피킹·포장 주문 상세"),
+                WebPage("마트 주문 상세", "/warehouse/mart/picking/orders/{OrderId:long}", "stable-ID 피킹·포장 주문 상세"),
                 AppPage("OrdererApp", "마트 주문 요청", MartProductPageRoutes.OrderTemplate, "비구속 상품 주문 요청")
             ])
     ];

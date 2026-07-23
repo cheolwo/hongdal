@@ -113,6 +113,7 @@ public sealed class 콘텐츠시청진행Request
 
 public sealed class 콘텐츠시청완료Result
 {
+    public bool 완료여부 { get; set; }
     public bool 보상지급여부 { get; set; }
     public string 메시지 { get; set; } = string.Empty;
     public int 지급포인트 { get; set; }

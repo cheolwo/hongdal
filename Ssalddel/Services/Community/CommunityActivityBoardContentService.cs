@@ -79,7 +79,7 @@ public sealed class CommunityActivityBoardContentService(
             .AppendLine($"{bundle.Board.DisplayName} 게시판은 프로젝트에서 발생하는 공개 가능한 활동을 관찰하는 읽기 전용 공간입니다.")
             .AppendLine()
             .AppendLine($"상징: {CommunityActivityBoardBundleDefinition.MountainSymbol} {CommunityActivityBoardBundleDefinition.MountainName}괘 · 산")
-            .AppendLine($"로드맵: {bundle.RoadmapStage.FullDisplayName}")
+            .AppendLine($"로드맵: {bundle.RoadmapDisplayName}")
             .AppendLine($"연결 수: Command {bundle.CommandCount} · Event {bundle.EventCount} · 페이지 {bundle.Pages.Count}")
             .AppendLine()
             .AppendLine("관찰 Command·Event:");
@@ -108,7 +108,7 @@ public sealed class CommunityActivityBoardContentService(
             $"activity-board-notice-{bundle.Board.Key}",
             "notice-v2",
             bundle.Board.DisplayName,
-            $"{bundle.RoadmapStage.ProductName} {bundle.ProductVersion} 활동 관찰",
+            $"{bundle.ProductName} {bundle.ProductVersion} 활동 관찰",
             "게시판 안내",
             $"[게시판 안내] {bundle.Board.DisplayName}",
             body.ToString().Trim(),
@@ -130,7 +130,7 @@ public sealed class CommunityActivityBoardContentService(
             "[테스트 데이터 안내] 화면·Command·Event 연결과 게시판 목록 표시를 검증하기 위해 생성한 가상 활동입니다.",
             "실제 주문, 계약, 결제, 통관, 운송 또는 창고 작업이 아닙니다.",
             string.Empty,
-            $"로드맵: {definition.RoadmapStage.FullDisplayName}",
+            $"로드맵: {definition.RoadmapDisplayName}",
             $"발생 유형: {definition.SourceKindDisplayName} · {definition.SourceName}",
             $"관련 App·페이지: {CommunityActivityBoardCatalog.SurfaceMappingBoundary}",
             $"가상 발생 시각(UTC): {occurredAtUtc:yyyy-MM-dd HH:mm}",
@@ -142,7 +142,7 @@ public sealed class CommunityActivityBoardContentService(
             $"activity-board-test-{bundle.Board.Key}",
             $"{scenarioKey}-{sequence.ToString("00", CultureInfo.InvariantCulture)}",
             bundle.Board.DisplayName,
-            $"{definition.RoadmapStage.ProductName} {definition.ProductVersion} 테스트 활동",
+            $"{definition.ProductName} {definition.ProductVersion} 테스트 활동",
             "테스트 관찰",
             $"[테스트 데이터] {bundle.Board.DisplayName} 활동 #{sequence.ToString(CultureInfo.InvariantCulture)}",
             body,

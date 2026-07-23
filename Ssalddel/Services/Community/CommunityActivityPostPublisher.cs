@@ -31,7 +31,7 @@ public sealed class CommunityActivityPostPublisher(
             $"activity-{definition.Board.Key}",
             BuildOccurrenceKey(definition, occurrence),
             definition.Board.DisplayName,
-            $"{definition.RoadmapStage.ProductName} {definition.ProductVersion} 공개 활동",
+            $"{definition.ProductName} {definition.ProductVersion} 공개 활동",
             "자동 활동",
             $"[{definition.SourceKindDisplayName} 활동] {definition.ActivityDisplayName}",
             BuildPublicBody(definition, occurredAtUtc),
@@ -81,7 +81,7 @@ public sealed class CommunityActivityPostPublisher(
         => string.Join(
             Environment.NewLine,
             "[자동 활동 안내] 다른 앱에서 완료된 업무의 발생 사실만 비식별 요약으로 기록했습니다.",
-            $"버전: {definition.RoadmapStage.FullDisplayName}",
+            $"버전: {definition.RoadmapDisplayName}",
             $"발생 유형: {definition.SourceKindDisplayName} · {definition.SourceName}",
             $"발생 시각(UTC): {occurredAtUtc:yyyy-MM-dd HH:mm}",
             string.Empty,
