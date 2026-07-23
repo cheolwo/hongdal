@@ -27,7 +27,9 @@ public sealed class CommunityActivityCommandPostBehavior<TRequest, TResponse>(
             CommunityActivitySourceKinds.Command,
             typeof(TRequest).Name);
         var response = await next();
-        if (definition is null || !IsSuccessfulResponse(response))
+        if (definition is null
+            || !definition.PublishesActivityPost
+            || !IsSuccessfulResponse(response))
         {
             return response;
         }

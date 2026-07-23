@@ -60,9 +60,20 @@ public static class CommunityBoardGroupCodes
 {
     public const string PeopleAndInformation = "people-information";
     public const string CollectiveWork = "collective-work";
+    // Legacy grouping code retained only for resolving pre-work-unit links.
     public const string ActivityRoadmap = "activity-roadmap";
+    public const string WorkFoundation = "activity-work-foundation";
+    public const string WorkGroupPurchase = "activity-work-group-purchase";
+    public const string WorkTrade = "activity-work-trade";
+    public const string WorkTransport = "activity-work-transport";
+    public const string WorkFulfillment = "activity-work-fulfillment";
+    public const string WorkFoodDelivery = "activity-work-food-delivery";
+    public const string WorkMart = "activity-work-mart";
     public const string ServiceOperation = "service-operation";
     public const string Safety = "safety";
+
+    public static bool IsActivityWorkflow(string? groupCode)
+        => groupCode?.StartsWith("activity-work-", StringComparison.Ordinal) == true;
 }
 
 public static class CommunityBoardPostingAccessCodes
@@ -122,7 +133,8 @@ public static class CommunityAnonymousNicknameCatalog
 }
 
 /// <summary>
-/// 게시판은 글의 목적을 나타내고, 공동구매·창고·운송 같은 업무 영역은 WorkflowTag로 분리합니다.
+/// 일반 게시판은 글의 목적을 나타냅니다. 운영 점검 게시판은 독립된 업무단위로 나누고,
+/// 제품 버전과 넓은 역할 영역은 각 업무 게시판의 보조 metadata로 둡니다.
 /// 기존 Category 값은 별칭으로 유지해 데이터 이관 없이 새 게시판에서 함께 조회합니다.
 /// </summary>
 public static class CommunityBoardCatalog

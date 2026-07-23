@@ -35,13 +35,13 @@ public sealed class CommunityBoardCatalogTests
     }
 
     [Fact]
-    public void 시스템활동게시판은_CommandEvent별이아니라_0점0부터3점5까지일곱산으로확정한다()
+    public void 시스템활동게시판은_버전이아니라_업무단위산으로확정한다()
     {
         var activityBoards = CommunityBoardCatalog.PublicBoards
-            .Where(board => board.GroupCode == CommunityBoardGroupCodes.ActivityRoadmap)
+            .Where(board => CommunityBoardGroupCodes.IsActivityWorkflow(board.GroupCode))
             .ToArray();
 
-        Assert.Equal(7, activityBoards.Length);
+        Assert.Equal(16, activityBoards.Length);
         Assert.Equal(
             CommunityActivityBoardCatalog.Boards.Select(board => board.Key),
             activityBoards.Select(board => board.Key));
@@ -128,5 +128,7 @@ public sealed class CommunityBoardCatalogTests
         Assert.DoesNotContain(CommunityBoardCatalog.All, board => board.DisplayName == "운송");
         Assert.DoesNotContain(CommunityBoardCatalog.All, board => board.DisplayName == "창고");
         Assert.DoesNotContain(CommunityBoardCatalog.All, board => board.DisplayName == "창고 관리자");
+        Assert.Contains(CommunityBoardCatalog.All, board => board.DisplayName == "배차 결정");
+        Assert.Contains(CommunityBoardCatalog.All, board => board.DisplayName == "창고 입고·검수·적재");
     }
 }

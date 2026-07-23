@@ -17,9 +17,9 @@ public sealed class CommunityActivityPostHandlersTests
     public async Task EventHandler_PublishesSelectedEvent()
     {
         var publisher = new RecordingActivityPublisher();
-        var handler = new CommunityActivityEventPostHandler<운송상차완료됨Event>(
+        var handler = new CommunityActivityEventPostEventHandler<운송상차완료됨Event>(
             publisher,
-            NullLogger<CommunityActivityEventPostHandler<운송상차완료됨Event>>.Instance);
+            NullLogger<CommunityActivityEventPostEventHandler<운송상차완료됨Event>>.Instance);
         var notification = new 운송상차완료됨Event(
             "driver",
             1,
@@ -35,7 +35,7 @@ public sealed class CommunityActivityPostHandlersTests
         await handler.Handle(notification, CancellationToken.None);
 
         var publication = Assert.Single(publisher.Publications);
-        Assert.Equal("activity-transport", publication.Definition.Board.Key);
+        Assert.Equal(CommunityActivityBoardKeys.LoadingJourney, publication.Definition.Board.Key);
         Assert.Same(notification, publication.Occurrence);
     }
 
@@ -43,9 +43,9 @@ public sealed class CommunityActivityPostHandlersTests
     public async Task EventHandler_IgnoresUnselectedEvent()
     {
         var publisher = new RecordingActivityPublisher();
-        var handler = new CommunityActivityEventPostHandler<UnselectedEvent>(
+        var handler = new CommunityActivityEventPostEventHandler<UnselectedEvent>(
             publisher,
-            NullLogger<CommunityActivityEventPostHandler<UnselectedEvent>>.Instance);
+            NullLogger<CommunityActivityEventPostEventHandler<UnselectedEvent>>.Instance);
 
         await handler.Handle(new UnselectedEvent(), CancellationToken.None);
 
@@ -60,7 +60,7 @@ public sealed class CommunityActivityPostHandlersTests
         services.AddSingleton<ICommunityActivityPostPublisher>(new RecordingActivityPublisher());
         services.AddScoped(
             typeof(INotificationHandler<>),
-            typeof(CommunityActivityEventPostHandler<>));
+            typeof(CommunityActivityEventPostEventHandler<>));
 
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions
         {
@@ -69,7 +69,7 @@ public sealed class CommunityActivityPostHandlersTests
         });
         using var scope = provider.CreateScope();
 
-        Assert.IsType<CommunityActivityEventPostHandler<운송상차완료됨Event>>(
+        Assert.IsType<CommunityActivityEventPostEventHandler<운송상차완료됨Event>>(
             scope.ServiceProvider.GetRequiredService<INotificationHandler<운송상차완료됨Event>>());
     }
 
@@ -106,7 +106,7 @@ public sealed class CommunityActivityPostHandlersTests
         Assert.False(incomplete!.완료여부);
         Assert.True(completed!.완료여부);
         var publication = Assert.Single(publisher.Publications);
-        Assert.Equal("activity-foundation", publication.Definition.Board.Key);
+        Assert.Equal(CommunityActivityBoardKeys.FoundationEvidence, publication.Definition.Board.Key);
         Assert.Same(command, publication.Occurrence);
     }
 

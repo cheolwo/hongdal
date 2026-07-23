@@ -13,7 +13,7 @@
             <div>
                 <span>GEN ☶ · COMMUNITY MOUNTAINS</span>
                 <h1>게시판 산맥</h1>
-                <p>일반 대화 게시판과 0.0~3.5의 일곱 Command·Event 업무 산을 한곳에서 조망합니다.</p>
+                <p>일반 대화 게시판과 Command·Event가 묶인 업무단위 산을 한곳에서 조망합니다. 0.0~3.5 버전은 보조 표지입니다.</p>
             </div>
         </div>
         <label class="community-directory__search">
@@ -67,7 +67,7 @@
     {
         @foreach (var group in ViewModel.VisibleGroups)
         {
-            var isActivityGroup = group.Key == CommunityBoardGroupCodes.ActivityRoadmap;
+            var isActivityGroup = CommunityBoardGroupCodes.IsActivityWorkflow(group.Key);
             <section class="@BuildGroupClass(group.Key)" aria-labelledby="@($"board-group-{group.Key}")">
                 <header>
                     <span>@GroupEyebrow(group.Key)</span>
@@ -76,7 +76,7 @@
                 @if (isActivityGroup)
                 {
                     <p class="community-directory__group-description">
-                        각 산을 열면 그 게시판에 자동 기록되는 Command·Event와 점검할 단일책임 페이지를 확인할 수 있습니다.
+                        각 산은 하나의 업무 책임입니다. 버전은 보조 표지로만 남기고, 관련 Command·Event·페이지와 공개 기록 여부를 함께 점검합니다.
                     </p>
                 }
                 <div class="@BuildBoardListClass(group.Key)">
@@ -111,7 +111,7 @@
                                                 <strong>Command</strong>
                                                 @if (activityBundle.CommandCount == 0)
                                                 {
-                                                    <p>현재 공개 관찰 Command 없음</p>
+                                                    <p>현재 구현된 Command 경계 없음</p>
                                                 }
                                                 else
                                                 {
@@ -121,7 +121,7 @@
                                                         {
                                                             <li>
                                                                 <code>@activity.SourceName</code>
-                                                                <small>@activity.ActivityDisplayName</small>
+                                                                <small>@activity.PublicationLabel · @activity.ActivityDisplayName</small>
                                                             </li>
                                                         }
                                                     </ul>
@@ -131,7 +131,7 @@
                                                 <strong>Event</strong>
                                                 @if (activityBundle.EventCount == 0)
                                                 {
-                                                    <p>현재 공개 관찰 Event 없음</p>
+                                                    <p>현재 구현된 Event 경계 없음</p>
                                                 }
                                                 else
                                                 {
@@ -141,7 +141,7 @@
                                                         {
                                                             <li>
                                                                 <code>@activity.SourceName</code>
-                                                                <small>@activity.ActivityDisplayName</small>
+                                                                <small>@activity.PublicationLabel · @activity.ActivityDisplayName</small>
                                                             </li>
                                                         }
                                                     </ul>
@@ -242,9 +242,9 @@
 
     private static string GroupEyebrow(string groupCode)
     {
-        if (groupCode == CommunityBoardGroupCodes.ActivityRoadmap)
+        if (CommunityBoardGroupCodes.IsActivityWorkflow(groupCode))
         {
-            return "☶ GEN · ROADMAP 0.0—3.5";
+            return "☶ GEN · WORK UNIT";
         }
 
         return groupCode switch
@@ -274,12 +274,12 @@
     }
 
     private static string BuildGroupClass(string groupCode)
-        => groupCode == CommunityBoardGroupCodes.ActivityRoadmap
+        => CommunityBoardGroupCodes.IsActivityWorkflow(groupCode)
             ? "community-directory__group community-directory__group--activity"
             : "community-directory__group";
 
     private static string BuildBoardListClass(string groupCode)
-        => groupCode == CommunityBoardGroupCodes.ActivityRoadmap
+        => CommunityBoardGroupCodes.IsActivityWorkflow(groupCode)
             ? "community-directory__list community-directory__list--activity"
             : "community-directory__list";
 }

@@ -7,10 +7,10 @@ namespace Ssalddel.Tests.Contracts.Common.Community;
 public sealed class CommunityActivityBoardCatalogTests
 {
     [Fact]
-    public void Catalog_ConfirmsSevenVersionMountainsThroughV35()
+    public void Catalog_ConfirmsIndependentWorkUnitMountainsThroughV35()
     {
-        Assert.Equal(SsalddelProductRoadmapCatalog.All.Count, CommunityActivityBoardCatalog.Bundles.Count);
-        Assert.Equal(7, CommunityActivityBoardCatalog.Boards.Count);
+        Assert.Equal(16, CommunityActivityBoardCatalog.Bundles.Count);
+        Assert.Equal(16, CommunityActivityBoardCatalog.Boards.Count);
         Assert.Equal("☶", CommunityActivityBoardBundleDefinition.MountainSymbol);
         Assert.Equal("간", CommunityActivityBoardBundleDefinition.MountainName);
 
@@ -28,8 +28,7 @@ public sealed class CommunityActivityBoardCatalogTests
                 Assert.Equal(
                     CommunityBoardPostingAccessCodes.OperatorOnly,
                     bundle.Board.PostingAccessCode);
-                Assert.Equal(CommunityBoardGroupCodes.ActivityRoadmap, bundle.Board.GroupCode);
-                Assert.NotEmpty(bundle.Activities);
+                Assert.True(CommunityBoardGroupCodes.IsActivityWorkflow(bundle.Board.GroupCode));
                 Assert.NotEmpty(bundle.Pages);
                 Assert.All(bundle.Pages, page =>
                 {
@@ -44,28 +43,30 @@ public sealed class CommunityActivityBoardCatalogTests
     [Fact]
     public void Catalog_GroupsSourcesByBoardAndPreservesLegacyBoardKeys()
     {
-        var transport = Assert.IsType<CommunityActivityBoardBundleDefinition>(
+        var request = Assert.IsType<CommunityActivityBoardBundleDefinition>(
             CommunityActivityBoardCatalog.FindBundle("activity-transport"));
 
-        Assert.Equal("2.0", transport.ProductVersion);
-        Assert.Equal(1, transport.CommandCount);
-        Assert.Equal(7, transport.EventCount);
+        Assert.Equal("2.0", request.ProductVersion);
+        Assert.Equal(5, request.CommandCount);
+        Assert.Equal(0, request.EventCount);
+        Assert.Equal(1, request.PublishedActivityCount);
+
+        var journey = Assert.IsType<CommunityActivityBoardBundleDefinition>(
+            CommunityActivityBoardCatalog.FindBundle("activity-loading-completed"));
+        Assert.Equal(CommunityActivityBoardKeys.LoadingJourney, journey.Board.Key);
         Assert.Equal(
-            transport.Board,
-            CommunityActivityBoardCatalog.FindBundle("activity-loading-completed")?.Board);
-        Assert.Equal(
-            transport.Board,
+            journey.Board,
             CommunityBoardCatalog.Find("상차 완료"));
         Assert.Same(
-            transport.Board,
-            CommunityBoardCatalog.Find(transport.Board.Key));
+            request.Board,
+            CommunityBoardCatalog.Find(request.Board.Key));
     }
 
     [Fact]
     public void Catalog_MapsEachBoardToCommandsEventsAndSingleResponsibilityPages()
     {
         var mart = Assert.IsType<CommunityActivityBoardBundleDefinition>(
-            CommunityActivityBoardCatalog.FindBundle("activity-mart"));
+            CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.MartFulfillment));
 
         Assert.Equal(0, mart.CommandCount);
         Assert.Equal(3, mart.EventCount);
@@ -79,17 +80,21 @@ public sealed class CommunityActivityBoardCatalogTests
     public void SurfaceMappingBoundary_IsFinalizedThroughV35()
     {
         Assert.Contains("0.0~3.5", CommunityActivityBoardCatalog.SurfaceMappingBoundary);
-        Assert.Contains("일곱 개", CommunityActivityBoardCatalog.SurfaceMappingBoundary);
-        Assert.Contains("단일책임", CommunityActivityBoardCatalog.SurfaceMappingBoundary);
+        Assert.Contains("독립된 업무단위", CommunityActivityBoardCatalog.SurfaceMappingBoundary);
+        Assert.DoesNotContain("버전 게시판에 연결", CommunityActivityBoardCatalog.SurfaceMappingBoundary);
     }
 
     [Fact]
     public void Catalog_HasUniqueSourcesAndReferencesRealApplicationTypes()
     {
         var definitions = CommunityActivityBoardCatalog.All;
-        var applicationTypeNames = typeof(CommunityActivityCommandPostBehavior<,>)
-            .Assembly
-            .GetTypes()
+        var applicationTypeNames = new[]
+            {
+                typeof(CommunityActivityCommandPostBehavior<,>).Assembly,
+                typeof(CommunityActivityBoardCatalog).Assembly
+            }
+            .Distinct()
+            .SelectMany(assembly => assembly.GetTypes())
             .Select(type => type.Name)
             .ToHashSet(StringComparer.Ordinal);
 
@@ -107,6 +112,45 @@ public sealed class CommunityActivityBoardCatalogTests
         Assert.All(
             definitions,
             definition => Assert.Contains(definition.SourceName, applicationTypeNames));
+    }
+
+    [Fact]
+    public void Catalog_SeparatesWorkflowRelationshipsFromPublicActivityProjection()
+    {
+        Assert.Equal(27, CommunityActivityBoardCatalog.Bundles.Sum(bundle => bundle.CommandCount));
+        Assert.Equal(25, CommunityActivityBoardCatalog.Bundles.Sum(bundle => bundle.EventCount));
+        Assert.Equal(
+            28,
+            CommunityActivityBoardCatalog.All.Count(activity => activity.PublishesActivityPost));
+
+        var groupPurchase = Assert.IsType<CommunityActivityBoardBundleDefinition>(
+            CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.IndividualDemand));
+        Assert.Contains(
+            groupPurchase.Activities,
+            activity => activity.SourceName == "공동구매자동수요등록Command"
+                        && !activity.PublishesActivityPost);
+
+        var foodDelivery = Assert.IsType<CommunityActivityBoardBundleDefinition>(
+            CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.FoodOrderAcceptance));
+        Assert.Contains(
+            foodDelivery.Activities,
+            activity => activity.SourceName == "음식주문등록Command"
+                        && !activity.PublishesActivityPost);
+
+        var mart = Assert.IsType<CommunityActivityBoardBundleDefinition>(
+            CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.MartFulfillment));
+        Assert.Equal(0, mart.CommandCount);
+    }
+
+    [Fact]
+    public void Catalog_ExposesMissingFoodDeliveryBoundaryInsteadOfHidingItInVersionBoard()
+    {
+        var handoff = Assert.IsType<CommunityActivityBoardBundleDefinition>(
+            CommunityActivityBoardCatalog.FindBundle(CommunityActivityBoardKeys.FoodDeliveryHandoff));
+
+        Assert.Empty(handoff.Activities);
+        Assert.NotEmpty(handoff.Pages);
+        Assert.Contains("보완", handoff.Board.Description);
     }
 
     [Theory]

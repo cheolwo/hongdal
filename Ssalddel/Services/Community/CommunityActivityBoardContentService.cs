@@ -82,10 +82,11 @@ public sealed class CommunityActivityBoardContentService(
             .AppendLine($"로드맵: {bundle.RoadmapDisplayName}")
             .AppendLine($"연결 수: Command {bundle.CommandCount} · Event {bundle.EventCount} · 페이지 {bundle.Pages.Count}")
             .AppendLine()
-            .AppendLine("관찰 Command·Event:");
+            .AppendLine("업무 관계 Command·Event:");
         foreach (var activity in bundle.Activities)
         {
-            body.AppendLine($"- {activity.SourceKindDisplayName} · {activity.SourceName} · {activity.ActivityDisplayName}");
+            body.AppendLine(
+                $"- {activity.SourceKindDisplayName} · {activity.SourceName} · {activity.PublicationLabel} · {activity.ActivityDisplayName}");
         }
 
         body
@@ -124,25 +125,33 @@ public sealed class CommunityActivityBoardContentService(
         int sequence,
         DateTime occurredAtUtc)
     {
-        var definition = bundle.Activities[(sequence - 1) % bundle.Activities.Count];
+        var definition = bundle.Activities.Count == 0
+            ? null
+            : bundle.Activities[(sequence - 1) % bundle.Activities.Count];
+        var roadmapDisplayName = definition?.RoadmapDisplayName ?? bundle.RoadmapDisplayName;
+        var occurrenceDisplayName = definition is null
+            ? "미구현 경계 · Command/Event 보완 대상"
+            : $"{definition.SourceKindDisplayName} · {definition.SourceName}";
+        var activitySummary = definition?.PublicActivitySummary
+            ?? "이 업무 게시판에는 아직 연결된 Command/Event가 없으며, 테스트 글은 누락된 경계를 가시화합니다.";
         var body = string.Join(
             Environment.NewLine,
             "[테스트 데이터 안내] 화면·Command·Event 연결과 게시판 목록 표시를 검증하기 위해 생성한 가상 활동입니다.",
             "실제 주문, 계약, 결제, 통관, 운송 또는 창고 작업이 아닙니다.",
             string.Empty,
-            $"로드맵: {definition.RoadmapDisplayName}",
-            $"발생 유형: {definition.SourceKindDisplayName} · {definition.SourceName}",
+            $"로드맵: {roadmapDisplayName}",
+            $"발생 유형: {occurrenceDisplayName}",
             $"관련 App·페이지: {CommunityActivityBoardCatalog.SurfaceMappingBoundary}",
             $"가상 발생 시각(UTC): {occurredAtUtc:yyyy-MM-dd HH:mm}",
             $"테스트 시나리오: {scenarioKey} · #{sequence.ToString(CultureInfo.InvariantCulture)}",
             string.Empty,
-            definition.PublicActivitySummary,
+            activitySummary,
             CommunityActivityBoardCatalog.PrivacyBoundary);
         return new CommunityAutomatedPostDraft(
             $"activity-board-test-{bundle.Board.Key}",
             $"{scenarioKey}-{sequence.ToString("00", CultureInfo.InvariantCulture)}",
             bundle.Board.DisplayName,
-            $"{definition.ProductName} {definition.ProductVersion} 테스트 활동",
+            $"{bundle.ProductName} {bundle.ProductVersion} 테스트 활동",
             "테스트 관찰",
             $"[테스트 데이터] {bundle.Board.DisplayName} 활동 #{sequence.ToString(CultureInfo.InvariantCulture)}",
             body,

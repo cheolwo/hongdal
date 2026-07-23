@@ -1,25 +1,24 @@
-# 0.0~3.5 간괘 게시판 산맥 확정
+# 업무단위 간괘 게시판 산맥 확정
 
 ## 결과
 
-- Command/Event 하나당 하나였던 활동 게시판을 버전 흐름별 일곱 게시판으로 통합했다.
-- 일반 대화 게시판과 시스템 활동 게시판의 책임을 분리했다.
-- 각 활동 게시판에 Command 수, Event 수와 관련 Web·App 페이지를 명시했다.
-- 게시판 모음과 공용 커뮤니티 게시판 선택 화면에 간괘 `☶` 산 표현을 적용했다.
-- 활동 카드를 펼쳐 Command·Event 이름과 페이지 Route를 점검하고, 실제 Web 목록 Route는 바로 열 수 있게 했다.
-- 각 업무 게시판의 고정 안내 글이 전체 Command·Event·Page 연결을 설명하도록 변경했다.
-- 기존 Command/Event별 게시판 key와 표시명은 별칭으로 보존해 과거 글을 새 게시판에서 함께 조회한다.
+- `0.0~3.5` 버전별 일곱 게시판을 16개의 독립된 업무단위 게시판으로 재분류했다.
+- 버전은 게시판 식별 기준에서 보조 표지로 낮추고, 개별 수요·배차·상차·인수·검수처럼 한 가지 책임을 카드 하나에서 깊게 살피게 했다.
+- 각 카드에 관련 Command·Event·Page를 표시하고 `업무 관계`와 실제 공개 글을 만드는 `게시 투영`을 구분했다.
+- 음식 배달 인계처럼 아직 Command/Event가 없는 책임도 빈 업무 산으로 보여 보완 대상을 숨기지 않는다.
+- 기존 버전 게시판 key는 과거 글 조회를 위한 별칭으로 보존했다.
+- 간괘 `☶` 표현과 일반 대화 게시판 구조는 유지했다.
+- 16개 업무 key마다 배치 주제, 실행 가능한 원천, 향후 공식 connector와 편집 검토 정책을 연결했다.
 
 ## 시각 확인
 
-간접 확인. Razor와 CSS 조립, Web Release 빌드와 구조 테스트로 확인했으며 브라우저 캡처와 실제 배포는 수행하지 않았다.
+간접 확인. Razor 조립과 구조 테스트로 확인했으며 브라우저 캡처와 실제 배포는 수행하지 않았다.
 
 ## 검증
 
-- `eng/validate-changes.ps1 -Level Fast -Paths ...`: 통과
-- `eng/validate-changes.ps1 -Level Task -Paths ...`: 통과
-- `WarehouseManagerApp` Windows Release 빌드: 경고 0개, 오류 0개
+- 업무단위 catalog·투영 정책·게시판 ViewModel targeted test: 실행
+- 전체 변경 검증: 후속 검증에서 기록
 
 ## 기준 문서
 
-- [간괘 게시판 산맥과 Command·Event·Page 묶음](../Architecture/CommunityBoardMountainCatalog.md)
+- [업무단위 간괘 게시판과 Command·Event·Page 묶음](../Architecture/CommunityBoardMountainCatalog.md)

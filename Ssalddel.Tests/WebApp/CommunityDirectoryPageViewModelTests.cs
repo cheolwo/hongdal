@@ -58,9 +58,9 @@ public sealed class CommunityDirectoryPageViewModelTests
     }
 
     [Theory]
-    [InlineData("운송상차완료됨Event", "activity-transport")]
-    [InlineData("3.5", "activity-mart")]
-    [InlineData("Command", "activity-foundation")]
+    [InlineData("운송상차완료됨Event", CommunityActivityBoardKeys.LoadingJourney)]
+    [InlineData("3.5", CommunityActivityBoardKeys.MartFulfillment)]
+    [InlineData("콘텐츠시청완료Command", CommunityActivityBoardKeys.FoundationEvidence)]
     public async Task UpdateSearch_FindsActivityBoardsBySourceAndVersion(
         string search,
         string expectedBoardKey)
