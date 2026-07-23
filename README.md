@@ -2,13 +2,15 @@
 
 살뜰은 게시글과 대화에서 시작한 필요를 공동 원장과 다이어그램으로 정리하고, 필요한 업무 도구까지 이어 주는 **커뮤니티 기반 생활 협업 플랫폼**입니다.
 
+> **현재 공개된 커뮤니티 게시판은 테스트용입니다.** 기능과 사용자 흐름을 확인하기 위한 개발 환경이며 실제 주문, 계약, 결제, 운송 또는 정산을 처리하지 않습니다.
+
 <p align="center">
   <a href="https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/community">
-    <strong>커뮤니티 게시판 바로 보기 →</strong>
+    <strong>테스트용 커뮤니티 게시판 보기 →</strong>
   </a>
 </p>
 
-현재 배포: [웹사이트 홈](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/) · [커뮤니티 게시판](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/community)
+테스트 배포: [웹사이트 홈](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/) · [커뮤니티 게시판](https://ssalddel-v0-7q4m2k.koreacentral.cloudapp.azure.com/community)
 
 <p align="center">
   <a href="docs/ProjectOverview/page-docs/">
