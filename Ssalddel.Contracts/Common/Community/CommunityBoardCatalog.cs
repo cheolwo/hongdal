@@ -290,22 +290,25 @@ public static class CommunityBoardCatalog
         "분쟁");
 
     public static IReadOnlyList<CommunityBoardDefinition> All { get; } =
-    [
-        Vow,
-        FreeLife,
-        QuestionHelp,
-        InformationPrices,
-        Food,
-        Cargo,
-        Prajna,
-        Participation,
-        SalesSupply,
-        LedgerProgress,
-        CompletionReview,
-        NoticeGuide,
-        ProductFeedback,
-        SafetyReport
-    ];
+        new[]
+        {
+            Vow,
+            FreeLife,
+            QuestionHelp,
+            InformationPrices,
+            Food,
+            Cargo,
+            Prajna,
+            Participation,
+            SalesSupply,
+            LedgerProgress,
+            CompletionReview,
+            NoticeGuide,
+            ProductFeedback
+        }
+        .Concat(CommunityActivityBoardCatalog.Boards)
+        .Append(SafetyReport)
+        .ToArray();
 
     public static IReadOnlyList<CommunityBoardDefinition> PublicBoards { get; } =
         All.Where(board => board.IsPublic).ToArray();
