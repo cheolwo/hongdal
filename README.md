@@ -16,6 +16,43 @@
   </a>
 </p>
 
+## 역할별 화면 설계
+
+게시판에서 시작한 생각을 업무단위 게시판으로 깊게 살피고, 주문자·화주·기사·창고 담당자가 각자의 화면에서 같은 흐름을 이어 가도록 [Figma 역할 레이어](https://www.figma.com/design/0KhuQLc1MleUBIQnARC21Z/ssalddle?node-id=0-1) `01~05`를 분리했습니다.
+
+<p align="center">
+  <img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/community-business-unit-boards.png" alt="공동구매 주문, 수출입 공급, 운송 배송, 창고 재고, 통관 원장 다이어그램 업무단위 게시판" width="900">
+</p>
+
+<details>
+  <summary><strong>01 Community부터 05 Warehouse까지 역할별 화면 보기</strong></summary>
+  <br>
+  <table>
+    <tr>
+      <td width="50%"><img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/community-layer.png" alt="01 Community 화면 레이어"></td>
+      <td width="50%"><img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/orderer-layer.png" alt="02 Orderer 화면 레이어"></td>
+    </tr>
+    <tr>
+      <td align="center"><strong>01 Community</strong></td>
+      <td align="center"><strong>02 Orderer</strong></td>
+    </tr>
+    <tr>
+      <td><img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/shipper-layer.png" alt="03 Shipper 화면 레이어"></td>
+      <td><img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/driver-layer.png" alt="04 Driver 화면 레이어"></td>
+    </tr>
+    <tr>
+      <td align="center"><strong>03 Shipper</strong></td>
+      <td align="center"><strong>04 Driver</strong></td>
+    </tr>
+  </table>
+  <p align="center">
+    <img src="docs/assets/changes/2026-07-24-figma-role-layer-milestone/warehouse-layer.png" alt="05 Warehouse 화면 레이어" width="440">
+    <br><strong>05 Warehouse</strong>
+  </p>
+</details>
+
+화면 분리 범위와 검증 결과는 [Figma 역할 레이어 정리 기록](docs/Changes/2026-07-24-figma-role-layer-milestone.md)에 남겼습니다. 이 이미지는 구현 완료를 뜻하는 화면 캡처가 아니라, 기존 구현과 앞으로의 화면 책임을 맞추기 위한 설계 기준입니다.
+
 ## 커뮤니티 게시판에서 업무까지
 
 사용자는 필요한 일과 가능한 일을 공개하고 상대를 직접 선택합니다. 참여자가 합의한 경우에만 공동 원장과 다이어그램을 만들고, 구체적인 관리 기능을 같은 문맥에서 엽니다.

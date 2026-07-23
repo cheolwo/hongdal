@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-24 | [Figma 01~05 역할 레이어와 업무단위 게시판](2026-07-24-figma-role-layer-milestone.md) | Figma의 Community·Orderer·Shipper·Driver·Warehouse 화면을 역할별 페이지로 분리하고, 커뮤니티에 6개 업무단위 게시판 화면을 추가한 설계 성과를 실제 PNG로 기록 |
 | 2026-07-24 | [업무단위 간괘 게시판 산맥 확정](2026-07-24-community-board-mountains.md) | 간접 확인 — 버전별 일곱 산을 16개 업무단위 산으로 재분류하고 Command·Event·페이지 및 공개 투영 여부를 카드에서 점검, 간괘 `☶` 유지 |
 | 2026-07-24 | [3.5 알뜰살뜰 마트 페이지 단일책임 정리](2026-07-24-mart-v35-srp.md) | 간접 확인 — 피킹 주문 목록·stable-ID 상세를 Web·창고 앱 공용 Screen과 독립 Route로 분리하고, 샘플 작업 보드를 실제 서버 원장 허브로 전환하며 3.5 Simulation 배포 override를 추가 |
 | 2026-07-23 | [커뮤니티 내비게이션 최소 노출](2026-07-23-community-navigation-minimal.md) | 커뮤니티 공용 메뉴를 공개 커뮤니티·내 정보·내 글로 제한하고 개인 보조 메뉴도 내 정보·내 글만 표시하되 기존 route와 화면 구현은 보존, desktop·390px 실제 확인 |
