@@ -1,0 +1,21 @@
+@page "/group-purchase/groups"
+@using Ssalddel.Contracts.Common.Orderer
+
+<PageTitle>내 공동 진행</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.GroupList"
+                              Eyebrow="INDIVIDUAL → COLLECTIVE · 1.0"
+                              Title="내 공동 진행"
+                              Description="내가 먼저 남긴 개별 원함을 기준으로, 그 원함이 포함된 공동 집계만 모아 봅니다."
+                              BackHref="@GroupPurchasePageRoutes.WishesRoot"
+                              BoundaryMessage="공동 진행은 개인 원함의 집계입니다. 집단 조건 충족만으로 주문·결제·계약을 확정하지 않습니다.">
+        <GroupPurchaseOrdererAccessGate LoginTitle="내 공동 진행 로그인"
+                                        LoginDescription="본인 원함이 참여한 집단만 보려면 로그인해 주세요."
+                                        LoginButtonText="로그인하고 공동 진행 보기">
+            <Authorized>
+                <GroupPurchaseMyGroupsScreen />
+            </Authorized>
+        </GroupPurchaseOrdererAccessGate>
+    </GroupPurchaseScreenFrame>
+</MudContainer>

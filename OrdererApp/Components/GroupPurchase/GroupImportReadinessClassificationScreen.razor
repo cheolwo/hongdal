@@ -1,0 +1,80 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudStack Spacing="3">
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        HSK·HTS와 국가별 규제는 후보 근거입니다. 신고 코드나 법적 판단으로 확정되지 않았으며 자격 있는 전문가의 검토가 필요합니다.
+    </MudAlert>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">품목분류 후보</MudText>
+            @if (Ledger.품목분류목록.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">등록된 품목분류 후보가 없습니다.</MudAlert>
+            }
+            else
+            {
+                @foreach (var candidate in Ledger.품목분류목록)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudStack Spacing="1">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudText Typo="Typo.subtitle1">@candidate.분류체계코드 @candidate.품목코드</MudText>
+                                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined">
+                                    @candidate.검토상태코드
+                                </MudChip>
+                            </MudStack>
+                            <MudText Typo="Typo.body2">@candidate.분류근거</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                @candidate.재료명 · 관할 @candidate.관할국가코드 · 신뢰도 @candidate.신뢰도.ToString("P0")
+                            </MudText>
+                            @if (!string.IsNullOrWhiteSpace(candidate.원출처Url))
+                            {
+                                <MudLink Href="@candidate.원출처Url" Target="_blank" Typo="Typo.caption">공식 근거 열기</MudLink>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                }
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">국가별 규제 검토 항목</MudText>
+            @if (Ledger.국가별검토목록.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">등록된 국가별 검토 항목이 없습니다.</MudAlert>
+            }
+            else
+            {
+                @foreach (var item in Ledger.국가별검토목록)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudStack Spacing="1">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                                <MudText Typo="Typo.body1">@item.표시명</MudText>
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@item.검토상태코드</MudChip>
+                            </MudStack>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                @item.관할국가코드 · 담당 역할 @item.책임역할코드
+                            </MudText>
+                            @if (!string.IsNullOrWhiteSpace(item.미확인사유))
+                            {
+                                <MudText Typo="Typo.body2">@item.미확인사유</MudText>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.공식원출처Url))
+                            {
+                                <MudLink Href="@item.공식원출처Url" Target="_blank" Typo="Typo.caption">공식 원출처 열기</MudLink>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                }
+            }
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired] public 공동수입준비주문자조회응답 Ledger { get; set; } = default!;
+}

@@ -1,0 +1,11 @@
+@page "/orders/{OrderLedgerId}"
+@using OrdererApp.Components.Orders
+
+<PageTitle>개별주문 원장</PageTitle>
+
+<OrdererIndividualOrderLedgerDetailScreen OrderLedgerId="@OrderLedgerId" />
+
+@code {
+    [Parameter]
+    public string OrderLedgerId { get; set; } = string.Empty;
+}

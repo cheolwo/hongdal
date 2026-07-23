@@ -37,7 +37,7 @@ public sealed class 공동구매자동집단화ControllerTests
         };
         var controller = Controller(useCase, "viewer");
 
-        var result = await controller.목록(null, null, null, CancellationToken.None);
+        var result = await controller.목록(null, null, null, null, CancellationToken.None);
 
         var ok = Assert.IsType<OkObjectResult>(result);
         var groups = Assert.IsType<공동구매자동집단요약응답[]>(ok.Value);
@@ -48,6 +48,8 @@ public sealed class 공동구매자동집단화ControllerTests
         var json = JsonSerializer.Serialize(ok.Value);
         Assert.DoesNotContain(nameof(공동구매자동집단응답.수요목록), json, StringComparison.Ordinal);
         Assert.DoesNotContain(nameof(공동구매자동집단응답.공동구매주문집계원장Id), json, StringComparison.Ordinal);
+        Assert.DoesNotContain(nameof(공동구매자동수요응답.개별원함원장Id), json, StringComparison.Ordinal);
+        Assert.DoesNotContain("wish-ledger-orderer-a", json, StringComparison.Ordinal);
         Assert.DoesNotContain(nameof(공동구매자동집단응답.예약결제합계), json, StringComparison.Ordinal);
         Assert.DoesNotContain("orderer-a", json, StringComparison.Ordinal);
         Assert.DoesNotContain("참여자 A", json, StringComparison.Ordinal);
@@ -85,6 +87,7 @@ public sealed class 공동구매자동집단화ControllerTests
         var response = Assert.IsType<공동구매자동집단사용자응답>(ok.Value);
         var ownDemand = Assert.Single(response.수요목록);
         Assert.Equal("authenticated-orderer", ownDemand.주문자키);
+        Assert.Equal("wish-ledger-authenticated-orderer", ownDemand.개별원함원장Id);
         Assert.Equal(30_003m, ownDemand.예약결제금액);
         Assert.Equal("aggregation-ledger-1", response.공동구매주문집계원장Id);
 
@@ -161,7 +164,7 @@ public sealed class 공동구매자동집단화ControllerTests
     }
 
     [Fact]
-    public async Task 비구속수요철회는_로그인사용자와멱등키만전달한다()
+    public async Task 비구속수요철회는_로그인사용자와멱등키와개별원함Revision을전달한다()
     {
         var useCase = new RecordingUseCase
         {
@@ -177,13 +180,16 @@ public sealed class 공동구매자동집단화ControllerTests
             "ingredient:garlic:seoul",
             "withdraw-demand-1",
             "더 이상 필요하지 않음",
-            CancellationToken.None);
+            CancellationToken.None,
+            개별원함기대Revision: 7);
 
         Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(useCase.LastWithdrawalCommand);
         Assert.Equal("authenticated-orderer", useCase.LastWithdrawalCommand!.주문자키);
         Assert.Equal("withdraw-demand-1", useCase.LastWithdrawalCommand.요청멱등키);
         Assert.Equal("ingredient:garlic:seoul", useCase.LastWithdrawalCommand.수요출처키);
+        Assert.Equal(7, useCase.LastWithdrawalCommand.개별원함기대Revision);
+        Assert.Equal("더 이상 필요하지 않음", useCase.LastWithdrawalCommand.철회사유);
     }
 
     [Fact]
@@ -202,6 +208,7 @@ public sealed class 공동구매자동집단화ControllerTests
                     수요Id = "demand-1",
                     수요출처키 = "source-mine",
                     주문자키 = "authenticated-orderer",
+                    개별원함원장Id = "wish-ledger-1",
                     개별주문원장Id = "individual-ledger-1"
                 }
             ]
@@ -213,6 +220,7 @@ public sealed class 공동구매자동집단화ControllerTests
         Assert.NotNull(legacyResponse);
         Assert.Equal(response.자동집단Id, legacyResponse.자동집단Id);
         Assert.Equal(response.공동구매주문집계원장Id, legacyResponse.공동구매주문집계원장Id);
+        Assert.Equal("wish-ledger-1", Assert.Single(legacyResponse.수요목록).개별원함원장Id);
         Assert.Equal("individual-ledger-1", Assert.Single(legacyResponse.수요목록).개별주문원장Id);
     }
 
@@ -270,6 +278,7 @@ public sealed class 공동구매자동집단화ControllerTests
             주문자키 = ordererId,
             주문자표시명 = displayName,
             수령지주소참조키 = addressReference,
+            개별원함원장Id = $"wish-ledger-{ordererId}",
             공동구매주문집계원장Id = "aggregation-ledger-1",
             개별주문원장Id = $"individual-ledger-{ordererId}",
             희망수량 = 1,

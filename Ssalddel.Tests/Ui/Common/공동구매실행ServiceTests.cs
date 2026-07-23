@@ -98,6 +98,28 @@ public sealed class 공동구매실행ServiceTests
     }
 
     [Fact]
+    public async Task 비구속수요철회는_개별원함기대Revision을ControllerQuery로전달한다()
+    {
+        var response = new 공동구매자동수요철회응답 { 철회완료 = true };
+        var client = new RecordingJsonApiClient { Response = response };
+        var service = new 공동구매실행Service(client);
+
+        var result = await service.비구속수요철회Async(
+            "ingredient:onion/us:10001",
+            "wish-withdraw:ledger-1:17",
+            expectedWishRevision: 17,
+            reason: "주문자 앱 내 원함에서 철회");
+
+        Assert.Same(response, result);
+        Assert.Equal(HttpMethod.Delete, client.LastMethod);
+        Assert.Equal(
+            $"api/v1/orderer/group-purchase-auto-groups/demands/{Uri.EscapeDataString("ingredient:onion/us:10001")}" +
+            $"?reason={Uri.EscapeDataString("주문자 앱 내 원함에서 철회")}&expectedWishRevision=17",
+            client.LastPath);
+        Assert.Equal("wish-withdraw:ledger-1:17", client.LastHeaders!["Idempotency-Key"]);
+    }
+
+    [Fact]
     public async Task 주문원장조회_기본경로를보호형역할응답으로읽는다()
     {
         var response = new 주문원장역할별조회공개Dto { 주문원장Id = "order/root 1" };

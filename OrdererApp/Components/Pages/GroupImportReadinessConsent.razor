@@ -1,0 +1,18 @@
+@page "/group-purchase/imports/{LedgerId}/consent"
+
+<PageTitle>공동수입 정보 제공 범위</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.Consent"
+                                Title="정보 제공 범위와 동의 상태"
+                                Description="포워더 인계에 포함되는 정보 범위와 별도 동의 근거의 확인 여부를 읽습니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessConsentScreen Ledger="ledger" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

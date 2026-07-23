@@ -1,0 +1,18 @@
+@page "/group-purchase/imports/{LedgerId}/handoff"
+
+<PageTitle>공동수입 포워더 인계</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.Handoff"
+                                Title="포워더 인계와 회신"
+                                Description="집계 조건의 인계 상태와 사람이 기록한 LCL·FCL 비교 회신만 확인합니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessHandoffScreen Ledger="ledger" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

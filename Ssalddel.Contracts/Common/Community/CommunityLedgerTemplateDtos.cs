@@ -430,6 +430,7 @@ public sealed class CommunityLedgerExperienceEventResponse
 
 public static class CommunityLedgerTemplateKeys
 {
+    public const string IndividualDemand = "individual-demand";
     public const string Order = "order";
     public const string GroupOrder = "group-order";
     public const string CargoTransport = "cargo-transport";
@@ -592,6 +593,7 @@ public static class CommunityLedgerEngineHints
 
 public static class CommunityLedgerCompositionRuleCodes
 {
+    public const string IndividualDemandBeforeAutomaticGrouping = "IndividualDemandBeforeAutomaticGrouping";
     public const string OrderBeforeFulfillment = "OrderBeforeFulfillment";
     public const string GroupPurchaseAgreementBeforeGroupOrder = "GroupPurchaseAgreementBeforeGroupOrder";
     public const string GroupOrderRequiresIndividualOrders = "GroupOrderRequiresIndividualOrders";

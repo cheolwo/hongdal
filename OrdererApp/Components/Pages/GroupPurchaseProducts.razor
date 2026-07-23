@@ -11,8 +11,9 @@
     <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.ProductList"
                               Eyebrow="INGREDIENT · AUTO GROUPING"
                               Title="재료를 보고 바로 집단화"
-                              Description="카드에서 재료를 고르고 한 번 누르면 서버가 같은 재료·배송권·보관 조건의 집단을 찾아 비구속 수요를 반영합니다."
+                              Description="한 재료는 카드에서 바로 집단화하고, 여러 재료는 선택 화면에서 재료별 개별 원함으로 함께 저장할 수 있습니다."
                               BackHref="@GroupPurchasePageRoutes.Root">
+        <MudButton Href="@GroupPurchasePageRoutes.WishCreate" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Class="mb-3">여러 재료 한 번에 선택</MudButton>
         @if (Authentication.처리중 && !Authentication.초기화됨)
         {
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">

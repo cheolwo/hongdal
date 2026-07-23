@@ -29,6 +29,12 @@ public interface I공동구매자동집단화저장소
         string 자동집단Id,
         CancellationToken cancellationToken = default);
 
+    Task<공동구매자동집단응답> 개별원함원장연결Async(
+        string 자동집단Id,
+        string 수요Id,
+        string 개별원함원장Id,
+        CancellationToken cancellationToken = default);
+
     Task<공동구매자동집단응답> 개별주문원장연결Async(
         string 자동집단Id,
         string 수요Id,
@@ -86,7 +92,9 @@ public sealed class Mongo공동구매자동집단화저장소 :
         var 상품키 = 정규화(command.상품키, "unknown-product", 120);
         var 배송권키 = 정규화(command.배송권키, "unknown-scope", 160);
         var 온도코드 = 정규화(command.온도코드, "상온", 40);
-        var 물류방식 = 정규화(command.물류방식, "LCL", 40);
+        var 물류방식 = 정규화(command.물류방식, 공동구매자동수요물류방식코드.후속검토, 40);
+        var 거래유형 = 공동구매거래유형코드.정규화(command.거래유형);
+        var 가격표시기준 = 공동구매가격표시기준코드.정규화(command.가격표시기준, 거래유형);
         var 주문자키 = 정규화(command.주문자키, "anonymous-orderer", 120);
         var 수요출처키 = 정규화(
             command.수요출처키,
@@ -168,6 +176,16 @@ public sealed class Mongo공동구매자동집단화저장소 :
                     커뮤니티원장Id = 정규화(command.커뮤니티원장Id, string.Empty, 200),
                     상품키 = 상품키,
                     상품명 = 정규화(command.상품명, 상품키, 160),
+                    거래유형 = 거래유형,
+                    가격표시기준 = 가격표시기준,
+                    구매조직참조키 = 정규화(command.구매조직참조키, string.Empty, 160),
+                    구매조직표시명 = 정규화(command.구매조직표시명, string.Empty, 160),
+                    사업자검증상태 = 거래유형 == 공동구매거래유형코드.B2B
+                        ? 기존수요?.사업자검증상태 is 주문자집단사업자검증상태코드.검증완료
+                            ? 주문자집단사업자검증상태코드.검증완료
+                            : 주문자집단사업자검증상태코드.필요
+                        : 주문자집단사업자검증상태코드.불필요,
+                    세금계산서필요 = command.세금계산서필요,
                     배송권키 = 배송권키,
                     배송권명 = 정규화(command.배송권명, 배송권키, 160),
                     주문자키 = 주문자키,
@@ -176,6 +194,7 @@ public sealed class Mongo공동구매자동집단화저장소 :
                     도착창고유형 = 정규화(command.도착창고유형, string.Empty, 50),
                     도착창고명 = 정규화(command.도착창고명, string.Empty, 200),
                     수령지주소참조키 = 정규화(command.수령지주소참조키, string.Empty, 200),
+                    개별원함원장Id = 기존수요?.개별원함원장Id ?? string.Empty,
                     입고의미상태 = 주문확정수요인가(command)
                         ? 공동구매개별주문입고상태코드.입고예정
                         : 기존수요?.입고의미상태 ?? 공동구매개별주문입고상태코드.미지정,
@@ -214,12 +233,17 @@ public sealed class Mongo공동구매자동집단화저장소 :
                     HS코드 = 정규화(command.HS코드, string.Empty, 20),
                     온도코드 = 온도코드,
                     물류방식 = 물류방식,
+                    거래유형 = 거래유형,
+                    가격표시기준 = 가격표시기준,
                     배송권키 = 배송권키,
                     배송권명 = 수요.배송권명,
                     현재상태 = 공동구매자동집단상태코드.수요수집중,
                     생성시각Utc = now,
                     모집종료시각Utc = 공동구매자동집단모집정책.기본모집종료시각Utc(now)
                 };
+
+                변경문서.거래유형 = 거래유형;
+                변경문서.가격표시기준 = 가격표시기준;
 
                 변경문서.수요목록.RemoveAll(x => x.수요출처키 == 수요출처키);
                 변경문서.수요목록.Add(수요);
@@ -231,7 +255,7 @@ public sealed class Mongo공동구매자동집단화저장소 :
                         : 재활성화
                             ? "DemandReactivated"
                             : "DemandUpdated",
-                    요약 = $"{수요.주문자표시명} 수요가 {수요.희망수량:N0}{수요.수량단위} {(기존수요 is null ? "등록" : 재활성화 ? "재등록" : "변경")}되었습니다.",
+                    요약 = $"{공동구매거래유형코드.표시명(거래유형)} 수요가 {수요.희망수량:N0}{수요.수량단위} {(기존수요 is null ? "등록" : 재활성화 ? "재등록" : "변경")}되었습니다.",
                     발생시각Utc = now
                 });
                 재계산(변경문서, now);
@@ -398,6 +422,12 @@ public sealed class Mongo공동구매자동집단화저장소 :
             var 현재상태 = 정규화(조건.현재상태, string.Empty, 80);
             responses = responses.Where(x =>
                 string.Equals(x.현재상태, 현재상태, StringComparison.Ordinal));
+        }
+
+        if (!string.IsNullOrWhiteSpace(조건.거래유형))
+        {
+            var 거래유형 = 공동구매거래유형코드.정규화(조건.거래유형);
+            responses = responses.Where(x => string.Equals(x.거래유형, 거래유형, StringComparison.Ordinal));
         }
 
         return responses
@@ -626,7 +656,7 @@ public sealed class Mongo공동구매자동집단화저장소 :
             안내 = 이미처리됨
                 ? "이미 인계 승인된 모집 결과입니다. 중복 후속 실행은 만들지 않았습니다."
                 : 후속워크플로우활성여부
-                    ? "인계 승인을 원장에 기록했습니다. 1.5 준비 원장은 별도 승인된 UseCase가 생성해야 합니다."
+                    ? "인계 승인을 기록했습니다. 별도 승인된 UseCase가 정식 공동수입 원장을 연결하고 그 안에 1.5 준비 블록을 저장해야 합니다."
                     : "인계 승인을 원장에 기록했습니다. 1.5 기능 플래그가 꺼져 있어 후속 원장은 생성하지 않았습니다."
         };
     }
@@ -679,7 +709,7 @@ public sealed class Mongo공동구매자동집단화저장소 :
                 변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
                 {
                     이벤트유형 = "GroupPurchaseImportReadinessLedgerLinked",
-                    요약 = "승인된 수요 인계 요청에 1.5 공급·가격·무역 준비 원장을 연결했습니다. 계약·결제·신고·운송 실행은 열지 않았습니다.",
+                    요약 = "승인된 수요 인계 요청에 정식 공동수입 원장과 1.5 공급·가격·무역 준비 블록을 연결했습니다. 계약·결제·신고·운송 실행은 열지 않았습니다.",
                     발생시각Utc = now
                 });
                 변경문서.수정시각Utc = now;
@@ -688,6 +718,55 @@ public sealed class Mongo공동구매자동집단화저장소 :
             cancellationToken);
 
         return Os상태응답으로(문서);
+    }
+
+    public async Task<공동구매자동집단응답> 개별원함원장연결Async(
+        string 자동집단Id,
+        string 수요Id,
+        string 개별원함원장Id,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(자동집단Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(수요Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(개별원함원장Id);
+        await 인덱스준비Async(cancellationToken);
+
+        var normalizedLedgerId = 개별원함원장Id.Trim();
+        var now = DateTime.UtcNow;
+        var 문서 = await 집단저장Async(
+            자동집단Id.Trim(),
+            생성허용: false,
+            기존문서 =>
+            {
+                var 변경문서 = 기존문서
+                    ?? throw new InvalidOperationException("개별 원함 원장을 연결할 자동집단을 찾을 수 없습니다.");
+                var 수요 = 변경문서.수요목록.FirstOrDefault(x => x.수요Id == 수요Id.Trim())
+                    ?? throw new InvalidOperationException("개별 원함 원장을 연결할 주문자 수요를 찾을 수 없습니다.");
+
+                if (string.Equals(수요.개별원함원장Id, normalizedLedgerId, StringComparison.Ordinal))
+                {
+                    return 집단저장계획.보존(변경문서);
+                }
+                if (!string.IsNullOrWhiteSpace(수요.개별원함원장Id))
+                {
+                    throw new InvalidOperationException("이 수요에는 이미 다른 개별 원함 원장이 연결되어 있습니다.");
+                }
+
+                수요.개별원함원장Id = normalizedLedgerId;
+                수요.갱신시각Utc = now;
+                수요.갱신토큰 = ObjectId.GenerateNewId().ToString();
+                변경문서.이벤트목록.Add(new 공동구매자동집단이벤트문서
+                {
+                    이벤트유형 = "IndividualDemandLedgerLinked",
+                    요약 = "개별 원함 원장을 자동집단 수요의 원본으로 연결했습니다.",
+                    발생시각Utc = now
+                });
+                변경문서.수정시각Utc = now;
+                return 집단저장계획.변경(변경문서);
+            },
+            cancellationToken);
+
+        return 응답으로(문서);
     }
 
     public async Task<공동구매자동집단응답> 개별주문원장연결Async(
@@ -965,7 +1044,8 @@ public sealed class Mongo공동구매자동집단화저장소 :
             문서.목표수량,
             문서.현재상태,
             모집종료시각Utc,
-            now);
+            now,
+            문서.거래유형);
         문서.현재상태 = 진행.현재상태;
         문서.수요건수 = 진행.수요건수;
         문서.예약결제건수 = 진행.예약결제건수;
@@ -1010,6 +1090,7 @@ public sealed class Mongo공동구매자동집단화저장소 :
                     Builders<공동구매자동집단문서>.IndexKeys
                         .Ascending(x => x.상품키)
                         .Ascending(x => x.배송권키)
+                        .Ascending(x => x.거래유형)
                         .Ascending(x => x.현재상태)
                         .Descending(x => x.수정시각Utc)),
                 new CreateIndexModel<공동구매자동집단문서>(
@@ -1050,6 +1131,8 @@ public sealed class Mongo공동구매자동집단화저장소 :
         {
             throw new InvalidOperationException("희망수량은 0보다 커야 합니다.");
         }
+
+        공동구매주문자집단화Engine.거래문맥검증(command);
 
         if (주문확정수요인가(command))
         {
@@ -1138,7 +1221,8 @@ public sealed class Mongo공동구매자동집단화저장소 :
             문서.목표수량,
             문서.현재상태,
             모집종료시각Utc,
-            기준시각Utc);
+            기준시각Utc,
+            문서.거래유형);
 
         return new 공동구매자동집단응답
         {
@@ -1149,6 +1233,8 @@ public sealed class Mongo공동구매자동집단화저장소 :
             HS코드 = 문서.HS코드,
             온도코드 = 문서.온도코드,
             물류방식 = 문서.물류방식,
+            거래유형 = 공동구매거래유형코드.정규화(문서.거래유형),
+            가격표시기준 = 공동구매가격표시기준코드.정규화(문서.가격표시기준, 문서.거래유형),
             배송권키 = 문서.배송권키,
             배송권명 = 문서.배송권명,
             현재상태 = 진행.현재상태,
@@ -1266,9 +1352,20 @@ public sealed class Mongo공동구매자동집단화저장소 :
             수요출처키 = 문서.수요출처키,
             커뮤니티게시글Id = 문서.커뮤니티게시글Id,
             커뮤니티원장Id = 문서.커뮤니티원장Id,
+            개별원함원장Id = 문서.개별원함원장Id,
             자동집단Id = 자동집단Id,
             상품키 = 문서.상품키,
             상품명 = 문서.상품명,
+            거래유형 = 공동구매거래유형코드.정규화(문서.거래유형),
+            가격표시기준 = 공동구매가격표시기준코드.정규화(문서.가격표시기준, 문서.거래유형),
+            구매조직참조키 = 문서.구매조직참조키,
+            구매조직표시명 = 문서.구매조직표시명,
+            사업자검증상태 = string.IsNullOrWhiteSpace(문서.사업자검증상태)
+                ? 공동구매거래유형코드.정규화(문서.거래유형) == 공동구매거래유형코드.B2B
+                    ? 주문자집단사업자검증상태코드.필요
+                    : 주문자집단사업자검증상태코드.불필요
+                : 문서.사업자검증상태,
+            세금계산서필요 = 문서.세금계산서필요,
             주문자키 = 문서.주문자키,
             주문자표시명 = 문서.주문자표시명,
             배송권키 = 문서.배송권키,
@@ -1511,6 +1608,11 @@ internal static class 공동구매자동수요멱등정책
             command.HS코드,
             command.온도코드,
             command.물류방식,
+            command.거래유형,
+            command.가격표시기준,
+            command.구매조직참조키,
+            command.구매조직표시명,
+            command.세금계산서필요.ToString(),
             command.주문자키,
             command.주문자표시명,
             command.배송권키,
@@ -1599,6 +1701,8 @@ public sealed class 공동구매자동집단문서
     public string HS코드 { get; set; } = string.Empty;
     public string 온도코드 { get; set; } = string.Empty;
     public string 물류방식 { get; set; } = string.Empty;
+    public string 거래유형 { get; set; } = 공동구매거래유형코드.B2C;
+    public string 가격표시기준 { get; set; } = 공동구매가격표시기준코드.부가세포함;
     public string 배송권키 { get; set; } = string.Empty;
     public string 배송권명 { get; set; } = string.Empty;
     public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
@@ -1644,8 +1748,15 @@ public sealed class 공동구매자동수요문서
     public string 수요출처키 { get; set; } = string.Empty;
     public long? 커뮤니티게시글Id { get; set; }
     public string 커뮤니티원장Id { get; set; } = string.Empty;
+    public string 개별원함원장Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
+    public string 거래유형 { get; set; } = 공동구매거래유형코드.B2C;
+    public string 가격표시기준 { get; set; } = 공동구매가격표시기준코드.부가세포함;
+    public string 구매조직참조키 { get; set; } = string.Empty;
+    public string 구매조직표시명 { get; set; } = string.Empty;
+    public string 사업자검증상태 { get; set; } = 주문자집단사업자검증상태코드.불필요;
+    public bool 세금계산서필요 { get; set; }
     public string 배송권키 { get; set; } = string.Empty;
     public string 배송권명 { get; set; } = string.Empty;
     public string 주문자키 { get; set; } = string.Empty;

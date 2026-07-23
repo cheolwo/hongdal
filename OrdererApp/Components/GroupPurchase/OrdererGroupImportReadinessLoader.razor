@@ -1,0 +1,116 @@
+@using Ssalddel.Contracts.Common.Orderer
+@using Ssalddel.Ui.Common.Areas.App.Services
+@implements IDisposable
+@inject I공동수입준비주문자Client ReadinessClient
+
+@if (string.IsNullOrWhiteSpace(AutoGroupId))
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        본인이 참여한 원천 자동집단 식별자가 필요합니다. 내 공동 진행 화면에서 다시 열어 주세요.
+    </MudAlert>
+}
+else if (_isLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+else if (!string.IsNullOrWhiteSpace(_error))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.body2">@_error</MudText>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       OnClick="RetryAsync">
+                다시 시도
+            </MudButton>
+        </MudStack>
+    </MudAlert>
+}
+else if (_readiness is null)
+{
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        조회할 수 있는 공동수입 준비 원장이 없습니다. 참여 원장과 준비 상태를 확인해 주세요.
+    </MudAlert>
+}
+else
+{
+    @ChildContent(_readiness)
+}
+
+@code {
+    private string? _loadedKey;
+    private bool _isLoading;
+    private string? _error;
+    private 공동수입준비주문자조회응답? _readiness;
+    private CancellationTokenSource? _loadCancellation;
+
+    [Parameter, EditorRequired] public string LedgerId { get; set; } = string.Empty;
+    [Parameter] public string? AutoGroupId { get; set; }
+    [Parameter, EditorRequired] public RenderFragment<공동수입준비주문자조회응답> ChildContent { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = $"{LedgerId}|{AutoGroupId}";
+        if (string.Equals(_loadedKey, key, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        await LoadAsync(key);
+    }
+
+    private async Task RetryAsync()
+        => await LoadAsync($"{LedgerId}|{AutoGroupId}", force: true);
+
+    private async Task LoadAsync(string key, bool force = false)
+    {
+        if (!force && string.Equals(_loadedKey, key, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadCancellation?.Cancel();
+        _loadCancellation?.Dispose();
+        var cancellation = new CancellationTokenSource();
+        _loadCancellation = cancellation;
+        _loadedKey = key;
+        _readiness = null;
+        _error = null;
+        if (string.IsNullOrWhiteSpace(LedgerId) || string.IsNullOrWhiteSpace(AutoGroupId))
+        {
+            return;
+        }
+
+        _isLoading = true;
+        try
+        {
+            _readiness = await ReadinessClient.조회Async(
+                LedgerId,
+                AutoGroupId,
+                cancellation.Token);
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+            return;
+        }
+        catch (Exception exception)
+        {
+            _error = $"공동수입 준비 자료를 불러오지 못했습니다. {exception.Message}";
+        }
+        finally
+        {
+            if (ReferenceEquals(_loadCancellation, cancellation))
+            {
+                _isLoading = false;
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _loadCancellation?.Cancel();
+        _loadCancellation?.Dispose();
+        _loadCancellation = null;
+    }
+}

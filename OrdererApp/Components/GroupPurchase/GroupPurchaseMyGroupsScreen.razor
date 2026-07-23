@@ -1,0 +1,90 @@
+@using Ssalddel.Contracts.Common.Orderer
+@inject GroupPurchaseMyWishesViewModel ViewModel
+
+@if (ViewModel.IsLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudText Typo="Typo.subtitle1">내 원함이 포함된 공동 진행 @ViewModel.Groups.Count.ToString("N0")건</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                           Color="Color.Primary"
+                           OnClick="ReloadAsync"
+                           aria-label="내 공동 진행 새로고침" />
+        </MudStack>
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.ErrorMessage</MudAlert>
+        }
+        @if (ViewModel.Groups.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                참여 중인 공동 진행이 없습니다. 먼저 재료별 비구속 원함을 저장해 주세요.
+            </MudAlert>
+            <MudButton Href="@GroupPurchasePageRoutes.WishCreate" Color="Color.Primary" Variant="Variant.Filled">여러 재료 고르기</MudButton>
+        }
+        else
+        {
+            @foreach (var group in ViewModel.Groups)
+            {
+                var wish = group.PrimaryWish;
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">@wish.상품명</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @wish.거래유형 · @wish.배송권명 · 내 원함 @group.Wishes.Count.ToString("N0")건
+                                </MudText>
+                            </MudStack>
+                            <MudChip T="string"
+                                     Color="@(group.AllWishesClosed ? Color.Default : Color.Info)"
+                                     Variant="Variant.Outlined">
+                                @(group.Summary?.현재상태 ?? (group.AllWishesClosed ? "원함 닫힘" : "집계 확인 중"))
+                            </MudChip>
+                        </MudStack>
+                        @if (group.Summary is { } summary)
+                        {
+                            <MudText Typo="Typo.body2">
+                                참여 @summary.참여자수.ToString("N0")명 · 총 희망 @summary.총희망수량.ToString("N2") @summary.수량단위
+                            </MudText>
+                            <MudProgressLinear Value="@Progress(summary)"
+                                               Color="Color.Primary"
+                                               Rounded="true" />
+                        }
+                        <MudButton Href="@GroupPurchasePageRoutes.GroupDetailFor(group.AutoGroupId)"
+                                   Variant="Variant.Outlined"
+                                   Color="Color.Primary">
+                            공동 진행 상세
+                        </MudButton>
+                    </MudStack>
+                </MudPaper>
+            }
+        }
+    </MudStack>
+}
+
+@code {
+    protected override Task OnInitializedAsync() => ViewModel.LoadAsync();
+    private Task ReloadAsync() => ViewModel.LoadAsync(force: true);
+
+    private static double Progress(공동구매자동집단요약응답 group)
+    {
+        var progress = new List<double>();
+        if (group.목표참여자수 is > 0)
+        {
+            progress.Add(100d * group.참여자수 / group.목표참여자수.Value);
+        }
+        if (group.목표수량 is > 0)
+        {
+            progress.Add(100d * (double)(group.총희망수량 / group.목표수량.Value));
+        }
+
+        return progress.Count == 0
+            ? 0d
+            : Math.Clamp(progress.Min(), 0d, 100d);
+    }
+}

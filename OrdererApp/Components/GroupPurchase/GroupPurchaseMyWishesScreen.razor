@@ -1,0 +1,133 @@
+@using Ssalddel.Contracts.Common.Orderer
+@inject GroupPurchaseMyWishesViewModel ViewModel
+
+@if (ViewModel.IsLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudStack Spacing="3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+            <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                <MudChip T="string" Color="Color.Primary">전체 @(ViewModel.Result?.전체건수 ?? 0)</MudChip>
+                <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">활성 @(ViewModel.Result?.활성건수 ?? 0)</MudChip>
+                <MudChip T="string" Color="Color.Default" Variant="Variant.Outlined">닫힘 @(ViewModel.Result?.닫힘건수 ?? 0)</MudChip>
+            </MudStack>
+            <MudStack Row="true" Spacing="1">
+                <MudButton Href="@GroupPurchasePageRoutes.WishCreate"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add">
+                    여러 재료 원함 추가
+                </MudButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                               Color="Color.Primary"
+                               Disabled="@ViewModel.IsOperating"
+                               OnClick="ReloadAsync"
+                               aria-label="내 원함 새로고침" />
+            </MudStack>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.ErrorMessage</MudAlert>
+        }
+        @if (!string.IsNullOrWhiteSpace(ViewModel.Notice))
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@ViewModel.Notice</MudAlert>
+        }
+
+        @if (ViewModel.Wishes.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                아직 저장한 원함이 없습니다. 재료를 하나 이상 골라 각 재료의 희망 수량을 남겨 보세요.
+            </MudAlert>
+        }
+        else
+        {
+            @foreach (var wish in ViewModel.Wishes)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.h6">@wish.상품명</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @TransactionLabel(wish.거래유형) · @wish.배송권명 · 수정 @DateLabel(wish.수정시각Utc)
+                                </MudText>
+                            </MudStack>
+                            <MudChip T="string"
+                                     Color="@(GroupPurchaseMyWishesViewModel.IsActive(wish) ? Color.Success : Color.Default)"
+                                     Variant="Variant.Outlined">
+                                @(GroupPurchaseMyWishesViewModel.IsActive(wish) ? "활성 원함" : "닫힌 원함")
+                            </MudChip>
+                        </MudStack>
+                        <MudText Typo="Typo.subtitle1">내 희망 @wish.희망수량.ToString("N2") @wish.수량단위</MudText>
+                        @if (wish.자동집단요약 is { } group)
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                함께 모인 수요 @group.참여자수.ToString("N0")명 · @group.총희망수량.ToString("N2") @group.수량단위
+                            </MudText>
+                        }
+                        <MudStack Row="true" Spacing="1" Wrap="Wrap.Wrap">
+                            <MudButton Href="@GroupPurchasePageRoutes.WishDetailFor(wish.개별원함원장Id)"
+                                       Variant="Variant.Outlined"
+                                       Color="Color.Primary">
+                                원함 상세
+                            </MudButton>
+                            @if (GroupPurchaseMyWishesViewModel.IsActive(wish))
+                            {
+                                <MudButton Href="@GroupPurchasePageRoutes.WishEditFor(wish.개별원함원장Id)"
+                                           Variant="Variant.Text"
+                                           Color="Color.Primary">
+                                    수량 수정
+                                </MudButton>
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Error"
+                                           Disabled="@ViewModel.IsOperating"
+                                           OnClick="@(() => AskWithdraw(wish))">
+                                    원함 철회
+                                </MudButton>
+                            }
+                        </MudStack>
+                        @if (ReferenceEquals(_pendingWithdraw, wish))
+                        {
+                            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                                이 비구속 원함을 닫을까요? 이미 만들어진 주문·계약이 있다면 그것을 취소하는 동작은 아닙니다.
+                                <MudStack Row="true" Spacing="1" Class="mt-2">
+                                    <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => ConfirmWithdrawAsync(wish))">철회 확인</MudButton>
+                                    <MudButton Variant="Variant.Text" OnClick="CancelWithdraw">계속 유지</MudButton>
+                                </MudStack>
+                            </MudAlert>
+                        }
+                    </MudStack>
+                </MudPaper>
+            }
+        }
+    </MudStack>
+}
+
+@code {
+    private 공동구매내원함응답? _pendingWithdraw;
+
+    protected override Task OnInitializedAsync() => ViewModel.LoadAsync();
+
+    private Task ReloadAsync() => ViewModel.LoadAsync(force: true);
+    private void AskWithdraw(공동구매내원함응답 wish) => _pendingWithdraw = wish;
+    private void CancelWithdraw() => _pendingWithdraw = null;
+
+    private async Task ConfirmWithdrawAsync(공동구매내원함응답 wish)
+    {
+        if (await ViewModel.WithdrawAsync(wish))
+        {
+            _pendingWithdraw = null;
+        }
+    }
+
+    private static string TransactionLabel(string value)
+        => 공동구매거래유형코드.정규화(value) == 공동구매거래유형코드.B2B ? "B2B 사업 구매" : "B2C 개인 구매";
+
+    private static string DateLabel(DateTime utc)
+        => utc == default ? "미기록" : DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+}

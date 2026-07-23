@@ -64,7 +64,13 @@ public sealed class 공동구매주문자집단화EngineTests
 
         Assert.Equal(공동구매자동집단배치유형코드.기존집단, preview.배치유형);
         Assert.False(preview.기존수요갱신여부);
-        Assert.Equal(4, preview.적용기준목록.Count);
+        Assert.Equal(6, preview.적용기준목록.Count);
+        Assert.Contains(
+            preview.적용기준목록,
+            item => item.기준코드 == 공동구매자동집단배치기준코드.거래유형);
+        Assert.Contains(
+            preview.적용기준목록,
+            item => item.기준코드 == 공동구매자동집단배치기준코드.가격표시기준);
         Assert.Equal(1, preview.현재진행.참여자수);
         Assert.Equal(2, preview.예상진행.참여자수);
         Assert.Equal(5, preview.예상진행.총희망수량);
@@ -146,6 +152,84 @@ public sealed class 공동구매주문자집단화EngineTests
         Assert.Equal(공동구매자동집단상태코드.확정대기, progress.현재상태);
         Assert.True(progress.모집종료여부);
         Assert.True(progress.모집조건충족여부);
+        Assert.True(progress.확정검토가능);
+    }
+
+    [Fact]
+    public void 기존B2C자동집단Id는_거래문맥확장후에도_유지한다()
+    {
+        var command = Command("orderer-1", "source-1");
+
+        var legacyId = 공동구매자동집단화계획기.자동집단키생성(
+            command.상품키,
+            command.배송권키,
+            command.온도코드,
+            command.물류방식);
+
+        Assert.Equal(legacyId, _engine.자동집단Id생성(command));
+    }
+
+    [Fact]
+    public void 같은상품과배송권이어도_B2B와B2C는_다른집단으로_배치한다()
+    {
+        var consumer = Command("orderer-1", "consumer-source");
+        var business = Command("orderer-1", "business-source");
+        business.거래유형 = 공동구매거래유형코드.B2B;
+        business.가격표시기준 = 공동구매가격표시기준코드.부가세별도;
+        business.구매조직표시명 = "동네마트";
+
+        Assert.NotEqual(
+            _engine.자동집단Id생성(consumer),
+            _engine.자동집단Id생성(business));
+    }
+
+    [Fact]
+    public void B2B는_가격기준과수량단위가_다르면_다른집단으로_배치한다()
+    {
+        var vatExcluded = Command("orderer-1", "business-source-1");
+        vatExcluded.거래유형 = 공동구매거래유형코드.B2B;
+        vatExcluded.가격표시기준 = 공동구매가격표시기준코드.부가세별도;
+        vatExcluded.구매조직표시명 = "동네마트";
+        var vatIncluded = Command("orderer-2", "business-source-2");
+        vatIncluded.거래유형 = 공동구매거래유형코드.B2B;
+        vatIncluded.가격표시기준 = 공동구매가격표시기준코드.부가세포함;
+        vatIncluded.구매조직표시명 = "지역식당";
+        var packageUnit = Command("orderer-3", "business-source-3");
+        packageUnit.거래유형 = 공동구매거래유형코드.B2B;
+        packageUnit.가격표시기준 = 공동구매가격표시기준코드.부가세별도;
+        packageUnit.구매조직표시명 = "지역급식소";
+        packageUnit.수량단위 = "box";
+
+        Assert.NotEqual(
+            _engine.자동집단Id생성(vatExcluded),
+            _engine.자동집단Id생성(vatIncluded));
+        Assert.NotEqual(
+            _engine.자동집단Id생성(vatExcluded),
+            _engine.자동집단Id생성(packageUnit));
+    }
+
+    [Fact]
+    public void B2B수요는_구매조직정보가_없으면_거부한다()
+    {
+        var command = Command("orderer-1", "business-source");
+        command.거래유형 = 공동구매거래유형코드.B2B;
+
+        var error = Assert.Throws<InvalidOperationException>(
+            () => _engine.배치미리보기(command, null));
+
+        Assert.Contains("구매 조직", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void B2B는_명시한한개구매조직과수량목표를_충족하면_확정검토대기다()
+    {
+        var progress = _engine.진행계산(
+            [Demand("orderer-1", "business-source", 30)],
+            목표참여자수: 1,
+            목표수량: 30,
+            거래유형: 공동구매거래유형코드.B2B);
+
+        Assert.Equal(공동구매자동집단상태코드.확정대기, progress.현재상태);
         Assert.True(progress.확정검토가능);
     }
 

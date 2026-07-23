@@ -31,13 +31,15 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
         [FromQuery(Name = "productKey")] string? 상품키,
         [FromQuery(Name = "deliveryScopeKey")] string? 배송권키,
         [FromQuery(Name = "currentStatus")] string? 현재상태,
+        [FromQuery(Name = "transactionType")] string? 거래유형,
         CancellationToken cancellationToken)
     {
         var result = await _useCase.목록조회Async(new 공동구매자동집단조회조건
         {
             상품키 = 상품키,
             배송권키 = 배송권키,
-            현재상태 = 현재상태
+            현재상태 = 현재상태,
+            거래유형 = 거래유형
         }, cancellationToken);
 
         if (!result.성공)
@@ -113,13 +115,15 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
         [FromRoute(Name = "demandSourceKey")] string 수요출처키,
         [FromHeader(Name = "Idempotency-Key")] string? 요청멱등키,
         [FromQuery(Name = "reason")] string? 철회사유,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "expectedWishRevision")] long? 개별원함기대Revision = null)
     {
         var result = await _useCase.수요철회Async(new 공동구매자동수요철회Command
         {
             수요출처키 = 수요출처키,
             요청멱등키 = 요청멱등키?.Trim() ?? string.Empty,
             주문자키 = CurrentUserId(),
+            개별원함기대Revision = 개별원함기대Revision,
             철회사유 = 철회사유?.Trim() ?? string.Empty
         }, cancellationToken);
         if (!result.성공)
@@ -206,6 +210,8 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
             HS코드 = source.HS코드,
             온도코드 = source.온도코드,
             물류방식 = source.물류방식,
+            거래유형 = source.거래유형,
+            가격표시기준 = source.가격표시기준,
             배송권키 = source.배송권키,
             배송권명 = source.배송권명,
             현재상태 = source.현재상태,
@@ -230,9 +236,16 @@ public sealed class 공동구매자동집단화Controller : ControllerBase
             수요Id = source.수요Id,
             수요출처키 = source.수요출처키,
             커뮤니티게시글Id = source.커뮤니티게시글Id,
+            개별원함원장Id = source.개별원함원장Id,
             자동집단Id = source.자동집단Id,
             상품키 = source.상품키,
             상품명 = source.상품명,
+            거래유형 = source.거래유형,
+            가격표시기준 = source.가격표시기준,
+            구매조직참조키 = source.구매조직참조키,
+            구매조직표시명 = source.구매조직표시명,
+            사업자검증상태 = source.사업자검증상태,
+            세금계산서필요 = source.세금계산서필요,
             주문자키 = source.주문자키,
             배송권키 = source.배송권키,
             배송권명 = source.배송권명,

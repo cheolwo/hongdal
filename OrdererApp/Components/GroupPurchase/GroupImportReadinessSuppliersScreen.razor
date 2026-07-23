@@ -1,0 +1,59 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudPaper Elevation="0" Outlined="true" Class="pa-4">
+    <MudStack Spacing="3">
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.h6">공급자 후보의 공식 근거</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                후보를 비교하기 위한 자료이며 플랫폼이 공급자를 자동 선정하거나 연락하지 않습니다.
+            </MudText>
+        </MudStack>
+
+        @if (Ledger.공급자근거목록.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">등록된 공급자 근거가 없습니다.</MudAlert>
+        }
+        else
+        {
+            @foreach (var supplier in Ledger.공급자근거목록)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                    <MudStack Spacing="1">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                            <MudText Typo="Typo.subtitle1">@supplier.조직명</MudText>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">
+                                @supplier.국가코드 · @supplier.관계코드
+                            </MudChip>
+                        </MudStack>
+                        <MudText Typo="Typo.body2">@supplier.근거요약</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            공식 근거 확인 @DateLabel(supplier.확인시각Utc)
+                        </MudText>
+                        @if (!string.IsNullOrWhiteSpace(supplier.원출처Url))
+                        {
+                            <MudLink Href="@supplier.원출처Url" Target="_blank" Typo="Typo.caption">
+                                @ValueOrPending(supplier.원출처명)
+                            </MudLink>
+                        }
+                        @if (supplier.최신상태재확인필요)
+                        {
+                            <MudAlert Severity="Severity.Warning" Variant="Variant.Text" Dense="true">
+                                거래 전에 공식 출처의 최신 상태를 다시 확인해야 합니다.
+                            </MudAlert>
+                        }
+                    </MudStack>
+                </MudPaper>
+            }
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public 공동수입준비주문자조회응답 Ledger { get; set; } = default!;
+
+    private static string ValueOrPending(string? value)
+        => string.IsNullOrWhiteSpace(value) ? "미확인" : value;
+
+    private static string DateLabel(DateTimeOffset value)
+        => value == default ? "미기록" : value.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+}

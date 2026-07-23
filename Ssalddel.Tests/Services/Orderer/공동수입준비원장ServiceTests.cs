@@ -25,6 +25,8 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.True(created.생성됨);
         Assert.False(created.이미처리됨);
         Assert.Equal(공동수입준비원장상태코드.전문검토자료준비, created.상태코드);
+        Assert.Equal(공동구매거래유형코드.B2C, created.거래문맥.거래유형);
+        Assert.Equal(공동구매가격표시기준코드.부가세포함, created.거래문맥.가격표시기준);
         Assert.True(created.평가.전문검토인계가능);
         Assert.False(created.평가.계약서명가능);
         Assert.False(created.평가.결제가능);
@@ -39,14 +41,93 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.Equal(1, fixture.DemandOperatingSystem.LinkCount);
 
         var ledger = Assert.Single(fixture.LedgerStore.Items.Values);
-        Assert.Equal("1.5", ledger.확장속성["WorkflowVersion"]);
-        Assert.Equal("NoContractNoPaymentNoFilingNoTransport", ledger.확장속성["ExecutionBoundary"]);
+        Assert.Equal("1.5", ledger.확장속성["ReadinessWorkflowVersion"]);
+        Assert.Equal(
+            "NoForwarderAutoSelectionNoExternalAutoSendNoContractNoPaymentNoFilingNoTransport",
+            ledger.확장속성["ExecutionBoundary"]);
+        Assert.StartsWith("group-import-", ledger.원장Id, StringComparison.Ordinal);
+        Assert.DoesNotContain("readiness", ledger.원장Id, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(커뮤니티원장상태.진행중, ledger.상태);
         Assert.DoesNotContain(ledger.포함원장목록, item =>
             item.원장템플릿Key == CommunityLedgerTemplateKeys.CargoTransport
             || item.원장템플릿Key == CommunityLedgerTemplateKeys.WarehouseInbound);
         var boundary = Assert.Single(ledger.블록목록, block => block.BlockId == "execution-boundary");
         Assert.All(boundary.Data.Values, value => Assert.Equal(bool.FalseString, value));
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "forwarder-handoff");
+        var transactionContext = Assert.Single(ledger.블록목록, block => block.BlockId == "transaction-context");
+        Assert.Equal(공동구매거래유형코드.B2C, transactionContext.Data[공동구매거래문맥원장키.거래유형]);
+        Assert.Equal(
+            공동구매가격표시기준코드.부가세포함,
+            ledger.외부참조[공동구매거래문맥원장키.가격표시기준]);
+    }
+
+    [Fact]
+    public async Task 기존공동수입원장이있으면_별도준비원장을만들지않고_준비블록만병합한다()
+    {
+        var fixture = CreateFixture();
+        const string existingLedgerId = "group-import-existing-canonical";
+        fixture.LedgerStore.Items[existingLedgerId] = new 커뮤니티원장Dto
+        {
+            원장Id = existingLedgerId,
+            Revision = 4,
+            커뮤니티Id = "platform",
+            원장템플릿Key = CommunityLedgerTemplateKeys.GroupImport,
+            제목 = "기존 공동수입 원장",
+            상태 = 커뮤니티원장상태.진행중,
+            현재단계Key = CommunityGroupImportLedgerStageCodes.Shipment,
+            대상OsCode = CommunityLedgerOperatingSystemCodes.GroupPurchaseImport,
+            대상OsName = "공동수입 OS",
+            블록목록 =
+            [
+                new 커뮤니티원장블록Dto
+                {
+                    BlockId = "shipment-customs",
+                    BlockType = CommunityLedgerBlockTypes.Generic,
+                    Title = "기존 선적·통관 블록",
+                    State = "planned"
+                }
+            ],
+            포함원장목록 =
+            [
+                new 커뮤니티포함원장참조Dto
+                {
+                    원장Id = fixture.Group.공동구매주문집계원장Id,
+                    원장템플릿Key = CommunityLedgerTemplateKeys.GroupPurchase,
+                    역할 = 공동수입원장관계역할.원천공동구매,
+                    관계유형 = CommunityLedgerRelationTypes.Reference
+                }
+            ],
+            다이어그램스냅샷 = new DiagramSnapshotDto
+            {
+                DiagramId = "existing-group-import-diagram",
+                DiagramName = "기존 공동수입 실행 다이어그램",
+                LedgerTemplateKey = CommunityLedgerTemplateKeys.GroupImport
+            },
+            외부참조 = new Dictionary<string, string> { ["ExistingReference"] = "preserved" },
+            확장속성 = new Dictionary<string, string> { ["WorkflowVersion"] = "1.0" },
+            생성시각Utc = Now.UtcDateTime.AddDays(-2),
+            수정시각Utc = Now.UtcDateTime.AddDays(-1)
+        };
+        var request = CompleteRequest();
+        request.기대Revision = 4;
+
+        var result = await fixture.Service.저장Async(
+            fixture.Group.자동집단Id,
+            request,
+            "admin-1",
+            "운영 관리자");
+
+        Assert.False(result.생성됨);
+        Assert.Equal(existingLedgerId, result.원장Id);
+        var ledger = Assert.Single(fixture.LedgerStore.Items.Values);
+        Assert.Equal(CommunityGroupImportLedgerStageCodes.Shipment, ledger.현재단계Key);
+        Assert.Equal("existing-group-import-diagram", ledger.다이어그램스냅샷?.DiagramId);
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "shipment-customs");
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "trade-readiness-request");
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "forwarder-handoff");
+        Assert.Equal("preserved", ledger.외부참조["ExistingReference"]);
+        Assert.Equal("1.0", ledger.확장속성["WorkflowVersion"]);
+        Assert.Equal("1.5", ledger.확장속성["ReadinessWorkflowVersion"]);
     }
 
     [Fact]
@@ -113,7 +194,7 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.Equal(1, fixture.LedgerStore.SaveCount);
         Assert.Equal(2, fixture.DemandOperatingSystem.LinkCount);
 
-        request.재료명 = "서로 다른 재료";
+        request.출발국가코드 = "VN";
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             fixture.Service.저장Async(
                 fixture.Group.자동집단Id,
@@ -122,6 +203,150 @@ public sealed class 공동수입준비원장ServiceTests
                 "운영 관리자"));
         Assert.Contains("같은 멱등 키", exception.Message, StringComparison.Ordinal);
         Assert.Equal(1, fixture.LedgerStore.SaveCount);
+    }
+
+    [Fact]
+    public async Task 여러승인수요집단의재료를_한준비원장에연결하고_품목별근거를검증한다()
+    {
+        var secondGroup = new 공동구매자동집단응답
+        {
+            자동집단Id = "auto-group-spice-210690-kr-seoul",
+            공동구매주문집계원장Id = "group-purchase-demand-ledger-2",
+            상품키 = "ingredient-spice",
+            상품명 = "혼합 향신료",
+            HS코드 = "2106.90",
+            온도코드 = "상온",
+            물류방식 = "ReviewRequired",
+            배송권키 = "KR-11",
+            배송권명 = "서울 모집권",
+            현재상태 = 공동구매자동집단상태코드.확정,
+            수요건수 = 12,
+            참여자수 = 12,
+            총희망수량 = 720m,
+            수량단위 = "kg",
+            목표수량 = 600m,
+            모집조건충족여부 = true
+        };
+        var fixture = CreateFixture(additionalGroups: [secondGroup]);
+        var request = CompleteRequest();
+        request.재료품목목록 =
+        [
+            new 공동수입준비재료품목 { 원천자동집단Id = fixture.Group.자동집단Id },
+            new 공동수입준비재료품목 { 원천자동집단Id = secondGroup.자동집단Id }
+        ];
+        request.견적목록[0].재료키 = fixture.Group.상품키;
+        request.견적목록.Add(new 공동수입견적근거
+        {
+            견적키 = "quote-2",
+            재료키 = secondGroup.상품키,
+            공급자후보키 = "supplier-1",
+            통화코드 = "KRW",
+            수량단위 = "kg",
+            최소주문수량 = 600m,
+            단가 = 4_100m,
+            납기일수 = 25,
+            포장조건 = "10kg 식품용 카톤",
+            Incoterms후보 = "FCA Qingdao",
+            유효기한Utc = Now.AddDays(14),
+            원출처명 = "공급자 서면 견적",
+            원출처Url = "https://example.com/evidence/quote-2",
+            확인시각Utc = Now.AddHours(-1)
+        });
+        request.품목분류후보목록[0].재료키 = fixture.Group.상품키;
+        request.품목분류후보목록.Add(new 공동수입품목분류후보
+        {
+            후보키 = "classification-kr-spice",
+            재료키 = secondGroup.상품키,
+            관할국가코드 = "KR",
+            분류체계코드 = 공동수입준비품목분류체계코드.한국HsK,
+            품목코드 = "2106909099",
+            분류근거 = "혼합 원재료와 조제품 가공 상태 대조",
+            신뢰도 = 0.76m,
+            검토상태코드 = 공동수입준비검토상태코드.전문가검토필요,
+            원출처Url = "https://unipass.customs.go.kr/",
+            확인시각Utc = Now.AddHours(-1),
+            전문가검토필요 = true
+        });
+
+        var result = await fixture.Service.저장Async(
+            fixture.Group.자동집단Id,
+            request,
+            "admin-1",
+            "운영 관리자");
+
+        Assert.Equal(2, result.준비자료.재료품목목록.Count);
+        Assert.Equal(2, result.원천수요목록.Count);
+        Assert.True(result.평가.재료품목구조완료);
+        Assert.True(result.평가.견적구조완료);
+        Assert.True(result.평가.품목분류후보구조완료);
+        Assert.True(result.평가.국제운송검토구조완료);
+        Assert.Contains(result.평가.경고목록, item => item.Contains("LCL/FCL", StringComparison.Ordinal));
+        Assert.Equal(2, fixture.DemandOperatingSystem.LinkCount);
+        var ledger = Assert.Single(fixture.LedgerStore.Items.Values);
+        Assert.Equal(2, ledger.포함원장목록.Count);
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "material-items");
+        Assert.Contains(ledger.블록목록, block => block.BlockId == "international-transport-review");
+    }
+
+    [Fact]
+    public async Task 거래문맥이다른수요집단은_같은공동수입원장에합치지않는다()
+    {
+        var businessGroup = Group();
+        businessGroup.자동집단Id = "auto-group-business-spice";
+        businessGroup.공동구매주문집계원장Id = "group-purchase-demand-ledger-b2b";
+        businessGroup.상품키 = "ingredient-business-spice";
+        businessGroup.상품명 = "사업용 향신료";
+        businessGroup.거래유형 = 공동구매거래유형코드.B2B;
+        businessGroup.가격표시기준 = 공동구매가격표시기준코드.부가세별도;
+        var fixture = CreateFixture(additionalGroups: [businessGroup]);
+        var request = CompleteRequest();
+        request.재료품목목록 =
+        [
+            new 공동수입준비재료품목 { 원천자동집단Id = fixture.Group.자동집단Id },
+            new 공동수입준비재료품목 { 원천자동집단Id = businessGroup.자동집단Id }
+        ];
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            fixture.Service.미리보기Async(fixture.Group.자동집단Id, request));
+
+        Assert.Contains("거래 문맥별로 원장을 나눠", exception.Message, StringComparison.Ordinal);
+        Assert.Empty(fixture.LedgerStore.Items);
+    }
+
+    [Fact]
+    public async Task 준비자료를갱신해도_같은원장의1_5Os상태블록을보존한다()
+    {
+        var fixture = CreateFixture();
+        var created = await fixture.Service.저장Async(
+            fixture.Group.자동집단Id,
+            CompleteRequest(),
+            "admin-1",
+            "운영 관리자");
+        var ledger = Assert.Single(fixture.LedgerStore.Items.Values);
+        ledger.블록목록 = ledger.블록목록.Append(new 커뮤니티원장블록Dto
+        {
+            BlockId = "trade-readiness-os-state",
+            BlockType = CommunityLedgerBlockTypes.Generic,
+            Title = "1.5 OS 상태",
+            State = 공동수입준비Os상태코드.전문검토인계준비,
+            Data = new Dictionary<string, string> { ["Json"] = "{}" }
+        }).ToArray();
+        ledger.Revision++;
+        var update = CompleteRequest();
+        update.요청멱등키 = "readiness-update-with-os-state";
+        update.기대Revision = ledger.Revision;
+
+        var updated = await fixture.Service.저장Async(
+            fixture.Group.자동집단Id,
+            update,
+            "admin-1",
+            "운영 관리자");
+
+        Assert.Equal(created.Revision + 2, updated.Revision);
+        Assert.Contains(
+            Assert.Single(fixture.LedgerStore.Items.Values).블록목록,
+            block => block.BlockId == "trade-readiness-os-state"
+                     && block.Data.GetValueOrDefault("Json") == "{}");
     }
 
     [Fact]
@@ -139,25 +364,28 @@ public sealed class 공동수입준비원장ServiceTests
         Assert.True(unitedStates.전문검토인계가능);
     }
 
-    private static Fixture CreateFixture(bool approved = true)
+    private static Fixture CreateFixture(
+        bool approved = true,
+        IReadOnlyList<공동구매자동집단응답>? additionalGroups = null)
     {
         var group = Group();
-        var state = new 공동구매수요모집Os상태응답
+        var groups = new[] { group }.Concat(additionalGroups ?? []).ToArray();
+        var states = groups.Select((item, index) => new 공동구매수요모집Os상태응답
         {
-            자동집단Id = group.자동집단Id,
+            자동집단Id = item.자동집단Id,
             인계상태 = approved
                 ? 공동구매수요모집인계상태코드.승인후속대기
                 : 공동구매수요모집인계상태코드.승인대기,
-            인계요청Id = approved ? "handoff-1" : string.Empty,
+            인계요청Id = approved ? $"handoff-{index + 1}" : string.Empty,
             승인자키 = approved ? "admin-approver" : string.Empty,
             승인시각Utc = approved ? Now.UtcDateTime : null,
             후속워크플로우활성여부 = true,
             실행모드 = "Simulation",
             시뮬레이션여부 = true
-        };
-        var groupStore = new FakeGroupStore(group);
+        }).ToArray();
+        var groupStore = new FakeGroupStore(groups);
         var ledgerStore = new FakeLedgerStore();
-        var demandOperatingSystem = new FakeDemandOperatingSystem(state);
+        var demandOperatingSystem = new FakeDemandOperatingSystem(states);
         var service = new 공동수입준비원장Service(
             groupStore,
             demandOperatingSystem,
@@ -332,36 +560,41 @@ public sealed class 공동수입준비원장ServiceTests
         public override DateTimeOffset GetUtcNow() => now;
     }
 
-    private sealed class FakeGroupStore(공동구매자동집단응답 group) : I공동구매자동집단화저장소
+    private sealed class FakeGroupStore(IReadOnlyList<공동구매자동집단응답> groups) : I공동구매자동집단화저장소
     {
         public Task<공동구매자동집단응답?> 집단조회Async(string 자동집단Id, CancellationToken cancellationToken = default)
-            => Task.FromResult(string.Equals(자동집단Id, group.자동집단Id, StringComparison.Ordinal)
-                ? group
-                : null);
+            => Task.FromResult(groups.FirstOrDefault(group => string.Equals(
+                자동집단Id,
+                group.자동집단Id,
+                StringComparison.Ordinal)));
 
         public Task<IReadOnlyList<공동구매자동집단응답>> 집단목록조회Async(공동구매자동집단조회조건 조건, CancellationToken cancellationToken = default)
-            => Task.FromResult<IReadOnlyList<공동구매자동집단응답>>([group]);
+            => Task.FromResult(groups);
 
         public Task<공동구매자동집단응답> 수요등록Async(공동구매자동수요등록Command command, CancellationToken cancellationToken = default)
-            => Task.FromResult(group);
+            => Task.FromResult(groups[0]);
 
         public Task<공동구매자동수요철회응답> 수요철회Async(공동구매자동수요철회Command command, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
+
+        public Task<공동구매자동집단응답> 개별원함원장연결Async(string 자동집단Id, string 수요Id, string 개별원함원장Id, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
 
         public Task<공동구매자동집단응답> 개별주문원장연결Async(string 자동집단Id, string 수요Id, string 공동구매주문집계원장Id, string 개별주문원장Id, string 입고예정원장Id, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
     }
 
-    private sealed class FakeDemandOperatingSystem(공동구매수요모집Os상태응답 state) : I공동구매수요모집OS
+    private sealed class FakeDemandOperatingSystem(IReadOnlyList<공동구매수요모집Os상태응답> states) : I공동구매수요모집OS
     {
         public string LinkedHandoffId { get; private set; } = string.Empty;
         public string LinkedLedgerId { get; private set; } = string.Empty;
         public int LinkCount { get; private set; }
 
         public Task<공동구매수요모집Os상태응답?> 운영상태조회Async(string 자동집단Id, CancellationToken cancellationToken = default)
-            => Task.FromResult(string.Equals(자동집단Id, state.자동집단Id, StringComparison.Ordinal)
-                ? state
-                : null);
+            => Task.FromResult(states.FirstOrDefault(state => string.Equals(
+                자동집단Id,
+                state.자동집단Id,
+                StringComparison.Ordinal)));
 
         public Task<공동구매자동집단응답> 수요등록조율Async(공동구매자동수요등록Command command, CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
@@ -384,6 +617,7 @@ public sealed class 공동수입준비원장ServiceTests
             string 대상원장Id,
             CancellationToken cancellationToken = default)
         {
+            var state = states.Single(item => string.Equals(item.자동집단Id, 자동집단Id, StringComparison.Ordinal));
             LinkCount++;
             LinkedHandoffId = 인계요청Id;
             LinkedLedgerId = 대상원장Id;

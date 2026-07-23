@@ -17,6 +17,44 @@ public static class CommunityLedgerTemplateCatalog
     [
         new()
         {
+            Key = CommunityLedgerTemplateKeys.IndividualDemand,
+            DisplayName = "개별 원함 원장",
+            Category = "개인 원본 원장",
+            WorkflowTag = "개별 원함·비구속 수요",
+            TargetOperatingSystemCode = CommunityLedgerOperatingSystemCodes.CommunityTrust,
+            TargetOperatingSystemName = "커뮤니티 신뢰 OS",
+            Summary = "한 사용자가 원하는 상품·수량·수령 권역과 거래 문맥을 비구속 상태로 먼저 보존하는 원본 원장입니다. 자동집단은 이 개인 원장을 참조해 구성하며 개인의 선택을 대신 확정하지 않습니다.",
+            EngineHints = [CommunityLedgerEngineHints.Grouping],
+            UiSectionHints = ["원함 주체", "원하는 상품", "희망 수량", "수령 권역", "거래 문맥", "비구속 상태", "자동집단 참조"],
+            ActionHints = ["개별 원함 저장", "개별 원함 변경", "개별 원함 철회", "자동집단 후보 확인"],
+            CompositionRules =
+            [
+                Rule(
+                    CommunityLedgerCompositionRuleCodes.IndividualDemandBeforeAutomaticGrouping,
+                    "개별 원함을 먼저 보존한 뒤 공동집단에 투영합니다.",
+                    "사용자별 상품·수량·수령 권역과 비구속 상태를 개별 원함 원장에 저장한 뒤, 상품과 공동 조건이 맞는 자동집단이 이 원장을 참조하도록 합니다.",
+                    requiredLedgerTemplateKeys: [CommunityLedgerTemplateKeys.GroupPurchase],
+                    requiredUiSectionHints: ["원함 주체", "원하는 상품", "희망 수량", "수령 권역", "비구속 상태"],
+                    gatedActionHints: ["자동집단 후보 확인"])
+            ],
+            ProcessingSurfaces =
+            [
+                ApiEndpoint("PUT", "공동구매자동집단화Controller", "비구속수요저장", "개별 원함 원장을 먼저 저장하고 자동집단 수요에 그 원장 참조를 연결합니다.", "I공동구매자동집단화UseCase.비구속수요저장Async"),
+                ApiEndpoint("DELETE", "공동구매자동집단화Controller", "비구속수요철회", "본인의 비구속 수요를 철회하고 대응하는 개별 원함 원장을 닫습니다.", "I공동구매자동집단화UseCase.수요철회Async")
+            ],
+            PersistencePolicy = MongoPolicy(
+                Projection("자동집단 수요", "GroupPurchaseDemand / 공동구매자동수요", "IndividualDemandLedgerId", "개별 원함 원장을 상품·수령 권역·거래 문맥별 자동집단 수요로 투영합니다.")),
+            BestLedgerPatternTitle = "개별 원함을 원본으로 두는 공동집단",
+            BestLedgerPatternSummary = "개인의 원함·변경·철회를 독립 원장에 먼저 남기고, 공동집단은 여러 개인 원장의 공통 조건만 집계합니다. 주문·결제·계약은 별도의 명시적 동의 뒤에 생성합니다.",
+            CommunityDiscussionPrompts = ["내가 원하는 상품과 수량은 무엇인가요?", "어느 수령 권역까지 함께 묶여도 괜찮나요?", "이 관심을 언제든 변경하거나 철회할 수 있나요?"],
+            Roles =
+            [
+                Role("원함 주체", "자신의 상품·수량·수령 권역을 저장하고 변경하거나 철회합니다.", CommunityLedgerPermissionCodes.ChangeState, CommunityLedgerPermissionCodes.CloseLedger),
+                Role("확인자", "자동집단이 개인 원장의 명시된 조건만 참조하는지 확인합니다.", CommunityLedgerPermissionCodes.ConfirmCompletion)
+            ]
+        },
+        new()
+        {
             Key = CommunityLedgerTemplateKeys.Order,
             DisplayName = "주문 원장",
             Category = "통합 원장",

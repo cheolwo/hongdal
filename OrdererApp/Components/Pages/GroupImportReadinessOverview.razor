@@ -1,0 +1,18 @@
+@page "/group-purchase/imports/{LedgerId}"
+
+<PageTitle>공동수입 준비 현황</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.Overview"
+                                Title="공동수입 준비 현황"
+                                Description="여러 재료를 묶은 공동수입 원장의 1.5 준비도와 미확인 항목을 확인합니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessOverviewScreen Ledger="ledger" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

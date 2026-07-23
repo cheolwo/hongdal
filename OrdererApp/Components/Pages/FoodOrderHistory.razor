@@ -1,0 +1,39 @@
+@page "/orders/food"
+@inject NavigationManager Navigation
+
+<PageTitle>음식 주문 내역</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">음식 주문 내역</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    로그인한 계정의 실제 음식 주문 목록과 선택한 정확한 주문 상세를 확인합니다.
+                </MudText>
+            </MudStack>
+            <MudButton Href="/orders"
+                       Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                전체 주문 원장
+            </MudButton>
+        </MudStack>
+
+        <OrdererFoodOrderWorkspace OrderNo="@OrderNo"
+                                   OrderSelected="OnOrderSelectedAsync" />
+    </MudStack>
+</MudContainer>
+
+@code {
+    [SupplyParameterFromQuery(Name = "orderNo")]
+    public string? OrderNo { get; set; }
+
+    private Task OnOrderSelectedAsync(string? orderNo)
+    {
+        var target = string.IsNullOrWhiteSpace(orderNo)
+            ? "/orders/food"
+            : $"/orders/food?orderNo={Uri.EscapeDataString(orderNo.Trim())}";
+        Navigation.NavigateTo(target, replace: true);
+        return Task.CompletedTask;
+    }
+}

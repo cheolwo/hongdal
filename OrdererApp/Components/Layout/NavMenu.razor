@@ -10,7 +10,10 @@
     <MudNavLink Href="@OrdererRoutes.Mart" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storefront">홈달마트</MudNavLink>
     <MudNavLink Href="food/restaurants" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.RamenDining">음식점</MudNavLink>
     <MudNavLink Href="cargo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory2">화물·공산품 주문</MudNavLink>
-    <MudNavLink Href="@OrdererRoutes.GroupPurchase" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups">공동구매</MudNavLink>
+    <MudNavLink Href="@OrdererRoutes.GroupPurchase" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Groups">공동구매 개요</MudNavLink>
+    <MudNavLink Href="@OrdererRoutes.GroupPurchaseProducts" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">공동구매 재료</MudNavLink>
+    <MudNavLink Href="@OrdererRoutes.GroupPurchaseWishes" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FavoriteBorder">내 원함</MudNavLink>
+    <MudNavLink Href="@OrdererRoutes.GroupPurchaseGroups" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.GroupWork">내 공동 진행</MudNavLink>
     <MudDivider Class="my-3" />
     <MudNavLink Href="orders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ReceiptLong">주문 내역</MudNavLink>
 </MudNavMenu>

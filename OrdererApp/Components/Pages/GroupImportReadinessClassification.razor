@@ -1,0 +1,18 @@
+@page "/group-purchase/imports/{LedgerId}/classification"
+
+<PageTitle>공동수입 품목분류와 규제</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.Classification"
+                                Title="품목분류와 국가별 규제"
+                                Description="재료별 HSK·HTS 후보와 국가별 공식 검토 항목을 확정 전 근거로 확인합니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessClassificationScreen Ledger="ledger" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

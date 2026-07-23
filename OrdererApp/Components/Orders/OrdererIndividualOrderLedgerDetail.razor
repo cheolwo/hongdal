@@ -1,0 +1,215 @@
+@using Ssalddel.Contracts.Common.Community
+@inject 주문조회ViewModel OrderLedger
+
+@if (_loading)
+{
+    <MudPaper Elevation="0" Outlined="true" Class="pa-6">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="2">
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+            <MudText Typo="Typo.body2">정확한 주문 원장을 불러오고 있습니다.</MudText>
+        </MudStack>
+    </MudPaper>
+}
+else if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+        @_errorMessage
+        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="ReloadAsync">
+            다시 시도
+        </MudButton>
+    </MudAlert>
+}
+else if (_order is not null)
+{
+    var ledger = _order.주문원장상세;
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h5">@Display(ledger?.제목, "개별주문")</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        @Display(_order.주문원장조회근거, "주문 당사자 보호형 조회")
+                    </MudText>
+                </MudStack>
+                <MudChip T="string" Color="@StatusColor(_order.주문원장상태)" Variant="Variant.Outlined">
+                    @Display(_order.주문원장상태, "상태 확인 중")
+                </MudChip>
+            </MudStack>
+
+            @if (ledger is null)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                    이 계정에는 주문 원장의 세부 정보가 공개되지 않았습니다.
+                </MudAlert>
+            }
+            else
+            {
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">현재 단계</MudText>
+                        <MudText Typo="Typo.body1">@Display(ledger.현재단계Key)</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Revision</MudText>
+                        <MudText Typo="Typo.body1">@ledger.Revision.ToString("N0")</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">주문자</MudText>
+                        <MudText Typo="Typo.body1">@Display(ledger.생성자표시명, "본인")</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">최근 수정</MudText>
+                        <MudText Typo="Typo.body1">@FormatDateTime(ledger.수정시각Utc)</MudText>
+                    </MudItem>
+                </MudGrid>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                <MudText Typo="Typo.h6">연결된 이행 원장</MudText>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">
+                    @_order.관련원장목록.Count.ToString("N0")개
+                </MudChip>
+            </MudStack>
+
+            @if (_order.관련원장목록.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    아직 판매·입출고·배송 등 연결된 이행 원장이 없습니다.
+                </MudAlert>
+            }
+            else
+            {
+                @foreach (var related in _order.관련원장목록.OrderBy(item => item.주문안역할))
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3" @key="related.원장Id">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.subtitle1">
+                                    @Display(related.원장상세?.제목, Display(related.주문안역할, "연결 원장"))
+                                </MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @related.원장Id · @Display(related.원장템플릿Key)
+                                </MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    @Display(related.조회근거)
+                                </MudText>
+                            </MudStack>
+                            <MudStack AlignItems="AlignItems.End" Spacing="1">
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Color="@(related.상세조회가능여부 ? Color.Success : Color.Default)"
+                                         Variant="Variant.Outlined">
+                                    @(related.상세조회가능여부 ? "상세 공개" : "요약 공개")
+                                </MudChip>
+                                @if (related.필수여부)
+                                {
+                                    <MudText Typo="Typo.caption" Color="Color.Warning">필수 이행</MudText>
+                                }
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                }
+            }
+
+            @if (_order.상세공개요청필요수 > 0)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                    연결 원장 @_order.상세공개요청필요수.ToString("N0")건은 담당자의 상세 공개 승인이 필요합니다.
+                </MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudButton Variant="Variant.Outlined"
+               StartIcon="@Icons.Material.Filled.Refresh"
+               Disabled="@_loading"
+               OnClick="ReloadAsync">
+        원장 새로고침
+    </MudButton>
+}
+
+@code {
+    private 주문원장역할별조회공개Dto? _order;
+    private string? _loadedOrderLedgerId;
+    private string? _errorMessage;
+    private bool _loading;
+
+    [Parameter, EditorRequired]
+    public string OrderLedgerId { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.Equals(_loadedOrderLedgerId, OrderLedgerId, StringComparison.Ordinal))
+        {
+            await LoadAsync();
+        }
+    }
+
+    public Task ReloadAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        if (string.IsNullOrWhiteSpace(OrderLedgerId))
+        {
+            _order = null;
+            _errorMessage = "조회할 주문 원장 ID가 없습니다.";
+            return;
+        }
+
+        _loading = true;
+        _errorMessage = null;
+        _order = null;
+
+        try
+        {
+            var normalizedId = OrderLedgerId.Trim();
+            OrderLedger.주문원장선택(normalizedId);
+            OrderLedger.보기선택(주문원장보기코드.주문자보호);
+            var succeeded = await OrderLedger.조회Async();
+            _loadedOrderLedgerId = normalizedId;
+            _order = OrderLedger.항목;
+            if (!succeeded || _order is null)
+            {
+                _errorMessage = OrderLedger.오류메시지
+                    ?? "주문 원장을 찾을 수 없거나 이 계정에 조회 권한이 없습니다.";
+            }
+        }
+        catch (Exception exception)
+        {
+            _errorMessage = $"주문 원장을 불러오지 못했습니다. {exception.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static string Display(string? value, string fallback = "미확인")
+        => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+
+    private static string FormatDateTime(DateTime utc)
+        => utc == default
+            ? "미확인"
+            : DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime().ToString("yyyy.MM.dd HH:mm");
+
+    private static Color StatusColor(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return Color.Default;
+        }
+
+        return status.Contains("완료", StringComparison.OrdinalIgnoreCase)
+            || status.Contains("확정", StringComparison.OrdinalIgnoreCase)
+                ? Color.Success
+                : status.Contains("취소", StringComparison.OrdinalIgnoreCase)
+                  || status.Contains("철회", StringComparison.OrdinalIgnoreCase)
+                    ? Color.Error
+                    : Color.Info;
+    }
+}

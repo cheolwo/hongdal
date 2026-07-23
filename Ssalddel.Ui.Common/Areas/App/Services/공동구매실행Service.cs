@@ -65,6 +65,18 @@ public interface I비구속공동구매수요Service
         string? reason = null,
         CancellationToken cancellationToken = default)
         => throw new NotSupportedException("이 서비스는 비구속 수요 철회를 지원하지 않습니다.");
+
+    Task<공동구매자동수요철회응답?> 비구속수요철회Async(
+        string demandSourceKey,
+        string idempotencyKey,
+        long expectedWishRevision,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+        => 비구속수요철회Async(
+            demandSourceKey,
+            idempotencyKey,
+            reason,
+            cancellationToken);
 }
 
 /// <summary>
@@ -200,13 +212,48 @@ public sealed class 공동구매실행Service(ISsalddelJsonApiClient client) : I
         string idempotencyKey,
         string? reason = null,
         CancellationToken cancellationToken = default)
+        => 비구속수요철회내부Async(
+            demandSourceKey,
+            idempotencyKey,
+            expectedWishRevision: null,
+            reason,
+            cancellationToken);
+
+    public Task<공동구매자동수요철회응답?> 비구속수요철회Async(
+        string demandSourceKey,
+        string idempotencyKey,
+        long expectedWishRevision,
+        string? reason = null,
+        CancellationToken cancellationToken = default)
+        => 비구속수요철회내부Async(
+            demandSourceKey,
+            idempotencyKey,
+            expectedWishRevision,
+            reason,
+            cancellationToken);
+
+    private Task<공동구매자동수요철회응답?> 비구속수요철회내부Async(
+        string demandSourceKey,
+        string idempotencyKey,
+        long? expectedWishRevision,
+        string? reason,
+        CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(demandSourceKey);
         ArgumentException.ThrowIfNullOrWhiteSpace(idempotencyKey);
         var path = $"{AutoGroupsPath}/demands/{Segment(demandSourceKey)}";
+        var query = new List<string>();
         if (!string.IsNullOrWhiteSpace(reason))
         {
-            path += $"?reason={Uri.EscapeDataString(reason.Trim())}";
+            query.Add($"reason={Uri.EscapeDataString(reason.Trim())}");
+        }
+        if (expectedWishRevision is not null)
+        {
+            query.Add($"expectedWishRevision={expectedWishRevision.Value}");
+        }
+        if (query.Count > 0)
+        {
+            path += $"?{string.Join("&", query)}";
         }
 
         return client.SendWithHeadersAsync<공동구매자동수요철회응답>(

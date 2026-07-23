@@ -12,6 +12,8 @@ public class 공동구매자동집단요약응답
     public string HS코드 { get; set; } = string.Empty;
     public string 온도코드 { get; set; } = string.Empty;
     public string 물류방식 { get; set; } = string.Empty;
+    public string 거래유형 { get; set; } = 공동구매거래유형코드.B2C;
+    public string 가격표시기준 { get; set; } = 공동구매가격표시기준코드.부가세포함;
     public string 배송권키 { get; set; } = string.Empty;
     public string 배송권명 { get; set; } = string.Empty;
     public string 현재상태 { get; set; } = 공동구매자동집단상태코드.수요수집중;
@@ -89,9 +91,16 @@ public sealed class 공동구매자동본인수요응답
     public string 수요Id { get; set; } = string.Empty;
     public string 수요출처키 { get; set; } = string.Empty;
     public long? 커뮤니티게시글Id { get; set; }
+    public string 개별원함원장Id { get; set; } = string.Empty;
     public string 자동집단Id { get; set; } = string.Empty;
     public string 상품키 { get; set; } = string.Empty;
     public string 상품명 { get; set; } = string.Empty;
+    public string 거래유형 { get; set; } = 공동구매거래유형코드.B2C;
+    public string 가격표시기준 { get; set; } = 공동구매가격표시기준코드.부가세포함;
+    public string 구매조직참조키 { get; set; } = string.Empty;
+    public string 구매조직표시명 { get; set; } = string.Empty;
+    public string 사업자검증상태 { get; set; } = 주문자집단사업자검증상태코드.불필요;
+    public bool 세금계산서필요 { get; set; }
     public string 주문자키 { get; set; } = string.Empty;
     public string 배송권키 { get; set; } = string.Empty;
     public string 배송권명 { get; set; } = string.Empty;
@@ -109,7 +118,7 @@ public sealed class 공동구매자동본인수요응답
 
 public static class 공동구매주문자집단화정책코드
 {
-    public const string 현재버전 = "orderer-grouping-v1";
+    public const string 현재버전 = "orderer-grouping-v2-buyer-context";
 }
 
 public static class 공동구매자동집단배치유형코드
@@ -124,6 +133,8 @@ public static class 공동구매자동집단배치기준코드
     public const string 배송권 = "DeliveryScope";
     public const string 보관온도 = "Temperature";
     public const string 물류방식 = "LogisticsMode";
+    public const string 거래유형 = "TransactionType";
+    public const string 가격표시기준 = "PriceBasis";
 }
 
 public static class 공동구매자동집단다음단계코드

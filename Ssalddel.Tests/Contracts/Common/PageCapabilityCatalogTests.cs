@@ -465,6 +465,81 @@ public sealed class PageCapabilityCatalogTests
         Assert.Contains("계약·결제·신고·운송은 실행하지 않습니다", capability.Notice);
     }
 
+    [Theory]
+    [InlineData("/group-purchase/wishes", "orderer-group-purchase-wishes", PageInteractionBoundary.ReadOnly, false)]
+    [InlineData("/group-purchase/wishes/new", "orderer-group-purchase-wish-create", PageInteractionBoundary.PlatformPersistence, true)]
+    [InlineData("/group-purchase/wishes/wish-ledger-17", "orderer-group-purchase-wish-workspace", PageInteractionBoundary.PlatformPersistence, true)]
+    [InlineData("/group-purchase/wishes/wish-ledger-17/edit", "orderer-group-purchase-wish-workspace", PageInteractionBoundary.PlatformPersistence, true)]
+    public void 주문자_내원함은_목록조회와_본인원장Command경계를_분리한다(
+        string route,
+        string pageKey,
+        PageInteractionBoundary boundary,
+        bool hasExternalEffects)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(boundary, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.Equal(hasExternalEffects, capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("GroupPurchaseDemand", capability.WorkflowCodes);
+    }
+
+    [Theory]
+    [InlineData("/group-purchase/groups", "orderer-group-purchase-groups")]
+    [InlineData("/group-purchase/groups/auto-group-onion", "orderer-group-purchase-group-detail")]
+    public void 주문자_내집단은_개별원함에서_연결된_참여집단만_읽는다(
+        string route,
+        string pageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+    }
+
+    [Theory]
+    [InlineData("/group-purchase/imports/group-import-17")]
+    [InlineData("/group-purchase/imports/group-import-17/suppliers")]
+    [InlineData("/group-purchase/imports/group-import-17/costs")]
+    [InlineData("/group-purchase/imports/group-import-17/classification")]
+    [InlineData("/group-purchase/imports/group-import-17/handoff")]
+    [InlineData("/group-purchase/imports/group-import-17/consent?autoGroupId=auto-group-onion")]
+    public void 주문자_공동수입준비현황은_참여자인증된_1점5_읽기전용화면이다(string route)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal("orderer-group-import-readiness", capability.PageKey);
+        Assert.Equal("1.5", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("CustomsAndTradeDataWorkflow", capability.FeatureKeys);
+        Assert.Contains("GroupPurchaseImport", capability.WorkflowCodes);
+        Assert.Contains("계약·결제·신고·운송은 실행하지 않습니다", capability.Notice);
+    }
+
     [Fact]
     public void 관리자_공동수입작업대는_1점5_인증저장경계다()
     {
@@ -639,7 +714,7 @@ public sealed class PageCapabilityCatalogTests
     {
         var found = SsalddelPageCapabilityCatalog.TryResolve(
             SsalddelPageAppCodes.Orderer,
-            "/orders?orderNo=FOOD-20260720-01",
+            "/orders/food?orderNo=FOOD-20260720-01",
             out var capability);
 
         Assert.True(found);
@@ -651,6 +726,29 @@ public sealed class PageCapabilityCatalogTests
         Assert.Equal("3.0", capability.IntroducedVersion);
         Assert.Contains("FoodDeliveryWorkflow", capability.FeatureKeys);
         Assert.Contains("FoodDelivery", capability.WorkflowCodes);
+    }
+
+    [Theory]
+    [InlineData("/orders", "orderer-orders")]
+    [InlineData("/orders/individual-order-ledger-17?view=orderer", "orderer-order-detail")]
+    public void 전체주문원장은_인증된주문자의_개별주문원장만_읽는다(
+        string route,
+        string pageKey)
+    {
+        var found = SsalddelPageCapabilityCatalog.TryResolve(
+            SsalddelPageAppCodes.Orderer,
+            route,
+            out var capability);
+
+        Assert.True(found);
+        Assert.Equal(pageKey, capability.PageKey);
+        Assert.Equal("1.0", capability.IntroducedVersion);
+        Assert.Equal(PageCapabilityStage.Beta, capability.Stage);
+        Assert.Equal(PageInteractionBoundary.ReadOnly, capability.Boundary);
+        Assert.True(capability.RequiresAuthentication);
+        Assert.False(capability.HasExternalEffects);
+        Assert.Contains("GroupPurchaseDemandWorkflow", capability.FeatureKeys);
+        Assert.Contains("GroupPurchaseDemand", capability.WorkflowCodes);
     }
 
     [Fact]

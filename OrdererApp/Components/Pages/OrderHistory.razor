@@ -1,32 +1,28 @@
 @page "/orders"
+@using OrdererApp.Components.Orders
 @inject NavigationManager Navigation
 
-<PageTitle>음식 주문 내역</PageTitle>
+<PageTitle>내 주문</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="py-4">
-    <MudStack Spacing="3">
-        <MudStack Spacing="0">
-            <MudText Typo="Typo.h4">음식 주문 내역</MudText>
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                로그인한 계정의 실제 음식 주문 목록과 선택한 정확한 주문 상세를 확인합니다.
-            </MudText>
-        </MudStack>
-
-        <OrdererFoodOrderWorkspace OrderNo="@OrderNo"
-                                   OrderSelected="OnOrderSelectedAsync" />
-    </MudStack>
-</MudContainer>
+<OrdererIndividualOrderLedgerHistoryScreen OrderSelected="OpenOrderAsync" />
 
 @code {
     [SupplyParameterFromQuery(Name = "orderNo")]
     public string? OrderNo { get; set; }
 
-    private Task OnOrderSelectedAsync(string? orderNo)
+    protected override void OnParametersSet()
     {
-        var target = string.IsNullOrWhiteSpace(orderNo)
-            ? "/orders"
-            : $"/orders?orderNo={Uri.EscapeDataString(orderNo.Trim())}";
-        Navigation.NavigateTo(target, replace: true);
+        if (!string.IsNullOrWhiteSpace(OrderNo))
+        {
+            Navigation.NavigateTo(
+                $"/orders/food?orderNo={Uri.EscapeDataString(OrderNo.Trim())}",
+                replace: true);
+        }
+    }
+
+    private Task OpenOrderAsync(string orderLedgerId)
+    {
+        Navigation.NavigateTo($"/orders/{Uri.EscapeDataString(orderLedgerId.Trim())}");
         return Task.CompletedTask;
     }
 }

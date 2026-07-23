@@ -12,7 +12,8 @@ public interface I공동구매주문자집단화Engine
         decimal? 목표수량,
         string? 현재상태 = null,
         DateTime? 모집종료시각Utc = null,
-        DateTime? 기준시각Utc = null);
+        DateTime? 기준시각Utc = null,
+        string? 거래유형 = null);
 
     공동구매자동집단배치미리보기응답 배치미리보기(
         공동구매자동수요등록Command command,
@@ -37,7 +38,10 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
             정규화(command.상품키, "unknown-product", 120),
             정규화(command.배송권키, "unknown-scope", 160),
             정규화(command.온도코드, "상온", 40),
-            정규화(command.물류방식, "LCL", 40));
+            정규화(command.물류방식, 공동구매자동수요물류방식코드.후속검토, 40),
+            공동구매거래유형코드.정규화(command.거래유형),
+            공동구매가격표시기준코드.정규화(command.가격표시기준, command.거래유형),
+            정규화(command.수량단위, "kg", 20));
     }
 
     public 공동구매자동집단진행응답 진행계산(
@@ -46,7 +50,8 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
         decimal? 목표수량,
         string? 현재상태 = null,
         DateTime? 모집종료시각Utc = null,
-        DateTime? 기준시각Utc = null)
+        DateTime? 기준시각Utc = null,
+        string? 거래유형 = null)
     {
         ArgumentNullException.ThrowIfNull(수요목록);
 
@@ -70,7 +75,8 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
             예약결제참여자수,
             총희망수량,
             유효목표참여자수,
-            유효목표수량);
+            유효목표수량,
+            공동구매거래유형코드.정규화(거래유형));
         var 모집조건충족여부 = 현재상태 == 공동구매자동집단상태코드.확정
             || 제안상태 == 공동구매자동집단상태코드.확정대기;
         var 상태 = 현재상태 == 공동구매자동집단상태코드.확정
@@ -111,7 +117,8 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
                 총희망수량,
                 유효목표참여자수,
                 유효목표수량,
-                유효모집종료시각Utc)
+                유효모집종료시각Utc,
+                공동구매거래유형코드.정규화(거래유형))
         };
     }
 
@@ -169,14 +176,16 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
                 기존집단?.목표수량,
                 기존집단?.현재상태,
                 모집종료시각Utc,
-                기준시각Utc),
+                기준시각Utc,
+                기존집단?.거래유형 ?? command.거래유형),
             예상진행 = 진행계산(
                 예상수요목록,
                 예상목표참여자수,
                 예상목표수량,
                 기존집단?.현재상태,
                 모집종료시각Utc,
-                기준시각Utc),
+                기준시각Utc,
+                command.거래유형),
             안내 = 배치안내(기존집단 is not null, 기존수요갱신여부, 모집종료여부),
             비구속안내 = "미리보기와 관심 수요 등록은 주문, 결제 또는 계약을 자동 확정하지 않습니다."
         };
@@ -193,6 +202,14 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
             자동집단Id = 자동집단Id,
             상품키 = 정규화(command.상품키, "unknown-product", 120),
             상품명 = 정규화(command.상품명, command.상품키, 160),
+            거래유형 = 공동구매거래유형코드.정규화(command.거래유형),
+            가격표시기준 = 공동구매가격표시기준코드.정규화(command.가격표시기준, command.거래유형),
+            구매조직참조키 = 정규화(command.구매조직참조키, string.Empty, 160),
+            구매조직표시명 = 정규화(command.구매조직표시명, string.Empty, 160),
+            사업자검증상태 = 공동구매거래유형코드.정규화(command.거래유형) == 공동구매거래유형코드.B2B
+                ? 주문자집단사업자검증상태코드.필요
+                : 주문자집단사업자검증상태코드.불필요,
+            세금계산서필요 = command.세금계산서필요,
             주문자키 = 주문자키,
             주문자표시명 = 정규화(command.주문자표시명, "주문자", 80),
             배송권키 = 정규화(command.배송권키, "unknown-scope", 160),
@@ -228,7 +245,17 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
             new()
             {
                 기준코드 = 공동구매자동집단배치기준코드.물류방식,
-                기준값 = 정규화(command.물류방식, "LCL", 40)
+                기준값 = 정규화(command.물류방식, 공동구매자동수요물류방식코드.후속검토, 40)
+            },
+            new()
+            {
+                기준코드 = 공동구매자동집단배치기준코드.거래유형,
+                기준값 = 공동구매거래유형코드.정규화(command.거래유형)
+            },
+            new()
+            {
+                기준코드 = 공동구매자동집단배치기준코드.가격표시기준,
+                기준값 = 공동구매가격표시기준코드.정규화(command.가격표시기준, command.거래유형)
             }
         ];
 
@@ -251,6 +278,8 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
         {
             throw new InvalidOperationException("희망수량은 0보다 커야 합니다.");
         }
+
+        거래문맥검증(command);
     }
 
     private static string 참여자식별키(공동구매자동수요응답 수요)
@@ -289,7 +318,8 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
         decimal 총희망수량,
         int? 목표참여자수,
         decimal? 목표수량,
-        DateTime? 모집종료시각Utc)
+        DateTime? 모집종료시각Utc,
+        string 거래유형)
     {
         if (상태 == 공동구매자동집단상태코드.확정)
         {
@@ -309,9 +339,14 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
             return $"모집이 {종료안내} 종료되었고 조건을 충족하지 못했습니다. 새 모집 회차를 검토해 주세요.";
         }
 
-        if (참여자수 < 2)
+        if (거래유형 == 공동구매거래유형코드.B2C && 참여자수 < 2)
         {
             return $"공동구매 후보가 되려면 서로 다른 주문자가 최소 2명 필요합니다. 현재 {참여자수}명입니다.";
+        }
+
+        if (거래유형 == 공동구매거래유형코드.B2B && 참여자수 == 1)
+        {
+            return $"사업 목적 수요 1곳이 모였습니다. 목표 수량·가격·사업자 확인과 공급 조건을 충족해야 계약 검토로 넘어갑니다. 현재 수량 {총희망수량:N0}입니다.";
         }
 
         if (목표참여자수.HasValue || 목표수량.HasValue)
@@ -341,8 +376,43 @@ public sealed class 공동구매주문자집단화Engine : I공동구매주문�
         }
 
         return 기존집단존재
-            ? "상품, 배송권, 보관 온도와 물류 방식이 같은 기존 후보 집단에 합산할 예정입니다."
+            ? "상품, 배송권, 보관 온도, 물류 방식과 B2B/B2C 거래 문맥이 같은 기존 후보 집단에 합산할 예정입니다."
             : "같은 배치 기준의 기존 후보가 없어 새 공동구매 후보 집단을 만들 예정입니다.";
+    }
+
+    internal static void 거래문맥검증(공동구매자동수요등록Command command)
+    {
+        if (!string.IsNullOrWhiteSpace(command.거래유형)
+            && !공동구매거래유형코드.지원여부(command.거래유형))
+        {
+            throw new InvalidOperationException("공동구매 거래 유형은 B2C 또는 B2B여야 합니다.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(command.가격표시기준)
+            && !공동구매가격표시기준코드.지원여부(command.가격표시기준))
+        {
+            throw new InvalidOperationException("가격 표시 기준은 부가세 포함 또는 부가세 별도여야 합니다.");
+        }
+
+        var 거래유형 = 공동구매거래유형코드.정규화(command.거래유형);
+        if (거래유형 == 공동구매거래유형코드.B2B
+            && string.IsNullOrWhiteSpace(command.구매조직참조키)
+            && string.IsNullOrWhiteSpace(command.구매조직표시명))
+        {
+            throw new InvalidOperationException("B2B 공동구매 수요에는 구매 조직 참조 또는 조직 표시명이 필요합니다.");
+        }
+
+        if (거래유형 == 공동구매거래유형코드.B2C
+            && (command.세금계산서필요
+                || !string.IsNullOrWhiteSpace(command.구매조직참조키)
+                || !string.IsNullOrWhiteSpace(command.구매조직표시명)
+                || string.Equals(
+                    command.가격표시기준,
+                    공동구매가격표시기준코드.부가세별도,
+                    StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException("B2C 수요에는 구매 조직, 세금계산서 또는 부가세 별도 조건을 지정할 수 없습니다.");
+        }
     }
 
     private static DateTime 모집종료시각(공동구매자동집단응답? 기존집단, DateTime 기준시각Utc)

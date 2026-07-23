@@ -218,6 +218,13 @@ public sealed class DomesticGroupPurchaseVehicleRecommendationServiceTests
                     ? _group
                     : null);
 
+        public Task<공동구매자동집단응답> 개별원함원장연결Async(
+            string 자동집단Id,
+            string 수요Id,
+            string 개별원함원장Id,
+            CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
+
         public Task<공동구매자동집단응답> 개별주문원장연결Async(
             string 자동집단Id,
             string 수요Id,

@@ -1,0 +1,18 @@
+@page "/group-purchase/imports/{LedgerId}/costs"
+
+<PageTitle>공동수입 견적과 예상 비용</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.Costs"
+                                Title="견적과 예상 비용"
+                                Description="재료별 견적 조건과 예상 도착 비용의 계산 근거를 분리해 확인합니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessCostsScreen Ledger="ledger" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

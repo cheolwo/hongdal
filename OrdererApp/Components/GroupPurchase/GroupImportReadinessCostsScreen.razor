@@ -1,0 +1,87 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudStack Spacing="3">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">공급 견적</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">통화·단위·MOQ·유효기간을 분리해 비교합니다.</MudText>
+            </MudStack>
+            @if (Ledger.견적목록.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">등록된 견적 근거가 없습니다.</MudAlert>
+            }
+            else
+            {
+                @foreach (var quote in Ledger.견적목록)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@quote.재료명</MudText>
+                        <MudGrid>
+                            <MudItem xs="12" sm="4">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">단가</MudText>
+                                <MudText Typo="Typo.subtitle1">@quote.단가.ToString("N2") @quote.통화코드 / @quote.수량단위</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">최소 주문수량</MudText>
+                                <MudText Typo="Typo.subtitle1">@quote.최소주문수량.ToString("N2") @quote.수량단위</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="4">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">유효기한</MudText>
+                                <MudText Typo="Typo.subtitle1">@DateLabel(quote.유효기한Utc)</MudText>
+                            </MudItem>
+                        </MudGrid>
+                        <MudText Typo="Typo.body2">@quote.포장조건 · 납기 @(quote.납기일수)일 · @quote.Incoterms후보</MudText>
+                        @if (!string.IsNullOrWhiteSpace(quote.원출처Url))
+                        {
+                            <MudLink Href="@quote.원출처Url" Target="_blank" Typo="Typo.caption">
+                                @(string.IsNullOrWhiteSpace(quote.원출처명) ? "공식 견적 근거 열기" : quote.원출처명)
+                            </MudLink>
+                        }
+                    </MudPaper>
+                }
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6">예상 도착 비용</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">상품·국제운송·관세·세금·국내 이행 비용을 합산하지 않고 항목별 근거로 표시합니다.</MudText>
+            </MudStack>
+            @if (Ledger.예상비용목록.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">등록된 예상 비용 근거가 없습니다.</MudAlert>
+            }
+            else
+            {
+                @foreach (var cost in Ledger.예상비용목록)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.body1">@cost.표시명</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @cost.재료명 · @cost.범주코드 · @cost.계산근거
+                                </MudText>
+                            </MudStack>
+                            <MudText Typo="Typo.subtitle1">@cost.예상금액.ToString("N2") @cost.통화코드</MudText>
+                        </MudStack>
+                        @if (!string.IsNullOrWhiteSpace(cost.원출처Url))
+                        {
+                            <MudLink Href="@cost.원출처Url" Target="_blank" Typo="Typo.caption">공식 비용 근거 열기</MudLink>
+                        }
+                    </MudPaper>
+                }
+            }
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired] public 공동수입준비주문자조회응답 Ledger { get; set; } = default!;
+
+    private static string DateLabel(DateTimeOffset value)
+        => value == default ? "미기록" : value.ToLocalTime().ToString("yyyy-MM-dd");
+}

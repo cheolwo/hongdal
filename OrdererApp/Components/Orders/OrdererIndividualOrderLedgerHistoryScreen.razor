@@ -1,0 +1,31 @@
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h4">내 주문</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    내 개별주문 원장의 현재 단계와 연결된 이행 원장을 확인합니다.
+                </MudText>
+            </MudStack>
+            <MudButton Href="/orders/food"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       StartIcon="@Icons.Material.Filled.Restaurant">
+                음식 주문 이력
+            </MudButton>
+        </MudStack>
+
+        <OrdererOrderAccessGate LoginTitle="내 주문 로그인"
+                                LoginDescription="개별주문 원장은 주문 당사자에게만 공개됩니다."
+                                LoginButtonText="로그인하고 내 주문 보기">
+            <Authorized>
+                <OrdererIndividualOrderLedgerList OrderSelected="@OrderSelected" />
+            </Authorized>
+        </OrdererOrderAccessGate>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public EventCallback<string> OrderSelected { get; set; }
+}

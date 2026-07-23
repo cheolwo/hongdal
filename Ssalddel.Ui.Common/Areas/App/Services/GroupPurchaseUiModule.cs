@@ -16,8 +16,10 @@ internal static class GroupPurchaseUiModule
         services.TryAddScoped<I공동구매물류Service, PlatformCommunity공동구매물류Service>();
         services.TryAddScoped<I공동구매실행Service, 공동구매실행Service>();
         services.TryAddScoped<I비구속공동구매수요Service, 공동구매실행Service>();
+        services.TryAddScoped<I공동구매내원함Client, 공동구매내원함Client>();
         services.TryAddScoped<I공동구매원장절차Client, 공동구매원장절차Client>();
         services.TryAddScoped<I공동수입원장전환Client, 공동수입원장전환Client>();
+        services.TryAddScoped<I공동수입준비주문자Client, 공동수입준비주문자Client>();
         services.TryAddScoped<I공동수입선적통관Client, 공동수입선적통관Client>();
         services.TryAddScoped<I공동구매가격의사결정Service, 공동구매가격의사결정Service>();
         services.TryAddScoped<IOperatingMarketProfileClient, OperatingMarketProfileClient>();
@@ -102,6 +104,7 @@ internal static class GroupPurchaseUiModule
         services.TryAddTransient<UnitedStatesKoreanFoodGroupBuyStorefrontViewModel>();
         services.TryAddTransient<OfficialFoodIngredientDemandViewModel>();
         services.TryAddScoped<OrdererIngredientCardAutoGroupingViewModel>();
+        services.TryAddScoped<GroupPurchaseMyWishesViewModel>();
 
         return services;
     }

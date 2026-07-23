@@ -1,0 +1,97 @@
+@using Ssalddel.Contracts.Common.Orderer
+@inject GroupPurchaseMyWishesViewModel ViewModel
+
+@if (ViewModel.IsLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage) && ViewModel.Result is null)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@ViewModel.ErrorMessage</MudAlert>
+}
+else if (ViewModel.FindGroup(AutoGroupId) is not { } group)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+        본인 원함이 포함된 공동 진행에서 이 집단을 찾을 수 없습니다.
+    </MudAlert>
+}
+else
+{
+    <MudStack Spacing="3">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h5">@group.PrimaryWish.상품명</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">자동집단 @group.AutoGroupId</MudText>
+                    </MudStack>
+                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                        @(group.Summary?.현재상태 ?? "집계 확인 중")
+                    </MudChip>
+                </MudStack>
+                @if (group.Summary is { } summary)
+                {
+                    <MudGrid>
+                        <MudItem xs="6" md="3"><MudText Typo="Typo.caption">참여자</MudText><MudText>@summary.참여자수.ToString("N0")명</MudText></MudItem>
+                        <MudItem xs="6" md="3"><MudText Typo="Typo.caption">전체 희망</MudText><MudText>@summary.총희망수량.ToString("N2") @summary.수량단위</MudText></MudItem>
+                        <MudItem xs="6" md="3"><MudText Typo="Typo.caption">목표 참여</MudText><MudText>@Optional(summary.목표참여자수, "명")</MudText></MudItem>
+                        <MudItem xs="6" md="3"><MudText Typo="Typo.caption">목표 수량</MudText><MudText>@Optional(summary.목표수량, summary.수량단위)</MudText></MudItem>
+                    </MudGrid>
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Text">
+                        조건 충족은 자동 주문 확정이 아닙니다. 공급 조건과 각 참여자의 명시적 동의를 별도로 확인해야 합니다.
+                    </MudAlert>
+                }
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">이 집단에 연결된 내 원함</MudText>
+                @foreach (var wish in group.Wishes)
+                {
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                        <MudText Typo="Typo.body2">@wish.희망수량.ToString("N2") @wish.수량단위 · @(GroupPurchaseMyWishesViewModel.IsActive(wish) ? "활성" : "닫힘")</MudText>
+                        <MudButton Href="@GroupPurchasePageRoutes.WishDetailFor(wish.개별원함원장Id)" Variant="Variant.Text" Size="Size.Small">원함 보기</MudButton>
+                    </MudStack>
+                }
+            </MudStack>
+        </MudPaper>
+
+        @if (!string.IsNullOrWhiteSpace(group.GroupImportLedgerId))
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">1.5 공동수입 준비</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        공급자 근거, 견적·예상 비용, 품목분류·규제, 포워더 인계 기록과 정보 제공 범위를 원장별로 확인합니다.
+                    </MudText>
+                    <MudButton Href="@ImportReadinessHref(group)"
+                               Color="Color.Info"
+                               Variant="Variant.Filled">
+                        공동수입 준비 현황
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                아직 연결된 공동수입 준비 원장이 없습니다. 수요가 모였다는 이유만으로 수입·운송을 자동 시작하지 않습니다.
+            </MudAlert>
+        }
+    </MudStack>
+}
+
+@code {
+    [Parameter, EditorRequired] public string AutoGroupId { get; set; } = string.Empty;
+    protected override Task OnParametersSetAsync() => ViewModel.LoadAsync();
+
+    private static string ImportReadinessHref(GroupPurchaseOwnedGroupSummary group)
+        => $"{GroupPurchasePageRoutes.ImportOverviewFor(group.GroupImportLedgerId)}?autoGroupId={Uri.EscapeDataString(group.AutoGroupId)}";
+
+    private static string Optional(int? value, string unit)
+        => value is > 0 ? $"{value.Value:N0}{unit}" : "미설정";
+
+    private static string Optional(decimal? value, string unit)
+        => value is > 0 ? $"{value.Value:N2} {unit}" : "미설정";
+}

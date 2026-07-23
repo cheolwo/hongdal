@@ -24,6 +24,9 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<I공동구매수요모집OS, 공동구매수요모집OS>();
         services.AddHostedService<공동구매수요모집OsWorker>();
         services.AddScoped<I공동구매수령창고Service, 공동구매수령창고Service>();
+        services.AddScoped<I공동구매개별원함원장Service, 공동구매개별원함원장Service>();
+        services.AddScoped<I공동구매개별원함자동집단투영Service, 공동구매개별원함자동집단투영Service>();
+        services.AddScoped<I공동구매내원함조회UseCase, 공동구매내원함조회UseCase>();
         services.AddScoped<I공동구매개별주문원장Service, 공동구매개별주문원장Service>();
         services.AddSingleton<ICommunityGroupPurchaseDemandHandoff, CommunityVoteOrdererDemandHandoff>();
         services.AddSingleton<ICommunityProducerMemberDirectory, UnconnectedCommunityProducerMemberDirectory>();
@@ -42,6 +45,9 @@ public static partial class ServiceCollectionExtensions
         services.AddSingleton<ICollectiveProcurementPlanningStore, MongoCollectiveProcurementPlanningStore>();
         services.AddScoped<ICollectiveProcurementPlanningService, CollectiveProcurementPlanningService>();
         services.AddScoped<I공동수입준비원장Service, 공동수입준비원장Service>();
+        services.AddScoped<I공동수입준비주문자조회UseCase, 공동수입준비주문자조회UseCase>();
+        services.AddSingleton<I공동수입준비OS, 공동수입준비OS>();
+        services.AddHostedService<공동수입준비OsWorker>();
         services.AddSingleton<I공동구매해외선적추적저장소, Mongo공동구매해외선적추적저장소>();
         services.AddSingleton<I공동구매커머스이행계획저장소, Mongo공동구매커머스이행계획저장소>();
         services.AddSingleton<I주문자집단운영주체저장소, Mongo주문자집단운영주체저장소>();

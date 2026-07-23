@@ -163,6 +163,13 @@ public sealed class 공동구매수요모집OSTests
             CancellationToken cancellationToken = default)
             => Task.FromResult<공동구매자동집단응답?>(Group(자동집단Id, 공동구매자동집단상태코드.수요수집중));
 
+        public Task<공동구매자동집단응답> 개별원함원장연결Async(
+            string 자동집단Id,
+            string 수요Id,
+            string 개별원함원장Id,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(Group(자동집단Id, 공동구매자동집단상태코드.수요수집중));
+
         public Task<공동구매자동집단응답> 개별주문원장연결Async(
             string 자동집단Id,
             string 수요Id,

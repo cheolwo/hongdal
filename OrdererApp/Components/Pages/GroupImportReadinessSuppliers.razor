@@ -1,0 +1,18 @@
+@page "/group-purchase/imports/{LedgerId}/suppliers"
+
+<PageTitle>공동수입 공급자 근거</PageTitle>
+
+<GroupImportReadinessRouteFrame LedgerId="@LedgerId"
+                                AutoGroupId="@AutoGroupId"
+                                CurrentSection="GroupImportReadinessSection.Suppliers"
+                                Title="공급자 근거"
+                                Description="공급자 후보별 공식 식별자, 원출처와 최신성 확인 상태만 살펴봅니다.">
+    <ChildContent Context="ledger">
+        <GroupImportReadinessSuppliersScreen Ledger="ledger" />
+    </ChildContent>
+</GroupImportReadinessRouteFrame>
+
+@code {
+    [Parameter] public string LedgerId { get; set; } = string.Empty;
+    [SupplyParameterFromQuery(Name = "autoGroupId")] public string? AutoGroupId { get; set; }
+}

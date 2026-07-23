@@ -1,0 +1,55 @@
+@using Ssalddel.Ui.Common.Areas.App.Models.Auth
+@inject 주문자앱인증ViewModel Authentication
+
+@if (Authentication.처리중 && !Authentication.초기화됨)
+{
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+        <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+        <MudText Typo="Typo.body2">@AuthenticationCheckMessage</MudText>
+    </MudStack>
+}
+else if (!Authentication.로그인됨)
+{
+    <Ssalddel공통로그인Panel 제목="@LoginTitle"
+                         설명="@LoginDescription"
+                         상태메시지="@Authentication.오류메시지"
+                         상태Severity="@(Authentication.오류발생 ? Severity.Error : Severity.Info)"
+                         일반로그인표시="true"
+                         소셜로그인표시="false"
+                         일반로그인버튼텍스트="@LoginButtonText"
+                         IsBusy="@Authentication.처리중"
+                         Elevation="0"
+                         OnPasswordLogin="LoginAsync" />
+}
+else
+{
+    @Authorized
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string LoginTitle { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string LoginDescription { get; set; } = string.Empty;
+
+    [Parameter]
+    public string LoginButtonText { get; set; } = "로그인하고 계속";
+
+    [Parameter]
+    public string AuthenticationCheckMessage { get; set; } = "저장된 주문자 로그인을 확인하고 있습니다.";
+
+    [Parameter, EditorRequired]
+    public RenderFragment Authorized { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Authentication.초기화됨)
+        {
+            await Authentication.복원Async();
+        }
+    }
+
+    private Task LoginAsync(공통로그인요청 request)
+        => Authentication.로그인Async(request.UserNameOrEmail, request.Password);
+}

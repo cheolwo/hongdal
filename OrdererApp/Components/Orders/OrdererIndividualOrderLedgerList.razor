@@ -1,0 +1,242 @@
+@using Ssalddel.Contracts.Common.Community
+@inject 주문자개별주문ViewModel Orders
+
+<section aria-label="내 개별주문 원장 목록">
+    <MudStack Spacing="2">
+        <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+            <MudStack Row="true" AlignItems="AlignItems.End" Spacing="2">
+                <MudTextField T="string"
+                              @bind-Value="_search"
+                              Label="주문 검색"
+                              Placeholder="주문명 또는 원장 ID"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              FullWidth="true"
+                              Disabled="@_loading" />
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Disabled="@_loading"
+                           OnClick="SearchAsync">
+                    검색
+                </MudButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                               Color="Color.Default"
+                               Disabled="@_loading"
+                               OnClick="RefreshAsync"
+                               aria-label="주문 목록 새로고침" />
+            </MudStack>
+        </MudPaper>
+
+        @if (_loading)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-6">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="2">
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                    <MudText Typo="Typo.body2">개별주문 원장을 불러오고 있습니다.</MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+                @_errorMessage
+                <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="RefreshAsync">
+                    다시 시도
+                </MudButton>
+            </MudAlert>
+        }
+        else if (Orders.항목목록.Count == 0)
+        {
+            <MudPaper Elevation="0" Outlined="true" Class="pa-6">
+                <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Large" Color="Color.Secondary" />
+                    <MudText Typo="Typo.h6">확정된 개별주문이 없습니다</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                        비구속 원함이 주문으로 확정되면 이곳에서 원장별 진행 상태를 확인할 수 있습니다.
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        else
+        {
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                총 @Orders.결과.전체건수.ToString("N0")건 · 최근 수정 순
+            </MudText>
+
+            <MudGrid Spacing="2">
+                @foreach (var item in Orders.항목목록)
+                {
+                    <MudItem xs="12" md="6" @key="item.주문원장Id">
+                        <MudPaper Elevation="0" Outlined="true" Class="pa-4 h-100">
+                            <MudStack Spacing="2" Class="h-100">
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.h6">@Display(item.제목, "개별주문")</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            원장 @item.주문원장Id
+                                        </MudText>
+                                    </MudStack>
+                                    <MudChip T="string"
+                                             Size="Size.Small"
+                                             Variant="Variant.Outlined"
+                                             Color="@StatusColor(item.상태)">
+                                        @Display(item.상태, "상태 확인 중")
+                                    </MudChip>
+                                </MudStack>
+
+                                <MudStack Row="true" Spacing="1">
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Text">
+                                        현재 단계 · @Display(item.원본.현재단계Key)
+                                    </MudChip>
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Text">
+                                        연결 원장 @item.원본.관련하위원장수.ToString("N0")개
+                                    </MudChip>
+                                </MudStack>
+
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    @Display(item.원본.주문자표시명, "본인") · @FormatDateTime(item.원본.수정시각Utc)
+                                </MudText>
+
+                                <MudSpacer />
+
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           FullWidth="true"
+                                           OnClick="@(() => SelectAsync(item.주문원장Id))">
+                                    주문 원장 보기
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+
+            @if (Orders.결과.전체건수 > PageSize)
+            {
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="2">
+                    <MudButton Variant="Variant.Outlined"
+                               Disabled="@(_page == 0 || _loading)"
+                               OnClick="PreviousPageAsync">
+                        이전
+                    </MudButton>
+                    <MudText Typo="Typo.body2">@(_page + 1) / @PageCount</MudText>
+                    <MudButton Variant="Variant.Outlined"
+                               Disabled="@(!CanMoveNext || _loading)"
+                               OnClick="NextPageAsync">
+                        다음
+                    </MudButton>
+                </MudStack>
+            }
+        }
+    </MudStack>
+</section>
+
+@code {
+    private const int PageSize = 20;
+    private string? _search;
+    private string? _errorMessage;
+    private int _page;
+    private bool _loading;
+
+    [Parameter]
+    public EventCallback<string> OrderSelected { get; set; }
+
+    private int PageCount
+        => Math.Max(1, (int)Math.Ceiling(Orders.결과.전체건수 / (double)PageSize));
+
+    private bool CanMoveNext
+        => (_page + 1) * PageSize < Orders.결과.전체건수;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    public Task ReloadAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _errorMessage = null;
+
+        try
+        {
+            var succeeded = await Orders.조회Async(
+                new 목록조회요청
+                {
+                    페이지 = _page,
+                    페이지크기 = PageSize,
+                    검색어 = string.IsNullOrWhiteSpace(_search) ? null : _search.Trim(),
+                    정렬조건 =
+                    [
+                        new 목록정렬조건(
+                            nameof(개별주문관점항목응답.수정시각Utc),
+                            목록정렬방향.내림차순)
+                    ]
+                });
+            if (!succeeded)
+            {
+                _errorMessage = Orders.오류메시지 ?? "개별주문 원장을 불러오지 못했습니다.";
+            }
+        }
+        catch (Exception exception)
+        {
+            _errorMessage = $"개별주문 원장을 불러오지 못했습니다. {exception.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private Task SearchAsync()
+    {
+        _page = 0;
+        return LoadAsync();
+    }
+
+    private Task RefreshAsync() => LoadAsync();
+
+    private Task PreviousPageAsync()
+    {
+        _page = Math.Max(0, _page - 1);
+        return LoadAsync();
+    }
+
+    private Task NextPageAsync()
+    {
+        if (CanMoveNext)
+        {
+            _page++;
+        }
+
+        return LoadAsync();
+    }
+
+    private Task SelectAsync(string orderLedgerId)
+        => string.IsNullOrWhiteSpace(orderLedgerId)
+            ? Task.CompletedTask
+            : OrderSelected.InvokeAsync(orderLedgerId);
+
+    private static string Display(string? value, string fallback = "미확인")
+        => string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+
+    private static string FormatDateTime(DateTime utc)
+        => utc == default
+            ? "수정 시각 미확인"
+            : $"{DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime():yyyy.MM.dd HH:mm} 수정";
+
+    private static Color StatusColor(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return Color.Default;
+        }
+
+        return status.Contains("완료", StringComparison.OrdinalIgnoreCase)
+            || status.Contains("확정", StringComparison.OrdinalIgnoreCase)
+                ? Color.Success
+                : status.Contains("취소", StringComparison.OrdinalIgnoreCase)
+                  || status.Contains("철회", StringComparison.OrdinalIgnoreCase)
+                    ? Color.Error
+                    : Color.Info;
+    }
+
+}

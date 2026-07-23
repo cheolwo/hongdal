@@ -12,8 +12,9 @@ public sealed class 공동구매자동집단화UseCaseTests
     {
         var store = new StubStore();
         var warehouse = new StubReceivingWarehouseService();
+        var wishes = new StubIndividualDemandLedgerService();
         var ledgers = new StubIndividualOrderLedgerService();
-        var useCase = new 공동구매자동집단화UseCase(store, warehouse, ledgers, new 공동구매주문자집단화Engine());
+        var useCase = new 공동구매자동집단화UseCase(store, warehouse, wishes, ledgers, new 공동구매주문자집단화Engine());
         var command = new 공동구매자동수요등록Command
         {
             수요출처키 = "paid-demand-1",
@@ -36,8 +37,10 @@ public sealed class 공동구매자동집단화UseCaseTests
 
         Assert.True(result.성공);
         Assert.True(warehouse.Called);
+        Assert.True(wishes.SaveCalled);
         Assert.True(ledgers.Called);
         var demand = Assert.Single(result.값!.수요목록);
+        Assert.Equal("individual-demand-ledger-1", demand.개별원함원장Id);
         Assert.Equal(101, demand.도착창고Id);
         Assert.Equal(창고유형코드.가상창고, demand.도착창고유형);
         Assert.Equal("warehouse:101:receiving-address", demand.수령지주소참조키);
@@ -52,8 +55,9 @@ public sealed class 공동구매자동집단화UseCaseTests
     {
         var store = new StubStore();
         var warehouse = new StubReceivingWarehouseService();
+        var wishes = new StubIndividualDemandLedgerService();
         var ledgers = new StubIndividualOrderLedgerService();
-        var useCase = new 공동구매자동집단화UseCase(store, warehouse, ledgers, new 공동구매주문자집단화Engine());
+        var useCase = new 공동구매자동집단화UseCase(store, warehouse, wishes, ledgers, new 공동구매주문자집단화Engine());
 
         var result = await useCase.수요등록Async(new 공동구매자동수요등록Command
         {
@@ -69,7 +73,11 @@ public sealed class 공동구매자동집단화UseCaseTests
 
         Assert.True(result.성공);
         Assert.False(warehouse.Called);
+        Assert.True(wishes.SaveCalled);
         Assert.False(ledgers.Called);
+        Assert.Equal(
+            "individual-demand-ledger-1",
+            Assert.Single(result.값!.수요목록).개별원함원장Id);
         Assert.Equal(
             공동구매개별주문입고상태코드.미지정,
             Assert.Single(result.값!.수요목록).입고의미상태);
@@ -103,8 +111,9 @@ public sealed class 공동구매자동집단화UseCaseTests
             ]
         });
         var warehouse = new StubReceivingWarehouseService();
+        var wishes = new StubIndividualDemandLedgerService();
         var ledgers = new StubIndividualOrderLedgerService();
-        var useCase = new 공동구매자동집단화UseCase(store, warehouse, ledgers, engine);
+        var useCase = new 공동구매자동집단화UseCase(store, warehouse, wishes, ledgers, engine);
 
         var result = await useCase.배치미리보기Async(command);
 
@@ -112,6 +121,7 @@ public sealed class 공동구매자동집단화UseCaseTests
         Assert.Equal(공동구매자동집단배치유형코드.기존집단, result.값!.배치유형);
         Assert.Equal(2, result.값.예상진행.참여자수);
         Assert.False(warehouse.Called);
+        Assert.False(wishes.SaveCalled);
         Assert.False(ledgers.Called);
         Assert.Equal(0, store.RegisterCount);
     }
@@ -119,12 +129,15 @@ public sealed class 공동구매자동집단화UseCaseTests
     [Fact]
     public async Task 비구속수요저장은_결제주소창고정보를제거하고_수요만저장한다()
     {
-        var store = new StubStore();
+        var sequence = new List<string>();
+        var store = new StubStore(sequence: sequence);
         var warehouse = new StubReceivingWarehouseService();
+        var wishes = new StubIndividualDemandLedgerService(sequence);
         var ledgers = new StubIndividualOrderLedgerService();
         var useCase = new 공동구매자동집단화UseCase(
             store,
             warehouse,
+            wishes,
             ledgers,
             new 공동구매주문자집단화Engine());
         var command = new 공동구매자동수요등록Command
@@ -155,7 +168,9 @@ public sealed class 공동구매자동집단화UseCaseTests
         Assert.Empty(command.수령지주소참조키);
         Assert.Empty(command.수령도로명주소);
         Assert.False(warehouse.Called);
+        Assert.True(wishes.SaveCalled);
         Assert.False(ledgers.Called);
+        Assert.Equal(["individual-demand-ledger", "automatic-group-demand", "individual-demand-link"], sequence);
     }
 
     [Fact]
@@ -165,6 +180,7 @@ public sealed class 공동구매자동집단화UseCaseTests
         var useCase = new 공동구매자동집단화UseCase(
             store,
             new StubReceivingWarehouseService(),
+            new StubIndividualDemandLedgerService(),
             new StubIndividualOrderLedgerService(),
             new 공동구매주문자집단화Engine());
 
@@ -187,9 +203,11 @@ public sealed class 공동구매자동집단화UseCaseTests
     public async Task 수요철회는_주문자와멱등키를_저장소에전달한다()
     {
         var store = new StubStore();
+        var wishes = new StubIndividualDemandLedgerService();
         var useCase = new 공동구매자동집단화UseCase(
             store,
             new StubReceivingWarehouseService(),
+            wishes,
             new StubIndividualOrderLedgerService(),
             new 공동구매주문자집단화Engine());
         var command = new 공동구매자동수요철회Command
@@ -204,7 +222,37 @@ public sealed class 공동구매자동집단화UseCaseTests
 
         Assert.True(result.성공);
         Assert.Same(command, store.LastWithdrawalCommand);
-        Assert.True(result.값!.철회완료);
+        Assert.True(wishes.WithdrawCalled);
+        Assert.Equal("individual-demand-ledger-1", result.값!.개별원함원장Id);
+        Assert.True(result.값.철회완료);
+    }
+
+    [Fact]
+    public async Task 재등록뒤_오래된철회멱등응답은_활성개별원함원장을_닫지않는다()
+    {
+        var store = new StubStore
+        {
+            WithdrawalCompleted = false
+        };
+        var wishes = new StubIndividualDemandLedgerService();
+        var useCase = new 공동구매자동집단화UseCase(
+            store,
+            new StubReceivingWarehouseService(),
+            wishes,
+            new StubIndividualOrderLedgerService(),
+            new 공동구매주문자집단화Engine());
+
+        var result = await useCase.수요철회Async(new 공동구매자동수요철회Command
+        {
+            요청멱등키 = "old-withdrawal",
+            수요출처키 = "ingredient:garlic:seoul",
+            주문자키 = "orderer-1"
+        });
+
+        Assert.True(result.성공);
+        Assert.False(result.값!.철회완료);
+        Assert.False(wishes.WithdrawCalled);
+        Assert.Empty(result.값.개별원함원장Id);
     }
 
     private sealed class StubReceivingWarehouseService : I공동구매수령창고Service
@@ -242,16 +290,49 @@ public sealed class 공동구매자동집단화UseCaseTests
         }
     }
 
+    private sealed class StubIndividualDemandLedgerService(
+        List<string>? sequence = null) : I공동구매개별원함원장Service
+    {
+        public bool SaveCalled { get; private set; }
+        public bool WithdrawCalled { get; private set; }
+
+        public Task<공동구매개별원함원장결과> 저장Async(
+            공동구매자동수요등록Command command,
+            string 자동집단Id,
+            CancellationToken cancellationToken = default)
+        {
+            SaveCalled = true;
+            sequence?.Add("individual-demand-ledger");
+            return Task.FromResult(new 공동구매개별원함원장결과(
+                "individual-demand-ledger-1",
+                1));
+        }
+
+        public Task<공동구매개별원함원장결과?> 철회Async(
+            공동구매자동수요철회Command command,
+            CancellationToken cancellationToken = default)
+        {
+            WithdrawCalled = true;
+            return Task.FromResult<공동구매개별원함원장결과?>(
+                new 공동구매개별원함원장결과("individual-demand-ledger-1", 2));
+        }
+    }
+
     private sealed class StubStore : I공동구매자동집단화저장소
     {
         private 공동구매자동집단응답? _group;
+        private readonly List<string>? _sequence;
 
-        public StubStore(공동구매자동집단응답? group = null)
+        public StubStore(
+            공동구매자동집단응답? group = null,
+            List<string>? sequence = null)
         {
             _group = group;
+            _sequence = sequence;
         }
 
         public int RegisterCount { get; private set; }
+        public bool WithdrawalCompleted { get; init; } = true;
         public 공동구매자동수요철회Command? LastWithdrawalCommand { get; private set; }
 
         public Task<공동구매자동집단응답> 수요등록Async(
@@ -259,6 +340,7 @@ public sealed class 공동구매자동집단화UseCaseTests
             CancellationToken cancellationToken = default)
         {
             RegisterCount++;
+            _sequence?.Add("automatic-group-demand");
             var inboundStatus = command.수요유형 == 공동구매자동수요유형코드.예약결제
                 ? 공동구매개별주문입고상태코드.입고예정
                 : 공동구매개별주문입고상태코드.미지정;
@@ -305,7 +387,7 @@ public sealed class 공동구매자동집단화UseCaseTests
             {
                 요청멱등키 = command.요청멱등키,
                 수요출처키 = command.수요출처키,
-                철회완료 = true
+                철회완료 = WithdrawalCompleted
             });
         }
 
@@ -313,6 +395,18 @@ public sealed class 공동구매자동집단화UseCaseTests
             string 자동집단Id,
             CancellationToken cancellationToken = default)
             => Task.FromResult(_group);
+
+        public Task<공동구매자동집단응답> 개별원함원장연결Async(
+            string 자동집단Id,
+            string 수요Id,
+            string 개별원함원장Id,
+            CancellationToken cancellationToken = default)
+        {
+            var demand = _group!.수요목록.Single(x => x.수요Id == 수요Id);
+            demand.개별원함원장Id = 개별원함원장Id;
+            _sequence?.Add("individual-demand-link");
+            return Task.FromResult(_group);
+        }
 
         public Task<공동구매자동집단응답> 개별주문원장연결Async(
             string 자동집단Id,

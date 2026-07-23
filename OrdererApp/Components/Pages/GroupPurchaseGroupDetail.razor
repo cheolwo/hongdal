@@ -1,0 +1,24 @@
+@page "/group-purchase/groups/{AutoGroupId}"
+@using Ssalddel.Contracts.Common.Orderer
+
+<PageTitle>내 공동 진행 상세</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4 px-0">
+    <GroupPurchaseScreenFrame CurrentScreen="GroupPurchaseScreenKind.GroupDetail"
+                              Eyebrow="OWN PARTICIPATION · 1.0 → 1.5"
+                              Title="내 공동 진행 상세"
+                              Description="본인 원함의 공동 집계와 연결된 준비 원장만 단계적으로 확인합니다."
+                              BackHref="@GroupPurchasePageRoutes.GroupsRoot"
+                              BoundaryMessage="다른 참여자의 식별정보는 표시하지 않습니다. 1.5 준비자료도 읽기 전용이며 외부 전송이나 실행을 하지 않습니다.">
+        <GroupPurchaseOrdererAccessGate LoginTitle="공동 진행 상세 로그인"
+                                        LoginDescription="본인 원함이 실제 포함된 공동 진행만 보려면 로그인해 주세요.">
+            <Authorized>
+                <GroupPurchaseGroupDetailScreen AutoGroupId="@AutoGroupId" />
+            </Authorized>
+        </GroupPurchaseOrdererAccessGate>
+    </GroupPurchaseScreenFrame>
+</MudContainer>
+
+@code {
+    [Parameter] public string AutoGroupId { get; set; } = string.Empty;
+}

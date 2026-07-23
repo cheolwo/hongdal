@@ -6,6 +6,7 @@
 
 | 날짜 | 기록 | 주요 화면 변화 |
 | --- | --- | --- |
+| 2026-07-23 | [주문자 중심 1.0→1.5 공동구매 흐름](2026-07-23-orderer-individual-first-v1-5.md) | 여러 재료를 개별 원함으로 저장하고 내 원함·내 공동 진행·공동수입 준비·개별주문 원장을 독립 Route로 조회하는 주문자 흐름을 실제 Windows App에서 확인 |
 | 2026-07-22 | [공동구매 수요·모집 OS 분리](2026-07-22-group-purchase-demand-os.md) | 화면 없음 — 1.0 수요 변경·마감·Aging·검토 큐·사람 승인 인계를 실제 원장 조율 OS로 구현하고 1.5 외부 실행은 분리 |
 | 2026-07-22 | [음식·재료 탐색에서 비구속 수요 등록까지](2026-07-22-food-ingredient-nonbinding-demand.md) | 공개 재료 근거를 유지하는 독립 수요 Route와 Web·모바일 공용 Screen을 추가하고 로그인 저장·철회, 주문·결제·운송 비실행 경계를 desktop·390px에서 실제 확인 |
 | 2026-07-22 | [Warehouse 플랫폼 Home·커뮤니티 Route 단일책임 분리](2026-07-22-warehouse-platform-home-srp.md) | 공용 `CommunityWorkspaceScreen` 기반 Home에는 사방괘·업무 허브만 남기고 게시판 목록·개설 신청·글쓰기·상세·원장·다이어그램을 독립 Route로 분리, desktop·561px 실제 확인 |

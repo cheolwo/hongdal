@@ -1,0 +1,30 @@
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.overline">INDIVIDUAL ORDER LEDGER</MudText>
+                <MudText Typo="Typo.h4">개별주문 원장</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@OrderLedgerId</MudText>
+            </MudStack>
+            <MudButton Href="/orders"
+                       Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                내 주문
+            </MudButton>
+        </MudStack>
+
+        <OrdererOrderAccessGate LoginTitle="주문 원장 로그인"
+                                LoginDescription="주문 당사자 확인 후 보호된 주문 원장을 불러옵니다."
+                                LoginButtonText="로그인하고 주문 원장 보기"
+                                AuthenticationCheckMessage="주문자 로그인을 확인하고 있습니다.">
+            <Authorized>
+                <OrdererIndividualOrderLedgerDetail OrderLedgerId="@OrderLedgerId" />
+            </Authorized>
+        </OrdererOrderAccessGate>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter, EditorRequired]
+    public string OrderLedgerId { get; set; } = string.Empty;
+}

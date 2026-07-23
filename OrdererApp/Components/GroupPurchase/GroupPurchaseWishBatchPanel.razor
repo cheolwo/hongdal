@@ -1,0 +1,194 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudStack Spacing="3">
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6">구매 문맥</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        한 번에 고른 재료는 같은 B2B/B2C·부가세 기준으로 저장되지만, 재료별 개별 원함 원장은 따로 유지됩니다.
+                    </MudText>
+                </MudStack>
+                <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                    @(ViewModel.SelectedCount)개 선택
+                </MudChip>
+            </MudStack>
+
+            <MudSelect T="string"
+                       Label="구매 목적"
+                       Value="@ViewModel.TransactionType"
+                       ValueChanged="ChangeTransactionTypeAsync"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense">
+                <MudSelectItem T="string" Value="@공동구매거래유형코드.B2C">개인 소비 공동구매(B2C)</MudSelectItem>
+                <MudSelectItem T="string" Value="@공동구매거래유형코드.B2B">사업 목적 공동구매(B2B)</MudSelectItem>
+            </MudSelect>
+
+            @if (ViewModel.IsBusinessPurchase)
+            {
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string"
+                                      Label="구매 조직 참조"
+                                      @bind-Value="ViewModel.PurchasingOrganizationReference"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Placeholder="사업자번호 또는 내부 조직 참조" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string"
+                                      Label="구매 조직 표시명"
+                                      @bind-Value="ViewModel.PurchasingOrganizationName"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string"
+                                   Label="가격 표시 기준"
+                                   @bind-Value="ViewModel.PriceBasis"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@공동구매가격표시기준코드.부가세포함">부가세 포함</MudSelectItem>
+                            <MudSelectItem T="string" Value="@공동구매가격표시기준코드.부가세별도">부가세 별도</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudCheckBox T="bool"
+                                     @bind-Value="ViewModel.TaxInvoiceRequired"
+                                     Label="세금계산서 검토 필요"
+                                     Color="Color.Primary" />
+                    </MudItem>
+                </MudGrid>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                    B2C 원함은 부가세 포함 기준으로 집단화되며 구매 조직이나 세금계산서 조건을 저장하지 않습니다.
+                </MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="3">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6">원하는 재료와 수량</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        국제운송 방식은 지금 선택하지 않습니다. 합산 조건을 받은 포워더가 이후 LCL/FCL 후보를 회신합니다.
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" Spacing="1">
+                    <MudButton Variant="Variant.Text" Size="Size.Small" OnClick="@(() => SelectAll(true))">전체 선택</MudButton>
+                    <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => SelectAll(false))">선택 해제</MudButton>
+                </MudStack>
+            </MudStack>
+
+            @foreach (var item in ViewModel.Items)
+            {
+                <MudPaper Elevation="0" Outlined="true" Class="pa-3">
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" sm="7">
+                            <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="2">
+                                <MudCheckBox T="bool"
+                                             @bind-Value="item.Selected"
+                                             Disabled="@(item.IsBusy || item.Saved)"
+                                             Color="Color.Primary"
+                                             aria-label="@($"{item.Product.상품명} 선택")" />
+                                <MudStack Spacing="0">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                                        <MudText Typo="Typo.subtitle1">@item.Product.상품명</MudText>
+                                        @if (item.Saved)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Success">저장됨</MudChip>
+                                        }
+                                    </MudStack>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        HS @item.Product.HS코드 · @GroupPurchasePresentation.TemperatureLabel(item.Product.온도코드)
+                                    </MudText>
+                                </MudStack>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="12" sm="5">
+                            <MudNumericField T="decimal"
+                                             Label="희망 수량(kg)"
+                                             @bind-Value="item.Quantity"
+                                             Min="1m"
+                                             Step="1m"
+                                             Disabled="@(item.IsBusy || item.Saved)"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" />
+                        </MudItem>
+                    </MudGrid>
+
+                    @if (!string.IsNullOrWhiteSpace(item.ErrorMessage))
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mt-2">
+                            @item.ErrorMessage
+                        </MudAlert>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(item.Notice))
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mt-2">
+                            @item.Notice
+                        </MudAlert>
+                    }
+                </MudPaper>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudCheckBox T="bool"
+                         @bind-Value="ViewModel.NonBindingAgreementAccepted"
+                         Color="Color.Primary"
+                         Label="이 선택은 비구속 원함이며 결제·주문·계약·수입·운송을 확정하지 않음을 확인했습니다." />
+
+            @if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+            {
+                <MudAlert Severity="@(ViewModel.HasError ? Severity.Warning : Severity.Success)" Variant="Variant.Outlined">
+                    @ViewModel.StatusMessage
+                </MudAlert>
+            }
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.PlaylistAddCheck"
+                       FullWidth="true"
+                       Disabled="@(ViewModel.IsBusy || ViewModel.SelectedCount == 0)"
+                       OnClick="SaveAsync">
+                @(ViewModel.IsBusy ? "개별 원함 저장 중" : $"선택한 {ViewModel.SelectedCount:N0}개 원함 저장")
+            </MudButton>
+
+            @if (ViewModel.SavedCount > 0)
+            {
+                <MudButton Href="@GroupPurchasePageRoutes.WishesRoot"
+                           Variant="Variant.Outlined"
+                           Color="Color.Success"
+                           FullWidth="true">
+                    내 원함에서 저장 결과 확인
+                </MudButton>
+            }
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public GroupPurchaseWishBatchViewModel ViewModel { get; set; } = default!;
+
+    private Task ChangeTransactionTypeAsync(string value)
+    {
+        ViewModel.ApplyTransactionType(value);
+        return Task.CompletedTask;
+    }
+
+    private void SelectAll(bool selected)
+        => ViewModel.SelectAll(selected);
+
+    private Task SaveAsync()
+        => ViewModel.SaveAsync();
+}

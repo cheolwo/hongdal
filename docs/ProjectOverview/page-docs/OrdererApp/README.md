@@ -9,9 +9,21 @@
 | [OrdererApp-P01 - 주문자 홈](OrdererApp-P01/) | / | 보조 | 주문자 홈 | 완료 |
 | [OrdererApp-P02 - 공동구매 개요](OrdererApp-P02/) | `/group-purchase` | 1.0 | 공동구매 화면 진입과 버전 경계 안내 | 재캡처 필요 |
 | OrdererApp-P02-1 - 재료 자동집단화 | `/group-purchase/products` | 1.0 | 카드 한 번 클릭으로 기존 집단 합류 또는 새 비구속 집단 시작 | 재캡처 필요 |
+| OrdererApp-P02-1-1 - 내 원함 | `/group-purchase/wishes` | 1.0 | 본인의 재료별 개별 원함 목록과 수정·철회 진입점 | 재캡처 필요 |
+| OrdererApp-P02-1-2 - 여러 재료 원함 등록 | `/group-purchase/wishes/new` | 1.0 | 여러 재료와 수량을 한 번에 선택하되 재료별 개별 원함 원장을 독립 저장 | 재캡처 필요 |
+| OrdererApp-P02-1-3 - 내 원함 상세 | `/group-purchase/wishes/{WishLedgerId}` | 1.0 | 본인 원함의 수량·거래 문맥과 그 원함에서 이어진 공동 진행 조회·철회 | 재캡처 필요 |
+| OrdererApp-P02-1-4 - 내 원함 수량 수정 | `/group-purchase/wishes/{WishLedgerId}/edit` | 1.0 | 본인의 활성 비구속 원함에서 희망 수량만 변경 | 재캡처 필요 |
+| OrdererApp-P02-1-5 - 내 공동 진행 | `/group-purchase/groups` | 1.0 | 본인 원함이 포함된 공동 집계만 목록으로 조회 | 재캡처 필요 |
+| OrdererApp-P02-1-6 - 내 공동 진행 상세 | `/group-purchase/groups/{AutoGroupId}` | 1.0→1.5 | 본인 원함의 집계와 연결된 공동수입 준비 원장 진입점 조회 | 재캡처 필요 |
 | OrdererApp-P02-2 - 공동구매 상품 근거 상세 | `/group-purchase/products/{ProductId}` | 1.0 | 한 상품의 HS·보관·모집 근거 읽기 | 재캡처 필요 |
 | OrdererApp-P02-3 - 수요 상세 조건 | `/group-purchase/demands/new/{ProductId}` | 1.0 | 배송권·희망 수량을 직접 조정하는 보조 Action | 재캡처 필요 |
 | OrdererApp-P02-4 - 수입 원가 참고 | `/group-purchase/import-review/{ProductId}` | 1.5 준비 | 한 상품의 Simulation 원가 조회 | 재캡처 필요 |
+| OrdererApp-P02-4-1 - 공동수입 준비 현황 | `/group-purchase/imports/{GroupImportLedgerId}?autoGroupId={AutoGroupId}` | 1.5 준비 | 본인이 참여한 집단에 연결된 공동수입 원장의 준비도와 미확인 항목 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-2 - 공동수입 공급자 근거 | `/group-purchase/imports/{GroupImportLedgerId}/suppliers?autoGroupId={AutoGroupId}` | 1.5 준비 | 공급자 후보·원출처·확인 시각 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-3 - 공동수입 견적·예상 비용 | `/group-purchase/imports/{GroupImportLedgerId}/costs?autoGroupId={AutoGroupId}` | 1.5 준비 | 재료별 견적 조건과 예상 도착 비용 근거 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-4 - 공동수입 품목분류·규제 | `/group-purchase/imports/{GroupImportLedgerId}/classification?autoGroupId={AutoGroupId}` | 1.5 준비 | HSK·HTS 후보와 국가별 공식 검토 항목 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-5 - 공동수입 포워더 인계 | `/group-purchase/imports/{GroupImportLedgerId}/handoff?autoGroupId={AutoGroupId}` | 1.5 준비 | 사람이 인계한 범위와 기록된 LCL/FCL·견적·일정 회신 읽기 | 재캡처 필요 |
+| OrdererApp-P02-4-6 - 정보 제공 근거 | `/group-purchase/imports/{GroupImportLedgerId}/consent?autoGroupId={AutoGroupId}` | 1.5 준비 | 저장된 정보 제공 범위와 별도 동의 근거 확인 상태를 읽기 전용으로 표시 | 재캡처 필요 |
 | OrdererApp-P02-5 - 선적 조회 | `/group-purchase/shipments` | 1.5 준비 | 문서관리번호 한 건 조회 | 재캡처 필요 |
 | [OrdererApp-P03 - 주문자 화물 주문](OrdererApp-P03/) | /cargo | 확장 | 주문자 화물 주문 | 완료 |
 | [OrdererApp-P04 - 음식 주문 홈](OrdererApp-P04/) | /food | 확장 | 음식 주문 홈 | 완료 |
@@ -20,5 +32,7 @@
 | [OrdererApp-P04-2-1 - 마트 공개 상품 상세](OrdererApp-P04-2-1/) | `/food/mart/products/{ProductId}` | 확장 | stable product ID 공개 설명·재고 투영·구매 근거 읽기 | stable-ID 실제 확인 |
 | [OrdererApp-P04-2-2 - 마트 상품 구매후기 작성](OrdererApp-P04-2-2/) | `/food/mart/reviews/{ProductId}` | 확장 | 완료 원장 참여자의 명시적 공개 후기 저장과 같은 상품 재조회 | 390px 완료 |
 | [OrdererApp-P04-3 - 마트 비구속 주문 요청](OrdererApp-P04-3/) | `/food/mart/order/{ProductId}` | 확장 | 공개 상품 한 건의 주문 요청 저장과 같은 요청 ID 재조회 | stable-ID·390px 로그인 경계 확인 |
-| [OrdererApp-P05 - 주문 이력](OrdererApp-P05/) | /orders | 보조 | 주문 이력 | 완료 |
+| [OrdererApp-P05 - 내 주문](OrdererApp-P05/) | `/orders` | 1.0 연결 | 로그인한 주문자의 개별주문 원장 목록과 현재 단계 조회 | 재캡처 필요 |
+| OrdererApp-P05-1 - 개별주문 원장 상세 | `/orders/{OrderLedgerId}` | 1.0 연결 | 주문 당사자 권한으로 한 개별주문과 연결 이행 원장 조회 | 재캡처 필요 |
+| OrdererApp-P05-2 - 음식 주문 이력 | `/orders/food` | 확장 | 기존 음식 주문 목록과 주문번호별 상세 조회 | 재캡처 필요 |
 | [OrdererApp-P99 - 미발견 페이지](OrdererApp-P99/) | /not-found | 시스템 | 미발견 페이지 | 완료 |

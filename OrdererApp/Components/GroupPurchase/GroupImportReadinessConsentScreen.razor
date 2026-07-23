@@ -1,0 +1,49 @@
+@using Ssalddel.Contracts.Common.Orderer
+
+<MudStack Spacing="3">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        기본 인계는 개인 식별정보를 제외한 집계 수요만 사용합니다. 아래 상태는 운영자가 기록한 집계 인계 조건이며
+        현재 로그인 사용자의 주체·버전·범위·시각을 갖춘 본인 동의 기록이 아닙니다.
+    </MudAlert>
+
+    <MudPaper Elevation="0" Outlined="true" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h6">정보 제공 범위</MudText>
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">전달 범위</MudText>
+                    <MudText Typo="Typo.body1">@Ledger.포워더인계.전달정보범위코드</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">개인정보 포함</MudText>
+                    <MudChip T="string"
+                             Color="@(Ledger.포워더인계.개인정보포함여부 ? Color.Warning : Color.Success)"
+                             Variant="Variant.Outlined">
+                        @(Ledger.포워더인계.개인정보포함여부 ? "포함" : "포함 안 함")
+                    </MudChip>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">운영 기록상 조건 확인</MudText>
+                    <MudChip T="string"
+                             Color="@(Ledger.포워더인계.운영자기록정보제공조건확인여부 ? Color.Success : Color.Warning)"
+                             Variant="Variant.Outlined">
+                        @(Ledger.포워더인계.운영자기록정보제공조건확인여부 ? "운영 기록 있음" : "운영 기록 없음")
+                    </MudChip>
+                </MudItem>
+            </MudGrid>
+            <MudText Typo="Typo.body2">@Ledger.포워더인계.전달범위요약</MudText>
+        </MudStack>
+    </MudPaper>
+
+    @if (Ledger.포워더인계.개인정보포함여부
+         && !Ledger.포워더인계.운영자기록정보제공조건확인여부)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
+            개인정보 포함 표시와 운영 기록상 조건 확인 상태가 일치하지 않습니다. 운영자가 인계를 진행하기 전에 반드시 보완해야 합니다.
+        </MudAlert>
+    }
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired] public 공동수입준비주문자조회응답 Ledger { get; set; } = default!;
+}
