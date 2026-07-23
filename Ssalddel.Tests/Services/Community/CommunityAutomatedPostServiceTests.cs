@@ -44,6 +44,43 @@ public sealed class CommunityAutomatedPostServiceTests
     }
 
     [Fact]
+    public async Task Publisher_CanCreatePinnedPostWithoutDerivedWorkOrCreatedEvent()
+    {
+        await using var context = CreateContext();
+        var publisher = new RecordingPublisher();
+        var service = new EfCommunityAutomatedPostPublisher(
+            context,
+            new 커뮤니티게시글음성작업예약Service(),
+            new CommunityKeywordNotificationQueue(),
+            publisher,
+            new FixedTimeProvider(new DateTimeOffset(2026, 7, 23, 0, 0, 0, TimeSpan.Zero)),
+            NullLogger<EfCommunityAutomatedPostPublisher>.Instance);
+        var draft = new CommunityAutomatedPostDraft(
+            "activity-board-notice-example",
+            "notice-v1",
+            CommunityBoardCatalog.NoticeGuide.DisplayName,
+            "활동 관찰",
+            "게시판 안내",
+            "[게시판 안내] 예시",
+            "Command와 Event 관계를 안내합니다.",
+            "살뜰 활동 안내봇",
+            IsOperatorPinned: true,
+            EnqueueDerivedWork: false,
+            PublishCreatedEvent: false);
+
+        await service.PublishIfMissingAsync(draft);
+
+        var post = Assert.Single(await context.PlatformCommunityPosts.ToListAsync());
+        Assert.True(post.IsOperatorPinned);
+        Assert.Equal(
+            new DateTime(2026, 7, 23, 0, 0, 0, DateTimeKind.Utc),
+            post.OperatorPinnedAtUtc);
+        Assert.Null(post.Audio);
+        Assert.Null(post.KeywordNotificationScan);
+        Assert.Empty(publisher.Notifications);
+    }
+
+    [Fact]
     public void SystemAuthorKey_UsesSourceAndPeriodAndResolvesSystemKind()
     {
         var post = new PlatformCommunityPost

@@ -1,3 +1,4 @@
+using Ssalddel.Application.Community;
 using Ssalddel.Services.Auth;
 using Ssalddel.Services.Community;
 using Ssalddel.Services.Content;
@@ -34,6 +35,7 @@ public static partial class ServiceCollectionExtensions
         services.AddScoped<ICommunityLedgerCompletionPostStore, EfCommunityLedgerCompletionPostStore>();
         services.AddScoped<ICommunityLedgerCompletionPostService, CommunityLedgerCompletionPostService>();
         services.AddScoped<ICommunityAutomatedPostPublisher, EfCommunityAutomatedPostPublisher>();
+        services.AddScoped<ICommunityActivityPostPublisher, CommunityActivityPostPublisher>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityKamisPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityUsdaNassPriceBriefSource>();
         services.AddScoped<ICommunityAutomatedPostSource, CommunityReflectionSource>();

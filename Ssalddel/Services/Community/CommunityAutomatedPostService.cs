@@ -33,7 +33,10 @@ public sealed record CommunityAutomatedPostDraft(
     string Title,
     string Body,
     string Nickname,
-    string? SharedLinkUrl = null)
+    string? SharedLinkUrl = null,
+    bool IsOperatorPinned = false,
+    bool EnqueueDerivedWork = true,
+    bool PublishCreatedEvent = true)
 {
     public string SystemAuthorKey => CommunityAutomatedPostPublication.BuildSystemAuthorKey(SourceKey, PeriodKey);
 }
@@ -196,31 +199,40 @@ public sealed class EfCommunityAutomatedPostPublisher : ICommunityAutomatedPostP
             AuthorUserId = draft.SystemAuthorKey,
             Nickname = Limit(draft.Nickname, 40),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString("N")),
+            IsOperatorPinned = draft.IsOperatorPinned,
+            OperatorPinnedAtUtc = draft.IsOperatorPinned ? now : null,
             CreatedAtUtc = now,
             UpdatedAtUtc = now
         };
 
         _db.PlatformCommunityPosts.Add(entity);
-        _audioQueue.예약(entity, now);
-        _keywordQueue.Enqueue(entity, now);
+        if (draft.EnqueueDerivedWork)
+        {
+            _audioQueue.예약(entity, now);
+            _keywordQueue.Enqueue(entity, now);
+        }
+
         await _db.SaveChangesAsync(cancellationToken);
         if (transaction is not null)
         {
             await transaction.CommitAsync(cancellationToken);
         }
 
-        try
+        if (draft.PublishCreatedEvent)
         {
-            await _publisher.Publish(new 커뮤니티게시글등록됨Event(entity.Id), cancellationToken);
-        }
-        catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
-        {
-            _logger.LogWarning(
-                exception,
-                "자동 정보 게시글 후속 작업 신호 발행에 실패했습니다. DB 대기열에서 복구합니다. PostId={PostId} SourceKey={SourceKey} PeriodKey={PeriodKey}",
-                entity.Id,
-                draft.SourceKey,
-                draft.PeriodKey);
+            try
+            {
+                await _publisher.Publish(new 커뮤니티게시글등록됨Event(entity.Id), cancellationToken);
+            }
+            catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning(
+                    exception,
+                    "자동 정보 게시글 후속 작업 신호 발행에 실패했습니다. DB 대기열에서 복구합니다. PostId={PostId} SourceKey={SourceKey} PeriodKey={PeriodKey}",
+                    entity.Id,
+                    draft.SourceKey,
+                    draft.PeriodKey);
+            }
         }
 
         return new CommunityAutomatedPostPublishResult(entity.Id, true);

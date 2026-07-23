@@ -2,6 +2,7 @@ using FluentValidation;
 using Ssalddel.Application.Behaviors;
 using Ssalddel.Application.CommandProcessing;
 using Ssalddel.Application.Community;
+using Ssalddel.Application.Community.Handlers;
 using Ssalddel.Middleware;
 using Ssalddel.Application.HumanResources;
 using Ssalddel.Application.Sales;
@@ -45,6 +46,8 @@ public static partial class ServiceCollectionExtensions
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Command후처리Behavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CommunityActivityCommandPostBehavior<,>));
+        services.AddScoped(typeof(INotificationHandler<>), typeof(CommunityActivityEventPostHandler<>));
 
         services.AddSsalddelInfrastructure();
         services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
