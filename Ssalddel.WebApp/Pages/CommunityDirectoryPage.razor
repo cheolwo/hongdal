@@ -1,16 +1,17 @@
 @page "/community/categories"
+@page "/community/boards/directory"
 @using Ssalddel.WebApp.ViewModels
 @inject PlatformCommunityService CommunityService
 
-<PageTitle>게시판 전체보기 · 살뜰</PageTitle>
+<PageTitle>게시판 모음 · 살뜰</PageTitle>
 
 <PlatformCommunityReadingThemeFrame>
 <main class="community-directory platform-home--classic-forum">
     <header class="community-directory__hero">
         <div>
             <span>COMMUNITY BOARDS</span>
-            <h1>게시판 전체보기</h1>
-            <p>관심 있는 주제를 고른 뒤 해당 게시판의 글 목록으로 이동합니다.</p>
+            <h1>게시판 모음</h1>
+            <p>일상 게시판과 전체 버전의 Command·Event 활동 게시판을 한곳에서 고릅니다.</p>
         </div>
         <label class="community-directory__search">
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
@@ -38,7 +39,7 @@
         </MudAlert>
     }
 
-    <a class="community-directory__all" href="/community/boards">
+    <a class="community-directory__all" href="@CommunityPageRoutes.Boards">
         <span class="community-directory__icon"><MudIcon Icon="@Icons.Material.Filled.DynamicFeed" /></span>
         <span><strong>전체 글</strong><small>공개 게시판의 글을 한 번에 봅니다.</small></span>
         <b>@ViewModel.TotalPostCount.ToString("N0")</b>
@@ -71,13 +72,24 @@
                 <div class="community-directory__list">
                     @foreach (var board in group.Boards)
                     {
+                        var activityDefinition = CommunityActivityBoardCatalog.FindBoard(board.BoardKey);
                         <a class="community-directory__board"
+                           data-activity-source="@activityDefinition?.SourceKind"
                            href="@BoardHref(board.BoardKey)">
                             <span class="community-directory__icon">
                                 <MudIcon Icon="@ResolveBoardIcon(board.BoardKey)" />
                             </span>
-                            <span>
-                                <strong>@board.DisplayName</strong>
+                            <span class="community-directory__board-copy">
+                                <span class="community-directory__board-heading">
+                                    <strong>@board.DisplayName</strong>
+                                    @if (activityDefinition is not null)
+                                    {
+                                        <span class="community-directory__activity-badges">
+                                            <em>v@activityDefinition.ProductVersion</em>
+                                            <em>@activityDefinition.SourceKindDisplayName</em>
+                                        </span>
+                                    }
+                                </span>
                                 <small>@board.Description</small>
                             </span>
                             <b>@board.PostCount.ToString("N0")</b>
@@ -121,18 +133,36 @@
         => ViewModel.UpdateSearch(args.Value?.ToString());
 
     private static string BoardHref(string boardKey)
-        => $"/community/boards?boardKey={Uri.EscapeDataString(boardKey)}";
+        => CommunityPageRoutes.BoardsFor(boardKey: boardKey);
 
     private static string GroupEyebrow(string groupCode)
-        => groupCode switch
+    {
+        var activityDefinition = CommunityActivityBoardCatalog.All.FirstOrDefault(definition =>
+            string.Equals(definition.Board.GroupCode, groupCode, StringComparison.OrdinalIgnoreCase));
+        if (activityDefinition is not null)
+        {
+            return $"ROADMAP {activityDefinition.ProductVersion} · {activityDefinition.RoadmapStage.ProductName}";
+        }
+
+        return groupCode switch
         {
             CommunityBoardGroupCodes.CollectiveWork => "COLLECTIVE WORK",
             CommunityBoardGroupCodes.ServiceOperation => "SERVICE OPERATION",
             _ => "PEOPLE & INFORMATION"
         };
+    }
 
     private static string ResolveBoardIcon(string boardKey)
-        => boardKey switch
+    {
+        var activityDefinition = CommunityActivityBoardCatalog.FindBoard(boardKey);
+        if (activityDefinition is not null)
+        {
+            return activityDefinition.SourceKind == CommunityActivitySourceKinds.Command
+                ? Icons.Material.Filled.Bolt
+                : Icons.Material.Filled.Notifications;
+        }
+
+        return boardKey switch
         {
             CommunityBoardKeys.NoticeGuide => Icons.Material.Filled.Campaign,
             CommunityBoardKeys.Vow => Icons.Material.Filled.FavoriteBorder,
@@ -146,4 +176,5 @@
             CommunityBoardKeys.ProductFeedback => Icons.Material.Filled.Lightbulb,
             _ => Icons.Material.Filled.Topic
         };
+    }
 }

@@ -91,8 +91,8 @@
     color: var(--community-reading-on-accent, #fff);
 }
 
-.community-directory__all span:nth-child(2),
-.community-directory__board span:nth-child(2),
+.community-directory__all > span:nth-child(2),
+.community-directory__board > span:nth-child(2),
 .community-directory__safety > span:nth-child(2) {
     display: grid;
     gap: .18rem;
@@ -129,7 +129,7 @@
 }
 
 .community-directory__board {
-    min-height: 54px;
+    min-height: 68px;
     gap: .65rem;
     padding: .5rem .65rem;
     border: 0;
@@ -140,11 +140,51 @@
     transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
 }
 
+.community-directory__board[data-activity-source] {
+    border-top: 2px solid color-mix(in srgb, var(--community-reading-accent, #2457a6) 38%, transparent);
+}
+
 .community-directory__board:hover {
     transform: none;
     border-color: var(--community-reading-accent, rgba(69, 101, 66, .42));
     background: color-mix(in srgb, var(--community-reading-accent, #2457a6) 7%, #fff);
     box-shadow: inset 0 0 0 1px var(--community-reading-accent, #2457a6);
+}
+
+.community-directory__board-copy,
+.community-directory__board-heading {
+    min-width: 0;
+}
+
+.community-directory__board-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .45rem;
+}
+
+.community-directory__board-heading > strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.community-directory__activity-badges {
+    display: inline-flex;
+    flex: none;
+    gap: .22rem;
+}
+
+.community-directory__activity-badges em {
+    padding: .08rem .3rem;
+    border: 1px solid color-mix(in srgb, var(--community-reading-accent, #2457a6) 24%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--community-reading-accent, #2457a6) 7%, #fff);
+    color: var(--community-reading-accent, #2457a6);
+    font-size: .58rem;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.25;
 }
 
 .community-directory__board small,

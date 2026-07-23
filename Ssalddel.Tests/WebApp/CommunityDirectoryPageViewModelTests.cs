@@ -57,6 +57,25 @@ public sealed class CommunityDirectoryPageViewModelTests
             board => Assert.Equal(CommunityBoardGroupCodes.CollectiveWork, board.GroupCode));
     }
 
+    [Theory]
+    [InlineData("운송상차완료됨Event", "activity-loading-completed")]
+    [InlineData("3.5", "activity-mart-order-paid")]
+    [InlineData("Command", "activity-content-watch-completed")]
+    public async Task UpdateSearch_FindsActivityBoardsBySourceAndVersion(
+        string search,
+        string expectedBoardKey)
+    {
+        var viewModel = new CommunityDirectoryPageViewModel(
+            _ => Task.FromResult<IReadOnlyList<CommunityBoardSummaryResponse>>([]));
+        await viewModel.LoadAsync();
+
+        viewModel.UpdateSearch(search);
+
+        Assert.Contains(
+            viewModel.VisibleGroups.SelectMany(group => group.Boards),
+            board => board.BoardKey == expectedBoardKey);
+    }
+
     [Fact]
     public async Task LoadAsync_WhenServerFails_ShowsCoreBoardsAndRecoverableStatus()
     {

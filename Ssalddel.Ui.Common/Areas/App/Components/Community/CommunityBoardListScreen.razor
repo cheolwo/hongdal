@@ -17,7 +17,7 @@
     <header class="community-board-page__header">
         <a href="@BackHref">
             <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
-            공개 커뮤니티
+            @BackLabel
         </a>
         <div>
             <span>COMMUNITY BOARD</span>
@@ -129,6 +129,7 @@
 @code {
     [Parameter] public string AppKey { get; set; } = "shipper";
     [Parameter] public string BackHref { get; set; } = CommunityPageRoutes.Home;
+    [Parameter] public string BackLabel { get; set; } = "공개 커뮤니티";
     [Parameter] public string? BoardKey { get; set; }
     [Parameter] public string? BoardName { get; set; }
     [Parameter] public string? WorkflowTag { get; set; }

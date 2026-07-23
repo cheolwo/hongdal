@@ -102,9 +102,15 @@ public sealed class CommunityDirectoryPageViewModel(
     private bool MatchesSearch(CommunityBoardSummaryResponse board)
     {
         var search = SearchText.Trim();
+        var activityDefinition = CommunityActivityBoardCatalog.FindBoard(board.BoardKey);
         return search.Length == 0
                || board.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
                || board.Description.Contains(search, StringComparison.OrdinalIgnoreCase)
-               || board.GroupDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase);
+               || board.GroupDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
+               || activityDefinition is not null
+               && (activityDefinition.SourceName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                   || activityDefinition.ProductVersion.Contains(search, StringComparison.OrdinalIgnoreCase)
+                   || activityDefinition.SourceKindDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                   || activityDefinition.RoadmapStage.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase));
     }
 }
