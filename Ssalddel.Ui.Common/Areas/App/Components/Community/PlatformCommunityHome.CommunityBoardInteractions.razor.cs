@@ -33,7 +33,14 @@ public partial class PlatformCommunityHome
         };
 
     private static string ResolveCommunityBoardDescription(string board)
-        => board switch
+    {
+        var definition = CommunityBoardCatalog.Find(board);
+        if (definition is not null)
+        {
+            return definition.Description;
+        }
+
+        return board switch
         {
             "전체" => "모든 커뮤니티 글",
             PlatformCommunityPostCategories.Sales => "상품과 거래 조건을 댓글로 확인",
@@ -46,6 +53,7 @@ public partial class PlatformCommunityHome
             "신고/분쟁" => "보호가 필요한 이야기",
             _ => "구성원이 만든 게시판"
         };
+    }
 
     private int GetCommunityBoardPostCount(string board)
     {

@@ -8,10 +8,13 @@
 <PlatformCommunityReadingThemeFrame>
 <main class="community-directory platform-home--classic-forum">
     <header class="community-directory__hero">
-        <div>
-            <span>COMMUNITY BOARDS</span>
-            <h1>게시판 모음</h1>
-            <p>일상 게시판과 전체 버전의 Command·Event 활동 게시판을 한곳에서 고릅니다.</p>
+        <div class="community-directory__hero-title">
+            <span class="community-directory__mountain" aria-label="간괘, 산">☶</span>
+            <div>
+                <span>GEN ☶ · COMMUNITY MOUNTAINS</span>
+                <h1>게시판 산맥</h1>
+                <p>일반 대화 게시판과 0.0~3.5의 일곱 Command·Event 업무 산을 한곳에서 조망합니다.</p>
+            </div>
         </div>
         <label class="community-directory__search">
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
@@ -64,37 +67,139 @@
     {
         @foreach (var group in ViewModel.VisibleGroups)
         {
-            <section class="community-directory__group" aria-labelledby="@($"board-group-{group.Key}")">
+            var isActivityGroup = group.Key == CommunityBoardGroupCodes.ActivityRoadmap;
+            <section class="@BuildGroupClass(group.Key)" aria-labelledby="@($"board-group-{group.Key}")">
                 <header>
                     <span>@GroupEyebrow(group.Key)</span>
                     <h2 id="@($"board-group-{group.Key}")">@group.DisplayName</h2>
                 </header>
-                <div class="community-directory__list">
+                @if (isActivityGroup)
+                {
+                    <p class="community-directory__group-description">
+                        각 산을 열면 그 게시판에 자동 기록되는 Command·Event와 점검할 단일책임 페이지를 확인할 수 있습니다.
+                    </p>
+                }
+                <div class="@BuildBoardListClass(group.Key)">
                     @foreach (var board in group.Boards)
                     {
-                        var activityDefinition = CommunityActivityBoardCatalog.FindBoard(board.BoardKey);
-                        <a class="community-directory__board"
-                           data-activity-source="@activityDefinition?.SourceKind"
-                           href="@BoardHref(board.BoardKey)">
-                            <span class="community-directory__icon">
-                                <MudIcon Icon="@ResolveBoardIcon(board.BoardKey)" />
-                            </span>
-                            <span class="community-directory__board-copy">
-                                <span class="community-directory__board-heading">
-                                    <strong>@board.DisplayName</strong>
-                                    @if (activityDefinition is not null)
-                                    {
+                        var activityBundle = CommunityActivityBoardCatalog.FindBundle(board.BoardKey);
+                        @if (activityBundle is not null)
+                        {
+                            <article class="community-directory__board community-directory__board--activity"
+                                     data-activity-board="@activityBundle.Board.Key">
+                                <span class="community-directory__icon community-directory__icon--mountain"
+                                      aria-label="간괘, 산">☶</span>
+                                <div class="community-directory__board-copy">
+                                    <div class="community-directory__board-heading">
+                                        <strong>@board.DisplayName</strong>
                                         <span class="community-directory__activity-badges">
-                                            <em>v@activityDefinition.ProductVersion</em>
-                                            <em>@activityDefinition.SourceKindDisplayName</em>
+                                            <em>v@activityBundle.ProductVersion</em>
+                                            <em>@activityBundle.RoadmapStage.ProductName</em>
                                         </span>
-                                    }
+                                    </div>
+                                    <small>@board.Description</small>
+                                    <div class="community-directory__activity-counts"
+                                         aria-label="연결된 Command Event 페이지 수">
+                                        <span>Command <strong>@activityBundle.CommandCount</strong></span>
+                                        <span>Event <strong>@activityBundle.EventCount</strong></span>
+                                        <span>페이지 <strong>@activityBundle.Pages.Count</strong></span>
+                                    </div>
+                                    <details class="community-directory__activity-details">
+                                        <summary>Command·Event·페이지 연결 보기</summary>
+                                        <div class="community-directory__connections">
+                                            <section>
+                                                <strong>Command</strong>
+                                                @if (activityBundle.CommandCount == 0)
+                                                {
+                                                    <p>현재 공개 관찰 Command 없음</p>
+                                                }
+                                                else
+                                                {
+                                                    <ul>
+                                                        @foreach (var activity in activityBundle.Activities.Where(item =>
+                                                                      item.SourceKind == CommunityActivitySourceKinds.Command))
+                                                        {
+                                                            <li>
+                                                                <code>@activity.SourceName</code>
+                                                                <small>@activity.ActivityDisplayName</small>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </section>
+                                            <section>
+                                                <strong>Event</strong>
+                                                @if (activityBundle.EventCount == 0)
+                                                {
+                                                    <p>현재 공개 관찰 Event 없음</p>
+                                                }
+                                                else
+                                                {
+                                                    <ul>
+                                                        @foreach (var activity in activityBundle.Activities.Where(item =>
+                                                                      item.SourceKind == CommunityActivitySourceKinds.Event))
+                                                        {
+                                                            <li>
+                                                                <code>@activity.SourceName</code>
+                                                                <small>@activity.ActivityDisplayName</small>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </section>
+                                            <section class="community-directory__connection-pages">
+                                                <strong>관련 페이지</strong>
+                                                <ul>
+                                                    @foreach (var relatedPage in activityBundle.Pages)
+                                                    {
+                                                        <li>
+                                                            @if (relatedPage.CanNavigateFromCommunityWeb)
+                                                            {
+                                                                <a href="@relatedPage.Route">@relatedPage.PageName</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>@relatedPage.PageName</span>
+                                                            }
+                                                            <small>@relatedPage.Surface · <code>@relatedPage.Route</code></small>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </section>
+                                        </div>
+                                    </details>
+                                </div>
+                                <div class="community-directory__activity-footer">
+                                    <span><strong>@board.PostCount.ToString("N0")</strong>개 글</span>
+                                    <a href="@BoardHref(board.BoardKey)">
+                                        게시판 보기
+                                        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                                    </a>
+                                </div>
+                            </article>
+                        }
+                        else
+                        {
+                            <a class="community-directory__board" href="@BoardHref(board.BoardKey)">
+                                <span class="community-directory__icon">
+                                    <MudIcon Icon="@ResolveBoardIcon(board.BoardKey)" />
                                 </span>
-                                <small>@board.Description</small>
-                            </span>
-                            <b>@board.PostCount.ToString("N0")</b>
-                            <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
-                        </a>
+                                <span class="community-directory__board-copy">
+                                    <span class="community-directory__board-heading">
+                                        <strong>@board.DisplayName</strong>
+                                        @if (!board.IsUserCreatable)
+                                        {
+                                            <span class="community-directory__activity-badges">
+                                                <em>운영</em>
+                                            </span>
+                                        }
+                                    </span>
+                                    <small>@board.Description</small>
+                                </span>
+                                <b>@board.PostCount.ToString("N0")</b>
+                                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" />
+                            </a>
+                        }
                     }
                 </div>
             </section>
@@ -137,11 +242,9 @@
 
     private static string GroupEyebrow(string groupCode)
     {
-        var activityDefinition = CommunityActivityBoardCatalog.All.FirstOrDefault(definition =>
-            string.Equals(definition.Board.GroupCode, groupCode, StringComparison.OrdinalIgnoreCase));
-        if (activityDefinition is not null)
+        if (groupCode == CommunityBoardGroupCodes.ActivityRoadmap)
         {
-            return $"ROADMAP {activityDefinition.ProductVersion} · {activityDefinition.RoadmapStage.ProductName}";
+            return "☶ GEN · ROADMAP 0.0—3.5";
         }
 
         return groupCode switch
@@ -154,14 +257,6 @@
 
     private static string ResolveBoardIcon(string boardKey)
     {
-        var activityDefinition = CommunityActivityBoardCatalog.FindBoard(boardKey);
-        if (activityDefinition is not null)
-        {
-            return activityDefinition.SourceKind == CommunityActivitySourceKinds.Command
-                ? Icons.Material.Filled.Bolt
-                : Icons.Material.Filled.Notifications;
-        }
-
         return boardKey switch
         {
             CommunityBoardKeys.NoticeGuide => Icons.Material.Filled.Campaign,
@@ -177,4 +272,14 @@
             _ => Icons.Material.Filled.Topic
         };
     }
+
+    private static string BuildGroupClass(string groupCode)
+        => groupCode == CommunityBoardGroupCodes.ActivityRoadmap
+            ? "community-directory__group community-directory__group--activity"
+            : "community-directory__group";
+
+    private static string BuildBoardListClass(string groupCode)
+        => groupCode == CommunityBoardGroupCodes.ActivityRoadmap
+            ? "community-directory__list community-directory__list--activity"
+            : "community-directory__list";
 }

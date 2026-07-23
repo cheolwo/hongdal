@@ -3,9 +3,9 @@
 <section class="platform-community-board-index" aria-labelledby="community-board-index-title">
     <header class="platform-community-board-index__header">
         <div>
-            <span>COMMUNITY BOARDS</span>
-            <h1 id="community-board-index-title">살뜰 생활 게시판</h1>
-            <p>관심 있는 게시판을 고르면 그곳의 글 목록으로 이동합니다.</p>
+            <span>GEN ☶ · COMMUNITY MOUNTAINS</span>
+            <h1 id="community-board-index-title">살뜰 게시판 산맥</h1>
+            <p>간괘의 산처럼 독립된 게시판을 보고, 필요한 글과 업무 흐름으로 이동합니다.</p>
         </div>
         <label class="platform-community-board-index__search">
             <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Small" />
@@ -41,13 +41,27 @@
         <div class="platform-community-board-index__list">
             @foreach (var board in Boards)
             {
-                <a class="platform-community-board-index__item" href="@board.Href">
-                    <span class="platform-community-board-index__icon">
-                        <MudIcon Icon="@board.Icon" />
+                var activityBundle = CommunityActivityBoardCatalog.FindBundle(board.Name);
+                <a class="@BuildBoardClass(activityBundle)" href="@board.Href">
+                    <span class="@BuildIconClass(activityBundle)" aria-label="@(activityBundle is null ? null : "간괘, 산")">
+                        @if (activityBundle is null)
+                        {
+                            <MudIcon Icon="@board.Icon" />
+                        }
+                        else
+                        {
+                            <span aria-hidden="true">☶</span>
+                        }
                     </span>
                     <span>
                         <strong>@board.Name</strong>
                         <small>@board.Description</small>
+                        @if (activityBundle is not null)
+                        {
+                            <span class="platform-community-board-index__activity">
+                                v@activityBundle.ProductVersion · Command @activityBundle.CommandCount · Event @activityBundle.EventCount · 페이지 @activityBundle.Pages.Count
+                            </span>
+                        }
                         <MudChip T="string"
                                  Size="Size.Small"
                                  Variant="Variant.Text"
@@ -78,4 +92,14 @@
 
     private Task HandleSearchInput(ChangeEventArgs args)
         => SearchTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private static string BuildBoardClass(CommunityActivityBoardBundleDefinition? bundle)
+        => bundle is null
+            ? "platform-community-board-index__item"
+            : "platform-community-board-index__item platform-community-board-index__item--activity";
+
+    private static string BuildIconClass(CommunityActivityBoardBundleDefinition? bundle)
+        => bundle is null
+            ? "platform-community-board-index__icon"
+            : "platform-community-board-index__icon platform-community-board-index__icon--mountain";
 }

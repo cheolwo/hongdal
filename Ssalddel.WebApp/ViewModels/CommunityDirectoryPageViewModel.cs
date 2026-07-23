@@ -102,15 +102,22 @@ public sealed class CommunityDirectoryPageViewModel(
     private bool MatchesSearch(CommunityBoardSummaryResponse board)
     {
         var search = SearchText.Trim();
-        var activityDefinition = CommunityActivityBoardCatalog.FindBoard(board.BoardKey);
+        var activityBundle = CommunityActivityBoardCatalog.FindBundle(board.BoardKey);
         return search.Length == 0
                || board.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
                || board.Description.Contains(search, StringComparison.OrdinalIgnoreCase)
                || board.GroupDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
-               || activityDefinition is not null
-               && (activityDefinition.SourceName.Contains(search, StringComparison.OrdinalIgnoreCase)
-                   || activityDefinition.ProductVersion.Contains(search, StringComparison.OrdinalIgnoreCase)
-                   || activityDefinition.SourceKindDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
-                   || activityDefinition.RoadmapStage.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase));
+               || activityBundle is not null
+               && (activityBundle.ProductVersion.Contains(search, StringComparison.OrdinalIgnoreCase)
+                   || activityBundle.RoadmapStage.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                   || activityBundle.Activities.Any(activity =>
+                       activity.SourceName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                       || activity.ActivityDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                       || activity.SourceKindDisplayName.Contains(search, StringComparison.OrdinalIgnoreCase))
+                   || activityBundle.Pages.Any(page =>
+                       page.Surface.Contains(search, StringComparison.OrdinalIgnoreCase)
+                       || page.PageName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                       || page.Route.Contains(search, StringComparison.OrdinalIgnoreCase)
+                       || page.Responsibility.Contains(search, StringComparison.OrdinalIgnoreCase)));
     }
 }

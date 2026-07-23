@@ -194,6 +194,11 @@
         padding: 10px 12px;
     }
 
+    .platform-community-board-index__item--activity {
+        border-top: 3px solid color-mix(in srgb, var(--community-reading-accent, var(--mud-palette-primary)) 45%, transparent);
+        border-radius: 10px;
+    }
+
     .platform-community-board-index__item:hover,
     .platform-community-board-index__item:focus-visible,
     .platform-community-board-index__all:hover,
@@ -210,6 +215,19 @@
         border-radius: 4px;
         background: color-mix(in srgb, var(--community-reading-accent, var(--mud-palette-primary)) 8%, var(--community-reading-surface, var(--mud-palette-surface)));
         color: var(--community-reading-accent, var(--mud-palette-primary));
+    }
+
+    .platform-community-board-index__icon--mountain {
+        border-radius: 9px 9px 3px 3px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.45rem;
+        font-weight: 800;
+    }
+
+    .platform-community-board-index__activity {
+        color: var(--community-reading-accent, var(--mud-palette-primary));
+        font-size: 0.67rem;
+        font-weight: 700;
     }
 
     .platform-community-board-index__all > span:nth-child(2),
